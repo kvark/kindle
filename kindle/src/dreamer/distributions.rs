@@ -36,8 +36,7 @@ impl TwoHotBins {
         self.values.len()
     }
 
-    #[cfg(test)]
-    fn values(&self) -> &[f32] {
+    pub(super) fn values(&self) -> &[f32] {
         &self.values
     }
 

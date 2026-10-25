@@ -1,0 +1,96 @@
+{
+  "status": "complete",
+  "review_finished_utc": "2026-10-16T13:57:45.315368+00:00",
+  "actual_contracts": 54,
+  "selected_shader_keys": 9,
+  "actual_occurrences": {
+    "rgb": 342,
+    "cdp": 387
+  },
+  "typed_requests": 468,
+  "admissible_generic_requests": 459,
+  "existing_test_iterations_covered": 72,
+  "control_modules": 463,
+  "candidate_modules": 463,
+  "counts": {
+    "producer_values": 3833856,
+    "consumer_values": 7667712,
+    "affine_input_values": 442368,
+    "geometry_producer_values": 184320,
+    "independent_geometry_consumer_values": 184320
+  },
+  "negative_tests": [
+    "consumer-stride",
+    "consumer-layout",
+    "producer-address",
+    "missing-producer",
+    "short-capacity",
+    "rounding",
+    "barrier"
+  ],
+  "selected_shared_bytes_range": [
+    9728,
+    27648
+  ],
+  "newly_over_limit": [
+    {
+      "columns": 128,
+      "stage": 16,
+      "bytes": 4,
+      "at": false,
+      "bt": true,
+      "scratch": true,
+      "old_shared_bytes": 47104,
+      "new_shared_bytes": 54272,
+      "old_fits": true,
+      "new_fits": false
+    },
+    {
+      "columns": 128,
+      "stage": 32,
+      "bytes": 2,
+      "at": false,
+      "bt": true,
+      "scratch": true,
+      "old_shared_bytes": 47104,
+      "new_shared_bytes": 50176,
+      "old_fits": true,
+      "new_fits": false
+    }
+  ],
+  "requires_orientation_aware_runtime_storage_accounting": true,
+  "geometry_envelopes": 48,
+  "subgroup_width_cases": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128
+  ],
+  "retained_failure": {
+    "source": "/x/Code/kindle/runs/matrix-vector-contract-20261016.f8fnF2th/review.py",
+    "log": "/x/Code/kindle/runs/matrix-vector-contract-20261016.f8fnF2th/review.log",
+    "cause": "CPU reviewer expected 96 envelopes, but 2 columns x 2 K stages x 2 widths x 3 orientations x 2 scratch states is 48; prefetch does not change storage.",
+    "repair": "Correct only the envelope-count assertion/report and retain the original source/log.",
+    "gpu_repeats": 0
+  },
+  "gpu_calls": 0,
+  "backend_builds": 0,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "limits": [
+    "CPU address/type/emission feasibility, not GPU numerical or performance qualification",
+    "SPIR-V emitted through Naga; no standalone SPIR-V validator is installed",
+    "Other legal geometry envelopes are CPU coverage, not GPU selection or a timing sweep",
+    "Source vector stores do not prove fewer native instructions/conflicts or asynchronous loads",
+    "Explicit shared allocation is not opaque driver storage or register pressure"
+  ],
+  "artifact_root": "/x/Code/kindle/runs/matrix-vector-contract-20261016.f8fnF2th",
+  "source_seals": 1885,
+  "review_sha256": "92a26858ccd33c5d49f73d2320565923ba32b28f216c49296f478b9b49390085",
+  "audit_sha256": "894ed81f8bc9bbacaefa3860d0a460fc02cd4ef4f87fa935202cce0925be8e68",
+  "preparation_sha256": "efd01da6ad3f7060475f13143ec772db65856071ffd8ee5f478b6bea19cf8f9a"
+}

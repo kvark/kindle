@@ -1,0 +1,266 @@
+{
+  "status": "qualified",
+  "adopted_in_kindle": true,
+  "publication_checks": {
+    "native_configuration_and_pin_tests": 14,
+    "installed_binding_runner_tests": 193,
+    "both_dependency_locks_match": true,
+    "clippy_workspace_and_binding": "passed",
+    "python_extension_sha256": "e02ffcb88644bcd39153d9d67462bc44a87aeaf8ce1fa23c42f78c20afd56062"
+  },
+  "upstream_base": "20af998",
+  "standalone_candidate": "9d7caffd01a1f8d227e19f4b4f1ef144413541be",
+  "test_only_followup": {
+    "commit": "8a9baad73cbefee632768f3607452fe1aa0316e7",
+    "failed_ci": "https://github.com/kvark/meganeura/actions/runs/38265565595",
+    "failure": "Stale shader-selection expectation in vision::conv2d_grad_weight_selected_splits on both Metal and lavapipe",
+    "other_oracle_tests_passed_per_platform": 163,
+    "runtime_or_tolerances_changed": false,
+    "local_test": "vision::conv2d_grad_weight_selected_splits",
+    "status": "passed",
+    "test_seconds": 2.68,
+    "additional_allocation_warnings": 1,
+    "reviewed_validation_vuids": ["VUID-StandaloneSpirv-None-10684"],
+    "production_pin_unchanged": true
+  },
+  "integrated_control": "62fd7dc52343c463421d52a50d1e7478e3e6b659",
+  "integrated_candidate": "5a493322af7569a057f3c8db3ff73c1ca10680b2",
+  "blade": "663afd2194069af25c5be884e90c3d53e83a3973",
+  "naga": "c9fd6a85a87034ecb5a784611c6f90a14d8d50ce",
+  "pairs": {
+    "rgb": {
+      "arms": {
+        "control": {
+          "mean_update_ms": 61.02732692968754,
+          "median_update_ms": 60.928041,
+          "stages_ms": {
+            "behavior_train_and_sync": 3.60034940234375,
+            "imagination_and_targets": 13.67008891015625,
+            "posterior": 7.13442361328125,
+            "world_train_and_sync": 36.62246500390625
+          },
+          "minimum_sampled_headroom_bytes": 14715518976,
+          "reported_meganeura_revision": "62fd7dc52343c463421d52a50d1e7478e3e6b659"
+        },
+        "candidate": {
+          "mean_update_ms": 56.057886003906255,
+          "median_update_ms": 56.0210165,
+          "stages_ms": {
+            "behavior_train_and_sync": 3.62010792578125,
+            "imagination_and_targets": 13.7037173828125,
+            "posterior": 7.10144180078125,
+            "world_train_and_sync": 31.63261889453125
+          },
+          "minimum_sampled_headroom_bytes": 14715518976,
+          "reported_meganeura_revision": "5a493322af7569a057f3c8db3ff73c1ca10680b2"
+        }
+      },
+      "exact_reports": 272,
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "refresh_matches_retained_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "exact_plan_hashes": {
+        "posterior": "24f5465c5c53889d4f4b256a8472021885e33243fa34c40d59b274fd0a210c6a",
+        "imagination": "5156f811b08f4395ab974c014b73bc60f2247781f528f2484dd26b9d8cf3cef1",
+        "world_gradient": "dfbc5d16625850a742a44676b4ef97b2bb96fbb57252efae657dc61bbfb7b054",
+        "behavior_gradient": "86698f397c977c1449e844b24d5527303d6bb25db45c15de7a9859661efc103d",
+        "slow_value": "001cc5ef0fae7a6fd590b38ef4906d2cda1135f7b5ca845c6c227af68e51d73f"
+      },
+      "changed_dispatches": [
+        {
+          "index": 2482,
+          "old": [
+            50,
+            1,
+            128
+          ],
+          "new": [
+            25,
+            1,
+            128
+          ]
+        },
+        {
+          "index": 2499,
+          "old": [
+            75,
+            2,
+            32
+          ],
+          "new": [
+            38,
+            1,
+            32
+          ]
+        },
+        {
+          "index": 4118,
+          "old": [
+            50,
+            3,
+            32
+          ],
+          "new": [
+            25,
+            2,
+            32
+          ]
+        },
+        {
+          "index": 4130,
+          "old": [
+            5,
+            2,
+            128
+          ],
+          "new": [
+            3,
+            1,
+            128
+          ]
+        }
+      ],
+      "short_export_exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "less_time_pct": 8.142976557873515
+    },
+    "cdp": {
+      "arms": {
+        "control": {
+          "mean_update_ms": 135.07009000000002,
+          "median_update_ms": 134.9715355,
+          "stages_ms": {
+            "behavior_train_and_sync": 9.8561957265625,
+            "imagination_and_targets": 54.221193160156254,
+            "posterior": 16.65235830078125,
+            "world_train_and_sync": 54.3403428125
+          },
+          "minimum_sampled_headroom_bytes": 11290017792,
+          "reported_meganeura_revision": "62fd7dc52343c463421d52a50d1e7478e3e6b659"
+        },
+        "candidate": {
+          "mean_update_ms": 126.73897826562502,
+          "median_update_ms": 126.63165950000001,
+          "stages_ms": {
+            "behavior_train_and_sync": 9.8990434453125,
+            "imagination_and_targets": 54.218098828125,
+            "posterior": 16.67926328125,
+            "world_train_and_sync": 45.9425727109375
+          },
+          "minimum_sampled_headroom_bytes": 11290017792,
+          "reported_meganeura_revision": "5a493322af7569a057f3c8db3ff73c1ca10680b2"
+        }
+      },
+      "exact_reports": 272,
+      "exact_tensors": {
+        "initial": 346,
+        "first": 346,
+        "final": 346
+      },
+      "refresh_matches_retained_tensors": {
+        "initial": 346,
+        "first": 346,
+        "final": 346
+      },
+      "exact_plan_hashes": {
+        "posterior": "60e997a8dfb4f70e1db99e1414502abed63defcc98bdad30958c6438abf3ac87",
+        "imagination": "29a7b63d6cfd2e038819b2a7b14e2d7beec138281e452f143cc372f4b471a2e2",
+        "world_gradient": "ded288b37fd95ccd0ebb998115e2ad5e423c354ecd3610f8cf03e0dbd6e420f6",
+        "behavior_gradient": "c8d03d75284b3dbe330e78b3f0191da8ac0cb106422b199b325ee2dc1a3325e5",
+        "slow_value": "44289fbc60e785892ad38539c84af74f568d0aff01f0b3e5e063f46be6cac6b4"
+      },
+      "changed_dispatches": [
+        {
+          "index": 4123,
+          "old": [
+            50,
+            3,
+            128
+          ],
+          "new": [
+            25,
+            2,
+            128
+          ]
+        },
+        {
+          "index": 4135,
+          "old": [
+            5,
+            2,
+            512
+          ],
+          "new": [
+            3,
+            1,
+            512
+          ]
+        }
+      ],
+      "short_export_exact_tensors": {
+        "initial": 346,
+        "first": 346,
+        "final": 346
+      },
+      "less_time_pct": 6.1679915474810105
+    }
+  },
+  "guards": [
+    "upstream-qualification/split_weight_gradients_and_every_partial_match_full_f64_oracles",
+    "upstream-qualification/split_weight_gradients_preserve_optimizer_updates_with_and_without_aliasing",
+    "refresh-qualification/bf16",
+    "refresh-qualification/bf16-convolution",
+    "refresh-qualification/row-addressing",
+    "refresh-qualification/subtile",
+    "final-queue/candidate-split_weight_gradients_and_every_partial_match_full_f64_oracles",
+    "final-queue/candidate-split_weight_gradients_preserve_optimizer_updates_with_and_without_aliasing",
+    "final-queue/cdp-candidate",
+    "final-queue/cdp-control",
+    "final-queue/rgb-candidate",
+    "final-queue/rgb-control",
+    "plan-queue/plan-cdp-candidate",
+    "plan-queue/plan-cdp-control",
+    "plan-queue/plan-rgb-candidate",
+    "plan-queue/plan-rgb-control",
+    "oracle-qualification/selected-splits-oracle"
+  ],
+  "allocation_warnings": 4,
+  "binaries": {
+    "upstream-tests": "02b12c221611a157fc6044e712b5de5122743525c49262a272dc0d4df3dd39db",
+    "control-backend-tests": "a6852d35e0b924600155baffe69c6a102e86a5017c1eab2416da4fb9aceda01b",
+    "candidate-backend-tests": "5c4c8a4a0a31afd274df1d893ab10051ba300b02cffe46530ef1642b2da49f85",
+    "control-labelled-kindle-tests": "569e4d9a8652d04e6e72a55094d9de9a89805a0771b8740bfd47782e67dacdaa",
+    "candidate-kindle-tests": "d17e85131455f5526bfddd736ae6901bfa5377224756bc52ed3a3d47d8f0a9ca",
+    "oracle-tests": "980acc5b7759fd2a1843141af0b3afc73944d6ac42852ca6178453e6494d1dea"
+  },
+  "game_actions": 0,
+  "full_jax_gap_closed": false,
+  "ordinary_sm_utilization": null,
+  "plan_export_extra_synthetic_updates": 96,
+  "ordinary_timing_repeated": false,
+  "raw_root": "runs/split-conv-tiles-20261012.exkYhrAF",
+  "upstream_pr": "https://github.com/kvark/meganeura/pull/255",
+  "audit_wall_seconds": 96.65,
+  "audit_memory_peak": "1.3 GiB",
+  "patch_id": "61f7a4c233a4f97aacd7b5b9d044b6c1faebadf1",
+  "limits": [
+    "Synthetic fixed-batch updates, not learning or time-to-score evidence",
+    "Prior Nsight failure and rejected PR248 remain unchanged",
+    "No Tensor Core convolution weight-gradient implementation in this patch",
+    "Existing cached scalar plans remain valid but retain their old tile selection",
+    "Four short plan exports retain 96 extra synthetic updates, not new ordinary timings",
+    "CPU packaging and missing-export audit failures retained",
+    "Upstream CI974 stale oracle expectation failure and test-only correction retained; no runtime repin",
+    "Full JAX gap and ordinary SM utilization remain open"
+  ]
+}

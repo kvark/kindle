@@ -1,0 +1,208 @@
+{
+  "status": "complete",
+  "root": "runs/convolution-backend-20261014.rB3ZvdJX",
+  "reviews": [
+    "ordinary-review.json",
+    "counters-review.json",
+    "counter-summary.json",
+    "capabilities.json"
+  ],
+  "native_sha256": "9bd001c7671d4b83871096bc78683f8b46f78b290665cea9bc424baf94a67518",
+  "cuda_sha256": "06b1993708bb77f348e77b6b22389c2f1f62c18547eb1a68018240491169ba1c",
+  "capabilities_sha256": "dd1b1cb58210619499ff9e2f3c43f86afa221243ef1d9ea4180790c87c4fce18",
+  "shape": {
+    "batch": 512,
+    "input_channels": 32,
+    "output_channels": 48,
+    "height": 32,
+    "width": 32,
+    "kernel": 5,
+    "stride": 1,
+    "padding": 2,
+    "dw_partitions": 128,
+    "output_tile": [
+      32,
+      32
+    ],
+    "threads": 128,
+    "k_stage": 32,
+    "accumulation": "F32",
+    "operands": "BF16"
+  },
+  "reports": [
+    {
+      "name": "encoder-dx",
+      "elements": 16777216,
+      "native_gpu_ms": 2.14780275,
+      "native_wall_ms": 2.1514193671874997,
+      "native_recording_ms": 0.0023877578125,
+      "cuda_gpu_ms": 1.8715842962265,
+      "cuda_wall_ms": 1.871671765625,
+      "cuda_extra_vs_native_percent": -12.860513088247982,
+      "within_10_percent_band": false,
+      "exact_all_outputs": true,
+      "f64_coordinates_per_backend": 128,
+      "exact_descriptors_and_pipelines": true,
+      "retained_cudnn_primitive_ms": 0.479327625,
+      "cuda_counters": {
+        "profiled_ms": 1.867296,
+        "warp_instructions": 1006803968,
+        "integer_warp_instructions": 585456640,
+        "integer_fraction": 0.5815001317118369,
+        "tensor_active_percent": 8.98222,
+        "occupancy_percent": 81.678003,
+        "l1tex_percent": 64.581932,
+        "dram_percent": 6.540852,
+        "registers_per_thread": 48,
+        "local_spilling_requests": 0,
+        "profiler_passes": 17
+      }
+    },
+    {
+      "name": "encoder-dw",
+      "elements": 38400,
+      "native_gpu_ms": 2.019144,
+      "native_wall_ms": 2.024241734375,
+      "native_recording_ms": 0.0036637890625,
+      "cuda_gpu_ms": 2.441455841064453,
+      "cuda_wall_ms": 2.4415265234375,
+      "cuda_extra_vs_native_percent": 20.915389940710185,
+      "within_10_percent_band": false,
+      "exact_all_outputs": true,
+      "f64_coordinates_per_backend": 128,
+      "exact_descriptors_and_pipelines": true,
+      "retained_cudnn_primitive_ms": 0.5495440625,
+      "cuda_counters": {
+        "profiled_ms": 2.402176,
+        "warp_instructions": 1104588800,
+        "integer_warp_instructions": 636774400,
+        "integer_fraction": 0.5764809492908131,
+        "tensor_active_percent": 9.131296,
+        "occupancy_percent": 32.777111,
+        "l1tex_percent": 78.559375,
+        "dram_percent": 4.743692,
+        "registers_per_thread": 128,
+        "local_spilling_requests": 0,
+        "profiler_passes": 17
+      }
+    }
+  ],
+  "cooperative_matrix2": {
+    "advertised_flexible_type_records": 25,
+    "status": "complete",
+    "device": "NVIDIA GeForce RTX 5080",
+    "vendor_id": 4318,
+    "device_id": 11266,
+    "api_version": 4211000,
+    "driver_version": 2435612928,
+    "matrix2_extension": 1,
+    "bfloat16_extension": 1,
+    "minimum_sampled_headroom_bytes": 16594173952,
+    "features": {
+      "workgroup_scope": 1,
+      "flexible_dimensions": 1,
+      "reductions": 1,
+      "conversions": 1,
+      "per_element_operations": 1,
+      "tensor_addressing": 1,
+      "block_loads": 1
+    },
+    "limits": {
+      "max_workgroup_size": 256,
+      "max_dimension": 1024,
+      "reserved_shared_bytes": 8192
+    },
+    "logical_devices_created": 0,
+    "dispatches": 0,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "bf16_workgroup_granularities": [
+      {
+        "m": 16,
+        "n": 16,
+        "k": 16,
+        "a": 1000141000,
+        "b": 1000141000,
+        "c": 1,
+        "result": 1,
+        "saturating": 0,
+        "scope": 2,
+        "workgroup_invocations": 32
+      },
+      {
+        "m": 16,
+        "n": 16,
+        "k": 16,
+        "a": 1000141000,
+        "b": 1000141000,
+        "c": 1,
+        "result": 1,
+        "saturating": 0,
+        "scope": 2,
+        "workgroup_invocations": 64
+      },
+      {
+        "m": 32,
+        "n": 16,
+        "k": 16,
+        "a": 1000141000,
+        "b": 1000141000,
+        "c": 1,
+        "result": 1,
+        "saturating": 0,
+        "scope": 2,
+        "workgroup_invocations": 128
+      },
+      {
+        "m": 32,
+        "n": 32,
+        "k": 16,
+        "a": 1000141000,
+        "b": 1000141000,
+        "c": 1,
+        "result": 1,
+        "saturating": 0,
+        "scope": 2,
+        "workgroup_invocations": 256
+      }
+    ],
+    "source_support": {
+      "naga_revision": "a97559b6318dc0a857ace502ffc7f3e442951f39",
+      "naga_writer_sha256": "9ffc990a76e7f2a133edbdd841399ab75e9dd938a653650b18ddf1008746f963",
+      "blade_init_sha256": "5c1f037268ff0b29987fc9e4834599970056e355af1bcd5893f3a266149f7409",
+      "naga_matrix_scope": "hard-coded Subgroup",
+      "blade_matrix2_feature_path": false
+    },
+    "performance_qualified": false
+  },
+  "accounting": {
+    "guards_passed": 5,
+    "allocation_warnings": 1,
+    "native_operation_calls": 292,
+    "cuda_operation_calls": 330,
+    "cuda_profiler_captures": 2,
+    "cuda_profiler_passes_per_capture": 17,
+    "exact_output_value_checks": 50446848,
+    "f64_checks": 512,
+    "synthetic_updates": 0,
+    "game_actions": 0,
+    "minimum_sampled_headroom_bytes": 16213671936,
+    "active_workers": 0
+  },
+  "limits": [
+    "Both source translations fail the within-10% native timing band; CUDA counters are not native counters or a native time model.",
+    "Retained cuDNN primitive timings are not a fresh pair; both miniature tunings differ from the full JAX executable.",
+    "No locked clocks/cache state, native occupancy claim, learning change or production promotion.",
+    "Capability query creates only a Vulkan instance; no logical device, allocation, pipeline, feature enablement or shader execution.",
+    "Cooperative-matrix2 support is not a speedup, numerical or convolution-mapping qualification."
+  ],
+  "current_full_update": {
+    "source": "docs/results/2026-10-14-convolution-scheduling.json",
+    "native_ms": 60.041187437500014,
+    "retained_jax_ms": 26.63169575862412,
+    "new_measurement": false,
+    "production_changed": false
+  },
+  "next": "Bounded native proof of compiler-managed workgroup matrix loads/staging, with independent numerics and full operation cost, before Naga/Blade/Meganeura feature work. No tile sweep or automatic production promotion.",
+  "root_cause_goal_complete": false
+}

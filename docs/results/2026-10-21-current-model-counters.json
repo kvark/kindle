@@ -1,0 +1,194 @@
+{
+  "status": "qualified_grouped_counters",
+  "date": "2026-10-21",
+  "driver": "615.71.09",
+  "retained_native": "72005c8b536bedf02543676e2be04e7d55f18a10e7c5b6975a63506cdc642faf",
+  "observer_native": "1a6a88b6a648551d7d15ad6552c7baf53244c561a24553bcace9c92506c2e125",
+  "production_changed": false,
+  "atari_started": false,
+  "ordinary_timing_scope": "retained current-driver profile, not remeasured here",
+  "ordinary_ms": {
+    "rgb": 48.442387347656265,
+    "cdp": 41.893398535156216,
+    "jax_inclusive": 26.066381933361527
+  },
+  "workloads": {
+    "rgb": {
+      "dispatches": 3751,
+      "groups": 1112,
+      "range_count": 36,
+      "counter_passes": 50,
+      "exact_state_pairs": {
+        "initial": 292,
+        "first": 292,
+        "frozen": 292
+      },
+      "exact_output_values": 1310729,
+      "protected_buffers": 813,
+      "shader_files": 205,
+      "offline_metrics": 2088,
+      "classes": {
+        "convolution": {
+          "sm__ctas_launched.sum": 283600,
+          "smsp__inst_executed.sum": 11486508928,
+          "smsp__inst_executed_pipe_alu.sum": 6657970816,
+          "smsp__inst_executed_pipe_tensor.sum": 180224000,
+          "smsp__inst_executed_pipe_lsu.sum": 1136913024,
+          "smsp__thread_inst_executed.sum": 360735502317,
+          "dram__bytes.sum": 1749503488,
+          "lts__t_bytes.sum": 15398793248,
+          "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0,
+          "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0
+        },
+        "other": {
+          "sm__ctas_launched.sum": 1410877,
+          "smsp__inst_executed.sum": 1534845049,
+          "smsp__inst_executed_pipe_alu.sum": 629883186,
+          "smsp__inst_executed_pipe_tensor.sum": 6717440,
+          "smsp__inst_executed_pipe_lsu.sum": 209905138,
+          "smsp__thread_inst_executed.sum": 48353137833,
+          "dram__bytes.sum": 3825893888,
+          "lts__t_bytes.sum": 8587494400,
+          "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0,
+          "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0
+        }
+      },
+      "cache_recording_replays": [
+        1,
+        49
+      ],
+      "counter_data_bytes": 18969644
+    },
+    "cdp": {
+      "dispatches": 763,
+      "groups": 522,
+      "range_count": 21,
+      "counter_passes": 50,
+      "exact_state_pairs": {
+        "initial": 346,
+        "first": 346,
+        "frozen": 346
+      },
+      "exact_output_values": 44964352,
+      "protected_buffers": 210,
+      "shader_files": 225,
+      "offline_metrics": 1218,
+      "classes": {
+        "base": {
+          "sm__ctas_launched.sum": 1640,
+          "smsp__inst_executed.sum": 1255738,
+          "smsp__inst_executed_pipe_alu.sum": 446386,
+          "smsp__inst_executed_pipe_tensor.sum": 2048,
+          "smsp__inst_executed_pipe_lsu.sum": 216884,
+          "smsp__thread_inst_executed.sum": 38668713,
+          "dram__bytes.sum": 2105088,
+          "lts__t_bytes.sum": 3918816,
+          "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0,
+          "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0
+        },
+        "mixed": {
+          "sm__ctas_launched.sum": 4823437,
+          "smsp__inst_executed.sum": 3538837969,
+          "smsp__inst_executed_pipe_alu.sum": 1329047798,
+          "smsp__inst_executed_pipe_tensor.sum": 62334976,
+          "smsp__inst_executed_pipe_lsu.sum": 597161738,
+          "smsp__thread_inst_executed.sum": 110527770324,
+          "dram__bytes.sum": 7340768256,
+          "lts__t_bytes.sum": 17600625024,
+          "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0,
+          "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0
+        }
+      },
+      "cache_recording_replays": [
+        1,
+        49
+      ],
+      "counter_data_bytes": 11068964
+    }
+  },
+  "historical_native_comparison": {
+    "sm__ctas_launched.sum": {
+      "old": 283600,
+      "current": 283600,
+      "ratio": 1
+    },
+    "smsp__inst_executed.sum": {
+      "old": 10295818368,
+      "current": 11486508928,
+      "ratio": 1.115647976434854
+    },
+    "smsp__inst_executed_pipe_alu.sum": {
+      "old": 6818554368,
+      "current": 6657970816,
+      "ratio": 0.976449032546601
+    },
+    "smsp__inst_executed_pipe_tensor.sum": {
+      "old": 180224000,
+      "current": 180224000,
+      "ratio": 1
+    },
+    "smsp__inst_executed_pipe_cbu.sum": {
+      "old": 25593280,
+      "current": 464484288,
+      "ratio": 18.148681528901335
+    },
+    "smsp__inst_executed_pipe_lsu.sum": {
+      "old": 774339200,
+      "current": 1136913024,
+      "ratio": 1.4682364317859666
+    }
+  },
+  "comparison_scope": "historical580 versus current615; not driver-only intervention",
+  "cdp_ownership": {
+    "mixed_base_bonus": 19,
+    "base_only": 1
+  },
+  "compiler_audit": {
+    "scope": "reconstructed real bindings and release compiler inputs, not captured driver payload or SASS",
+    "occurrences": 23,
+    "unique_sources": 8,
+    "exact_pairs": 23,
+    "changed": [],
+    "finished_utc": "2026-10-21T09:37:26.223379+00:00"
+  },
+  "cpu_cdp_partition": {
+    "scope": "CPU-only potential partition; captured mixed metrics unchanged",
+    "range_count": 6,
+    "dispatch_ownership": {
+      "mixed": 130,
+      "base": 633
+    },
+    "bonus_dispatch_ownership": {
+      "mixed": 82,
+      "base": 0
+    }
+  },
+  "failures": {
+    "original_per_kernel_capture": "failed; eight CTA mismatches, post-capture gates missing; CDP unstarted",
+    "prefix_reader": "missing math import; separate CPU-only repair",
+    "region_annotations": "25 stale merged CTA annotations; actual hardware acceptance sums all dispatches and passes",
+    "failure_log_snapshot": "guard output truncated; capture_incomplete event retained"
+  },
+  "guards": {
+    "passing": 4,
+    "failed": 1
+  },
+  "warnings": 0,
+  "synthetic_updates": 51,
+  "counter_replays": 150,
+  "ordinary_fixed_replays": 53,
+  "game_actions": 0,
+  "cleanup": {
+    "files": 105,
+    "bytes": 1425383820,
+    "selected_and_sealed_artifacts_preserved": true,
+    "rebuildable": true
+  },
+  "source_receipts_verified": 2135,
+  "artifacts": {
+    "observer": "runs/current-model-counters-20261021.4x0Qqjih",
+    "repaired": "runs/current-model-counters-20261021.4x0Qqjih/barrier-fix.rbhNWlXL",
+    "compiler": "runs/convolution-compiler-inputs-20261021.K66zrHCS"
+  },
+  "finished_utc": "2026-10-21T09:41:35.892234+00:00"
+}

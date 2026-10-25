@@ -1,0 +1,263 @@
+{
+  "status": "complete",
+  "artifact_root": "runs/matrix-library-20261014.vBSvjn7s",
+  "operations": [
+    {
+      "name": "dense-rows",
+      "elements": 2048,
+      "native_gpu_pass_us": 10.59975,
+      "native_zero_work_us": 4.239000000000001,
+      "native_dispatches": 2,
+      "jax_kernel_us": 3.3960000000000004,
+      "jax_copy_us": 0.0,
+      "jax_kernels": 2.0,
+      "jax_copies": 0.0,
+      "jax_gemm_beta": 0,
+      "native_host_batch_us_per_call": 12.776515625,
+      "jax_profiled_process_host_batch_us_per_call": 31.707548259873874
+    },
+    {
+      "name": "dense-gradient",
+      "elements": 524288,
+      "native_gpu_pass_us": 8.31775,
+      "native_zero_work_us": 2.10025,
+      "native_dispatches": 1,
+      "jax_kernel_us": 5.0260625,
+      "jax_copy_us": 0.0,
+      "jax_kernels": 2.0,
+      "jax_copies": 0.0,
+      "jax_gemm_beta": 0,
+      "native_host_batch_us_per_call": 9.5738359375,
+      "jax_profiled_process_host_batch_us_per_call": 28.374781322781928
+    },
+    {
+      "name": "grouped-gradient",
+      "elements": 2097152,
+      "native_gpu_pass_us": 20.705750000000002,
+      "native_zero_work_us": 4.18975,
+      "native_dispatches": 2,
+      "jax_kernel_us": 11.004125,
+      "jax_copy_us": 0.0,
+      "jax_kernels": 2.0,
+      "jax_copies": 0.0,
+      "jax_gemm_beta": 0,
+      "native_host_batch_us_per_call": 22.811148437499998,
+      "jax_profiled_process_host_batch_us_per_call": 19.62799251487013
+    },
+    {
+      "name": "grouped-forward",
+      "elements": 49152,
+      "native_gpu_pass_us": 10.35725,
+      "native_zero_work_us": 2.0715,
+      "native_dispatches": 1,
+      "jax_kernel_us": 3.93,
+      "jax_copy_us": 0.0,
+      "jax_kernels": 1.0,
+      "jax_copies": 0.0,
+      "jax_gemm_beta": 0,
+      "native_host_batch_us_per_call": 11.621203125,
+      "jax_profiled_process_host_batch_us_per_call": 17.439373550587334
+    }
+  ],
+  "counters": [
+    {
+      "arm": "cuda-profile",
+      "warp_instructions": 1772544,
+      "integer_instructions": 858624,
+      "global_load_instructions": 98304,
+      "shared_store_instructions": 101376,
+      "tensor_instructions": 24576,
+      "profile_kernel_us": 10.784,
+      "achieved_occupancy_pct": 18.91838,
+      "tensor_pipeline_pct": 3.81041,
+      "grid": "(1, 24, 8)",
+      "block": "(128, 1, 1)",
+      "selected_instruction_forms": [
+        {
+          "label": "STS.U16",
+          "count": 98304
+        },
+        {
+          "label": "LDG.E.U16",
+          "count": 98304
+        },
+        {
+          "label": "HMMA.16816.F32.BF16",
+          "count": 24576
+        },
+        {
+          "label": "STS.64",
+          "count": 3072
+        }
+      ]
+    },
+    {
+      "arm": "library-profile",
+      "warp_instructions": 520704,
+      "integer_instructions": 164352,
+      "global_load_instructions": 16896,
+      "shared_store_instructions": 15360,
+      "tensor_instructions": 24576,
+      "profile_kernel_us": 4.608,
+      "achieved_occupancy_pct": 18.452529,
+      "tensor_pipeline_pct": 8.947138,
+      "grid": "(8, 3, 8)",
+      "block": "(128, 1, 1)",
+      "selected_instruction_forms": [
+        {
+          "label": "HMMA.16816.F32.BF16",
+          "count": 24576
+        },
+        {
+          "label": "LDG.E.LTC128B.128",
+          "count": 15360
+        },
+        {
+          "label": "STS.128",
+          "count": 12288
+        },
+        {
+          "label": "STS.64",
+          "count": 3072
+        },
+        {
+          "label": "LDG.E",
+          "count": 1536
+        }
+      ]
+    }
+  ],
+  "cuda_translation_event_us": 10.3240003809375,
+  "exact_native_f64_values": 2672640,
+  "exact_matched_library_values": 2672640,
+  "additional_counter_output_comparisons": 344064,
+  "full_hlo_contracts": [
+    {
+      "name": "dense-rows",
+      "matches": [
+        {
+          "module": "command_buffer.40",
+          "node": "custom-call.94",
+          "output_dtype": "bf16",
+          "beta": 0,
+          "invocations": 16,
+          "transposed_product": false
+        }
+      ]
+    },
+    {
+      "name": "dense-gradient",
+      "matches": [
+        {
+          "module": "command_buffer.36",
+          "node": "cublas-gemm.10",
+          "output_dtype": "f32",
+          "beta": 1,
+          "invocations": 16,
+          "transposed_product": false
+        }
+      ]
+    },
+    {
+      "name": "grouped-gradient",
+      "matches": [
+        {
+          "module": "command_buffer.36",
+          "node": "cublas-batch-gemm.4",
+          "output_dtype": "f32",
+          "beta": 1,
+          "invocations": 16,
+          "transposed_product": false
+        }
+      ]
+    },
+    {
+      "name": "grouped-forward",
+      "matches": [
+        {
+          "module": "command_buffer.42",
+          "node": "cublas-batch-gemm.17",
+          "output_dtype": "bf16",
+          "beta": 1,
+          "invocations": 16,
+          "transposed_product": true
+        }
+      ]
+    }
+  ],
+  "native_matrix_output_storage": {
+    "BF16": 247,
+    "F32": 469
+  },
+  "jax_matrix_output_storage": {
+    "bf16": 456,
+    "f32": 96
+  },
+  "output_histograms_not_one_to_one_mapping": true,
+  "failed_additional_bf16_control": {
+    "exact_gate_passed": false,
+    "maximum_absolute_error": 0.0625,
+    "capture_started": false,
+    "not_a_matched_performance_result": true
+  },
+  "passing_guards": 5,
+  "failed_guards_retained": 2,
+  "allocation_warnings": 0,
+  "bridge": [
+    {
+      "name": "ordinary",
+      "status": "complete",
+      "calls": 146,
+      "profiled_launches": 0,
+      "exact_native_elements": 49152,
+      "changed_input_checked": true,
+      "minimum_sampled_headroom_bytes": 16594173952,
+      "game_actions": 0,
+      "synthetic_updates": 0,
+      "profiler_replays_not_in_call_count": false
+    },
+    {
+      "name": "cuda-profile",
+      "status": "complete",
+      "calls": 19,
+      "profiled_launches": 1,
+      "exact_native_elements": 49152,
+      "changed_input_checked": true,
+      "minimum_sampled_headroom_bytes": 16594173952,
+      "game_actions": 0,
+      "synthetic_updates": 0,
+      "profiler_replays_not_in_call_count": true
+    },
+    {
+      "name": "library-profile",
+      "status": "complete",
+      "calls": 17,
+      "profiled_launches": 1,
+      "exact_native_elements": 49152,
+      "changed_input_checked": false,
+      "minimum_sampled_headroom_bytes": 16594173952,
+      "game_actions": 0,
+      "synthetic_updates": 0,
+      "profiler_replays_not_in_call_count": true
+    }
+  ],
+  "native_calls": 1170,
+  "failed_native_calls": 292,
+  "jax_calls": 650,
+  "failed_jax_calls": 147,
+  "additional_bridge_calls": 182,
+  "profiler_replays_not_in_call_count": true,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "minimum_sampled_headroom_bytes": 7955873792,
+  "native_sha256": "495855c22d53ebc035cd15b7265b2806ff6133db1c83ef6751ba7d5a14fae3ef",
+  "cuda_translation_sha256": "87ffceea50200461ff896b49eb56d5e52b24eca978f552f71544730d5ce708bd",
+  "backend_patch_sha256": "076e47f1db8580d57826f87f7b1f35d2c80244ffd30bd063c241d9fb9c5430d1",
+  "full_hlo_sha256": "1f51f0c5c233068bc0215cbc32a10fc070660cb0afb059d17654b0d02236b52c",
+  "retained_complete_rgb_ms": 24.339903566406242,
+  "retained_complete_jax_ms": 12.836475,
+  "fresh_whole_update_timing": false,
+  "production_changed": false,
+  "workers_remaining": false,
+  "interpretation": "Matched matrix contracts and CUDA-translation counters, not Vulkan instruction measurements, full-executable algorithm parity or a whole-update speedup."
+}

@@ -1,0 +1,87 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-17T02:43:42.107543+00:00",
+  "gpu_calls": 0,
+  "builds": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "world_checks": [
+    {
+      "workload": "rgb",
+      "queries": 1137,
+      "cached_chunks": 5,
+      "world_groups": 1112,
+      "within_group_barriers": 20,
+      "within_chunk_group_barriers": 1107,
+      "replaced_group_edges": 4,
+      "max_chunk_queries": 256,
+      "interval_counts": {
+        "other": 1115,
+        "convolution": 17
+      }
+    },
+    {
+      "workload": "cdp",
+      "queries": 1130,
+      "cached_chunks": 5,
+      "world_groups": 1117,
+      "within_group_barriers": 8,
+      "within_chunk_group_barriers": 1112,
+      "replaced_group_edges": 4,
+      "max_chunk_queries": 264,
+      "interval_counts": {
+        "other": 1117,
+        "convolution": 8
+      }
+    }
+  ],
+  "lifecycle_negative_checks": [
+    "wait_timeout",
+    "wait_device_error",
+    "swallowed_wait_none",
+    "wrong_pool_owner",
+    "old_available_generation",
+    "unavailable_current_generation"
+  ],
+  "retained_trace": {
+    "updates": 272,
+    "intervals": 6775,
+    "stage_intersections": 1088,
+    "retained_crossing_ns": 2107,
+    "added_intermediate_waits": 3
+  },
+  "required_implementation_conditions": [
+    "Keep normal context/pass timing disabled; use separate cached-secondary pools.",
+    "Check success from the existing wait, not its currently discarded return or Option<timings>. No added wait.",
+    "Match pool owner and execution generation; query availability alone permits stale replay results.",
+    "Export actual non-world groups and all command projections; their retained plans contain no groups.",
+    "Normal timing-disabled context does not enable calibrated timestamps. Report intra-secondary elapsed intervals only; no calibrated host/global overlap claim.",
+    "ALL_COMMANDS writes add their own execution dependencies; measure overhead even with unchanged original barriers and submissions.",
+    "Keep independently issued convolutions together: 23 RGB products occupy 17 existing intervals, not 23 isolated kernel times."
+  ],
+  "query_upper_bounds": {
+    "rgb": 4700,
+    "cdp": 5119
+  },
+  "retained_failures": [
+    "Original CPU source-variant count confused 20 shape contracts with 18 enum variants; explicit-set reader passes."
+  ],
+  "source_seals_checked": 29,
+  "date": "2026-10-17",
+  "artifact_root": "runs/boundary-timing-contract-20261017.Uhh6GIP0",
+  "qualified_native": "e45b9c433d88b3bf6467ae253a22b2bf188e7ee24a85a8300a7b11d01c9e419e",
+  "native_rgb_ms": 43.196506554687524,
+  "inclusive_jax_ms": 27.22256929610012,
+  "ratio": 1.5867902138420056,
+  "review_sha256": "9f2d8b51f3f0d317e166fa32f28bde5380d5394c6a4e9f5d2b809f771483df0e",
+  "audit_sha256": "a1788905ce51f79f42e9ee680c7cd0b953b1c8d27d72cb68b4515bc66ed4ce34",
+  "command_projection_pairs": 10,
+  "lifecycle_model_executions": 2176,
+  "lifecycle_model_updates": 272,
+  "audit_negative_checks": 16,
+  "review_negative_checks": 6,
+  "duration_positive_checks": 3,
+  "current_gpu_timing_implemented": false,
+  "production_changed": false,
+  "decision": "CPU contract passes; implement isolated observer and verify actual commands/lifetimes before a separate bounded qualification, not yet GPU allocation."
+}

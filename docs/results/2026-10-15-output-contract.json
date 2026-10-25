@@ -1,0 +1,95 @@
+{
+  "status": "complete_cpu_feasibility",
+  "root": "runs/output-contract-20261015.PkiE0hzR",
+  "current_whole_update": {
+    "native_ms": 51.944966918,
+    "jax_inclusive_ms": 27.222569,
+    "ratio": 1.9081581506139262,
+    "remeasured": false
+  },
+  "gpu_calls": 0,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "production_changed": false,
+  "naga_changed": false,
+  "current_occurrences": 23,
+  "distinct_contracts": 20,
+  "output_elements": 280985600,
+  "fragment_elements_including_discarded": 378339328,
+  "rounding": {
+    "values": 1441792,
+    "nan_values": 5624,
+    "all_high_bit_patterns": true,
+    "tie_even": true,
+    "signed_zero": true,
+    "finite_overflow": true,
+    "nan_quiet_payload_bits": true,
+    "gpu_conversion_exceptional_values_qualified": false
+  },
+  "direct_store": {
+    "typed_spirv_modules": 9,
+    "explicit_output_scratch_bytes": 0,
+    "naga_reduced_constructor_supported": false,
+    "requires_unexposed_tensor_store_and_conversion": true
+  },
+  "segmented_store": {
+    "typed_naga_ir_variants": 9,
+    "explicit_output_scratch_bytes": 4096,
+    "supported_without_new_builtins": true,
+    "barrier_orders": 576,
+    "barriers_per_phase": 2,
+    "gpu_and_spirv_qualified": false
+  },
+  "negative_checks": 7,
+  "explicit_limit_bytes": 49152,
+  "library_tiles_known": 22,
+  "resource_fit_counts": {
+    "padded_two_slots_plus_full_output": 3,
+    "padded_two_slots_plus_fragment": 9,
+    "padded_two_slots_direct_output": 13,
+    "unpadded_two_slots_plus_fragment": 18,
+    "unpadded_two_slots_direct_output": 22
+  },
+  "logical_state_warning": {
+    "occurrences": 4,
+    "values_per_compute_lane": 384,
+    "current_checked": 24,
+    "current_packed": 96,
+    "measured_registers_or_spills": false,
+    "compensation_removal_trial_remains_rejected": "docs/results/2026-10-14-accumulation-cost.md"
+  },
+  "cpu_services": {
+    "original_failure_wall_seconds": 1.102,
+    "repaired_wall_seconds": 4.809,
+    "segmented_wall_seconds": 1.037,
+    "peak_mib": 319.7,
+    "cpu_quota_percent": 100,
+    "memory_max_bytes": 2147483648,
+    "swap_max_bytes": 0
+  },
+  "retained_failure": "Systemd PATH did not contain rustc; audit_v2 uses its absolute path. Original sources/log retained.",
+  "upstream": {
+    "meganeura": "99e3de27b71140498bc1b175a326b8662a9c2a6e",
+    "blade": "e7c3f7b64abe1caf25147987020931065665a9cc",
+    "changed": false
+  },
+  "receipts": {
+    "runs/output-contract-20261015.PkiE0hzR/summary.json": "4f26fdc66fef51cba4fe93a3e0055b74623c25ea039e3c92835f1fbea255e41f",
+    "runs/output-contract-20261015.PkiE0hzR/segmented-summary.json": "d85dc9a22100867ba768eb079969cc03401c5633a6275c0d8d13fc8c7d32b42f",
+    "runs/output-contract-20261015.PkiE0hzR/naga-probe.json": "d1b3148d9b11ac9b1772348945ec22c2aec2b7d4f0602ebfd41d8c70764a048e",
+    "runs/output-contract-20261015.PkiE0hzR/segmented-naga.json": "b0bbeb86b719e0e0db92e33e2b7f5f50e58ce775898eb65c51f76ce4d9f29d1a",
+    "runs/output-contract-20261015.PkiE0hzR/service-history.log": "28cef17f5d94607f6e0c785824379bb5c72566ecc6dd50a99cc34ccd6702b444",
+    "runs/image-views-20261015.EblKUBZN/meganeura/src/codegen/cooperative.rs": "d4a93950b85045b5a829d25744c41cb0d6d3efdec1b47d52558b9652c8087b99"
+  },
+  "limits": [
+    "No convolution numerical/timing or speedup evidence",
+    "Unpadded payload is only a storage lower bound, not a qualified conflict-free layout",
+    "Logical matrix state is not measured registers/spilling",
+    "Unknown CNN0 library tile is retained, not guessed or counted in 22-tile envelope",
+    "No existing numerical gates, compensation or production paths changed"
+  ],
+  "full_resource_review": {
+    "path": "runs/output-contract-20261015.PkiE0hzR/review.json",
+    "sha256": "14a38693a483c6bbc8677d2989445c67242f436211be6a9604a4a9b6c6af1447"
+  }
+}

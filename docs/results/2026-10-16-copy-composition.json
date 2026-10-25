@@ -1,0 +1,269 @@
+{
+  "status": "qualified_isolated",
+  "date": "2026-10-16",
+  "artifact_root": "runs/copy-composition-20261016.ABr4pCUH",
+  "native_sha256": "58aff45226e654c164a9c864c2a8e12737117db8350ad3d14b8307940a7c3bf0",
+  "qualified_control": "834241b6b9f702a8150731a0e879e704ba817aa8dfde5aa48742251aa249c596",
+  "performance_gate": true,
+  "rgb_over_inclusive_jax": 1.6970999027727691,
+  "inclusive_jax_ms": 27.222569,
+  "workloads": {
+    "rgb": {
+      "exact_reports": 272,
+      "exact_checkpoint_pairs": 3,
+      "tensors_per_pair": 292,
+      "programs": {
+        "world_gradient": {
+          "modified": 71,
+          "removed": 241,
+          "unchanged_pipelines": 3680,
+          "captured_world_groups": 1112,
+          "nonworld_group_membership_exported": false
+        },
+        "imagination": {
+          "modified": 22,
+          "removed": 121,
+          "unchanged_pipelines": 659,
+          "captured_world_groups": null,
+          "nonworld_group_membership_exported": false
+        },
+        "slow_value": {
+          "modified": 0,
+          "removed": 0,
+          "unchanged_pipelines": 13,
+          "captured_world_groups": null,
+          "nonworld_group_membership_exported": false
+        },
+        "behavior_gradient": {
+          "modified": 0,
+          "removed": 0,
+          "unchanged_pipelines": 247,
+          "captured_world_groups": null,
+          "nonworld_group_membership_exported": false
+        }
+      },
+      "timing": {
+        "control": {
+          "mean_ms": 48.13348547265625,
+          "first32_ms": 48.0648346875,
+          "last32_ms": 48.163113718750004,
+          "stage_ms": {
+            "behavior_train_and_sync": 4.4485169921875,
+            "imagination_and_targets": 11.92318571875,
+            "posterior": 7.20891840625,
+            "world_train_and_sync": 24.55286435546875
+          }
+        },
+        "candidate": {
+          "mean_ms": 46.199419203125,
+          "first32_ms": 46.15011525,
+          "last32_ms": 46.32636515625,
+          "stage_ms": {
+            "behavior_train_and_sync": 4.55187973828125,
+            "imagination_and_targets": 10.2079456875,
+            "posterior": 7.0367494765625,
+            "world_train_and_sync": 24.40284430078125
+          }
+        }
+      },
+      "fraction_reduced": 0.04018130518783969
+    },
+    "cdp": {
+      "exact_reports": 272,
+      "exact_checkpoint_pairs": 3,
+      "tensors_per_pair": 346,
+      "programs": {
+        "world_gradient": {
+          "modified": 90,
+          "removed": 337,
+          "unchanged_pipelines": 3998,
+          "captured_world_groups": 1117,
+          "nonworld_group_membership_exported": false
+        },
+        "imagination": {
+          "modified": 22,
+          "removed": 121,
+          "unchanged_pipelines": 741,
+          "captured_world_groups": null,
+          "nonworld_group_membership_exported": false
+        },
+        "slow_value": {
+          "modified": 0,
+          "removed": 0,
+          "unchanged_pipelines": 13,
+          "captured_world_groups": null,
+          "nonworld_group_membership_exported": false
+        },
+        "behavior_gradient": {
+          "modified": 0,
+          "removed": 0,
+          "unchanged_pipelines": 247,
+          "captured_world_groups": null,
+          "nonworld_group_membership_exported": false
+        }
+      },
+      "timing": {
+        "control": {
+          "mean_ms": 45.6685948359375,
+          "first32_ms": 45.73306434375,
+          "last32_ms": 45.65059909375,
+          "stage_ms": {
+            "behavior_train_and_sync": 4.552212886718751,
+            "imagination_and_targets": 21.40320476171875,
+            "posterior": 7.95489653515625,
+            "world_train_and_sync": 11.75828065234375
+          }
+        },
+        "candidate": {
+          "mean_ms": 43.9387759296875,
+          "first32_ms": 43.82272209375,
+          "last32_ms": 43.783466625,
+          "stage_ms": {
+            "behavior_train_and_sync": 4.541995441406249,
+            "imagination_and_targets": 19.66267943359375,
+            "posterior": 7.66764230859375,
+            "world_train_and_sync": 12.066458746093751
+          }
+        }
+      },
+      "fraction_reduced": 0.03787764682632122
+    }
+  },
+  "calibration": {
+    "rgb": {
+      "retained_ms": 48.06795265624996,
+      "relative_control_drift": 0.0013633369591365962,
+      "passes": true
+    },
+    "cdp": {
+      "retained_ms": 45.50459017578125,
+      "relative_control_drift": 0.00360413442957519,
+      "passes": true
+    }
+  },
+  "cpu_programs": {
+    "rgb/world_gradient": {
+      "modified_dispatches": 71,
+      "removed_dispatches": 241,
+      "logical_write_bytes_removed": 216461056
+    },
+    "rgb/imagination": {
+      "modified_dispatches": 22,
+      "removed_dispatches": 121,
+      "logical_write_bytes_removed": 973733888
+    },
+    "rgb/slow_value": {
+      "modified_dispatches": 0,
+      "removed_dispatches": 0,
+      "logical_write_bytes_removed": 0
+    },
+    "rgb/behavior_gradient": {
+      "modified_dispatches": 0,
+      "removed_dispatches": 0,
+      "logical_write_bytes_removed": 0
+    },
+    "cdp/world_gradient": {
+      "modified_dispatches": 90,
+      "removed_dispatches": 337,
+      "logical_write_bytes_removed": 232916224
+    },
+    "cdp/imagination": {
+      "modified_dispatches": 22,
+      "removed_dispatches": 121,
+      "logical_write_bytes_removed": 973733888
+    },
+    "cdp/slow_value": {
+      "modified_dispatches": 0,
+      "removed_dispatches": 0,
+      "logical_write_bytes_removed": 0
+    },
+    "cdp/behavior_gradient": {
+      "modified_dispatches": 0,
+      "removed_dispatches": 0,
+      "logical_write_bytes_removed": 0
+    }
+  },
+  "cpu_address_values": 319752192,
+  "typed_shader_variants": 615,
+  "rust_fixture_cases": 11,
+  "raw_gradient_conditions": {
+    "rgb": [
+      {
+        "tensors": 68,
+        "elements": 8852675
+      },
+      {
+        "tensors": 68,
+        "elements": 8852675
+      }
+    ],
+    "cdp": [
+      {
+        "tensors": 86,
+        "elements": 14688256
+      },
+      {
+        "tensors": 86,
+        "elements": 14688256
+      }
+    ]
+  },
+  "raw_checkpoint_pairs_per_workload": 9,
+  "raw_gradient_values_per_complete_comparison": 47081862,
+  "exact_smoke_reports_per_arm": 24,
+  "all_24_update_prefixes_exact": true,
+  "actual_plans_idempotent": true,
+  "runtime_copy_modules": {
+    "rgb": {
+      "executed_copy_occurrences": 93,
+      "executed_copy_modules": 24,
+      "all_used_modules_exact": true,
+      "outside_exported_learner_programs": {
+        "b9272ba86ab2dc4b99c82fee3192fa5d003a81af5dc1e4d0af0a6a050b01e954": "copy_main_f2ab99c443ba45fc.wgsl",
+        "d9c00bec9e8a456f580c7e7ef9f47decb38447cb7c4a7491f7a47496c890b456": "copy_main_12e0c1c54fcb56ad.wgsl",
+        "fd7e83c6a49a5f7842d056b836df80be2d0bf9ee351fb51102692a252dfd8caa": "copy_main_ce1e5319fa13192f.wgsl"
+      },
+      "removed_modules": 0,
+      "unchanged_modules": 178
+    },
+    "cdp": {
+      "executed_copy_occurrences": 112,
+      "executed_copy_modules": 32,
+      "all_used_modules_exact": true,
+      "outside_exported_learner_programs": {
+        "b9272ba86ab2dc4b99c82fee3192fa5d003a81af5dc1e4d0af0a6a050b01e954": "copy_main_f2ab99c443ba45fc.wgsl",
+        "d9c00bec9e8a456f580c7e7ef9f47decb38447cb7c4a7491f7a47496c890b456": "copy_main_12e0c1c54fcb56ad.wgsl",
+        "fd7e83c6a49a5f7842d056b836df80be2d0bf9ee351fb51102692a252dfd8caa": "copy_main_ce1e5319fa13192f.wgsl"
+      },
+      "removed_modules": 0,
+      "unchanged_modules": 190
+    }
+  },
+  "helper_order_occurrences": 6,
+  "guards": 12,
+  "allocation_warnings": 10,
+  "minimum_sampled_headroom_bytes": 12315787264,
+  "timing_source_seals": 3044,
+  "synthetic_updates": 1188,
+  "raw_backwards": 16,
+  "game_actions": 0,
+  "production_changed": false,
+  "gpu_finished_utc": "2026-10-16T11:51:32.058439+00:00",
+  "cpu_finished_utc": "2026-10-16T11:59:49.951064+00:00",
+  "limits": [
+    "No learning or acting qualification.",
+    "F16 checked offline, not exercised in these GPU workloads.",
+    "Non-world runtime group membership was not exported.",
+    "Logical bytes are not DRAM traffic; timings are not utilization."
+  ],
+  "retained_failures": [
+    "First arity fixture did not construct the intended connected eight-leaf tree.",
+    "Backend explicit-reference Clippy failures.",
+    "Rust negative fixture used unknown Sqrt shader.",
+    "Raw-gradient observer referenced unavailable bytemuck dependency.",
+    "CPU reader expected runtime groups in the emptied serialized plan field.",
+    "Construction-wide shader dump compared against learner-only catalog.",
+    "First scope repair assumed learner helper order was byte-identical to the post-schedule CPU catalog.",
+    "Final helper-order observer expected two occurrences; full count is six."
+  ]
+}

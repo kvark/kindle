@@ -107,12 +107,12 @@ impl ActingGpu {
             source: include_str!("live_state.wgsl"),
             naga_module: None,
         });
-        let sample = gpu.create_compute_pipeline(gpu::ComputePipelineDesc {
+        let sample = gpu.create_compute_pipeline(gpu::ComputePipelineDesc { full_subgroup_size: None,
             name: "kindle_categorical",
             data_layouts: &[&SamplingBindings::layout()],
             compute: sample_shader.at("main"),
         });
-        let commit = gpu.create_compute_pipeline(gpu::ComputePipelineDesc {
+        let commit = gpu.create_compute_pipeline(gpu::ComputePipelineDesc { full_subgroup_size: None,
             name: "kindle_live_state",
             data_layouts: &[&StateBindings::layout()],
             compute: state_shader.at("main"),

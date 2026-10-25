@@ -1,0 +1,139 @@
+{
+  "status": "complete",
+  "timings": {
+    "control": {
+      "mean_update_ms": 53.156679710937496,
+      "stages_ms": {
+        "behavior_train_and_sync": 3.56088718359375,
+        "imagination_and_targets": 12.9819823359375,
+        "posterior": 6.3419116171875,
+        "world_train_and_sync": 30.27189857421875
+      }
+    },
+    "reduced": {
+      "mean_update_ms": 48.901266843750015,
+      "stages_ms": {
+        "behavior_train_and_sync": 3.4907520078125,
+        "imagination_and_targets": 12.9103852578125,
+        "posterior": 6.28256187109375,
+        "world_train_and_sync": 26.21756770703125
+      }
+    }
+  },
+  "less_time_percent": 8.005415105548607,
+  "tensors": {
+    "initial": {
+      "count": 292,
+      "exact": 292,
+      "relative_l2": 0.0
+    },
+    "first": {
+      "count": 292,
+      "exact": 194,
+      "relative_l2": 0.03162200185326058
+    },
+    "final": {
+      "count": 292,
+      "exact": 1,
+      "relative_l2": 0.07023463409965128
+    }
+  },
+  "exact_first_outputs": true,
+  "exact_reports": 2,
+  "unchanged_other_session_plans": true,
+  "typed_gradient_counts": {
+    "Conv2dGradientTyped { weight_gradient: false, kernel_h: 5, kernel_w: 5, stride: 1, splits: 1, types: MatrixTypes { a: BF16, b: BF16, multiply: BF16, output: F32 } }": 7,
+    "Conv2dGradientTyped { weight_gradient: true, kernel_h: 5, kernel_w: 5, stride: 1, splits: 128, types: MatrixTypes { a: BF16, b: BF16, multiply: BF16, output: F32 } }": 2,
+    "Conv2dGradientTyped { weight_gradient: true, kernel_h: 5, kernel_w: 5, stride: 1, splits: 2, types: MatrixTypes { a: BF16, b: BF16, multiply: BF16, output: F32 } }": 2,
+    "Conv2dGradientTyped { weight_gradient: true, kernel_h: 5, kernel_w: 5, stride: 1, splits: 32, types: MatrixTypes { a: BF16, b: BF16, multiply: BF16, output: F32 } }": 2,
+    "Conv2dGradientTyped { weight_gradient: true, kernel_h: 5, kernel_w: 5, stride: 1, splits: 8, types: MatrixTypes { a: BF16, b: BF16, multiply: BF16, output: F32 } }": 2
+  },
+  "world_dispatches": [
+    4237,
+    4230
+  ],
+  "guards_passed": 5,
+  "allocation_warnings": 0,
+  "synthetic_updates": 544,
+  "game_actions": 0,
+  "production_changed": false,
+  "arithmetic_changed": true,
+  "learning_quality_unmeasured": true,
+  "matched_host_annotations": true,
+  "gpu_profiler": false,
+  "retained_failed_guard": "queue/reduced-f64",
+  "date": "2026-10-13",
+  "artifacts": "runs/conv-backward-gap-20261013.8N61hY2O",
+  "matching_convolutions": 15,
+  "arithmetic_inventory": {
+    "status": "complete",
+    "arms": {
+      "rgb-control": {
+        "families": {
+          "bf16_dense": 19778050048,
+          "bf16_conv_forward": 28940697600,
+          "f32_grouped": 9026142208,
+          "f32_conv_input": 18035507200,
+          "f32_conv_weight": 19293798400
+        },
+        "dispatches": {
+          "bf16_dense": 667,
+          "bf16_conv_forward": 12,
+          "f32_grouped": 161,
+          "f32_conv_input": 7,
+          "f32_conv_weight": 8
+        },
+        "nominal_macs": 95074195456,
+        "scalar_f32_macs": 46355447808,
+        "scalar_f32_fraction": 0.48757128667423894,
+        "plan_sha256": {
+          "posterior": "6858cbd0c85e923b8b1de8d1ecdae1296efe173464acdc7a6ecacd2a11265325",
+          "world_gradient": "9c6b0ceca79fa87380f25533e117cf2faf810f7ed7f5087e6faaebade0cdac0a",
+          "imagination": "16843d020e49f7908c119706c583f9426e701cd798067da371b6a73e5dd7cbb3",
+          "behavior_gradient": "67075d5f5c17797ba264f9f9f478458149f99273f7ee2ad937972315d47e3f23",
+          "slow_value": "1d865b7fcc2760fd54202fec3e513e0f9c5bd4742ab04ff0520c333c5724ad9c"
+        }
+      },
+      "rgb-reduced": {
+        "families": {
+          "bf16_dense": 19778050048,
+          "bf16_conv_forward": 28940697600,
+          "f32_grouped": 9026142208,
+          "bf16_conv_input": 18035507200,
+          "bf16_conv_weight": 19293798400
+        },
+        "dispatches": {
+          "bf16_dense": 667,
+          "bf16_conv_forward": 12,
+          "f32_grouped": 161,
+          "bf16_conv_input": 7,
+          "bf16_conv_weight": 8
+        },
+        "nominal_macs": 95074195456,
+        "scalar_f32_macs": 9026142208,
+        "scalar_f32_fraction": 0.09493787630500924,
+        "plan_sha256": {
+          "posterior": "b6666ce45f463e568b01cadb0cd92b24fd2a68cb8b32c68bc27a60a45c4af071",
+          "world_gradient": "d201a382202d86604fca399f8c27f23befb175da3769227fb6de35d914a5e9cd",
+          "imagination": "6b2fc35aaba9d71126716fcf7ea3421ce0d7143ff88fd0bd094b242f74b80f84",
+          "behavior_gradient": "a95b122f3cc4360da2c6b6de1661999094301e47e0042378fa044dde20bc648d",
+          "slow_value": "74b1ce16439eeffacd7452fe85fe543f1bf8a4c32ec05545d59d78e4af2ce74a"
+        }
+      }
+    },
+    "scope": "Nominal matrix/convolution MACs from actual complete plans; includes padding/repeated posterior. Not issued FLOPs, tensor utilization, pointwise/optimizer work or a timing allocation."
+  },
+  "effective_backend": {
+    "meganeura": "056562b5adeb6b667a49e29869ab5d7db1871260",
+    "blade": "fe5f5b569da6bdcea48d3211277b4906ec764dba",
+    "naga": "a4b4183e7fa1f26848e48ba5e837084999c8dfe8",
+    "patch": "bounded-backend.patch"
+  },
+  "qualification": {
+    "reduced_cases": 40,
+    "independent_partials": 17,
+    "strict_cases": 16,
+    "dense_cases": 12
+  },
+  "not_combined_with_tiled_prototype": true
+}

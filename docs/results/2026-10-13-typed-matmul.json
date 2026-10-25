@@ -1,0 +1,220 @@
+{
+  "date": "2026-10-13",
+  "status": "qualified",
+  "pairs": {
+    "rgb": {
+      "arms": {
+        "control": {
+          "mean_update_ms": 52.803481578124966,
+          "stages_ms": {
+            "behavior_train_and_sync": 3.48526656640625,
+            "imagination_and_targets": 12.889550734375,
+            "posterior": 6.23577251953125,
+            "world_train_and_sync": 30.1928917578125
+          },
+          "minimum_sampled_headroom_bytes": 14709227520,
+          "reported_meganeura_revision": "87a3236ed068ca52d0c5821d9b92ce28791f9798"
+        },
+        "candidate": {
+          "mean_update_ms": 53.04719943359372,
+          "stages_ms": {
+            "behavior_train_and_sync": 3.51568308984375,
+            "imagination_and_targets": 12.992407640625,
+            "posterior": 6.28993453125,
+            "world_train_and_sync": 30.249174171875
+          },
+          "minimum_sampled_headroom_bytes": 14709227520,
+          "reported_meganeura_revision": "056562b5adeb6b667a49e29869ab5d7db1871260"
+        }
+      },
+      "tensors": {
+        "initial": {
+          "tensors": 292,
+          "exact_tensors": 292,
+          "max_abs": 0,
+          "relative_l2": 0
+        },
+        "first": {
+          "tensors": 292,
+          "exact_tensors": 292,
+          "max_abs": 0,
+          "relative_l2": 0
+        },
+        "final": {
+          "tensors": 292,
+          "exact_tensors": 292,
+          "max_abs": 0,
+          "relative_l2": 0
+        }
+      },
+      "first_outputs": {
+        "action_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "deter": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "imagined_slow_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "imagined_value_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "imagined_weight": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "replay_slow_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "replay_value_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "replay_weight": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "stoch": {
+          "exact": true,
+          "relative_l2": 0
+        }
+      },
+      "control_reproduces_retained": true,
+      "finite_reports": 272,
+      "exact_metric_reports": 272,
+      "less_time_pct": -0.46155641291978355
+    },
+    "cdp": {
+      "arms": {
+        "control": {
+          "mean_update_ms": 124.99723916796884,
+          "stages_ms": {
+            "behavior_train_and_sync": 9.22582642578125,
+            "imagination_and_targets": 54.2075957890625,
+            "posterior": 15.67454616015625,
+            "world_train_and_sync": 45.88927079296875
+          },
+          "minimum_sampled_headroom_bytes": 11287920640,
+          "reported_meganeura_revision": "87a3236ed068ca52d0c5821d9b92ce28791f9798"
+        },
+        "candidate": {
+          "mean_update_ms": 126.182283703125,
+          "stages_ms": {
+            "behavior_train_and_sync": 9.2817371796875,
+            "imagination_and_targets": 54.29753987109375,
+            "posterior": 15.68828825,
+            "world_train_and_sync": 46.91471840234375
+          },
+          "minimum_sampled_headroom_bytes": 11287920640,
+          "reported_meganeura_revision": "056562b5adeb6b667a49e29869ab5d7db1871260"
+        }
+      },
+      "tensors": {
+        "initial": {
+          "tensors": 346,
+          "exact_tensors": 346,
+          "max_abs": 0,
+          "relative_l2": 0
+        },
+        "first": {
+          "tensors": 346,
+          "exact_tensors": 346,
+          "max_abs": 0,
+          "relative_l2": 0
+        },
+        "final": {
+          "tensors": 346,
+          "exact_tensors": 346,
+          "max_abs": 0,
+          "relative_l2": 0
+        }
+      },
+      "first_outputs": {
+        "action_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "deter": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "imagined_slow_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "imagined_value_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "imagined_weight": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "replay_slow_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "replay_value_target": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "replay_weight": {
+          "exact": true,
+          "relative_l2": 0
+        },
+        "stoch": {
+          "exact": true,
+          "relative_l2": 0
+        }
+      },
+      "control_reproduces_retained": true,
+      "finite_reports": 272,
+      "exact_metric_reports": 272,
+      "less_time_pct": -0.9480565675244357
+    }
+  },
+  "passing_guards": 13,
+  "allocation_warnings": 2,
+  "binaries": {
+    "backend-tests": "636918b643c3090741af4abf441331f790903d141d2cb82c4f9acfc28ee894a0",
+    "backend-reviewed-tests": "0d0fc47485d6872da3cd12242bc5253b84681162db369215d6929eb916886b75",
+    "backend-extents-tests": "6f7fd7822d278d6d4234a61e306bd37e6342d353285660b3729dfadb2cb142e6",
+    "kindle-tests": "62162784ae8afa431d467e9b54de354a979056df8c5e67d59c389e8e235f900a",
+    "kindle-extents-tests": "22cad027d24229eb788923187393f5520201f1dd73768d122f18cfb0ff531612"
+  },
+  "game_actions": 0,
+  "synthetic_updates": 1088,
+  "backend_adam_updates": 32,
+  "numerical_checks_passed": true,
+  "complete_update_gate_passed": true,
+  "ordinary_sm_utilization": null,
+  "learning_equivalence": false,
+  "native_f32_gpu_qualification": false,
+  "timing_repeated": false,
+  "failed_guards": [
+    "queue/typed_partitions_and_tuning_preserve_precision",
+    "queue-reviewed/typed_partitions_and_tuning_preserve_precision"
+  ],
+  "corrected_cpu_failure": "obsolete vec4<F16> spelling assertion; check F16 storage declaration",
+  "corrected_test_option": "sample_pairs=1 violated the existing minimum; use four",
+  "corrected_tuner": "keep odd halfword logical extents exact; pad private transfer allocations only",
+  "meganeura": "056562b5adeb6b667a49e29869ab5d7db1871260",
+  "blade": "663afd2194069af25c5be884e90c3d53e83a3973",
+  "naga": "c9fd6a85a87034ecb5a784611c6f90a14d8d50ce",
+  "control": "87a3236ed068ca52d0c5821d9b92ce28791f9798",
+  "control_runtime_matches_qualified_pin": "9e05731ae12c1e7b73331c2591a13fa22ac9a74d",
+  "pr": "https://github.com/kvark/meganeura/pull/257",
+  "artifacts": "runs/typed-matmul-20261013.9OmuXOPr",
+  "typed_device_cases": 6,
+  "qualified_typed_tuning_probes": 6,
+  "full_f64_cases": 32,
+  "exact_full_f64_values": 859216,
+  "cache_version": 30,
+  "kernel_memo_revision": 3
+}

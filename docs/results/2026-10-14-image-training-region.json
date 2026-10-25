@@ -1,0 +1,214 @@
+{
+  "status": "complete",
+  "whole_goal": "active",
+  "production_unchanged": true,
+  "artifact_roots": [
+    "runs/image-training-20261014.JMU3OLS2",
+    "runs/image-remainder-20261014.bbwMyVKw"
+  ],
+  "native_sha256": "e1a2407c088558ed6525d3c51839b67688541c0b0da6db192a8fb6f7ca816318",
+  "arms": {
+    "control": {
+      "mean_update_ms": 65.60920737499997,
+      "median_update_ms": 65.6102035,
+      "minimum_sampled_headroom_bytes": 12933726208,
+      "stages_ms": {
+        "behavior_train_and_sync": 4.5483232851562505,
+        "imagination_and_targets": 17.74488047265625,
+        "posterior": 8.46939595703125,
+        "world_train_and_sync": 34.84660766015625
+      }
+    },
+    "candidate": {
+      "mean_update_ms": 63.63993407421876,
+      "median_update_ms": 63.55598400000001,
+      "minimum_sampled_headroom_bytes": 13202161664,
+      "stages_ms": {
+        "behavior_train_and_sync": 4.516258453125,
+        "imagination_and_targets": 17.80402115625,
+        "posterior": 7.48725474609375,
+        "world_train_and_sync": 33.83239971875
+      }
+    }
+  },
+  "speedup_percent": 3.0015197250067516,
+  "passes_predeclared_speed_gate": true,
+  "speed_gate_margin_percentage_points": 0.001519725006751571,
+  "promotion": "retain isolated numerical candidate; borderline timing, no robust speed or learning claim",
+  "retained_original_jax_ms": 26.63169575862412,
+  "retained_wide_image_jax_ms": 26.875910188209673,
+  "candidate_to_retained_original_jax": 2.389631311915626,
+  "candidate_to_retained_wide_image_jax": 2.3679173515819114,
+  "qualification": {
+    "status": "complete",
+    "cases": 42,
+    "sessions": 210,
+    "block_calls": 462,
+    "checked_values": 1266240,
+    "all_staged_exact": true,
+    "max_f32_relative_l2": 3.661503114233249e-07,
+    "max_bf16_relative_l2": 0.00020866722393974015,
+    "guard_passed": true,
+    "allocation_warnings": 0,
+    "minimum_sampled_headroom_bytes": 16551575552,
+    "game_actions": 0,
+    "synthetic_updates": 0
+  },
+  "first_world_loss_relative": 0,
+  "all_first_posterior_and_target_outputs_exact": true,
+  "tensor_counts": {
+    "initial": 292,
+    "first": 292,
+    "final": 292
+  },
+  "changed_tensors": {
+    "initial": 0,
+    "first": 96,
+    "final": 289
+  },
+  "differing_metric_reports": 270,
+  "plan": {
+    "exact": false,
+    "before_dispatches": 4089,
+    "after_dispatches": 4023,
+    "image_regions": 8,
+    "image_kernels": 16,
+    "identical_heavy_descriptors": 514,
+    "unchanged_descriptors": 3977,
+    "before_scheduled_output_bytes": 5551419328,
+    "after_scheduled_output_bytes": 4183809984,
+    "image_channels": [
+      32,
+      48,
+      64
+    ]
+  },
+  "removed_descriptors": 112,
+  "added_descriptors": 46,
+  "remainder": {
+    "status": "complete",
+    "guard_passed": true,
+    "allocation_warnings": 0,
+    "exact_plans": 5,
+    "exact_pipelines": 5,
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_first_outputs": true,
+    "exact_first_report": true,
+    "exact_full_restores": 3,
+    "category_counts": {
+      "2": 3463,
+      "0": 514,
+      "1": 46
+    },
+    "masks": 4,
+    "sweeps": 3,
+    "measured_replays": 192,
+    "optimizer_free_replays": 367,
+    "synthetic_updates": 1,
+    "game_actions": 0,
+    "minimum_sampled_headroom_bytes": 13221036032,
+    "native_sha256": "6d67fca1938b90d922779161b85bffb65db5af9a92bc712cd75ce967087e0cb7",
+    "mask_means_ms": {
+      "0": 26.821886666666664,
+      "1": 48.41879333333333,
+      "2": 31.688760666666667,
+      "3": 38.237505999999996
+    },
+    "allocations_ms": {
+      "heavy_plus_dependencies": 26.821886666666664,
+      "image_region": 14.072826,
+      "remaining_nonheavy": -2.6572066666666667,
+      "image_increment_all_other_active": 6.548745333333332,
+      "remaining_increment_image_active": -10.181287333333335,
+      "full": 38.237505999999996
+    },
+    "allocation_repetitions_ms": [
+      {
+        "heavy_plus_dependencies": 26.815768,
+        "image_region": 14.025387,
+        "remaining_nonheavy": -2.7721670000000014,
+        "image_increment_all_other_active": 6.379923999999999,
+        "remaining_increment_image_active": -10.417630000000003,
+        "full": 38.068988
+      },
+      {
+        "heavy_plus_dependencies": 26.78287,
+        "image_region": 14.018907,
+        "remaining_nonheavy": -2.6451270000000005,
+        "image_increment_all_other_active": 6.465505999999998,
+        "remaining_increment_image_active": -10.198528000000003,
+        "full": 38.15665
+      },
+      {
+        "heavy_plus_dependencies": 26.867022,
+        "image_region": 14.174183999999999,
+        "remaining_nonheavy": -2.554325999999998,
+        "image_increment_all_other_active": 6.800805999999998,
+        "remaining_increment_image_active": -9.927703999999999,
+        "full": 38.48688
+      }
+    ],
+    "full_baseline_before_ms": 38.13644,
+    "full_baseline_after_ms": 38.1092555,
+    "caveat": "Interacting cached one-chunk fixed-graph allocations, not pure kernels, full learner timing, or independently removable costs."
+  },
+  "remainder_interpretation": "Not usable for latency ranking: strong repeated interaction and negative formal residual allocation; cause not established.",
+  "gpu_guards_passed": 4,
+  "allocation_warnings": 0,
+  "synthetic_updates": 545,
+  "numerical_block_calls": 462,
+  "optimizer_free_world_replays": 367,
+  "game_actions": 0,
+  "minimum_sampled_headroom_bytes": 12933726208,
+  "retained_cpu_failures": [
+    "Clippy reference-pattern style",
+    "Rust floating literal",
+    "Missing old-fixture device-name environment metadata",
+    "Private scratch buffer IDs assumed stable",
+    "Optional descriptor fields assumed serialized",
+    "Follow-up classifier moved a borrowed kernel"
+  ],
+  "gpu_retries": 0,
+  "numerical_gates_relaxed": false,
+  "remaining_workers": 0,
+  "next": "Sparse timing in intact cached execution; exact reports/states and bounded complete-update perturbation before attribution.",
+  "artifacts": {
+    "runs/image-training-20261014.JMU3OLS2/backend.patch": "c87a3d00bacc6b82d7c893532954d019f228697d41bc3e6d773e3f39fe7b37aa",
+    "runs/image-training-20261014.JMU3OLS2/kindle.patch": "c81e59c17a242ec07872ba61e2387ef9a971afe7491e0059ad4144cf69019ede",
+    "runs/image-training-20261014.JMU3OLS2/kindle-tests": "e1a2407c088558ed6525d3c51839b67688541c0b0da6db192a8fb6f7ca816318",
+    "runs/image-training-20261014.JMU3OLS2/native-checks": "8b1542d218329ffa8492d65fe910538eaede4b70392d40379d479f315d936f74",
+    "runs/image-training-20261014.JMU3OLS2/checks.rs": "8d0d20f0503908c9cdd6f499a6ec4c493e304307398d24dd52ac041965d61ede",
+    "runs/image-training-20261014.JMU3OLS2/Cargo.lock": "c246bfeead9ba9f033ad769fc1078a50ad1d70702cc295068161ec6b19beda5e",
+    "runs/image-training-20261014.JMU3OLS2/kindle/Cargo.lock": "06549e9174610a978587fd6f59a1359cd7a316e372001ecd37bf4e70352fbeb4",
+    "runs/image-training-20261014.JMU3OLS2/meganeura/Cargo.lock": "aa16a029efe9fe16e8608607e8616ca560e735d91359482dad6f37b6be04407f",
+    "runs/image-training-20261014.JMU3OLS2/preflight.json": "b17220d6a2111bc762c98c11b0c4d7a293471e61ff88c62bf9dc464f1b2b0066",
+    "runs/image-training-20261014.JMU3OLS2/qualification-review.json": "ea5439e198bc09495f743ab4297d3fb7594c143c4b8239eb7b8be0bd7d2eca40",
+    "runs/image-training-20261014.JMU3OLS2/review.json": "6c2894418109753b46805089911de91f6b3fff48a0c5d1467f0ac4f098febdc1",
+    "runs/image-training-20261014.JMU3OLS2/prepare_timing.py": "a3de668c37ee0fa845d49aa56d73d8c6154fc49e5f0ab6ca09115d5b9bbb2346",
+    "runs/image-training-20261014.JMU3OLS2/review.py": "1080fe2ba68ec1e892d4c20c183992b7c38130333b435f7094e495785b16000a",
+    "runs/image-training-20261014.JMU3OLS2/review_v2.py": "d0fac026e0d403e3283f41dd0abaccf5a502857fa45f58c8213c9fdfcb141a3d",
+    "runs/image-training-20261014.JMU3OLS2/review_v3.py": "dc79ff2c3f9acd7fa24b04e38b67cded77645c70789ee93b9d3601adeff91839",
+    "runs/image-training-20261014.JMU3OLS2/build.log": "cb952d49d4c52c0b29a2430f1792f280d29844c6e8a6f491d824ae31f45639d7",
+    "runs/image-training-20261014.JMU3OLS2/checks-build.log": "deea6fc0d9439b66bd84baf4a2ff3bb1f24246869c04411f3a122cff23a4e826",
+    "runs/image-training-20261014.JMU3OLS2/prepare.log": "cea5a6c33772c8f543c1d30f4917fd058d096423d7f38f27e33f03351498ecda",
+    "runs/image-training-20261014.JMU3OLS2/review.log": "ebf57b5a91435faf84f14107e0bb9f8f5d305244119fba5a84b7c81a69e95f87",
+    "runs/image-training-20261014.JMU3OLS2/review-v2.log": "20ee9901faffcc3ba81727ce094f5165a67d0ffaf6ad38187b6dbedd7201b8d8",
+    "runs/image-training-20261014.JMU3OLS2/clippy-image-first.rs": "bcc35443d4341bb9b8066223e66e8262eecdeb446b9417e8dd7c6b7c05e62e80",
+    "runs/image-training-20261014.JMU3OLS2/clippy-pool-first.rs": "0a7a48f3462be20bcf5158a314fb4219f2aa69cb7530772b0ab8e2e2d1f79aa9",
+    "runs/image-training-20261014.JMU3OLS2/checks-first.rs": "1d7e72b9e67f02aa97a5ff59c893b3463a130554eeb7ca3371ee4a494158b4e9",
+    "runs/image-training-20261014.JMU3OLS2/forward-first.wgsl": "dc1ee06f1e309e36eeb6f1e914e873beb891d419c4034949bbfe5ed4b95fbb5a",
+    "runs/image-remainder-20261014.bbwMyVKw/kindle.patch": "1244468c8a2ae8872d60b2e1545fef45ea39a536e3e9fd3bc34b542096b15d90",
+    "runs/image-remainder-20261014.bbwMyVKw/kindle-tests": "6d67fca1938b90d922779161b85bffb65db5af9a92bc712cd75ce967087e0cb7",
+    "runs/image-remainder-20261014.bbwMyVKw/kindle/Cargo.lock": "06549e9174610a978587fd6f59a1359cd7a316e372001ecd37bf4e70352fbeb4",
+    "runs/image-remainder-20261014.bbwMyVKw/preflight.json": "c3fab4386b953ff77478d9b1ce8e616c0614c836e816a5879c64b3bcf1bc4d80",
+    "runs/image-remainder-20261014.bbwMyVKw/prepare.py": "706495c691b919b359330b80ed5cc0da0b91ea3fbeb65f95464df8ce9f31e013",
+    "runs/image-remainder-20261014.bbwMyVKw/review.py": "fa7e64c1db964729620657580371a9b657a42f3a69ee120ad5112e5299f2adc5",
+    "runs/image-remainder-20261014.bbwMyVKw/review.json": "656a6e113b8be226d41886e7c993058ff13a712850805dda8b7352325951c853",
+    "runs/image-remainder-20261014.bbwMyVKw/build.log": "9a4f2206e2cc511c08f574cd841bfd1ed30cd86168f07377c4a7a672483cc998",
+    "runs/image-remainder-20261014.bbwMyVKw/inline_gap-first.rs": "eff531c745da44c587046fb470a85a115b19688d92fa8294f21baa3f6d92a2a5"
+  }
+}

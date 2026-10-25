@@ -11,7 +11,7 @@ def test_pinned_baseline_and_d3_defaults() -> None:
     assert config["world_backprop_length"] == 8
     assert config["world_microbatch_size"] is None
     assert config["imagination_length"] == 15
-    assert config["actor_unimix"] == 0.01
+    assert config["actor_unimix"] == 0.0
     assert config["train_ratio"] == 32.0
     assert config["loss_scales"]["reconstruction"] == 1.0
     assert config["loss_scales"]["future_prediction"] == 0.0

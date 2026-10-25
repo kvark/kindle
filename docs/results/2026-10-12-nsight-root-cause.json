@@ -1,0 +1,795 @@
+{
+  "status": "bottlenecks_identified_one_causal_check_passes",
+  "initial_status": "partial_counter_access_required",
+  "initial_fields_scope": "Existing protocol, annotation_audits, native_captures and completed_target_guard_receipts describe pre-counter-enable collection; resumed is the current diagnostic evidence.",
+  "raw_root": "runs/nsight-root-cause-20261012.EyyOrUOP",
+  "source_base": "20837340aebbf550fb03c6061a6431432d104661",
+  "backend": {
+    "meganeura": "d68f1a52278747a4e7af147c36db36ca2ed59829",
+    "blade": "663afd2194069af25c5be884e90c3d53e83a3973",
+    "naga": "c9fd6a85a87034ecb5a784611c6f90a14d8d50ce"
+  },
+  "binaries": {
+    "kindle-tests": "909ed07954dd0227d0bf1d7a06312824c88a2a12a20fd963f7360b933837d819",
+    "kindle-tests-short": "d6cbdbcabfd25ef4094f676e1b1dc7e90acd7e1a917494472ff89dafb0e47235"
+  },
+  "protocol": {
+    "warmup_updates": 16,
+    "captured_updates": 8,
+    "game_actions": 0,
+    "native_attribution_complete": false,
+    "gpu_sm_utilization": null,
+    "production_math_changed": false,
+    "admin_capture_executed": false,
+    "guard_nvml_queries": 0,
+    "host_recovery_performed": false,
+    "incomplete_targets": [
+      "native-rgb-start",
+      "native-rgb-graphics-capture"
+    ],
+    "prelaunch_failure": "native-rgb-graphics: output directory did not exist",
+    "native_short_cdp_final_control": false,
+    "earlier_guards_owned_profiler": true,
+    "latest_and_prepared_guards_own_native": true
+  },
+  "annotation_audits": [
+    {
+      "name": "native-cdp-batch",
+      "exact_tensors": {
+        "initial": 346,
+        "first": 346,
+        "final": 346
+      },
+      "exact_metric_reports": 272,
+      "mean_update_ms": 137.64451021874996,
+      "captured_mean_ms": 138.025542875
+    },
+    {
+      "name": "native-cdp-short-batch",
+      "exact_tensors": {
+        "initial": 346,
+        "first": 346
+      },
+      "exact_metric_reports": 24,
+      "mean_update_ms": 139.52692775,
+      "captured_mean_ms": 139.52692775
+    },
+    {
+      "name": "native-rgb-batch",
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "exact_metric_reports": 272,
+      "mean_update_ms": 63.36962686328126,
+      "captured_mean_ms": 63.53440525
+    },
+    {
+      "name": "native-rgb-individual",
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "exact_metric_reports": 272,
+      "mean_update_ms": 63.71232581640623,
+      "captured_mean_ms": 63.8075195
+    },
+    {
+      "name": "native-rgb-latest",
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "exact_metric_reports": 24,
+      "mean_update_ms": 64.7857105,
+      "captured_mean_ms": 64.7857105
+    },
+    {
+      "name": "native-rgb-layer",
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "exact_metric_reports": 272,
+      "mean_update_ms": 63.88405388671871,
+      "captured_mean_ms": 64.35769775
+    },
+    {
+      "name": "native-rgb-ordinary",
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "exact_metric_reports": 272,
+      "mean_update_ms": 61.164710496093804,
+      "captured_mean_ms": 60.672377374999996
+    },
+    {
+      "name": "native-rgb-short",
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292
+      },
+      "exact_metric_reports": 24,
+      "mean_update_ms": 61.142340125,
+      "captured_mean_ms": 61.142340125
+    },
+    {
+      "name": "native-rgb-short-batch",
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "exact_metric_reports": 24,
+      "mean_update_ms": 64.2746985,
+      "captured_mean_ms": 64.2746985
+    }
+  ],
+  "jax_captures": {
+    "jax-bf16": {
+      "captured_updates": 8,
+      "update_mean_ms": 15.789575375,
+      "cuda_kernel_count_per_update": 3429,
+      "cuda_kernel_sum_ms_per_update": 9.897068,
+      "cuda_kernel_union_ms_per_update": 9.897068,
+      "gpu_covered_ms_per_update": 10.37553575,
+      "kernel_families": [
+        {
+          "name": "xla_fusion",
+          "count_per_update": 2592,
+          "sum_ms_per_update": 3.338985875
+        },
+        {
+          "name": "matrix_product",
+          "count_per_update": 552,
+          "sum_ms_per_update": 2.371793625
+        },
+        {
+          "name": "convolution_forward_or_other",
+          "count_per_update": 158,
+          "sum_ms_per_update": 1.86083625
+        },
+        {
+          "name": "convolution_weight_gradient",
+          "count_per_update": 11,
+          "sum_ms_per_update": 1.442353
+        },
+        {
+          "name": "convolution_input_gradient",
+          "count_per_update": 7,
+          "sum_ms_per_update": 0.74673825
+        },
+        {
+          "name": "other",
+          "count_per_update": 109,
+          "sum_ms_per_update": 0.136361
+        }
+      ],
+      "copies": [
+        {
+          "kind": 1,
+          "count_per_update": 1,
+          "bytes_per_update": 8,
+          "sum_ms_per_update": 0.000296
+        },
+        {
+          "kind": 2,
+          "count_per_update": 35,
+          "bytes_per_update": 658048,
+          "sum_ms_per_update": 0.05276425
+        },
+        {
+          "kind": 8,
+          "count_per_update": 401,
+          "bytes_per_update": 48920580,
+          "sum_ms_per_update": 0.373691375
+        }
+      ],
+      "cuda_graph_launches_per_update": 0
+    },
+    "jax-f32": {
+      "captured_updates": 8,
+      "update_mean_ms": 26.29680925,
+      "cuda_kernel_count_per_update": 3459,
+      "cuda_kernel_sum_ms_per_update": 20.68716775,
+      "cuda_kernel_union_ms_per_update": 20.152682875,
+      "gpu_covered_ms_per_update": 20.7685835,
+      "kernel_families": [
+        {
+          "name": "matrix_product",
+          "count_per_update": 583,
+          "sum_ms_per_update": 7.832641
+        },
+        {
+          "name": "convolution_forward_or_other",
+          "count_per_update": 128,
+          "sum_ms_per_update": 5.386445875
+        },
+        {
+          "name": "xla_fusion",
+          "count_per_update": 2615,
+          "sum_ms_per_update": 4.119368875
+        },
+        {
+          "name": "convolution_weight_gradient",
+          "count_per_update": 14,
+          "sum_ms_per_update": 2.694818375
+        },
+        {
+          "name": "convolution_input_gradient",
+          "count_per_update": 2,
+          "sum_ms_per_update": 0.483192125
+        },
+        {
+          "name": "other",
+          "count_per_update": 117,
+          "sum_ms_per_update": 0.1707015
+        }
+      ],
+      "copies": [
+        {
+          "kind": 1,
+          "count_per_update": 1,
+          "bytes_per_update": 8,
+          "sum_ms_per_update": 0.00026
+        },
+        {
+          "kind": 2,
+          "count_per_update": 33.75,
+          "bytes_per_update": 1313403,
+          "sum_ms_per_update": 0.075932625
+        },
+        {
+          "kind": 8,
+          "count_per_update": 467,
+          "bytes_per_update": 85888004,
+          "sum_ms_per_update": 0.437451625
+        }
+      ],
+      "cuda_graph_launches_per_update": 0
+    }
+  },
+  "native_captures": {
+    "native-cdp-batch-trace": {
+      "captured_updates": 8,
+      "update_mean_ms": 138.028571125,
+      "gpu_attribution_valid": false,
+      "status": "no Vulkan GPU workload table",
+      "failure_counts": {},
+      "first_failures": []
+    },
+    "native-cdp-short-batch-trace": {
+      "captured_updates": 8,
+      "update_mean_ms": 139.52992875,
+      "gpu_attribution_valid": false,
+      "status": "rejected: missing/stale intervals; no utilization or kernel-time attribution",
+      "failure_counts": {
+        "missing": 112
+      },
+      "first_failures": [
+        {
+          "kind": "missing",
+          "correlation": 1188
+        }
+      ]
+    },
+    "native-rgb-batch-trace": {
+      "captured_updates": 8,
+      "update_mean_ms": 63.535162625000005,
+      "gpu_attribution_valid": false,
+      "status": "no Vulkan GPU workload table",
+      "failure_counts": {},
+      "first_failures": []
+    },
+    "native-rgb-individual-trace": {
+      "captured_updates": 8,
+      "update_mean_ms": 63.808164,
+      "gpu_attribution_valid": false,
+      "status": "no Vulkan GPU workload table",
+      "failure_counts": {},
+      "first_failures": []
+    },
+    "native-rgb-latest-trace": {
+      "captured_updates": 8,
+      "update_mean_ms": 64.786271875,
+      "gpu_attribution_valid": false,
+      "status": "rejected: missing/stale intervals; no utilization or kernel-time attribution",
+      "failure_counts": {
+        "outside_synchronous_update": 40,
+        "missing": 5
+      },
+      "first_failures": [
+        {
+          "kind": "outside_synchronous_update",
+          "correlation": 1092,
+          "api_start_ns": 3537359119,
+          "gpu_start_ns": 2149402140,
+          "gpu_end_ns": 2149402141,
+          "update_end_ns": 3599109978
+        }
+      ],
+      "api_counts_per_update": {
+        "vkUpdateDescriptorSetWithTemplate": 6570,
+        "vkCmdBindPipeline": 6570,
+        "vkAllocateDescriptorSets": 283,
+        "vkBeginCommandBuffer": 14,
+        "vkQueueSubmit": 14,
+        "vkEndCommandBuffer": 14,
+        "vkAllocateCommandBuffers": 2,
+        "vkCmdBindDescriptorSets": 2.75,
+        "vkCmdBeginDebugUtilsLabelEXT": 22,
+        "vkSetDebugUtilsObjectNameEXT": 6,
+        "vkCreateBuffer": 4,
+        "vkBindBufferMemory": 4,
+        "vkCmdEndDebugUtilsLabelEXT": 22,
+        "vkCreateCommandPool": 2
+      }
+    },
+    "native-rgb-layer-trace": {
+      "captured_updates": 8,
+      "update_mean_ms": 64.358423875,
+      "gpu_attribution_valid": false,
+      "status": "no Vulkan GPU workload table",
+      "failure_counts": {},
+      "first_failures": []
+    },
+    "native-rgb-short-batch-trace": {
+      "captured_updates": 8,
+      "update_mean_ms": 64.27578125,
+      "gpu_attribution_valid": false,
+      "status": "rejected: missing/stale intervals; no utilization or kernel-time attribution",
+      "failure_counts": {
+        "missing": 112
+      },
+      "first_failures": [
+        {
+          "kind": "missing",
+          "correlation": 1092
+        }
+      ]
+    },
+    "native-rgb-start-trace": {
+      "captured_updates": 8,
+      "update_mean_ms": 64.7760605,
+      "gpu_attribution_valid": false,
+      "status": "rejected: missing/stale intervals; no utilization or kernel-time attribution",
+      "failure_counts": {
+        "missing": 61,
+        "outside_synchronous_update": 19
+      },
+      "first_failures": [
+        {
+          "kind": "missing",
+          "correlation": 493
+        }
+      ]
+    }
+  },
+  "completed_target_guard_receipts": [
+    {
+      "path": "profile-queue/native-rgb-ordinary",
+      "passed": true,
+      "new_allocation_warnings": 0
+    },
+    {
+      "path": "profile-queue/native-rgb-batch",
+      "passed": true,
+      "new_allocation_warnings": 0
+    },
+    {
+      "path": "profile-queue/native-rgb-individual",
+      "passed": true,
+      "new_allocation_warnings": 4
+    },
+    {
+      "path": "profile-queue/jax-bf16",
+      "passed": true,
+      "new_allocation_warnings": 1
+    },
+    {
+      "path": "profile-queue/jax-f32",
+      "passed": true,
+      "new_allocation_warnings": 1
+    },
+    {
+      "path": "profile-queue/native-cdp-batch",
+      "passed": true,
+      "new_allocation_warnings": 0
+    },
+    {
+      "path": "layer-queue/native-rgb-layer",
+      "passed": true,
+      "new_allocation_warnings": 0
+    },
+    {
+      "path": "short-queue/native-rgb-short",
+      "passed": true,
+      "new_allocation_warnings": 0
+    },
+    {
+      "path": "short-queue/native-rgb-short-batch",
+      "passed": true,
+      "new_allocation_warnings": 0
+    },
+    {
+      "path": "short-queue/native-cdp-short-batch",
+      "passed": true,
+      "new_allocation_warnings": 1
+    },
+    {
+      "path": "native-rgb-latest-guard",
+      "passed": true,
+      "new_allocation_warnings": 0
+    }
+  ],
+  "limits": [
+    "Native Graphics hardware windows are diagnostic-only because injected userspace teardown fails after completed benchmarks",
+    "Native Systems GPU timestamps remain rejected; JAX CUDA timeline is valid",
+    "Native/JAX kernel families are not one-to-one operations; graphs, weights, RNG and input residency differ",
+    "Profiled SM/engine/tensor counters are not ordinary training utilization or peak-FLOP fractions",
+    "Complete-update tile gains come from separate passing ordinary runs with exact numerical controls",
+    "The isolated tile variant is not adopted in production, not a tile sweep or learning result",
+    "One causal kernel bottleneck is established; the complete JAX performance gap remains open",
+    "No game training, agent driver recovery, separate NVML polling or production repin"
+  ],
+  "resumed": {
+    "status": "bottlenecks_identified_one_causal_check_passes",
+    "counter_admin_only": 0,
+    "user_reloaded_driver": true,
+    "agent_reloaded_driver": false,
+    "driver": "580.178.04",
+    "production_backend_changed": false,
+    "game_actions": 0,
+    "profiler_teardown_resolved": false,
+    "full_gap_explained": false,
+    "raw_label_attribution": "label-attribution.json",
+    "numerical_audits": [
+      "resumed-audit.json",
+      "labels-control-audit.json",
+      "labels-capture-audit.json",
+      "tile32-rgb-audit.json",
+      "tile32-cdp-audit.json",
+      "postcheck-cdp-audit.json"
+    ],
+    "capture_scope": "One warmed update per native graph; failed injected-process teardown; not ordinary utilization",
+    "native_captures": {
+      "rgb": {
+        "profiler_clean_exit": false,
+        "diagnostic_only": true,
+        "expected_dispatches": 6570,
+        "frame_ms": 63.0704,
+        "kernel_sum_ms": 46.682965,
+        "families": {
+          "other": {
+            "count": 3553,
+            "ms": 6.594899
+          },
+          "fused_pointwise": {
+            "count": 2162,
+            "ms": 2.293118
+          },
+          "matrix_product": {
+            "count": 828,
+            "ms": 15.026375
+          },
+          "convolution_forward": {
+            "count": 12,
+            "ms": 5.47805
+          },
+          "convolution_input_gradient": {
+            "count": 7,
+            "ms": 4.668957
+          },
+          "convolution_weight_gradient": {
+            "count": 8,
+            "ms": 12.621566
+          }
+        },
+        "frame_counters": {
+          "compute_engine_active_pct": 74.4551,
+          "sm_throughput_pct_peak": 23.9768,
+          "tensor_active_pct": 1.96517,
+          "dram_throughput_pct_peak": 6.75671,
+          "warp_slots_active_pct": 42.5417,
+          "mio_stalled_warp_slots_pct": 13.1781,
+          "shared_load_bank_conflicts_per_request": 0.296632,
+          "shared_store_bank_conflicts_per_request": 0.368242
+        },
+        "target_mean_ms": 69.9906485429688,
+        "capture_update_wall_ms": 66.16026799999999
+      },
+      "cdp": {
+        "profiler_clean_exit": false,
+        "diagnostic_only": true,
+        "expected_dispatches": 6916,
+        "frame_ms": 132.424,
+        "kernel_sum_ms": 103.470533,
+        "families": {
+          "other": {
+            "count": 3727,
+            "ms": 24.46793
+          },
+          "fused_pointwise": {
+            "count": 2299,
+            "ms": 10.461691
+          },
+          "matrix_product": {
+            "count": 875,
+            "ms": 36.806609
+          },
+          "convolution_forward": {
+            "count": 8,
+            "ms": 9.73187
+          },
+          "convolution_input_gradient": {
+            "count": 3,
+            "ms": 3.581911
+          },
+          "convolution_weight_gradient": {
+            "count": 4,
+            "ms": 18.420522000000002
+          }
+        },
+        "frame_counters": {
+          "compute_engine_active_pct": 79.2953,
+          "sm_throughput_pct_peak": 25.6864,
+          "tensor_active_pct": 5.08223,
+          "dram_throughput_pct_peak": 23.2014,
+          "warp_slots_active_pct": 51.9239,
+          "mio_stalled_warp_slots_pct": 10.0234,
+          "shared_load_bank_conflicts_per_request": 0.470559,
+          "shared_store_bank_conflicts_per_request": 0.263704
+        },
+        "target_mean_ms": 146.89762445312513,
+        "capture_update_wall_ms": 137.347961
+      }
+    },
+    "causal_tile_check": {
+      "rgb": {
+        "control": "native-rgb-postreload",
+        "control_ms": 60.98033929296876,
+        "variant_ms": 55.96858871875001,
+        "time_reduction_pct": 8.218633468306425,
+        "control_stages": {
+          "behavior_train_and_sync": 3.599495140625,
+          "imagination_and_targets": 13.6927837890625,
+          "posterior": 7.0842384140625,
+          "world_train_and_sync": 36.60382194921875
+        },
+        "variant_stages": {
+          "behavior_train_and_sync": 3.60081137890625,
+          "imagination_and_targets": 13.6631559296875,
+          "posterior": 7.14581804296875,
+          "world_train_and_sync": 31.5588033671875
+        },
+        "exact_metric_reports": 272,
+        "exact_tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "changed_dispatches": [
+          {
+            "index": 2482,
+            "old": [
+              50,
+              1,
+              128
+            ],
+            "new": [
+              25,
+              1,
+              128
+            ]
+          },
+          {
+            "index": 2499,
+            "old": [
+              75,
+              2,
+              32
+            ],
+            "new": [
+              38,
+              1,
+              32
+            ]
+          },
+          {
+            "index": 4118,
+            "old": [
+              50,
+              3,
+              32
+            ],
+            "new": [
+              25,
+              2,
+              32
+            ]
+          },
+          {
+            "index": 4130,
+            "old": [
+              5,
+              2,
+              128
+            ],
+            "new": [
+              3,
+              1,
+              128
+            ]
+          }
+        ],
+        "guard_passed": true
+      },
+      "cdp": {
+        "control": "native-cdp-postcheck",
+        "control_ms": 135.12808957812499,
+        "variant_ms": 126.60758956250002,
+        "time_reduction_pct": 6.30549876211991,
+        "control_stages": {
+          "behavior_train_and_sync": 9.8610044375,
+          "imagination_and_targets": 54.2771593515625,
+          "posterior": 16.62380905078125,
+          "world_train_and_sync": 54.36611673828125
+        },
+        "variant_stages": {
+          "behavior_train_and_sync": 9.879050187499999,
+          "imagination_and_targets": 54.19360758984375,
+          "posterior": 16.612876140625,
+          "world_train_and_sync": 45.92205564453125
+        },
+        "exact_metric_reports": 272,
+        "exact_tensors": {
+          "initial": 346,
+          "first": 346,
+          "final": 346
+        },
+        "changed_dispatches": [
+          {
+            "index": 4123,
+            "old": [
+              50,
+              3,
+              128
+            ],
+            "new": [
+              25,
+              2,
+              128
+            ]
+          },
+          {
+            "index": 4135,
+            "old": [
+              5,
+              2,
+              512
+            ],
+            "new": [
+              3,
+              1,
+              512
+            ]
+          }
+        ],
+        "guard_passed": true
+      }
+    },
+    "new_passing_guards": 8,
+    "structural_audit": {
+      "parser": "ijson",
+      "version": "3.5.1",
+      "method": "Event-stream SHA256 tree; map keys sorted, array order preserved",
+      "earlier_materializing_attempts_oom": 2,
+      "plans": [
+        {
+          "title": "rgb",
+          "stage": "posterior",
+          "transformed_control_and_variant_sha256": "24f5465c5c53889d4f4b256a8472021885e33243fa34c40d59b274fd0a210c6a",
+          "changes": 0
+        },
+        {
+          "title": "rgb",
+          "stage": "imagination",
+          "transformed_control_and_variant_sha256": "5156f811b08f4395ab974c014b73bc60f2247781f528f2484dd26b9d8cf3cef1",
+          "changes": 0
+        },
+        {
+          "title": "rgb",
+          "stage": "world_gradient",
+          "transformed_control_and_variant_sha256": "00c4c100cf90da127d13e93cecd1987e5f08b7ba28a1447e5fed6981d41c7ba4",
+          "changes": 4
+        },
+        {
+          "title": "rgb",
+          "stage": "behavior_gradient",
+          "transformed_control_and_variant_sha256": "86698f397c977c1449e844b24d5527303d6bb25db45c15de7a9859661efc103d",
+          "changes": 0
+        },
+        {
+          "title": "rgb",
+          "stage": "slow_value",
+          "transformed_control_and_variant_sha256": "001cc5ef0fae7a6fd590b38ef4906d2cda1135f7b5ca845c6c227af68e51d73f",
+          "changes": 0
+        },
+        {
+          "title": "cdp",
+          "stage": "posterior",
+          "transformed_control_and_variant_sha256": "60e997a8dfb4f70e1db99e1414502abed63defcc98bdad30958c6438abf3ac87",
+          "changes": 0
+        },
+        {
+          "title": "cdp",
+          "stage": "imagination",
+          "transformed_control_and_variant_sha256": "29a7b63d6cfd2e038819b2a7b14e2d7beec138281e452f143cc372f4b471a2e2",
+          "changes": 0
+        },
+        {
+          "title": "cdp",
+          "stage": "world_gradient",
+          "transformed_control_and_variant_sha256": "45d10ae37ededf795cffe9327518a92ec09706f52babfb94fc64ec606e79dd11",
+          "changes": 2
+        },
+        {
+          "title": "cdp",
+          "stage": "behavior_gradient",
+          "transformed_control_and_variant_sha256": "c8d03d75284b3dbe330e78b3f0191da8ac0cb106422b199b325ee2dc1a3325e5",
+          "changes": 0
+        },
+        {
+          "title": "cdp",
+          "stage": "slow_value",
+          "transformed_control_and_variant_sha256": "44289fbc60e785892ad38539c84af74f568d0aff01f0b3e5e063f46be6cac6b4",
+          "changes": 0
+        }
+      ],
+      "wall_seconds": 88.722,
+      "memory_peak_human": "151.3 MiB",
+      "result": "passed"
+    },
+    "kernel_messages": {
+      "allocation_warnings": 2,
+      "profiler_refcount_warnings": 9,
+      "userspace_segfaults": 9,
+      "xid_lines": []
+    },
+    "binaries": {
+      "kindle-tests-short": "d6cbdbcabfd25ef4094f676e1b1dc7e90acd7e1a917494472ff89dafb0e47235",
+      "kindle-tests-labels": "939a89c30497f80cf10f85984e96801849077a0fa32c9b7d05eb95024abae9b9",
+      "kindle-tests-tiles": "9528decc6a0059f3f9b6a68e72bc66a21c97e779bdf93caa221392ed451d1159"
+    },
+    "upstream_recheck": {
+      "meganeura": "07445e8eeb9d3013b30c35e36498e77e3abe58af",
+      "blade": "7909fc17392f803b02be001041695127426e0fa3",
+      "repinned": false
+    },
+    "diagnostic_source_base": "1780ceec82ab2b49b97a9b26c8ae0746c664d9ff",
+    "raw_summary": "resumed-summary.json",
+    "injected_capture_outcomes": {
+      "exact_completed_benchmarks": 9,
+      "failed_guard_receipts": 8,
+      "missing_first_launcher_receipt": 1,
+      "detached_prebenchmark_failure": 1,
+      "clean_profiler_qualification": false
+    }
+  },
+  "initial_limits": [
+    "JAX kernels grouped by demangled names, not learner stages",
+    "Summed time and interval coverage are not SM utilization",
+    "Native stale/missing timestamps rejected, not treated as idle",
+    "JAX and native fixtures/weights/RNG/data residency differ",
+    "Annotated control and profiler timing do not replace ordinary baseline",
+    "Short RGB finals compare to short control; CDP only initial/first/prefix plus finite final",
+    "Incomplete profiler attempts retain additional compute; no game actions",
+    "Graphics attaches but administrator-only counter permission prevents capture"
+  ]
+}

@@ -1,0 +1,387 @@
+{
+  "protocol": "kindle-cdp-qualification-v1",
+  "date": "2026-10-04",
+  "status": "qualification-complete-learning-started",
+  "root": "/x/Code/kindle/runs/cdp-evaluation-20261004.olfQrV",
+  "implementation_commit": "8bc17d39eef74844da795c1ec4faa68e2c159df6",
+  "backend": {
+    "meganeura": "13b19d33c811ac6eb59b2d64d9d28645b2ca2edc",
+    "blade": "e349cddf7a9bf181a362507e640b3d576b1aac72",
+    "checked_upstream": "6268ea54416810a9c97d7f4511cf6f6b1cd1700e",
+    "gpu": "NVIDIA GeForce RTX 5080",
+    "driver": "580.178.04",
+    "boot": "3e89d55c-a9e5-472f-a18a-06508c5bafa7"
+  },
+  "cpu": {
+    "rust_passed": 111,
+    "rust_ignored": 55,
+    "python_passed": 1061,
+    "reference_tests_after_adapter_changes": 17,
+    "workspace_clippy": true,
+    "binding_clippy": true,
+    "formatting": true,
+    "service": "kindle-cdp-build-v4-20261004.service",
+    "retained_failures": [
+      "initial graph scalar shape mismatch",
+      "large future-predictor enum Clippy failure"
+    ]
+  },
+  "initialization": {
+    "guard": "init-guard",
+    "passed": true,
+    "allowed_warning_occurrences": 1,
+    "allocation_bytes": [
+      4096,
+      4096,
+      4096
+    ],
+    "exact_dispatch_outputs": 256,
+    "teardown_completed": true,
+    "seconds": 2.106998,
+    "minimum_sampled_vulkan_headroom_bytes": 16560095232
+  },
+  "cosine": {
+    "guard": "cosine-v2-queue/cosine-f64",
+    "passed": true,
+    "distances": 4,
+    "raw_gradients": 1024,
+    "reference": "independent F64 analytic",
+    "detached_target": true,
+    "retained_failed_guard": "cosine-queue/cosine-f64",
+    "failure": "inference-only clamp used in differentiated graph; replaced by differentiable ReLU floor; CPU autodiff now checked",
+    "test_executable_sha256": "40281be48e4a53c49dafe763b62cd1749a62ba0c93a98113e31ffd1857e5e9cc",
+    "native_library_sha256": "cb5ef73b62477320139f7171150db8f3a736197cde6a4b5a6f0f02dbc3d0572e"
+  },
+  "native_updates": {
+    "cdp": {
+      "guard": "cdp-native-queue/cdp-native-reference",
+      "completed": 4
+    },
+    "rgb": {
+      "guard": "rgb-native-queue/rgb-native-reference",
+      "completed": 4
+    },
+    "shared_initial_tensors": {
+      "world": 60,
+      "behavior": 22,
+      "slow_critic": 11,
+      "different": 0
+    },
+    "unique_parameter_counts": {
+      "rgb": 688004,
+      "cdp": 804785
+    }
+  },
+  "upstream": {
+    "cdp_revision": "a851fa3e3d70b624b094ee1810ad4bb602346092",
+    "rgb_revision": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+    "rgb_comparison": {
+      "status": "passed",
+      "comparisons": 1524,
+      "updates": 4,
+      "guard": "rgb-upstream-queue/rgb-upstream-reference",
+      "maximum_parameter_error": 1.1920928955078125e-7,
+      "new_allocation_warnings": 0
+    },
+    "cdp_attempts": [
+      {
+        "guard": "cdp-upstream-queue/cdp-upstream-reference",
+        "status": "failed",
+        "reason": "released encoder helper receives outer config; depth64 default gives 4096-wide predictor vs actual Size1M 256-wide CNN; nested configuration corrected in adapter"
+      },
+      {
+        "guard": "cdp-upstream-v2-queue/cdp-upstream-reference",
+        "status": "failed",
+        "comparisons": 674,
+        "passed_comparisons": 673,
+        "complete_steps": 2,
+        "complete_step_comparisons": [
+          325,
+          325
+        ],
+        "failed_comparison": {
+          "name": "step2/gradient/dyn/dynin1/bias",
+          "maximum_absolute_error": 0.039679687500211,
+          "relative_l2": 0.000006074425026922252
+        },
+        "coordinate_tolerance": {
+          "absolute": 0.003,
+          "relative": 0.003
+        },
+        "gradient_norm_tolerance": {
+          "relative": 0.003,
+          "absolute_per_root_element": 1e-7
+        },
+        "cause": "unresolved; tensor-relative agreement does not waive a failed component gate"
+      },
+      {
+        "guard": "cdp-upstream-v3-queue/cdp-upstream-reference",
+        "status": "stopped",
+        "reason": "new allocation warning before comparison",
+        "change": "isolate raw gradient comparison at exact native pre-step parameters; reference optimizer/EMA remains independent; tolerances unchanged",
+        "numerical_result": null
+      },
+      {
+        "guard": "cdp-upstream-v4-queue/cdp-upstream-reference",
+        "status": "passed",
+        "comparisons": 1300,
+        "updates": 4,
+        "maximum_parameter_error": 2.384185791015625e-7,
+        "maximum_gradient_relative_l2": 0.00045674313588525754,
+        "new_allowed_allocation_warnings": 1,
+        "raw_gradients": "exact native pre-step weights",
+        "optimizer_ema": "independent common-gradient trajectory",
+        "tolerances_changed": false
+      }
+    ]
+  },
+  "allocation_stop": {
+    "receipt_utc": "2026-10-04 06:31:48.810180 UTC",
+    "cursor": "s=a5eec2671d5c497daa45e6fc28c57f05;i=e30da8f;b=3e89d55ca9e5472fa18a06508c5bafa7;m=71db0c64ee;t=65cfdeb8fb9c4;x=15482c5c5ffc993a",
+    "message": "NVRM: nvCheckOkFailedNoLog: Check failed: Out of memory [NV_ERR_NO_MEMORY] (0x00000051) returned from _memdescAllocInternal(pMemDesc) @ mem_desc.c:1359",
+    "source_monotonic_us": 488999678271,
+    "journal_monotonic_us": 489006327022,
+    "child_spawn_monotonic_seconds": 489005.900037582,
+    "child_pid": 542471,
+    "exit_code": -15,
+    "unfinished_children": [],
+    "kernel_snapshot_incomplete": "probe output limit exceeded; streaming warning record retained",
+    "recovery_performed": false,
+    "separate_nvml_queries": 0,
+    "new_xid_or_hang_recorded": false,
+    "causal_attribution": "unresolved; source and receipt timestamps differ"
+  },
+  "learning": {
+    "status": "started-after-qualification-review",
+    "service": "kindle-cdp-learning-20261004.service",
+    "spec": "learning-spec.json",
+    "queue": "learning-queue",
+    "order": [
+      "rgb-1009",
+      "cdp-1009",
+      "cdp-2017",
+      "rgb-2017",
+      "rgb-3019",
+      "cdp-3019"
+    ],
+    "actions_per_run": 200000,
+    "updates_per_run": 49939,
+    "timeout_seconds_per_run": 3600,
+    "allocation_warning_allowance": 0,
+    "automatic_retry": false,
+    "remaining": [
+      "six-run learning comparison and audits",
+      "frozen diagnostics"
+    ]
+  },
+  "guard_audits": [
+    {
+      "guard": "init-guard",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cosine-queue/cosine-f64",
+      "audit_exit_code": 0,
+      "verified_pins": 27,
+      "unsealed_files": [],
+      "host_guard_passed": false,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cosine-v2-queue/cosine-f64",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-native-queue/cdp-native-reference",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "rgb-native-queue/rgb-native-reference",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-upstream-queue/cdp-upstream-reference",
+      "audit_exit_code": 0,
+      "verified_pins": 27,
+      "unsealed_files": [],
+      "host_guard_passed": false,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-upstream-v2-queue/cdp-upstream-reference",
+      "audit_exit_code": 0,
+      "verified_pins": 27,
+      "unsealed_files": [],
+      "host_guard_passed": false,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-upstream-v3-queue/cdp-upstream-reference",
+      "audit_exit_code": 0,
+      "verified_pins": 27,
+      "unsealed_files": [],
+      "host_guard_passed": false,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-upstream-v4-queue/cdp-upstream-reference",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "rgb-upstream-queue/rgb-upstream-reference",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-replay-queue/cdp-replay-debug",
+      "audit_exit_code": 0,
+      "verified_pins": 27,
+      "unsealed_files": [],
+      "host_guard_passed": false,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-replay-v2-queue/cdp-replay-debug",
+      "audit_exit_code": 0,
+      "verified_pins": 27,
+      "unsealed_files": [],
+      "host_guard_passed": false,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-replay-v3-queue/cdp-replay-debug",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "rgb-replay-queue/rgb-replay-debug",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-smoke-queue/cdp-smoke",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "rgb-smoke-queue/rgb-smoke",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    }
+  ],
+  "limitations": [
+    "initialization success with an allowed warning is not hardware-health qualification",
+    "isolated raw-gradient and independent common-gradient optimizer parity is not bitwise stochastic-trajectory equivalence",
+    "no CDP learning advantage established yet; smokes excluded",
+    "GPU utilization and physical/peak VRAM unmeasured",
+    "numerical exact-warning allowance does not extend to training"
+  ],
+  "production": {
+    "commit": "bee4e64c477ccc5161239bafa0153ee358f2dd7d",
+    "native_sha256": "32353ffb5d4516aa9281e94004f7b7ca2f126c9d29bfd62e33c36f78c44f502a",
+    "debug_test_sha256": "2988bc5f8659c9818365efcd6419bc929fcfcdecc1807453fb538727e8ee8821",
+    "ci": {
+      "run": 37184358740,
+      "number": 278,
+      "linux": "success",
+      "macos": "success",
+      "python": "success"
+    }
+  },
+  "replay_restore": {
+    "rgb": {
+      "passed": true,
+      "seconds": 23.57,
+      "guard": "rgb-replay-queue/rgb-replay-debug"
+    },
+    "cdp": {
+      "passed": true,
+      "seconds": 22.82,
+      "guard": "cdp-replay-v3-queue/cdp-replay-debug"
+    },
+    "new_allocation_warnings": 0,
+    "retained_failures": [
+      {
+        "guard": "cdp-replay-queue/cdp-replay-debug",
+        "reason": "debug nested construction stack overflow; vector learner now heap-owned"
+      },
+      {
+        "guard": "cdp-replay-v2-queue/cdp-replay-debug",
+        "reason": "test mixed host/device replay; now exercises resident Agent API"
+      }
+    ]
+  },
+  "production_smokes": {
+    "seed": 103,
+    "actions_per_arm": 1024,
+    "updates_per_arm": 195,
+    "training_debt": 0,
+    "completed_episodes_per_arm": 0,
+    "partial_returns_per_arm": [
+      40,
+      0,
+      20,
+      20,
+      0,
+      40,
+      0,
+      0
+    ],
+    "actions_per_stream": 128,
+    "new_allocation_warnings": 0,
+    "excluded_from_learning": true,
+    "all_saved_tensors_finite": true,
+    "tensor_counts": {
+      "cdp": {
+        "world": 173,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "rgb": {
+        "world": 215,
+        "behavior": 66,
+        "slow_value": 11
+      }
+    },
+    "sampled_gpu_memory": {
+      "samples": 776,
+      "minimum_estimated_headroom_bytes": 15900344320,
+      "maximum_estimated_usage_bytes": 647102464
+    }
+  }
+}

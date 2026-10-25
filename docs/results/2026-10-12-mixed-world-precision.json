@@ -1,0 +1,18 @@
+{
+  "status": "fixed_mixed_stage_policy_qualified",
+  "raw_root": "runs/mixed-world-20261012.63YIxyjc",
+  "meganeura": "17c9287",
+  "native_sha256": "5afb0c172a3da99997ca969e91eec844d060eb592ece79fb40e36c05d8dc1777",
+  "full_update_ms": [146.1321339296875, 140.72621618359375],
+  "world_update_ms": [61.7786782109375, 56.53332280859375],
+  "logical_world_buffer_bytes": [5037528980, 4130358996],
+  "minimum_sampled_headroom_bytes": [9904783360, 10289545216],
+  "passing_guards": 2,
+  "allocation_warnings": 1,
+  "exact_initial_tensors": 346,
+  "exact_first_imagined_targets": true,
+  "finite_reports_per_arm": 272,
+  "game_actions": 0,
+  "decision": "CDP mixed-stage candidate; RGB retains separately qualified BF16; Auto default unchanged",
+  "limits": ["World gradients retain F32 storage", "No learning or utilization claim", "Final integration pending"]
+}

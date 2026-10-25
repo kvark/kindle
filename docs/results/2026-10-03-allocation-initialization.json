@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-03",
+  "kind": "bounded_initialization_diagnostic",
+  "training_runs": 0,
+  "environment_interactions": 0,
+  "result": "native allocation and exact compute succeed despite one startup allocation warning; CUDA initialization passes without warning",
+  "backend": {
+    "meganeura": "6268ea54416810a9c97d7f4511cf6f6b1cd1700e",
+    "blade": "e349cddf7a9bf181a362507e640b3d576b1aac72",
+    "upstream_heads_match": true
+  },
+  "device": {
+    "name": "NVIDIA GeForce RTX 5080",
+    "driver": "580.178.04",
+    "boot_id": "3e89d55c-a9e5-472f-a18a-06508c5bafa7"
+  },
+  "native": {
+    "evidence": "runs/allocation-init-20261003.YNlShm/native-guard",
+    "executable_sha256": "60b34cca4ed3db9fc7f5ae042121c220d31bfac99dbb7ccfb702bd05c725a738",
+    "host_guard_passed": true,
+    "exit_code": 0,
+    "duration_seconds": 2.20691,
+    "checks": {
+      "allocation_bytes": 4096,
+      "memory_classes": [
+        "Device",
+        "Shared",
+        "Upload"
+      ],
+      "outputs_exact": 256,
+      "context_destroyed": true
+    },
+    "minimum_estimated_headroom_bytes": 16560095232,
+    "allocation_warning_count": 1,
+    "warning_receipt_after_start_seconds": 0.105416,
+    "warning_cursor": "s=a5eec2671d5c497daa45e6fc28c57f05;i=e30c302;b=3e89d55ca9e5472fa18a06508c5bafa7;m=5d6578dc23;t=65ce975fc30f9;x=790955e6f8e77432",
+    "warning_observed_stage": "context initialization, before explicit probe allocations",
+    "warning_caller_identified": false,
+    "reviewed_validation_vuids": [
+      "VUID-StandaloneSpirv-None-10684"
+    ],
+    "seal_verified_files": 9
+  },
+  "cuda": {
+    "evidence": "runs/allocation-init-20261003.YNlShm/cuda-v2-guard",
+    "host_guard_passed": true,
+    "exit_code": 0,
+    "cuInit_status": 0,
+    "device_count_status": 0,
+    "device_count": 1,
+    "device_name_status": 0,
+    "allocation_warning_count": 0,
+    "explicit_contexts": 0,
+    "explicit_device_allocations": 0,
+    "kernel_dispatches": 0,
+    "seal_verified_files": 9
+  },
+  "retained_failure": {
+    "evidence": "runs/allocation-init-20261003.YNlShm/cuda-guard",
+    "exit_code": 1,
+    "reason": "TypeError in diagnostic logging helper after successful cuInit and device count",
+    "allocation_warning_count": 0,
+    "seal_verified_files": 27
+  },
+  "validation": {
+    "guard_tests_passed": 125,
+    "python_tests_passed": 1004,
+    "strict_workspace_all_targets_clippy": true,
+    "formatting": true
+  },
+  "limits": [
+    "No evidence of a new Xid, hang or device loss; no recovery performed",
+    "Internal allocation request size, address space and caller remain unknown",
+    "Receipt times do not establish process attribution",
+    "Estimated memory budget is not physical free or peak VRAM",
+    "Known warning exception is exact-message, at most two occurrences, at most 120 seconds",
+    "No NVML polling, privileged tracing or driver changes",
+    "Not Tiny numerical, learning or hardware-health qualification"
+  ],
+  "next": "bounded backend and Tiny numerical qualification"
+}

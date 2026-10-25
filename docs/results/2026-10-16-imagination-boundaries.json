@@ -1,0 +1,64 @@
+{
+  "status": "complete_cpu_boundary_audit",
+  "artifacts": "runs/imagination-boundaries-20261016.W7Up85O0",
+  "qualified_native": "834241b6b9f702a8150731a0e879e704ba817aa8dfde5aa48742251aa249c596",
+  "complete_rgb_ms": 48.06795265625,
+  "inclusive_jax_ms": 27.222569,
+  "production_changed": false,
+  "native_imagination_partition": {
+    "parameter_conversion": {"dispatches": 20, "matrices": 0, "macs": 0},
+    "recurrence_and_per_state_features": {"dispatches": 722, "matrices": 180, "macs": 44865945600},
+    "rollout_assembly": {"dispatches": 43, "matrices": 0, "macs": 0},
+    "batched_heads": {"dispatches": 17, "matrices": 8, "macs": 18251513856}
+  },
+  "core_input_composition": {
+    "chains": 15,
+    "dispatches_per_chain": 7,
+    "jax_fusions_per_step": 1,
+    "exact_address_checks": 62914560,
+    "logical_native_write_bytes": 747110400,
+    "final_packed_output_bytes": 125829120,
+    "protected_buffers": 182,
+    "gpu_implementation_qualified": false,
+    "latency_saving_measured": false
+  },
+  "rollout_assembly": {
+    "dispatches": 43,
+    "unique_logical_write_bytes": 647049216,
+    "tree_depths": [4, 4, 4],
+    "quadratic_stack_hypothesis": "rejected",
+    "fifteen_state_output_is_sixteen_state_prefix": true
+  },
+  "retained_jax_recurrence": {
+    "updates": 8,
+    "kernels_per_update": 630,
+    "copies_per_update": 45,
+    "copy_bytes_per_update": 39352320,
+    "kernel_ms": 2.852145,
+    "copy_ms": 0.055252125,
+    "activity_union_ms": 2.907397125,
+    "elapsed_span_ms": 3.146679125,
+    "matched_native_recurrence_ms": null
+  },
+  "audit": {
+    "source_seals": 63,
+    "independent_mutations": 6,
+    "nvtx_label_regressions": 3,
+    "cpu_services": 4,
+    "max_rss_kib": 316828,
+    "failed_original_sql_reviewer": true,
+    "registered_label_repair": "passed"
+  },
+  "gpu_calls": 0,
+  "synthetic_updates": 0,
+  "game_actions": 0,
+  "next": "Separately declare fixed-input valid-value native recurrence attribution before selecting copy composition or recurrent matrix execution work.",
+  "limits": [
+    "Logical write bytes are not measured DRAM traffic or speedup.",
+    "Native 8.740ms includes heads, conversions and rollout assembly; no recurrence-only ratio is established.",
+    "Native and JAX random-generation and exported-state boundaries differ.",
+    "Mixed JAX post-loop call.15 is not an imagination-only interval.",
+    "CPU address proof is not GPU numerical qualification.",
+    "Prior batching remains failed, untimed and unpromoted; production and Atari remain unchanged."
+  ]
+}

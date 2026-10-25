@@ -1,0 +1,83 @@
+{
+  "status": "complete",
+  "date": "2026-10-13",
+  "artifacts": "runs/conv-kernel-cause-20261013.3aafPTCV",
+  "layout_pair": {
+    "operation_ms": {
+      "control": 0.6293932795523437,
+      "layout": 0.342672258615625
+    },
+    "speedup": 1.836720842518896,
+    "less_time_percent": 45.55514497082797
+  },
+  "reuse_pair": {
+    "operation_ms": {
+      "control": 0.3476437628265625,
+      "reuse": 0.2111559957265625
+    },
+    "speedup": 1.6463835735772596,
+    "less_time_percent": 39.260812847688854
+  },
+  "cross_pair_original_to_final_ratio": 2.980702856135706,
+  "cross_pair_is_not_direct_pair": true,
+  "profiled_convolution_counters": {
+    "original": {
+      "duration_us": 623.424,
+      "executed_warp_instructions": 388579328.0,
+      "tensor_pipe_active_pct_elapsed_peak": 8.790448,
+      "achieved_occupancy_pct": 87.918814,
+      "l1tex_pct_active_peak": 65.252391,
+      "dram_pct_elapsed_peak": 2.248068
+    },
+    "packed": {
+      "duration_us": 325.12,
+      "executed_warp_instructions": 118521856.0,
+      "tensor_pipe_active_pct_elapsed_peak": 16.9694,
+      "achieved_occupancy_pct": 72.396949,
+      "l1tex_pct_active_peak": 91.540047,
+      "dram_pct_elapsed_peak": 4.184668
+    },
+    "reuse": {
+      "duration_us": 194.08,
+      "executed_warp_instructions": 61243392.0,
+      "tensor_pipe_active_pct_elapsed_peak": 28.749708,
+      "achieved_occupancy_pct": 31.753249,
+      "l1tex_pct_active_peak": 80.916623,
+      "dram_pct_elapsed_peak": 3.882132
+    }
+  },
+  "exact_output_elements_per_convolution": 6291456,
+  "inherited_f64_probes": 128,
+  "ordinary_warmup_calls_per_arm": 16,
+  "ordinary_measured_calls_per_arm": 128,
+  "packing_included_on_every_candidate_call": true,
+  "guards_passed": 5,
+  "failed_guards": 1,
+  "new_allocation_warnings": 0,
+  "game_actions": 0,
+  "optimizer_updates": 0,
+  "operation_invocations": 2304,
+  "kernel_launches_excluding_profiler_replays": 4608,
+  "successful_counter_captures": 3,
+  "production_changed": false,
+  "full_update_measured": false,
+  "hashes": {
+    "profile.py": "550c653d3486df5bbaf60f21644ce9867a83f9e345a44868f27535a0c630b83c",
+    "profile-v3.py": "499bef64821bb1e422324f8ed38d4f91c0fdc33558efdfe660834ce8bc2f813a",
+    "layout.cu": "8c37ecf05cbddff5c368d9a8a3fb2807dac87a7dd19ad857dffaec827bbe013b",
+    "layout.py": "d90c448343c0722df353125881b4ee7427cbc19c98ca45fe499eeaba2c6202c8",
+    "reuse.cu": "1ecea0802ceb0594b03dc54c046ef20e3a4a7a475a8c46e6dd59d14f2461af88",
+    "reuse.py": "7becfccc486f2861c0a385e60730a09ff74092d7ab1286d9e6fa51c738864460",
+    "layout": "ceee27023b7207d16d87741e7ac6abccd43d6fa557b31378c1ce36c7abb019b4",
+    "reuse": "596543c83fbfc209510aa1e934f15094d369a726237c4d2095b4f36a2b3430af",
+    "../execution-gap-20261013.EYeKOvtY/same_kernel.cu": "d7dfce880137b8d2b5e65ea8b5af8639d0929d4c3df882e668806562625196d0",
+    "../execution-gap-20261013.EYeKOvtY/same-kernel-cuda": "97c7b1477f865dec3eea0de6c898fed86187e35b1b66f4a08169e71aee1f10c8"
+  },
+  "limits": [
+    "Fixed shape/representable fixture, not general derivative qualification",
+    "CUDA diagnostic, not identical native machine code or native speedup",
+    "Profiler clocks/cache uncontrolled; counters are not whole-agent utilization",
+    "No matched BF16 library-output comparison or full JAX parity claim",
+    "Controller fingerprint, name-filter, units-row parser and unused-main compiler warnings retained"
+  ]
+}

@@ -1,0 +1,509 @@
+{
+  "status": "reviewed",
+  "backend": {
+    "meganeura": "2c42b4488310d83640c934c411202dde05b055e0",
+    "blade": "56f05651cca73659130e924e497dda633f839d40"
+  },
+  "native_sha256": "0f26ee639aaa387c6dc8cc1b454897159e716724301860573cdd442b268d57ca",
+  "decision": "adopt qualified ordinary backend; reject measured construction; no retry or tolerance change",
+  "qualification": {
+    "guards": 19,
+    "references": {
+      "cdp": {
+        "comparisons": 1300,
+        "limits": [
+          "fixed synthetic batches; not replay sampling or gameplay competence",
+          "raw gradients use exact native pre-step weights; optimizer weights/moments remain independent",
+          "raw gradients compared first; optimizer receives identical gradients to isolate its math"
+        ]
+      },
+      "rgb": {
+        "comparisons": 1524,
+        "limits": [
+          "fixed synthetic batches; not replay sampling or gameplay competence",
+          "raw gradients use exact native pre-step weights; optimizer weights/moments remain independent",
+          "raw gradients compared first; optimizer receives identical gradients to isolate its math"
+        ]
+      }
+    },
+    "minimum_sampled_headroom_bytes": 12397051904,
+    "smoke_training_actions": 3072,
+    "smoke_training_updates": 585,
+    "smoke_frozen_actions": 3072,
+    "smoke_frozen_updates": 0
+  },
+  "ordinary_timing": {
+    "status": "passed",
+    "guards": [
+      {
+        "name": "control-timing",
+        "passed": true,
+        "warnings": 0
+      },
+      {
+        "name": "candidate-timing",
+        "passed": true,
+        "warnings": 0
+      }
+    ],
+    "results": {
+      "control": {
+        "final_step": 125211,
+        "imagination_dispatches": 1210,
+        "initial_step": 124939,
+        "mean_update_ms": 107.93133803515619,
+        "measured_updates": 256,
+        "meganeura_revision": "3102683311f3376026928364928a4aa966102311",
+        "status": "complete",
+        "warmup_updates": 16,
+        "p50_ms": 107.86413099999999,
+        "p90_ms": 108.556187,
+        "full_report_sha256": "452a938cdd9de4d499d8df276415e51bf76b72cc1274bef020fc23f494e882bc"
+      },
+      "candidate": {
+        "final_step": 125211,
+        "imagination_dispatches": 1210,
+        "initial_step": 124939,
+        "mean_update_ms": 108.30190596093753,
+        "measured_updates": 256,
+        "meganeura_revision": "2c42b4488310d83640c934c411202dde05b055e0",
+        "status": "complete",
+        "warmup_updates": 16,
+        "p50_ms": 108.25600800000001,
+        "p90_ms": 108.9111695,
+        "full_report_sha256": "e8c18e2e7d9de0a07fa907115e0385e5431f84605815ed4e733cf89259762a9d"
+      }
+    },
+    "tensor_counts": {
+      "control": {
+        "initial": {
+          "world": 269,
+          "behavior": 66,
+          "slow": 11
+        },
+        "first": {
+          "world": 269,
+          "behavior": 66,
+          "slow": 11
+        },
+        "final": {
+          "world": 269,
+          "behavior": 66,
+          "slow": 11
+        }
+      },
+      "candidate": {
+        "initial": {
+          "world": 269,
+          "behavior": 66,
+          "slow": 11
+        },
+        "first": {
+          "world": 269,
+          "behavior": 66,
+          "slow": 11
+        },
+        "final": {
+          "world": 269,
+          "behavior": 66,
+          "slow": 11
+        }
+      }
+    },
+    "exact_source_tensors": 346,
+    "exact_initial_tensors": 346,
+    "first_outputs": {
+      "action_target": {
+        "count": 34560,
+        "changed": 0,
+        "maximum_absolute_error": 0.0,
+        "relative_l2": 0.0
+      },
+      "deter": {
+        "count": 262144,
+        "changed": 0,
+        "maximum_absolute_error": 0.0,
+        "relative_l2": 0.0
+      },
+      "imagined_slow_target": {
+        "count": 489600,
+        "changed": 0,
+        "maximum_absolute_error": 0.0,
+        "relative_l2": 0.0
+      },
+      "imagined_value_target": {
+        "count": 489600,
+        "changed": 0,
+        "maximum_absolute_error": 0.0,
+        "relative_l2": 0.0
+      },
+      "imagined_weight": {
+        "count": 1920,
+        "changed": 0,
+        "maximum_absolute_error": 0.0,
+        "relative_l2": 0.0
+      },
+      "replay_slow_target": {
+        "count": 30600,
+        "changed": 0,
+        "maximum_absolute_error": 0.0,
+        "relative_l2": 0.0
+      },
+      "replay_value_target": {
+        "count": 30600,
+        "changed": 0,
+        "maximum_absolute_error": 0.0,
+        "relative_l2": 0.0
+      },
+      "replay_weight": {
+        "count": 120,
+        "changed": 0,
+        "maximum_absolute_error": 0.0,
+        "relative_l2": 0.0
+      },
+      "stoch": {
+        "count": 65536,
+        "changed": 0,
+        "maximum_absolute_error": 0.0,
+        "relative_l2": 0.0
+      }
+    },
+    "speedup": 0.9965783803849676,
+    "reduction_fraction": -0.0034333672919040215,
+    "retain": false,
+    "scope": "synthetic full network updates, not environment throughput; stochastic trajectory equality is not asserted"
+  },
+  "ordinary_metric_reports_exact": 272,
+  "ordinary_final_exact_tensors": 346,
+  "original_failed_preflight": {
+    "status": "reviewed_failed_trial",
+    "child_exit_code": 101,
+    "warnings": 0,
+    "reason": "native job exited 101",
+    "error": "no qualified program within the search bounds",
+    "qualification_calls": 0,
+    "optimizer_updates": 0,
+    "game_actions": 0,
+    "calibration_exact_tensors": 346,
+    "original_source_files_checked": 153,
+    "original_scripts_checked": 4,
+    "retained_profile": "/x/Code/kindle/runs/cdp-imagination-cost-20261009.c1GzuW6V/profile/profiles/imagination.json",
+    "retained_profile_sha256": "9c6b321f0456e52664cd8304f4660abc6b468f6f1e43ccc4d9b6e62cdec3c71c",
+    "retained_plan": {
+      "adam_state_bytes": 0,
+      "allocated_buffer_bytes": 2400187972,
+      "backward_dispatch_count": 0,
+      "barrier_group_count": 919,
+      "device_local_bytes": 2154708992,
+      "dispatch_count": 1210,
+      "forward_dispatch_count": 1210,
+      "grad_accumulator_bytes": 0,
+      "logical_buffer_bytes": 9788951108,
+      "optimizer_aux_bytes": 0,
+      "physical_allocation_count": 160,
+      "resident_buffer_bytes": 2400187972
+    },
+    "original_max_plan_bytes": 4294967296,
+    "proposed_max_plan_bytes": 21474836480,
+    "interpretation": "The logical limit is below even the retained ordinary plan. No candidate was numerically checked or timed. The failed API discards its per-program report, so the exact new-plan sizes were not recorded.",
+    "ordinary_metric_reports_exact": true,
+    "ordinary_final_exact_tensors": 346,
+    "preserved_source_sha256": "529a8f5eac18effb3a291f9b4b3d5aa3964cc38bb93d786173957526124afb45"
+  },
+  "corrected_preflight": {
+    "learner_step": 124939,
+    "max_plan_bytes": 21474836480,
+    "ordinary_logical_buffer_bytes": 9788951108
+  },
+  "corrected_qualification_calls": [
+    {
+      "headroom_bytes": 10336731136,
+      "outputs": [
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 0,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 4915200,
+          "name": "features"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 1,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 5242880,
+          "name": "all_features"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 2,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 34560,
+          "name": "actions"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 3,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 522240,
+          "name": "reward_logits"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 4,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 2048,
+          "name": "continuation"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 5,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 522240,
+          "name": "value_logits"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 6,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 1920,
+          "name": "intrinsic_bonus"
+        }
+      ]
+    },
+    {
+      "headroom_bytes": 10322051072,
+      "outputs": [
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 0,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 4915200,
+          "name": "features"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 1,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 5242880,
+          "name": "all_features"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 2,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 34560,
+          "name": "actions"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 3,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 522240,
+          "name": "reward_logits"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 4,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 2048,
+          "name": "continuation"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 5,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 522240,
+          "name": "value_logits"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 6,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 1920,
+          "name": "intrinsic_bonus"
+        }
+      ]
+    },
+    {
+      "headroom_bytes": 8116043776,
+      "outputs": [
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 2.631545066833496e-05,
+          "output": 0,
+          "passed": true,
+          "relative_l2": 2.78468403021173e-07,
+          "values": 4915200,
+          "name": "features"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 2.899765968322754e-05,
+          "output": 1,
+          "passed": true,
+          "relative_l2": 3.0068175876884126e-07,
+          "values": 5242880,
+          "name": "all_features"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0,
+          "output": 2,
+          "passed": true,
+          "relative_l2": 0.0,
+          "values": 34560,
+          "name": "actions"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.0006513595581054688,
+          "output": 3,
+          "passed": true,
+          "relative_l2": 2.7488435237224487e-06,
+          "values": 522240,
+          "name": "reward_logits"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 4.649162292480469e-06,
+          "output": 4,
+          "passed": true,
+          "relative_l2": 1.652016719550476e-07,
+          "values": 2048,
+          "name": "continuation"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 0.005532979965209961,
+          "output": 5,
+          "passed": false,
+          "relative_l2": 2.0634500135952725e-05,
+          "values": 522240,
+          "name": "value_logits"
+        },
+        {
+          "discrete_exact": true,
+          "finite": true,
+          "maximum_absolute_error": 2.6591122150421143e-05,
+          "output": 6,
+          "passed": false,
+          "relative_l2": 8.18782867942838e-05,
+          "values": 1920,
+          "name": "intrinsic_bonus"
+        }
+      ]
+    }
+  ],
+  "failed_guards": [
+    {
+      "root": "/x/Code/kindle/runs/cdp-measured-build-20261011.4TQhs8Cc",
+      "result": {
+        "monitoring": "host-only",
+        "host_guard_passed": false,
+        "child_spawned": true,
+        "child_exit_code": 101,
+        "reason": "native job exited 101",
+        "host_recovery_performed": false,
+        "guard_nvml_queries": 0,
+        "gpu_telemetry": "unmeasured",
+        "hardware_qualified": false,
+        "child_pid": 1438982,
+        "unfinished_children": []
+      },
+      "warnings": 0
+    },
+    {
+      "root": "/x/Code/kindle/runs/cdp-measured-bound-repair-20261011.E12THDy8",
+      "result": {
+        "monitoring": "host-only",
+        "host_guard_passed": false,
+        "child_spawned": true,
+        "child_exit_code": 101,
+        "reason": "native job exited 101",
+        "host_recovery_performed": false,
+        "guard_nvml_queries": 0,
+        "gpu_telemetry": "unmeasured",
+        "hardware_qualified": false,
+        "child_pid": 1439881,
+        "unfinished_children": []
+      },
+      "warnings": 1
+    }
+  ],
+  "total_passed_guards": 21,
+  "total_failed_guards": 2,
+  "total_warnings": 10,
+  "search_game_actions": 0,
+  "search_optimizer_updates": 0,
+  "ordinary_synthetic_updates": 544,
+  "measured_candidate_timing_available": false,
+  "per_program_search_report_available": false,
+  "corrected_minimum_sampled_headroom_bytes": 8116043776,
+  "source_files_checked": 153,
+  "historical_learning_repeated": false,
+  "quality_goal_complete": false,
+  "evidence_sha256": {
+    "/x/Code/kindle/runs/cdp-measured-build-20261011.4TQhs8Cc/qualification-audit.json": "28efcb553d2e368d512a8ffb249cc35e838460c17cd6a7154105ecb29773a0ca",
+    "/x/Code/kindle/runs/cdp-measured-build-20261011.4TQhs8Cc/timing-audit.json": "d0bf6ce3729c0cc95f25730b87f8433cc65a5dcb403aa90648066ac5adaaaf53",
+    "/x/Code/kindle/runs/cdp-measured-build-20261011.4TQhs8Cc/failure-review.json": "388401a5cafa3d6c93d15a3d7567c800fd01b8b7f41f6a0eca84c3fd175f9b69",
+    "/x/Code/kindle/runs/cdp-measured-bound-repair-20261011.E12THDy8/measured.json": "b16ab24e2de86da62ea6be44c6b44b5d22ef5ca252f19222be297dc0eeb87244",
+    "/x/Code/kindle/runs/cdp-measured-bound-repair-20261011.E12THDy8/measured-timing/search-preflight.json": "84801467c2eb625b0f4f89a8577bd9dbfafdae45b8e0bb8eb43c3d32a9b722bd",
+    "/x/Code/kindle/runs/cdp-measured-bound-repair-20261011.E12THDy8/measured-timing/search-qualifications.jsonl": "2839a8fbbed33c0dd0ad6d1e63f82c1f78479157ce39645ba48f62460e84ec44",
+    "/x/Code/kindle/runs/cdp-measured-bound-repair-20261011.E12THDy8/measured-queue/measured-timing/child.stderr": "decba33031a8d0443fa6b37d9896492b879816bda4e35c46d4a8fc48fb4f2717"
+  },
+  "cpu_review_seconds": 0.850078193936497,
+  "limits": [
+    "No rejected program identity/kernel report survived the search panic.",
+    "Numerical gate failure does not establish a GPU fault or cause of historical learning weakness.",
+    "Synthetic control timings are not whole-game throughput or GPU utilization.",
+    "The failed hook is test-only; production ordinary execution is unchanged."
+  ]
+}

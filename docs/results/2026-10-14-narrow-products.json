@@ -1,0 +1,89 @@
+{
+  "status": "complete",
+  "date": "2026-10-14",
+  "artifacts": "runs/narrow-products-20261014.YS5lxYKB",
+  "decision": "reject: 7.03% slower, no geometry sweep or CDP follow-up",
+  "comparison": {
+    "control_ms": 28.488335785156277,
+    "candidate_ms": 30.492293164062506,
+    "less_time_percent": -7.034308335941408,
+    "reports": 272,
+    "exact_reports": 0,
+    "first_outputs_exact": true,
+    "tensors": {
+      "initial": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact": 192,
+        "relative_l2": 0.03197081964780495,
+        "max_abs": 0.2000000774860382
+      },
+      "final": {
+        "tensors": 292,
+        "exact": 1,
+        "relative_l2": 0.08645849772603993,
+        "max_abs": 1.1154685318470001
+      }
+    },
+    "minimum_sampled_headroom_bytes": 15104540672,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.61411481640625,
+        "imagination_and_targets": 7.47420444921875,
+        "posterior": 4.3366921953125,
+        "world_train_and_sync": 15.06332432421875
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.61864752734375,
+        "imagination_and_targets": 7.507633109375,
+        "posterior": 4.3341019609375,
+        "world_train_and_sync": 17.03191056640625
+      }
+    }
+  },
+  "queues": {
+    "numerical": {
+      "guards": 1,
+      "allocation_warnings": 1
+    },
+    "smoke": {
+      "guards": 2,
+      "allocation_warnings": 1
+    },
+    "timing": {
+      "guards": 2,
+      "allocation_warnings": 1
+    }
+  },
+  "numerical": {
+    "cases": 90,
+    "values": 4705658,
+    "max_relative_l2": 6.16063398253298e-7
+  },
+  "synthetic_updates": 592,
+  "game_actions": 0,
+  "cpu": {
+    "shader_variants": 90,
+    "selection_checks": 8,
+    "existing_shader_tests": 45,
+    "release_clippy": [
+      "meganeura",
+      "kindle"
+    ]
+  },
+  "scope": {
+    "selected_world_kernels": 2,
+    "unchanged_control_reports": 272,
+    "unchanged_control_tensors_per_checkpoint": 292,
+    "gpu_grouped_qualification": false,
+    "f32_cooperative_qualification": false,
+    "learning_equivalence": false,
+    "production_changed": false,
+    "whole_gap_closed": false
+  }
+}

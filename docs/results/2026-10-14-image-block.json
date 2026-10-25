@@ -1,0 +1,70 @@
+{
+  "status": "native_attribution_complete_jax_comparison_unqualified",
+  "guards": [
+    {
+      "path": "queue/native",
+      "passed": false,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "queue-v2/native",
+      "passed": true,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "queue-v2/jax",
+      "passed": false,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "jax-queue-v2/jax",
+      "passed": false,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "rounding-queue/rounding",
+      "passed": true,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "fenced-queue/jax",
+      "passed": false,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "masks-queue/masks",
+      "passed": true,
+      "allocation_warnings": 0
+    }
+  ],
+  "allocation_warnings": 0,
+  "retained_guard_failures": 4,
+  "retained_cpu_failures": 3,
+  "block_invocations": 471,
+  "failed_numerical_block_attempts": 2,
+  "measured_calls": 320,
+  "optimizer_updates": 0,
+  "game_actions": 0,
+  "exact_runtime_dispatch_descriptors": true,
+  "dispatches": 23,
+  "prepared_dispatches": 9,
+  "independent_native_f64_values": 5104,
+  "native_ordinary_ms": 6.218014140625,
+  "native_staged_ms": 6.3786496875,
+  "mask_allocated_wall_ms": {
+    "empty_command_stream": 0.06926541666666666,
+    "convolution": 1.2688022812500002,
+    "other": 4.85931346875
+  },
+  "mask_full_ms": 6.197381166666667,
+  "bracketing_full_ms": 6.238797046875,
+  "other_percent": 78.40914312139425,
+  "jax_large_weight_gradient_max_abs": 0.0306549072265625,
+  "jax_block_timing_valid": false,
+  "minimum_sampled_headroom_bytes": 15217721344,
+  "native_sha256": "0d2ab53f792365d52826c5df5143b7f4e4b3e96162e13f2c8076b89bfd4c0a8d",
+  "mask_native_sha256": "7013a35285e79979f1899eab3fb59e6ba67ea1c13975a9ac022496d37b3e2e13",
+  "scope": "First CNN fixed native block, complete forward and late-gradient backward. Mask allocations include host/command/cache interactions, not pure shader duration or removable savings. No JAX block speed ratio or whole-learner improvement.",
+  "artifacts": "runs/image-block-20261014.vPwv5OlK",
+  "review": "runs/image-block-20261014.vPwv5OlK/review.py"
+}

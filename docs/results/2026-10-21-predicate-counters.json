@@ -1,0 +1,252 @@
+{
+  "date": "2026-10-21",
+  "status": "qualified_control_instruction_reduction",
+  "candidate": "79bc7cec",
+  "control": "72005c8b",
+  "artifacts": "runs/predicate-counters-20261021.A3HhZ0zZ",
+  "build": {
+    "native_sha256": "85b689ec35bab72dda73ab136f69251992a393fcd98ae14cc9421b2abccab2e7",
+    "naga_unchanged": true,
+    "partition_test_valid": 2,
+    "partition_test_negative": 10
+  },
+  "prefix": {
+    "status": "passed",
+    "workloads": {
+      "rgb": {
+        "reports": 24,
+        "tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "program_pipeline_exports": 10,
+        "shader_files": 205
+      }
+    },
+    "guards": 1,
+    "warnings": 0,
+    "synthetic_updates": 24,
+    "game_actions": 0,
+    "source_receipts": 1918,
+    "finished_utc": "2026-10-21T10:32:12.336497+00:00"
+  },
+  "capture": {
+    "original_per_kernel_capture": "failed",
+    "grouped_not_individual_counters": true,
+    "status": "passed",
+    "workloads": {
+      "rgb": {
+        "dispatches": 3751,
+        "groups": 1112,
+        "range_count": 36,
+        "counter_passes": 50,
+        "exact_state_pairs": {
+          "initial": 292,
+          "first": 292,
+          "frozen": 292
+        },
+        "exact_output_values": 1310729,
+        "protected_buffers": 813,
+        "shader_files": 205,
+        "offline_metrics": 2088,
+        "cache_recording_replays": [
+          1,
+          49
+        ],
+        "counter_data_bytes": 18969644
+      }
+    },
+    "guards": 1,
+    "warnings": 0,
+    "synthetic_updates": 1,
+    "ordinary_fixed_replays": 18,
+    "counter_replays": 50,
+    "game_actions": 0,
+    "production_changed": false,
+    "finished_utc": "2026-10-21T10:32:25.974679+00:00"
+  },
+  "comparison": {
+    "status": "passed",
+    "scope": "same615 boot, retained control versus candidate; identical grouped execution, not latency attribution",
+    "metrics": {
+      "typed": {
+        "smsp__inst_executed.sum": {
+          "control": 9945344512,
+          "candidate": 8760672768
+        },
+        "smsp__inst_executed_pipe_cbu.sum": {
+          "control": 456761856,
+          "candidate": 17358848
+        },
+        "smsp__inst_executed_pipe_alu.sum": {
+          "control": 5697761792,
+          "candidate": 5520477696
+        },
+        "smsp__inst_executed_pipe_lsu.sum": {
+          "control": 1015118848,
+          "candidate": 1017805824
+        },
+        "smsp__inst_executed_pipe_tensor.sum": {
+          "control": 104857600,
+          "candidate": 104857600
+        },
+        "dram__bytes.sum": {
+          "control": 1370916096,
+          "candidate": 1369400064
+        },
+        "lts__t_bytes.sum": {
+          "control": 7759001312,
+          "candidate": 8414158880
+        },
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": {
+          "control": 0,
+          "candidate": 0
+        },
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": {
+          "control": 0,
+          "candidate": 0
+        }
+      },
+      "packed": {
+        "smsp__inst_executed.sum": {
+          "control": 1541164416,
+          "candidate": 1541164416
+        },
+        "smsp__inst_executed_pipe_cbu.sum": {
+          "control": 7722432,
+          "candidate": 7722432
+        },
+        "smsp__inst_executed_pipe_alu.sum": {
+          "control": 960209024,
+          "candidate": 960209024
+        },
+        "smsp__inst_executed_pipe_lsu.sum": {
+          "control": 121794176,
+          "candidate": 121794176
+        },
+        "smsp__inst_executed_pipe_tensor.sum": {
+          "control": 75366400,
+          "candidate": 75366400
+        },
+        "dram__bytes.sum": {
+          "control": 378587392,
+          "candidate": 380218624
+        },
+        "lts__t_bytes.sum": {
+          "control": 7639791936,
+          "candidate": 7643501824
+        },
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": {
+          "control": 0,
+          "candidate": 0
+        },
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": {
+          "control": 0,
+          "candidate": 0
+        }
+      },
+      "other": {
+        "smsp__inst_executed.sum": {
+          "control": 1534845049,
+          "candidate": 1534845049
+        },
+        "smsp__inst_executed_pipe_cbu.sum": {
+          "control": 31863788,
+          "candidate": 31863788
+        },
+        "smsp__inst_executed_pipe_alu.sum": {
+          "control": 629883186,
+          "candidate": 629883186
+        },
+        "smsp__inst_executed_pipe_lsu.sum": {
+          "control": 209905138,
+          "candidate": 209905138
+        },
+        "smsp__inst_executed_pipe_tensor.sum": {
+          "control": 6717440,
+          "candidate": 6717440
+        },
+        "dram__bytes.sum": {
+          "control": 3825893888,
+          "candidate": 3826577152
+        },
+        "lts__t_bytes.sum": {
+          "control": 8587494400,
+          "candidate": 8587907200
+        },
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": {
+          "control": 0,
+          "candidate": 0
+        },
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": {
+          "control": 0,
+          "candidate": 0
+        }
+      },
+      "convolution": {
+        "smsp__inst_executed.sum": {
+          "control": 11486508928,
+          "candidate": 10301837184
+        },
+        "smsp__inst_executed_pipe_cbu.sum": {
+          "control": 464484288,
+          "candidate": 25081280
+        },
+        "smsp__inst_executed_pipe_alu.sum": {
+          "control": 6657970816,
+          "candidate": 6480686720
+        },
+        "smsp__inst_executed_pipe_lsu.sum": {
+          "control": 1136913024,
+          "candidate": 1139600000
+        },
+        "smsp__inst_executed_pipe_tensor.sum": {
+          "control": 180224000,
+          "candidate": 180224000
+        },
+        "dram__bytes.sum": {
+          "control": 1749503488,
+          "candidate": 1749618688
+        },
+        "lts__t_bytes.sum": {
+          "control": 15398793248,
+          "candidate": 16057660704
+        },
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": {
+          "control": 0,
+          "candidate": 0
+        },
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": {
+          "control": 0,
+          "candidate": 0
+        }
+      }
+    },
+    "changed_runtime_shader_bodies": 4,
+    "finished_utc": "2026-10-21T10:32:27.948386+00:00"
+  },
+  "publication": {
+    "status": "passed",
+    "source_receipts": 2717,
+    "guards": 2,
+    "warnings": 0,
+    "synthetic_updates": 25,
+    "counter_replays": 50,
+    "ordinary_fixed_replays": 18,
+    "offline_metrics": 2088,
+    "game_actions": 0,
+    "production_changed": false,
+    "timing_repeated": false,
+    "upstream": {
+      "revision": "a75c38e1880de8e25e44ca169cc5f737812385ae",
+      "source_sha256": {
+        "src/codegen/cooperative.rs": "17f2f16e643e124cfacc093da1f36929cc7ad481fb314a70b5cdccc4666c9363",
+        "src/shaders/conv2d_checked.wgsl": "89cd216066c787e8690951f40c04765193720948f1743d632d51e1d98a4765ac",
+        "src/shaders/matmul_checked.wgsl": "067c2d83e6e77c67d97912ce2a129f146b82f618eb0a31ccb2ec3e0621867872"
+      },
+      "note": "Current upstream uses shared checked templates, not the retained convolution_words.rs/conv_tile_address.wgsl files. A clean port needs separate source/coverage qualification; no port speed claim."
+    },
+    "finished_utc": "2026-10-21T10:35:57.426961+00:00"
+  }
+}

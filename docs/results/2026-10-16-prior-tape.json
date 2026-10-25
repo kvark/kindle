@@ -1,0 +1,65 @@
+{
+  "schema": "kindle.prior-tape.v1",
+  "status": "forward_precision_diagnosis_complete",
+  "qualification_changed": false,
+  "artifacts": "runs/prior-tape-20261016.bFYniS7c",
+  "cpu_rounding_artifacts": "runs/prior-rounding-20261016.Zct8P2SA",
+  "native_reader_sha256": "cb9beef45a74bac38a7b1121b7c6685753ccecc1f2f5a859ca6f4dc69105afdf",
+  "backend_rebuilt": false,
+  "plan_and_pipeline_identity": true,
+  "retained_logits_exact": {"variants": 2, "values_per_variant": 262144},
+  "local_arithmetic": {
+    "matrix_and_bias_exact_values": 2097152,
+    "normalization_activation_compatible_values": 1048576,
+    "normalization_rows_with_uniform_legal_inverse": 2048,
+    "normalization_max_f32_ulp_vs_correctly_rounded_cpu": 3,
+    "normalization_max_absolute": 4.76837158203125e-7,
+    "silu_bf16_branch_changes": 6,
+    "changed_rows": [69, 158, 228, 317, 387, 476],
+    "changed_column": 165,
+    "normalized_f32": 0.8458033800125122,
+    "exact_silu": 0.5917968390172256,
+    "expected_bf16": 0.58984375,
+    "actual_bf16": 0.59375,
+    "midpoint_distance_f32_ulp": 0.6036907788366079,
+    "local_not_end_to_end_f64_qualification": true
+  },
+  "original_f64_logit_failures_by_variant": [0, 748],
+  "cpu_source_ordered_diagnosis": {
+    "values_checked": 18376640,
+    "failed_array_checks": 12,
+    "second_variant_logit_failures": 340,
+    "gpu_calls": 0,
+    "qualification_changed": false
+  },
+  "serialization_review": {
+    "different_json_decimals": 2097153,
+    "exact_constant_f32_values": 2101253,
+    "negative_regressions": 7,
+    "positive_regressions": 1,
+    "gpu_repeat": false
+  },
+  "source_seals": 2477,
+  "guards": 1,
+  "allocation_warnings": 0,
+  "forward_prefixes": 2,
+  "original_graph_dispatches": 106,
+  "raw_backward_passes": 0,
+  "optimizer_updates": 0,
+  "game_actions": 0,
+  "minimum_sampled_headroom_bytes": 16467558400,
+  "original_gradient_failures_resolved": false,
+  "world_qualification_run": false,
+  "performance_measured": false,
+  "production_changed": false,
+  "retained_failures": [
+    "CPU rounding v1 nullable reduction epilogue",
+    "CPU rounding v2 assumed unpacked Tiny reduction rows",
+    "CPU tape preflight compared in-memory and parsed JSON numbers",
+    "CPU review v1 compared distinct decimal forms of exact F32 constants"
+  ],
+  "evidence_sha256": {
+    "review.json": "2ed1fcc6030b6fd88e1a7b65c52ff641607db61b3d6faa427bca01b3b76b0d1f",
+    "cpu_rounding_diagnosis.json": "267e9785b5c6db0ee4b589dc351dc1f594b8936635f50cbbc601b9f885fd35e8"
+  }
+}

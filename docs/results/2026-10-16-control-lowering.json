@@ -1,0 +1,702 @@
+{
+  "status": "complete",
+  "published_at": "2026-10-16T19:12:09.518258+00:00",
+  "artifact_root": "runs/control-lowering-20261016.S6Tu7DVO",
+  "contracts": 20,
+  "occurrences": 23,
+  "totals": {
+    "guards": 41,
+    "allocation_warnings": 40,
+    "counter_passes": 2050,
+    "offline_values": 6902,
+    "operation_calls": 2822,
+    "retained_output_values": 516574592,
+    "paired_output_values": 258287296
+  },
+  "aggregate": {
+    "control": {
+      "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0.0,
+      "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0.0,
+      "smsp__inst_executed.sum": 10295818368.0,
+      "smsp__inst_executed_pipe_adu.sum": 88836416.0,
+      "smsp__inst_executed_pipe_alu.sum": 6818554368.0,
+      "smsp__inst_executed_pipe_cbu.sum": 25593280.0,
+      "smsp__inst_executed_pipe_cbu_pred_off_all.sum": 0.0,
+      "smsp__inst_executed_pipe_cbu_pred_on_any.sum": 25593280.0,
+      "smsp__inst_executed_pipe_fma.sum": 1141384640.0,
+      "smsp__inst_executed_pipe_lsu.sum": 774339200.0,
+      "smsp__inst_executed_pipe_tensor.sum": 180224000.0,
+      "smsp__inst_executed_pipe_uniform.sum": 43965504.0,
+      "smsp__inst_executed_pipe_xu.sum": 9727424.0,
+      "smsp__thread_inst_executed.sum": 329435223488.0,
+      "smsp__thread_inst_executed_pipe_alu_pred_on.sum": 173562216704.0,
+      "smsp__thread_inst_executed_pipe_fma_pred_on.sum": 28328268672.0,
+      "smsp__thread_inst_executed_pipe_lsu_pred_on.sum": 20746425248.0,
+      "smsp__thread_inst_executed_pred_off.sum": 62253634896.0,
+      "smsp__thread_inst_executed_pred_on.sum": 267181588592.0
+    },
+    "candidate": {
+      "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0.0,
+      "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0.0,
+      "smsp__inst_executed.sum": 12150281344.0,
+      "smsp__inst_executed_pipe_adu.sum": 71797056.0,
+      "smsp__inst_executed_pipe_alu.sum": 7646631424.0,
+      "smsp__inst_executed_pipe_cbu.sum": 350211520.0,
+      "smsp__inst_executed_pipe_cbu_pred_off_all.sum": 0.0,
+      "smsp__inst_executed_pipe_cbu_pred_on_any.sum": 350211520.0,
+      "smsp__inst_executed_pipe_fma.sum": 1589605824.0,
+      "smsp__inst_executed_pipe_lsu.sum": 892568192.0,
+      "smsp__inst_executed_pipe_tensor.sum": 180224000.0,
+      "smsp__inst_executed_pipe_uniform.sum": 43023424.0,
+      "smsp__inst_executed_pipe_xu.sum": 9727424.0,
+      "smsp__thread_inst_executed.sum": 253417370542.0,
+      "smsp__thread_inst_executed_pipe_alu_pred_on.sum": 128553659584.0,
+      "smsp__thread_inst_executed_pipe_fma_pred_on.sum": 27478814048.0,
+      "smsp__thread_inst_executed_pipe_lsu_pred_on.sum": 18012731840.0,
+      "smsp__thread_inst_executed_pred_off.sum": 40735656518.0,
+      "smsp__thread_inst_executed_pred_on.sum": 212681714024.0
+    }
+  },
+  "derived": {
+    "control": {
+      "active_threads_per_warp_instruction": 31.996992537465868,
+      "predicated_on_threads_per_warp_instruction": 25.95049553539288,
+      "thread_predicate_residual": 0.0,
+      "cbu_predicate_residual": 0.0
+    },
+    "candidate": {
+      "active_threads_per_warp_instruction": 20.85691379213548,
+      "predicated_on_threads_per_warp_instruction": 17.504262494219986,
+      "thread_predicate_residual": 0.0,
+      "cbu_predicate_residual": 0.0
+    }
+  },
+  "rows": [
+    {
+      "case": "0-3-32-64",
+      "occurrences": 1,
+      "family": "Conv2dBF16",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.484948821035566,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 348913664.0,
+          "cbu_instructions": 4456448.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 20.72385773937684,
+          "predicated_on_threads_per_warp_instruction": 18.136932731915977,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 428690432.0,
+          "cbu_instructions": 15598592.0
+        }
+      }
+    },
+    {
+      "case": "0-32-48-32",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.333684393376046,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 262602752.0,
+          "cbu_instructions": 2195456.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.33383345502792,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 262602752.0,
+          "cbu_instructions": 2195456.0
+        }
+      }
+    },
+    {
+      "case": "0-48-64-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.52444580532521,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 123240448.0,
+          "cbu_instructions": 548864.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.525470988226203,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 123240448.0,
+          "cbu_instructions": 548864.0
+        }
+      }
+    },
+    {
+      "case": "0-64-64-8",
+      "occurrences": 2,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.791896374800586,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 30810112.0,
+          "cbu_instructions": 137216.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.791686054240895,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 30810112.0,
+          "cbu_instructions": 137216.0
+        }
+      }
+    },
+    {
+      "case": "0-64-48-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.767930350420077,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 122126336.0,
+          "cbu_instructions": 548864.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.76814173807687,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 122126336.0,
+          "cbu_instructions": 548864.0
+        }
+      }
+    },
+    {
+      "case": "0-48-32-32",
+      "occurrences": 1,
+      "family": "Conv2dBF16",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.8997690029784,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 765984768.0,
+          "cbu_instructions": 1114112.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 18.334588753450376,
+          "predicated_on_threads_per_warp_instruction": 15.100584703615143,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 923911168.0,
+          "cbu_instructions": 29757440.0
+        }
+      }
+    },
+    {
+      "case": "0-32-3-64",
+      "occurrences": 1,
+      "family": "Conv2dBF16",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0000015162052,
+          "predicated_on_threads_per_warp_instruction": 23.960648522245606,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 2026110976.0,
+          "cbu_instructions": 4456448.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 16.629755072621595,
+          "predicated_on_threads_per_warp_instruction": 14.312380475396292,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 2289637376.0,
+          "cbu_instructions": 81772544.0
+        }
+      }
+    },
+    {
+      "case": "1-32-3-64",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.26149275885688,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 353894400.0,
+          "cbu_instructions": 4456448.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 16.70220393132378,
+          "predicated_on_threads_per_warp_instruction": 14.370293291420293,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 534167552.0,
+          "cbu_instructions": 16647168.0
+        }
+      }
+    },
+    {
+      "case": "2-32-3-64",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 31.99999926618215,
+          "predicated_on_threads_per_warp_instruction": 24.390454030531224,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 2180377600.0,
+          "cbu_instructions": 870400.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 21.169148512003854,
+          "predicated_on_threads_per_warp_instruction": 17.712178491638003,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 2368199680.0,
+          "cbu_instructions": 81119232.0
+        }
+      }
+    },
+    {
+      "case": "2-48-32-32",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 31.999052443782034,
+          "predicated_on_threads_per_warp_instruction": 27.334271059336697,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 829958144.0,
+          "cbu_instructions": 334848.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 22.495713046197668,
+          "predicated_on_threads_per_warp_instruction": 18.258377924086236,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 988348416.0,
+          "cbu_instructions": 30178304.0
+        }
+      }
+    },
+    {
+      "case": "1-48-32-32",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.434356230951188,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 257359872.0,
+          "cbu_instructions": 2195456.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.43438103668314,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 257359872.0,
+          "cbu_instructions": 2195456.0
+        }
+      }
+    },
+    {
+      "case": "1-64-48-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.596246069762635,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 121397248.0,
+          "cbu_instructions": 548864.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.597087077295196,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 121397248.0,
+          "cbu_instructions": 548864.0
+        }
+      }
+    },
+    {
+      "case": "2-64-48-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.672986180514872,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 185708800.0,
+          "cbu_instructions": 419200.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.665170072715995,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 185708800.0,
+          "cbu_instructions": 419200.0
+        }
+      }
+    },
+    {
+      "case": "1-64-64-8",
+      "occurrences": 2,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.854632355422094,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 30349312.0,
+          "cbu_instructions": 137216.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.854728304878872,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 30349312.0,
+          "cbu_instructions": 137216.0
+        }
+      }
+    },
+    {
+      "case": "2-64-64-8",
+      "occurrences": 2,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.781434685841464,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 46728000.0,
+          "cbu_instructions": 104800.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 27.77477281287451,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 46728000.0,
+          "cbu_instructions": 104800.0
+        }
+      }
+    },
+    {
+      "case": "1-48-64-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.809326619352895,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 120676352.0,
+          "cbu_instructions": 548864.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.809922063272182,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 120676352.0,
+          "cbu_instructions": 548864.0
+        }
+      }
+    },
+    {
+      "case": "2-48-64-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 31.859788450347448,
+          "predicated_on_threads_per_warp_instruction": 27.96353952007668,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 186963200.0,
+          "cbu_instructions": 470400.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 31.859788450347448,
+          "predicated_on_threads_per_warp_instruction": 27.980510046896928,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 186963200.0,
+          "cbu_instructions": 470400.0
+        }
+      }
+    },
+    {
+      "case": "1-32-48-32",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 28.084336030997832,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 841089024.0,
+          "cbu_instructions": 1114112.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 14.932876828490931,
+          "predicated_on_threads_per_warp_instruction": 12.480193197274073,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 1464013824.0,
+          "cbu_instructions": 38670336.0
+        }
+      }
+    },
+    {
+      "case": "2-32-48-32",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 32.0,
+          "predicated_on_threads_per_warp_instruction": 26.58395132056499,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 1091532800.0,
+          "cbu_instructions": 435200.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 22.198249589574687,
+          "predicated_on_threads_per_warp_instruction": 18.191951550899102,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 1267212288.0,
+          "cbu_instructions": 39724032.0
+        }
+      }
+    },
+    {
+      "case": "2-3-32-64",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "arms": {
+        "control": {
+          "arm": "control",
+          "active_threads_per_warp_instruction": 31.98487287274773,
+          "predicated_on_threads_per_warp_instruction": 26.349069004363162,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 262107136.0,
+          "cbu_instructions": 120832.0
+        },
+        "candidate": {
+          "arm": "candidate",
+          "active_threads_per_warp_instruction": 24.794591088604655,
+          "predicated_on_threads_per_warp_instruction": 18.817630601694358,
+          "thread_predicate_residual": 0.0,
+          "cbu_predicate_residual": 0.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0,
+          "warp_instructions": 290250752.0,
+          "cbu_instructions": 8509440.0
+        }
+      }
+    }
+  ],
+  "last_guard_event_utc": "2026-10-16T18:55:17.160053+00:00",
+  "completed_at": "2026-10-16T18:55:32.163365+00:00",
+  "minimum_sampled_headroom_bytes": 15827992576,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "ordinary_timings": 0,
+  "kernel_builds": 0,
+  "production_changed": false,
+  "cpu": {
+    "changed_contracts": 9,
+    "unchanged_packed_occurrences": 14,
+    "dw_reduction_positions": 1310720,
+    "helper_interpreted_values": 65564,
+    "helper_call_sites": 64,
+    "negative_mutations": 8,
+    "sdk_metric_base_names": 1639,
+    "subgroup_counterexample": {
+      "valid_alignment_count": 32,
+      "contiguous_mixed_subgroups": 4,
+      "regrouped_mixed_subgroups": 0,
+      "negative_permutations_rejected": 2,
+      "actual_mapping_measured": false
+    }
+  },
+  "collection_source_seals": 361,
+  "all_source_seals_checked": 365,
+  "artifact_sha256": {
+    "summary.json": "872a0bf7e9a49c27288b21c77a335e5db28484cfb872f1a6db318573dd1a5b66",
+    "audit-v2.json": "4da8f21e9d5550fc7a5907d64307d88f306cc0b127270f05db4021de1df4c46b",
+    "independent.json": "34bd7bf896bd66b5b0a339a5c564655568f1c809f8fe02cde7d9bdbaf0b42880",
+    "publish.py": "b13978bb48ba8fb98ed6dcafcb761777c00ea688e5daad06371ee62c67676fd2",
+    "declaration.md": "9430236ff88ac1e6110a133626047fe08c89bc1c80324210844f91b9cc769258",
+    "gpu_declaration.md": "871a7a7893cc16a52388e25161d9a898bd7b3c1b9d74f9f81514fc52de2a2d07",
+    "audit.py": "2cdd31c425331650d840f5fb9213209b7024fe80d78edd801352204e2e9b1059",
+    "audit.log": "4510ee24fcb258e142ae46bde4c41c5efeee814fe6a1736b31363eb1154a0922",
+    "prepare_counters.py": "8aaaf277724dd38c3ae8df7367baa2e781f0cccd63b94178f4b6eab665a5e347",
+    "counter-prepare.log": "d5886cf125c58b41b3230d7c397476e1f990265c7f0ff2c62c8f47a6b04b8978"
+  },
+  "limits": [
+    "Instruction masks are not SM utilization or latency shares.",
+    "No direct divergent-branch, function-call or driver-inlining attribution.",
+    "Static sites include both branch arms and are not native instruction counts.",
+    "Original read-span timing rejection and all failures remain.",
+    "Qualified baseline already has nearly 32 active threads per warp instruction.",
+    "No full-update speedup, production promotion or learning claim."
+  ]
+}

@@ -1,0 +1,292 @@
+{
+  "status": "complete",
+  "date": "2026-10-15",
+  "artifact_root": "runs/cdp-precision-recheck-20261015.SDZLNuhK",
+  "native_sha256": "99f8aab038d460bfd8ad4f5cc967d99d4716a3f1fc157d44279ebf8793004214",
+  "policies": [
+    "mixed",
+    "bf16"
+  ],
+  "mean_update_ms": {
+    "mixed": 78.20575050000002,
+    "bf16": 50.12159263671872
+  },
+  "stage_ms": {
+    "mixed": {
+      "behavior_train_and_sync": 4.4775290468749995,
+      "imagination_and_targets": 23.9403996171875,
+      "posterior": 9.689444558593749,
+      "world_train_and_sync": 40.09837727734375,
+      "posterior_plus_world": 49.7878218359375
+    },
+    "bf16": {
+      "behavior_train_and_sync": 4.4651055546875,
+      "imagination_and_targets": 23.94118869921875,
+      "posterior": 8.29864341796875,
+      "world_train_and_sync": 13.416654964843751,
+      "posterior_plus_world": 21.7152983828125
+    }
+  },
+  "improvement_percent": 35.91060463422225,
+  "guards_passed": 4,
+  "allocation_warnings": 1,
+  "synthetic_updates": 592,
+  "game_actions": 0,
+  "exact_initial_tensors": 346,
+  "own_smoke_first_reports_exact": 24,
+  "own_smoke_first_outputs_and_tensors_exact": true,
+  "minimum_sampled_headroom_bytes": {
+    "smoke-mixed": 11317280768,
+    "smoke-bf16": 12378701824,
+    "timing-mixed": 11317280768,
+    "timing-bf16": 12378701824
+  },
+  "first_output_differences": {
+    "action_target": {
+      "exact": false,
+      "max_absolute": 0.9076147675514221,
+      "relative_l2": 0.39005479613598865
+    },
+    "deter": {
+      "exact": false,
+      "max_absolute": 0.6533938497304916,
+      "relative_l2": 0.012286481197524719
+    },
+    "imagined_slow_target": {
+      "exact": false,
+      "max_absolute": 0.9652019739151001,
+      "relative_l2": 0.09819759116409232
+    },
+    "imagined_value_target": {
+      "exact": false,
+      "max_absolute": 0.9995109438896179,
+      "relative_l2": 0.2316838469195817
+    },
+    "imagined_weight": {
+      "exact": false,
+      "max_absolute": 0.296752005815506,
+      "relative_l2": 0.014736273378995416
+    },
+    "replay_slow_target": {
+      "exact": false,
+      "max_absolute": 0.13375885784626007,
+      "relative_l2": 0.017017817225415795
+    },
+    "replay_value_target": {
+      "exact": false,
+      "max_absolute": 0.9989157319068909,
+      "relative_l2": 0.2537966110187185
+    },
+    "replay_weight": {
+      "exact": true,
+      "max_absolute": 0.0,
+      "relative_l2": 0.0
+    },
+    "stoch": {
+      "exact": false,
+      "max_absolute": 1.0,
+      "relative_l2": 0.0924387466109315
+    }
+  },
+  "separate_parameter_moment_differences": {
+    "initial": {
+      "parameters": {
+        "tensors": 130,
+        "changed": 0,
+        "relative_l2": 0.0
+      },
+      "adam_m": {
+        "tensors": 108,
+        "changed": 0,
+        "relative_l2": 0.0
+      },
+      "adam_v": {
+        "tensors": 108,
+        "changed": 0,
+        "relative_l2": 0.0
+      }
+    },
+    "first": {
+      "parameters": {
+        "tensors": 130,
+        "changed": 129,
+        "relative_l2": 0.00017567166856128128
+      },
+      "adam_m": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 0.08225021229814605
+      },
+      "adam_v": {
+        "tensors": 108,
+        "changed": 107,
+        "relative_l2": 0.0010086512221846628
+      }
+    },
+    "final": {
+      "parameters": {
+        "tensors": 130,
+        "changed": 130,
+        "relative_l2": 0.056770874586545304
+      },
+      "adam_m": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 1.2303564759794885
+      },
+      "adam_v": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 0.07743115311407078
+      }
+    }
+  },
+  "actual_parameter_update_checks": {
+    "smoke-mixed": {
+      "parameters": {
+        "tensors": 130,
+        "changed": 130,
+        "relative_l2": 0.0031372854958252165
+      },
+      "adam_m": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 6.797946449312511
+      },
+      "adam_v": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 0.026960927419652416
+      }
+    },
+    "smoke-bf16": {
+      "parameters": {
+        "tensors": 130,
+        "changed": 130,
+        "relative_l2": 0.0031371297793465823
+      },
+      "adam_m": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 6.794075680505565
+      },
+      "adam_v": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 0.0271280517090093
+      }
+    },
+    "timing-mixed": {
+      "parameters": {
+        "tensors": 130,
+        "changed": 130,
+        "relative_l2": 0.0031372854958252165
+      },
+      "adam_m": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 6.797946449312511
+      },
+      "adam_v": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 0.026960927419652416
+      }
+    },
+    "timing-bf16": {
+      "parameters": {
+        "tensors": 130,
+        "changed": 130,
+        "relative_l2": 0.0031371297793465823
+      },
+      "adam_m": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 6.794075680505565
+      },
+      "adam_v": {
+        "tensors": 108,
+        "changed": 108,
+        "relative_l2": 0.0271280517090093
+      }
+    }
+  },
+  "plans": {
+    "mixed": {
+      "posterior_is_world_prefix": false,
+      "posterior_prefix_dispatches": 0,
+      "world_gradient": {
+        "bf16_matrices": 0,
+        "bf16_scalar": 0,
+        "dispatches": 3770,
+        "groups": 1063,
+        "logical_buffer_bytes": 4518049492,
+        "standalone_casts": 0
+      },
+      "imagination": {
+        "bf16_matrices": 170,
+        "bf16_scalar": 205,
+        "dispatches": 892,
+        "groups": 599,
+        "logical_buffer_bytes": 15176219196,
+        "standalone_casts": 114
+      },
+      "behavior_gradient": {
+        "bf16_matrices": 33,
+        "bf16_scalar": 21,
+        "dispatches": 247,
+        "groups": 36,
+        "logical_buffer_bytes": 846278684,
+        "standalone_casts": 23
+      }
+    },
+    "bf16": {
+      "posterior_is_world_prefix": true,
+      "posterior_prefix_dispatches": 1263,
+      "world_gradient": {
+        "bf16_matrices": 436,
+        "bf16_scalar": 278,
+        "dispatches": 4444,
+        "groups": 1248,
+        "logical_buffer_bytes": 6417727380,
+        "standalone_casts": 393
+      },
+      "imagination": {
+        "bf16_matrices": 170,
+        "bf16_scalar": 205,
+        "dispatches": 892,
+        "groups": 599,
+        "logical_buffer_bytes": 15176219196,
+        "standalone_casts": 114
+      },
+      "behavior_gradient": {
+        "bf16_matrices": 33,
+        "bf16_scalar": 21,
+        "dispatches": 247,
+        "groups": 36,
+        "logical_buffer_bytes": 846278684,
+        "standalone_casts": 23
+      }
+    }
+  },
+  "source_seals": 454,
+  "retained_reviewer_label_correction": "changed_parameters in the initial reviews includes adam_m/adam_v suffix matches; separated actual parameters above confirm every required update without a GPU repeat",
+  "independent_numerical_qualification": false,
+  "learning_equivalence": false,
+  "production_changed": false,
+  "rgb_jax_retimed": false,
+  "root_cause_goal_complete": false,
+  "next": "Independently qualify CDP BF16 loss/gradients and staged prefix/tail numerics before promotion; no timing repeat or learning allocation.",
+  "source_sha256": {
+    "/x/Code/kindle/runs/cdp-precision-recheck-20261015.SDZLNuhK/publication.py": "e713533ad9724f180c2164dc2d52763df3da24886ffdb2dcd18fe6a1cb879232",
+    "/x/Code/kindle/runs/cdp-precision-recheck-20261015.SDZLNuhK/prepare.json": "707d11d90b6ed4d9070c696d75df2dcee75405f333e57b7d7874ea81945b18e0",
+    "/x/Code/kindle/runs/cdp-precision-recheck-20261015.SDZLNuhK/smoke-review.json": "dcd0c05b4db7babc8e5f3b36fe9dd3de81d1cf3cad86cb71e17f094ffbf96dc1",
+    "/x/Code/kindle/runs/cdp-precision-recheck-20261015.SDZLNuhK/timing-review.json": "bb079f60435277a82f8ae7aeefa78499eb0541d35a67dbc255d61fe5cfa1bc89",
+    "/x/Code/kindle/docs/experiments/2026-10-15-cdp-precision-recheck.md": "0997dd19cc2547ab9b5bbf7b1cd230c1489968cdb9164a52de65f5187ac47362",
+    "/x/Code/kindle/runs/cdp-precision-recheck-20261015.SDZLNuhK/smoke-mixed/result.json": "b01641b52e298cc3ebe0a66a5bbac7f291b94c0bd4ab2f5dc001c31b6099a524",
+    "/x/Code/kindle/runs/cdp-precision-recheck-20261015.SDZLNuhK/smoke-bf16/result.json": "3bbd98274418c24fc6e52a7631db03ae1fae41b2cce54e7566edc30b738aa8c7",
+    "/x/Code/kindle/runs/cdp-precision-recheck-20261015.SDZLNuhK/timing-mixed/result.json": "951e3595468fb7ed2a8914c6c29c08b8fb1b12f630360ad04a8b2a96c9bbc6b8",
+    "/x/Code/kindle/runs/cdp-precision-recheck-20261015.SDZLNuhK/timing-bf16/result.json": "66788d0ce0e6e77045a238dcc02494e8578b3b9dbd28786dcb86f0953b7a1435"
+  },
+  "raw_publication_sha256": "e87d388753edb960cfd46949e18dc022d07adf92ab7a7ebafb2ff594882883e3"
+}

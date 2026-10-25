@@ -1,0 +1,1474 @@
+{
+  "status": "complete",
+  "raw_audit": "/x/Code/kindle/runs/cdp-qbert-forecasts-repair-20261011.vzrMzTOu/forecast-review.json",
+  "raw_audit_sha256": "0a3f6189d0695d04635430e4576ec371b8e2741d738fe41b12a0c075bd51a640",
+  "terminal_correction": "/x/Code/kindle/runs/cdp-qbert-forecasts-repair-20261011.vzrMzTOu/terminal-calibration.json",
+  "terminal_correction_sha256": "71d94f3d8898b2cc9d9f58c1cf35be6f9893addd5565f6571c946307d7797718",
+  "native_sha256": "7311547db9c002cbdf3b0ecea80de069bfb8ec872b8734ed0908cc13b288fe0f",
+  "seeds": [
+    1009,
+    2017,
+    3019
+  ],
+  "actions": 386496,
+  "actor_updates": 0,
+  "captures": 6,
+  "exact_tensors_per_capture": 346,
+  "capture_seconds": 1456.8371422640048,
+  "warnings": 12,
+  "failed_actions": 40789,
+  "original_smoke_actions": 128,
+  "total_diagnostic_actions": 427413,
+  "review_seconds": 3.8367622019723058,
+  "paired": {
+    "h1_reward_actual_reward_mae": {
+      "retained": {
+        "mean": 2.911023189432932,
+        "ci95": [
+          1.9345841941514628,
+          3.9408660160656015
+        ],
+        "seeds": [
+          2.8576193580817337,
+          3.9408660160656015,
+          1.9345841941514625
+        ]
+      },
+      "final": {
+        "mean": 0.6894076725343347,
+        "ci95": [
+          0.5512152730217386,
+          0.8696556769765199
+        ],
+        "seeds": [
+          0.6473520676047458,
+          0.8696556769765199,
+          0.5512152730217386
+        ]
+      },
+      "final_minus_retained": {
+        "mean": -2.221615516898598,
+        "ci95": [
+          -3.0712103390890815,
+          -1.3833689211297238
+        ],
+        "seeds": [
+          -2.210267290476988,
+          -3.0712103390890815,
+          -1.383368921129724
+        ]
+      }
+    },
+    "h1_reward_actual_reward_rmse": {
+      "retained": {
+        "mean": 24.935538559442858,
+        "ci95": [
+          22.043946233465977,
+          28.754773579542498
+        ],
+        "seeds": [
+          22.04394623346598,
+          24.007895865320084,
+          28.754773579542498
+        ]
+      },
+      "final": {
+        "mean": 11.616657964643926,
+        "ci95": [
+          10.04987781942383,
+          14.053289210693277
+        ],
+        "seeds": [
+          10.746806863814662,
+          14.053289210693277,
+          10.04987781942383
+        ]
+      },
+      "final_minus_retained": {
+        "mean": -13.318880594798932,
+        "ci95": [
+          -18.704895760118667,
+          -9.954606654626806
+        ],
+        "seeds": [
+          -11.297139369651319,
+          -9.954606654626806,
+          -18.704895760118667
+        ]
+      }
+    },
+    "h15_reward_actual_reward_mae": {
+      "retained": {
+        "mean": 3.3227907317368985,
+        "ci95": [
+          2.2180067854876993,
+          5.136692338091041
+        ],
+        "seeds": [
+          2.2180067854876993,
+          5.136692338091041,
+          2.6136730716319563
+        ]
+      },
+      "final": {
+        "mean": 1.3421667562011217,
+        "ci95": [
+          0.8436499115574776,
+          2.282649184869526
+        ],
+        "seeds": [
+          0.9002011721763613,
+          2.282649184869526,
+          0.8436499115574776
+        ]
+      },
+      "final_minus_retained": {
+        "mean": -1.9806239755357773,
+        "ci95": [
+          -2.854043153221516,
+          -1.317805613311338
+        ],
+        "seeds": [
+          -1.317805613311338,
+          -2.8540431532215154,
+          -1.7700231600744787
+        ]
+      }
+    },
+    "h15_reward_actual_reward_rmse": {
+      "retained": {
+        "mean": 27.719114091796754,
+        "ci95": [
+          17.879586094998484,
+          33.674873698232325
+        ],
+        "seeds": [
+          17.879586094998484,
+          31.602882482159455,
+          33.674873698232325
+        ]
+      },
+      "final": {
+        "mean": 16.301631853341704,
+        "ci95": [
+          7.9481677371769806,
+          26.743749718738087
+        ],
+        "seeds": [
+          7.9481677371769806,
+          26.743749718738087,
+          14.212978104110041
+        ]
+      },
+      "final_minus_retained": {
+        "mean": -11.417482238455051,
+        "ci95": [
+          -19.461895594122282,
+          -4.859132763421368
+        ],
+        "seeds": [
+          -9.931418357821503,
+          -4.859132763421368,
+          -19.461895594122282
+        ]
+      }
+    },
+    "h15_final_actual_minus_unrelated_reward_mae": {
+      "mean": -1.2189871935635843,
+      "ci95": [
+        -2.2443333505453045,
+        -0.548931944442926
+      ],
+      "seeds": [
+        -0.548931944442926,
+        -0.8636962857025221,
+        -2.2443333505453045
+      ]
+    },
+    "h15_final_actual_minus_zero_mae": {
+      "mean": -2.2467221996818116,
+      "ci95": [
+        -2.9494183256789968,
+        -1.140948403264527
+      ],
+      "seeds": [
+        -1.140948403264527,
+        -2.949418325678997,
+        -2.649799870101911
+      ]
+    },
+    "h15_final_actual_minus_calibration_mean_mae": {
+      "mean": -5.413007352828406,
+      "ci95": [
+        -6.161623738872371,
+        -4.397587318420947
+      ],
+      "seeds": [
+        -4.397587318420947,
+        -6.161623738872371,
+        -5.679811001191902
+      ]
+    },
+    "h15_final_actual_minus_persistence_mae": {
+      "mean": -2.905812281811039,
+      "ci95": [
+        -3.6827189161213933,
+        -2.169687789286735
+      ],
+      "seeds": [
+        -2.169687789286735,
+        -2.865030140024989,
+        -3.6827189161213933
+      ]
+    }
+  },
+  "groups": [
+    {
+      "seed": 1009,
+      "arm": "retained",
+      "horizon": 1,
+      "calibration": 12885,
+      "test": 24695,
+      "exclusions": 0,
+      "events": {
+        "positive": 1011,
+        "zero": 23684,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 2.8576193580817337,
+          "rmse": 22.04394623346598
+        },
+        "unrelated_reward": {
+          "mae": 2.868594901712745,
+          "rmse": 22.05158134018473
+        },
+        "posterior_reward": {
+          "mae": 2.689904022849847,
+          "rmse": 21.874582314415456
+        },
+        "zero": {
+          "mae": 3.271917392184653,
+          "rmse": 25.640213151839347
+        },
+        "calibration_mean": {
+          "mae": 6.360822995139067,
+          "rmse": 25.430761606042203
+        },
+        "persistence": {
+          "mae": 4.178983599919012,
+          "rmse": 32.73334626777733
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 62.804313673575706,
+        "unrelated_reward": 62.977529438591816,
+        "posterior_reward": 62.83401618162274,
+        "zero": 79.92087042532147,
+        "calibration_mean": 76.5564932425508,
+        "persistence": 51.50840751730959
+      },
+      "positive_auc": {
+        "actual_reward": 0.6239517645036502,
+        "unrelated_reward": 0.6185188730417026,
+        "posterior_reward": 0.6999937021090918,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.6381748912611501
+      },
+      "reward_sum": null,
+      "terminal": {
+        "count": 16,
+        "examples": 24695,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.0006260870802300138,
+            "auc": 0.5182607176141659
+          },
+          "unrelated": {
+            "brier": 0.000617349141712924,
+            "auc": 0.5216631549090319
+          },
+          "calibration_mean": {
+            "brier": 0.0006474853844230515,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.0006479044340959708,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 7508,
+          "positive": 373,
+          "mae": 0.6456422508021468,
+          "auc": 0.959300055798644
+        },
+        "after_first_pyramid": {
+          "count": 17187,
+          "positive": 638,
+          "mae": 3.8239034170481117,
+          "auc": 0.45137949787569204
+        }
+      }
+    },
+    {
+      "seed": 1009,
+      "arm": "retained",
+      "horizon": 15,
+      "calibration": 804,
+      "test": 1531,
+      "exclusions": 20,
+      "events": {
+        "positive": 56,
+        "zero": 1475,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 2.2180067854876993,
+          "rmse": 17.879586094998484
+        },
+        "unrelated_reward": {
+          "mae": 2.7232981224199895,
+          "rmse": 19.243255446549067
+        },
+        "posterior_reward": {
+          "mae": 1.8595839075522307,
+          "rmse": 12.562515713694792
+        },
+        "zero": {
+          "mae": 2.041149575440888,
+          "rmse": 12.794537738830552
+        },
+        "calibration_mean": {
+          "mae": 5.297788490597308,
+          "rmse": 12.716220149908759
+        },
+        "persistence": {
+          "mae": 3.069888961463096,
+          "rmse": 24.446852469982552
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 48.43269872165944,
+        "unrelated_reward": 53.67285857946133,
+        "posterior_reward": 47.46742402439893,
+        "zero": 55.80357142857143,
+        "calibration_mean": 52.28988983653163,
+        "persistence": 27.678571428571427
+      },
+      "positive_auc": {
+        "actual_reward": 0.5831719128329298,
+        "unrelated_reward": 0.45104116222760293,
+        "posterior_reward": 0.7303389830508474,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.7298910411622276
+      },
+      "reward_sum": {
+        "actual": {
+          "mae": 41.49433422422555,
+          "rmse": 176.05572163860498
+        },
+        "unrelated": {
+          "mae": 43.79305350129825,
+          "rmse": 176.87402585359078
+        },
+        "zero": {
+          "mae": 49.59177008491182,
+          "rmse": 183.75283537093588
+        },
+        "persistence": {
+          "mae": 66.91704768125408,
+          "rmse": 359.34046741479193
+        },
+        "calibration_mean": {
+          "mae": 78.25194731762481,
+          "rmse": 176.94093508564143
+        }
+      },
+      "terminal": {
+        "count": 3,
+        "examples": 1531,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.0019595460684407634,
+            "auc": 0.40575916230366493
+          },
+          "unrelated": {
+            "brier": 0.00195955324092278,
+            "auc": 0.3969240837696335
+          },
+          "calibration_mean": {
+            "brier": 0.0019588033539856995,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.001959503592423253,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 467,
+          "positive": 30,
+          "mae": 3.4097928165483165,
+          "auc": 0.7765827612509535
+        },
+        "after_first_pyramid": {
+          "count": 1064,
+          "positive": 26,
+          "mae": 1.6949202474188005,
+          "auc": 0.3492292870905588
+        }
+      }
+    },
+    {
+      "seed": 1009,
+      "arm": "final",
+      "horizon": 1,
+      "calibration": 12885,
+      "test": 24695,
+      "exclusions": 0,
+      "events": {
+        "positive": 1011,
+        "zero": 23684,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 0.6473520676047458,
+          "rmse": 10.746806863814662
+        },
+        "unrelated_reward": {
+          "mae": 0.6287208426591068,
+          "rmse": 11.018176309962575
+        },
+        "posterior_reward": {
+          "mae": 0.5709667954075951,
+          "rmse": 10.133838746844615
+        },
+        "zero": {
+          "mae": 3.271917392184653,
+          "rmse": 25.640213151839347
+        },
+        "calibration_mean": {
+          "mae": 6.360822995139067,
+          "rmse": 25.430761606042203
+        },
+        "persistence": {
+          "mae": 4.178983599919012,
+          "rmse": 32.73334626777733
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 7.613581335013814,
+        "unrelated_reward": 8.153803837175612,
+        "posterior_reward": 7.020530015649774,
+        "zero": 79.92087042532147,
+        "calibration_mean": 76.5564932425508,
+        "persistence": 51.50840751730959
+      },
+      "positive_auc": {
+        "actual_reward": 0.9939375282632472,
+        "unrelated_reward": 0.9941314139299657,
+        "posterior_reward": 0.9947641473265453,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.6381748912611501
+      },
+      "reward_sum": null,
+      "terminal": {
+        "count": 16,
+        "examples": 24695,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.00042519070650818235,
+            "auc": 0.9442529579804693
+          },
+          "unrelated": {
+            "brier": 0.00042253103630974603,
+            "auc": 0.9413785505895701
+          },
+          "calibration_mean": {
+            "brier": 0.0006474853844230515,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.0006479044340959708,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 7508,
+          "positive": 373,
+          "mae": 0.360391758662399,
+          "auc": 0.9959374078242098
+        },
+        "after_first_pyramid": {
+          "count": 17187,
+          "positive": 638,
+          "mae": 0.7727083252145173,
+          "auc": 0.9931011372894516
+        }
+      }
+    },
+    {
+      "seed": 1009,
+      "arm": "final",
+      "horizon": 15,
+      "calibration": 804,
+      "test": 1531,
+      "exclusions": 20,
+      "events": {
+        "positive": 56,
+        "zero": 1475,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 0.9002011721763613,
+          "rmse": 7.9481677371769806
+        },
+        "unrelated_reward": {
+          "mae": 1.4491331166192873,
+          "rmse": 9.238678832567903
+        },
+        "posterior_reward": {
+          "mae": 0.35285524982395194,
+          "rmse": 3.633137480476435
+        },
+        "zero": {
+          "mae": 2.041149575440888,
+          "rmse": 12.794537738830552
+        },
+        "calibration_mean": {
+          "mae": 5.297788490597308,
+          "rmse": 12.716220149908759
+        },
+        "persistence": {
+          "mae": 3.069888961463096,
+          "rmse": 24.446852469982552
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 8.999713638176868,
+        "unrelated_reward": 23.755560631534113,
+        "posterior_reward": 2.0357122290546874,
+        "zero": 55.80357142857143,
+        "calibration_mean": 52.28988983653163,
+        "persistence": 27.678571428571427
+      },
+      "positive_auc": {
+        "actual_reward": 0.9508716707021792,
+        "unrelated_reward": 0.801271186440678,
+        "posterior_reward": 0.9947820823244552,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.7298910411622276
+      },
+      "reward_sum": {
+        "actual": {
+          "mae": 12.445169395774842,
+          "rmse": 71.73678693406345
+        },
+        "unrelated": {
+          "mae": 15.913949174974029,
+          "rmse": 78.25732006859413
+        },
+        "zero": {
+          "mae": 49.59177008491182,
+          "rmse": 183.75283537093588
+        },
+        "persistence": {
+          "mae": 66.91704768125408,
+          "rmse": 359.34046741479193
+        },
+        "calibration_mean": {
+          "mae": 78.25194731762481,
+          "rmse": 176.94093508564143
+        }
+      },
+      "terminal": {
+        "count": 3,
+        "examples": 1531,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.0016679479437592209,
+            "auc": 0.8913612565445026
+          },
+          "unrelated": {
+            "brier": 0.002651950004458206,
+            "auc": 0.7984293193717278
+          },
+          "calibration_mean": {
+            "brier": 0.0019588033539856995,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.001959503592423253,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 467,
+          "positive": 30,
+          "mae": 1.5685656628419413,
+          "auc": 0.980701754385965
+        },
+        "after_first_pyramid": {
+          "count": 1064,
+          "positive": 26,
+          "mae": 0.6068494643372393,
+          "auc": 0.9159997035719579
+        }
+      }
+    },
+    {
+      "seed": 2017,
+      "arm": "retained",
+      "horizon": 1,
+      "calibration": 9879,
+      "test": 19164,
+      "exclusions": 0,
+      "events": {
+        "positive": 1179,
+        "zero": 17985,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 3.9408660160656015,
+          "rmse": 24.007895865320084
+        },
+        "unrelated_reward": {
+          "mae": 3.972889670812866,
+          "rmse": 24.092556585401276
+        },
+        "posterior_reward": {
+          "mae": 3.932869402795468,
+          "rmse": 23.940650636091654
+        },
+        "zero": {
+          "mae": 4.659778751826341,
+          "rmse": 27.949099454196435
+        },
+        "calibration_mean": {
+          "mae": 9.116022405863612,
+          "rmse": 27.561140384084087
+        },
+        "persistence": {
+          "mae": 5.841682321018577,
+          "rmse": 34.71489869194231
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 61.84814269008008,
+        "unrelated_reward": 61.84095112468288,
+        "posterior_reward": 62.127702966063296,
+        "zero": 75.74215436810857,
+        "calibration_mean": 70.66066838774618,
+        "persistence": 47.9431721798134
+      },
+      "positive_auc": {
+        "actual_reward": 0.6305830676444865,
+        "unrelated_reward": 0.6283431933547488,
+        "posterior_reward": 0.671942290991244,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.6275963406504761
+      },
+      "reward_sum": null,
+      "terminal": {
+        "count": 16,
+        "examples": 19164,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.0008111709677662942,
+            "auc": 0.6499585465844997
+          },
+          "unrelated": {
+            "brier": 0.0008056981684776171,
+            "auc": 0.6591598992061835
+          },
+          "calibration_mean": {
+            "brier": 0.0008342023425909701,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.0008348987685243164,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 8102,
+          "positive": 370,
+          "mae": 0.7321005225786751,
+          "auc": 0.9785587449839908
+        },
+        "after_first_pyramid": {
+          "count": 11062,
+          "positive": 809,
+          "mae": 6.291021325072209,
+          "auc": 0.36281846779567184
+        }
+      }
+    },
+    {
+      "seed": 2017,
+      "arm": "retained",
+      "horizon": 15,
+      "calibration": 615,
+      "test": 1185,
+      "exclusions": 18,
+      "events": {
+        "positive": 78,
+        "zero": 1107,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 5.136692338091041,
+          "rmse": 31.602882482159455
+        },
+        "unrelated_reward": {
+          "mae": 5.975231257796523,
+          "rmse": 34.9021767342702
+        },
+        "posterior_reward": {
+          "mae": 4.913397153872843,
+          "rmse": 30.968756713816603
+        },
+        "zero": {
+          "mae": 5.232067510548523,
+          "rmse": 31.888518892084054
+        },
+        "calibration_mean": {
+          "mae": 8.444272923741897,
+          "rmse": 31.493695073465236
+        },
+        "persistence": {
+          "mae": 5.147679324894515,
+          "rmse": 34.92004127575484
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 71.82333546128446,
+        "unrelated_reward": 78.74855492104562,
+        "posterior_reward": 71.25345217314619,
+        "zero": 79.48717948717949,
+        "calibration_mean": 75.78799249530955,
+        "persistence": 49.35897435897436
+      },
+      "positive_auc": {
+        "actual_reward": 0.5856901304055776,
+        "unrelated_reward": 0.4886503138535659,
+        "posterior_reward": 0.6236536724341603,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.7045723021332777
+      },
+      "reward_sum": {
+        "actual": {
+          "mae": 60.23838012950227,
+          "rmse": 217.5611486335667
+        },
+        "unrelated": {
+          "mae": 63.13730721951606,
+          "rmse": 218.74639648896095
+        },
+        "zero": {
+          "mae": 71.35021097046413,
+          "rmse": 224.29918988324164
+        },
+        "persistence": {
+          "mae": 81.22362869198312,
+          "rmse": 328.00702369756766
+        },
+        "calibration_mean": {
+          "mae": 110.51559123186168,
+          "rmse": 212.69089708174752
+        }
+      },
+      "terminal": {
+        "count": 2,
+        "examples": 1185,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.0016857090020676031,
+            "auc": 0.6538461538461539
+          },
+          "unrelated": {
+            "brier": 0.0016879320199097683,
+            "auc": 0.3338968723584108
+          },
+          "calibration_mean": {
+            "brier": 0.0016877637130801688,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.0016877637130801688,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 505,
+          "positive": 25,
+          "mae": 2.7249283191933427,
+          "auc": 0.7683333333333333
+        },
+        "after_first_pyramid": {
+          "count": 680,
+          "positive": 53,
+          "mae": 6.927781793301832,
+          "auc": 0.4426589630164605
+        }
+      }
+    },
+    {
+      "seed": 2017,
+      "arm": "final",
+      "horizon": 1,
+      "calibration": 9879,
+      "test": 19164,
+      "exclusions": 0,
+      "events": {
+        "positive": 1179,
+        "zero": 17985,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 0.8696556769765199,
+          "rmse": 14.053289210693277
+        },
+        "unrelated_reward": {
+          "mae": 0.9420073230271676,
+          "rmse": 14.438095795294833
+        },
+        "posterior_reward": {
+          "mae": 0.8071169396199769,
+          "rmse": 13.313842387115997
+        },
+        "zero": {
+          "mae": 4.659778751826341,
+          "rmse": 27.949099454196435
+        },
+        "calibration_mean": {
+          "mae": 9.116022405863612,
+          "rmse": 27.561140384084087
+        },
+        "persistence": {
+          "mae": 5.841682321018577,
+          "rmse": 34.71489869194231
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 8.439412415215623,
+        "unrelated_reward": 9.042566885626313,
+        "posterior_reward": 8.117182629066926,
+        "zero": 75.74215436810857,
+        "calibration_mean": 70.66066838774618,
+        "persistence": 47.9431721798134
+      },
+      "positive_auc": {
+        "actual_reward": 0.9925678334810627,
+        "unrelated_reward": 0.9922030020776431,
+        "posterior_reward": 0.9938518174248968,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.6275963406504761
+      },
+      "reward_sum": null,
+      "terminal": {
+        "count": 16,
+        "examples": 19164,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.0006273600223803116,
+            "auc": 0.98173764884061
+          },
+          "unrelated": {
+            "brier": 0.000642744836440757,
+            "auc": 0.9828572174639649
+          },
+          "calibration_mean": {
+            "brier": 0.0008342023425909701,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.0008348987685243164,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 8102,
+          "positive": 370,
+          "mae": 0.4449696423087545,
+          "auc": 0.9941059269305519
+        },
+        "after_first_pyramid": {
+          "count": 11062,
+          "positive": 809,
+          "mae": 1.1807030692092295,
+          "auc": 0.9913965305701475
+        }
+      }
+    },
+    {
+      "seed": 2017,
+      "arm": "final",
+      "horizon": 15,
+      "calibration": 615,
+      "test": 1185,
+      "exclusions": 18,
+      "events": {
+        "positive": 78,
+        "zero": 1107,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 2.282649184869526,
+          "rmse": 26.743749718738087
+        },
+        "unrelated_reward": {
+          "mae": 3.146345470572048,
+          "rmse": 27.092992870558916
+        },
+        "posterior_reward": {
+          "mae": 0.7301217741286674,
+          "rmse": 14.822386611671934
+        },
+        "zero": {
+          "mae": 5.232067510548523,
+          "rmse": 31.888518892084054
+        },
+        "calibration_mean": {
+          "mae": 8.444272923741897,
+          "rmse": 31.493695073465236
+        },
+        "persistence": {
+          "mae": 5.147679324894515,
+          "rmse": 34.92004127575484
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 26.094142741056775,
+        "unrelated_reward": 36.948009384294124,
+        "posterior_reward": 9.205185047482164,
+        "zero": 79.48717948717949,
+        "calibration_mean": 75.78799249530955,
+        "persistence": 49.35897435897436
+      },
+      "positive_auc": {
+        "actual_reward": 0.9671322354249183,
+        "unrelated_reward": 0.754916267111389,
+        "posterior_reward": 0.9968614643411391,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.7045723021332777
+      },
+      "reward_sum": {
+        "actual": {
+          "mae": 16.781486821888702,
+          "rmse": 81.30508418753277
+        },
+        "unrelated": {
+          "mae": 21.448316236627615,
+          "rmse": 83.5962425757997
+        },
+        "zero": {
+          "mae": 71.35021097046413,
+          "rmse": 224.29918988324164
+        },
+        "persistence": {
+          "mae": 81.22362869198312,
+          "rmse": 328.00702369756766
+        },
+        "calibration_mean": {
+          "mae": 110.51559123186168,
+          "rmse": 212.69089708174752
+        }
+      },
+      "terminal": {
+        "count": 2,
+        "examples": 1185,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.0018533009519112647,
+            "auc": 0.5667793744716821
+          },
+          "unrelated": {
+            "brier": 0.004302023320472148,
+            "auc": 0.24936601859678784
+          },
+          "calibration_mean": {
+            "brier": 0.0016877637130801688,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.0016877637130801688,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 505,
+          "positive": 25,
+          "mae": 0.7875668436626897,
+          "auc": 0.9745833333333334
+        },
+        "after_first_pyramid": {
+          "count": 680,
+          "positive": 53,
+          "mae": 3.392967688265779,
+          "auc": 0.9556137341638831
+        }
+      }
+    },
+    {
+      "seed": 3019,
+      "arm": "retained",
+      "horizon": 1,
+      "calibration": 42479,
+      "test": 47820,
+      "exclusions": 0,
+      "events": {
+        "positive": 1092,
+        "zero": 46728,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 1.9345841941514625,
+          "rmse": 28.754773579542498
+        },
+        "unrelated_reward": {
+          "mae": 1.9510249071897556,
+          "rmse": 28.786531891918813
+        },
+        "posterior_reward": {
+          "mae": 1.9434806633899147,
+          "rmse": 28.751863406494273
+        },
+        "zero": {
+          "mae": 3.009201171058135,
+          "rmse": 31.78520155763354
+        },
+        "calibration_mean": {
+          "mae": 5.769697958562229,
+          "rmse": 31.642650661122016
+        },
+        "persistence": {
+          "mae": 4.87034713508992,
+          "rmse": 43.65059358551779
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 79.51316668893095,
+        "unrelated_reward": 79.875809521494,
+        "posterior_reward": 79.42886642286713,
+        "zero": 131.7765567765568,
+        "calibration_mean": 128.88395101841743,
+        "persistence": 106.89102564102564
+      },
+      "positive_auc": {
+        "actual_reward": 0.9440339360890209,
+        "unrelated_reward": 0.9469517848755137,
+        "posterior_reward": 0.9456017342669885,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.6184598025170059
+      },
+      "reward_sum": null,
+      "terminal": {
+        "count": 16,
+        "examples": 47820,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.009401053592038128,
+            "auc": 0.6912568770395783
+          },
+          "unrelated": {
+            "brier": 0.00923980602343908,
+            "auc": 0.6641272173876663
+          },
+          "calibration_mean": {
+            "brier": 0.0003344974812184654,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.00033458803847762444,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 7040,
+          "positive": 354,
+          "mae": 0.20813646091409127,
+          "auc": 0.99082660285173
+        },
+        "after_first_pyramid": {
+          "count": 40780,
+          "positive": 738,
+          "mae": 2.232627157417551,
+          "auc": 0.9176360079369237
+        }
+      }
+    },
+    {
+      "seed": 3019,
+      "arm": "retained",
+      "horizon": 15,
+      "calibration": 2652,
+      "test": 2977,
+      "exclusions": 22,
+      "events": {
+        "positive": 73,
+        "zero": 2904,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 2.6136730716319563,
+          "rmse": 33.674873698232325
+        },
+        "unrelated_reward": {
+          "mae": 2.9549403015223525,
+          "rmse": 33.816578947919155
+        },
+        "posterior_reward": {
+          "mae": 2.5745306585155383,
+          "rmse": 33.6274639516347
+        },
+        "zero": {
+          "mae": 3.493449781659389,
+          "rmse": 35.87993639075702
+        },
+        "calibration_mean": {
+          "mae": 6.523460912749379,
+          "rmse": 35.71078269480288
+        },
+        "persistence": {
+          "mae": 4.526368827678871,
+          "rmse": 42.597376046966374
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 102.20723813318675,
+        "unrelated_reward": 107.82993813613702,
+        "posterior_reward": 99.9594976081296,
+        "zero": 142.46575342465752,
+        "calibration_mean": 139.27947891485357,
+        "persistence": 124.65753424657534
+      },
+      "positive_auc": {
+        "actual_reward": 0.9156571946111174,
+        "unrelated_reward": 0.7068851654779426,
+        "posterior_reward": 0.9432337069323371,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.6864858107853127
+      },
+      "reward_sum": {
+        "actual": {
+          "mae": 28.81809100975156,
+          "rmse": 112.53183111098868
+        },
+        "unrelated": {
+          "mae": 30.860529265780567,
+          "rmse": 113.70033597023897
+        },
+        "zero": {
+          "mae": 46.31340275445079,
+          "rmse": 164.99928746499788
+        },
+        "persistence": {
+          "mae": 63.97379912663755,
+          "rmse": 381.7957190852951
+        },
+        "calibration_mean": {
+          "mae": 76.08522427601052,
+          "rmse": 158.3885949221806
+        }
+      },
+      "terminal": {
+        "count": 2,
+        "examples": 2977,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.01858937432350075,
+            "auc": 0.8692436974789916
+          },
+          "unrelated": {
+            "brier": 0.02685250754235854,
+            "auc": 0.7547899159663866
+          },
+          "calibration_mean": {
+            "brier": 0.0006714528009130341,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.0006718172657037286,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 438,
+          "positive": 30,
+          "mae": 0.3239865174054731,
+          "auc": 0.9998366013071895
+        },
+        "after_first_pyramid": {
+          "count": 2539,
+          "positive": 43,
+          "mae": 3.0086642928809515,
+          "auc": 0.8382435152057245
+        }
+      }
+    },
+    {
+      "seed": 3019,
+      "arm": "final",
+      "horizon": 1,
+      "calibration": 42479,
+      "test": 47820,
+      "exclusions": 0,
+      "events": {
+        "positive": 1092,
+        "zero": 46728,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 0.5512152730217386,
+          "rmse": 10.04987781942383
+        },
+        "unrelated_reward": {
+          "mae": 1.2618053263484261,
+          "rmse": 21.422389944277302
+        },
+        "posterior_reward": {
+          "mae": 0.5221602399271098,
+          "rmse": 9.994226396767951
+        },
+        "zero": {
+          "mae": 3.009201171058135,
+          "rmse": 31.78520155763354
+        },
+        "calibration_mean": {
+          "mae": 5.769697958562229,
+          "rmse": 31.642650661122016
+        },
+        "persistence": {
+          "mae": 4.87034713508992,
+          "rmse": 43.65059358551779
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 10.52752416293853,
+        "unrelated_reward": 47.18480184787489,
+        "posterior_reward": 9.741886575836567,
+        "zero": 131.7765567765568,
+        "calibration_mean": 128.88395101841743,
+        "persistence": 106.89102564102564
+      },
+      "positive_auc": {
+        "actual_reward": 0.9917691379555786,
+        "unrelated_reward": 0.9869370663862189,
+        "posterior_reward": 0.993491442643985,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.6184598025170059
+      },
+      "reward_sum": null,
+      "terminal": {
+        "count": 16,
+        "examples": 47820,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.0003407788389288315,
+            "auc": 0.8577374539787466
+          },
+          "unrelated": {
+            "brier": 0.00034051553291612275,
+            "auc": 0.873327153585474
+          },
+          "calibration_mean": {
+            "brier": 0.0003344974812184654,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.00033458803847762444,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 7040,
+          "positive": 354,
+          "mae": 0.22004779423834214,
+          "auc": 0.9924811267662761
+        },
+        "after_first_pyramid": {
+          "count": 40780,
+          "positive": 738,
+          "mae": 0.6083859216395686,
+          "auc": 0.9936009940240255
+        }
+      }
+    },
+    {
+      "seed": 3019,
+      "arm": "final",
+      "horizon": 15,
+      "calibration": 2652,
+      "test": 2977,
+      "exclusions": 22,
+      "events": {
+        "positive": 73,
+        "zero": 2904,
+        "negative": 0
+      },
+      "reward": {
+        "actual_reward": {
+          "mae": 0.8436499115574776,
+          "rmse": 14.212978104110041
+        },
+        "unrelated_reward": {
+          "mae": 3.087983262102782,
+          "rmse": 34.77708252632164
+        },
+        "posterior_reward": {
+          "mae": 0.6053718943682678,
+          "rmse": 8.459343125552042
+        },
+        "zero": {
+          "mae": 3.493449781659389,
+          "rmse": 35.87993639075702
+        },
+        "calibration_mean": {
+          "mae": 6.523460912749379,
+          "rmse": 35.71078269480288
+        },
+        "persistence": {
+          "mae": 4.526368827678871,
+          "rmse": 42.597376046966374
+        }
+      },
+      "positive_reward_mae": {
+        "actual_reward": 15.394595322871744,
+        "unrelated_reward": 107.17020385336943,
+        "posterior_reward": 7.971010471247647,
+        "zero": 142.46575342465752,
+        "calibration_mean": 139.27947891485357,
+        "persistence": 124.65753424657534
+      },
+      "positive_auc": {
+        "actual_reward": 0.97298954677535,
+        "unrelated_reward": 0.7182204988867504,
+        "posterior_reward": 0.9914383561643836,
+        "zero": 0.5,
+        "calibration_mean": 0.5,
+        "persistence": 0.6864858107853127
+      },
+      "reward_sum": {
+        "actual": {
+          "mae": 7.8868272970917666,
+          "rmse": 46.35120652826652
+        },
+        "unrelated": {
+          "mae": 27.400089883062858,
+          "rmse": 107.74415698614817
+        },
+        "zero": {
+          "mae": 46.31340275445079,
+          "rmse": 164.99928746499788
+        },
+        "persistence": {
+          "mae": 63.97379912663755,
+          "rmse": 381.7957190852951
+        },
+        "calibration_mean": {
+          "mae": 76.08522427601052,
+          "rmse": 158.3885949221806
+        }
+      },
+      "terminal": {
+        "count": 2,
+        "examples": 2977,
+        "limited": true,
+        "predictions": {
+          "actual": {
+            "brier": 0.0006802842943663286,
+            "auc": 0.548235294117647
+          },
+          "unrelated": {
+            "brier": 0.0008001707548535217,
+            "auc": 0.5404201680672269
+          },
+          "calibration_mean": {
+            "brier": 0.0006714528009130341,
+            "auc": 0.5
+          },
+          "always_continuing": {
+            "brier": 0.0006718172657037286,
+            "auc": 0.5
+          }
+        }
+      },
+      "phase": {
+        "before_first_pyramid": {
+          "count": 438,
+          "positive": 30,
+          "mae": 0.3747043743073669,
+          "auc": 0.991421568627451
+        },
+        "after_first_pyramid": {
+          "count": 2539,
+          "positive": 43,
+          "mae": 0.9245471724143303,
+          "auc": 0.9640727489564699
+        }
+      }
+    }
+  ],
+  "continuation_discount": 0.9969969987869263,
+  "terminal_probability": "1 - clip(head / discount, 0, 1)",
+  "original_terminal_metrics_retained": true,
+  "quality_goal_complete": false,
+  "next": "bounded greedy-versus-sampled frozen Qbert evaluation; unchanged checkpoints and existing action mode"
+}

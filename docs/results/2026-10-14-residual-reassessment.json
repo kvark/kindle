@@ -1,0 +1,546 @@
+{
+  "status": "complete",
+  "date": "2026-10-14",
+  "artifacts": "runs/residual-reassessment-20261014.FpwNnsTD",
+  "workload": "RGB12M/B8/T16/H15/BF16, same retained fixture and recipe; staged world, GPU RNG/EMA, row selection, latest compiler. No actual-grid candidate.",
+  "ordinary": {
+    "native_retained_ms": 28.212816078124998,
+    "jax_retained": {
+      "core_ms": 12.420477441082767,
+      "seed_ms": 0.2386791229582741,
+      "metrics_ms": 0.17731866591930157,
+      "complete_ms": 12.836475229960342
+    },
+    "native_to_complete_jax_ratio": 2.197863165137129,
+    "source": "docs/results/2026-10-14-dense-launch-grid.json"
+  },
+  "parity": {
+    "rgb-single-ordinary": {
+      "exact_reports": 272,
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "plan_hashes": {
+        "precision-plans.json": "a08140130d384932876efd633a1ff10bc0448aace72dd69c6cdb1bd70b8e0293",
+        "imagination-plan.json": "0d2694d6c5ec19332b72fd045ab44061ad1f0c8d59d083d2c0b3ca2c62cf779f",
+        "slow_value-plan.json": "706412a4a5f1fdda9b0c31b9e984ae5585755f1a374173e36e125af0bf86439a",
+        "posterior-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "world_gradient-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "behavior_gradient-plan.json": "21cd8f90476d9d4c6294c659ee90f477e29ba1f968ee086dbc10078600428bc6"
+      },
+      "mean_update_ms": 30.066304082031248,
+      "reference": "/x/Code/kindle/runs/storage-propagation-20261014.LAt4T0Zs/rgb-compiler",
+      "reference_ms": 28.313988761718743,
+      "minimum_sampled_headroom_bytes": 15123415040
+    },
+    "rgb-single-coarse": {
+      "exact_reports": 272,
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "plan_hashes": {
+        "precision-plans.json": "a08140130d384932876efd633a1ff10bc0448aace72dd69c6cdb1bd70b8e0293",
+        "imagination-plan.json": "0d2694d6c5ec19332b72fd045ab44061ad1f0c8d59d083d2c0b3ca2c62cf779f",
+        "slow_value-plan.json": "706412a4a5f1fdda9b0c31b9e984ae5585755f1a374173e36e125af0bf86439a",
+        "posterior-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "world_gradient-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "behavior_gradient-plan.json": "21cd8f90476d9d4c6294c659ee90f477e29ba1f968ee086dbc10078600428bc6"
+      },
+      "mean_update_ms": 30.114890671874996,
+      "reference": "/x/Code/kindle/runs/storage-propagation-20261014.LAt4T0Zs/rgb-compiler",
+      "reference_ms": 28.313988761718743,
+      "minimum_sampled_headroom_bytes": 15123415040
+    }
+  },
+  "smoke_parity": {
+    "rgb-coarse-smoke": {
+      "exact_reports": 24,
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "plan_hashes": {
+        "precision-plans.json": "a08140130d384932876efd633a1ff10bc0448aace72dd69c6cdb1bd70b8e0293",
+        "imagination-plan.json": "0d2694d6c5ec19332b72fd045ab44061ad1f0c8d59d083d2c0b3ca2c62cf779f",
+        "slow_value-plan.json": "706412a4a5f1fdda9b0c31b9e984ae5585755f1a374173e36e125af0bf86439a",
+        "posterior-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "world_gradient-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "behavior_gradient-plan.json": "21cd8f90476d9d4c6294c659ee90f477e29ba1f968ee086dbc10078600428bc6"
+      },
+      "mean_update_ms": 28.881177625,
+      "reference": "/x/Code/kindle/runs/storage-propagation-20261014.LAt4T0Zs/rgb-smoke",
+      "reference_ms": 27.787109875,
+      "minimum_sampled_headroom_bytes": 15123415040
+    }
+  },
+  "coarse": {
+    "summary": {
+      "wall_ms": 30.1158045390625,
+      "gpu_pass_ms": 22.1436301171875,
+      "uncovered_ms": 7.972174421875,
+      "outside_timer_union_ms": 0.0119636328125,
+      "stages": {
+        "posterior": {
+          "wall_ms": 4.95900242578125,
+          "gpu_pass_ms": 3.26892775,
+          "uncovered_ms": 1.69007467578125
+        },
+        "imagination": {
+          "wall_ms": 7.50544280078125,
+          "gpu_pass_ms": 4.575671875,
+          "uncovered_ms": 2.92977092578125
+        },
+        "world": {
+          "wall_ms": 15.9912920546875,
+          "gpu_pass_ms": 13.3701305,
+          "uncovered_ms": 2.6211615546875
+        },
+        "behavior": {
+          "wall_ms": 1.6600672578125,
+          "gpu_pass_ms": 0.9288999921875,
+          "uncovered_ms": 0.731167265625
+        }
+      },
+      "pieces": {
+        "posterior_inputs": {
+          "wall_ms": 0.41962194140625,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.41962194140625
+        },
+        "posterior_submit": {
+          "wall_ms": 0.97360701953125,
+          "gpu_pass_ms": 0.007591875,
+          "uncovered_ms": 0.96601514453125
+        },
+        "posterior_readback": {
+          "wall_ms": 3.5245289375,
+          "gpu_pass_ms": 3.261335875,
+          "uncovered_ms": 0.2631930625
+        },
+        "posterior_unpack": {
+          "wall_ms": 0.04124452734375,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.04124452734375
+        },
+        "imagination_inputs": {
+          "wall_ms": 0.1402548671875,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.1402548671875
+        },
+        "imagination_submit": {
+          "wall_ms": 1.0108903203125,
+          "gpu_pass_ms": 0.03377259375,
+          "uncovered_ms": 0.9771177265625
+        },
+        "slow_value_submit": {
+          "wall_ms": 0.033972640625,
+          "gpu_pass_ms": 0.01447060546875,
+          "uncovered_ms": 0.01950203515625
+        },
+        "imagination_readback": {
+          "wall_ms": 4.807752375,
+          "gpu_pass_ms": 4.52742867578125,
+          "uncovered_ms": 0.28032369921875
+        },
+        "decode": {
+          "wall_ms": 1.181870734375,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 1.181870734375
+        },
+        "targets": {
+          "wall_ms": 0.33070186328125,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.33070186328125
+        },
+        "world_inputs": {
+          "wall_ms": 0.05442822265625,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.05442822265625
+        },
+        "world_submit": {
+          "wall_ms": 2.194779671875,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 2.194779671875
+        },
+        "world_wait": {
+          "wall_ms": 13.66061601171875,
+          "gpu_pass_ms": 13.3701305,
+          "uncovered_ms": 0.29048551171875
+        },
+        "world_metrics": {
+          "wall_ms": 0.01509896875,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.01509896875
+        },
+        "world_sync": {
+          "wall_ms": 0.0663691796875,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.0663691796875
+        },
+        "behavior_inputs": {
+          "wall_ms": 0.2556131484375,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.2556131484375
+        },
+        "behavior_submit": {
+          "wall_ms": 0.33428969921875,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.33428969921875
+        },
+        "behavior_wait": {
+          "wall_ms": 1.00168907421875,
+          "gpu_pass_ms": 0.928802125,
+          "uncovered_ms": 0.07288694921875
+        },
+        "behavior_metrics": {
+          "wall_ms": 0.01196587109375,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.01196587109375
+        },
+        "behavior_sync": {
+          "wall_ms": 0.05650946484375,
+          "gpu_pass_ms": 9.78671875e-05,
+          "uncovered_ms": 0.05641159765625
+        }
+      },
+      "pass_ms": {
+        "step 1/1": 21.26024825,
+        "kindle_uniforms": 0.028232375,
+        "kindle_readback": 0.301414625,
+        "kindle_device_copy": 0.0887525,
+        "agc_norms": 0.107296,
+        "agc_factor": 0.008641625,
+        "agc_apply": 0.040188125,
+        "adam_update": 0.30875875,
+        "parameter_blend": 0.0120615,
+        "readback_copy": 0
+      }
+    },
+    "all_updates_covered": 272,
+    "per_update_counts": {
+      "step 1/1": 5,
+      "kindle_uniforms": 2,
+      "kindle_readback": 2,
+      "kindle_device_copy": 2,
+      "agc_norms": 2,
+      "agc_factor": 2,
+      "agc_apply": 2,
+      "adam_update": 2,
+      "parameter_blend": 1
+    },
+    "drain_after_last_end_ms": 0.027531,
+    "scalar_probe_copies": 45,
+    "checkpoint_passes": 3,
+    "instrumentation_overhead_percent": 0.16159814558911467
+  },
+  "masks": {
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_reports": 1,
+    "total_dispatches": 5286,
+    "total_groups": 2058,
+    "baseline_gpu_ms": 21.1836775,
+    "mask_means_ms": {
+      "0": 4.271919333333333,
+      "1": 11.339498666666668,
+      "2": 8.63105,
+      "3": 15.769102666666667,
+      "4": 9.924,
+      "5": 16.61581866666667,
+      "6": 14.497335333333332,
+      "7": 21.179395333333332
+    },
+    "shapley_ms": {
+      "command_stream_floor": 4.271919333333333,
+      "convolution": 6.888191666666667,
+      "matrix": 4.474725666666666,
+      "remaining": 5.544558666666666
+    },
+    "sessions": {
+      "behavior_gradient": {
+        "dispatches": 247,
+        "groups": 36,
+        "families": {
+          "remaining": 214,
+          "matrix": 33
+        },
+        "baseline_gpu_ms": 0.86022725,
+        "shapley_ms": {
+          "command_stream_floor": 0.07514266666666666,
+          "convolution": -0.00032166666666667376,
+          "matrix": 0.412688,
+          "remaining": 0.37295366666666663
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 0.075068,
+            "1": 0.075192,
+            "2": 0.46511800000000003,
+            "3": 0.464182,
+            "4": 0.42469,
+            "5": 0.425384,
+            "6": 0.861138,
+            "7": 0.86095
+          },
+          {
+            "0": 0.075154,
+            "1": 0.075082,
+            "2": 0.465194,
+            "3": 0.465082,
+            "4": 0.425584,
+            "5": 0.426824,
+            "6": 0.861488,
+            "7": 0.859884
+          },
+          {
+            "0": 0.075206,
+            "1": 0.075068,
+            "2": 0.465764,
+            "3": 0.46544399999999997,
+            "4": 0.425658,
+            "5": 0.424238,
+            "6": 0.861144,
+            "7": 0.860554
+          }
+        ]
+      },
+      "imagination": {
+        "dispatches": 922,
+        "groups": 689,
+        "families": {
+          "remaining": 734,
+          "matrix": 188
+        },
+        "baseline_gpu_ms": 4.019395,
+        "shapley_ms": {
+          "command_stream_floor": 1.4122066666666668,
+          "convolution": 0.0006851111111111486,
+          "matrix": 1.3704124444444445,
+          "remaining": 1.2415831111111113
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 1.412338,
+            "1": 1.4125079999999999,
+            "2": 2.788458,
+            "3": 2.788954,
+            "4": 2.659852,
+            "5": 2.658658,
+            "6": 4.0263,
+            "7": 4.023246
+          },
+          {
+            "0": 1.412044,
+            "1": 1.41219,
+            "2": 2.788874,
+            "3": 2.788808,
+            "4": 2.658796,
+            "5": 2.660276,
+            "6": 4.024182,
+            "7": 4.02538
+          },
+          {
+            "0": 1.412238,
+            "1": 1.41221,
+            "2": 2.788072,
+            "3": 2.788144,
+            "4": 2.659276,
+            "5": 2.661476,
+            "6": 4.019796,
+            "7": 4.026036
+          }
+        ]
+      },
+      "slow_value": {
+        "dispatches": 13,
+        "groups": 9,
+        "families": {
+          "remaining": 9,
+          "matrix": 4
+        },
+        "baseline_gpu_ms": 0.13471425,
+        "shapley_ms": {
+          "command_stream_floor": 0.019618666666666666,
+          "convolution": -0.000102111111111113,
+          "matrix": 0.07681655555555555,
+          "remaining": 0.038412222222222216
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 0.019562,
+            "1": 0.019790000000000002,
+            "2": 0.096156,
+            "3": 0.096358,
+            "4": 0.0583,
+            "5": 0.057812,
+            "6": 0.135248,
+            "7": 0.134996
+          },
+          {
+            "0": 0.01975,
+            "1": 0.019754,
+            "2": 0.096242,
+            "3": 0.096794,
+            "4": 0.058032,
+            "5": 0.057904,
+            "6": 0.13531,
+            "7": 0.13467
+          },
+          {
+            "0": 0.019544000000000002,
+            "1": 0.019799999999999998,
+            "2": 0.096358,
+            "3": 0.09673999999999999,
+            "4": 0.057934,
+            "5": 0.05824,
+            "6": 0.135498,
+            "7": 0.13457
+          }
+        ]
+      },
+      "world_gradient": {
+        "dispatches": 4104,
+        "groups": 1324,
+        "families": {
+          "remaining": 3590,
+          "matrix": 491,
+          "convolution": 23
+        },
+        "baseline_gpu_ms": 16.169341,
+        "shapley_ms": {
+          "command_stream_floor": 2.7649513333333333,
+          "convolution": 6.887930333333333,
+          "matrix": 2.614808666666666,
+          "remaining": 3.891609666666666
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 2.76467,
+            "1": 9.834716,
+            "2": 5.279954,
+            "3": 12.417086,
+            "4": 6.784496,
+            "5": 13.472502,
+            "6": 9.48009,
+            "7": 16.160376
+          },
+          {
+            "0": 2.76517,
+            "1": 9.83121,
+            "2": 5.282278,
+            "3": 12.41943,
+            "4": 6.78231,
+            "5": 13.471966,
+            "6": 9.474794,
+            "7": 16.158046
+          },
+          {
+            "0": 2.765014,
+            "1": 9.830976,
+            "2": 5.280682,
+            "3": 12.420286,
+            "4": 6.7770719999999995,
+            "5": 13.472176000000001,
+            "6": 9.477018,
+            "7": 16.159478
+          }
+        ]
+      }
+    },
+    "optimizer_free_session_replays": 2380,
+    "scope": "Counterfactual zero-workgroup dispatches retain bindings/barriers. Masked outputs are not valid learner outputs. Shapley allocates cache/overlap interactions; not pure kernel durations or independently additive optimization savings."
+  },
+  "jax_retained_capture": {
+    "summary": {
+      "nvtx_wall_ms": 15.78736625,
+      "gpu_union_ms": 10.295496625,
+      "kernel_sum_ms": 9.869361875000001,
+      "copy_sum_ms": 0.42613475,
+      "uncovered_ms": 5.491869625,
+      "kernels": 3429,
+      "copies": 437
+    },
+    "families_ms": {
+      "fusion_and_other": 3.470207750000113,
+      "convolution_forward_or_other": 1.8527128749999997,
+      "matrix_product": 2.3661768749999976,
+      "convolution_weight_gradient": 1.4358224999999998,
+      "convolution_input_gradient": 0.7444418749999999
+    },
+    "exact_reports": 24,
+    "exact_initial_state_tensors": 288,
+    "all_eight_samples_retained": true
+  },
+  "bridge_ms": {
+    "convolution": 2.8552144166666675,
+    "matrix": 2.1085487916666685,
+    "other_optimizer_rng_ema": 2.579529291666553,
+    "native_empty_command_stream": 4.271919333333333,
+    "transfers": -0.035967625,
+    "fixed_session_to_update_graph": 0.08085291666666805,
+    "pass_sum_to_in_timer_union": -0.011963632812502567,
+    "uncovered": 2.480304796875
+  },
+  "captured_gap_ms": 14.328438289062499,
+  "ordinary_minus_captured_gap_ms": 1.0479025591021571,
+  "next_source_hypothesis": {
+    "weight_gradient_dispatches": 8,
+    "positions_per_partition": [
+      4096
+    ],
+    "compensated_blocks_per_partition": [
+      16
+    ],
+    "source": "codegen/cooperative.rs::compensated_partials; codegen/coop_tiled.rs",
+    "limitation": "Extra accumulator matrices and 256-position compensated partials are visible in source; actual register pressure and performance cost are unmeasured. No numerical policy change or assumption about cuDNN arithmetic."
+  },
+  "validation": {
+    "guards": 4,
+    "allocation_warnings": 1,
+    "synthetic_updates": 569,
+    "game_actions": 0,
+    "gpu_failures": 0,
+    "cpu_coverage_assertion_failures": 1,
+    "cpu_tests": 2,
+    "clippy": true,
+    "format": true
+  },
+  "upstream": {
+    "meganeura": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "experimental_base": "056562b5adeb6b667a49e29869ab5d7db1871260",
+    "blade": "96c1dc731b1d5e133a6c0a8a020014619ff2e434",
+    "naga": "a97559b6318dc0a857ace502ffc7f3e442951f39",
+    "last_rechecked_utc": "2026-10-14 04:36:49"
+  },
+  "sha256": {
+    "kindle-tests": "92632321fac5ce9afe932c55edc41cae891bbd1e59b08241e13a31b3b4e787d0",
+    "kindle.patch": "736e8409266bedb261b092958c81a1f84f9d532465a28f962860260e10227c2a",
+    "kindle-tests-masks": "cd6096891b92e89f7ddc2bf4d652f015e2ccf335440827de106abad1eee6da71",
+    "backend-masks.patch": "cd74fa2b1b139272fcd08012203b7bd9817e4153acc125af4683ba6833002928",
+    "kindle-masks.patch": "824460d1227e5148bce1eaaaf961ae531522648209a483c6269c2ebe932a7a8e",
+    "kindle-Cargo.lock": "ff6d6f041a5af741264a6c7bef0ba69200d1f5894d144f438a74e80d259114f2",
+    "backend-Cargo.lock": "82e55a5c4fd0d8c797e174d96410be067a61f4b544a31ee764bf6af787d1a449",
+    "kindle-tests-initial-instrumentation": "c08bbaa2c8cd8da3507f799301ef5375fd7ee07a5dbea051e5f8fadd34532b22",
+    "kindle-initial-instrumentation.patch": "b21a615e764be575433ac7b161e9672887e82c7442dcd1971d2cfa7be5ccca04"
+  },
+  "production_changed": false,
+  "game_actions": 0,
+  "limits": [
+    "Native pass union includes barriers/issue overhead; not SM utilization.",
+    "Single-chunk capture is not ordinary four-chunk scheduling.",
+    "JAX capture is retained, differently instrumented, with different weights/RNG/graphs.",
+    "Family counterfactuals allocate interactions, not pure kernel times or additive speedup forecasts.",
+    "EMA tails are outside update timers and explicitly retained; final drain is outside timers.",
+    "Current compiler's inherited unconditional row-gradient F64 failure remains; unchanged-graph parity does not qualify it.",
+    "Initial coverage-audit failure, unused first instrumentation build and checked-only inventory remain.",
+    "No production adoption, learning evidence or complete performance-goal closure."
+  ]
+}

@@ -1,4 +1,4 @@
-"""CPU replay of a complete frozen vector run, with task outcomes and optional video.
+"""CPU replay of a finished frozen vector run, with task outcomes and optional video.
 
 Replays every recorded action in fresh environments. It does not construct or
 train Kindle. A movie shows every episode of the chosen stream, not selected
@@ -119,15 +119,17 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--video', type=Path)
     parser.add_argument('--video-stream', type=int, default=0)
+    parser.add_argument('--allow-capped-evaluation', action='store_true',
+                        help='retain an episode-limited evaluation that hit its declared action cap; never mark it complete')
     args = parser.parse_args()
     targets = [args.output] + ([args.video] if args.video else [])
     require(len(set(path.resolve() for path in targets)) == len(targets), 'output paths must differ')
     for path in targets:
         require(not path.exists() and path.parent.is_dir(), 'outputs must be fresh paths in existing directories')
-    run = read_run(args.log)
+    run = read_run(args.log, allow_capped_evaluation=args.allow_capped_evaluation)
     header = run['start']
     require(header['mode'] in ('evaluate_sample', 'evaluate_greedy') and run['accounting']['updates'] == 0,
-            'reconstruct only a complete frozen evaluation')
+            'reconstruct only a finished frozen evaluation')
     require(0 <= args.video_stream < header['num_envs'], 'invalid video stream')
     ffmpeg = shutil.which('ffmpeg') if args.video else None
     require(not args.video or ffmpeg is not None, 'ffmpeg is required for video')

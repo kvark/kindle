@@ -1,0 +1,134 @@
+{
+  "status": "performance_qualified_learning_stopped_for_backend_work",
+  "raw_root": "runs/cdp-performance-20261011.7SpyzGUa",
+  "audits": {
+    "first_round": {
+      "file": "completion-audit.json",
+      "sha256": "6b61d4abdcd773aaec9715812cfd15583f4922f3e7d2ddb786c146aee9cdda1a"
+    },
+    "latest_refresh": {
+      "file": "refresh-completion.json",
+      "sha256": "b373b89baa9baa57c50af9fa28ce16b610aaa8994678b51382e354a10cd5586c"
+    },
+    "final_profiles": {
+      "file": "final-profile-audit.json",
+      "sha256": "0ef2f78d1a979b0faae7441cc29be4403f3e901e6c837ef622a92497832ed00f"
+    },
+    "learning_declaration": {
+      "file": "learning.json",
+      "sha256": "3a89811386c9faca5a03bd7a76e4166d70ec3222e95107458a8da66abf7438ab"
+    }
+  },
+  "backend": {
+    "meganeura": "d7a7293378db1b0e8ee3b94a1e6d73ef14a1a32c",
+    "blade": "56f05651cca73659130e924e497dda633f839d40",
+    "native_sha256": "78f6f5a29979256628ff4332b465144cc6ce2f58b5c16f206cb2a6e2a2511f6a"
+  },
+  "gpu_guards": 50,
+  "recorded_warnings": 10,
+  "synthetic_updates": {
+    "old_cdp_b8_auto_ms": 107.915877,
+    "latest_cdp_b8_auto_ms": 65.5989795117188,
+    "latest_cdp_b32_f16_ms": 161.9984058671875,
+    "speedup_per_replay_position": 2.664615776243467,
+    "latest_rgb_b8_f16_ms": 71.37348410546873,
+    "jax_rgb_b8_float32_ms": 24.35912418695807,
+    "jax_rgb_b8_bfloat16_ms": 12.40344265170279,
+    "jax_rgb_b32_bfloat16_ms": 26.075243324157782
+  },
+  "production_smokes": {
+    "8": {
+      "actions": 4096,
+      "updates": 963,
+      "frozen_actions": 1024,
+      "frozen_updates": 0,
+      "frozen_tensors": {
+        "world": 269,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "training_seconds": 67.34338333597407,
+      "aggregate_actions_per_second": 60.82260494049107,
+      "construction_seconds": 2.5104405251331627,
+      "first_training_action": 248,
+      "training_debt": 0
+    },
+    "32": {
+      "actions": 4096,
+      "updates": 217,
+      "frozen_actions": 1024,
+      "frozen_updates": 0,
+      "frozen_tensors": {
+        "world": 269,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "training_seconds": 39.05182159389369,
+      "aggregate_actions_per_second": 104.8862724662367,
+      "construction_seconds": 2.6896191141568124,
+      "first_training_action": 632,
+      "training_debt": 0.5
+    }
+  },
+  "refreshed_fixture_comparisons": {
+    "auto-b8": {
+      "old_ms": 65.40222982031251,
+      "new_ms": 65.5989795117188,
+      "first_outputs_exact": true,
+      "final_tensors_exact": 346,
+      "final_tensors": 346
+    },
+    "f16-b32": {
+      "old_ms": 161.71891769140623,
+      "new_ms": 161.9984058671875,
+      "first_outputs_exact": true,
+      "final_tensors_exact": 346,
+      "final_tensors": 346
+    },
+    "rgb-f16-b8": {
+      "old_ms": 71.21063507812497,
+      "new_ms": 71.37348410546873,
+      "first_outputs_exact": true,
+      "final_tensors_exact": 292,
+      "final_tensors": 292
+    }
+  },
+  "local_checks": {
+    "cpu_rust_tests": 118,
+    "python_tests": 1223,
+    "formatting": "passed",
+    "workspace_clippy": "passed",
+    "python_clippy": "passed"
+  },
+  "cleanup": {
+    "approximate_filesystem_GiB_freed": 63,
+    "removed": "regenerable Rust debug artifacts",
+    "unique_evidence_deleted": false
+  },
+  "learning": {
+    "status": "stopped_by_user",
+    "stop_receipt": "2026-10-11-performance-learning-stop.json",
+    "seeds": [
+      1009,
+      2017,
+      3019
+    ],
+    "game": "Freeway",
+    "arms": [
+      "optimized_b8_auto",
+      "optimized_b32_f16"
+    ],
+    "actions_per_learner": 200000,
+    "total_actions": 1200000,
+    "total_updates": 187200,
+    "screen_complete": false,
+    "automatic_extension": false
+  },
+  "limits": [
+    "Synthetic throughput is not learning/time-to-score; B32 changes prefill and optimizer/centering statistics.",
+    "Half input products retain F32 graph storage, master weights, reductions and optimizer; inference stays Auto.",
+    "JAX/native shapes match, weights/RNG/graph decomposition and precision do not; no numerical parity claim.",
+    "Sampled Vulkan headroom and instrumented GPU activity are not physical/peak memory or SM utilization.",
+    "The split-source archive's one premature Cargo revision was corrected in split-source-corrected.tar; both remain."
+  ]
+}

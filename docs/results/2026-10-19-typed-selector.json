@@ -1,0 +1,57 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-19T07:12:44.242851+00:00",
+  "guard_passed": 1,
+  "guard_failed": 1,
+  "allocation_warning_events": 0,
+  "historical_baseline_warning_events": 1712,
+  "actions": 0,
+  "learner_updates": 0,
+  "cpu_tests": 4,
+  "offline_shader_variants": 1182,
+  "actual_plans": {
+    "rgb": {
+      "dense": 587,
+      "grouped_excluded": 129
+    },
+    "cdp": {
+      "dense": 643,
+      "grouped_excluded": 126
+    }
+  },
+  "gpu_cases": 12,
+  "changed_fixture_plans": 8,
+  "exact_f64_comparisons": 327800,
+  "fixture_forward_passes": 48,
+  "races": 12,
+  "challenger_outcomes": 190,
+  "minimum_sampled_headroom_bytes": 16472014848,
+  "checked_source_seals": 743,
+  "native_sha256": "db9d584920f81a86a295950d800d149ba8bf84176fb81d5addcaff3752c26cca",
+  "original_native_gap_ratio": 1.5789439516894972,
+  "whole_model_search_run": false,
+  "evidence": "runs/typed-selector-20261019.MhXVhJTs",
+  "repaired_source": "runs/typed-selector-20261019.MhXVhJTs/device-fix",
+  "current_rgb_update_ms": 42.982910672,
+  "inclusive_jax_update_ms": 27.222569,
+  "current_cdp_update_ms": 40.741071086,
+  "production_promoted": false,
+  "atari_restarted": false,
+  "scratch_lower_bound_max_mib": {
+    "rgb": 86.25,
+    "cdp": 203.625
+  },
+  "excluded_incumbent_occurrences_at_64mib": {
+    "rgb": 8,
+    "cdp": 16
+  },
+  "limitations": [
+    "CPU recognition precedes actual alias/device filtering",
+    "Grouped products excluded",
+    "Only selected race finalists numerically qualified",
+    "Fixed signed binary-fraction fixtures; no arbitrary-input/full-model oracle",
+    "Swap invalidation changed but GPU swap path untested",
+    "No new complete learner performance result",
+    "Fixture raw arrays not exported"
+  ]
+}

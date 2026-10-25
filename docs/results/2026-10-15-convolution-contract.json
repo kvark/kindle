@@ -1,0 +1,230 @@
+{
+  "status": "complete",
+  "date": "2026-10-15",
+  "kind": "CPU-only complete-family and legal shader contract audit",
+  "root": "runs/convolution-contract-20261015.rRE9xjXd",
+  "gpu_calls": 0,
+  "synthetic_updates": 0,
+  "game_actions": 0,
+  "production_changed": false,
+  "latest_retained_native_ms": 54.223671332031245,
+  "retained_jax_ms": 26.6316957586,
+  "native_ratio": 2.036057779554693,
+  "operations": 23,
+  "roles": {
+    "Forward": 8,
+    "InputGradient": 7,
+    "WeightGradient": 8
+  },
+  "packed_occurrences": 14,
+  "distinct_packed_contracts": 11,
+  "captured_updates": 8,
+  "library_calls_per_update": 41,
+  "library_main_schedule_counts": {
+    "('common_three_channel', None, None)": 1,
+    "('xmma_implicit', [256, 32, 32], 4)": 4,
+    "('xmma_implicit', [128, 64, 64], 3)": 1,
+    "('xmma_implicit', [256, 64, 32], 3)": 3,
+    "('xmma_implicit', [128, 32, 32], 4)": 1,
+    "('xmma_implicit', [32, 128, 32], 4)": 2,
+    "('cutlass_dgrad', [256, 64, 32], 4)": 2,
+    "('cutlass_multistage', [64, 256, 32], 4)": 4,
+    "('cutlass_dgrad', [128, 64, 64], 3)": 3,
+    "('cutlass_multistage', [64, 64, 64], 5)": 2
+  },
+  "library_traced_total_ms": 11.25511425,
+  "library_traced_main_ms": 10.9398725,
+  "native_nominal_convolution_macs": 226492416000,
+  "native_padded_tile_macs": 369098752000,
+  "native_padding_percent": 62.962962962962955,
+  "rejected_family_native_tile_macs": 228170137600,
+  "rejected_family_candidate_tile_macs": 335544320000,
+  "rejected_family_padding_increase_percent": 47.058823529411775,
+  "rows": [
+    {"layer":"cnn0","role":"Forward","parameters":[512,3,64,64,32,5,5,1,2,64,64,2],"parameter":"world.representation.encoder.cnn0.weight","native_shader":"Conv2dBF16","native_tile":[32,32,32],"native_grid":[1,128,512],"native_partial_splits":1,"native_output":"BF16","nominal_macs":5033164800,"native_tiled_macs":6442450944,"library_schedule":{"family":"common_three_channel","tile_mnk":null,"stages":null,"alignment_bytes":null},"library_launch":{"gridX":65536,"gridY":1,"gridZ":1,"blockX":8,"blockY":8,"blockZ":1,"staticSharedMemory":2304,"dynamicSharedMemory":0,"registersPerThread":80},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.663953,"library_main_ms":0.663953,"rejected_family":{"case":"forward-0","native_gpu_ms":0.58983225,"candidate_gpu_ms":3.30951675,"whole_operation_regression_percent":461.0945739233485,"scratch_bytes":420005888,"k_expansion_vs_useful":10.666666666666666,"padded_tile_mac_ratio_vs_native":8.333333333333334,"native_padded_tile_macs":6442450944,"candidate_padded_tile_macs":53687091200,"instruction_count_claim":false}},
+    {"layer":"cnn1","role":"Forward","parameters":[512,32,32,32,48,5,5,1,2,32,32,2],"parameter":"world.representation.encoder.cnn1.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,16,512],"native_partial_splits":1,"native_output":"BF16","nominal_macs":20132659200,"native_tiled_macs":26843545600,"library_schedule":{"family":"xmma_implicit","tile_mnk":[256,32,32],"stages":4,"alignment_bytes":null},"library_launch":{"gridX":2,"gridY":2048,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":77824,"registersPerThread":166},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.5753204999999999,"library_main_ms":0.5753205,"rejected_family":{"case":"forward-1","native_gpu_ms":0.8420195,"candidate_gpu_ms":1.602011,"whole_operation_regression_percent":90.25818285681034,"scratch_bytes":143233024,"k_expansion_vs_useful":1,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":26843545600,"candidate_padded_tile_macs":26843545600,"instruction_count_claim":false}},
+    {"layer":"cnn2","role":"Forward","parameters":[512,48,16,16,64,5,5,1,2,16,16,2],"parameter":"world.representation.encoder.cnn2.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,4,512],"native_partial_splits":1,"native_output":"BF16","nominal_macs":10066329600,"native_tiled_macs":13421772800,"library_schedule":{"family":"xmma_implicit","tile_mnk":[128,64,64],"stages":3,"alignment_bytes":null},"library_launch":{"gridX":1,"gridY":1024,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":75776,"registersPerThread":196},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.260005625,"library_main_ms":0.260005625,"rejected_family":{"case":"forward-2","native_gpu_ms":0.37258975,"candidate_gpu_ms":0.684434,"whole_operation_regression_percent":83.69641140154822,"scratch_bytes":59973632,"k_expansion_vs_useful":1.3333333333333333,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":13421772800,"candidate_padded_tile_macs":13421772800,"instruction_count_claim":false}},
+    {"layer":"cnn3","role":"Forward","parameters":[512,64,8,8,64,5,5,1,2,8,8,2],"parameter":"world.representation.encoder.cnn3.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,1,512],"native_partial_splits":1,"native_output":"BF16","nominal_macs":3355443200,"native_tiled_macs":3355443200,"library_schedule":{"family":"xmma_implicit","tile_mnk":[256,64,32],"stages":3,"alignment_bytes":null},"library_launch":{"gridX":1,"gridY":128,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":65536,"registersPerThread":255},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.08344437500000002,"library_main_ms":0.083444375,"rejected_family":{"case":"forward-3","native_gpu_ms":0.11731975,"candidate_gpu_ms":0.1416605,"whole_operation_regression_percent":20.74735924684463,"scratch_bytes":18030592,"k_expansion_vs_useful":1,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":3355443200,"candidate_padded_tile_macs":3355443200,"instruction_count_claim":false}},
+    {"layer":"conv2","role":"Forward","parameters":[512,64,8,8,64,5,5,1,2,8,8,2],"parameter":"world.decoder.conv2.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,1,512],"native_partial_splits":1,"native_output":"BF16","nominal_macs":3355443200,"native_tiled_macs":3355443200,"library_schedule":{"family":"xmma_implicit","tile_mnk":[256,64,32],"stages":3,"alignment_bytes":null},"library_launch":{"gridX":1,"gridY":128,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":65536,"registersPerThread":255},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.08337675,"library_main_ms":0.08337675,"rejected_family":{"case":"forward-3","native_gpu_ms":0.11731975,"candidate_gpu_ms":0.1416605,"whole_operation_regression_percent":20.74735924684463,"scratch_bytes":18030592,"k_expansion_vs_useful":1,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":3355443200,"candidate_padded_tile_macs":3355443200,"instruction_count_claim":false}},
+    {"layer":"conv1","role":"Forward","parameters":[512,64,16,16,48,5,5,1,2,16,16,2],"parameter":"world.decoder.conv1.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,4,512],"native_partial_splits":1,"native_output":"BF16","nominal_macs":10066329600,"native_tiled_macs":13421772800,"library_schedule":{"family":"xmma_implicit","tile_mnk":[256,64,32],"stages":3,"alignment_bytes":null},"library_launch":{"gridX":1,"gridY":512,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":65536,"registersPerThread":255},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.277782,"library_main_ms":0.277782,"rejected_family":{"case":"forward-4","native_gpu_ms":0.3709315,"candidate_gpu_ms":0.67219575,"whole_operation_regression_percent":81.21829771804225,"scratch_bytes":51585024,"k_expansion_vs_useful":1,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":13421772800,"candidate_padded_tile_macs":13421772800,"instruction_count_claim":false}},
+    {"layer":"conv0","role":"Forward","parameters":[512,48,32,32,32,5,5,1,2,32,32,2],"parameter":"world.decoder.conv0.weight","native_shader":"Conv2dBF16","native_tile":[32,32,32],"native_grid":[1,32,512],"native_partial_splits":1,"native_output":"BF16","nominal_macs":20132659200,"native_tiled_macs":20401094656,"library_schedule":{"family":"xmma_implicit","tile_mnk":[256,32,32],"stages":4,"alignment_bytes":null},"library_launch":{"gridX":1,"gridY":2048,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":77824,"registersPerThread":166},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.5406119999999999,"library_main_ms":0.540612,"rejected_family":{"case":"forward-5","native_gpu_ms":1.5238575,"candidate_gpu_ms":1.37653825,"whole_operation_regression_percent":-9.667521405380752,"scratch_bytes":152145920,"k_expansion_vs_useful":1.3333333333333333,"padded_tile_mac_ratio_vs_native":1.3157894736842106,"native_padded_tile_macs":20401094656,"candidate_padded_tile_macs":26843545600,"instruction_count_claim":false}},
+    {"layer":"imgout","role":"Forward","parameters":[512,32,64,64,3,5,5,1,2,64,64,2],"parameter":"world.decoder.imgout.weight","native_shader":"Conv2dBF16","native_tile":[32,32,32],"native_grid":[1,128,512],"native_partial_splits":1,"native_output":"BF16","nominal_macs":5033164800,"native_tiled_macs":53687091200,"library_schedule":{"family":"xmma_implicit","tile_mnk":[256,32,32],"stages":4,"alignment_bytes":null},"library_launch":{"gridX":1,"gridY":8192,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":77824,"registersPerThread":166},"library_workspace_bytes":33567264,"library_output":"bf16","library_total_ms":1.2547051249999999,"library_main_ms":1.1508445,"rejected_family":{"case":"forward-6","native_gpu_ms":3.890313,"candidate_gpu_ms":2.96795025,"whole_operation_regression_percent":-23.7092169704597,"scratch_bytes":176736256,"k_expansion_vs_useful":1,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":53687091200,"candidate_padded_tile_macs":53687091200,"instruction_count_claim":false}},
+    {"layer":"imgout","role":"InputGradient","parameters":[512,32,64,64,3,5,5,1,2,64,64,2],"parameter":"world.decoder.imgout.weight","native_shader":"Conv2dGradientTyped","native_tile":[32,32,32],"native_grid":[1,128,512],"native_partial_splits":1,"native_output":"F32","nominal_macs":5033164800,"native_tiled_macs":6442450944,"library_schedule":{"family":"xmma_implicit","tile_mnk":[128,32,32],"stages":4,"alignment_bytes":null},"library_launch":{"gridX":1,"gridY":16384,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":40960,"registersPerThread":128},"library_workspace_bytes":33567248,"library_output":"bf16","library_total_ms":0.98956325,"library_main_ms":0.949271,"rejected_family":{"case":"dx-6","native_gpu_ms":0.66057075,"candidate_gpu_ms":2.9214225,"whole_operation_regression_percent":342.257320657931,"scratch_bytes":151570432,"k_expansion_vs_useful":10.666666666666666,"padded_tile_mac_ratio_vs_native":8.333333333333334,"native_padded_tile_macs":6442450944,"candidate_padded_tile_macs":53687091200,"instruction_count_claim":false}},
+    {"layer":"imgout","role":"WeightGradient","parameters":[512,32,64,64,3,5,5,1,2,64,64,2],"parameter":"world.decoder.imgout.weight","native_shader":"Conv2dGradientTyped","native_tile":[32,32,32],"native_grid":[1,25,512],"native_partial_splits":512,"native_output":"F32","nominal_macs":5033164800,"native_tiled_macs":53687091200,"library_schedule":{"family":"xmma_implicit","tile_mnk":[32,128,32],"stages":4,"alignment_bytes":null},"library_launch":{"gridX":7,"gridY":1,"gridZ":112,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":40960,"registersPerThread":122},"library_workspace_bytes":46300911,"library_output":"bf16","library_total_ms":1.2809130000000002,"library_main_ms":1.216536625,"rejected_family":null},
+    {"layer":"conv0","role":"WeightGradient","parameters":[512,48,32,32,32,5,5,1,2,32,32,2],"parameter":"world.decoder.conv0.weight","native_shader":"Conv2dGradientTyped","native_tile":[32,32,32],"native_grid":[1,38,128],"native_partial_splits":128,"native_output":"F32","nominal_macs":20132659200,"native_tiled_macs":20401094656,"library_schedule":{"family":"xmma_implicit","tile_mnk":[32,128,32],"stages":4,"alignment_bytes":null},"library_launch":{"gridX":10,"gridY":1,"gridZ":56,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":40960,"registersPerThread":122},"library_workspace_bytes":9013599,"library_output":"bf16","library_total_ms":0.4502753749999999,"library_main_ms":0.43573925,"rejected_family":null},
+    {"layer":"conv0","role":"InputGradient","parameters":[512,48,32,32,32,5,5,1,2,32,32,2],"parameter":"world.decoder.conv0.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,16,512],"native_partial_splits":1,"native_output":"F32","nominal_macs":20132659200,"native_tiled_macs":26843545600,"library_schedule":{"family":"cutlass_dgrad","tile_mnk":[256,64,32],"stages":4,"alignment_bytes":16},"library_launch":{"gridX":2048,"gridY":1,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":81920,"registersPerThread":250},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.5293518749999999,"library_main_ms":0.529351875,"rejected_family":{"case":"dx-5","native_gpu_ms":0.85107925,"candidate_gpu_ms":1.456996,"whole_operation_regression_percent":71.1939281800138,"scratch_bytes":42569728,"k_expansion_vs_useful":1,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":26843545600,"candidate_padded_tile_macs":26843545600,"instruction_count_claim":false}},
+    {"layer":"conv1","role":"InputGradient","parameters":[512,64,16,16,48,5,5,1,2,16,16,2],"parameter":"world.decoder.conv1.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,4,512],"native_partial_splits":1,"native_output":"F32","nominal_macs":10066329600,"native_tiled_macs":13421772800,"library_schedule":{"family":"cutlass_dgrad","tile_mnk":[256,64,32],"stages":4,"alignment_bytes":16},"library_launch":{"gridX":512,"gridY":1,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":81920,"registersPerThread":250},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.275938,"library_main_ms":0.275938,"rejected_family":{"case":"dx-4","native_gpu_ms":0.38019225,"candidate_gpu_ms":0.65198375,"whole_operation_regression_percent":71.48791170782675,"scratch_bytes":26419200,"k_expansion_vs_useful":1.3333333333333333,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":13421772800,"candidate_padded_tile_macs":13421772800,"instruction_count_claim":false}},
+    {"layer":"conv1","role":"WeightGradient","parameters":[512,64,16,16,48,5,5,1,2,16,16,2],"parameter":"world.decoder.conv1.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,25,32],"native_partial_splits":32,"native_output":"F32","nominal_macs":10066329600,"native_tiled_macs":13421772800,"library_schedule":{"family":"cutlass_multistage","tile_mnk":[64,256,32],"stages":4,"alignment_bytes":16},"library_launch":{"gridX":4,"gridY":2,"gridZ":132,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":81920,"registersPerThread":246},"library_workspace_bytes":40550528,"library_output":"bf16","library_total_ms":0.41735500000000003,"library_main_ms":0.40197075,"rejected_family":null},
+    {"layer":"conv2","role":"InputGradient","parameters":[512,64,8,8,64,5,5,1,2,8,8,2],"parameter":"world.decoder.conv2.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,1,512],"native_partial_splits":1,"native_output":"F32","nominal_macs":3355443200,"native_tiled_macs":3355443200,"library_schedule":{"family":"cutlass_dgrad","tile_mnk":[128,64,64],"stages":3,"alignment_bytes":16},"library_launch":{"gridX":256,"gridY":1,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":73728,"registersPerThread":168},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.08112849999999999,"library_main_ms":0.08112849999999999,"rejected_family":{"case":"dx-3","native_gpu_ms":0.11820575,"candidate_gpu_ms":0.13532425,"whole_operation_regression_percent":14.481952020100564,"scratch_bytes":9641984,"k_expansion_vs_useful":1,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":3355443200,"candidate_padded_tile_macs":3355443200,"instruction_count_claim":false}},
+    {"layer":"conv2","role":"WeightGradient","parameters":[512,64,8,8,64,5,5,1,2,8,8,2],"parameter":"world.decoder.conv2.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,25,8],"native_partial_splits":8,"native_output":"F32","nominal_macs":3355443200,"native_tiled_macs":3355443200,"library_schedule":{"family":"cutlass_multistage","tile_mnk":[64,256,32],"stages":4,"alignment_bytes":16},"library_launch":{"gridX":4,"gridY":2,"gridZ":32,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":81920,"registersPerThread":246},"library_workspace_bytes":13107328,"library_output":"bf16","library_total_ms":0.11589687499999998,"library_main_ms":0.111108875,"rejected_family":null},
+    {"layer":"cnn3","role":"InputGradient","parameters":[512,64,8,8,64,5,5,1,2,8,8,2],"parameter":"world.representation.encoder.cnn3.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,1,512],"native_partial_splits":1,"native_output":"F32","nominal_macs":3355443200,"native_tiled_macs":3355443200,"library_schedule":{"family":"cutlass_dgrad","tile_mnk":[128,64,64],"stages":3,"alignment_bytes":16},"library_launch":{"gridX":256,"gridY":1,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":73728,"registersPerThread":168},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.08136475,"library_main_ms":0.08136475,"rejected_family":{"case":"dx-3","native_gpu_ms":0.11820575,"candidate_gpu_ms":0.13532425,"whole_operation_regression_percent":14.481952020100564,"scratch_bytes":9641984,"k_expansion_vs_useful":1,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":3355443200,"candidate_padded_tile_macs":3355443200,"instruction_count_claim":false}},
+    {"layer":"cnn3","role":"WeightGradient","parameters":[512,64,8,8,64,5,5,1,2,8,8,2],"parameter":"world.representation.encoder.cnn3.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,25,8],"native_partial_splits":8,"native_output":"F32","nominal_macs":3355443200,"native_tiled_macs":3355443200,"library_schedule":{"family":"cutlass_multistage","tile_mnk":[64,256,32],"stages":4,"alignment_bytes":16},"library_launch":{"gridX":4,"gridY":2,"gridZ":32,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":81920,"registersPerThread":246},"library_workspace_bytes":13107328,"library_output":"bf16","library_total_ms":0.11662899999999998,"library_main_ms":0.111833,"rejected_family":null},
+    {"layer":"cnn2","role":"InputGradient","parameters":[512,48,16,16,64,5,5,1,2,16,16,2],"parameter":"world.representation.encoder.cnn2.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,4,512],"native_partial_splits":1,"native_output":"F32","nominal_macs":10066329600,"native_tiled_macs":13421772800,"library_schedule":{"family":"cutlass_dgrad","tile_mnk":[128,64,64],"stages":3,"alignment_bytes":16},"library_launch":{"gridX":1024,"gridY":1,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":73728,"registersPerThread":168},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.262634,"library_main_ms":0.262634,"rejected_family":{"case":"dx-2","native_gpu_ms":0.368421,"candidate_gpu_ms":0.6435945,"whole_operation_regression_percent":74.68996066999438,"scratch_bytes":26419200,"k_expansion_vs_useful":1,"padded_tile_mac_ratio_vs_native":1,"native_padded_tile_macs":13421772800,"candidate_padded_tile_macs":13421772800,"instruction_count_claim":false}},
+    {"layer":"cnn2","role":"WeightGradient","parameters":[512,48,16,16,64,5,5,1,2,16,16,2],"parameter":"world.representation.encoder.cnn2.weight","native_shader":"Conv2dPacked","native_tile":[64,64,32],"native_grid":[1,25,32],"native_partial_splits":32,"native_output":"F32","nominal_macs":10066329600,"native_tiled_macs":13421772800,"library_schedule":{"family":"cutlass_multistage","tile_mnk":[64,64,64],"stages":5,"alignment_bytes":16},"library_launch":{"gridX":4,"gridY":5,"gridZ":37,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":81920,"registersPerThread":98},"library_workspace_bytes":11366528,"library_output":"bf16","library_total_ms":0.30589025,"library_main_ms":0.30156625,"rejected_family":null},
+    {"layer":"cnn1","role":"InputGradient","parameters":[512,32,32,32,48,5,5,1,2,32,32,2],"parameter":"world.representation.encoder.cnn1.weight","native_shader":"Conv2dGradientTyped","native_tile":[32,32,32],"native_grid":[1,32,512],"native_partial_splits":1,"native_output":"F32","nominal_macs":20132659200,"native_tiled_macs":20401094656,"library_schedule":{"family":"xmma_implicit","tile_mnk":[256,32,32],"stages":4,"alignment_bytes":null},"library_launch":{"gridX":1,"gridY":2048,"gridZ":1,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":77824,"registersPerThread":166},"library_workspace_bytes":0,"library_output":"bf16","library_total_ms":0.545256,"library_main_ms":0.545256,"rejected_family":{"case":"dx-1","native_gpu_ms":2.5119142500000002,"candidate_gpu_ms":1.290478,"whole_operation_regression_percent":-48.62571443272795,"scratch_bytes":85037056,"k_expansion_vs_useful":1.3333333333333333,"padded_tile_mac_ratio_vs_native":1.3157894736842106,"native_padded_tile_macs":20401094656,"candidate_padded_tile_macs":26843545600,"instruction_count_claim":false}},
+    {"layer":"cnn1","role":"WeightGradient","parameters":[512,32,32,32,48,5,5,1,2,32,32,2],"parameter":"world.representation.encoder.cnn1.weight","native_shader":"Conv2dGradientTyped","native_tile":[32,32,32],"native_grid":[2,25,128],"native_partial_splits":128,"native_output":"F32","nominal_macs":20132659200,"native_tiled_macs":26843545600,"library_schedule":{"family":"cutlass_multistage","tile_mnk":[64,256,32],"stages":4,"alignment_bytes":16},"library_launch":{"gridX":4,"gridY":1,"gridZ":156,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":81920,"registersPerThread":246},"library_workspace_bytes":23961728,"library_output":"bf16","library_total_ms":0.9522349999999999,"library_main_ms":0.931231,"rejected_family":null},
+    {"layer":"cnn0","role":"WeightGradient","parameters":[512,3,64,64,32,5,5,1,2,64,64,2],"parameter":"world.representation.encoder.cnn0.weight","native_shader":"Conv2dGradientTyped","native_tile":[32,32,32],"native_grid":[1,3,512],"native_partial_splits":512,"native_output":"F32","nominal_macs":5033164800,"native_tiled_macs":6442450944,"library_schedule":{"family":"cutlass_multistage","tile_mnk":[64,64,64],"stages":5,"alignment_bytes":16},"library_launch":{"gridX":4,"gridY":1,"gridZ":18,"blockX":128,"blockY":1,"blockZ":1,"staticSharedMemory":0,"dynamicSharedMemory":81920,"registersPerThread":98},"library_workspace_bytes":34028176,"library_output":"bf16","library_total_ms":1.111484,"library_main_ms":1.0696038749999999,"rejected_family":null}
+  ],
+  "load_contract": {
+    "status": "complete",
+    "gpu_calls": 0,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "naga": {
+      "cases": [
+        {
+          "error": null,
+          "name": "f32-typed",
+          "parsed": true,
+          "validated": true
+        },
+        {
+          "error": "error: the type of `value` is expected to be `coop_mat16x16<f32,A>`, but got `coop_mat16x16<u32,A>`\n  ┌─ wgsl:5:5\n  │\n5 │ let value: coop_mat16x16<f32, A> = coopLoadT<coop_mat16x16<f32, A>>(&tile[0], 4u);\n  │     ^^^^^ definition of `value`\n\n",
+          "name": "f32-packed",
+          "parsed": false,
+          "validated": false
+        },
+        {
+          "error": null,
+          "name": "f16-typed",
+          "parsed": true,
+          "validated": true
+        },
+        {
+          "error": "error: the type of `value` is expected to be `coop_mat16x16<f16,A>`, but got `coop_mat16x16<u32,A>`\n  ┌─ wgsl:5:5\n  │\n5 │ let value: coop_mat16x16<f16, A> = coopLoadT<coop_mat16x16<f16, A>>(&tile[0], 2u);\n  │     ^^^^^ definition of `value`\n\n",
+          "name": "f16-packed",
+          "parsed": false,
+          "validated": false
+        },
+        {
+          "error": null,
+          "name": "bf16-typed",
+          "parsed": true,
+          "validated": true
+        },
+        {
+          "error": "error: the type of `value` is expected to be `coop_mat16x16<bf16,A>`, but got `coop_mat16x16<u32,A>`\n  ┌─ wgsl:5:5\n  │\n5 │ let value: coop_mat16x16<bf16, A> = coopLoadT<coop_mat16x16<bf16, A>>(&tile[0], 2u);\n  │     ^^^^^ definition of `value`\n\n",
+          "name": "bf16-packed",
+          "parsed": false,
+          "validated": false
+        }
+      ],
+      "gpu_calls": 0,
+      "status": "complete"
+    },
+    "validated_spirv": [
+      {
+        "scalar": "f32",
+        "cooperative_component_type": [
+          22,
+          [
+            32
+          ]
+        ],
+        "pointer_type": "Workgroup vec4<u32>",
+        "stride_in_vectors": 4,
+        "spirv_sha256": "4c36971f1ba2ecef5c77e16c339293cd83f9a96140490202f666d65773256a3b"
+      },
+      {
+        "scalar": "f16",
+        "cooperative_component_type": [
+          22,
+          [
+            16
+          ]
+        ],
+        "pointer_type": "Workgroup vec4<u32>",
+        "stride_in_vectors": 2,
+        "spirv_sha256": "b709d309928351db257e7291958710fcea0defcb18ce8be08275538f98f803b7"
+      },
+      {
+        "scalar": "bf16",
+        "cooperative_component_type": [
+          22,
+          [
+            16,
+            0
+          ]
+        ],
+        "pointer_type": "Workgroup vec4<u32>",
+        "stride_in_vectors": 2,
+        "spirv_sha256": "404f078587f4aae8aa058f6b1b719c38c502f749f2d329c674012a2a168874fd"
+      }
+    ],
+    "rlib_sha256": {
+      "/x/Code/kindle-backend-perf/target/release/deps/libnaga-b05531660f12931c.rlib": "aa6c39c1d38bd8cd8269202e966355510b5bd4b1087c7dd0ac5f6fb741ca26c2",
+      "/x/Code/kindle-backend-perf/target/release/deps/libserde_json-19b160c3083e1e71.rlib": "155cdffa8a8592ab7241cf84c1b1260c9ea85a0d941a28d59e77d51cba863f68"
+    },
+    "sources": {
+      "runs/convolution-contract-20261015.rRE9xjXd/load-v2/load-contract.py": "f9b392d704c82652890924b8982c5a7f8e259b7a7c61a6fe8361c62720c1601e",
+      "runs/convolution-contract-20261015.rRE9xjXd/load-v2/load-contract.rs": "93fb6872f7b4211563ca318fb2cb4e7d1eab0939aed57bc2d81188d0f3c9e4cf",
+      "runs/convolution-contract-20261015.rRE9xjXd/load-v2/load-contract.comp": "5bfa847c86b6d644c5a426824d444adec5806d4d355101903b90f1cac746042d"
+    }
+  },
+  "source_hashes": {
+    "runs/convolution-scheduling-20261014.BJ5AVZFt/automatic/world_gradient-plan.json": "6476e09e8212e8f024c9cd1e8100cde612d140adbc55908695ec4b8f41fb0266",
+    "runs/jax-image-profile-20261014.qpFghMhM/trace.sqlite": "65a3fcb3592735e122df766bc4b91bdb05e4dca8753d9a453ae4103788ce56f6",
+    "runs/jax-image-profile-20261014.qpFghMhM/library-mapping.json": "10e64c6f0415f2e2166c9db591bd017ffbde16ce3e38cd38d27a58cb3484f71c",
+    "runs/jax-image-profile-20261014.qpFghMhM/jax/compiled.hlo": "1274292383158394476eda5eabc96923c69b366b1b6d92872a0eaaa645378f40",
+    "runs/convolution-family-20261015.ZI0VhKI6/ordinary-wall-review.json": "581fb2fa29297e5499be09775e02338d2f3c4b1e8f4c239d5afc2e6c92843d2e",
+    "runs/convolution-family-20261015.ZI0VhKI6/cases.json": "254a5b4e2fce7704d2d246347310752881e52f00c41f7d3b12d52ea49e192798",
+    "runs/convolution-contract-20261015.rRE9xjXd/audit.py": "57889f04c29604947568830f41f9a558b41acd48e9b6475b7a0f93d5030c3a21",
+    "runs/convolution-contract-20261015.rRE9xjXd/audit-v2.py": "fab7c17712cca9bfdf38b5a47f628ba92c8d237bf75feaa10763ce56e9d82b11",
+    "runs/convolution-scheduling-20261014.BJ5AVZFt/meganeura/src/codegen/coop_tiled.rs": "bbba070c437f0cf87464544e44b596f6fe03ab65b31f986ea1b2ea9bbf45f40d",
+    "runs/convolution-scheduling-20261014.BJ5AVZFt/meganeura/src/codegen/cooperative/convolution.rs": "282f707dfb26caaafd9c579ea5ffd7a37f6285bb0aa2f99bc5bf497db604128b",
+    "runs/convolution-scheduling-20261014.BJ5AVZFt/meganeura/src/compile/channels.rs": "78077c9cfa9f732aaa2cc9f8e3f4ac598e5626270917e79c24ff81a52a2055c1"
+  },
+  "naga_source_hashes": {
+    "/home/kvark/.cargo/git/checkouts/wgpu-1c18d873ed3af1d7/a97559b/naga/src/front/wgsl/lower/mod.rs": "09a794d7120f65e0c74b2d3d4357cf2a5c3727654f8d48c8b8a81fa8b0c635bf",
+    "/home/kvark/.cargo/git/checkouts/wgpu-1c18d873ed3af1d7/a97559b/naga/src/ir/mod.rs": "11e809d71e660a8f3da9c847953a70fcbbc3ce6ef47870c3d8f5de7bd3ba17e2",
+    "/home/kvark/.cargo/git/checkouts/wgpu-1c18d873ed3af1d7/a97559b/naga/src/proc/typifier.rs": "4f075ed5d342debc4e81bb7fa1eaad156e939dd9848c2eec576e37790313ad0d",
+    "/home/kvark/.cargo/git/checkouts/wgpu-1c18d873ed3af1d7/a97559b/naga/src/back/spv/block.rs": "3ac4248de65b53c7fbf2b6d25e5a71e039562fe6f95011a62f10e8323a02044f"
+  },
+  "raw_reviews": {
+    "runs/convolution-contract-20261015.rRE9xjXd/audit.json": "69e682538ca72216c3b0e8db3f32572f783ff909dbcd271afa96fefebf60dc45",
+    "runs/convolution-contract-20261015.rRE9xjXd/audit-v2.json": "a6bfc67aa24c54e2eb33060d97e97ca5f266603b2fe30a1931978cb07e1e4741",
+    "runs/convolution-contract-20261015.rRE9xjXd/load-v2/load-contract.json": "3ce1989215455f5e30a26a3a633e32d16b9cdce22eeb6dcaa8982f8b5a623bf5"
+  },
+  "retained_failures": [
+    {
+      "kind": "source-derived packed48 padding accounting corrected in audit-v2",
+      "path": "runs/convolution-contract-20261015.rRE9xjXd/audit.json"
+    },
+    {
+      "kind": "reserved WGSL shared identifier in CPU proof; corrected separately",
+      "path": "runs/convolution-contract-20261015.rRE9xjXd/load-contract.log"
+    }
+  ],
+  "services": {
+    "kindle-convolution-contract-v2-20261015": {
+      "ActiveState": "inactive",
+      "Result": "success",
+      "ExecMainStatus": "0"
+    },
+    "kindle-load-contract-v2-20261015": {
+      "ActiveState": "inactive",
+      "Result": "success",
+      "ExecMainStatus": "0"
+    }
+  },
+  "upstream": {
+    "meganeura": "99e3de27b71140498bc1b175a326b8662a9c2a6e",
+    "blade": "e7c3f7b64abe1caf25147987020931065665a9cc"
+  },
+  "ci": {
+    "head": "1f0d6d4f593f6d1bb3cf5146741fd078a1f08bb1",
+    "run": 418,
+    "conclusion": "success"
+  },
+  "limits": [
+    "Library captured kernel intervals and native standalone operation timings have different coverage; not additive savings.",
+    "Padded tile MACs count cooperative product tile extents from source and actual grids, including zero lanes; not instruction counts, DRAM traffic or measured SM utilization.",
+    "Kernel names identify library schedule contracts, not proof of all internal compiler choices.",
+    "Native output precision differs from library derivatives; this audit does not qualify a changed precision policy.",
+    "The first encoder has no input derivative in either reachable program.",
+    "No new GPU execution or performance measurement.",
+    "Source vector width and legal SPIR-V do not prove hardware instruction width or asynchronous lowering.",
+    "The Naga mismatch blocks this packed-pointer representation, not every possible efficient implementation.",
+    "The next fixed-contract transfer proof is declared but unstarted; no compiler change or permission inferred."
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "status": "complete",
+  "decision": "reject direct-output candidate",
+  "artifact_root": "runs/convolution-direct-output-20261016.93l7AixM",
+  "unchanged_native": "e45b9c433d88b3bf6467ae253a22b2bf188e7ee24a85a8300a7b11d01c9e419e",
+  "unchanged_complete_rgb_ms": 43.196506554687524,
+  "unchanged_jax_inclusive_ms": 27.22256929610012,
+  "weighted_costs": {
+    "native": {
+      "gpu_ms": 19.464758749999998,
+      "queued_wall_ms": 19.529490953125,
+      "record_ms": 0.015413999999999997
+    },
+    "control": {
+      "gpu_ms": 19.119745,
+      "queued_wall_ms": 19.188834164062502,
+      "record_ms": 0.1034159296875
+    },
+    "candidate": {
+      "gpu_ms": 18.432206250000004,
+      "queued_wall_ms": 18.4885516875,
+      "record_ms": 0.10115321093749999
+    }
+  },
+  "benefit_percent": {
+    "gpu_ms": 3.595961923132329,
+    "queued_wall_ms": 3.6494269040795335
+  },
+  "calibration_percent": {
+    "gpu_ms": -1.7725046296810487,
+    "queued_wall_ms": -1.7443198590283093
+  },
+  "passes_performance_gate": false,
+  "contracts": 20,
+  "occurrences": 23,
+  "regressing_contracts": 10,
+  "guards": 100,
+  "allocation_warnings": 15,
+  "operation_calls": 8880,
+  "independent_f64_comparisons": 2690432,
+  "exact_output_pairs": 774861888,
+  "timing_samples": 7680,
+  "largest_first_last_shift": {
+    "case": "1-32-3-64",
+    "arm": "native",
+    "first32_ms": 2.035327,
+    "last32_ms": 0.457215,
+    "shift_percent": -77.53604212001315
+  },
+  "minimum_sampled_vulkan_headroom_bytes": 15828123648,
+  "cpu_totals": {
+    "outputs": 280985600,
+    "direct_outputs": 104595456,
+    "direct_groups": 92928,
+    "fallback_groups": 190672,
+    "total_groups": 283600,
+    "occurrences_with_direct_tiles": 7
+  },
+  "source_seals": 2020,
+  "last_guard_event": "2026-10-16T23:28:37.396821+00:00",
+  "finished_utc": "2026-10-16T23:29:00.122244+00:00",
+  "backend_builds": 0,
+  "synthetic_updates": 0,
+  "game_actions": 0,
+  "production_promoted": false,
+  "atari_resumed": false,
+  "goal_complete": false,
+  "failures_retained": [
+    "Initial CPU audit unmatched parenthesis; preserved source/log and syntax-only repair"
+  ],
+  "limits": [
+    "Complete standalone convolution operations are not a full-update or pure-epilogue timing",
+    "All samples retained, including native dX's large transient; no cause or new steady-state timing asserted",
+    "No retime, favorable selector, integration or full-update trial"
+  ]
+}

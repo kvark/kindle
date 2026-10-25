@@ -1,0 +1,224 @@
+{
+  "status": "complete",
+  "guards": [
+    {
+      "path": "limits/limits",
+      "passed": true,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "numerical/packing",
+      "passed": true,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "numerical/derivatives",
+      "passed": true,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "smoke/b8-smoke",
+      "passed": true,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "smoke/b32-smoke",
+      "passed": true,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "timing/b32-control",
+      "passed": true,
+      "allocation_warnings": 1
+    },
+    {
+      "path": "timing/b32-candidate",
+      "passed": true,
+      "allocation_warnings": 1
+    }
+  ],
+  "allocation_warnings": 2,
+  "packing_cases": 14,
+  "packing_executions": 28,
+  "exact_packing_values": 536894080,
+  "derivative_cases": 40,
+  "independent_partials": 7,
+  "synthetic_updates": 592,
+  "game_actions": 0,
+  "whole_plan_comparison": "Every parsed field/value, canonical sorted JSON; only legacy empty extra_outputs omitted",
+  "arms": {
+    "control": {
+      "complete_ms": 68.3444008984375,
+      "finite_reports": 272,
+      "finite_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "minimum_sampled_headroom_bytes": 12665225216,
+      "cache": {
+        "behavior": [
+          1,
+          271
+        ],
+        "imagination": [
+          1,
+          271
+        ],
+        "slow_value": [
+          1,
+          271
+        ],
+        "world": [
+          5,
+          1355
+        ]
+      },
+      "stages_ms": {
+        "behavior_train_and_sync": 4.5856817226562505,
+        "imagination_and_targets": 17.71415032421875,
+        "posterior": 9.21493305859375,
+        "world_train_and_sync": 36.82963579296875
+      }
+    },
+    "candidate": {
+      "complete_ms": 67.32562694140626,
+      "finite_reports": 272,
+      "finite_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "minimum_sampled_headroom_bytes": 12665225216,
+      "cache": {
+        "behavior": [
+          1,
+          271
+        ],
+        "imagination": [
+          1,
+          271
+        ],
+        "slow_value": [
+          1,
+          271
+        ],
+        "world": [
+          5,
+          1355
+        ]
+      },
+      "stages_ms": {
+        "behavior_train_and_sync": 4.4931348125,
+        "imagination_and_targets": 17.786052875,
+        "posterior": 9.215362171875,
+        "world_train_and_sync": 35.83107708203125
+      }
+    }
+  },
+  "exact_initial_tensors": 292,
+  "trajectory_differences": {
+    "first": {
+      "changed_tensors": 100,
+      "aggregate_relative_l2": 0.02974414705528444
+    },
+    "final": {
+      "changed_tensors": 289,
+      "aggregate_relative_l2": 0.07613851333912026
+    }
+  },
+  "less_complete_time_percent": 1.4906472858620567,
+  "retain_isolated_candidate": false,
+  "retained_complete_jax_ms": 27.187344880076125,
+  "candidate_over_retained_jax": 2.476359028010305,
+  "control_reproduction": {
+    "exact_reports": 272,
+    "first_outputs_exact": true,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    }
+  },
+  "plan_changes": {
+    "behavior_gradient-plan.json": {
+      "changed_convolutions": 0,
+      "added_packs": 0,
+      "two_dimensional_packs": 0,
+      "all_dependencies_topological": true,
+      "reordered": false,
+      "control_sha256": "ef59c6fa724d5338cc767c7931c249007a828ae3d5c064d02f7917acc945b310",
+      "candidate_sha256": "0fb8c41e0532796a5e22b3d47199107128ee5c32ed76156558536e764af03ee1"
+    },
+    "imagination-plan.json": {
+      "changed_convolutions": 0,
+      "added_packs": 0,
+      "two_dimensional_packs": 0,
+      "all_dependencies_topological": true,
+      "reordered": false,
+      "control_sha256": "e4a9b22c49010766af6fd22aa99c3b7ab8f9fe060822a02756877fbcd8c6777a",
+      "candidate_sha256": "d4c88f7a71507d66d948d3e1f085a001622016af92d55fc8504ee880770af231"
+    },
+    "posterior-plan.json": {
+      "changed_convolutions": 4,
+      "added_packs": 8,
+      "two_dimensional_packs": 4,
+      "all_dependencies_topological": true,
+      "reordered": true,
+      "control_sha256": "4b4aa99920b5de75622572c2259f40f61585930b01f641533180227b1ca92b4e",
+      "candidate_sha256": "5e6565b1b69ef53512acf237b49811994b58e041073456fa02652fb8cae79a9a"
+    },
+    "slow_value-plan.json": {
+      "changed_convolutions": 0,
+      "added_packs": 0,
+      "two_dimensional_packs": 0,
+      "all_dependencies_topological": true,
+      "reordered": false,
+      "control_sha256": "8ccfa10fda4ac989f43ebfe6235d4941f6945c5686cf0d423deb59b762385b1a",
+      "candidate_sha256": "dcb42797734714a609ab410e364fe52f0b901a0b911e1b8bc6fb2a958b1486f4"
+    },
+    "world_gradient-plan.json": {
+      "changed_convolutions": 4,
+      "added_packs": 8,
+      "two_dimensional_packs": 4,
+      "all_dependencies_topological": true,
+      "reordered": true,
+      "control_sha256": "4b4aa99920b5de75622572c2259f40f61585930b01f641533180227b1ca92b4e",
+      "candidate_sha256": "5e6565b1b69ef53512acf237b49811994b58e041073456fa02652fb8cae79a9a"
+    }
+  },
+  "artifacts": "runs/packing-grid-20261014.3ge6SKP4",
+  "control_sha256": "e5d890dd4c121e1f51e98cb41075c34639692dbd9aabfe0d39a95956445e663d",
+  "candidate_sha256": "9ad4b2b679459e3b6324d1c9b263c880ed8d71c0e28705ce1f561c019edea206",
+  "numerical_sha256": "b7b7c86f60dd1cb9f1b2b28a4c1a0ac3d7cd92356d27d60fb7aebea8e05c089b",
+  "actual_device_grid_limits": [
+    2147483647,
+    65535,
+    65535
+  ],
+  "affected_nominal_macs": 80530636800,
+  "b8_exact_smoke": {
+    "reports": 24,
+    "tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "plans": 5,
+    "pipelines": 5,
+    "first_outputs": true
+  },
+  "retained_cpu_failures": [
+    "Rust test ShaderEntry move",
+    "artificial-graph portable-grid assertion included unrelated conversions",
+    "dispatch-order comparison instead of output identities",
+    "300-second stream-sorting audit timeout"
+  ],
+  "production_changed": false,
+  "limits": [
+    "One matched ordinary full-update pair, not a latency confidence interval",
+    "Changed B32 arithmetic and optimizer trajectory; no learning equivalence",
+    "Retained JAX complete boundary, not a new JAX timing",
+    "No SM-utilization, GPU fault/recovery, or Atari-training claim"
+  ]
+}

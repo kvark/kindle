@@ -1,0 +1,62 @@
+{
+  "status": "complete",
+  "interfaces": 12,
+  "native_products": 180,
+  "jax_products": 180,
+  "physical_address_checks": 20933632,
+  "negative_tests": 7,
+  "native_macs": 44865945600,
+  "jax_macs": 44889538560,
+  "captured_jax_matrix_launches": 1440,
+  "jax_launch_nodes": 12,
+  "jax_matrix_kernel_ms": 2.105519,
+  "native_counter_covered_occurrences": 150,
+  "native_counter_uncovered_occurrences": 30,
+  "native_counter_cases": [
+    "tiled-001",
+    "tiled-002",
+    "tiled-007",
+    "tiled-008",
+    "tiled-009",
+    "tiled-010",
+    "tiled-011"
+  ],
+  "uncovered_parameters": [
+    "behavior.actor.out.weight",
+    "world.dynamics.core.dynin2.weight"
+  ],
+  "individual_hlo_launch_ownership_proven": false,
+  "upstream_meganeura": "12df95cda18e8e5039e2e360e3e2619be25900a1",
+  "upstream_blade": "4845d6529c38b07718a624bf3c4f2ab4317c9bf4",
+  "upstream_review": [
+    "Six new commits add/generalize typed dense staging and bounded K partitions; no source identity or runtime qualification is asserted",
+    "The isolated checked path already stages vectors, but is not the same implementation as new upstream",
+    "Upstream coop_tiled.rs is unchanged across the six commits and has no isolated MatMulTyped/BlockMatMulTyped branches",
+    "Native primitive acceptance policy does not waive connected-graph failures or change retained gates"
+  ],
+  "upstream_tiled_blob_unchanged": "cdb65862b401813d2628af3cceff510d8dc788a6",
+  "retained_failure": "First CPU reviewer incorrectly asserted that upstream coop_tiled.rs did not exist; separately reviewed source-membership repair proves its blob is unchanged and typed branches are isolated. No GPU repeat or numerical gate change.",
+  "finished_utc": "2026-10-16T14:51:56.219729+00:00",
+  "gpu_calls": 0,
+  "backend_builds": 0,
+  "game_actions": 0,
+  "learner_updates": 0,
+  "artifact_root": "/x/Code/kindle/runs/jax-matrix-contract-20261016.y2ImIOLk",
+  "limits": [
+    "Graph-node identity and enclosing command buffer are proven; individual HLO ownership is not yet proven",
+    "Kernel names and first-launch order do not establish exact HLO ownership",
+    "Native grouped products omit the JAX in-kernel beta=1 addend; surrounding bias/rounding must remain distinct",
+    "No native/JAX instruction or matched complete-operation timing ratio follows"
+  ],
+  "review_sha256": "e30ec78596ba6f458d768232c85a16359a8067361199c00f685f792b9734adb5",
+  "source_seals_verified": 19,
+  "publication": {
+    "status": "complete",
+    "finished_utc": "2026-10-16T14:56:05.973699+00:00",
+    "source_seals_verified": 149,
+    "current_jax_interfaces_exact": 12,
+    "local_links": 5,
+    "gpu_calls": 0,
+    "sha256": "a9326862ccb600486ff2b33336fb1bad8e6c9dec0e9ca62382dd9d7db3ec9405"
+  }
+}

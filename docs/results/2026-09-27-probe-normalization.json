@@ -1,0 +1,66 @@
+{
+  "kind": "offline_normalization_correction",
+  "dataset_manifest_sha256": "0759cafb7da3184cee07d61a080b2c4d31d466693fbe57243c2bf5174cd2e4b0",
+  "analysis_split": "training only; no validation/test data used to diagnose or choose a new threshold",
+  "numpy_version": "2.5.2",
+  "rows": [
+    {
+      "game": "Pong",
+      "training_shape": [
+        1024,
+        18816
+      ],
+      "constant_columns": 10081,
+      "false_nonconstant_float32": 7498,
+      "maximum_false_std": 1.1086463928222656e-05,
+      "maximum_constant_std_float64": 0.0
+    },
+    {
+      "game": "Breakout",
+      "training_shape": [
+        1024,
+        18816
+      ],
+      "constant_columns": 11556,
+      "false_nonconstant_float32": 3136,
+      "maximum_false_std": 7.62939453125e-06,
+      "maximum_constant_std_float64": 0.0
+    },
+    {
+      "game": "Seaquest",
+      "training_shape": [
+        1024,
+        18816
+      ],
+      "constant_columns": 8175,
+      "false_nonconstant_float32": 4104,
+      "maximum_false_std": 6.735324859619141e-06,
+      "maximum_constant_std_float64": 0.0
+    }
+  ],
+  "threshold": 1e-06,
+  "correction": "F64 training-only means/std, existing scale1 constant-column handling, F32 native GPU learning",
+  "ridge": "unaffected; already F64",
+  "superseded": [
+    {
+      "path": "runs/representation-probes-20260927.POCnif/tiny-mlp-v2/result.json",
+      "sha256": "e3084ed8761d02c47625d2c17ba35c946e4cad46e16cea44404b1c6e18d57b06"
+    },
+    {
+      "path": "runs/representation-probes-20260927.POCnif/initial-mlp/result.json",
+      "sha256": "df946c8cffc8256464872c53c4bdcb6afa73dc51747bc6e882644e839908277f"
+    },
+    {
+      "path": "runs/representation-probes-20260927.POCnif/large-mlp/result.json",
+      "sha256": "8f561cd0fc4eef381c889af5f7887c441ee0688bcb7fbb86a67d01f36f56d5ed"
+    },
+    {
+      "path": "runs/representation-probes-20260927.POCnif/cnn-mlp/result.json",
+      "sha256": "6cbcf569566720841ea2f4c0a90f6c353cd10bb444f81cb8d7c27af6edc785a5"
+    },
+    {
+      "path": "runs/representation-probes-20260927.POCnif/raw-mlp/result.json",
+      "sha256": "a5cdacf7b00b21c4bc248e52725033b738985a5dbd001ec9b571a54f749f34cb"
+    }
+  ]
+}

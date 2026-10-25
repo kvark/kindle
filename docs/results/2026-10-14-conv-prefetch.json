@@ -1,0 +1,206 @@
+{
+  "status": "complete",
+  "mode": "timing",
+  "game_actions": 0,
+  "queues": {
+    "numerics": {
+      "guards": 2,
+      "allocation_warnings": 0
+    },
+    "smoke": {
+      "guards": 1,
+      "allocation_warnings": 0
+    },
+    "timing": {
+      "guards": 2,
+      "allocation_warnings": 1
+    }
+  },
+  "smoke": {
+    "control_ms": 27.787109875,
+    "candidate_ms": 28.12980025,
+    "less_time_percent": -1.2332710258158963,
+    "reports": 24,
+    "exact_reports": 24,
+    "first_outputs_exact": true,
+    "tensors": {
+      "initial": {
+        "tensors": 292,
+        "exact": 292,
+        "elements": 33203322,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact": 292,
+        "elements": 33203322,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "final": {
+        "tensors": 292,
+        "exact": 292,
+        "elements": 33203322,
+        "relative_l2": 0,
+        "max_abs": 0
+      }
+    },
+    "canonical_plans": {
+      "precision-plans.json": "a08140130d384932876efd633a1ff10bc0448aace72dd69c6cdb1bd70b8e0293",
+      "imagination-plan.json": "0d2694d6c5ec19332b72fd045ab44061ad1f0c8d59d083d2c0b3ca2c62cf779f",
+      "slow_value-plan.json": "706412a4a5f1fdda9b0c31b9e984ae5585755f1a374173e36e125af0bf86439a",
+      "posterior-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+      "world_gradient-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+      "behavior_gradient-plan.json": "21cd8f90476d9d4c6294c659ee90f477e29ba1f968ee086dbc10078600428bc6"
+    },
+    "minimum_sampled_headroom_bytes": 15104540672,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.5593831249999996,
+        "imagination_and_targets": 7.159986,
+        "posterior": 4.2756982500000005,
+        "world_train_and_sync": 14.792042499999999
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.5547564999999999,
+        "imagination_and_targets": 7.161260875,
+        "posterior": 4.313746375,
+        "world_train_and_sync": 15.1000365
+      }
+    }
+  },
+  "control_reproduction": {
+    "control_ms": 28.313988761718743,
+    "candidate_ms": 28.43561366796877,
+    "less_time_percent": -0.4295576553115854,
+    "reports": 272,
+    "exact_reports": 272,
+    "first_outputs_exact": true,
+    "tensors": {
+      "initial": {
+        "tensors": 292,
+        "exact": 292,
+        "elements": 33203322,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact": 292,
+        "elements": 33203322,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "final": {
+        "tensors": 292,
+        "exact": 292,
+        "elements": 33203322,
+        "relative_l2": 0,
+        "max_abs": 0
+      }
+    },
+    "canonical_plans": {
+      "precision-plans.json": "a08140130d384932876efd633a1ff10bc0448aace72dd69c6cdb1bd70b8e0293",
+      "imagination-plan.json": "0d2694d6c5ec19332b72fd045ab44061ad1f0c8d59d083d2c0b3ca2c62cf779f",
+      "slow_value-plan.json": "706412a4a5f1fdda9b0c31b9e984ae5585755f1a374173e36e125af0bf86439a",
+      "posterior-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+      "world_gradient-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+      "behavior_gradient-plan.json": "21cd8f90476d9d4c6294c659ee90f477e29ba1f968ee086dbc10078600428bc6"
+    },
+    "minimum_sampled_headroom_bytes": 15104540672,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.5864410664062498,
+        "imagination_and_targets": 7.4290582578125,
+        "posterior": 4.31405940625,
+        "world_train_and_sync": 14.98443003125
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.6068678203125,
+        "imagination_and_targets": 7.44938166796875,
+        "posterior": 4.33849791796875,
+        "world_train_and_sync": 15.04086626171875
+      }
+    }
+  },
+  "comparison": {
+    "control_ms": 28.43561366796877,
+    "candidate_ms": 28.714047906250006,
+    "less_time_percent": -0.9791743604776748,
+    "reports": 272,
+    "exact_reports": 272,
+    "first_outputs_exact": true,
+    "tensors": {
+      "initial": {
+        "tensors": 292,
+        "exact": 292,
+        "elements": 33203322,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact": 292,
+        "elements": 33203322,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "final": {
+        "tensors": 292,
+        "exact": 292,
+        "elements": 33203322,
+        "relative_l2": 0,
+        "max_abs": 0
+      }
+    },
+    "canonical_plans": {
+      "precision-plans.json": "a08140130d384932876efd633a1ff10bc0448aace72dd69c6cdb1bd70b8e0293",
+      "imagination-plan.json": "0d2694d6c5ec19332b72fd045ab44061ad1f0c8d59d083d2c0b3ca2c62cf779f",
+      "slow_value-plan.json": "706412a4a5f1fdda9b0c31b9e984ae5585755f1a374173e36e125af0bf86439a",
+      "posterior-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+      "world_gradient-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+      "behavior_gradient-plan.json": "21cd8f90476d9d4c6294c659ee90f477e29ba1f968ee086dbc10078600428bc6"
+    },
+    "minimum_sampled_headroom_bytes": 15104540672,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.6068678203125,
+        "imagination_and_targets": 7.44938166796875,
+        "posterior": 4.33849791796875,
+        "world_train_and_sync": 15.04086626171875
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.5806665156249997,
+        "imagination_and_targets": 7.42052734765625,
+        "posterior": 4.40391602734375,
+        "world_train_and_sync": 15.308938015625
+      }
+    }
+  },
+  "followup_threshold_percent": 5,
+  "substantial": false,
+  "synthetic_updates": 568,
+  "date": "2026-10-14",
+  "artifact_root": "/x/Code/kindle/runs/conv-prefetch-20261014.VO3cQDiz",
+  "decision": "Do not promote or tune further: whole-update time regresses .98%, below predeclared5% benefit threshold.",
+  "upstream": {
+    "meganeura": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "blade": "96c1dc731b1d5e133a6c0a8a020014619ff2e434",
+    "naga": "a97559b6318dc0a857ace502ffc7f3e442951f39"
+  },
+  "sha256": {
+    "backend-tests": "2a1001b22a0aee369006af2b8349a0cec07c5c4a9aa4f460fa3300b50ed0c716",
+    "kindle-tests": "6d18ad7bec7911d42160bec59ae006750d257c7e8655c53f7f5405b93cc9e7c3",
+    "backend.patch": "12204489ec259d9375f39050cf280ef3006d81f09e2074a9d6449d330deaa00e",
+    "kindle.patch": "d8c790f4d2ca4bf9f13805c5d5cc393cb26ede3840692b8f1e03ab27d25d393f",
+    "backend-Cargo.lock": "82e55a5c4fd0d8c797e174d96410be067a61f4b544a31ee764bf6af787d1a449",
+    "kindle-Cargo.lock": "ff6d6f041a5af741264a6c7bef0ba69200d1f5894d144f438a74e80d259114f2"
+  },
+  "limits": [
+    "One complete matched pair, not a latency confidence interval.",
+    "No production/default/pin change, learning or SM-utilization claim.",
+    "No conditional CDP/counter follow-up or tuning sweep.",
+    "All inherited numerical failures and qualification limits remain."
+  ]
+}

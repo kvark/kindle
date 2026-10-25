@@ -1,0 +1,223 @@
+{
+  "status": "complete",
+  "artifact_root": "runs/conv-iterators-20261014.bs7ouWMr",
+  "decision": "retain isolated iterator candidate; no production/CDP/learning qualification",
+  "kernels": {
+    "status": "complete",
+    "reports": [
+      {
+        "name": "encoder-forward",
+        "control_gpu_pass_ms": 0.1603875,
+        "candidate_gpu_pass_ms": 0.14542075000000002,
+        "reduction_percent": 9.331618735874036,
+        "exact_values": 16777216,
+        "exact_plan": true,
+        "changed_input_exact": true
+      },
+      {
+        "name": "decoder-forward",
+        "control_gpu_pass_ms": 1.31014575,
+        "candidate_gpu_pass_ms": 0.9377245,
+        "reduction_percent": 28.425940396326133,
+        "exact_values": 1572864,
+        "exact_plan": true,
+        "changed_input_exact": true
+      },
+      {
+        "name": "decoder-dx",
+        "control_gpu_pass_ms": 0.16829325,
+        "candidate_gpu_pass_ms": 0.1682485,
+        "reduction_percent": 0.026590490111755294,
+        "exact_values": 16777216,
+        "exact_plan": true,
+        "changed_input_exact": true
+      },
+      {
+        "name": "decoder-dw",
+        "control_gpu_pass_ms": 1.7414895,
+        "candidate_gpu_pass_ms": 1.094554,
+        "reduction_percent": 37.148400837329184,
+        "exact_values": 2400,
+        "exact_plan": true,
+        "changed_input_exact": true
+      },
+      {
+        "name": "encoder-dw",
+        "control_gpu_pass_ms": 0.366442,
+        "candidate_gpu_pass_ms": 0.155518,
+        "reduction_percent": 57.559995852003865,
+        "exact_values": 2400,
+        "exact_plan": true,
+        "changed_input_exact": true
+      }
+    ],
+    "guards": 3,
+    "allocation_warnings": 0,
+    "exact_values": 70264192,
+    "f64_probes": 1280,
+    "independent_coordinates": 640,
+    "forward_derivative_cases": 40,
+    "independent_partial_gradients": 17,
+    "typed_cases": 32,
+    "typed_f64_values": 5520,
+    "minimum_sampled_headroom_bytes": 16322920448,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "full_learner_gate": true
+  },
+  "timing": {
+    "control_ms": 25.474683949218765,
+    "candidate_ms": 24.339903566406242,
+    "less_time_percent": 4.454541556137038,
+    "exact_reports": 272,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "first_outputs_exact": true,
+    "plan_sha256": {
+      "behavior_gradient-plan.json": "9dfbb32686172160042544911f494568dac1a0deb6181f667d5f42bf205e6da6",
+      "imagination-plan.json": "8965dd9423c245054337271a8a4350a7e0fa07a692af931f962c51477d5d8e64",
+      "posterior-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58",
+      "slow_value-plan.json": "96b8f478a446ac5f1271705cb12f7429af26b23360de444f7d46ca7c6e36cbcb",
+      "world_gradient-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58"
+    },
+    "minimum_sampled_headroom_bytes": 15121317888,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.3879051640625,
+        "imagination_and_targets": 6.464127140625,
+        "posterior": 3.81238633984375,
+        "world_train_and_sync": 13.8102653046875
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.3829415546874997,
+        "imagination_and_targets": 6.557640296875,
+        "posterior": 3.81610090625,
+        "world_train_and_sync": 12.583220808593751
+      }
+    }
+  },
+  "retained_control": {
+    "control_ms": 25.53032745312499,
+    "candidate_ms": 25.474683949218765,
+    "less_time_percent": 0.2179506079911797,
+    "exact_reports": 272,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "first_outputs_exact": true,
+    "plan_sha256": {
+      "behavior_gradient-plan.json": "9dfbb32686172160042544911f494568dac1a0deb6181f667d5f42bf205e6da6",
+      "imagination-plan.json": "8965dd9423c245054337271a8a4350a7e0fa07a692af931f962c51477d5d8e64",
+      "posterior-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58",
+      "slow_value-plan.json": "96b8f478a446ac5f1271705cb12f7429af26b23360de444f7d46ca7c6e36cbcb",
+      "world_gradient-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58"
+    },
+    "minimum_sampled_headroom_bytes": 15121317888,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.40277753515625,
+        "imagination_and_targets": 6.51139529296875,
+        "posterior": 3.80847955859375,
+        "world_train_and_sync": 13.807675066406249
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.3879051640625,
+        "imagination_and_targets": 6.464127140625,
+        "posterior": 3.81238633984375,
+        "world_train_and_sync": 13.8102653046875
+      }
+    }
+  },
+  "smoke": {
+    "control_ms": 25.722455125,
+    "candidate_ms": 24.069098874999998,
+    "less_time_percent": 6.427676681581929,
+    "exact_reports": 24,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "first_outputs_exact": true,
+    "plan_sha256": {
+      "behavior_gradient-plan.json": "9dfbb32686172160042544911f494568dac1a0deb6181f667d5f42bf205e6da6",
+      "imagination-plan.json": "8965dd9423c245054337271a8a4350a7e0fa07a692af931f962c51477d5d8e64",
+      "posterior-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58",
+      "slow_value-plan.json": "96b8f478a446ac5f1271705cb12f7429af26b23360de444f7d46ca7c6e36cbcb",
+      "world_gradient-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58"
+    },
+    "minimum_sampled_headroom_bytes": 15121317888,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.50600625,
+        "imagination_and_targets": 6.439080625,
+        "posterior": 3.826151,
+        "world_train_and_sync": 13.95121725
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.3876676249999997,
+        "imagination_and_targets": 6.300624624999999,
+        "posterior": 3.791789125,
+        "world_train_and_sync": 12.5890175
+      }
+    }
+  },
+  "candidate_over_retained_complete_jax": 1.8961516745373042,
+  "retained_complete_jax_ms": 12.836475,
+  "jax_remeasured": false,
+  "guards": [
+    "runs/conv-iterators-20261014.bs7ouWMr/numerical-queue/numerical",
+    "runs/conv-iterators-20261014.bs7ouWMr/kernels-queue/control",
+    "runs/conv-iterators-20261014.bs7ouWMr/kernels-queue/candidate",
+    "runs/conv-iterators-20261014.bs7ouWMr/smoke-queue/rgb-control-smoke",
+    "runs/conv-iterators-20261014.bs7ouWMr/smoke-queue/rgb-candidate-smoke",
+    "runs/conv-iterators-20261014.bs7ouWMr/timing-queue/rgb-control",
+    "runs/conv-iterators-20261014.bs7ouWMr/timing-queue/rgb-candidate"
+  ],
+  "allocation_warnings": 0,
+  "synthetic_updates": 592,
+  "named_boundary_operation_calls": 1460,
+  "game_actions": 0,
+  "production_changed": false,
+  "workers_remaining": false,
+  "source_changes": [
+    "src/codegen/cooperative/convolution.rs",
+    "src/codegen/cooperative.rs",
+    "src/shaders/conv_forward_iterator.wgsl",
+    "src/shaders/conv_tile_address.wgsl",
+    "src/shaders/conv_weight_iterator.wgsl",
+    "src/shaders/matmul_checked.wgsl",
+    "src/shaders/matmul_checked_load.wgsl"
+  ],
+  "kindle_source_unchanged": true,
+  "address_checks": {
+    "status": "complete",
+    "shapes": 8,
+    "address_checks": 256600,
+    "gradient_address_checks": 32075
+  },
+  "typed_checks": {
+    "cases": 32,
+    "f32_multiply_gpu_qualified": false,
+    "f64_values": 5520,
+    "game_actions": 0,
+    "status": "complete",
+    "synthetic_updates": 0
+  },
+  "source_sha256": {
+    "backend.patch": "9dcee74ea4af58540630c877174465c59c017bcf3b951bcb4c1663fa74c2208d",
+    "kindle.patch": "6ff27a870bf1377977ad67eef88c263288d5c4c0e506f5fcd8646ce7ec6e72db",
+    "native-tests-validated": "5e178d830839b444eb0c452a83cd09b059a45f5d72ff5d033d0236e66d2661d5",
+    "kindle-tests": "b91527645d7bdc345e6bdc2c57865b0a35c88ba164920269612d0fca197a0419",
+    "declare.py": "b76041891dab15539d2294416de0d8adcc81d37ca2b604425855b0b7b55a79a3",
+    "audit-kernels.py": "488479d47d84425a19303309d07005d128881a8a2b5f6426f2587f7c37ca2ec7",
+    "audit-whole.py": "579cc4b2078f0e327d0d5eb3e11d4fdbf3991ffe197fcdea29211dbb312c9c76",
+    "publish.py": "1c812f08b5d9b8c2a1584bbb43ae865e23bd392810d1504fbe7c97405fe9ed8d"
+  },
+  "scope": "Same arithmetic, precision, tile, K partitions, shared-memory stage and graphs. F32 storage with reduced products tested; native F32 cooperative multiplication is not GPU-qualified. No new counter capture or whole-gap closure."
+}

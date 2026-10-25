@@ -1,0 +1,525 @@
+{
+  "status": "complete",
+  "date": "2026-10-14",
+  "artifacts": "runs/cached-residual-20261014.l68izkI8",
+  "workload": "RGB12M/B8/T16/H15/BF16; retained vector-staging/iterator/command-cache candidate, one world chunk for timing diagnostics",
+  "ordinary": {
+    "single_chunk_native_ms": 23.03914041015624,
+    "retained_four_chunk_native_ms": 22.881178542968748,
+    "fresh_jax_complete_ms": 12.683879483120108,
+    "retained_four_chunk_to_jax_ratio": 1.8039574227600754
+  },
+  "parity": {
+    "rgb-single-ordinary": {
+      "exact_reports": 272,
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "plan_hashes": {
+        "precision-plans.json": "a08140130d384932876efd633a1ff10bc0448aace72dd69c6cdb1bd70b8e0293",
+        "imagination-plan.json": "0d2694d6c5ec19332b72fd045ab44061ad1f0c8d59d083d2c0b3ca2c62cf779f",
+        "slow_value-plan.json": "706412a4a5f1fdda9b0c31b9e984ae5585755f1a374173e36e125af0bf86439a",
+        "posterior-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "world_gradient-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "behavior_gradient-plan.json": "21cd8f90476d9d4c6294c659ee90f477e29ba1f968ee086dbc10078600428bc6"
+      },
+      "mean_update_ms": 23.03914041015624,
+      "reference": "/x/Code/kindle/runs/matrix-staging-20261014.iRAlLKXg/rgb-candidate",
+      "reference_ms": 22.881178542968748,
+      "minimum_sampled_headroom_bytes": 15138095104
+    },
+    "rgb-single-coarse": {
+      "exact_reports": 272,
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "plan_hashes": {
+        "precision-plans.json": "a08140130d384932876efd633a1ff10bc0448aace72dd69c6cdb1bd70b8e0293",
+        "imagination-plan.json": "0d2694d6c5ec19332b72fd045ab44061ad1f0c8d59d083d2c0b3ca2c62cf779f",
+        "slow_value-plan.json": "706412a4a5f1fdda9b0c31b9e984ae5585755f1a374173e36e125af0bf86439a",
+        "posterior-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "world_gradient-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "behavior_gradient-plan.json": "21cd8f90476d9d4c6294c659ee90f477e29ba1f968ee086dbc10078600428bc6"
+      },
+      "mean_update_ms": 23.154423632812506,
+      "reference": "/x/Code/kindle/runs/matrix-staging-20261014.iRAlLKXg/rgb-candidate",
+      "reference_ms": 22.881178542968748,
+      "minimum_sampled_headroom_bytes": 15138095104
+    }
+  },
+  "smoke_parity": {
+    "rgb-coarse-smoke": {
+      "exact_reports": 24,
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "plan_hashes": {
+        "precision-plans.json": "a08140130d384932876efd633a1ff10bc0448aace72dd69c6cdb1bd70b8e0293",
+        "imagination-plan.json": "0d2694d6c5ec19332b72fd045ab44061ad1f0c8d59d083d2c0b3ca2c62cf779f",
+        "slow_value-plan.json": "706412a4a5f1fdda9b0c31b9e984ae5585755f1a374173e36e125af0bf86439a",
+        "posterior-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "world_gradient-plan.json": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+        "behavior_gradient-plan.json": "21cd8f90476d9d4c6294c659ee90f477e29ba1f968ee086dbc10078600428bc6"
+      },
+      "mean_update_ms": 23.003393000000003,
+      "reference": "/x/Code/kindle/runs/matrix-staging-20261014.iRAlLKXg/rgb-candidate-smoke",
+      "reference_ms": 22.756256875000002,
+      "minimum_sampled_headroom_bytes": 15138095104
+    }
+  },
+  "command_cache": {
+    "behavior": [
+      1,
+      271
+    ],
+    "imagination": [
+      1,
+      271
+    ],
+    "slow_value": [
+      1,
+      271
+    ],
+    "world": [
+      2,
+      542
+    ]
+  },
+  "coarse": {
+    "summary": {
+      "wall_ms": 23.1553431328125,
+      "gpu_pass_ms": 19.697327375,
+      "uncovered_ms": 3.4580157578125,
+      "outside_timer_union_ms": 0.01216025,
+      "stages": {
+        "posterior": {
+          "wall_ms": 3.7542018125,
+          "gpu_pass_ms": 3.034483625,
+          "uncovered_ms": 0.7197181875
+        },
+        "imagination": {
+          "wall_ms": 6.5664960625,
+          "gpu_pass_ms": 4.57750875,
+          "uncovered_ms": 1.9889873125
+        },
+        "world": {
+          "wall_ms": 11.454609953125,
+          "gpu_pass_ms": 11.162877875,
+          "uncovered_ms": 0.291732078125
+        },
+        "behavior": {
+          "wall_ms": 1.3800353046875,
+          "gpu_pass_ms": 0.922457125,
+          "uncovered_ms": 0.4575781796875
+        }
+      },
+      "pieces": {
+        "posterior_inputs": {
+          "wall_ms": 0.41694794140625,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.41694794140625
+        },
+        "posterior_submit": {
+          "wall_ms": 0.01083484765625,
+          "gpu_pass_ms": 0.00055726171875,
+          "uncovered_ms": 0.0102775859375
+        },
+        "posterior_readback": {
+          "wall_ms": 3.2870972734375,
+          "gpu_pass_ms": 3.03392636328125,
+          "uncovered_ms": 0.25317091015625
+        },
+        "posterior_unpack": {
+          "wall_ms": 0.03932175,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.03932175
+        },
+        "imagination_inputs": {
+          "wall_ms": 0.1307316171875,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.1307316171875
+        },
+        "imagination_submit": {
+          "wall_ms": 0.0444111484375,
+          "gpu_pass_ms": 0.0182435625,
+          "uncovered_ms": 0.0261675859375
+        },
+        "slow_value_submit": {
+          "wall_ms": 0.0725880859375,
+          "gpu_pass_ms": 0.05085447265625,
+          "uncovered_ms": 0.02173361328125
+        },
+        "imagination_readback": {
+          "wall_ms": 4.79662601171875,
+          "gpu_pass_ms": 4.50841071484375,
+          "uncovered_ms": 0.288215296875
+        },
+        "decode": {
+          "wall_ms": 1.2014860625,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 1.2014860625
+        },
+        "targets": {
+          "wall_ms": 0.32065313671875,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.32065313671875
+        },
+        "world_inputs": {
+          "wall_ms": 0.05188726953125,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.05188726953125
+        },
+        "world_submit": {
+          "wall_ms": 0.05874153125,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.05874153125
+        },
+        "world_wait": {
+          "wall_ms": 11.26699742578125,
+          "gpu_pass_ms": 11.162877875,
+          "uncovered_ms": 0.10411955078125
+        },
+        "world_metrics": {
+          "wall_ms": 0.01569625,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.01569625
+        },
+        "world_sync": {
+          "wall_ms": 0.0612874765625,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.0612874765625
+        },
+        "behavior_inputs": {
+          "wall_ms": 0.25389137109375,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.25389137109375
+        },
+        "behavior_submit": {
+          "wall_ms": 0.0767247734375,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.0767247734375
+        },
+        "behavior_wait": {
+          "wall_ms": 0.98748910546875,
+          "gpu_pass_ms": 0.922457125,
+          "uncovered_ms": 0.06503198046875
+        },
+        "behavior_metrics": {
+          "wall_ms": 0.011036609375,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.011036609375
+        },
+        "behavior_sync": {
+          "wall_ms": 0.0508934453125,
+          "gpu_pass_ms": 0.0,
+          "uncovered_ms": 0.0508934453125
+        }
+      },
+      "pass_ms": {
+        "cached_graph": 18.808687125,
+        "kindle_uniforms": 0.028663875,
+        "kindle_readback": 0.3045495,
+        "kindle_device_copy": 0.08978325,
+        "agc_norms": 0.107864125,
+        "agc_factor": 0.00855425,
+        "agc_apply": 0.0403955,
+        "adam_update": 0.30882975,
+        "parameter_blend": 0.01216025,
+        "readback_copy": 0
+      }
+    },
+    "all_updates_covered": 272,
+    "per_update_counts": {
+      "cached_graph": 5,
+      "kindle_uniforms": 2,
+      "kindle_readback": 2,
+      "kindle_device_copy": 2,
+      "agc_norms": 2,
+      "agc_factor": 2,
+      "agc_apply": 2,
+      "adam_update": 2,
+      "parameter_blend": 1
+    },
+    "drain_after_last_end_ms": 0.05151,
+    "scalar_probe_copies": 45,
+    "checkpoint_passes": 3,
+    "instrumentation_overhead_percent": 0.500379877911783
+  },
+  "masks": {
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_reports": 1,
+    "total_dispatches": 5286,
+    "total_groups": 2058,
+    "baseline_gpu_ms": 18.74189075,
+    "mask_means_ms": {
+      "0": 4.295188666666666,
+      "1": 10.052762000000001,
+      "2": 7.663058666666666,
+      "3": 13.502824,
+      "4": 9.964324,
+      "5": 15.350586666666665,
+      "6": 13.343113333333333,
+      "7": 18.732683333333334
+    },
+    "shapley_ms": {
+      "command_stream_floor": 4.295188666666666,
+      "convolution": 5.586719111111111,
+      "matrix": 3.388130777777777,
+      "remaining": 5.462644777777777
+    },
+    "sessions": {
+      "behavior_gradient": {
+        "dispatches": 247,
+        "family_counts": {
+          "remaining": 214,
+          "matrix": 33
+        },
+        "baseline_gpu_ms": 0.85501625,
+        "shapley_ms": {
+          "command_stream_floor": 0.08024133333333333,
+          "convolution": 0.00014877777777778006,
+          "matrix": 0.39528177777777773,
+          "remaining": 0.3803454444444444
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 0.080392,
+            "1": 0.080238,
+            "2": 0.447592,
+            "3": 0.44917,
+            "4": 0.432184,
+            "5": 0.43265,
+            "6": 0.8565699999999999,
+            "7": 0.855712
+          },
+          {
+            "0": 0.080028,
+            "1": 0.080204,
+            "2": 0.446602,
+            "3": 0.447508,
+            "4": 0.43225199999999997,
+            "5": 0.43208199999999997,
+            "6": 0.855172,
+            "7": 0.856282
+          },
+          {
+            "0": 0.080304,
+            "1": 0.080264,
+            "2": 0.446318,
+            "3": 0.446562,
+            "4": 0.43275399999999997,
+            "5": 0.432212,
+            "6": 0.856194,
+            "7": 0.856058
+          }
+        ],
+        "groups": 36
+      },
+      "imagination": {
+        "dispatches": 922,
+        "family_counts": {
+          "remaining": 734,
+          "matrix": 188
+        },
+        "baseline_gpu_ms": 4.0416485,
+        "shapley_ms": {
+          "command_stream_floor": 1.417432,
+          "convolution": -0.0002727777777778131,
+          "matrix": 1.3733455555555552,
+          "remaining": 1.2488025555555553
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 1.4176440000000001,
+            "1": 1.417918,
+            "2": 2.79424,
+            "3": 2.7947319999999998,
+            "4": 2.6694080000000002,
+            "5": 2.669724,
+            "6": 4.041452,
+            "7": 4.039978
+          },
+          {
+            "0": 1.41762,
+            "1": 1.417506,
+            "2": 2.794442,
+            "3": 2.794388,
+            "4": 2.669782,
+            "5": 2.670576,
+            "6": 4.039032,
+            "7": 4.038474
+          },
+          {
+            "0": 1.417032,
+            "1": 1.417128,
+            "2": 2.793732,
+            "3": 2.79427,
+            "4": 2.669318,
+            "5": 2.669738,
+            "6": 4.041402,
+            "7": 4.03947
+          }
+        ],
+        "groups": 689
+      },
+      "slow_value": {
+        "dispatches": 13,
+        "family_counts": {
+          "remaining": 9,
+          "matrix": 4
+        },
+        "baseline_gpu_ms": 0.13784275,
+        "shapley_ms": {
+          "command_stream_floor": 0.023558,
+          "convolution": -2.2333333333333298e-05,
+          "matrix": 0.07611733333333333,
+          "remaining": 0.038237666666666656
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 0.023438,
+            "1": 0.023782,
+            "2": 0.099918,
+            "3": 0.09993,
+            "4": 0.061958,
+            "5": 0.06196,
+            "6": 0.138148,
+            "7": 0.137954
+          },
+          {
+            "0": 0.023624,
+            "1": 0.023662,
+            "2": 0.099616,
+            "3": 0.10007,
+            "4": 0.062376,
+            "5": 0.061782000000000004,
+            "6": 0.137784,
+            "7": 0.13805399999999998
+          },
+          {
+            "0": 0.023612,
+            "1": 0.023714,
+            "2": 0.099842,
+            "3": 0.099598,
+            "4": 0.061942,
+            "5": 0.061678,
+            "6": 0.138108,
+            "7": 0.137664
+          }
+        ],
+        "groups": 9
+      },
+      "world_gradient": {
+        "dispatches": 4104,
+        "family_counts": {
+          "remaining": 3590,
+          "matrix": 491,
+          "convolution": 23
+        },
+        "baseline_gpu_ms": 13.70738325,
+        "shapley_ms": {
+          "command_stream_floor": 2.773957333333333,
+          "convolution": 5.586865444444444,
+          "matrix": 1.543386111111111,
+          "remaining": 3.7952591111111107
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 2.774254,
+            "1": 8.52981,
+            "2": 4.320188,
+            "3": 10.159914,
+            "4": 6.79897,
+            "5": 12.183842,
+            "6": 8.31165,
+            "7": 13.696864
+          },
+          {
+            "0": 2.773282,
+            "1": 8.534112,
+            "2": 4.323032,
+            "3": 10.161204,
+            "4": 6.80192,
+            "5": 12.185454,
+            "6": 8.307974,
+            "7": 13.700061999999999
+          },
+          {
+            "0": 2.774336,
+            "1": 8.529948,
+            "2": 4.323654,
+            "3": 10.161126,
+            "4": 6.800108,
+            "5": 12.190062,
+            "6": 8.305854,
+            "7": 13.701478
+          }
+        ],
+        "groups": 1324
+      }
+    },
+    "optimizer_free_session_replays": 2380,
+    "measured_cached_replays": 1536,
+    "scope": "Counterfactual zero-workgroup dispatches retain bindings/barriers. Masked outputs are not valid learner outputs. Shapley allocates cache/overlap interactions; not pure kernel durations or independently additive optimization savings."
+  },
+  "retained_jax_capture": {
+    "summary": {
+      "nvtx_wall_ms": 15.78736625,
+      "gpu_union_ms": 10.295496625,
+      "kernel_sum_ms": 9.869361875000001,
+      "copy_sum_ms": 0.42613475,
+      "uncovered_ms": 5.491869625,
+      "kernels": 3429,
+      "copies": 437
+    },
+    "families_ms": {
+      "fusion_and_other": 3.470207750000113,
+      "convolution_forward_or_other": 1.8527128749999997,
+      "matrix_product": 2.3661768749999976,
+      "convolution_weight_gradient": 1.4358224999999998,
+      "convolution_input_gradient": 0.7444418749999999
+    },
+    "exact_reports": 24,
+    "exact_initial_state_tensors": 288,
+    "all_eight_samples_retained": true
+  },
+  "validation": {
+    "guards": 4,
+    "allocation_warnings": 1,
+    "synthetic_updates": 569,
+    "game_actions": 0,
+    "gpu_failures": 0,
+    "clippy": true,
+    "format": true
+  },
+  "sha256": {
+    "kindle-tests": "c3b7975b6a44f52fe8c3d5493b108b4a7373f8edfc79c10b0d9c57fe7d8804d9",
+    "kindle.patch": "5d73a78bd227403be949e78403bb291d0a587a863913f837fb36c50270a1c6c9",
+    "backend.patch": "2d09b2667c03042e715c7fd823b82c8ef1752068d3ffda671be76d95ee39c419",
+    "blade.patch": "0ae205cb6ed62656ed348ea118bdf609d78ce9c3c554967f040e1aa37b21d15c",
+    "kindle/Cargo.lock": "06549e9174610a978587fd6f59a1359cd7a316e372001ecd37bf4e70352fbeb4",
+    "meganeura/Cargo.lock": "54ea670e70d2a7671e90a4f6ce5a19a64ea49383157b777d0e7fb7dc3611273f",
+    "audit.py": "35a9c1b8ea620eaf8c27de6bd788b5e21e0658e5755924ad1be759618b498d27",
+    "audit-masks.py": "7c414509c954ebe79690e22cc2df0c4e9b877be362ce56b0186b1851deed6528",
+    "queues.py": "d45b4b3a08a0afce71c8988b0e164692a3daddeb4c1f4f7afd6f83c10827a308"
+  },
+  "production_changed": false,
+  "limits": [
+    "Coarse pass union includes command issue/dependencies; it is not SM utilization.",
+    "Single-chunk timing is not a fresh unchanged four-chunk speed claim.",
+    "Retained JAX capture has different instrumentation and a slower instrumented wall time; family allocations are not a causal subtraction from it.",
+    "Zero-work masks retain commands/dependencies. Their interacting allocations are not independent removable costs or optimization savings.",
+    "One full world plan is counted, not its identical posterior prefix again.",
+    "No numerical tolerance changes, production adoption or learning evidence."
+  ]
+}

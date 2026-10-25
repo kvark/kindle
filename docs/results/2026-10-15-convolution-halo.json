@@ -1,0 +1,167 @@
+{
+  "date": "2026-10-15",
+  "status": "complete",
+  "decision": "reject_halo_cache",
+  "root_artifacts": "runs/convolution-halo-20261015.kK1iZn4z",
+  "backend_changed_files": [
+    "src/runtime.rs",
+    "src/codegen.rs",
+    "src/codegen/convolution_halo.rs"
+  ],
+  "candidate_binary_sha256": "74f488868cd455dc428a9fc525d59860ce7e2d63ac811cd3c32a54282331771e",
+  "unchanged_arithmetic_geometry_staging_scatter": true,
+  "unchanged_weight_gradient_occurrences": 8,
+  "maximum_explicit_shared_bytes": 47104,
+  "shader_cpu_tests": 2,
+  "clippy_passed": true,
+  "numerical": {
+    "independent_f64_outputs": 503808,
+    "exact_output_pairs": 503808,
+    "pointwise_failures": 0,
+    "original_coverage_failure_retained": true,
+    "earlier_partial_f64_outputs": 131072
+  },
+  "timing": {
+    "distinct_cases": 13,
+    "occurrences": 15,
+    "warmup_per_case": 16,
+    "samples_per_case": 128,
+    "weighted_control_gpu_ms": 13.705759,
+    "weighted_candidate_gpu_ms": 18.59778325,
+    "weighted_control_queued_wall_ms": 13.74356653125,
+    "weighted_candidate_queued_wall_ms": 18.6377482265625,
+    "gpu_regression_percent": 35.6932020328097,
+    "clears_10_percent_gate": false,
+    "exact_output_pairs": 257949696,
+    "all_samples_retained": true,
+    "cases": [
+      {
+        "name": "forward-0",
+        "occurrences": 1,
+        "control_gpu_ms": 0.5893615,
+        "candidate_gpu_ms": 0.71967325,
+        "gpu_reduction_percent": -22.110665525318506
+      },
+      {
+        "name": "forward-1",
+        "occurrences": 1,
+        "control_gpu_ms": 0.84223875,
+        "candidate_gpu_ms": 1.07145975,
+        "gpu_reduction_percent": -27.21567963953213
+      },
+      {
+        "name": "forward-2",
+        "occurrences": 1,
+        "control_gpu_ms": 0.3728465,
+        "candidate_gpu_ms": 0.478319,
+        "gpu_reduction_percent": -28.28845114544456
+      },
+      {
+        "name": "forward-3",
+        "occurrences": 2,
+        "control_gpu_ms": 0.11733975,
+        "candidate_gpu_ms": 0.14743725,
+        "gpu_reduction_percent": -25.649875681514555
+      },
+      {
+        "name": "forward-4",
+        "occurrences": 1,
+        "control_gpu_ms": 0.37153425,
+        "candidate_gpu_ms": 0.48050075000000003,
+        "gpu_reduction_percent": -29.328790010611417
+      },
+      {
+        "name": "forward-5",
+        "occurrences": 1,
+        "control_gpu_ms": 2.35937575,
+        "candidate_gpu_ms": 3.171853,
+        "gpu_reduction_percent": -34.43611090772634
+      },
+      {
+        "name": "forward-6",
+        "occurrences": 1,
+        "control_gpu_ms": 3.88248125,
+        "candidate_gpu_ms": 5.43724275,
+        "gpu_reduction_percent": -40.04556364567118
+      },
+      {
+        "name": "dx-1",
+        "occurrences": 1,
+        "control_gpu_ms": 2.57761375,
+        "candidate_gpu_ms": 3.83998475,
+        "gpu_reduction_percent": -48.974405106273224
+      },
+      {
+        "name": "dx-2",
+        "occurrences": 1,
+        "control_gpu_ms": 0.3690605,
+        "candidate_gpu_ms": 0.476063,
+        "gpu_reduction_percent": -28.993213849761766
+      },
+      {
+        "name": "dx-3",
+        "occurrences": 2,
+        "control_gpu_ms": 0.1182405,
+        "candidate_gpu_ms": 0.1475915,
+        "gpu_reduction_percent": -24.823135896752802
+      },
+      {
+        "name": "dx-4",
+        "occurrences": 1,
+        "control_gpu_ms": 0.38077099999999997,
+        "candidate_gpu_ms": 0.4862875,
+        "gpu_reduction_percent": -27.71127528094315
+      },
+      {
+        "name": "dx-5",
+        "occurrences": 1,
+        "control_gpu_ms": 0.74745275,
+        "candidate_gpu_ms": 1.128344,
+        "gpu_reduction_percent": -50.958572297713815
+      },
+      {
+        "name": "dx-6",
+        "occurrences": 1,
+        "control_gpu_ms": 0.7418625,
+        "candidate_gpu_ms": 0.717998,
+        "gpu_reduction_percent": 3.2168360039764754
+      }
+    ]
+  },
+  "guards": 6,
+  "allocation_warnings": 2,
+  "operation_calls": 3952,
+  "operation_shader_dispatches": 8720,
+  "minimum_sampled_headroom_bytes": 15828123648,
+  "finished_utc": "2026-10-15 08:42:42 UTC",
+  "timing_service_wall_seconds": 226.44,
+  "source_seals": 412,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "production_changed": false,
+  "current_isolated_native": "076f3135",
+  "current_rgb_update_ms": 54.245025125,
+  "retained_jax_update_ms": 26.6316957586,
+  "current_rgb_jax_ratio": 2.0368595983033866,
+  "full_update_remeasured": false,
+  "retained_failures": [
+    "initial build inferred wrong dependency receipt filename",
+    "first build continuation expected absolute source paths in a relative receipt",
+    "original B1 compilation selected different kernels; CPU coverage review rejected it"
+  ],
+  "timing_shape_audit": {
+    "new_gpu_calls": 0,
+    "means_replaced": false,
+    "rgb_first32_ms": 54.26000903125,
+    "rgb_last32_ms": 54.1975340625,
+    "cdp_first32_ms": 47.737609875000004,
+    "cdp_last32_ms": 47.731057093749996
+  },
+  "next": "Refresh the latest native whole-update trace against retained JAX before another kernel change; no sweep or automatic promotion.",
+  "source_sha256": {
+    "/x/Code/kindle/runs/convolution-halo-20261015.kK1iZn4z/publish.py": "dc67862ccf3212c1de31f18e4ee13c14903b834bbdc4ee09d761272f5aa7e29b",
+    "/x/Code/kindle/runs/convolution-halo-20261015.kK1iZn4z/contract-repair/numerical-review.json": "5d20cdee1a59be473fcef7fe10d2ede9de06884c345dc64d67319a56a6706d30",
+    "/x/Code/kindle/runs/convolution-halo-20261015.kK1iZn4z/contract-repair/ordinary-review.json": "b62b674ffc691c05abf26c5f2196e7bf917e4ff6a6e5f7ec8f713a8baa9e9c76",
+    "/x/Code/kindle/runs/convolution-halo-20261015.kK1iZn4z/timing-shape.json": "d5f9517be1de0331ddab58ac957e3644fd5e58d2d9eba851e1aa05beb7b66bd3"
+  }
+}

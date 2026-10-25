@@ -1,0 +1,36 @@
+{
+  "status": "cpu_compatibility_passed_gpu_unqualified",
+  "finished_utc": "2026-10-17T03:47:15.203666+00:00",
+  "artifacts": "runs/workgroup-matrix-contract-20261017.IWJLx2Fi",
+  "upstream": {
+    "meganeura": "5d6d9a3666cca4090a9c960b7ebfe8551f5ba18a",
+    "blade": "4845d6529c38b07718a624bf3c4f2ab4317c9bf4",
+    "naga": "13f582ddd2792befb46952498010248bd65818e6"
+  },
+  "shape": { "rows": 32, "columns": 64, "k_stage": 32, "threads": 64 },
+  "workloads": {
+    "rgb": { "matrices": 716, "selected": 504, "grouped": 129, "unaligned": 83 },
+    "cdp": { "matrices": 769, "selected": 552, "grouped": 126, "unaligned": 91 }
+  },
+  "contracts": 61,
+  "shader_modules": 6,
+  "split_products": 106,
+  "changed_split_partitions": 0,
+  "address_comparisons": 4936704,
+  "output_ownership_values": 2048,
+  "negative_checks": { "selection_kernel": 14, "capabilities": 7, "compiler_capabilities": 6 },
+  "source_receipts": 71,
+  "retained_cpu_reader_failures": 4,
+  "gpu_calls": 0,
+  "synthetic_updates": 0,
+  "game_actions": 0,
+  "production_changed": false,
+  "performance_measured": false,
+  "learning_parity_claimed": false,
+  "qualified_native": "e45b9c433d88b3bf6467ae253a22b2bf188e7ee24a85a8300a7b11d01c9e419e",
+  "source_sha256": {
+    "runs/workgroup-matrix-contract-20261017.IWJLx2Fi/review.json": "d9d7e55174d5b643bac6e8bd51f3c93b8c2187999b71e7b77cfe9ce6a583262e",
+    "runs/workgroup-matrix-contract-20261017.IWJLx2Fi/offline-review.json": "21732f7fbf931b911f7a11995e06828194dc05008f6bfa09cbbb203a8cf89143",
+    "runs/workgroup-matrix-contract-20261017.IWJLx2Fi/inventory.json": "347af946700cf545830ad854019771a04c0532fb0bf5d0c1342d66474a8b164c"
+  }
+}

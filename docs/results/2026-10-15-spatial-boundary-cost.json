@@ -1,0 +1,212 @@
+{
+  "status": "complete",
+  "fixed_world_gpu_ms": [
+    34.194511,
+    14.28873525,
+    30.02155225,
+    6.56363925
+  ],
+  "queued_wall_ms": [
+    34.203266546875,
+    14.2996960703125,
+    30.03312175,
+    6.5703682265625005
+  ],
+  "before_snapshot_gpu_ms": 34.170241,
+  "relative_baseline_drift": {
+    "pre_snapshot": 0.0007102671590757392,
+    "retained": -0.0003514094961659664
+  },
+  "baseline_five_percent_gate": true,
+  "conditional_differences_ms": {
+    "convolution_with_spatial": 19.905775749999997,
+    "convolution_without_spatial": 23.457912999999998,
+    "spatial_with_convolution": 4.172958749999999,
+    "spatial_without_convolution": 7.725096000000001,
+    "convolution_symmetric": 21.681844374999997,
+    "spatial_symmetric": 5.949027375000001,
+    "interaction": -3.552137250000003,
+    "total": 27.630871749999997
+  },
+  "blocks": [
+    {
+      "block": 0,
+      "condition": 0,
+      "gpu_ms": 34.1645295,
+      "queued_wall_ms": 34.170739078124996
+    },
+    {
+      "block": 1,
+      "condition": 1,
+      "gpu_ms": 14.2803115,
+      "queued_wall_ms": 14.293501875
+    },
+    {
+      "block": 2,
+      "condition": 2,
+      "gpu_ms": 30.0053715,
+      "queued_wall_ms": 30.016692453125
+    },
+    {
+      "block": 3,
+      "condition": 3,
+      "gpu_ms": 6.5663235,
+      "queued_wall_ms": 6.5719808125000005
+    },
+    {
+      "block": 4,
+      "condition": 3,
+      "gpu_ms": 6.560955,
+      "queued_wall_ms": 6.568755640625
+    },
+    {
+      "block": 5,
+      "condition": 2,
+      "gpu_ms": 30.037733,
+      "queued_wall_ms": 30.049551046875
+    },
+    {
+      "block": 6,
+      "condition": 1,
+      "gpu_ms": 14.297159,
+      "queued_wall_ms": 14.305890265624999
+    },
+    {
+      "block": 7,
+      "condition": 0,
+      "gpu_ms": 34.2244925,
+      "queued_wall_ms": 34.235794015625004
+    }
+  ],
+  "all_samples_retained": true,
+  "snapshot_bytes": 3154096284,
+  "snapshot_outputs": 344,
+  "live_boundaries": 178,
+  "convolution_dispatches": 23,
+  "spatial_dispatches": 286,
+  "exact_conditions": 4,
+  "exact_tensors": 292,
+  "exact_tensor_boundary_pairs": 3,
+  "program_identity": {
+    "world-plan.json": "ea3c54f7aeb0c5e1421d5bed6b66d40a30ef4f2af783293de2b2c957e793519b",
+    "world-pipelines.json": "753d0e44ff601234f19bb442fc9b64473b39404efd71a92b06c2688d48cbd679",
+    "world-groups.json": "2300ef59ee2b25e0dedba62f65f6a2df426d80c7fd8adc7c8b686346fcb87f97",
+    "first-outputs.json": "b1278278cbe9391dfe22740d206beb2f35efb7dd7171ebd5bfca73d461329fe5",
+    "config.json": "6acb14e4c85d8f601fe677cd2a0af2d8cada995a32c8e76218210e2cd2423bde"
+  },
+  "minimum_sampled_headroom_bytes": 9575661568,
+  "guards": 1,
+  "allocation_warnings": 0,
+  "source_seals": 4123,
+  "full_world_replays": 733,
+  "measured_world_replays": 576,
+  "synthetic_updates": 1,
+  "game_actions": 0,
+  "independent_runtime_version_checks": true,
+  "poisoned_conditions": 3,
+  "cuts": [
+    {
+      "original_output_count": 0,
+      "kept_output_count": 0,
+      "dropped_output_count": 0,
+      "original_output_bytes": 0,
+      "kept_output_bytes": 0,
+      "dropped_output_bytes": 0,
+      "completely_internal_dispatches": 0,
+      "active_reads_proved": 7198,
+      "protected_values_proved": 892
+    },
+    {
+      "original_output_count": 23,
+      "kept_output_count": 23,
+      "dropped_output_count": 0,
+      "original_output_bytes": 855506944,
+      "kept_output_bytes": 855506944,
+      "dropped_output_bytes": 0,
+      "completely_internal_dispatches": 0,
+      "active_reads_proved": 7152,
+      "protected_values_proved": 892
+    },
+    {
+      "original_output_count": 321,
+      "kept_output_count": 86,
+      "dropped_output_count": 235,
+      "original_output_bytes": 2298589340,
+      "kept_output_bytes": 705121428,
+      "dropped_output_bytes": 1593467912,
+      "completely_internal_dispatches": 200,
+      "active_reads_proved": 6765,
+      "protected_values_proved": 892
+    },
+    {
+      "original_output_count": 344,
+      "kept_output_count": 46,
+      "dropped_output_count": 298,
+      "original_output_bytes": 3154096284,
+      "kept_output_bytes": 7014164,
+      "dropped_output_bytes": 3147082120,
+      "completely_internal_dispatches": 263,
+      "active_reads_proved": 6719,
+      "protected_values_proved": 892
+    }
+  ],
+  "production_changed": false,
+  "artifacts": "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW",
+  "native_sha256": "50a0df641ffbcea224f7019a9906a16bbc650e85a766b1c8348ef526f6826d51",
+  "prior_all_output_gpu_ms": [
+    34.2065315,
+    14.27509575,
+    33.67674,
+    13.9791395
+  ],
+  "prior_minus_closed_ms": [
+    0.012020499999998435,
+    -0.013639500000000027,
+    3.655187750000003,
+    7.415500250000001
+  ],
+  "relative_world_reduction": 0.8080499162570274,
+  "retained_full_rgb_ms": 54.11269456640627,
+  "retained_jax_inclusive_ms": 27.222569296139643,
+  "limits": [
+    "Exact fixed-input boundary substitution is not an implementable optimization.",
+    "Differences include changed copies, memory accesses and dispatch work, not isolated DRAM cost.",
+    "Current interventions interact and cannot be added into full-update savings.",
+    "The result is RGB, including reconstruction; no new CDP or learning claim.",
+    "Production and learning remain unchanged."
+  ],
+  "retained_failures": [
+    "Two explicit-reference Clippy attempts.",
+    "Controller edited while running, then reverted: sealed intermediate version differs from launched version.",
+    "First repair used garbage-collected transient-unit timestamps; journal/final-output audit replaces it."
+  ],
+  "provenance_repair": {
+    "status": "complete",
+    "scope": "one orchestration-only in-flight edit, then reverted",
+    "sealed_sha256": "645e4bcf0db46cb4d7b767b7c69060251db79c486a0098f5e334e2d5ebf9ba3d",
+    "current_and_launched_controller_sha256": "5c023ca516f92cc4525a5ff73a2f573306cdf46863a4c9cbf3b7d3dc9a84f4b7",
+    "difference": "extra CPU publication wait only; all GPU commands and review commands identical",
+    "journal_records": 3,
+    "publication_final_output_mtime_ns": 1792060428681344111,
+    "gpu_service_start_microseconds": 1792060444867074,
+    "gpu_repeat": false,
+    "source_sha256": {
+      "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/orchestrate.py": "5c023ca516f92cc4525a5ff73a2f573306cdf46863a4c9cbf3b7d3dc9a84f4b7",
+      "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/orchestrate-sealed-snapshot.py": "645e4bcf0db46cb4d7b767b7c69060251db79c486a0098f5e334e2d5ebf9ba3d",
+      "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/review-v3.py": "1d970c1b045435bd4e38e965b9b57af710f9046af312ed16b4aa7541d80fadc3",
+      "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/review.py": "f14d2be525c3c3af2d8550d28116e2ce12259771ad9a140b5e1c8b0390248209",
+      "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/review-v2.py": "1f34cdbfab07cf82f51555b95361da50c7160f87bc0157082d0d5fe7715c379e",
+      "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/review-v2.log": "09a741ce41b4f58e87ad55edb9ac8389d44af986abc49295895e7d4c77df00f6",
+      "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/controller-journal.json": "77e2481475ca67d93d71d2cb9116662587facd67a1ccc0762432dd93bbf6ce7f",
+      "/x/Code/kindle/runs/spatial-value-cost-20261015.AzzHQJ2v/publish.log": "048a7d72fdc74f3ce4986a1d8e0664edffccc3fe3d154d9a54e533686b8c7774"
+    }
+  },
+  "source_sha256": {
+    "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/review.json": "d733db6aabeb745202b2f3be962e8588b70f16d6db4ee9d4deeb3df651049198",
+    "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/review-provenance.json": "96180dba58ab42576eace5c4c6df1ab5cd6edbd3b55b18427b39d7caff01d062",
+    "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/review-v3.py": "1d970c1b045435bd4e38e965b9b57af710f9046af312ed16b4aa7541d80fadc3",
+    "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/review-v3.log": "c66ba8d7d8fed58eaf6653a92c2bc744ee99fc4252f9ea820d942906d328b3ec",
+    "/x/Code/kindle/runs/spatial-boundary-cost-20261015.dyPFMiZW/publish.py": "ea3748a767e3cb96860f79a22b550f36cae0928085606c63c4bede377fff2d1e",
+    "/x/Code/kindle/runs/spatial-value-cost-20261015.AzzHQJ2v/review.json": "96fe9d574d0d946b2512eaa18cba1fd3a90c8ec720668f204d192eeb9b719daf"
+  }
+}
