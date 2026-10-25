@@ -74,6 +74,19 @@ three per stream, seed4000001009; complete action replays and whole stream0
 videos follow. Every frozen export is compared tensor-for-tensor. Failures stop
 the queue. No automatic extension or seed sweep follows.
 
+The first fixed500k checkpoint is saved after about2h55m:1,998,287 emulator
+frames and124843 updates. CPU review verifies its exact configuration/counters,
+all three tensor-file hashes and all346 finite tensors; all124843 learner
+reports in the fixed prefix are finite and sequential. The installed native hash
+is unchanged. Evidence: `life/prefix-checkpoint-review.json`. Training continues
+past this checkpoint without restarting; its frozen evaluation remains queued
+after the uninterrupted2M life. Online last-50 return is12.54, not a frozen score.
+
+The nearest preceding progress record (499712 actions) reports10467.08s,
+47.74 aggregate actions/s and zero debt. Replay is full at100k; reported GPU
+memory has plateaued at7.923GiB, with recent device-wide busy samples93–94%.
+These measurements do not establish kernel efficiency or playing reliability.
+
 Measured throughput projects roughly12h. The receiving-host declaration changes
 the old8h training wall cap to14h;2M actions, ratio32 and128 replay positions per
 update stay fixed. Evaluation caps remain600k actions/1800s; CPU audits3600s,
