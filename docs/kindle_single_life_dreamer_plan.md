@@ -15,6 +15,12 @@ smoke and exact frozen restore pass at similar throughput. A fresh
 [500k Auto comparison](experiments/2026-10-25-cdp-amd-auto.md) is now running in
 `kindle-amd-auto500k-20261025`. Do not duplicate it or extend the weak F16 life.
 
+**Compute priority, updated from the user's October25 direction:** finding useful
+game-specific configurations matters more than maintaining one universal set of
+hyperparameters. Measure frozen learning against GPU time and experience. A
+working development recipe is useful evidence; reliable success across seeds is
+still a separate requirement. The current declared run keeps its fixed budget.
+
 ## Goal and architecture
 
 Learn to play games through experience, initially with sparse explicit rewards
@@ -95,10 +101,13 @@ Evidence and videos:
    final/initial evaluations and curves before attributing the score gap to
    precision or context. No automatic extension, broad seed campaign,
    optimization sweep or JAX-parity project.
-5. **Address Qbert and remaining gaps.** Use the qualified faster implementation,
-   explicit matched budgets and controls. Confirm any changed recipe on the five
-   selected games: Boxing, Pong, Freeway, Breakout and Qbert. Keep useful gains
-   separate from published-endpoint and held-out-reliability claims.
+5. **Find cheaper recipes for the remaining gaps.** Use T16 as the development
+   starting point, eight independent lanes and batched GPU inference. Try lower
+   replay ratios and smaller capacity in bounded development runs; changing
+   several settings together is allowed when seeking a working cheap recipe.
+   Use the game-specific capacity evidence below instead of shrinking every
+   game blindly. Confirm promising configurations across seeds before claiming
+   reliability. Keep useful gains separate from published endpoints.
 
 The original B2/T64 smoke completed4096 actions/867 updates in45.245s with finite
 346 tensors and exact initial tensors. Normal restores faulted before run_start;
@@ -108,6 +117,43 @@ are complete. Hardware, precision and execution-path differences remain
 comparison limitations.
 
 [Incident and diagnostic boundaries](results/2026-10-23-cdp-context64-gpu-fault.md).
+
+## Compute-constrained development
+
+The historical500k-action capacity cohort supports specializing by game:
+
+| Game | Size1M frozen mean | Size12M frozen mean | Cost-conscious direction |
+| --- | ---: | ---: | --- |
+| Boxing |77.69 |85.26 | Prefer1M initially; both sizes won72/72 selected matches |
+| Freeway |30.26 |27.54 | Prefer1M initially; preserve separate reporting for action aids |
+| Pong |4.54 |12.40 | Test intermediate capacity rather than assuming1M is sufficient |
+| Breakout |5.14 |38.21 | Small capacity was weak; test an intermediate preset before a long run |
+| Qbert |993.75 |2657.99 | Small capacity was weak; prioritize learning per GPU-hour |
+
+[Archived capacity data](https://github.com/kvark/kindle/blob/archive/phase2-before-cleanup-20261025/docs/results/2026-10-09-cdp-five-game-capacity.json),
+blob`b600def5ce8bb55894eacf64e8a0b1c043251ad3`. These are historical development
+cohorts, with some runtime differences; the roughly3.56x aggregate wall-cost
+ratio is not an AMD speed prediction. They are not the later qualified-backend
+results in the main status table. The current native presets jump from1M to12M;
+an intermediate preset is a proposed change, not an implemented option.
+
+The first cheap development configuration should use existing controls: centered
+CDP, Auto precision, N8/B8/T16/H15, microbatch8, native frames/one GPU64 resize,
+and replay ratio16 as a candidate instead of32. Choose capacity by the game;
+1M is a justified starting point for Boxing/Freeway. Halving the ratio halves
+scheduled replay-position work per action, not necessarily end-to-end time or
+the experience needed to learn. Target100–200k actions and a30-minute training
+cap for the first learning screen, with fixed frozen/actual-initial evaluation;
+record a wall-cap cutoff explicitly. A short weak result does not prove that
+the configuration cannot learn. No broad queue or automatic extension follows.
+
+Image resolution is currently fixed at64 in native preprocessing, replay shapes
+and CNN geometry. Test lower resolutions through that native path when it is
+implemented; do not simulate them with CPU downscale/upscale.48x48 has56.25%
+of the pixels and32x32 has25%, but RSSM and imagined actor/critic work do not
+shrink proportionally. Check small-object visibility and actual learning before
+using lower resolution, especially in ball games. Smaller capacity, shorter
+sequences and fewer updates can be tested without that code change first.
 
 ## Runtime and performance
 

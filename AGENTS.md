@@ -22,6 +22,17 @@ Training is the priority. Backend optimization, upstream porting and JAX parity
 are parked. The selected architecture is **centered CDP**, with a jointly learned
 CNN, categorical RSSM and imagined actor/critic. No pretrained DINO or Tiny JEPA
 encoder is required. Explicitly select CDP; the CLI default remains learned RGB.
+The user's current priority is compute-constrained success on this game set.
+Game-specific model sizes, image resolutions and learning hyperparameters are
+allowed; one universal recipe is not a prerequisite. Prefer useful frozen
+learning per GPU-hour, with short development runs before long allocations.
+T64 is an experiment, not the default for subsequent development. Start from
+T16 and consider lower replay ratios and smaller models using the historical
+capacity evidence. Size1M already worked well for Boxing and Freeway, but was
+much weaker for Breakout and Qbert. Lower image resolution needs native support;
+preserve one GPU resize from native frames and verify small-object visibility.
+Changing several settings to find a useful cheap recipe is allowed; disclose
+the changes without claiming an isolated causal effect or five-game reliability.
 Work on `phase2-levjepa-evaluation` and PR31. This branch now includes the
 qualified c8aeba28 implementation with portable dependencies. Do not switch to
 a separate takeover branch. Keep `runs/`, large data and archived experiment
