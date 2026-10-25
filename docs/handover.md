@@ -10,7 +10,18 @@ The fresh [500k Auto comparison](experiments/2026-10-25-cdp-amd-auto.md) also
 completed: frozen15.67 versus F16's14.71, all0/24 two-wall successes, in2h53m.
 All audits pass. Both services have exited; do not restart or extend these lives.
 The user now prioritizes cheaper game-specific recipes; use the roadmap.
-Use the new report for current host, precision, results and evidence details.
+[Cheap Freeway screens](results/2026-10-25-cdp-cheap-freeway.md) finish200k actions
+in about8 minutes but remain weak (unassisted/aided frozen0.00/0.25, initial0.00).
+[Smaller native recipes](results/2026-10-25-cdp-cheap-runtime.md) add4M capacity
+and32/48 image geometry; GPU training/frozen checks and retained64 restore pass.
+The current allocation is the [200k Boxing screen](experiments/2026-10-25-cdp-cheap-boxing.md),
+service `kindle-cheap-boxing-200k-v2-20261025`. Check its state before GPU work.
+Current native source`bfb8c31`, runner`a99416e`, native SHA256
+`f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
+Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
+`original-native` preserves the prior AMD binary. Both installed and source-tree
+extensions now use the new native build; old completed queues are historical.
+Use these reports for current host, precision, results and evidence details.
 The historical handover steps below describe its origin.
 
 The goal remains strong, reliable learning on **Boxing, Pong, Freeway, Breakout
