@@ -18,6 +18,12 @@ available. The five-game reliability goal remains unfinished.
 - Archive SHA256 and all304 member hashes verified. Evidence, declarations,
   controller and weights: `/x/Temp/kindle-amd-20261025`, outside Git.
 
+The user confirms `/mnt/data/kindle-handover-20261025` is the complete available
+transfer. Its manifest contains only the context-smoke and B8/T16 Breakout
+checkpoints. Boxing, Pong, Freeway and Qbert scores remain historical evidence;
+their trained weights are not available on this host. Preserve that distinction
+when planning verification after the current learning comparison.
+
 The host guard now accepts explicit `driver_module: amdgpu`, checks the loaded
 module srcversion, and recognizes AMD page faults, ring timeouts and GPU resets.
 NVIDIA declarations keep their default.150 CPU guard/queue tests pass. No driver
