@@ -68,7 +68,7 @@ Native32/48 RGB support and an intermediate4M preset now pass bounded GPU checks
 including unchanged64x64 checkpoint restore. Current cheap allocation: fresh
 Boxing1M/RGB32/B8/T16/R16,200k actions,30-minute training cap and fixed final/
 actual-initial evaluations. See `docs/experiments/2026-10-25-cdp-cheap-boxing.md`;
-service owner `kindle-cheap-boxing-200k-20261025`. Check its live state before
+service owner `kindle-cheap-boxing-200k-v2-20261025`. Check its live state before
 further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.

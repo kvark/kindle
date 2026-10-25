@@ -29,7 +29,12 @@ still needs replication before a reliability claim.
 
 Artifacts: `/x/Temp/kindle-cheap-20261025/boxing-1m-32-200k`.
 Controller: `run_boxing_200k.py` in that root. Service owner, once launched:
-`kindle-cheap-boxing-200k-20261025`. The machine declaration records native/source
+`kindle-cheap-boxing-200k-v2-20261025`. The machine declaration records native/source
 hashes and the passing smoke receipt before launch. The prepared native build
 uses the existing Meganeura/Blade dependency pins; no backend optimization or
 driver change is included.
+
+The first controller invocation omitted its required `run` argument and exited
+before creating a queue or constructing a native agent. Its log and failure
+receipt are retained as `launch-attempt1`; the corrected service above starts
+the unchanged declared allocation. No training work was repeated.
