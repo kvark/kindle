@@ -114,8 +114,17 @@ B8/T16 milestone's66.02, so the early weakness persists halfway through this
 allocation. This is an integrity milestone, not another selected frozen arm.
 Evidence: `life/checkpoint-1000000-review.json`. Training continues uninterrupted.
 
-The nearest preceding progress record (999424 actions) reports20971.40s,
-47.66 aggregate actions/s and zero debt. Replay is full at100k; reported GPU
+The1.5M checkpoint is saved after about8h45m:5,995,063 emulator frames and374843
+updates. Exact configuration/counters, tensor-file hashes and all346 finite
+tensors pass; all374843 learner reports in the fixed prefix are finite and
+sequential. The native hash is unchanged. Online last-50 return is8.96 versus
+the retained B8/T16 milestone's112.68; no late online recovery is evident at
+this milestone. Context/batch, precision and host remain confounded. Evidence:
+`life/checkpoint-1500000-review.json`. Frozen arms remain initial/500k/2M, and
+the uninterrupted fixed allocation continues.
+
+The nearest preceding progress record (1499136 actions) reports31484.94s,
+47.61 aggregate actions/s and zero debt. Replay is full at100k; reported GPU
 memory has plateaued at7.923GiB, with recent device-wide busy samples93–94%.
 These measurements do not establish kernel efficiency or playing reliability.
 
