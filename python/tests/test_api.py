@@ -33,6 +33,10 @@ def test_unknown_size_is_rejected() -> None:
         raise AssertionError("invalid model size was accepted")
 
 
+def test_intermediate_size_is_available_in_python() -> None:
+    assert kindle.default_config(18, "4m")["model_size"] == "size4_m"
+
+
 def test_invalid_action_count_is_a_python_error() -> None:
     try:
         kindle.default_config(1)

@@ -621,13 +621,14 @@ fn parse_model_size(value: &str) -> PyResult<ModelSize> {
     match value {
         "tiny" => Ok(ModelSize::Tiny),
         "1m" => Ok(ModelSize::Size1M),
+        "4m" => Ok(ModelSize::Size4M),
         "12m" => Ok(ModelSize::Size12M),
         "25m" => Ok(ModelSize::Size25M),
         "50m" => Ok(ModelSize::Size50M),
         "100m" => Ok(ModelSize::Size100M),
         "200m" => Ok(ModelSize::Size200M),
         _ => Err(PyValueError::new_err(format!(
-            "unknown model_size {value:?}; expected tiny, 1m, 12m, 25m, 50m, 100m, or 200m"
+            "unknown model_size {value:?}; expected tiny, 1m, 4m, 12m, 25m, 50m, 100m, or 200m"
         ))),
     }
 }

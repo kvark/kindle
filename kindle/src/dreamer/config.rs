@@ -51,13 +51,15 @@ impl TrainingPrecision {
     }
 }
 
-/// DreamerV3 scaling presets from the pinned upstream configuration.
+/// Model scaling presets, including the pinned DreamerV3 configurations.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ModelSize {
     /// CI and wiring preset only; not an upstream benchmark size.
     Tiny,
     Size1M,
+    /// Intermediate Kindle development preset; not an upstream benchmark size.
+    Size4M,
     #[default]
     Size12M,
     Size25M,
@@ -97,6 +99,15 @@ impl ModelSize {
                 blocks: 8,
                 units: 64,
                 vision_depth: 4,
+            },
+            Self::Size4M => NetworkSize {
+                deter: 1_024,
+                hidden: 128,
+                stoch: 32,
+                classes: 8,
+                blocks: 8,
+                units: 128,
+                vision_depth: 8,
             },
             Self::Size12M => NetworkSize {
                 deter: 2_048,
@@ -838,6 +849,30 @@ mod tests {
                 two_hundred.vision_depth,
             ),
             (8_192, 1_024, 32, 64, 8, 1_024, 64)
+        );
+    }
+
+    #[test]
+    fn intermediate_cdp_configuration_roundtrips() {
+        let mut config = DreamerConfig::new(18);
+        config.model_size = ModelSize::Size4M;
+        config.observation_kind = ObservationKind::Rgb64;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.cdp_centered = true;
+        config.batch_size = 8;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.world_microbatch_size = Some(8);
+        config.train_ratio = 16.0;
+        assert!(config.check().is_ok());
+        assert_eq!(config.feature_dim(), 1_280);
+        assert_eq!(config.prediction_dim(), 512);
+        let encoded = serde_json::to_value(&config).unwrap();
+        assert_eq!(encoded["model_size"], "size4_m");
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(encoded).unwrap(),
+            config
         );
     }
 
