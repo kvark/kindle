@@ -29,7 +29,7 @@ learning per GPU-hour, with short development runs before long allocations.
 T64 is an experiment, not the default for subsequent development. Start from
 T16 and consider lower replay ratios and smaller models using the historical
 capacity evidence. Size1M already worked well for Boxing and Freeway, but was
-much weaker for Breakout and Qbert. Lower image resolution needs native support;
+much weaker for Breakout and Qbert. Native32/48/64 image geometry is supported;
 preserve one GPU resize from native frames and verify small-object visibility.
 Changing several settings to find a useful cheap recipe is allowed; disclose
 the changes without claiming an isolated causal effect or five-game reliability.
@@ -70,11 +70,14 @@ but freezes at−3.875 versus initial0.00 (both10/24 wins); all audits pass.
 Pong4M/RGB48 completes200k in10m22s: frozen−17.125 versus initial−20.375,
 both0/24 wins; all audits pass. The short screens use only about one fifth of
 the historical successful cohorts' updates, so capacity/resolution remain open.
-Current allocation: fresh Boxing seed2017,1M/RGB32/B8/T16/R32,500k actions,
-expected124939 updates, unchanged30-minute training cap and fixed final/actual-
-initial evaluations. It is a new life, not a warm start. See
-`docs/experiments/2026-10-25-cdp-cheap-boxing-update-budget.md`;
-service owner `kindle-cheap-boxing-r32-500k-2017-20261025`. Check its live state before
+Fresh Boxing seed2017,1M/RGB32/B8/T16/R32,500k actions now passes: frozen76.8333
+versus initial2.875,24/24 wins,124939 updates in28m22s. All audits pass and the
+service exits. Retain this useful cheap recipe for seed confirmation; one
+development seed is not reliability. See the cheap-Boxing result report.
+Current allocation: fresh Qbert seed1009,4M/RGB48/B8/T16/R32,200k actions,
+expected49939 updates,30-minute training cap and fixed24-episode final/actual-
+initial evaluations. See `docs/experiments/2026-10-25-cdp-cheap-qbert.md`;
+service owner `kindle-cheap-qbert-r32-200k-20261025`. Check its live state before
 further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.

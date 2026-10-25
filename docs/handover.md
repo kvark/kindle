@@ -18,9 +18,14 @@ The [200k Boxing screen](results/2026-10-25-cdp-cheap-boxing.md) completes in6m0
 but fails: frozen−3.875 versus initial0.00, both10/24 wins, all audits pass.
 The [Pong4M/RGB48 screen](results/2026-10-25-cdp-cheap-pong.md) completes in10m22s:
 frozen−17.125 versus initial−20.375, both0/24 wins, all audits pass.
-Current allocation: [fresh Boxing2017,500k/R32](experiments/2026-10-25-cdp-cheap-boxing-update-budget.md),
-service `kindle-cheap-boxing-r32-500k-2017-20261025`, with an unchanged30-minute
-training cap. Check its state before GPU work; do not restart completed screens.
+Fresh Boxing2017,1M/RGB32/500k/R32 now passes: frozen76.8333 versus initial2.875,
+24/24 wins,124939 updates in28m22s; all audits pass and the service exits. Retain
+this useful cheap recipe for seed confirmation; one development seed is not
+reliability. Details and historical wall-time comparison are in the Boxing report.
+Current allocation: [Qbert4M/RGB48/R32,200k](experiments/2026-10-25-cdp-cheap-qbert.md),
+service `kindle-cheap-qbert-r32-200k-20261025`, with a30-minute training cap and
+fixed24-episode final/actual-initial evaluation. Check its state before GPU work;
+do not restart completed screens.
 Current native source`bfb8c31`, runner`a99416e`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

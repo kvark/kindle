@@ -24,8 +24,13 @@ finishes200k in6m03s but fails too: frozen−3.875 versus initial0.00, both10/24
 wins. Those screens use about one fifth of the historical successful cohorts'
 updates; they do not isolate capacity or resolution. [Pong4M/RGB48](results/2026-10-25-cdp-cheap-pong.md)
 finishes200k in10m22s: frozen−17.125 versus initial−20.375, both0/24 wins.
-Current allocation: [fresh Boxing2017,500k/R32](experiments/2026-10-25-cdp-cheap-boxing-update-budget.md),
-testing the historical update budget under the unchanged30-minute training cap.
+Fresh Boxing2017,1M/RGB32/500k/R32 now passes: frozen76.8333 versus initial2.875,
+24/24 wins,124939 updates in28m22s, all audits pass. This is the first useful cheap
+AMD recipe; confirm it across seeds before claiming reliability. The retained
+same-seed1M/RGB64/500k/R32 control takes65m38s and scores71.625; geometry, runtime
+and GPU differ, so the2.31× wall-cost comparison does not isolate resolution.
+Current allocation: [Qbert4M/RGB48/R32,200k](experiments/2026-10-25-cdp-cheap-qbert.md),
+with a30-minute training cap and fixed24-episode final/actual-initial evaluation.
 
 **Compute priority, updated from the user's October25 direction:** finding useful
 game-specific configurations matters more than maintaining one universal set of
@@ -49,7 +54,8 @@ reconstruction remains the control. CDP's five-game advantage over matched RGB
 has not been established; the earlier Seaquest comparison is narrower evidence.
 
 Use eight environments with batched inference and one shared learner, independent
-stream histories, native max-pooled frames and one GPU64 resize. The current
+stream histories, native max-pooled frames and one GPU resize (64 for the
+reference;32/48 for declared game-specific tests). The current
 Atari reference is12M/B8/T16/H15/BF16/replay-ratio32, full18-action space,
 sticky actions.25 and action repeat4.500k actions are roughly2M emulator frames;
 budgets count aggregate actions across streams, not per-stream actions.
@@ -58,7 +64,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 
 | Game | Latest useful frozen result | What remains |
 | --- | --- | --- |
-| Boxing | Historical12M500k mean85.26;72/72 wins | Reference99.61; no current-backend replication |
+| Boxing | AMD1M/RGB32/R32/500k mean76.83;24/24 wins in28m22s; historical12M mean85.26/72 wins | Reference99.61; cheap-recipe seed confirmation |
 | Pong | Three500k seeds mean15.71;72/72 wins | Reference20.45;2M on1009 only improves16.75→16.92 |
 | Freeway | Fixed aided500k seeds32.67/30.67/32.96;mean32.10;72/72 crossing successes | Reference33.40; selected/reused development seeds |
 | Breakout | Retained B8/T16:500k58.83→2M98.21; AMD B2/T64:14.71→10.04;initial1.42 | Reference381.81;zero two-wall successes; reliability open |
@@ -159,6 +165,10 @@ the experience needed to learn. Target100–200k actions and a30-minute training
 cap for the first learning screen, with fixed frozen/actual-initial evaluation;
 record a wall-cap cutoff explicitly. A short weak result does not prove that
 the configuration cannot learn. No broad queue or automatic extension follows.
+The firstR16 screens complete quickly but fail their gates. Fresh Boxing500k/R32
+then passes within28m22s, with five times as many updates; the experience budget,
+ratio and seed change together. Preserve enough learning work to test a recipe:
+lower replay ratios are candidates, not a requirement for cheap training.
 
 Native preprocessing, replay shapes and CNN geometry now support32/48/64, with
 `--image-size` selecting fresh learned RGB/CDP geometry and restore retaining
