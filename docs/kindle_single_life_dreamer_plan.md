@@ -4,6 +4,12 @@ Updated October25,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+**Current run:** [AMD takeover](results/2026-10-25-cdp-amd-takeover.md) passes
+restore and867-update smoke; fresh Breakout2M B2/T64 is running in
+`kindle-amd-context64-20261025`. BF16 is unavailable on RX7900XT/RADV; the existing
+F16-input/ordinary-target path takes1.63 times the historical smoke wall time.
+Do not launch a duplicate learner. Review its fixed evaluations before more work.
+
 ## Goal and architecture
 
 Learn to play games through experience, initially with sparse explicit rewards
@@ -87,11 +93,11 @@ Evidence and videos:
    selected games: Boxing, Pong, Freeway, Breakout and Qbert. Keep useful gains
    separate from published-endpoint and held-out-reliability claims.
 
-The B2/T64 smoke already completed4096 actions/867 updates in45.245s with finite
-346 tensors and exact initial tensors. Frozen restore is unfinished: normal
-restores faulted before run_start; one traced restore passed1024 actions and
-exact tensors. No full2M context run has started. A different GPU/driver/build
-must be disclosed as a comparison difference, not called same-hardware parity.
+The original B2/T64 smoke completed4096 actions/867 updates in45.245s with finite
+346 tensors and exact initial tensors. Normal restores faulted before run_start;
+one traced restore passed. AMD restore now passes with all346 tensors unchanged
+under the explicitly adapted precision. The fresh2M life has started. Hardware,
+precision and execution-path differences remain comparison limitations.
 
 [Incident and diagnostic boundaries](results/2026-10-23-cdp-context64-gpu-fault.md).
 

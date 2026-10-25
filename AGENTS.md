@@ -32,11 +32,14 @@ Freeway crosses consistently; Breakout and Qbert remain much weaker. Published
 long-run scores are aspirations, not matched-budget comparisons. Do not claim
 mastery or CDP superiority from short runs, finite losses or backend speed alone.
 
-Next learning test: Breakout B2/T64 versus retained B8/T16, keeping128 replay
+Current learning test: Breakout B2/T64 versus retained B8/T16, keeping128 replay
 positions/update and replay ratio32. Longer sequences also reduce independent
-sequences; disclose that confound. The4096-action smoke completed867 updates,
-but ordinary frozen restore failed on the original GPU. No fresh2M run started.
-Finish a short restore check on a healthy target before the full experiment.
+sequences; disclose that confound. The original4096-action smoke completed867
+updates, but ordinary frozen restore failed on the original GPU. On this AMD
+host, bounded restore and a new F16-input smoke pass; the fresh2M life is running.
+See `docs/results/2026-10-25-cdp-amd-takeover.md` for its service and evidence.
+Do not launch a duplicate learner. BF16 and `KINDLE_DEVICE_TARGETS` are unavailable
+on this current path; preserve the explicit precision/execution-path confound.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 

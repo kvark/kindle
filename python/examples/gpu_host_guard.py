@@ -18,6 +18,8 @@ import uuid
 
 import gpu_guard as retained
 
+AMD_DRIVER = Path("/sys/module/amdgpu/srcversion")
+
 
 class HostEvidence(retained.Evidence):
     def probe(self, name, command, **kwargs):
@@ -38,7 +40,7 @@ def declaration(path):
     fields = {"monitoring", "boot_id", "driver", "command", "executable_sha256", "timeout_seconds", "poll_seconds"}
     if (not isinstance(config, dict) or not fields <= set(config)
             or set(config) - fields - {"reviewed_kernel_warnings", "allocation_diagnostic", "reviewed_validation_vuids",
-                                      "record_allocation_warnings"}
+                                      "record_allocation_warnings", "driver_module"}
             or config["monitoring"] != "host-only"):
         raise ValueError("require an explicit host-only declaration")
     warnings = config.get("reviewed_kernel_warnings", [])
@@ -63,7 +65,11 @@ def declaration(path):
     vuids = config.get("reviewed_validation_vuids", [])
     if not isinstance(vuids, list) or any(vuid != "VUID-StandaloneSpirv-None-10684" for vuid in vuids):
         raise ValueError("only the reviewed workgroup-layout VUID may be non-blocking")
-    if str(uuid.UUID(config["boot_id"])) != config["boot_id"] or not re.fullmatch(r"[0-9]+(?:\.[0-9]+)+", config["driver"]):
+    driver_module = config.get("driver_module", "nvidia")
+    driver_pattern = r"[0-9]+(?:\.[0-9]+)+" if driver_module == "nvidia" else r"[0-9A-Fa-f]{1,24}"
+    if (driver_module not in {"nvidia", "amdgpu"}
+            or str(uuid.UUID(config["boot_id"])) != config["boot_id"]
+            or not re.fullmatch(driver_pattern, config["driver"])):
         raise ValueError("invalid boot or driver identity")
     for name, maximum in (("timeout_seconds", 172800), ("poll_seconds", 5)):
         value = config[name]
@@ -87,8 +93,9 @@ def declaration(path):
 def check_host(evidence, config, cursor=None):
     started = time.monotonic()
     def identity():
+        driver = AMD_DRIVER if config.get("driver_module") == "amdgpu" else retained.DRIVER
         if (retained.BOOT.read_text().strip() != config["boot_id"]
-                or retained.DRIVER.read_text().strip() != config["driver"]):
+                or driver.read_text().strip() != config["driver"]):
             raise retained.GuardError("boot or loaded driver changed")
     identity()
     cursor = retained.check_kernel(evidence, config["boot_id"], cursor,
@@ -126,6 +133,7 @@ def check_validation_logs(evidence, positions, reviewed=()):
 def run(root, declaration_path):
     config = declaration(declaration_path)  # Refuse legacy declarations before probes, outputs or a child.
     evidence = HostEvidence(root)
+    evidence.driver_module = config.get("driver_module", "nvidia")
     retained.write_json(evidence.root / "job.json", {
         "host_guard": config, "declaration": str(Path(declaration_path).resolve()),
         "declaration_sha256": retained.fingerprint(declaration_path),

@@ -28,6 +28,9 @@ FIELDS = (
 FAULT = re.compile(
     r"NVRM: Xid|PMU has halted|GPU is probably locked|RmInitAdapter failed"
     r"|Cannot initialize GSP|NVRM: API mismatch|GSP.*(?:timeout|Timeout)"
+    r"|amdgpu.*(?:GPU reset|ring .*timeout|(?:VM|page|protection) fault|GPU fault|MES.*failed)"
+    r"|\[drm:amdgpu[^\]]*\].*(?:timeout|fault|reset)",
+    re.IGNORECASE,
 )
 ALLOCATION_WARNING = re.compile(r"NVRM:.*(?:nvCheckOkFailedNoLog|NV_ERR_NO_MEMORY)")
 BOOT = Path("/proc/sys/kernel/random/boot_id")
@@ -144,7 +147,7 @@ class Evidence:
             "boots": ["journalctl", "--list-boots", "--no-pager"],
             "pci": ["lspci", "-nnk"],
             "modules": ["lsmod"],
-            "driver": ["modinfo", "nvidia"],
+            "driver": ["modinfo", getattr(self, "driver_module", "nvidia")],
             "processes": ["ps", "-eo", "user,pid,ppid,stat,comm,wchan:32"],
         }
         for name, command in commands.items():
@@ -224,7 +227,7 @@ def check_kernel(evidence, boot, cursor=None, reviewed_warnings=(), allocation_d
     for row in records:
         if FAULT.search(row["MESSAGE"]):
             evidence.event("kernel_fault", record=row)
-            raise GuardError("NVIDIA kernel fault; this boot requires explicit recovery review")
+            raise GuardError("GPU kernel fault; this boot requires explicit recovery review")
         if ALLOCATION_WARNING.search(row["MESSAGE"]):
             if record_allocation_warnings:
                 evidence.event("allocation_warning", record=row, baseline=cursor is None)

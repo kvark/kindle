@@ -1,5 +1,10 @@
 # Breakout: longer training sequences at fixed sampled-position budget
 
+**October25 receiving-host update:** [AMD restore and smoke pass; fresh2M life
+running](../results/2026-10-25-cdp-amd-takeover.md). The new declaration records
+F16-input precision, ordinary targets and a14h wall cap on RX7900XT/RADV.
+The original NVIDIA declaration and failures below remain historical evidence.
+
 **Smoke training completes; frozen restore fails on a real GPU fault.**
 [Incident and CPU review](../results/2026-10-23-cdp-context64-gpu-fault.md).
 Freeway replication completes first. No full2M context run has started.

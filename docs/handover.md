@@ -1,5 +1,11 @@
 # CDP handover — October25,2026
 
+**Receiving-host update:** [AMD takeover](results/2026-10-25-cdp-amd-takeover.md).
+RX7900XT/RADV cannot run the saved BF16 configuration. A labelled F16-input copy
+passes restore with all346 tensors unchanged; the fresh2M B2/T64 life is running.
+Use the new report for current host, precision, controller and timing details.
+The historical handover steps below describe its origin.
+
 The goal remains strong, reliable learning on **Boxing, Pong, Freeway, Breakout
 and Qbert**, then native games and transfer. Training is the priority; another
 backend optimization/JAX-parity campaign is not the next step.

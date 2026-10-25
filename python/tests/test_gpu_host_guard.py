@@ -42,7 +42,7 @@ def environment(tmp_path, monkeypatch):
             raise InterruptedError("host guard interrupted")
         if controls["change_at"] == calls["kernel"]:
             driver.write_text("changed")
-        message = "NVRM: Xid (PCI:0000:01:00): 62, CPU fixture" if controls["fault_at"] == calls["kernel"] else "CPU fixture ordinary record"
+        message = controls.get("fault_message", "NVRM: Xid (PCI:0000:01:00): 62, CPU fixture") if controls["fault_at"] == calls["kernel"] else "CPU fixture ordinary record"
         if controls["warning_at"] == calls["kernel"] or calls["kernel"] in controls.get("warnings_at", ()):
             message = controls.get("warning_message", "NVRM: nvCheckOkFailedNoLog: Out of memory [NV_ERR_NO_MEMORY]")
         row = dict(_BOOT_ID=BOOT.replace("-", ""), __CURSOR=f'cursor-{calls["kernel"]}',
@@ -80,6 +80,52 @@ def test_cpu_child_passes_without_telemetry_or_legacy_guard(environment):
     assert "guard_passed" not in result  # Cannot masquerade as the historical telemetry guard.
     with pytest.raises(FileExistsError):
         host.run(path / "evidence", path / "declaration.json")
+
+
+def test_amd_driver_identity_passes_without_nvidia(environment, monkeypatch):
+    path, _calls, _controls = environment
+    driver = path / "amdgpu-srcversion"
+    identity = "4B803D5D5A2CA02E40497CD"
+    driver.write_text(identity)
+    monkeypatch.setattr(host, "AMD_DRIVER", driver)
+    retained.DRIVER.unlink()
+    result = execute(environment, driver_module="amdgpu", driver=identity)
+    assert result["host_guard_passed"]
+    assert host.audit(path / "evidence")["host_guard_passed"]
+
+
+def test_amd_driver_change_refuses_launch(environment, monkeypatch):
+    path, calls, _controls = environment
+    driver = path / "amdgpu-srcversion"
+    driver.write_text("0" * 24)
+    monkeypatch.setattr(host, "AMD_DRIVER", driver)
+    result = execute(environment, driver_module="amdgpu", driver="1" * 24)
+    assert not result["child_spawned"]
+    assert result["reason"] == "boot or loaded driver changed"
+    assert calls["kernel"] == 0
+
+
+@pytest.mark.parametrize("when", [1, 2])
+@pytest.mark.parametrize("message", [
+    "amdgpu 0000:03:00.0: amdgpu: ring gfx_0.0.0 timeout, signaled seq=5",
+    "amdgpu 0000:03:00.0: amdgpu: GPU reset begin!",
+    "amdgpu 0000:03:00.0: [gfxhub] page fault (src_id:0 ring:24 vmid:1)",
+    "[drm:amdgpu_job_timedout [amdgpu]] *ERROR* ring compute timeout",
+])
+def test_amd_fault_stops_before_or_during_child(environment, when, message):
+    _path, _calls, controls = environment
+    controls.update(fault_at=when, fault_message=message)
+    result = execute(environment, code="import time; time.sleep(1)")
+    assert not result["host_guard_passed"]
+    assert result["child_spawned"] is (when == 2)
+    assert not result["unfinished_children"]
+
+
+def test_amd_startup_messages_are_not_faults():
+    for message in ("amdgpu: ring gfx_0.0.0 uses VM inv eng 0 on hub 0",
+                    "amdgpu: SMU driver if version not matched",
+                    "amdgpu: [drm] Cannot find any crtc or sizes"):
+        assert not retained.FAULT.search(message)
 
 
 @pytest.mark.parametrize("destination", ["stdout", "stderr"])
