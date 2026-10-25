@@ -56,6 +56,8 @@ def main():
                         help="train posterior representations from initial imagined actor/value losses (upstream ac_grads)")
     parser.add_argument("--cdp", action="store_true",
                         help="learned CNN with cosine feature prediction instead of RGB reconstruction; CDP split learning rates")
+    parser.add_argument("--image-size", type=int, choices=(32, 48, 64),
+                        help="learned RGB/CDP GPU resize side; fresh default64, restore uses checkpoint geometry")
     parser.add_argument("--cdp-centered", action="store_true",
                         help="CDP ablation: center cosine predictions/targets over the full replay batch")
     parser.add_argument("--disagreement-scale", type=float, default=0.0,
@@ -126,6 +128,7 @@ def main():
     if args.evaluate and args.exploration_probability:
         parser.error("frozen evaluation must not use exploration overrides")
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
+    training_options.add("--image-size")
     training_options.add("--cdp")
     training_options.add("--cdp-centered")
     training_options.add("--disagreement-scale")
@@ -151,6 +154,8 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     args.observation_size = args.observation_size or "native"
     learned_rgb = args.encoder_checkpoint is None
+    if args.image_size is not None and not learned_rgb:
+        parser.error("image-size requires the learned RGB/CNN frontend")
     if args.cdp and (not learned_rgb or args.actor_critic_gradient or args.learning_rate != 4e-5):
         parser.error("CDP requires the learned CNN, ac_grads=false and base learning-rate4e-5")
     if args.cdp_centered and (not args.cdp or args.world_microbatch_size not in (None, args.batch_size)):
@@ -222,7 +227,7 @@ def main():
                       intrinsic_reward_scale=args.disagreement_scale,
                       learning_rate_warmup=1000, agc=0.3)
         if learned_rgb:
-            config["observation_kind"] = "rgb64"
+            config["observation_kind"] = f"rgb{args.image_size or 64}"
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
             if args.cdp:
                 config["loss_scales"].update(reconstruction=0.0, future_prediction=500.0)
@@ -272,7 +277,7 @@ def main():
                   noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
                   full_action_space=protocol.full_action_space, sticky_actions=args.sticky_actions,
                   observation_size=args.observation_size, observation_shape=list(initial[0].shape),
-                  **(dict(learned_rgb_preprocessing="single GPU Pillow-equivalent antialiased bilinear resize to 64x64, per-axis RGB8 rounding; CHW /255-0.5") if learned_rgb else {}),
+                  **(dict(learned_rgb_preprocessing=f"single GPU Pillow-equivalent antialiased bilinear resize to {agent.config['observation_kind'][3:]}x{agent.config['observation_kind'][3:]}, per-axis RGB8 rounding; CHW /255-0.5") if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
                   **(dict(behavior_probe="live-posterior-v1") if args.probe_behavior else {}),

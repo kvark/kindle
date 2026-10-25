@@ -32,6 +32,9 @@ import profile_atari_vector
     (["--restore", "unused", "--cdp-centered"], "training overrides"),
     (["--restore", "unused", "--training-precision", "f16"], "training overrides"),
     (["--training-precision", "fp8"], "invalid choice"),
+    (["--image-size", "33"], "invalid choice"),
+    (["--restore", "unused", "--image-size", "32"], "training overrides"),
+    (["--encoder-checkpoint", "unused", "--image-size", "48"], "image-size requires"),
     (["--restore", "unused", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
     (["--evaluate", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
     (["--checkpoint", "fresh", "--initial-checkpoint", "fresh"], "separate fresh path"),
@@ -94,14 +97,15 @@ def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path,
 @pytest.mark.parametrize("scale", [0, 1])
 @pytest.mark.parametrize("centered", [False, True])
 @pytest.mark.parametrize("batch_shape", [None, (8, 16), (2, 64)])
-def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, batch_shape):
+@pytest.mark.parametrize("image_size", [None, 32, 48])
+def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, batch_shape, image_size):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
     monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
 
     def construct(streams, config):
-        assert config['observation_kind'] == 'rgb64'
+        assert config['observation_kind'] == f'rgb{image_size or 64}'
         assert config['loss_scales']['reconstruction'] == 0
         assert config['loss_scales']['future_prediction'] == 500
         assert config['encoder_learning_rate'] == 6e-6
@@ -121,6 +125,7 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, ba
     monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct))
     monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path / 'cdp.jsonl'),
                                     '--cdp', '--disagreement-scale', str(scale),
+                                    *(['--image-size', str(image_size)] if image_size else []),
                                     *(['--batch-size', str(batch_shape[0]), '--batch-length', str(batch_shape[1]),
                                        '--world-microbatch-size', str(batch_shape[0])] if batch_shape else []),
                                     *(['--cdp-centered'] if centered else [])])
