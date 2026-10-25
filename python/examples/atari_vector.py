@@ -21,7 +21,7 @@ import gymnasium as gym
 
 import kindle
 import atari
-from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, episode_summary
+from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, episode_summary, require_numbers
 import kindle._exploration as exploration_module
 from kindle._exploration import EXPLORATION_KIND, EXPLORATION_PROTOCOL, PersistentExploration
 from atari import (
@@ -372,6 +372,7 @@ def main():
                 timing["learn"] += time.perf_counter() - before
                 check_memory("learn", run_actions)
                 for report in reports:
+                    require_numbers(report)
                     emit(dict(event="learner", run_step=run_actions, report=report))
                 resets = []
                 for stream in ids:

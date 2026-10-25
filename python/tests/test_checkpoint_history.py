@@ -20,7 +20,7 @@ FILES = ('metadata.json', 'world.safetensors', 'behavior.safetensors', 'slow_val
 def fake_runner(tmp_path, monkeypatch):
     cases = []
 
-    def run(*, history=False, steps=6, every=4, exploration=False, collision=None, fail_at=None, encoder=None):
+    def run(*, history=False, steps=6, every=4, exploration=False, collision=None, fail_at=None, encoder=None, learner_reports=()):
         root = tmp_path / str(len(cases))
         output, checkpoint = root / 'run.jsonl', root / 'checkpoints'
         case = dict(root=root, output=output, checkpoint=checkpoint, saves=[], environments=[])
@@ -81,7 +81,7 @@ def fake_runner(tmp_path, monkeypatch):
                 return [[reward, 0.0] for reward in rewards]
 
             def learn_scheduled(self):
-                return []
+                return list(learner_reports)
 
             def save_checkpoint(self, path):
                 path = Path(path)
@@ -204,3 +204,23 @@ def test_history_preserves_explicit_tiny_selection(fake_runner):
     assert case['encoder'] == 'levjepa-tiny'
     assert [path.name for path in case['saves']] == ['4', '6']
     assert audit(case['output'])['budget_complete']
+
+
+@pytest.mark.parametrize('bad', [None, float('nan'), float('inf'), -float('inf')])
+def test_nonfinite_learner_report_stops_before_checkpoint(fake_runner, bad):
+    run, cases = fake_runner
+    with pytest.raises(ValueError):
+        run(learner_reports=[{'world': {'total_loss': bad}}])
+    case = cases[-1]
+    assert not case['saves']
+    assert [row['event'] for row in case['rows']] == ['run_start', 'transition']
+    assert all(env.closed and env.executed_action_frames == 4 for env in case['environments'])
+
+
+def test_finite_learner_report_is_emitted(fake_runner):
+    run, _ = fake_runner
+    report = {'world': {'total_loss': 0.0}, 'behavior': {'total_loss': -0.5}}
+    case = run(learner_reports=[report])
+    assert [row['report'] for row in case['rows'] if row['event'] == 'learner'] == [report] * 3
+    assert case['rows'][-1]['event'] == 'run_end'
+    assert case['saves']
