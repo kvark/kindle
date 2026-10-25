@@ -43,6 +43,14 @@ unchanged. Construction13.14s; acting/export0.827s. Export counters867/6144;
 the original shared export remains867/5120. F16 permits reduced matrix inputs
 with F32 parameters, optimizer state and accumulators; this is not BF16 parity.
 
+Source review confirms `F16` selects Meganeura's `AllowF16`, which permits
+uncompensated F16 derivative operands and bypasses its normal gradient-precision
+protection. Kindle's session builder adds no numerical loss scaling. Finite
+losses and F32 parameter storage therefore do not establish gradient fidelity.
+No actual underflow or causal score effect has been measured. This remains an
+unresolved precision limitation; see `precision-source-review.json` for pinned
+source paths/hashes and the question to revisit after the fixed evaluation.
+
 Fresh smoke: centered CDP12M/B2/T64/H15/R32, full-sequence/full-batch updates,
 action-effects1, replay100k, eight independent environments with batched inference
 and shared GPU context. Native max-pooled frames receive one GPU64 resize.
