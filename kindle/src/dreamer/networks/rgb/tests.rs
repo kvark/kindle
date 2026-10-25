@@ -47,6 +47,44 @@ fn rgb_graphs_match_upstream_shapes_and_encoder_counts() {
     }
 }
 
+#[test]
+fn smaller_rgb_graphs_keep_shapes_and_cdp_gradients() {
+    for (kind, side) in [(ObservationKind::Rgb32, 32), (ObservationKind::Rgb48, 48)] {
+        let mut config = DreamerConfig::tiny(18);
+        config.observation_kind = kind;
+        assert!(config.check().is_ok());
+        let mut graph = Graph::new();
+        let encoder = Encoder::new(&mut graph, &config);
+        let pixels = graph.input("pixels", &config.observation_shape(2));
+        let encoded = encoder.forward(&mut graph, pixels, 2);
+        assert_eq!(
+            graph.node(encoded).ty.shape,
+            [2, (side / 16) * (side / 16) * 16]
+        );
+        assert_eq!(encoder.output_dim(), config.encoded_observation_dim());
+        let decoder = Decoder::new(&mut graph, &config, "world.decoder", config.feature_dim());
+        let feature = graph.input("feature", &[2, config.feature_dim()]);
+        let decoded = decoder.forward(&mut graph, feature, 2);
+        assert_eq!(graph.node(decoded).ty.shape, [2, 3 * side * side]);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.cdp_centered = true;
+        config.world_backprop_length = config.batch_length;
+        config.world_microbatch_size = Some(config.batch_size);
+        assert!(config.check().is_ok());
+        assert!(config.is_cdp());
+        assert_eq!(config.prediction_dim(), encoder.output_dim());
+        let encoded_config = serde_json::to_value(&config).unwrap();
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(encoded_config).unwrap(),
+            config
+        );
+        let graph = crate::dreamer::world::build_training_graph(&config, 4);
+        let backward = meganeura::autodiff::differentiate(&graph);
+        assert!(backward.nodes().len() > graph.nodes().len());
+    }
+}
+
 // Independent scalar cross-correlation, max-pool, per-pixel channel RMS and SiLU.
 fn reference(input: &[f32], parameters: &HashMap<String, Vec<f32>>) -> Vec<f64> {
     let mut values = input.iter().map(|&x| f64::from(x)).collect::<Vec<_>>();

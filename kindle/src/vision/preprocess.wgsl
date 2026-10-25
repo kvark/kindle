@@ -16,9 +16,9 @@ fn channel(x: u32, y: u32, c: u32) -> f32 {
     return f32((pixels[byte / 4u] >> ((byte % 4u) * 8u)) & 255u);
 }
 
-fn rgb64(x: u32, y: u32, c: u32) -> f32 {
+fn resized_rgb(x: u32, y: u32, c: u32) -> f32 {
     let horizontal = 3u * x;
-    let vertical = 3u * (64u + y);
+    let vertical = 3u * (params.source.z + y);
     var sum_y = 1u << 21u;
     for (var j = 0u; j < rgb_coefficients[vertical + 2u]; j += 1u) {
         var sum_x = 1u << 21u;
@@ -40,7 +40,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let y = id.x / size;
     if params.output.y != 0u {
         for (var c = 0u; c < 3u; c += 1u) {
-            patches[params.output.x + c * size * size + id.x] = rgb64(x, y, c);
+            patches[params.output.x + c * size * size + id.x] = resized_rgb(x, y, c);
         }
         return;
     }

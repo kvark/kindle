@@ -180,8 +180,9 @@ impl GpuPreprocessor {
 
     /// Learned RGB control: one antialiased full-frame resize, channel-major values in
     /// [-0.5, 0.5]. No letterbox, ImageNet statistics or second upscale.
-    pub fn rgb64(gpu: Arc<gpu::Context>, streams: usize) -> Self {
-        let mut pixels = Self::new(gpu, streams, 64, 64);
+    pub fn rgb(gpu: Arc<gpu::Context>, streams: usize, side: usize) -> Self {
+        assert!(matches!(side, 32 | 48 | 64));
+        let mut pixels = Self::new(gpu, streams, side, side);
         pixels.input = "observation";
         pixels.centered_rgb = true;
         pixels
@@ -315,9 +316,10 @@ impl GpuPreprocessor {
                 .rgb_filters
                 .entry((layout.width, layout.height))
                 .or_insert_with(|| {
-                    let coefficients = rgb_filter::coefficients(layout.width, layout.height);
+                    let coefficients =
+                        rgb_filter::coefficients(layout.width, layout.height, self.size as usize);
                     let buffer = self.gpu.create_buffer(gpu::BufferDesc {
-                        name: "rgb64_filter",
+                        name: "rgb_filter",
                         size: (coefficients.len() * size_of::<u32>()) as u64,
                         memory: gpu::Memory::Shared,
                     });
@@ -564,71 +566,74 @@ mod tests {
     #[ignore = "requires GPU; also exercised on lavapipe in CI"]
     fn gpu_rgb64_resize_matches_scalar_reference() {
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
-        let mut graph = meganeura::Graph::new();
-        let input = graph.input("observation", &[2, 12288]);
-        let output = graph.neg(input);
-        graph.set_outputs(vec![output]);
-        let mut session = meganeura::build(
-            &graph,
-            meganeura::SessionConfig {
-                mode: meganeura::Mode::Inference,
-                gpu: Some(Arc::clone(&gpu)),
-                ..Default::default()
-            },
-        )
-        .0;
-        let mut pixels = GpuPreprocessor::rgb64(Arc::clone(&gpu), 2);
-        for (width, height) in [
-            (160, 210),
-            (64, 64),
-            (13, 7),
-            (1, 19),
-            (640, 480),
-            (641, 479),
-            (1, 1),
-        ] {
-            let rgb = (0..width * height * 3)
-                .map(|i| ((i * 37 + i / 43) % 256) as u8)
-                .collect::<Vec<_>>();
-            let mut expected = vec![0.0; 2 * 12288];
-            let resized = rgb_filter::reference(&rgb, width, height);
-            for y in 0..64 {
-                for x in 0..64 {
-                    for c in 0..3 {
-                        expected[12288 + c * 4096 + y * 64 + x] =
-                            f32::from(resized[(y * 64 + x) * 3 + c]) / 255.0 - 0.5;
+        for side in [32, 48, 64] {
+            let elements = 3 * side * side;
+            let mut graph = meganeura::Graph::new();
+            let input = graph.input("observation", &[2, elements]);
+            let output = graph.neg(input);
+            graph.set_outputs(vec![output]);
+            let mut session = meganeura::build(
+                &graph,
+                meganeura::SessionConfig {
+                    mode: meganeura::Mode::Inference,
+                    gpu: Some(Arc::clone(&gpu)),
+                    ..Default::default()
+                },
+            )
+            .0;
+            let mut pixels = GpuPreprocessor::rgb(Arc::clone(&gpu), 2, side);
+            for (width, height) in [
+                (160, 210),
+                (64, 64),
+                (13, 7),
+                (1, 19),
+                (640, 480),
+                (641, 479),
+                (1, 1),
+            ] {
+                let rgb = (0..width * height * 3)
+                    .map(|i| ((i * 37 + i / 43) % 256) as u8)
+                    .collect::<Vec<_>>();
+                let mut expected = vec![0.0; 2 * elements];
+                let resized = rgb_filter::reference(&rgb, width, height, side);
+                for y in 0..side {
+                    for x in 0..side {
+                        for c in 0..3 {
+                            expected[elements + c * side * side + y * side + x] =
+                                f32::from(resized[(y * side + x) * 3 + c]) / 255.0 - 0.5;
+                        }
                     }
                 }
+                pixels.cpu_frames(&mut session, &[(1, &rgb, width, height)]);
+                let uploaded = check_patches(&mut session, &expected, "RGB CPU source");
+                let buffer = gpu.create_buffer(gpu::BufferDesc {
+                    name: "rgb64_test_source",
+                    size: rgb.len().next_multiple_of(4) as u64,
+                    memory: gpu::Memory::Shared,
+                });
+                unsafe {
+                    std::ptr::write_bytes(buffer.data(), 0, buffer.size() as usize);
+                    std::ptr::copy_nonoverlapping(rgb.as_ptr(), buffer.data(), rgb.len());
+                }
+                let frame = unsafe {
+                    GpuFrame::from_buffer(
+                        &gpu,
+                        &buffer,
+                        0,
+                        FrameLayout::new(
+                            width as u32,
+                            height as u32,
+                            (width * 3) as u32,
+                            PixelFormat::Rgb8,
+                        ),
+                    )
+                };
+                pixels.gpu_frames(&mut session, &[(1, frame)]);
+                let resident = check_patches(&mut session, &expected, "RGB GPU source");
+                assert_eq!(resident, uploaded);
+                pixels.wait();
+                gpu.destroy_buffer(buffer);
             }
-            pixels.cpu_frames(&mut session, &[(1, &rgb, width, height)]);
-            let uploaded = check_patches(&mut session, &expected, "RGB64 CPU source");
-            let buffer = gpu.create_buffer(gpu::BufferDesc {
-                name: "rgb64_test_source",
-                size: rgb.len().next_multiple_of(4) as u64,
-                memory: gpu::Memory::Shared,
-            });
-            unsafe {
-                std::ptr::write_bytes(buffer.data(), 0, buffer.size() as usize);
-                std::ptr::copy_nonoverlapping(rgb.as_ptr(), buffer.data(), rgb.len());
-            }
-            let frame = unsafe {
-                GpuFrame::from_buffer(
-                    &gpu,
-                    &buffer,
-                    0,
-                    FrameLayout::new(
-                        width as u32,
-                        height as u32,
-                        (width * 3) as u32,
-                        PixelFormat::Rgb8,
-                    ),
-                )
-            };
-            pixels.gpu_frames(&mut session, &[(1, frame)]);
-            let resident = check_patches(&mut session, &expected, "RGB64 GPU source");
-            assert_eq!(resident, uploaded);
-            pixels.wait();
-            gpu.destroy_buffer(buffer);
         }
     }
 

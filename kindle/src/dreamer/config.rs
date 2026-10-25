@@ -8,6 +8,16 @@ pub enum ObservationKind {
     Features,
     /// One GPU resize to 64x64, channel-major RGB in [-0.5, 0.5].
     Rgb64,
+    /// One GPU resize to 48x48, channel-major RGB in [-0.5, 0.5].
+    Rgb48,
+    /// One GPU resize to 32x32, channel-major RGB in [-0.5, 0.5].
+    Rgb32,
+}
+
+impl ObservationKind {
+    pub const fn is_rgb(self) -> bool {
+        !matches!(self, Self::Features)
+    }
 }
 
 /// Native-detail, phase-aligned causal replay. Both modes re-encode pixels;
@@ -398,13 +408,15 @@ impl DreamerConfig {
         match self.observation_kind {
             ObservationKind::Features => OBSERVATION_GRID,
             ObservationKind::Rgb64 => 64,
+            ObservationKind::Rgb48 => 48,
+            ObservationKind::Rgb32 => 32,
         }
     }
 
     pub const fn observation_channels(&self) -> usize {
         match self.observation_kind {
             ObservationKind::Features => OBSERVATION_CHANNELS,
-            ObservationKind::Rgb64 => 3,
+            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => 3,
         }
     }
 
@@ -414,7 +426,9 @@ impl DreamerConfig {
                 batch * OBSERVATION_GRID * OBSERVATION_GRID,
                 OBSERVATION_CHANNELS,
             ],
-            ObservationKind::Rgb64 => [batch, 3 * 64 * 64],
+            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+                [batch, self.observation_dim()]
+            }
         }
     }
 
@@ -423,7 +437,10 @@ impl DreamerConfig {
             ObservationKind::Features => {
                 OBSERVATION_GRID * OBSERVATION_GRID * self.network().vision_depth
             }
-            ObservationKind::Rgb64 => 4 * 4 * self.network().vision_depth * 4,
+            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+                let side = self.observation_grid() / 16;
+                side * side * self.network().vision_depth * 4
+            }
         }
     }
 
@@ -440,7 +457,7 @@ impl DreamerConfig {
     }
 
     pub fn is_cdp(&self) -> bool {
-        self.observation_kind == ObservationKind::Rgb64 && self.loss_scales.future_prediction > 0.0
+        self.observation_kind.is_rgb() && self.loss_scales.future_prediction > 0.0
     }
 
     /// CDP forecasts CNN embeddings, not RGB images or reconstructed features.
@@ -547,7 +564,7 @@ impl DreamerConfig {
                     .into(),
             );
         }
-        if self.observation_kind == ObservationKind::Rgb64
+        if self.observation_kind.is_rgb()
             && (self.visitation_bonus
                 || (self.loss_scales.future_prediction > 0.0)
                     == (self.loss_scales.reconstruction > 0.0))

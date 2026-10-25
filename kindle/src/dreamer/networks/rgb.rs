@@ -3,8 +3,6 @@
 
 use super::*;
 
-const SIDE: usize = 64;
-const BOTTLENECK: usize = 4;
 const DECODER_BLOCKS: usize = 8;
 
 struct Convolution {
@@ -118,11 +116,13 @@ impl ConvNorm {
 pub(crate) struct Encoder {
     layers: Vec<ConvNorm>,
     channels: usize,
+    side: usize,
 }
 
 impl Encoder {
     pub(super) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let depth = config.network().vision_depth;
+        let side = config.observation_grid();
         let mut channels = 3;
         let layers = [2, 3, 4, 4]
             .into_iter()
@@ -134,25 +134,35 @@ impl Encoder {
                     &format!("world.representation.encoder.cnn{i}"),
                     channels,
                     output,
-                    SIDE >> i,
+                    side >> i,
                 );
                 channels = output;
                 layer
             })
             .collect();
-        Self { layers, channels }
+        Self {
+            layers,
+            channels,
+            side,
+        }
     }
 
     pub(super) fn output_dim(&self) -> usize {
-        BOTTLENECK * BOTTLENECK * self.channels
+        (self.side / 16) * (self.side / 16) * self.channels
     }
 
     pub(super) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        let mut value = graph.reshape(input, &[batch * 3 * SIDE * SIDE]);
+        let mut value = graph.reshape(input, &[batch * 3 * self.side * self.side]);
         for layer in &self.layers {
             value = layer.forward(graph, value, batch, true);
         }
-        let value = transpose_spatial(graph, value, batch, self.channels, BOTTLENECK * BOTTLENECK);
+        let value = transpose_spatial(
+            graph,
+            value,
+            batch,
+            self.channels,
+            (self.side / 16) * (self.side / 16),
+        );
         graph.reshape(value, &[batch, self.output_dim()])
     }
 }
@@ -167,14 +177,16 @@ pub(crate) struct Decoder {
     deter: usize,
     stoch: usize,
     channels: usize,
+    side: usize,
 }
 
 impl Decoder {
     pub(super) fn new(graph: &mut Graph, config: &DreamerConfig, name: &str, input: usize) -> Self {
         assert_eq!(input, config.feature_dim());
         let size = config.network();
+        let side = config.observation_grid();
         let channels = 4 * size.vision_depth;
-        let spatial = BOTTLENECK * BOTTLENECK * channels;
+        let spatial = (side / 16) * (side / 16) * channels;
         let mut input_channels = channels;
         Self {
             deterministic: BlockLinear::new(
@@ -213,7 +225,7 @@ impl Decoder {
                         &format!("{name}.conv{i}"),
                         input_channels,
                         output_channels,
-                        SIDE >> (i + 1),
+                        side >> (i + 1),
                     );
                     input_channels = output_channels;
                     layer
@@ -224,11 +236,12 @@ impl Decoder {
                 &format!("{name}.imgout"),
                 2 * size.vision_depth,
                 3,
-                SIDE,
+                side,
             ),
             deter: size.deter,
             stoch: size.stoch * size.classes,
             channels,
+            side,
         }
     }
 
@@ -248,14 +261,26 @@ impl Decoder {
             graph,
             deter,
             batch * DECODER_BLOCKS,
-            BOTTLENECK * BOTTLENECK,
+            (self.side / 16) * (self.side / 16),
             self.channels / DECODER_BLOCKS,
         );
-        let deter = graph.reshape(deter, &[batch * self.channels * BOTTLENECK * BOTTLENECK]);
+        let deter = graph.reshape(
+            deter,
+            &[batch * self.channels * (self.side / 16) * (self.side / 16)],
+        );
         let stoch = self.stochastic_hidden.forward(graph, stoch);
         let stoch = self.stochastic_output.forward(graph, stoch);
-        let stoch = transpose_spatial(graph, stoch, batch, BOTTLENECK * BOTTLENECK, self.channels);
-        let stoch = graph.reshape(stoch, &[batch * self.channels * BOTTLENECK * BOTTLENECK]);
+        let stoch = transpose_spatial(
+            graph,
+            stoch,
+            batch,
+            (self.side / 16) * (self.side / 16),
+            self.channels,
+        );
+        let stoch = graph.reshape(
+            stoch,
+            &[batch * self.channels * (self.side / 16) * (self.side / 16)],
+        );
         let value = graph.add(deter, stoch);
         let mut value = normalize_image(
             graph,
@@ -263,9 +288,9 @@ impl Decoder {
             &self.spatial_norm,
             batch,
             self.channels,
-            BOTTLENECK,
+            self.side / 16,
         );
-        let mut side = BOTTLENECK;
+        let mut side = self.side / 16;
         let mut channels = self.channels;
         for layer in &self.layers {
             value = graph.upsample_2x(
@@ -290,10 +315,10 @@ impl Decoder {
         value = graph.sigmoid(value);
         // Both replay and diagnostic outputs are centered. This is the same
         // summed pixel MSE as sigmoid prediction versus upstream's RGB / 255.
-        value = graph.reshape(value, &[batch * 3 * SIDE * SIDE, 1]);
+        value = graph.reshape(value, &[batch * 3 * self.side * self.side, 1]);
         let offset = graph.scalar(-0.5);
         value = graph.bias_add(value, offset);
-        graph.reshape(value, &[batch, 3 * SIDE * SIDE])
+        graph.reshape(value, &[batch, 3 * self.side * self.side])
     }
 }
 

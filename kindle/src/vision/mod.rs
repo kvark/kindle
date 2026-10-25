@@ -147,7 +147,12 @@ impl Observation {
 
     /// Resized channel-major pixels, not frozen features.
     pub fn rgb64(values: Vec<f32>) -> Self {
-        assert_eq!(values.len(), 3 * 64 * 64);
+        Self::rgb(values, 64)
+    }
+
+    pub fn rgb(values: Vec<f32>, side: usize) -> Self {
+        assert!(matches!(side, 32 | 48 | 64));
+        assert_eq!(values.len(), 3 * side * side);
         Self::checked(values)
     }
 

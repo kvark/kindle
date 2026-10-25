@@ -700,11 +700,12 @@ impl VectorDreamerAgent {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         config.check()?;
         check_capacity(&config, streams)?;
-        if config.observation_kind != ObservationKind::Rgb64 {
-            return Err("learned RGB requires observation_kind=rgb64".into());
+        if !config.observation_kind.is_rgb() {
+            return Err("learned RGB requires observation_kind=rgb32, rgb48 or rgb64".into());
         }
+        let side = config.observation_grid();
         let learner = DreamerCore::new(config)?;
-        let pixels = GpuPreprocessor::rgb64(Arc::clone(&learner.gpu), streams);
+        let pixels = GpuPreprocessor::rgb(Arc::clone(&learner.gpu), streams, side);
         Ok(Self {
             perception: VectorPerception::Learned(Box::new(pixels)),
             history: None,
@@ -718,13 +719,15 @@ impl VectorDreamerAgent {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let metadata = read_checkpoint_metadata(checkpoint.as_ref())?;
         check_capacity(&metadata.config, streams)?;
-        if metadata.config.observation_kind != ObservationKind::Rgb64
-            || metadata.perception.is_some()
-        {
+        if !metadata.config.observation_kind.is_rgb() || metadata.perception.is_some() {
             return Err("checkpoint is not a jointly learned RGB model".into());
         }
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let pixels = GpuPreprocessor::rgb64(Arc::clone(&gpu), streams);
+        let pixels = GpuPreprocessor::rgb(
+            Arc::clone(&gpu),
+            streams,
+            metadata.config.observation_grid(),
+        );
         let learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
         Ok(Self {
             perception: VectorPerception::Learned(Box::new(pixels)),
