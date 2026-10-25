@@ -62,11 +62,14 @@ recipes; see `docs/kindle_single_life_dreamer_plan.md`. BF16 and
 The cheap unassisted Freeway1M/B8/T16/R16 trial completes200k actions in8m07s
 but freezes at0/24 crossings, matching its actual initial control. All audits
 pass; see `docs/results/2026-10-25-cdp-cheap-freeway.md`.
-Current cheap allocation repeats that fresh200k budget with5% persistent
-uniform16-action exploration during training only,30-minute training cap and
-fixed final/actual-initial evaluations. See
-`docs/experiments/2026-10-25-cdp-cheap-freeway.md`; service owner
-`kindle-cheap-freeway-aided200k-20261025`. Check its live state before further GPU work.
+The aided comparison also finishes: frozen0.25 versus initial0.00, six episodes
+cross once but0/24 reach the25-crossing milestone; all audits pass. No extension.
+Native32/48 RGB support and an intermediate4M preset now pass bounded GPU checks,
+including unchanged64x64 checkpoint restore. Current cheap allocation: fresh
+Boxing1M/RGB32/B8/T16/R16,200k actions,30-minute training cap and fixed final/
+actual-initial evaluations. See `docs/experiments/2026-10-25-cdp-cheap-boxing.md`;
+service owner `kindle-cheap-boxing-200k-20261025`. Check its live state before
+further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 

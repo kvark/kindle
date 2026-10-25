@@ -16,6 +16,12 @@ smoke and exact frozen restore pass at similar throughput. The fresh
 frozen15.67 versus F16's14.71, initial1.42, all0/24 two-wall successes. Training
 takes2h53m; all audits pass. Do not extend either T64 life.
 
+The first [cheap Freeway screens](results/2026-10-25-cdp-cheap-freeway.md) each
+finish200k actions in about8 minutes. Frozen unassisted/aided/initial means are
+0.00/0.25/0.00, with0/24 task milestones; all audits pass. These are fast weak
+recipes, not successful Freeway learning. The next short allocation is
+[Boxing1M/RGB32](experiments/2026-10-25-cdp-cheap-boxing.md).
+
 **Compute priority, updated from the user's October25 direction:** finding useful
 game-specific configurations matters more than maintaining one universal set of
 hyperparameters. Measure frozen learning against GPU time and experience. A
@@ -133,8 +139,11 @@ The historical500k-action capacity cohort supports specializing by game:
 blob`b600def5ce8bb55894eacf64e8a0b1c043251ad3`. These are historical development
 cohorts, with some runtime differences; the roughly3.56x aggregate wall-cost
 ratio is not an AMD speed prediction. They are not the later qualified-backend
-results in the main status table. The current native presets jump from1M to12M;
-an intermediate preset is a proposed change, not an implemented option.
+results in the main status table. An intermediate native4M preset is now
+implemented: deterministic1024, hidden128,32 stochastic variables with8 classes,
+8 blocks, units128 and vision depth8. It is a Kindle development preset, not an
+upstream benchmark size. Actual parameter count depends on image geometry;
+RGB48 centered CDP/action-effects1 has3,578,225 trainable parameters.
 
 The first cheap development configuration should use existing controls: centered
 CDP, Auto precision, N8/B8/T16/H15, microbatch8, native frames/one GPU64 resize,
@@ -146,13 +155,18 @@ cap for the first learning screen, with fixed frozen/actual-initial evaluation;
 record a wall-cap cutoff explicitly. A short weak result does not prove that
 the configuration cannot learn. No broad queue or automatic extension follows.
 
-Image resolution is currently fixed at64 in native preprocessing, replay shapes
-and CNN geometry. Test lower resolutions through that native path when it is
-implemented; do not simulate them with CPU downscale/upscale.48x48 has56.25%
+Native preprocessing, replay shapes and CNN geometry now support32/48/64, with
+`--image-size` selecting fresh learned RGB/CDP geometry and restore retaining
+checkpoint geometry. The default remains64. Do not simulate lower resolution
+with CPU downscale/upscale.48x48 has56.25%
 of the pixels and32x32 has25%, but RSSM and imagined actor/critic work do not
 shrink proportionally. Check small-object visibility and actual learning before
-using lower resolution, especially in ball games. Smaller capacity, shorter
-sequences and fewer updates can be tested without that code change first.
+using lower resolution, especially in ball games. Initial CPU visibility frames
+support testing Boxing at32 and Pong at48; Breakout's tiny ball loses contrast
+at32, so retain64 initially. Bounded native training/frozen smokes pass for
+Boxing1M/RGB32 and Pong4M/RGB48, at578.11 and349.37 aggregate actions/s. They
+verify execution and exact frozen tensors, not learning. The existing64x64
+checkpoint restores unchanged; see the cheap-runtime result report.
 
 ## Runtime and performance
 

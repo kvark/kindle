@@ -9,6 +9,7 @@ Full18 actions, sticky.25 and repeat4 remain unchanged.
 | Allocation | Actions | Emulator frames | Updates | Training wall | Frozen final / initial | Task successes |
 |---|---:|---:|---:|---:|---:|---:|
 | Unassisted |200000|799992|24970|486.58s|0.00 /0.00|0/24|
+| Training action aid |200000|799992|24970|491.09s|0.25 /0.00|0/24|
 
 Training averages411.03 aggregate actions/s, with first update at248 and zero
 debt. It sees one crossing in96 completed episodes; the last50-episode mean is
@@ -32,5 +33,29 @@ Review SHA256`193a56c81d46ef291086abd5a3e5496bdae03ad269f6433ad7d2cec2aead1c83`.
 
 This is one reused development seed, with capacity, sequence geometry and
 replay ratio changed from the earlier12M/T64 work. It neither measures an
-isolated speedup nor establishes five-game reliability. The next short test
-adds the historically used training action aid; see the amended declaration.
+isolated speedup nor establishes five-game reliability. The follow-up adds the
+historically used training action aid; see the amended declaration. Neither
+short configuration passes its frozen learning gate.
+
+## Aided comparison
+
+The only recipe change is5% persistent-uniform16-action blocks during training,
+disabled in frozen evaluation. This fresh run reuses seed1009 after its failed
+unassisted result. All346 actual-initial tensors, full learner config and native
+library match the unassisted run. It finishes in491.09s (8m11s),407.26 aggregate
+actions/s, with zero debt. The aid ledger verifies10048 overridden actions.
+
+Learning improves late:27 crossings occur in96 completed training episodes,
+with three more in partial tails;13 completed episodes have positive returns.
+The last50-episode mean is0.50. Frozen evaluation retains only a small gain:
+mean0.25, six of24 episodes cross once, and0/24 reach the25-crossing task
+milestone. Actual initial remains0.00. Both frozen arms again complete49152
+actions/196600 emulator frames, without truncation or learner updates.
+
+All24970 finite reports, action-aid accounting, checkpoint/counter/config checks,
+exact frozen tensors, full CPU replays/videos and host guards pass. The service
+exits successfully. Artifacts and independently reconciled action/frame/time
+curves: `/x/Temp/kindle-cheap-20261025/freeway-1m-200k-aided`.
+The action aid was selected on a reused development seed. This is a small gain
+at a cheap budget, not consistent crossing behavior or seed reliability. No
+extension is queued; proceed to the separately declared small-image Boxing test.
