@@ -44,3 +44,21 @@ replication or changed recipe. This changes capacity, sequence geometry and
 replay ratio together. It tests whether a cheap configuration is useful, not
 which change caused a speed or score difference. One reused development seed
 does not establish reliability or solve the five-game goal.
+
+## Follow-up: persistent exploration
+
+The unassisted trial is complete: frozen final and initial both score0/24
+crossings after8m07s training; all audits pass. See the result report.
+The follow-up changes only training exploration: probability.05, persistent
+uniform16-action blocks (`persistent-uniform-v1`), disabled in both frozen arms.
+The same seed1009 is selected after seeing its failure, so it is not held out.
+All other config, fresh200k-action budget, caps, actual-initial control and
+24-episode frozen selection remain identical. It is a fresh life, not a warm
+start. No automatic extension or replication is queued.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/freeway-1m-200k-aided`.
+Controller: `run_freeway_200k_aided.py`; service owner:
+`kindle-cheap-freeway-aided200k-20261025`. Native runtime remains unchanged.
+A separate low-priority, two-core CPU build may prepare a future intermediate
+model preset during this allocation; it cannot replace the installed runtime
+until training, frozen checks and replay have all exited.
