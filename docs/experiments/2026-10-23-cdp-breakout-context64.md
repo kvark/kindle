@@ -2,10 +2,14 @@
 
 **Smoke training completes; frozen restore fails on a real GPU fault.**
 [Incident and CPU review](../results/2026-10-23-cdp-context64-gpu-fault.md).
-Freeway replication completes first. Restore fails again after reboot onto
-595.91.07. After recovery, localize construction/checkpoint/query stages before
-another restore; no identical blind retry. Finish and review the restore before launching the learning
-comparison. Backend optimization remains parked.
+Freeway replication completes first. No full2M context run has started.
+The original host repeats PMU halts on595 and615; the latest captured wait is
+initialization buffer fills, before checkpoint loading. On that host, capture
+arguments without submitting after recovery. On a different healthy machine,
+follow the [handover](../handover.md), use bounded initialization/frozen restore,
+and record the new hardware/build identity before the learning comparison.
+Do not reuse historical absolute paths or boot/device assertions unchanged.
+Backend optimization remains parked.
 
 ## Learning hypothesis
 

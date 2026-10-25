@@ -19,29 +19,31 @@ scores, whole-rollout **videos**, world-model reports and next experiments;
 [AGENTS.md](AGENTS.md) for working directions. Swarms follow strong single-actor
 learning and cross-game transfer, not the other way around.
 
-Current priority follows the [strategy reset](docs/strategy_reset_plan.md).
-Phase 2 selects **learned RGB for 2D Atari screening**: three-seed Seaquest final
-online means are 368.0 for RGB, 225.3 for pretrained Tiny and 230.7 for initial Tiny.
-Tiny halves world-training time but takes 18% longer end to end. Pretraining does
-not establish a benefit; these short curves are not frozen competence or a
-general rejection of JEPA. [Decision, costs and limits](docs/results/2026-10-01-frontend-decision.md).
-Next is sparse-reward exploration, then video priors; causal Tiny remains an
-explicit video/3D hypothesis, not a required cost for every 2D experiment.
-Do not repeat unchanged mastery-gate runs. New compact evidence belongs in
-`docs/results/`; the PR remains the live status dashboard.
+Current priority is **centered CDP learning on five Atari games**, using a
+jointly learned RGB CNN and latent prediction instead of pixel reconstruction.
+Training uses eight batched environments and the qualified12M/BF16 runtime.
+Pong and aided Freeway are reliable at intermediate gates; Breakout and Qbert
+remain weaker. Full five-game mastery and a matched CDP/RGB advantage remain open.
 
-[Fused learner results](docs/results/2026-09-27-fused-learner.md): 1.15× faster
-12M synthetic updates, 1.16× short Pong throughput; the 3× target remains unmet.
-The separate [MinAtar screening recipe](docs/screening.md) uses Size1M and a
-jointly learned small-observation encoder, without pretrained weights.
+**Moving to another machine? Read [the handover](docs/handover.md) first.**
+Recent training used an isolated runtime that differs from this historical PR
+branch's normal build. Its source and dependencies are preserved on explicit
+handover branches; checkpoints and evidence are on shared storage.
 
-Historical Freeway training used random-action assistance (probability .5,
-hold 64); frozen evaluation was unassisted. Tiny encoder `7fe9b252` received
-250,000 random-play RGB64 observations from **Boxing, Pong, Freeway, Breakout
-and Qbert** (45k train + 5k validation per game), additional same-title offline
-experience. [Native pretraining source](https://github.com/kvark/kindle/tree/exp/levjepa-tiny-pretrain-20260920).
+Backend optimization is parked. The next learning test is Breakout with longer
+training sequences, after bounded frozen restore on a healthy target. The
+original machine encountered repeated GPU PMU halts during initialization.
+See the roadmap for current evidence and the incident report for what is known.
 
-## Architecture
+Historical Tiny pretraining used250,000 random-play observations from the same
+five Atari games. Historical Freeway aids differ from the current fixed5%/
+16-action-block recipe; these experiences are disclosed in their result reports.
+
+## Architecture and retained controls
+
+The current CDP path uses the learned CNN with centered latent prediction and
+no RGB decoder. The RGB and Tiny paths below remain comparison controls; their
+older default recipes are not the current12M/BF16 training recipe.
 
 The learned-RGB path uses Dreamer's multiscale CNN and posterior pixel decoder.
 The causal-JEPA path instead predicts frozen visual features from the deterministic
