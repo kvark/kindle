@@ -163,3 +163,10 @@ attached. Frozen learning quality remains pending.
 Initial metadata SHA256`c9ce275c8cbdd5f5547476795eeb432b217138e4247ad29d931167ef78f8540a`;
 startup review`ac21617f4a181ef5f9a4a214f04a80eef7185ee4a493445e64bcf79ba009d0ce`;
 selected declaration`93e0680499b79d79c2ebc35f4cc2c5e001b2a68617c606483efa6d44f12cf47d`.
+
+The100k recovery passes24,939 updates, exact357-tensor schema and frozen actor
+copy consistency. Its stable prefix contains103,872 actions/25,905 finite reports;
+102,400-action progress is633.657s/25,539 updates with zero debt. Metadata SHA256
+`bd5f4010bdc08ccdb6338501d86aca753cae00f00139985260729faae1d9ee08`.
+The recovery watcher exits successfully; training/final-result monitoring
+remain active. This is recoverability evidence, not frozen competence.

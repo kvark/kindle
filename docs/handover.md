@@ -178,8 +178,18 @@ with the original864-point two-wall/90%-success gate and complete357-tensor/
 replay/guard audits. No smoke experience is reused. Started17:43:46 UTC/source
 `710fd6d`; startup passes full config except the flag,357 initial tensors matching
 the smoke,346 shared tensors matching the control and248:1/256:2/256:3 updates.
-Recovery monitoring, fixed evaluations and comparison are attached. No cap
-increase, extension, selected checkpoint or automatic next allocation.
+Recovery monitoring, fixed evaluations and comparison are attached. The100k
+recovery passes24,939 updates/all357 tensors; stable103,872-action prefix has
+25,905 finite reports,102,400 progress633.657s and zero debt. Its watcher exits
+successfully; frozen quality remains pending. No cap increase, extension,
+selected checkpoint or automatic next allocation.
+
+An [unselected QbertRGB64 option](results/2026-10-25-cdp-cheap-qbert.md#rgb64-compact-option-cpu-preparation-only)
+is prepared at the original4M/H15/full18 recipe and fixed200k/30-minute budget.
+CPU checks verify the already completed native shape, actual100k recovery,
+control reader and refusal while unselected. Geometry also changes parameters
+and initialization; this does not diagnose RGB48 or establish useful learning.
+No GPU work follows preparation; review active Breakout before choosing next.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,

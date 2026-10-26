@@ -62,6 +62,11 @@ shared control tensors and248:1/256:2/256:3 updates. Owner
 `docs/experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md`. Check live
 state before GPU work. No cap increase, extension or automatic next allocation.
 
+Breakout's100k recovery passes24,939 updates/all357 tensors; watcher exits
+successfully. A Qbert4M/RGB64/H15/full18/200k option is prepared outside Git,
+unselected, using the completed native geometry. See the cheap-Qbert report.
+Review active Breakout's completed outcome before choosing another allocation.
+
 The bounded actor/critic check passes4096/963 in22.474s and1024 frozen actions
 in0.489s, all357 tensors unchanged, all963 initial policy/value losses nonzero,
 changed CNN/reward weights and346 shared initial tensors matching control.

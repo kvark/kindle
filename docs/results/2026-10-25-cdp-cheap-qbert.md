@@ -554,3 +554,48 @@ comparison`2a59a1c630cf619aa282ca2557482c5bde0f129f46f57dae5fd125ad04494262`;
 completion with deviation`b8bf2db1c22919295d368c6ef00619ef7dfc1688109bf23e6e0112c2fe55357d`.
 Launch source`c1e00c2`, native`bfb8c31`, CLI`22bd61b`, replay`e853818`.
 No active or selected next GPU allocation after this review.
+
+## RGB64 compact option: CPU preparation only
+
+After the completed H30, capacity, bonus, action-vocabulary and random-aid
+results, prepare a different compact option:4M/RGB64 with the original H15,
+full18 actions, coefficient1/actor0, Auto/N8/B8/T16/R32 and original rates.
+It remains **unselected** while the Breakout actor/critic learner runs. Its
+completed result must be reviewed before choosing the next GPU allocation.
+
+The saved native/RGB48/RGB64 scene at action256 retains a visible board at both
+sizes; it does not show that RGB48 caused the missing-cube problem. Testing64
+keeps the intermediate4M preset but changes CNN/target geometry, parameters and
+initialization:3,578,225→4,131,729 trainable parameters. Keep own actual-initial
+controls; do not claim matched initial weights versus RGB48 or an isolated
+resolution effect. The old/new kernel/module difference also remains.
+
+The candidate's complete native config equals the already completed full18
+Breakout4M64 configuration. That run passed200k/49,939 updates and frozen checks
+in22m30s; Qbert48 took19m45s. This is existing execution evidence and cross-game
+cost context, not a Qbert timing prediction or learning result. No new native
+build, GPU qualification, agent or game collection is performed for preparation.
+Native max-pooled frames still receive one GPU resize.
+
+If separately selected, keep fresh1009/eval4000001009,200k/49,939 updates,
+6,392,192 sampled positions,95,882,880 imagined actor rows, first248, zero debt
+and30-minute training cap. Retain100k recovery and fixed200k final, fixed
+final/own initial24 natural episodes,600k-action/300-second evaluation caps,
+zero updates/truncations, excess/tails, full346-tensor/replay/guard/coverage
+checks and the original15k/90%-first-pyramid gate. No aid, teacher, RAM policy,
+reward shaping, checkpoint selection, cap increase, extension or automatic run.
+
+CPU preparation passes the completed-control reader, wrong-geometry refusal,
+unselected-launch refusal, manifest pins, native config identity and the actual
+checkpoint schedule. The inherited old Qbert queue saved every200k; the prepared
+queue explicitly saves every100k. An inherited H30 actor-row count and unrelated
+predecessor metadata are corrected before validation; the earlier preparation
+is retained. Active Breakout files remain unchanged.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-4m-64-r32-200k`.
+Feasibility SHA256`841f5a05a2ccd58975e7343930e05ea3fa0d6157f203e87132ae70870eb8cfa0`;
+CPU preparation`88e1990c91b8e28a2a022dddf50ba247e316658cda771b08f9f3e9f876feac70`;
+unselected declaration`bdebd93a10bf72db4359a1a6f7827b3012d1afe80a47556095f2cb6dddbcc0f1`.
+Prepared source`3e97df0`; controller`run_qbert_rgb64_200k.py`, SHA256
+`39f76bc6c8e4524e4fb24f60f93b079a32152d941ea4661bb4a1e99a9fb0540e`;
+queue`89d76a622f02d362d8623fe548846626858651cd362a86844f421871d0cb7ef2`.
