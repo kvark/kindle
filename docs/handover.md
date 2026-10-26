@@ -242,10 +242,19 @@ training overrides15,360 (7.680%);23 completed guided episodes clear a pyramid,
 none of366 unguided episodes does. All audits,100k recovery,346 matched initial
 and unchanged frozen tensors, semantic initial traces, full training pixel/
 action replay and comparison pass; service exits21:30:21 UTC. Retain unaided.
-No extension, confirmation or next GPU allocation selected. The applied
+No extension or confirmation follows capped Qbert. The applied
 640-action option passes444 CPU tests; native unchanged. Use the matching
 `runtime-qbert-guidance-cap` overlay. Prior isolation failures remain recorded.
 See [the completed result](results/2026-10-25-cdp-cheap-qbert.md#capped-guidance-recovers-some-quality-but-remains-below-unaided-training).
+
+Select a bounded Pong actor/critic-rate check after the completed Qbert result:
+4M48/Auto/N8/B16/T16/H15/R32/coefficient.01/actor0/full18, original world/encoder/
+dynamics rates and behavior rate8e-5 only. Keep4096 actions/466 updates, first376,
+zero debt,90-second training cap and1024 frozen actions/60-second cap. All346
+initial/frozen tensors, config/counters, selected parameter changes and both
+host guards are required. CLI passes460 CPU tests; native unchanged. Owner
+`kindle-cheap-pong-behavior-lr2-smoke-20261026`. No full allocation is selected;
+review the bounded result first. See the cheap-Pong report's separate-rate check.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
@@ -253,12 +262,12 @@ New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
 Check live service state before GPU work. Whole-episode and capped Qbert
-guidance, Pong RGB32 and their postprocessing are complete. No GPU allocation
-is currently selected; do not restart completed services.
+guidance, Pong RGB32 and their postprocessing are complete. The bounded Pong
+behavior-rate check is selected above; do not restart completed services.
 
 Current native source`bfb8c31`; the runner now supports optional per-episode
 Qbert guidance limits, SHA256
-`c4da3f76ad33c55190bb4052b4e43dfd461bfaea8ae446f857b13874b96fc02c`.
+`50ba7759d4ff108d724e831d83fda69c9d4f4dce3da660cebf394f995cac98da`.
 Use the `runtime-qbert-guidance-cap` Python overlay; frozen replay remains
 `5043b7a` and the current guidance replay supports both bounded and whole-episode
 kinds. The selected declaration pins exact source hashes. Native SHA256

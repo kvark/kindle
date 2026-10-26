@@ -62,6 +62,16 @@ import profile_atari_vector
     (["--cdp", "--learning-rate", "1e-45"], "CDP learning rates must be finite and positive in F32"),
     (["--restore", "unused", "--learning-rate", "0.00008"], "training overrides"),
     (["--restore", "unused", "--learning-rate=0.00004"], "training overrides"),
+    (["--behavior-learning-rate", "0"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "-0.1"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "nan"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "inf"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "1e300"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "1e-300"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "1e38"], "behavior-learning-rate ratio must be finite and positive in F32"),
+    (["--learning-rate", "1e38", "--behavior-learning-rate", "1e-38"], "behavior-learning-rate ratio must be finite and positive in F32"),
+    (["--restore", "unused", "--behavior-learning-rate", "0.00008"], "training overrides"),
+    (["--restore", "unused", "--behavior-learning-rate=0.00004"], "training overrides"),
     (["--restore", "unused", "--disagreement-scale", "1"], "training overrides"),
     (["--disagreement-scale", "-1"], "finite and non-negative"),
     (["--disagreement-scale", "nan"], "finite and non-negative"),
@@ -182,7 +192,8 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, ba
     (2e-5, 3e-6, 2e-4), (4e-5, 6e-6, 4e-4), (8e-5, 1.2e-5, 8e-4),
 ])
 @pytest.mark.parametrize("cdp", [False, True])
-def test_runner_learning_rate_recipe_before_gpu(monkeypatch, tmp_path, rate, encoder, dynamics, cdp):
+@pytest.mark.parametrize("behavior", [None, 8e-5])
+def test_runner_learning_rate_recipe_before_gpu(monkeypatch, tmp_path, rate, encoder, dynamics, cdp, behavior):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
@@ -192,7 +203,7 @@ def test_runner_learning_rate_recipe_before_gpu(monkeypatch, tmp_path, rate, enc
         assert config["learning_rate"] == rate
         assert config["encoder_learning_rate"] == (encoder if cdp else None)
         assert config["dynamics_learning_rate"] == (dynamics if cdp else None)
-        assert config["behavior_learning_rate"] is None
+        assert config["behavior_learning_rate"] == behavior
         assert config["learning_rate_warmup"] == 1000
         assert config["optimizer_beta1"] == .9 and config["optimizer_beta2"] == .999
         assert config["batch_size"] == config["world_microbatch_size"] == 16
@@ -207,6 +218,7 @@ def test_runner_learning_rate_recipe_before_gpu(monkeypatch, tmp_path, rate, enc
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "rate.jsonl"),
         "--model-size", "4m", "--image-size", "48", "--batch-size", "16", "--batch-length", "16",
         "--world-microbatch-size", "16", "--train-ratio", "32", "--learning-rate", str(rate),
+        *(["--behavior-learning-rate", str(behavior)] if behavior is not None else []),
         *(["--cdp", "--cdp-centered"] if cdp else [])])
     with pytest.raises(RuntimeError, match="learning rates checked before GPU"):
         atari_vector.main()

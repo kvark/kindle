@@ -850,3 +850,40 @@ curve`211bca2a82aa98b715d8597c06429e709bfda1d51be8f3807023bfc3a3976ef4`;
 comparison`2c4857c6dbe07b98d43314df4d5576dd66ce3fa2a7a028d2c09251e1dfb33c0b`;
 completion`7997eb67114b8020b0c77efec86e62575a46de40ba02e7cee658a5f481884f3c`.
 After review, select the prepared fresh Qbert capped-guidance comparison.
+
+
+## Separate actor/critic rate: bounded check
+
+After the completed capped-Qbert comparison remains below its unaided control,
+select a bounded Pong check of **B16 with only the actor/critic learning rate
+raised from4e-5 to8e-5**. B16's completed500k run costs38m45s versus B8's49m55s,
+but scores11.875 versus14.958. Doubling all rates gave9.125. That failed global
+change does not isolate the actor/critic rate; a separate behavior rate tests
+whether the cheaper update cadence can retain more policy learning while keeping
+the world/encoder/dynamics rates fixed. This is a hypothesis, not evidence of
+learning-rate equivalence between batch sizes.
+
+The native runtime already reads `behavior_learning_rate` when configuring the
+behavior optimizer. Add fresh-only `--behavior-learning-rate` to the Python CLI;
+omitting it preserves the native fallback to the base rate. Reject invalid F32
+values/ratios and any restore override before creating environments or output.
+**460 relevant CPU tests pass**, including unchanged base/CDP rates and default
+behavior, explicit forwarding, invalid values and restore refusals. Native
+binary, architecture, optimizer coefficients and learning operations are unchanged.
+The existing `runtime-qbert-guidance-cap` overlay remains compatible.
+
+The selected bounded allocation keeps4M/RGB48/Auto/N8/B16/T16/H15/R32,
+coefficient.01, actor mixture0, full18 actions, disabled actor/critic gradients,
+base4e-5/encoder6e-6/dynamics4e-4, and1009/eval4000001009. Train4096 aggregate
+actions for466 updates (first376, zero debt), with a90-second cap, then restore
+for1024 frozen actions with a60-second cap. Require config/source/counter checks,
+all346 initial tensors matching the B16 control, selected CNN/reward/actor/critic
+weight changes, finite reports/checkpoints, all346 unchanged frozen tensors and
+both host guards. This does not evaluate natural-match competence. No experience
+from this check will be reused in a future fresh run. A full learning allocation
+requires reviewing this bounded result; no automatic next queue follows.
+
+Evidence: `/x/Temp/kindle-cheap-20261025/pong-4m-48-b16-behavior-lr2-smoke`;
+owner`kindle-cheap-pong-behavior-lr2-smoke-20261026`;
+controller`run_pong_behavior_lr2_smoke.py`. CLI validation is retained at
+`/x/Temp/kindle-cheap-20261025/cdp-behavior-rate-cli/validation.json`.

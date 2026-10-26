@@ -95,6 +95,8 @@ def main():
     parser.add_argument("--train-ratio", type=float, default=256)
     parser.add_argument("--learning-rate", type=float, default=0.00004,
                         help="fresh base rate; CDP encoder/dynamics rates scale proportionally from default4e-5")
+    parser.add_argument("--behavior-learning-rate", type=float,
+                        help="fresh actor/critic rate; omitted: native default follows the base rate")
     parser.add_argument("--actor-unimix", type=float, default=0.0,
                         help="native policy uniform mixture in [0,1); fresh default0, restore keeps checkpoint policy")
     parser.add_argument("--report-every", type=int, default=1000)
@@ -132,6 +134,11 @@ def main():
         parser.error("world-microbatch-size must be positive")
     if not positive_f32(args.learning_rate):
         parser.error("learning-rate must be finite and positive in F32")
+    if args.behavior_learning_rate is not None:
+        if not positive_f32(args.behavior_learning_rate):
+            parser.error("behavior-learning-rate must be finite and positive in F32")
+        if not positive_f32(args.behavior_learning_rate / args.learning_rate):
+            parser.error("behavior-learning-rate ratio must be finite and positive in F32")
     if args.imagination_length is not None and args.imagination_length <= 0:
         parser.error("imagination-length must be positive")
     if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
@@ -174,6 +181,7 @@ def main():
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
+    training_options.add("--behavior-learning-rate")
     training_options.add("--cdp")
     training_options.add("--cdp-centered")
     training_options.add("--disagreement-scale")
@@ -279,6 +287,8 @@ def main():
                       learning_rate_warmup=1000, agc=0.3)
         if args.imagination_length is not None:
             config["imagination_length"] = args.imagination_length
+        if args.behavior_learning_rate is not None:
+            config["behavior_learning_rate"] = args.behavior_learning_rate
         if learned_rgb:
             config["observation_kind"] = f"rgb{args.image_size or 64}"
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
