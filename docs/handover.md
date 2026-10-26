@@ -138,7 +138,8 @@ CPU audit. The original service failure at 13:43:51 UTC and incomplete watcher
 receipt are retained; no GPU work repeats. Retain coefficient 1; no extension.
 
 Current allocation: [Pong B16/R40](experiments/2026-10-26-cdp-pong-b16-r40.md),
-selected after reviewing that completed Breakout result. Keep fresh 1009/
+started 13:56:58 UTC/source`647b457` after reviewing that completed Breakout result.
+Keep fresh 1009/
 eval4000001009, 4M/RGB48/Auto/N8/B16/T16/H15, bonus .01, actor0, original rates
 and full18/no aid. Only native replay ratio 32→40 changes versus B16/R32.
 Fixed 500k actions/78,067 updates, first376, 19,985,152 sampled positions and
@@ -148,6 +149,8 @@ matches and original mean15/90%-wins retain full audits/replays/guards. Projecte
 47m38s is not measured speed or quality. Native unchanged; no cap increase,
 resume, extension or automatic next allocation. Check live owner
 `kindle-cheap-pong-b16-r40-intrinsic001-500k-20261026` before GPU work.
+Startup matches all 346 finite initial tensors and the first six R40 updates;
+recovery/evaluation/comparison monitoring is attached. Frozen quality is pending.
 
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

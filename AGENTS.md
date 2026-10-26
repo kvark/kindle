@@ -51,11 +51,12 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Pong4M/RGB48/Auto/N8/B16/T16/H15/R40, selected after the
-completed Breakout smaller-bonus result. Fresh1009/eval4000001009, bonus.01,
+Current allocation: Pong4M/RGB48/Auto/N8/B16/T16/H15/R40, active from13:56:58
+UTC/source`647b457` after the completed Breakout smaller-bonus result. Fresh1009/eval4000001009, bonus.01,
 actor0, original rates, full18/no external aid; only native ratio32→40 changes
 versus B16/R32. Keep500k actions/78,067 updates, first376, four100k recoveries,
-residual credit.25 and55-minute training cap. Fixed final/own initial24-natural
+residual credit.25 and55-minute training cap. Startup matches346 initial tensors
+and first376:1/384:2/392:3/400:4/408:5/408:6 updates. Fixed final/own initial24-natural
 match controls retain mean15/90%-wins and full audits/replays/guards. See
 `docs/experiments/2026-10-26-cdp-pong-b16-r40.md`;
 owner`kindle-cheap-pong-b16-r40-intrinsic001-500k-20261026`. Check live state
