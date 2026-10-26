@@ -28,6 +28,11 @@ and GPU differ, so the2.31× wall-cost comparison does not isolate resolution.
 Qbert's mean first-pyramid coverage improves5.83→16.63 of21 cubes, with a maximum
 of20, but its task gate fails. Neither these results nor short-screen failures
 establish a universal capacity or resolution rule.
+Qbert's [prepared coefficient100 test](experiments/2026-10-26-cdp-qbert-intrinsic-scale.md)
+keeps the200k budget and native model fixed. Its recorded late bonus is0.146% of
+predicted extrinsic reward; stronger scaling is an unproved hypothesis and would
+also dominate early rewards. Review the active Pong and focused Freeway work
+before selecting it; no additional learner has started.
 
 Breakout's smaller model gains modestly, with lower score per action than the
 earlier T64 run but3.07× lower wall cost at the shared196,608-action point. One
