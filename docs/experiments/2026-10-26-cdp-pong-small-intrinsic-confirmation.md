@@ -40,3 +40,14 @@ CPU preparation verifies the complete queue changes only seeds/output paths;
 unselected execution refuses before GPU/log artifacts. Selection pins the
 preceding completed review/comparison and requires its service to be terminal.
 One focused confirmation, not a broad campaign; no automatic next allocation.
+
+Started07:36:01 UTC, source`1ff41da`. Startup passes both full-config comparisons,
+zero starting counters,3,578,225 parameters, all346 finite initial tensors
+matching the same-seed coefficient1 control and updates248:1,256:2,256:3.
+Initial metadata SHA256
+`427af9e6b2308d5aebc1dcc6f9caafad56aac3c4cccd4975e8ae22c942abd2c6`;
+selected declaration`2cc6d4a2fe7113d81960a8b3b38011110e60f01a7afab299f34466099bea48af`.
+Read-only recovery monitoring covers60 minutes; completed-run plotting is
+automated. The first watcher invocation omitted its milestone arguments and
+exited before monitoring; the corrected invocation is live. Training was not
+restarted and its limits did not change. Frozen results remain pending.

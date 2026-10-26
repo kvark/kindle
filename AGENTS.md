@@ -57,9 +57,10 @@ Current allocation: focused Pong intrinsic coefficient .01 confirmation, fixed
 mean15/90%-win gate remain. The primary finishes at14.9583 with24/24 wins:
 promising, but still below15; all audits pass and its service has exited.
 No external aid or native change. See
-`docs/experiments/2026-10-26-cdp-pong-small-intrinsic-confirmation.md`; intended
+`docs/experiments/2026-10-26-cdp-pong-small-intrinsic-confirmation.md`;
 service owner `kindle-cheap-pong-intrinsic001-500k-4013-20261026`. Check live state
-before GPU work. The confirmation is selected; startup and fixed evaluations
+before GPU work. Started07:36:01 UTC, source`1ff41da`; full config/counters,
+matched initial tensors and first updates pass. Fixed evaluations/full audit
 follow. No automatic extension or next allocation.
 The four-action Breakout candidate is prepared only, pending this outcome:
 `docs/experiments/2026-10-26-cdp-breakout-minimal-actions.md`.

@@ -116,8 +116,9 @@ a pass. Training cost is similar. This promising result merits one confirmation.
 Keep4M/RGB48/Auto/N8/B8/T16/H15/R32,3,578,225 parameters,500k actions and55-minute
 cap, no aid; change only learner/evaluation seeds to4013/4000004013. Preserve
 own actual-initial/fixed-final controls and mean15/90%-win gate. Match initial
-tensors against the completed coefficient1 seed4013 control. Selected, with
-startup/fixed evaluations/full audit to follow; no automatic extension or next
+tensors against the completed coefficient1 seed4013 control. Started07:36:01 UTC,
+source`1ff41da`; full config/counters, all346 matched initial tensors and first
+updates pass. Fixed evaluations/full audit follow; no automatic extension or next
 allocation. The seed is reused development data, not held out.
 A [four-action Breakout candidate](experiments/2026-10-26-cdp-breakout-minimal-actions.md)
 is prepared for later review at the original compact H15/200k budget. Existing
