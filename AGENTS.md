@@ -51,16 +51,22 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Selected bounded check: Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32, minimal4,
-coefficient1/actor.01, original rates, fresh1009/eval4000001009, no aid. Only
-actor_critic_gradientfalse→true changes. Keep4096 actions/963 updates/first248,
-300-second training cap and1024-action/60-second frozen restore, zero updates.
-The exact313-test CPU-staged CLI patch is applied; native remains unchanged.
-Verify the expected357-tensor schema, frozen actor copies, full restore
-invariance, finite/nonzero initial policy/value reports and changed world
-weights. Launch pending; owner`kindle-cheap-breakout-acgrads-smoke-20261026`.
-See`docs/experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md`. Check live
-state before GPU work. No full learning life, cap increase or automatic next run.
+Selected fresh Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32 learning test, minimal4,
+coefficient1/actor.01, original rates,1009/eval4000001009, no aid. Only native
+actor_critic_gradientfalse→true changes. Keep200k/49,939 updates/first248,
+100k recovery, zero debt and30-minute training cap. Fixed final/own initial24
+natural episodes retain864-point two-wall/90%-success gate and full audits.
+Launch pending; owner`kindle-cheap-breakout-acgrads-200k-20261026`. See
+`docs/experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md`. Check live
+state before GPU work. No cap increase, extension or automatic next allocation.
+
+The bounded actor/critic check passes4096/963 in22.474s and1024 frozen actions
+in0.489s, all357 tensors unchanged, all963 initial policy/value losses nonzero,
+changed CNN/reward weights and346 shared initial tensors matching control.
+Both guards pass; service exits17:34:23 UTC. The exact313-test CLI patch is
+applied; native unchanged. Full-run recovery/frozen audits use the observed
+357-tensor schema including11 frozen actor copies. This is execution evidence,
+not task competence or gradient correctness.
 
 Pong minimal6 completes500k/124,939 updates in44m21s,11.17% less training time,
 but frozen10.375 is below full18's14.958; both24/24 wins and below mean15. All
@@ -113,8 +119,8 @@ but frozen11.875 is below14.958; both24/24 wins and below mean15. All audits and
 comparison pass; service exits10:28:51 UTC. No extension or confirmation.
 Qbert500k/R16 remains weaker than its200k/R32 control, with0/24 pyramids.
 
-Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, CPU replay `5043b7a`; runner now permits opt-in CDP
-actor/critic gradients on top of`22bd61b` (SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`). The active declaration pins exact runtime/script
+Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, CPU replay `5043b7a`; runner`fbdaee3` permits opt-in CDP
+actor/critic gradients (SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`). The active declaration pins exact runtime/script
 hashes; the handover locates the build receipt. Native 32/48/64 geometry and the
 intermediate 4M preset pass bounded training/frozen checks, including 64 restore.
 The CLI exposes imagination length for fresh runs; defaults retain 15 and

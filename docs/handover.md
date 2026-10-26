@@ -162,25 +162,31 @@ four recoveries and curves/comparison pass; service exits17:28:27 UTC. Dimension
 and initial weights differ, and the control used the older kernel. Retain
 full18; no extension or conditional4013 confirmation is selected.
 
-After this completed review, select only the [bounded Breakout actor/critic
-check](experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md). The exact
-313-test CPU-staged CLI patch is applied; native remains unchanged. Fresh
-4M64/Auto/N8/B8/T16/H15/R32, minimal4/coefficient1/actor.01, original rates/no aid;
-only actor_critic_gradient changes. Keep4096 actions/963 updates/300 seconds,
-then1024 frozen actions/zero updates/60 seconds. Verify the expected357 tensors,
-frozen actor copies and complete restore invariance. Launch pending; no full
-learning life, cap increase, extension or automatic next allocation.
+The [bounded Breakout actor/critic check](experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md)
+passes4096 actions/963 updates in22.474s and1024 frozen actions in0.489s. All357
+tensors preserve frozen invariance; all963 initial policy/value loss reports
+are nonzero, CNN/reward weights change and346 shared initial tensors match the
+control. Both guards pass; service exits17:34:23 UTC. This verifies execution,
+not useful task learning or gradient correctness. Native unchanged; the exact
+313-test CLI patch is applied as runner`fbdaee3`.
+
+After this review, select a separate fresh200k/49,939-update learning life,
+4M64/Auto/N8/B8/T16/H15/R32, minimal4/coefficient1/actor.01, original rates/no aid.
+Only actor_critic_gradient changes versus the control. Keep100k recovery,
+30-minute cap and fixed final/actual-initial24-natural-episode evaluations,
+with the original864-point two-wall/90%-success gate and complete357-tensor/
+replay/guard audits. No smoke experience is reused. Launch pending; no cap
+increase, extension, selected checkpoint or automatic next allocation.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
-Check live service state before GPU work; selected bounded-check owner
-`kindle-cheap-breakout-acgrads-smoke-20261026`.
+Check live service state before GPU work; selected learning owner
+`kindle-cheap-breakout-acgrads-200k-20261026`.
 
-Current native source`bfb8c31`; runner adds opt-in CDP actor/critic gradients
-to`22bd61b`, SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`. Native SHA256
+Current native source`bfb8c31`; runner`fbdaee3` adds opt-in CDP actor/critic gradients, SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`. Native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
 `original-native` preserves the prior AMD binary. Both installed and source-tree

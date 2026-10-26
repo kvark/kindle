@@ -1,12 +1,14 @@
-# Breakout actor/critic gradients: bounded check
+# Breakout actor/critic gradients
 
-**Bounded GPU check selected after completed Pong review; launch pending.**
-Six-action Pong saves11.17% training time but lowers frozen14.958→10.375,
-both24/24 wins and below mean15. Its complete audits/comparison pass and service
-exits17:28:27 UTC. Retain full18; no conditional4013 confirmation. The exact
-CPU-tested CLI patch is now applied, with no native change. Select only the
-4096-action/300-second training check and1024-action/60-second frozen restore.
-No full learning life or automatic next allocation is selected.
+**Bounded check passes; fresh200k learning test selected, launch pending.**
+The smoke completes4096 actions/963 updates in22.474s, with357 finite tensors,
+nonzero initial policy/value losses, changed encoder/reward weights and exact
+1024-action frozen restore. After reviewing this execution evidence, select a
+separate fresh200k/49,939-update life with a30-minute training cap and the fixed
+final/actual-initial24-natural-episode protocol. No validation experience is
+reused. Useful learning remains unmeasured; no extension or automatic next run.
+
+## Preparation before GPU execution
 
 The compact four-action Breakout control scores9.542 at200k actions in20m59s,
 with0/24 two-wall successes. Shorter imagination and smaller intrinsic reward
@@ -98,3 +100,55 @@ The bounded selection retains all prepared actions, updates, caps and357-tensor
 requirements. Owner`kindle-cheap-breakout-acgrads-smoke-20261026`; its launch
 receipt will record the exact source and selected declaration. No existing
 checkpoint is reused for learning, and this is not a task-competence test.
+
+## Completed bounded check
+
+Started17:33:54 UTC/source`fbdaee3`, service exits17:34:23 after29.221s total wall.
+Training uses4096 actions/16,349 emulator frames/963 updates in22.474s; frozen
+restore uses1024 actions/4,093 frames in0.489s with zero updates. Both guards,
+full configuration/counters and all357 finite tensor schemas pass. Frozen
+exports preserve every tensor exactly; all11 world actor copies equal behavior
+weights. Trainable parameters remain4,120,963. All346 shared initial tensors
+match the four-action control; actual initial and final checkpoints are retained.
+CNN0 changes1200 weight elements and the first reward layer changes163,840.
+All963 reports have nonzero initial policy and value losses. These checks do not
+prove gradient correctness or useful task learning.
+
+Smoke review SHA256`41791dc3d7c3206842dcf24bf164104240af8e16861fbd7452059ae1d9ca94a2`;
+terminal review`7acc1880e499d28f6d57d28eee279464555ba759d4ba0d96bfe0328aed181022`;
+selected declaration`3f1159d1e3b1ef681d7bee241f311277e1678b4e9b5d29884b070f38ab2a0faa`.
+
+## Fresh200k learning test
+
+Fresh1009/eval4000001009, centered CDP4M/RGB64/Auto/N8/B8/T16/H15/R32,
+microbatch8/replay100k, minimal4, coefficient1/actor.01, original rates and no
+aid. Only actor_critic_gradientfalse→true changes versus the9.542 four-action
+control. Native frames receive one GPU resize; no RAM policy or reward shaping.
+Keep200k aggregate actions/49,939 updates/6,392,192 sampled positions, first248,
+zero debt,100k recovery and fixed200k final, with1800-second training cap.
+Frozen final/actual-initial each select the first three natural episodes per
+lane,24 total, with600k-action/300-second caps, zero updates/truncations, excess/tails
+retained and full CPU replay/video. Keep the864-point two-wall/90%-success gate.
+
+The357-tensor checkpoint helper is checked against all actual smoke exports,
+including frozen actor copies, exact restore invariance and346 shared initial
+tensors. The full run verifies all357 initial tensors against the fresh smoke
+initial,346 shared tensors against the control, complete numeric reports and
+full frozen invariance. Its100k recovery watcher uses the same exact schema;
+existing346-tensor helpers remain unchanged. CPU preparation validates the
+completed control reader, wrong-flag refusal, queue differences, actual100k
+checkpoint schedule, all caps, manifest pins and unselected-launch refusal.
+Same GPU/Mesa/native, changed kernel/module versus the control; no isolated
+attribution or broad seed reliability. No cap increase, selected checkpoint,
+warm start, extension or automatic next allocation.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/breakout-4m-64-r32-minimal-acgrads-200k`;
+owner`kindle-cheap-breakout-acgrads-200k-20261026`.
+Controller`run_breakout_actor_critic_200k.py`, SHA256
+`a3f0ca768aeeb7fe9cee7907f89ae9fb3b8f48aa58e369d429b98022ece93cb3`;
+queue`d19adf14a80c4bc2f84d2e1462a4faf15b897e39bae8c5f224a118eb3497e400`;
+CPU preparation`9a914b0ecc28cabd861a0110807889d820aeed4d4c190363be1b04677924587b`.
+Native`bfb8c31`, runner`fbdaee3`/SHA256
+`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`,
+CPU replay`5043b7a`. The declaration pins the schema/helper/watcher/comparison
+and postprocessor; the launch receipt records the final source revision.
