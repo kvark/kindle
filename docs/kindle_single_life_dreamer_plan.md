@@ -42,6 +42,9 @@ Compact aided Freeway now passes in28m17s:31.0417 versus actual initial0.00,
 same-protocol CPU always-UP reference scores21.6667,0/24. Resolution, ratio,
 budget and native runtime differ from the short screen; no isolated attribution.
 This useful recipe still needs focused seed confirmation.
+One [fixed-recipe seed4013 confirmation](experiments/2026-10-26-cdp-compact-freeway-confirmation.md)
+is prepared, with the same500k actions and30-minute cap. Review Pong before
+selecting the next allocation; it has not started and is not an automatic queue.
 
 **Current allocation:** [Pong update-budget test](experiments/2026-10-26-cdp-cheap-pong-update-budget.md).
 Fresh1009/4M/RGB48/Auto/B8/T16/R32,500k actions/124939 expected updates, no aid,
@@ -92,7 +95,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | --- | --- | --- |
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
 | Pong | Three500k seeds mean15.71;72/72 wins | Reference20.45;2M on1009 only improves16.75→16.92 |
-| Freeway | Fixed aided500k seeds32.67/30.67/32.96;mean32.10;72/72 crossing successes | Reference33.40; selected/reused development seeds |
+| Freeway | AMD1M/RGB32/R32/aided500k:31.04,24/24 successes in28m17s; historical aided cohort32.10,72/72 | Reference33.40; compact recipe needs seed confirmation |
 | Breakout | Retained B8/T16:500k58.83→2M98.21; AMD B2/T64:14.71→10.04;initial1.42 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | Historical2M mean7,367;62/72 first pyramids | Reference193,220.77; intermediate15k/90% also unmet |
 
