@@ -75,3 +75,10 @@ Frozen-control review SHA256
 `2e0b341a19e7e028bfae855dc795158a23a71800f53e98bd4b83b1e967552eb2`.
 Native source`bfb8c31`, runner`bcef410`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
+
+A later [CPU checkpoint comparison](2026-10-25-cdp-cheap-qbert.md#completed-compact-encoders-do-update)
+finds all55,808 CNN parameter elements changed from this life's own initial,
+with nonzero final optimizer moments throughout. The first reward projection
+also changes all163,840 elements. This excludes wholly unchanged encoder tensors
+in this completed run; it does not establish useful features or diagnose the
+remaining Breakout failure. No new GPU work or checkpoint mutation occurs.

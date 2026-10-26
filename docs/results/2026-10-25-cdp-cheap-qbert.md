@@ -221,3 +221,28 @@ before GPU artifacts while unselected. Its R16 recovery checker passes against
 an actual completed R16 log/checkpoint and rejects invalid counters. It remains
 an option pending review of the active Pong confirmation; no GPU launch or
 automatic queue follows from this preparation.
+
+## Completed compact encoders do update
+
+A bounded CPU checkpoint comparison checks the full18 Qbert200k control and
+the Breakout4M/RGB64/H15/mixture.01/200k control, both using Auto precision and
+49,939 updates. Each own-initial/final pair changes all55,808 elements across
+the12 CNN parameter tensors (four kernels, biases and normalization weights).
+Every corresponding final first/second optimizer moment is nonzero. The first
+reward projection also changes all163,840 elements, with nonzero moments.
+
+This rules out wholly unchanged CNN tensors in these two completed runs. It
+does not establish useful visual features, correct derivative scale or a cause
+of failed task gates. Relative RMS kernel changes are2.57–7.50% for Breakout
+and2.69–7.94% for Qbert; those magnitudes do not establish an optimal learning
+rate. Raw derivatives and counterfactual learning remain unmeasured.
+
+The0.16-second analysis constructs no agent, performs no GPU work and leaves
+all source checkpoint files unchanged. It retains complete per-tensor counts,
+RMS values, shapes, review identities and source hashes in
+`/x/Temp/kindle-cheap-20261025/compact-encoder-update-review.json`, SHA256
+`8d98e37a8e7341e51fda839174f4972d7c6127b6c5e8eb32ccb38905cfa2dae1`.
+Script:`review_compact_encoder_updates.py` in the same root. An initial CPU
+attempt expected a top-level initial-checkpoint field absent from the older
+Qbert review; using its existing evaluated-source checkpoint identity completes
+the analysis. The correction receipt is retained; no experiment is repeated.
