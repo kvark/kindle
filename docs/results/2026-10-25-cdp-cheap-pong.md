@@ -798,3 +798,12 @@ updates. Four recovery audits, progress observation and final CPU postprocessing
 are attached. Full-budget cost and frozen quality remain pending.
 Selected declaration SHA256 `d5ef6bcf9c03a7f52ecc3cf76213c8e1509a6f5ae9067c1b448faa5789051f57`;
 startup `dc7413938c9ce06c67b103ad404197fedb8cf2599bf9f3533822e98b29e45285`.
+
+
+The100k recovery passes24,939 updates and all346 finite tensors. Its complete
+105,552-action log prefix has26,325 finite reports;102,400 progress is518.986s,
+25,539 updates and zero debt. The same process continues. During training, a
+separate purported CPU Qbert fixture accidentally executes13.690s of zero-update
+inference on the integrated AMD GPU. It exits; the original failure/correction
+are retained in the cheap-Qbert report. This adds a co-host timing caveat;
+there is no RX7900XT restart or training-cap change.

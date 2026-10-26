@@ -70,6 +70,16 @@ experience reused. Owner`kindle-cheap-pong-rgb32-intrinsic001-500k-20261026`,
 active from20:18:26 UTC/source`ebcd406`. Startup matches346 bounded32 initial
 tensors and248:1/256:2/256:3 updates; monitoring attached.
 No cap increase, extension, selected earlier checkpoint or automatic next run.
+
+Qbert's optional640-action guidance limit is staged, not applied:444 CPU tests
+and explicitly verified CPU-stub Atari/replay checks pass. The completed5% run
+spends11,756 of23,428 overrides on NOOP after its first pyramid. A640-action cap
+covers all23 recorded successful prefixes; later transfer is unmeasured.
+Initial integration attempts used native integrated-GPU inference despite a
+CPU-stub label, due to lazy exports; both current failure and historical
+correction are retained in the cheap-Qbert report. Zero learning updates;
+active Pong runtime/PID unchanged. No next GPU allocation selected.
+
 See [the declaration](docs/results/2026-10-25-cdp-cheap-pong.md#fresh-rgb32-learning-comparison).
 
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions

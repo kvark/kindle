@@ -706,11 +706,13 @@ learning remains unchanged; native guidance integration and unaided transfer are
 The optional episode-guidance adapter is now staged outside the active source
 and runtime.420 CPU tests pass. Its formatted policy reproduces all29,552
 reference actions, pixel hashes and outcomes exactly in29.391s. A separate
-real-Atari integration uses a CPU stub that returns NOOP outside guided episodes:
-16,384 actions/40 natural episodes,3,032 guided overrides, collection15.969s and
-complete training-action/pixel replay7.268s. No native agent or learning occurs.
-The5% per-episode probability gives18.506% of actions in this fixture; this is
-not a prediction for the learner. Report actual action share in every trial.
+real-Atari integration was originally labelled a CPU stub, but the later
+isolation audit below corrects that claim: lazy imports replaced the stub with
+native inference on the integrated AMD GPU. It completes16,384 actions/40 natural
+episodes with3,032 overrides, collection15.969s and complete CPU replay7.268s,
+with zero learner updates. It is not CPU-only collection or a trained policy.
+The5% episode probability gives18.506% of actions in that trajectory; this is
+not a prediction for the learner. Original artifacts and the correction remain.
 
 The adapter draws independently per lane at episode start, preserves selected
 episodes until their natural boundary or timeout, and resets only that lane's
@@ -759,8 +761,8 @@ restore, not useful unaided learning or a stable guidance action fraction.
 
 The original service fails19:40:14 UTC in the subsequent CPU audit. The new
 `replay_qbert_guidance.py` reused a frozen-oriented reader that rejects nonzero
-intrinsic rewards during training; the earlier CPU stub used zero intrinsic
-reward and missed this case. Correct the new replay command to read completed
+intrinsic rewards during training; the earlier integration disabled the
+disagreement bonus and had zero intrinsic reward, missing this case. Correct the new replay command to read completed
 training logs through the vector accounting audit.421 CPU tests pass, including
 that regression. The saved4096-action trajectory then reproduces every action,
 reward, boundary and guided input-frame hash, with512 verified overrides.
@@ -853,3 +855,70 @@ guidance replay `f78ae6ab75e37768ecfb34fb0f88841d2700859f0a47a3c3f51a668cd7c7143
 comparison `802ffc6bdf5a30146ed464c724a05fdeb79e53866e7cf83a992253cb65f9b656`;
 completion `583b2d4cc4f65c36a7b64c3263753589d75d9b4981205021c7473c309e0b1461`.
 After review, select only the separately prepared bounded Pong RGB32 check.
+
+
+## Guidance exposure motivates an optional action limit
+
+The completed 5% episode-guided run contains 23 guided natural episodes, all
+clearing the first pyramid, and 355 unguided episodes, none clearing it. Guided
+mean return is3709.783; unguided mean364.296. The last50 unguided episodes average
+605.0, below the unaided control's677.5. The displayed aided last50 mean786.5
+includes three teacher successes; it is not the learner's unaided performance.
+These are post-hoc training groups with different trajectories, not frozen or
+independent policy comparisons.
+
+Of23,428 overrides,11,672 occur through the first-pyramid milestone and **11,756
+are NOOP after it**, continuing until death. This identifies wasted guidance,
+not the cause of the frozen regression. The latest observed first pyramid is
+at2439 emulator frames. A640-action limit (2560 frames) would preserve all23
+recorded successful prefixes, cap their overrides at14,720 and reduce their
+post-milestone overrides to3048. Later learner-controlled trajectories are
+unmeasured. The limit is selected from existing development evidence, not a
+held-out evaluation; no RAM/task signal enters the policy or its release rule.
+Exposure review SHA256 `a6a98db77593e95431ffaa611238cd0db6c5b14b0511022452d9862a6531827a`.
+
+An optional fresh-only `--qbert-guidance-max-actions` is staged outside the
+active source/runtime. The whole-episode default is preserved; the new bounded
+kind releases each selected lane after the declared number of actions, without
+a new selection draw, and resets the allowance only at that lane's next episode.
+Released frames are not read by the teacher, native policy actions are used,
+and ordinary observation/learning continues. Accounting rejects early/late
+release and hashes after release; replay retains the episode's original guided
+label even when the teacher stopped before the natural boundary.
+
+**444 CPU tests pass.** A corrected real-Atari integration explicitly verifies
+CPU-stub device/provenance/zero parameters before accepting its result. It
+collects16,384 actions/48 natural episodes in6.382s with2560 overrides and zero
+updates.137 actions after guidance release execute the stub's UP choice.
+Complete pixel/action/reward/boundary replay passes in6.797s; this is adapter
+validation, not learned or native execution evidence. The original PixelPolicy
+and connected-components ASTs are unchanged; the patch applies cleanly.
+Source and active runtime remain untouched during Pong; no next GPU allocation
+is selected. Stage:`/x/Temp/kindle-cheap-20261025/qbert-guidance-cap-adapter`.
+Validation SHA256 `1f2e843a50036b2367ebe4bc7f4c4a933507ddeda0a89941f39af404c501fdb0`;
+verified CPU review `ae33a53613a04c77ee7c7cd0c2ac2e5511316cc1ff43c370f7a616059620f785`.
+
+### Integration isolation correction
+
+The first new integration attempt accidentally instantiates native inference on
+AMD Ryzen5 9600X/RADV RAPHAEL_MENDOCINO, the integrated device. Accessing lazy
+`kindle.default_config` overwrites a directly assigned `VectorAgent` stub. The
+attempt completes16,384 actions/65,480 frames in13.690s with **zero updates**;
+full CPU pixel/action replay passes, but the added released-action assertion
+fails. Its artifacts are retained as a failed CPU-isolation attempt, not counted
+as CPU-only validation or a selected GPU experiment. The RX7900XT Pong process
+keeps the same PID/invocation; no restart, cap change, driver reset or native
+rebuild occurs. This unplanned co-host activity is an additional timing caveat.
+
+Inspection of the original whole-episode integration finds the same error:
+its observed header names the integrated GPU and2,697,457 native parameters,
+contradicting the review's hard-coded `native_agent_constructed=False`. Original
+review/logs remain unchanged; `qbert-pixel-guidance-adapter/cpu-integration/
+isolation-correction.json` records the correction, SHA256
+`066d56c7acd906b04b8ff429656c42f079454eb63ddc54eb4c552534930630f7`.
+The separately guarded RX7900XT training/frozen reviews remain valid. The second
+new harness revision fails on a default-config argument before any environment;
+the third uses a fixed adapter-facing API object and verifies observed stub
+identity. Both failed scripts/logs remain beside the successful CPU result.
+First-new failure review SHA256
+`8a06389ba2a76dfb4b41430a8beafb6f9d3a886aa085bdf6a0f93f9c6d27ce17`.
