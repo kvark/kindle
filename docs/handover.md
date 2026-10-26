@@ -191,6 +191,11 @@ matching the completed4M64 native shape and248:1/256:2/256:3 updates. Recovery,
 fixed evaluations, CPU replay/coverage/comparison monitoring are attached.
 No cap increase, extension or automatic next allocation.
 
+A [Pong greedy-action assessment](results/2026-10-25-cdp-cheap-pong.md#entropy-review-and-unselected-greedy-action-assessment)
+is CPU-prepared but unselected. It would evaluate retained final/own initial
+weights with zero learning, preserving the original sampled failure and training
+cost. Entropy-log analysis gives no causal diagnosis. Review Qbert before selection.
+
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.

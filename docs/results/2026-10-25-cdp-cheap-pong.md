@@ -583,3 +583,42 @@ Launch source`5043b7a`, native`bfb8c31`, CLI`22bd61b`, replay`5043b7a`.
 After this completed review, select only the separately declared bounded
 Breakout actor/critic-gradient execution/restore check; no full learning life
 follows automatically.
+
+
+## Entropy review and unselected greedy-action assessment
+
+A2.98-second CPU review of the last20% of completed learner updates finds mean
+imagined policy entropy1.295/0.977 for the two B8 coefficient.01 seeds and1.203
+for B16 seed1009. Entropy coefficient times weighted entropy divided by weighted
+absolute normalized advantage is0.00849/0.00714/0.00839. These are descriptive
+minibatch values, not raw gradient norms or live frozen-action probabilities.
+Redundant full18 action labels also limit interpretation. This does not establish
+that entropy regularization causes the missed mean15 gate; no entropy-rate
+training change is selected from this evidence.
+
+Prepare an alternative that requires no training: assess the fixed retained
+B8/4M/RGB48/coefficient.01 seed1009 final policy and its own actual initial
+weights using native `--greedy`. It remains **unselected while QbertRGB64 runs**.
+This changes evaluation policy; preserve the original sampled14.958/−20.375
+result and its failed mean15 gate. A greedy result cannot relabel that failure.
+The existing native argmax path needs no code change, rebuild or qualification.
+
+If selected after Qbert outcome review, retain full18/sticky.25/repeat4/native
+frames/one GPU48 resize, eval4000001009, N8, first3 natural matches per lane,
+24 per arm,600k-action/300-second caps, zero updates/truncations, excess/tails,
+all346 unchanged tensors and complete CPU replay/video/guard audits. Keep
+mean15/90%-wins. The original500k/124,939-update training cost remains49m55s;
+this adds only frozen assessment. One reused development seed; no checkpoint
+selection, extension, automatic confirmation or claim of isolated causality
+versus the older-kernel sampled control.
+
+CPU preparation verifies both source checkpoints, exact sampled score/criteria
+recomputation, frozen-only commands, source/runtime/ROM pins and refusal while
+unselected. Pong's natural-score keys replace task-score keys before validation;
+the earlier preparation is retained. Active Qbert scripts/pins remain unchanged.
+Entropy review:`/x/Temp/kindle-cheap-20261025/pong-entropy-review.json`, SHA256
+`d0bebc8c428ba1f690b2b4a9ea5d415de3bd29b1668b5623a88cea360d3cd154`.
+Candidate:`/x/Temp/kindle-cheap-20261025/pong-4m-48-intrinsic001-500k-greedy-frozen`;
+preparation`18f6fd69bedcfe82cca8c1a4c7bb2152e68d04db853402255f50314610502b7b`;
+unselected declaration`52edc14fd1930f83e68116be965aebe9ad8cd5595d07bbc3a8e3079c9888c44b`;
+controller`adf1206b9339e26b9467c65974c52a9f187a535a8f8acee58e052577a2b7b501`.

@@ -60,6 +60,10 @@ Started18:16:53 UTC/source`093e5c6`; all346 initial tensors match the completed
 4M64 native shape, first248:1/256:2/256:3 updates. Recovery/evaluation/analysis
 monitoring attached. Owner`kindle-cheap-qbert-rgb64-200k-20261026`; cheap-Qbert report. Check live state before GPU work. No extension or automatic next run.
 
+A frozen-only Pong greedy-action option is CPU-prepared but unselected; see the
+cheap-Pong report. It reuses final/own initial weights, preserves sampled-policy
+failure and training cost, and changes no learner. Review Qbert before choosing.
+
 Breakout actor/critic gradients finish200k/49,939 updates in20m41s, frozen11.208
 versus9.542, both0/24 two-wall successes. All357-tensor/recovery/replay/guard
 checks and matched shared initial weights/traces pass; main service exits
