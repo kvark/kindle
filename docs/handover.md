@@ -267,6 +267,15 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
+A fresh Qbert expert-imitation comparison is selected:200k actions/49,939
+updates within25minutes,4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
+original rates, fresh1009/eval4000001009. Keep5% episode guidance/cap640; add
+expert scale1/NOOPweight.05. Fixed final/actual-initial24-natural assessments
+have no aid;100k recovery/full audits/replays/guards/comparison remain required.
+Owner`kindle-expert-qbert-cap640-200k-20261026`, isolated79c9a7f runtime. No
+smoke experience reuse, cap increase, extension or automatic next allocation.
+See [selected protocol](experiments/2026-10-26-cdp-qbert-expert-imitation.md). Check live state before GPU work.
+
 Optional native expert imitation passes127 Rust CPU tests/strict Clippy,
 477 packaged Python tests/binding Clippy, analytic GPU gradients and an actor-
 only supervised update. Fresh Qbert4096 actions/16,378 frames/963 updates take
@@ -276,7 +285,8 @@ pixel replay/guards pass. Service exits22:49:20; strengthened actor-only check
 exits22:51:05 UTC. Native`79c9a7f`, isolated runtime
 `/x/Temp/kindle-expert-20261026/runtime`; original native retained. Scale1,
 NOOPweight.05,5% episode guidance/cap640; no natural-episode competence measured.
-No GPU allocation is active or queued. Build cache released after packaging.
+Build cache released after packaging. The bounded checks are complete; the
+separately selected full comparison is described below.
 See [bounded result](results/2026-10-25-cdp-cheap-qbert.md#native-expert-imitation-smoke-passes-task-benefit-remains-unmeasured).
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
