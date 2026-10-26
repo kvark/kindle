@@ -88,13 +88,16 @@ All audits/curves pass and service exits. No extension. A separate
 [CPU Breakout pixel follower](results/2026-10-26-cdp-breakout-pixel-reference.md)
 also fails at11.333 and0/24 two-wall successes; full replay passes, no training aid.
 
-**Selected next allocation:** [fresh compact Breakout H5/500k](experiments/2026-10-26-cdp-breakout-compact-h5-budget.md).
+**Current allocation:** [fresh compact Breakout H5/500k](experiments/2026-10-26-cdp-breakout-compact-h5-budget.md).
 Keep4M/RGB64/Auto/N8/B8/T16/R32 and native mixture.01; shorten imagined rollouts
 H15→5 while increasing experience200k→500k under a fixed45-minute training cap.
 The earlier12M H5 warm start regressed, so this is a new combined compute/budget
 recipe, not an established horizon improvement or warm continuation. Own actual
 initial/fixed final controls and all existing gates remain. No pixel reference,
-RAM or external action aid enters learning. Startup follows; no automatic extension.
+RAM or external action aid enters learning. Started05:41:58 UTC, source`8910efe`;
+full config/counters, finite initial weights matching all346 control tensors and
+first updates pass.4,131,729 parameters. Fixed evaluations/full audit follow;
+no automatic extension.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

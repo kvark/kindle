@@ -52,7 +52,18 @@ pass and its service exits. The separate CPU Breakout pixel follower scores
 guidance. Both negative results are retained.
 
 Artifacts: `/x/Temp/kindle-cheap-20261025/breakout-4m-64-h5-r32-unimix001-500k`.
-Controller: `run_breakout_compact_h5_500k.py`; intended service:
+Controller: `run_breakout_compact_h5_500k.py`; service:
 `kindle-cheap-breakout-h5-unimix-500k-20261026`. Exact commands, caps and control
 hashes are declared. CPU preparation verifies the command changes are only H5,
-training budget/cap and artifact paths. Startup and learning results follow.
+training budget/cap and artifact paths.
+
+Started05:41:58 UTC, source`8910efe`. Startup confirms complete native config
+changes only H15→5,4,131,729 parameters, zero starting counters, no external aid,
+finite346-tensor initial checkpoint matching the control exactly, and first
+updates248:1,256:2,256:3. Initial metadata SHA256
+`7f95379c05f7caff754f9f34040308fae47084b51e4f75eb457f2fbf19538c61`.
+Selected declaration SHA256
+`057296c3ef2466cae098bad796bb17443aded4304a39c85cb8ee463762a3e9f6`.
+Recovery-checkpoint audits and completed-run plotting are monitored automatically.
+Fixed final/own initial evaluations and full audit remain pending; finite startup
+does not establish a learning gain.
