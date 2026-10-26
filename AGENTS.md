@@ -51,12 +51,13 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Pong4M/RGB48/B8/T16/H5/R32, selected after completed Qbert
-aided evaluation/comparison. Fresh1009/eval4000001009, Auto/N8, coefficient.01,
+Current allocation: Pong4M/RGB48/B8/T16/H5/R32, active from12:38:15 UTC/source
+`36500e7` after completed Qbert aided evaluation/comparison. Fresh1009/eval4000001009, Auto/N8, coefficient.01,
 actor_unimix0, full18, original rates and no aid. Fixed500k actions/124,939 updates,
 first248, four100k recoveries and45-minute training cap. Only imagined rollout
 length15→5 changes versus the B8 H15 control; preserve replay/update cadence and
-match346 initial tensors. Fixed final/initial24-natural-match evaluations retain
+match346 initial tensors (startup passes, including first248:1/256:2/256:3).
+Fixed final/initial24-natural-match evaluations retain
 mean15/90%-wins and full numerical/config/counter/tensor/replay/guard audits.
 See`docs/experiments/2026-10-26-cdp-pong-short-imagination.md`; owner
 `kindle-cheap-pong-h5-intrinsic001-500k-20261026`. Check live state before GPU work.

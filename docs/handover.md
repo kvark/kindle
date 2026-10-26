@@ -125,13 +125,14 @@ All audits and completed comparison pass; service exits12:24:16 UTC. Retain the
 unaided recipe; no extension or confirmation selected.
 
 Current allocation: [Pong with H5 imagined rollouts](experiments/2026-10-26-cdp-pong-short-imagination.md),
-selected after that completed result. Fresh1009/eval4000001009,4M/RGB48/Auto/N8/
+started12:38:15 UTC/source`36500e7` after that completed result.
+Fresh1009/eval4000001009,4M/RGB48/Auto/N8/
 B8/T16/H5/R32, coefficient.01, actor_unimix0, full18, original rates and no aid.
 Keep500k actions/124,939 updates, first248, four100k recovery checks and a45-minute
 training cap. Only imagination_length15→5 changes versus the completed B8 H15
 control; replay/cadence/sampled positions stay fixed, while imagined actor/critic
-rollouts and value bootstrapping differ. Own actual initial must match346 control
-tensors. Fixed final/initial24-natural-match controls retain mean15/90%-wins and
+rollouts and value bootstrapping differ. Startup verifies all346 matching initial
+tensors, full config exceptH5 and first248:1/256:2/256:3 numeric reports. Fixed final/initial24-natural-match controls retain mean15/90%-wins and
 complete numerical/config/counter/tensor/replay/guard audits. Native unchanged.
 Owner`kindle-cheap-pong-h5-intrinsic001-500k-20261026`; check live state before
 GPU work. No cap increase, resume, extension or automatic next allocation.

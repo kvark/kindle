@@ -50,3 +50,21 @@ Compilation, complete queue normalization and unselected refusal pass. The
 completed-run reader validates the H15 control; comparison/curve automation is
 prepared, with no process started from preparation. Comparison SHA256
 `8381b57cd2996c5ac2cb72381b2cb63795927c35bc9c7b3bf223a1ef32915251`.
+
+## Started on AMD
+
+Started October26 at12:38:15 UTC, source`36500e7f969b86bb8e55b8fb2cc76e00114198b8`,
+owner`kindle-cheap-pong-h5-intrinsic001-500k-20261026`, invocation
+`2d611a7c16e94d1d92c382b33a4f1288`. Selection verifies the completed Qbert review,
+postprocessing/comparison, terminal service, clean pushed source, host identity
+and exact runtime/controller/queue hashes. Selected declaration SHA256
+`538252e5e19818cfd4f24c8a60be4b5767a427a73e6931167314d6f7757bcb97`.
+
+Startup passes full native config equality exceptH15→5,3,578,225 parameters,
+fresh1009/no aid, all346 finite initial tensors matching the H15 control, and
+numeric reports at248:1/256:2/256:3. Initial metadata SHA256
+`687d4090d68632ec18fb8e4bb668f8ae62a2a23747a944670a6b2af6123e3ecd`;
+startup review`1386dcf36abb32bea864f35a2faa5e0288952a9908389e6bbb44e5d5523dfcfd`.
+Four recovery audits, fixed final/initial evaluation, complete replay/guards,
+curves and completed comparison are running or waiting automatically. These
+startup checks establish execution and initial equality; learning remains pending.
