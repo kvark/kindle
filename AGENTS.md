@@ -61,9 +61,11 @@ audits/replays/guards. See`docs/experiments/2026-10-26-cdp-pong-minimal-actions.
 owner`kindle-cheap-pong-minimal-intrinsic001-500k-20261026`. Check live state before
 GPU work. No cap increase, extension or automatic next allocation.
 
-Pong's100k recovery passes24,939 updates/346 finite tensors. A later Breakout
-actor/critic-gradient option is staged outside the worktree with313 CPU tests;
-no patch or GPU allocation is selected. See
+Pong's100k/200k/300k recoveries pass24,939/49,939/74,939 updates and346 finite
+tensors each. A later Breakout actor/critic-gradient option is staged outside
+the worktree with313 CPU tests and a prepared4096-action/300-second smoke plus
+1024-action/60-second frozen restore. CPU schema/refusal checks pass; no patch
+or GPU allocation is selected. See
 `docs/experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md`. Keep active
 Pong files pinned; any later smoke must verify the expected357-tensor schema.
 

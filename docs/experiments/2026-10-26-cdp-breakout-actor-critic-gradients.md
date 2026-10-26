@@ -61,3 +61,28 @@ Schema`e60b9e6d2ba653872cc4bfdf55fd0ae42ca91de08718c0183c72e5ba2372d9d1`
 (`expected-checkpoint-schema.json`) retains the control-derived complete key/shape
 map and its source/checkpoint hashes. Preparation source`88ec353`; native remains
 `bfb8c31`, production runner`22bd61b`, CPU replay`5043b7a`.
+
+The bounded controller and two-job queue are now prepared outside Git in
+`/x/Temp/kindle-cheap-20261025/breakout-actor-critic-smoke`, still unselected.
+Training command comparison against the four-action control changes only the
+actor/critic flag,4096-action budget, output paths and removal of its100k
+checkpoint interval. The queue retains the current host guard,300/60-second
+job caps, exact runtime pins and original rates. No full learning job is queued.
+
+CPU checks pass the existing346-tensor baseline schema and unchanged-tensor
+comparison, reject the missing11 actor tensors and a wrong tensor shape, and
+confirm the controller refuses to launch while unselected. Production CLI and
+tests remain byte-identical. The prepared GPU audit requires the complete357
+schema at initial/final/restored checkpoints, exact frozen invariance, all11
+actor copies equal to their behavior counterparts, finite/nonzero initial
+policy/value losses and changed encoder/reward weights. It records all346
+shared initial-tensor comparisons without assuming equality. Those requirements
+remain unmeasured until a separately selected GPU check completes.
+
+Controller`run_breakout_actor_critic_smoke.py`, SHA256
+`443e288da11fd21a2da9fab444abeb7bb17c7934bcf3f65e3ba95f69a6040844`;
+queue`b1c8a8571c436350b089dc601c222574bb2cc46d530787bb8ce86c7122200dcf`;
+unselected declaration`7c0fa22c2d3593e8aeec1190da371351255b99d3e75ecc2f539fa70c3d730214`;
+CPU preparation review`298c5e44b19839d0d8eb79308739169f0b1e558dfcc03d3cf8be1147a88e3189`.
+Prepared source`431e8eb`. Current Pong must finish and be reviewed before an
+allocation decision; this preparation does not select Breakout as the next run.

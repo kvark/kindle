@@ -215,13 +215,16 @@ guard audits. CPU replay`5043b7a` explicitly supports Pong's six actions; native
 and training CLI are unchanged. Monitoring/comparison attached, frozen quality
 pending. No extension or automatic next allocation.
 
-Pong's100k recovery passes24,939 updates and346 finite tensors; stable prefix
-105,792 actions/26,385 numeric reports,102,400 progress541.144s with zero debt.
+Pong's100k/200k/300k recoveries pass24,939/49,939/74,939 updates and346 finite
+tensors each. The300k review checks a303,120-action/75,719-report stable prefix;
+303,104-action progress is1610.434s/75,715 updates with zero debt.
 Separately, a [Breakout actor/critic-gradient option](experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md)
-is staged outside the worktree and passes313 CPU CLI tests. No patch application
-or GPU check is selected. Current Pong files remain pinned. A later bounded
-smoke must verify the extra frozen actor tensors and complete restore invariance
-before any learning allocation; this is not measured learning evidence.
+is staged outside the worktree and passes313 CPU CLI tests. Its prepared smoke
+caps training at4096 actions/300 seconds and frozen restore at1024 actions/60
+seconds. CPU schema/refusal checks pass; no patch application or GPU check is
+selected. Current Pong files remain pinned. The smoke must verify the extra
+frozen actor tensors and complete restore invariance before any learning
+allocation; preparation is not GPU execution or learning evidence.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,

@@ -105,3 +105,18 @@ and26,385 finite reports; latest102,400-action progress is541.144s/25,539 update
 zero debt. Metadata SHA256
 `d086d92a02f0da72c1f5e731b94d2663982253451bd790e1238ba6d48ab9a4a2`.
 This verifies recoverability and recorded learning work, not frozen competence.
+
+## 200k and300k recoveries
+
+Both checkpoints pass full configuration/counter checks and all346 finite
+tensors:200k/49,939 updates and300k/74,939 updates. The300k review verifies a
+stable303,120-action prefix with75,719 finite learner reports. Latest progress
+there is303,104 actions/75,715 updates in1610.434s, zero debt. The run remains
+active; fixed-final frozen quality is pending and its budget is unchanged.
+
+Metadata SHA256:200k
+`51aee6fa9cd0087afd6c5a583ff28236184e4459a26499f8efff178b63946629`,
+300k`1d8bec54ac34ea1ed013d8b433b4f523b8c3f86bb4c7b80bb8b5542e4b58df05`.
+Review SHA256:200k
+`c5e353540f1e3ab1eeb7e32fc7bc729bcbbb4aff026728fbda19a584dd2354ab`,
+300k`c2a9c6b82b090b0788e19e66a5d3d81de1cd79ddda9c13a42bbb85ebe897e5c8`.
