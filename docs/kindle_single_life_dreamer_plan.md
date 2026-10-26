@@ -330,6 +330,13 @@ Startup matches346 same-seed initial tensors, differs from1009, and matches
 248:1/256:2/256:3/264:4/264:5/272:6. First5640 actions/1347 finite reports pass;
 recovery, progress and postprocessing monitors are attached.
 See [selected seed check](experiments/2026-10-26-cdp-qbert-expert-seed4013.md). Check live state before GPU work.
+The100k/24,939 recovery passes with346 finite tensors. Independent CPU replay
+of1009 finds17/24 frozen episodes stop at19–20 cubes; every episode's ever-lit
+count equals its simultaneous maximum. An unchanged pixel teacher recovers
+all8 recorded200-action learner prefixes within640 further actions, but all
+trajectories remain partial and this is not learned transfer.4013 and its caps
+are unchanged; no delayed-guidance training is selected. See
+[diagnostic evidence](results/2026-10-25-cdp-cheap-qbert.md#frozen-expert-policy-leaves-individual-cubes-untouched).
 
 The fresh Qbert expert-imitation comparison completes200k actions/799,509
 frames/49,939 updates in20m11s. Frozen1083.333/2of24 first pyramids improves

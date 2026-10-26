@@ -1454,3 +1454,68 @@ comparison`7b4edd990733ac7754ec49a5c693d9af66058ba9344c5c2244da4e01776dab39`;
 completion`bad2bcff8bd51ba954ee1bfefe457216e30ae3b0211fd3a97713e3ae9e00056b`;
 exposure`240f1d5da7383aa1989db9f8472634672d7bcab07963b697e70578ce808de4c7`;
 100k recovery`8b2c5a8311ab24e1c81916c34696de2a9042dae526b5733b12376c13531dd899`.
+
+## Frozen expert policy leaves individual cubes untouched
+
+A CPU-only replay of the completed1009 final policy reproduces every saved
+episode and partial outcome, rewards, boundaries, frames and reset count. It
+takes5.972s and constructs no agent. The observer includes the exact first-
+pyramid completion frame, so both successful episodes retain all21 cubes.
+This adds diagnostic detail to the existing frozen cohort; it is not another
+policy evaluation or a new sample of learning reliability.
+
+In all24 selected episodes, the number of cubes ever lit equals the maximum
+simultaneously lit: mean18.625/21. Only the same2 successful episodes ever light
+all21. Seventeen episodes peak at19 or20 and then last another804–2744 emulator
+frames without improving that peak. Thus, for this cohort, missing first-pyramid
+completion cannot be explained solely by lighting all cubes at different times
+and losing coverage before they are simultaneously lit.
+
+The cube tracked at RAM address42 is never lit in21/24 episodes; address32 is
+never lit in14/24. The rest are each missed in at most4 episodes. These addresses
+are post-hoc observer data and never reach the policy. Two decoded frames from
+the verified stream0 video show the remaining bottom-corner tile tops still
+blue: both corners near episode0's19-cube peak, and the bottom-right corner
+near episode2's20-cube peak. The images are illustrative lossy video frames,
+not exact native inputs or a complete RAM-to-position mapping.
+
+This localizes a recurring incomplete-visitation pattern. It does not establish
+whether perception, policy learning, planning, demonstration coverage or some
+other mechanism causes it. The same CPU analysis is attached after the active
+4013 run's completed audits; its learner, recipe and caps remain unchanged.
+
+Artifacts:`expert-tile-coverage-review.json`, two`*-episode-near-peak.png` frames
+and`expert-tile-visual-review.json` in the completed1009 trial directory.
+Tile review SHA256`f9af1005d6acef474077a42b8eb83e09b7698d02790a6c9e4f664d6f09f67e67`;
+visual review`da227a79f1853526e0e2f6a7703fd2e33bad3725d7b9ddb8ed4fbbccc9bb366b`.
+
+## Pixel teacher can recover after a recorded learner prefix
+
+A separate CPU-only feasibility check replays the completed1009 frozen policy's
+first200 actions in each of its eight first episodes, then branches to the
+**unchanged** native-RGB pixel teacher for at most640 actions per lane. All eight
+original episodes are still live at the branch. Their initial partial coverage
+is10–18 cubes, with no first pyramid cleared. The teacher receives only current
+native max-pooled RGB, without RAM, rewards, task labels or environment handles.
+
+All8 trajectories reach the first pyramid after176–291 teacher actions. The
+declared640-action window still runs in full:1600 recorded-prefix actions plus
+5120 teacher actions,26,880 emulator frames total. There are **zero natural
+terminations and eight partial tails** at the cutoff. These are milestone
+observations from hand-coded recovery, not8 eligible natural-episode successes,
+not learned transfer and not a full Qbert gate pass.
+
+The first pass takes6.732s and an independent fresh-environment replay takes
+6.692s. Every action, pixel hash, reward, boundary and frame count matches.
+The recorded learner prefixes also match their source log's rewards, boundaries
+and frame counts; all ROM/ALE/wrapper/policy/source pins remain unchanged. No
+Kindle agent or GPU is used, and the active4013 learner is unaffected.
+
+This supports the feasibility of starting the existing teacher after the
+learner has acted. It does not show that delayed guidance improves learning,
+or that a fresh weak learner supplies the same distribution of prefix states.
+The current4013 result is still pending. No delayed-guidance implementation or
+GPU allocation is selected by this CPU check.
+
+Artifacts:`/x/Temp/kindle-expert-20261026/qbert-delayed-teacher-prefix200`.
+Review SHA256`a78ecf9b8d4bf2cde9aa6444872ec43051e160cc77cfee50207f63d1aeb6a275`.

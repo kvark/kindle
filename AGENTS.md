@@ -108,6 +108,8 @@ cap increase or automatic successor; no paired unaided Qbert4013 control.
 Startup matches346 same-seed initial tensors, differs from1009, and matches
 248:1/256:2/256:3/264:4/264:5/272:6. First5640 actions/1347 finite reports pass;
 recovery, progress and postprocessing monitors are attached.
+The100k/24,939 recovery passes with346 finite tensors; training continues.
+Independent CPU tile/recovery diagnostics leave this allocation unchanged.
 See [selected seed check](docs/experiments/2026-10-26-cdp-qbert-expert-seed4013.md). Check live state before GPU work.
 
 The fresh Qbert expert-imitation comparison completes200k actions/799,509

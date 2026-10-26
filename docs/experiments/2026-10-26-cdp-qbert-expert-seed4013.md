@@ -85,3 +85,19 @@ Read-only progress,100k recovery and completed-run postprocessing units are
 attached under`kindle-expert-qbert-seed4013-{progress,recovery,post}-20261026`.
 The postprocessor performs curves, coverage, two-seed comparison and expert
 exposure analysis after terminal success. It cannot extend or restart training.
+
+## Recovery and independent CPU analysis
+
+The100k/24,939-update recovery audit passes23:42:36 UTC with346 finite tensors.
+It also verifies26,193 finite reports in the complete105,024-action log prefix,
+with zero debt at the latest progress record. Recovery review SHA256:
+`ee75e2f1fa4841d42e9bd1e7ad71536cdfefa396e9f76407db0ecc8cbf4a336a`.
+The same training PID/invocation continues; the fixed final outcome is pending.
+
+A separate CPU observer,`kindle-expert-qbert-seed4013-tiles-20261026`, waits for
+completed postprocessing and then replays the frozen final's saved actions to
+measure ever-lit versus simultaneous tile coverage. The helper first matches
+every outcome of the completed1009 replay, including its two successful
+pyramids. This observer cannot restart or extend GPU work. The independent
+[1009 tile and delayed-teacher analyses](../results/2026-10-25-cdp-cheap-qbert.md#frozen-expert-policy-leaves-individual-cubes-untouched)
+do not change this run's pinned sources, recipe or allocation.
