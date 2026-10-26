@@ -1206,3 +1206,62 @@ owner`kindle-cheap-qbert-48-forecasts-20261026`. The declaration pins source,
 checkpoints, retained replay, completed smoke and exact applied tests. Forecast
 errors remain descriptive, not a causal explanation for poor policy transfer;
 no extension or next GPU allocation follows automatically.
+
+
+## Compact Qbert learns reward forecasts despite weak task performance
+
+The fixed comparison starts22:28:23 UTC/source`915e442` and exits successfully
+at **22:30:05 UTC**, total service wall1m41.711s. The trained and actual-initial
+captures replay the same15,376 aggregate actions/61,462 emulator frames each,
+in50.329847s and49.267957s. Both perform **zero learning** and preserve all346
+checkpoint tensors. All8 recorded stream pixel hashes and action/reward/boundary/
+episode/split arrays match between models. All source/checkpoint/native/device
+pins, forecast-prefix invariance, finite outputs, sample-support checks and
+host guards pass. Neither process approaches its300-second cap.
+
+The first natural episode per lane calibrates baselines; the next two provide
+9328 one-step test examples (299 positive rewards) and567 valid15-step windows
+(193 positive sums). The initial reward heads predict zero. Errors below are
+mean absolute errors in reward points; lower is better. AUC measures ranking
+of reward events; higher is better and.5 is chance/constant ranking.
+
+| Test metric | Actual initial / zero | Trained, recorded actions | Trained, unrelated actions | Calibration mean | Persistence |
+|---|---:|---:|---:|---:|---:|
+| One-step reward MAE, all |1.431|1.190|1.149|2.609|2.836|
+| One-step reward MAE, positives |44.649|18.398|19.178|43.391|45.819|
+| One-step positive-reward AUC |.500|.969|.968|.500|.492|
+|15-step reward-sum MAE, all |22.487|12.400|13.274|28.753|36.287|
+|15-step reward-sum MAE, positives |66.062|31.089|34.724|46.431|79.404|
+|15-step positive-sum AUC |.500|.899|.869|.500|.519|
+
+After observing the resulting frame, trained posterior reward prediction has
+positive-event MAE15.124 and AUC.979. This is a separate, easier measurement
+than forecasting before the action. At the15-step endpoint there are only17
+positive events: recorded-action AUC.956 versus unrelated.546; retain that
+small support alongside the broader reward-sum comparison. The actual-action
+sum forecast improves MAE but has worse RMSE than unrelated conditioning
+(49.975 versus48.071), so it does not dominate every metric. One-step unrelated
+actions also have slightly lower all-example error; action sensitivity is not
+uniformly useful. Unrelated actions have no observed counterfactual outcomes.
+
+The4M48 model learns useful reward information, including15-step sums, on this
+retained final-policy cohort. That does not establish accurate alternative-action
+ranking, exploration, actor optimization or the cause of failed first-pyramid
+transfer. It provides no independent reason to enlarge the model or change
+H15 again; retain the unaided4M48/H15 control. Guided-training results and the
+absence of a supervised actor-imitation loss remain separate evidence. No new
+training, unchanged extension or next GPU allocation is selected here.
+
+There are only16 one-step terminals and zero15-step endpoint terminals. No
+terminal-quality conclusion follows; the one-step learned terminal Brier score
+.002020 is worse than the calibration-frequency baseline.001712 despite a high
+ranking AUC. Scalar re-observation uses new categorical draws, not the original
+vector actor's exact latent states. All trajectories and learner/evaluation seeds
+are reused development evidence. The frozen task score remains809.375/0-of24
+pyramids; this diagnostic changes no five-game gate or competence claim.
+
+Artifacts remain in`qbert-4m-48-policy-forecasts` under the declared runtime root,
+including both captures, comparison JSON/PNG/SVG, source pins and terminal journal.
+Comparison SHA256`1421a339edeb1fdff27086e506f5de92862107515c090de19461fea7bdb0c057`;
+completion`9a0107f304ea3dbf42dc9b88f2ccf9f47167fdf4ccdf8a2d78a43c94e7c777d9`.
+The geometry helper passes24 applied CPU tests; native binary is unchanged.

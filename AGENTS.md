@@ -88,14 +88,14 @@ The CPU startup import failure remains recorded; no GPU stage repeated.
 CLI`a2c467c` passes460 CPU tests; native unchanged. See
 [the completed comparison](docs/results/2026-10-25-cdp-cheap-pong.md#behavior-rate-doubling-gives-a-small-gain-but-still-misses-the-gate).
 
-QbertRGB48 bounded reward forecasts pass128 recorded actions in2.675s, zero
-learning and346 unchanged tensors; guard passes, service exits22:25:46 UTC.
-The applied helper passes24 CPU tests. Separately select the fixed trained/initial
-forecast comparison on the same15,376 saved actions/61,462 frames per model,
-with300-second cap per model and zero learning. First natural episode per lane
-calibrates baselines; next two test. H15 has no terminal support; forecast errors
-alone cannot diagnose failed learning. Owner`kindle-cheap-qbert-48-forecasts-20261026`.
-No new training or automatic next allocation. Check live state before GPU work.
+QbertRGB48 frozen forecasts complete on15,376 recorded actions/61,462 frames
+per model in50.330s trained/49.268s initial, with zero updates. One-step reward
+AUC improves.500→.969; H15 reward-sum MAE22.487→12.400. All346 frozen tensors,
+8 matched stream trajectories/pixel hashes, source/counter/support/guard checks
+pass; service exits22:30:05 UTC. This shows predictive learning on the reused
+cohort, not the cause of weak policy transfer. Retain4M48/H15; no new training
+or automatic next allocation. The geometry helper passes24 CPU tests; native
+unchanged. See [forecast results](docs/results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions
 in0.452s;512 verified overrides,346 matched initial/unchanged frozen tensors,
