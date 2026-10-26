@@ -209,8 +209,16 @@ sampled matches, mean15/90%-wins and full357-tensor/replay/guard/curve compariso
 No smoke experience reused. Started18:57:18 UTC/source`7ebd7f4`;357 initial
 tensors match the smoke,346 shared tensors match control and first376:1/384:2/
 392:3/400:4 updates pass. Recovery, fixed evaluations and analysis monitors are
-attached. Owner`kindle-cheap-pong-b16-acgrads-500k-20261026`; frozen quality
-pending. No extension or automatic next run.
+attached.100k/200k recoveries pass; a progress observer was reattached after
+exit143 with the same training PID/invocation and no training restart. Owner
+`kindle-cheap-pong-b16-acgrads-500k-20261026`; frozen quality pending. No extension
+or automatic next run.
+
+The [CPU-only Qbert pixel rule](results/2026-10-25-cdp-cheap-qbert.md#pixel-only-cpu-rule-clears-the-first-pyramid)
+clears24/24 first pyramids, mean3764.583 and21/21 coverage. Collection and exact
+pixel/action/reward replay each take about30s; no agent or learning occurs.
+This hand-coded guidance candidate still misses mean15000 and does not establish
+unaided Kindle transfer. No training aid or GPU allocation is selected yet.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,

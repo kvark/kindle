@@ -107,3 +107,18 @@ monitoring are attached. Frozen quality remains pending.
 Selected declaration SHA256`b40d8dc902253a5cf60379410cdb9ba3f3bc7d79a507ef9519ff5731b901be3b`;
 selection review`e5eb3c90bdd16b4b0e2395f3b33cdc70ccfb7f6fc77f20fbdcef20689cd492fb`;
 startup`a30a913b2cee766c8559867e02ef0cc4bdb8a3e2c387f013bf69ad3b625d9dc0`.
+
+The100k/200k recoveries pass12,454/24,954 updates, all357 finite tensors and
+actor-copy consistency. At200k, the complete201,528-action log prefix contains
+25,144 finite reports;200,704 progress is907.621s with25,042 updates and zero
+debt. Recovery reviews SHA256`3dc619ede216081e0459fc12f57f629a96a4498caf4b685c8409e906597d3904`
+and`b5fef7efdd00f144c724782c9f9e76bdaab505f77523d5c9e3cbce756ea7c482`.
+Frozen quality is still pending.
+
+The separate progress observer exited143 for an unmeasured reason. Checks at
+19:03:55 and19:16:09 UTC confirm the same active training PID24946, invocation
+and boot; training did not restart. A replacement observer attached19:04:15,
+while the recovery and final-analysis monitors remained live. Original and
+replacement receipts are retained as `progress-observer-interruption.json`
+and `progress-observer-reattachment.json`. This is not a recorded GPU fault or
+training-service failure.

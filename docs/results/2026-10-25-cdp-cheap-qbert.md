@@ -660,3 +660,45 @@ completion`83b45cdaf2af61071e3fee08c0ec5a3037ed1452cd41f9a0e6a48b923d7d600d`.
 Launch source`093e5c6`, native`bfb8c31`, runner`fbdaee3`, replay`5043b7a`.
 After review, select the separately prepared frozen-only Pong greedy assessment;
 this adds no new Qbert allocation or training extension.
+
+## Pixel-only CPU rule clears the first pyramid
+
+A fixed hand-coded rule clears the first pyramid in **24/24 natural episodes**,
+with mean score **3764.583** and mean maximum coverage **21/21**. It still misses
+the original mean15000/90%-pyramid gate. This supplies a concrete candidate for
+training guidance; it is not learned Kindle competence or evidence of transfer
+to an unaided policy. No training aid or GPU allocation is selected here.
+
+The rule receives only native210×160 max-pooled RGB. It recognizes visible
+blue/yellow cube roofs and the orange player, remembers occluded roof states,
+and follows a shortest board path toward an unlit cube. Single four-frame
+direction pulses alternate with visual landing waits. It has no reward, RAM,
+task-observer output or environment handle. The existing RAM task observer
+measures outcomes separately. No enemy avoidance or learned model is added.
+
+Fixed-action calibration and one development episode use seed9001. That episode
+scores3650, clears the first pyramid at frame2129 and ends naturally after1092
+actions/4367 frames. The policy stays unchanged for the subsequent assessment:
+N8, eval4000001009 with the usual per-lane seeds, full18/sticky.25/repeat4/noops0,
+first3 natural episodes per lane. These evaluation seeds are reused from the
+compact learners, not held-out reliability evidence.
+
+Collection takes29.622s for29,552 aggregate actions/118,160 emulator frames;
+an independent fresh CPU rollout reproduces every action, RGB-frame hash,
+reward, boundary, executed-frame count, episode and partial tail in29.587s.
+There are exactly24 natural episodes, no excess or truncation, and seven
+nonempty partial tails. Selected first-pyramid milestones span1619–2104 frames.
+Both passes finish within the declared60k-action/120-second caps. No Kindle
+agent, GPU work or learner updates occur. There is no video audit for this
+reference; complete pixel hashes and trajectories are retained.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/qbert-pixel-reference-v1`, with policy
+`qbert_pixel_policy_v1.py` and driver `run_qbert_pixel_reference_v1.py` in its
+parent. Development artifacts remain in `qbert-pixel-guidance-dev`.
+Review SHA256`6956fd1329769fb1c338e63bb436d833a4cb1b62047cf89cebd6e600d96f4ff5`;
+declaration`b8815003ccd60a196d088385ab22c035b7aee47201be135edea30106b6dbbb8b`;
+trace`e2e8ae5c225256df15eeeab0075e128dfb4a71b81d7616579cb0dc2954d80c5c`;
+policy`d8e47b4b0815fbcdbf2ff19d2e06fb06ca3e4a37e0033310585113d3892a4f59`;
+driver`65a47fb30ce0ea669f3eeb5fc8cc174dcb443a932420545b9e602e04152aeb2e`.
+ROM/emulator/wrapper pins and fixed cohort are in the declaration. Active Pong
+learning remains unchanged; guidance integration and unaided transfer are untested.
