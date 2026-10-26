@@ -45,7 +45,12 @@ so it is not a matched-budget frozen control for this200k result.
 
 ## Long relaunch delay in a selected episode
 
-The final action log contains a12,115-action gap without a chosen FIRE variant.
+The final action log contains a12,115-action gap without a chosen FIRE variant
+among completed episodes; an unfinished tail contains14,047. A consistent
+saved-command summary records selected final/initial mean lengths3,267/184.17
+actions and FIRE fractions1.11%/50.59%. Excess episodes and unfinished tails
+remain separate. A command gap can include active play and is not by itself
+evidence of a relaunch stall.
 A separate CPU replay checks selected stream4/episode0: after losing its fourth
 life at action358, the next chosen FIRE is action12419, a12,061-action delay.
 There are48,240 emulator frames before that FIRE command, no intervening reward,
@@ -63,9 +68,12 @@ Artifacts: `/x/Temp/kindle-cheap-20261025/breakout-4m-64-r32-200k`.
 `curve/` retains the complete action/frame/time curve; `t64-comparison/` uses only
 shared observed action points, without interpolation or extrapolation.
 `fire-action-diagnostic.json` and `fire-delay-stream4-episode0/` retain the command
-gaps, replay checks, snapshots and hashes. Review SHA256
+gaps, replay checks, snapshots and hashes. `fire-gap-summary.json` adds a reusable
+summary for both arms, with selected/excess/tail accounting and source/script hashes.
+Review SHA256
 `50f0df9952d48383dc3d18960e3df16d696301211523c26531f7a18d41189c8f`.
 Native`bfb8c31`, runner`a99416e`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
-One reused development seed; no reliability or superiority claim. The current
-allocation is the separately declared Boxing seed4013 confirmation.
+One reused development seed; no reliability or superiority claim. Boxing's
+separate seed4013 confirmation now passes. The current allocation is the
+[fresh1% native policy-mixture test](../experiments/2026-10-26-cdp-cheap-breakout-unimix.md).

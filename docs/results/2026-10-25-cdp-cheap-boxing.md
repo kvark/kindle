@@ -1,8 +1,9 @@
 # Small-image Boxing: useful frozen learning within 30 minutes
 
-The fresh 500k/R32 run passes the existing Boxing gate in 28m22s with 24/24
-frozen wins. The earlier 200k/R16 screen fails. These are different development
-seeds and budgets; one successful learner does not establish seed reliability.
+The selected 1M/RGB32/500k/R32 recipe passes the existing Boxing gate on two fresh
+learners: seed2017 scores76.83 in28m22s and confirmation seed4013 scores79.17 in
+28m13s, each with24/24 frozen wins. The earlier200k/R16 screen fails. Two learners
+support this cheap recipe without establishing broad seed reliability.
 
 ## Initial 200k/R16 screen
 
@@ -85,5 +86,44 @@ Artifacts: `/x/Temp/kindle-cheap-20261025/boxing-1m-32-500k-r32-seed2017`.
 `historical-comparison/` contains both observed curves and separate frozen scores.
 Review SHA256`109450faca39af5ea6b51766c53924d8568494e4dd785498289e67eb331faa34`.
 
-Retain this cheap Boxing recipe for seed confirmation. The next bounded allocation
-is the declared4M/RGB48/R32 Qbert200k screen; the five-game goal remains unfinished.
+## Fixed-recipe confirmation: seed4013
+
+[Declaration](../experiments/2026-10-26-cdp-cheap-boxing-confirmation.md).
+Only learner/evaluation seeds change, to4013/4000004013. The recipe, native/runner
+bytes,500k-action budget and30-minute training cap are fixed before this seed.
+It is a fresh learner with new replay/games/RNG and saved actual-initial weights.
+
+| Fixed policy | Natural matches | Mean | Wins | Draws | Losses | Gate |
+|---|---:|---:|---:|---:|---:|---|
+| 500k final |24|79.1667|24|0|0|pass|
+| Actual initial |24|−0.6250|11|2|11|fail|
+
+Training completes500,000 aggregate actions,1,999,275 emulator frames and124,939
+updates in **1,692.899s (28m13s)**,295.35 actions/s. First update248, zero debt;
+286 natural training matches and final online last50 mean80.58. The250k recovery
+checkpoint passes finite/config/counter checks before replacement by fixed500k.
+No checkpoint selection, cap increase, retry or warm-start extension.
+
+Final/initial evaluations select the first three natural sampled matches per
+lane,24 each, with no excess episodes or truncations; unfinished tails remain.
+Final uses40,192 actions/160,727 frames/17.541s; initial42,864 actions/171,384
+frames/18.656s. Zero updates and all346 tensors unchanged in both arms.
+All124,939 strict numeric reports, finite checkpoints, complete config/source/
+counter checks, full CPU replays/videos and three host guards pass. Service
+`kindle-cheap-boxing-r32-500k-4013-20261026` exits successfully.
+
+Both frozen policies pass the existing mean≥50/90%-wins gate within30 minutes.
+The confirmation learns more slowly on its online curve but reaches a slightly
+higher fixed frozen score; those are different measures. Keep the two trained
+policies separate rather than treating48 matches as48 independent learners.
+Seed2017 is reused development data;4013 is one focused confirmation. This does
+not establish broad seed reliability, an isolated resolution speedup or five-game
+completion. No further Boxing allocation is needed for the current cheap screen.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/boxing-1m-32-500k-r32-seed4013`.
+`curve/` retains independently reconciled action/frame/time curves;
+`seed-comparison/` retains both observed curves, separate frozen outcomes and
+source hashes. Review SHA256
+`74365191a4a70e173de18b3ef5c189030f9578af517d5ecd9ecc72376d8566c7`.
+The next allocation is the declared
+[Breakout1% native policy-mixture test](../experiments/2026-10-26-cdp-cheap-breakout-unimix.md).

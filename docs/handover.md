@@ -19,21 +19,25 @@ but fails: frozen−3.875 versus initial0.00, both10/24 wins, all audits pass.
 The [Pong4M/RGB48 screen](results/2026-10-25-cdp-cheap-pong.md) completes in10m22s:
 frozen−17.125 versus initial−20.375, both0/24 wins, all audits pass.
 Fresh Boxing2017,1M/RGB32/500k/R32 now passes: frozen76.8333 versus initial2.875,
-24/24 wins,124939 updates in28m22s; all audits pass and the service exits. Retain
-this useful cheap recipe for seed confirmation; one development seed is not
-reliability. Details and historical wall-time comparison are in the Boxing report.
+24/24 wins,124939 updates in28m22s; all audits pass and the service exits. The fixed
+recipe also passes fresh confirmation4013:79.1667 versus initial−0.625,24/24 wins,
+500k/124939 updates in28m13s, all audits pass and service exits. Two useful learners
+do not establish broad reliability. Details and curves are in the Boxing report.
 [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) finishes200k in19m45s:
 frozen809.375 versus180.2083,0/24 first pyramids. Mean coverage improves5.83→16.63
 of21 cubes; all audits pass, but the task gate fails. No extension.
 [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) finishes200k in
 22m30s: frozen6.2083 versus1.375,0/24 two-wall successes, all audits pass. A CPU
 replay verifies one12061-action delay before FIRE after a lost life. No extension.
-Current allocation: [Boxing seed4013 confirmation](experiments/2026-10-26-cdp-cheap-boxing-confirmation.md),
-service `kindle-cheap-boxing-r32-500k-4013-20261026`. Keep the successful2017
-1M/RGB32/500k/R32 recipe and30-minute cap; only learner/evaluation seeds change.
-Initial finite/config/source checks and first updates pass. Check its state before GPU work;
-do not restart completed screens.
-Current native source`bfb8c31`, runner`a99416e`, native SHA256
+Current allocation: [Breakout1% native policy mixture](experiments/2026-10-26-cdp-cheap-breakout-unimix.md),
+service `kindle-cheap-breakout-unimix001-200k-20261026`. Keep the completed control's
+fresh1009/4M/RGB64/Auto/R32 recipe,200k budget and30-minute cap; change only
+actor_unimix0→.01. The saved policy mixture remains active during frozen sampling.
+CLI exposure passes255 CPU tests; native code is unchanged. All346 initial
+tensors match the control, complete config differs only in the mixture, and
+first updates pass. Check the service state before GPU work; do not restart
+completed screens.
+Current native source`bfb8c31`, runner`bcef410`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
 `original-native` preserves the prior AMD binary. Both installed and source-tree

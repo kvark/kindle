@@ -72,8 +72,10 @@ both0/24 wins; all audits pass. The short screens use only about one fifth of
 the historical successful cohorts' updates, so capacity/resolution remain open.
 Fresh Boxing seed2017,1M/RGB32/B8/T16/R32,500k actions now passes: frozen76.8333
 versus initial2.875,24/24 wins,124939 updates in28m22s. All audits pass and the
-service exits. Retain this useful cheap recipe for seed confirmation; one
-development seed is not reliability. See the cheap-Boxing result report.
+service exits. Fresh confirmation seed4013 now also passes: frozen79.1667 versus
+initial−0.625,24/24 wins,500k actions/124939 updates in28m13s. The recipe and cap
+are unchanged; all audits pass and the service exits. Two useful cheap learners
+do not establish broad seed reliability. See the cheap-Boxing result report.
 Qbert4M/RGB48/R32 completes200k actions in19m45s: frozen809.375 versus180.2083,
 0/24 first pyramids. Mean first-pyramid coverage improves5.83→16.63 of21 cubes,
 but the task gate fails. All audits pass; no extension. See the cheap-Qbert report.
@@ -81,12 +83,13 @@ Breakout4M/RGB64/R32 completes200k in22m30s: frozen6.2083 versus1.375,0/24
 two-wall successes, all audits pass. One selected episode waits12061 actions
 after a lost life before choosing FIRE; CPU replay verifies this stall. See
 `docs/results/2026-10-26-cdp-cheap-breakout.md`; no extension.
-Current allocation: fresh Boxing confirmation seed4013,1M/RGB32/B8/T16/R32,
-500k actions,expected124939 updates,30-minute training cap and fixed24-match
-final/actual-initial evaluations. The successful2017 recipe is unchanged except
-learner/evaluation seeds. See
-`docs/experiments/2026-10-26-cdp-cheap-boxing-confirmation.md`;
-service owner `kindle-cheap-boxing-r32-500k-4013-20261026`. Check its live state before
+Current allocation: fresh Breakout1009,4M/RGB64/Auto/B8/T16/R32,200k actions,
+expected49939 updates,30-minute training cap and fixed24-natural-episode
+final/actual-initial evaluations. Change only native actor_unimix0→.01 against the
+completed control; retain the saved mixture in frozen sampling. CLI exposure
+passes255 CPU tests; native code is unchanged. No forced FIRE or RAM input. See
+`docs/experiments/2026-10-26-cdp-cheap-breakout-unimix.md`;
+service owner `kindle-cheap-breakout-unimix001-200k-20261026`. Check its live state before
 further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.

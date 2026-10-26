@@ -7,10 +7,10 @@ Test whether a small uniform mixture in the native actor prevents these long
 command gaps and improves useful learning at the same budget.
 
 Change only **actor_unimix:0→0.01**. Native acting, imagined action sampling and
-the actor objective already use this field. The CLI exposure is prepared in an
-isolated copy while Boxing runs; apply it only after that service and its audits
-are terminal, so the active runner's pinned bytes remain stable. No native rebuild
-or backend optimization. Default mixture remains0, and restore uses its saved
+the actor objective already use this field. CLI exposure was checked in an
+isolated copy, then applied after Boxing and its audits finished. Commit`bcef410`
+passes all255 vector-runner CPU tests. No native rebuild or backend optimization.
+Default mixture remains0, and restore uses its saved
 policy configuration rather than accepting CLI overrides.
 
 For18 unmasked actions,1% uniform mixture assigns the nine FIRE variants at least
@@ -44,5 +44,13 @@ data, and a promising result still needs seed confirmation.
 Artifacts: `/x/Temp/kindle-cheap-20261025/breakout-4m-64-r32-unimix001-200k`.
 Controller: `run_breakout_unimix_200k.py`; intended service owner:
 `kindle-cheap-breakout-unimix001-200k-20261026`. Exact commands, caps and hashes
-are recorded before launch. This test is prepared, not automatically queued;
-start only after reviewing the active Boxing4013 confirmation.
+are sealed before launch. Boxing4013 passed79.1667 versus initial−0.625 with24/24
+wins in28m13s; its complete audit was reviewed before starting this test.
+
+Started October26 at00:58:24 UTC. Startup checks pass: all346 initial tensors
+equal the0-mixture control, the complete configuration differs only in
+actor_unimix, native SHA is unchanged and first updates are248:1,256:2,256:3.
+`startup-review.json` retains those checks. Source at launch`bcef410`; native
+source`bfb8c31`, SHA256
+`f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
+The result remains pending; inspect the service before further GPU work.
