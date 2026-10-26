@@ -1,36 +1,39 @@
 # Kindle: CDP learning roadmap
 
-Updated October25,2026. [Handover](handover.md) contains the reproducible runtime
+Updated October26,2026. [Handover](handover.md) contains the reproducible runtime
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-**Current result:** [AMD takeover](results/2026-10-25-cdp-amd-takeover.md) completes
-Breakout2M B2/T64 in11h40m. Frozen500k/final/initial scores are14.71/10.04/1.42,
-all0/24 two-wall successes; accounting, frozen tensor equality and full replays
-pass. The service has exited. BF16 is unavailable on RX7900XT/RADV; F16 inputs,
-ordinary targets, hardware and sequence/batch changes confound comparison.
-Paired early updates differ despite matching initial tensors/experience; see
-[precision evidence](results/2026-10-25-cdp-amd-precision.md). Auto's4096-action
-smoke and exact frozen restore pass at similar throughput. The fresh
-[500k Auto comparison](experiments/2026-10-25-cdp-amd-auto.md) is complete:
-frozen15.67 versus F16's14.71, initial1.42, all0/24 two-wall successes. Training
-takes2h53m; all audits pass. Do not extend either T64 life.
+**Current AMD development results:** all completed rows pass numerical,
+checkpoint, accounting, frozen-tensor and full-replay audits. The learning gate
+is separate. Each row is one development seed, not a reliability result.
 
-The first [cheap Freeway screens](results/2026-10-25-cdp-cheap-freeway.md) each
-finish200k actions in about8 minutes. Frozen unassisted/aided/initial means are
-0.00/0.25/0.00, with0/24 task milestones; all audits pass. These are fast weak
-recipes, not successful Freeway learning. [Boxing1M/RGB32](results/2026-10-25-cdp-cheap-boxing.md)
-finishes200k in6m03s but fails too: frozen−3.875 versus initial0.00, both10/24
-wins. Those screens use about one fifth of the historical successful cohorts'
-updates; they do not isolate capacity or resolution. [Pong4M/RGB48](results/2026-10-25-cdp-cheap-pong.md)
-finishes200k in10m22s: frozen−17.125 versus initial−20.375, both0/24 wins.
-Fresh Boxing2017,1M/RGB32/500k/R32 now passes: frozen76.8333 versus initial2.875,
-24/24 wins,124939 updates in28m22s, all audits pass. This is the first useful cheap
-AMD recipe; confirm it across seeds before claiming reliability. The retained
-same-seed1M/RGB64/500k/R32 control takes65m38s and scores71.625; geometry, runtime
+| Game and recipe | Actions / updates | Training wall | Frozen final / initial | Task outcome |
+|---|---:|---:|---:|---|
+| [Boxing1M/RGB32/R16](results/2026-10-25-cdp-cheap-boxing.md) |200k /24,970|6m03s|−3.875 /0.00|10/24 wins; fail|
+| Boxing1M/RGB32/R32 |500k /124,939|28m22s|76.833 /2.875|24/24 wins; pass|
+| [Freeway1M/RGB64/R16, no aid](results/2026-10-25-cdp-cheap-freeway.md) |200k /24,970|8m07s|0.00 /0.00|0/24 milestones|
+| Same,5% persistent action aid in training |200k /24,970|8m11s|0.25 /0.00|0/24 milestones|
+| [Pong4M/RGB48/R16](results/2026-10-25-cdp-cheap-pong.md) |200k /24,970|10m22s|−17.125 /−20.375|0/24 wins|
+| [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
+
+Boxing is the first useful cheap AMD recipe; confirm it across seeds. The retained
+same-seed1M/RGB64/500k/R32 control takes65m38s and scores71.625. Geometry, runtime
 and GPU differ, so the2.31× wall-cost comparison does not isolate resolution.
-Current allocation: [Qbert4M/RGB48/R32,200k](experiments/2026-10-25-cdp-cheap-qbert.md),
-with a30-minute training cap and fixed24-episode final/actual-initial evaluation.
+Qbert's mean first-pyramid coverage improves5.83→16.63 of21 cubes, with a maximum
+of20, but its task gate fails. Neither these results nor short-screen failures
+establish a universal capacity or resolution rule.
+
+**Current allocation:** [Breakout4M/RGB64/R32,200k](experiments/2026-10-25-cdp-cheap-breakout.md),
+with a30-minute training cap, halfway recovery checkpoint and fixed24-episode
+final/actual-initial evaluation. Preserve64x64 ball detail and one GPU resize.
+
+Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
+finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
+[Auto500k comparison](results/2026-10-25-cdp-amd-precision.md) takes2h53m and scores
+15.67 versus initial1.42. All0/24 two-wall successes; all audits pass. Do not
+extend either life. BF16 is unavailable on RX7900XT/RADV, and the early paired
+precision update difference does not establish the cause of the historical gap.
 
 **Compute priority, updated from the user's October25 direction:** finding useful
 game-specific configurations matters more than maintaining one universal set of

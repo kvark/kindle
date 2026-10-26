@@ -74,10 +74,14 @@ Fresh Boxing seed2017,1M/RGB32/B8/T16/R32,500k actions now passes: frozen76.8333
 versus initial2.875,24/24 wins,124939 updates in28m22s. All audits pass and the
 service exits. Retain this useful cheap recipe for seed confirmation; one
 development seed is not reliability. See the cheap-Boxing result report.
-Current allocation: fresh Qbert seed1009,4M/RGB48/B8/T16/R32,200k actions,
+Qbert4M/RGB48/R32 completes200k actions in19m45s: frozen809.375 versus180.2083,
+0/24 first pyramids. Mean first-pyramid coverage improves5.83→16.63 of21 cubes,
+but the task gate fails. All audits pass; no extension. See the cheap-Qbert report.
+Current allocation: fresh Breakout seed1009,4M/RGB64/B8/T16/R32,200k actions,
 expected49939 updates,30-minute training cap and fixed24-episode final/actual-
-initial evaluations. See `docs/experiments/2026-10-25-cdp-cheap-qbert.md`;
-service owner `kindle-cheap-qbert-r32-200k-20261025`. Check its live state before
+initial evaluations. Preserve64x64 ball detail. See
+`docs/experiments/2026-10-25-cdp-cheap-breakout.md`;
+service owner `kindle-cheap-breakout-r32-200k-20261025`. Check its live state before
 further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
