@@ -1124,3 +1124,41 @@ Bounded queue:
 `/x/Temp/kindle-cheap-20261025/qbert-4m-48-policy-forecast-smoke`;
 controller`run_qbert48_forecast_smoke.py`. Unselected declaration SHA256
 `ef5aee5b7947cbdfd2a1c1d7259ad59d6ce885ac8c22fb45ba7baaad4a599455`.
+
+
+## Guidance changes experience; supervised actor imitation is not implemented
+
+A read-only source review verifies the relevant native files are unchanged from
+runtime`bfb8c31`. The Python adapter forwards forced actions and then ordinary
+observations/rewards/boundaries. Native action selection replaces the proposed
+action and stores it as `pending_action`; replay retains that executed action
+with its resulting observation, without a teacher/expert-label flag. The actor
+loss consumes imagined actions weighted by discounted normalized advantages;
+replay features feed the critic loss. Thus the completed guidance experiments
+supply experience for world/critic learning, with policy transfer through
+imagined returns. They do not perform supervised actor imitation.
+
+The capped run's verified15,360 teacher actions contain14,447 NOOP and913 movement
+actions. A constant NOOP predictor would match **94.06% of these saved labels**;
+that is a dataset arithmetic result, not a game score or policy assessment.
+Movement labels account for0.4565% of all200k collected actions. These counts
+make aggregate label accuracy inadequate for judging a future imitation change.
+They do not prove why the current unaided frozen result is weak.
+
+If supervised guidance is later proposed, it needs an explicit trusted-label
+path, separate from random exploration and ordinary actions. Replay's incoming
+`previous_action` belongs to the preceding state: a state-at-t imitation target
+must use the action stored at t+1, within the same lane and valid episode boundary.
+A native auxiliary actor loss would be a new algorithm intervention requiring
+alignment/gradient checks, unchanged default behavior and unaided frozen task
+evaluation. **No imitation implementation or allocation is selected.** The
+prepared reward-forecast check remains unselected while Pong trains.
+
+Source locations: [override path](../../kindle/src/dreamer/agent/vector.rs),
+[replay frame semantics](../../kindle/src/dreamer/replay.rs),
+[behavior targets](../../kindle/src/dreamer/agent.rs),
+[behavior loss graph](../../kindle/src/dreamer/behavior.rs), and
+[Python binding](../../python/src/vector.rs). The review constructs no agent,
+changes no code and verifies every active Pong pin remains unchanged.
+Evidence:`/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-pixel-cap640-200k/guidance-learning-path-review.json`;
+SHA256`a2a4e096462169e4d5670e6f7ab067a0fdc934f1e12480bc7dfe79e430b898b7`.
