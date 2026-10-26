@@ -51,17 +51,21 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Active fresh Qbert pixel-guidance learning:1009/eval4000001009,
-4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates/acgradsfalse.
-Keep200k actions/49,939 updates, first248, zero debt,100k recovery and25-minute
-training cap. Five-percent episode selection is separate from actual measured
-action share. Fixed final/own initial24 natural episodes disable guidance and
-retain mean15000/90%-pyramid gate, full346-tensor/replay/guard/coverage checks.
-Native unchanged; Python overlay`runtime-qbert-guidance`. Owner
-`kindle-cheap-qbert-pixel-aid-200k-20261026`; active from19:45:05 UTC/source`53ffc6b`.
-Startup matches346 initial tensors and248:1/256:2/256:3 updates; all monitoring
-attached. No smoke experience
-reuse, cap increase, extension or automatic next allocation.
+The fresh Qbert pixel-guided comparison completes 200k actions/49,939 updates
+in 20m13s, but lowers unaided frozen score 809.375→633.333 and first-pyramid
+coverage 16.625→11.667/21; both have 0/24 pyramids. The 5% episode rule actually
+overrides 23,428 actions (11.714%). All audits, 100k recovery, 346 matched initial
+tensors/semantic traces, complete pixel/action replay and comparison pass;
+service exits 20:07:01 UTC. Retain unaided; no extension or confirmation.
+See [the result](docs/results/2026-10-25-cdp-cheap-qbert.md#pixel-guided-training-lowers-unaided-frozen-quality).
+
+Select only the prepared bounded Pong RGB32 check: 16,384 actions/4,035 updates
+plus 1,024 frozen restore actions, 180s/60s caps. Keep the stronger B8 control's
+4M/Auto/N8/B8/T16/H15/R32/coefficient.01/actor0/full18/original rates/no aid,
+fresh1009/eval4000001009. Only image geometry changes 48→32; shapes and initial
+weights differ. Native frames retain one GPU resize. Owner
+`kindle-cheap-pong-rgb32-smoke-20261026`; no full learning allocation selected.
+See [the declaration](docs/results/2026-10-25-cdp-cheap-pong.md#rgb32-bounded-check-prepared-not-selected).
 
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions
 in0.452s;512 verified overrides,346 matched initial/unchanged frozen tensors,
@@ -79,7 +83,7 @@ no extension or confirmation. Progress-observer interruption did not restart tra
 The CPU-only Qbert pixel rule clears24/24 first pyramids, mean3764.583 and
 coverage21/21; complete replay passes. It misses mean15000 and is hand-coded
 guidance evidence, not Kindle success. Bounded native integration passes;
-unaided transfer remains untested. See the cheap-Qbert report.
+the completed 200k test lowers unaided quality. See the cheap-Qbert report.
 
 The bounded PongB16 check passes4096/466 in16.126s and1024 frozen actions in
 0.436s, all357 tensors unchanged,346 shared initial tensors matching control,

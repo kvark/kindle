@@ -732,3 +732,11 @@ reviewed before selecting this check; no full learning allocation is selected.
 Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-32-b8-smoke`;
 controller`run_pong_rgb32_smoke.py`. Preparation SHA256
 `07fa7fe6727ff31049cf4ffb254ff0feab731b11707c3bbf5de483a930099ec0`.
+
+
+After the completed Qbert pixel-guided comparison and all audits are reviewed,
+select this bounded check only. Qbert score 633.333 and coverage 11.667/21 are
+below its unaided control, with 0/24 pyramids; it receives no extension.
+The GPU is idle before selection. Keep the declared 16,384/4,035 and 1,024-action
+budgets, 180s/60s caps and all checks. Owner
+`kindle-cheap-pong-rgb32-smoke-20261026`. No full RGB32 learning run is selected.

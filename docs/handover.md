@@ -220,26 +220,35 @@ only in the new CPU reader, which incorrectly rejects training intrinsic rewards
 A training-aware correction passes421 tests and the saved trajectory replay;
 original failure retained, no GPU repeat.
 
-After review, select fresh200k/49,939-update Qbert learning with5% episode
-selection, actual action share measured,25-minute training cap and100k recovery.
-Keep4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
-1009/eval4000001009, fixed final/own initial24 natural episodes with guidance
-disabled, original15000/90%-pyramid gate and full audits. Native unchanged;
-separate Python overlay preserves old runtime. Owner
-`kindle-cheap-qbert-pixel-aid-200k-20261026`; active from19:45:05 UTC/source`53ffc6b`.
-Startup matches346 initial tensors and248:1/256:2/256:3 updates; all monitoring
-attached. No smoke experience
-reuse, cap increase, extension or automatic next run.
+The fresh Qbert pixel-guided comparison completes 200k actions/49,939 updates
+in 20m13s, but lowers unaided frozen score 809.375→633.333 and first-pyramid
+coverage 16.625→11.667/21; both have 0/24 pyramids. The 5% episode rule actually
+overrides 23,428 actions (11.714%). All audits, 100k recovery, 346 matched initial
+tensors/semantic traces, complete pixel/action replay and comparison pass;
+service exits 20:07:01 UTC. Retain unaided; no extension or confirmation.
+See [the result](results/2026-10-25-cdp-cheap-qbert.md#pixel-guided-training-lowers-unaided-frozen-quality).
+
+Select only the prepared bounded Pong RGB32 check: 16,384 actions/4,035 updates
+plus 1,024 frozen restore actions, 180s/60s caps. Keep the stronger B8 control's
+4M/Auto/N8/B8/T16/H15/R32/coefficient.01/actor0/full18/original rates/no aid,
+fresh1009/eval4000001009. Only image geometry changes 48→32; shapes and initial
+weights differ. Native frames retain one GPU resize. Owner
+`kindle-cheap-pong-rgb32-smoke-20261026`; no full learning allocation selected.
+See [the declaration](results/2026-10-25-cdp-cheap-pong.md#rgb32-bounded-check-prepared-not-selected).
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
-Check live service state before GPU work; the latest frozen-assessment owner
-`kindle-cheap-pong-greedy-frozen-20261026` has completed.
+Check live service state before GPU work; Qbert pixel-guided learning and its
+postprocessing have completed. The bounded Pong check is the only selection.
 
-Current native source`bfb8c31`; runner`fbdaee3` adds opt-in CDP actor/critic gradients, SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`. Native SHA256
+Current native source`bfb8c31`; runner`137ed77` adds optional Qbert pixel guidance
+and opt-in CDP actor/critic gradients, SHA256
+`4a7cf99bb5e55382b74d65c97d855f5a87772ed7199fc11bb4199e35a6d78de4`.
+Use the `runtime-qbert-guidance` Python overlay with this CLI; frozen replay is
+`5043b7a` and corrected guidance replay is `53ffc6b`. Native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
 `original-native` preserves the prior AMD binary. Both installed and source-tree

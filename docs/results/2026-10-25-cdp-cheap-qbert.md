@@ -816,3 +816,40 @@ The100k recovery passes24,939 updates and all346 finite tensors. A complete
 with25,539 updates and zero debt. The recovery watcher exits successfully;
 fixed200k learning and unaided evaluation remain pending. Recovery review
 SHA256`7e9ad619807969f8b5abf9fc2019f4a9e833a9f9f35e088d776a3c73f1532cf1`.
+
+
+## Pixel-guided training lowers unaided frozen quality
+
+The fresh 200k comparison finishes in **20m13s**, but unaided frozen score falls
+**809.375→633.333**, and mean maximum first-pyramid coverage falls
+**16.625→11.667/21**. Both have **0/24 pyramids**; own initial scores 180.208.
+Retain the unaided recipe. No extension or seed confirmation is selected.
+The online curve includes guidance and its higher returns do not establish
+unaided transfer. The original mean15000/90%-pyramid gate remains unmet.
+
+Training completes 200,000 actions/799,409 emulator frames/49,939 finite updates
+in 1213.509s, first248, zero debt and 378 natural episodes. The fixed 5% episode
+selection chooses 23 of 386 started episodes and overrides 23,428 actions,
+**11.714%** of the action budget; episode probability is not action fraction.
+Complete CPU replay of the saved training trajectory takes 69.236s and verifies
+every guided action/input-frame hash, executed action, reward and boundary.
+The native config is unchanged from the unaided control; all 346 actual-initial
+tensors and semantic frozen-initial traces match. Native source `bfb8c31`, CLI
+`137ed77`, guidance replay `53ffc6b`; launch source `53ffc6b`.
+
+Guidance is disabled in both frozen arms. Final/initial collection uses
+16,624/9,232 actions, 66,452/36,888 frames and 6.701/3.748s, selecting the fixed
+first three natural episodes per lane. One excess final episode and all partial
+tails are retained; no truncations or learning updates. All 346 tensors remain
+unchanged. Full config/source/counter checks, 100k recovery, complete frozen
+replays/videos, three guards, curves, coverage and comparison pass. Service
+exits successfully at 20:07:01 UTC, 21m55.901s total. No GPU stage repeats.
+One reused development seed and the control's older kernel limit attribution.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-pixel-aid-200k`.
+Learning review SHA256 `5e71127f30573ad88dc9e3d7dcd6979fa4470ca7249d3fce99400d616be7c62e`;
+coverage `82b617a90d7abae2acb80228b0367d661cfc61483bd9a2228708780ea35e3b74`;
+guidance replay `f78ae6ab75e37768ecfb34fb0f88841d2700859f0a47a3c3f51a668cd7c71433`;
+comparison `802ffc6bdf5a30146ed464c724a05fdeb79e53866e7cf83a992253cb65f9b656`;
+completion `583b2d4cc4f65c36a7b64c3263753589d75d9b4981205021c7473c309e0b1461`.
+After review, select only the separately prepared bounded Pong RGB32 check.
