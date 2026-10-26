@@ -6,9 +6,9 @@ is the status dashboard; individual result reports preserve the evidence.
 
 **Current AMD development results:** all completed rows pass numerical,
 checkpoint, accounting, frozen-tensor and full-replay audits. The learning gate
-is separate. Each row is one development seed, not a reliability result.
+is separate. Each row describes one learner or warm-start lineage, not broad reliability.
 
-| Game and recipe | Actions / updates | Training wall | Frozen final / initial | Task outcome |
+| Game and recipe | Actions / updates | Training wall | Frozen final / starting policy | Task outcome |
 |---|---:|---:|---:|---|
 | [Boxing1M/RGB32/R16](results/2026-10-25-cdp-cheap-boxing.md) |200k /24,970|6m03s|−3.875 /0.00|10/24 wins; fail|
 | Boxing1M/RGB32/R32, seed2017 |500k /124,939|28m22s|76.833 /2.875|24/24 wins; pass|
@@ -23,6 +23,7 @@ is separate. Each row is one development seed, not a reliability result.
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
+| [Retained Breakout12M/RGB64/H5 warm start](results/2026-10-26-cdp-breakout-short-imagination.md) |50k new /12,439 new|8m02s|27.208 /67.583 source|0/24 two-wall successes; regression|
 
 Boxing's cheap AMD recipe now passes on two fresh learners, each within30 minutes;
 this is useful confirmation, not broad seed reliability. The retained
@@ -65,17 +66,21 @@ GPU/precision/runtime, so the difference does not isolate precision. This is a
 transferred-policy control for any separately declared warm start, not new
 learning or a matched-budget comparison with the fresh compact200k policies.
 
-**Current allocation:** [50k-action Breakout H5 warm start](experiments/2026-10-26-cdp-breakout-short-imagination.md).
-Reuse the verified retained weights. Only imagined rollout length15→5 changes;
-12M/RGB64/Auto/N8/B8/T16/R32 and the other settings remain. The frozen H5 source
-exactly reproduces the current H15 action/outcome trace and67.5833 score, with
-all346 tensors unchanged and all source audits passing. Startup config/source/
-counter checks and first learning updates pass. Keep the20-minute training cap,
-12,439 expected new updates and fixed source/final natural-episode evaluations.
-Preserve source counters499939/2027152. Replay, games, belief and
-RNG restart; this is a warm start. No benefit is established, and new experience
-plus replay restart prevent isolated horizon attribution without a matched H15
-learning arm. No automatic next allocation, cap increase or unchanged extension.
+The [completed H5 warm start](results/2026-10-26-cdp-breakout-short-imagination.md)
+uses50k new actions/12,439 updates in8m02s but regresses67.5833→27.2083, both0/24
+two-wall successes. The frozen source trace matches H15 before learning; all
+audits pass and service exits. Replay/games/belief/RNG restart, so new experience
+and replay restart confound isolated horizon attribution. Retain the source;
+no extension. Counter-aware curves pass70 CPU checks without changing training.
+
+**Current allocation:** [compact Pong seed4013 confirmation](experiments/2026-10-26-cdp-compact-pong-confirmation.md).
+Keep4M/RGB48/Auto/N8/B8/T16/H15/R32,500k actions/124939 updates and the55-minute
+cap fixed; only learner/evaluation seeds change. The primary23/24 wins justify
+focused confirmation, but mean11.0 still misses the unchanged15-point gate.
+Startup full config/source/counter checks, finite own actual-initial checkpoint
+and first updates pass. Fixed24-natural-match final/actual-initial controls and
+full audits follow. This selected seed is not held out; no broad campaign,
+automatic next allocation, cap increase or unchanged extension.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

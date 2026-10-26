@@ -53,16 +53,18 @@ Only precision metadata changes to Auto; the warm start below is separately decl
 completes200k/49939 updates in20m12s: frozen809.375,0/24 pyramids. Score matches
 the control but mean coverage falls16.625→13.708 of21 cubes. All audits pass and
 service exits; no extension.
-Current allocation: [short H5 Breakout warm start](experiments/2026-10-26-cdp-breakout-short-imagination.md),
-service `kindle-breakout-retained-h5-50k-20261026`, started03:53:51 UTC.
-Reuse verified12M/RGB64/Auto weights, changing only imagination15→5; keepN8/B8/
-T16/R32. Fixed50k new actions/12439 expected updates,20-minute training cap.
-The frozen H5 source reproduces the complete H15 action/outcome trace and67.5833
-score, with all346 tensors unchanged and all audits passing. Startup checks and
-first learning updates pass. Replay/games/belief/RNG restart; preserve source
-counters499939/2027152. Fixed final evaluation and full audit follow. Check live
-state before GPU work. CLI`1ed07af` rejects restore overrides; a labelled input
-copy supplies H5. No native rebuild or automatic next allocation.
+The [H5 Breakout warm start](results/2026-10-26-cdp-breakout-short-imagination.md)
+completes50k new actions/12439 updates in8m02s but regresses67.5833→27.2083,
+both0/24 two-wall successes. The frozen source trace matched H15 before learning;
+all audits pass and service exits. Retain the source; no extension.
+Current allocation: [compact Pong seed4013 confirmation](experiments/2026-10-26-cdp-compact-pong-confirmation.md),
+service `kindle-cheap-pong-48-r32-500k-4013-20261026`, started04:10:30 UTC.
+Keep4M/RGB48/Auto/N8/B8/T16/H15/R32,500k/124939 updates and55-minute cap fixed;
+only learner/evaluation seeds change. The primary wins23/24 but mean11.0 misses
+the unchanged15-point gate. Startup full config/source/counter checks, finite
+own actual-initial checkpoint and first updates pass. Fixed final/actual-initial
+evaluations and full audit follow. Check live state before GPU work. Native and
+training CLI remain unchanged; no automatic next allocation or extension.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

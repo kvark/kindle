@@ -107,16 +107,18 @@ match the source, all audits pass and service exits. See
 Qbert coefficient100 completes200k/49939 updates in20m12s: frozen809.375,
 0/24 pyramids, matching the coefficient1 score but reducing mean coverage
 16.625→13.708 of21 cubes. All audits pass and service exits. No extension.
-Current allocation:50k-action Breakout H5 warm start from the retained source,
-12M/RGB64/Auto/N8/B8/T16/R32,20-minute training cap. Only imagination length
-15→5 changes; replay, games, belief and RNG restart. The frozen H5 source exactly
-reproduces the current H15 action/outcome trace and67.5833 score; all346 tensors
-remain unchanged and all source audits pass. Startup config/counter checks and
-first learning updates pass. Retain499939/2027152 starting counters; expected
-12,439 new updates, fixed50k final and source/final natural-episode controls.
-See `docs/experiments/2026-10-26-cdp-breakout-short-imagination.md`; service owner
-`kindle-breakout-retained-h5-50k-20261026`. Check its live state before further
-GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
+Breakout H5 warm start completes50k new actions/12439 updates in8m02s but
+regresses frozen67.5833→27.2083, both0/24 two-wall successes. Frozen source trace
+matches H15 before learning; all audits pass and service exits. Retain the source,
+no extension. See `docs/results/2026-10-26-cdp-breakout-short-imagination.md`.
+Current allocation: focused Pong seed4013 confirmation,4M/RGB48/Auto/N8/B8/T16/
+H15/R32,500k actions/124939 expected updates and unchanged55-minute cap. Only
+learner/evaluation seeds change from the23/24-win primary recipe; its mean11.0
+still fails the unchanged15-point gate. Fresh initialization/config/counter
+checks and first updates pass. Fixed final/actual-initial evaluations and full
+audits follow. See `docs/experiments/2026-10-26-cdp-compact-pong-confirmation.md`;
+service owner `kindle-cheap-pong-48-r32-500k-4013-20261026`. Check its live state
+before further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
 and restores reject overrides.263 vector-runner tests pass; native is unchanged.
 Do not restart completed training, old queues, broad seed campaigns or unchanged

@@ -43,3 +43,9 @@ Controller: `run_pong_500k_r32_4013.py`; intended service:
 Exact commands match the primary run except seeds and artifact paths. CPU
 preparation passes; native/runner/controller identities and caps are recorded.
 Selected after the completed Qbert coefficient and Breakout H5 results.
+
+Started04:10:30 UTC, source`923b47b`. Startup checks pass: full native config
+matches the first500k learner except seed,3,578,225 parameters, H15, no action
+aid, zero starting counters, finite346-tensor actual initial checkpoint and
+first updates248:1,256:2,256:3. The initial world tensor hash differs from seed1009
+as expected. Fixed final/actual-initial evaluations and full audits are pending.
