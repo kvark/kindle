@@ -930,3 +930,20 @@ Artifacts:
 owner`kindle-cheap-pong-behavior-lr2-500k-20261026`. Controller
 `run_pong_behavior_lr2_500k.py`, comparison`compare_pong_behavior_rate.py`,
 postprocessing`finish_pong_behavior_lr2.py`; exact hashes in the declaration.
+
+
+The fresh run starts **21:41:35 UTC/source`523eaca`**, invocation
+`8b9cabed37a048cb869b93bed3082a0d`. Startup verifies RX7900XT, exact declared
+native config,3,578,225 parameters, fresh counters and first376:1/384:2/392:3
+updates. All346 actual-initial tensors match both the completed B16 control and
+the bounded check. Progress, four-recovery monitoring and fixed-final
+postprocessing are attached. Selected declaration SHA256
+`0e22b1b038bdc53c4452373d0181bc417498d0bf2175f5373ca70a7735406350`;
+startup`7f96a8eb44ad24d50b859de3f3bec2c4a3d2d0b15313f73aedba66cc2fa7138e`.
+
+The first CPU startup-receipt attempt used the plotting environment, whose
+transitive checkpoint-audit import lacks`ale_py`. The failure is retained in
+`startup-review-first-attempt-failure.json`. Repeating only those read-only
+checks under the existing Atari Python environment passes. Training retains
+the same PID/invocation and cap; no GPU stage repeats. Frozen learning quality
+remains pending.

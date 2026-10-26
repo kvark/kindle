@@ -78,7 +78,7 @@ No extension or confirmation follows capped Qbert. The applied
 `runtime-qbert-guidance-cap` overlay. Prior isolation failures remain recorded.
 See [the completed result](docs/results/2026-10-25-cdp-cheap-qbert.md#capped-guidance-recovers-some-quality-but-remains-below-unaided-training).
 
-Select fresh Pong B16 behavior-rate learning after the bounded check passes:
+Fresh Pong B16 behavior-rate learning is active from21:41:35 UTC/source`523eaca`:
 4M48/Auto/N8/B16/T16/H15/R32/coefficient.01/actor0/full18, world4e-5/encoder6e-6/
 dynamics4e-4 and behavior8e-5 only; fresh1009/eval4000001009. Keep500k actions/
 62,454 updates, first376, zero debt, four100k recoveries and45-minute training
@@ -86,6 +86,9 @@ cap. Fixed final/own initial24-natural evaluations retain mean15/90%-wins,
 all346 tensors, full config/source/counter/replay/video/guard/curve checks and
 comparison to original B16, global2x and B8. No cap increase, extension or
 automatic next allocation. Owner`kindle-cheap-pong-behavior-lr2-500k-20261026`.
+Startup matches346 initial tensors and376:1/384:2/392:3 updates. Progress,
+four-recovery monitoring and postprocessing are attached. A CPU startup import
+failure is retained and corrected without changing training PID/invocation.
 Bounded4096/466 training and1024 frozen actions pass in15.979s/0.437s, with346
 matched initial/unchanged frozen tensors and both guards; service exits21:37:35.
 CLI`a2c467c` passes460 CPU tests; native unchanged. See cheap-Pong's selected
