@@ -96,3 +96,28 @@ finite tensors;100,803 strict reports pass through403,464 actions. Captured
 401,408-action progress is1,830.097s with zero debt. Checkpoint metadata SHA256
 `6572e8436401aec668e905f153413c6dfc0210063ada594faf7e099092856dcf`.
 The recovery watcher exits successfully while training continues to500k.
+
+## Conditional confirmation preparation
+
+Before the primary frozen result, prepare one fixed-recipe4013 confirmation,
+without selecting or starting it. It is eligible only if the completed primary
+passes the original mean15/90%-wins gate with all audits/comparison complete and
+service terminal. The controller checks that gate before launching GPU work.
+Otherwise leave it unselected and review the separately prepared Breakout test.
+This conditional preparation uses no online-score trigger or automatic queue.
+
+Only learner/evaluation seeds become4013/4000004013. Keep500k/124,939 updates,
+H5/original rates/45-minute cap and fixed-final/own-initial evaluation. All346
+initial tensors must match the existing same-seed H15 coefficient.01 control;
+compare its complete semantic initial trace. This is a reused development seed,
+not held-out validation or a broad seed campaign.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-48-h5-r32-intrinsic001-500k-seed4013`;
+controller`run_pong_h5_intrinsic001_500k_4013.py`, SHA256
+`984307051e2c9d47b25e7b82532571d2f53662b48c11d0785cc0fa4ed28f7493`;
+queue`6faf2f658d8d526c5dcaeb9889957ad90d458cd2912ade8c7c73ad2cc1f00f47`;
+prepared declaration`ee1fbd89f782591bb48c95a10d65ffe5e88ca19fd70f53a9c77915793baa8548`.
+Compilation, complete queue normalization to the primary except seeds/paths,
+unselected refusal and same-seed H15 comparison-reader checks pass. Comparison
+SHA256`4d28f62f0ee92b5ba1dfaea2f462f2e6e811a9257898e6c4975da02c6ddbed3b`.
+All preparation is CPU-only; production runtime and active trial files stay fixed.
