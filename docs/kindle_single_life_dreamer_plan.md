@@ -21,6 +21,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Pong4M/RGB48/R32](results/2026-10-25-cdp-cheap-pong.md#r32-and500k-actions) |500k /124,939|48m53s|11.000 /−20.375|23/24 wins; mean15 gate fails|
 | [Same recipe, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#fixed-recipe-seed4013-confirmation) |500k /124,939|50m14s|7.333 /−20.333|22/24 wins; mean15 gate fails|
 | [Same, coefficient.01, seed1009](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-improves-the-fixed-budget-result) |500k /124,939|49m55s|14.958 /−20.375|24/24 wins; mean15 narrowly fails|
+| [Same, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-seed4013-confirmation) |500k /124,939|49m58s|14.000 /−20.333|24/24 wins; mean15 fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -110,22 +111,23 @@ completes500k/124939 updates in49m55s: frozen14.9583 and24/24 wins versus own
 initial−20.375 and0/24. The coefficient1 control scores11.0/23 wins at the same
 budget. All audits/curves pass, initial tensors/semantic evaluation traces match,
 and service exits. The unchanged mean15 gate still fails; do not round it into
-a pass. Training cost is similar. This promising result merits one confirmation.
+a pass. Training cost is similar. This result motivated the confirmation below.
 
-**Current allocation:** [focused Pong coefficient.01 seed4013 confirmation](experiments/2026-10-26-cdp-pong-small-intrinsic-confirmation.md).
-Keep4M/RGB48/Auto/N8/B8/T16/H15/R32,3,578,225 parameters,500k actions and55-minute
-cap, no aid; change only learner/evaluation seeds to4013/4000004013. Preserve
-own actual-initial/fixed-final controls and mean15/90%-win gate. Match initial
-tensors against the completed coefficient1 seed4013 control. Started07:36:01 UTC,
-source`1ff41da`; full config/counters, all346 matched initial tensors and first
-updates pass. Fixed evaluations/full audit follow; no automatic extension or next
-allocation. The seed is reused development data, not held out.
-A [four-action Breakout candidate](experiments/2026-10-26-cdp-breakout-minimal-actions.md)
-is prepared for later review at the original compact H15/200k budget. Existing
-adapter/replay support needs no code change; shared actions match in a bounded
-CPU check. Action dimensions, initial weights and policy probabilities change,
-so retain an own initial control and label the protocol variant. It stays
-unselected pending the focused Pong confirmation; no GPU result or established benefit.
+The [smaller-bonus confirmation](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-seed4013-confirmation)
+completes500k/124939 updates in49m58s:14.0 and24/24 wins versus initial−20.333,
+improving the same-seed coefficient1 control's7.333/22 wins. All audits and both
+comparisons pass; service exits08:27:53 UTC. Both coefficient.01 learners still
+miss mean15. These are reused development seeds, not broad reliability evidence.
+
+**Current allocation:** [four-action Breakout](experiments/2026-10-26-cdp-breakout-minimal-actions.md).
+Fresh1009/eval4000001009,4M/RGB64/Auto/N8/B8/T16/H15/R32, actor_unimix.01,
+fixed200k/49939 updates and30-minute cap. Only native action_count changes18→4
+from the completed H15 mixture control. Existing adapter/replay support needs
+no code change; shared actions match in a bounded CPU check. Dimensions, initial
+weights and policy probabilities change, so retain an own initial control and
+label the protocol variant. Keep the864-point two-wall gate. No benefit is yet
+established, no third Pong seed or unchanged extension is selected, and no next
+allocation launches automatically.
 
 For later Qbert review, the [prepared experience-budget candidate](experiments/2026-10-26-cdp-qbert-experience-budget.md)
 uses fresh full18/4M/RGB48/H15,500k actions at ratio16,62,470 expected updates
@@ -133,7 +135,7 @@ and the same30-minute cap. A CPU stage-cost estimate suggests26.4 minutes; it
 does not predict runtime or learning. Configuration/preflight checks and an R16
 recovery audit against completed evidence pass. This remains unselected, with
 no GPU work or automatic queue; own initial/fixed final controls and the task
-gate stay fixed. Review the active Pong outcome before choosing an allocation.
+gate stay fixed. Review the selected Breakout outcome before choosing an allocation.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
@@ -175,7 +177,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Game | Latest useful frozen result | What remains |
 | --- | --- | --- |
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
-| Pong | AMD4M/RGB48/R32/500k: coefficient1 seeds1009/4013 score11.0/7.33; coefficient.01 seed1009 improves to14.958 and24/24 wins in49m55s | Reference20.45; compact mean15 gate and broad reliability remain open |
+| Pong | AMD4M/RGB48/R32/500k: coefficient1 seeds1009/4013 score11.0/7.33; coefficient.01 seeds1009/4013 improve to14.958/14.0 and24/24 wins each in49m55s/49m58s | Reference20.45; compact mean15 gate and broad reliability remain open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | Historical2M mean7,367;62/72 first pyramids | Reference193,220.77; intermediate15k/90% also unmet |

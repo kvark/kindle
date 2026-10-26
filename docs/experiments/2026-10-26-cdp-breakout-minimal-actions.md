@@ -1,9 +1,9 @@
 # Four-action compact Breakout candidate
 
-**Prepared only.** Pong coefficient.01 completes at14.9583 with24/24 wins,
-narrowly missing mean15. Its focused seed4013 confirmation is selected next.
-Review that outcome and terminal service before selecting this allocation. This candidate
-does not launch automatically or extend the failed H5 life.
+**Selected after completed Pong confirmation.** Coefficient.01 scores14.9583
+and14.0 with24/24 wins each; both still miss mean15. The confirmation and both
+comparisons pass all audits and its service exits at08:27:53 UTC. This allocation
+starts a fresh bounded Breakout life; it does not extend the failed H5 life.
 
 The full18 compact H15/200k mixture control scores7.083; H5 reaches its45-minute
 cap at487,736 actions and scores8.458. Neither completes two walls. Test the

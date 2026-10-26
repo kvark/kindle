@@ -221,3 +221,53 @@ comparison`94c2ba7bc4fee016512b8c7371af3db1d9b151ca4b48fcdda6213f1a8dc20606`.
 Source at launch`12a6553`, native`bfb8c31`, runner`1ed07af`, replay`e853818`.
 The [fixed-recipe confirmation](../experiments/2026-10-26-cdp-pong-small-intrinsic-confirmation.md)
 uses previously evaluated4013, not a held-out seed. The gate remains unchanged.
+
+## Smaller-bonus seed4013 confirmation
+
+The fixed-recipe confirmation scores **14.0 with 24/24 frozen wins**, versus
+7.333 and 22/24 for its coefficient1 control. Its own initial scores−20.333
+with0/24 wins. Both smaller-bonus learners improve over their respective controls,
+but **both still fail the unchanged mean15 gate**. Retain this useful recipe and
+move the next allocation to the four-action Breakout test; no third Pong seed or
+unchanged extension is selected.
+
+Only learner/evaluation seeds change from the coefficient.01 primary to
+4013/4000004013. Native configuration differs from the same-seed coefficient1
+control only in intrinsic_reward_scale; all346 initial tensors and the complete
+initial semantic evaluation trace match that control. Keep4M/RGB48/Auto,
+3,578,225 parameters, N8/B8/T16/H15/R32, full18, actor_unimix0 and no aid.
+
+| Coefficient, seed4013 | Actions / emulator frames / updates | Training wall | Frozen final / initial | Wins |
+|---|---:|---:|---:|---:|
+|1|500k /1,999,806 /124,939|50m14s|7.333 /−20.333|22/24|
+|.01|500k /1,999,727 /124,939|49m58s|14.000 /−20.333|24/24|
+
+Training takes2,998.127072s, with150 natural matches, first update248 and zero
+debt. The online last50 mean14.82 is separate from the frozen14.0. The reviewed
+curves show an earlier rise than the same-seed coefficient1 control, while
+execution cost remains similar. The two coefficient.01 policies score14.9583
+and14.0 separately; these are two reused development seeds, not held-out tests
+or48 independent learners.
+
+Final/initial frozen evaluations use96,072/26,416 actions,384,239/105,641 emulator
+frames and40.330/11.195s. Each collects24 natural matches, the first three per
+lane, with partial tails retained and zero updates/truncations. All346 frozen
+tensors,124,939 strict reports, four recovery checkpoints, full configuration,
+source/counters, finite checkpoints, complete CPU replays/videos and three host
+guards pass. The original service exits successfully at08:27:53 UTC, after
+51m52s including evaluations/audit; its journal is retained. Both comparison
+scripts complete without repair and their plots are visually reviewed.
+
+In the last25k updates, observed scaled bonus is0.0000951322 and inferred
+extrinsic net prediction0.00605091, ratio0.01572 versus3.461 for coefficient1.
+Different learned trajectories and signed cancellation limit this comparison;
+it does not establish the mechanism behind the score gain.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/pong-4m-48-r32-intrinsic001-500k-seed4013`,
+including `learning-review.json`, `curve/`, `coefficient-comparison/`,
+`seed-comparison/`, `comparisons-review.json` and `terminal-journal.txt`.
+Review SHA256`b82d9054f0edf366fbd6256570ad567612a0a88bbdcd333265de8b31ceecb432`;
+curve`8318ea9ab0373f61cc5c584d8d794855877a531f84ce409e843e838d7b4e760e`;
+coefficient comparison`c7e6a85f189111c20df5d48772cdcfeb4f136646c9b92f3ebe104d2291e80dd7`;
+seed comparison`a1895ad57fc6a9e595e1cecba63f6cfdbbda67764af3da41ed4b19df5d33bc39`.
+Source at launch`1ff41da`, native`bfb8c31`, runner`1ed07af`, replay`e853818`.

@@ -1,9 +1,8 @@
 # More Qbert experience at lower replay ratio
 
-**Prepared only.** Pong coefficient.01 seed4013 remains the active learner.
-Review its completed outcome and terminal service before selecting another
-allocation. This candidate and the four-action Breakout candidate are separate
-options, not an automatic queue. No Qbert GPU work has started.
+**Prepared only.** Pong coefficient.01 confirmation is complete; the four-action
+Breakout test is selected next. Review that outcome and terminal service before
+selecting this candidate. No automatic queue or Qbert GPU work has started.
 
 The full18 coefficient1 compact control scores809.375 with0/24 first pyramids
 after200k actions/49,939 updates in19m45s. Its mean coverage reaches16.625/21;

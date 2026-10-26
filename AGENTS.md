@@ -51,19 +51,16 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: focused Pong intrinsic coefficient .01 confirmation, fixed
-4M/RGB48/Auto/N8/B8/T16/H15/R32, 500k actions and a 55-minute cap, fresh seed
-4013/evaluation4000004013. Own actual-initial/fixed-final controls and the
-mean15/90%-win gate remain. The primary finishes at14.9583 with24/24 wins:
-promising, but still below15; all audits pass and its service has exited.
-No external aid or native change. See
-`docs/experiments/2026-10-26-cdp-pong-small-intrinsic-confirmation.md`;
-service owner `kindle-cheap-pong-intrinsic001-500k-4013-20261026`. Check live state
-before GPU work. Started07:36:01 UTC, source`1ff41da`; full config/counters,
-matched initial tensors and first updates pass. Fixed evaluations/full audit
-follow. No automatic extension or next allocation.
-The four-action Breakout candidate is prepared only, pending this outcome:
-`docs/experiments/2026-10-26-cdp-breakout-minimal-actions.md`.
+Current allocation: four-action Breakout, fresh1009/eval4000001009,
+4M/RGB64/Auto/N8/B8/T16/H15/R32, native actor mixture.01, fixed200k actions and
+30-minute training cap. Only native action_count changes18→4 from the completed
+H15 mixture control. Changed dimensions/initialization require an own actual
+initial; do not claim matched full18 weights. Keep the864-point two-wall gate.
+See `docs/experiments/2026-10-26-cdp-breakout-minimal-actions.md`; service owner
+`kindle-cheap-breakout-minimal-unimix-200k-20261026`. Check live state before GPU
+work. Selection follows completed Pong coefficient.01 results14.9583/14.0,
+24/24 frozen wins each; both miss mean15, all audits pass, both services exit.
+No third Pong seed, unchanged extension or automatic next allocation.
 
 Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
 `1ed07af`, CPU replay `e853818`. The active declaration pins exact runtime/script

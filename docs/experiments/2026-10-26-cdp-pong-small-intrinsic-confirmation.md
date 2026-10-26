@@ -1,10 +1,15 @@
 # Fixed-recipe confirmation of Pong's smaller bonus
 
-**Selected after the completed coefficient.01 primary and comparison.** Its
+**Completed:** frozen14.0 and24/24 wins in49m58s; mean15 still fails. All audits
+and comparisons pass, and the service exits at08:27:53 UTC. See the
+[completed result](../results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-seed4013-confirmation).
+The four-action Breakout candidate is selected next.
+
+Selected after the completed coefficient.01 primary and comparison. Its
 frozen14.9583 and24/24 wins improve over11.0/23 wins at the same500k budget, but
 still miss mean15. Confirm this promising change on previously used4013 without
 rounding the primary into a pass, relaxing the gate or extending its life.
-The four-action Breakout candidate remains prepared for later review.
+The four-action Breakout candidate was kept prepared during this confirmation.
 
 Only learner/evaluation seeds change from1009/4000001009 to4013/4000004013.
 Keep centered CDP, intrinsic coefficient.01,4M/RGB48/Auto,3,578,225 parameters,
@@ -49,5 +54,5 @@ Initial metadata SHA256
 selected declaration`2cc6d4a2fe7113d81960a8b3b38011110e60f01a7afab299f34466099bea48af`.
 Read-only recovery monitoring covers60 minutes; completed-run plotting is
 automated. The first watcher invocation omitted its milestone arguments and
-exited before monitoring; the corrected invocation is live. Training was not
-restarted and its limits did not change. Frozen results remain pending.
+exited before monitoring; the corrected invocation completed all four recoveries.
+Training was not restarted and its limits did not change.

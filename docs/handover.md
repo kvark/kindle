@@ -76,17 +76,19 @@ The [Pong coefficient.01 primary](results/2026-10-25-cdp-cheap-pong.md#smaller-b
 completes500k/124939 updates in49m55s: frozen14.9583 and24/24 wins versus own
 initial−20.375 and0/24. This improves the coefficient1 control's11.0/23 wins,
 but still misses mean15. All audits/curves pass and its service exits; no extension.
-Current allocation: [focused coefficient.01 confirmation](experiments/2026-10-26-cdp-pong-small-intrinsic-confirmation.md),
-same4M/RGB48/Auto/N8/B8/T16/H15/R32,500k and55-minute cap, changing only seeds to
-4013/eval4000004013. No aid; own actual-initial/fixed-final controls and original
-mean15/90%-win gate remain. Started07:36:01 UTC, source`1ff41da`; full native
-configuration/counters, all346 finite initial tensors matching the same-seed
-control and first updates pass. Fixed evaluations/full audit follow.
-Artifacts/controller:`pong-4m-48-r32-intrinsic001-500k-seed4013`,
-`run_pong_intrinsic001_500k_4013.py`; owner
-`kindle-cheap-pong-intrinsic001-500k-4013-20261026`. Check live state before GPU
-work. The four-action Breakout candidate remains prepared. No automatic extension
-or next allocation;4013 is a reused development seed, not held out.
+The [coefficient.01 confirmation](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-seed4013-confirmation)
+finishes500k/124939 updates in49m58s:14.0 and24/24 wins versus initial−20.333.
+Its coefficient1 control scores7.333/22 wins. All audits/curves/comparisons pass;
+service exits08:27:53 UTC. Both smaller-bonus seeds miss mean15; no extension.
+Current allocation: [four-action Breakout](experiments/2026-10-26-cdp-breakout-minimal-actions.md),
+fresh1009/eval4000001009,4M/RGB64/Auto/N8/B8/T16/H15/R32, actor_unimix.01,
+fixed200k actions and30-minute cap. Only native action_count changes18→4 from
+the completed H15 mixture control; use an own initial because dimensions and
+initialization change. Keep the864-point two-wall gate and full frozen audit.
+Artifacts/controller:`breakout-4m-64-r32-minimal-unimix001-200k`,
+`run_breakout_minimal_unimix_200k.py`; owner
+`kindle-cheap-breakout-minimal-unimix-200k-20261026`. Check live state before GPU
+work. No automatic extension or next allocation; QbertR16 remains prepared only.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
