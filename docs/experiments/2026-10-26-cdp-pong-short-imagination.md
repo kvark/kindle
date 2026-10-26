@@ -90,3 +90,9 @@ The300k recovery passes at74,939 updates,346 finite tensors and76,307 strict
 reports through305,480 actions. Captured303,104-action progress is1,377.361s
 with zero debt. Checkpoint metadata SHA256
 `85d9f29bb41da9da75289bf4018fc0beb837718f9b3708d0115c9aa238d9b9dc`.
+
+All four recovery audits now pass. The400k checkpoint has99,939 updates and346
+finite tensors;100,803 strict reports pass through403,464 actions. Captured
+401,408-action progress is1,830.097s with zero debt. Checkpoint metadata SHA256
+`6572e8436401aec668e905f153413c6dfc0210063ada594faf7e099092856dcf`.
+The recovery watcher exits successfully while training continues to500k.
