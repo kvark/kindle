@@ -271,3 +271,33 @@ curve`8318ea9ab0373f61cc5c584d8d794855877a531f84ce409e843e838d7b4e760e`;
 coefficient comparison`c7e6a85f189111c20df5d48772cdcfeb4f136646c9b92f3ebe104d2291e80dd7`;
 seed comparison`a1895ad57fc6a9e595e1cecba63f6cfdbbda67764af3da41ed4b19df5d33bc39`.
 Source at launch`1ff41da`, native`bfb8c31`, runner`1ed07af`, replay`e853818`.
+
+## Larger replay batch: source feasibility only
+
+A source/CPU review identifies B16/T16 as a possible later cost experiment,
+keeping the coefficient.01 recipe, N8 and ratio32. Centered CDP requires full
+batch BPTT, so world_microbatch_size must also change8→16. This is not a selected
+allocation, GPU benchmark or learning result; the Qbert500k/R16 test remains
+active. A full Pong run is not justified by fewer optimizer steps alone.
+
+Replay warmup requires batch_size×batch_length eligible sequences. With eight
+fresh lanes and context1, the expected first update moves248→376; verify the
+actual startup before using those counts. At500k actions, scheduled updates
+move124,939→62,454. Sampled positions are15,992,192 versus15,988,224, nearly equal
+apart from the different warmup. The count calculation matches both completed
+B8/T16 controls at ratios32 and16; B16 execution remains unmeasured.
+
+The completed coefficient.01 primary spends2,801.583s learning and193.690s in
+other stages, averaging22.424ms per update. Holding that other cost fixed, a
+40-minute500k run would require the larger update to cost at most1.575× the
+current update; a30-minute run requires at most1.147×. These are requirements,
+not predictions: doubling batch size increases work per update. Optimizer
+cadence, centering population and learning-rate warmup per action also change,
+so sampled-position accounting does not establish equivalent learning.
+
+Any later B16 allocation needs one bounded initialization/learning/frozen-restore
+check before a full trial. No native code change, agent construction, GPU work,
+new policy decisions or queue is performed by this review. Source hashes and
+completed control receipts are retained in
+`/x/Temp/kindle-cheap-20261025/pong-batch-width-feasibility-review.json`, SHA256
+`917fa8d8e999358830264b06ed1a376d786f76c1e66de183f2d6eb8a36ff944a`.
