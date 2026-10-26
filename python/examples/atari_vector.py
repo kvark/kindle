@@ -81,6 +81,8 @@ def main():
     parser.add_argument("--world-microbatch-size", type=int)
     parser.add_argument("--train-ratio", type=float, default=256)
     parser.add_argument("--learning-rate", type=float, default=0.00004)
+    parser.add_argument("--actor-unimix", type=float, default=0.0,
+                        help="native policy uniform mixture in [0,1); fresh default0, restore keeps checkpoint policy")
     parser.add_argument("--report-every", type=int, default=1000)
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--initial-checkpoint", type=Path,
@@ -125,10 +127,13 @@ def main():
         parser.error("exploration probability must be in [0, 1]")
     if args.exploration_hold <= 0:
         parser.error("exploration hold must be positive")
+    if not math.isfinite(args.actor_unimix) or not 0 <= args.actor_unimix < 1:
+        parser.error("actor-unimix must be finite and in [0, 1)")
     if args.evaluate and args.exploration_probability:
         parser.error("frozen evaluation must not use exploration overrides")
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
     training_options.add("--image-size")
+    training_options.add("--actor-unimix")
     training_options.add("--cdp")
     training_options.add("--cdp-centered")
     training_options.add("--disagreement-scale")
@@ -219,7 +224,7 @@ def main():
         config.update(seed=args.seed, batch_size=args.batch_size, batch_length=args.batch_length,
                       training_precision=args.training_precision,
                       video_encoder=args.encoder_training, replay_capacity=args.replay_capacity,
-                      actor_critic_gradient=args.actor_critic_gradient,
+                      actor_critic_gradient=args.actor_critic_gradient, actor_unimix=args.actor_unimix,
                       world_backprop_length=args.batch_length,
                       world_microbatch_size=(args.batch_size if args.world_microbatch_size is None else args.world_microbatch_size),
                       train_ratio=args.train_ratio, learning_rate=args.learning_rate,

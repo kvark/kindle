@@ -32,6 +32,12 @@ import profile_atari_vector
     (["--restore", "unused", "--cdp-centered"], "training overrides"),
     (["--restore", "unused", "--training-precision", "f16"], "training overrides"),
     (["--training-precision", "fp8"], "invalid choice"),
+    (["--actor-unimix", "-0.1"], "actor-unimix must be finite and in [0, 1)"),
+    (["--actor-unimix", "1"], "actor-unimix must be finite and in [0, 1)"),
+    (["--actor-unimix", "nan"], "actor-unimix must be finite and in [0, 1)"),
+    (["--actor-unimix", "inf"], "actor-unimix must be finite and in [0, 1)"),
+    (["--restore", "unused", "--actor-unimix", ".01"], "training overrides"),
+    (["--restore", "unused", "--actor-unimix=0"], "training overrides"),
     (["--image-size", "33"], "invalid choice"),
     (["--restore", "unused", "--image-size", "32"], "training overrides"),
     (["--encoder-checkpoint", "unused", "--image-size", "48"], "image-size requires"),
@@ -73,9 +79,10 @@ def test_vector_api_rejects_invalid_config_before_loading_weights():
         kindle.VectorAgent("unused", 4, config, encoder="levjepa-tiny")
 
 
+@pytest.mark.parametrize("unimix", [None, .01])
 @pytest.mark.parametrize("enabled", [False, True])
 @pytest.mark.parametrize("precision", ["auto", "f32", "f16", "bf16", "mixed"])
-def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path, enabled, precision):
+def test_runner_forwards_actor_controls_before_gpu(monkeypatch, tmp_path, enabled, precision, unimix):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
@@ -83,12 +90,14 @@ def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path,
 
     def construct(streams, config):
         assert config["actor_critic_gradient"] is enabled
+        assert config["actor_unimix"] == (0 if unimix is None else unimix)
         assert config["training_precision"] == precision
         raise RuntimeError("checked before GPU initialization")
 
     monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"),
                                     "--training-precision", precision,
+                                    *(["--actor-unimix", str(unimix)] if unimix is not None else []),
                                     *(["--actor-critic-gradient"] if enabled else [])])
     with pytest.raises(RuntimeError, match="checked before GPU"):
         atari_vector.main()
@@ -112,6 +121,7 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, ba
         assert config['dynamics_learning_rate'] == 4e-4
         assert config['learning_rate'] == 4e-5
         assert config['actor_critic_gradient'] is False
+        assert config['actor_unimix'] == 0
         assert config['disagreement_bonus'] is (scale > 0)
         assert config['intrinsic_reward_scale'] == scale
         assert config['cdp_centered'] is centered
