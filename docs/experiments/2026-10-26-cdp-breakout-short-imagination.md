@@ -65,5 +65,15 @@ Source at preparation`4844b8b`, native`bfb8c31`, runner`1ed07af`.
 Native SHA256`f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Copied metadata SHA256`913fec93245330c44d2bb2fe17176746906bf162053e23438743cc78650b332f`.
 
-Prepared, not started. Review the active Qbert coefficient test before selecting
-this allocation. No concurrent learner or automatic next queue is created.
+Started03:53:51 UTC, source`bc7c47a`, after Qbert's completed coefficient100
+review. The H5 source check reproduces all21,976 actions/87,859 frames and the
+complete replay outcomes of the current H15 policy: selected score67.5833,
+0/24 two-wall successes, all346 tensors unchanged and all source audits pass.
+Only wall timestamps are excluded from episode-record identity. This comparison
+was corrected and checked on the completed Qbert initial controls before launch;
+the prior CPU analysis is retained and no GPU work was repeated.
+
+Training startup checks pass: only H15→5 differs from the verified Auto source,
+16,334,353 parameters, retained499939/2027152 counters, exact input metadata and
+finite first updates248:499940,256:499941,256:499942. Fixed50k final evaluation
+and the complete learning audit are pending. No automatic next allocation.

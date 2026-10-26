@@ -4,6 +4,9 @@ The fixed200k screen learns in19m45s: frozen809.375 versus actual initial180.208
 It reaches more of the first pyramid, but neither policy completes one. The
 existing15k/90%-first-pyramid gate fails; this is useful development progress,
 not successful Qbert play or seed reliability.
+The coefficient100 follow-up below also scores809.375, completes no pyramids
+and reduces mean coverage to13.708/21 in20m12s. A stronger bonus does not improve
+the fixed-budget result on this reused seed; both runs pass all audits.
 
 [Declaration](../experiments/2026-10-25-cdp-cheap-qbert.md). Fresh seed1009,
 Size4M/RGB48/Auto,3,578,225 trainable parameters, centered CDP/action-effects1,
@@ -53,8 +56,8 @@ imagined actor/critic and replay critic targets; it is not an action override.
 The small late mean does not prove that weak exploration causes the coverage gap.
 
 This motivates a [bounded coefficient test](../experiments/2026-10-26-cdp-qbert-intrinsic-scale.md),
-with the model, geometry, native runtime, seed and200k budget fixed. It has not
-started. The analysis constructs no agent and takes0.513s of CPU wall time.
+with the model, geometry, native runtime, seed and200k budget fixed. Its completed
+result follows below. The analysis constructs no agent and takes0.513s of CPU wall time.
 Evidence: `intrinsic-scale-review.json`, sibling`review_qbert_intrinsic_scale.py`;
 review SHA256`679f92860b5d67bda49716ff7b162fc1f312db22fc08a02753969b4ea4a48b14`.
 
@@ -86,4 +89,55 @@ from frozen competence. Review SHA256
 Seed1009 is reused development data. Capacity, resolution, runtime and budget
 differ from historical controls; no isolated speedup or superiority claim.
 Retain this result without extending it. The subsequent Breakout tests are
-reported separately; the stronger-bonus candidate is a fresh controlled test.
+reported separately; the stronger-bonus comparison is a fresh controlled test.
+
+## Coefficient100 does not improve the fixed-budget result
+
+The [declared test](../experiments/2026-10-26-cdp-qbert-intrinsic-scale.md) changes
+only intrinsic_reward_scale1→100 in the native configuration, retaining
+4M/RGB48/Auto/B8/T16/H15/R32, seed1009, actor_unimix0 and no external action aid.
+All346 actual-initial tensors match the control. Their frozen action/reward/
+boundary/frame traces and replay outcomes also match, excluding wall timestamps.
+The CLI adds optional mixture/horizon controls; their values stay0 and15.
+
+Training completes **200,000 actions /799,449 emulator frames /49,939 updates
+in1,211.601s (20m12s)**,165.07 actions/s, within the unchanged30-minute cap.
+First update248, zero debt,385 natural training episodes, final online mean701.5.
+The100k recovery checkpoint passes its finite/config/counter check before fixed
+200k replaces it. No favorable-checkpoint selection or extension occurs.
+
+| Intrinsic coefficient | Frozen final / initial | First pyramids | Mean maximum initial cubes | Training wall |
+|---|---:|---:|---:|---:|
+|1|809.375 /180.2083|0/24|16.625/21|19m45s|
+|100|809.375 /180.2083|0/24|13.708/21|20m12s|
+
+Coefficient100 coverage ranges11–15 cubes, median14, versus control12–20,
+median16.5. Equal mean score does not imply equal policies or trajectories.
+Neither recipe reaches the existing15k/90%-first-pyramid gate. The larger bonus
+does not improve frozen score or completion and has worse coverage on this seed.
+
+Final evaluation uses17,232 actions/68,890 frames/8.044s; initial uses9,232/
+36,888/4.289s. Both select all24 natural episodes, with no excess episodes,
+truncations or updates. Partial tails remain. All346 frozen tensors stay exact.
+All49,939 strict numeric reports, full config/source/counters, finite checkpoints,
+full CPU replays/videos and three host guards pass. The service exits successfully.
+
+The actual late bonus/extrinsic means become0.151820/0.958327, or15.84%, versus
+0.001305/0.894999, or0.146%, in the control. In the first1000 updates the ratio
+is8.57 times. Late policy entropy is1.4395 versus1.5558. These are minibatch means
+along different learned trajectories, not matched-state comparisons or a causal
+diagnosis of the coverage loss. The stronger coefficient changes learning, but
+its larger measured bonus does not establish useful exploration.
+
+Source at launch`0b151c6`, native`bfb8c31`, runner`1ed07af`; native SHA256 remains
+the same as the control. Artifacts:
+`/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-intrinsic100-200k`, including
+`curve/`, `coverage-review.json` and `coefficient-comparison-v2/`.
+Review SHA256`095b4e03bf4ea634828d3cbab71943edc7f33f78781c2fad8c411d8677095317`.
+Comparison SHA256`b5c7667373210a47c6b26ef19d93d15d84b8e39a74858e32f19da59a1ca5a1e7`.
+The first CPU comparison included wall timestamps in initial episode identity;
+v2 excludes only those fields, retaining v1. Scores, coverage, curves and bonus
+statistics are unchanged; no GPU run is repeated.
+
+Do not extend this failed setting or launch a broad coefficient/seed sweep.
+The bounded H5 Breakout warm start is selected after this completed review.

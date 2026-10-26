@@ -103,22 +103,22 @@ pass and service exits. Two compact learners now succeed within30 minutes each.
 The retained Breakout2M policy's frozen AMD Auto check completes:67.5833,
 0/24 two-wall successes,21,976 actions in14.127s and zero updates. All346 tensors
 match the source, all audits pass and service exits. See
-`docs/results/2026-10-26-cdp-retained-breakout-auto.md`; no warm start is allocated.
-Current allocation: Qbert4M/RGB48/Auto/B8/T16/H15/R32, intrinsic coefficient100,
-200k actions/49939 expected updates and unchanged30-minute training cap. Native
-recipe changes only the bonus coefficient from the completed control. Full
-config/source checks, all346 actual-initial tensors against the control and
-first updates pass. No action aid; actor_unimix0. Fixed24-natural-episode
-final/actual-initial evaluations and full audits follow. See
-`docs/experiments/2026-10-26-cdp-qbert-intrinsic-scale.md`; service owner
-`kindle-cheap-qbert-intrinsic100-200k-20261026`. Check its live state before
-further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
+`docs/results/2026-10-26-cdp-retained-breakout-auto.md`; its warm start is declared separately below.
+Qbert coefficient100 completes200k/49939 updates in20m12s: frozen809.375,
+0/24 pyramids, matching the coefficient1 score but reducing mean coverage
+16.625→13.708 of21 cubes. All audits pass and service exits. No extension.
+Current allocation:50k-action Breakout H5 warm start from the retained source,
+12M/RGB64/Auto/N8/B8/T16/R32,20-minute training cap. Only imagination length
+15→5 changes; replay, games, belief and RNG restart. The frozen H5 source exactly
+reproduces the current H15 action/outcome trace and67.5833 score; all346 tensors
+remain unchanged and all source audits pass. Startup config/counter checks and
+first learning updates pass. Retain499939/2027152 starting counters; expected
+12,439 new updates, fixed50k final and source/final natural-episode controls.
+See `docs/experiments/2026-10-26-cdp-breakout-short-imagination.md`; service owner
+`kindle-breakout-retained-h5-50k-20261026`. Check its live state before further
+GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
 and restores reject overrides.263 vector-runner tests pass; native is unchanged.
-A50k-action H5 warm start from retained Breakout weights is prepared, not started:
-`docs/experiments/2026-10-26-cdp-breakout-short-imagination.md`. Only imagined
-rollout length changes; require the frozen source trace to match H15 before
-learning. Training cap20 minutes. Review Qbert before selecting the allocation.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 

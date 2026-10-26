@@ -20,6 +20,7 @@ is separate. Each row is one development seed, not a reliability result.
 | [Pong4M/RGB48/R16](results/2026-10-25-cdp-cheap-pong.md) |200k /24,970|10m22s|−17.125 /−20.375|0/24 wins|
 | [Pong4M/RGB48/R32](results/2026-10-25-cdp-cheap-pong.md#r32-and500k-actions) |500k /124,939|48m53s|11.000 /−20.375|23/24 wins; mean15 gate fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
+| [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
 
@@ -30,11 +31,11 @@ and GPU differ, so the2.31× wall-cost comparison does not isolate resolution.
 Qbert's mean first-pyramid coverage improves5.83→16.63 of21 cubes, with a maximum
 of20, but its task gate fails. Neither these results nor short-screen failures
 establish a universal capacity or resolution rule.
-Qbert's [active coefficient100 test](experiments/2026-10-26-cdp-qbert-intrinsic-scale.md)
-keeps the200k budget and native model fixed. Its recorded late bonus is0.146% of
-predicted extrinsic reward; stronger scaling is an unproved hypothesis and would
-also dominate early rewards. The test starts after the completed Freeway
-confirmation and retained Breakout frozen review; its learning outcome is pending.
+Qbert's [completed coefficient100 test](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result)
+keeps the200k budget and native model fixed. Frozen score stays809.375 with0/24
+pyramids, while mean coverage falls16.625→13.708 of21 cubes. The measured late
+bonus/extrinsic ratio rises0.146%→15.84%; that does not establish useful
+exploration. All audits pass and service exits. No extension or broad sweep.
 
 Breakout's smaller model gains modestly, with lower score per action than the
 earlier T64 run but3.07× lower wall cost at the shared196,608-action point. One
@@ -64,22 +65,17 @@ GPU/precision/runtime, so the difference does not isolate precision. This is a
 transferred-policy control for any separately declared warm start, not new
 learning or a matched-budget comparison with the fresh compact200k policies.
 
-**Current allocation:** [Qbert coefficient100 test](experiments/2026-10-26-cdp-qbert-intrinsic-scale.md).
-Keep4M/RGB48/Auto/B8/T16/H15/R32,200k actions/49939 expected updates and the
-30-minute cap fixed; only native intrinsic coefficient1→100 changes from the
-completed control. No external action aid; actor_unimix0. Startup full config,
-source, all346 initial tensors against the control and first updates pass.
-Fixed24-natural-episode final/actual-initial controls and full audits follow.
-The existing15k/90%-pyramid gate remains. CLI`1ed07af` keeps H15;263 vector-runner
-checks pass. No automatic next allocation, warm start or cap increase.
-
-A [prepared50k-action Breakout H5 warm start](experiments/2026-10-26-cdp-breakout-short-imagination.md)
-reuses the verified retained weights. Only imagined rollout length15→5 changes;
-T16, model geometry and the other settings remain. A frozen source trace must
-match the current H15 policy before learning. The20-minute training cap and
-source/final evaluations are fixed; review Qbert before allocation. No benefit
-is established, and restarted replay plus new experience prevent isolated
-horizon attribution without a matched H15 learning arm.
+**Current allocation:** [50k-action Breakout H5 warm start](experiments/2026-10-26-cdp-breakout-short-imagination.md).
+Reuse the verified retained weights. Only imagined rollout length15→5 changes;
+12M/RGB64/Auto/N8/B8/T16/R32 and the other settings remain. The frozen H5 source
+exactly reproduces the current H15 action/outcome trace and67.5833 score, with
+all346 tensors unchanged and all source audits passing. Startup config/source/
+counter checks and first learning updates pass. Keep the20-minute training cap,
+12,439 expected new updates and fixed source/final natural-episode evaluations.
+Preserve source counters499939/2027152. Replay, games, belief and
+RNG restart; this is a warm start. No benefit is established, and new experience
+plus replay restart prevent isolated horizon attribution without a matched H15
+learning arm. No automatic next allocation, cap increase or unchanged extension.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

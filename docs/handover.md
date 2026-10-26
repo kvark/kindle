@@ -48,19 +48,21 @@ in28m50s. All audits pass and service exits. Two compact learners now pass withi
 30 minutes each. The [retained Breakout2M frozen check](results/2026-10-26-cdp-retained-breakout-auto.md)
 scores67.5833 with0/24 two-wall successes,21,976 actions in14.127s and zero updates.
 All346 source/copied/frozen tensors match; all audits pass and service exits.
-Only precision metadata changes to Auto. No warm-start learning is allocated.
-Current allocation: [Qbert coefficient100 test](experiments/2026-10-26-cdp-qbert-intrinsic-scale.md),
-service `kindle-cheap-qbert-intrinsic100-200k-20261026`, started03:29:04 UTC.
-Keep4M/RGB48/Auto/B8/T16/H15/R32,200k/49939 updates and30-minute cap fixed; only
-the native bonus coefficient changes from the completed control. Startup full
-config/source checks, all346 initial tensors and first updates pass. No action
-aid; actor_unimix0. Fixed final/actual-initial evaluations and full audits follow.
-Check live state before GPU work. CLI`1ed07af` adds optional imagination length;
-this recipe retains15. All263 vector-runner tests pass; no native rebuild.
-A [short H5 Breakout warm start](experiments/2026-10-26-cdp-breakout-short-imagination.md)
-is prepared, not started:50k actions,20-minute cap, verified retained weights and
-a frozen source trace check before learning. Review the active Qbert result
-before allocation; no automatic queue or unchanged extension.
+Only precision metadata changes to Auto; the warm start below is separately declared.
+[Qbert coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result)
+completes200k/49939 updates in20m12s: frozen809.375,0/24 pyramids. Score matches
+the control but mean coverage falls16.625→13.708 of21 cubes. All audits pass and
+service exits; no extension.
+Current allocation: [short H5 Breakout warm start](experiments/2026-10-26-cdp-breakout-short-imagination.md),
+service `kindle-breakout-retained-h5-50k-20261026`, started03:53:51 UTC.
+Reuse verified12M/RGB64/Auto weights, changing only imagination15→5; keepN8/B8/
+T16/R32. Fixed50k new actions/12439 expected updates,20-minute training cap.
+The frozen H5 source reproduces the complete H15 action/outcome trace and67.5833
+score, with all346 tensors unchanged and all audits passing. Startup checks and
+first learning updates pass. Replay/games/belief/RNG restart; preserve source
+counters499939/2027152. Fixed final evaluation and full audit follow. Check live
+state before GPU work. CLI`1ed07af` rejects restore overrides; a labelled input
+copy supplies H5. No native rebuild or automatic next allocation.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

@@ -56,7 +56,9 @@ confirmation and retained Breakout frozen checks. The declaration records their
 relevant review hashes and the allocation decision. Startup checks pass: full
 native configuration differs from the control only by intrinsic coefficient,
 3,578,225 parameters, all346 initial tensors equal the control, first updates
-248:1,256:2,256:3 and no action aid. Fixed final/actual-initial evaluations and
-complete audits are pending. Seed1009 is reused development data. A useful
-outcome requires focused seed confirmation; no broad queue, held-out benchmark
-result or five-game reliability claim follows.
+248:1,256:2,256:3 and no action aid. Completed200k actions/49939 updates in20m12s:
+frozen809.375 versus initial180.2083,0/24 first pyramids. The score matches the
+coefficient1 control while mean coverage falls16.625→13.708 of21 cubes. All
+audits pass and the service exits successfully. See the
+[completed comparison](../results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result).
+Seed1009 is reused development data; no extension or broad sweep follows.
