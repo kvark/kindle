@@ -562,7 +562,8 @@ results, prepare a different compact option:4M/RGB64 with the original H15,
 full18 actions, coefficient1/actor0, Auto/N8/B8/T16/R32 and original rates.
 It was prepared unselected while Breakout ran. After reviewing Breakout's
 completed11.208/0of24 result and corrected CPU comparison, **select this fixed
-200k test, now active from18:16:53 UTC**. Breakout receives no extension or confirmation.
+200k test**. It ran from18:16:53 UTC and is now complete; the result follows
+below. Breakout receives no extension or confirmation.
 
 The saved native/RGB48/RGB64 scene at action256 retains a visible board at both
 sizes; it does not show that RGB48 caused the missing-cube problem. Testing64
@@ -622,4 +623,40 @@ The100k recovery passes24,939 updates/all346 finite tensors. The stable
 104,160-action prefix has25,977 finite reports;102,400 progress is683.034s with
 25,539 updates and zero debt. Recovery watcher exits successfully; learning
 continues to the fixed200k endpoint. Recovery review SHA256`e3c0d856e7556160b6c66f6408e1cca6d979b6cfdc4d59df73703169ce48769a`.
-Frozen quality is pending; no extension or next allocation is selected.
+At this recovery, frozen quality was pending; the completed result follows.
+
+
+## RGB64 costs more and lowers frozen quality
+
+The fixed200k RGB64 test completes in **22m20s**,13.14% more training time than
+RGB48's19m45s. Frozen score falls **809.375→718.750**, and mean maximum initial
+pyramid coverage falls **16.625→15.083 of21 cubes**. Both have0/24 first pyramids
+and miss the original15k/90% gate. Retain RGB48 for this compact recipe; no
+extension or confirmation is selected. This reused seed does not isolate image
+resolution: parameter shapes, initialization and the host kernel/module differ.
+
+Fresh1009/eval4000001009 keeps4M/Auto/N8/B8/T16/H15/R32, full18, coefficient1/
+actor0, original rates and no aid. Actual4,131,729 parameters. Training completes
+200,000 actions /799,444 emulator frames /49,939 updates in1,340.138s, with first
+update248,6,392,192 sampled positions,364 natural episodes and zero debt.
+Construction1.975s is separate. Online last50 mean842 exceeds RGB48's677.5;
+the reviewed curves' online advantage does not survive fixed-final evaluation.
+
+Frozen final/own initial score718.750/180.208, coverage15.083/5.833, both0/24
+pyramids. Final coverage range11–18, median16. Evaluations collect18,344/9,232
+actions and73,336/36,891 frames in7.572/3.825s. Exactly24 natural episodes per
+arm, no excess, all partial tails retained, zero updates/truncations. All346
+frozen tensors remain unchanged. The initial tensors match the already completed
+full18/4M64 native geometry; no matched-weight claim versus QbertRGB48.
+Every49,939 numeric report, full config/source/counters,100k recovery, CPU
+replay/video, three guards, curves/coverage and comparison pass. Service exits
+successfully18:39:49 UTC,22m55.905s total. No retries, cutoff or GPU repetition.
+
+Artifacts remain in `qbert-4m-64-r32-200k` under the runtime directory above.
+Learning review SHA256`ff2f9cf1f2d009e82937e6cafd461f401a93168e01ce3e7d7f7b1785270fb126`;
+curve`f4d56a3582b5081417670779591d95a748816c08e7ad34ce59ada564e3d6d9a4`;
+comparison`b1636a1fd64d7567f2dd938a03a9283a168005a211cc4f75408fd0b168f92da6`;
+completion`83b45cdaf2af61071e3fee08c0ec5a3037ed1452cd41f9a0e6a48b923d7d600d`.
+Launch source`093e5c6`, native`bfb8c31`, runner`fbdaee3`, replay`5043b7a`.
+After review, select the separately prepared frozen-only Pong greedy assessment;
+this adds no new Qbert allocation or training extension.

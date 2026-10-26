@@ -23,6 +23,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same, coefficient.01, seed1009](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-improves-the-fixed-budget-result) |500k /124,939|49m55s|14.958 /−20.375|24/24 wins; mean15 narrowly fails|
 | [Same, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-seed4013-confirmation) |500k /124,939|49m58s|14.000 /−20.333|24/24 wins; mean15 fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
+| [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
 | [Full18, more experience at R16](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-does-not-improve-the-result) |500k /62,470|26m53s|719.792 /180.208|0/24 pyramids;14.125/21 coverage|
@@ -229,32 +230,29 @@ comparison import failure is retained; corrected comparison passes without
 repeating GPU work. This is a modest unconfirmed gain, with an older-kernel
 control; no extension, seed confirmation or global default change is selected.
 
-Select the [prepared QbertRGB64 test](results/2026-10-25-cdp-cheap-qbert.md#rgb64-compact-option-cpu-preparation-only)
-after reviewing that completed result. Fresh1009/eval4000001009,4M/RGB64/Auto/
-N8/B8/T16/H15/R32, full18/coefficient1/actor0, original rates/no aid, ac_gradsfalse.
-Only native geometry changes versus Qbert48; parameters and initialization also
-change. Keep200k/49,939 updates, first248,100k recovery, zero debt,30-minute
-training cap and fixed final/own initial24 natural episodes with full346-tensor/
-replay/coverage/guard checks and unchanged15k/90%-pyramid gate. Started18:16:53
-UTC/source`093e5c6`; startup passes4,131,729 parameters, all346 initial tensors
-matching the completed4M64 native shape and248:1/256:2/256:3 updates. Recovery,
-fixed evaluations, CPU replay/coverage/comparison monitoring are attached.
-The100k recovery passes24,939 updates/all346 tensors; its watcher exits
-successfully. Stable104,160-action prefix has25,977 finite reports and zero debt.
-Frozen quality remains pending. No cap increase, extension or automatic next allocation.
+The [completed QbertRGB64 test](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality)
+finishes200k/799,444 frames/49,939 updates in22m20s,13.14% more training time
+than RGB48. Frozen718.750 versus809.375 and coverage15.083 versus16.625/21 are
+lower; both0/24 first pyramids. All numerical/config/counter/346-tensor/replay/
+guard/100k recovery/curve/coverage/comparison checks pass; service exits18:39:49
+UTC. Retain RGB48; no extension or confirmation. Geometry, parameter shapes,
+initialization and old/new kernel/module limit attribution.
 
-A [Pong greedy-action assessment](results/2026-10-25-cdp-cheap-pong.md#entropy-review-and-unselected-greedy-action-assessment)
-is CPU-prepared but unselected. It would evaluate retained final/own initial
-weights with zero learning, preserving the original sampled failure and training
-cost. Entropy-log analysis gives no causal diagnosis. Review Qbert before selection.
+After reviewing that outcome, select the [Pong greedy-action assessment](results/2026-10-25-cdp-cheap-pong.md#entropy-review-and-unselected-greedy-action-assessment).
+It reuses fixed B8/4M48/coefficient.01 seed1009 final/own initial weights with
+zero learning. Keep eval4000001009,N8/full18/sticky.25,24 natural matches per
+arm,600k-action/300-second caps and mean15/90%-wins/full346-tensor/replay/guard
+checks. Preserve sampled14.958/−20.375 and the original49m55s training cost;
+greedy evaluation cannot relabel the sampled failure. Launch pending. No
+extension or automatic confirmation/next allocation.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
-Check live service state before GPU work; selected learning owner
-`kindle-cheap-qbert-rgb64-200k-20261026`.
+Check live service state before GPU work; selected frozen-assessment owner
+`kindle-cheap-pong-greedy-frozen-20261026`.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

@@ -598,12 +598,14 @@ training change is selected from this evidence.
 
 Prepare an alternative that requires no training: assess the fixed retained
 B8/4M/RGB48/coefficient.01 seed1009 final policy and its own actual initial
-weights using native `--greedy`. It remains **unselected while QbertRGB64 runs**.
+weights using native `--greedy`. It was prepared unselected while QbertRGB64
+ran. After reviewing Qbert's lower718.750/0of24 result and passing complete
+audits, **select this frozen assessment; launch pending**.
 This changes evaluation policy; preserve the original sampled14.958/−20.375
 result and its failed mean15 gate. A greedy result cannot relabel that failure.
 The existing native argmax path needs no code change, rebuild or qualification.
 
-If selected after Qbert outcome review, retain full18/sticky.25/repeat4/native
+The selected assessment retains full18/sticky.25/repeat4/native
 frames/one GPU48 resize, eval4000001009, N8, first3 natural matches per lane,
 24 per arm,600k-action/300-second caps, zero updates/truncations, excess/tails,
 all346 unchanged tensors and complete CPU replay/video/guard audits. Keep

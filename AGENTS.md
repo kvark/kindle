@@ -51,19 +51,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Active fresh Qbert4M/RGB64/Auto/N8/B8/T16/H15/R32, full18, coefficient1/
-actor0/ac_gradsfalse, original rates,1009/eval4000001009, no aid. Only native
-geometry changes versus Qbert48; parameters and initialization also change.
-Keep200k/49,939 updates/first248,100k recovery, zero debt,30-minute training cap,
-fixed final/own initial24 natural episodes and15k/90%-pyramid gate/full audits.
-Started18:16:53 UTC/source`093e5c6`; all346 initial tensors match the completed
-4M64 native shape, first248:1/256:2/256:3 updates. Recovery/evaluation/analysis
-monitoring attached.100k recovery passes24,939 updates/all346 tensors; watcher
-exits successfully. Owner`kindle-cheap-qbert-rgb64-200k-20261026`; cheap-Qbert report. Check live state before GPU work. No extension or automatic next run.
+Selected frozen-only Pong greedy assessment, reusing fixed B8/4M48/coefficient.01
+seed1009 final/own initial weights. Zero learning; keep eval4000001009,N8,
+full18/sticky.25,24 natural matches per arm,600k-action/300-second caps and
+mean15/90%-wins/full audits. Preserve sampled14.958/−20.375 and49m55s training
+cost. Launch pending; owner`kindle-cheap-pong-greedy-frozen-20261026`.
+Check live state before GPU work. No extension or automatic next allocation.
 
-A frozen-only Pong greedy-action option is CPU-prepared but unselected; see the
-cheap-Pong report. It reuses final/own initial weights, preserves sampled-policy
-failure and training cost, and changes no learner. Review Qbert before choosing.
+QbertRGB64 finishes200k/49,939 updates in22m20s,13.14% more time than RGB48,
+with lower frozen718.750 versus809.375 and coverage15.083 versus16.625/21;
+both0/24 pyramids. All numerical/config/counter/tensor/replay/guard/recovery/
+comparison checks pass; service exits18:39:49 UTC. Retain RGB48; no extension
+or confirmation. See cheap-Qbert and cheap-Pong reports for evidence/limits.
 
 Breakout actor/critic gradients finish200k/49,939 updates in20m41s, frozen11.208
 versus9.542, both0/24 two-wall successes. All357-tensor/recovery/replay/guard
