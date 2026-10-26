@@ -96,6 +96,15 @@ def test_accounting_distinguishes_schedule_from_pixel_verification(tmp_path):
     assert result['exploration_ledger_verified'] is False
 
 
+def test_training_replay_reader_accepts_cdp_intrinsic_rewards(tmp_path):
+    rows = guided_events()
+    rows[0]['config'].update(disagreement_bonus=True, intrinsic_reward_scale=1.0,
+                             extrinsic_reward_scale=1.0, visitation_bonus=False)
+    result = replay_qbert_guidance.read_guided_run(write_log(tmp_path, rows))
+    assert result['accounting']['actions'] == 6 and result['accounting']['updates'] == 3
+    assert result['start']['config']['intrinsic_reward_scale'] == 1.0
+
+
 @pytest.mark.parametrize('mutation', ['frozen', 'wrong_game', 'hash', 'override', 'input_hash', 'counts', 'episodes'])
 def test_accounting_rejects_bad_guidance(tmp_path, mutation):
     rows = guided_events(); transition = next(r for r in rows if r['event'] == 'transition')

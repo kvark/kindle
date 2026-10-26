@@ -10,10 +10,24 @@ import ale_py
 import gymnasium as gym
 
 import atari
-from audit_atari import read_run, require, sha256
+from audit_atari import require, sha256
 from check_atari_adapter import rom_identity
 from kindle._qbert_guidance import GUIDANCE_KIND, QbertGuidance
+from kindle._vector_audit import audit
 from replay_atari import TaskMonitor, verify_replay_identity
+
+
+def read_guided_run(path):
+    accounting = audit(path)
+    require(accounting['budget_complete'], "guidance replay requires a completed action budget")
+    with Path(path).open() as source:
+        header = json.loads(next(source))
+        end = None
+        for line in source:
+            end = json.loads(line)
+    require(header['mode'] == 'train' and header.get('exploration', {}).get('kind') == GUIDANCE_KIND,
+            "requires declared Qbert pixel guidance training")
+    return dict(start=header, end=end, accounting=accounting, sha256=sha256(path))
 
 
 def replay_rows(source, environments, monitors, frames, guidance, deadline):
@@ -61,10 +75,8 @@ def main():
     require(args.wall_cap > 0, "wall cap must be positive")
     require(not args.output.exists() and args.output.parent.is_dir(), "output must be a fresh path")
     started = time.monotonic()
-    run = read_run(args.log)
+    run = read_guided_run(args.log)
     header = run['start']
-    require(header['mode'] == 'train' and header.get('exploration', {}).get('kind') == GUIDANCE_KIND,
-            "requires declared Qbert pixel guidance training")
     manifest = json.loads(args.source_manifest.read_text())
     gym.register_envs(ale_py)
     rom = rom_identity(header['environment'])

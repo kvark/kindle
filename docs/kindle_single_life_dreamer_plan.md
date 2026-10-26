@@ -263,14 +263,22 @@ The [CPU-only Qbert pixel rule and prepared adapter](results/2026-10-25-cdp-chea
 clear24/24 first pyramids, mean3764.583 and21/21 coverage. Collection and exact
 replay each take about30s; no agent or learning. This hand-coded candidate
 still misses mean15000 and does not establish unaided Kindle transfer.
-The optional episode-guidance adapter passes420 CPU tests and a real-Atari
-stub integration with full pixel/action replay. Source is applied after completed
-Pong review; native unchanged, separate Python overlay preserves the old runtime.
-Select only the bounded4096-action/963-update native check plus1024 frozen
-restore,300s/60s caps,5% episode selection with actual action share measured.
-Owner`kindle-cheap-qbert-pixel-guidance-smoke-20261026`; launch pending.
-The fresh200k/49,939-update/25-minute follow-up is prepared unselected, pending
-bounded review. No smoke experience reuse, cap increase or automatic next run.
+The optional episode-guidance adapter passes CPU tests and full pixel/action
+replay. The bounded native check completes4096/963 in22.541s and1024 frozen
+restore in0.452s;512 verified overrides,346 matched initial/unchanged frozen
+tensors, all finite reports and both guards pass. Its service fails19:40:14 UTC
+only in the new CPU reader, which incorrectly rejects training intrinsic rewards.
+A training-aware correction passes421 tests and the saved trajectory replay;
+original failure retained, no GPU repeat.
+
+After review, select fresh200k/49,939-update Qbert learning with5% episode
+selection, actual action share measured,25-minute training cap and100k recovery.
+Keep4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
+1009/eval4000001009, fixed final/own initial24 natural episodes with guidance
+disabled, original15000/90%-pyramid gate and full audits. Native unchanged;
+separate Python overlay preserves old runtime. Owner
+`kindle-cheap-qbert-pixel-aid-200k-20261026`; launch pending. No smoke experience
+reuse, cap increase, extension or automatic next run.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,

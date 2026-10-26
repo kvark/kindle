@@ -51,15 +51,22 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Selected bounded Qbert pixel-guidance check: fresh1009/eval4000001009,
+Selected fresh Qbert pixel-guidance learning:1009/eval4000001009,
 4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates/acgradsfalse.
-Keep4096 actions/963 updates, first248, zero debt,300s training cap and1024
-frozen actions/60s. Five-percent episode selection is separate from actual
-measured action share. Preserve346 initial/frozen tensors, finite reports,
-complete training-action/pixel replay and both guards. Source adapter is applied
-byte-identically to the420-test preparation; native unchanged, separate Python
-overlay`runtime-qbert-guidance`. Owner`kindle-cheap-qbert-pixel-guidance-smoke-20261026`;
-launch pending. See cheap-Qbert report. No automatic full allocation or extension.
+Keep200k actions/49,939 updates, first248, zero debt,100k recovery and25-minute
+training cap. Five-percent episode selection is separate from actual measured
+action share. Fixed final/own initial24 natural episodes disable guidance and
+retain mean15000/90%-pyramid gate, full346-tensor/replay/guard/coverage checks.
+Native unchanged; Python overlay`runtime-qbert-guidance`. Owner
+`kindle-cheap-qbert-pixel-aid-200k-20261026`; launch pending. No smoke experience
+reuse, cap increase, extension or automatic next allocation.
+
+The bounded guidance check completes4096/963 in22.541s and1024 frozen actions
+in0.452s;512 verified overrides,346 matched initial/unchanged frozen tensors,
+all finite reports and both guards pass. Original service exits failed19:40:14
+UTC because the new CPU replay used a frozen-oriented reward reader. The
+training-aware correction passes421 CPU tests and complete saved-action/pixel
+replay; original failure retained, no GPU repeat. See cheap-Qbert report.
 
 Pong B16 actor/critic gradients finish500k/62,454 updates in37m52s but lower
 frozen11.875→−0.542 and wins24/24→10/24. Own initial−20.375/0 wins. All357-tensor/
@@ -69,9 +76,8 @@ no extension or confirmation. Progress-observer interruption did not restart tra
 
 The CPU-only Qbert pixel rule clears24/24 first pyramids, mean3764.583 and
 coverage21/21; complete replay passes. It misses mean15000 and is hand-coded
-guidance evidence, not Kindle success. Native integration and unaided transfer
-remain untested. A fresh200k/49,939-update/25-minute follow-up is prepared
-unselected; it depends on completed bounded review. See the cheap-Qbert report.
+guidance evidence, not Kindle success. Bounded native integration passes;
+unaided transfer remains untested. See the cheap-Qbert report.
 
 The bounded PongB16 check passes4096/466 in16.126s and1024 frozen actions in
 0.436s, all357 tensors unchanged,346 shared initial tensors matching control,
@@ -157,7 +163,7 @@ comparison pass; service exits10:28:51 UTC. No extension or confirmation.
 Qbert500k/R16 remains weaker than its200k/R32 control, with0/24 pyramids.
 
 Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, CPU replay `5043b7a`; runner`fbdaee3` permits opt-in CDP
-actor/critic gradients (SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`). The active declaration pins exact runtime/script
+actor/critic gradients (SHA256`4a7cf99bb5e55382b74d65c97d855f5a87772ed7199fc11bb4199e35a6d78de4`). The active declaration pins exact runtime/script
 hashes; the handover locates the build receipt. Native 32/48/64 geometry and the
 intermediate 4M preset pass bounded training/frozen checks, including 64 restore.
 The CLI exposes imagination length for fresh runs; defaults retain 15 and

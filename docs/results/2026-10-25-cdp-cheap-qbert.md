@@ -744,3 +744,56 @@ episodes with aid disabled. Its plot reader accepts the completed control,
 rejects it when labelled guided, and imports no ALE. Queue recovery cadence/caps
 and unselected refusal pass. It cannot run before the bounded check completes
 and is reviewed. Preparation SHA256`ab29eea77e0514d058926ffd13e7f97fb79f3ccaa914129c25a66a67a2559fd3`.
+
+
+## Bounded native guidance passes after a CPU reader correction
+
+Started19:39:44 UTC/source`137ed77`, the bounded check completes4096 actions/
+16,375 frames/963 updates in22.541s and1024 frozen actions/4096 frames in0.452s.
+There are512 verified guided actions (12.5% of this short run), from5% episode
+selection. Initial346 tensors match the Qbert48 control; all346 frozen tensors
+remain unchanged. All963 finite reports, exact config/counters, selected CNN/
+reward weight changes and both guards pass. This verifies native execution and
+restore, not useful unaided learning or a stable guidance action fraction.
+
+The original service fails19:40:14 UTC in the subsequent CPU audit. The new
+`replay_qbert_guidance.py` reused a frozen-oriented reader that rejects nonzero
+intrinsic rewards during training; the earlier CPU stub used zero intrinsic
+reward and missed this case. Correct the new replay command to read completed
+training logs through the vector accounting audit.421 CPU tests pass, including
+that regression. The saved4096-action trajectory then reproduces every action,
+reward, boundary and guided input-frame hash, with512 verified overrides.
+Both GPU stages had already succeeded and are not repeated. Original controller,
+declaration, source reader, service failure and journal remain retained.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-pixel-guidance-smoke`.
+Corrected review SHA256`a4fc31556ac9234606eb237e48d8cf755be184fddb02e88f9f9af0e6fa751c22`;
+guidance replay`7741b43414d34676609e867a04dba41e2221fbe27a318939fe7bc3b4e9023fd0`;
+completion`b67964cb947ae2a7a4f241f871655480b779951d701efc327f0ce598438276b9`.
+The original service retains its failed state; separate CPU completion records
+all checks and the reader repair. No frozen reward-recipe restriction is relaxed.
+
+## Selected fresh pixel-guided learning at200k actions
+
+After reviewing the bounded result and CPU repair, select a fresh200k-action/
+49,939-update comparison. No smoke experience is reused. Keep the exact unaided
+control's4M/RGB48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original-rate
+native config, fresh1009/eval4000001009 and first248/zero debt. Add only the
+optional5% per-episode pixel guidance during training; measure actual action
+share and retain complete training-action/pixel replay. RAM observer outputs
+remain separate from policy inputs. Initial346 tensors must match the control.
+
+Keep6,392,192 sampled positions/95,882,880 imagined actor rows,100k/24,939-update
+recovery, fixed200k final,25-minute training cap,600k-action/300-second frozen
+caps per arm, and fixed first3 natural episodes/lane with all excess/tails.
+Both final and actual-initial policies disable guidance, with zero updates/
+truncations and full346-tensor/config/source/counter/replay/video/guard/curve/
+coverage comparison. Original mean15000/90%-first-pyramid gate stays unchanged.
+Aided online returns are distinct from unaided frozen results. Reused development
+seed and older-kernel control limit attribution and reliability claims.
+
+Preparation after reader correction SHA256
+`3d0c582057b64ae67719479d7e0aad996bdd2eb5a2d5f2e6b2b3665e859e0571`.
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-pixel-aid-200k`;
+owner`kindle-cheap-qbert-pixel-aid-200k-20261026`. Launch pending. No cap increase,
+extension, checkpoint selection, automatic next allocation or unchanged retry.
