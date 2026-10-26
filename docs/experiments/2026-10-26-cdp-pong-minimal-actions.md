@@ -1,6 +1,7 @@
 # Six-action Pong at the compact B8 budget
 
-Prepared after the completed Qbert H30 review. H30 costs35.34% more training
+**Active from16:42:36 UTC**, source`5043b7a`; startup checks pass. Selected
+after the completed Qbert H30 review. H30 costs35.34% more training
 time and lowers frozen score/coverage; retain H15 without extension. Pong's
 best compact B8/H15/coefficient.01 learners score14.958 and14.0, both24/24 wins,
 but miss the mean15 gate. B16 and H5 save time but lower frozen quality; doubled
@@ -67,4 +68,31 @@ Runtime remains native`bfb8c31`/CLI`22bd61b`; CPU replay SHA256
 `0109aeef4c8f6a347353bdac0e57656d017f869f6b4869a196d2d415880e74e4`.
 Preparation verifies normalized queue differences, actual checkpoint schedule,
 manifest/runtime pins, completed-control comparison reader and unselected refusal.
-Launch remains a separate explicit selection after these checks.
+Selection verifies completed Qbert audits and its retained protocol deviation,
+CPU replay validation, exact runtime/script/manifest pins, actual checkpoint
+schedule, current host and no concurrent learner, with clean pushed source.
+Selected declaration SHA256
+`1e66261fdf0a53dcbf3d0f6f2a71541869b71cc62e643811655f26e7ba8f5290`.
+
+Started16:42:36 UTC/source`5043b7aac7d29ebc76290fcf84bb223db7524de4`, owner
+`kindle-cheap-pong-minimal-intrinsic001-500k-20261026`, invocation
+`c0b42deafb764ce5b8f52ace4e08e33b`. Startup passes full native config equality
+except action_count18→6,3,568,997 parameters, the declared action names,
+346 finite own initial tensors and first updates248:1/256:2/256:3. No initial-
+weight equality to full18 is claimed. Initial metadata SHA256
+`480c713b07b57e832d718773969ab9cf93f1ccfaeb8c9bf8ab43e1fd0b8b8b27`;
+startup review`6fe25b478c767da9568bcf51af2effda4087d19af5cf36d70e260584ce97f555`.
+Recovery monitoring, automatic fixed-final/initial evaluation, CPU replay/video,
+curves and completed comparison are attached. Frozen quality remains pending.
+
+## Early measured cost
+
+The first16,384 actions/4,035 updates take83.943s versus94.054s for the full18
+control, **10.75% less wall time**. Emulator frames65,525 versus65,524;
+construction1.949 versus2.140s is separate. Both have zero debt. All prefix
+reports/counters pass and the candidate's exact byte prefix is stable on a
+second read. The complete config differs only in action_count, while the
+documented kernel/module confound remains. This is early cost evidence, not
+full-budget speed or frozen learning; no budget or evaluation changes.
+Review:`prefix-cost-review.json`, SHA256
+`8d465502b9f3a76a9ac24878f90abf4e509080d8950c017d4a96c6f6b0b9d3ba`.

@@ -152,15 +152,27 @@ guard/comparison checks pass, including346 matched initial tensors and identical
 semantic initial traces. The declared100k recovery was never written because the
 pinned queue saved every200k. Original watcher failures remain; separate CPU
 completion records `protocol_complete=false`. Service exits16:26:25 UTC. No GPU
-repeat, extension or confirmation. No active or selected next allocation.
+repeat, extension or confirmation for H30.
+
+Current allocation: [six-action Pong](experiments/2026-10-26-cdp-pong-minimal-actions.md),
+started16:42:36 UTC/source`5043b7a`. Keep fresh1009/eval4000001009,
+4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient.01/actor0 and original rates/no aid;
+only full18→minimal6 changes versus the completed B8 control. Fixed500k/124,939
+updates, four100k recoveries and55-minute training cap. Startup passes3,568,997
+parameters,346 finite own initial tensors and248:1/256:2/256:3 updates. Dimensions
+and initialization differ from full18. Fixed final/own initial24-natural-match
+controls retain mean15/90%-wins and full numerical/config/counter/tensor/replay/
+guard audits. CPU replay`5043b7a` explicitly supports Pong's six actions; native
+and training CLI are unchanged. Monitoring/comparison attached, frozen quality
+pending. No extension or automatic next allocation.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
-Check live service state before GPU work; the completed owner was
-`kindle-cheap-qbert-h30-200k-20261026`.
+Check live service state before GPU work; current owner
+`kindle-cheap-pong-minimal-intrinsic001-500k-20261026`.
 
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

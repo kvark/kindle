@@ -51,8 +51,16 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-No active GPU allocation after Qbert H30 exits16:26:25 UTC. Check live state
-before GPU work; no next allocation, extension or confirmation is selected.
+Current allocation: Pong4M/RGB48/Auto/N8/B8/T16/H15/R32, six-action vocabulary,
+active from16:42:36 UTC/source`5043b7a`. Fresh1009/eval4000001009, coefficient.01,
+actor0, original rates/no aid; only full18→minimal6 changes versus the B8 control.
+Keep500k/124,939 updates, four100k recoveries and55-minute training cap. Startup
+passes3,568,997 parameters,346 finite initial tensors and248:1/256:2/256:3 updates.
+Own initial/fixed final24-natural-match controls retain mean15/90%-wins and full
+audits/replays/guards. See`docs/experiments/2026-10-26-cdp-pong-minimal-actions.md`;
+owner`kindle-cheap-pong-minimal-intrinsic001-500k-20261026`. Check live state before
+GPU work. No cap increase, extension or automatic next allocation.
+
 Qbert4M48/B8/T16/H30/R32 completes200k/49,939 updates in26m43s,35.34% more
 training time than H15. Frozen582.292 versus809.375 and coverage9.583 versus
 16.625/21 are worse; both0/24 pyramids. Retain H15. Final training/frozen/replay/
@@ -100,7 +108,7 @@ comparison pass; service exits10:28:51 UTC. No extension or confirmation.
 Qbert500k/R16 remains weaker than its200k/R32 control, with0/24 pyramids.
 
 Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
-`22bd61b`, CPU replay `e853818`. The active declaration pins exact runtime/script
+`22bd61b`, CPU replay `5043b7a`. The active declaration pins exact runtime/script
 hashes; the handover locates the build receipt. Native 32/48/64 geometry and the
 intermediate 4M preset pass bounded training/frozen checks, including 64 restore.
 The CLI exposes imagination length for fresh runs; defaults retain 15 and
