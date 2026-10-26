@@ -96,3 +96,12 @@ documented kernel/module confound remains. This is early cost evidence, not
 full-budget speed or frozen learning; no budget or evaluation changes.
 Review:`prefix-cost-review.json`, SHA256
 `8d465502b9f3a76a9ac24878f90abf4e509080d8950c017d4a96c6f6b0b9d3ba`.
+
+## 100k recovery
+
+The100k checkpoint passes at24,939 updates, with all346 tensors finite and full
+config/counter checks. The stable complete log prefix contains105,792 actions
+and26,385 finite reports; latest102,400-action progress is541.144s/25,539 updates,
+zero debt. Metadata SHA256
+`d086d92a02f0da72c1f5e731b94d2663982253451bd790e1238ba6d48ab9a4a2`.
+This verifies recoverability and recorded learning work, not frozen competence.

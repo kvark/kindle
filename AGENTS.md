@@ -61,6 +61,12 @@ audits/replays/guards. See`docs/experiments/2026-10-26-cdp-pong-minimal-actions.
 owner`kindle-cheap-pong-minimal-intrinsic001-500k-20261026`. Check live state before
 GPU work. No cap increase, extension or automatic next allocation.
 
+Pong's100k recovery passes24,939 updates/346 finite tensors. A later Breakout
+actor/critic-gradient option is staged outside the worktree with313 CPU tests;
+no patch or GPU allocation is selected. See
+`docs/experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md`. Keep active
+Pong files pinned; any later smoke must verify the expected357-tensor schema.
+
 Qbert4M48/B8/T16/H30/R32 completes200k/49,939 updates in26m43s,35.34% more
 training time than H15. Frozen582.292 versus809.375 and coverage9.583 versus
 16.625/21 are worse; both0/24 pyramids. Retain H15. Final training/frozen/replay/
