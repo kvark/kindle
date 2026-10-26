@@ -51,20 +51,21 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Qbert4M/RGB48/B8/R32 with5% persistent-uniform16-action
-training blocks, selected after completed Pong rate evaluation/comparison.
-Fresh1009/eval4000001009, Auto/N8/T16/H15, coefficient1, actor_unimix0, full18 and
-original rates. Fixed200k actions/49,939 updates, first248,100k recovery and
-25-minute training cap. Native config and observation/learning cadence match the
-unaided control. Own actual initial must match346 control tensors. Frozen final/
-initial24-natural-episode evaluations have no aid and retain15k/90%-pyramid gate;
-full numerical/config/counter/action-ledger/tensor/replay/guard audits apply.
-See`docs/experiments/2026-10-26-cdp-qbert-persistent-aid.md`; owner
-`kindle-cheap-qbert-aided-200k-20261026`. Check live state before GPU work.
+Current allocation: Pong4M/RGB48/B8/T16/H5/R32, selected after completed Qbert
+aided evaluation/comparison. Fresh1009/eval4000001009, Auto/N8, coefficient.01,
+actor_unimix0, full18, original rates and no aid. Fixed500k actions/124,939 updates,
+first248, four100k recoveries and45-minute training cap. Only imagined rollout
+length15→5 changes versus the B8 H15 control; preserve replay/update cadence and
+match346 initial tensors. Fixed final/initial24-natural-match evaluations retain
+mean15/90%-wins and full numerical/config/counter/tensor/replay/guard audits.
+See`docs/experiments/2026-10-26-cdp-pong-short-imagination.md`; owner
+`kindle-cheap-pong-h5-intrinsic001-500k-20261026`. Check live state before GPU work.
 No retry, cap increase, extension or automatic next allocation.
-Started12:03:20 UTC/source`1c31c4c`; native config and346 matched initial tensors
-pass startup. First4,096 actions reproduce the aid ledger. Recovery and completed
-unaided evaluation/analysis are automated.
+
+Qbert's5% training aid completes200k in20m17s, but lowers frozen score809.375→
+678.125 and coverage16.625→15.125, both0/24 pyramids. All audits/comparison and
+matched initial tensors/traces pass; service exits12:24:16 UTC. Retain unaided
+recipe; no extension or confirmation selected.
 
 PongB16 doubled rates finish500k in38m32s, with frozen9.125 versus11.875 for
 original rates; both24/24 wins and below mean15. All audits/comparison and

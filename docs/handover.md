@@ -118,22 +118,23 @@ Training38m32s is essentially unchanged from38m45s. All audits, initial-tensor/
 semantic-trace equality and completed comparison pass; service exits11:59:15 UTC.
 Retain the original rates; no extension or seed confirmation selected.
 
-Current allocation: [Qbert with5% persistent exploration](experiments/2026-10-26-cdp-qbert-persistent-aid.md),
-selected after completed Pong evaluation/comparison and terminal service. Fresh
-1009/eval4000001009,4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient1, actor_unimix0,
-full18 and original rates. Keep200k actions/49,939 updates, first248,100k recovery
-and25-minute training cap. Only the wrapper adds5% uniformly random16-action
-blocks during training; observation and learning cadence remain. Frozen final
-and own initial have no aid, with24 natural episodes per arm and unchanged
-15k/90%-pyramid gate. Match346 initial control tensors and audit the complete
-action-override ledger, numeric reports, counters, replays/videos and guards.
-Labelled curves, coverage and matched-config comparison are prepared. Native
-binary and production runner remain unchanged. Owner
-`kindle-cheap-qbert-aided-200k-20261026`; check live state before GPU work.
-No cap increase, resume, extension or automatic next allocation.
-Started12:03:20 UTC/source`1c31c4c`; native config and346 matched initial tensors
-pass startup. First4,096 actions reproduce the aid ledger. Recovery and completed
-unaided evaluation/analysis are automated.
+The [completed Qbert training-aid test](results/2026-10-25-cdp-cheap-qbert.md#persistent-training-aid-does-not-improve-frozen-coverage)
+scores678.125 versus809.375 without aid; mean cube coverage15.125 versus16.625,
+both0/24 pyramids. Training20m17s versus19m45s, with10,039 verified overrides.
+All audits and completed comparison pass; service exits12:24:16 UTC. Retain the
+unaided recipe; no extension or confirmation selected.
+
+Current allocation: [Pong with H5 imagined rollouts](experiments/2026-10-26-cdp-pong-short-imagination.md),
+selected after that completed result. Fresh1009/eval4000001009,4M/RGB48/Auto/N8/
+B8/T16/H5/R32, coefficient.01, actor_unimix0, full18, original rates and no aid.
+Keep500k actions/124,939 updates, first248, four100k recovery checks and a45-minute
+training cap. Only imagination_length15→5 changes versus the completed B8 H15
+control; replay/cadence/sampled positions stay fixed, while imagined actor/critic
+rollouts and value bootstrapping differ. Own actual initial must match346 control
+tensors. Fixed final/initial24-natural-match controls retain mean15/90%-wins and
+complete numerical/config/counter/tensor/replay/guard audits. Native unchanged.
+Owner`kindle-cheap-pong-h5-intrinsic001-500k-20261026`; check live state before
+GPU work. No cap increase, resume, extension or automatic next allocation.
 
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

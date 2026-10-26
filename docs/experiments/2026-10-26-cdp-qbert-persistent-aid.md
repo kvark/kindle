@@ -1,6 +1,11 @@
 # Qbert with bounded persistent exploration
 
-**Selected after the completed Pong rate comparison.** Doubled rates lower
+**Complete; [result](../results/2026-10-25-cdp-cheap-qbert.md#persistent-training-aid-does-not-improve-frozen-coverage).**
+Frozen678.125/15.125 cubes versus unaided809.375/16.625, both0/24 pyramids.
+Training20m17s; all audits and comparison pass, service exits12:24:16 UTC.
+Retain the unaided recipe; no extension or seed confirmation selected.
+
+Originally selected after the completed Pong rate comparison. Doubled rates lower
 Pong's fixed-final score11.875→9.125 at essentially unchanged38m32s training cost;
 all audits and completed analysis pass. No Pong extension or confirmation is
 selected. Advance this separate fresh Qbert200k test under its25-minute cap,

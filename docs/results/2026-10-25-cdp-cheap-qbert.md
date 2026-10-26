@@ -409,11 +409,54 @@ and partial tail for each control, in4.217/5.301s. No GPU work, agent constructi
 or learning occurs. This supports a bounded hypothesis about coherent exploration;
 it cannot predict whether5% held-action blocks help a learned policy. The
 [training-aid candidate](../experiments/2026-10-26-cdp-qbert-persistent-aid.md)
-is selected after the completed Pong rate comparison; it uses a separate fresh
-life, with no learning outcome yet.
+was selected after the completed Pong rate comparison. Its subsequent frozen
+score678.125 and coverage15.125/21 are below the unaided control; see the completed
+training result below. The random-control benefit did not transfer to this aid.
 
 Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-persistent-random-reference`;
 review SHA256`b916cc639c11d38bd5a7f0eafa9ef4ad0569d215a21e2fbeb91891fc1c4f92e1`;
 declaration`4f01f70b87669577fc19833e175988aa59c607bb1b4facb17782b48562c0fc2f`.
 Script:`qbert_persistent_reference.py`; traces and complete episode records stay
 outside Git. No reference success or five-game reliability is claimed.
+
+## Persistent training aid does not improve frozen coverage
+
+The5% held-action training aid scores **678.125 versus809.375** for the unaided
+control, both0/24 first pyramids. Mean frozen cube coverage drops16.625→15.125/21.
+Own initial remains180.208/5.833 cubes. Training takes **20m17s versus19m45s**;
+the aid does not improve useful learning at this fixed200k budget. Retain the
+unaided recipe; no extension or seed confirmation is selected.
+
+Fresh1009/eval4000001009, centered CDP4M/RGB48/Auto/N8/B8/T16/H15/R32,
+3,578,225 parameters, full BPTT/microbatch8, coefficient1, actor_unimix0, full18,
+sticky.25/repeat4/noops0 and original rates. Native config, all346 initial tensors
+and the complete semantic initial evaluation trace match the control. Only the
+training wrapper adds5% persistent-uniform16-action blocks. The complete ledger
+verifies10,039 overrides,5.0195% of actions; frozen evaluation has no aid.
+Both runs use49,939 updates and6,392,192 sampled positions. Reused development
+seeds do not supply independent confirmation.
+
+Training completes200,000 actions/799,371 emulator frames in1,217.328262s,
+with first248, zero debt and408 natural episodes. Construction2.079s is separate.
+Final online last50 mean672.0 is close to the control's677.5, while fixed frozen
+score and coverage are worse. Reviewed action/time curves show alternating leads,
+not a sustained improvement. The CPU random-control coverage result did not
+transfer into a benefit from a sparse training aid.
+
+Final/initial frozen evaluation uses13,496/9,232 actions,53,944/36,888 emulator
+frames and6.216/4.260s. Each collects and selects24 natural episodes with no
+excess; partial tails remain. Zero updates/truncations and346 unchanged tensors
+per arm. Final coverage median15, range13–17. All49,939 strict reports,100k
+recovery, full config/source/counters, complete override ledger, CPU replays/videos
+and three guards pass. Service exits12:24:16 UTC,20m56.234s total wall; completed
+curves, coverage and comparison pass and are visually reviewed. Original15k/
+90%-pyramid gate remains unmet.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-aided-200k`.
+Learning review SHA256`9b0971ba1acd65196f147b112e072dbbd03fdc83096eb38d61d3610cb242e005`;
+curve`de5da4b1305a0670ab6fe090d366a4389754c26b2fb67c0167077906e0516fdb`;
+coverage`ed24bd5b317c6e74bb68a3b7cc65bdf10fd4fe3f2dcfb2363a345ff5de0e8665`;
+comparison`9a81593fb54b680ed8e29bef01ed96fa32f767398e327898c559d41b33b1364d`.
+Source at launch`1c31c4c`, native`bfb8c31`, CLI`22bd61b`, replay`e853818`.
+After review, select the bounded PongH5 test, preserving B8's original update
+cadence and rates while shortening imagined actor/critic rollouts.
