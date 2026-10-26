@@ -427,3 +427,39 @@ def test_small_comparison_pairs_seeds_before_bootstrap_and_omits_incomplete_pair
         game="Seaquest", seeds=(1009, 2017, 3019), difference=dict(mean=6., ci95=[3., 9.], seeds=[3., 6., 9.]))]
     assert "6.000 [3.000, 9.000]" in markdown(result, "data.json")
     assert summarize(inputs[:-1], budget=32, small_representation=True)["paired_scores"] == []
+
+
+def test_restored_learning_reader_counts_only_new_updates_when_explicit(tmp_path):
+    rows = fixture()
+    rows[0].update(starting_learner_step=499939, starting_environment_step=2027152,
+                   restored_checkpoint=dict(path="retained"))
+    for row in rows:
+        if row["event"] in ("progress", "run_end"):
+            row["learner_step"] += 499939
+    path = write(tmp_path, rows)
+    with pytest.raises(ValueError, match="fresh training"):
+        read_run(path)
+    run = read_run(path, allow_restored=True)
+    assert run["final"]["learner_updates"] == 5
+    assert run["final"]["learner_step"] == 499944
+    assert [p["learner_steps"] for p in run["curve"]] == [1, 2, 4, 5]
+    assert run["header"]["starting_learner_step"] == 499939
+    assert run["curve"][-1]["score"] == 3
+    rows[-1]["learner_step"] += 1
+    with pytest.raises(ValueError, match="restored training"):
+        read_run(write(tmp_path, rows), allow_restored=True)
+
+
+@pytest.mark.parametrize("starting", [-1, 1.5, True])
+def test_restored_learning_reader_rejects_invalid_starting_counter(tmp_path, starting):
+    rows = fixture()
+    rows[0]["starting_learner_step"] = starting
+    with pytest.raises(ValueError, match="starting learner counter"):
+        read_run(write(tmp_path, rows), allow_restored=True)
+
+
+def test_fresh_learning_comparison_still_rejects_restored_checkpoint(tmp_path):
+    rows = fixture()
+    rows[0]["restored_checkpoint"] = dict(path="retained")
+    with pytest.raises(ValueError, match="fresh unassisted"):
+        summarize([("pretrained_tiny", write(tmp_path, rows))], budget=24)

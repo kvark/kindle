@@ -31,11 +31,12 @@ def reject_constant(value):
     raise ValueError(f"nonfinite JSON: {value}")
 
 
-def read_run(path, *, allow_interrupted=False, diagnostics=False):
+def read_run(path, *, allow_interrupted=False, diagnostics=False, allow_restored=False):
     """Stream raw transitions to independently reconcile returns and boundaries."""
     episodes, curve, pending = [], [], {}
     header, final, actual, first_update = None, None, 0, None
     previous_seconds = 0.0
+    starting_updates = 0
     digest = hashlib.sha256()
     reports = []
     with path.open("rb") as stream:
@@ -51,6 +52,10 @@ def read_run(path, *, allow_interrupted=False, diagnostics=False):
                 if event != "run_start" or row["num_envs"] <= 0:
                     raise ValueError("missing run_start")
                 header = row
+                if allow_restored:
+                    starting_updates = row.get("starting_learner_step", 0)
+                    if type(starting_updates) is not int or starting_updates < 0:
+                        raise ValueError("invalid starting learner counter")
                 n = row["num_envs"]
                 returns, lengths, counts, totals = [0.] * n, [0] * n, [0] * n, [0.] * n
                 continue
@@ -88,7 +93,7 @@ def read_run(path, *, allow_interrupted=False, diagnostics=False):
                         row["episode_counts"] != counts or row["partial_returns"] != returns or
                         row["partial_lengths"] != lengths):
                     raise ValueError("progress disagrees with transitions")
-                point = dict(actions=actual, seconds=row["elapsed_seconds"], learner_steps=row["learner_step"],
+                point = dict(actions=actual, seconds=row["elapsed_seconds"], learner_steps=row["learner_step"] - starting_updates,
                              completed_episodes=len(episodes),
                              score=fmean(e["episode_return"] for e in episodes[-50:]) if episodes else None)
                 if reports:
@@ -111,8 +116,8 @@ def read_run(path, *, allow_interrupted=False, diagnostics=False):
     interrupted = (allow_interrupted and final is not None and final["reason"] == "interrupted" and
                    0 < actual < header["steps"])
     if (not (complete or interrupted) or
-            final["learner_updates"] != final["learner_step"] or first_update is None):
-        raise ValueError("incomplete fresh training run")
+            final["learner_updates"] != final["learner_step"] - starting_updates or first_update is None):
+        raise ValueError("incomplete restored training run" if allow_restored else "incomplete fresh training run")
     first_update = final.get("first_training_action", first_update)
     schedule = header.get("config", header)
     positions = schedule["batch_size"] * schedule["batch_length"]

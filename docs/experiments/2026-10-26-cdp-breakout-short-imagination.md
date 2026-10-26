@@ -75,5 +75,8 @@ the prior CPU analysis is retained and no GPU work was repeated.
 
 Training startup checks pass: only H15→5 differs from the verified Auto source,
 16,334,353 parameters, retained499939/2027152 counters, exact input metadata and
-finite first updates248:499940,256:499941,256:499942. Fixed50k final evaluation
-and the complete learning audit are pending. No automatic next allocation.
+finite first updates248:499940,256:499941,256:499942. The fixed50k life now completes
+12,439 new updates in8m02s: frozen27.2083 versus source67.5833, both0/24 two-wall
+successes. All audits pass and service exits. See the
+[completed result](../results/2026-10-26-cdp-breakout-short-imagination.md).
+Retain the source; no extension or favorable-checkpoint selection follows.
