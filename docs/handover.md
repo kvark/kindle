@@ -143,6 +143,11 @@ zero updates/truncations and full numerical/config/counter/tensor/replay/guard
 audits. Native unchanged. Owner`kindle-cheap-breakout-minimal-intrinsic001-200k-20261026`;
 check live state before GPU work. No cap increase, resume, extension or automatic
 next allocation. This tests learning incentives; ensemble arithmetic stays fixed.
+The100k recovery passes at24,939 updates and346 finite tensors, with zero debt.
+A [PongB16/R40 candidate](experiments/2026-10-26-cdp-pong-b16-r40.md) is prepared
+on CPU only: original rates/H15,500k/78,067 updates and55-minute cap. Its projected
+47m38s cost is not measured performance. Review Breakout's completed result
+before selection; no automatic queue.
 
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

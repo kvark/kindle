@@ -71,3 +71,10 @@ startup review`85e14c09c88c3675ee46131f8ea220e450851434b1cb79c96d44c86e6e05927e`
 Recovery, fixed-final/own-initial evaluation, full replay/guards, curves and
 completed comparison are running or waiting automatically. Startup verifies
 execution and initial equality; learning remains pending.
+
+The100k recovery passes at24,939 updates,346 finite tensors and25,531 strict
+reports through102,376 actions. Captured98,304-action progress is620.077s with
+zero debt. Checkpoint metadata SHA256
+`5c8374f85b10ebde1e6cae8bcd30daeb3486b512463e1fabdd69211922d9e37b`.
+The recovery watcher exits successfully; training and fixed frozen result remain
+pending. No budget or recipe change follows from this recovery check.
