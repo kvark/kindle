@@ -298,14 +298,18 @@ No extension or confirmation follows capped Qbert. The applied
 `runtime-qbert-guidance-cap` overlay. Prior isolation failures remain recorded.
 See [the completed result](results/2026-10-25-cdp-cheap-qbert.md#capped-guidance-recovers-some-quality-but-remains-below-unaided-training).
 
-Select a bounded Pong actor/critic-rate check after the completed Qbert result:
-4M48/Auto/N8/B16/T16/H15/R32/coefficient.01/actor0/full18, original world/encoder/
-dynamics rates and behavior rate8e-5 only. Keep4096 actions/466 updates, first376,
-zero debt,90-second training cap and1024 frozen actions/60-second cap. All346
-initial/frozen tensors, config/counters, selected parameter changes and both
-host guards are required. CLI passes460 CPU tests; native unchanged. Owner
-`kindle-cheap-pong-behavior-lr2-smoke-20261026`. No full allocation is selected;
-review the bounded result first. See the cheap-Pong report's separate-rate check.
+Select fresh Pong B16 behavior-rate learning after the bounded check passes:
+4M48/Auto/N8/B16/T16/H15/R32/coefficient.01/actor0/full18, world4e-5/encoder6e-6/
+dynamics4e-4 and behavior8e-5 only; fresh1009/eval4000001009. Keep500k actions/
+62,454 updates, first376, zero debt, four100k recoveries and45-minute training
+cap. Fixed final/own initial24-natural evaluations retain mean15/90%-wins,
+all346 tensors, full config/source/counter/replay/video/guard/curve checks and
+comparison to original B16, global2x and B8. No cap increase, extension or
+automatic next allocation. Owner`kindle-cheap-pong-behavior-lr2-500k-20261026`.
+Bounded4096/466 training and1024 frozen actions pass in15.979s/0.437s, with346
+matched initial/unchanged frozen tensors and both guards; service exits21:37:35.
+CLI`a2c467c` passes460 CPU tests; native unchanged. See cheap-Pong's selected
+fresh behavior-rate comparison. Check live state before GPU work.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
@@ -313,8 +317,8 @@ New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
 Check live service state before GPU work. Whole-episode and capped Qbert
-guidance, Pong RGB32 and their postprocessing are complete. The bounded Pong
-behavior-rate check is selected above; do not restart completed services.
+guidance, Pong RGB32 and their postprocessing are complete. The fresh Pong B16
+behavior-rate run is selected above; do not restart completed services.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

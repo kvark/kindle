@@ -887,3 +887,46 @@ Evidence: `/x/Temp/kindle-cheap-20261025/pong-4m-48-b16-behavior-lr2-smoke`;
 owner`kindle-cheap-pong-behavior-lr2-smoke-20261026`;
 controller`run_pong_behavior_lr2_smoke.py`. CLI validation is retained at
 `/x/Temp/kindle-cheap-20261025/cdp-behavior-rate-cli/validation.json`.
+
+
+The bounded run starts21:37:12 UTC/source`a2c467c` and exits successfully at
+21:37:35 UTC. It completes4096 actions/16,384 emulator frames/466 updates in
+15.9788s; frozen1024 actions/4096 frames take0.4375s, with zero updates and zero
+natural matches. All346 initial tensors match the B16 control, all346 frozen
+tensors are unchanged, all466 reports and checkpoints are finite, selected
+CNN/reward/actor/critic weights change, and both guards pass. This is execution
+and restore evidence only. Review SHA256
+`651052b477f825a024637248c9a961b8aebd19c285288e7e42897346ab858d01`.
+
+## Selected fresh B16 behavior-rate comparison
+
+After reviewing the bounded success and terminal service, select **one fresh
+500k-action/62,454-update B16 run**, with a45-minute training cap. Only behavior
+rate becomes8e-5 versus the original B16 control; keep world4e-5, encoder6e-6,
+dynamics4e-4,4M/RGB48/Auto/N8/B16/T16/H15/R32/coefficient.01/actor0/full18,
+disabled actor/critic gradients,1009/eval4000001009, and original optimizer
+coefficients/warmup. First update376, zero residual debt, recoveries at100k/
+12,454,200k/24,954,300k/37,454 and400k/49,954 updates. No smoke experience is
+reused. Native`bfb8c31`, CLI`a2c467c`, frozen replay`5043b7a`; no native rebuild.
+
+Assess only fixed final and actual initial policies, each first3 natural matches
+per lane (24 total),600k-action/300-second evaluation caps, zero updates and
+truncations, retained excess/tails,346 unchanged tensors, complete action/reward/
+boundary replay and videos. Keep mean15/90%-wins. Require all finite reports,
+config/source/counter audits, four recovery receipts, matched346 initial tensors
+and semantic initial traces, guards and learning curves. Compare original B16
+11.875/38m45s, globally doubled rates9.125/38m32s and B8 14.958/49m55s. Controls
+use older kernels; neither timing nor optimizer equivalence is isolated. One
+reused development seed is not independent reliability evidence.
+
+The controller, queue, complete-control readers, comparison and postprocessing
+compile; unselected launch is refused, and an unchanged-rate control falsely
+labelled as the new candidate is rejected before output. No cap increase,
+resume, extension, selected earlier checkpoint, conditional seed campaign or
+automatic next GPU allocation follows. Full frozen quality remains unmeasured.
+
+Artifacts:
+`/x/Temp/kindle-cheap-20261025/pong-4m-48-b16-r32-intrinsic001-behavior-lr2-500k`;
+owner`kindle-cheap-pong-behavior-lr2-500k-20261026`. Controller
+`run_pong_behavior_lr2_500k.py`, comparison`compare_pong_behavior_rate.py`,
+postprocessing`finish_pong_behavior_lr2.py`; exact hashes in the declaration.
