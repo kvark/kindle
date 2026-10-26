@@ -541,3 +541,45 @@ New-boot evidence:`newboot-recovery-20261026-a8648671`, restore review SHA256
 `5a47b92a473bb8cc1aa60328534d5818e72e108f7b2322e8aa121b34d541d81c`.
 Training source`647b457`, frozen wrapper source`32e6714`, native`bfb8c31`,
 runner`22bd61b`, replay`e853818`. Original declarations/logs are unchanged.
+
+## Six actions save time but lower frozen quality
+
+The six-action run completes500,000 actions/1,999,742 emulator frames and124,939
+updates in2660.589s (**44m21s**),11.17% less training time than the full18
+control's49m55s. Frozen final score is **10.375 versus own initial−20.042**,
+24/24 versus0/24 wins. Full18 scores14.958/24 wins at the same budget. Both miss
+the unchanged mean15 gate. Retain full18; no extension or conditional4013
+confirmation is selected. The prepared second-seed refusal/decision is retained.
+
+Only action_count18→6 and published→published-minimal change: NOOP, FIRE, RIGHT,
+LEFT, RIGHTFIRE, LEFTFIRE. Keep4M/RGB48/Auto/N8/B8/T16/H15/R32, microbatch8,
+replay100k, coefficient.01/actor0, original rates and no aid. Native frames
+receive one GPU resize. Trainable parameters change3,578,225→3,568,997 with
+different initial dimensions/weights; own initial controls are required, and
+no matched-weight claim is made. Fresh1009/eval4000001009 are reused development
+seeds. Same RX7900XT/Mesa/native binary; kernel7.0.0-34→7.0.0-38 and AMD module
+changes remain a comparison confound.
+
+First update248,15,992,192 sampled replay positions, zero debt,143 natural
+training matches and final online last50 mean9.88. Construction1.949s is separate.
+The reviewed curve is slower per action in the middle of training and catches
+up late; its late wall-time advantage does not carry over to frozen quality.
+The55-minute training cap is met without cutoff or selected checkpoints.
+
+Final/initial frozen checks use81,944/23,936 actions,327,735/95,723 emulator
+frames and31.254/9.175s. Each collects/selects exactly24 natural matches, first
+three per lane, with zero updates/truncations and no excess matches; partial
+tails remain. All346 tensors stay unchanged per frozen arm. All124,939 numeric
+reports, full configuration/source/counters, four recovery checkpoints, complete
+CPU replays/videos and three guards pass. Curves/comparison pass and are visually
+reviewed. Service exits17:28:27 UTC after45m50.755s total wall.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-48-r32-minimal-intrinsic001-500k`.
+Learning review SHA256`e7337fd5992b55a336069cffba47407eb6958593179fc553f750fab702b89c15`;
+curve`e767f56faa346f748534613f7a9304964d7e7233e7ce2e9db4c167cc132a9ea9`;
+comparison`31fe2d3a9281b716e640e3dba87190e2ef85440f42b1ce576d6a50bee7bee06f`;
+completion`588861c219ac101a476c83a37faa86b5810ac662490a7dcd182010874363400f`.
+Launch source`5043b7a`, native`bfb8c31`, CLI`22bd61b`, replay`5043b7a`.
+After this completed review, select only the separately declared bounded
+Breakout actor/critic-gradient execution/restore check; no full learning life
+follows automatically.

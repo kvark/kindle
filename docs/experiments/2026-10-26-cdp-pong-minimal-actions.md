@@ -1,6 +1,12 @@
 # Six-action Pong at the compact B8 budget
 
-**Active from16:42:36 UTC**, source`5043b7a`; startup checks pass. Selected
+**Completed; retain full18.** Six actions finish500k/124,939 updates in44m21s,
+11.17% less training time, but frozen10.375 is below full18's14.958; both24/24
+wins and below mean15. All audits, recoveries, replays, guards and comparison
+pass; service exits17:28:27 UTC. No extension or conditional4013 confirmation.
+See [completed result](../results/2026-10-25-cdp-cheap-pong.md#six-actions-save-time-but-lower-frozen-quality).
+
+Started16:42:36 UTC, source`5043b7a`; startup checks pass. Selected
 after the completed Qbert H30 review. H30 costs35.34% more training
 time and lowers frozen score/coverage; retain H15 without extension. Pong's
 best compact B8/H15/coefficient.01 learners score14.958 and14.0, both24/24 wins,
@@ -129,6 +135,10 @@ All four recovery reviews are complete and their watcher exits successfully;
 training and final-result monitoring remain active.
 
 ## Conditional second-seed preparation
+
+**Not selected after the completed primary result:**10.375 fails the original
+mean15 gate and is below full18's14.958. The original preparation is retained;
+`selection-decision.json` records this decision. No process or GPU work starts.
 
 While the primary remains active, a fresh4013/eval4000004013 configuration is
 prepared outside Git, **unselected**. It changes only learner/evaluation seeds

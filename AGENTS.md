@@ -51,27 +51,21 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Pong4M/RGB48/Auto/N8/B8/T16/H15/R32, six-action vocabulary,
-active from16:42:36 UTC/source`5043b7a`. Fresh1009/eval4000001009, coefficient.01,
-actor0, original rates/no aid; only full18→minimal6 changes versus the B8 control.
-Keep500k/124,939 updates, four100k recoveries and55-minute training cap. Startup
-passes3,568,997 parameters,346 finite initial tensors and248:1/256:2/256:3 updates.
-Own initial/fixed final24-natural-match controls retain mean15/90%-wins and full
-audits/replays/guards. See`docs/experiments/2026-10-26-cdp-pong-minimal-actions.md`;
-owner`kindle-cheap-pong-minimal-intrinsic001-500k-20261026`. Check live state before
-GPU work. No cap increase, extension or automatic next allocation.
+Selected bounded check: Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32, minimal4,
+coefficient1/actor.01, original rates, fresh1009/eval4000001009, no aid. Only
+actor_critic_gradientfalse→true changes. Keep4096 actions/963 updates/first248,
+300-second training cap and1024-action/60-second frozen restore, zero updates.
+The exact313-test CPU-staged CLI patch is applied; native remains unchanged.
+Verify the expected357-tensor schema, frozen actor copies, full restore
+invariance, finite/nonzero initial policy/value reports and changed world
+weights. Launch pending; owner`kindle-cheap-breakout-acgrads-smoke-20261026`.
+See`docs/experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md`. Check live
+state before GPU work. No full learning life, cap increase or automatic next run.
 
-A matching minimal6 seed4013 confirmation is prepared outside Git, unselected.
-It requires the primary's completed audits and passing mean15/90%-wins gate,
-followed by outcome review and a separate allocation decision. No automatic launch.
-
-All four Pong recoveries through400k pass, with99,939 updates/346 finite tensors
-at400k; recovery watcher exits successfully. A later Breakout option is staged outside
-the worktree with313 CPU tests and a prepared4096-action/300-second smoke plus
-1024-action/60-second frozen restore. CPU schema/refusal checks pass; no patch
-or GPU allocation is selected. See
-`docs/experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md`. Keep active
-Pong files pinned; any later smoke must verify the expected357-tensor schema.
+Pong minimal6 completes500k/124,939 updates in44m21s,11.17% less training time,
+but frozen10.375 is below full18's14.958; both24/24 wins and below mean15. All
+audits, four recoveries, replays, guards and comparison pass; service exits
+17:28:27 UTC. Retain full18; no extension or conditional4013 confirmation.
 
 Qbert4M48/B8/T16/H30/R32 completes200k/49,939 updates in26m43s,35.34% more
 training time than H15. Frozen582.292 versus809.375 and coverage9.583 versus
@@ -119,8 +113,8 @@ but frozen11.875 is below14.958; both24/24 wins and below mean15. All audits and
 comparison pass; service exits10:28:51 UTC. No extension or confirmation.
 Qbert500k/R16 remains weaker than its200k/R32 control, with0/24 pyramids.
 
-Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
-`22bd61b`, CPU replay `5043b7a`. The active declaration pins exact runtime/script
+Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, CPU replay `5043b7a`; runner now permits opt-in CDP
+actor/critic gradients on top of`22bd61b` (SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`). The active declaration pins exact runtime/script
 hashes; the handover locates the build receipt. Native 32/48/64 geometry and the
 intermediate 4M preset pass bounded training/frozen checks, including 64 restore.
 The CLI exposes imagination length for fresh runs; defaults retain 15 and

@@ -52,7 +52,6 @@ import profile_atari_vector
     (["--cdp-centered"], "centered CDP requires"),
     (["--cdp", "--cdp-centered", "--world-microbatch-size", "1"], "full-batch world training"),
     (["--cdp", "--encoder-checkpoint", "unused"], "CDP requires"),
-    (["--cdp", "--actor-critic-gradient"], "CDP requires"),
     (["--learning-rate", "0"], "learning-rate must be finite and positive in F32"),
     (["--learning-rate", "-0.1"], "learning-rate must be finite and positive in F32"),
     (["--learning-rate", "nan"], "learning-rate must be finite and positive in F32"),
@@ -137,11 +136,12 @@ def test_runner_forwards_imagination_length_before_gpu(monkeypatch, tmp_path, le
         atari_vector.main()
 
 
+@pytest.mark.parametrize("actor_critic_gradient", [False, True])
 @pytest.mark.parametrize("scale", [0, 1])
 @pytest.mark.parametrize("centered", [False, True])
 @pytest.mark.parametrize("batch_shape", [None, (8, 16), (2, 64)])
 @pytest.mark.parametrize("image_size", [None, 32, 48])
-def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, batch_shape, image_size):
+def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, batch_shape, image_size, actor_critic_gradient):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
@@ -154,7 +154,7 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, ba
         assert config['encoder_learning_rate'] == 6e-6
         assert config['dynamics_learning_rate'] == 4e-4
         assert config['learning_rate'] == 4e-5
-        assert config['actor_critic_gradient'] is False
+        assert config['actor_critic_gradient'] is actor_critic_gradient
         assert config['actor_unimix'] == 0
         assert config['disagreement_bonus'] is (scale > 0)
         assert config['intrinsic_reward_scale'] == scale
@@ -172,7 +172,8 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, ba
                                     *(['--image-size', str(image_size)] if image_size else []),
                                     *(['--batch-size', str(batch_shape[0]), '--batch-length', str(batch_shape[1]),
                                        '--world-microbatch-size', str(batch_shape[0])] if batch_shape else []),
-                                    *(['--cdp-centered'] if centered else [])])
+                                    *(['--cdp-centered'] if centered else []),
+                                    *(['--actor-critic-gradient'] if actor_critic_gradient else [])])
     with pytest.raises(RuntimeError, match='CDP recipe checked'):
         atari_vector.main()
 

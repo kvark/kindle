@@ -178,8 +178,8 @@ def main():
     learned_rgb = args.encoder_checkpoint is None
     if args.image_size is not None and not learned_rgb:
         parser.error("image-size requires the learned RGB/CNN frontend")
-    if args.cdp and (not learned_rgb or args.actor_critic_gradient):
-        parser.error("CDP requires the learned CNN and ac_grads=false")
+    if args.cdp and not learned_rgb:
+        parser.error("CDP requires the learned CNN")
     if args.cdp:
         rate_scale = args.learning_rate / 4e-5
         cdp_rates = dict(encoder_learning_rate=6e-6 * rate_scale,

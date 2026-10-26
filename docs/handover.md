@@ -154,45 +154,33 @@ pinned queue saved every200k. Original watcher failures remain; separate CPU
 completion records `protocol_complete=false`. Service exits16:26:25 UTC. No GPU
 repeat, extension or confirmation for H30.
 
-Current allocation: [six-action Pong](experiments/2026-10-26-cdp-pong-minimal-actions.md),
-started16:42:36 UTC/source`5043b7a`. Keep fresh1009/eval4000001009,
-4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient.01/actor0 and original rates/no aid;
-only full18→minimal6 changes versus the completed B8 control. Fixed500k/124,939
-updates, four100k recoveries and55-minute training cap. Startup passes3,568,997
-parameters,346 finite own initial tensors and248:1/256:2/256:3 updates. Dimensions
-and initialization differ from full18. Fixed final/own initial24-natural-match
-controls retain mean15/90%-wins and full numerical/config/counter/tensor/replay/
-guard audits. CPU replay`5043b7a` explicitly supports Pong's six actions; native
-and training CLI are unchanged. Monitoring/comparison attached, frozen quality
-pending. No extension or automatic next allocation.
+The [completed six-action Pong test](results/2026-10-25-cdp-cheap-pong.md#six-actions-save-time-but-lower-frozen-quality)
+finishes500k/124,939 updates in44m21s,11.17% less training time than full18.
+Frozen10.375 versus own initial−20.042 is below full18's14.958; both24/24 wins
+and below mean15. All numerical/config/counter/tensor/replay/guard checks,
+four recoveries and curves/comparison pass; service exits17:28:27 UTC. Dimensions
+and initial weights differ, and the control used the older kernel. Retain
+full18; no extension or conditional4013 confirmation is selected.
 
-All four Pong recoveries through400k pass, with99,939 updates and346 finite
-tensors at400k. The stable prefix contains404,584 actions/101,083 finite reports;
-401,408-action progress is2134.646s/100,291 updates with zero debt. The recovery
-watcher exits successfully; training and final-result monitoring remain active.
-Separately, a [Breakout actor/critic-gradient option](experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md)
-is staged outside the worktree and passes313 CPU CLI tests. Its prepared smoke
-caps training at4096 actions/300 seconds and frozen restore at1024 actions/60
-seconds. CPU schema/refusal checks pass; no patch application or GPU check is
-selected. Current Pong files remain pinned. The smoke must verify the extra
-frozen actor tensors and complete restore invariance before any learning
-allocation; preparation is not GPU execution or learning evidence.
-
-The active Pong declaration also records an unselected minimal6 seed4013
-confirmation, prepared with the identical recipe/budgets and own initial control.
-CPU queue/seed/refusal checks pass. Selection requires the primary's completed
-audits and passing mean15/90%-wins gate, then a separate outcome/allocation
-review. A failed primary does not activate it; no automatic next run.
+After this completed review, select only the [bounded Breakout actor/critic
+check](experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md). The exact
+313-test CPU-staged CLI patch is applied; native remains unchanged. Fresh
+4M64/Auto/N8/B8/T16/H15/R32, minimal4/coefficient1/actor.01, original rates/no aid;
+only actor_critic_gradient changes. Keep4096 actions/963 updates/300 seconds,
+then1024 frozen actions/zero updates/60 seconds. Verify the expected357 tensors,
+frozen actor copies and complete restore invariance. Launch pending; no full
+learning life, cap increase, extension or automatic next allocation.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
-Check live service state before GPU work; current owner
-`kindle-cheap-pong-minimal-intrinsic001-500k-20261026`.
+Check live service state before GPU work; selected bounded-check owner
+`kindle-cheap-breakout-acgrads-smoke-20261026`.
 
-Current native source`bfb8c31`, runner`22bd61b`, native SHA256
+Current native source`bfb8c31`; runner adds opt-in CDP actor/critic gradients
+to`22bd61b`, SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`. Native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
 `original-native` preserves the prior AMD binary. Both installed and source-tree

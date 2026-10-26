@@ -1,8 +1,12 @@
-# Breakout actor/critic gradients: staged option
+# Breakout actor/critic gradients: bounded check
 
-**CPU preparation only; no GPU allocation is selected.** Six-action Pong remains
-the active learner. Its pinned runner, runtime and analysis files are unchanged.
-Any application or bounded GPU check follows review of that completed run.
+**Bounded GPU check selected after completed Pong review; launch pending.**
+Six-action Pong saves11.17% training time but lowers frozen14.958→10.375,
+both24/24 wins and below mean15. Its complete audits/comparison pass and service
+exits17:28:27 UTC. Retain full18; no conditional4013 confirmation. The exact
+CPU-tested CLI patch is now applied, with no native change. Select only the
+4096-action/300-second training check and1024-action/60-second frozen restore.
+No full learning life or automatic next allocation is selected.
 
 The compact four-action Breakout control scores9.542 at200k actions in20m59s,
 with0/24 two-wall successes. Shorter imagination and smaller intrinsic reward
@@ -86,3 +90,11 @@ unselected declaration`7c0fa22c2d3593e8aeec1190da371351255b99d3e75ecc2f539fa70c3
 CPU preparation review`298c5e44b19839d0d8eb79308739169f0b1e558dfcc03d3cf8be1147a88e3189`.
 Prepared source`431e8eb`. Current Pong must finish and be reviewed before an
 allocation decision; this preparation does not select Breakout as the next run.
+
+Following the completed Pong review, the applied runner and tests match the
+previously validated313-test staged files byte-for-byte. Application review
+SHA256`ef99ef71fef2360ce736be201898a51a00e0705af9ee3e7770561d5826dd5b07`.
+The bounded selection retains all prepared actions, updates, caps and357-tensor
+requirements. Owner`kindle-cheap-breakout-acgrads-smoke-20261026`; its launch
+receipt will record the exact source and selected declaration. No existing
+checkpoint is reused for learning, and this is not a task-competence test.
