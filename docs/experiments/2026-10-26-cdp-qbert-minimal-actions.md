@@ -1,8 +1,10 @@
 # Compact Qbert with six action choices
 
-Prepared, not started. Review the active Pong4013 confirmation and its complete
-audit before selecting this allocation. The controller refuses to launch without
-that review and the separately validated CPU replay change described below.
+Selected after Pong4013 completes:22/24 frozen wins and mean7.333 in50m14s, with
+all audits passing and the service exited. Both compact Pong learners improve
+substantially but miss mean15. Retain those results and allocate this bounded
+Qbert test next. The controller requires the completed Pong review and the
+validated CPU replay change described below before launching.
 
 The compact4M/RGB48/R32 control completes200k actions in19m45s but scores809.375
 with0/24 first pyramids. Increasing the native exploration coefficient to100
@@ -52,12 +54,12 @@ unchanged frozen tensors, full CPU replays/videos and host guards. Audit cap1200
 seconds; service cap3660 seconds. Stop on real faults or numerical failure.
 
 The training adapter already supports this vocabulary. CPU replay previously
-allowed minimal actions only for Breakout. A staged change adds an explicit
+allowed minimal actions only for Breakout. A change adds an explicit
 Qbert six-action declaration while preserving exact vocabulary, ROM and protocol
-checks.138 CPU tests pass, including real full/minimal Atari trajectories and
-rejection of missing, reordered or mismatched declarations. Production replay
-remains unchanged until Pong's audit finishes. Apply and verify the staged
-change before selecting this experiment; it changes no training behavior.
+checks.138 CPU tests pass both staged and after application, including real
+full/minimal Atari trajectories and rejection of missing, reordered or mismatched
+declarations. Applied only after Pong's complete audit and terminal service;
+native and training CLI remain unchanged.
 
 Artifacts: `/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-minimal-200k`.
 Controller: `run_qbert_minimal_200k.py`; intended service:
@@ -66,4 +68,5 @@ remain fixed. The declaration seals exact commands, caps and control identities.
 CPU action review: `qbert-action-vocabulary-review.json`, SHA256
 `276f2d6483c4b8247975951dfd0bc7e3c240f3220f7fb5ab7a49e59258fe3d54`.
 Staged replay patch and validation: `qbert-minimal-replay/` in the same artifact
-root. This preparation neither allocates another GPU learner nor starts a queue.
+root. Selection allows this one bounded learner; no automatic next allocation
+or extension follows. Record startup checks and the actual parameter count below.

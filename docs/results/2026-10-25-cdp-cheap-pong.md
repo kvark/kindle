@@ -1,9 +1,10 @@
 # Intermediate Pong learns to win with a larger update budget
 
-The4M/RGB48/R32 recipe reaches **11.0 versus actual initial−20.375, with23/24
-frozen wins**, after500k actions in48m53s. The mean-score target of15 remains
-unmet. All audits pass. This is a useful compact-model result on one reused
-development seed, not broad reliability or a demonstrated hardware speedup.
+The4M/RGB48/R32 recipe wins most frozen matches on two fresh learners: seed1009
+scores **11.0 with23/24 wins in48m53s**; confirmation4013 scores **7.333 with22/24
+wins in50m14s**. Both actual-initial controls lose24/24, and all audits pass.
+Both miss the unchanged mean-score target of15. This confirms useful compact
+learning on two selected seeds, not broad reliability or a hardware speedup.
 
 ## Short R16 screen
 
@@ -89,3 +90,49 @@ learners took about37 minutes on different GPU/precision/model settings; smaller
 parameter count has not established a speedup here. Preserve the useful result
 without extending it unchanged. The focused Freeway seed confirmation follows
 after review; Pong's remaining score gap stays open.
+
+## Fixed-recipe seed4013 confirmation
+
+The [focused confirmation](../experiments/2026-10-26-cdp-compact-pong-confirmation.md)
+keeps the native recipe and budget fixed. Only learner/environment seed4013 and
+evaluation seed4000004013 change. CLI`1ed07af` adds an optional imagination-length
+argument relative to the primary runner; both retain H15. Full native config
+matches the primary except seed. The new initial weights differ as expected;
+retain this life's own actual-initial control.
+
+Training completes **500,000 aggregate actions /1,999,806 emulator frames /
+124,939 updates in3,014.113s (50m14s)**,165.89 actions/s, first update248 and zero
+debt. The55-minute cap is unchanged. There are138 natural training matches;
+final online last50 mean3.20. All four100k recovery checkpoints pass finite,
+configuration and counter checks before fixed500k replaces them.
+
+| Fixed policy | Selected natural matches | Mean | Wins / losses | Gate |
+|---|---:|---:|---:|---|
+|500k final, seed4013|24|7.333|22 /2|fail: mean below15|
+|Own actual initial|24|−20.333|0 /24|fail|
+
+The final policy wins91.67% of selected matches but misses the score gate.
+Frozen final uses121,080 actions/484,284 emulator frames in51.321s; initial
+uses26,416/105,641 in11.324s. Each collects exactly24 natural matches, the first
+three per lane; partial tails remain in the full replay/video. There are zero
+updates or truncations, and all346 tensors remain unchanged in each arm.
+
+All124,939 numeric reports, full source/config/counter checks, finite checkpoints,
+full CPU action replays/videos and three host guards pass. Service
+`kindle-cheap-pong-48-r32-500k-4013-20261026` exits successfully. Independently
+reconciled curves show slower learning on4013 than1009; the comparison preserves
+separate frozen policies and their own initial controls. No earlier checkpoint
+selection, cap increase, resume or extension occurs.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/pong-4m-48-500k-r32-seed4013`, including
+`learning-review.json`, `curve/`, `seed-comparison/` and `postprocess-review.json`.
+Review SHA256`0ed92b0c8c06fee2eab15accf6d8b085f38d8960b3d42120ed520a968297f2c0`.
+Curve SHA256`851db14046df0d39af9d62f531703ab0be1d3c7e0d0c4d323ea190a7a13f398c`;
+comparison SHA256`bde887e6bde03a794b7eab75497e084766701c29482b1895354549eb1bacb52e`.
+Source at launch`923b47b`, native`bfb8c31`, runner`1ed07af`, native SHA above.
+
+Seed4013 was selected after use on Boxing/Freeway and is not held out. Two
+learners and48 evaluation matches do not establish broad training-seed
+reliability. Both compact policies are useful, both mean15 gates remain unmet,
+and neither is extended unchanged. The next bounded test addresses Qbert's
+remaining task failure using the separately declared six-action vocabulary.

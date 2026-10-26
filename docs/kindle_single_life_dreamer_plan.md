@@ -19,6 +19,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same recipe, confirmation4013](results/2026-10-25-cdp-cheap-freeway.md#fixed-recipe-seed4013-confirmation) |500k /124,939|28m50s|32.000 /0.00|24/24 milestones; pass|
 | [Pong4M/RGB48/R16](results/2026-10-25-cdp-cheap-pong.md) |200k /24,970|10m22s|−17.125 /−20.375|0/24 wins|
 | [Pong4M/RGB48/R32](results/2026-10-25-cdp-cheap-pong.md#r32-and500k-actions) |500k /124,939|48m53s|11.000 /−20.375|23/24 wins; mean15 gate fails|
+| [Same recipe, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#fixed-recipe-seed4013-confirmation) |500k /124,939|50m14s|7.333 /−20.333|22/24 wins; mean15 gate fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
@@ -73,22 +74,20 @@ audits pass and service exits. Replay/games/belief/RNG restart, so new experienc
 and replay restart confound isolated horizon attribution. Retain the source;
 no extension. Counter-aware curves pass70 CPU checks without changing training.
 
-**Current allocation:** [compact Pong seed4013 confirmation](experiments/2026-10-26-cdp-compact-pong-confirmation.md).
-Keep4M/RGB48/Auto/N8/B8/T16/H15/R32,500k actions/124939 updates and the55-minute
-cap fixed; only learner/evaluation seeds change. The primary23/24 wins justify
-focused confirmation, but mean11.0 still misses the unchanged15-point gate.
-Startup full config/source/counter checks, finite own actual-initial checkpoint
-and first updates pass. Fixed24-natural-match final/actual-initial controls and
-full audits follow. This selected seed is not held out; no broad campaign,
-automatic next allocation, cap increase or unchanged extension.
+The [Pong4013 confirmation](results/2026-10-25-cdp-cheap-pong.md#fixed-recipe-seed4013-confirmation)
+completes500k actions/124939 updates in50m14s: frozen7.333 and22/24 wins versus
+own initial−20.333 and0/24. All audits and curves pass; service exits successfully.
+Both compact learners win most matches but miss the unchanged mean15 gate.
+Selected seeds are not held out; no unchanged extension or broad campaign.
 
-Prepared for review after Pong: [Qbert with six action choices](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
-keeping the compact coefficient1 recipe and200k/30-minute cap. The existing
-adapter preserves timing/sticky settings; a bounded CPU comparison matches the
-shared six actions. Explicit Qbert replay support passes138 staged CPU checks
-and remains outside production until Pong's audit finishes. Changing action
-count changes initialization and policy probabilities; retain an own initial
-control and label the protocol variant. No GPU allocation has started.
+**Selected next allocation:** [Qbert with six action choices](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
+keeping4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient1 and200k/30-minute cap. The
+existing adapter preserves timing/sticky settings; a bounded CPU comparison
+matches the shared six actions. Explicit Qbert replay support passes138 checks
+both staged and applied after Pong's audit/exit. Changing action count changes
+initialization and policy probabilities; retain an own initial control and
+label the protocol variant. The mean15k/90%-pyramid gate is unchanged. One
+bounded learner, no automatic next allocation or extension; startup follows.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
@@ -130,7 +129,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Game | Latest useful frozen result | What remains |
 | --- | --- | --- |
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
-| Pong | AMD4M/RGB48/R32/500k:11.0,23/24 wins in48m53s; historical three-seed15.71,72/72 | Reference20.45; current mean15 gate and seed confirmation remain open |
+| Pong | AMD4M/RGB48/R32/500k seeds1009/4013:11.0/7.33,23/24 and22/24 wins in48m53s/50m14s; historical three-seed15.71,72/72 | Reference20.45; both compact mean15 gates and broad reliability remain open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | Historical2M mean7,367;62/72 first pyramids | Reference193,220.77; intermediate15k/90% also unmet |

@@ -3,7 +3,7 @@
 Replays every recorded action in fresh environments. It does not construct or
 train Kindle. A movie shows every episode of the chosen stream, not selected
 successes. RAM is used only by the post-hoc Qbert completion observer.
-Published full-action runs retain replay v1. Minimal-action Breakout requires
+Published full-action runs retain replay v1. Minimal-action Breakout and Qbert require
 an explicit matching declaration and replay v2; it does not change task gates.
 """
 
@@ -43,11 +43,17 @@ class TaskMonitor(gym.Wrapper):
         return result
 
 
+MINIMAL_ACTIONS = {
+    'ALE/Breakout-v5': ['NOOP', 'FIRE', 'RIGHT', 'LEFT'],
+    'ALE/Qbert-v5': ['NOOP', 'FIRE', 'UP', 'RIGHT', 'LEFT', 'DOWN'],
+}
+
+
 def replay_protocol(header):
     profile = header['atari_protocol']
     require(profile in ('published', 'published-minimal'), 'unsupported replay preprocessing')
     if profile == 'published-minimal':
-        require(header['environment'] == 'ALE/Breakout-v5', 'minimal replay is Breakout only')
+        require(header['environment'] in MINIMAL_ACTIONS, 'unsupported minimal replay game')
     if header.get('observation_size', '64') != '64' or header.get('sticky_actions', 0) != 0:
         return 'kindle-atari-task-replay-v3'
     return 'kindle-atari-task-replay-v2' if profile == 'published-minimal' else 'kindle-atari-task-replay-v1'
@@ -74,10 +80,10 @@ def verify_replay_identity(header, manifest, rom):
             and manifest.get('sticky_actions', 0.0) == header['sticky_actions'],
             'changed declared pixel or sticky-action preprocessing')
     if not full_actions:
-        actions = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
-        require(type(header['config'].get('action_count')) is int and header['config']['action_count'] == 4
+        actions = MINIMAL_ACTIONS[header['environment']]
+        require(type(header['config'].get('action_count')) is int and header['config']['action_count'] == len(actions)
                 and header['action_meanings'] == actions, 'changed minimal action vocabulary')
-        require(type(manifest.get('action_count')) is int and manifest['action_count'] == 4
+        require(type(manifest.get('action_count')) is int and manifest['action_count'] == len(actions)
                 and manifest.get('action_meanings') == actions, 'missing declared minimal action vocabulary')
     for path in (Path(rom['path']), Path(ale_native.__file__), Path(atari.__file__)):
         # The source wrapper may live in another checkout, with identical bytes.

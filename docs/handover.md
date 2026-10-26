@@ -57,18 +57,18 @@ The [H5 Breakout warm start](results/2026-10-26-cdp-breakout-short-imagination.m
 completes50k new actions/12439 updates in8m02s but regresses67.5833→27.2083,
 both0/24 two-wall successes. The frozen source trace matched H15 before learning;
 all audits pass and service exits. Retain the source; no extension.
-Current allocation: [compact Pong seed4013 confirmation](experiments/2026-10-26-cdp-compact-pong-confirmation.md),
-service `kindle-cheap-pong-48-r32-500k-4013-20261026`, started04:10:30 UTC.
-Keep4M/RGB48/Auto/N8/B8/T16/H15/R32,500k/124939 updates and55-minute cap fixed;
-only learner/evaluation seeds change. The primary wins23/24 but mean11.0 misses
-the unchanged15-point gate. Startup full config/source/counter checks, finite
-own actual-initial checkpoint and first updates pass. Fixed final/actual-initial
-evaluations and full audit follow. Check live state before GPU work. Native and
-training CLI remain unchanged; no automatic next allocation or extension.
-The [six-action Qbert test](experiments/2026-10-26-cdp-qbert-minimal-actions.md) is
-prepared only. Its replay support is staged outside production with138 passing
-CPU checks; apply it only after Pong's audit, then review allocation separately.
-Controller preparation is under `qbert-4m-48-r32-minimal-200k` in the artifact root.
+The [Pong4013 confirmation](results/2026-10-25-cdp-cheap-pong.md#fixed-recipe-seed4013-confirmation)
+completes500k/124939 updates in50m14s: frozen7.333 and22/24 wins versus own
+initial−20.333 and0/24. All audits and curves pass; service exits successfully.
+Both compact Pong learners win most matches but miss mean15. No extension.
+Selected next: the [six-action Qbert test](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
+4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient1,200k actions and30-minute cap.
+Its replay support passes138 CPU checks staged and applied after Pong's full
+audit/exit. Native and training CLI remain unchanged. Changing action count
+changes initialization and policy probabilities; retain its own initial control.
+Artifacts/controller: `qbert-4m-48-r32-minimal-200k`, `run_qbert_minimal_200k.py`;
+intended owner `kindle-cheap-qbert-minimal-200k-20261026`. Check live state before
+GPU work. Startup follows; no automatic next allocation or extension.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

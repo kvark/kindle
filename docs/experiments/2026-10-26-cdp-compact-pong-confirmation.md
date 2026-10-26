@@ -48,4 +48,10 @@ Started04:10:30 UTC, source`923b47b`. Startup checks pass: full native config
 matches the first500k learner except seed,3,578,225 parameters, H15, no action
 aid, zero starting counters, finite346-tensor actual initial checkpoint and
 first updates248:1,256:2,256:3. The initial world tensor hash differs from seed1009
-as expected. Fixed final/actual-initial evaluations and full audits are pending.
+as expected. Completed500k actions/1,999,806 emulator frames/124,939 updates in
+50m14s, within the unchanged55-minute cap. Frozen final7.333 with22/24 wins versus
+own actual initial−20.333 and0/24; the mean15 gate fails. All numeric, checkpoint,
+frozen, replay and host audits pass; service exits successfully. Curves and the
+two-seed comparison are complete. See the
+[result](../results/2026-10-25-cdp-cheap-pong.md#fixed-recipe-seed4013-confirmation).
+No unchanged extension follows.
