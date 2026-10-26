@@ -15,6 +15,7 @@ is separate. Each row is one development seed, not a reliability result.
 | Same recipe, confirmation4013 |500k /124,939|28m13s|79.167 /−0.625|24/24 wins; pass|
 | [Freeway1M/RGB64/R16, no aid](results/2026-10-25-cdp-cheap-freeway.md) |200k /24,970|8m07s|0.00 /0.00|0/24 milestones|
 | Same,5% persistent action aid in training |200k /24,970|8m11s|0.25 /0.00|0/24 milestones|
+| [Freeway1M/RGB32/R32, same aid](results/2026-10-25-cdp-cheap-freeway.md#compact-rgb32-with-the-successful-update-budget) |500k /124,939|28m17s|31.042 /0.00|24/24 milestones; pass|
 | [Pong4M/RGB48/R16](results/2026-10-25-cdp-cheap-pong.md) |200k /24,970|10m22s|−17.125 /−20.375|0/24 wins|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
@@ -36,11 +37,19 @@ selected no-FIRE gap12115→447. Adding the mixture only to the baseline frozen
 weights scores6.0833, gap724, with zero updates. All task gates still fail;
 shorter rollouts are useful but not Breakout success. No unchanged extension.
 
-**Current allocation:** [compact aided Freeway](experiments/2026-10-26-cdp-cheap-freeway-update-budget.md).
-Fresh1009/1M/RGB32/Auto/B8/T16/R32,500k actions/124939 expected updates and the
-30-minute training cap. Keep5% persistent-uniform16-action aid in training only;
-actor_unimix remains0. Fixed24-natural-episode final/actual-initial controls and
-full audits. Startup checks and all346 same-seed RGB32 initial tensors pass.
+Compact aided Freeway now passes in28m17s:31.0417 versus actual initial0.00,
+24/24 versus0/24 crossing successes. Frozen evaluation disables the aid. The
+same-protocol CPU always-UP reference scores21.6667,0/24. Resolution, ratio,
+budget and native runtime differ from the short screen; no isolated attribution.
+This useful recipe still needs focused seed confirmation.
+
+**Current allocation:** [Pong update-budget test](experiments/2026-10-26-cdp-cheap-pong-update-budget.md).
+Fresh1009/4M/RGB48/Auto/B8/T16/R32,500k actions/124939 expected updates, no aid,
+actor_unimix0. A new55-minute training cap was declared before allocation from
+measured stage costs (49-minute projection); historical37-minute successes used
+different GPU/precision/model settings. Fixed24-natural-match final/actual-initial
+controls and full audits. Startup checks and all346 initial tensors against the
+200k control pass. No cap increase, unchanged extension or automatic next run.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

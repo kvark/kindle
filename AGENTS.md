@@ -88,13 +88,18 @@ Breakout's1% mixture test also completes: frozen7.0833 versus initial1.375 in
 weights with only frozen mixture score6.0833 and gap724 in9.8s, zero updates.
 All three policies remain0/24 two-wall successes; all audits pass and services
 exit. See `docs/results/2026-10-26-cdp-breakout-unimix.md`; no extension.
-Current allocation: fresh Freeway1009,1M/RGB32/Auto/B8/T16/R32,500k actions,
-expected124939 updates,30-minute training cap and fixed24-natural-episode
-final/actual-initial evaluations. Keep5% persistent-uniform16-action aid in
-training only; actor_unimix remains0. Complete config/source checks, all346
-same-seed RGB32 initial tensors and first updates pass. See
-`docs/experiments/2026-10-26-cdp-cheap-freeway-update-budget.md`;
-service owner `kindle-cheap-freeway-32-r32-500k-aided-20261026`. Check its live state before
+Compact aided Freeway1009,1M/RGB32/Auto/B8/T16/R32, completes500k actions and
+124939 updates in28m17s: frozen31.0417 versus actual initial0.00,24/24 versus0/24
+crossing successes. The5% persistent16-action aid is disabled in evaluation;
+constant-UP CPU reference scores21.6667,0/24. All audits pass and the service
+exits. One reused development seed needs focused confirmation; see the Freeway
+result report. Resolution, ratio, budget and runtime change together.
+Current allocation: fresh Pong1009,4M/RGB48/Auto/B8/T16/R32,500k actions,
+expected124939 updates,55-minute training cap and fixed24-natural-match
+final/actual-initial evaluations. No action aid; actor_unimix remains0. Complete
+config/source checks, all346 initial tensors against the200k control and first
+updates pass. See `docs/experiments/2026-10-26-cdp-cheap-pong-update-budget.md`;
+service owner `kindle-cheap-pong-48-r32-500k-20261026`. Check its live state before
 further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.

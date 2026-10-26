@@ -1,5 +1,13 @@
 # Cheap Freeway development results
 
+The compact RGB32/R32 recipe now passes after 500k actions: **31.042 frozen
+crossings versus actual initial 0.00, with 24/24 task successes in 28m17s of
+training**. The two earlier RGB64/R16 screens below fail. All three runs pass
+their numerical and replay audits. One successful reused development seed needs
+focused confirmation; it is not a seed-reliability result.
+
+## Short RGB64 screens
+
 The first cheap configuration executes quickly but fails its frozen learning
 test. The fresh, unassisted seed1009 uses centered CDP/action-effects1,
 Size1M (1,057,201 trainable parameters), Auto, N8/B8/T16/H15, replay100k/R16,
@@ -58,4 +66,54 @@ exits successfully. Artifacts and independently reconciled action/frame/time
 curves: `/x/Temp/kindle-cheap-20261025/freeway-1m-200k-aided`.
 The action aid was selected on a reused development seed. This is a small gain
 at a cheap budget, not consistent crossing behavior or seed reliability. No
-extension is queued; proceed to the separately declared small-image Boxing test.
+extension followed this screen; the later compact recipe is reported below.
+
+## Compact RGB32 with the successful update budget
+
+The [declared fresh test](../experiments/2026-10-26-cdp-cheap-freeway-update-budget.md)
+keeps seed1009 and the same training aid, while changing RGB64→32, replay ratio
+16→32, actions200k→500k and the qualified native runtime. Size1M now has 834,673
+parameters. Centered CDP/action-effects1, Auto, N8/B8/T16/H15, full BPTT/microbatch8,
+replay100k, full18/sticky.25/repeat4 and one GPU resize from native frames remain.
+Native actor_unimix is0. All346 initial tensors match the same-seed RGB32 smoke;
+this run retains its own actual-initial frozen control.
+
+Training completes **500,000 aggregate actions /1,999,960 emulator frames /
+124,939 updates in 1,697.484 seconds (28m17s)**,294.55 actions/s. First update248,
+zero debt,240 natural training episodes, final online last50 mean26.62. The aid
+ledger verifies24,756 overridden actions. The30-minute cap is unchanged; the
+250k recovery checkpoint passes its finite/config/counter audit and is replaced
+by the fixed500k final. No checkpoint selection or extension occurs.
+
+Frozen evaluation disables the aid and selects the first three natural episodes
+per lane,24 per arm, using seed4000001009. Final mean **31.0417**, range29–32,
+with **24/24 episodes reaching25 crossings**, versus initial0.00 and0/24. The
+existing mean≥25/90%-success gate passes. Each arm uses49,152 actions and196,600
+emulator frames; final/initial wall time is22.363/22.263s. There are no excess
+episodes, nonempty partial tails, truncations or learner updates. All346 tensors
+remain unchanged in each frozen export.
+
+All124,939 numeric reports, complete configuration/source/counters, initial and
+final checkpoints, aid accounting, full CPU replays/videos and three host guards
+pass. The service exits successfully. Independently reconciled action/frame/time
+curves and a three-recipe comparison by actions, updates and wall time are
+retained. Resolution, ratio, experience budget and native runtime change together;
+the result does not isolate the benefit of smaller images or more updates.
+
+A separate CPU reference always chooses UP under the same evaluation protocol
+and environment seeds. It averages **21.6667**, range21–23, with0/24 task
+successes, using49,152 actions/196,600 frames in16.291s. It constructs no agent and
+performs no learning. The trained score exceeds this simple fixed policy; that
+alone does not establish visual reactivity or explain the learned strategy.
+
+Source at launch`541c90b`, native`bfb8c31`, runner`bcef410`, RX7900XT/RADV.
+Native SHA256`f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
+Artifacts: `/x/Temp/kindle-cheap-20261025/freeway-1m-32-500k-r32-aided`, including
+`learning-review.json`, `curve/`, `budget-comparison/` and fixed checkpoints.
+Review SHA256`4f72aa5686df726ac32d02f1d591f2c762fc3f539bb269219b0e1df6257f0036`.
+The CPU reference is in sibling`freeway-always-up-reference`; review SHA256
+`fd85fab155917f17b87c8c3b564f102bb31f1f1a1e1c31c41d18e6740c395b14`.
+
+This establishes a useful compact aided-training recipe on one reused development
+seed. Focused confirmation remains necessary. The separately declared Pong
+update-budget test starts after this complete review; no broad queue follows.

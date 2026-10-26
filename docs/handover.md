@@ -34,12 +34,18 @@ replay verifies one12061-action delay before FIRE after a lost life. No extensio
 versus control12115. The baseline weights with only frozen mixture score6.0833
 with gap724 in9.8s and zero updates. All three policies remain0/24 two-wall
 successes. All audits pass and services exit; no extension.
-Current allocation: [compact aided Freeway](experiments/2026-10-26-cdp-cheap-freeway-update-budget.md),
-service `kindle-cheap-freeway-32-r32-500k-aided-20261026`. Fresh1009/1M/RGB32/Auto/
-B8/T16/R32,500k actions/124939 expected updates,30-minute cap. Keep5% persistent-
-uniform16-action aid in training only; actor_unimix remains0. Finite/config/source
-checks, all346 initial tensors against the same-seed RGB32 smoke and first updates
-pass. Check the service state before GPU work; do not restart completed screens.
+[Compact aided Freeway](results/2026-10-25-cdp-cheap-freeway.md#compact-rgb32-with-the-successful-update-budget)
+completes500k/124939 updates in28m17s: frozen31.0417 versus actual initial0.00,
+24/24 versus0/24 crossing successes, aid disabled in evaluation. All audits pass
+and service exits. Constant-UP CPU reference scores21.6667,0/24. The successful
+1M/RGB32/R32 recipe needs focused seed confirmation; no isolated attribution.
+Current allocation: [Pong update-budget test](experiments/2026-10-26-cdp-cheap-pong-update-budget.md),
+service `kindle-cheap-pong-48-r32-500k-20261026`. Fresh1009/4M/RGB48/Auto/
+B8/T16/R32,500k actions/124939 expected updates,55-minute training cap, no aid and
+actor_unimix0. Startup finite/config/source checks, all346 initial tensors against
+the200k control and first updates pass. The55-minute cap was declared before this
+new allocation from measured stage costs. Check live state before GPU work;
+do not restart completed screens or extend the cap.
 Current native source`bfb8c31`, runner`bcef410`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

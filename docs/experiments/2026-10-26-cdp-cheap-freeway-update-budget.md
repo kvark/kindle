@@ -51,5 +51,11 @@ Started October26 at01:24:36 UTC after reviewing both completed Breakout audits.
 Startup checks pass:834,673 parameters, expected config/aid/source, finite zero-
 experience checkpoint, all346 initial tensors equal the same-seed RGB32 smoke,
 and first updates248:1,256:2,256:3. Source at launch`541c90b`; native`bfb8c31`,
-runner`bcef410`. `startup-review.json` retains the checks. Result pending;
-inspect the named service before additional GPU work.
+runner`bcef410`. `startup-review.json` retains the checks.
+
+Completed:500k actions/1,999,960 frames/124,939 updates in28m17s, within the
+unchanged cap. Frozen final31.0417 versus actual initial0.00,24/24 versus0/24
+crossing successes; evaluation disables the aid. All numeric, checkpoint,
+configuration/source/counter, aid, frozen-tensor, replay/video and guard checks
+pass; the service exits successfully. See the [result and CPU reference](../results/2026-10-25-cdp-cheap-freeway.md#compact-rgb32-with-the-successful-update-budget).
+No extension. The separate Pong update-budget test is selected after this review.

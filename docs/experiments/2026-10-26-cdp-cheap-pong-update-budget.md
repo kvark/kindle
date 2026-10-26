@@ -38,8 +38,15 @@ Audit cap1200 seconds; service cap5160 seconds.
 Artifacts: `/x/Temp/kindle-cheap-20261025/pong-4m-48-500k-r32`.
 Controller: `run_pong_500k_r32.py`; intended service:
 `kindle-cheap-pong-48-r32-500k-20261026`.
-Commands, caps, source hashes and cost projection are prepared. Review the active
-Freeway result before selecting the next allocation; this is not an automatic
-queue. Seed1009 is reused development data, not held out. A useful result needs
+Commands, caps, source hashes and cost projection were prepared before allocation.
+Seed1009 is reused development data, not held out. A useful result needs
 focused seed confirmation; neither parameter count nor a single seed establishes
 reliability or an isolated speedup.
+
+Started October26 at02:01:31 UTC after reviewing compact Freeway's completed
+31.0417/24-of24 result and all audits. Source at launch`4918f78`; native`bfb8c31`,
+runner`bcef410`. Startup checks pass:3,578,225 parameters, expected configuration
+with only replay ratio changed, no aid, all346 initial tensors equal the200k
+control and first updates248:1,256:2,256:3. The sealed declaration records the
+preceding Freeway review hash. Inspect the named service before further GPU work;
+the fixed result and full audit are pending. No automatic next allocation.
