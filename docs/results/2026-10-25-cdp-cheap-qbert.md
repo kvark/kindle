@@ -922,3 +922,44 @@ the third uses a fixed adapter-facing API object and verifies observed stub
 identity. Both failed scripts/logs remain beside the successful CPU result.
 First-new failure review SHA256
 `8a06389ba2a76dfb4b41430a8beafb6f9d3a886aa085bdf6a0f93f9c6d27ce17`.
+
+
+## Prepared640-action guidance comparison, unselected
+
+Prepare one fresh200k-action/49,939-update comparison with the same native
+4M/RGB48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original-rate config,
+1009/eval4000001009 and5% independent per-episode selection. Change only guidance
+duration versus the whole-episode candidate: release each selected lane after
+640 actions and let the native learner act for the rest of that episode.
+Keep first248, zero debt,100k recovery and25-minute training cap. No experience
+is reused. The image-based teacher itself is unchanged; it receives no RAM,
+reward or task-observer input, and the release rule uses only action count.
+
+Both frozen arms disable guidance and use the fixed first3 natural episodes per
+lane,24 each, with600k-action/300-second caps, no updates/truncations, retained
+excess/tails and all346 tensors unchanged. Keep the original mean15000/90%-first-
+pyramid gate. Compare final/actual-initial scores, coverage and learning curves
+against both unaided809.375 and whole-episode-guided633.333, checking all346
+initial tensors against both. Full config/source/counter/report/replay/video/
+guard audits and complete training-action/pixel replay remain required.
+
+The queue pins1500-second training,100k checkpoint cadence and the640-action
+flag; frozen commands omit all aid. Compilation, unselected-launch refusal and
+both completed-control readers pass; labeling the whole-episode control as
+capped is rejected. An unused `runtime-qbert-guidance-cap` overlay carries the
+staged Python changes and a symlink to the unchanged native binary. Existing
+runtime/source files retain their exact hashes. The controller additionally
+requires the exact source application and its applied validation receipt.
+
+This is **unselected** until current Pong learning, frozen evaluations and
+postprocessing complete and are reviewed. A promising RGB32 Pong result may
+instead receive focused seed confirmation. No GPU queue, source application,
+cap increase, extension or automatic next allocation follows this preparation.
+The640 limit was chosen from existing teacher traces; useful unaided transfer
+and generalization remain unmeasured. Unaided control uses the older kernel;
+whole-episode control uses the current host generation.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-pixel-cap640-200k`;
+controller`run_qbert_pixel_cap640_200k.py`, planned owner
+`kindle-cheap-qbert-pixel-cap640-200k-20261026`.
+Preparation SHA256 `a51807fd102f6f295bf7ef1924d4c739116a333f7f1e448f1b1bc2e3f6677b8b`.

@@ -298,7 +298,10 @@ covers all23 recorded successful prefixes; later transfer is unmeasured.
 Initial integration attempts used native integrated-GPU inference despite a
 CPU-stub label, due to lazy exports; both current failure and historical
 correction are retained in the cheap-Qbert report. Zero learning updates;
-active Pong runtime/PID unchanged. No next GPU allocation selected.
+active Pong runtime/PID unchanged. A fresh200k/49,939-update cap640 comparison
+is prepared unselected with25-minute cap,100k recovery and fixed unaided frozen
+controls; it requires completed Pong review and exact source application first.
+Pong's100k/200k/300k recoveries pass. No next GPU allocation selected.
 
 See [the declaration](results/2026-10-25-cdp-cheap-pong.md#fresh-rgb32-learning-comparison).
 

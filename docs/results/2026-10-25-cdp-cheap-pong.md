@@ -807,3 +807,11 @@ separate purported CPU Qbert fixture accidentally executes13.690s of zero-update
 inference on the integrated AMD GPU. It exits; the original failure/correction
 are retained in the cheap-Qbert report. This adds a co-host timing caveat;
 there is no RX7900XT restart or training-cap change.
+
+
+The200k and300k recoveries pass49,939/74,939 updates and all346 finite tensors.
+Their complete log prefixes contain51,477/75,133 finite reports at206,160/
+300,784 actions. Latest captured299,008-action progress is1517.113s with74,691
+updates and zero debt. Same PID32428/invocation; fixed500k/frozen evaluation
+remains pending. Recovery SHA256s:200k`a6396fcefcd7f6722f0a11dc5d50df046b05e31637cee8268cf62b2f4a5b260a`;
+300k`2b0e92c5477cb8d2e00d27c25c04db50f5f622eabedcd0bb6a4ade0fb34d383a`.
