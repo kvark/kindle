@@ -152,6 +152,13 @@ Started09:48:13 UTC, source`8a966a2`. Startup matches all346 initial tensors;
 the100k recovery passes12,454 updates and complete finite/config checks.
 Full final audits and B8/B16 comparison are automated; frozen result pending.
 
+Prepared, unselected: [Qbert12M/RGB48/B16 bounded check](experiments/2026-10-26-cdp-qbert-capacity-check.md).
+Historical larger models motivate checking existing12M capacity while retaining
+RGB48. The16,384-action/300s check measures execution/early cost and ordinary
+restore, not task competence. Capacity and batch change together. CPU shape
+derivation/queue checks pass; no new GPU work, full allocation or automatic queue.
+Review current Pong before selecting another learning step.
+
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
 [Auto500k comparison](results/2026-10-25-cdp-amd-precision.md) takes2h53m and scores
