@@ -1,6 +1,12 @@
 # Bounded Pong B16 learning and restore check
 
-**Selected after completed Qbert500k/R16.** That trial scores719.792 with0/24
+**Completed:**16,384 actions/2,002 updates in72.224s,23.21% less early wall time
+than B8; full configuration/initial/update/ordinary-restore checks pass. Frozen
+1,024 actions leave346 tensors unchanged; no natural-match competence is tested.
+Service exits09:38:03 UTC. See the [result](../results/2026-10-25-cdp-cheap-pong.md#b16-bounded-check-passes-with-lower-early-wall-cost).
+One fresh full-budget B16 learning test is selected after review.
+
+Selected after completed Qbert500k/R16. That trial scores719.792 with0/24
 pyramids and14.125/21 coverage, below the200k/R32 control; all audits/comparison
 pass and its service exits09:33:03 UTC. No Qbert extension, full Pong run, backend
 rebuild or automatic next allocation is selected.

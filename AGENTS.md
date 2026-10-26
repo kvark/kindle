@@ -51,18 +51,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: bounded PongB16 learning/restore check, fresh1009,
-4M/RGB48/Auto/N8/B16/T16/H15/R32, intrinsic coefficient.01, no aid. Train16,384
-actions/2,002 expected updates, first376,240s cap; restore for1,024 frozen actions
-under90s, audit120s/service600s. Verify full config, matched initial tensors,
-finite updates, selected parameter changes and all346 unchanged restored tensors.
-Compare only the matching early B8 window. This does not test natural-match
-competence or select a full Pong run. See
-`docs/experiments/2026-10-26-cdp-pong-batch16-check.md`; service owner
-`kindle-cheap-pong-b16-check-20261026`. Check live state before GPU work.
-Qbert500k/R16 is complete:26m53s, frozen719.792 versus initial180.208,0/24 pyramids
-and14.125/21 coverage; worse than the200k/R32 control. All audits pass and service
-exits. No unchanged extension, automatic promotion or broad campaign.
+Current allocation: full-budget PongB16 learning test, fresh1009/eval4000001009,
+4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01, no aid. Fixed500k actions,
+62,454 expected updates, first376 and45-minute training cap. Own actual initial
+must match the B8 control; keep fixed-final/initial24-natural-match evaluations
+and mean15/90%-win gate. Batch/microbatch8→16 changes optimizer cadence,
+centering and warmup; sampled positions remain nearly equal, not updates.
+See `docs/experiments/2026-10-26-cdp-pong-batch16-budget.md`; service owner
+`kindle-cheap-pong-b16-intrinsic001-500k-20261026`. Check live state before GPU work.
+The short B16 check passes16,384 actions/2,002 updates and ordinary restore,
+using23.21% less early wall time; this is not full-budget learning evidence.
+Qbert500k/R16 completes with lower719.792 score/14.125 coverage and0/24 pyramids;
+no extension. No automatic promotion, cap increase or next allocation.
 
 Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
 `1ed07af`, CPU replay `e853818`. The active declaration pins exact runtime/script

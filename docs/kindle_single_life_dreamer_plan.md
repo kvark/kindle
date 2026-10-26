@@ -134,14 +134,20 @@ coverage, below the200k/R32 control809.375/16.625. Experience increases2.5× and
 updates1.251× in1.36× training time, but this joint change does not improve the
 recipe. All audits/comparison pass; service exits09:33:03 UTC. No extension.
 
-**Current allocation:** [bounded PongB16 check](experiments/2026-10-26-cdp-pong-batch16-check.md).
-Fresh1009,4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01, no aid. Change replay
-batch/world microbatch8→16;16,384 training actions/2,002 expected updates,
-first376,240s cap. Ordinary1,024-action frozen restore under90s, full counters,
-finite/changed parameter checks and346-tensor invariance; audit120s/service600s.
-Compare the matching early B8 window with its cadence/centering/warmup changes.
-This short check does not measure natural-match competence or select a full
-Pong run. No native change, automatic promotion or next queue.
+The [bounded PongB16 check](results/2026-10-25-cdp-cheap-pong.md#b16-bounded-check-passes-with-lower-early-wall-cost)
+passes16,384 actions/2,002 updates in72.224s versus B8's94.054s,23.21% less early
+wall time. Full config, matched initial tensors, weight changes, ordinary restore
+and346-tensor invariance pass; service exits09:38:03 UTC. This is not a full-budget
+throughput measurement or natural-match competence result.
+
+**Current allocation:** [full-budget PongB16](experiments/2026-10-26-cdp-pong-batch16-budget.md).
+Fresh1009/eval4000001009, coefficient.01/4M/RGB48/Auto/N8/B16/T16/H15/R32, no aid.
+Keep500k actions, expected62,454 updates, first376 and45-minute cap. Replay batch
+and world microbatch change8→16; cadence, centering population and per-action
+warmup also change. Retain own actual-initial/fixed-final controls and mean15/90%
+gate, match346 initial tensors, audit100k recoveries and complete frozen replays.
+The short check motivates this trial but predicts no learning outcome. No cap
+increase, automatic extension or next queue.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

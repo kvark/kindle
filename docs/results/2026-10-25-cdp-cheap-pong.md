@@ -307,3 +307,36 @@ prepared for16,384 training actions and1,024 frozen restore actions. Its full
 configuration/counter/tensor audits and unselected guard are prepared; no GPU
 work has started and Qbert remains the active allocation. This is not a full
 Pong learning trial or an automatic queue.
+
+## B16 bounded check passes with lower early wall cost
+
+The existing-native B16 check completes16,384 actions/65,522 emulator frames and
+2,002 updates in **72.224s**, versus94.054s for the matching B8 action window:
+**23.21% less training wall time**. Construction is separate,2.299s versus2.140s.
+B8 performs4,035 updates and516,480 sampled positions; B16 performs2,002 and
+512,512. Warmup, cadence, centering population and trajectories differ. This
+short timing result is not full-budget throughput or frozen learning evidence.
+
+Fresh1009, coefficient.01/4M/RGB48/Auto/N8/B16/T16/H15/R32,3,578,225 parameters,
+full BPTT/microbatch16, full18 and no aid. Full config differs only in batch_size
+and world_microbatch_size8→16. First updates376:1,384:2,392:3 match the source
+calculation. All346 initial tensors match the B8 control, all2,002 numeric
+reports and exact counters pass, and CNN0's1,200 weights plus the first reward
+projection's163,840 weights all change. That excludes unchanged selected weights,
+not incorrect gradient scale or poor features.
+
+Ordinary restore executes1,024 frozen actions/4,096 frames in0.492s, zero updates
+and zero natural episodes; all346 tensors remain unchanged. This checks restore,
+not natural-match competence. Both guards pass; service exits09:38:03 UTC after
+1m23.065s including construction/restore/audit. No retry, cutoff or native change.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-b16-shape-check`, including
+`review.json`, `startup-review.json`, selected declaration and terminal journal.
+Review SHA256`41adf95403303df1d12d86d1fcf260c62081e1ef1c07ea4d637c1aa82a5fca8e`;
+source at launch`255bf94`, native`bfb8c31`, runner`1ed07af`.
+
+After reviewing this result, select one [fresh500k B16 learning test](../experiments/2026-10-26-cdp-pong-batch16-budget.md)
+with a45-minute cap and the original mean15/90%-win gate. It must establish
+actual frozen quality and full-budget cost; no result follows from this check
+alone. The validation life is retained separately and is not the performance
+trial or an independent training seed.
