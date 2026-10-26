@@ -735,7 +735,8 @@ After reviewing completed Pong actor/critic learning (−0.542/10of24 wins,
 all audits/comparison passed), select this bounded native check. Apply the exact
 420-test source, with application receipt SHA256
 `740d05076346e1dbc058a15b3c2c8c66b55b9e6f3ce8d2d550da6b0375be7828`.
-The original runtime and native binary remain unchanged. Launch is pending.
+The original runtime and native binary remain unchanged. The check starts
+19:39:44 UTC and completes as recorded below.
 No evidence of native guidance execution or unaided learning is claimed yet.
 
 A separate fresh200k/49,939-update follow-up is prepared unselected with the same
@@ -795,5 +796,17 @@ seed and older-kernel control limit attribution and reliability claims.
 Preparation after reader correction SHA256
 `3d0c582057b64ae67719479d7e0aad996bdd2eb5a2d5f2e6b2b3665e859e0571`.
 Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-pixel-aid-200k`;
-owner`kindle-cheap-qbert-pixel-aid-200k-20261026`. Launch pending. No cap increase,
+owner`kindle-cheap-qbert-pixel-aid-200k-20261026`. No cap increase,
 extension, checkpoint selection, automatic next allocation or unchanged retry.
+
+
+The fresh run starts19:45:05 UTC/source`53ffc6b`, invocation
+`d71773c5847b4575b7830a99e2b78823`. Startup passes exact native config versus
+control,3,578,225 parameters, all346 matched initial tensors, fresh counters,
+5% episode-guidance declaration and first248:1/256:2/256:3 finite updates.
+100k recovery, fixed frozen evaluations, complete action/pixel/video replays,
+curves/coverage and comparison monitoring are attached. Unaided transfer remains
+pending. Selected declaration SHA256
+`e451b20379c301a655f6583d656cad566ddf907cf32aa5945f7e2f55a09bc2bf`;
+startup`6b5b1abc1fa768ccce000de5d91fd0341a35c898c50993266cd14ffac33aad12`.
+Native`bfb8c31`, runner`137ed77`, frozen replay`5043b7a`, guidance replay`53ffc6b`.

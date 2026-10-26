@@ -51,14 +51,16 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Selected fresh Qbert pixel-guidance learning:1009/eval4000001009,
+Active fresh Qbert pixel-guidance learning:1009/eval4000001009,
 4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates/acgradsfalse.
 Keep200k actions/49,939 updates, first248, zero debt,100k recovery and25-minute
 training cap. Five-percent episode selection is separate from actual measured
 action share. Fixed final/own initial24 natural episodes disable guidance and
 retain mean15000/90%-pyramid gate, full346-tensor/replay/guard/coverage checks.
 Native unchanged; Python overlay`runtime-qbert-guidance`. Owner
-`kindle-cheap-qbert-pixel-aid-200k-20261026`; launch pending. No smoke experience
+`kindle-cheap-qbert-pixel-aid-200k-20261026`; active from19:45:05 UTC/source`53ffc6b`.
+Startup matches346 initial tensors and248:1/256:2/256:3 updates; all monitoring
+attached. No smoke experience
 reuse, cap increase, extension or automatic next allocation.
 
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions
@@ -162,9 +164,10 @@ but frozen11.875 is below14.958; both24/24 wins and below mean15. All audits and
 comparison pass; service exits10:28:51 UTC. No extension or confirmation.
 Qbert500k/R16 remains weaker than its200k/R32 control, with0/24 pyramids.
 
-Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, CPU replay `5043b7a`; runner`fbdaee3` permits opt-in CDP
-actor/critic gradients (SHA256`4a7cf99bb5e55382b74d65c97d855f5a87772ed7199fc11bb4199e35a6d78de4`). The active declaration pins exact runtime/script
-hashes; the handover locates the build receipt. Native 32/48/64 geometry and the
+Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, frozen CPU replay `5043b7a`; runner`137ed77` adds optional pixel guidance
+and permits opt-in CDP actor/critic gradients (SHA256`4a7cf99bb5e55382b74d65c97d855f5a87772ed7199fc11bb4199e35a6d78de4`). The active declaration pins exact runtime/script
+hashes; guidance replay`53ffc6b` uses the training-aware reader. The handover
+locates the build receipt. Native 32/48/64 geometry and the
 intermediate 4M preset pass bounded training/frozen checks, including 64 restore.
 The CLI exposes imagination length for fresh runs; defaults retain 15 and
 restores reject overrides. Do not restart completed training, old queues, broad

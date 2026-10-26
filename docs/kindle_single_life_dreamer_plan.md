@@ -277,7 +277,9 @@ Keep4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
 1009/eval4000001009, fixed final/own initial24 natural episodes with guidance
 disabled, original15000/90%-pyramid gate and full audits. Native unchanged;
 separate Python overlay preserves old runtime. Owner
-`kindle-cheap-qbert-pixel-aid-200k-20261026`; launch pending. No smoke experience
+`kindle-cheap-qbert-pixel-aid-200k-20261026`; active from19:45:05 UTC/source`53ffc6b`.
+Startup matches346 initial tensors and248:1/256:2/256:3 updates; all monitoring
+attached. No smoke experience
 reuse, cap increase, extension or automatic next run.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
