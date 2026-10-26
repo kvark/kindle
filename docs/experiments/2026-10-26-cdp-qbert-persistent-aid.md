@@ -78,3 +78,9 @@ actions reproduce the declared exploration RNG and every applied override;
 selected declaration`a9f48c9a81c75b2d7ae7f8dfa9346a5cf0ff059508ba4e0b20914a96b4eb0476`.
 The100k recovery watcher and terminal-service curve/coverage/comparison automation
 are running. Unaided frozen learning results remain pending.
+
+The100k recovery audit passes at24,939 updates,346 finite tensors and25,161
+strict numeric reports through100,896 actions. Captured98,304-action progress
+is595.749s with zero debt. Recovery metadata SHA256
+`0fe0ed9cb3bcdd9a16f2e29e2e701c5f1303a6e059ffd14d1b5c411d98ffd8a9`.
+The watcher exits successfully; fixed-final unaided evaluation remains pending.

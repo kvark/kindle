@@ -35,3 +35,41 @@ Controller: `breakout_pixel_reference.py`, SHA256
 `60fef11558709921e976eb3d682798cd6d95a01abc81e5cacbe0bb80d4ec04a2`.
 Review SHA256`df56e078e85e607b8cc38741d629ea7dd078ec83c01ae6e61bdea4b4ccbac6a0`.
 One selected development seed; no training allocation or task-mastery claim.
+
+## Two-frame interception improves the reference but remains weak
+
+A second fixed CPU reference scores **20.292 versus11.333** for position-only
+following, still0/24 two-wall successes. It uses the same red mask, object regions,
+two-pixel action dead zone, FIRE fallback and environment protocol. Two
+consecutive visible ball centroids estimate motion. For a descending ball, it
+projects to paddle_y−2, reflects the target between fixed x10 and149 wall bounds,
+and clamps it to the estimated paddle reach. Otherwise it follows current ball_x.
+Visibility gaps and episode ends reset motion history; implausible per-step
+displacements above16 pixels fall back to following. These are declared geometric
+assumptions, not learned physics or an isolated test of one control choice.
+
+The single declared run reuses evaluation4000001009 and the same eight lane
+seeds, full18/sticky.25/repeat4/noops0/native max-pooled frames. It retains the
+first-three-natural-episodes-per-lane selection and600k-action/180s CPU caps.
+Collection completes in9.848s at20,616 aggregate actions/82,426 emulator frames.
+It collects30 natural episodes, selects24, and retains six excess episodes and
+partial tails; zero truncations. Projection is used for10,385 actions; both
+objects are visible for19,089. Complete recorded-action replay reproduces every
+reward, boundary, frame count, episode outcome and partial tail in8.767s,
+with a full stream0 video.
+
+No Kindle agent, GPU work, learner updates, RAM, reward-based action choice or
+training guidance is used. The score is still below the retained learned policy's
+67.583, with different training/model context. Motion projection helps this
+particular weak rule, but does not establish a native representation defect or
+a useful teacher. No training-aid allocation, controller sweep or gate change
+follows from this result.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/breakout-pixel-intercept-reference`;
+script:`breakout_pixel_intercept_reference.py`, SHA256
+`e222deb85221bbc9f02bb9a30b1c7a0433cba2981569e615d4a56bf0344fe720`;
+review`585dc64a7b73ec2c6df77b525a9e3b60ec174570155dad40c5dfaf31948d486d`;
+declaration`3b55486ca98214a1774611113d9966b5cbb835856cc2fce45e10bdc10aca8744`.
+The prior reference, new ledger, full episode records and replay video remain
+outside Git. Both use selected development seeds and provide no training-seed
+reliability or Kindle task-mastery evidence.

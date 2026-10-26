@@ -65,7 +65,8 @@ The [six-action Qbert test](results/2026-10-25-cdp-cheap-qbert.md#six-action-cho
 completes200k/49939 updates in18m21s: frozen605.208 versus own initial148.958,
 0/24 pyramids. Coverage10.167/21 and score are lower than the full18 control.
 All audits/curves pass and service exits; no extension. The separate CPU Breakout
-pixel follower scores11.333,0/24 two-wall successes, with complete replay; no aid.
+pixel follower scores11.333 and a fixed two-frame interception variant20.292,
+both0/24 two-wall successes with complete replay. Neither supplies training guidance.
 The [compact Breakout H5 result](results/2026-10-26-cdp-breakout-compact-h5-budget.md)
 retains a45-minute cutoff at487,736 actions/121,873 updates: frozen8.458 versus
 initial1.375,0/24 two-wall successes. Its shared prefix costs18.06% less wall time

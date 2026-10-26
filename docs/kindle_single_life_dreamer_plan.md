@@ -95,8 +95,9 @@ The [six-action Qbert trial](results/2026-10-25-cdp-cheap-qbert.md#six-action-ch
 completes200k/49939 updates in18m21s, but frozen605.208 and10.167/21 mean coverage
 are below the full18 control's809.375 and16.625/21. Own initial148.958;0/24 pyramids.
 All audits/curves pass and service exits. No extension. A separate
-[CPU Breakout pixel follower](results/2026-10-26-cdp-breakout-pixel-reference.md)
-also fails at11.333 and0/24 two-wall successes; full replay passes, no training aid.
+[CPU Breakout references](results/2026-10-26-cdp-breakout-pixel-reference.md)
+score11.333 for position following and20.292 for fixed two-frame interception,
+both0/24 two-wall successes. Full replays pass; neither supplies training guidance.
 
 The [compact Breakout H5 result](results/2026-10-26-cdp-breakout-compact-h5-budget.md)
 retains the45-minute cutoff at487,736 actions/121,873 updates. Frozen8.458 versus
