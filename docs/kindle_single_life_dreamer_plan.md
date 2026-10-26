@@ -80,6 +80,11 @@ completes500k actions/124939 updates in50m14s: frozen7.333 and22/24 wins versus
 own initial−20.333 and0/24. All audits and curves pass; service exits successfully.
 Both compact learners win most matches but miss the unchanged mean15 gate.
 Selected seeds are not held out; no unchanged extension or broad campaign.
+Their [completed-report analysis](results/2026-10-25-cdp-cheap-pong.md#exploration-bonus-scale-in-the-completed-learners)
+finds a late exploration-bonus/net-predicted-reward ratio of3.76/3.46. Signed
+reward cancellation limits that comparison; it does not diagnose the score gap.
+A smaller game-specific bonus is a later test candidate, with no new allocation
+or change to the active Breakout recipe.
 
 The [six-action Qbert trial](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage)
 completes200k/49939 updates in18m21s, but frozen605.208 and10.167/21 mean coverage

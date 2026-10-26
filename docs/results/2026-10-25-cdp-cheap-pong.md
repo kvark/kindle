@@ -136,3 +136,36 @@ learners and48 evaluation matches do not establish broad training-seed
 reliability. Both compact policies are useful, both mean15 gates remain unmet,
 and neither is extended unchanged. The next bounded test addresses Qbert's
 remaining task failure using the separately declared six-action vocabulary.
+
+## Exploration-bonus scale in the completed learners
+
+A CPU-only analysis checks all 124,939 sequential reports from each completed
+500k run and verifies the metric definitions against native source `bfb8c31`.
+The reported imagined intrinsic reward is already scaled. Subtracting it from
+the combined imagined reward gives the predicted extrinsic **net** mean.
+
+| Seed | Last 25k updates: scaled bonus | Predicted extrinsic net mean | Ratio of these means |
+|---|---:|---:|---:|
+|1009|0.0105571|0.00280554|3.763|
+|4013|0.0103200|0.00298180|3.461|
+
+These are window averages of minibatch means. Pong's positive and negative
+rewards can cancel: the ratios do not compare absolute reward magnitudes and
+do not establish that the bonus caused the failed mean-score gates. Both
+learners already win most matches. Earlier windows have negative predicted
+extrinsic net means, so no positive bonus/net ratio is reported for them.
+
+Holding the recorded predictions fixed, coefficient .01 instead of 1 would
+reduce the late bonus/net ratios to .03763 and .03461. Actual training changes
+states, ensemble predictions and critic targets; this calculation predicts no
+score gain. A smaller game-specific bonus is a candidate for a later bounded
+test with the model and experience budget fixed. No GPU allocation, new policy
+decisions, learner updates or change to the active Breakout run occurs here.
+
+Artifacts: `intrinsic-scale-review.json` in each run directory above, produced
+by `/x/Temp/kindle-cheap-20261025/review_pong_intrinsic_scale.py`.
+Review SHA256, seed1009:
+`4fbc3c0821a4e173d800533ffb30a64c7cb2235d0c369c66c5399d7fa4180e6d`;
+seed4013: `f1c1639879017667066582217bc362dfd893f32cf9a04e64ce3d9ce8c47c1c3a`.
+The analysis takes 1.35s/1.66s CPU wall time and preserves source/log hashes,
+early/middle/late distributions and the offline rescaling calculation.
