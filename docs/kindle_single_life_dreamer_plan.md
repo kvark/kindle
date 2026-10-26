@@ -279,31 +279,25 @@ tensors/semantic traces, complete pixel/action replay and comparison pass;
 service exits 20:07:01 UTC. Retain unaided; no extension or confirmation.
 See [the result](results/2026-10-25-cdp-cheap-qbert.md#pixel-guided-training-lowers-unaided-frozen-quality).
 
-Select one fresh Pong RGB32 comparison after the bounded check passes with
-12.48% less early training time: 500k actions/124,939 updates, first248, zero debt,
-four100k recoveries and a50-minute training cap. Keep4M/Auto/N8/B8/T16/H15/R32,
-coefficient.01/actor0/full18/original rates/no aid, fresh1009/eval4000001009.
-Only image geometry changes48→32 versus the strongest B8 control; parameters
-and initialization differ. Fixed final/own initial24 natural matches retain
-mean15/90%-wins and full346-tensor/replay/video/guard/curve checks. No bounded
-experience reused. Owner`kindle-cheap-pong-rgb32-intrinsic001-500k-20261026`,
-active from20:18:26 UTC/source`ebcd406`. Startup matches346 bounded32 initial
-tensors and248:1/256:2/256:3 updates; monitoring attached.
-No cap increase, extension, selected earlier checkpoint or automatic next run.
+Pong RGB32 completes500k/124,939 updates in42m19s,15.24% less training time
+than RGB48, but lowers frozen14.958→2.292 and wins24/24→16/24. All numerical,
+config/source/counter/346-tensor/replay/video/guard/recovery/comparison checks
+pass; service exits21:02:34 UTC. Retain RGB48; no extension or confirmation.
+Geometry/initialization, older control kernel and13.690s unintended integrated-
+GPU inference during this run limit attribution. Full evidence is in cheap-Pong.
 
-Qbert's optional640-action guidance limit is staged, not applied:444 CPU tests
-and explicitly verified CPU-stub Atari/replay checks pass. The completed5% run
-spends11,756 of23,428 overrides on NOOP after its first pyramid. A640-action cap
-covers all23 recorded successful prefixes; later transfer is unmeasured.
-Initial integration attempts used native integrated-GPU inference despite a
-CPU-stub label, due to lazy exports; both current failure and historical
-correction are retained in the cheap-Qbert report. Zero learning updates;
-active Pong runtime/PID unchanged. A fresh200k/49,939-update cap640 comparison
-is prepared unselected with25-minute cap,100k recovery and fixed unaided frozen
-controls; it requires completed Pong review and exact source application first.
-Pong's100k/200k/300k recoveries pass. No next GPU allocation selected.
-
-See [the declaration](results/2026-10-25-cdp-cheap-pong.md#fresh-rgb32-learning-comparison).
+Select fresh Qbert cap640 learning:4M48/Auto/N8/B8/T16/H15/R32/coefficient1/
+actor0/full18/original rates,1009/eval4000001009,5% episode selection. Release
+selected episodes to the learner after640 actions; no pixel-policy change or
+RAM input. Keep200k/49,939 updates, first248, zero debt,100k recovery and25-minute
+training cap. Fixed final/own initial24 natural episodes disable aid and retain
+15000/90%-pyramid gate, all346 tensors and full replay/video/guard/coverage checks.
+Compare unaided and whole-episode controls. Exact staged patch is applied and
+444 tests pass; native unchanged, new Python overlay`runtime-qbert-guidance-cap`.
+Owner`kindle-cheap-qbert-pixel-cap640-200k-20261026`; no experience reused, cap
+increase, extension or automatic next allocation. The original CPU-isolation
+failures and historical correction remain in the cheap-Qbert report.
+See [the declaration](results/2026-10-25-cdp-cheap-qbert.md#selected-fresh-capped-guidance-learning).
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
@@ -311,7 +305,8 @@ New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
 Check live service state before GPU work; Qbert pixel-guided learning and its
-postprocessing have completed. The fresh RGB32 Pong run is the only selection.
+postprocessing have completed. Pong RGB32 also completes; capped Qbert is the
+only selected fresh run.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

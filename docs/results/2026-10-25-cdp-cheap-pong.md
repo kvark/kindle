@@ -815,3 +815,38 @@ Their complete log prefixes contain51,477/75,133 finite reports at206,160/
 updates and zero debt. Same PID32428/invocation; fixed500k/frozen evaluation
 remains pending. Recovery SHA256s:200k`a6396fcefcd7f6722f0a11dc5d50df046b05e31637cee8268cf62b2f4a5b260a`;
 300k`2b0e92c5477cb8d2e00d27c25c04db50f5f622eabedcd0bb6a4ade0fb34d383a`.
+
+
+## RGB32 saves time but substantially lowers frozen quality
+
+The fresh500k comparison completes in **42m19s**, **15.24% less training time**
+than RGB48's49m55s, but frozen score falls **14.958→2.292** and wins **24/24→16/24**.
+Own initial is−20.375/0 wins. Retain RGB48; no RGB32 extension or confirmation.
+The unchanged mean15/90%-win gate fails. The completed plot shows slower online
+learning at both matched actions and elapsed time; its late rise does not
+justify an unchanged extension. This result does not invalidate the separately
+successful RGB32 Boxing/Freeway recipes.
+
+Training completes500,000 actions/1,999,751 emulator frames/124,939 finite updates
+in2538.665s, first248, zero debt and154 natural matches. Actual3,244,305 parameters
+and all346 initial tensors match the bounded32 check; no experience is reused.
+No matched-initial-weight claim is made versus RGB48. Native config differs only
+in observation geometry, with native max-pooled frames and one GPU resize.
+One reused seed, changed shapes/initialization, the control's older kernel/module
+and the recorded13.690s unintended integrated-GPU inference limit attribution.
+
+Frozen final/initial use108,528/23,360 actions,434,066/93,415 frames and41.661/
+9.020s. Select first3 natural matches per lane,24 each; one excess final match
+and all partial tails are retained. No truncations or learning updates; all346
+tensors remain unchanged. Full source/config/counter checks, four recovery
+audits, complete CPU replays/videos, three guards, curves and comparison pass.
+Service exits successfully21:02:34 UTC,44m07.700s total wall. No restart, cutoff
+or GPU stage repeat. Launch source`ebcd406`, native`bfb8c31`, runner`137ed77`,
+frozen replay`5043b7a`.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-32-r32-intrinsic001-500k`.
+Review SHA256`b6cd101b672c312ec59db081e5f744de509de4dfe77859df8c505bbe657386eb`;
+curve`211bca2a82aa98b715d8597c06429e709bfda1d51be8f3807023bfc3a3976ef4`;
+comparison`2c4857c6dbe07b98d43314df4d5576dd66ce3fa2a7a028d2c09251e1dfb33c0b`;
+completion`7997eb67114b8020b0c77efec86e62575a46de40ba02e7cee658a5f481884f3c`.
+After review, select the prepared fresh Qbert capped-guidance comparison.

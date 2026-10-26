@@ -59,31 +59,25 @@ tensors/semantic traces, complete pixel/action replay and comparison pass;
 service exits 20:07:01 UTC. Retain unaided; no extension or confirmation.
 See [the result](docs/results/2026-10-25-cdp-cheap-qbert.md#pixel-guided-training-lowers-unaided-frozen-quality).
 
-Select one fresh Pong RGB32 comparison after the bounded check passes with
-12.48% less early training time: 500k actions/124,939 updates, first248, zero debt,
-four100k recoveries and a50-minute training cap. Keep4M/Auto/N8/B8/T16/H15/R32,
-coefficient.01/actor0/full18/original rates/no aid, fresh1009/eval4000001009.
-Only image geometry changes48→32 versus the strongest B8 control; parameters
-and initialization differ. Fixed final/own initial24 natural matches retain
-mean15/90%-wins and full346-tensor/replay/video/guard/curve checks. No bounded
-experience reused. Owner`kindle-cheap-pong-rgb32-intrinsic001-500k-20261026`,
-active from20:18:26 UTC/source`ebcd406`. Startup matches346 bounded32 initial
-tensors and248:1/256:2/256:3 updates; monitoring attached.
-No cap increase, extension, selected earlier checkpoint or automatic next run.
+Pong RGB32 completes500k/124,939 updates in42m19s,15.24% less training time
+than RGB48, but lowers frozen14.958→2.292 and wins24/24→16/24. All numerical,
+config/source/counter/346-tensor/replay/video/guard/recovery/comparison checks
+pass; service exits21:02:34 UTC. Retain RGB48; no extension or confirmation.
+Geometry/initialization, older control kernel and13.690s unintended integrated-
+GPU inference during this run limit attribution. Full evidence is in cheap-Pong.
 
-Qbert's optional640-action guidance limit is staged, not applied:444 CPU tests
-and explicitly verified CPU-stub Atari/replay checks pass. The completed5% run
-spends11,756 of23,428 overrides on NOOP after its first pyramid. A640-action cap
-covers all23 recorded successful prefixes; later transfer is unmeasured.
-Initial integration attempts used native integrated-GPU inference despite a
-CPU-stub label, due to lazy exports; both current failure and historical
-correction are retained in the cheap-Qbert report. Zero learning updates;
-active Pong runtime/PID unchanged. A fresh200k/49,939-update cap640 comparison
-is prepared unselected with25-minute cap,100k recovery and fixed unaided frozen
-controls; it requires completed Pong review and exact source application first.
-Pong's100k/200k/300k recoveries pass. No next GPU allocation selected.
-
-See [the declaration](docs/results/2026-10-25-cdp-cheap-pong.md#fresh-rgb32-learning-comparison).
+Select fresh Qbert cap640 learning:4M48/Auto/N8/B8/T16/H15/R32/coefficient1/
+actor0/full18/original rates,1009/eval4000001009,5% episode selection. Release
+selected episodes to the learner after640 actions; no pixel-policy change or
+RAM input. Keep200k/49,939 updates, first248, zero debt,100k recovery and25-minute
+training cap. Fixed final/own initial24 natural episodes disable aid and retain
+15000/90%-pyramid gate, all346 tensors and full replay/video/guard/coverage checks.
+Compare unaided and whole-episode controls. Exact staged patch is applied and
+444 tests pass; native unchanged, new Python overlay`runtime-qbert-guidance-cap`.
+Owner`kindle-cheap-qbert-pixel-cap640-200k-20261026`; no experience reused, cap
+increase, extension or automatic next allocation. The original CPU-isolation
+failures and historical correction remain in the cheap-Qbert report.
+See [the declaration](docs/results/2026-10-25-cdp-cheap-qbert.md#selected-fresh-capped-guidance-learning).
 
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions
 in0.452s;512 verified overrides,346 matched initial/unchanged frozen tensors,
@@ -186,9 +180,11 @@ but frozen11.875 is below14.958; both24/24 wins and below mean15. All audits and
 comparison pass; service exits10:28:51 UTC. No extension or confirmation.
 Qbert500k/R16 remains weaker than its200k/R32 control, with0/24 pyramids.
 
-Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, frozen CPU replay `5043b7a`; runner`137ed77` adds optional pixel guidance
-and permits opt-in CDP actor/critic gradients (SHA256`4a7cf99bb5e55382b74d65c97d855f5a87772ed7199fc11bb4199e35a6d78de4`). The active declaration pins exact runtime/script
-hashes; guidance replay`53ffc6b` uses the training-aware reader. The handover
+Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native`bfb8c31`, frozen CPU
+replay`5043b7a`; the new runner/replay source adds optional guidance limits,
+with runner SHA256`c4da3f76ad33c55190bb4052b4e43dfd461bfaea8ae446f857b13874b96fc02c`.
+The selected declaration pins exact source/runtime hashes; use the new
+`runtime-qbert-guidance-cap` overlay. The handover
 locates the build receipt. Native 32/48/64 geometry and the
 intermediate 4M preset pass bounded training/frozen checks, including 64 restore.
 The CLI exposes imagination length for fresh runs; defaults retain 15 and

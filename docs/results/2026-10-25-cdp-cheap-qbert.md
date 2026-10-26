@@ -963,3 +963,25 @@ Artifacts: `/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-pixel-cap640-200k`;
 controller`run_qbert_pixel_cap640_200k.py`, planned owner
 `kindle-cheap-qbert-pixel-cap640-200k-20261026`.
 Preparation SHA256 `a51807fd102f6f295bf7ef1924d4c739116a333f7f1e448f1b1bc2e3f6677b8b`.
+
+
+## Selected fresh capped-guidance learning
+
+After completed Pong RGB32 audits/comparison show lower frozen quality, select
+the prepared fresh200k/49,939-update capped-guidance test. Keep the exact declared
+5% episode selection,640-action release, native4M48/B8/T16/H15/R32/coefficient1
+recipe, original rates, full18 and1009/eval4000001009. Preserve25-minute cap,
+100k recovery, fixed final/actual-initial24-natural unaided evaluations and the
+original15000/90%-pyramid gate. No prior experience, extension or selected
+checkpoint is reused. Unaided transfer remains unmeasured for this cap.
+
+Apply the exact staged patch only after Pong's terminal success and completed
+postprocessing. **444 applied CPU tests pass**; the native binary is unchanged.
+The existing whole-episode kind/default remains supported. The unused prepared
+`runtime-qbert-guidance-cap` overlay now supplies the matching Python modules.
+Application receipt SHA256`e6939174c05527e2b152a00850b707b95552148fca7ee03a757c0bf4965e8da5`.
+Its source hashes match staged validation byte-for-byte. The controller requires
+this receipt, the completed Pong review and every declared source/runtime pin.
+No additional GPU qualification sweep or native rebuild is needed for the
+CPU action-limit schedule, already covered by real-Atari CPU integration and
+existing native forced/unforced-action execution; this200k run tests learning.

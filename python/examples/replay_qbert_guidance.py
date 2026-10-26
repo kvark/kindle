@@ -12,7 +12,7 @@ import gymnasium as gym
 import atari
 from audit_atari import require, sha256
 from check_atari_adapter import rom_identity
-from kindle._qbert_guidance import GUIDANCE_KIND, QbertGuidance
+from kindle._qbert_guidance import GUIDANCE_KINDS, QbertGuidance
 from kindle._vector_audit import audit
 from replay_atari import TaskMonitor, verify_replay_identity
 
@@ -25,7 +25,7 @@ def read_guided_run(path):
         end = None
         for line in source:
             end = json.loads(line)
-    require(header['mode'] == 'train' and header.get('exploration', {}).get('kind') == GUIDANCE_KIND,
+    require(header['mode'] == 'train' and header.get('exploration', {}).get('kind') in GUIDANCE_KINDS,
             "requires declared Qbert pixel guidance training")
     return dict(start=header, end=end, accounting=accounting, sha256=sha256(path))
 
@@ -53,7 +53,7 @@ def replay_rows(source, environments, monitors, frames, guidance, deadline):
             stream = row['stream']
             result = monitors[stream].task.result(row['terminated'], row['truncated'])
             require(result['episode_score'] == row['episode_return'], "guidance replay episode score differs")
-            episodes.append(dict(**row, guided=overrides[stream] is not None, task_outcome=result))
+            episodes.append(dict(**row, guided=guidance.selected_episodes[stream], task_outcome=result))
         elif row['event'] == 'reset':
             for stream in row['streams']:
                 frames[stream], _ = environments[stream].reset()

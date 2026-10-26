@@ -24,7 +24,7 @@ import kindle
 import atari
 from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, episode_summary, require_numbers
 import kindle._qbert_guidance as guidance_module
-from kindle._qbert_guidance import GUIDANCE_KIND, QbertGuidance
+from kindle._qbert_guidance import BOUNDED_GUIDANCE_KIND, GUIDANCE_KIND, QbertGuidance
 import kindle._exploration as exploration_module
 from kindle._exploration import EXPLORATION_KIND, EXPLORATION_PROTOCOL, PersistentExploration
 from atari import (
@@ -116,7 +116,9 @@ def main():
     parser.add_argument("--exploration-probability", type=float, default=0.0)
     parser.add_argument("--exploration-hold", type=int, default=16)
     parser.add_argument("--qbert-guidance-probability", type=float, default=0.0,
-                        help="fresh Qbert only: probability of pixel guidance for a whole training episode")
+                        help="fresh Qbert only: probability of selecting an episode for pixel guidance")
+    parser.add_argument("--qbert-guidance-max-actions", type=int,
+                        help="release each selected episode to the learner after this many actions")
     args = parser.parse_args()
     if args.num_envs <= 0 or args.steps <= 0 or args.steps % args.num_envs:
         parser.error("steps must be a positive multiple of num-envs")
@@ -147,6 +149,11 @@ def main():
         parser.error("exploration probability must be in [0, 1]")
     if not math.isfinite(args.qbert_guidance_probability) or not 0 <= args.qbert_guidance_probability <= 1:
         parser.error("Qbert guidance probability must be in [0, 1]")
+    if args.qbert_guidance_max_actions is not None:
+        if not 0 < args.qbert_guidance_max_actions < 2**32:
+            parser.error("Qbert guidance max-actions must be a positive u32")
+        if not args.qbert_guidance_probability:
+            parser.error("Qbert guidance max-actions requires positive guidance probability")
     if args.qbert_guidance_probability:
         if args.evaluate:
             parser.error("frozen evaluation must not use Qbert guidance")
@@ -163,6 +170,7 @@ def main():
         parser.error("frozen evaluation must not use exploration overrides")
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
     training_options.add("--qbert-guidance-probability")
+    training_options.add("--qbert-guidance-max-actions")
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
@@ -283,8 +291,11 @@ def main():
             probability=args.exploration_probability, hold_actions=args.exploration_hold,
             seed=args.seed), args.num_envs, actions) if args.exploration_probability else None)
         if args.qbert_guidance_probability:
-            exploration = QbertGuidance(dict(kind=GUIDANCE_KIND,
-                probability=args.qbert_guidance_probability, seed=args.seed), args.num_envs, actions)
+            guidance_config = dict(kind=GUIDANCE_KIND,
+                probability=args.qbert_guidance_probability, seed=args.seed)
+            if args.qbert_guidance_max_actions is not None:
+                guidance_config.update(kind=BOUNDED_GUIDANCE_KIND, max_actions=args.qbert_guidance_max_actions)
+            exploration = QbertGuidance(guidance_config, args.num_envs, actions)
         guidance = isinstance(exploration, QbertGuidance)
         current_frames = initial
         construction = time.perf_counter()

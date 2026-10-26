@@ -10,7 +10,7 @@ import pytest
 
 import kindle
 import kindle._qbert_guidance as module
-from kindle._qbert_guidance import GUIDANCE_KIND, GUIDANCE_SEED_XOR, QbertGuidance
+from kindle._qbert_guidance import BOUNDED_GUIDANCE_KIND, GUIDANCE_KIND, GUIDANCE_SEED_XOR, QbertGuidance
 from kindle._exploration import EXPLORATION_PROTOCOL
 from kindle._vector_audit import audit
 from test_vector import version_two_events, write_log
@@ -65,19 +65,20 @@ def test_unguided_lanes_do_not_inspect_frames_and_reset_clears_only_one_policy()
         all_guided.reset([0, 0])
 
 
-def guided_events():
+def guided_events(spec=None):
+    spec = config(1) if spec is None else spec
     rows = version_two_events()
     rows[0].update(protocol=EXPLORATION_PROTOCOL, seed=1009, environment='ALE/Qbert-v5',
         atari_protocol='published', full_action_space=True, observation_size='native',
         observation_shape=[210, 160, 3], sticky_actions=.25, noop_max=0, action_repeat=4,
-        exploration=config(1), exploration_sha256=hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest())
+        exploration=spec, exploration_sha256=hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest())
     rows[0]['config'].update(seed=1009, action_count=18)
-    guided = QbertGuidance(config(1), 2, 18)
+    guided = QbertGuidance(spec, 2, 18)
     frames = [np.zeros((210,160,3), dtype=np.uint8)] * 2
     for row in rows[1:]:
         if row['event'] == 'transition':
             row['action_overrides'] = guided.actions(frames)
-            row['actions'] = row['action_overrides']
+            row['actions'] = [1 if forced is None else forced for forced in row['action_overrides']]
             row['guidance_frame_sha256'] = guided.frame_sha256
         elif row['event'] == 'reset':
             guided.reset(row['streams'])
@@ -127,6 +128,13 @@ def test_accounting_rejects_bad_guidance(tmp_path, mutation):
     (['--observation-size', '64'], 'native pixels'),
     (['--atari-protocol', 'published-minimal'], 'full18'),
     (['--encoder-checkpoint', 'unused'], 'learned RGB'),
+    (['--qbert-guidance-max-actions', '0'], 'positive u32'),
+    (['--qbert-guidance-max-actions', '-1'], 'positive u32'),
+    (['--qbert-guidance-max-actions', str(2**32)], 'positive u32'),
+    (['--qbert-guidance-max-actions', '1.5'], 'invalid int'),
+    (['--qbert-guidance-max-actions', '640', '--qbert-guidance-probability', '0'], 'requires positive'),
+    (['--qbert-guidance-max-actions', '640', '--evaluate'], 'frozen evaluation'),
+    (['--qbert-guidance-max-actions', '640', '--restore', 'unused'], 'fresh run'),
 ])
 def test_cli_refuses_invalid_guidance_before_gpu(monkeypatch, tmp_path, capsys, args, message):
     monkeypatch.setattr(atari_vector.gym, 'make', lambda *a, **k: pytest.fail('environment constructed'))
@@ -136,7 +144,8 @@ def test_cli_refuses_invalid_guidance_before_gpu(monkeypatch, tmp_path, capsys, 
     assert error.value.code == 2 and message in capsys.readouterr().err
 
 
-def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkeypatch, tmp_path):
+@pytest.mark.parametrize('cap', [None, 1])
+def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkeypatch, tmp_path, cap):
     created = []
     class Policy:
         def action(self, frame): return int(frame[0,0,0])
@@ -162,7 +171,8 @@ def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkey
         def learned_rgb(cls, streams, config):
             obj = cls(); obj.config = config; return obj
         def begin_episodes(self, ids, frames): self.replay_len += len(ids)
-        def act(self, greedy=False, action_overrides=None): return action_overrides
+        def act(self, greedy=False, action_overrides=None):
+            return [17 if forced is None else forced for forced in action_overrides]
         def observe(self, ids, frames, rewards, terminated, truncated):
             self.environment_step += len(ids); self.replay_len += len(ids)
             return [[reward, 0.] for reward in rewards]
@@ -174,11 +184,13 @@ def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkey
     monkeypatch.setattr(kindle, 'VectorAgent', Agent)
     output = tmp_path/'run.jsonl'
     monkeypatch.setattr(sys, 'argv', ['atari_vector', 'ALE/Qbert-v5', '--output', str(output),
-        '--num-envs', '2', '--steps', '6', '--train-ratio', '0', '--qbert-guidance-probability', '1'])
+        '--num-envs', '2', '--steps', '6', '--train-ratio', '0', '--qbert-guidance-probability', '1',
+        *([] if cap is None else ['--qbert-guidance-max-actions', str(cap)])])
     atari_vector.main()
-    assert [env.actions for env in created] == [[0,2,3], [0,2,3]]
+    assert [env.actions for env in created] == ([[0,2,3], [0,2,3]] if cap is None else [[0,17,3], [0,17,3]])
     result = audit(output)
-    assert result['actions'] == 6 and result['updates'] == 0 and result['overridden_actions'] == [3,3]
+    assert result['actions'] == 6 and result['updates'] == 0
+    assert result['overridden_actions'] == ([3,3] if cap is None else [2,2])
     assert result['guidance_episodes'] == dict(started_episodes=[2,2], guided_episodes=[2,2])
 
 
@@ -192,3 +204,74 @@ def test_pixel_replay_rejects_forged_teacher_choices_before_environment_step(mut
     else: row['actions'] = [2]
     with pytest.raises(ValueError):
         replay_qbert_guidance.replay_rows([json.dumps(row)], [], [], [frame], guided, float('inf'))
+
+
+def bounded_config(cap=2):
+    return dict(config(1), kind=BOUNDED_GUIDANCE_KIND, max_actions=cap)
+
+
+@pytest.mark.parametrize('cap', [None, 0, -1, 2**32, True, 1.5, float('nan')])
+def test_bounded_guidance_requires_positive_integer_limit(cap):
+    with pytest.raises(ValueError, match='positive u32'):
+        QbertGuidance(bounded_config(cap), 2, 18)
+
+
+def test_whole_episode_kind_rejects_silent_limit():
+    with pytest.raises(ValueError, match='fields'):
+        QbertGuidance(dict(config(1), max_actions=640), 2, 18)
+
+
+def test_cap_releases_without_redraw_or_pixel_access_and_lane_reset_is_independent():
+    class Poison:
+        def __getattribute__(self, name): raise AssertionError('released pixels inspected')
+    frame = np.zeros((210,160,3), dtype=np.uint8)
+    guided = QbertGuidance(bounded_config(), 2, 18)
+    assert guided.actions([frame,frame]) == [0,0]
+    assert guided.actions([frame,frame]) == [0,0]
+    assert guided.actions([Poison(),Poison()]) == [None,None]
+    assert guided.frame_sha256 == [None,None]
+    assert guided.selected_episodes == [True,True]
+    assert guided.episode_counts == dict(started_episodes=[1,1], guided_episodes=[1,1])
+    assert guided.overridden_actions == [2,2]
+    guided.reset([0])
+    assert guided.actions([frame,Poison()]) == [0,None]
+    assert guided.overridden_actions == [3,2]
+    assert guided.episode_counts == dict(started_episodes=[2,1], guided_episodes=[2,1])
+
+
+@pytest.mark.parametrize('mutation', ['early_release','late_override','hash_after_release','limit'])
+def test_cap_accounting_rejects_forged_release(tmp_path, mutation):
+    rows = guided_events(bounded_config(1))
+    transitions = [r for r in rows if r['event']=='transition']
+    if mutation=='early_release': transitions[0]['action_overrides'][0]=None
+    elif mutation=='late_override': transitions[1]['action_overrides'][0]=0
+    elif mutation=='hash_after_release': transitions[1]['guidance_frame_sha256'][0]='0'*64
+    else: rows[0]['exploration']['max_actions']=2
+    with pytest.raises(ValueError): audit(write_log(tmp_path,rows))
+
+
+def test_cap_accounting_keeps_learning_and_episode_selection_after_release(tmp_path):
+    rows=guided_events(bounded_config(1))
+    result=replay_qbert_guidance.read_guided_run(write_log(tmp_path,rows))
+    assert result['accounting']['actions']==6 and result['accounting']['updates']==3
+    assert result['accounting']['overridden_actions']==[2,1]
+    assert result['accounting']['guidance_episodes']==dict(started_episodes=[2,1],guided_episodes=[2,1])
+
+
+def test_replay_preserves_selected_episode_label_after_guidance_release():
+    frame=np.zeros((210,160,3),dtype=np.uint8)
+    digest=hashlib.sha256(frame.tobytes()).hexdigest()
+    class Environment:
+        executed_action_frames=0
+        def step(self,action):
+            assert action==(0 if self.executed_action_frames==0 else 7)
+            self.executed_action_frames+=4
+            return frame,1.,self.executed_action_frames==8,False,{}
+    monitor=SimpleNamespace(task=SimpleNamespace(result=lambda *_:dict(episode_score=2.)))
+    rows=[dict(event='transition',run_step=tick,actions=[0 if tick==1 else 7],
+        action_overrides=[0 if tick==1 else None],guidance_frame_sha256=[digest if tick==1 else None],
+        rewards=[1.],terminated=[tick==2],truncated=[False],executed_action_frames=[tick*4]) for tick in (1,2)]
+    rows.append(dict(event='episode',stream=0,episode_return=2.,terminated=True,truncated=False))
+    episodes,_=replay_qbert_guidance.replay_rows([json.dumps(r) for r in rows],
+        [Environment()],[monitor],[frame],QbertGuidance(bounded_config(1),1,18),float('inf'))
+    assert episodes[0]['guided'] is True

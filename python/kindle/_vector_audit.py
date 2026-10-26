@@ -8,7 +8,7 @@ from pathlib import Path
 import struct
 
 from ._exploration import EXPLORATION_PROTOCOL, PersistentExploration
-from ._qbert_guidance import GUIDANCE_KIND, QbertGuidance
+from ._qbert_guidance import GUIDANCE_KINDS, QbertGuidance
 
 
 VECTOR_PROTOCOL = "kindle-vector-v2"
@@ -92,7 +92,7 @@ def audit(path):
         guidance = False
         if header["protocol"] == EXPLORATION_PROTOCOL:
             check(header["mode"] == "train", "frozen evaluation cannot contain exploration overrides")
-            guidance = header["exploration"].get("kind") == GUIDANCE_KIND
+            guidance = header["exploration"].get("kind") in GUIDANCE_KINDS
             if guidance:
                 check(header["environment"] == "ALE/Qbert-v5" and header["atari_protocol"] == "published"
                       and header["full_action_space"] is True and header["observation_size"] == "native"
