@@ -83,3 +83,28 @@ lengths/hashes, and rechecks all346 matching initial tensors. Artifact:
 `prefix-cost-comparison-196608.json`, SHA256
 `30a240423ffeb71688cdb4829717ba7ef848c39196eba890d4458fc033dd2324`.
 The fixed45-minute cap and pending final evaluations remain unchanged.
+
+## Conditional assessment if the wall cap interrupts training
+
+Prepared while training is still active, before any cutoff or frozen result:
+if the 2700s cap interrupts the run, retain that failed budget outcome and audit
+the exact graceful-stop checkpoint. Require terminal service state, a recorded
+time-budget stop with no fault/validation event, a clean worker exit, complete
+action/update accounting and finite weights. The original host guard remains
+failed for exceeding time; this audit does not turn a cutoff into completion.
+
+After that review, assess the exact cutoff weights and this life's actual
+initial weights in a separate frozen phase. Keep the originally declared
+24-natural-episode selection, seeds, protocol, task gate and per-arm
+600k-action/300s caps. Preserve all346 tensors and source file hashes, plus full
+CPU replay/videos. No new training actions, updates, changed configuration,
+earlier-policy selection, cap increase or resumed learning. Label every result
+with the actual training budget; it is not the planned500k endpoint.
+
+This conditional preparation changes only evaluation output paths. The
+unselected controller refuses before GPU/log artifacts. Selection requires the
+completed cutoff review, terminal preceding service and exact source hashes.
+Artifacts: `breakout-4m-64-h5-r32-unimix001-500k-cutoff-frozen` under the same
+runtime root; controller `run_breakout_h5_cutoff_frozen.py`, intended service
+`kindle-cheap-breakout-h5-cutoff-frozen-20261026`. Audit cap1200s and separate
+frozen-service cap1860s. No conditional evaluation has been launched yet.
