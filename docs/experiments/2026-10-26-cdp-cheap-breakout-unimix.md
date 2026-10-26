@@ -54,3 +54,29 @@ actor_unimix, native SHA is unchanged and first updates are248:1,256:2,256:3.
 source`bfb8c31`, SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 The result remains pending; inspect the service before further GPU work.
+
+## Separate frozen sampling control
+
+Prepare one posthoc frozen control to distinguish the effect of the action
+mixture during evaluation from training with that mixture. Copy the completed
+0-mixture200k final checkpoint and change only saved actor_unimix0→.01. All
+346 source tensors and the original checkpoint remain identical; no learning
+or warm-start extension occurs. Compare this policy with the original frozen
+score and the new mixed-training policy, reporting all three separately.
+
+Use the same frozen seed4000001009, first three natural sampled episodes per
+lane,24 selected,600k-action/300-second cap, zero updates and no external aid.
+Reuse the primary mixture experiment's actual-initial evaluation only after
+verifying identical346 initial tensors and the same saved configuration,
+native/runner, environment protocol and evaluation seeds. Audit the new metadata
+copy, all unchanged frozen tensors, complete CPU replay/video and host guard;
+audit cap600 seconds and service cap960 seconds. Preserve excess/tails/cutoffs.
+This control is selected after observing the baseline stall and is not an
+independent trained learner or held-out test.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/breakout-unimix-acting-only-probe`.
+Controller: `run_breakout_acting_probe.py`; intended service:
+`kindle-cheap-breakout-unimix-acting-probe-20261026`. Launch only after the active
+200k run and its complete frozen audit finish. Review this short control before
+starting the separately prepared Freeway test. The primary training comparison
+retains its declared budget and fixed final/initial evaluations.
