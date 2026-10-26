@@ -20,6 +20,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Pong4M/RGB48/R16](results/2026-10-25-cdp-cheap-pong.md) |200k /24,970|10m22s|−17.125 /−20.375|0/24 wins|
 | [Pong4M/RGB48/R32](results/2026-10-25-cdp-cheap-pong.md#r32-and500k-actions) |500k /124,939|48m53s|11.000 /−20.375|23/24 wins; mean15 gate fails|
 | [Same recipe, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#fixed-recipe-seed4013-confirmation) |500k /124,939|50m14s|7.333 /−20.333|22/24 wins; mean15 gate fails|
+| [Same, coefficient.01, seed1009](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-improves-the-fixed-budget-result) |500k /124,939|49m55s|14.958 /−20.375|24/24 wins; mean15 narrowly fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -104,20 +105,26 @@ recovery checkpoints, numerical/accounting and frozen replay checks pass; the
 original training guard/controller retain their time-budget failure. Both
 services exit and the comparison is reviewed. No extension.
 
-**Current allocation:** [Pong coefficient.01](experiments/2026-10-26-cdp-pong-small-intrinsic.md).
-Keep the native recipe otherwise fixed:4M/RGB48/Auto/N8/B8/T16/H15/R32,
-fresh1009/eval4000001009,500k actions,55-minute cap, no external aid. Preserve
-the own actual-initial/fixed-final controls and mean15/90%-win gate. The positive
-coefficient retains the ensemble; no native rebuild. Started06:36:15 UTC,
-source`12a6553`; full config/counters, finite initial weights matching all346
-control tensors and first updates pass.3,578,225 parameters. Fixed evaluations
-and full audit follow; no automatic extension or next allocation.
+The [Pong coefficient.01 primary](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-improves-the-fixed-budget-result)
+completes500k/124939 updates in49m55s: frozen14.9583 and24/24 wins versus own
+initial−20.375 and0/24. The coefficient1 control scores11.0/23 wins at the same
+budget. All audits/curves pass, initial tensors/semantic evaluation traces match,
+and service exits. The unchanged mean15 gate still fails; do not round it into
+a pass. Training cost is similar. This promising result merits one confirmation.
+
+**Current allocation:** [focused Pong coefficient.01 seed4013 confirmation](experiments/2026-10-26-cdp-pong-small-intrinsic-confirmation.md).
+Keep4M/RGB48/Auto/N8/B8/T16/H15/R32,3,578,225 parameters,500k actions and55-minute
+cap, no aid; change only learner/evaluation seeds to4013/4000004013. Preserve
+own actual-initial/fixed-final controls and mean15/90%-win gate. Match initial
+tensors against the completed coefficient1 seed4013 control. Selected, with
+startup/fixed evaluations/full audit to follow; no automatic extension or next
+allocation. The seed is reused development data, not held out.
 A [four-action Breakout candidate](experiments/2026-10-26-cdp-breakout-minimal-actions.md)
 is prepared for later review at the original compact H15/200k budget. Existing
 adapter/replay support needs no code change; shared actions match in a bounded
 CPU check. Action dimensions, initial weights and policy probabilities change,
-so retain an own initial control and label the protocol variant. It is unselected
-while Pong runs and has no GPU result or established benefit.
+so retain an own initial control and label the protocol variant. It stays
+unselected pending the focused Pong confirmation; no GPU result or established benefit.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
@@ -159,7 +166,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Game | Latest useful frozen result | What remains |
 | --- | --- | --- |
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
-| Pong | AMD4M/RGB48/R32/500k seeds1009/4013:11.0/7.33,23/24 and22/24 wins in48m53s/50m14s; historical three-seed15.71,72/72 | Reference20.45; both compact mean15 gates and broad reliability remain open |
+| Pong | AMD4M/RGB48/R32/500k: coefficient1 seeds1009/4013 score11.0/7.33; coefficient.01 seed1009 improves to14.958 and24/24 wins in49m55s | Reference20.45; compact mean15 gate and broad reliability remain open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | Historical2M mean7,367;62/72 first pyramids | Reference193,220.77; intermediate15k/90% also unmet |

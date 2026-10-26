@@ -51,14 +51,16 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Pong intrinsic coefficient .01, otherwise fixed 4M/RGB48/
-Auto/N8/B8/T16/H15/R32, 500k actions and a 55-minute cap, fresh seed 1009/evaluation
-4000001009. Own actual-initial/fixed-final controls and mean15/90%-win gate remain.
+Current allocation: focused Pong intrinsic coefficient .01 confirmation, fixed
+4M/RGB48/Auto/N8/B8/T16/H15/R32, 500k actions and a 55-minute cap, fresh seed
+4013/evaluation4000004013. Own actual-initial/fixed-final controls and the
+mean15/90%-win gate remain. The primary finishes at14.9583 with24/24 wins:
+promising, but still below15; all audits pass and its service has exited.
 No external aid or native change. See
-`docs/experiments/2026-10-26-cdp-pong-small-intrinsic.md`; service owner
-`kindle-cheap-pong-intrinsic001-500k-20261026`. Check live state before GPU work.
-Started 06:36:15 UTC, source `12a6553`, with matched initial tensors and verified
-startup. Fixed evaluations and full audit follow; no automatic extension.
+`docs/experiments/2026-10-26-cdp-pong-small-intrinsic-confirmation.md`; intended
+service owner `kindle-cheap-pong-intrinsic001-500k-4013-20261026`. Check live state
+before GPU work. The confirmation is selected; startup and fixed evaluations
+follow. No automatic extension or next allocation.
 The four-action Breakout candidate is prepared only, pending this outcome:
 `docs/experiments/2026-10-26-cdp-breakout-minimal-actions.md`.
 

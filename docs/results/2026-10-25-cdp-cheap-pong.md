@@ -169,3 +169,55 @@ Review SHA256, seed1009:
 seed4013: `f1c1639879017667066582217bc362dfd893f32cf9a04e64ce3d9ce8c47c1c3a`.
 The analysis takes 1.35s/1.66s CPU wall time and preserves source/log hashes,
 early/middle/late distributions and the offline rescaling calculation.
+
+## Smaller bonus improves the fixed-budget result
+
+Coefficient .01 reaches **14.9583 with24/24 frozen wins**, versus the coefficient1
+control's11.0 and23/24. Its own actual initial scores−20.375 with0/24 wins.
+This is promising development evidence, but **14.9583 remains below the unchanged
+mean15 gate**. Do not round it into a pass. One focused seed4013 confirmation is
+selected; no extension or favorable-checkpoint selection follows.
+
+Fresh1009/eval4000001009,4M/RGB48/Auto/N8/B8/T16/H15/R32,3,578,225 parameters,
+full18/sticky.25/repeat4, actor_unimix0 and no external aid remain fixed. Only
+native intrinsic_reward_scale changes1→.01; the ensemble stays enabled. All346
+initial tensors and the complete initial evaluation's semantic action/outcome
+trace match the primary control. The CLI adds an optional imagination-length
+argument relative to that control; both configurations retainH15.
+
+| Coefficient, seed1009 | Actions / emulator frames / updates | Training wall | Frozen final / initial | Wins |
+|---|---:|---:|---:|---:|
+|1|500k /1,999,756 /124,939|48m53s|11.000 /−20.375|23/24|
+|.01|500k /1,999,728 /124,939|49m55s|14.958 /−20.375|24/24|
+
+Recorded training time is2,995.273591s,166.93 aggregate actions/s, within the
+unchanged55-minute cap. First update248, zero debt,202 natural training matches,
+final online last50 mean9.50. Online curves are close across much of training;
+the improved frozen result does not establish faster execution or seed reliability.
+
+Final/initial frozen evaluations use71,840/24,200 actions,287,302/96,771 emulator
+frames and30.745/10.271s. Each collects exactly24 natural matches, the first three
+per lane; partial tails remain, with zero updates/truncations. All346 tensors
+remain unchanged per arm. All124,939 strict reports, four recovery checkpoints,
+full configuration/source/counters, finite checkpoints, CPU replays/videos and
+three host guards pass. The service exits at07:27:49 UTC; its journal is retained.
+
+In the last25k updates, observed scaled bonus is0.000102626 and inferred extrinsic
+net prediction0.00436039, a ratio0.02354 versus the control's3.763. These are
+different learned trajectories, not the earlier fixed-prediction rescaling.
+Signed cancellation still limits the ratio; it does not prove why the score rose.
+
+The comparison plot initially failed because the isolated CPU plotting environment
+lacked safetensors. Installing version0.8.0 there completes the unchanged script
+in3.22s; the failed attempt and repair receipt remain. No GPU work or evaluation
+is repeated. The comparison curves are reconciled and visually reviewed.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/pong-4m-48-r32-intrinsic001-500k`, including
+`learning-review.json`, `curve/`, `coefficient-comparison/`, `terminal-journal.txt`
+and `comparison-repair-review.json`. Review SHA256
+`c9160f58dc2c25b751a3b332ca85838b3c8ad3257b69bfb7df0215ab88b1c285`;
+curve`3525882ff33978150c8dfc260f5944d703757864c93965d3983a07d721e178ca`;
+comparison`94c2ba7bc4fee016512b8c7371af3db1d9b151ca4b48fcdda6213f1a8dc20606`.
+Source at launch`12a6553`, native`bfb8c31`, runner`1ed07af`, replay`e853818`.
+The [fixed-recipe confirmation](../experiments/2026-10-26-cdp-pong-small-intrinsic-confirmation.md)
+uses previously evaluated4013, not a held-out seed. The gate remains unchanged.

@@ -1,7 +1,8 @@
 # Four-action compact Breakout candidate
 
-**Prepared only.** Pong coefficient.01 remains the active learner. Review its
-outcome and terminal service before selecting another allocation. This candidate
+**Prepared only.** Pong coefficient.01 completes at14.9583 with24/24 wins,
+narrowly missing mean15. Its focused seed4013 confirmation is selected next.
+Review that outcome and terminal service before selecting this allocation. This candidate
 does not launch automatically or extend the failed H5 life.
 
 The full18 compact H15/200k mixture control scores7.083; H5 reaches its45-minute

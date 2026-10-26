@@ -1,6 +1,11 @@
 # Smaller exploration bonus for compact Pong
 
-**Selected after the Breakout H5 cutoff and frozen assessment.** That run stops
+**Completed: frozen14.9583 and24/24 wins in49m55s; the mean15 gate still fails.**
+All audits pass and the service exits. See the
+[result and comparison](../results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-improves-the-fixed-budget-result).
+One focused seed4013 confirmation is selected; no extension of this life.
+
+Originally selected after the Breakout H5 cutoff and frozen assessment. That run stops
 at487,736 actions under its45-minute cap and scores8.458 versus initial1.375,
 0/24 two-wall successes. Numerical/checkpoint/accounting and frozen replay checks
 pass; the original time-budget failure remains. Both services have exited and
@@ -65,4 +70,5 @@ selected declaration SHA256
 `d2249ae6865eaa21169806b7e2331ec83eedac87106769842486e9fd00aeb213`.
 Recovery checks and completed-run plotting are monitored automatically. The
 read-only checkpoint watch lasts60 minutes so it covers a55-minute training cap;
-this changes no training limit. Fixed final/own initial evaluations remain pending.
+this changes no training limit. Fixed final/own initial evaluations and full
+audits now complete; the original budget and success gate remain unchanged.
