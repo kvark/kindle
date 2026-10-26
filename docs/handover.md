@@ -228,13 +228,16 @@ tensors/semantic traces, complete pixel/action replay and comparison pass;
 service exits 20:07:01 UTC. Retain unaided; no extension or confirmation.
 See [the result](results/2026-10-25-cdp-cheap-qbert.md#pixel-guided-training-lowers-unaided-frozen-quality).
 
-Select only the prepared bounded Pong RGB32 check: 16,384 actions/4,035 updates
-plus 1,024 frozen restore actions, 180s/60s caps. Keep the stronger B8 control's
-4M/Auto/N8/B8/T16/H15/R32/coefficient.01/actor0/full18/original rates/no aid,
-fresh1009/eval4000001009. Only image geometry changes 48→32; shapes and initial
-weights differ. Native frames retain one GPU resize. Owner
-`kindle-cheap-pong-rgb32-smoke-20261026`; no full learning allocation selected.
-See [the declaration](results/2026-10-25-cdp-cheap-pong.md#rgb32-bounded-check-prepared-not-selected).
+Select one fresh Pong RGB32 comparison after the bounded check passes with
+12.48% less early training time: 500k actions/124,939 updates, first248, zero debt,
+four100k recoveries and a50-minute training cap. Keep4M/Auto/N8/B8/T16/H15/R32,
+coefficient.01/actor0/full18/original rates/no aid, fresh1009/eval4000001009.
+Only image geometry changes48→32 versus the strongest B8 control; parameters
+and initialization differ. Fixed final/own initial24 natural matches retain
+mean15/90%-wins and full346-tensor/replay/video/guard/curve checks. No bounded
+experience reused. Owner`kindle-cheap-pong-rgb32-intrinsic001-500k-20261026`.
+No cap increase, extension, selected earlier checkpoint or automatic next run.
+See [the declaration](results/2026-10-25-cdp-cheap-pong.md#fresh-rgb32-learning-comparison).
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
@@ -242,7 +245,7 @@ New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
 Check live service state before GPU work; Qbert pixel-guided learning and its
-postprocessing have completed. The bounded Pong check is the only selection.
+postprocessing have completed. The fresh RGB32 Pong run is the only selection.
 
 Current native source`bfb8c31`; runner`137ed77` adds optional Qbert pixel guidance
 and opt-in CDP actor/critic gradients, SHA256

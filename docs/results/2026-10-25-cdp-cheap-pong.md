@@ -740,3 +740,51 @@ below its unaided control, with 0/24 pyramids; it receives no extension.
 The GPU is idle before selection. Keep the declared 16,384/4,035 and 1,024-action
 budgets, 180s/60s caps and all checks. Owner
 `kindle-cheap-pong-rgb32-smoke-20261026`. No full RGB32 learning run is selected.
+
+
+## RGB32 bounded check passes with lower early cost
+
+The bounded check completes **16,384 actions/65,523 frames/4,035 updates in
+82.320s**, versus **94.054s** for the RGB48 control prefix: **12.48% less early
+training time**, at identical action/update counts. Actual trainable parameters
+are 3,244,305, comprising 2,814,336 world and 429,969 behavior parameters,
+versus 3,578,225 at RGB48. Construction takes 1.975s separately.
+
+All 4,035 finite reports, native config/source/counters, first248/zero debt,
+selected CNN/reward-weight changes and both guards pass. Ordinary restore uses
+1,024 actions/4,096 frames in 0.433s, zero updates and no natural matches;
+all 346 tensors stay unchanged. Service starts20:13:27/source`4171753` and exits
+successfully20:14:56 UTC, 1m29.582s total. This establishes bounded execution
+and early cost, not frozen competence, sufficient visual detail or a full-run
+speedup. Geometry/initial weights/trajectories and the control's kernel differ.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/pong-4m-32-b8-smoke`.
+Review SHA256 `d05b0446290cd51b296becc6ffa7b58a24eaecb0701eff3b93360b6b87f638df`.
+After reviewing the saving and all checks, select the fresh comparison below.
+
+## Fresh RGB32 learning comparison
+
+Select one fresh 500k-action/124,939-update run, retaining the strongest compact
+B8 recipe:4M/Auto/N8/B8/T16/H15/R32/coefficient.01/actor0/full18/original rates,
+no aid and disabled actor/critic gradients, fresh1009/eval4000001009. Only native
+image geometry changes48→32. Keep native max-pooled RGB and one GPU resize.
+Own actual-initial weights must match the bounded RGB32 initialization, but no
+bounded experience is reused and no initial-weight match to RGB48 is claimed.
+
+Keep15,992,192 sampled positions/239,882,880 imagined actor rows, first248 and
+zero debt. Recoveries at100k/200k/300k/400k and fixed final500k; training cap
+50 minutes (control55). Each frozen arm retains600k actions/300s maximum and
+selects the first3 natural matches per lane,24 per policy, keeping excess/tails.
+Final and actual initial use zero updates/truncations, original mean15/90%-win
+gate,346 unchanged tensors and full config/source/counter/replay/video/guard/
+curve comparison. Geometry changes shapes and initialization; an older-kernel
+control and one reused seed limit attribution and reliability claims.
+No cap increase, extension, earlier-checkpoint selection or automatic next run.
+
+Queue flags/caps/recovery schedule, script compilation, unselected-launch refusal
+and the completed-control comparison reader pass. Native unchanged; runner
+`137ed77`, frozen replay`5043b7a`, overlay`runtime-qbert-guidance`.
+Preparation SHA256 `a52432ef9fd7838f54b03820feb04359f82eaad704c9093e8bdafdeffba979e4`.
+Artifacts: `/x/Temp/kindle-cheap-20261025/pong-4m-32-r32-intrinsic001-500k`;
+controller`run_pong_rgb32_500k.py`, owner
+`kindle-cheap-pong-rgb32-intrinsic001-500k-20261026`.
