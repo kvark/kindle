@@ -364,3 +364,18 @@ comparison`15141dfdbe8a98498ad27678396a1c74f7e967a32fb776681d77d411be950796`.
 Source at launch`be6c942`, native`bfb8c31`, runner`1ed07af`, replay`e853818`.
 After review, select the prepared PongB16 doubled-rate test at its fixed500k
 budget; no further Qbert allocation follows from this result.
+
+The larger policy also leaves cubes untouched in every selected frozen episode.
+An additional saved-action CPU replay reproduces every original transition,
+episode outcome and partial tail. Its mean ever-lit count equals maximum
+simultaneous coverage,16.292/21, and0/24 episodes ever light all21 cubes. Two
+observer addresses (32 and40) remain untouched in all24 episodes, and42 in23/24;
+no new spatial labels or causal explanation are inferred from those addresses.
+Color reversions occur in all24 episodes, but losing a previously complete
+pyramid does not explain the failure. The4M control similarly never lights all21,
+with mean ever-lit16.667 versus simultaneous16.625. This distinguishes incomplete
+coverage from full coverage followed by loss; it does not diagnose policy,
+representation or exploration as the cause. RAM remains strictly post-hoc.
+The15.156s CPU analysis creates no agent, policy decisions or learner updates.
+Tile-review SHA256`ecbcbea37581c6439b0076271c9842ba52a38eaefed326d35d63f9e186291a3a`;
+artifact:`qbert-12m-48-b16-r32-200k/tile-coverage-review.json` under the same root.
