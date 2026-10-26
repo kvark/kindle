@@ -51,8 +51,16 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-No active GPU work or selected next allocation after the completed Pong greedy
-assessment. It scores14.333 versus sampled14.958, both24/24 wins and below
+Select only the bounded PongB16 actor/critic-gradient check:4096 actions/466
+updates plus1024 frozen actions,300/60-second caps, no full learning allocation.
+Only native actor_critic_gradient changes on4M48/Auto/N8/B16/T16/H15/R32,
+coefficient.01/actor0/full18/original rates/no aid. Expected357 tensors and
+3,578,225 trainable parameters; verify346 shared initial/357 unchanged frozen
+tensors and all reports/config/counters/guards. Native and CLI unchanged. See
+`docs/experiments/2026-10-26-cdp-pong-actor-critic-gradients.md`. Launch pending;
+owner`kindle-cheap-pong-b16-acgrads-smoke-20261026`. No automatic next run.
+
+The completed Pong greedy assessment scores14.333 versus sampled14.958, both24/24 wins and below
 mean15. Own initial−20.833/0 wins; zero learning. Full config/counter/346-tensor/
 replay/guard checks and source-file invariance pass; service exits18:44:25 UTC.
 Retain sampled evaluation and the learner's49m55s training cost; no greedy

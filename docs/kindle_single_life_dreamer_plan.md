@@ -244,8 +244,15 @@ greedy−20.833/0 wins. Final/initial77,640/20,288 actions and310,513/81,145 fra
 in29.564/7.757s, zero learning,24 natural matches each. All346 frozen tensors,
 source files, config/counters, complete replays/videos and both guards pass;
 service exits18:44:25 UTC. Retain sampled evaluation; no greedy confirmation.
-The retained learner's49m55s training cost remains. No active GPU work or selected
-next allocation after this review; the five-game goal remains unfinished.
+The retained learner's49m55s training cost remains. The five-game goal is unfinished.
+
+Select only the [bounded PongB16 actor/critic check](experiments/2026-10-26-cdp-pong-actor-critic-gradients.md):
+4096 actions/466 updates plus1024 frozen actions,300/60-second stage caps,
+4M48/Auto/N8/B16/T16/H15/R32, coefficient.01/actor0/full18/original rates/no aid.
+Only native actor_critic_gradient changes; verify exact357-tensor schema,346
+shared initial/357 frozen invariance and all report/config/counter/guard checks.
+No full learning allocation or automatic next run. Native and CLI unchanged;
+launch pending, owner`kindle-cheap-pong-b16-acgrads-smoke-20261026`.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
