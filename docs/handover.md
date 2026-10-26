@@ -25,10 +25,13 @@ reliability. Details and historical wall-time comparison are in the Boxing repor
 [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) finishes200k in19m45s:
 frozen809.375 versus180.2083,0/24 first pyramids. Mean coverage improves5.83→16.63
 of21 cubes; all audits pass, but the task gate fails. No extension.
-Current allocation: [Breakout4M/RGB64/R32,200k](experiments/2026-10-25-cdp-cheap-breakout.md),
-service `kindle-cheap-breakout-r32-200k-20261025`, with a30-minute training cap,
-halfway recovery checkpoint and fixed24-episode final/actual-initial evaluation.
-Check its state before GPU work;
+[Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) finishes200k in
+22m30s: frozen6.2083 versus1.375,0/24 two-wall successes, all audits pass. A CPU
+replay verifies one12061-action delay before FIRE after a lost life. No extension.
+Current allocation: [Boxing seed4013 confirmation](experiments/2026-10-26-cdp-cheap-boxing-confirmation.md),
+service `kindle-cheap-boxing-r32-500k-4013-20261026`. Keep the successful2017
+1M/RGB32/500k/R32 recipe and30-minute cap; only learner/evaluation seeds change.
+Initial finite/config/source checks and first updates pass. Check its state before GPU work;
 do not restart completed screens.
 Current native source`bfb8c31`, runner`a99416e`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

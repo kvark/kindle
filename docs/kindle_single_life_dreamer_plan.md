@@ -16,6 +16,7 @@ is separate. Each row is one development seed, not a reliability result.
 | Same,5% persistent action aid in training |200k /24,970|8m11s|0.25 /0.00|0/24 milestones|
 | [Pong4M/RGB48/R16](results/2026-10-25-cdp-cheap-pong.md) |200k /24,970|10m22s|−17.125 /−20.375|0/24 wins|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
+| [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 
 Boxing is the first useful cheap AMD recipe; confirm it across seeds. The retained
 same-seed1M/RGB64/500k/R32 control takes65m38s and scores71.625. Geometry, runtime
@@ -24,9 +25,16 @@ Qbert's mean first-pyramid coverage improves5.83→16.63 of21 cubes, with a maxi
 of20, but its task gate fails. Neither these results nor short-screen failures
 establish a universal capacity or resolution rule.
 
-**Current allocation:** [Breakout4M/RGB64/R32,200k](experiments/2026-10-25-cdp-cheap-breakout.md),
-with a30-minute training cap, halfway recovery checkpoint and fixed24-episode
-final/actual-initial evaluation. Preserve64x64 ball detail and one GPU resize.
+Breakout's smaller model gains modestly, with lower score per action than the
+earlier T64 run but3.07× lower wall cost at the shared196,608-action point. One
+selected frozen episode waits12061 actions after losing a life before choosing
+FIRE. A small native policy exploration floor is a candidate learning test;
+the CPU observation does not establish its benefit. No extension of this life.
+
+**Current allocation:** [Boxing seed4013 confirmation](experiments/2026-10-26-cdp-cheap-boxing-confirmation.md).
+Keep the successful2017 recipe,500k-action budget and30-minute training cap;
+only learner/evaluation seeds change. Fixed24-natural-match final/actual-initial
+controls and full audits. This is one focused confirmation, not a broad campaign.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
