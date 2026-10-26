@@ -1162,3 +1162,17 @@ Source locations: [override path](../../kindle/src/dreamer/agent/vector.rs),
 changes no code and verifies every active Pong pin remains unchanged.
 Evidence:`/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-pixel-cap640-200k/guidance-learning-path-review.json`;
 SHA256`a2a4e096462169e4d5670e6f7ab067a0fdc934f1e12480bc7dfe79e430b898b7`.
+
+
+## Selected bounded RGB48 reward-forecast check
+
+Pong behavior-rate learning and all postprocessing now finish successfully;
+frozen12.375 remains below B8 and the mean15 gate. After reviewing that result,
+select only the previously prepared128-action/one-stream frozen Qbert check.
+Use the pinned staged RGB48 helper and retained unaided final checkpoint on
+its recorded final-policy trajectory, with60-second process/180-second service
+caps, zero learning, all346 tensors unchanged and the existing host guard.
+The prepared declaration is preserved before selection; exact checkpoint files
+and the completed Pong review are added to its pins. No native rebuild or new
+training trajectory is involved. A full initial/final forecast comparison
+requires a separate cost/execution review after this check; it is not queued.

@@ -78,21 +78,22 @@ No extension or confirmation follows capped Qbert. The applied
 `runtime-qbert-guidance-cap` overlay. Prior isolation failures remain recorded.
 See [the completed result](docs/results/2026-10-25-cdp-cheap-qbert.md#capped-guidance-recovers-some-quality-but-remains-below-unaided-training).
 
-Fresh Pong B16 behavior-rate learning is active from21:41:35 UTC/source`523eaca`:
-4M48/Auto/N8/B16/T16/H15/R32/coefficient.01/actor0/full18, world4e-5/encoder6e-6/
-dynamics4e-4 and behavior8e-5 only; fresh1009/eval4000001009. Keep500k actions/
-62,454 updates, first376, zero debt, four100k recoveries and45-minute training
-cap. Fixed final/own initial24-natural evaluations retain mean15/90%-wins,
-all346 tensors, full config/source/counter/replay/video/guard/curve checks and
-comparison to original B16, global2x and B8. No cap increase, extension or
-automatic next allocation. Owner`kindle-cheap-pong-behavior-lr2-500k-20261026`.
-Startup matches346 initial tensors and376:1/384:2/392:3 updates. Progress,
-four-recovery monitoring and postprocessing are attached. A CPU startup import
-failure is retained and corrected without changing training PID/invocation.
-Bounded4096/466 training and1024 frozen actions pass in15.979s/0.437s, with346
-matched initial/unchanged frozen tensors and both guards; service exits21:37:35.
-CLI`a2c467c` passes460 CPU tests; native unchanged. See cheap-Pong's selected
-fresh behavior-rate comparison. Check live state before GPU work.
+Pong B16 behavior rate8e-5 completes500k actions/1,999,751 frames/62,454
+updates in37m38s. Frozen12.375/24 wins improves original B16's11.875 slightly,
+but trails B8's14.958; all miss mean15. All audits, four recoveries,346 matched
+initial/unchanged frozen tensors, semantic initial traces, replays, guards and
+comparison pass; service exits22:20:58 UTC. Retain B8 as the strongest compact
+Pong recipe; no extension or seed confirmation follows this small gain.
+The CPU startup import failure remains recorded; no GPU stage repeated.
+CLI`a2c467c` passes460 CPU tests; native unchanged. See
+[the completed comparison](docs/results/2026-10-25-cdp-cheap-pong.md#behavior-rate-doubling-gives-a-small-gain-but-still-misses-the-gate).
+
+After reviewing Pong completion, select only the prepared QbertRGB48 frozen
+128-action reward-forecast check, with60-second cap and zero learning.
+The staged helper passes24 focused CPU tests; same saved trajectory and finite
+346-tensor checkpoint. Owner`kindle-cheap-qbert-48-forecast-smoke-20261026`.
+Review bounded cost and invariance before any separate full diagnostic selection.
+No new training allocation. Check live state before GPU work.
 
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions
 in0.452s;512 verified overrides,346 matched initial/unchanged frozen tensors,

@@ -954,3 +954,44 @@ The100k recovery audit passes at21:49:35 UTC:100,000 actions/12,454 updates,
 prefix. Training debt at the latest progress is zero; the original service
 remains live. Receipt SHA256`709f5129dcb938cada64df1cd4a9a42a5187de06581089d7bad5d1f019d5b5f2`. This is recovery/accounting evidence;
 fixed-final frozen quality remains pending.
+
+
+## Behavior-rate doubling gives a small gain but still misses the gate
+
+The selected fresh run completes500,000 aggregate actions/1,999,751 emulator
+frames and62,454 updates in2257.534s (**37m38s**), with first update376 and zero
+residual debt. The original service exits successfully at **22:20:58 UTC**;
+total service wall time39m22.621s includes construction, evaluations and audits.
+Only behavior rate becomes8e-5; world/encoder/dynamics rates remain unchanged.
+
+| Fixed500k recipe | Training wall | Frozen mean | Natural wins |
+|---|---:|---:|---:|
+| B8, original rates |49m55s|14.958|24/24|
+| B16, original rates |38m45s|11.875|24/24|
+| B16, all rates doubled |38m32s|9.125|24/24|
+| B16, behavior rate doubled |37m38s|12.375|24/24|
+
+All four own-initial controls score−20.375/0 wins. The new final policy's
+conditional stream-bootstrap interval is[10.5,14.0];24 matches are not24
+independent learners. The0.5-point difference from original B16 is a small
+unconfirmed gain. It remains below B8 and the unchanged mean15/90%-wins gate.
+Training takes24.63% less time than B8, but older control kernels limit isolated
+timing attribution. Retain B8 as the strongest compact recipe; no extension,
+selected earlier checkpoint or seed confirmation is selected from this result.
+
+All62,454 reports are finite. Config/source/counter audits, four100k recoveries,
+346 matched initial tensors across all four arms, identical semantic initial
+traces,346 unchanged frozen tensors per assessment, full action/reward/boundary
+replay, videos, host guards, curves and comparison pass. Final evaluation uses
+105,448 actions/421,732 frames/40.308s and completes28 natural matches, selecting
+the original first3 per lane. Initial uses24,200/96,771/9.311s and24 matches.
+Both perform zero learning/truncation; excess episodes and partial tails remain.
+The earlier CPU startup import failure remains retained; no GPU stage repeats.
+Online curves improve sooner at the higher behavior rate, but fixed frozen
+quality remains the decision measure. All seeds/cohorts are reused development
+evidence; neither mastery nor optimizer equivalence is established.
+
+Artifacts remain in the declared run directory. Learning-review SHA256
+`050f0b1868c9d15ec022a22021458556ed61ba69b7b3ae8af6b145400d642909`;
+comparison`1957825072c2db06040e74a01bc87397cbc82da796285016dfb850cb69b6774c`;
+postprocessing`e1197f168f5845b2acffa1a71143f15ae27cd038f3cb5206aef598d95160e441`.
