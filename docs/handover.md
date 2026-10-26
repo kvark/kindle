@@ -101,6 +101,9 @@ Artifacts/controller:`pong-4m-48-b16-r32-intrinsic001-500k`,
 `run_pong_b16_intrinsic001_500k.py`; owner
 `kindle-cheap-pong-b16-intrinsic001-500k-20261026`. Check live state before GPU
 work. No cap increase, unchanged extension or automatic next queue.
+Started09:48:13 UTC, source`8a966a2`; startup verifies346 matched initial tensors
+and first376. The100k recovery passes12,454 updates and full finite/config checks;
+completed-run curves and B8/B16 comparison are automated. Frozen result pending.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

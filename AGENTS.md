@@ -59,6 +59,8 @@ and mean15/90%-win gate. Batch/microbatch8→16 changes optimizer cadence,
 centering and warmup; sampled positions remain nearly equal, not updates.
 See `docs/experiments/2026-10-26-cdp-pong-batch16-budget.md`; service owner
 `kindle-cheap-pong-b16-intrinsic001-500k-20261026`. Check live state before GPU work.
+Started09:48:13 UTC from`8a966a2`; startup matches346 initial tensors and the100k
+recovery passes12,454 updates. Full final audits and comparison are automated.
 The short B16 check passes16,384 actions/2,002 updates and ordinary restore,
 using23.21% less early wall time; this is not full-budget learning evidence.
 Qbert500k/R16 completes with lower719.792 score/14.125 coverage and0/24 pyramids;

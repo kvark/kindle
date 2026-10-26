@@ -148,6 +148,9 @@ warmup also change. Retain own actual-initial/fixed-final controls and mean15/90
 gate, match346 initial tensors, audit100k recoveries and complete frozen replays.
 The short check motivates this trial but predicts no learning outcome. No cap
 increase, automatic extension or next queue.
+Started09:48:13 UTC, source`8a966a2`. Startup matches all346 initial tensors;
+the100k recovery passes12,454 updates and complete finite/config checks.
+Full final audits and B8/B16 comparison are automated; frozen result pending.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
