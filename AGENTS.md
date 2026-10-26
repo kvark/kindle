@@ -51,17 +51,15 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Qbert4M/RGB48/Auto/N8/B8/T16/H30/R32, active from15:59:07
-UTC/source`c1e00c2` after the interrupted Pong review and saved200k assessment.
-Startup matches346 finite initial tensors and first248:1/256:2/256:3 updates. Fresh1009/eval4000001009,
-coefficient1/actor0, original rates/full18/no aid; only native imagination15→30
-changes. Keep200k actions/49,939 updates and35-minute cap. The declared100k
-recovery was missed: pinned queue saves every200k. Preserve this protocol
-deviation and original watcher failures; do not restart or invent the milestone. Own
-initial/fixed final24-natural-episode controls retain15k/90%-pyramids and full
-audits/replays/guards. See`docs/experiments/2026-10-26-cdp-qbert-long-imagination.md`;
-owner`kindle-cheap-qbert-h30-200k-20261026`. Check live state before GPU work.
-No cap increase, extension or automatic next allocation.
+No active GPU allocation after Qbert H30 exits16:26:25 UTC. Check live state
+before GPU work; no next allocation, extension or confirmation is selected.
+Qbert4M48/B8/T16/H30/R32 completes200k/49,939 updates in26m43s,35.34% more
+training time than H15. Frozen582.292 versus809.375 and coverage9.583 versus
+16.625/21 are worse; both0/24 pyramids. Retain H15. Final training/frozen/replay/
+guard/comparison checks and matched346 initial tensors/semantic traces pass.
+The declared100k recovery was never written: pinned queue saved every200k.
+Original watcher failures remain; completion is explicitly protocol-incomplete.
+See`docs/experiments/2026-10-26-cdp-qbert-long-imagination.md`. No GPU repeat.
 
 PongB16/R40's500k target is interrupted by a host restart:265,440 persisted
 actions/41,416 finite reports, saved200k/31,192 updates. Separate frozen saved/

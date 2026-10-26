@@ -480,9 +480,10 @@ trajectory and unit costs can change; this is not a speed or learning result.
 
 The [H30 candidate](../experiments/2026-10-26-cdp-qbert-long-imagination.md) keeps
 4M/RGB48/B8/T16/R32, original rates, bonus1/full18/no aid,200k actions and49,939
-updates, with a35-minute cap. It is prepared but unselected while Pong B16/R40
-trains. The original15k/90%-first-pyramid gate remains. No GPU work, controller
-sweep or automatic queue follows from the analysis.
+updates, with a35-minute cap. It was prepared while Pong B16/R40 trained, then
+selected after reviewing that run's interruption and saved-policy assessment.
+The completed result follows below. The original15k/90%-first-pyramid gate
+remains. The timing analysis itself performs no GPU work or controller sweep.
 
 Analysis:`/x/Temp/kindle-cheap-20261025/longer-imagination-review.json`, SHA256
 `c83ffa66d39124883d67bf5721ebcc1bf19976d1f8c109eb5fbde03d4f2df5e6`;
@@ -491,3 +492,65 @@ script`review_longer_imagination.py`, SHA256
 The script checks complete source-log/review hashes, action/update counters and
 natural-episode counts. Breakout timing is descriptive context, not a second
 selected candidate. Actor, learner and GPU work remain zero.
+
+## Longer imagination costs more and lowers frozen coverage
+
+H30 scores **582.292 versus809.375** for H15, with mean maximum first-pyramid
+coverage **9.583 versus16.625 of21**. Both have0/24 first pyramids. H30 takes
+**26m43s versus19m45s**,35.34% more training wall time at the same200k actions
+and49,939 updates. Retain H15; no extension or seed confirmation is selected.
+The complete recipe remains unsuccessful under the original15k/90% gate.
+
+| Fixed final / actual initial | H15 control | H30 candidate |
+| --- | ---: | ---: |
+| Frozen mean score |809.375 /180.208|582.292 /180.208|
+| Mean maximum cubes lit, of21 |16.625 /5.833|9.583 /5.833|
+| First-pyramid successes |0/24 /0/24|0/24 /0/24|
+| Training seconds |1184.523|1603.180|
+| Aggregate actions / emulator frames |200000 /799342|200000 /799441|
+
+Fresh1009/eval4000001009, centered CDP4M/RGB48/Auto/N8/B8/T16/R32,
+3,578,225 parameters, full BPTT/microbatch8, replay100k, coefficient1, actor
+mixture0, original rates/full18/sticky.25/repeat4/noops0 and no action aid.
+Native max-pooled frames receive one GPU resize. Only native imagination15→30
+changes; discount horizon333 and lambda.95 stay fixed. Both sample6,392,192
+replay positions, while imagined actor rows double95,882,880→191,765,760.
+This is not matched compute. Same GPU/Mesa/native binary, but kernel7.0.0-34
+versus7.0.0-38 and a changed AMD module confound isolated attribution. All346
+initial tensors and complete semantic initial evaluation traces match.
+
+H30 completes389 natural training episodes, first update248 and zero debt.
+Construction2.190s is separate from1603.180s training. Final online last50
+mean654.5 is close to H15's677.5; the action/time curves show no sustained
+advantage and frozen coverage is much lower. Recorded reward timing did not
+translate into a benefit from longer imagined rollouts in this test; no model-
+error or gradient mechanism is established.
+
+Fixed final/own-initial evaluation uses18,104/9,232 aggregate actions,
+72,388/36,888 emulator frames and7.319/3.747s. Each collects and selects24
+natural episodes, with no excess, zero updates/truncations and retained partial
+tails. Final coverage median9.5, range5–14. All49,939 numeric reports, full
+config/source/counters, finite checkpoints,346 unchanged frozen tensors per arm,
+complete CPU replays/videos and three host guards pass. Service exits16:26:25
+UTC,27m18.195s total wall time. Curves, coverage and completed comparison pass
+and are visually reviewed. Reused development seeds do not establish reliability.
+
+**Protocol deviation:** the declaration required a100k recovery, but the pinned
+queue used`--checkpoint-every 200000`; no100k checkpoint was written. This was
+recorded at16:16 UTC, before the outcome. The original recovery watcher exits1
+when it sees the200k checkpoint; the original postprocessor exits1 on the absent
+100k review. Both failures remain. A separate CPU completion review verifies
+the successful final service/audits and unchanged original artifacts, then runs
+the existing curve, coverage and comparison scripts. It explicitly records
+`protocol_complete=false`. This does not repair the missing milestone. No GPU
+stage repeats, cap increase, resumed learning or earlier-checkpoint selection.
+
+[Declaration and deviation](../experiments/2026-10-26-cdp-qbert-long-imagination.md).
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-4m-48-h30-r32-200k`.
+Learning review SHA256`bb75dc79d593f4ac3dcf6da74f983edb212f9c5ce513ce1bccadd247a89db592`;
+curve`e06383ee68998a290adc36358a7c80d9ee2983fbe459e25d57fa53bd1b084f0c`;
+coverage`a02d3de03631469a9dee0880527b5a2843ea05cc9c337025f24567834a4f62f1`;
+comparison`2a59a1c630cf619aa282ca2557482c5bde0f129f46f57dae5fd125ad04494262`;
+completion with deviation`b8bf2db1c22919295d368c6ef00619ef7dfc1688109bf23e6e0112c2fe55357d`.
+Launch source`c1e00c2`, native`bfb8c31`, CLI`22bd61b`, replay`e853818`.
+No active or selected next GPU allocation after this review.

@@ -193,24 +193,23 @@ versus initial−20.375, both0/24 wins. All frozen checks pass after a CPU-only
 checker-import correction; original failures/unsealed tails remain. The500k
 quality question is unresolved. No resumed training or extension.
 
-Current allocation: [Qbert H30](experiments/2026-10-26-cdp-qbert-long-imagination.md),
-started15:59:07 UTC/source`c1e00c2` after that interruption review and saved-policy
-assessment. Startup matches346 finite initial tensors and first248:1/256:2/256:3;
-evaluation/comparison monitoring is attached. The declared100k recovery was never
-written: the pinned queue saves every200k. Preserve this protocol deviation and
-watcher failures; final training/frozen checks remain separate. Frozen quality is pending. Keep
-fresh1009/eval4000001009,4M/RGB48/Auto/N8/B8/T16/R32, coefficient1/actor0,
-original rates/full18/no aid; only native imagination15→30 changes. Fixed200k/
-49,939 updates and35-minute cap. Keep own initial/fixed-final24
-natural episodes,15k/90%-pyramids and all numerical/config/counter/tensor/replay/
-guard audits. Longer rollouts can also compound model error. No automatic queue.
+The [completed Qbert H30 test](results/2026-10-25-cdp-cheap-qbert.md#longer-imagination-costs-more-and-lowers-frozen-coverage)
+finishes200k actions/799,441 frames/49,939 updates in26m43s,35.34% more training
+time than H15. Frozen582.292 versus809.375 and coverage9.583 versus16.625/21
+are worse; both0/24 first pyramids. Retain H15. Final training/frozen/replay/
+guard/comparison checks pass, including346 matched initial tensors and identical
+semantic initial traces. The declared100k recovery was never written because the
+pinned queue saved every200k. Original watcher failures remain; separate CPU
+completion records `protocol_complete=false`. Service exits16:26:25 UTC. No GPU
+repeat, extension or confirmation. No active or selected next allocation.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
-Check owner`kindle-cheap-qbert-h30-200k-20261026` before GPU work.
+Check live service state before GPU work; the completed owner was
+`kindle-cheap-qbert-h30-200k-20261026`.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

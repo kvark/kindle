@@ -1,7 +1,15 @@
 # Qbert H30 at the fixed 200k budget
 
-**Selected after reviewing the interrupted Pong run and its saved-policy
-assessment.** Pong's500k target remains incomplete after a host restart; its
+**Completed with a missing recovery checkpoint.** Training200k/49,939 updates
+takes26m43s,35.34% more than H15; frozen582.292 versus809.375 and coverage9.583
+versus16.625/21 are worse, both0/24 pyramids. Final training/frozen/replay/guard
+and comparison checks pass, but the required100k recovery was never written.
+Original watcher failures remain and separate completion records
+`protocol_complete=false`. Service exits16:26:25 UTC. Retain H15; no extension,
+confirmation or next allocation. [Result and limits](../results/2026-10-25-cdp-cheap-qbert.md#longer-imagination-costs-more-and-lowers-frozen-coverage).
+
+Selected after reviewing interrupted Pong and its saved-policy assessment.
+Pong's500k target remains incomplete after a host restart; its
 saved200k policy scores−9.708 versus initial−20.375, both0/24 wins. Complete
 frozen checks pass after a CPU checker correction, with no repeated GPU work.
 The new boot passes bounded restore. Proceed with this prepared Qbert test;
@@ -97,18 +105,26 @@ execution and initial equality; frozen learning remains pending.
 ## Missed recovery checkpoint
 
 At16:16 UTC, read-only monitoring finds that the pinned queue contains
-`--checkpoint-every200000`, despite this declaration requiring100k and200k.
+`--checkpoint-every 200000`, despite this declaration requiring100k and200k.
 At122,880 completed progress actions/30,659 updates, no trained checkpoint or
 100k review exists. Queue normalization against the older control missed the
 discrepancy. This is a preparation error and an unmet protocol requirement.
 
-Keep the original queue, declaration, controller, watcher and postprocessor.
-Continue the existing fixed200k/35-minute allocation, without restart or cap
-increase. The original recovery/completion watchers will retain their missing-
-milestone failures. Separate CPU analysis may verify final training, frozen
-evaluation and comparison while reporting `protocol_complete=false`; it cannot
-recover the missing100k checkpoint. Do not claim all declared checks passed.
+The original queue, declaration, controller, watcher and postprocessor remain.
+The existing fixed200k/35-minute allocation completes without restart or cap
+increase. Original recovery/completion watchers exit1 for the missing milestone;
+their terminal outputs are retained. Separate CPU analysis verifies final
+training, frozen evaluation and comparison with `protocol_complete=false`;
+it does not recover the missing100k checkpoint. Not all declared checks passed.
 
 Deviation receipt:`checkpoint-interval-deviation.json`, SHA256
 `1ed857954eef688f4d8c080d44a61ab64a0c70ab7ec13592d1e5a1bf0550939a`.
 No GPU work, runtime edit or output mutation occurs in this review.
+
+The final service succeeds at16:26:25 UTC,27m18.195s total wall time. All49,939
+reports, fixed final/actual-initial evaluations and full CPU replays pass. The
+separate`finish_qbert_h30_with_deviation.py` requires those audits, successful
+service journal and preserved original watcher failures before producing curves,
+coverage and comparison. Source logs, queue, declaration and original reviews
+remain byte-identical. Completion SHA256
+`b8bf2db1c22919295d368c6ef00619ef7dfc1688109bf23e6e0112c2fe55357d`.
