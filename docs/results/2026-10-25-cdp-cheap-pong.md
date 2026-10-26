@@ -788,3 +788,13 @@ Preparation SHA256 `a52432ef9fd7838f54b03820feb04359f82eaad704c9093e8bdafdeffba9
 Artifacts: `/x/Temp/kindle-cheap-20261025/pong-4m-32-r32-intrinsic001-500k`;
 controller`run_pong_rgb32_500k.py`, owner
 `kindle-cheap-pong-rgb32-intrinsic001-500k-20261026`.
+
+
+The fresh run starts20:18:26 UTC/source`ebcd406`, invocation
+`fceafef2d0154c7b978d3c167e73c167`. Startup verifies exact native config,
+3,244,305 parameters, fresh counters, no external aid, all346 actual-initial
+tensors matching the bounded RGB32 check, and first248:1/256:2/256:3 finite
+updates. Four recovery audits, progress observation and final CPU postprocessing
+are attached. Full-budget cost and frozen quality remain pending.
+Selected declaration SHA256 `d5ef6bcf9c03a7f52ecc3cf76213c8e1509a6f5ae9067c1b448faa5789051f57`;
+startup `dc7413938c9ce06c67b103ad404197fedb8cf2599bf9f3533822e98b29e45285`.

@@ -286,7 +286,9 @@ coefficient.01/actor0/full18/original rates/no aid, fresh1009/eval4000001009.
 Only image geometry changes48→32 versus the strongest B8 control; parameters
 and initialization differ. Fixed final/own initial24 natural matches retain
 mean15/90%-wins and full346-tensor/replay/video/guard/curve checks. No bounded
-experience reused. Owner`kindle-cheap-pong-rgb32-intrinsic001-500k-20261026`.
+experience reused. Owner`kindle-cheap-pong-rgb32-intrinsic001-500k-20261026`,
+active from20:18:26 UTC/source`ebcd406`. Startup matches346 bounded32 initial
+tensors and248:1/256:2/256:3 updates; monitoring attached.
 No cap increase, extension, selected earlier checkpoint or automatic next run.
 See [the declaration](results/2026-10-25-cdp-cheap-pong.md#fresh-rgb32-learning-comparison).
 
