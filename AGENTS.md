@@ -51,12 +51,14 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Selected fresh Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32 learning test, minimal4,
+Active fresh Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32 learning test, minimal4,
 coefficient1/actor.01, original rates,1009/eval4000001009, no aid. Only native
 actor_critic_gradientfalse→true changes. Keep200k/49,939 updates/first248,
 100k recovery, zero debt and30-minute training cap. Fixed final/own initial24
 natural episodes retain864-point two-wall/90%-success gate and full audits.
-Launch pending; owner`kindle-cheap-breakout-acgrads-200k-20261026`. See
+Started17:43:46 UTC/source`710fd6d`; startup passes357 own initial tensors,346
+shared control tensors and248:1/256:2/256:3 updates. Owner
+`kindle-cheap-breakout-acgrads-200k-20261026`. See
 `docs/experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md`. Check live
 state before GPU work. No cap increase, extension or automatic next allocation.
 

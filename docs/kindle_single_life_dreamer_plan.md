@@ -224,7 +224,10 @@ After this review, select a separate fresh200k/49,939-update learning life,
 Only actor_critic_gradient changes versus the control. Keep100k recovery,
 30-minute cap and fixed final/actual-initial24-natural-episode evaluations,
 with the original864-point two-wall/90%-success gate and complete357-tensor/
-replay/guard audits. No smoke experience is reused. Launch pending; no cap
+replay/guard audits. No smoke experience is reused. Started17:43:46 UTC/source
+`710fd6d`; startup passes full config except the flag,357 initial tensors matching
+the smoke,346 shared tensors matching the control and248:1/256:2/256:3 updates.
+Recovery monitoring, fixed evaluations and comparison are attached. No cap
 increase, extension, selected checkpoint or automatic next allocation.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module

@@ -1,6 +1,6 @@
 # Breakout actor/critic gradients
 
-**Bounded check passes; fresh200k learning test selected, launch pending.**
+**Bounded check passes; fresh200k learning test active from17:43:46 UTC.**
 The smoke completes4096 actions/963 updates in22.474s, with357 finite tensors,
 nonzero initial policy/value losses, changed encoder/reward weights and exact
 1024-action frozen restore. After reviewing this execution evidence, select a
@@ -152,3 +152,14 @@ Native`bfb8c31`, runner`fbdaee3`/SHA256
 `d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`,
 CPU replay`5043b7a`. The declaration pins the schema/helper/watcher/comparison
 and postprocessor; the launch receipt records the final source revision.
+
+Started17:43:46 UTC/source`710fd6d7858cb825c9d6882e61569d4f5077bb0f`, invocation
+`04c9feb14e2e48fcaddd15190ca5d03e`. Startup verifies full native config equality
+except actor_critic_gradient,4,120,963 trainable parameters, all357 finite own
+initial tensors matching the smoke and346 shared tensors matching the control.
+First updates248:1/256:2/256:3 have nonzero initial policy/value losses. Recovery
+monitoring, fixed evaluations, CPU replay/video and completed comparison are
+attached. Frozen learning quality remains pending.
+Initial metadata SHA256`c9ce275c8cbdd5f5547476795eeb432b217138e4247ad29d931167ef78f8540a`;
+startup review`ac21617f4a181ef5f9a4a214f04a80eef7185ee4a493445e64bcf79ba009d0ce`;
+selected declaration`93e0680499b79d79c2ebc35f4cc2c5e001b2a68617c606483efa6d44f12cf47d`.
