@@ -57,7 +57,7 @@ first376, four100k recoveries, zero debt and45-minute training cap. Fixed final/
 own initial24 natural sampled matches retain mean15/90%-wins and full357-tensor/
 replay/guard audits. No smoke experience reused. Started18:57:18 UTC/source
 `7ebd7f4`;357 initial tensors match the smoke,346 shared tensors match control,
-first376:1/384:2/392:3/400:4 updates pass.100k/200k recoveries pass. The progress
+first376:1/384:2/392:3/400:4 updates pass.All four100k–400k recoveries pass. The progress
 observer was reattached after exit143; training PID/invocation did not change.
 Recovery and final-analysis monitors remain attached. Owner
 `kindle-cheap-pong-b16-acgrads-500k-20261026`. See
@@ -67,7 +67,9 @@ no cap increase, extension or automatic next allocation.
 A CPU-only Qbert pixel rule clears the first pyramid in24/24 natural episodes,
 mean3764.583 and coverage21/21; complete pixel/action/reward replay passes.
 It misses mean15000 and is hand-coded guidance evidence, not Kindle success.
-No training aid is selected yet. See the cheap-Qbert report; no GPU allocation.
+The adapter is staged with420 passing CPU tests and full pixel replay. A4096-action
+native check is prepared unselected; active source/runtime remain unchanged.
+See the cheap-Qbert report; no new GPU allocation.
 
 The bounded PongB16 check passes4096/466 in16.126s and1024 frozen actions in
 0.436s, all357 tensors unchanged,346 shared initial tensors matching control,

@@ -701,4 +701,31 @@ trace`e2e8ae5c225256df15eeeab0075e128dfb4a71b81d7616579cb0dc2954d80c5c`;
 policy`d8e47b4b0815fbcdbf2ff19d2e06fb06ca3e4a37e0033310585113d3892a4f59`;
 driver`65a47fb30ce0ea669f3eeb5fc8cc174dcb443a932420545b9e602e04152aeb2e`.
 ROM/emulator/wrapper pins and fixed cohort are in the declaration. Active Pong
-learning remains unchanged; guidance integration and unaided transfer are untested.
+learning remains unchanged; native guidance integration and unaided transfer are untested.
+
+The optional episode-guidance adapter is now staged outside the active source
+and runtime.420 CPU tests pass. Its formatted policy reproduces all29,552
+reference actions, pixel hashes and outcomes exactly in29.391s. A separate
+real-Atari integration uses a CPU stub that returns NOOP outside guided episodes:
+16,384 actions/40 natural episodes,3,032 guided overrides, collection15.969s and
+complete training-action/pixel replay7.268s. No native agent or learning occurs.
+The5% per-episode probability gives18.506% of actions in this fixture; this is
+not a prediction for the learner. Report actual action share in every trial.
+
+The adapter draws independently per lane at episode start, preserves selected
+episodes until their natural boundary or timeout, and resets only that lane's
+pixel-rule state. Native action overrides retain normal observation/replay/
+learning cadence. CLI rejects frozen use, restore overrides, other games,
+non-native pixels, reduced action sets and combined random aid. Ordinary
+accounting checks the episode schedule and counts; a separate complete CPU
+environment replay verifies the policy's actions and input-frame hashes.
+
+Preparation: `qbert-pixel-guidance-adapter/validation.json`, SHA256
+`4cb8edabc23eb5e736ac928bc19a9930af6a4c054ed5406c4061b7c04f1cd1fc`.
+The separate `runtime-qbert-guidance` Python overlay uses the unchanged native
+binary and preserves the original runtime. A bounded4096-action/963-update
+native check plus1024 frozen actions is prepared **unselected**, with300s/60s
+caps and exact4M48/B8/T16/H15/R32/coefficient1 control config. It retains actual
+initial weights,346-tensor comparisons, finite reports, both guards and full
+guidance replay. Active Pong must finish and be reviewed before applying the
+staged source or selecting GPU work. No full learning allocation is selected.

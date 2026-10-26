@@ -122,3 +122,8 @@ while the recovery and final-analysis monitors remained live. Original and
 replacement receipts are retained as `progress-observer-interruption.json`
 and `progress-observer-reattachment.json`. This is not a recorded GPU fault or
 training-service failure.
+
+The300k/400k recoveries also pass37,454/49,954 updates, all357 finite tensors
+and copy checks. The watcher exits successfully after all four milestones.
+At405,504 actions, progress is1,841.062s with50,642 updates and zero debt.
+The fixed500k evaluation remains pending; this is recovery evidence only.

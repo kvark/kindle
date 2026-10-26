@@ -209,7 +209,7 @@ sampled matches, mean15/90%-wins and full357-tensor/replay/guard/curve compariso
 No smoke experience reused. Started18:57:18 UTC/source`7ebd7f4`;357 initial
 tensors match the smoke,346 shared tensors match control and first376:1/384:2/
 392:3/400:4 updates pass. Recovery, fixed evaluations and analysis monitors are
-attached.100k/200k recoveries pass; a progress observer was reattached after
+attached.All four100k–400k recoveries pass; a progress observer was reattached after
 exit143 with the same training PID/invocation and no training restart. Owner
 `kindle-cheap-pong-b16-acgrads-500k-20261026`; frozen quality pending. No extension
 or automatic next run.
