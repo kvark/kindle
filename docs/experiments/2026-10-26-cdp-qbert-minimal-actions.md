@@ -77,5 +77,9 @@ parameters, no aid, zero starting counters, finite346-tensor own actual-initial
 checkpoint and first updates248:1,256:2,256:3. The declared six-action replay
 identity passes. Initial metadata SHA256
 `c92daee765d7512a68372b23fcd7d365b63192ffe1275710d914d8089c740130`.
-The fixed200k final and own actual-initial evaluations remain pending. Runtime
-and caps stay fixed; early finite updates do not establish a learning gain.
+Completed200k actions/49,939 updates in18m21s: frozen605.208 versus own initial
+148.958,0/24 pyramids. Mean coverage10.167/21 is below the full18 control's16.625;
+its frozen score is also lower than809.375. All audits, curves and comparisons
+pass; service exits successfully. See the
+[result](../results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage).
+No extension follows.

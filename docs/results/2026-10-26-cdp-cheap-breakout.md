@@ -5,6 +5,10 @@ with0/24 two-wall successes. Smaller-model execution is faster, but play remains
 weak. A saved-action replay identifies a long delay before relaunching after a
 lost life in one selected episode; this is a concrete learning issue to test.
 
+A later [CPU pixel-following reference](2026-10-26-cdp-breakout-pixel-reference.md)
+also remains weak:11.333 and0/24 two-wall successes. Its complete action replay
+passes, but it provides no training guidance and is not a learned-policy result.
+
 [Declaration](../experiments/2026-10-25-cdp-cheap-breakout.md). Fresh seed1009,
 Size4M/RGB64/Auto,4,131,729 trainable parameters, centered CDP/action-effects1,
 N8/B8/T16/H15/R32, full BPTT/microbatch8 and replay100k. Full18/sticky.25/repeat4,

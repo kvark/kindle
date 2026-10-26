@@ -22,6 +22,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same recipe, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#fixed-recipe-seed4013-confirmation) |500k /124,939|50m14s|7.333 /−20.333|22/24 wins; mean15 gate fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
+| [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
 | [Retained Breakout12M/RGB64/H5 warm start](results/2026-10-26-cdp-breakout-short-imagination.md) |50k new /12,439 new|8m02s|27.208 /67.583 source|0/24 two-wall successes; regression|
@@ -80,16 +81,20 @@ own initial−20.333 and0/24. All audits and curves pass; service exits successf
 Both compact learners win most matches but miss the unchanged mean15 gate.
 Selected seeds are not held out; no unchanged extension or broad campaign.
 
-**Current allocation:** [Qbert with six action choices](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
-keeping4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient1 and200k/30-minute cap. The
-existing adapter preserves timing/sticky settings; a bounded CPU comparison
-matches the shared six actions. Explicit Qbert replay support passes138 checks
-both staged and applied after Pong's audit/exit. Changing action count changes
-initialization and policy probabilities; retain an own initial control and
-label the protocol variant. The mean15k/90%-pyramid gate is unchanged. One
-bounded learner, no automatic next allocation or extension. Started05:07:21 UTC;
-startup full-config/counter checks, finite own initial checkpoint and first
-updates pass. Actual3,568,997 parameters. Fixed evaluations and full audit follow.
+The [six-action Qbert trial](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage)
+completes200k/49939 updates in18m21s, but frozen605.208 and10.167/21 mean coverage
+are below the full18 control's809.375 and16.625/21. Own initial148.958;0/24 pyramids.
+All audits/curves pass and service exits. No extension. A separate
+[CPU Breakout pixel follower](results/2026-10-26-cdp-breakout-pixel-reference.md)
+also fails at11.333 and0/24 two-wall successes; full replay passes, no training aid.
+
+**Selected next allocation:** [fresh compact Breakout H5/500k](experiments/2026-10-26-cdp-breakout-compact-h5-budget.md).
+Keep4M/RGB64/Auto/N8/B8/T16/R32 and native mixture.01; shorten imagined rollouts
+H15→5 while increasing experience200k→500k under a fixed45-minute training cap.
+The earlier12M H5 warm start regressed, so this is a new combined compute/budget
+recipe, not an established horizon improvement or warm continuation. Own actual
+initial/fixed final controls and all existing gates remain. No pixel reference,
+RAM or external action aid enters learning. Startup follows; no automatic extension.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

@@ -61,16 +61,19 @@ The [Pong4013 confirmation](results/2026-10-25-cdp-cheap-pong.md#fixed-recipe-se
 completes500k/124939 updates in50m14s: frozen7.333 and22/24 wins versus own
 initial−20.333 and0/24. All audits and curves pass; service exits successfully.
 Both compact Pong learners win most matches but miss mean15. No extension.
-Current allocation: the [six-action Qbert test](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
-4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient1,200k actions and30-minute cap.
-Its replay support passes138 CPU checks staged and applied after Pong's full
-audit/exit. Native and training CLI remain unchanged. Changing action count
-changes initialization and policy probabilities; retain its own initial control.
-Artifacts/controller: `qbert-4m-48-r32-minimal-200k`, `run_qbert_minimal_200k.py`;
-owner `kindle-cheap-qbert-minimal-200k-20261026`, started05:07:21 UTC, source`e853818`.
-Full config/counters, finite own initial checkpoint and first updates pass;
-3,568,997 actual parameters. Fixed evaluations/full audit follow. Check live
-state before GPU work; no automatic next allocation or extension.
+The [six-action Qbert test](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage)
+completes200k/49939 updates in18m21s: frozen605.208 versus own initial148.958,
+0/24 pyramids. Coverage10.167/21 and score are lower than the full18 control.
+All audits/curves pass and service exits; no extension. The separate CPU Breakout
+pixel follower scores11.333,0/24 two-wall successes, with complete replay; no aid.
+Selected next: [fresh compact Breakout H5/500k](experiments/2026-10-26-cdp-breakout-compact-h5-budget.md),
+4M/RGB64/Auto/N8/B8/T16/R32, native mixture.01, H5 and45-minute training cap.
+This changes horizon and budget together; the earlier12M H5 warm start failed.
+Fresh state and own initial control; no pixel controller, RAM or external aid.
+Artifacts/controller: `breakout-4m-64-h5-r32-unimix001-500k`,
+`run_breakout_compact_h5_500k.py`; intended owner
+`kindle-cheap-breakout-h5-unimix-500k-20261026`. Check live state before GPU work.
+Startup follows; no automatic extension or next allocation.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

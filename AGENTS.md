@@ -114,17 +114,19 @@ no extension. See `docs/results/2026-10-26-cdp-breakout-short-imagination.md`.
 Pong4013 confirmation completes500k/124939 updates in50m14s: frozen7.333 and
 22/24 wins versus own initial−20.333 and0/24. All audits and curves pass; service
 exits. Both compact Pong learners win most matches but miss mean15; no extension.
-Current allocation: six-action Qbert,4M/RGB48/Auto/N8/B8/T16/H15/R32,
-coefficient1,200k actions/49939 expected updates and30-minute cap. The existing
-minimal protocol preserves timing/sticky settings. Explicit Qbert CPU replay
-passes138 checks staged and applied after Pong's full audit/exit; native and
-training CLI unchanged. Action count changes initialization and policy
-probabilities; retain an own actual-initial control and label this protocol
-variant. See `docs/experiments/2026-10-26-cdp-qbert-minimal-actions.md`;
-owner `kindle-cheap-qbert-minimal-200k-20261026`. Check live state before GPU work.
-Started05:07:21 UTC, source`e853818`. Full config/counter checks, finite own initial
-checkpoint and first updates pass;3,568,997 actual parameters. Fixed evaluations
-and full audit follow. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
+Six-action Qbert completes200k/49939 updates in18m21s: frozen605.208 versus own
+initial148.958,0/24 pyramids, mean coverage10.167/21. Score/coverage are lower than
+the full18 control. All audits/curves pass and service exits; no extension.
+The separate CPU Breakout pixel follower scores11.333,0/24 two-wall successes,
+with full replay. No reference controller or RAM enters learning.
+Selected next allocation: fresh compact Breakout H5/500k,4M/RGB64/Auto/N8/B8/T16/
+R32, native mixture.01, fixed45-minute cap. Horizon15→5 and experience200k→500k
+change together. The earlier12M H5 warm start regressed; this is a fresh compact
+compute/budget recipe, not a continuation or established horizon benefit. Retain
+own initial/fixed final controls and the unchanged two-wall gate. See
+`docs/experiments/2026-10-26-cdp-breakout-compact-h5-budget.md`; intended owner
+`kindle-cheap-breakout-h5-unimix-500k-20261026`. Check live state before GPU work.
+Startup follows. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
 and restores reject overrides.263 vector-runner tests pass; native is unchanged.
 Do not restart completed training, old queues, broad seed campaigns or unchanged

@@ -7,6 +7,8 @@ not successful Qbert play or seed reliability.
 The coefficient100 follow-up below also scores809.375, completes no pyramids
 and reduces mean coverage to13.708/21 in20m12s. A stronger bonus does not improve
 the fixed-budget result on this reused seed; both runs pass all audits.
+The six-action test below finishes in18m21s but scores605.208 and reduces coverage
+to10.167/21, still0/24 pyramids. Faster execution does not improve this task result.
 
 [Declaration](../experiments/2026-10-25-cdp-cheap-qbert.md). Fresh seed1009,
 Size4M/RGB48/Auto,3,578,225 trainable parameters, centered CDP/action-effects1,
@@ -141,3 +143,45 @@ statistics are unchanged; no GPU run is repeated.
 
 Do not extend this failed setting or launch a broad coefficient/seed sweep.
 The bounded H5 Breakout warm start is selected after this completed review.
+
+## Six action choices run faster but reduce frozen coverage
+
+The [six-action test](../experiments/2026-10-26-cdp-qbert-minimal-actions.md)
+completes200k actions/49,939 updates in **1,101.180s (18m21s)**,181.62 actions/s,
+with799,288 emulator frames, first update248 and zero debt. The native config
+matches the coefficient1 control except action_count18→6;3,568,997 parameters.
+The `published-minimal` protocol retains repeat4, sticky.25, zero no-op starts
+and100000-frame episode limit. Network dimensions, initialization and policy
+probabilities change, so this is a labelled protocol variant with its own
+actual-initial control, not a matched-initial-weight comparison.
+
+| Fixed policy | Selected natural episodes | Mean score | First pyramids | Mean maximum initial cubes |
+|---|---:|---:|---:|---:|
+| Six-action200k final |24|605.208|0|10.167/21|
+| Own actual initial |24|148.958|0|4.667/21|
+| Full18 coefficient1 control |24|809.375|0|16.625/21|
+
+The faster execution does not improve frozen play. Final coverage ranges6–17,
+median9; no episode completes the first pyramid. The original15k/90% gate fails.
+Training finishes489 natural episodes with final online last50 mean656.5. The
+100k recovery checkpoint passes before fixed200k replaces it; no earlier-policy
+selection, cap increase or extension occurs.
+
+Frozen final collects25 natural episodes using20,496 actions/81,948 frames in
+9.431s. Initial collects26 using9,712/38,810 in4.457s. Selection remains the first
+three per lane; one/two excess episodes and partial tails remain in full replay
+and video. All25 final episodes average632.0, distinct from the selected24 mean
+605.208. Zero truncations/updates, all346 tensors unchanged in each arm.
+
+All49,939 numeric reports, source/config/counters, finite checkpoints, complete
+CPU replays/videos and three host guards pass; service exits successfully.
+Curves, coverage and the full18/minimal6 comparison are independently reconciled
+and viewed.138 CPU replay tests pass staged and applied before launch. Native
+`bfb8c31` and runner`1ed07af` remain fixed; source at launch`e853818`.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-minimal-200k`, including
+`curve/`, `coverage-review.json` and `action-vocabulary-comparison/`.
+Review SHA256`d63361a46d6cd30f5c540014c6b45014b57bec4128d6554c89be72801e2de3aa`;
+curve SHA256`979db7a72c88ec75de57f91848709968f22f8a9be1b8d5485d0481f7d17729f0`;
+comparison SHA256`7563683311c2ce2cd737840943d22352af1181b6a7cf318523c9dfbf68fefdf8`.
+Seed1009 is reused development data. No extension or broad action/seed sweep.
