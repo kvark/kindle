@@ -261,7 +261,11 @@ failure is retained and corrected without changing training PID/invocation.
 Bounded4096/466 training and1024 frozen actions pass in15.979s/0.437s, with346
 matched initial/unchanged frozen tensors and both guards; service exits21:37:35.
 CLI`a2c467c` passes460 CPU tests; native unchanged. See cheap-Pong's selected
-fresh behavior-rate comparison. Check live state before GPU work.
+fresh behavior-rate comparison. Check live state before GPU work. The100k recovery
+passes with12,454 updates and346 finite tensors. A staged, unapplied QbertRGB48
+reward-forecast helper passes24 CPU tests and a source-trajectory support review;
+its128-action frozen check is prepared but unselected. No concurrent GPU work.
+See [the prepared diagnostic](results/2026-10-25-cdp-cheap-qbert.md#rgb48-reward-forecast-diagnostic-prepared-not-selected).
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,

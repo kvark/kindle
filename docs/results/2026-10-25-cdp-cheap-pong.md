@@ -947,3 +947,10 @@ transitive checkpoint-audit import lacks`ale_py`. The failure is retained in
 checks under the existing Atari Python environment passes. Training retains
 the same PID/invocation and cap; no GPU stage repeats. Frozen learning quality
 remains pending.
+
+
+The100k recovery audit passes at21:49:35 UTC:100,000 actions/12,454 updates,
+346 finite saved tensors and13,275 finite reports in the complete106,576-action
+prefix. Training debt at the latest progress is zero; the original service
+remains live. Receipt SHA256`709f5129dcb938cada64df1cd4a9a42a5187de06581089d7bad5d1f019d5b5f2`. This is recovery/accounting evidence;
+fixed-final frozen quality remains pending.

@@ -1065,3 +1065,62 @@ receipt retained alongside it). SHA256 receipts:
 - Comparison:`2097fb6849dae6fbdfbebbf03d2c3554b8e4684f994da2a2dda493bfbba2e309`.
 - Completion:`e1f9a995a09f105a8ff677270319d2843ae85638915eccddc3ea12f2ea17d268`.
 - Exposure analysis:`d7702449eb1f99126f643f6a3c8878082aafe1fae3891dd1fc33065b3de8273c`.
+
+
+## RGB48 reward-forecast diagnostic prepared, not selected
+
+The compact Qbert H30 result is weaker than H15, and the existing cheap runs do
+not measure multi-step prior reward quality. Prepare a small frozen diagnostic
+before proposing another rollout-length change. It will condition forecasts on
+saved actions from the retained unaided4M/RGB48 final evaluation, using the same
+recorded pixels/actions/outcomes for both actual-initial and trained models.
+This does not allocate GPU work; Pong behavior-rate learning remains active.
+
+The existing `probe_policy_forecasts.py` has a hard-coded RGB64 acceptance check.
+A **staged, unapplied** adapter admits the already-supported32/48/64 geometries
+while preserving full source/checkpoint configuration equality. It also checks
+metadata before constructing the native agent. All24 focused CPU tests pass,
+including geometry/config refusals, reset handling, forecast alignment and
+calibration/test separation. Native code and every active Pong pin are unchanged.
+
+A CPU review verifies the source replay, both finite346-tensor checkpoints and
+all15,376 recorded actions/61,462 emulator frames. The first natural episode per
+lane supplies calibration; the next two supply test data. Selection remains the
+original24 natural episodes, with excess/tails excluded from metrics. No new
+learner, acting policy or game trajectory is created by this preparation.
+
+| Forecast target | Calibration examples / positives | Test examples / positives | Test terminal events |
+|---|---:|---:|---:|
+| One-step reward |4829 /155|9328 /299|16|
+|15-step endpoint reward, stride16 |298 /5|567 /17|0|
+| Sum of rewards over those15-step windows |298 /102|567 /193|0|
+
+Twenty-two long-horizon origins cross resets or lack enough remaining actions
+and are excluded. The zero terminal support at15-step endpoints means that
+sampling cannot assess15-step terminal prediction; one-step terminal evidence
+is also limited. The proposed comparison should emphasize one-step positive
+reward discrimination and15-step reward sums, retaining zero/calibration-mean/
+persistence baselines and unrelated-action conditioning. It must not interpret
+low aggregate error on mostly zero rewards as useful event prediction.
+
+A concrete **unselected**128-action/one-stream frozen check has a60-second cap.
+Its controller refuses unselected launch and requires the active Pong service
+and postprocessing to finish before any separately selected start. It checks
+native/source/device identity, deterministic forecast prefixes, all346 frozen
+tensors, zero learning and the host guard. No full capture is queued. A later
+full comparison, if selected after reviewing bounded cost/execution, would have
+a300-second cap per model and retain the exact same recorded trajectories.
+
+Scalar re-observation uses different categorical draws from the original vector
+actor. Unrelated actions are model-conditioning controls, not observed alternative
+outcomes. Calibration/test episodes are reused development evidence, not held-out
+learner reliability. Forecast errors alone cannot identify the cause of failed
+Qbert learning. No checkpoint training, extension or native rebuild is selected.
+
+Staging and CPU evidence:
+`/x/Temp/kindle-cheap-20261025/qbert-48-policy-forecasts-preparation`.
+Review SHA256`7ecb7664fe7569286666ccd81e7f104e8c6c73ba5444022ace520f54d3954cfa`.
+Bounded queue:
+`/x/Temp/kindle-cheap-20261025/qbert-4m-48-policy-forecast-smoke`;
+controller`run_qbert48_forecast_smoke.py`. Unselected declaration SHA256
+`ef5aee5b7947cbdfd2a1c1d7259ad59d6ce885ac8c22fb45ba7baaad4a599455`.
