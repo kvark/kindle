@@ -319,13 +319,16 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-One fresh Qbert4013 expert-imitation check is selected after the completed
-1009 improvement. Same4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
+One fresh Qbert4013 expert-imitation check is active from23:31:58 UTC/source
+`207c776`, after the completed1009 improvement. Same4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
 original rates,5% episode guidance/cap640/expert1/NOOPweight.05. Keep200k
 /49,939 updates,25-minute cap,100k recovery and fixed final/own-initial24-natural
 evaluations with guidance off. Only seeds and output paths change; runtime79c9a7f
 is unchanged. Owner`kindle-expert-qbert-cap640-seed4013-20261026`. No extension,
 cap increase or automatic successor; no paired unaided Qbert4013 control.
+Startup matches346 same-seed initial tensors, differs from1009, and matches
+248:1/256:2/256:3/264:4/264:5/272:6. First5640 actions/1347 finite reports pass;
+recovery, progress and postprocessing monitors are attached.
 See [selected seed check](experiments/2026-10-26-cdp-qbert-expert-seed4013.md). Check live state before GPU work.
 
 The fresh Qbert expert-imitation comparison completes200k actions/799,509

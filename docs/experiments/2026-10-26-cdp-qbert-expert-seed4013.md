@@ -66,3 +66,22 @@ both pass; neither constructs an agent. Declaration SHA256:
 
 Primary evidence and interpretation:
 [completed expert-imitation result](../results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate).
+
+## Launch and startup
+
+The service starts23:31:58 UTC/source`207c776`, main PID58150, invocation
+`b6d276505dbf4dfbb6aeb25924491881`. The selected declaration is unchanged.
+All346 actual initial tensors match the retained zero-experience same-seed
+reference, while the initial world file differs from1009. The initial checkpoint
+has zero counters; no prior checkpoint is restored.
+
+The first six updates match the primary schedule:
+248:1/256:2/256:3/264:4/264:5/272:6. At5640 complete logged actions,1347 reports
+are finite;27 actions are explicitly trusted and the first sampled expert update
+has occurred. Config, source, all eight environment seeds and guidance seed
+match the declaration. These checks establish startup, not task performance.
+
+Read-only progress,100k recovery and completed-run postprocessing units are
+attached under`kindle-expert-qbert-seed4013-{progress,recovery,post}-20261026`.
+The postprocessor performs curves, coverage, two-seed comparison and expert
+exposure analysis after terminal success. It cannot extend or restart training.
