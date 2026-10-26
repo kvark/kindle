@@ -38,22 +38,25 @@ successes. All audits pass and services exit; no extension.
 completes500k/124939 updates in28m17s: frozen31.0417 versus actual initial0.00,
 24/24 versus0/24 crossing successes, aid disabled in evaluation. All audits pass
 and service exits. Constant-UP CPU reference scores21.6667,0/24. The successful
-1M/RGB32/R32 recipe needs focused seed confirmation; no isolated attribution.
+1M/RGB32/R32 recipe's focused confirmation follows below; no isolated attribution.
 [Pong500k/R32](results/2026-10-25-cdp-cheap-pong.md#r32-and500k-actions) completes
 in48m53s: frozen11.0 versus initial−20.375,23/24 versus0/24 wins. All audits pass
 and service exits; the mean15 gate fails. No unchanged extension.
-Current allocation: [Freeway seed4013 confirmation](experiments/2026-10-26-cdp-compact-freeway-confirmation.md),
-service `kindle-cheap-freeway-32-r32-500k-aided-4013-20261026`. Keep the successful
-1M/RGB32/Auto/B8/T16/H15/R32 recipe,500k/124939 updates and30-minute cap fixed;
-only learner/exploration/evaluation seeds change. The5% persistent16-action aid
-remains training-only. Startup config/source/aid checks, all346 initial tensors
-against Boxing4013 and first updates pass. Check live state before GPU work.
-CLI`1ed07af` adds optional fresh-run imagination length; this recipe retains15.
-All263 vector-runner tests pass; no native rebuild. Prepared runner hashes were
-updated after Pong's audit; the Qbert coefficient100 candidate is still unstarted.
-The [retained Breakout2M frozen check](experiments/2026-10-26-cdp-retained-breakout-auto.md)
-is prepared but unstarted. All346 copied tensors match the shared source;
-only precision metadata changes to Auto. Review Freeway before allocation.
+[Freeway seed4013 confirmation](results/2026-10-25-cdp-cheap-freeway.md#fixed-recipe-seed4013-confirmation)
+also passes:32.000 versus initial0.00,24/24 crossing successes,500k/124939 updates
+in28m50s. All audits pass and service exits. Two compact learners now pass within
+30 minutes each. The [retained Breakout2M frozen check](results/2026-10-26-cdp-retained-breakout-auto.md)
+scores67.5833 with0/24 two-wall successes,21,976 actions in14.127s and zero updates.
+All346 source/copied/frozen tensors match; all audits pass and service exits.
+Only precision metadata changes to Auto. No warm-start learning is allocated.
+Current allocation: [Qbert coefficient100 test](experiments/2026-10-26-cdp-qbert-intrinsic-scale.md),
+service `kindle-cheap-qbert-intrinsic100-200k-20261026`, started03:29:04 UTC.
+Keep4M/RGB48/Auto/B8/T16/H15/R32,200k/49939 updates and30-minute cap fixed; only
+the native bonus coefficient changes from the completed control. Startup full
+config/source checks, all346 initial tensors and first updates pass. No action
+aid; actor_unimix0. Fixed final/actual-initial evaluations and full audits follow.
+Check live state before GPU work. CLI`1ed07af` adds optional imagination length;
+this recipe retains15. All263 vector-runner tests pass; no native rebuild.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

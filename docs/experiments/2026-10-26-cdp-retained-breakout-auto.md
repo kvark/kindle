@@ -46,6 +46,9 @@ Native SHA256`f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Source metadata SHA256`9a37c5d919bc68f58535ec0ce48397e9bd68b22f8c350c40357a8b267ddb3574`;
 copied metadata SHA256`b7c2482902d7be7a10fc8277716d18674880d8a90d7ae9dd92f869eb273b9920`.
 
-Prepared, not started. Review the active Freeway confirmation before selecting
-this short frozen check. The Qbert coefficient100 learning candidate remains
-prepared; no concurrent learner or automatic queue is created.
+Started03:27:18 UTC after the completed Freeway confirmation, source`0b151c6`.
+The frozen check completes21,976 actions/87,859 frames in14.127s: selected
+score67.5833,0/24 two-wall successes. Zero updates; all346 tensors unchanged,
+full CPU replay/video and all audits pass. The service exits successfully.
+See the [completed result](../results/2026-10-26-cdp-retained-breakout-auto.md).
+The declared Qbert coefficient test is selected next; no warm start is allocated.

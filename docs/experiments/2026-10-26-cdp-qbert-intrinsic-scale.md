@@ -49,9 +49,14 @@ adds actor-unimix and imagination-length options; this recipe retains0 and15.
 The declaration records the runner repin after263 vector-runner checks.
 Verify runner identity and
 the entire native recipe. Exact commands, caps and source/control/analysis hashes
-are prepared; the existing CPU recipe check passes with coefficient100.
+are sealed; the existing CPU recipe check passes with coefficient100.
 
-This is a prepared candidate, not an allocated learner. Pong's result is complete;
-review the focused Freeway confirmation before selecting another allocation. Seed1009 is
-reused development data. A useful outcome requires focused seed confirmation;
-no broad queue, held-out benchmark result or five-game reliability claim follows.
+Started03:29:04 UTC, source`0b151c6`, after reviewing the completed Pong, Freeway
+confirmation and retained Breakout frozen checks. The declaration records their
+relevant review hashes and the allocation decision. Startup checks pass: full
+native configuration differs from the control only by intrinsic coefficient,
+3,578,225 parameters, all346 initial tensors equal the control, first updates
+248:1,256:2,256:3 and no action aid. Fixed final/actual-initial evaluations and
+complete audits are pending. Seed1009 is reused development data. A useful
+outcome requires focused seed confirmation; no broad queue, held-out benchmark
+result or five-game reliability claim follows.

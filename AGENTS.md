@@ -92,26 +92,29 @@ Compact aided Freeway1009,1M/RGB32/Auto/B8/T16/R32, completes500k actions and
 124939 updates in28m17s: frozen31.0417 versus actual initial0.00,24/24 versus0/24
 crossing successes. The5% persistent16-action aid is disabled in evaluation;
 constant-UP CPU reference scores21.6667,0/24. All audits pass and the service
-exits. One reused development seed needs focused confirmation; see the Freeway
-result report. Resolution, ratio, budget and runtime change together.
+exits. Focused confirmation follows below; see the Freeway result report.
+Resolution, ratio, budget and runtime change together.
 Pong4M/RGB48/R32 completes500k actions/124939 updates in48m53s: frozen11.0
 versus initial−20.375,23/24 versus0/24 wins. All audits pass and service exits;
 the mean15 gate fails. No unchanged extension. See the cheap-Pong result report.
-Current allocation: Freeway confirmation4013,1M/RGB32/Auto/B8/T16/H15/R32,
-500k actions/124939 expected updates, unchanged30-minute training cap and fixed
-24-natural-episode final/actual-initial evaluations. Keep5% persistent16-action
-training aid; evaluation disables it. Full config/source/aid checks, all346
-initial tensors against Boxing4013 and first updates pass. See
-`docs/experiments/2026-10-26-cdp-compact-freeway-confirmation.md`;
-service owner `kindle-cheap-freeway-32-r32-500k-aided-4013-20261026`. Check its live
-state before further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
+Freeway confirmation4013 also passes the fixed recipe: frozen32.000 versus
+initial0.00,24/24 crossing successes,500k/124939 updates in28m50s. All audits
+pass and service exits. Two compact learners now succeed within30 minutes each.
+The retained Breakout2M policy's frozen AMD Auto check completes:67.5833,
+0/24 two-wall successes,21,976 actions in14.127s and zero updates. All346 tensors
+match the source, all audits pass and service exits. See
+`docs/results/2026-10-26-cdp-retained-breakout-auto.md`; no warm start is allocated.
+Current allocation: Qbert4M/RGB48/Auto/B8/T16/H15/R32, intrinsic coefficient100,
+200k actions/49939 expected updates and unchanged30-minute training cap. Native
+recipe changes only the bonus coefficient from the completed control. Full
+config/source checks, all346 actual-initial tensors against the control and
+first updates pass. No action aid; actor_unimix0. Fixed24-natural-episode
+final/actual-initial evaluations and full audits follow. See
+`docs/experiments/2026-10-26-cdp-qbert-intrinsic-scale.md`; service owner
+`kindle-cheap-qbert-intrinsic100-200k-20261026`. Check its live state before
+further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
 and restores reject overrides.263 vector-runner tests pass; native is unchanged.
-The prepared Qbert coefficient100 test remains unstarted; review Freeway first.
-A short frozen Auto check of the retained Breakout2M policy is also prepared:
-`docs/experiments/2026-10-26-cdp-retained-breakout-auto.md`. All346 copied tensors
-match the shared source; only precision metadata changes. No new learning is
-allocated. Review the active Freeway result before selecting this check.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 

@@ -54,4 +54,9 @@ H15. The sealed declaration records the previous/new runner hashes and263 passin
 vector-runner checks. Startup checks pass: expected config with only seed changed,
 834,673 parameters, exact aid, all346 initial tensors equal Boxing4013 and first
 updates248:1,256:2,256:3. Inspect the named service before further GPU work.
-Fixed final/actual-initial evaluations and the complete audit are pending.
+Completed500k actions/124939 updates in28m50s, within the unchanged cap. Frozen
+final32.000 and24/24 crossing successes versus initial0.00 and0/24; the gate
+passes. All numerical/source/config/aid/checkpoint checks, frozen tensors, full
+CPU replays/videos and host guards pass; the service exits successfully.
+The250k recovery review and final curves are retained. See the
+[completed report](../results/2026-10-25-cdp-cheap-freeway.md#fixed-recipe-seed4013-confirmation).

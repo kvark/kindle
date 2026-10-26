@@ -1,10 +1,10 @@
 # Cheap Freeway development results
 
-The compact RGB32/R32 recipe now passes after 500k actions: **31.042 frozen
-crossings versus actual initial 0.00, with 24/24 task successes in 28m17s of
-training**. The two earlier RGB64/R16 screens below fail. All three runs pass
-their numerical and replay audits. One successful reused development seed needs
-focused confirmation; it is not a seed-reliability result.
+The compact RGB32/R32 recipe passes on two learners after500k actions each:
+**31.042/32.000 frozen crossings,24/24 task successes each, in28m17s/28m50s**.
+Both actual-initial controls score0.00. The second seed keeps the selected recipe
+and budget fixed. All audits pass. This is useful focused confirmation, not
+broad seed reliability. The two earlier RGB64/R16 screens below fail.
 
 ## Short RGB64 screens
 
@@ -115,5 +115,42 @@ The CPU reference is in sibling`freeway-always-up-reference`; review SHA256
 `fd85fab155917f17b87c8c3b564f102bb31f1f1a1e1c31c41d18e6740c395b14`.
 
 This establishes a useful compact aided-training recipe on one reused development
-seed. Focused confirmation remains necessary. The separately declared Pong
-update-budget test starts after this complete review; no broad queue follows.
+seed. The focused confirmation below tests the selected recipe on another learner.
+
+## Fixed-recipe seed4013 confirmation
+
+The [declared confirmation](../experiments/2026-10-26-cdp-compact-freeway-confirmation.md)
+changes learner/exploration seed1009→4013 and evaluation seed4000001009→4000004013.
+The complete native configuration otherwise matches:1M/RGB32/Auto,834,673
+parameters, N8/B8/T16/H15/R32, centered CDP/action-effects1 and actor_unimix0.
+The5% persistent-uniform16-action aid remains training-only. The CLI adds an
+optional imagination-length argument; this run omits it and retains15.
+
+Training completes **500,000 aggregate actions /1,999,960 emulator frames /
+124,939 updates in1,730.358 seconds (28m50s)**,288.96 actions/s, within the same
+1800-second cap. First update248, zero debt,240 natural training episodes and
+final online last50 mean28.94. The aid ledger verifies24,656 overrides. The250k
+recovery checkpoint passes its finite/config/counter audit before fixed500k
+replaces it. There is no favorable-checkpoint selection or extension.
+
+Unaided frozen final scores **32.000**, range29–33, with **24/24 episodes reaching
+25 crossings**, versus actual initial0.00 and0/24. The existing gate passes.
+Each arm selects all24 natural episodes,49,152 actions/196,600 frames;
+final/initial time26.648/26.839s. No excess episodes, nonempty partial tails,
+truncations or updates occur. All346 tensors remain unchanged per arm.
+
+All124,939 numeric reports, full source/config/counters, aid accounting, finite
+checkpoints, full CPU replays/videos and three host guards pass. All346 initial
+tensors match the same-config Boxing4013 initial checkpoint; this is an
+initialization check, not pretraining or a reused Freeway evaluation. The service
+exits successfully. Independently reconciled action/frame/time curves and a
+two-seed comparison are retained. Each seed's online and frozen outcomes remain
+separate;48 evaluation episodes are not48 independent learners.
+
+Source at launch`1ed07af`, native`bfb8c31`, runner`1ed07af`, same RX7900XT/RADV
+and native SHA256 as the primary run. Artifacts:
+`/x/Temp/kindle-cheap-20261025/freeway-1m-32-500k-r32-aided-seed4013`.
+Review SHA256`140815f4660d11b621d407fcb12c446def3842f5e1d0da599731cfa6987d3344`.
+The fixed compact recipe now succeeds on two learners within30 minutes each.
+That supports moving the next learning allocation to an unresolved game;
+broader reliability and five-game completion remain open.
