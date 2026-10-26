@@ -1,10 +1,10 @@
 # Pong B16 actor/critic gradients
 
-**Bounded check passes; select a separate fresh500k/62,454-update learning
-comparison with the original45-minute training cap.** No smoke experience is
+**Bounded check passes; fresh500k/62,454-update learning is active from
+18:57:18 UTC with the original45-minute training cap.** No smoke experience is
 reused. Native and CLI are unchanged. Keep four100k recoveries and fixed
-final/actual-initial24-natural-match evaluation with mean15/90%-wins. Launch
-pending; no cap increase, extension or automatic next allocation.
+final/actual-initial24-natural-match evaluation with mean15/90%-wins. No cap
+increase, extension or automatic next allocation.
 
 The completed B16 Pong recipe takes38m45s instead of B8's49m55s, but frozen
 score falls14.958→11.875, both24/24 wins and below mean15. Doubled global rates,
@@ -93,4 +93,17 @@ controller`e127dd965b01cbbeaa5f3ead54e25d2953a957d421c8fef65360b51767723f4f`;
 queue`8920aaf32480a1ceabba07c7cef44bb8eb78906898e82d67bea93d7c6bb83f76`;
 comparison`7cc9047dfb25af4d3d7896ab1d775f513eff981a93251beb0d10c02502e6f452`;
 watcher`fa40a38be18f10c3f02b07aa5f6c6a39cb2afe97d933d88c1fc5ccc87dacba14`.
-Owner`kindle-cheap-pong-b16-acgrads-500k-20261026`; launch pending.
+Owner`kindle-cheap-pong-b16-acgrads-500k-20261026`; active as recorded below.
+
+
+The fresh run starts18:57:18 UTC/source`7ebd7f4`, invocation
+`fc31a824524e42468bc29cef010c86a5`. Startup passes exact config versus the smoke
+and only the flag changed versus control,3,578,225 trainable parameters, all357
+initial tensors matching the smoke and346 shared tensors matching control.
+First updates376:1/384:2/392:3/400:4 are finite with nonzero initial policy/value
+losses. Fresh counters and no restored experience are verified. Four recovery
+checks, fixed evaluations, complete replays/videos and curves/comparison
+monitoring are attached. Frozen quality remains pending.
+Selected declaration SHA256`b40d8dc902253a5cf60379410cdb9ba3f3bc7d79a507ef9519ff5731b901be3b`;
+selection review`e5eb3c90bdd16b4b0e2395f3b33cdc70ccfb7f6fc77f20fbdcef20689cd492fb`;
+startup`a30a913b2cee766c8559867e02ef0cc4bdb8a3e2c387f013bf69ad3b625d9dc0`.

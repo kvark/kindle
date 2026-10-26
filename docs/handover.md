@@ -206,8 +206,11 @@ original45-minute cap.4M48/Auto/N8/B16/T16/H15/R32, coefficient.01/actor0/full18
 original rates/no aid,1009/eval4000001009; only actor_critic_gradient changes.
 Keep first376, zero debt, four100k recoveries, fixed final/own initial24 natural
 sampled matches, mean15/90%-wins and full357-tensor/replay/guard/curve comparison.
-No smoke experience reused. Launch pending; owner
-`kindle-cheap-pong-b16-acgrads-500k-20261026`. No extension or automatic next run.
+No smoke experience reused. Started18:57:18 UTC/source`7ebd7f4`;357 initial
+tensors match the smoke,346 shared tensors match control and first376:1/384:2/
+392:3/400:4 updates pass. Recovery, fixed evaluations and analysis monitors are
+attached. Owner`kindle-cheap-pong-b16-acgrads-500k-20261026`; frozen quality
+pending. No extension or automatic next run.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,

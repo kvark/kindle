@@ -51,11 +51,13 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Selected fresh Pong4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01/actor0,
+Active fresh Pong4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01/actor0,
 full18/original rates/no aid, actor_critic_gradienttrue. Keep500k/62,454 updates,
 first376, four100k recoveries, zero debt and45-minute training cap. Fixed final/
 own initial24 natural sampled matches retain mean15/90%-wins and full357-tensor/
-replay/guard audits. No smoke experience reused. Launch pending; owner
+replay/guard audits. No smoke experience reused. Started18:57:18 UTC/source
+`7ebd7f4`;357 initial tensors match the smoke,346 shared tensors match control,
+first376:1/384:2/392:3/400:4 updates pass. All monitoring attached. Owner
 `kindle-cheap-pong-b16-acgrads-500k-20261026`. See
 `docs/experiments/2026-10-26-cdp-pong-actor-critic-gradients.md`. Check live state;
 no cap increase, extension or automatic next allocation.
