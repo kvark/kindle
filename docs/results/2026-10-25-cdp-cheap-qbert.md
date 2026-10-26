@@ -460,3 +460,34 @@ comparison`9a81593fb54b680ed8e29bef01ed96fa32f767398e327898c559d41b33b1364d`.
 Source at launch`1c31c4c`, native`bfb8c31`, CLI`22bd61b`, replay`e853818`.
 After review, select the bounded PongH5 test, preserving B8's original update
 cadence and rates while shortening imagined actor/critic rollouts.
+
+## Reward timing and a longer imagination candidate
+
+A 1.54-second CPU analysis of the completed Qbert and four-action Breakout logs
+measures observed reward timing and projects rollout cost. Qbert has 91,787
+origins after aggregate100k actions in completed natural episodes, each with
+30 future actions available. On these identical origins, positive reward occurs
+within the next5/15/30 actions at13.84%/30.81%/45.43%. Current-action reward and
+unfinished tails are excluded. Overlapping origins are correlated; these are
+recorded on-policy trajectories, not independent trials or counterfactual rewards.
+
+Native H15 already bootstraps the critic beyond15, with discount horizon333 and
+lambda.95. The timing result motivates a bounded H30 hypothesis without claiming
+that H15 cannot learn delayed rewards. Longer learned rollouts may accumulate
+error. Adding one copy of the recorded imagination and behavior-training cost
+to measured H15 training time projects1,648.550s (27m29s) for200k/H30. Graph,
+trajectory and unit costs can change; this is not a speed or learning result.
+
+The [H30 candidate](../experiments/2026-10-26-cdp-qbert-long-imagination.md) keeps
+4M/RGB48/B8/T16/R32, original rates, bonus1/full18/no aid,200k actions and49,939
+updates, with a35-minute cap. It is prepared but unselected while Pong B16/R40
+trains. The original15k/90%-first-pyramid gate remains. No GPU work, controller
+sweep or automatic queue follows from the analysis.
+
+Analysis:`/x/Temp/kindle-cheap-20261025/longer-imagination-review.json`, SHA256
+`c83ffa66d39124883d67bf5721ebcc1bf19976d1f8c109eb5fbde03d4f2df5e6`;
+script`review_longer_imagination.py`, SHA256
+`5a6c5ef66629de16dde7077d8ced770f601a1fb4f7ecedf597be04a23b3a3958`.
+The script checks complete source-log/review hashes, action/update counters and
+natural-episode counts. Breakout timing is descriptive context, not a second
+selected candidate. Actor, learner and GPU work remain zero.

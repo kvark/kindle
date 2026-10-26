@@ -200,6 +200,12 @@ resume, extension or automatic next allocation. Check live owner
 `kindle-cheap-pong-b16-r40-intrinsic001-500k-20261026` before GPU work.
 Startup matches all 346 finite initial tensors and the first six R40 updates;
 recovery/evaluation/comparison monitoring is attached. Frozen quality is pending.
+The100k checkpoint passes at15,567 updates and346 finite tensors; captured
+102,400-action progress retains the expected.25 credit. A
+[Qbert H30 candidate](experiments/2026-10-26-cdp-qbert-long-imagination.md) is
+prepared on CPU only, with fixed200k/49,939 updates and35-minute cap. Longer
+rollouts may improve delayed reward learning or compound model error. Review
+Pong's completed result before selection; no automatic queue.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
