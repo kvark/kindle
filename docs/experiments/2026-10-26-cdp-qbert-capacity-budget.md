@@ -45,3 +45,12 @@ compilation and unselected refusal pass. Prepared declaration SHA256
 `231561532523991eb9101f0247456f11e37d4f1ea04e0473fc320501261a6fd5`;
 controller`2ac94ec4f411f3a60343ea0de8d1cc59c5cc75becfda467feedd4a5f436b512d`;
 comparison`6e044784a7f32df0aa20f4bbfe9bf53715666b1e994f20ea39fb6c362110a418`.
+
+Started **10:41:58 UTC**, source`be6c942`, on the same healthy RX7900XT/RADV host.
+Startup verifies the full configuration,14,123,473 parameters, zero counters,
+first updates376:1,384:2,392:3 and346 finite initial tensors. All346 match the
+same-shape check's initial, without an equality claim against4M. Initial metadata
+SHA256`147fc8966b9b6852a5a72aa131bf7bd9d2146964786c49a5eb5b712787d23909`;
+selected declaration`28c43419c871b413650dbb2dc83eb3a49e57a5d843b38345b525c4deb6937f69`.
+The100k recovery watcher and completed-run curve/coverage/comparison automation
+are running. Frozen learning results remain pending.

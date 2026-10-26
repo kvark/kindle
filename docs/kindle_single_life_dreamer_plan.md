@@ -160,6 +160,9 @@ initial/fixed final and full audits/curves/coverage/comparison remain required.
 Capacity and batch change together, with nearly equal sampled positions but
 fewer updates and different initial tensors. Short validation cost is additional.
 No cap increase, retry, resume, extension or automatic next queue.
+Started10:41:58 UTC, source`be6c942`; startup verifies14,123,473 parameters,
+first376 and346 finite initial tensors matching the same-shape check. Full
+audits and completed-run analysis are automated; frozen learning remains pending.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

@@ -60,6 +60,8 @@ cap. Own actual initial/fixed final24-natural-episode evaluation; unchanged
 Capacity and batch change together; no matched-initial claim across model sizes.
 See `docs/experiments/2026-10-26-cdp-qbert-capacity-budget.md`; intended owner
 `kindle-cheap-qbert-12m-48-b16-200k-20261026`. Check live state before GPU work.
+Started10:41:58 UTC from`be6c942`; startup verifies first376,14,123,473 parameters
+and346 initial tensors matching the same-shape check. Audits/analysis are automated.
 The separate16,384-action check takes149.387s and preserves346 tensors on restore;
 service exits10:35:06 UTC. It supplies execution/early cost, not competence.
 No retry, cap increase, extension or automatic next allocation.

@@ -114,6 +114,9 @@ comparison. Capacity and batch change together; sampled positions nearly match
 Artifacts/controller:`qbert-12m-48-b16-r32-200k`, `run_qbert_12m_48_b16_200k.py`;
 intended owner`kindle-cheap-qbert-12m-48-b16-200k-20261026`. Check live state before
 GPU work; the short check is not resumed and no next queue is automatic.
+Started10:41:58 UTC, source`be6c942`; startup verifies14,123,473 parameters,
+first376 and346 finite initial tensors matching the same-shape check. Recovery,
+frozen audits and completed curves/coverage/comparison are automated.
 
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
