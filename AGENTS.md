@@ -38,105 +38,38 @@ qualified c8aeba28 implementation with portable dependencies. Do not switch to
 a separate takeover branch. Keep `runs/`, large data and archived experiment
 ledgers out of Git; old evidence lives on the explicitly named archive branch.
 
-The five-game goal is unfinished. Boxing and Pong win consistently; aided
-Freeway crosses consistently; Breakout and Qbert remain much weaker. Published
+The five-game goal is unfinished. Compact AMD Boxing and aided Freeway pass on
+two learners each, within 30 minutes per learner. Compact Pong wins most matches
+but misses its mean-15 gate; Breakout and Qbert remain much weaker. Published
 long-run scores are aspirations, not matched-budget comparisons. Do not claim
 mastery or CDP superiority from short runs, finite losses or backend speed alone.
+Keep detailed results in the roadmap and linked reports, not another ledger here.
 
-Completed learning test: Breakout B2/T64 versus retained B8/T16, keeping128 replay
-positions/update and replay ratio32. The AMD F16 life finishes2M actions/499843
-updates in11h40m. Frozen500k/final/initial scores are14.71/10.04/1.42, all0/24
-two-wall successes, versus retained58.83/98.21/1.42. Full audits pass and the
-service has exited. See `docs/results/2026-10-25-cdp-amd-takeover.md`.
-Longer sequences also reduce independent sequences; precision, execution path
-and hardware differ too. Do not attribute this result to context length alone.
-Paired early updates now match initial tensors/experience but differ by precision:
-after three updates F16 leaves the first reward projection unchanged, while Auto
-changes654080 of655360 elements. Raw derivatives/mechanism remain unmeasured.
-Auto's500k B2/T64 comparison is complete: frozen15.67 versus F16's14.71,
-initial1.42; all0/24 two-wall successes. It takes2h53m with124843 updates; all
-numeric, checkpoint, frozen and replay audits pass. This does not justify a
-T64 extension. The next allocation uses the user's cheaper game-specific
-recipes; see `docs/kindle_single_life_dreamer_plan.md`. BF16 and
-`KINDLE_DEVICE_TARGETS` remain unavailable.
-The cheap unassisted Freeway1M/B8/T16/R16 trial completes200k actions in8m07s
-but freezes at0/24 crossings, matching its actual initial control. All audits
-pass; see `docs/results/2026-10-25-cdp-cheap-freeway.md`.
-The aided comparison also finishes: frozen0.25 versus initial0.00, six episodes
-cross once but0/24 reach the25-crossing milestone; all audits pass. No extension.
-Native32/48 RGB support and an intermediate4M preset now pass bounded GPU checks,
-including unchanged64x64 checkpoint restore. Boxing1M/RGB32 completes200k in6m03s
-but freezes at−3.875 versus initial0.00 (both10/24 wins); all audits pass.
-Pong4M/RGB48 completes200k in10m22s: frozen−17.125 versus initial−20.375,
-both0/24 wins; all audits pass. The short screens use only about one fifth of
-the historical successful cohorts' updates, so capacity/resolution remain open.
-Fresh Boxing seed2017,1M/RGB32/B8/T16/R32,500k actions now passes: frozen76.8333
-versus initial2.875,24/24 wins,124939 updates in28m22s. All audits pass and the
-service exits. Fresh confirmation seed4013 now also passes: frozen79.1667 versus
-initial−0.625,24/24 wins,500k actions/124939 updates in28m13s. The recipe and cap
-are unchanged; all audits pass and the service exits. Two useful cheap learners
-do not establish broad seed reliability. See the cheap-Boxing result report.
-Qbert4M/RGB48/R32 completes200k actions in19m45s: frozen809.375 versus180.2083,
-0/24 first pyramids. Mean first-pyramid coverage improves5.83→16.63 of21 cubes,
-but the task gate fails. All audits pass; no extension. See the cheap-Qbert report.
-Breakout4M/RGB64/R32 completes200k in22m30s: frozen6.2083 versus1.375,0/24
-two-wall successes, all audits pass. One selected episode waits12061 actions
-after a lost life before choosing FIRE; CPU replay verifies this stall. See
-`docs/results/2026-10-26-cdp-cheap-breakout.md`; no extension.
-Breakout's1% mixture test also completes: frozen7.0833 versus initial1.375 in
-22m29s, longest selected no-FIRE gap447 versus control12115. The original trained
-weights with only frozen mixture score6.0833 and gap724 in9.8s, zero updates.
-All three policies remain0/24 two-wall successes; all audits pass and services
-exit. See `docs/results/2026-10-26-cdp-breakout-unimix.md`; no extension.
-Compact aided Freeway1009,1M/RGB32/Auto/B8/T16/R32, completes500k actions and
-124939 updates in28m17s: frozen31.0417 versus actual initial0.00,24/24 versus0/24
-crossing successes. The5% persistent16-action aid is disabled in evaluation;
-constant-UP CPU reference scores21.6667,0/24. All audits pass and the service
-exits. Focused confirmation follows below; see the Freeway result report.
-Resolution, ratio, budget and runtime change together.
-Pong4M/RGB48/R32 completes500k actions/124939 updates in48m53s: frozen11.0
-versus initial−20.375,23/24 versus0/24 wins. All audits pass and service exits;
-the mean15 gate fails. No unchanged extension. See the cheap-Pong result report.
-Freeway confirmation4013 also passes the fixed recipe: frozen32.000 versus
-initial0.00,24/24 crossing successes,500k/124939 updates in28m50s. All audits
-pass and service exits. Two compact learners now succeed within30 minutes each.
-The retained Breakout2M policy's frozen AMD Auto check completes:67.5833,
-0/24 two-wall successes,21,976 actions in14.127s and zero updates. All346 tensors
-match the source, all audits pass and service exits. See
-`docs/results/2026-10-26-cdp-retained-breakout-auto.md`; its warm start is declared separately below.
-Qbert coefficient100 completes200k/49939 updates in20m12s: frozen809.375,
-0/24 pyramids, matching the coefficient1 score but reducing mean coverage
-16.625→13.708 of21 cubes. All audits pass and service exits. No extension.
-Breakout H5 warm start completes50k new actions/12439 updates in8m02s but
-regresses frozen67.5833→27.2083, both0/24 two-wall successes. Frozen source trace
-matches H15 before learning; all audits pass and service exits. Retain the source,
-no extension. See `docs/results/2026-10-26-cdp-breakout-short-imagination.md`.
-Pong4013 confirmation completes500k/124939 updates in50m14s: frozen7.333 and
-22/24 wins versus own initial−20.333 and0/24. All audits and curves pass; service
-exits. Both compact Pong learners win most matches but miss mean15; no extension.
-Six-action Qbert completes200k/49939 updates in18m21s: frozen605.208 versus own
-initial148.958,0/24 pyramids, mean coverage10.167/21. Score/coverage are lower than
-the full18 control. All audits/curves pass and service exits; no extension.
-The separate CPU Breakout pixel follower scores11.333,0/24 two-wall successes,
-with full replay. No reference controller or RAM enters learning.
-Compact Breakout H5 stops at the45-minute cap:487,736 actions/121,873 updates,
-frozen8.458 versus own initial1.375,0/24 two-wall successes. The shared prefix
-costs18.06% less wall time than H15; the larger-budget recipe still fails the
-task. Numerical/checkpoint/accounting and frozen replay checks pass, while the
-original training guard/controller retain their time-budget failure. Both
-services exit. See `docs/results/2026-10-26-cdp-breakout-compact-h5-budget.md`.
-Current allocation: Pong intrinsic coefficient.01, otherwise fixed4M/RGB48/Auto/
-N8/B8/T16/H15/R32,500k actions and55-minute cap, fresh1009/eval4000001009.
-Own initial/fixed final controls and mean15/90%-win gate remain. No aid or native
-change. See `docs/experiments/2026-10-26-cdp-pong-small-intrinsic.md`; service
-owner `kindle-cheap-pong-intrinsic001-500k-20261026`. Check live state before GPU
-work. Started06:36:15 UTC, source`12a6553`. Full config/counters, finite initial
-weights matching all346 control tensors and first updates pass;3,578,225 parameters.
-Fixed evaluations/full audit follow. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
-CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
-and restores reject overrides.263 vector-runner tests pass; native is unchanged.
-Do not restart completed training, old queues, broad seed campaigns or unchanged
-long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
+Use Auto precision for current AMD learning. BF16 and `KINDLE_DEVICE_TARGETS`
+remain unavailable. After three paired early updates, F16 leaves the first reward
+projection unchanged while Auto changes it; raw derivatives and the mechanism
+remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
+See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
+
+Current allocation: Pong intrinsic coefficient .01, otherwise fixed 4M/RGB48/
+Auto/N8/B8/T16/H15/R32, 500k actions and a 55-minute cap, fresh seed 1009/evaluation
+4000001009. Own actual-initial/fixed-final controls and mean15/90%-win gate remain.
+No external aid or native change. See
+`docs/experiments/2026-10-26-cdp-pong-small-intrinsic.md`; service owner
+`kindle-cheap-pong-intrinsic001-500k-20261026`. Check live state before GPU work.
+Started 06:36:15 UTC, source `12a6553`, with matched initial tensors and verified
+startup. Fixed evaluations and full audit follow; no automatic extension.
+The four-action Breakout candidate is prepared only, pending this outcome:
+`docs/experiments/2026-10-26-cdp-breakout-minimal-actions.md`.
+
+Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
+`1ed07af`, CPU replay `e853818`. The active declaration pins exact runtime/script
+hashes; the handover locates the build receipt. Native 32/48/64 geometry and the
+intermediate 4M preset pass bounded training/frozen checks, including 64 restore.
+The CLI exposes imagination length for fresh runs; defaults retain 15 and
+restores reject overrides. Do not restart completed training, old queues, broad
+seed campaigns or unchanged long extensions. Keep single-actor learning ahead
+of swarms/concurrent learners.
 
 ## Experiment practice
 
