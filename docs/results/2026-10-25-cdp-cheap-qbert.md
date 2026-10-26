@@ -204,7 +204,7 @@ actions estimates1,582.620s (**26.38 minutes**), including two hypothetical save
 but excluding construction. That leaves217s against a proposed30-minute cap
 which would include construction. This is a cost estimate, **not a measured
 speedup, learning prediction or selected allocation**. Trajectories and unit
-costs can change. No GPU work, new queue, extension or cap increase occurs.
+costs can change. The calculation performs no GPU work or training extension.
 If selected later, experience and ratio change together; retain own initial/
 fixed-final controls and the unchanged15k/90%-pyramid gate. The active Pong
 confirmation and prepared Breakout candidate are unaffected.
@@ -214,3 +214,10 @@ SHA256`c79bf10b5d53c07885687ba547689a2984f37d44371b1c287ca972a2209c2db2`.
 Script:`/x/Temp/kindle-cheap-20261025/review_qbert_experience_budget.py`.
 The receipt pins completed review/curve/coverage/R16-control identities and
 retains the formula, stage costs, observed curve points and assumptions.
+
+The [candidate controller and queue](../experiments/2026-10-26-cdp-qbert-experience-budget.md)
+are subsequently prepared, with complete queue-difference checks and refusal
+before GPU artifacts while unselected. Its R16 recovery checker passes against
+an actual completed R16 log/checkpoint and rejects invalid counters. It remains
+an option pending review of the active Pong confirmation; no GPU launch or
+automatic queue follows from this preparation.

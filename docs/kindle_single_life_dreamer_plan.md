@@ -127,11 +127,13 @@ CPU check. Action dimensions, initial weights and policy probabilities change,
 so retain an own initial control and label the protocol variant. It stays
 unselected pending the focused Pong confirmation; no GPU result or established benefit.
 
-For later Qbert review, a [CPU stage-cost estimate](results/2026-10-25-cdp-cheap-qbert.md#cost-estimate-for-more-experience-at-lower-replay-ratio)
-puts fresh full18/4M/RGB48/H15,500k actions at ratio16 near26.4 minutes, with
-62,470 expected updates. This would trade more experience for fewer updates per
-action within a proposed30-minute cap. It is an unselected hypothesis, not a
-new benchmark or learning result; no queue is created and the task gate stays fixed.
+For later Qbert review, the [prepared experience-budget candidate](experiments/2026-10-26-cdp-qbert-experience-budget.md)
+uses fresh full18/4M/RGB48/H15,500k actions at ratio16,62,470 expected updates
+and the same30-minute cap. A CPU stage-cost estimate suggests26.4 minutes; it
+does not predict runtime or learning. Configuration/preflight checks and an R16
+recovery audit against completed evidence pass. This remains unselected, with
+no GPU work or automatic queue; own initial/fixed final controls and the task
+gate stay fixed. Review the active Pong outcome before choosing an allocation.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
