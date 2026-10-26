@@ -66,3 +66,26 @@ current one. Timing and outcome differences do not isolate a mechanism.
 Seed1009 and the teacher cap are reused development choices, not held-out tests.
 Teacher-assisted online scores cannot establish unaided learning. Any useful
 result needs a separately selected seed confirmation; none is queued here.
+
+## Launch and startup
+
+Service starts23:01:34 UTC/source`bae5adc`, invocation
+`0c38a5bbd50441a9b5a89e0f59c2ac8f`, main PID55861. The immutable selected
+declaration SHA256 is
+`6d4669e507036a109aac4257e232b9582acfdc7fe1e3637ef488c85bb53ae319`.
+Read-only startup review matches all346 actual initial tensors and the first six
+updates against both retained control and qualified smoke:
+248:1/256:2/256:3/264:4/264:5/272:6. At8480 complete logged actions,2057 learner
+reports are finite,755 actions are explicitly trusted and1220 reports contain
+expert labels. These are execution checks; frozen competence remains unmeasured.
+
+A handwritten startup expectation incorrectly placed the second update at248.
+The CPU checker was corrected to compare the saved control/smoke traces, which
+match the live run. `startup-checker-correction.json` retains the original
+expectation and correction. The learner and GPU stages were not restarted.
+
+Separate read-only units are attached under the same `kindle-expert-qbert-cap640`
+prefix: `recovery-20261026` audits100k before replacement, `progress-20261026`
+observes completed log prefixes, and `post-20261026` waits for terminal success
+before plotting/comparison. Their deadlines do not extend the learner cap or
+launch another GPU allocation. Consult live service state before any GPU work.

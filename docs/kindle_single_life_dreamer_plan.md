@@ -318,13 +318,17 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-A fresh Qbert expert-imitation comparison is selected:200k actions/49,939
+A fresh Qbert expert-imitation comparison is active from23:01:34 UTC/source
+`bae5adc`:200k actions/49,939
 updates within25minutes,4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
 original rates, fresh1009/eval4000001009. Keep5% episode guidance/cap640; add
 expert scale1/NOOPweight.05. Fixed final/actual-initial24-natural assessments
 have no aid;100k recovery/full audits/replays/guards/comparison remain required.
 Owner`kindle-expert-qbert-cap640-200k-20261026`, isolated79c9a7f runtime. No
 smoke experience reuse, cap increase, extension or automatic next allocation.
+Startup matches346 initial tensors and the control/smoke sequence
+248:1/256:2/256:3/264:4/264:5/272:6;8480 actions/2057 finite reports checked.
+Recovery, progress and CPU postprocessing monitors are attached.
 See [selected protocol](experiments/2026-10-26-cdp-qbert-expert-imitation.md). Check live state before GPU work.
 
 Optional native expert imitation passes127 Rust CPU tests/strict Clippy,
