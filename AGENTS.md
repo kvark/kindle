@@ -88,12 +88,14 @@ The CPU startup import failure remains recorded; no GPU stage repeated.
 CLI`a2c467c` passes460 CPU tests; native unchanged. See
 [the completed comparison](docs/results/2026-10-25-cdp-cheap-pong.md#behavior-rate-doubling-gives-a-small-gain-but-still-misses-the-gate).
 
-After reviewing Pong completion, select only the prepared QbertRGB48 frozen
-128-action reward-forecast check, with60-second cap and zero learning.
-The staged helper passes24 focused CPU tests; same saved trajectory and finite
-346-tensor checkpoint. Owner`kindle-cheap-qbert-48-forecast-smoke-20261026`.
-Review bounded cost and invariance before any separate full diagnostic selection.
-No new training allocation. Check live state before GPU work.
+QbertRGB48 bounded reward forecasts pass128 recorded actions in2.675s, zero
+learning and346 unchanged tensors; guard passes, service exits22:25:46 UTC.
+The applied helper passes24 CPU tests. Separately select the fixed trained/initial
+forecast comparison on the same15,376 saved actions/61,462 frames per model,
+with300-second cap per model and zero learning. First natural episode per lane
+calibrates baselines; next two test. H15 has no terminal support; forecast errors
+alone cannot diagnose failed learning. Owner`kindle-cheap-qbert-48-forecasts-20261026`.
+No new training or automatic next allocation. Check live state before GPU work.
 
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions
 in0.452s;512 verified overrides,346 matched initial/unchanged frozen tensors,

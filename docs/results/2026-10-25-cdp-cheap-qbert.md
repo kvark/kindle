@@ -1176,3 +1176,33 @@ The prepared declaration is preserved before selection; exact checkpoint files
 and the completed Pong review are added to its pins. No native rebuild or new
 training trajectory is involved. A full initial/final forecast comparison
 requires a separate cost/execution review after this check; it is not queued.
+
+
+## RGB48 bounded success and selected fixed forecast comparison
+
+The bounded check starts22:25:43 and exits successfully22:25:46 UTC. It replays
+128 recorded actions in2.674757s total, including0.392923s collection, with zero
+updates, all346 tensors unchanged, repeatable forecast prefixes, unchanged
+belief/counters during forecast calls, finite predictions and a passing guard.
+Review SHA256`e3f485033cc6e1e7351315f6fdbf57fe0f76e0cd936d33302912e27cf2f2c313`.
+This validates execution and cost, not predictive quality. The exact staged
+geometry helper is applied, with24 CPU tests passing in0.10s; native unchanged.
+
+After reviewing that cost, select the **fixed final and actual-initial** models
+on the same15,376 recorded actions/61,462 emulator frames per model. Each frozen
+capture has a300-second cap, with720 seconds for the service. Zero updates,
+all346 tensors unchanged, exact source/replay/checkpoint/runtime identities,
+all8 stream pixel hashes and action/reward/boundary/split arrays must match.
+Retain horizons1/15 withstride16 for the latter, first natural episode per lane
+for baseline calibration and next two for test. Report zero/calibration-mean/
+persistence and unrelated-action baselines, emphasizing sparse positive events
+and15-step reward sums. The existing299 one-step test reward events and193
+positive15-step windows support that assessment;16/0 terminal events do not
+support a terminal-quality conclusion. No new trajectory or training allocation.
+
+Controller`run_qbert48_forecasts.py` compiles and refuses unselected launch.
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-4m-48-policy-forecasts`;
+owner`kindle-cheap-qbert-48-forecasts-20261026`. The declaration pins source,
+checkpoints, retained replay, completed smoke and exact applied tests. Forecast
+errors remain descriptive, not a causal explanation for poor policy transfer;
+no extension or next GPU allocation follows automatically.

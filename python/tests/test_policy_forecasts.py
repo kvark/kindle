@@ -5,7 +5,10 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parents[1]/'examples'))
-from probe_policy_forecasts import forecast_targets, replay_reset, reward_metrics, stream_records, summarize
+from probe_policy_forecasts import (
+    forecast_targets, replay_reset, reward_metrics, stream_records, summarize,
+    validate_checkpoint_config,
+)
 
 
 def transition(frame, terminal=False):
@@ -143,3 +146,20 @@ def test_recorded_reset_at_stream_end_does_not_open_an_unused_actor_episode(cont
     if not continuing:
         actor.begin_episode('next-stream')
         assert actor.arrivals == ['next-stream']
+
+
+@pytest.mark.parametrize('kind', ['rgb32', 'rgb48', 'rgb64'])
+def test_geometry_does_not_relax_full_config_equality(kind):
+    source = dict(observation_kind=kind, horizon=333, action_count=18, seed=1009)
+    validate_checkpoint_config(source, dict(source))
+    for key, value in [('horizon', 100), ('action_count', 6), ('seed', 4013),
+                       ('observation_kind', 'rgb64' if kind != 'rgb64' else 'rgb48')]:
+        with pytest.raises(ValueError, match='configuration differs'):
+            validate_checkpoint_config(source, dict(source, **{key: value}))
+
+
+@pytest.mark.parametrize('kind', ['features', 'rgb16', None])
+def test_unsupported_frontend_is_rejected_even_when_configs_match(kind):
+    config = dict(observation_kind=kind)
+    with pytest.raises(ValueError, match='configuration differs'):
+        validate_checkpoint_config(config, config)

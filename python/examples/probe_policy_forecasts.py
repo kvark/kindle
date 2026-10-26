@@ -151,6 +151,12 @@ def replay_reset(environment, agent, *, continuing):
         agent.begin_episode(frame)
 
 
+def validate_checkpoint_config(source_config, checkpoint_config):
+    if (checkpoint_config != source_config
+            or checkpoint_config.get('observation_kind') not in ('rgb32', 'rgb48', 'rgb64')):
+        raise ValueError('checkpoint configuration differs from source policy')
+
+
 def capture(log, checkpoint, manifest, replay_file, output, smoke):
     import ale_py
     import gymnasium as gym
@@ -163,6 +169,8 @@ def capture(log, checkpoint, manifest, replay_file, output, smoke):
     output.mkdir(exist_ok=False)
     source = read_run(log, allow_capped_evaluation=True)
     header = source['start']
+    checkpoint_config = json.loads((checkpoint/'metadata.json').read_text())['config']
+    validate_checkpoint_config(header['config'], checkpoint_config)
     selected = cohort(source['episodes'], natural_only=True)
     replay = json.loads(replay_file.read_text())
     if not selected['complete'] or source['accounting']['updates'] or replay['source_log_sha256'] != source['sha256']:
@@ -176,8 +184,7 @@ def capture(log, checkpoint, manifest, replay_file, output, smoke):
         raise ValueError('incomplete action ledger')
     started = time.monotonic()
     agent = kindle.Agent.restore_rgb(str(checkpoint))
-    if agent.config != header['config'] or agent.config['observation_kind'] != 'rgb64':
-        raise ValueError('checkpoint configuration differs from source policy')
+    validate_checkpoint_config(header['config'], agent.config)
     initial_updates, initial_actions = agent.learner_step, agent.environment_step
     result = dict(protocol=PROTOCOL, status='running', smoke=smoke, checkpoint=checkpoint_identity(checkpoint),
         source_log=str(log), source_log_sha256=source['sha256'], replay_sha256=sha256_file(replay_file),
