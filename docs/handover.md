@@ -61,14 +61,16 @@ The [Pong4013 confirmation](results/2026-10-25-cdp-cheap-pong.md#fixed-recipe-se
 completes500k/124939 updates in50m14s: frozen7.333 and22/24 wins versus own
 initial−20.333 and0/24. All audits and curves pass; service exits successfully.
 Both compact Pong learners win most matches but miss mean15. No extension.
-Selected next: the [six-action Qbert test](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
+Current allocation: the [six-action Qbert test](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
 4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient1,200k actions and30-minute cap.
 Its replay support passes138 CPU checks staged and applied after Pong's full
 audit/exit. Native and training CLI remain unchanged. Changing action count
 changes initialization and policy probabilities; retain its own initial control.
 Artifacts/controller: `qbert-4m-48-r32-minimal-200k`, `run_qbert_minimal_200k.py`;
-intended owner `kindle-cheap-qbert-minimal-200k-20261026`. Check live state before
-GPU work. Startup follows; no automatic next allocation or extension.
+owner `kindle-cheap-qbert-minimal-200k-20261026`, started05:07:21 UTC, source`e853818`.
+Full config/counters, finite own initial checkpoint and first updates pass;
+3,568,997 actual parameters. Fixed evaluations/full audit follow. Check live
+state before GPU work; no automatic next allocation or extension.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

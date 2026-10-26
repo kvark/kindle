@@ -69,4 +69,13 @@ CPU action review: `qbert-action-vocabulary-review.json`, SHA256
 `276f2d6483c4b8247975951dfd0bc7e3c240f3220f7fb5ab7a49e59258fe3d54`.
 Staged replay patch and validation: `qbert-minimal-replay/` in the same artifact
 root. Selection allows this one bounded learner; no automatic next allocation
-or extension follows. Record startup checks and the actual parameter count below.
+or extension follows.
+
+Started05:07:21 UTC, source`e853818`. Startup checks pass: the full native config
+differs from the coefficient1 control only by action_count18→6;3,568,997 actual
+parameters, no aid, zero starting counters, finite346-tensor own actual-initial
+checkpoint and first updates248:1,256:2,256:3. The declared six-action replay
+identity passes. Initial metadata SHA256
+`c92daee765d7512a68372b23fcd7d365b63192ffe1275710d914d8089c740130`.
+The fixed200k final and own actual-initial evaluations remain pending. Runtime
+and caps stay fixed; early finite updates do not establish a learning gain.

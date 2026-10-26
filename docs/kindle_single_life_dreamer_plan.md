@@ -80,14 +80,16 @@ own initial−20.333 and0/24. All audits and curves pass; service exits successf
 Both compact learners win most matches but miss the unchanged mean15 gate.
 Selected seeds are not held out; no unchanged extension or broad campaign.
 
-**Selected next allocation:** [Qbert with six action choices](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
+**Current allocation:** [Qbert with six action choices](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
 keeping4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient1 and200k/30-minute cap. The
 existing adapter preserves timing/sticky settings; a bounded CPU comparison
 matches the shared six actions. Explicit Qbert replay support passes138 checks
 both staged and applied after Pong's audit/exit. Changing action count changes
 initialization and policy probabilities; retain an own initial control and
 label the protocol variant. The mean15k/90%-pyramid gate is unchanged. One
-bounded learner, no automatic next allocation or extension; startup follows.
+bounded learner, no automatic next allocation or extension. Started05:07:21 UTC;
+startup full-config/counter checks, finite own initial checkpoint and first
+updates pass. Actual3,568,997 parameters. Fixed evaluations and full audit follow.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

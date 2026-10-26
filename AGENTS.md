@@ -114,15 +114,17 @@ no extension. See `docs/results/2026-10-26-cdp-breakout-short-imagination.md`.
 Pong4013 confirmation completes500k/124939 updates in50m14s: frozen7.333 and
 22/24 wins versus own initial−20.333 and0/24. All audits and curves pass; service
 exits. Both compact Pong learners win most matches but miss mean15; no extension.
-Selected next allocation: six-action Qbert,4M/RGB48/Auto/N8/B8/T16/H15/R32,
+Current allocation: six-action Qbert,4M/RGB48/Auto/N8/B8/T16/H15/R32,
 coefficient1,200k actions/49939 expected updates and30-minute cap. The existing
 minimal protocol preserves timing/sticky settings. Explicit Qbert CPU replay
 passes138 checks staged and applied after Pong's full audit/exit; native and
 training CLI unchanged. Action count changes initialization and policy
 probabilities; retain an own actual-initial control and label this protocol
-variant. See `docs/experiments/2026-10-26-cdp-qbert-minimal-actions.md`; intended
+variant. See `docs/experiments/2026-10-26-cdp-qbert-minimal-actions.md`;
 owner `kindle-cheap-qbert-minimal-200k-20261026`. Check live state before GPU work.
-Startup follows. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
+Started05:07:21 UTC, source`e853818`. Full config/counter checks, finite own initial
+checkpoint and first updates pass;3,568,997 actual parameters. Fixed evaluations
+and full audit follow. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
 and restores reject overrides.263 vector-runner tests pass; native is unchanged.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
