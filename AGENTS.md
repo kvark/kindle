@@ -51,8 +51,9 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Qbert4M/RGB48/Auto/N8/B8/T16/H30/R32, selected after the
-interrupted Pong review and saved200k frozen assessment. Fresh1009/eval4000001009,
+Current allocation: Qbert4M/RGB48/Auto/N8/B8/T16/H30/R32, active from15:59:07
+UTC/source`c1e00c2` after the interrupted Pong review and saved200k assessment.
+Startup matches346 finite initial tensors and first248:1/256:2/256:3 updates. Fresh1009/eval4000001009,
 coefficient1/actor0, original rates/full18/no aid; only native imagination15→30
 changes. Keep200k actions/49,939 updates,100k recovery and35-minute cap. Own
 initial/fixed final24-natural-episode controls retain15k/90%-pyramids and full

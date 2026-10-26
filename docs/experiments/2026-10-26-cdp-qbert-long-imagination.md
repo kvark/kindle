@@ -73,3 +73,23 @@ Refreshed queue SHA256
 `0bfe9bfb5e99969f764b0b4ef9a037f012d591425ee957718a5dbdd67944c920`;
 prepared declaration`5bc9068fc6a4ad2a71788abb843b8577301a457c33bf0dd08f4ed31222e29dfc`;
 comparison`58ef0953484d1e01f828d183e407933796145c581ea00c8aa1c2067fc3c39ee2`.
+
+## Started on the new boot
+
+Started October26 at15:59:07 UTC, source
+`c1e00c2ac5218f1c084c3531a8acff862e0c78af`, owner
+`kindle-cheap-qbert-h30-200k-20261026`, invocation
+`437f4f496c5b493f99478c2feccfedf8`. Selection verifies the interrupted Pong
+assessment and its CPU correction, bounded new-boot restore, no concurrent
+learner, clean pushed source and exact runtime/script/manifest/host pins.
+Selected declaration SHA256
+`5da417df7aba5b5c08225ba987513442f3f244687fa67e76bca00d79c6d22ca7`.
+
+Startup passes full native config equality except H15→30,3,578,225 parameters,
+fresh1009/no aid, all346 finite initial tensors matching the H15 control and
+numeric reports at248:1/256:2/256:3. Initial metadata SHA256
+`7b35b954397a225e614854a22a753338831388ad20f798d7c566762b54c07a8b`;
+startup review`2c33f6e2980ea2d0846c2515b1882230cc0a6a3cddf3dfa786fdffcbb2a15c86`.
+Recovery monitoring, fixed-final/own-initial evaluation, full CPU replay/video,
+coverage, curves and completed comparison are attached. Startup establishes
+execution and initial equality; frozen learning remains pending.
