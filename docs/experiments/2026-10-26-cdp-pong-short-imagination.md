@@ -85,3 +85,8 @@ strict reports through207,272 actions. Captured204,800-action progress is926.108
 with zero debt. Checkpoint metadata SHA256
 `50ec20e7a2541346b755690063138165142fa2cf4dec7ef9d9272f207b6918b2`.
 The service continues toward the fixed500k endpoint; no frozen result yet.
+
+The300k recovery passes at74,939 updates,346 finite tensors and76,307 strict
+reports through305,480 actions. Captured303,104-action progress is1,377.361s
+with zero debt. Checkpoint metadata SHA256
+`85d9f29bb41da9da75289bf4018fc0beb837718f9b3708d0115c9aa238d9b9dc`.
