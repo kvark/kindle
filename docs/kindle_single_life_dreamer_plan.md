@@ -23,6 +23,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same, coefficient.01, seed1009](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-improves-the-fixed-budget-result) |500k /124,939|49m55s|14.958 /−20.375|24/24 wins; mean15 narrowly fails|
 | [Same, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-seed4013-confirmation) |500k /124,939|49m58s|14.000 /−20.333|24/24 wins; mean15 fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
+| [Same, capped pixel guidance + expert imitation](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate) |200k /49,939|20m11s|1083.333 /180.208|2/24 first pyramids; gate still fails|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -39,7 +40,7 @@ Boxing's cheap AMD recipe now passes on two fresh learners, each within30 minute
 this is useful confirmation, not broad seed reliability. The retained
 same-seed1M/RGB64/500k/R32 control takes65m38s and scores71.625. Geometry, runtime
 and GPU differ, so the2.31× wall-cost comparison does not isolate resolution.
-Qbert's mean first-pyramid coverage improves5.83→16.63 of21 cubes, with a maximum
+Unaided Qbert's mean first-pyramid coverage improves5.83→16.63 of21 cubes, with a maximum
 of20, but its task gate fails. Neither these results nor short-screen failures
 establish a universal capacity or resolution rule.
 Qbert's [completed coefficient100 test](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result)
@@ -318,18 +319,17 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-A fresh Qbert expert-imitation comparison is active from23:01:34 UTC/source
-`bae5adc`:200k actions/49,939
-updates within25minutes,4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
-original rates, fresh1009/eval4000001009. Keep5% episode guidance/cap640; add
-expert scale1/NOOPweight.05. Fixed final/actual-initial24-natural assessments
-have no aid;100k recovery/full audits/replays/guards/comparison remain required.
-Owner`kindle-expert-qbert-cap640-200k-20261026`, isolated79c9a7f runtime. No
-smoke experience reuse, cap increase, extension or automatic next allocation.
-Startup matches346 initial tensors and the control/smoke sequence
-248:1/256:2/256:3/264:4/264:5/272:6;8480 actions/2057 finite reports checked.
-Recovery, progress and CPU postprocessing monitors are attached.
-See [selected protocol](experiments/2026-10-26-cdp-qbert-expert-imitation.md). Check live state before GPU work.
+The fresh Qbert expert-imitation comparison completes200k actions/799,509
+frames/49,939 updates in20m11s. Frozen1083.333/2of24 first pyramids improves
+unaided809.375/0 and capped guidance750.000/0; coverage18.625/21 versus16.625
+and16.208. Own initial180.208/0. All audits,100k recovery,346 initial/frozen
+tensors, matched initial traces, full pixel replay, guards and comparison pass;
+service exits23:23:23 UTC.5% episode guidance/cap640 actually labels14,080
+actions (7.040%); expert scale1/NOOPweight.05. Native79c9a7f/runtime
+`/x/Temp/kindle-expert-20261026/runtime`. Retain as a candidate for a separately
+selected fresh-seed check; the mean15000/90% gate still fails. No GPU allocation
+is active or queued, no extension or automatic successor. Check live state.
+See [completed result](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate).
 
 Optional native expert imitation passes127 Rust CPU tests/strict Clippy,
 477 packaged Python tests/binding Clippy, analytic GPU gradients and an actor-
@@ -341,7 +341,7 @@ exits22:51:05 UTC. Native`79c9a7f`, isolated runtime
 `/x/Temp/kindle-expert-20261026/runtime`; original native retained. Scale1,
 NOOPweight.05,5% episode guidance/cap640; no natural-episode competence measured.
 Build cache released after packaging. The bounded checks are complete; the
-separately selected full comparison is described below.
+completed full comparison is described above.
 See [bounded result](results/2026-10-25-cdp-cheap-qbert.md#native-expert-imitation-smoke-passes-task-benefit-remains-unmeasured).
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module

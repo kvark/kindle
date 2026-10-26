@@ -98,18 +98,17 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](docs/results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-A fresh Qbert expert-imitation comparison is active from23:01:34 UTC/source
-`bae5adc`:200k actions/49,939
-updates within25minutes,4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
-original rates, fresh1009/eval4000001009. Keep5% episode guidance/cap640; add
-expert scale1/NOOPweight.05. Fixed final/actual-initial24-natural assessments
-have no aid;100k recovery/full audits/replays/guards/comparison remain required.
-Owner`kindle-expert-qbert-cap640-200k-20261026`, isolated79c9a7f runtime. No
-smoke experience reuse, cap increase, extension or automatic next allocation.
-Startup matches346 initial tensors and the control/smoke sequence
-248:1/256:2/256:3/264:4/264:5/272:6;8480 actions/2057 finite reports checked.
-Recovery, progress and CPU postprocessing monitors are attached.
-See [selected protocol](docs/experiments/2026-10-26-cdp-qbert-expert-imitation.md). Check live state before GPU work.
+The fresh Qbert expert-imitation comparison completes200k actions/799,509
+frames/49,939 updates in20m11s. Frozen1083.333/2of24 first pyramids improves
+unaided809.375/0 and capped guidance750.000/0; coverage18.625/21 versus16.625
+and16.208. Own initial180.208/0. All audits,100k recovery,346 initial/frozen
+tensors, matched initial traces, full pixel replay, guards and comparison pass;
+service exits23:23:23 UTC.5% episode guidance/cap640 actually labels14,080
+actions (7.040%); expert scale1/NOOPweight.05. Native79c9a7f/runtime
+`/x/Temp/kindle-expert-20261026/runtime`. Retain as a candidate for a separately
+selected fresh-seed check; the mean15000/90% gate still fails. No GPU allocation
+is active or queued, no extension or automatic successor. Check live state.
+See [completed result](docs/results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate).
 
 Optional native expert imitation passes127 Rust CPU tests/strict Clippy,
 477 packaged Python tests/binding Clippy, analytic GPU gradients and an actor-
@@ -121,7 +120,7 @@ exits22:51:05 UTC. Native`79c9a7f`, isolated runtime
 `/x/Temp/kindle-expert-20261026/runtime`; original native retained. Scale1,
 NOOPweight.05,5% episode guidance/cap640; no natural-episode competence measured.
 Build cache released after packaging. The bounded checks are complete; the
-separately selected full comparison is described below.
+completed full comparison is described above.
 See [bounded result](docs/results/2026-10-25-cdp-cheap-qbert.md#native-expert-imitation-smoke-passes-task-benefit-remains-unmeasured).
 
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions

@@ -1,5 +1,12 @@
 # Qbert: explicit expert actor imitation at the existing 200k budget
 
+**Completed:**200k actions/799,509 frames/49,939 updates in20m11s. Fixed unaided
+frozen1083.333/2of24 pyramids versus809.375/0 for unaided training and750.000/0
+for capped guidance. All audits/comparison pass; service exits23:23:23 UTC.
+Coverage18.625/21; original mean15000/90% gate still fails. Retain the candidate
+for a separately selected fresh-seed check; no extension or successor queued.
+See [the completed result](../results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate).
+
 Selected after the completed native gradient, actor-only update and bounded
 Qbert checks. The question is whether learning directly from the trusted pixel
 rule's executed actions improves **unaided frozen play**. Capped guidance alone
@@ -89,3 +96,22 @@ prefix: `recovery-20261026` audits100k before replacement, `progress-20261026`
 observes completed log prefixes, and `post-20261026` waits for terminal success
 before plotting/comparison. Their deadlines do not extend the learner cap or
 launch another GPU allocation. Consult live service state before any GPU work.
+
+## Completed evidence
+
+The100k/24,939 recovery passes at23:12:14 UTC with346 finite tensors and26,161
+finite reports in its complete104,896-action log prefix. Review SHA256
+`8b2c5a8311ab24e1c81916c34696de2a9042dae526b5733b12376c13531dd899`.
+The fixed final and own-initial assessments complete with zero learning and
+truncations,346 unchanged tensors each, full replays/videos and guards.
+Both controls match all346 actual-initial tensors and initial semantic traces.
+All34 source/evidence pins remain unchanged after completion.
+
+The main service exits successfully23:23:23 UTC, total21m48.267s; the completed
+CPU comparison exits23:23:46 and the additional CPU exposure analysis exits
+23:24:02. All observer handles are terminal. The original CPU preparation and
+startup-checker corrections remain; no GPU stage is repeated.
+
+Full results and interpretation are in the linked result report. Completion
+SHA256`bad2bcff8bd51ba954ee1bfefe457216e30ae3b0211fd3a97713e3ae9e00056b`;
+comparison`7b4edd990733ac7754ec49a5c693d9af66058ba9344c5c2244da4e01776dab39`.

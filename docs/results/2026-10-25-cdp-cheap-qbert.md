@@ -1382,3 +1382,75 @@ capped comparison against the completed640-action guidance and unaided controls.
 Its benefit is not established by finite losses or a short execution check.
 No full training allocation, unchanged extension or seed campaign is selected
 by this smoke result. Never reuse the smoke's experience as a fresh learner.
+
+## Expert imitation improves compact Qbert, but remains far below the gate
+
+The separately selected fresh200k comparison completes **200,000 aggregate
+actions /799,509 emulator frames /49,939 updates in20m11s** (1210.768s). The
+fixed final policy, with guidance disabled, scores **1083.333 and clears2/24
+first pyramids**, versus809.375/0 for unaided training and750.000/0 for capped
+guidance without imitation. Mean first-pyramid coverage reaches18.625/21.
+This is useful transfer on the reused development seed, not Qbert mastery or
+evidence that the five-game goal is complete.
+
+| Fresh200k recipe | Training | Frozen mean | First pyramids | Mean coverage |
+| --- | ---: | ---: | ---: | ---: |
+| Unaided4M48 | 19m45s | 809.375 | 0/24 | 16.625/21 |
+| 5% episode guidance, cap640 | 20m00s | 750.000 | 0/24 | 16.208/21 |
+| Same capped guidance + expert loss | 20m11s | 1083.333 | 2/24 | 18.625/21 |
+| Actual initial, all three recipes | — | 180.208 | 0/24 | 5.833/21 |
+
+All recipes use4M/RGB48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
+original rates and fresh1009/eval4000001009. The candidate adds expert scale1,
+NOOPweight.05 and other weights1, using the qualified native/CLI79c9a7f runtime.
+The same346 initial tensors and initial semantic trajectories match both
+controls. The new native build and older unaided-control kernel limit causal
+attribution. Observed training time is0.93% above capped guidance and2.22% above
+unaided, while mean score is33.85% above unaided; these are single-run recipe
+comparisons, not isolated performance or seed-reliability estimates.
+
+The original mean15000/90%-first-pyramid gate remains unchanged and fails.
+The fixed final assessment runs18,808 actions/75,200 frames in7.605s;26 natural
+episodes complete, with the declared first3 per lane selecting24 and retaining
+the2 excess episodes and partial tails. Actual initial runs9232 actions/36,888
+frames in3.754s and completes24 natural episodes. Both have zero updates and
+zero truncations, and all346 tensors remain unchanged in each frozen arm.
+
+All49,939 reports are finite; config/source/counter checks, explicit trusted
+labels,100k/24,939-update recovery, all346 initial and frozen tensor checks,
+initial semantic trajectories, full training and frozen pixel/action replays,
+videos, host guards, curves and comparison pass. First update248 and zero
+residual credit match the declaration. The main service exits successfully
+**23:23:23 UTC**,21m48.267s including setup, evaluations and CPU audits. CPU
+comparison completes23:23:46; the added exposure analysis completes23:24:02.
+There is no GPU restart, cap increase or extension. The two CPU preparation/
+startup-checker corrections remain recorded in the experiment record.
+
+The5% episode selection rule chooses22 of338 started episodes and executes
+**14,080 trusted actions (7.040%)**:13,247 NOOP and833 movements. All22 completed
+guided episodes clear a first pyramid, mean3784.091. These returns include
+teacher actions. Among308 unguided training episodes,7 clear a pyramid and the
+mean is495.698; the last50 average762.000 with1 pyramid. The fixed frozen score
+above remains the outcome measure. Full replay verifies every teacher action
+from native RGB; RAM task observers remain post-hoc only.
+
+24,936 of49,939 updates contain expert labels. Repeated replay samples contain
+498,698 labelled rows with total target weight53,676.194; these are not unique
+demonstrations. Across successive50k-action windows, weighted mean expert
+cross-entropy is1.418,0.480,0.324,0.308. This shows fit to changing sampled
+training targets, not held-out action accuracy or the cause of the frozen gain.
+The trusted-action masks are absent after the640-action release; the native
+policy supplies6831 recorded actions in those released episode suffixes.
+
+Retain this candidate for a separately selected fresh-seed check before any
+broader claim. Do not extend this learner or choose an earlier checkpoint.
+No successor GPU allocation is selected or queued by this result.
+
+Protocol: [expert-imitation comparison](../experiments/2026-10-26-cdp-qbert-expert-imitation.md).
+Artifacts: `/x/Temp/kindle-expert-20261026/qbert-4m-48-r32-expert1-cap640-200k`.
+Learning review SHA256
+`3f1251fae80329393f4cdeac0725d5bdddd4a9f3c3feaae3edc94c68aa8dea79`;
+comparison`7b4edd990733ac7754ec49a5c693d9af66058ba9344c5c2244da4e01776dab39`;
+completion`bad2bcff8bd51ba954ee1bfefe457216e30ae3b0211fd3a97713e3ae9e00056b`;
+exposure`240f1d5da7383aa1989db9f8472634672d7bcab07963b697e70578ce808de4c7`;
+100k recovery`8b2c5a8311ab24e1c81916c34696de2a9042dae526b5733b12376c13531dd899`.
