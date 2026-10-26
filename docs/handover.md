@@ -185,8 +185,11 @@ N8/B8/T16/H15/R32, full18/coefficient1/actor0, original rates/no aid, ac_gradsfa
 Only native geometry changes versus Qbert48; parameters and initialization also
 change. Keep200k/49,939 updates, first248,100k recovery, zero debt,30-minute
 training cap and fixed final/own initial24 natural episodes with full346-tensor/
-replay/coverage/guard checks and unchanged15k/90%-pyramid gate. Launch pending;
-no cap increase, extension or automatic next allocation.
+replay/coverage/guard checks and unchanged15k/90%-pyramid gate. Started18:16:53
+UTC/source`093e5c6`; startup passes4,131,729 parameters, all346 initial tensors
+matching the completed4M64 native shape and248:1/256:2/256:3 updates. Recovery,
+fixed evaluations, CPU replay/coverage/comparison monitoring are attached.
+No cap increase, extension or automatic next allocation.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,

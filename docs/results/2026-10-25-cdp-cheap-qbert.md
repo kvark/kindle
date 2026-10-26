@@ -562,7 +562,7 @@ results, prepare a different compact option:4M/RGB64 with the original H15,
 full18 actions, coefficient1/actor0, Auto/N8/B8/T16/R32 and original rates.
 It was prepared unselected while Breakout ran. After reviewing Breakout's
 completed11.208/0of24 result and corrected CPU comparison, **select this fixed
-200k test; launch pending**. Breakout receives no extension or confirmation.
+200k test, now active from18:16:53 UTC**. Breakout receives no extension or confirmation.
 
 The saved native/RGB48/RGB64 scene at action256 retains a visible board at both
 sizes; it does not show that RGB48 caused the missing-cube problem. Testing64
@@ -600,3 +600,20 @@ unselected declaration`bdebd93a10bf72db4359a1a6f7827b3012d1afe80a47556095f2cb6dd
 Prepared source`3e97df0`; controller`run_qbert_rgb64_200k.py`, SHA256
 `39f76bc6c8e4524e4fb24f60f93b079a32152d941ea4661bb4a1e99a9fb0540e`;
 queue`89d76a622f02d362d8623fe548846626858651cd362a86844f421871d0cb7ef2`.
+
+
+The selected run starts18:16:53 UTC/source`093e5c6`, owner
+`kindle-cheap-qbert-rgb64-200k-20261026`, invocation
+`6794e50f12c74f43992c429ce99b8169`. Startup verifies the full config differs from
+Qbert48 only in native geometry,4,131,729 parameters, all346 finite initial
+tensors matching the completed full18/4M64 native shape, fresh counters,
+first248:1/256:2/256:3 updates and native frames/one GPU64 resize. This is not
+matched initialization versus Qbert48 or evidence of useful Qbert learning.
+100k recovery, fixed evaluations, replay/video, curves/coverage and comparison
+monitoring are attached. Selected declaration SHA256
+`11938b30a7c2d36fdd65fcc4756f8b35fda7e0a8e8c55c1e413ebfa6b680d7e3`;
+selection review`73e83853d20880adbbb726fa166507de4efd4ca8c10bb9e7bdb3d1fa7a7ddda9`;
+startup`4fe8c88269196ee1c5a94754978d1f10c4ab008135916804fc20a57661570224`.
+Selection uses Breakout's completed CPU-repair receipt; its original failed
+postprocessor and unchanged GPU artifacts remain preserved. Native`bfb8c31`,
+runner`fbdaee3`, replay`5043b7a`; no cap increase or automatic next allocation.

@@ -29,6 +29,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
 | [Same, four actions](results/2026-10-26-cdp-breakout-minimal-actions.md) |200k /49,939|20m59s|9.542 /1.167|0/24 two-wall successes|
+| [Four actions, coefficient1, actor/critic gradients](results/2026-10-26-cdp-breakout-minimal-actions.md#actorcritic-gradients-give-a-modest-unconfirmed-gain) |200k /49,939|20m41s|11.208 /1.167|0/24; modest unconfirmed gain|
 | [Same, coefficient .01](results/2026-10-26-cdp-breakout-minimal-actions.md#smaller-bonus-lowers-the-frozen-score) |200k /49,939|21m07s|5.042 /1.167|0/24; weaker frozen score|
 | [Same, H5/500k target](results/2026-10-26-cdp-breakout-compact-h5-budget.md) |487,736 /121,873|45-minute cutoff|8.458 /1.375|500k incomplete;0/24 two-wall successes|
 | [Retained Breakout12M/RGB64/H5 warm start](results/2026-10-26-cdp-breakout-short-imagination.md) |50k new /12,439 new|8m02s|27.208 /67.583 source|0/24 two-wall successes; regression|
@@ -234,8 +235,11 @@ N8/B8/T16/H15/R32, full18/coefficient1/actor0, original rates/no aid, ac_gradsfa
 Only native geometry changes versus Qbert48; parameters and initialization also
 change. Keep200k/49,939 updates, first248,100k recovery, zero debt,30-minute
 training cap and fixed final/own initial24 natural episodes with full346-tensor/
-replay/coverage/guard checks and unchanged15k/90%-pyramid gate. Launch pending;
-no cap increase, extension or automatic next allocation.
+replay/coverage/guard checks and unchanged15k/90%-pyramid gate. Started18:16:53
+UTC/source`093e5c6`; startup passes4,131,729 parameters, all346 initial tensors
+matching the completed4M64 native shape and248:1/256:2/256:3 updates. Recovery,
+fixed evaluations, CPU replay/coverage/comparison monitoring are attached.
+No cap increase, extension or automatic next allocation.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,

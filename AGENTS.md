@@ -51,13 +51,14 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Selected fresh Qbert4M/RGB64/Auto/N8/B8/T16/H15/R32, full18, coefficient1/
+Active fresh Qbert4M/RGB64/Auto/N8/B8/T16/H15/R32, full18, coefficient1/
 actor0/ac_gradsfalse, original rates,1009/eval4000001009, no aid. Only native
 geometry changes versus Qbert48; parameters and initialization also change.
 Keep200k/49,939 updates/first248,100k recovery, zero debt,30-minute training cap,
 fixed final/own initial24 natural episodes and15k/90%-pyramid gate/full audits.
-Launch pending; owner`kindle-cheap-qbert-rgb64-200k-20261026`. See the cheap-Qbert
-report. Check live state before GPU work. No extension or automatic next run.
+Started18:16:53 UTC/source`093e5c6`; all346 initial tensors match the completed
+4M64 native shape, first248:1/256:2/256:3 updates. Recovery/evaluation/analysis
+monitoring attached. Owner`kindle-cheap-qbert-rgb64-200k-20261026`; cheap-Qbert report. Check live state before GPU work. No extension or automatic next run.
 
 Breakout actor/critic gradients finish200k/49,939 updates in20m41s, frozen11.208
 versus9.542, both0/24 two-wall successes. All357-tensor/recovery/replay/guard
