@@ -689,3 +689,46 @@ completion`9942fe280aa39ecd3b8e2efad5fc214406e5e7d5035e6128cc5d7fd4ba7acaeb`.
 Launch source`7ebd7f4`, native`bfb8c31`, runner`fbdaee3`, replay`5043b7a`.
 The separately prepared bounded Qbert pixel-guidance check is selected after
 review; no further Pong allocation follows.
+
+## A pixel-rule development match loses
+
+A CPU-only native-RGB reference loses its single development match on seed9001,
+score−15, after4302 actions/17,208 frames in2.175s. Exact fresh pixel/action/
+reward/boundary replay takes2.176s. No agent, GPU, RAM or learning is involved;
+no training aid or full-cohort assessment is selected from this weak result.
+
+The rule projects an incoming white ball toward the green paddle, reflects
+vertical motion between fixed board bounds, offsets the target toward an edge
+away from the visible opponent, and estimates the paddle's stopping position
+using1.5 times its previous-step displacement with a four-pixel dead zone.
+These are hand-coded assumptions derived from existing native images and one
+fixed-action calibration. One development match does not establish reliability
+or isolate any rule's effect. Native learning remains stronger than this rule.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-pixel-guidance-dev/v1`;
+policy`pong_pixel_policy_v1.py`, driver`run_pong_pixel_dev_v1.py` in the runtime
+root. Review SHA256`9fbc646c8f1843d34f55d542dea62864f59f40126bde7c50401b2f3a499f6cfc`;
+trace`0c813912cd86bca12a00d44156f2524ab9aec47d53cede78fca4a4fb987e34a5`.
+
+## RGB32 bounded check prepared, not selected
+
+Prepare16,384 actions/4035 updates plus1024 frozen restore, with180s/60s caps,
+on the existing4M/B8/T16/H15/R32/coefficient.01/actor0/full18 recipe. Only native
+observation geometry48→32 changes; keep Auto, original rates, no aid, fresh1009/
+eval4000001009, first248 and zero debt. Preserve the actual initial checkpoint,
+all346 frozen tensors, finite reports, selected weight changes and both guards.
+Geometry changes parameter shapes and initialization; do not assert matched
+initial tensors versus RGB48. The control also used the older kernel/module.
+
+The existing action256 snapshot retains a ball-colored spot at32: local peak
+RGB162/104/60 versus background144/72/17, substantially weaker contrast than48.
+This establishes visibility in that image, not adequate detail for learning.
+Keep native max-pooled frames and one GPU32 resize. The completed RGB48 control's
+matching16,384-action prefix takes94.054s; no candidate timing is measured yet.
+
+Queue/cap checks, source compilation and unselected-launch refusal pass. No new
+native build or GPU work occurs. The active Qbert run must complete and be
+reviewed before selecting this check; no full learning allocation is selected.
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-32-b8-smoke`;
+controller`run_pong_rgb32_smoke.py`. Preparation SHA256
+`07fa7fe6727ff31049cf4ffb254ff0feab731b11707c3bbf5de483a930099ec0`.

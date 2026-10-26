@@ -73,3 +73,26 @@ declaration`3b55486ca98214a1774611113d9966b5cbb835856cc2fce45e10bdc10aca8744`.
 The prior reference, new ledger, full episode records and replay video remain
 outside Git. Both use selected development seeds and provide no training-seed
 reliability or Kindle task-mastery evidence.
+
+## One motion-aware development episode remains weak
+
+A fixed-action CPU calibration on seed9001 shows continued paddle motion after
+NOOP: the latest-frame centroid moves118.5→102.5→101.5 after a leftward command.
+The first calibration mask accidentally included the red right wall; its output
+is retained, and the corrected mask uses the original interior columns8–151.
+This concerns the hand-coded controller's motion assumptions, not the learned
+policy or its representation. No RAM or agent is used.
+
+A fixed correction estimates stopping position as paddle_x plus0.75 times its
+previous-step displacement, uses a four-pixel dead zone, and corrects partial
+side-wall velocity estimates from the previous magnitude. Native max-pooled RGB
+remains its only policy input. One development episode on9001 scores31, ending
+naturally after1018 actions/4071 frames in0.419s; exact fresh pixel/action/reward/
+boundary replay takes0.418s. It fails the two-wall gate. These joint rule changes
+do not isolate one control choice, and one episode is not comparable to a
+24-episode mean. No full-cohort assessment or training aid is selected.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/breakout-pixel-guidance-dev`;
+policy`breakout_pixel_policy_v1.py`, driver`run_breakout_pixel_dev_v1.py` in its
+parent. Review SHA256`5e1da37bae09609ea96a905715a72d3f2777e6556bb1f22217d810d6bcff3c9e`;
+trace`7061274507cea3ac771ef75cf271563cf5668ba63f01c8253dc8ec34c0ebc1f5`.

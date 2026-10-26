@@ -810,3 +810,9 @@ pending. Selected declaration SHA256
 `e451b20379c301a655f6583d656cad566ddf907cf32aa5945f7e2f55a09bc2bf`;
 startup`6b5b1abc1fa768ccce000de5d91fd0341a35c898c50993266cd14ffac33aad12`.
 Native`bfb8c31`, runner`137ed77`, frozen replay`5043b7a`, guidance replay`53ffc6b`.
+
+The100k recovery passes24,939 updates and all346 finite tensors. A complete
+104,416-action prefix contains26,041 finite reports;102,400 progress is624.690s
+with25,539 updates and zero debt. The recovery watcher exits successfully;
+fixed200k learning and unaided evaluation remain pending. Recovery review
+SHA256`7e9ad619807969f8b5abf9fc2019f4a9e833a9f9f35e088d776a3c73f1532cf1`.
