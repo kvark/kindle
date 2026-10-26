@@ -51,17 +51,20 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32, active from13:22:20
-UTC/source`66d1aed` after completed PongH5 evaluation/comparison. Fresh1009/eval4000001009, minimal4,
-native actor mixture.01, original rates and no external aid. Only intrinsic
-coefficient1→.01 changes versus the completed four-action control. Keep200k
-aggregate actions/49,939 updates, first248,100k recovery and30-minute cap.
-Startup matches346 finite initial tensors and first248:1/256:2/256:3 reports.
-Fixed final/initial24-natural-episode controls retain
-864-point two-wall/90%-success and full numeric/config/counter/tensor/replay/
-guard audits. See`docs/experiments/2026-10-26-cdp-breakout-smaller-bonus.md`;
-owner`kindle-cheap-breakout-minimal-intrinsic001-200k-20261026`. Check live state
-before GPU work. No retry, cap increase, extension or automatic next allocation.
+Current allocation: Pong4M/RGB48/Auto/N8/B16/T16/H15/R40, selected after the
+completed Breakout smaller-bonus result. Fresh1009/eval4000001009, bonus.01,
+actor0, original rates, full18/no external aid; only native ratio32→40 changes
+versus B16/R32. Keep500k actions/78,067 updates, first376, four100k recoveries,
+residual credit.25 and55-minute training cap. Fixed final/own initial24-natural
+match controls retain mean15/90%-wins and full audits/replays/guards. See
+`docs/experiments/2026-10-26-cdp-pong-b16-r40.md`;
+owner`kindle-cheap-pong-b16-r40-intrinsic001-500k-20261026`. Check live state
+before GPU work. No cap increase, extension or automatic next allocation.
+
+Breakout coefficient.01 completes200k/49,939 updates in21m07s, but lowers
+frozen9.542→5.042, both0/24 two-wall successes. All audits/comparison pass after
+CPU-only repair of an omitted replay manifest. Original service failure at
+13:43:51 UTC remains recorded; no GPU stage repeats. Retain coefficient1.
 
 PongH5 completes500k/124,939 updates in38m07s,23.65% less training time than H15,
 but frozen8.667 is below14.958; both24/24 wins and below mean15. All audits,

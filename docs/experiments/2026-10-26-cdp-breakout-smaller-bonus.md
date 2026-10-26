@@ -1,6 +1,14 @@
 # Smaller Breakout exploration bonus at the fixed200k budget
 
-**Selected after completed PongH5 evaluation and comparison.** H5 saves23.65%
+**Complete: smaller bonus lowers frozen score 9.542→5.042**, both 0/24 two-wall
+successes, at 200k actions/49,939 updates in 21m07s. All audits and comparison
+pass after a CPU-only repair of the omitted replay manifest. The original
+service failure is retained; no GPU work is repeated. Retain coefficient 1;
+no extension or confirmation. See the
+[result](../results/2026-10-26-cdp-breakout-minimal-actions.md#smaller-bonus-lowers-the-frozen-score).
+The selection and startup records below describe the completed run.
+
+Selected after completed PongH5 evaluation and comparison. H5 saves23.65%
 training time but lowers frozen score14.958→8.667; the primary mean15 gate fails,
 so its conditional confirmation remains unselected. Proceed with this fixed
 Breakout test, keeping its prepared recipe and budget. No automatic next queue.

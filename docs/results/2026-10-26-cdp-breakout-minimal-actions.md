@@ -5,7 +5,7 @@ two-wall successes. The full18 H15 mixture control scores7.083 versus1.375.
 Training takes **20m59s versus22m29s**,6.64% less wall time at the same200k-action
 and49,939-update budget. This is a modest development gain, not Breakout task
 success or seed reliability. Retain the result; no extension or confirmation is
-selected. The next allocation is the prepared Qbert experience-budget test.
+selected. The completed smaller-bonus follow-up below does not improve it.
 
 Fresh1009/eval4000001009, centered CDP/action-effects1,4M/RGB64/Auto,
 N8/B8/T16/H15/R32, full BPTT/microbatch8, replay100k and native actor mixture.01.
@@ -63,12 +63,55 @@ analysis subtracts that bonus to recover net predicted game reward. Predictions
 can be negative even when real rewards are not. These are minibatch means on
 different learned trajectories, not individual-state distributions, absolute
 reward magnitudes, gradient contributions or a causal explanation of weak play.
-All task outcomes above remain unchanged. The ratio motivates a
-[prepared coefficient.01 test](../experiments/2026-10-26-cdp-breakout-smaller-bonus.md),
-which is unselected while PongH5 is active.
+All task outcomes above remain unchanged. The ratio motivated the
+[coefficient.01 test](../experiments/2026-10-26-cdp-breakout-smaller-bonus.md)
+reported below.
 
 Analysis:`/x/Temp/kindle-cheap-20261025/breakout-intrinsic-scale-review.json`,
 SHA256`150c8eb7f2ac0b2e16fb97ee9b76e9547d7f295819c73ab40a25e571154837d6`;
 script`review_breakout_intrinsic_scale.py`, SHA256
 `5f5d17e3abca62472eac01aac9413263d888f2e47f5ef5edc5b47617b58b4364`.
 No agent construction, GPU work, new policy decisions or learner updates.
+
+## Smaller bonus lowers the frozen score
+
+Changing only native intrinsic coefficient 1→.01 lowers frozen score
+**9.542→5.042**, both versus initial 1.167 and both 0/24 two-wall successes.
+Keep coefficient 1 for this recipe; no extension or confirmation is selected.
+This reused seed does not establish a general exploration rule.
+
+The fresh 1009 learner keeps 4M/RGB64/Auto/N8/B8/T16/H15/R32, minimal four
+actions, native actor mixture .01, original rates and no external aid. It
+completes **200,000 actions / 798,710 emulator frames / 49,939 updates** in
+1,267.339s (21m07s), versus the control's 20m59s: 0.65% more training time.
+First update 248, 6,392,192 sampled replay positions, 635 natural training
+episodes and zero debt. Online last-50 mean 6.58 is separate from frozen 5.042.
+The reviewed curves show an earlier mid-run gain that does not survive the
+fixed-final comparison; no earlier checkpoint is substituted.
+
+Frozen final/initial use 11,376/4,984 actions, 45,453/19,891 emulator frames
+and 5.603/2.510s. Final collects 32 natural episodes and initial 24; the first
+three per lane give 24 per arm, with eight final excess episodes and all partial
+tails retained. Both have zero updates/truncations and 346 unchanged tensors.
+All initial tensors and semantic initial traces match the coefficient-1 control.
+All 49,939 numeric reports, full config/source/counters, finite checkpoints,
+100k recovery, CPU replays/videos and three host guards pass.
+
+The original service exits with failure at 13:43:51 UTC because preparation
+omitted `replay-manifest.json`. All GPU stages had exited successfully. The CPU
+repair verifies and copies the unchanged paired-control ROM/emulator manifest,
+then reruns the original audit without changing its code or repeating GPU work.
+The service journal and incomplete watcher receipt remain intact. Separate
+repair and completion receipts record the successful audit, plots and comparison;
+the original service is not relabelled successful.
+
+Late scaled bonus/net predicted game reward falls from .964 to .00469
+(.00005858/.012489). The smaller ratio does not yield better play. These signed
+minibatch means remain descriptive, without a gradient or causal interpretation.
+
+Artifacts: `/x/Temp/kindle-cheap-20261025/breakout-4m-64-r32-minimal-unimix001-intrinsic001-200k`.
+Source at launch `66d1aed`, native `bfb8c31`, runner `22bd61b`, replay `e853818`.
+Review SHA256 `14a9d375e9767e5f0f01b1c1e3cef4831a77572631b5fed2f2f5894d0b7e5941`;
+curve `b6cb638a385f0e7663a49c7992bef7ffdf04b22d9126815aedddcf6cc2afbbb8`;
+comparison `0e49b543597c67c2052f0e73c363c58c4503ca0b96de551d1faa05aa18ac7043`;
+CPU repair `6c649f5d571cdf79a45a778691ba055f7892b72056f60d9e585a6afc7e11c780`.

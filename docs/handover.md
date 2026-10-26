@@ -130,24 +130,24 @@ finishes500k/124,939 updates in38m07s,23.65% less training time than H15. Frozen
 tensors/traces and comparison pass; service exits13:18:17 UTC. Retain H15; no
 extension or conditional4013 confirmation is selected.
 
-Current allocation: [Breakout with a smaller native bonus](experiments/2026-10-26-cdp-breakout-smaller-bonus.md),
-started13:22:20 UTC/source`66d1aed` after completed PongH5 evaluation/comparison.
-Fresh1009/eval4000001009,
-4M/RGB64/Auto/N8/B8/T16/H15/R32,4,120,963 parameters, native actor mixture.01,
-minimal4 and original rates. Only intrinsic coefficient1→.01 changes versus the
-completed same-protocol control. Keep200k actions/49,939 updates, first248,
-100k recovery and30-minute training cap. Startup matches346 finite initial
-tensors, full config except coefficient.01 and first248:1/256:2/256:3. Fixed final/
-own initial24-natural-episode controls retain864-point two-wall/90%-success,
-zero updates/truncations and full numerical/config/counter/tensor/replay/guard
-audits. Native unchanged. Owner`kindle-cheap-breakout-minimal-intrinsic001-200k-20261026`;
-check live state before GPU work. No cap increase, resume, extension or automatic
-next allocation. This tests learning incentives; ensemble arithmetic stays fixed.
-The100k recovery passes at24,939 updates and346 finite tensors, with zero debt.
-A [PongB16/R40 candidate](experiments/2026-10-26-cdp-pong-b16-r40.md) is prepared
-on CPU only: original rates/H15,500k/78,067 updates and55-minute cap. Its projected
-47m38s cost is not measured performance. Review Breakout's completed result
-before selection; no automatic queue.
+The [completed smaller-bonus Breakout test](results/2026-10-26-cdp-breakout-minimal-actions.md#smaller-bonus-lowers-the-frozen-score)
+finishes 200k actions/49,939 updates in 21m07s, but lowers frozen score
+9.542→5.042, both 0/24 two-wall successes. All audits and comparison pass after
+copying the omitted, verified replay manifest and rerunning only the unchanged
+CPU audit. The original service failure at 13:43:51 UTC and incomplete watcher
+receipt are retained; no GPU work repeats. Retain coefficient 1; no extension.
+
+Current allocation: [Pong B16/R40](experiments/2026-10-26-cdp-pong-b16-r40.md),
+selected after reviewing that completed Breakout result. Keep fresh 1009/
+eval4000001009, 4M/RGB48/Auto/N8/B16/T16/H15, bonus .01, actor0, original rates
+and full18/no aid. Only native replay ratio 32→40 changes versus B16/R32.
+Fixed 500k actions/78,067 updates, first376, 19,985,152 sampled positions and
+55-minute training cap. Expected residual credit .25 is below one due update.
+Four recoveries, matched 346 initial tensors, fixed final/own initial 24 natural
+matches and original mean15/90%-wins retain full audits/replays/guards. Projected
+47m38s is not measured speed or quality. Native unchanged; no cap increase,
+resume, extension or automatic next allocation. Check live owner
+`kindle-cheap-pong-b16-r40-intrinsic001-500k-20261026` before GPU work.
 
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
