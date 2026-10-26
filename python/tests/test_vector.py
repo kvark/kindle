@@ -17,6 +17,16 @@ import profile_atari_vector
 
 
 @pytest.mark.parametrize("args,message", [
+    (["--guidance-imitation-scale", "0"], "scale must be positive"),
+    (["--guidance-imitation-scale", "nan"], "scale must be positive"),
+    (["--guidance-imitation-scale", "inf"], "scale must be positive"),
+    (["--guidance-imitation-scale", "1e300"], "scale must be positive"),
+    (["--guidance-imitation-scale", "1e-300"], "scale must be positive"),
+    (["--guidance-imitation-scale", "1"], "requires fresh guided training"),
+    (["--guidance-noop-weight", ".05"], "requires imitation"),
+    (["--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-noop-weight", "0"], "NOOP weight must"),
+    (["--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-noop-weight", "nan"], "NOOP weight must"),
+    (["--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-noop-weight", "2"], "NOOP weight must"),
     (["--encoder-training", "joint"], "encoder-training requires a Tiny"),
     (["--encoder-training", "frozen", "--encoder-checkpoint", "unused"], "batch-length16"),
     (["--encoder-training", "joint", "--encoder-checkpoint", "unused", "--batch-length", "16"], "explicit replay-capacity"),

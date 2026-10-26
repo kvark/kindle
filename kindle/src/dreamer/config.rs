@@ -207,6 +207,15 @@ pub struct FeatureStandardization {
     pub scale: Vec<f32>,
 }
 
+/// Optional supervised actor targets from explicitly trusted executed actions.
+/// Weights are applied before averaging over all replay rows, not renormalized
+/// within each minibatch; rare actions therefore retain their relative weight.
+#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct ExpertImitation {
+    pub scale: f32,
+    pub action_weights: Vec<f32>,
+}
+
 /// Configuration of the D3 baseline. Defaults use the upstream 12M preset;
 /// the pinned upstream default is 200M. Larger presets remain one enum change.
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -283,6 +292,8 @@ pub struct DreamerConfig {
     /// training while the actor parameters are gated.
     #[serde(default)]
     pub actor_learning_starts: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expert_imitation: Option<ExpertImitation>,
     pub learning_rate_warmup: u64,
     pub optimizer_beta1: f32,
     pub optimizer_beta2: f32,
@@ -353,6 +364,7 @@ impl DreamerConfig {
             dynamics_learning_rate: None,
             behavior_learning_rate: None,
             actor_learning_starts: 0,
+            expert_imitation: None,
             learning_rate_warmup: 1_000,
             optimizer_beta1: 0.9,
             optimizer_beta2: 0.999,
@@ -517,6 +529,17 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         let size = self.network();
+        if let Some(expert) = &self.expert_imitation
+            && (!expert.scale.is_finite()
+                || expert.scale <= 0.0
+                || expert.action_weights.len() != self.action_count
+                || !expert.action_weights.iter().any(|&weight| weight > 0.0)
+                || expert.action_weights.iter().any(|&weight| {
+                    !weight.is_finite() || weight < 0.0 || !(weight * expert.scale).is_finite()
+                }))
+        {
+            return Err("expert imitation requires positive finite scale and nonnegative finite action weights".into());
+        }
         if self.cdp_centered
             && (!self.is_cdp()
                 || self.world_backprop_length != self.batch_length
@@ -710,6 +733,44 @@ const fn default_replay_value_gradient() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn expert_imitation_defaults_preserve_legacy_config_and_validate_weights() {
+        let mut config = DreamerConfig::tiny(3);
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert!(legacy.get("expert_imitation").is_none());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(legacy).unwrap(),
+            config
+        );
+        for (scale, weights) in [
+            (0.0, vec![1.0; 3]),
+            (f32::NAN, vec![1.0; 3]),
+            (f32::INFINITY, vec![1.0; 3]),
+            (1.0, vec![1.0; 2]),
+            (1.0, vec![0.0; 3]),
+            (1.0, vec![-1.0, 1.0, 1.0]),
+            (1.0, vec![f32::NAN, 1.0, 1.0]),
+            (f32::MAX, vec![2.0; 3]),
+        ] {
+            config.expert_imitation = Some(ExpertImitation {
+                scale,
+                action_weights: weights,
+            });
+            assert!(config.check().unwrap_err().contains("expert imitation"));
+        }
+        config.expert_imitation = Some(ExpertImitation {
+            scale: 2.0,
+            action_weights: vec![0.05, 0.0, 1.0],
+        });
+        config.check().unwrap();
+        let encoded = serde_json::to_value(&config).unwrap();
+        assert!(encoded.get("expert_imitation").is_some());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(encoded).unwrap(),
+            config
+        );
+    }
 
     #[test]
     fn cdp_configuration_and_split_rates_roundtrip() {

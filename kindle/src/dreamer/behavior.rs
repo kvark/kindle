@@ -7,6 +7,7 @@ use super::networks::{MlpHead, mixed_log_probabilities, scale, sum, weighted_cro
 
 pub const LOSS_TOTAL: usize = 0;
 pub const LOSS_POLICY: usize = 1;
+pub const LOSS_EXPERT: usize = 6;
 pub const LOSS_VALUE: usize = 2;
 pub const LOSS_REPLAY_VALUE: usize = 3;
 pub const POLICY_ENTROPY: usize = 4;
@@ -74,10 +75,7 @@ pub(crate) fn policy_loss(
     // Keep this reduction explicit. Meganeura's fused cross-entropy stores
     // per-row partials for terminal losses, whereas this loss is composed with
     // entropy and value terms and must remain a true scalar metric.
-    let score_terms = graph.mul(action_target, log_probabilities);
-    let score_loss = graph.sum_inner(score_terms);
-    let score_loss = graph.mean_all(score_loss);
-    let score_loss = graph.neg(score_loss);
+    let score_loss = action_cross_entropy(graph, log_probabilities, action_target);
     let p_log_p = graph.mul(probabilities, log_probabilities);
     let entropy = graph.sum_inner(p_log_p);
     let entropy = graph.neg(entropy);
@@ -87,6 +85,13 @@ pub(crate) fn policy_loss(
     let entropy_bonus = scale(graph, weighted_entropy, -config.actor_entropy);
     let policy = graph.add(score_loss, entropy_bonus);
     (policy, mean_entropy, weighted_entropy)
+}
+
+fn action_cross_entropy(graph: &mut Graph, log_probabilities: NodeId, target: NodeId) -> NodeId {
+    let terms = graph.mul(target, log_probabilities);
+    let loss = graph.sum_inner(terms);
+    let loss = graph.mean_all(loss);
+    graph.neg(loss)
 }
 
 /// Joint actor/value update over imagined states plus D3's replay-value loss.
@@ -143,18 +148,34 @@ pub fn build_training_graph(
     let weighted_policy = scale(&mut graph, policy, scales.policy);
     let weighted_value = scale(&mut graph, value, scales.value);
     let weighted_replay = scale(&mut graph, replay_value, scales.replay_value);
-    let total = sum(
-        &mut graph,
-        &[weighted_policy, weighted_value, weighted_replay],
-    );
-    graph.set_outputs(vec![
+    let mut losses = vec![weighted_policy, weighted_value, weighted_replay];
+    let expert_loss = config.expert_imitation.as_ref().map(|expert| {
+        let target = graph.input("expert_action_target", &[replay_rows, config.action_count]);
+        let logits = model.actor.forward(&mut graph, replay_feature);
+        let log_probabilities = mixed_log_probabilities(
+            &mut graph,
+            logits,
+            replay_rows,
+            config.action_count,
+            config.actor_unimix,
+        );
+        let loss = action_cross_entropy(&mut graph, log_probabilities, target);
+        losses.push(scale(&mut graph, loss, expert.scale));
+        loss
+    });
+    let total = sum(&mut graph, &losses);
+    let mut outputs = vec![
         total,
         policy,
         value,
         replay_value,
         mean_entropy,
         weighted_entropy,
-    ]);
+    ];
+    if let Some(loss) = expert_loss {
+        outputs.push(loss);
+    }
+    graph.set_outputs(outputs);
     graph
 }
 
@@ -243,6 +264,99 @@ mod tests {
 
     use super::*;
     use crate::dreamer::runtime::{build_session, configure_d3_optimizer, initialize_d3};
+
+    #[test]
+    fn expert_imitation_reuses_actor_parameters_and_is_absent_by_default() {
+        let mut config = DreamerConfig::tiny(3);
+        let baseline = build_training_graph(&config, 12, 6);
+        config.expert_imitation = Some(super::super::ExpertImitation {
+            scale: 1.0,
+            action_weights: vec![0.05, 1.0, 1.0],
+        });
+        let expert = build_training_graph(&config, 12, 6);
+        let parameters = |graph: &Graph| {
+            graph
+                .nodes()
+                .iter()
+                .filter_map(|node| {
+                    if let meganeura::graph::Op::Parameter { name } = &node.op {
+                        Some((name.clone(), node.ty.shape.clone()))
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(parameters(&baseline), parameters(&expert));
+        assert_eq!(baseline.outputs().len(), LOSS_EXPERT);
+        assert_eq!(expert.outputs().len(), LOSS_EXPERT + 1);
+        let (plan, _) = meganeura::compile_training_graph(&expert);
+        assert!(!plan.dispatches.is_empty());
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded Vulkan expert-gradient check"]
+    fn expert_cross_entropy_matches_weighted_masked_gradients() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let rows = 120;
+        let actions = 18;
+        for unimix in [0.0, 0.01] {
+            let mut graph = Graph::new();
+            let logits = graph.parameter("logits", &[rows, actions]);
+            let target = graph.input("target", &[rows, actions]);
+            let log_probabilities =
+                mixed_log_probabilities(&mut graph, logits, rows, actions, unimix);
+            let loss = action_cross_entropy(&mut graph, log_probabilities, target);
+            let loss = scale(&mut graph, loss, 2.0);
+            let constant = graph.constant(vec![0.5], &[1]);
+            let total = graph.add(loss, constant);
+            graph.set_outputs(vec![total]);
+            let mut session = build_session(&graph, &gpu, Mode::Training, false);
+            let logits = (0..rows * actions)
+                .map(|i| (i as f32 * 0.13).sin())
+                .collect::<Vec<_>>();
+            let mut target = vec![0.0; logits.len()];
+            for row in 0..rows {
+                target[row * actions + row % actions] = match row % 4 {
+                    0 => 0.0,
+                    1 => 0.05,
+                    _ => 1.0,
+                };
+            }
+            session.set_parameter("logits", &logits);
+            session.set_input("target", &target);
+            session.step();
+            session.wait();
+            let mut actual_loss = [0.0];
+            let mut gradients = vec![0.0; logits.len()];
+            session.read_output_by_index(0, &mut actual_loss);
+            session.read_param_grad("logits", &mut gradients);
+            let mut expected_loss = 0.5;
+            for row in 0..rows {
+                let p = logits[row * actions..(row + 1) * actions]
+                    .iter()
+                    .map(|&x| f64::from(x).exp())
+                    .collect::<Vec<_>>();
+                let sum = p.iter().sum::<f64>();
+                let chosen = row % actions;
+                let weight = f64::from(target[row * actions + chosen]);
+                let mixed = (1.0 - f64::from(unimix)) * p[chosen] / sum
+                    + f64::from(unimix) / actions as f64;
+                expected_loss -= 2.0 * weight * mixed.ln() / rows as f64;
+                for action in 0..actions {
+                    let expected = 2.0 * weight / rows as f64
+                        * ((1.0 - f64::from(unimix)) * p[chosen] / sum / mixed)
+                        * (p[action] / sum - f64::from(action == chosen));
+                    assert!((f64::from(gradients[row * actions + action]) - expected).abs() < 2e-7);
+                }
+            }
+            assert!((f64::from(actual_loss[0]) - expected_loss).abs() < 2e-5);
+        }
+    }
 
     #[test]
     fn diagnostic_graph_has_only_critic_and_enabled_ensemble_parameters() {

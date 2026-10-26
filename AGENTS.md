@@ -97,6 +97,14 @@ cohort, not the cause of weak policy transfer. Retain4M48/H15; no new training
 or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](docs/results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
+
+Optional native expert imitation is implemented, default-disabled, with127 CPU
+Rust tests/strict Clippy and477 Python tests passing. Only explicit expert
+actions create replay labels; per-action weights can downweight NOOP. Select
+bounded gradient/vector GPU checks (120s each), then review before any Atari
+allocation. No full training selected. Existing native runtime remains retained.
+See [implementation and scope](docs/results/2026-10-25-cdp-cheap-qbert.md#optional-native-expert-imitation-implementation-and-bounded-validation).
+
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions
 in0.452s;512 verified overrides,346 matched initial/unchanged frozen tensors,
 all finite reports and both guards pass. Original service exits failed19:40:14

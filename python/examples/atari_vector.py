@@ -121,6 +121,10 @@ def main():
                         help="fresh Qbert only: probability of selecting an episode for pixel guidance")
     parser.add_argument("--qbert-guidance-max-actions", type=int,
                         help="release each selected episode to the learner after this many actions")
+    parser.add_argument("--guidance-imitation-scale", type=float,
+                        help="fresh guided training only: native supervised actor loss on expert actions")
+    parser.add_argument("--guidance-noop-weight", type=float,
+                        help="relative NOOP target weight for expert imitation; default1")
     args = parser.parse_args()
     if args.num_envs <= 0 or args.steps <= 0 or args.steps % args.num_envs:
         parser.error("steps must be a positive multiple of num-envs")
@@ -156,6 +160,16 @@ def main():
         parser.error("exploration probability must be in [0, 1]")
     if not math.isfinite(args.qbert_guidance_probability) or not 0 <= args.qbert_guidance_probability <= 1:
         parser.error("Qbert guidance probability must be in [0, 1]")
+    if args.guidance_imitation_scale is not None:
+        if not positive_f32(args.guidance_imitation_scale):
+            parser.error("guidance imitation scale must be positive finite F32")
+        if not args.qbert_guidance_probability or args.evaluate:
+            parser.error("guidance imitation requires fresh guided training")
+    if args.guidance_noop_weight is not None:
+        if args.guidance_imitation_scale is None:
+            parser.error("guidance NOOP weight requires imitation")
+        if not positive_f32(args.guidance_noop_weight) or args.guidance_noop_weight > 1:
+            parser.error("guidance NOOP weight must be positive F32 and at most1")
     if args.qbert_guidance_max_actions is not None:
         if not 0 < args.qbert_guidance_max_actions < 2**32:
             parser.error("Qbert guidance max-actions must be a positive u32")
@@ -178,6 +192,7 @@ def main():
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
     training_options.add("--qbert-guidance-probability")
     training_options.add("--qbert-guidance-max-actions")
+    training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight"))
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
@@ -199,6 +214,8 @@ def main():
         parser.error("GPU memory output must be a fresh path")
     if (args.exploration_probability or args.qbert_guidance_probability) and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("persistent exploration requires native vector action overrides")
+    if args.guidance_imitation_scale is not None and "expert_actions" not in inspect.signature(kindle.VectorAgent.act).parameters:
+        parser.error("guidance imitation requires native expert-action support")
     if args.restore and args.encoder:
         metadata = json.loads((args.restore / "metadata.json").read_text())
         if (metadata.get("perception") or {}).get("kind") != args.encoder:
@@ -289,6 +306,11 @@ def main():
             config["imagination_length"] = args.imagination_length
         if args.behavior_learning_rate is not None:
             config["behavior_learning_rate"] = args.behavior_learning_rate
+        if args.guidance_imitation_scale is not None:
+            weights = [1.0] * actions
+            noop = environments[0].action_meanings.index("NOOP")
+            weights[noop] = args.guidance_noop_weight if args.guidance_noop_weight is not None else 1.0
+            config["expert_imitation"] = dict(scale=args.guidance_imitation_scale, action_weights=weights)
         if learned_rgb:
             config["observation_kind"] = f"rgb{args.image_size or 64}"
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
@@ -416,7 +438,8 @@ def main():
                 before = time.perf_counter()
                 overrides = (exploration.actions(current_frames) if guidance else
                              exploration.actions() if exploration else None)
-                selected = (agent.act(greedy=args.greedy, action_overrides=overrides)
+                override_argument = "expert_actions" if args.guidance_imitation_scale is not None else "action_overrides"
+                selected = (agent.act(greedy=args.greedy, **{override_argument: overrides})
                             if exploration else agent.act(greedy=args.greedy))
                 if overrides is not None and any(forced is not None and selected[stream] != forced
                                                 for stream, forced in enumerate(overrides)):
@@ -446,7 +469,9 @@ def main():
                           executed_action_frames=[env.executed_action_frames for env in environments],
                           **behavior,
                           **(dict(guidance_frame_sha256=exploration.frame_sha256) if guidance else {}),
-                          **(dict(action_overrides=overrides) if exploration else {})))
+                          **(dict(action_overrides=overrides) if exploration else {}),
+                          **(dict(expert_action_mask=[action is not None for action in overrides])
+                             if args.guidance_imitation_scale is not None else {})))
                 before = time.perf_counter()
                 reports = [] if args.evaluate else agent.learn_scheduled()
                 timing["learn"] += time.perf_counter() - before

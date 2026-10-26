@@ -108,6 +108,16 @@ def audit(path):
             check(header["exploration_sha256"] == expected_hash, "exploration implementation differs")
         else:
             check(not {"exploration", "exploration_sha256"}.intersection(header), "undeclared exploration protocol")
+        expert = config.get("expert_imitation")
+        if expert is not None:
+            check(isinstance(expert, dict) and set(expert) == {"scale", "action_weights"}, "invalid expert imitation config")
+            require_numbers(expert)
+            check(expert["scale"] > 0 and isinstance(expert["action_weights"], list)
+                  and len(expert["action_weights"]) == config["action_count"]
+                  and all(weight >= 0 for weight in expert["action_weights"])
+                  and any(weight > 0 for weight in expert["action_weights"]), "invalid expert imitation weights")
+            check(header["mode"] != "train" or guidance, "expert imitation requires trusted guidance")
+        expert_training = expert is not None and header["mode"] == "train"
         training = header["mode"] == "train" and config["train_ratio"] > 0
         required = config["replay_context"] + config["batch_length"]
         samples = config["batch_size"] * config["batch_length"]
@@ -195,6 +205,13 @@ def audit(path):
                     check("action_overrides" not in event, "undeclared action overrides")
                 if not guidance:
                     check("guidance_frame_sha256" not in event, "undeclared guidance frame hashes")
+                if expert_training:
+                    mask = event.get("expert_action_mask")
+                    check(isinstance(mask, list) and len(mask) == count
+                          and all(type(value) is bool for value in mask), "invalid expert action mask")
+                    check(mask == [action is not None for action in overrides], "expert action mask differs from guidance")
+                else:
+                    check("expert_action_mask" not in event, "undeclared expert action mask")
                 for stream in range(count):
                     action = event["actions"][stream]
                     check(type(action) is int and 0 <= action < config["action_count"], "invalid executed action")

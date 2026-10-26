@@ -148,11 +148,21 @@ pub struct WorldMetrics {
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct ExpertImitationMetrics {
+    /// Weighted cross-entropy averaged over every replay row, before scale.
+    pub loss: f32,
+    pub labeled_rows: usize,
+    pub weight_sum: f32,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct BehaviorMetrics {
     pub total_loss: f32,
     pub policy_loss: f32,
     /// One when the policy objective contributes gradients, otherwise zero.
     pub actor_update_scale: f32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expert_imitation: Option<ExpertImitationMetrics>,
     pub value_loss: f32,
     pub replay_value_loss: f32,
     /// Mean categorical entropy before trajectory weighting.
@@ -199,6 +209,8 @@ struct PosteriorBatch {
 
 #[derive(Default)]
 struct BehaviorTrainingBatch {
+    expert_action_target: Vec<f32>,
+    expert_labeled_rows: usize,
     action_target: Vec<f32>,
     imagined_weight: Vec<f32>,
     imagined_value_target: Vec<f32>,
@@ -1208,6 +1220,10 @@ impl DreamerCore {
         // its frozen critic routes that auxiliary gradient into the RSSM.
         let stage = Instant::now();
         let mut behavior_batch = self.imagine_and_target(&batch, &posterior);
+        (
+            behavior_batch.expert_action_target,
+            behavior_batch.expert_labeled_rows,
+        ) = batch.expert_targets(&self.config);
         timing.imagination_seconds = stage.elapsed().as_secs_f64();
         let stage = Instant::now();
         let world = self.train_world(&batch, &posterior, &mut behavior_batch);
@@ -2054,6 +2070,8 @@ impl DreamerCore {
         }
 
         BehaviorTrainingBatch {
+            expert_action_target: Vec::new(),
+            expert_labeled_rows: 0,
             action_target,
             imagined_weight,
             imagined_value_target,
@@ -2124,6 +2142,10 @@ impl DreamerCore {
 
     fn train_behavior(&mut self, batch: &BehaviorTrainingBatch) -> BehaviorMetrics {
         let actor_update_scale = self.config.actor_update_scale(self.learner_step);
+        if self.config.expert_imitation.is_some() {
+            self.behavior_train
+                .set_input("expert_action_target", &batch.expert_action_target);
+        }
         if self.targets_gpu.is_none() {
             self.behavior_train
                 .set_input("action_target", &batch.action_target);
@@ -2165,7 +2187,18 @@ impl DreamerCore {
         }
         #[cfg(test)]
         meganeura::profiler::record_instant("phase:behavior_wait_done");
+        let expert_imitation = self.config.expert_imitation.as_ref().map(|_| {
+            let loss = read_scalar(&self.behavior_train, behavior::LOSS_EXPERT);
+            let weight_sum = batch.expert_action_target.iter().sum::<f32>();
+            assert!(loss.is_finite() && weight_sum.is_finite());
+            ExpertImitationMetrics {
+                loss,
+                weight_sum,
+                labeled_rows: batch.expert_labeled_rows,
+            }
+        });
         let metrics = BehaviorMetrics {
+            expert_imitation,
             total_loss: read_scalar(&self.behavior_train, behavior::LOSS_TOTAL),
             policy_loss: read_scalar(&self.behavior_train, behavior::LOSS_POLICY),
             actor_update_scale,

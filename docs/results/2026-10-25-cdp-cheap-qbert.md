@@ -1265,3 +1265,49 @@ including both captures, comparison JSON/PNG/SVG, source pins and terminal journ
 Comparison SHA256`1421a339edeb1fdff27086e506f5de92862107515c090de19461fea7bdb0c057`;
 completion`9a0107f304ea3dbf42dc9b88f2ccf9f47167fdf4ccdf8a2d78a43c94e7c777d9`.
 The geometry helper passes24 applied CPU tests; native binary is unchanged.
+
+
+## Optional native expert imitation: implementation and bounded validation
+
+The retained compact model predicts rewards, but guided experience has not
+improved its unaided task performance. Select an optional supervised actor term
+on explicitly trusted replay actions as the next bounded learning intervention.
+This adds no parameters and keeps the existing CDP world/imagined actor/critic.
+No general backend optimization, pretrained encoder or Python learning is added.
+
+`expert_imitation = {scale, action_weights}` is absent by default and omitted
+from serialized default configs. When enabled, the shared native actor also
+consumes detached replay features. The auxiliary cross-entropy is averaged over
+all replay rows after applying explicit per-action weights, then multiplied by
+scale. It does not normalize by the current minibatch's expert count; that would
+cancel NOOP downweighting on batches containing only NOOP labels. The default
+graph retains its original six outputs and parameter layout.
+
+Only the explicit `expert_actions` vector API marks labels; ordinary overrides
+and action masks remain untrusted. Targets pair state t with the executed action
+stored at t+1 in the same lane. Last/reset crossings and sequence tails are
+excluded; an action leading into a true terminal can still be supervised.
+The Atari CLI exposes fresh-only `--guidance-imitation-scale` and optional
+`--guidance-noop-weight`, requiring Qbert pixel guidance. Frozen restore keeps
+the checkpoint config and supplies no expert labels. Logs retain an explicit
+expert mask; the CPU audit rejects missing, forged or undeclared masks.
+
+127 Rust CPU tests and strict library/test Clippy pass;80 GPU tests remain
+ignored in that suite.477 relevant Python tests pass in1.11s. New checks cover
+legacy/default config, weight validation, incoming/outgoing alignment, resets,
+stream sampling, actor parameter reuse, graph compilation, CLI forwarding and
+trusted-label logging. The first replay test incorrectly assumed sampling would
+select each lane once; the corrected test checks tags across sampled identities
+and confirms both lanes are exercised without imposing that false assumption.
+
+Select only two bounded GPU checks under the existing host guard: analytic
+weighted/masked cross-entropy gradients, and explicit vector expert labels
+reaching one native replay actor update. Each has a120-second process cap;
+service cap300 seconds. These are correctness checks, not game performance.
+A separate release wheel will preserve the previous native runtime. A bounded
+Atari learning/restore check follows only after reviewing this result; no full
+training allocation, extension or seed campaign is selected.
+
+Implementation/build/check artifacts:
+`/x/Temp/kindle-expert-20261026`. Original runtime and all completed learner
+checkpoints remain under`/x/Temp/kindle-cheap-20261025`.

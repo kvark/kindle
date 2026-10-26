@@ -145,14 +145,15 @@ def test_cli_refuses_invalid_guidance_before_gpu(monkeypatch, tmp_path, capsys, 
 
 
 @pytest.mark.parametrize('cap', [None, 1])
-def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkeypatch, tmp_path, cap):
+@pytest.mark.parametrize('imitation', [False, True])
+def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkeypatch, tmp_path, cap, imitation):
     created = []
     class Policy:
         def action(self, frame): return int(frame[0,0,0])
     monkeypatch.setattr(module, 'PixelPolicy', Policy)
     class Environment:
         action_space = SimpleNamespace(n=18)
-        action_meanings = [str(n) for n in range(18)]
+        action_meanings = ["NOOP"] + [str(n) for n in range(1,18)]
         executed_action_frames = reset_noop_frames = emulator_resets = 0
         def reset(self, seed=None):
             self.length = 0; self.emulator_resets += 1
@@ -169,10 +170,17 @@ def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkey
         trainable_parameter_counts = dict(world=0, behavior=0)
         @classmethod
         def learned_rgb(cls, streams, config):
+            if imitation:
+                assert config['expert_imitation'] == dict(scale=2.0, action_weights=[.05]+[1.0]*17)
+            else:
+                assert 'expert_imitation' not in config
             obj = cls(); obj.config = config; return obj
         def begin_episodes(self, ids, frames): self.replay_len += len(ids)
-        def act(self, greedy=False, action_overrides=None):
-            return [17 if forced is None else forced for forced in action_overrides]
+        def act(self, greedy=False, action_overrides=None, *, expert_actions=None):
+            assert (expert_actions is not None) is imitation
+            assert (action_overrides is not None) is not imitation
+            choices = expert_actions if imitation else action_overrides
+            return [17 if forced is None else forced for forced in choices]
         def observe(self, ids, frames, rewards, terminated, truncated):
             self.environment_step += len(ids); self.replay_len += len(ids)
             return [[reward, 0.] for reward in rewards]
@@ -185,7 +193,8 @@ def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkey
     output = tmp_path/'run.jsonl'
     monkeypatch.setattr(sys, 'argv', ['atari_vector', 'ALE/Qbert-v5', '--output', str(output),
         '--num-envs', '2', '--steps', '6', '--train-ratio', '0', '--qbert-guidance-probability', '1',
-        *([] if cap is None else ['--qbert-guidance-max-actions', str(cap)])])
+        *([] if cap is None else ['--qbert-guidance-max-actions', str(cap)]),
+        *(['--guidance-imitation-scale', '2', '--guidance-noop-weight', '.05'] if imitation else [])])
     atari_vector.main()
     assert [env.actions for env in created] == ([[0,2,3], [0,2,3]] if cap is None else [[0,17,3], [0,17,3]])
     result = audit(output)
@@ -275,3 +284,21 @@ def test_replay_preserves_selected_episode_label_after_guidance_release():
     episodes,_=replay_qbert_guidance.replay_rows([json.dumps(r) for r in rows],
         [Environment()],[monitor],[frame],QbertGuidance(bounded_config(1),1,18),float('inf'))
     assert episodes[0]['guided'] is True
+
+
+@pytest.mark.parametrize('mutation', [None, 'missing', 'untrusted', 'numeric', 'undeclared'])
+def test_imitation_labels_must_match_declared_trusted_guidance(tmp_path, mutation):
+    rows = guided_events()
+    rows[0]['config']['expert_imitation'] = dict(scale=2., action_weights=[.05]+[1.]*17)
+    transitions = [row for row in rows if row['event'] == 'transition']
+    for row in transitions:
+        row['expert_action_mask'] = [value is not None for value in row['action_overrides']]
+    if mutation == 'missing': del transitions[0]['expert_action_mask']
+    elif mutation == 'untrusted': transitions[0]['expert_action_mask'][0] = False
+    elif mutation == 'numeric': transitions[0]['expert_action_mask'][0] = 1
+    elif mutation == 'undeclared': del rows[0]['config']['expert_imitation']
+    if mutation is None:
+        assert audit(write_log(tmp_path, rows))['actions'] == 6
+    else:
+        with pytest.raises(ValueError, match='expert action mask'):
+            audit(write_log(tmp_path, rows))

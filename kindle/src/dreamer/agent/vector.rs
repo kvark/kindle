@@ -14,6 +14,7 @@ struct LiveStream {
     active: bool,
     needs_reset: bool,
     pending_action: Option<usize>,
+    pending_expert: bool,
 }
 
 pub(super) struct VectorCore {
@@ -139,6 +140,7 @@ impl VectorCore {
                     active: false,
                     needs_reset: false,
                     pending_action: None,
+                    pending_expert: false,
                 }
             })
             .collect();
@@ -277,6 +279,8 @@ impl VectorCore {
             .map(|&(id, flags, reward)| {
                 let stream = &mut self.streams[id];
                 let previous_action = stream.pending_action.take();
+                let expert = std::mem::take(&mut stream.pending_expert);
+                assert!(!expert || (!flags.is_first && previous_action.is_some()));
                 stream.active = true;
                 stream.needs_reset = flags.is_last;
                 if !flags.is_first {
@@ -285,7 +289,7 @@ impl VectorCore {
                         config.train_ratio / (config.batch_size * config.batch_length) as f32,
                     );
                 }
-                (id, previous_action, reward, flags)
+                (id, previous_action, reward, flags, expert)
             })
             .collect();
         self.learner
@@ -309,6 +313,21 @@ impl VectorCore {
             self.learner.config.action_count,
         )?;
         Ok(self.act_inner(mode, Some(overrides), None))
+    }
+
+    fn act_with_expert_actions(
+        &mut self,
+        mode: ActionMode,
+        actions: &[Option<usize>],
+    ) -> Result<Vec<usize>, &'static str> {
+        if self.learner.config.expert_imitation.is_none() {
+            return Err("expert actions require an imitation configuration");
+        }
+        let selected = self.act_with_overrides(mode, actions)?;
+        for (stream, action) in self.streams.iter_mut().zip(actions) {
+            stream.pending_expert = action.is_some();
+        }
+        Ok(selected)
     }
 
     pub(super) fn act_inner(
@@ -364,6 +383,7 @@ impl VectorCore {
                 );
                 let action = overrides.and_then(|a| a[id]).unwrap_or(proposed as usize);
                 self.streams[id].pending_action = Some(action);
+                self.streams[id].pending_expert = false;
                 action
             })
             .collect()
@@ -930,6 +950,16 @@ impl VectorDreamerAgent {
         overrides: &[Option<usize>],
     ) -> Result<Vec<usize>, &'static str> {
         self.core.act_with_overrides(mode, overrides)
+    }
+
+    /// Execute trusted labels and retain them for the optional replay actor loss.
+    /// Ordinary overrides and action masks never imply expert supervision.
+    pub fn act_with_expert_actions(
+        &mut self,
+        mode: ActionMode,
+        actions: &[Option<usize>],
+    ) -> Result<Vec<usize>, &'static str> {
+        self.core.act_with_expert_actions(mode, actions)
     }
 
     pub fn observe(&mut self, transitions: &[(usize, Transition)]) -> Vec<Reward> {
@@ -1788,6 +1818,95 @@ mod tests {
         for (&a, &b) in left.iter().zip(right) {
             assert!((a - b).abs() < 1e-4, "{a} != {b}");
         }
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded expert replay/actor update check"]
+    fn expert_actions_are_explicit_and_train_the_replay_actor() {
+        let mut config = config();
+        config.learning_rate_warmup = 0;
+        config.expert_imitation = Some(super::super::super::ExpertImitation {
+            scale: 2.0,
+            action_weights: vec![0.05, 1.0, 1.0],
+        });
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let learner = DreamerCore::with_gpu(config, gpu);
+        let mut vector = VectorCore::new(learner, 2);
+        let first = FrameFlags {
+            is_first: true,
+            ..Default::default()
+        };
+        vector.ingest(
+            (0..2)
+                .map(|id| (id, observation(id, 0), first, Reward::default()))
+                .collect(),
+        );
+        assert!(
+            vector
+                .act_with_expert_actions(ActionMode::Sample, &[Some(0)])
+                .is_err()
+        );
+        assert!(
+            vector
+                .act_with_expert_actions(ActionMode::Sample, &[Some(99), None])
+                .is_err()
+        );
+        assert!(
+            vector
+                .streams
+                .iter()
+                .all(|stream| stream.pending_action.is_none() && !stream.pending_expert)
+        );
+        for time in 1..9 {
+            if time == 2 {
+                vector
+                    .act_with_overrides(ActionMode::Sample, &[Some(0), Some(1)])
+                    .unwrap();
+                assert!(vector.streams.iter().all(|stream| !stream.pending_expert));
+            } else {
+                let actions = vector
+                    .act_with_expert_actions(ActionMode::Sample, &[Some(2), None])
+                    .unwrap();
+                assert_eq!(actions[0], 2);
+                assert!(vector.streams[0].pending_expert && !vector.streams[1].pending_expert);
+            }
+            vector.ingest(
+                (0..2)
+                    .map(|id| {
+                        (
+                            id,
+                            observation(id, time),
+                            FrameFlags::default(),
+                            Reward::default(),
+                        )
+                    })
+                    .collect(),
+            );
+            assert!(vector.streams.iter().all(|stream| !stream.pending_expert));
+        }
+        let mut before = vec![0.0; 3];
+        vector
+            .learner
+            .behavior_train
+            .read_param("behavior.actor.out.bias", &mut before);
+        let report = vector.learn().unwrap();
+        let expert = report.behavior.expert_imitation.unwrap();
+        assert!(expert.labeled_rows > 0 && expert.weight_sum > 0.0 && expert.loss > 0.0);
+        let mut after = vec![0.0; 3];
+        vector
+            .learner
+            .behavior_train
+            .read_param("behavior.actor.out.bias", &mut after);
+        assert_ne!(before, after);
+        assert!(after.iter().all(|x| x.is_finite()));
+        println!(
+            "expert labels={} weight_sum={} loss={}",
+            expert.labeled_rows, expert.weight_sum, expert.loss
+        );
     }
 
     #[test]

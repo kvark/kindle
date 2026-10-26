@@ -77,6 +77,7 @@ pub struct SequenceReplay {
 
 struct StoredFrame {
     values: FrameValues,
+    previous_action_is_expert: bool,
     previous_action: Option<usize>,
     reward: Reward,
     flags: FrameFlags,
@@ -174,6 +175,7 @@ impl SequenceReplay {
                     deter: frame.deter,
                     stoch: frame.stoch,
                 },
+                previous_action_is_expert: false,
                 previous_action: frame.previous_action,
                 reward: frame.reward,
                 flags: frame.flags,
@@ -213,7 +215,7 @@ impl SequenceReplay {
     pub(super) fn push_device(
         &mut self,
         session: &meganeura::Session,
-        arrivals: &[(usize, Option<usize>, Reward, FrameFlags)],
+        arrivals: &[(usize, Option<usize>, Reward, FrameFlags, bool)],
         config: &DreamerConfig,
     ) {
         assert!(arrivals.len() <= self.capacity);
@@ -226,7 +228,9 @@ impl SequenceReplay {
             .as_mut()
             .expect("device replay enabled")
             .store(session, &slots);
-        for (&(stream, previous_action, reward, flags), &(_, slot)) in arrivals.iter().zip(&slots) {
+        for (&(stream, previous_action, reward, flags, previous_action_is_expert), &(_, slot)) in
+            arrivals.iter().zip(&slots)
+        {
             self.push_stored(
                 stream,
                 StoredFrame {
@@ -235,6 +239,7 @@ impl SequenceReplay {
                         refreshed: None,
                     },
                     previous_action,
+                    previous_action_is_expert,
                     reward,
                     flags,
                 },
@@ -334,6 +339,7 @@ impl SequenceReplay {
         let mut previous_actions = (0..length)
             .map(|_| vec![0.0; batch * config.action_count])
             .collect::<Vec<_>>();
+        let mut previous_action_is_expert = vec![vec![false; batch]; length];
         let mut rewards = (0..length).map(|_| vec![0.0; batch]).collect::<Vec<_>>();
         let mut flags = (0..length)
             .map(|_| vec![FrameFlags::default(); batch])
@@ -445,6 +451,7 @@ impl SequenceReplay {
                 if let Some(action) = frame.previous_action {
                     previous_actions[time][row * config.action_count + action] = 1.0;
                 }
+                previous_action_is_expert[time][row] = frame.previous_action_is_expert;
                 rewards[time][row] = frame.reward.combined(config);
                 flags[time][row] = frame.flags;
                 frame_indices[time][row] = (stream, index);
@@ -479,6 +486,7 @@ impl SequenceReplay {
             observations,
             pixels,
             previous_actions,
+            previous_action_is_expert,
             rewards,
             flags,
             frame_indices,
@@ -531,12 +539,46 @@ pub struct SequenceBatch {
     pub observations: Vec<Vec<f32>>,
     pub pixels: Option<Vec<Vec<f32>>>,
     pub previous_actions: Vec<Vec<f32>>,
+    pub previous_action_is_expert: Vec<Vec<bool>>,
     pub rewards: Vec<Vec<f32>>,
     pub flags: Vec<Vec<FrameFlags>>,
     frame_indices: Vec<Vec<(usize, usize)>>,
 }
 
 impl SequenceBatch {
+    /// Pair the outgoing expert action stored on frame t+1 with state t.
+    /// Last/reset boundaries and the sequence tail never acquire a label.
+    pub fn expert_targets(&self, config: &DreamerConfig) -> (Vec<f32>, usize) {
+        let Some(expert) = &config.expert_imitation else {
+            return (Vec::new(), 0);
+        };
+        let rows = config.batch_size * (config.batch_length - 1);
+        let mut targets = vec![0.0; rows * config.action_count];
+        let mut labeled = 0;
+        for time in 0..config.batch_length - 1 {
+            for lane in 0..config.batch_size {
+                if self.flags[time][lane].is_last
+                    || self.flags[time + 1][lane].is_first
+                    || !self.previous_action_is_expert[time + 1][lane]
+                {
+                    continue;
+                }
+                let offset = lane * config.action_count;
+                let incoming =
+                    &self.previous_actions[time + 1][offset..offset + config.action_count];
+                assert_eq!(incoming.iter().filter(|&&value| value == 1.0).count(), 1);
+                assert!(incoming.iter().all(|&value| value == 0.0 || value == 1.0));
+                labeled += 1;
+                let row = time * config.batch_size + lane;
+                for action in 0..config.action_count {
+                    targets[row * config.action_count + action] =
+                        incoming[action] * expert.action_weights[action];
+                }
+            }
+        }
+        (targets, labeled)
+    }
+
     pub fn keep(&self, time: usize, row: usize) -> f32 {
         if self.flags[time][row].is_first {
             0.0
@@ -550,6 +592,80 @@ impl SequenceBatch {
 mod tests {
     use super::*;
     use rand::{SeedableRng, rngs::StdRng};
+
+    #[test]
+    fn expert_targets_align_outgoing_actions_and_exclude_reset_tail_and_untrusted_rows() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 2;
+        config.batch_length = 4;
+        config.expert_imitation = Some(super::super::ExpertImitation {
+            scale: 2.0,
+            action_weights: vec![0.05, 1.0, 2.0],
+        });
+        let mut batch = SequenceBatch {
+            previous_actions: vec![vec![0.0; 6]; 4],
+            previous_action_is_expert: vec![vec![false; 2]; 4],
+            flags: vec![vec![FrameFlags::default(); 2]; 4],
+            ..Default::default()
+        };
+        batch.previous_action_is_expert[0][0] = true;
+        batch.previous_actions[0][0] = 1.0; // Incoming action must not label state0.
+        batch.previous_action_is_expert[1][0] = true;
+        batch.previous_actions[1][2] = 1.0;
+        batch.previous_actions[1][4] = 1.0; // Ordinary override is not expert.
+        batch.flags[1][0].is_last = true;
+        batch.flags[2][0].is_first = true;
+        batch.previous_action_is_expert[2][0] = true; // Mask even a malformed reset label.
+        batch.previous_action_is_expert[2][1] = true;
+        batch.previous_actions[2][4] = 1.0;
+        batch.previous_action_is_expert[3][0] = true;
+        batch.previous_actions[3][0] = 1.0;
+        batch.flags[3][0].is_last = true; // The action leading into terminal is valid.
+        let (targets, count) = batch.expert_targets(&config);
+        assert_eq!(count, 3);
+        assert_eq!(
+            targets,
+            vec![
+                0., 0., 2., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0.05, 0., 0., 0., 0., 0.
+            ]
+        );
+        config.expert_imitation = None;
+        assert_eq!(batch.expert_targets(&config), (Vec::new(), 0));
+    }
+
+    #[test]
+    fn expert_tags_survive_replay_sampling_without_crossing_streams() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 2;
+        config.batch_length = 3;
+        let mut replay = SequenceReplay::with_streams(16, 2);
+        for index in 0..4 {
+            for stream in 0..2 {
+                replay.push_stream(stream, frame(index, &config), &config);
+                replay.streams[stream]
+                    .frames
+                    .back_mut()
+                    .unwrap()
+                    .previous_action_is_expert = stream == 1 && index == 2;
+            }
+        }
+        let mut rng = StdRng::seed_from_u64(1);
+        let mut seen = [false; 2];
+        for _ in 0..16 {
+            let batch = replay.sample(&config, &mut rng).unwrap();
+            for time in 0..3 {
+                for row in 0..2 {
+                    let (stream, index) = batch.frame_indices[time][row];
+                    seen[stream] = true;
+                    assert_eq!(
+                        batch.previous_action_is_expert[time][row],
+                        stream == 1 && index == 2
+                    );
+                }
+            }
+        }
+        assert_eq!(seen, [true, true]);
+    }
 
     #[test]
     fn video_replay_chunks_follow_arrivals_resets_and_eviction() {
@@ -590,6 +706,7 @@ mod tests {
                             stoch: Box::new([]),
                         },
                         previous_action: (!first).then_some(0),
+                        previous_action_is_expert: false,
                         reward: Reward::default(),
                         flags: FrameFlags {
                             is_first: first,

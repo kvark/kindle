@@ -317,6 +317,14 @@ cohort, not the cause of weak policy transfer. Retain4M48/H15; no new training
 or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
+
+Optional native expert imitation is implemented, default-disabled, with127 CPU
+Rust tests/strict Clippy and477 Python tests passing. Only explicit expert
+actions create replay labels; per-action weights can downweight NOOP. Select
+bounded gradient/vector GPU checks (120s each), then review before any Atari
+allocation. No full training selected. Existing native runtime remains retained.
+See [implementation and scope](results/2026-10-25-cdp-cheap-qbert.md#optional-native-expert-imitation-implementation-and-bounded-validation).
+
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.
@@ -324,8 +332,8 @@ No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
 Check live service state before GPU work. Whole-episode and capped Qbert
 guidance, Pong RGB32, Pong behavior-rate learning and their postprocessing are
-complete, including the fixed frozen Qbert forecast comparison. No GPU allocation
-is active or queued. Do not restart completed services.
+complete, including the fixed frozen Qbert forecast comparison. The newly selected bounded expert checks are described above. Do not restart
+completed services.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
