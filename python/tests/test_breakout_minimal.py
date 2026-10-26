@@ -10,15 +10,20 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'examples'))
 import audit_atari_tasks as scorer
+from audit_atari import score_matches
+from audit_atari_campaign import check_match_replay
 import replay_atari as replay
 
 
-MINIMAL_ACTIONS = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
+MINIMAL_ACTIONS = {
+    'ALE/Breakout-v5': ['NOOP', 'FIRE', 'RIGHT', 'LEFT'],
+    'ALE/Qbert-v5': ['NOOP', 'FIRE', 'UP', 'RIGHT', 'LEFT', 'DOWN'],
+    'ALE/Pong-v5': ['NOOP', 'FIRE', 'RIGHT', 'LEFT', 'RIGHTFIRE', 'LEFTFIRE'],
+}
 
 
 def identity_fixture(environment='ALE/Breakout-v5'):
-    actions = (MINIMAL_ACTIONS if environment == 'ALE/Breakout-v5' else
-               ['NOOP', 'FIRE', 'UP', 'RIGHT', 'LEFT', 'DOWN'])
+    actions = MINIMAL_ACTIONS[environment]
     rom = replay.rom_identity(environment)
     native = Path(replay.ale_native.__file__)
     header = dict(environment=environment, atari_protocol='published-minimal',
@@ -31,7 +36,7 @@ def identity_fixture(environment='ALE/Breakout-v5'):
     return header, manifest, rom
 
 
-@pytest.mark.parametrize('environment', ['ALE/Breakout-v5', 'ALE/Qbert-v5'])
+@pytest.mark.parametrize('environment', list(MINIMAL_ACTIONS))
 def test_minimal_requires_a_new_replay_version_and_explicit_declaration(environment):
     header, manifest, rom = identity_fixture(environment)
     assert replay.verify_replay_identity(header, manifest, rom) == 'kindle-atari-task-replay-v2'
@@ -78,7 +83,7 @@ def test_published_replay_retains_v1_and_implicit_historical_declarations(declar
     (lambda h, m: h.update(wrapper_sha256='wrong'), 'source wrapper'),
     (lambda h, m: m.update(pins={}), 'replay input'),
 ])
-@pytest.mark.parametrize('environment', ['ALE/Breakout-v5', 'ALE/Qbert-v5'])
+@pytest.mark.parametrize('environment', list(MINIMAL_ACTIONS))
 def test_minimal_protocol_does_not_accept_mixed_or_incomplete_inputs(mutation, message, environment):
     header, manifest, rom = identity_fixture(environment)
     mutation(header, manifest)
@@ -86,7 +91,7 @@ def test_minimal_protocol_does_not_accept_mixed_or_incomplete_inputs(mutation, m
         replay.verify_replay_identity(header, manifest, rom)
 
 
-@pytest.mark.parametrize('environment', ['ALE/Freeway-v5', 'ALE/Pong-v5'])
+@pytest.mark.parametrize('environment', ['ALE/Freeway-v5', 'ALE/Boxing-v5'])
 def test_minimal_replay_is_not_implicitly_enabled_for_other_games(environment):
     header, manifest, rom = identity_fixture()
     header['environment'] = manifest['environment'] = environment
@@ -101,7 +106,7 @@ def test_existing_current_preprocessing_is_not_a_published_minimal_replay():
         replay.verify_replay_identity(header, manifest, rom)
 
 
-@pytest.mark.parametrize('environment', ['ALE/Breakout-v5', 'ALE/Qbert-v5'])
+@pytest.mark.parametrize('environment', list(MINIMAL_ACTIONS))
 @pytest.mark.parametrize('minimal', [False, True])
 @pytest.mark.parametrize('observation_size', ['64', 'native'])
 @pytest.mark.parametrize('sticky_actions', [0.0, 0.25])
@@ -131,9 +136,9 @@ def test_replay_cli_constructs_the_declared_real_ale_action_space(tmp_path, monk
             environments.append(env)
         header['action_meanings'] = list(environments[0].action_meanings)
         header['config']['action_count'] = len(header['action_meanings'])
-        minimal_indices = [0, 1, 3, 4] if environment == 'ALE/Breakout-v5' else list(range(6))
+        minimal_indices = [header['action_meanings'].index(name) for name in MINIMAL_ACTIONS[environment]]
         assert header['config']['action_count'] == (len(minimal_indices) if minimal else 18)
-        for tick in range(512):
+        for tick in range(4096 if environment == 'ALE/Pong-v5' else 512):
             indices = [(tick + stream) % len(minimal_indices) for stream in range(2)]
             actions = [index if minimal else minimal_indices[index] for index in indices]
             results = [env.step(action) for env, action in zip(environments, actions)]
@@ -155,6 +160,8 @@ def test_replay_cli_constructs_the_declared_real_ale_action_space(tmp_path, monk
                     environments[stream].reset()
             if resets:
                 rows.append(dict(event='reset', streams=resets))
+            if environment == 'ALE/Pong-v5' and all(counts):
+                break
         end = dict(executed_action_frames=[env.executed_action_frames for env in environments],
                    emulator_resets=[env.emulator_resets for env in environments], partial_returns=returns)
     assert episodes, 'fixture must exercise real episode boundaries and resets'
@@ -171,11 +178,19 @@ def test_replay_cli_constructs_the_declared_real_ale_action_space(tmp_path, monk
     version = 3 if observation_size == 'native' or sticky_actions else 2 if minimal else 1
     assert result['protocol'] == f'kindle-atari-task-replay-v{version}'
     assert result['source_header']['action_meanings'] == header['action_meanings']
-    scorer.check_replay(run, result)
-    assert not scorer.score_tasks(header['environment'], result['episodes'])['task_gate_passed']
-    result['protocol'] = f'kindle-atari-task-replay-v{1 if version != 1 else 2}'
-    with pytest.raises(ValueError, match='unsupported replay protocol'):
+    if environment == 'ALE/Pong-v5':
+        check_match_replay(run, result)
+        assert not score_matches(environment, result['episodes'])['mastery_passed']
+        error = 'match replay source differs'
+        check = check_match_replay
+    else:
         scorer.check_replay(run, result)
+        assert not scorer.score_tasks(header['environment'], result['episodes'])['task_gate_passed']
+        error = 'unsupported replay protocol'
+        check = scorer.check_replay
+    result['protocol'] = f'kindle-atari-task-replay-v{1 if version != 1 else 2}'
+    with pytest.raises(ValueError, match=error):
+        check(run, result)
 
 
 @pytest.mark.parametrize('field,value', [('observation_size', 'native'), ('sticky_actions', .25)])

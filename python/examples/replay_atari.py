@@ -3,7 +3,7 @@
 Replays every recorded action in fresh environments. It does not construct or
 train Kindle. A movie shows every episode of the chosen stream, not selected
 successes. RAM is used only by the post-hoc Qbert completion observer.
-Published full-action runs retain replay v1. Minimal-action Breakout and Qbert require
+Published full-action runs retain replay v1. Minimal-action Breakout, Qbert and Pong require
 an explicit matching declaration and replay v2; it does not change task gates.
 """
 
@@ -46,6 +46,7 @@ class TaskMonitor(gym.Wrapper):
 MINIMAL_ACTIONS = {
     'ALE/Breakout-v5': ['NOOP', 'FIRE', 'RIGHT', 'LEFT'],
     'ALE/Qbert-v5': ['NOOP', 'FIRE', 'UP', 'RIGHT', 'LEFT', 'DOWN'],
+    'ALE/Pong-v5': ['NOOP', 'FIRE', 'RIGHT', 'LEFT', 'RIGHTFIRE', 'LEFTFIRE'],
 }
 
 
