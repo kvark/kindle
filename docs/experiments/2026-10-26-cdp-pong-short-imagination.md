@@ -79,3 +79,9 @@ progress point. Cost-review SHA256
 `0d6b8a1f6113179bd5e1ed329748dde6bd32b6d0da8f6438f96ba2086e3041dc`.
 This is incomplete-run cost evidence; trajectories differ and frozen learning
 remains pending. No budget or gate changes follow from the early speed.
+
+The200k recovery also passes at49,939 updates,346 finite tensors and51,755
+strict reports through207,272 actions. Captured204,800-action progress is926.108s
+with zero debt. Checkpoint metadata SHA256
+`50ec20e7a2541346b755690063138165142fa2cf4dec7ef9d9272f207b6918b2`.
+The service continues toward the fixed500k endpoint; no frozen result yet.
