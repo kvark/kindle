@@ -92,23 +92,23 @@ The [bounded B16 check](results/2026-10-25-cdp-cheap-pong.md#b16-bounded-check-p
 passes16,384 actions/2,002 updates and ordinary restore, using72.224s versus
 94.054s for B8. All346 initial tensors match and restored tensors stay unchanged;
 service exits09:38:03 UTC. The23.21% early cost reduction is not learning evidence.
-Current allocation: [full-budget PongB16](experiments/2026-10-26-cdp-pong-batch16-budget.md),
-fresh1009/eval4000001009,4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01, no aid.
-Fixed500k/62454 updates, first376 and45-minute cap;100k recoveries, own actual
-initial/fixed final and unchanged mean15/90%-win gate. Cadence, centering and
-per-action warmup change; match346 initial tensors and retain full audits.
-Artifacts/controller:`pong-4m-48-b16-r32-intrinsic001-500k`,
-`run_pong_b16_intrinsic001_500k.py`; owner
-`kindle-cheap-pong-b16-intrinsic001-500k-20261026`. Check live state before GPU
-work. No cap increase, unchanged extension or automatic next queue.
-Started09:48:13 UTC, source`8a966a2`; startup verifies346 matched initial tensors
-and first376. The100k recovery passes12,454 updates and full finite/config checks;
-completed-run curves and B8/B16 comparison are automated. Frozen result pending.
-The [Qbert12M/RGB48/B16 check](experiments/2026-10-26-cdp-qbert-capacity-check.md)
-is prepared but unselected:16,384 actions under300s, then ordinary1,024-action
-restore. CPU shape/config/queue checks pass; actual14,123,473 parameters and
-execution remain unverified. It changes capacity and replay batch together.
-No GPU work or full learning allocation follows automatically; review Pong first.
+The [full-budget PongB16 result](results/2026-10-25-cdp-cheap-pong.md#b16-at-the-fixed500k-budget)
+completes500k/62,454 updates in38m45s,22.37% less training time than B8. Frozen
+11.875 versus initial−20.375 retains24/24 wins but falls below B8's14.958 and
+misses mean15. All four recoveries, frozen audits, curves and comparison pass;
+service exits10:28:51 UTC. No extension or seed confirmation selected.
+
+Current allocation: [bounded Qbert12M/RGB48/B16 check](experiments/2026-10-26-cdp-qbert-capacity-check.md),
+selected after Pong's completed outcome/comparison and terminal service. Fresh
+1009/eval4000001009, Auto/N8/T16/H15/R32, coefficient1, full18, no aid.16,384
+training actions/2,002 expected updates under300s, first376, then ordinary1,024
+frozen actions under90s. Expected14,123,473 parameters; own actual initial and
+full config/numeric/counter/finite/346-frozen-tensor checks. Capacity and batch
+change together; no competence claim or full learning allocation follows.
+Artifacts/controller:`qbert-12m-48-b16-check`, `run_qbert_12m_48_b16_check.py`;
+intended owner`kindle-cheap-qbert-12m-48-b16-check-20261026`. Check live state
+before GPU work. No retry, cap increase or automatic promotion.
+
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

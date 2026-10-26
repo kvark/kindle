@@ -1,8 +1,10 @@
 # Bounded Qbert12M/RGB48/B16 check
 
-**Prepared, unselected. Pong's full-budget B16 trial remains active.** Review
-that outcome and terminal service before selecting any further GPU work. This
-preparation starts no agent and makes no full learning allocation.
+**Selected after the completed Pong B16 comparison.** Pong uses22.37% less
+training time but scores11.875 versus14.958, both24/24 wins and below mean15.
+All audits/comparison pass; its service exits10:28:51 UTC. No extension or
+confirmation follows. This separate Qbert check tests a different capacity/game;
+it is not a full learning allocation or a claim that B16 preserves quality.
 
 The compact Qbert4M/RGB48 tests improve over their actual initial policies but
 complete no first pyramids. Increasing experience to500k at R16 scores719.792,

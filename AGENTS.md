@@ -51,20 +51,21 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: full-budget PongB16 learning test, fresh1009/eval4000001009,
-4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01, no aid. Fixed500k actions,
-62,454 expected updates, first376 and45-minute training cap. Own actual initial
-must match the B8 control; keep fixed-final/initial24-natural-match evaluations
-and mean15/90%-win gate. Batch/microbatch8→16 changes optimizer cadence,
-centering and warmup; sampled positions remain nearly equal, not updates.
-See `docs/experiments/2026-10-26-cdp-pong-batch16-budget.md`; service owner
-`kindle-cheap-pong-b16-intrinsic001-500k-20261026`. Check live state before GPU work.
-Started09:48:13 UTC from`8a966a2`; startup matches346 initial tensors and the100k
-recovery passes12,454 updates. Full final audits and comparison are automated.
-The short B16 check passes16,384 actions/2,002 updates and ordinary restore,
-using23.21% less early wall time; this is not full-budget learning evidence.
-Qbert500k/R16 completes with lower719.792 score/14.125 coverage and0/24 pyramids;
-no extension. No automatic promotion, cap increase or next allocation.
+Current allocation: bounded Qbert12M/RGB48/B16 learning/restore check, selected
+after the completed Pong comparison. Fresh1009/eval4000001009, Auto/N8/T16/H15/
+R32, full microbatch16, coefficient1, full18 and no aid. Fixed16,384 actions/
+2,002 expected updates, first376,300s training cap; ordinary1,024-action restore
+under90s, audit120s/service660s. Own actual initial, expected14,123,473 parameters,
+complete config/finite/report/counter checks and346 unchanged frozen tensors.
+See `docs/experiments/2026-10-26-cdp-qbert-capacity-check.md`; intended owner
+`kindle-cheap-qbert-12m-48-b16-check-20261026`. Check live state before GPU work.
+Capacity and replay batch change together; this bounded check tests execution
+and early cost, not competence. No full allocation or automatic promotion.
+
+PongB16 completes500k/62,454 updates in38m45s,22.37% less training time than B8,
+but frozen11.875 is below14.958; both24/24 wins and below mean15. All audits and
+comparison pass; service exits10:28:51 UTC. No extension or confirmation.
+Qbert500k/R16 remains weaker than its200k/R32 control, with0/24 pyramids.
 
 Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
 `1ed07af`, CPU replay `e853818`. The active declaration pins exact runtime/script

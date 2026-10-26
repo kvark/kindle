@@ -1,6 +1,11 @@
 # Full-budget Pong learning with replay batch16
 
-**Selected after the completed bounded B16 check.** Its16,384-action window
+**Completed.** [Result and comparison](../results/2026-10-25-cdp-cheap-pong.md#b16-at-the-fixed500k-budget):
+500k/62,454 updates in38m45s,22.37% less training time than B8; frozen11.875
+versus14.958, both24/24 wins and below mean15. All audits/comparison pass;
+service exits10:28:51 UTC. No extension or confirmation selected.
+
+Selected after the completed bounded B16 check. Its16,384-action window
 uses72.224s versus94.054s for B8,23.21% less wall time. Full configuration,
 matched initial tensors, first376/2,002 updates, selected parameter changes,
 ordinary restore and346-tensor invariance pass; service exits09:38:03 UTC.

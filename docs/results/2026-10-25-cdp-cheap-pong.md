@@ -340,3 +340,57 @@ with a45-minute cap and the original mean15/90%-win gate. It must establish
 actual frozen quality and full-budget cost; no result follows from this check
 alone. The validation life is retained separately and is not the performance
 trial or an independent training seed.
+
+## B16 at the fixed500k budget
+
+B16 completes **500,000 actions /1,999,733 emulator frames /62,454 updates in
+2,325.367s (38m45s)**, using **22.37% less training wall time** than B8's49m55s
+at the same experience budget. Action throughput is215.02/s,1.288× B8. Frozen
+quality is lower: **11.875 versus14.958**, both24/24 wins. Both miss the unchanged
+mean15/90%-win gate. This is a useful measured cost tradeoff, not a quality pass
+or evidence that batch16 is an interchangeable replacement.
+
+| Same reused seed1009, coefficient.01 | B8 | B16 |
+| --- | ---: | ---: |
+| Aggregate actions |500,000 |500,000 |
+| Emulator frames |1,999,728 |1,999,733 |
+| Updates / first update action |124,939 /248 |62,454 /376 |
+| Sampled replay positions |15,992,192 |15,988,224 |
+| Training wall |2,995.274s |2,325.367s |
+| Construction, separate |2.140s |2.203s |
+| Fixed frozen final / actual initial |14.958 /−20.375 |11.875 /−20.375 |
+| Selected wins, final / initial |24/24 /0/24 |24/24 /0/24 |
+
+Only native batch_size and world_microbatch_size change8→16;4M/RGB48/Auto,
+N8/T16/H15/R32, full18, actor_unimix0 and no aid remain fixed. All346 actual
+initial tensors and semantic frozen-initial traces match. Cadence, centering
+population and optimizer warmup per action differ; no learning-rate rescaling.
+The online curve develops earlier in wall time, while its fixed frozen endpoint
+scores lower. Neither curve nor speed substitutes for that endpoint. The short
+shape check's cost is additional, and this reused seed is not independent
+confirmation.
+
+B16 completes154 natural training episodes, mean−4.545 over all completions and
+online last50 mean8.18, with zero debt. All62,454 strict numeric reports, four
+100k recoveries, complete config/source/counters and finite checkpoints pass.
+Final/initial frozen collection uses95,664/24,200 actions,382,597/96,771 frames
+and40.406/10.252s. Select24 natural matches per arm, retaining two excess final
+matches and partial tails. Zero updates/truncations, all346 unchanged frozen
+tensors, complete CPU replays/videos and three host guards pass.
+
+Curves and the B8/B16 comparison complete and are visually reviewed. Service
+`kindle-cheap-pong-b16-intrinsic001-500k-20261026` exits successfully at10:28:51 UTC,
+40m38.181s total service wall. Source at launch`8a966a2`, native`bfb8c31`,
+runner`1ed07af` and replay`e853818`; no cutoff, retry or native change.
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-48-b16-r32-intrinsic001-500k`,
+including `learning-review.json`, `curve/`, `batch-comparison/`, four recovery
+reviews and terminal journal. Review SHA256
+`bc6e9fbc5889066141be478cf115aa5648383f4a7e87656bbe3bdf124b0b229f`;
+curve`32e73c1401181bfe3060b960934601ec25b70079e4e9c092522079a73321a63f`;
+comparison`944e622a80ba30f3cb212300fd3cf0b9e46566c5675896cc759572c8e9157738`.
+
+No extension or seed confirmation is selected for this lower-scoring recipe.
+The next selected step is the separately prepared
+[bounded Qbert capacity check](../experiments/2026-10-26-cdp-qbert-capacity-check.md).
+Its different game/capacity still requires its own learning test; Pong's speed
+result does not establish Qbert competence or justify a full allocation.

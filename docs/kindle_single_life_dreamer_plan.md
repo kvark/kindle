@@ -140,24 +140,22 @@ wall time. Full config, matched initial tensors, weight changes, ordinary restor
 and346-tensor invariance pass; service exits09:38:03 UTC. This is not a full-budget
 throughput measurement or natural-match competence result.
 
-**Current allocation:** [full-budget PongB16](experiments/2026-10-26-cdp-pong-batch16-budget.md).
-Fresh1009/eval4000001009, coefficient.01/4M/RGB48/Auto/N8/B16/T16/H15/R32, no aid.
-Keep500k actions, expected62,454 updates, first376 and45-minute cap. Replay batch
-and world microbatch change8→16; cadence, centering population and per-action
-warmup also change. Retain own actual-initial/fixed-final controls and mean15/90%
-gate, match346 initial tensors, audit100k recoveries and complete frozen replays.
-The short check motivates this trial but predicts no learning outcome. No cap
-increase, automatic extension or next queue.
-Started09:48:13 UTC, source`8a966a2`. Startup matches all346 initial tensors;
-the100k recovery passes12,454 updates and complete finite/config checks.
-Full final audits and B8/B16 comparison are automated; frozen result pending.
+The [full-budget PongB16 result](results/2026-10-25-cdp-cheap-pong.md#b16-at-the-fixed500k-budget)
+completes500k/62,454 updates in38m45s,22.37% less training time than B8. Frozen
+11.875 versus initial−20.375 retains24/24 wins but is below B8's14.958 and misses
+mean15. Full audits/curves/comparison pass; service exits10:28:51 UTC. The online
+curve develops earlier in wall time, but fixed frozen quality is lower. No
+extension or seed confirmation is selected for this recipe.
 
-Prepared, unselected: [Qbert12M/RGB48/B16 bounded check](experiments/2026-10-26-cdp-qbert-capacity-check.md).
-Historical larger models motivate checking existing12M capacity while retaining
-RGB48. The16,384-action/300s check measures execution/early cost and ordinary
-restore, not task competence. Capacity and batch change together. CPU shape
-derivation/queue checks pass; no new GPU work, full allocation or automatic queue.
-Review current Pong before selecting another learning step.
+**Current allocation:** [bounded Qbert12M/RGB48/B16 check](experiments/2026-10-26-cdp-qbert-capacity-check.md),
+selected after the completed Pong review. Historical larger models motivate
+checking existing12M capacity while retaining RGB48. Fixed16,384 actions/2,002
+expected updates, first376,300s training cap, then ordinary1,024-action restore.
+Fresh1009/eval4000001009, Auto/N8/T16/H15/R32, coefficient1, full18 and no aid.
+Capacity and batch change together. Own actual initial, expected14,123,473
+parameters and full config/counter/finite/unchanged-tensor audits are required.
+This measures execution and early cost, not task competence. No full learning
+allocation, retry, cap increase or automatic promotion follows.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
