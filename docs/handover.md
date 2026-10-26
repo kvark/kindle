@@ -136,6 +136,11 @@ tensors, full config exceptH5 and first248:1/256:2/256:3 numeric reports. Fixed 
 complete numerical/config/counter/tensor/replay/guard audits. Native unchanged.
 Owner`kindle-cheap-pong-h5-intrinsic001-500k-20261026`; check live state before
 GPU work. No cap increase, resume, extension or automatic next allocation.
+The100k recovery passes with24,939 updates and346 finite tensors. Its matched
+98,304-action prefix costs440.533s versus584.186s for H15,24.59% less time;
+frozen learning remains pending. CPU analysis also motivates an
+[unselected Breakout coefficient.01 candidate](experiments/2026-10-26-cdp-breakout-smaller-bonus.md)
+at the same minimal4/200k budget; review Pong's completed result before selection.
 
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

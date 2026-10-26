@@ -48,3 +48,27 @@ Source at launch`9c8f382`, native`bfb8c31`, runner`1ed07af`, replay`e853818`.
 The full18 control's older CLI predates optional imagination-length selection;
 both configurations retainH15. One reused development seed; this protocol
 variant is distinct from the full18 reference.
+
+## Native exploration bonus in the completed controls
+
+A1.48-second CPU analysis reads both complete200k logs and checks them against
+their reviewed curves. During updates37,440–49,939, the four-action policy has
+mean scaled imagined bonus0.009418 and inferred extrinsic reward0.009768, ratio
+0.964. The full18 mixture control has0.003387 and0.015031, ratio0.225. None of
+these12,500 per-update inferred extrinsic means is nonpositive. Both observed
+training streams have only nonnegative rewards.
+
+The native combined imagined reward includes its already-scaled bonus; the
+analysis subtracts that bonus to recover net predicted game reward. Predictions
+can be negative even when real rewards are not. These are minibatch means on
+different learned trajectories, not individual-state distributions, absolute
+reward magnitudes, gradient contributions or a causal explanation of weak play.
+All task outcomes above remain unchanged. The ratio motivates a
+[prepared coefficient.01 test](../experiments/2026-10-26-cdp-breakout-smaller-bonus.md),
+which is unselected while PongH5 is active.
+
+Analysis:`/x/Temp/kindle-cheap-20261025/breakout-intrinsic-scale-review.json`,
+SHA256`150c8eb7f2ac0b2e16fb97ee9b76e9547d7f295819c73ab40a25e571154837d6`;
+script`review_breakout_intrinsic_scale.py`, SHA256
+`5f5d17e3abca62472eac01aac9413263d888f2e47f5ef5edc5b47617b58b4364`.
+No agent construction, GPU work, new policy decisions or learner updates.

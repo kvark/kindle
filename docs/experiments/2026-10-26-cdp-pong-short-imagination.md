@@ -68,3 +68,14 @@ startup review`1386dcf36abb32bea864f35a2faa5e0288952a9908389e6bbb44e5d5523dfcfd`
 Four recovery audits, fixed final/initial evaluation, complete replay/guards,
 curves and completed comparison are running or waiting automatically. These
 startup checks establish execution and initial equality; learning remains pending.
+
+The100k recovery passes at24,939 updates with all346 tensors finite and25,383
+strict reports through101,784 actions. Checkpoint metadata SHA256
+`6819a61db9af700823cd3130fe8850a8f8eac54cf3ee051dc3ae6fd8a515bca0`.
+The matched98,304-action/24,515-update prefix costs440.533s versus H15's584.186s,
+24.59% less wall time, with393,138/393,167 emulator frames and zero debt.
+The retained prefix digest identifies every complete log record through that
+progress point. Cost-review SHA256
+`0d6b8a1f6113179bd5e1ed329748dde6bd32b6d0da8f6438f96ba2086e3041dc`.
+This is incomplete-run cost evidence; trajectories differ and frozen learning
+remains pending. No budget or gate changes follow from the early speed.
