@@ -108,6 +108,10 @@ state before further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`
 CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
 and restores reject overrides.263 vector-runner tests pass; native is unchanged.
 The prepared Qbert coefficient100 test remains unstarted; review Freeway first.
+A short frozen Auto check of the retained Breakout2M policy is also prepared:
+`docs/experiments/2026-10-26-cdp-retained-breakout-auto.md`. All346 copied tensors
+match the shared source; only precision metadata changes. No new learning is
+allocated. Review the active Freeway result before selecting this check.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 

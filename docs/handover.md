@@ -51,6 +51,9 @@ against Boxing4013 and first updates pass. Check live state before GPU work.
 CLI`1ed07af` adds optional fresh-run imagination length; this recipe retains15.
 All263 vector-runner tests pass; no native rebuild. Prepared runner hashes were
 updated after Pong's audit; the Qbert coefficient100 candidate is still unstarted.
+The [retained Breakout2M frozen check](experiments/2026-10-26-cdp-retained-breakout-auto.md)
+is prepared but unstarted. All346 copied tensors match the shared source;
+only precision metadata changes to Auto. Review Freeway before allocation.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

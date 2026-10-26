@@ -62,6 +62,11 @@ updates pass. Fixed24-natural-episode final/actual-initial controls and full
 audits follow. CLI`1ed07af` adds optional imagination length but keeps15 here;
 263 vector-runner checks pass. No automatic next allocation or cap increase.
 
+A [bounded frozen check of retained Breakout2M weights](experiments/2026-10-26-cdp-retained-breakout-auto.md)
+is also prepared, with zero learning updates. All346 copied tensors match the
+shared source; only precision metadata changes to Auto. Measure the transferred
+policy on AMD before choosing any warm start. Review Freeway before allocation.
+
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
 [Auto500k comparison](results/2026-10-25-cdp-amd-precision.md) takes2h53m and scores
