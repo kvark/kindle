@@ -1,9 +1,10 @@
 # Pong B16 actor/critic gradients
 
-**Select only a bounded4096-action/466-update learning and1024-action frozen
-restore check.** No full learning allocation is selected yet. Native and CLI
-are unchanged. Keep the existing host guard and300/60-second stage caps; no
-retry, cap increase, extension or automatic next allocation.
+**Bounded check passes; select a separate fresh500k/62,454-update learning
+comparison with the original45-minute training cap.** No smoke experience is
+reused. Native and CLI are unchanged. Keep four100k recoveries and fixed
+final/actual-initial24-natural-match evaluation with mean15/90%-wins. Launch
+pending; no cap increase, extension or automatic next allocation.
 
 The completed B16 Pong recipe takes38m45s instead of B8's49m55s, but frozen
 score falls14.958→11.875, both24/24 wins and below mean15. Doubled global rates,
@@ -41,4 +42,55 @@ queue`43d381d9dbb42a16cc3d3bb14aa97b06e9c9ecb14776241a281c9cad14cf9fd7`;
 expected schema`69286fe580d6ccd81ab6f6ad081042010a4eeeb7c540a2d770584c4ad70a9027`;
 CPU preparation`e997c86efad4d06c4115a5c5ceed91a3b911ceb65537880acb2ed05733e51f4c`.
 Native`bfb8c31`, runner`fbdaee3`, replay`5043b7a`. Owner
-`kindle-cheap-pong-b16-acgrads-smoke-20261026`; launch pending.
+`kindle-cheap-pong-b16-acgrads-smoke-20261026`; completed as recorded below.
+
+
+## Bounded learning and restore pass
+
+The check starts18:50:37 UTC/source`19d75a4` and completes4096 actions/16,384
+emulator frames/466 updates in16.126s. Construction2.087s is separate. The
+1024-action/4096-frame frozen restore takes0.436s with zero updates. Both guards,
+all466 finite reports and exact357-tensor schema pass. All466 initial policy
+and value loss reports are nonzero; selected CNN/reward weights change. All346
+shared initial tensors match the B16 control, and all357 final/frozen tensors
+match exactly. All11 frozen actor copies match behavior tensors. Service exits
+successfully18:51:00 UTC,23.053s total. This is execution evidence, not competence
+or raw-gradient correctness. The older-kernel control's4096 prefix takes16.216s;
+do not infer a full-budget speed improvement from this short comparison.
+
+Review SHA256`45e319c37919ef2acca0c7c503126f2ee1c94d371d61feed1d9a2156510f93e7`;
+terminal review`95c30132ba2e929afa47c198df2a1e3cf4abb5d13edf37d3157b6b940a43e10c`;
+selected declaration`741a7a78c49746b91f4215878e1cdb3e6fc549da61ce61c4a8d92b4516645f2d`.
+
+## Selected fresh fixed-budget learning comparison
+
+After reviewing the check, select fresh1009/eval4000001009 with the same exact
+native config. Keep500k actions/62,454 updates,15,988,224 sampled positions,
+239,823,360 imagined actor rows, first376 and zero debt. Save100k/200k/300k/400k
+recoveries at12,454/24,954/37,454/49,954 updates and fixed500k final at62,454.
+Training cap2700s, frozen caps600k actions/300s per arm, audit1200s and total
+service4560s. Evaluations sample native actions, with no aid; first3 natural
+matches per lane give24 per arm, with excess/tails retained and zero updates/
+truncations. Preserve mean15/90%-wins and full357-tensor/config/source/counter/
+replay/video/guard checks. No checkpoint selection or extension.
+
+The paired B16 control scores11.875/24wins in38m45s. Stronger B8's14.958/24wins
+in49m55s is separate cost/quality context. Both miss mean15. This trial tests
+whether the existing gradient option helps the faster recipe, not equivalence
+to B8 or five-game reliability. Reused development seed, older-kernel control.
+
+CPU preparation passes full-queue normalization against the B16 control,
+actual100k schedule/caps, source compilation, unselected refusal, the observed
+357-tensor helper and recovery checker. The helper rejects346-tensor inputs.
+The plot-venv reader accepts the completed disabled control, rejects it when
+labelled enabled, and compares the bounded357-tensor exports without importing
+ALE. Full frozen comparisons therefore use the correct schema and Pong score
+keys; existing historical scripts remain unchanged.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-48-b16-r32-acgrads-intrinsic001-500k`.
+CPU preparation SHA256`1d397f9ccdd9a5d731d970e7fb63f9d5c1fad35abbef9e2fa86200e650945f09`;
+controller`e127dd965b01cbbeaa5f3ead54e25d2953a957d421c8fef65360b51767723f4f`;
+queue`8920aaf32480a1ceabba07c7cef44bb8eb78906898e82d67bea93d7c6bb83f76`;
+comparison`7cc9047dfb25af4d3d7896ab1d775f513eff981a93251beb0d10c02502e6f452`;
+watcher`fa40a38be18f10c3f02b07aa5f6c6a39cb2afe97d933d88c1fc5ccc87dacba14`.
+Owner`kindle-cheap-pong-b16-acgrads-500k-20261026`; launch pending.

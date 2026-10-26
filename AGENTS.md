@@ -51,14 +51,19 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Select only the bounded PongB16 actor/critic-gradient check:4096 actions/466
-updates plus1024 frozen actions,300/60-second caps, no full learning allocation.
-Only native actor_critic_gradient changes on4M48/Auto/N8/B16/T16/H15/R32,
-coefficient.01/actor0/full18/original rates/no aid. Expected357 tensors and
-3,578,225 trainable parameters; verify346 shared initial/357 unchanged frozen
-tensors and all reports/config/counters/guards. Native and CLI unchanged. See
-`docs/experiments/2026-10-26-cdp-pong-actor-critic-gradients.md`. Launch pending;
-owner`kindle-cheap-pong-b16-acgrads-smoke-20261026`. No automatic next run.
+Selected fresh Pong4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01/actor0,
+full18/original rates/no aid, actor_critic_gradienttrue. Keep500k/62,454 updates,
+first376, four100k recoveries, zero debt and45-minute training cap. Fixed final/
+own initial24 natural sampled matches retain mean15/90%-wins and full357-tensor/
+replay/guard audits. No smoke experience reused. Launch pending; owner
+`kindle-cheap-pong-b16-acgrads-500k-20261026`. See
+`docs/experiments/2026-10-26-cdp-pong-actor-critic-gradients.md`. Check live state;
+no cap increase, extension or automatic next allocation.
+
+The bounded PongB16 check passes4096/466 in16.126s and1024 frozen actions in
+0.436s, all357 tensors unchanged,346 shared initial tensors matching control,
+all466 initial policy/value losses nonzero and both guards passing. Service
+exits18:51:00 UTC. Native/CLI unchanged; this is execution evidence only.
 
 The completed Pong greedy assessment scores14.333 versus sampled14.958, both24/24 wins and below
 mean15. Own initial−20.833/0 wins; zero learning. Full config/counter/346-tensor/
