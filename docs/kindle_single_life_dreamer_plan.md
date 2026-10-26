@@ -174,6 +174,12 @@ No cap increase, resume, extension or automatic next allocation.
 Started11:18:38 UTC/source`d4d1093`; full config, first376 and346 matched initial
 tensors pass startup checks. Recovery and completed evaluation/analysis are automated.
 
+A [Qbert persistent-action-aid candidate](experiments/2026-10-26-cdp-qbert-persistent-aid.md)
+is prepared but unselected. CPU random controls show more coverage with16-step
+holds than1, without a learning claim. The candidate keeps4M48/B8/R32/200k and
+adds5% held-action blocks during training only, under25 minutes. Review active
+Pong before choosing any next allocation; no automatic queue.
+
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
 [Auto500k comparison](results/2026-10-25-cdp-amd-precision.md) takes2h53m and scores

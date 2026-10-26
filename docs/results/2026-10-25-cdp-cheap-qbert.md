@@ -379,3 +379,40 @@ representation or exploration as the cause. RAM remains strictly post-hoc.
 The15.156s CPU analysis creates no agent, policy decisions or learner updates.
 Tile-review SHA256`ecbcbea37581c6439b0076271c9842ba52a38eaefed326d35d63f9e186291a3a`;
 artifact:`qbert-12m-48-b16-r32-200k/tile-coverage-review.json` under the same root.
+
+## Persistent random-action controls
+
+Two declared CPU controls compare uniform random full18 actions held for1 versus
+16 agent steps. These are reference behaviors, not Kindle learning or a training
+aid. Both use eight independent environments, the reused evaluation seeds
+4000001009 plus the standard lane offsets, sticky.25/repeat4/noops0/native frames,
+24 selected natural episodes and a60k-action/120s cap per arm. Actions depend
+only on the existing persistent-control RNG and fixed hold length; pixels,
+rewards and RAM never determine actions. RAM measures post-hoc cube coverage.
+
+| Hold actions | Actions / emulator frames | CPU wall | Natural score | Mean maximum cubes | Mean ever-lit cubes | First pyramids |
+|---|---:|---:|---:|---:|---:|---:|
+|1|9,136 /36,516|4.225s|131.250|3.917/21|4.000/21|0/24|
+|16|12,544 /50,148|5.300s|207.292|7.042/21|7.167/21|0/24|
+
+Both collect exactly24 natural episodes, retain partial tails and have no
+truncations. Held16 episodes last453.167 actions on average versus331.708 for
+held1, so their experience per natural episode differs. They use the same RNG
+seed rule, but different draw cadence and trajectories. Neither ever lights all21
+or approaches the learned policy's coverage. Held16 does reach the two observer
+addresses never lit by the12M policy, in3/24 and2/24 episodes respectively;
+held1 reaches them in0/24 and1/24. These are observer addresses, not new spatial
+labels or a causal diagnosis.
+
+A second pass reproduces every action/reward/boundary/frame count, episode result
+and partial tail for each control, in4.217/5.301s. No GPU work, agent construction
+or learning occurs. This supports a bounded hypothesis about coherent exploration;
+it cannot predict whether5% held-action blocks help a learned policy. The
+[prepared training-aid candidate](../experiments/2026-10-26-cdp-qbert-persistent-aid.md)
+is not selected; active Pong remains the only learner.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-persistent-random-reference`;
+review SHA256`b916cc639c11d38bd5a7f0eafa9ef4ad0569d215a21e2fbeb91891fc1c4f92e1`;
+declaration`4f01f70b87669577fc19833e175988aa59c607bb1b4facb17782b48562c0fc2f`.
+Script:`qbert_persistent_reference.py`; traces and complete episode records stay
+outside Git. No reference success or five-game reliability is claimed.

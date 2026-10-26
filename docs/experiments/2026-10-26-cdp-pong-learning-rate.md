@@ -77,3 +77,8 @@ strict finite reports through100,808 actions. Captured98,304-action progress
 is449.955s with zero debt. Recovery metadata SHA256
 `367b440f527105c9f480d586c64b69d70e2b5e2e400b098f7dc4e50b48f8aec5`.
 This is numerical/counter evidence; fixed-final frozen competence remains pending.
+
+The200k recovery audit passes at24,954 updates, with346 finite tensors and25,508
+strict finite reports through204,440 actions. Captured200,704-action progress
+is924.585s with zero debt. Recovery metadata SHA256
+`11f2d77c308e1609b71674e399ddfa6f70b59a3da91f7a2c8d18b7a7eac8ed6a`.

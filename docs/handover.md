@@ -126,6 +126,12 @@ No cap increase, resume, extension or automatic next allocation.
 Started11:18:38 UTC/source`d4d1093`; full config, first376 and346 matched initial
 tensors pass startup checks. Recovery and completed evaluation/analysis are automated.
 
+A [Qbert persistent-action-aid candidate](experiments/2026-10-26-cdp-qbert-persistent-aid.md)
+is prepared but unselected. CPU random controls show more coverage with16-step
+holds than1, without a learning claim. The candidate keeps4M48/B8/R32/200k and
+adds5% held-action blocks during training only, under25 minutes. Review active
+Pong before choosing any next allocation; no automatic queue.
+
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
