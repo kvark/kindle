@@ -164,6 +164,12 @@ Started10:41:58 UTC, source`be6c942`; startup verifies14,123,473 parameters,
 first376 and346 finite initial tensors matching the same-shape check. Full
 audits and completed-run analysis are automated; frozen learning remains pending.
 
+A [staged CDP learning-rate option](experiments/2026-10-26-cdp-pong-learning-rate.md)
+passes278 CPU vector tests while production files remain unchanged. It permits
+proportional base/encoder/dynamics rates with the existing CLI flag; defaults and
+restore rules stay fixed. Review Qbert and its completed analysis before applying
+or repinning the runner. No further GPU allocation is selected.
+
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
 [Auto500k comparison](results/2026-10-25-cdp-amd-precision.md) takes2h53m and scores

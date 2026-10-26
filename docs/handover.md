@@ -118,6 +118,12 @@ Started10:41:58 UTC, source`be6c942`; startup verifies14,123,473 parameters,
 first376 and346 finite initial tensors matching the same-shape check. Recovery,
 frozen audits and completed curves/coverage/comparison are automated.
 
+A [staged CDP learning-rate option](experiments/2026-10-26-cdp-pong-learning-rate.md)
+passes278 CPU vector tests while production files remain unchanged. It permits
+proportional base/encoder/dynamics rates with the existing CLI flag; defaults and
+restore rules stay fixed. Review Qbert and its completed analysis before applying
+or repinning the runner. No further GPU allocation is selected.
+
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
