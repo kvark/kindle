@@ -123,6 +123,8 @@ The CLI change is applied after Qbert's completed analysis and passes278 vector
 tests; defaults and restore restrictions remain. Native binary is unchanged.
 Owner`kindle-cheap-pong-b16-lr2-500k-20261026`; check live state before GPU work.
 No cap increase, resume, extension or automatic next allocation.
+Started11:18:38 UTC/source`d4d1093`; full config, first376 and346 matched initial
+tensors pass startup checks. Recovery and completed evaluation/analysis are automated.
 
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

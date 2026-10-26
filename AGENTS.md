@@ -61,6 +61,8 @@ controls retain mean15/90%-win gate and full audits. CLI passes278 vector tests;
 native unchanged. See`docs/experiments/2026-10-26-cdp-pong-learning-rate.md`.
 Owner`kindle-cheap-pong-b16-lr2-500k-20261026`; check live state before GPU work.
 No retry, cap increase, extension or automatic next allocation.
+Started11:18:38 UTC/source`d4d1093`; full config, first376 and346 matched initial
+tensors pass startup checks. Recovery and completed evaluation/analysis are automated.
 
 Qbert12M48/B16 completes200k in32m19s, scores959.375/0of24 pyramids and coverage
 16.292/21, versus4M/B8's809.375/0of24 and16.625/21 in19m45s. All audits and

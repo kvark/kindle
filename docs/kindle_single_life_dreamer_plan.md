@@ -171,6 +171,8 @@ The CLI change is applied after Qbert's completed analysis and passes278 vector
 tests; defaults and restore restrictions remain. Native binary is unchanged.
 Owner`kindle-cheap-pong-b16-lr2-500k-20261026`; check live state before GPU work.
 No cap increase, resume, extension or automatic next allocation.
+Started11:18:38 UTC/source`d4d1093`; full config, first376 and346 matched initial
+tensors pass startup checks. Recovery and completed evaluation/analysis are automated.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

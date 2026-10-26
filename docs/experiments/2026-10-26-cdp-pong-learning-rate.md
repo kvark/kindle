@@ -62,3 +62,12 @@ those pins and a terminal preceding service. Same500k/62,454-update budget,
 Audit1200s/service4560s; any cutoff is retained without cap increase or resume.
 Rate rescaling is a hypothesis on one reused seed, not independent confirmation
 or equivalence to B8. No extension or automatic next allocation is selected.
+
+Started **11:18:38 UTC**, source`d4d1093`, native`bfb8c31`, CLI`22bd61b`.
+Startup verifies the complete config against the B16 control with only the three
+rate changes,3,578,225 parameters, zero counters and first376:1/384:2/392:3.
+All346 finite initial tensors match the control. Initial metadata SHA256
+`8e9b00dce6b9292e4813ec652c2fac47d5123d85802006ea5f73a933114dc15c`;
+selected declaration`0d2bded744d86db073ea3ea34be6bb58d1ba600eb2fd8bd26bc4fedc03160ec6`.
+Four recovery audits, frozen evaluations and completed curves/comparison are
+automated. Frozen learning results remain pending.
