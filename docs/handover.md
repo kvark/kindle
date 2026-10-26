@@ -131,11 +131,13 @@ tensors/traces and comparison pass; service exits13:18:17 UTC. Retain H15; no
 extension or conditional4013 confirmation is selected.
 
 Current allocation: [Breakout with a smaller native bonus](experiments/2026-10-26-cdp-breakout-smaller-bonus.md),
-selected after completed PongH5 evaluation/comparison. Fresh1009/eval4000001009,
+started13:22:20 UTC/source`66d1aed` after completed PongH5 evaluation/comparison.
+Fresh1009/eval4000001009,
 4M/RGB64/Auto/N8/B8/T16/H15/R32,4,120,963 parameters, native actor mixture.01,
 minimal4 and original rates. Only intrinsic coefficient1→.01 changes versus the
 completed same-protocol control. Keep200k actions/49,939 updates, first248,
-100k recovery and30-minute training cap. Match346 initial tensors; fixed final/
+100k recovery and30-minute training cap. Startup matches346 finite initial
+tensors, full config except coefficient.01 and first248:1/256:2/256:3. Fixed final/
 own initial24-natural-episode controls retain864-point two-wall/90%-success,
 zero updates/truncations and full numerical/config/counter/tensor/replay/guard
 audits. Native unchanged. Owner`kindle-cheap-breakout-minimal-intrinsic001-200k-20261026`;

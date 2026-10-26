@@ -51,12 +51,13 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32, selected after
-completed PongH5 evaluation/comparison. Fresh1009/eval4000001009, minimal4,
+Current allocation: Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32, active from13:22:20
+UTC/source`66d1aed` after completed PongH5 evaluation/comparison. Fresh1009/eval4000001009, minimal4,
 native actor mixture.01, original rates and no external aid. Only intrinsic
 coefficient1→.01 changes versus the completed four-action control. Keep200k
 aggregate actions/49,939 updates, first248,100k recovery and30-minute cap.
-Match346 initial tensors; fixed final/initial24-natural-episode controls retain
+Startup matches346 finite initial tensors and first248:1/256:2/256:3 reports.
+Fixed final/initial24-natural-episode controls retain
 864-point two-wall/90%-success and full numeric/config/counter/tensor/replay/
 guard audits. See`docs/experiments/2026-10-26-cdp-breakout-smaller-bonus.md`;
 owner`kindle-cheap-breakout-minimal-intrinsic001-200k-20261026`. Check live state

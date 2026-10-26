@@ -52,3 +52,22 @@ comparison reader validates the completed control and reproduces its prior
 late-bonus analysis. Comparison SHA256
 `1174a7a7857c2b236b36a37343c640e854bbb9c331ab05dc519eea3823342901`.
 Postprocessing and comparison watchers are prepared; none is started.
+
+## Started on AMD
+
+Started October26 at13:22:20 UTC, source`66d1aed26c54e903b4ae039faedae4a46fcfd048`,
+owner`kindle-cheap-breakout-minimal-intrinsic001-200k-20261026`, invocation
+`35e56c1dfa2049b7b6f56cda07769a12`. Selection verifies completed Pong reviews,
+comparison and terminal service, clean pushed source, host identity and exact
+runtime/controller/queue/analysis hashes. Selected declaration SHA256
+`8d90301a704e9c8fd34318e0752759a1e2dcf317ee52cae32ef2e9926e8ee3d2`.
+
+Startup passes full native config equality except coefficient1→.01,4,120,963
+parameters, fresh1009/no external aid, minimal4, native mixture.01/H15,
+all346 finite initial tensors matching the control and numeric reports at
+248:1/256:2/256:3. Initial metadata SHA256
+`d058f39eeb342eb1d5713f8fbfc253ad8c4ef475caf85d6614fd1494bce66528`;
+startup review`85e14c09c88c3675ee46131f8ea220e450851434b1cb79c96d44c86e6e05927e`.
+Recovery, fixed-final/own-initial evaluation, full replay/guards, curves and
+completed comparison are running or waiting automatically. Startup verifies
+execution and initial equality; learning remains pending.
