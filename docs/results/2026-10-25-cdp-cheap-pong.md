@@ -487,3 +487,57 @@ comparison`54c91f2ec846d10c907cf2d3a27dafffa1cf180d562c884cfe5aaf3a49f87cfb`.
 Launch source`36500e7`, native`bfb8c31`, CLI`22bd61b`, replay`e853818`.
 After completed review, select the separately prepared Breakout coefficient.01
 test at its fixed minimal4/200k budget; this result does not alter its recipe.
+
+## Host restart interrupts B16/R40
+
+The declared500k-action/78,067-update R40 experiment is **incomplete**. Complete
+persisted records reach265,440 actions,1,061,594 emulator frames and41,416 finite
+learner reports, last timestamp14:22:08 UTC. The last saved checkpoint is200k/
+31,192 updates, matching its previously audited346 finite tensors. No run_end,
+terminal training-guard result or original frozen evaluation exists. The393-byte
+torn training record and3,600 trailing NUL guard-log bytes are preserved and
+hashed separately. Complete prefix action/update/frame/episode accounting passes;
+this does not certify unrecorded work or a clean exit.108 completed training
+matches are recorded. Last complete262,144-action progress is1,487.186s
+(24m47s),40,902 updates and expected.25 credit; actual terminal wall time is
+unknown. The196,608-action cost comparison remains valid, without500k quality.
+
+A new boot starts15:34 UTC on kernel7.0.0-38, replacing7.0.0-34. AMD module
+identity changes to`9BDBC866F55BF296F1B7FA2`; RX7900XT and Mesa26.0.8-1ubuntu0.3
+remain. The interruption cause is unmeasured. Current-boot host scan passes,
+and a512-action/2,048-frame frozen restore completes in0.251s after construction,
+with zero updates and all346 tensors unchanged. Its guard passes and service
+exits15:48:47 UTC; no automatic driver reset, reload or reboot occurs.
+
+A separate assessment of the saved200k policy scores **−9.708 versus own
+initial−20.375**, both0/24 natural wins. This is not the missing500k endpoint or
+a matched-budget quality comparison with the completed500k controls. The
+original mean15/90%-wins gate fails at this saved checkpoint. No resumed
+training, checkpoint selection, seed confirmation or extension follows.
+
+Final/initial frozen evaluations use87,792/24,200 actions,351,124/96,771 emulator
+frames and33.532/9.252s. Each completes exactly24 natural matches, first three
+per lane, with no excess, truncations or updates; partial tails remain. All346
+source/frozen tensors stay exact per arm, both guards and complete CPU replays/
+videos pass, and the initial semantic trace matches the old-boot B16/R32 control.
+
+The separate frozen service exits with a CPU-audit failure at15:51:45 UTC:
+its new wrapper incorrectly imports the task-replay checker for Pong. A separate
+CPU-only auditor uses the same match-replay checker as the existing Pong
+controller, reuses the completed final replay and generates the initial replay.
+All checks then pass. The original wrapper, failed journal and correction
+receipts remain; no GPU stage repeats. The interrupted learning curve is
+reconstructed only through the last complete progress record and reviewed.
+
+Artifacts under`/x/Temp/kindle-cheap-20261025`:
+`pong-4m-48-b16-r40-intrinsic001-500k/interruption-review.json`, SHA256
+`9236dc07e625372fd5ffe4abd323de4e57cb24c665019349cd919c5dcf33dc79`;
+`interrupted-curve/curve.json`, SHA256
+`f0210ad741a4131a04ae07c20e82afd64a35f63f316cfbc182f2474001c81bc6`.
+Frozen assessment:`pong-4m-48-b16-r40-interrupted-200k-frozen/review.json`, SHA256
+`16302a91140207e2591f6d1e35b435ffe262d70f1ea9590864d644a3bee29f7e`;
+CPU repair`8741ebec1a44b38e19fcdbc1094c751069792b26a40dc6b246da43a1726adf33`.
+New-boot evidence:`newboot-recovery-20261026-a8648671`, restore review SHA256
+`5a47b92a473bb8cc1aa60328534d5818e72e108f7b2322e8aa121b34d541d81c`.
+Training source`647b457`, frozen wrapper source`32e6714`, native`bfb8c31`,
+runner`22bd61b`, replay`e853818`. Original declarations/logs are unchanged.

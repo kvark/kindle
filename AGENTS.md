@@ -51,16 +51,23 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Pong4M/RGB48/Auto/N8/B16/T16/H15/R40, active from13:56:58
-UTC/source`647b457` after the completed Breakout smaller-bonus result. Fresh1009/eval4000001009, bonus.01,
-actor0, original rates, full18/no external aid; only native ratio32→40 changes
-versus B16/R32. Keep500k actions/78,067 updates, first376, four100k recoveries,
-residual credit.25 and55-minute training cap. Startup matches346 initial tensors
-and first376:1/384:2/392:3/400:4/408:5/408:6 updates. Fixed final/own initial24-natural
-match controls retain mean15/90%-wins and full audits/replays/guards. See
-`docs/experiments/2026-10-26-cdp-pong-b16-r40.md`;
-owner`kindle-cheap-pong-b16-r40-intrinsic001-500k-20261026`. Check live state
-before GPU work. No cap increase, extension or automatic next allocation.
+Current allocation: Qbert4M/RGB48/Auto/N8/B8/T16/H30/R32, selected after the
+interrupted Pong review and saved200k frozen assessment. Fresh1009/eval4000001009,
+coefficient1/actor0, original rates/full18/no aid; only native imagination15→30
+changes. Keep200k actions/49,939 updates,100k recovery and35-minute cap. Own
+initial/fixed final24-natural-episode controls retain15k/90%-pyramids and full
+audits/replays/guards. See`docs/experiments/2026-10-26-cdp-qbert-long-imagination.md`;
+owner`kindle-cheap-qbert-h30-200k-20261026`. Check live state before GPU work.
+No cap increase, extension or automatic next allocation.
+
+PongB16/R40's500k target is interrupted by a host restart:265,440 persisted
+actions/41,416 finite reports, saved200k/31,192 updates. Separate frozen saved/
+initial scores−9.708/−20.375, both0/24 wins. Full frozen checks pass after a
+CPU checker correction; original failures and torn tails remain. No resume.
+New boot a8648671 uses kernel7.0.0-38/AMD module9BDBC866F55BF296F1B7FA2;
+same RX7900XT/Mesa26.0.8/native binary. Host scan and512-action frozen restore
+pass with346 unchanged tensors. No host recovery. Qbert's H15 control used
+7.0.0-34; retain that kernel change as a comparison confound.
 
 Breakout coefficient.01 completes200k/49,939 updates in21m07s, but lowers
 frozen9.542→5.042, both0/24 two-wall successes. All audits/comparison pass after

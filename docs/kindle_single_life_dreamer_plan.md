@@ -186,26 +186,27 @@ copying the omitted, verified replay manifest and rerunning only the unchanged
 CPU audit. The original service failure at 13:43:51 UTC and incomplete watcher
 receipt are retained; no GPU work repeats. Retain coefficient 1; no extension.
 
-Current allocation: [Pong B16/R40](experiments/2026-10-26-cdp-pong-b16-r40.md),
-started 13:56:58 UTC/source`647b457` after reviewing that completed Breakout result.
-Keep fresh 1009/
-eval4000001009, 4M/RGB48/Auto/N8/B16/T16/H15, bonus .01, actor0, original rates
-and full18/no aid. Only native replay ratio 32→40 changes versus B16/R32.
-Fixed 500k actions/78,067 updates, first376, 19,985,152 sampled positions and
-55-minute training cap. Expected residual credit .25 is below one due update.
-Four recoveries, matched 346 initial tensors, fixed final/own initial 24 natural
-matches and original mean15/90%-wins retain full audits/replays/guards. Projected
-47m38s is not measured speed or quality. Native unchanged; no cap increase,
-resume, extension or automatic next allocation. Check live owner
-`kindle-cheap-pong-b16-r40-intrinsic001-500k-20261026` before GPU work.
-Startup matches all 346 finite initial tensors and the first six R40 updates;
-recovery/evaluation/comparison monitoring is attached. Frozen quality is pending.
-The100k checkpoint passes at15,567 updates and346 finite tensors; captured
-102,400-action progress retains the expected.25 credit. A
-[Qbert H30 candidate](experiments/2026-10-26-cdp-qbert-long-imagination.md) is
-prepared on CPU only, with fixed200k/49,939 updates and35-minute cap. Longer
-rollouts may improve delayed reward learning or compound model error. Review
-Pong's completed result before selection; no automatic queue.
+The [Pong B16/R40 run is interrupted](results/2026-10-25-cdp-cheap-pong.md#host-restart-interrupts-b16r40)
+after a host restart:265,440 complete logged actions/41,416 finite reports,
+saved200k/31,192-update checkpoint. Its separate frozen assessment scores−9.708
+versus initial−20.375, both0/24 wins. All frozen checks pass after a CPU-only
+checker-import correction; original failures/unsealed tails remain. The500k
+quality question is unresolved. No resumed training or extension.
+
+Current allocation: [Qbert H30](experiments/2026-10-26-cdp-qbert-long-imagination.md),
+selected after that interruption review and saved-policy assessment. Keep
+fresh1009/eval4000001009,4M/RGB48/Auto/N8/B8/T16/R32, coefficient1/actor0,
+original rates/full18/no aid; only native imagination15→30 changes. Fixed200k/
+49,939 updates,100k recovery and35-minute cap. Keep own initial/fixed-final24
+natural episodes,15k/90%-pyramids and all numerical/config/counter/tensor/replay/
+guard audits. Longer rollouts can also compound model error. No automatic queue.
+
+New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
+`9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
+512-action restore/346-tensor invariance and natural frozen evaluation pass.
+No host recovery performed. Qbert's refreshed queue uses this identity; its H15
+control used7.0.0-34, so record the kernel change as a comparison confound.
+Check owner`kindle-cheap-qbert-h30-200k-20261026` before GPU work.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

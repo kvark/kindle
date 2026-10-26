@@ -1,8 +1,11 @@
 # Qbert H30 at the fixed 200k budget
 
-**Prepared, not selected or running.** Review the active Pong B16/R40 fixed-final
-result, comparison and terminal service before selecting further GPU work.
-No automatic queue follows from this CPU preparation.
+**Selected after reviewing the interrupted Pong run and its saved-policy
+assessment.** Pong's500k target remains incomplete after a host restart; its
+saved200k policy scores−9.708 versus initial−20.375, both0/24 wins. Complete
+frozen checks pass after a CPU checker correction, with no repeated GPU work.
+The new boot passes bounded restore. Proceed with this prepared Qbert test;
+no automatic next allocation follows.
 
 The completed Qbert H15 control scores 809.375 versus initial 180.208, with
 0/24 first pyramids and mean maximum coverage 16.625/21. More experience at R16,
@@ -53,3 +56,20 @@ controller/postprocessor refusal and completed-control reader pass. No native
 or production CLI edit, GPU shape qualification or process start is required
 by this preparation. Runtime remains native `bfb8c31`, CLI `22bd61b`, replay
 `e853818`; prepared source `f4ad875`.
+
+## Host refresh before selection
+
+The machine restarts to boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel
+7.0.0-38 and AMD module`9BDBC866F55BF296F1B7FA2`, retaining RX7900XT/Mesa26.0.8
+and the native binary. Host scan and512-action frozen restore pass, with all346
+tensors unchanged; separate natural-match evaluation also passes execution and
+replay checks. No agent-triggered driver reset or host recovery occurs.
+
+Only queue host identity changes. Original queue/declaration/comparison sources
+are retained, and the comparison now explicitly records the kernel change from
+the H15 control's7.0.0-34. This is a confound for isolated attribution, despite
+unchanged GPU/Mesa/native/config exceptH30. No recipe or budget changes.
+Refreshed queue SHA256
+`0bfe9bfb5e99969f764b0b4ef9a037f012d591425ee957718a5dbdd67944c920`;
+prepared declaration`5bc9068fc6a4ad2a71788abb843b8577301a457c33bf0dd08f4ed31222e29dfc`;
+comparison`58ef0953484d1e01f828d183e407933796145c581ea00c8aa1c2067fc3c39ee2`.
