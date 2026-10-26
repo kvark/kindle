@@ -32,6 +32,11 @@ import profile_atari_vector
     (["--restore", "unused", "--cdp-centered"], "training overrides"),
     (["--restore", "unused", "--training-precision", "f16"], "training overrides"),
     (["--training-precision", "fp8"], "invalid choice"),
+    (["--imagination-length", "0"], "imagination-length must be positive"),
+    (["--imagination-length", "-1"], "imagination-length must be positive"),
+    (["--imagination-length", "1.5"], "invalid int value"),
+    (["--restore", "unused", "--imagination-length", "5"], "training overrides"),
+    (["--restore", "unused", "--imagination-length=15"], "training overrides"),
     (["--actor-unimix", "-0.1"], "actor-unimix must be finite and in [0, 1)"),
     (["--actor-unimix", "1"], "actor-unimix must be finite and in [0, 1)"),
     (["--actor-unimix", "nan"], "actor-unimix must be finite and in [0, 1)"),
@@ -100,6 +105,26 @@ def test_runner_forwards_actor_controls_before_gpu(monkeypatch, tmp_path, enable
                                     *(["--actor-unimix", str(unimix)] if unimix is not None else []),
                                     *(["--actor-critic-gradient"] if enabled else [])])
     with pytest.raises(RuntimeError, match="checked before GPU"):
+        atari_vector.main()
+
+
+@pytest.mark.parametrize("length", [None, 1, 5])
+def test_runner_forwards_imagination_length_before_gpu(monkeypatch, tmp_path, length):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        expected = kindle.default_config(18, "4m")["imagination_length"] if length is None else length
+        assert config["imagination_length"] == expected
+        raise RuntimeError("rollout length checked before GPU initialization")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"),
+                                    "--model-size", "4m",
+                                    *(["--imagination-length", str(length)] if length is not None else [])])
+    with pytest.raises(RuntimeError, match="rollout length checked before GPU"):
         atari_vector.main()
 
 

@@ -79,6 +79,8 @@ def main():
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--batch-length", type=int, default=64)
     parser.add_argument("--world-microbatch-size", type=int)
+    parser.add_argument("--imagination-length", type=int,
+                        help="fresh imagined rollout steps; omitted: native default, restore keeps checkpoint length")
     parser.add_argument("--train-ratio", type=float, default=256)
     parser.add_argument("--learning-rate", type=float, default=0.00004)
     parser.add_argument("--actor-unimix", type=float, default=0.0,
@@ -112,6 +114,8 @@ def main():
         parser.error("initial-checkpoint requires fresh training")
     if args.world_microbatch_size is not None and args.world_microbatch_size <= 0:
         parser.error("world-microbatch-size must be positive")
+    if args.imagination_length is not None and args.imagination_length <= 0:
+        parser.error("imagination-length must be positive")
     if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
         parser.error("GPU budget headroom must be positive")
     if args.greedy and not args.evaluate:
@@ -134,6 +138,7 @@ def main():
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
+    training_options.add("--imagination-length")
     training_options.add("--cdp")
     training_options.add("--cdp-centered")
     training_options.add("--disagreement-scale")
@@ -231,6 +236,8 @@ def main():
                       disagreement_bonus=args.disagreement_scale > 0,
                       intrinsic_reward_scale=args.disagreement_scale,
                       learning_rate_warmup=1000, agc=0.3)
+        if args.imagination_length is not None:
+            config["imagination_length"] = args.imagination_length
         if learned_rgb:
             config["observation_kind"] = f"rgb{args.image_size or 64}"
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
