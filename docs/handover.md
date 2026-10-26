@@ -39,14 +39,19 @@ completes500k/124939 updates in28m17s: frozen31.0417 versus actual initial0.00,
 24/24 versus0/24 crossing successes, aid disabled in evaluation. All audits pass
 and service exits. Constant-UP CPU reference scores21.6667,0/24. The successful
 1M/RGB32/R32 recipe needs focused seed confirmation; no isolated attribution.
-Current allocation: [Pong update-budget test](experiments/2026-10-26-cdp-cheap-pong-update-budget.md),
-service `kindle-cheap-pong-48-r32-500k-20261026`. Fresh1009/4M/RGB48/Auto/
-B8/T16/R32,500k actions/124939 expected updates,55-minute training cap, no aid and
-actor_unimix0. Startup finite/config/source checks, all346 initial tensors against
-the200k control and first updates pass. The55-minute cap was declared before this
-new allocation from measured stage costs. Check live state before GPU work;
-do not restart completed screens or extend the cap.
-Current native source`bfb8c31`, runner`bcef410`, native SHA256
+[Pong500k/R32](results/2026-10-25-cdp-cheap-pong.md#r32-and500k-actions) completes
+in48m53s: frozen11.0 versus initial−20.375,23/24 versus0/24 wins. All audits pass
+and service exits; the mean15 gate fails. No unchanged extension.
+Current allocation: [Freeway seed4013 confirmation](experiments/2026-10-26-cdp-compact-freeway-confirmation.md),
+service `kindle-cheap-freeway-32-r32-500k-aided-4013-20261026`. Keep the successful
+1M/RGB32/Auto/B8/T16/H15/R32 recipe,500k/124939 updates and30-minute cap fixed;
+only learner/exploration/evaluation seeds change. The5% persistent16-action aid
+remains training-only. Startup config/source/aid checks, all346 initial tensors
+against Boxing4013 and first updates pass. Check live state before GPU work.
+CLI`1ed07af` adds optional fresh-run imagination length; this recipe retains15.
+All263 vector-runner tests pass; no native rebuild. Prepared runner hashes were
+updated after Pong's audit; the Qbert coefficient100 candidate is still unstarted.
+Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
 `original-native` preserves the prior AMD binary. Both installed and source-tree

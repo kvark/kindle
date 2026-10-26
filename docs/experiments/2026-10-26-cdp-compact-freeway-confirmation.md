@@ -3,8 +3,8 @@
 The selected RGB32/R32 recipe reaches31.0417 frozen crossings,24/24 successes,
 in28m17s; [all audits pass](../results/2026-10-25-cdp-cheap-freeway.md#compact-rgb32-with-the-successful-update-budget).
 Test one fresh learner, seed4013, with the successful recipe fixed before launch.
-This is focused seed confirmation. Review the active Pong test before selecting
-the next allocation; this declaration does not launch another learner.
+This is focused seed confirmation, selected after reviewing the completed Pong
+test. The recipe and budgets below were fixed before allocation.
 
 Keep Size1M/RGB32/Auto,834,673 parameters, centered CDP/action-effects1,
 N8/B8/T16/H15/R32, full BPTT/microbatch8, replay100k and actor_unimix0.
@@ -43,7 +43,15 @@ Artifacts: `/x/Temp/kindle-cheap-20261025/freeway-1m-32-500k-r32-aided-seed4013`
 Controller: `run_freeway_500k_r32_32_aided_4013.py`; intended service:
 `kindle-cheap-freeway-32-r32-500k-aided-4013-20261026`.
 Exact commands, caps, native/runner/controller hashes and the successful1009
-review hash are prepared. Native source`bfb8c31`, runner`bcef410`; no rebuild.
+review hash are sealed. Native source`bfb8c31`, runner`1ed07af`; no native rebuild.
 The seed is selected for this confirmation, without a held-out benchmark claim.
 Two successful learners would still leave broader reliability and the other
 games' unresolved learning gaps open. No broad seed campaign is queued.
+
+Started October26 at02:55:20 UTC, source`1ed07af`, after Pong's completed audit.
+The new CLI exposes an optional imagination length; this run omits it and retains
+H15. The sealed declaration records the previous/new runner hashes and263 passing
+vector-runner checks. Startup checks pass: expected config with only seed changed,
+834,673 parameters, exact aid, all346 initial tensors equal Boxing4013 and first
+updates248:1,256:2,256:3. Inspect the named service before further GPU work.
+Fixed final/actual-initial evaluations and the complete audit are pending.

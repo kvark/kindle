@@ -44,12 +44,14 @@ failures. No automatic extension follows a positive score or finite losses.
 Artifacts: `/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-intrinsic100-200k`.
 Controller: `run_qbert_intrinsic100_200k.py`; intended service:
 `kindle-cheap-qbert-intrinsic100-200k-20261026`.
-Native source`bfb8c31` is unchanged. Current CLI`bcef410` versus control`a99416e`
-adds the actor-unimix option; its default remains0. Verify runner identity and
+Native source`bfb8c31` is unchanged. Current CLI`1ed07af` versus control`a99416e`
+adds actor-unimix and imagination-length options; this recipe retains0 and15.
+The declaration records the runner repin after263 vector-runner checks.
+Verify runner identity and
 the entire native recipe. Exact commands, caps and source/control/analysis hashes
 are prepared; the existing CPU recipe check passes with coefficient100.
 
-This is a prepared candidate, not an allocated learner. Review Pong and the
-focused Freeway confirmation before selecting another allocation. Seed1009 is
+This is a prepared candidate, not an allocated learner. Pong's result is complete;
+review the focused Freeway confirmation before selecting another allocation. Seed1009 is
 reused development data. A useful outcome requires focused seed confirmation;
 no broad queue, held-out benchmark result or five-game reliability claim follows.

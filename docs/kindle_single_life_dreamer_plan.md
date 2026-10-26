@@ -17,6 +17,7 @@ is separate. Each row is one development seed, not a reliability result.
 | Same,5% persistent action aid in training |200k /24,970|8m11s|0.25 /0.00|0/24 milestones|
 | [Freeway1M/RGB32/R32, same aid](results/2026-10-25-cdp-cheap-freeway.md#compact-rgb32-with-the-successful-update-budget) |500k /124,939|28m17s|31.042 /0.00|24/24 milestones; pass|
 | [Pong4M/RGB48/R16](results/2026-10-25-cdp-cheap-pong.md) |200k /24,970|10m22s|−17.125 /−20.375|0/24 wins|
+| [Pong4M/RGB48/R32](results/2026-10-25-cdp-cheap-pong.md#r32-and500k-actions) |500k /124,939|48m53s|11.000 /−20.375|23/24 wins; mean15 gate fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
@@ -31,8 +32,8 @@ establish a universal capacity or resolution rule.
 Qbert's [prepared coefficient100 test](experiments/2026-10-26-cdp-qbert-intrinsic-scale.md)
 keeps the200k budget and native model fixed. Its recorded late bonus is0.146% of
 predicted extrinsic reward; stronger scaling is an unproved hypothesis and would
-also dominate early rewards. Review the active Pong and focused Freeway work
-before selecting it; no additional learner has started.
+also dominate early rewards. Review the focused Freeway confirmation before
+selecting it; the Qbert candidate has not started.
 
 Breakout's smaller model gains modestly, with lower score per action than the
 earlier T64 run but3.07× lower wall cost at the shared196,608-action point. One
@@ -47,17 +48,19 @@ Compact aided Freeway now passes in28m17s:31.0417 versus actual initial0.00,
 same-protocol CPU always-UP reference scores21.6667,0/24. Resolution, ratio,
 budget and native runtime differ from the short screen; no isolated attribution.
 This useful recipe still needs focused seed confirmation.
-One [fixed-recipe seed4013 confirmation](experiments/2026-10-26-cdp-compact-freeway-confirmation.md)
-is prepared, with the same500k actions and30-minute cap. Review Pong before
-selecting the next allocation; it has not started and is not an automatic queue.
+Pong's4M/RGB48/R32 test now completes500k actions and124939 updates in48m53s,
+scoring11.0 with23/24 frozen wins versus initial−20.375 and0/24. The mean15 gate
+fails despite useful learning. All audits pass. The larger update budget does
+not isolate a replay-ratio effect or establish a hardware speedup; no extension.
 
-**Current allocation:** [Pong update-budget test](experiments/2026-10-26-cdp-cheap-pong-update-budget.md).
-Fresh1009/4M/RGB48/Auto/B8/T16/R32,500k actions/124939 expected updates, no aid,
-actor_unimix0. A new55-minute training cap was declared before allocation from
-measured stage costs (49-minute projection); historical37-minute successes used
-different GPU/precision/model settings. Fixed24-natural-match final/actual-initial
-controls and full audits. Startup checks and all346 initial tensors against the
-200k control pass. No cap increase, unchanged extension or automatic next run.
+**Current allocation:** [Freeway seed4013 confirmation](experiments/2026-10-26-cdp-compact-freeway-confirmation.md).
+The selected1M/RGB32/Auto/B8/T16/H15/R32 recipe,500k actions/124939 updates and
+30-minute training cap remain fixed. Only learner/exploration/evaluation seeds
+change; the5% persistent16-action aid remains training-only. Startup full config,
+source and aid checks, all346 initial tensors against Boxing4013 and first
+updates pass. Fixed24-natural-episode final/actual-initial controls and full
+audits follow. CLI`1ed07af` adds optional imagination length but keeps15 here;
+263 vector-runner checks pass. No automatic next allocation or cap increase.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
@@ -99,7 +102,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Game | Latest useful frozen result | What remains |
 | --- | --- | --- |
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
-| Pong | Three500k seeds mean15.71;72/72 wins | Reference20.45;2M on1009 only improves16.75→16.92 |
+| Pong | AMD4M/RGB48/R32/500k:11.0,23/24 wins in48m53s; historical three-seed15.71,72/72 | Reference20.45; current mean15 gate and seed confirmation remain open |
 | Freeway | AMD1M/RGB32/R32/aided500k:31.04,24/24 successes in28m17s; historical aided cohort32.10,72/72 | Reference33.40; compact recipe needs seed confirmation |
 | Breakout | Retained B8/T16:500k58.83→2M98.21; AMD B2/T64:14.71→10.04;initial1.42 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | Historical2M mean7,367;62/72 first pyramids | Reference193,220.77; intermediate15k/90% also unmet |

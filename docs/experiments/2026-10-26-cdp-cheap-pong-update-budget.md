@@ -48,5 +48,11 @@ Started October26 at02:01:31 UTC after reviewing compact Freeway's completed
 runner`bcef410`. Startup checks pass:3,578,225 parameters, expected configuration
 with only replay ratio changed, no aid, all346 initial tensors equal the200k
 control and first updates248:1,256:2,256:3. The sealed declaration records the
-preceding Freeway review hash. Inspect the named service before further GPU work;
-the fixed result and full audit are pending. No automatic next allocation.
+preceding Freeway review hash.
+
+Completed:500k actions/1,999,756 emulator frames/124,939 updates in48m53s.
+Fixed frozen final11.0 with23/24 wins, versus initial−20.375 and0/24. The existing
+mean≥15 gate fails. All numeric, finite/config/source/counter, frozen-tensor,
+replay/video and guard checks pass; the service exits successfully. See the
+[result and comparison](../results/2026-10-25-cdp-cheap-pong.md#r32-and500k-actions).
+No extension. The declared Freeway seed confirmation starts after this review.

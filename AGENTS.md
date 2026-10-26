@@ -94,13 +94,20 @@ crossing successes. The5% persistent16-action aid is disabled in evaluation;
 constant-UP CPU reference scores21.6667,0/24. All audits pass and the service
 exits. One reused development seed needs focused confirmation; see the Freeway
 result report. Resolution, ratio, budget and runtime change together.
-Current allocation: fresh Pong1009,4M/RGB48/Auto/B8/T16/R32,500k actions,
-expected124939 updates,55-minute training cap and fixed24-natural-match
-final/actual-initial evaluations. No action aid; actor_unimix remains0. Complete
-config/source checks, all346 initial tensors against the200k control and first
-updates pass. See `docs/experiments/2026-10-26-cdp-cheap-pong-update-budget.md`;
-service owner `kindle-cheap-pong-48-r32-500k-20261026`. Check its live state before
-further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
+Pong4M/RGB48/R32 completes500k actions/124939 updates in48m53s: frozen11.0
+versus initial−20.375,23/24 versus0/24 wins. All audits pass and service exits;
+the mean15 gate fails. No unchanged extension. See the cheap-Pong result report.
+Current allocation: Freeway confirmation4013,1M/RGB32/Auto/B8/T16/H15/R32,
+500k actions/124939 expected updates, unchanged30-minute training cap and fixed
+24-natural-episode final/actual-initial evaluations. Keep5% persistent16-action
+training aid; evaluation disables it. Full config/source/aid checks, all346
+initial tensors against Boxing4013 and first updates pass. See
+`docs/experiments/2026-10-26-cdp-compact-freeway-confirmation.md`;
+service owner `kindle-cheap-freeway-32-r32-500k-aided-4013-20261026`. Check its live
+state before further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
+CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
+and restores reject overrides.263 vector-runner tests pass; native is unchanged.
+The prepared Qbert coefficient100 test remains unstarted; review Freeway first.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 
