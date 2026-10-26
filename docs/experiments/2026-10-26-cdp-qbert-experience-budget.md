@@ -53,3 +53,15 @@ passes against the actual completed Pong200k/R16 log/checkpoint:24,970 updates,
 counts and a wrong checkpoint counter are rejected. This is monitoring evidence,
 not new Qbert execution. Monitoring check SHA256
 `705a2897da7d0bccf422b0d44a9e68a0a10ee428bd304ebd74b74764beab963c`.
+
+Completed-run analysis is prepared in `finish_qbert_experience_budget.py` and
+`compare_qbert_experience_budget.py`, alongside the existing generic pyramid
+coverage reader. It requires the250k recovery audit, completed500k/62,470-update
+review, three host guards, unchanged frozen tensors and complete replays before
+plotting. The comparison retains both actual initials, the original task gate,
+and separate action/time axes; experience and ratio change together. Compilation
+passes and unselected postprocessing refuses before creating artifacts. These
+scripts are not running and start no GPU work.
+Analysis preparation: `analysis-preparation.json`; comparison SHA256
+`faf4cb4880a48a8ae7117f141d7e39a950477569273afe8d06d1b795d9d3a646`;
+postprocessor`7d1f69b6cdcfd429c321c7a7983c4c9232119467b1e3450df7e8a72f4b4eedd0`.
