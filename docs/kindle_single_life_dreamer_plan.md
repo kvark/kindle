@@ -83,8 +83,10 @@ Selected seeds are not held out; no unchanged extension or broad campaign.
 Their [completed-report analysis](results/2026-10-25-cdp-cheap-pong.md#exploration-bonus-scale-in-the-completed-learners)
 finds a late exploration-bonus/net-predicted-reward ratio of3.76/3.46. Signed
 reward cancellation limits that comparison; it does not diagnose the score gap.
-A smaller game-specific bonus is a later test candidate, with no new allocation
-or change to the active Breakout recipe.
+A [smaller game-specific bonus test](experiments/2026-10-26-cdp-pong-small-intrinsic.md)
+is prepared with the native recipe and500k budget otherwise fixed. Its controller
+refuses unselected execution. Select only after reviewing the active Breakout
+result or cutoff and terminal service; no additional learner is running.
 
 The [six-action Qbert trial](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage)
 completes200k/49939 updates in18m21s, but frozen605.208 and10.167/21 mean coverage
