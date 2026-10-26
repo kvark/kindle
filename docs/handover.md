@@ -130,6 +130,9 @@ Labelled curves, coverage and matched-config comparison are prepared. Native
 binary and production runner remain unchanged. Owner
 `kindle-cheap-qbert-aided-200k-20261026`; check live state before GPU work.
 No cap increase, resume, extension or automatic next allocation.
+Started12:03:20 UTC/source`1c31c4c`; native config and346 matched initial tensors
+pass startup. First4,096 actions reproduce the aid ledger. Recovery and completed
+unaided evaluation/analysis are automated.
 
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

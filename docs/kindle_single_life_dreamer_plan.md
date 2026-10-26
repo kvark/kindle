@@ -178,6 +178,9 @@ Labelled curves, coverage and matched-config comparison are prepared. Native
 binary and production runner remain unchanged. Owner
 `kindle-cheap-qbert-aided-200k-20261026`; check live state before GPU work.
 No cap increase, resume, extension or automatic next allocation.
+Started12:03:20 UTC/source`1c31c4c`; native config and346 matched initial tensors
+pass startup. First4,096 actions reproduce the aid ledger. Recovery and completed
+unaided evaluation/analysis are automated.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

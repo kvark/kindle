@@ -62,6 +62,9 @@ full numerical/config/counter/action-ledger/tensor/replay/guard audits apply.
 See`docs/experiments/2026-10-26-cdp-qbert-persistent-aid.md`; owner
 `kindle-cheap-qbert-aided-200k-20261026`. Check live state before GPU work.
 No retry, cap increase, extension or automatic next allocation.
+Started12:03:20 UTC/source`1c31c4c`; native config and346 matched initial tensors
+pass startup. First4,096 actions reproduce the aid ledger. Recovery and completed
+unaided evaluation/analysis are automated.
 
 PongB16 doubled rates finish500k in38m32s, with frozen9.125 versus11.875 for
 original rates; both24/24 wins and below mean15. All audits/comparison and

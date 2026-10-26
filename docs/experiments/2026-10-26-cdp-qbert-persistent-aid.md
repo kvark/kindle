@@ -67,3 +67,14 @@ Comparison SHA256`5378b754064a2a0bfa33dab771e426040592fd423fd27c193e252dcbe52a29
 postprocessor`0281757bb16c9c4494d4f4843c4962004c2a7d6393b09fe1b4bd996778537e8d`.
 Pins and CPU checks are retained in`analysis-preparation.json` and
 `initial-trace-preparation.json` under the candidate artifacts.
+
+Started **12:03:20 UTC**, source`1c31c4c`, native`bfb8c31`, CLI`22bd61b`.
+Startup verifies the full native config against the unaided control,3,578,225
+parameters, zero counters and first updates248:1/256:2/256:3. All346 finite
+initial tensors match that control. The first512 vector ticks/4,096 aggregate
+actions reproduce the declared exploration RNG and every applied override;
+184 actions are overridden in that prefix. Initial metadata SHA256
+`a51927112c98eaafa73f7462f2f4d30bd0128ea6ef0e95962cbd529a1a6f0b0b`;
+selected declaration`a9f48c9a81c75b2d7ae7f8dfa9346a5cf0ff059508ba4e0b20914a96b4eb0476`.
+The100k recovery watcher and terminal-service curve/coverage/comparison automation
+are running. Unaided frozen learning results remain pending.
