@@ -185,3 +185,32 @@ Review SHA256`d63361a46d6cd30f5c540014c6b45014b57bec4128d6554c89be72801e2de3aa`;
 curve SHA256`979db7a72c88ec75de57f91848709968f22f8a9be1b8d5485d0481f7d17729f0`;
 comparison SHA256`7563683311c2ce2cd737840943d22352af1181b6a7cf318523c9dfbf68fefdf8`.
 Seed1009 is reused development data. No extension or broad action/seed sweep.
+
+## Cost estimate for more experience at lower replay ratio
+
+The full18 coefficient1 learner spends1,103.742s of1,184.523s in learning
+(93.18%). Its online last50 score rises from294 at49,152 actions to677.5 at200k;
+that does not predict further frozen gains. The saved coverage evidence above
+still shows cubes never colored during an episode, without identifying a cause.
+
+A CPU-only planning calculation considers fresh4M/RGB48/H15 with500k actions
+and ratio16, retaining the full18 coefficient1 recipe otherwise. Expected
+updates are62,470, versus49,939 in the completed200k/R32 test:2.5 times the
+experience and1.251 times the updates. The existing completed R16 control
+confirms the first-update248/count convention; a new run must verify it itself.
+
+Scaling recorded learning cost by updates and acting/remaining overhead by
+actions estimates1,582.620s (**26.38 minutes**), including two hypothetical saves
+but excluding construction. That leaves217s against a proposed30-minute cap
+which would include construction. This is a cost estimate, **not a measured
+speedup, learning prediction or selected allocation**. Trajectories and unit
+costs can change. No GPU work, new queue, extension or cap increase occurs.
+If selected later, experience and ratio change together; retain own initial/
+fixed-final controls and the unchanged15k/90%-pyramid gate. The active Pong
+confirmation and prepared Breakout candidate are unaffected.
+
+Artifact:`experience-budget-projection.json` in the full18 coefficient1 run;
+SHA256`c79bf10b5d53c07885687ba547689a2984f37d44371b1c287ca972a2209c2db2`.
+Script:`/x/Temp/kindle-cheap-20261025/review_qbert_experience_budget.py`.
+The receipt pins completed review/curve/coverage/R16-control identities and
+retains the formula, stage costs, observed curve points and assumptions.
