@@ -51,20 +51,20 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Qbert12M/RGB48/B16/R32 capacity/batch learning screen,
-selected after bounded training/restore passes. Fresh1009/eval4000001009,
-Auto/N8/T16/H15, coefficient1, full18, no aid,14,123,473 parameters. Fixed200k
-aggregate actions/24,954 updates, first376,100k recovery and35-minute training
-cap. Own actual initial/fixed final24-natural-episode evaluation; unchanged
-15k/90%-pyramid gate and full config/counter/numeric/tensor/replay/guard audits.
-Capacity and batch change together; no matched-initial claim across model sizes.
-See `docs/experiments/2026-10-26-cdp-qbert-capacity-budget.md`; intended owner
-`kindle-cheap-qbert-12m-48-b16-200k-20261026`. Check live state before GPU work.
-Started10:41:58 UTC from`be6c942`; startup verifies first376,14,123,473 parameters
-and346 initial tensors matching the same-shape check. Audits/analysis are automated.
-The separate16,384-action check takes149.387s and preserves346 tensors on restore;
-service exits10:35:06 UTC. It supplies execution/early cost, not competence.
+Current allocation: Pong4M/RGB48/B16/R32 with doubled learning rates, selected
+following completed Qbert capacity/batch evaluation. Fresh1009/eval4000001009,
+Auto/N8/T16/H15, coefficient.01, full18 and no aid. Keep500k actions/62,454 updates,
+first376, four100k recoveries and45-minute training cap. Base/encoder/dynamics
+rates8e-5/1.2e-5/8e-4; warmup and other optimizer settings stay fixed. Actual
+initial must match346 B16 control tensors. Fixed final/initial24-natural-match
+controls retain mean15/90%-win gate and full audits. CLI passes278 vector tests;
+native unchanged. See`docs/experiments/2026-10-26-cdp-pong-learning-rate.md`.
+Owner`kindle-cheap-pong-b16-lr2-500k-20261026`; check live state before GPU work.
 No retry, cap increase, extension or automatic next allocation.
+
+Qbert12M48/B16 completes200k in32m19s, scores959.375/0of24 pyramids and coverage
+16.292/21, versus4M/B8's809.375/0of24 and16.625/21 in19m45s. All audits and
+comparison pass; service exits11:15:13 UTC. No extension or confirmation.
 
 PongB16 completes500k/62,454 updates in38m45s,22.37% less training time than B8,
 but frozen11.875 is below14.958; both24/24 wins and below mean15. All audits and
@@ -72,7 +72,7 @@ comparison pass; service exits10:28:51 UTC. No extension or confirmation.
 Qbert500k/R16 remains weaker than its200k/R32 control, with0/24 pyramids.
 
 Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
-`1ed07af`, CPU replay `e853818`. The active declaration pins exact runtime/script
+`22bd61b`, CPU replay `e853818`. The active declaration pins exact runtime/script
 hashes; the handover locates the build receipt. Native 32/48/64 geometry and the
 intermediate 4M preset pass bounded training/frozen checks, including 64 restore.
 The CLI exposes imagination length for fresh runs; defaults retain 15 and

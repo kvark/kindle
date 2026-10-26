@@ -1,6 +1,10 @@
 # Qbert capacity and replay batch at200k actions
 
-**Selected after the bounded12M/RGB48/B16 check.** It passes16,384 actions/
+**Complete; [result](../results/2026-10-25-cdp-cheap-qbert.md#larger-capacity-at-the-fixed200k-budget).**
+Frozen959.375/0of24 pyramids versus initial165.625. Training32m19s, all audits
+and completed analysis pass; service exits11:15:13 UTC. No extension selected.
+
+Originally selected after the bounded12M/RGB48/B16 check. It passes16,384 actions/
 2,002 updates, ordinary restore and all346-tensor/guard checks in149.387s of
 training. It does not establish competence. A rough scaling from the completed
 4M control suggests about31 minutes for200k; this is not a measured full-budget

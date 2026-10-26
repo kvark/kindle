@@ -152,23 +152,25 @@ passes16,384 actions/2,002 updates in149.387s, versus93.813s for4M/B8. All check
 and ordinary restore/346-tensor invariance pass; service exits10:35:06 UTC. This
 measures execution/early cost, not competence or a full-budget speed ratio.
 
-**Current allocation:** [Qbert12M/RGB48/B16/R32 at200k](experiments/2026-10-26-cdp-qbert-capacity-budget.md),
-selected after that result. Fresh1009/eval4000001009, Auto/N8/T16/H15, coefficient1,
-full18 and no aid;14,123,473 parameters. Fixed200k/24,954 updates, first376,
-100k recovery,35-minute training cap and original15k/90%-pyramid gate. Own actual
-initial/fixed final and full audits/curves/coverage/comparison remain required.
-Capacity and batch change together, with nearly equal sampled positions but
-fewer updates and different initial tensors. Short validation cost is additional.
-No cap increase, retry, resume, extension or automatic next queue.
-Started10:41:58 UTC, source`be6c942`; startup verifies14,123,473 parameters,
-first376 and346 finite initial tensors matching the same-shape check. Full
-audits and completed-run analysis are automated; frozen learning remains pending.
+The [completed Qbert capacity/batch screen](results/2026-10-25-cdp-cheap-qbert.md#larger-capacity-at-the-fixed200k-budget)
+scores959.375 versus own initial165.625, with0/24 pyramids. At200k actions,
+12M/B16 takes32m19s versus4M/B8's19m45s; coverage16.292/21 is below16.625/21.
+All audits and completed comparison pass; service exits11:15:13 UTC. The score
+increase does not justify63.70% more wall time for this compute-constrained
+screen. No extension or confirmation selected.
 
-A [staged CDP learning-rate option](experiments/2026-10-26-cdp-pong-learning-rate.md)
-passes278 CPU vector tests while production files remain unchanged. It permits
-proportional base/encoder/dynamics rates with the existing CLI flag; defaults and
-restore rules stay fixed. Review Qbert and its completed analysis before applying
-or repinning the runner. No further GPU allocation is selected.
+Current allocation: [PongB16 with doubled learning rates](experiments/2026-10-26-cdp-pong-learning-rate.md),
+selected after the completed Qbert comparison. Fresh1009/eval4000001009,
+4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01, full18 and no aid. Keep500k
+aggregate actions/62,454 updates and45-minute training cap, with four100k recovery
+checks. Only base/encoder/dynamics rates double to8e-5/1.2e-5/8e-4 against the
+completed B16 control; warmup and other optimizer settings stay fixed. Own actual
+initial must match346 control tensors; fixed final/initial24-natural-match
+controls retain mean15/90%-wins and full numerical/tensor/replay/guard audits.
+The CLI change is applied after Qbert's completed analysis and passes278 vector
+tests; defaults and restore restrictions remain. Native binary is unchanged.
+Owner`kindle-cheap-pong-b16-lr2-500k-20261026`; check live state before GPU work.
+No cap increase, resume, extension or automatic next allocation.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

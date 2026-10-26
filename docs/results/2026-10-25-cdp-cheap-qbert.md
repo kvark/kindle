@@ -321,3 +321,46 @@ After reviewing the check, select a separate fresh
 [200k-action capacity/batch learning screen](../experiments/2026-10-26-cdp-qbert-capacity-budget.md)
 under a35-minute cap. Keep the original frozen15k/90%-pyramid gate and own actual
 initial. The short validation cost is additional, and its weights are not resumed.
+
+## Larger capacity at the fixed200k budget
+
+The12M/RGB48/B16 policy scores **959.375 versus own initial165.625**, with0/24
+first pyramids. The4M/B8 control scores809.375, but costs19m45s versus **32m19s**
+for the larger recipe. Mean first-pyramid coverage is16.292/21 versus16.625/21.
+The modest score increase costs63.70% more training time and does not improve
+coverage or pass the original15000/90%-pyramid gate. No extension or confirmation
+is selected for this recipe.
+
+Fresh1009/eval4000001009,12M/RGB48/Auto/N8/B16/T16/H15/R32,14,123,473 parameters,
+full BPTT/microbatch16, coefficient1, actor_unimix0, full18 and no aid. Native
+frames receive one GPU resize; sticky.25/repeat4/noops0 remain. Capacity and batch
+change together against4M/B8, including initialization, centering, cadence and
+warmup per action. Both200k budgets sample nearly equal replay positions:
+6,388,224 versus6,392,192, with24,954 versus49,939 updates. Each uses its own
+actual initial; no matched-initial claim across sizes. Seeds are reused development
+data, and the separate bounded check adds cost without supplying an independent seed.
+
+Training completes **200,000 actions /799,491 emulator frames /24,954 updates**
+in1,939.063095s,103.14 actions/s, with first update376 and zero debt. All350
+training episodes are natural; final online last50 mean822.0 is separate from
+frozen959.375. Reviewed curves show better learning per action after early
+training, but slower online improvement over much of the shared wall-time window.
+
+Final/initial frozen evaluations use28,472/9,232 actions,113,848/36,891 frames and
+17.098/5.528s. Select the first three natural episodes per lane,24 per arm;
+final collects28 with four excess episodes retained, initial24. Partial tails
+remain in complete traces. Zero updates/truncations and346 unchanged tensors
+per arm. Final coverage median16.5, range10–18; initial mean5.292/21.
+All24,954 strict reports,100k recovery, full config/source/counters, finite
+checkpoints, complete CPU replays/videos and three host guards pass. Service
+exits11:15:13 UTC with33m15.306s total wall, within the original35-minute training
+cap. Completed curves, coverage and comparison pass and are visually reviewed.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-12m-48-b16-r32-200k`.
+Learning review SHA256`9f5a0fc158fe8601fa475f4b949b658ec8cc5ae90989af8c215aa8849e03086e`;
+curve`ee9bc3853703e61e57f623a01bf53d1ecaa95402216a06607a87f9a44422ecc9`;
+coverage`564bb72d4b5d09c12ae5d08c44f5d148a16452e17929c4f0d34b3dff7a3b186a`;
+comparison`15141dfdbe8a98498ad27678396a1c74f7e967a32fb776681d77d411be950796`.
+Source at launch`be6c942`, native`bfb8c31`, runner`1ed07af`, replay`e853818`.
+After review, select the prepared PongB16 doubled-rate test at its fixed500k
+budget; no further Qbert allocation follows from this result.

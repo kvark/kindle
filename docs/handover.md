@@ -104,27 +104,27 @@ passes16,384 actions/65,481 frames/2,002 updates in149.387s, versus93.813s for
 selected parameter changes and ordinary restore/346-tensor invariance pass.
 Service exits10:35:06 UTC. This is execution/early-cost evidence, not competence.
 
-Current allocation: [Qbert12M/RGB48/B16/R32 at200k](experiments/2026-10-26-cdp-qbert-capacity-budget.md),
-selected after that completed check and terminal service. Fresh1009/eval4000001009,
-Auto/N8/T16/H15, coefficient1, full18 and no aid. Fixed200k/24,954 updates,
-first376,100k recovery and35-minute cap. Own actual initial/fixed final24-natural-
-episode controls, original15k/90%-pyramid gate and full audits/curves/coverage/
-comparison. Capacity and batch change together; sampled positions nearly match
-4M/B8 while updates/initial tensors differ. No retry, cap increase or extension.
-Artifacts/controller:`qbert-12m-48-b16-r32-200k`, `run_qbert_12m_48_b16_200k.py`;
-intended owner`kindle-cheap-qbert-12m-48-b16-200k-20261026`. Check live state before
-GPU work; the short check is not resumed and no next queue is automatic.
-Started10:41:58 UTC, source`be6c942`; startup verifies14,123,473 parameters,
-first376 and346 finite initial tensors matching the same-shape check. Recovery,
-frozen audits and completed curves/coverage/comparison are automated.
+The [completed Qbert capacity/batch screen](results/2026-10-25-cdp-cheap-qbert.md#larger-capacity-at-the-fixed200k-budget)
+scores959.375 versus own initial165.625, with0/24 pyramids. At200k actions,
+12M/B16 takes32m19s versus4M/B8's19m45s; coverage16.292/21 is below16.625/21.
+All audits and completed comparison pass; service exits11:15:13 UTC. The score
+increase does not justify63.70% more wall time for this compute-constrained
+screen. No extension or confirmation selected.
 
-A [staged CDP learning-rate option](experiments/2026-10-26-cdp-pong-learning-rate.md)
-passes278 CPU vector tests while production files remain unchanged. It permits
-proportional base/encoder/dynamics rates with the existing CLI flag; defaults and
-restore rules stay fixed. Review Qbert and its completed analysis before applying
-or repinning the runner. No further GPU allocation is selected.
+Current allocation: [PongB16 with doubled learning rates](experiments/2026-10-26-cdp-pong-learning-rate.md),
+selected after the completed Qbert comparison. Fresh1009/eval4000001009,
+4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01, full18 and no aid. Keep500k
+aggregate actions/62,454 updates and45-minute training cap, with four100k recovery
+checks. Only base/encoder/dynamics rates double to8e-5/1.2e-5/8e-4 against the
+completed B16 control; warmup and other optimizer settings stay fixed. Own actual
+initial must match346 control tensors; fixed final/initial24-natural-match
+controls retain mean15/90%-wins and full numerical/tensor/replay/guard audits.
+The CLI change is applied after Qbert's completed analysis and passes278 vector
+tests; defaults and restore restrictions remain. Native binary is unchanged.
+Owner`kindle-cheap-pong-b16-lr2-500k-20261026`; check live state before GPU work.
+No cap increase, resume, extension or automatic next allocation.
 
-Current native source`bfb8c31`, runner`1ed07af`, native SHA256
+Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
 `original-native` preserves the prior AMD binary. Both installed and source-tree
