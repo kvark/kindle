@@ -53,7 +53,16 @@ import profile_atari_vector
     (["--cdp", "--cdp-centered", "--world-microbatch-size", "1"], "full-batch world training"),
     (["--cdp", "--encoder-checkpoint", "unused"], "CDP requires"),
     (["--cdp", "--actor-critic-gradient"], "CDP requires"),
-    (["--cdp", "--learning-rate", ".001"], "CDP requires"),
+    (["--learning-rate", "0"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "-0.1"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "nan"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "inf"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "1e300"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "1e-300"], "learning-rate must be finite and positive in F32"),
+    (["--cdp", "--learning-rate", "1e38"], "CDP learning rates must be finite and positive in F32"),
+    (["--cdp", "--learning-rate", "1e-45"], "CDP learning rates must be finite and positive in F32"),
+    (["--restore", "unused", "--learning-rate", "0.00008"], "training overrides"),
+    (["--restore", "unused", "--learning-rate=0.00004"], "training overrides"),
     (["--restore", "unused", "--disagreement-scale", "1"], "training overrides"),
     (["--disagreement-scale", "-1"], "finite and non-negative"),
     (["--disagreement-scale", "nan"], "finite and non-negative"),
@@ -165,6 +174,40 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, ba
                                        '--world-microbatch-size', str(batch_shape[0])] if batch_shape else []),
                                     *(['--cdp-centered'] if centered else [])])
     with pytest.raises(RuntimeError, match='CDP recipe checked'):
+        atari_vector.main()
+
+
+@pytest.mark.parametrize("rate,encoder,dynamics", [
+    (2e-5, 3e-6, 2e-4), (4e-5, 6e-6, 4e-4), (8e-5, 1.2e-5, 8e-4),
+])
+@pytest.mark.parametrize("cdp", [False, True])
+def test_runner_learning_rate_recipe_before_gpu(monkeypatch, tmp_path, rate, encoder, dynamics, cdp):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config["learning_rate"] == rate
+        assert config["encoder_learning_rate"] == (encoder if cdp else None)
+        assert config["dynamics_learning_rate"] == (dynamics if cdp else None)
+        assert config["behavior_learning_rate"] is None
+        assert config["learning_rate_warmup"] == 1000
+        assert config["optimizer_beta1"] == .9 and config["optimizer_beta2"] == .999
+        assert config["batch_size"] == config["world_microbatch_size"] == 16
+        assert config["batch_length"] == config["world_backprop_length"] == 16
+        assert config["observation_kind"] == "rgb48" and config["train_ratio"] == 32
+        assert config["loss_scales"]["future_prediction"] == (500 if cdp else 0)
+        assert config["loss_scales"]["reconstruction"] == (0 if cdp else 1)
+        assert config["cdp_centered"] is cdp
+        raise RuntimeError("learning rates checked before GPU")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "rate.jsonl"),
+        "--model-size", "4m", "--image-size", "48", "--batch-size", "16", "--batch-length", "16",
+        "--world-microbatch-size", "16", "--train-ratio", "32", "--learning-rate", str(rate),
+        *(["--cdp", "--cdp-centered"] if cdp else [])])
+    with pytest.raises(RuntimeError, match="learning rates checked before GPU"):
         atari_vector.main()
 
 

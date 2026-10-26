@@ -12,6 +12,7 @@ import json
 import math
 import os
 import signal
+import struct
 import sys
 import time
 from pathlib import Path
@@ -38,6 +39,14 @@ def require_gpu_budget(snapshot, minimum_bytes):
         raise ValueError("native GPU memory budget is unsupported")
     if snapshot["budget_bytes"] - snapshot["usage_bytes"] < minimum_bytes:
         raise ValueError("native GPU memory budget headroom below declared minimum")
+
+
+def positive_f32(value):
+    try:
+        value, = struct.unpack("=f", struct.pack("=f", value))
+    except OverflowError:
+        return False
+    return math.isfinite(value) and value > 0
 
 
 def require_gpu_device(snapshot, expected):
@@ -82,7 +91,8 @@ def main():
     parser.add_argument("--imagination-length", type=int,
                         help="fresh imagined rollout steps; omitted: native default, restore keeps checkpoint length")
     parser.add_argument("--train-ratio", type=float, default=256)
-    parser.add_argument("--learning-rate", type=float, default=0.00004)
+    parser.add_argument("--learning-rate", type=float, default=0.00004,
+                        help="fresh base rate; CDP encoder/dynamics rates scale proportionally from default4e-5")
     parser.add_argument("--actor-unimix", type=float, default=0.0,
                         help="native policy uniform mixture in [0,1); fresh default0, restore keeps checkpoint policy")
     parser.add_argument("--report-every", type=int, default=1000)
@@ -114,6 +124,8 @@ def main():
         parser.error("initial-checkpoint requires fresh training")
     if args.world_microbatch_size is not None and args.world_microbatch_size <= 0:
         parser.error("world-microbatch-size must be positive")
+    if not positive_f32(args.learning_rate):
+        parser.error("learning-rate must be finite and positive in F32")
     if args.imagination_length is not None and args.imagination_length <= 0:
         parser.error("imagination-length must be positive")
     if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
@@ -166,8 +178,14 @@ def main():
     learned_rgb = args.encoder_checkpoint is None
     if args.image_size is not None and not learned_rgb:
         parser.error("image-size requires the learned RGB/CNN frontend")
-    if args.cdp and (not learned_rgb or args.actor_critic_gradient or args.learning_rate != 4e-5):
-        parser.error("CDP requires the learned CNN, ac_grads=false and base learning-rate4e-5")
+    if args.cdp and (not learned_rgb or args.actor_critic_gradient):
+        parser.error("CDP requires the learned CNN and ac_grads=false")
+    if args.cdp:
+        rate_scale = args.learning_rate / 4e-5
+        cdp_rates = dict(encoder_learning_rate=6e-6 * rate_scale,
+                         dynamics_learning_rate=4e-4 * rate_scale)
+        if not all(positive_f32(rate) for rate in cdp_rates.values()):
+            parser.error("CDP learning rates must be finite and positive in F32")
     if args.cdp_centered and (not args.cdp or args.world_microbatch_size not in (None, args.batch_size)):
         parser.error("centered CDP requires --cdp and full-batch world training")
     if not math.isfinite(args.disagreement_scale) or args.disagreement_scale < 0:
@@ -243,8 +261,7 @@ def main():
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
             if args.cdp:
                 config["loss_scales"].update(reconstruction=0.0, future_prediction=500.0)
-                config.update(encoder_learning_rate=6e-6, dynamics_learning_rate=4e-4,
-                              cdp_centered=args.cdp_centered)
+                config.update(**cdp_rates, cdp_centered=args.cdp_centered)
         else:
             config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)
         exploration = (PersistentExploration(dict(kind=EXPLORATION_KIND,
