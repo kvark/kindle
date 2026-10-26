@@ -84,17 +84,18 @@ The [four-action Breakout result](results/2026-10-26-cdp-breakout-minimal-action
 completes200k/49939 updates in20m59s,6.64% less training time than full18.
 Frozen9.542 versus own initial1.167 improves the full18 control's7.083, but
 still0/24 two-wall successes. All audits/comparison pass; service exits09:01:55.
-Current allocation: [Qbert experience budget](experiments/2026-10-26-cdp-qbert-experience-budget.md),
-fresh1009/eval4000001009,4M/RGB48/Auto/N8/B8/T16/H15/full18, coefficient1, no aid.
-Ratio32→16 and experience200k→500k change together;62,470 expected updates,
-30-minute cap and250k recovery. Own actual-initial/fixed-final controls and
-mean15000/90%-pyramid gate remain. Match346 initial tensors against full18 control.
-Artifacts/controller:`qbert-4m-48-r16-500k`, `run_qbert_500k_r16.py`; owner
-`kindle-cheap-qbert-r16-500k-20261026`. Check live state before GPU work.
-No Breakout extension or automatic next allocation.
-Started09:05:27 UTC, source`640f614`; full config/counters,3,578,225 parameters,
-all346 matched initial tensors and first updates pass. Recovery monitoring and
-completed analysis are active; fixed frozen results remain pending.
+The [Qbert500k/R16 result](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-does-not-improve-the-result)
+finishes in26m53s: frozen719.792 versus initial180.208,0/24 pyramids and14.125/21
+coverage, below the200k/R32 control809.375/16.625. All audits/comparison pass;
+service exits09:33:03 UTC. No extension or confirmation selected.
+Current allocation: [bounded PongB16 check](experiments/2026-10-26-cdp-pong-batch16-check.md),
+fresh1009,4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01, no aid. Fixed16,384
+training actions/2,002 updates under240s, first376; ordinary1,024-action frozen
+restore under90s, audit120s/service600s. Match initial tensors and audit all346
+frozen tensors. Compare only the matching early B8 window; no natural-match
+competence test or full Pong allocation. Artifacts/controller:`pong-b16-shape-check`,
+`run_pong_b16_shape_check.py`; owner`kindle-cheap-pong-b16-check-20261026`.
+Check live state before GPU work. No automatic promotion or next queue.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

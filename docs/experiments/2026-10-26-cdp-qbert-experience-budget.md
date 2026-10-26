@@ -1,6 +1,12 @@
 # More Qbert experience at lower replay ratio
 
-**Selected after the completed four-action Breakout result.** That trial finishes
+**Completed:**500k actions/62,470 updates in26m53s; frozen719.792 versus own
+initial180.208,0/24 pyramids and14.125/21 coverage. The200k/R32 control scores
+809.375 with16.625/21 coverage. All audits/comparison pass; service exits09:33:03.
+See the [result](../results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-does-not-improve-the-result).
+No extension; the bounded PongB16 check is selected next.
+
+Selected after the completed four-action Breakout result. That trial finishes
 in20m59s with frozen9.542 and0/24 two-wall successes; all audits/comparison pass
 and its service exits09:01:55 UTC. Move this allocation to Qbert with the
 previously prepared fixed recipe and limits. No automatic next queue.
@@ -75,5 +81,5 @@ Initial metadata SHA256
 selected declaration`76a6e972db87ee93bb1739edb7b8bba3944902060f8b2e6970879125a2bcc6d6`.
 Selection pins the completed Breakout review/comparison and terminal service;
 no concurrent learner was active. The250k recovery monitor and completed-run
-analysis waiter are running. Fixed final/initial evaluations and full audit
-precede plots and coverage analysis; learning results remain pending.
+analysis finish successfully. Fixed final/initial evaluations, full audit,
+plots and coverage analysis complete; the original learning gate fails.

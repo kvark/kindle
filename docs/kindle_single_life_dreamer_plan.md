@@ -25,6 +25,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
+| [Full18, more experience at R16](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-does-not-improve-the-result) |500k /62,470|26m53s|719.792 /180.208|0/24 pyramids;14.125/21 coverage|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
 | [Same, four actions](results/2026-10-26-cdp-breakout-minimal-actions.md) |200k /49,939|20m59s|9.542 /1.167|0/24 two-wall successes|
@@ -127,17 +128,20 @@ control. Frozen9.542 versus own initial1.167 improves on7.083/1.375, but still
 no matched-weight or seed-reliability claim. All audits/comparison pass and
 service exits09:01:55 UTC. Retain the modest gain; no extension selected.
 
-**Current allocation:** [Qbert experience-budget test](experiments/2026-10-26-cdp-qbert-experience-budget.md).
-Fresh1009/eval4000001009, full18/coefficient1/4M/RGB48/Auto/N8/B8/T16/H15, no aid.
-Use500k actions at ratio16,62,470 expected updates and the same30-minute cap.
-Experience increases2.5× and updates1.251× over the200k/R32 control; these changes
-do not isolate replay ratio. The26.4-minute CPU cost projection is not a runtime
-or learning result. Match346 initial tensors; retain own initial/fixed final,
-250k recovery, full audits and the unchanged15000/90%-first-pyramid gate.
-Monitoring and completed analysis are prepared; no automatic next allocation.
-Started09:05:27 UTC, source`640f614`; full config/counters,3,578,225 parameters,
-all346 matched initial tensors and first updates pass. Recovery monitoring and
-completed analysis are active; fixed frozen results remain pending.
+The [Qbert500k/R16 result](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-does-not-improve-the-result)
+completes in26m53s: frozen719.792 versus initial180.208,0/24 pyramids and14.125/21
+coverage, below the200k/R32 control809.375/16.625. Experience increases2.5× and
+updates1.251× in1.36× training time, but this joint change does not improve the
+recipe. All audits/comparison pass; service exits09:33:03 UTC. No extension.
+
+**Current allocation:** [bounded PongB16 check](experiments/2026-10-26-cdp-pong-batch16-check.md).
+Fresh1009,4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01, no aid. Change replay
+batch/world microbatch8→16;16,384 training actions/2,002 expected updates,
+first376,240s cap. Ordinary1,024-action frozen restore under90s, full counters,
+finite/changed parameter checks and346-tensor invariance; audit120s/service600s.
+Compare the matching early B8 window with its cadence/centering/warmup changes.
+This short check does not measure natural-match competence or select a full
+Pong run. No native change, automatic promotion or next queue.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

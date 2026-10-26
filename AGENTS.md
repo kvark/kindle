@@ -51,20 +51,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Qbert experience-budget test, fresh1009/eval4000001009,
-4M/RGB48/Auto/N8/B8/T16/H15/full18, intrinsic coefficient1, no action aid.
-Change ratio32→16 and experience200k→500k together:62,470 expected updates,
-30-minute training cap,250k recovery, own actual-initial/fixed-final controls.
-Match all346 initial tensors to the completed full18 control and keep the
-mean15000/90%-first-pyramid gate. See
-`docs/experiments/2026-10-26-cdp-qbert-experience-budget.md`; service owner
-`kindle-cheap-qbert-r16-500k-20261026`. Check live state before GPU work.
-Selection follows completed four-action Breakout:20m59s, frozen9.542 versus
-initial1.167,0/24 two-wall successes; all audits pass and service exits.
-No Breakout extension, automatic next allocation or broad campaign.
-Started09:05:27 UTC, source`640f614`; full config/counters,3,578,225 parameters,
-all346 matched initial tensors and first updates pass. Recovery monitoring and
-completed analysis are active; fixed frozen results remain pending.
+Current allocation: bounded PongB16 learning/restore check, fresh1009,
+4M/RGB48/Auto/N8/B16/T16/H15/R32, intrinsic coefficient.01, no aid. Train16,384
+actions/2,002 expected updates, first376,240s cap; restore for1,024 frozen actions
+under90s, audit120s/service600s. Verify full config, matched initial tensors,
+finite updates, selected parameter changes and all346 unchanged restored tensors.
+Compare only the matching early B8 window. This does not test natural-match
+competence or select a full Pong run. See
+`docs/experiments/2026-10-26-cdp-pong-batch16-check.md`; service owner
+`kindle-cheap-pong-b16-check-20261026`. Check live state before GPU work.
+Qbert500k/R16 is complete:26m53s, frozen719.792 versus initial180.208,0/24 pyramids
+and14.125/21 coverage; worse than the200k/R32 control. All audits pass and service
+exits. No unchanged extension, automatic promotion or broad campaign.
 
 Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
 `1ed07af`, CPU replay `e853818`. The active declaration pins exact runtime/script

@@ -1,8 +1,9 @@
 # Bounded Pong B16 learning and restore check
 
-**Prepared only.** Qbert500k/R16 is the active learner. Review its completed
-outcome and terminal service before selecting this check. No full Pong run,
-backend rebuild or automatic next allocation is selected.
+**Selected after completed Qbert500k/R16.** That trial scores719.792 with0/24
+pyramids and14.125/21 coverage, below the200k/R32 control; all audits/comparison
+pass and its service exits09:33:03 UTC. No Qbert extension, full Pong run, backend
+rebuild or automatic next allocation is selected.
 
 The [source feasibility review](../results/2026-10-25-cdp-cheap-pong.md#larger-replay-batch-source-feasibility-only)
 finds that doubling replay batch size roughly halves optimizer steps at fixed

@@ -246,3 +246,49 @@ Script:`review_compact_encoder_updates.py` in the same root. An initial CPU
 attempt expected a top-level initial-checkpoint field absent from the older
 Qbert review; using its existing evaluated-source checkpoint identity completes
 the analysis. The correction receipt is retained; no experiment is repeated.
+
+## More experience at R16 does not improve the result
+
+The500k/R16 policy scores **719.792 versus initial180.208**, with0/24 first
+pyramids. Mean first-pyramid coverage is14.125/21, below the200k/R32 control's
+16.625/21; its score is also below809.375. Training completes in **26m53s** within
+the original30-minute cap. More experience at lower replay ratio fails to
+improve this development recipe. No extension or confirmation is selected.
+
+Fresh1009/eval4000001009, full18/coefficient1/4M/RGB48/Auto/N8/B8/T16/H15,
+3,578,225 parameters, full BPTT/microbatch8, replay100k, actor_unimix0 and no aid.
+Native train_ratio32→16 and experience200k→500k change together:2.5× experience
+and1.251× updates, not an isolated ratio effect. All346 initial tensors match
+the full18 control. Native frames receive one GPU resize; sticky.25/repeat4,
+zero no-op starts and100000-frame episode limit remain.
+
+| Budget / ratio | Actions / emulator frames / updates | Training wall | Frozen final / own initial | First pyramids | Mean coverage |
+|---|---:|---:|---:|---:|---:|
+|200k /R32|200k /799,342 /49,939|19m45s|809.375 /180.208|0/24|16.625/21|
+|500k /R16|500k /1,998,525 /62,470|26m53s|719.792 /180.208|0/24|14.125/21|
+
+Recorded training time1,612.906818s,310.00 aggregate actions/s, first update248,
+zero debt and1,001 natural training episodes. The final online last50 mean721.0
+is separate from frozen719.792. Reviewed wall-time curves are similar over much
+of their shared window. Collecting experience faster does not establish faster
+useful learning, and neither budget passes the original15000/90%-pyramid gate.
+The joint budget/ratio change and one reused seed limit broader conclusions.
+
+Final/initial frozen evaluations use19,752/9,232 actions,78,972/36,888 emulator
+frames and9.218/4.248s. Select the first three natural episodes per lane,24 each;
+final collects26 with two excess episodes retained, initial24. Partial tails
+remain in complete traces. Zero updates/truncations; all346 tensors unchanged
+per arm. Final coverage median15, range6–19; no selected episode reaches21 cubes.
+All62,470 strict reports,250k recovery, full config/source/counters, finite
+checkpoints, full CPU replays/videos and three host guards pass. The service
+exits successfully09:33:03 UTC, total wall27m36.119s including evaluations/audit.
+The completed coverage report and comparison plots pass and are reviewed.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-4m-48-r16-500k`.
+Learning review SHA256`c641ae25ce3e38aaf9bb69c5b0e2bd88e80c8d159fefcb6458bf8d647e4c5f19`;
+curve`db89a4a471912fe69c7417334df687bebdeef95889768714f8aadf459c1ca427`;
+coverage`f3225efe2f54c427313be05b37e9a724b8a34d23e2f2229c808de910af79085d`;
+comparison`9ed385d96f93a153105f9050c23e8eaa2c08cd9ddf23554894d9681a4fb6445e`.
+Source at launch`640f614`, native`bfb8c31`, runner`1ed07af`, replay`e853818`.
+The next selected work is the bounded PongB16 learning/restore check; it does
+not select a full Pong run or restart any completed Qbert training.
