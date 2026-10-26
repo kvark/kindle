@@ -51,25 +51,27 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Active fresh Pong4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01/actor0,
-full18/original rates/no aid, actor_critic_gradienttrue. Keep500k/62,454 updates,
-first376, four100k recoveries, zero debt and45-minute training cap. Fixed final/
-own initial24 natural sampled matches retain mean15/90%-wins and full357-tensor/
-replay/guard audits. No smoke experience reused. Started18:57:18 UTC/source
-`7ebd7f4`;357 initial tensors match the smoke,346 shared tensors match control,
-first376:1/384:2/392:3/400:4 updates pass.All four100k–400k recoveries pass. The progress
-observer was reattached after exit143; training PID/invocation did not change.
-Recovery and final-analysis monitors remain attached. Owner
-`kindle-cheap-pong-b16-acgrads-500k-20261026`. See
-`docs/experiments/2026-10-26-cdp-pong-actor-critic-gradients.md`. Check live state;
-no cap increase, extension or automatic next allocation.
+Selected bounded Qbert pixel-guidance check: fresh1009/eval4000001009,
+4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates/acgradsfalse.
+Keep4096 actions/963 updates, first248, zero debt,300s training cap and1024
+frozen actions/60s. Five-percent episode selection is separate from actual
+measured action share. Preserve346 initial/frozen tensors, finite reports,
+complete training-action/pixel replay and both guards. Source adapter is applied
+byte-identically to the420-test preparation; native unchanged, separate Python
+overlay`runtime-qbert-guidance`. Owner`kindle-cheap-qbert-pixel-guidance-smoke-20261026`;
+launch pending. See cheap-Qbert report. No automatic full allocation or extension.
 
-A CPU-only Qbert pixel rule clears the first pyramid in24/24 natural episodes,
-mean3764.583 and coverage21/21; complete pixel/action/reward replay passes.
-It misses mean15000 and is hand-coded guidance evidence, not Kindle success.
-The adapter is staged with420 passing CPU tests and full pixel replay. A4096-action
-native check is prepared unselected; active source/runtime remain unchanged.
-See the cheap-Qbert report; no new GPU allocation.
+Pong B16 actor/critic gradients finish500k/62,454 updates in37m52s but lower
+frozen11.875→−0.542 and wins24/24→10/24. Own initial−20.375/0 wins. All357-tensor/
+replay/guard/recovery/curve/comparison checks and346 shared initial tensors/
+semantic traces pass; service exits19:36:47 UTC. Retain disabled gradients;
+no extension or confirmation. Progress-observer interruption did not restart training.
+
+The CPU-only Qbert pixel rule clears24/24 first pyramids, mean3764.583 and
+coverage21/21; complete replay passes. It misses mean15000 and is hand-coded
+guidance evidence, not Kindle success. Native integration and unaided transfer
+remain untested. A fresh200k/49,939-update/25-minute follow-up is prepared
+unselected; it depends on completed bounded review. See the cheap-Qbert report.
 
 The bounded PongB16 check passes4096/466 in16.126s and1024 frozen actions in
 0.436s, all357 tensors unchanged,346 shared initial tensors matching control,

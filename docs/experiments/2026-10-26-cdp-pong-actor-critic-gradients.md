@@ -1,10 +1,10 @@
 # Pong B16 actor/critic gradients
 
-**Bounded check passes; fresh500k/62,454-update learning is active from
-18:57:18 UTC with the original45-minute training cap.** No smoke experience is
-reused. Native and CLI are unchanged. Keep four100k recoveries and fixed
-final/actual-initial24-natural-match evaluation with mean15/90%-wins. No cap
-increase, extension or automatic next allocation.
+**Complete: retain disabled actor/critic gradients.** The fresh500k comparison
+finishes in37m52s but scores−0.542/10of24 wins versus11.875/24of24 for the B16
+control. All audits and comparison pass; service exits19:36:47 UTC. No extension
+or confirmation. See the [completed result](../results/2026-10-25-cdp-cheap-pong.md#b16-actorcritic-gradients-lower-frozen-quality).
+The declaration and progress evidence below describe the completed experiment.
 
 The completed B16 Pong recipe takes38m45s instead of B8's49m55s, but frozen
 score falls14.958→11.875, both24/24 wins and below mean15. Doubled global rates,

@@ -655,3 +655,37 @@ startup`cdc25bf469e693cd62790679d85e32eeede753b059fb75b658fb4a329ad6c117`;
 review`36b31032e9a76f6e1975e412ed6840bfe303970682c578af40c0b7838bafdf33`;
 completion`d689faa46e32f87424ee2950f3134d0dc8f7acb6e5fe894608591683dcfc9c92`.
 Native`bfb8c31`, runner`fbdaee3`, replay`5043b7a`; no next allocation selected.
+## B16 actor/critic gradients lower frozen quality
+
+The fresh500k comparison finishes in **37m52s**, but enabling actor/critic
+gradients lowers frozen score **11.875→−0.542** and wins **24/24→10/24** against
+the B16 control. Own initial scores−20.375 with0/24 wins. Retain disabled
+actor/critic gradients for this Pong recipe; no extension or seed confirmation.
+Both candidates miss the original mean15/90%-wins gate. The2.30% wall reduction
+does not justify the quality loss, and the older-kernel control limits attribution.
+
+Fresh1009/eval4000001009 keeps4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01,
+actor0/full18/original rates/no aid. Only native `actor_critic_gradient` changes.
+Training completes500,000 aggregate actions/1,999,767 emulator frames/62,454
+updates in2271.883s, first376, zero debt and191 natural matches. All62,454
+numeric reports pass with nonzero initial policy/value losses. Initial346 shared
+tensors and semantic frozen-initial traces match the control; the enabled
+checkpoint contains357 tensors, including11 frozen actor copies.
+
+Frozen final/initial collect92,720/24,200 actions and370,844/96,771 frames in
+35.543/9.297s. Each has exactly24 natural matches, no excess or truncations;
+all partial tails remain. Zero updates and all357 frozen tensors unchanged.
+Every config/source/counter check, four100k recoveries, complete CPU replays/
+videos, three guards, curves and comparison pass. The service exits successfully
+19:36:47 UTC,39m28.691s total. No training restart, cutoff or GPU repeat.
+The separate progress-observer exit143 and reattachment remain documented in
+the [experiment](../experiments/2026-10-26-cdp-pong-actor-critic-gradients.md).
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-48-b16-r32-acgrads-intrinsic001-500k`.
+Review SHA256`209c008b9c3770af2f59c7c69a22e26e4a9df676b689a341da7ba156ed2ad03e`;
+curve`419d47f1ef9f6a6a3055bb15c915a7a342c3c299c8750855166ff4fb13c5636a`;
+comparison`811f4fa23c91200153e072d8f9f8a8e7728fdca0770838533e066ee132063bd2`;
+completion`9942fe280aa39ecd3b8e2efad5fc214406e5e7d5035e6128cc5d7fd4ba7acaeb`.
+Launch source`7ebd7f4`, native`bfb8c31`, runner`fbdaee3`, replay`5043b7a`.
+The separately prepared bounded Qbert pixel-guidance check is selected after
+review; no further Pong allocation follows.

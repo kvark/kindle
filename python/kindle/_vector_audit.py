@@ -8,6 +8,7 @@ from pathlib import Path
 import struct
 
 from ._exploration import EXPLORATION_PROTOCOL, PersistentExploration
+from ._qbert_guidance import GUIDANCE_KIND, QbertGuidance
 
 
 VECTOR_PROTOCOL = "kindle-vector-v2"
@@ -88,12 +89,22 @@ def audit(path):
         require_numbers(config["train_ratio"])
         check(config["train_ratio"] >= 0, "invalid train ratio")
         exploration = None
+        guidance = False
         if header["protocol"] == EXPLORATION_PROTOCOL:
             check(header["mode"] == "train", "frozen evaluation cannot contain exploration overrides")
-            exploration = PersistentExploration(header["exploration"], count, config["action_count"])
+            guidance = header["exploration"].get("kind") == GUIDANCE_KIND
+            if guidance:
+                check(header["environment"] == "ALE/Qbert-v5" and header["atari_protocol"] == "published"
+                      and header["full_action_space"] is True and header["observation_size"] == "native"
+                      and header["observation_shape"] == [210, 160, 3]
+                      and header["noop_max"] == 0 and header["action_repeat"] == 4,
+                      "unsupported Qbert guidance game or preprocessing")
+            cls = QbertGuidance if guidance else PersistentExploration
+            exploration = cls(header["exploration"], count, config["action_count"])
             check(exploration.config["seed"] == config["seed"] == header["seed"], "exploration seed differs")
-            from . import _exploration
-            expected_hash = hashlib.sha256(Path(_exploration.__file__).read_bytes()).hexdigest()
+            from . import _exploration, _qbert_guidance
+            module = _qbert_guidance if guidance else _exploration
+            expected_hash = hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()
             check(header["exploration_sha256"] == expected_hash, "exploration implementation differs")
         else:
             check(not {"exploration", "exploration_sha256"}.intersection(header), "undeclared exploration protocol")
@@ -168,13 +179,22 @@ def audit(path):
                 if behavior_probe:
                     check(all(value >= 0 for value in event["behavior_intrinsic"]), "negative exploration bonus")
                 if exploration:
-                    expected_overrides = exploration.actions()
                     overrides = event["action_overrides"]
                     check(isinstance(overrides, list) and len(overrides) == count, "wrong action override batch")
                     check(all(action is None or type(action) is int for action in overrides), "invalid action override type")
-                    check(overrides == expected_overrides, "exploration action history differs")
+                    if guidance:
+                        exploration.verify_actions(overrides)
+                        hashes = event["guidance_frame_sha256"]
+                        check(isinstance(hashes, list) and len(hashes) == count, "wrong guidance frame hash batch")
+                        for action, digest in zip(overrides, hashes):
+                            check(digest is None if action is None else isinstance(digest, str) and len(digest) == 64
+                                  and all(c in "0123456789abcdef" for c in digest), "invalid guidance frame hash")
+                    else:
+                        check(overrides == exploration.actions(), "exploration action history differs")
                 else:
                     check("action_overrides" not in event, "undeclared action overrides")
+                if not guidance:
+                    check("guidance_frame_sha256" not in event, "undeclared guidance frame hashes")
                 for stream in range(count):
                     action = event["actions"][stream]
                     check(type(action) is int and 0 <= action < config["action_count"], "invalid executed action")
@@ -258,6 +278,12 @@ def audit(path):
                           and all(type(value) is int for value in event["overridden_actions"]), "exploration action counts differ")
                 else:
                     check("overridden_actions" not in event, "undeclared exploration counts")
+                if guidance:
+                    check(event["guidance_episodes"] == exploration.episode_counts, "guidance episode counts differ")
+                    check(all(type(n) is int for values in event["guidance_episodes"].values() for n in values),
+                          "invalid guidance episode count type")
+                else:
+                    check("guidance_episodes" not in event, "undeclared guidance episode counts")
                 check(event["elapsed_seconds"] > 0 and math.isfinite(event["elapsed_seconds"]), "invalid clock")
                 elapsed = event["elapsed_seconds"]
                 check(event["actions_per_second"] == actions / elapsed, "invalid action throughput")
@@ -300,7 +326,9 @@ def audit(path):
             check(final[field] == value and (field == "mean_completed_return" or type(final[field]) is int), "final score mismatch")
         exploration_result = (dict(exploration=exploration.config,
             exploration_sha256=header["exploration_sha256"],
-            overridden_actions=exploration.overridden_actions, exploration_ledger_verified=True)
+            overridden_actions=exploration.overridden_actions, exploration_ledger_verified=not guidance,
+            **(dict(guidance_episodes=exploration.episode_counts, exploration_schedule_verified=True,
+                    exploration_pixel_actions_verified=False) if guidance else {}))
             if exploration else {})
         evaluation_result = (dict(evaluation_episodes_per_stream=episode_target,
             **(dict(evaluation_episode_kind="natural") if natural_budget else {}),

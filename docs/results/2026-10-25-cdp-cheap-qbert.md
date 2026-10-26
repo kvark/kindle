@@ -729,3 +729,18 @@ caps and exact4M48/B8/T16/H15/R32/coefficient1 control config. It retains actual
 initial weights,346-tensor comparisons, finite reports, both guards and full
 guidance replay. Active Pong must finish and be reviewed before applying the
 staged source or selecting GPU work. No full learning allocation is selected.
+
+
+After reviewing completed Pong actor/critic learning (−0.542/10of24 wins,
+all audits/comparison passed), select this bounded native check. Apply the exact
+420-test source, with application receipt SHA256
+`740d05076346e1dbc058a15b3c2c8c66b55b9e6f3ce8d2d550da6b0375be7828`.
+The original runtime and native binary remain unchanged. Launch is pending.
+No evidence of native guidance execution or unaided learning is claimed yet.
+
+A separate fresh200k/49,939-update follow-up is prepared unselected with the same
+native config,100k recovery,25-minute cap and fixed final/own initial24 natural
+episodes with aid disabled. Its plot reader accepts the completed control,
+rejects it when labelled guided, and imports no ALE. Queue recovery cadence/caps
+and unselected refusal pass. It cannot run before the bounded check completes
+and is reviewed. Preparation SHA256`ab29eea77e0514d058926ffd13e7f97fb79f3ccaa914129c25a66a67a2559fd3`.

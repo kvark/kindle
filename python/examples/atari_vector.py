@@ -23,6 +23,8 @@ import gymnasium as gym
 import kindle
 import atari
 from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, episode_summary, require_numbers
+import kindle._qbert_guidance as guidance_module
+from kindle._qbert_guidance import GUIDANCE_KIND, QbertGuidance
 import kindle._exploration as exploration_module
 from kindle._exploration import EXPLORATION_KIND, EXPLORATION_PROTOCOL, PersistentExploration
 from atari import (
@@ -113,6 +115,8 @@ def main():
                         help="check native budget after each GPU stage; write OUTPUT.gpu-memory.jsonl")
     parser.add_argument("--exploration-probability", type=float, default=0.0)
     parser.add_argument("--exploration-hold", type=int, default=16)
+    parser.add_argument("--qbert-guidance-probability", type=float, default=0.0,
+                        help="fresh Qbert only: probability of pixel guidance for a whole training episode")
     args = parser.parse_args()
     if args.num_envs <= 0 or args.steps <= 0 or args.steps % args.num_envs:
         parser.error("steps must be a positive multiple of num-envs")
@@ -141,6 +145,16 @@ def main():
             parser.error("episodes-per-env requires frozen restore")
     if not math.isfinite(args.exploration_probability) or not 0 <= args.exploration_probability <= 1:
         parser.error("exploration probability must be in [0, 1]")
+    if not math.isfinite(args.qbert_guidance_probability) or not 0 <= args.qbert_guidance_probability <= 1:
+        parser.error("Qbert guidance probability must be in [0, 1]")
+    if args.qbert_guidance_probability:
+        if args.evaluate:
+            parser.error("frozen evaluation must not use Qbert guidance")
+        if args.exploration_probability:
+            parser.error("Qbert guidance cannot combine with persistent exploration")
+        if (args.environment != "ALE/Qbert-v5" or args.atari_protocol != "published"
+                or args.observation_size not in (None, "native") or args.encoder_checkpoint is not None):
+            parser.error("Qbert guidance requires Qbert/full18/native pixels/learned RGB")
     if args.exploration_hold <= 0:
         parser.error("exploration hold must be positive")
     if not math.isfinite(args.actor_unimix) or not 0 <= args.actor_unimix < 1:
@@ -148,6 +162,7 @@ def main():
     if args.evaluate and args.exploration_probability:
         parser.error("frozen evaluation must not use exploration overrides")
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
+    training_options.add("--qbert-guidance-probability")
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
@@ -166,7 +181,7 @@ def main():
     memory_path = args.output.with_suffix(".gpu-memory.jsonl")
     if args.min_gpu_budget_headroom_mib is not None and memory_path.exists():
         parser.error("GPU memory output must be a fresh path")
-    if args.exploration_probability and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
+    if (args.exploration_probability or args.qbert_guidance_probability) and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("persistent exploration requires native vector action overrides")
     if args.restore and args.encoder:
         metadata = json.loads((args.restore / "metadata.json").read_text())
@@ -267,6 +282,11 @@ def main():
         exploration = (PersistentExploration(dict(kind=EXPLORATION_KIND,
             probability=args.exploration_probability, hold_actions=args.exploration_hold,
             seed=args.seed), args.num_envs, actions) if args.exploration_probability else None)
+        if args.qbert_guidance_probability:
+            exploration = QbertGuidance(dict(kind=GUIDANCE_KIND,
+                probability=args.qbert_guidance_probability, seed=args.seed), args.num_envs, actions)
+        guidance = isinstance(exploration, QbertGuidance)
+        current_frames = initial
         construction = time.perf_counter()
         restored = checkpoint_identity(args.restore) if args.restore else None
         if learned_rgb:
@@ -292,7 +312,7 @@ def main():
             agent.save_checkpoint(str(args.initial_checkpoint))
             initial_checkpoint = checkpoint_identity(args.initial_checkpoint)
         exploration_header = (dict(exploration=exploration.config,
-            exploration_sha256=sha256_file(exploration_module.__file__)) if exploration else {})
+            exploration_sha256=sha256_file(guidance_module.__file__ if guidance else exploration_module.__file__)) if exploration else {})
         vector_protocol = (EPISODE_EVALUATION_PROTOCOL if args.episodes_per_env else
                            EXPLORATION_PROTOCOL if exploration else VECTOR_PROTOCOL)
         emit(dict(event="run_start", protocol=vector_protocol, environment=args.environment,
@@ -352,6 +372,8 @@ def main():
             frames = [env.executed_action_frames for env in environments]
             exploration_counts = (dict(overridden_actions=exploration.overridden_actions)
                                   if exploration else {})
+            if guidance:
+                exploration_counts.update(guidance_episodes=exploration.episode_counts)
             return dict(event=event, run_step=run_actions, vector_ticks=run_actions // args.num_envs,
                         environment_step=agent.environment_step, learner_step=agent.learner_step,
                         elapsed_seconds=elapsed, actions_per_second=run_actions / elapsed,
@@ -371,7 +393,8 @@ def main():
                 if stop:
                     break
                 before = time.perf_counter()
-                overrides = exploration.actions() if exploration else None
+                overrides = (exploration.actions(current_frames) if guidance else
+                             exploration.actions() if exploration else None)
                 selected = (agent.act(greedy=args.greedy, action_overrides=overrides)
                             if exploration else agent.act(greedy=args.greedy))
                 if overrides is not None and any(forced is not None and selected[stream] != forced
@@ -390,6 +413,7 @@ def main():
                 results = [env.step(action) for env, action in zip(environments, selected)]
                 timing["environment"] += time.perf_counter() - before
                 frames, rewards, terminated, truncated, _ = map(list, zip(*results))
+                current_frames = frames
                 before = time.perf_counter()
                 stored_rewards = agent.observe(ids, frames, rewards, terminated, truncated)
                 timing["observe"] += time.perf_counter() - before
@@ -400,6 +424,7 @@ def main():
                           terminated=terminated, truncated=truncated,
                           executed_action_frames=[env.executed_action_frames for env in environments],
                           **behavior,
+                          **(dict(guidance_frame_sha256=exploration.frame_sha256) if guidance else {}),
                           **(dict(action_overrides=overrides) if exploration else {})))
                 before = time.perf_counter()
                 reports = [] if args.evaluate else agent.learn_scheduled()
@@ -430,6 +455,8 @@ def main():
                 if resets:
                     reset_frames = [environments[stream].reset()[0] for stream in resets]
                     agent.begin_episodes(resets, reset_frames)
+                    for stream, frame in zip(resets, reset_frames):
+                        current_frames[stream] = frame
                     check_memory("reset", run_actions)
                     if exploration:
                         exploration.reset(resets)

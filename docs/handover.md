@@ -201,24 +201,25 @@ remain unchanged,346 shared initial tensors match the control, all466 initial
 policy/value reports are nonzero and both guards pass. Service exits18:51:00
 UTC. Native/CLI unchanged; this is execution evidence, not useful learning.
 
-After review, select a separate fresh500k/62,454-update comparison with the
-original45-minute cap.4M48/Auto/N8/B16/T16/H15/R32, coefficient.01/actor0/full18,
-original rates/no aid,1009/eval4000001009; only actor_critic_gradient changes.
-Keep first376, zero debt, four100k recoveries, fixed final/own initial24 natural
-sampled matches, mean15/90%-wins and full357-tensor/replay/guard/curve comparison.
-No smoke experience reused. Started18:57:18 UTC/source`7ebd7f4`;357 initial
-tensors match the smoke,346 shared tensors match control and first376:1/384:2/
-392:3/400:4 updates pass. Recovery, fixed evaluations and analysis monitors are
-attached.All four100k–400k recoveries pass; a progress observer was reattached after
-exit143 with the same training PID/invocation and no training restart. Owner
-`kindle-cheap-pong-b16-acgrads-500k-20261026`; frozen quality pending. No extension
-or automatic next run.
+The [completed PongB16 actor/critic comparison](results/2026-10-25-cdp-cheap-pong.md#b16-actorcritic-gradients-lower-frozen-quality)
+finishes500k/62,454 updates in37m52s but lowers frozen11.875→−0.542 and wins
+24/24→10/24. Own initial−20.375/0 wins. All357-tensor/replay/guard/recovery/
+curve/comparison checks,346 shared initial tensors and semantic traces pass;
+service exits19:36:47 UTC. Retain disabled gradients; no extension or confirmation.
+The separate progress observer was reattached without restarting training.
 
-The [CPU-only Qbert pixel rule](results/2026-10-25-cdp-cheap-qbert.md#pixel-only-cpu-rule-clears-the-first-pyramid)
-clears24/24 first pyramids, mean3764.583 and21/21 coverage. Collection and exact
-pixel/action/reward replay each take about30s; no agent or learning occurs.
-This hand-coded guidance candidate still misses mean15000 and does not establish
-unaided Kindle transfer. No training aid or GPU allocation is selected yet.
+The [CPU-only Qbert pixel rule and prepared adapter](results/2026-10-25-cdp-cheap-qbert.md#pixel-only-cpu-rule-clears-the-first-pyramid)
+clear24/24 first pyramids, mean3764.583 and21/21 coverage. Collection and exact
+replay each take about30s; no agent or learning. This hand-coded candidate
+still misses mean15000 and does not establish unaided Kindle transfer.
+The optional episode-guidance adapter passes420 CPU tests and a real-Atari
+stub integration with full pixel/action replay. Source is applied after completed
+Pong review; native unchanged, separate Python overlay preserves the old runtime.
+Select only the bounded4096-action/963-update native check plus1024 frozen
+restore,300s/60s caps,5% episode selection with actual action share measured.
+Owner`kindle-cheap-qbert-pixel-guidance-smoke-20261026`; launch pending.
+The fresh200k/49,939-update/25-minute follow-up is prepared unselected, pending
+bounded review. No smoke experience reuse, cap increase or automatic next run.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
