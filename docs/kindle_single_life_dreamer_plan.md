@@ -27,6 +27,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
+| [Same, four actions](results/2026-10-26-cdp-breakout-minimal-actions.md) |200k /49,939|20m59s|9.542 /1.167|0/24 two-wall successes|
 | [Same, H5/500k target](results/2026-10-26-cdp-breakout-compact-h5-budget.md) |487,736 /121,873|45-minute cutoff|8.458 /1.375|500k incomplete;0/24 two-wall successes|
 | [Retained Breakout12M/RGB64/H5 warm start](results/2026-10-26-cdp-breakout-short-imagination.md) |50k new /12,439 new|8m02s|27.208 /67.583 source|0/24 two-wall successes; regression|
 
@@ -119,26 +120,21 @@ improving the same-seed coefficient1 control's7.333/22 wins. All audits and both
 comparisons pass; service exits08:27:53 UTC. Both coefficient.01 learners still
 miss mean15. These are reused development seeds, not broad reliability evidence.
 
-**Current allocation:** [four-action Breakout](experiments/2026-10-26-cdp-breakout-minimal-actions.md).
-Fresh1009/eval4000001009,4M/RGB64/Auto/N8/B8/T16/H15/R32, actor_unimix.01,
-fixed200k/49939 updates and30-minute cap. Only native action_count changes18→4
-from the completed H15 mixture control. Existing adapter/replay support needs
-no code change; shared actions match in a bounded CPU check. Dimensions, initial
-weights and policy probabilities change, so retain an own initial control and
-label the protocol variant. Keep the864-point two-wall gate. No benefit is yet
-established, no third Pong seed or unchanged extension is selected, and no next
-allocation launches automatically.
-Started08:39:48 UTC, source`9c8f382`; full config/counters,4,120,963 parameters,
-finite own initial and first updates pass. Recovery monitoring and completed-run
-plotting are automated; fixed frozen results remain pending.
+The [four-action Breakout test](results/2026-10-26-cdp-breakout-minimal-actions.md)
+finishes200k/49939 updates in20m59s,6.64% less training time than the full18
+control. Frozen9.542 versus own initial1.167 improves on7.083/1.375, but still
+0/24 two-wall successes. Changed dimensions/initialization require own controls;
+no matched-weight or seed-reliability claim. All audits/comparison pass and
+service exits09:01:55 UTC. Retain the modest gain; no extension selected.
 
-For later Qbert review, the [prepared experience-budget candidate](experiments/2026-10-26-cdp-qbert-experience-budget.md)
-uses fresh full18/4M/RGB48/H15,500k actions at ratio16,62,470 expected updates
-and the same30-minute cap. A CPU stage-cost estimate suggests26.4 minutes; it
-does not predict runtime or learning. Configuration/preflight checks and an R16
-recovery audit against completed evidence pass. This remains unselected, with
-no GPU work or automatic queue; own initial/fixed final controls and the task
-gate stay fixed. Review the selected Breakout outcome before choosing an allocation.
+**Current allocation:** [Qbert experience-budget test](experiments/2026-10-26-cdp-qbert-experience-budget.md).
+Fresh1009/eval4000001009, full18/coefficient1/4M/RGB48/Auto/N8/B8/T16/H15, no aid.
+Use500k actions at ratio16,62,470 expected updates and the same30-minute cap.
+Experience increases2.5× and updates1.251× over the200k/R32 control; these changes
+do not isolate replay ratio. The26.4-minute CPU cost projection is not a runtime
+or learning result. Match346 initial tensors; retain own initial/fixed final,
+250k recovery, full audits and the unchanged15000/90%-first-pyramid gate.
+Monitoring and completed analysis are prepared; no automatic next allocation.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

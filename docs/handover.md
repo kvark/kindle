@@ -80,18 +80,18 @@ The [coefficient.01 confirmation](results/2026-10-25-cdp-cheap-pong.md#smaller-b
 finishes500k/124939 updates in49m58s:14.0 and24/24 wins versus initial−20.333.
 Its coefficient1 control scores7.333/22 wins. All audits/curves/comparisons pass;
 service exits08:27:53 UTC. Both smaller-bonus seeds miss mean15; no extension.
-Current allocation: [four-action Breakout](experiments/2026-10-26-cdp-breakout-minimal-actions.md),
-fresh1009/eval4000001009,4M/RGB64/Auto/N8/B8/T16/H15/R32, actor_unimix.01,
-fixed200k actions and30-minute cap. Only native action_count changes18→4 from
-the completed H15 mixture control; use an own initial because dimensions and
-initialization change. Keep the864-point two-wall gate and full frozen audit.
-Artifacts/controller:`breakout-4m-64-r32-minimal-unimix001-200k`,
-`run_breakout_minimal_unimix_200k.py`; owner
-`kindle-cheap-breakout-minimal-unimix-200k-20261026`. Check live state before GPU
-work. No automatic extension or next allocation; QbertR16 remains prepared only.
-Started08:39:48 UTC, source`9c8f382`; full config/counters,4,120,963 parameters,
-finite own initial and first updates pass. Recovery monitoring and completed-run
-plotting are automated; fixed frozen results remain pending.
+The [four-action Breakout result](results/2026-10-26-cdp-breakout-minimal-actions.md)
+completes200k/49939 updates in20m59s,6.64% less training time than full18.
+Frozen9.542 versus own initial1.167 improves the full18 control's7.083, but
+still0/24 two-wall successes. All audits/comparison pass; service exits09:01:55.
+Current allocation: [Qbert experience budget](experiments/2026-10-26-cdp-qbert-experience-budget.md),
+fresh1009/eval4000001009,4M/RGB48/Auto/N8/B8/T16/H15/full18, coefficient1, no aid.
+Ratio32→16 and experience200k→500k change together;62,470 expected updates,
+30-minute cap and250k recovery. Own actual-initial/fixed-final controls and
+mean15000/90%-pyramid gate remain. Match346 initial tensors against full18 control.
+Artifacts/controller:`qbert-4m-48-r16-500k`, `run_qbert_500k_r16.py`; owner
+`kindle-cheap-qbert-r16-500k-20261026`. Check live state before GPU work.
+No Breakout extension or automatic next allocation.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

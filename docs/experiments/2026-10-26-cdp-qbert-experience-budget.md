@@ -1,8 +1,9 @@
 # More Qbert experience at lower replay ratio
 
-**Prepared only.** Pong coefficient.01 confirmation is complete; the four-action
-Breakout test is selected next. Review that outcome and terminal service before
-selecting this candidate. No automatic queue or Qbert GPU work has started.
+**Selected after the completed four-action Breakout result.** That trial finishes
+in20m59s with frozen9.542 and0/24 two-wall successes; all audits/comparison pass
+and its service exits09:01:55 UTC. Move this allocation to Qbert with the
+previously prepared fixed recipe and limits. No automatic next queue.
 
 The full18 coefficient1 compact control scores809.375 with0/24 first pyramids
 after200k actions/49,939 updates in19m45s. Its mean coverage reaches16.625/21;

@@ -1,6 +1,11 @@
 # Four-action compact Breakout candidate
 
-**Selected after completed Pong confirmation.** Coefficient.01 scores14.9583
+**Completed:**200k actions/49,939 updates in20m59s; frozen9.542 versus own
+initial1.167,0/24 two-wall successes. All audits/comparison pass and the service
+exits09:01:55 UTC. See the [result](../results/2026-10-26-cdp-breakout-minimal-actions.md).
+No extension; Qbert experience-budget test is selected next.
+
+Selected after completed Pong confirmation. Coefficient.01 scores14.9583
 and14.0 with24/24 wins each; both still miss mean15. The confirmation and both
 comparisons pass all audits and its service exits at08:27:53 UTC. This allocation
 starts a fresh bounded Breakout life; it does not extend the failed H5 life.
@@ -66,5 +71,5 @@ zero counters, all346 finite initial tensors, NOOP/FIRE/RIGHT/LEFT and updates
 selected declaration`9dd9f088ec11916f12697376fae876ad6ff91b3f7b43b4bf4210ee35ea443022`.
 The selection pins the completed Pong4013 review and both comparisons, verifies
 its terminal service and confirms no concurrent learner. Read-only100k recovery
-monitoring and completed-run plotting are active. Fixed frozen evaluations/full
-audit follow; training and task outcomes remain pending.
+monitoring and completed-run plotting complete successfully. Fixed frozen
+evaluations/full audit pass; the unchanged task gate fails.
