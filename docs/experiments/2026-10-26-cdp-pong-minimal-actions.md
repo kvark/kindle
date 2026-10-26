@@ -120,3 +120,44 @@ Metadata SHA256:200k
 Review SHA256:200k
 `c5e353540f1e3ab1eeb7e32fc7bc729bcbbb4aff026728fbda19a584dd2354ab`,
 300k`c2a9c6b82b090b0788e19e66a5d3d81de1cd79ddda9c13a42bbb85ebe897e5c8`.
+
+The400k recovery also passes at99,939 updates with346 finite tensors. Its stable
+prefix contains404,584 actions/101,083 finite reports;401,408-action progress
+is2134.646s/100,291 updates, zero debt. Metadata SHA256
+`0d336351bed9367efea9600f1ada94b6a90823875a42dfce326c21ccf30c3c33`.
+All four recovery reviews are complete and their watcher exits successfully;
+training and final-result monitoring remain active.
+
+## Conditional second-seed preparation
+
+While the primary remains active, a fresh4013/eval4000004013 configuration is
+prepared outside Git, **unselected**. It changes only learner/evaluation seeds
+and output paths relative to six-action1009: same500k/124,939 updates,4M/RGB48,
+Auto/N8/B8/T16/H15/R32, coefficient.01/actor0, original rates, no aid, four100k
+recoveries and55-minute training cap. Fixed final/own initial evaluation keeps
+24 natural matches, the mean15/90%-wins gate and all existing audits/replays.
+
+Selection requires the primary's completed audits, recoveries, replays, guards,
+curves/comparison and terminal service, **plus a passing primary frozen gate**.
+Its outcome must be reviewed before a separate allocation decision. The
+controller refuses unselected execution and requires the primary gate pass.
+There is no automatic launch or extension. A primary failure does not activate
+this confirmation. Seed4013 was used in earlier full18 development; it is not
+held out or broad reliability evidence.
+
+CPU preparation checks normalized queue equality apart from paths/seeds, all
+actual checkpoint intervals and3300/300/300-second job caps. A separate
+explicit-seed comparison reader validates the completed4013 full18 control
+(14.000,24/24 wins), rejects a wrong seed, and leaves active pinned helpers
+unchanged. The prepared comparison includes both same-seed full18/minimal6
+results and the two fresh six-action learners with their own initial controls;
+it does not assume equal initial weights across vocabularies or seeds. The
+full18 control's older kernel remains a comparison confound.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-48-r32-minimal-intrinsic001-500k-seed4013`.
+Prepared source`3f359ad`; controller`run_pong_minimal_intrinsic001_500k_4013.py`,
+SHA256`7f114c3825b49672b6b3640389e01d7620a124876140d49f3ad713fa52714c4f`;
+queue`94cbe0f8c1b72705d85a7c53d5b88b412795c1a53ba767e786549e74e8dff613`;
+unselected declaration`69d634bd9039c4e95eb275c14be3708ccb8351743f78240cc03bda59e7d996aa`;
+CPU review`83aeb8c24093b6d970ce48b883adec0928b9e660697e5b270528cc2ea0884a22`.
+No production or active-run file changes and no new GPU work.
