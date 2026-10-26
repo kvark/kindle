@@ -394,3 +394,49 @@ The next selected step is the separately prepared
 [bounded Qbert capacity check](../experiments/2026-10-26-cdp-qbert-capacity-check.md).
 Its different game/capacity still requires its own learning test; Pong's speed
 result does not establish Qbert competence or justify a full allocation.
+
+## Doubling B16 learning rates lowers the frozen score
+
+The doubled-rate policy scores **9.125 versus11.875** for the original B16 rates,
+with24/24 natural wins for both. Own actual initial scores−20.375/0wins. Training
+takes **38m32s**, essentially unchanged from38m45s. The rate change fails to
+recover the quality lost with B16 and still misses the original mean15 gate.
+Retain the original rates; no extension or seed confirmation is selected.
+
+Fresh1009/eval4000001009,4M/RGB48/Auto/N8/B16/T16/H15/R32,3,578,225 parameters,
+full BPTT/microbatch16, coefficient.01, actor_unimix0, full18 and no aid.
+Only native base/encoder/dynamics rates double4e-5/6e-6/4e-4→8e-5/1.2e-5/8e-4.
+Behavior inherits the base;1,000-update warmup, moments, clipping, slow critic
+and normalization schedules remain fixed. Both runs keep500k actions/62,454
+updates,15,988,224 sampled positions and first376. All346 actual initial tensors
+and the complete semantic initial evaluation trace match the B16 control.
+This is one reused development seed and a fresh life, not independent confirmation
+or an equivalence between B8 and B16 optimization.
+
+| Rate scale | Actions / emulator frames / updates | Training wall | Frozen final / initial | Natural wins |
+|---|---:|---:|---:|---:|
+|1|500k /1,999,733 /62,454|38m45s|11.875 /−20.375|24/24|
+|2|500k /1,999,797 /62,454|38m32s|9.125 /−20.375|24/24|
+
+Recorded training time2,311.673782s,216.29 actions/s; construction is separate,
+2.111s. All133 training episodes are natural, with zero debt and final online
+last50 mean2.34 versus the control's8.18. Reviewed curves show similar early
+learning, then slower improvement with doubled rates after about210k actions.
+Wall-time ratio.9941 is not evidence of a material speed gain.
+
+Final/initial frozen evaluations use110,376/24,200 actions,441,457/96,771 emulator
+frames and46.835/10.312s. Each collects and selects24 natural matches, with no
+excess episodes; partial tails remain in complete traces. Zero updates/truncations,
+all346 unchanged tensors per arm, all62,454 strict reports, four recovery audits,
+full config/source/counters, complete CPU replays/videos and three guards pass.
+Service exits11:59:15 UTC,40m37.303s total wall. Completed curves and comparison
+pass and are visually reviewed; no checkpoint selection or cutoff occurred.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-48-b16-r32-intrinsic001-lr2-500k`.
+Learning review SHA256`915aae2ff28e0dcabcd55c1fa7acc3e5e3aa84dcf4ee9c05994a60d69fbff84b`;
+curve`c9e192407ad3897e935438f0432f945567451123720ee0728b94c986f39b6d5f`;
+comparison`e7b304e0da51be66d6a028989a015dbafca58d2e5844f0e9f424844b47c5e14b`.
+Source at launch`d4d1093`, native`bfb8c31`, CLI`22bd61b`, replay`e853818`.
+The fresh-rate CLI change passes278 applied vector tests; native binary and
+original default rates remain unchanged. After reviewing this result, select
+the prepared Qbert5% persistent-action-aid screen under its25-minute cap.

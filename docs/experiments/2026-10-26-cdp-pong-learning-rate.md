@@ -1,6 +1,11 @@
-# Pong learning-rate candidate after the B16 tradeoff
+# Pong learning-rate comparison after the B16 tradeoff
 
-**Selected after completed Qbert evaluation and analysis.** Qbert12M48/B16
+**Complete; [result](../results/2026-10-25-cdp-cheap-pong.md#doubling-b16-learning-rates-lowers-the-frozen-score).**
+Frozen9.125 versus the B16 control's11.875, both24/24 wins and below mean15.
+Training38m32s, all audits and comparison pass; service exits11:59:15 UTC.
+Retain original rates; no extension or seed confirmation selected.
+
+Originally selected after completed Qbert evaluation and analysis. Qbert12M48/B16
 scores959.375/0of24 pyramids at63.70% more training time than4M/B8, with lower
 cube coverage. No Qbert extension is selected. The exact staged CLI patch is
 applied only after its training, frozen arms, audits and comparison finish.

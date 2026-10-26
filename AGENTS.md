@@ -51,18 +51,22 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Pong4M/RGB48/B16/R32 with doubled learning rates, selected
-following completed Qbert capacity/batch evaluation. Fresh1009/eval4000001009,
-Auto/N8/T16/H15, coefficient.01, full18 and no aid. Keep500k actions/62,454 updates,
-first376, four100k recoveries and45-minute training cap. Base/encoder/dynamics
-rates8e-5/1.2e-5/8e-4; warmup and other optimizer settings stay fixed. Actual
-initial must match346 B16 control tensors. Fixed final/initial24-natural-match
-controls retain mean15/90%-win gate and full audits. CLI passes278 vector tests;
-native unchanged. See`docs/experiments/2026-10-26-cdp-pong-learning-rate.md`.
-Owner`kindle-cheap-pong-b16-lr2-500k-20261026`; check live state before GPU work.
+Current allocation: Qbert4M/RGB48/B8/R32 with5% persistent-uniform16-action
+training blocks, selected after completed Pong rate evaluation/comparison.
+Fresh1009/eval4000001009, Auto/N8/T16/H15, coefficient1, actor_unimix0, full18 and
+original rates. Fixed200k actions/49,939 updates, first248,100k recovery and
+25-minute training cap. Native config and observation/learning cadence match the
+unaided control. Own actual initial must match346 control tensors. Frozen final/
+initial24-natural-episode evaluations have no aid and retain15k/90%-pyramid gate;
+full numerical/config/counter/action-ledger/tensor/replay/guard audits apply.
+See`docs/experiments/2026-10-26-cdp-qbert-persistent-aid.md`; owner
+`kindle-cheap-qbert-aided-200k-20261026`. Check live state before GPU work.
 No retry, cap increase, extension or automatic next allocation.
-Started11:18:38 UTC/source`d4d1093`; full config, first376 and346 matched initial
-tensors pass startup checks. Recovery and completed evaluation/analysis are automated.
+
+PongB16 doubled rates finish500k in38m32s, with frozen9.125 versus11.875 for
+original rates; both24/24 wins and below mean15. All audits/comparison and
+matched initial tensors/traces pass; service exits11:59:15 UTC. Retain original
+rates; no extension or seed confirmation selected.
 
 Qbert12M48/B16 completes200k in32m19s, scores959.375/0of24 pyramids and coverage
 16.292/21, versus4M/B8's809.375/0of24 and16.625/21 in19m45s. All audits and

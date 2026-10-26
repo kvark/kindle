@@ -111,26 +111,25 @@ All audits and completed comparison pass; service exits11:15:13 UTC. The score
 increase does not justify63.70% more wall time for this compute-constrained
 screen. No extension or confirmation selected.
 
-Current allocation: [PongB16 with doubled learning rates](experiments/2026-10-26-cdp-pong-learning-rate.md),
-selected after the completed Qbert comparison. Fresh1009/eval4000001009,
-4M/RGB48/Auto/N8/B16/T16/H15/R32, coefficient.01, full18 and no aid. Keep500k
-aggregate actions/62,454 updates and45-minute training cap, with four100k recovery
-checks. Only base/encoder/dynamics rates double to8e-5/1.2e-5/8e-4 against the
-completed B16 control; warmup and other optimizer settings stay fixed. Own actual
-initial must match346 control tensors; fixed final/initial24-natural-match
-controls retain mean15/90%-wins and full numerical/tensor/replay/guard audits.
-The CLI change is applied after Qbert's completed analysis and passes278 vector
-tests; defaults and restore restrictions remain. Native binary is unchanged.
-Owner`kindle-cheap-pong-b16-lr2-500k-20261026`; check live state before GPU work.
-No cap increase, resume, extension or automatic next allocation.
-Started11:18:38 UTC/source`d4d1093`; full config, first376 and346 matched initial
-tensors pass startup checks. Recovery and completed evaluation/analysis are automated.
+The [completed Pong doubled-rate test](results/2026-10-25-cdp-cheap-pong.md#doubling-b16-learning-rates-lowers-the-frozen-score)
+scores9.125 versus the B16 control's11.875, both24/24 wins and below mean15.
+Training38m32s is essentially unchanged from38m45s. All audits, initial-tensor/
+semantic-trace equality and completed comparison pass; service exits11:59:15 UTC.
+Retain the original rates; no extension or seed confirmation selected.
 
-A [Qbert persistent-action-aid candidate](experiments/2026-10-26-cdp-qbert-persistent-aid.md)
-is prepared but unselected. CPU random controls show more coverage with16-step
-holds than1, without a learning claim. The candidate keeps4M48/B8/R32/200k and
-adds5% held-action blocks during training only, under25 minutes. Review active
-Pong before choosing any next allocation; no automatic queue.
+Current allocation: [Qbert with5% persistent exploration](experiments/2026-10-26-cdp-qbert-persistent-aid.md),
+selected after completed Pong evaluation/comparison and terminal service. Fresh
+1009/eval4000001009,4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient1, actor_unimix0,
+full18 and original rates. Keep200k actions/49,939 updates, first248,100k recovery
+and25-minute training cap. Only the wrapper adds5% uniformly random16-action
+blocks during training; observation and learning cadence remain. Frozen final
+and own initial have no aid, with24 natural episodes per arm and unchanged
+15k/90%-pyramid gate. Match346 initial control tensors and audit the complete
+action-override ledger, numeric reports, counters, replays/videos and guards.
+Labelled curves, coverage and matched-config comparison are prepared. Native
+binary and production runner remain unchanged. Owner
+`kindle-cheap-qbert-aided-200k-20261026`; check live state before GPU work.
+No cap increase, resume, extension or automatic next allocation.
 
 Current native source`bfb8c31`, runner`22bd61b`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

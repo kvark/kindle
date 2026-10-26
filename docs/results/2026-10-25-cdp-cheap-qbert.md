@@ -408,8 +408,9 @@ A second pass reproduces every action/reward/boundary/frame count, episode resul
 and partial tail for each control, in4.217/5.301s. No GPU work, agent construction
 or learning occurs. This supports a bounded hypothesis about coherent exploration;
 it cannot predict whether5% held-action blocks help a learned policy. The
-[prepared training-aid candidate](../experiments/2026-10-26-cdp-qbert-persistent-aid.md)
-is not selected; active Pong remains the only learner.
+[training-aid candidate](../experiments/2026-10-26-cdp-qbert-persistent-aid.md)
+is selected after the completed Pong rate comparison; it uses a separate fresh
+life, with no learning outcome yet.
 
 Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-persistent-random-reference`;
 review SHA256`b916cc639c11d38bd5a7f0eafa9ef4ad0569d215a21e2fbeb91891fc1c4f92e1`;

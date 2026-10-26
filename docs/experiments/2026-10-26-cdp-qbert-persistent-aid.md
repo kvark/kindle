@@ -1,9 +1,10 @@
 # Qbert with bounded persistent exploration
 
-**Prepared, not selected.** PongB16's doubled-rate500k test remains active.
-Review its fixed-final evaluation and completed comparison before choosing a
-next allocation. This controller refuses an unselected launch; preparation
-starts no GPU job and creates no automatic queue.
+**Selected after the completed Pong rate comparison.** Doubled rates lower
+Pong's fixed-final score11.875→9.125 at essentially unchanged38m32s training cost;
+all audits and completed analysis pass. No Pong extension or confirmation is
+selected. Advance this separate fresh Qbert200k test under its25-minute cap,
+with the original rates and one learner. There is no automatic next allocation.
 
 Qbert12M48/B16 costs63.70% more than4M48/B8 at200k yet still completes no pyramids,
 with slightly lower cube coverage. Its saved-action replay shows that no selected
