@@ -617,3 +617,9 @@ startup`4fe8c88269196ee1c5a94754978d1f10c4ab008135916804fc20a57661570224`.
 Selection uses Breakout's completed CPU-repair receipt; its original failed
 postprocessor and unchanged GPU artifacts remain preserved. Native`bfb8c31`,
 runner`fbdaee3`, replay`5043b7a`; no cap increase or automatic next allocation.
+
+The100k recovery passes24,939 updates/all346 finite tensors. The stable
+104,160-action prefix has25,977 finite reports;102,400 progress is683.034s with
+25,539 updates and zero debt. Recovery watcher exits successfully; learning
+continues to the fixed200k endpoint. Recovery review SHA256`e3c0d856e7556160b6c66f6408e1cca6d979b6cfdc4d59df73703169ce48769a`.
+Frozen quality is pending; no extension or next allocation is selected.

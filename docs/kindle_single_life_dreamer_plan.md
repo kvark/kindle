@@ -239,7 +239,9 @@ replay/coverage/guard checks and unchanged15k/90%-pyramid gate. Started18:16:53
 UTC/source`093e5c6`; startup passes4,131,729 parameters, all346 initial tensors
 matching the completed4M64 native shape and248:1/256:2/256:3 updates. Recovery,
 fixed evaluations, CPU replay/coverage/comparison monitoring are attached.
-No cap increase, extension or automatic next allocation.
+The100k recovery passes24,939 updates/all346 tensors; its watcher exits
+successfully. Stable104,160-action prefix has25,977 finite reports and zero debt.
+Frozen quality remains pending. No cap increase, extension or automatic next allocation.
 
 A [Pong greedy-action assessment](results/2026-10-25-cdp-cheap-pong.md#entropy-review-and-unselected-greedy-action-assessment)
 is CPU-prepared but unselected. It would evaluate retained final/own initial

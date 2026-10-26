@@ -58,7 +58,8 @@ Keep200k/49,939 updates/first248,100k recovery, zero debt,30-minute training cap
 fixed final/own initial24 natural episodes and15k/90%-pyramid gate/full audits.
 Started18:16:53 UTC/source`093e5c6`; all346 initial tensors match the completed
 4M64 native shape, first248:1/256:2/256:3 updates. Recovery/evaluation/analysis
-monitoring attached. Owner`kindle-cheap-qbert-rgb64-200k-20261026`; cheap-Qbert report. Check live state before GPU work. No extension or automatic next run.
+monitoring attached.100k recovery passes24,939 updates/all346 tensors; watcher
+exits successfully. Owner`kindle-cheap-qbert-rgb64-200k-20261026`; cheap-Qbert report. Check live state before GPU work. No extension or automatic next run.
 
 A frozen-only Pong greedy-action option is CPU-prepared but unselected; see the
 cheap-Pong report. It reuses final/own initial weights, preserves sampled-policy
