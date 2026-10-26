@@ -128,6 +128,9 @@ weights and policy probabilities change, so retain an own initial control and
 label the protocol variant. Keep the864-point two-wall gate. No benefit is yet
 established, no third Pong seed or unchanged extension is selected, and no next
 allocation launches automatically.
+Started08:39:48 UTC, source`9c8f382`; full config/counters,4,120,963 parameters,
+finite own initial and first updates pass. Recovery monitoring and completed-run
+plotting are automated; fixed frozen results remain pending.
 
 For later Qbert review, the [prepared experience-budget candidate](experiments/2026-10-26-cdp-qbert-experience-budget.md)
 uses fresh full18/4M/RGB48/H15,500k actions at ratio16,62,470 expected updates

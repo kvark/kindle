@@ -61,6 +61,9 @@ See `docs/experiments/2026-10-26-cdp-breakout-minimal-actions.md`; service owner
 work. Selection follows completed Pong coefficient.01 results14.9583/14.0,
 24/24 frozen wins each; both miss mean15, all audits pass, both services exit.
 No third Pong seed, unchanged extension or automatic next allocation.
+Started08:39:48 UTC, source`9c8f382`; full config/counters,4,120,963 parameters,
+finite own initial and first updates pass. Recovery monitoring and completed-run
+plotting are automated; fixed frozen results remain pending.
 
 Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
 `1ed07af`, CPU replay `e853818`. The active declaration pins exact runtime/script

@@ -89,6 +89,9 @@ Artifacts/controller:`breakout-4m-64-r32-minimal-unimix001-200k`,
 `run_breakout_minimal_unimix_200k.py`; owner
 `kindle-cheap-breakout-minimal-unimix-200k-20261026`. Check live state before GPU
 work. No automatic extension or next allocation; QbertR16 remains prepared only.
+Started08:39:48 UTC, source`9c8f382`; full config/counters,4,120,963 parameters,
+finite own initial and first updates pass. Recovery monitoring and completed-run
+plotting are automated; fixed frozen results remain pending.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

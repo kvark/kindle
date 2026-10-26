@@ -57,3 +57,14 @@ code changes are needed.
 CPU action review: `/x/Temp/kindle-cheap-20261025/breakout-action-vocabulary-review.json`,
 SHA256`305a33014cc8a2ccadb58aec3534b8bb496e7353a2d741899b22d3538dfe9ffa`.
 One reused development seed; no held-out or broad reliability claim.
+
+Started08:39:48 UTC, source`9c8f382`. Startup verifies the complete native
+configuration differs only in action_count18→4,4,120,963 actual parameters,
+zero counters, all346 finite initial tensors, NOOP/FIRE/RIGHT/LEFT and updates
+248:1,256:2,256:3. Initial metadata SHA256
+`25a5124c443762f81410b1d2bc8f6c339321ce14f9037caaab772f42a5b17bb6`;
+selected declaration`9dd9f088ec11916f12697376fae876ad6ff91b3f7b43b4bf4210ee35ea443022`.
+The selection pins the completed Pong4013 review and both comparisons, verifies
+its terminal service and confirms no concurrent learner. Read-only100k recovery
+monitoring and completed-run plotting are active. Fixed frozen evaluations/full
+audit follow; training and task outcomes remain pending.
