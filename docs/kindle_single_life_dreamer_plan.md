@@ -112,6 +112,12 @@ coefficient retains the ensemble; no native rebuild. Started06:36:15 UTC,
 source`12a6553`; full config/counters, finite initial weights matching all346
 control tensors and first updates pass.3,578,225 parameters. Fixed evaluations
 and full audit follow; no automatic extension or next allocation.
+A [four-action Breakout candidate](experiments/2026-10-26-cdp-breakout-minimal-actions.md)
+is prepared for later review at the original compact H15/200k budget. Existing
+adapter/replay support needs no code change; shared actions match in a bounded
+CPU check. Action dimensions, initial weights and policy probabilities change,
+so retain an own initial control and label the protocol variant. It is unselected
+while Pong runs and has no GPU result or established benefit.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

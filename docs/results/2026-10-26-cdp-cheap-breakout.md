@@ -9,6 +9,16 @@ A later [CPU pixel-following reference](2026-10-26-cdp-breakout-pixel-reference.
 also remains weak:11.333 and0/24 two-wall successes. Its complete action replay
 passes, but it provides no training guidance and is not a learned-policy result.
 
+The later [H5/larger-budget recipe](2026-10-26-cdp-breakout-compact-h5-budget.md)
+costs18.06% less wall time at a matched prefix but stops at487,736 actions under
+its45-minute cap, frozen8.458 and0/24 successes. A
+[four-action H15/200k candidate](../experiments/2026-10-26-cdp-breakout-minimal-actions.md)
+is prepared while Pong runs. Shared full/minimal actions match in a bounded
+CPU check (4,096 actions/16,353 frames per protocol,15 natural episodes each).
+The full18 H15/H5 policies use choices outside the four-action vocabulary for
+66.71%/82.07% of selected actions; these are not ineffective-action rates.
+No new learner is started by this preparation.
+
 [Declaration](../experiments/2026-10-25-cdp-cheap-breakout.md). Fresh seed1009,
 Size4M/RGB64/Auto,4,131,729 trainable parameters, centered CDP/action-effects1,
 N8/B8/T16/H15/R32, full BPTT/microbatch8 and replay100k. Full18/sticky.25/repeat4,
