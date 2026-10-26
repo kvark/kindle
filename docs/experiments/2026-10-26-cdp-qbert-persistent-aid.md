@@ -54,3 +54,15 @@ prepared declaration`880e0b829068946defd481345b9f33b86f166f2a4b939f78e6116acb243
 queue`d5a946e5ba19ff42deeb2aa7d50a49462bf4cb75f6a212c04bf640b58d741e6a`.
 The existing B8/R32 recovery monitor covers100k/24,939; completed-run analysis
 must preserve the aid distinction and fixed unaided final/initial controls.
+
+Completed-run automation is prepared: an explicitly labelled aided curve,
+generic cube coverage and matched-config unaided-control comparison. The reader
+validates the completed control's49,939 updates, gates, guard/tensor/coverage
+receipts and log hashes. Its actual initial trace reads successfully across all
+1,203 transition/episode/reset/final-counter events; equality to the candidate
+remains pending. Candidate analysis requires completed training/frozen audits,
+100k recovery and a terminal service. No analysis process or GPU work starts.
+Comparison SHA256`5378b754064a2a0bfa33dab771e426040592fd423fd27c193e252dcbe52a29e0`;
+postprocessor`0281757bb16c9c4494d4f4843c4962004c2a7d6393b09fe1b4bd996778537e8d`.
+Pins and CPU checks are retained in`analysis-preparation.json` and
+`initial-trace-preparation.json` under the candidate artifacts.

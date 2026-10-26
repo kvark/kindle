@@ -82,3 +82,8 @@ The200k recovery audit passes at24,954 updates, with346 finite tensors and25,508
 strict finite reports through204,440 actions. Captured200,704-action progress
 is924.585s with zero debt. Recovery metadata SHA256
 `11f2d77c308e1609b71674e399ddfa6f70b59a3da91f7a2c8d18b7a7eac8ed6a`.
+
+The300k recovery audit passes at37,454 updates, with346 finite tensors and37,663
+strict finite reports through301,680 actions. Captured299,008-action progress
+is1,380.047s with zero debt. Recovery metadata SHA256
+`410516a0ae8810005fdd9a38f3c6e7fca44cdd1d48656a16c3cadbadba076b61`.
