@@ -74,8 +74,11 @@ training cap. Fixed final/own initial24 natural episodes disable aid and retain
 15000/90%-pyramid gate, all346 tensors and full replay/video/guard/coverage checks.
 Compare unaided and whole-episode controls. Exact staged patch is applied and
 444 tests pass; native unchanged, new Python overlay`runtime-qbert-guidance-cap`.
-Owner`kindle-cheap-qbert-pixel-cap640-200k-20261026`; no experience reused, cap
-increase, extension or automatic next allocation. The original CPU-isolation
+Owner`kindle-cheap-qbert-pixel-cap640-200k-20261026`, active from21:08:46 UTC/
+source`8f1f7ef`. Startup matches346 initial tensors against both controls and
+248:1/256:2/256:3 updates. First5120 transitions match whole-episode guidance;
+first release is5128/lane5 after640 guided actions. All monitoring attached.
+No experience reused, cap increase, extension or automatic next allocation. The original CPU-isolation
 failures and historical correction remain in the cheap-Qbert report.
 See [the declaration](docs/results/2026-10-25-cdp-cheap-qbert.md#selected-fresh-capped-guidance-learning).
 

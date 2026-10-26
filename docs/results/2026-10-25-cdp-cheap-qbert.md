@@ -985,3 +985,22 @@ this receipt, the completed Pong review and every declared source/runtime pin.
 No additional GPU qualification sweep or native rebuild is needed for the
 CPU action-limit schedule, already covered by real-Atari CPU integration and
 existing native forced/unforced-action execution; this200k run tests learning.
+
+
+The fresh run starts21:08:46 UTC/source`8f1f7ef`, invocation
+`732153dabd2646c082fc55e08ca75cc7`. Startup verifies RX7900XT, exact native config,
+3,578,225 parameters, fresh counters,5%/640-action guidance and first248:1/
+256:2/256:3 finite updates. All346 actual-initial tensors match both unaided and
+whole-episode controls. Progress,100k recovery and fixed-final postprocessing
+are attached. Selected declaration SHA256
+`0dd481e4695c31e3d5e35751ea5b275b8dd5fce638b91a08762c2d92ba992e61`;
+startup`7986c895c34bf8a6157b36008e4e6f09a821d81604a16797ca95f144b2fc030d`.
+
+A read-only complete22,552-action prefix verifies577 actions after guidance
+release, with no forced action or teacher-frame hash. First release is aggregate
+5128/lane5 after exactly640 guided actions; native choices begin17,16,13,3.
+The first5120 transitions match the whole-episode control for actions, rewards,
+stored rewards, boundaries, executed frames, overrides and teacher input hashes.
+This is execution/schedule evidence; full pixel replay and unaided competence
+remain pending. Prefix review SHA256
+`6d03d0be51ebf0b6ac3700fcf5d3b2002de9ee8c5ed67dd49bfb947d4aed6111`.
