@@ -93,3 +93,22 @@ startup review`2c33f6e2980ea2d0846c2515b1882230cc0a6a3cddf3dfa786fdffcbb2a15c86`
 Recovery monitoring, fixed-final/own-initial evaluation, full CPU replay/video,
 coverage, curves and completed comparison are attached. Startup establishes
 execution and initial equality; frozen learning remains pending.
+
+## Missed recovery checkpoint
+
+At16:16 UTC, read-only monitoring finds that the pinned queue contains
+`--checkpoint-every200000`, despite this declaration requiring100k and200k.
+At122,880 completed progress actions/30,659 updates, no trained checkpoint or
+100k review exists. Queue normalization against the older control missed the
+discrepancy. This is a preparation error and an unmet protocol requirement.
+
+Keep the original queue, declaration, controller, watcher and postprocessor.
+Continue the existing fixed200k/35-minute allocation, without restart or cap
+increase. The original recovery/completion watchers will retain their missing-
+milestone failures. Separate CPU analysis may verify final training, frozen
+evaluation and comparison while reporting `protocol_complete=false`; it cannot
+recover the missing100k checkpoint. Do not claim all declared checks passed.
+
+Deviation receipt:`checkpoint-interval-deviation.json`, SHA256
+`1ed857954eef688f4d8c080d44a61ab64a0c70ab7ec13592d1e5a1bf0550939a`.
+No GPU work, runtime edit or output mutation occurs in this review.

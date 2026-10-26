@@ -147,10 +147,12 @@ quality question is unresolved. No resumed training or extension.
 Current allocation: [Qbert H30](experiments/2026-10-26-cdp-qbert-long-imagination.md),
 started15:59:07 UTC/source`c1e00c2` after that interruption review and saved-policy
 assessment. Startup matches346 finite initial tensors and first248:1/256:2/256:3;
-recovery/evaluation/comparison monitoring is attached. Frozen quality is pending. Keep
+evaluation/comparison monitoring is attached. The declared100k recovery was never
+written: the pinned queue saves every200k. Preserve this protocol deviation and
+watcher failures; final training/frozen checks remain separate. Frozen quality is pending. Keep
 fresh1009/eval4000001009,4M/RGB48/Auto/N8/B8/T16/R32, coefficient1/actor0,
 original rates/full18/no aid; only native imagination15→30 changes. Fixed200k/
-49,939 updates,100k recovery and35-minute cap. Keep own initial/fixed-final24
+49,939 updates and35-minute cap. Keep own initial/fixed-final24
 natural episodes,15k/90%-pyramids and all numerical/config/counter/tensor/replay/
 guard audits. Longer rollouts can also compound model error. No automatic queue.
 
