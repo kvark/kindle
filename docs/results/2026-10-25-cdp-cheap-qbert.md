@@ -1004,3 +1004,64 @@ stored rewards, boundaries, executed frames, overrides and teacher input hashes.
 This is execution/schedule evidence; full pixel replay and unaided competence
 remain pending. Prefix review SHA256
 `6d03d0be51ebf0b6ac3700fcf5d3b2002de9ee8c5ed67dd49bfb947d4aed6111`.
+
+
+## Capped guidance recovers some quality but remains below unaided training
+
+The selected fresh run completes **200,000 aggregate actions / 799,403 emulator
+frames / 49,939 updates in 1199.665 seconds (20m00s)**, within its25-minute cap.
+Service `kindle-cheap-qbert-pixel-cap640-200k-20261026` exits successfully at
+**21:30:21 UTC**, after21m35.325s including construction, frozen evaluation and
+audits. Source remains`8f1f7ef`; native remains`bfb8c31`. There is no restart,
+extension, cap increase or checkpoint selection.
+
+| Fixed200k recipe | Training wall | Frozen final / own initial | First pyramids | Mean first-pyramid coverage |
+|---|---:|---:|---:|---:|
+| Unaided4M/RGB48 control |19m45s|809.375 /180.208|0/24|16.625/21|
+|5% whole-episode pixel guidance |20m13s|633.333 /180.208|0/24|11.667/21|
+|5% episode selection,640-action guidance cap |20m00s|750.000 /180.208|0/24|16.208/21|
+
+All three share native4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
+original rates and1009/eval4000001009. The cap improves this one run relative to
+whole-episode guidance, but both score and coverage remain below unaided.
+**Retain the unaided recipe. No extension, confirmation or next GPU allocation
+is selected.** The original mean15000/90%-pyramid gate still fails. These reused
+development seeds/cohorts do not establish reliability or isolated host effects;
+the unaided control used the older kernel. The cap was chosen from prior teacher
+traces, not held-out evidence.
+
+The recovery checkpoint contains100,000 actions/24,939 updates. All49,939 reports
+are finite, first update remains248, training debt is zero, and training finishes
+389 natural episodes without truncation. Config/source/counter audits, all346
+matched initial tensors against both controls, identical semantic initial traces,
+all346 unchanged tensors per frozen arm, complete action/reward/boundary replays,
+videos, host guards, coverage, learning curves and the three-arm comparison pass.
+The final frozen arm collects14,712 actions/58,815 frames in5.956s and25 natural
+episodes, selecting the first3 per lane (24 total). Its one excess episode and
+all partial tails remain recorded. Own-initial evaluation collects9,232 actions/
+36,888 frames in3.759s and exactly24 natural episodes. Both use zero updates and
+no guidance; neither action/time cap is reached.
+
+Full training pixel/action replay verifies15,360 overrides (**7.680%** of actions),
+from24 selected episodes among397 started. The completed23 selected episodes
+all clear the first pyramid before guidance release, with mean3900; none of366
+completed unguided episodes does. Unguided mean return is420.697 overall and727.5
+for its last50 episodes. A separate read-only analysis verifies3,561 native
+policy actions after release, with no override or teacher input hash. Teacher-
+assisted successes remain distinct from unaided learning; the frozen score is
+750, despite a higher late online curve. Post-hoc task labels never enter policy
+inputs. The final incomplete selected episode remains in the replay tails.
+
+Evidence remains under
+`/x/Temp/kindle-cheap-20261025/qbert-4m-48-r32-pixel-cap640-200k`.
+The viewed comparison plot is`guidance-cap-comparison/comparison.png` (SVG and
+receipt retained alongside it). SHA256 receipts:
+
+- Learning:`69222e771b73dfcdb11e892dd0150d62bb6e7b19fd476dad5fdeb718f2ea6ffa`.
+- 100k recovery:`935b69de96f348dff9e897d597becd426147b8fa33608bd26f1bc97334670b4c`.
+- Guidance replay:`71711e6d9b037e1c10d415747f33e77291b391002dcfd79d8727ee443768a703`.
+- Coverage:`8b4621838b78afdcc51f4f697d8f7e36aeb314bd5f39b5205c22a1ec4bcf4e94`.
+- Curves:`7c16526056fa7839550a880214219a6cf63a35bf12b2508104c715085c743efe`.
+- Comparison:`2097fb6849dae6fbdfbebbf03d2c3554b8e4684f994da2a2dda493bfbba2e309`.
+- Completion:`e1f9a995a09f105a8ff677270319d2843ae85638915eccddc3ea12f2ea17d268`.
+- Exposure analysis:`d7702449eb1f99126f643f6a3c8878082aafe1fae3891dd1fc33065b3de8273c`.

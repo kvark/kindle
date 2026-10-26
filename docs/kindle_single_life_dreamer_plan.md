@@ -286,30 +286,26 @@ pass; service exits21:02:34 UTC. Retain RGB48; no extension or confirmation.
 Geometry/initialization, older control kernel and13.690s unintended integrated-
 GPU inference during this run limit attribution. Full evidence is in cheap-Pong.
 
-Select fresh Qbert cap640 learning:4M48/Auto/N8/B8/T16/H15/R32/coefficient1/
-actor0/full18/original rates,1009/eval4000001009,5% episode selection. Release
-selected episodes to the learner after640 actions; no pixel-policy change or
-RAM input. Keep200k/49,939 updates, first248, zero debt,100k recovery and25-minute
-training cap. Fixed final/own initial24 natural episodes disable aid and retain
-15000/90%-pyramid gate, all346 tensors and full replay/video/guard/coverage checks.
-Compare unaided and whole-episode controls. Exact staged patch is applied and
-444 tests pass; native unchanged, new Python overlay`runtime-qbert-guidance-cap`.
-Owner`kindle-cheap-qbert-pixel-cap640-200k-20261026`, active from21:08:46 UTC/
-source`8f1f7ef`. Startup matches346 initial tensors against both controls and
-248:1/256:2/256:3 updates. First5120 transitions match whole-episode guidance;
-first release is5128/lane5 after640 guided actions. All monitoring attached.
-No experience reused, cap increase, extension or automatic next allocation. The original CPU-isolation
-failures and historical correction remain in the cheap-Qbert report.
-See [the declaration](results/2026-10-25-cdp-cheap-qbert.md#selected-fresh-capped-guidance-learning).
+Qbert cap640 completes200k actions/799,403 frames/49,939 updates in20m00s.
+Frozen750.000 improves whole-episode guidance633.333 but stays below unaided
+809.375; all0/24 pyramids. Coverage16.208/21 versus11.667 and16.625. Actual
+training overrides15,360 (7.680%);23 completed guided episodes clear a pyramid,
+none of366 unguided episodes does. All audits,100k recovery,346 matched initial
+and unchanged frozen tensors, semantic initial traces, full training pixel/
+action replay and comparison pass; service exits21:30:21 UTC. Retain unaided.
+No extension, confirmation or next GPU allocation selected. The applied
+640-action option passes444 CPU tests; native unchanged. Use the matching
+`runtime-qbert-guidance-cap` overlay. Prior isolation failures remain recorded.
+See [the completed result](results/2026-10-25-cdp-cheap-qbert.md#capped-guidance-recovers-some-quality-but-remains-below-unaided-training).
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
-Check live service state before GPU work; Qbert pixel-guided learning and its
-postprocessing have completed. Pong RGB32 also completes; capped Qbert is the
-only selected fresh run.
+Check live service state before GPU work. Whole-episode and capped Qbert
+guidance, Pong RGB32 and their postprocessing are complete. No GPU allocation
+is currently selected; do not restart completed services.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
