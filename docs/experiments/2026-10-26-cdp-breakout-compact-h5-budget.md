@@ -67,3 +67,19 @@ Selected declaration SHA256
 Recovery-checkpoint audits and completed-run plotting are monitored automatically.
 Fixed final/own initial evaluations and full audit remain pending; finite startup
 does not establish a learning gain.
+
+At the shared 196,608-action/49,091-update prefix, H5 takes **1,086.206s
+(18m06s)** versus H15's **1,325.662s (22m06s)**: 18.06% less wall time, or
+1.220× the action throughput. Same native binary, GPU, model, resolution,
+initial tensors and update count; the imagined horizon and learned trajectories
+differ. This is a single-seed recipe-cost observation, not a hardware speedup
+or evidence of improved play. The planned total budgets also differ, so no
+full-run runtime or frozen-score extrapolation follows.
+
+Both 100k/200k recovery checkpoints pass; the 200k checkpoint contains 49,939
+updates and finite346 tensors. The prefix comparison independently checks all
+49,091 reports and action/update counters in each prefix, pins their exact byte
+lengths/hashes, and rechecks all346 matching initial tensors. Artifact:
+`prefix-cost-comparison-196608.json`, SHA256
+`30a240423ffeb71688cdb4829717ba7ef848c39196eba890d4458fc033dd2324`.
+The fixed45-minute cap and pending final evaluations remain unchanged.

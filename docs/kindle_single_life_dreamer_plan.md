@@ -105,6 +105,10 @@ RAM or external action aid enters learning. Started05:41:58 UTC, source`8910efe`
 full config/counters, finite initial weights matching all346 control tensors and
 first updates pass.4,131,729 parameters. Fixed evaluations/full audit follow;
 no automatic extension.
+Its shared196,608-action/49,091-update prefix takes18m06s versus H15's22m06s,
+18.06% less wall time on the same native binary/GPU. The100k/200k checkpoint
+audits pass. This measures recipe cost, not frozen learning; final results remain
+pending and the45-minute cap stays fixed.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
