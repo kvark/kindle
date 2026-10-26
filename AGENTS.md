@@ -125,12 +125,14 @@ costs18.06% less wall time than H15; the larger-budget recipe still fails the
 task. Numerical/checkpoint/accounting and frozen replay checks pass, while the
 original training guard/controller retain their time-budget failure. Both
 services exit. See `docs/results/2026-10-26-cdp-breakout-compact-h5-budget.md`.
-Selected next: Pong intrinsic coefficient.01, otherwise fixed4M/RGB48/Auto/
+Current allocation: Pong intrinsic coefficient.01, otherwise fixed4M/RGB48/Auto/
 N8/B8/T16/H15/R32,500k actions and55-minute cap, fresh1009/eval4000001009.
 Own initial/fixed final controls and mean15/90%-win gate remain. No aid or native
-change. See `docs/experiments/2026-10-26-cdp-pong-small-intrinsic.md`; intended
+change. See `docs/experiments/2026-10-26-cdp-pong-small-intrinsic.md`; service
 owner `kindle-cheap-pong-intrinsic001-500k-20261026`. Check live state before GPU
-work. Startup follows. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
+work. Started06:36:15 UTC, source`12a6553`. Full config/counters, finite initial
+weights matching all346 control tensors and first updates pass;3,578,225 parameters.
+Fixed evaluations/full audit follow. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
 and restores reject overrides.263 vector-runner tests pass; native is unchanged.
 Do not restart completed training, old queues, broad seed campaigns or unchanged

@@ -104,12 +104,14 @@ recovery checkpoints, numerical/accounting and frozen replay checks pass; the
 original training guard/controller retain their time-budget failure. Both
 services exit and the comparison is reviewed. No extension.
 
-**Selected next allocation:** [Pong coefficient.01](experiments/2026-10-26-cdp-pong-small-intrinsic.md).
+**Current allocation:** [Pong coefficient.01](experiments/2026-10-26-cdp-pong-small-intrinsic.md).
 Keep the native recipe otherwise fixed:4M/RGB48/Auto/N8/B8/T16/H15/R32,
 fresh1009/eval4000001009,500k actions,55-minute cap, no external aid. Preserve
 the own actual-initial/fixed-final controls and mean15/90%-win gate. The positive
-coefficient retains the ensemble; no native rebuild. Startup follows; one
-bounded learner, no automatic extension or next allocation.
+coefficient retains the ensemble; no native rebuild. Started06:36:15 UTC,
+source`12a6553`; full config/counters, finite initial weights matching all346
+control tensors and first updates pass.3,578,225 parameters. Fixed evaluations
+and full audit follow; no automatic extension or next allocation.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

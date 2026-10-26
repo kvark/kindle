@@ -53,4 +53,16 @@ CPU preparation checks the complete queue against the primary control: only
 the coefficient and artifact paths differ. An unselected controller refuses
 before creating GPU/log artifacts. Selection must pin the preceding review
 and source commit; the controller also requires the preceding service to be
-terminal. Startup follows; no automatic next allocation or extension.
+terminal. No automatic next allocation or extension.
+
+Started06:36:15 UTC, source`12a6553`. Startup confirms complete native config
+changes only intrinsic_reward_scale1→.01,3,578,225 parameters, zero starting
+counters, the enabled ensemble, no external aid, finite346-tensor own initial
+checkpoint matching the control exactly, and updates248:1,256:2,256:3.
+Initial metadata SHA256
+`39e7168a675225259a52dcc55586845c22861a163c201685729228601d5e488f`;
+selected declaration SHA256
+`d2249ae6865eaa21169806b7e2331ec83eedac87106769842486e9fd00aeb213`.
+Recovery checks and completed-run plotting are monitored automatically. The
+read-only checkpoint watch lasts60 minutes so it covers a55-minute training cap;
+this changes no training limit. Fixed final/own initial evaluations remain pending.

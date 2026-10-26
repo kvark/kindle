@@ -72,13 +72,15 @@ initial1.375,0/24 two-wall successes. Its shared prefix costs18.06% less wall ti
 than H15, but the larger-budget recipe still fails the task. Numerical,
 checkpoint/accounting and frozen replay checks pass; the original controller/
 guard retain their time-budget failure. Both services exit; no extension.
-Selected next: [Pong coefficient.01](experiments/2026-10-26-cdp-pong-small-intrinsic.md),
+Current allocation: [Pong coefficient.01](experiments/2026-10-26-cdp-pong-small-intrinsic.md),
 otherwise fixed4M/RGB48/Auto/N8/B8/T16/H15/R32,500k and55-minute cap,
 fresh1009/eval4000001009, no aid. Own initial/fixed final controls and existing
 mean15/90%-win gate remain. Artifacts/controller:
-`pong-4m-48-r32-intrinsic001-500k`, `run_pong_intrinsic001_500k.py`; intended owner
+`pong-4m-48-r32-intrinsic001-500k`, `run_pong_intrinsic001_500k.py`; owner
 `kindle-cheap-pong-intrinsic001-500k-20261026`. Check live state before GPU work.
-Startup follows; no automatic extension or next allocation.
+Started06:36:15 UTC, source`12a6553`. Full config/counters, finite initial weights
+matching all346 control tensors and first updates pass;3,578,225 parameters.
+Fixed evaluations/full audit follow; no automatic extension or next allocation.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
