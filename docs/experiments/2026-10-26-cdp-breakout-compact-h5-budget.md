@@ -1,5 +1,11 @@
 # More compact Breakout experience within a fixed wall budget
 
+**Result:** the45-minute cap stops training at487,736 actions/121,873 updates.
+The declared separate frozen assessment scores8.458 versus own initial1.375,
+0/24 two-wall successes. The500k target remains incomplete; numerical,
+checkpoint/accounting and frozen replay checks pass. See the
+[result](../results/2026-10-26-cdp-breakout-compact-h5-budget.md). No extension.
+
 The compact4M/RGB64/H15/R32 policy with1% native mixture scores7.083 after200k
 actions in22m29s, with0/24 two-wall successes. The mixture greatly reduces FIRE
 stalls but does not establish competent play. Test a fresh H5 life with500k
@@ -65,8 +71,8 @@ updates248:1,256:2,256:3. Initial metadata SHA256
 Selected declaration SHA256
 `057296c3ef2466cae098bad796bb17443aded4304a39c85cb8ee463762a3e9f6`.
 Recovery-checkpoint audits and completed-run plotting are monitored automatically.
-Fixed final/own initial evaluations and full audit remain pending; finite startup
-does not establish a learning gain.
+The later cutoff and separate frozen assessment are recorded in the result;
+finite startup alone did not establish a learning gain.
 
 At the shared 196,608-action/49,091-update prefix, H5 takes **1,086.206s
 (18m06s)** versus H15's **1,325.662s (22m06s)**: 18.06% less wall time, or
@@ -82,7 +88,7 @@ updates and finite346 tensors. The prefix comparison independently checks all
 lengths/hashes, and rechecks all346 matching initial tensors. Artifact:
 `prefix-cost-comparison-196608.json`, SHA256
 `30a240423ffeb71688cdb4829717ba7ef848c39196eba890d4458fc033dd2324`.
-The fixed45-minute cap and pending final evaluations remain unchanged.
+The fixed45-minute cap remains unchanged; the later cutoff is retained.
 
 ## Conditional assessment if the wall cap interrupts training
 
@@ -107,4 +113,6 @@ completed cutoff review, terminal preceding service and exact source hashes.
 Artifacts: `breakout-4m-64-h5-r32-unimix001-500k-cutoff-frozen` under the same
 runtime root; controller `run_breakout_h5_cutoff_frozen.py`, intended service
 `kindle-cheap-breakout-h5-cutoff-frozen-20261026`. Audit cap1200s and separate
-frozen-service cap1860s. No conditional evaluation has been launched yet.
+frozen-service cap1860s. Selected after the cutoff audit; started06:28:51 UTC,
+source`bd652bc`. The assessment completes8.458/1.375 with0/24 successes and all
+frozen checks passing. It performs zero further learning and exits successfully.

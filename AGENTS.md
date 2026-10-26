@@ -119,16 +119,18 @@ initial148.958,0/24 pyramids, mean coverage10.167/21. Score/coverage are lower t
 the full18 control. All audits/curves pass and service exits; no extension.
 The separate CPU Breakout pixel follower scores11.333,0/24 two-wall successes,
 with full replay. No reference controller or RAM enters learning.
-Current allocation: fresh compact Breakout H5/500k,4M/RGB64/Auto/N8/B8/T16/
-R32, native mixture.01, fixed45-minute cap. Horizon15→5 and experience200k→500k
-change together. The earlier12M H5 warm start regressed; this is a fresh compact
-compute/budget recipe, not a continuation or established horizon benefit. Retain
-own initial/fixed final controls and the unchanged two-wall gate. See
-`docs/experiments/2026-10-26-cdp-breakout-compact-h5-budget.md`; owner
-`kindle-cheap-breakout-h5-unimix-500k-20261026`. Check live state before GPU work.
-Started05:41:58 UTC, source`8910efe`. Full config/counters, finite initial weights
-matching all346 control tensors and first updates pass;4,131,729 parameters.
-Fixed evaluations/full audit follow. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
+Compact Breakout H5 stops at the45-minute cap:487,736 actions/121,873 updates,
+frozen8.458 versus own initial1.375,0/24 two-wall successes. The shared prefix
+costs18.06% less wall time than H15; the larger-budget recipe still fails the
+task. Numerical/checkpoint/accounting and frozen replay checks pass, while the
+original training guard/controller retain their time-budget failure. Both
+services exit. See `docs/results/2026-10-26-cdp-breakout-compact-h5-budget.md`.
+Selected next: Pong intrinsic coefficient.01, otherwise fixed4M/RGB48/Auto/
+N8/B8/T16/H15/R32,500k actions and55-minute cap, fresh1009/eval4000001009.
+Own initial/fixed final controls and mean15/90%-win gate remain. No aid or native
+change. See `docs/experiments/2026-10-26-cdp-pong-small-intrinsic.md`; intended
+owner `kindle-cheap-pong-intrinsic001-500k-20261026`. Check live state before GPU
+work. Startup follows. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
 and restores reject overrides.263 vector-runner tests pass; native is unchanged.
 Do not restart completed training, old queues, broad seed campaigns or unchanged

@@ -1,8 +1,10 @@
 # Smaller exploration bonus for compact Pong
 
-**Prepared only.** Breakout H5/500k remains the active learner. Select this test
-only after reviewing that run's completed result or cutoff and verifying its
-service has exited. Preparation does not create an automatic training queue.
+**Selected after the Breakout H5 cutoff and frozen assessment.** That run stops
+at487,736 actions under its45-minute cap and scores8.458 versus initial1.375,
+0/24 two-wall successes. Numerical/checkpoint/accounting and frozen replay checks
+pass; the original time-budget failure remains. Both services have exited and
+the comparison is reviewed. Select this one fixed-budget Pong test next.
 
 The compact Pong recipe wins 23/24 and 22/24 frozen matches on seeds 1009 and
 4013, but means 11.0 and 7.333 miss the existing mean-15 gate. Both runs finish
@@ -51,4 +53,4 @@ CPU preparation checks the complete queue against the primary control: only
 the coefficient and artifact paths differ. An unselected controller refuses
 before creating GPU/log artifacts. Selection must pin the preceding review
 and source commit; the controller also requires the preceding service to be
-terminal. No GPU work or learning result exists for this candidate yet.
+terminal. Startup follows; no automatic next allocation or extension.

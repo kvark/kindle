@@ -25,6 +25,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
+| [Same, H5/500k target](results/2026-10-26-cdp-breakout-compact-h5-budget.md) |487,736 /121,873|45-minute cutoff|8.458 /1.375|500k incomplete;0/24 two-wall successes|
 | [Retained Breakout12M/RGB64/H5 warm start](results/2026-10-26-cdp-breakout-short-imagination.md) |50k new /12,439 new|8m02s|27.208 /67.583 source|0/24 two-wall successes; regression|
 
 Boxing's cheap AMD recipe now passes on two fresh learners, each within30 minutes;
@@ -83,10 +84,8 @@ Selected seeds are not held out; no unchanged extension or broad campaign.
 Their [completed-report analysis](results/2026-10-25-cdp-cheap-pong.md#exploration-bonus-scale-in-the-completed-learners)
 finds a late exploration-bonus/net-predicted-reward ratio of3.76/3.46. Signed
 reward cancellation limits that comparison; it does not diagnose the score gap.
-A [smaller game-specific bonus test](experiments/2026-10-26-cdp-pong-small-intrinsic.md)
-is prepared with the native recipe and500k budget otherwise fixed. Its controller
-refuses unselected execution. Select only after reviewing the active Breakout
-result or cutoff and terminal service; no additional learner is running.
+This motivates the selected smaller-bonus test below, without establishing that
+the bonus caused either failed score gate.
 
 The [six-action Qbert trial](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage)
 completes200k/49939 updates in18m21s, but frozen605.208 and10.167/21 mean coverage
@@ -95,20 +94,22 @@ All audits/curves pass and service exits. No extension. A separate
 [CPU Breakout pixel follower](results/2026-10-26-cdp-breakout-pixel-reference.md)
 also fails at11.333 and0/24 two-wall successes; full replay passes, no training aid.
 
-**Current allocation:** [fresh compact Breakout H5/500k](experiments/2026-10-26-cdp-breakout-compact-h5-budget.md).
-Keep4M/RGB64/Auto/N8/B8/T16/R32 and native mixture.01; shorten imagined rollouts
-H15→5 while increasing experience200k→500k under a fixed45-minute training cap.
-The earlier12M H5 warm start regressed, so this is a new combined compute/budget
-recipe, not an established horizon improvement or warm continuation. Own actual
-initial/fixed final controls and all existing gates remain. No pixel reference,
-RAM or external action aid enters learning. Started05:41:58 UTC, source`8910efe`;
-full config/counters, finite initial weights matching all346 control tensors and
-first updates pass.4,131,729 parameters. Fixed evaluations/full audit follow;
-no automatic extension.
-Its shared196,608-action/49,091-update prefix takes18m06s versus H15's22m06s,
-18.06% less wall time on the same native binary/GPU. The100k/200k checkpoint
-audits pass. This measures recipe cost, not frozen learning; final results remain
-pending and the45-minute cap stays fixed.
+The [compact Breakout H5 result](results/2026-10-26-cdp-breakout-compact-h5-budget.md)
+retains the45-minute cutoff at487,736 actions/121,873 updates. Frozen8.458 versus
+own initial1.375,0/24 two-wall successes; the500k target is incomplete. Its shared
+196,608-action/49,091-update prefix takes18m06s versus H15's22m06s,18.06% less wall
+time on the same native/GPU/model. This cost saving and modest score gain over
+the differently budgeted7.083 control do not establish task competence. All four
+recovery checkpoints, numerical/accounting and frozen replay checks pass; the
+original training guard/controller retain their time-budget failure. Both
+services exit and the comparison is reviewed. No extension.
+
+**Selected next allocation:** [Pong coefficient.01](experiments/2026-10-26-cdp-pong-small-intrinsic.md).
+Keep the native recipe otherwise fixed:4M/RGB48/Auto/N8/B8/T16/H15/R32,
+fresh1009/eval4000001009,500k actions,55-minute cap, no external aid. Preserve
+the own actual-initial/fixed-final controls and mean15/90%-win gate. The positive
+coefficient retains the ensemble; no native rebuild. Startup follows; one
+bounded learner, no automatic extension or next allocation.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

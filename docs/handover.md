@@ -66,16 +66,19 @@ completes200k/49939 updates in18m21s: frozen605.208 versus own initial148.958,
 0/24 pyramids. Coverage10.167/21 and score are lower than the full18 control.
 All audits/curves pass and service exits; no extension. The separate CPU Breakout
 pixel follower scores11.333,0/24 two-wall successes, with complete replay; no aid.
-Current allocation: [fresh compact Breakout H5/500k](experiments/2026-10-26-cdp-breakout-compact-h5-budget.md),
-4M/RGB64/Auto/N8/B8/T16/R32, native mixture.01, H5 and45-minute training cap.
-This changes horizon and budget together; the earlier12M H5 warm start failed.
-Fresh state and own initial control; no pixel controller, RAM or external aid.
-Artifacts/controller: `breakout-4m-64-h5-r32-unimix001-500k`,
-`run_breakout_compact_h5_500k.py`; owner
-`kindle-cheap-breakout-h5-unimix-500k-20261026`. Check live state before GPU work.
-Started05:41:58 UTC, source`8910efe`. Full config/counters, finite initial weights
-matching all346 control tensors and first updates pass;4,131,729 parameters.
-Fixed evaluations/full audit follow; no automatic extension or next allocation.
+The [compact Breakout H5 result](results/2026-10-26-cdp-breakout-compact-h5-budget.md)
+retains a45-minute cutoff at487,736 actions/121,873 updates: frozen8.458 versus
+initial1.375,0/24 two-wall successes. Its shared prefix costs18.06% less wall time
+than H15, but the larger-budget recipe still fails the task. Numerical,
+checkpoint/accounting and frozen replay checks pass; the original controller/
+guard retain their time-budget failure. Both services exit; no extension.
+Selected next: [Pong coefficient.01](experiments/2026-10-26-cdp-pong-small-intrinsic.md),
+otherwise fixed4M/RGB48/Auto/N8/B8/T16/H15/R32,500k and55-minute cap,
+fresh1009/eval4000001009, no aid. Own initial/fixed final controls and existing
+mean15/90%-win gate remain. Artifacts/controller:
+`pong-4m-48-r32-intrinsic001-500k`, `run_pong_intrinsic001_500k.py`; intended owner
+`kindle-cheap-pong-intrinsic001-500k-20261026`. Check live state before GPU work.
+Startup follows; no automatic extension or next allocation.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
