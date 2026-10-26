@@ -292,3 +292,32 @@ comparison`9ed385d96f93a153105f9050c23e8eaa2c08cd9ddf23554894d9681a4fb6445e`.
 Source at launch`640f614`, native`bfb8c31`, runner`1ed07af`, replay`e853818`.
 The next selected work is the bounded PongB16 learning/restore check; it does
 not select a full Pong run or restart any completed Qbert training.
+
+## Larger capacity at RGB48: bounded check
+
+The existing-native12M/RGB48/B16 check passes16,384 actions/65,481 emulator frames
+and2,002 updates in149.387s, versus93.813s for4M/B8's matching action prefix.
+This larger recipe costs1.592× as much early wall time; it is not an isolated
+capacity effect or a full-budget prediction. Construction is separate,2.472s
+versus1.969s. B16 samples512,512 positions in2,002 updates; B8 samples516,480
+in4,035. Capacity, initialization, cadence, centering and warmup per action differ.
+
+Fresh1009/eval4000001009, Auto/N8/T16/H15/R32, full microbatch16, coefficient1,
+full18 and no aid. Runtime confirms14,123,473 parameters and first updates
+376:1,384:2,392:3. All2,002 reports, full config/source/counters, finite346 tensors
+and both guards pass. CNN0's2,400 weights and reward layer0's655,360 weights all
+change; that is not proof of correct gradient scale or useful representation.
+Own actual initial is retained; no equality claim across model sizes.
+
+Ordinary frozen restore runs1,024 actions/4,096 frames in0.802s with zero updates,
+zero natural episodes and all346 tensors unchanged. No natural-episode competence
+gate is tested. Service exits10:35:06 UTC,2m39.870s total wall, without retry,
+cutoff or native change. Source at launch`47690dc`, native`bfb8c31`, runner`1ed07af`.
+Artifacts:`/x/Temp/kindle-cheap-20261025/qbert-12m-48-b16-check`;
+review SHA256`924d6a6931f7f90580649b3f28eaf1043d5ebd4e7600108ac9073123c82bac47`;
+initial metadata`463c6e54d23ab7d8212b5fcdf3cc8a0d8b84300b74e7a7a83781b9cc155c5aca`.
+
+After reviewing the check, select a separate fresh
+[200k-action capacity/batch learning screen](../experiments/2026-10-26-cdp-qbert-capacity-budget.md)
+under a35-minute cap. Keep the original frozen15k/90%-pyramid gate and own actual
+initial. The short validation cost is additional, and its weights are not resumed.

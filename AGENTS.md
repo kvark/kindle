@@ -51,16 +51,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: bounded Qbert12M/RGB48/B16 learning/restore check, selected
-after the completed Pong comparison. Fresh1009/eval4000001009, Auto/N8/T16/H15/
-R32, full microbatch16, coefficient1, full18 and no aid. Fixed16,384 actions/
-2,002 expected updates, first376,300s training cap; ordinary1,024-action restore
-under90s, audit120s/service660s. Own actual initial, expected14,123,473 parameters,
-complete config/finite/report/counter checks and346 unchanged frozen tensors.
-See `docs/experiments/2026-10-26-cdp-qbert-capacity-check.md`; intended owner
-`kindle-cheap-qbert-12m-48-b16-check-20261026`. Check live state before GPU work.
-Capacity and replay batch change together; this bounded check tests execution
-and early cost, not competence. No full allocation or automatic promotion.
+Current allocation: Qbert12M/RGB48/B16/R32 capacity/batch learning screen,
+selected after bounded training/restore passes. Fresh1009/eval4000001009,
+Auto/N8/T16/H15, coefficient1, full18, no aid,14,123,473 parameters. Fixed200k
+aggregate actions/24,954 updates, first376,100k recovery and35-minute training
+cap. Own actual initial/fixed final24-natural-episode evaluation; unchanged
+15k/90%-pyramid gate and full config/counter/numeric/tensor/replay/guard audits.
+Capacity and batch change together; no matched-initial claim across model sizes.
+See `docs/experiments/2026-10-26-cdp-qbert-capacity-budget.md`; intended owner
+`kindle-cheap-qbert-12m-48-b16-200k-20261026`. Check live state before GPU work.
+The separate16,384-action check takes149.387s and preserves346 tensors on restore;
+service exits10:35:06 UTC. It supplies execution/early cost, not competence.
+No retry, cap increase, extension or automatic next allocation.
 
 PongB16 completes500k/62,454 updates in38m45s,22.37% less training time than B8,
 but frozen11.875 is below14.958; both24/24 wins and below mean15. All audits and

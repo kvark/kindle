@@ -98,16 +98,22 @@ completes500k/62,454 updates in38m45s,22.37% less training time than B8. Frozen
 misses mean15. All four recoveries, frozen audits, curves and comparison pass;
 service exits10:28:51 UTC. No extension or seed confirmation selected.
 
-Current allocation: [bounded Qbert12M/RGB48/B16 check](experiments/2026-10-26-cdp-qbert-capacity-check.md),
-selected after Pong's completed outcome/comparison and terminal service. Fresh
-1009/eval4000001009, Auto/N8/T16/H15/R32, coefficient1, full18, no aid.16,384
-training actions/2,002 expected updates under300s, first376, then ordinary1,024
-frozen actions under90s. Expected14,123,473 parameters; own actual initial and
-full config/numeric/counter/finite/346-frozen-tensor checks. Capacity and batch
-change together; no competence claim or full learning allocation follows.
-Artifacts/controller:`qbert-12m-48-b16-check`, `run_qbert_12m_48_b16_check.py`;
-intended owner`kindle-cheap-qbert-12m-48-b16-check-20261026`. Check live state
-before GPU work. No retry, cap increase or automatic promotion.
+The [bounded Qbert capacity check](results/2026-10-25-cdp-cheap-qbert.md#larger-capacity-at-rgb48-bounded-check)
+passes16,384 actions/65,481 frames/2,002 updates in149.387s, versus93.813s for
+4M/B8. Actual14,123,473 parameters, all reports/config/counters/finite checks,
+selected parameter changes and ordinary restore/346-tensor invariance pass.
+Service exits10:35:06 UTC. This is execution/early-cost evidence, not competence.
+
+Current allocation: [Qbert12M/RGB48/B16/R32 at200k](experiments/2026-10-26-cdp-qbert-capacity-budget.md),
+selected after that completed check and terminal service. Fresh1009/eval4000001009,
+Auto/N8/T16/H15, coefficient1, full18 and no aid. Fixed200k/24,954 updates,
+first376,100k recovery and35-minute cap. Own actual initial/fixed final24-natural-
+episode controls, original15k/90%-pyramid gate and full audits/curves/coverage/
+comparison. Capacity and batch change together; sampled positions nearly match
+4M/B8 while updates/initial tensors differ. No retry, cap increase or extension.
+Artifacts/controller:`qbert-12m-48-b16-r32-200k`, `run_qbert_12m_48_b16_200k.py`;
+intended owner`kindle-cheap-qbert-12m-48-b16-200k-20261026`. Check live state before
+GPU work; the short check is not resumed and no next queue is automatic.
 
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

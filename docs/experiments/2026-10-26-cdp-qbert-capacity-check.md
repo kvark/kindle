@@ -1,6 +1,11 @@
 # Bounded Qbert12M/RGB48/B16 check
 
-**Selected after the completed Pong B16 comparison.** Pong uses22.37% less
+**Completed.** [Result](../results/2026-10-25-cdp-cheap-qbert.md#larger-capacity-at-rgb48-bounded-check):
+16,384 actions/2,002 updates in149.387s; all config/counter/numeric/tensor and
+ordinary-restore checks pass. Service exits10:35:06 UTC. A separate fresh
+[200k learning screen](2026-10-26-cdp-qbert-capacity-budget.md) is now selected.
+
+Selected after the completed Pong B16 comparison. Pong uses22.37% less
 training time but scores11.875 versus14.958, both24/24 wins and below mean15.
 All audits/comparison pass; its service exits10:28:51 UTC. No extension or
 confirmation follows. This separate Qbert check tests a different capacity/game;

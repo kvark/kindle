@@ -147,15 +147,19 @@ mean15. Full audits/curves/comparison pass; service exits10:28:51 UTC. The onlin
 curve develops earlier in wall time, but fixed frozen quality is lower. No
 extension or seed confirmation is selected for this recipe.
 
-**Current allocation:** [bounded Qbert12M/RGB48/B16 check](experiments/2026-10-26-cdp-qbert-capacity-check.md),
-selected after the completed Pong review. Historical larger models motivate
-checking existing12M capacity while retaining RGB48. Fixed16,384 actions/2,002
-expected updates, first376,300s training cap, then ordinary1,024-action restore.
-Fresh1009/eval4000001009, Auto/N8/T16/H15/R32, coefficient1, full18 and no aid.
-Capacity and batch change together. Own actual initial, expected14,123,473
-parameters and full config/counter/finite/unchanged-tensor audits are required.
-This measures execution and early cost, not task competence. No full learning
-allocation, retry, cap increase or automatic promotion follows.
+The [bounded Qbert12M/RGB48/B16 check](results/2026-10-25-cdp-cheap-qbert.md#larger-capacity-at-rgb48-bounded-check)
+passes16,384 actions/2,002 updates in149.387s, versus93.813s for4M/B8. All checks
+and ordinary restore/346-tensor invariance pass; service exits10:35:06 UTC. This
+measures execution/early cost, not competence or a full-budget speed ratio.
+
+**Current allocation:** [Qbert12M/RGB48/B16/R32 at200k](experiments/2026-10-26-cdp-qbert-capacity-budget.md),
+selected after that result. Fresh1009/eval4000001009, Auto/N8/T16/H15, coefficient1,
+full18 and no aid;14,123,473 parameters. Fixed200k/24,954 updates, first376,
+100k recovery,35-minute training cap and original15k/90%-pyramid gate. Own actual
+initial/fixed final and full audits/curves/coverage/comparison remain required.
+Capacity and batch change together, with nearly equal sampled positions but
+fewer updates and different initial tensors. Short validation cost is additional.
+No cap increase, retry, resume, extension or automatic next queue.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
