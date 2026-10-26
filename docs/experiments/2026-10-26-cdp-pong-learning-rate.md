@@ -71,3 +71,9 @@ All346 finite initial tensors match the control. Initial metadata SHA256
 selected declaration`0d2bded744d86db073ea3ea34be6bb58d1ba600eb2fd8bd26bc4fedc03160ec6`.
 Four recovery audits, frozen evaluations and completed curves/comparison are
 automated. Frozen learning results remain pending.
+
+The100k recovery audit passes at12,454 updates, with346 finite tensors and12,554
+strict finite reports through100,808 actions. Captured98,304-action progress
+is449.955s with zero debt. Recovery metadata SHA256
+`367b440f527105c9f480d586c64b69d70e2b5e2e400b098f7dc4e50b48f8aec5`.
+This is numerical/counter evidence; fixed-final frozen competence remains pending.
