@@ -321,8 +321,11 @@ unchanged. See [forecast results](results/2026-10-25-cdp-cheap-qbert.md#compact-
 Optional native expert imitation is implemented, default-disabled, with127 CPU
 Rust tests/strict Clippy and477 Python tests passing. Only explicit expert
 actions create replay labels; per-action weights can downweight NOOP. Select
-bounded gradient/vector GPU checks (120s each), then review before any Atari
-allocation. No full training selected. Existing native runtime remains retained.
+bounded gradient/vector checks now pass (service exits22:44:40 UTC). The separate
+release wheel passes477 Python tests and binding Clippy. Select only4096 fresh
+Qbert actions/963 updates with expert scale1/NOOPweight.05/cap640, plus1024 frozen
+actions;300s/60s caps. Owner`kindle-expert-qbert-smoke-20261026`. No full training
+selected. New runtime`/x/Temp/kindle-expert-20261026/runtime`; old native retained.
 See [implementation and scope](results/2026-10-25-cdp-cheap-qbert.md#optional-native-expert-imitation-implementation-and-bounded-validation).
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module

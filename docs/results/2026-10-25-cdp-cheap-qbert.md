@@ -1311,3 +1311,29 @@ training allocation, extension or seed campaign is selected.
 Implementation/build/check artifacts:
 `/x/Temp/kindle-expert-20261026`. Original runtime and all completed learner
 checkpoints remain under`/x/Temp/kindle-cheap-20261025`.
+
+
+Both bounded native checks pass; service exits22:44:40 UTC in4.947s. The analytic
+check verifies all120×18 logit derivatives with zero/.05/1 target weights and
+actor mixture0/.01. The vector check exercises invalid-before-mutation refusals,
+ordinary versus trusted overrides, tag consumption and one native learner update
+(3 expert rows, weight sum3, loss.5461493); actor parameters change. Both guards
+pass. Review SHA256`a735cae7c76459a72657206f2530285b05301641e3de83e95f38677ddebc34b9`.
+
+Release wheel/source`79c9a7f` is packaged separately at
+`/x/Temp/kindle-expert-20261026/runtime`; native SHA256
+`7c07d6702e37ca11aa20c1b35b48951f0ed01e0e1dfe72e187eac52253f8455e`.
+The prior runtime remains unchanged.477 Python tests pass against the packaged
+binding, and strict Python-binding Clippy passes. No additional native parameters.
+
+After that review, select only a fresh4096-action/963-update Qbert smoke and
+1024-action frozen restore:4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
+1009/eval4000001009,5% guided episodes capped at640 actions, expert scale1,
+NOOP weight.05 and other action weights1. Keep300s training/60s frozen caps,
+600s service cap; first update248 and zero debt. Require346 matched initial and
+unchanged frozen tensors, world/actor/critic weight changes, nonzero trusted
+movement labels and auxiliary reports, complete pixel/action replay, declared
+expert masks, config/source/counter checks and guards. This does not assess
+natural-episode competence and its experience will not seed a full learner.
+Owner`kindle-expert-qbert-smoke-20261026`; controller`run_qbert_expert1_smoke.py`.
+Artifacts`qbert-4m-48-expert1-smoke` in the new root. No full allocation selected.
