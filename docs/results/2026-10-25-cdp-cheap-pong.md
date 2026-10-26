@@ -440,3 +440,50 @@ Source at launch`d4d1093`, native`bfb8c31`, CLI`22bd61b`, replay`e853818`.
 The fresh-rate CLI change passes278 applied vector tests; native binary and
 original default rates remain unchanged. After reviewing this result, select
 the prepared Qbert5% persistent-action-aid screen under its25-minute cap.
+
+## Shorter imagination saves time but lowers the frozen score
+
+The [fixed-budget H5 test](../experiments/2026-10-26-cdp-pong-short-imagination.md)
+completes500k actions/1,999,739 emulator frames/124,939 updates in2,286.891s
+(**38m07s**),23.65% less training time than H15's49m55s and1.310× action
+throughput. Frozen score falls **14.958→8.667**, with24/24 wins for both.
+Own actual initial remains−20.375/0wins. The original mean15 gate still fails;
+retain H15, with no extension or H5 seed confirmation selected.
+
+| Imagined rollout | Actions / updates | Training wall | Frozen final / initial | Wins |
+|---|---:|---:|---:|---:|
+|H15 control|500k /124,939|49m55s|14.958 /−20.375|24/24|
+|H5 candidate|500k /124,939|38m07s|8.667 /−20.375|24/24|
+
+Only native imagination_length15→5 changes. Keep centered CDP4M/RGB48/Auto,
+3,578,225 parameters,N8/B8/T16/R32, microbatch8, replay100k, coefficient.01,
+actor_unimix0, original rates, full18/sticky.25/repeat4/noops0 and no aid.
+Fresh1009/eval4000001009 is reused development data. All346 actual-initial
+tensors and the complete semantic initial evaluation trace match the H15
+control. The CLI now permits optional fresh learning rates; both use defaults
+and the native binary is unchanged. H5 changes imagined actor/critic learning
+and bootstrapping, while replay/update cadence and15,992,192 sampled positions
+stay fixed. Native max-pooled frames receive one GPU resize.
+
+First update248, zero debt,186 natural training matches, online last50 mean11.44;
+construction2.101s is separate. The reviewed online plot shows slower early
+learning per action, then a better late online score and earlier progress in
+wall time. That does not carry over to the fixed frozen endpoint. The45-minute
+training cap is met; no cutoff, resume or selected checkpoint.
+
+Final/initial frozen use95,752/24,200 actions,382,980/96,771 emulator frames and
+40.561/10.095s. Exactly24 natural matches are collected/selected in each arm,
+with partial tails retained, zero updates/truncations and346 unchanged tensors.
+All124,939 numeric reports, four recovery audits, full config/source/counters,
+finite checkpoints, complete CPU replays/videos and three guards pass. Curves
+and comparison pass and are visually reviewed. Service exits13:18:17 UTC,
+40m02.184s total wall. The conditional4013 preparation remains unselected
+because the primary gate fails; no agent or GPU work is started for it.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-48-h5-r32-intrinsic001-500k`;
+review SHA256`b4f5a05008975edbd766bdf490e35ee4c2ed957a4d6d6f541738d0757f1d8d23`;
+curve`42800c5367f0c9d0fee5cde611ba2bb939fa1db6ffc72e74538cd5c436fa641b`;
+comparison`54c91f2ec846d10c907cf2d3a27dafffa1cf180d562c884cfe5aaf3a49f87cfb`.
+Launch source`36500e7`, native`bfb8c31`, CLI`22bd61b`, replay`e853818`.
+After completed review, select the separately prepared Breakout coefficient.01
+test at its fixed minimal4/200k budget; this result does not alter its recipe.

@@ -1,8 +1,9 @@
 # Smaller Breakout exploration bonus at the fixed200k budget
 
-**Prepared, not selected or running.** Review the active PongH5 fixed-final
-result, comparison and terminal service before selecting any next allocation.
-No automatic queue follows from this preparation.
+**Selected after completed PongH5 evaluation and comparison.** H5 saves23.65%
+training time but lowers frozen score14.958→8.667; the primary mean15 gate fails,
+so its conditional confirmation remains unselected. Proceed with this fixed
+Breakout test, keeping its prepared recipe and budget. No automatic next queue.
 
 The completed four-action Breakout control scores9.542 versus initial1.167,
 with0/24 two-wall successes, in20m59s. Its last12,500 updates have mean scaled

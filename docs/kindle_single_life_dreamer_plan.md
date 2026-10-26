@@ -172,23 +172,23 @@ both0/24 pyramids. Training20m17s versus19m45s, with10,039 verified overrides.
 All audits and completed comparison pass; service exits12:24:16 UTC. Retain the
 unaided recipe; no extension or confirmation selected.
 
-Current allocation: [Pong with H5 imagined rollouts](experiments/2026-10-26-cdp-pong-short-imagination.md),
-started12:38:15 UTC/source`36500e7` after that completed result.
-Fresh1009/eval4000001009,4M/RGB48/Auto/N8/
-B8/T16/H5/R32, coefficient.01, actor_unimix0, full18, original rates and no aid.
-Keep500k actions/124,939 updates, first248, four100k recovery checks and a45-minute
-training cap. Only imagination_length15→5 changes versus the completed B8 H15
-control; replay/cadence/sampled positions stay fixed, while imagined actor/critic
-rollouts and value bootstrapping differ. Startup verifies all346 matching initial
-tensors, full config exceptH5 and first248:1/256:2/256:3 numeric reports. Fixed final/initial24-natural-match controls retain mean15/90%-wins and
-complete numerical/config/counter/tensor/replay/guard audits. Native unchanged.
-Owner`kindle-cheap-pong-h5-intrinsic001-500k-20261026`; check live state before
-GPU work. No cap increase, resume, extension or automatic next allocation.
-The100k recovery passes with24,939 updates and346 finite tensors. Its matched
-98,304-action prefix costs440.533s versus584.186s for H15,24.59% less time;
-frozen learning remains pending. CPU analysis also motivates an
-[unselected Breakout coefficient.01 candidate](experiments/2026-10-26-cdp-breakout-smaller-bonus.md)
-at the same minimal4/200k budget; review Pong's completed result before selection.
+The [completed PongH5 test](results/2026-10-25-cdp-cheap-pong.md#shorter-imagination-saves-time-but-lowers-the-frozen-score)
+finishes500k/124,939 updates in38m07s,23.65% less training time than H15. Frozen
+8.667 is below14.958, both24/24 wins and below mean15. All audits, matched initial
+tensors/traces and comparison pass; service exits13:18:17 UTC. Retain H15; no
+extension or conditional4013 confirmation is selected.
+
+Current allocation: [Breakout with a smaller native bonus](experiments/2026-10-26-cdp-breakout-smaller-bonus.md),
+selected after completed PongH5 evaluation/comparison. Fresh1009/eval4000001009,
+4M/RGB64/Auto/N8/B8/T16/H15/R32,4,120,963 parameters, native actor mixture.01,
+minimal4 and original rates. Only intrinsic coefficient1→.01 changes versus the
+completed same-protocol control. Keep200k actions/49,939 updates, first248,
+100k recovery and30-minute training cap. Match346 initial tensors; fixed final/
+own initial24-natural-episode controls retain864-point two-wall/90%-success,
+zero updates/truncations and full numerical/config/counter/tensor/replay/guard
+audits. Native unchanged. Owner`kindle-cheap-breakout-minimal-intrinsic001-200k-20261026`;
+check live state before GPU work. No cap increase, resume, extension or automatic
+next allocation. This tests learning incentives; ensemble arithmetic stays fixed.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

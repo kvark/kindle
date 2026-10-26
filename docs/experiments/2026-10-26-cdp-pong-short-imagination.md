@@ -1,6 +1,11 @@
 # Pong with shorter imagined rollouts at a fixed500k budget
 
-**Selected after completed Qbert aided evaluation and analysis.** The aid lowers
+**Complete:**500k/124,939 updates in38m07s,23.65% less training time than H15,
+but frozen8.667 versus14.958, both24/24 wins and below mean15. All audits and
+comparison pass; service exits13:18:17 UTC. Retain H15; no extension or focused
+confirmation selected. [Full result](../results/2026-10-25-cdp-cheap-pong.md#shorter-imagination-saves-time-but-lowers-the-frozen-score).
+
+Selected after completed Qbert aided evaluation and analysis. The aid lowers
 Qbert's frozen score and coverage without a pyramid success; no extension is
 selected. PongB16 saves22.37% wall time but lowers score14.958→11.875, and doubled
 rates lower it again to9.125. This test keeps B8's original cadence and rates,
@@ -98,6 +103,9 @@ finite tensors;100,803 strict reports pass through403,464 actions. Captured
 The recovery watcher exits successfully while training continues to500k.
 
 ## Conditional confirmation preparation
+
+**Not selected:** the primary frozen8.667 fails mean15. The prepared declaration
+stays unselected, with a retained selection-decision receipt and no GPU work.
 
 Before the primary frozen result, prepare one fixed-recipe4013 confirmation,
 without selecting or starting it. It is eligible only if the completed primary

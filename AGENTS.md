@@ -51,17 +51,21 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Current allocation: Pong4M/RGB48/B8/T16/H5/R32, active from12:38:15 UTC/source
-`36500e7` after completed Qbert aided evaluation/comparison. Fresh1009/eval4000001009, Auto/N8, coefficient.01,
-actor_unimix0, full18, original rates and no aid. Fixed500k actions/124,939 updates,
-first248, four100k recoveries and45-minute training cap. Only imagined rollout
-length15→5 changes versus the B8 H15 control; preserve replay/update cadence and
-match346 initial tensors (startup passes, including first248:1/256:2/256:3).
-Fixed final/initial24-natural-match evaluations retain
-mean15/90%-wins and full numerical/config/counter/tensor/replay/guard audits.
-See`docs/experiments/2026-10-26-cdp-pong-short-imagination.md`; owner
-`kindle-cheap-pong-h5-intrinsic001-500k-20261026`. Check live state before GPU work.
-No retry, cap increase, extension or automatic next allocation.
+Current allocation: Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32, selected after
+completed PongH5 evaluation/comparison. Fresh1009/eval4000001009, minimal4,
+native actor mixture.01, original rates and no external aid. Only intrinsic
+coefficient1→.01 changes versus the completed four-action control. Keep200k
+aggregate actions/49,939 updates, first248,100k recovery and30-minute cap.
+Match346 initial tensors; fixed final/initial24-natural-episode controls retain
+864-point two-wall/90%-success and full numeric/config/counter/tensor/replay/
+guard audits. See`docs/experiments/2026-10-26-cdp-breakout-smaller-bonus.md`;
+owner`kindle-cheap-breakout-minimal-intrinsic001-200k-20261026`. Check live state
+before GPU work. No retry, cap increase, extension or automatic next allocation.
+
+PongH5 completes500k/124,939 updates in38m07s,23.65% less training time than H15,
+but frozen8.667 is below14.958; both24/24 wins and below mean15. All audits,
+matched initial tensors/traces and comparison pass; service exits13:18:17 UTC.
+Retain H15; no extension or conditional4013 confirmation selected.
 
 Qbert's5% training aid completes200k in20m17s, but lowers frozen score809.375→
 678.125 and coverage16.625→15.125, both0/24 pyramids. All audits/comparison and
