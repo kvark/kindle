@@ -21,6 +21,16 @@ median6. The trained policy reaches20 cubes once. This localizes the remaining
 task gap to incomplete first-pyramid play; it does not establish whether more
 experience, exploration, visual precision or dynamics changes would fix it.
 
+An October26 CPU follow-up tracks which cubes ever meet the existing color
+criterion, as well as the maximum simultaneously colored count. Final mean
+ever-colored coverage is16.667, and no episode ever colors all21; one cube is
+missed in21/24 episodes. Thus the evaluated policy has a per-episode coverage
+gap. This does not identify the underlying learning failure or a successful
+intervention. The8.27-second saved-action replay reproduces all original
+episode/tail outcomes, rewards, frames and resets, with no agent or GPU work.
+`tile-coverage-review.json` retains per-cube RAM addresses, masks and source/script
+hashes; it introduces no new spatial-label interpretation or training input.
+
 Training completes200,000 aggregate actions,799,342 emulator frames and49,939
 updates in1,184.523s (19m45s),168.84 actions/s. First update248, zero debt,
 442 natural training episodes, final online last50 mean677.5. Frozen evaluation
