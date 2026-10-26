@@ -115,6 +115,10 @@ final/actual-initial evaluations and full audits follow. See
 further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 CLI`1ed07af` exposes imagination length for fresh runs; existing recipes retain15
 and restores reject overrides.263 vector-runner tests pass; native is unchanged.
+A50k-action H5 warm start from retained Breakout weights is prepared, not started:
+`docs/experiments/2026-10-26-cdp-breakout-short-imagination.md`. Only imagined
+rollout length changes; require the frozen source trace to match H15 before
+learning. Training cap20 minutes. Review Qbert before selecting the allocation.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 

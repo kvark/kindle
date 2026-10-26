@@ -57,6 +57,10 @@ config/source checks, all346 initial tensors and first updates pass. No action
 aid; actor_unimix0. Fixed final/actual-initial evaluations and full audits follow.
 Check live state before GPU work. CLI`1ed07af` adds optional imagination length;
 this recipe retains15. All263 vector-runner tests pass; no native rebuild.
+A [short H5 Breakout warm start](experiments/2026-10-26-cdp-breakout-short-imagination.md)
+is prepared, not started:50k actions,20-minute cap, verified retained weights and
+a frozen source trace check before learning. Review the active Qbert result
+before allocation; no automatic queue or unchanged extension.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

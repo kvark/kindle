@@ -73,6 +73,14 @@ Fixed24-natural-episode final/actual-initial controls and full audits follow.
 The existing15k/90%-pyramid gate remains. CLI`1ed07af` keeps H15;263 vector-runner
 checks pass. No automatic next allocation, warm start or cap increase.
 
+A [prepared50k-action Breakout H5 warm start](experiments/2026-10-26-cdp-breakout-short-imagination.md)
+reuses the verified retained weights. Only imagined rollout length15→5 changes;
+T16, model geometry and the other settings remain. A frozen source trace must
+match the current H15 policy before learning. The20-minute training cap and
+source/final evaluations are fixed; review Qbert before allocation. No benefit
+is established, and restarted replay plus new experience prevent isolated
+horizon attribution without a matched H15 learning arm.
+
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
 [Auto500k comparison](results/2026-10-25-cdp-amd-precision.md) takes2h53m and scores
