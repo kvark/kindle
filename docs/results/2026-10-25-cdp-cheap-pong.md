@@ -301,3 +301,9 @@ new policy decisions or queue is performed by this review. Source hashes and
 completed control receipts are retained in
 `/x/Temp/kindle-cheap-20261025/pong-batch-width-feasibility-review.json`, SHA256
 `917fa8d8e999358830264b06ed1a376d786f76c1e66de183f2d6eb8a36ff944a`.
+
+The [bounded B16 check](../experiments/2026-10-26-cdp-pong-batch16-check.md) is now
+prepared for16,384 training actions and1,024 frozen restore actions. Its full
+configuration/counter/tensor audits and unselected guard are prepared; no GPU
+work has started and Qbert remains the active allocation. This is not a full
+Pong learning trial or an automatic queue.
