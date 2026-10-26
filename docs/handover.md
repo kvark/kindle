@@ -92,6 +92,9 @@ mean15000/90%-pyramid gate remain. Match346 initial tensors against full18 contr
 Artifacts/controller:`qbert-4m-48-r16-500k`, `run_qbert_500k_r16.py`; owner
 `kindle-cheap-qbert-r16-500k-20261026`. Check live state before GPU work.
 No Breakout extension or automatic next allocation.
+Started09:05:27 UTC, source`640f614`; full config/counters,3,578,225 parameters,
+all346 matched initial tensors and first updates pass. Recovery monitoring and
+completed analysis are active; fixed frozen results remain pending.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;

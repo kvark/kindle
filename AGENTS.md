@@ -62,6 +62,9 @@ mean15000/90%-first-pyramid gate. See
 Selection follows completed four-action Breakout:20m59s, frozen9.542 versus
 initial1.167,0/24 two-wall successes; all audits pass and service exits.
 No Breakout extension, automatic next allocation or broad campaign.
+Started09:05:27 UTC, source`640f614`; full config/counters,3,578,225 parameters,
+all346 matched initial tensors and first updates pass. Recovery monitoring and
+completed analysis are active; fixed frozen results remain pending.
 
 Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native `bfb8c31`, runner
 `1ed07af`, CPU replay `e853818`. The active declaration pins exact runtime/script

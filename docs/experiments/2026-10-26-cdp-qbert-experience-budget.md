@@ -62,7 +62,18 @@ review, three host guards, unchanged frozen tensors and complete replays before
 plotting. The comparison retains both actual initials, the original task gate,
 and separate action/time axes; experience and ratio change together. Compilation
 passes and unselected postprocessing refuses before creating artifacts. These
-scripts are not running and start no GPU work.
+scripts perform CPU analysis only after completed training/evaluation audits.
 Analysis preparation: `analysis-preparation.json`; comparison SHA256
 `faf4cb4880a48a8ae7117f141d7e39a950477569273afe8d06d1b795d9d3a646`;
 postprocessor`7d1f69b6cdcfd429c321c7a7983c4c9232119467b1e3450df7e8a72f4b4eedd0`.
+
+Started09:05:27 UTC, source`640f614`. Startup verifies the full native config
+differs only in train_ratio32→16,3,578,225 parameters, zero counters,346 finite
+initial tensors matching the full18 control and updates248:1,256:2,264:3.
+Initial metadata SHA256
+`6ddb2a18dc72b4b74c836bfe8121a8a1410e64bb5320c0008b4aae6dba0c3210`;
+selected declaration`76a6e972db87ee93bb1739edb7b8bba3944902060f8b2e6970879125a2bcc6d6`.
+Selection pins the completed Breakout review/comparison and terminal service;
+no concurrent learner was active. The250k recovery monitor and completed-run
+analysis waiter are running. Fixed final/initial evaluations and full audit
+precede plots and coverage analysis; learning results remain pending.

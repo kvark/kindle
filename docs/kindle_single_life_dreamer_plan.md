@@ -135,6 +135,9 @@ do not isolate replay ratio. The26.4-minute CPU cost projection is not a runtime
 or learning result. Match346 initial tensors; retain own initial/fixed final,
 250k recovery, full audits and the unchanged15000/90%-first-pyramid gate.
 Monitoring and completed analysis are prepared; no automatic next allocation.
+Started09:05:27 UTC, source`640f614`; full config/counters,3,578,225 parameters,
+all346 matched initial tensors and first updates pass. Recovery monitoring and
+completed analysis are active; fixed frozen results remain pending.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
