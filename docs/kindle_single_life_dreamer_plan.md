@@ -82,6 +82,14 @@ and first updates pass. Fixed24-natural-match final/actual-initial controls and
 full audits follow. This selected seed is not held out; no broad campaign,
 automatic next allocation, cap increase or unchanged extension.
 
+Prepared for review after Pong: [Qbert with six action choices](experiments/2026-10-26-cdp-qbert-minimal-actions.md),
+keeping the compact coefficient1 recipe and200k/30-minute cap. The existing
+adapter preserves timing/sticky settings; a bounded CPU comparison matches the
+shared six actions. Explicit Qbert replay support passes138 staged CPU checks
+and remains outside production until Pong's audit finishes. Changing action
+count changes initialization and policy probabilities; retain an own initial
+control and label the protocol variant. No GPU allocation has started.
+
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The
 [Auto500k comparison](results/2026-10-25-cdp-amd-precision.md) takes2h53m and scores

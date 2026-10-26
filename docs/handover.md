@@ -65,6 +65,10 @@ the unchanged15-point gate. Startup full config/source/counter checks, finite
 own actual-initial checkpoint and first updates pass. Fixed final/actual-initial
 evaluations and full audit follow. Check live state before GPU work. Native and
 training CLI remain unchanged; no automatic next allocation or extension.
+The [six-action Qbert test](experiments/2026-10-26-cdp-qbert-minimal-actions.md) is
+prepared only. Its replay support is staged outside production with138 passing
+CPU checks; apply it only after Pong's audit, then review allocation separately.
+Controller preparation is under `qbert-4m-48-r32-minimal-200k` in the artifact root.
 Current native source`bfb8c31`, runner`1ed07af`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
