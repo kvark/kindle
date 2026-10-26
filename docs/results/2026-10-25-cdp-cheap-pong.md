@@ -600,7 +600,7 @@ Prepare an alternative that requires no training: assess the fixed retained
 B8/4M/RGB48/coefficient.01 seed1009 final policy and its own actual initial
 weights using native `--greedy`. It was prepared unselected while QbertRGB64
 ran. After reviewing Qbert's lower718.750/0of24 result and passing complete
-audits, **select this frozen assessment; launch pending**.
+audits, **select this frozen assessment**. It is now complete; the result follows.
 This changes evaluation policy; preserve the original sampled14.958/−20.375
 result and its failed mean15 gate. A greedy result cannot relabel that failure.
 The existing native argmax path needs no code change, rebuild or qualification.
@@ -624,3 +624,34 @@ Candidate:`/x/Temp/kindle-cheap-20261025/pong-4m-48-intrinsic001-500k-greedy-fro
 preparation`18f6fd69bedcfe82cca8c1a4c7bb2152e68d04db853402255f50314610502b7b`;
 unselected declaration`52edc14fd1930f83e68116be965aebe9ad8cd5595d07bbc3a8e3079c9888c44b`;
 controller`adf1206b9339e26b9467c65974c52a9f187a535a8f8acee58e052577a2b7b501`.
+
+
+## Greedy evaluation does not improve the retained Pong policy
+
+Native greedy evaluation scores **14.333 versus sampled14.958**, both24/24 wins
+and both below the unchanged mean15 gate. Own initial greedy scores−20.833 with
+0/24 wins, versus sampled−20.375. Retain sampled evaluation; no greedy seed
+confirmation or training extension is selected. This is one reused learner and
+a changed evaluation protocol, not a new independent training result.
+
+The fixed retained B8/4M48/Auto/N8/T16/H15/R32/coefficient.01 final and actual
+initial weights keep their full18/sticky.25/native one-resize configuration.
+The assessment starts18:43:09 UTC/source`9989fa6`, owner
+`kindle-cheap-pong-greedy-frozen-20261026`, with zero new training actions or
+updates. Original training cost remains500k/124,939 updates/49m55s. Startup
+verifies unchanged native config, retained counters and `evaluate_greedy`.
+
+Final/initial use77,640/20,288 actions and310,513/81,145 emulator frames in
+29.564/7.757s. Exactly24 natural matches per arm, no excess, all partial tails
+retained, zero updates/truncations. All346 frozen tensors and original source
+files remain unchanged. Full configuration/counter/finite-tensor, CPU replay/
+video and both host guards pass. Service exits successfully18:44:25 UTC,
+1m16.097s total wall. No retry, GPU repetition or host recovery. The sampled
+control ran on the earlier kernel/module; this is not an isolated sampler effect.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/pong-4m-48-intrinsic001-500k-greedy-frozen`.
+Selected declaration SHA256`0249a71b189474ea3dbb5446a8909127b3aba2dab2be29428c2b05005da7d6c0`;
+startup`cdc25bf469e693cd62790679d85e32eeede753b059fb75b658fb4a329ad6c117`;
+review`36b31032e9a76f6e1975e412ed6840bfe303970682c578af40c0b7838bafdf33`;
+completion`d689faa46e32f87424ee2950f3134d0dc8f7acb6e5fe894608591683dcfc9c92`.
+Native`bfb8c31`, runner`fbdaee3`, replay`5043b7a`; no next allocation selected.

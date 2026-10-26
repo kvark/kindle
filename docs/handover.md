@@ -187,21 +187,22 @@ guard/100k recovery/curve/coverage/comparison checks pass; service exits18:39:49
 UTC. Retain RGB48; no extension or confirmation. Geometry, parameter shapes,
 initialization and old/new kernel/module limit attribution.
 
-After reviewing that outcome, select the [Pong greedy-action assessment](results/2026-10-25-cdp-cheap-pong.md#entropy-review-and-unselected-greedy-action-assessment).
-It reuses fixed B8/4M48/coefficient.01 seed1009 final/own initial weights with
-zero learning. Keep eval4000001009,N8/full18/sticky.25,24 natural matches per
-arm,600k-action/300-second caps and mean15/90%-wins/full346-tensor/replay/guard
-checks. Preserve sampled14.958/−20.375 and the original49m55s training cost;
-greedy evaluation cannot relabel the sampled failure. Launch pending. No
-extension or automatic confirmation/next allocation.
+The [completed Pong greedy-action assessment](results/2026-10-25-cdp-cheap-pong.md#greedy-evaluation-does-not-improve-the-retained-pong-policy)
+scores14.333 versus sampled14.958, both24/24 wins and below mean15. Own initial
+greedy−20.833/0 wins. Final/initial77,640/20,288 actions and310,513/81,145 frames
+in29.564/7.757s, zero learning,24 natural matches each. All346 frozen tensors,
+source files, config/counters, complete replays/videos and both guards pass;
+service exits18:44:25 UTC. Retain sampled evaluation; no greedy confirmation.
+The retained learner's49m55s training cost remains. No active GPU work or selected
+next allocation after this review; the five-game goal remains unfinished.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
 512-action restore/346-tensor invariance and natural frozen evaluation pass.
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
-Check live service state before GPU work; selected frozen-assessment owner
-`kindle-cheap-pong-greedy-frozen-20261026`.
+Check live service state before GPU work; the latest frozen-assessment owner
+`kindle-cheap-pong-greedy-frozen-20261026` has completed.
 
 Current native source`bfb8c31`; runner`fbdaee3` adds opt-in CDP actor/critic gradients, SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`. Native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

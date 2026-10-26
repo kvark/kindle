@@ -51,12 +51,12 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Selected frozen-only Pong greedy assessment, reusing fixed B8/4M48/coefficient.01
-seed1009 final/own initial weights. Zero learning; keep eval4000001009,N8,
-full18/sticky.25,24 natural matches per arm,600k-action/300-second caps and
-mean15/90%-wins/full audits. Preserve sampled14.958/−20.375 and49m55s training
-cost. Launch pending; owner`kindle-cheap-pong-greedy-frozen-20261026`.
-Check live state before GPU work. No extension or automatic next allocation.
+No active GPU work or selected next allocation after the completed Pong greedy
+assessment. It scores14.333 versus sampled14.958, both24/24 wins and below
+mean15. Own initial−20.833/0 wins; zero learning. Full config/counter/346-tensor/
+replay/guard checks and source-file invariance pass; service exits18:44:25 UTC.
+Retain sampled evaluation and the learner's49m55s training cost; no greedy
+confirmation. Check live state before GPU work. The five-game goal is unfinished.
 
 QbertRGB64 finishes200k/49,939 updates in22m20s,13.14% more time than RGB48,
 with lower frozen718.750 versus809.375 and coverage15.083 versus16.625/21;
