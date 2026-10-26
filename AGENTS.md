@@ -51,21 +51,20 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Active fresh Breakout4M/RGB64/Auto/N8/B8/T16/H15/R32 learning test, minimal4,
-coefficient1/actor.01, original rates,1009/eval4000001009, no aid. Only native
-actor_critic_gradientfalse→true changes. Keep200k/49,939 updates/first248,
-100k recovery, zero debt and30-minute training cap. Fixed final/own initial24
-natural episodes retain864-point two-wall/90%-success gate and full audits.
-Started17:43:46 UTC/source`710fd6d`; startup passes357 own initial tensors,346
-shared control tensors and248:1/256:2/256:3 updates. Owner
-`kindle-cheap-breakout-acgrads-200k-20261026`. See
-`docs/experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md`. Check live
-state before GPU work. No cap increase, extension or automatic next allocation.
+Selected fresh Qbert4M/RGB64/Auto/N8/B8/T16/H15/R32, full18, coefficient1/
+actor0/ac_gradsfalse, original rates,1009/eval4000001009, no aid. Only native
+geometry changes versus Qbert48; parameters and initialization also change.
+Keep200k/49,939 updates/first248,100k recovery, zero debt,30-minute training cap,
+fixed final/own initial24 natural episodes and15k/90%-pyramid gate/full audits.
+Launch pending; owner`kindle-cheap-qbert-rgb64-200k-20261026`. See the cheap-Qbert
+report. Check live state before GPU work. No extension or automatic next run.
 
-Breakout's100k recovery passes24,939 updates/all357 tensors; watcher exits
-successfully. A Qbert4M/RGB64/H15/full18/200k option is prepared outside Git,
-unselected, using the completed native geometry. See the cheap-Qbert report.
-Review active Breakout's completed outcome before choosing another allocation.
+Breakout actor/critic gradients finish200k/49,939 updates in20m41s, frozen11.208
+versus9.542, both0/24 two-wall successes. All357-tensor/recovery/replay/guard
+checks and matched shared initial weights/traces pass; main service exits
+18:05:14 UTC. Original CPU comparison import failure is retained; separate
+repair passes without GPU repetition. Modest unconfirmed gain, older-kernel
+control; no extension, seed confirmation or global default change selected.
 
 The bounded actor/critic check passes4096/963 in22.474s and1024 frozen actions
 in0.489s, all357 tensors unchanged, all963 initial policy/value losses nonzero,

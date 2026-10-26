@@ -170,26 +170,23 @@ control. Both guards pass; service exits17:34:23 UTC. This verifies execution,
 not useful task learning or gradient correctness. Native unchanged; the exact
 313-test CLI patch is applied as runner`fbdaee3`.
 
-After this review, select a separate fresh200k/49,939-update learning life,
-4M64/Auto/N8/B8/T16/H15/R32, minimal4/coefficient1/actor.01, original rates/no aid.
-Only actor_critic_gradient changes versus the control. Keep100k recovery,
-30-minute cap and fixed final/actual-initial24-natural-episode evaluations,
-with the original864-point two-wall/90%-success gate and complete357-tensor/
-replay/guard audits. No smoke experience is reused. Started17:43:46 UTC/source
-`710fd6d`; startup passes full config except the flag,357 initial tensors matching
-the smoke,346 shared tensors matching the control and248:1/256:2/256:3 updates.
-Recovery monitoring, fixed evaluations and comparison are attached. The100k
-recovery passes24,939 updates/all357 tensors; stable103,872-action prefix has
-25,905 finite reports,102,400 progress633.657s and zero debt. Its watcher exits
-successfully; frozen quality remains pending. No cap increase, extension,
-selected checkpoint or automatic next allocation.
+The [completed Breakout actor/critic test](results/2026-10-26-cdp-breakout-minimal-actions.md#actorcritic-gradients-give-a-modest-unconfirmed-gain)
+finishes200k/799,187 frames/49,939 updates in20m41s, with frozen11.208 versus
+9.542 and own initial1.167; both0/24 two-wall successes. All357-tensor/frozen,
+100k recovery, numerical/replay/guard checks and matched346 shared initial
+weights/semantic traces pass. Main service exits18:05:14 UTC. A separate CPU
+comparison import failure is retained; corrected comparison passes without
+repeating GPU work. This is a modest unconfirmed gain, with an older-kernel
+control; no extension, seed confirmation or global default change is selected.
 
-An [unselected QbertRGB64 option](results/2026-10-25-cdp-cheap-qbert.md#rgb64-compact-option-cpu-preparation-only)
-is prepared at the original4M/H15/full18 recipe and fixed200k/30-minute budget.
-CPU checks verify the already completed native shape, actual100k recovery,
-control reader and refusal while unselected. Geometry also changes parameters
-and initialization; this does not diagnose RGB48 or establish useful learning.
-No GPU work follows preparation; review active Breakout before choosing next.
+Select the [prepared QbertRGB64 test](results/2026-10-25-cdp-cheap-qbert.md#rgb64-compact-option-cpu-preparation-only)
+after reviewing that completed result. Fresh1009/eval4000001009,4M/RGB64/Auto/
+N8/B8/T16/H15/R32, full18/coefficient1/actor0, original rates/no aid, ac_gradsfalse.
+Only native geometry changes versus Qbert48; parameters and initialization also
+change. Keep200k/49,939 updates, first248,100k recovery, zero debt,30-minute
+training cap and fixed final/own initial24 natural episodes with full346-tensor/
+replay/coverage/guard checks and unchanged15k/90%-pyramid gate. Launch pending;
+no cap increase, extension or automatic next allocation.
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
@@ -197,7 +194,7 @@ New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
 Check live service state before GPU work; selected learning owner
-`kindle-cheap-breakout-acgrads-200k-20261026`.
+`kindle-cheap-qbert-rgb64-200k-20261026`.
 
 Current native source`bfb8c31`; runner`fbdaee3` adds opt-in CDP actor/critic gradients, SHA256`d190fd9ad314c6d242d68163fcdf89db3d406fab0f6fe9e51cd9cd03eddc1ee5`. Native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

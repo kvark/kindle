@@ -1,12 +1,12 @@
 # Breakout actor/critic gradients
 
-**Bounded check passes; fresh200k learning test active from17:43:46 UTC.**
-The smoke completes4096 actions/963 updates in22.474s, with357 finite tensors,
-nonzero initial policy/value losses, changed encoder/reward weights and exact
-1024-action frozen restore. After reviewing this execution evidence, select a
-separate fresh200k/49,939-update life with a30-minute training cap and the fixed
-final/actual-initial24-natural-episode protocol. No validation experience is
-reused. Useful learning remains unmeasured; no extension or automatic next run.
+**Completed:200k/49,939 updates in20m41s; frozen11.208 versus9.542.**
+Both recipes remain0/24 two-wall successes. Full357-tensor, recovery, replay and
+guard audits pass; main service exits18:05:14 UTC. A separate CPU comparison
+import failure is preserved and repaired without repeating any GPU stage.
+See the [completed result](../results/2026-10-26-cdp-breakout-minimal-actions.md#actorcritic-gradients-give-a-modest-unconfirmed-gain).
+This modest gain on one reused seed remains unconfirmed. No extension or seed
+confirmation is selected; the CLI default remains false.
 
 ## Preparation before GPU execution
 

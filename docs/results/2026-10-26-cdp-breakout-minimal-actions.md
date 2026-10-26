@@ -115,3 +115,50 @@ Review SHA256 `14a9d375e9767e5f0f01b1c1e3cef4831a77572631b5fed2f2f5894d0b7e5941`
 curve `b6cb638a385f0e7663a49c7992bef7ffdf04b22d9126815aedddcf6cc2afbbb8`;
 comparison `0e49b543597c67c2052f0e73c363c58c4503ca0b96de551d1faa05aa18ac7043`;
 CPU repair `6c649f5d571cdf79a45a778691ba055f7892b72056f60d9e585a6afc7e11c780`.
+
+
+## Actor/critic gradients give a modest unconfirmed gain
+
+Enabling native actor/critic gradients raises frozen score **9.542→11.208**,
+versus the same actual-initial1.167. Both remain0/24 two-wall successes. This
+is one reused development seed, far below the864-point/90%-success gate. Keep
+this as an unconfirmed development result; no extension, seed confirmation or
+global default change is selected.
+
+The fresh1009 learner keeps4M/RGB64/Auto/N8/B8/T16/H15/R32, minimal4,
+coefficient1/actor.01, original rates and no external aid. Only native
+`actor_critic_gradient` changes. It completes **200,000 actions /799,187 emulator
+frames /49,939 updates in1,241.483s (20m41s)**, versus20m59s for the control.
+The1.40% lower wall cost is not an isolated flag effect: the kernel/module also
+changed. First update248,6,392,192 sampled positions,476 natural training
+episodes, zero debt and online last50 mean9.26. Construction2.047s is separate.
+The reviewed curves show a late online gain; no earlier checkpoint is selected.
+
+Frozen final/initial use36,928/4,984 actions,147,657/19,891 frames and
+15.522/2.209s. Final collects41 natural episodes and initial24; select the first
+three per lane,24 per arm, retaining17 excess final episodes and all partial
+tails. Both have zero updates/truncations and all357 tensors unchanged. Eleven
+extra world tensors are frozen actor copies; trainable count stays4,120,963.
+All346 shared initial tensors and semantic initial evaluation traces match the
+control. Full config/counter checks,100k recovery, every49,939 finite report,
+CPU replays/videos and three host guards pass. Every initial policy/value loss
+report is nonzero; this does not prove raw-gradient correctness or causality.
+
+The main training/evaluation service exits successfully at18:05:14 UTC,
+21m27.619s total. A separate CPU comparison postprocessor fails because its
+checkpoint-helper import transitively requires `ale_py`, absent from the plot
+venv. Preserve that original failure. A separate v2 comparator copies the exact
+pure shared-initial comparison function and removes the unused ALE import;
+all original pinned scripts, GPU logs, reviews, replays and plots are unchanged.
+The corrected comparison passes and its plot is reviewed. No GPU stage repeats.
+
+Artifacts:`/x/Temp/kindle-cheap-20261025/breakout-4m-64-r32-minimal-acgrads-200k`.
+Launch source`710fd6d`, native`bfb8c31`, runner`fbdaee3`, replay`5043b7a`.
+Review SHA256`97c4b183bac0b18ee5665bfaf9720d37e54d10754a75c008e781c15659026b4a`;
+curve`8775a94c804f243e728ef5a4aaa0f9bb5899c71f9fb0eb475de9f2026f1e19be`;
+v2 comparison`1481c67401988023d460b30519f11711f278ecc08c38f7c5d7e44f4d50c407fb`;
+completion after CPU repair`da46a2559aa00efe0ea6a26728862dcedffecde3d297276b366d19e422a653cc`.
+Original `postprocess-command-1.json`, repaired command, input-invariance and
+terminal-service receipts remain beside the result. The
+[experiment declaration](../experiments/2026-10-26-cdp-breakout-actor-critic-gradients.md)
+retains preparation, startup and recovery evidence.

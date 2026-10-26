@@ -560,8 +560,9 @@ No active or selected next GPU allocation after this review.
 After the completed H30, capacity, bonus, action-vocabulary and random-aid
 results, prepare a different compact option:4M/RGB64 with the original H15,
 full18 actions, coefficient1/actor0, Auto/N8/B8/T16/R32 and original rates.
-It remains **unselected** while the Breakout actor/critic learner runs. Its
-completed result must be reviewed before choosing the next GPU allocation.
+It was prepared unselected while Breakout ran. After reviewing Breakout's
+completed11.208/0of24 result and corrected CPU comparison, **select this fixed
+200k test; launch pending**. Breakout receives no extension or confirmation.
 
 The saved native/RGB48/RGB64 scene at action256 retains a visible board at both
 sizes; it does not show that RGB48 caused the missing-cube problem. Testing64
@@ -577,7 +578,7 @@ cost context, not a Qbert timing prediction or learning result. No new native
 build, GPU qualification, agent or game collection is performed for preparation.
 Native max-pooled frames still receive one GPU resize.
 
-If separately selected, keep fresh1009/eval4000001009,200k/49,939 updates,
+The selected run keeps fresh1009/eval4000001009,200k/49,939 updates,
 6,392,192 sampled positions,95,882,880 imagined actor rows, first248, zero debt
 and30-minute training cap. Retain100k recovery and fixed200k final, fixed
 final/own initial24 natural episodes,600k-action/300-second evaluation caps,
