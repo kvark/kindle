@@ -41,7 +41,15 @@ Audit cap1200 seconds; service cap3660 seconds.
 Artifacts: `/x/Temp/kindle-cheap-20261025/freeway-1m-32-500k-r32-aided`.
 Controller: `run_freeway_500k_r32_32_aided.py`. Intended service:
 `kindle-cheap-freeway-32-r32-500k-aided-20261026`.
-Commands, caps, recipe differences and source hashes are prepared. Launch only
-after reviewing the active Breakout mixture result; this is not an automatic
+Commands, caps, recipe differences and source hashes are sealed before launch.
+Both Breakout mixture reviews complete with failed task gates; see the
+[result](../results/2026-10-26-cdp-breakout-unimix.md). This is not an automatic
 queue. Seed1009 is reused development data. A useful result warrants focused
 confirmation, not a broad seed campaign or five-game reliability claim.
+
+Started October26 at01:24:36 UTC after reviewing both completed Breakout audits.
+Startup checks pass:834,673 parameters, expected config/aid/source, finite zero-
+experience checkpoint, all346 initial tensors equal the same-seed RGB32 smoke,
+and first updates248:1,256:2,256:3. Source at launch`541c90b`; native`bfb8c31`,
+runner`bcef410`. `startup-review.json` retains the checks. Result pending;
+inspect the named service before additional GPU work.

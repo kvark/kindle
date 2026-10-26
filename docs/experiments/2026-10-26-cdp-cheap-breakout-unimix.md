@@ -53,7 +53,9 @@ actor_unimix, native SHA is unchanged and first updates are248:1,256:2,256:3.
 `startup-review.json` retains those checks. Source at launch`bcef410`; native
 source`bfb8c31`, SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
-The result remains pending; inspect the service before further GPU work.
+Completed200k in22m29s with frozen7.0833 versus initial1.375,0/24 two-wall
+successes; all audits pass and the service exits. See the
+[result and sampling control](../results/2026-10-26-cdp-breakout-unimix.md).
 
 ## Separate frozen sampling control
 
@@ -76,7 +78,8 @@ independent trained learner or held-out test.
 
 Artifacts: `/x/Temp/kindle-cheap-20261025/breakout-unimix-acting-only-probe`.
 Controller: `run_breakout_acting_probe.py`; intended service:
-`kindle-cheap-breakout-unimix-acting-probe-20261026`. Launch only after the active
-200k run and its complete frozen audit finish. Review this short control before
-starting the separately prepared Freeway test. The primary training comparison
-retains its declared budget and fixed final/initial evaluations.
+`kindle-cheap-breakout-unimix-acting-probe-20261026`. This control runs after the
+200k experiment and its complete audit finish. It completes with frozen6.0833,
+0/24 two-wall successes in9.801s and zero updates; all audits pass and service
+exits. Its review precedes the separate Freeway test. The primary training
+comparison retains its declared budget and fixed final/initial evaluations.

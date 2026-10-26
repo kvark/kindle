@@ -18,6 +18,7 @@ is separate. Each row is one development seed, not a reliability result.
 | [Pong4M/RGB48/R16](results/2026-10-25-cdp-cheap-pong.md) |200k /24,970|10m22s|−17.125 /−20.375|0/24 wins|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
+| [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
 
 Boxing's cheap AMD recipe now passes on two fresh learners, each within30 minutes;
 this is useful confirmation, not broad seed reliability. The retained
@@ -30,14 +31,16 @@ establish a universal capacity or resolution rule.
 Breakout's smaller model gains modestly, with lower score per action than the
 earlier T64 run but3.07× lower wall cost at the shared196,608-action point. One
 selected frozen episode waits12061 actions after losing a life before choosing
-FIRE. The declared native policy exploration-floor test now follows; the CPU
-observation does not establish its benefit. No extension of the completed life.
+FIRE. Training with native actor mixture.01 scores7.0833 and reduces the longest
+selected no-FIRE gap12115→447. Adding the mixture only to the baseline frozen
+weights scores6.0833, gap724, with zero updates. All task gates still fail;
+shorter rollouts are useful but not Breakout success. No unchanged extension.
 
-**Current allocation:** [Breakout1% native policy mixture](experiments/2026-10-26-cdp-cheap-breakout-unimix.md).
-Keep the completed control's fresh1009/4M/RGB64/Auto/R32 recipe,200k budget and
-30-minute training cap; change only actor_unimix0→.01. Its saved mixture remains
-active during frozen sampling. Fixed24-natural-episode final/actual-initial
-controls and full audits. Native code is unchanged;255 CLI/runner CPU tests pass.
+**Current allocation:** [compact aided Freeway](experiments/2026-10-26-cdp-cheap-freeway-update-budget.md).
+Fresh1009/1M/RGB32/Auto/B8/T16/R32,500k actions/124939 expected updates and the
+30-minute training cap. Keep5% persistent-uniform16-action aid in training only;
+actor_unimix remains0. Fixed24-natural-episode final/actual-initial controls and
+full audits. Startup checks and all346 same-seed RGB32 initial tensors pass.
 
 Earlier context comparisons are complete: [AMD B2/T64 F16](results/2026-10-25-cdp-amd-takeover.md)
 finishes2M in11h40m, frozen500k/final/initial14.71/10.04/1.42. The

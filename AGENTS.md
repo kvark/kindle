@@ -83,13 +83,18 @@ Breakout4M/RGB64/R32 completes200k in22m30s: frozen6.2083 versus1.375,0/24
 two-wall successes, all audits pass. One selected episode waits12061 actions
 after a lost life before choosing FIRE; CPU replay verifies this stall. See
 `docs/results/2026-10-26-cdp-cheap-breakout.md`; no extension.
-Current allocation: fresh Breakout1009,4M/RGB64/Auto/B8/T16/R32,200k actions,
-expected49939 updates,30-minute training cap and fixed24-natural-episode
-final/actual-initial evaluations. Change only native actor_unimix0→.01 against the
-completed control; retain the saved mixture in frozen sampling. CLI exposure
-passes255 CPU tests; native code is unchanged. No forced FIRE or RAM input. See
-`docs/experiments/2026-10-26-cdp-cheap-breakout-unimix.md`;
-service owner `kindle-cheap-breakout-unimix001-200k-20261026`. Check its live state before
+Breakout's1% mixture test also completes: frozen7.0833 versus initial1.375 in
+22m29s, longest selected no-FIRE gap447 versus control12115. The original trained
+weights with only frozen mixture score6.0833 and gap724 in9.8s, zero updates.
+All three policies remain0/24 two-wall successes; all audits pass and services
+exit. See `docs/results/2026-10-26-cdp-breakout-unimix.md`; no extension.
+Current allocation: fresh Freeway1009,1M/RGB32/Auto/B8/T16/R32,500k actions,
+expected124939 updates,30-minute training cap and fixed24-natural-episode
+final/actual-initial evaluations. Keep5% persistent-uniform16-action aid in
+training only; actor_unimix remains0. Complete config/source checks, all346
+same-seed RGB32 initial tensors and first updates pass. See
+`docs/experiments/2026-10-26-cdp-cheap-freeway-update-budget.md`;
+service owner `kindle-cheap-freeway-32-r32-500k-aided-20261026`. Check its live state before
 further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.

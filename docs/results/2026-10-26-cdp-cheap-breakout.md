@@ -74,6 +74,6 @@ Review SHA256
 `50f0df9952d48383dc3d18960e3df16d696301211523c26531f7a18d41189c8f`.
 Native`bfb8c31`, runner`a99416e`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
-One reused development seed; no reliability or superiority claim. Boxing's
-separate seed4013 confirmation now passes. The current allocation is the
-[fresh1% native policy-mixture test](../experiments/2026-10-26-cdp-cheap-breakout-unimix.md).
+One reused development seed; no reliability or superiority claim. The follow-up
+[1% native policy-mixture test and frozen sampling control](2026-10-26-cdp-breakout-unimix.md)
+are now complete; all policies remain below the two-wall gate.

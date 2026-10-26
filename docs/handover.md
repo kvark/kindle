@@ -29,14 +29,17 @@ of21 cubes; all audits pass, but the task gate fails. No extension.
 [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) finishes200k in
 22m30s: frozen6.2083 versus1.375,0/24 two-wall successes, all audits pass. A CPU
 replay verifies one12061-action delay before FIRE after a lost life. No extension.
-Current allocation: [Breakout1% native policy mixture](experiments/2026-10-26-cdp-cheap-breakout-unimix.md),
-service `kindle-cheap-breakout-unimix001-200k-20261026`. Keep the completed control's
-fresh1009/4M/RGB64/Auto/R32 recipe,200k budget and30-minute cap; change only
-actor_unimix0→.01. The saved policy mixture remains active during frozen sampling.
-CLI exposure passes255 CPU tests; native code is unchanged. All346 initial
-tensors match the control, complete config differs only in the mixture, and
-first updates pass. Check the service state before GPU work; do not restart
-completed screens.
+[Breakout's1% native mixture](results/2026-10-26-cdp-breakout-unimix.md) completes
+200k in22m29s: frozen7.0833 versus initial1.375, longest selected no-FIRE gap447
+versus control12115. The baseline weights with only frozen mixture score6.0833
+with gap724 in9.8s and zero updates. All three policies remain0/24 two-wall
+successes. All audits pass and services exit; no extension.
+Current allocation: [compact aided Freeway](experiments/2026-10-26-cdp-cheap-freeway-update-budget.md),
+service `kindle-cheap-freeway-32-r32-500k-aided-20261026`. Fresh1009/1M/RGB32/Auto/
+B8/T16/R32,500k actions/124939 expected updates,30-minute cap. Keep5% persistent-
+uniform16-action aid in training only; actor_unimix remains0. Finite/config/source
+checks, all346 initial tensors against the same-seed RGB32 smoke and first updates
+pass. Check the service state before GPU work; do not restart completed screens.
 Current native source`bfb8c31`, runner`bcef410`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
