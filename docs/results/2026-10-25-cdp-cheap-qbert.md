@@ -1151,8 +1151,9 @@ path, separate from random exploration and ordinary actions. Replay's incoming
 must use the action stored at t+1, within the same lane and valid episode boundary.
 A native auxiliary actor loss would be a new algorithm intervention requiring
 alignment/gradient checks, unchanged default behavior and unaided frozen task
-evaluation. **No imitation implementation or allocation is selected.** The
-prepared reward-forecast check remains unselected while Pong trains.
+evaluation. At this review, no imitation implementation or allocation was
+selected. The completed forecast check and later optional implementation are
+recorded below; this source-path review describes the retained original runtime.
 
 Source locations: [override path](../../kindle/src/dreamer/agent/vector.rs),
 [replay frame semantics](../../kindle/src/dreamer/replay.rs),
@@ -1337,3 +1338,47 @@ expert masks, config/source/counter checks and guards. This does not assess
 natural-episode competence and its experience will not seed a full learner.
 Owner`kindle-expert-qbert-smoke-20261026`; controller`run_qbert_expert1_smoke.py`.
 Artifacts`qbert-4m-48-expert1-smoke` in the new root. No full allocation selected.
+
+
+## Native expert-imitation smoke passes; task benefit remains unmeasured
+
+The selected fresh check/source`0bb6939` completes4096 aggregate actions/16,378
+emulator frames/963 updates in **22.662s**, first update248 and zero debt. Frozen
+1024 actions/4096 frames take0.452s, with zero learning and zero natural episodes.
+The service exits successfully **22:49:20 UTC**, total32.565s including setup,
+frozen restore and CPU audits. No cap increase or GPU repeat occurs.
+
+All963 reports and346 checkpoint tensors are finite. All346 actual-initial
+tensors match the retained unaided4M48 control, and all346 trained tensors remain
+unchanged after restore/frozen evaluation. The selected CNN/reward/actor/critic
+weights change; parameter count remains3,578,225. Both guards, config/source/
+counter checks, explicit trusted-label masks and full training pixel/action
+replay pass. The teacher executes512 actions (12.5% of this short run):474 NOOP
+and38 movement actions. The schedule still selects episodes at5%; actual action
+share is measured separately.
+
+611 of963 updates contain expert labels. Across sampled replay,13,785 labelled
+rows carry total weight1524.300 and accumulated unscaled auxiliary loss33.4449.
+These are repeated replay exposures, not additional environment actions. Zero-
+label updates have zero auxiliary loss. No aggregate label accuracy or task
+competence is claimed; frozen natural-episode assessment is still required.
+The short timing is execution cost, not an isolated performance comparison.
+
+A strengthened vector test disables the imagined policy loss entirely; the
+expert loss still changes actor parameters (3 labelled rows, weight3, loss.5461493).
+Its separately guarded service passes and exits22:51:05 UTC. The analytic test
+already checks weighted/masked logit derivatives. This one-line test-only change
+does not change the packaged release native. Review SHA256
+`e67d9dea6938284ce2cd876caf4f17cceeaa95de899db199698ad413bfc98e2b`.
+
+Smoke review SHA256`cd942380d147d839d01ec18457075a48909d72de13a1fc06612c7d10bdc3b537`;
+completion`fcaecb6bd346117cebd7fc38374f8d6752e18018dee72ce68997ccfbf3631f45`.
+The isolated wheel/runtime, validation executables and all evidence remain in
+`/x/Temp/kindle-expert-20261026`. The2.7GiB disposable build cache is released
+after packaging. Original native and learned checkpoints remain unchanged.
+
+The next learning decision can use this qualified optional path in a fresh,
+capped comparison against the completed640-action guidance and unaided controls.
+Its benefit is not established by finite losses or a short execution check.
+No full training allocation, unchanged extension or seed campaign is selected
+by this smoke result. Never reuse the smoke's experience as a fresh learner.

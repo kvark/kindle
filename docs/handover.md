@@ -267,15 +267,17 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-Optional native expert imitation is implemented, default-disabled, with127 CPU
-Rust tests/strict Clippy and477 Python tests passing. Only explicit expert
-actions create replay labels; per-action weights can downweight NOOP. Select
-bounded gradient/vector checks now pass (service exits22:44:40 UTC). The separate
-release wheel passes477 Python tests and binding Clippy. Select only4096 fresh
-Qbert actions/963 updates with expert scale1/NOOPweight.05/cap640, plus1024 frozen
-actions;300s/60s caps. Owner`kindle-expert-qbert-smoke-20261026`. No full training
-selected. New runtime`/x/Temp/kindle-expert-20261026/runtime`; old native retained.
-See [implementation and scope](results/2026-10-25-cdp-cheap-qbert.md#optional-native-expert-imitation-implementation-and-bounded-validation).
+Optional native expert imitation passes127 Rust CPU tests/strict Clippy,
+477 packaged Python tests/binding Clippy, analytic GPU gradients and an actor-
+only supervised update. Fresh Qbert4096 actions/16,378 frames/963 updates take
+22.662s;1024 frozen actions take.452s,346 matched initial/unchanged frozen tensors,
+512 verified expert actions (38 movement),611 nonzero auxiliary reports and full
+pixel replay/guards pass. Service exits22:49:20; strengthened actor-only check
+exits22:51:05 UTC. Native`79c9a7f`, isolated runtime
+`/x/Temp/kindle-expert-20261026/runtime`; original native retained. Scale1,
+NOOPweight.05,5% episode guidance/cap640; no natural-episode competence measured.
+No GPU allocation is active or queued. Build cache released after packaging.
+See [bounded result](results/2026-10-25-cdp-cheap-qbert.md#native-expert-imitation-smoke-passes-task-benefit-remains-unmeasured).
 
 New boot`a8648671-8577-4f42-9b46-a4345d3ac297`, kernel7.0.0-38, AMD module
 `9BDBC866F55BF296F1B7FA2`; same RX7900XT/Mesa26.0.8/native binary. Host scan,
@@ -284,13 +286,14 @@ No host recovery performed. Qbert's refreshed queue uses this identity; its H15
 control used7.0.0-34, so record the kernel change as a comparison confound.
 Check live service state before GPU work. Whole-episode and capped Qbert
 guidance, Pong RGB32, Pong behavior-rate learning and their postprocessing are
-complete, including the fixed frozen Qbert forecast comparison. The newly selected bounded expert checks are described above. Do not restart
+complete, including the fixed frozen Qbert forecast comparison. The bounded expert checks also complete as described above. Do not restart
 completed services.
 
-Current native source`bfb8c31`; the runner now supports optional per-episode
+Original compact native source`bfb8c31`; its retained runner supports per-episode
 Qbert guidance limits, SHA256
 `50ba7759d4ff108d724e831d83fda69c9d4f4dce3da660cebf394f995cac98da`.
-Use the `runtime-qbert-guidance-cap` Python overlay; frozen replay remains
+Use `runtime-qbert-guidance-cap` for that retained runtime. The expert candidate
+uses the isolated79c9a7f runtime described above. Frozen replay remains
 `5043b7a` and the current guidance replay supports both bounded and whole-episode
 kinds. The selected declaration pins exact source hashes. Native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.

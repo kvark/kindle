@@ -98,15 +98,17 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](docs/results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-Optional native expert imitation is implemented, default-disabled, with127 CPU
-Rust tests/strict Clippy and477 Python tests passing. Only explicit expert
-actions create replay labels; per-action weights can downweight NOOP. Select
-bounded gradient/vector checks now pass (service exits22:44:40 UTC). The separate
-release wheel passes477 Python tests and binding Clippy. Select only4096 fresh
-Qbert actions/963 updates with expert scale1/NOOPweight.05/cap640, plus1024 frozen
-actions;300s/60s caps. Owner`kindle-expert-qbert-smoke-20261026`. No full training
-selected. New runtime`/x/Temp/kindle-expert-20261026/runtime`; old native retained.
-See [implementation and scope](docs/results/2026-10-25-cdp-cheap-qbert.md#optional-native-expert-imitation-implementation-and-bounded-validation).
+Optional native expert imitation passes127 Rust CPU tests/strict Clippy,
+477 packaged Python tests/binding Clippy, analytic GPU gradients and an actor-
+only supervised update. Fresh Qbert4096 actions/16,378 frames/963 updates take
+22.662s;1024 frozen actions take.452s,346 matched initial/unchanged frozen tensors,
+512 verified expert actions (38 movement),611 nonzero auxiliary reports and full
+pixel replay/guards pass. Service exits22:49:20; strengthened actor-only check
+exits22:51:05 UTC. Native`79c9a7f`, isolated runtime
+`/x/Temp/kindle-expert-20261026/runtime`; original native retained. Scale1,
+NOOPweight.05,5% episode guidance/cap640; no natural-episode competence measured.
+No GPU allocation is active or queued. Build cache released after packaging.
+See [bounded result](docs/results/2026-10-25-cdp-cheap-qbert.md#native-expert-imitation-smoke-passes-task-benefit-remains-unmeasured).
 
 The bounded guidance check completes4096/963 in22.541s and1024 frozen actions
 in0.452s;512 verified overrides,346 matched initial/unchanged frozen tensors,
@@ -209,11 +211,12 @@ but frozen11.875 is below14.958; both24/24 wins and below mean15. All audits and
 comparison pass; service exits10:28:51 UTC. No extension or confirmation.
 Qbert500k/R16 remains weaker than its200k/R32 control, with0/24 pyramids.
 
-Runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native`bfb8c31`, frozen CPU
-replay`5043b7a`; the new runner/replay source adds optional guidance limits,
+Original compact runtime/evidence: `/x/Temp/kindle-cheap-20261025`. Native
+`bfb8c31`, frozen CPU replay`5043b7a`; its retained runner adds guidance limits,
 with runner SHA256`50ba7759d4ff108d724e831d83fda69c9d4f4dce3da660cebf394f995cac98da`.
-The selected declaration pins exact source/runtime hashes; use the new
-`runtime-qbert-guidance-cap` overlay. The handover
+These hashes describe completed original-runtime runs. Expert imitation uses
+the isolated79c9a7f runtime above; do not mix overlays. Each new declaration
+pins its exact source/runtime hashes. The handover
 locates the build receipt. Native 32/48/64 geometry and the
 intermediate 4M preset pass bounded training/frozen checks, including 64 restore.
 The CLI exposes imagination length for fresh runs; defaults retain 15 and

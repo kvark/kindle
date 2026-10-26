@@ -1825,6 +1825,7 @@ mod tests {
     fn expert_actions_are_explicit_and_train_the_replay_actor() {
         let mut config = config();
         config.learning_rate_warmup = 0;
+        config.loss_scales.policy = 0.0;
         config.expert_imitation = Some(super::super::super::ExpertImitation {
             scale: 2.0,
             action_weights: vec![0.05, 1.0, 1.0],
