@@ -223,3 +223,33 @@ emulator replay and.025s of affined summary work. It executes only saved actions
 with zero native decisions or updates and leaves all60 active pins unchanged.
 The work is a co-host timing caveat, not a wall-time correction. It changes no
 training settings or evaluation gate and selects no successor allocation.
+
+## Prepared higher-exposure and lower-replay check
+
+While the1009 confirmation is still active, prepare an external CPU-checked
+candidate at`/x/Temp/kindle-qbert-exposure-20261027`. No GPU allocation is selected
+by this preparation. Its controller requires terminal success and complete
+learning/postprocessing/exposure reviews from the1009 confirmation before it
+can run. The active runtime and all60 input pins remain unchanged.
+
+The candidate keeps4M48/Auto/N8/B8/T16/H15/coefficient1/actor0/full18/original
+rates, continuation/cap1920/expert1/NOOPweight.05 and fresh4013/eval4000004013.
+Change episode guidance5%→20% and replay ratio32→16 together. The hypothesis
+is that more teacher experience on later boards can improve transfer while
+fewer repeated updates reduce wall cost. Neither effect is established or
+isolated. The original mean15000/90%-pyramid gate remains the eventual target;
+guided online scores cannot satisfy it.
+
+The proposed check is8192 aggregate actions /994 updates, first248/residual0,
+then1024 unguided frozen actions with zero updates. Training/frozen/audit caps
+are180/60/180 seconds, total service480. Require finite reports/346 tensors,
+346 matched initial and unchanged frozen tensors, changes to CNN/reward/actor/
+value weights, hop labels/nonzero imitation, exact guided input/action/outcome
+replay and host guards.8192 aggregate actions do not reach cap1920 in a lane;
+the completed continuation lives cover that unchanged release schedule.
+
+Two commands parse and three scripts compile without constructing an agent or
+environment. The retained R16 log independently verifies994 updates at8192
+and first248:1/256:2/264:3/272:4/280:5/288:6. CPU preflight takes.031s on one
+affined low-priority core. No full learner, cap increase, retry, extension or
+automatic successor is selected, and check experience will not be reused.
