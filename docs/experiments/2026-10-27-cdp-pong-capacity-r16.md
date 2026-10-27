@@ -1,7 +1,7 @@
 # Pong12M/RGB48/B16/R16 capacity comparison
 
 The bounded check completes successfully; the separately reviewed fresh500k
-allocation below is selected.
+allocation below is active from01:08:02 UTC on October27.
 
 Selected after the completed Qbert expert500k/R16 comparison and terminal
 services. The strongest compact Pong4M48/B8/R32 recipe scores14.958 and14.000
@@ -85,3 +85,18 @@ Owner`kindle-pong-12m48-b16-r16-500k-20261027`; service cap4620s, including
 training, evaluations and1200s CPU audit cap. The declaration pins42 files.
 Both existing controls pass the comparison reader and all three commands parse
 before selection; preflight passes without constructing an agent.
+
+
+## Active startup
+
+The fresh service starts01:08:02 UTC on October27 from source
+`002e403b553d791808c1406f6aabc8d2931d66d1`, PID66140, invocation
+`ee2a9c4847594b40baf4aa99d3e034a3`. Startup passes at3480 complete actions and
+194 finite reports: exact config/source, zero starting counters/no restore,
+14,123,473 parameters, all346 initial tensors matching the bounded check,
+all47 prelearning transitions identical, and first six updates at the declared
+376/392/408/424/440/456 actions. All42 declared input pins remain unchanged.
+Progress,100k-recovery and terminal CPU postprocessing observers are attached.
+This is startup evidence; no full-run quality or completion claim.
+Startup receipt SHA256:`077ba1494d6fb928464c8cbc4cecce7b0338086e34f4178f51e819c79d514e2e`.
+Launch declaration SHA256:`11f2eef80e359cf510e07ef49cd47cdbc07301b2c4e4c013953da5cca6fbf911`.

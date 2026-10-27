@@ -99,12 +99,15 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](docs/results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-Selected fresh Pong12M48/Auto/N8/B16/T16/H15/R16, coefficient.01, actor0,
+Active fresh Pong12M48/Auto/N8/B16/T16/H15/R16 from01:08:02 UTC/source002e403,
+coefficient.01, actor0,
 original rates/full18/no aid.500k actions/31,227 updates, first376/residual.5,
 four100k recoveries and45-minute training cap. Fixed final/own initial24-natural
 matches retain mean15/90%-wins and full audits/replays/guards. Bounded16,384
 check passes in78.872s,16.14% below4M/B8 prefix; this is not competence.
 Owner`kindle-pong-12m48-b16-r16-500k-20261027`; native/CLI79c9a7f unchanged.
+Startup passes346 matched initial tensors,47 prelearning transitions and
+first376/392/408/424/440/456 updates; monitors are attached.
 No cap increase, extension or automatic next allocation. See [protocol](docs/experiments/2026-10-27-cdp-pong-capacity-r16.md).
 Check live state before GPU work.
 
