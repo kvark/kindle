@@ -81,5 +81,5 @@ and633 reports containing expert labels. Last progress16,384/2018 is58.195s
 with zero debt. These establish execution and provenance, not task benefit.
 Read-only recovery, progress and completion monitors run as
 `kindle-expert-qbert-r16-{recovery,progress,post}-20261027`.
-Startup review fa85b4a73f4ebe41fea8be66bb6d59b346cec84c0ddf95d71bcea061259b5195256:
+Startup review SHA256:
 `fa85b4a73f4ebe41fea8be66bb6d59b346cec84c0ddf95d71bcea061259b5195`.
