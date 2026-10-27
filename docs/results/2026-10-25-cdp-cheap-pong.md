@@ -1022,3 +1022,60 @@ See the [protocol](../experiments/2026-10-27-cdp-pong-capacity-r16.md).
 Artifacts:`/x/Temp/kindle-pong-capacity-20261027`.
 Bounded review SHA256:
 `b56204eb1e0d6233546e1d2832aba8b8ca37a526f3a60bffcfacbde2f2845b5f`.
+
+
+## Larger capacity with less replay work reaches the gate
+
+The fixed final12M/RGB48/B16/R16 learner scores **15.625 with24/24 wins**,
+versus its actual initial **−20.292 with0/24 wins**. It meets the unchanged
+mean15/90%-wins gate on this reused development seed. Training completes
+**500,000 aggregate actions /1,999,714 emulator frames /31,227 updates in
+2,487.555s (41m28s)**,16.95% less wall time than the strongest4M/B8/R32 control.
+One passing learner does not establish training-seed reliability.
+
+| Fixed500k recipe | Training wall | Frozen mean | Wins | Gate |
+|---|---:|---:|---:|---|
+|4M48/B8/R32|49m55s|14.958|24/24|fail: mean below15|
+|4M48/B16/R32|38m45s|11.875|24/24|fail: mean below15|
+|12M48/B16/R16|41m28s|15.625|24/24|pass on this learner|
+
+The [declared recipe](../experiments/2026-10-27-cdp-pong-capacity-r16.md) keeps
+centered CDP/Auto/N8/T16/H15, coefficient.01, actor mixture0, original rates,
+full18/sticky.25/repeat4/noops0 and one GPU resize from native frames. Capacity,
+batch/microbatch and ratio change together versus4M/B8; actual parameters are
+14,123,473. Native/runner and the older control kernel also differ. This is a
+useful measured recipe comparison, without an isolated capacity or speed claim.
+No external aid, expert imitation or restored experience is used.
+
+First update376, residual credit.5, and all four100k recoveries pass. Training
+finishes within the45-minute cap;200 natural training matches finish with last50
+mean12.28. The frozen final uses74,512 actions /297,998 frames in37.763s; own
+initial uses24,376 /97,476 in12.525s. Each selects the first three natural sampled
+matches per lane, exactly24 completed matches, zero truncations and zero updates.
+All346 tensors remain invariant in each frozen arm. Conditional stream-bootstrap
+95% interval for the final mean is[14.833,16.292]; the win Wilson interval is
+[.862,1]. These intervals describe this policy, not training-seed reliability.
+
+All31,227 finite reports, exact config/source/counters,346 actual initial tensors
+matching the bounded same-seed check,47 prelearning transitions, recovery audits,
+three guards and CPU comparison pass. Complete recorded-action replay checks
+rewards, frame counts, boundaries and outcomes, and reconstructs videos. Ordinary
+unguided logs contain no live pixel hashes; retain the protocol's explicit scope
+correction rather than claiming direct live/replay image equality. All42 declared
+input pins remain unchanged. Service exits successfully01:51:06 UTC on October27;
+CPU plots/comparison finish01:51:35. No GPU or audit stage repeats.
+
+The separately staged Breakout adapter uses16.038s of measured CPU test/replay
+portions during this life, in addition to55.935s of earlier reference development.
+It constructs no native agent and changes none of the active pins. Retain this
+co-host timing caveat; no causal timing adjustment is claimed.
+
+Artifacts, curves, comparison and videos:
+`/x/Temp/kindle-pong-capacity-20261027/pong-12m-48-b16-r16-intrinsic001-500k`.
+Learning review SHA256:
+`0a0eb5df3a5b51bfcb44ff8d8c86dfc2cbecb3ede3ead9dcbd69acfa6a3de63b`;
+completion`6decc800e5f68332065cb68a395d55b14ebc51de2a4ac9dec12b9796f61dc465`;
+comparison`5626775b6f31b2bf739d7a1dbb1825eb21705c12b5ec11bc3d568bcb4d81c9b8`.
+The completed learner is terminal. The result justifies the separately selected
+[fresh4013 confirmation](../experiments/2026-10-27-cdp-pong-capacity-seed4013.md),
+with identical recipe and budgets. It is not an extension or broad seed campaign.

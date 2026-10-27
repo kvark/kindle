@@ -39,8 +39,7 @@ a separate takeover branch. Keep `runs/`, large data and archived experiment
 ledgers out of Git; old evidence lives on the explicitly named archive branch.
 
 The five-game goal is unfinished. Compact AMD Boxing and aided Freeway pass on
-two learners each, within 30 minutes per learner. Compact Pong wins most matches
-but misses its mean-15 gate; Qbert expert imitation improves on two seeds but
+two learners each, within 30 minutes per learner. Pong12M48 passes its gate on one learner; Qbert expert imitation improves on two seeds but
 misses its full-game gate, and Breakout remains much weaker. Published
 long-run scores are aspirations, not matched-budget comparisons. Do not claim
 mastery or CDP superiority from short runs, finite losses or backend speed alone.
@@ -99,20 +98,25 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](docs/results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-Active fresh Pong12M48/Auto/N8/B16/T16/H15/R16 from01:08:02 UTC/source002e403,
-coefficient.01, actor0,
-original rates/full18/no aid.500k actions/31,227 updates, first376/residual.5,
-four100k recoveries and45-minute training cap. Fixed final/own initial24-natural
-matches retain mean15/90%-wins and full audits/replays/guards. Bounded16,384
-check passes in78.872s,16.14% below4M/B8 prefix; this is not competence.
-Owner`kindle-pong-12m48-b16-r16-500k-20261027`; native/CLI79c9a7f unchanged.
-Startup passes346 matched initial tensors,47 prelearning transitions and
-first376/392/408/424/440/456 updates; monitors are attached.
-100k/6227 and200k/12,477 recovery audits pass; same service remains active.
-Ordinary frozen replay checks outcomes and reconstructs video; live pixel
-hashes are not recorded. See the protocol correction.
-No cap increase, extension or automatic next allocation. See [protocol](docs/experiments/2026-10-27-cdp-pong-capacity-r16.md).
+Pong12M48/Auto/N8/B16/T16/H15/R16 completes500k actions /31,227 updates in
+41m28s,16.95% less training time than4M/B8/R32. Frozen15.625/24 wins versus
+own initial−20.292/0 meets mean15/90% on one learner. All audits, four recoveries,
+346 frozen tensors,42 pins, recorded-action replays, guards and comparison pass;
+service exits01:51:06 UTC, CPU postprocessing01:51:35 on October27.
+No live pixel hashes are available in ordinary unguided logs. See the protocol
+scope correction and [completed result](docs/results/2026-10-25-cdp-cheap-pong.md#larger-capacity-with-less-replay-work-reaches-the-gate).
+
+Selected fresh4013/eval4000004013 confirmation keeps the exact12M48 recipe,
+native/CLI79c9a7f and unchanged Python sources.500k actions /31,227 updates,
+first376/residual.5, four100k recoveries,45-minute training cap and fixed final/
+own actual initial24-natural matches. Original mean15/90%-wins gate; complete
+numerical/config/counter/replay/346-tensor/guard audits. No restoration, cap
+increase, extension or automatic successor.4013 was used in prior4M development;
+this is a fresh fixed-recipe learner, not a held-out test or broad reliability.
+Owner`kindle-pong-12m48-b16-r16-500k-seed4013-20261027`; see
+[protocol](docs/experiments/2026-10-27-cdp-pong-capacity-seed4013.md).
 Check live state before GPU work.
+
 
 CPU Breakout predictive reference scores166.167 across24 natural episodes,
 0/24 two-wall successes; full input/output pixel-hash replay passes. Selected

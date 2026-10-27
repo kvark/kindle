@@ -159,3 +159,39 @@ Standard24 review:
 `7992b6d31b278a2d3995ee477fbfc625207477b59bb19b0a4ea3671b999caf4b`.
 `reference-summary.json` pins the diagnostics, calibration, policies, drivers,
 reviews and exact eight-episode overlap check. All artifacts remain outside Git.
+
+
+## Guidance adapter passes CPU checks and remains staged
+
+The optional Breakout rule is packaged in an external staging tree without
+changing the checkout, active runtime or native binary. The adapter shares
+Qbert's episode schedule, adds explicit probability/cap flags, native expert
+labels and source hashes for both policy and shared schedule. It rejects frozen,
+restored, nonnative-pixel, non-full18 and combined-aid use. The rule takes only
+RGB frames and its own prior choices; RAM stays outside the policy.
+
+442 CPU tests pass with10 unchanged native-constructor validation cases excluded;
+both public and native constructors are replaced before tests import, with zero
+construction attempts. Exact replay of11,809 retained Breakout actions reproduces
+all choices, input/output hashes, rewards and boundaries. The extracted Qbert
+schedule/rule reproduces4096 saved actions and512 guided hashes/choices exactly.
+A separate8192-action CPU fixture supplies512 trusted labels and verifies2834
+released actions, caps, resets and full guided-input/action replay; it uses an
+explicit CPU actor and zero learner updates. These are execution checks, not
+Kindle learning evidence. Guided inputs are live-hashed; unguided inputs are not.
+
+Measured CPU test/parity/fixture portions total16.038s, co-hosted on one affined
+low-priority core during Pong. All42 active pins and106 original Python sources
+remain unchanged. The eight-file patch passes `git apply --check` only; it is not
+applied. Evidence:`/x/Temp/kindle-breakout-guidance-20261027`;
+validation SHA256`0e0ff2298f8f6ef0ba4befee7f2b6b1de21f4b37cc94784c89afa6101f5d3d63`. Old guided logs retain their matching old
+runtime. A later shell-only schedule check initially used system Python without
+NumPy and failed before native/environment construction, then used the Atari
+venv successfully.
+
+A4096-action native check was prepared but never selected or launched. Its
+proposed25%episode/cap128 schedule would exercise labels and release, because
+5% selects no episodes within the old4096-action control prefix; that is a
+validation setting, not a selected full-run recipe. Pong's passing final result
+instead justifies a fresh fixed-recipe confirmation first. Keep this staged
+adapter available; do not mutate the confirmation's pinned files.

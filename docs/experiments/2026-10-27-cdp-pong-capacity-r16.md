@@ -1,7 +1,8 @@
 # Pong12M/RGB48/B16/R16 capacity comparison
 
-The bounded check completes successfully; the separately reviewed fresh500k
-allocation below is active from01:08:02 UTC on October27.
+The bounded check and fresh500k allocation complete successfully. Frozen15.625
+with24/24 wins meets the original gate on1009, in41m28s of training; all audits
+pass. Service exits01:51:06 UTC on October27; CPU postprocessing01:51:35.
 
 Selected after the completed Qbert expert500k/R16 comparison and terminal
 services. The strongest compact Pong4M48/B8/R32 recipe scores14.958 and14.000
@@ -75,8 +76,8 @@ The complete comparison retains4M/B8/R32 and4M/B16/R32 fixed500k controls,
 which score14.958 and11.875 in49m55s and38m45s. Capacity, batch and ratio change
 together versus B8; native/runner and control kernel differences remain explicit.
 No initial-tensor equality across capacities or isolated causal effect is claimed.
-No full-run score is known yet. A promising result requires separate seed
-confirmation before reliability claims. No extension, cap increase, checkpoint
+The completed full-run result follows below. A promising result requires separate
+seed confirmation before reliability claims. No extension, cap increase, checkpoint
 selection or automatic successor follows this allocation.
 
 Artifacts:`/x/Temp/kindle-pong-capacity-20261027/pong-12m-48-b16-r16-intrinsic001-500k`.
@@ -129,3 +130,26 @@ All42 active pins remain unchanged afterward. Retain this co-host timing caveat.
 The reference scores166.167/0of24 two-wall successes; it supplies no training
 input and selects no subsequent allocation. See the
 [reference result](../results/2026-10-26-cdp-breakout-pixel-reference.md#calibrated-paddle-response-improves-the-reference-but-misses-the-two-wall-gate).
+
+
+## Completed result and next decision
+
+500k actions /1,999,714 frames /31,227 updates complete in41m28s. Fixed final
+15.625/24 wins versus actual initial−20.292/0 meets mean15/90% on1009. This is
+16.95% less training wall time than4M/B8/R32, with capacity/batch/ratio and older
+runtime/kernel differences. All audits, four recoveries,346 matched initial and
+unchanged frozen tensors,42 source pins, replays, guards and comparison pass.
+300k/18,727 recovery passes01:33:22 and400k/24,977 passes01:41:23 UTC;
+receipts`24cb4c954ca9b6b78055799ae5abd60c8a66d1c2ff44dd1848f73c417babf95e`
+and`35cdc625f4f331504dee33b599064266a7ccda86b1858555483f446357921a93`.
+Main service exits01:51:06 and CPU postprocessing01:51:35 UTC. No repeated stage.
+The declaration/controller's original pixel wording is superseded by the scope
+correction above; ordinary live frames were not hashed. Additional staged
+adapter CPU checks cost16.038s in measured portions, with no native construction
+or active input change; retain the co-host timing caveat.
+
+[Full result](../results/2026-10-25-cdp-cheap-pong.md#larger-capacity-with-less-replay-work-reaches-the-gate).
+After reviewing this completed passing result, select one
+[fresh4013 confirmation](2026-10-27-cdp-pong-capacity-seed4013.md) at the exact
+recipe/budget. The original learner is terminal; no extension. Breakout guidance
+remains staged externally and its prepared GPU check is not selected.
