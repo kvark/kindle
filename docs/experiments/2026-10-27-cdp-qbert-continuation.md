@@ -196,3 +196,16 @@ or environment. All56 primary pins remain unchanged. The paired comparison
 includes old-teacher1009/4013 and continuation1009/4013, with original gates.
 No retry, cap increase, extension, checkpoint selection, third seed or automatic
 successor is selected. Only this fresh1009 allocation is selected here.
+
+
+## Seed1009 startup passes
+
+Service starts04:17:32 UTC/source`7560d2d`, PID85716,
+invocation`bef8ea63356848a88f69884efb2f039a`. Declaration SHA256
+`73a79ddbfec359c92dfac75e7367c91b0a87688f436940e4967abd5dbf05324d`.
+All60 pins match; all346 initial tensors are finite and exactly match the
+retained1009 expert control and native check. First248:1/256:2/256:3/264:4/
+264:5/272:6 updates match. At3008 actions,689 reports are finite,376 actions
+are trusted and443 reports contain expert labels. Read-only progress,100k
+recovery and terminal CPU postprocessing observers are attached. No frozen
+outcome is available yet; retain the declared cap and full audit scope.
