@@ -1823,3 +1823,41 @@ Aggregate`movement-avoidance-review.json` SHA256
 `b71b9391ea0e6ea380c9081af23afa94636607b2d577b36808523e8b60a7e0b2`;
 repeat review`595125ad6b661c9aa69ff4b67cf94a67dc40eb5d408d6d996927ca07fa5e8395`;
 avoidance review`99afab5535aec6b2dd311fd08b3cb5bed7bf2ac945ba076e50ca5fe14b033c60`.
+
+
+## Fixed24 CPU reference passes and optional adapter remains staged
+
+The unchanged avoidance reference completes **80,496 aggregate actions /321,923
+emulator frames**, with first3 natural episodes per lane selecting exactly24.
+Mean **22050.000**,24/24 first pyramids and24/24 individual scores at least15000
+(range19100–22500). All24 completed episodes and8 partial tails are retained.
+Collection233.913s and independent replay27.403s both stay within their declared
+360-second caps. Every input/output/reset pixel hash, saved action, reward,
+frame count and boundary matches. The first8 outcomes equal the earlier cohort
+and are included in24; this is not independent confirmation or native learning.
+No native module is loaded. Standard review SHA256
+`87e852aa2acdc8d7e48a36ea102c6e520bfae61a44857dbcf118497351790986`.
+
+An optional continuation adapter is staged externally at
+`/x/Temp/kindle-qbert-guidance-20261027`, without modifying the active checkout
+or runtime. Its explicit `--qbert-guidance-policy continuation` requires a
+positive guidance probability and an action cap, and remains fresh/Qbert/full18/
+native-RGB only. The default first-pyramid class has identical AST; the shared
+selection/reset schedule and native expert API stay unchanged. The continuation
+rule is a separately declared guidance kind for audit/replay.
+
+**456 CPU tests pass**,10 unchanged native-constructor validations deselected,
+zero native construction attempts, in1.341s. Replaying all **24,733 actions
+/98,913 frames** through the staged policy reproduces every saved action, output
+pixel, reward and boundary in74.678s. No native module loads in this parity run.
+All46 active Breakout pins and original Python sources remain unchanged;
+`git apply --check` accepts the exact three-file patch. These are CPU adapter
+checks; native execution and learned benefit remain unmeasured. No Qbert GPU
+allocation is selected yet. Original runtimes/logs are retained.
+
+Patch SHA256`aeb61a4510b9122ae0fbf4ee8777eb86e15d2d082ebc7ee7dccbe2a3351ebfbc`;
+validation`82b534c911aa4499cafd14f8d50d146f22d8e637ffd5f90145b3405a25bd4563`;
+policy parity`2f2d4d44f9b90412fad4234c5ee9531f790d9e857f32af33e63fa357db3c29dc`.
+Measured standard24 and adapter portions add337.336s to the earlier123.747s
+of affined CPU reference work during Breakout. Retain the co-host timing caveat;
+no causal wall-time correction is claimed.

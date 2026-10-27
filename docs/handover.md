@@ -301,8 +301,10 @@ first248:1/256:2/256:3/264:4/264:5/272:6. All46 pins unchanged; progress,
 100k recovery and CPU postprocessing observers attached.100k/24,939 recovery
 passes03:03:42 UTC with346 finite tensors and complete-prefix finite reports.
 Frozen score pending. Independent CPU Qbert reference reaches21825 on8 reused
-episodes with exact replay; fixed24 CPU check is active. No production guidance
-or native allocation follows automatically; all46 active inputs remain unchanged.
+episodes with exact replay. Fixed24 CPU reference now scores22050/24 pyramids,
+all action/input/output/reset-pixel replay exact. Optional continuation adapter
+remains staged externally:456 CPU tests and24,733-action parity pass, native
+unchanged. No Qbert GPU allocation yet; all46 active inputs remain unchanged.
 Owner`kindle-breakout-expert-cap640-200k-20261027`; see
 [protocol](experiments/2026-10-27-cdp-breakout-expert.md).
 Check live state before GPU work.
