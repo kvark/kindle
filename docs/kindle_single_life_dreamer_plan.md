@@ -34,6 +34,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Full18, more experience at R16](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-does-not-improve-the-result) |500k /62,470|26m53s|719.792 /180.208|0/24 pyramids;14.125/21 coverage|
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
+| [Full18, capped expert imitation](results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality) |200k /49,939|22m38s|4.000 /1.375|0/24; below full18 control|
 | [Same, four actions](results/2026-10-26-cdp-breakout-minimal-actions.md) |200k /49,939|20m59s|9.542 /1.167|0/24 two-wall successes|
 | [Four actions, coefficient1, actor/critic gradients](results/2026-10-26-cdp-breakout-minimal-actions.md#actorcritic-gradients-give-a-modest-unconfirmed-gain) |200k /49,939|20m41s|11.208 /1.167|0/24; modest unconfirmed gain|
 | [Same, coefficient .01](results/2026-10-26-cdp-breakout-minimal-actions.md#smaller-bonus-lowers-the-frozen-score) |200k /49,939|21m07s|5.042 /1.167|0/24; weaker frozen score|
@@ -342,27 +343,23 @@ progress-observer failure is retained; no GPU stage repeats. Both reused
 seeds are development evidence. No extension or third seed is selected.
 See [completed confirmation](results/2026-10-25-cdp-cheap-pong.md#capacity-confirmation-improves4013-but-narrowly-misses-the-gate).
 
-Bounded Breakout expert check passes4096 actions /16,350 frames /963 updates
-in24.792s; frozen1024/.488s,346 unchanged tensors,669 trusted actions/660
-nonzero expert reports, all matched initial/parameter/replay/guard checks pass.
-Service exits02:50:25 UTC. Exact442-test adapter applied; native79c9a7f unchanged.
-After review, select one fresh200k/49,939 comparison under25 minutes,5%episode
-guidance/cap640/expert1/all weights1. Keep4M64/Auto/N8/B8/T16/H15/R32,
-coefficient1/actor.01/full18/original rates,1009/eval4000001009. Fixed final/own
-initial24-natural evaluations disable aid, retaining864-point/90%-two-wall gate,
-full audits and100k recovery. No check experience reuse or automatic successor.
-Active from02:51:51 UTC/source`da8dee8`, PID76965. Startup passes6840 actions/
-1647 finite updates,34 supervised reports,346 matched initial tensors and
-first248:1/256:2/256:3/264:4/264:5/272:6. All46 pins unchanged; progress,
-100k recovery and CPU postprocessing observers attached.100k/24,939 recovery
-passes03:03:42 UTC with346 finite tensors and complete-prefix finite reports.
-Frozen score pending. Independent CPU Qbert reference reaches21825 on8 reused
-episodes with exact replay. Fixed24 CPU reference now scores22050/24 pyramids,
-all action/input/output/reset-pixel replay exact. Optional continuation adapter
-remains staged externally:456 CPU tests and24,733-action parity pass, native
-unchanged. No Qbert GPU allocation yet; all46 active inputs remain unchanged.
-Owner`kindle-breakout-expert-cap640-200k-20261027`; see
-[protocol](experiments/2026-10-27-cdp-breakout-expert.md).
+Breakout expert200k completes798,964 frames /49,939 updates in22m38s,
+frozen4.000 versus initial1.375, below full18 control7.083/minimal4 9.542;
+all0/24 two-wall successes. All audits,100k recovery,346 matched initial/frozen
+tensors,46 pins, replays, guards, comparison and exposure pass. Service exits
+03:16:09 UTC; postprocessing03:16:14. Retain controls; no extension/confirmation.
+20,463 trusted actions (10.2315%); guided/unguided completed means24.871/2.948
+are not frozen competence. See [result](results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality).
+
+Qbert CPU continuation reference scores22050/24 first pyramids, all24 above15k,
+with exact input/output/reset pixel replay; not native learning or held-out
+confirmation. After terminal Breakout audits, apply the exact456-test optional
+adapter;24,733-action staged parity passes, original first-pyramid AST/native
+unchanged. Select only a bounded8192/1987 native check,4M48/Auto/N8/B8/T16/H15/
+R32/coefficient1/actor0/full18/original rates,4013/eval4000004013,25%episodes/
+cap640/expert1/NOOPweight.05. Training180s/frozen1024actions60s; full audits/
+346 matched initial and frozen tensors/guards. No full learner selected.
+Owner`kindle-qbert-continuation-check-20261027`; see [protocol](experiments/2026-10-27-cdp-qbert-continuation.md).
 Check live state before GPU work.
 
 

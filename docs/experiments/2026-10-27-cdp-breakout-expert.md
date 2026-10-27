@@ -75,7 +75,7 @@ differences retained. No retry, checkpoint selection, extension, cap increase,
 automatic next allocation or promotion of the eight-episode settling variant.
 
 
-## Active full-run startup
+## Recorded full-run startup
 
 Service starts02:51:51 UTC on October27 from
 `da8dee8bacefb9f474d2411aa2012d3f95372698`, PID76965,
@@ -113,3 +113,16 @@ all46 active pins remain unchanged. Their measured successful portions123.747s,
 plus the.015s exposure-reader check and the pending fixed24 reference, are
 co-host timing caveats. See the [reference evidence](../results/2026-10-25-cdp-cheap-qbert.md#repeated-movement-and-pixel-avoidance-strengthen-the-cpu-reference).
 No new GPU allocation, cap increase or extension is selected by this CPU work.
+
+
+## Completed result
+
+200k actions /798,964 frames /49,939 updates complete in22m38s. Frozen final4.000
+versus own initial1.375 is below the full18 control7.083 and minimal4 9.542;
+all0/24 two-wall successes. All audits,46 pins,100k recovery,346 matched initial/
+invariant frozen tensors, complete guided replay, frozen outcome replay,
+guards, curves, comparison and exposure analysis pass. Service exits03:16:09 UTC,
+postprocessing03:16:14. Retain controls; no extension or confirmation.
+See [complete evidence](../results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality).
+The following Qbert adapter application occurs only after all terminal reviews
+and pin verification; it does not alter this completed run's runtime or evidence.

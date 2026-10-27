@@ -122,6 +122,8 @@ def main():
     parser.add_argument("--exploration-hold", type=int, default=16)
     parser.add_argument("--qbert-guidance-probability", type=float, default=0.0,
                         help="fresh Qbert only: probability of selecting an episode for pixel guidance")
+    parser.add_argument("--qbert-guidance-policy", choices=("first-pyramid", "continuation"),
+                        help="fresh guided Qbert only; continuation requires an explicit action cap")
     parser.add_argument("--qbert-guidance-max-actions", type=int,
                         help="release each selected episode to the learner after this many actions")
     parser.add_argument("--breakout-guidance-probability", type=float, default=0.0,
@@ -194,6 +196,10 @@ def main():
             parser.error("guidance NOOP weight requires imitation")
         if not positive_f32(args.guidance_noop_weight) or args.guidance_noop_weight > 1:
             parser.error("guidance NOOP weight must be positive F32 and at most1")
+    if args.qbert_guidance_policy is not None and not args.qbert_guidance_probability:
+        parser.error("Qbert guidance policy requires positive guidance probability")
+    if args.qbert_guidance_policy == "continuation" and args.qbert_guidance_max_actions is None:
+        parser.error("Qbert continuation guidance requires an explicit max-actions cap")
     if args.qbert_guidance_max_actions is not None:
         if not 0 < args.qbert_guidance_max_actions < 2**32:
             parser.error("Qbert guidance max-actions must be a positive u32")
@@ -216,6 +222,7 @@ def main():
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
     training_options.add("--qbert-guidance-probability")
     training_options.add("--qbert-guidance-max-actions")
+    training_options.add("--qbert-guidance-policy")
     training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions"))
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight"))
     training_options.add("--image-size")
@@ -352,6 +359,8 @@ def main():
                 probability=args.qbert_guidance_probability, seed=args.seed)
             if args.qbert_guidance_max_actions is not None:
                 guidance_config.update(kind=BOUNDED_GUIDANCE_KIND, max_actions=args.qbert_guidance_max_actions)
+            if args.qbert_guidance_policy == "continuation":
+                guidance_config["kind"] = guidance_module.CONTINUATION_GUIDANCE_KIND
             exploration = QbertGuidance(guidance_config, args.num_envs, actions)
         if args.breakout_guidance_probability:
             exploration = BreakoutGuidance(dict(kind=breakout_guidance_module.GUIDANCE_KIND,

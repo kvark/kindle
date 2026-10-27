@@ -148,11 +148,11 @@ def test_cli_refuses_invalid_guidance_before_gpu(monkeypatch, tmp_path, capsys, 
 
 @pytest.mark.parametrize('cap', [None, 1])
 @pytest.mark.parametrize('imitation', [False, True])
-def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkeypatch, tmp_path, cap, imitation):
+def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkeypatch, tmp_path, cap, imitation, policy="first-pyramid"):
     created = []
     class Policy:
         def action(self, frame): return int(frame[0,0,0])
-    monkeypatch.setattr(module, 'PixelPolicy', Policy)
+    monkeypatch.setattr(module, 'ContinuationPixelPolicy' if policy == 'continuation' else 'PixelPolicy', Policy)
     class Environment:
         action_space = SimpleNamespace(n=18)
         action_meanings = ["NOOP"] + [str(n) for n in range(1,18)]
@@ -196,6 +196,7 @@ def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkey
     monkeypatch.setattr(sys, 'argv', ['atari_vector', 'ALE/Qbert-v5', '--output', str(output),
         '--num-envs', '2', '--steps', '6', '--train-ratio', '0', '--qbert-guidance-probability', '1',
         *([] if cap is None else ['--qbert-guidance-max-actions', str(cap)]),
+        *(['--qbert-guidance-policy', policy] if policy == 'continuation' else []),
         *(['--guidance-imitation-scale', '2', '--guidance-noop-weight', '.05'] if imitation else [])])
     atari_vector.main()
     assert [env.actions for env in created] == ([[0,2,3], [0,2,3]] if cap is None else [[0,17,3], [0,17,3]])
@@ -304,3 +305,37 @@ def test_imitation_labels_must_match_declared_trusted_guidance(tmp_path, mutatio
     else:
         with pytest.raises(ValueError, match='expert action mask'):
             audit(write_log(tmp_path, rows))
+
+
+@pytest.mark.parametrize('imitation', [False, True])
+def test_continuation_uses_current_pixels_cap_reset_and_native_labels(monkeypatch, tmp_path, imitation):
+    test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkeypatch, tmp_path, 1, imitation, 'continuation')
+    header = json.loads((tmp_path/'run.jsonl').open().readline())
+    assert header['exploration']['kind'] == module.CONTINUATION_GUIDANCE_KIND
+
+
+@pytest.mark.parametrize('cap', [None, 0, -1, 2**32, True, 1.5])
+def test_continuation_requires_a_positive_integer_cap(cap):
+    spec = dict(config(1), kind=module.CONTINUATION_GUIDANCE_KIND, max_actions=cap)
+    with pytest.raises(ValueError, match='positive u32'):
+        QbertGuidance(spec, 2, 18)
+
+
+@pytest.mark.parametrize('args,message', [
+    ([], 'explicit max-actions cap'),
+    (['--qbert-guidance-probability','0'], 'positive guidance probability'),
+    (['--qbert-guidance-max-actions','640','--evaluate'], 'frozen evaluation'),
+    (['--qbert-guidance-max-actions','640','--restore','unused'], 'fresh run'),
+    (['--qbert-guidance-max-actions','640','--exploration-probability','.1'], 'cannot combine'),
+])
+def test_continuation_cli_rejects_invalid_setup_before_gpu(monkeypatch,tmp_path,capsys,args,message):
+    test_cli_refuses_invalid_guidance_before_gpu(monkeypatch,tmp_path,capsys,
+        ['--qbert-guidance-policy','continuation',*args],message)
+
+
+def test_continuation_replay_reader_keeps_cap_and_expert_accounting(tmp_path):
+    spec = dict(config(1), kind=module.CONTINUATION_GUIDANCE_KIND, max_actions=1)
+    rows = guided_events(spec)
+    result = replay_qbert_guidance.read_guided_run(write_log(tmp_path, rows))
+    assert result['accounting']['overridden_actions'] == [2,1]
+    assert result['accounting']['exploration_schedule_verified']

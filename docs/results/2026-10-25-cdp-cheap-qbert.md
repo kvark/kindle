@@ -1861,3 +1861,9 @@ policy parity`2f2d4d44f9b90412fad4234c5ee9531f790d9e857f32af33e63fa357db3c29dc`.
 Measured standard24 and adapter portions add337.336s to the earlier123.747s
 of affined CPU reference work during Breakout. Retain the co-host timing caveat;
 no causal wall-time correction is claimed.
+
+
+The exact validated adapter is subsequently applied after Breakout's complete
+terminal audits and pin checks. Select only the [bounded native continuation
+check](../experiments/2026-10-27-cdp-qbert-continuation.md); no full Qbert learner
+is selected. Historical staged descriptions above preserve preparation order.

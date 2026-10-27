@@ -313,3 +313,50 @@ fresh200k comparison. Keep5% episodes/cap640/expert1/all action weights1 and a
 25-minute training cap, with fixed final/own initial24-natural evaluations.
 No check experience is reused, and no transfer benefit is assumed. See the
 [full declaration](../experiments/2026-10-27-cdp-breakout-expert.md#selected-full-comparison).
+
+
+## Capped native imitation lowers frozen Breakout quality
+
+The fresh expert learner completes **200k actions /798,964 emulator frames
+/49,939 updates in22m38s** (1358.085s), within25 minutes. Fixed final frozen mean
+**4.000**, versus its own actual initial1.375, is below the full18 control7.083
+and stronger minimal4 control9.542. All have0/24 two-wall successes. The measured
+training wall ratio to full18 is1.00698; the recipe provides no useful gain.
+Retain the unaided controls; no extension or confirmation follows this learner.
+
+Configuration4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/full18, original
+rates, reused1009/eval4000001009,5% episode guidance capped640, expert scale1,
+all18 action weights1. Guidance plus expert loss, qualified native and older
+control kernel differ; this does not isolate an imitation mechanism. Training
+uses20,463 trusted actions (10.2315%):8157 NOOP,683 FIRE,5622 RIGHT,6001 LEFT.
+32 of557 episode starts are selected;28,839 updates contain expert labels.
+
+All finite reports, config/source/counters,46 pins,100k recovery,346 initial
+tensors matching both control/check,346 invariant tensors in each frozen arm,
+complete guided input/action/outcome replay, frozen recorded-action replay,
+videos, guards, curves and comparison pass. Final evaluation selects first3
+natural episodes per lane from25 completed episodes:9336 actions /37,305 frames
+/4.669s. Own initial selects24 from29:5944 /23,717 /3.051s. Zero learning or
+truncations; excess episodes and partial tails retained. Frozen logs lack live
+pixel hashes, so their replay does not establish direct live-image equality.
+Service exits03:16:09 UTC on October27; postprocessing03:16:14. No GPU repeats.
+
+Exposure analysis reconciles every action/report and completed/partial reward.
+31 completed guided episodes average24.871, with707 points during teacher
+prefixes and64 after release across6209 released actions. The518 unguided
+episodes average2.948; their last50 average5.100. All0 two-wall successes.
+After-release rewards inherit a guided state; these online figures are not
+causal attribution or frozen competence. Label cross-entropy falls1.168→1.062
+across50k update-time windows on changing replay samples, not held-out labels.
+The negative frozen result remains decisive.
+
+Independent Qbert reference/adapter CPU work contributes461.083s of measured
+affined successful portions during this life, plus.015s exposure-reader validation.
+All46 pinned inputs remain unchanged until terminal audits. Retain this co-host
+wall-time caveat; no correction or isolated timing claim is made.
+
+Artifacts:`/x/Temp/kindle-breakout-guidance-20261027/breakout-4m-64-r32-expert1-cap640-noop1-200k`.
+Learning review SHA256`93a5c42bf90b6d1036880b04f101539cbda6be0b8b05edea3ac1ac1553354c2f`;
+completion`ae048f66de4dda8ff92f97c4c37f30d62268eceee3dc2527fd251fe1d5787da7`;
+comparison`0d6ec959dd417a4e08f4a750684ed6d78ea95037f2bcd74c28efaa8b409b38cc`;
+exposure`356e7aa2073a1125aaef9ebf1662f61c1e27b38c06b7080189802d972c869539`.
