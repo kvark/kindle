@@ -372,17 +372,26 @@ on October27. Actual1009 guidance38,400 actions (19.2%); online guided returns
 are not frozen competence. Both reused development seeds; no broad reliability,
 extension or third seed. See the paired continuation result in cheap-Qbert.
 
-Select only the bounded Qbert4M48/Auto/N8/B8/T16/H15/R16/coefficient1/actor0/
-full18/original-rates check with20% episode continuation/cap1920/expert1/
-NOOPweight.05, fresh4013/eval4000004013.8192 actions/994 updates, first248,
-residual0, then1024 unguided frozen actions;180/60/180-second train/frozen/audit
-caps,480-second service. Probability and replay ratio change together against
-5%/R32; no isolated attribution or competence claim. Require full finite,
-346 initial/frozen tensor, parameter-change, label, replay and guard checks.
-Owner`kindle-qbert-r16-p20-check-20261027`; external runtime/evidence
-`/x/Temp/kindle-qbert-exposure-20261027`,33 pins. Preceding1009 services are
-terminal. No full learner, extension or automatic promotion selected. Check
-live state before GPU work; protocol remains in the continuation experiment.
+Select one fresh Qbert4M48/Auto/N8/B8/T16/H15/R16/coefficient1/actor0/full18/
+original-rates comparison with20%episode continuation/cap1920/expert1/
+NOOPweight.05,4013/eval4000004013.200k actions/24,970 updates, first248,
+residual0,100k recovery12,470. Declare25-minute training cap before launch;
+fixed final/own initial24-natural assessments retain mean15000/90%-pyramid and
+full audits. Probability and ratio change together against5%/R32's4730.208/23
+in25m23s; reused development seed, no isolated attribution. No retry, extension,
+cap increase, checkpoint selection or automatic next allocation.
+Owner`kindle-qbert-r16-p20-cap1920-200k-20261027`;47 inputs pinned under
+`/x/Temp/kindle-qbert-exposure-20261027`. Check live state before GPU work.
+The unselected20-minute draft is retained; measured bounded cost motivates
+this separately declared25-minute cap before any full run starts.
+
+The R16/20% bounded check completes8192 actions/32,752 frames/994 updates in
+52.742s, frozen1024/.524s with346 invariant tensors and no completed natural
+episodes. All33 pins,346 matched initial tensors, finite reports, changed
+CNN/reward/actor/value,4527 trusted actions/990 supervised reports, exact guided
+replay and guards pass; service exits04:52:23 UTC on October27. No GPU stage
+repeats or check experience is reused. This is execution/early-cost evidence,
+not competence. Protocol remains in the continuation experiment.
 
 Qbert continuation200k completes799,570 frames /49,939 updates in25m23s.
 Frozen4730.208/23of24 first pyramids versus own initial182.292/0 improves

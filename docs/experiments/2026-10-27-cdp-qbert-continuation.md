@@ -281,3 +281,59 @@ confirmation and changes none of its60 pins. That possible comparison would
 retain the full frozen protocol and a20-minute training cap, but has no trial,
 declaration, selection or launch yet. Passing the bounded check is not automatic
 authorization for its controller to promote itself.
+
+## Higher-exposure R16 bounded result
+
+Service starts04:51:06 UTC/source`e920f7b`, PID89803,
+invocation`579681656ed744a5a22a2389d06c6d6e`; exits successfully04:52:23.
+8192 actions /32,752 frames /994 updates take52.742s; first248/residual0.
+All finite reports/346 tensors,346 matched initial and unchanged frozen tensors,
+CNN/reward/actor/value changes,4527 trusted actions (1036 hops),990 supervised
+reports,33 pins, exact guided replay and guards pass. Frozen1024 /4096 frames
+take.524s with zero updates and no natural completed episodes. Review SHA256
+`9b03f5c7dc686b554b821d9a3fdbc6912dfa73c38d924c7a261730db575871ef`.
+See [evidence and limits](../results/2026-10-25-cdp-cheap-qbert.md#higher-exposure-r16-bounded-check-passes).
+
+## Selected fresh higher-exposure R16 comparison
+
+After terminal bounded success and the paired continuation audits, select one
+fresh200k life on reused4013/eval4000004013. Keep4M48/Auto/N8/B8/T16/H15,
+coefficient1/actor0/full18/original rates, continuation/cap1920/expert1/
+NOOPweight.05 and the same native binary/runtime/host. Change episode guidance
+5%→20% and replay ratio32→16 together. More teacher experience and fewer
+repeated updates are a joint cheap-recipe hypothesis, not isolated effects.
+
+The52.742s bounded training rate extrapolates to21.46 minutes for200k; later
+cost and guidance exposure may differ. Before launch, replace the unselected
+20-minute draft with a **25-minute training cap**. The original draft/scripts
+and preflight remain under`prepared-20min`; no launched allocation receives a
+cap increase. Updated three-command/eight-script CPU preflight and retained
+control/recovery readers pass in.080s without agent/environment construction.
+
+- Train200,000 aggregate actions /24,970 updates, first248/residual0. Save100k
+  recovery at12,470 updates and final200k. Restore no weights or experience.
+- Evaluate fixed final and own actual initial on first3 natural episodes per8
+  lanes=24 each, guidance off, zero updates/truncations. Keep the original
+  mean15000/90%-pyramid gate and600k-action/300s caps per arm; retain excess
+  completed episodes and partial tails.
+- Require all finite reports/346 tensors,346 initial tensors matching primary
+  continuation4013 and bounded check,346 invariant tensors per frozen arm,
+  paired initial semantic traces, full guided input/action/outcome replay,
+  frozen outcome replay/videos, host guards, recovery, curves, coverage,
+  exposure and paired comparison. Ordinary frozen logs lack live pixel hashes.
+- Record actual guided-action fraction, guided/unguided online outcomes and
+  repeated replay-label exposure. CPU audit cap1200s; total service3360s.
+  No retry, cap increase, extension, checkpoint selection or automatic successor.
+
+Primary control is continuation4013/5%/R32:200k actions/49,939 updates in25m23s,
+frozen4730.208/23 first pyramids. Same initial model and evaluation seed, but
+guidance probability and replay ratio jointly change training trajectories.
+Both reuse development data; no independent seed confirmation is claimed.
+Full-game success and five-game reliability remain unproved.
+
+Trial:`/x/Temp/kindle-qbert-exposure-20261027/qbert-4m-48-r16-p20-cap1920-expert1-200k-seed4013`.
+Owner:`kindle-qbert-r16-p20-cap1920-200k-20261027`.
+External`prepare_full.py`, `run_full.py`, `check_startup.py`, `finish_full.py`,
+`compare_full.py`, `analyze_exposure.py` and the retained R16 recovery watcher
+are pinned with the runtime and evidence (47 inputs). Only this fresh comparison
+is selected; no automatic seed confirmation follows it.

@@ -2049,3 +2049,31 @@ Learning review SHA256`18e4a3a5bb0ac330fd04c6d1e12dfa2baa53ff51dac13aa8c56261cfb
 completion`cec2e9ccb4fbb75c8de4b8c716430f7d83e0555219f25bddcd037410c48d0bab`;
 comparison`2fc6eca1584e980c8078b2afac9b3b572298c3870afb9af6661a3d6ccdf2a749`;
 exposure`9d9d18f654e9276ff0df70d7458bc42a17901b0b6312d42dc6280f12e420e1cb`.
+
+## Higher-exposure R16 bounded check passes
+
+Fresh4013 at4M48/Auto/N8/B8/T16/H15/R16,20% episode continuation/cap1920,
+expert1/NOOPweight.05 completes **8192 actions /32,752 frames /994 updates in
+52.742s**. First248, zero residual credit; the native model, rates, coefficient1,
+actor0 and full18 actions remain unchanged. All reports/346 tensors are finite,
+all346 initial tensors match continuation4013, and CNN/reward/actor/value
+weights change. Actual guidance4527 actions (55.261%):3491 NOOP and1036 hops;
+990 reports contain expert labels. Exact guided input/action/outcome replay and
+both host guards pass; all33 pins remain unchanged.
+
+Frozen1024 actions /4096 frames take.524s, zero updates and346 invariant tensors.
+No natural frozen episode completes; this is execution and early-cost evidence,
+not task competence. The check does not reach cap1920 in any lane; prior full
+continuation lives cover its unchanged release schedule. No check experience
+is reused. Service starts04:51:06 UTC/source`e920f7b`, exits04:52:23 successfully,
+1m16.753s total. No GPU stage repeats.
+
+The measured early rate projects to21.46 minutes for200k, with uncertain later
+guidance fraction and update cost. Therefore the previously prepared, unselected
+20-minute full-run draft is archived; the separately selected fresh comparison
+declares a25-minute training cap before launch. Neither bound is extended.
+Probability and replay ratio change together, and the original mean15000/90%
+gate remains unchanged. See the [selected protocol](../experiments/2026-10-27-cdp-qbert-continuation.md#selected-fresh-higher-exposure-r16-comparison).
+
+Artifacts:`/x/Temp/kindle-qbert-exposure-20261027/qbert-4m-48-r16-p20-check`.
+Review SHA256`9b03f5c7dc686b554b821d9a3fdbc6912dfa73c38d924c7a261730db575871ef`.
