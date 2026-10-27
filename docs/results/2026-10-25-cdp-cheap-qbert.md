@@ -1782,3 +1782,44 @@ Learning review`3cad7a4285536a7d484759f3f483250636a82dac9fb66d031749f2c8b1dcaa40
 completion`391554dfef3c781c9a432088d4f59c64e5b622594ff3bb9eea1b2ee5a8e84622`;
 comparison`58879af670c951c03fce61c5a07a2d50233a3643a4a6f1242eca4ff0e5ed9d8a`;
 exposure`5e311a769d85f41e340e7ca23812ce658029bf265097b13ff53e2a37cbef1ef5`.
+
+
+## Repeated movement and pixel avoidance strengthen the CPU reference
+
+A CPU replay of the saved hybrid reference's lane0 reproduces1096 actions,
+4382 frames and7550 points exactly. Its rule releases29 pending moves at age16
+while the character remains visible; many intervals between move requests are
+17 actions. Native RGB snapshots place purple sprites near recorded life losses.
+Lives are read only after each step for analysis and never passed to the policy.
+This motivates two focused CPU candidates, not a native-learning diagnosis.
+
+| Same eight reused4013 first episodes | Mean natural return | First pyramids | Actions /frames | Collection /replay |
+|---|---:|---:|---:|---:|
+| Existing hybrid color rule |6743.750|8/8|9024 /36,091|26.185s /3.494s|
+| Repeat a new hop while its origin stays visible, at most3 further actions |14703.125|8/8|11,581 /46,306|33.400s /4.242s|
+| Same, reroute a new hop away from nearby purple pixels |21825.000|8/8|24,733 /98,913|71.038s /8.002s|
+
+Both new candidates complete all8 natural episodes without truncations or tails;
+every saved output pixel, action, reward, frame count and boundary replays exactly.
+No native module is loaded. The avoidance rule uses current RGB, the existing
+route graph and no RAM, reward or task inputs. The repeated-command candidate
+still misses15000; all8 avoidance episodes exceed15000 (19100–22500). These are
+hand-coded reference scores on repeatedly selected development episodes, not
+Kindle learning or independent confirmation. Provisional color-flip counts are
+not validated later-pyramid counts.
+
+Select only a fixed CPU standard24 assessment of the unchanged avoidance rule:
+first3 natural episodes per8 lanes, retaining excess episodes and partial tails,
+120k-action/360-second cap per collection/replay pass, exact input/output/reset
+pixels and outcome replay. The earlier8 are included in24. That assessment is
+active; no production guidance patch, native training allocation or successor
+is selected. Breakout's active learner retains the same PID/invocation and all46
+input pins. These CPU jobs run on one affined core at nice10; measured successful
+diagnostic/collection/replay portions total123.747s before the24 assessment and
+remain a co-host timing caveat.
+
+Artifacts:`/x/Temp/kindle-qbert-continuation-20261027`.
+Aggregate`movement-avoidance-review.json` SHA256
+`b71b9391ea0e6ea380c9081af23afa94636607b2d577b36808523e8b60a7e0b2`;
+repeat review`595125ad6b661c9aa69ff4b67cf94a67dc40eb5d408d6d996927ca07fa5e8395`;
+avoidance review`99afab5535aec6b2dd311fd08b3cb5bed7bf2ac945ba076e50ca5fe14b033c60`.

@@ -354,7 +354,11 @@ full audits and100k recovery. No check experience reuse or automatic successor.
 Active from02:51:51 UTC/source`da8dee8`, PID76965. Startup passes6840 actions/
 1647 finite updates,34 supervised reports,346 matched initial tensors and
 first248:1/256:2/256:3/264:4/264:5/272:6. All46 pins unchanged; progress,
-100k recovery and CPU postprocessing observers attached. Frozen score pending.
+100k recovery and CPU postprocessing observers attached.100k/24,939 recovery
+passes03:03:42 UTC with346 finite tensors and complete-prefix finite reports.
+Frozen score pending. Independent CPU Qbert reference reaches21825 on8 reused
+episodes with exact replay; fixed24 CPU check is active. No production guidance
+or native allocation follows automatically; all46 active inputs remain unchanged.
 Owner`kindle-breakout-expert-cap640-200k-20261027`; see
 [protocol](experiments/2026-10-27-cdp-breakout-expert.md).
 Check live state before GPU work.

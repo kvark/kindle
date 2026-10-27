@@ -87,3 +87,29 @@ matching both the full18 control and bounded check, and first six updates
 Startup SHA256`2df0189db11426d60c0020bc7a4e9b3fa26034651d59e8538a7716d05f8e9938`.
 No full-run frozen score is known yet. Progress,100k recovery and terminal CPU
 postprocessing observers are attached; they never start/extend GPU work.
+
+
+## Recovery and independent CPU work
+
+The100k/24,939-update recovery passes03:03:42 UTC:346 finite checkpoint tensors,
+complete prefix104,880 actions/26,159 finite reports, last progress102,400/
+25,539 in691.392s with zero debt. Receipt SHA256
+`821c0e3176180bc1ba7c12b86efaf0d78ceab6d35659d0be385e471d0a574462`.
+The same learner/PID76965/invocation07c8d434 continues; fixed frozen result pending.
+
+A separate CPU exposure reader reconciles the completed4096-action check's669
+trusted actions,963 reports and all completed/partial rewards. It distinguishes
+guided prefixes, released actions and wholly unguided episodes, and is attached
+after terminal postprocessing. It does not alter any active input or scoring.
+Reader`analyze_exposure.py`, observer`finish_exposure.py`, validation
+`exposure-validation.json` live in the artifact root. Reader SHA256
+`a2ff2d08288ef0634686380a34b06b07eae03318561662349b3fd7157b164737`.
+After-release rewards still inherit a guided starting state and are not a causal
+measure of native transfer; fixed unguided frozen evaluation remains decisive.
+
+Independent CPU Qbert reference developments improve6743.750→14703.125→21825.000
+on eight reused first episodes, all with exact replay. No native module loads;
+all46 active pins remain unchanged. Their measured successful portions123.747s,
+plus the.015s exposure-reader check and the pending fixed24 reference, are
+co-host timing caveats. See the [reference evidence](../results/2026-10-25-cdp-cheap-qbert.md#repeated-movement-and-pixel-avoidance-strengthen-the-cpu-reference).
+No new GPU allocation, cap increase or extension is selected by this CPU work.
