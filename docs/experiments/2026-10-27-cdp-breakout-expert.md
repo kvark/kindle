@@ -126,3 +126,41 @@ postprocessing03:16:14. Retain controls; no extension or confirmation.
 See [complete evidence](../results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality).
 The following Qbert adapter application occurs only after all terminal reviews
 and pin verification; it does not alter this completed run's runtime or evidence.
+
+## Selected bounded check of a longer guidance prefix
+
+After the completed paired Pong greedy assessment, select one16,384-action
+Breakout check of cap1920. The saved reference prefix analysis retains96.19%
+of full-teacher reward at1920 versus14.52% at640. This motivates an exposure
+hypothesis, not a diagnosis of frozen4.000 or a forecast of learned success;
+even the full teacher misses the two-wall gate.
+
+Keep the exact original Breakout runner SHA256
+`684666a882378575ace1b8dcee67f99ea90827dba4d097812905473a00abfa18`,
+original packaged runtime/native79c9a7f, host,4M/RGB64/Auto/N8/B8/T16/H15/R32,
+coefficient1/actor.01/full18/original rates, seed1009/eval4000001009 and expert
+scale1/all18 weights1. Use25% episode guidance solely for this short execution
+check, as in the prior bounded check. A future full candidate would keep5% and
+change only the cap640→1920 against the completed expert control.
+
+- Train16,384 aggregate actions/4035 updates, first248/residual0;180-second cap.
+  First updates248:1/256:2/256:3/264:4/264:5/272:6 match the retained control.
+- Restore the check's final weights for1024 frozen actions, zero updates and
+  guidance off,60-second cap. This is not a natural-episode competence test.
+- Require finite reports/all346 tensors,346 initial tensors matching cap640,
+ 346 invariant frozen tensors, changed CNN/reward/actor/value parameters,
+  trusted movement labels/nonzero auxiliary reports, exact guided input/action/
+  outcome replay and host guards. Audit180s; service480s.
+-2048 actions per lane allow a1920 prefix, but natural episode ends may preempt
+  the cap; measure actual override/release counts rather than assume them.
+  No retry, cap increase, extension, automatic full promotion or check experience
+  reuse. Select a full run only after reviewing this completed check and cost.
+
+CPU preflight parses both commands, compiles four scripts, verifies the exact
+original runtime and4035 retained-prefix updates in.059s. No native module,
+agent or environment loads; no repository runtime changes. All32 declared pins
+match. Preceding Pong main/postprocessing are terminal with complete receipt
+`57128cfdbbb46719cd1b87c27063b7f36834473318800880e2043d46ef1e5b35`.
+Artifacts:`/x/Temp/kindle-breakout-exposure-20261027/breakout-4m-64-cap1920-check`;
+owner`kindle-breakout-cap1920-check-20261027`. Prepared declaration SHA256
+`e8f50e75a90466cced5320dc5a50a0d4b86449cb397c7b2f0cc162ac3767b782`.
