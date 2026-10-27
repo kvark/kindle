@@ -995,3 +995,30 @@ Artifacts remain in the declared run directory. Learning-review SHA256
 `050f0b1868c9d15ec022a22021458556ed61ba69b7b3ae8af6b145400d642909`;
 comparison`1957825072c2db06040e74a01bc87397cbc82da796285016dfb850cb69b6774c`;
 postprocessing`e1197f168f5845b2acffa1a71143f15ae27cd038f3cb5206aef598d95160e441`.
+
+
+## Larger capacity at lower replay ratio passes the bounded check
+
+The native12M/RGB48/Auto/N8/B16/T16/H15/R16 candidate completes16,384 aggregate
+actions /65,523 emulator frames /1,001 updates in **78.872s**, versus94.054s
+for the4M/B8/R32 control prefix:16.14% less training time. Construction2.171s
+is separate. Coefficient.01, actor0, original rates, full18, no aid or imitation.
+All finite reports,14,123,473 parameters, exact config/source/counters, changed
+CNN/reward weights and both guards pass. First376, residual credit.5.
+All346 actual initial tensors match the retained same-seed12M48 initial.
+Frozen1024 actions take.708s, zero updates and346 unchanged tensors.
+Service exits01:04:22 UTC on October27,1m28.029s total; no GPU repeat.
+
+This measures execution and early cost, not natural-match competence. Capacity,
+batch width and replay ratio change together; native/runner and control kernel
+differ. Historical12M64 Pong success motivated the candidate without predicting
+AMD learning. The completed compact4M recipes remain the measured task controls.
+
+After reviewing the bounded result, select one fresh500k-action/31,227-update
+comparison with45-minute training cap and fixed final/own initial24-natural
+matches. Mean15/90%-wins remains unchanged. No smoke experience is reused,
+no extension or automatic successor is queued, and no full-run score is known.
+See the [protocol](../experiments/2026-10-27-cdp-pong-capacity-r16.md).
+Artifacts:`/x/Temp/kindle-pong-capacity-20261027`.
+Bounded review SHA256:
+`b56204eb1e0d6233546e1d2832aba8b8ca37a526f3a60bffcfacbde2f2845b5f`.

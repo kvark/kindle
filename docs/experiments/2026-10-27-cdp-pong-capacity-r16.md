@@ -1,4 +1,7 @@
-# Pong12M/RGB48/B16/R16 development check
+# Pong12M/RGB48/B16/R16 capacity comparison
+
+The bounded check completes successfully; the separately reviewed fresh500k
+allocation below is selected.
 
 Selected after the completed Qbert expert500k/R16 comparison and terminal
 services. The strongest compact Pong4M48/B8/R32 recipe scores14.958 and14.000
@@ -32,4 +35,53 @@ Owner:`kindle-pong-12m48-b16-r16-check-20261027`.
 The declaration pins24 input files. CPU preparation corrected an unsupported
 bonus flag before execution; its parser-only preflight initially omitted the
 `Path` symbol, then both commands parsed. No environments or agents were
-constructed during preparation. No full learning allocation is selected yet.
+constructed during preparation. The bounded allocation is terminal; its result and subsequent decision follow.
+
+
+## Bounded result
+
+16,384 aggregate actions /65,523 emulator frames /1,001 updates complete in
+**78.872s**, versus94.054s for the compact4M/B8 prefix,16.14% less training time.
+Construction2.171s is separate. First376, residual credit.5,14,123,473 parameters,
+all finite reports/config/counters, changed CNN/reward weights and both guards
+pass. All346 actual initial tensors match the existing12M48 initial despite the
+new native binary; no equality across model sizes is claimed. Ordinary1024-action
+frozen restore takes.708s with zero updates and346 unchanged tensors.
+Service starts01:02:54 and exits successfully01:04:22 UTC on October27,
+1m28.029s total. No GPU retry or audit repair. Review SHA256:
+`b56204eb1e0d6233546e1d2832aba8b8ca37a526f3a60bffcfacbde2f2845b5f`.
+
+## Selected fresh500k comparison
+
+The bounded result fits the intended cost range, so select one fresh500k-action
+life on1009, with the same recipe and **45-minute training cap**, including
+construction. A linear projection from the short prefix is40m07s; this is an
+estimate, not measured full-run throughput or learning quality. Training expects
+31,227 updates, first376, residual credit.5 and initial six updates at376,392,
+408,424,440,456. Recovery saves every100k:6227/12477/18727/24977 updates before
+final31227. No smoke checkpoint, replay, belief, environment or RNG is reused.
+
+Fixed final and own actual initial each assess the first three natural matches
+per eight streams, with eval4000001009, sampled actions and no aid. Keep the
+original mean15/90%-wins gate; zero updates/truncations and346 unchanged tensors
+per frozen arm. Each arm has600k-action/300-second caps. Complete replay checks
+pixels, actions, rewards, frames and episode boundaries, with videos. Training
+must pass all finite reports, exact configuration/source/counters and guards;
+startup compares all346 initial tensors and the prelearning trajectory against
+the bounded check. All four recoveries must be audited before replacement.
+
+The complete comparison retains4M/B8/R32 and4M/B16/R32 fixed500k controls,
+which score14.958 and11.875 in49m55s and38m45s. Capacity, batch and ratio change
+together versus B8; native/runner and control kernel differences remain explicit.
+No initial-tensor equality across capacities or isolated causal effect is claimed.
+No full-run score is known yet. A promising result requires separate seed
+confirmation before reliability claims. No extension, cap increase, checkpoint
+selection or automatic successor follows this allocation.
+
+Artifacts:`/x/Temp/kindle-pong-capacity-20261027/pong-12m-48-b16-r16-intrinsic001-500k`.
+Controller`run_full.py`, startup`check_startup.py`, recovery`watch_recovery.py`,
+comparison`compare_capacity.py`, completion`finish_full.py` in the same parent.
+Owner`kindle-pong-12m48-b16-r16-500k-20261027`; service cap4620s, including
+training, evaluations and1200s CPU audit cap. The declaration pins42 files.
+Both existing controls pass the comparison reader and all three commands parse
+before selection; preflight passes without constructing an agent.
