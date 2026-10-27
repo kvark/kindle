@@ -55,3 +55,23 @@ Controller`run_seed4013.py`, preparation`prepare_seed4013.py`, startup
 Audit cap1200s; main service cap4620s. Monitoring and CPU postprocessing do not
 start, stop or extend GPU work. Declaration and launch/startup receipts retain
 exact hashes and the launch commit.
+
+
+## Active startup
+
+Service starts01:57:51 UTC on October27 from`4cd7fb5f13294bc692e8b75dbdb341f8711f499e`,
+PID71345, invocation`bfe98b4e4ae84b3f996e05f86f28e3df`. Startup passes at5656
+complete actions/330 finite reports: zero starting counters/no restore, exact
+recipe except4013,14,123,473 parameters, all346 initial tensors finite, fresh
+world weights different from1009,47 prelearning transitions and first six
+376/392/408/424/440/456 updates. All53 declared inputs remain unchanged. No
+cross-seed tensor/trajectory equality is asserted. Startup receipt SHA256:
+`49695c5e5676de8d5bd6949c0c1e44cbdf6d645435a1090bf1c95f5b67e49284`;
+launch declaration`a0d84ffa794713df966e95a0c5de1cffe4257fe44e72f5846090d91d6ea44d96`.
+
+The initial read-only progress observer exits2 because unsupported `--seconds`
+and `--poll-seconds` flags were supplied. Its original journal is retained.
+A separate-v2 observer uses the script's existing45-second/3600-second defaults
+and runs correctly; the main learner keeps the same PID/invocation and no GPU
+stage repeats. Recovery100k/200k/300k/400k and terminal CPU plot/comparison
+observers are attached. This is startup evidence, not full-run competence.

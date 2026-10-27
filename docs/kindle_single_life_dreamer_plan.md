@@ -330,13 +330,18 @@ service exits01:51:06 UTC, CPU postprocessing01:51:35 on October27.
 No live pixel hashes are available in ordinary unguided logs. See the protocol
 scope correction and [completed result](results/2026-10-25-cdp-cheap-pong.md#larger-capacity-with-less-replay-work-reaches-the-gate).
 
-Selected fresh4013/eval4000004013 confirmation keeps the exact12M48 recipe,
+Active fresh4013/eval4000004013 confirmation from01:57:51 UTC/source4cd7fb5
+keeps the exact12M48 recipe,
 native/CLI79c9a7f and unchanged Python sources.500k actions /31,227 updates,
 first376/residual.5, four100k recoveries,45-minute training cap and fixed final/
 own actual initial24-natural matches. Original mean15/90%-wins gate; complete
 numerical/config/counter/replay/346-tensor/guard audits. No restoration, cap
 increase, extension or automatic successor.4013 was used in prior4M development;
 this is a fresh fixed-recipe learner, not a held-out test or broad reliability.
+Startup passes5656 actions/330 finite reports,346 finite initial tensors, fresh
+world weights and first376/392/408/424/440/456 updates; all53 pins unchanged.
+The progress observer was corrected after unsupported flags; training was not
+interrupted. Recovery and CPU postprocessing observers are attached.
 Owner`kindle-pong-12m48-b16-r16-500k-seed4013-20261027`; see
 [protocol](experiments/2026-10-27-cdp-pong-capacity-seed4013.md).
 Check live state before GPU work.
