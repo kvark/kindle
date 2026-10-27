@@ -2228,3 +2228,17 @@ Artifacts:`/x/Temp/kindle-qbert-greedy-20261027/qbert-4m-48-continuation-two-see
 Prepared declaration SHA256`037b86f98297970bc1b4efeb343f6ca3def04e4fe38d1fcb925f5770558ca3b4`;
 CPU preflight`84de1e79bf3e4b905a15deac7c1579829051595845c1ca91e77200ae8ef76652`;
 controller`cbd80844532238fe51e5835cf3a4350428fc1803d41622a867d19b2b74a746b4`.
+
+## Retained Qbert greedy comparison selected
+
+After complete Breakout cap1920 audits and both main/postprocessing services
+are inactive/MainPID0/Resultsuccess, select only the prepared four-arm greedy
+assessment above. The preceding terminal receipt is
+`cae88022cf55cd8d1461bc3a4b8781557980432d463d8516c7ff47666c373ae0`.
+Keep all60 pins, fixed source checkpoints, original host/runtime, four24-natural
+assessments,600k-action/300s caps per arm, original mean15000/90%-pyramid gate,
+zero updates/truncations,346 invariant tensors and complete replays/videos/
+guards. Audit1200s/service2460s. No retry, cap increase, extension, new learner,
+checkpoint selection or automatic successor. Archive the prepared declaration
+before marking selection. No new training or global inference default change.
+Owner:`kindle-qbert-continuation-two-seed-greedy-frozen-20261027`.

@@ -241,3 +241,27 @@ review`81f9b8f8aa51005944c13bb2e7a3271752dda823f377f42e514822d58daa518b`.
 The recovery observer completes successfully; the original main service remains
 active under PID94810/invocation`8114cb5a27d74a8787a4b1297ab179d2`.
 Keep200k/25-minute cap and fixed evaluations/audits. No frozen result exists.
+
+A separately declared CPU-only collision-window reference variant runs while
+this same native service remains active. Collection/replay use10.460s on one
+affined low-priority core; all47 input pins stay unchanged. It scores142.750
+versus original144.875 on the same eight reference episodes, all0/8 two-wall
+successes, so no teacher or adapter change follows. This is a co-host timing
+caveat, not a correction to native wall time. See [the negative CPU result](../results/2026-10-26-cdp-breakout-pixel-reference.md#a-collision-time-window-does-not-improve-the-cpu-reference).
+
+## Longer-prefix comparison completes
+
+200k actions /798,815 frames /49,939 updates take23m33s, within25 minutes.
+Frozen2.625 versus own initial1.375 is below cap640's4.000; both0/24 two-wall
+successes. All audits,100k recovery,346 matched initial/unchanged frozen tensors,
+paired initial semantic traces,47 pins, full replays/videos, guards, curves,
+comparison and exposure pass. Main exits06:07:00 UTC; postprocessing06:07:30.
+Actual guidance46,833 actions (23.4165%); online guided mean169.700 is not
+frozen competence. No GPU stage repeats, extension or confirmation follows.
+See [complete evidence and limits](../results/2026-10-26-cdp-breakout-pixel-reference.md#longer-guidance-lowers-frozen-breakout-quality).
+
+After both services are inactive/MainPID0/Resultsuccess with complete terminal
+receipt`cae88022cf55cd8d1461bc3a4b8781557980432d463d8516c7ff47666c373ae0`,
+separately select the prepared four-arm Qbert continuation greedy evaluation.
+It adds no training and preserves the sampled outcomes and original costs;
+its fixed protocol remains in the Qbert continuation experiment.

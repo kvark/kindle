@@ -408,3 +408,17 @@ cap increase or successor. The original sampled3137.500/4730.208 failures and
 26m38s/25m23s training costs remain. Reused cohorts are development evidence;
 Pong's greedy gain does not establish Qbert benefit. See [the complete prepared
 protocol and receipts](../results/2026-10-25-cdp-cheap-qbert.md#prepared-greedy-comparison-of-both-retained-continuation-learners).
+
+## Retained Qbert greedy comparison selected
+
+After complete Breakout cap1920 audits and both main/postprocessing services
+are inactive/MainPID0/Resultsuccess, select only the prepared four-arm greedy
+assessment above. The preceding terminal receipt is
+`cae88022cf55cd8d1461bc3a4b8781557980432d463d8516c7ff47666c373ae0`.
+Keep all60 pins, fixed source checkpoints, original host/runtime, four24-natural
+assessments,600k-action/300s caps per arm, original mean15000/90%-pyramid gate,
+zero updates/truncations,346 invariant tensors and complete replays/videos/
+guards. Audit1200s/service2460s. No retry, cap increase, extension, new learner,
+checkpoint selection or automatic successor. Archive the prepared declaration
+before marking selection. No new training or global inference default change.
+Owner:`kindle-qbert-continuation-two-seed-greedy-frozen-20261027`.

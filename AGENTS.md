@@ -146,26 +146,27 @@ UTC on October27. A copied4096-action CPU exposure assumption is repaired;
 original failure retained, no GPU repeat. Natural ends/late starts leave0 released
 actions in this check; do not claim cap-release coverage or competence.
 
-Breakout cap1920 is active from05:41:26 UTC/source`8c888aa`, PID94810/
-invocation`8114cb5a27d74a8787a4b1297ab179d2`. Startup verifies47 pins,346 initial
-tensors matching cap640 and bounded check, and first248:1/256:2/256:3/264:4/
-264:5/272:6 updates. At10,496 actions,2561 reports are finite,604 actions are
-trusted and323 reports contain expert labels. Progress/100k recovery/terminal
-postprocessing observers are attached. The100k recovery passes05:53:24 UTC:
-24,939 updates/346 finite tensors,25,309 finite reports in the101,488-action
-complete prefix; zero debt. Recovery watcher completes. Keep200k/25-minute
-training cap; no frozen outcome yet and no automatic successor.
+Breakout cap1920 completes200k actions /798,815 frames /49,939 updates in
+23m33s. Frozen2.625 versus own initial1.375 is below cap640's4.000; both0/24
+two-wall successes. Training costs4.02% more. All audits,100k recovery,346
+matched initial/unchanged frozen tensors, paired initial semantic traces,47 pins,
+full replays/videos, guards, curves, comparison and exposure pass. Main exits
+06:07:00 UTC; postprocessing06:07:30 on October27. Actual guidance46,833 actions
+(23.4165%); guided online mean169.700 is not frozen competence. Retain controls;
+no extension or confirmation. See the completed longer-guidance result in the
+Breakout pixel-reference report.
 
-Current allocation: fresh Breakout4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/
-full18/original-rates comparison,1009/eval4000001009,5%episode guidance/
-cap1920/expert1/all weights1. Only cap640→1920 changes against frozen4.000
-primary control; exact original runner/runtime/native/host and initial weights.
-200k actions/49,939 updates, first248/residual0,100k recovery24,939;
-25-minute training cap declared before launch. Fixed final/own initial24-natural
-assessments retain original90%two-wall gate, full audits and47 pins.
-Owner`kindle-breakout-cap1920-200k-20261027`, artifacts
-`/x/Temp/kindle-breakout-exposure-20261027`. No retry, cap increase, extension,
-checkpoint selection or automatic successor. Check live state before GPU work.
+Current allocation selected after terminal Breakout review: four-arm Qbert
+continuation greedy evaluation, retained final1009/initial1009/final4013/initial4013.
+No new training. Exact original runner/runtime/native/host,60 pins,24 natural
+episodes per arm,600k-action/300s caps, mean15000/90%-pyramid gate, zero updates/
+truncations,346 invariant tensors per arm and full replays/videos/guards.
+Owner`kindle-qbert-continuation-two-seed-greedy-frozen-20261027`, artifacts
+`/x/Temp/kindle-qbert-greedy-20261027`. Audit1200s/service2460s; preserve sampled
+3137.500/4730.208 and original26m38s/25m23s training costs. No retry, cap increase,
+extension, checkpoint selection or automatic successor. Check live state before
+GPU work.
+
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,
 13.41% less training time than5%/R32, but frozen3333.333/18of24 first pyramids

@@ -488,3 +488,75 @@ Artifacts:`/x/Temp/kindle-breakout-exposure-20261027/breakout-4m-64-cap1920-chec
 Review SHA256`f93023cad808e5a85143aef76a0b6c98f0747215baceec00e667a34331ad570a`;
 completion`d85dd71ccc1a8fc505bd3bb6c4fa7a39b86c40fe36c229b8ac6724548097bef7`;
 exposure`90a18f0d95e7fea1ff714590681af1e94f4548c5f6daf91f43662202c6a36b3e`.
+
+## A collision-time window does not improve the CPU reference
+
+One external CPU variant replaces nominal impact error with the maximum error
+at nominal time and±.25 action intervals (one raw frame), retaining the earlier
+.5 impact-velocity penalty. Detector, calibrated response, five-command plans,
+RGB-only inputs and action vocabulary stay fixed. The hypothesis is less
+sensitivity to pooled-pixel lag and fast paddle crossing, suggested by the
+already retained405-point miss trace; it is not a proven failure mechanism.
+
+On the same eight reused first natural episodes, the variant scores142.750,
+below original144.875 and settling-only152.750. All three have0/8 two-wall
+successes. New scores107,124,68,412,212,42,106,71 use11,326 actions/45,289 frames;
+all end naturally. Collection6.217s and exact input/output/action/reward/boundary
+replay4.243s pass on one affined low-priority CPU core. All47 active native
+Breakout inputs remain unchanged; no native module or learner is constructed.
+
+Retain the original teacher; no adapter change, further variant or GPU
+allocation is selected. This selected development cohort is not held out and
+these CPU scores are not learned Kindle competence. The10.460s of co-host work
+is retained as a timing caveat for the active cap1920 training run.
+Artifacts:`/x/Temp/kindle-breakout-robust-20261027/robust-eight/review.json`,
+SHA256`f14bba98a4cc5f2841e1d5955ef239edf267c9f6ad62e29e63a399625d4c1a79`.
+
+
+## Longer guidance lowers frozen Breakout quality
+
+The fresh cap1920 comparison completes **200,000 aggregate actions /798,815
+emulator frames /49,939 updates in23m33s** (1412.688s), within its25-minute cap.
+Frozen mean **2.625**, versus own actual initial1.375, is below cap640's4.000;
+both have **0/24 two-wall successes**. Training costs4.02% more than cap640's
+22m38s. Retain the controls; no extension or confirmation is selected.
+
+Only the guidance cap640→1920 changes against the primary expert control.
+Keep4M/RGB64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/full18/original rates,
+fresh1009/eval4000001009,5% episode guidance/expert1/all action weights1 and
+the exact original runner/runtime/native/host. No weights or experience are
+reused. Both assessment cohorts and the development seed are reused; this is
+not independent confirmation. The unaided full18 control7.083 and minimal4
+control9.542 remain stronger, also with0/24 successes.
+
+All49,939 reports are finite. All47 input pins,100k recovery at24,939 updates,
+346 initial tensors matching cap640 and the bounded check, paired initial
+semantic traces,346 invariant tensors per frozen arm, full guided input/action/
+outcome replay, frozen outcome replays/videos, guards, curves, comparison and
+exposure accounting pass. Final evaluation uses10,616 actions /42,411 frames /
+5.064s; initial5944 /23,717 /3.009s. Each selects first3 natural episodes per8
+lanes=24, with zero updates/truncations; excess episodes and partial tails are
+retained. Original90%-two-wall criterion is unchanged. Ordinary frozen logs
+lack live pixel hashes; their outcome replay does not prove live-image equality.
+No GPU stage repeats. Main exits06:07:00 UTC, postprocessing06:07:30 on October27.
+
+The5% schedule selects32 of554 episode starts, actually overriding46,833
+actions (23.4165%):16,152 NOOP/4071 FIRE/12,868 RIGHT/13,742 LEFT. There are
+41,440 supervised reports and1,322,945 repeated replay-label rows. Label cross
+entropy falls1.192→1.124 across50k windows; this is not held-out accuracy.
+The30 completed guided episodes average169.700 versus24.871 for cap640,
+but516 unguided episodes average1.597 (last50:2.720), below cap640's2.948
+(last50:5.100). Guided episodes earn4970 prefix reward and121 after351 released
+native actions; their inherited guided states prevent a causal phase comparison.
+Higher teacher-driven online returns do not imply stronger frozen learning.
+
+The comparison PNG is visually checked. The protocol records the low-priority
+CPU co-host work, including10.460s for the rejected collision-window reference;
+the older control also has recorded CPU co-host work. No wall-time correction
+or isolated timing-effect claim is made.
+
+Artifacts:`/x/Temp/kindle-breakout-exposure-20261027/breakout-4m-64-r32-expert1-cap1920-noop1-200k`.
+Learning review SHA256`03d58ea8501e846cb318c50a0c5fc2ba08849cc4310183ee77e2ae2516ffb9e4`;
+postprocessing`cae88022cf55cd8d1461bc3a4b8781557980432d463d8516c7ff47666c373ae0`;
+comparison`d7d8de689570fbea72d46fea7925af62cd651060300fa9b3228a8725e905664f`;
+exposure`dfc4c189a0cbb30c15022d49f6711bf3b3cf6d67efc3c8b625fb26ca54e9ff5c`.
