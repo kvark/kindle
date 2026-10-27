@@ -112,3 +112,16 @@ construction. The initial plot-environment import failure lacked ALE; the
 unchanged preflight passes under the Atari environment before any GPU stage.
 Native binary and applied adapter remain unchanged. No retry, cap increase,
 extension, checkpoint selection or automatic successor is selected.
+
+
+## Live startup
+
+The selected service starts03:38:49 UTC/source`8761ff2`, PID81404,
+invocation`ab0b0ad39c914bd89ab77e9e94773971`. Declaration SHA256
+`f88fa2fe0baee5449dd48baa2ee0a04f2ee0f19b591864cdf1c034cf000996d3`.
+All56 pins match. The initial346 tensors are finite and exactly match both
+retained4013 control and bounded check. First updates are248:1/256:2/256:3/
+264:4/264:5/272:6. At the first check,2312 actions have515 finite reports and
+zero guided actions; no selected episode has begun yet. This is startup evidence,
+not a frozen outcome. Read-only progress,100k recovery and terminal CPU
+postprocessing observers are attached; no next GPU allocation is selected.

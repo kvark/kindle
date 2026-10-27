@@ -294,6 +294,14 @@ tensors,46 pins, replays, guards, comparison and exposure pass. Service exits
 20,463 trusted actions (10.2315%); guided/unguided completed means24.871/2.948
 are not frozen competence. See [result](results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality).
 
+Qbert continuation training is active from03:38:49 UTC/source`8761ff2`,
+PID81404/invocation`ab0b0ad39c914bd89ab77e9e94773971`. Startup verifies56 pins,
+346 initial tensors matching both control and check, and first248:1/256:2/
+256:3/264:4/264:5/272:6 updates. The first2312-action prefix has515 finite
+reports and no selected guided episode yet; no task outcome is available.
+Progress,100k recovery and postprocessing observers are attached. Keep the
+selected200k/30-minute cap and all frozen audits; no next allocation.
+
 A fresh Qbert continuation comparison is selected after the passing bounded
 check:4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
 4013/eval4000004013,200k actions/49,939 updates, first248/residual0,100k recovery,
