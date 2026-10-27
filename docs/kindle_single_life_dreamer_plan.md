@@ -32,6 +32,8 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Expert4013, more experience at R16](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-improves-first-pyramid-success-with-higher-cost) |500k /62,470|28m20s|3752.083 /182.292|21/24 first pyramids; gate still fails|
 | [Continuation teacher/cap1920,4013/R32](results/2026-10-25-cdp-cheap-qbert.md#continuation-guidance-improves-frozen-learning-but-misses-the-full-gate) |200k /49,939|25m23s|4730.208 /182.292|23/24 first pyramids; mean15k still fails|
 | [Same recipe, fresh1009](results/2026-10-25-cdp-cheap-qbert.md#continuation-improves-the-weaker-seed-but-both-miss-the-full-gate) |200k /49,939|26m38s|3137.500 /180.208|17/24 first pyramids; both gate criteria fail|
+| [Retained continuation1009, greedy evaluation](results/2026-10-25-cdp-cheap-qbert.md#greedy-evaluation-lowers-both-retained-qbert-results) |200k /49,939 retained;0 new|26m38s retained|3058.333 /85.417|16/24 pyramids; below sampled3137.500/17|
+| [Retained continuation4013, greedy evaluation](results/2026-10-25-cdp-cheap-qbert.md#greedy-evaluation-lowers-both-retained-qbert-results) |200k /49,939 retained;0 new|25m23s retained|3770.833 /263.542|19/24 pyramids; below sampled4730.208/23|
 | [Continuation20%/R16,4013](results/2026-10-25-cdp-cheap-qbert.md#more-guidance-with-less-replay-saves-time-but-lowers-frozen-quality) |200k /24,970|21m59s|3333.333 /182.292|18/24 first pyramids; below5%/R32|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
@@ -40,6 +42,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Breakout4M/RGB64/R32](results/2026-10-26-cdp-cheap-breakout.md) |200k /49,939|22m30s|6.208 /1.375|0/24 two-wall successes|
 | [Same, native actor mixture.01](results/2026-10-26-cdp-breakout-unimix.md) |200k /49,939|22m29s|7.083 /1.375|0/24 two-wall successes|
 | [Full18, capped expert imitation](results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality) |200k /49,939|22m38s|4.000 /1.375|0/24; below full18 control|
+| [Full18, longer expert cap1920](results/2026-10-26-cdp-breakout-pixel-reference.md#longer-guidance-lowers-frozen-breakout-quality) |200k /49,939|23m33s|2.625 /1.375|0/24; below cap640 control4.000|
 | [Same, four actions](results/2026-10-26-cdp-breakout-minimal-actions.md) |200k /49,939|20m59s|9.542 /1.167|0/24 two-wall successes|
 | [Four actions, coefficient1, actor/critic gradients](results/2026-10-26-cdp-breakout-minimal-actions.md#actorcritic-gradients-give-a-modest-unconfirmed-gain) |200k /49,939|20m41s|11.208 /1.167|0/24; modest unconfirmed gain|
 | [Same, coefficient .01](results/2026-10-26-cdp-breakout-minimal-actions.md#smaller-bonus-lowers-the-frozen-score) |200k /49,939|21m07s|5.042 /1.167|0/24; weaker frozen score|
@@ -400,16 +403,18 @@ full replays/videos, guards, curves, comparison and exposure pass. Main exits
 no extension or confirmation. See the completed longer-guidance result in the
 Breakout pixel-reference report.
 
-Current allocation selected after terminal Breakout review: four-arm Qbert
-continuation greedy evaluation, retained final1009/initial1009/final4013/initial4013.
-No new training. Exact original runner/runtime/native/host,60 pins,24 natural
-episodes per arm,600k-action/300s caps, mean15000/90%-pyramid gate, zero updates/
-truncations,346 invariant tensors per arm and full replays/videos/guards.
-Owner`kindle-qbert-continuation-two-seed-greedy-frozen-20261027`, artifacts
-`/x/Temp/kindle-qbert-greedy-20261027`. Audit1200s/service2460s; preserve sampled
-3137.500/4730.208 and original26m38s/25m23s training costs. No retry, cap increase,
-extension, checkpoint selection or automatic successor. Check live state before
-GPU work.
+Qbert continuation greedy evaluation completes on both retained learners.
+1009 scores3058.333/16of24 first pyramids versus sampled3137.500/17;4013
+scores3770.833/19 versus4730.208/23. Own greedy initials85.417/263.542,0pyramids.
+Both greedy arms fail mean15000/90%; retain sampled actions for Qbert.
+Four arms total65,104 actions /260,268 frames /30.277s evaluation, zero new
+training/updates; entire service1m17.712s. Starts06:12:49 UTC/source`62482da`,
+main exits06:14:07, postprocessing06:14:10 on October27. All60 pins, source
+invariance,346 invariant tensors per arm, full outcome replays/videos and
+host guards pass. Original26m38s/25m23s training costs and sampled results
+remain. No retry, extension, third learner or automatic successor selected.
+No GPU allocation is active; check live state before new work. See the completed
+greedy comparison in cheap-Qbert. The five-game goal remains unfinished.
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,

@@ -324,16 +324,18 @@ full replays/videos, guards, curves, comparison and exposure pass. Main exits
 no extension or confirmation. See the completed longer-guidance result in the
 Breakout pixel-reference report.
 
-Current allocation selected after terminal Breakout review: four-arm Qbert
-continuation greedy evaluation, retained final1009/initial1009/final4013/initial4013.
-No new training. Exact original runner/runtime/native/host,60 pins,24 natural
-episodes per arm,600k-action/300s caps, mean15000/90%-pyramid gate, zero updates/
-truncations,346 invariant tensors per arm and full replays/videos/guards.
-Owner`kindle-qbert-continuation-two-seed-greedy-frozen-20261027`, artifacts
-`/x/Temp/kindle-qbert-greedy-20261027`. Audit1200s/service2460s; preserve sampled
-3137.500/4730.208 and original26m38s/25m23s training costs. No retry, cap increase,
-extension, checkpoint selection or automatic successor. Check live state before
-GPU work.
+Qbert continuation greedy evaluation completes on both retained learners.
+1009 scores3058.333/16of24 first pyramids versus sampled3137.500/17;4013
+scores3770.833/19 versus4730.208/23. Own greedy initials85.417/263.542,0pyramids.
+Both greedy arms fail mean15000/90%; retain sampled actions for Qbert.
+Four arms total65,104 actions /260,268 frames /30.277s evaluation, zero new
+training/updates; entire service1m17.712s. Starts06:12:49 UTC/source`62482da`,
+main exits06:14:07, postprocessing06:14:10 on October27. All60 pins, source
+invariance,346 invariant tensors per arm, full outcome replays/videos and
+host guards pass. Original26m38s/25m23s training costs and sampled results
+remain. No retry, extension, third learner or automatic successor selected.
+No GPU allocation is active; check live state before new work. See the completed
+greedy comparison in cheap-Qbert. The five-game goal remains unfinished.
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,

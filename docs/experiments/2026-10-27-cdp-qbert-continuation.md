@@ -402,9 +402,10 @@ videos/guards. Audit1200s/service2460s; no training, new seed or checkpoint
 selection. All60 pins, four finite source checkpoints, source runtime identity,
 sampled score replay, command parses and refusal while unselected pass.
 
-This is **prepared/unselected**, gated on terminal active Breakout main and
-postprocessing plus a separate decision. No automatic launch, retry, extension,
-cap increase or successor. The original sampled3137.500/4730.208 failures and
+At preparation this was **unselected**, gated on terminal Breakout main and
+postprocessing plus a separate decision. Selection and completion follow below.
+No automatic launch, retry, extension, cap increase or successor.
+The original sampled3137.500/4730.208 failures and
 26m38s/25m23s training costs remain. Reused cohorts are development evidence;
 Pong's greedy gain does not establish Qbert benefit. See [the complete prepared
 protocol and receipts](../results/2026-10-25-cdp-cheap-qbert.md#prepared-greedy-comparison-of-both-retained-continuation-learners).
@@ -422,3 +423,17 @@ guards. Audit1200s/service2460s. No retry, cap increase, extension, new learner,
 checkpoint selection or automatic successor. Archive the prepared declaration
 before marking selection. No new training or global inference default change.
 Owner:`kindle-qbert-continuation-two-seed-greedy-frozen-20261027`.
+
+## Retained Qbert greedy comparison completes
+
+Four fixed arms finish with zero new training/updates. Greedy1009 scores3058.333
+with16/24 first pyramids versus sampled3137.500/17;4013 scores3770.833/19 versus
+4730.208/23. Greedy initial controls85.417/263.542 have0/24 pyramids. Both greedy
+learners fail the original mean15000/90% gate; retain sampled Qbert actions.
+All60 pins, source invariance,346 invariant tensors per arm, config/counters,
+full outcome replays/videos and guards pass.65,104 actions /260,268 frames /
+30.277s evaluation; service1m17.712s including construction/audits. Starts
+06:12:49 UTC/source`62482da`, exits06:14:07, postprocessing06:14:10 on October27.
+No GPU repeat, cap increase, new training, extension or automatic successor.
+Original26m38s/25m23s training costs remain. See [the completed comparison and
+receipts](../results/2026-10-25-cdp-cheap-qbert.md#greedy-evaluation-lowers-both-retained-qbert-results).

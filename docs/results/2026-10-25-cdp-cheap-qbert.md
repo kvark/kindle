@@ -2215,10 +2215,11 @@ Four commands parse, five scripts compile, all four source checkpoints contain
 verified saved replays. The controller refuses while unselected. Preparation
 and checks use.148s/.459s on one affined low-priority core, constructing no
 native module, agent or environment; all47 active Breakout pins remain unchanged.
-The declaration pins60 inputs. No greedy score exists.
+The declaration pins60 inputs. No greedy score existed at preparation.
 
-The assessment stays **prepared/unselected** until the active Breakout life and
-all postprocessing finish, followed by a separate terminal-review decision.
+At preparation the assessment stayed **unselected** until the active Breakout
+life and all postprocessing finished, followed by a separate terminal-review
+decision. Selection and completed results follow below.
 It cannot launch automatically. No retry, cap increase, extension, checkpoint
 selection or successor. Reused development weights/cohorts do not become new
 independent learners or establish broad reliability. Retain original training
@@ -2242,3 +2243,57 @@ guards. Audit1200s/service2460s. No retry, cap increase, extension, new learner,
 checkpoint selection or automatic successor. Archive the prepared declaration
 before marking selection. No new training or global inference default change.
 Owner:`kindle-qbert-continuation-two-seed-greedy-frozen-20261027`.
+
+## Greedy evaluation lowers both retained Qbert results
+
+The fixed four-arm assessment completes with **zero new training or updates**.
+Both retained continuation learners lose mean return and first-pyramid success
+under greedy action selection. Retain sampled actions for this Qbert recipe;
+neither greedy learner meets the original mean15000/90%-pyramid gate.
+
+| Learner | Sampled final / own initial | Greedy final / own initial | Sampled / greedy first pyramids | Original training |
+|---|---:|---:|---:|---:|
+|1009|3137.500 /180.208|3058.333 /85.417|17/24 →16/24|26m38s|
+|4013|4730.208 /182.292|3770.833 /263.542|23/24 →19/24|25m23s|
+
+All four initial controls have0/24 first pyramids. These are the same two
+retained200k/49,939-update learners and reused evaluation cohorts, not new
+independent learners. Original sampled outcomes and training costs remain;
+the narrow Pong greedy success does not generalize to this Qbert comparison.
+No global inference default changes, extension, third learner or successor
+allocation is selected.
+
+Only frozen action selection/output paths change. Exact original Qbert runner,
+packaged runtime/native79c9a7f, host, saved config, wrapper/ROM, seeds4000001009/
+4000004013, full18/sticky.25/repeat4/noops0/native frames/one GPU48 resize remain.
+Each arm selects first3 natural episodes per8 lanes=24, with zero updates or
+truncations and no guidance. All60 input pins, source checkpoints/config/counters,
+346 invariant tensors per arm, recorded-action outcome replays/videos and
+host guards pass. All source files remain unchanged. Ordinary frozen logs
+have no live pixel hashes; replay validates outcomes, not live-image equality.
+No GPU stage repeats or declared cap increases.
+
+| Arm | Aggregate actions | Emulator frames | Evaluation seconds |
+|---|---:|---:|---:|
+|final1009|20,072|80,247|9.374|
+|initial1009|9216|36,827|4.244|
+|final4013|25,384|101,497|11.774|
+|initial4013|10,432|41,697|4.884|
+|Total|65,104|260,268|30.277|
+
+Evaluation times exclude construction and audits; the entire service takes
+**1m17.712s**, starts06:12:49 UTC/source`62482da`, exits06:14:07, and terminal
+postprocessing completes06:14:10 on October27. PID98877/invocation
+`88c34726d7074c7a9b1351c58dd22a82`. Both services are inactive with successful
+results. The fixed600k-action/300s per-arm,1200s audit and2460s service caps
+are unchanged. Excess completed episodes (28/24/27/25) and partial tails are
+retained, but only the declared24 per arm enter the table.
+
+Two ad-hoc read-only status inspections accidentally included `.gpu-memory.jsonl`
+files and failed header lookup; explicit four-arm names resolve the inspection.
+The pinned controller/audits were unaffected and no GPU work repeats.
+
+Artifacts:`/x/Temp/kindle-qbert-greedy-20261027/qbert-4m-48-continuation-two-seed-greedy-frozen`.
+Selected declaration SHA256`876359cc525a1b3088daac595e8f9e1c7431aa2ff938abeb6c69926007ded156`;
+review`c57c6b70854a5ad56bba496b7d086b063175c20e2313caf075d476eeff724102`;
+postprocessing`ae63ad499af82718c2355593238f23803025877fa0c6bd4d6c86b55ae99e5489`.
