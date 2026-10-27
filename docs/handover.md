@@ -305,6 +305,13 @@ on October27. Actual1009 guidance38,400 actions (19.2%); online guided returns
 are not frozen competence. Both reused development seeds; no broad reliability,
 extension or third seed. See the paired continuation result in cheap-Qbert.
 
+Qbert R16/20% is active from04:56:02 UTC/source`d8cdc8a`, PID90234/
+invocation`f880fba1fa344bd7b84467a0f5ceeb5e`. Startup verifies47 pins,346
+initial tensors matching primary continuation4013/check and first248:1/256:2/
+264:3/272:4/280:5/288:6 updates. At3224 actions,372 reports are finite,1612
+are trusted actions and371 reports contain expert labels. Progress/R16 recovery/
+postprocessing observers are attached; no frozen outcome yet. Keep200k/25min.
+
 Select one fresh Qbert4M48/Auto/N8/B8/T16/H15/R16/coefficient1/actor0/full18/
 original-rates comparison with20%episode continuation/cap1920/expert1/
 NOOPweight.05,4013/eval4000004013.200k actions/24,970 updates, first248,

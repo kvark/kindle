@@ -337,3 +337,15 @@ External`prepare_full.py`, `run_full.py`, `check_startup.py`, `finish_full.py`,
 `compare_full.py`, `analyze_exposure.py` and the retained R16 recovery watcher
 are pinned with the runtime and evidence (47 inputs). Only this fresh comparison
 is selected; no automatic seed confirmation follows it.
+
+## Higher-exposure R16 startup passes
+
+Service starts04:56:02 UTC/source`d8cdc8a`, PID90234,
+invocation`f880fba1fa344bd7b84467a0f5ceeb5e`. Declaration SHA256
+`e5800c0bc04e6021c26c3fc9bc7f18d307c4599503f02e6d6e80d93ba722cb5c`.
+All47 pins match. All346 initial tensors are finite and exactly match both the
+primary continuation4013 and bounded check. First updates248:1/256:2/264:3/
+272:4/280:5/288:6 match the declared R16 schedule. At3224 actions,372 reports
+are finite,1612 actions are trusted and371 reports contain expert labels.
+Read-only progress,100k R16 recovery and terminal CPU postprocessing observers
+are attached. No frozen outcome yet; retain200k/25-minute cap and full audits.
