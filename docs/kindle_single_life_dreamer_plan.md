@@ -342,13 +342,17 @@ progress-observer failure is retained; no GPU stage repeats. Both reused
 seeds are development evidence. No extension or third seed is selected.
 See [completed confirmation](results/2026-10-25-cdp-cheap-pong.md#capacity-confirmation-improves4013-but-narrowly-misses-the-gate).
 
-Select one bounded Breakout expert check after that terminal review:4096 actions
-/963 updates,180-second training cap,1024 frozen actions/60-second cap.
-Use4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/full18, fresh1009,
-25%episode guidance/cap128/expert1/all action weights1. The exact validated
-eight-file adapter is applied;442 CPU tests and saved Breakout/Qbert replay
-checks pass. Native79c9a7f is unchanged. No natural-episode competence or full
-allocation follows automatically. See [protocol](experiments/2026-10-27-cdp-breakout-expert.md).
+Bounded Breakout expert check passes4096 actions /16,350 frames /963 updates
+in24.792s; frozen1024/.488s,346 unchanged tensors,669 trusted actions/660
+nonzero expert reports, all matched initial/parameter/replay/guard checks pass.
+Service exits02:50:25 UTC. Exact442-test adapter applied; native79c9a7f unchanged.
+After review, select one fresh200k/49,939 comparison under25 minutes,5%episode
+guidance/cap640/expert1/all weights1. Keep4M64/Auto/N8/B8/T16/H15/R32,
+coefficient1/actor.01/full18/original rates,1009/eval4000001009. Fixed final/own
+initial24-natural evaluations disable aid, retaining864-point/90%-two-wall gate,
+full audits and100k recovery. No check experience reuse or automatic successor.
+Owner`kindle-breakout-expert-cap640-200k-20261027`; see
+[protocol](experiments/2026-10-27-cdp-breakout-expert.md).
 Check live state before GPU work.
 
 

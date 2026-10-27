@@ -46,12 +46,30 @@ control and terminal Pong review; declaration records the launch source.
 Patch SHA256`fe109513fa4f8476321a0ba5b9cef6486a85854acff18317029e1263a844b940`;
 validation`0e0ff2298f8f6ef0ba4befee7f2b6b1de21f4b37cc94784c89afa6101f5d3d63`.
 
-## Prepared full candidate remains unselected
+## Selected full comparison
 
-Only after reviewing the bounded result may a separate declaration select one
-fresh200k-action/49,939-update comparison,5% episodes/cap640/expert1/all weights1,
+The bounded check passes4096 actions /16,350 frames /963 updates in24.792s,
+669 trusted actions and660 nonzero expert updates; all initial/frozen346 tensors,
+parameter changes, replay and guards pass. Frozen1024 actions take.488s with
+zero updates. Service exits02:50:25 UTC. Review SHA256
+`f55e5d90dab8e79b379fe45398d54087597500246a3960308bd0b520722bdc8f`.
+This establishes execution only. After separate review, select one fresh
+200k-action/49,939-update comparison,5% episodes/cap640/expert1/all weights1,
 with the same model/settings and a25-minute training cap. Fixed final and own
 actual initial each select24 natural episodes; original864-point/90%-two-wall
 gate, no guidance or learning in evaluation, full audits and100k recovery.
 Compare full18 control7.083 and stronger minimal4 control9.542, retaining the
 action-space/native/kernel differences. No automatic promotion or successor.
+
+
+The full trial is`breakout-4m-64-r32-expert1-cap640-noop1-200k`, service
+`kindle-breakout-expert-cap640-200k-20261027`. Preparation`prepare_full.py`,
+controller`run_full.py`, completion`finish_full.py`, and
+`compare_breakout_expert.py` are retained in the artifact root. Declaration
+pins their exact bytes, runtime/source, controls, completed check and Pong review.
+Recover100k/24,939 updates; fixed final200k/49,939, first248, residual0.
+Each frozen arm has600k-action/300-second caps; audit1200s, service3360s.
+Report actual guidance exposure and guided/unguided outcomes. This changes
+guidance plus expert loss versus the full18 control, with native/control-kernel
+differences retained. No retry, checkpoint selection, extension, cap increase,
+automatic next allocation or promotion of the eight-episode settling variant.

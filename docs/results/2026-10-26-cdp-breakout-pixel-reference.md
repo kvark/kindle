@@ -289,3 +289,27 @@ saved trajectory parity apply to identical bytes. Application receipt is
 `/x/Temp/kindle-breakout-guidance-20261027/application-review.json`.
 Select only the [bounded4096-action check](../experiments/2026-10-27-cdp-breakout-expert.md);
 the prepared200k candidate remains unselected until separate review.
+
+
+## Bounded native check passes
+
+The applied adapter completes **4096 aggregate actions /16,350 emulator frames
+/963 updates in24.792s**. First update248, zero residual credit,4,131,729
+parameters, all finite reports and changed CNN/reward/actor/value weights.
+All346 initial tensors match the full18 control. Guidance executes669 trusted
+actions (16.333%):309 NOOP,27 FIRE,149 RIGHT and184 LEFT;660 updates have
+nonzero imitation loss. Episode probability25% is separate from actual exposure.
+Full guided input-pixel/action/reward/boundary replay and both host guards pass.
+
+Ordinary frozen restore performs1024 actions /4096 frames in.488s, zero updates,
+all346 tensors unchanged. It completes no natural episodes and establishes no
+task competence. Service exits02:50:25 UTC on October27,34.550s total wall.
+Source`d49c0b7`, native79c9a7f unchanged, no repeated GPU stage. Review SHA256:
+`f55e5d90dab8e79b379fe45398d54087597500246a3960308bd0b520722bdc8f`.
+
+After reviewing the finite native updates, meaningful expert labels, matched
+initialization and complete restore/replay checks, select the separately declared
+fresh200k comparison. Keep5% episodes/cap640/expert1/all action weights1 and a
+25-minute training cap, with fixed final/own initial24-natural evaluations.
+No check experience is reused, and no transfer benefit is assumed. See the
+[full declaration](../experiments/2026-10-27-cdp-breakout-expert.md#selected-full-comparison).
