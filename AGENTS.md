@@ -99,6 +99,20 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](docs/results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
+One fresh Qbert4013 expert **500k/R16** comparison is selected, not yet launched.
+Keep4M48/Auto/N8/B8/T16/H15/coefficient1/actor0/full18/original rates,
+5% first-pyramid guidance/cap640/expert1/NOOPweight.05 and native79c9a7f.
+Only action budget200k→500k and replay ratio32→16 change versus completed4013:
+62,470 expected updates, first248, four100k recoveries, zero debt and a hard
+30-minute training cap. Fixed final/own-initial24-natural controls retain the
+15k/90% gate. Reused4013 is selected after its stronger result; this is not an
+independent seed confirmation or isolated ratio effect. All67 pins and the
+CPU comparison-reader preflight pass. Owner
+`kindle-expert-qbert-r16-500k-seed4013-20261027`. No extension, cap increase or
+automatic successor. CPU teacher prototypes remain external and unselected.
+See [selected protocol](docs/experiments/2026-10-27-cdp-qbert-expert-r16.md).
+Check live state before GPU work.
+
 The fresh Qbert4013 expert-imitation check completes 200k actions /799,532
 frames /49,939 updates in **20m07s**. Frozen **3153.125 /17 of24 first pyramids**
 versus own initial182.292 /0; coverage20.167 /21. Seed1009 scores1083.333 /2
@@ -110,7 +124,7 @@ CPU tile replay pass; all50 declaration pins stay unchanged. Training uses
 11,520 trusted actions (5.760%); frozen evaluation has no guidance.
 Service exits23:53:38 UTC on October26; postprocessing23:54:08, tile replay23:54:40.
 Both learners miss the mean15000/90%-pyramid gate. No paired unaided Qbert4013
-control exists. No GPU work is active or queued; do not extend either life.
+control exists. Both completed lives are terminal; do not extend either life.
 See [completed seed check](docs/results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-transfers-on4013-with-substantial-seed-variation)
 and [protocol](docs/experiments/2026-10-26-cdp-qbert-expert-seed4013.md).
 Check live state before GPU work.

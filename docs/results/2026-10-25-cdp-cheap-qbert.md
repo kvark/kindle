@@ -1593,3 +1593,62 @@ completion`0489d949361d7f645fa03f87c5e25ad38de1df0cd4db65e3f7fc45a1ef771044`;
 comparison`87faaa70a7d1e19249d381992ab7b97e02a47e55fb9931465b308e57baef24da`;
 exposure`ddcc3c669cc8ce495b55dd39213d88ded3f528d4d4ad50119595ac439b8f056a`;
 tile replay`57ee54e4e3a3534ff8206d4e65a9c7a4a5aeea5f0a22f38bfe2c5a9ff29f4c0d`.
+
+
+## After the first pyramid, movement continues but the teacher is limited
+
+Read-only analysis of both completed expert lives verifies every completed
+training/frozen episode's action count, reward sum and frame count against the
+existing full replays. Among successful frozen episodes,1009 chooses NOOP for
+554/602 actions after the first-pyramid milestone (92.03%);4013 chooses it for
+only559/6384 (8.76%). Thus4013's weak full-game score is not explained by simply
+stopping movement. The17 and2 episodes are selected outcomes within reused
+cohorts, not independent learners or a causal comparison.
+
+The capped teacher supplies only NOOP labels after that milestone:3136 on1009
+and2703 on4013. Its source recognizes the first board's blue→yellow target.
+Later reward totals include delayed completion payouts: in one exact CPU replay
+of4013 lane0/episode0, score850 at frame1156 rises to3950 at1396 and ends4075.
+Native RGB snapshots retain the completed yellow board, then show blue tiles
+on subsequent movement. This motivates testing continuation behavior, without
+claiming a particular cause of the learned policy's shortfall. The milestone
+analysis excludes the action containing the milestone; it does not measure a
+validated second-pyramid success count.
+
+Two bounded CPU prototypes keep the existing movement rule and receive only
+native max-pooled RGB. Neither constructs a Kindle agent, changes runtime code,
+uses RAM/rewards as policy inputs or consumes GPU work. Each uses the first
+natural episode of8 reused4013 evaluation lanes, followed by independent exact
+saved-action/pixel/reward/boundary replay:
+
+| CPU teacher prototype | Mean natural return | First pyramids | Actions / frames | Collection / replay |
+| --- | ---: | ---: | ---: | ---: |
+| Alternate blue/yellow target after a full-color board |6615.625|8/8|9116 /36,451|12.608s /3.439s|
+| Infer board colors and pause64 actions after completion |5840.625|8/8|8637 /34,531|22.341s /3.345s|
+
+Both complete8 natural episodes without truncations or partial tails, and both
+remain below15000. The second prototype sees later gray palettes but performs
+worse on this small reused cohort. These are hand-coded reference outcomes,
+not learned success; repeated development on the same8 seeds is not held-out
+validation. No production guidance change or guidance-training allocation is
+selected from these prototypes.
+
+Select instead one fresh500k/R16 test of the existing expert recipe:2.5 times
+the experience,62,470 versus49,939 updates,30-minute cap, same4013 seed and
+fixed final/own-initial controls. The stronger4013 policy already moves after
+its first pyramid; additional experience may help it learn continuation, but
+prior unaided500k/R16 was negative. Budget and ratio change together. See
+[the separate selection](../experiments/2026-10-27-cdp-qbert-expert-r16.md).
+
+All diagnostics live under`/x/Temp/kindle-qbert-continuation-20261027`.
+CPU preparation corrected a missing training-replay frame-offset field and an
+unset module search path before successful collection; no native agent or GPU
+stage was involved. The exact single-episode RGB replay takes0.588s.
+Action analysis SHA256:
+`00a8abbc938b5a5a67874e9b6e8a90007a793a3897a4e6a52f4b270e58214c48`.
+Native RGB replay:
+`57d757e876a084c700956e40e865b7a91590532beef37be41f510828f16b5e72`.
+Alternating prototype:
+`be1ad5044aafab070bd79e9f85ef8b43500576ce27093e182765b0dfd2b20df9`.
+Palette prototype:
+`bd8807697dbcc4b657553be31c635cd6e8a195e42b9b7a8f49108d78a9968abd`.
