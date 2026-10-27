@@ -366,3 +366,8 @@ low-priority core. No native module, agent or environment is constructed;
 all47 active Qbert inputs remain unchanged. This is a co-host timing caveat,
 not a wall-time correction. That separate frozen assessment remains unselected
 and cannot start before Qbert and its postprocessing are terminal.
+
+A separate.261s affined log-only [Breakout prefix review](../results/2026-10-26-cdp-breakout-pixel-reference.md#longer-saved-prefixes-expose-most-teacher-reward)
+compares one1920-action prefix with retained640/full controls. It constructs no
+agent/environment, makes no new decisions and leaves all47 Qbert inputs
+unchanged. No Breakout allocation or runtime change is selected.

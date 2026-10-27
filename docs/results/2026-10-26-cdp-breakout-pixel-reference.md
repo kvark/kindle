@@ -415,3 +415,38 @@ reviews and combined review SHA256
 `8d77cc026e295bd98f34c14f72427feb25a29bdf13e96c59b6006fb18eb48609`.
 Ordinary frozen logs lack live pixel hashes; reconstructed input/output hashes
 are retained but do not establish direct equality with absent live hashes.
+
+## Longer saved prefixes expose most teacher reward
+
+One additional log-only check compares the existing640-action limit with a
+predetermined1920-action prefix on the same24 saved predictive-reference
+episodes. Full-reference mean remains166.167, with0/24 two-wall successes;
+no new policy, play, action decision or learner update occurs.
+
+| Prefix cap | Retained action labels | Mean prefix reward | Fraction of full reward | Episodes ending within cap |
+| --- | ---: | ---: | ---: | ---: |
+|640|15,269|24.125|14.52%|1/24|
+|1920|36,242|159.833|96.19%|20/24|
+|Full natural episode|36,727|166.167|100%|24/24|
+
+The longer prefix retains98.68% of full-reference labels, versus41.57% at640.
+Its action mix is35.20% NOOP,8.75% FIRE and56.05% lateral movement. All action
+weights remain1 for this description; action mass is not a gradient norm.
+The640/full counts, visibility fractions and rewards exactly match the earlier
+prefix receipt, and the complete logged action/frame/episode reward accounting
+reconciles with the verified source review.
+
+This makes later reward exposure a concrete hypothesis for a future cheap
+Breakout recipe. It does not diagnose the failed native learner or predict
+transfer: these reference trajectories use the reused evaluation cohort, and
+real guidance changes the learner's visited states. The completed cap640
+learner remains frozen4.000, below its unaided controls; a stronger teacher
+prefix cannot relabel that result. Even the full teacher misses the original
+two-wall gate. No new Breakout allocation, source edit, cap change or further
+prefix sweep is selected here.
+
+The check takes.261s on one affined low-priority CPU core during the active
+Qbert R16/20% life, with all47 input pins unchanged. Artifacts:
+`/x/Temp/kindle-breakout-exposure-20261027/reference-prefix-review.json`, SHA256
+`1bc3d5263cb12cfcc1aba083a51222e087a8bc48cfa2f66fa32244e758bf0825`;
+script`d94b0b51c27e3a96b21313a4f148b62bc7ab17ad42b9b07896446f5ad1ad2669`.

@@ -361,6 +361,12 @@ trajectories; teacher advice is not ground-truth action accuracy. Do not choose
 an imitation-weight increase from falling loss alone. CPU-only replay passes
 all recorded outcomes and56 active pins; no new Breakout allocation is selected.
 
+[Longer saved Breakout prefixes](results/2026-10-26-cdp-breakout-pixel-reference.md#longer-saved-prefixes-expose-most-teacher-reward)
+retain96.19% of full-reference reward at1920 actions versus14.52% at640.
+This is a later-exposure hypothesis from reused CPU reference logs, not learned
+transfer or a diagnosis of the failed4.000 native result. No Breakout allocation
+is selected; the full teacher itself still has0/24 two-wall successes.
+
 Qbert continuation1009 completes200k actions /799,538 frames /49,939 updates
 in26m38s. Frozen3137.500/17of24 first pyramids versus own initial180.208/0
 improves old-teacher1083.333/2; continuation4013 scores4730.208/23 in25m23s.
