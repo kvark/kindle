@@ -1,6 +1,6 @@
 # Kindle: CDP learning roadmap
 
-Updated October26,2026. [Handover](handover.md) contains the reproducible runtime
+Updated October27,2026. [Handover](handover.md) contains the reproducible runtime
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
@@ -24,6 +24,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-seed4013-confirmation) |500k /124,939|49m58s|14.000 /−20.333|24/24 wins; mean15 fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Same, capped pixel guidance + expert imitation](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate) |200k /49,939|20m11s|1083.333 /180.208|2/24 first pyramids; gate still fails|
+| [Same, fresh seed4013](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-transfers-on4013-with-substantial-seed-variation) |200k /49,939|20m07s|3153.125 /182.292|17/24 first pyramids; gate still fails|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -319,23 +320,28 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-One fresh Qbert4013 expert-imitation check is active from23:31:58 UTC/source
-`207c776`, after the completed1009 improvement. Same4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
-original rates,5% episode guidance/cap640/expert1/NOOPweight.05. Keep200k
-/49,939 updates,25-minute cap,100k recovery and fixed final/own-initial24-natural
-evaluations with guidance off. Only seeds and output paths change; runtime79c9a7f
-is unchanged. Owner`kindle-expert-qbert-cap640-seed4013-20261026`. No extension,
-cap increase or automatic successor; no paired unaided Qbert4013 control.
-Startup matches346 same-seed initial tensors, differs from1009, and matches
-248:1/256:2/256:3/264:4/264:5/272:6. First5640 actions/1347 finite reports pass;
-recovery, progress and postprocessing monitors are attached.
-See [selected seed check](experiments/2026-10-26-cdp-qbert-expert-seed4013.md). Check live state before GPU work.
-The100k/24,939 recovery passes with346 finite tensors. Independent CPU replay
-of1009 finds17/24 frozen episodes stop at19–20 cubes; every episode's ever-lit
-count equals its simultaneous maximum. An unchanged pixel teacher recovers
-all8 recorded200-action learner prefixes within640 further actions, but all
-trajectories remain partial and this is not learned transfer.4013 and its caps
-are unchanged; no delayed-guidance training is selected. See
+The fresh Qbert4013 expert-imitation check completes 200k actions /799,532
+frames /49,939 updates in **20m07s**. Frozen **3153.125 /17 of24 first pyramids**
+versus own initial182.292 /0; coverage20.167 /21. Seed1009 scores1083.333 /2
+in20m11s with the same recipe, so both improve but vary substantially. Retain
+4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18, original rates,
+5% episode guidance/cap640/expert1/NOOPweight.05. All audits, 100k recovery,
+346 initial/frozen tensors, full pixel/action replay, guards, comparison and
+CPU tile replay pass; all50 declaration pins stay unchanged. Training uses
+11,520 trusted actions (5.760%); frozen evaluation has no guidance.
+Service exits23:53:38 UTC on October26; postprocessing23:54:08, tile replay23:54:40.
+Both learners miss the mean15000/90%-pyramid gate. No paired unaided Qbert4013
+control exists. No GPU work is active or queued; do not extend either life.
+See [completed seed check](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-transfers-on4013-with-substantial-seed-variation)
+and [protocol](experiments/2026-10-26-cdp-qbert-expert-seed4013.md).
+Check live state before GPU work.
+
+Independent CPU replay of1009 finds17/24 frozen episodes peak at19–20 cubes;
+every episode's ever-lit count equals its simultaneous maximum. On4013 only3
+peak at19–20, and17 clear all21. The corner-omission pattern varies by learner.
+An unchanged pixel teacher recovers all8 recorded200-action learner prefixes
+within640 further actions, but all trajectories remain partial. No delayed-
+guidance implementation or training is selected. See
 [diagnostic evidence](results/2026-10-25-cdp-cheap-qbert.md#frozen-expert-policy-leaves-individual-cubes-untouched).
 
 The fresh Qbert expert-imitation comparison completes200k actions/799,509
@@ -345,8 +351,8 @@ and16.208. Own initial180.208/0. All audits,100k recovery,346 initial/frozen
 tensors, matched initial traces, full pixel replay, guards and comparison pass;
 service exits23:23:23 UTC.5% episode guidance/cap640 actually labels14,080
 actions (7.040%); expert scale1/NOOPweight.05. Native79c9a7f/runtime
-`/x/Temp/kindle-expert-20261026/runtime`. Retain as a candidate for a separately
-selected fresh-seed check above; the mean15000/90% gate still fails.
+`/x/Temp/kindle-expert-20261026/runtime`. The completed fresh-seed check above
+also improves over its own initial; the mean15000/90% gate still fails.
 The completed1009 service is terminal; do not restart or extend it.
 See [completed result](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate).
 
@@ -416,7 +422,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD4M/RGB48/R32/500k: coefficient1 seeds1009/4013 score11.0/7.33; coefficient.01 seeds1009/4013 improve to14.958/14.0 and24/24 wins each in49m55s/49m58s | Reference20.45; compact mean15 gate and broad reliability remain open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
-| Qbert | Historical2M mean7,367;62/72 first pyramids | Reference193,220.77; intermediate15k/90% also unmet |
+| Qbert | AMD4M/RGB48/R32/expert200k seeds1009/4013:1083.333/3153.125,2/24 and17/24 first pyramids in20m11s/20m07s; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and

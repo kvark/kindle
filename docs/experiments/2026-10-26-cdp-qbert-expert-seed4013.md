@@ -1,7 +1,14 @@
 # Qbert expert imitation: one fresh-seed check
 
-Select one fresh4013 learner after the completed1009 candidate:200k actions in
-20m11s, frozen1083.333/2of24 first pyramids versus unaided809.375/0 and capped
+**Completed:** 200k actions /799,532 emulator frames /49,939 updates in20m07s.
+Frozen3153.125 /17 of24 first pyramids versus own initial182.292 /0, with
+guidance disabled. All audits and comparison pass. Both seeds improve over
+their own initials but miss the unchanged15k/90% gate, with substantial seed
+variation. No extension or next allocation is selected. See the
+[completed result](../results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-transfers-on4013-with-substantial-seed-variation).
+
+The selection was one fresh4013 learner after the completed1009 candidate:
+200k actions in20m11s, frozen1083.333/2of24 first pyramids versus unaided809.375/0 and capped
 guidance750.000/0. Coverage improves to18.625/21; all audits and comparisons
 pass. The original mean15000/90%-pyramid gate still fails. This check asks
 whether the candidate's useful transfer repeats on another learner, without
@@ -42,7 +49,7 @@ intrinsic coefficient and the optional expert objective, which add no parameters
 This reference is read only for CPU equality checks; no checkpoint is restored.
 There is **no matching unaided Qbert4013 training control**, so the two-seed
 comparison checks candidate repeatability rather than a paired imitation effect.
-Seed4013 comes from the development seed set; two learners would not establish
+Seed4013 comes from the development seed set; two learners do not establish
 broad reliability or satisfy the five-game goal by themselves.
 
 ## Runtime and evidence
@@ -92,12 +99,39 @@ The100k/24,939-update recovery audit passes23:42:36 UTC with346 finite tensors.
 It also verifies26,193 finite reports in the complete105,024-action log prefix,
 with zero debt at the latest progress record. Recovery review SHA256:
 `ee75e2f1fa4841d42e9bd1e7ad71536cdfefa396e9f76407db0ecc8cbf4a336a`.
-The same training PID/invocation continues; the fixed final outcome is pending.
+The same training PID/invocation continued through the fixed final budget.
 
-A separate CPU observer,`kindle-expert-qbert-seed4013-tiles-20261026`, waits for
-completed postprocessing and then replays the frozen final's saved actions to
-measure ever-lit versus simultaneous tile coverage. The helper first matches
+A separate CPU observer,`kindle-expert-qbert-seed4013-tiles-20261026`, completed
+after postprocessing and replayed the frozen final's saved actions to measure
+ever-lit versus simultaneous tile coverage. The helper first matched
 every outcome of the completed1009 replay, including its two successful
 pyramids. This observer cannot restart or extend GPU work. The independent
 [1009 tile and delayed-teacher analyses](../results/2026-10-25-cdp-cheap-qbert.md#frozen-expert-policy-leaves-individual-cubes-untouched)
 do not change this run's pinned sources, recipe or allocation.
+
+## Completed outcome
+
+The fixed200k budget finishes in1207.015s, with49,939 finite reports, zero debt
+and346 finite checkpoint tensors. Final/own-initial evaluations each complete
+exactly24 natural episodes without truncations or updates and retain all346
+tensors unchanged. Mean coverage is20.167 /5.167 of21. Final evaluation uses
+16,608 actions /66,398 frames in6.716s; initial uses8728 /34,875 in3.553s.
+Partial tails are retained. All50 declared pins remain unchanged.
+
+Guidance selects18 of325 started episodes:11,520 trusted actions (5.760%),
+including665 movements. All18 completed guided episodes clear a pyramid;
+95 of299 unguided training episodes do. These online outcomes are separate
+from frozen evaluation.21,735 updates contain expert labels. Native/CLI79c9a7f
+and the recipe stay unchanged from1009; only seeds/output paths differ.
+
+The main service exits successfully23:53:38 UTC on October26,2026; total
+21m40.264s including construction, evaluations and CPU audits. Postprocessing
+finishes23:54:08 and the5.148s tile replay finishes23:54:40. All services and
+observers are terminal. No GPU stage is repeated or extended.
+
+Learning review SHA256:
+`cd1e51e85eebdb007951a5d8950ccb3798e36784dbb40cf9c057853bf9344c36`.
+Postprocessing completion:
+`0489d949361d7f645fa03f87c5e25ad38de1df0cd4db65e3f7fc45a1ef771044`.
+Two-seed comparison:
+`87faaa70a7d1e19249d381992ab7b97e02a47e55fb9931465b308e57baef24da`.

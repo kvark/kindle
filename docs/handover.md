@@ -267,19 +267,21 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-One fresh Qbert4013 expert-imitation check is active from23:31:58 UTC/source
-`207c776`, after the completed1009 improvement. Same4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
-original rates,5% episode guidance/cap640/expert1/NOOPweight.05. Keep200k
-/49,939 updates,25-minute cap,100k recovery and fixed final/own-initial24-natural
-evaluations with guidance off. Only seeds and output paths change; runtime79c9a7f
-is unchanged. Owner`kindle-expert-qbert-cap640-seed4013-20261026`. No extension,
-cap increase or automatic successor; no paired unaided Qbert4013 control.
-Startup matches346 same-seed initial tensors, differs from1009, and matches
-248:1/256:2/256:3/264:4/264:5/272:6. First5640 actions/1347 finite reports pass;
-recovery, progress and postprocessing monitors are attached.
-The100k/24,939 recovery passes with346 finite tensors; training continues.
-Independent CPU tile/recovery diagnostics leave this allocation unchanged.
-See [selected seed check](experiments/2026-10-26-cdp-qbert-expert-seed4013.md). Check live state before GPU work.
+The fresh Qbert4013 expert-imitation check completes 200k actions /799,532
+frames /49,939 updates in **20m07s**. Frozen **3153.125 /17 of24 first pyramids**
+versus own initial182.292 /0; coverage20.167 /21. Seed1009 scores1083.333 /2
+in20m11s with the same recipe, so both improve but vary substantially. Retain
+4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18, original rates,
+5% episode guidance/cap640/expert1/NOOPweight.05. All audits, 100k recovery,
+346 initial/frozen tensors, full pixel/action replay, guards, comparison and
+CPU tile replay pass; all50 declaration pins stay unchanged. Training uses
+11,520 trusted actions (5.760%); frozen evaluation has no guidance.
+Service exits23:53:38 UTC on October26; postprocessing23:54:08, tile replay23:54:40.
+Both learners miss the mean15000/90%-pyramid gate. No paired unaided Qbert4013
+control exists. No GPU work is active or queued; do not extend either life.
+See [completed seed check](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-transfers-on4013-with-substantial-seed-variation)
+and [protocol](experiments/2026-10-26-cdp-qbert-expert-seed4013.md).
+Check live state before GPU work.
 
 The fresh Qbert expert-imitation comparison completes200k actions/799,509
 frames/49,939 updates in20m11s. Frozen1083.333/2of24 first pyramids improves
@@ -288,8 +290,8 @@ and16.208. Own initial180.208/0. All audits,100k recovery,346 initial/frozen
 tensors, matched initial traces, full pixel replay, guards and comparison pass;
 service exits23:23:23 UTC.5% episode guidance/cap640 actually labels14,080
 actions (7.040%); expert scale1/NOOPweight.05. Native79c9a7f/runtime
-`/x/Temp/kindle-expert-20261026/runtime`. Retain as a candidate for a separately
-selected fresh-seed check above; the mean15000/90% gate still fails.
+`/x/Temp/kindle-expert-20261026/runtime`. The completed fresh-seed check above
+also improves over its own initial; the mean15000/90% gate still fails.
 The completed1009 service is terminal; do not restart or extend it.
 See [completed result](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate).
 

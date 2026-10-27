@@ -1481,8 +1481,8 @@ not exact native inputs or a complete RAM-to-position mapping.
 
 This localizes a recurring incomplete-visitation pattern. It does not establish
 whether perception, policy learning, planning, demonstration coverage or some
-other mechanism causes it. The same CPU analysis is attached after the active
-4013 run's completed audits; its learner, recipe and caps remain unchanged.
+other mechanism causes it. The same CPU analysis subsequently completes after4013
+without changing its learner, recipe or caps; the result follows below.
 
 Artifacts:`expert-tile-coverage-review.json`, two`*-episode-near-peak.png` frames
 and`expert-tile-visual-review.json` in the completed1009 trial directory.
@@ -1509,13 +1509,87 @@ The first pass takes6.732s and an independent fresh-environment replay takes
 6.692s. Every action, pixel hash, reward, boundary and frame count matches.
 The recorded learner prefixes also match their source log's rewards, boundaries
 and frame counts; all ROM/ALE/wrapper/policy/source pins remain unchanged. No
-Kindle agent or GPU is used, and the active4013 learner is unaffected.
+Kindle agent or GPU is used, and the then-running4013 learner is unaffected.
 
 This supports the feasibility of starting the existing teacher after the
 learner has acted. It does not show that delayed guidance improves learning,
 or that a fresh weak learner supplies the same distribution of prefix states.
-The current4013 result is still pending. No delayed-guidance implementation or
+The completed4013 result follows below. No delayed-guidance implementation or
 GPU allocation is selected by this CPU check.
 
 Artifacts:`/x/Temp/kindle-expert-20261026/qbert-delayed-teacher-prefix200`.
 Review SHA256`a78ecf9b8d4bf2cde9aa6444872ec43051e160cc77cfee50207f63d1aeb6a275`.
+
+## Expert imitation transfers on4013, with substantial seed variation
+
+The fixed-recipe fresh4013 check completes **200,000 actions /799,532 emulator
+frames /49,939 updates in20m07s** (1207.015s). With guidance disabled, its fixed
+final policy scores **3153.125 and clears17/24 first pyramids**, versus its own
+actual initial182.292/0. Mean coverage rises5.167→20.167/21. The same recipe on
+1009 scored1083.333/2, so both learners show useful transfer at about20 minutes
+each, with a large difference in outcome. Neither passes the unchanged
+mean15000/90%-first-pyramid gate; the five-game goal remains unfinished.
+
+| Fresh learner | Training | Frozen final / own initial | First pyramids final / initial | Mean coverage final / initial |
+| --- | ---: | ---: | ---: | ---: |
+| 1009 | 20m11s | 1083.333 /180.208 | 2/24 /0/24 | 18.625 /5.833 |
+| 4013 | 20m07s | 3153.125 /182.292 | 17/24 /0/24 | 20.167 /5.167 |
+
+Only learner/guidance/evaluation seeds and output paths change. Both use the
+same native/CLI79c9a7f,4M/RGB48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/
+full18/original rates,5% episode guidance capped640, expert scale1/NOOPweight.05.
+The native config differs only in seed1009→4013. Seed4013 comes from the reused
+development seed set, not a broad held-out test. There is no paired unaided
+Qbert4013 training control; this checks repeatability of candidate learning,
+not an isolated imitation effect on that seed.
+
+All50 source/evidence pins remain unchanged. All49,939 reports and346 checkpoint
+tensors are finite. The zero-experience initial matches all346 same-seed,
+same-architecture reference tensors and differs from1009; nothing is restored
+into training. First update248, zero debt,100k/24,939 recovery, config/source/
+counters, explicit trusted labels, complete training/frozen pixel/action replays,
+videos, host guards, curves, exposure analysis and two-seed comparison all pass.
+No startup failure, GPU retry, extension or cap increase occurs in this life.
+
+Final and own-initial assessments each complete exactly24 natural episodes
+with zero updates/truncations; all346 tensors remain unchanged in each arm.
+Final:16,608 actions/66,398 frames in6.716s. Initial:8728 actions/34,875 frames
+in3.553s. Partial tails are retained. The main service exits successfully
+**23:53:38 UTC**,21m40.264s total including setup, evaluations and CPU audits.
+Postprocessing completes23:54:08 and the additional tile replay23:54:40.
+All services and observers are terminal.
+
+Guidance selects18 of325 started episodes and executes **11,520 trusted actions
+(5.760%)**:10,855 NOOP and665 movements. All18 completed guided episodes clear
+a pyramid, mean3894.444. Among299 unguided training episodes,95 clear a pyramid,
+mean1500.167; the last50 average3484.500 with41 pyramids. Those online results
+remain separate from the fixed frozen outcome. The different realized exposure
+from1009's7.040% is a consequence of the fixed stochastic episode rule and
+different trajectories, not a changed guidance probability.
+
+21,735 updates contain expert labels; repeated replay contributes431,760 labelled
+rows with total target weight45,420.645. Weighted cross-entropy over successive
+50k-action windows is1.116,0.379,0.301,0.306, similar at the end to1009's0.308.
+These changing training samples do not measure held-out action accuracy or
+explain the large frozen-score difference.
+
+The independent5.148s CPU tile replay reproduces every saved outcome. Mean
+ever-lit coverage is20.208 versus simultaneous20.167; the same17 episodes ever
+light all21. None of the7 failed episodes ever lights all21. Only3 episodes peak
+at19–20, compared with17 on1009. Address32 is never lit in0/24 episodes and42 in
+2/24, compared with14/24 and21/24 on1009. The earlier corner-omission pattern
+therefore varies across learners. This does not diagnose its mechanism.
+
+Retain the expert-imitation recipe and both learners as useful compact evidence,
+without extending either life or claiming mastery, broad reliability or CDP
+superiority. Any changed-budget or guidance test needs a separate selection;
+none is active or queued by this result. The CPU delayed-teacher reference
+remains feasibility evidence only; no delayed-guidance implementation is applied.
+
+Protocol:[fresh4013 check](../experiments/2026-10-26-cdp-qbert-expert-seed4013.md).
+Artifacts:`/x/Temp/kindle-expert-20261026/qbert-4m-48-r32-expert1-cap640-200k-seed4013`.
+Learning review`cd1e51e85eebdb007951a5d8950ccb3798e36784dbb40cf9c057853bf9344c36`;
+completion`0489d949361d7f645fa03f87c5e25ad38de1df0cd4db65e3f7fc45a1ef771044`;
+comparison`87faaa70a7d1e19249d381992ab7b97e02a47e55fb9931465b308e57baef24da`;
+exposure`ddcc3c669cc8ce495b55dd39213d88ded3f528d4d4ad50119595ac439b8f056a`;
+tile replay`57ee54e4e3a3534ff8206d4e65a9c7a4a5aeea5f0a22f38bfe2c5a9ff29f4c0d`.
