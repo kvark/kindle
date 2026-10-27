@@ -2153,3 +2153,78 @@ The.447s affined CPU receipt check constructs no agent/environment and leaves
 all58 active Pong inputs unchanged. Receipt:
 `/x/Temp/kindle-expert-path-20261027/source-review.json`, SHA256
 `0150815d50796637e2608c4b06961b24c1d071208aaba2704021b59148511159`.
+
+## Saved action timing does not support a simple excess-waiting diagnosis
+
+A log-only comparison uses all24 selected natural episodes from each retained
+continuation learner and the stronger pixel teacher. All executed actions,
+completed reward/frame accounting and source hashes reconcile. The4013
+post-first-pyramid count exactly reproduces the earlier13,407 actions/8703
+NOOP review; no emulator, new decisions or native updates are used.
+
+| Policy | Selected actions | NOOP share | Median NOOP run | Cardinal action followed by same command |
+| --- | ---: | ---: | ---: | ---: |
+| Native continuation4013, score4730.208 |19,399 |65.81% |5 |61.36% |
+| Native continuation1009, score3137.500 |15,147 |68.05% |5 |57.15% |
+| Pixel teacher4013, score22050 |75,674 |76.22% |7 |60.36% |
+
+Median same-command cardinal runs are2 actions in all three policies. After
+excluding actions until162 frames after the first milestone, NOOP shares are
+65.48%/56.70%/76.07% respectively. The162-frame transition duration was verified
+in the earlier native4013 color replay; for the other rows it is only a fixed
+time exclusion, not a qualified general level detector. The teacher therefore
+waits more in these marginal summaries, while the learned policies repeat
+cardinal commands at similar rates. The earlier64.91% post-milestone NOOP share
+alone does not show excess waiting.
+
+These policies visit different states, survive different lengths and complete
+different numbers of boards. Requested commands are not actual movement under
+sticky actions. Counts are descriptive, not matching-state teacher accuracy,
+causal attribution, a NOOP-weight prescription or proof of a sampling problem.
+They motivate avoiding an inactivity diagnosis from NOOP counts alone. A fixed
+retained-weight greedy assessment can cheaply test action selection directly;
+no further training is needed for that question.
+
+The.162s affined low-priority CPU analysis leaves all47 active Breakout pins
+unchanged. Artifacts:`/x/Temp/kindle-qbert-transfer-20261027/action-timing-review.json`,
+SHA256`f3582c8d8883e6d25566cfd91927ef1337ae110f4ad0a916f337836d66b623ef`.
+All observations are post-hoc on reused development cohorts; task gates stay
+unchanged and broad reliability remains unproved.
+
+## Prepared greedy comparison of both retained continuation learners
+
+Prepare a fixed four-arm comparison: final1009/initial1009/final4013/initial4013
+from the completed5%/R32/cap1920 continuation lives. Both original sampled
+outcomes3137.500/17 first pyramids and4730.208/23 remain; neither meets the full
+mean15000/90%-pyramid gate. Existing native `--greedy` changes only frozen
+action selection/output locations. There is no new learner or additional
+training, and no assumption that the narrow Pong improvement transfers.
+
+Keep exact original Qbert runner SHA256
+`9b7e6631b43cf4368cca902b16c9027a88cb11d11088e4199b42da4452f89b58`,
+packaged runtime/native79c9a7f, all12 original runtime pins per source, wrapper,
+ROM, host, seeds4000001009/4000004013, full18/sticky.25/repeat4/noops0/native
+frames/one GPU48 resize. Each arm retains first3 natural episodes per8 lanes=24,
+600k-action/300s caps, zero updates/truncations and the original mean15000/90%
+gate. Require346 invariant tensors per arm, source invariance, full recorded-
+action outcome replays/videos and guards. Audit1200s/service2460s. Ordinary
+frozen logs have no live pixel hashes.
+
+Four commands parse, five scripts compile, all four source checkpoints contain
+346 finite tensors each, and sampled scores/criteria recompute exactly from
+verified saved replays. The controller refuses while unselected. Preparation
+and checks use.148s/.459s on one affined low-priority core, constructing no
+native module, agent or environment; all47 active Breakout pins remain unchanged.
+The declaration pins60 inputs. No greedy score exists.
+
+The assessment stays **prepared/unselected** until the active Breakout life and
+all postprocessing finish, followed by a separate terminal-review decision.
+It cannot launch automatically. No retry, cap increase, extension, checkpoint
+selection or successor. Reused development weights/cohorts do not become new
+independent learners or establish broad reliability. Retain original training
+costs26m38s/25m23s; frozen work adds cost and cannot relabel sampled failures.
+
+Artifacts:`/x/Temp/kindle-qbert-greedy-20261027/qbert-4m-48-continuation-two-seed-greedy-frozen`.
+Prepared declaration SHA256`037b86f98297970bc1b4efeb343f6ca3def04e4fe38d1fcb925f5770558ca3b4`;
+CPU preflight`84de1e79bf3e4b905a15deac7c1579829051595845c1ca91e77200ae8ef76652`;
+controller`cbd80844532238fe51e5835cf3a4350428fc1803d41622a867d19b2b74a746b4`.

@@ -223,3 +223,21 @@ native module or environment. Receipt SHA256
 Progress,100k recovery and terminal CPU postprocessing observers are attached;
 all four service handles are live. Keep the declared200k/25-minute cap and full
 fixed evaluations/audits. No frozen result or automatic successor exists.
+
+While the original Breakout service remains active, a.162s log-only Qbert
+action-timing analysis and.607s of four-arm greedy preparation/checks run on one
+affined low-priority core. They construct no native module, agent or environment
+and leave all47 Breakout inputs unchanged. This.769s measured CPU work is a
+co-host timing caveat, not a wall-time correction. The separate Qbert assessment
+remains prepared/unselected until Breakout and its postprocessing are terminal.
+
+## Longer-prefix100k recovery passes
+
+At05:53:24 UTC, the100k recovery contains24,939 updates and346 finite tensors.
+The watcher verifies25,309 finite reports in the101,488-action complete prefix;
+last progress98,304/24,515 at691.636s, zero debt. Recovery checkpoint SHA256
+`35b5576802e15b09ee698829e6c9d1deef2f3375a687b18b4e399d58403110a8`;
+review`81f9b8f8aa51005944c13bb2e7a3271752dda823f377f42e514822d58daa518b`.
+The recovery observer completes successfully; the original main service remains
+active under PID94810/invocation`8114cb5a27d74a8787a4b1297ab179d2`.
+Keep200k/25-minute cap and fixed evaluations/audits. No frozen result exists.

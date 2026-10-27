@@ -390,13 +390,24 @@ UTC on October27. A copied4096-action CPU exposure assumption is repaired;
 original failure retained, no GPU repeat. Natural ends/late starts leave0 released
 actions in this check; do not claim cap-release coverage or competence.
 
+A four-arm greedy assessment of both retained Qbert continuation learners and
+own actual initial weights is prepared at`/x/Temp/kindle-qbert-greedy-20261027`.
+Original runner/runtime/host and all12 runtime pins per source, four346-finite
+checkpoints, sampled-score replay, four command parses and refusal while
+unselected pass.60 inputs pinned; no GPU work or new training. It remains
+unselected until current Breakout and postprocessing finish and a separate
+review selects it. Original sampled3137.500/4730.208 and training costs remain.
+See the prepared greedy comparison in cheap-Qbert; no automatic next allocation.
+
 Breakout cap1920 is active from05:41:26 UTC/source`8c888aa`, PID94810/
 invocation`8114cb5a27d74a8787a4b1297ab179d2`. Startup verifies47 pins,346 initial
 tensors matching cap640 and bounded check, and first248:1/256:2/256:3/264:4/
 264:5/272:6 updates. At10,496 actions,2561 reports are finite,604 actions are
 trusted and323 reports contain expert labels. Progress/100k recovery/terminal
-postprocessing observers are active. Keep200k/25-minute training cap; no frozen
-outcome yet and no automatic successor.
+postprocessing observers are attached. The100k recovery passes05:53:24 UTC:
+24,939 updates/346 finite tensors,25,309 finite reports in the101,488-action
+complete prefix; zero debt. Recovery watcher completes. Keep200k/25-minute
+training cap; no frozen outcome yet and no automatic successor.
 
 Current allocation: fresh Breakout4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/
 full18/original-rates comparison,1009/eval4000001009,5%episode guidance/

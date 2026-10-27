@@ -151,8 +151,10 @@ invocation`8114cb5a27d74a8787a4b1297ab179d2`. Startup verifies47 pins,346 initia
 tensors matching cap640 and bounded check, and first248:1/256:2/256:3/264:4/
 264:5/272:6 updates. At10,496 actions,2561 reports are finite,604 actions are
 trusted and323 reports contain expert labels. Progress/100k recovery/terminal
-postprocessing observers are active. Keep200k/25-minute training cap; no frozen
-outcome yet and no automatic successor.
+postprocessing observers are attached. The100k recovery passes05:53:24 UTC:
+24,939 updates/346 finite tensors,25,309 finite reports in the101,488-action
+complete prefix; zero debt. Recovery watcher completes. Keep200k/25-minute
+training cap; no frozen outcome yet and no automatic successor.
 
 Current allocation: fresh Breakout4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/
 full18/original-rates comparison,1009/eval4000001009,5%episode guidance/

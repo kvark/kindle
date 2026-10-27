@@ -386,3 +386,25 @@ together on reused4013. See [complete result and receipts](../results/2026-10-25
 After terminal review, separately select the prepared four-arm retained Pong
 12M greedy evaluation. It adds no training and preserves the sampled outcomes;
 its fixed protocol remains in the Pong capacity experiment.
+
+## Prepared retained-weight action-selection comparison
+
+A saved-trace diagnostic finds65.81%/68.05% NOOP for the two continuation
+learners versus76.22% for the stronger teacher, with median same-command
+cardinal runs2 each. These differing state distributions do not diagnose
+excess waiting or an optimal imitation weight. See the [action-timing evidence](../results/2026-10-25-cdp-cheap-qbert.md#saved-action-timing-does-not-support-a-simple-excess-waiting-diagnosis).
+
+Prepare one fixed final1009/initial1009/final4013/initial4013 greedy assessment.
+Use the exact original runner/runtime/native/host and saved checkpoints,24
+natural episodes per arm,600k-action/300s caps, original mean15000/90%-pyramid
+criteria, zero updates/truncations,346 invariant tensors per arm, full replays/
+videos/guards. Audit1200s/service2460s; no training, new seed or checkpoint
+selection. All60 pins, four finite source checkpoints, source runtime identity,
+sampled score replay, command parses and refusal while unselected pass.
+
+This is **prepared/unselected**, gated on terminal active Breakout main and
+postprocessing plus a separate decision. No automatic launch, retry, extension,
+cap increase or successor. The original sampled3137.500/4730.208 failures and
+26m38s/25m23s training costs remain. Reused cohorts are development evidence;
+Pong's greedy gain does not establish Qbert benefit. See [the complete prepared
+protocol and receipts](../results/2026-10-25-cdp-cheap-qbert.md#prepared-greedy-comparison-of-both-retained-continuation-learners).
