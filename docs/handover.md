@@ -305,17 +305,25 @@ on October27. Actual1009 guidance38,400 actions (19.2%); online guided returns
 are not frozen competence. Both reused development seeds; no broad reliability,
 extension or third seed. See the paired continuation result in cheap-Qbert.
 
-Select one bounded Breakout cap1920 check after terminal Pong audits.
-Original runner/runtime/native79c9a7f,4M64/Auto/N8/B8/T16/H15/R32/coefficient1/
-actor.01/full18/original rates,1009/eval4000001009,check25%episodes/expert1/
-all weights1.16,384 actions/4035 updates, first248/residual0,180s training cap;
-1024 frozen/zero updates/60s, audit180s/service480s. Require346 matched initial/
-unchanged frozen tensors, finite reports/parameter changes, full guided replay
-and guards. CPU preflight passes;32 pins. Owner`kindle-breakout-cap1920-check-20261027`,
-artifacts`/x/Temp/kindle-breakout-exposure-20261027`. No automatic promotion,
-retry, cap increase, extension or experience reuse. A full candidate would
-keep5% and change only cap640→1920; it is not selected. Check live state before
-GPU work. See the longer-prefix section in the Breakout expert protocol.
+The Breakout cap1920 bounded check completes16,384 actions/65,473 frames/
+4035 updates in114.327s;1024 frozen/4096 frames/.558s, zero updates and no
+natural frozen episodes. All32 pins,346 matched initial/unchanged frozen tensors,
+finite reports, CNN/reward/actor/value changes,10,125 trusted actions/3829
+supervised reports, exact guided replay and guards pass. Service exits05:38:24
+UTC on October27. A copied4096-action CPU exposure assumption is repaired;
+original failure retained, no GPU repeat. Natural ends/late starts leave0 released
+actions in this check; do not claim cap-release coverage or competence.
+
+Select one fresh Breakout4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/
+full18/original-rates comparison,1009/eval4000001009,5%episode guidance/
+cap1920/expert1/all weights1. Only cap640→1920 changes against frozen4.000
+primary control; exact original runner/runtime/native/host and initial weights.
+200k actions/49,939 updates, first248/residual0,100k recovery24,939;
+25-minute training cap declared before launch. Fixed final/own initial24-natural
+assessments retain original90%two-wall gate, full audits and47 pins.
+Owner`kindle-breakout-cap1920-200k-20261027`, artifacts
+`/x/Temp/kindle-breakout-exposure-20261027`. No retry, cap increase, extension,
+checkpoint selection or automatic successor. Check live state before GPU work.
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,
 13.41% less training time than5%/R32, but frozen3333.333/18of24 first pyramids

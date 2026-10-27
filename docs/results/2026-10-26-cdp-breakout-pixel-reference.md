@@ -450,3 +450,41 @@ Qbert R16/20% life, with all47 input pins unchanged. Artifacts:
 `/x/Temp/kindle-breakout-exposure-20261027/reference-prefix-review.json`, SHA256
 `1bc3d5263cb12cfcc1aba083a51222e087a8bc48cfa2f66fa32244e758bf0825`;
 script`d94b0b51c27e3a96b21313a4f148b62bc7ab17ad42b9b07896446f5ad1ad2669`.
+
+## Longer-prefix native check passes
+
+The fixed bounded check completes16,384 aggregate actions/65,473 emulator
+frames/4035 updates in114.327s, followed by1024 frozen actions/4096 frames
+in.558s with zero updates and no natural episodes. Original native79c9a7f,
+Breakout runner/runtime and all32 pins stay unchanged. All346 initial tensors
+match the cap640 primary control; all346 frozen tensors remain invariant.
+All reports are finite, first update248/residual0 matches, and every element
+of the selected CNN/reward/actor/value projections changes. Full guided
+input-pixel/action/outcome replay and both guards pass. Service exits05:38:24
+UTC on October27,2m10.891s including construction and audits.
+
+The execution-check25% episode schedule selects7/35 starts and10,125 trusted
+actions (61.7981%):3449 NOOP,675 FIRE,2907 RIGHT,3094 LEFT.3829 updates contain
+labels;219,758 repeated replay rows/weight mass219758 and loss sum2386.045.
+Two completed guided episodes average141.5;25 unguided average1.44, all0 two-wall
+successes. The check has0 released native actions: natural ends or late starts
+preempt reaching cap1920. It does not qualify cap release or frozen competence.
+
+The additional log-only exposure helper initially assumes the old4096/963
+smoke budget. Its original script/failure are retained; correcting the reader
+to the declared16384/4035 makes complete action/report/reward decomposition
+pass. The native service was already successful and no GPU stage repeats.
+
+The early rate extrapolates to23.26 minutes at200k, with uncertainty and a
+higher check guidance probability than the proposed5% full run. After reviewing
+terminal audits, separately select one fresh200k comparison with a25-minute
+training cap; no cap increase occurs on an existing allocation. Only the
+640→1920 guidance limit changes against the primary expert control. No check
+weights, replay, belief, games or RNG are reused. Fixed final/own initial
+assessments and the original two-wall gate remain. This is an exposure test,
+not a predicted success or justification for an unchanged extension.
+
+Artifacts:`/x/Temp/kindle-breakout-exposure-20261027/breakout-4m-64-cap1920-check`.
+Review SHA256`f93023cad808e5a85143aef76a0b6c98f0747215baceec00e667a34331ad570a`;
+completion`d85dd71ccc1a8fc505bd3bb6c4fa7a39b86c40fe36c229b8ac6724548097bef7`;
+exposure`90a18f0d95e7fea1ff714590681af1e94f4548c5f6daf91f43662202c6a36b3e`.

@@ -151,7 +151,7 @@ change only the cap640→1920 against the completed expert control.
  346 invariant frozen tensors, changed CNN/reward/actor/value parameters,
   trusted movement labels/nonzero auxiliary reports, exact guided input/action/
   outcome replay and host guards. Audit180s; service480s.
--2048 actions per lane allow a1920 prefix, but natural episode ends may preempt
+- 2048 actions per lane allow a1920 prefix, but natural episode ends may preempt
   the cap; measure actual override/release counts rather than assume them.
   No retry, cap increase, extension, automatic full promotion or check experience
   reuse. Select a full run only after reviewing this completed check and cost.
@@ -164,3 +164,46 @@ match. Preceding Pong main/postprocessing are terminal with complete receipt
 Artifacts:`/x/Temp/kindle-breakout-exposure-20261027/breakout-4m-64-cap1920-check`;
 owner`kindle-breakout-cap1920-check-20261027`. Prepared declaration SHA256
 `e8f50e75a90466cced5320dc5a50a0d4b86449cb397c7b2f0cc162ac3767b782`.
+
+## Longer-prefix check completes and fresh comparison is selected
+
+The bounded check completes16,384 actions/65,473 frames/4035 updates in114.327s,
+1024 frozen/.558s, all32 pins/346 initial and frozen tensors/finite reports/
+parameter changes/guided replay/guards pass. Main exits05:38:24 UTC.10,125
+trusted actions and3829 supervised reports; no frozen natural episodes and0
+released native actions, so neither competence nor cap-release coverage follows.
+The extra CPU exposure reader's old4096/963 assumption is repaired without
+repeating GPU work; its original failure is retained. Full result and receipt
+are in [the reference report](../results/2026-10-26-cdp-breakout-pixel-reference.md#longer-prefix-native-check-passes).
+
+The early rate projects23.26 minutes for200k at the higher25% execution-check
+probability. Select one fresh comparison with **25-minute training cap**,
+5% episode guidance and cap1920. Change only cap640→1920 against the completed
+primary expert control4.000/0of24 in22m38s. Keep exact original Breakout runner,
+packaged runtime/native79c9a7f, host, seed1009/eval4000001009 and all model/rate/
+loss settings:4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/full18/expert1/
+all action weights1. No weights or experience are restored.
+
+- 200k aggregate actions/49,939 updates, first248/residual0;100k recovery at
+ 24,939 updates and final200k. Fixed25-minute training cap.
+- Fixed final and own actual initial, first3 natural episodes per8 lanes=24;
+  guidance off, zero updates/truncations, original90%-two-wall gate.600k actions/
+  300s per arm. Retain excess episodes and partial tails.
+- Require all finite reports/346 tensors,346 initial tensors matching cap640
+  and bounded check,346 invariant tensors per frozen arm, paired initial
+  semantic traces, complete guided input/action/outcome replay, frozen outcome
+  replays/videos, guards, recovery, curves, comparison and exposure. Frozen
+  logs do not have live pixel hashes. Audit1200s; total service3360s.
+- No retry, cap increase, extension, checkpoint selection or automatic successor.
+  The existing5% schedule can have a much larger actual guided-action fraction;
+  measure that and guided/unguided outcomes without claiming frozen competence.
+
+Three commands parse, six scripts compile, the retained primary control reader
+and24,939/49,939 recovery/final arithmetic pass in.071s with no native module,
+agent or environment. All32 bounded pins remain unchanged. The full declaration
+pins47 inputs; prepared SHA256
+`fb9b2652145a4a1654bc6e2673186dfc9665f77b6b1848f7c89580cc3857dd20`.
+Owner`kindle-breakout-cap1920-200k-20261027`; trial
+`/x/Temp/kindle-breakout-exposure-20261027/breakout-4m-64-r32-expert1-cap1920-noop1-200k`.
+The reference/evaluation cohorts and1009 seed are reused development evidence;
+stronger teacher prefixes do not predict transfer or satisfy the two-wall goal.
