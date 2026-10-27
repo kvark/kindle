@@ -1867,3 +1867,25 @@ The exact validated adapter is subsequently applied after Breakout's complete
 terminal audits and pin checks. Select only the [bounded native continuation
 check](../experiments/2026-10-27-cdp-qbert-continuation.md); no full Qbert learner
 is selected. Historical staged descriptions above preserve preparation order.
+
+
+## Native continuation check passes
+
+Fresh4013 completes **8192 actions /32,739 emulator frames /1987 updates in
+70.493s**. First248, zero residual credit,3,578,225 parameters, all reports/tensors
+finite. All346 initial tensors match the retained same-seed expert control;
+CNN/reward/actor/value weights change. The check uses25% episode selection and
+cap640, actually executing2987 trusted actions:2300 NOOP and687 hops.
+1968 updates report nonzero imitation loss. Complete guided-input/action/outcome
+replay and both host guards pass, including capped release. All32 declaration
+pins remain unchanged. Native source79c9a7f is unchanged; adapter source3f3f7b5.
+
+Frozen1024 actions /4096 frames take.531s, zero updates, all346 tensors invariant.
+No natural frozen episode completes, so this establishes execution and restore,
+not task competence. Service starts03:21:37 and exits03:23:09 UTC on October27,
+1m31.375s total. No GPU stage repeats. The25% guidance check and its early cost
+are not a full-run speed prediction. No full learner, cap increase, extension
+or automatic promotion is selected by this result.
+
+Artifacts:`/x/Temp/kindle-qbert-guidance-20261027/qbert-4m-48-continuation-check`.
+Review SHA256`6f91901f01eb2101735282f6c2fb2a4bcff754863de1160edb3c29e393b5943c`.

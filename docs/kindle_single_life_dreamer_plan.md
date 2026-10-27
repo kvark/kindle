@@ -353,13 +353,17 @@ are not frozen competence. See [result](results/2026-10-26-cdp-breakout-pixel-re
 
 Qbert CPU continuation reference scores22050/24 first pyramids, all24 above15k,
 with exact input/output/reset pixel replay; not native learning or held-out
-confirmation. After terminal Breakout audits, apply the exact456-test optional
-adapter;24,733-action staged parity passes, original first-pyramid AST/native
-unchanged. Select only a bounded8192/1987 native check,4M48/Auto/N8/B8/T16/H15/
-R32/coefficient1/actor0/full18/original rates,4013/eval4000004013,25%episodes/
-cap640/expert1/NOOPweight.05. Training180s/frozen1024actions60s; full audits/
-346 matched initial and frozen tensors/guards. No full learner selected.
-Owner`kindle-qbert-continuation-check-20261027`; see [protocol](experiments/2026-10-27-cdp-qbert-continuation.md).
+confirmation. The exact456-test optional adapter is applied after terminal
+Breakout audits;24,733-action parity passes, original first-pyramid AST/native
+unchanged. Native bounded8192/1987 check completes32,739 frames in70.493s,
+frozen1024/.531s with346 invariant tensors. All32 pins,346 matched initial
+weights, finite reports, parameter changes,2987 trusted labels/1968 nonzero
+expert reports, full guided replay and guards pass; service exits03:23:09 UTC.
+Configuration4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original
+rates,4013/eval4000004013,25%episodes/cap640/expert1/NOOPweight.05.
+No frozen natural episodes or full learner yet; do not infer task competence
+from the check. See [result](results/2026-10-25-cdp-cheap-qbert.md#native-continuation-check-passes)
+and [protocol](experiments/2026-10-27-cdp-qbert-continuation.md).
 Check live state before GPU work.
 
 

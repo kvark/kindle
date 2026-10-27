@@ -48,3 +48,16 @@ no full Qbert learner is selected by this declaration.
 Patch SHA256`aeb61a4510b9122ae0fbf4ee8777eb86e15d2d082ebc7ee7dccbe2a3351ebfbc`;
 validation`82b534c911aa4499cafd14f8d50d146f22d8e637ffd5f90145b3405a25bd4563`;
 parity`2f2d4d44f9b90412fad4234c5ee9531f790d9e857f32af33e63fa357db3c29dc`.
+
+
+## Completed bounded result
+
+Service starts03:21:37 UTC/source3f3f7b5, PID80351,
+invocationc1b17474007e431e8f9482bbec2357b2; exits successfully03:23:09.
+8192 actions /32,739 frames /1987 updates take70.493s. All finite reports,
+346 matched initial tensors, changed CNN/reward/actor/value,32 declared pins,
+2987 trusted actions (687 hops),1968 nonzero expert reports, full guided replay
+and guards pass. Frozen1024 /4096 frames take.531s with zero updates and346
+unchanged tensors. No natural frozen episode completes. Review SHA256
+`6f91901f01eb2101735282f6c2fb2a4bcff754863de1160edb3c29e393b5943c`.
+No full learner or automatic successor is selected. See [evidence and limits](../results/2026-10-25-cdp-cheap-qbert.md#native-continuation-check-passes).
