@@ -1889,3 +1889,16 @@ or automatic promotion is selected by this result.
 
 Artifacts:`/x/Temp/kindle-qbert-guidance-20261027/qbert-4m-48-continuation-check`.
 Review SHA256`6f91901f01eb2101735282f6c2fb2a4bcff754863de1160edb3c29e393b5943c`.
+
+
+## Fresh continuation comparison selected
+
+The passing8192-action check is followed by a separately selected fresh200k
+comparison with5% episode guidance, continuation policy and cap1920. Model,
+learning settings, native binary and host match the retained4013/R32/200k
+first-pyramid control; teacher and cap change together. Saved reference prefixes
+at640/1280/1920 actions average4875.000/11311.458/15026.042, motivating1920
+without claiming those are natural-episode or learned scores. Keep30-minute
+training cap and fixed final/own-initial24-natural unguided evaluations against
+the original15k/90% gate. See the [selected protocol](../experiments/2026-10-27-cdp-qbert-continuation.md#selected-fresh-200k-comparison).
+No training outcome is available yet; no extension or automatic successor.

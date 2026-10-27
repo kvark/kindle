@@ -294,6 +294,18 @@ tensors,46 pins, replays, guards, comparison and exposure pass. Service exits
 20,463 trusted actions (10.2315%); guided/unguided completed means24.871/2.948
 are not frozen competence. See [result](results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality).
 
+A fresh Qbert continuation comparison is selected after the passing bounded
+check:4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
+4013/eval4000004013,200k actions/49,939 updates, first248/residual0,100k recovery,
+30-minute training cap. Keep5% episode guidance/expert1/NOOPweight.05; change
+teacher to continuation and cap640→1920 together. Primary same-native/config/
+host200k control scores3153.125/17of24; secondary500k/R16 scores3752.083/21.
+Fixed final/own initial24-natural episodes retain mean15000/90%-pyramid gate,
+zero learning/aid,346-tensor/replay/guard/coverage/exposure audits. The cap is
+selected from reused CPU-reference prefixes, not learned outcomes. No restore,
+extension, cap increase or automatic successor. Owner
+`kindle-qbert-continuation-cap1920-200k-20261027`; check live state before GPU work.
+
 Qbert CPU continuation reference scores22050/24 first pyramids, all24 above15k,
 with exact input/output/reset pixel replay; not native learning or held-out
 confirmation. The exact456-test optional adapter is applied after terminal
@@ -304,8 +316,8 @@ weights, finite reports, parameter changes,2987 trusted labels/1968 nonzero
 expert reports, full guided replay and guards pass; service exits03:23:09 UTC.
 Configuration4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original
 rates,4013/eval4000004013,25%episodes/cap640/expert1/NOOPweight.05.
-No frozen natural episodes or full learner yet; do not infer task competence
-from the check. See [result](results/2026-10-25-cdp-cheap-qbert.md#native-continuation-check-passes)
+No frozen natural episodes complete in the bounded check; do not infer task
+competence from it. See [result](results/2026-10-25-cdp-cheap-qbert.md#native-continuation-check-passes)
 and [protocol](experiments/2026-10-27-cdp-qbert-continuation.md).
 Check live state before GPU work.
 

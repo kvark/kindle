@@ -1,4 +1,4 @@
-# Bounded native Qbert continuation-guidance check
+# Qbert continuation guidance: bounded check and fresh learning comparison
 
 Select one bounded native check after the Breakout expert comparison completes
 with all audits and a negative frozen result4.000 versus control7.083. Do not
@@ -61,3 +61,54 @@ and guards pass. Frozen1024 /4096 frames take.531s with zero updates and346
 unchanged tensors. No natural frozen episode completes. Review SHA256
 `6f91901f01eb2101735282f6c2fb2a4bcff754863de1160edb3c29e393b5943c`.
 No full learner or automatic successor is selected. See [evidence and limits](../results/2026-10-25-cdp-cheap-qbert.md#native-continuation-check-passes).
+
+
+## Selected fresh 200k comparison
+
+After the bounded check passes, select one fresh life with the same centered
+CDP4M/RGB48/Auto/N8/B8/T16/H15/R32, coefficient1, actor mixture0, original
+learning rates, full18/sticky.25/repeat4/noops0 and native79c9a7f. Seed4013 and
+evaluation4000004013 are reused development seeds, selected after the stronger
+old-teacher result. Restore no weights or experience from the check or controls.
+
+Change the teacher from first-pyramid to continuation and the guidance cap from
+640 to1920 actions. Keep5% episode selection, expert scale1, NOOP weight.05 and
+other action weights1. These two changes are tested together. On the24 saved
+CPU-reference episodes,640/1280/1920-action prefixes average4875.000/11311.458/
+15026.042. This selects1920 to expose later-board rewards; prefix scores are
+neither natural-episode scores nor native learning. The full CPU reference
+averages22050.000. The same development episodes inform both choices.
+
+- Train200,000 aggregate actions /49,939 updates, first248, residual credit0;
+  save100k recovery at24,939 updates and final200k. Training cap30 minutes.
+- Evaluate fixed final and own actual initial on first3 natural episodes per8
+  lanes,24 selected each. Guidance off, zero updates/truncations; retain original
+  mean15000/90%-first-pyramid gate,600k-action and300s caps per arm.
+- Require all finite reports/346 tensors, matched initial weights against the
+  retained4013 control and bounded check,346 invariant tensors per frozen arm,
+  identical frozen initial semantic traces, complete guided input/action/outcome
+  replay, frozen outcome replay/videos, guards, recovery, curves and coverage.
+  Ordinary frozen logs have no live pixel hashes. Training trajectories need
+  not match because the teacher changes.
+- Record actual guided-action fraction, guided/unguided episode outcomes,
+  actions after guidance release and repeated replay-label exposure. Online
+  returns include teacher actions; changing replay cross entropy is not held-out
+  imitation accuracy. CPU audit cap1200s; service cap3660s.
+
+Primary control is the retained200k/R32/first-pyramid/cap640 life:3153.125,
+17/24 pyramids,20m07s. Secondary500k/R16 control scores3752.083,21/24 in28m20s;
+it also changes action budget and replay ratio. All three use the same native
+binary, boot, driver and model config except the secondary replay ratio. The
+Python runner/guidance implementation changes. No isolated teacher/cap effect,
+independent seed confirmation or five-game reliability claim follows this test.
+
+Trial:`/x/Temp/kindle-qbert-guidance-20261027/qbert-4m-48-r32-continuation-cap1920-expert1-200k-seed4013`.
+Owner:`kindle-qbert-continuation-cap1920-200k-20261027`.
+External `prepare_full.py`, `run_full.py`, `check_startup.py`, `finish_full.py`,
+`compare_full.py` and `analyze_full_exposure.py` retain the declaration, audit,
+comparison and actual-exposure receipts. Three commands parse, seven scripts
+compile, and both retained-control readers pass without environment/native
+construction. The initial plot-environment import failure lacked ALE; the
+unchanged preflight passes under the Atari environment before any GPU stage.
+Native binary and applied adapter remain unchanged. No retry, cap increase,
+extension, checkpoint selection or automatic successor is selected.
