@@ -209,3 +209,17 @@ retained1009 expert control and native check. First248:1/256:2/256:3/264:4/
 are trusted and443 reports contain expert labels. Read-only progress,100k
 recovery and terminal CPU postprocessing observers are attached. No frozen
 outcome is available yet; retain the declared cap and full audit scope.
+
+## Seed1009 recovery and co-host analysis
+
+At04:31:53 UTC, the100k recovery passes with24,939 updates and346 finite
+tensors. The watcher checks25,375 finite reports in the101,752-action complete
+prefix; last progress98,304/24,515 at824.058s, zero debt. The original service
+remains active under the same PID/invocation; no frozen outcome yet.
+
+During training, [saved4013 replay analysis](../results/2026-10-25-cdp-cheap-qbert.md#saved-replay-locates-the-remaining-gap-after-the-first-pyramid)
+uses2.518s of single-process unpinned log analysis,12.301s of affined low-priority
+emulator replay and.025s of affined summary work. It executes only saved actions
+with zero native decisions or updates and leaves all60 active pins unchanged.
+The work is a co-host timing caveat, not a wall-time correction. It changes no
+training settings or evaluation gate and selects no successor allocation.

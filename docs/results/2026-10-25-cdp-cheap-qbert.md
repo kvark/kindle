@@ -1957,3 +1957,43 @@ completion`6e35aa36ee74291debec6a2635ee3aa6f003a3176cbf0efaa7543b7c8c45da59`;
 comparison`ef10ab0f268d3385f82238625b97010a657db0d09f0e4b322f7229640ee91e8d`;
 exposure`0e2025a544e7a6d5f9acc3c23e98e975307ab80977c3457c7db437f5a8f1cba3`.
 The comparison PNG/SVG and curves remain outside Git with their receipts.
+
+## Saved replay locates the remaining gap after the first pyramid
+
+CPU analysis of the completed continuation4013 frozen cohort finds23/24 first
+pyramids but only **3/24 second-board color-cycle signatures**: all21 cube bytes
+become148, followed5–7 raw frames later by a uniform completion flash. Among
+the23 episodes reaching the second board, peak target-color coverage averages
+16.739/21; four stall at20 and two at19. This is a post-hoc color diagnostic,
+not a newly qualified general level detector or a changed success gate.
+
+Every first completion adds **3100 automatic bonus points** before the next
+board starts162 raw frames later. Thus reward after the first milestone cannot
+be read as later-board tile progress. The native policy does make progress on
+the second board, but most of these episodes end before its completion. Lane0's
+first episode reaches19/21 second-board colors, then loses its last three lives
+without further tile progress; its third episode completes the second color
+cycle and ends at7875 on the next palette. Saved native210×160 snapshots are
+illustrations from lane0 only; the counts use all24 selected episodes.
+
+After the first milestone, the continuation policy executes13,407 actions:
+8703 NOOP (64.91%),4703 cardinal commands and one other action. The old200k
+policy uses all18 actions, with8.76% NOOP among6384 post-milestone actions;
+old500k uses31.31% NOOP among11,672. Restriction to the teacher's five-action
+vocabulary shows behavioral transfer, not correct timing or a causal diagnosis.
+The changing state distributions prevent treating these fractions as accuracy.
+
+Replaying the26,768 saved frozen actions /107,020 frames matches every recorded
+reward, boundary, reset/frame counter, completed episode and partial tail.
+RAM cube colors and lives are observer outputs only; no native policy receives
+them and no new action decisions or learner updates occur. The12.301s replay
+and.025s summary run on one affined low-priority core during the1009 confirmation.
+The preceding2.518s log-only analysis runs as a single unpinned CPU process.
+All60 active pins remain unchanged. Ordinary frozen logs lack live pixel
+hashes, so reconstruction hashes do not establish direct live-image equality.
+
+Artifacts:`/x/Temp/kindle-qbert-transfer-20261027`.
+After-pyramid review SHA256`f0619ce871fe9227c4e0bdcc638d7a68963dd0d69213895f9692ff1991d0f21a`;
+raw-frame replay`854cda3ec027729e709a47085aa0a7e210001c51ad6351b23e3a6ef74c85d5d8`;
+color summary`bb8dc27163ea03825b8633e3201f0f33ef76b2838c0691270600d5de30f543ab`.
+No runtime, guidance policy, allocation or evaluation criterion changes.
