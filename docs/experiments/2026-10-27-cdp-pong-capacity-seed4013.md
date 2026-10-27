@@ -57,7 +57,7 @@ start, stop or extend GPU work. Declaration and launch/startup receipts retain
 exact hashes and the launch commit.
 
 
-## Active startup
+## Recorded startup
 
 Service starts01:57:51 UTC on October27 from`4cd7fb5f13294bc692e8b75dbdb341f8711f499e`,
 PID71345, invocation`bfe98b4e4ae84b3f996e05f86f28e3df`. Startup passes at5656
@@ -102,3 +102,17 @@ A separate one-episode Breakout diagnostic costs0.980s and one CPU reference
 variant costs5.572s collection/3.899s replay. Its small152.750 versus144.875 gain
 on eight reused episodes, both0/8 two-wall successes, does not replace the staged
 teacher. No native agent or live input changes; all53 active pins remain intact.
+
+
+## Completed result
+
+The fixed final scores14.833/24 wins versus own initial−20.542/0. Mean15 fails;
+only one of the two12M learners passes.500k actions /1,999,720 frames /31,227
+updates take41m31s,16.90% less training time than the paired4M4013 control.
+All53 input pins, finite reports, four recovery checkpoints, config/counters,
+346 frozen tensors, replays, guards, curves and comparison pass. Service exits
+02:41:08 UTC; postprocessing02:41:23. No extension or third seed follows.
+See [complete evidence and hashes](../results/2026-10-25-cdp-cheap-pong.md#capacity-confirmation-improves4013-but-narrowly-misses-the-gate).
+The original read-only observer failure remains retained. The later application
+of the validated Breakout adapter follows terminal audits and does not change
+this run's immutable declaration, artifacts or runtime.

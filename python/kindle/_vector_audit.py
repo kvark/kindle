@@ -9,6 +9,7 @@ import struct
 
 from ._exploration import EXPLORATION_PROTOCOL, PersistentExploration
 from ._qbert_guidance import GUIDANCE_KINDS, QbertGuidance
+from ._breakout_guidance import GUIDANCE_KINDS as BREAKOUT_GUIDANCE_KINDS, BreakoutGuidance
 
 
 VECTOR_PROTOCOL = "kindle-vector-v2"
@@ -92,20 +93,26 @@ def audit(path):
         guidance = False
         if header["protocol"] == EXPLORATION_PROTOCOL:
             check(header["mode"] == "train", "frozen evaluation cannot contain exploration overrides")
-            guidance = header["exploration"].get("kind") in GUIDANCE_KINDS
+            breakout_guidance = header["exploration"].get("kind") in BREAKOUT_GUIDANCE_KINDS
+            guidance = breakout_guidance or header["exploration"].get("kind") in GUIDANCE_KINDS
             if guidance:
-                check(header["environment"] == "ALE/Qbert-v5" and header["atari_protocol"] == "published"
+                game = "ALE/Breakout-v5" if breakout_guidance else "ALE/Qbert-v5"
+                check(header["environment"] == game and header["atari_protocol"] == "published"
                       and header["full_action_space"] is True and header["observation_size"] == "native"
                       and header["observation_shape"] == [210, 160, 3]
                       and header["noop_max"] == 0 and header["action_repeat"] == 4,
-                      "unsupported Qbert guidance game or preprocessing")
-            cls = QbertGuidance if guidance else PersistentExploration
+                      "unsupported pixel guidance game or preprocessing")
+            cls = (BreakoutGuidance if breakout_guidance else QbertGuidance) if guidance else PersistentExploration
             exploration = cls(header["exploration"], count, config["action_count"])
             check(exploration.config["seed"] == config["seed"] == header["seed"], "exploration seed differs")
-            from . import _exploration, _qbert_guidance
-            module = _qbert_guidance if guidance else _exploration
+            from . import _exploration, _qbert_guidance, _breakout_guidance
+            module = (_breakout_guidance if breakout_guidance else _qbert_guidance) if guidance else _exploration
             expected_hash = hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()
             check(header["exploration_sha256"] == expected_hash, "exploration implementation differs")
+            if guidance:
+                from . import _pixel_guidance
+                schedule_hash = hashlib.sha256(Path(_pixel_guidance.__file__).read_bytes()).hexdigest()
+                check(header.get("guidance_schedule_sha256") == schedule_hash, "guidance schedule implementation differs")
         else:
             check(not {"exploration", "exploration_sha256"}.intersection(header), "undeclared exploration protocol")
         expert = config.get("expert_imitation")

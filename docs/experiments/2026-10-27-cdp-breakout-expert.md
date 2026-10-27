@@ -1,0 +1,57 @@
+# Bounded Breakout pixel-guided expert imitation
+
+After both Pong12M48 learners finish and pass their execution audits, select
+one short native training/restore check. The five-game goal remains unfinished;
+Pong passes its mean15 gate on one of two learners. Neither is extended.
+
+The unchanged calibrated CPU reference scores166.167 across24 reused natural
+episodes,0/24 two-wall successes. It motivates testing transfer to a native
+learner, not a claim of learned competence. The settling variant's small gain
+on eight selected episodes is insufficient to replace this teacher.
+
+The exact eight-file adapter patch is applied after Pong4013's terminal audit.
+442 CPU tests pass with native construction blocked;11,809 saved Breakout and
+4096 Qbert actions reproduce exactly. An8192-action ALE fixture verifies512
+trusted labels and cap release. Validation/application receipts retain hashes.
+Qbert's policy and episode schedule retain their behavior; new guided logs pin
+both policy and shared schedule source. Old guided logs use their old runtime.
+
+## Selected execution check
+
+- Centered CDP4M/RGB64/Auto/N8/B8/T16/H15/R32, coefficient1, actor mixture.01,
+  original rates, full18/sticky.25/repeat4/noops0, one GPU resize from native RGB.
+- Fresh1009/eval4000001009;4096 aggregate actions /963 updates, first248,
+  residual0. Training cap180s; frozen1024 actions/60s; audit180s; service480s.
+- Select25% of episodes for pixel-only guidance, release after128 actions.
+  Native expert loss scale1, all18 action weights1, including NOOP braking.
+  The higher check probability exercises labels/release; it is not the proposed
+  full learning recipe. No RAM enters the teacher or native policy.
+- Require finite reports/all346 tensors,4,131,729 parameters, initial equality
+  to the full18 control, changed CNN/reward/actor/value weights, movement and
+  NOOP labels, nonzero expert updates, unchanged frozen tensors, full guided
+  input-pixel/action/outcome replay and passing host guards.
+
+Native source79c9a7f and SHA256
+`7c07d6702e37ca11aa20c1b35b48951f0ed01e0e1dfe72e187eac52253f8455e`
+are unchanged. Package the applied Python files at
+`/x/Temp/kindle-breakout-guidance-20261027/runtime`; retain the old runtime.
+Device RX7900XT/RADV0x744c, boota8648671, kernel7.0.0-38, Mesa26.0.8.
+The queue uses the existing host guard. No reset, retry, cap increase or reuse
+of check experience. A passing check establishes execution/restore only.
+
+Artifacts and controllers: `/x/Temp/kindle-breakout-guidance-20261027`.
+Trial`breakout-4m-64-expert1-check`, owner`kindle-breakout-expert-check-20261027`.
+`prepare_check.py` and `run_check.py` pin the source, native, queue, runtime,
+control and terminal Pong review; declaration records the launch source.
+Patch SHA256`fe109513fa4f8476321a0ba5b9cef6486a85854acff18317029e1263a844b940`;
+validation`0e0ff2298f8f6ef0ba4befee7f2b6b1de21f4b37cc94784c89afa6101f5d3d63`.
+
+## Prepared full candidate remains unselected
+
+Only after reviewing the bounded result may a separate declaration select one
+fresh200k-action/49,939-update comparison,5% episodes/cap640/expert1/all weights1,
+with the same model/settings and a25-minute training cap. Fixed final and own
+actual initial each select24 natural episodes; original864-point/90%-two-wall
+gate, no guidance or learning in evaluation, full audits and100k recovery.
+Compare full18 control7.083 and stronger minimal4 control9.542, retaining the
+action-space/native/kernel differences. No automatic promotion or successor.

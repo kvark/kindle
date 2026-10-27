@@ -1079,3 +1079,48 @@ comparison`5626775b6f31b2bf739d7a1dbb1825eb21705c12b5ec11bc3d568bcb4d81c9b8`.
 The completed learner is terminal. The result justifies the separately selected
 [fresh4013 confirmation](../experiments/2026-10-27-cdp-pong-capacity-seed4013.md),
 with identical recipe and budgets. It is not an extension or broad seed campaign.
+
+
+## Capacity confirmation improves4013 but narrowly misses the gate
+
+The fresh4013 learner scores **14.833 with24/24 wins**, versus its own actual
+initial **−20.542 with0/24 wins**. It narrowly misses the unchanged mean15 gate.
+The identical12M48 recipe passes on1009, so **one of two learners passes**.
+Both improve their paired compact4M/B8 controls while using about17% less
+training time; this is useful development evidence, not broad reliability.
+
+| Seed |4M48/B8/R32 mean /wall |12M48/B16/R16 mean /wall |12M gate |
+|---|---|---|---|
+|1009|14.958 /49m55s|15.625 /41m28s|pass|
+|4013|14.000 /49m58s|14.833 /41m31s|fail: mean below15|
+
+All four final policies win24/24 natural matches. The new run completes
+**500,000 aggregate actions /1,999,720 emulator frames /31,227 updates in
+2491.468s**, within its45-minute cap. First update376, residual credit.5,
+175 natural training matches and last50 online mean15.14. The exact recipe is
+centered CDP12M/RGB48/Auto/N8/B16/T16/H15/R16, coefficient.01, actor0, original
+rates/full18, no aid or imitation. Actual parameters14,123,473. Seed4013 and its
+evaluation cohort were used in earlier4M development. Capacity, batch, ratio,
+native and older control kernel confound attribution against compact controls.
+
+Final evaluation uses85,368 actions /341,420 frames /43.478s; actual initial
+uses23,408 /93,605 /12.004s. Each completes exactly24 natural matches, first3
+per lane, zero learning/truncation and346 invariant tensors. Conditional
+stream-bootstrap mean interval[13.000,16.708] and win Wilson[.862,1] describe
+this frozen policy, not training-seed reliability. Do not pool episodes as
+independent learners or relax the gate because the point estimate is close.
+
+All31,227 reports, config/source/counters,53 declared pins, four100k recovery
+checkpoints, finite tensors, guards, recorded-action outcome replays, videos,
+curves and paired comparison pass. Ordinary unguided logs have no live pixel
+hashes, so direct live/replay image equality remains untested. Startup checks
+fresh world weights and the expected update trace; no cross-seed weight equality
+is claimed. Service exits02:41:08 UTC on October27, CPU postprocessing02:41:23.
+The initial progress-observer flag error is retained, corrected without
+interrupting training or repeating GPU stages. Co-hosted CPU reference work is
+recorded in the protocol. Neither learner is extended; no third seed is selected.
+
+Artifacts: `/x/Temp/kindle-pong-capacity-20261027/pong-12m-48-b16-r16-intrinsic001-500k-seed4013`.
+Learning review SHA256`a5d261a0e75ec8146ccdc361cabca6581fb403c1a0e5a27d931487239c86d437`;
+completion`cfb0fbe1738dc8728302a50799105a12003069eafaa04200c0757af5e517442e`;
+comparison`5583ccb3e8a3d724c0c437e0b18385235d44efea003d764ef3557eb1c146f67e`.

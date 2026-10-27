@@ -10,6 +10,7 @@ import pytest
 
 import kindle
 import kindle._qbert_guidance as module
+import kindle._pixel_guidance as schedule_module
 from kindle._qbert_guidance import BOUNDED_GUIDANCE_KIND, GUIDANCE_KIND, GUIDANCE_SEED_XOR, QbertGuidance
 from kindle._exploration import EXPLORATION_PROTOCOL
 from kindle._vector_audit import audit
@@ -70,6 +71,7 @@ def guided_events(spec=None):
     rows = version_two_events()
     rows[0].update(protocol=EXPLORATION_PROTOCOL, seed=1009, environment='ALE/Qbert-v5',
         atari_protocol='published', full_action_space=True, observation_size='native',
+        guidance_schedule_sha256=hashlib.sha256(Path(schedule_module.__file__).read_bytes()).hexdigest(),
         observation_shape=[210, 160, 3], sticky_actions=.25, noop_max=0, action_repeat=4,
         exploration=spec, exploration_sha256=hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest())
     rows[0]['config'].update(seed=1009, action_count=18)

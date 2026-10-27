@@ -13,6 +13,7 @@ import atari
 from audit_atari import require, sha256
 from check_atari_adapter import rom_identity
 from kindle._qbert_guidance import GUIDANCE_KINDS, QbertGuidance
+from kindle._breakout_guidance import GUIDANCE_KINDS as BREAKOUT_GUIDANCE_KINDS, BreakoutGuidance
 from kindle._vector_audit import audit
 from replay_atari import TaskMonitor, verify_replay_identity
 
@@ -25,8 +26,8 @@ def read_guided_run(path):
         end = None
         for line in source:
             end = json.loads(line)
-    require(header['mode'] == 'train' and header.get('exploration', {}).get('kind') in GUIDANCE_KINDS,
-            "requires declared Qbert pixel guidance training")
+    require(header['mode'] == 'train' and header.get('exploration', {}).get('kind') in (*GUIDANCE_KINDS, *BREAKOUT_GUIDANCE_KINDS),
+            "requires declared pixel guidance training")
     return dict(start=header, end=end, accounting=accounting, sha256=sha256(path))
 
 
@@ -81,7 +82,8 @@ def main():
     gym.register_envs(ale_py)
     rom = rom_identity(header['environment'])
     verify_replay_identity(header, manifest, rom)
-    guidance = QbertGuidance(header['exploration'], header['num_envs'], header['config']['action_count'])
+    cls = BreakoutGuidance if header['exploration']['kind'] in BREAKOUT_GUIDANCE_KINDS else QbertGuidance
+    guidance = cls(header['exploration'], header['num_envs'], header['config']['action_count'])
     environments, monitors, frames = [], [], []
     with ExitStack() as stack:
         for seed in header['environment_seeds']:
@@ -103,7 +105,7 @@ def main():
         require([env.emulator_resets for env in environments] == run['end']['emulator_resets'],
                 "guidance replay reset counts differ")
     require(sha256(args.log) == run['sha256'], "guidance source changed during replay")
-    result = dict(protocol='kindle-qbert-guidance-replay-v1', source_log=str(args.log.resolve()),
+    result = dict(protocol=('kindle-breakout-guidance-replay-v1' if cls is BreakoutGuidance else 'kindle-qbert-guidance-replay-v1'), source_log=str(args.log.resolve()),
                   source_log_sha256=run['sha256'], source_header=header, source_accounting=run['accounting'],
                   source_manifest_sha256=sha256(args.source_manifest), replay_script_sha256=sha256(__file__),
                   elapsed_seconds=time.monotonic() - started, agent_constructed=False, learner_updates=0,

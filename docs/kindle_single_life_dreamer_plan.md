@@ -23,6 +23,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same, coefficient.01, seed1009](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-improves-the-fixed-budget-result) |500k /124,939|49m55s|14.958 /−20.375|24/24 wins; mean15 narrowly fails|
 | [Same, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-seed4013-confirmation) |500k /124,939|49m58s|14.000 /−20.333|24/24 wins; mean15 fails|
 | [Pong12M48/B16/R16, coefficient.01](results/2026-10-25-cdp-cheap-pong.md#larger-capacity-with-less-replay-work-reaches-the-gate) |500k /31,227|41m28s|15.625 /−20.292|24/24 wins; pass on one learner|
+| [Pong12M48, same recipe4013](results/2026-10-25-cdp-cheap-pong.md#capacity-confirmation-improves4013-but-narrowly-misses-the-gate) |500k /31,227|41m31s|14.833 /−20.542|24/24 wins; mean15 narrowly fails|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Same, capped pixel guidance + expert imitation](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate) |200k /49,939|20m11s|1083.333 /180.208|2/24 first pyramids; gate still fails|
 | [Same, fresh seed4013](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-transfers-on4013-with-substantial-seed-variation) |200k /49,939|20m07s|3153.125 /182.292|17/24 first pyramids; gate still fails|
@@ -330,29 +331,32 @@ service exits01:51:06 UTC, CPU postprocessing01:51:35 on October27.
 No live pixel hashes are available in ordinary unguided logs. See the protocol
 scope correction and [completed result](results/2026-10-25-cdp-cheap-pong.md#larger-capacity-with-less-replay-work-reaches-the-gate).
 
-Active fresh4013/eval4000004013 confirmation from01:57:51 UTC/source4cd7fb5
-keeps the exact12M48 recipe,
-native/CLI79c9a7f and unchanged Python sources.500k actions /31,227 updates,
-first376/residual.5, four100k recoveries,45-minute training cap and fixed final/
-own actual initial24-natural matches. Original mean15/90%-wins gate; complete
-numerical/config/counter/replay/346-tensor/guard audits. No restoration, cap
-increase, extension or automatic successor.4013 was used in prior4M development;
-this is a fresh fixed-recipe learner, not a held-out test or broad reliability.
-Startup passes5656 actions/330 finite reports,346 finite initial tensors, fresh
-world weights and first376/392/408/424/440/456 updates; all53 pins unchanged.
-The progress observer was corrected after unsupported flags; training was not
-interrupted. Recovery and CPU postprocessing observers are attached.
-100k/6227 and200k/12,477 recoveries pass02:06:20/02:14:50 UTC, with346 finite
-tensors and complete-prefix finite reports; same learner continues.
-Owner`kindle-pong-12m48-b16-r16-500k-seed4013-20261027`; see
-[protocol](experiments/2026-10-27-cdp-pong-capacity-seed4013.md).
+Pong12M48 fresh4013 completes500k actions /1,999,720 frames /31,227 updates
+in41m31s. Frozen14.833/24 wins versus own initial−20.542/0 narrowly misses
+mean15; primary1009 scores15.625/24 wins in41m28s. Both improve their paired
+4M/B8 controls14.000/14.958 with about17% less training time, but only one of
+two learners passes the full gate. All numerical/config/counter checks, four
+recoveries,346 frozen tensors,53 pins, replays, guards and comparison pass.
+Service exits02:41:08 UTC, CPU postprocessing02:41:23 on October27. Original
+progress-observer failure is retained; no GPU stage repeats. Both reused
+seeds are development evidence. No extension or third seed is selected.
+See [completed confirmation](results/2026-10-25-cdp-cheap-pong.md#capacity-confirmation-improves4013-but-narrowly-misses-the-gate).
+
+Select one bounded Breakout expert check after that terminal review:4096 actions
+/963 updates,180-second training cap,1024 frozen actions/60-second cap.
+Use4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/full18, fresh1009,
+25%episode guidance/cap128/expert1/all action weights1. The exact validated
+eight-file adapter is applied;442 CPU tests and saved Breakout/Qbert replay
+checks pass. Native79c9a7f is unchanged. No natural-episode competence or full
+allocation follows automatically. See [protocol](experiments/2026-10-27-cdp-breakout-expert.md).
 Check live state before GPU work.
 
 
 CPU Breakout predictive reference scores166.167 across24 natural episodes,
 0/24 two-wall successes; full input/output pixel-hash replay passes. Selected
 after one9001 and eight reused evaluation episodes; those8 are included in24.
-No native learner or guidance integration is selected.55.935s affined CPU work
+This reference work preceded the separately selected bounded adapter check.
+55.935s affined CPU work
 co-hosted with Pong; all42 active pins unchanged. See [reference result](results/2026-10-26-cdp-breakout-pixel-reference.md#calibrated-paddle-response-improves-the-reference-but-misses-the-two-wall-gate).
 
 Fresh Qbert4013 expert500k/R16 completes **500k actions /1,998,773 frames
@@ -470,7 +474,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Game | Latest useful frozen result | What remains |
 | --- | --- | --- |
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
-| Pong | AMD4M/RGB48/R32/500k: coefficient1 seeds1009/4013 score11.0/7.33; coefficient.01 seeds1009/4013 improve to14.958/14.0 and24/24 wins each in49m55s/49m58s | Reference20.45; compact mean15 gate and broad reliability remain open |
+| Pong | AMD12M48/B16/R16/500k: seeds1009/4013 score15.625/14.833 with24/24 wins each in41m28s/41m31s | Reference20.45; one of two meets mean15, broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh4013 at500k/R16:3752.083 and21/24 in28m20s; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |

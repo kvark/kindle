@@ -23,7 +23,10 @@ import gymnasium as gym
 import kindle
 import atari
 from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, episode_summary, require_numbers
+import kindle._pixel_guidance as guidance_schedule_module
 import kindle._qbert_guidance as guidance_module
+import kindle._breakout_guidance as breakout_guidance_module
+from kindle._breakout_guidance import BreakoutGuidance
 from kindle._qbert_guidance import BOUNDED_GUIDANCE_KIND, GUIDANCE_KIND, QbertGuidance
 import kindle._exploration as exploration_module
 from kindle._exploration import EXPLORATION_KIND, EXPLORATION_PROTOCOL, PersistentExploration
@@ -121,6 +124,10 @@ def main():
                         help="fresh Qbert only: probability of selecting an episode for pixel guidance")
     parser.add_argument("--qbert-guidance-max-actions", type=int,
                         help="release each selected episode to the learner after this many actions")
+    parser.add_argument("--breakout-guidance-probability", type=float, default=0.0,
+                        help="fresh Breakout/full18 only: probability of pixel-guided episodes")
+    parser.add_argument("--breakout-guidance-max-actions", type=int,
+                        help="required action cap for each selected Breakout episode")
     parser.add_argument("--guidance-imitation-scale", type=float,
                         help="fresh guided training only: native supervised actor loss on expert actions")
     parser.add_argument("--guidance-noop-weight", type=float,
@@ -160,10 +167,27 @@ def main():
         parser.error("exploration probability must be in [0, 1]")
     if not math.isfinite(args.qbert_guidance_probability) or not 0 <= args.qbert_guidance_probability <= 1:
         parser.error("Qbert guidance probability must be in [0, 1]")
+    if not math.isfinite(args.breakout_guidance_probability) or not 0 <= args.breakout_guidance_probability <= 1:
+        parser.error("Breakout guidance probability must be in [0, 1]")
+    if args.breakout_guidance_max_actions is not None:
+        if not 0 < args.breakout_guidance_max_actions < 2**32:
+            parser.error("Breakout guidance max-actions must be a positive u32")
+        if not args.breakout_guidance_probability:
+            parser.error("Breakout guidance max-actions requires positive guidance probability")
+    if args.breakout_guidance_probability:
+        if args.breakout_guidance_max_actions is None:
+            parser.error("Breakout guidance requires an explicit max-actions cap")
+        if args.evaluate:
+            parser.error("frozen evaluation must not use Breakout guidance")
+        if args.exploration_probability or args.qbert_guidance_probability:
+            parser.error("Breakout guidance cannot combine with another action aid")
+        if (args.environment != "ALE/Breakout-v5" or args.atari_protocol != "published"
+                or args.observation_size not in (None, "native") or args.encoder_checkpoint is not None):
+            parser.error("Breakout guidance requires Breakout/full18/native pixels/learned RGB")
     if args.guidance_imitation_scale is not None:
         if not positive_f32(args.guidance_imitation_scale):
             parser.error("guidance imitation scale must be positive finite F32")
-        if not args.qbert_guidance_probability or args.evaluate:
+        if not (args.qbert_guidance_probability or args.breakout_guidance_probability) or args.evaluate:
             parser.error("guidance imitation requires fresh guided training")
     if args.guidance_noop_weight is not None:
         if args.guidance_imitation_scale is None:
@@ -192,6 +216,7 @@ def main():
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
     training_options.add("--qbert-guidance-probability")
     training_options.add("--qbert-guidance-max-actions")
+    training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions"))
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight"))
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
@@ -212,7 +237,7 @@ def main():
     memory_path = args.output.with_suffix(".gpu-memory.jsonl")
     if args.min_gpu_budget_headroom_mib is not None and memory_path.exists():
         parser.error("GPU memory output must be a fresh path")
-    if (args.exploration_probability or args.qbert_guidance_probability) and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
+    if (args.exploration_probability or args.qbert_guidance_probability or args.breakout_guidance_probability) and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("persistent exploration requires native vector action overrides")
     if args.guidance_imitation_scale is not None and "expert_actions" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("guidance imitation requires native expert-action support")
@@ -328,7 +353,12 @@ def main():
             if args.qbert_guidance_max_actions is not None:
                 guidance_config.update(kind=BOUNDED_GUIDANCE_KIND, max_actions=args.qbert_guidance_max_actions)
             exploration = QbertGuidance(guidance_config, args.num_envs, actions)
-        guidance = isinstance(exploration, QbertGuidance)
+        if args.breakout_guidance_probability:
+            exploration = BreakoutGuidance(dict(kind=breakout_guidance_module.GUIDANCE_KIND,
+                probability=args.breakout_guidance_probability, seed=args.seed,
+                max_actions=args.breakout_guidance_max_actions), args.num_envs, actions)
+        guidance = isinstance(exploration, (QbertGuidance, BreakoutGuidance))
+        selected_guidance_module = breakout_guidance_module if isinstance(exploration, BreakoutGuidance) else guidance_module
         current_frames = initial
         construction = time.perf_counter()
         restored = checkpoint_identity(args.restore) if args.restore else None
@@ -355,7 +385,8 @@ def main():
             agent.save_checkpoint(str(args.initial_checkpoint))
             initial_checkpoint = checkpoint_identity(args.initial_checkpoint)
         exploration_header = (dict(exploration=exploration.config,
-            exploration_sha256=sha256_file(guidance_module.__file__ if guidance else exploration_module.__file__)) if exploration else {})
+            **(dict(guidance_schedule_sha256=sha256_file(guidance_schedule_module.__file__)) if guidance else {}),
+            exploration_sha256=sha256_file(selected_guidance_module.__file__ if guidance else exploration_module.__file__)) if exploration else {})
         vector_protocol = (EPISODE_EVALUATION_PROTOCOL if args.episodes_per_env else
                            EXPLORATION_PROTOCOL if exploration else VECTOR_PROTOCOL)
         emit(dict(event="run_start", protocol=vector_protocol, environment=args.environment,

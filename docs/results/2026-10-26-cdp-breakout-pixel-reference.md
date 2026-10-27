@@ -278,3 +278,14 @@ Miss review SHA256`43dbff1c477e20c67ae27117694a0bf9699f894a35acaee20866c1d608db8
 variant review`cb41918e71d164fea904f2df491d6e094cef0c3b66f9ec5c80b2f22061643156`.
 Both are retained under`/x/Temp/kindle-breakout-guidance-20261027` with exact
 source pins, traces and snapshots.
+
+
+## Validated adapter applied after Pong completion
+
+After Pong4013 exits02:41:08 UTC and its CPU completion audit passes02:41:23,
+all53 preceding pins are verified unchanged. The exact validated eight-file
+patch is applied; native79c9a7f remains unchanged. The442-test CPU result and
+saved trajectory parity apply to identical bytes. Application receipt is
+`/x/Temp/kindle-breakout-guidance-20261027/application-review.json`.
+Select only the [bounded4096-action check](../experiments/2026-10-27-cdp-breakout-expert.md);
+the prepared200k candidate remains unselected until separate review.
