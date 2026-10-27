@@ -280,7 +280,9 @@ CPU comparison-reader preflight pass. Startup matches346 initial tensors and
 all31 pre-learning transitions with the completed4013 control. First six updates
 match248:1/256:2/264:3/272:4/280:5/288:6;17,136 complete actions/2111 finite
 reports,1920 trusted actions and633 supervised reports pass. Recovery, progress
-and postprocessing monitors are attached. Frozen quality is pending. Owner
+and postprocessing monitors are attached.100k/12,470,200k/24,970 and300k/37,470
+recoveries pass with346 finite tensors each. The300k audit verifies37,937 finite
+reports in a303,744-action prefix, with zero debt. Frozen quality is pending. Owner
 `kindle-expert-qbert-r16-500k-seed4013-20261027`. No extension, cap increase or
 automatic successor. CPU teacher prototypes remain external and unselected.
 See [selected protocol](experiments/2026-10-27-cdp-qbert-expert-r16.md).

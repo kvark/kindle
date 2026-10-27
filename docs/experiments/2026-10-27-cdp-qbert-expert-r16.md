@@ -83,3 +83,28 @@ Read-only recovery, progress and completion monitors run as
 `kindle-expert-qbert-r16-{recovery,progress,post}-20261027`.
 Startup review SHA256:
 `fa85b4a73f4ebe41fea8be66bb6d59b346cec84c0ddf95d71bcea061259b5195`.
+
+
+## Recovery checks while training continues
+
+| Checkpoint actions / updates | Audit UTC | Finite tensors | Complete prefix actions / finite reports |
+| --- | --- | ---: | --- |
+|100,000 /12,470|00:23:17|346|100,864 /12,577|
+|200,000 /24,970|00:28:48|346|203,072 /25,354|
+|300,000 /37,470|00:34:18|346|303,744 /37,937|
+
+The same PID61973/invocation continues. At the300k audit the latest progress
+is303,104 actions /37,858 updates in1024.610s, with zero debt. These are
+recovery and execution checks; frozen task quality remains pending.
+
+Independent score-color CPU prototypes complete on one affined core at nice10
+while this learner runs. Their111.935s total measured collection/replay time
+is a co-host timing caveat; this is not an isolated backend speed comparison.
+They never construct an agent or change any of the67 active pins, recipe or
+caps. All prototypes remain outside production and unselected. See
+[results and failed attempts](../results/2026-10-25-cdp-cheap-qbert.md#score-color-prototypes-remain-below-the-game-gate).
+
+Recovery review SHA256s:
+100k`7edd98a8c1d0e10f1be6517d98c0cd21a33a452fe3ae593f7b01cebc2f039e7c`;
+200k`3868d0a42c39bf435212b1c80e7442504af34bb4767b5c0340006500b40daa5c`;
+300k`439dd6525474fa7dea6f0f46a9fd9c3407fadf8cdaea446cfe7aa89c85d2864c`.

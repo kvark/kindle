@@ -1652,3 +1652,54 @@ Alternating prototype:
 `be1ad5044aafab070bd79e9f85ef8b43500576ce27093e182765b0dfd2b20df9`.
 Palette prototype:
 `bd8807697dbcc4b657553be31c635cd6e8a195e42b9b7a8f49108d78a9968abd`.
+
+
+## Score-color prototypes remain below the game gate
+
+The original manual identifies the score/life-icon color as the current tile
+color target and specifies a3100-point completion bonus. Thus post-milestone
+reward totals include completion payouts, not exclusively progress on a later
+board. [Parker Brothers1983 instructions](https://www.atariage.com/manual_html_page.php?SoftwareLabelID=379).
+
+Five bounded CPU developments use only native max-pooled RGB and the existing
+movement rule. Each collects the first natural episode of the same8 reused4013
+evaluation lanes, then independently replays saved actions and checks every
+pixel hash, reward and boundary. All complete8 natural episodes, zero
+truncations/partial tails, and exact replay. No Kindle agent or GPU is used.
+
+| Prototype | Mean return | First pyramids | Actions / emulator frames | Collection / replay |
+| --- | ---: | ---: | ---: | ---: |
+| Score-color reader without initial fallback |0.000|0/8|8304 /33,216|4.775s /3.144s|
+| Initial yellow fallback, broad score crop |3684.375|8/8|8805 /35,201|21.876s /3.384s|
+| Narrow digit crop |3684.375|8/8|8805 /35,201|21.286s /3.412s|
+| Narrow crop plus a hop to a neighboring tile after full color |4825.000|8/8|8649 /34,581|21.010s /3.369s|
+| Alternating transition target plus stable digit color |6743.750|8/8|9024 /36,091|26.185s /3.494s|
+
+The first reader never obtains a target before scoring and stays idle. Initial
+fallback restores first-pyramid behavior. The broad crop can admit the orange
+character; narrowing it removes that observed color error but does not improve
+scores. Continuing with a board hop exposes transition flashing, which the
+three-observation reader incorrectly accepts as target changes. The final
+prototype requires8 consecutive visible observations, preserves the original
+base/target color handling, and alternates provisionally after a full-color
+board. Its recorded targets reach the later gray palette in5/8 lanes, but the
+mean is only128.125 above the earlier alternating reference's6615.625. No
+validated later-pyramid success count or causal mechanism is claimed.
+
+All failed attempts are retained. This is repeated selection on one small
+reused cohort, not held-out validation or learned success. The best score still
+misses15000 substantially; no production guidance change, seed campaign or new
+GPU allocation is selected from these results. The existing500k/R16 learner
+continues with its original teacher and30-minute cap.
+
+Collection/replay totals111.935s on one affined CPU core at nice10 during the
+active learner. This is recorded as a co-host timing caveat. All67 active pins
+remain unchanged afterward; the service retains PID61973 and invocation
+`66573c6168d640428dfcdafa9d82ca17`. No agent, native training source or runtime
+is modified by the prototypes.
+
+Artifact root:`/x/Temp/kindle-qbert-continuation-20261027`.
+The aggregate`hud-teacher-review.json` pins every per-prototype review, script
+and exact trace, preserving all scores, natural episodes, raw-frame counts and
+CPU times. SHA256:
+`61d328699bf25851672c55765196f14fb4dc235fb2335b85e3f6e3b494933355`.
