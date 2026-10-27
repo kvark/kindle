@@ -294,30 +294,20 @@ tensors,46 pins, replays, guards, comparison and exposure pass. Service exits
 20,463 trusted actions (10.2315%); guided/unguided completed means24.871/2.948
 are not frozen competence. See [result](results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality).
 
-Qbert continuation training is active from03:38:49 UTC/source`8761ff2`,
-PID81404/invocation`ab0b0ad39c914bd89ab77e9e94773971`. Startup verifies56 pins,
-346 initial tensors matching both control and check, and first248:1/256:2/
-256:3/264:4/264:5/272:6 updates. The first2312-action prefix has515 finite
-reports and no selected guided episode yet; no task outcome is available.
-Progress,100k recovery and postprocessing observers are attached. Keep the
-selected200k/30-minute cap and all frozen audits; no next allocation.
-
-The100k Qbert recovery audit passes03:53:05 UTC:24,939 saved updates,
-346 finite tensors,103,600-action prefix/25,837 finite reports; last progress
-102,400/25,539 at844.397s with zero debt. The same learner remains active;
-fixed final/initial task outcomes are pending. Keep the200k/30-minute cap.
-
-A fresh Qbert continuation comparison is selected after the passing bounded
-check:4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
-4013/eval4000004013,200k actions/49,939 updates, first248/residual0,100k recovery,
-30-minute training cap. Keep5% episode guidance/expert1/NOOPweight.05; change
-teacher to continuation and cap640→1920 together. Primary same-native/config/
-host200k control scores3153.125/17of24; secondary500k/R16 scores3752.083/21.
-Fixed final/own initial24-natural episodes retain mean15000/90%-pyramid gate,
-zero learning/aid,346-tensor/replay/guard/coverage/exposure audits. The cap is
-selected from reused CPU-reference prefixes, not learned outcomes. No restore,
-extension, cap increase or automatic successor. Owner
-`kindle-qbert-continuation-cap1920-200k-20261027`; check live state before GPU work.
+Qbert continuation200k completes799,570 frames /49,939 updates in25m23s.
+Frozen4730.208/23of24 first pyramids versus own initial182.292/0 improves
+old-teacher200k's3153.125/17 by50.02% for26.17% more training time. It also
+beats500k/R16's3752.083/21 with10.45% less time. Mean15000 still fails.
+All audits,100k recovery,346 matched initial/unchanged frozen tensors, identical
+initial semantic traces,56 pins, replays, guards, curves, coverage and exposure
+pass; main service exits04:07:44 UTC, CPU postprocessing04:08:08 on October27.
+Keep4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
+5%episode continuation/cap1920/expert1/NOOPweight.05 as a promising development
+recipe. Actual guidance34,468 actions (17.234%); guided online scores are not
+unaided competence. Teacher and cap change together on reused4013; no isolated
+causal effect or seed reliability claim. No extension or next allocation selected.
+See [completed result](results/2026-10-25-cdp-cheap-qbert.md#continuation-guidance-improves-frozen-learning-but-misses-the-full-gate).
+Check live state before GPU work.
 
 Qbert CPU continuation reference scores22050/24 first pyramids, all24 above15k,
 with exact input/output/reset pixel replay; not native learning or held-out

@@ -1902,3 +1902,58 @@ without claiming those are natural-episode or learned scores. Keep30-minute
 training cap and fixed final/own-initial24-natural unguided evaluations against
 the original15k/90% gate. See the [selected protocol](../experiments/2026-10-27-cdp-qbert-continuation.md#selected-fresh-200k-comparison).
 No training outcome is available yet; no extension or automatic successor.
+
+
+## Continuation guidance improves frozen learning but misses the full gate
+
+The fresh4013 continuation life completes **200k aggregate actions /799,570
+emulator frames /49,939 updates in25m23s** (1522.860s), within30 minutes.
+Fixed final frozen mean **4730.208 with23/24 first pyramids**, versus its own
+actual initial182.292/0. Coverage rises5.167→20.583 of21 cubes. The95.83%
+first-pyramid rate passes that part of the gate, but **mean15000 still fails**;
+none of the24 selected returns reaches15000. This is useful development
+learning, not completed Qbert success or five-game reliability.
+
+| Fresh recipe on4013 | Actions / updates | Training wall | Frozen mean | First pyramids |
+| --- | ---: | ---: | ---: | ---: |
+| First-pyramid teacher/cap640/R32 |200k /49,939|20m07s|3153.125|17/24|
+| First-pyramid teacher/cap640/R16 |500k /62,470|28m20s|3752.083|21/24|
+| Continuation teacher/cap1920/R32 |200k /49,939|25m23s|4730.208|23/24|
+
+Against the primary200k control, mean improves50.02% for26.17% more training
+time. Against the secondary500k/R16 control it improves26.07% with10.45% less
+time. All use the same native binary and host; primary model/learning settings
+match. Teacher behavior and guidance cap change together; the secondary also
+changes ratio and budget. Seed4013 and the cap were selected on reused
+observations. Co-host CPU work is recorded in the protocol. No isolated causal
+effect, hardware speedup or independent seed confirmation is established.
+Retain the recipe as promising; no extension or next allocation is selected.
+
+Configuration remains4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18,
+original rates, expert scale1/NOOPweight.05,5% episode selection/cap1920;
+evaluation4000004013, no restored training state. Source8761ff2/native79c9a7f.
+Actual guidance is34,468 actions (17.234%):26,336 NOOP and8132 hops.18 of295
+episode starts are selected. The17 completed guided episodes average15110.294;
+270 unguided online episodes average1754.444, last50 mean3983.500 with43 first
+pyramids. These changing-policy online scores are distinct from frozen learning.
+38,378 reports contain1,148,366 repeated labeled replay rows. Weighted label
+cross-entropy falls1.036→.209 across50k windows on changing samples, not held-out
+accuracy; lower imitation loss alone does not establish the remaining mechanism.
+
+All numerical/config/source/counter checks,100k recovery,346 initial tensors
+matching control/check,346 unchanged tensors per frozen arm, identical initial
+semantic traces,56 declared pins, complete guided input/action/outcome replay,
+frozen recorded-outcome replay/videos, host guards, curves, coverage, exposure
+and comparison pass. Final evaluation takes26,768 actions /107,020 frames /
+12.511s and selects first3 natural episodes per lane from32 completed. Initial
+uses8728 /34,875 /4.086s,24 completed. Zero updates/truncations; excess episodes
+and partial tails are retained. Ordinary frozen logs have no live pixel hashes.
+
+Main service exits successfully04:07:44 UTC,28m54.691s total including frozen
+assessments/audits; CPU postprocessing completes04:08:08. No GPU stage repeats.
+Artifacts:`/x/Temp/kindle-qbert-guidance-20261027/qbert-4m-48-r32-continuation-cap1920-expert1-200k-seed4013`.
+Learning review SHA256`bc536f1deb00295678dbb9765ecc9f6ab4d1a08dc426b519291bbac5a1ac095c`;
+completion`6e35aa36ee74291debec6a2635ee3aa6f003a3176cbf0efaa7543b7c8c45da59`;
+comparison`ef10ab0f268d3385f82238625b97010a657db0d09f0e4b322f7229640ee91e8d`;
+exposure`0e2025a544e7a6d5f9acc3c23e98e975307ab80977c3457c7db437f5a8f1cba3`.
+The comparison PNG/SVG and curves remain outside Git with their receipts.

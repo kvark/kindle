@@ -142,3 +142,17 @@ plus an initial failed/repeated two-arm attempt whose timestamp interval is
 use13.225s. Each runs on one affined low-priority core and leaves all56 pins
 unchanged. Both source-version mismatches and CPU repeats are retained outside
 Git; no GPU stage repeats. These are wall-time caveats, not time corrections.
+
+
+## Completed fresh result
+
+The selected life completes200k actions /799,570 frames /49,939 updates in
+1522.860s (25m23s), within30 minutes. Frozen4730.208/23of24 first pyramids versus
+own initial182.292/0 improves primary3153.125/17 and secondary3752.083/21.
+The original mean15000 gate still fails despite95.83% first-pyramid success.
+All numerical/config/counter checks,100k recovery,346 matched initial and
+unchanged frozen tensors, initial semantic traces,56 pins, guided input/action
+replay, frozen outcome replays/videos, guards, curves, coverage, exposure and
+comparison pass. Main service exits04:07:44 UTC; postprocessing04:08:08.
+No repeated GPU stage, extension or successor is selected. Both services are
+terminal with MainPID0/Resultsuccess. See [full evidence and limits](../results/2026-10-25-cdp-cheap-qbert.md#continuation-guidance-improves-frozen-learning-but-misses-the-full-gate).
