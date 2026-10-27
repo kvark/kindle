@@ -1214,3 +1214,57 @@ recorded; this is not a global default change. Both original sampled outcomes
 and training costs remain. No retry, extension, cap increase, checkpoint
 selection or automatic successor. The previous unselected preparation is
 historical; this separate decision authorizes only the fixed assessment.
+
+## Greedy evaluation passes the gate on both retained12M learners
+
+Both retained12M policies score **15.208 with24/24 wins** under greedy action
+selection and the unchanged mean15/90%-win gate. The fixed four-arm assessment
+adds **zero training actions or updates**. It slightly lowers1009 and improves
+4013, leaving both just.208 above15. Retain this as a useful12M development
+option. It is not a global greedy default or new independent training evidence.
+
+| Retained learner | Sampled final / own initial | Greedy final / own initial | Final wins, sampled / greedy | Retained training |
+| --- | ---: | ---: | ---: | ---: |
+|1009 |15.625 /−20.292 |15.208 /−20.583 |24/24 /24/24 |41m28s |
+|4013 |14.833 /−20.542 |15.208 /−20.625 |24/24 /24/24 |41m31s |
+
+Each actual-initial control has0/24 wins under either action policy. The
+sampled4013 failure remains recorded. Both development seeds and evaluation
+cohorts are reused; this changes the frozen action-selection protocol and
+cannot create extra independent learners. Conditional stream-bootstrap95%
+intervals are14.292–16.250 for1009 and13.958–16.292 for4013; both cross15.
+The24/24 win interval is.862–1.000, also below.9 at its lower endpoint. These
+are the existing descriptive uncertainties, not a new gate or a broad
+reliability claim. The prior4M greedy regression remains recorded.
+
+Keep12M48/Auto/N8/B16/T16/H15/R16/coefficient.01/actor0/full18/original rates,
+no training aid or imitation; each learner originally used500k actions/31,227
+updates. Exact original runner/runtime/native79c9a7f, wrapper, host, ROM,
+sticky.25/repeat4/noops0/native frames/one GPU48 resize and evaluation seeds
+4000001009/4000004013 match the sampled controls. Greedy action selection and
+output locations are the only evaluation changes. All58 pins and every source
+file stay unchanged.
+
+| Fixed evaluation arm | Aggregate actions | Emulator frames | Evaluation seconds |
+| --- | ---: | ---: | ---: |
+|final1009 |78,080 |312,258 |42.953 |
+|initial1009 |21,448 |85,774 |12.010 |
+|final4013 |82,128 |328,463 |45.156 |
+|initial4013 |21,112 |84,432 |11.797 |
+|Total |202,768 |810,927 |111.916 |
+
+All four arms complete first3 natural matches per8 lanes,24 selected per arm,
+with zero updates/truncations and346 invariant tensors each. Source identity,
+config/counters, complete recorded-action reward/frame/boundary replays,
+videos and host guards pass. Ordinary frozen logs lack live pixel hashes;
+these are outcome replays, not direct live-image equality. No cap, retry,
+checkpoint selection or GPU repeat. Main service takes3m32.855s including
+construction/audits, exits05:29:46 UTC; terminal observer completes05:29:51
+on October27. Original training costs remain and the evaluation adds cost.
+No extension, third learner or successor allocation is selected.
+
+Artifacts:`/x/Temp/kindle-pong-greedy-20261027/pong-12m-48-two-seed-greedy-frozen`.
+Audit SHA256`d13581a9dd6227a9639e7abf99160650b6799d533565f6f3ab0ae1fe1a41f6d7`;
+completion`57128cfdbbb46719cd1b87c27063b7f36834473318800880e2043d46ef1e5b35`;
+startup`f627e2e491af68cb5f93ee659ee1ac6fb743b4d0ec3c9d10a20bcb2cd7dfca36`;
+selected declaration`9a7c489a213fa7c58720f72921aafe9ea0c8c28677953fbc5ecc6850374130f9`.

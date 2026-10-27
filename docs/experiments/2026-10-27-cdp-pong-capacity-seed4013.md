@@ -155,3 +155,34 @@ recorded; this is not a global default change. Both original sampled outcomes
 and training costs remain. No retry, extension, cap increase, checkpoint
 selection or automatic successor. The previous unselected preparation is
 historical; this separate decision authorizes only the fixed assessment.
+
+## Paired greedy startup
+
+Service starts05:26:13 UTC/source`edb9ac8`, PID93214,
+invocation`cb443e7d9f4e4c2484dd63e197d54051`. Selected declaration SHA256
+`9a7c489a213fa7c58720f72921aafe9ea0c8c28677953fbc5ecc6850374130f9`.
+All58 pins match; the first completed final/initial1009 headers identify greedy
+mode, the exact original native/runner and RX7900XT. Both have zero updates.
+The terminal observer starts05:26:20 UTC. An ad hoc read-only probe initially
+assumed the first JSON row was run_start; the corrected reader filters by event.
+No service mutation or GPU repeat follows that reader error. Fixed caps remain.
+
+A separate.447s affined CPU source-identity receipt checks the optional expert
+learning path without loading a native module or environment. All58 Pong pins
+remain unchanged. Source-reading wall time is not instrumented; no timing
+correction or new GPU work is inferred from this receipt.
+
+## Paired greedy assessment completes
+
+Both retained learners score15.208/24wins under greedy, versus sampled15.625
+and14.833. Own greedy initials−20.583/−20.625 have0wins. Both pass the unchanged
+mean15/90%-win gate, but only.208 above15 and both conditional uncertainty
+intervals cross15. The original sampled outcomes remain. Reused development
+cohorts and existing weights do not become new independent learners.
+
+Four arms total202,768 actions/810,927 frames/111.916s, zero training/updates.
+All58 pins,346 unchanged tensors per arm, source/config/counters, replays,
+videos and guards pass. Main exits05:29:46 UTC after3m32.855s including audits;
+postprocessing05:29:51. No cap increase or GPU repeat. Retain as a useful12M
+option, with no global default change, extension, third learner or successor
+allocation. See [complete result and receipts](../results/2026-10-25-cdp-cheap-pong.md#greedy-evaluation-passes-the-gate-on-both-retained12m-learners).

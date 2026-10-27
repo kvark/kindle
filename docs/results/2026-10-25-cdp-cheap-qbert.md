@@ -2131,3 +2131,25 @@ coverage`8b9f3e4d1b6068ca5b39d8faf862500569d838d561b0ab9c094ac4906bbe891d`;
 exposure`bebaffd8faff07c4443504ae313a970b9e6b88877c10542f4b3e95ffde227172`.
 The preceding protocol retains the prelaunch25-minute cap, bounded check,
 unselected20-minute draft and2.067s of co-host CPU preparation/analysis.
+
+## Expert labels currently train the actor without direct world gradients
+
+A read-only review verifies that`behavior.rs`, `agent.rs` and`world.rs` exactly
+match native source`79c9a7f`. The [expert term](../../kindle/src/dreamer/behavior.rs)
+uses replay features as graph inputs and trains the behavior actor. The
+[agent](../../kindle/src/dreamer/agent.rs) builds separate world and behavior
+training sessions and uploads expert targets only to the latter. The
+[world graph](../../kindle/src/dreamer/world.rs) has no expert target or loss;
+`actor_critic_gradient` routes the initial imagined policy/value losses through
+frozen heads into world state. Enabling that existing option therefore does
+not route expert-label gradients into the encoder/world.
+
+Teacher actions still change experience and ordinary world learning. This
+source-path fact is not a measurement of raw derivatives or a diagnosis of
+weak policy transfer. A direct supervised representation objective would
+require an explicit native implementation and bounded gradient/alignment
+checks; none is selected or implemented here. No runtime/default changes.
+The.447s affined CPU receipt check constructs no agent/environment and leaves
+all58 active Pong inputs unchanged. Receipt:
+`/x/Temp/kindle-expert-path-20261027/source-review.json`, SHA256
+`0150815d50796637e2608c4b06961b24c1d071208aaba2704021b59148511159`.

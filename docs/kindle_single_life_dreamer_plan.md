@@ -24,12 +24,15 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same, confirmation4013](results/2026-10-25-cdp-cheap-pong.md#smaller-bonus-seed4013-confirmation) |500k /124,939|49m58s|14.000 /−20.333|24/24 wins; mean15 fails|
 | [Pong12M48/B16/R16, coefficient.01](results/2026-10-25-cdp-cheap-pong.md#larger-capacity-with-less-replay-work-reaches-the-gate) |500k /31,227|41m28s|15.625 /−20.292|24/24 wins; pass on one learner|
 | [Pong12M48, same recipe4013](results/2026-10-25-cdp-cheap-pong.md#capacity-confirmation-improves4013-but-narrowly-misses-the-gate) |500k /31,227|41m31s|14.833 /−20.542|24/24 wins; mean15 narrowly fails|
+| [Same retained12M1009, greedy evaluation](results/2026-10-25-cdp-cheap-pong.md#greedy-evaluation-passes-the-gate-on-both-retained12m-learners) |500k /31,227 retained;0 new|41m28s retained|15.208 /−20.583|24/24 wins; greedy gate passes|
+| [Same retained12M4013, greedy evaluation](results/2026-10-25-cdp-cheap-pong.md#greedy-evaluation-passes-the-gate-on-both-retained12m-learners) |500k /31,227 retained;0 new|41m31s retained|15.208 /−20.625|24/24 wins; greedy gate passes|
 | [Qbert4M/RGB48/R32](results/2026-10-25-cdp-cheap-qbert.md) |200k /49,939|19m45s|809.375 /180.208|0/24 first pyramids|
 | [Same, capped pixel guidance + expert imitation](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-improves-compact-qbert-but-remains-far-below-the-gate) |200k /49,939|20m11s|1083.333 /180.208|2/24 first pyramids; gate still fails|
 | [Same, fresh seed4013](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-transfers-on4013-with-substantial-seed-variation) |200k /49,939|20m07s|3153.125 /182.292|17/24 first pyramids; gate still fails|
 | [Expert4013, more experience at R16](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-improves-first-pyramid-success-with-higher-cost) |500k /62,470|28m20s|3752.083 /182.292|21/24 first pyramids; gate still fails|
 | [Continuation teacher/cap1920,4013/R32](results/2026-10-25-cdp-cheap-qbert.md#continuation-guidance-improves-frozen-learning-but-misses-the-full-gate) |200k /49,939|25m23s|4730.208 /182.292|23/24 first pyramids; mean15k still fails|
 | [Same recipe, fresh1009](results/2026-10-25-cdp-cheap-qbert.md#continuation-improves-the-weaker-seed-but-both-miss-the-full-gate) |200k /49,939|26m38s|3137.500 /180.208|17/24 first pyramids; both gate criteria fail|
+| [Continuation20%/R16,4013](results/2026-10-25-cdp-cheap-qbert.md#more-guidance-with-less-replay-saves-time-but-lowers-frozen-quality) |200k /24,970|21m59s|3333.333 /182.292|18/24 first pyramids; below5%/R32|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -389,16 +392,18 @@ competence. Retain5%/R32; no extension or confirmation. Probability and ratio
 change together on reused4013; no isolated causal claim. See the completed
 higher-exposure comparison in cheap-Qbert.
 
-Select the prepared four-arm greedy evaluation of both retained12M Pong
-learners and their own actual initial weights, after terminal Qbert audits.
-Fixed order final1009/initial1009/final4013/initial4013; original runtime/runner,
-24 natural matches each,600k actions/300s per arm, original mean15/90%-win gate.
-Zero training/updates;346 invariant tensors,58 pins, full replays/videos/guards.
-Owner`kindle-pong-12m-two-seed-greedy-frozen-20261027`, artifacts
-`/x/Temp/kindle-pong-greedy-20261027`. Audit1200s/service2460s; no retry, cap
-increase, checkpoint selection or automatic successor. Original sampled
-15.625/14.833 and41m28s/41m31s training costs remain; reused cohorts, no new
-independent learners or global greedy default. Check live state before GPU work.
+Pong12M greedy evaluation completes on both retained learners:1009/4013 each
+score15.208/24of24 wins, versus own initial−20.583/−20.625 and0wins. Both pass
+the original mean15/90%-win gate under changed greedy inference; original
+sampled15.625/14.833 and one-of-two outcome remain. Four arms total202,768
+actions/810,927 frames/111.916s of evaluation, zero new training/updates;
+main service3m33s, exits05:29:46 UTC, postprocessing05:29:51 on October27.
+All58 pins,346 invariant tensors per arm, full replays/videos and guards pass.
+Retain greedy as a useful12M development option, not a global default or new
+independent learner evidence. Both means are only.208 above15; uncertainty
+intervals cross15. Original training costs41m28s/41m31s remain. No extension,
+retry, third learner or successor allocation selected. No GPU job remains
+active. See the paired greedy result in cheap-Pong; check live state before GPU work.
 
 The R16/20% bounded check completes8192 actions/32,752 frames/994 updates in
 52.742s, frozen1024/.524s with346 invariant tensors and no completed natural
@@ -561,7 +566,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Game | Latest useful frozen result | What remains |
 | --- | --- | --- |
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
-| Pong | AMD12M48/B16/R16/500k: seeds1009/4013 score15.625/14.833 with24/24 wins each in41m28s/41m31s | Reference20.45; one of two meets mean15, broad reliability open |
+| Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |

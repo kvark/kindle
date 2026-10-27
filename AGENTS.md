@@ -39,7 +39,8 @@ a separate takeover branch. Keep `runs/`, large data and archived experiment
 ledgers out of Git; old evidence lives on the explicitly named archive branch.
 
 The five-game goal is unfinished. Compact AMD Boxing and aided Freeway pass on
-two learners each, within 30 minutes per learner. Pong12M48 passes its gate on one of two learners; Qbert expert imitation improves on two seeds but
+two learners each, within 30 minutes per learner. Pong12M48 passes its gate on both retained learners with greedy evaluation
+(sampled actions pass on one of two); Qbert expert imitation improves on two seeds but
 misses its full-game gate, and Breakout remains much weaker. Published
 long-run scores are aspirations, not matched-budget comparisons. Do not claim
 mastery or CDP superiority from short runs, finite losses or backend speed alone.
@@ -147,16 +148,18 @@ competence. Retain5%/R32; no extension or confirmation. Probability and ratio
 change together on reused4013; no isolated causal claim. See the completed
 higher-exposure comparison in cheap-Qbert.
 
-Select the prepared four-arm greedy evaluation of both retained12M Pong
-learners and their own actual initial weights, after terminal Qbert audits.
-Fixed order final1009/initial1009/final4013/initial4013; original runtime/runner,
-24 natural matches each,600k actions/300s per arm, original mean15/90%-win gate.
-Zero training/updates;346 invariant tensors,58 pins, full replays/videos/guards.
-Owner`kindle-pong-12m-two-seed-greedy-frozen-20261027`, artifacts
-`/x/Temp/kindle-pong-greedy-20261027`. Audit1200s/service2460s; no retry, cap
-increase, checkpoint selection or automatic successor. Original sampled
-15.625/14.833 and41m28s/41m31s training costs remain; reused cohorts, no new
-independent learners or global greedy default. Check live state before GPU work.
+Pong12M greedy evaluation completes on both retained learners:1009/4013 each
+score15.208/24of24 wins, versus own initial−20.583/−20.625 and0wins. Both pass
+the original mean15/90%-win gate under changed greedy inference; original
+sampled15.625/14.833 and one-of-two outcome remain. Four arms total202,768
+actions/810,927 frames/111.916s of evaluation, zero new training/updates;
+main service3m33s, exits05:29:46 UTC, postprocessing05:29:51 on October27.
+All58 pins,346 invariant tensors per arm, full replays/videos and guards pass.
+Retain greedy as a useful12M development option, not a global default or new
+independent learner evidence. Both means are only.208 above15; uncertainty
+intervals cross15. Original training costs41m28s/41m31s remain. No extension,
+retry, third learner or successor allocation selected. No GPU job remains
+active. See the paired greedy result in cheap-Pong; check live state before GPU work.
 
 The R16/20% bounded check completes8192 actions/32,752 frames/994 updates in
 52.742s, frozen1024/.524s with346 invariant tensors and no completed natural
