@@ -360,3 +360,58 @@ Learning review SHA256`93a5c42bf90b6d1036880b04f101539cbda6be0b8b05edea3ac1ac155
 completion`ae048f66de4dda8ff92f97c4c37f30d62268eceee3dc2527fd251fe1d5787da7`;
 comparison`0d6ec959dd417a4e08f4a750684ed6d78ea95037f2bcd74c28efaa8b409b38cc`;
 exposure`356e7aa2073a1125aaef9ebf1662f61c1e27b38c06b7080189802d972c869539`.
+
+
+## Frozen movement agreement does not track task quality
+
+A CPU-only diagnostic replays the saved final/actual-initial expert trajectories
+and the full18/minimal4 controls. Only recorded native actions are executed.
+The unchanged pixel teacher provides advice on each reconstructed native frame;
+its previous-command state is set to the actual recorded movement command.
+This avoids predicting from an unexecuted teacher action. Movement aliases are
+grouped as LEFT/neutral/RIGHT, ignoring FIRE for this comparison. All actions,
+rewards, episode boundaries, reset counts and emulator-frame counters reproduce;
+selected24 natural-episode scores equal the completed reviews. No native module
+loads, learner runs or checkpoint changes.
+
+| Frozen arm | Mean return | Visible-ball movement agreement | Near-impact samples | Mean distance to predicted landing point |
+| --- | ---: | ---: | ---: | ---: |
+| Expert actual initial |1.375|32.87%|316|57.53 pixels|
+| Expert final |4.000|40.32%|438|36.60 pixels|
+| Full18 control |7.083|33.76%|610|26.88 pixels|
+| Minimal4 control |9.542|37.42%|632|15.42 pixels|
+
+Near impact means the teacher projects a descending ball with at most two
+remaining action intervals. Distance is measured before the recorded action,
+in native pixels, against that teacher's estimate; it is not ground-truth
+collision error. The detector excludes balls above row90, and an undetected
+ball does not establish waiting to serve. Policies visit different trajectories,
+so these conditional summaries do not isolate training effects. The teacher is
+also imperfect: direction agreement is a descriptive proxy, not action accuracy.
+Visible-ball agreement expected from independent empirical action marginals is
+33.11/33.36/31.77/32.57% respectively. Temporal dependence and reused episodes
+preclude treating these action counts as independent confidence samples.
+
+The expert policy shows some movement association with the teacher beyond its
+initial policy, while its lower frozen return remains decisive. Higher teacher
+agreement does not order these policies by task quality. This evidence does
+not justify increasing imitation weight from loss/overall agreement alone or
+extending the completed expert learner. Retain the unguided controls; no new
+Breakout GPU allocation is selected by this analysis.
+
+The four successful replay arms cover9336/5944/16296/52080 aggregate actions
+and take50.202s on one affined low-priority core during the active Qbert life.
+All56 Qbert pins remain unchanged. The initial attempt repeats the two expert
+CPU arms before rejecting an older control replay-helper hash; its timestamp
+interval is11.050s. A second historical helper is required for the minimal4
+control; already completed receipts are reused on that repair. Both original
+failures are retained. Exact helper versions are recovered from Git, and their
+own historical receipts pass without editing current source. No GPU stage is
+repeated. Co-host CPU work remains a Qbert timing caveat.
+
+Artifacts:`/x/Temp/kindle-breakout-transfer-20261027` contains preparations,
+original attempts, exact historical helpers, per-action observations, per-arm
+reviews and combined review SHA256
+`8d77cc026e295bd98f34c14f72427feb25a29bdf13e96c59b6006fb18eb48609`.
+Ordinary frozen logs lack live pixel hashes; reconstructed input/output hashes
+are retained but do not establish direct equality with absent live hashes.

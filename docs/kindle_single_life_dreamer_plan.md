@@ -351,6 +351,14 @@ tensors,46 pins, replays, guards, comparison and exposure pass. Service exits
 20,463 trusted actions (10.2315%); guided/unguided completed means24.871/2.948
 are not frozen competence. See [result](results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality).
 
+[Breakout frozen movement analysis](results/2026-10-26-cdp-breakout-pixel-reference.md#frozen-movement-agreement-does-not-track-task-quality)
+finds expert visible-ball teacher agreement40.32% versus initial32.87%, but
+frozen4.000 remains below full18/minimal4 controls7.083/9.542. Near-impact
+predicted landing distances36.60/26.88/15.42 pixels also differ across those
+trajectories; teacher advice is not ground-truth action accuracy. Do not choose
+an imitation-weight increase from falling loss alone. CPU-only replay passes
+all recorded outcomes and56 active pins; no new Breakout allocation is selected.
+
 Qbert continuation training is active from03:38:49 UTC/source`8761ff2`,
 PID81404/invocation`ab0b0ad39c914bd89ab77e9e94773971`. Startup verifies56 pins,
 346 initial tensors matching both control and check, and first248:1/256:2/
