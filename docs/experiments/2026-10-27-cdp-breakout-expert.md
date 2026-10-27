@@ -73,3 +73,17 @@ Report actual guidance exposure and guided/unguided outcomes. This changes
 guidance plus expert loss versus the full18 control, with native/control-kernel
 differences retained. No retry, checkpoint selection, extension, cap increase,
 automatic next allocation or promotion of the eight-episode settling variant.
+
+
+## Active full-run startup
+
+Service starts02:51:51 UTC on October27 from
+`da8dee8bacefb9f474d2411aa2012d3f95372698`, PID76965,
+invocation`07c8d434e643404d90d48e26b383c286`. Preflight verifies46 pinned inputs.
+Read-only startup passes at6840 complete actions/1647 finite updates, including
+34 supervised reports. Exact recipe/device/counters,346 finite initial tensors
+matching both the full18 control and bounded check, and first six updates
+248:1/256:2/256:3/264:4/264:5/272:6 pass. All46 pins remain unchanged.
+Startup SHA256`2df0189db11426d60c0020bc7a4e9b3fa26034651d59e8538a7716d05f8e9938`.
+No full-run frozen score is known yet. Progress,100k recovery and terminal CPU
+postprocessing observers are attached; they never start/extend GPU work.
