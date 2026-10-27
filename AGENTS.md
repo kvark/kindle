@@ -146,7 +146,15 @@ UTC on October27. A copied4096-action CPU exposure assumption is repaired;
 original failure retained, no GPU repeat. Natural ends/late starts leave0 released
 actions in this check; do not claim cap-release coverage or competence.
 
-Select one fresh Breakout4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/
+Breakout cap1920 is active from05:41:26 UTC/source`8c888aa`, PID94810/
+invocation`8114cb5a27d74a8787a4b1297ab179d2`. Startup verifies47 pins,346 initial
+tensors matching cap640 and bounded check, and first248:1/256:2/256:3/264:4/
+264:5/272:6 updates. At10,496 actions,2561 reports are finite,604 actions are
+trusted and323 reports contain expert labels. Progress/100k recovery/terminal
+postprocessing observers are active. Keep200k/25-minute training cap; no frozen
+outcome yet and no automatic successor.
+
+Current allocation: fresh Breakout4M64/Auto/N8/B8/T16/H15/R32/coefficient1/actor.01/
 full18/original-rates comparison,1009/eval4000001009,5%episode guidance/
 cap1920/expert1/all weights1. Only cap640→1920 changes against frozen4.000
 primary control; exact original runner/runtime/native/host and initial weights.

@@ -207,3 +207,19 @@ Owner`kindle-breakout-cap1920-200k-20261027`; trial
 `/x/Temp/kindle-breakout-exposure-20261027/breakout-4m-64-r32-expert1-cap1920-noop1-200k`.
 The reference/evaluation cohorts and1009 seed are reused development evidence;
 stronger teacher prefixes do not predict transfer or satisfy the two-wall goal.
+
+## Longer-prefix full comparison startup passes
+
+Service starts05:41:26 UTC/source`8c888aa`, PID94810,
+invocation`8114cb5a27d74a8787a4b1297ab179d2`. Selected declaration SHA256
+`9faaed7a9298dddece9180ac2d8195b70c11a192f40fc50d2268d29a955b8880`.
+All47 pins match. All346 finite initial tensors exactly match primary cap640
+and the bounded check; native/runner/runtime/host/config/seed identity passes.
+First updates248:1/256:2/256:3/264:4/264:5/272:6 match. The10,496-action
+complete prefix contains2561 finite reports,604 trusted actions and323 reports
+with expert labels. Read-only startup receipt takes.172s and constructs no
+native module or environment. Receipt SHA256
+`90cca477d67f72dc89df37cab33ddbb6609707f9105fc8669411c1c4a42c461f`.
+Progress,100k recovery and terminal CPU postprocessing observers are attached;
+all four service handles are live. Keep the declared200k/25-minute cap and full
+fixed evaluations/audits. No frozen result or automatic successor exists.
