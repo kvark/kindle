@@ -424,8 +424,9 @@ initial tensors,35 pins, full guided replay and guards pass.4520 trusted actions
 Original service fails06:31:56 UTC only at the CPU schema validator; a separate
 CPU-only repair completes audits without repeating GPU work or changing pins.
 129 Rust CPU tests,474 Python tests and strict Clippy pass. Native0e157df,
-SHA6a9c41c; default off. Root`/x/Temp/kindle-expert-world-20261027`; use the audited
-runtime for future work. R32 early cost projects32.66min/200k; consider the retained
+SHA6a9c41c; default off. Use`/x/Temp/kindle-expert-world-20261027/runtime-audited`
+for future work; its packaging receipt pins native/wheel/Python source. The2.6GiB
+build cache is released; wheels/test executable and all evidence remain. R32 early cost projects32.66min/200k; consider the retained
 20%/R16 control for a separately selected cheap comparison. No full learner or
 GPU allocation is active. See the expert-world-gradients protocol and check
 live state before GPU work.

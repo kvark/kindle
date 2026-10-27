@@ -138,3 +138,18 @@ future world-gradient test:200k/24,970 updates in21m59s, frozen3333.333/18 first
 pyramids, while the stronger5%/R32 control scores4730.208/23 in25m23s. A new
 R16 comparison would need its own fixed budget/cap,357-tensor recovery/evaluation
 audits and a separate selection. No full learner is selected by this result.
+
+## Packaging and current state
+
+Completed receipt SHA256`b8ff705544e56b1c64e9615d3671c95f434bec3ec491ab2a4ccb9abd9e05aa95`.
+The corrected Python validator is source`44085dd`; Rust/native code stays exactly
+source`0e157df`. The separately exported
+`/x/Temp/kindle-expert-world-20261027/runtime-audited` contains the same native
+SHA256`6a9c41c44aef4747cef6504a2525195d8f2f2a62dbece7c6ecc6d1128fff1c1e`.
+Audited wheel SHA256`15c4beae2ccd97da3cea6d1089adadd38e96c08ef65153628861f55bbb3b7a60`;
+validator`700b8c19f534b60cd8fec09b14eea9251a6cfc4332f9658f5ea9e20f32f76925`.
+All474 relevant tests also pass against that packaged runtime. The original
+wheel/runtime and failed audit remain unchanged. `packaging-receipt.json`
+records both source revisions, exact files and the retained test executable.
+The disposable2.6GiB build cache is released after packaging and verification.
+No GPU allocation is active and no full learner is selected.
