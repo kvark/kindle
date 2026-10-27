@@ -125,6 +125,17 @@ tensors,46 pins, replays, guards, comparison and exposure pass. Service exits
 20,463 trusted actions (10.2315%); guided/unguided completed means24.871/2.948
 are not frozen competence. See [result](docs/results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality).
 
+Select one fresh Qbert continuation1009 check after terminal4013 audits.
+Keep4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
+5%episode continuation/cap1920/expert1/NOOPweight.05; only learner/evaluation
+seeds change to1009/4000001009.200k actions/49,939 updates, first248/residual0,
+100k recovery and30-minute training cap. Fixed final/own actual initial24-natural
+assessments retain mean15000/90%-pyramid gate and full audits. Compare against
+old-teacher1009's1083.333/2of24 and continuation4013's4730.208/23; both reused
+seeds, no held-out reliability claim. No restore, extension or automatic successor.
+Owner`kindle-qbert-continuation-cap1920-200k-seed1009-20261027`; check live state
+before GPU work. Protocol and runtime remain under the continuation experiment.
+
 Qbert continuation200k completes799,570 frames /49,939 updates in25m23s.
 Frozen4730.208/23of24 first pyramids versus own initial182.292/0 improves
 old-teacher200k's3153.125/17 by50.02% for26.17% more training time. It also
@@ -136,7 +147,7 @@ Keep4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
 5%episode continuation/cap1920/expert1/NOOPweight.05 as a promising development
 recipe. Actual guidance34,468 actions (17.234%); guided online scores are not
 unaided competence. Teacher and cap change together on reused4013; no isolated
-causal effect or seed reliability claim. No extension or next allocation selected.
+causal effect or seed reliability claim. No extension of this completed life.
 See [completed result](docs/results/2026-10-25-cdp-cheap-qbert.md#continuation-guidance-improves-frozen-learning-but-misses-the-full-gate).
 Check live state before GPU work.
 

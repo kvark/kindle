@@ -156,3 +156,43 @@ replay, frozen outcome replays/videos, guards, curves, coverage, exposure and
 comparison pass. Main service exits04:07:44 UTC; postprocessing04:08:08.
 No repeated GPU stage, extension or successor is selected. Both services are
 terminal with MainPID0/Resultsuccess. See [full evidence and limits](../results/2026-10-25-cdp-cheap-qbert.md#continuation-guidance-improves-frozen-learning-but-misses-the-full-gate).
+
+
+## Selected seed1009 check
+
+After the4013 life and CPU postprocessing finish with all audits, select one
+fresh1009 life to check the promising recipe on the weaker old-teacher seed.
+The4013 gain is4730.208/23 first pyramids versus3153.125/17, but mean15000 still
+fails. Its old-teacher1009 counterpart scored1083.333/2 in20m11s. Both seeds
+and evaluation cohorts were previously used in development; this is a focused
+paired check, not held-out or broad reliability evidence.
+
+Keep the exact continuation recipe, native binary, Python runtime and host:
+4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
+5%episode guidance/cap1920/expert1/NOOPweight.05. Change only learner/evaluation
+seeds to1009/4000001009. Train200k aggregate actions /49,939 updates, first248,
+residual0;100k recovery at24,939 updates and final200k,30-minute training cap.
+Restore no weights, replay, live belief, games or RNG. The native binary and
+optional policy already pass bounded and full execution; no rebuild or new
+backend qualification is needed for this seed change.
+
+Fixed final and own actual initial each select first3 natural episodes per8
+lanes=24, guidance off, zero updates/truncations, original mean15000/90%-pyramid
+gate. Keep600k-action/300s cap per frozen arm,1200s CPU audit and3660s total
+service cap. Require all finite reports/346 tensors, initial tensors matching
+the retained1009 expert control and original1009 native check,346 frozen
+invariant tensors, paired frozen initial semantic traces, full guided input/
+action/outcome replay, frozen outcome replay/videos, host guards,100k recovery,
+curves, coverage, exposure and four-arm comparison. Ordinary frozen logs lack
+live pixel hashes. Actual guidance fraction is separate from5% episode selection.
+
+Trial:`/x/Temp/kindle-qbert-guidance-20261027/qbert-4m-48-r32-continuation-cap1920-expert1-200k-seed1009`.
+Owner:`kindle-qbert-continuation-cap1920-200k-seed1009-20261027`.
+External`prepare_seed1009.py`, `run_seed1009.py`, `check_seed1009_startup.py`,
+`finish_seed1009.py`, `compare_seeds.py` and shared`analyze_full_exposure.py`
+are pinned by the declaration. Three commands parse, seven scripts compile,
+and all three retained-control readers pass without constructing a native agent
+or environment. All56 primary pins remain unchanged. The paired comparison
+includes old-teacher1009/4013 and continuation1009/4013, with original gates.
+No retry, cap increase, extension, checkpoint selection, third seed or automatic
+successor is selected. Only this fresh1009 allocation is selected here.
