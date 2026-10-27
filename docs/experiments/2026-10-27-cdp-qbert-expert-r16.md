@@ -1,5 +1,8 @@
 # Qbert expert imitation: more experience at lower replay ratio
 
+**Active from00:17:08 UTC on October27/source`bad8f55`.** Startup checks pass;
+fixed final performance is pending. No budget or recipe change after launch.
+
 Select one fresh **500k-action/R16** learner on reused seed4013 after its
 completed200k/R32 result:3153.125 and17/24 first pyramids in20m07s. The same
 expert recipe on1009 scores1083.333/2. Both improve over their actual initials,
@@ -63,3 +66,20 @@ constructing an agent. Declaration SHA256:
 Selection evidence:
 [completed two-seed comparison](../results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-transfers-on4013-with-substantial-seed-variation),
 [continuation diagnostics](../results/2026-10-25-cdp-cheap-qbert.md#after-the-first-pyramid-movement-continues-but-the-teacher-is-limited).
+
+
+## Launch and verified startup
+
+Service starts00:17:08 UTC, main PID61973, invocation
+`66573c6168d640428dfcdafa9d82ca17`. All67 pins stay unchanged. Actual initial
+matches all346 completed4013 tensors, and all31 transitions through action248
+match before the first learning update. Nothing is restored. The first six
+updates match248:1/256:2/264:3/272:4/280:5/288:6.
+
+The complete17,136-action prefix has2111 finite reports,1920 trusted actions
+and633 reports containing expert labels. Last progress16,384/2018 is58.195s
+with zero debt. These establish execution and provenance, not task benefit.
+Read-only recovery, progress and completion monitors run as
+`kindle-expert-qbert-r16-{recovery,progress,post}-20261027`.
+Startup review fa85b4a73f4ebe41fea8be66bb6d59b346cec84c0ddf95d71bcea061259b5195256:
+`fa85b4a73f4ebe41fea8be66bb6d59b346cec84c0ddf95d71bcea061259b5195`.
