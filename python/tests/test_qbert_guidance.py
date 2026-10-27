@@ -146,6 +146,30 @@ def test_cli_refuses_invalid_guidance_before_gpu(monkeypatch, tmp_path, capsys, 
     assert error.value.code == 2 and message in capsys.readouterr().err
 
 
+@pytest.mark.parametrize('fields,valid', [
+    ({}, True),
+    ({'world_gradient': False}, True),
+    ({'world_gradient': True}, True),
+    ({'world_gradient': 0}, False),
+    ({'world_gradient': 1}, False),
+    ({'world_gradient': None}, False),
+    ({'world_gradient': 'true'}, False),
+    ({'world_gradient': True, 'unknown': 1}, False),
+])
+def test_audit_expert_world_gradient_requires_an_explicit_boolean(tmp_path, fields, valid):
+    rows = guided_events()
+    rows[0]['config']['expert_imitation'] = dict(scale=2., action_weights=[.05]+[1.]*17, **fields)
+    for row in rows:
+        if row['event'] == 'transition':
+            row['expert_action_mask'] = [value is not None for value in row['action_overrides']]
+    path = write_log(tmp_path, rows)
+    if valid:
+        assert audit(path)['actions'] == 6
+    else:
+        with pytest.raises(ValueError, match='invalid expert'):
+            audit(path)
+
+
 @pytest.mark.parametrize('cap', [None, 1])
 @pytest.mark.parametrize('imitation', [False, True])
 def test_runner_uses_current_pixels_and_reset_pixels_and_native_overrides(monkeypatch, tmp_path, cap, imitation, policy="first-pyramid"):

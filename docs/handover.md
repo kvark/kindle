@@ -337,16 +337,19 @@ remain. No retry, extension, third learner or automatic successor selected.
 That frozen assessment is terminal. See the completed greedy comparison in
 cheap-Qbert. The five-game goal remains unfinished.
 
-Current selection: one8192-action Qbert expert-world-gradient execution check,
-source0e157df/new separately packaged native6a9c41c.129 Rust CPU tests,466 Python
-tests, strict Clippy and two isolated/native vector GPU checks pass. The new
-opt-in loss routes trusted targets through the frozen actor into world/CNN;
-default off.4M48/Auto/N8/B8/T16/H15/R32/coef1/actor0/full18,4013,25%continuation/
-cap1920/expert1/NOOP.05;1987 updates/first248,180s training cap,1024 frozen/60s,
-357 finite/invariant tensors and346 shared initial matches, full replay/guards.
-Owner`kindle-qbert-expert-world-check-20261027`, root
-`/x/Temp/kindle-expert-world-20261027`. No full learner or automatic promotion.
-See the expert-world-gradients protocol; check live state before GPU work.
+Optional native expert-world gradients pass two guarded derivative/alignment
+checks and a real Qbert8192-action/1987-update check in80.263s; frozen1024/.489s,
+zero updates/no natural episodes. All357 finite/invariant tensors,346 shared
+initial tensors,35 pins, full guided replay and guards pass.4520 trusted actions,
+1978 supervised reports; max world/actor expert-loss difference1.5e−7.
+Original service fails06:31:56 UTC only at the CPU schema validator; a separate
+CPU-only repair completes audits without repeating GPU work or changing pins.
+129 Rust CPU tests,474 Python tests and strict Clippy pass. Native0e157df,
+SHA6a9c41c; default off. Root`/x/Temp/kindle-expert-world-20261027`; use the audited
+runtime for future work. R32 early cost projects32.66min/200k; consider the retained
+20%/R16 control for a separately selected cheap comparison. No full learner or
+GPU allocation is active. See the expert-world-gradients protocol and check
+live state before GPU work.
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,

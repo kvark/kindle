@@ -117,8 +117,12 @@ def audit(path):
             check(not {"exploration", "exploration_sha256"}.intersection(header), "undeclared exploration protocol")
         expert = config.get("expert_imitation")
         if expert is not None:
-            check(isinstance(expert, dict) and set(expert) == {"scale", "action_weights"}, "invalid expert imitation config")
-            require_numbers(expert)
+            check(isinstance(expert, dict)
+                  and {"scale", "action_weights"} <= set(expert) <= {"scale", "action_weights", "world_gradient"},
+                  "invalid expert imitation config")
+            check(type(expert.get("world_gradient", False)) is bool, "invalid expert world gradient flag")
+            require_numbers(expert["scale"])
+            require_numbers(expert["action_weights"])
             check(expert["scale"] > 0 and isinstance(expert["action_weights"], list)
                   and len(expert["action_weights"]) == config["action_count"]
                   and all(weight >= 0 for weight in expert["action_weights"])
