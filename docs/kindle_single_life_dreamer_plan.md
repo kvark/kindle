@@ -29,6 +29,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same, fresh seed4013](results/2026-10-25-cdp-cheap-qbert.md#expert-imitation-transfers-on4013-with-substantial-seed-variation) |200k /49,939|20m07s|3153.125 /182.292|17/24 first pyramids; gate still fails|
 | [Expert4013, more experience at R16](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-improves-first-pyramid-success-with-higher-cost) |500k /62,470|28m20s|3752.083 /182.292|21/24 first pyramids; gate still fails|
 | [Continuation teacher/cap1920,4013/R32](results/2026-10-25-cdp-cheap-qbert.md#continuation-guidance-improves-frozen-learning-but-misses-the-full-gate) |200k /49,939|25m23s|4730.208 /182.292|23/24 first pyramids; mean15k still fails|
+| [Same recipe, fresh1009](results/2026-10-25-cdp-cheap-qbert.md#continuation-improves-the-weaker-seed-but-both-miss-the-full-gate) |200k /49,939|26m38s|3137.500 /180.208|17/24 first pyramids; both gate criteria fail|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -360,23 +361,28 @@ trajectories; teacher advice is not ground-truth action accuracy. Do not choose
 an imitation-weight increase from falling loss alone. CPU-only replay passes
 all recorded outcomes and56 active pins; no new Breakout allocation is selected.
 
-Qbert continuation1009 is active from04:17:32 UTC/source`7560d2d`,
-PID85716/invocation`bef8ea63356848a88f69884efb2f039a`. Startup verifies60 pins,
-346 initial tensors matching retained1009 control/check and first248:1/256:2/
-256:3/264:4/264:5/272:6 updates. First3008 actions have689 finite reports,
-376 trusted actions and443 supervised reports. Progress/recovery/postprocessing
-observers are attached; no frozen outcome yet. Keep200k/30-minute cap.
+Qbert continuation1009 completes200k actions /799,538 frames /49,939 updates
+in26m38s. Frozen3137.500/17of24 first pyramids versus own initial180.208/0
+improves old-teacher1083.333/2; continuation4013 scores4730.208/23 in25m23s.
+Both seeds improve, neither meets mean15000;1009 also misses90% pyramids.
+All audits,100k recovery,346 matched initial/unchanged frozen tensors, paired
+initial semantic traces,60 pins, replays, guards, curves, coverage, exposure and
+four-arm comparison pass. Main service exits04:47:41 UTC; postprocessing04:47:57
+on October27. Actual1009 guidance38,400 actions (19.2%); online guided returns
+are not frozen competence. Both reused development seeds; no broad reliability,
+extension or third seed. See the paired continuation result in cheap-Qbert.
 
-Select one fresh Qbert continuation1009 check after terminal4013 audits.
-Keep4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
-5%episode continuation/cap1920/expert1/NOOPweight.05; only learner/evaluation
-seeds change to1009/4000001009.200k actions/49,939 updates, first248/residual0,
-100k recovery and30-minute training cap. Fixed final/own actual initial24-natural
-assessments retain mean15000/90%-pyramid gate and full audits. Compare against
-old-teacher1009's1083.333/2of24 and continuation4013's4730.208/23; both reused
-seeds, no held-out reliability claim. No restore, extension or automatic successor.
-Owner`kindle-qbert-continuation-cap1920-200k-seed1009-20261027`; check live state
-before GPU work. Protocol and runtime remain under the continuation experiment.
+Select only the bounded Qbert4M48/Auto/N8/B8/T16/H15/R16/coefficient1/actor0/
+full18/original-rates check with20% episode continuation/cap1920/expert1/
+NOOPweight.05, fresh4013/eval4000004013.8192 actions/994 updates, first248,
+residual0, then1024 unguided frozen actions;180/60/180-second train/frozen/audit
+caps,480-second service. Probability and replay ratio change together against
+5%/R32; no isolated attribution or competence claim. Require full finite,
+346 initial/frozen tensor, parameter-change, label, replay and guard checks.
+Owner`kindle-qbert-r16-p20-check-20261027`; external runtime/evidence
+`/x/Temp/kindle-qbert-exposure-20261027`,33 pins. Preceding1009 services are
+terminal. No full learner, extension or automatic promotion selected. Check
+live state before GPU work; protocol remains in the continuation experiment.
 
 Qbert continuation200k completes799,570 frames /49,939 updates in25m23s.
 Frozen4730.208/23of24 first pyramids versus own initial182.292/0 improves
@@ -534,7 +540,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD12M48/B16/R16/500k: seeds1009/4013 score15.625/14.833 with24/24 wins each in41m28s/41m31s | Reference20.45; one of two meets mean15, broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
-| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/200k/R32:4730.208 and23/24 in25m23s; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
+| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and

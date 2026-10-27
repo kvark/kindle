@@ -253,3 +253,31 @@ environment. The retained R16 log independently verifies994 updates at8192
 and first248:1/256:2/264:3/272:4/280:5/288:6. CPU preflight takes.031s on one
 affined low-priority core. No full learner, cap increase, retry, extension or
 automatic successor is selected, and check experience will not be reused.
+
+## Seed1009 completes and the bounded exposure check is selected
+
+The confirmation finishes200k actions /799,538 frames /49,939 updates in
+1597.708s (26m38s), within30 minutes. Frozen3137.500/17of24 first pyramids
+versus own initial180.208/0 improves the paired old-teacher1083.333/2, but
+misses both mean15000 and90%-pyramid criteria. All audits,100k recovery,
+346 matched initial/unchanged frozen tensors, paired initial semantic traces,
+60 pins, replays, guards, curves, coverage, exposure and four-arm comparison
+pass. Main service exits04:47:41 UTC; postprocessing04:47:57. No GPU stage
+repeats or completed life is extended. See [paired results and limits](../results/2026-10-25-cdp-cheap-qbert.md#continuation-improves-the-weaker-seed-but-both-miss-the-full-gate).
+
+After both services are verified inactive/MainPID0/Resultsuccess, select only
+the prepared8192-action/994-update **20% guidance/R16 bounded check** above.
+Keep every declared setting, cap and audit. Owner
+`kindle-qbert-r16-p20-check-20261027`, trial
+`/x/Temp/kindle-qbert-exposure-20261027/qbert-4m-48-r16-p20-check`.
+All33 input pins and the existing runtime match. No full learner or automatic
+promotion is selected; the check cannot establish natural-episode competence.
+
+CPU preparation for a possible200k/24,970-update comparison is also retained
+externally: three commands parse, eight scripts compile, the primary-control
+reader passes and the retained R16 recovery checker verifies100k/12,470 and
+200k/24,970. It takes.082s on one affined low-priority core during the completed
+confirmation and changes none of its60 pins. That possible comparison would
+retain the full frozen protocol and a20-minute training cap, but has no trial,
+declaration, selection or launch yet. Passing the bounded check is not automatic
+authorization for its controller to promote itself.

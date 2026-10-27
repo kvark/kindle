@@ -125,23 +125,28 @@ tensors,46 pins, replays, guards, comparison and exposure pass. Service exits
 20,463 trusted actions (10.2315%); guided/unguided completed means24.871/2.948
 are not frozen competence. See [result](docs/results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality).
 
-Qbert continuation1009 is active from04:17:32 UTC/source`7560d2d`,
-PID85716/invocation`bef8ea63356848a88f69884efb2f039a`. Startup verifies60 pins,
-346 initial tensors matching retained1009 control/check and first248:1/256:2/
-256:3/264:4/264:5/272:6 updates. First3008 actions have689 finite reports,
-376 trusted actions and443 supervised reports. Progress/recovery/postprocessing
-observers are attached; no frozen outcome yet. Keep200k/30-minute cap.
+Qbert continuation1009 completes200k actions /799,538 frames /49,939 updates
+in26m38s. Frozen3137.500/17of24 first pyramids versus own initial180.208/0
+improves old-teacher1083.333/2; continuation4013 scores4730.208/23 in25m23s.
+Both seeds improve, neither meets mean15000;1009 also misses90% pyramids.
+All audits,100k recovery,346 matched initial/unchanged frozen tensors, paired
+initial semantic traces,60 pins, replays, guards, curves, coverage, exposure and
+four-arm comparison pass. Main service exits04:47:41 UTC; postprocessing04:47:57
+on October27. Actual1009 guidance38,400 actions (19.2%); online guided returns
+are not frozen competence. Both reused development seeds; no broad reliability,
+extension or third seed. See the paired continuation result in cheap-Qbert.
 
-Select one fresh Qbert continuation1009 check after terminal4013 audits.
-Keep4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
-5%episode continuation/cap1920/expert1/NOOPweight.05; only learner/evaluation
-seeds change to1009/4000001009.200k actions/49,939 updates, first248/residual0,
-100k recovery and30-minute training cap. Fixed final/own actual initial24-natural
-assessments retain mean15000/90%-pyramid gate and full audits. Compare against
-old-teacher1009's1083.333/2of24 and continuation4013's4730.208/23; both reused
-seeds, no held-out reliability claim. No restore, extension or automatic successor.
-Owner`kindle-qbert-continuation-cap1920-200k-seed1009-20261027`; check live state
-before GPU work. Protocol and runtime remain under the continuation experiment.
+Select only the bounded Qbert4M48/Auto/N8/B8/T16/H15/R16/coefficient1/actor0/
+full18/original-rates check with20% episode continuation/cap1920/expert1/
+NOOPweight.05, fresh4013/eval4000004013.8192 actions/994 updates, first248,
+residual0, then1024 unguided frozen actions;180/60/180-second train/frozen/audit
+caps,480-second service. Probability and replay ratio change together against
+5%/R32; no isolated attribution or competence claim. Require full finite,
+346 initial/frozen tensor, parameter-change, label, replay and guard checks.
+Owner`kindle-qbert-r16-p20-check-20261027`; external runtime/evidence
+`/x/Temp/kindle-qbert-exposure-20261027`,33 pins. Preceding1009 services are
+terminal. No full learner, extension or automatic promotion selected. Check
+live state before GPU work; protocol remains in the continuation experiment.
 
 Qbert continuation200k completes799,570 frames /49,939 updates in25m23s.
 Frozen4730.208/23of24 first pyramids versus own initial182.292/0 improves

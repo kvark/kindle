@@ -1997,3 +1997,55 @@ After-pyramid review SHA256`f0619ce871fe9227c4e0bdcc638d7a68963dd0d69213895f9692
 raw-frame replay`854cda3ec027729e709a47085aa0a7e210001c51ad6351b23e3a6ef74c85d5d8`;
 color summary`bb8dc27163ea03825b8633e3201f0f33ef76b2838c0691270600d5de30f543ab`.
 No runtime, guidance policy, allocation or evaluation criterion changes.
+
+## Continuation improves the weaker seed but both miss the full gate
+
+The fixed-recipe fresh1009 confirmation completes **200k aggregate actions
+/799,538 emulator frames /49,939 updates in26m38s** (1597.708s). Frozen mean
+**3137.500 with17/24 first pyramids** improves its paired old-teacher control's
+1083.333/2, versus the identical own initial180.208/0. Coverage rises5.833→20.167
+of21 cubes. Mean improves189.62% for31.96% more training time than20m11s.
+Both the original mean15000 and90%-pyramid requirements fail on this seed.
+
+| Seed | Old teacher/cap640: mean / pyramids / training | Continuation/cap1920: mean / pyramids / training |
+| --- | --- | --- |
+|1009|1083.333 /2 of24 /20m11s|3137.500 /17 of24 /26m38s|
+|4013|3153.125 /17 of24 /20m07s|4730.208 /23 of24 /25m23s|
+
+All four lives use200k actions/49,939 updates. The two continuation lives have
+identical4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
+5%episode continuation/cap1920/expert1/NOOPweight.05, native binary, Python
+runtime and host; only learner/evaluation seeds differ. Each starts fresh and
+matches all346 initial tensors and frozen initial semantic traces of its paired
+control. Different learner seeds have different initial weights. Teacher and
+cap change together against the old controls. Both seeds/cohorts were reused
+in development; two improvements do not establish held-out reliability or full
+Qbert success. No extension or third seed is selected.
+
+Actual1009 guidance is38,400 actions (19.200%), from20 of319 episode starts:
+29,393 NOOP and9007 hops. All20 completed guided episodes clear a first pyramid
+and average15022.500, but these returns include teacher actions. The291
+unguided online episodes average1110.052 with58 first pyramids; their last50
+average2617.000 with29 first pyramids.42,319 supervised reports sample1,284,883 repeated
+labeled replay rows. Weighted label cross-entropy falls1.260→.394 across50k
+windows on changing samples; this is not held-out imitation accuracy.
+
+All numerical/config/source/counter checks,100k recovery,346 matched initial
+and unchanged frozen tensors, paired initial semantic traces,60 pins, exact
+guided input/action/outcome replay, frozen outcome replays/videos, host guards,
+curves, coverage, exposure and four-arm comparison pass. Final frozen uses
+19,040 actions /76,121 frames /9.015s; initial9232 /36,888 /4.384s. Each selects
+the first3 natural episodes per lane,24 total, with zero updates/truncations;
+excess episodes and partial tails remain retained. Ordinary frozen logs lack
+live pixel hashes. The comparison figure is visually checked and stays external.
+
+Main service exits successfully04:47:41 UTC on October27,30m09.082s total;
+training itself stays inside30 minutes. CPU postprocessing exits04:47:57.
+No GPU stage repeats. Source`7560d2d`/native`79c9a7f`; co-host CPU diagnostics
+and preparation are recorded in the protocol and are not wall-time corrections.
+
+Artifacts:`/x/Temp/kindle-qbert-guidance-20261027/qbert-4m-48-r32-continuation-cap1920-expert1-200k-seed1009`.
+Learning review SHA256`18e4a3a5bb0ac330fd04c6d1e12dfa2baa53ff51dac13aa8c56261cfb0a657ff`;
+completion`cec2e9ccb4fbb75c8de4b8c716430f7d83e0555219f25bddcd037410c48d0bab`;
+comparison`2fc6eca1584e980c8078b2afac9b3b572298c3870afb9af6661a3d6ccdf2a749`;
+exposure`9d9d18f654e9276ff0df70d7458bc42a17901b0b6312d42dc6280f12e420e1cb`.
