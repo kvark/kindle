@@ -334,8 +334,19 @@ main exits06:14:07, postprocessing06:14:10 on October27. All60 pins, source
 invariance,346 invariant tensors per arm, full outcome replays/videos and
 host guards pass. Original26m38s/25m23s training costs and sampled results
 remain. No retry, extension, third learner or automatic successor selected.
-No GPU allocation is active; check live state before new work. See the completed
-greedy comparison in cheap-Qbert. The five-game goal remains unfinished.
+That frozen assessment is terminal. See the completed greedy comparison in
+cheap-Qbert. The five-game goal remains unfinished.
+
+Current selection: one8192-action Qbert expert-world-gradient execution check,
+source0e157df/new separately packaged native6a9c41c.129 Rust CPU tests,466 Python
+tests, strict Clippy and two isolated/native vector GPU checks pass. The new
+opt-in loss routes trusted targets through the frozen actor into world/CNN;
+default off.4M48/Auto/N8/B8/T16/H15/R32/coef1/actor0/full18,4013,25%continuation/
+cap1920/expert1/NOOP.05;1987 updates/first248,180s training cap,1024 frozen/60s,
+357 finite/invariant tensors and346 shared initial matches, full replay/guards.
+Owner`kindle-qbert-expert-world-check-20261027`, root
+`/x/Temp/kindle-expert-world-20261027`. No full learner or automatic promotion.
+See the expert-world-gradients protocol; check live state before GPU work.
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,
