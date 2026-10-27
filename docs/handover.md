@@ -302,6 +302,11 @@ reports and no selected guided episode yet; no task outcome is available.
 Progress,100k recovery and postprocessing observers are attached. Keep the
 selected200k/30-minute cap and all frozen audits; no next allocation.
 
+The100k Qbert recovery audit passes03:53:05 UTC:24,939 saved updates,
+346 finite tensors,103,600-action prefix/25,837 finite reports; last progress
+102,400/25,539 at844.397s with zero debt. The same learner remains active;
+fixed final/initial task outcomes are pending. Keep the200k/30-minute cap.
+
 A fresh Qbert continuation comparison is selected after the passing bounded
 check:4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor0/full18/original rates,
 4013/eval4000004013,200k actions/49,939 updates, first248/residual0,100k recovery,

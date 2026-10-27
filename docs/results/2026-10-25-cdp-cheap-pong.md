@@ -1124,3 +1124,36 @@ Artifacts: `/x/Temp/kindle-pong-capacity-20261027/pong-12m-48-b16-r16-intrinsic0
 Learning review SHA256`a5d261a0e75ec8146ccdc361cabca6581fb403c1a0e5a27d931487239c86d437`;
 completion`cfb0fbe1738dc8728302a50799105a12003069eafaa04200c0757af5e517442e`;
 comparison`5583ccb3e8a3d724c0c437e0b18385235d44efea003d764ef3557eb1c146f67e`.
+
+
+## A calibrated pixel reference wins one development match
+
+One external CPU controller replaces the old1.5-times-displacement stopping
+heuristic with a fixed calibrated response and five-command predictive search.
+The detector, reflected incoming-ball target and four-pixel opponent-dependent
+target offset stay as in the retained reference. Fit response coefficients only
+from the first3000 actions of its existing9001 trace, excluding clipped boundary
+positions. The2874 fit samples have2.117-pixel mean absolute one-step error;
+1226 later same-episode samples have2.122. This chronological split is correlated,
+not independent evaluation. It is calibration of a hand-coded reference, not
+Kindle pretraining or a native model change.
+
+With the fixed candidate on the same reused9001 development seed, the natural
+match improves **−15→+12**:11,216 actions /44,863 emulator frames,6.652s collection
+and6.530s exact fresh input/output-pixel/action/reward/boundary replay. Both use
+full18/sticky.25/repeat4/noops0/native RGB. The declared16384-action/60-second
+per-pass caps remain fixed. Planning and response calibration change together;
+this does not isolate either effect. No native module loads or learner runs.
+
+The candidate wins one match but remains below mean15 on that match. It does
+not justify a Pong guidance adapter, full reference cohort, native allocation
+or reliability claim. Keep the completed native12M recipe as the stronger
+measured learning result and the five-game goal open. No further CPU variant
+is selected here.
+
+All56 active Qbert pins and source hashes remain unchanged. Successful fit,
+collection and replay take13.225s on one affined low-priority core during Qbert;
+retain this timing caveat. Artifacts:`/x/Temp/kindle-pong-guidance-20261027`.
+Reference review SHA256`0da6d71a9496e435413b5ba70429a92ff11157fde83d9772a15372239de57c3a`;
+response fit`6860f3f127ebcc24118368eed925c8c0aefe19a3ac2694052998d26facf6466b`. The old losing reference remains
+retained; native training/inference stays on Meganeura and Blade.

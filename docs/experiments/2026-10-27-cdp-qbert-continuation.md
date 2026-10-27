@@ -125,3 +125,20 @@ retained4013 control and bounded check. First updates are248:1/256:2/256:3/
 zero guided actions; no selected episode has begun yet. This is startup evidence,
 not a frozen outcome. Read-only progress,100k recovery and terminal CPU
 postprocessing observers are attached; no next GPU allocation is selected.
+
+
+## Recovery checkpoint passes
+
+At03:53:05 UTC, the100k recovery contains the expected24,939 updates and346
+finite tensors. The watcher verifies25,837 finite reports in the103,600-action
+complete prefix; last progress102,400/25,539 at844.397s, zero debt. Recovery
+receipt SHA256`a7b9132298a8ac152518a7dcf895cbc79ecf991861ce18b7d4d36d1e2acd1fcb`. The same PID81404/invocation remains
+active; no frozen task outcome exists yet. Keep200k/30-minute cap and pending
+fixed final/own-initial assessments; no resume or additional allocation.
+
+CPU-only Breakout movement diagnostics co-host50.202s of successful arm replays,
+plus an initial failed/repeated two-arm attempt whose timestamp interval is
+11.050s. A separate fixed Pong reference fit and one development-match/replay
+use13.225s. Each runs on one affined low-priority core and leaves all56 pins
+unchanged. Both source-version mismatches and CPU repeats are retained outside
+Git; no GPU stage repeats. These are wall-time caveats, not time corrections.
