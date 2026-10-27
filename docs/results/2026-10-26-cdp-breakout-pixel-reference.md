@@ -195,3 +195,86 @@ proposed25%episode/cap128 schedule would exercise labels and release, because
 validation setting, not a selected full-run recipe. Pong's passing final result
 instead justifies a fresh fixed-recipe confirmation first. Keep this staged
 adapter available; do not mutate the confirmation's pinned files.
+
+
+## Capped reference labels support equal action weights
+
+CPU analysis of the existing24 selected reference episodes informs the proposed
+Breakout imitation recipe without collecting new experience or constructing an
+agent. Reconcile every saved episode length/reward and the full43,496-action/
+173,949-frame log before selecting the same24 episodes. These are prefixes of
+the pure reference, not counterfactual guided-learner scores.
+
+| Prefix cap per episode | Retained labels | Mean accumulated reward | NOOP | FIRE | LEFT/RIGHT |
+|---|---:|---:|---:|---:|---:|
+|128|3,072|2.917|43.46%|3.22%|53.32%|
+|640|15,269|24.125|39.94%|3.40%|56.66%|
+|Whole natural episode|36,727|166.167|34.94%|9.24%|55.82%|
+
+All24 prefixes at128 and640 include positive reward. One episode ends before640;
+the remaining23 would be released at that cap. At640,96.60% of input frames have
+a visible ball under the reference detector. FIRE contributes only5.48% of the
+weighted label mass even with the prior Qbert NOOP weight.05; FIRE does not
+dominate this prefix cohort. NOOP is a substantial part of the predictive
+controller's stopping behavior, so the proposed Breakout test keeps **all action
+weights1**, including NOOP, rather than inheriting Qbert's.05. Label mass is not
+gradient magnitude; no weight optimum or learning benefit has been measured.
+
+The external execution-check draft keeps4096 actions/963 updates,25%episodes/
+cap128, expert scale1, full action weights,180-second training cap and1024 frozen
+actions/60-second cap. It must follow the active Pong confirmation's terminal
+audits and application of the validated eight-file adapter. The separate full
+candidate is200k actions/49,939 updates under25 minutes,4M64/Auto/N8/B8/T16/H15/
+R32/coefficient1/actor.01/full18/original rates,5%episodes/cap640/expert1/allweights1.
+It retains100k recovery, fixed final/own initial24 natural episodes, original
+90%-two-wall gate, guidance off in evaluation, full audit/replay/guard evidence
+and no extension or automatic successor. The full candidate also requires the
+short native check to pass and a separate selection; **neither is selected**.
+
+Five candidate commands parse without agent/environment construction; eight
+external scripts compile and comparison readers accept the existing full18
+7.083 and minimal4 9.542 controls. All53 active Pong pins and the staged patch
+stay unchanged. Successful prefix/parser portions take0.630s on one affined
+low-priority core during Pong; no claim of isolated timing. An initial CPU-only
+analysis used Pong's `mean_natural_return` field instead of the existing task
+score's `mean_completed_return`; that KeyError and its correction are retained.
+No trajectory, source/runtime, score criterion or GPU stage changes.
+
+Artifacts remain in`/x/Temp/kindle-breakout-guidance-20261027`:
+`reference-prefix-review.json` SHA256`e148de7b1f1afd41a5612f82f94c6e81a9265ad6452305ca790ae756c244d008`;
+`draft-preflight.json` SHA256`309637aae43829a8beb1dcaa614edb036758e6eb820960c6f3410fdc4b9447cf`.
+The draft scripts identify their exact predecessors, controls, caps and hashes.
+
+
+## A settling penalty gives only a small selected-cohort gain
+
+An exact CPU replay of the strongest saved first episode, lane1/seed4001001012,
+reproduces405 points,1980 actions and7917 frames, including all recorded input/
+output hashes, rewards and boundaries. Its five life-loss steps are662,1162,1424,
+1533,1980. Last-step snapshots and predicted/observed paddle positions show
+fast target crossings and several-pixel forecast errors near impact. These are
+observations from one selected reference episode, not a causal diagnosis of
+native learning. Life counts label the replay retrospectively and never enter
+policy decisions. Diagnostic replay takes0.980s.
+
+One external CPU variant adds0.5 times squared predicted paddle displacement
+at the impact segment to the existing near-impact planning cost. It retains
+the calibrated response, detector, native frames and action vocabulary. On the
+same eight reused first natural episodes it scores **152.750 versus144.875**,
+with **0/8 two-wall successes for both**. Variant scores are90,112,106,91,125,
+376,106,216;12,259 actions /49,022 frames,5.572s collection and3.899s exact
+input/output/action/reward/boundary replay. All eight finish naturally; no cap
+increase or further variant is selected.
+
+The variant was chosen after inspecting this cohort's strongest baseline episode;
+it is development evidence, not a held-out comparison. The modest7.875-point
+gain does not justify replacing the already validated staged teacher. Retain
+the original predictive rule and the separately proposed all-action-weight1
+imitation recipe. No native learner, staged source, checkpoint or active runtime
+changes. All53 active Pong pins remain unchanged; low-priority CPU work during
+that run remains a timing caveat.
+
+Miss review SHA256`43dbff1c477e20c67ae27117694a0bf9699f894a35acaee20866c1d608db8f1e`;
+variant review`cb41918e71d164fea904f2df491d6e094cef0c3b66f9ec5c80b2f22061643156`.
+Both are retained under`/x/Temp/kindle-breakout-guidance-20261027` with exact
+source pins, traces and snapshots.

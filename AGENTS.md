@@ -118,6 +118,8 @@ Startup passes5656 actions/330 finite reports,346 finite initial tensors, fresh
 world weights and first376/392/408/424/440/456 updates; all53 pins unchanged.
 The progress observer was corrected after unsupported flags; training was not
 interrupted. Recovery and CPU postprocessing observers are attached.
+100k/6227 and200k/12,477 recoveries pass02:06:20/02:14:50 UTC, with346 finite
+tensors and complete-prefix finite reports; same learner continues.
 Owner`kindle-pong-12m48-b16-r16-500k-seed4013-20261027`; see
 [protocol](docs/experiments/2026-10-27-cdp-pong-capacity-seed4013.md).
 Check live state before GPU work.

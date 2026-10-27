@@ -75,3 +75,30 @@ A separate-v2 observer uses the script's existing45-second/3600-second defaults
 and runs correctly; the main learner keeps the same PID/invocation and no GPU
 stage repeats. Recovery100k/200k/300k/400k and terminal CPU plot/comparison
 observers are attached. This is startup evidence, not full-run competence.
+
+
+## First recovery and independent CPU preparation
+
+The100k/6227-update recovery passes02:06:20 UTC: all346 checkpoint tensors finite,
+complete prefix102,264 actions/6368 finite reports, last progress98,304/6121 in
+485.781s with residual credit.5. Receipt SHA256:
+`7111674bd6490a202fa6e57e2011aff8d961ea7d0c12ae89accfbe5742405626`.
+The original PID71345/invocationbfe98b4e4ae84b3f996e05f86f28e3df remains active.
+No frozen confirmation score is known yet.
+
+Independent CPU-only analysis of already saved Breakout trajectories supports
+keeping full-weight NOOP braking labels for a proposed capped expert trial.
+Prefix/parser successful portions total0.630s on one affined low-priority core;
+no native agent or environment is constructed. External controllers and both
+retained-control readers are prepared, but neither Breakout candidate is selected.
+All53 active pins remain unchanged. See [candidate evidence](../results/2026-10-26-cdp-breakout-pixel-reference.md#capped-reference-labels-support-equal-action-weights).
+
+
+The200k/12,477 recovery also passes02:14:50 UTC: all346 tensors finite,
+complete prefix204,600 actions/12,764 finite reports, last progress200,704/
+12,521 in996.722s and residual credit.5. Receipt SHA256:
+`f28147195462ece6dad4ce2122406d2b25d14e18e73794b1565d184df1e35914`.
+A separate one-episode Breakout diagnostic costs0.980s and one CPU reference
+variant costs5.572s collection/3.899s replay. Its small152.750 versus144.875 gain
+on eight reused episodes, both0/8 two-wall successes, does not replace the staged
+teacher. No native agent or live input changes; all53 active pins remain intact.
