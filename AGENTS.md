@@ -99,25 +99,20 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](docs/results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
-One fresh Qbert4013 expert **500k/R16** comparison is active from00:17:08 UTC
-on October27/source`bad8f55`.
-Keep4M48/Auto/N8/B8/T16/H15/coefficient1/actor0/full18/original rates,
-5% first-pyramid guidance/cap640/expert1/NOOPweight.05 and native79c9a7f.
-Only action budget200k→500k and replay ratio32→16 change versus completed4013:
-62,470 expected updates, first248, four100k recoveries, zero debt and a hard
-30-minute training cap. Fixed final/own-initial24-natural controls retain the
-15k/90% gate. Reused4013 is selected after its stronger result; this is not an
-independent seed confirmation or isolated ratio effect. All67 pins and the
-CPU comparison-reader preflight pass. Startup matches346 initial tensors and
-all31 pre-learning transitions with the completed4013 control. First six updates
-match248:1/256:2/264:3/272:4/280:5/288:6;17,136 complete actions/2111 finite
-reports,1920 trusted actions and633 supervised reports pass. Recovery, progress
-and postprocessing monitors are attached.100k/12,470,200k/24,970 and300k/37,470
-recoveries pass with346 finite tensors each. The300k audit verifies37,937 finite
-reports in a303,744-action prefix, with zero debt. Frozen quality is pending. Owner
-`kindle-expert-qbert-r16-500k-seed4013-20261027`. No extension, cap increase or
-automatic successor. CPU teacher prototypes remain external and unselected.
-See [selected protocol](docs/experiments/2026-10-27-cdp-qbert-expert-r16.md).
+Fresh Qbert4013 expert500k/R16 completes **500k actions /1,998,773 frames
+/62,470 updates in28m20s**. Frozen **3752.083 /21 of24 first pyramids** versus
+own initial182.292 /0 improves200k/R32's3153.125 /17, but costs40.88% more
+training time for19.00% higher mean. Both miss the original15k/90% gate.
+All audits, four recoveries,346 matched initial/unchanged frozen tensors,
+identical initial semantic traces, full pixel/action replays, guards, curves,
+coverage, exposure and comparison pass. All67 declared pins stay unchanged.
+Service exits00:48:34 UTC on October27; postprocessing completes00:48:42.
+Keep both measured budget points; no extension or seed confirmation is selected.
+No GPU work is active or queued. This reuses4013 after its stronger result,
+changes budget and ratio together, and is not independent seed confirmation.
+CPU teacher prototypes remain external and unselected. See
+[completed result](docs/results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-improves-first-pyramid-success-with-higher-cost)
+and [protocol](docs/experiments/2026-10-27-cdp-qbert-expert-r16.md).
 Check live state before GPU work.
 
 The fresh Qbert4013 expert-imitation check completes 200k actions /799,532

@@ -1,9 +1,11 @@
 # Qbert expert imitation: more experience at lower replay ratio
 
-**Active from00:17:08 UTC on October27/source`bad8f55`.** Startup checks pass;
-fixed final performance is pending. No budget or recipe change after launch.
+**Completed:**500k actions /1,998,773 frames /62,470 updates in28m20s. Frozen
+3752.083 /21 of24 first pyramids versus initial182.292 /0. All audits and
+comparison pass; the original15k/90% gate still fails. No extension or next
+allocation is selected. Launch source`bad8f55`; no recipe change after launch.
 
-Select one fresh **500k-action/R16** learner on reused seed4013 after its
+Selected one fresh **500k-action/R16** learner on reused seed4013 after its
 completed200k/R32 result:3153.125 and17/24 first pyramids in20m07s. The same
 expert recipe on1009 scores1083.333/2. Both improve over their actual initials,
 but neither passes the original mean15000/90%-first-pyramid gate.
@@ -85,26 +87,59 @@ Startup review SHA256:
 `fa85b4a73f4ebe41fea8be66bb6d59b346cec84c0ddf95d71bcea061259b5195`.
 
 
-## Recovery checks while training continues
+## Completed recovery checks
 
 | Checkpoint actions / updates | Audit UTC | Finite tensors | Complete prefix actions / finite reports |
 | --- | --- | ---: | --- |
 |100,000 /12,470|00:23:17|346|100,864 /12,577|
 |200,000 /24,970|00:28:48|346|203,072 /25,354|
 |300,000 /37,470|00:34:18|346|303,744 /37,937|
+|400,000 /49,970|00:40:19|346|409,944 /51,212|
 
-The same PID61973/invocation continues. At the300k audit the latest progress
-is303,104 actions /37,858 updates in1024.610s, with zero debt. These are
-recovery and execution checks; frozen task quality remains pending.
+The same PID61973/invocation continued through completion. The400k audit
+checks progress409,600 /51,170 at1386.221s, with zero debt. Recovery checks
+establish execution; the fixed final outcome is reported below.
 
 Independent score-color CPU prototypes complete on one affined core at nice10
-while this learner runs. Their111.935s total measured collection/replay time
+while this learner ran. Their111.935s total measured collection/replay time
 is a co-host timing caveat; this is not an isolated backend speed comparison.
 They never construct an agent or change any of the67 active pins, recipe or
-caps. All prototypes remain outside production and unselected. See
+caps. A subsequent hop timing check adds29.848s and produces an
+identical trace; total CPU prototype time is141.783s. All prototypes remain
+outside production and unselected. See
 [results and failed attempts](../results/2026-10-25-cdp-cheap-qbert.md#score-color-prototypes-remain-below-the-game-gate).
 
 Recovery review SHA256s:
 100k`7edd98a8c1d0e10f1be6517d98c0cd21a33a452fe3ae593f7b01cebc2f039e7c`;
 200k`3868d0a42c39bf435212b1c80e7442504af34bb4767b5c0340006500b40daa5c`;
-300k`439dd6525474fa7dea6f0f46a9fd9c3407fadf8cdaea446cfe7aa89c85d2864c`.
+300k`439dd6525474fa7dea6f0f46a9fd9c3407fadf8cdaea446cfe7aa89c85d2864c`;
+400k`a344db5d4303764631eb2c825f9ef6f2f1e2ab41030d4ff914884d413c3feef9`.
+
+
+## Completed outcome
+
+Training finishes the full500k budget in1700.485s, within the30-minute cap,
+with62,470 finite reports, zero debt and346 finite checkpoint tensors. All67
+pins, four recovery audits, full training/frozen pixel-action replay, explicit
+expert labels, source/config/counters, guards and comparison pass. Initial
+parameters match all346 control tensors, and both initial evaluation traces
+have the same1140 semantic events. No GPU retry or CPU audit repair occurs.
+
+Final/own-initial each select exactly24 natural episodes, zero updates and
+truncations,346 unchanged tensors and retained partial tails. Frozen final
+3752.083 /21 first pyramids /20.333-of21 coverage versus initial182.292 /0
+/5.167. Final20,256 actions /80,984 frames take8.244s; initial8728 /34,875
+in3.565s. The200k/R32 control scores3153.125 /17 /20.167 in20m07s training.
+The gain costs40.88% more training time; neither15k nor90% is reached.
+
+The main service exits successfully00:48:34 UTC,31m25.790s total including
+setup, evaluation and CPU audits. Postprocessing completes00:48:42. All
+services and observers are terminal; no extension, confirmation or successor
+is selected. [Full result and limits](../results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-improves-first-pyramid-success-with-higher-cost).
+
+Learning review SHA256:
+`3cad7a4285536a7d484759f3f483250636a82dac9fb66d031749f2c8b1dcaa40`.
+Completion:
+`391554dfef3c781c9a432088d4f59c64e5b622594ff3bb9eea1b2ee5a8e84622`.
+Comparison:
+`58879af670c951c03fce61c5a07a2d50233a3643a4a6f1242eca4ff0e5ed9d8a`.

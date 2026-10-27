@@ -1690,7 +1690,7 @@ All failed attempts are retained. This is repeated selection on one small
 reused cohort, not held-out validation or learned success. The best score still
 misses15000 substantially; no production guidance change, seed campaign or new
 GPU allocation is selected from these results. The existing500k/R16 learner
-continues with its original teacher and30-minute cap.
+kept its original teacher and30-minute cap; its completed result follows.
 
 Collection/replay totals111.935s on one affined CPU core at nice10 during the
 active learner. This is recorded as a co-host timing caveat. All67 active pins
@@ -1703,3 +1703,82 @@ The aggregate`hud-teacher-review.json` pins every per-prototype review, script
 and exact trace, preserving all scores, natural episodes, raw-frame counts and
 CPU times. SHA256:
 `61d328699bf25851672c55765196f14fb4dc235fb2335b85e3f6e3b494933355`.
+
+
+A subsequent CPU check changes only the hybrid teacher's minimum hop age6→2.
+All eight saved action/pixel/reward/boundary traces are byte-identical to the
+hybrid control, including6743.750 mean and8/8 first pyramids. The minimum age
+was not binding on these trajectories; this does not diagnose other timing
+rules or native learning. Collection26.354s plus replay3.493s bring the measured
+co-host CPU total to141.783s. No production change or allocation follows.
+Receipt`hop-wait-check.json` SHA256:
+`07a259da3b4286b06b97293a45b4ec3dab442df9417893b0035e25691a2e3abb`.
+
+## More experience at R16 improves first-pyramid success, with higher cost
+
+The fresh expert-imitation4013 candidate completes **500,000 aggregate actions
+/1,998,773 emulator frames /62,470 updates in28m20s** (1700.485s), within its
+30-minute training cap. Fixed frozen quality improves to **3752.083 /21 of24
+first pyramids**, versus the completed200k/R32 control's3153.125 /17. Own
+initial182.292 /0 is unchanged. The mean gains19.00% for40.88% more training
+time. Both the original mean15000 and90%-first-pyramid requirements remain
+unmet; the five-game goal is unfinished.
+
+| Fresh4013 budget | Actions / updates | Training wall | Frozen final / own initial | First pyramids | Mean coverage |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| R32 |200k /49,939|20m07s|3153.125 /182.292|17/24|20.167 /21|
+| R16 |500k /62,470|28m20s|3752.083 /182.292|21/24|20.333 /21|
+
+Only action budget and replay ratio change, along with their declared cap and
+fresh output paths. Both use native/CLI79c9a7f,4M/RGB48/Auto/N8/B8/T16/H15/
+coefficient1/actor0/full18/original rates and5% first-pyramid guidance/cap640/
+expert1/NOOPweight.05. This is2.5 times the experience and1.251 times the
+updates, not an isolated ratio effect. Seed4013 was selected after its stronger
+result and the evaluation cohort is reused. No checkpoint, replay, belief,
+game or RNG is reused, but this is not an independent seed confirmation.
+
+All62,470 reports and346 tensors are finite. All67 source/evidence pins remain
+unchanged. First update248, zero debt, four100k recovery checks, exact config/
+source/counters, explicit trusted labels, full training/frozen pixel-action
+replays, videos, guards, curves, coverage, exposure and comparison pass. Initial
+tensors match all346 control tensors, and the initial evaluations have identical
+1140-event semantic traces. No failed training/audit attempt, GPU retry, cap
+increase or extension occurs in this life.
+
+Each frozen arm completes exactly24 natural episodes with zero updates and
+truncations,346 unchanged tensors and retained partial tails. Final evaluation:
+20,256 actions /80,984 frames in8.244s. Initial:8728 /34,875 in3.565s. Final
+coverage histogram is10:1,17:1,20:1,21:21; success87.5%. Scores range275–4600,
+so improved first-pyramid frequency still leaves a large full-game score gap.
+
+Guidance selects45 of817 started episodes and executes28,324 trusted actions
+(5.6648%):26,669 NOOP and1655 movements. All44 completed guided episodes clear
+a pyramid, mean3831.818; one selected episode remains partial. Of765 unguided
+training episodes,264 clear a pyramid, mean1717.712. The last50 unguided average
+3788.000 with44 successes. These online figures remain separate from the fixed
+frozen outcome. The online curve dips markedly between about220k and330k,
+then recovers; no earlier checkpoint is selected from that curve.
+
+24,212 updates contain expert labels; repeated replay contributes464,475
+labelled rows with total target weight48,926.944. Weighted cross-entropy over
+successive50k-action windows falls1.601→0.316, with intervening variation.
+These changing replay samples do not measure held-out action accuracy or
+establish why the policy improves.
+
+The service exits successfully **00:48:34 UTC on October27**,31m25.790s total
+including setup, evaluation and CPU audits. Postprocessing completes00:48:42;
+all services and observers are terminal. The independent CPU teacher checks
+consume141.783s on one affined low-priority core during training, a co-host
+timing caveat. The runtime, native learning and action guidance remain unchanged.
+
+Retain both measured cost/quality points. The larger budget improves this reused
+seed but still fails both gate components; no unchanged extension, seed campaign
+or automatic successor follows. The CPU continuation rules remain unselected.
+
+Protocol:[fresh500k/R16 comparison](../experiments/2026-10-27-cdp-qbert-expert-r16.md).
+Artifacts:
+`/x/Temp/kindle-qbert-continuation-20261027/qbert-4m-48-r16-expert1-cap640-500k-seed4013`.
+Learning review`3cad7a4285536a7d484759f3f483250636a82dac9fb66d031749f2c8b1dcaa40`;
+completion`391554dfef3c781c9a432088d4f59c64e5b622594ff3bb9eea1b2ee5a8e84622`;
+comparison`58879af670c951c03fce61c5a07a2d50233a3643a4a6f1242eca4ff0e5ed9d8a`;
+exposure`5e311a769d85f41e340e7ca23812ce658029bf265097b13ff53e2a37cbef1ef5`.
