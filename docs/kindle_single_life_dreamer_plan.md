@@ -372,6 +372,14 @@ on October27. Actual1009 guidance38,400 actions (19.2%); online guided returns
 are not frozen competence. Both reused development seeds; no broad reliability,
 extension or third seed. See the paired continuation result in cheap-Qbert.
 
+A four-arm greedy assessment of both retained12M Pong learners and their own
+initial weights is prepared externally at`/x/Temp/kindle-pong-greedy-20261027`.
+Exact original runner/runtime, four finite checkpoints, sampled score replay,
+four command parses and refusal while unselected pass. No training or GPU
+assessment starts; current Qbert retains priority and all47 pins. The original
+sampled15.625/14.833 results remain. See the prepared comparison in cheap-Pong;
+separate selection after terminal Qbert/postprocessing is required.
+
 Qbert R16/20% is active from04:56:02 UTC/source`d8cdc8a`, PID90234/
 invocation`f880fba1fa344bd7b84467a0f5ceeb5e`. Startup verifies47 pins,346
 initial tensors matching primary continuation4013/check and first248:1/256:2/

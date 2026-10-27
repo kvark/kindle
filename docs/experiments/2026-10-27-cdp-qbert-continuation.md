@@ -349,3 +349,20 @@ primary continuation4013 and bounded check. First updates248:1/256:2/264:3/
 are finite,1612 actions are trusted and371 reports contain expert labels.
 Read-only progress,100k R16 recovery and terminal CPU postprocessing observers
 are attached. No frozen outcome yet; retain200k/25-minute cap and full audits.
+
+## Higher-exposure R16 recovery passes
+
+At05:07:46 UTC, the100k recovery contains12,470 updates and346 finite tensors.
+The watcher verifies13,000 finite reports in the104,248-action complete prefix;
+last progress102,400/12,770 at689.563s, zero debt. Receipt SHA256
+`47bd8bef3f5e43330283138f04c1173ea78b2e2fd6efd5431f8f1f7d7c93bdfc`.
+The original service remains active under PID90234/invocation
+`f880fba1fa344bd7b84467a0f5ceeb5e`; no frozen result exists yet. Keep the
+declared200k/25-minute cap. The recovery observer completes successfully.
+
+CPU preparation of a [four-arm retained Pong greedy check](../results/2026-10-25-cdp-cheap-pong.md#prepared-greedy-comparison-of-both-retained12m-learners)
+uses1.806s of measured preparation/source-validation work on one affined
+low-priority core. No native module, agent or environment is constructed;
+all47 active Qbert inputs remain unchanged. This is a co-host timing caveat,
+not a wall-time correction. That separate frozen assessment remains unselected
+and cannot start before Qbert and its postprocessing are terminal.

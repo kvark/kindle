@@ -1157,3 +1157,46 @@ retain this timing caveat. Artifacts:`/x/Temp/kindle-pong-guidance-20261027`.
 Reference review SHA256`0da6d71a9496e435413b5ba70429a92ff11157fde83d9772a15372239de57c3a`;
 response fit`6860f3f127ebcc24118368eed925c8c0aefe19a3ac2694052998d26facf6466b`. The old losing reference remains
 retained; native training/inference stays on Meganeura and Blade.
+
+## Prepared greedy comparison of both retained12M learners
+
+The two completed12M learners win24/24 sampled matches each, but their means
+15.625/14.833 leave only one above15. Prepare a fixed four-arm assessment:
+both retained final policies and each learner's actual initial weights, using
+the existing native greedy path. The earlier4M greedy result was slightly worse
+(14.333 versus14.958), so this is a model-specific check, not evidence for a
+global sampler change. No new learner or further training is proposed.
+
+The exact original Pong runner is exported from`002e403b`; its SHA256
+`814eef835aebdcc6d6adbe7a670f922f48525dafcf51ee0b2bcd9e53482dcdba` matches
+both controls. Use their original packaged runtime/native79c9a7f, unchanged
+wrapper, ROM, host, seeds4000001009/4000004013, full18/sticky.25/repeat4/native
+frames/one GPU48 resize. Only greedy action selection and output locations
+change. Each arm keeps first3 natural matches per8 lanes=24,600k-action/300s
+caps, zero updates/truncations and the original mean15/90%-win gate. Require
+346 invariant tensors, source-file invariance, full outcome replay/videos and
+host guards. Ordinary frozen logs lack live pixel hashes.
+
+Four commands parse, five scripts compile, all four retained checkpoints have
+346 finite tensors each, and every source sampled score/criterion recomputes
+exactly from its verified replay. The controller refuses while unselected.
+Preparation/checking use.361s/1.429s on one affined low-priority core, with no
+native module, agent or environment construction and all47 active Qbert pins
+unchanged. This supplies preparation evidence only; no greedy score exists.
+
+An additional.016s CPU check matches all10 original runtime pins from each
+source declaration, covering the native binary and all nine Python files.
+Receipt SHA256`b3426a3b3fb40c69764ecee0e83f72cbd64afebf4950e1e07da949177080423a`.
+
+The assessment remains **unselected** while the R16/20% Qbert learner runs.
+It cannot start before that service and its postprocessing finish successfully
+and a separate selection supplies the terminal receipt. No automatic launch,
+retry, extension, checkpoint selection or default change follows preparation.
+Both seeds/cohorts are reused development evidence. Original sampled outcomes
+and training costs41m28s/41m31s remain; changed greedy results cannot relabel
+the sampled failure or become new independent learners.
+
+Artifacts:`/x/Temp/kindle-pong-greedy-20261027/pong-12m-48-two-seed-greedy-frozen`.
+Prepared declaration SHA256`ad41c3ae99e06594269030199d5fb228c98e4420e8af718eb4bcd4ffee4923a8`;
+CPU preflight`615dc7fdb3d22e8193629f8333c44fe7c1ecb70755ea12dd54a5b2474a222ebe`;
+controller`acf3f12b2df12be2476c540537d5ce7485a0b1159490f56948ca14764265ac20`.

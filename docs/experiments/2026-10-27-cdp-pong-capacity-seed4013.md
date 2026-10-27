@@ -116,3 +116,28 @@ See [complete evidence and hashes](../results/2026-10-25-cdp-cheap-pong.md#capac
 The original read-only observer failure remains retained. The later application
 of the validated Breakout adapter follows terminal audits and does not change
 this run's immutable declaration, artifacts or runtime.
+
+## Prepared frozen action-selection comparison
+
+The completed12M pair motivates a separately prepared four-arm greedy
+assessment: fixed final and own actual initial for both1009/4013, no new
+training. Preserve original sampled15.625/14.833 and their training costs.
+The existing native argmax path and exact original Pong runner require no
+source edit or rebuild. The older4M greedy test was negative; no global
+default change or broad reliability claim is justified.
+
+Keep full18/sticky.25/native one-resize RGB48, N8, original evaluation seeds,
+first3 natural matches per lane=24 per arm,600k-action/300s caps, zero updates/
+truncations, mean15/90%-win gate,346 invariant tensors and full replay/video/
+guard/source audits. Order is final1009, initial1009, final4013, initial4013,
+fixed before any result. Audit cap1200s, total service2460s. No retry, cap
+increase, extension, checkpoint selection or automatic successor.
+
+Candidate:`/x/Temp/kindle-pong-greedy-20261027/pong-12m-48-two-seed-greedy-frozen`;
+owner if later selected:`kindle-pong-12m-two-seed-greedy-frozen-20261027`.
+All58 prepared pins match. Four command parses, five compiled scripts, four
+finite source checkpoints, exact sampled score recomputation and refusal while
+unselected pass. All47 active Qbert inputs stay unchanged. The declaration
+remains prepared/unselected and no service starts. A separate decision and
+terminal Qbert/postprocessing receipt are required before GPU work. See
+[prepared evidence and limits](../results/2026-10-25-cdp-cheap-pong.md#prepared-greedy-comparison-of-both-retained12m-learners).
