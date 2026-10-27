@@ -371,3 +371,18 @@ A separate.261s affined log-only [Breakout prefix review](../results/2026-10-26-
 compares one1920-action prefix with retained640/full controls. It constructs no
 agent/environment, makes no new decisions and leaves all47 Qbert inputs
 unchanged. No Breakout allocation or runtime change is selected.
+
+## Higher-exposure R16 comparison completes
+
+200k actions /799,662 frames /24,970 updates take21m59s,13.41% less training
+time than5%/R32. Frozen3333.333/18 first pyramids versus own initial182.292/0
+is below the primary4730.208/23. All audits,100k recovery,346 matched initial/
+unchanged frozen tensors, paired initial semantic traces,47 pins, replays,
+guards, curves, coverage, exposure and comparison pass. Main exits05:23:55 UTC;
+postprocessing05:24:19 on October27. Actual guided-action fraction45.9565%.
+Retain5%/R32; no extension or confirmation. Probability and ratio changed
+together on reused4013. See [complete result and receipts](../results/2026-10-25-cdp-cheap-qbert.md#more-guidance-with-less-replay-saves-time-but-lowers-frozen-quality).
+
+After terminal review, separately select the prepared four-arm retained Pong
+12M greedy evaluation. It adds no training and preserves the sampled outcomes;
+its fixed protocol remains in the Pong capacity experiment.

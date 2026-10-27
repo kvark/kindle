@@ -1200,3 +1200,17 @@ Artifacts:`/x/Temp/kindle-pong-greedy-20261027/pong-12m-48-two-seed-greedy-froze
 Prepared declaration SHA256`ad41c3ae99e06594269030199d5fb228c98e4420e8af718eb4bcd4ffee4923a8`;
 CPU preflight`615dc7fdb3d22e8193629f8333c44fe7c1ecb70755ea12dd54a5b2474a222ebe`;
 controller`acf3f12b2df12be2476c540537d5ce7485a0b1159490f56948ca14764265ac20`.
+
+## Paired greedy assessment selected after Qbert completion
+
+Qbert R16/20% and all postprocessing finish successfully at05:23:55/05:24:19
+UTC. Its complete receipt is SHA256
+`eeccfd460ba6afe09618cfd21e250f24bcf44b294ab5c4c68cc84f8b8b6c0515`.
+Select the prepared four-arm greedy assessment without changing its58 pins,
+original runtime, seeds, fixed arm order, checkpoints, action/time caps or
+mean15/90%-win gate. This tests whether greedy inference improves the retained
+12M pair at no additional training cost. The earlier4M greedy regression remains
+recorded; this is not a global default change. Both original sampled outcomes
+and training costs remain. No retry, extension, cap increase, checkpoint
+selection or automatic successor. The previous unselected preparation is
+historical; this separate decision authorizes only the fixed assessment.

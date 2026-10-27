@@ -378,33 +378,27 @@ on October27. Actual1009 guidance38,400 actions (19.2%); online guided returns
 are not frozen competence. Both reused development seeds; no broad reliability,
 extension or third seed. See the paired continuation result in cheap-Qbert.
 
-A four-arm greedy assessment of both retained12M Pong learners and their own
-initial weights is prepared externally at`/x/Temp/kindle-pong-greedy-20261027`.
-Exact original runner/runtime, four finite checkpoints, sampled score replay,
-four command parses and refusal while unselected pass. No training or GPU
-assessment starts; current Qbert retains priority and all47 pins. The original
-sampled15.625/14.833 results remain. See the prepared comparison in cheap-Pong;
-separate selection after terminal Qbert/postprocessing is required.
+Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,
+13.41% less training time than5%/R32, but frozen3333.333/18of24 first pyramids
+is below4730.208/23. Own initial182.292/0; both miss mean15000. All audits,
+100k recovery,346 matched initial/unchanged frozen tensors, paired initial
+semantic traces,47 pins, full replays, guards, curves, coverage, exposure and
+comparison pass. Main exits05:23:55 UTC; postprocessing05:24:19 on October27.
+Actual guidance91,913 actions (45.9565%); online guided scores are not frozen
+competence. Retain5%/R32; no extension or confirmation. Probability and ratio
+change together on reused4013; no isolated causal claim. See the completed
+higher-exposure comparison in cheap-Qbert.
 
-Qbert R16/20% is active from04:56:02 UTC/source`d8cdc8a`, PID90234/
-invocation`f880fba1fa344bd7b84467a0f5ceeb5e`. Startup verifies47 pins,346
-initial tensors matching primary continuation4013/check and first248:1/256:2/
-264:3/272:4/280:5/288:6 updates. At3224 actions,372 reports are finite,1612
-are trusted actions and371 reports contain expert labels. Progress/R16 recovery/
-postprocessing observers are attached; no frozen outcome yet. Keep200k/25min.
-
-Select one fresh Qbert4M48/Auto/N8/B8/T16/H15/R16/coefficient1/actor0/full18/
-original-rates comparison with20%episode continuation/cap1920/expert1/
-NOOPweight.05,4013/eval4000004013.200k actions/24,970 updates, first248,
-residual0,100k recovery12,470. Declare25-minute training cap before launch;
-fixed final/own initial24-natural assessments retain mean15000/90%-pyramid and
-full audits. Probability and ratio change together against5%/R32's4730.208/23
-in25m23s; reused development seed, no isolated attribution. No retry, extension,
-cap increase, checkpoint selection or automatic next allocation.
-Owner`kindle-qbert-r16-p20-cap1920-200k-20261027`;47 inputs pinned under
-`/x/Temp/kindle-qbert-exposure-20261027`. Check live state before GPU work.
-The unselected20-minute draft is retained; measured bounded cost motivates
-this separately declared25-minute cap before any full run starts.
+Select the prepared four-arm greedy evaluation of both retained12M Pong
+learners and their own actual initial weights, after terminal Qbert audits.
+Fixed order final1009/initial1009/final4013/initial4013; original runtime/runner,
+24 natural matches each,600k actions/300s per arm, original mean15/90%-win gate.
+Zero training/updates;346 invariant tensors,58 pins, full replays/videos/guards.
+Owner`kindle-pong-12m-two-seed-greedy-frozen-20261027`, artifacts
+`/x/Temp/kindle-pong-greedy-20261027`. Audit1200s/service2460s; no retry, cap
+increase, checkpoint selection or automatic successor. Original sampled
+15.625/14.833 and41m28s/41m31s training costs remain; reused cohorts, no new
+independent learners or global greedy default. Check live state before GPU work.
 
 The R16/20% bounded check completes8192 actions/32,752 frames/994 updates in
 52.742s, frozen1024/.524s with346 invariant tensors and no completed natural

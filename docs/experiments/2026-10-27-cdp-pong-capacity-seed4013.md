@@ -141,3 +141,17 @@ unselected pass. All47 active Qbert inputs stay unchanged. The declaration
 remains prepared/unselected and no service starts. A separate decision and
 terminal Qbert/postprocessing receipt are required before GPU work. See
 [prepared evidence and limits](../results/2026-10-25-cdp-cheap-pong.md#prepared-greedy-comparison-of-both-retained12m-learners).
+
+## Paired greedy assessment selected after Qbert completion
+
+Qbert R16/20% and all postprocessing finish successfully at05:23:55/05:24:19
+UTC. Its complete receipt is SHA256
+`eeccfd460ba6afe09618cfd21e250f24bcf44b294ab5c4c68cc84f8b8b6c0515`.
+Select the prepared four-arm greedy assessment without changing its58 pins,
+original runtime, seeds, fixed arm order, checkpoints, action/time caps or
+mean15/90%-win gate. This tests whether greedy inference improves the retained
+12M pair at no additional training cost. The earlier4M greedy regression remains
+recorded; this is not a global default change. Both original sampled outcomes
+and training costs remain. No retry, extension, cap increase, checkpoint
+selection or automatic successor. The previous unselected preparation is
+historical; this separate decision authorizes only the fixed assessment.

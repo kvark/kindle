@@ -2077,3 +2077,57 @@ gate remains unchanged. See the [selected protocol](../experiments/2026-10-27-cd
 
 Artifacts:`/x/Temp/kindle-qbert-exposure-20261027/qbert-4m-48-r16-p20-check`.
 Review SHA256`9b03f5c7dc686b554b821d9a3fdbc6912dfa73c38d924c7a261730db575871ef`.
+
+## More guidance with less replay saves time but lowers frozen quality
+
+The fresh4013 comparison completes **200,000 aggregate actions /799,662
+emulator frames /24,970 updates in21m59s** (1318.663s). Relative to the matched
+5%/R32 continuation control, training takes13.41% less time but frozen mean
+falls29.53%, from4730.208 to3333.333. Retain5%/R32; no extension or confirmation
+of this candidate is selected.
+
+| Recipe | Frozen mean | First pyramids | Mean first-board coverage | Training |
+| --- | ---: | ---: | ---: | ---: |
+| Continuation5% /R32 |4730.208 |23/24 |20.583/21 |25m23s |
+| Continuation20% /R16 |3333.333 |18/24 |20.750/21 |21m59s |
+| Own actual initial |182.292 |0/24 |5.167/21 |0 |
+
+Keep4M/RGB48/Auto/N8/B8/T16/H15, coefficient1/actor0/full18/original rates,
+continuation/cap1920/expert1/NOOPweight.05. Only episode probability5%→20% and
+ratio32→16 jointly change against the primary control; same native/runtime/host,
+all346 initial tensors and paired initial semantic traces match. This reused
+seed and cohort are development evidence, not isolated attribution or an
+independent confirmation. Both trained means remain below15000; the candidate
+also misses90% first-pyramid success. No selected episode reaches15000.
+
+The20% episode schedule selects49/225 starts and actually overrides91,913/200k
+actions (45.9565%):70,218 NOOP and21,695 cardinal hops. All46 completed guided
+episodes clear a first pyramid, mean15127.174;171 unguided completed episodes
+average1305.994 with45 first pyramids. The final50 unguided average2585.5 with29
+first pyramids. There are8692 native actions after guidance releases. These
+online returns contain different trajectory distributions and are not frozen
+competence.24,835 reports contain labels, with1,519,459 repeated replay rows,
+weighted target mass416148.910 and summed reported loss1733.083. Weighted
+cross entropy across50k-action windows is1.2024/.3567/.1955/.1610; these changing
+replay samples are not held-out accuracy. Lower imitation loss does not establish
+better task behavior.
+
+All24,970 reports are finite; first update248 and zero residual debt match.
+The100k recovery contains12,470 updates/346 finite tensors. Both fixed frozen
+arms select first3 natural episodes per8 lanes,24 each, with zero updates or
+truncations and all346 tensors unchanged. Final uses22,112 actions/88,401 frames
+in10.516s; initial8728/34,875 in4.087s. All47 pins, configuration/counters,
+matched initial weights/traces, full guided input-pixel/action/outcome replay,
+frozen outcome replay/videos, host guards, curves, coverage, exposure and
+comparison pass. Ordinary frozen logs have no live pixel hashes. The comparison
+plot was visually checked. Main service exits05:23:55 UTC and postprocessing
+05:24:19 on October27; no GPU stage repeats or cap increases.
+
+Artifacts:`/x/Temp/kindle-qbert-exposure-20261027/qbert-4m-48-r16-p20-cap1920-expert1-200k-seed4013`.
+Learning review SHA256`0ba07bfde70af02425b8d2b867f1727dbbe9a93d32cfe424c053fa7f4ad4d7a0`;
+completion`eeccfd460ba6afe09618cfd21e250f24bcf44b294ab5c4c68cc84f8b8b6c0515`;
+comparison`7a9f10c2d77afc845dfaadffbea2630fd5e5b769322fa8179978e427d3ffe182`;
+coverage`8b9f3e4d1b6068ca5b39d8faf862500569d838d561b0ab9c094ac4906bbe891d`;
+exposure`bebaffd8faff07c4443504ae313a970b9e6b88877c10542f4b3e95ffde227172`.
+The preceding protocol retains the prelaunch25-minute cap, bounded check,
+unselected20-minute draft and2.067s of co-host CPU preparation/analysis.
