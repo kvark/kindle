@@ -601,6 +601,7 @@ mod tests {
         config.expert_imitation = Some(super::super::ExpertImitation {
             scale: 2.0,
             action_weights: vec![0.05, 1.0, 2.0],
+            world_gradient: false,
         });
         let mut batch = SequenceBatch {
             previous_actions: vec![vec![0.0; 6]; 4],

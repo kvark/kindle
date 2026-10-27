@@ -127,6 +127,9 @@ pub struct WorldMetrics {
     /// Their frozen actor/critic heads route gradients into the posterior only.
     pub initial_policy_loss: f32,
     pub initial_value_loss: f32,
+    /// Trusted-action loss through the frozen actor, before scale/warmup gating.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expert_imitation_loss: Option<f32>,
     pub replay_reward_prediction_mean: f32,
     pub replay_reward_target_mean: f32,
     pub replay_reward_mae: f32,
@@ -1382,7 +1385,7 @@ impl DreamerCore {
         posterior: &PosteriorBatch,
         behavior: &mut BehaviorTrainingBatch,
     ) -> WorldMetrics {
-        if self.config.actor_critic_gradient {
+        if self.config.actor_critic_gradient || self.config.expert_world_gradient() {
             self.world_train.set_input(
                 "actor_update_scale",
                 &[self.config.actor_update_scale(self.learner_step)],
@@ -1538,6 +1541,17 @@ impl DreamerCore {
                         &format!("replay_value_weight_{local_time}"),
                         &replay_value_weight,
                     );
+                    if self.config.expert_world_gradient() {
+                        let target = world_expert_targets(
+                            &behavior.expert_action_target,
+                            &self.config,
+                            time,
+                            first_row,
+                            microbatch_rows,
+                        );
+                        self.world_train
+                            .set_input(&format!("expert_action_target_{local_time}"), &target);
+                    }
                     if self.config.actor_critic_gradient {
                         // Imagination is time-major; its first B*T rows are
                         // the posterior starts, with already-stopped targets.
@@ -1592,6 +1606,10 @@ impl DreamerCore {
                 #[cfg(test)]
                 meganeura::profiler::record_instant("phase:world_wait_done");
                 metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
+                if self.config.expert_world_gradient() {
+                    *metrics.expert_imitation_loss.get_or_insert(0.0) +=
+                        read_scalar(&self.world_train, world::LOSS_EXPERT);
+                }
                 metrics.reconstruction_loss +=
                     read_scalar(&self.world_train, world::LOSS_RECONSTRUCTION);
                 metrics.future_prediction_loss +=
@@ -1630,6 +1648,10 @@ impl DreamerCore {
         }
         let scale = 1.0 / pass_count as f32;
         metrics.total_loss *= scale;
+        if let Some(loss) = &mut metrics.expert_imitation_loss {
+            *loss *= scale;
+            assert!(loss.is_finite());
+        }
         metrics.reconstruction_loss *= scale;
         metrics.future_prediction_loss *= scale;
         metrics.exploration_loss *= scale;
@@ -2529,6 +2551,34 @@ fn row_slice(values: &[f32], first_row: usize, row_count: usize, row_width: usiz
     &values[start..end]
 }
 
+fn world_expert_targets(
+    targets: &[f32],
+    config: &DreamerConfig,
+    time: usize,
+    first_row: usize,
+    row_count: usize,
+) -> Vec<f32> {
+    assert!(time < config.batch_length && first_row + row_count <= config.batch_size);
+    assert_eq!(
+        targets.len(),
+        config.batch_size * (config.batch_length - 1) * config.action_count
+    );
+    if time + 1 == config.batch_length {
+        return vec![0.0; row_count * config.action_count];
+    }
+    // World losses average T states; the same behavior targets average T-1.
+    let correction = config.batch_length as f32 / (config.batch_length - 1) as f32;
+    row_slice(
+        targets,
+        time * config.batch_size + first_row,
+        row_count,
+        config.action_count,
+    )
+    .iter()
+    .map(|value| value * correction)
+    .collect()
+}
+
 fn world_training_config(config: &DreamerConfig) -> DreamerConfig {
     let mut world = config.clone();
     world.batch_size = config.world_microbatch_size();
@@ -3323,6 +3373,31 @@ mod tests {
         let values = (0..15).map(|value| value as f32).collect::<Vec<_>>();
         assert_eq!(row_slice(&values, 1, 3, 3), &values[3..12]);
         assert!(row_slice(&values, 5, 0, 3).is_empty());
+    }
+
+    #[test]
+    fn world_expert_targets_preserve_rows_masks_and_t_minus_one_normalization() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 2;
+        config.batch_length = 4;
+        let targets = vec![
+            0., 0., 2., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0.05, 0., 0., 0., 0., 0.,
+        ];
+        let mut full = Vec::new();
+        for time in 0..4 {
+            let a = world_expert_targets(&targets, &config, time, 0, 2);
+            let mut split = world_expert_targets(&targets, &config, time, 0, 1);
+            split.extend(world_expert_targets(&targets, &config, time, 1, 1));
+            assert_eq!(a, split);
+            full.extend(a);
+        }
+        for (actual, expected) in full[..18].iter().zip(&targets) {
+            assert_eq!(*actual, expected * (4.0 / 3.0));
+        }
+        assert_eq!(&full[18..], &[0.0; 6]);
+        let behavior_mean = targets.iter().sum::<f32>() / 6.0;
+        let world_mean = full.iter().sum::<f32>() / 8.0;
+        assert!((behavior_mean - world_mean).abs() < 1e-7);
     }
 
     #[test]

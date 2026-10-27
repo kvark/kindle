@@ -214,6 +214,13 @@ pub struct FeatureStandardization {
 pub struct ExpertImitation {
     pub scale: f32,
     pub action_weights: Vec<f32>,
+    /// Route the same trusted targets through the frozen actor into world state.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub world_gradient: bool,
+}
+
+fn is_false(value: &bool) -> bool {
+    !value
 }
 
 /// Configuration of the D3 baseline. Defaults use the upstream 12M preset;
@@ -521,6 +528,12 @@ impl DreamerConfig {
         1.0 - 1.0 / self.horizon as f32
     }
 
+    pub fn expert_world_gradient(&self) -> bool {
+        self.expert_imitation
+            .as_ref()
+            .is_some_and(|expert| expert.world_gradient)
+    }
+
     pub fn validate(&self) {
         if let Err(error) = self.check() {
             panic!("invalid Dreamer configuration: {error}");
@@ -756,18 +769,28 @@ mod tests {
             config.expert_imitation = Some(ExpertImitation {
                 scale,
                 action_weights: weights,
+                world_gradient: false,
             });
             assert!(config.check().unwrap_err().contains("expert imitation"));
         }
         config.expert_imitation = Some(ExpertImitation {
             scale: 2.0,
             action_weights: vec![0.05, 0.0, 1.0],
+            world_gradient: false,
         });
         config.check().unwrap();
         let encoded = serde_json::to_value(&config).unwrap();
         assert!(encoded.get("expert_imitation").is_some());
+        assert!(encoded["expert_imitation"].get("world_gradient").is_none());
         assert_eq!(
             serde_json::from_value::<DreamerConfig>(encoded).unwrap(),
+            config
+        );
+        config.expert_imitation.as_mut().unwrap().world_gradient = true;
+        assert!(config.expert_world_gradient());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(serde_json::to_value(&config).unwrap())
+                .unwrap(),
             config
         );
     }

@@ -24,6 +24,9 @@ import profile_atari_vector
     (["--guidance-imitation-scale", "1e-300"], "scale must be positive"),
     (["--guidance-imitation-scale", "1"], "requires fresh guided training"),
     (["--guidance-noop-weight", ".05"], "requires imitation"),
+    (["--guidance-world-gradient"], "world gradient requires imitation"),
+    (["ALE/Qbert-v5", "--restore", "unused", "--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-world-gradient"], "training overrides"),
+    (["--evaluate", "--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-world-gradient"], "requires fresh guided training"),
     (["--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-noop-weight", "0"], "NOOP weight must"),
     (["--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-noop-weight", "nan"], "NOOP weight must"),
     (["--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-noop-weight", "2"], "NOOP weight must"),
@@ -154,6 +157,51 @@ def test_runner_forwards_imagination_length_before_gpu(monkeypatch, tmp_path, le
                                     *(["--imagination-length", str(length)] if length is not None else [])])
     with pytest.raises(RuntimeError, match="rollout length checked before GPU"):
         atari_vector.main()
+
+
+@pytest.mark.parametrize("world_gradient", [False, True])
+def test_runner_expert_world_gradient_is_explicit_before_gpu(monkeypatch, tmp_path, world_gradient):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  action_meanings=["NOOP"] + [f"action{i}" for i in range(1, 18)],
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        expected = dict(scale=1.0, action_weights=[.05] + [1.0] * 17)
+        if world_gradient:
+            expected["world_gradient"] = True
+        assert config["expert_imitation"] == expected
+        raise RuntimeError("expert world gradient checked before GPU")
+
+    def act(self, action_overrides=None, expert_actions=None):
+        raise AssertionError("no native action should run")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct, act=act,
+                                                            SUPPORTS_EXPERT_WORLD_GRADIENT=True))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "ALE/Qbert-v5", "--output", str(tmp_path / "expert.jsonl"),
+                                    "--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1",
+                                    "--guidance-noop-weight", ".05",
+                                    *(["--guidance-world-gradient"] if world_gradient else [])])
+    with pytest.raises(RuntimeError, match="expert world gradient checked before GPU"):
+        atari_vector.main()
+
+
+def test_runner_rejects_old_native_for_expert_world_gradient(monkeypatch, tmp_path, capsys):
+    def act(self, action_overrides=None, expert_actions=None):
+        raise AssertionError("no native action should run")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(act=act))
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("must reject before environment"))
+    output = tmp_path / "never.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "ALE/Qbert-v5", "--output", str(output),
+                                    "--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1",
+                                    "--guidance-world-gradient"])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert "requires native world-gradient support" in capsys.readouterr().err
+    assert not output.exists()
 
 
 @pytest.mark.parametrize("actor_critic_gradient", [False, True])

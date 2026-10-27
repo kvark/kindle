@@ -1823,12 +1823,23 @@ mod tests {
     #[test]
     #[ignore = "requires a separately guarded expert replay/actor update check"]
     fn expert_actions_are_explicit_and_train_the_replay_actor() {
+        check_expert_actions(false);
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded expert world update check"]
+    fn expert_world_loss_matches_the_preupdate_replay_actor_loss() {
+        check_expert_actions(true);
+    }
+
+    fn check_expert_actions(world_gradient: bool) {
         let mut config = config();
         config.learning_rate_warmup = 0;
         config.loss_scales.policy = 0.0;
         config.expert_imitation = Some(super::super::super::ExpertImitation {
             scale: 2.0,
             action_weights: vec![0.05, 1.0, 1.0],
+            world_gradient,
         });
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         assert_eq!(
@@ -1897,6 +1908,16 @@ mod tests {
         let report = vector.learn().unwrap();
         let expert = report.behavior.expert_imitation.unwrap();
         assert!(expert.labeled_rows > 0 && expert.weight_sum > 0.0 && expert.loss > 0.0);
+        if world_gradient {
+            let world_loss = report.world.expert_imitation_loss.unwrap();
+            assert!(
+                (world_loss - expert.loss).abs() < 2e-4,
+                "{world_loss} != {}",
+                expert.loss
+            );
+        } else {
+            assert_eq!(report.world.expert_imitation_loss, None);
+        }
         let mut after = vec![0.0; 3];
         vector
             .learner

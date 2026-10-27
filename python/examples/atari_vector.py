@@ -134,6 +134,8 @@ def main():
                         help="fresh guided training only: native supervised actor loss on expert actions")
     parser.add_argument("--guidance-noop-weight", type=float,
                         help="relative NOOP target weight for expert imitation; default1")
+    parser.add_argument("--guidance-world-gradient", action="store_true",
+                        help="fresh imitation only: route expert loss through the frozen actor into world state")
     args = parser.parse_args()
     if args.num_envs <= 0 or args.steps <= 0 or args.steps % args.num_envs:
         parser.error("steps must be a positive multiple of num-envs")
@@ -196,6 +198,8 @@ def main():
             parser.error("guidance NOOP weight requires imitation")
         if not positive_f32(args.guidance_noop_weight) or args.guidance_noop_weight > 1:
             parser.error("guidance NOOP weight must be positive F32 and at most1")
+    if args.guidance_world_gradient and args.guidance_imitation_scale is None:
+        parser.error("guidance world gradient requires imitation")
     if args.qbert_guidance_policy is not None and not args.qbert_guidance_probability:
         parser.error("Qbert guidance policy requires positive guidance probability")
     if args.qbert_guidance_policy == "continuation" and args.qbert_guidance_max_actions is None:
@@ -224,7 +228,7 @@ def main():
     training_options.add("--qbert-guidance-max-actions")
     training_options.add("--qbert-guidance-policy")
     training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions"))
-    training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight"))
+    training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-world-gradient"))
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
@@ -248,6 +252,8 @@ def main():
         parser.error("persistent exploration requires native vector action overrides")
     if args.guidance_imitation_scale is not None and "expert_actions" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("guidance imitation requires native expert-action support")
+    if args.guidance_world_gradient and not getattr(kindle.VectorAgent, "SUPPORTS_EXPERT_WORLD_GRADIENT", False):
+        parser.error("guidance world gradient requires native world-gradient support")
     if args.restore and args.encoder:
         metadata = json.loads((args.restore / "metadata.json").read_text())
         if (metadata.get("perception") or {}).get("kind") != args.encoder:
@@ -343,6 +349,8 @@ def main():
             noop = environments[0].action_meanings.index("NOOP")
             weights[noop] = args.guidance_noop_weight if args.guidance_noop_weight is not None else 1.0
             config["expert_imitation"] = dict(scale=args.guidance_imitation_scale, action_weights=weights)
+            if args.guidance_world_gradient:
+                config["expert_imitation"]["world_gradient"] = True
         if learned_rgb:
             config["observation_kind"] = f"rgb{args.image_size or 64}"
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)

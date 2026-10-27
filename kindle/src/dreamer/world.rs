@@ -8,8 +8,8 @@ use super::config::{DreamerConfig, FeatureStandardization, ObservationKind};
 use super::exploration::Disagreement;
 use super::networks::{
     FeatureDecoder, MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl,
-    feature, gumbel_sample, mixed_probabilities, scale, slice_columns, straight_through_sample,
-    sum, weighted_cross_entropy,
+    feature, gumbel_sample, mixed_log_probabilities, mixed_probabilities, scale, slice_columns,
+    straight_through_sample, sum, weighted_cross_entropy,
 };
 use crate::vision::levjepa::joint;
 #[cfg(test)]
@@ -29,6 +29,7 @@ pub const ENCODER_SPREAD: usize = 10;
 pub const LOSS_INITIAL_POLICY: usize = 11;
 pub const LOSS_INITIAL_VALUE: usize = 12;
 pub const LOSS_EXPLORATION: usize = 13;
+pub const LOSS_EXPERT: usize = 14;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 mod cdp;
@@ -201,7 +202,7 @@ impl WorldModel {
                 3,
                 config.value_bins,
             ),
-            actor: config.actor_critic_gradient.then(|| {
+            actor: (config.actor_critic_gradient || config.expert_world_gradient()).then(|| {
                 MlpHead::new(
                     graph,
                     "behavior.actor",
@@ -328,6 +329,7 @@ fn training_graph(
     let mut replay_value_losses = Vec::with_capacity(length);
     let mut initial_policy_losses = Vec::new();
     let mut initial_value_losses = Vec::new();
+    let mut expert_losses = Vec::new();
     let mut deters = Vec::new();
     let mut stochs = Vec::new();
 
@@ -490,6 +492,9 @@ fn training_graph(
                 target("initial_slow_target", config.value_bins),
             )
         });
+        let expert_target = config
+            .expert_world_gradient()
+            .then(|| target("expert_action_target", config.action_count));
         let reward_weight = graph.constant(vec![1.0; rows], &[rows, 1]);
 
         if let Some(predictor) = &model.future_predictor {
@@ -592,6 +597,25 @@ fn training_graph(
                 weight,
             ));
         }
+        if let Some(target) = expert_target {
+            let logits = model
+                .actor
+                .as_ref()
+                .unwrap()
+                .forward_frozen(&mut graph, state);
+            let log_probabilities = mixed_log_probabilities(
+                &mut graph,
+                logits,
+                rows,
+                config.action_count,
+                config.actor_unimix,
+            );
+            expert_losses.push(behavior::action_cross_entropy(
+                &mut graph,
+                log_probabilities,
+                target,
+            ));
+        }
     }
 
     let average = 1.0 / length as f32;
@@ -630,6 +654,8 @@ fn training_graph(
         total
     };
     let mut initial_losses = None;
+    let actor_scale = (config.actor_critic_gradient || config.expert_world_gradient())
+        .then(|| graph.input("actor_update_scale", &[1]));
     let total = if config.actor_critic_gradient {
         // Upstream averages over H imagined losses. The other H-1 states
         // contribute behavior gradients but no world/encoder gradients.
@@ -640,8 +666,7 @@ fn training_graph(
         let value = scale(&mut graph, value, average);
         initial_losses = Some((policy, value));
         let policy = scale(&mut graph, policy, scales.policy);
-        let actor_scale = graph.input("actor_update_scale", &[1]);
-        let policy = graph.mul(policy, actor_scale);
+        let policy = graph.mul(policy, actor_scale.unwrap());
         let value = scale(&mut graph, value, scales.value);
         sum(&mut graph, &[total, policy, value])
     } else {
@@ -654,6 +679,21 @@ fn training_graph(
             joint::REGULARIZATION_WEIGHT,
         );
         graph.add(total, regularizer)
+    } else {
+        total
+    };
+    let expert_loss = config.expert_world_gradient().then(|| {
+        let loss = sum(&mut graph, &expert_losses);
+        scale(&mut graph, loss, head_average)
+    });
+    let total = if let Some(loss) = expert_loss {
+        let scaled = scale(
+            &mut graph,
+            loss,
+            config.expert_imitation.as_ref().unwrap().scale,
+        );
+        let scaled = graph.mul(scaled, actor_scale.unwrap());
+        graph.add(total, scaled)
     } else {
         total
     };
@@ -679,6 +719,12 @@ fn training_graph(
     }
     if config.uses_disagreement() {
         outputs.push(exploration_loss);
+    }
+    if let Some(loss) = expert_loss {
+        while outputs.len() < LOSS_EXPERT {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.push(loss);
     }
     if sample_posterior {
         outputs.push(stack_time(&mut graph, &deters, batch, size.deter));
@@ -1302,6 +1348,217 @@ mod tests {
                 assert_eq!(checked, 148);
             }
         }
+    }
+
+    fn expert_gradient_config() -> DreamerConfig {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 2;
+        config.batch_length = 2;
+        config.world_backprop_length = 2;
+        config.observation_kind = ObservationKind::Rgb32;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 1.0;
+        config.cdp_centered = true;
+        config.disagreement_bonus = false;
+        config.expert_imitation = Some(super::super::ExpertImitation {
+            scale: 1.0,
+            action_weights: vec![0.05, 1.0, 1.0],
+            world_gradient: true,
+        });
+        config
+    }
+
+    #[test]
+    fn expert_world_loss_connects_cnn_and_posterior_but_freezes_actor() {
+        use meganeura::graph::Op;
+        let mut config = expert_gradient_config();
+        for staged in [false, true] {
+            for actor_gradient in [false, true] {
+                config.actor_critic_gradient = actor_gradient;
+                let mut graph = if staged {
+                    build_staged_training_graph(&config)
+                } else {
+                    build_training_graph(&config, 2)
+                };
+                let names = graph
+                    .nodes()
+                    .iter()
+                    .filter_map(|node| match &node.op {
+                        Op::Input { name } => Some(name),
+                        _ => None,
+                    })
+                    .collect::<Vec<_>>();
+                assert_eq!(
+                    names
+                        .iter()
+                        .filter(|name| name.as_str() == "actor_update_scale")
+                        .count(),
+                    1
+                );
+                assert_eq!(
+                    names
+                        .iter()
+                        .filter(|name| name.starts_with("expert_action_target_"))
+                        .count(),
+                    2
+                );
+                graph.set_outputs(vec![graph.outputs()[LOSS_EXPERT]]);
+                let backward = meganeura::autodiff::differentiate(&graph);
+                let mut cnn = 0;
+                let mut posterior = 0;
+                let mut actor = 0;
+                for (parameter, &gradient) in graph
+                    .nodes()
+                    .iter()
+                    .filter(|node| matches!(node.op, Op::Parameter { .. }))
+                    .zip(&backward.outputs()[1..])
+                {
+                    let Op::Parameter { name } = &parameter.op else {
+                        unreachable!()
+                    };
+                    let connected = backward.node(gradient).ty == parameter.ty;
+                    if name.starts_with("world.representation.encoder.") {
+                        assert!(connected, "{name}");
+                        cnn += 1;
+                    } else if name.starts_with("world.representation.posterior.") {
+                        assert!(connected, "{name}");
+                        posterior += 1;
+                    } else if name.starts_with("behavior.") {
+                        assert!(!connected, "expert world loss trained {name}");
+                        actor += usize::from(name.starts_with("behavior.actor."));
+                    }
+                }
+                assert!(cnn > 0 && posterior > 0 && actor > 0);
+            }
+        }
+        config.actor_critic_gradient = false;
+        config.expert_imitation.as_mut().unwrap().world_gradient = false;
+        let disabled = build_training_graph(&config, 2);
+        config.expert_imitation = None;
+        let baseline = build_training_graph(&config, 2);
+        assert_eq!(disabled.outputs(), baseline.outputs());
+        assert_eq!(
+            format!("{:?}", disabled.nodes()),
+            format!("{:?}", baseline.nodes())
+        );
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded GPU"]
+    fn isolated_expert_world_loss_has_masked_cnn_gradients_and_frozen_actor() {
+        use super::super::runtime::{
+            build_training_session, configure_d3_optimizer, initialize_d3,
+        };
+        use meganeura::graph::Op;
+        use std::sync::Arc;
+        let mut config = expert_gradient_config();
+        config.learning_rate_warmup = 0;
+        let mut graph = build_training_graph(&config, 2);
+        graph.set_outputs(vec![graph.outputs()[LOSS_EXPERT]]);
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!gpu.device_information().is_software_emulated);
+        let mut session = build_training_session(&graph, &gpu, &config);
+        initialize_d3(&mut session, &graph, 103);
+        for node in graph.nodes() {
+            let Op::Input { name } = &node.op else {
+                continue;
+            };
+            if session.input_buffer(name).is_none() {
+                continue;
+            }
+            let width = *node.ty.shape.last().unwrap();
+            let time = name
+                .rsplit('_')
+                .next()
+                .unwrap()
+                .parse::<usize>()
+                .unwrap_or(0);
+            let values = (0..node.ty.num_elements())
+                .map(|i| {
+                    if name.starts_with("observation_") {
+                        (i as f32 * 0.013 + time as f32).sin() * 0.4
+                    } else if name.starts_with("keep_") {
+                        1.0
+                    } else if name.starts_with("expert_action_target_") {
+                        // Only the outgoing action of the first state is labeled.
+                        if time == 0 && i % width == (i / width + 1) % width {
+                            2.0
+                        } else {
+                            0.0
+                        }
+                    } else if name == "initial_deter" {
+                        (i as f32 * 0.17).sin() * 0.2
+                    } else {
+                        f32::from(i % width == (i / width + time) % width)
+                    }
+                })
+                .collect::<Vec<_>>();
+            session.set_input(name, &values);
+        }
+        let names = session
+            .param_names()
+            .iter()
+            .map(|name| name.to_string())
+            .collect::<Vec<_>>();
+        let refs = names.iter().map(String::as_str).collect::<Vec<_>>();
+        let before = session.read_params(&refs);
+        session.clear_optimizer();
+        session.step();
+        session.wait();
+        let loss = session.read_loss();
+        assert!(loss.is_finite() && loss > 0.0);
+        let mut cnn_gradient = 0.0f64;
+        let mut posterior_gradient = 0.0f64;
+        for name in &names {
+            if name.starts_with("world.representation.") {
+                let mut gradient = vec![0.0; session.param_size(name).unwrap()];
+                session.read_param_grad(name, &mut gradient);
+                assert!(gradient.iter().all(|g| g.is_finite()), "{name}");
+                let norm = gradient.iter().map(|&g| f64::from(g).powi(2)).sum::<f64>();
+                if name.starts_with("world.representation.encoder.") {
+                    cnn_gradient += norm;
+                } else {
+                    posterior_gradient += norm;
+                }
+            }
+        }
+        assert!(cnn_gradient > 0.0 && posterior_gradient > 0.0);
+        configure_d3_optimizer(&mut session, &config, 0, config.learning_rate);
+        session.step();
+        session.wait();
+        let after = session.read_params(&refs);
+        let mut cnn_changed = false;
+        for ((name, a), b) in names.iter().zip(&before).zip(&after) {
+            assert!(b.iter().all(|value| value.is_finite()), "{name}");
+            if name.starts_with("behavior.") {
+                assert_eq!(a, b, "{name}");
+            }
+            if name.starts_with("world.representation.encoder.") {
+                cnn_changed |= a != b;
+            }
+        }
+        assert!(cnn_changed);
+        session.clear_optimizer();
+        for time in 0..2 {
+            session.set_input(&format!("expert_action_target_{time}"), &[0.0; 6]);
+        }
+        session.step();
+        session.wait();
+        assert_eq!(session.read_loss(), 0.0);
+        for name in &names {
+            if name.starts_with("world.representation.") {
+                let mut gradient = vec![0.0; session.param_size(name).unwrap()];
+                session.read_param_grad(name, &mut gradient);
+                assert!(gradient.iter().all(|&value| value == 0.0), "{name}");
+            }
+        }
+        eprintln!(
+            "isolated expert loss={loss}, CNN gradient squared norm={cnn_gradient}, posterior gradient squared norm={posterior_gradient}; masked loss/gradients zero, actor parameters unchanged"
+        );
     }
 
     #[test]

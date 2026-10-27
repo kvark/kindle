@@ -87,7 +87,11 @@ pub(crate) fn policy_loss(
     (policy, mean_entropy, weighted_entropy)
 }
 
-fn action_cross_entropy(graph: &mut Graph, log_probabilities: NodeId, target: NodeId) -> NodeId {
+pub(crate) fn action_cross_entropy(
+    graph: &mut Graph,
+    log_probabilities: NodeId,
+    target: NodeId,
+) -> NodeId {
     let terms = graph.mul(target, log_probabilities);
     let loss = graph.sum_inner(terms);
     let loss = graph.mean_all(loss);
@@ -272,6 +276,7 @@ mod tests {
         config.expert_imitation = Some(super::super::ExpertImitation {
             scale: 1.0,
             action_weights: vec![0.05, 1.0, 1.0],
+            world_gradient: false,
         });
         let expert = build_training_graph(&config, 12, 6);
         let parameters = |graph: &Graph| {
