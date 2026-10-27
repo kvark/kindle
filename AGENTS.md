@@ -99,6 +99,12 @@ or automatic next allocation. The geometry helper passes24 CPU tests; native
 unchanged. See [forecast results](docs/results/2026-10-25-cdp-cheap-qbert.md#compact-qbert-learns-reward-forecasts-despite-weak-task-performance). Check live state before GPU work.
 
 
+Current selection: bounded Pong12M48/Auto/N8/B16/T16/H15/R16, coefficient.01,
+no aid;16,384 actions/1,001 updates plus1024 frozen restore actions.
+Training cap180s; no full run or automatic promotion. Owner
+`kindle-pong-12m48-b16-r16-check-20261027`; see [protocol](docs/experiments/2026-10-27-cdp-pong-capacity-r16.md).
+Check live state before GPU work.
+
 Fresh Qbert4013 expert500k/R16 completes **500k actions /1,998,773 frames
 /62,470 updates in28m20s**. Frozen **3752.083 /21 of24 first pyramids** versus
 own initial182.292 /0 improves200k/R32's3153.125 /17, but costs40.88% more
@@ -108,7 +114,7 @@ identical initial semantic traces, full pixel/action replays, guards, curves,
 coverage, exposure and comparison pass. All67 declared pins stay unchanged.
 Service exits00:48:34 UTC on October27; postprocessing completes00:48:42.
 Keep both measured budget points; no extension or seed confirmation is selected.
-No GPU work is active or queued. This reuses4013 after its stronger result,
+This completed comparison reuses4013 after its stronger result,
 changes budget and ratio together, and is not independent seed confirmation.
 CPU teacher prototypes remain external and unselected. See
 [completed result](docs/results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r16-improves-first-pyramid-success-with-higher-cost)
