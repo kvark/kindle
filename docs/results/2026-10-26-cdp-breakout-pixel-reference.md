@@ -96,3 +96,66 @@ Artifacts:`/x/Temp/kindle-cheap-20261025/breakout-pixel-guidance-dev`;
 policy`breakout_pixel_policy_v1.py`, driver`run_breakout_pixel_dev_v1.py` in its
 parent. Review SHA256`5e1da37bae09609ea96a905715a72d3f2777e6556bb1f22217d810d6bcff3c9e`;
 trace`7061274507cea3ac771ef75cf271563cf5668ba63f01c8253dc8ec34c0ebc1f5`.
+
+## Calibrated paddle response improves the reference but misses the two-wall gate
+
+A revised CPU reference scores **166.167 across24 natural episodes**, with
+**0/24 two-wall successes**. The older position follower and two-frame reference
+score11.333 and20.292 on the same evaluation protocol. This is reference control,
+not learned Kindle performance or evidence that guidance transfers to a learner.
+No training integration or GPU allocation is selected from this result.
+
+An exact replay of the retained9001 development episode reproduces31 points,
+1018 actions/4071 frames and all five life losses. The saved controller repeatedly
+crosses its predicted landing point before those losses. Retrospective life
+counts label the failures only; they never enter the policy. Native snapshots
+were inspected. This concerns the reference controller, not a diagnosis of
+Kindle's representation or policy.
+
+Using only saved pixel centroids and chosen actions, a four-coefficient linear
+model predicts the next paddle displacement from a constant, previous observed
+displacement, current direction and previous direction. Fit426 interior samples
+before step680; the later204 samples have RMSE3.444 pixels. On29 later NOOP
+samples, RMSE3.124 versus10.049 for the previous0.75-displacement estimate.
+This chronological split is within one reused episode, not an independent
+trajectory or validation at walls. The exploratory fit first had a CPU indentation
+error, corrected before calibration and rollouts; no GPU work was repeated.
+
+The new rule uses that fixed response model to score243 five-action plans over
+NOOP/LEFT/RIGHT, retaining the latest landing estimate when the ball reaches the
+bottom of the detector crop. It keeps the existing native RGB detector and
+FIRE fallback. Paddle clipping and constant-velocity ball projection remain
+hand-written assumptions. Response control and late-ball tracking change
+together; the result does not isolate either change.
+
+On9001, the new rule scores64 in1055 actions/4217 frames, with exact replay.
+It then scores144.875 versus23.750 for the original damped rule on eight fixed
+first natural episodes; both0/8 two-wall successes. Every saved input/output
+pixel hash, action, reward, frame count and boundary replays exactly. These
+development checks precede the standard24 selection; that cohort includes
+the same eight episodes, whose complete traces match exactly. Do not count
+them as independent confirmation.
+
+The standard24 run keeps eight independent environments, full18/sticky.25/
+repeat4/noops0/native max-pooled RGB and eval4000001009. First three natural
+episodes per lane,600k aggregate-action/180-second collection cap. It completes
+43,496 actions/173,949 emulator frames in20.899s, collecting27 natural episodes
+and retaining three excess episodes plus eight partial tails. Zero truncations.
+Selected returns range16–405. Independent recorded-action replay takes19.950s
+and verifies every recorded input/output pixel hash, reward, boundary, frame
+count, episode and tail; a complete stream0 video is retained.
+
+All diagnostics/calibration/reference collection and replay total55.935 CPU
+seconds on one affined low-priority core alongside the active Pong learner.
+This is a co-host timing caveat. All42 Pong input pins remain unchanged, with
+the same PID66140/invocation; no agent, native weights or active runtime changed.
+The reference is a possible guidance candidate, still far below the unchanged
+two-wall gate and not a native learning result.
+
+Artifacts:`/x/Temp/kindle-breakout-control-20261027`.
+Eight-episode comparison SHA256:
+`42dced746cb295836cb92b6d3480abf175e7f359e96c040df9ca98816135d47e`.
+Standard24 review:
+`7992b6d31b278a2d3995ee477fbfc625207477b59bb19b0a4ea3671b999caf4b`.
+`reference-summary.json` pins the diagnostics, calibration, policies, drivers,
+reviews and exact eight-episode overlap check. All artifacts remain outside Git.

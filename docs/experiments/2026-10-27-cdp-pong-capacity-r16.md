@@ -64,8 +64,9 @@ final31227. No smoke checkpoint, replay, belief, environment or RNG is reused.
 Fixed final and own actual initial each assess the first three natural matches
 per eight streams, with eval4000001009, sampled actions and no aid. Keep the
 original mean15/90%-wins gate; zero updates/truncations and346 unchanged tensors
-per frozen arm. Each arm has600k-action/300-second caps. Complete replay checks
-pixels, actions, rewards, frames and episode boundaries, with videos. Training
+per frozen arm. Each arm has600k-action/300-second caps. Complete recorded-action replay checks
+rewards, frames and episode boundaries, with reconstructed videos. Ordinary
+unguided runs do not record live pixel hashes for direct image comparison. Training
 must pass all finite reports, exact configuration/source/counters and guards;
 startup compares all346 initial tensors and the prelearning trajectory against
 the bounded check. All four recoveries must be audited before replacement.
@@ -100,3 +101,31 @@ Progress,100k-recovery and terminal CPU postprocessing observers are attached.
 This is startup evidence; no full-run quality or completion claim.
 Startup receipt SHA256:`077ba1494d6fb928464c8cbc4cecce7b0338086e34f4178f51e819c79d514e2e`.
 Launch declaration SHA256:`11f2eef80e359cf510e07ef49cd47cdbc07301b2c4e4c013953da5cca6fbf911`.
+
+
+## Recovery and replay scope update
+
+The100k/6227-update recovery passes01:16:51 UTC: all346 tensors finite,
+complete log prefix106,408 actions/6627 finite reports. The200k/12,477 recovery
+passes01:24:52: prefix203,064 actions/12,668 finite reports. Last progress at
+200,704/12,521 uses994.253s and residual credit.5. The original learner remains
+PID66140/invocationee2a9c4847594b40baf4aa99d3e034a3. Recovery receipts:
+`3af96d06551bf68519a20268629936d559f0347a11490cccf05b778c6ec9a39f` and
+`08fc6abbd4d6f057772073f2799d70db3851844b2d71af29682dadf364793824`.
+
+Source inspection corrects the earlier wording that ordinary frozen replay
+checks live pixels directly. The runner records input pixel hashes only for
+guided transitions. Unguided Pong replay verifies every recorded action's
+reward, flags, frame count, episode outcome and tail, and reconstructs video
+with a replay-time raw-frame hash. It cannot compare images against absent
+live hashes. The original declaration is retained; direct live/replay pixel
+hash comparison is not supported by this allocation. No source/runtime is
+changed, no GPU stage is repeated, and no score gate is changed. Scope review
+`b32662ce9c2fe200d896c3f2bf71a8c77af6ac1af5842e6ad1812b550b0fca88`.
+
+Independent Breakout CPU reference development totals55.935s of collection,
+calibration and replay on one affined low-priority core during this learner.
+All42 active pins remain unchanged afterward. Retain this co-host timing caveat.
+The reference scores166.167/0of24 two-wall successes; it supplies no training
+input and selects no subsequent allocation. See the
+[reference result](../results/2026-10-26-cdp-breakout-pixel-reference.md#calibrated-paddle-response-improves-the-reference-but-misses-the-two-wall-gate).

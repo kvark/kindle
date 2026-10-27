@@ -276,8 +276,17 @@ check passes in78.872s,16.14% below4M/B8 prefix; this is not competence.
 Owner`kindle-pong-12m48-b16-r16-500k-20261027`; native/CLI79c9a7f unchanged.
 Startup passes346 matched initial tensors,47 prelearning transitions and
 first376/392/408/424/440/456 updates; monitors are attached.
+100k/6227 and200k/12,477 recovery audits pass; same service remains active.
+Ordinary frozen replay checks outcomes and reconstructs video; live pixel
+hashes are not recorded. See the protocol correction.
 No cap increase, extension or automatic next allocation. See [protocol](experiments/2026-10-27-cdp-pong-capacity-r16.md).
 Check live state before GPU work.
+
+CPU Breakout predictive reference scores166.167 across24 natural episodes,
+0/24 two-wall successes; full input/output pixel-hash replay passes. Selected
+after one9001 and eight reused evaluation episodes; those8 are included in24.
+No native learner or guidance integration is selected.55.935s affined CPU work
+co-hosted with Pong; all42 active pins unchanged. See [reference result](results/2026-10-26-cdp-breakout-pixel-reference.md#calibrated-paddle-response-improves-the-reference-but-misses-the-two-wall-gate).
 
 Fresh Qbert4013 expert500k/R16 completes **500k actions /1,998,773 frames
 /62,470 updates in28m20s**. Frozen **3752.083 /21 of24 first pyramids** versus
