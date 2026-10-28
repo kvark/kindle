@@ -2574,3 +2574,14 @@ It motivates a separate bounded wait-weight check, not extending this life.
 Artifacts:`/x/Temp/kindle-qbert-corrective-full-20261028` and
 `/x/Temp/kindle-qbert-passive-review-20261028`. See the
 [completed protocol, timing and receipts](../experiments/2026-10-28-cdp-qbert-corrective-labels.md#completed-fresh200k-comparison).
+
+
+The separate equal-wait-weight/R32 check passes4096 actions/16,381 frames/963
+updates in43.238s, then1024 frozen/.495s with zero updates/no natural episodes.
+All36 pins,357 matching initial/unchanged frozen tensors,finite aligned expert
+losses,equal labeled-row/weight sums,parameter changes,full replay and guards
+pass. Service exits18:15:27 UTC on October28; native unchanged, no GPU repeat.
+This is execution/early-cost evidence only. A fresh100k/R32/all-weight1 comparison
+is separately selected, with roughly the same update count as200k/R16, half the
+experience and a30-minute cap. No full allocation is active at this milestone.
+See the [wait-labels protocol](../experiments/2026-10-28-cdp-qbert-wait-labels.md).

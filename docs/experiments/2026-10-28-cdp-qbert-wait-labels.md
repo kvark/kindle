@@ -1,6 +1,6 @@
 # Qbert wait-label weighting and a cheaper experience budget
 
-**One bounded native check is selected; no full learner is selected.** The
+**The bounded check passes; a separate fresh100k comparison is selected.** The
 completed corrective200k/R16 recipe scores3633.333/17 first pyramids for25m57s,
 below its control3670.833/19 in21m28s. Retain the control. The completed life
 is terminal and will not be extended or reused.
@@ -42,3 +42,62 @@ pin the existing runtime, source, controls, queue and auditors in
 the device is healthy and no other GPU job is active. Stop on real faults or
 nonfinite reports; no driver recovery. Exact declaration and live identities
 will be recorded externally and results added here.
+
+
+## Completed bounded check
+
+Fresh4096 actions /16,381 emulator frames /963 updates take43.238s. Frozen1024
+/4096 frames take.495s, with zero updates and no completed natural episodes.
+All36 pins,357 initial tensors matching the completed corrective control,357
+invariant frozen tensors,finite reports,CNN/reward/actor/value changes,complete
+teacher-label/input-pixel/actual-action replay and both host guards pass.
+All963 reports are supervised;115,504 labeled replay rows have exactly115,504
+weight sum, and max world/actor expert-loss difference is8e−7.4096 labels include
+836 movement recommendations,2048 passive labels and1582 actual/teacher
+disagreements.2048 overrides are50% of actions, distinct from20% episode
+selection. No cap-release or frozen competence claim follows this short check.
+
+Service starts18:14:21 UTC/source`309a0a0`, PID189010/invocation
+`e991d8264e4246c09be110d641b50454`, and succeeds18:15:27 on October28.
+Whole service1m05.521s. No GPU stage repeats or cap changes. Native and packaged
+Python are unchanged. First six report pairs are248/1,256/2,256/3,264/4,264/5,
+272/6; first update248/debt0. Declaration
+`7910f87fe67f86ed797a7a5f70179c28e48e521a40cbc31cea6463a0d17f9eeb`;
+review`dd2132a5b7a5b9ce6b7a5547741db5fdf4d2d4975450b9467ba9116618b7b67b`;
+completion`dc80b5680ff6b3848782505b93662dc896189e6e88305816a2148be841c16215`.
+
+## Separately selected fresh100k comparison
+
+The early rate projects17m36s/100k, motivating one fresh fixed-budget test under
+a30-minute training cap. Use exactly the bounded4M48/Auto/N8/B8/T16/H15/R32/
+coefficient1/actor0/full18/original-rate recipe,20%episode continuation/cap1920/
+expert1/world gradients/corrective labels and all18 action weights1. Seed4013,
+evaluation4000004013. Do not restore or reuse the bounded/control weights,
+replay, live belief, games or RNG. No settings are tuned during the life.
+
+At100k aggregate actions expect24,939 updates, first248/debt0; save/audit50k
+recovery at12,439 updates and fixed final. This is close to the completed
+200k/R16's24,970 updates, with half the environment/teacher experience. Wait
+weight.05→1, ratio16→32 and budget200k→100k change together; compare complete
+recipe quality/cost, not an isolated causal effect. Primary retained corrective
+control3633.333/17 in25m57s; retained forced-only world control3670.833/19 in
+21m28s and5%/R32/world-off4730.208/23 are contextual. Same native/Python runtime,
+model, geometry, teacher, episode probability, cap and rates; require357 matching
+initial tensors and identical paired initial semantic traces. Seed/cohort are
+reused development evidence, not independent confirmation.
+
+Evaluate fixed final and own actual initial with sampled actions, no labels or
+guidance, first3 natural episodes per8 lanes=24 each. Original mean15000/90%-
+first-pyramid gate, zero truncations/updates,357 invariant frozen tensors and
+full recorded-outcome replay. Training requires complete teacher-label/input-
+pixel/actual-action replay, finite reports and equal-weight counts, explicit
+config/source/host/counters, curves, coverage, exposure and comparison. Ordinary
+frozen logs lack live pixel hashes; do not claim direct live-image equality.
+Online guided returns are not unaided competence.
+
+Training cap1800s; each frozen arm300s/600k actions; training replay600s;
+CPU audit1200s; owning service3900s. No retry, cap increase, extension, checkpoint
+selection or automatic successor. Preparation must pin the exact queue/runtime/
+auditors and verify the current device and terminal predecessor before launch.
+Full root`/x/Temp/kindle-qbert-wait-full-20261028`; no full allocation is active
+at this selection milestone.

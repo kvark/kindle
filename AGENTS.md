@@ -226,8 +226,15 @@ correction preserves original data/pins. Retain control; no extension/confirmati
 200k labels include103,712 passive states;96,288 overrides are48.144%. Late
 passive teacher/learner NOOP frequencies79.447%/46.077% suggest checking wait-label
 weight, not a causal diagnosis. Root`/x/Temp/kindle-qbert-corrective-full-20261028`.
-See the corrective-labels protocol/completed cheap-Qbert result and separately
-selected wait-label bounded check. No full successor is selected; check live state.
+See the corrective-labels protocol/completed cheap-Qbert result. The separate
+R32/wait-weight1 check passes4096 actions/16,381 frames/963 updates in43.238s,
+1024 frozen/.495s,36 pins,357 initial/frozen tensors,equal row/weight sums,full
+replay and guards; exits18:15:27 UTC. No natural frozen episodes. Early17m36s/
+100k projection supports a separately selected fresh100k/24,939-update comparison,
+50k recovery and fixed24-episode final/own-initial evaluation under a30-minute
+training cap. Same runtime; wait weight/ratio/budget change together on reused4013.
+Full root`/x/Temp/kindle-qbert-wait-full-20261028`; selected, not launched at this
+milestone. See the wait-labels protocol and check live state before GPU work.
 
 
 
