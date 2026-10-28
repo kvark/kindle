@@ -65,3 +65,15 @@ Owner:`kindle-qbert-world-r16-p20-200k-20261028`. The external declaration pins
 the exact controller, runtime, audit helpers and control evidence. Review the
 fixed outcome before any separately selected confirmation; no automatic next
 allocation follows this experiment.
+
+## Launch and startup
+
+The selected declaration SHA256 is
+`fb873d471da02acd66c90ecbd633a9c9e506a93b8c6e24b218bc242a0cf33209`, with52
+pinned inputs. Source`a8da75d`; service starts14:54:02 UTC on October28,
+PID166981/invocation`020e6239255e4d4ba97293ab8815647d`. Startup passes52 pins,
+357 finite initial tensors,346 shared control matches,357 bounded-initial
+matches and the first6 expected update counters. The initial inspected prefix
+contains3960 actions/464 finite reports; this is startup evidence only.
+Recovery, progress observation and terminal CPU processing are automated.
+Training and frozen outcomes remain pending; check live state before GPU work.
