@@ -95,3 +95,10 @@ outcome yet; no extension or automatic successor selected.
 
 Startup passes at4256 actions/501 finite supervised reports:all138 pins,357
 initial tensors matching control and check,exact config and first6 updates.
+
+Two affined CPU-only Breakout staging checks overlap this life:1.734s guarded
+tests and30.982s recorded-reference parity (parity service21:09:03–21:09:34 UTC).
+All138 active inputs and the same learner PID/invocation remain unchanged. Tests
+construct no native agent; parity imports no native module. These are co-host
+timing caveats, with no correction to measured training time. No production or
+active-runtime inputs change. See the separate Breakout corrective-label protocol.
