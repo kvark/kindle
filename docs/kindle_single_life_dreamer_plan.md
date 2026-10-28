@@ -504,13 +504,19 @@ and guards pass. Retain greedy as a useful18m58s development option on this one
 reused learner, not a global default or independent confirmation. No extension,
 learner confirmation or automatic successor. See the completed wait-greedy result.
 
-Expert scale10 passes a4096-action/963-update bounded check in43.517s,with357
-matched/invariant tensors and full replay/guards. A separately selected fresh
-100k comparison starts19:16:56 UTC/source`c0abf6a` on October28, service
-`kindle-qbert-expert10-100k-20261028`. Startup84 pins/357 initial tensors/381
-finite reports pass;50k recovery and sampled/greedy final/own-initial evaluations
-are automated. Only expert scale1→10 changes, affecting actor/world supervision
-together. See the expert-scale10 protocol; check live state before GPU work.
+Qbert expert scale10 completes100k actions/399,860 frames/24,939 updates in
+18m55s versus scale1's18m58s. Greedy7700/24of24 first pyramids improves
+4965.625/21; sampled5572.917/24 improves2260.417/12. Own sampled/greedy initials
+182.292/263.542,0pyramids. Both still fail mean15000. All84 pins,50k recovery,
+357 matched initial/invariant frozen tensors,paired sampled/greedy initial traces,
+finite reports,full training label/pixel/action and frozen outcome replays,
+guards,curves,coverage,exposure and comparison pass. Main succeeds19:42:39 UTC,
+postprocessing19:42:59 on October28; observers also succeed. Only expert scale
+changes, affecting actor/world supervision together; actual overrides42.147%.
+Retain scale10/greedy as the stronger100k development recipe on reused4013;
+no extension, second learner or successor is selected. No allocation is active
+at this milestone. See the completed expert-scale10 result in cheap-Qbert and
+its protocol; check live state before GPU work.
 
 The fixed Breakout CPU edge correction scores225.083 versus166.167 on24 reused
 natural episodes, both0/24 two-wall successes. All52,072 actions/208,254 frames,

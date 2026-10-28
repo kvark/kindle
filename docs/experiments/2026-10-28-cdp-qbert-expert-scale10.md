@@ -114,3 +114,25 @@ outcomes while comparing pixel-teacher suggestions before/after first-pyramid
 completion. All14 analysis pins and84 active inputs remain unchanged, with the
 same learner PID/invocation and no native module/agent. This is another co-host
 timing caveat; see the retrospective agreement result in cheap-Qbert.
+
+## Completed fixed100k comparison
+
+Training completes100k actions/399,860 frames/24,939 updates in1135.180s
+(18m55s), versus scale1's1138.028s (18m58s). Primary greedy frozen mean rises
+4965.625→7700, pyramids21/24→24/24; sampled2260.417→5572.917,12/24→24/24.
+Own initials match controls: sampled182.292/0,greedy263.542/0. Both action modes
+still miss mean15000 despite satisfying90% first-pyramid success. This is one
+reused development seed/cohort, not independent confirmation or five-game success.
+
+All84 pins,357 matched initial/invariant frozen tensors per arm,50k recovery,
+finite reports,parameter changes,equal row/weight sums,paired sampled/greedy
+initial traces,full training label/pixel/action replay,frozen replays/videos,
+guards,curves,coverage,exposure and comparison pass. Actual overrides42,147
+(42.147%); guided returns are not frozen competence. Four frozen arms total
+84,920 actions/339,538 frames/40.315s, zero updates/truncations. No failed attempt,
+GPU repeat, cap increase or runtime edit occurs.
+
+Main succeeds19:42:39 UTC on October28,whole25m43.379s; postprocessing19:42:59.
+All observers are terminal success. Retain scale10/greedy as the stronger100k
+development recipe. No extension, second learner or successor is selected.
+The full receipt and limitations are in the [completed result](../results/2026-10-25-cdp-cheap-qbert.md#stronger-expert-supervision-improves-frozen-qbert-at-the-same100k-budget).
