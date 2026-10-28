@@ -125,3 +125,16 @@ environment is constructed. The Breakout candidate stays unselected and cannot
 launch before all four Qbert services and complete terminal audits succeed.
 Retain co-host preparation as a timing caveat without correcting training wall
 time. See the [prepared assessment](2026-10-28-cdp-breakout-corrective-greedy.md).
+
+## Halfway recovery passes while training continues
+
+At23:13:22 UTC on October28,the scheduled100k checkpoint passes at6227 updates,
+with357 finite tensors. The observer checks6403 finite reports in a complete
+102,816-action log prefix and exits successfully. Checkpoint digest
+`64899b29e66c538852cbbfca075bf205ed13a48c6fd4308fe99f07ab3e29f74c`;
+review`e60174d6c1cf43eee381f3abbebdc02600720084ee2373bc5eabb29c7e009a8a`.
+All190 declared inputs remain unchanged. Main PID213871/invocation
+cb7dc9b9f81f4a538acaf15a26a39c67 continues beyond103,928 actions/6472 updates;
+progress and terminal postprocessing observers remain active. No GPU stage
+repeats or settings change. This verifies recoverable weights and numerical
+reports,not frozen competence. The200k target and35-minute training cap remain.

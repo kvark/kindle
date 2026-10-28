@@ -66,6 +66,9 @@ gate unchanged. No extension or successor selected. Use the matching
 `/x/Temp/kindle-qbert-expert100-capacity-20261028/full`. No new native/CLI code,
 failed attempt or GPU repeat. Eight CPU config checks and six
 header-readiness cases pass;historical sources resolve explicitly through archives.
+At23:13:22 UTC,the100k recovery passes at6227 updates,357 finite tensors and
+6403 finite reports in the102,816-action prefix. Recovery exits successfully;
+main/progress/postprocessing continue with the same process and190 unchanged pins.
 No frozen benefit is measured yet. See the expert100-capacity protocol;check live state.
 
 A retained Breakout greedy assessment is CPU-prepared but unselected;no GPU
