@@ -2403,3 +2403,74 @@ first actual GPU execution. All budgets/caps remain fixed. The early rate
 projects24.55min/200k, with later cost and learning unknown. This is execution
 and early-cost evidence; no full learner or automatic promotion is selected.
 The linked protocol records exact failures, identities, counters and hashes.
+
+
+## Guided12M B16 R16 lowers quality and costs more
+
+The separately declared [capacity comparison](../experiments/2026-10-28-cdp-qbert-expert-capacity.md)
+completes200,000 aggregate actions /799,693 emulator frames /12,477 updates in
+**24m51s** (1490.781s). Frozen **1792.708/9of24 first pyramids** improves its own
+initial177.083/0, but is **51.16% below** the same-native4M/B8 control3670.833/19
+while taking **15.74% more training time**. Both original mean15000/90%-pyramid
+criteria fail. Retain4M/B8; no extension, seed confirmation or automatic successor
+follows this negative result. The five-game goal remains unfinished.
+
+| Recipe, fresh4013 | Actions / updates | Training wall | Frozen final / own initial | First pyramids |
+|---|---:|---:|---:|---:|
+|4M/B8/R16/20%, expert world gradients|200k /24,970|21m28s|3670.833 /182.292|19/24|
+|12M/B16/R16/20%, expert world gradients|200k /12,477|24m51s|1792.708 /177.083|9/24|
+|Stronger retained4M/B8/R32/5%, world gradients off|200k /49,939|25m23s|4730.208 /182.292|23/24|
+
+All actual initial controls have0/24 pyramids. Candidate mean first-pyramid
+coverage is19.833/21, versus4M/R16's20.625 and own initial4.917. No selected frozen
+episode reaches15000; the maximum is4150. The stronger5%/R32 recipe remains the
+best retained4013 Qbert budget point here, despite also missing the full-game gate.
+
+The primary comparison keeps RGB48/Auto/N8/T16/H15/R16/coefficient1/actor0/
+full18/original rates,20% episode continuation/cap1920/expert1/NOOPweight.05 and
+expert world gradients fixed. Native`0e157df`, audited runtime, runner, teacher,
+wrapper and host match exactly. Capacity4M→12M and batch/microbatch8→16 change
+together; the optimizer cadence halves at the same replay positions per action.
+This does not isolate capacity or establish that larger models generally fail.
+Seed4013/evaluation4000004013 are reused development evidence. No weights,
+replay, belief, games or RNG are restored into training.
+
+All12,477 finite reports, first376/residual.5,100k/6227 recovery,357 finite tensor
+schemas/actor-copy equality,357 unchanged tensors per frozen arm,63 unchanged
+pins, changed CNN/reward/actor/value parameters, exact guided input/action/outcome
+replay, frozen outcome replays/videos, guards, curves, coverage, exposure and
+comparison pass. All357 initial tensors match the bounded12M check;346 shared
+tensors match retained12M initialization only. Different-size actual initial
+policies and semantic traces are assessed separately, not required to match.
+Ordinary frozen logs lack live pixel hashes; replay verifies recorded outcomes.
+
+| Frozen arm | Actions | Emulator frames | Seconds | Updates |
+|---|---:|---:|---:|---:|
+|Final|17,640|70,508|10.472|0|
+|Actual initial|8728|34,881|5.362|0|
+
+Each arm selects the first3 natural episodes per8 lanes=24, with no guidance or
+truncations; excess episodes and partial tails remain recorded. Training and
+per-arm caps remain1800s/300s. The service starts16:09:28 UTC/source`eebf838`,
+PID171410/invocation`0a687e9f00f747189c3546f29534f036`, and succeeds16:40:13
+on October28,30m44.506s including construction, evaluations and CPU replay.
+CPU postprocessing succeeds16:40:29. No GPU stage repeats, cap changes or repairs
+are needed. The earlier bounded-check prelaunch failure remains preserved.
+
+Training overrides92,822 actions (**46.411%**, not20% of actions), including
+70,933 NOOP and21,889 hops.51of231 episode starts receive guidance.46 completed
+guided episodes average15089.674 and all clear a pyramid;177 unguided episodes
+average809.887 with24 pyramids, and the last50 unguided average1851.5. Guided
+online returns are not unaided competence.12,476 supervised reports contain
+1,525,417 repeated label rows, total weight416,970.851 and actor/world expert-loss
+sums898.986512/898.986619, max difference1.4e−7. Late weighted cross entropy.1479
+is descriptive of changing replay samples, not held-out accuracy or a diagnosis.
+
+Artifacts:`/x/Temp/kindle-qbert-expert-capacity-20261028/full/qbert-12m-48-b16-r16-p20-world-200k-seed4013`.
+Selected declaration SHA256
+`616019129a983dfe59af77ebfecd85bd6df695d38f296bf7ae8e1f5c5a2b5e97`;
+learning review`c6ce278f90f151b3667ff2ae570d9b3b2e7624d2fd8f9558dafc671ce9d7ed23`;
+comparison`278cd6b3738d39adc7fe44475c6b323c87f762e25330a28fc99c8dc169a0e813`;
+postprocessing`09dbbb8ecc68fc677adddf9290a85e24e87e7c456b17bfa15864ead8a677dd3d`.
+No learner or GPU allocation is active after this result; check live state before
+further GPU work.

@@ -201,15 +201,16 @@ UTC on October28. Original prelaunch first384/0 assumption and unselected-servic
 failure remain; reviewed first376/residual.5 passes. No GPU stage repeats.
 Use`/x/Temp/kindle-qbert-expert-capacity-20261028/reviewed`. Early200k cost
 projects24.55min, not competence or measured full cost. Model/batch change
-together. A separate fresh200k/12,477-update comparison starts16:09:28 UTC
-on October28/source`eebf838`, with a30-minute training cap,100k/6227 recovery
-and fixed24-episode final/own-initial assessment. Startup passes63 pins,357
-initial tensors and259 finite reports.100k/6227 recovery passes16:22:27 UTC
-with357 finite tensors and6377 finite prefix reports; all63 pins stay fixed.
-The recovery watcher exits successfully; training/completion observation continue. Same native/runner/teacher/host as4M world-gradient control3670.833/19;
-model/batch change together.63 inputs pinned; no retry, extension or automatic
-successor. Full root`/x/Temp/kindle-qbert-expert-capacity-20261028/full`; see the
-expert-capacity protocol and check live state.
+together. The separate fresh200k comparison completes799,693 frames/12,477
+updates in24m51s. Frozen1792.708/9of24 versus own initial177.083/0 is51.16%
+below same-native4M/B8 control3670.833/19, at15.74% more training cost. All63
+pins,100k recovery,357 initial/frozen tensors,finite reports,parameter changes,
+full replays,guards,curves,coverage,exposure and comparison pass. Main succeeds
+16:40:13 UTC,postprocessing16:40:29 on October28. Actual guidance46.411%.
+Retain4M; no extension or confirmation. Model/batch change together on reused4013.
+Full root`/x/Temp/kindle-qbert-expert-capacity-20261028/full`; see the completed
+expert-capacity result in cheap-Qbert. No learner/GPU allocation is active;
+check live state before GPU work.
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,

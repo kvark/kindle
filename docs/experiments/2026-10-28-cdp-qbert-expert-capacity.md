@@ -1,8 +1,9 @@
 # Guided Qbert capacity with B16 and R16
 
-**Fresh200k comparison running:** the completed bounded check supports a
-separate30-minute training allocation, followed by fixed final/actual-initial
-evaluation. The full result is pending.
+**Full comparison complete:**200k/12,477 updates in24m51s; frozen1792.708/9of24
+first pyramids versus own initial177.083/0. Same-native4M/B8 scores3670.833/19
+in21m28s. All audits pass. Retain4M; no extension or confirmation. See the
+[completed result](../results/2026-10-25-cdp-cheap-qbert.md#guided12m-b16-r16-lowers-quality-and-costs-more).
 
 **Bounded check complete:**8192 actions/489 updates in60.333s;1024 frozen
 actions/.810s, zero updates and no natural episodes. All audits pass. The
@@ -201,3 +202,22 @@ Separately, the unchanged CPU exposure reader reproduces all supervision,
 episode-group and released-action fields of the completed4M control in1.044s,
 using scratch output and no native/environment construction. Its receipt lives
 at`full/exposure-reader-control-check/review.json`; all63 active pins stay fixed.
+
+
+## Full comparison complete
+
+The fixed200k life completes799,693 emulator frames/12,477 updates in1490.781s.
+Frozen final1792.708/9of24 versus own initial177.083/0 is51.16% below the4M/B8
+control3670.833/19, at15.74% more training cost. Both original gates fail.
+Coverage19.833/21 versus20.625 control and4.917 initial. All63 pins,357 finite/
+invariant tensors,100k recovery,initialization references, finite losses and
+parameter changes, full guided/frozen replays/videos, guards, curves, coverage,
+exposure and comparison pass. Different-size initial traces are not equated.
+Training overrides92,822 actions (46.411%); guided scores are not competence.
+
+Main service succeeds16:40:13 UTC on October28,30m44.506s total; CPU postprocessing
+succeeds16:40:29. No GPU stage repeats or cap changes. Retain4M/B8 and the stronger
+5%/R32 world-off budget point; no extension, confirmation or automatic successor.
+All services are terminal and no GPU job is active. Exact tables, limitations,
+artifact paths and hashes are in the linked completed result. The five-game goal
+remains unfinished.
