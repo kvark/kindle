@@ -2297,3 +2297,85 @@ Artifacts:`/x/Temp/kindle-qbert-greedy-20261027/qbert-4m-48-continuation-two-see
 Selected declaration SHA256`876359cc525a1b3088daac595e8f9e1c7431aa2ff938abeb6c69926007ded156`;
 review`c57c6b70854a5ad56bba496b7d086b063175c20e2313caf075d476eeff724102`;
 postprocessing`ae63ad499af82718c2355593238f23803025877fa0c6bd4d6c86b55ae99e5489`.
+
+## Expert world gradients give a small R16 gain below the stronger control
+
+The [fixed expert-world comparison](../experiments/2026-10-28-cdp-qbert-expert-world.md)
+completes **200,000 aggregate actions /799,662 emulator frames /24,970 updates
+in21m28s**. Frozen mean improves3333.333→3670.833 and first-pyramid success
+18/24→19/24 against the retained20%/R16 control. Training takes2.32% less measured
+time, and mean return is10.13% higher. These are one reused development seed's
+point estimates, not an established speedup, reliability or isolated causal effect.
+
+| Recipe, seed4013 | Actions / updates | Training wall | Frozen final / own initial | First pyramids |
+|---|---:|---:|---:|---:|
+|20% continuation/R16, world gradients off|200k /24,970|21m59s|3333.333 /182.292|18/24|
+|Same, world gradients on|200k /24,970|21m28s|3670.833 /182.292|19/24|
+|Stronger retained5%/R32, world gradients off|200k /49,939|25m23s|4730.208 /182.292|23/24|
+
+All actual initial controls have0/24 pyramids. The new run remains22.40% below
+the stronger control's score while taking15.42% less training time; it fails
+both original mean15000/90%-pyramid criteria. Final first-pyramid coverage is
+20.625/21 versus primary control20.750 and own initial5.167. No selected frozen
+episode reaches15000. Retain5%/R32 as the stronger measured Qbert recipe and
+keep this small R16 improvement as a budget point. No extension, seed
+confirmation or new allocation is selected; world gradients remain default off.
+
+The primary comparison keeps4M/RGB48/Auto/N8/B8/T16/H15/R16/coefficient1/
+actor0/full18/original rates, continuation teacher,20% episode probability,
+cap1920, expert scale1, NOOP weight.05, fresh4013/evaluation4000004013 and host
+fixed. Only the expert-world-gradient learning setting changes, but native
+source`0e157df`, exported runner and audited Python package differ from the
+old control. All346 shared initial tensors and complete initial semantic
+traces match; all357 initial tensors also match the preceding bounded check.
+No weights, replay, belief, games or RNG are restored into training. The seed
+and evaluation cohort are reused, and no same-binary off arm is measured.
+
+All24,970 finite reports, first248/residual0,100k recovery/12,470 updates,
+357-tensor checkpoint schemas/actor-copy equality,357 unchanged tensors per
+frozen arm,52 unchanged declaration pins, host guards, exact guided input/
+action/outcome replay, frozen outcome replays/videos, curves, coverage,
+comparison and exposure pass. CNN/reward/actor/value parameters change during
+joint learning; that does not assign those changes exclusively to expert loss.
+The maximum world/behavior expert-loss difference is1.7e−7. Ordinary frozen
+logs lack live pixel hashes, so their replays establish outcomes rather than
+direct equality to live images.
+
+| Frozen arm | Actions | Emulator frames | Seconds | Updates |
+|---|---:|---:|---:|---:|
+|Final|22,496|89,958|10.605|0|
+|Actual initial|8728|34,875|4.125|0|
+
+Each arm uses the first3 natural episodes per8 lanes=24, no truncations or
+guidance. The30-minute training and300-second per-arm caps remain unchanged.
+The main service starts14:54:02 UTC/source`a8da75d`, invocation
+`020e6239255e4d4ba97293ab8815647d`, and succeeds at15:21:35 on October28.
+Its27m32.975s wall time includes construction, evaluation and CPU replays;
+the full training replay alone takes about5m18s.
+
+Original CPU postprocessing fails at15:22:04 because importing the new
+checkpoint helper eagerly imports ALE, absent from the plotting environment.
+Keep the original failed service, journal, controller and52 pins. A separate
+helper copy defers the unused checkpoint-audit import, leaving tensor comparison
+unchanged. The failed comparison then passes, the missing exposure analysis
+completes, and a separate repair receipt finishes at15:24:27. Existing curves/
+coverage remain unchanged; no GPU stage repeats or original failure is relabeled.
+
+Training overrides92,176 actions (**46.088%**, not20% of actions), including
+70,408 NOOP and21,768 hops.49of219 episode starts receive guidance.45 completed
+guided episodes average15150 and all clear a pyramid;166 unguided episodes
+average1471.988 with46 first pyramids, and the last50 unguided average2907.5.
+These guided online scores are not unaided competence.24,854 supervised reports
+contain1,507,728 repeated replay-label rows, total weight412,366.564 and actor/
+world loss sums1659.824352/1659.824550. Repeated labels are not unique examples.
+The late weighted cross entropy.1459 is descriptive of changing training
+samples, not held-out accuracy or a diagnosis of the remaining policy gap.
+
+Artifacts:`/x/Temp/kindle-expert-world-20261028/qbert-4m-48-r16-p20-world-gradient-200k-seed4013`.
+The directory retains curves, comparison PNG/SVG, videos, source/config,
+checkpoints and original failure evidence. Selected declaration SHA256
+`fb873d471da02acd66c90ecbd633a9c9e506a93b8c6e24b218bc242a0cf33209`;
+learning review`d4e8b50e1868bc05ea5f4d04a87ac804c446c0e4daf6495ebf63e80fb6b4d9aa`;
+comparison`c28961e0fcafec146483347222ed97af142874feca7a37da2c86c5b8615f6798`;
+CPU repair`cd06fbc1f258b34c6ad2a7980ca0a4a5640e5251dbc072848496722a32268f24`;
+completed postprocessing`fe37b62889b2eed68144a4073cb0094eb348368fd006b009d266879f8a26ce32`.

@@ -153,3 +153,9 @@ wheel/runtime and failed audit remain unchanged. `packaging-receipt.json`
 records both source revisions, exact files and the retained test executable.
 The disposable2.6GiB build cache is released after packaging and verification.
 No GPU allocation is active and no full learner is selected.
+
+The subsequent separately selected [R16/20% comparison](2026-10-28-cdp-qbert-expert-world.md)
+completes200k in21m28s: frozen3670.833/19of24 first pyramids versus R16
+control3333.333/18. It remains below stronger5%/R32 and misses both Qbert gates.
+All audits complete after a separate CPU plotting-import repair, without GPU
+repetition; no extension or confirmation is selected.

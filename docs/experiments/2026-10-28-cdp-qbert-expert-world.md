@@ -1,5 +1,9 @@
 # Qbert expert gradients at the cheaper R16 budget
 
+**Completed:**200k/24,970 updates in21m28s, frozen3670.833/19of24 first pyramids
+versus primary control3333.333/18. Both miss the gate; stronger5%/R32 remains
+4730.208/23. [Full result and CPU postprocessing repair](../results/2026-10-25-cdp-cheap-qbert.md#expert-world-gradients-give-a-small-r16-gain-below-the-stronger-control).
+
 Select one fresh200k-action comparison after the completed
 [native derivative and bounded Qbert checks](2026-10-27-cdp-expert-world-gradients.md).
 The new loss can teach CNN/world state from trusted expert actions. Task benefit
@@ -83,3 +87,21 @@ tensors and frozen actor-copy equality. The stable complete log prefix contains
 103,576 actions/12,916 finite reports. All52 declaration pins remain unchanged;
 training continues. Recovery review SHA256
 `bf13b06fe66ee1fc7dd6fd81108fa43875bac295f99bee1ac4c3339eedd89b06`.
+
+## Terminal review
+
+The main service succeeds at15:21:35 UTC on October28, after200k actions /
+799,662 frames /24,970 updates in1288.092s. Frozen final3670.833/19pyramids
+and own initial182.292/0 each cover24 unaided natural episodes with zero
+updates/truncations. All numerical/config/counter checks, recovery,357 frozen
+tensors,346 shared initial tensors,357 bounded initial tensors, paired initial
+semantic traces,52 pins, full replays/videos and host guards pass.
+
+Original terminal CPU postprocessing fails15:22:04 at comparison import:
+the checkpoint helper eagerly imports ALE, absent from the plotting environment.
+A separately copied helper defers that unused import; the comparison and missing
+exposure analysis complete at15:24:27, without changing52 pins, repeating GPU
+work or relabeling the failed service. Curves and coverage from the original
+postprocessor remain valid. The complete result links the original failure,
+repair and all final evidence hashes. No trial extension, seed confirmation
+or automatic successor is selected. Check live state before new GPU work.

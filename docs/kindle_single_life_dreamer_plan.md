@@ -35,6 +35,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Retained continuation1009, greedy evaluation](results/2026-10-25-cdp-cheap-qbert.md#greedy-evaluation-lowers-both-retained-qbert-results) |200k /49,939 retained;0 new|26m38s retained|3058.333 /85.417|16/24 pyramids; below sampled3137.500/17|
 | [Retained continuation4013, greedy evaluation](results/2026-10-25-cdp-cheap-qbert.md#greedy-evaluation-lowers-both-retained-qbert-results) |200k /49,939 retained;0 new|25m23s retained|3770.833 /263.542|19/24 pyramids; below sampled4730.208/23|
 | [Continuation20%/R16,4013](results/2026-10-25-cdp-cheap-qbert.md#more-guidance-with-less-replay-saves-time-but-lowers-frozen-quality) |200k /24,970|21m59s|3333.333 /182.292|18/24 first pyramids; below5%/R32|
+| [Same, expert world gradients](results/2026-10-25-cdp-cheap-qbert.md#expert-world-gradients-give-a-small-r16-gain-below-the-stronger-control) |200k /24,970|21m28s|3670.833 /182.292|19/24 first pyramids; small R16 gain, below5%/R32|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -427,15 +428,19 @@ CPU-only repair completes audits without repeating GPU work or changing pins.
 SHA6a9c41c; default off. Use`/x/Temp/kindle-expert-world-20261027/runtime-audited`
 for future work; its packaging receipt pins native/wheel/Python source. The2.6GiB
 build cache is released; wheels/test executable and all evidence remain.
-A separate October28 comparison now selects fresh Qbert4013/4M48/Auto/N8/B8/
-T16/H15/R16/20% continuation/cap1920/expert1/NOOP.05 with world gradients on:
-200k actions/24,970 updates,100k recovery and a30-minute training cap, then
-fixed final/own-initial24-episode unaided sampled evaluation. Primary retained
-20%/R16 control scores3333.333/18; stronger5%/R32 scores4730.208/23. New native/
-runner identities and reused seed/cohort limit attribution.52 inputs are pinned;
-357-tensor audits and346 shared initial matches are required. See
-`docs/experiments/2026-10-28-cdp-qbert-expert-world.md`; no automatic successor.
-Check live state before GPU work.
+Qbert4013/4M48/R16/20% with expert world gradients completes200k actions /
+799,662 frames /24,970 updates in21m28s. Frozen3670.833/19of24 first pyramids
+versus own initial182.292/0 improves matched R16 control3333.333/18 by10.13%
+with2.32% less measured training time, but remains below5%/R32's4730.208/23.
+All audits,100k recovery,357 invariant tensors,346 shared initial matches,
+paired initial semantic traces,52 pins, full replays, guards and comparison pass.
+Main succeeds15:21:35 UTC on October28; original CPU postprocessing fails at
+15:22:04 on an eager ALE import. A separate lazy-import repair completes at
+15:24:27; original failure/pins remain, no GPU repeat. Actual guidance46.088%.
+Retain5%/R32 as stronger; small reused-seed R16 gain gets no extension or
+confirmation. New native/runner identities limit attribution. See the completed
+expert-world result in cheap-Qbert and its October28 protocol. No GPU allocation
+is active; check live state before new GPU work.
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,
