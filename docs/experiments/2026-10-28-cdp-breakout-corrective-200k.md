@@ -55,3 +55,23 @@ CPU preparation parses3 commands, compiles13 controllers, verifies all41 bounded
 inputs and346 shared initial tensors, with no native/environment construction.
 Pin exact inputs and recheck live state before launch. The five-game goal remains
 unfinished; no task outcome is inferred from this selection.
+
+## Launch and CPU observer repair
+
+Declaration`04c278538a2778f7f120ab2e28cf7183a49720eb20be16c4b6488d35cff9bc93`
+pins64 inputs. Main starts21:52:19 UTC/source9e8ead1,PID207148/invocation
+`f08ef9cc0f4c41f2b54af5a619dd7e5b`. Startup passes at15,576 actions/1916 finite
+reports,all64 pins,346 shared old initial tensors,357 matching bounded initial
+tensors and first6 expected updates. No frozen outcome is available yet.
+
+The original CPU recovery observer fails at21:52:19 because the log file exists
+before its header is written: JSONDecodeError at line1/column1. The failure is
+preserved under`full/recovery-observer-repair/original-journal.txt`, SHA
+`a7238c763ce32b2216a72584aab0bf82412ef85f1a08c4acc26d2b8a934ca8af`.
+After validating the complete header, launch the exact unchanged watcher in
+`kindle-breakout-corrective-recovery-repair-20261028`. The original learner stays
+on the same PID/invocation and all64 pins stay unchanged. No GPU stage repeats.
+The separate completion collector records the original failed observer and
+requires the replacement to succeed; the pinned original collector is untouched.
+The100k milestone and terminal audits remain required. No training restart,
+cap increase,extension or next allocation follows this observer repair.

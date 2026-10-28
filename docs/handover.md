@@ -1,5 +1,17 @@
 # CDP handover — October25,2026
 
+A fresh Breakout corrective-label200k comparison is active from21:52:19 UTC on
+October28/source9e8ead1. Recipe4M64/Auto/N8/B8/T16/H15/R16/expert10/20%episodes/
+cap1920/world gradients/all-state labels keeps the bounded runtime. Declaration
+pins64 inputs; startup passes15,576 actions/1916 finite reports,346 shared old
+initial tensors and357 bounded initial tensors. Training cap25min,100k recovery
+and final/actual-initial sampled24-natural-episode assessments are automated.
+The first CPU recovery observer reads an empty startup header and fails; its
+unchanged replacement runs after header verification. Original failure remains,
+all64 pins and the same learner PID/invocation stay unchanged; no GPU repeat.
+No task result,extension or automatic successor. See the corrective-200k protocol;
+check the existing live service before GPU work.
+
 Optional Breakout corrective labels pass510 CPU tests,forced-reference parity
 and181,224 recorded learner-action feedback checks. Applied source2854dd9 keeps
 native447fe50 unchanged. The fresh8192-action/32,725-frame/994-update check takes
@@ -8,9 +20,9 @@ All41 pins,346 shared initial/357 invariant frozen tensors,finite reports,change
 CNN/reward/actor/value,full label/pixel/action replay and guards pass. Main succeeds
 21:43:38 UTC on October28. No task competence or cap-release coverage is measured.
 Use`/x/Temp/kindle-breakout-corrective-20261028/runtime` for this adapter; original
-sources remain archived. Early200k projection15m01s; no full learner is selected.
-See the Breakout corrective-label protocol and pixel-reference result. No active
-GPU allocation; check live state before GPU work.
+sources remain archived. Early200k projection15m01s; no full learner was selected at bounded completion.
+See the Breakout corrective-label protocol and pixel-reference result. The
+separately selected current allocation is described above.
 
 Qbert expert100/200k/R16 completes200k actions/799,703 frames/24,970 updates in
 26m07s. Greedy9654.167/23 first pyramids improves100k/R32's8365.625/24 by
