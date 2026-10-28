@@ -512,6 +512,14 @@ finite reports pass;50k recovery and sampled/greedy final/own-initial evaluation
 are automated. Only expert scale1→10 changes, affecting actor/world supervision
 together. See the expert-scale10 protocol; check live state before GPU work.
 
+The fixed Breakout CPU edge correction scores225.083 versus166.167 on24 reused
+natural episodes, both0/24 two-wall successes. All52,072 actions/208,254 frames,
+policy/debug/input-output pixels/outcomes replay exactly;2051 earlier-eight
+prefix rows match. Service succeeds19:21:19 UTC on October28, whole1m07.715s;
+all11 inputs and84 active Qbert pins remain unchanged. This is reference
+development, not native learning or independent confirmation; no training aid
+is selected. See [the expanded assessment](results/2026-10-26-cdp-breakout-pixel-reference.md#fixed-edge-correction-improves-the-expanded24-episode-reference).
+
 
 
 

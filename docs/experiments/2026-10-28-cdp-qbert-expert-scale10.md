@@ -101,3 +101,9 @@ Startup passes at1776 actions/381 finite supervised reports:84 pins,357 initial
 tensors matching both control and bounded check,exact config and first6 updates.
 50k recovery,progress observation and terminal postprocessing are automated.
 No frozen outcome yet; no extension or automatic successor is selected.
+
+The50k recovery passes at12,439 updates with357 finite tensors. A separately
+declared, affined low-priority Breakout CPU reference assessment overlaps this
+life for67.624s measured wrapper time (19:20:12–19:21:19 UTC). All84 active pins
+and the same learner PID/invocation remain unchanged; it loads no native module
+or agent. Keep this co-host timing caveat without correcting measured wall time.

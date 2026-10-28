@@ -644,3 +644,31 @@ candidate review`6b6836155aca55833c053b01a8f76da39a4fb6a0e90637b698c20d1e0597855
 completion`2b529d004f7fe987ec13d8fe76d203c0a29697dab260ff5db7b42db38d44db5d`.
 Pixel diagnostic review`b06b8717f625191c55598f0288687105c5256dd2c0fd2bba00e98b94f3af272b`;
 completion`0eda3e6ff3fb83ce12444f73dc238155c9c4340482ab64648b20e31adeae72a4`.
+
+## Fixed edge correction improves the expanded24-episode reference
+
+The unchanged edge-reset policy scores **225.083 versus166.167** on the first
+three natural episodes per lane,24 selected episodes. Both have0/24 two-wall
+successes and no truncations. The35.46% mean gain is reference-controller
+development evidence; these reused episodes include the earlier8 used to select
+the expansion. It is neither independent confirmation nor native learning.
+No training-aid integration or automatic successor is selected.
+
+The CPU-only collection takes30.588s for52,072 aggregate actions/208,254 emulator
+frames. It retains25 completed episodes and partial tails, selecting only the
+declared24. Full36.708s replay reproduces policy actions/debug state, input/output
+pixel hashes, rewards, boundaries, resets and task outcomes; video is retained.
+All2051 earlier-eight prefix rows match exactly, with no policy/detector changes.
+All11 declared inputs and84 active Qbert inputs remain unchanged.
+
+The affined low-priority service`kindle-breakout-edge-reset24-20261028` starts
+19:20:12 UTC and succeeds19:21:19 on October28, whole1m07.715s. Its67.624s
+measured wrapper time is a co-host timing caveat for the expert-scale10 Qbert
+life, which retains PID193426/invocation`b9d840aed2e34da79c483f9e348d5210`.
+No native module, agent or GPU work is involved. No retry or cap change occurs.
+
+Artifacts:`/x/Temp/kindle-breakout-edge-reset-20261028/standard24`.
+Declaration`3edd67c2c9f68b4dc2984a7080524ed50a5c675f7dfbe3266fece7a53f2bfd1b`;
+review`78c8e983546c68172f6cfdf7457ab04b69323e17c30ea638aa3b35bee0fef059`;
+comparison`18b8938e2b57c23290c258f0398463fbd84db098a984649e967318ddb2c55b44`;
+completion`bcf375dc51266700d61d9991cf2e30ecaa4fc4b2d5911ada7f799d26e0775f7f`.
