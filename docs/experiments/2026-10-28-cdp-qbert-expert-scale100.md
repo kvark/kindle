@@ -33,3 +33,51 @@ A fresh100k comparison can be selected separately after this check and its
 measured cost pass review. It must retain sampled and greedy final/actual-initial
 natural-episode assessments and both original mean15000/90% gates. Reused4013
 and its cohort remain development evidence. The five-game goal is unfinished.
+
+## Bounded launch
+
+CPU preparation initially stops on a copied `gpu_stages_repeated` field absent
+from the full-run control's completion schema. The original script and failure
+receipt remain external. The corrected check verifies the actual terminal
+service states and completion-file hashes; no GPU stage had started. Both
+commands then parse without native/environment construction,84 control pins
+remain unchanged,and36 check inputs are pinned.
+
+The service starts20:26:52 UTC on October28/source`6a144ee`, PID199497/invocation
+`d9ed7d25684341e1857a79106c5fdf82`; declaration
+`9b3e5f57a21d9e4fabdb41aa55bf240a7f87a7624701ca19aff7311918670bc0`.
+
+## Completed bounded check and separately selected100k comparison
+
+4096 actions/16,381 frames/963 updates take43.170s;1024 greedy frozen actions/
+4096 frames take.497s,zero updates/no natural episodes. All36 pins,357 matched
+initial/invariant frozen tensors,finite reports,changed CNN/reward/actor/value,
+equal115,504 row/weight sums,raw expert-loss alignment (max8e−7),full label/pixel/
+action replay and host guards pass. There are823 hop labels,2048 passive labels,
+1579 actual/teacher disagreements and2048 overrides. Service succeeds20:27:57
+UTC,whole1m05.506s. The CPU preparation failure above remains; no GPU repeats.
+
+Early cost projects17m34s/100k,close to the preceding scale10 check. Select one
+fresh100k-action/24,939-update life,under a30-minute training cap,with the exact
+bounded recipe. Only expert scale10→100 changes against retained4013/100k.
+No weights,replay,belief,games or RNG are reused. Save/audit50k recovery at12,439
+updates and fixed final; no checkpoint selection or extension.
+
+Evaluate fixed final and own actual initial using both sampled and greedy native
+actions,without guidance/labels. Primary greedy comparison is against7700/24;
+sampled5572.917/24 remains explicit. Each of4 arms selects first3 natural
+episodes per8 lanes=24,seed4000004013,original mean15000/90%-pyramid gate,zero
+updates/truncations,357 invariant tensors,full outcome replay/videos and guards.
+Require357 matching initial tensors and paired initial semantic traces for both
+action modes. Ordinary frozen logs do not contain live pixel hashes.
+
+Require complete training label/input-pixel/actual-action replay,finite reports,
+equal row/weight sums,source/config/counters,curves,coverage,exposure and paired
+comparison. Guided online scores are not unaided competence. Reused seed/cohort
+and earlier development costs remain explicit.
+
+Caps:training1800s,each frozen arm300s/600k actions,training replay600s,CPU
+audit1200s,owning service4500s. No retry,cap increase,extension or automatic
+successor. Full root`/x/Temp/kindle-qbert-expert-scale100-20261028/full`,service
+`kindle-qbert-expert100-100k-20261028`. Pin exact inputs and check current host
+before launch; all preceding services are terminal at selection.
