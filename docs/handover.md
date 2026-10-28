@@ -347,10 +347,16 @@ CPU-only repair completes audits without repeating GPU work or changing pins.
 129 Rust CPU tests,474 Python tests and strict Clippy pass. Native0e157df,
 SHA6a9c41c; default off. Use`/x/Temp/kindle-expert-world-20261027/runtime-audited`
 for future work; its packaging receipt pins native/wheel/Python source. The2.6GiB
-build cache is released; wheels/test executable and all evidence remain. R32 early cost projects32.66min/200k; consider the retained
-20%/R16 control for a separately selected cheap comparison. No full learner or
-GPU allocation is active. See the expert-world-gradients protocol and check
-live state before GPU work.
+build cache is released; wheels/test executable and all evidence remain.
+A separate October28 comparison now selects fresh Qbert4013/4M48/Auto/N8/B8/
+T16/H15/R16/20% continuation/cap1920/expert1/NOOP.05 with world gradients on:
+200k actions/24,970 updates,100k recovery and a30-minute training cap, then
+fixed final/own-initial24-episode unaided sampled evaluation. Primary retained
+20%/R16 control scores3333.333/18; stronger5%/R32 scores4730.208/23. New native/
+runner identities and reused seed/cohort limit attribution.52 inputs are pinned;
+357-tensor audits and346 shared initial matches are required. See
+`docs/experiments/2026-10-28-cdp-qbert-expert-world.md`; no automatic successor.
+Check live state before GPU work.
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,
