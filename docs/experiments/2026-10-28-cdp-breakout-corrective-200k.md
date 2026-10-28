@@ -81,3 +81,14 @@ It constructs no environment or native agent. All64 inputs and the same learner
 PID/invocation remain unchanged. Keep the co-host duration without correcting
 wall time. Evidence is in the cheap-Qbert training-phase diagnostic; it selects
 no new GPU allocation.
+
+The replacement recovery observer succeeds22:01:11 UTC at100k actions/12,470
+updates,357 finite tensors. Its observed complete prefix has102,424 actions/
+12,772 finite reports. The original failed observer remains recorded; all64
+inputs and the original learner process stay unchanged. Repair completion:
+`full/recovery-observer-repair/completion-review.json`.
+
+A further.228s affined CPU scan of retained Breakout reference detections finds
+no observed descending velocity outside the existing tracker gate. It constructs
+no environment or agent,changes no policy,and preserves all64 inputs and the
+same learner process. Retain the co-host duration without time correction.

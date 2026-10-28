@@ -774,3 +774,19 @@ review`922690e0dae0697f718973eb372cfa3a66c350c53f41c25338c23f86b43cc1b8`;
 replay`fd363e68c9be89df3b3e35428ee762dc3a1169414b29f547a7654355dcb3f93a`;
 completion`9ef671641d6416f2f81a0fc16a0b1cabbb3fa82f161104c325f9e403209144cd`.
 See the [adapter and check protocol](../experiments/2026-10-28-cdp-breakout-corrective-labels.md).
+
+## Retained visible descents stay within the tracker velocity gate
+
+A CPU recount of all52,072 edge-reset reference actions finds46,122 observations
+with both ball and paddle detected. All22,899 detected descents are projected;
+none exceeds the current dy≤16/absolute-dx≤16 gate. This includes13,045 descents
+at ball-y≥140. The largest positive detected dy is15.5 and absolute dx9.6.
+These observations provide no reason to widen that velocity filter. They do
+not measure true velocity, explain lost lives, or rule out missed detections.
+No teacher or policy change is selected.
+
+The read-only scan takes.228s, constructs no environment or agent, and preserves
+the source hash,all64 active Breakout inputs and the learner PID/invocation.
+Retain this CPU co-host duration without adjusting training time.
+Artifacts:`/x/Temp/kindle-breakout-tracking-audit-20261028`;
+review`595fdc70efa4f8acf8fc542752a172c0965f04ea12b3d9ad991faf91539be84c`.
