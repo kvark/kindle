@@ -937,3 +937,43 @@ learning`de6378afc7fb5854dfffbd620e84edf4ad3af51a54558dbf67c62f4a1df78d3c`,
 comparison`b571ad5e81116f4a97ba1976f6aadc63ab8028da827f4e32015e3b65a5d9c8ae`.
 The comparison plot is inspected;all services are terminal and no GPU allocation
 is active. [Protocol and repair receipts](../experiments/2026-10-28-cdp-breakout-encoder-rate.md).
+
+## Greedy corrective Breakout gives a small gain but remains weak
+
+The retained corrective200k learner scores **5.000 with greedy actions versus
+4.292 sampled**. Its own greedy initial scores2.583 versus1.375 sampled. All four
+policy/mode combinations have **zero of24 two-wall successes**. The small mean
+increase leaves the task gap unresolved and does not justify an extension or
+seed confirmation. Retain both measured modes and stronger historical controls;
+no global greedy default or automatic successor follows.
+
+| Frozen action selection | Trained mean | Own initial mean | Two-wall successes |
+|---|---:|---:|---:|
+|Sampled,original assessment|4.292|1.375|0/24 each|
+|Greedy,retained checkpoints|5.000|2.583|0/24 each|
+
+This adds **zero training and zero updates**. Original200k/24,970/17m25s training
+cost remains. Native447fe50,original runner,wrapper,runtime,all weights/config,
+seed4000001009 and game protocol stay fixed;only frozen action selection changes.
+Guidance and labels are disabled. The one retained learner and reused cohort
+are development evidence,not independent confirmation. Stochastic latents and
+ALE stickiness remain under greedy inference.
+
+Both arms select first3 natural episodes per8 lanes=24. Final collects26 and
+initial24,with excess episodes and partial tails retained. Final9784 actions /
+39,101 frames /4.776s and initial5464 /21,828 /2.825s total15,248 actions /
+60,929 frames /7.601s. There are no updates,truncations or cap changes. All54
+inputs,exact source/config/counters,357 invariant tensors per arm,full outcome
+replays/videos and host guards pass. Ordinary frozen logs lack live pixel hashes.
+
+Main starts23:45:07 UTC/sourceefc8192 after all Qbert terminal audits,and succeeds
+23:45:31 on October28,whole23.812s;postprocessing succeeds23:45:32. No failed
+attempt or GPU repeat occurs. Both services are terminal and the device is idle.
+The original prepared declaration/preflight remain archived alongside selection
+and launch receipts. [Protocol](../experiments/2026-10-28-cdp-breakout-corrective-greedy.md).
+
+Root`/x/Temp/kindle-breakout-corrective-greedy-20261028`,trial
+`breakout-4m-64-corrective-200k-greedy-frozen`. Completion
+`ffa4bbf5f62699b837f2ae8f8c5c3c219069b599b376171c2169403f82188080`,
+review`46b2260b9259dbd05dd61858336424d72b81d0175010b968abbabe2ea3eb0325`,
+postprocessing`33de3dce65b50c921dc40f4d536fad173f5d8a7864cdeb8da69e7c2bfa46eb2b`.

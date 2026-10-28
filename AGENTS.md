@@ -68,11 +68,14 @@ or automatic successor is selected. Use the matching Breakout-era runtime and
 pinned Qbert runner;native447fe50 unchanged. See the expert100-capacity protocol
 and completed cheap-Qbert result;check live state before GPU work.
 
-The retained Breakout corrective greedy assessment is active from23:45:07 UTC,
-sourceefc8192,service`kindle-breakout-corrective-greedy-frozen-20261028`. Its original
-final/actual initial use54 pinned inputs,zero new training and the original90%-
-two-wall criterion;sampled4.292/1.375 and17m25s training cost remain. Qbert terminal
-audits completed before launch. No greedy result is accepted yet. [Protocol](docs/experiments/2026-10-28-cdp-breakout-corrective-greedy.md).
+Retained Breakout corrective greedy assessment completes:final5.000/initial2.583
+versus sampled4.292/1.375,all0/24 two-wall successes. Original17m25s training cost
+remains;zero new training/updates. All54 pins,357 invariant tensors per arm,source/
+config/counters,full outcome replays/videos and guards pass. Total15,248 actions/
+60,929 frames/7.601s evaluation;main succeeds23:45:31 UTC in23.812s,postprocessing
+23:45:32 on October28. No failure,GPU repeat or cap change. Retain both weak modes
+and stronger controls;no extension,confirmation,global default or automatic next
+allocation. Both services are terminal and the host is idle;check live state. [Protocol](docs/experiments/2026-10-28-cdp-breakout-corrective-greedy.md).
 
 Breakout encoder-rate200k completes200k actions/799,152 frames/24,970 updates
 in17m41s. Raising encoder6e-6→4e-5 lowers frozen4.292→1.458 versus own initial

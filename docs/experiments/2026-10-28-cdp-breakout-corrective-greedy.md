@@ -70,3 +70,20 @@ success and no Kindle service is running before launch. The first header confirm
 greedy Breakout,seed4000001009 and retained24,970 updates/200k actions.
 Launch`bd46fbc341948b8c90d915c7063d528ba19ac3b709c2d8442769a60c65eb85f4`.
 No greedy outcome is accepted yet.
+
+## Completed assessment
+
+Greedy final5.000 versus own initial2.583 compares with sampled4.292/1.375;
+all0/24 two-wall successes. The small increase leaves Breakout weak. No extension,
+seed confirmation,global default change or automatic successor is selected.
+Original200k actions/24,970 updates/17m25s training cost remains;this assessment
+adds zero training or updates.
+
+All54 pins,357 invariant tensors per arm,source/config/counters,complete outcome
+replays/videos and guards pass. Final/initial select24 natural episodes each from
+26/24 collected,with excess episodes/tails retained. Total15,248 actions/60,929
+frames/7.601s evaluation,zero updates/truncations. Main succeeds23:45:31 UTC,
+whole23.812s,and postprocessing23:45:32 on October28. Both services are terminal;
+no failure,GPU repeat or cap change occurs. The host is idle at completion.
+Completion`ffa4bbf5f62699b837f2ae8f8c5c3c219069b599b376171c2169403f82188080`.
+See the [completed comparison](../results/2026-10-26-cdp-breakout-pixel-reference.md#greedy-corrective-breakout-gives-a-small-gain-but-remains-weak).

@@ -20,11 +20,14 @@ or automatic successor is selected. Use the matching Breakout-era runtime and
 pinned Qbert runner;native447fe50 unchanged. See the expert100-capacity protocol
 and completed cheap-Qbert result;check live state before GPU work.
 
-The retained Breakout corrective greedy assessment is active from23:45:07 UTC,
-sourceefc8192,service`kindle-breakout-corrective-greedy-frozen-20261028`. Its original
-final/actual initial use54 pinned inputs,zero new training and the original90%-
-two-wall criterion;sampled4.292/1.375 and17m25s training cost remain. Qbert terminal
-audits completed before launch. No greedy result is accepted yet. [Protocol](experiments/2026-10-28-cdp-breakout-corrective-greedy.md).
+Retained Breakout corrective greedy assessment completes:final5.000/initial2.583
+versus sampled4.292/1.375,all0/24 two-wall successes. Original17m25s training cost
+remains;zero new training/updates. All54 pins,357 invariant tensors per arm,source/
+config/counters,full outcome replays/videos and guards pass. Total15,248 actions/
+60,929 frames/7.601s evaluation;main succeeds23:45:31 UTC in23.812s,postprocessing
+23:45:32 on October28. No failure,GPU repeat or cap change. Retain both weak modes
+and stronger controls;no extension,confirmation,global default or automatic next
+allocation. Both services are terminal and the host is idle;check live state. [Protocol](experiments/2026-10-28-cdp-breakout-corrective-greedy.md).
 
 Breakout encoder-rate200k completes200k actions/799,152 frames/24,970 updates
 in17m41s. Raising encoder6e-6→4e-5 lowers frozen4.292→1.458 versus own initial
@@ -140,6 +143,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Full18, capped expert imitation](results/2026-10-26-cdp-breakout-pixel-reference.md#capped-native-imitation-lowers-frozen-breakout-quality) |200k /49,939|22m38s|4.000 /1.375|0/24; below full18 control|
 | [Full18, longer expert cap1920](results/2026-10-26-cdp-breakout-pixel-reference.md#longer-guidance-lowers-frozen-breakout-quality) |200k /49,939|23m33s|2.625 /1.375|0/24; below cap640 control4.000|
 | [Full18, corrective labels/expert10/20%/R16](results/2026-10-26-cdp-breakout-pixel-reference.md#corrective-labels-save-time-but-remain-below-unaided-breakout) |200k /24,970|17m25s|4.292 /1.375|0/24 two-wall;26.02% less time than old guidance,but below unaided7.083|
+| [Retained corrective learner,greedy](results/2026-10-26-cdp-breakout-pixel-reference.md#greedy-corrective-breakout-gives-a-small-gain-but-remains-weak) |200k /24,970 retained;0 new|17m25s retained|5.000 /2.583|0/24 two-wall;small gain over sampled4.292|
 | [Same, encoder rate4e-5](results/2026-10-26-cdp-breakout-pixel-reference.md#higher-encoder-rate-lowers-frozen-breakout-quality) |200k /24,970|17m41s|1.458 /1.375|0/24 two-wall;below original-rate4.292,1.52% more time|
 | [Same, four actions](results/2026-10-26-cdp-breakout-minimal-actions.md) |200k /49,939|20m59s|9.542 /1.167|0/24 two-wall successes|
 | [Four actions, coefficient1, actor/critic gradients](results/2026-10-26-cdp-breakout-minimal-actions.md#actorcritic-gradients-give-a-modest-unconfirmed-gain) |200k /49,939|20m41s|11.208 /1.167|0/24; modest unconfirmed gain|
