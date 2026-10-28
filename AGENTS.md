@@ -52,14 +52,17 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-A fresh Qbert expert100/200k/R16 comparison is active from21:02:45 UTC on
-October28/source`0d73300`. Budget100k→200k and ratio32→16 change together at
-24,970 versus24,939 updates; wall time is not matched. The8192 check passes in
-60.947s,all36 pins/357 tensors/full replay/guards,projecting24m48s. Full startup
-passes138 pins/357 initial tensors and501 finite reports. Training cap30min,
-100k recovery and4 frozen sampled/greedy final/own-initial arms are automated.
-No outcome,extension or automatic successor. See the expert100-r16 protocol;
-check live state before GPU work.
+Qbert expert100/200k/R16 completes200k actions/799,703 frames/24,970 updates in
+26m07s. Greedy9654.167/23 first pyramids improves100k/R32's8365.625/24 by
+15.40%,for37.63% more training time; sampled7569.792/24 versus7339.583/22.
+Own initials263.542/182.292,zero pyramids. Both still miss mean15000. All138 pins,
+100k recovery,357 matched initial/invariant frozen tensors,paired initial traces,
+full replays,guards,curves,coverage,exposure and comparison pass. Main succeeds
+21:41:05 UTC,postprocessing21:41:19 on October28; all services are inactive.
+Actual overrides41.383%; guided returns are not competence. Budget and ratio
+change together on reused4013; no isolated effect or seed confirmation. Retain
+both budget points; no extension or automatic successor. See the expert100-r16
+protocol and completed result in cheap-Qbert; check live state before GPU work.
 
 Qbert expert100 completes100k actions/399,886 frames/24,939 updates in18m59s.
 Greedy8365.625/24 first pyramids improves scale10's7700/24 by8.64%; sampled

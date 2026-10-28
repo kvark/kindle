@@ -111,3 +111,22 @@ A further affined CPU-only Breakout feedback parity replay runs21:21:08–21:22:
 UTC,108.206s measured analysis. It imports no native module and reconstructs old
 learner trajectories only. All138 inputs and the same learner process remain
 unchanged. Retain this additional co-host timing caveat without time adjustment.
+
+## Completed fresh200k comparison
+
+Qbert expert100/200k/R16 completes200k actions/799,703 frames/24,970 updates in
+26m07s. Greedy9654.167/23 first pyramids improves100k/R32's8365.625/24 by
+15.40%,for37.63% more training time; sampled7569.792/24 versus7339.583/22.
+Own initials263.542/182.292,zero pyramids. Both still miss mean15000. All138 pins,
+100k recovery,357 matched initial/invariant frozen tensors,paired initial traces,
+full replays,guards,curves,coverage,exposure and comparison pass. Main succeeds
+21:41:05 UTC,postprocessing21:41:19 on October28; all services are inactive.
+Actual overrides41.383%; guided returns are not competence. Budget and ratio
+change together on reused4013; no isolated effect or seed confirmation. Retain
+both budget points; no extension or automatic successor. See the expert100-r16
+protocol and completed result in cheap-Qbert; check live state before GPU work.
+
+Full training time is1567.221200s. The four frozen arms and complete training
+replay pass without GPU repetition,cap changes or runtime edits. The original
+co-host CPU durations remain unadjusted. Full outcomes and evidence hashes are in
+[the result](../results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-nearly-equal-updates-improves-qbert-with-higher-cost).
