@@ -118,3 +118,24 @@ launch; use the existing AMD host guard and stop on real faults/nonfinite report
 No driver recovery,retry,cap increase,automatic promotion or full learner is
 selected. Root`/x/Temp/kindle-breakout-corrective-20261028/native-check`,service
 `kindle-breakout-corrective-check-20261028`. Check live state before launch.
+
+## Completed bounded native check
+
+Optional Breakout corrective labels pass510 CPU tests,forced-reference parity
+and181,224 recorded learner-action feedback checks. Applied source2854dd9 keeps
+native447fe50 unchanged. The fresh8192-action/32,725-frame/994-update check takes
+36.919s;1024 frozen actions/4096 frames take.555s,zero updates/no natural episodes.
+All41 pins,346 shared initial/357 invariant frozen tensors,finite reports,changed
+CNN/reward/actor/value,full label/pixel/action replay and guards pass. Main succeeds
+21:43:38 UTC on October28. No task competence or cap-release coverage is measured.
+Use`/x/Temp/kindle-breakout-corrective-20261028/runtime` for this adapter; original
+sources remain archived. Early200k projection15m01s; no full learner is selected.
+See the Breakout corrective-label protocol and pixel-reference result. No active
+GPU allocation; check live state before GPU work.
+
+Declaration`20ea2c67af4adfe823b69b407abcac28dbc0282b8ebd66b38b4aa86b3daee1d0` pins41 inputs. CPU preparation
+parses both commands and derives the357-tensor schema without loading a native
+module or constructing an environment. Service starts21:42:47 UTC/source2854dd9,
+PID206620/invocation`e8ba704750a64264833a84c7882f7112`; all audits pass.
+The measured early rate projects901.337s/200k; no full learner is selected.
+[Completed evidence](../results/2026-10-26-cdp-breakout-pixel-reference.md#corrective-breakout-labels-pass-the-bounded-native-check).

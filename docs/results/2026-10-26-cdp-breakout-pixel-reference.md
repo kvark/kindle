@@ -730,3 +730,47 @@ raw completion`ae992ac4abafb4e147cd6fd43e4ff47ae2f055f564a898e3d44b78607cd2ea65`
 Aiming comparison`34abe424a6e6591506c0f32a48e135d02dbb4e7369e271a12372f1faad2c726b`;
 review`153f4b7384169f92a2cee6561c13d5048aff9157c3aad1a678a6c0a7f07b4d13`;
 completion`1c40bf9307aeacf4c2a09be1eaa24b81df19fc9b84951fb17107f13b63b65fdb`.
+
+## Corrective Breakout labels pass the bounded native check
+
+The optional adapter is applied as2854dd9 after all Qbert services and audits
+finish. Its exact five files pass510 CPU tests,52,072 forced-reference actions
+and181,224 recorded learner-action feedback checks. Default guidance stays
+unchanged; native447fe50/SHA35ad0db is unchanged. Original declarations remain
+intact,with an explicit archived resolver for the changed historical replay path.
+
+A separately selected fresh **8192 actions /32,725 emulator frames /994 updates**
+take **36.919s**. Frozen greedy1024 actions /4096 frames take.555s,zero updates and
+no completed natural episodes. All41 declared inputs,346 shared control-matched
+initial tensors,357 invariant frozen tensors,finite reports,changed CNN/reward/
+actor/value,source/config/counters and both host guards pass. Full teacher-label/
+input-pixel/actual-action replay passes with no agent construction. No failed
+attempt,GPU repetition,cap increase or runtime edit occurs.
+
+Configuration:4M64/Auto/N8/B8/T16/H15/R16/coefficient1/actor-unimix.01/full18/
+original rates,1009/eval4000001009,20%episode guidance/cap1920/expert10/all18 action
+weights1/world gradients/corrective labels. Native max-pooled frames get one GPU
+resize. First update248,residual debt0;all994 reports are supervised,118,983 labeled
+replay rows equal weight sum,and maximum raw world/actor expert-loss difference
+is8e−7. Raw losses exclude the expert coefficient. Labels include2367 NOOP,
+1183 FIRE and4642 paddle commands;4295 passive labels and3865 actual/teacher
+disagreements. Actual overrides3897/8192 (47.571%),not20% of actions.
+
+The measured early rate projects15m01s/200k actions. This is execution and early
+cost evidence,not natural-episode competence. No lane reaches the1920-action
+cap in this check,so it does not establish native cap-release coverage. Compared
+with the old forced-only control,native/runtime,edge correction/feedback,all-state
+labels,world gradients,expert scale,guidance probability and replay ratio change
+together; no isolated causal effect is claimed. Initial tensor equality checks
+compatibility,not a matched algorithm comparison. No full learner,extension,
+retry or automatic promotion is selected; no check experience is reused.
+
+Service starts21:42:47 UTC/source2854dd9 and succeeds21:43:38,whole51.167s.
+All GPU work is terminal. Current adapter runtime:
+`/x/Temp/kindle-breakout-corrective-20261028/runtime`; bounded evidence:
+`/x/Temp/kindle-breakout-corrective-20261028/native-check/breakout-4m-64-r16-corrective-expert10-check`.
+Declaration`20ea2c67af4adfe823b69b407abcac28dbc0282b8ebd66b38b4aa86b3daee1d0`;
+review`922690e0dae0697f718973eb372cfa3a66c350c53f41c25338c23f86b43cc1b8`;
+replay`fd363e68c9be89df3b3e35428ee762dc3a1169414b29f547a7654355dcb3f93a`;
+completion`9ef671641d6416f2f81a0fc16a0b1cabbb3fa82f161104c325f9e403209144cd`.
+See the [adapter and check protocol](../experiments/2026-10-28-cdp-breakout-corrective-labels.md).

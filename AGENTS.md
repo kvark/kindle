@@ -52,6 +52,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
+Optional Breakout corrective labels pass510 CPU tests,forced-reference parity
+and181,224 recorded learner-action feedback checks. Applied source2854dd9 keeps
+native447fe50 unchanged. The fresh8192-action/32,725-frame/994-update check takes
+36.919s;1024 frozen actions/4096 frames take.555s,zero updates/no natural episodes.
+All41 pins,346 shared initial/357 invariant frozen tensors,finite reports,changed
+CNN/reward/actor/value,full label/pixel/action replay and guards pass. Main succeeds
+21:43:38 UTC on October28. No task competence or cap-release coverage is measured.
+Use`/x/Temp/kindle-breakout-corrective-20261028/runtime` for this adapter; original
+sources remain archived. Early200k projection15m01s; no full learner is selected.
+See the Breakout corrective-label protocol and pixel-reference result. No active
+GPU allocation; check live state before GPU work.
+
 Qbert expert100/200k/R16 completes200k actions/799,703 frames/24,970 updates in
 26m07s. Greedy9654.167/23 first pyramids improves100k/R32's8365.625/24 by
 15.40%,for37.63% more training time; sampled7569.792/24 versus7339.583/22.
