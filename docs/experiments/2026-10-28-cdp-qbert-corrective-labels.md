@@ -1,10 +1,12 @@
 # Qbert corrective labels on learner-visited states
 
-**Optional implementation passes CPU checks; packaging is next.** Independent
-expert labels and fresh Qbert corrective guidance are implemented, with130 Rust
-CPU tests and491 relevant Python tests passing. Native GPU behavior, bounded
-cost and task benefit remain unverified; no full learner is selected. The
-five-game goal remains unfinished.
+**Optional corrective labels pass native and bounded Qbert checks.** The fresh
+8192-action/994-update check takes61.976s, followed by1024 frozen actions/.511s.
+All36 pins,357 matching initial/invariant frozen tensors, exact teacher-label/
+actual-action/pixel replay and host guards pass. No natural frozen episode
+completes, so competence remains unmeasured. A separate fresh200k comparison is
+selected below under a30-minute training cap; check live state before GPU work.
+The five-game goal remains unfinished.
 
 ## Evidence and scope
 
@@ -139,3 +141,113 @@ hash under`/x/Temp/kindle-corrective-labels-20261028/prior-source`. Original
 runtimes/checkpoints/reviews are unchanged; do not rerun old pinned controllers
 against the new shared script. Separate packaging and a newly pinned bounded
 GPU declaration remain outstanding.
+
+
+## Isolated package and native diagnostic
+
+Native source`447fe50` is packaged in
+`/x/Temp/kindle-corrective-labels-20261028/runtime`. Native SHA256
+`35ad0db42fc7ed5dbaf6dacddff613fdc04d83ae6e0f38548532f6ab2c7812a2`;
+wheel`bef181caf99e080a535a14b1626f81db490960ddf55f318f978b56b13d067bb6`.
+The build receipt pins source, packaged Python, wheel, native extension, retained
+test executable and validation logs. Packaged491 Python tests pass with zero
+native constructions. The original native runtime is unchanged. A prelaunch
+review fixes only the diagnostic: mixed replay may legitimately have no labels,
+so it checks mixed samples and selects one supervised sample for its update.
+130 CPU tests and strict Clippy pass after that test-only correction.
+
+The guarded native check preserves sampled actions, live beliefs and executed
+transition replay against an identical no-label control over8 two-lane steps,
+including ordinary overrides. It observes3 actual/teacher disagreements and
+independent targets in16 matched replay samples. Invalid inputs leave pending
+state/RNG unchanged. A supervised sample with3 labeled rows gives actor loss
+.54905325/world loss.5490533 and changes finite actor parameters. This verifies
+execution and alignment, not task competence or new derivative measurements.
+The one diagnostic passes in5.87s; service starts17:21:12 and succeeds17:21:19 UTC
+on October28, invocation`7260c5512ef146f1a71052b73114851c`, whole6.797s.
+All7 pins and the host guard pass. Declaration
+`aa87c72d02eb3b9c3508b9b5b89a87e12626172038189f7b97da35628388ffba`;
+review`c48f5bc871e5544814b1e95361e7f29a350ab2024f25e18256fc7585fe8ea17c`.
+
+## Selected bounded Qbert check
+
+Only8192 training actions/994 expected updates and1024 frozen actions are
+selected. Use fresh4013/evaluation4000004013,4M48/Auto/N8/B8/T16/H15/R16,
+coefficient1/actor0/full18/original rates,20%episode continuation/cap1920,
+expert1/NOOPweight.05/world gradients and corrective labels on every native
+pixel state. No check/control weights, replay, games or RNG are reused.
+Actual episode-based overrides remain separately counted. Require passive
+states, label/action disagreements, movement labels, finite aligned expert
+losses, changed CNN/reward/actor/value,357 matching control-initial and invariant
+frozen tensors, full teacher-label/action/pixel replay and both host guards.
+First update248/debt0. Training cap180s, frozen60s, CPU audit180s, service480s;
+no retry, cap increase, automatic promotion or reuse of check experience.
+
+Service`kindle-qbert-corrective-check-20261028` starts17:22:39 UTC on October28,
+invocation`d5f655e02d9845cbad240661c0b38393`.36 pins identify the exact sources,
+runtime, initial reference, queue and auditors. Declaration
+`c0fd3874c271e253799b10e7b8bbc40cb816bf8216908e626f041b1e3a9a936b`.
+Artifacts are under`qbert-4m-48-r16-corrective-check` in the package root.
+The bounded service is terminal; its completed result follows.
+
+
+## Bounded Qbert result and packaging
+
+The fresh check completes8192 actions /32,753 emulator frames /994 updates in
+61.976s. Frozen1024 actions /4096 frames take.511s with zero updates and no
+completed natural episodes. All357 initial tensors match the retained4M world-
+gradient control; all357 frozen tensors remain unchanged. CNN, reward, actor
+and value parameters change and all reports remain finite. All8192 teacher
+recommendations are independently reproduced, including3607 passive states and
+3195 actual/teacher disagreements. There are1511 movement labels and6681 NOOPs.
+994 supervised reports contain119,174 replayed labeled rows; max world/actor
+expert-loss difference is3e−7. Replayed rows are repeated samples, not distinct
+labels or an accuracy measurement. Actual overrides4585 (55.9692%) remain
+separate from20% episode probability and100% label exposure.
+
+All36 pins, source/config/counter/schema checks, complete label/input-pixel/
+actual-action/outcome replay and both host guards pass. Main service succeeds
+17:24:16 UTC on October28, whole1m37.041s; no GPU stage repeats. Bounded review
+SHA256`77ae031c2b3a2e37aaf1ac832b06728ee4be04e2528e67458fe954e8d2243526`;
+replay`7d8e1f8edab076909ca5895372d3f65253ed2744c821e5010e6783a79f44a689`.
+The2.6GiB disposable build cache is released after retaining wheels, the native
+runtime, validation executable and evidence. Packaging receipt
+`28c2f7c112903f887c76cfc8a98e1adc4d84631e337a977908bf6c4557b0dddd`
+pins the exact package and completed checks. This is execution/early-cost
+evidence, not unaided competence, cap-release coverage or derivative isolation.
+
+## Separately selected fresh200k comparison
+
+The early rate projects25m13s/200k, sufficient to select one fresh fixed-budget
+comparison under a30-minute training cap. Use the exact bounded recipe above:
+4M48/Auto/N8/B8/T16/H15/R16/coefficient1/actor0/full18/original rates,
+20%episode continuation/cap1920/expert1/NOOPweight.05/world gradients, plus
+corrective labels on every visited state. Start fresh4013; do not restore the
+bounded/control weights or reuse experience. Primary retained control is the
+same4M/R16/20%/world-gradient learner:3670.833/19of24 first pyramids in21m28s.
+Stronger5%/R32/world-off4730.208/23 is contextual evidence. Native, runner and
+validator revisions differ. Labels and teacher feedback change together; no
+isolated causal effect or independent seed reliability is claimed.
+
+At exactly200k actions expect24,970 updates, first update248/debt0. Keep100k
+recovery (12,470 updates) and fixed final checkpoints. Evaluate fixed final and
+own actual initial with sampled actions, no guidance or labels, first3 natural
+episodes per8 lanes=24 each, evaluation seed4000004013. Preserve original
+mean15000/90%-first-pyramid gate. Require357 matching initial tensors, identical
+paired initial semantic traces,357 invariant tensors per frozen arm, finite
+reports, explicit config/source/host/counters, full training label/pixel/action
+replay and frozen outcome replay, curves, coverage, exposure and comparison.
+Ordinary frozen logs lack live pixel hashes; replay does not establish direct
+live-image equality. Online guided returns are not unaided competence.
+
+Training cap1800s; each frozen arm300s/600k actions; training replay900s;
+CPU audit1500s; owning service4200s. The larger CPU replay allowance is selected
+before launch because full all-state replay measured about26s/8192 in the
+bounded check. No retry, cap increase, extension, checkpoint selection or
+automatic successor. No completed life is restarted. CPU preparation parses
+all3 commands, checks all11 scripts, retained control metrics,357 initial
+tensors,36 bounded pins and100k/200k update accounting without loading native
+code or constructing environments. Root
+`/x/Temp/kindle-qbert-corrective-full-20261028`; service
+`kindle-qbert-corrective-200k-20261028`. Exact declaration and launch identities
+are recorded externally before/at execution.

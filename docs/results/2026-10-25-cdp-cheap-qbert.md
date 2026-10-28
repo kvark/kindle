@@ -2509,3 +2509,31 @@ training budget or automatic successor is selected. See the
 [protocol and required invariants](../experiments/2026-10-28-cdp-qbert-corrective-labels.md).
 Artifacts:`/x/Temp/kindle-qbert-correction-20261028`; review SHA256
 `0eab9a3a3f710b0bfac144ad876e3c288d627f35abb2ca3bf82e315a575cea37`.
+
+
+## Corrective labels pass a bounded native Qbert check
+
+The optional independent-label API keeps actual actions in world transitions
+and teacher recommendations in masked expert targets. A5.87s guarded native
+check preserves sampling/beliefs/transition replay with different labels and
+passes one finite aligned expert update.130 Rust CPU tests,491 packaged Python
+tests with zero native constructions, and strict workspace/binding Clippy pass.
+Native`447fe50`/SHA35ad0db is separately packaged; legacy forcing/defaults remain.
+
+Fresh4M48/Auto/N8/B8/T16/H15/R16/20%episode continuation/cap1920/expert1/
+NOOP.05/world gradients with corrective labels completes8192 actions/32,753
+frames/994 updates in61.976s. Frozen1024/4096/.511s has zero updates and no
+natural episodes. All36 pins,357 matching initial/invariant frozen tensors,
+finite reports,CNN/reward/actor/value changes,full label/input-pixel/actual-action
+replay and guards pass. All8192 labels include1511 hops,3607 passive states and
+3195 actual/teacher disagreements; actual overrides4585 (55.9692%).994 reports
+are supervised; max world/actor expert-loss difference3e−7. Main service exits
+17:24:16 UTC on October28; no GPU stage repeats. This is execution and early-cost
+evidence, not competence.2.6GiB build cache released, artifacts retained under
+`/x/Temp/kindle-corrective-labels-20261028`.
+
+The early25m13s/200k projection motivates a separately selected fresh200k
+comparison with the retained4M control, a30-minute training cap and fixed
+final/own-initial24-episode frozen evaluation. Labels and feedback change
+together on reused4013; no isolated causal or reliability claim. See the
+[protocol and receipts](../experiments/2026-10-28-cdp-qbert-corrective-labels.md).

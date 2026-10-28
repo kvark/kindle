@@ -458,16 +458,29 @@ full replays,guards,curves,coverage,exposure and comparison pass. Main succeeds
 16:40:13 UTC,postprocessing16:40:29 on October28. Actual guidance46.411%.
 Retain4M; no extension or confirmation. Model/batch change together on reused4013.
 Full root`/x/Temp/kindle-qbert-expert-capacity-20261028/full`; see the completed
-expert-capacity result in cheap-Qbert. No learner/GPU allocation is active;
-check live state before GPU work.
+expert-capacity result in cheap-Qbert. That life is terminal; the separately
+selected corrective-label check is below. Check live state before GPU work.
 
 The CPU corrective-teacher check preserves24,733 accepted reference actions and
 scores13087.500 versus8584.375 under fixed5% random disturbance, both8/8 pyramids.
 Full proposal/action/pixel replay and all10/63 source/retained pins pass; service
 succeeds16:53:20 UTC on October28. This is teacher robustness on reused episodes,
-not native learning. Select optional independent expert labels plus action
-feedback; implementation/packaging/bounded GPU validation remain outstanding.
-No training allocation is selected. See the corrective-labels October28 protocol.
+not native learning. Independent expert labels/action feedback are now optional,
+CPU-validated and separately packaged as native447fe50/SHA35ad0db.130 Rust CPU
+and491 packaged Python tests plus strict Clippy pass. The guarded native action/
+belief/replay/target/update diagnostic passes in5.87s; service exits17:21:19 UTC.
+The bounded corrective Qbert check completes8192 actions/32,753 frames/994
+updates in61.976s;1024 frozen/.511s,zero updates/no natural episodes. All36 pins,
+357 matching initial/unchanged frozen tensors,finite aligned losses,parameter
+changes,full label/pixel/action replay and guards pass; exits17:24:16 UTC.
+8192 labels include3607 passive states/3195 action disagreements;4585 overrides.
+Use`/x/Temp/kindle-corrective-labels-20261028/runtime`;2.6GiB cache released.
+Separately select fresh200k/24,970 updates with the same4M48/Auto/N8/B8/T16/H15/
+R16/20%/cap1920/expert1/NOOP.05/world/all-state-label recipe,30-minute training
+cap and own-initial/final24-episode frozen arms. Compare retained4M world3670.833/
+19;labels and feedback change together on reused4013. Root
+`/x/Temp/kindle-qbert-corrective-full-20261028`; no extension or automatic
+successor. See the corrective-labels October28 protocol and check live state.
 
 
 
