@@ -93,3 +93,12 @@ Startup passes at944 actions/173 finite supervised reports,all111 pins,357
 initial tensors matching both control and check,exact config and first6 updates.
 50k recovery,progress and terminal postprocessing are automated. No frozen task
 outcome yet; no extension or automatic successor selected.
+
+An affined CPU-only analysis of completed expert10/1009 training logs overlaps
+this life for.687s at20:34:10 UTC. All111 active inputs and the same learner
+PID/invocation remain unchanged; it constructs no native agent or environment.
+Keep this small co-host timing caveat without adjusting measured wall time.
+
+The50k recovery audit succeeds20:39:09 UTC at12,439 updates,357 finite tensors;
+the observed complete log prefix contains51,064 actions/12,703 finite reports.
+The recovery watcher exits successfully without changing the running learner.

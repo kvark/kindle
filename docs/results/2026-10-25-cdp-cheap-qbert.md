@@ -2868,3 +2868,14 @@ postprocessing`346be2c6742ce86dc7c238730bf31c6036da735d1dad92ede9cf1e34ed4974c0`
 comparison`fa5b7c0dbc2b800e964cd1f67762554164913f272fd709d09f48d008e35c03ae`;
 completion`9a5423a24cf2b2510c43f0dfd821c844cfa91d6ba84f0ecccee65fb830141a3c`.
 See the [second-learner protocol](../experiments/2026-10-28-cdp-qbert-expert10-seed1009.md).
+
+Retrospective saved-log analysis finds final50k passive teacher agreement of
+77.637% on1009 versus78.267% on4013; hop agreement45.634% versus47.203%,wait
+agreement89.573% versus90.672%. Weighted replay CE is.157522 versus.137775.
+These aggregate differences describe distinct visited states and replay samples;
+they do not establish the cause of the much larger frozen-score difference or
+measure held-out teacher accuracy. The affined CPU analysis takes.687s during
+the separately selected expert100 life, preserving all111 inputs and its process
+identity, with no native/environment construction. Evidence:
+`/x/Temp/kindle-qbert-expert10-seed-analysis-20261028`, review
+`0ec88bec80f3b9126e220976ddb4b9d47620e8acb58e682a963dfd7a4290403e`.
