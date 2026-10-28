@@ -92,3 +92,23 @@ A further.228s affined CPU scan of retained Breakout reference detections finds
 no observed descending velocity outside the existing tracker gate. It constructs
 no environment or agent,changes no policy,and preserves all64 inputs and the
 same learner process. Retain the co-host duration without time correction.
+
+## Completed comparison
+
+Breakout corrective200k completes200k actions/799,234 frames/24,970 updates in
+17m25s,26.02% less training time than the old forced-only cap1920 control.
+Frozen4.292 versus own initial1.375 improves the old guided2.625 but stays below
+unaided full18's7.083; all0/24 two-wall successes. All64 pins,100k recovery,
+346 shared old/357 bounded initial and357 invariant frozen tensors,paired initial
+semantic traces,finite reports,full replays,guards,curves,exposure and comparison
+pass. Main succeeds22:12:00 UTC,postprocessing22:12:22 on October28. Original
+CPU observer startup failure remains; replacement succeeds,no GPU stage repeats.
+Actual overrides67.135%; guided mean203.275 is not competence. Multiple settings
+and native/runtime change together on reused1009. Retain stronger controls;
+no extension,seed confirmation or automatic successor. No active GPU allocation.
+See the corrective-200k protocol and completed pixel-reference result.
+
+The complete receipt explicitly retains the original failed observer and the
+successful replacement. Its separate CPU collector changes no declared input.
+No training/evaluation stage repeats,no cap changes,and no completed life is
+extended. [Full result](../results/2026-10-26-cdp-breakout-pixel-reference.md#corrective-labels-save-time-but-remain-below-unaided-breakout).

@@ -790,3 +790,76 @@ the source hash,all64 active Breakout inputs and the learner PID/invocation.
 Retain this CPU co-host duration without adjusting training time.
 Artifacts:`/x/Temp/kindle-breakout-tracking-audit-20261028`;
 review`595fdc70efa4f8acf8fc542752a172c0965f04ea12b3d9ad991faf91539be84c`.
+
+## Corrective labels save time but remain below unaided Breakout
+
+Fresh **200k actions /799,234 emulator frames /24,970 updates in17m25s** costs
+**26.02% less training time** than the old forced-only cap1920 control. Frozen
+sampled mean **4.292** improves that control's2.625 and its own initial1.375, but
+remains below the unaided full18 control's7.083. All policies have **zero of24
+two-wall successes**. Retain the stronger controls. This cheaper budget point
+does not justify an extension, seed confirmation or automatic successor.
+
+| Recipe | Updates | Training | Frozen final / own initial | Two-wall successes |
+|---|---:|---:|---:|---:|
+|Unaided full18/actor-unimix .01|49,939|22m29s|7.083 /1.375|0/24 /0|
+|Old forced-only cap1920/expert1/5%/R32|49,939|23m33s|2.625 /1.375|0/24 /0|
+|Corrective labels/expert10/20%/R16|24,970|17m25s|4.292 /1.375|0/24 /0|
+
+Keep4M64/Auto/N8/B8/T16/H15/coefficient1/actor-unimix .01/full18/original rates,
+cap1920/all18 action weights1. Compared with the old guided control,native/runtime,
+edge-reset teacher with actual-action feedback,all-state labels,world gradients,
+expert scale1→10,episode probability5%→20% and replay ratio32→16 change together.
+No isolated causal effect, matched update budget or independent seed confirmation
+is claimed. Seed1009/evaluation4000001009 are reused development data. No weights,
+replay,belief,games,RNG or bounded-check experience are reused. Native frames
+retain one GPU resize; native447fe50 and the checked adapter stay unchanged.
+
+All64 declared inputs remain unchanged. The100k recovery passes at12,470 updates;
+346 shared initial tensors match the old guided control and357 match the bounded
+check. All802 actual-initial semantic events match the control,including final
+counters,outcomes and tails. All24,970 reports are finite,CNN/reward/actor/value
+change,and357 frozen tensors per arm remain invariant. Complete training teacher-
+label/input-pixel/action replay,frozen outcome replays/videos,host guards,curves,
+exposure and comparison pass. The comparison PNG is visually inspected.
+
+Each frozen arm selects first3 natural episodes per8 lanes=24,with guidance and
+labels disabled,zero updates and zero truncations. Final/initial collect25/29
+episodes; excess episodes and partial tails remain recorded. The two arms total
+14,320 actions /57,179 frames /7.392s. Ordinary frozen logs lack live pixel hashes;
+outcome replay does not compare unavailable live images.
+
+Episode guidance selects83/408 starts but overrides134,270 actions (**67.135%**).
+All200k states receive labels:61,717 NOOP,29,569 FIRE and108,714 paddle commands.
+There are65,730 passive labels and42,845 actual/teacher disagreements. All24,970
+supervised reports total2,989,938 labeled replay rows and identical weight sum;
+maximum raw world/actor expert-loss difference is8e−7. Raw losses exclude the
+expert coefficient. Target-weighted replay cross entropy declines1.375602→1.000155
+across the first/final50k windows; these repeated changing samples do not measure
+held-out classification accuracy or establish a mechanism.
+
+The80 completed guided episodes average203.275,while320 unguided episodes average
+1.8125; both have zero two-wall successes. There are1052 native actions after a
+selected episode reaches its cap,with complete replay/accounting. Guided and
+released returns inherit teacher actions and are not unaided frozen competence.
+The large online curve changes therefore cannot be read as a learning success.
+
+Main starts21:52:19 UTC/source9e8ead1 and succeeds22:12:00,whole19m41.536s;
+postprocessing succeeds22:12:22,whole20m02.702s. The original CPU recovery observer
+fails on an empty startup header before initialization writes it. After checking
+the complete header,the exact unchanged watcher runs in a separate service and
+successfully audits100k. Its original failure/journal remain; the separate CPU
+completion collector requires the replacement's success and records both states.
+The learner keeps the same PID/invocation and all64 pins. No GPU stage repeats,
+cap changes or runtime edits occur. Affined CPU analyses of retained Qbert labels
+and Breakout detections take1.131s/.228s during training; retain these co-host
+caveats without correcting wall time. Main,postprocessing,progress and replacement
+recovery are terminal success; the original failed observer is preserved.
+No active GPU allocation remains. The five-game goal is unfinished.
+
+Artifacts:`/x/Temp/kindle-breakout-corrective-20261028/full/breakout-4m-64-r16-corrective-expert10-200k-seed1009`.
+Learning review`8499499c4e911f8c51cbf7856bdef43a86c1b82cb8ed97e3c6b13598aaf7175b`;
+postprocessing`5e29c1aa4565ec96f6c80ed24e16e6ce341291fc5118adc5b9e572572307123c`;
+comparison`9807b363564ab4daf845e72700c8b1d13f04c98725ee33fd8dfa9cd93c0ceadc`;
+completion`e1941e46d0664cad8e55d7b970b1f49f1f550a2abe5fda8c3df5d6de73723bcc`.
+See the [selected protocol](../experiments/2026-10-28-cdp-breakout-corrective-200k.md).

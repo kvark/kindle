@@ -1,16 +1,17 @@
 # CDP handover — October25,2026
 
-A fresh Breakout corrective-label200k comparison is active from21:52:19 UTC on
-October28/source9e8ead1. Recipe4M64/Auto/N8/B8/T16/H15/R16/expert10/20%episodes/
-cap1920/world gradients/all-state labels keeps the bounded runtime. Declaration
-pins64 inputs; startup passes15,576 actions/1916 finite reports,346 shared old
-initial tensors and357 bounded initial tensors. Training cap25min,100k recovery
-and final/actual-initial sampled24-natural-episode assessments are automated.
-The first CPU recovery observer reads an empty startup header and fails; its
-unchanged replacement runs after header verification. Original failure remains,
-all64 pins and the same learner PID/invocation stay unchanged; no GPU repeat.
-No task result,extension or automatic successor. See the corrective-200k protocol;
-check the existing live service before GPU work.
+Breakout corrective200k completes200k actions/799,234 frames/24,970 updates in
+17m25s,26.02% less training time than the old forced-only cap1920 control.
+Frozen4.292 versus own initial1.375 improves the old guided2.625 but stays below
+unaided full18's7.083; all0/24 two-wall successes. All64 pins,100k recovery,
+346 shared old/357 bounded initial and357 invariant frozen tensors,paired initial
+semantic traces,finite reports,full replays,guards,curves,exposure and comparison
+pass. Main succeeds22:12:00 UTC,postprocessing22:12:22 on October28. Original
+CPU observer startup failure remains; replacement succeeds,no GPU stage repeats.
+Actual overrides67.135%; guided mean203.275 is not competence. Multiple settings
+and native/runtime change together on reused1009. Retain stronger controls;
+no extension,seed confirmation or automatic successor. No active GPU allocation.
+See the corrective-200k protocol and completed pixel-reference result.
 
 Optional Breakout corrective labels pass510 CPU tests,forced-reference parity
 and181,224 recorded learner-action feedback checks. Applied source2854dd9 keeps
@@ -22,7 +23,7 @@ CNN/reward/actor/value,full label/pixel/action replay and guards pass. Main succ
 Use`/x/Temp/kindle-breakout-corrective-20261028/runtime` for this adapter; original
 sources remain archived. Early200k projection15m01s; no full learner was selected at bounded completion.
 See the Breakout corrective-label protocol and pixel-reference result. The
-separately selected current allocation is described above.
+separately selected full comparison is completed above.
 
 Qbert expert100/200k/R16 completes200k actions/799,703 frames/24,970 updates in
 26m07s. Greedy9654.167/23 first pyramids improves100k/R32's8365.625/24 by
