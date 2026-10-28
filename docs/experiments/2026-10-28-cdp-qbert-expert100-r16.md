@@ -102,3 +102,7 @@ All138 active inputs and the same learner PID/invocation remain unchanged. Tests
 construct no native agent; parity imports no native module. These are co-host
 timing caveats, with no correction to measured training time. No production or
 active-runtime inputs change. See the separate Breakout corrective-label protocol.
+
+The100k recovery audit succeeds21:16:21 UTC at12,470 updates,357 finite tensors.
+Its complete log prefix has103,728 actions/12,936 finite reports. The recovery
+watcher exits successfully without changing the learner.
