@@ -94,3 +94,28 @@ All supervision rows/weights match. The recovery observer starts22:25:14 after
 the complete header; main,progress,recovery and postprocessing are active.
 Startup review`584fcdb20c8b5ba10add8e0725112c84271b2b89e346ee9c5c1eefafc12b3f53`.
 No frozen benefit has been measured and no additional allocation is selected.
+
+## CPU comparison corrected while training continues
+
+At22:28:43 UTC,read-only inspection finds a copied assertion in the future CPU
+comparison still requiring the old config. It would reject the declared encoder
+rate before producing a comparison. No comparison has executed. Preserve every
+original input and replace only the waiting CPU postprocessor with a separately
+staged version in`/x/Temp/kindle-breakout-encoder-rate-20261028/postprocess-repair`.
+The main learner staysPID210609/invocation`b46837dd8b0b430c90a5c4fc8a3ae4d9`;
+all64 declared inputs remain unchanged. No GPU stage is stopped or repeated.
+
+Six CPU checks accept the actual bounded candidate config and reject the old
+encoder rate or changed dynamics/base rates,replay ratio and actor mixture.
+The corrected comparison changes the expected config only toencoder4e-5;
+all other audit requirements remain. The original waiting observer is deliberately
+stopped before comparison,with its journal and state retained. Replacement unit
+`kindle-breakout-encoder-rate-postprocess-repair-20261028` starts22:28:43,
+PID211059/invocation`8fd3c8100c0c403f8c1a99de5628e8bb`,with the original absolute
+CPU deadline preserved. Training/evaluation caps and recovery observer are unchanged.
+
+Preparation receipt`8a5e6b33edaf52efeae1b74867426657ef6da7fa1cacc2f53b6b62f1d100929c`
+pins original and corrected CPU sources. Use the separate repair-directory
+`collect_full.py` after terminal success; it additionally checks the replacement
+and the recorded intentional stop. The original pinned collector remains untouched.
+This repair constructs no agent or environment and supplies no learning result.

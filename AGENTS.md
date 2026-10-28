@@ -65,6 +65,10 @@ Recovery now waits for a complete valid header. A CPU preparation path error is
 preserved and corrected before launch; no GPU repeat. Runtime remains
 `/x/Temp/kindle-breakout-corrective-20261028/runtime`; use the new pinned runner
 and controllers in`/x/Temp/kindle-breakout-encoder-rate-20261028/full`.
+The waiting CPU comparison observer is replaced22:28:43 after a stale config
+assertion is found before execution; all64 inputs and the learner stay unchanged.
+Use`postprocess-repair/collect_full.py` after terminal success; original scripts,
+observer stop and six CPU checks are retained. No GPU repeat or cap change.
 No frozen benefit is measured yet. See the encoder-rate protocol; check live state.
 
 Breakout corrective200k completes200k actions/799,234 frames/24,970 updates in
