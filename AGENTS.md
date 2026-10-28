@@ -232,8 +232,10 @@ cap and own-initial/final24-episode frozen arms. Compare retained4M world3670.83
 19;labels and feedback change together on reused4013. Root
 `/x/Temp/kindle-qbert-corrective-full-20261028`; service starts17:29:58 UTC,
 training17:29:59/sourcee3b2ceb. All52 pins,config,update timing and357 initial
-tensors pass startup at4136 actions/486 finite reports. Recovery/progress/CPU
-postprocessing monitors are active; no frozen outcome yet. No extension or
+tensors pass startup at4136 actions/486 finite reports.100k recovery passes
+17:43:23 UTC with12,470 updates/357 finite tensors. Released states retain
+independent labels; progress/CPU postprocessing remain active, no frozen outcome
+at this milestone. No extension or
 automatic successor. See the corrective-labels October28 protocol and check
 live state before any GPU work.
 

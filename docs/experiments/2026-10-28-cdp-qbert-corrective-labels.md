@@ -263,3 +263,14 @@ all-state labels and unchanged pins. Separate CPU services observe progress,
 audit100k recovery and wait for terminal success before plots/comparison.
 Host guards and strict finite-report checks remain active. No outcome is
 available yet; no completed life is extended or repeated.
+
+
+The live37,064-action prefix verifies all37,064 labels,16,470 passive
+states and1152 released actions after the1920 cap, including892 released
+label/action disagreements. All52 pins remain unchanged. This verifies logged
+release coverage; full independent teacher replay remains pending. The100k
+recovery checkpoint passes at17:43:23 UTC with12,470 updates and357 finite
+tensors; its completed-prefix audit checks12,863 reports/103,152 actions.
+Recovery metadata SHA256
+`bd849d0859f4b81be528c71e8f565552f90ba558804b3fe054bb0bf6abd22b52`.
+The learner remains active; no frozen result is available at this milestone.

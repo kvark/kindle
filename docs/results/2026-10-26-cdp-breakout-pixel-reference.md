@@ -560,3 +560,42 @@ Learning review SHA256`03d58ea8501e846cb318c50a0c5fc2ba08849cc4310183ee77e2ae251
 postprocessing`cae88022cf55cd8d1461bc3a4b8781557980432d463d8516c7ff47666c373ae0`;
 comparison`d7d8de689570fbea72d46fea7925af62cd651060300fa9b3228a8725e905664f`;
 exposure`dfc4c189a0cbb30c15022d49f6711bf3b3cf6d67efc3c8b625fb26ca54e9ff5c`.
+
+
+## Retained reference replay exposes paddle-model errors near edges
+
+A CPU-only replay of the unchanged166.167 reference reproduces all43,496
+recorded actions/173,949 emulator frames, input/output pixel hashes, rewards,
+boundaries and resets in21.860s. Life counts label138 misses retrospectively;
+they never enter a policy. Native code, teacher choices and scores are unchanged.
+The proposed velocity-limit explanation is unsupported: all19,975 tracked
+descending observations are projected, with no speed-limit rejection. Largest
+observed absolute dx/dy are9.6/15.5 pixels per decision.
+
+Comparing the recorded first-step paddle predictions with the next observed
+pooled-pixel centroid gives:
+
+| Prior observed position/control | Samples | MAE pixels | RMSE pixels |
+|---|---:|---:|---:|
+|Interior center20–143 exclusive|30,080|1.779|3.013|
+|Near either edge, center≤20 or≥143|9,712|2.806|5.591|
+|Stationary near-edge paddle, command points away|2,056|7.364|10.179|
+
+All39,792 valid pairs haveMAE2.030/RMSE3.807. In the last visible history before
+138 life losses,60 have paddle speed above10 pixels/decision and76 have absolute
+error above8 pixels against the controller's landing estimate. Retained snapshots
+also show pooled-mask contamination by the ball near paddle height. These are
+observational diagnostics of this hand-coded reference; sticky controls,
+occlusion, geometry and model error remain confounded. They do not isolate a
+failure cause, establish a new controller score or diagnose Kindle's policy.
+No controller change or additional GPU allocation is selected by this analysis.
+
+The affined low-priority CPU service starts17:40:34 and succeeds17:40:56 UTC on
+October28, whole22.073s. All6 inputs and52 active Qbert pins remain unchanged;
+Qbert retains PID185426/invocation`bdeb69c11326484bb7240cd7e946252e`.
+No native module loads, agent is constructed or learner update occurs. This is
+a co-host timing caveat. The saved-log summary is independently reproduced by
+the retained analysis script. Artifacts:`/x/Temp/kindle-breakout-misses-20261028`.
+Replay review`147ca8262d5dd668954ac99034faf427f4e02726e12c1f1248078bb7f29feef0`;
+response review`60c81b5c767fe20b38572ab8ad7d4b68aaaf06877091a9ca4d14742fa6be249c`;
+completion`c82cd60f1afd7f92adc7a6181930c6552040edf773bd5bd15bd6e21d59b37903`.
