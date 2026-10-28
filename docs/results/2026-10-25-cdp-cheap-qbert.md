@@ -2537,3 +2537,40 @@ comparison with the retained4M control, a30-minute training cap and fixed
 final/own-initial24-episode frozen evaluation. Labels and feedback change
 together on reused4013; no isolated causal or reliability claim. See the
 [protocol and receipts](../experiments/2026-10-28-cdp-qbert-corrective-labels.md).
+
+
+## Corrective labels cost more without improving frozen quality
+
+Fresh corrective labels complete200k aggregate actions /799,682 emulator frames
+/24,970 updates in **25m57s**. Frozen **3633.333/17of24 first pyramids** versus own
+initial182.292/0 is below the retained4M world-gradient control3670.833/19 in
+21m28s. Training costs **20.86% more**; first-pyramid coverage20.292/21 versus
+20.625. Both original15k/90% gate criteria fail. Retain the control and stronger
+5%/R32/world-off4730.208/23; no extension or confirmation of this completed life.
+
+The recipe keeps4M48/Auto/N8/B8/T16/H15/R16/coefficient1/actor0/full18/original
+rates,20%episode continuation/cap1920/expert1/NOOP.05/world gradients. Independent
+recommendations cover every learner-visited state, and the teacher receives
+actual-action feedback. Those two changes move together on reused4013/cohort;
+native/runner/validator identities also differ, so no isolated causal effect or
+independent-seed claim follows.
+
+All52 pins,100k recovery,357 matching initial/unchanged frozen tensors, paired
+initial semantic traces,24,970 finite reports,parameter changes,complete training
+label/input-pixel/actual-action replay,frozen outcome replays/videos,guards,curves,
+coverage,exposure and comparison pass. Main service exits18:06:30 UTC; CPU
+postprocessing18:07:02 on October28. No GPU stage repeats. A separate CPU figure
+caption correction clarifies20% episode probability; original artifacts and
+pins remain, and comparison data are byte-identical.
+
+Training uses200k labels,103,712 passive labels and54,396 teacher/action
+disagreements.96,288 overrides are48.144% of actions.47 guided completed episodes
+average15176.064 with47 pyramids;177 unguided episodes average2129.096 with74.
+Guided returns are not unaided competence. Final50k passive wait-label agreement
+is54.505%: teacher NOOP frequency79.447%, learner46.077%. This changing-state
+command agreement is not held-out label accuracy or proof of a failure cause.
+It motivates a separate bounded wait-weight check, not extending this life.
+
+Artifacts:`/x/Temp/kindle-qbert-corrective-full-20261028` and
+`/x/Temp/kindle-qbert-passive-review-20261028`. See the
+[completed protocol, timing and receipts](../experiments/2026-10-28-cdp-qbert-corrective-labels.md#completed-fresh200k-comparison).

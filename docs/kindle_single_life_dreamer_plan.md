@@ -37,6 +37,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Continuation20%/R16,4013](results/2026-10-25-cdp-cheap-qbert.md#more-guidance-with-less-replay-saves-time-but-lowers-frozen-quality) |200k /24,970|21m59s|3333.333 /182.292|18/24 first pyramids; below5%/R32|
 | [Same, expert world gradients](results/2026-10-25-cdp-cheap-qbert.md#expert-world-gradients-give-a-small-r16-gain-below-the-stronger-control) |200k /24,970|21m28s|3670.833 /182.292|19/24 first pyramids; small R16 gain, below5%/R32|
 | [Same,12M/B16](results/2026-10-25-cdp-cheap-qbert.md#guided12m-b16-r16-lowers-quality-and-costs-more) |200k /12,477|24m51s|1792.708 /177.083|9/24 first pyramids; lower quality and higher cost|
+| [Same4M, corrective labels and feedback](results/2026-10-25-cdp-cheap-qbert.md#corrective-labels-cost-more-without-improving-frozen-quality) |200k /24,970|25m57s|3633.333 /182.292|17/24 first pyramids;20.86% more training time without gain|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -461,32 +462,22 @@ Full root`/x/Temp/kindle-qbert-expert-capacity-20261028/full`; see the completed
 expert-capacity result in cheap-Qbert. That life is terminal; the separately
 selected corrective-label check is below. Check live state before GPU work.
 
-The CPU corrective-teacher check preserves24,733 accepted reference actions and
-scores13087.500 versus8584.375 under fixed5% random disturbance, both8/8 pyramids.
-Full proposal/action/pixel replay and all10/63 source/retained pins pass; service
-succeeds16:53:20 UTC on October28. This is teacher robustness on reused episodes,
-not native learning. Independent expert labels/action feedback are now optional,
-CPU-validated and separately packaged as native447fe50/SHA35ad0db.130 Rust CPU
-and491 packaged Python tests plus strict Clippy pass. The guarded native action/
-belief/replay/target/update diagnostic passes in5.87s; service exits17:21:19 UTC.
-The bounded corrective Qbert check completes8192 actions/32,753 frames/994
-updates in61.976s;1024 frozen/.511s,zero updates/no natural episodes. All36 pins,
-357 matching initial/unchanged frozen tensors,finite aligned losses,parameter
-changes,full label/pixel/action replay and guards pass; exits17:24:16 UTC.
-8192 labels include3607 passive states/3195 action disagreements;4585 overrides.
-Use`/x/Temp/kindle-corrective-labels-20261028/runtime`;2.6GiB cache released.
-Separately select fresh200k/24,970 updates with the same4M48/Auto/N8/B8/T16/H15/
-R16/20%/cap1920/expert1/NOOP.05/world/all-state-label recipe,30-minute training
-cap and own-initial/final24-episode frozen arms. Compare retained4M world3670.833/
-19;labels and feedback change together on reused4013. Root
-`/x/Temp/kindle-qbert-corrective-full-20261028`; service starts17:29:58 UTC,
-training17:29:59/sourcee3b2ceb. All52 pins,config,update timing and357 initial
-tensors pass startup at4136 actions/486 finite reports.100k recovery passes
-17:43:23 UTC with12,470 updates/357 finite tensors. Released states retain
-independent labels; progress/CPU postprocessing remain active, no frozen outcome
-at this milestone. No extension or
-automatic successor. See the corrective-labels October28 protocol and check
-live state before any GPU work.
+Independent corrective labels are optional and separately validated: native
+447fe50/SHA35ad0db,130 Rust CPU/491 packaged Python tests,strict Clippy,a5.87s
+native diagnostic and8192/994 bounded Qbert check in61.976s. Runtime
+`/x/Temp/kindle-corrective-labels-20261028/runtime`;2.6GiB cache released.
+Fresh200k corrective training completes799,682 frames/24,970 updates in25m57s,
+frozen3633.333/17of24 pyramids versus own182.292/0 and control3670.833/19.
+Training costs20.86% more. All52 pins,100k recovery,357 matching initial/unchanged
+frozen tensors,paired initial traces,full label/pixel/action replays,guards,
+curves,coverage,exposure and comparison pass. Main exits18:06:30 UTC,CPU
+postprocessing18:07:02 on October28; no GPU repeats. Display-only caption
+correction preserves original data/pins. Retain control; no extension/confirmation.
+200k labels include103,712 passive states;96,288 overrides are48.144%. Late
+passive teacher/learner NOOP frequencies79.447%/46.077% suggest checking wait-label
+weight, not a causal diagnosis. Root`/x/Temp/kindle-qbert-corrective-full-20261028`.
+See the corrective-labels protocol/completed cheap-Qbert result and separately
+selected wait-label bounded check. No full successor is selected; check live state.
 
 
 

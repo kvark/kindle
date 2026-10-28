@@ -1,12 +1,11 @@
 # Qbert corrective labels on learner-visited states
 
-**Optional corrective labels pass native and bounded Qbert checks.** The fresh
-8192-action/994-update check takes61.976s, followed by1024 frozen actions/.511s.
-All36 pins,357 matching initial/invariant frozen tensors, exact teacher-label/
-actual-action/pixel replay and host guards pass. No natural frozen episode
-completes, so competence remains unmeasured. A separate fresh200k comparison is
-selected below under a30-minute training cap; check live state before GPU work.
-The five-game goal remains unfinished.
+**The fresh corrective-label comparison completes without a useful gain.**
+200k actions/24,970 updates take25m57s; frozen3633.333/17of24 first pyramids
+versus control3670.833/19 costs20.86% more training time. All audits pass.
+Retain the control and stronger5%/R32 recipe; no extension or confirmation of
+this completed life. Main service exits18:06:30 UTC, CPU postprocessing18:07:02
+on October28. The five-game goal remains unfinished.
 
 ## Evidence and scope
 
@@ -274,3 +273,55 @@ tensors; its completed-prefix audit checks12,863 reports/103,152 actions.
 Recovery metadata SHA256
 `bd849d0859f4b81be528c71e8f565552f90ba558804b3fe054bb0bf6abd22b52`.
 The learner remains active; no frozen result is available at this milestone.
+
+
+## Completed fresh200k comparison
+
+Training completes200,000 aggregate actions /799,682 emulator frames /24,970
+updates in1556.801s (25m57s), within1800s. Final frozen selection scores3633.333
+and17/24 first pyramids versus own initial182.292/0. The primary retained4M
+world-gradient control scores3670.833/19 in1288.092s: the new mean is1.02% lower
+and training costs20.86% more. Coverage20.292/21 versus20.625. Both gate criteria
+still fail; stronger5%/R32/world-off4730.208/23 remains the best retained recipe.
+No extension, retry or confirmation follows this completed life.
+
+All52 pins, exact config/counters,100k recovery,24,970 finite reports,357 matched
+control and bounded initial tensors,357 invariant tensors per frozen arm,
+CNN/reward/actor/value changes, paired initial1140-event semantic traces,
+complete teacher-label/input-pixel/actual-action replay, frozen outcome replays/
+videos, host guards, curves, coverage, exposure and comparison pass. The source
+training log has200,000 teacher labels,103,712 passive labels and54,396 actual/
+teacher disagreements.96,288 actual overrides are48.144%;20% is an episode
+probability. All24,970 reports are supervised, with2,992,861 replayed label rows
+and max world/actor loss difference3e−7.47 completed guided episodes average
+15176.064 and all clear a first pyramid;177 unguided episodes average2129.096,
+74 clear one. Those online numbers are not frozen competence.
+
+Final and initial frozen runs use18,696/8728 actions,74,746/34,875 frames and
+8.878/4.125s, zero updates. Final collects25 completed episodes; the declared
+first3 per lane selects24 and retains the excess/tails. Main service succeeds
+18:06:30 UTC on October28,36m31.688s total; CPU postprocessing18:07:02.
+No GPU stage repeats. Training's action stage, which includes teacher work and
+native inference, rises261.869→554.720s; learning stage949.362→924.397s.
+These stage timings do not isolate a hardware speedup or teacher-only cost.
+
+The original plot caption incorrectly called20% an override rate. A separate
+CPU display correction says20% episode guidance, preserves the original figure/
+script and all52 pins, and produces byte-identical comparison data. Use the
+`exposure-comparison-display` figure; original postprocessing remains retained.
+Learning review`dcec2fadb6de8b052375f7075efe903b243e0603f421de573471961fc187de10`;
+comparison`8e9ab37261ac53ea631a66115f6304b620a062bb2b91840aeca81c8981277b22`;
+postprocess`9e8cfb2f3af63ea79e3dc8a3fde959ca8de1fb29f1616e572fcc0c8146859dff`;
+completion`59281945114e9462cb79eb43995e1fc74008a8a37ccae7a533b7605014acd665`.
+
+A separate immutable-log diagnostic finds final50k passive exact-command
+agreement55.580%, wait-label agreement54.505%, and movement-label agreement
+59.735%. The teacher recommends NOOP on26,803/33,737 passive states (79.447%),
+while the learner selects it15,545 times (46.077%). All actual actions in that
+window are among0/2/3/4/5. Weighted replay cross entropy is.400589; it summarizes
+changing replay states, not held-out accuracy or online agreement. The diagnostic
+matches the independently replayed full log and preserves52 pins. It suggests
+examining the.05 wait-label weight without proving a cause of failed play.
+Artifact:`/x/Temp/kindle-qbert-passive-review-20261028`; review
+`eebcdcaf0efcfe1a7e9e64c43a437ba8ed2b7fc8f5632eda0a04c77ebb17e7b4`.
+The separately selected wait-label bounded check has its own declaration.
