@@ -1,5 +1,9 @@
 # Guided Qbert capacity with B16 and R16
 
+**Fresh200k comparison selected:** the completed bounded check supports a
+separate30-minute training allocation, followed by fixed final/actual-initial
+evaluation. The full result is pending.
+
 **Bounded check complete:**8192 actions/489 updates in60.333s;1024 frozen
 actions/.810s, zero updates and no natural episodes. All audits pass. The
 early200k projection is24.55 minutes, not a measured full-run cost or task result.
@@ -122,3 +126,45 @@ bounded review`b81334532ca32cbd1d3e1e7e3329af8bee69fc861c315941b9e4a7773952004e`
 completion`0514244aa3718ea64b7ecf549e4b7e99a0c2c21f9d0a167f72eb181e9277b8c5`.
 The preceding CPU action diagnostic is SHA256
 `90c745723feb77d0999a101fe64a04f194183d34b08291cef8b39923f69a683c`.
+
+
+## Separately selected200k comparison
+
+The completed60.333s check projects24.55 minutes at200k, within a fixed30-minute
+training cap. Select one fresh12M/RGB48/Auto/N8/B16/T16/H15/R16 learner with the
+same20% continuation/cap1920/expert1/NOOPweight.05/world-gradient recipe and
+original rates. Seed4013/evaluation4000004013 are reused development seeds.
+No weights, replay, belief, games or RNG are restored from the bounded check.
+
+Train200,000 aggregate actions/12,477 updates, first376 and residual.5; save and
+audit100,000/6227 recovery, then the fixed final checkpoint. Compare against the
+completed4M/B8/R16/world-gradient control3670.833/19of24 in21m28s. Native, runner,
+teacher, host, geometry, guidance probability, reward coefficient and rates
+match that control. Capacity and batch/microbatch change together, halving
+optimizer cadence at the same replay positions per action. This is a recipe
+comparison, not an isolated capacity effect. Stronger5%/R32/world-off4730.208/23
+in25m23s remains secondary context.
+
+Evaluate final and own actual initial with sampled actions, no aid or updates,
+first3 natural episodes in each of8 lanes (24 each), no truncations, at most
+600k actions/300s per arm. Retain the original mean15000/90%-first-pyramid gate.
+Require357 finite/invariant tensors,357 initial tensors matching the bounded12M
+initialization and346 shared tensors matching the retained12M reference only.
+Different-size initial policies are evaluated separately; neither weights nor
+initial action traces must equal the4M control. Preserve guided input/action/
+outcome replay, frozen outcome replay/videos, curves, coverage, expert exposure,
+source/config/counters and host guards. Guided online returns are not competence.
+
+CPU preflight parses all3 exact commands, validates the observed B16 scheduler,
+compiles10 scripts and exercises the completed-control reader in both the normal
+and plotting environments without native/environment construction. The plotting
+path uses the audited lazy checkpoint import. A copied exposure assertion is
+corrected to reconcile report counts against audited accounting before selection;
+the earlier preflight receipt is retained. All41 bounded input pins remain fixed.
+The new declaration pins63 inputs. Training cap1800s, each frozen arm300s, CPU
+audit1200s, whole service3660s. Stop on real faults/numerical failure. No retry,
+cap increase, extension, checkpoint selection, confirmation or automatic successor.
+
+Trial:`/x/Temp/kindle-qbert-expert-capacity-20261028/full/qbert-12m-48-b16-r16-p20-world-200k-seed4013`.
+Owner:`kindle-qbert-expert-capacity-200k-20261028`. CPU-only recovery and completion
+observers cover this declared life; they never start another GPU job.
