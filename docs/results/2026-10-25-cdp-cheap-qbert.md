@@ -2585,3 +2585,65 @@ This is execution/early-cost evidence only. A fresh100k/R32/all-weight1 comparis
 is separately selected, with roughly the same update count as200k/R16, half the
 experience and a30-minute cap. No full allocation is active at this milestone.
 See the [wait-labels protocol](../experiments/2026-10-28-cdp-qbert-wait-labels.md).
+
+## Equal wait weights and100k actions save time but lower frozen quality
+
+The fresh R32/all-weight1 recipe completes **100,000 aggregate actions /399,864
+emulator frames /24,939 updates in18m58s** (1138.028s). Frozen mean
+**2260.417/12of24 first pyramids**, versus own actual initial182.292/0, is below
+the corrective200k/R16/NOOP.05 control's3633.333/17. Training time falls26.90%,
+but frozen mean falls37.79%. First-pyramid coverage falls20.292→20.125 of21.
+Both original mean15000/90%-pyramid criteria fail. Retain the controls; this
+completed life has no extension, confirmation or automatic successor.
+
+Wait weight.05→1, ratio16→32 and experience budget200k→100k change together;
+the nearly equal24,970/24,939 update counts do not isolate any one change.
+Same native447fe50/runner/teacher,4M48/Auto/N8/B8/T16/H15/coefficient1/actor0/
+full18/original rates,20%episode continuation/cap1920/expert1/world gradients/
+all-state corrective labels. Fresh4013/eval4000004013 reuses development seeds
+and cohort, not weights, replay, live belief, games or RNG. No held-out seed claim.
+The forced-only4M world control3670.833/19 in21m28s and stronger5%/R32 world-off
+4730.208/23 in25m23s remain contextual controls.
+
+All55 declared inputs remain unchanged. All24,939 reports are finite, first
+update248/debt0, and CNN/reward/actor/value tensors change. The50k recovery
+passes at12,439 updates with357 finite tensors. All357 initial tensors match
+both the primary control and bounded check; paired actual-initial evaluations
+have identical1140 semantic events. Both frozen arms preserve all357 tensors,
+finish24 natural episodes without truncation or updates, and pass full recorded
+outcome replay/video. Final17,800 actions/71,165 frames take8.320s; initial8728
+/34,875 frames take4.132s. Ordinary frozen logs have no live pixel hashes.
+Complete training teacher-label/input-pixel/actual-action replay, host guards,
+curves, coverage, exposure and comparison pass. The comparison figure is checked.
+
+There are100k teacher labels:74,530 NOOP/25,470 movement, including52,928 passive
+states and16,508 actual/teacher disagreements. Actual overrides47,072 (47.072%)
+are distinct from20% episode selection. All24,939 reports are supervised;
+2,989,442 labeled replay rows have exactly2,989,442 weight sum, and maximum
+world/actor expert-loss difference is8e−7. The22 completed guided episodes
+average15110.227/all22 first pyramids;84 unguided episodes average1353.869/20
+pyramids (last50:2042.5/20). Guided returns are not unaided competence.
+
+On the last50k training actions, passive teacher/learner NOOP frequencies are
+72.193%/76.339%. Wait-label agreement is88.121%, movement agreement33.651%,
+overall exact agreement72.974%; weighted replay cross entropy.224 and mean
+policy entropy.241. The prior control's last50k had54.505% wait/59.735% movement
+agreement. These describe different visited states, experience budgets and replay
+distributions; they neither establish label accuracy nor explain the frozen
+regression causally. Higher overall agreement is not the task objective.
+
+Main service starts18:29:15 UTC/source`00eed19` and succeeds18:53:59 on October28;
+whole service24m44.154s. CPU postprocessing succeeds18:54:18. Original optional
+progress observer rejects unsupported arguments; its failed service/journal is
+retained and a separately named CPU observer succeeds. Learner identity stays
+PID189477/invocation`00d3435a0afe4e2688a0d7c2b43aa1a6`; no GPU stage repeats,
+runtime pin changes or cap increases. The protocol records two short affined
+CPU Breakout studies as timing caveats, with no wall-time correction.
+
+Artifacts:`/x/Temp/kindle-qbert-wait-full-20261028/qbert-4m-48-r32-wait1-100k-seed4013`;
+passive analysis`/x/Temp/kindle-qbert-wait-analysis-20261028`. Learning review
+`e191ac5e1a04352869d568476f0724ac98e442208d9944557304c26fa82253ae`;
+comparison`32f496a5aced6b5a4cd2ab2589ac106082ea2027a261ce590e2f34d39d47cc9e`;
+postprocessing`1e790da08baefa5943ff1672c617c9b29883f8e71e6168e6a049b287d4f360e5`;
+completion`c3cd7f5b46c64be183626ab2c720541c3a4ba7f0b18d8c512824d9ce8bb4c10c`;
+passive review`23be3fd9d4b80f1053b726d4548cfad9fe09adf47ce2ba4fce9fcbdb42414c67`.

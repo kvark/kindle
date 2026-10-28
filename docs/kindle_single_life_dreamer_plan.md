@@ -38,6 +38,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same, expert world gradients](results/2026-10-25-cdp-cheap-qbert.md#expert-world-gradients-give-a-small-r16-gain-below-the-stronger-control) |200k /24,970|21m28s|3670.833 /182.292|19/24 first pyramids; small R16 gain, below5%/R32|
 | [Same,12M/B16](results/2026-10-25-cdp-cheap-qbert.md#guided12m-b16-r16-lowers-quality-and-costs-more) |200k /12,477|24m51s|1792.708 /177.083|9/24 first pyramids; lower quality and higher cost|
 | [Same4M, corrective labels and feedback](results/2026-10-25-cdp-cheap-qbert.md#corrective-labels-cost-more-without-improving-frozen-quality) |200k /24,970|25m57s|3633.333 /182.292|17/24 first pyramids;20.86% more training time without gain|
+| [Corrective labels, equal wait weights/R32/100k](results/2026-10-25-cdp-cheap-qbert.md#equal-wait-weights-and100k-actions-save-time-but-lower-frozen-quality) |100k /24,939|18m58s|2260.417 /182.292|12/24 first pyramids;26.90% less time,37.79% lower mean|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -476,21 +477,22 @@ correction preserves original data/pins. Retain control; no extension/confirmati
 200k labels include103,712 passive states;96,288 overrides are48.144%. Late
 passive teacher/learner NOOP frequencies79.447%/46.077% suggest checking wait-label
 weight, not a causal diagnosis. Root`/x/Temp/kindle-qbert-corrective-full-20261028`.
-See the corrective-labels protocol/completed cheap-Qbert result. The separate
-R32/wait-weight1 check passes4096 actions/16,381 frames/963 updates in43.238s,
-1024 frozen/.495s,36 pins,357 initial/frozen tensors,equal row/weight sums,full
-replay and guards; exits18:15:27 UTC. No natural frozen episodes. Early17m36s/
-100k projection supports a separately selected fresh100k/24,939-update comparison,
-50k recovery and fixed24-episode final/own-initial evaluation under a30-minute
-training cap. Same runtime; wait weight/ratio/budget change together on reused4013.
-Full root`/x/Temp/kindle-qbert-wait-full-20261028`; one fresh life starts18:29:15
-UTC/source`00eed19` on October28, service`kindle-qbert-wait1-r32-100k-20261028`,
-PID189477/invocation`00d3435a0afe4e2688a0d7c2b43aa1a6`. Startup55 pins,357
-matching initial tensors and429 finite supervised reports pass.50k recovery
-passes18:39:09 UTC at12,439 updates/357 finite tensors; terminal audits are automated. Original CPU progress-observer argument failure
-is retained; corrected observer runs separately without repeating GPU work.
-No frozen outcome yet; no extension or automatic successor. See the wait-labels
-protocol and check live state before GPU work.
+See the corrective-labels protocol/completed cheap-Qbert result.
+
+The R32/wait-weight1/100k recipe completes100k actions/399,864 frames/24,939
+updates in18m58s,26.90% less training time but37.79% lower frozen mean than the
+corrective200k control:2260.417/12of24 first pyramids versus3633.333/17. Own
+initial182.292/0; both original15k/90% criteria fail. All55 pins,50k recovery,
+357 matched initial/invariant frozen tensors,identical paired initial traces,
+finite reports,equal row/weight sums,full replays/videos,guards,curves,coverage,
+exposure and comparison pass. Main succeeds18:53:59 UTC,postprocessing18:54:18
+on October28. Actual overrides47,072 (47.072%); guided returns are not competence.
+Original CPU observer argument failure is retained; no GPU stage repeats.
+Retain controls,including stronger5%/R32/world-off4730.208/23. Weight,ratio and
+budget change together on reused4013/cohort; no isolated attribution,extension,
+confirmation or automatic successor. Root`/x/Temp/kindle-qbert-wait-full-20261028`.
+The host is idle at this milestone. See the completed wait-labels result and
+check live state before GPU work.
 
 
 

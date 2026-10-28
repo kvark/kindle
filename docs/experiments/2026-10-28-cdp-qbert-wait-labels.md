@@ -1,6 +1,6 @@
 # Qbert wait-label weighting and a cheaper experience budget
 
-**The bounded check passes; the selected fresh100k comparison is running.** The
+**The fresh100k comparison completes: faster, with lower frozen quality.** The
 completed corrective200k/R16 recipe scores3633.333/17 first pyramids for25m57s,
 below its control3670.833/19 in21m28s. Retain the control. The completed life
 is terminal and will not be extended or reused.
@@ -119,7 +119,7 @@ Startup checks55 pins,357 initial tensors matching both control and bounded
 check, expected first6 updates,429 finite supervised reports and exact equal
 row/weight counts at1968 actions. This establishes execution, not competence.
 
-The50k checkpoint watcher and terminal postprocessor are active. Original CPU
+At launch,the50k checkpoint watcher and terminal postprocessor are active. Original CPU
 progress observer rejects unsupported optional arguments and exits18:29:39 UTC.
 Its journal is retained; a separately named observer uses the existing supported
 positional arguments. Main learner PID/invocation remain unchanged; no GPU stage
@@ -140,3 +140,33 @@ separately selected eight-episode edge-response reference comparison/replay
 (service18:38:41–18:39:05). Both preserve all55 active pins and learner identity;
 no GPU work or live source changes. They remain timing caveats; no wall-time
 correction is applied. See the [reference result](../results/2026-10-26-cdp-breakout-pixel-reference.md#stationary-edge-response-correction-improves-eight-reused-reference-episodes).
+
+
+## Completed full comparison
+
+Fresh100k actions/399,864 frames/24,939 updates finish in18m58s. Frozen2260.417
+/12of24 first pyramids versus own initial182.292/0 is below the primary
+corrective200k control3633.333/17. Training time falls26.90%, mean falls37.79%;
+both original15k/90% criteria fail. Retain controls, including the stronger
+5%/R32/world-off4730.208/23 recipe. No extension or confirmation is selected.
+
+All55 pins,50k/12,439-update recovery,357 initial tensors matching both references,
+357 invariant tensors per frozen arm,paired initial semantic traces,finite
+reports,parameter changes,equal labeled-row/weight counts,complete training
+teacher-label/input-pixel/actual-action replay,frozen outcome replays/videos,
+host guards,curves,coverage,exposure and comparison pass. All24,939 reports are
+supervised;2,989,442 labeled replay rows equal the weight sum exactly. Maximum
+world/actor expert-loss difference8e−7.100k labels include52,928 passive states
+and16,508 disagreements;47,072 actual overrides are47.072%, not20%.
+
+Main succeeds18:53:59 UTC,whole24m44.154s; postprocessing18:54:18 on October28.
+Original progress-observer argument failure remains recorded; no GPU stage
+repeats or caps change. The completed-log diagnostic describes higher wait
+agreement but lower movement agreement than the primary control's late window;
+changed visited states and budgets prevent causal attribution. Detailed outcomes,
+exposure and hashes are in the [completed result](../results/2026-10-25-cdp-cheap-qbert.md#equal-wait-weights-and100k-actions-save-time-but-lower-frozen-quality).
+
+Learning review`e191ac5e1a04352869d568476f0724ac98e442208d9944557304c26fa82253ae`;
+completion`c3cd7f5b46c64be183626ab2c720541c3a4ba7f0b18d8c512824d9ce8bb4c10c`.
+No GPU allocation or automatic successor is active at completion. The five-game
+goal remains unfinished. Check live state before future GPU work.
