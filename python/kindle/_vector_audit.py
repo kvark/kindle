@@ -9,7 +9,8 @@ import struct
 
 from ._exploration import EXPLORATION_PROTOCOL, PersistentExploration
 from ._qbert_guidance import CORRECTIVE_GUIDANCE_KIND, GUIDANCE_KINDS, QbertGuidance
-from ._breakout_guidance import GUIDANCE_KINDS as BREAKOUT_GUIDANCE_KINDS, BreakoutGuidance
+from ._breakout_guidance import (CORRECTIVE_GUIDANCE_KIND as BREAKOUT_CORRECTIVE_GUIDANCE_KIND,
+                                 GUIDANCE_KINDS as BREAKOUT_GUIDANCE_KINDS, BreakoutGuidance)
 
 
 VECTOR_PROTOCOL = "kindle-vector-v2"
@@ -129,7 +130,7 @@ def audit(path):
                   and any(weight > 0 for weight in expert["action_weights"]), "invalid expert imitation weights")
             check(header["mode"] != "train" or guidance, "expert imitation requires trusted guidance")
         expert_training = expert is not None and header["mode"] == "train"
-        corrective = guidance and header["exploration"]["kind"] == CORRECTIVE_GUIDANCE_KIND
+        corrective = guidance and header["exploration"]["kind"] in (CORRECTIVE_GUIDANCE_KIND, BREAKOUT_CORRECTIVE_GUIDANCE_KIND)
         check(not corrective or expert_training, "corrective guidance requires expert imitation")
         training = header["mode"] == "train" and config["train_ratio"] > 0
         required = config["replay_context"] + config["batch_length"]
@@ -221,7 +222,7 @@ def audit(path):
                 if corrective:
                     labels = event.get("expert_labels")
                     check(isinstance(labels, list) and len(labels) == count
-                          and all(type(label) is int and label in (0, 2, 3, 4, 5) for label in labels),
+                          and all(type(label) is int and label in ((0, 1, 3, 4) if breakout_guidance else (0, 2, 3, 4, 5)) for label in labels),
                           "invalid corrective expert labels")
                     check(all(action is None or action == label for action, label in zip(overrides, labels)),
                           "guided override differs from expert label")

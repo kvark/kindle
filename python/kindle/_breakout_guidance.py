@@ -5,13 +5,15 @@ reference trace. See docs/results/2026-10-26-cdp-breakout-pixel-reference.md.
 This is a reference policy, not a learned Kindle model or a RAM-based teacher.
 """
 
+import hashlib
 import itertools
 import numpy as np
 
 from ._pixel_guidance import EpisodePixelGuidance
 
 GUIDANCE_KIND = "bounded-episode-breakout-pixels-v1"
-GUIDANCE_KINDS = (GUIDANCE_KIND,)
+CORRECTIVE_GUIDANCE_KIND = "bounded-episode-breakout-corrective-pixels-v1"
+GUIDANCE_KINDS = (GUIDANCE_KIND, CORRECTIVE_GUIDANCE_KIND)
 GUIDANCE_SEED_XOR = 0x4252_4541_4B50_5801
 ACTION_IDS = {"NOOP": 0, "FIRE": 1, "RIGHT": 3, "LEFT": 4}
 RESPONSE_WEIGHTS = np.array([-0.20973869463450853, 0.1227875991027573,
@@ -83,8 +85,9 @@ class _TrackingPolicy:
 
 class PixelPolicy(_TrackingPolicy):
 
-    def __init__(self):
+    def __init__(self, *, edge_reset=False):
         super().__init__()
+        self.edge_reset = edge_reset
         self.weights = RESPONSE_WEIGHTS
         self.plans = ACTION_PLANS
         self.previous_command = 0
@@ -111,6 +114,9 @@ class PixelPolicy(_TrackingPolicy):
         previous = np.full(len(self.plans), self.previous_command)
         predictions = [position.copy()]
         for t in range(5):
+            if self.edge_reset:
+                stationary_edge = ((position <= 16) | (position >= 147)) & (np.abs(velocity) < .01)
+                previous = np.where(stationary_edge, 0, previous)
             velocity = self.weights[0] + self.weights[1] * velocity + self.weights[2] * self.plans[:, t] + self.weights[3] * previous
             next_position = np.clip(position + velocity, 15.5, 147.5)
             velocity = next_position - position
@@ -131,10 +137,74 @@ class PixelPolicy(_TrackingPolicy):
         d.update(response_target_x=target, collision_steps=steps, selected_plan=self.plans[best].tolist(), predicted_positions=[float(v[best]) for v in predictions], response_cost=float(error[best]))
         return ACTION_IDS['RIGHT' if command > 0 else 'LEFT' if command < 0 else 'NOOP']
 
+class FeedbackPixelPolicy:
+    """Use the executed horizontal command in the calibrated response model."""
+
+    def __init__(self):
+        self.teacher = PixelPolicy(edge_reset=True)
+        self.pending = None
+        self.rejected = 0
+
+    def propose(self, frame):
+        if self.pending is not None:
+            raise ValueError('Previous proposal needs action feedback')
+        self.pending = self.teacher.action(frame)
+        return self.pending
+
+    def feedback(self, action):
+        if self.pending is None:
+            raise ValueError('No pending proposal')
+        if type(action) is not int or not 0 <= action < 18:
+            raise ValueError('Executed action must be a full18 integer')
+        self.teacher.previous_command = (1 if action in (3, 6, 8, 11, 14, 16) else
+                                         -1 if action in (4, 7, 9, 12, 15, 17) else 0)
+        self.rejected += action != self.pending
+        self.pending = None
+
+
 class BreakoutGuidance(EpisodePixelGuidance):
-    """Capped per-episode guidance; full18 action indices, with no RAM inputs."""
+    """Breakout episode selection with the original pixel rule and random schedule."""
 
     def __init__(self, config, streams, action_count):
+        self.corrective_labels = isinstance(config, dict) and config.get("kind") == CORRECTIVE_GUIDANCE_KIND
+        self.expert_labels = []
         super().__init__(config, streams, action_count, game="Breakout", kinds=GUIDANCE_KINDS,
-                         bounded_kind=GUIDANCE_KIND, seed_xor=GUIDANCE_SEED_XOR,
-                         policy_factory=PixelPolicy, valid_actions=(0, 1, 3, 4))
+                         bounded_kind=CORRECTIVE_GUIDANCE_KIND if self.corrective_labels else GUIDANCE_KIND,
+                         seed_xor=GUIDANCE_SEED_XOR,
+                         policy_factory=FeedbackPixelPolicy if self.corrective_labels else PixelPolicy,
+                         valid_actions=(0, 1, 3, 4))
+        self.expert_labels = [None] * len(self._policies)
+
+    def reset(self, streams):
+        super().reset(streams)
+        if self.corrective_labels:
+            for lane in streams:
+                if self._policies[lane] is None:
+                    self._policies[lane] = self._policy_factory()
+                if self.expert_labels:
+                    self.expert_labels[lane] = None
+
+    def actions(self, frames):
+        if not self.corrective_labels:
+            return super().actions(frames)
+        if len(frames) != len(self._policies):
+            raise ValueError('wrong Breakout guidance frame batch')
+        if any(policy.pending is not None for policy in self._policies):
+            raise ValueError('Previous proposals need action feedback')
+        if any(frame.shape != (210, 160, 3) or frame.dtype != np.uint8 for frame in frames):
+            raise ValueError('Native RGB8 required')
+        self.expert_labels = [policy.propose(frame) for policy, frame in zip(self._policies, frames)]
+        self.frame_sha256 = [hashlib.sha256(frame.tobytes()).hexdigest() for frame in frames]
+        overrides = [label if active else None for label, active in zip(self.expert_labels, self.active_guidance)]
+        self.verify_actions(overrides)
+        return overrides
+
+    def feedback(self, actions):
+        if not self.corrective_labels:
+            raise ValueError('Action feedback requires corrective guidance')
+        if (not isinstance(actions, list) or len(actions) != len(self._policies)
+                or any(type(action) is not int or not 0 <= action < 18 for action in actions)
+                or any(policy.pending is None for policy in self._policies)):
+            raise ValueError('Invalid Breakout action feedback batch')
+        for policy, action in zip(self._policies, actions):
+            policy.feedback(action)

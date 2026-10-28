@@ -43,7 +43,7 @@ def replay_rows(source, environments, monitors, frames, guidance, deadline):
             require(guidance.frame_sha256 == row['guidance_frame_sha256'], "guidance input pixels differ")
             require(all(forced is None or forced == action for forced, action in zip(overrides, row['actions'])),
                     "guidance override was not executed")
-            if isinstance(guidance, QbertGuidance) and guidance.corrective_labels:
+            if isinstance(guidance, (QbertGuidance, BreakoutGuidance)) and guidance.corrective_labels:
                 require(guidance.expert_labels == row['expert_labels'], "corrective expert labels differ")
                 guidance.feedback(row['actions'])
             results = [environment.step(action) for environment, action in zip(environments, row['actions'])]
@@ -114,7 +114,7 @@ def main():
                   elapsed_seconds=time.monotonic() - started, agent_constructed=False, learner_updates=0,
                   full_trajectory_replayed=True, exploration_pixel_actions_verified=True,
                   **(dict(corrective_expert_labels_verified=True)
-                     if isinstance(guidance, QbertGuidance) and guidance.corrective_labels else {}),
+                     if isinstance(guidance, (QbertGuidance, BreakoutGuidance)) and guidance.corrective_labels else {}),
                   overridden_actions=guidance.overridden_actions, guidance_episodes=guidance.episode_counts,
                   actual_overridden_action_fraction=sum(guidance.overridden_actions) / run['accounting']['actions'],
                   episodes=episodes, partial=partial, reliability_assessed=False,

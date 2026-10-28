@@ -76,3 +76,45 @@ module or agent is loaded. Original frozen logs lack live pixel hashes, so this
 checks reconstructed outcomes, not equality to unavailable live images. The
 additional co-host duration is retained without correcting Qbert wall time.
 Review`95d2f9fb6a0e17966556f176e20548b56caeb7104ad540576665af06f5dab014`.
+
+## Exact adapter applied after terminal Qbert audits
+
+All four Qbert services succeed; main exits21:41:05 UTC,postprocessing21:41:19.
+The guarded application then copies exactly the five CPU-checked files. All138
+historical inputs verify,using the archived original replay source where its
+canonical path changes. Original declarations remain untouched; native447fe50
+and its binary remain unchanged. The optional flag defaults off. No broad suite
+is repeated for identical bytes:510 CPU tests,forced-reference parity and
+181,224-action feedback parity remain the validation evidence.
+
+Application receipt`47439376e6171f2cd610a0259c33f06e2e7c3a7b2289409faff62bb08621a9c5`.
+
+## Separately selected bounded native check
+
+After terminal Qbert audits and exact adapter application, select one fresh
+8192-action/994-update Breakout check, then1024 greedy frozen actions/zero updates.
+Use4M64/Auto/N8/B8/T16/H15/R16/coefficient1/actor-unimix.01/full18/original rates,
+1009/eval4000001009,20%episode guidance/cap1920/expert10/all18 action weights1,
+expert-world gradients and corrective labels on every visited state. Keep native
+max-pooled frames and one GPU resize; RGB64 retains the existing compact Breakout
+geometry. Native447fe50 is unchanged. No check experience is reused.
+
+Require346 shared initial tensors matching the retained cap1920 control and all
+357 finite/invariant frozen tensors,exact config/source/counters,first update248
+with zero residual debt,finite reports,changed CNN/reward/actor/value,equal labeled
+row/weight sums,aligned raw world/actor expert losses,FIRE and paddle labels,
+passive labels and actual/teacher disagreements,complete teacher-label/input-pixel/
+action replay and host guards. Initial matching is a numerical compatibility
+check, not a matched algorithm comparison. Raw losses exclude the expert scale.
+
+Compared with the old forced-only Breakout control,native/runtime,edge correction/
+feedback,all-state labels,world gradients,expert scale1→10,guidance probability
+5%→20% and replay ratio32→16 change together. No isolated causal attribution or
+natural-episode competence follows this bounded check. Actual overrides are
+measured separately from episode probability. Eight lanes share one learner.
+
+Training cap120s,frozen60s,CPU audit180s,owning service420s. Pin exact inputs before
+launch; use the existing AMD host guard and stop on real faults/nonfinite reports.
+No driver recovery,retry,cap increase,automatic promotion or full learner is
+selected. Root`/x/Temp/kindle-breakout-corrective-20261028/native-check`,service
+`kindle-breakout-corrective-check-20261028`. Check live state before launch.
