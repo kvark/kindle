@@ -1,0 +1,57 @@
+# Breakout corrective labels at a fixed cheap budget
+
+Select one fresh **200k-action / 24,970-update** life after the bounded native
+check succeeds. Its 8192 actions take 36.919s, projecting 15m01s for 200k; this
+is an early estimate, not a measured full-run cost or evidence of competence.
+Keep a **25-minute training cap**. The preceding check and every Qbert service
+are terminal success, and the host is idle at selection.
+
+Use the checked recipe: 4M/RGB64/Auto/N8/B8/T16/H15/R16, coefficient1,
+actor-unimix .01, full18 and original rates; seed1009/evaluation4000001009.
+Training uses 20% episode guidance capped at1920 actions, expert scale10,
+all18 action weights1, expert-world gradients and corrective labels on every
+visited state. The edge-reset teacher receives each submitted action as feedback.
+Keep native max-pooled frames with one GPU resize. Native447fe50 and the exact
+checked Python adapter remain unchanged. No weights, replay, belief, games, RNG
+or experience from the bounded check are reused.
+
+Compare fixed final and actual initial policies using sampled actions, guidance
+and labels off. Each arm selects the first3 natural episodes per8 independent
+lanes, 24 total, with zero updates or truncations and357 invariant tensors.
+Keep the original90%-two-wall gate and report scores separately. Retain excess
+episodes and partial tails. Require complete frozen outcome replays/videos and
+host guards. Ordinary frozen logs lack live pixel hashes; do not claim direct
+equality to unavailable live images. Greedy evaluation is not selected here.
+
+The retained same-seed forced-only cap1920 control scores2.625 versus its own
+initial1.375, zero two-wall successes, in23m33s/49,939 updates. Also retain the
+unaided full18/actor-unimix .01 control's7.083/zero two-wall successes as historical
+context. Native/runtime, teacher edge correction/feedback, all-state labels,
+world gradients, expert scale1→10, episode probability5%→20% and replay ratio32→16
+change together. This is a practical recipe comparison, not an isolated causal
+effect or matched update budget. Seed1009 and the cohort are reused development
+data. Historical control artifacts are pinned; original declarations are not
+rewritten or claimed unchanged at their current canonical source paths.
+
+Save and audit100k recovery at12,470 updates, then the fixed final at24,970;
+no checkpoint selection. Require346 shared initial tensors matching the old
+control,357 initial tensors matching the bounded check, paired actual-initial
+semantic traces, finite reports, changed CNN/reward/actor/value, equal labeled
+row/weight sums and raw world/actor expert-loss alignment. Raw losses exclude
+the expert coefficient. Verify every training label, input pixel hash, submitted
+action and outcome; retain actual override counts, guided/released/unguided
+exposure and learning curves. Online guided returns are not frozen competence.
+
+Caps: training1500s; each frozen arm300s/600k actions; training replay600s with
+outer630s; total CPU audit1200s; owning service3360s. Automate recovery, progress,
+terminal replay and comparison. Stop on real faults or numerical failures using
+the existing AMD host guard; no driver recovery, retry, cap increase, extension,
+automatic successor or reuse of completed experience.
+
+Root: `/x/Temp/kindle-breakout-corrective-20261028/full`.
+Service: `kindle-breakout-corrective-200k-20261028`.
+Runtime: `/x/Temp/kindle-breakout-corrective-20261028/runtime`.
+CPU preparation parses3 commands, compiles13 controllers, verifies all41 bounded
+inputs and346 shared initial tensors, with no native/environment construction.
+Pin exact inputs and recheck live state before launch. The five-game goal remains
+unfinished; no task outcome is inferred from this selection.
