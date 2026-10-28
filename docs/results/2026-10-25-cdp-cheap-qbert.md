@@ -3075,3 +3075,66 @@ The early200k projection28m26s supports a separately selected fresh200k comparis
 under a35-minute cap,with fixed final/own-initial sampled and greedy assessments.
 The original mean15000/90%-pyramid gate remains. No bounded-check experience is
 reused. [Protocol and receipts](../experiments/2026-10-28-cdp-qbert-expert100-capacity.md).
+
+## Larger strongly supervised Qbert improves greedy score with higher cost
+
+Fresh12M48/B16/R16/expert100 completes **200k actions /799,742 emulator frames /
+12,477 updates in30m27s**. Greedy frozen mean **11,984.375 /24of24 first pyramids**
+improves4M/B8's9654.167/23 by24.14%,for16.57% more training time. Sampled mean
+falls10.71%,7569.792→6759.375,with24/24 pyramids on both. Own actual initials are
+80.208 greedy and177.083 sampled,zero pyramids. Both trained modes still miss
+the original mean15000 gate. Retain the larger greedy recipe as a promising
+development budget point; the4M recipe remains cheaper and stronger under
+sampled inference. No extension,seed confirmation or automatic successor is
+selected at completion.
+
+| Recipe | Actions / updates | Training | Greedy final / initial | Sampled final / initial |
+|---|---:|---:|---:|---:|
+|4M48/B8/R16/expert100|200k /24,970|26m07s|9654.167 /263.542|7569.792 /182.292|
+|12M48/B16/R16/expert100|200k /12,477|30m27s|11984.375 /80.208|6759.375 /177.083|
+
+Capacity4M→12M and batch/microbatch8→16 change together;optimizer cadence halves
+and warmup spans more actions. This does not isolate capacity or match update/
+wall budgets. KeepRGB48/Auto/N8/T16/H15/coefficient1/actor-unimix0/full18/original
+rates,20%episode continuation/cap1920/expert100/all18 weights1/world gradients/
+all-state corrective labels. Native447fe50,runner and Qbert teacher match the
+control. Newer Python audit/Breakout modules and current replay are explicitly
+pinned;historical control paths resolve through recorded archives. No weights,
+replay,belief,games,RNG or bounded-check experience are reused. Seed4013 and
+evaluation4000004013 are reused development inputs,not independent confirmation.
+
+All190 inputs remain unchanged. The100k recovery passes at6227 updates. All357
+initial tensors match the retained12M reference and bounded check;initial traces
+are recorded separately across architectures,without claiming4M/12M equality.
+All12,477 reports are finite,CNN/reward/actor/value change,and357 tensors remain
+invariant in each frozen arm. Complete training label/input-pixel/action replay,
+four frozen outcome replays/videos,host guards,curves,coverage,exposure and the
+comparison pass. The comparison plot is visually inspected. Each frozen arm
+selects/collects24 natural episodes,first3 per8 lanes,with partial tails retained,
+zero updates/truncations and no guidance. Four arms total98,664 actions /394,520
+frames /59.634s. Ordinary frozen logs lack live pixel hashes.
+
+Episode guidance selects45/198 starts but actually overrides85,916 actions
+(42.958%). Labels include151,616 NOOP and48,384 hops,114,084 passive states and
+24,319 actual/teacher disagreements. All12,477 reports are supervised;2,991,282
+labeled replay rows equal weight sums,max raw world/actor expert-loss difference
+8e-7. The44 completed guided episodes average15,184.091 with44 first pyramids;
+146 unguided online episodes average2509.932 with64. There are10,642 native
+actions after a selected episode reaches its cap. Guided/released outcomes are
+not unaided frozen competence. Replay cross entropy and these changing online
+samples do not establish a mechanism or held-out action accuracy.
+
+Main starts22:57:47 UTC/sourcecb4ab40 and succeeds23:40:33 on October28,
+whole42m46.186s. CPU postprocessing succeeds23:40:50,whole43m03.375s;all four
+services are terminal success. No failed attempt,GPU repeat,cap change or runtime
+edit occurs. CPU-only Breakout preparation/preflight takes.632s/.672s during
+training with the same learner process and190 pins;retain the co-host caveat
+without correcting wall time. Training time excludes initialization,evaluation
+and CPU audits. The device is idle at completion;the five-game goal is unfinished.
+
+Root`/x/Temp/kindle-qbert-expert100-capacity-20261028/full`,trial
+`qbert-12m-48-b16-r16-expert100-200k-seed4013`. Completion
+`0050b01138057006f4f35f02c13ea9c0c644ff076400f03f4b4cf48c2e5e8a70`,
+learning`e84006962525e7616052aa75e970176b28fe63e65704dcedc49f79369e1584e1`,
+comparison`5d816b773b39daae47b31005364e7ffb836f409559b0d4ca0dfd60d1e5c3b3d6`.
+See the [fixed protocol and receipts](../experiments/2026-10-28-cdp-qbert-expert100-capacity.md).

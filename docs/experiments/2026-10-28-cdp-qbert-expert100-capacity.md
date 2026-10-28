@@ -138,3 +138,28 @@ cb7dc9b9f81f4a538acaf15a26a39c67 continues beyond103,928 actions/6472 updates;
 progress and terminal postprocessing observers remain active. No GPU stage
 repeats or settings change. This verifies recoverable weights and numerical
 reports,not frozen competence. The200k target and35-minute training cap remain.
+
+## Completed full comparison
+
+The fresh life finishes200k actions/799,742 frames/12,477 updates in1826.985s
+(30m27s). Greedy11984.375/24 first pyramids improves4M's9654.167/23 by24.14%,
+for16.57% more training time. Sampled6759.375/24 falls10.71% below7569.792/24.
+Own greedy/sampled initials80.208/177.083 clear no pyramids. Both final means
+still fail15000;retain12M greedy as a promising budget point,not seed reliability.
+The cheaper4M control and its stronger sampled result remain. No extension,
+confirmation or automatic successor follows this completed allocation.
+
+All190 pins,100k recovery,357 reference/check initial and invariant frozen
+tensors,12,477 finite reports,changed parameters,full training label/pixel/action
+replay,four frozen outcome replays/videos,guards,curves,coverage,exposure and
+comparison pass. Initial semantic traces are recorded without equality across
+architectures. Frozen total98,664 actions/394,520 frames/59.634s,zero updates or
+truncations. Actual overrides85,916 (42.958%);guided returns are not competence.
+All12,477 reports are supervised,2,991,282 labeled rows equal weights,and10,642
+cap-released native actions replay correctly. Capacity/batch changes remain
+coupled;one reused seed/cohort does not establish a global greedy default.
+
+Main succeeds23:40:33 UTC,CPU postprocessing23:40:50 on October28. All four
+services succeed;no failed attempt,GPU repeat or cap/runtime change. Completion
+`0050b01138057006f4f35f02c13ea9c0c644ff076400f03f4b4cf48c2e5e8a70`.
+The comparison plot is inspected. [Complete result](../results/2026-10-25-cdp-cheap-qbert.md#larger-strongly-supervised-qbert-improves-greedy-score-with-higher-cost).

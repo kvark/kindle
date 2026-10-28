@@ -52,29 +52,25 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Fresh Qbert12M48/B16/R16/expert100/200k is active from22:57:47 UTC on October28,
-sourcecb4ab40,service`kindle-qbert-expert100-capacity-200k-20261028`. Capacity and
-batch/microbatch change together against strong4M/B8;no isolated capacity effect.
-Native447fe50,runner and Qbert teacher match. The8192/489 bounded check passes
-in69.886s,all44 pins/357 reference-matched initial and invariant frozen tensors,
-full guidance replay and guards;early200k projection28m26s. Full startup verifies
-190 pins,357 matching12M reference/check initial tensors and191 finite reports
-at3416 actions. Training cap35min,100k recovery/6227 updates,final12477 updates,
-fixed final/own-initial greedy and sampled24-episode assessments;original15k/90%
-gate unchanged. No extension or successor selected. Use the matching
-`/x/Temp/kindle-breakout-corrective-20261028/runtime` and pinned Qbert runner in
-`/x/Temp/kindle-qbert-expert100-capacity-20261028/full`. No new native/CLI code,
-failed attempt or GPU repeat. Eight CPU config checks and six
-header-readiness cases pass;historical sources resolve explicitly through archives.
-At23:13:22 UTC,the100k recovery passes at6227 updates,357 finite tensors and
-6403 finite reports in the102,816-action prefix. Recovery exits successfully;
-main/progress/postprocessing continue with the same process and190 unchanged pins.
-No frozen benefit is measured yet. See the expert100-capacity protocol;check live state.
+Qbert12M48/B16/R16/expert100 completes200k actions/799,742 frames/12,477
+updates in30m27s. Greedy11984.375/24 first pyramids improves4M/B8's9654.167/23
+by24.14%,for16.57% more training time;sampled6759.375/24 falls below7569.792/24.
+Own initials80.208greedy/177.083sampled,zero pyramids;both final means fail15000.
+All190 pins,100k recovery,357 reference/check initial and invariant frozen tensors,
+finite reports,changed CNN/reward/actor/value,full label/pixel/action and frozen
+replays,guards,curves,coverage,exposure and comparison pass. Main succeeds23:40:33
+UTC,postprocessing23:40:50 on October28;all services terminal success. No failed
+attempt,GPU repeat or cap/runtime change. Capacity and batch change together on
+reused4013;no isolated capacity or seed-reliability claim. Actual overrides42.958%;
+guided returns are not competence. Retain12M greedy as a promising development
+budget point and4M as cheaper/stronger sampled control. No extension,confirmation
+or automatic successor is selected. Use the matching Breakout-era runtime and
+pinned Qbert runner;native447fe50 unchanged. See the expert100-capacity protocol
+and completed cheap-Qbert result;check live state before GPU work.
 
 A retained Breakout greedy assessment is CPU-prepared but unselected;no GPU
-job is queued. It uses the original corrective final/actual initial and requires
-all current Qbert services and terminal audits to finish before a separate launch
-decision. [Protocol](docs/experiments/2026-10-28-cdp-breakout-corrective-greedy.md).
+job is queued. It uses the original corrective final/actual initial. Its Qbert
+terminal-audit prerequisite is complete;check live state before separate selection. [Protocol](docs/experiments/2026-10-28-cdp-breakout-corrective-greedy.md).
 
 Breakout encoder-rate200k completes200k actions/799,152 frames/24,970 updates
 in17m41s. Raising encoder6e-6→4e-5 lowers frozen4.292→1.458 versus own initial
