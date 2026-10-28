@@ -184,3 +184,20 @@ the fixed final outcome remains pending.
 Selected declaration SHA256
 `616019129a983dfe59af77ebfecd85bd6df695d38f296bf7ae8e1f5c5a2b5e97`.
 The CPU exposure-count correction precedes selection; no GPU stage is repeated.
+
+
+## Full-run100k recovery
+
+At16:22:27 UTC the read-only observer passes the100,000-action/6227-update
+checkpoint with357 finite tensors. Its complete log prefix contains102,408
+actions/6377 finite reports;102,400-action progress takes774.017s. Recovery
+review SHA256`b8c4833e37e9423c8c0b5dddc761f9d6207cd4edbf174b0b5318cac1d69bdb1c`.
+All63 input pins remain unchanged, and the original PID171410/invocation remains
+active. The watcher exits successfully after this sole declared milestone;
+training and completion observation continue. This does not evaluate competence
+or select a checkpoint. The final200k/own-initial assessment remains pending.
+
+Separately, the unchanged CPU exposure reader reproduces all supervision,
+episode-group and released-action fields of the completed4M control in1.044s,
+using scratch output and no native/environment construction. Its receipt lives
+at`full/exposure-reader-control-check/review.json`; all63 active pins stay fixed.

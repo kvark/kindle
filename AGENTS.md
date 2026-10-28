@@ -204,7 +204,9 @@ projects24.55min, not competence or measured full cost. Model/batch change
 together. A separate fresh200k/12,477-update comparison starts16:09:28 UTC
 on October28/source`eebf838`, with a30-minute training cap,100k/6227 recovery
 and fixed24-episode final/own-initial assessment. Startup passes63 pins,357
-initial tensors and259 finite reports; automatic observers are active. Same native/runner/teacher/host as4M world-gradient control3670.833/19;
+initial tensors and259 finite reports.100k/6227 recovery passes16:22:27 UTC
+with357 finite tensors and6377 finite prefix reports; all63 pins stay fixed.
+The recovery watcher exits successfully; training/completion observation continue. Same native/runner/teacher/host as4M world-gradient control3670.833/19;
 model/batch change together.63 inputs pinned; no retry, extension or automatic
 successor. Full root`/x/Temp/kindle-qbert-expert-capacity-20261028/full`; see the
 expert-capacity protocol and check live state.
