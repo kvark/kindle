@@ -266,12 +266,17 @@ no extension, second learner or successor is selected. No allocation is active
 at this milestone. See the completed expert-scale10 result in cheap-Qbert and
 its protocol; check live state before GPU work.
 
-A separately selected expert10 seed1009 check starts19:51:22 UTC/source`447d3c5`
-on October28, service`kindle-qbert-expert10-seed1009-20261028`, fixed100k actions.
-Only seeds change from4013; no matched100k scale1 control exists on1009. Startup
-passes115 pins,357 finite initial tensors/346 shared legacy1009 tensors and1109
-finite reports at4688 actions.50k recovery and sampled/greedy final/own-initial
-arms are automated. No frozen outcome yet; no extension or automatic successor.
+Expert10 seed1009 completes100k actions/399,823 frames/24,939 updates in19m11s.
+Greedy3832.292/23of24 first pyramids versus own85.417/0 trails4013's7700/24 in
+18m55s; sampled2667.708/15 versus own180.208/0 trails5572.917/24. Both greedy
+learners meet90% pyramids,neither mean15000. All115 pins,50k recovery,357 finite
+initial/invariant frozen tensors,346 shared legacy1009 tensors,matching sampled
+initial semantic trace,full replays/videos,guards,curves,coverage,exposure and
+comparison pass. Main succeeds20:16:56 UTC,postprocessing20:17:25 on October28;
+observers also succeed. Actual overrides40.745%; guided returns are not competence.
+Both reused development seeds; no matched100k scale1 control on1009 or broad
+reliability. No extension,third learner or automatic successor selected. Host idle
+at completion; retain both results and check live state before GPU work.
 See`docs/experiments/2026-10-28-cdp-qbert-expert10-seed1009.md`; check live state.
 
 

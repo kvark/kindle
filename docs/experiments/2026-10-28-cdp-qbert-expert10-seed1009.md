@@ -61,3 +61,25 @@ All declared inputs and115 active Qbert pins remain unchanged, with the same
 learner PID/invocation. No native module or agent is constructed by those jobs.
 Keep these co-host timing caveats without correcting measured training time;
 see the completed Breakout pixel-reference report.
+
+## Completed second learner
+
+Seed1009 completes100k actions/399,823 frames/24,939 updates in1151.255s
+(19m11s). Greedy frozen3832.292/23of24 first pyramids improves own85.417/0,
+but trails4013's7700/24 in18m55s. Sampled2667.708/15 versus own180.208/0 also
+trails4013's5572.917/24. Both greedy learners meet90% first pyramids; neither
+meets mean15000. These are two reused development seeds, not broad reliability
+or paired scale1-versus10 confirmation on1009.
+
+All115 pins,50k recovery,357 finite initial/invariant frozen tensors,346 shared
+legacy1009 initial tensors and1203 matching sampled initial semantic events,
+finite reports,parameter changes,full training label/pixel/action replay,frozen
+outcome replay/videos,guards,curves,coverage,exposure and comparison pass. Actual
+overrides40.745%; guided returns are not frozen competence. Four frozen arms
+total61,392 actions/245,415 frames/28.689s,zero updates/truncations. No failed
+attempt,GPU repeat,cap change or runtime edit occurs.
+
+Main succeeds20:16:56 UTC on October28,whole25m34.027s; postprocessing20:17:25.
+All observers also succeed. Retain both measured budget points; no extension,
+third learner or automatic successor is selected. The host is idle at completion.
+See the [full result and receipts](../results/2026-10-25-cdp-cheap-qbert.md#expert10-reaches-the-first-pyramid-fraction-on-two-greedy-learners-with-large-score-variation).

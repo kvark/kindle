@@ -2807,3 +2807,64 @@ comparison`3ba4d8f904c4f956d660c6431c01ffe587d83f1a47923b27a745a508922633bc`;
 completion`bf316ed8851a650fde2934d856abe476645289ed61e6f2f530926b43d4c06c94`;
 log-only analysis`eb64f866780b0ae5f4557584081a2f6976c55cdc1867d3dc480e7f9057a66096`.
 See the [fixed-budget protocol](../experiments/2026-10-28-cdp-qbert-expert-scale10.md).
+
+## Expert10 reaches the first-pyramid fraction on two greedy learners, with large score variation
+
+The fixed-recipe seed1009 check completes **100k actions/399,823 emulator frames/
+24,939 updates in19m11s**. Primary greedy frozen score **3832.292/23of24 first
+pyramids** improves its own85.417/0 initial, but is much weaker than4013's
+**7700/24of24 in18m55s**. Both greedy learners meet the90% first-pyramid fraction;
+neither meets the original **mean15000** gate. Retain both development results,
+not just the stronger seed. No extension, third learner or automatic successor
+is selected; the five-game goal remains unfinished.
+
+| Learner | Training | Sampled final / own initial | Sampled pyramids | Greedy final / own initial | Greedy pyramids |
+|---|---:|---:|---:|---:|---:|
+|4013|18m55s|5572.917 /182.292|24/24 /0|7700.000 /263.542|24/24 /0|
+|1009|19m11s|2667.708 /180.208|15/24 /0|3832.292 /85.417|23/24 /0|
+
+Only learner/environment/evaluation seeds change from the completed expert10
+recipe:4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor-unimix0/full18/original
+rates,20% episode continuation/cap1920,all18 weights1,world gradients and
+corrective labels. Native447fe50,runner and teacher bytes are identical. No
+weights,replay,belief,games or RNG are reused. Both seeds/cohorts have earlier
+development use. There is no matched100k scale1 control on1009: this supports
+usefulness of the recipe on two learners, not a paired expert-scale effect
+across seeds or broad reliability. Different seeds need not match trajectories.
+
+All115 declared inputs remain unchanged. The50k recovery passes at12,439 updates;
+357 initial tensors are finite and346 shared initial tensors match the retained
+legacy1009 control. Its1203-event sampled actual-initial semantic trace matches
+exactly. All24,939 reports are finite; CNN/reward/actor/value tensors change.
+All357 frozen tensors remain unchanged per arm. Complete training label/input-
+pixel/actual-action replay,frozen outcome replays/videos,host guards,curves,
+coverage,exposure and two-learner comparison pass. The comparison PNG is visually
+checked. No failed attempt,GPU repeat,cap change or runtime edit occurs.
+
+Each of four frozen arms selects first3 natural episodes per8 lanes=24 with no
+guidance/labels,updates or truncations. Sampled final collects25 episodes; other
+arms collect24 each. Excess episodes and partial tails remain. Evaluations total
+61,392 actions/245,415 frames/28.689s. Mean first-pyramid coverage is20.167/21
+sampled and20.792/21 greedy, versus own5.833/3.375. Ordinary frozen logs have no
+live pixel hashes; outcome replay does not establish direct live-image equality.
+
+The20% episode rule selects22/121 starts and overrides40,745 actions (40.745%).
+100k labels include75,051 NOOP/24,949 hops,59,255 passive states and16,871 actual/
+teacher disagreements. All24,939 supervised reports have2,988,750 labeled replay
+rows and identical weight sum; maximum raw actor/world loss difference8e−7.
+20 completed guided episodes average15,295/20pyramids;93 unguided average1717.473/
+34pyramids (last50:2945.500/34). There are4471 released native actions. These
+online returns include changing policies and teacher exposure, not frozen
+competence. The original4013 exposure and fixed-budget scale1 comparison remain.
+
+Main starts19:51:22 UTC/source`447d3c5` on October28 and succeeds20:16:56,
+whole25m34.027s; postprocessing succeeds20:17:25. Recovery/progress observers
+also succeed. The protocol preserves the affined Breakout CPU co-host work;
+no timing correction is made. No allocation remains active at this milestone.
+
+Artifacts:`/x/Temp/kindle-qbert-expert10-seed1009-20261028/qbert-4m-48-r32-wait1-expert10-100k-seed1009`.
+Learning review`22ec3a12ccefa0101865f726df696e5e50cb57c17781ddea27eb2997cf1a7b00`;
+postprocessing`346be2c6742ce86dc7c238730bf31c6036da735d1dad92ede9cf1e34ed4974c0`;
+comparison`fa5b7c0dbc2b800e964cd1f67762554164913f272fd709d09f48d008e35c03ae`;
+completion`9a5423a24cf2b2510c43f0dfd821c844cfa91d6ba84f0ecccee65fb830141a3c`.
+See the [second-learner protocol](../experiments/2026-10-28-cdp-qbert-expert10-seed1009.md).
