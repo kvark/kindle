@@ -14,7 +14,7 @@ struct LiveStream {
     active: bool,
     needs_reset: bool,
     pending_action: Option<usize>,
-    pending_expert: bool,
+    pending_expert: Option<usize>,
 }
 
 pub(super) struct VectorCore {
@@ -69,6 +69,27 @@ fn check_action_overrides(
         .any(|&action| action >= action_count)
     {
         return Err("action override is outside the action vocabulary");
+    }
+    Ok(())
+}
+
+fn check_expert_labels(
+    config: &DreamerConfig,
+    streams: usize,
+    labels: &[Option<usize>],
+) -> Result<(), &'static str> {
+    if config.expert_imitation.is_none() {
+        return Err("expert labels require an imitation configuration");
+    }
+    if labels.len() != streams {
+        return Err("expert labels must have one entry per stream");
+    }
+    if labels
+        .iter()
+        .flatten()
+        .any(|&action| action >= config.action_count)
+    {
+        return Err("expert label is outside the action vocabulary");
     }
     Ok(())
 }
@@ -140,7 +161,7 @@ impl VectorCore {
                     active: false,
                     needs_reset: false,
                     pending_action: None,
-                    pending_expert: false,
+                    pending_expert: None,
                 }
             })
             .collect();
@@ -280,7 +301,7 @@ impl VectorCore {
                 let stream = &mut self.streams[id];
                 let previous_action = stream.pending_action.take();
                 let expert = std::mem::take(&mut stream.pending_expert);
-                assert!(!expert || (!flags.is_first && previous_action.is_some()));
+                assert!(expert.is_none() || (!flags.is_first && previous_action.is_some()));
                 stream.active = true;
                 stream.needs_reset = flags.is_last;
                 if !flags.is_first {
@@ -325,7 +346,28 @@ impl VectorCore {
         }
         let selected = self.act_with_overrides(mode, actions)?;
         for (stream, action) in self.streams.iter_mut().zip(actions) {
-            stream.pending_expert = action.is_some();
+            stream.pending_expert = *action;
+        }
+        Ok(selected)
+    }
+
+    fn act_with_expert_labels(
+        &mut self,
+        mode: ActionMode,
+        labels: &[Option<usize>],
+        overrides: Option<&[Option<usize>]>,
+    ) -> Result<Vec<usize>, &'static str> {
+        check_expert_labels(&self.learner.config, self.streams.len(), labels)?;
+        if let Some(actions) = overrides {
+            check_action_overrides(
+                actions,
+                self.streams.len(),
+                self.learner.config.action_count,
+            )?;
+        }
+        let selected = self.act_inner(mode, overrides, None);
+        for (stream, label) in self.streams.iter_mut().zip(labels) {
+            stream.pending_expert = *label;
         }
         Ok(selected)
     }
@@ -383,7 +425,7 @@ impl VectorCore {
                 );
                 let action = overrides.and_then(|a| a[id]).unwrap_or(proposed as usize);
                 self.streams[id].pending_action = Some(action);
-                self.streams[id].pending_expert = false;
+                self.streams[id].pending_expert = None;
                 action
             })
             .collect()
@@ -960,6 +1002,17 @@ impl VectorDreamerAgent {
         actions: &[Option<usize>],
     ) -> Result<Vec<usize>, &'static str> {
         self.core.act_with_expert_actions(mode, actions)
+    }
+
+    /// Label the current beliefs without forcing the recommended actions.
+    /// Optional ordinary overrides affect executed transitions, not the labels.
+    pub fn act_with_expert_labels(
+        &mut self,
+        mode: ActionMode,
+        labels: &[Option<usize>],
+        overrides: Option<&[Option<usize>]>,
+    ) -> Result<Vec<usize>, &'static str> {
+        self.core.act_with_expert_labels(mode, labels, overrides)
     }
 
     pub fn observe(&mut self, transitions: &[(usize, Transition)]) -> Vec<Reward> {
@@ -1749,6 +1802,22 @@ mod tests {
     }
 
     #[test]
+    fn expert_labels_require_configuration_and_validate_every_stream() {
+        let mut config = DreamerConfig::tiny(3);
+        assert!(check_expert_labels(&config, 2, &[None, None]).is_err());
+        config.expert_imitation = Some(super::super::super::ExpertImitation {
+            scale: 1.0,
+            action_weights: vec![1.0; 3],
+            world_gradient: false,
+        });
+        assert!(check_expert_labels(&config, 2, &[Some(2), None]).is_ok());
+        assert!(check_expert_labels(&config, 2, &[None, None]).is_ok());
+        assert!(check_expert_labels(&config, 2, &[Some(0)]).is_err());
+        assert!(check_expert_labels(&config, 2, &[Some(0), Some(3)]).is_err());
+        assert!(check_expert_labels(&config, 2, &[Some(usize::MAX), None]).is_err());
+    }
+
+    #[test]
     fn action_overrides_preserve_policy_rng_draws_and_default_selection() {
         let logits = [0.4, -0.9, 2.0];
         let mut reference = StdRng::seed_from_u64(73);
@@ -1832,6 +1901,153 @@ mod tests {
         check_expert_actions(true);
     }
 
+    #[test]
+    #[ignore = "requires a separately guarded passive-label action/replay/update check"]
+    fn passive_labels_preserve_actions_beliefs_and_independent_replay_targets() {
+        let mut config = config();
+        config.learning_rate_warmup = 0;
+        config.loss_scales.policy = 0.0;
+        config.expert_imitation = Some(super::super::super::ExpertImitation {
+            scale: 1.0,
+            action_weights: vec![0.05, 1.0, 1.0],
+            world_gradient: true,
+        });
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let mut baseline =
+            VectorCore::new(DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu)), 2);
+        let mut labeled = VectorCore::new(DreamerCore::with_gpu(config.clone(), gpu), 2);
+        let first = FrameFlags {
+            is_first: true,
+            ..Default::default()
+        };
+        for vector in [&mut baseline, &mut labeled] {
+            vector.ingest(
+                (0..2)
+                    .map(|id| (id, observation(id, 0), first, Reward::default()))
+                    .collect(),
+            );
+        }
+        let before_rng: Vec<_> = labeled
+            .streams
+            .iter()
+            .map(|stream| stream.policy_rng.clone().random::<u64>())
+            .collect();
+        for labels in [vec![Some(0)], vec![None, Some(3)]] {
+            assert!(
+                labeled
+                    .act_with_expert_labels(ActionMode::Sample, &labels, None)
+                    .is_err()
+            );
+        }
+        assert!(
+            labeled
+                .act_with_expert_labels(ActionMode::Sample, &[Some(2), None], Some(&[Some(0)]))
+                .is_err()
+        );
+        assert!(
+            labeled
+                .streams
+                .iter()
+                .all(|stream| stream.pending_action.is_none() && stream.pending_expert.is_none())
+        );
+        assert_eq!(
+            before_rng,
+            labeled
+                .streams
+                .iter()
+                .map(|stream| stream.policy_rng.clone().random::<u64>())
+                .collect::<Vec<_>>()
+        );
+        let mut disagreements = 0;
+        for time in 1..9 {
+            let overrides = [if time % 3 == 0 { Some(0) } else { None }, None];
+            let expected = baseline
+                .act_with_overrides(ActionMode::Sample, &overrides)
+                .unwrap();
+            let actions = labeled
+                .act_with_expert_labels(ActionMode::Sample, &[Some(2), None], Some(&overrides))
+                .unwrap();
+            assert_eq!(actions, expected);
+            disagreements += usize::from(actions[0] != 2);
+            assert_eq!(labeled.streams[0].pending_expert, Some(2));
+            assert_eq!(labeled.streams[1].pending_expert, None);
+            for vector in [&mut baseline, &mut labeled] {
+                vector.ingest(
+                    (0..2)
+                        .map(|id| {
+                            (
+                                id,
+                                observation(id, time),
+                                FrameFlags::default(),
+                                Reward::default(),
+                            )
+                        })
+                        .collect(),
+                );
+            }
+        }
+        assert!(disagreements > 0);
+        let mut baseline_rng = StdRng::seed_from_u64(911);
+        let mut labeled_rng = baseline_rng.clone();
+        for _ in 0..16 {
+            let a = baseline
+                .learner
+                .replay
+                .sample(&config, &mut baseline_rng)
+                .unwrap();
+            let b = labeled
+                .learner
+                .replay
+                .sample(&config, &mut labeled_rng)
+                .unwrap();
+            assert_eq!(a.previous_actions, b.previous_actions);
+            assert_eq!(a.observations, b.observations);
+            assert_eq!(a.initial_deter, b.initial_deter);
+            assert_eq!(a.initial_stoch, b.initial_stoch);
+            assert!(
+                a.previous_expert_action
+                    .iter()
+                    .flatten()
+                    .all(Option::is_none)
+            );
+            let (targets, count) = b.expert_targets(&config);
+            assert!(count > 0);
+            assert!(
+                targets
+                    .chunks(3)
+                    .all(|row| row == [0., 0., 0.] || row == [0., 0., 1.])
+            );
+        }
+        assert_eq!(
+            baseline.learner.environment_step,
+            labeled.learner.environment_step
+        );
+        assert_eq!(baseline.learner.learner_step, 0);
+        let before = labeled
+            .learner
+            .behavior_train
+            .read_params(&["behavior.actor.out.bias"]);
+        let report = labeled.learn().unwrap();
+        let expert = report.behavior.expert_imitation.unwrap();
+        let world = report.world.expert_imitation_loss.unwrap();
+        assert!(expert.loss.is_finite() && expert.loss > 0. && expert.labeled_rows > 0);
+        assert!((expert.loss - world).abs() < 2e-4);
+        let after = labeled
+            .learner
+            .behavior_train
+            .read_params(&["behavior.actor.out.bias"]);
+        assert_ne!(before, after);
+        assert!(after.iter().flatten().all(|x| x.is_finite()));
+        println!(
+            "passive disagreements={disagreements} labels={} actor_loss={} world_loss={world}",
+            expert.labeled_rows, expert.loss
+        );
+    }
+
     fn check_expert_actions(world_gradient: bool) {
         let mut config = config();
         config.learning_rate_warmup = 0;
@@ -1871,20 +2087,28 @@ mod tests {
             vector
                 .streams
                 .iter()
-                .all(|stream| stream.pending_action.is_none() && !stream.pending_expert)
+                .all(|stream| stream.pending_action.is_none() && stream.pending_expert.is_none())
         );
         for time in 1..9 {
             if time == 2 {
                 vector
                     .act_with_overrides(ActionMode::Sample, &[Some(0), Some(1)])
                     .unwrap();
-                assert!(vector.streams.iter().all(|stream| !stream.pending_expert));
+                assert!(
+                    vector
+                        .streams
+                        .iter()
+                        .all(|stream| stream.pending_expert.is_none())
+                );
             } else {
                 let actions = vector
                     .act_with_expert_actions(ActionMode::Sample, &[Some(2), None])
                     .unwrap();
                 assert_eq!(actions[0], 2);
-                assert!(vector.streams[0].pending_expert && !vector.streams[1].pending_expert);
+                assert!(
+                    vector.streams[0].pending_expert == Some(2)
+                        && vector.streams[1].pending_expert.is_none()
+                );
             }
             vector.ingest(
                 (0..2)
@@ -1898,7 +2122,12 @@ mod tests {
                     })
                     .collect(),
             );
-            assert!(vector.streams.iter().all(|stream| !stream.pending_expert));
+            assert!(
+                vector
+                    .streams
+                    .iter()
+                    .all(|stream| stream.pending_expert.is_none())
+            );
         }
         let mut before = vec![0.0; 3];
         vector

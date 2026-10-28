@@ -76,12 +76,18 @@ def guided_events(spec=None):
         exploration=spec, exploration_sha256=hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest())
     rows[0]['config'].update(seed=1009, action_count=18)
     guided = QbertGuidance(spec, 2, 18)
+    if guided.corrective_labels:
+        rows[0]['config']['expert_imitation'] = dict(scale=1., action_weights=[.05]+[1.]*17)
     frames = [np.zeros((210,160,3), dtype=np.uint8)] * 2
     for row in rows[1:]:
         if row['event'] == 'transition':
             row['action_overrides'] = guided.actions(frames)
             row['actions'] = [1 if forced is None else forced for forced in row['action_overrides']]
             row['guidance_frame_sha256'] = guided.frame_sha256
+            if guided.corrective_labels:
+                row['expert_labels'] = list(guided.expert_labels)
+                row['expert_action_mask'] = [True]*2
+                guided.feedback(row['actions'])
         elif row['event'] == 'reset':
             guided.reset(row['streams'])
         elif row['event'] in ('progress', 'run_end'):

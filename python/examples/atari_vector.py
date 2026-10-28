@@ -126,6 +126,8 @@ def main():
                         help="fresh guided Qbert only; continuation requires an explicit action cap")
     parser.add_argument("--qbert-guidance-max-actions", type=int,
                         help="release each selected episode to the learner after this many actions")
+    parser.add_argument("--qbert-corrective-labels", action="store_true",
+                        help="fresh continuation imitation: label all learner states and give the teacher action feedback")
     parser.add_argument("--breakout-guidance-probability", type=float, default=0.0,
                         help="fresh Breakout/full18 only: probability of pixel-guided episodes")
     parser.add_argument("--breakout-guidance-max-actions", type=int,
@@ -200,6 +202,9 @@ def main():
             parser.error("guidance NOOP weight must be positive F32 and at most1")
     if args.guidance_world_gradient and args.guidance_imitation_scale is None:
         parser.error("guidance world gradient requires imitation")
+    if args.qbert_corrective_labels and (args.qbert_guidance_policy != "continuation"
+                                         or args.guidance_imitation_scale is None):
+        parser.error("Qbert corrective labels require continuation guidance and imitation")
     if args.qbert_guidance_policy is not None and not args.qbert_guidance_probability:
         parser.error("Qbert guidance policy requires positive guidance probability")
     if args.qbert_guidance_policy == "continuation" and args.qbert_guidance_max_actions is None:
@@ -227,6 +232,7 @@ def main():
     training_options.add("--qbert-guidance-probability")
     training_options.add("--qbert-guidance-max-actions")
     training_options.add("--qbert-guidance-policy")
+    training_options.add("--qbert-corrective-labels")
     training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions"))
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-world-gradient"))
     training_options.add("--image-size")
@@ -252,6 +258,8 @@ def main():
         parser.error("persistent exploration requires native vector action overrides")
     if args.guidance_imitation_scale is not None and "expert_actions" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("guidance imitation requires native expert-action support")
+    if args.qbert_corrective_labels and "expert_labels" not in inspect.signature(kindle.VectorAgent.act).parameters:
+        parser.error("Qbert corrective labels require native passive-label support")
     if args.guidance_world_gradient and not getattr(kindle.VectorAgent, "SUPPORTS_EXPERT_WORLD_GRADIENT", False):
         parser.error("guidance world gradient requires native world-gradient support")
     if args.restore and args.encoder:
@@ -369,6 +377,8 @@ def main():
                 guidance_config.update(kind=BOUNDED_GUIDANCE_KIND, max_actions=args.qbert_guidance_max_actions)
             if args.qbert_guidance_policy == "continuation":
                 guidance_config["kind"] = guidance_module.CONTINUATION_GUIDANCE_KIND
+            if args.qbert_corrective_labels:
+                guidance_config["kind"] = guidance_module.CORRECTIVE_GUIDANCE_KIND
             exploration = QbertGuidance(guidance_config, args.num_envs, actions)
         if args.breakout_guidance_probability:
             exploration = BreakoutGuidance(dict(kind=breakout_guidance_module.GUIDANCE_KIND,
@@ -487,11 +497,17 @@ def main():
                 overrides = (exploration.actions(current_frames) if guidance else
                              exploration.actions() if exploration else None)
                 override_argument = "expert_actions" if args.guidance_imitation_scale is not None else "action_overrides"
-                selected = (agent.act(greedy=args.greedy, **{override_argument: overrides})
-                            if exploration else agent.act(greedy=args.greedy))
+                if args.qbert_corrective_labels:
+                    selected = agent.act(greedy=args.greedy, action_overrides=overrides,
+                                         expert_labels=exploration.expert_labels)
+                else:
+                    selected = (agent.act(greedy=args.greedy, **{override_argument: overrides})
+                                if exploration else agent.act(greedy=args.greedy))
                 if overrides is not None and any(forced is not None and selected[stream] != forced
                                                 for stream, forced in enumerate(overrides)):
                     raise ValueError("native action override was not honored")
+                if args.qbert_corrective_labels:
+                    exploration.feedback(selected)
                 timing["act"] += time.perf_counter() - before
                 check_memory("act", run_actions)
                 behavior = {}
@@ -518,7 +534,9 @@ def main():
                           **behavior,
                           **(dict(guidance_frame_sha256=exploration.frame_sha256) if guidance else {}),
                           **(dict(action_overrides=overrides) if exploration else {}),
-                          **(dict(expert_action_mask=[action is not None for action in overrides])
+                          **(dict(expert_labels=exploration.expert_labels) if args.qbert_corrective_labels else {}),
+                          **(dict(expert_action_mask=[action is not None for action in
+                                 (exploration.expert_labels if args.qbert_corrective_labels else overrides)])
                              if args.guidance_imitation_scale is not None else {})))
                 before = time.perf_counter()
                 reports = [] if args.evaluate else agent.learn_scheduled()

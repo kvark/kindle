@@ -1,6 +1,7 @@
 """Optional Qbert pixel guidance, selected per episode and optionally action-limited."""
 
 from collections import Counter, deque
+import hashlib
 
 import numpy as np
 
@@ -10,7 +11,9 @@ from ._pixel_guidance import EpisodePixelGuidance
 GUIDANCE_KIND = "episode-qbert-pixels-v1"
 BOUNDED_GUIDANCE_KIND = "bounded-episode-qbert-pixels-v1"
 CONTINUATION_GUIDANCE_KIND = "bounded-episode-qbert-continuation-pixels-v1"
-GUIDANCE_KINDS = (GUIDANCE_KIND, BOUNDED_GUIDANCE_KIND, CONTINUATION_GUIDANCE_KIND)
+CORRECTIVE_GUIDANCE_KIND = "bounded-episode-qbert-corrective-pixels-v1"
+GUIDANCE_KINDS = (GUIDANCE_KIND, BOUNDED_GUIDANCE_KIND, CONTINUATION_GUIDANCE_KIND,
+                 CORRECTIVE_GUIDANCE_KIND)
 GUIDANCE_SEED_XOR = 0x5142_4552_5450_5801
 ROW_X = ((77.5,), (65.5, 93.5), (53.5, 77.5, 105.5),
          (41.5, 65.5, 93.5, 117.5), (29.5, 53.5, 77.5, 105.5, 129.5),
@@ -241,13 +244,81 @@ class ContinuationPixelPolicy:
         return action
 
 
+class FeedbackPixelPolicy:
+    """Reconcile movement intent with the submitted action, keeping pixel history."""
+
+    def __init__(self):
+        self.teacher = ContinuationPixelPolicy()
+        self.pending = None
+        self.rejected = 0
+
+    def propose(self, frame):
+        if self.pending is not None:
+            raise ValueError('Previous proposal needs action feedback')
+        self.pending = self.teacher.action(frame)
+        return self.pending
+
+    def feedback(self, action):
+        if self.pending is None:
+            raise ValueError('No pending proposal')
+        if type(action) is not int or not 0 <= action < 18:
+            raise ValueError('Executed action must be a full18 integer')
+        if action != self.pending:
+            movement = self.teacher.policy
+            movement.target = None
+            movement.age = 0
+            movement.command = 0
+            movement.origin = None
+            self.rejected += 1
+        self.pending = None
+
+
 class QbertGuidance(EpisodePixelGuidance):
     """Qbert episode selection with the original pixel rule and random schedule."""
 
     def __init__(self, config, streams, action_count):
+        self.corrective_labels = isinstance(config, dict) and config.get("kind") == CORRECTIVE_GUIDANCE_KIND
+        self.expert_labels = []
         continuation = isinstance(config, dict) and config.get("kind") == CONTINUATION_GUIDANCE_KIND
         super().__init__(config, streams, action_count, game="Qbert", kinds=GUIDANCE_KINDS,
-                         bounded_kind=CONTINUATION_GUIDANCE_KIND if continuation else BOUNDED_GUIDANCE_KIND,
+                         bounded_kind=(CORRECTIVE_GUIDANCE_KIND if self.corrective_labels else
+                                       CONTINUATION_GUIDANCE_KIND if continuation else BOUNDED_GUIDANCE_KIND),
                          seed_xor=GUIDANCE_SEED_XOR,
-                         policy_factory=ContinuationPixelPolicy if continuation else PixelPolicy,
+                         policy_factory=(FeedbackPixelPolicy if self.corrective_labels else
+                                         ContinuationPixelPolicy if continuation else PixelPolicy),
                          valid_actions=(0, 2, 3, 4, 5))
+        self.expert_labels = [None] * len(self._policies)
+
+    def reset(self, streams):
+        super().reset(streams)
+        if self.corrective_labels:
+            for lane in streams:
+                if self._policies[lane] is None:
+                    self._policies[lane] = self._policy_factory()
+                if self.expert_labels:
+                    self.expert_labels[lane] = None
+
+    def actions(self, frames):
+        if not self.corrective_labels:
+            return super().actions(frames)
+        if len(frames) != len(self._policies):
+            raise ValueError('wrong Qbert guidance frame batch')
+        if any(policy.pending is not None for policy in self._policies):
+            raise ValueError('Previous proposals need action feedback')
+        if any(frame.shape != (210, 160, 3) or frame.dtype != np.uint8 for frame in frames):
+            raise ValueError('Native RGB8 required')
+        self.expert_labels = [policy.propose(frame) for policy, frame in zip(self._policies, frames)]
+        self.frame_sha256 = [hashlib.sha256(frame.tobytes()).hexdigest() for frame in frames]
+        overrides = [label if active else None for label, active in zip(self.expert_labels, self.active_guidance)]
+        self.verify_actions(overrides)
+        return overrides
+
+    def feedback(self, actions):
+        if not self.corrective_labels:
+            raise ValueError('Action feedback requires corrective guidance')
+        if (not isinstance(actions, list) or len(actions) != len(self._policies)
+                or any(type(action) is not int or not 0 <= action < 18 for action in actions)
+                or any(policy.pending is None for policy in self._policies)):
+            raise ValueError('Invalid Qbert action feedback batch')
+        for policy, action in zip(self._policies, actions):
+            policy.feedback(action)

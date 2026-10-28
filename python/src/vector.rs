@@ -112,12 +112,13 @@ impl PyVectorAgent {
         Ok(())
     }
 
-    #[pyo3(signature = (greedy = false, action_overrides = None, *, expert_actions = None))]
+    #[pyo3(signature = (greedy = false, action_overrides = None, *, expert_actions = None, expert_labels = None))]
     fn act(
         &mut self,
         greedy: bool,
         action_overrides: Option<Vec<Option<usize>>>,
         expert_actions: Option<Vec<Option<usize>>>,
+        expert_labels: Option<Vec<Option<usize>>>,
     ) -> PyResult<Vec<usize>> {
         let mode = if greedy {
             ActionMode::Greedy
@@ -125,14 +126,20 @@ impl PyVectorAgent {
             ActionMode::Sample
         };
         if let Some(actions) = expert_actions {
-            if action_overrides.is_some() {
+            if action_overrides.is_some() || expert_labels.is_some() {
                 return Err(PyValueError::new_err(
-                    "expert actions and ordinary overrides are mutually exclusive",
+                    "expert actions are mutually exclusive with ordinary overrides and passive labels",
                 ));
             }
             return self
                 .inner
                 .act_with_expert_actions(mode, &actions)
+                .map_err(PyValueError::new_err);
+        }
+        if let Some(labels) = expert_labels {
+            return self
+                .inner
+                .act_with_expert_labels(mode, &labels, action_overrides.as_deref())
                 .map_err(PyValueError::new_err);
         }
         match action_overrides {

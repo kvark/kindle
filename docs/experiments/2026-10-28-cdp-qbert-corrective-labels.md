@@ -1,9 +1,10 @@
 # Qbert corrective labels on learner-visited states
 
-**CPU teacher check complete; optional implementation selected.** Native labels
-remain tied to executed expert actions. No corrective-label native runtime,
-bounded GPU check or full training allocation exists yet. The five-game goal
-remains unfinished.
+**Optional implementation passes CPU checks; packaging is next.** Independent
+expert labels and fresh Qbert corrective guidance are implemented, with130 Rust
+CPU tests and491 relevant Python tests passing. Native GPU behavior, bounded
+cost and task benefit remain unverified; no full learner is selected. The
+five-game goal remains unfinished.
 
 ## Evidence and scope
 
@@ -93,3 +94,48 @@ finite expert actor/world losses, parameter changes, frozen invariance and exact
 label/action replay before selecting a full learner. Keep4M/RGB48/T16 as the
 candidate base and measure cost before any long allocation. No GPU budget,
 full comparison, extension or seed campaign is selected by this CPU result.
+
+
+## Implementation and CPU validation
+
+Replay stores an optional expert action separately from the executed action.
+`VectorAgent.act(expert_labels=..., action_overrides=...)` supplies passive
+recommendations, with optional executed overrides; `expert_actions` retains its
+old forcing behavior and cannot combine with either argument. Labels require
+imitation config and valid batch/vocabulary before sampling or mutation. World
+transitions still consume executed actions; expert targets use recommendations
+with unchanged reset/last/tail masks, action weights and normalization. No
+checkpoint/config/tensor schema or learning-graph change is needed because
+checkpoints omit replay and pending live actions.
+
+The explicit fresh-only`--qbert-corrective-labels` requires continuation guidance,
+its positive episode probability/cap, and imitation. All lanes receive teacher
+recommendations, including unselected/released lanes. Episode controls still
+bound executed overrides; actual chosen commands feed back before the next
+proposal, and completed lanes reset independently. Logs distinguish labels,
+action masks, controls and executed actions, with hashes for every teacher input.
+CPU audits reject malformed/undeclared labels, mismatched masks/overrides and
+missing hashes. Independent replay reconstructs labels, feedback and outcomes.
+Old native extensions are rejected before environment construction.
+
+130 Rust CPU tests pass;83 GPU tests remain ignored. Updated tests check a label
+that disagrees with the executed action, unchanged transition arrays, stream
+isolation and masked boundaries. The new ignored GPU diagnostic will compare
+sampling/beliefs/replay against a no-label control before a supervised update.
+491 Python tests pass with10 unchanged native-constructor tests deselected and
+zero native construction attempts. The guarded harness eagerly replaces native
+constructors; new integration tests verify CPU-stub provenance/zero parameters,
+released-state labels, actual-action feedback, resets and full replay. This
+prepackaging harness uses the retained binary only for CPU config helpers, not
+native passive-label execution.
+
+Workspace and binding strict Clippy pass. Its original type-complexity rejection
+is retained in the external log; a named arrival alias resolves it without a
+semantic change. Original pixel/continuation class ASTs and the previously
+validated feedback method ASTs are unchanged. Source edits occur after all
+prior services are terminal:62of63 latest learner pins remain at their original
+paths; the changed shared replay script is preserved with its exact original
+hash under`/x/Temp/kindle-corrective-labels-20261028/prior-source`. Original
+runtimes/checkpoints/reviews are unchanged; do not rerun old pinned controllers
+against the new shared script. Separate packaging and a newly pinned bounded
+GPU declaration remain outstanding.

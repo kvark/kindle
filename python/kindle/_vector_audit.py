@@ -8,7 +8,7 @@ from pathlib import Path
 import struct
 
 from ._exploration import EXPLORATION_PROTOCOL, PersistentExploration
-from ._qbert_guidance import GUIDANCE_KINDS, QbertGuidance
+from ._qbert_guidance import CORRECTIVE_GUIDANCE_KIND, GUIDANCE_KINDS, QbertGuidance
 from ._breakout_guidance import GUIDANCE_KINDS as BREAKOUT_GUIDANCE_KINDS, BreakoutGuidance
 
 
@@ -129,6 +129,8 @@ def audit(path):
                   and any(weight > 0 for weight in expert["action_weights"]), "invalid expert imitation weights")
             check(header["mode"] != "train" or guidance, "expert imitation requires trusted guidance")
         expert_training = expert is not None and header["mode"] == "train"
+        corrective = guidance and header["exploration"]["kind"] == CORRECTIVE_GUIDANCE_KIND
+        check(not corrective or expert_training, "corrective guidance requires expert imitation")
         training = header["mode"] == "train" and config["train_ratio"] > 0
         required = config["replay_context"] + config["batch_length"]
         samples = config["batch_size"] * config["batch_length"]
@@ -208,7 +210,7 @@ def audit(path):
                         hashes = event["guidance_frame_sha256"]
                         check(isinstance(hashes, list) and len(hashes) == count, "wrong guidance frame hash batch")
                         for action, digest in zip(overrides, hashes):
-                            check(digest is None if action is None else isinstance(digest, str) and len(digest) == 64
+                            check(digest is None if action is None and not corrective else isinstance(digest, str) and len(digest) == 64
                                   and all(c in "0123456789abcdef" for c in digest), "invalid guidance frame hash")
                     else:
                         check(overrides == exploration.actions(), "exploration action history differs")
@@ -216,11 +218,21 @@ def audit(path):
                     check("action_overrides" not in event, "undeclared action overrides")
                 if not guidance:
                     check("guidance_frame_sha256" not in event, "undeclared guidance frame hashes")
+                if corrective:
+                    labels = event.get("expert_labels")
+                    check(isinstance(labels, list) and len(labels) == count
+                          and all(type(label) is int and label in (0, 2, 3, 4, 5) for label in labels),
+                          "invalid corrective expert labels")
+                    check(all(action is None or action == label for action, label in zip(overrides, labels)),
+                          "guided override differs from expert label")
+                else:
+                    check("expert_labels" not in event, "undeclared corrective expert labels")
                 if expert_training:
                     mask = event.get("expert_action_mask")
                     check(isinstance(mask, list) and len(mask) == count
                           and all(type(value) is bool for value in mask), "invalid expert action mask")
-                    check(mask == [action is not None for action in overrides], "expert action mask differs from guidance")
+                    check(mask == [action is not None for action in (labels if corrective else overrides)],
+                          "expert action mask differs from guidance")
                 else:
                     check("expert_action_mask" not in event, "undeclared expert action mask")
                 for stream in range(count):
