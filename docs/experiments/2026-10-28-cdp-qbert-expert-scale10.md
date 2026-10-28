@@ -60,7 +60,7 @@ whole1m06.709s. No GPU repeat, cap change or runtime edit. Declaration
 
 ## Separately selected fresh100k comparison
 
-The early rate projects17m43s/100k, close to the scale1 check; select one fresh
+The early rate projects17m42s/100k, close to the scale1 check; select one fresh
 fixed100k-action/24,939-update life under a30-minute training cap. Keep exactly
 the bounded recipe above, changing only expert scale1→10 against the retained
 100k control. This changes actor and world supervision together. No weights,
@@ -87,3 +87,17 @@ successor. Full root`/x/Temp/kindle-qbert-expert-scale10-20261028/full`, service
 `kindle-qbert-expert10-100k-20261028`. Pin exact queue/runtime/controllers and
 verify terminal predecessors and current device before launch. At selection,
 the bounded check is terminal and no GPU allocation is active.
+
+
+## Full launch
+
+CPU preparation parses5 commands,compiles11 scripts,validates retained sampled/
+greedy controls and357 matching initial tensors before any native/environment
+construction. The selected declaration pins84 inputs. One fresh service starts
+19:16:56 UTC/source`c0abf6a` on October28, PID193426/invocation
+`b9d840aed2e34da79c483f9e348d5210`; declaration
+`ba1cc1ef54068828de44670c8a86e4d2abb32abd7a8447bef984a8dce1a566ae`.
+Startup passes at1776 actions/381 finite supervised reports:84 pins,357 initial
+tensors matching both control and bounded check,exact config and first6 updates.
+50k recovery,progress observation and terminal postprocessing are automated.
+No frozen outcome yet; no extension or automatic successor is selected.

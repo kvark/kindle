@@ -420,6 +420,15 @@ and guards pass. Retain greedy as a useful18m58s development option on this one
 reused learner, not a global default or independent confirmation. No extension,
 learner confirmation or automatic successor. See the completed wait-greedy result.
 
+Expert scale10 passes a4096-action/963-update bounded check in43.517s,with357
+matched/invariant tensors and full replay/guards. A separately selected fresh
+100k comparison starts19:16:56 UTC/source`c0abf6a` on October28, service
+`kindle-qbert-expert10-100k-20261028`. Startup84 pins/357 initial tensors/381
+finite reports pass;50k recovery and sampled/greedy final/own-initial evaluations
+are automated. Only expert scale1→10 changes, affecting actor/world supervision
+together. See the expert-scale10 protocol; check live state before GPU work.
+
+
 
 
 
