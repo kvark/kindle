@@ -461,6 +461,15 @@ Full root`/x/Temp/kindle-qbert-expert-capacity-20261028/full`; see the completed
 expert-capacity result in cheap-Qbert. No learner/GPU allocation is active;
 check live state before GPU work.
 
+The CPU corrective-teacher check preserves24,733 accepted reference actions and
+scores13087.500 versus8584.375 under fixed5% random disturbance, both8/8 pyramids.
+Full proposal/action/pixel replay and all10/63 source/retained pins pass; service
+succeeds16:53:20 UTC on October28. This is teacher robustness on reused episodes,
+not native learning. Select optional independent expert labels plus action
+feedback; implementation/packaging/bounded GPU validation remain outstanding.
+No training allocation is selected. See the corrective-labels October28 protocol.
+
+
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,
 13.41% less training time than5%/R32, but frozen3333.333/18of24 first pyramids

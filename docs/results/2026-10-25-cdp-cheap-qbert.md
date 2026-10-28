@@ -2474,3 +2474,38 @@ comparison`278cd6b3738d39adc7fe44475c6b323c87f762e25330a28fc99c8dc169a0e813`;
 postprocessing`09dbbb8ecc68fc677adddf9290a85e24e87e7c456b17bfa15864ead8a677dd3d`.
 No learner or GPU allocation is active after this result; check live state before
 further GPU work.
+
+
+## Action feedback improves the CPU teacher under fixed disturbances
+
+The current expert API forces the teacher action and stores a boolean expert
+tag on that executed transition. It cannot label a different learner action;
+unguided states receive no supervised targets. The continuation rule also
+remembers its proposed destination. A CPU-only wrapper clears movement intent
+when the submitted command differs, while preserving board/pixel observations.
+This source review identifies missing capability, not the cause of weak learning.
+
+Accepted-command parity reproduces all24,733 retained first8 actions /98,913
+frames, output pixels, rewards and boundaries in73.593s. A predeclared5% uniform18
+disturbance comparison then scores **13087.500 versus8584.375** for feedback-aware
+versus unchanged continuation, both8/8 first pyramids. Only2/8 feedback episodes
+reach15000. These are8 reused CPU-reference episodes, not native learning,
+held-out confirmation or evidence of accurate labels on learner-visited states.
+
+Unchanged collection/replay take31.937/31.646s for10,315 actions /41,243 frames;
+feedback-aware take42.827/44.614s for13,915 /55,644. All proposals, noise choices,
+actions, input/output pixels, rewards, frames and boundaries reproduce exactly.
+Actual changed commands526/688 differ because trajectories and episode lengths
+differ. All10 declared pins and63 preceding-learner pins stay unchanged. No
+native module loads or agent is constructed; zero learning updates/GPU work.
+CPU service starts16:49:35 UTC/source`c12de77` and succeeds16:53:20,3m45.104s total.
+
+Select an optional independent-label implementation: preserve actual actions for
+world transitions, store teacher recommendations separately for masked imitation,
+and provide actual-action feedback to the optional Qbert teacher. Legacy forcing
+and defaults must remain unchanged. Native implementation, focused validation,
+separate packaging and a bounded GPU check remain outstanding; no full learner,
+training budget or automatic successor is selected. See the
+[protocol and required invariants](../experiments/2026-10-28-cdp-qbert-corrective-labels.md).
+Artifacts:`/x/Temp/kindle-qbert-correction-20261028`; review SHA256
+`0eab9a3a3f710b0bfac144ad876e3c288d627f35abb2ca3bf82e315a575cea37`.
