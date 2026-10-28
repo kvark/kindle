@@ -449,9 +449,10 @@ UTC on October28. Original prelaunch first384/0 assumption and unselected-servic
 failure remain; reviewed first376/residual.5 passes. No GPU stage repeats.
 Use`/x/Temp/kindle-qbert-expert-capacity-20261028/reviewed`. Early200k cost
 projects24.55min, not competence or measured full cost. Model/batch change
-together. A separate fresh200k/12,477-update comparison is selected with a
-30-minute training cap,100k/6227 recovery and fixed24-episode final/own-initial
-assessment. Same native/runner/teacher/host as4M world-gradient control3670.833/19;
+together. A separate fresh200k/12,477-update comparison starts16:09:28 UTC
+on October28/source`eebf838`, with a30-minute training cap,100k/6227 recovery
+and fixed24-episode final/own-initial assessment. Startup passes63 pins,357
+initial tensors and259 finite reports; automatic observers are active. Same native/runner/teacher/host as4M world-gradient control3670.833/19;
 model/batch change together.63 inputs pinned; no retry, extension or automatic
 successor. Full root`/x/Temp/kindle-qbert-expert-capacity-20261028/full`; see the
 expert-capacity protocol and check live state.

@@ -1,6 +1,6 @@
 # Guided Qbert capacity with B16 and R16
 
-**Fresh200k comparison selected:** the completed bounded check supports a
+**Fresh200k comparison running:** the completed bounded check supports a
 separate30-minute training allocation, followed by fixed final/actual-initial
 evaluation. The full result is pending.
 
@@ -168,3 +168,19 @@ cap increase, extension, checkpoint selection, confirmation or automatic success
 Trial:`/x/Temp/kindle-qbert-expert-capacity-20261028/full/qbert-12m-48-b16-r16-p20-world-200k-seed4013`.
 Owner:`kindle-qbert-expert-capacity-200k-20261028`. CPU-only recovery and completion
 observers cover this declared life; they never start another GPU job.
+
+
+## Full-run launch and startup
+
+The selected service starts16:09:28 UTC on October28/source`eebf838`, PID171410,
+invocation`0a687e9f00f747189c3546f29534f036`. Its first startup review passes
+all63 pins,357 finite initial tensors matching the bounded check,346 shared
+reference tensors, exact config/native/runner/guidance identities, and the first
+six updates at376/392/408/424/440/456. The complete prefix has4520 actions and259
+finite supervised reports;4096-action progress takes27.935s with.5 residual.
+This is startup evidence only. Recovery and completion observers are active;
+the fixed final outcome remains pending.
+
+Selected declaration SHA256
+`616019129a983dfe59af77ebfecd85bd6df695d38f296bf7ae8e1f5c5a2b5e97`.
+The CPU exposure-count correction precedes selection; no GPU stage is repeated.
