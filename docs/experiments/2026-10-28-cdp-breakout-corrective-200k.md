@@ -75,3 +75,9 @@ The separate completion collector records the original failed observer and
 requires the replacement to succeed; the pinned original collector is untouched.
 The100k milestone and terminal audits remain required. No training restart,
 cap increase,extension or next allocation follows this observer repair.
+
+A1.131s affined CPU recount of retained Qbert training labels overlaps this life.
+It constructs no environment or native agent. All64 inputs and the same learner
+PID/invocation remain unchanged. Keep the co-host duration without correcting
+wall time. Evidence is in the cheap-Qbert training-phase diagnostic; it selects
+no new GPU allocation.

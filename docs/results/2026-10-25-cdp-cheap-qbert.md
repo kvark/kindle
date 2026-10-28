@@ -3020,3 +3020,39 @@ postprocessing`1b2738dda73547df352a0ceb5754329c240ca2949086f8d18b44a17431805991`
 comparison`b188cecda9ddc2b1db672dce55079f8d52a2ec806fe32e9b7b34b2fca015eaf5`;
 completion`451bb3b1f140dca1766f07688e92e6fe5bc25bf819a98cd739c263a538ea8f39`.
 See the [expert100/R16 protocol](../experiments/2026-10-28-cdp-qbert-expert100-r16.md).
+
+## Verified training labels retain a larger disagreement after the first pyramid
+
+A CPU-only recount of the completed expert100 runs uses their already verified
+training labels and first-pyramid frame markers. It reconstructs episode-local
+frame positions, assigning each decision to the phase of its input state before
+the submitted action. No environment, native module, inference or learning is
+run. Agreement denominators include only passive actions; forced actions remain
+counted separately. These are the last50k aggregate actions of each life:
+
+| Recipe | First-pyramid phase | Passive actions | Exact agreement | Agreement on teacher waits | Agreement on teacher hops |
+|---|---|---:|---:|---:|---:|
+|100k/R32|Before|8,112|95.994%|98.675%|86.919% (1608/1850)|
+|100k/R32|After|25,127|80.415%|93.629%|49.555% (3733/7533)|
+|200k/R16|Before|9,133|98.095%|99.393%|93.610% (1919/2050)|
+|200k/R16|After|25,375|83.732%|94.372%|56.399% (4010/7110)|
+
+The longer run agrees more in both phases on its own visited states, while
+post-pyramid hop disagreement remains much larger. This helps locate remaining
+policy/teacher disagreement for development; it does not identify a capacity,
+resolution, memory, optimization or teacher error as the cause. Training stages
+and state distributions differ. These counts are neither frozen-policy agreement,
+teacher accuracy, action equivalence nor independent seed evidence. They select
+no additional GPU allocation by themselves.
+
+All300k recorded actions/1,199,589 frames are accounted for. Every completed and
+partial episode frame boundary matches the verified replay; full teacher-label,
+passive-action, disagreement and override totals match the existing learning
+reviews. All9 analysis inputs and64 active Breakout inputs remain unchanged,
+with the same learner PID207148/invocation`f08ef9cc0f4c41f2b54af5a619dd7e5b`.
+The affined low-priority analysis takes1.131s during Breakout training; retain
+that co-host duration without adjusting training wall time. No failed attempt
+or GPU stage occurs in this analysis.
+
+Artifacts:`/x/Temp/kindle-qbert-supervision-phases-20261028`.
+Review`e5569a190729d8a5a06ca7e24c5f9b2cc98676d4a9dd5d7d3031a4d1213efbf1`.
