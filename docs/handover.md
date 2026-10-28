@@ -360,12 +360,17 @@ Main succeeds15:21:35 UTC on October28; original CPU postprocessing fails at
 Retain5%/R32 as stronger; small reused-seed R16 gain gets no extension or
 confirmation. New native/runner identities limit attribution. See the completed
 expert-world result in cheap-Qbert and its October28 protocol. A separate
-12M48/B16/R16/20%/world-gradient check now selects8192 actions/489 updates,
-180s train plus1024 frozen/60s, with41 pinned inputs. A prelaunch accounting
-error is preserved: first376/residual.5, not384/0; the unselected service
-refuses before GPU work. The separate reviewed declaration corrects this. Model and batch change
-together; this tests execution/cost, not competence. See the October28
-expert-capacity protocol. No full learner is selected; check live state.
+12M48/B16/R16/20%/world-gradient check completes8192 actions/32,756 frames/489
+updates in60.333s;1024 frozen/.810s, zero updates/no natural episodes. All41
+pins,357 finite/invariant tensors,346 shared12M initial tensors, parameter
+changes,489 supervised reports, full guided replay and guards pass.4492 trusted
+actions; max world/actor expert-loss difference1.4e−7. Service succeeds15:49:49
+UTC on October28. Original prelaunch first384/0 assumption and unselected-service
+failure remain; reviewed first376/residual.5 passes. No GPU stage repeats.
+Use`/x/Temp/kindle-qbert-expert-capacity-20261028/reviewed`. Early200k cost
+projects24.55min, not competence or measured full cost. Model/batch change
+together. No full learner is selected; see the expert-capacity protocol and
+check live state.
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,

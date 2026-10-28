@@ -2379,3 +2379,27 @@ learning review`d4e8b50e1868bc05ea5f4d04a87ac804c446c0e4daf6495ebf63e80fb6b4d9aa
 comparison`c28961e0fcafec146483347222ed97af142874feca7a37da2c86c5b8615f6798`;
 CPU repair`cd06fbc1f258b34c6ad2a7980ca0a4a5640e5251dbc072848496722a32268f24`;
 completed postprocessing`fe37b62889b2eed68144a4073cb0094eb348368fd006b009d266879f8a26ce32`.
+
+## Guided12M B16 R16 passes its bounded cost check
+
+After the small4M/R16 world-gradient gain, a separate
+[capacity check](../experiments/2026-10-28-cdp-qbert-expert-capacity.md) keeps
+RGB48/Auto/N8/T16/H15/R16/coefficient1/actor0/full18,20% continuation/cap1920/
+expert1/NOOP.05/world gradients and original rates, while changing4M→12M and
+batch/microbatch8→16 together.14,123,473 parameters; fresh4013/eval4000004013.
+
+It completes8192 actions /32,756 frames /489 updates in **60.333s**, followed by
+1024 frozen /4096 frames /.810s, zero updates and no natural episodes. All41
+pins,357 finite/invariant tensors,346 shared initial tensors against retained
+12M4013 initialization, actor-copy equality, finite reports, changed parameters,
+full guided replay and host guards pass.4492 trusted actions include1026 hops;
+all489 reports are supervised, max world/actor expert-loss difference1.4e−7.
+Service succeeds15:49:49 UTC on October28,1m25.463s total. No GPU stage repeats.
+
+A final CPU prelaunch check corrects an assumed first384/residual0 to observed
+first376/residual.5. The original unselected service refuses before any GPU
+stage; its failure and40 pins remain. The separate reviewed declaration is the
+first actual GPU execution. All budgets/caps remain fixed. The early rate
+projects24.55min/200k, with later cost and learning unknown. This is execution
+and early-cost evidence; no full learner or automatic promotion is selected.
+The linked protocol records exact failures, identities, counters and hashes.

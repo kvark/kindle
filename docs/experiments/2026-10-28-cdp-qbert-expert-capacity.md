@@ -1,5 +1,9 @@
 # Guided Qbert capacity with B16 and R16
 
+**Bounded check complete:**8192 actions/489 updates in60.333s;1024 frozen
+actions/.810s, zero updates and no natural episodes. All audits pass. The
+early200k projection is24.55 minutes, not a measured full-run cost or task result.
+
 Select one bounded12M/RGB48 execution and cost check after the completed4M/R16
 expert-world comparison. Its frozen3670.833/19of24 first pyramids is a small gain
 over3333.333/18, below stronger5%/R32's4730.208/23 and the mean15000/90% gate.
@@ -87,3 +91,34 @@ input pins. A separate `reviewed` preparation corrects both assertions, verifies
 the reference counters/config and parses both commands again. It pins41 inputs,
 including the original failure receipt, with no model/budget/cap change. The
 reviewed owner above is a distinct first GPU check, not a repeated GPU stage.
+
+## Completed bounded result
+
+The reviewed service starts15:48:24 UTC/source`1083a65`, PID169963/invocation
+`221aad6399eb4708878555325397b49a`, and succeeds at15:49:49 on October28.
+Whole service1m25.463s. Training8192 aggregate actions /32,756 emulator frames /
+489 updates takes60.332659s, first376/residual.5. Frozen1024 /4096 frames takes
+.809770s with zero updates and no natural completed episodes.
+
+All489 finite reports contain expert labels;58,825 repeated label rows have
+total weight15,333.036.4492 trusted actions (54.834%) include3466 NOOP and1026
+directional hops. World/actor expert-loss sums161.943426/161.943407 agree, with
+maximum per-report difference1.4e−7. All41 input pins,357 finite/invariant
+tensors, actor-copy equality,346 shared initialization tensors, changed CNN/
+reward/actor/value parameters, full guided input/action/outcome replay and both
+host guards pass. The original40 unselected pins and CPU-only failure remain
+unchanged; no GPU stage repeats or cap changes.
+
+The early rate extrapolates to24.55min/200k, with later exposure and cost unknown.
+It is affordable enough to consider a separately declared30-minute200k screen,
+but this bounded check establishes execution/cost only. No full learner,
+confirmation or automatic promotion is selected by this receipt. Use the
+`reviewed` controller/schema and first376/residual.5 accounting for future B16
+preparation; a fresh full life must not reuse check experience.
+
+Selected declaration SHA256
+`0098cf7083cf54f419a65fbb16238f41c03a28a4b61b592e65e81005fbd2c27d`;
+bounded review`b81334532ca32cbd1d3e1e7e3329af8bee69fc861c315941b9e4a7773952004e`;
+completion`0514244aa3718ea64b7ecf549e4b7e99a0c2c21f9d0a167f72eb181e9277b8c5`.
+The preceding CPU action diagnostic is SHA256
+`90c745723feb77d0999a101fe64a04f194183d34b08291cef8b39923f69a683c`.
