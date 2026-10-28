@@ -3056,3 +3056,22 @@ or GPU stage occurs in this analysis.
 
 Artifacts:`/x/Temp/kindle-qbert-supervision-phases-20261028`.
 Review`e5569a190729d8a5a06ca7e24c5f9b2cc98676d4a9dd5d7d3031a4d1213efbf1`.
+
+## Larger strongly supervised Qbert passes the bounded check
+
+A fresh12M48/Auto/N8/B16/T16/H15/R16/expert100 check completes8192 actions/
+32,754 frames/489 updates in69.886s.1024 frozen actions/4096 frames take.788s,
+zero updates/no natural episodes. All44 inputs,357 matching retained12M initial/
+invariant frozen tensors,finite reports,changed CNN/reward/actor/value,full
+teacher-label/input-pixel/action replay and guards pass. Main succeeds22:54:14
+UTC on October28,whole1m45.686s;no GPU repeat or failed attempt occurs.
+
+Native447fe50,runner and Qbert teacher match the strong4M control. Capacity4M→12M
+and batch/microbatch8→16 change together,halving optimizer cadence atR16;no isolated
+capacity effect or task competence follows. All489 reports are supervised;
+117,261 labeled rows equal weight sums.4341actual overrides differ from20%
+episode probability;3851 passive labels/3425 action disagreements replay exactly.
+The early200k projection28m26s supports a separately selected fresh200k comparison
+under a35-minute cap,with fixed final/own-initial sampled and greedy assessments.
+The original mean15000/90%-pyramid gate remains. No bounded-check experience is
+reused. [Protocol and receipts](../experiments/2026-10-28-cdp-qbert-expert100-capacity.md).
