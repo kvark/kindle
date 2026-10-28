@@ -483,8 +483,14 @@ replay and guards; exits18:15:27 UTC. No natural frozen episodes. Early17m36s/
 100k projection supports a separately selected fresh100k/24,939-update comparison,
 50k recovery and fixed24-episode final/own-initial evaluation under a30-minute
 training cap. Same runtime; wait weight/ratio/budget change together on reused4013.
-Full root`/x/Temp/kindle-qbert-wait-full-20261028`; selected, not launched at this
-milestone. See the wait-labels protocol and check live state before GPU work.
+Full root`/x/Temp/kindle-qbert-wait-full-20261028`; one fresh life starts18:29:15
+UTC/source`00eed19` on October28, service`kindle-qbert-wait1-r32-100k-20261028`,
+PID189477/invocation`00d3435a0afe4e2688a0d7c2b43aa1a6`. Startup55 pins,357
+matching initial tensors and429 finite supervised reports pass.50k recovery and
+terminal audits are automated. Original CPU progress-observer argument failure
+is retained; corrected observer runs separately without repeating GPU work.
+No frozen outcome yet; no extension or automatic successor. See the wait-labels
+protocol and check live state before GPU work.
 
 
 

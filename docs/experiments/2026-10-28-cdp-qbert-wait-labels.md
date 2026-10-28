@@ -1,6 +1,6 @@
 # Qbert wait-label weighting and a cheaper experience budget
 
-**The bounded check passes; a separate fresh100k comparison is selected.** The
+**The bounded check passes; the selected fresh100k comparison is running.** The
 completed corrective200k/R16 recipe scores3633.333/17 first pyramids for25m57s,
 below its control3670.833/19 in21m28s. Retain the control. The completed life
 is terminal and will not be extended or reused.
@@ -101,3 +101,27 @@ selection or automatic successor. Preparation must pin the exact queue/runtime/
 auditors and verify the current device and terminal predecessor before launch.
 Full root`/x/Temp/kindle-qbert-wait-full-20261028`; no full allocation is active
 at this selection milestone.
+
+
+## Full launch
+
+CPU preparation parses all3 commands before native/environment construction,
+compiles12 scripts, checks both counter schedules and357 initial tensors, and
+verifies the36 bounded/52 control pins. All55 full declaration pins pass. The
+RX7900XT host remains on boot`a8648671`, kernel7.0.0-38 and AMD module
+`9BDBC866F55BF296F1B7FA2`; no kernel errors follow the terminal bounded check.
+
+One fresh service`kindle-qbert-wait1-r32-100k-20261028` starts18:29:15 UTC on
+October28/source`00eed19`, PID189477/invocation
+`00d3435a0afe4e2688a0d7c2b43aa1a6`. Selected declaration
+`9b77f5e89b5ef98f4dcbc71b0d661eaa001af4f468786a9b78110fbd1eec74a9`.
+Startup checks55 pins,357 initial tensors matching both control and bounded
+check, expected first6 updates,429 finite supervised reports and exact equal
+row/weight counts at1968 actions. This establishes execution, not competence.
+
+The50k checkpoint watcher and terminal postprocessor are active. Original CPU
+progress observer rejects unsupported optional arguments and exits18:29:39 UTC.
+Its journal is retained; a separately named observer uses the existing supported
+positional arguments. Main learner PID/invocation remain unchanged; no GPU stage
+repeats and no runtime/controller pin changes. No frozen outcome is available at
+this milestone. No extension or automatic successor is selected.
