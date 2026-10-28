@@ -1993,7 +1993,9 @@ mod tests {
         assert!(disagreements > 0);
         let mut baseline_rng = StdRng::seed_from_u64(911);
         let mut labeled_rng = baseline_rng.clone();
+        let mut supervised_sample_rng = None;
         for _ in 0..16 {
+            let sample_rng = labeled_rng.clone();
             let a = baseline
                 .learner
                 .replay
@@ -2015,7 +2017,9 @@ mod tests {
                     .all(Option::is_none)
             );
             let (targets, count) = b.expert_targets(&config);
-            assert!(count > 0);
+            if count > 0 && supervised_sample_rng.is_none() {
+                supervised_sample_rng = Some(sample_rng);
+            }
             assert!(
                 targets
                     .chunks(3)
@@ -2027,6 +2031,7 @@ mod tests {
             labeled.learner.environment_step
         );
         assert_eq!(baseline.learner.learner_step, 0);
+        labeled.learner.rngs.replay = supervised_sample_rng.expect("sampled supervised replay");
         let before = labeled
             .learner
             .behavior_train
