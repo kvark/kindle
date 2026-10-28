@@ -82,3 +82,16 @@ automatic successor. Full root`/x/Temp/kindle-qbert-expert100-r16-20261028/full`
 service`kindle-qbert-expert100-r16-200k-20261028`. Pin exact inputs and check live
 state before launch. At selection the bounded check and all predecessors are
 terminal success, with no active GPU allocation.
+
+## Full launch
+
+CPU preparation parses5 commands,compiles11 controllers and verifies retained
+control/357 initial tensors without native/environment construction. Declaration
+pins138 inputs. Main starts21:02:45 UTC/source`0d73300`,PID203447/invocation
+`e042da0cefc4457f826202e4d6a37661`; declaration
+`dbd098bed2c7278622c467b9e305e688dae67249869c7c528e16a38a403eecd0`.
+100k recovery,progress and terminal postprocessing are automated. No frozen
+outcome yet; no extension or automatic successor selected.
+
+Startup passes at4256 actions/501 finite supervised reports:all138 pins,357
+initial tensors matching control and check,exact config and first6 updates.
