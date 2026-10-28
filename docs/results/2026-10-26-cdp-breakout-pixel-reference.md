@@ -672,3 +672,61 @@ Declaration`3edd67c2c9f68b4dc2984a7080524ed50a5c675f7dfbe3266fece7a53f2bfd1b`;
 review`78c8e983546c68172f6cfdf7457ab04b69323e17c30ea638aa3b35bee0fef059`;
 comparison`18b8938e2b57c23290c258f0398463fbd84db098a984649e967318ddb2c55b44`;
 completion`bcf375dc51266700d61d9991cf2e30ecaa4fc4b2d5911ada7f799d26e0775f7f`.
+
+## Raw contact tracks support direction control, but a fixed aiming bias loses score
+
+A separately selected three-pixel aiming change lowers the eight-episode CPU
+reference mean **185.375→135.125**, with0/8 two-wall successes in both. Returns
+change from`151,97,256,226,204,331,82,136` to`117,63,69,293,110,140,180,109`;
+only2/8 improve. Retain the edge-reset reference. No expanded24-episode test,
+training integration or automatic successor is selected for this variant.
+
+For projected descending trajectories, the candidate requests ball contact
+three pixels toward the nearer side wall (landing<80:left, otherwise:right),
+offsetting the desired paddle position oppositely and clipping it15.5–147.5.
+The retained detector,response coefficients,stationary-edge reset and planning
+cost stay fixed. This tests one small steering rule; it does not establish that
+all aiming strategies are harmful or that direction control caused each loss.
+
+The motivation comes from a fixed-action raw-frame replay, not a fitted score
+prediction. A preceding.296s pooled-debug analysis finds1132 candidate contacts
+but no clean offset/direction relation. Raw-frame reconstruction then reproduces
+all52,072 actions/208,254 frames of the225.083 reference, including policy/debug,
+original pooled input/output pixel hashes,rewards,boundaries,resets and outcomes.
+It records raw RGB centroids without feeding them into the controller or using
+RAM. Original live raw-frame hashes were not recorded; these are reconstructed
+raw observations. Four-point incoming/outgoing line fits retain947/1829 candidate
+contacts (vertical span≥3 pixels,fit RMSE≤1,inferred contact y182–192):
+
+| Inferred ball offset from paddle center | Contacts | Mean outgoing dx / upward dy | Fraction moving right |
+|---|---:|---:|---:|
+|Below−4 pixels|205|−.618|7.8%|
+|−4 to−1|169|−.530|11.2%|
+|−1 to1|131|.266|71.0%|
+|1 to4|222|.495|86.9%|
+|Above4|220|.733|93.2%|
+
+The raw observations show directional association, but interpolation,detector
+error,paddle motion and filtering remain. They are not ground-truth contact
+physics or a causal action-response model.425 tracks lack span,133 are nearly
+parallel,280 intersect outside the contact zone and44 fail the linearity/sign
+checks. The.527s saved-centroid analysis changes no policy or environment state.
+
+Raw replay takes56.199s; its affined low-priority service starts19:57:04 and
+succeeds19:58:01 UTC on October28,whole56.417s. All11 inputs and115 active Qbert
+pins remain unchanged. The separately declared aiming test collects17,496
+actions/69,973 frames in11.422s, with11.851s complete policy/pixel/action/outcome
+replay and retained video. Its service starts20:01:17 and succeeds20:01:41,
+whole23.602s (23.501s wrapper); all10 inputs/115 active pins stay unchanged.
+Both preserve Qbert PID195981/invocation`0e7002a141f54fc5b691af4969e6eb98`.
+No native module,agent,learner updates or GPU work; no retry/cap change. These
+affined CPU jobs are timing caveats for the concurrent1009 Qbert learner.
+
+Artifacts:`/x/Temp/kindle-breakout-contact-20261028` and
+`/x/Temp/kindle-breakout-aim3-20261028`. Raw replay review
+`f54d2c1f45f95805c3b8ce09b3eed451922028a2ec88aed0bca6ef5895128971`;
+contact analysis`710e0113df8cb814d17403a5f52405b9a45141df5855ec46e0bbb4128c3fb667`;
+raw completion`ae992ac4abafb4e147cd6fd43e4ff47ae2f055f564a898e3d44b78607cd2ea65`.
+Aiming comparison`34abe424a6e6591506c0f32a48e135d02dbb4e7369e271a12372f1faad2c726b`;
+review`153f4b7384169f92a2cee6561c13d5048aff9157c3aad1a678a6c0a7f07b4d13`;
+completion`1c40bf9307aeacf4c2a09be1eaa24b81df19fc9b84951fb17107f13b63b65fdb`.

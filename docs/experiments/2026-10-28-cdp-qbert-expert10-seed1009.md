@@ -51,3 +51,13 @@ pins115 inputs. Startup passes at4688 actions/1109 finite supervised reports,
 357 finite initial tensors,346 matching legacy1009 initial tensors,exact config
 and first6 updates.50k recovery,progress observation and terminal postprocessing
 are automated. No outcome is inferred from startup; no extra allocation follows.
+
+The50k recovery passes at12,439 updates with357 finite tensors. Affined
+low-priority Breakout CPU work overlaps this life: a.296s saved-debug analysis,
+56.199s fixed-action raw-frame replay (19:57:04–19:58:01 UTC),.527s saved-centroid
+analysis and23.501s fixed aiming-test wrapper (20:01:17–20:01:41). The latter
+loses135.125 versus185.375 on eight reused reference episodes and is rejected.
+All declared inputs and115 active Qbert pins remain unchanged, with the same
+learner PID/invocation. No native module or agent is constructed by those jobs.
+Keep these co-host timing caveats without correcting measured training time;
+see the completed Breakout pixel-reference report.
