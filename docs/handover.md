@@ -1,13 +1,18 @@
 # CDP handover — October25,2026
 
-A separately selected Qbert expert100/100k comparison is active from20:29:26
-UTC on October28/source`a6ee6da`. Only expert scale10→100 changes against4013;
-actor/world supervision change together. The4096-action check passes in43.170s,
-all36 pins/357 tensors/full replay/guards; its initial CPU receipt-schema failure
-is retained. Full startup passes111 pins/357 matching initial tensors. Training
-cap30min,50k recovery and4 sampled/greedy final/own-initial arms are automated.
-No frozen outcome,extension or automatic successor. See the expert-scale100
-protocol and check live state before GPU work.
+Qbert expert100 completes100k actions/399,886 frames/24,939 updates in18m59s.
+Greedy8365.625/24 first pyramids improves scale10's7700/24 by8.64%; sampled
+7339.583/22 improves5572.917/24 in mean but loses two pyramids. Own initials
+263.542/182.292,zero pyramids. Both still miss mean15000. All111 pins,50k recovery,
+357 matched initial/invariant frozen tensors,paired initial traces,full replays,
+guards,curves,coverage,exposure and comparison pass. Main succeeds20:55:18 UTC,
+postprocessing20:55:29 on October28; all services inactive. Actual overrides
+38.397%; guided returns are not competence. Only expert10→100 changes,affecting
+actor/world supervision together,on reused4013. Modest unconfirmed same-budget
+gain; no extension,second expert100 learner or automatic successor selected.
+The bounded check's CPU preparation schema failure remains,no GPU repeat.
+See the expert-scale100 protocol and completed result in cheap-Qbert; check
+live state before GPU work.
 
 **Receiving-host update:** [AMD takeover](results/2026-10-25-cdp-amd-takeover.md).
 RX7900XT/RADV cannot run the saved BF16 configuration. A labelled F16-input copy

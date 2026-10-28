@@ -2879,3 +2879,77 @@ the separately selected expert100 life, preserving all111 inputs and its process
 identity, with no native/environment construction. Evidence:
 `/x/Temp/kindle-qbert-expert10-seed-analysis-20261028`, review
 `0ec88bec80f3b9126e220976ddb4b9d47620e8acb58e682a963dfd7a4290403e`.
+
+## Expert100 gives a smaller further gain at the same100k budget
+
+Increasing expert scale10→100 completes **100k actions / 399,886 emulator frames /
+24,939 updates in18m59s**. Greedy frozen mean rises **7700→8365.625 (+8.64%)**,
+with24/24 first pyramids for both. Sampled mean rises5572.917→7339.583 (+31.70%),
+but first-pyramid successes fall24/24→22/24. Both action modes still miss the
+original **mean15000** gate, while meeting90% first pyramids. This is a modest
+further gain on reused4013, not a confirmed recipe improvement across learners.
+Retain both budget points and the separate expert10/1009 result. No extension,
+second expert100 learner or automatic successor is selected.
+
+| Expert scale | Training | Greedy final / own initial | Greedy pyramids | Sampled final / own initial | Sampled pyramids |
+|---|---:|---:|---:|---:|---:|
+|10|18m55s|7700.000 /263.542|24/24 /0|5572.917 /182.292|24/24 /0|
+|100|18m59s|8365.625 /263.542|24/24 /0|7339.583 /182.292|22/24 /0|
+
+Only the expert coefficient changes, affecting actor and world supervision
+together. Keep4M48/Auto/N8/B8/T16/H15/R32/coefficient1/actor-unimix0/full18/
+original rates,20% episode continuation/cap1920/all18 action weights1/world
+gradients/all-state corrective labels. Native447fe50, runner and teacher bytes
+match the control. No weights, replay, belief, games or RNG are reused. Seed4013
+and evaluation4000004013 are development data. The3.523s (+.31%) training-time
+difference is not a meaningful speed change; prior development costs remain.
+
+All111 declared inputs stay unchanged. The50k recovery passes at12,439 updates;
+357 initial tensors match the control and bounded check. Actual-initial semantic
+traces match in both modes:1140 sampled events and1354 greedy events. All24,939
+reports are finite, CNN/reward/actor/value parameters change, and357 frozen
+tensors remain invariant per arm. Full training teacher-label/input-pixel/action
+replay, all frozen outcome replays/videos, guards, curves, coverage, exposure and
+paired comparison pass. The comparison PNG is visually checked.
+
+Each frozen arm selects first3 natural episodes per8 lanes=24, with guidance and
+labels off, zero updates and zero truncations. Greedy initial collects25 natural
+episodes; the other arms collect24 each. Excess episodes and partial tails remain
+recorded. Four arms total86,104 actions /344,276 frames /39.722s. Mean first-pyramid
+coverage is21/21 greedy and20.750/21 sampled, versus own7.667/5.167. Ordinary frozen
+logs contain no live pixel hashes; replay does not prove equality to unavailable
+live images. No selected episode in either final arm reaches15000.
+
+The20% episode rule selects22/94 starts and actually overrides38,397 actions
+(38.397%), versus scale10's42.147%. Labels comprise74,506 NOOP and25,494 hop
+recommendations,61,603 passive states and12,771 actual/teacher disagreements.
+All24,939 supervised reports have2,989,863 labeled replay rows and identical
+weight sum; maximum raw world/actor expert-loss difference is8e−7. Raw reported
+losses exclude the coefficient. Seventeen completed guided episodes average
+15,297.059/17 pyramids;69 unguided average3774.638/40 pyramids (last50:5094.500/40).
+There are5152 released native actions. These online scores are not frozen
+competence.
+
+During the final50k actions, passive teacher agreement is84.217% versus scale10's
+78.267%; hop agreement56.922% versus47.203%, wait agreement94.953% versus90.672%.
+Weighted replay cross entropy is.078477 versus.137775, mean policy entropy.086033
+versus.152069. These different visited states and replay samples are descriptive,
+not held-out teacher accuracy or a causal explanation of the score gain.
+
+The bounded4096-action check passes in43.170s before full selection. Its initial
+CPU preparation fails on a copied receipt-schema field, then is corrected before
+any GPU work; original failure/script are retained. No GPU stage repeats, cap
+change or runtime edit occurs. Main starts20:29:26 UTC/source`a6ee6da` on October28
+and succeeds20:55:18, whole25m51.514s. Postprocessing succeeds20:55:29; both
+observers also succeed. The protocol retains.687s affined CPU log analysis during
+training as a co-host caveat, without correcting wall time. All services are
+inactive at completion. The five-game goal remains unfinished.
+
+Artifacts:`/x/Temp/kindle-qbert-expert-scale100-20261028/full/qbert-4m-48-r32-wait1-expert100-100k-seed4013`;
+log analysis:`/x/Temp/kindle-qbert-expert-scale100-analysis-20261028`.
+Learning review`24cfd46ad02b66af67f260a142df26418ac0acb2a68afd0169c7f7e4d8de76fb`;
+postprocessing`2bb5d52c5031bc6dafa23f3f174cd0ffa8c4e206dc5193d6df7c30afdd4b8b51`;
+comparison`67d27a221d61e10c96aad0dbb39baf059977247e7cce8e75a0a8015bde398466`;
+completion`60680c92fe500bad048c9a3de2ec9748e45c7b94dccba2e8a1758c86f3ce17a5`;
+log analysis`e8249c4abec2d2048f3444b54428d3f3a63854e4985a2cc8d5f20d8e0877bd02`.
+See the [expert-scale100 protocol](../experiments/2026-10-28-cdp-qbert-expert-scale100.md).

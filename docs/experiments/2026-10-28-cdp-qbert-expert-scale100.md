@@ -102,3 +102,25 @@ Keep this small co-host timing caveat without adjusting measured wall time.
 The50k recovery audit succeeds20:39:09 UTC at12,439 updates,357 finite tensors;
 the observed complete log prefix contains51,064 actions/12,703 finite reports.
 The recovery watcher exits successfully without changing the running learner.
+
+## Completed fixed100k comparison
+
+Training completes100k actions/399,886 frames/24,939 updates in1138.703s
+(18m59s), versus scale10's1135.180s (18m55s). Greedy mean7700→8365.625 improves
+8.64%, both24/24 first pyramids; sampled5572.917→7339.583 improves31.70% while
+pyramids fall24/24→22/24. Own initials remain263.542 greedy/182.292 sampled,
+zero pyramids. Both modes miss mean15000. This one reused learner does not
+confirm an improvement across seeds; no second expert100 learner is selected.
+
+All111 pins,50k recovery,357 matched initial/invariant frozen tensors,paired
+initial semantic traces,finite reports,parameter changes,equal row/weight sums,
+full training label/pixel/action and frozen outcome replays,guards,curves,
+coverage,exposure and comparison pass. Four frozen arms total86,104 actions/
+344,276 frames/39.722s,zero updates/truncations. Actual overrides38,397 (38.397%);
+guided online returns are not unaided competence. The earlier CPU preparation
+failure remains; no GPU stage repeats,cap increase or runtime edit occurs.
+
+Main succeeds20:55:18 UTC on October28,whole25m51.514s; postprocessing20:55:29.
+All observers are terminal success. Host idle at completion. Retain this modest
+same-budget4013 gain and all prior controls; no extension or automatic successor.
+The five-game goal remains unfinished. See the [completed result and receipts](../results/2026-10-25-cdp-cheap-qbert.md#expert100-gives-a-smaller-further-gain-at-the-same100k-budget).

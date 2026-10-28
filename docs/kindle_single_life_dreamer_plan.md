@@ -4,14 +4,19 @@ Updated October28,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-A separately selected Qbert expert100/100k comparison is active from20:29:26
-UTC on October28/source`a6ee6da`. Only expert scale10→100 changes against4013;
-actor/world supervision change together. The4096-action check passes in43.170s,
-all36 pins/357 tensors/full replay/guards; its initial CPU receipt-schema failure
-is retained. Full startup passes111 pins/357 matching initial tensors. Training
-cap30min,50k recovery and4 sampled/greedy final/own-initial arms are automated.
-No frozen outcome,extension or automatic successor. See the expert-scale100
-protocol and check live state before GPU work.
+Qbert expert100 completes100k actions/399,886 frames/24,939 updates in18m59s.
+Greedy8365.625/24 first pyramids improves scale10's7700/24 by8.64%; sampled
+7339.583/22 improves5572.917/24 in mean but loses two pyramids. Own initials
+263.542/182.292,zero pyramids. Both still miss mean15000. All111 pins,50k recovery,
+357 matched initial/invariant frozen tensors,paired initial traces,full replays,
+guards,curves,coverage,exposure and comparison pass. Main succeeds20:55:18 UTC,
+postprocessing20:55:29 on October28; all services inactive. Actual overrides
+38.397%; guided returns are not competence. Only expert10→100 changes,affecting
+actor/world supervision together,on reused4013. Modest unconfirmed same-budget
+gain; no extension,second expert100 learner or automatic successor selected.
+The bounded check's CPU preparation schema failure remains,no GPU repeat.
+See the expert-scale100 protocol and completed result in cheap-Qbert; check
+live state before GPU work.
 
 **Current AMD development results:** all completed rows pass numerical,
 checkpoint, accounting, frozen-tensor and full-replay audits. The learning gate
@@ -51,6 +56,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same retained100k learner, greedy evaluation](results/2026-10-25-cdp-cheap-qbert.md#greedy-actions-improve-the-retained-equal-weight-policy) |100k /24,939 retained;0 new|18m58s retained|4965.625 /263.542|21/24 first pyramids; both gate criteria still fail|
 | [Expert scale10, fresh100k4013](results/2026-10-25-cdp-cheap-qbert.md#stronger-expert-supervision-improves-frozen-qbert-at-the-same100k-budget) |100k /24,939|18m55s|Greedy7700 /263.542; sampled5572.917 /182.292|24/24 first pyramids under both modes; mean15k fails|
 | [Expert scale10, fixed-recipe1009](results/2026-10-25-cdp-cheap-qbert.md#expert10-reaches-the-first-pyramid-fraction-on-two-greedy-learners-with-large-score-variation) |100k /24,939|19m11s|Greedy3832.292 /85.417; sampled2667.708 /180.208|23/24 greedy,15/24 sampled pyramids; mean15k fails|
+| [Expert scale100, fixed100k](results/2026-10-25-cdp-cheap-qbert.md#expert100-gives-a-smaller-further-gain-at-the-same100k-budget) |100k /24,939|18m59s|Greedy8365.625 /263.542; sampled7339.583 /182.292|24/24 greedy,22/24 sampled pyramids; mean15k fails,one reused learner|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -743,7 +749,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
-| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s; expert10/100k4013/1009 greedy7700/3832.292 and24/24 /23/24 in18m55s/19m11s; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
+| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s; expert10/100k4013/1009 greedy7700/3832.292 and24/24 /23/24 in18m55s/19m11s; expert100/100k4013 greedy8365.625/24 in18m59s,unconfirmed; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and
