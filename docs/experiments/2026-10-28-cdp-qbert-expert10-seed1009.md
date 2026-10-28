@@ -39,3 +39,15 @@ service`kindle-qbert-expert10-seed1009-20261028`. Pin exact inputs,parse all fiv
 commands and verify terminal predecessors/current host before launch. Stop on
 real faults or numerical failure; no driver reset/reload/reboot. At selection,
 all predecessor services are terminal success and the GPU is idle.
+
+## Launch and startup
+
+CPU preparation parses5 commands and compiles11 scripts without constructing
+an agent/environment. The same-seed4013 legacy/current bridge matches346 shared
+initial tensors. One service starts19:51:22 UTC/source`447d3c5` on October28,
+PID195981/invocation`0e7002a141f54fc5b691af4969e6eb98`; declaration
+`13a2df84af7818c8278cd57ae1cd78094f7b069ca110505c9d8c6e8c8f4dc358`
+pins115 inputs. Startup passes at4688 actions/1109 finite supervised reports,
+357 finite initial tensors,346 matching legacy1009 initial tensors,exact config
+and first6 updates.50k recovery,progress observation and terminal postprocessing
+are automated. No outcome is inferred from startup; no extra allocation follows.

@@ -519,6 +519,15 @@ no extension, second learner or successor is selected. No allocation is active
 at this milestone. See the completed expert-scale10 result in cheap-Qbert and
 its protocol; check live state before GPU work.
 
+A separately selected expert10 seed1009 check starts19:51:22 UTC/source`447d3c5`
+on October28, service`kindle-qbert-expert10-seed1009-20261028`, fixed100k actions.
+Only seeds change from4013; no matched100k scale1 control exists on1009. Startup
+passes115 pins,357 finite initial tensors/346 shared legacy1009 tensors and1109
+finite reports at4688 actions.50k recovery and sampled/greedy final/own-initial
+arms are automated. No frozen outcome yet; no extension or automatic successor.
+See the expert10-seed1009 protocol; check live state before GPU work.
+
+
 The fixed Breakout CPU edge correction scores225.083 versus166.167 on24 reused
 natural episodes, both0/24 two-wall successes. All52,072 actions/208,254 frames,
 policy/debug/input-output pixels/outcomes replay exactly;2051 earlier-eight
