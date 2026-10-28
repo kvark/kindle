@@ -411,6 +411,16 @@ confirmation or automatic successor. Root`/x/Temp/kindle-qbert-wait-full-2026102
 The host is idle at this milestone. See the completed wait-labels result and
 check live state before GPU work.
 
+The retained100k/wait1 greedy assessment improves2260.417/12→4965.625/21of24
+first pyramids, own initial263.542/0; both original15k/90% criteria still fail.
+Zero new training/updates;41,976 actions/167,838 frames/19.462s evaluation,
+whole service46.404s, exits19:03:28 UTC; postprocessing19:03:31 on October28.
+All47 pins/55 source-training inputs,357 invariant tensors per arm,replays/videos
+and guards pass. Retain greedy as a useful18m58s development option on this one
+reused learner, not a global default or independent confirmation. No extension,
+learner confirmation or automatic successor. See the completed wait-greedy result.
+
+
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,

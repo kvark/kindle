@@ -2647,3 +2647,49 @@ comparison`32f496a5aced6b5a4cd2ab2589ac106082ea2027a261ce590e2f34d39d47cc9e`;
 postprocessing`1e790da08baefa5943ff1672c617c9b29883f8e71e6168e6a049b287d4f360e5`;
 completion`c3cd7f5b46c64be183626ab2c720541c3a4ba7f0b18d8c512824d9ce8bb4c10c`;
 passive review`23be3fd9d4b80f1053b726d4548cfad9fe09adf47ce2ba4fce9fcbdb42414c67`.
+
+## Greedy actions improve the retained equal-weight policy
+
+With zero new training, the retained100k/R32/all-weight1 policy scores
+**4965.625/21of24 first pyramids** under greedy actions, versus its sampled
+2260.417/12. Own actual initial greedy scores263.542/0, sampled182.292/0.
+The original mean15000/90%-pyramid gate still fails both criteria. Retain greedy
+as a useful development option for this18m58s learner; no global default change,
+new learner confirmation, extension or automatic successor is selected.
+
+| Frozen action choice | Final mean | First pyramids | Own initial mean |
+|---|---:|---:|---:|
+|Sampled, original result|2260.417|12/24|182.292|
+|Greedy, same retained weights|4965.625|21/24|263.542|
+
+The mean is4.98% above the stronger retained5%/R32/world-off sampled recipe's
+4730.208, but pyramid successes are21 versus23. Original training18m58s versus
+25m23s is about25% cheaper; this additional frozen assessment costs46.404s as
+a whole service. The two training recipes and evaluation choices differ, so
+this is a quality/cost comparison, not isolated training attribution. That older
+4013 learner's greedy result is3770.833/19. All use reused development cohorts;
+this single retained learner is not independent confirmation or broad reliability.
+
+Both arms use unchanged native447fe50/runner/runtime/checkpoint/config and
+seed4000004013, with no guidance or labels. Final31,544 actions/126,141 frames
+take14.710s; initial10,432/41,697 take4.752s. Total41,976 aggregate actions/
+167,838 emulator frames/19.462s evaluation, zero learner updates. Each selects
+first3 natural episodes per8 lanes=24; final collects27 and initial25, with
+excess episodes and partial tails retained. No truncations. All47 declared pins,
+all55 source-training pins,357 finite/invariant tensors per arm, source-file
+invariance, full outcome replays/videos and host guards pass. Ordinary frozen
+logs lack live pixel hashes; no direct live-image equality claim is made.
+
+Main starts19:02:41 UTC/source`1222ce9`, PID192628/invocation
+`da526475b8194663b55c86b9c8a23abd`, and succeeds19:03:28 on October28.
+CPU postprocessing succeeds19:03:31. No failed attempt, repeated GPU stage,
+runtime change or cap increase. The earlier label-path inspection establishes
+no implementation defect; greedy improvement does not diagnose the training
+failure or establish teacher-label accuracy.
+
+Artifacts:`/x/Temp/kindle-qbert-wait-greedy-20261028/qbert-4m-48-wait1-100k-greedy-frozen`.
+Declaration`ae93f4ca26aee04f35d4f357f48c08e02520faa2220808881a8ab8f4bf5dc341`;
+review`fa142ce8a695278f1e2e8136cff3e59a325650fbc11c2164fbd38d7900e5e74e`;
+postprocessing`38cbbfc1f33d693c00cd60cd8507a1d066905c8d016977783bd89a1a51bc3a74`;
+completion`df9f451190b2d1b041a032cd170685d130ae18e8a5983442948daa2f8221ff8c`.
+See the [frozen protocol](../experiments/2026-10-28-cdp-qbert-wait-greedy.md).
