@@ -40,6 +40,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Same4M, corrective labels and feedback](results/2026-10-25-cdp-cheap-qbert.md#corrective-labels-cost-more-without-improving-frozen-quality) |200k /24,970|25m57s|3633.333 /182.292|17/24 first pyramids;20.86% more training time without gain|
 | [Corrective labels, equal wait weights/R32/100k](results/2026-10-25-cdp-cheap-qbert.md#equal-wait-weights-and100k-actions-save-time-but-lower-frozen-quality) |100k /24,939|18m58s|2260.417 /182.292|12/24 first pyramids;26.90% less time,37.79% lower mean|
 | [Same retained100k learner, greedy evaluation](results/2026-10-25-cdp-cheap-qbert.md#greedy-actions-improve-the-retained-equal-weight-policy) |100k /24,939 retained;0 new|18m58s retained|4965.625 /263.542|21/24 first pyramids; both gate criteria still fail|
+| [Expert scale10, fresh100k4013](results/2026-10-25-cdp-cheap-qbert.md#stronger-expert-supervision-improves-frozen-qbert-at-the-same100k-budget) |100k /24,939|18m55s|Greedy7700 /263.542; sampled5572.917 /182.292|24/24 first pyramids under both modes; mean15k fails|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|
@@ -718,7 +719,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
-| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s training; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
+| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s; fresh expert10/100k4013 greedy7700/24 and sampled5572.917/24 in18m55s; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and
