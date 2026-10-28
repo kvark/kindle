@@ -2693,3 +2693,43 @@ review`fa142ce8a695278f1e2e8136cff3e59a325650fbc11c2164fbd38d7900e5e74e`;
 postprocessing`38cbbfc1f33d693c00cd60cd8507a1d066905c8d016977783bd89a1a51bc3a74`;
 completion`df9f451190b2d1b041a032cd170685d130ae18e8a5983442948daa2f8221ff8c`.
 See the [frozen protocol](../experiments/2026-10-28-cdp-qbert-wait-greedy.md).
+
+## Retained greedy actions disagree more with the teacher after the first pyramid
+
+A CPU replay of that unchanged4965.625/21-of24 policy recomputes corrective
+teacher suggestions from native max-pooled RGB and feedback of the recorded
+native action. Teacher intent resets on disagreement exactly as in training;
+it receives no rewards or RAM. The existing task observer labels decisions
+before/after first-pyramid completion retrospectively. Only the original first3
+natural episodes per lane enter these counts:
+
+| Decision phase | Actions | Exact agreement | Agreement when teacher waits | Agreement when teacher suggests a hop |
+|---|---:|---:|---:|---:|
+|Before first pyramid|10,442|74.717%|94.396% (6620/7013)|34.471% (1182/3429)|
+|After first pyramid|13,844|62.092%|90.056% (6946/7713)|26.912% (1650/6131)|
+
+Native NOOP counts are8557/10,442 before and10,628/13,844 after, versus teacher
+7013 and7713 on the same observed states. Exact command agreement is not teacher
+accuracy, action equivalence or a causal diagnosis. Stage/state distributions,
+teacher errors and sticky-action timing remain relevant; these observations do
+not establish that additional waiting causes the task-performance gap. They
+select no policy change or additional GPU allocation.
+
+All31,544 recorded actions/126,141 frames replay, including excess episodes and
+tails. Rewards, boundaries, resets, all27 task outcomes and partial outcomes
+exactly match the retained replay; the selected24 contain24,286 decisions.
+The original frozen log has no live pixel hashes. The new label trace records
+reconstructed input hashes, not proof of equality to unavailable live images.
+All14 declared pins and84 active expert-scale10 inputs remain unchanged; no
+native module loads, agent is constructed or learner update occurs.
+
+The affined low-priority service starts19:29:28 and succeeds19:31:09 UTC on
+October28, whole1m41.407s; measured analysis101.232s. The active learner retains
+PID193426/invocation`b9d840aed2e34da79c483f9e348d5210`. This is a co-host timing
+caveat, not a wall-time correction. Saved labels independently reproduce the
+phase totals. No retry or cap change occurs.
+
+Artifacts:`/x/Temp/kindle-qbert-greedy-phases-20261028`.
+Declaration`905548a183270780d64d700cd7dd8659d814ddcd1347e5a3b44b66ac3f738c77`;
+review`b7d61f78c02572204fc1e253b5b9647b4c2c839dc8f22c5039ea912e7c8940fc`;
+completion`45bef23a486a497c5bb2c209235f6d7658b3c618c1da3f09f352a6589347a4ac`.

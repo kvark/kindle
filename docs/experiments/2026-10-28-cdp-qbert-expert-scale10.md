@@ -107,3 +107,10 @@ declared, affined low-priority Breakout CPU reference assessment overlaps this
 life for67.624s measured wrapper time (19:20:12–19:21:19 UTC). All84 active pins
 and the same learner PID/invocation remain unchanged; it loads no native module
 or agent. Keep this co-host timing caveat without correcting measured wall time.
+
+A second affined CPU-only replay of the retained scale1 greedy policy runs
+19:29:28–19:31:09 UTC (101.232s measured analysis). It reproduces all recorded
+outcomes while comparing pixel-teacher suggestions before/after first-pyramid
+completion. All14 analysis pins and84 active inputs remain unchanged, with the
+same learner PID/invocation and no native module/agent. This is another co-host
+timing caveat; see the retrospective agreement result in cheap-Qbert.
