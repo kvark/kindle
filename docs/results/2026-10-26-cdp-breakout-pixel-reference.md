@@ -879,3 +879,61 @@ October28. Actual overrides3896/8192; all994 reports supervised. This establishe
 execution and early cost,not competence or a speed gain. A separate fresh200k
 comparison is selected after completion,with the same budget as its control;
 no check experience is reused. [Protocol and receipts](../experiments/2026-10-28-cdp-breakout-encoder-rate.md).
+
+## Higher encoder rate lowers frozen Breakout quality
+
+The fresh encoder4e-5 learner completes200k actions/799,152 emulator frames/
+24,970 updates in17m41s. Frozen score falls4.292→1.458 versus the same actual
+initial1.375;both0/24 two-wall successes. Training costs1.52% more than the
+original encoder6e-6 control. Retain the original rate and stronger controls;
+no extension,seed confirmation or automatic successor follows.
+
+| Learner | Actions / updates | Training wall | Frozen final / own initial | Two-wall successes |
+|---|---:|---:|---:|---:|
+| Corrective control,encoder6e-6 |200k /24,970|17m25s|4.292 /1.375|0/24|
+| Same recipe,encoder4e-5 |200k /24,970|17m41s|1.458 /1.375|0/24|
+| Unaided full18 historical context |200k /49,939|22m29s|7.083 /1.375|0/24|
+
+Only encoder6e-6→4e-5 is the intended learner-setting change in the paired
+corrective comparison. Keep4M64/Auto/N8/B8/T16/H15/R16/coefficient1/actor-unimix.01/
+full18,base/actor4e-5,dynamics4e-4,warmup1000,20%episode guidance/cap1920/expert10/
+all weights1/world gradients/all-state corrective labels and the edge-reset
+feedback teacher. Native447fe50,teacher and host match;the new runner exposes
+an optional rate flag. No experience or weights are reused. Seed1009 and the
+same evaluation cohort are development inputs,not independent confirmation or
+proof of an optimization mechanism. Historical unaided context has another
+native/runtime and twice the update budget.
+
+All64 inputs,100k recovery/12,470 updates,357 matched control/check initial
+and invariant frozen tensors per arm,802 paired initial semantic events,
+24,970 finite reports,changed CNN/reward/actor/value,full guided training replay,
+frozen outcome replays/videos,guards,curves,exposure and corrected comparison pass.
+Frozen final6032actions/24,071frames/3.134s and initial5944/23,717/3.105s have
+zero updates/truncations. Select first3 natural episodes per lane=24;28/29 are
+collected,with excess episodes/tails retained. Frozen logs lack live pixel hashes.
+
+Actual overrides135,244/200k (67.622%) differ from20% episode probability:
+84/437 starts are selected. Labels61,342NOOP/30,521FIRE/52,700RIGHT/55,437LEFT
+include64,756 passive labels and47,168 actual/teacher disagreements. All24,970
+reports are supervised;2,989,928 labeled replay rows equal weights,max raw
+world/actor loss difference8e-7.859 released native actions replay correctly.
+Guided79 completed mean196.418 and unguided350 mean1.297 are not frozen competence.
+Final50k weighted replay cross-entropy1.194 versus control1.000 is descriptive
+of different changing replay samples,not held-out accuracy or a causal diagnosis.
+
+Main succeeds22:45:00 UTC on October28,whole19m49.651s;replacement CPU
+postprocessing succeeds22:45:15. A copied control-path error occurred in CPU
+preparation before launch. A separate stale comparison assertion was found
+before execution;only its waiting CPU observer was deliberately replaced,
+with six config checks and the original absolute deadline preserved. All
+original inputs,script bytes and stop records remain. No GPU stage is stopped
+or repeated;no runtime or cap changes occur. The separate completion collector
+verifies both successful replacement and original intentional stop.
+
+Root`/x/Temp/kindle-breakout-encoder-rate-20261028/full`,trial
+`breakout-4m-64-r16-encoder4e5-200k-seed1009`. Completion
+`663b86a1173bd1646747d0849bcea85bec123a8f57264d45a3b9729914ef47df`,
+learning`de6378afc7fb5854dfffbd620e84edf4ad3af51a54558dbf67c62f4a1df78d3c`,
+comparison`b571ad5e81116f4a97ba1976f6aadc63ab8028da827f4e32015e3b65a5d9c8ae`.
+The comparison plot is inspected;all services are terminal and no GPU allocation
+is active. [Protocol and repair receipts](../experiments/2026-10-28-cdp-breakout-encoder-rate.md).

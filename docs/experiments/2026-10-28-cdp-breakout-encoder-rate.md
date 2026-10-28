@@ -119,3 +119,42 @@ pins original and corrected CPU sources. Use the separate repair-directory
 `collect_full.py` after terminal success; it additionally checks the replacement
 and the recorded intentional stop. The original pinned collector remains untouched.
 This repair constructs no agent or environment and supplies no learning result.
+
+## Completed comparison
+
+The candidate completes200k actions/799,152 frames/24,970 updates in1060.989s
+(17m41s),1.52% more training time than the original-rate control's1045.147s.
+Frozen mean1.458 versus own initial1.375 is below control4.292; all0/24 two-wall
+successes. Retain encoder6e-6. No extension,seed confirmation or successor is
+selected. This single intended learner-setting change on reused1009 does not
+establish a general rate rule or a mechanism for weak transfer.
+
+Main succeeds22:45:00 UTC,whole19m49.651s. The replacement CPU postprocessor
+succeeds22:45:15;progress and recovery also succeed. The intentionally stopped
+original waiting observer remains separate. All64 declared inputs and corrected
+CPU source hashes verify. Both frozen outcome replays/videos,the full200k training
+teacher-label/input-pixel/action replay,100k recovery,357 matched initial/invariant
+frozen tensors,802 identical initial semantic events,finite reports,parameter
+changes,host guards,curves,exposure and corrected comparison pass. No GPU stage
+repeats. The original CPU preparation path error and proactive comparison repair
+remain recorded; no cap or runtime changes occur.
+
+Frozen arms total11,976 actions/47,788 frames/6.239s with zero updates/truncations.
+Final collects28 natural episodes,initial29;each selects the first3 per lane=24,
+with excess episodes and partial tails retained. Ordinary frozen logs have no
+live pixel hashes; outcome replay is not comparison with unavailable live images.
+
+Training overrides135,244 actions (67.622%),although84/437 episode starts are
+selected by the20% rule. All24970 reports are supervised;2,989,928 labeled replay
+rows equal weight sums;max raw world/actor expert-loss difference8e-7. All200k
+teacher labels replay exactly,including64,756 passive labels/47,168 command
+disagreements.859 cap-released actions are accounted for. Guided79 completed
+mean196.418 versus unguided350 mean1.297 are not frozen competence. Final50k
+weighted replay cross-entropy1.194 is above control1.000;changing replay samples
+limit interpretation and neither is held-out accuracy.
+
+Completion`663b86a1173bd1646747d0849bcea85bec123a8f57264d45a3b9729914ef47df`,
+learning`de6378afc7fb5854dfffbd620e84edf4ad3af51a54558dbf67c62f4a1df78d3c`,
+comparison`b571ad5e81116f4a97ba1976f6aadc63ab8028da827f4e32015e3b65a5d9c8ae`,
+replay`baf2a69501b690c1793fec46ec83817eb3935231ee36cf242fad76b84f9d0e64`.
+[Completed result](../results/2026-10-26-cdp-breakout-pixel-reference.md#higher-encoder-rate-lowers-frozen-breakout-quality).

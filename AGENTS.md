@@ -52,24 +52,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Fresh Breakout encoder-rate200k is active from22:25:10 UTC on October28,
-sourcecae0cf1,service`kindle-breakout-encoder-rate-200k-20261028`. It raises only
-encoder6e-6→4e-5 against the completed corrective200k control; native447fe50,
-4M64/N8/B8/T16/H15/R16,teacher and other rates stay fixed. The8192/994 bounded
-check passes in36.895s,all42 pins/357 matched initial/invariant frozen tensors,
-full replay and guards;348 CPU tests pass with zero construction attempts.
-Full-run startup passes5936 actions/711 finite reports,64 pins and357 matching
-control/check initial tensors. Training cap25min,100k recovery,fixed sampled
-final/own-initial24-episode assessments; no extension or automatic successor.
-Recovery now waits for a complete valid header. A CPU preparation path error is
-preserved and corrected before launch; no GPU repeat. Runtime remains
-`/x/Temp/kindle-breakout-corrective-20261028/runtime`; use the new pinned runner
-and controllers in`/x/Temp/kindle-breakout-encoder-rate-20261028/full`.
-The waiting CPU comparison observer is replaced22:28:43 after a stale config
-assertion is found before execution; all64 inputs and the learner stay unchanged.
-Use`postprocess-repair/collect_full.py` after terminal success; original scripts,
-observer stop and six CPU checks are retained. No GPU repeat or cap change.
-No frozen benefit is measured yet. See the encoder-rate protocol; check live state.
+Breakout encoder-rate200k completes200k actions/799,152 frames/24,970 updates
+in17m41s. Raising encoder6e-6→4e-5 lowers frozen4.292→1.458 versus own initial
+1.375; both0/24 two-wall successes. Training costs1.52% more. All64 pins,100k
+recovery,357 matched control/check initial and invariant frozen tensors,802 paired
+initial semantic events,finite reports,full replays,guards,curves,exposure and
+comparison pass. Main succeeds22:45:00 UTC,replacement CPU postprocessing22:45:15
+on October28. The copied CPU preparation error and proactively replaced waiting
+comparison observer are retained; no GPU stage repeats or caps change. Actual
+overrides67.622%; online guided returns are not competence. Retain encoder6e-6;
+no extension,seed confirmation or automatic successor. Native447fe50 unchanged;
+optional CLI passes348 CPU tests. No active GPU allocation. See the encoder-rate
+protocol and completed pixel-reference result; check live state before GPU work.
 
 Breakout corrective200k completes200k actions/799,234 frames/24,970 updates in
 17m25s,26.02% less training time than the old forced-only cap1920 control.
