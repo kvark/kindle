@@ -1,5 +1,14 @@
 # CDP handover — October25,2026
 
+A separately selected Qbert expert100/100k comparison is active from20:29:26
+UTC on October28/source`a6ee6da`. Only expert scale10→100 changes against4013;
+actor/world supervision change together. The4096-action check passes in43.170s,
+all36 pins/357 tensors/full replay/guards; its initial CPU receipt-schema failure
+is retained. Full startup passes111 pins/357 matching initial tensors. Training
+cap30min,50k recovery and4 sampled/greedy final/own-initial arms are automated.
+No frozen outcome,extension or automatic successor. See the expert-scale100
+protocol and check live state before GPU work.
+
 **Receiving-host update:** [AMD takeover](results/2026-10-25-cdp-amd-takeover.md).
 RX7900XT/RADV cannot run the saved BF16 configuration. A labelled F16-input copy
 passes restore with all346 tensors unchanged. The fresh2M B2/T64 life and audits

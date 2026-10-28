@@ -81,3 +81,15 @@ audit1200s,owning service4500s. No retry,cap increase,extension or automatic
 successor. Full root`/x/Temp/kindle-qbert-expert-scale100-20261028/full`,service
 `kindle-qbert-expert100-100k-20261028`. Pin exact inputs and check current host
 before launch; all preceding services are terminal at selection.
+
+## Full launch
+
+CPU preparation parses5 commands,compiles11 controllers and verifies the saved
+control and357 initial tensors without native/environment construction. The
+declaration pins111 inputs. Main service starts20:29:26 UTC/source`a6ee6da`,
+PID199894/invocation`1ae99e7bbe5f43a4868074fc15338a80`; declaration
+`c358c45d2517a252343eedfa3ce5e1c9a25ad4b67719c5d2e1971e2ff281b891`.
+Startup passes at944 actions/173 finite supervised reports,all111 pins,357
+initial tensors matching both control and check,exact config and first6 updates.
+50k recovery,progress and terminal postprocessing are automated. No frozen task
+outcome yet; no extension or automatic successor selected.

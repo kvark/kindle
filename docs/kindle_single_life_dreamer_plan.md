@@ -4,6 +4,15 @@ Updated October28,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+A separately selected Qbert expert100/100k comparison is active from20:29:26
+UTC on October28/source`a6ee6da`. Only expert scale10→100 changes against4013;
+actor/world supervision change together. The4096-action check passes in43.170s,
+all36 pins/357 tensors/full replay/guards; its initial CPU receipt-schema failure
+is retained. Full startup passes111 pins/357 matching initial tensors. Training
+cap30min,50k recovery and4 sampled/greedy final/own-initial arms are automated.
+No frozen outcome,extension or automatic successor. See the expert-scale100
+protocol and check live state before GPU work.
+
 **Current AMD development results:** all completed rows pass numerical,
 checkpoint, accounting, frozen-tensor and full-replay audits. The learning gate
 is separate. Each row describes one learner or warm-start lineage, not broad reliability.
