@@ -81,3 +81,16 @@ now waits for a complete valid training header before starting the recovery obse
 six CPU readiness cases pass. Historical failed observer evidence remains intact.
 Root`/x/Temp/kindle-breakout-encoder-rate-20261028/full`,service
 `kindle-breakout-encoder-rate-200k-20261028`. Check live state before launch.
+
+## Fresh200k launched and startup checked
+
+Main starts22:25:10 UTC on October28/sourcecae0cf1,PID210609,
+invocation`b46837dd8b0b430c90a5c4fc8a3ae4d9`. Declaration
+`6a631febc2f09c67f26d47c5f3ddc95c998b5713f5f8b46d0800d5e084500bca`
+pins64 inputs. Startup at5936 actions/711 finite reports verifies every pin,
+exact config,357 initial tensors matching control and bounded check,and the
+expected first updates248/256/264/272/280/288 with zero reported residual debt.
+All supervision rows/weights match. The recovery observer starts22:25:14 after
+the complete header; main,progress,recovery and postprocessing are active.
+Startup review`584fcdb20c8b5ba10add8e0725112c84271b2b89e346ee9c5c1eefafc12b3f53`.
+No frozen benefit has been measured and no additional allocation is selected.
