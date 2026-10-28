@@ -439,8 +439,11 @@ Main succeeds15:21:35 UTC on October28; original CPU postprocessing fails at
 15:24:27; original failure/pins remain, no GPU repeat. Actual guidance46.088%.
 Retain5%/R32 as stronger; small reused-seed R16 gain gets no extension or
 confirmation. New native/runner identities limit attribution. See the completed
-expert-world result in cheap-Qbert and its October28 protocol. No GPU allocation
-is active; check live state before new GPU work.
+expert-world result in cheap-Qbert and its October28 protocol. A separate
+12M48/B16/R16/20%/world-gradient check now selects8192 actions/489 updates,
+180s train plus1024 frozen/60s, with40 pinned inputs. Model and batch change
+together; this tests execution/cost, not competence. See the October28
+expert-capacity protocol. No full learner is selected; check live state.
 
 
 Qbert R16/20% completes200k actions /799,662 frames /24,970 updates in21m59s,
