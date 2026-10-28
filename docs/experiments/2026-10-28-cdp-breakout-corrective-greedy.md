@@ -40,3 +40,20 @@ Root`/x/Temp/kindle-breakout-corrective-greedy-20261028`,trial
 preparation`d04d57eebf85bac06fb3cd85e3c786a7b9d09b7955c3f10e3578d964d8cf8b0a`,
 preflight`26c714dc663f784081dc1e83e580c74711d9601019d8f4a75c2cbdbe952d4a5a`.
 No greedy outcome or new GPU allocation exists at preparation completion.
+
+## Separately selected after Qbert completion
+
+The Qbert12M comparison and all four services now finish successfully,with190
+unchanged inputs and a complete terminal receipt. Select the prepared two-arm
+Breakout frozen assessment without changing its commands,caps,checkpoints or
+success criterion. The host has no running Kindle service at selection. Verify
+the prepared49 inputs,CPU preflight,completed Qbert receipts and host before
+launch;archive the original prepared declaration and pin the selection launcher.
+No new training,checkpoint selection,extension or automatic successor is selected.
+
+The older12M/2M and8M-lineage Breakout greedy assessments had inconsistent
+effects and no two-wall successes. They do not determine this new corrective
+recipe's outcome. Greedy action selection also retains stochastic latent state
+and ALE stickiness;it does not make complete game trajectories deterministic.
+The original sampled4.292/1.375 and17m25s training cost remain whatever this
+separately selected assessment finds.
