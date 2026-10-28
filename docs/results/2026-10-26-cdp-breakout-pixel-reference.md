@@ -863,3 +863,19 @@ postprocessing`5e29c1aa4565ec96f6c80ed24e16e6ce341291fc5118adc5b9e572572307123c`
 comparison`9807b363564ab4daf845e72700c8b1d13f04c98725ee33fd8dfa9cd93c0ceadc`;
 completion`e1941e46d0664cad8e55d7b970b1f49f1f550a2abe5fda8c3df5d6de73723bcc`.
 See the [selected protocol](../experiments/2026-10-28-cdp-breakout-corrective-200k.md).
+
+## Higher encoder rate passes a bounded native check
+
+A fresh4M64/Auto/N8/B8/T16/H15/R16 corrective check raises only the CDP encoder
+rate6e-6→4e-5. Native447fe50,teacher,base/actor rate4e-5,dynamics4e-4 and the rest
+of the completed corrective recipe remain fixed. The optional CLI flag passes
+348 CPU tests,10 native-construction cases excluded,zero construction attempts.
+
+8192 actions/32,722 frames/994 updates take36.895s;1024 frozen actions/4096 frames
+take.557s with zero updates/no natural episodes. All42 pins,357 matched initial/
+invariant frozen tensors,finite reports,changed CNN/reward/actor/value,complete
+label/pixel/action replay and host guards pass. Service succeeds22:23:22 UTC on
+October28. Actual overrides3896/8192; all994 reports supervised. This establishes
+execution and early cost,not competence or a speed gain. A separate fresh200k
+comparison is selected after completion,with the same budget as its control;
+no check experience is reused. [Protocol and receipts](../experiments/2026-10-28-cdp-breakout-encoder-rate.md).
