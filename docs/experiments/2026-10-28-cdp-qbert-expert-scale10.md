@@ -40,3 +40,50 @@ A later fixed100k comparison may be selected separately only after this check
 is audited and its measured cost reviewed. It would preserve the original
 sampled and greedy final/own-initial assessments and all reused-seed limitations.
 The five-game goal remains unfinished; no completed life is extended.
+
+## Completed bounded check
+
+Fresh4096 actions/16,382 frames/963 updates take43.517s;1024 greedy frozen
+actions/4096 frames take.530s with zero updates and no natural episodes. All36
+pins,357 matching initial/invariant frozen tensors,finite reports,equal row/weight
+sums,aligned raw expert losses,changed CNN/reward/actor/value tensors,complete
+teacher-label/input-pixel/actual-action replay and guards pass.4096 labels
+include851 movement recommendations,2048 passive states and1598 actual/teacher
+disagreements;2048 overrides.963 supervised reports/115,502 labeled replay rows
+have exactly115,502 weight sum; max raw world/actor expert-loss difference8e−7.
+This verifies execution and early cost, not competence or cap-release coverage.
+
+Service starts19:11:15 UTC/source`6363ed5`, PID193065/invocation
+`cd961e7a6d614f528556304bd51736c2`, and succeeds19:12:22 on October28,
+whole1m06.709s. No GPU repeat, cap change or runtime edit. Declaration
+`2545ed212834c812a16854012ea8a440b3eddd8b6c7b7906a222858bb7e5cc6a`.
+
+## Separately selected fresh100k comparison
+
+The early rate projects17m43s/100k, close to the scale1 check; select one fresh
+fixed100k-action/24,939-update life under a30-minute training cap. Keep exactly
+the bounded recipe above, changing only expert scale1→10 against the retained
+100k control. This changes actor and world supervision together. No weights,
+replay, belief, games or RNG are reused; seed4013/cohort remain development data.
+Save/audit50k recovery at12,439 updates and fixed final; no checkpoint selection.
+
+Evaluate fixed final and own actual initial with **both sampled and greedy**
+native actions, no guidance/labels. Greedy is the primary task assessment for
+this candidate, compared with retained scale1's4965.625/21; sampled comparison
+with2260.417/12 remains explicit. Each of4 arms selects first3 natural episodes
+per8 lanes=24, seed4000004013, original mean15000/90%-pyramid gate, zero updates/
+truncations,357 invariant tensors, full outcome replay/videos and guards.
+Require357 matching initial tensors and paired initial semantic traces for both
+inference choices. Ordinary frozen logs have no live pixel hashes.
+
+Require full training label/input-pixel/actual-action replay,finite reports,
+equal labeled-row/weight counts,source/config/counters,curves,coverage,exposure
+and comparisons. Guided online scores are not unaided competence. All retained
+training/evaluation costs stay visible; no independent seed claim follows.
+
+Caps: training1800s,each frozen arm300s/600k actions,training replay600s,
+CPU audit1200s,owning service4500s. No retry,cap increase,extension or automatic
+successor. Full root`/x/Temp/kindle-qbert-expert-scale10-20261028/full`, service
+`kindle-qbert-expert10-100k-20261028`. Pin exact queue/runtime/controllers and
+verify terminal predecessors and current device before launch. At selection,
+the bounded check is terminal and no GPU allocation is active.
