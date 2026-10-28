@@ -117,3 +117,11 @@ at3416 actions/191 finite supervised reports verifies every pin,exact config,
 376/392/408/424/440/456. Recovery starts22:57:52 after the complete valid header;
 main,postprocess,progress and recovery are active. No failed attempt or GPU repeat.
 Startup review`a882f846377fcb3dff648514042145b940d09b069ecefbdfacabbda84142e30a`. No frozen result or additional allocation yet.
+
+During training,CPU-only preparation of a retained Breakout greedy assessment
+takes.632s plus.672s preflight on one affined low-priority core. All190 active
+pins and the same main PID/invocation remain unchanged;no native module or
+environment is constructed. The Breakout candidate stays unselected and cannot
+launch before all four Qbert services and complete terminal audits succeed.
+Retain co-host preparation as a timing caveat without correcting training wall
+time. See the [prepared assessment](2026-10-28-cdp-breakout-corrective-greedy.md).

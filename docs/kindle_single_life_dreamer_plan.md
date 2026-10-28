@@ -16,9 +16,14 @@ fixed final/own-initial greedy and sampled24-episode assessments;original15k/90%
 gate unchanged. No extension or successor selected. Use the matching
 `/x/Temp/kindle-breakout-corrective-20261028/runtime` and pinned Qbert runner in
 `/x/Temp/kindle-qbert-expert100-capacity-20261028/full`. No new native/CLI code,
-failed attempt or GPU repeat. Eight CPU config/evaluation-boundary checks and six
+failed attempt or GPU repeat. Eight CPU config checks and six
 header-readiness cases pass;historical sources resolve explicitly through archives.
 No frozen benefit is measured yet. See the expert100-capacity protocol;check live state.
+
+A retained Breakout greedy assessment is CPU-prepared but unselected;no GPU
+job is queued. It uses the original corrective final/actual initial and requires
+all current Qbert services and terminal audits to finish before a separate launch
+decision. [Protocol](experiments/2026-10-28-cdp-breakout-corrective-greedy.md).
 
 Breakout encoder-rate200k completes200k actions/799,152 frames/24,970 updates
 in17m41s. Raising encoder6e-6→4e-5 lowers frozen4.292→1.458 versus own initial
