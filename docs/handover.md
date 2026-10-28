@@ -398,8 +398,12 @@ Separately select fresh200k/24,970 updates with the same4M48/Auto/N8/B8/T16/H15/
 R16/20%/cap1920/expert1/NOOP.05/world/all-state-label recipe,30-minute training
 cap and own-initial/final24-episode frozen arms. Compare retained4M world3670.833/
 19;labels and feedback change together on reused4013. Root
-`/x/Temp/kindle-qbert-corrective-full-20261028`; no extension or automatic
-successor. See the corrective-labels October28 protocol and check live state.
+`/x/Temp/kindle-qbert-corrective-full-20261028`; service starts17:29:58 UTC,
+training17:29:59/sourcee3b2ceb. All52 pins,config,update timing and357 initial
+tensors pass startup at4136 actions/486 finite reports. Recovery/progress/CPU
+postprocessing monitors are active; no frozen outcome yet. No extension or
+automatic successor. See the corrective-labels October28 protocol and check
+live state before any GPU work.
 
 
 

@@ -251,3 +251,15 @@ code or constructing environments. Root
 `/x/Temp/kindle-qbert-corrective-full-20261028`; service
 `kindle-qbert-corrective-200k-20261028`. Exact declaration and launch identities
 are recorded externally before/at execution.
+
+
+The fresh service starts17:29:58 UTC on October28; guarded training starts
+17:29:59, source`e3b2ceb`, PID185426/invocation
+`bdeb69c11326484bb7240cd7e946252e`. Declaration SHA256
+`863fabce3df678fbbb76c919bdbb74462e50d35c7b49694990d95f26d3411479`
+pins52 inputs. Startup passes at4136 actions/486 finite reports: exact config,
+first six updates248..288,357 matching control and bounded initial tensors,
+all-state labels and unchanged pins. Separate CPU services observe progress,
+audit100k recovery and wait for terminal success before plots/comparison.
+Host guards and strict finite-report checks remain active. No outcome is
+available yet; no completed life is extended or repeated.
