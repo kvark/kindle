@@ -106,3 +106,8 @@ active-runtime inputs change. See the separate Breakout corrective-label protoco
 The100k recovery audit succeeds21:16:21 UTC at12,470 updates,357 finite tensors.
 Its complete log prefix has103,728 actions/12,936 finite reports. The recovery
 watcher exits successfully without changing the learner.
+
+A further affined CPU-only Breakout feedback parity replay runs21:21:08–21:22:56
+UTC,108.206s measured analysis. It imports no native module and reconstructs old
+learner trajectories only. All138 inputs and the same learner process remain
+unchanged. Retain this additional co-host timing caveat without time adjustment.

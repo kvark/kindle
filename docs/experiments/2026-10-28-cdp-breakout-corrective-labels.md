@@ -57,3 +57,22 @@ requires terminal success of every Qbert service,its complete receipt and every
 current pin before copying the exact tested patch. It then verifies historical
 hashes using explicit archived paths where working-tree sources change. The
 script has not been executed at this stage; native validation remains unselected.
+
+## Feedback parity on retained native-policy trajectories
+
+A separate CPU replay covers the original compact Breakout initial5944 actions/
+23,717 frames/29 collected episodes and trained175,280 actions/701,036 frames/
+43 collected episodes. Both include all18 submitted commands. On every state,
+the staged feedback teacher matches the retained edge-reference implementation
+when its previous-command term is updated independently from the submitted
+action's meaning. All decisions,debug values and recorded game outcomes match.
+There are5641/174,234 teacher/action disagreements; those are descriptive, not
+proof that recommendations are correct. No labels enter a native learner.
+
+The two arms total181,224 actions/724,753 frames in108.206s CPU analysis. Service
+starts21:21:08 UTC and succeeds21:22:56,whole1m48.305s. All14 source pins and138
+active Qbert inputs remain unchanged with the same learner process; no native
+module or agent is loaded. Original frozen logs lack live pixel hashes, so this
+checks reconstructed outcomes, not equality to unavailable live images. The
+additional co-host duration is retained without correcting Qbert wall time.
+Review`95d2f9fb6a0e17966556f176e20548b56caeb7104ad540576665af06f5dab014`.
