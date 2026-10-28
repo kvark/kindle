@@ -599,3 +599,48 @@ the retained analysis script. Artifacts:`/x/Temp/kindle-breakout-misses-20261028
 Replay review`147ca8262d5dd668954ac99034faf427f4e02726e12c1f1248078bb7f29feef0`;
 response review`60c81b5c767fe20b38572ab8ad7d4b68aaaf06877091a9ca4d14742fa6be249c`;
 completion`c82cd60f1afd7f92adc7a6181930c6552040edf773bd5bd15bd6e21d59b37903`.
+
+## Stationary-edge response correction improves eight reused reference episodes
+
+A fixed CPU reference change scores **185.375 versus144.875** on the retained
+first natural episode from each of8 lanes. Returns change from
+`86,405,16,127,262,99,90,74` to`151,97,256,226,204,331,82,136`;5 of8 improve.
+Both have0/8 two-wall successes. These reused development episodes are too few
+for the original20-episode minimum and do not establish independent reliability,
+Kindle learning or a useful training aid. No native implementation is changed.
+
+The candidate resets the previous-command term in the paddle-response model
+at a stationary predicted edge: center≤16 or≥147 and absolute velocity<.01.
+This applies at each of the five planning steps. Detector, response coefficients,
+landing calculation, actions and observation protocol remain fixed. Retrospective
+fixed-action analysis first reproduced all39,792 original one-step predictions;
+the reset lowersMAE2.030→1.869/RMSE3.807→3.246. On5571 stationary-edge pairs,
+MAE3.433→2.284/RMSE6.742→4.147. These noisy pooled-centroid errors motivated
+the separate policy test; they were not a policy-score forecast or causal diagnosis.
+
+Collection uses16,280 aggregate actions/65,107 emulator frames in10.236s.
+Independent replay takes13.228s and reproduces policy actions/debug state,
+input/output pixels, rewards, boundaries, resets and task outcomes; video retained.
+The affined low-priority CPU service starts18:38:41 and succeeds18:39:05 UTC on
+October28, whole23.662s. All8 inputs and55 active Qbert pins remain unchanged;
+Qbert retains PID189477/invocation`00d3435a0afe4e2688a0d7c2b43aa1a6`.
+No native module loads, learner updates occur or GPU allocation is added.
+No full reference assessment, training integration or successor is selected.
+
+A preceding26.820s CPU replay compared the original paddle mask with a wider
+fixed-row component and current unpooled RGB, without feeding these diagnostic
+pixels into a policy. All43,496 original actions/pixels/outcomes match. The
+wider detector is ambiguous on36,950 pooled observations; all50 retained
+lane0/episode0 snapshots contain the same red8×6 right-edge region. Its smaller
+pooled/current-component discrepancy is **not** detector validation: both can
+include that region. Keep the original detector; no geometry conclusion follows.
+This service succeeds18:33:52 UTC, all6 inputs/55 active Qbert pins unchanged.
+Both CPU jobs are co-host timing caveats for the concurrent Qbert life.
+
+Artifacts:`/x/Temp/kindle-breakout-edge-reset-20261028` and
+`/x/Temp/kindle-breakout-paddle-pixels-20261028`. Candidate comparison
+`991d4abbc26e0869060efe48f7e836f5c5bdaee7f1724cd1067654f53cebd440`;
+candidate review`6b6836155aca55833c053b01a8f76da39a4fb6a0e90637b698c20d1e05978557`;
+completion`2b529d004f7fe987ec13d8fe76d203c0a29697dab260ff5db7b42db38d44db5d`.
+Pixel diagnostic review`b06b8717f625191c55598f0288687105c5256dd2c0fd2bba00e98b94f3af272b`;
+completion`0eda3e6ff3fb83ce12444f73dc238155c9c4340482ab64648b20e31adeae72a4`.

@@ -125,3 +125,18 @@ Its journal is retained; a separately named observer uses the existing supported
 positional arguments. Main learner PID/invocation remain unchanged; no GPU stage
 repeats and no runtime/controller pin changes. No frozen outcome is available at
 this milestone. No extension or automatic successor is selected.
+
+
+## Recovery and CPU co-host work
+
+The50k recovery passes18:39:09 UTC at12,439 updates with357 finite tensors;
+metadata SHA`f05c9a88f2056429752c0ef0c5ac490c2536293aeb3f7e2758513db99e7cdba5`.
+The watcher exits successfully after checking12,939 finite reports through a
+52,008-action complete prefix. Training continues under the original identity.
+
+Two affined low-priority CPU Breakout studies co-host with this life:26.820s
+for exact retained pixel replay (service18:33:25–18:33:52) and23.614s for the
+separately selected eight-episode edge-response reference comparison/replay
+(service18:38:41–18:39:05). Both preserve all55 active pins and learner identity;
+no GPU work or live source changes. They remain timing caveats; no wall-time
+correction is applied. See the [reference result](../results/2026-10-26-cdp-breakout-pixel-reference.md#stationary-edge-response-correction-improves-eight-reused-reference-episodes).
