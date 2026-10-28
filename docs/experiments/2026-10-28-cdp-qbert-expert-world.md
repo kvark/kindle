@@ -77,3 +77,9 @@ matches and the first6 expected update counters. The initial inspected prefix
 contains3960 actions/464 finite reports; this is startup evidence only.
 Recovery, progress observation and terminal CPU processing are automated.
 Training and frozen outcomes remain pending; check live state before GPU work.
+
+The100k recovery audit passes at15:05:30 UTC:12,470 saved updates,357 finite
+tensors and frozen actor-copy equality. The stable complete log prefix contains
+103,576 actions/12,916 finite reports. All52 declaration pins remain unchanged;
+training continues. Recovery review SHA256
+`bf13b06fe66ee1fc7dd6fd81108fa43875bac295f99bee1ac4c3339eedd89b06`.
