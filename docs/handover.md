@@ -1,5 +1,21 @@
 # CDP handover — October25,2026
 
+Fresh Qbert12M48/B16/R16/expert100/200k is active from22:57:47 UTC on October28,
+sourcecb4ab40,service`kindle-qbert-expert100-capacity-200k-20261028`. Capacity and
+batch/microbatch change together against strong4M/B8;no isolated capacity effect.
+Native447fe50,runner and Qbert teacher match. The8192/489 bounded check passes
+in69.886s,all44 pins/357 reference-matched initial and invariant frozen tensors,
+full guidance replay and guards;early200k projection28m26s. Full startup verifies
+190 pins,357 matching12M reference/check initial tensors and191 finite reports
+at3416 actions. Training cap35min,100k recovery/6227 updates,final12477 updates,
+fixed final/own-initial greedy and sampled24-episode assessments;original15k/90%
+gate unchanged. No extension or successor selected. Use the matching
+`/x/Temp/kindle-breakout-corrective-20261028/runtime` and pinned Qbert runner in
+`/x/Temp/kindle-qbert-expert100-capacity-20261028/full`. No new native/CLI code,
+failed attempt or GPU repeat. Eight CPU config/evaluation-boundary checks and six
+header-readiness cases pass;historical sources resolve explicitly through archives.
+No frozen benefit is measured yet. See the expert100-capacity protocol;check live state.
+
 Breakout encoder-rate200k completes200k actions/799,152 frames/24,970 updates
 in17m41s. Raising encoder6e-6→4e-5 lowers frozen4.292→1.458 versus own initial
 1.375; both0/24 two-wall successes. Training costs1.52% more. All64 pins,100k
@@ -10,7 +26,7 @@ on October28. The copied CPU preparation error and proactively replaced waiting
 comparison observer are retained; no GPU stage repeats or caps change. Actual
 overrides67.622%; online guided returns are not competence. Retain encoder6e-6;
 no extension,seed confirmation or automatic successor. Native447fe50 unchanged;
-optional CLI passes348 CPU tests. No active GPU allocation. See the encoder-rate
+optional CLI passes348 CPU tests. The device was idle at completion. See the encoder-rate
 protocol and completed pixel-reference result; check live state before GPU work.
 
 Breakout corrective200k completes200k actions/799,234 frames/24,970 updates in

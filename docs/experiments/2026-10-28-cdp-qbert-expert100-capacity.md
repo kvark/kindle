@@ -105,3 +105,15 @@ Caps:training2100s,each frozen300s,training replay900s/outer930s,CPU audit1500s,
 main5100s;terminal postprocessor5700s. Root
 `/x/Temp/kindle-qbert-expert100-capacity-20261028/full`,service
 `kindle-qbert-expert100-capacity-200k-20261028`. Check live state before launch.
+
+## Fresh200k launched and startup checked
+
+Main starts22:57:47 UTC on October28/sourcecb4ab40,PID213871,
+invocation`cb7dc9b9f81f4a538acaf15a26a39c67`. Declaration
+`4cfc1378695f5ec710003f4681e75f9a50d100ed716f24a013f0b2a91b154e1f`
+pins190 inputs,including explicit archived historical-control sources. Startup
+at3416 actions/191 finite supervised reports verifies every pin,exact config,
+357 initial tensors matching12M reference and bounded check,and first updates
+376/392/408/424/440/456. Recovery starts22:57:52 after the complete valid header;
+main,postprocess,progress and recovery are active. No failed attempt or GPU repeat.
+Startup review`a882f846377fcb3dff648514042145b940d09b069ecefbdfacabbda84142e30a`. No frozen result or additional allocation yet.
