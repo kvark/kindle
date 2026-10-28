@@ -193,7 +193,9 @@ Retain5%/R32 as stronger; small reused-seed R16 gain gets no extension or
 confirmation. New native/runner identities limit attribution. See the completed
 expert-world result in cheap-Qbert and its October28 protocol. A separate
 12M48/B16/R16/20%/world-gradient check now selects8192 actions/489 updates,
-180s train plus1024 frozen/60s, with40 pinned inputs. Model and batch change
+180s train plus1024 frozen/60s, with41 pinned inputs. A prelaunch accounting
+error is preserved: first376/residual.5, not384/0; the unselected service
+refuses before GPU work. The separate reviewed declaration corrects this. Model and batch change
 together; this tests execution/cost, not competence. See the October28
 expert-capacity protocol. No full learner is selected; check live state.
 

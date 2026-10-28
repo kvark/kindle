@@ -43,7 +43,7 @@ Capacity4M→12M and batch/microbatch8→16 change together; replay positions pe
 action stay16 while optimizer cadence halves. Do not claim an isolated effect.
 Native max-pooled observations still receive one GPU resize.
 
-Train8192 aggregate actions/489 updates, first384/residual0, within180s. Restore
+Train8192 aggregate actions/489 updates, first376/residual.5, within180s. Restore
 for1024 frozen actions/60s, guidance off and zero updates. Require finite reports,
 positive world/actor expert losses when labeled, zero masked losses and agreement
 within.002×(1+absolute actor loss). Verify trusted directional labels and changed
@@ -64,7 +64,7 @@ No native or CLI change/rebuild. The separate checkpoint helper has the audited
 lazy import used by the completed CPU repair. CPU preparation parses both exact
 commands, compiles4 scripts, checks config against the retained12M initialization
 and preserves all52 preceding-run pins, without native/environment construction.
-The new declaration pins40 inputs, including schema, source runs and diagnosis.
+The new declaration pins41 inputs, including schema, source runs and diagnosis.
 
 RX7900XT host/boota8648671/AMD module9BDBC866F55BF296F1B7FA2 remain unchanged.
 Use the host guard, one GPU job at a time, and stop on real faults or numerical
@@ -72,5 +72,18 @@ failure. No driver reset/reload/reboot. Audit cap180s; whole service480s. No ret
 cap increase, reuse of check experience or automatic full promotion. Review cost
 and correctness before separately selecting any full learner.
 
-Trial:`/x/Temp/kindle-qbert-expert-capacity-20261028/qbert-12m-48-b16-r16-world-check`.
-Owner:`kindle-qbert-expert-capacity-check-20261028`.
+Trial:`/x/Temp/kindle-qbert-expert-capacity-20261028/reviewed/qbert-12m-48-b16-r16-world-check`.
+Owner:`kindle-qbert-expert-capacity-reviewed-check-20261028`.
+
+## Prelaunch accounting correction
+
+A final check against the retained B16/R16 source catches a mistaken first384/
+zero-credit assumption: the observed scheduler starts376 and retains.5 credit;
+8192 still schedules489 updates. The shell continues past that failed read-only
+assertion to the original service, whose unselected-declaration guard refuses
+before creating guards, a training log or any GPU stage. Preserve its15:45:31
+UTC failed service/journal, original prepared declaration and all40 unchanged
+input pins. A separate `reviewed` preparation corrects both assertions, verifies
+the reference counters/config and parses both commands again. It pins41 inputs,
+including the original failure receipt, with no model/budget/cap change. The
+reviewed owner above is a distinct first GPU check, not a repeated GPU stage.
