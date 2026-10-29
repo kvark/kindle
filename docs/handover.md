@@ -1,13 +1,17 @@
 # CDP handover — October25,2026
 
-Native action temperature passes136 Rust/658 Python CPU tests,strict Clippy,
-two guarded GPU tests and two1024-action restores with357 invariant tensors.
-Default sampling matches128 retained transitions;no completed episodes/updates.
-The15.363s service succeeds14:02:57 UTC October29. Sourcee416696/native40872a3,
-runtime `/x/Temp/kindle-action-temperature-20261029/runtime`;packaging receipt
-retained,857MB build cache released. Original CPU packaging lookup failure is
-preserved;no GPU repeat. A fixed four-arm frozen Qbert temperature0.5 assessment
-is separately selected after these checks;no new learner or sweep. See the
+Frozen Qbert temperature0.5 completes at12389.583/24 first pyramids,3.38% above
+retained greedy11984.375/24;default sampled6759.375/24 reproduces exactly.
+Own initial arms177.083/0;mean15000 still fails. Retain0.5 as a development
+option,not broad superiority or a global default. Four arms96,872 actions /
+387,366 frames /58.516s,zero updates;original30m27s training remains. All57 pins,
+357 invariant tensors per arm,4204/1138 default semantic events,replays/videos
+and guards pass. Service succeeds14:10:15 UTC October29/source4b24f75 after
+2m04.158s;collection14:10:56. Nativee416696/SHA40872a3 passes136 Rust/658 Python
+CPU tests/Clippy and bounded checks. Runtime
+`/x/Temp/kindle-action-temperature-20261029/runtime`;packaging receipt retained,
+857MB cache released. CPU packaging lookup failure preserved;no GPU repeat.
+No active allocation,sweep,extension or successor. See the
 [result](results/2026-10-29-cdp-qbert-action-temperature.md) and
 [protocol](experiments/2026-10-29-cdp-qbert-action-temperature.md). Check live state.
 

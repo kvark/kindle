@@ -85,3 +85,21 @@ Root `/x/Temp/kindle-action-temperature-20261029/full`, service
 `kindle-action-temperature-full-20261029`. Pin a fixed protocol copy, leaving
 later status edits outside the declaration. Record the original30m27s training
 cost and the reused development seed/cohort;no independent learner is created.
+
+## Completed frozen assessment
+
+Temperature0.5 scores12389.583/24 first pyramids,3.38% above retained greedy
+11984.375/24 and83.29% above default sampled6759.375/24. Both actual-initial
+arms score177.083/0. The mean15000 gate still fails. Retain0.5 as a development
+option with a small point-estimate gain,not independent confirmation or a
+global default. No sweep,extension,new learner or automatic successor follows.
+
+All57 pins,357 invariant/finite tensors per arm,4204/1138 exact default semantic
+events,full replays/videos and guards pass. Four arms total96,872 actions /
+387,366 frames /58.516s,zero updates;original30m27s training cost remains.
+Service starts14:08:10 UTC October29/source4b24f75 and succeeds14:10:15 after
+2m04.158s. Terminal collection passes,with no GPU repeat or new failure. The
+original CPU packaging-path failure remains preserved. Completion SHA256
+`c2964928da86d26bbc0523dedbc5078a29180fc8f2795f47e49517a3734d3bcc`.
+See the [completed result](../results/2026-10-29-cdp-qbert-action-temperature.md).
+No active GPU allocation remains;the five-game goal is unfinished.

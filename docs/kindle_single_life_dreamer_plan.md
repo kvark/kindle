@@ -1,12 +1,14 @@
 # Kindle: CDP learning roadmap
 
-The [native action-temperature check](results/2026-10-29-cdp-qbert-action-temperature.md)
-passes136 Rust/658 Python CPU tests,strict Clippy,two guarded GPU tests and two
-1024-action restores,357 invariant tensors and128 matching default transitions.
-No updates or natural episodes;service succeeds14:02:57 UTC October29. A fixed
-four-arm frozen assessment of temperature0.5 on retained12M Qbert is separately
-selected,with greedy11984.375 primary and sampled6759.375 secondary. No new
-training or sweep;original30m27s training cost stays. See the fixed protocol.
+The [completed action-temperature assessment](results/2026-10-29-cdp-qbert-action-temperature.md)
+scores12389.583/24 first pyramids at0.5,3.38% above retained greedy11984.375/24;
+default sampled6759.375/24 reproduces exactly. Own initials177.083/0;mean15000
+still fails. Retain0.5 as a development option with a small point-estimate gain,
+not broad superiority or a global default. All57 pins,357 invariant tensors per
+arm,4204/1138 default semantic events,replays/videos and guards pass. Four arms
+96,872 actions /387,366 frames /58.516s,zero updates;original30m27s training stays.
+Service succeeds14:10:15 UTC October29/source4b24f75 after2m04.158s;collection
+14:10:56. No active allocation,sweep,extension or successor. The goal is unfinished.
 
 The [completed Qbert25M/R16 comparison](results/2026-10-29-cdp-qbert-25m-r16.md)
 finishes200k actions /799,730 frames /12,477 updates in42m51s,40.72% more training
@@ -1117,7 +1119,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Compact12M64/B16/R16/expert100/200k:sampled13.208,greedy17.875 in22m19s,unconfirmed; own initials1.417/2.208. Smaller4M/B8:9.458/12.208 in17m45s. Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
-| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s; expert10/100k4013/1009 greedy7700/3832.292 and24/24 /23/24 in18m55s/19m11s; expert100/100k4013 greedy8365.625/24 in18m59s,4M/200k9654.167/23 in26m07s,and12M/B16/200k11984.375/24 in30m27s,unconfirmed; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
+| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s; expert10/100k4013/1009 greedy7700/3832.292 and24/24 /23/24 in18m55s/19m11s; expert100/100k4013 greedy8365.625/24 in18m59s,4M/200k9654.167/23 in26m07s,and12M/B16/200k11984.375/24 greedy or12389.583/24 attemperature.5 in30m27s,unconfirmed; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and

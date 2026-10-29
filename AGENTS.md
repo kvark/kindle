@@ -18,15 +18,18 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-Optional native action temperature passes136 Rust/658 Python CPU tests,strict
-Clippy,two guarded GPU checks and two1024-action frozen restores,357 invariant
-tensors and128 matching default transitions. No updates/natural episodes;
-service succeeds14:02:57 UTC October29. Nativee416696/SHA40872a3,runtime
+Frozen Qbert temperature0.5 scores12389.583/24 first pyramids,3.38% above retained
+greedy11984.375/24;sampled6759.375/24 reproduces exactly. Own initials177.083/0;
+mean15000 still fails. Retain0.5 as development option,not broad superiority or
+global default. Four arms96,872 actions /387,366 frames /58.516s,zero updates;
+original30m27s training stays. All57 pins,357 invariant tensors per arm,4204/1138
+default semantic events,replays/videos/guards pass. Service succeeds14:10:15 UTC
+October29/source4b24f75 after2m04.158s;collection14:10:56. Nativee416696/SHA40872a3
+passes136 Rust/658 Python CPU tests/Clippy and bounded checks. Use
 `/x/Temp/kindle-action-temperature-20261029/runtime`,packaging receipt retained,
-857MB cache released. CPU packaging lookup failure preserved;no GPU repeat.
-Fixed four-arm Qbert temperature0.5 assessment separately selected,no learner
-or sweep. Primary retained greedy11984.375;original30m27s training stays.
-See action-temperature result/protocol;check live state before GPU work.
+857MB cache released. CPU packaging lookup failure preserved,no GPU repeat.
+No active allocation,sweep,extension or successor. See action-temperature result;
+check live state before work. The five-game goal remains unfinished.
 
 Frozen modal-posterior Qbert lowers11984.375→10539.583,each24/24 first pyramids;
 own initials80.208/0.000,zero pyramids. Retain sampled posteriors/greedy actions.

@@ -1,4 +1,50 @@
-# Native action temperature passes bounded frozen checks
+# Sharper sampled Qbert actions give a small gain but still miss the gate
+
+Frozen temperature0.5 scores **12389.583 /24of24 first pyramids**, a **3.38%**
+higher point estimate than the retained greedy11984.375/24. It also improves
+ordinary sampled6759.375/24 by83.29%, with zero new training. All means remain
+below15000. Retain temperature0.5 as a useful12M development option, alongside
+the established greedy result; this small selected-cohort difference does not
+establish reliable superiority. No temperature sweep, learner extension, seed
+confirmation or automatic successor is selected. The five-game goal remains
+unfinished.
+
+| Action policy on the retained12M learner | Frozen mean | First pyramids |
+| --- | ---: | ---: |
+| Retained greedy, previous assessment | 11984.375 | 24/24 |
+| Default sampling, exactly reproduced | 6759.375 | 24/24 |
+| Sampled temperature0.5 | 12389.583 | 24/24 |
+
+The four new arms use final and actual-initial checkpoints, each with default
+sampling or temperature0.5. Both initial arms score177.083 with zero pyramids.
+Posterior sampling, weights, preprocessing and checkpoint settings stay fixed;
+temperature acts only on the action distribution. Every arm selects the first3
+natural episodes per8 lanes=24,guidance/labels off,zero updates/truncations,
+with partial/excess episodes retained. The original15000/90%-pyramid gate and
+the primary comparison with retained greedy remain fixed.
+
+All57 input pins,357 finite/invariant tensors per arm,source/config/counter
+checks,full action/outcome replays/videos and host guards pass. New default
+final/initial traces match all4204/1138 retained semantic events and reproduce
+their scores exactly. The greedy primary is the earlier retained evaluation;
+it is not an additional arm of this service. Ordinary source logs lack live
+pixel hashes. Four arms total **96,872 actions /387,366 emulator frames /
+58.516s** of evaluation, with zero learner updates. Original training remains
+200k actions /12,477 updates /30m27s. These are reused development weights and
+evaluation lanes, not another learner or independent confirmation.
+
+Service `kindle-action-temperature-full-20261029` runs14:08:10–14:10:15 UTC
+October29,source `4b24f75`,whole2m04.158s including CPU audits. The service and
+terminal collector succeed,without GPU repeats,cap changes or host recovery.
+No GPU allocation remains active. Root
+`/x/Temp/kindle-action-temperature-20261029/full` retains the four logs,
+checkpoints,videos,per-arm reviews and completed comparison outside Git.
+
+- Full declaration: `d3c8bca87b9949d350efce751b209f721a1fc03490cc3654069d15ce0aa566c3`
+- Comparison: `a746c77d45ef7e019600da8dd9ba2debc077dbbe9854dc30d8388e5e2dc2e441`
+- Completion: `c2964928da86d26bbc0523dedbc5078a29180fc8f2795f47e49517a3734d3bcc`
+
+## Bounded native checks
 
 The optional native action temperature passes its guarded probability/RNG/reset
 checks and a default vector/serial parity check. Both1024-action Qbert restores
@@ -45,7 +91,6 @@ The packaging receipt pins native,wheel,test executable and Python sources.
 
 The retained12M learner's original200k-action/12,477-update training cost remains
 30m27s. Its greedy11984.375/24 and sampled6759.375/24 both miss mean15000.
-One fixed four-arm frozen assessment is selected separately after these checks;
+The four-arm assessment above was separately selected after these checks;
 see the [protocol](../experiments/2026-10-29-cdp-qbert-action-temperature.md).
-There is no temperature sweep,new learner,extension or automatic successor.
-The five-game goal remains unfinished.
+No bounded experience was reused for training.
