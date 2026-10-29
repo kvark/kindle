@@ -6,7 +6,9 @@ Same12M48/Auto/N8/B16/T16/H5/R32/expert100 as4013;seed6029/eval4000006029,
 200k actions/24,954 updates,45min cap,100k recovery,four frozen arms. Startup
 passes263 pins,357 finite initial tensors,48 changed initial tensors versus4013,
 first updates376/384/392/400/408/416 and319 finite supervised reports in2920
-actions. Progress,recovery and postprocessing observers are active. Greedy
+actions. The100k/12,454-update recovery passes17:19:48 UTC with357 finite
+tensors;midpoint recheck17:20:48 verifies263 pins and original PID/invocation.
+Recovery observer succeeds;main,progress and postprocessing continue. Greedy
 primary,original15000/90% gate. No H15/R16 control for6029;this checks recipe
 performance on another learner,not an isolated gain. Native447fe50,runner and
 teacher fixed;no build or experience reuse. Root`/x/Temp/kindle-qbert-h5-seed6029-20261029/full`.
