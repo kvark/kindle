@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+A [fresh Breakout centroid100 comparison](experiments/2026-10-29-cdp-breakout-centroid100-200k.md)
+is separately selected:200k actions/12,477 updates,30-minute training cap,
+12M64/Auto/N8/B16/T16/H15/R16/expert100 and the checked position loss scale100.
+No bounded-check experience is reused. Require100k/6227 recovery,372 matching
+bounded initial/invariant frozen tensors,357 shared control initials,paired
+sampled/greedy final-and-initial24-episode assessments,full replays and guards.
+Native2974160 and runner differ from retained447fe50;no isolated causal claim.
+Root`/x/Temp/kindle-color-centroid-20261029/full`;service
+`kindle-breakout-centroid100-200k-20261029`. No gameplay result is available at
+selection. Check actual live state before GPU work;do not restart old services.
+
 The [optional native color-position loss](results/2026-10-29-cdp-color-centroid.md)
 passes F64 targets/loss/derivatives and a fresh Breakout8192-action/32,735-frame/
 489-update check in48.101s;1024 frozen actions take.875s with zero updates and

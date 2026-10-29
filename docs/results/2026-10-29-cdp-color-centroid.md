@@ -113,3 +113,12 @@ Bounded evidence: `native-check/breakout-centroid100-check`.
 
 No learner or GPU allocation is active at completion. The five-game goal remains
 unfinished; check live state before any separately selected GPU work.
+
+## Fresh 200k comparison selected
+
+The [separate full-run protocol](../experiments/2026-10-29-cdp-breakout-centroid100-200k.md)
+now selects a fresh200k/12,477-update comparison under a30-minute training cap.
+It retains the checked recipe and scale100,with100k recovery and fixed final/
+actual-initial sampled and greedy24-episode assessments. No short-check experience
+is reused. The original bounded outcome remains execution evidence only; no
+full-run gameplay result is available at selection.
