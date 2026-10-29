@@ -144,3 +144,40 @@ no preparation failure. Preflight receipt
 Root `/x/Temp/kindle-breakout-expert100-capacity-20261029/full`,trial
 `breakout-12m-64-b16-r16-expert100-200k-seed1009`;
 service `kindle-breakout-expert100-capacity-200k-20261029`.
+
+## CPU-only launch failure and corrected copy
+
+The first full controller and postprocessor fail at05:02:34 UTC on October29,
+source1d81ade. A broad private-script substitution accidentally duplicates the
+root as `kindle-breakout-expert100-capacity-capacity-20261029`. The controller
+fails at its first declaration read inside CPU preflight, before the GPU queue
+is invoked. No training log,guard directory,initial/final checkpoint,native agent,
+environment or learner experience exists. The original progress observer records
+zero actions/updates and exits successfully05:03:19. The launcher detects the
+terminal main PID and exits1 before starting recovery. This is a failed CPU
+orchestration attempt, not a GPU or learning failure.
+
+Preserve the original `full` directory,all106 pins,declaration,launch record and
+both failed units. The original preflight checked command/config/observer logic
+but did not exercise the controller's absolute paths. A separate corrected copy
+lives in **`/x/Temp/kindle-breakout-expert100-capacity-20261029/full-repaired`**.
+It keeps the same learner configuration,seed,200k/12,477 budget,30-minute training
+cap andfour frozen arms; no GPU work is repeated and no experience can be reused.
+Its distinct service is **`kindle-breakout-expert100-capacity-200k-repair-20261029`**,
+with matching `postprocess-repair`,`progress-repair` and`recovery-repair` units.
+
+Corrected CPU preflight passes.379s,adding44 resolved-path checks to the prior
+five CLI/14-script/16-config/six-header/four-parser/five-recovery-body checks.
+Controller,postprocessor andcomparison now resolve the exact declared trial;
+all literal absolute input paths exist. The launcher must additionally execute
+the actual `run_full.py preflight` before any service starts,and retain its
+receipt. Original failure review
+`18c528bea047d5d94d440a609ab2778ae71300803eb2df1c0f79a3c98e2f9d8f`;
+corrected preflight
+`86cdff333a0dba2ac0ecb985b88e09b2e0c8f155ab7c2f87bed9de6a575a0607`.
+
+Use **`full-repaired/collect_full.py`** at completion. It requires successful
+corrected services,all candidate audits,unchanged original106 pins,the preserved
+original failures andabsence of original GPU artifacts. Do not clear the original
+failed units or run the failed attempt's collector. No driver recovery,wall-cap
+increase,learner extension or automatic successor is selected.

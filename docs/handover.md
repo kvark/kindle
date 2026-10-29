@@ -1,16 +1,18 @@
 # CDP handover — October25,2026
 
-A fresh Breakout12M64/B16/R16/expert100200k comparison is separately selected after
-the complete bounded check and21m19s cost projection pass. Keep30min training cap,
-12,477 updates,100k/6227 recovery andfour fixed final/own-initial frozen arms,
-sampled primary. Capacity4M→12M andbatch/microbatch8→16 change together; other
-learner settings,native447fe50,runner andteacher stayfixed. Full initial tensors
-must match the bounded12M check; no cross-architecture initial equality or reuse
-of weights/experience. Full CPU preflight passes.359s with five CLI boundaries,
-14 scripts,16 config,six header,four parser andfive actual recovery-body cases;
-all56 check/69 control pins verify,no native construction or preparation failure.
-No retry,cap increase,extension,checkpoint selection or automatic successor.
-See the expert100-capacity protocol;check live state before GPU work.
+Fresh Breakout12M64/B16/R16/expert100200k remains selected with30min cap,
+12,477 updates,100k/6227 recovery andfour fixed frozen arms,sampled primary.
+The first CPU controller/postprocessor fail05:02:34 UTC on a duplicated private
+path before any GPU queue,native agent,environment or training artifact exists.
+Original106 pins,failed units andzero-action progress record are preserved.
+The separate `full-repaired` copy corrects paths;CPU preflight passes.379s with
+44 resolved-path checks plus the prior CLI/config/header/observer cases. The
+actual controller preflight must pass before services start. Same configuration,
+seed,budgets,native447fe50,runner andteacher;no GPU stage repeats or experience
+reuse. Use `/x/Temp/kindle-breakout-expert100-capacity-20261029/full-repaired` and
+its `kindle-breakout-expert100-capacity-200k-repair-20261029` service. Do not clear
+original failed units. No extension,cap increase,checkpoint selection or automatic
+successor. See the expert100-capacity protocol;check live state before GPU work.
 
 Breakout12M64/B16/R16/expert100 bounded check passes8192 actions/32,720 frames/
 489 updates in47.623s; frozen1024/4096frames/.877s haszero updates/no natural
