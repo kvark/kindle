@@ -805,16 +805,17 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
-Qbert25M48/B16/R8 finishes200k actions /799,672 frames /6239 updates in26m24s.
-Train guard passes12:09:29 UTC October29;all four frozen arms finish12:10:45,
-zero updates/passing guards,total76,968 actions /307,711 frames /55.737s.226 pins
-unchanged. Same main PID288915/invocation6eab4d2791074af8a3f5217487735324 active
-on CPU replay audits (child292418);comparison/postprocessing pending.100k recovery
-passes3114 updates/357 finite tensors. Capacity12M→25M and replay16→8 together;
-supervision/native447fe50/control runner/teacher fixed. Greedy11984.375 primary,
-sampled6759.375 secondary;15000/90% gate fixed. No completed gameplay claim yet.
-Own initials retained;no12M tensor equality. No GPU repeat/extension/automatic
-successor. Sourceeea4eed/start11:43:00;see25M/R8-200k protocol and check live state.
+Qbert25M48/B16/R8 completes200k actions /799,672 frames /6239 updates in26m24s,
+13.28% less training time. Greedy5817.708/24 pyramids falls51.46% below retained
+11984.375/24;sampled4533.333/23 falls32.93% below6759.375/24. Own initials9.375/
+177.083 clear none;mean15000 fails. Retain12M/R16;no extension/confirmation or
+successor. All226 pins,100k/3114 recovery,357 matching25M bounded initial/invariant
+frozen tensors,full replays/videos,guards,curves,coverage,exposure/comparison pass.
+Capacity12M→25M and replay16→8 together;no isolated effect/12M initial equality.
+Native447fe50/control runner/teacher/supervision fixed. Actual guidance45.751%;
+guided online mean15207.979 is not competence. Main succeeds12:21:32 UTC October29,
+postprocessing12:22:03,collection12:22:22;all services succeed,no failure/GPU repeat.
+See completed25M/R8 result;no GPU allocation active,check live state before work.
 
 Qbert25M48/B16/R8 bounded check passes 8192 actions / 32,753 frames / 245 updates
 in 63.119s; 1024 frozen / 4096 frames take 1.148s, zero updates/no natural episodes.

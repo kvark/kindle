@@ -1,19 +1,18 @@
 # Kindle: CDP learning roadmap
 
-The [Qbert25M/R8 200k comparison](experiments/2026-10-29-cdp-qbert-25m-r8-200k.md)
-finishes training200k actions /799,672 frames /6239 updates in26m24s. Train guard
-passes12:09:29 UTC October29;four frozen arms finish12:10:45 with zero updates
-and passing guards,total76,968 actions /307,711 frames /55.737s. All226 pins
-remain unchanged. Same main PID288915/invocation6eab4d2791074af8a3f5217487735324
-is active on CPU replay audits (child292418);comparison/postprocessing pending.
-No completed gameplay result or gate claim yet.100k recovery passed3114 updates,
-357 finite tensors and matching config/metadata/hashes. Progress/postprocessing
-observers remain active. Capacity12M→25M and replay16→8 change together;all
-supervision/native447fe50/control runner/teacher fixed. Greedy11984.375 primary,
-sampled6759.375 secondary;original15000/90% gate unchanged. Own initial controls
-are retained;no12M initial equality. Root `/x/Temp/kindle-qbert-25m-r8-20261029/full`.
-Reused development seed/cohort;no extension/automatic successor or GPU repeat.
-Check actual live state before work. Source `eea4eed`,start11:43:00 UTC.
+The [completed Qbert25M/R8 comparison](results/2026-10-29-cdp-qbert-25m-r8.md)
+finishes200k actions /799,672 frames /6239 updates in26m24s,13.28% less training
+time. Greedy11984.375→5817.708 (−51.46%),both24/24 first pyramids;sampled6759.375
+→4533.333 (−32.93%),24→23 pyramids. Own initials9.375/177.083 clear none;mean15000
+still fails. Retain12M/R16;no extension,confirmation or automatic successor.
+All226 pins,100k/3114 recovery,357 matching25M bounded initial/invariant frozen
+tensors,full replays/videos,guards,curves,coverage,exposure and comparison pass.
+Capacity12M→25M and replay16→8 change together;no isolated effect or12M initial
+equality. Same native447fe50/control runner/teacher/supervision. Actual guidance
+45.751%;guided online mean15207.979 is not competence. Main succeeds12:21:32 UTC
+October29,postprocessing12:22:03,collection12:22:22;all four services succeed,
+no GPU repeat or failure. Root `/x/Temp/kindle-qbert-25m-r8-20261029/full`.
+No GPU allocation active at completion;check live state before work.
 
 The [completed Qbert25M/R8 bounded check](results/2026-10-29-cdp-qbert-25m-r8.md)
 passes 8192 actions / 32,753 frames / 245 updates in 63.119s, then 1024 frozen
