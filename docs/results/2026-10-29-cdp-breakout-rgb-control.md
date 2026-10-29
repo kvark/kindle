@@ -135,3 +135,31 @@ main PID324938/invocation`23da92f687b74243812a8007db61ac5a` stays active.
 The recovery observer exits successfully;main/progress/post continue. This is
 checkpoint integrity evidence,not frozen competence. Recovery-review SHA256
 `488f39780a830572131f4644d690e9203c1df4e4f01c9fde446b39b7e9de3913`.
+
+
+## Automated terminal collection: CPU observer correction
+
+A read-only terminal collector is added while the original learner continues.
+Its first service fails18:35:31 UTC because systemd unloads a completed
+successful recovery observer and clears its live`InvocationID`. The observer
+incorrectly required that field to remain populated. No training,evaluation,
+checkpoint or main-service input is changed;no GPU stage restarts.
+
+The original script,declaration,failed service and journal remain at
+`/x/Temp/kindle-breakout-rgb-control-20261029/terminal-collection`. A separate
+`cpu-repair` checks active PID/invocation as before and validates terminal
+success against the original invocation preserved in journal records. Eight
+cases cover active/terminal/deactivating states,wrong PID/identity,multiple
+journal identities and failures;all four actual service states also pass.
+
+Service`kindle-breakout-rgb-control-collection-repair-20261029` starts18:37:31
+UTC/source`cb09d72`,PID327156/invocation`94465c790a5448fe81cb000c83adc7df`.
+It is verified live;all11 collection pins and212 learner inputs remain unchanged,
+as does learner PID324938/invocation`23da92f687b74243812a8007db61ac5a`. It waits
+for the four original services to succeed,then invokes the existing pinned
+CPU collector once. An observation timeout never starts/stops/restarts a
+service or changes an allocation cap. Do not manually repeat the exclusive
+collector while this observer is pending or after completion exists.
+
+Repair declaration SHA256`85fb7bdbcd43478fe7e1a6d7361b42f339089d4ce0c79703cd0d8fc1b28e3a79`;
+preflight`9d6be67e223ddab91b811f048f46fb1d8bb6cadae1c3879ba98b5ad283873767`.

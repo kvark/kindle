@@ -87,3 +87,11 @@ main PID324938/invocation`23da92f687b74243812a8007db61ac5a` stays active.
 The recovery observer exits successfully;main/progress/post continue. This is
 checkpoint integrity evidence,not frozen competence. Recovery-review SHA256
 `488f39780a830572131f4644d690e9203c1df4e4f01c9fde446b39b7e9de3913`.
+
+Read-only terminal collection is automated after the original CPU observer
+fails18:35:31 on an unloaded service's empty invocation field. The separate
+repair starts18:37:31,passes eight identity cases and four actual states,and
+checks retained journal identity for terminal services. All212 learner pins
+and original process identity stay unchanged;no GPU stage repeats or cap changes.
+See the result's terminal-collection section. The repair observer invokes the
+pinned collector exactly once after success;do not manually repeat it.

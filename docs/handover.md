@@ -32,8 +32,14 @@ reuse. Full root`/x/Temp/kindle-breakout-rgb-control-20261029/full`,trial
 18:28:50 UTC:6227 updates,399 finite tensors and6371 finite reports in the
 complete102,312-action prefix;all212 pins unchanged. Recovery observer exits
 success;main/progress/post remain active,original PID/invocation unchanged.
-Training/evaluation/replays/comparison remain unfinished. Check live state
-before GPU work;do not launch concurrent work or restart.
+Training/evaluation/replays/comparison remain unfinished. The read-only terminal
+collector is now automated by`kindle-breakout-rgb-control-collection-repair-20261029`,
+PID327156/invocation`94465c790a5448fe81cb000c83adc7df`,started18:37:31 UTC.
+Use`terminal-collection/cpu-repair`;the original18:35:31 CPU observer failure
+is retained. Eight identity cases and four actual states pass;212 learner inputs
+stay unchanged,no GPU stage repeats. It writes completion only after all four
+original services succeed;do not manually rerun the exclusive collector.
+Check live state before GPU work;do not launch concurrent work or restart.
 
 The completed [Breakout kernel action readout](results/2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy) takes1.824s CPU and scores49.25% overall/47.06% near-paddle teacher agreement,
 below linear50.58%/49.26% and recorded policy54.58%/53.68%. No evidence for this
