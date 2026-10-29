@@ -95,6 +95,10 @@ def main():
     parser.add_argument("--world-microbatch-size", type=int)
     parser.add_argument("--imagination-length", type=int,
                         help="fresh imagined rollout steps; omitted: native default, restore keeps checkpoint length")
+    parser.add_argument("--open-loop-length", type=int,
+                        help="optional CDP world supervision from one replay start, without future observations")
+    parser.add_argument("--open-loop-scale", type=float,
+                        help="scale for open-loop supervision; requires open-loop-length, omitted: 1")
     parser.add_argument("--train-ratio", type=float, default=256)
     parser.add_argument("--learning-rate", type=float, default=0.00004,
                         help="fresh base rate; CDP encoder/dynamics rates scale proportionally from default4e-5")
@@ -168,6 +172,12 @@ def main():
             parser.error("encoder-learning-rate ratio must be finite and positive in F32")
     if args.imagination_length is not None and args.imagination_length <= 0:
         parser.error("imagination-length must be positive")
+    if args.open_loop_scale is not None and (args.open_loop_length is None or not positive_f32(args.open_loop_scale)
+                                            or not positive_f32(500 * args.open_loop_scale)):
+        parser.error("open-loop-scale requires open-loop-length and a positive finite scaled F32 loss")
+    if args.open_loop_length is not None and (not args.cdp or args.encoder_checkpoint
+                                             or not 2 <= args.open_loop_length < args.batch_length):
+        parser.error("open-loop-length requires learned CDP and 2 <= length < batch-length")
     if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
         parser.error("GPU budget headroom must be positive")
     if args.greedy and not args.evaluate:
@@ -251,6 +261,7 @@ def main():
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
+    training_options.update(("--open-loop-length", "--open-loop-scale"))
     training_options.add("--behavior-learning-rate")
     training_options.add("--encoder-learning-rate")
     training_options.add("--cdp")
@@ -276,6 +287,8 @@ def main():
         parser.error("corrective labels require native passive-label support")
     if args.guidance_world_gradient and not getattr(kindle.VectorAgent, "SUPPORTS_EXPERT_WORLD_GRADIENT", False):
         parser.error("guidance world gradient requires native world-gradient support")
+    if args.open_loop_length is not None and not getattr(kindle.VectorAgent, "SUPPORTS_OPEN_LOOP_SUPERVISION", False):
+        parser.error("open-loop supervision requires native open-loop support")
     if args.restore and args.encoder:
         metadata = json.loads((args.restore / "metadata.json").read_text())
         if (metadata.get("perception") or {}).get("kind") != args.encoder:
@@ -368,6 +381,9 @@ def main():
                       learning_rate_warmup=1000, agc=0.3)
         if args.imagination_length is not None:
             config["imagination_length"] = args.imagination_length
+        if args.open_loop_length is not None:
+            config["open_loop_supervision"] = dict(horizon=args.open_loop_length,
+                scale=1.0 if args.open_loop_scale is None else args.open_loop_scale)
         if args.behavior_learning_rate is not None:
             config["behavior_learning_rate"] = args.behavior_learning_rate
         if args.guidance_imitation_scale is not None:

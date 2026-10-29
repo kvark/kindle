@@ -548,6 +548,30 @@ pub struct SequenceBatch {
 }
 
 impl SequenceBatch {
+    /// Prior rollout targets after `start`, retaining a terminal arrival but
+    /// never crossing an episode end/reset. Invalid rows stay masked thereafter.
+    pub fn open_loop_weights(
+        &self,
+        start: usize,
+        horizon: usize,
+        first_row: usize,
+        row_count: usize,
+    ) -> Vec<Vec<f32>> {
+        assert!(start + horizon < self.flags.len());
+        let mut valid = vec![1.0; row_count];
+        (start + 1..=start + horizon)
+            .map(|time| {
+                for (local, weight) in valid.iter_mut().enumerate() {
+                    let row = first_row + local;
+                    if self.flags[time - 1][row].is_last || self.flags[time][row].is_first {
+                        *weight = 0.0;
+                    }
+                }
+                valid.clone()
+            })
+            .collect()
+    }
+
     /// Pair the outgoing expert recommendation stored on frame t+1 with state t.
     /// Last/reset boundaries and the sequence tail never acquire a label.
     pub fn expert_targets(&self, config: &DreamerConfig) -> (Vec<f32>, usize) {
@@ -587,6 +611,35 @@ impl SequenceBatch {
 mod tests {
     use super::*;
     use rand::{SeedableRng, rngs::StdRng};
+
+    #[test]
+    fn open_loop_masks_retain_terminal_arrival_without_crossing_boundaries() {
+        let mut batch = SequenceBatch {
+            flags: vec![vec![FrameFlags::default(); 5]; 7],
+            ..Default::default()
+        };
+        // Start at an offset and slice rows, including a reset first state.
+        batch.flags[2][1].is_first = true;
+        batch.flags[3][1].is_last = true;
+        batch.flags[3][1].is_terminal = true;
+        batch.flags[4][2].is_first = true;
+        batch.flags[2][3].is_last = true;
+        // A time-limit end is also a boundary, even without is_terminal.
+        batch.flags[4][4].is_last = true;
+        assert_eq!(
+            batch.open_loop_weights(2, 3, 1, 4),
+            vec![
+                vec![1.0, 1.0, 0.0, 1.0],
+                vec![0.0, 0.0, 0.0, 1.0],
+                vec![0.0, 0.0, 0.0, 0.0],
+            ]
+        );
+        let full = batch.open_loop_weights(2, 3, 0, 5);
+        let part = batch.open_loop_weights(2, 3, 2, 2);
+        for (full, part) in full.iter().zip(part) {
+            assert_eq!(full[2..4], part);
+        }
+    }
 
     #[test]
     fn expert_targets_align_outgoing_actions_and_exclude_reset_tail_and_untrusted_rows() {

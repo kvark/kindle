@@ -30,9 +30,14 @@ pub const LOSS_INITIAL_POLICY: usize = 11;
 pub const LOSS_INITIAL_VALUE: usize = 12;
 pub const LOSS_EXPLORATION: usize = 13;
 pub const LOSS_EXPERT: usize = 14;
+pub const LOSS_OPEN_LOOP: usize = 15;
+pub const LOSS_OPEN_LOOP_PREDICTION: usize = 16;
+pub const LOSS_OPEN_LOOP_REWARD: usize = 17;
+pub const LOSS_OPEN_LOOP_CONTINUATION: usize = 18;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 mod cdp;
+mod open_loop;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
     (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_centered {
@@ -332,12 +337,14 @@ fn training_graph(
     let mut expert_losses = Vec::new();
     let mut deters = Vec::new();
     let mut stochs = Vec::new();
+    let mut actions = Vec::new();
 
     for time in 0..length {
         let action = graph.input(
             &format!("previous_action_{time}"),
             &[batch, config.action_count],
         );
+        actions.push(action);
         let keep_deter = graph.input(&format!("keep_deter_{time}"), &[batch, size.deter]);
         let keep_stoch = graph.input(
             &format!("keep_stoch_{time}"),
@@ -697,6 +704,17 @@ fn training_graph(
     } else {
         total
     };
+    let open_loop = config.open_loop_supervision.as_ref().map(|rollout| {
+        assert!(rollout.horizon < length);
+        open_loop::build(
+            &mut graph, config, &model, deters[0], stochs[0], &actions, &encodings, cdp_center,
+        )
+    });
+    let total = if let Some(losses) = &open_loop {
+        graph.add(total, losses.outputs[0])
+    } else {
+        total
+    };
     let mut outputs = vec![
         total,
         reconstruction,
@@ -725,6 +743,12 @@ fn training_graph(
             outputs.push(graph.scalar(0.0));
         }
         outputs.push(loss);
+    }
+    if let Some(losses) = open_loop {
+        while outputs.len() < LOSS_OPEN_LOOP {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend(losses.outputs);
     }
     if sample_posterior {
         outputs.push(stack_time(&mut graph, &deters, batch, size.deter));

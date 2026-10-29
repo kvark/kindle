@@ -17,6 +17,15 @@ import profile_atari_vector
 
 
 @pytest.mark.parametrize("args,message", [
+    (["--open-loop-length", "3"], "requires learned CDP"),
+    (["--cdp", "--open-loop-length", "1"], "requires learned CDP"),
+    (["--cdp", "--open-loop-length", "16", "--batch-length", "16"], "requires learned CDP"),
+    (["--cdp", "--open-loop-length", "3", "--encoder-checkpoint", "unused"], "requires learned CDP"),
+    (["--open-loop-scale", "1"], "requires open-loop-length"),
+    (["--cdp", "--open-loop-length", "3", "--open-loop-scale", "nan"], "positive finite"),
+    (["--cdp", "--open-loop-length", "3", "--open-loop-scale", "0"], "positive finite"),
+    (["--cdp", "--open-loop-length", "3", "--open-loop-scale", "1e38"], "positive finite"),
+    (["--restore", "unused", "--cdp", "--open-loop-length=3"], "training overrides"),
     (["--guidance-imitation-scale", "0"], "scale must be positive"),
     (["--guidance-imitation-scale", "nan"], "scale must be positive"),
     (["--guidance-imitation-scale", "inf"], "scale must be positive"),
@@ -113,6 +122,36 @@ def test_joint_encoder_recipe_refusals_precede_outputs(monkeypatch, tmp_path, ca
     assert error.value.code == 2
     assert message in capsys.readouterr().err
     assert not output.exists()
+
+
+@pytest.mark.parametrize("length,scale", [(None, None), (3, None), (3, .25)])
+def test_open_loop_config_reaches_native_without_default_changes(monkeypatch, tmp_path, length, scale):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    def construct(streams, config):
+        if length is None:
+            assert "open_loop_supervision" not in config
+        else:
+            assert config["open_loop_supervision"] == dict(horizon=length, scale=1.0 if scale is None else scale)
+        raise RuntimeError("checked before GPU")
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct, SUPPORTS_OPEN_LOOP_SUPERVISION=True))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"), "--cdp",
+                                    *(["--open-loop-length", str(length)] if length is not None else []),
+                                    *(["--open-loop-scale", str(scale)] if scale is not None else [])])
+    with pytest.raises(RuntimeError, match="checked before GPU"):
+        atari_vector.main()
+
+
+def test_open_loop_rejects_old_native_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("environment created"))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "never.jsonl"), "--cdp", "--open-loop-length", "3"])
+    with pytest.raises(SystemExit):
+        atari_vector.main()
+    assert "requires native open-loop support" in capsys.readouterr().err
+    assert not (tmp_path / "never.jsonl").exists()
 
 
 def test_vector_api_rejects_invalid_config_before_loading_weights():

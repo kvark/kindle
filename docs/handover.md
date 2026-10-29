@@ -11,8 +11,9 @@ Evidence `/x/Temp/kindle-action-ranking-20261029`,
 [result](results/2026-10-29-cdp-learning-diagnosis.md).
 Next selected work is the [bounded open-loop supervision implementation](experiments/2026-10-29-cdp-open-loop-supervision.md).
 No full learner or GPU allocation is selected yet; check live state. The separate
-greedy-posterior draft remains uncommitted; exclude it from an experimental
-runtime unless explicitly qualified.
+greedy-posterior draft is parked at
+`/x/Temp/kindle-open-loop-20261029/parked-posterior` (patch, exact files and hash
+receipt); exclude it from an experimental runtime unless explicitly qualified.
 
 Live Qbert critic calibration completes four frozen arms,98664 actions/394520
 frames in69.704s,zero updates. Sampled predicted mean1218.534 versus realized
@@ -31,7 +32,7 @@ are substantially larger, but forecasts remain useful through15 steps. All39
 pins,357 invariant tensors, recorded trajectories/pixel hashes and guards pass;
 service exits06:18:53 UTC. No new loss or training allocation is selected.
 Next diagnostic direction: critic calibration and actual alternative-action
-outcomes. The optional greedy-posterior draft is separate and still uncommitted;
+outcomes. The optional greedy-posterior draft is separate and now parked above;
 its CPU tests passed, but no new native runtime was built or GPU-tested.
 See [result and source audit](results/2026-10-29-cdp-learning-diagnosis.md).
 No GPU allocation is active; check live state before work.

@@ -90,6 +90,17 @@ def audit(path):
             check(type(config[field]) is int and config[field] > 0, f"invalid {field}")
         require_numbers(config["train_ratio"])
         check(config["train_ratio"] >= 0, "invalid train ratio")
+        open_loop = config.get("open_loop_supervision")
+        if open_loop is not None:
+            check(isinstance(open_loop, dict) and set(open_loop) == {"horizon", "scale"},
+                  "invalid open-loop config")
+            check(type(open_loop["horizon"]) is int
+                  and 2 <= open_loop["horizon"] < min(config["batch_length"], config.get("world_backprop_length", 0)),
+                  "invalid open-loop horizon")
+            require_numbers(open_loop["scale"])
+            check(open_loop["scale"] > 0 and config.get("observation_kind") in ("rgb32", "rgb48", "rgb64")
+                  and config.get("loss_scales", {}).get("future_prediction", 0) > 0,
+                  "open-loop supervision requires positive scale and CDP")
         exploration = None
         guidance = False
         if header["protocol"] == EXPLORATION_PROTOCOL:
@@ -273,6 +284,17 @@ def audit(path):
                 check(event["run_step"] == actions and pending_updates > 0, "unexpected learner update")
                 report = event["report"]
                 require_numbers(report)
+                rollout = report.get("world", {}).get("open_loop_supervision")
+                check((rollout is not None) == (open_loop is not None), "open-loop report/config mismatch")
+                if rollout is not None:
+                    check(isinstance(rollout, dict) and set(rollout) == {
+                        "total_loss", "prediction_loss", "reward_loss", "continuation_loss", "valid_fraction"},
+                        "invalid open-loop report")
+                    check(0 <= rollout["valid_fraction"] <= 1, "invalid open-loop valid fraction")
+                    expected = open_loop["scale"] * sum(rollout[name + "_loss"] * config["loss_scales"][component]
+                        for name, component in (("prediction", "future_prediction"), ("reward", "reward"), ("continuation", "continuation")))
+                    check(math.isclose(rollout["total_loss"], expected, rel_tol=2e-5, abs_tol=2e-4),
+                          "open-loop loss reduction differs")
                 updates += 1
                 check(report["learner_step"] == header["starting_learner_step"] + updates, "learner counter mismatch")
                 check(report["replay_len"] == len(replay), "learner replay length mismatch")

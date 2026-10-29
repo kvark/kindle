@@ -223,6 +223,13 @@ fn is_false(value: &bool) -> bool {
     !value
 }
 
+/// Prior-only predictions from the first posterior state of each training chunk.
+#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct OpenLoopSupervision {
+    pub horizon: usize,
+    pub scale: f32,
+}
+
 /// Configuration of the D3 baseline. Defaults use the upstream 12M preset;
 /// the pinned upstream default is 200M. Larger presets remain one enum change.
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -263,6 +270,8 @@ pub struct DreamerConfig {
     /// changes peak activation memory without changing the effective D3 batch.
     #[serde(default)]
     pub world_microbatch_size: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub open_loop_supervision: Option<OpenLoopSupervision>,
     pub replay_context: usize,
     /// Replay samples per action. Zero disables scheduled updates; explicit
     /// `DreamerCore::learn` remains available for isolated diagnostics.
@@ -351,6 +360,7 @@ impl DreamerConfig {
             batch_length: 64,
             world_backprop_length: 8,
             world_microbatch_size: None,
+            open_loop_supervision: None,
             replay_context: 1,
             train_ratio: 32.0,
             imagination_length: 15,
@@ -542,6 +552,22 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         let size = self.network();
+        if let Some(rollout) = &self.open_loop_supervision
+            && (!self.is_cdp()
+                || rollout.horizon < 2
+                || rollout.horizon >= self.world_backprop_length
+                || !rollout.scale.is_finite()
+                || rollout.scale <= 0.0
+                || [
+                    self.loss_scales.future_prediction,
+                    self.loss_scales.reward,
+                    self.loss_scales.continuation,
+                ]
+                .iter()
+                .any(|weight| !(weight * rollout.scale).is_finite()))
+        {
+            return Err("open-loop supervision requires CDP, 2 <= horizon < world BPTT, and a positive finite scale".into());
+        }
         if let Some(expert) = &self.expert_imitation
             && (!expert.scale.is_finite()
                 || expert.scale <= 0.0
@@ -1082,6 +1108,7 @@ mod tests {
     #[test]
     fn older_configs_default_new_fields() {
         let mut value = serde_json::to_value(DreamerConfig::tiny(3)).unwrap();
+        assert!(value.get("open_loop_supervision").is_none());
         let object = value.as_object_mut().unwrap();
         object.remove("replay_value_gradient");
         object.remove("actor_critic_gradient");
@@ -1108,6 +1135,37 @@ mod tests {
         assert_eq!(restored.world_microbatch_size, None);
         assert_eq!(restored.world_microbatch_size(), restored.batch_size);
         assert_eq!(restored.training_precision, TrainingPrecision::Auto);
+        assert_eq!(restored.open_loop_supervision, None);
+    }
+
+    #[test]
+    fn open_loop_requires_cdp_valid_horizon_and_finite_weights() {
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_kind = ObservationKind::Rgb32;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.batch_length = 4;
+        config.world_backprop_length = 4;
+        config.open_loop_supervision = Some(OpenLoopSupervision {
+            horizon: 3,
+            scale: 1.0,
+        });
+        assert!(config.check().is_ok());
+        let restored: DreamerConfig =
+            serde_json::from_value(serde_json::to_value(&config).unwrap()).unwrap();
+        assert_eq!(config, restored);
+        for horizon in [0, 1, 4, usize::MAX] {
+            config.open_loop_supervision.as_mut().unwrap().horizon = horizon;
+            assert!(config.check().is_err());
+        }
+        config.open_loop_supervision.as_mut().unwrap().horizon = 3;
+        for scale in [0.0, -1.0, f32::NAN, f32::INFINITY, f32::MAX] {
+            config.open_loop_supervision.as_mut().unwrap().scale = scale;
+            assert!(config.check().is_err());
+        }
+        config.open_loop_supervision.as_mut().unwrap().scale = 1.0;
+        config.observation_kind = ObservationKind::Features;
+        assert!(config.check().is_err());
     }
 
     #[test]

@@ -25,9 +25,46 @@ GPU validation. Preserve the original teacher-forced objective and expert loss.
 The selected work is implementation, meaningful CPU/gradient validation and a
 bounded real execution/cost check. It is not a full training allocation or a
 commitment to a particular loss weight without inspecting the implementation.
-The existing uncommitted greedy-posterior draft is separate and unused. Build
+The greedy-posterior draft is parked separately and unused. Its exact seven-file
+patch, source copies and hash receipt are retained under
+`/x/Temp/kindle-open-loop-20261029/parked-posterior`; the reverse patch was checked
+before applying and the saved forward patch applied cleanly to the baseline.
+Its protocol remains an untracked draft. Build
 from explicitly pinned sources; do not silently include its unqualified native
 changes in the new experimental runtime.
+
+## Selected implementation and numerical checks
+
+`open_loop_supervision: {horizon: 3, scale: 1.0}` is optional and absent from
+default serialization. The fresh CLI exposes `--open-loop-length` and
+`--open-loop-scale`; restore rejects overrides. One posterior start at local
+time0 of each replay chunk/row uses recorded incoming actions at times1..3.
+Subsequent states use sampled prior categoricals with the existing straight-
+through estimator, from a separate ChaCha12 stream; future observations never
+enter these states. No new trainable parameters are added.
+
+Detached centered CNN targets at steps2..3 receive cosine loss. Step1 has the
+same deterministic prediction inputs as existing CDP and is not duplicated.
+Prior-state reward two-hot cross-entropy and continuation logits BCE receive
+targets at steps1..3. Each component averages all rows, including masked zeros,
+then its supervised horizons (two CDP, three reward/continuation). Apply existing
+component weights500/1/1 and global scale1. The detached centering mean remains
+over the existing full real-observation batch. Gradients reach the initial
+posterior/CNN and rollout dynamics, prior and prediction heads; targets and
+centering mean remain detached. No auxiliary actor/critic loss is added.
+
+Masks accumulate from the start: exclude any arrival with `is_first` or with
+an `is_last` predecessor, retain a valid terminal arrival, and never re-enable
+a row after a boundary. Horizon must be at least2 and shorter than world BPTT.
+The original teacher-forced and expert losses remain intact. Metrics declare
+the weighted total, three component means and valid fraction.
+
+CPU checks cover configuration compatibility, RNG isolation, boundary masks,
+action ancestry, detached-target gradients, unchanged parameters/inference and
+ordinary/staged graphs. Separately guarded tiny GPU checks compare masked
+continuation values/derivatives with F64, check a smooth reward-head derivative,
+world gradient routing, future-target/state invariance, action sensitivity and
+zero masks. These checks precede packaging and any bounded Atari allocation.
 
 ## Required evidence before a full learner
 

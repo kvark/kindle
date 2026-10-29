@@ -27,6 +27,9 @@ impl PyVectorAgent {
     #[classattr]
     const SUPPORTS_EXPERT_WORLD_GRADIENT: bool = true;
 
+    #[classattr]
+    const SUPPORTS_OPEN_LOOP_SUPERVISION: bool = true;
+
     #[classmethod]
     fn learned_rgb(
         _class: &Bound<'_, PyType>,

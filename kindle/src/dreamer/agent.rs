@@ -53,6 +53,7 @@ const RNG_LIVE_POSTERIOR: u64 = 0x6c69_7665_706f_7374;
 const RNG_REPLAY: u64 = 0x7265_706c_6179_0001;
 const RNG_TRAIN_POSTERIOR: u64 = 0x7472_6169_6e70_6f73;
 const RNG_IMAGINATION: u64 = 0x696d_6167_696e_6501;
+const RNG_OPEN_LOOP: u64 = 0x6f70_656e_6c6f_6f70;
 const RNG_DIAGNOSTIC: u64 = 0x6469_6167_6e6f_7374;
 const RNG_RESUME: u64 = 0x7265_7375_6d65_0001;
 
@@ -130,6 +131,8 @@ pub struct WorldMetrics {
     /// Trusted-action loss through the frozen actor, before scale/warmup gating.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expert_imitation_loss: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_loop_supervision: Option<OpenLoopMetrics>,
     pub replay_reward_prediction_mean: f32,
     pub replay_reward_target_mean: f32,
     pub replay_reward_mae: f32,
@@ -148,6 +151,15 @@ pub struct WorldMetrics {
     pub replay_continuation_prediction_mean: f32,
     pub replay_continuation_target_mean: f32,
     pub replay_continuation_mae: f32,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct OpenLoopMetrics {
+    pub total_loss: f32,
+    pub prediction_loss: f32,
+    pub reward_loss: f32,
+    pub continuation_loss: f32,
+    pub valid_fraction: f32,
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -299,6 +311,7 @@ struct DreamerRngs {
     replay: StdRng,
     train_posterior: ChaCha12Rng,
     imagination: ChaCha12Rng,
+    open_loop: ChaCha12Rng,
 }
 
 impl DreamerRngs {
@@ -309,6 +322,7 @@ impl DreamerRngs {
             replay: StdRng::seed_from_u64(seed ^ RNG_REPLAY),
             train_posterior: ChaCha12Rng::seed_from_u64(seed ^ RNG_TRAIN_POSTERIOR),
             imagination: ChaCha12Rng::seed_from_u64(seed ^ RNG_IMAGINATION),
+            open_loop: ChaCha12Rng::seed_from_u64(seed ^ RNG_OPEN_LOOP),
         }
     }
 
@@ -1582,6 +1596,57 @@ impl DreamerCore {
                     }
                 }
 
+                if let Some(rollout) = &self.config.open_loop_supervision {
+                    let weights =
+                        batch.open_loop_weights(start, rollout.horizon, first_row, microbatch_rows);
+                    let mut uniforms = Vec::new();
+                    for (step, weight) in weights.iter().enumerate() {
+                        let local_time = step + 1;
+                        let time = start + local_time;
+                        let mut reward_target = vec![0.0; microbatch_rows * self.config.value_bins];
+                        for local_row in 0..microbatch_rows {
+                            self.bins.encode(
+                                batch.rewards[time][first_row + local_row],
+                                &mut reward_target[local_row * self.config.value_bins
+                                    ..(local_row + 1) * self.config.value_bins],
+                            );
+                        }
+                        let continuation_target = batch.flags[time]
+                            [first_row..first_row + microbatch_rows]
+                            .iter()
+                            .map(|flags| {
+                                if flags.is_terminal {
+                                    0.0
+                                } else {
+                                    self.config.continuation_discount()
+                                }
+                            })
+                            .collect::<Vec<_>>();
+                        self.world_train
+                            .set_input(&format!("rollout_weight_{local_time}"), weight);
+                        self.world_train.set_input(
+                            &format!("rollout_reward_target_{local_time}"),
+                            &reward_target,
+                        );
+                        self.world_train.set_input(
+                            &format!("rollout_continuation_target_{local_time}"),
+                            &continuation_target,
+                        );
+                        uniforms.push((
+                            self.world_train
+                                .input_buffer(&format!("rollout_uniforms_{local_time}"))
+                                .unwrap(),
+                            microbatch_rows * stochastic_width,
+                        ));
+                    }
+                    self.uniforms_gpu.fill(&mut self.rngs.open_loop, &uniforms);
+                    metrics
+                        .open_loop_supervision
+                        .get_or_insert_default()
+                        .valid_fraction += weights.iter().flatten().sum::<f32>()
+                        / (rollout.horizon * microbatch_rows) as f32;
+                }
+
                 let pass = chunk * microbatch_count + microbatch;
                 if pass + 1 == pass_count {
                     configure_d3_optimizer(
@@ -1606,6 +1671,16 @@ impl DreamerCore {
                 #[cfg(test)]
                 meganeura::profiler::record_instant("phase:world_wait_done");
                 metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
+                if self.config.open_loop_supervision.is_some() {
+                    let rollout = metrics.open_loop_supervision.as_mut().unwrap();
+                    rollout.total_loss += read_scalar(&self.world_train, world::LOSS_OPEN_LOOP);
+                    rollout.prediction_loss +=
+                        read_scalar(&self.world_train, world::LOSS_OPEN_LOOP_PREDICTION);
+                    rollout.reward_loss +=
+                        read_scalar(&self.world_train, world::LOSS_OPEN_LOOP_REWARD);
+                    rollout.continuation_loss +=
+                        read_scalar(&self.world_train, world::LOSS_OPEN_LOOP_CONTINUATION);
+                }
                 if self.config.expert_world_gradient() {
                     *metrics.expert_imitation_loss.get_or_insert(0.0) +=
                         read_scalar(&self.world_train, world::LOSS_EXPERT);
@@ -1648,6 +1723,18 @@ impl DreamerCore {
         }
         let scale = 1.0 / pass_count as f32;
         metrics.total_loss *= scale;
+        if let Some(rollout) = &mut metrics.open_loop_supervision {
+            for value in [
+                &mut rollout.total_loss,
+                &mut rollout.prediction_loss,
+                &mut rollout.reward_loss,
+                &mut rollout.continuation_loss,
+                &mut rollout.valid_fraction,
+            ] {
+                *value *= scale;
+                assert!(value.is_finite());
+            }
+        }
         if let Some(loss) = &mut metrics.expert_imitation_loss {
             *loss *= scale;
             assert!(loss.is_finite());
@@ -3319,6 +3406,43 @@ mod tests {
         assert_ne!(
             seed_zero.imagination.random::<u64>(),
             seed_one.imagination.random::<u64>()
+        );
+    }
+
+    #[test]
+    fn open_loop_randomness_does_not_consume_existing_streams() {
+        let mut baseline = DreamerRngs::new(42);
+        let mut changed = DreamerRngs::new(42);
+        for _ in 0..1024 {
+            let _ = changed.open_loop.random::<u64>();
+        }
+        for _ in 0..16 {
+            assert_eq!(
+                baseline.policy.random::<u64>(),
+                changed.policy.random::<u64>()
+            );
+            assert_eq!(
+                baseline.live_posterior.random::<u64>(),
+                changed.live_posterior.random::<u64>()
+            );
+            assert_eq!(
+                baseline.replay.random::<u64>(),
+                changed.replay.random::<u64>()
+            );
+            assert_eq!(
+                baseline.train_posterior.random::<u64>(),
+                changed.train_posterior.random::<u64>()
+            );
+            assert_eq!(
+                baseline.imagination.random::<u64>(),
+                changed.imagination.random::<u64>()
+            );
+        }
+        assert!(
+            serde_json::to_value(WorldMetrics::default())
+                .unwrap()
+                .get("open_loop_supervision")
+                .is_none()
         );
     }
 
