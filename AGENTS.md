@@ -808,7 +808,10 @@ of swarms/concurrent learners.
 Qbert25M48/B16/R16 200k comparison is active from12:43:20 UTC October29/source
 `5d9d93e`,PID293701/invocationa597cab72ab845b9ba8c3b3468096bc6. Startup passes273
 pins,357 finite initial tensors matching25M/R16 bounded/25M/R8 full,and92 finite
-supervised updates through1832 actions. Progress/recovery/postprocessing live.
+supervised updates through1832 actions. Recovery100k/6227 passes13:04:57 UTC,
+357 finite tensors;13:08:41 recheck confirms273 pins,metadata/config and same
+main invocation. Recovery exits success;main/progress/postprocessing active.
+No frozen competence result yet.
 12,477 updates,recovery6227,45min cap;only model size changes from12M/R16.
 Supervision/native447fe50/control runner/teacher fixed. Greedy11984.375 primary,
 sampled6759.375 secondary;25M/R8 secondary comparison requires matching initial

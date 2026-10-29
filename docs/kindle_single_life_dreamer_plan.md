@@ -4,7 +4,11 @@ The fresh [Qbert25M/R16 200k comparison](experiments/2026-10-29-cdp-qbert-25m-r1
 is active from12:43:20 UTC October29/source `5d9d93e`,PID293701/invocation
 `a597cab72ab845b9ba8c3b3468096bc6`. Startup passes273 unchanged pins,357 finite
 initial tensors matching25M/R16 bounded and25M/R8 full,and92 finite supervised
-updates through1832 actions. Progress/100k recovery/postprocessing observers live.
+updates through1832 actions. The100k/6227 recovery audit passes13:04:57 UTC:
+all357 tensors finite;13:08:41 recheck confirms273 unchanged pins,matching
+checkpoint metadata/config and the same main invocation. Recovery observer
+exits successfully;main,progress and postprocessing remain active. No frozen
+competence result yet.
 200k/12,477 updates,100k recovery6227,45min cap;only exposed model size changes
 from12M/R16,supervision/native447fe50/control runner/teacher fixed. Greedy11984.375
 primary,sampled6759.375 secondary;25M/R8 supplies secondary replay comparison
