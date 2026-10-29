@@ -26,6 +26,7 @@ def frozen_run(monkeypatch, tmp_path, request):
     all_timeouts = terminal_timeout = False
     exports = []
     greedy_posterior = False
+    action_temperature = None
 
     class Environment:
         action_space = SimpleNamespace(n=2)
@@ -82,13 +83,20 @@ def frozen_run(monkeypatch, tmp_path, request):
             return instance
 
         posterior_selected = False
+        temperature_selected = None
 
         def use_greedy_posterior_for_evaluation(self):
             assert self.replay_len == 0, 'posterior mode must precede first observation'
             self.posterior_selected = True
 
+        def set_action_temperature_for_evaluation(self, value):
+            assert self.replay_len == 0, 'temperature must precede first observation'
+            assert value == action_temperature
+            self.temperature_selected = value
+
         def begin_episodes(self, ids, frames):
             assert self.posterior_selected == greedy_posterior
+            assert self.temperature_selected == action_temperature
             self.replay_len += len(ids)
 
         def act(self, *, greedy):
@@ -120,10 +128,12 @@ def frozen_run(monkeypatch, tmp_path, request):
     monkeypatch.setattr(kindle, 'VectorAgent', Agent)
 
     def run(target=2, cap=100, interrupted=False, memory=False, export=False,
-            timeouts_forever=False, both_flags=False, posterior=False):
+            timeouts_forever=False, both_flags=False, posterior=False, temperature=None):
         nonlocal interrupt, export_checkpoint, all_timeouts, terminal_timeout, greedy_posterior
+        nonlocal action_temperature
         interrupt = interrupted
         greedy_posterior = posterior
+        action_temperature = temperature
         export_checkpoint = export
         all_timeouts, terminal_timeout = timeouts_forever, both_flags
         output = tmp_path / f'vector-{target}-{cap}.jsonl'
@@ -135,6 +145,8 @@ def frozen_run(monkeypatch, tmp_path, request):
             args += ['--episodes-per-env', str(target)]
         if posterior:
             args += ['--greedy-posterior']
+        if temperature is not None:
+            args += ['--action-temperature', str(temperature)]
         if memory:
             args += ['--min-gpu-budget-headroom-mib', '2048']
         if export:
@@ -146,6 +158,33 @@ def frozen_run(monkeypatch, tmp_path, request):
         return output, [json.loads(line) for line in output.read_text().splitlines()]
 
     return run
+
+
+@pytest.mark.parametrize('temperature', [None, 0.5, 1.0])
+def test_action_temperature_preserves_frozen_audit(frozen_run, temperature):
+    path, rows = frozen_run(temperature=temperature)
+    assert rows[0]['mode'] == 'evaluate_sample'
+    assert rows[0].get('action_temperature') == temperature
+    assert ('action_temperature' in rows[0]) == (temperature is not None)
+    assert audit(path)['updates'] == 0
+
+
+@pytest.mark.parametrize('mutate, message', [
+    (lambda h: h.update(action_temperature=0), 'invalid action temperature'),
+    (lambda h: h.update(action_temperature=True), 'invalid action temperature'),
+    (lambda h: h.update(action_temperature=float('inf')), 'invalid action temperature'),
+    (lambda h: h.update(action_temperature=1e-40), 'invalid action temperature'),
+    (lambda h: h.update(action_temperature=1e40), 'invalid action temperature'),
+    (lambda h: h.update(mode='train'), 'requires sampled frozen restore'),
+    (lambda h: h.update(mode='evaluate_greedy'), 'requires sampled frozen restore'),
+    (lambda h: h.update(restored_checkpoint=None), 'requires sampled frozen restore'),
+])
+def test_action_temperature_audit_rejects_invalid_or_training_use(frozen_run, mutate, message):
+    path, rows = frozen_run(temperature=0.5)
+    mutate(rows[0])
+    path.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+    with pytest.raises(ValueError, match=message):
+        audit(path)
 
 
 @pytest.mark.parametrize('posterior', [False, True])

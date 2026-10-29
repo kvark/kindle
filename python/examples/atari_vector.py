@@ -118,6 +118,8 @@ def main():
     parser.add_argument("--restore", type=Path)
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--greedy", action="store_true")
+    parser.add_argument("--action-temperature", type=float,
+                        help="sampled frozen restore only: positive native action softmax temperature")
     parser.add_argument("--greedy-posterior", action="store_true",
                         help="frozen restore only: use categorical posterior modes independently of action sampling")
     parser.add_argument("--probe-behavior", action="store_true",
@@ -184,6 +186,13 @@ def main():
         parser.error("GPU budget headroom must be positive")
     if args.greedy and not args.evaluate:
         parser.error("greedy actions are only supported for frozen evaluation")
+    if args.action_temperature is not None:
+        if not math.isfinite(args.action_temperature) or not 2**-126 <= args.action_temperature <= float.fromhex('0x1.fffffep+127'):
+            parser.error("action temperature must be a positive normal finite F32 value")
+        if not args.evaluate or not args.restore or args.greedy:
+            parser.error("action temperature requires sampled frozen restore")
+        if not hasattr(kindle.VectorAgent, "set_action_temperature_for_evaluation"):
+            parser.error("native runtime does not support action temperature evaluation")
     if args.greedy_posterior:
         if not args.evaluate or not args.restore:
             parser.error("greedy posterior requires frozen restore")
@@ -448,6 +457,8 @@ def main():
         starting_actions, starting_updates = agent.environment_step, agent.learner_step
         if args.greedy_posterior:
             agent.use_greedy_posterior_for_evaluation()
+        if args.action_temperature is not None:
+            agent.set_action_temperature_for_evaluation(args.action_temperature)
         started = time.perf_counter()
         agent.begin_episodes(ids, initial)
         check_memory("initialized", 0)
@@ -474,6 +485,7 @@ def main():
                   **(dict(learned_rgb_preprocessing=f"single GPU Pillow-equivalent antialiased bilinear resize to {agent.config['observation_kind'][3:]}x{agent.config['observation_kind'][3:]}, per-axis RGB8 rounding; CHW /255-0.5") if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
+                  **(dict(action_temperature=args.action_temperature) if args.action_temperature is not None else {}),
                   **(dict(posterior_mode="greedy") if args.greedy_posterior else {}),
                   **(dict(behavior_probe="live-posterior-v1") if args.probe_behavior else {}),
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,

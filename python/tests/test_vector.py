@@ -17,6 +17,12 @@ import profile_atari_vector
 
 
 @pytest.mark.parametrize("args,message", [
+    (["--action-temperature", ".5"], "requires sampled frozen restore"),
+    (["--evaluate", "--action-temperature", ".5"], "requires sampled frozen restore"),
+    (["--restore", "unused", "--action-temperature", ".5"], "requires sampled frozen restore"),
+    (["--evaluate", "--restore", "unused", "--greedy", "--action-temperature", ".5"], "requires sampled frozen restore"),
+    *[(["--action-temperature", value], "positive normal finite F32")
+      for value in ("0", "-1", "nan", "inf", "1e-40", "1e40")],
     (["--greedy-posterior"], "greedy posterior requires frozen restore"),
     (["--evaluate", "--greedy-posterior"], "greedy posterior requires frozen restore"),
     (["--restore", "unused", "--greedy-posterior"], "greedy posterior requires frozen restore"),
@@ -168,16 +174,20 @@ def test_vector_api_rejects_invalid_config_before_loading_weights():
         kindle.VectorAgent("unused", 4, config, encoder="levjepa-tiny")
 
 
-def test_greedy_posterior_rejects_old_native_before_output(monkeypatch, tmp_path, capsys):
+@pytest.mark.parametrize('option, message', [
+    (['--greedy-posterior'], 'greedy posterior'),
+    (['--action-temperature', '.5'], 'action temperature'),
+])
+def test_evaluation_controls_reject_old_native_before_output(monkeypatch, tmp_path, capsys, option, message):
     monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace())
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("unexpected environment"))
     output = tmp_path / "absent" / "run.jsonl"
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output),
-                                    "--evaluate", "--restore", "unused", "--greedy-posterior"])
+                                    "--evaluate", "--restore", "unused", *option])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
     assert error.value.code == 2
-    assert "native runtime does not support greedy posterior" in capsys.readouterr().err
+    assert "native runtime does not support " + message in capsys.readouterr().err
     assert not output.parent.exists()
 
 

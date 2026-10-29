@@ -74,6 +74,13 @@ def audit(path):
             check(type(header.get("sticky_actions")) in (int, float)
                   and header["sticky_actions"] in (0.0, 0.25), "invalid sticky action probability")
         check(header["mode"] in ("train", "evaluate_sample", "evaluate_greedy"), "unknown action mode")
+        if "action_temperature" in header:
+            temperature = header["action_temperature"]
+            check(type(temperature) in (int, float) and math.isfinite(temperature)
+                  and 2**-126 <= temperature <= float.fromhex('0x1.fffffep+127'),
+                  "invalid action temperature")
+            check(header["mode"] == "evaluate_sample" and header.get("restored_checkpoint") is not None,
+                  "action temperature requires sampled frozen restore")
         posterior_mode = header.get("posterior_mode", "sample")
         check(posterior_mode in ("sample", "greedy"), "unknown posterior mode")
         if posterior_mode == "greedy":

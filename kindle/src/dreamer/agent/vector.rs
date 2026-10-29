@@ -26,6 +26,14 @@ pub(super) struct VectorCore {
     policy: Session,
     diagnostics: Option<Session>,
     posterior_mode: ActionMode,
+    action_temperature: Option<f32>,
+}
+
+fn check_action_temperature(temperature: f32) -> Result<(), &'static str> {
+    if !temperature.is_normal() || temperature <= 0.0 {
+        return Err("action temperature must be a positive normal finite F32 value");
+    }
+    Ok(())
 }
 
 fn check_capacity(config: &DreamerConfig, streams: usize) -> Result<(), &'static str> {
@@ -175,6 +183,7 @@ impl VectorCore {
             policy,
             diagnostics: None,
             posterior_mode: ActionMode::Sample,
+            action_temperature: None,
         }
     }
 
@@ -183,6 +192,18 @@ impl VectorCore {
             return Err("posterior mode must be selected before the first observation");
         }
         self.posterior_mode = ActionMode::Greedy;
+        Ok(())
+    }
+
+    fn set_action_temperature_for_evaluation(
+        &mut self,
+        temperature: f32,
+    ) -> Result<(), &'static str> {
+        check_action_temperature(temperature)?;
+        if self.streams.iter().any(|stream| stream.active) {
+            return Err("action temperature must be selected before the first observation");
+        }
+        self.action_temperature = Some(temperature);
         Ok(())
     }
 
@@ -425,7 +446,13 @@ impl VectorCore {
                 ActionMode::Greedy => 0.0,
             })
             .collect();
-        let selected = self.acting.actions(&self.policy, &draws, mode, mask);
+        let selected = self.acting.actions(
+            &self.policy,
+            &draws,
+            mode,
+            mask,
+            self.action_temperature.unwrap_or(1.0),
+        );
         let mut actions = vec![0.0; self.streams.len()];
         self.learner
             .readback
@@ -450,6 +477,10 @@ impl VectorCore {
     }
 
     pub(super) fn learn(&mut self) -> Option<LearnReport> {
+        assert!(
+            self.action_temperature.is_none(),
+            "action temperature is evaluation only"
+        );
         assert_eq!(
             self.posterior_mode,
             ActionMode::Sample,
@@ -537,6 +568,10 @@ impl VectorCore {
     }
 
     fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
+        assert!(
+            self.action_temperature.is_none(),
+            "action temperature is evaluation only"
+        );
         assert_eq!(
             self.posterior_mode,
             ActionMode::Sample,
@@ -1020,6 +1055,20 @@ impl VectorDreamerAgent {
         self.core.posterior_mode
     }
 
+    /// Set the action softmax temperature before the first observation. This
+    /// disables learning for this instance and leaves checkpoints unchanged.
+    /// Posterior sampling and the number of action RNG draws are unaffected.
+    pub fn set_action_temperature_for_evaluation(
+        &mut self,
+        temperature: f32,
+    ) -> Result<(), &'static str> {
+        self.core.set_action_temperature_for_evaluation(temperature)
+    }
+
+    pub fn action_temperature(&self) -> Option<f32> {
+        self.core.action_temperature
+    }
+
     pub fn act(&mut self, mode: ActionMode) -> Vec<usize> {
         self.core.act(mode)
     }
@@ -1471,6 +1520,239 @@ mod joint_qualification {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn evaluation_temperature_rejects_non_normal_or_nonpositive_values() {
+        for value in [
+            0.0,
+            -0.0,
+            -1.0,
+            f32::NAN,
+            f32::INFINITY,
+            f32::NEG_INFINITY,
+            f32::from_bits(1),
+        ] {
+            assert!(check_action_temperature(value).is_err());
+        }
+        for value in [f32::MIN_POSITIVE, 0.5, 1.0, 2.0, f32::MAX] {
+            assert!(check_action_temperature(value).is_ok());
+        }
+    }
+
+    #[test]
+    #[ignore = "requires GPU; action temperature, masks, RNG and frozen-only guards"]
+    fn action_temperature_matches_probabilities_and_blocks_learning() {
+        let mut config = config();
+        config.actor_unimix = 0.1;
+        assert_eq!(config.action_count, 3);
+        let mut agent = FeatureVectorAgent::new(config.clone(), 2).unwrap();
+        assert_eq!(agent.core.action_temperature, None);
+        for value in [0.0, -1.0, f32::NAN, f32::INFINITY, f32::from_bits(1)] {
+            assert!(
+                agent
+                    .core
+                    .set_action_temperature_for_evaluation(value)
+                    .is_err()
+            );
+            assert_eq!(agent.core.action_temperature, None);
+        }
+        agent
+            .core
+            .set_action_temperature_for_evaluation(1.0)
+            .unwrap();
+        for scheduled in [false, true] {
+            assert!(
+                std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    if scheduled {
+                        agent.core.learn_scheduled(1);
+                    } else {
+                        agent.core.learn();
+                    }
+                }))
+                .is_err()
+            );
+        }
+        agent
+            .core
+            .set_action_temperature_for_evaluation(0.5)
+            .unwrap();
+        agent.core.learner.behavior_train.set_parameter(
+            "behavior.actor.out.weight",
+            &vec![0.0; config.network().units * 3],
+        );
+        agent
+            .core
+            .learner
+            .behavior_train
+            .set_parameter("behavior.actor.out.bias", &[0.0, 0.5, -0.5]);
+        agent.begin_episodes((0..2).map(|id| (id, observation(id, 0))).collect());
+        assert!(
+            agent
+                .core
+                .set_action_temperature_for_evaluation(0.5)
+                .is_err()
+        );
+        agent.core.policy.step();
+        agent.core.policy.wait();
+        agent.core.acting.wait();
+        let mut logits = vec![0.0; 6];
+        agent.core.policy.read_output_by_index(0, &mut logits);
+        for row in logits.chunks(3) {
+            for (&actual, expected) in row.iter().zip([0.0, 0.5, -0.5]) {
+                assert!((actual - expected).abs() < 1e-5);
+            }
+        }
+        let expected =
+            |values: &[f32], draw: f32, temperature: f32, mask: Option<&[bool]>, mode| {
+                let allowed = |i| mask.is_none_or(|m| m[i]);
+                let maximum = values
+                    .iter()
+                    .enumerate()
+                    .filter(|(i, _)| allowed(*i))
+                    .map(|(_, &x)| f64::from(x))
+                    .fold(f64::NEG_INFINITY, f64::max);
+                let weights: Vec<f64> = values
+                    .iter()
+                    .enumerate()
+                    .map(|(i, &x)| {
+                        if allowed(i) {
+                            ((f64::from(x) - maximum) / f64::from(temperature)).exp()
+                        } else {
+                            0.0
+                        }
+                    })
+                    .collect();
+                let normalizer: f64 = weights.iter().sum();
+                let count = (0..values.len()).filter(|&i| allowed(i)).count();
+                let probabilities: Vec<f64> = weights
+                    .iter()
+                    .enumerate()
+                    .map(|(i, &weight)| {
+                        if allowed(i) {
+                            (1.0 - f64::from(config.actor_unimix)) * weight / normalizer
+                                + f64::from(config.actor_unimix) / count as f64
+                        } else {
+                            0.0
+                        }
+                    })
+                    .collect();
+                if mode == ActionMode::Greedy {
+                    let maximum = probabilities
+                        .iter()
+                        .copied()
+                        .fold(f64::NEG_INFINITY, f64::max);
+                    return probabilities.iter().position(|&p| p == maximum).unwrap();
+                }
+                let mut cumulative = 0.0;
+                for (i, p) in probabilities.iter().enumerate() {
+                    cumulative += p;
+                    if f64::from(draw) < cumulative {
+                        return i;
+                    }
+                }
+                unreachable!("normalized categorical draw");
+            };
+        let mask = [true, false, true, true, true, false];
+        for temperature in [f32::MIN_POSITIVE, 0.5, 1.0, 2.0, f32::MAX] {
+            for mode in [ActionMode::Sample, ActionMode::Greedy] {
+                for masked in [false, true] {
+                    for draw in [
+                        0.013, 0.097, 0.173, 0.281, 0.431, 0.589, 0.743, 0.887, 0.983,
+                    ] {
+                        let selected = agent.core.acting.actions(
+                            &agent.core.policy,
+                            &[draw; 2],
+                            mode,
+                            masked.then_some(&mask),
+                            temperature,
+                        );
+                        let mut actions = [0.0; 2];
+                        agent
+                            .core
+                            .learner
+                            .readback
+                            .read_regions(&mut [(selected, &mut actions)]);
+                        for (id, &action) in actions.iter().enumerate() {
+                            let expected = expected(
+                                &logits[id * 3..id * 3 + 3],
+                                draw,
+                                temperature,
+                                masked.then_some(&mask[id * 3..id * 3 + 3]),
+                                mode,
+                            );
+                            assert_eq!(
+                                action, expected as f32,
+                                "temperature={temperature} mask={masked} draw={draw}"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        for round in 0..2 {
+            let mut rngs: Vec<_> = agent
+                .core
+                .streams
+                .iter()
+                .map(|s| s.policy_rng.clone())
+                .collect();
+            let before_posterior: Vec<_> = agent
+                .core
+                .streams
+                .iter()
+                .map(|s| s.posterior_rng.clone().random::<u64>())
+                .collect();
+            let draws: Vec<f32> = rngs.iter_mut().map(|rng| rng.random()).collect();
+            let actions = agent.act(ActionMode::Sample);
+            for id in 0..2 {
+                assert_eq!(
+                    actions[id],
+                    expected(
+                        &logits[id * 3..id * 3 + 3],
+                        draws[id],
+                        0.5,
+                        None,
+                        ActionMode::Sample
+                    )
+                );
+                assert_eq!(
+                    agent.core.streams[id].policy_rng.clone().random::<u64>(),
+                    rngs[id].random::<u64>()
+                );
+                assert_eq!(
+                    agent.core.streams[id].posterior_rng.clone().random::<u64>(),
+                    before_posterior[id]
+                );
+            }
+            agent.observe(
+                (0..2)
+                    .map(|id| {
+                        (
+                            id,
+                            observation(id, 1),
+                            FrameFlags {
+                                is_last: true,
+                                is_terminal: true,
+                                ..Default::default()
+                            },
+                            Reward::default(),
+                        )
+                    })
+                    .collect(),
+            );
+            assert!(
+                agent
+                    .core
+                    .set_action_temperature_for_evaluation(1.0)
+                    .is_err()
+            );
+            if round == 0 {
+                agent.begin_episodes((0..2).map(|id| (id, observation(id, 100))).collect());
+            }
+        }
+        assert_eq!(agent.core.learner.config, config);
+        assert_eq!(agent.learner().learner_step(), 0);
+    }
 
     #[test]
     #[ignore = "requires GPU; posterior argmax, independent RNG and evaluation-only guards"]

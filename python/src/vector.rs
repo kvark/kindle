@@ -106,6 +106,12 @@ impl PyVectorAgent {
             .map_err(PyValueError::new_err)
     }
 
+    fn set_action_temperature_for_evaluation(&mut self, temperature: f32) -> PyResult<()> {
+        self.inner
+            .set_action_temperature_for_evaluation(temperature)
+            .map_err(PyValueError::new_err)
+    }
+
     fn begin_episodes(
         &mut self,
         streams: Vec<usize>,
@@ -221,6 +227,11 @@ impl PyVectorAgent {
     ) -> PyResult<Bound<'py, PyAny>> {
         if self.inner.posterior_mode() == ActionMode::Greedy {
             return Err(PyValueError::new_err("greedy posterior is evaluation only"));
+        }
+        if self.inner.action_temperature().is_some() {
+            return Err(PyValueError::new_err(
+                "action temperature is evaluation only",
+            ));
         }
         reports_to_python(py, &self.inner.learn_scheduled(maximum_updates))
     }

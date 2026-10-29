@@ -4,7 +4,7 @@ struct Params {
     unimix: f32,
     greedy: u32,
     masked: u32,
-    padding0: u32,
+    temperature: f32,
     padding1: u32,
     padding2: u32,
 }
@@ -37,7 +37,11 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     for (var c = 0u; c < params.classes; c++) {
         var p = 0.0f;
         if params.masked == 0u || allowed[base + c] != 0u {
-            p = exp(logits[base + c] - maximum);
+            var shifted = logits[base + c] - maximum;
+            if params.temperature != 1.0f {
+                shifted /= params.temperature;
+            }
+            p = exp(shifted);
         }
         onehot[base + c] = p;
         normalizer += p;
