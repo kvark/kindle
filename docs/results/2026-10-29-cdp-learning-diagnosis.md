@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [qualified fixed-checkpoint gradient diagnostic](2026-10-29-cdp-breakout-gradient-attribution.md)
+shows that imitation already supplies larger raw gradients than CDP to the CNN,
+posterior and recurrent dynamics on both fixed batches. Total–expert alignment
+is.925–.997. This does not support simple CDP dominance on these states; AGC,
+LaProp history, training-state coverage and autonomous transfer remain unresolved.
+All139 pins,357 invariant tensors and production/component agreement pass, with
+zero updates. The original staged-path startup failure remains preserved; the
+corrected Auto diagnostic succeeds23:40:08 UTC. No new learner is selected.
+
 The [completed FIRE-weight4 comparison](2026-10-29-cdp-breakout-fire-weight.md#full-comparison-completes-without-timeouts-but-does-not-improve-score)
 finishes200k actions in22m07s, with all196 pins, full replays, frozen invariance
 and terminal collection passing. Sampled12.375 / greedy17.792 do not improve

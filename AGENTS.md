@@ -18,16 +18,20 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [fixed Breakout gradient diagnostic](docs/experiments/2026-10-29-cdp-breakout-gradient-attribution.md) stops23:33:29 UTC
-October29/source523e67e on a test-only startup assertion: Auto uses a separate
-posterior session, while the test assumed the BF16 staged path. No batch or
-backward pass starts; all119 original pins are verified and the failed service/
-guard are preserved. Corrected test-only Auto graph and hard-posterior inputs
-pass141 CPU tests and strict Clippy. Select a separate guarded180s execution in
-`/x/Temp/kindle-gradient-attribution-20261029/auto-corrected`, reusing the exact
-512 native frames and32 cached preceding states. Require production/component
-agreement and357 invariant tensors. No new learner or policy evaluation;
-check live state before execution. The five-game goal remains unfinished.
+The [completed Breakout gradient diagnostic](docs/results/2026-10-29-cdp-breakout-gradient-attribution.md) finds expert raw gradient
+norms above CDP in encoder, posterior and dynamics on both fixed B16/T16 batches;
+total–expert cosine.925–.997. This does not support CDP swamping imitation on
+these states; actual clipped/LaProp updates and gameplay effects remain unmeasured.
+Corrected Auto execution succeeds23:40:08 UTC October29/sourced3283ba, with2.868s
+measured loop/7.31s native test, zero updates,139 pins,357 invariant tensors and
+exact production-total gradient agreement. Both component sums/resize/host guard
+and terminal collection pass23:41:12. Original523e67e startup assertion/guard
+remain failed: a BF16-staged assumption rejected Auto before either batch;119
+original pins were verified and the corrected run repeats no completed batch.
+All141 CPU tests/Clippy pass; production learner/runtime unchanged. Root
+`/x/Temp/kindle-gradient-attribution-20261029/auto-corrected`. No new learner,
+coefficient change or automatic GPU successor. Both services terminal; check
+live state before work. The five-game goal remains unfinished.
 
 The [completed FIRE-weight4 comparison](docs/results/2026-10-29-cdp-breakout-fire-weight.md#full-comparison-completes-without-timeouts-but-does-not-improve-score) finishes 200k actions /
 799,434 frames / 12,477 updates in 22m07s. Sampled 12.375 / greedy 17.792 do not

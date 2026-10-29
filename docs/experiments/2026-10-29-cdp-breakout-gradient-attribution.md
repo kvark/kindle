@@ -115,3 +115,13 @@ and strict Clippy pass again. Production source and packaged learning runtime
 remain unchanged. Reuse the exact two prepared batches without another replay;
 all numerical, invariance, memory and180-second limits above remain unchanged.
 No new learner, policy evaluation or coefficient change is selected.
+
+## Completed corrected diagnostic
+
+The [qualified result](../results/2026-10-29-cdp-breakout-gradient-attribution.md)
+completes23:40:08 UTC October29, sourced3283ba, with139 pins and357 invariant
+tensors. Both batches have exact production-total gradient agreement and passing
+component-additivity checks. Imitation raw gradients exceed CDP in all three
+representation groups on both batches; this is not a measured optimizer or
+gameplay effect. The original startup failure remains preserved. No new learner,
+coefficient change or automatic GPU successor is selected.
