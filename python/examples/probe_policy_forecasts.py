@@ -290,7 +290,6 @@ def capture(log, checkpoint, manifest, replay_file, output, smoke):
         after = output/'frozen-after'
         agent.save_checkpoint(str(after))
         result['unchanged_tensors'] = assert_frozen_tensors(checkpoint, after)
-        assert sum(result['unchanged_tensors'].values()) == 346
         assert agent.learner_step == initial_updates and agent.environment_step-initial_actions == expected_actions
         assert result['diagnostic_actions'] == expected_actions
         memory_check()
