@@ -108,3 +108,19 @@ All47 bounded pins and357 matching initial tensors verify;100k/12,470 and
 final200k/24,970 accounting pass. No native/environment construction or preparation
 failure occurs. The progress observer uses a private copy with a4500s wait and
 tested positional invocation; recovery starts only after a complete valid header.
+
+## Fresh full learner active
+
+Service `kindle-breakout-expert100-200k-20261029` starts03:26:38 UTC on October29,
+source08d080a,PID235051/invocatione8a6e8c36aa241f294f9b845645e770b. Declaration
+`8b79faf0d9f34a045ae239d56b571f49c6769814eb37a66a3e4655c10b6d06ba` pins69 inputs.
+Startup verifies every pin, exact configuration/fresh0/0 counters,357 initial
+tensors matching control and bounded check, and first updates248/256/264/272/
+280/288. The checked4992-action prefix contains593 finite supervised reports.
+
+Main, progress, recovery and terminal CPU postprocessing services are active.
+Recovery waits for100k/12,470; final remains200k/24,970 followed by the four fixed
+frozen assessments. Keep the25-minute training cap. No observer or GPU stage
+has failed or repeated. No task benefit is measured at startup and no additional
+learner, extension, checkpoint selection or successor is selected. Use this run's
+original `full/collect_full.py` only after all four services finish successfully.

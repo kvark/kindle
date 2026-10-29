@@ -52,16 +52,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Breakout expert100 bounded check passes8192 actions/32,720 frames/994 updates
-in37.011s, then1024 frozen actions/.559s with zero updates/no natural episodes.
-All47 pins,357 matching initial/invariant tensors,finite reports,full replay and
-guards pass; service succeeds03:21:46 UTC on October29. Conservative200k cost
-16m34s passes25min. After full audit, one fresh200k/24,970-update comparison is
-separately selected, with100k recovery and four final/initial sampled/greedy arms.
-Only expert scale10→100 changes;4M64/B8/R16,original rates,native/runner/teacher
-stay fixed. Full CPU preflight passes.272s with no native/environment construction.
-No full learner is active yet; no check experience will be reused. See the
-Breakout expert100 protocol and check live state before GPU work.
+Breakout expert100 fresh200k is active from03:26:38 UTC on October29,
+source08d080a,PID235051/invocatione8a6e8c36aa241f294f9b845645e770b. Only expert
+scale10→100 changes from4M64/Auto/N8/B8/T16/H15/R16/original rates; native,
+runner and teacher stay fixed. Startup passes all69 pins,357 matching initial
+tensors and593 finite reports through4992 actions. Main/progress/recovery/CPU
+postprocessing are active;100k/12,470 recovery and fixed200k/24,970 plus four
+final/initial sampled/greedy assessments remain pending. Training cap25min;
+no extension, retry, cap change or automatic successor. The preceding8192/994
+check took37.011s and passed all47 pins,357 tensors,replay/guards and the16m34s
+conservative cost gate. No observer/GPU failure or repeat. Use the original
+full/collect_full.py at terminal success. See the Breakout expert100 protocol;
+check live state before GPU work.
 
 Qbert12M48/B16/R16/expert1000 completes200k actions/799,697 frames/12,477
 updates in30m31s. Greedy10588.542/24of24 first pyramids and sampled6150/21
