@@ -12,6 +12,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parents[1]/'examples'))
 from probe_breakout_representation import (
     PROTOCOL, TARGETS, advance, fit_readouts, read_features, row_split, sha, validate_corpus,
+    validate_capture_config,
 )
 
 
@@ -64,6 +65,61 @@ def test_lane_split_and_stride_ignore_target_presence():
             row['targets'] = [None]*6
     assert validate_corpus(corpus) == dict(train=16, validation=8, test=8)
     assert row_split(7, 3, 0) is None
+
+
+def centroid_configs():
+    source = dict(observation_kind='rgb64', action_count=18, train_ratio=16)
+    candidate = dict(source, color_centroid_supervision=dict(scale=100.0, channel=0,
+        background_scale=1.5, region=[.05, .42857143, .95, .88095236]))
+    return source, candidate
+
+
+def test_centroid_comparison_requires_explicit_mode_and_preserves_inputs():
+    source, candidate = centroid_configs()
+    originals = copy.deepcopy((source, candidate))
+    validate_capture_config(source, source)
+    with pytest.raises(ValueError, match='configuration differs'):
+        validate_capture_config(source, candidate)
+    validate_capture_config(source, candidate, compare_centroid100=True)
+    assert (source, candidate) == originals
+    with pytest.raises(ValueError, match='unsupervised source'):
+        validate_capture_config(candidate, candidate, compare_centroid100=True)
+
+
+@pytest.mark.parametrize('field,value', [('scale', 10), ('channel', 1),
+    ('background_scale', 1), ('region', [0, 0, 1, 1])])
+def test_centroid_comparison_rejects_changed_target(field, value):
+    source, candidate = centroid_configs()
+    candidate['color_centroid_supervision'][field] = value
+    with pytest.raises(ValueError, match='fixed centroid100'):
+        validate_capture_config(source, candidate, compare_centroid100=True)
+
+
+@pytest.mark.parametrize('field,value', [('train_ratio', 32), ('action_count', 6),
+    ('observation_kind', 'rgb48'), ('unknown_option', True)])
+def test_centroid_comparison_rejects_other_configuration_changes(field, value):
+    source, candidate = centroid_configs()
+    candidate[field] = value
+    with pytest.raises(ValueError, match='configuration differs'):
+        validate_capture_config(source, candidate, compare_centroid100=True)
+
+
+def test_capture_config_check_does_not_import_native_or_emulator():
+    source, candidate = centroid_configs()
+    code = """
+import importlib.abc,json,sys
+class NoNative(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname in ('kindle._native','ale_py','gymnasium'):
+            raise RuntimeError('native/environment import forbidden')
+sys.meta_path.insert(0,NoNative())
+from probe_breakout_representation import validate_capture_config
+validate_capture_config(*json.loads(sys.argv[1]),compare_centroid100=True)
+"""
+    result = subprocess.run([sys.executable, '-c', code, json.dumps([source, candidate])],
+        env={**os.environ, 'PYTHONPATH': os.pathsep.join([str(Path(__file__).parents[1]/'examples'), *sys.path])},
+        capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, result.stderr
 
 
 @pytest.mark.parametrize('field,value', [('split', 'test'), ('step', 7), ('frames', 0),
