@@ -12,6 +12,14 @@ teacher-target x error remains14.848 source pixels on average. The accuracy
 needed for reliable play and the information used by the actual policy are
 still unresolved; this diagnostic does not establish a causal policy bottleneck.
 
+The later [centroid100 checkpoint comparison](2026-10-29-cdp-centroid-representation.md)
+uses this exact corpus and saved control features. Recurrent linear ball x/y
+MAE improves from12.878/10.918 to9.267/8.064 on555 shared rows, while near-paddle
+response-target error improves only14.848→13.486. Both decoder families retain
+substantial position error. This establishes better feature accessibility for
+that checkpoint, with native/runner and training-history confounds; actor use
+and gameplay benefit remain open. The original results below stay unchanged.
+
 ## RGB64 pixels retain much more precise ball position than the linear feature readouts recover
 
 A fixed CPU pixel decoder recovers ball position from the same64×64 geometry

@@ -222,3 +222,15 @@ Separate closure artifacts live in its`closure/`directory.
 - Evidence review:`9a6d44497bc7fbc476e69fb220f0897bcde204075b5c9719d58db0878526bd34`.
 - Descriptive comparison:`cb10634332f62e8567f0c1273a6fa75477d68f3db6f1ad22e897b6a76a97ae9e`.
 - Closure completion:`41ce6517c95c9e70aed1920dd21ed3a450936fd9e578b0b33e8c978fb1294a37`.
+
+## Subsequent held-out feature readouts
+
+The [separate frozen diagnostic](2026-10-29-cdp-centroid-representation.md)
+compares this final checkpoint on the exact saved control trajectories.
+Recurrent linear ball x/y MAE improves12.878/10.918→9.267/8.064 source pixels
+on555 shared rows, while near-paddle response-target MAE improves14.848→13.486.
+Motion readouts also improve, but substantial position error remains and
+nonlinear near-paddle target readouts do not improve. No new training or policy
+evaluation occurs. This tests learned-feature accessibility, not the auxiliary
+head itself or the actor's use of those features. The full learner's protocol
+failure and lack of an established gameplay benefit remain unchanged.

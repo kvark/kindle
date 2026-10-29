@@ -1,5 +1,18 @@
 # Kindle: CDP learning roadmap
 
+The [frozen centroid state readouts](results/2026-10-29-cdp-centroid-representation.md) complete with better recurrent
+ball-position precision: linear x/y MAE 12.878/10.918→9.267/8.064 on 555 shared
+rows, versus pixel .059/.140. Near-paddle target-x improves only 14.848→13.486;
+nonlinear target readouts do not improve there. All 265 pins, 372 invariant
+tensors, exact recorded trajectories and host guards pass. Full capture takes
+32.435s and CPU fitting 3.368s, with zero updates. Service succeeds 21:44:05 UTC
+October 29/source2418ac6; collection passes 21:44:19. The 47 scoped CPU checks
+pass after preserved preflight/legacy-import failures; no GPU stage repeats.
+Root `/x/Temp/kindle-centroid-representation-20261029`. Position accessibility
+improves, but actor use and gameplay benefit remain unmeasured. The full learner
+remains protocol-failed. No new learner or automatic successor is selected;
+all services are terminal. Check live state before any later GPU work.
+
 The [Breakout centroid100 comparison](results/2026-10-29-cdp-color-centroid.md#full-200k-comparison-fails-the-evaluation-protocol) finishes200k actions/799,500 frames/
 12,477 updates in21m45s, but fails its zero-truncation protocol: the final greedy
 arm has one25,000-action timeout. Sampled14.375 versus13.208 and selected-natural
@@ -11,7 +24,7 @@ full replays/videos and five host guards pass. Main fails21:18:18 UTC October29,
 sourceb58d3a2; CPU-only evidence closure finishes21:25:40,collection21:31:01.
 Status`closed_protocol_failed`; no GPU stage repeats or original passing review
 is created. Late raw position loss falls.05547→.00349 across50k windows,while
-expert CE ends.684 versus control.696; held-out position benefit is unmeasured.
+expert CE ends.684 versus control.696; held-out position is assessed above.
 Actual overrides55.413%; guided returns are not unaided competence. Native2974160,
 runner and added656386 parameters differ from447fe50; reused1009/cohort, no
 isolated causal or speedup claim. Root`/x/Temp/kindle-color-centroid-20261029/full`.

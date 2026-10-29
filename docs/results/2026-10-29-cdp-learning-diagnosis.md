@@ -6,10 +6,15 @@ windows. Fresh200k training takes21m45s. Sampled14.375 versus13.208 and selected
 natural greedy20.125 versus17.875 are modest descriptive changes; all0/24 two-wall
 successes. One final-greedy25,000-action timeout fails the declared four-arm
 protocol. Complete CPU closure preserves the failure and all saved evidence,
-without repeating GPU work. Retain the control. Held-out position precision and
-whether the policy uses it remain unmeasured for this checkpoint; falling
-training loss does not settle the control bottleneck. The five-game goal remains
-unfinished, with no retry or automatic successor selected.
+without repeating GPU work. Retain the control. The subsequent
+[frozen state readouts](2026-10-29-cdp-centroid-representation.md) show better
+recurrent linear ball precision,12.878/10.918→9.267/8.064 source pixels on555
+shared test rows, but much smaller response-target gains. Near-paddle linear
+target error falls14.848→13.486; nonlinear target readouts do not improve there.
+The new checkpoint carries more accessible position information, while actor
+use and a gameplay benefit remain unmeasured. Native/runner and learning-history
+confounds remain. The five-game goal is unfinished, with no retry or automatic
+successor selected.
 
 ## More Breakout fitting updates lower imitation error without improving play
 
