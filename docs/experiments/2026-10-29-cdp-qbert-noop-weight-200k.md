@@ -112,3 +112,19 @@ services remain active;the100k recovery observer already succeeded. No GPU
 stage repeats or caps change. A separate read-only status inspection briefly
 encounters an empty newly created greedy log;its failure/correction is recorded
 in`monitor-tail-empty-file.json`,with no worker or pinned observer change.
+
+## Completed comparison retains weight1
+
+All audits and the terminal collector pass. Greedy9756.250/24 pyramids and
+sampled6120.833/22 are below retained11984.375/24 and6759.375/24;own initials
+80.208/177.083 clear none. Both candidate means miss15000. All230 pins,100k
+recovery,357 initial/frozen tensors,paired initial traces,full replays,guards,
+curves,coverage,exposure and comparison pass. Main exits11:18:14 UTC October29,
+postprocessing11:18:33,all four services terminal success. Retain weight1;
+no extension,confirmation,weight sweep or automatic successor is selected.
+
+The separate1.000s CPU phase recount has10 unchanged inputs. On last50k passive
+post-pyramid states,wait agreement95.044%→86.137% and hop55.968%→58.100%;before
+that phase,both fall. These changing training states are descriptive,not causal
+or held-out accuracy evidence. No GPU work or checkpoint changes occur.
+[Completed result and receipts](../results/2026-10-29-cdp-qbert-noop-weight.md).

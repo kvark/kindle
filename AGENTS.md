@@ -805,21 +805,16 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
-A fresh Qbert NOOP-weight.25/200k comparison is active from10:36:00 UTC October29,
-sourcebcaf51a/PID283869,after bounded completion. Retain12M48/B16/R16/expert100/native447fe50;only wait-label weight
-changes.35min training cap,100k recovery,four24-natural-episode sampled/greedy
-final/initial assessments;greedy primary11984.375 and original15k/90% gate.
-CPU command/config/startup/observer checks pass. Use the matching Breakout-era
-runtime and full-root pinned runner. Root`/x/Temp/kindle-qbert-noop-weight-20261029/full`,
-service`kindle-qbert-noop025-200k-20261029`. No extension or automatic successor;
-check live state before work. All230 pins,357 matching initial tensors and125
-finite early reports pass startup. The100k/6227 recovery passes10:51:04 UTC,
-357 finite tensors/6254 finite prefix reports;recovery observer exits success.
-Training completes200k/799,700 frames/12,477 updates in30m12s;four frozen arms
-finish91,104 actions/364,258 frames/54.843s,zero updates,all guards passing.
-GPU stages finish11:07:29 UTC;main PID283869 continues CPU audits with child287674.
-All230 pins match;replay/comparison still pending,no completed gate result.
-See the NOOP-weight200k protocol.
+Qbert NOOP-weight.25 completes200k actions/799,700 frames/12,477 updates in
+30m12s. Greedy9756.250/24 pyramids and sampled6120.833/22 fall18.59%/9.45%
+below retained weight1's11984.375/24 and6759.375/24;own initials80.208/177.083
+clear none. Mean15000 fails. All230 pins,100k recovery,357 initial/frozen tensors,
+paired initial traces,full replays,guards,curves,coverage,exposure and comparison
+pass. Main succeeds11:18:14 UTC October29,postprocessing11:18:33;all services/
+collector succeed. Retain weight1;no extension,confirmation or further sweep.
+A1.000s CPU recount finds later passive wait agreement95.044%→86.137%,hop
+55.968%→58.100%;changing states limit interpretation. Native447fe50 unchanged;
+no GPU allocation active. See the completed NOOP-weight report;check live state.
 
 Qbert NOOP-weight.25 bounded check passes8192 actions/32,754 frames/489 updates
 in70.160s;1024 frozen/.783s,zero updates/no natural episodes. All45 pins,357

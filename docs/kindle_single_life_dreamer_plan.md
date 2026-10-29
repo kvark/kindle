@@ -1,20 +1,18 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Qbert200k NOOP-weight comparison](experiments/2026-10-29-cdp-qbert-noop-weight-200k.md)
-is selected after the completed bounded check. Only wait-label weight1→.25
-changes;retain12M48/B16/R16/expert100/native447fe50 and200k/12,477 updates.
-Greedy primary11984.375/24 and original15000/90% gate stay fixed;four24-episode
-final/initial arms,100k recovery,full replays/guards/comparison and35min training
-cap. All five commands/14 scripts/config/startup/observer CPU checks pass. No
-bounded experience reuse,extension or automatic successor;check live state.
-Launched10:36:00 UTC October29/sourcebcaf51a,PID283869. All230 pins and357
-control/check initial tensors verify;2376 actions/125 finite reports pass startup.
-The100k/6227 recovery passes at10:51:04 UTC with357 finite tensors and6254
-finite prefix reports;observer exits success. All230 pins remain unchanged.
-Training completes200k/799,700 frames/12,477 updates in30m12s;four frozen arms
-complete91,104 actions/364,258 frames/54.843s,zero updates. All guards/230 pins
-pass. GPU stages finish11:07:29 UTC;main PID283869 continues CPU audits with
-child287674. Replay/final comparison pending;no completed gate result yet.
+The [completed Qbert NOOP-weight comparison](results/2026-10-29-cdp-qbert-noop-weight.md)
+finishes200k actions/799,700 frames/12,477 updates in30m12s. Weight1→.25 lowers
+greedy11984.375→9756.250 (−18.59%),both24/24 pyramids,and sampled6759.375→
+6120.833 (−9.45%),24→22 pyramids. Own initials80.208/177.083 clear none;mean15000
+still fails. Retain weight1;no extension,confirmation or further sweep selected.
+All230 pins,100k recovery,357 initial/frozen tensors,paired initial traces,full
+replays,guards,curves,coverage,exposure and comparison pass. Main succeeds11:18:14
+UTC October29,postprocessing11:18:33;all services/collector succeed. Actual
+training guidance43.631%;online aided scores are not competence. A1.000s CPU
+recount finds later passive wait agreement95.044%→86.137%,hop55.968%→58.100%;
+changing states prevent causal attribution. All10 recount pins match. Same native
+447fe50/control runner/teacher;no GPU repeats or new allocation. The separate
+empty-log status-read failure remains recorded. Check live state before work.
 
 The [bounded Qbert NOOP-weight check](results/2026-10-29-cdp-qbert-noop-weight.md)
 passes8192/489 in70.160s and1024 frozen/.783s,zero updates/no natural episodes.
