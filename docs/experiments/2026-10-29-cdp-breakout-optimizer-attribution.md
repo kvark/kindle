@@ -49,3 +49,14 @@ save timing, source, tests and terminal CPU receipts outside Git. No GPU allocat
 or architecture/optimizer change is selected by this protocol.
 
 Evidence root: `/x/Temp/kindle-optimizer-attribution-20261029`.
+
+## Completed CPU estimate
+
+The [result](../results/2026-10-29-cdp-breakout-optimizer-attribution.md) completes
+in4.150s, source46534b7, with191 input pins, both86-parameter batches and12 CPU
+tests passing. Every encoder tensor is clipped on both batches. The estimated
+encoder update is much smaller relative to its weights than recurrent dynamics;
+inherited momentum changes alignment with the current imitation contribution.
+Native optimizer movement and gameplay effects remain unmeasured. Terminal
+review23:53:36 UTC October29; zero GPU work or learner updates. No optimizer
+setting or new learner is selected.

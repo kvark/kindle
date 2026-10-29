@@ -18,14 +18,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [CPU optimizer attribution](docs/experiments/2026-10-29-cdp-breakout-optimizer-attribution.md) is selected to follow the qualified raw
-gradient diagnostic. Use both saved batches and all86 trainable parameters with
-their12477-step moments; calculate existing AGC/LaProp inF64 with configured
-learning rates. Separate fixed-total current components from inherited momentum,
-without applying an update or claiming native parameter movement. Twelve scalar/
-invariance CPU tests pass; no GPU allocation or new learner is selected. Root
-`/x/Temp/kindle-optimizer-attribution-20261029`. Check live state before later GPU
-work; the five-game goal remains unfinished.
+The [completed CPU optimizer attribution](docs/results/2026-10-29-cdp-breakout-optimizer-attribution.md) estimates all12 encoder
+parameter tensors clipped on both fixed batches; encoder update/weight norm
+.00212–.00234% versus recurrent .1449–.1490%. Saved momentum changes total
+alignment: full-update/current-expert cosine .299–.784. These are F64 estimates,
+not native parameter movement or a gameplay effect. Both86-parameter batches,
+191 pins, prior raw matrices and conditional component sums pass in4.150s;
+12 CPU tests and zero native-import attempts. Terminal review23:53:36 UTC
+October29/source46534b7. No updates, GPU work, new learner or optimizer setting.
+Root `/x/Temp/kindle-optimizer-attribution-20261029`; native qualification remains
+unmeasured. Check live state before GPU work; the five-game goal is unfinished.
 
 The [completed Breakout gradient diagnostic](docs/results/2026-10-29-cdp-breakout-gradient-attribution.md) finds expert raw gradient
 norms above CDP in encoder, posterior and dynamics on both fixed B16/T16 batches;

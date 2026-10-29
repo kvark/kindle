@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [CPU optimizer follow-up](2026-10-29-cdp-breakout-optimizer-attribution.md)
+finds that AGC clips every encoder tensor on both saved batches. The F64 estimate
+of update/weight norm is .00212–.00234% for the encoder versus .1449–.1490% for
+recurrent dynamics; saved momentum substantially changes the total direction.
+All191 pins, both complete parameter sets and12 CPU tests pass in4.150s, with
+zero GPU work or learner updates. This makes the optimizer's transformation a
+concrete target for native qualification. It does not establish a beneficial
+learning-rate/clipping change or measured native parameter movement.
+
 The [qualified fixed-checkpoint gradient diagnostic](2026-10-29-cdp-breakout-gradient-attribution.md)
 shows that imitation already supplies larger raw gradients than CDP to the CNN,
 posterior and recurrent dynamics on both fixed batches. Total–expert alignment
