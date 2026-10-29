@@ -39,8 +39,13 @@ but linear decoding does not identify the cause of weak control. All55 pins,
 counter/host checks pass;19 CPU tests and terminal collector pass. Service exits
 09:02:23 UTC October29;no GPU allocation active. Native447fe50 unchanged.
 Evidence `/x/Temp/kindle-breakout-representation-20261029`; see
-`docs/results/2026-10-29-cdp-breakout-representation.md`. Teacher-action readouts
-from saved features are a next diagnostic question,not a selected new learner.
+`docs/results/2026-10-29-cdp-breakout-representation.md`. The CPU teacher-action
+follow-up completes in1.333s with zero GPU work/updates: trained concatenated
+features50.58% overall/49.26% near-paddle agreement trail the recorded policy
+54.58%/53.68%,though better than initial38.60%/41.18%. All34 inputs and55 prior
+pins stay unchanged;26 CPU tests pass. Review09:23:24 UTC October29/source26a9961.
+Evidence `/x/Temp/kindle-breakout-action-readout-20261029`. No simple head/CNN
+skip benefit is established; no new native architecture or learner is selected.
 
 Optional H3 open-loop supervision (`ab80486`,default off) passes135 Rust/611
 packaged Python CPU tests,strict Clippy,two guarded gradient checks and legacy

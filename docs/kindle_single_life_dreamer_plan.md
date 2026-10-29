@@ -44,8 +44,14 @@ remains14.848. Useful information is present,but this does not identify the
 cause of weak control. All55 pins,357 tensors per capture,matched trajectories/
 input hashes,readback/counter/host checks and terminal collector pass;19 CPU
 tests pass. Service exits09:02:23 UTC October29. No native change,new learner
-or active GPU allocation. A next diagnostic question is teacher-action access
-from these saved features,with validation/test separation retained.
+or active GPU allocation. The separately selected CPU teacher-action follow-up
+now completes in1.333s,with zero GPU work/updates. Trained concatenated features
+reach50.58% overall/49.26% near-paddle agreement,below the recorded native
+policy54.58%/53.68%; initial concatenated38.60%/41.18%. All34 inputs and55
+prior capture pins stay unchanged;26 CPU tests pass. Review completes09:23:24
+UTC October29/source26a9961. No simple replacement-head or direct-CNN benefit
+is established; no native change or new learner is selected. See the
+[completed action readouts](results/2026-10-29-cdp-breakout-representation.md#teacher-action-readouts-improve-with-learning-but-trail-the-recorded-policy).
 
 The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
 zero updates. Sampled value estimates beat a constant baseline but underpredict

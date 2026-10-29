@@ -23,8 +23,14 @@ UTC October29. Evidence `/x/Temp/kindle-breakout-representation-20261029`
 contains both captures and954/509/601 examples across separate readout lanes.
 Native447fe50 remains unchanged; no GPU allocation is active. Useful motion/
 position information is present,not proof of a causal policy bottleneck.
-Checking teacher-action access from these saved features is a next question;
-no new learner or automatic successor has been selected.
+The [CPU teacher-action follow-up](results/2026-10-29-cdp-breakout-representation.md#teacher-action-readouts-improve-with-learning-but-trail-the-recorded-policy)
+is also complete:1.333s analysis,zero GPU work/updates. Trained concatenated
+CNN/recurrent features reach50.58% overall/49.26% near-paddle agreement,below
+the recorded policy54.58%/53.68%; initial concatenated38.60%/41.18%.
+All34 inputs and55 prior capture pins stay unchanged;26 CPU tests pass.
+Review completes09:23:24 UTC October29/source26a9961. Evidence is in
+`/x/Temp/kindle-breakout-action-readout-20261029`. No simple replacement-head
+or direct-CNN benefit is established; no new learner or successor is selected.
 
 Optional H3 supervision (`ab80486`,default off) passes135 Rust/611 packaged
 Python CPU tests,strict Clippy,both guarded numerical checks and1024-action

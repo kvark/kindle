@@ -83,9 +83,9 @@ Useful state information is present, but linear accessibility is not the same
 as all available information or accurate closed-loop control. The different
 CNN/recurrent error patterns motivate checking how well teacher actions can be
 read out from these saved features before choosing a native architecture or
-loss change. No such action readout, new learner or automatic successor is
-selected by this completed comparison. Keep the existing learned controls and
-the original five-game gates.
+loss change. The separately selected CPU follow-up below is now complete;
+it gives no evidence for replacing the policy with a simple readout. Keep the
+existing learned controls and the original five-game gates.
 
 The selected learner and trajectories are reused development evidence. A small
 readout trained on separate lanes does not establish broad generalization or
@@ -103,3 +103,64 @@ remain outside Git.
 - Full review: `5e5fe435433ceb7c0f8a2c1b69251a4b30f87d71b5ea264f02ae3f97d2b48446`.
 - Readouts: `d0bad21c9aecddffc106046065795fe12a1914e6e1325f247fdac838a4f09de2`.
 - Completion: `0271834fc89308eebae8d7b454f3caeb5ede9adbcf66e837066d55b7a177f819`.
+
+## Teacher-action readouts improve with learning but trail the recorded policy
+
+The CPU follow-up fits four-action linear classifiers to the saved CNN,
+recurrent, and concatenated features. Trained features improve teacher agreement
+over initial features, but **none beats the recorded native policy** on either
+all601 test rows or the136 near-paddle descending rows. Concatenating CNN and
+recurrent features adds only one correct action overall and two near the paddle
+over recurrent features alone. This supplies no positive evidence that a simple
+replacement head or a direct CNN input would fix control.
+
+| Exact teacher agreement | All test rows | Near-paddle descending |
+| --- | ---: | ---: |
+| Training-majority action (NOOP) |28.79%|34.56%|
+| Initial CNN |36.11%|41.91%|
+| Initial recurrent |38.27%|36.03%|
+| Initial concatenated |38.60%|41.18%|
+| Trained CNN |40.43%|43.38%|
+| Trained recurrent |50.42%|47.79%|
+| Trained concatenated |50.58%|49.26%|
+| Recorded native greedy policy |54.58%|53.68%|
+
+The existing954/509/601 lane split and every-eighth-row selection are unchanged.
+Each of four one-hot targets uses a validation-selected ridge penalty; no class
+weighting, test selection or validation refit occurs. Predictions take the
+largest raw score in fixed canonical order NOOP/FIRE/RIGHT/LEFT; those scores
+are not calibrated probabilities. Labels and original native actions match
+the complete source by lane/episode/step/input hash, including unselected rows.
+
+Class imbalance remains visible. Near the paddle, there are47 NOOP,48 RIGHT,
+41 LEFT andzero FIRE targets. Trained concatenated recall is72.34% NOOP,
+47.92% RIGHT and24.39% LEFT, versus59.57%/58.33%/41.46% for the recorded policy.
+Near-phase macro recall is48.22% versus53.12%; all-row macro recall is57.51%
+versus63.34%. Initial readouts never select a correct LEFT in that near phase.
+Trained concatenated agreement is51.37%/49.63% on the two test lanes, versus
+54.71%/54.41% for the recorded policy. Full class/phase/lane support, confusion
+counts and selected penalties are retained.
+
+The native policy baseline used the original vector categorical draws, while
+these features came from scalar re-observation. This is therefore a descriptive
+comparison on the same recorded inputs/history, not an exact actor-head swap.
+Teacher agreement is neither teacher correctness nor closed-loop competence.
+Linear readout error does not establish that nonlinear information is absent.
+The reused learner/cohort and two test lanes do not establish learner-seed
+reliability. No new native architecture, loss, learner or gameplay follows this
+completed analysis; Breakout's original17.875/zero two-wall result is unchanged.
+
+Analysis takes **1.333s**,1.667s including the wrapper and checks, on one affined
+CPU with one BLAS thread. A native-import guard remains active throughout.
+No emulator, agent, GPU work, learner update or checkpoint write occurs.
+All34 declared inputs and55 preceding capture pins stay unchanged;26 combined
+CPU tests pass, including9 action-readout tests. Source`26a9961`; review completes
+**09:23:24 UTC October29** without retries. No GPU allocation is active.
+
+[Fixed action-readout protocol](../experiments/2026-10-29-cdp-breakout-action-readout.md).
+Evidence: `/x/Temp/kindle-breakout-action-readout-20261029`, including predictions,
+full metrics, command record and the completed review.
+
+- Declaration: `dfbd835829f5e19640bbf3b999add0b883d1adcf64097b50af558fd28d29aeea`.
+- Metrics: `0d411a563900a1e25da656748a80a846dbde90ea8050db8d03cb5e3017d97377`.
+- Review: `f87ce8a2f39a69594855e7f81699dc71bbf6ae2f3240afd9e2486628304b4660`.
