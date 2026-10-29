@@ -1,5 +1,73 @@
 # Qbert retains useful forecasts; later-game accuracy and policy use remain open
 
+## Actual action-block rankings weaken after the first pyramid
+
+The subsequent frozen branch comparison completes128 origins /2432 modeled
+15-step plans while re-observing48256 recorded actions/192980 frames, in95.811s.
+No updates occur. A128-action/19-plan check takes3.360s; full service runs
+06:51:13–06:52:55 UTC on October29 (1m42.029s). All46 pins,357 invariant tensors,
+128 exact recorded-plan matches with the earlier forecasts, eight CPU/native
+pixel-hash trajectories and host guards pass. Native447fe50 remains unchanged.
+
+At each origin, each of18 candidate controls holds one action for four policy
+steps, then follows the recorded continuation through step15. A19th recorded
+plan provides replay/prediction parity. The128 fixed origins contain four
+positions per phase per test episode:64 before/64 after the first pyramid,
+across the same16 reused episodes. They are balanced positions rather than a
+frequency-weighted sample of all visited states. Both emulator futures and
+model latent draws are paired across candidates, with one realization per plan.
+
+| Actual branch comparison | Before first pyramid | After first pyramid | All |
+| --- | ---: | ---: | ---: |
+| Origins with unequal candidate outcomes | 19/64 | 21/64 | 40/128 |
+| Pairwise ranking agreement on unequal outcomes | 72.96% | 57.21% | 64.50% |
+| Mean actual discounted return of model-selected block | 120.687 | 339.478 | 230.082 |
+| Uniform-choice actual return | 102.429 | 337.877 | 220.153 |
+| Best candidate actual return | 144.159 | 344.077 | 244.118 |
+| Model gain over uniform | 18.258 | 1.601 | 9.929 |
+| Lane-bootstrap95% interval for that gain | [.249,37.313] | [−.131,3.443] | [.996,19.692] |
+
+Ties receive fair average-outcome and half-pairwise credit. The88 origins with
+identical actual outcomes do not count as successful discrimination. Overall
+model-selected return230.082 is below the recorded-plan return233.863 and close
+to the scalar actor's preferred held block231.016. These are short open-loop
+plan scores, not the full adaptive policy's return; there is no evidence here
+that deploying this planner would improve the retained greedy score.
+
+This supplies actual counterfactual outcomes for the declared control plans,
+unlike the earlier unrelated-action sensitivity control. It supports useful
+action-conditioned learning, with weaker evidence of useful ranking later in
+play. Later-phase gain over uniform is not resolved above zero, and many
+origins are insensitive to the candidate controls. Fixed continuations, short
+horizon, uncommon held actions, a single model/emulator draw and reused lanes
+limit causal conclusions. This does not establish that an additional world loss
+will improve policy learning.
+
+CPU oracle generation takes26.878s for the full recorded source and154607 extra
+branch emulator frames, including eight reverse-order checks. All128 recorded
+plans reproduce their actual outcomes; the full source trajectory is unchanged.
+The first ALE snapshot prototype failed source replay at stream0/index3879 after
+15 origins. Its serialized bytes matched, but ALE0.12.1 keeps previous sticky
+actions outside `ALEState`. Isolated CPU process copies preserve that memory;
+candidate-order reversal and full replay pass. Original failure/source/log are
+retained; no GPU stage repeats and the pinned emulator runtime is unchanged.
+See the [protocol and upstream source references](../experiments/2026-10-29-cdp-action-ranking.md).
+
+The helper's nine new CPU tests cover ranking ties, ineffective controls,
+invalid scores and reward-independent/reset-safe origin selection; together
+with the24 existing forecast tests, all33 pass. Sourcef3da9ff, evidence root
+`/x/Temp/kindle-action-ranking-20261029`. Declaration SHA256
+`8e08ad1bdc3cd72b1fa5e64de5514496f9b97162cd62826c9a52bcb1f371865f`;
+comparison `b1e1115715dabb9467473d68756feee224b8adfc907d0235d69aa0c487dddfaf`;
+CPU oracle `b44a1cd0523e7c2da1aab8f6dea1cc1784daf1b367b934b5bed477a29372a274`;
+final review `971b7b29bafae8b92a929e148cc1dec9819d13b89bbcebc41f23a9a2cadf68e9`.
+The service is terminal success; no GPU allocation is active.
+
+These three diagnostics motivate a separately selected bounded implementation
+of short open-loop world supervision. That next experiment must establish
+correct gradients and acceptable cost before selecting a full learner; the
+current frozen evidence is not a measured training improvement.
+
 ## Live critic learns useful values but underestimates realized returns
 
 The subsequent four-arm live-state diagnostic completes98664 actions /394520

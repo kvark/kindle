@@ -18,6 +18,17 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+Qbert action-block ranking completes128 origins/2432 forecasts on48256 source
+actions in95.811s,zero updates. Pairwise agreement72.96% before/57.21% after
+the first pyramid; only40/128 origins distinguish candidates. Later gain over
+uniform1.601 has lane interval[−.131,3.443]. All46 pins,357 invariant tensors,
+128 exact prior-forecast matches,pixel trajectories and guards pass; service
+exits06:52:55 UTC October29. The CPU oracle uses process copies to preserve
+sticky-action memory; original snapshot failure is retained, native unchanged.
+Next selected development is optional three-step open-loop world supervision,
+with gradient/cost checks before a full learner. See its protocol and the
+diagnosis report. No GPU allocation is active; check live state before work.
+
 Qbert live-critic calibration completes98664 actions/394520 frames in69.704s,
 zero updates. Sampled value correlation.542/R².184 beats the constant baseline
 but underestimates mean realized1475.689 with1218.534; later-phase correlation

@@ -1,5 +1,19 @@
 # CDP handover — October25,2026
 
+Qbert actual action-block comparison completes128 origins/2432 modeled plans
+on48256 recorded actions/192980 frames in95.811s,zero updates. Ranking agreement
+is72.96% before/57.21% after the first pyramid;40/128 origins are informative.
+Later gain over uniform1.601 has interval[−.131,3.443]. All46 pins,357 invariant
+tensors,128 exact prior-forecast matches,pixel trajectories and guards pass;
+service exits06:52:55 UTC October29. The original CPU snapshot failure is retained;
+process-isolated branches pass complete replay/order checks without changing ALE.
+Evidence `/x/Temp/kindle-action-ranking-20261029`,
+[result](results/2026-10-29-cdp-learning-diagnosis.md).
+Next selected work is the [bounded open-loop supervision implementation](experiments/2026-10-29-cdp-open-loop-supervision.md).
+No full learner or GPU allocation is selected yet; check live state. The separate
+greedy-posterior draft remains uncommitted; exclude it from an experimental
+runtime unless explicitly qualified.
+
 Live Qbert critic calibration completes four frozen arms,98664 actions/394520
 frames in69.704s,zero updates. Sampled predicted mean1218.534 versus realized
 1475.689,correlation.542/R².184,beats the constant baseline; after-first-pyramid

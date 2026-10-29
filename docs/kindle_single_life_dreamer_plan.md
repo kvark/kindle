@@ -4,6 +4,19 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+The actual action-block diagnostic completes128 origins/2432 forecasts while
+re-observing48256 actions in95.811s,zero updates. Ranking agreement72.96% before/
+57.21% after the first pyramid, with40/128 informative origins, supports useful
+but weaker later-game action discrimination. Later gain1.601 over uniform has
+interval[−.131,3.443]. All46 pins,357 invariant tensors,128 exact forecast matches,
+pixel trajectories and guards pass; service exits06:52:55 UTC October29. The
+original CPU snapshot failure is retained; isolated process branches preserve
+sticky-action memory and pass full source replay. See the
+[completed result](results/2026-10-29-cdp-learning-diagnosis.md).
+Next implement and validate [optional three-step open-loop world supervision](experiments/2026-10-29-cdp-open-loop-supervision.md),
+with gradient/cost evidence before selecting a full learner. No GPU allocation
+is active. The five-game goal and its remaining Qbert/Breakout gaps are unchanged.
+
 The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
 zero updates. Sampled value estimates beat a constant baseline but underpredict
 mean return1218.534 versus1475.689;correlation.542/R².184 and later-phase
