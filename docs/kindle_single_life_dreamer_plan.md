@@ -1,5 +1,18 @@
 # Kindle: CDP learning roadmap
 
+The [native-checked actor diagnostic](results/2026-10-29-cdp-centroid-actor.md) finds teacher agreement
+54.08%→55.41% overall and 50.00%→58.82% near the paddle for centroid100.
+FIRE agreement falls 42/44→34/44; 56/136 urgent decisions still disagree.
+Linear/RBF replacement readouts trail the learned actor. Two 128-action checks
+match CPU/native probabilities within 9.45e-7, with exact greedy choices and
+357/372 invariant tensors. All 289 pins, 26 CPU tests, host guards and collection
+pass. Checks take 3.364s/2.624s; CPU analysis 1.630s, zero updates. Service succeeds
+21:56:33 UTC October 29/source7e3b0f1; collection 21:56:51. Root
+`/x/Temp/kindle-centroid-actor-20261029`. This measures action agreement on the
+reused control corpus, not causal feature use, gameplay gain or the timeout's
+cause. The full learner remains protocol-failed. No new learner or automatic
+successor is selected; all services are terminal. Check live state before GPU work.
+
 The [frozen centroid state readouts](results/2026-10-29-cdp-centroid-representation.md) complete with better recurrent
 ball-position precision: linear x/y MAE 12.878/10.918→9.267/8.064 on 555 shared
 rows, versus pixel .059/.140. Near-paddle target-x improves only 14.848→13.486;

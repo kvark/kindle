@@ -125,3 +125,13 @@ predictions, metrics, guards, original failures and `readouts-final.png/svg`.
 - Analysis: `36ca9c74898b99c71ff1eaeb412388285de22116052e159430f2d154d02ee3df`.
 - Review: `0bb4c67c2a49f923b46ca6b098d5e09caf7a901c99c55b04f7909942a41ea556`.
 - Completion: `ba983597512a650909c83453ef98f1b943d462159a4dfd9c71d0057a2d8b7fb4`.
+
+## Subsequent learned-actor comparison
+
+The [separate actor diagnostic](2026-10-29-cdp-centroid-actor.md) evaluates the
+actual head on these saved features after native probability qualification.
+Near-paddle teacher agreement improves50.00%→58.82%, while overall agreement
+changes54.08%→55.41% and FIRE agreement worsens42/44→34/44. Both tested
+replacement-readout families remain below the learned actor. This measures
+policy decisions on the reused control states; it does not identify causal
+feature use or change the full learner's protocol-failed gameplay result.

@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [native-checked actor comparison](2026-10-29-cdp-centroid-actor.md) now
+measures the learned policy on those saved states. Overall teacher agreement
+changes54.08%→55.41%, and near-paddle agreement50.00%→58.82%; simple linear/RBF
+readouts still trail the actor. FIRE agreement worsens42/44→34/44, and56/136
+near-paddle decisions still disagree. This is uneven imitation improvement,
+not a closed-loop or causal result. It does not explain the candidate's timeout,
+which is absent from the reused control corpus. All289 pins, native probability
+checks and frozen tensors pass; no training or full gameplay evaluation repeats.
+
 The subsequent [position-supervision experiment](2026-10-29-cdp-color-centroid.md#full-200k-comparison-fails-the-evaluation-protocol)
 learns its direct target: mean raw loss falls.05547→.00349 across fixed50k-action
 windows. Fresh200k training takes21m45s. Sampled14.375 versus13.208 and selected-
