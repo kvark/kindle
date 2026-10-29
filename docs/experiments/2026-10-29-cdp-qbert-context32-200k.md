@@ -106,3 +106,27 @@ checkpoint metadata
 `5ebc6ef3a8475142fab36836d95d50fe24e1045c8a35ccd3bb3310444fbcd611`.
 The separate `midpoint-review.json` retains the pin/process recheck. Recovery
 and finite values are not task competence; no GPU stage repeats.
+
+## Completed comparison
+
+B8/T32 completes200k actions/799,710 frames/12,469 updates in1908.101s (31m48s),
+4.44% more training time than B16/T16. Primary greedy11609.375/24 first pyramids
+is3.13% below control11984.375/24. Sampled6120.833/20 is9.45% below6759.375/24.
+Own initials80.208 greedy/177.083 sampled clear none and exactly match the
+control's paired semantic traces. Both final means miss15000;sampled also misses
+90% pyramids. RetainB16/T16;no extension,confirmation or automatic successor.
+
+All229 pins,100k/6219 recovery,357 initial/invariant frozen tensors,full training
+and frozen replays/videos,guards,curves,coverage,exposure and comparison pass.
+Four frozen arms total96,608 actions/386,285 frames/58.074s,zero updates.
+Actual overrides85,900 (42.950%);guided online returns are not competence.
+The batch/sequence/backprop/microbatch changes also alter diversity,warmup and
+behavior-target counts;no isolated memory claim or independent seed evidence.
+
+Training ends15:03:38 UTC October29;all GPU stages end15:05:03. Full training
+replay and main service succeed15:15:59,postprocessing15:16:17,collection15:17:05.
+All four services succeed;no stage repeats or fails. The.788s CPU source review
+remains a timing caveat. The plot is inspected. Completion SHA256
+`4dc567bcc744515552b3f7f6438e022da8e38d69a71455ad90777887733d194b`.
+See the [complete result](../results/2026-10-29-cdp-qbert-context32.md). No GPU
+allocation is active at completion;the five-game goal remains unfinished.

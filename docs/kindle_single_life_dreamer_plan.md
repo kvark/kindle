@@ -1,13 +1,17 @@
 # Kindle: CDP learning roadmap
 
-The fresh Qbert B8/T32 comparison remains **active** under its original14:31:43
-UTC October29/source `07ce3dc`, service `kindle-qbert-context32-200k-20261029`,
-PID307065/invocation `7e5b79d7f445434187c3f3221a6117e4`. The100k recovery audit
-passes14:47:50:6,219 updates,357 finite tensors and6,272 finite reports in the
-100,856-action prefix. Read-only recheck14:48:38 verifies all229 pins, metadata
-hash and original process identity. Recovery observer succeeds;training,progress
-and postprocessing continue. Budget200k/12469 updates,45min training cap and
-four frozen arms stay fixed. No frozen task result yet; check actual service state.
+The [completed Qbert B8/T32 comparison](results/2026-10-29-cdp-qbert-context32.md) finishes200k actions/799,710 frames/
+12,469 updates in31m48s,+4.44% training time. Greedy11609.375/24 first pyramids
+falls3.13% below B16/T16's11984.375/24;sampled6120.833/20 falls9.45% below
+6759.375/24. Own initials80.208/177.083 clear none;both miss15000. RetainB16/T16;
+no extension,confirmation or automatic successor. All229 pins,100k recovery,357
+matched initial/invariant frozen tensors,paired initial traces,full replays/videos,
+guards,curves,coverage,exposure and comparison pass. Main succeeds15:15:59 UTC
+October29/source07ce3dc,postprocessing15:16:17,collection15:17:05;all services
+succeed. B16/T16→B8/T32 also changes diversity,warmup and target rows;no isolated
+memory claim. Actual overrides42.950%;online aided returns are not competence.
+The.788s CPU source review remains a timing caveat. No GPU allocation active;
+check live state before work. The five-game goal remains unfinished.
 
 A.788s [exact-runtime source review](results/2026-10-29-cdp-learning-diagnosis.md#reviewed-expert-label-path-has-no-apparent-one-step-offset)
 finds no apparent one-step expert-label offset. Labels stored on arrival t+1
@@ -20,9 +24,9 @@ The [Qbert B8/T32 check](results/2026-10-29-cdp-qbert-context32.md) passes8192
 actions/32,756 frames/481 updates in72.797s;1024 frozen/.788s haszero updates
 and no natural episodes. All41 pins,357 matching initial/invariant frozen tensors,
 full guided replay and guards pass;service succeeds14:28:05 UTC October29,
-collection14:28:28. Conservative200k projection32m35s passes45min. Separately
-select one [fresh200k comparison](experiments/2026-10-29-cdp-qbert-context32-200k.md),
-12M48/Auto/N8/B8/T32/H15/R16/expert100,with100k recovery and four frozen arms.
+collection14:28:28. Conservative200k projection32m35s passes45min. The separately
+selected [fresh200k comparison](experiments/2026-10-29-cdp-qbert-context32-200k.md),
+12M48/Auto/N8/B8/T32/H15/R16/expert100 completes with100k recovery and four frozen arms.
 B16/T16→B8/T32 preserves256 positions/update but changes temporal gradients,
 sequence diversity,warmup and targets;no isolated memory claim. Native447fe50,
 runner,teacher and supervision fixed. No prior experience reused. Check live state.
