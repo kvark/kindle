@@ -48,3 +48,15 @@ Root `/x/Temp/kindle-qbert-context32-20261029/native-check`, trial
 `kindle-qbert-context32-check-20261029`. All preceding Kindle services are terminal
 at selection. The declaration pins a fixed protocol copy and exact executables;
 check live state again before launch. Existing completed lives remain terminal.
+
+## Completed check
+
+The check passes8192 actions/32,756 frames/481 updates in72.797s and1024 frozen
+actions/4096 frames in.788s, zero updates/no natural episodes. All41 pins,357
+matched initial/invariant frozen tensors, finite aligned expert reports, parameter
+changes, complete guided replay and host guards pass. Conservative200k projection
+32m35s passes45min. Service succeeds14:28:05 UTC October29/sourcec1ca09b;
+collection14:28:28. No stage fails or repeats. See the
+[result](../results/2026-10-29-cdp-qbert-context32.md) and separately selected
+[full comparison](2026-10-29-cdp-qbert-context32-200k.md). The short check's
+experience is not reused.

@@ -18,13 +18,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-A separately selected [Qbert B8/T32 check](docs/experiments/2026-10-29-cdp-qbert-context32.md) tests longer temporal gradients
-against retained B16/T16 at256 positions/update andR16. Capacity12M48 and
-supervision/native447fe50 stay fixed. Batch diversity, warmup and behavior-target
-rows also change; no isolated memory effect is claimed. Budget8192 actions/481
-updates plus1024 frozen; conservative200k projection must fit45min before a
-separate full selection. No full learner, extension or sweep is selected.
-Evidence `/x/Temp/kindle-qbert-context32-20261029/native-check`; check live state.
+The [Qbert B8/T32 check](docs/results/2026-10-29-cdp-qbert-context32.md) passes8192
+actions/32,756 frames/481 updates in72.797s;1024 frozen/.788s haszero updates
+and no natural episodes. All41 pins,357 matching initial/invariant frozen tensors,
+full guided replay and guards pass;service succeeds14:28:05 UTC October29,
+collection14:28:28. Conservative200k projection32m35s passes45min. Separately
+select one [fresh200k comparison](docs/experiments/2026-10-29-cdp-qbert-context32-200k.md),
+12M48/Auto/N8/B8/T32/H15/R16/expert100,with100k recovery and four frozen arms.
+B16/T16→B8/T32 preserves256 positions/update but changes temporal gradients,
+sequence diversity,warmup and targets;no isolated memory claim. Native447fe50,
+runner,teacher and supervision fixed. No prior experience reused. Check live state.
 
 Frozen Qbert temperature0.5 scores12389.583/24 first pyramids,3.38% above retained
 greedy11984.375/24;sampled6759.375/24 reproduces exactly. Own initials177.083/0;
