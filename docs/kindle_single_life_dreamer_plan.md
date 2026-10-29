@@ -4,7 +4,10 @@ The fresh [Qbert25M/R8 200k comparison](experiments/2026-10-29-cdp-qbert-25m-r8-
 is active from11:43:00 UTC October29/source `eea4eed`, PID288915/invocation
 `6eab4d2791074af8a3f5217487735324`. Startup verifies all226 pins,357 finite initial
 tensors matching the25M bounded initial,and71 finite supervised updates through
-2640 actions. Progress,100k recovery and postprocessing observers are active.
+2640 actions. The100k recovery audit passes11:56:35 UTC at3114 saved updates,
+357 finite tensors and matching metadata/config/tensor hashes;3207 finite reports
+through102,968 actions. Recovery observer succeeds;the same learner and progress/
+postprocessing observers continue,all226 pins unchanged. Frozen quality is pending.
 Capacity12M→25M and replay16→8 change together:200k/6239 updates,100k recovery3114,
 35min training cap. RGB48/Auto/B16/T16/H15/expert100/all weights1/world gradients/
 all-state labels/native447fe50/control runner/teacher remain fixed. Greedy11984.375
