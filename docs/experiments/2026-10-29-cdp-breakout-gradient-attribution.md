@@ -30,7 +30,7 @@ match every reference value within 1e-6. Do not feed the CPU resize to the model
 Implement instrumentation only in a private Rust test module. Production graph
 construction, learner methods, configuration and packaged runtime remain
 unchanged. Restore the complete checkpoint, including optimizer state. Use the
-production staged posterior and imagination/target computation at the saved
+production separate posterior and imagination/target computation at the saved
 weights. Generate fresh fixed training-posterior/imagination draws in the
 discarded diagnostic runtime, shared by every objective comparison. Supply
 corrective targets with the existing T/(T−1) normalization and masked tail.
@@ -92,3 +92,26 @@ failure remain recorded with the original source. Explicit fixture coefficient1
 and an enumerated loop fix those test-only issues. No GPU diagnostic has run at
 this preparation milestone. Production learner methods and packaged runtime
 are unchanged; only a `cfg(test)` module is added.
+
+## Startup assertion and corrected Auto execution
+
+The first guarded invocation starts23:33:25 and fails23:33:29 UTC October29,
+source523e67e. The test assumes a staged posterior session, but production uses
+that path only for BF16. The restored Auto checkpoint has a separate posterior
+session. The assertion fails immediately after restore, before either selected
+batch, gradient pass or output checkpoint. All119 original pins are verified at
+closure; source weights remain unchanged. Original service and guard remain
+failed, with `failure-closure.json` and the exact source/logs preserved. Its
+failure snapshot reports a journal record limit; that is not a passing guard.
+No host recovery or completed-batch repetition occurs.
+
+Select corrected execution under `auto-corrected/`, with its own declaration
+and service. Use `build_training_graph` and the externally sampled hard posterior
+inputs, as Auto's production `train_world` does. Fill the same initial states,
+observations, action/reset masks, hard samples and late targets for the single
+full B16/T16 pass; invoke `step` with the optimizer disabled. CPU graph checks
+require hard-sample inputs and exclude the staged uniforms. All141 CPU tests
+and strict Clippy pass again. Production source and packaged learning runtime
+remain unchanged. Reuse the exact two prepared batches without another replay;
+all numerical, invariance, memory and180-second limits above remain unchanged.
+No new learner, policy evaluation or coefficient change is selected.

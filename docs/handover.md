@@ -1,15 +1,15 @@
 # CDP handover — October25,2026
 
-The [fixed Breakout gradient diagnostic](experiments/2026-10-29-cdp-breakout-gradient-attribution.md) is selected after the completed
-FIRE-weight comparison shows no score gain. Two B16/T16 batches use512 native
-frames and32 preceding scalar posterior states from the retained control corpus;
-full20,960-action CPU replay verifies all pixels/labels in10.520s with zero native
-imports. All141 Rust CPU tests and strict Clippy pass after preserved fixture/
-loop failures. Test-only instrumentation will compare production and gated raw
-world gradients with the optimizer disabled, requiring357 invariant tensors.
-No new learner or policy evaluation is selected. GPU execution has not started;
-check live state before the guarded180s diagnostic. Root
-`/x/Temp/kindle-gradient-attribution-20261029`. The five-game goal is unfinished.
+The [fixed Breakout gradient diagnostic](experiments/2026-10-29-cdp-breakout-gradient-attribution.md) stops23:33:29 UTC
+October29/source523e67e on a test-only startup assertion: Auto uses a separate
+posterior session, while the test assumed the BF16 staged path. No batch or
+backward pass starts; all119 original pins are verified and the failed service/
+guard are preserved. Corrected test-only Auto graph and hard-posterior inputs
+pass141 CPU tests and strict Clippy. Select a separate guarded180s execution in
+`/x/Temp/kindle-gradient-attribution-20261029/auto-corrected`, reusing the exact
+512 native frames and32 cached preceding states. Require production/component
+agreement and357 invariant tensors. No new learner or policy evaluation;
+check live state before execution. The five-game goal remains unfinished.
 
 The [completed FIRE-weight4 comparison](results/2026-10-29-cdp-breakout-fire-weight.md#full-comparison-completes-without-timeouts-but-does-not-improve-score) finishes 200k actions /
 799,434 frames / 12,477 updates in 22m07s. Sampled 12.375 / greedy 17.792 do not

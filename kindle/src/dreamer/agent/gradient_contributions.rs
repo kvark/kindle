@@ -25,7 +25,11 @@ fn gated_graph(config: &DreamerConfig) -> Graph {
     assert!(config.color_centroid_supervision.is_none() && config.open_loop_supervision.is_none());
     assert!(config.uses_disagreement());
     assert_eq!(config.loss_scales.reconstruction, 0.0);
-    let mut graph = world::build_staged_training_graph(config);
+    assert_eq!(
+        config.training_precision,
+        super::super::config::TrainingPrecision::Auto
+    );
+    let mut graph = world::build_training_graph(config, config.world_backprop_length);
     let outputs = graph.outputs().to_vec();
     let actor_scale = graph
         .nodes()
@@ -177,17 +181,42 @@ fn batch(core: &mut DreamerCore, directory: &Path, index: usize) -> (SequenceBat
     (batch, maximum_error)
 }
 
-fn late_targets(core: &mut DreamerCore, batch: &SequenceBatch, behavior: &BehaviorTrainingBatch) {
-    // Same CPU-target path and normalization as train_world; no optimizer call.
-    assert!(core.targets_gpu.is_none());
+fn world_inputs(
+    core: &mut DreamerCore,
+    batch: &SequenceBatch,
+    posterior: &PosteriorBatch,
+    behavior: &BehaviorTrainingBatch,
+) {
+    // One full Auto-precision pass of train_world's inputs; no optimizer call.
+    assert!(core.world_posterior.is_some() && core.targets_gpu.is_none());
     let config = &core.config;
     let rows = config.batch_size;
     let bins = config.value_bins;
+    assert_eq!(config.world_microbatch_size(), rows);
+    assert_eq!(config.world_backprop_length, config.batch_length);
+    assert!(batch.pixels.is_none());
+    core.world_train.set_grad_accumulate(1);
+    core.world_train
+        .set_input("initial_deter", &batch.initial_deter);
+    core.world_train
+        .set_input("initial_stoch", &batch.initial_stoch);
     core.world_train.set_input(
         "actor_update_scale",
         &[config.actor_update_scale(core.learner_step)],
     );
     for time in 0..config.batch_length {
+        let (keep_deter, keep_stoch, keep_action) = keep_masks(batch, time, config);
+        for (name, values) in [
+            ("observation", &batch.observations[time]),
+            ("previous_action", &batch.previous_actions[time]),
+            ("keep_deter", &keep_deter),
+            ("keep_stoch", &keep_stoch),
+            ("keep_action", &keep_action),
+            ("posterior_sample", &posterior.stoch[time]),
+        ] {
+            core.world_train
+                .set_input(&format!("{name}_{time}"), values);
+        }
         let mut rewards = vec![0.0; rows * bins];
         for row in 0..rows {
             core.bins.encode(
@@ -392,7 +421,11 @@ fn diagnostic_gates_preserve_original_graph_prefix() {
         action_weights: vec![1.0; 18],
         world_gradient: true,
     });
-    let original = world::build_staged_training_graph(&config);
+    let original = world::build_training_graph(&config, config.world_backprop_length);
+    assert!(original.nodes().iter().any(|node| matches!(&node.op,
+        Op::Input { name } if name == "posterior_sample_0")));
+    assert!(!original.nodes().iter().any(|node| matches!(&node.op,
+        Op::Input { name } if name == "uniforms_0")));
     let probe = gated_graph(&config);
     assert_eq!(
         format!("{:?}", original.nodes()),
@@ -440,10 +473,10 @@ fn recorded_world_gradient_contributions() {
         (16, 16, 16)
     );
     assert_eq!(core.config.observation_kind, crate::ObservationKind::Rgb64);
-    assert!(core.world_posterior.is_none() && core.targets_gpu.is_none());
+    assert!(core.world_posterior.is_some() && core.targets_gpu.is_none());
     let counters = (core.learner_step, core.environment_step);
     let config = world_training_config(&core.config);
-    let production_graph = world::build_staged_training_graph(&config);
+    let production_graph = world::build_training_graph(&config, config.world_backprop_length);
     let graph = gated_graph(&config);
     let mut probe = super::super::runtime::build_training_session(&graph, &core.gpu, &config);
     let names = probe
@@ -477,7 +510,7 @@ fn recorded_world_gradient_contributions() {
         (targets.expert_action_target, targets.expert_labeled_rows) =
             batch.expert_targets(&core.config);
         assert_eq!(targets.expert_labeled_rows, 240);
-        late_targets(&mut core, &batch, &targets);
+        world_inputs(&mut core, &batch, &posterior, &targets);
         let mut captured_inputs = BTreeMap::new();
         for node in production_graph.nodes() {
             let Op::Input { name } = &node.op else {
@@ -501,7 +534,7 @@ fn recorded_world_gradient_contributions() {
                 .map(|(name, values)| (name, values.len()))
                 .collect::<Vec<_>>(),
         );
-        core.world_train.finish_prepared_step();
+        core.world_train.step();
         core.world_train.wait();
         let production_loss = core.world_train.read_loss();
         assert!(production_loss.is_finite());
