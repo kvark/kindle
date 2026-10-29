@@ -1,4 +1,21 @@
-# Qbert retains useful forecasts; later-game accuracy and policy use remain open
+# Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
+
+## More Breakout fitting updates lower imitation error without improving play
+
+The [completed H5/R32 comparison](2026-10-29-cdp-breakout-h5-r32.md) doubles
+world/expert updates to24,954 while reducing total scheduled imagined
+transitions by one third. Its final50k-action mask-corrected expert CE falls
+.696→.391,or43.80%,but sampled13.125/greedy14.333 do not improve the retained
+H15/R16 control13.208/17.875. All0/24 two-wall successes;training takes33m30s
+versus22m19s,50.12% more time. All audits pass,including357 matched initial
+tensors and identical actual-initial semantic traces. Retain the cheaper control.
+
+This separates improved fitting on each learner's sampled replay from improved
+frozen control. It does not isolate the cause: horizon,cadence,sampling,warmup,
+total work and encountered trajectories differ. Together with the pixel
+precision and readout findings below,it leaves precise state use,training-state
+coverage and objective effects unresolved. It supplies no evidence for an
+unchanged training extension or a chosen architecture/loss replacement.
 
 ## H5/R32 reaches the Qbert gate on one of two learners
 
@@ -77,6 +94,25 @@ so the fixed four-arm protocol fails; no paired modal gain is accepted. All
 exports remain finite/invariant and saved trajectories replay. This supplies
 no demonstrated fix for the control gap and does not isolate sampling noise
 as its cause. Retain sampled states; no training or automatic successor follows.
+
+## RGB64 preserves precise ball positions on the reused Breakout cohort
+
+The [fixed pixel diagnostic](2026-10-29-cdp-breakout-representation.md#rgb64-pixels-retain-much-more-precise-ball-position-than-the-linear-feature-readouts-recover)
+uses the same resized geometry and teacher targets as the saved-feature readouts.
+On555 shared test rows,ball x/y errors are.059/.140 source pixels,versus
+CNN13.387/13.861 and recurrent12.878/10.918. The pixel rule misses two of557
+reference balls and produces four extra detections;these failures remain in the
+report. Its explicit color/crop priors make this a diagnostic of available pixel
+precision,not a learned policy or proof of information lost in the features.
+Only position is tested. Resize alone is a weak explanation for the much larger
+linear readout errors;the cause of weak closed-loop control remains unresolved.
+
+The complete20,960-action/83,799-frame CPU replay takes9.701s,with.161s for the
+exact common-row comparison. All18 diagnostic and169 active H5/R32 inputs stay
+unchanged,as does the original learner PID/invocation. No native module,agent,
+GPU work or update occurs. Both low-priority CPU operations co-host with that
+learner;no training-time correction is made. No architecture,loss or additional
+learner is selected from this reused development cohort.
 
 ## Breakout action readouts do not outperform its retained policy
 

@@ -1,19 +1,29 @@
 # Kindle: CDP learning roadmap
 
-The fresh [Breakout H5/R32 comparison](results/2026-10-29-cdp-breakout-h5-r32.md) is active from19:29:30 UTC October29/source`86eb300`:200k actions/24,954
-updates,12M64/Auto/N8/B16/T16/H5/R32/expert100,45-minute training cap.
-The preceding8192-action/978-update check takes69.748s;all41 pins,357 matched
-initial/invariant frozen tensors,full guided replay and guards pass,with31m13s
-conservative200k projection. Full startup passes169 pins,357 matching initial
-tensors and exact first-six update cadence;PID330763/invocation
-`547224e0548644b089a790683a6c7c78`. The100k/12,454 recovery passes19:46:35 with357
-finite tensors; its observer succeeds while training continues. Progress,
-postprocessing and collection remain active. No frozen competence is measured
-yet. H15/R16→H5/R32 changes horizon,
-cadence,sampling,warmup and total work together;no isolated causal claim.
-Native447fe50,runner and teacher unchanged;no prior experience is reused.
-Root`/x/Temp/kindle-breakout-h5-r32-20261029/full`. Check live state before
-GPU work;do not restart this learner or the preceding failed posterior assessment.
+The [completed Breakout H5/R32 comparison](results/2026-10-29-cdp-breakout-h5-r32.md) finishes200k actions /799,475 frames /24,954 updates in33m30s,
+50.12% more training time than H15/R16. Sampled13.125/greedy14.333 do not improve
+control13.208/17.875; all0/24 two-wall successes. Final50k-action expert CE
+falls.696→.391 without a frozen gameplay gain. All169 pins,100k/12,454 recovery,
+357 matched initial/invariant frozen tensors,paired initial semantic traces,
+full replays/videos,guards,curves,exposure and comparison pass. Source86eb300;
+main/post/collection succeed20:05:58/20:06:03/20:06:35 UTC October29. Actual
+overrides54.8335%;online guided returns are not unaided competence. H15→5/R16→32
+changes horizon,cadence,sampling,warmup and total work together on reused1009;
+no isolated cause or reliability claim. Retain H15/R16;no extension,confirmation
+or automatic successor. Native447fe50,runner and teacher remain unchanged.
+Root`/x/Temp/kindle-breakout-h5-r32-20261029/full`. CPU co-hosting caveats remain.
+All services are terminal;no GPU allocation is active. Check live state before
+GPU work;do not restart this learner or the failed posterior assessment.
+
+The [fixed RGB64 pixel diagnostic](results/2026-10-29-cdp-breakout-representation.md#rgb64-pixels-retain-much-more-precise-ball-position-than-the-linear-feature-readouts-recover)
+finds ball x/y MAE.059/.140 source pixels on555 shared test rows,versus learned
+CNN13.387/13.861 and recurrent12.878/10.918. Two reference balls are missed and
+four extra detections remain recorded. Color/crop priors and reused teacher
+labels limit this to available pixel precision,not causal proof of feature
+information loss or a selected architecture/loss change. Complete20,960-action/
+83,799-frame CPU replay and paired rows pass;all18 diagnostic/169 active inputs
+and original process identity remain unchanged.9.701s+.161s CPU co-hosting is
+retained without time correction;no GPU work or learning occurs.
 
 The [Breakout modal-posterior assessment](results/2026-10-29-cdp-greedy-posterior.md#breakout-trained-score-rises-slightly-the-paired-assessment-fails-its-protocol) is terminal and protocol-failed: trained sampled/modal means17.875/18.833 both
 have0/24 two-wall successes, while the actual-initial modal arm records five

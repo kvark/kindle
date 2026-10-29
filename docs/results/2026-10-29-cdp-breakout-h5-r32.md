@@ -1,54 +1,114 @@
-# Breakout H5/R32: bounded check passes; fresh full comparison is active
+# Breakout H5/R32 fits teacher labels better but does not improve frozen play
 
-## Fresh200k learner is active
+The fresh comparison completes **200,000 actions / 799,475 emulator frames /
+24,954 updates in 33m30s**. Doubling world/expert updates while shortening
+imagination lowers late training imitation error, but neither frozen action
+mode improves the retained H15/R16 control. Training takes **50.12% longer**.
+Retain H15/R16; no extension, second learner or automatic successor is selected.
 
-The100k recovery audit passes **19:46:35 UTC**: exactly12,454 updates and357
-finite tensors. It also validates12,738 finite reports in the complete102,280-
-action prefix while training continues on the original PID/invocation. The
-recovery observer exits successfully; progress,postprocessing and terminal
-collection remain active. No frozen gameplay outcome is available yet.
-Recovery review SHA256:
-`9a0bb5d25fe2d9f4855f00ffcbdb35b7f9d25ed3435d55e4d398149f1305fc06`.
+| Fixed final-policy evaluation | H15/R16 control | H5/R32 candidate | Actual initial, both |
+| --- | ---: | ---: | ---: |
+| Sampled mean, primary |13.208|13.125|1.417|
+| Greedy mean |17.875|14.333|2.208|
+| Two-wall successes, either mode |0/24|0/24|0/24|
+| Training updates |12,477|24,954|—|
+| Training time |22m19s|33m30s|—|
 
-The full comparison starts **19:29:30 UTC October29/source86eb300** under
-`kindle-breakout-h5-r32-200k-20261029`,PID330763/invocation
-`547224e0548644b089a790683a6c7c78`. Its200k-action/24,954-update target has a
-45-minute training cap,100k/12,454 recovery,and fixed final/actual-initial
-sampled and greedy evaluations. No full-run task outcome is available yet.
+Each frozen arm uses the first three natural episodes per eight lanes, with
+zero guidance, labels, updates or truncations. Excess episodes and partial tails
+remain recorded. Both candidate modes improve their actual initial controls,
+but all miss the original 90%-two-wall gate. The four candidate evaluation arms
+total 42,536 actions / 169,983 frames / 27.852s, separate from training time.
 
-Startup passes19:29:59 with169 declared pins unchanged,357 finite initial
-tensors matching the bounded check,and first updates at376,384,392,400,408,416
-actions. All369 reports in the completed3,328-action prefix are finite and
-supervised. These are execution checks, not evidence of gameplay improvement.
-Progress,recovery and postprocessing observers run independently and cannot
-restart the learner. No prior weights or check experience are reused.
+## Better replay-label fitting does not yield better task performance
 
-The full CPU preflight validates five actual commands,16 config cases,all14
-scripts,44 paths and observer/recovery boundaries. A separate check with the
-plotting interpreter reads the actual comparator/control and matches357 initial
-tensors with ALE/native imports forbidden. Native447fe50,runner and teacher
-remain unchanged. Full declaration SHA256:
-`7865cc633e3a36102896a71bb384ea469fa7d0eeb7247f209742470d0b32958f`.
-Evidence: `/x/Temp/kindle-breakout-h5-r32-20261029/full`, trial
-`breakout-12m-64-b16-h5-r32-expert100-200k-seed1009`.
-Check live state before GPU work; do not restart this selected life.
+Mask-corrected expert cross-entropy over the fixed action windows is:
 
-Terminal collection is also automated from19:35:03 UTC, under
-`kindle-breakout-h5-r32-collection-20261029`. Its separate9-pin declaration
-reuses the exact previously checked service-identity implementation and verifies
-all four original service identities plus169 active-learning pins. It waits for
-successful terminal training/recovery/progress/postprocessing, then invokes the
-declared collector once; an existing valid completion is reused. Failed services
-or an observation timeout do not restart or stop the learner. Unloaded successful
-services are checked against their original journal invocation IDs. Evidence:
-`/x/Temp/kindle-breakout-h5-r32-20261029/terminal-collection`, declaration
+| Training actions | H15/R16 | H5/R32 |
+| --- | ---: | ---: |
+| 0–50k |1.364|1.005|
+| 50–100k |.884|.513|
+| 100–150k |.777|.447|
+| 150–200k |.696|.391|
+
+Final-window error falls **43.80%**, and geometric-mean teacher-action
+probability rises .499→.676. This is error on sampled training replay, not
+held-out accuracy or greedy agreement. The lives encounter different states
+and replay samples. H15→5/R16→32 changes horizon, cadence, sampling, action-clock
+warmup and total work together; it does not isolate a causal mechanism.
+The result does not establish that more optimization can never help, or that
+representation precision alone causes the poor policy transfer.
+
+Actual guidance overrides 109,667 actions (**54.8335%**), despite a 20% episode
+selection probability; the remaining 90,333 actions receive passive corrective
+labels. There are 24,954 supervised reports and 5,977,882 valid replay labels,
+which include repeated samples. Maximum raw world/actor expert-loss difference
+is 8e-7. Completed guided/unguided online means are 195.838/6.155 across 68/251
+episodes. These use changing parameters, and guided returns include teacher
+actions; neither substitutes for unaided frozen competence.
+
+## Execution, audits and retained evidence
+
+All **169 declared pins**, numeric/config/source/counter checks, exact update
+cadence, changed CNN/reward/actor/value weights, **357 matching initial tensors**
+and **357 invariant frozen tensors per arm** pass. Both actual-initial semantic
+traces reproduce the retained control: 800 sampled and 795 greedy events.
+Complete guided training input-pixel/action/label replay, frozen outcome/action/
+frame/reset replays and videos, host guards, curves, exposure and comparison
+pass. Ordinary frozen logs have no live pixel hashes; their replay does not
+compare unavailable original images. Both saved plots are visually checked.
+
+The 100k/12,454 recovery passes at **19:46:35 UTC** with 357 finite tensors and
+12,738 finite reports through the complete 102,280-action prefix. Training
+continues on the original process. Startup at 19:29:59 had already verified
+357 bounded-matching initial tensors and the first updates at 376, 384, 392,
+400, 408 and 416 actions. CPU preparation exercises five actual CLI validation
+paths, 14 scripts, 44 paths and config/observer/recovery boundaries. A separate
+plot-interpreter preflight reads the real comparator/control with ALE/native
+imports forbidden, avoiding the previous RGB plotting dependency failure.
+
+Source **86eb300**, service `kindle-breakout-h5-r32-200k-20261029`, starts
+**19:29:30 UTC October29**, PID330763/invocation
+`547224e0548644b089a790683a6c7c78`. Training ends 20:03:04; main succeeds
+**20:05:58**, postprocessing **20:06:03**, progress **20:06:16** and automated
+terminal collection **20:06:35**. Main service time is 36m27.782s including
+setup, evaluation and audits. All services are terminal and successful; no GPU
+stage repeats, host recovery or failed attempt occurs in this comparison.
+
+The separate 9-pin terminal collector verifies the original four service
+identities, using journal invocation IDs after successful unload, and invokes
+the declared collector once. Its declaration is
 `f4c53e67b2475d163538836a476e08aa309de4a176df0dfc12e483b91f9aec1f`.
+Do not rerun completed collectors or restart this life. No GPU allocation is
+active at completion; the five-game goal remains unfinished.
 
-A separate.736s CPU summary at19:39:29 reconciles completed controls' recorded
-stage/update timings; it does not read the active trajectory or change its
-selection. All169 inputs and the original PID/invocation remain unchanged.
-Retain this co-hosting caveat without a training wall-time correction. See the
-[cost diagnosis](2026-10-29-cdp-learning-diagnosis.md#recorded-learning-work-dominates-breakouts-training-cost).
+Native447fe50/SHA35ad0db, runner, teacher, 12M64/Auto/N8/B16/T16, full18,
+actor-unimix .01, original rates and expert100/world gradients are unchanged.
+Both lives start fresh with no reused weights, replay, belief, games, RNG or
+bounded-check experience. Seed1009/evaluation4000001009 are reused development
+inputs, so this is not independent learner confirmation. Scheduled imagined
+transitions fall by one third while world/expert updates double. This is not
+an equal-wall-time comparison or an isolated horizon/optimization test.
+
+Two completed-control CPU diagnostics co-host on one low-priority CPU core:
+.736s for the [timing summary](2026-10-29-cdp-learning-diagnosis.md#recorded-learning-work-dominates-breakouts-training-cost),
+and 9.701s plus .161s for the [pixel precision and paired comparison](2026-10-29-cdp-breakout-representation.md#rgb64-pixels-retain-much-more-precise-ball-position-than-the-linear-feature-readouts-recover).
+Neither reads the active trajectory to select its analysis; all169 inputs and
+the original PID/invocation remain unchanged. Neither performs GPU work or
+learning. Retain the co-hosting caveat without correcting training wall time.
+
+[Fixed full protocol](../experiments/2026-10-29-cdp-breakout-h5-r32-200k.md).
+Evidence: `/x/Temp/kindle-breakout-h5-r32-20261029/full`, trial
+`breakout-12m-64-b16-h5-r32-expert100-200k-seed1009`. Logs, weights, videos and
+plots remain outside Git.
+
+- Declaration: `7865cc633e3a36102896a71bb384ea469fa7d0eeb7247f209742470d0b32958f`.
+- Learning review: `0916670b081c21a78ba2a3024539c1515b76889cf14b900cea0d05bbe21d1207`.
+- Recovery: `9a0bb5d25fe2d9f4855f00ffcbdb35b7f9d25ed3435d55e4d398149f1305fc06`.
+- Comparison: `aa849d8b67385a9b52aa56553fbc4067affeb20706b3f0341d162d05e3661421`.
+- Exposure: `b23dfb36aa19dfc5c070b1fd3058715a262915793360bfc734363a0d77578935`.
+- Postprocessing: `f91beb8b8170299ba5736a80d7897bf319f69f8352e5faa1ff3b3822d4693c71`.
+- Completion: `fd9c230d1f7fb636dca87a77c30fe6f4854489b0db8f107d342b3780cd334b73`.
 
 ## Bounded execution and early cost
 

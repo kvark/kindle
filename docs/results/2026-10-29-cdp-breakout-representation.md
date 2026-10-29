@@ -12,7 +12,61 @@ teacher-target x error remains14.848 source pixels on average. The accuracy
 needed for reliable play and the information used by the actual policy are
 still unresolved; this diagnostic does not establish a causal policy bottleneck.
 
-## Fixed test results
+## RGB64 pixels retain much more precise ball position than the linear feature readouts recover
+
+A fixed CPU pixel decoder recovers ball position from the same64×64 geometry
+with much smaller errors than the learned-feature linear readouts. On identical
+test rows and teacher targets, mean absolute errors in source-image pixels are:
+
+| Target | Shared rows | Fixed RGB64 pixel decoder | Trained CNN linear readout | Trained recurrent linear readout |
+| --- | ---: | ---: | ---: | ---: |
+| Ball x |555|.059|13.387|12.878|
+| Ball y |555|.140|13.861|10.918|
+| Paddle x |601|2.843|4.334|9.643|
+
+The test cohort contains557 reference ball detections. The fixed decoder misses
+two and produces four extra detections among the44 reference-negative rows;
+neither failure is hidden by the555-row error comparison. It finds every
+reference paddle with no extra paddle detection. On all136 near-paddle
+descending rows, ball x/y errors are.075/.137 with no misses, compared with
+CNN12.167/13.727 and recurrent12.352/11.590. Paddle error is2.811 versus
+CNN4.398/recurrent9.097. Full per-lane metrics, tails and every prediction remain.
+
+The decoder applies one RGB bilinear resize, then uses positive red excess
+`max(R−1.5*max(G,B),0)` within the teacher's fixed source-coordinate crops.
+Ball position is its intensity centroid; paddle position is the centroid in
+the maximum-mass paddle row. There is no fitting, threshold search or retuning.
+The160×210→64 Pillow RGB output matches the native source's exact byte fixture;
+three known-position synthetic frames and an empty frame pass before replay.
+No new GPU resize-equivalence run occurs, and production preprocessing is unchanged.
+
+This shows that the resize preserves accurate position information on most of
+this reused bottom-screen cohort when supplied with explicit color/crop priors.
+It makes resizing alone an inadequate explanation for the measured linear
+readout error. It does **not** prove that this information is absent from the
+CNN/RSSM, identify a causal policy bottleneck, measure motion decoding, or show
+that supplying these positions would improve play. The references are the
+existing native-pixel teacher's detections, not independent physical truth.
+No decoder is inserted into the agent and no architecture/loss change is selected.
+
+The complete20,960-action/83,799-frame CPU replay verifies every recorded native
+input hash,outcome,frame counter and reset before computing2064 selected rows
+with the original954/509/601 lane split. All18 diagnostic inputs and169 active
+H5/R32 training pins remain unchanged, with the original PID/invocation before
+and after. No agent,native extension,GPU work or learner update occurs.
+The replay/readout takes9.701s; exact common-row comparison adds.161s. Both use
+one low-priority CPU core while H5/R32 trains; retain the co-hosting caveat
+without subtracting this time. No active trajectory selects the diagnostic.
+
+Evidence: `/x/Temp/kindle-breakout-pixel-precision-20261029`, including the
+fixed protocol,script,pre-data declaration,all predictions and paired metrics.
+
+- Pixel review: `ee9dd7ba2697277be4a970eddc8e9551c8985fbb526950a8b33547a4dde5fb97`.
+- Common-row comparison: `78d322c49cef14be44e2a965f867f280731f2b9db011ad498f6ca85b9b5d7981`.
+- Declaration: `6c848c38a86a3e269e40164f8c773212abbf89e391623683b889cf31dde420cb`.
+- Completion: `54a19207880619655f5052e7c97d0ee8f69f69e37994eeb44e7bcab3d0b6e54b`.
+
+## Fixed learned-feature test results
 
 Both checkpoints consume the same recorded inputs/actions. Separate environment
 lanes provide954 training,509 validation and601 test examples. Every eighth
