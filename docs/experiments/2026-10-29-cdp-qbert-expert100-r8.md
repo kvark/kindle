@@ -184,3 +184,13 @@ recovery review`c8776df78091ddcc80e930c5490940fe18f8ea0a314242e270a2b8e7e4442295
 587396941e1c4312b91578919b1650c9 continues beyond105,784 actions. Recovery still
 waits for200k/6239 and300k/9364. No frozen result,checkpoint selection,cap change
 or GPU repeat. This is checkpoint/numerical evidence,not task competence.
+
+
+## Halfway recovery passes
+
+At01:33:22 UTC,the200k recovery verifies6239 saved updates and357 finite tensors.
+Its complete log prefix contains6318 finite reports through202,536 actions;
+credit remains.25. Checkpoint digest`dafc32b3db05e95d544a5de1933ca160bd0096ed08bcbf5acf20536480fd26e3`;
+review`61dc0c31b77a684a083b2de57344aef15d9fb07f7287fdc9275b06ff7a46692d`. Main PID223970/invocation587396941e1c4312b91578919b1650c9 remains
+active;300k/9364 recovery and fixed400k/12,489 final assessments are pending.
+No GPU restart,cap change,interim evaluation or checkpoint selection occurs.
