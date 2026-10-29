@@ -281,3 +281,57 @@ Evidence: `/x/Temp/kindle-breakout-kernel-readout-20261029`.
 - Declaration: `3873740cec5d3ae557fc9b7ee0844219d8b8e792f5190ad3cb77690420e7d91f`.
 - Metrics: `751e475d521ce37c2703c461c19c913537645767d5dc5cff8ced249260d67727`.
 - Review: `921af557afaedcc59724760aca317a22c29983d421165d1bcb852eb87f867d7c`.
+
+## Nonlinear state readouts still leave substantial position error
+
+The fixed RBF regression improves some motion and combined-feature readouts,
+but does not recover the precise ball positions available to the pixel rule.
+All six initial/trained fits use the unchanged954/509/601 lane split. Test MAE
+in source pixels (motion: pixels per action) is:
+
+| Target | Initial CNN | Trained CNN | Initial recurrent | Trained recurrent | Initial combined | Trained combined |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Ball x |18.498|13.301|25.688|13.418|19.997|12.036|
+| Ball y |15.236|13.329|20.722|11.437|19.023|10.222|
+| Paddle x |6.909|5.716|24.859|10.579|9.050|6.768|
+| Horizontal motion |4.934|4.915|3.848|2.916|3.616|2.953|
+| Vertical motion |4.429|4.360|4.332|2.412|3.945|2.422|
+| Teacher response-target x |22.757|20.986|26.710|18.143|22.359|17.642|
+
+Support remains557 ball/target rows,601 paddle rows and540 motion rows.
+Trained recurrent motion R² is.539/.637 versus linear.473/.614; combined
+near-descending response-target error is13.353 versus the earlier recurrent
+linear14.848. Paddle decoding is worse than the CNN linear4.334. Full metrics,
+per-lane/near-phase support,penalties and every prediction remain retained.
+
+On the exact555 rows shared with the pixel decoder,trained combined ball x/y
+errors are12.053/10.211 versus pixel.059/.140. Near the paddle,all136 rows give
+10.618/9.711 versus.075/.137. The pixel rule's two misses and four extras remain
+disclosed above;the common-support comparison does not remove those failures.
+This decoder does not close the position-precision gap. Its failure does not
+prove information absent,identify the policy's causal limitation,or establish
+that a proposed native auxiliary objective will improve gameplay.
+
+Each target independently excludes missing training/validation labels,while
+every test row receives a prediction. Normalization and median positive-distance
+bandwidth use observed-label training rows only. The unchanged centered RBF
+solver selects among the fixed seven penalties by validation MSE,with no
+validation refit,bandwidth sweep or test-based adjustment. Teacher references,
+bottom-screen coverage,reused weak-policy cohort and scalar/vector categorical
+draw differences retain their earlier limits. Test lanes are not new learners.
+
+All35 CPU tests pass,including masking,test-target independence,lane isolation,
+the existing direct-system solver check,and an actual analysis subprocess that
+forbids native/ALE/Gym imports. The analysis takes **5.368s**,5.676s including
+checks and the exact common-row comparison,on one low-priority CPU core with one
+BLAS thread. All93 input pins remain unchanged. Source`378f4f8`; review completes
+**20:14:49 UTC October29**,with no failure,retry,environment,GPU work,learner
+update or checkpoint write. No Kindle service is running before or after.
+
+[Fixed state-readout protocol](../experiments/2026-10-29-cdp-breakout-kernel-state.md).
+Evidence:`/x/Temp/kindle-breakout-kernel-state-20261029`.
+
+- Declaration: `4530614f708f7cbca99f3c90deec4fab680418370f29ec905b284cb7d0ef6c90`.
+- Metrics: `95340428088b6566f1ca414cdc7e4b483f8890f9f33fda82c2c5d1e9ff6b63fa`.
+- Common rows: `e99e0f93339d054b1d9b5769cbdd028ea1b594814fbe5d4425219b85983c9771`.
+- Review: `7500b9f9f9500d3891321fe0a692f0f71f13011e0acf2e59eb76cb9d52426d24`.

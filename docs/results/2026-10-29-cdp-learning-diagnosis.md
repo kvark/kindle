@@ -114,6 +114,13 @@ GPU work or update occurs. Both low-priority CPU operations co-host with that
 learner;no training-time correction is made. No architecture,loss or additional
 learner is selected from this reused development cohort.
 
+The [subsequent fixed nonlinear state readout](2026-10-29-cdp-breakout-representation.md#nonlinear-state-readouts-still-leave-substantial-position-error)
+does not close that gap:trained combined ball x/y errors are12.053/10.211 on
+the same555 pixel-supported rows. Recurrent motion R² improves to.539/.637
+versus linear.473/.614,but paddle decoding worsens. All93 pins and35 CPU tests
+pass;analysis takes5.368s with zero native/GPU work. This narrows the tested
+decoder explanation,without proving information absent or a causal policy fix.
+
 ## Breakout action readouts do not outperform its retained policy
 
 The [completed linear and nonlinear readouts](2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy)
