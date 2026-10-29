@@ -161,6 +161,7 @@ impl ActingGpu {
         policy: &Session,
         active: &[u32],
         draws: &[f32],
+        mode: ActionMode,
     ) {
         assert_eq!(active.len(), self.streams);
         assert_eq!(draws.len(), self.streams * self.stoch);
@@ -176,7 +177,7 @@ impl ActingGpu {
             draws.len(),
             self.classes,
             self.unimix,
-            ActionMode::Sample,
+            mode,
             false,
         );
         let data = StateBindings {

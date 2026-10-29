@@ -118,6 +118,8 @@ def main():
     parser.add_argument("--restore", type=Path)
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--greedy", action="store_true")
+    parser.add_argument("--greedy-posterior", action="store_true",
+                        help="frozen restore only: use categorical posterior modes independently of action sampling")
     parser.add_argument("--probe-behavior", action="store_true",
                         help="frozen diagnostic: log live critic values and scaled action-effects bonuses")
     parser.add_argument("--episodes-per-env", type=int,
@@ -182,6 +184,11 @@ def main():
         parser.error("GPU budget headroom must be positive")
     if args.greedy and not args.evaluate:
         parser.error("greedy actions are only supported for frozen evaluation")
+    if args.greedy_posterior:
+        if not args.evaluate or not args.restore:
+            parser.error("greedy posterior requires frozen restore")
+        if not hasattr(kindle.VectorAgent, "use_greedy_posterior_for_evaluation"):
+            parser.error("native runtime does not support greedy posterior evaluation")
     if args.probe_behavior and not args.evaluate:
         parser.error("behavior probing requires frozen evaluation")
     if args.episodes_per_env is not None:
@@ -439,6 +446,8 @@ def main():
         check_memory("constructed", 0)
         ids = list(range(args.num_envs))
         starting_actions, starting_updates = agent.environment_step, agent.learner_step
+        if args.greedy_posterior:
+            agent.use_greedy_posterior_for_evaluation()
         started = time.perf_counter()
         agent.begin_episodes(ids, initial)
         check_memory("initialized", 0)
@@ -465,6 +474,7 @@ def main():
                   **(dict(learned_rgb_preprocessing=f"single GPU Pillow-equivalent antialiased bilinear resize to {agent.config['observation_kind'][3:]}x{agent.config['observation_kind'][3:]}, per-axis RGB8 rounding; CHW /255-0.5") if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
+                  **(dict(posterior_mode="greedy") if args.greedy_posterior else {}),
                   **(dict(behavior_probe="live-posterior-v1") if args.probe_behavior else {}),
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,
                   cpu_worker_threads=agent.cpu_worker_threads,

@@ -74,6 +74,11 @@ def audit(path):
             check(type(header.get("sticky_actions")) in (int, float)
                   and header["sticky_actions"] in (0.0, 0.25), "invalid sticky action probability")
         check(header["mode"] in ("train", "evaluate_sample", "evaluate_greedy"), "unknown action mode")
+        posterior_mode = header.get("posterior_mode", "sample")
+        check(posterior_mode in ("sample", "greedy"), "unknown posterior mode")
+        if posterior_mode == "greedy":
+            check(header["mode"] != "train" and header.get("restored_checkpoint") is not None,
+                  "greedy posterior requires frozen restore")
         behavior_probe = header.get("behavior_probe")
         if behavior_probe is not None:
             check(behavior_probe == "live-posterior-v1" and header["mode"] != "train",

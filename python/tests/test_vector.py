@@ -17,6 +17,9 @@ import profile_atari_vector
 
 
 @pytest.mark.parametrize("args,message", [
+    (["--greedy-posterior"], "greedy posterior requires frozen restore"),
+    (["--evaluate", "--greedy-posterior"], "greedy posterior requires frozen restore"),
+    (["--restore", "unused", "--greedy-posterior"], "greedy posterior requires frozen restore"),
     (["--open-loop-length", "3"], "requires learned CDP"),
     (["--cdp", "--open-loop-length", "1"], "requires learned CDP"),
     (["--cdp", "--open-loop-length", "16", "--batch-length", "16"], "requires learned CDP"),
@@ -163,6 +166,19 @@ def test_vector_api_rejects_invalid_config_before_loading_weights():
         kindle.VectorAgent("unused", 4, config)
     with pytest.raises(ValueError, match="batch_size"):
         kindle.VectorAgent("unused", 4, config, encoder="levjepa-tiny")
+
+
+def test_greedy_posterior_rejects_old_native_before_output(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("unexpected environment"))
+    output = tmp_path / "absent" / "run.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output),
+                                    "--evaluate", "--restore", "unused", "--greedy-posterior"])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert "native runtime does not support greedy posterior" in capsys.readouterr().err
+    assert not output.parent.exists()
 
 
 @pytest.mark.parametrize("unimix", [None, .01])

@@ -25,6 +25,7 @@ pub(super) struct VectorCore {
     observe: Session,
     policy: Session,
     diagnostics: Option<Session>,
+    posterior_mode: ActionMode,
 }
 
 fn check_capacity(config: &DreamerConfig, streams: usize) -> Result<(), &'static str> {
@@ -173,7 +174,16 @@ impl VectorCore {
             observe,
             policy,
             diagnostics: None,
+            posterior_mode: ActionMode::Sample,
         }
+    }
+
+    fn use_greedy_posterior_for_evaluation(&mut self) -> Result<(), &'static str> {
+        if self.streams.iter().any(|stream| stream.active) {
+            return Err("posterior mode must be selected before the first observation");
+        }
+        self.posterior_mode = ActionMode::Greedy;
+        Ok(())
     }
 
     fn check_arrivals(&self, arrivals: impl Iterator<Item = (usize, FrameFlags, Reward)>) {
@@ -273,7 +283,10 @@ impl VectorCore {
         for &(id, flags, _) in arrivals {
             active[id] = 1;
             for draw in &mut draws[id * size.stoch..(id + 1) * size.stoch] {
-                *draw = self.streams[id].posterior_rng.random();
+                *draw = match self.posterior_mode {
+                    ActionMode::Sample => self.streams[id].posterior_rng.random(),
+                    ActionMode::Greedy => 0.0,
+                };
             }
             if !flags.is_first {
                 actions[id * config.action_count + self.streams[id].pending_action.unwrap()] = 1.0;
@@ -293,8 +306,13 @@ impl VectorCore {
             self.observe.set_input(name, values);
         }
         self.observe.step();
-        self.acting
-            .posterior(&self.observe, &self.policy, &active, &draws);
+        self.acting.posterior(
+            &self.observe,
+            &self.policy,
+            &active,
+            &draws,
+            self.posterior_mode,
+        );
         let frames: Vec<_> = arrivals
             .iter()
             .map(|&(id, flags, reward)| {
@@ -432,6 +450,11 @@ impl VectorCore {
     }
 
     pub(super) fn learn(&mut self) -> Option<LearnReport> {
+        assert_eq!(
+            self.posterior_mode,
+            ActionMode::Sample,
+            "greedy posterior is evaluation only"
+        );
         let mut report = self.learner.learn()?;
         self.sync_live(&mut report);
         Some(report)
@@ -514,6 +537,11 @@ impl VectorCore {
     }
 
     fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
+        assert_eq!(
+            self.posterior_mode,
+            ActionMode::Sample,
+            "greedy posterior is evaluation only"
+        );
         let mut reports = self.learner.learn_scheduled(maximum_updates);
         if let Some(last) = reports.last_mut() {
             self.sync_live(last);
@@ -980,6 +1008,18 @@ impl VectorDreamerAgent {
         self.core.behavior_predictions()
     }
 
+    /// Select each posterior category's mode without consuming posterior RNG.
+    /// Call before the first observation. This disables learning for this agent
+    /// instance; checkpoint configuration and weights remain unchanged. Restores
+    /// default to sampled posteriors, independently of action selection.
+    pub fn use_greedy_posterior_for_evaluation(&mut self) -> Result<(), &'static str> {
+        self.core.use_greedy_posterior_for_evaluation()
+    }
+
+    pub fn posterior_mode(&self) -> ActionMode {
+        self.core.posterior_mode
+    }
+
     pub fn act(&mut self, mode: ActionMode) -> Vec<usize> {
         self.core.act(mode)
     }
@@ -1431,6 +1471,84 @@ mod joint_qualification {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[ignore = "requires GPU; posterior argmax, independent RNG and evaluation-only guards"]
+    fn greedy_posterior_matches_logits_without_consuming_rng() {
+        let config = config();
+        let size = config.network();
+        let mut agent = FeatureVectorAgent::new(config.clone(), 2).unwrap();
+        assert_eq!(agent.core.posterior_mode, ActionMode::Sample);
+        agent.core.use_greedy_posterior_for_evaluation().unwrap();
+        let posterior_rngs = |core: &VectorCore| {
+            core.streams
+                .iter()
+                .map(|stream| stream.posterior_rng.clone().random::<u64>())
+                .collect::<Vec<_>>()
+        };
+        let before_rng = posterior_rngs(&agent.core);
+        agent.begin_episodes((0..2).map(|id| (id, observation(id, 0))).collect());
+        assert!(agent.core.use_greedy_posterior_for_evaluation().is_err());
+        for time in 1..6 {
+            let mut logits = vec![0.0; 2 * size.stoch * size.classes];
+            agent.core.observe.read_output_by_index(1, &mut logits);
+            assert!(logits.iter().all(|value| value.is_finite()));
+            for id in 0..2 {
+                let feature = agent.core.feature(id);
+                for (category, onehot) in feature[size.deter..].chunks(size.classes).enumerate() {
+                    assert_eq!(onehot.iter().sum::<f32>(), 1.0);
+                    assert!(onehot.iter().all(|&value| value == 0.0 || value == 1.0));
+                    let selected = onehot.iter().position(|&value| value == 1.0).unwrap();
+                    let offset = (id * size.stoch + category) * size.classes;
+                    let values = &logits[offset..offset + size.classes];
+                    assert_eq!(
+                        values[selected],
+                        values.iter().copied().fold(f32::NEG_INFINITY, f32::max)
+                    );
+                }
+            }
+            agent.act(if time % 2 == 0 {
+                ActionMode::Greedy
+            } else {
+                ActionMode::Sample
+            });
+            let last = time == 3;
+            agent.observe(
+                (0..2)
+                    .map(|id| {
+                        (
+                            id,
+                            observation(id, time),
+                            FrameFlags {
+                                is_last: last,
+                                is_terminal: last,
+                                ..Default::default()
+                            },
+                            Reward::default(),
+                        )
+                    })
+                    .collect(),
+            );
+            if last {
+                assert!(agent.core.streams.iter().all(|stream| stream.needs_reset));
+                assert!(agent.core.use_greedy_posterior_for_evaluation().is_err());
+                agent.begin_episodes((0..2).map(|id| (id, observation(id, 100))).collect());
+            }
+        }
+        assert_eq!(posterior_rngs(&agent.core), before_rng);
+        assert_eq!(agent.learner().learner_step(), 0);
+        for scheduled in [false, true] {
+            let rejected = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                if scheduled {
+                    agent.core.learn_scheduled(1);
+                } else {
+                    agent.core.learn();
+                }
+            }));
+            assert!(rejected.is_err());
+        }
+        assert_eq!(agent.learner().learner_step(), 0);
+    }
 
     #[test]
     #[ignore = "requires GPU; batched read-only live values and action-aligned bonuses"]

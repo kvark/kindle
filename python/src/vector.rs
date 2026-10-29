@@ -100,6 +100,12 @@ impl PyVectorAgent {
         Ok(Self { inner })
     }
 
+    fn use_greedy_posterior_for_evaluation(&mut self) -> PyResult<()> {
+        self.inner
+            .use_greedy_posterior_for_evaluation()
+            .map_err(PyValueError::new_err)
+    }
+
     fn begin_episodes(
         &mut self,
         streams: Vec<usize>,
@@ -213,6 +219,9 @@ impl PyVectorAgent {
         py: Python<'py>,
         maximum_updates: usize,
     ) -> PyResult<Bound<'py, PyAny>> {
+        if self.inner.posterior_mode() == ActionMode::Greedy {
+            return Err(PyValueError::new_err("greedy posterior is evaluation only"));
+        }
         reports_to_python(py, &self.inner.learn_scheduled(maximum_updates))
     }
 

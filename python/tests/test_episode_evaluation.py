@@ -25,6 +25,7 @@ def frozen_run(monkeypatch, tmp_path, request):
     export_checkpoint = False
     all_timeouts = terminal_timeout = False
     exports = []
+    greedy_posterior = False
 
     class Environment:
         action_space = SimpleNamespace(n=2)
@@ -80,7 +81,14 @@ def frozen_run(monkeypatch, tmp_path, request):
             instance.config['loss_scales'].update(reconstruction=1.0, future_prediction=0.0)
             return instance
 
+        posterior_selected = False
+
+        def use_greedy_posterior_for_evaluation(self):
+            assert self.replay_len == 0, 'posterior mode must precede first observation'
+            self.posterior_selected = True
+
         def begin_episodes(self, ids, frames):
+            assert self.posterior_selected == greedy_posterior
             self.replay_len += len(ids)
 
         def act(self, *, greedy):
@@ -112,9 +120,10 @@ def frozen_run(monkeypatch, tmp_path, request):
     monkeypatch.setattr(kindle, 'VectorAgent', Agent)
 
     def run(target=2, cap=100, interrupted=False, memory=False, export=False,
-            timeouts_forever=False, both_flags=False):
-        nonlocal interrupt, export_checkpoint, all_timeouts, terminal_timeout
+            timeouts_forever=False, both_flags=False, posterior=False):
+        nonlocal interrupt, export_checkpoint, all_timeouts, terminal_timeout, greedy_posterior
         interrupt = interrupted
+        greedy_posterior = posterior
         export_checkpoint = export
         all_timeouts, terminal_timeout = timeouts_forever, both_flags
         output = tmp_path / f'vector-{target}-{cap}.jsonl'
@@ -124,6 +133,8 @@ def frozen_run(monkeypatch, tmp_path, request):
                 *(['--encoder-checkpoint', 'unused'] if request.param == 'tiny' else [])]
         if target is not None:
             args += ['--episodes-per-env', str(target)]
+        if posterior:
+            args += ['--greedy-posterior']
         if memory:
             args += ['--min-gpu-budget-headroom-mib', '2048']
         if export:
@@ -135,6 +146,28 @@ def frozen_run(monkeypatch, tmp_path, request):
         return output, [json.loads(line) for line in output.read_text().splitlines()]
 
     return run
+
+
+@pytest.mark.parametrize('posterior', [False, True])
+def test_posterior_mode_is_independent_of_actions_and_preserves_frozen_audit(frozen_run, posterior):
+    path, rows = frozen_run(posterior=posterior)
+    assert rows[0]['mode'] == 'evaluate_sample'
+    assert rows[0].get('posterior_mode', 'sample') == ('greedy' if posterior else 'sample')
+    assert ('posterior_mode' in rows[0]) == posterior
+    assert audit(path)['updates'] == 0
+
+
+@pytest.mark.parametrize('mutate, message', [
+    (lambda header: header.update(posterior_mode='mean'), 'unknown posterior mode'),
+    (lambda header: header.update(mode='train'), 'greedy posterior requires frozen restore'),
+    (lambda header: header.update(restored_checkpoint=None), 'greedy posterior requires frozen restore'),
+])
+def test_greedy_posterior_audit_rejects_undeclared_or_training_use(frozen_run, mutate, message):
+    path, rows = frozen_run(posterior=True)
+    mutate(rows[0])
+    path.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+    with pytest.raises(ValueError, match=message):
+        audit(path)
 
 
 @pytest.mark.parametrize('target, cap, reason', [
