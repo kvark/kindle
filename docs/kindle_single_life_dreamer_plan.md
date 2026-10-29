@@ -15,7 +15,10 @@ The original CPU recovery observer exits1 at03:57:54 on a copied scale1000
 assertion; declared/actual learner scale100 is correct. Preserve that failure.
 The private replacement starts04:00:15 after six actual header checks, retaining
 the original absolute deadlines. Main PID238223/invocation and all227 pins stay
-unchanged; no GPU stage repeats. Record.630s co-host CPU repair. Use
+unchanged; no GPU stage repeats. Record.630s co-host CPU repair. The replacement
+passes100k/6227 recovery with357 finite tensors and6263 finite reports through
+100,584 actions, then succeeds04:12:46 UTC. Main/progress/postprocessing remain
+active; frozen quality is unmeasured. Use
 `/x/Temp/kindle-qbert-guidance3840-20261029/full/recovery-repair/collect_repaired.py`
 at completion, not the original collector. Four fixed frozen assessments remain.
 Task benefit is unmeasured; no extension, retry, cap increase or successor is

@@ -128,3 +128,23 @@ Use **`full/recovery-repair/collect_repaired.py`** at completion. It requires th
 original failure record, successful replacement, unchanged original pins and all
 terminal audits; do not run the original collector for this life. No extension,
 retry, wall-cap increase, checkpoint selection or automatic successor is selected.
+
+## Halfway recovery passes
+
+The replacement CPU observer verifies the100k-action/6227-update checkpoint and
+succeeds04:12:46 UTC on October29. All357 tensors are finite:280 world,66 behavior,
+11 slow-value. Its stable checkpoint/config/schema audit passes; the complete
+log prefix contains100,584 actions/12,573 vector ticks and6263 finite sequential
+reports. Checkpoint digest
+`327454ba3d2d9954bc159568e8aac7723f1521076f4bef560a72a37e717c49a6`;
+recovery review
+`cccba0c349c39a0ff71dc1256853b08a0148a792919c5b59a290f4b209ce3d19`.
+The review pins corrected watcher
+`d4c2f9297ffbcccee835ba0bb0523767b669b8786296c38751c344913f505111`.
+
+The original observer remains failed with exit1. Main retains PID238223 and
+invocation37e895989a1149fe9b8dbfee76dd35cf; main/progress/postprocessing are active.
+No learner restart, GPU assessment, cap change or checkpoint selection occurs.
+This establishes the recovery milestone, not frozen task competence. Continue
+to the fixed200k final and four declared frozen arms; use the repaired terminal
+collector after all services and audits finish.
