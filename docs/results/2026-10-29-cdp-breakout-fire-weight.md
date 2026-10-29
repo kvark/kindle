@@ -4,9 +4,11 @@ The separately selected [fresh200k comparison](../experiments/2026-10-29-cdp-bre
 starts22:43:07 UTC October29/sourcece86d72 under the30-minute cap, with100k
 recovery and four frozen arms. All196 pins,372 bounded-matching initial tensors,
 47 pre-update semantic events and427 finite reports through7208 actions pass
-startup checks. MainPID354340 and four observers are active. No full frozen
-result is available; do not restart this learner. This is a fresh experiment,
-with no bounded-check experience reused.
+startup checks. Recovery at100k actions/6227 updates passes22:54:42 UTC, with
+all372 tensors finite and6489 finite reports through104,200 actions. The recovery
+observer succeeds; MainPID354340 and the remaining three observers are active.
+No full frozen result is available; do not restart this learner. This is a fresh
+experiment, with no bounded-check experience reused.
 
 The CPU audit of both completed200k training logs finds no missing FIRE target
 path. All collected states receive corrective labels, and **99.805%** of

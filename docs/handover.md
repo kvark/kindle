@@ -5,10 +5,12 @@ with196 pins and a30-minute training cap. Keep12M64/Auto/N8/B16/T16/H15/R16/
 centroid100/expert100/native2974160; only FIRE imitation weight1→4 changes from
 the earlier centroid learner. Startup passes372 bounded-matching initial tensors,
 47 pre-update semantic events, correct cadence and427 finite reports through7208
-actions. MainPID354340/invocationad37c04842fa4b7bb51ec0f9a42ebf7e and progress,
-recovery, postprocessing and terminal-collection observers are active. Require
-100k/6227 recovery and final/actual-initial sampled/greedy24-episode assessments
-against retained13.208/17.875, with unchanged zero-truncation/two-wall gates.
+actions. The100k/6227 recovery passes22:54:42 UTC with372 finite tensors and
+6489 finite reports through104,200 actions. Its observer completes successfully.
+MainPID354340/invocationad37c04842fa4b7bb51ec0f9a42ebf7e and progress,
+postprocessing and terminal-collection observers remain active. Require final/
+actual-initial sampled/greedy24-episode assessments against retained13.208/17.875,
+with unchanged zero-truncation/two-wall gates.
 No full frozen result is available. The.612s CPU startup check co-hosts without
 time correction. Root `/x/Temp/kindle-breakout-fire-weight-20261029/full`; service
 `kindle-breakout-fire-weight4-200k-20261029`. Check live state; do not restart

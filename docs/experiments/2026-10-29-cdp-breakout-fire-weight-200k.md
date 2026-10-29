@@ -86,8 +86,9 @@ and after clarifying count labels are retained; no preflight failure occurs.
 
 The main service starts **22:43:07 UTC October29**, source `ce86d72`, with196
 pinned inputs. PID354340/invocation`ad37c04842fa4b7bb51ec0f9a42ebf7e` is active
-on the declared RX7900XT. Progress,100k recovery, postprocessing and terminal
-collection observers are active. The startup audit verifies all372 initial
+on the declared RX7900XT. Progress, postprocessing and terminal collection
+observers are active; the100k recovery observer completes successfully below.
+The startup audit verifies all372 initial
 tensors against the bounded check,47 matching pre-update semantic events and
 the first six updates at376,392,408,424,440,456 actions. Its complete prefix has
 7208 actions and427 finite reports, with the declared FIRE weight4 and cadence.
@@ -103,3 +104,17 @@ collection. An observer timeout alone does not indicate a stopped learner.
 - Startup review: `7c11f2c507022135649448280b29abac8884a4f5cea9476e7fd893602ffb45ff`,
   retained in the trial's `startup-review.json` with the original process identity
   and input hashes.
+
+## Halfway recovery verified
+
+At **22:54:42 UTC October29**, the read-only observer verifies the saved
+**100,000-action /6,227-update** checkpoint:295 world,66 behavior and11 slow-value
+tensors, all372 finite. It also checks every complete learner report in the log
+prefix:6,489 sequential finite reports through104,200 actions. The checkpoint
+metadata and file sizes/timestamps stay unchanged during the audit. The recovery
+observer then succeeds without restarting or stopping the learner. The original
+main PID/invocation remains active; frozen competence is still unmeasured.
+
+Checkpoint digest: `0fff0ef0afcfa6e159dedd642c73d189aea430dc5f917db5eeb534079cfc3d07`.
+Full receipt: the trial's `checkpoint-review-100k.json`. No training setting,
+wall cap, evaluation cohort or pinned controller changes.

@@ -7,7 +7,9 @@ far shorter than the frozen greedy stall. A fresh FIRE-weight1→4 check passes
 8192 actions/489 updates in48.059s with unchanged native/model sizes, matched
 initial tensors, full replay and frozen invariance. Its conservative200k cost
 projection is21m31s. The eight short frozen episodes all score zero; a gameplay
-benefit remains unmeasured and no full learner is selected. The first preflight's
+benefit remains unmeasured. The separately selected fresh200k comparison is now
+active; its100k/6227 recovery passes with372 finite tensors. No full frozen
+outcome is available. The first preflight's
 unintended integrated-GPU initialization is preserved separately; no actions,
 updates or checkpoint occurred, and the corrected guarded check completes.
 
