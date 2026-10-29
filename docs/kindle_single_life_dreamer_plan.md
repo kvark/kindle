@@ -1,15 +1,16 @@
 # Kindle: CDP learning roadmap
 
-One [bounded Qbert25M/R16 check](experiments/2026-10-29-cdp-qbert-25m-r16.md)
-is selected after the negative25M/R8 comparison. Keep the retained12M control's
-R16/B16/update schedule and supervision;only exposed model size12M→25M changes.
-8192 actions/489 updates then1024 greedy frozen;357 finite/invariant tensors,
-matching25M/R8 actual-initial tensors,full guided replay and guards required.
-No12M initial equality claimed. Native447fe50/control runner/teacher unchanged.
-Training180s cap;conservative200k projection must fit45min before any separate
-full selection. This new ceiling matches earlier larger-budget trials;no prior
-run is extended. No full learner or automatic promotion selected. Root
-`/x/Temp/kindle-qbert-25m-r16-20261029/native-check`. Check live state before work.
+The [completed Qbert25M/R16 bounded check](results/2026-10-29-cdp-qbert-25m-r16.md)
+passes8192 actions /32,757 frames /489 updates in100.299s,then1024 greedy frozen
+/4096 frames in1.202s,zero updates/no natural episodes. All53 pins,357 finite/
+invariant frozen tensors,357 matching25M/R8 initial tensors,derived geometry,
+parameter changes,finite expert reports,full guided replay and guards pass.
+Only exposed model size changes from12M/R16;update schedule/supervision/native
+447fe50/control runner/teacher fixed. No12M initial equality. Conservative200k
+projection44m54s narrowly passes45min;execution/early cost only,not competence.
+Actual short-check overrides55.457%. Service succeeds12:33:10 UTC October29/
+source `a25513b`,collection12:33:56. No failure/GPU repeat/full learner or automatic
+promotion. Root `/x/Temp/kindle-qbert-25m-r16-20261029/native-check`. Check live state.
 
 The [completed Qbert25M/R8 comparison](results/2026-10-29-cdp-qbert-25m-r8.md)
 finishes200k actions /799,672 frames /6239 updates in26m24s,13.28% less training

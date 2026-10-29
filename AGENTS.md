@@ -805,13 +805,16 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
-A bounded Qbert25M48/B16/R16 check is selected after negative25M/R8. Only exposed
-model size changes from12M/R16;keep update schedule/supervision/native447fe50/
-control runner/teacher.8192/489 then1024 frozen,357 finite/invariant tensors and
-matching25M/R8 actual initial,full guided replay/guards. No12M initial equality.
-Training180s cap;conservative200k projection must fit45min before separate full
-selection. No prior life extended,no full learner or automatic promotion. See
-25M/R16 protocol;check live state before GPU work.
+Qbert25M48/B16/R16 bounded check passes8192 actions /32,757 frames /489 updates
+in100.299s;1024 greedy frozen/4096 frames take1.202s,zero updates/no natural episodes.
+All53 pins,357 finite/invariant frozen tensors,357 matching25M/R8 initial tensors,
+derived geometry/parameter changes/finite expert reports/full guided replay/guards
+pass. Only exposed model size changes from12M/R16;update schedule/supervision/
+native447fe50/control runner/teacher fixed. No12M initial equality. Conservative
+200k projection44m54s narrowly passes45min;execution/early cost,not competence.
+Actual short-check guidance55.457%. Service succeeds12:33:10 UTC October29/source
+`a25513b`,collection12:33:56. No failure/GPU repeat/full learner or promotion.
+See completed25M/R16 result;check live state before GPU work.
 
 Qbert25M48/B16/R8 completes200k actions /799,672 frames /6239 updates in26m24s,
 13.28% less training time. Greedy5817.708/24 pyramids falls51.46% below retained
