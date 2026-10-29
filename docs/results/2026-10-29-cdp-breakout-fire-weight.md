@@ -1,5 +1,10 @@
 # FIRE supervision exists, but sampled training avoids the long greedy stall
 
+The separately selected [fresh200k comparison](../experiments/2026-10-29-cdp-breakout-fire-weight-200k.md)
+will test task outcomes under the30-minute cap, with100k recovery and four frozen
+arms. Its CPU command/config/observer and saved-log analysis preflights pass.
+This full learner is a new experiment; no bounded-check experience is reused.
+
 The CPU audit of both completed200k training logs finds no missing FIRE target
 path. All collected states receive corrective labels, and **99.805%** of
 eligible sampled replay rows contribute imitation in the centroid run. Its

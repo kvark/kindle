@@ -1,5 +1,18 @@
 # CDP handover — October25,2026
 
+A [fresh200k FIRE-weight4 comparison](experiments/2026-10-29-cdp-breakout-fire-weight-200k.md) is selected after the48.059s bounded
+check and21m31s conservative cost projection. Keep12M64/Auto/N8/B16/T16/H15/R16/
+centroid100/expert100/native2974160; only FIRE imitation weight1→4 changes from
+the earlier centroid learner. Training cap30min; require100k/6227 recovery and
+final/actual-initial sampled/greedy24-episode assessments against retained
+13.208/17.875, with unchanged zero-truncation/two-wall gates. All five commands,
+20 config cases, observer/recovery checks and saved-log FIRE-gap analysis pass
+CPU preflight;142 bounded/132 control pins are unchanged. No full result exists
+and the service has not launched at this revision. Root
+`/x/Temp/kindle-breakout-fire-weight-20261029/full`; service
+`kindle-breakout-fire-weight4-200k-20261029`. Check live state; do not repeat
+earlier learners or schedule another GPU job while this learner is active.
+
 The [FIRE-weight4 bounded check](results/2026-10-29-cdp-breakout-fire-weight.md) completes8192 actions/32,736 frames/489 updates
 in48.059s; frozen1024/4,076 frames takes.971s with zero updates and eight natural
 zero-return episodes. All142 pins,372 matched initial/invariant frozen tensors,
