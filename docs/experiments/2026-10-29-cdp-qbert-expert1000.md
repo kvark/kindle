@@ -186,3 +186,34 @@ main PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5 now runs CPU audit;
 full200k training label/input-pixel/action replay starts03:04:08,under unchanged
 1200s inner/1230s outer caps. Comparison,exposure and terminal collection remain
 pending. No GPU repeat,cap increase,extension or automatic successor is selected.
+
+
+## Completed comparison: retain expert100
+
+The full training replay and all terminal audits pass. Final200k actions /
+799,697 frames /12,477 updates take1830.753s (30m31s). Greedy10588.542/24of24
+first pyramids and sampled6150.000/21 are below retained scale100's11984.375/24
+and6759.375/24 by11.65%/9.02%, for0.21% more training time. Own initial scores
+remain80.208 greedy and177.083 sampled, both zero pyramids. Both final means
+miss15000; sampled also misses90% pyramids. Retain scale100, with no extension,
+coefficient retry, checkpoint selection or automatic successor.
+
+All229 pins,100k/6227 recovery,357 matching initial and invariant frozen tensors,
+paired initial semantic traces, finite reports, changed CNN/reward/actor/value,
+full label/input-pixel/action replay, frozen replays/videos, host guards, curves,
+coverage, exposure and comparison pass. Both plots are visually inspected.
+Actual training overrides are87,605 (43.8025%); guided scores are not unaided
+competence. Only expert scale changes, affecting actor and world supervision
+together, on reused4013/cohort; no mechanism or seed-reliability claim.
+
+Main succeeds03:14:19 UTC on October29, whole42m44.356s; CPU postprocessing
+succeeds03:14:39, whole43m03.805s. All four services are terminal success.
+The original `full/collect_full.py` succeeds once. No observer or GPU failure,
+GPU repetition, cap change or runtime edit occurs. Full training replay takes
+611.664s. Retain the.668s co-host numerical-monitor caveat without correcting
+training time. No GPU allocation is active at completion.
+
+Completion `e5436127858cfd1ffaa8d1f27826f0e8c82e2ece6057ffc9a223788c9869e552`;
+learning `2fcb0d85b24044ea0af8a61478d3ee290b94463b35a01f8ffba775e82b3fb069`;
+comparison `2243636ff74833b2813b0ad4e3f0ebdb0c17ef3bbf1e03c5bf88e753929e0f47`.
+[Full result and limits](../results/2026-10-25-cdp-cheap-qbert.md#stronger-imitation-lowers-both-frozen-scores-at-the-same-short-budget).

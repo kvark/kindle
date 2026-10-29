@@ -52,18 +52,20 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Qbert12M48/B16/R16/expert1000 finishes200k actions/799,697 frames/12,477
-updates in30m31s,within35min. All four frozen GPU arms finish03:03:20 UTC on
-October29 with passing guards. Provisional first3-per-lane replay scores are
-greedy10588.542/24of24 first pyramids versus own80.208/0,and sampled6150/21
-versus177.083/0. Both miss15000;greedy/sample fall11.65%/9.02% versus retained
-expert100 for.21% more time. All229 pins remain unchanged;100k/6227 recovery
-passes357 finite tensors. Main PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5
-is active in CPU audit;full training replay,comparison and terminal collection
-remain pending. Use`full/collect_full.py` for this run. No GPU repeat,cap change,
-extension or automatic successor selected. The.668s post-warmup CPU monitor is
-recorded alongside training. See the expert1000 protocol;check live state before
-GPU work.
+Qbert12M48/B16/R16/expert1000 completes200k actions/799,697 frames/12,477
+updates in30m31s. Greedy10588.542/24of24 first pyramids and sampled6150/21
+fall11.65%/9.02% below retained expert100, for0.21% more training time. Own
+initials80.208/177.083, zero pyramids; both final means miss15000. All229 pins,
+100k/6227 recovery,357 matching initial/invariant frozen tensors, paired initial
+traces, finite reports, full replays, guards, curves, coverage, exposure,
+comparison and original terminal collector pass. Main succeeds03:14:19 UTC,
+postprocessing03:14:39 on October29; all four services are terminal success.
+Actual overrides43.8025%; guided scores are not frozen competence. Only expert
+scale100→1000 changes on reused4013; no mechanism or seed-reliability claim.
+Retain expert100. No observer/GPU failure, repeated GPU stage, cap change,
+extension, coefficient retry or automatic successor. The.668s co-host monitor
+remains recorded. GPU idle at completion; check live state before work. See
+[the completed result](docs/results/2026-10-25-cdp-cheap-qbert.md#stronger-imitation-lowers-both-frozen-scores-at-the-same-short-budget).
 
 Qbert12M48/B16/R8/expert100 completes400k actions/1,599,459 frames/12,489
 updates in40m35s. Greedy10042.708/23of24 first pyramids is16.20% below retained

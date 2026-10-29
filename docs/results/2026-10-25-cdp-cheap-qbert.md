@@ -3215,3 +3215,72 @@ learning`baff95ce8d30350eeb15626b8a6664dc4e419c5bd50fe09384301e6c3ea2ae02`,
 comparison`dc4ad5388433147cc5c12fcc041f890b9d2cd3dc064adb5c69f5d21b8b1f4b42`,
 training replay`7175a47255f52be777c6840529ec6d9894d046e9587875af1030679e05f43054`.
 See the [fixed protocol and preserved observer failure](../experiments/2026-10-29-cdp-qbert-expert100-r8.md).
+
+
+## Stronger imitation lowers both frozen scores at the same short budget
+
+Fresh 12M48/B16/R16 with expert scale1000 completes **200,000 actions / 799,697
+emulator frames / 12,477 updates in30m31s**, within the35-minute cap. Primary
+greedy mean falls **11.65%**, and sampled mean falls **9.02%**, relative to the
+retained scale100 control. Training costs0.21% more. Both modes miss the unchanged
+mean15000 gate; sampled also misses90% first-pyramid success. Retain scale100.
+No extension, coefficient retry, checkpoint selection or automatic successor
+is selected.
+
+| Expert scale | Training | Greedy mean / first pyramids | Sampled mean / first pyramids |
+| --- | ---: | ---: | ---: |
+|100, retained|30m27s|11984.375 /24of24|6759.375 /24of24|
+|1000|30m31s|10588.542 /24of24|6150.000 /21of24|
+|Own initial, both recipes|Zero updates|80.208 /0of24|177.083 /0of24|
+
+Only the saved expert scale changes100→1000. Keep centered CDP,12M48/Auto/N8/
+B16/T16/H15/R16/coefficient1/actor-unimix0/full18/original rates,20% episode
+continuation guidance/cap1920/all18 weights1/world gradients/all-state labels.
+Native447fe50, runner and teacher stay fixed. The coefficient affects actor and
+world supervision together. No check experience, retained weights, replay,
+belief, games or RNG are reused. Seed4013/evaluation4000004013 are reused
+development inputs; this comparison does not establish seed reliability or the
+mechanism of the regression.
+
+All229 inputs remain unchanged. Recovery100k/6227 passes;357 initial tensors
+match the control and bounded check. All1139 sampled and1101 greedy initial
+semantic events match their respective controls. All12,477 reports are finite,
+CNN/reward/actor/value parameters change, and357 tensors remain invariant in
+each frozen arm. Complete training label/input-pixel/action replay, four frozen
+outcome replays/videos, host guards, curves, coverage, exposure, comparison and
+the original terminal collector pass. Both plots are visually inspected.
+
+Each frozen arm selects the first3 natural episodes per8 lanes=24, with guidance
+off, zero updates and no truncations. Final greedy/sample collect27/25 episodes;
+each initial collects24. Excess episodes and partial tails remain recorded.
+The four arms total88,432 actions /353,575 frames /53.646s. Mean first-pyramid
+coverage is21/21 greedy and20.833/21 sampled, versus own2.500 and4.917. Ordinary
+frozen logs lack live pixel hashes, so outcome replay does not establish equality
+to unavailable live images.
+
+The20% episode rule selects47/207 starts and actually overrides87,605 actions
+(43.8025%). Labels comprise152,140 NOOP and47,860 hops, including112,395 passive
+states and23,761 actual/teacher disagreements. All12,477 reports are supervised;
+2,991,252 labeled replay rows equal weight sums, with maximum raw world/actor
+loss difference8e-7. The45 completed guided episodes average15,210 with45 first
+pyramids;154 unguided online episodes average2314.286 with64. There are10,022
+native actions after guidance caps. These online outcomes are not unaided frozen
+competence. Final25k replay cross entropy is.098881, versus control.096632;
+changing replay samples do not measure held-out action accuracy.
+
+Main starts02:31:35 UTC/sourcecff4772 and succeeds **03:14:19 UTC on October29**,
+whole42m44.356s. CPU postprocessing succeeds **03:14:39**, whole43m03.805s;
+all four services finish successfully. Training time excludes construction,
+evaluation and audits; full training replay takes611.664s. No observer or GPU
+failure, repeated GPU stage, cap change or runtime edit occurs. The.668s
+read-only numerical monitor co-hosted with training; retain that timing caveat
+without correcting measured wall time. The GPU is idle at completion and the
+five-game goal remains unfinished.
+
+Root `/x/Temp/kindle-qbert-expert1000-20261029/full`, trial
+`qbert-12m-48-b16-r16-expert1000-200k-seed4013`. Completion
+`e5436127858cfd1ffaa8d1f27826f0e8c82e2ece6057ffc9a223788c9869e552`,
+learning `2fcb0d85b24044ea0af8a61478d3ee290b94463b35a01f8ffba775e82b3fb069`,
+comparison `2243636ff74833b2813b0ad4e3f0ebdb0c17ef3bbf1e03c5bf88e753929e0f47`,
+training replay `824aa035c01304fa3479124b7b474db0f5c5cc9ca4a281ba286a57acab26538a`.
+See the [fixed protocol](../experiments/2026-10-29-cdp-qbert-expert1000.md).
