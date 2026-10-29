@@ -14,15 +14,17 @@ H15/R16 control for6029. CPU co-hosting caveats remain;no time correction.
 Root`/x/Temp/kindle-qbert-h5-seed6029-20261029/full`. No Qbert extension,third
 learner or automatic successor selected. The five-game goal remains unfinished.
 
-A [matched Breakout reconstruction control](experiments/2026-10-29-cdp-breakout-rgb-control.md) is CPU-prepared; no GPU declaration or launch exists.
-Keep12M64/B16/T16/H15/R16/expert100 and native447fe50; only centered flag and
-reconstruction/future objectives change. Preflight17:29:20 UTC passes7 CLI/config
-branch cases,11 audit-config cases,6 compiled scripts,132 control pins and342
-shared shapes;399 tensors/14,457,556 parameters are predicted. No native import.
-All263 active6029 pins and original PID/invocation stay unchanged. The1.398s
-CPU co-hosting remains a timing caveat. Wait for completed Qbert6029 audits and
-idle host before the8192/489-update cost check;35min full projection gate,
-no full learner or automatic successor. Root`/x/Temp/kindle-breakout-rgb-control-20261029/native-check`.
+The [Breakout reconstruction check](results/2026-10-29-cdp-breakout-rgb-control.md) completes8192 actions/32,726 frames/489 updates in59.857s;1024 frozen/.866s,
+zero updates/no natural episodes. All399 finite/invariant tensors,342 shared
+initial tensors,loss/config/counter/parameter-change/full pixel-action-label
+replay/guard checks pass after a CPU-only schema-name repair. Original service
+fails17:57:08 UTC after both successful GPU stages;38 optimizer prefixes are
+corrected separately,original156 inputs retained,176 repair pins pass,no GPU
+repeat. Repair succeeds17:59:54,collection18:01:33/source2261a7a. Fixed200k
+projection26m47s passes35min. The [fresh200k RGB comparison](experiments/2026-10-29-cdp-breakout-rgb-control-200k.md) is separately selected with original settings/cap and corrected
+`native-check/cpu-repair` schema. CPU full-controller preparation is next;no
+full declaration/launch exists. Native447fe50 unchanged. Root
+`/x/Temp/kindle-breakout-rgb-control-20261029`. Check live state before GPU work.
 
 The completed [Breakout kernel action readout](results/2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy) takes1.824s CPU and scores49.25% overall/47.06% near-paddle teacher agreement,
 below linear50.58%/49.26% and recorded policy54.58%/53.68%. No evidence for this

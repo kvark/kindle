@@ -1,5 +1,11 @@
 # Bounded reconstruction control for the retained Breakout recipe
 
+Completed October29:8192/489 takes59.857s,frozen1024/.866s,with all execution
+checks passing after a separate CPU-only optimizer-name schema repair. The
+original failed service is retained and no GPU stage repeats. Fixed projection
+26m47s passes35min. See the [complete result](../results/2026-10-29-cdp-breakout-rgb-control.md)
+and separately selected [fresh200k comparison](2026-10-29-cdp-breakout-rgb-control-200k.md).
+
 Breakout's trained features carry useful position/motion information, but fixed
 linear and RBF action readouts trail its policy. Those diagnostics do not identify
 the cause of weak control. The retained matched Qbert RGB control does not answer
@@ -92,3 +98,25 @@ Retain the17:29:19–17:29:20 CPU co-hosting as a timing caveat without correcti
 Qbert wall time. No preparation failure occurs. The bounded queue and controllers
 are ready, but no declaration/launch/full learner exists. Selection checks require
 Qbert's completed review and an idle host; no GPU job is enqueued automatically.
+
+## Bounded completion and CPU-only repair
+
+The service starts17:55:59 UTC October29/source2261a7a after Qbert's completed
+audits. Training8192 actions/32,726 frames/489 updates takes59.857s;1024 greedy
+frozen/4096 frames takes.866s,zero updates/no natural episodes. Both GPU stages
+and host guards pass. At17:57:08 the original service fails its CPU validator:
+38 generated decoder optimizer names have an extra`world.` prefix. Native
+weights,shapes and parameter counts are unchanged.
+
+The separate`native-check/cpu-repair` corrects those names against the existing
+RGB schema and verifies399 finite actual initial tensors. The original audit
+then passes all config/counter/finite/loss/parameter-change/342 shared initial/
+399 frozen invariance/pixel-action-label replay/guard checks in7.138s,with no
+native import. All156 original inputs and176 repair pins remain unchanged.
+Original service,journal,schema,preflight and controller remain preserved.
+CPU repair succeeds17:59:54;terminal collection18:01:33. No GPU stage repeats.
+
+The conservative projection1607.487s passes2100s. Actual overrides3898 (47.583%)
+and489 supervised reports are execution evidence only. The separately selected
+full comparison uses the corrected schema/helper and no check experience.
+Completion`bd43647a5445ccda18e9634f9f5c3ec01a1bc1462a3ac087d5f1537945d565f1`.
