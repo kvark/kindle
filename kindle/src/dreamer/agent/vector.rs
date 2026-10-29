@@ -1490,6 +1490,8 @@ mod tests {
         agent.begin_episodes((0..2).map(|id| (id, observation(id, 0))).collect());
         assert!(agent.core.use_greedy_posterior_for_evaluation().is_err());
         for time in 1..6 {
+            agent.core.observe.wait();
+            agent.core.acting.wait();
             let mut logits = vec![0.0; 2 * size.stoch * size.classes];
             agent.core.observe.read_output_by_index(1, &mut logits);
             assert!(logits.iter().all(|value| value.is_finite()));
