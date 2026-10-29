@@ -52,17 +52,19 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Qbert12M48/B16/R16/expert1000 bounded check passes8192 actions/32,754 frames/
-489 updates in69.211s;1024 frozen/.786s,zero updates/no natural episodes. All47
-pins,357 matching initial/invariant frozen tensors,finite reports,parameter
-changes,full label/pixel/action replay and guards pass. Service succeeds02:25:14
-UTC on October29;no failure,GPU repeat or native edit. Conservative200k estimate
-30m59s passes35min. After that complete review,one fresh200k/12,477-update
-comparison is separately selected,with100k/6227 recovery and four final/own-
-initial sampled+greedy arms. Only expert scale100→1000 changes versus retained
-12M/R16;no check experience reused. Full CPU preflight passes5 commands,14
-scripts,11 config/8 header/3 observer-parser checks without native construction.
-No full learner is active yet. See the expert1000 protocol;check live state.
+One fresh Qbert12M48/B16/R16/expert1000 learner is active from02:31:35 UTC
+on October29,sourcecff4772,PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5.
+All229 pins,exact config/fresh counters,357 control/check initial tensors and
+first updates376/392/408/424/440/456 pass;the checked3768-action prefix has212
+finite supervised reports. Keep200k/12,477 and35-minute training cap,100k/6227
+recovery and four fixed final/own-initial sampled+greedy assessments. Only expert
+scale100→1000 changes versus retained12M/R16. Native,runner and teacher unchanged;
+no check experience reused. Main and all three observers start normally;no GPU
+repeat or failure. Use`full/collect_full.py` for this run,not the historical R8
+repair collector. No second learner or automatic successor. The bounded check
+passes69.211s/all47 pins;conservative200k estimate30m59s. Full CPU preflight
+passes5 commands,14 scripts,11 config/8 header/3 observer checks. Frozen benefit
+remains unmeasured. See the expert1000 protocol;check live state before GPU work.
 
 Qbert12M48/B16/R8/expert100 completes400k actions/1,599,459 frames/12,489
 updates in40m35s. Greedy10042.708/23of24 first pyramids is16.20% below retained

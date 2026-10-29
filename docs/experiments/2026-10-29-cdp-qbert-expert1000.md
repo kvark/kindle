@@ -123,3 +123,22 @@ have6000s service/5700s internal waits;recovery2700s service/2400s internal wait
 These audit limits do not expand the35-minute training cap. No observer can
 restart the learner. The protocol snapshot,source/runtime,controllers,analysis
 and retained-control inputs are pinned before launch.
+
+
+## Fresh full learner active
+
+Service`kindle-qbert-expert1000-200k-20261029` starts02:31:35 UTC on October29,
+sourcecff4772,PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5. Declaration
+`281a4727560354b0e23a171234ef7fa64935065511c3a891bb485ac3bf74efdd` pins229 inputs.
+Startup verifies all pins,exact config/fresh0/0 counters,357 initial tensors
+matching retained12M control and bounded check,and first updates at376/392/408/
+424/440/456 actions. The checked3768-action prefix has212 finite supervised
+reports. No frozen task benefit is measured at startup.
+
+Main,progress,recovery and terminal CPU postprocessing services are active.
+The recovery watcher waits for100k/6227;the fixed final is200k/12,477,with the
+four sampled/greedy final/own-initial arms above. Keep the35-minute training cap.
+The corrected progress invocation starts normally;no observer or GPU stage fails
+or repeats. Use this full directory's original`collect_full.py` at terminal
+completion;the earlier R8 repair collector belongs only to that historical run.
+No additional learner,extension,retry,checkpoint selection or successor is selected.
