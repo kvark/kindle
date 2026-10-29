@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [CPU timeout diagnostic](results/2026-10-29-cdp-centroid-timeout.md) identifies a Breakout serving failure:
+12,828 actions without FIRE after a life loss, with two lives remaining.
+FIRE launches a moving ball at the preselected5,000/10,000-step origins; at20,000,
+colors have changed and eight FIRE actions leave the image unchanged. The late
+state remains unexplained. All26,804 lane actions /107,212 raw frames and24
+recorded branch rows match exactly; all22 pins pass. CPU replay19.309s completes
+22:10:19 UTC October29; collection22:12:16, source45f23ea plus pinned script.
+Root `/x/Temp/kindle-centroid-timeout-20261029`. Zero native imports, GPU work or
+learner updates. No new learner, evaluation override or automatic successor is
+selected; the full learner remains protocol-failed. Check live state before GPU work.
+
 The [native-checked actor diagnostic](results/2026-10-29-cdp-centroid-actor.md) finds teacher agreement
 54.08%→55.41% overall and 50.00%→58.82% near the paddle for centroid100.
 FIRE agreement falls 42/44→34/44; 56/136 urgent decisions still disagree.

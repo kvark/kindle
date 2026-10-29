@@ -1,5 +1,11 @@
 # Breakout actor decisions improve near the paddle, with substantial disagreement remaining
 
+The subsequent [CPU timeout replay](2026-10-29-cdp-centroid-timeout.md) directly
+examines the candidate's failed episode. It finds12,828 actions without FIRE
+after a life loss; FIRE launches a ball at two earlier branch origins, while a
+late color-changing state remains unresolved. That evidence is separate from
+the teacher-agreement corpus analyzed here.
+
 On the same saved control trajectories, the centroid100 actor agrees with the
 pixel teacher on **333/601 test decisions (55.41%)**, versus the control's
 325/601 (54.08%). Near the paddle, agreement improves **68/136 → 80/136

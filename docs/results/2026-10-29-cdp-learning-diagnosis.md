@@ -1,5 +1,15 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [CPU timeout replay](2026-10-29-cdp-centroid-timeout.md) identifies a concrete
+Breakout serving failure:12,828 actions without FIRE after a life loss, with two
+lives remaining. FIRE launches a ball at two preselected earlier origins; at a
+third, late color-changing origin, eight FIRE actions have no visible effect.
+All26,804 lane actions /107,212 raw frames match the retained replay, and24
+recorded branch rows reproduce exactly. CPU cost19.309s, zero updates. This
+supports examining serving-state coverage and actor targets before another
+undirected training increase; it does not establish a training fix or explain
+the late ROM state. The full learner remains protocol-failed.
+
 The [native-checked actor comparison](2026-10-29-cdp-centroid-actor.md) now
 measures the learned policy on those saved states. Overall teacher agreement
 changes54.08%→55.41%, and near-paddle agreement50.00%→58.82%; simple linear/RBF
