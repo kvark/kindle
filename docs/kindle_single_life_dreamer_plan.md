@@ -4,20 +4,16 @@ Updated October28,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-The compatible Qbert RGB check completes8192 actions/32,756 frames/994 updates
-in68.085s,then1024 frozen/.502s,zero updates/no natural episodes. All45 pins,
-399 finite/invariant tensors,342 shared CDP initial tensors,exact config/counters,
-finite reports,changed CNN/reward/decoder/actor/value,full guidance replay and
-guards pass. Service succeeds00:06:12 UTC on October29;no GPU repeat or failure.
-The locked conservative200k estimate30m28s passes the35-minute cost gate. Two
-CPU preparation corrections remain recorded;native447fe50 unchanged. Separately
-select one fresh RGB200k/24,970-update control,100k recovery,35-minute cap and
-four fixed final/own-initial assessments. Reuse the completed4M CDP evidence;
-no new CDP learner or check experience reuse. Controller/CPU outcome-reader
-preparation passes five CLI boundaries,10 config checks and nine statistical
-decision cases with no native construction;no GPU job active before launch. Negative/inconclusive controlled evidence
-ends this nearby tuning direction without a rescue learner. See qbert-rgb-control
-for exact settings,bootstrap decision and stopping criteria;check live state.
+One fresh RGB Qbert200k/24,970-update control is active from00:16:54 UTC on
+October29,source58dad39,PID219461/invocation2b57733b633540c88847636af3f62c86.
+All195 pins,startup config/counters,399 fresh RGB initial tensors and342 shared
+CDP initial tensors pass. First updates occur at248,256,264,272,280,288 actions.
+Keep4M48/Auto/N8/B8/T16/H15/R16/expert100 and the fixed matched settings;
+training cap35min,100k recovery,four final/own-initial assessments. No CDP learner
+is added;reuse its completed26m07s control. The locked greedy learning-per-minute
+comparison decides this nearby tuning direction;negative/inconclusive ends it.
+No rescue learner,cap increase,extension or automatic successor. Details in
+`docs/experiments/2026-10-28-cdp-qbert-rgb-control.md`;check live state before GPU work.
 
 Qbert12M48/B16/R16/expert100 completes200k actions/799,742 frames/12,477
 updates in30m27s. Greedy11984.375/24 first pyramids improves4M/B8's9654.167/23

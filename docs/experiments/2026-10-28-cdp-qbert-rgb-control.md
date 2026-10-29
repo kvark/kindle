@@ -155,3 +155,15 @@ frozen replays each have500s caps within the total audit bound. Recovery and
 progress observers cannot restart training. Terminal CPU postprocessing produces
 curves,coverage,supervision exposure and the locked comparison. All controllers,
 config,source/runtime and retained control evidence are pinned before launch.
+
+## Full control active
+
+Service`kindle-qbert-rgb-control-200k-20261029` starts00:16:54 UTC on October29,
+source58dad39,PID219461/invocation2b57733b633540c88847636af3f62c86. Declaration
+`342419d193e3268f129384c12eb37f49abee137633ee2c27cd459eed75cbca24` pins195 inputs.
+Startup verifies all pins,the exact RGB config/3,432,500 parameters,fresh0/0
+counters,399 tensors identical to bounded RGB initialization and342 shared CDP
+initial tensors. First six updates occur at248,256,264,272,280,288 actions;the
+initial checked prefix has79 finite/supervised reports. This is execution
+only;fixed final assessments and the locked comparison remain pending.
+Recovery,progress and terminal CPU audit/postprocessing observers are active.
