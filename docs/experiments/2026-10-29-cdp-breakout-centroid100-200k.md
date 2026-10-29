@@ -84,3 +84,11 @@ observers are active. The final gameplay outcome remains pending.
 
 Declaration SHA256:
 `21c5a539eb81847da6cd10dbe16c1bf9a3889fae456af22ee899b51d4eb32df7`.
+
+## Midpoint recovery
+
+The declared100k/6,227-update recovery passes **21:04:40 UTC October29** with
+all372 finite tensors. The observer checks6,516 finite reports through104,632
+complete actions and exits successfully. Original PID346205/invocation
+3522002a6e344decb27f4ddd8b8f6988 and all187 pins remain unchanged. The learner
+continues; no frozen task outcome is established at this milestone.

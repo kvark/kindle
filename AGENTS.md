@@ -31,6 +31,10 @@ runner differ from447fe50;no isolated causal claim. Root
 `/x/Temp/kindle-color-centroid-20261029/full`;service
 `kindle-breakout-centroid100-200k-20261029`. Check live state;do not restart it,
 repeat earlier lives or schedule another GPU job while this learner is active.
+The100k/6227 recovery passes21:04:40 UTC with372 finite tensors;the observer
+checks6516 finite reports through104632 complete actions and exits successfully.
+Original learner PID/invocation and all187 inputs remain unchanged;no frozen
+result is available at this midpoint.
 
 The [optional native color-position loss](docs/results/2026-10-29-cdp-color-centroid.md)
 passes F64 targets/loss/derivatives and a fresh Breakout8192-action/32,735-frame/
