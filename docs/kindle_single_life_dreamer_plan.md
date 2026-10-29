@@ -1,5 +1,14 @@
 # Kindle: CDP learning roadmap
 
+The [CPU optimizer attribution](experiments/2026-10-29-cdp-breakout-optimizer-attribution.md) is selected to follow the qualified raw
+gradient diagnostic. Use both saved batches and all86 trainable parameters with
+their12477-step moments; calculate existing AGC/LaProp inF64 with configured
+learning rates. Separate fixed-total current components from inherited momentum,
+without applying an update or claiming native parameter movement. Twelve scalar/
+invariance CPU tests pass; no GPU allocation or new learner is selected. Root
+`/x/Temp/kindle-optimizer-attribution-20261029`. Check live state before later GPU
+work; the five-game goal remains unfinished.
+
 The [completed Breakout gradient diagnostic](results/2026-10-29-cdp-breakout-gradient-attribution.md) finds expert raw gradient
 norms above CDP in encoder, posterior and dynamics on both fixed B16/T16 batches;
 total–expert cosine.925–.997. This does not support CDP swamping imitation on
