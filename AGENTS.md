@@ -55,8 +55,9 @@ See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 Fresh Breakout12M64/B16/R16/expert100200k is active from05:08:58 UTC on October29,
 source404b541,PID243198/invocation9ab610854d844a45bccd05acad54d45a. Startup passes
 132 pins,357 bounded-matching initial tensors and368 finite reports through6256
-actions. Recovery waits for100k/6227;keep200k/12,477,30min cap andfour fixed frozen
-arms,sampled primary. The original05:02:34 CPU controller/postprocessor failures
+actions. The100k/6227 recovery passes05:20:33 UTC with357 finite tensors and
+6494 finite reports through104,280 actions;its observer exits successfully while
+training continues. Keep200k/12,477,30min cap andfour fixed frozen arms,sampled primary. The original05:02:34 CPU controller/postprocessor failures
 on a duplicated path remain preserved with106 unchanged pins andzero GPU work.
 Corrected path checks andthe actual controller preflight pass;23 experiment
 fields andthe normalized queue match the original attempt. No GPU stage repeats.

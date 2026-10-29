@@ -197,7 +197,7 @@ Corrected main `kindle-breakout-expert100-capacity-200k-repair-20261029` starts
 `7e2622615b2587f5e10b9a517602ceaa075bd9ad3d849ced65805353a7659a7f` pins132 inputs,
 including the original failure evidence. Postprocessing/progress are active;
 recovery starts05:09:03,PID243335/invocationf6c10af280b046659255445e1d15e5c4,
-and waits for100k/6227.
+and completes the100k/6227 audit05:20:33 UTC before exiting successfully.
 
 Startup verifies132 pins,exact fresh configuration/counters and357 initial tensors
 matching the bounded12M64 check. First six updates are376/392/408/424/440/456;
@@ -207,3 +207,17 @@ startup receipt `efc8761400360ad52016e76c8d1907d32a8e1395c994260fcf31acb7bb9953b
 This is startup evidence,not a frozen task result. Preserve the original failed
 services and use `full-repaired/collect_full.py` only after the corrected services
 and all audits finish. Fixed200k/12,477 and30-minute training cap remain unchanged.
+
+## Scheduled100k recovery passes
+
+The recovery observer passes at05:20:33 UTC on October29. The saved checkpoint
+contains100,000 actions/6227 updates and357 finite tensors:280 world,66 behavior
+and11 slow-value. Its content digest is
+`cc063a1cb27263f470042ee2a7e2a92b0662f865c07a6783ac0c41fdc28a6037`.
+The complete log prefix contains104,280 actions/13,035 vector ticks and6494
+strictly finite supervised reports. Review digest
+`a25dabcf6d6a7043b7a98b96a604455a3e41021cebc54b10ba75758b38100a16`.
+
+The observer exits successfully; the original learner PID243198 remains active.
+This CPU audit performs no restore or evaluation and does not interrupt training.
+The fixed200k/12,477 budget and30-minute cap remain; frozen competence is unmeasured.
