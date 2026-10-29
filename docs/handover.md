@@ -12,6 +12,18 @@ the terminal collector succeed,with no GPU repeats. Evidence:
 `/x/Temp/kindle-open-loop-20261029/full/qbert-open-loop-h3-200k-seed4013`.
 No GPU allocation is active; check live state before new work.
 
+The [H3 forecast follow-up](results/2026-10-29-cdp-open-loop-supervision.md#frozen-forecasts-worsen-overall-with-a-small-early-game-improvement)
+is complete:48,256 recorded actions/192,980 frames per model in208.483s control/
+207.348s candidate,zero updates. H3 raises15-step reward-sum MAE37.499→40.793;
+early error improves2.347→2.035,but later error worsens45.259→49.350. The new
+runtime reproduces all152 original control arrays/eight frame-hash trajectories
+exactly. All65 current/39 resolved historical pins,357 invariant tensors per
+capture,config/counter/prefix/guard checks and34 CPU tests pass. Service exits
+09:49:38 UTC October29/sourcea3fbd03;terminal collection passes,no GPU work active.
+Evidence `/x/Temp/kindle-open-loop-forecast-20261029` includes the preserved
+historical helper/source resolver. Retain control;no new learner or loss variant
+selected. Candidate-policy trajectories and causal mechanism remain unmeasured.
+
 The [Breakout representation diagnostic](results/2026-10-29-cdp-breakout-representation.md)
 is complete. Both retained12M models re-observe20,960 actions/83,799 frames in
 32.301s trained/32.420s initial,zero updates. Recurrent motion R² improves

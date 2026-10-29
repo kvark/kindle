@@ -9,7 +9,13 @@ sampled6759.375→5613.542. Both modes clear23/24 first pyramids versus control'
 comparison checks pass; [full result](2026-10-29-cdp-open-loop-supervision.md).
 Retain the control. This tests one concrete loss on a reused development seed;
 it does not invalidate the forecast diagnosis or establish why the loss hurts.
-No post-training forecast comparison or seed confirmation has been performed.
+The subsequent [frozen forecast comparison](2026-10-29-cdp-open-loop-supervision.md#frozen-forecasts-worsen-overall-with-a-small-early-game-improvement)
+finds H3 also raises15-step reward-sum MAE37.499→40.793 on identical control
+trajectories. Early-game error improves2.347→2.035,but later error worsens
+45.259→49.350; corrected one-step predictions also worsen overall. All152
+control arrays reproduce exactly under the newer runtime. This does not show
+better aggregate reward prediction paired with worse policy performance,or
+identify the causal mechanism. No seed confirmation or new learner is selected.
 
 ## Actual action-block rankings weaken after the first pyramid
 

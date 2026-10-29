@@ -30,6 +30,14 @@ full replays/videos,guards,curves,coverage,exposure and comparison pass. Main
 exits08:41:03 UTC October29,postprocessing08:41:29;allservices/collector succeed.
 Actual training overrides87,421 actions(43.7105%);online aided scores are not
 competence. No GPU allocation is active. The five-game goal remains unfinished.
+The [subsequent frozen forecast comparison](results/2026-10-29-cdp-open-loop-supervision.md#frozen-forecasts-worsen-overall-with-a-small-early-game-improvement)
+finds H3 raises15-step reward-sum MAE37.499→40.793 on the control trajectories:
+early2.347→2.035 improves,but later45.259→49.350 worsens. Captures48,256 actions/
+192,980 frames each take208.483s/207.348s,zero updates. All152 control arrays
+reproduce exactly;65 current/39 resolved historical pins,357 invariant tensors,
+eight frame-hash trajectories,guards and34 CPU tests pass. Service exits09:49:38
+UTC October29;terminal collection passes. Retain control;no new loss or learner
+selected,and no causal policy mechanism established.
 
 The concurrent33.384s CPU-only Breakout replay finds near-
 paddle teacher agreement55.19%/54.18% for retained4M/12M greedy policies,despite

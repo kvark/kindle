@@ -30,6 +30,15 @@ services and the collector succeed. No GPU repeats or active allocation.
 See `docs/results/2026-10-29-cdp-open-loop-supervision.md`; evidence remains
 under `/x/Temp/kindle-open-loop-20261029/full`. Check live state before GPU work.
 
+The frozen H3 forecast follow-up raises15-step reward-sum MAE37.499→40.793;
+early2.347→2.035 improves,later45.259→49.350 worsens. All152 original control
+arrays reproduce exactly. Both48,256-action captures preserve357 tensors with
+zero updates;65 current/39 resolved historical pins,34 CPU tests and guards pass.
+Service exits09:49:38 UTC October29/sourcea3fbd03;terminal collection passes.
+Evidence `/x/Temp/kindle-open-loop-forecast-20261029` includes historical source
+resolution. Retain control;no new learner/loss variant or active GPU allocation.
+See the open-loop result report;candidate-state distribution/causality unmeasured.
+
 Breakout frozen representation readouts complete20,960 actions/83,799 frames
 per model in32.301s trained/32.420s initial,zero updates. Recurrent motion R²
 improves.282/.051→.473/.614; trained paddle MAE4.334 CNN/9.643 recurrent pixels,

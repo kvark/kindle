@@ -42,7 +42,8 @@ Those changing-policy training returns are not frozen competence.
 All new auxiliary reports are finite and nonzero, with mean total47.2208,
 prediction.0936888,reward.346874,continuation.029539 and valid fraction.998013.
 This verifies loss execution, not improved forecasting or task performance.
-The final model's forecast accuracy has not been measured by this comparison.
+The training comparison does not itself measure forecast accuracy; the separate
+frozen comparison below now supplies that evidence.
 Recorded update time is45.86% imagination/targets,28.91% world training and16.54%
 posterior preparation. Total training is.64% shorter than control, but differing
 trajectories and native/runner revisions prevent an isolated overhead claim.
@@ -61,9 +62,9 @@ and no host recovery occurs.
 This reused development seed/cohort does not establish that all multi-step
 supervision is harmful, or identify why this particular loss lowers performance.
 It does reject this exact candidate as the next retained recipe. The five-game
-goal remains unfinished. The separate [Breakout representation preparation](../experiments/2026-10-29-cdp-breakout-representation.md)
-addresses the unresolved visual-information versus policy-use question; it has
-not allocated native capture or another learner.
+goal remains unfinished. The separate [completed Breakout readouts](2026-10-29-cdp-breakout-representation.md)
+find useful position/motion information but no simple action readout that beats
+the recorded policy; they do not establish a causal control bottleneck.
 
 Evidence: `/x/Temp/kindle-open-loop-20261029/full/qbert-open-loop-h3-200k-seed4013`.
 The [full protocol](../experiments/2026-10-29-cdp-open-loop-qbert-200k.md) remains
@@ -73,6 +74,90 @@ Git and visually checked.
 - Learning review: `73134dd1749f6152e61013773c7b3b3b4fe3f018b6d4f165bb27052e315ee077`.
 - Comparison: `90e8dbb2cfb2720dea1abd695561f7f7e83eeef6f086077c8d746d1c6d60d6d3`.
 - Completion: `cebc1086ea832ea3f0f4470a1f268a6f0863ceb1e4be29c0dc929e6e38d251f3`.
+
+## Frozen forecasts worsen overall, with a small early-game improvement
+
+The separately selected comparison finds that **H3/scale1 does not improve
+reward forecasts overall on the control's recorded gameplay**. Fifteen-step
+cumulative reward MAE rises37.499→40.793 (+8.78%). The regression is concentrated
+after the first pyramid; early-game error improves slightly. Lower gameplay
+scores are therefore not accompanied by better aggregate reward predictions in
+this measurement. Retain the control; no loss variant or new learner is selected.
+
+| Measurement on identical recorded inputs | Retained control | H3/scale1 |
+| --- | ---: | ---: |
+| One-step prior reward MAE, all test actions |2.592|3.004|
+| Observation-corrected reward MAE, all test actions |2.274|2.887|
+| One-step positive-reward AUC |.978|.976|
+| 15-step endpoint positive-reward AUC |.938|.931|
+| 15-step reward-sum MAE, all origins |37.499|40.793|
+| 15-step reward-sum MAE, before first pyramid |2.347|2.035|
+| 15-step reward-sum MAE, after first pyramid |45.259|49.350|
+| 15-step reward-sum MAE, unrelated actions |69.538|68.081|
+
+Both models still predict recorded rewards much better than the saved actual
+initial model's15-step MAE107.570. The fixed common-origin comparison also loses
+accuracy at the trained three-step horizon: MAE7.096→8.121 (+14.45%). At horizons
+1/3/5/10/15, control cumulative MAE is2.569/7.096/11.583/24.234/37.499 versus
+candidate2.926/8.121/13.222/27.014/40.793. Endpoint AUC is mixed at intermediate
+horizons: control.976/.966/.954/.945/.938 versus candidate.974/.961/.962/.951/.931.
+Do not collapse that distinction into a claim that every forecast metric worsens.
+
+Before the first pyramid, one-step prior MAE improves.176→.095 and corrected
+MAE.143→.094. After it, prior MAE worsens3.123→3.643 and corrected MAE2.743→3.500.
+The latter shows that the measured regression is not confined to accumulating
+error during unobserved rollouts. It does not identify which head, representation,
+training-distribution change or competing gradient causes the difference.
+
+One-step terminal Brier score changes.00058415→.00058552, versus.00059036 for
+always continuing. There are only16 test terminations; sampled15-step endpoints
+contain onlytwo. Their apparently high AUC is insufficient evidence of improved
+death-risk calibration. The first episode in each lane supplies calibration
+baselines; the next two supply16 reused evaluation episodes. One-step support
+is27,102 actions, and common15-step support is1,681 origins:304 before/1,377 after
+the first pyramid. Complete baseline, phase, horizon and support metrics remain
+in the evidence; the cohort and selection are unchanged.
+
+Both final checkpoints re-observe **48,256 actions /192,980 emulator frames**
+each, with zero updates:208.483s control /207.348s candidate. Two128-action checks
+take3.570s/3.336s. Both use packaged nativeab80486/SHA b4cdf26. The control exactly
+reproduces all152 arrays and eight raw-frame hash trajectories from its original
+native447fe50 capture, and its summaries/profiles also match exactly. Its short
+check reproduces19 saved arrays. Runtime compatibility is verified rather than
+assumed. Candidate/control target arrays and all eight frame-hash trajectories
+match; all357 tensors remain finite and unchanged per capture.
+
+All65 current pins,39 resolved historical pins,config/source/counter/prefix
+checks and host guards pass. The narrow Python comparison option permits only
+the declared H3/scale1 training-loss difference; restored config still matches
+checkpoint config exactly. It changes no agent setting. All34 forecast CPU tests
+pass with native import prohibited. The previous helper bytes and hash resolver
+are preserved, with original declarations unchanged.
+
+Service`kindle-open-loop-forecast-20261029`,source`a3fbd03`,runs **09:42:29–09:49:38
+UTC October29**,7m8.704s total. Terminal collection passes; no GPU stage repeats,
+host recovery or active GPU allocation remains. Original training costs remain
+30m15s candidate/30m27s control. The inspected plot and its receipt are retained
+outside Git.
+
+This is one reused development learner on the control policy's trajectories.
+Candidate-policy state distribution, latent-target accuracy and causal policy
+effects are unmeasured. Scalar re-observation uses different posterior draws
+from the original vector actor. Unrelated-action predictions are sensitivity
+controls without counterfactual outcome labels. H3 also supervises latent
+features, so reward/continuation measurements do not evaluate every loss
+component. The evidence rejects this exact candidate as a better retained
+recipe; it does not reject multi-step supervision generally or justify another
+training allocation automatically.
+
+[Fixed forecast protocol](../experiments/2026-10-29-cdp-open-loop-forecasts.md).
+Evidence: `/x/Temp/kindle-open-loop-forecast-20261029`,including both captures,
+full summaries/profiles,compatibility check,terminal review and
+`forecast-comparison.png`/SVG.
+
+- Declaration: `baf3da7356e8a160749a41bb76d11fd43f242e4b2ad7fc1f69760782b5afb157`.
+- Review: `042fc482357244500d41d01ad9babf328f66593f14289bb596b64cbe1e4df24f`.
+- Completion: `788cd24f600b6e73dedadb1589708d02f55ff9514669d3b958360f9688b1d9d4`.
 
 ## Preceding numerical and early-cost checks
 
