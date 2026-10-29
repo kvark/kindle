@@ -335,3 +335,9 @@ Evidence:`/x/Temp/kindle-breakout-kernel-state-20261029`.
 - Metrics: `95340428088b6566f1ca414cdc7e4b483f8890f9f33fda82c2c5d1e9ff6b63fa`.
 - Common rows: `e99e0f93339d054b1d9b5769cbdd028ea1b594814fbe5d4425219b85983c9771`.
 - Review: `7500b9f9f9500d3891321fe0a692f0f71f13011e0acf2e59eb76cb9d52426d24`.
+
+The separately selected [native centroid objective](2026-10-29-cdp-color-centroid.md)
+subsequently passes numerical and bounded learning/restore checks. It supplies
+an explicit current-pixel position target during training,with no position input
+to inference. Gameplay benefit remains unmeasured;this implementation does not
+turn the readout gap into a proven causal diagnosis.

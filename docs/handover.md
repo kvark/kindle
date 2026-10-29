@@ -1,5 +1,30 @@
 # CDP handover — October25,2026
 
+The [optional native color-position loss](results/2026-10-29-cdp-color-centroid.md)
+passes F64 targets/loss/derivatives and a fresh Breakout8192-action/32,735-frame/
+489-update check in48.101s;1024 frozen actions take.875s with zero updates and
+no natural episodes. Shared357 initial tensors and47 pre-update semantic events
+match;all372 frozen tensors,full pixel/action/label replay and guards pass.
+The head adds656386 parameters;scale100,12M64/Auto/N8/B16/T16/H15/R16/expert100,
+other retained settings unchanged. Native2974160/SHAe7ba0d4 at
+`/x/Temp/kindle-color-centroid-20261029/runtime`;default off. Its683 packaged
+Python/144 Rust CPU checks and strict Clippy pass. Three isolated numerical
+fixtures are retained:readback and exact-float test failures precede the pass,
+with identical production source. The bounded service fails20:42:25 UTC only
+because its CPU schema omitted ten Adam moments;separate CPU repair completes
+20:43:45 preserving41 original/21 repair pins and zero repeated training/frozen
+stages. Original service remains failed;closure`complete_with_cpu_audit_repair`.
+The2.9GiB build cache is released;wheels/test binaries/evidence remain. Execution
+and early cost are established;no gameplay benefit or full learner is selected.
+No GPU allocation is active at completion;check live state before work.
+
+The [fixed nonlinear Breakout state readout](results/2026-10-29-cdp-breakout-representation.md#nonlinear-state-readouts-still-leave-substantial-position-error)
+also leaves substantial position error:combined-feature ball x/y MAE12.053/10.211
+versus pixel.059/.140 on555 shared test rows. Motion decoding improves,but this
+does not prove information absent or identify the policy's causal limitation.
+All35 CPU tests/93 pins pass;5.676s CPU-only analysis completes20:14:49 UTC,
+source378f4f8. No new learner or GPU work occurs in that diagnostic.
+
 The [completed Breakout H5/R32 comparison](results/2026-10-29-cdp-breakout-h5-r32.md) finishes200k actions /799,475 frames /24,954 updates in33m30s,
 50.12% more training time than H15/R16. Sampled13.125/greedy14.333 do not improve
 control13.208/17.875; all0/24 two-wall successes. Final50k-action expert CE

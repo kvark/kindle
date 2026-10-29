@@ -123,3 +123,21 @@ This separately selected check does not select a full learner,repeat earlier
 training or permit reuse of its experience. No natural-episode competence is
 expected from the short frozen budget. The native and runner versions differ
 from retained447fe50 and must remain explicit even if initial checks match.
+
+## Bounded completion and schema correction
+
+The check completes8192 actions/32,735 frames/489 updates in48.101s and1024
+frozen actions/4096 frames in.875s,zero updates/no natural episodes. Shared357
+initial tensors and47 pre-update semantic events match. All reports are finite;
+head/CNN/reward/actor/value weights change; full guided pixel/action/label replay
+and both guards pass. Mean raw centroid loss.098275 and valid fraction.816470
+measure training replay only. No full learner is selected.
+
+The original expected362-tensor schema above was incorrect:five new parameters
+also add ten Adam moments,so the correct total is372. The service fails only
+in this CPU audit at20:42:25 UTC. The separate CPU repair checks all372 exact
+keys/shapes and frozen invariance while preserving41 original/21 repair pins;
+completion20:43:45,status`complete_with_cpu_audit_repair`. No GPU stage repeats.
+The original declaration,controller,schema and service failure remain unchanged.
+See the [completed result](../results/2026-10-29-cdp-color-centroid.md) for the
+three isolated numerical fixtures,packaging,cost limits and complete evidence.

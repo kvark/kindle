@@ -1,5 +1,13 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The subsequent [position-supervision check](2026-10-29-cdp-color-centroid.md)
+qualifies an optional native centroid loss after both linear and nonlinear
+readouts leave substantial ball-position error. Its8192-action check takes48.101s
+and passes numerical,shared-initial,learning,restore,replay and guard checks after
+a preserved CPU schema repair. This establishes execution,not a gameplay gain;
+no full learner is selected by the bounded result. The five-game goal remains
+unfinished.
+
 ## More Breakout fitting updates lower imitation error without improving play
 
 The [completed H5/R32 comparison](2026-10-29-cdp-breakout-h5-r32.md) doubles
