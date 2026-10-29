@@ -68,7 +68,7 @@ environment or native construction; eight checks exercise the real audit config
 assertion, including wrong expert scale, world-gradient flag and action weights.
 Independent replay-readiness/credit accounting verifies first376, check489,
 recovery6227 and final12,477 updates, all with credit.5. The357-tensor control
-schema and all190 control/228 preceding R8 inputs verify. All seven isolated
+schema and all190 control/228 preceding R8 inputs verify. All six isolated
 Python controllers/helpers compile; native capability metadata is stubbed only
 for the CPU boundary check. No native module or environment is constructed and
 no preparation failure occurs. The original controllers and native remain fixed.
