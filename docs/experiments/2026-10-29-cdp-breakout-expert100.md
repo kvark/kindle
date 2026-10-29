@@ -143,3 +143,31 @@ The recovery observer finishes successfully. Main PID235051/invocation
 e8a6e8c36aa241f294f9b845645e770b remains active; the fixed200k endpoint and four
 frozen assessments remain pending. No GPU restart,cap change,interim evaluation
 or checkpoint selection occurs.
+
+## Completed comparison: useful gain, task gate still fails
+
+The fresh learner completes200k actions/799,351 frames/24,970 updates in1065.211s
+(17m45s), within25min. Sampled9.458 versus own1.375 improves expert10's4.292 by
+120.39%; greedy12.208 versus own2.583 improves5.000 by144.17%. Training costs1.92%
+more. All0/24 two-wall successes; the task gate still fails. Retain expert100 as
+a useful development point and retain the distinct stronger sampled controls.
+No extension, coefficient sweep, seed confirmation or automatic successor.
+
+All69 pins,100k/12,470 recovery,357 matching initial/invariant frozen tensors,
+paired initial semantic traces, finite reports, parameter changes, full training
+and frozen replays/videos, host guards, curves, exposure, comparison and original
+terminal collector pass. Both plots are visually inspected. Actual overrides
+117,525 (58.7625%); guided online returns are not unaided competence. Only expert
+scale changes on reused1009/cohort, affecting actor and world supervision together;
+no mechanism or seed-reliability claim follows.
+
+Main succeeds03:47:13 UTC on October29, whole20m35.653s; CPU postprocessing
+succeeds03:47:41, whole21m03.193s. All four services finish successfully. Full
+training replay takes94.868s. No observer/GPU failure, GPU repetition, cap change
+or runtime edit occurs. Retain the.894s co-host Qbert-analysis timing caveat
+without correcting training time. No GPU allocation is active at completion.
+
+Completion `4c14dc24d62ca005298a9eb97baf1beed5dac283a6453cf168c43b17319d6733`;
+learning `c9b158e828f2b5ac3bdcee4e4fbc9b1eb20bff5aa88b9919568aa967420f0881`;
+comparison `57243c1ac00ec3361fa06c414d1ff28b67887d15a174c8244c571d713b26dda1`.
+[Full result and limits](../results/2026-10-26-cdp-breakout-pixel-reference.md#stronger-imitation-improves-frozen-breakout-at-nearly-unchanged-cost).

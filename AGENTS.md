@@ -52,19 +52,19 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Breakout expert100 fresh200k is active from03:26:38 UTC on October29,
-source08d080a,PID235051/invocatione8a6e8c36aa241f294f9b845645e770b. Only expert
-scale10→100 changes from4M64/Auto/N8/B8/T16/H15/R16/original rates; native,
-runner and teacher stay fixed. Startup passes all69 pins,357 matching initial
-tensors and593 finite reports through4992 actions. The100k/12,470 recovery passes
-357 finite tensors at03:35:42 UTC;12,737 complete-prefix reports are finite.
-Main/progress/CPU postprocessing remain active; fixed200k/24,970 plus four
-final/initial sampled/greedy assessments remain pending. Training cap25min;
-no extension, retry, cap change or automatic successor. The preceding8192/994
-check took37.011s and passed all47 pins,357 tensors,replay/guards and the16m34s
-conservative cost gate. No observer/GPU failure or repeat. Use the original
-full/collect_full.py at terminal success. See the Breakout expert100 protocol;
-check live state before GPU work.
+Breakout expert100 completes200k actions/799,351 frames/24,970 updates in
+17m45s. Sampled9.458/greedy12.208 improve retained expert10's4.292/5.000 for
+1.92% more training time; own initials1.375/2.583. All0/24 two-wall successes.
+All69 pins,100k recovery,357 matching initial/invariant frozen tensors, paired
+initial traces,finite reports,full replays,guards,curves,exposure,comparison and
+original collector pass. Main succeeds03:47:13 UTC,postprocessing03:47:41 on
+October29; all four services terminal success. Actual overrides58.7625%;guided
+scores are not frozen competence. Retain expert100 as a useful development point
+and the distinct stronger sampled controls. Only expert scale10→100 changes on
+reused1009; no mechanism or seed-reliability claim. No observer/GPU failure,
+GPU repeat,cap change,extension,coefficient sweep,confirmation or automatic
+successor. The.894s co-host Qbert analysis remains recorded. GPU idle at completion;
+check live state before work. See [the completed result](docs/results/2026-10-26-cdp-breakout-pixel-reference.md#stronger-imitation-improves-frozen-breakout-at-nearly-unchanged-cost).
 
 Qbert12M48/B16/R16/expert1000 completes200k actions/799,697 frames/12,477
 updates in30m31s. Greedy10588.542/24of24 first pyramids and sampled6150/21

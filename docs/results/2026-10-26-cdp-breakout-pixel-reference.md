@@ -1016,6 +1016,7 @@ agent or environment and did not change any experiment input.
 Artifacts:`/x/Temp/kindle-breakout-passive-labels-20261029`,review
 `6c400c6079b563bfd1743b43646f2290c1a00e7a93f10d724defc42adcbadebb`.
 The active Qbert400k/R8 budget,caps and evaluations are unchanged.
+
 ## Stronger corrective imitation: bounded check passes
 
 The separately selected scale10→100 check completes8192 actions/32,720 frames/
@@ -1030,3 +1031,74 @@ execution/cost evidence only. After reviewing the complete audit, one fresh200k
 comparison is separately selected; task benefit remains unmeasured. Keep4M64/
 Auto/N8/B8/T16/H15/R16/coefficient1/actor-unimix.01/full18/original rates and the
 same teacher. No check experience is reused. [Protocol and receipts](../experiments/2026-10-29-cdp-breakout-expert100.md).
+
+
+## Stronger imitation improves frozen Breakout at nearly unchanged cost
+
+Fresh expert100 completes **200,000 actions /799,351 emulator frames /24,970
+updates in17m45s**, within the25-minute cap. Primary sampled mean improves
+**4.292→9.458**, and greedy improves **5.000→12.208**, versus own initials1.375
+and2.583. These are2.20×/2.44× the retained expert10 scores for1.92% more training
+time. **All frozen arms have0/24 two-wall successes**; the original task gate
+still fails. Retain expert100 as a useful development point, without an extension,
+coefficient sweep, seed confirmation or automatic successor.
+
+| Expert scale | Training | Sampled final / initial | Greedy final / initial |
+| --- | ---: | ---: | ---: |
+|10|17m25s|4.292 /1.375|5.000 /2.583|
+|100|17m45s|9.458 /1.375|12.208 /2.583|
+
+Only expert scale10→100 changes in the saved configuration, affecting actor and
+world supervision together. Keep4M64/Auto/N8/B8/T16/H15/R16/coefficient1/
+actor-unimix.01/full18/original rates,20% episode guidance/cap1920/all18 weights1/
+world gradients/all-state corrective labels. Native447fe50, runner and teacher
+stay fixed. No bounded-check experience, retained weights, replay, belief, games
+or RNG are reused. Seed1009/evaluation4000001009 remain reused development inputs;
+this comparison does not establish seed reliability or the mechanism of the gain.
+
+For context, the older unaided full18 recipe scores7.083, minimal4 scores9.542
+and optional actor/critic gradients score11.208 under sampled actions. The new
+sampled result still trails the latter two; preserve them as distinct controls.
+Their runtime/settings differ, and greedy12.208 is not a matched-mode comparison.
+The much longer retained12M/2M checkpoint's AMD Auto score67.583 also remains.
+
+All69 inputs,100k/12,470 recovery,357 matching control/check initial tensors,
+802 sampled/732 greedy matching initial semantic events, finite reports and
+changed CNN/reward/actor/value pass. Every frozen arm retains357 invariant
+tensors. Full training label/input-pixel/action replay, four frozen outcome
+replays/videos, host guards, curves, exposure, comparison and the original
+terminal collector pass. Both plots are visually inspected. Online curves include
+teacher actions and do not replace the fixed frozen outcome.
+
+Each arm selects the first3 natural episodes per8 lanes=24, with guidance off,
+zero updates and no truncations. Sampled final/initial collect25/29 episodes;
+greedy final/initial collect54/24. Excess episodes and partial tails remain
+recorded. Four arms total58,632 actions /234,352 frames /29.389s. Ordinary frozen
+logs lack live pixel hashes, so replay cannot establish equality to unavailable
+live images.
+
+The20% episode rule selects74/374 starts but overrides117,525 actions (58.7625%).
+Labels include62,795 NOOP,26,676 FIRE and110,529 paddle actions, with82,475 passive
+labels and49,226 actual/teacher disagreements. All24,970 reports are supervised;
+2,990,279 labeled replay rows equal weight sums, maximum raw world/actor loss
+difference8e-7. The70 completed guided episodes average205.943 and296 unguided
+online episodes average3.919, all zero two-wall successes. There are1217 native
+actions after guidance caps. These online outcomes are not unaided competence.
+Final50k replay cross entropy is.821091, versus control1.000155; changing replay
+samples do not measure held-out accuracy.
+
+Main starts03:26:38 UTC/source08d080a and succeeds **03:47:13 UTC on October29**,
+whole20m35.653s. CPU postprocessing succeeds **03:47:41**, whole21m03.193s;
+all four services are terminal success. Training time excludes construction,
+evaluation and audits; full training replay takes94.868s. No observer or GPU
+failure, repeated GPU stage, cap change or runtime edit occurs. The.894s affined
+Qbert analysis co-hosted with training; retain this timing caveat without
+correcting measured wall time. GPU idle at completion; the five-game goal remains
+unfinished.
+
+Root `/x/Temp/kindle-breakout-expert100-20261029/full`, trial
+`breakout-4m-64-r16-expert100-200k-seed1009`. Completion
+`4c14dc24d62ca005298a9eb97baf1beed5dac283a6453cf168c43b17319d6733`,
+learning `c9b158e828f2b5ac3bdcee4e4fbc9b1eb20bff5aa88b9919568aa967420f0881`,
+comparison `57243c1ac00ec3361fa06c414d1ff28b67887d15a174c8244c571d713b26dda1`.
+[Fixed protocol and bounded prerequisite](../experiments/2026-10-29-cdp-breakout-expert100.md).

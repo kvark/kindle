@@ -4,19 +4,19 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-Breakout expert100 fresh200k is active from03:26:38 UTC on October29,
-source08d080a,PID235051/invocatione8a6e8c36aa241f294f9b845645e770b. Only expert
-scale10→100 changes from4M64/Auto/N8/B8/T16/H15/R16/original rates; native,
-runner and teacher stay fixed. Startup passes all69 pins,357 matching initial
-tensors and593 finite reports through4992 actions. The100k/12,470 recovery passes
-357 finite tensors at03:35:42 UTC;12,737 complete-prefix reports are finite.
-Main/progress/CPU postprocessing remain active; fixed200k/24,970 plus four
-final/initial sampled/greedy assessments remain pending. Training cap25min;
-no extension, retry, cap change or automatic successor. The preceding8192/994
-check took37.011s and passed all47 pins,357 tensors,replay/guards and the16m34s
-conservative cost gate. No observer/GPU failure or repeat. Use the original
-full/collect_full.py at terminal success. See the Breakout expert100 protocol;
-check live state before GPU work.
+Breakout expert100 completes200k actions/799,351 frames/24,970 updates in
+17m45s. Sampled9.458/greedy12.208 improve retained expert10's4.292/5.000 for
+1.92% more training time; own initials1.375/2.583. All0/24 two-wall successes.
+All69 pins,100k recovery,357 matching initial/invariant frozen tensors, paired
+initial traces,finite reports,full replays,guards,curves,exposure,comparison and
+original collector pass. Main succeeds03:47:13 UTC,postprocessing03:47:41 on
+October29; all four services terminal success. Actual overrides58.7625%;guided
+scores are not frozen competence. Retain expert100 as a useful development point
+and the distinct stronger sampled controls. Only expert scale10→100 changes on
+reused1009; no mechanism or seed-reliability claim. No observer/GPU failure,
+GPU repeat,cap change,extension,coefficient sweep,confirmation or automatic
+successor. The.894s co-host Qbert analysis remains recorded. GPU idle at completion;
+check live state before work. See [the completed result](results/2026-10-26-cdp-breakout-pixel-reference.md#stronger-imitation-improves-frozen-breakout-at-nearly-unchanged-cost).
 
 Qbert12M48/B16/R16/expert1000 completes200k actions/799,697 frames/12,477
 updates in30m31s. Greedy10588.542/24of24 first pyramids and sampled6150/21
@@ -891,7 +891,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
-| Breakout | Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
+| Breakout | Compact4M64/B8/R16/expert100/200k:sampled9.458,greedy12.208 in17m45s,unconfirmed; own initials1.375/2.583. Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s; expert10/100k4013/1009 greedy7700/3832.292 and24/24 /23/24 in18m55s/19m11s; expert100/100k4013 greedy8365.625/24 in18m59s,4M/200k9654.167/23 in26m07s,and12M/B16/200k11984.375/24 in30m27s,unconfirmed; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
 
 These references are published long-run Dreamer scores, not equal-budget
