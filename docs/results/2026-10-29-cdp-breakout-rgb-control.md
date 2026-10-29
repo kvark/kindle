@@ -77,3 +77,21 @@ runtime artifacts remain outside Git.
 - Completed execution review: `52bd0cc559a0350b6b2746253d0700d834c1f3fb8e95b0809a5079b6c5fc4a36`.
 - CPU repair: `a8be9c8492e558258db5f6396ac7c2d543733d9f19afba9fc6c4e3baf7193dbb`.
 - Completion: `bd43647a5445ccda18e9634f9f5c3ec01a1bc1462a3ac087d5f1537945d565f1`.
+
+
+## Full-controller CPU preflight
+
+The fresh200k controller passes CPU preflight at18:13:34 UTC October29 in
+1.188s:five actual commands parse,22 actual audit/comparison config
+cases,six header-readiness cases,four observer parser cases,five recovery
+cases,40 resolved paths and14 compiled scripts pass. All156 bounded inputs,
+176 CPU-repair inputs and132 retained CDP inputs remain unchanged. The copied
+corrected schema validates all399 finite bounded initial tensors and342 shared
+initial values against CDP;100k/200k schedules are6227/12477 updates. Native
+construction is prohibited and no game is created. The prior failed bounded
+service remains failed;the successful CPU repair is checked separately.
+
+Receipt:`full/full-preflight.json`,SHA256`42c423d80d90ecd5519390ac57c2b6e67c4ebea4337fe7f41ee7231276cca63f`.
+The fixed protocol,controllers,corrected schema,original failure and repair
+evidence are pinned before launch. The selected training cap remains35min;
+this preflight is execution evidence,not a task outcome.

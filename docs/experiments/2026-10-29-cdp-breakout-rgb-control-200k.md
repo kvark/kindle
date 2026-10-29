@@ -56,3 +56,12 @@ Root`/x/Temp/kindle-breakout-rgb-control-20261029/full`,trial
 `breakout-rgb12m-64-b16-r16-expert100-200k-seed1009`,service
 `kindle-breakout-rgb-control-200k-20261029`. CPU controller preparation and
 preflight precede any declaration/launch. Check actual live state first.
+
+CPU preflight completes18:13:34 UTC October29 in1.188s. Five actual
+commands,22 config cases,header/observer/recovery checks,40 resolved paths,
+14 scripts,399 finite bounded initial tensors and342 shared initial values pass.
+All156 original/176 repair/132 CDP pins remain unchanged;no agent/game created.
+Corrected schema SHA256`4c9ea7443dfa36ed87db7b45b4005ee2e6b9c1550b1f7734a648db62f72b3f3a`.
+Full preflight SHA256`42c423d80d90ecd5519390ac57c2b6e67c4ebea4337fe7f41ee7231276cca63f`.
+Declaration and launch follow the fixed protocol;the earlier bounded failure
+remains recorded and no GPU stage is repeated.
