@@ -4,8 +4,9 @@ One fresh Qbert12M48/B16/R8/expert100400k learner is active from01:12:47 UTC
 on October29,source90a9475,PID223970/invocation587396941e1c4312b91578919b1650c9.
 All228 pins,exact config/fresh counters,357 initial tensors matching retained
 control and bounded check,and first updates376/408/440/472/504/536 pass. Keep
-400k/12,489 updates and45-minute training cap;100k/200k/300k recovery observers
-and four fixed final/own-initial sampled+greedy assessments are selected. Native,
+400k/12,489 updates and45-minute training cap. The100k recovery passes3114
+updates/357 finite tensors at01:23:22 UTC;200k/300k recoveries and four fixed
+final/own-initial sampled+greedy assessments remain pending. Native,
 runner,teacher and other12M settings unchanged. No cap increase,retry,checkpoint
 selection,extension or automatic successor. The bounded48.107s check passes all
 45 pins/replays/guards;conservative400k estimate43m04s. Frozen benefit remains

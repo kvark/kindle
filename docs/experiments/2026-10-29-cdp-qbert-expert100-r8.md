@@ -172,3 +172,15 @@ passive label agreement41.753% for original encoder6e-6 versus28.780% for4e-5,
 with low agreement across all four labels. It selects no GPU work. Preserve
 co-host duration as a timing caveat;see the completed Breakout pixel-reference
 report and`/x/Temp/kindle-breakout-passive-labels-20261029/review.json`.
+
+
+## First recovery checkpoint passes
+
+At01:23:22 UTC on October29,the scheduled100k checkpoint verifies3114 saved
+updates and357 finite tensors. The audit checks3236 finite reports through
+103,928 complete-prefix actions;observed credit.25 matches the declaration.
+Checkpoint digest`18adfcad3b198f00e625d23cec1a74575a36f1d3aa36323023bdfee57c6bb28c`;
+recovery review`c8776df78091ddcc80e930c5490940fe18f8ea0a314242e270a2b8e7e4442295`. The same main PID223970/invocation
+587396941e1c4312b91578919b1650c9 continues beyond105,784 actions. Recovery still
+waits for200k/6239 and300k/9364. No frozen result,checkpoint selection,cap change
+or GPU repeat. This is checkpoint/numerical evidence,not task competence.
