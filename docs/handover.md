@@ -1,19 +1,18 @@
 # CDP handover — October25,2026
 
-The [fresh6029 Qbert H5/R32 learner](experiments/2026-10-29-cdp-qbert-h5-seed6029.md) is active from16:59:13 UTC October29
-/source9920dee,service`kindle-qbert-h5-seed6029-200k-20261029`,PID318957.
-Same12M48/Auto/N8/B16/T16/H5/R32/expert100 as4013;seed6029/eval4000006029,
-200k actions/24,954 updates,45min cap,100k recovery,four frozen arms. Startup
-passes263 pins,357 finite initial tensors,48 changed initial tensors versus4013,
-first updates376/384/392/400/408/416 and319 finite supervised reports in2920
-actions. The100k/12,454-update recovery passes17:19:48 UTC with357 finite
-tensors;midpoint recheck17:20:48 verifies263 pins and original PID/invocation.
-Recovery observer succeeds;main,progress and postprocessing continue. Greedy
-primary,original15000/90% gate. No H15/R16 control for6029;this checks recipe
-performance on another learner,not an isolated gain. Native447fe50,runner and
-teacher fixed;no build or experience reuse. Root`/x/Temp/kindle-qbert-h5-seed6029-20261029/full`.
-No frozen outcome yet;check actual service state and never restart on observer
-expiry. No extension,seed campaign or automatic successor selected.
+The [fresh6029 Qbert H5/R32 learner](experiments/2026-10-29-cdp-qbert-h5-seed6029.md) finishes200k actions/799,761 frames/24,954 updates in40m22s.
+Four frozen replays complete:greedy15792.708/24 first pyramids,sampled15420.833/24,
+versus own initials91.667/0 and103.125/0. Both candidate modes pass15k/90% on
+this learner;4013 remains14050/23 greedy and13331.250/23 sampled,below15k.
+The full training-label replay and terminal postprocessing are still active;
+this is not yet a completed protocol. Main PID318957/invocationb53406373693476ca9c08f5a5d05cc0a
+remains;do not restart it or launch another GPU job. The100k/12,454 recovery
+passed with357 finite tensors and263 pins;startup confirmed48 changed initial
+tensors versus4013. Same12M48/Auto/N8/B16/T16/H5/R32/expert100,seed6029/eval4000006029,
+native447fe50,source9920dee,no experience reuse. No H15/R16 control for6029;
+one of two H5/R32 learners reaches the gate,not broad reliability. Original
+service starts16:59:13 UTC October29. Root`/x/Temp/kindle-qbert-h5-seed6029-20261029/full`.
+No extension,seed campaign or automatic successor selected.
 
 A [matched Breakout reconstruction control](experiments/2026-10-29-cdp-breakout-rgb-control.md) is CPU-prepared; no GPU declaration or launch exists.
 Keep12M64/B16/T16/H15/R16/expert100 and native447fe50; only centered flag and
