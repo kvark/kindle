@@ -1,5 +1,18 @@
 # Qbert retains useful forecasts; later-game accuracy and policy use remain open
 
+## Shorter imagination with more replay improves one learner
+
+The [completed H5/R32 comparison](2026-10-29-cdp-qbert-h5-r32.md) reallocates
+compute from longer imagined rollouts to twice as many world/expert updates.
+At200k actions, primary greedy improves11984.375→14050 and sampled6759.375→
+13331.250, with23/24 first pyramids each, for32.67% more training time. Both
+still miss mean15000. All audits pass. This supports retaining a different
+allocation of learning work in the current architecture. Horizon,replay ratio,
+cadence,sampling and warmup change together;it does not identify which change
+caused the gain or establish better quality per GPU-hour in general. The reused
+seed/cohort remain development evidence;no extension or automatic successor.
+
+
 ## Reviewed expert-label path has no apparent one-step offset
 
 A source review of the exact native447fe50 runtime follows corrective labels

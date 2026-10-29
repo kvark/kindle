@@ -1,18 +1,20 @@
 # CDP handover — October25,2026
 
-The fresh [Qbert H5/R32 comparison](experiments/2026-10-29-cdp-qbert-h5-r32-200k.md) remains active. Its100k recovery
-passes15:58:25 UTC October29:12,454 saved updates and357 finite tensors. The
-inspected101,400-action prefix has12,628 finite reports. A15:59:45 read-only
-recheck confirms all229 input pins,checkpoint config/counters/hashes and original
-PID312184/invocation0359bcc31f964fdf8e92542561e2e949. Recovery observer succeeds;
-main,progress and postprocessing remain active. Start15:37:50/sourcee57dd2f,
-service`kindle-qbert-h5-r32-200k-20261029`. Budget200k/24,954 updates,45min and
-four fixed frozen arms remain unchanged.12M48/Auto/N8/B16/T16/H5/R32/expert100
-changes horizon,cadence and total work together;no isolated effect or promised
-speedup. Native447fe50,runner,teacher fixed;no check experience reused. The
-[bounded check](results/2026-10-29-cdp-qbert-h5-r32.md) passes8192/978 in93.933s,all41 pins/replay/guards,
-conservative200k42m03s. Evidence`/x/Temp/kindle-qbert-h5-r32-20261029`;check actual
-service state. No frozen task result yet;never restart because observation times out.
+The [completed Qbert H5/R32 comparison](results/2026-10-29-cdp-qbert-h5-r32.md) finishes200k actions/799,762 frames/
+24,954 updates in40m24s,+32.67% training time. Greedy14050/23 first pyramids
+improves11984.375/24 by17.24%;sampled13331.250/23 improves6759.375/24 by97.23%.
+Own initials80.208/177.083 clear none;both candidate means still miss15000.
+RetainH5/R32 as strongest primary development score andH15/R16 as cheaper point;
+no extension,confirmation or automatic successor selected. All229 pins,100k
+recovery,357 matched initial/invariant frozen tensors,paired initial traces,full
+replays/videos,guards,curves,coverage,exposure and comparison pass. Main succeeds
+16:31:07 UTC October29/sourcee57dd2f,postprocessing16:31:24,collection16:32:04;
+all services succeed,no GPU stage repeats. Actual overrides75,030 (37.515%);
+online aided returns are not competence. H15→5/R16→32 changes horizon,cadence,
+sampling,warmup and total work together;no isolated effect or seed confirmation.
+Native447fe50,runner,teacher fixed. Evidence`/x/Temp/kindle-qbert-h5-r32-20261029`.
+No GPU allocation remains active at completion;check live state before work.
+The five-game goal remains unfinished.
 
 The [completed Qbert B8/T32 comparison](results/2026-10-29-cdp-qbert-context32.md) finishes200k actions/799,710 frames/
 12,469 updates in31m48s,+4.44% training time. Greedy11609.375/24 first pyramids

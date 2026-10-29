@@ -1,18 +1,20 @@
 # Kindle: CDP learning roadmap
 
-The fresh [Qbert H5/R32 comparison](experiments/2026-10-29-cdp-qbert-h5-r32-200k.md) remains active. Its100k recovery
-passes15:58:25 UTC October29:12,454 saved updates and357 finite tensors. The
-inspected101,400-action prefix has12,628 finite reports. A15:59:45 read-only
-recheck confirms all229 input pins,checkpoint config/counters/hashes and original
-PID312184/invocation0359bcc31f964fdf8e92542561e2e949. Recovery observer succeeds;
-main,progress and postprocessing remain active. Start15:37:50/sourcee57dd2f,
-service`kindle-qbert-h5-r32-200k-20261029`. Budget200k/24,954 updates,45min and
-four fixed frozen arms remain unchanged.12M48/Auto/N8/B16/T16/H5/R32/expert100
-changes horizon,cadence and total work together;no isolated effect or promised
-speedup. Native447fe50,runner,teacher fixed;no check experience reused. The
-[bounded check](results/2026-10-29-cdp-qbert-h5-r32.md) passes8192/978 in93.933s,all41 pins/replay/guards,
-conservative200k42m03s. Evidence`/x/Temp/kindle-qbert-h5-r32-20261029`;check actual
-service state. No frozen task result yet;never restart because observation times out.
+The [completed Qbert H5/R32 comparison](results/2026-10-29-cdp-qbert-h5-r32.md) finishes200k actions/799,762 frames/
+24,954 updates in40m24s,+32.67% training time. Greedy14050/23 first pyramids
+improves11984.375/24 by17.24%;sampled13331.250/23 improves6759.375/24 by97.23%.
+Own initials80.208/177.083 clear none;both candidate means still miss15000.
+RetainH5/R32 as strongest primary development score andH15/R16 as cheaper point;
+no extension,confirmation or automatic successor selected. All229 pins,100k
+recovery,357 matched initial/invariant frozen tensors,paired initial traces,full
+replays/videos,guards,curves,coverage,exposure and comparison pass. Main succeeds
+16:31:07 UTC October29/sourcee57dd2f,postprocessing16:31:24,collection16:32:04;
+all services succeed,no GPU stage repeats. Actual overrides75,030 (37.515%);
+online aided returns are not competence. H15→5/R16→32 changes horizon,cadence,
+sampling,warmup and total work together;no isolated effect or seed confirmation.
+Native447fe50,runner,teacher fixed. Evidence`/x/Temp/kindle-qbert-h5-r32-20261029`.
+No GPU allocation remains active at completion;check live state before work.
+The five-game goal remains unfinished.
 
 The [completed Qbert B8/T32 comparison](results/2026-10-29-cdp-qbert-context32.md) finishes200k actions/799,710 frames/
 12,469 updates in31m48s,+4.44% training time. Greedy11609.375/24 first pyramids
@@ -1164,7 +1166,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Compact12M64/B16/R16/expert100/200k:sampled13.208,greedy17.875 in22m19s,unconfirmed; own initials1.417/2.208. Smaller4M/B8:9.458/12.208 in17m45s. Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
-| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s; expert10/100k4013/1009 greedy7700/3832.292 and24/24 /23/24 in18m55s/19m11s; expert100/100k4013 greedy8365.625/24 in18m59s,4M/200k9654.167/23 in26m07s,and12M/B16/200k11984.375/24 greedy or12389.583/24 attemperature.5 in30m27s,unconfirmed; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
+| Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s; expert10/100k4013/1009 greedy7700/3832.292 and24/24 /23/24 in18m55s/19m11s; expert100/100k4013 greedy8365.625/24 in18m59s,4M/200k9654.167/23 in26m07s,and12M/B16/200k11984.375/24 greedy or12389.583/24 attemperature.5 in30m27s; H5/R32 at200k improvesgreedy14050/23 andsampled13331.25/23 in40m24s,unconfirmed; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and
