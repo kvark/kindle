@@ -1,5 +1,18 @@
 # Kindle: CDP learning roadmap
 
+The [Breakout modal-posterior assessment](results/2026-10-29-cdp-greedy-posterior.md#breakout-trained-score-rises-slightly-the-paired-assessment-fails-its-protocol) is terminal and protocol-failed: trained sampled/modal means17.875/18.833 both
+have0/24 two-wall successes, while the actual-initial modal arm records five
+25,000-action time limits. Default final/initial traces reproduce; all357 frozen
+tensors per arm,100 original pins,full recorded-action replays/videos and host
+guards pass. Main fails19:07:21 UTC October29/sourcef676b27. Separate72.712s
+CPU closure completes19:13:56 with192 pins; an earlier over-specific CPU
+assertion remains preserved. No GPU stage repeats. Four arms total251,928
+actions/1,007,559 frames/159.615s,zero updates; original22m19s training remains.
+Retain sampled posteriors; no accepted paired modal gain,retry,cap increase or
+successor. Closure status is `closed_protocol_failed`; no original passing
+comparison/completion exists. No learner or GPU allocation is active at closure.
+Check live state before GPU work; the five-game goal remains unfinished.
+
 The [completed Qbert6029 H5/R32 learner](results/2026-10-29-cdp-qbert-h5-seed6029.md) finishes200k actions/799,761 frames/24,954 updates in40m22s.
 Greedy15792.708/24 first pyramids and sampled15420.833/24 pass15k/90%,versus
 own initials91.667/0 and103.125/0. Seed4013 remains14050/23 and13331.250/23;

@@ -30,8 +30,9 @@ measured plateau. Its final1000 updates still assign the teacher action only
 substantial remaining training-label error alongside the previously observed
 frozen urgent-action disagreements. It does not distinguish missing precise
 state information,ambiguous teacher labels,insufficient optimization,or loss
-interference. The active reconstruction control tests one representation
-objective change;this diagnostic does not select another learner or intervention.
+interference. The reconstruction control selected at this point tests one
+representation objective change; its completed result appears below. This
+diagnostic does not select another learner or intervention.
 
 These probabilities are`exp(-cross_entropy)`,not greedy agreement,sampled
 accuracy or calibrated action quality. Games,states,class mix,horizon,resolution
@@ -68,6 +69,14 @@ training time. Its matched initial tensors/traces and all audits pass after
 a CPU-only plotting import repair. This supplies no evidence that this pixel
 objective fixes Breakout's training-fit/control gap. It does not isolate the
 cause or rule out other representation objectives;retain CDP.
+
+The subsequent [frozen posterior assessment](2026-10-29-cdp-greedy-posterior.md#breakout-trained-score-rises-slightly-the-paired-assessment-fails-its-protocol)
+raises trained greedy17.875→18.833 with modal states, but both remain0/24
+two-wall successes. Its actual-initial modal arm has five time-limit truncations,
+so the fixed four-arm protocol fails; no paired modal gain is accepted. All
+exports remain finite/invariant and saved trajectories replay. This supplies
+no demonstrated fix for the control gap and does not isolate sampling noise
+as its cause. Retain sampled states; no training or automatic successor follows.
 
 ## Breakout action readouts do not outperform its retained policy
 

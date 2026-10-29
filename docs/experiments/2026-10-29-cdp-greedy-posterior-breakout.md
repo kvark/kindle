@@ -64,3 +64,22 @@ Evidence root: `/x/Temp/kindle-breakout-greedy-posterior-20261029`.
 Service: `kindle-posterior-breakout-eval-20261029`.
 Check actual live state before launching. Stop on real host faults or numerical
 failures; no driver reset, reload, reboot or automatic retry.
+
+## Terminal outcome: zero-truncation protocol fails
+
+The trained sampled/modal arms score17.875/18.833, bothzero of24 two-wall
+successes; default final/initial semantic traces reproduce. The actual-initial
+modal arm records five25,000-action time limits before finishing its natural
+cohort. The fixed zero-truncation requirement fails; its natural-only mean is
+not an accepted paired control. Main service exits failed19:07:21 UTC October29,
+sourcef676b27. No GPU stage repeats and no cap changes.
+
+A separate CPU closure audits the saved fourth export and replays its full
+trajectory/video once, preserving the experiment failure. All100 original pins,
+357 finite/invariant tensors per arm and host guards pass. The first CPU closure
+has an over-specific truncation diagnostic assertion; source/failure are retained.
+The corrected72.712s closure checks all192 pins and records
+`closed_protocol_failed`. Four arms total251,928 actions/1,007,559 frames/
+159.615s evaluation,zero updates. Original22m19s training remains.
+Retain sampled posteriors; no retry,extension,second learner or successor.
+See the [complete result and limits](../results/2026-10-29-cdp-greedy-posterior.md#breakout-trained-score-rises-slightly-the-paired-assessment-fails-its-protocol).

@@ -1,6 +1,72 @@
-# Modal posterior categories lower frozen Qbert score
+# Frozen modal-posterior assessments
 
-## Retain sampled posterior states with greedy actions
+## Breakout trained score rises slightly; the paired assessment fails its protocol
+
+Retain sampled posterior states. With greedy actions, the retained CDP Breakout
+learner scores **17.875 with sampled posteriors and18.833 with modal posteriors**,
+a5.36% increase on one reused development cohort. Both have **0/24 two-wall
+successes**. The actual-initial modal arm has five time-limit truncations,
+violating the fixed zero-truncation requirement. The four-arm assessment is
+therefore **protocol-failed**, not a completed paired modal improvement.
+
+| Frozen checkpoint | Sampled posterior | Modal posterior |
+| --- | ---: | ---: |
+| Trained mean score,24 natural episodes |17.875|18.833|
+| Trained two-wall successes |0/24|0/24|
+| Actual-initial accepted mean |2.208|Not accepted: five truncations|
+| Arm protocol |Both sampled arms pass|Trained passes;initial fails|
+
+The initial modal arm eventually obtains at least three natural episodes in
+each lane, but also records five25,000-action time limits. Four occur at
+aggregate action200,000 and one at201,592; one truncated episode has return1,
+the others0. Its first-three-natural cohort mean1.500 is retained as a censored
+diagnostic only, not an accepted paired control. All40 completed episodes,
+including five truncations, and partial tails remain in the ledger and replay.
+Do not discard the timeouts or redefine the declared evaluation after seeing them.
+
+The original service starts19:03:54 UTC October29/source`f676b27` and fails
+**19:07:21 UTC**, after3m26.130s, at the zero-truncation assertion. The final
+modal initial evaluation itself stays within its600k-action/300s allocation:
+204,960 actions/819,796 frames/128.994s,zero updates. This is an evaluation
+protocol failure, not a host fault or a numerical failure. No GPU stage repeats,
+cap increases, new training, second learner or successor is selected.
+
+CPU closure audits the saved fourth arm and performs its full recorded-action
+replay/video once. All357 tensors per arm remain finite and unchanged; source,
+config,seed,counters,100 original pins,132 retained-control pins,69 resolved
+qualification pins and host guards pass. The sampled final/initial arms reproduce
+2672/794 transition/episode/reset events and their complete retained semantic
+traces, including final counters and tails. Ordinary live logs have no pixel
+hashes; replay establishes recorded outcomes/frame/reset consistency, not direct
+equality with the original live images.
+
+The first CPU closure fails before replay because an unnecessarily specific
+diagnostic assertion assumes every truncation has return0 and occurs at200,000.
+Its source,declaration and failure receipt remain unchanged. The separate
+corrected closure checks the actual common25,000-action time limit and retains
+all episode values. It takes72.712s, with192 closure pins unchanged, and closes
+the evidence as `closed_protocol_failed` at19:13:56 UTC. The experiment stays failed;
+no passing `comparison.json` or original `completion-review.json` is created.
+
+The four frozen arms consume **251,928 actions /1,007,559 frames /159.615s**,
+with zero learning updates. Original CDP training remains200k actions/12,477
+updates/**22m19s**. Different trajectories prevent an isolated speed claim.
+Modal categories change the state distribution supplied to a policy trained
+with samples; even the small trained-arm gain does not identify representation
+precision as its cause. The same inference change lowers Qbert's score below.
+
+[Fixed Breakout protocol](../experiments/2026-10-29-cdp-greedy-posterior-breakout.md).
+Evidence: `/x/Temp/kindle-breakout-greedy-posterior-20261029`, including all four
+logs,exports,guards,three passing arm reviews and the preserved failed service.
+The fourth replay/video and terminal closure are in `cpu-closure-corrected`;
+the original CPU closure failure is in `cpu-closure`. Runtimeb76f91c and its exact
+historical runner are reused; the explicit runner path/hash resolution preserves
+the old declarations. No build or backend requalification occurs.
+
+- Original declaration: `2bf9ed34753331475b4a1585030a3fa8f8fbde7b31ea304b17ea319a83ce640b`.
+- Failed-assessment closure: `ff2edd68fdd147f7af17fce516b0bd648be2f1b901a9b2c459241c49cc86fd66`.
+
+## Qbert: retain sampled posterior states with greedy actions
 
 The separately selected full assessment lowers trained Qbert mean
 **11984.375→10539.583 (−12.06%)** when live posterior categories use their modes
