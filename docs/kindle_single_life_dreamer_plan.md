@@ -4,19 +4,20 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-Fresh Breakout12M64/B16/R16/expert100200k remains selected with30min cap,
-12,477 updates,100k/6227 recovery andfour fixed frozen arms,sampled primary.
-The first CPU controller/postprocessor fail05:02:34 UTC on a duplicated private
-path before any GPU queue,native agent,environment or training artifact exists.
-Original106 pins,failed units andzero-action progress record are preserved.
-The separate `full-repaired` copy corrects paths;CPU preflight passes.379s with
-44 resolved-path checks plus the prior CLI/config/header/observer cases. The
-actual controller preflight must pass before services start. Same configuration,
-seed,budgets,native447fe50,runner andteacher;no GPU stage repeats or experience
-reuse. Use `/x/Temp/kindle-breakout-expert100-capacity-20261029/full-repaired` and
-its `kindle-breakout-expert100-capacity-200k-repair-20261029` service. Do not clear
-original failed units. No extension,cap increase,checkpoint selection or automatic
-successor. See the expert100-capacity protocol;check live state before GPU work.
+Fresh Breakout12M64/B16/R16/expert100200k is active from05:08:58 UTC on October29,
+source404b541,PID243198/invocation9ab610854d844a45bccd05acad54d45a. Startup passes
+132 pins,357 bounded-matching initial tensors and368 finite reports through6256
+actions. Recovery waits for100k/6227;keep200k/12,477,30min cap andfour fixed frozen
+arms,sampled primary. The original05:02:34 CPU controller/postprocessor failures
+on a duplicated path remain preserved with106 unchanged pins andzero GPU work.
+Corrected path checks andthe actual controller preflight pass;23 experiment
+fields andthe normalized queue match the original attempt. No GPU stage repeats.
+Use `/x/Temp/kindle-breakout-expert100-capacity-20261029/full-repaired` andservice
+`kindle-breakout-expert100-capacity-200k-repair-20261029`;at completion use its
+`collect_full.py`. Do not clear the original failed units. Native447fe50,runner,
+teacher andbudgets stayfixed;no extension,cap increase,checkpoint selection or
+automatic successor. See the expert100-capacity protocol;check live state before
+GPU work.
 
 Breakout12M64/B16/R16/expert100 bounded check passes8192 actions/32,720 frames/
 489 updates in47.623s; frozen1024/4096frames/.877s haszero updates/no natural

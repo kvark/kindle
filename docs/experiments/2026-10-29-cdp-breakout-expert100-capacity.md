@@ -181,3 +181,29 @@ corrected services,all candidate audits,unchanged original106 pins,the preserved
 original failures andabsence of original GPU artifacts. Do not clear the original
 failed units or run the failed attempt's collector. No driver recovery,wall-cap
 increase,learner extension or automatic successor is selected.
+
+## Corrected fresh learner active
+
+The actual CPU controller preflight passes all132 pins before any service starts.
+All23 compared experiment fields and the entire queue after output-path
+normalization match the preserved original attempt. Configuration,seed,budgets,
+native,runner,teacher and assessment rules are unchanged; zero GPU stages existed
+in the original attempt. Prelaunch receipt
+`d5ccec45d1d352eabc98e09828f9b7aeb126d68419699a4f5a33d5f7cc274cf7`.
+
+Corrected main `kindle-breakout-expert100-capacity-200k-repair-20261029` starts
+05:08:58 UTC on October29,source404b541,PID243198/invocation
+9ab610854d844a45bccd05acad54d45a. Declaration
+`7e2622615b2587f5e10b9a517602ceaa075bd9ad3d849ced65805353a7659a7f` pins132 inputs,
+including the original failure evidence. Postprocessing/progress are active;
+recovery starts05:09:03,PID243335/invocationf6c10af280b046659255445e1d15e5c4,
+and waits for100k/6227.
+
+Startup verifies132 pins,exact fresh configuration/counters and357 initial tensors
+matching the bounded12M64 check. First six updates are376/392/408/424/440/456;
+368 finite supervised reports appear through6256 actions. Initial checkpoint
+`e6c167e00e36f948ff47516d887b34ec93025c5aad56d0e6f3e86c4a441fc4c1`;
+startup receipt `efc8761400360ad52016e76c8d1907d32a8e1395c994260fcf31acb7bb9953b5`.
+This is startup evidence,not a frozen task result. Preserve the original failed
+services and use `full-repaired/collect_full.py` only after the corrected services
+and all audits finish. Fixed200k/12,477 and30-minute training cap remain unchanged.
