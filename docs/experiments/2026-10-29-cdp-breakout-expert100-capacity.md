@@ -182,7 +182,7 @@ original failures andabsence of original GPU artifacts. Do not clear the origina
 failed units or run the failed attempt's collector. No driver recovery,wall-cap
 increase,learner extension or automatic successor is selected.
 
-## Corrected fresh learner active
+## Corrected fresh learner launch
 
 The actual CPU controller preflight passes all132 pins before any service starts.
 All23 compared experiment fields and the entire queue after output-path
@@ -221,3 +221,29 @@ strictly finite supervised reports. Review digest
 The observer exits successfully; the original learner PID243198 remains active.
 This CPU audit performs no restore or evaluation and does not interrupt training.
 The fixed200k/12,477 budget and30-minute cap remain; frozen competence is unmeasured.
+
+## Completed comparison
+
+The corrected service completes the declared200,000 actions /799,464 frames /
+12,477 updates in1339.198s (22m19s), below the unchanged30-minute training cap.
+Primary sampled score13.208 versus own initial1.417 improves the4M/B8 control's
+9.458 by39.65%; greedy17.875 versus own2.208 improves12.208 by46.42%. Training
+cost rises25.72%. All frozen arms have0/24 two-wall successes; the original task
+gate fails. Retain both measured budget points without selecting an extension,
+confirmation, cap increase or automatic successor.
+
+All132 candidate pins,100k recovery,357 matched bounded-check initial and357
+invariant frozen tensors per arm, finite reports, parameter changes, full training
+label/pixel/action replay, four outcome replays/videos, guards, curves, exposure
+and comparison pass. The corrected terminal collector passes once and preserves
+the original failed services,106 input pins and absence of original GPU artifacts.
+No GPU stage repeats. Main exits05:34:19 UTC on October29, postprocessing05:34:31;
+all corrected services are terminal success. Actual guidance overrides113,424
+actions (56.712%); guided online outcomes are not frozen competence.
+
+Completion receipt
+`eaba2293baaeb0ad777167167171ab6d5a977d151398bd2c474a8fa7b6b3a474`;
+learning review
+`4407b5d8fc1739ea1bae9c0830e2d928d85f923000f57ce5021c220c50e79bda`.
+See the [full result](../results/2026-10-26-cdp-breakout-pixel-reference.md#larger-capacity-improves-frozen-breakout-with-higher-cost).
+The GPU is idle at completion; check live state before new work.

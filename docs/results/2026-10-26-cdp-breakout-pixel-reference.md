@@ -1138,3 +1138,79 @@ Root `/x/Temp/kindle-breakout-expert100-capacity-20261029/native-check`, trial
 `breakout-12m-64-b16-r16-expert100-check`; completion
 `90f5067865b24aa2fa75fad76e734eb1c44e2d1657a8c2d72230a3a138c8b7e4`,review
 `89c04f0a8722f5493beb5800eb2307ab9b24983b72d8a45faa9768b89409d0ea`.
+
+
+## Larger capacity improves frozen Breakout with higher cost
+
+The fresh12M64/B16/R16/expert100 learner completes **200,000 aggregate actions /
+799,464 emulator frames /12,477 updates in22m19s**. Sampled frozen score improves
+**9.458→13.208 (+39.65%)** relative to the retained4M/B8/expert100 control;
+greedy improves **12.208→17.875 (+46.42%)**. Training takes **25.72% longer**,
+versus17m45s. All policy/mode combinations have **0/24 two-wall successes**.
+Retain both measured budget points as limited development evidence. No extension,
+confirmation, cap increase or automatic successor is selected.
+
+| Recipe | Sampled final / own initial | Greedy final / own initial | Training | Two-wall successes |
+| --- | ---: | ---: | ---: | ---: |
+| Retained4M64/B8/R16/expert100 |9.458 /1.375|12.208 /2.583|17m45s|0/24 in each arm|
+| Fresh12M64/B16/R16/expert100 |13.208 /1.417|17.875 /2.208|22m19s|0/24 in each arm|
+
+Capacity4M→12M and batch/microbatch8→16 change together, halving optimizer
+cadence at the same replay ratio. The12M64 model has16,334,353 trainable
+parameters, versus4,131,729 for4M64. Keep Auto/N8/T16/H15/R16/coefficient1,
+actor-unimix.01/full18, original rates,20% episode guidance/cap1920/expert100,
+all18 weights1, world gradients and all-state corrective labels. Native447fe50,
+runner, edge-reset teacher and host match. Native max-pooled frames receive one
+GPU resize to64. No prior weights or bounded-check experience are reused.
+
+This is neither an isolated capacity effect nor an equal-update or equal-time
+comparison. Seed1009 and evaluation4000001009 are reused development inputs;
+there is no independent confirmation. Initial weights and semantic trajectories
+may differ across architectures, so each model retains its own actual-initial
+control. The new initial matches all357 tensors of its own bounded12M64 check.
+The much longer retained12M/2M checkpoint's AMD Auto score67.583 remains a distinct
+budget point. The new score does not establish full-game competence.
+
+All132 candidate inputs,100k/6227 recovery,12,477 finite reports, changed
+CNN/reward/actor/value,357 finite initial/final tensors and357 invariant tensors
+per frozen arm pass. Full training label/input-pixel/action replay, four frozen
+outcome replays/videos, host guards, curves, exposure, comparison and terminal
+collector pass. Both plots were inspected. Each frozen arm selects the first3
+natural episodes per8 lanes=24, with guidance and labels off, zero updates and
+no truncations. Collected episodes are28/28 sampled final/initial and26/27 greedy;
+excess episodes and partial tails are retained. Four arms total49,904 actions /
+199,448 frames /32.586s. Ordinary frozen logs lack live pixel hashes; their replay
+checks outcomes, not equality to unavailable live images.
+
+The20% episode rule selects71/347 starts and overrides113,424 actions (56.712%).
+Labels comprise64,162 NOOP,24,036 FIRE and111,802 paddle commands. There are86,576
+passive labels and48,787 actual/teacher disagreements. All12,477 reports contain
+supervision;2,988,570 labeled replay rows equal weight sums, with maximum raw
+world/actor loss difference8e-7. The67 completed guided episodes average201.045,
+and272 unguided online episodes average5.180; all havezero two-wall successes.
+There are1124 native actions after guidance caps. These outcomes inherit changing
+parameters or teacher actions and are not frozen competence. Final50k replay
+cross entropy is.695816 versus the control's.821091; these changing replay
+samples do not measure held-out accuracy.
+
+The first controller/postprocessor fail on a duplicated absolute path at05:02:34
+UTC, before any GPU queue, native agent, environment or training artifact exists.
+That CPU-only attempt, its106 unchanged pins and failed services remain preserved.
+A separate corrected copy passes its actual CPU controller preflight before
+launch, with unchanged experiment fields and normalized queue. No GPU stage repeats.
+
+Corrected main starts05:08:58 UTC/source404b541 and succeeds **05:34:19 UTC on
+October29**, whole25m20.932s. CPU postprocessing succeeds **05:34:31**, whole
+25m33.061s; all four corrected services are terminal success. The training cap
+remains1800s; measured1339.198s excludes construction, evaluation and audits.
+Training replay takes95.653s. Routine monitoring and read-only source inspection
+co-hosted with training; no other GPU work or runtime edit occurred. The corrected
+collector verifies all original failure evidence as well as the completed result.
+GPU idle at completion; the five-game goal remains unfinished.
+
+Root `/x/Temp/kindle-breakout-expert100-capacity-20261029/full-repaired`, trial
+`breakout-12m-64-b16-r16-expert100-200k-seed1009`. Completion
+`eaba2293baaeb0ad777167167171ab6d5a977d151398bd2c474a8fa7b6b3a474`,
+learning `4407b5d8fc1739ea1bae9c0830e2d928d85f923000f57ce5021c220c50e79bda`,
+comparison `94af7831d57e6f2331ee108daf6d2bf4cc67119f8279be3b11d8575f50310677`.
+[Fixed protocol, CPU launch failure and recovery evidence](../experiments/2026-10-29-cdp-breakout-expert100-capacity.md).

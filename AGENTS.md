@@ -52,21 +52,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Fresh Breakout12M64/B16/R16/expert100200k is active from05:08:58 UTC on October29,
-source404b541,PID243198/invocation9ab610854d844a45bccd05acad54d45a. Startup passes
-132 pins,357 bounded-matching initial tensors and368 finite reports through6256
-actions. The100k/6227 recovery passes05:20:33 UTC with357 finite tensors and
-6494 finite reports through104,280 actions;its observer exits successfully while
-training continues. Keep200k/12,477,30min cap andfour fixed frozen arms,sampled primary. The original05:02:34 CPU controller/postprocessor failures
-on a duplicated path remain preserved with106 unchanged pins andzero GPU work.
-Corrected path checks andthe actual controller preflight pass;23 experiment
-fields andthe normalized queue match the original attempt. No GPU stage repeats.
-Use `/x/Temp/kindle-breakout-expert100-capacity-20261029/full-repaired` andservice
-`kindle-breakout-expert100-capacity-200k-repair-20261029`;at completion use its
-`collect_full.py`. Do not clear the original failed units. Native447fe50,runner,
-teacher andbudgets stayfixed;no extension,cap increase,checkpoint selection or
-automatic successor. See the expert100-capacity protocol;check live state before
-GPU work.
+Breakout12M64/B16/R16/expert100 completes 200k actions /799,464 frames /12,477
+updates in22m19s. Frozen sampled13.208/greedy17.875 improve4M/B8's9.458/12.208
+by39.65%/46.42%, for25.72% more training time; own initials1.417/2.208.
+All0/24 two-wall successes. All132 pins,100k recovery,357 bounded-matching
+initial/invariant frozen tensors, full replays, guards, curves, exposure,
+comparison and terminal collector pass. Main exits05:34:19 UTC,postprocessing
+05:34:31 on October29. The original CPU path failure and106 pins remain preserved;
+no GPU stage repeats. Retain both budget points; capacity and batch change together
+on reused1009, without an isolated effect or reliability claim. Actual overrides
+56.712%; online guided scores are not frozen competence. No extension,cap increase,
+confirmation or automatic successor is selected. No GPU allocation is active.
+See the [completed capacity result](docs/results/2026-10-26-cdp-breakout-pixel-reference.md#larger-capacity-improves-frozen-breakout-with-higher-cost); check live state before GPU work.
 
 Breakout12M64/B16/R16/expert100 bounded check passes8192 actions/32,720 frames/
 489 updates in47.623s; frozen1024/4096frames/.877s haszero updates/no natural

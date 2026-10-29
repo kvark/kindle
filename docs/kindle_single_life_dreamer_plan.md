@@ -4,21 +4,18 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-Fresh Breakout12M64/B16/R16/expert100200k is active from05:08:58 UTC on October29,
-source404b541,PID243198/invocation9ab610854d844a45bccd05acad54d45a. Startup passes
-132 pins,357 bounded-matching initial tensors and368 finite reports through6256
-actions. The100k/6227 recovery passes05:20:33 UTC with357 finite tensors and
-6494 finite reports through104,280 actions;its observer exits successfully while
-training continues. Keep200k/12,477,30min cap andfour fixed frozen arms,sampled primary. The original05:02:34 CPU controller/postprocessor failures
-on a duplicated path remain preserved with106 unchanged pins andzero GPU work.
-Corrected path checks andthe actual controller preflight pass;23 experiment
-fields andthe normalized queue match the original attempt. No GPU stage repeats.
-Use `/x/Temp/kindle-breakout-expert100-capacity-20261029/full-repaired` andservice
-`kindle-breakout-expert100-capacity-200k-repair-20261029`;at completion use its
-`collect_full.py`. Do not clear the original failed units. Native447fe50,runner,
-teacher andbudgets stayfixed;no extension,cap increase,checkpoint selection or
-automatic successor. See the expert100-capacity protocol;check live state before
-GPU work.
+Breakout12M64/B16/R16/expert100 completes 200k actions /799,464 frames /12,477
+updates in22m19s. Frozen sampled13.208/greedy17.875 improve4M/B8's9.458/12.208
+by39.65%/46.42%, for25.72% more training time; own initials1.417/2.208.
+All0/24 two-wall successes. All132 pins,100k recovery,357 bounded-matching
+initial/invariant frozen tensors, full replays, guards, curves, exposure,
+comparison and terminal collector pass. Main exits05:34:19 UTC,postprocessing
+05:34:31 on October29. The original CPU path failure and106 pins remain preserved;
+no GPU stage repeats. Retain both budget points; capacity and batch change together
+on reused1009, without an isolated effect or reliability claim. Actual overrides
+56.712%; online guided scores are not frozen competence. No extension,cap increase,
+confirmation or automatic successor is selected. No GPU allocation is active.
+See the [completed capacity result](results/2026-10-26-cdp-breakout-pixel-reference.md#larger-capacity-improves-frozen-breakout-with-higher-cost); check live state before GPU work.
 
 Breakout12M64/B16/R16/expert100 bounded check passes8192 actions/32,720 frames/
 489 updates in47.623s; frozen1024/4096frames/.877s haszero updates/no natural
@@ -249,6 +246,8 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Full18, corrective labels/expert10/20%/R16](results/2026-10-26-cdp-breakout-pixel-reference.md#corrective-labels-save-time-but-remain-below-unaided-breakout) |200k /24,970|17m25s|4.292 /1.375|0/24 two-wall;26.02% less time than old guidance,but below unaided7.083|
 | [Retained corrective learner,greedy](results/2026-10-26-cdp-breakout-pixel-reference.md#greedy-corrective-breakout-gives-a-small-gain-but-remains-weak) |200k /24,970 retained;0 new|17m25s retained|5.000 /2.583|0/24 two-wall;small gain over sampled4.292|
 | [Same, encoder rate4e-5](results/2026-10-26-cdp-breakout-pixel-reference.md#higher-encoder-rate-lowers-frozen-breakout-quality) |200k /24,970|17m41s|1.458 /1.375|0/24 two-wall;below original-rate4.292,1.52% more time|
+| [Full18, corrective expert100/4M/B8/R16](results/2026-10-26-cdp-breakout-pixel-reference.md#stronger-imitation-improves-frozen-breakout-at-nearly-unchanged-cost) |200k /24,970|17m45s|Sampled9.458 /1.375; greedy12.208 /2.583|0/24 two-wall; one reused learner|
+| [Same supervision,12M/B16/R16](results/2026-10-26-cdp-breakout-pixel-reference.md#larger-capacity-improves-frozen-breakout-with-higher-cost) |200k /12,477|22m19s|Sampled13.208 /1.417; greedy17.875 /2.208|0/24 two-wall; higher scores for25.72% more time,one reused learner|
 | [Same, four actions](results/2026-10-26-cdp-breakout-minimal-actions.md) |200k /49,939|20m59s|9.542 /1.167|0/24 two-wall successes|
 | [Four actions, coefficient1, actor/critic gradients](results/2026-10-26-cdp-breakout-minimal-actions.md#actorcritic-gradients-give-a-modest-unconfirmed-gain) |200k /49,939|20m41s|11.208 /1.167|0/24; modest unconfirmed gain|
 | [Same, coefficient .01](results/2026-10-26-cdp-breakout-minimal-actions.md#smaller-bonus-lowers-the-frozen-score) |200k /49,939|21m07s|5.042 /1.167|0/24; weaker frozen score|
@@ -934,7 +933,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
-| Breakout | Compact4M64/B8/R16/expert100/200k:sampled9.458,greedy12.208 in17m45s,unconfirmed; own initials1.375/2.583. Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
+| Breakout | Compact12M64/B16/R16/expert100/200k:sampled13.208,greedy17.875 in22m19s,unconfirmed; own initials1.417/2.208. Smaller4M/B8:9.458/12.208 in17m45s. Retained B8/T16:2M98.21, same weights AMD Auto67.58; AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | AMD4M48/expert200k/R32 seeds1009/4013:1083.333/3153.125 and2/24 /17/24 in20m11s/20m07s; fresh continuation4013/1009 at200k/R32:4730.208/3137.500 and23/24 /17/24 in25m23s/26m38s; retained100k/wait1 greedy4965.625/21 in18m58s; expert10/100k4013/1009 greedy7700/3832.292 and24/24 /23/24 in18m55s/19m11s; expert100/100k4013 greedy8365.625/24 in18m59s,4M/200k9654.167/23 in26m07s,and12M/B16/200k11984.375/24 in30m27s,unconfirmed; historical2M mean7,367 and62/72 | Reference193,220.77; intermediate15k/90% also unmet |
 
 These references are published long-run Dreamer scores, not equal-budget
