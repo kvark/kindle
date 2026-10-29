@@ -1,14 +1,16 @@
 # Kindle: CDP learning roadmap
 
-Select one [frozen temperature0.5 assessment](experiments/2026-10-29-cdp-qbert-h5-temperature.md) on the completed H5/R32 Qbert
-checkpoint. Four fixed final/own-initial default/temperature arms,zero updates,
-24 natural episodes each. Primary remains candidate0.5 versus retained greedy
-14050/23;sampled13331.250/23 stays separate. Require entire default trace parity,
-357 invariant tensors,replays and guards. Use qualifiede416696/runtime
-`/x/Temp/kindle-action-temperature-20261029/runtime`;no build or training.
-CPU preflight passes4 commands/357 finite source tensors/all229 source pins.
-Root`/x/Temp/kindle-qbert-h5-temperature-20261029`;check live state. No sweep,
-new learner,extension or automatic successor;the five-game goal remains open.
+The [completed H5/R32 frozen temperature assessment](results/2026-10-29-cdp-qbert-h5-temperature.md) scores14025/22 first pyramids
+at0.5 versus retained greedy14050/23;default sampled13331.250/23 reproduces
+exactly. Both own initial arms177.083/0;all final means still miss15000. Retain
+greedy forH5/R32;no sweep,extension,confirmation or automatic successor. All63
+pins,357 invariant tensors per arm,6722/1138 default semantic events,replays/
+videos and guards pass. Four arms135,136 actions/540,407 frames/81.325s,zero
+updates;original40m24s training remains. Service succeeds16:45:24 UTC October29
+/source81a0280 after2m43.706s;collection16:47:10. Qualifiede416696/runtime
+`/x/Temp/kindle-action-temperature-20261029/runtime` unchanged,no build/retry.
+Root`/x/Temp/kindle-qbert-h5-temperature-20261029`;no GPU allocation active at
+completion. Reused development cohort;the five-game goal remains unfinished.
 
 The [completed Qbert H5/R32 comparison](results/2026-10-29-cdp-qbert-h5-r32.md) finishes200k actions/799,762 frames/
 24,954 updates in40m24s,+32.67% training time. Greedy14050/23 first pyramids

@@ -47,3 +47,21 @@ all229 source-learner pins and357 finite tensors in each source checkpoint.
 Retained default final/initial semantic counts are6722/1138. No environment,
 native agent or learner update is constructed. Packaging, prior temperature
 assessments and completed H5/R32 evidence are checked before declaration.
+
+## Completed assessment
+
+The service starts16:42:40 UTC October29/source81a0280,PID317387/invocation
+`db74a455a220467ca8ce90b6573a8e4a`,and succeeds16:45:24 after2m43.706s. All63
+pins,357 finite/invariant tensors per arm,6722/1138 exact default semantic
+events,full outcome replays/videos and guards pass. Default final/initial
+reproduce13331.250/23 first pyramids and177.083/0 exactly. Temperature0.5 final
+scores14025/22 versus retained greedy14050/23;its initial177.083/0 is unchanged.
+All final means still miss15000. Retain greedy forH5/R32;no temperature sweep,
+extension,confirmation or automatic successor. Original training remains40m24s.
+
+Four arms135,136 actions/540,407 frames/81.325s,zero updates. Terminal collection
+succeeds16:47:10.486,with no failed/repeated stage,cap change or host recovery.
+The native/runtime remains unchanged. Completion SHA256
+`511d595591a4c985a9ab1b93a4453c037053481c3278e322316caed02c4b0347`.
+See the [full result](../results/2026-10-29-cdp-qbert-h5-temperature.md). No active
+GPU allocation remains;the five-game goal is unfinished.
