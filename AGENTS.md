@@ -52,16 +52,22 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-A fresh Qbert12M48/B16/R16/expert100 comparison is selected with episode guidance
-limit1920→3840, keeping200k/12,477 updates and35min training cap. Learner/native/
-runner/teacher stay fixed. This tests exposure after the old guidance cutoff;
-no task benefit is presumed. Reuse the completed identical native check/control
-as execution evidence: another8192-action check cannot reach either limit across
-8 lanes. Actual CPU scheduling boundaries pass.023s; full preflight passes.949s
-with five CLI paths,15 scripts,17 config/exploration checks and observer checks.
-No native/environment construction or preparation failure. No weights/experience
-are reused. No learner is active yet. See the guidance3840 protocol and check
-live state before GPU work.
+Fresh Qbert12M48/B16/R16/expert100 guidance3840 is active, starting03:57:50 UTC
+on October29/source7705eb7. Only episode guidance limit1920→3840 changes;
+200k/12,477 updates,100k/6227 recovery and35min training cap stay fixed. Startup
+passes227 pins,357 matching initial tensors and167 finite reports through3032
+actions. No prior weights/experience are reused. The identical retained native
+check supplies execution evidence; another8192-action check cannot reach either
+guidance limit across8 lanes. Actual CPU scheduling boundary checks pass.
+The original CPU recovery observer exits1 at03:57:54 on a copied scale1000
+assertion; declared/actual learner scale100 is correct. Preserve that failure.
+The private replacement starts04:00:15 after six actual header checks, retaining
+the original absolute deadlines. Main PID238223/invocation and all227 pins stay
+unchanged; no GPU stage repeats. Record.630s co-host CPU repair. Use
+`/x/Temp/kindle-qbert-guidance3840-20261029/full/recovery-repair/collect_repaired.py`
+at completion, not the original collector. Four fixed frozen assessments remain.
+Task benefit is unmeasured; no extension, retry, cap increase or successor is
+selected. See the guidance3840 protocol and check live state before GPU work.
 
 Breakout expert100 completes200k actions/799,351 frames/24,970 updates in
 17m45s. Sampled9.458/greedy12.208 improve retained expert10's4.292/5.000 for

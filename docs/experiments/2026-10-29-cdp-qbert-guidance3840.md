@@ -93,3 +93,38 @@ and no new GPU smoke is run. Exact native-check review
 `8c9579a6f48ae6fd5b8f927673b8b0d5b4ff0729660a9cdc450f035306679e21` and retained
 control cost supply the prior execution evidence. The fresh run remains subject
 to the unchanged35-minute training cap and complete final audit.
+
+## Fresh learner active; CPU recovery observer repaired
+
+Main `kindle-qbert-guidance3840-200k-20261029` starts03:57:50 UTC on October29,
+source7705eb7,PID238223/invocation37e895989a1149fe9b8dbfee76dd35cf. Declaration
+`fbebc47ee9b28d7d9a91aa980177d696861ffe3eadd5e8ca1be5dccd11b85d02` pins227 inputs.
+Startup passes exact fresh config/counters,357 matching control/check initial
+tensors, first updates376/392/408/424/440/456 and167 finite supervised reports
+through3032 actions. This does not establish task benefit.
+
+The original CPU recovery observer exits1 at03:57:54 on a copied assertion still
+requiring expert scale1000. The declared and actual learner correctly use100.
+The preflight checked observer parsers but missed this body assertion. Preserve
+the failed service, original script and journal under `full/recovery-repair`;
+original journal SHA
+`b60286bc0aec18f13fe55d913f10f6bbb576864100d7d451a1f2a8547ac9ff8b`.
+
+A separate.630s affined CPU repair changes only the private observer expectation
+to scale100/guidance3840 and retains its original absolute deadlines, using the
+slightly earlier main launch as the time origin. Six checks exercise its actual
+header assertions. Replacement unit
+`kindle-qbert-guidance3840-recovery-repair-20261029` starts04:00:15 UTC,
+PID238561/invocation0a3f9bdf35c841b7bb271f271b6801df, and waits for100k/6227.
+Repair preparation receipt
+`6a6bb21c58b8e6fa98002b4ad5fa88f4e0955971da49b7638c230ac5adddc4d9`.
+Main PID/invocation and all227 pinned inputs remain unchanged; no GPU stage is
+stopped or repeated. Retain the co-host repair duration without correcting
+training time. The original failed observer remains recorded.
+
+Main,progress,postprocessing and replacement recovery are active. Final remains
+200k/12,477 with four fixed frozen assessments and the35-minute training cap.
+Use **`full/recovery-repair/collect_repaired.py`** at completion. It requires the
+original failure record, successful replacement, unchanged original pins and all
+terminal audits; do not run the original collector for this life. No extension,
+retry, wall-cap increase, checkpoint selection or automatic successor is selected.
