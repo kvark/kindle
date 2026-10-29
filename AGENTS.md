@@ -18,15 +18,14 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The fresh Qbert B8/T32 comparison is **active**, starting14:31:43 UTC October29
-under source `07ce3dc`, service `kindle-qbert-context32-200k-20261029`, PID307065/
-invocation `7e5b79d7f445434187c3f3221a6117e4`. Startup passes all229 pins, exact
-config and357 finite initial tensors matching both control and bounded check.
-First updates504/520/536/552/568/584 and86 finite supervised reports in the
-1880-action inspected prefix match the schedule. Progress,100k recovery and
-postprocessing observers are active. Budget200k/12469 updates,45min training
-cap and four frozen arms stay fixed. No task result is available yet. Check
-actual service state; never restart because observation times out.
+The fresh Qbert B8/T32 comparison remains **active** under its original14:31:43
+UTC October29/source `07ce3dc`, service `kindle-qbert-context32-200k-20261029`,
+PID307065/invocation `7e5b79d7f445434187c3f3221a6117e4`. The100k recovery audit
+passes14:47:50:6,219 updates,357 finite tensors and6,272 finite reports in the
+100,856-action prefix. Read-only recheck14:48:38 verifies all229 pins, metadata
+hash and original process identity. Recovery observer succeeds;training,progress
+and postprocessing continue. Budget200k/12469 updates,45min training cap and
+four frozen arms stay fixed. No frozen task result yet; check actual service state.
 
 The [Qbert B8/T32 check](docs/results/2026-10-29-cdp-qbert-context32.md) passes8192
 actions/32,756 frames/481 updates in72.797s;1024 frozen/.788s haszero updates

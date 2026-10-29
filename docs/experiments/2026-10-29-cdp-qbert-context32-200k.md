@@ -89,3 +89,20 @@ before/after. This uses existing bounded replay evidence and creates no native
 agent,GPU work or updates. See the [qualified source finding](../results/2026-10-29-cdp-learning-diagnosis.md#reviewed-expert-label-path-has-no-apparent-one-step-offset).
 Keep this co-hosted work as a timing caveat without wall-time correction; no
 current-run inputs, budgets or evaluation criteria change.
+
+## Recovery checkpoint verified
+
+The recovery observer passes14:47:50 UTC October29:100,000 actions,6,219 updates
+and357 finite tensors. Its completed log prefix contains100,856 actions and6,272
+finite reports. The observer succeeds without stopping or changing training.
+A read-only14:48:38 recheck confirms all229 declaration pins, checkpoint config/
+counters/metadata hash and the original main PID/invocation. Main,progress and
+postprocessing remain active. The200k budget,45min training cap and four frozen
+assessments stay fixed; no frozen task score is available.
+
+Recovery review SHA256
+`3dd80c1f0cf2691d570542ee862611cb5b3a483a95be7d0333e91a5f411d3db4`;
+checkpoint metadata
+`5ebc6ef3a8475142fab36836d95d50fe24e1045c8a35ccd3bb3310444fbcd611`.
+The separate `midpoint-review.json` retains the pin/process recheck. Recovery
+and finite values are not task competence; no GPU stage repeats.
