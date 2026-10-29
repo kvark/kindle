@@ -1,17 +1,21 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [FIRE supervision audit and bounded weighting check](2026-10-29-cdp-breakout-fire-weight.md)
-find labels present:23,317 FIRE targets and99.805% eligible replay coverage.
-Sampled training's longest passive FIRE-label run without FIRE is45 actions,
-far shorter than the frozen greedy stall. A fresh FIRE-weight1→4 check passes
-8192 actions/489 updates in48.059s with unchanged native/model sizes, matched
-initial tensors, full replay and frozen invariance. Its conservative200k cost
-projection is21m31s. The eight short frozen episodes all score zero; a gameplay
-benefit remains unmeasured. The separately selected fresh200k comparison is now
-active; its100k/6227 recovery passes with372 finite tensors. No full frozen
-outcome is available. The first preflight's
-unintended integrated-GPU initialization is preserved separately; no actions,
-updates or checkpoint occurred, and the corrected guarded check completes.
+The [completed FIRE-weight4 comparison](2026-10-29-cdp-breakout-fire-weight.md#full-comparison-completes-without-timeouts-but-does-not-improve-score)
+finishes200k actions in22m07s, with all196 pins, full replays, frozen invariance
+and terminal collection passing. Sampled12.375 / greedy17.792 do not improve
+accepted control13.208 /17.875; all0/24 two-wall successes. No evaluation times
+out. The longest recorded FIRE-free command intervals are123/167 actions,
+compared with the prior verified12,828-action stall; command gaps also include
+normal play and are not verified serving waits. The absence of that failure
+in this rollout does not close the gameplay gap or establish an isolated cause.
+Retain the control, with no extension, sweep or confirmation selected.
+
+The saved training audit found labels present:23,317 FIRE targets and99.805%
+eligible replay coverage in the previous centroid run. The new full run verifies
+399,577 repeated FIRE replay targets with weight4 and2,988,487 total labeled
+rows. Its weight-normalized expert CE is not directly comparable with the old
+unweighted-label CE. The bounded preflight's accidental integrated-GPU
+initialization remains preserved; no declared full-run GPU stage repeats.
 
 The [CPU timeout replay](2026-10-29-cdp-centroid-timeout.md) identifies a concrete
 Breakout serving failure:12,828 actions without FIRE after a life loss, with two

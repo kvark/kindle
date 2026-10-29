@@ -1,14 +1,13 @@
-# FIRE supervision exists, but sampled training avoids the long greedy stall
+# Stronger FIRE imitation completes without timeouts but does not improve Breakout
 
-The separately selected [fresh200k comparison](../experiments/2026-10-29-cdp-breakout-fire-weight-200k.md)
-starts22:43:07 UTC October29/sourcece86d72 under the30-minute cap, with100k
-recovery and four frozen arms. All196 pins,372 bounded-matching initial tensors,
-47 pre-update semantic events and427 finite reports through7208 actions pass
-startup checks. Recovery at100k actions/6227 updates passes22:54:42 UTC, with
-all372 tensors finite and6489 finite reports through104,200 actions. The recovery
-observer succeeds; MainPID354340 and the remaining three observers are active.
-No full frozen result is available; do not restart this learner. This is a fresh
-experiment, with no bounded-check experience reused.
+The fresh 200k-action comparison completes in **22m07s** with all audits passing.
+Frozen sampled **12.375** and greedy **17.792** do not improve the retained
+control's **13.208 / 17.875**; all have zero of 24 two-wall successes. All four
+candidate evaluations finish without truncation. Retain the accepted control;
+no weight sweep, extension or confirmation is selected. The previous centroid
+learner's protocol failure remains unchanged. [Full results below](#full-comparison-completes-without-timeouts-but-does-not-improve-score).
+
+## Existing FIRE supervision and the training/frozen gap
 
 The CPU audit of both completed200k training logs finds no missing FIRE target
 path. All collected states receive corrective labels, and **99.805%** of
@@ -118,10 +117,114 @@ construction or real environments. The subsequent declared stages run on the
 explicit RX7900XT under their normal guards.
 
 Evidence: `/x/Temp/kindle-breakout-fire-weight-20261029`, with bounded artifacts
-under `check/`. No full learner, coefficient sweep or automatic successor is
-selected. The original centroid full learner remains `closed_protocol_failed`;
-this adjustment still has no measured gameplay benefit.
+under `check/`. At bounded-check completion no full learner, coefficient sweep
+or automatic successor was selected. The separate full comparison follows below.
+The original centroid full learner remains `closed_protocol_failed`.
 
 - Bounded declaration: `c88778421b34165943749f0979c740b5461151a1d9ed7a0f04903d3e32354cf2`.
 - Bounded review: `ccf30109cdb3855f23d265630b0ef8f11786ec5ba75d589f58fba5d9e6ca21de`.
 - Completion: `4f9d01ec03e38a2f520c2103877d0e7a8d9c735f357e5a9167add9632b2576cc`.
+
+## Full comparison completes without timeouts but does not improve score
+
+The [fixed fresh comparison](../experiments/2026-10-29-cdp-breakout-fire-weight-200k.md)
+completes **200,000 actions / 799,434 frames / 12,477 updates in 1,327.241s
+(22m07s)**. The retained control takes 1,339.198s (22m19s), a 0.89% difference
+that does not establish an isolated speedup. The model remains
+12M64/Auto/N8/B16/T16/H15/R16, with centroid scale100, expert scale100, world
+gradients and the existing pixel teacher. Only exact FIRE's weight changes
+1→4 relative to the previous centroid configuration. No prior experience is reused.
+
+| Frozen actions | Own initial | Final | Accepted control final | Final two-wall successes | Total candidate timeouts |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Sampled | 1.417 | 12.375 | 13.208 | 0/24 | 0 |
+| Greedy | 2.208 | 17.792 | 17.875 | 0/24 | 0 |
+
+Each mean uses the first three natural episodes per lane, 24 total. Sampled
+score is 6.31% lower and greedy 0.47% lower than the accepted control. All four
+final/actual-initial arms finish with zero updates and zero truncations:
+**45,488 actions / 181,795 frames / 29.271s** in total. The zero-truncation
+protocol passes, but the original 90%-two-wall task gate does not.
+
+The previous centroid weight1 learner's sampled14.375 / selected-natural
+greedy20.125 remain descriptive context: its greedy timeout still makes that
+comparison protocol-failed. This new completed run does not repair the old result.
+Relative to the accepted control, native/runner versions, the centroid head/loss,
+extra656,386 parameters and FIRE weight differ. Weight4 also increases total
+imitation magnitude. Reused seed1009 and evaluation lanes, changed trajectories
+and these configuration differences prevent isolated causal or reliability claims.
+
+### FIRE commands and training fit
+
+| Frozen final diagnostic | Sampled | Greedy |
+| --- | ---: | ---: |
+| All recorded actions | 14,208 | 19,400 |
+| All FIRE-bearing actions | 1,486 | 1,506 |
+| Longest FIRE-free command interval, all recorded | 123 | 167 |
+| Longest reward-free episode tail, all recorded | 56 | 44 |
+| Selected natural-cohort actions | 11,699 | 15,723 |
+| Selected FIRE-bearing actions | 1,247 | 1,264 |
+| Longest selected reward-free episode tail | 56 | 40 |
+
+These counts include all FIRE-bearing action aliases and preserve excess
+completed episodes and partial segments. No interval approaches the prior
+verified12,828-action stall, but command gaps also include normal ball play.
+This is not a new pixel/life-based measurement of waiting to serve, a matched-state
+intervention, or evidence that serving failures are eliminated generally.
+The absence of a timeout here accompanies no score gain; pressing FIRE was a
+concrete failure in the previous rollout, not a sufficient explanation or fix
+for the overall performance gap.
+
+All12,477 learner reports are finite. Repeated sampled supervision contains
+**2,988,487 labeled rows**, including **399,577 FIRE targets**; total weight
+**4,187,218 = 2,988,487 + 3×399,577**. World and actor raw expert losses agree
+within1.5e-6. The collected trajectory has24,016 FIRE labels and82,657 passive
+labels. Actual teacher overrides total117,343 (**58.6715%**). Guided completed
+episodes average191.167, while unguided changing-policy episodes average4.440;
+neither replaces frozen evaluation.
+
+| Training action window | Raw centroid loss | Valid centroid fraction | Weight-normalized expert CE |
+| --- | ---: | ---: | ---: |
+| 0–50k | .057221 | .847048 | 1.295569 |
+| 50–100k | .027911 | .847866 | .744572 |
+| 100–150k | .012074 | .861734 | .641786 |
+| 150–200k | .004900 | .883765 | .592494 |
+
+The expert column divides summed cross-entropy by target weight mass. FIRE has
+four times the weight, so these values are not the same unweighted-label metric
+as the previous weight1 comparisons. The lower late scalar alone does not prove
+better fitting on a common distribution, larger useful gradients or better
+held-out action choices. The auxiliary loss remains a changing-replay metric;
+no new representation capture or actor readout is included in this experiment.
+
+### Verification and disposition
+
+The main service starts22:43:07 UTC October29, source `ce86d72`, and succeeds
+**23:08:19**. CPU postprocessing completes **23:08:40**, terminal collection
+**23:08:43**. All five services are terminal success. No full-run failure, GPU
+stage repetition, cap change or host recovery occurs. The earlier bounded
+preflight failure remains preserved in its separate record above.
+
+All196 pinned inputs and all ten terminal artifact hashes pass collection and a
+subsequent read-only check. The100k/6,227-update recovery passes. All372 initial
+tensors match the bounded learner;357 shared tensors match the accepted control.
+The47 pre-update semantic events match the bounded run. Actual-initial sampled
+and greedy traces reproduce all800/795 control semantic events. All372 tensors
+remain invariant in every frozen arm, while CNN, reward, centroid, actor and
+value weights change during training. Full training pixel/action/label replay,
+all frozen replays/videos, five host guards, curves, exposure, comparison and
+FIRE-command accounting pass. The generated plots are visually inspected.
+
+Retain the accepted H15/R16 control. No unchanged extension, coefficient sweep,
+confirmation learner or automatic successor is selected. The five-game goal
+remains unfinished. No GPU allocation remains active; check live state before
+any later work. Keep the.612s startup-check co-hosting caveat without subtracting
+it from training time; lightweight source/status/documentation work also co-hosts.
+
+Evidence: `/x/Temp/kindle-breakout-fire-weight-20261029/full`, trial
+`breakout-12m-64-b16-r16-centroid100-fire4-expert100-200k-seed1009`.
+
+- Learning review: `ddde22f17ee96069c77d24dbad8d9de55c0d72be7841b2075a6477135fd22021`.
+- Comparison: `46f64810497c768d04fa23f2b35c70b71061c22a6a6b42af32194709c0cdf411`.
+- FIRE accounting: `0f01a1f115f6e29433d7dc4029c8b8120626b5bcd820bb6cce637bafdc606133`.
+- Completion: `61de8c14509b9ffbde758cbc31831be746aad7d7c2edba7bce2688bb888b4b31`.

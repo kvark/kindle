@@ -85,9 +85,9 @@ and after clarifying count labels are retained; no preflight failure occurs.
 ## Launched and startup verified
 
 The main service starts **22:43:07 UTC October29**, source `ce86d72`, with196
-pinned inputs. PID354340/invocation`ad37c04842fa4b7bb51ec0f9a42ebf7e` is active
-on the declared RX7900XT. Progress, postprocessing and terminal collection
-observers are active; the100k recovery observer completes successfully below.
+pinned inputs. PID354340/invocation`ad37c04842fa4b7bb51ec0f9a42ebf7e` runs
+on the declared RX7900XT, with progress, postprocessing and terminal collection
+observers. The100k recovery observer completes successfully below.
 The startup audit verifies all372 initial
 tensors against the bounded check,47 matching pre-update semantic events and
 the first six updates at376,392,408,424,440,456 actions. Its complete prefix has
@@ -95,10 +95,9 @@ the first six updates at376,392,408,424,440,456 actions. Its complete prefix has
 The read-only startup command takes.612s while co-hosting with the learner;
 retain this timing caveat without wall-time correction.
 
-No full frozen outcome is available. Do not restart the live learner or schedule
-another GPU job while it is active. Inspect the original service and observers
+At startup no full frozen outcome was available. The original service proceeds
 through recovery, all four frozen arms, full evidence checks and terminal
-collection. An observer timeout alone does not indicate a stopped learner.
+collection without restart; its completed outcome is recorded below.
 
 - Declaration: `3ecbc619b49481cb3cba8809d63777e13b68b35ec270d12b36ca4715237035f9`.
 - Startup review: `7c11f2c507022135649448280b29abac8884a4f5cea9476e7fd893602ffb45ff`,
@@ -113,8 +112,22 @@ tensors, all372 finite. It also checks every complete learner report in the log
 prefix:6,489 sequential finite reports through104,200 actions. The checkpoint
 metadata and file sizes/timestamps stay unchanged during the audit. The recovery
 observer then succeeds without restarting or stopping the learner. The original
-main PID/invocation remains active; frozen competence is still unmeasured.
+main PID/invocation remains active at that milestone; frozen competence is then
+still unmeasured.
 
 Checkpoint digest: `0fff0ef0afcfa6e159dedd642c73d189aea430dc5f917db5eeb534079cfc3d07`.
 Full receipt: the trial's `checkpoint-review-100k.json`. No training setting,
 wall cap, evaluation cohort or pinned controller changes.
+
+## Completed outcome
+
+The declared run completes200k actions /799,434 frames /12,477 updates in22m07s.
+Sampled12.375 /greedy17.792 do not improve retained13.208 /17.875; own initials
+1.417 /2.208 match. All0/24 two-wall successes, with zero timeouts in all four
+arms. All196 pins,372 matched initial/invariant frozen tensors,357 shared
+control tensors, both initial traces, full replays/videos, guards, curves,
+exposure, FIRE-command accounting and collection pass. Main/post/collection
+succeed23:08:19 /23:08:40 /23:08:43 UTC October29. No full-run failure or GPU
+stage repetition occurs. Retain the control; no extension, coefficient sweep,
+confirmation or automatic successor. All services are terminal and no GPU
+allocation is active. [Detailed results and limitations](../results/2026-10-29-cdp-breakout-fire-weight.md#full-comparison-completes-without-timeouts-but-does-not-improve-score).

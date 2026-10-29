@@ -1,27 +1,29 @@
 # CDP handover — October25,2026
 
-The [fresh200k FIRE-weight4 comparison](experiments/2026-10-29-cdp-breakout-fire-weight-200k.md) launches22:43:07 UTC October29/sourcece86d72,
-with196 pins and a30-minute training cap. Keep12M64/Auto/N8/B16/T16/H15/R16/
-centroid100/expert100/native2974160; only FIRE imitation weight1→4 changes from
-the earlier centroid learner. Startup passes372 bounded-matching initial tensors,
-47 pre-update semantic events, correct cadence and427 finite reports through7208
-actions. The100k/6227 recovery passes22:54:42 UTC with372 finite tensors and
-6489 finite reports through104,200 actions. Its observer completes successfully.
-MainPID354340/invocationad37c04842fa4b7bb51ec0f9a42ebf7e and progress,
-postprocessing and terminal-collection observers remain active. Require final/
-actual-initial sampled/greedy24-episode assessments against retained13.208/17.875,
-with unchanged zero-truncation/two-wall gates.
-No full frozen result is available. The.612s CPU startup check co-hosts without
-time correction. Root `/x/Temp/kindle-breakout-fire-weight-20261029/full`; service
-`kindle-breakout-fire-weight4-200k-20261029`. Check live state; do not restart
-this learner, repeat earlier lives or schedule another GPU job while it is active.
+The [completed FIRE-weight4 comparison](results/2026-10-29-cdp-breakout-fire-weight.md#full-comparison-completes-without-timeouts-but-does-not-improve-score) finishes 200k actions /
+799,434 frames / 12,477 updates in 22m07s. Sampled 12.375 / greedy 17.792 do not
+improve retained 13.208 / 17.875; all 0/24 two-wall successes. Own initials
+1.417 / 2.208 match. All four frozen arms have zero timeouts; longest recorded
+FIRE-free command gaps are 123 sampled / 167 greedy, not verified serving waits.
+All 196 pins, 100k/6227 recovery, 372 matched initial/invariant frozen tensors,
+357 shared control tensors, paired initial traces, full replays/videos, guards,
+curves, exposure and comparison pass. Main/post/collection succeed
+23:08:19 / 23:08:40 / 23:08:43 UTC October29, source ce86d72. No full-run failure
+or GPU repeat occurs. Actual overrides are 58.6715%; guided returns are not
+unaided competence. Relative to the accepted control, centroid loss/head,
+FIRE weight, native and runner differ; reused seed/cohort, no isolated cause or
+reliability claim. Retain the control; no extension, weight sweep, confirmation
+or automatic successor. Root `/x/Temp/kindle-breakout-fire-weight-20261029/full`.
+All services are terminal; no GPU allocation is active. Check live state before
+work. The five-game goal remains unfinished.
 
 The [FIRE-weight4 bounded check](results/2026-10-29-cdp-breakout-fire-weight.md) completes8192 actions/32,736 frames/489 updates
 in48.059s; frozen1024/4,076 frames takes.971s with zero updates and eight natural
 zero-return episodes. All142 pins,372 matched initial/invariant frozen tensors,
 357 shared control tensors,47 pre-update events, full guided replay and both
-host guards pass. Conservative200k projection21m31s passes30min; no gameplay gain
-or full learner is selected. Service succeeds22:27:25 UTC October29/sourcec4bb03b,
+host guards pass. Conservative200k projection21m31s passes30min; this bounded
+check establishes execution and cost only. The full result is recorded above.
+Service succeeds22:27:25 UTC October29/sourcec4bb03b,
 collection22:27:54. The699 CPU checks pass. An earlier preflight accidentally
 initializes the integrated GPU before rejecting a fake frame, with no actions,
 updates or checkpoint; source/receipt/kernel review are retained, no fault/reset
