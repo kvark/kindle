@@ -1,5 +1,15 @@
 # Qbert retains useful forecasts; later-game accuracy and policy use remain open
 
+## H5/R32 reaches the Qbert gate on one of two learners
+
+The [completed fresh6029 check](2026-10-29-cdp-qbert-h5-seed6029.md) scores
+15,792.708 greedy and15,420.833 sampled,each24/24 first pyramids,in40m22s.
+Its own initial checkpoints clear none;all audits pass. Seed4013 remains
+14,050/13,331.250 with23/24 each,in40m24s. This establishes useful frozen
+success for the fixed recipe on one learner,while retaining variation across
+the two learners. It does not identify which earlier recipe change caused the
+gain,replicate the H15/R16 comparison on6029,or establish broad reliability.
+
 ## Breakout action readouts do not outperform its retained policy
 
 The [completed linear and nonlinear readouts](2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy)

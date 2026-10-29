@@ -1,18 +1,18 @@
 # Kindle: CDP learning roadmap
 
-The [fresh6029 Qbert H5/R32 learner](experiments/2026-10-29-cdp-qbert-h5-seed6029.md) finishes200k actions/799,761 frames/24,954 updates in40m22s.
-Four frozen replays complete:greedy15792.708/24 first pyramids,sampled15420.833/24,
-versus own initials91.667/0 and103.125/0. Both candidate modes pass15k/90% on
-this learner;4013 remains14050/23 greedy and13331.250/23 sampled,below15k.
-The full training-label replay and terminal postprocessing are still active;
-this is not yet a completed protocol. Main PID318957/invocationb53406373693476ca9c08f5a5d05cc0a
-remains;do not restart it or launch another GPU job. The100k/12,454 recovery
-passed with357 finite tensors and263 pins;startup confirmed48 changed initial
-tensors versus4013. Same12M48/Auto/N8/B16/T16/H5/R32/expert100,seed6029/eval4000006029,
-native447fe50,source9920dee,no experience reuse. No H15/R16 control for6029;
-one of two H5/R32 learners reaches the gate,not broad reliability. Original
-service starts16:59:13 UTC October29. Root`/x/Temp/kindle-qbert-h5-seed6029-20261029/full`.
-No extension,seed campaign or automatic successor selected.
+The [completed Qbert6029 H5/R32 learner](results/2026-10-29-cdp-qbert-h5-seed6029.md) finishes200k actions/799,761 frames/24,954 updates in40m22s.
+Greedy15792.708/24 first pyramids and sampled15420.833/24 pass15k/90%,versus
+own initials91.667/0 and103.125/0. Seed4013 remains14050/23 and13331.250/23;
+one of two H5/R32 learners passes,not broad reliability. All263 pins,100k recovery,
+357 finite/invariant tensors,48 recorded initial differences,full pixel/action/
+label and frozen replays/videos,guards,curves,coverage,exposure and comparison pass.
+Main succeeds17:52:35 UTC October29/source9920dee,postprocessing17:52:48,
+collection17:53:23;all services succeed,no failures or GPU repeats. Same12M48/
+Auto/N8/B16/T16/H5/R32/expert100/native447fe50,no experience reuse. Actual
+overrides67,200 (33.6%);online guided scores are not frozen competence. No paired
+H15/R16 control for6029. CPU co-hosting caveats remain;no time correction.
+Root`/x/Temp/kindle-qbert-h5-seed6029-20261029/full`. No Qbert extension,third
+learner or automatic successor selected. The five-game goal remains unfinished.
 
 A [matched Breakout reconstruction control](experiments/2026-10-29-cdp-breakout-rgb-control.md) is CPU-prepared; no GPU declaration or launch exists.
 Keep12M64/B16/T16/H15/R16/expert100 and native447fe50; only centered flag and
