@@ -80,3 +80,29 @@ milestones. The retained357-tensor schema and all190 control/195 preceding RGB
 pins verify. Capability metadata is stubbed only for the CPU boundary cases;
 no native module,agent or environment is constructed. All copied controllers
 compile. No native edit,build,preparation failure or GPU stage occurs here.
+
+## Bounded check completes and one full comparison is separately selected
+
+Service`kindle-qbert-expert100-r8-check-20261029` starts01:07:15 UTC on October29,
+source5f95863,PID223567/invocationb3420c0a83d848cbae3e1ffa7dad81e7. It completes
+8192 actions/32,753 frames/245 updates in48.107s;1024 frozen actions/4096 frames
+in.799s,zero updates/no natural episodes. All45 pins,357 matching initial and
+invariant frozen tensors,exact config/counters,finite reports,changed CNN/reward/
+actor/value,full label/input-pixel/action replay and guards pass. No GPU failure,
+repeat,cap increase or native/runtime edit. All245 reports are supervised;
+58,762 labeled replay rows equal weights,max raw world/actor loss difference7e-7.
+Labels6633NOOP/1559hops include3750 passive states and3522 disagreements. Actual
+4442 overrides are54.224% of the bounded actions;this is not task competence.
+
+The fixed conservative400k estimate is2583.876s (43m04s),below2700s. The cost
+and compatibility gates pass. Completion
+`acfa05242f0f786225bc3fd6671dc3ce12f73ed65974310bf8124eccc4d0253f`,review
+`9afe07a4f4d20435cc59cbafd15d8cf9b869201716fb68d94263483cb13acf98`;
+declaration`db7570b491200b3ecbcead4f6c7ffd027fab25d2c03381162130e3d7aabcfd91`.
+
+After this complete audit,select exactly one fresh400k/12,489-update life under
+the fixed45-minute training cap and four assessments above. Recovery milestones
+remain100k/3114,200k/6239,300k/9364. No check experience or previous weights are
+reused. Full-controller/CPU comparison preparation precedes launch;no full GPU
+job is active at selection. This is a separately reviewed budget/ratio experiment,
+not an extension or reliability confirmation of the completed200k learner.
