@@ -1,12 +1,17 @@
 # CDP handover — October25,2026
 
-The [Qbert NOOP-weight check](experiments/2026-10-29-cdp-qbert-noop-weight.md)
-is selected:only wait-label weight1→.25 under the retained12M48/B16/R16/
-expert100 recipe. Verified last50k passive post-pyramid wait/hop agreement is
-95.044%/55.968%;this motivates a test,not a causal diagnosis. Use the matching
-old447fe50 runtime and copied control runner;no rebuild. Train8192/489 then
-1024 frozen,with full audits and guards. No full learner is selected. Evidence
-`/x/Temp/kindle-qbert-noop-weight-20261029`. Check live state before GPU work.
+The [Qbert NOOP-weight check](results/2026-10-29-cdp-qbert-noop-weight.md)
+passes8192 actions/32,754 frames/489 updates in70.160s;1024 frozen/4096 frames
+in.783s,zero updates/no natural episodes. All45 pins,357 matched initial/invariant
+frozen tensors,weighted loss counts,full guided replay and guards pass. Service
+succeeds10:29:24 UTC October29/source75eca29;terminal collection passes. Only
+wait-label weight1→.25 changes under retained12M48/B16/R16/expert100. The same
+native447fe50/control runner/teacher are retained;use the matching
+`/x/Temp/kindle-breakout-corrective-20261028/runtime`. Conservative200k projection
+31m24s passes35min,not measured competence or full-run cost. Original CPU import
+assertion failure is preserved;corrected preflight constructs no environment or
+native agent. Evidence`/x/Temp/kindle-qbert-noop-weight-20261029`. No full learner
+or GPU allocation is active;check live state before work.
 
 The [full Qbert posterior-mode assessment](results/2026-10-29-cdp-greedy-posterior.md)
 is complete:modal states lower11984.375→10539.583 (−12.06%),both24/24 first

@@ -1,11 +1,14 @@
 # Kindle: CDP learning roadmap
 
-A [bounded Qbert NOOP-weight check](experiments/2026-10-29-cdp-qbert-noop-weight.md)
-is selected within the five-game goal. Lower only wait-label weight1→.25 under
-retained12M/B16/R16/expert100; actor/world supervision and total expert magnitude
-change together.8192 actions/489 updates then1024 frozen;no full learner selected.
-CPU recount confirms95.044% wait/55.968% hop agreement on late-training passive
-post-pyramid states,not a causal bottleneck or frozen competence.
+The [bounded Qbert NOOP-weight check](results/2026-10-29-cdp-qbert-noop-weight.md)
+passes8192/489 in70.160s and1024 frozen/.783s,zero updates/no natural episodes.
+All45 pins,357 matched initial/invariant frozen tensors,weighted loss counts,
+full guided replay and guards pass;service succeeds10:29:24 UTC October29.
+Only wait-label weight1→.25 changes under retained12M/B16/R16/expert100/native
+447fe50;actor/world losses and total expert magnitude change together.
+Conservative200k projection31m24s passes35min;task benefit remains untested.
+Original CPU import assertion failure is preserved,corrected before GPU launch.
+No full learner,extension,confirmation or active GPU allocation remains.
 
 Updated October29,2026. [Handover](handover.md) contains the reproducible runtime
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)

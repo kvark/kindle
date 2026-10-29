@@ -805,6 +805,16 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
+Qbert NOOP-weight.25 bounded check passes8192 actions/32,754 frames/489 updates
+in70.160s;1024 frozen/.783s,zero updates/no natural episodes. All45 pins,357
+matched initial/invariant frozen tensors,weighted-loss counts,full guided replay
+and guards pass;service succeeds10:29:24 UTC October29/source75eca29. Native
+447fe50/control runner/teacher unchanged;matching Breakout-era runtime required.
+Conservative200k projection31m24s passes35min;no task benefit measured. Original
+CPU import assertion failure is preserved,corrected before GPU launch. No full
+learner or GPU allocation is active. See the NOOP-weight result/protocol and
+check live state before work.
+
 ## Experiment practice
 
 - Use small development runs and meaningful checks; avoid turning preparation
