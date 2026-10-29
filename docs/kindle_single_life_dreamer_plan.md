@@ -1,5 +1,15 @@
 # Kindle: CDP learning roadmap
 
+The [bounded Qbert25M/R8 check](experiments/2026-10-29-cdp-qbert-25m-r8.md)
+is selected after the negative wait-weight comparison. Increase capacity12M→25M
+and reduce replay16→8 together;retainRGB48/B16/T16/H15/Auto/expert100/all weights1,
+world gradients/all-state labels and unchanged native447fe50/control runner/teacher.
+CPU-derived357-tensor geometry has31,636,273 trainable parameters;cross-model
+initial equality is not claimed.8192 actions/245 updates then1024 frozen,full
+audits/guards,180s training cap;200k projection×1.10 must fit35min before any
+separate full selection. Root`/x/Temp/kindle-qbert-25m-r8-20261029/native-check`.
+No full learner or automatic promotion selected;check live state before work.
+
 The [completed Qbert NOOP-weight comparison](results/2026-10-29-cdp-qbert-noop-weight.md)
 finishes200k actions/799,700 frames/12,477 updates in30m12s. Weight1→.25 lowers
 greedy11984.375→9756.250 (−18.59%),both24/24 pyramids,and sampled6759.375→

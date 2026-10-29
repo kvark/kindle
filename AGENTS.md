@@ -805,6 +805,14 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
+A bounded Qbert25M48/B16/R8 check is selected after the negative wait-weight
+comparison. Capacity12M→25M and replay16→8 change together;retain expert100/all
+weights1/world gradients/all-state labels/native447fe50 and the matching runtime.
+8192 actions/245 updates then1024 frozen;CPU-derived357-tensor schema/31,636,273
+parameters,full replay/guards and35min conservative200k projection gate. No full
+learner or automatic promotion selected. See the25M/R8 protocol and check live
+state before GPU work.
+
 Qbert NOOP-weight.25 completes200k actions/799,700 frames/12,477 updates in
 30m12s. Greedy9756.250/24 pyramids and sampled6120.833/22 fall18.59%/9.45%
 below retained weight1's11984.375/24 and6759.375/24;own initials80.208/177.083
