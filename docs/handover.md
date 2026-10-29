@@ -1,19 +1,26 @@
 # CDP handover — October25,2026
 
-The fresh [200k Qbert H3 comparison](experiments/2026-10-29-cdp-open-loop-qbert-200k.md)
-is selected after bounded validation. Keep12M48/Auto/N8/B16/T16/H15/R16 and the
-retained expert100 recipe;add only optional H3/scale1 world supervision as the
-intended learning change. Training cap35min,100k recovery,greedy-primary final/
-actual-initial assessments in both modes. CPU preflight passes5 CLI boundaries,
-10 config cases,7 header checks and190 retained control pins. Full evidence is
-`/x/Temp/kindle-open-loop-20261029/full`;check service
-`kindle-open-loop-200k-20261029` and its observers before new GPU work.
-It launches07:58:25 UTC October29/source`fc3a21a`,PID268210/invocation006562fc.
-Startup verifies7,224 actions/428 finite reports,242 unchanged pins,357 control/
-check initial tensors and the first-six update schedule. Allthree observers
-are running;the100k recovery and fixed final outcomes remain pending.
-The100k recovery subsequently passes6,227 updates/357 finite tensors at08:14:00
-UTC. Its observer exits success;training and final assessments remain pending.
+The [200k Qbert H3 comparison](results/2026-10-29-cdp-open-loop-supervision.md#full-comparison-retains-the-control)
+is complete:200,000 actions/799,709 frames/12,477 updates in30m15s. Greedy mean
+9377.083 and sampled5613.542,each23/24 first pyramids,are below the retained
+control11984.375/6759.375,each24/24. Own initials80.208/177.083,zero pyramids.
+The original15000 mean gate fails. Retain control; no extension or confirmation.
+All242 pins,100k recovery,357 initial/frozen tensors,initial semantic traces,
+full replays/videos,guards,curves,coverage,exposure and comparison pass. Main
+service exits08:41:03 UTC October29;postprocessing08:41:29. Allfour services and
+the terminal collector succeed,with no GPU repeats. Evidence:
+`/x/Temp/kindle-open-loop-20261029/full/qbert-open-loop-h3-200k-seed4013`.
+No GPU allocation is active; check live state before new work.
+
+The next [Breakout representation preparation](experiments/2026-10-29-cdp-breakout-representation.md)
+tests accessible ball/paddle position and motion information in the retained
+12M CNN and recurrent state,against its actual initial model on identical
+recorded states. CPU corpus preparation under
+`/x/Temp/kindle-breakout-representation-20261029` aligns20,960 actions and
+954/509/601 examples across separate train/validation/test lanes. It constructs
+no agent. Native capture is not yet allocated: implement CPU checks,freeze a
+declaration and pass a bounded capture first. Use the retained447fe50 runtime
+specified by that protocol; no rebuild or new learner is selected.
 
 Optional H3 supervision (`ab80486`,default off) passes135 Rust/611 packaged
 Python CPU tests,strict Clippy,both guarded numerical checks and1024-action

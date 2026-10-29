@@ -20,20 +20,27 @@ Fresh8192-action/489-update Qbert12M check takes70.207s;all44 pins,357 initial/
 frozen tensors,auxiliary reports,replay and guards pass. Conservative200k
 projection31m25s passes35min,but no frozen episodes complete in the short check.
 See the [completed result](results/2026-10-29-cdp-open-loop-supervision.md).
-A [fresh200k comparison](experiments/2026-10-29-cdp-open-loop-qbert-200k.md) is
-separately selected with a35min training cap,100k recovery and frozen actual-
-initial controls. Greedy mean is primary;the original15000/90%-pyramid gate
-remains. Check `kindle-open-loop-200k-20261029` before new GPU work. The five-game
-goal and its Qbert/Breakout gaps are unchanged.
-The comparison launches07:58:25 UTC October29/source`fc3a21a`;startup passes
-7,224 actions/428 finite reports,242 pins and357 matched initial tensors.
-Training and its observers are active;frozen task outcomes remain pending.
-The100k recovery passes6,227 updates/357 finite tensors at08:14:00 UTC;main
-training continues. The concurrent33.384s CPU-only Breakout replay finds near-
+The [fresh200k comparison](results/2026-10-29-cdp-open-loop-supervision.md#full-comparison-retains-the-control)
+completes799,709 frames/12,477 updates in30m15s. Greedy9377.083 and sampled
+5613.542,each23/24 first pyramids,are lower than control11984.375/6759.375,
+each24/24. Own initials80.208/177.083 havezero pyramids. The original15000 mean
+gate remains unmet. Retain control; no extension,confirmation or retry.
+All242 pins,100k recovery,357 initial/frozen tensors,initial semantic traces,
+full replays/videos,guards,curves,coverage,exposure and comparison pass. Main
+exits08:41:03 UTC October29,postprocessing08:41:29;allservices/collector succeed.
+Actual training overrides87,421 actions(43.7105%);online aided scores are not
+competence. No GPU allocation is active. The five-game goal remains unfinished.
+
+The concurrent33.384s CPU-only Breakout replay finds near-
 paddle teacher agreement55.19%/54.18% for retained4M/12M greedy policies,despite
 their different overall scores. Canonical-only chosen buttons rule out aliases
 as the explanation for those greedy errors. See the [phase diagnostic](results/2026-10-26-cdp-breakout-pixel-reference.md#larger-frozen-policy-still-disagrees-on-urgent-paddle-commands);
 all242 active Qbert pins and its process identity stay unchanged.
+Next [prepare the frozen Breakout representation readout](experiments/2026-10-29-cdp-breakout-representation.md)
+to distinguish accessible position/motion information from policy-use problems.
+CPU preparation aligns20,960 recorded actions and954/509/601 examples on separate
+train/validation/test lanes. No agent is constructed and native capture is not
+yet allocated; its declaration,CPU checks and bounded capture remain required.
 
 The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
 zero updates. Sampled value estimates beat a constant baseline but underpredict

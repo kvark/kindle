@@ -1,5 +1,16 @@
 # Qbert retains useful forecasts; later-game accuracy and policy use remain open
 
+## Tested three-step loss does not improve the retained recipe
+
+The subsequent fresh200k-action test adds direct H3/scale1 world supervision.
+It completes in30m15s but lowers fixed-final greedy mean11984.375→9377.083 and
+sampled6759.375→5613.542. Both modes clear23/24 first pyramids versus control's
+24/24, and still miss mean15000. All numerical,checkpoint,replay,host and
+comparison checks pass; [full result](2026-10-29-cdp-open-loop-supervision.md).
+Retain the control. This tests one concrete loss on a reused development seed;
+it does not invalidate the forecast diagnosis or establish why the loss hurts.
+No post-training forecast comparison or seed confirmation has been performed.
+
 ## Actual action-block rankings weaken after the first pyramid
 
 The subsequent frozen branch comparison completes128 origins /2432 modeled

@@ -1,4 +1,80 @@
-# Three-step world supervision passes numerical and early-cost checks
+# Three-step world supervision lowers frozen Qbert quality
+
+## Full comparison retains the control
+
+The separately selected fresh learner completes **200,000 actions /799,709
+emulator frames /12,477 updates in30m15s** (1815.270s), within the35-minute
+training cap. Fixed-final greedy mean falls **11984.375→9377.083**, a21.76%
+decrease against the retained control. Sampled mean also falls16.95%.
+Both new modes clear23/24 first pyramids, but miss the original mean15000 gate.
+Retain the control; no extension, retry or seed confirmation follows this result.
+
+| Frozen assessment | Retained control | H3/scale1 loss | H3 own initial |
+| --- | ---: | ---: | ---: |
+| Greedy mean, primary |11984.375|9377.083|80.208|
+| Greedy first pyramids |24/24|23/24|0/24|
+| Sampled mean |6759.375|5613.542|177.083|
+| Sampled first pyramids |24/24|23/24|0/24|
+| Original full-game gate |Fail|Fail|Fail|
+| Training time |30m27s|30m15s|Zero experience|
+
+The first three natural episodes per eight lanes supply24 episodes per arm,
+with no guidance, labels, truncations or learner updates. All four arms together
+execute99,200 actions /396,641 frames in59.555s. Their extra completed episodes
+and partial tails remain in the evidence and do not change selection. Candidate
+first-pyramid coverage is20.833/21 greedy and20.875/21 sampled.
+
+Configuration remains12M48/Auto/N8/B16/T16/H15/R16,centered CDP,coefficient1,
+actor-unimix0,full18,original rates,seed4013/evaluation4000004013. Guidance stays
+at20% episodes with continuation/cap1920,expert scale100,all18 action weights1,
+world expert gradients and all-state corrective labels. Optional H3/scale1
+world supervision is the intended learning change. No bounded-check experience
+or prior checkpoint state is reused. Native/runner revisions differ explicitly;
+all357 initial tensors and both initial semantic traces match the control.
+
+Training actually overrides87,421 actions (43.7105%), compared with the
+control's42.958%. The remaining112,579 actions receive passive corrective labels.
+All12,477 updates report expert supervision, with2,991,348 labeled replay rows;
+these are repeated samples, not unique demonstrations. The44 completed guided
+episodes average15313.636, whereas148 unguided online episodes average2273.649.
+Those changing-policy training returns are not frozen competence.
+
+All new auxiliary reports are finite and nonzero, with mean total47.2208,
+prediction.0936888,reward.346874,continuation.029539 and valid fraction.998013.
+This verifies loss execution, not improved forecasting or task performance.
+The final model's forecast accuracy has not been measured by this comparison.
+Recorded update time is45.86% imagination/targets,28.91% world training and16.54%
+posterior preparation. Total training is.64% shorter than control, but differing
+trajectories and native/runner revisions prevent an isolated overhead claim.
+See `full/completed-update-timing.json` for both complete timing sums.
+
+All242 declared pins, configuration/counter/numerical checks,100k recovery at
+6,227 updates,357 matched initial and unchanged frozen tensors,parameter changes,
+initial semantic traces,full frozen outcome replays/videos,training pixel/action/
+label replay,host guards,curves,coverage,exposure and fixed comparison pass.
+The training replay takes614.126s. Main service
+`kindle-open-loop-200k-20261029` starts07:58:25 UTC/source`fc3a21a` and exits
+success08:41:03 on October29; CPU postprocessing exits08:41:29. All four services
+are terminal success and the final collector passes. No GPU stage is repeated
+and no host recovery occurs.
+
+This reused development seed/cohort does not establish that all multi-step
+supervision is harmful, or identify why this particular loss lowers performance.
+It does reject this exact candidate as the next retained recipe. The five-game
+goal remains unfinished. The separate [Breakout representation preparation](../experiments/2026-10-29-cdp-breakout-representation.md)
+addresses the unresolved visual-information versus policy-use question; it has
+not allocated native capture or another learner.
+
+Evidence: `/x/Temp/kindle-open-loop-20261029/full/qbert-open-loop-h3-200k-seed4013`.
+The [full protocol](../experiments/2026-10-29-cdp-open-loop-qbert-200k.md) remains
+unchanged as a declared input. Curves and comparison plots are retained outside
+Git and visually checked.
+
+- Learning review: `73134dd1749f6152e61013773c7b3b3b4fe3f018b6d4f165bb27052e315ee077`.
+- Comparison: `90e8dbb2cfb2720dea1abd695561f7f7e83eeef6f086077c8d746d1c6d60d6d3`.
+- Completion: `cebc1086ea832ea3f0f4470a1f268a6f0863ceb1e4be29c0dc929e6e38d251f3`.
+
+## Preceding numerical and early-cost checks
 
 Optional prior-rollout supervision is implemented, default off. The fresh
 Qbert12M bounded check completes **8,192 actions /32,754 emulator frames /489
@@ -104,7 +180,7 @@ checkpoints and evidence remain.
 - Completion: `f72896741831138dc3fc9cbf92906d15b21a471da1c5bf8a0611ac07f3f2be9e`.
 - Packaging: `4dea42a0229db9d8e0faf1ea08511b3a0318ded210ce62ca5a3eb7bd977ecb6a`.
 
-No GPU allocation is active at completion. The five-game goal remains unfinished;
-a fresh full-budget comparison is needed to measure whether this loss helps.
-The [separately selected200k comparison](../experiments/2026-10-29-cdp-open-loop-qbert-200k.md)
-follows this completed check with a fixed35-minute training cap.
+The bounded check selected no full learner by itself. The subsequent
+[separately declared200k comparison](../experiments/2026-10-29-cdp-open-loop-qbert-200k.md)
+uses a fixed35-minute training cap and completes as reported above. The
+five-game goal remains unfinished.

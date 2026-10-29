@@ -18,21 +18,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-Fresh Qbert H3/scale1 world-supervision comparison is separately selected after
-the completed bounded checks:200k actions/12,477 expected updates,12M48/Auto/N8/
-B16/T16/H15/R16,retained expert100 recipe and reused4013. Fixed35min training,
-100k recovery,four frozen final/actual-initial sampled/greedy arms;greedy primary,
-original15000/90%-pyramid gate. Allfive full CLI boundaries,10 config checks,
-seven header checks and190 retained control pins pass before declaration.
-Protocol `docs/experiments/2026-10-29-cdp-open-loop-qbert-200k.md`;evidence
-`/x/Temp/kindle-open-loop-20261029/full`. Inspect live service
-`kindle-open-loop-200k-20261029` before GPU work;never restart from a stale wait.
-Launched07:58:25 UTC October29/source`fc3a21a`,PID268210/invocation006562fc;
-startup passes7,224 actions/428 finite reports,242 unchanged pins,357 matching
-control/check initial tensors and first-six update schedule. Recovery/progress/
-postprocessing observers are active;no frozen outcome yet. Check live state.
-100k recovery passes6,227 updates/357 finite tensors;observer exits08:14:00 UTC.
-Main learner remains active;no midpoint evaluation or checkpoint selection.
+Qbert H3/scale1 world supervision completes200k actions/799,709 frames/12,477
+updates in30m15s. Greedy9377.083 and sampled5613.542,each23/24 first pyramids,
+are below control11984.375/6759.375,each24/24. Own initials80.208/177.083,zero
+pyramids; the mean15000 gate still fails. Retain the control; no extension,
+retry or confirmation follows. All242 pins,100k recovery,357 matched initial/
+invariant frozen tensors,both initial semantic traces,full replay/video/guard/
+curve/coverage/exposure/comparison checks pass. Actual guidance87,421 actions
+(43.7105%). Main exits08:41:03 UTC October29,postprocessing08:41:29;all four
+services and the collector succeed. No GPU repeats or active allocation.
+See `docs/results/2026-10-29-cdp-open-loop-supervision.md`; evidence remains
+under `/x/Temp/kindle-open-loop-20261029/full`. Check live state before GPU work.
+
+Next prepare the frozen Breakout CNN/recurrent-state readout in
+`docs/experiments/2026-10-29-cdp-breakout-representation.md`. CPU corpus checks
+align20,960 recorded actions and954/509/601 train/validation/test examples on
+separate lanes. No agent or GPU is constructed. Capture still requires its
+separate pinned declaration,CPU checks and bounded check; no learner selected.
 
 Optional H3 open-loop supervision (`ab80486`,default off) passes135 Rust/611
 packaged Python CPU tests,strict Clippy,two guarded gradient checks and legacy
