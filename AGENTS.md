@@ -18,18 +18,19 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The fresh [Qbert H5/R32 comparison](docs/experiments/2026-10-29-cdp-qbert-h5-r32-200k.md) is active from15:37:50 UTC
-October29/sourcee57dd2f, service`kindle-qbert-h5-r32-200k-20261029`, PID312184.
-12M48/Auto/N8/B16/T16/H5/R32/expert100 trains200k actions/24,954 updates within
-45min, with100k recovery and four fixed frozen arms. Startup passes all229 pins,
-357 initial tensors matching control/check, exact first updates376/384/392/400/
-408/416 and169 finite supervised reports. Progress,recovery and postprocessing
-observers are active. H15→5/R16→32 changes horizon,cadence and total work together;
-no isolated horizon effect or overall speedup promised. Native447fe50,runner and
-teacher fixed;no check experience reused. The [bounded check](docs/results/2026-10-29-cdp-qbert-h5-r32.md)
-passes8192/978 in93.933s, all41 pins/replay/guards, conservative200k42m03s.
-Evidence `/x/Temp/kindle-qbert-h5-r32-20261029`;check actual service state.
-No frozen task result yet;never restart because an observer times out.
+The fresh [Qbert H5/R32 comparison](docs/experiments/2026-10-29-cdp-qbert-h5-r32-200k.md) remains active. Its100k recovery
+passes15:58:25 UTC October29:12,454 saved updates and357 finite tensors. The
+inspected101,400-action prefix has12,628 finite reports. A15:59:45 read-only
+recheck confirms all229 input pins,checkpoint config/counters/hashes and original
+PID312184/invocation0359bcc31f964fdf8e92542561e2e949. Recovery observer succeeds;
+main,progress and postprocessing remain active. Start15:37:50/sourcee57dd2f,
+service`kindle-qbert-h5-r32-200k-20261029`. Budget200k/24,954 updates,45min and
+four fixed frozen arms remain unchanged.12M48/Auto/N8/B16/T16/H5/R32/expert100
+changes horizon,cadence and total work together;no isolated effect or promised
+speedup. Native447fe50,runner,teacher fixed;no check experience reused. The
+[bounded check](docs/results/2026-10-29-cdp-qbert-h5-r32.md) passes8192/978 in93.933s,all41 pins/replay/guards,
+conservative200k42m03s. Evidence`/x/Temp/kindle-qbert-h5-r32-20261029`;check actual
+service state. No frozen task result yet;never restart because observation times out.
 
 The [completed Qbert B8/T32 comparison](docs/results/2026-10-29-cdp-qbert-context32.md) finishes200k actions/799,710 frames/
 12,469 updates in31m48s,+4.44% training time. Greedy11609.375/24 first pyramids
