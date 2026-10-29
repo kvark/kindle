@@ -1,5 +1,12 @@
 # Selected next development step: short open-loop world supervision
 
+Implementation,numerical validation,legacy compatibility and the bounded
+execution/cost check are complete. See the [result](../results/2026-10-29-cdp-open-loop-supervision.md).
+The8192-action/489-update check takes70.207s,with31m25s conservative200k projection.
+All44 bounded pins,357 matched initial/invariant frozen tensors,loss reports,
+full guided replay and guards pass;service exits07:43:21 UTC October29. No full
+learner is allocated by this protocol;task benefit remains unmeasured.
+
 The three completed Qbert diagnostics show useful forecasts and values, with
 weaker later-game action-block ranking. They do not establish that world error
 causes the remaining score gap. Test a concrete learning change against that
@@ -96,6 +103,18 @@ linearly and with10% allowance; a projection above35minutes calls for a cheaper
 recipe rather than silently extending the budget. The short check cannot
 establish task competence or select a full learner automatically. Reused seeds
 and ordinary frozen logs without live pixel hashes retain their limitations.
+
+The legacy compatibility capture completes1024 actions in.823s with zero
+updates and357 invariant tensors. All128 transition rows match the retained
+greedy log after excluding only finite wall-clock timestamps. The original
+service exits07:36:27 UTC at the CPU comparison because it incorrectly included
+`unix_time`; a separate CPU-only audit passes07:37:39 without repeating GPU
+work or changing29 declaration pins. Original controller/journal remain.
+The bounded CLI preflight also required CPU-only fixture fixes: missing future
+checkpoint identity and empty output files created before the fake constructor.
+Original scripts/logs/empty outputs remain; the corrected preflight uses separate
+temporary output paths and verifies both full CLI boundaries with no native or
+real environment construction. No training settings or budgets change.
 
 ## Required evidence before a full learner
 

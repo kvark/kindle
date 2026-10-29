@@ -18,14 +18,18 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-Optional H3 open-loop world supervision is implemented default-off in `ab80486`.
-135 Rust CPU tests,611 packaged Python tests,strict native/binding Clippy and
-two guarded gradient/alignment tests pass;189 pins unchanged,service exits
-07:30:58 UTC October29. Runtime `/x/Temp/kindle-open-loop-20261029/runtime`,
-native SHAb4cdf26; separate posterior draft is parked under that root. Next
-selected checks are1024-action legacy frozen compatibility,then fresh Qbert12M
-8192-action execution/cost and1024 frozen; see the open-loop protocol. No full
-learner is selected; check live state before GPU work.
+Optional H3 open-loop supervision (`ab80486`,default off) passes135 Rust/611
+packaged Python CPU tests,strict Clippy,two guarded gradient checks and legacy
+1024-action compatibility (128 matched traces,357 invariant tensors). Fresh
+Qbert12M check8192 actions/32,754 frames/489 updates takes70.207s;1024 frozen/.792s
+haszero updates/no completed episodes. All44 pins,357 matched initial/invariant
+frozen tensors,finite auxiliary reports,full guided replay and guards pass;
+service exits07:43:21 UTC October29. Conservative200k projection31m25s is below
+35min;task benefit remains unmeasured. Original CPU fixture/timestamp failures
+remain;no GPU repeats. Runtime `/x/Temp/kindle-open-loop-20261029/runtime`,native
+SHAb4cdf26;packaging pins exact sources,both build caches released,posterior
+draft parked separately. See the open-loop result/protocol. No full learner or
+GPU allocation is active;check live state before work.
 
 Qbert action-block ranking completes128 origins/2432 forecasts on48256 source
 actions in95.811s,zero updates. Pairwise agreement72.96% before/57.21% after

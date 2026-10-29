@@ -1,13 +1,19 @@
 # CDP handover — October25,2026
 
-Optional H3 open-loop supervision in `ab80486` passes135 Rust CPU tests,611
-packaged Python tests,strict native/binding Clippy and both guarded numerical
-checks (189 unchanged pins). Service exits07:30:58 UTC October29. Isolated
-runtime `/x/Temp/kindle-open-loop-20261029/runtime`,native SHAb4cdf26; default off.
-Next selected checks:1024-action legacy frozen compatibility,then8192 fresh
-Qbert12M actions/1024 frozen for execution and early cost. No full learner.
-See the [exact protocol](experiments/2026-10-29-cdp-open-loop-supervision.md)
-and check live state. The separate posterior draft is parked as described below.
+Optional H3 supervision (`ab80486`,default off) passes135 Rust/611 packaged
+Python CPU tests,strict Clippy,both guarded numerical checks and1024-action
+legacy compatibility. Fresh Qbert12M8192 actions/32,754 frames/489 updates take
+70.207s;1024 frozen/.792s haszero updates/no completed episodes. All44 pins,
+357 matching initial/invariant frozen tensors,finite auxiliary reports,full
+guided replay and guards pass;service exits07:43:21 UTC October29. Conservative
+200k projection31m25s passes35min;task benefit remains unmeasured. Original CPU
+timestamp/fixture failures remain without GPU repetition. Use isolated runtime
+`/x/Temp/kindle-open-loop-20261029/runtime`,native SHAb4cdf26,and its pinned
+`native-check/atari_vector.py`. Packaging receipt is at that root;both build
+caches are released. No full learner or active GPU allocation. See the
+[completed result](results/2026-10-29-cdp-open-loop-supervision.md) and
+[protocol](experiments/2026-10-29-cdp-open-loop-supervision.md);check live state.
+The separate posterior draft is parked as described below.
 
 Qbert actual action-block comparison completes128 origins/2432 modeled plans
 on48256 recorded actions/192980 frames in95.811s,zero updates. Ranking agreement

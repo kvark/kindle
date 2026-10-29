@@ -15,9 +15,13 @@ sticky-action memory and pass full source replay. See the
 [completed result](results/2026-10-29-cdp-learning-diagnosis.md).
 The [optional three-step open-loop supervision](experiments/2026-10-29-cdp-open-loop-supervision.md)
 is implemented default-off (`ab80486`):135 Rust/611 packaged Python CPU tests,
-strict Clippy and two guarded gradient/alignment checks pass. Next selected
-work is legacy frozen compatibility and8192-action execution/cost before a full
-learner. The five-game goal and its remaining Qbert/Breakout gaps are unchanged.
+strict Clippy,two guarded gradient checks and legacy frozen compatibility pass.
+Fresh8192-action/489-update Qbert12M check takes70.207s;all44 pins,357 initial/
+frozen tensors,auxiliary reports,replay and guards pass. Conservative200k
+projection31m25s passes35min,but no frozen episodes complete in the short check.
+See the [completed result](results/2026-10-29-cdp-open-loop-supervision.md).
+A fresh full-budget comparison is needed to measure task benefit;none is
+allocated yet. The five-game goal and its Qbert/Breakout gaps are unchanged.
 
 The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
 zero updates. Sampled value estimates beat a constant baseline but underpredict
