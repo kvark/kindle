@@ -79,3 +79,13 @@ Declaration SHA256
 `40c0f68ba3a836e56832c69a2efe370058b6085f5352d602dafb576b45851c07`.
 The prelaunch fixed protocol and executable inputs remain unchanged. This status
 update is outside that pinned copy. No preceding GPU stage was repeated.
+
+## Co-hosted source review
+
+A.788s read-only CPU review at14:40:56 UTC October29/source27cd30c finds no
+apparent one-step offset in the exact native447fe50 expert-label path. It retains
+source snapshots and verifies all229 active pins and the original PID/invocation
+before/after. This uses existing bounded replay evidence and creates no native
+agent,GPU work or updates. See the [qualified source finding](../results/2026-10-29-cdp-learning-diagnosis.md#reviewed-expert-label-path-has-no-apparent-one-step-offset).
+Keep this co-hosted work as a timing caveat without wall-time correction; no
+current-run inputs, budgets or evaluation criteria change.

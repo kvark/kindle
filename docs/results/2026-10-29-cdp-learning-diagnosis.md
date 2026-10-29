@@ -1,5 +1,37 @@
 # Qbert retains useful forecasts; later-game accuracy and policy use remain open
 
+## Reviewed expert-label path has no apparent one-step offset
+
+A source review of the exact native447fe50 runtime follows corrective labels
+from the current input image through replay and both supervised losses. The
+teacher proposes an outgoing action before the environment advances. Native
+acting retains that label separately from the executed action; observation
+stores both with the next arrival. `SequenceBatch::expert_targets` therefore
+takes the label stored at t+1 for state t. It excludes outgoing terminal/reset
+boundaries and the sampled sequence tail, while retaining actions that lead
+into a terminal state.
+
+Behavior targets and posterior features use the same time-major row order.
+The active GPU handoff copies the initial imagination features, which are the
+posterior replay states before an imagined transition, excluding the final
+replay time. The world loss uses the corresponding posterior state and label,
+with T/(T−1) normalization to match behavior's averaging. Executed actions
+remain the dynamics inputs even when they disagree with the teacher.
+
+No one-step offset is identified in this reviewed path. This is static source
+evidence, supported by the already completed8192-action T32 adapter pixel/label
+replay; it is not a new device-index capture, gradient test, proof of teacher
+quality or explanation for weak control. No code or training setting changes.
+
+Exact source snapshots, runtime/receipt hashes and source locations remain in
+`/x/Temp/kindle-expert-alignment-review-20261029`. The review takes.788s on one
+affined low-priority CPU core at14:40:56 UTC October29/source27cd30c, co-hosted
+with the declared T32 comparison. All229 active pins and its original
+PID/invocation remain unchanged before/after. No native agent, GPU work or new
+updates are created by the review. Retain co-hosting as a timing caveat without
+correcting training wall time. Review SHA256
+`81cbc0d674fbc35bec7c5141e8d5abc7dc0bfa5ba25411b7946216811a0c4918`.
+
 ## Late latent prediction loss remains above its floor
 
 A retrospective CPU-only check of the retained Qbert12M and Breakout12M control

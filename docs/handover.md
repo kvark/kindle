@@ -10,6 +10,13 @@ postprocessing observers are active. Budget200k/12469 updates,45min training
 cap and four frozen arms stay fixed. No task result is available yet. Check
 actual service state; never restart because observation times out.
 
+A.788s [exact-runtime source review](results/2026-10-29-cdp-learning-diagnosis.md#reviewed-expert-label-path-has-no-apparent-one-step-offset)
+finds no apparent one-step expert-label offset. Labels stored on arrival t+1
+train posterior state t, with explicit boundary/tail masking and matching GPU
+feature order. This is source evidence, not a new device-index/gradient test.
+All229 active T32 pins and original process identity stay unchanged. The14:40:56
+UTC CPU co-hosting is retained as a timing caveat; no GPU work or setting change.
+
 The [Qbert B8/T32 check](results/2026-10-29-cdp-qbert-context32.md) passes8192
 actions/32,756 frames/481 updates in72.797s;1024 frozen/.788s haszero updates
 and no natural episodes. All41 pins,357 matching initial/invariant frozen tensors,
