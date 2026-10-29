@@ -18,6 +18,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+Frozen modal-posterior Qbert lowers11984.375→10539.583,each24/24 first pyramids;
+own initials80.208/0.000,zero pyramids. Retain sampled posteriors/greedy actions.
+All53 pins,357 tensors per arm,6080/1100 default semantic events,replays/videos/
+guards pass;110,112 actions/440,249 frames/67.014s,zero updates. Service exits
+10:12:26 UTC October29;no active GPU allocation or successor. Nativeb76f91c/
+SHA7555bf9 passes135 Rust/625 Python CPU tests and bounded checks. Original
+unsynchronized test failure is preserved;corrected producer waits change only
+the test. Use`/x/Temp/kindle-greedy-posterior-20261029/resumed/synchronized/runtime`;
+packaging receipt retained,build cache released. See the greedy-posterior result.
+
 Qbert H3/scale1 world supervision completes200k actions/799,709 frames/12,477
 updates in30m15s. Greedy9377.083 and sampled5613.542,each23/24 first pyramids,
 are below control11984.375/6759.375,each24/24. Own initials80.208/177.083,zero

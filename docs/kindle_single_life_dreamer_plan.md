@@ -4,6 +4,17 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+The [frozen posterior-mode assessment](results/2026-10-29-cdp-greedy-posterior.md)
+lowers Qbert11984.375→10539.583 with modal categories,each24/24 first pyramids
+and below mean15000. Own initials80.208/0.000 clear none. Retain sampled posterior
+states with greedy actions. Four arms total110,112 actions/440,249 frames/67.014s,
+zero updates;original training remains30m27s. All53 pins,357 invariant tensors,
+6080/1100 exact default semantic events,full replays/videos and guards pass.
+Service exits10:12:26 UTC October29;terminal collection passes,no GPU allocation
+or successor selected. The optional native mode passes focused checks after a
+test-only synchronization repair;original failure remains preserved. This is
+one reused learner/cohort,not independent confirmation or a global default.
+
 The actual action-block diagnostic completes128 origins/2432 forecasts while
 re-observing48256 actions in95.811s,zero updates. Ranking agreement72.96% before/
 57.21% after the first pyramid, with40/128 informative origins, supports useful

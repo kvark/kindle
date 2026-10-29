@@ -1,5 +1,22 @@
 # CDP handover — October25,2026
 
+The [full Qbert posterior-mode assessment](results/2026-10-29-cdp-greedy-posterior.md)
+is complete:modal states lower11984.375→10539.583 (−12.06%),both24/24 first
+pyramids and below mean15000. Own initials80.208/0.000 clear none. Retain sampled
+posteriors with greedy actions;no extension,confirmation or global mode change.
+Four arms total110,112 actions/440,249 frames/67.014s,zero updates. All53 pins,
+357 invariant tensors per arm,6080/1100 exact default semantic events,full replays/
+videos and guards pass. Service exits10:12:26 UTC October29/sourcef278e42;terminal
+collection passes and no GPU allocation is active. Original training remains30m27s.
+Use nativeb76f91c/SHA7555bf9 at
+`/x/Temp/kindle-greedy-posterior-20261029/resumed/synchronized/runtime`,with its
+packaging receipt.135 Rust/625 packaged Python CPU tests,strict Clippy,guarded
+argmax/RNG/reset checks,default parity and two1024-action restores pass. The
+original unsynchronized test failure is retained separately;adding producer
+waits changes only the test and leaves the native library hash identical.
+The857,454,521-byte build cache is released;wheels and both test executables remain.
+Full evidence is under that root's`full`directory. Check live state before GPU work.
+
 The [200k Qbert H3 comparison](results/2026-10-29-cdp-open-loop-supervision.md#full-comparison-retains-the-control)
 is complete:200,000 actions/799,709 frames/12,477 updates in30m15s. Greedy mean
 9377.083 and sampled5613.542,each23/24 first pyramids,are below the retained
