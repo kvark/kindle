@@ -1,5 +1,17 @@
 # CDP handover — October25,2026
 
+A fresh Breakout12M64/B16/R16/expert100200k comparison is separately selected after
+the complete bounded check and21m19s cost projection pass. Keep30min training cap,
+12,477 updates,100k/6227 recovery andfour fixed final/own-initial frozen arms,
+sampled primary. Capacity4M→12M andbatch/microbatch8→16 change together; other
+learner settings,native447fe50,runner andteacher stayfixed. Full initial tensors
+must match the bounded12M check; no cross-architecture initial equality or reuse
+of weights/experience. Full CPU preflight passes.359s with five CLI boundaries,
+14 scripts,16 config,six header,four parser andfive actual recovery-body cases;
+all56 check/69 control pins verify,no native construction or preparation failure.
+No retry,cap increase,extension,checkpoint selection or automatic successor.
+See the expert100-capacity protocol;check live state before GPU work.
+
 Breakout12M64/B16/R16/expert100 bounded check passes8192 actions/32,720 frames/
 489 updates in47.623s; frozen1024/4096frames/.877s haszero updates/no natural
 completed episodes. All56 pins,357 finite/invariant tensors,16,334,353 parameters,

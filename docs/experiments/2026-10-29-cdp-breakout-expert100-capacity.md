@@ -106,3 +106,41 @@ Completion `90f5067865b24aa2fa75fad76e734eb1c44e2d1657a8c2d72230a3a138c8b7e4`;
 review `89c04f0a8722f5493beb5800eb2307ab9b24983b72d8a45faa9768b89409d0ea`;
 guided replay `ecacacac0c147096cf78c3d144eeaa28fc2aae054e35988e79c8659a99e45931`;
 declaration `749b402123e8ce2cdd7f3b7c88a916fe9649c4dd1fd3f29f8c22c690e6a752f0`.
+
+## Fresh200k comparison selected
+
+After the bounded terminal audit and21m19s conservative cost projection pass,
+separately select one fresh200k-action/12,477-update life under1800s. Keep the
+exact checked12M64/Auto/N8/B16/T16/H15/R16/expert100 recipe above and100k/6227
+recovery. Compare retained4M64/B8/expert100 at the same200k action budget; capacity
+and batch change together, while update counts differ24,970→12,477. This is not
+an isolated capacity or equal-wall-cost comparison.
+
+Run only the fixed final/actual-initial sampled and greedy assessments, sampled
+primary,first3 natural episodes per8 lanes=24,600k-action/300s caps,zero guidance,
+labels,updates or truncations. Preserve the90%-two-wall task gate. Match all357
+full-run initial tensors to the bounded check; the4M architecture has different
+initial values and trajectories, so retain its own initial assessments separately.
+No weights or check experience are reused. No intermediate evaluation,checkpoint
+selection,retry,cap increase,extension,seed campaign or automatic successor.
+
+Keep600s inner/630s outer full training replay,1200s CPU audit,4500s main service,
+5100s progress/postprocessing services with4800s internal waits, and3000s recovery
+service with2400s internal wait. These observers cannot restart the learner.
+Require complete finite/config/source/counter checks,parameter changes,357 frozen
+invariant tensors,full training label/pixel/action and frozen outcome replays,
+videos,guards,curves,exposure,comparison and the terminal collector. Ordinary
+frozen logs lack live pixel hashes. No new native build or GPU smoke is needed.
+
+Full CPU preflight passes.359s: five actual CLI paths before construction,
+14 compiled scripts,16 actual audit/comparison config cases,six header-readiness
+cases,four actual observer-parser cases andfive recovery-body cases. The recovery
+observer now checks the exact declaration rather than copied model constants.
+All56 bounded and69 retained-control pins verify;357 bounded initial tensors and
+100k/6227/final12,477 accounting pass. Zero native/environment construction and
+no preparation failure. Preflight receipt
+`d2eb602edc7b52e94cfc3c514def6a3a26e97efdb2be3671ba854395df64d83e`.
+
+Root `/x/Temp/kindle-breakout-expert100-capacity-20261029/full`,trial
+`breakout-12m-64-b16-r16-expert100-200k-seed1009`;
+service `kindle-breakout-expert100-capacity-200k-20261029`.
