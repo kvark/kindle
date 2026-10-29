@@ -30,11 +30,17 @@ services and the collector succeed. No GPU repeats or active allocation.
 See `docs/results/2026-10-29-cdp-open-loop-supervision.md`; evidence remains
 under `/x/Temp/kindle-open-loop-20261029/full`. Check live state before GPU work.
 
-Next prepare the frozen Breakout CNN/recurrent-state readout in
-`docs/experiments/2026-10-29-cdp-breakout-representation.md`. CPU corpus checks
-align20,960 recorded actions and954/509/601 train/validation/test examples on
-separate lanes. No agent or GPU is constructed. Capture still requires its
-separate pinned declaration,CPU checks and bounded check; no learner selected.
+Breakout frozen representation readouts complete20,960 actions/83,799 frames
+per model in32.301s trained/32.420s initial,zero updates. Recurrent motion R²
+improves.282/.051→.473/.614; trained paddle MAE4.334 CNN/9.643 recurrent pixels,
+near-paddle teacher-target MAE14.848 recurrent. Useful information is present,
+but linear decoding does not identify the cause of weak control. All55 pins,
+357 invariant tensors per capture,matched input hashes/trajectories,readback/
+counter/host checks pass;19 CPU tests and terminal collector pass. Service exits
+09:02:23 UTC October29;no GPU allocation active. Native447fe50 unchanged.
+Evidence `/x/Temp/kindle-breakout-representation-20261029`; see
+`docs/results/2026-10-29-cdp-breakout-representation.md`. Teacher-action readouts
+from saved features are a next diagnostic question,not a selected new learner.
 
 Optional H3 open-loop supervision (`ab80486`,default off) passes135 Rust/611
 packaged Python CPU tests,strict Clippy,two guarded gradient checks and legacy

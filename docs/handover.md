@@ -12,15 +12,19 @@ the terminal collector succeed,with no GPU repeats. Evidence:
 `/x/Temp/kindle-open-loop-20261029/full/qbert-open-loop-h3-200k-seed4013`.
 No GPU allocation is active; check live state before new work.
 
-The next [Breakout representation preparation](experiments/2026-10-29-cdp-breakout-representation.md)
-tests accessible ball/paddle position and motion information in the retained
-12M CNN and recurrent state,against its actual initial model on identical
-recorded states. CPU corpus preparation under
-`/x/Temp/kindle-breakout-representation-20261029` aligns20,960 actions and
-954/509/601 examples across separate train/validation/test lanes. It constructs
-no agent. Native capture is not yet allocated: implement CPU checks,freeze a
-declaration and pass a bounded capture first. Use the retained447fe50 runtime
-specified by that protocol; no rebuild or new learner is selected.
+The [Breakout representation diagnostic](results/2026-10-29-cdp-breakout-representation.md)
+is complete. Both retained12M models re-observe20,960 actions/83,799 frames in
+32.301s trained/32.420s initial,zero updates. Recurrent motion R² improves
+.282/.051→.473/.614. Trained paddle MAE is4.334 CNN/9.643 recurrent pixels;
+near-paddle recurrent teacher-target MAE remains14.848. All55 pins,357 invariant
+tensors per capture,matched input trajectories/hashes,readback/counter/host
+checks and terminal collection pass;19 CPU tests pass. Service exits09:02:23
+UTC October29. Evidence `/x/Temp/kindle-breakout-representation-20261029`
+contains both captures and954/509/601 examples across separate readout lanes.
+Native447fe50 remains unchanged; no GPU allocation is active. Useful motion/
+position information is present,not proof of a causal policy bottleneck.
+Checking teacher-action access from these saved features is a next question;
+no new learner or automatic successor has been selected.
 
 Optional H3 supervision (`ab80486`,default off) passes135 Rust/611 packaged
 Python CPU tests,strict Clippy,both guarded numerical checks and1024-action

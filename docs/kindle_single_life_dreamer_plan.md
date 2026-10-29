@@ -36,11 +36,16 @@ paddle teacher agreement55.19%/54.18% for retained4M/12M greedy policies,despite
 their different overall scores. Canonical-only chosen buttons rule out aliases
 as the explanation for those greedy errors. See the [phase diagnostic](results/2026-10-26-cdp-breakout-pixel-reference.md#larger-frozen-policy-still-disagrees-on-urgent-paddle-commands);
 all242 active Qbert pins and its process identity stay unchanged.
-Next [prepare the frozen Breakout representation readout](experiments/2026-10-29-cdp-breakout-representation.md)
-to distinguish accessible position/motion information from policy-use problems.
-CPU preparation aligns20,960 recorded actions and954/509/601 examples on separate
-train/validation/test lanes. No agent is constructed and native capture is not
-yet allocated; its declaration,CPU checks and bounded capture remain required.
+The subsequent [frozen Breakout representation readout](results/2026-10-29-cdp-breakout-representation.md)
+completes20,960 actions/83,799 frames per model in32.301s trained/32.420s initial,
+zero updates. Recurrent motion R² improves.282/.051→.473/.614. Trained paddle
+MAE is4.334 CNN/9.643 recurrent pixels;near-paddle recurrent teacher-target MAE
+remains14.848. Useful information is present,but this does not identify the
+cause of weak control. All55 pins,357 tensors per capture,matched trajectories/
+input hashes,readback/counter/host checks and terminal collector pass;19 CPU
+tests pass. Service exits09:02:23 UTC October29. No native change,new learner
+or active GPU allocation. A next diagnostic question is teacher-action access
+from these saved features,with validation/test separation retained.
 
 The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
 zero updates. Sampled value estimates beat a constant baseline but underpredict
