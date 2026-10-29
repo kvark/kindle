@@ -81,3 +81,25 @@ all214,432 recorded actions of the retained failed greedy evaluation, preserving
 its25k-action timeout and20,819-action reward-free tail. These are saved-log
 checks, with zero environment actions or learner updates. Both passes before
 and after clarifying count labels are retained; no preflight failure occurs.
+
+## Launched and startup verified
+
+The main service starts **22:43:07 UTC October29**, source `ce86d72`, with196
+pinned inputs. PID354340/invocation`ad37c04842fa4b7bb51ec0f9a42ebf7e` is active
+on the declared RX7900XT. Progress,100k recovery, postprocessing and terminal
+collection observers are active. The startup audit verifies all372 initial
+tensors against the bounded check,47 matching pre-update semantic events and
+the first six updates at376,392,408,424,440,456 actions. Its complete prefix has
+7208 actions and427 finite reports, with the declared FIRE weight4 and cadence.
+The read-only startup command takes.612s while co-hosting with the learner;
+retain this timing caveat without wall-time correction.
+
+No full frozen outcome is available. Do not restart the live learner or schedule
+another GPU job while it is active. Inspect the original service and observers
+through recovery, all four frozen arms, full evidence checks and terminal
+collection. An observer timeout alone does not indicate a stopped learner.
+
+- Declaration: `3ecbc619b49481cb3cba8809d63777e13b68b35ec270d12b36ca4715237035f9`.
+- Startup review: `7c11f2c507022135649448280b29abac8884a4f5cea9476e7fd893602ffb45ff`,
+  retained in the trial's `startup-review.json` with the original process identity
+  and input hashes.

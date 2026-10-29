@@ -1,17 +1,18 @@
 # CDP handover — October25,2026
 
-A [fresh200k FIRE-weight4 comparison](experiments/2026-10-29-cdp-breakout-fire-weight-200k.md) is selected after the48.059s bounded
-check and21m31s conservative cost projection. Keep12M64/Auto/N8/B16/T16/H15/R16/
+The [fresh200k FIRE-weight4 comparison](experiments/2026-10-29-cdp-breakout-fire-weight-200k.md) launches22:43:07 UTC October29/sourcece86d72,
+with196 pins and a30-minute training cap. Keep12M64/Auto/N8/B16/T16/H15/R16/
 centroid100/expert100/native2974160; only FIRE imitation weight1→4 changes from
-the earlier centroid learner. Training cap30min; require100k/6227 recovery and
-final/actual-initial sampled/greedy24-episode assessments against retained
-13.208/17.875, with unchanged zero-truncation/two-wall gates. All five commands,
-20 config cases, observer/recovery checks and saved-log FIRE-gap analysis pass
-CPU preflight;142 bounded/132 control pins are unchanged. No full result exists
-and the service has not launched at this revision. Root
-`/x/Temp/kindle-breakout-fire-weight-20261029/full`; service
-`kindle-breakout-fire-weight4-200k-20261029`. Check live state; do not repeat
-earlier learners or schedule another GPU job while this learner is active.
+the earlier centroid learner. Startup passes372 bounded-matching initial tensors,
+47 pre-update semantic events, correct cadence and427 finite reports through7208
+actions. MainPID354340/invocationad37c04842fa4b7bb51ec0f9a42ebf7e and progress,
+recovery, postprocessing and terminal-collection observers are active. Require
+100k/6227 recovery and final/actual-initial sampled/greedy24-episode assessments
+against retained13.208/17.875, with unchanged zero-truncation/two-wall gates.
+No full frozen result is available. The.612s CPU startup check co-hosts without
+time correction. Root `/x/Temp/kindle-breakout-fire-weight-20261029/full`; service
+`kindle-breakout-fire-weight4-200k-20261029`. Check live state; do not restart
+this learner, repeat earlier lives or schedule another GPU job while it is active.
 
 The [FIRE-weight4 bounded check](results/2026-10-29-cdp-breakout-fire-weight.md) completes8192 actions/32,736 frames/489 updates
 in48.059s; frozen1024/4,076 frames takes.971s with zero updates and eight natural

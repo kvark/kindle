@@ -1,9 +1,12 @@
 # FIRE supervision exists, but sampled training avoids the long greedy stall
 
 The separately selected [fresh200k comparison](../experiments/2026-10-29-cdp-breakout-fire-weight-200k.md)
-will test task outcomes under the30-minute cap, with100k recovery and four frozen
-arms. Its CPU command/config/observer and saved-log analysis preflights pass.
-This full learner is a new experiment; no bounded-check experience is reused.
+starts22:43:07 UTC October29/sourcece86d72 under the30-minute cap, with100k
+recovery and four frozen arms. All196 pins,372 bounded-matching initial tensors,
+47 pre-update semantic events and427 finite reports through7208 actions pass
+startup checks. MainPID354340 and four observers are active. No full frozen
+result is available; do not restart this learner. This is a fresh experiment,
+with no bounded-check experience reused.
 
 The CPU audit of both completed200k training logs finds no missing FIRE target
 path. All collected states receive corrective labels, and **99.805%** of
