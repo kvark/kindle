@@ -1,17 +1,18 @@
 # CDP handover — October25,2026
 
-One compatible Qbert RGB control is now the bounded comparison before further
-nearby CDP tuning. Reuse the completed4M48/B8/R16/expert100/200k CDP control;do
-not retrain it. Select only8192 RGB actions/994 updates plus1024 frozen actions,
-with native447fe50 unchanged and exactly centered/loss settings changed;keep
-rates,exploration,supervision,seed4013 and pixel geometry. Require399 tensors/
-342 shared initial matches and the fixed conservative cost projection<=35min
-before separately selecting at most one fresh200k RGB learner. Full learner is
-not selected. Seven CPU preparation cases pass;two preparation corrections and
-original bytes remain,no GPU attempt. A negative/inconclusive controlled result
-ends this nearby tuning direction,without another learner to rescue it. See the
-qbert-rgb-control protocol for fixed budgets/evaluations/stopping criteria;check
-live state before GPU work.
+The compatible Qbert RGB check completes8192 actions/32,756 frames/994 updates
+in68.085s,then1024 frozen/.502s,zero updates/no natural episodes. All45 pins,
+399 finite/invariant tensors,342 shared CDP initial tensors,exact config/counters,
+finite reports,changed CNN/reward/decoder/actor/value,full guidance replay and
+guards pass. Service succeeds00:06:12 UTC on October29;no GPU repeat or failure.
+The locked conservative200k estimate30m28s passes the35-minute cost gate. Two
+CPU preparation corrections remain recorded;native447fe50 unchanged. Separately
+select one fresh RGB200k/24,970-update control,100k recovery,35-minute cap and
+four fixed final/own-initial assessments. Reuse the completed4M CDP evidence;
+no new CDP learner or check experience reuse. Controller/CPU outcome-reader
+preparation is next;no GPU job active. Negative/inconclusive controlled evidence
+ends this nearby tuning direction without a rescue learner. See qbert-rgb-control
+for exact settings,bootstrap decision and stopping criteria;check live state.
 
 Qbert12M48/B16/R16/expert100 completes200k actions/799,742 frames/12,477
 updates in30m27s. Greedy11984.375/24 first pyramids improves4M/B8's9654.167/23

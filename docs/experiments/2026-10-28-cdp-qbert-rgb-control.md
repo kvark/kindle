@@ -100,3 +100,38 @@ boundary but rejected native-module loading during capability introspection;
 the corrected harness supplies explicit metadata and forbids construction.
 Original schema/script bytes and receipts remain in the external root. No
 environment or GPU stage was invoked by either preparation attempt.
+
+## Bounded native check completes
+
+Service`kindle-qbert-rgb-control-check-20261029` starts00:04:30 UTC on October29,
+source1956ad8,PID218905/invocation34ddf2986a2f41bba3c5bae507306d80,and succeeds
+00:06:12,whole1m42.696s.8192 actions/32,756 frames/994 updates take68.085s;
+1024 frozen actions/4096 frames take.502s,zero updates/no natural episodes.
+All45 inputs,399 finite/invariant tensors,342 shared initial tensors,exact config/
+counters,positive reconstruction/zero future loss,finite reports,changed CNN/
+reward/decoder/actor/value,full label/input-pixel/action replay and guards pass.
+No GPU failure,repeat,cap change or native/runtime edit occurs.
+
+All994 reports are supervised;119,173 labeled replay rows equal weight sums,
+max raw world/actor expert-loss difference8e-7. Labels6440NOOP/1752hops include
+3682 passive states and2923 actual/teacher disagreements. Actual overrides4510
+are55.054% of actions. These are execution observations,not task competence.
+The fixed conservative200k estimate is1828.453s (30m28s),below2100s. The cost
+gate passes;the hard full-run cap remains necessary.
+
+Declaration`7cb3d1729bafd26eb5997fbb63c9304e31a57a62fe1d4f4f19b96def02bbf44a`,
+review`23f4a39511864ef21adda15b433165e70c5ee680982689f40fb7188319851fe5`,
+completion`6f532e8d59e645df8f382faed68a8b7f82ea870580291775aa74df7891b72b34`.
+The device is idle and no full learner exists at bounded-check completion.
+
+## Separate full-control selection
+
+After the complete bounded audit and prescribed cost test,select exactly one
+fresh RGB200k/24,970-update life under the fixed comparison above. Save100k at
+12,470 updates. Reuse only the completed CDP evidence,not its weights or any
+check experience. Keep the35-minute training cap and the four fixed final/own-
+initial assessments;no new settings,additional CDP learner or rescue allocation.
+The controller and CPU-only outcome reader must implement the locked config,
+accounting and lane-block decision before launch. Preparation is next;no full
+GPU job is active at this selection. A negative/inconclusive controlled result
+ends this nearby tuning direction and is reported with the remaining task gaps.
