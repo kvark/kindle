@@ -208,3 +208,26 @@ Main PID223970/invocation587396941e1c4312b91578919b1650c9 remains active beyond
 305,136 actions. The fixed 400k/12,489 endpoint and four frozen assessments
 remain pending. No GPU restart, cap change, interim evaluation or checkpoint
 selection occurs; this is recovery and numerical evidence, not task competence.
+
+
+## GPU stages complete; full training audit pending
+
+Training reaches the fixed 400k actions /1,599,459 emulator frames /12,489
+updates in2434.985s (40m35s), within the2700s cap. Its host guard passes at
+01:53:27 UTC on October29. All four frozen arms complete by01:54:47 with passing
+host guards, zero updates and no truncations. Their full outcome replays finish
+by01:55:41. Using the declared first3 natural episodes per lane, provisional
+scores are greedy10042.708/23of24 first pyramids versus own80.208/0, and
+sampled7456.250/22 versus own177.083/0. Both fail mean15000. Retained200k/R16
+scores11984.375/24 greedy and6759.375/24 sampled in30m27s; the primary greedy
+result is weaker despite the larger experience budget. Do not infer an isolated
+ratio or experience effect or extend this completed training life.
+
+All228 pins remain unchanged. The small read-only stage receipt is
+`gpu-stage-review.json`, SHA256
+`9e4f87532782227b9500e492115cec0a4de0a5d31ac90551fa3f1821aaa75cb6`.
+It is explicitly provisional and does not replace the complete audit. The same
+main PID223970/invocation587396941e1c4312b91578919b1650c9 now runs CPU audit;
+the full400k training label/input-pixel/action replay starts01:55:44. Its existing
+1800s inner/1830s outer caps remain. Comparison, exposure and terminal collection
+are still pending. No GPU repeat, cap increase, extension or successor is selected.

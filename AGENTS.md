@@ -52,26 +52,21 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-One fresh Qbert12M48/B16/R8/expert100400k learner is active from01:12:47 UTC
-on October29,source90a9475,PID223970/invocation587396941e1c4312b91578919b1650c9.
-All228 pins,exact config/fresh counters,357 initial tensors matching retained
-control and bounded check,and first updates376/408/440/472/504/536 pass. Keep
-400k/12,489 updates and45-minute training cap. All three recoveries100k/3114,
-200k/6239 and300k/9364 pass357 finite tensors;the last audit completes01:43:23
-UTC and the recovery watcher succeeds. Four fixed final/own-initial sampled+
-greedy assessments remain pending. Native,
-runner,teacher and other12M settings unchanged. No cap increase,retry,checkpoint
-selection,extension or automatic successor. The bounded48.107s check passes all
-45 pins/replays/guards;conservative400k estimate43m04s. Frozen benefit remains
-unmeasured. See`docs/experiments/2026-10-29-cdp-qbert-expert100-r8.md` and check
-live state before GPU work. No second learner may run concurrently. The original
-CPU progress observer rejects an unsupported option;its failure is retained. A
-private replacement starts01:15:17 UTC with the same learner PID/invocation and
-all228 pins unchanged. Use`full/progress-repair/collect_repaired.py` at completion;
-no GPU stage repeats. A1.953s CPU-only retained Breakout label recount co-hosts
-with this learner;all228 pins/same PID remain unchanged. Late passive agreement
-is41.753% at encoder6e-6 versus28.780% at4e-5,low across all four labels. This
-selects no Breakout allocation;details in the pixel-reference report.
+Qbert12M48/B16/R8/expert100 finishes400k actions/1,599,459 frames/12,489
+updates in40m35s,within45min. All four frozen GPU arms finish by01:54:47 UTC
+on October29 with host guards passing. Provisional first3-per-lane replay scores:
+greedy10042.708/23of24 first pyramids versus own80.208/0;sampled7456.250/22
+versus177.083/0. Both miss15000;greedy trails retained200k/R16's11984.375/24.
+All228 pins remain unchanged and100k/200k/300k recoveries pass357 finite tensors.
+Main PID223970/invocation587396941e1c4312b91578919b1650c9 is active in CPU audit;
+full training label/pixel replay,comparison and terminal completion remain pending.
+No GPU repeat,extension,cap increase or successor is selected. See
+`docs/experiments/2026-10-29-cdp-qbert-expert100-r8.md`;check live state before GPU
+work. Original CPU progress-observer failure is retained;use
+`full/progress-repair/collect_repaired.py` only after required services succeed.
+The private replacement and all228 experiment pins remain unchanged. A.285s
+observer repair and1.953s retained Breakout CPU analysis co-hosted with training;
+keep those timing caveats. The Breakout analysis selects no GPU work.
 
 The compatible RGB Qbert control completes200k actions/799,695 frames/24,970
 updates in28m41s. Greedy6090.625/24 first pyramids and sampled4335.417/23 are
