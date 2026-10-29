@@ -65,3 +65,9 @@ Corrected schema SHA256`4c9ea7443dfa36ed87db7b45b4005ee2e6b9c1550b1f7734a648db62
 Full preflight SHA256`42c423d80d90ecd5519390ac57c2b6e67c4ebea4337fe7f41ee7231276cca63f`.
 Declaration and launch follow the fixed protocol;the earlier bounded failure
 remains recorded and no GPU stage is repeated.
+
+Selected declaration and launch complete18:14:45 UTC October29/source531ce35.
+MainPID324938/invocation`23da92f687b74243812a8007db61ac5a`,212 pins;startup
+18:15:01 passes399 finite/bounded-matching and342 shared initial tensors,
+firstsix updates and90 finite reports. All services are active;training and
+final audits remain pending. See the linked result for exact receipts.

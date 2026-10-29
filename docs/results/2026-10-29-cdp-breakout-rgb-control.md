@@ -95,3 +95,27 @@ Receipt:`full/full-preflight.json`,SHA256`42c423d80d90ecd5519390ac57c2b6e67c4ebe
 The fixed protocol,controllers,corrected schema,original failure and repair
 evidence are pinned before launch. The selected training cap remains35min;
 this preflight is execution evidence,not a task outcome.
+
+
+## Fresh200k comparison active
+
+The selected fresh life starts18:14:45 UTC October29/source`531ce35`,main
+PID324938/invocation`23da92f687b74243812a8007db61ac5a`,under
+`kindle-breakout-rgb-control-200k-20261029`. Its212 immutable inputs include
+the corrected schema and prior failure/repair. Training has a35min cap and
+100k recovery;four final/actual-initial sampled/greedy arms,full replays,
+curves,exposure and comparison follow automatically. No check/control
+experience is reused. The main and three observers are active.
+
+Startup18:15:01 passes:399 finite initial tensors,399 matching bounded RGB
+initial values,342 shared CDP initial values,expected updates at376/392/408/
+424/440/456,1800 observed actions and90 finite supervised reports with positive
+reconstruction/zero future loss. All212 pins and original process identity
+match. These are startup checks,not frozen task results;training and audits
+remain unfinished. No extension,second seed or successor allocation selected.
+
+Root:`/x/Temp/kindle-breakout-rgb-control-20261029/full`,trial
+`breakout-rgb12m-64-b16-r16-expert100-200k-seed1009`.
+Declaration:`cf3a4f45cd1ad497ce48d5acbae8314310c0bc630ac85bb567aab2959d1c8a45`.
+Launch:`d0b4787d58888f3daea9a46468fa834e965ba3ae4f2e137ff7ae9dd7c499b303`.
+Startup:`eda45ab6a2585596f4fdcb2c0ec74215449ab8a2572ca17efe4b9f1a77f48bb8`.

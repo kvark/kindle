@@ -21,10 +21,16 @@ replay/guard checks pass after a CPU-only schema-name repair. Original service
 fails17:57:08 UTC after both successful GPU stages;38 optimizer prefixes are
 corrected separately,original156 inputs retained,176 repair pins pass,no GPU
 repeat. Repair succeeds17:59:54,collection18:01:33/source2261a7a. Fixed200k
-projection26m47s passes35min. The [fresh200k RGB comparison](experiments/2026-10-29-cdp-breakout-rgb-control-200k.md) is separately selected with original settings/cap and corrected
-`native-check/cpu-repair` schema. CPU full-controller preparation is next;no
-full declaration/launch exists. Native447fe50 unchanged. Root
-`/x/Temp/kindle-breakout-rgb-control-20261029`. Check live state before GPU work.
+projection26m47s passes35min. The [fresh200k RGB comparison](experiments/2026-10-29-cdp-breakout-rgb-control-200k.md) starts18:14:45 UTC October29/source531ce35 after1.188s CPU preflight.
+MainPID324938/invocation`23da92f687b74243812a8007db61ac5a`,212 pins,35min training
+cap,100k recovery and four frozen arms. Startup18:15:01 validates399 finite
+initial tensors,399 matches to bounded RGB and342 shared CDP values,firstsix
+updates and90 finite supervised reports;all212 pins unchanged. Original
+bounded failure/CPU repair retained;native447fe50 unchanged,no experience
+reuse. Full root`/x/Temp/kindle-breakout-rgb-control-20261029/full`,trial
+`breakout-rgb12m-64-b16-r16-expert100-200k-seed1009`. Main/progress/recovery/post
+services are active;training/evaluation/replays/comparison remain unfinished.
+Check live state before GPU work;do not launch concurrent work or restart.
 
 The completed [Breakout kernel action readout](results/2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy) takes1.824s CPU and scores49.25% overall/47.06% near-paddle teacher agreement,
 below linear50.58%/49.26% and recorded policy54.58%/53.68%. No evidence for this
