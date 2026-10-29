@@ -1016,3 +1016,17 @@ agent or environment and did not change any experiment input.
 Artifacts:`/x/Temp/kindle-breakout-passive-labels-20261029`,review
 `6c400c6079b563bfd1743b43646f2290c1a00e7a93f10d724defc42adcbadebb`.
 The active Qbert400k/R8 budget,caps and evaluations are unchanged.
+## Stronger corrective imitation: bounded check passes
+
+The separately selected scale10→100 check completes8192 actions/32,720 frames/
+994 updates in37.011s, followed by1024 greedy frozen actions/4096 frames in.559s,
+zero updates/no completed natural episodes. All47 pins,357 control-matching
+initial and invariant frozen tensors,finite reports,parameter changes,full
+label/input-pixel/action replay and both host guards pass. Service succeeds
+03:21:46 UTC on October29 without failure,GPU repeat,cap or runtime change.
+
+The fixed conservative200k projection is16m34s, below the25-minute cap. This is
+execution/cost evidence only. After reviewing the complete audit, one fresh200k
+comparison is separately selected; task benefit remains unmeasured. Keep4M64/
+Auto/N8/B8/T16/H15/R16/coefficient1/actor-unimix.01/full18/original rates and the
+same teacher. No check experience is reused. [Protocol and receipts](../experiments/2026-10-29-cdp-breakout-expert100.md).

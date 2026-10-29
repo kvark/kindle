@@ -71,3 +71,40 @@ first248 and994/12,470/24,970 updates at8192/100k/200k actions with zero credit.
 All64 retained Breakout and229 preceding Qbert pins verify; the357-tensor initial
 schema verifies. Six controllers/helpers compile. No preparation failure or
 native/runtime change occurs. The exact control runner is copied unchanged.
+
+## Bounded check completed; one full learner separately selected
+
+Service starts03:20:55 UTC on October29,sourcee69390d,PID234643/invocation
+6c2704d3ab6d4bb4819724a23d93f656. Training8192 actions/32,720 frames/994 updates
+takes37.011s;1024 frozen actions/4096 frames take.559s,zero updates/no natural
+episodes. All47 pins,357 matching initial/invariant frozen tensors,finite reports,
+changed CNN/reward/actor/value,complete label/input-pixel/action replay and both
+host guards pass. All994 reports are supervised;118,949 labeled rows equal weight
+sums,maximum raw world/actor loss difference8e-7. Labels include2293NOOP,
+1250FIRE,4649 paddle actions,4321 passive labels and3871 actual/teacher differences.
+Actual overrides3871 (47.2534%) are not task competence.
+
+The conservative200k projection is993.953s (16m34s), below1500s. Service succeeds
+03:21:46 UTC,whole51.565s,without failure,GPU repetition,cap or runtime change.
+Completion `a908eaad5549967ac2e652926ce4a56caf5c6a8e6fefea9f19f28674f7e4123a`;
+review `05d6522a23b57ed5420bca56b8613f2eb5676ec6a3cc28c54ffaf2eb4cc6149f`.
+
+After the complete audit and cost gate pass, separately select one fresh200k/
+24,970-update comparison under the fixed25-minute training cap and four frozen
+assessments above. Save/audit100k/12,470 recovery. Only expert scale10→100 changes
+versus the retained control; no check experience is reused. Full CPU controller
+validation precedes launch. Root `/x/Temp/kindle-breakout-expert100-20261029/full`.
+
+Keep300s per frozen arm,600s inner/630s outer training-replay cap,1200s total CPU
+audit,4200s main service. Postprocessing/progress use4800s services and4500s
+internal waits; recovery3000s service/2400s internal wait. These audit limits do
+not expand the25-minute training cap. No observer may restart the learner.
+
+Full CPU preflight passes in.272s: five actual CLI boundaries,14 compiled scripts,
+10 checks of actual audit/comparison config assertions, six recovery-header cases
+and four actual observer-parser cases. The sampled and separately retained greedy
+controls verify, including their source checkpoint identities and original pins.
+All47 bounded pins and357 matching initial tensors verify;100k/12,470 and
+final200k/24,970 accounting pass. No native/environment construction or preparation
+failure occurs. The progress observer uses a private copy with a4500s wait and
+tested positional invocation; recovery starts only after a complete valid header.
