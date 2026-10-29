@@ -18,16 +18,19 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-A [fresh Breakout centroid100 comparison](docs/experiments/2026-10-29-cdp-breakout-centroid100-200k.md)
-is separately selected:200k actions/12,477 updates,30-minute training cap,
-12M64/Auto/N8/B16/T16/H15/R16/expert100 and the checked position loss scale100.
-No bounded-check experience is reused. Require100k/6227 recovery,372 matching
-bounded initial/invariant frozen tensors,357 shared control initials,paired
-sampled/greedy final-and-initial24-episode assessments,full replays and guards.
-Native2974160 and runner differ from retained447fe50;no isolated causal claim.
-Root`/x/Temp/kindle-color-centroid-20261029/full`;service
-`kindle-breakout-centroid100-200k-20261029`. No gameplay result is available at
-selection. Check actual live state before GPU work;do not restart old services.
+The [fresh Breakout centroid100 comparison](docs/experiments/2026-10-29-cdp-breakout-centroid100-200k.md)
+launches20:53:05 UTC October29/sourceb58d3a2 with187 pins and a30-minute training
+cap:200k actions/12,477 updates,12M64/Auto/N8/B16/T16/H15/R16/expert100 plus
+position-loss scale100. Startup passes372 bounded-matching initial tensors,
+correct cadence and171 finite reports through3112 actions. Main PID346205,
+invocation3522002a6e344decb27f4ddd8b8f6988; progress,recovery,postprocessing and
+terminal-collection observers are active. No full frozen result is available.
+Require100k/6227 recovery and final/actual-initial sampled/greedy24-episode
+assessments against retained13.208/17.875,all0/24 two-wall. Native2974160 and
+runner differ from447fe50;no isolated causal claim. Root
+`/x/Temp/kindle-color-centroid-20261029/full`;service
+`kindle-breakout-centroid100-200k-20261029`. Check live state;do not restart it,
+repeat earlier lives or schedule another GPU job while this learner is active.
 
 The [optional native color-position loss](docs/results/2026-10-29-cdp-color-centroid.md)
 passes F64 targets/loss/derivatives and a fresh Breakout8192-action/32,735-frame/

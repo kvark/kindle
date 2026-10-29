@@ -72,3 +72,15 @@ Trial:`breakout-12m-64-b16-r16-centroid100-expert100-200k-seed1009`.
 Main service:`kindle-breakout-centroid100-200k-20261029`.
 Check live state before launching; never restart merely because observation
 times out or a completed transient service unloads.
+
+## Launch and startup
+
+The selected service starts **20:53:05 UTC October29**, source`b58d3a2`, with187
+unchanged declaration pins. PID346205/invocation3522002a6e344decb27f4ddd8b8f6988
+passes startup at20:53:26:372 finite initial tensors matching the bounded check,
+correct first-six update cadence and171 finite supervised reports through3112
+complete actions. Progress,recovery,postprocessing and terminal-collection
+observers are active. The final gameplay outcome remains pending.
+
+Declaration SHA256:
+`21c5a539eb81847da6cd10dbe16c1bf9a3889fae456af22ee899b51d4eb32df7`.
