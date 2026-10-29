@@ -194,3 +194,17 @@ credit remains.25. Checkpoint digest`dafc32b3db05e95d544a5de1933ca160bd0096ed08b
 review`61dc0c31b77a684a083b2de57344aef15d9fb07f7287fdc9275b06ff7a46692d`. Main PID223970/invocation587396941e1c4312b91578919b1650c9 remains
 active;300k/9364 recovery and fixed400k/12,489 final assessments are pending.
 No GPU restart,cap change,interim evaluation or checkpoint selection occurs.
+
+
+## All three recovery checkpoints pass
+
+At 01:43:23 UTC on October 29, the 300k recovery verifies 9364 saved updates
+and 357 finite tensors. Its complete log prefix contains 9394 finite reports
+through 300,952 actions; credit remains .25. Checkpoint digest
+`97adf02bc439dcaf9b43cd89b435faf47864bf30e032e3e2135112d20583759f`;
+review `9f581a3aca21c30634c3e5588633ceb77e25618f2219ef083265fd6fd6760b10`.
+The recovery watcher exits successfully after all three declared milestones.
+Main PID223970/invocation587396941e1c4312b91578919b1650c9 remains active beyond
+305,136 actions. The fixed 400k/12,489 endpoint and four frozen assessments
+remain pending. No GPU restart, cap change, interim evaluation or checkpoint
+selection occurs; this is recovery and numerical evidence, not task competence.
