@@ -72,3 +72,33 @@ schema and all190 control/228 preceding R8 inputs verify. All six isolated
 Python controllers/helpers compile; native capability metadata is stubbed only
 for the CPU boundary check. No native module or environment is constructed and
 no preparation failure occurs. The original controllers and native remain fixed.
+
+
+## Bounded check completes; one full comparison is separately selected
+
+Service`kindle-qbert-expert1000-check-20261029` starts02:23:30 UTC on October29,
+source57b53b2,PID229514/invocation2c2a0fc8a1d94907aee24e7b24aa10a8. It completes
+8192 actions/32,754 frames/489 updates in69.211s;1024 frozen actions/4096 frames
+in.786s,zero updates/no natural episodes. All47 pins,357 control-matching initial
+and invariant frozen tensors,exact config/counters,finite reports,changed CNN/
+reward/actor/value,full training label/input-pixel/action replay and both guards
+pass. All489 reports are supervised;117,260 labeled replay rows equal weights,
+maximum raw world/actor expert-loss difference8e-7. Labels6699NOOP/1493hops
+include3827 passive states and3382 actual/teacher disagreements. There are4365
+actual overrides (53.2837%);these bounded outcomes are not task competence.
+
+The fixed conservative200k projection is1858.706s (30m59s),below2100s. Service
+succeeds02:25:14 UTC,whole1m44.421s,without failed attempt,GPU repetition,cap
+increase or native/runtime edit. Completion
+`8aeee509800fab822e6c2fa3efd555bf565189f12c6285b792b4acd17c41796d`,review
+`767a158566a147ae35f3700d4267a23c408f781f42cb4365d2a06fabdcae7c27`,declaration
+`0859474cc3df643e66deeb3b6118ae61917f97ece5fd710807a4918403d11140`.
+
+After reviewing the complete execution and cost evidence,select exactly one
+fresh200k/12,477-update comparison under the fixed35-minute training cap and
+four assessments above. Save/audit100k/6227 recovery. Only expert scale100→1000
+changes versus retained12M48/B16/R16;all other settings remain fixed. No check
+experience or retained weights are reused. Full-controller and CPU comparison
+preparation precede launch;no full learner is active at selection. This separate
+selection tests task benefit;the bounded pass supplies no policy-quality claim.
+Root `/x/Temp/kindle-qbert-expert1000-20261029/full`.

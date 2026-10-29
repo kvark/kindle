@@ -4,14 +4,16 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-One bounded Qbert12M48/B16/R16/expert1000 check is separately selected after
-terminal R8 audits. Only expert scale100→1000 changes versus retained200k/R16.
-CPU preflight passes two CLI boundaries,eight config checks,357-tensor schema
-and update accounting without native/environment construction. Check8192/489,
-then1024 frozen;caps180s/60s/180s audit/480s service. Require all audits and
-`check_seconds*200000/8192*1.10<=2100` before separately selecting any full life.
-No full learner or successor selected. See the expert1000 protocol;check live
-state before GPU work.
+Qbert12M48/B16/R16/expert1000 bounded check passes8192 actions/32,754 frames/
+489 updates in69.211s;1024 frozen/.786s,zero updates/no natural episodes. All47
+pins,357 matching initial/invariant frozen tensors,finite reports,parameter
+changes,full label/pixel/action replay and guards pass. Service succeeds02:25:14
+UTC on October29;no failure,GPU repeat or native edit. Conservative200k estimate
+30m59s passes35min. After that complete review,one fresh200k/12,477-update
+comparison is separately selected,with100k/6227 recovery and four final/own-
+initial sampled+greedy arms. Only expert scale100→1000 changes versus retained
+12M/R16;no check experience reused. Full CPU preparation must precede launch;
+no full learner is active yet. See the expert1000 protocol;check live state.
 
 Qbert12M48/B16/R8/expert100 completes400k actions/1,599,459 frames/12,489
 updates in40m35s. Greedy10042.708/23of24 first pyramids is16.20% below retained
