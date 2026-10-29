@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [FIRE supervision audit](results/2026-10-29-cdp-breakout-fire-weight.md) finds23,317 FIRE labels and99.805% sampled-label
+coverage in centroid100 training. Late passive sampled FIRE agreement is78.35%;
+the longest passive FIRE-label run without a FIRE-bearing action is45, versus
+the verified frozen12,828-action wait. Exact full-pixel overlap is zero but does
+not prove perceptual novelty. All16 pins pass in2.668s CPU. A fresh8192-action/
+489-update FIRE-weight1→4 check is selected, retaining12M64/Auto/N8/B16/T16/
+H15/R16/centroid100/expert100 and native2974160. Its optional CLI flag passes699
+CPU checks with zero native construction attempts. The bounded GPU check has
+not launched at this revision; no full learner or automatic successor is selected.
+Evidence `/x/Temp/kindle-breakout-fire-weight-20261029`. Check live state before work.
+
 The [CPU timeout diagnostic](results/2026-10-29-cdp-centroid-timeout.md) identifies a Breakout serving failure:
 12,828 actions without FIRE after a life loss, with two lives remaining.
 FIRE launches a moving ball at the preselected5,000/10,000-step origins; at20,000,

@@ -150,6 +150,8 @@ def main():
                         help="fresh guided training only: native supervised actor loss on expert actions")
     parser.add_argument("--guidance-noop-weight", type=float,
                         help="relative NOOP target weight for expert imitation; default1")
+    parser.add_argument("--guidance-fire-weight", type=float,
+                        help="relative FIRE target weight for expert imitation; default1")
     parser.add_argument("--guidance-world-gradient", action="store_true",
                         help="fresh imitation only: route expert loss through the frozen actor into world state")
     args = parser.parse_args()
@@ -244,6 +246,12 @@ def main():
             parser.error("guidance NOOP weight requires imitation")
         if not positive_f32(args.guidance_noop_weight) or args.guidance_noop_weight > 1:
             parser.error("guidance NOOP weight must be positive F32 and at most1")
+    if args.guidance_fire_weight is not None:
+        if args.guidance_imitation_scale is None:
+            parser.error("guidance FIRE weight requires imitation")
+        if (not positive_f32(args.guidance_fire_weight)
+                or not positive_f32(args.guidance_fire_weight * args.guidance_imitation_scale)):
+            parser.error("guidance FIRE weight and scaled weight must be positive finite F32")
     if args.guidance_world_gradient and args.guidance_imitation_scale is None:
         parser.error("guidance world gradient requires imitation")
     if args.breakout_corrective_labels and (not args.breakout_guidance_probability
@@ -281,7 +289,7 @@ def main():
     training_options.add("--qbert-guidance-policy")
     training_options.add("--qbert-corrective-labels")
     training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions", "--breakout-corrective-labels"))
-    training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-world-gradient"))
+    training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-fire-weight", "--guidance-world-gradient"))
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
@@ -420,6 +428,8 @@ def main():
             weights = [1.0] * actions
             noop = environments[0].action_meanings.index("NOOP")
             weights[noop] = args.guidance_noop_weight if args.guidance_noop_weight is not None else 1.0
+            if args.guidance_fire_weight is not None:
+                weights[environments[0].action_meanings.index("FIRE")] = args.guidance_fire_weight
             config["expert_imitation"] = dict(scale=args.guidance_imitation_scale, action_weights=weights)
             if args.guidance_world_gradient:
                 config["expert_imitation"]["world_gradient"] = True

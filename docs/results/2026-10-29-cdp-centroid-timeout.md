@@ -1,5 +1,10 @@
 # Breakout timeout includes a long failure to serve
 
+The subsequent [supervision audit](2026-10-29-cdp-breakout-fire-weight.md) finds
+FIRE labels present and a much shorter maximum45-action passive FIRE-label run
+during sampled training. A separate bounded FIRE-weight check is selected; the
+saved timeout and its failed evaluation status remain unchanged.
+
 The saved centroid100 greedy timeout contains a concrete policy failure:
 after losing a life at zero-based episode step4,198, the policy takes **12,828
 actions without FIRE**, despite two lives remaining. The playfield stays
