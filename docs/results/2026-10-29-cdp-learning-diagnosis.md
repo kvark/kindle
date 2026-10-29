@@ -1,5 +1,46 @@
 # Qbert retains useful forecasts; later-game accuracy and policy use remain open
 
+## Late latent prediction loss remains above its floor
+
+A retrospective CPU-only check of the retained Qbert12M and Breakout12M control
+logs finds no evidence that the entire latent prediction term becomes inactive
+late in training. Each completed 200k-action learner has 12,477 finite reports.
+The last 50k actions contain 3,125 reports per learner:
+
+| Final 50k actions | Qbert | Breakout |
+| --- | ---: | ---: |
+| Mean raw posterior/prior KL | 5.476490 | 11.357183 |
+| Mean KL after the floor | 5.490822 | 11.357186 |
+| Mean addition from the floor | .014332 | .000003 |
+| Reports whose averaged loss is at the floor | 0/3,125 | 0/3,125 |
+
+Both use a one-nat floor. Inspection of the exact native447fe50 source confirms
+that it applies separately to each state's KL before averaging over batch and
+time. Logged averages therefore cannot recover the fraction of clipped states
+or the gradient magnitudes. This is not evidence that every state receives a
+useful dynamics gradient, nor that removing the floor would have no effect.
+It does not support treating a broadly inactive late dynamics term as an
+established explanation for weak control; no floor-change learner is selected.
+
+Across the whole runs, raw/floored means are 4.811732/4.840013 for Qbert and
+8.331334/8.333059 for Breakout. Raw report means below one occur 51 and 148
+times, respectively, all in the first 50k actions. Report means at the floor
+occur zero and four times, respectively, using a 1e-6 numerical tolerance.
+Quarter summaries and exact source snapshots remain in the evidence package.
+
+The script verifies completed-review and curve/log hashes, exact headers,
+sequential report counts, finite values and equal dynamics/representation KL
+metrics. All nine analysis inputs and 273 active Qbert comparison pins remain
+unchanged, as does the active PID/invocation. The 2.290s check runs on one affined
+low-priority CPU core at 13:17:13 UTC October29/source `30bff33`; no native agent,
+GPU work or updates occur. It is co-hosted with the 25M/R16 comparison, whose
+training wall time receives no correction. These are reused development logs,
+not independent learners or a causal experiment.
+
+Evidence: `/x/Temp/kindle-kl-floor-diagnosis-20261029`. Review SHA256
+`5a31c432c0ef89b46a3831d5546774d3cdafa916011208f9baf1b8586105e0da`;
+analysis `c7e637f7c7657a66ccbd6a6d8b63239db4e3a09c99952aae8c9beace2676062a`.
+
 ## Tested three-step loss does not improve the retained recipe
 
 The subsequent fresh200k-action test adds direct H3/scale1 world supervision.

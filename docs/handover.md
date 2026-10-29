@@ -18,6 +18,11 @@ Original CPU template-edit assertion/correction retained before declaration;
 no GPU repeat/experience reuse. Root `/x/Temp/kindle-qbert-25m-r16-20261029/full`.
 Reused development seed/cohort;no extension/automatic successor. Check live state.
 
+The13:17:13 UTC CPU loss-floor diagnosis takes2.290s co-hosted on one low-priority
+core;all273 active pins and main invocation stay unchanged. It constructs no
+native agent and changes no run input. Preserve this timing caveat; details are
+in the live protocol and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md#late-latent-prediction-loss-remains-above-its-floor).
+
 The [completed Qbert25M/R16 bounded check](results/2026-10-29-cdp-qbert-25m-r16.md)
 passes8192 actions /32,757 frames /489 updates in100.299s,then1024 greedy frozen
 /4096 frames in1.202s,zero updates/no natural episodes. All53 pins,357 finite/

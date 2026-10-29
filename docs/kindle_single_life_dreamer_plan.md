@@ -18,6 +18,11 @@ Original CPU template-edit assertion/correction retained before declaration;
 no GPU repeat/experience reuse. Root `/x/Temp/kindle-qbert-25m-r16-20261029/full`.
 Reused development seed/cohort;no extension/automatic successor. Check live state.
 
+A [CPU loss-floor diagnosis](results/2026-10-29-cdp-learning-diagnosis.md#late-latent-prediction-loss-remains-above-its-floor)
+finds late mean dynamics KL5.491 Qbert/11.357 Breakout, above the one-nat floor.
+Per-state clipping and derivatives remain unmeasured; no additional learner is
+selected. The2.290s co-hosted check preserves all273 active pins and main invocation.
+
 The [completed Qbert25M/R16 bounded check](results/2026-10-29-cdp-qbert-25m-r16.md)
 passes8192 actions /32,757 frames /489 updates in100.299s,then1024 greedy frozen
 /4096 frames in1.202s,zero updates/no natural episodes. All53 pins,357 finite/

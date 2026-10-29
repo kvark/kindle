@@ -820,6 +820,11 @@ arms and15000/90% gate fixed. CPU template-edit assertion/correction retained;
 no GPU repeat/experience reuse/extension/successor. See25M/R16-200k protocol and
 check actual live state;observer timeout is not a restart signal.
 
+The13:17:13 UTC CPU-only KL-floor diagnosis finds late mean dynamics KL5.491
+Qbert/11.357 Breakout,above floor1;per-state clipping/derivatives unmeasured.
+All9 analysis inputs/273 active pins/main invocation unchanged;2.290s low-priority
+co-host work is a timing caveat. No additional learner selected;see diagnosis.
+
 Qbert25M48/B16/R16 bounded check passes8192 actions /32,757 frames /489 updates
 in100.299s;1024 greedy frozen/4096 frames take1.202s,zero updates/no natural episodes.
 All53 pins,357 finite/invariant frozen tensors,357 matching25M/R8 initial tensors,
