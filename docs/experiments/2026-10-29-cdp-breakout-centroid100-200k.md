@@ -92,3 +92,24 @@ all372 finite tensors. The observer checks6,516 finite reports through104,632
 complete actions and exits successfully. Original PID346205/invocation
 3522002a6e344decb27f4ddd8b8f6988 and all187 pins remain unchanged. The learner
 continues; no frozen task outcome is established at this milestone.
+
+## Terminal outcome: original comparison fails
+
+Training completes200k actions/799,500 frames/12,477 updates in21m45s. Final
+sampled14.375 and selected-natural greedy20.125 compare with13.208/17.875;
+actual initials1.417/2.208 match. All0/24 two-wall successes. Final greedy has
+one25,000-action timeout, so the declared zero-truncation requirement fails.
+These scores remain descriptive; the four-arm comparison is not accepted.
+
+All five GPU stages finish with passing guards. Main fails **21:18:18 UTC**
+on the protocol assertion; automatic postprocessing/collection preserve that
+failure. Separate CPU closure completes missing saved replays, full training
+pixel/action/label replay, curves, exposure and comparison at **21:25:40**,
+without repeating GPU stages. It verifies187 original/234 closure pins,
+372 bounded-matching initial/invariant frozen tensors,357 shared control initial
+tensors and both actual-initial semantic traces. Collection completes21:31:01;
+status remains`closed_protocol_failed`, with no original passing review created.
+
+Retain the control; no retry,extension,confirmation or automatic successor.
+All services are terminal and no GPU allocation remains active at collection.
+See the [full result and limitations](../results/2026-10-29-cdp-color-centroid.md#full-200k-comparison-fails-the-evaluation-protocol).

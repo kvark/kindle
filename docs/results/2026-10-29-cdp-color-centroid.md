@@ -1,11 +1,18 @@
-# Native color-position supervision: bounded check passes
+# Native color-position supervision: learned target, unresolved gameplay benefit
 
-The optional position objective passes native target/loss/gradient checks and a
-fresh Breakout training/restore check. It has **not yet demonstrated a gameplay
-benefit**. The bounded learner completes **8,192 actions / 32,735 frames / 489
+The optional position loss passes numerical and bounded learning checks. A
+subsequent fresh **200,000-action** Breakout learner finishes in **21m45s**, but
+its full evaluation **fails the declared zero-truncation requirement**. Sampled
+score is 14.375 versus control 13.208; the selected natural greedy cohort scores
+20.125 versus 17.875, with one additional 25,000-action timeout. Both have zero
+of 24 two-wall successes. These descriptive changes do not establish a gameplay
+benefit or justify promoting the recipe. The original failed service and all
+saved evidence remain; separate CPU closure finishes without repeating GPU work.
+
+The earlier bounded learner completes **8,192 actions / 32,735 frames / 489
 updates in 48.101s**. Its 1,024-action / 4,096-frame greedy frozen check takes
-0.875s, makes zero updates and completes no natural episodes. No full learner
-is selected by this result, and the check's experience is not reused.
+0.875s, makes zero updates and completes no natural episodes. That check's
+experience is not reused by the full learner.
 
 ## Why this objective
 
@@ -117,8 +124,101 @@ unfinished; check live state before any separately selected GPU work.
 ## Fresh 200k comparison selected
 
 The [separate full-run protocol](../experiments/2026-10-29-cdp-breakout-centroid100-200k.md)
-now selects a fresh200k/12,477-update comparison under a30-minute training cap.
+selected a fresh200k/12,477-update comparison under a30-minute training cap.
 It retains the checked recipe and scale100,with100k recovery and fixed final/
 actual-initial sampled and greedy24-episode assessments. No short-check experience
 is reused. The original bounded outcome remains execution evidence only; no
 full-run gameplay result is available at selection.
+
+## Full 200k comparison fails the evaluation protocol
+
+The fresh learner completes **200,000 actions / 799,500 frames / 12,477 updates
+in 1,304.573s (21m45s)**. Retained control takes 1,339.198s (22m19s); this run
+is 2.59% shorter. Native and runner versions, the extra head and encountered
+trajectories differ, so this does not isolate a speedup or loss overhead. All
+settings and the teacher remain as declared above; no checkpoint or scale is
+chosen from intermediate results.
+
+| Fixed evaluation | Own initial | Final | Retained control final | Final two-wall successes | Total final timeouts |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Sampled actions | 1.417 | 14.375 | 13.208 | 0/24 | 0 |
+| Greedy actions | 2.208 | 20.125 | 17.875 | 0/24 | 1 |
+
+Means use the declared first three **natural** episodes per lane, 24 total.
+The greedy score excludes its time-limited episode and cannot be treated as a
+passing evaluation. Lane0/episode1 reaches 25,000 actions at score27, with a
+20,819-action reward-free tail. Recorded actions include 16,555 NOOP,850 FIRE,
+3,736 RIGHT and3,859 LEFT. Those counts do not identify why the policy stalled.
+The assessment eventually records154 natural episodes and the timeout while
+waiting for each lane's cohort. All four frozen arms total **244,312 actions /
+976,892 frames / 172.214s**, with zero learner updates. The sampled arm meets
+its own episode/accounting requirements; it does not retroactively pass the
+four-arm declaration. No task gate passes.
+
+Training overrides110,826 actions (**55.413%**) and passively labels89,174.
+All12,477 reports are finite. Fixed50k-action windows show:
+
+| Training action window | Mean raw position loss | Valid target fraction | Expert CE on labeled rows | Control expert CE |
+| --- | ---: | ---: | ---: | ---: |
+| 0–50k | .05547 | .8351 | 1.3583 | 1.3635 |
+| 50–100k | .02095 | .8497 | .8687 | .8840 |
+| 100–150k | .00758 | .8744 | .7535 | .7772 |
+| 150–200k | .00349 | .8927 | .6837 | .6958 |
+
+The raw auxiliary loss falls about94% between first and last windows. It is a
+masked training-replay mean on changing states, not held-out coordinate error.
+The direct target is learnable, but this alone does not show improved state
+precision on the diagnostic cohort or better action choices near the paddle.
+Expert fitting improves only modestly relative to the control. Guided selected
+episodes average187.609, while unguided online episodes average5.519; these
+changing-policy online groups are not substitutes for frozen competence.
+
+### Validation, failure and closure
+
+The original service starts **20:53:05 UTC October29**, source`b58d3a2`, with187
+pins. Startup verifies372 finite initial tensors matching the bounded learner
+and the correct first update at376 actions. The100k/6,227 recovery passes at
+**21:04:40**. All five GPU stages finish with passing host guards; all372
+tensors remain invariant through each frozen arm. All357 shared control initial
+tensors match, and sampled/greedy actual-initial semantic traces reproduce all
+800/795 events respectively. Auxiliary,CNN,reward,actor and value weights change.
+
+Main fails at **21:18:18** when its CPU audit enforces the original
+`truncated_episodes == 0` requirement for final greedy. Automatic postprocessing
+records incomplete status at21:18:35; automatic collection preserves the failed
+main and terminal observers at21:18:40. This is a protocol failure, not a GPU
+fault or a CPU schema defect that can turn the comparison into a pass.
+
+Separately pinned CPU-only closure starts21:20:54, preserves all187 original
+and234 closure pins, reuses the two completed sampled replays, and finishes the
+two missing greedy replays/videos and complete training pixel/action/label replay.
+It verifies all372 tensors, numerical/config/counter/source checks and guards.
+Audit completes21:24:43; exposure,curve and descriptive comparison complete
+**21:25:40**,285.936s after closure selection. Final collection at **21:31:01**
+checks the five postprocessing pins and all nine retained-control completion
+files, including its exposure summary. The curve is visually inspected. No
+native agent or environment is constructed by the closure collector, no GPU
+stage repeats, and no host reset/reload/reboot occurs.
+
+Closure status remains **`closed_protocol_failed`**, with
+`comparison_accepted: false`. No passing original learning,postprocessing or
+completion review is created. Ordinary frozen logs lack live pixel hashes;
+replays verify the saved outcome/action/frame/reset trajectories. The original
+failed service remains failed, all observers are terminal and no GPU allocation
+is active at collection. Reused seed/cohort, explicit color/region priors and
+changed native/runner limit causal and reliability claims.
+
+Retain the control. No retry, cap increase, extension, confirmation or automatic
+successor follows this life. A useful remaining diagnostic is whether the new
+checkpoint improves held-out position precision and urgent action choices on
+matched trajectories; the training losses above do not answer that question.
+The five-game goal remains unfinished.
+
+Full root:`/x/Temp/kindle-color-centroid-20261029/full`.
+Trial:`breakout-12m-64-b16-r16-centroid100-expert100-200k-seed1009`.
+Separate closure artifacts live in its`closure/`directory.
+
+- Original declaration:`21c5a539eb81847da6cd10dbe16c1bf9a3889fae456af22ee899b51d4eb32df7`.
+- Evidence review:`9a6d44497bc7fbc476e69fb220f0897bcde204075b5c9719d58db0878526bd34`.
+- Descriptive comparison:`cb10634332f62e8567f0c1273a6fa75477d68f3db6f1ad22e897b6a76a97ae9e`.
+- Closure completion:`41ce6517c95c9e70aed1920dd21ed3a450936fd9e578b0b33e8c978fb1294a37`.

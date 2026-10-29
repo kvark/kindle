@@ -18,23 +18,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [fresh Breakout centroid100 comparison](docs/experiments/2026-10-29-cdp-breakout-centroid100-200k.md)
-launches20:53:05 UTC October29/sourceb58d3a2 with187 pins and a30-minute training
-cap:200k actions/12,477 updates,12M64/Auto/N8/B16/T16/H15/R16/expert100 plus
-position-loss scale100. Startup passes372 bounded-matching initial tensors,
-correct cadence and171 finite reports through3112 actions. Main PID346205,
-invocation3522002a6e344decb27f4ddd8b8f6988; progress,recovery,postprocessing and
-terminal-collection observers are active. No full frozen result is available.
-Require100k/6227 recovery and final/actual-initial sampled/greedy24-episode
-assessments against retained13.208/17.875,all0/24 two-wall. Native2974160 and
-runner differ from447fe50;no isolated causal claim. Root
-`/x/Temp/kindle-color-centroid-20261029/full`;service
-`kindle-breakout-centroid100-200k-20261029`. Check live state;do not restart it,
-repeat earlier lives or schedule another GPU job while this learner is active.
-The100k/6227 recovery passes21:04:40 UTC with372 finite tensors;the observer
-checks6516 finite reports through104632 complete actions and exits successfully.
-Original learner PID/invocation and all187 inputs remain unchanged;no frozen
-result is available at this midpoint.
+The [Breakout centroid100 comparison](docs/results/2026-10-29-cdp-color-centroid.md#full-200k-comparison-fails-the-evaluation-protocol) finishes200k actions/799,500 frames/
+12,477 updates in21m45s, but fails its zero-truncation protocol: the final greedy
+arm has one25,000-action timeout. Sampled14.375 versus13.208 and selected-natural
+greedy20.125 versus17.875 are descriptive; all0/24 two-wall successes. Own initials
+1.417/2.208 match. Retain the control; no accepted full comparison or promotion.
+All187 original/234 closure pins,100k/6227 recovery,372 bounded-matching initial/
+invariant frozen tensors,357 shared control tensors,both initial semantic traces,
+full replays/videos and five host guards pass. Main fails21:18:18 UTC October29,
+sourceb58d3a2; CPU-only evidence closure finishes21:25:40,collection21:31:01.
+Status`closed_protocol_failed`; no GPU stage repeats or original passing review
+is created. Late raw position loss falls.05547→.00349 across50k windows,while
+expert CE ends.684 versus control.696; held-out position benefit is unmeasured.
+Actual overrides55.413%; guided returns are not unaided competence. Native2974160,
+runner and added656386 parameters differ from447fe50; reused1009/cohort, no
+isolated causal or speedup claim. Root`/x/Temp/kindle-color-centroid-20261029/full`.
+All services are terminal; no GPU allocation remains active. No retry,extension,
+confirmation or automatic successor. Check live state before any later GPU work.
 
 The [optional native color-position loss](docs/results/2026-10-29-cdp-color-centroid.md)
 passes F64 targets/loss/derivatives and a fresh Breakout8192-action/32,735-frame/
@@ -50,9 +50,9 @@ with identical production source. The bounded service fails20:42:25 UTC only
 because its CPU schema omitted ten Adam moments;separate CPU repair completes
 20:43:45 preserving41 original/21 repair pins and zero repeated training/frozen
 stages. Original service remains failed;closure`complete_with_cpu_audit_repair`.
-The2.9GiB build cache is released;wheels/test binaries/evidence remain. Execution
-and early cost are established;no gameplay benefit or full learner is selected.
-No GPU allocation is active at completion;check live state before work.
+The2.9GiB build cache is released;wheels/test binaries/evidence remain. The bounded
+check establishes execution and early cost; the separately selected full learner
+and its protocol-failed outcome are documented above.
 
 The [fixed nonlinear Breakout state readout](docs/results/2026-10-29-cdp-breakout-representation.md#nonlinear-state-readouts-still-leave-substantial-position-error)
 also leaves substantial position error:combined-feature ball x/y MAE12.053/10.211
