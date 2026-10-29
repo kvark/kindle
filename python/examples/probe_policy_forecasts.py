@@ -151,13 +151,18 @@ def replay_reset(environment, agent, *, continuing):
         agent.begin_episode(frame)
 
 
-def validate_checkpoint_config(source_config, checkpoint_config):
-    if (checkpoint_config != source_config
+def validate_checkpoint_config(source_config, checkpoint_config, *, compare_open_loop_h3=False):
+    source, checkpoint = dict(source_config), dict(checkpoint_config)
+    if compare_open_loop_h3:
+        if (source.pop('open_loop_supervision', None) is not None
+                or checkpoint.pop('open_loop_supervision', None) != dict(horizon=3, scale=1.0)):
+            raise ValueError('requires an unsupervised source and H3/scale1 checkpoint')
+    if (checkpoint != source
             or checkpoint_config.get('observation_kind') not in ('rgb32', 'rgb48', 'rgb64')):
         raise ValueError('checkpoint configuration differs from source policy')
 
 
-def capture(log, checkpoint, manifest, replay_file, output, smoke):
+def capture(log, checkpoint, manifest, replay_file, output, smoke, *, compare_open_loop_h3=False):
     import ale_py
     import gymnasium as gym
     import kindle
@@ -170,7 +175,7 @@ def capture(log, checkpoint, manifest, replay_file, output, smoke):
     source = read_run(log, allow_capped_evaluation=True)
     header = source['start']
     checkpoint_config = json.loads((checkpoint/'metadata.json').read_text())['config']
-    validate_checkpoint_config(header['config'], checkpoint_config)
+    validate_checkpoint_config(header['config'], checkpoint_config, compare_open_loop_h3=compare_open_loop_h3)
     selected = cohort(source['episodes'], natural_only=True)
     replay = json.loads(replay_file.read_text())
     if not selected['complete'] or source['accounting']['updates'] or replay['source_log_sha256'] != source['sha256']:
@@ -184,7 +189,7 @@ def capture(log, checkpoint, manifest, replay_file, output, smoke):
         raise ValueError('incomplete action ledger')
     started = time.monotonic()
     agent = kindle.Agent.restore_rgb(str(checkpoint))
-    validate_checkpoint_config(header['config'], agent.config)
+    validate_checkpoint_config(checkpoint_config, agent.config)
     initial_updates, initial_actions = agent.learner_step, agent.environment_step
     result = dict(protocol=PROTOCOL, status='running', smoke=smoke, checkpoint=checkpoint_identity(checkpoint),
         source_log=str(log), source_log_sha256=source['sha256'], replay_sha256=sha256_file(replay_file),
@@ -193,6 +198,9 @@ def capture(log, checkpoint, manifest, replay_file, output, smoke):
         native_sha256=sha256_file(kindle._native.__file__), source_sha256=sha256_file(__file__),
         files=[], diagnostic_actions=0, actor_updates=0, collection_cuts=0, prefix_checks=0,
         belief='scalar frozen re-observation; not original vector categorical draws', gpu_device=agent.gpu_device)
+    if compare_open_loop_h3:
+        result['training_config_difference'] = dict(open_loop_supervision=dict(
+            source=header['config'].get('open_loop_supervision'), checkpoint=checkpoint_config['open_loop_supervision']))
 
     def save():
         (output/'result.json').write_text(json.dumps(result, indent=2, allow_nan=False)+'\n')
@@ -310,5 +318,8 @@ if __name__ == '__main__':
     parser.add_argument('replay', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--smoke', action='store_true')
+    parser.add_argument('--compare-open-loop-h3', action='store_true',
+                        help='allow only H3/scale1 training-loss differences on the recorded source trajectories')
     args = parser.parse_args()
-    capture(args.log, args.checkpoint, args.manifest, args.replay, args.output, args.smoke)
+    capture(args.log, args.checkpoint, args.manifest, args.replay, args.output, args.smoke,
+            compare_open_loop_h3=args.compare_open_loop_h3)

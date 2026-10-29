@@ -163,3 +163,35 @@ def test_unsupported_frontend_is_rejected_even_when_configs_match(kind):
     config = dict(observation_kind=kind)
     with pytest.raises(ValueError, match='configuration differs'):
         validate_checkpoint_config(config, config)
+
+
+def test_declared_h3_comparison_preserves_configs_and_default_strictness():
+    source = dict(observation_kind='rgb48', seed=4013, action_count=18)
+    candidate = dict(source, open_loop_supervision=dict(horizon=3, scale=1.0))
+    with pytest.raises(ValueError, match='configuration differs'):
+        validate_checkpoint_config(source, candidate)
+    validate_checkpoint_config(source, candidate, compare_open_loop_h3=True)
+    assert 'open_loop_supervision' not in source
+    assert candidate['open_loop_supervision'] == dict(horizon=3, scale=1.0)
+
+
+@pytest.mark.parametrize('setting', [None, dict(horizon=5, scale=1.0), dict(horizon=3, scale=2.0)])
+def test_h3_comparison_rejects_undeclared_loss_settings(setting):
+    source = dict(observation_kind='rgb48')
+    with pytest.raises(ValueError, match='H3/scale1'):
+        validate_checkpoint_config(source, dict(source, open_loop_supervision=setting), compare_open_loop_h3=True)
+
+
+@pytest.mark.parametrize('key,value', [('seed', 1009), ('action_count', 6), ('observation_kind', 'rgb64'),
+                                     ('horizon', 100), ('train_ratio', 32)])
+def test_h3_comparison_does_not_allow_other_checkpoint_changes(key, value):
+    source = dict(observation_kind='rgb48', seed=4013, action_count=18, horizon=333, train_ratio=16)
+    candidate = dict(source, open_loop_supervision=dict(horizon=3, scale=1.0), **{key: value})
+    with pytest.raises(ValueError, match='configuration differs'):
+        validate_checkpoint_config(source, candidate, compare_open_loop_h3=True)
+
+
+def test_h3_comparison_rejects_a_source_that_already_has_the_loss():
+    source = dict(observation_kind='rgb48', open_loop_supervision=dict(horizon=3, scale=1.0))
+    with pytest.raises(ValueError, match='unsupervised source'):
+        validate_checkpoint_config(source, dict(source), compare_open_loop_h3=True)
