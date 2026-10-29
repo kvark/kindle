@@ -148,3 +148,42 @@ No learner restart, GPU assessment, cap change or checkpoint selection occurs.
 This establishes the recovery milestone, not frozen task competence. Continue
 to the fixed200k final and four declared frozen arms; use the repaired terminal
 collector after all services and audits finish.
+
+## Completed fixed comparison
+
+The fresh life completes200k actions/799,726 frames/12,477 updates in1771.442s
+(29m31s),3.04% less training time than the retained1920 control. Greedy8187.500
+with24of24 first pyramids falls31.68% from11984.375;sampled7051.042/23 rises4.31%
+from6759.375/24. Own initials remain80.208/177.083 withzero pyramids. Both final
+means miss15000. Retain1920;no extension,guidance-limit sweep,retry,seed confirmation,
+checkpoint selection or automatic successor is selected.
+
+All227 inputs,100k/6227 recovery,357 matched control/check initial and invariant
+frozen tensors,1139 sampled/1101 greedy paired initial semantic events,12,477
+finite reports,parameter changes,full training/frozen replays,host guards,curves,
+coverage,exposure and comparison pass. Both plots are visually inspected. The
+four fixed frozen arms total85,072 actions/340,154 frames/50.976s,zero updates or
+truncations;sampled final collects25 episodes and each other arm24,selecting24
+per arm as declared. Ordinary frozen logs lack live pixel hashes.
+
+Actual guidance overrides119,323 actions (59.6615%),with39/166 episode starts
+selected. All45,727 actions at ages1920–3839 remain guided;none reaches3840.
+Zero cap-released native actions occur,so this life does not cover the new release
+boundary in live gameplay. Episode age is not verified game level,and guided
+online scores are not unaided competence.
+
+Main succeeds04:39:46 UTC on October29 after41m56.067s;postprocessing succeeds
+04:39:55 after42m05.388s. Full training replay takes630.395s. Main,progress,
+postprocessing and replacement recovery finish successfully. The original CPU
+recovery observer remains failed with exit1;the repaired collector verifies its
+preserved failure and successful replacement. Original absolute deadlines and
+all227 pins stay unchanged; the learner retains its original PID/invocation until
+exit. No GPU stage repeats or wall caps change. Retain the.630s co-host repair timing caveat. The original
+collector is not run. All work for this life is terminal;the GPU is idle.
+
+Completion `93841561c8b9e27ef8fcdd00e5e6759e0299fc1acd377eeec8dfff92dd6a3f40`;
+learning `6393deddcc96748774954546fb656a045524d363358397ab8d3006b8d4e97452`;
+postprocessing `b6a3bb3eab0c1629eb32e9d47940cedf737666d9bde14d2081cd2d71e4cf4349`;
+comparison `a34fd4e924d0ab400db7d29c0b3521101ca3b6419efdf4e847f3b4062652275b`;
+training replay `1cc167558577025ba7b93ebbab9c9a42143841a3c9659f4fa177c96ec61887bb`.
+See [the completed result](../results/2026-10-25-cdp-cheap-qbert.md#longer-guidance-lowers-primary-greedy-quality-at-the-same-short-budget).

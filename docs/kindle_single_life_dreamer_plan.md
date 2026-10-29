@@ -4,25 +4,20 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-Fresh Qbert12M48/B16/R16/expert100 guidance3840 is active, starting03:57:50 UTC
-on October29/source7705eb7. Only episode guidance limit1920→3840 changes;
-200k/12,477 updates,100k/6227 recovery and35min training cap stay fixed. Startup
-passes227 pins,357 matching initial tensors and167 finite reports through3032
-actions. No prior weights/experience are reused. The identical retained native
-check supplies execution evidence; another8192-action check cannot reach either
-guidance limit across8 lanes. Actual CPU scheduling boundary checks pass.
-The original CPU recovery observer exits1 at03:57:54 on a copied scale1000
-assertion; declared/actual learner scale100 is correct. Preserve that failure.
-The private replacement starts04:00:15 after six actual header checks, retaining
-the original absolute deadlines. Main PID238223/invocation and all227 pins stay
-unchanged; no GPU stage repeats. Record.630s co-host CPU repair. The replacement
-passes100k/6227 recovery with357 finite tensors and6263 finite reports through
-100,584 actions, then succeeds04:12:46 UTC. Main/progress/postprocessing remain
-active; frozen quality is unmeasured. Use
-`/x/Temp/kindle-qbert-guidance3840-20261029/full/recovery-repair/collect_repaired.py`
-at completion, not the original collector. Four fixed frozen assessments remain.
-Task benefit is unmeasured; no extension, retry, cap increase or successor is
-selected. See the guidance3840 protocol and check live state before GPU work.
+Qbert guidance3840 completes200k actions/799,726 frames/12,477 updates in29m31s.
+Primary greedy8187.500/24 first pyramids falls31.68% below retained1920's11984.375,
+for3.04% less training time; sampled7051.042/23 rises4.31% from6759.375/24. Own
+initials80.208greedy/177.083sampled,zero pyramids; both final means miss15000.
+All227 pins,100k recovery,357 matching initial/invariant frozen tensors, paired
+initial traces,finite reports,full replays,guards,curves,coverage,exposure,
+comparison and repaired collector pass. Main succeeds04:39:46 UTC,postprocessing
+04:39:55 on October29. Original CPU observer exit1 remains;replacement succeeds
+with original deadlines. No GPU stage repeats or caps change. Actual overrides
+59.6615%;45,727 actions at ages1920–3839 are all guided,none reaches3840,and no
+cap-released native action occurs. These are exposure counts,not verified game
+levels or competence. Retain1920;no extension,limit sweep,retry,confirmation or
+automatic successor. The.630s co-host repair remains recorded. No GPU allocation
+is active;check live state before work. See [the completed result](results/2026-10-25-cdp-cheap-qbert.md#longer-guidance-lowers-primary-greedy-quality-at-the-same-short-budget).
 
 Breakout expert100 completes200k actions/799,351 frames/24,970 updates in
 17m45s. Sampled9.458/greedy12.208 improve retained expert10's4.292/5.000 for

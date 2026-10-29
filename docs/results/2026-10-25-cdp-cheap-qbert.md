@@ -3318,3 +3318,86 @@ e8a6e8c36aa241f294f9b845645e770b remain unchanged. Retain that timing caveat
 without correcting Breakout's measured training time. Evidence:
 `/x/Temp/kindle-qbert-cap-release-20261029/{analyze.py,review.json}`; review
 `cc353f89b15aa95847784280710df080fe006fac2e29673a2fe42f90297f1171`.
+
+
+## Longer guidance lowers primary greedy quality at the same short budget
+
+Fresh12M48/B16/R16/expert100 with the episode guidance limit increased1920→3840
+completes **200,000 aggregate actions /799,726 emulator frames /12,477 updates
+in29m31s**, within the35-minute cap. Primary greedy mean falls **31.68%** for
+**3.04% less training time**. Sampled mean rises4.31%, with one fewer first-pyramid
+success. Both final means miss the unchanged15000 gate. Retain the1920-action
+limit; no extension, guidance-limit sweep, retry, seed confirmation, checkpoint
+selection or automatic successor is selected.
+
+| Episode guidance limit | Training | Greedy mean / first pyramids | Sampled mean / first pyramids |
+| --- | ---: | ---: | ---: |
+|1920, retained|30m27s|11984.375 /24of24|6759.375 /24of24|
+|3840|29m31s|8187.500 /24of24|7051.042 /23of24|
+|Own initial, both recipes|Zero updates|80.208 /0of24|177.083 /0of24|
+
+Only the episode guidance limit changes. Keep centered CDP,12M48/Auto/N8/B16/
+T16/H15/R16/coefficient1/actor-unimix0/full18/original rates,20% episode selection,
+expert100/all18 weights1/world gradients/all-state corrective labels. Native
+447fe50, runtime, runner and continuation teacher remain fixed. No prior weights,
+check experience, replay, belief, games or RNG are reused. Seed4013 and evaluation
+cohort4000004013 are reused development inputs. This comparison does not establish
+seed reliability or a mechanism for the regression.
+
+All227 pins,100k/6227 recovery,357 matching control/check initial tensors and357
+invariant tensors per frozen arm pass. All1139 sampled and1101 greedy initial
+semantic events match the retained control. All12,477 reports are finite;
+CNN/reward/actor/value parameters change. Complete training label/input-pixel/
+action replay, four frozen outcome replays/videos, host guards, curves, coverage,
+exposure, comparison and the repaired terminal collector pass. Both plots are
+visually inspected. Each frozen arm selects the first3 natural episodes per8
+lanes=24, with guidance off and zero updates/truncations. Sampled final collects25
+episodes; the other arms collect24. Excess episodes and partial tails remain
+recorded. Four arms total85,072 actions /340,154 frames /50.976s. Mean first-pyramid
+coverage is21/21 greedy and20.708/21 sampled, versus own2.500/4.917. Ordinary frozen
+logs lack live pixel hashes; outcome replay does not establish equality to
+unavailable live images.
+
+The20% episode rule selects39/166 starts and actually overrides119,323 actions
+(**59.6615%**, versus control42.958%). Episode-age exposure changes as follows:
+
+| Episode action age | Retained1920: actions / overrides | Candidate3840: actions / overrides |
+| --- | ---: | ---: |
+|Below1920|189341 /85916|154273 /73596|
+|1920–3839|10659 /0|45727 /45727|
+|3840 onward|0 /0|0 /0|
+
+All candidate actions after the old cutoff remain guided; no episode reaches3840.
+Thus this life has **zero cap-released native actions**, versus control10,642,
+and does not exercise the new release boundary in live gameplay. The CPU boundary
+check remains separate. These counts describe episode age, not verified game
+level; forced agreement with the teacher is not native competence. The35 completed
+guided episodes average21969.286 with35 first pyramids;123 unguided online episodes
+average2331.911 with56. Those online returns do not replace frozen evaluation.
+
+Labels comprise152,090 NOOP and47,910 hops, including80,677 passive states and
+18,017 actual/teacher disagreements. All12,477 reports are supervised;2,991,901
+labeled replay rows equal weight sums, with maximum raw world/actor loss
+difference8e-7. Final25k replay cross entropy is.069967 versus control.096632;
+changing replay samples do not measure held-out action accuracy or explain the
+lower frozen score.
+
+Main starts03:57:50 UTC/source7705eb7 and succeeds **04:39:46 UTC on October29**,
+whole41m56.067s. CPU postprocessing succeeds **04:39:55**, whole42m05.388s. Training
+takes1771.442s; full training replay takes630.395s. Training time excludes
+construction, evaluation and audits. Main, progress, postprocessing and replacement
+recovery finish successfully. The original CPU recovery observer's03:57:54 exit1
+on a stale expert1000 assertion remains preserved; the actual learner correctly
+uses100. The private observer repair retains original absolute deadlines and
+passes the100k audit. Record its.630s affined co-host CPU cost without correcting
+training time. No GPU stage repeats, runtime changes or wall-cap increases occur.
+The repaired collector verifies the original failure and successful replacement.
+The GPU is idle at completion; the five-game goal remains unfinished.
+
+Root `/x/Temp/kindle-qbert-guidance3840-20261029/full`, trial
+`qbert-12m-48-b16-r16-expert100-cap3840-200k-seed4013`. Completion
+`93841561c8b9e27ef8fcdd00e5e6759e0299fc1acd377eeec8dfff92dd6a3f40`,
+learning `6393deddcc96748774954546fb656a045524d363358397ab8d3006b8d4e97452`,
+comparison `a34fd4e924d0ab400db7d29c0b3521101ca3b6419efdf4e847f3b4062652275b`,
+training replay `1cc167558577025ba7b93ebbab9c9a42143841a3c9659f4fa177c96ec61887bb`.
+See the [fixed protocol and preserved observer repair](../experiments/2026-10-29-cdp-qbert-guidance3840.md).
