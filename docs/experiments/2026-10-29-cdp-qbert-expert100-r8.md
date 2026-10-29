@@ -106,3 +106,22 @@ remain100k/3114,200k/6239,300k/9364. No check experience or previous weights are
 reused. Full-controller/CPU comparison preparation precedes launch;no full GPU
 job is active at selection. This is a separately reviewed budget/ratio experiment,
 not an extension or reliability confirmation of the completed200k learner.
+
+## Full-controller preparation
+
+The bounded main exits01:08:39 UTC,whole1m23.488s. Full CPU preflight then passes
+in.612s:five commands parse,13 scripts compile,eight checks exercise real
+comparison/audit config assertions,and seven readiness cases reject missing,
+partial or mismatched recovery headers. All45 bounded pins and357 reference
+initial tensors verify. Recovery accounting verifies3114/6239/9364 and final
+12,489 updates. No native module,agent or environment is constructed;no preparation
+failure occurs. The complete source/recipe/analysis declaration is pinned before
+launch and includes this protocol snapshot.
+
+Keep2700s training and300s per frozen arm. Full training replay has1800s inner/
+1830s outer caps;CPU audit2400s,main6900s. These longer CPU audit allowances cover
+the doubled saved trajectory and do not expand the45-minute GPU training cap.
+Terminal postprocessing/progress observers have7500s service caps,with7200s
+internal waits;recovery has3600s service/3300s internal limits. None can restart
+training. Full outcome replays/videos,curve,coverage,exposure and comparison
+are automatic after the fixed evaluations;no interim policy selection.

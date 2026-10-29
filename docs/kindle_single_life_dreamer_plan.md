@@ -9,7 +9,8 @@ Qbert12M/R8 bounded check completes8192 actions/32,753 frames/245 updates in
 initial/invariant tensors,finite/config/counter checks,full label/pixel/action
 replay and guards pass. Fixed conservative400k estimate43m04s passes45min.
 Separately select one fresh400k/R8 comparison with12,489 updates and100k/200k/
-300k recoveries;full-controller/CPU comparison preparation comes before launch.
+300k recoveries. Full CPU preparation passes five parsed commands,eight
+config checks,seven readiness cases and all milestone counters;launch follows.
 No full GPU job active. Keep every other12M/expert100 setting and native/runner/
 teacher unchanged;no check experience reused. The original15k/90% gate remains.
 No retry,cap increase,checkpoint selection,extension or automatic successor.
