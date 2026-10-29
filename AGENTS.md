@@ -66,7 +66,10 @@ live state before GPU work. No second learner may run concurrently. The original
 CPU progress observer rejects an unsupported option;its failure is retained. A
 private replacement starts01:15:17 UTC with the same learner PID/invocation and
 all228 pins unchanged. Use`full/progress-repair/collect_repaired.py` at completion;
-no GPU stage repeats.
+no GPU stage repeats. A1.953s CPU-only retained Breakout label recount co-hosts
+with this learner;all228 pins/same PID remain unchanged. Late passive agreement
+is41.753% at encoder6e-6 versus28.780% at4e-5,low across all four labels. This
+selects no Breakout allocation;details in the pixel-reference report.
 
 The compatible RGB Qbert control completes200k actions/799,695 frames/24,970
 updates in28m41s. Greedy6090.625/24 first pyramids and sampled4335.417/23 are

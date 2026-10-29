@@ -977,3 +977,42 @@ Root`/x/Temp/kindle-breakout-corrective-greedy-20261028`,trial
 `ffa4bbf5f62699b837f2ae8f8c5c3c219069b599b376171c2169403f82188080`,
 review`46b2260b9259dbd05dd61858336424d72b81d0175010b968abbabe2ea3eb0325`,
 postprocessing`33de3dce65b50c921dc40f4d536fad173f5d8a7864cdeb8da69e7c2bfa46eb2b`.
+
+
+## Corrective Breakout still disagrees across all four teacher actions
+
+A CPU-only recount of the two completed corrective200k lives separates native
+sampled actions from forced overrides. It reads the already verified labels and
+logs, constructs no environment or native agent, and changes no checkpoint.
+The final50k aggregate actions give these exact full18-label agreement counts:
+
+| Teacher action | Original encoder6e-6 | Higher encoder4e-5 |
+| --- | ---: | ---: |
+| NOOP |2382/5479 (43.475%)|887/3445 (25.747%)|
+| FIRE |1775/4415 (40.204%)|1445/5033 (28.711%)|
+| RIGHT |2232/5874 (37.998%)|1105/4174 (26.473%)|
+| LEFT |2575/5701 (45.168%)|1567/4735 (33.094%)|
+| All passive actions |8964/21469 (41.753%)|5004/17387 (28.780%)|
+
+The original recipe's disagreement spans every teacher action, rather than one
+rare target class. Its late labeled replay cross entropy is1.000155; the higher
+encoder-rate candidate is worse at1.194138, alongside weaker sampled frozen
+score1.458 versus4.292. Retain encoder6e-6. This describes each learner's own
+changing training states and sampled actions; it is not frozen-policy accuracy,
+teacher correctness, equivalent-action scoring or proof that a different loss
+weight, capacity, perception or temporal representation would repair transfer.
+No new Breakout learner or parameter sweep is selected by this analysis.
+
+All400k actions,49,940 reports,label/passive/override/disagreement totals and
+supervision sums reconcile with the complete learning reviews and training
+replays. All8 source inputs and228 active Qbert inputs remain unchanged,with
+Qbert PID223970/invocation587396941e1c4312b91578919b1650c9 still active. The
+single affined low-priority CPU analysis takes1.953s while co-hosted with that
+learner;retain this timing caveat without subtracting it from training cost.
+An initial read-only inspection expected Qbert's supervision field;the actual
+Breakout schema uses`supervision_windows`. That inspection constructed no native
+agent or environment and did not change any experiment input.
+
+Artifacts:`/x/Temp/kindle-breakout-passive-labels-20261029`,review
+`6c400c6079b563bfd1743b43646f2290c1a00e7a93f10d724defc42adcbadebb`.
+The active Qbert400k/R8 budget,caps and evaluations are unchanged.

@@ -163,3 +163,12 @@ original progress exit2 and repair pins,and retains that failure in the final
 completion review. The original pinned collector remains untouched. Repair
 receipt,launch and original journal are in`full/progress-repair`;no automatic
 retry of the learner,checkpoint selection or extension is authorized by this repair.
+
+
+While this learner runs,a1.953s affined low-priority CPU recount of retained
+Breakout logs completes without environments or native construction. All228
+active inputs and the same main PID/invocation remain unchanged. It finds late
+passive label agreement41.753% for original encoder6e-6 versus28.780% for4e-5,
+with low agreement across all four labels. It selects no GPU work. Preserve
+co-host duration as a timing caveat;see the completed Breakout pixel-reference
+report and`/x/Temp/kindle-breakout-passive-labels-20261029/review.json`.
