@@ -106,3 +106,5 @@ checkpoints and evidence remain.
 
 No GPU allocation is active at completion. The five-game goal remains unfinished;
 a fresh full-budget comparison is needed to measure whether this loss helps.
+The [separately selected200k comparison](../experiments/2026-10-29-cdp-open-loop-qbert-200k.md)
+follows this completed check with a fixed35-minute training cap.

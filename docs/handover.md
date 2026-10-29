@@ -1,5 +1,14 @@
 # CDP handover — October25,2026
 
+The fresh [200k Qbert H3 comparison](experiments/2026-10-29-cdp-open-loop-qbert-200k.md)
+is selected after bounded validation. Keep12M48/Auto/N8/B16/T16/H15/R16 and the
+retained expert100 recipe;add only optional H3/scale1 world supervision as the
+intended learning change. Training cap35min,100k recovery,greedy-primary final/
+actual-initial assessments in both modes. CPU preflight passes5 CLI boundaries,
+10 config cases,7 header checks and190 retained control pins. Full evidence is
+`/x/Temp/kindle-open-loop-20261029/full`;check service
+`kindle-open-loop-200k-20261029` and its observers before new GPU work.
+
 Optional H3 supervision (`ab80486`,default off) passes135 Rust/611 packaged
 Python CPU tests,strict Clippy,both guarded numerical checks and1024-action
 legacy compatibility. Fresh Qbert12M8192 actions/32,754 frames/489 updates take

@@ -20,8 +20,11 @@ Fresh8192-action/489-update Qbert12M check takes70.207s;all44 pins,357 initial/
 frozen tensors,auxiliary reports,replay and guards pass. Conservative200k
 projection31m25s passes35min,but no frozen episodes complete in the short check.
 See the [completed result](results/2026-10-29-cdp-open-loop-supervision.md).
-A fresh full-budget comparison is needed to measure task benefit;none is
-allocated yet. The five-game goal and its Qbert/Breakout gaps are unchanged.
+A [fresh200k comparison](experiments/2026-10-29-cdp-open-loop-qbert-200k.md) is
+separately selected with a35min training cap,100k recovery and frozen actual-
+initial controls. Greedy mean is primary;the original15000/90%-pyramid gate
+remains. Check `kindle-open-loop-200k-20261029` before new GPU work. The five-game
+goal and its Qbert/Breakout gaps are unchanged.
 
 The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
 zero updates. Sampled value estimates beat a constant baseline but underpredict

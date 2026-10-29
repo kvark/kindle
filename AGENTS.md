@@ -18,6 +18,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+Fresh Qbert H3/scale1 world-supervision comparison is separately selected after
+the completed bounded checks:200k actions/12,477 expected updates,12M48/Auto/N8/
+B16/T16/H15/R16,retained expert100 recipe and reused4013. Fixed35min training,
+100k recovery,four frozen final/actual-initial sampled/greedy arms;greedy primary,
+original15000/90%-pyramid gate. Allfive full CLI boundaries,10 config checks,
+seven header checks and190 retained control pins pass before declaration.
+Protocol `docs/experiments/2026-10-29-cdp-open-loop-qbert-200k.md`;evidence
+`/x/Temp/kindle-open-loop-20261029/full`. Inspect live service
+`kindle-open-loop-200k-20261029` before GPU work;never restart from a stale wait.
+
 Optional H3 open-loop supervision (`ab80486`,default off) passes135 Rust/611
 packaged Python CPU tests,strict Clippy,two guarded gradient checks and legacy
 1024-action compatibility (128 matched traces,357 invariant tensors). Fresh
