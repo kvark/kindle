@@ -805,19 +805,16 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
-Qbert25M48/B16/R8 200k comparison is active from11:43:00 UTC October29/source
-`eea4eed`,PID288915/invocation6eab4d2791074af8a3f5217487735324. Startup passes226
-pins,357 finite initial tensors matching25M bounded,and71 finite supervised
-updates through2640 actions.100k recovery passes11:56:35 UTC at3114 updates,357
-finite tensors and matching config/metadata/tensor hashes;3207 finite reports
-through102,968 actions. Recovery observer succeeds;learner/progress/postprocessing
-continue with226 unchanged pins. Frozen outcomes pending.
-Capacity12M→25M and replay16→8 together;6239 updates/recovery3114/35min cap.
-Keep expert100/all weights1/world gradients/all-state labels/native447fe50/control
-runner/teacher. Greedy11984.375 primary,sampled6759.375 secondary,15000/90% gate
-fixed. Own actual-initial/final24-episode arms pending;no12M initial equality.
-No experience reuse/GPU repeat. Reused seed/cohort;no extension/automatic successor.
-See25M/R8-200k protocol;check actual live state,never restart on observer timeout.
+Qbert25M48/B16/R8 finishes200k actions /799,672 frames /6239 updates in26m24s.
+Train guard passes12:09:29 UTC October29;all four frozen arms finish12:10:45,
+zero updates/passing guards,total76,968 actions /307,711 frames /55.737s.226 pins
+unchanged. Same main PID288915/invocation6eab4d2791074af8a3f5217487735324 active
+on CPU replay audits (child292418);comparison/postprocessing pending.100k recovery
+passes3114 updates/357 finite tensors. Capacity12M→25M and replay16→8 together;
+supervision/native447fe50/control runner/teacher fixed. Greedy11984.375 primary,
+sampled6759.375 secondary;15000/90% gate fixed. No completed gameplay claim yet.
+Own initials retained;no12M tensor equality. No GPU repeat/extension/automatic
+successor. Sourceeea4eed/start11:43:00;see25M/R8-200k protocol and check live state.
 
 Qbert25M48/B16/R8 bounded check passes 8192 actions / 32,753 frames / 245 updates
 in 63.119s; 1024 frozen / 4096 frames take 1.148s, zero updates/no natural episodes.
