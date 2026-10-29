@@ -4,6 +4,17 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+A fresh Qbert12M48/B16/R16/expert100 comparison is selected with episode guidance
+limit1920→3840, keeping200k/12,477 updates and35min training cap. Learner/native/
+runner/teacher stay fixed. This tests exposure after the old guidance cutoff;
+no task benefit is presumed. Reuse the completed identical native check/control
+as execution evidence: another8192-action check cannot reach either limit across
+8 lanes. Actual CPU scheduling boundaries pass.023s; full preflight passes.949s
+with five CLI paths,15 scripts,17 config/exploration checks and observer checks.
+No native/environment construction or preparation failure. No weights/experience
+are reused. No learner is active yet. See the guidance3840 protocol and check
+live state before GPU work.
+
 Breakout expert100 completes200k actions/799,351 frames/24,970 updates in
 17m45s. Sampled9.458/greedy12.208 improve retained expert10's4.292/5.000 for
 1.92% more training time; own initials1.375/2.583. All0/24 two-wall successes.
