@@ -1,5 +1,13 @@
 # CDP handover — October25,2026
 
+The [Qbert NOOP-weight check](experiments/2026-10-29-cdp-qbert-noop-weight.md)
+is selected:only wait-label weight1→.25 under the retained12M48/B16/R16/
+expert100 recipe. Verified last50k passive post-pyramid wait/hop agreement is
+95.044%/55.968%;this motivates a test,not a causal diagnosis. Use the matching
+old447fe50 runtime and copied control runner;no rebuild. Train8192/489 then
+1024 frozen,with full audits and guards. No full learner is selected. Evidence
+`/x/Temp/kindle-qbert-noop-weight-20261029`. Check live state before GPU work.
+
 The [full Qbert posterior-mode assessment](results/2026-10-29-cdp-greedy-posterior.md)
 is complete:modal states lower11984.375→10539.583 (−12.06%),both24/24 first
 pyramids and below mean15000. Own initials80.208/0.000 clear none. Retain sampled
