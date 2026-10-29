@@ -18,17 +18,18 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [bounded Qbert H5/R32 check](docs/results/2026-10-29-cdp-qbert-h5-r32.md) passes
-8,192 actions / 32,748 frames / 978 updates in93.933s; 1,024 frozen actions
-in0.798s have zero updates and no natural episodes. All41 pins,357 matching
-initial/invariant frozen tensors,full guided replay and guards pass. Main
-succeeds15:29:06 UTC October29/source97cda44,collection15:29:37. Conservative
-200k projection42m03s fits45min. Separately select one [fresh200k comparison](docs/experiments/2026-10-29-cdp-qbert-h5-r32-200k.md):
-12M48/Auto/N8/B16/T16/H5/R32/expert100,24,954 updates,100k recovery and four
-fixed frozen arms. H15→5/R16→32 doubles world/expert work and changes cadence;
-no isolated horizon claim or overall speedup promised. Native447fe50,runner,
-teacher and other settings fixed. No check experience reused. Evidence
-`/x/Temp/kindle-qbert-h5-r32-20261029`;check live state. No task result yet.
+The fresh [Qbert H5/R32 comparison](docs/experiments/2026-10-29-cdp-qbert-h5-r32-200k.md) is active from15:37:50 UTC
+October29/sourcee57dd2f, service`kindle-qbert-h5-r32-200k-20261029`, PID312184.
+12M48/Auto/N8/B16/T16/H5/R32/expert100 trains200k actions/24,954 updates within
+45min, with100k recovery and four fixed frozen arms. Startup passes all229 pins,
+357 initial tensors matching control/check, exact first updates376/384/392/400/
+408/416 and169 finite supervised reports. Progress,recovery and postprocessing
+observers are active. H15→5/R16→32 changes horizon,cadence and total work together;
+no isolated horizon effect or overall speedup promised. Native447fe50,runner and
+teacher fixed;no check experience reused. The [bounded check](docs/results/2026-10-29-cdp-qbert-h5-r32.md)
+passes8192/978 in93.933s, all41 pins/replay/guards, conservative200k42m03s.
+Evidence `/x/Temp/kindle-qbert-h5-r32-20261029`;check actual service state.
+No frozen task result yet;never restart because an observer times out.
 
 The [completed Qbert B8/T32 comparison](docs/results/2026-10-29-cdp-qbert-context32.md) finishes200k actions/799,710 frames/
 12,469 updates in31m48s,+4.44% training time. Greedy11609.375/24 first pyramids
@@ -40,7 +41,7 @@ guards,curves,coverage,exposure and comparison pass. Main succeeds15:15:59 UTC
 October29/source07ce3dc,postprocessing15:16:17,collection15:17:05;all services
 succeed. B16/T16→B8/T32 also changes diversity,warmup and target rows;no isolated
 memory claim. Actual overrides42.950%;online aided returns are not competence.
-The.788s CPU source review remains a timing caveat. No GPU allocation active;
+The.788s CPU source review remains a timing caveat. No allocation active at completion;
 check live state before work. The five-game goal remains unfinished.
 
 The [Qbert B8/T32 check](docs/results/2026-10-29-cdp-qbert-context32.md) passes8192
