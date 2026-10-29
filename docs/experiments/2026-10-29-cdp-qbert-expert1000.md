@@ -142,3 +142,27 @@ The corrected progress invocation starts normally;no observer or GPU stage fails
 or repeats. Use this full directory's original`collect_full.py` at terminal
 completion;the earlier R8 repair collector belongs only to that historical run.
 No additional learner,extension,retry,checkpoint selection or successor is selected.
+
+
+## Post-warmup numerical monitor
+
+A read-only .668s CPU monitor verifies4234 finite supervised reports through
+68,120 complete-prefix actions,with the last update at68,104. All229 pins and
+main PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5 remain unchanged.
+No native module,agent or environment is constructed;no GPU stage changes.
+This numerical monitor runs alongside training and leaves the fixed100k recovery
+and final assessments intact. It is not frozen task evidence. Receipt
+`post-warmup-monitor.json`,SHA256
+`2d39225a7bb013eb055a49d03c4c9b84ea70f6ca15becdbb69d914fd30c45d39`.
+
+
+## Halfway recovery passes
+
+At02:47:10 UTC on October29,the100k recovery verifies6227 saved updates and
+357 finite tensors. Its complete log prefix contains6392 finite reports through
+102,648 actions;credit.5 matches the declaration. Checkpoint digest
+`6604dbbfe23d1be781e011b462553de3bdce1fe825f100f8661ae75b1221c22d`;review
+`a0dcec4b96eaa3e4396937fa6d8db8a925ead010671af86fac507f435892e6c3`. The recovery watcher completes
+successfully. Main PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5 continues
+beyond103,768 actions. The fixed200k endpoint and four frozen assessments remain
+pending. No GPU restart,cap change,interim evaluation or checkpoint selection.

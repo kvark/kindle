@@ -56,8 +56,10 @@ One fresh Qbert12M48/B16/R16/expert1000 learner is active from02:31:35 UTC
 on October29,sourcecff4772,PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5.
 All229 pins,exact config/fresh counters,357 control/check initial tensors and
 first updates376/392/408/424/440/456 pass;the checked3768-action prefix has212
-finite supervised reports. Keep200k/12,477 and35-minute training cap,100k/6227
-recovery and four fixed final/own-initial sampled+greedy assessments. Only expert
+finite supervised reports. The100k/6227 recovery passes357 finite tensors at
+02:47:10 UTC;the watcher succeeds after6392 finite reports through102,648 actions.
+Keep200k/12,477 and35-minute cap;four fixed final/own-initial sampled+greedy
+assessments remain pending. Only expert
 scale100→1000 changes versus retained12M/R16. Native,runner and teacher unchanged;
 no check experience reused. Main and all three observers start normally;no GPU
 repeat or failure. Use`full/collect_full.py` for this run,not the historical R8
