@@ -15,6 +15,16 @@ teacher fixed;no build or experience reuse. Root`/x/Temp/kindle-qbert-h5-seed602
 No frozen outcome yet;check actual service state and never restart on observer
 expiry. No extension,seed campaign or automatic successor selected.
 
+A [matched Breakout reconstruction control](experiments/2026-10-29-cdp-breakout-rgb-control.md) is CPU-prepared; no GPU declaration or launch exists.
+Keep12M64/B16/T16/H15/R16/expert100 and native447fe50; only centered flag and
+reconstruction/future objectives change. Preflight17:29:20 UTC passes7 CLI/config
+branch cases,11 audit-config cases,6 compiled scripts,132 control pins and342
+shared shapes;399 tensors/14,457,556 parameters are predicted. No native import.
+All263 active6029 pins and original PID/invocation stay unchanged. The1.398s
+CPU co-hosting remains a timing caveat. Wait for completed Qbert6029 audits and
+idle host before the8192/489-update cost check;35min full projection gate,
+no full learner or automatic successor. Root`/x/Temp/kindle-breakout-rgb-control-20261029/native-check`.
+
 The completed [Breakout kernel action readout](results/2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy) takes1.824s CPU and scores49.25% overall/47.06% near-paddle teacher agreement,
 below linear50.58%/49.26% and recorded policy54.58%/53.68%. No evidence for this
 replacement head; other decoders/feature precision remain unresolved.31 CPU
