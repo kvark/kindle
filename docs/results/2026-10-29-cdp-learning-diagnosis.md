@@ -1,5 +1,17 @@
 # Qbert retains useful forecasts; later-game accuracy and policy use remain open
 
+## Breakout action readouts do not outperform its retained policy
+
+The [completed linear and nonlinear readouts](2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy)
+use the same saved CNN/recurrent features and held-out lanes. Trained
+concatenated linear agreement is50.58% overall/49.26% near the paddle;
+the fixed RBF readout scores49.25%/47.06%, versus recorded native greedy
+54.58%/53.68%. Both improve over their initial-feature readouts, but neither
+supports a simple actor replacement as an established fix. Other nonlinear
+decoders and inadequate feature precision remain unresolved. Teacher agreement
+is not closed-loop competence, and the original vector policy and scalar
+feature capture use different categorical draws. No native change follows.
+
 ## Shorter imagination with more replay improves one learner
 
 The [completed H5/R32 comparison](2026-10-29-cdp-qbert-h5-r32.md) reallocates

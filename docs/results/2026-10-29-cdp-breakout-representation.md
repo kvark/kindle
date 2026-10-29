@@ -164,3 +164,66 @@ full metrics, command record and the completed review.
 - Declaration: `dfbd835829f5e19640bbf3b999add0b883d1adcf64097b50af558fd28d29aeea`.
 - Metrics: `0d411a563900a1e25da656748a80a846dbde90ea8050db8d03cb5e3017d97377`.
 - Review: `f87ce8a2f39a69594855e7f81699dc71bbf6ae2f3240afd9e2486628304b4660`.
+
+## A fixed nonlinear readout also trails the recorded policy
+
+The RBF kernel follow-up finds no improvement over the earlier trained linear
+readouts. Trained concatenated features give **49.25% overall /47.06% near-paddle
+teacher agreement**, versus linear50.58%/49.26% and the recorded policy's
+54.58%/53.68%. Recurrent-only kernel agreement is48.75%/47.79%. The result gives
+no positive evidence for replacing the actor with this readout. It does not
+exclude other nonlinear decoders, establish missing information, or identify
+the cause of weak closed-loop control.
+
+| Exact teacher agreement | All601 test rows | Near-paddle136 rows |
+| --- | ---: | ---: |
+| Initial CNN kernel |35.94%|39.71%|
+| Initial recurrent kernel |39.60%|39.71%|
+| Initial concatenated kernel |39.43%|38.97%|
+| Trained CNN kernel |36.77%|41.18%|
+| Trained recurrent kernel |48.75%|47.79%|
+| Trained concatenated kernel |49.25%|47.06%|
+| Trained concatenated linear |50.58%|49.26%|
+| Recorded native greedy policy |54.58%|53.68%|
+
+The exact954/509/601 lane split, source observations, label joins and baselines
+match the linear analysis. Normalization and the median positive squared-distance
+bandwidth use training features only. Each one-hot target chooses its penalty
+from the same seven-value grid using validation MSE; there is no validation
+refit, bandwidth sweep or test-based selection. Kernel centering supplies an
+unpenalized intercept. Scores are not calibrated action probabilities.
+Trained concatenated macro recall is56.21% overall and45.66% near the paddle;
+its two test-lane agreements are50.46% and47.79%. Full six-fit predictions,
+per-class/phase/lane metrics, bandwidths and selected penalties remain saved.
+
+The31 combined CPU tests pass, including a direct augmented-system solver
+comparison, XOR accessibility, test-label/feature independence, lane isolation
+and a forbidden-native-import subprocess. The diagnostic imports no native
+extension and creates no environment, GPU work, learner update or checkpoint.
+Analysis takes **1.824s**, with2.621s for execution and checks, on one affined
+low-priority CPU with one BLAS thread. The test wrapper takes1.103s. All96
+declared input pins and263 active Qbert6029 pins remain unchanged; Qbert keeps
+PID318957/invocation`b53406373693476ca9c08f5a5d05cc0a` before and after.
+Tests run17:15:22–17:15:23 and analysis17:16:28–17:16:30 UTC October29;
+review completes17:16:31/source`7b43296`. Retain this brief co-hosting as a
+training-time caveat without correcting Qbert's measured wall time.
+
+The first CPU preparation fails before analysis because two canonical source
+files have changed since the original capture: `atari_vector.py` and
+`probe_policy_forecasts.py`. The separate repaired controller resolves their
+exact expected hashes from commit26a9961 into the external evidence directory;
+all other historical pins match. Original controller, failure record and
+resolution mapping are retained. No feature capture, fit or GPU stage repeats.
+
+The original vector-policy/scalar-feature draw difference and the reused
+development cohort remain limitations. Teacher agreement is not teacher
+correctness or task competence. Breakout's retained greedy17.875/zero two-wall
+result stays unchanged. No new native loss, architecture or learner is selected
+by this completed diagnostic; Qbert6029 continues its existing fixed allocation.
+
+[Fixed kernel protocol](../experiments/2026-10-29-cdp-breakout-kernel-actions.md).
+Evidence: `/x/Temp/kindle-breakout-kernel-readout-20261029`.
+
+- Declaration: `3873740cec5d3ae557fc9b7ee0844219d8b8e792f5190ad3cb77690420e7d91f`.
+- Metrics: `751e475d521ce37c2703c461c19c913537645767d5dc5cff8ced249260d67727`.
+- Review: `921af557afaedcc59724760aca317a22c29983d421165d1bcb852eb87f867d7c`.

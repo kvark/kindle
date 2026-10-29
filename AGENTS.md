@@ -31,6 +31,16 @@ teacher fixed;no build or experience reuse. Root`/x/Temp/kindle-qbert-h5-seed602
 No frozen outcome yet;check actual service state and never restart on observer
 expiry. No extension,seed campaign or automatic successor selected.
 
+The completed [Breakout kernel action readout](docs/results/2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy) takes1.824s CPU and scores49.25% overall/47.06% near-paddle teacher agreement,
+below linear50.58%/49.26% and recorded policy54.58%/53.68%. No evidence for this
+replacement head; other decoders/feature precision remain unresolved.31 CPU
+tests,96 pins and263 active Qbert6029 pins pass; original PID/invocation stays.
+Review17:16:31 UTC October29/source7b43296. The original historical-pin failure
+is retained; two exact old sources are resolved fromGit before the first fit.
+No GPU work or new learner. Tests1.103s/analysis wrapper2.621s co-host with6029;
+retain as a timing caveat without wall-time correction. Evidence
+`/x/Temp/kindle-breakout-kernel-readout-20261029`.
+
 The [completed H5/R32 frozen temperature assessment](docs/results/2026-10-29-cdp-qbert-h5-temperature.md) scores14025/22 first pyramids
 at0.5 versus retained greedy14050/23;default sampled13331.250/23 reproduces
 exactly. Both own initial arms177.083/0;all final means still miss15000. Retain
