@@ -103,6 +103,42 @@ caused the gain or establish better quality per GPU-hour in general. The reused
 seed/cohort remain development evidence;no extension or automatic successor.
 
 
+## Recorded learning work dominates Breakout's training cost
+
+A CPU summary of the completed Breakout H15/R16 control and both Qbert H5/R32
+learners reconciles their wrapper stage timers with the previously audited
+per-update timing aggregates. These are recorded wall times, not kernel-exclusive
+GPU measurements. The denominators differ explicitly in the table:
+
+| Completed learner | Learning / training wall time | Acting / training wall time | World training / recorded update time | Imagination / recorded update time |
+| --- | ---: | ---: | ---: | ---: |
+| Breakout12M64/H15/R16 |89.15%|4.69%|30.92%|40.68%|
+| Qbert4013,12M48/H5/R32 |73.57%|23.05%|41.95%|26.10%|
+| Qbert6029,12M48/H5/R32 |73.49%|23.12%|41.85%|26.06%|
+
+Breakout spends1,193.879 of1,339.198 training seconds inside the learning call.
+Its recorded update totals are1,180.487s, including365.036s world training and
+480.262s imagination/target work. Environment stepping takes62.714s (4.68%).
+This supports examining the allocation of learning work rather than expecting
+emulator throughput alone to remove the measured cost. It does not identify a
+particular shader, prove wasted computation, or establish that shorter horizons
+preserve policy quality. The active H5/R32 experiment remains the selected test.
+
+Qbert's acting stage is also substantial, about559–560s. In the exact recorded
+runner this timer includes guidance generation, the native policy call, override
+checks and teacher feedback. It therefore does **not** isolate Python teacher
+cost from native action selection. Different games, resolutions, trajectories
+and recipes prevent an isolated cross-game speed claim. No backend change or
+new GPU allocation follows this summary.
+
+The.736s analysis uses one low-priority CPU core while the selected Breakout
+learner runs. All13 inputs and169 active-learning pins remain unchanged, with
+the same PID/invocation before and after. No active trajectory is read to select
+an intervention; no agent, game, learning update or GPU work occurs. Keep the
+CPU co-hosting caveat without correcting training wall time. Evidence:
+`/x/Temp/kindle-training-cost-summary-20261029`, review SHA256
+`bdf199e7f9fb508ce7d90ac5e636026f71f8e971fd3e1607644acebc71fa0921`.
+
 ## Reviewed expert-label path has no apparent one-step offset
 
 A source review of the exact native447fe50 runtime follows corrective labels

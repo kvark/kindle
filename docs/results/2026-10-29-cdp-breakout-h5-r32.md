@@ -25,6 +25,23 @@ Evidence: `/x/Temp/kindle-breakout-h5-r32-20261029/full`, trial
 `breakout-12m-64-b16-h5-r32-expert100-200k-seed1009`.
 Check live state before GPU work; do not restart this selected life.
 
+Terminal collection is also automated from19:35:03 UTC, under
+`kindle-breakout-h5-r32-collection-20261029`. Its separate9-pin declaration
+reuses the exact previously checked service-identity implementation and verifies
+all four original service identities plus169 active-learning pins. It waits for
+successful terminal training/recovery/progress/postprocessing, then invokes the
+declared collector once; an existing valid completion is reused. Failed services
+or an observation timeout do not restart or stop the learner. Unloaded successful
+services are checked against their original journal invocation IDs. Evidence:
+`/x/Temp/kindle-breakout-h5-r32-20261029/terminal-collection`, declaration
+`f4c53e67b2475d163538836a476e08aa309de4a176df0dfc12e483b91f9aec1f`.
+
+A separate.736s CPU summary at19:39:29 reconciles completed controls' recorded
+stage/update timings; it does not read the active trajectory or change its
+selection. All169 inputs and the original PID/invocation remain unchanged.
+Retain this co-hosting caveat without a training wall-time correction. See the
+[cost diagnosis](2026-10-29-cdp-learning-diagnosis.md#recorded-learning-work-dominates-breakouts-training-cost).
+
 ## Bounded execution and early cost
 
 The fresh 12M64/H5/R32/expert100 check completes **8,192 actions /32,717
