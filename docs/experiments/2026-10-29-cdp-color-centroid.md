@@ -64,3 +64,20 @@ separate. The first Rust compilation fails on an inferred integer type in the
 ignored GPU-test fixture;explicit usize indices repair it. Original and corrected
 build logs remain under`/x/Temp/kindle-color-centroid-20261029`;no GPU work repeats.
 Native numerical checks,packaging and a real bounded learner remain pending.
+
+## Original numerical check stops at test readback
+
+The first guarded release test executes once and fails in.72s with a CPU
+`read_buffer: F32 view exceeds buffer capacity` assertion. The test mistakenly
+uses `Session::read_output(length)` as an output-index API. No target/loss/
+derivative comparison completes;no numerical pass or GPU fault is inferred.
+The original75-pin declaration,binary,source snapshot,logs and guard failure
+remain under`gradients`. No learner or checkpoint is created.
+
+Select a corrected validation using `read_output_by_index` with explicit target,
+mask and scalar buffer lengths. Only the test body changes;the production target
+and loss source must remain byte-identical. Use a separate declaration,binary
+and evidence directory with the same120-second cap and all original numerical
+assertions. This is a second execution of the isolated derivative fixture after
+a diagnosed validator defect,not a passing closure of the first check. No
+training is repeated and no full learner is selected.

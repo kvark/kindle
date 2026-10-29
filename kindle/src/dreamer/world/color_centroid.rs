@@ -312,8 +312,10 @@ mod tests {
             !session.has_param_grad("pixels"),
             "centroid targets must be detached"
         );
-        let actual_target = session.read_output(3);
-        let actual_valid = session.read_output(4);
+        let mut actual_target = vec![0.0; ROWS * 2];
+        let mut actual_valid = vec![0.0; ROWS];
+        session.read_output_by_index(3, &mut actual_target);
+        session.read_output_by_index(4, &mut actual_valid);
         let mut gradients = vec![0.0; ROWS * 2];
         session.read_param_grad("prediction", &mut gradients);
         let mut expected_loss = 0.0;
@@ -368,8 +370,12 @@ mod tests {
             (f64::from(session.read_loss()) - f64::from(settings.scale) * expected_loss).abs()
                 < 3e-6
         );
-        assert!((f64::from(session.read_output(1)[0]) - expected_loss).abs() < 3e-6);
-        assert_eq!(session.read_output(2), vec![0.5]);
+        let mut raw_loss = [0.0];
+        let mut valid_fraction = [0.0];
+        session.read_output_by_index(1, &mut raw_loss);
+        session.read_output_by_index(2, &mut valid_fraction);
+        assert!((f64::from(raw_loss[0]) - expected_loss).abs() < 3e-6);
+        assert_eq!(valid_fraction, [0.5]);
         assert_eq!(session.read_params(&["prediction"])[0], predictions);
         eprintln!("F64 color centroid targets/loss/gradients and exact absent-row zeros pass");
     }
