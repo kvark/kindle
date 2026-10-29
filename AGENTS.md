@@ -18,6 +18,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+Optional native action temperature passes136 Rust/658 Python CPU tests,strict
+Clippy,two guarded GPU checks and two1024-action frozen restores,357 invariant
+tensors and128 matching default transitions. No updates/natural episodes;
+service succeeds14:02:57 UTC October29. Nativee416696/SHA40872a3,runtime
+`/x/Temp/kindle-action-temperature-20261029/runtime`,packaging receipt retained,
+857MB cache released. CPU packaging lookup failure preserved;no GPU repeat.
+Fixed four-arm Qbert temperature0.5 assessment separately selected,no learner
+or sweep. Primary retained greedy11984.375;original30m27s training stays.
+See action-temperature result/protocol;check live state before GPU work.
+
 Frozen modal-posterior Qbert lowers11984.375→10539.583,each24/24 first pyramids;
 own initials80.208/0.000,zero pyramids. Retain sampled posteriors/greedy actions.
 All53 pins,357 tensors per arm,6080/1100 default semantic events,replays/videos/

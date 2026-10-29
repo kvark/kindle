@@ -58,3 +58,30 @@ after seeing results. Reused seed/cohort are not independent confirmation.
 This selects implementation and bounded validation, not the full assessment,
 other games, a learner, an extension or an automatic successor. The five-game
 goal remains unfinished. Check live state before every GPU allocation.
+
+## Bounded checks complete; full assessment separately selected
+
+Sourcee416696 passes136 Rust CPU tests,658 packaged Python tests and both strict
+Clippy checks. The original packaging test-executable lookup failure is preserved;
+a CPU-only repair uses the already compiled binary without repeating a build or
+GPU stage. Native SHA40872a3 is packaged under the declared root. Both guarded
+GPU tests and two1024-action restores pass,zero updates,357 invariant tensors,
+128 exact default transitions and all52 pins. The service succeeds14:02:57 UTC
+October29 after15.363s. The build cache is released after packaging;see the
+[bounded result](../results/2026-10-29-cdp-qbert-action-temperature.md).
+
+Now select exactly the four frozen arms above, using the retained12M final and
+actual initial checkpoint. Native40872a3/runner/source hashes and packaging
+receipt are fixed before launch. Require entire default sampled semantic traces
+and scores to match the retained control, not only the bounded prefix. Primary
+comparison remains temperature0.5 final versus retained greedy11984.375/24;
+default sampled6759.375/24 is secondary. Each arm retains300s/600k-action caps,
+first3 natural episodes per8 lanes,zero updates/truncations,guidance off and357
+invariant tensors. Audit each arm before the next;allow180s per CPU replay and
+1800s for the whole service. No training, temperature search, retry, cap increase,
+checkpoint choice or automatic successor. The host is idle at selection.
+
+Root `/x/Temp/kindle-action-temperature-20261029/full`, service
+`kindle-action-temperature-full-20261029`. Pin a fixed protocol copy, leaving
+later status edits outside the declaration. Record the original30m27s training
+cost and the reused development seed/cohort;no independent learner is created.

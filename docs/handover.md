@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+Native action temperature passes136 Rust/658 Python CPU tests,strict Clippy,
+two guarded GPU tests and two1024-action restores with357 invariant tensors.
+Default sampling matches128 retained transitions;no completed episodes/updates.
+The15.363s service succeeds14:02:57 UTC October29. Sourcee416696/native40872a3,
+runtime `/x/Temp/kindle-action-temperature-20261029/runtime`;packaging receipt
+retained,857MB build cache released. Original CPU packaging lookup failure is
+preserved;no GPU repeat. A fixed four-arm frozen Qbert temperature0.5 assessment
+is separately selected after these checks;no new learner or sweep. See the
+[result](results/2026-10-29-cdp-qbert-action-temperature.md) and
+[protocol](experiments/2026-10-29-cdp-qbert-action-temperature.md). Check live state.
+
 The [completed Qbert25M/R16 comparison](results/2026-10-29-cdp-qbert-25m-r16.md)
 finishes200k actions /799,730 frames /12,477 updates in42m51s,40.72% more training
 time than12M/R16. Primary greedy11984.375→9773.958 (−18.44%),both24/24 pyramids;

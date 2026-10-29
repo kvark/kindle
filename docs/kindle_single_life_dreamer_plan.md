@@ -1,5 +1,13 @@
 # Kindle: CDP learning roadmap
 
+The [native action-temperature check](results/2026-10-29-cdp-qbert-action-temperature.md)
+passes136 Rust/658 Python CPU tests,strict Clippy,two guarded GPU tests and two
+1024-action restores,357 invariant tensors and128 matching default transitions.
+No updates or natural episodes;service succeeds14:02:57 UTC October29. A fixed
+four-arm frozen assessment of temperature0.5 on retained12M Qbert is separately
+selected,with greedy11984.375 primary and sampled6759.375 secondary. No new
+training or sweep;original30m27s training cost stays. See the fixed protocol.
+
 The [completed Qbert25M/R16 comparison](results/2026-10-29-cdp-qbert-25m-r16.md)
 finishes200k actions /799,730 frames /12,477 updates in42m51s,40.72% more training
 time than12M/R16. Primary greedy11984.375→9773.958 (−18.44%),both24/24 pyramids;
