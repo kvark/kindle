@@ -1,16 +1,18 @@
 # CDP handover — October25,2026
 
-One fresh [Qbert25M/R8 200k comparison](experiments/2026-10-29-cdp-qbert-25m-r8-200k.md)
-is selected after the successful bounded check. Capacity12M→25M and replay16→8
-change together; 200k actions /6239 updates, 100k recovery at3114, 35min training
-cap. KeepRGB48/Auto/B16/T16/H15/expert100/all weights1/world gradients/all-state
-labels and native447fe50/control runner/teacher. Greedy11984.375/24 is primary;
-sampled6759.375/24 secondary; original mean15000/90% gate unchanged. Require own
-actual-initial/final24-episode assessments in both modes and357 initial tensors
-matching the25M bounded check; no cross-model initial equality claim. CPU checks
-pass in.547s. Root `/x/Temp/kindle-qbert-25m-r8-20261029/full`. No check experience
-is reused. This is a reused development seed/cohort; no extension or automatic
-successor selected. Check live state before GPU work.
+The fresh [Qbert25M/R8 200k comparison](experiments/2026-10-29-cdp-qbert-25m-r8-200k.md)
+is active from11:43:00 UTC October29/source `eea4eed`, PID288915/invocation
+`6eab4d2791074af8a3f5217487735324`. Startup verifies all226 pins,357 finite initial
+tensors matching the25M bounded initial,and71 finite supervised updates through
+2640 actions. Progress,100k recovery and postprocessing observers are active.
+Capacity12M→25M and replay16→8 change together:200k/6239 updates,100k recovery3114,
+35min training cap. RGB48/Auto/B16/T16/H15/expert100/all weights1/world gradients/
+all-state labels/native447fe50/control runner/teacher remain fixed. Greedy11984.375
+is primary;sampled6759.375 secondary;original15000/90% gate fixed. Own actual-initial
+and final24-episode sampled/greedy assessments remain pending;no12M initial equality
+claim. Root `/x/Temp/kindle-qbert-25m-r8-20261029/full`. No experience reuse or
+GPU repeat;reused development seed/cohort,not independent confirmation. Check live
+state before work;do not restart on observer timeout. No extension/automatic successor.
 
 The [completed Qbert25M/R8 bounded check](results/2026-10-29-cdp-qbert-25m-r8.md)
 passes 8192 actions / 32,753 frames / 245 updates in 63.119s, then 1024 frozen

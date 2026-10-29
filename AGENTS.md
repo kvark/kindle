@@ -805,15 +805,16 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
-A fresh Qbert25M48/B16/R8 200k comparison is selected after its bounded check.
-Capacity12M→25M and replay16→8 change together;6239 updates/100k recovery3114,
-35min training cap. Keep expert100/all weights1/world gradients/all-state labels/
-native447fe50/control runner/teacher. Greedy11984.375/24 primary;sampled6759.375/24
-secondary;original15000/90% gate fixed. Own actual-initial/final sampled/greedy24
-episodes and357 fresh initial tensors matching25M bounded;no12M initial equality.
-CPU preflight passes.547s;no bounded experience reused. Reused development seed/
-cohort,not confirmation;no extension/automatic successor. See25M/R8-200k protocol.
-Check live state before GPU work.
+Qbert25M48/B16/R8 200k comparison is active from11:43:00 UTC October29/source
+`eea4eed`,PID288915/invocation6eab4d2791074af8a3f5217487735324. Startup passes226
+pins,357 finite initial tensors matching25M bounded,and71 finite supervised
+updates through2640 actions. Progress/100k recovery/postprocessing observers live.
+Capacity12M→25M and replay16→8 together;6239 updates/recovery3114/35min cap.
+Keep expert100/all weights1/world gradients/all-state labels/native447fe50/control
+runner/teacher. Greedy11984.375 primary,sampled6759.375 secondary,15000/90% gate
+fixed. Own actual-initial/final24-episode arms pending;no12M initial equality.
+No experience reuse/GPU repeat. Reused seed/cohort;no extension/automatic successor.
+See25M/R8-200k protocol;check actual live state,never restart on observer timeout.
 
 Qbert25M48/B16/R8 bounded check passes 8192 actions / 32,753 frames / 245 updates
 in 63.119s; 1024 frozen / 4096 frames take 1.148s, zero updates/no natural episodes.
