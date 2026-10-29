@@ -89,3 +89,37 @@ declaration and failure remain in`gradients-corrected`. Select a third isolated
 fixture with a one-F32-epsilon tolerance for this mean only. Exact per-row masks
 and absent gradients,and all earlier loss/derivative tolerances,remain unchanged.
 The production target/loss source remains byte-identical;no training has run.
+
+## Numerical pass and bounded learning selection
+
+The third isolated fixture passes all F64 target/loss/derivative checks,exact
+absent-row zero gradients,detached targets,unchanged prediction parameters and
+host guards. All83 declaration pins remain unchanged. The earlier two failed
+fixture executions remain recorded;zero learner stages have run or repeated.
+Review`gradients-tolerant/review.json` SHA256
+`eb0c4bef75bf820e895b32f1a16399faf8f732cdad9997a229b548a28ca9f136`.
+
+Native2974160 is packaged at`/x/Temp/kindle-color-centroid-20261029/runtime`,
+SHA256`e7ba0d4b208fa15be5790615034fb36ab727e4bd02b041114775b42b8e888e90`.
+The exact packaged Python suite passes683 checks with ten native-construction
+cases deselected and zero native-construction attempts. Earlier144 Rust CPU
+tests and strict workspace/binding Clippy remain recorded in the build receipt.
+
+Select one fresh8192-action/489-update check followed by1024 frozen greedy
+actions. Keep retained12M64/Auto/N8/B16/T16/H15/R16/full18/expert100/world-gradient/
+corrective-label recipe,seed1009/evaluation4000001009,20% episode overrides,
+cap1920,all action weights1 and original rates. Add centroid scale100,selected
+before observing learner metrics. Its one-hidden-layer256-unit head adds five
+tensors/656386 parameters,for16990739 trainable parameters. Require actual
+checkpoint/schema verification,357 identical shared initial tensors,identical
+pre-update semantic traces,362 unchanged frozen tensors,finite and nonzero
+auxiliary metrics,changed head/CNN/reward/actor/value weights and complete guided
+pixel/action/label replay. The target and prediction use the same replay row;
+this adds no outgoing-action label alignment. Keep the native one-resize path.
+
+Use existing host guards and240s training/60s frozen/180s CPU audit/480s service
+caps. Measure early cost without treating it as a full-run time guarantee.
+This separately selected check does not select a full learner,repeat earlier
+training or permit reuse of its experience. No natural-episode competence is
+expected from the short frozen budget. The native and runner versions differ
+from retained447fe50 and must remain explicit even if initial checks match.
