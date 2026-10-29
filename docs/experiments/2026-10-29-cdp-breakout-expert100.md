@@ -130,3 +130,16 @@ co-hosts with training. It constructs no environment or native agent, changes no
 learner setting and preserves all69 pins and the same PID/invocation. Retain the
 co-host duration without correcting measured training time. This analysis
 selects no new GPU allocation; its evidence is in the cheap-Qbert report.
+
+## Halfway recovery passes
+
+At03:35:42 UTC on October29, the100k recovery verifies12,470 saved updates and
+357 finite tensors. The complete log prefix contains12,737 finite reports through
+102,144 actions, with zero residual credit at the last progress report. All69
+pins remain unchanged. Checkpoint digest
+`c6b58f7ef1a424e3b1cbe41b9bd52bf973b5a7192d6dd8d37c9ba217feb34fdf`;
+recovery review `29404a91538c243b00d5f53037c2124bf0a978f6c355eaa1cd704d571591c356`.
+The recovery observer finishes successfully. Main PID235051/invocation
+e8a6e8c36aa241f294f9b845645e770b remains active; the fixed200k endpoint and four
+frozen assessments remain pending. No GPU restart,cap change,interim evaluation
+or checkpoint selection occurs.

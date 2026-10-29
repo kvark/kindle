@@ -4,8 +4,9 @@ Breakout expert100 fresh200k is active from03:26:38 UTC on October29,
 source08d080a,PID235051/invocatione8a6e8c36aa241f294f9b845645e770b. Only expert
 scale10→100 changes from4M64/Auto/N8/B8/T16/H15/R16/original rates; native,
 runner and teacher stay fixed. Startup passes all69 pins,357 matching initial
-tensors and593 finite reports through4992 actions. Main/progress/recovery/CPU
-postprocessing are active;100k/12,470 recovery and fixed200k/24,970 plus four
+tensors and593 finite reports through4992 actions. The100k/12,470 recovery passes
+357 finite tensors at03:35:42 UTC;12,737 complete-prefix reports are finite.
+Main/progress/CPU postprocessing remain active; fixed200k/24,970 plus four
 final/initial sampled/greedy assessments remain pending. Training cap25min;
 no extension, retry, cap change or automatic successor. The preceding8192/994
 check took37.011s and passed all47 pins,357 tensors,replay/guards and the16m34s
