@@ -166,3 +166,23 @@ At02:47:10 UTC on October29,the100k recovery verifies6227 saved updates and
 successfully. Main PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5 continues
 beyond103,768 actions. The fixed200k endpoint and four frozen assessments remain
 pending. No GPU restart,cap change,interim evaluation or checkpoint selection.
+
+
+## GPU stages complete; full training audit pending
+
+Training reaches200k actions/799,697 emulator frames/12,477 updates in1830.753s
+(30m31s),within the2100s cap. Training guard passes03:02:10 UTC on October29;
+all four frozen GPU arms finish03:03:20 with passing guards and zero updates.
+Full frozen outcome replays finish03:04:07. The declared first3 natural episodes
+per lane give provisional greedy10588.542/24of24 first pyramids versus own
+80.208/0,and sampled6150.000/21 versus own177.083/0. Both miss mean15000.
+Against retained scale100,greedy falls11.65% and sampled9.02%;training costs.21%
+more. These outcomes do not support an extension or another coefficient trial.
+
+All229 pins remain unchanged. The small stage receipt is`gpu-stage-review.json`,
+SHA256`5efc3c2d56234f013a5d385058bb249ea25bdaf3c37e149caf3bf5532bdbf5b0`.
+It is explicitly provisional and does not replace the complete audit. The same
+main PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5 now runs CPU audit;
+full200k training label/input-pixel/action replay starts03:04:08,under unchanged
+1200s inner/1230s outer caps. Comparison,exposure and terminal collection remain
+pending. No GPU repeat,cap increase,extension or automatic successor is selected.

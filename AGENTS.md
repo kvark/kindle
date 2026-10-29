@@ -52,21 +52,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-One fresh Qbert12M48/B16/R16/expert1000 learner is active from02:31:35 UTC
-on October29,sourcecff4772,PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5.
-All229 pins,exact config/fresh counters,357 control/check initial tensors and
-first updates376/392/408/424/440/456 pass;the checked3768-action prefix has212
-finite supervised reports. The100k/6227 recovery passes357 finite tensors at
-02:47:10 UTC;the watcher succeeds after6392 finite reports through102,648 actions.
-Keep200k/12,477 and35-minute cap;four fixed final/own-initial sampled+greedy
-assessments remain pending. Only expert
-scale100→1000 changes versus retained12M/R16. Native,runner and teacher unchanged;
-no check experience reused. Main and all three observers start normally;no GPU
-repeat or failure. Use`full/collect_full.py` for this run,not the historical R8
-repair collector. No second learner or automatic successor. The bounded check
-passes69.211s/all47 pins;conservative200k estimate30m59s. Full CPU preflight
-passes5 commands,14 scripts,11 config/8 header/3 observer checks. Frozen benefit
-remains unmeasured. See the expert1000 protocol;check live state before GPU work.
+Qbert12M48/B16/R16/expert1000 finishes200k actions/799,697 frames/12,477
+updates in30m31s,within35min. All four frozen GPU arms finish03:03:20 UTC on
+October29 with passing guards. Provisional first3-per-lane replay scores are
+greedy10588.542/24of24 first pyramids versus own80.208/0,and sampled6150/21
+versus177.083/0. Both miss15000;greedy/sample fall11.65%/9.02% versus retained
+expert100 for.21% more time. All229 pins remain unchanged;100k/6227 recovery
+passes357 finite tensors. Main PID230301/invocation3a3e8c1921624a44abd85e8fe4a725d5
+is active in CPU audit;full training replay,comparison and terminal collection
+remain pending. Use`full/collect_full.py` for this run. No GPU repeat,cap change,
+extension or automatic successor selected. The.668s post-warmup CPU monitor is
+recorded alongside training. See the expert1000 protocol;check live state before
+GPU work.
 
 Qbert12M48/B16/R8/expert100 completes400k actions/1,599,459 frames/12,489
 updates in40m35s. Greedy10042.708/23of24 first pyramids is16.20% below retained
