@@ -8,6 +8,10 @@ actual-initial assessments in both modes. CPU preflight passes5 CLI boundaries,
 10 config cases,7 header checks and190 retained control pins. Full evidence is
 `/x/Temp/kindle-open-loop-20261029/full`;check service
 `kindle-open-loop-200k-20261029` and its observers before new GPU work.
+It launches07:58:25 UTC October29/source`fc3a21a`,PID268210/invocation006562fc.
+Startup verifies7,224 actions/428 finite reports,242 unchanged pins,357 control/
+check initial tensors and the first-six update schedule. Allthree observers
+are running;the100k recovery and fixed final outcomes remain pending.
 
 Optional H3 supervision (`ab80486`,default off) passes135 Rust/611 packaged
 Python CPU tests,strict Clippy,both guarded numerical checks and1024-action

@@ -27,6 +27,10 @@ seven header checks and190 retained control pins pass before declaration.
 Protocol `docs/experiments/2026-10-29-cdp-open-loop-qbert-200k.md`;evidence
 `/x/Temp/kindle-open-loop-20261029/full`. Inspect live service
 `kindle-open-loop-200k-20261029` before GPU work;never restart from a stale wait.
+Launched07:58:25 UTC October29/source`fc3a21a`,PID268210/invocation006562fc;
+startup passes7,224 actions/428 finite reports,242 unchanged pins,357 matching
+control/check initial tensors and first-six update schedule. Recovery/progress/
+postprocessing observers are active;no frozen outcome yet. Check live state.
 
 Optional H3 open-loop supervision (`ab80486`,default off) passes135 Rust/611
 packaged Python CPU tests,strict Clippy,two guarded gradient checks and legacy

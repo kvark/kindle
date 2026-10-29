@@ -25,6 +25,9 @@ separately selected with a35min training cap,100k recovery and frozen actual-
 initial controls. Greedy mean is primary;the original15000/90%-pyramid gate
 remains. Check `kindle-open-loop-200k-20261029` before new GPU work. The five-game
 goal and its Qbert/Breakout gaps are unchanged.
+The comparison launches07:58:25 UTC October29/source`fc3a21a`;startup passes
+7,224 actions/428 finite reports,242 pins and357 matched initial tensors.
+Training and its observers are active;frozen task outcomes remain pending.
 
 The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
 zero updates. Sampled value estimates beat a constant baseline but underpredict
