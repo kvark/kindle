@@ -24,8 +24,10 @@ The preceding8192-action/978-update check takes69.748s;all41 pins,357 matched
 initial/invariant frozen tensors,full guided replay and guards pass,with31m13s
 conservative200k projection. Full startup passes169 pins,357 matching initial
 tensors and exact first-six update cadence;PID330763/invocation
-`547224e0548644b089a790683a6c7c78`. Recovery,progress,postprocessing and terminal
-collection observers are active. No frozen competence is measured yet. H15/R16→H5/R32 changes horizon,
+`547224e0548644b089a790683a6c7c78`. The100k/12,454 recovery passes19:46:35 with357
+finite tensors; its observer succeeds while training continues. Progress,
+postprocessing and collection remain active. No frozen competence is measured
+yet. H15/R16→H5/R32 changes horizon,
 cadence,sampling,warmup and total work together;no isolated causal claim.
 Native447fe50,runner and teacher unchanged;no prior experience is reused.
 Root`/x/Temp/kindle-breakout-h5-r32-20261029/full`. Check live state before

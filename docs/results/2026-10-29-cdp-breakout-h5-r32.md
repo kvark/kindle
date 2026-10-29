@@ -2,6 +2,14 @@
 
 ## Fresh200k learner is active
 
+The100k recovery audit passes **19:46:35 UTC**: exactly12,454 updates and357
+finite tensors. It also validates12,738 finite reports in the complete102,280-
+action prefix while training continues on the original PID/invocation. The
+recovery observer exits successfully; progress,postprocessing and terminal
+collection remain active. No frozen gameplay outcome is available yet.
+Recovery review SHA256:
+`9a0bb5d25fe2d9f4855f00ffcbdb35b7f9d25ed3435d55e4d398149f1305fc06`.
+
 The full comparison starts **19:29:30 UTC October29/source86eb300** under
 `kindle-breakout-h5-r32-200k-20261029`,PID330763/invocation
 `547224e0548644b089a790683a6c7c78`. Its200k-action/24,954-update target has a
