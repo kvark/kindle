@@ -13,9 +13,11 @@ pixel trajectories and guards pass; service exits06:52:55 UTC October29. The
 original CPU snapshot failure is retained; isolated process branches preserve
 sticky-action memory and pass full source replay. See the
 [completed result](results/2026-10-29-cdp-learning-diagnosis.md).
-Next implement and validate [optional three-step open-loop world supervision](experiments/2026-10-29-cdp-open-loop-supervision.md),
-with gradient/cost evidence before selecting a full learner. No GPU allocation
-is active. The five-game goal and its remaining Qbert/Breakout gaps are unchanged.
+The [optional three-step open-loop supervision](experiments/2026-10-29-cdp-open-loop-supervision.md)
+is implemented default-off (`ab80486`):135 Rust/611 packaged Python CPU tests,
+strict Clippy and two guarded gradient/alignment checks pass. Next selected
+work is legacy frozen compatibility and8192-action execution/cost before a full
+learner. The five-game goal and its remaining Qbert/Breakout gaps are unchanged.
 
 The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
 zero updates. Sampled value estimates beat a constant baseline but underpredict

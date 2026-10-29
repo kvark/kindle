@@ -18,6 +18,15 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+Optional H3 open-loop world supervision is implemented default-off in `ab80486`.
+135 Rust CPU tests,611 packaged Python tests,strict native/binding Clippy and
+two guarded gradient/alignment tests pass;189 pins unchanged,service exits
+07:30:58 UTC October29. Runtime `/x/Temp/kindle-open-loop-20261029/runtime`,
+native SHAb4cdf26; separate posterior draft is parked under that root. Next
+selected checks are1024-action legacy frozen compatibility,then fresh Qbert12M
+8192-action execution/cost and1024 frozen; see the open-loop protocol. No full
+learner is selected; check live state before GPU work.
+
 Qbert action-block ranking completes128 origins/2432 forecasts on48256 source
 actions in95.811s,zero updates. Pairwise agreement72.96% before/57.21% after
 the first pyramid; only40/128 origins distinguish candidates. Later gain over

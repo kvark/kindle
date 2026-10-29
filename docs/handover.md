@@ -1,5 +1,14 @@
 # CDP handover — October25,2026
 
+Optional H3 open-loop supervision in `ab80486` passes135 Rust CPU tests,611
+packaged Python tests,strict native/binding Clippy and both guarded numerical
+checks (189 unchanged pins). Service exits07:30:58 UTC October29. Isolated
+runtime `/x/Temp/kindle-open-loop-20261029/runtime`,native SHAb4cdf26; default off.
+Next selected checks:1024-action legacy frozen compatibility,then8192 fresh
+Qbert12M actions/1024 frozen for execution and early cost. No full learner.
+See the [exact protocol](experiments/2026-10-29-cdp-open-loop-supervision.md)
+and check live state. The separate posterior draft is parked as described below.
+
 Qbert actual action-block comparison completes128 origins/2432 modeled plans
 on48256 recorded actions/192980 frames in95.811s,zero updates. Ranking agreement
 is72.96% before/57.21% after the first pyramid;40/128 origins are informative.

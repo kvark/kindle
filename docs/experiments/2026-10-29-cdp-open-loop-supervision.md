@@ -66,6 +66,37 @@ continuation values/derivatives with F64, check a smooth reward-head derivative,
 world gradient routing, future-target/state invariance, action sensitivity and
 zero masks. These checks precede packaging and any bounded Atari allocation.
 
+## Numerical checks complete; selected bounded runtime assessment
+
+Source `ab80486` passes135 Rust CPU tests,611 Python tests and strict native/
+binding Clippy. Both guarded numerical tests pass on the RX7900XT; all189 pins
+remain unchanged. Service succeeds07:30:58 UTC October29, whole3.222s. Evidence
+and isolated wheel/runtime are under `/x/Temp/kindle-open-loop-20261029`.
+The original CPU-only missing-method compile error and wrong interpreter path
+are retained in their logs; no GPU check failed or repeated.
+
+Next restore the retained12M Qbert checkpoint with the new runtime, with this
+option absent, for1024 greedy actions. Require zero updates,357 unchanged
+tensors and an exact recorded-action/outcome prefix before new learning.
+
+Then select one fresh8192-action Qbert execution/cost check:12M48/Auto/N8/B16/
+T16/H15/R16,coefficient1,actor-unimix0,full18,original rates,seed4013,
+20%episode continuation/cap1920/expert100/all18weights1/world gradients/all-state
+corrective labels, plus open-loop H3/scale1. Compare all357 actual-initial tensors
+with the retained12M4013 initial. Expected489 updates,first at376 actions,
+residual scheduler credit.5. Restore its final model for1024 greedy actions at
+evaluation seed4000004013,zero updates; require357 invariant tensors.
+
+Require finite/nonzero auxiliary reports,declared weighted reductions and masks,
+changed CNN/reward/actor/value parameters,complete guidance/pixel/action replay,
+matching configs/source/counters and host guards. Fix budgets before launch:
+180s training process,60s frozen process,180s CPU audits. Record aggregate
+actions,emulator frames and measured training time. Project200k cost both
+linearly and with10% allowance; a projection above35minutes calls for a cheaper
+recipe rather than silently extending the budget. The short check cannot
+establish task competence or select a full learner automatically. Reused seeds
+and ordinary frozen logs without live pixel hashes retain their limitations.
+
 ## Required evidence before a full learner
 
 - Disabled configuration preserves checkpoint compatibility, default RNG draws,
