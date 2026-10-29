@@ -1,5 +1,65 @@
 # Qbert retains useful forecasts; later-game accuracy and policy use remain open
 
+## Live critic learns useful values but underestimates realized returns
+
+The subsequent four-arm live-state diagnostic completes98664 actions /394520
+frames in69.704s of evaluation, with zero updates. Main service
+`kindle-critic-calibration-20261029` runs06:28:28–06:30:01 UTC on October29
+(1m33.689s). A preceding1024-action/4096-frame check takes.882s. All44 pins,
+357 invariant tensors per arm,12522 matching full semantic events, counters and
+guards pass. The instrumented actions, rewards, episode/reset boundaries and
+frame counters exactly reproduce all four retained evaluations. Original
+verified replays supply task phases; no new pixel recordings are claimed.
+
+The sampled final policy is primary, because the actor samples during
+imagination. Returns include actual rewards and frozen intrinsic bonuses,
+discounted with the model's F32 gamma, with no critic bootstrap. First episodes
+per lane calibrate a constant baseline; subsequent16 natural episodes are tested.
+
+| Live critic measurement | Sampled final | Greedy final |
+| --- | ---: | ---: |
+| Test state-action observations | 19574 | 27102 |
+| Mean realized discounted return | 1475.689 | 1936.698 |
+| Mean predicted value | 1218.534 | 1545.437 |
+| Bias | −257.154 | −391.262 |
+| Critic MAE / constant-baseline MAE | 790.664 /1038.765 | 955.480 /1148.890 |
+| R² / correlation | .184 /.542 | .287 /.613 |
+| Mean intrinsic discounted return | .710 | .805 |
+
+Sampled before/after-first-pyramid correlations are.618/.358, with biases
+−649.367/−102.482. Within those phases R² is−.388/−.104 despite overall positive
+R²: some aggregate explanatory power comes from distinguishing phases. The
+critic still beats the declared global calibration constant in phasewise MAE.
+Greedy before-pyramid correlation is.941 with bias−1135.742; greedy behavior
+changes the return being estimated, so this is not evidence that the sampled
+policy's critic should predict the greedy return exactly.
+
+Actual-initial critics predict zero; their sampled/greedy mean target returns
+are70.477/34.404, including intrinsic returns9.092/8.538. These actors visit
+different states from the trained actor. The controls therefore do not establish
+a matched-state improvement in critic accuracy. All four unchanged task scores
+are6759.375/177.083 sampled final/initial and11984.375/80.208 greedy final/initial.
+
+This is evidence of useful but imperfect value learning. Underestimation alone
+does not identify an incorrect action ranking or prove why policy improvement
+falls short: shared value bias can leave action preferences unchanged, realized
+returns are stochastic samples, and the critic uses symlog-distribution decoding.
+The small trained intrinsic contribution does not explain the observed value
+gap. Proceed toward actual alternative-action outcomes before selecting a
+critic/loss intervention. No new training or changed loss is selected here.
+
+Native447fe50 and the pinned runner remain unchanged; all9 value-analysis CPU
+tests pass. [Protocol](../experiments/2026-10-29-cdp-critic-calibration.md), source
+1227d1e, evidence `/x/Temp/kindle-critic-calibration-20261029`. The controller
+validates each completed arm before starting the next. No GPU stage repeats,
+failures or host recovery occur; no GPU allocation is active at completion.
+Declaration SHA256
+`9ea9be0f32dec18cf1737ba5b29c07518aacbaa6a47224dca076b33137087cbc`;
+comparison `95c90655aaefad74be9f3066bf4acc92ff5452bd5ad2ae28d9f41a58d7ff17eb`;
+bounded review `0db34d65e9c8e72559aed69a85e9b4394d59a684f5f571c8f7d68fc7ca719f17`.
+
+## Forecast interpretation
+
 The first investigation within the existing five-game goal finds useful
 action-conditioned15-step reward forecasts in the strongest retained Qbert
 learner. This does not support treating a wholesale collapse of imagination as

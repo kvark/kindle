@@ -4,6 +4,15 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
+zero updates. Sampled value estimates beat a constant baseline but underpredict
+mean return1218.534 versus1475.689;correlation.542/R².184 and later-phase
+correlation.358 leave substantial uncertainty. Greedy changes the policy and
+return target. All44 pins,357 invariant tensors per arm,12522 matching semantic
+events and guards pass; service exits06:30:01 UTC October29. No new loss or
+training is selected; next inspect actual alternative-action ranking. See the
+[updated diagnosis](results/2026-10-29-cdp-learning-diagnosis.md).
+
 The October29 architecture diagnosis completes two48256-action frozen captures
 of the strongest Qbert12M model and its own initial weights, zero updates.
 Fifteen-step reward-sum MAE107.570→37.499 and endpoint AUC.500→.938 show useful

@@ -18,6 +18,14 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+Qbert live-critic calibration completes98664 actions/394520 frames in69.704s,
+zero updates. Sampled value correlation.542/R².184 beats the constant baseline
+but underestimates mean realized1475.689 with1218.534; later-phase correlation
+is.358. Greedy changes the policy and has larger bias. All44 pins,357 invariant
+tensors per arm,12522 matching semantic events and guards pass; service exits
+06:30:01 UTC on October29. No new loss/training allocation follows. Next inspect
+actual alternative-action ranking. See the diagnosis report; check live state.
+
 The October29 architecture diagnosis is within the existing five-game goal.
 Retained Qbert12M frozen forecasts preserve useful15-step reward information:
 cumulative MAE107.570 initial→37.499 trained, versus69.538 with unrelated actions.

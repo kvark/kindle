@@ -1,5 +1,15 @@
 # CDP handover — October25,2026
 
+Live Qbert critic calibration completes four frozen arms,98664 actions/394520
+frames in69.704s,zero updates. Sampled predicted mean1218.534 versus realized
+1475.689,correlation.542/R².184,beats the constant baseline; after-first-pyramid
+correlation is.358. Greedy behavior has larger bias and a different target policy.
+All44 pins,357 invariant tensors per arm,12522 exact semantic events and guards
+pass; service exits06:30:01 UTC October29. No changed loss or training allocation
+is selected. Next inspect actual alternative-action ranking; evidence is in
+`/x/Temp/kindle-critic-calibration-20261029` and the
+[diagnosis report](results/2026-10-29-cdp-learning-diagnosis.md).
+
 The October29 learning diagnosis completes both48256-action frozen Qbert12M
 captures in207.599/207.409s, zero updates. Fifteen-step reward-sum MAE falls
 107.570 initial→37.499 trained; unrelated actions give69.538. Later-play errors
