@@ -1,5 +1,17 @@
 # Kindle: CDP learning roadmap
 
+One fresh [Qbert25M/R16 200k comparison](experiments/2026-10-29-cdp-qbert-25m-r16-200k.md)
+is selected after the bounded cost check.200k/12,477 updates,100k recovery6227,
+45min training cap. Only exposed model size changes from12M/R16;supervision/
+native447fe50/control runner/teacher fixed. Greedy11984.375/24 primary;sampled
+6759.375/24 secondary. Completed25M/R8 supplies a secondary replay comparison
+with357 matching initial tensors/paired initial semantic traces;no12M initial
+equality. Own initial/final sampled/greedy24-episode assessments,original15000/
+90% gate and full audits fixed. CPU preflight passes1.026s. Original template-edit
+assertion/correction preserved before declaration;no GPU work repeated. Root
+`/x/Temp/kindle-qbert-25m-r16-20261029/full`. Reused development seed/cohort;
+no experience reuse,extension or automatic successor. Check live state before work.
+
 The [completed Qbert25M/R16 bounded check](results/2026-10-29-cdp-qbert-25m-r16.md)
 passes8192 actions /32,757 frames /489 updates in100.299s,then1024 greedy frozen
 /4096 frames in1.202s,zero updates/no natural episodes. All53 pins,357 finite/

@@ -805,6 +805,16 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
+A fresh Qbert25M48/B16/R16 200k comparison is selected:12,477 updates,100k recovery
+6227,45min training cap. Only exposed model size changes from12M/R16;supervision/
+native447fe50/control runner/teacher fixed. Greedy11984.375/24 primary;sampled
+6759.375/24 secondary;25M/R8 supplies secondary replay comparison with357 matched
+initial tensors/paired initial semantic traces. No12M initial equality. Own initial/
+final sampled/greedy24-episode assessments and15000/90% gate fixed. CPU preflight
+passes1.026s;original CPU template-edit assertion/correction retained before
+preflight/declaration,no GPU repeat. Reused seed/cohort,no extension/automatic
+successor. See25M/R16-200k protocol;check live state before GPU work.
+
 Qbert25M48/B16/R16 bounded check passes8192 actions /32,757 frames /489 updates
 in100.299s;1024 greedy frozen/4096 frames take1.202s,zero updates/no natural episodes.
 All53 pins,357 finite/invariant frozen tensors,357 matching25M/R8 initial tensors,
