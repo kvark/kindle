@@ -1,16 +1,18 @@
 # Kindle: CDP learning roadmap
 
-One fresh [Qbert25M/R16 200k comparison](experiments/2026-10-29-cdp-qbert-25m-r16-200k.md)
-is selected after the bounded cost check.200k/12,477 updates,100k recovery6227,
-45min training cap. Only exposed model size changes from12M/R16;supervision/
-native447fe50/control runner/teacher fixed. Greedy11984.375/24 primary;sampled
-6759.375/24 secondary. Completed25M/R8 supplies a secondary replay comparison
-with357 matching initial tensors/paired initial semantic traces;no12M initial
-equality. Own initial/final sampled/greedy24-episode assessments,original15000/
-90% gate and full audits fixed. CPU preflight passes1.026s. Original template-edit
-assertion/correction preserved before declaration;no GPU work repeated. Root
-`/x/Temp/kindle-qbert-25m-r16-20261029/full`. Reused development seed/cohort;
-no experience reuse,extension or automatic successor. Check live state before work.
+The fresh [Qbert25M/R16 200k comparison](experiments/2026-10-29-cdp-qbert-25m-r16-200k.md)
+is active from12:43:20 UTC October29/source `5d9d93e`,PID293701/invocation
+`a597cab72ab845b9ba8c3b3468096bc6`. Startup passes273 unchanged pins,357 finite
+initial tensors matching25M/R16 bounded and25M/R8 full,and92 finite supervised
+updates through1832 actions. Progress/100k recovery/postprocessing observers live.
+200k/12,477 updates,100k recovery6227,45min cap;only exposed model size changes
+from12M/R16,supervision/native447fe50/control runner/teacher fixed. Greedy11984.375
+primary,sampled6759.375 secondary;25M/R8 supplies secondary replay comparison
+with matching initial tensors/paired initial evaluation traces required. No12M
+initial equality. Own initial/final24-episode arms and15000/90% gate fixed.
+Original CPU template-edit assertion/correction retained before declaration;
+no GPU repeat/experience reuse. Root `/x/Temp/kindle-qbert-25m-r16-20261029/full`.
+Reused development seed/cohort;no extension/automatic successor. Check live state.
 
 The [completed Qbert25M/R16 bounded check](results/2026-10-29-cdp-qbert-25m-r16.md)
 passes8192 actions /32,757 frames /489 updates in100.299s,then1024 greedy frozen
