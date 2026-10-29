@@ -102,3 +102,24 @@ experience or retained weights are reused. Full-controller and CPU comparison
 preparation precede launch;no full learner is active at selection. This separate
 selection tests task benefit;the bounded pass supplies no policy-quality claim.
 Root `/x/Temp/kindle-qbert-expert1000-20261029/full`.
+
+
+## Full-controller preparation
+
+Full CPU preflight passes in.615s: five experiment commands parse,14 scripts
+compile,11 checks exercise the actual comparison/audit config assertions and
+8 header-readiness cases reject missing,partial or mismatched recovery headers.
+The actual progress/recovery observer parsers pass3 checks,including rejection
+of the old unsupported progress option. Both observers use the tested command
+builders;the progress copy takes positional arguments only. All47 bounded pins
+and357 matching control/check initial tensors verify. Recovery100k/6227 and
+final200k/12,477 accounting pass. No native module,agent or environment is
+constructed and no preparation failure occurs. Native and retained scripts
+remain unchanged.
+
+Keep2100s training and300s per frozen arm. Full training replay uses1200s inner/
+1230s outer caps;CPU audit1800s and main service5400s. Postprocessing/progress
+have6000s service/5700s internal waits;recovery2700s service/2400s internal wait.
+These audit limits do not expand the35-minute training cap. No observer can
+restart the learner. The protocol snapshot,source/runtime,controllers,analysis
+and retained-control inputs are pinned before launch.

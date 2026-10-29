@@ -8,8 +8,9 @@ UTC on October29;no failure,GPU repeat or native edit. Conservative200k estimate
 30m59s passes35min. After that complete review,one fresh200k/12,477-update
 comparison is separately selected,with100k/6227 recovery and four final/own-
 initial sampled+greedy arms. Only expert scale100→1000 changes versus retained
-12M/R16;no check experience reused. Full CPU preparation must precede launch;
-no full learner is active yet. See the expert1000 protocol;check live state.
+12M/R16;no check experience reused. Full CPU preflight passes5 commands,14
+scripts,11 config/8 header/3 observer-parser checks without native construction.
+No full learner is active yet. See the expert1000 protocol;check live state.
 
 Qbert12M48/B16/R8/expert100 completes400k actions/1,599,459 frames/12,489
 updates in40m35s. Greedy10042.708/23of24 first pyramids is16.20% below retained
