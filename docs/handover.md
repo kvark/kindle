@@ -1,5 +1,17 @@
 # CDP handover — October25,2026
 
+The [fresh Qbert200k NOOP-weight comparison](experiments/2026-10-29-cdp-qbert-noop-weight-200k.md)
+is separately selected after bounded completion. Only wait-label weight1→.25
+changes under retained12M48/B16/R16/expert100;same native447fe50/control runner/
+teacher and matching Breakout-era runtime. Budget200k/12,477 updates,35min cap,
+100k recovery and four24-natural-episode final/initial sampled/greedy arms.
+Greedy is primary against11984.375/24;original15000/90% gate remains. CPU
+preflight passes five commands,14 scripts,11 config boundaries,eight startup
+checks,three observer checks and357 matching initial tensors in.592s,with no
+native/environment construction. Root`/x/Temp/kindle-qbert-noop-weight-20261029/full`,
+service`kindle-qbert-noop025-200k-20261029`. No extension or automatic successor;
+check live state before work.
+
 The [Qbert NOOP-weight check](results/2026-10-29-cdp-qbert-noop-weight.md)
 passes8192 actions/32,754 frames/489 updates in70.160s;1024 frozen/4096 frames
 in.783s,zero updates/no natural episodes. All45 pins,357 matched initial/invariant

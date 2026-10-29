@@ -1,5 +1,13 @@
 # Kindle: CDP learning roadmap
 
+The [fresh Qbert200k NOOP-weight comparison](experiments/2026-10-29-cdp-qbert-noop-weight-200k.md)
+is selected after the completed bounded check. Only wait-label weight1→.25
+changes;retain12M48/B16/R16/expert100/native447fe50 and200k/12,477 updates.
+Greedy primary11984.375/24 and original15000/90% gate stay fixed;four24-episode
+final/initial arms,100k recovery,full replays/guards/comparison and35min training
+cap. All five commands/14 scripts/config/startup/observer CPU checks pass. No
+bounded experience reuse,extension or automatic successor;check live state.
+
 The [bounded Qbert NOOP-weight check](results/2026-10-29-cdp-qbert-noop-weight.md)
 passes8192/489 in70.160s and1024 frozen/.783s,zero updates/no natural episodes.
 All45 pins,357 matched initial/invariant frozen tensors,weighted loss counts,

@@ -805,6 +805,15 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
+A fresh Qbert NOOP-weight.25/200k comparison is separately selected after bounded
+completion. Retain12M48/B16/R16/expert100/native447fe50;only wait-label weight
+changes.35min training cap,100k recovery,four24-natural-episode sampled/greedy
+final/initial assessments;greedy primary11984.375 and original15k/90% gate.
+CPU command/config/startup/observer checks pass. Use the matching Breakout-era
+runtime and full-root pinned runner. Root`/x/Temp/kindle-qbert-noop-weight-20261029/full`,
+service`kindle-qbert-noop025-200k-20261029`. No extension or automatic successor;
+check live state before work. See the NOOP-weight200k protocol.
+
 Qbert NOOP-weight.25 bounded check passes8192 actions/32,754 frames/489 updates
 in70.160s;1024 frozen/.783s,zero updates/no natural episodes. All45 pins,357
 matched initial/invariant frozen tensors,weighted-loss counts,full guided replay
