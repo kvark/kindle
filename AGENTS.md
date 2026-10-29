@@ -31,6 +31,8 @@ Launched07:58:25 UTC October29/source`fc3a21a`,PID268210/invocation006562fc;
 startup passes7,224 actions/428 finite reports,242 unchanged pins,357 matching
 control/check initial tensors and first-six update schedule. Recovery/progress/
 postprocessing observers are active;no frozen outcome yet. Check live state.
+100k recovery passes6,227 updates/357 finite tensors;observer exits08:14:00 UTC.
+Main learner remains active;no midpoint evaluation or checkpoint selection.
 
 Optional H3 open-loop supervision (`ab80486`,default off) passes135 Rust/611
 packaged Python CPU tests,strict Clippy,two guarded gradient checks and legacy

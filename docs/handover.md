@@ -12,6 +12,8 @@ It launches07:58:25 UTC October29/source`fc3a21a`,PID268210/invocation006562fc.
 Startup verifies7,224 actions/428 finite reports,242 unchanged pins,357 control/
 check initial tensors and the first-six update schedule. Allthree observers
 are running;the100k recovery and fixed final outcomes remain pending.
+The100k recovery subsequently passes6,227 updates/357 finite tensors at08:14:00
+UTC. Its observer exits success;training and final assessments remain pending.
 
 Optional H3 supervision (`ab80486`,default off) passes135 Rust/611 packaged
 Python CPU tests,strict Clippy,both guarded numerical checks and1024-action

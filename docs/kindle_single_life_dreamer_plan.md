@@ -28,6 +28,12 @@ goal and its Qbert/Breakout gaps are unchanged.
 The comparison launches07:58:25 UTC October29/source`fc3a21a`;startup passes
 7,224 actions/428 finite reports,242 pins and357 matched initial tensors.
 Training and its observers are active;frozen task outcomes remain pending.
+The100k recovery passes6,227 updates/357 finite tensors at08:14:00 UTC;main
+training continues. The concurrent33.384s CPU-only Breakout replay finds near-
+paddle teacher agreement55.19%/54.18% for retained4M/12M greedy policies,despite
+their different overall scores. Canonical-only chosen buttons rule out aliases
+as the explanation for those greedy errors. See the [phase diagnostic](results/2026-10-26-cdp-breakout-pixel-reference.md#larger-frozen-policy-still-disagrees-on-urgent-paddle-commands);
+all242 active Qbert pins and its process identity stay unchanged.
 
 The live-critic follow-up completes98664 frozen actions/394520 frames in69.704s,
 zero updates. Sampled value estimates beat a constant baseline but underpredict
