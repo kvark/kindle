@@ -59,3 +59,25 @@ Root `/x/Temp/kindle-qbert-noop-weight-20261029/full`, trial
 `qbert-12m-48-b16-r16-expert100-noop025-200k-seed4013`, service
 `kindle-qbert-noop025-200k-20261029`. Check live state before launch. The bounded
 service is terminal success and the host is idle at selection.
+
+## Launched and startup checked
+
+Main service starts10:36:00 UTC October29/source`bcaf51a`,PID283869/invocation
+`0522d3f2958a4f47880218d10aa18cac`. All230 declared inputs remain unchanged.
+Startup verifies the exact selected config,357 finite initial tensors matching
+both retained control and bounded check,and the first six updates at376/392/
+408/424/440/456 actions. The inspected2376-action prefix contains125 finite,
+supervised reports. No frozen result is available yet. Progress,100k recovery
+and terminal postprocessing observers are all active,with parsed commands and
+fixed deadlines. No preparation failure or GPU repeat occurs in this full run.
+
+The five CPU command parses,14 compiled scripts,11 exact-config boundary checks,
+eight header-readiness checks,three observer CLI checks and357 initial tensor
+matches pass in.592s without native/environment construction. All45 bounded
+pins and190 historically resolved control inputs verify. The original bounded
+CPU import assertion failure remains separate; no completed check is repeated.
+
+Declaration`bfb3e2864f87e5be79c20e21f5ea6278db76c0251483fcf12866ee60f9cc0c74`.
+The copied`full/fixed-protocol.md` and all executable inputs remain pinned; this
+status paragraph is outside that immutable declaration. Check live service state
+before any additional GPU work.

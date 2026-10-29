@@ -7,6 +7,9 @@ Greedy primary11984.375/24 and original15000/90% gate stay fixed;four24-episode
 final/initial arms,100k recovery,full replays/guards/comparison and35min training
 cap. All five commands/14 scripts/config/startup/observer CPU checks pass. No
 bounded experience reuse,extension or automatic successor;check live state.
+Launched10:36:00 UTC October29/sourcebcaf51a,PID283869. All230 pins and357
+control/check initial tensors verify;2376 actions/125 finite reports pass startup.
+Main/progress/recovery/postprocessing services are active;no frozen score yet.
 
 The [bounded Qbert NOOP-weight check](results/2026-10-29-cdp-qbert-noop-weight.md)
 passes8192/489 in70.160s and1024 frozen/.783s,zero updates/no natural episodes.

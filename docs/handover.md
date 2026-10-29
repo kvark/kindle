@@ -11,6 +11,9 @@ checks,three observer checks and357 matching initial tensors in.592s,with no
 native/environment construction. Root`/x/Temp/kindle-qbert-noop-weight-20261029/full`,
 service`kindle-qbert-noop025-200k-20261029`. No extension or automatic successor;
 check live state before work.
+Launched10:36:00 UTC October29/sourcebcaf51a,PID283869. All230 pins and357
+control/check initial tensors verify;2376 actions/125 finite reports pass startup.
+Main/progress/recovery/postprocessing services are active;no frozen score yet.
 
 The [Qbert NOOP-weight check](results/2026-10-29-cdp-qbert-noop-weight.md)
 passes8192 actions/32,754 frames/489 updates in70.160s;1024 frozen/4096 frames
