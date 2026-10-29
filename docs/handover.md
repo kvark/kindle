@@ -1,12 +1,16 @@
 # CDP handover — October25,2026
 
-Select one [bounded Qbert H5/R32 check](experiments/2026-10-29-cdp-qbert-h5-r32.md) on the retained12M48/B16/T16/
-expert100 recipe. H15→H5 and replay16→32 trade shorter imagination for twice
-as many world/expert updates;no isolated rollout-length claim. Native447fe50,
-runner,teacher and other settings remain fixed. Budget8192 actions/978 updates
-plus1024 frozen;conservative200k projection must fit45min before a separate
-full selection. No full learner,extension or automatic promotion selected.
-Evidence `/x/Temp/kindle-qbert-h5-r32-20261029/native-check`;check live state.
+The [bounded Qbert H5/R32 check](results/2026-10-29-cdp-qbert-h5-r32.md) passes
+8,192 actions / 32,748 frames / 978 updates in93.933s; 1,024 frozen actions
+in0.798s have zero updates and no natural episodes. All41 pins,357 matching
+initial/invariant frozen tensors,full guided replay and guards pass. Main
+succeeds15:29:06 UTC October29/source97cda44,collection15:29:37. Conservative
+200k projection42m03s fits45min. Separately select one [fresh200k comparison](experiments/2026-10-29-cdp-qbert-h5-r32-200k.md):
+12M48/Auto/N8/B16/T16/H5/R32/expert100,24,954 updates,100k recovery and four
+fixed frozen arms. H15→5/R16→32 doubles world/expert work and changes cadence;
+no isolated horizon claim or overall speedup promised. Native447fe50,runner,
+teacher and other settings fixed. No check experience reused. Evidence
+`/x/Temp/kindle-qbert-h5-r32-20261029`;check live state. No task result yet.
 
 The [completed Qbert B8/T32 comparison](results/2026-10-29-cdp-qbert-context32.md) finishes200k actions/799,710 frames/
 12,469 updates in31m48s,+4.44% training time. Greedy11609.375/24 first pyramids
