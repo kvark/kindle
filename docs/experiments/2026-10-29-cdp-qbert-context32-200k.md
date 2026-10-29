@@ -62,3 +62,20 @@ CPU preflight passes in.591s: five parsed commands,14 compiled scripts,13 actual
 config boundary checks,eight startup-header checks,three observer CLI checks
 and357 matched initial tensors. All41 bounded pins stay unchanged; no environment
 or native agent is constructed. The100k/200k schedule is6219/12469 updates.
+
+## Launched and startup checked
+
+The fresh Qbert B8/T32 comparison is **active**, starting14:31:43 UTC October29
+under source `07ce3dc`, service `kindle-qbert-context32-200k-20261029`, PID307065/
+invocation `7e5b79d7f445434187c3f3221a6117e4`. Startup passes all229 pins, exact
+config and357 finite initial tensors matching both control and bounded check.
+First updates504/520/536/552/568/584 and86 finite supervised reports in the
+1880-action inspected prefix match the schedule. Progress,100k recovery and
+postprocessing observers are active. Budget200k/12469 updates,45min training
+cap and four frozen arms stay fixed. No task result is available yet. Check
+actual service state; never restart because observation times out.
+
+Declaration SHA256
+`40c0f68ba3a836e56832c69a2efe370058b6085f5352d602dafb576b45851c07`.
+The prelaunch fixed protocol and executable inputs remain unchanged. This status
+update is outside that pinned copy. No preceding GPU stage was repeated.

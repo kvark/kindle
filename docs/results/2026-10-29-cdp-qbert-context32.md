@@ -1,5 +1,15 @@
 # Longer Qbert training sequences pass the bounded execution and cost check
 
+The fresh Qbert B8/T32 comparison is **active**, starting14:31:43 UTC October29
+under source `07ce3dc`, service `kindle-qbert-context32-200k-20261029`, PID307065/
+invocation `7e5b79d7f445434187c3f3221a6117e4`. Startup passes all229 pins, exact
+config and357 finite initial tensors matching both control and bounded check.
+First updates504/520/536/552/568/584 and86 finite supervised reports in the
+1880-action inspected prefix match the schedule. Progress,100k recovery and
+postprocessing observers are active. Budget200k/12469 updates,45min training
+cap and four frozen arms stay fixed. No task result is available yet. Check
+actual service state; never restart because observation times out.
+
 Fresh 12M48/Auto/N8/B8/T32/H15/R16 completes **8,192 actions / 32,756 emulator
 frames / 481 updates in 72.797s**. The subsequent 1,024-action frozen restore
 takes .788s with 4,096 frames and zero updates. No natural frozen episodes
