@@ -231,3 +231,31 @@ main PID223970/invocation587396941e1c4312b91578919b1650c9 now runs CPU audit;
 the full400k training label/input-pixel/action replay starts01:55:44. Its existing
 1800s inner/1830s outer caps remain. Comparison, exposure and terminal collection
 are still pending. No GPU repeat, cap increase, extension or successor is selected.
+
+
+## Complete result: retain the shorter R16 control
+
+The full training label/input-pixel/action replay passes, followed by comparison,
+coverage, exposure, curves and terminal collection. All228 declared inputs remain
+unchanged. All357 initial tensors match the retained12M control and bounded
+check;357 tensors are invariant in each frozen arm. Sampled and greedy initial
+semantic traces match their respective control exactly. The three recovery
+checks,12,489 finite supervised reports,changed CNN/reward/actor/value and all
+host guards pass. Both plots are visually inspected.
+
+Final greedy10042.708/23of24 first pyramids is16.20% below retained11984.375/24;
+training40m35s costs33.28% more than30m27s. Sampled7456.250/22 improves6759.375/24
+by10.31%,but both inference modes still miss the original mean15000 gate. Retain
+the200k/R16 control. No extension,seed confirmation,nearby ratio retry or automatic
+successor is selected by this result. The five-game goal remains unfinished.
+
+Main succeeds02:16:04 UTC on October29,whole1h03m17.041s;CPU postprocessing
+succeeds02:16:22,whole1h03m34.982s. Recovery and replacement progress observers
+also succeed. The original unsupported-option observer failure remains recorded;
+`progress-repair/collect_repaired.py` verifies it and the successful replacement.
+No GPU stage repeats or cap changes. All services are terminal;the GPU is idle.
+
+Completion`1f3eba07f3be98b31e1557d2e22573d3176cecc1dc6d8d9f291c2e05f43bf1c6`;
+learning`baff95ce8d30350eeb15626b8a6664dc4e419c5bd50fe09384301e6c3ea2ae02`;
+comparison`dc4ad5388433147cc5c12fcc041f890b9d2cd3dc064adb5c69f5d21b8b1f4b42`.
+See [the full result](../results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r8-costs-more-and-lowers-primary-greedy-quality).

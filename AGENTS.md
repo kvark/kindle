@@ -52,21 +52,21 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-Qbert12M48/B16/R8/expert100 finishes400k actions/1,599,459 frames/12,489
-updates in40m35s,within45min. All four frozen GPU arms finish by01:54:47 UTC
-on October29 with host guards passing. Provisional first3-per-lane replay scores:
-greedy10042.708/23of24 first pyramids versus own80.208/0;sampled7456.250/22
-versus177.083/0. Both miss15000;greedy trails retained200k/R16's11984.375/24.
-All228 pins remain unchanged and100k/200k/300k recoveries pass357 finite tensors.
-Main PID223970/invocation587396941e1c4312b91578919b1650c9 is active in CPU audit;
-full training label/pixel replay,comparison and terminal completion remain pending.
-No GPU repeat,extension,cap increase or successor is selected. See
-`docs/experiments/2026-10-29-cdp-qbert-expert100-r8.md`;check live state before GPU
-work. Original CPU progress-observer failure is retained;use
-`full/progress-repair/collect_repaired.py` only after required services succeed.
-The private replacement and all228 experiment pins remain unchanged. A.285s
-observer repair and1.953s retained Breakout CPU analysis co-hosted with training;
-keep those timing caveats. The Breakout analysis selects no GPU work.
+Qbert12M48/B16/R8/expert100 completes400k actions/1,599,459 frames/12,489
+updates in40m35s. Greedy10042.708/23of24 first pyramids is16.20% below retained
+200k/R16's11984.375/24,for33.28% more training time;sampled7456.250/22 rises
+from6759.375/24. Own initials80.208greedy/177.083sampled,zero pyramids. Both
+modes still miss mean15000. All228 pins,three recoveries,357 matching initial/
+invariant frozen tensors,paired initial semantic traces,finite reports,full
+label/pixel/action and frozen replays,guards,curves,coverage,exposure and
+comparison pass. Main succeeds02:16:04 UTC,postprocessing02:16:22 on October29.
+Original CPU progress-observer exit2 is preserved;the private replacement and
+repaired terminal collector pass. No GPU stage repeats or caps change. Retain
+200k/R16;no extension,seed confirmation or automatic successor is selected.
+The experience budget and ratio change together on reused4013;no isolated causal
+or reliability claim. Actual training overrides40.40975%;guided scores are not
+frozen competence. No learner or GPU allocation is active. See the completed
+R8 result in cheap-Qbert and its protocol;check live state before GPU work.
 
 The compatible RGB Qbert control completes200k actions/799,695 frames/24,970
 updates in28m41s. Greedy6090.625/24 first pyramids and sampled4335.417/23 are

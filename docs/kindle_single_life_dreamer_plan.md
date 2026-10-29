@@ -4,21 +4,21 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-Qbert12M48/B16/R8/expert100 finishes400k actions/1,599,459 frames/12,489
-updates in40m35s,within45min. All four frozen GPU arms finish by01:54:47 UTC
-on October29 with host guards passing. Provisional first3-per-lane replay scores:
-greedy10042.708/23of24 first pyramids versus own80.208/0;sampled7456.250/22
-versus177.083/0. Both miss15000;greedy trails retained200k/R16's11984.375/24.
-All228 pins remain unchanged and100k/200k/300k recoveries pass357 finite tensors.
-Main PID223970/invocation587396941e1c4312b91578919b1650c9 is active in CPU audit;
-full training label/pixel replay,comparison and terminal completion remain pending.
-No GPU repeat,extension,cap increase or successor is selected. See
-`docs/experiments/2026-10-29-cdp-qbert-expert100-r8.md`;check live state before GPU
-work. Original CPU progress-observer failure is retained;use
-`full/progress-repair/collect_repaired.py` only after required services succeed.
-The private replacement and all228 experiment pins remain unchanged. A.285s
-observer repair and1.953s retained Breakout CPU analysis co-hosted with training;
-keep those timing caveats. The Breakout analysis selects no GPU work.
+Qbert12M48/B16/R8/expert100 completes400k actions/1,599,459 frames/12,489
+updates in40m35s. Greedy10042.708/23of24 first pyramids is16.20% below retained
+200k/R16's11984.375/24,for33.28% more training time;sampled7456.250/22 rises
+from6759.375/24. Own initials80.208greedy/177.083sampled,zero pyramids. Both
+modes still miss mean15000. All228 pins,three recoveries,357 matching initial/
+invariant frozen tensors,paired initial semantic traces,finite reports,full
+label/pixel/action and frozen replays,guards,curves,coverage,exposure and
+comparison pass. Main succeeds02:16:04 UTC,postprocessing02:16:22 on October29.
+Original CPU progress-observer exit2 is preserved;the private replacement and
+repaired terminal collector pass. No GPU stage repeats or caps change. Retain
+200k/R16;no extension,seed confirmation or automatic successor is selected.
+The experience budget and ratio change together on reused4013;no isolated causal
+or reliability claim. Actual training overrides40.40975%;guided scores are not
+frozen competence. No learner or GPU allocation is active. See the completed
+R8 result in cheap-Qbert and its protocol;check live state before GPU work.
 
 The compatible RGB Qbert control completes200k actions/799,695 frames/24,970
 updates in28m41s. Greedy6090.625/24 first pyramids and sampled4335.417/23 are
@@ -165,6 +165,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Expert scale100, fixed100k](results/2026-10-25-cdp-cheap-qbert.md#expert100-gives-a-smaller-further-gain-at-the-same100k-budget) |100k /24,939|18m59s|Greedy8365.625 /263.542; sampled7339.583 /182.292|24/24 greedy,22/24 sampled pyramids; mean15k fails,one reused learner|
 | [Expert100,200k/R16](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-nearly-equal-updates-improves-qbert-with-higher-cost) |200k /24,970|26m07s|Greedy9654.167 /263.542; sampled7569.792 /182.292|23/24 greedy,24/24 sampled pyramids; mean15k fails,37.63% more time|
 | [Expert100,12M48/B16/200k/R16](results/2026-10-25-cdp-cheap-qbert.md#larger-strongly-supervised-qbert-improves-greedy-score-with-higher-cost) |200k /12,477|30m27s|Greedy11984.375 /80.208; sampled6759.375 /177.083|24/24 pyramids both modes;mean15k fails,16.57% more time|
+| [Expert100,12M48/B16/400k/R8](results/2026-10-25-cdp-cheap-qbert.md#more-experience-at-r8-costs-more-and-lowers-primary-greedy-quality) |400k /12,489|40m35s|Greedy10042.708 /80.208; sampled7456.250 /177.083|23/24 greedy,22/24 sampled pyramids;mean15k fails,primary16.20% lower for33.28% more time|
 | [Same, RGB64](results/2026-10-25-cdp-cheap-qbert.md#rgb64-costs-more-and-lowers-frozen-quality) |200k /49,939|22m20s|718.750 /180.208|0/24 pyramids; lower coverage|
 | [Same, intrinsic coefficient100](results/2026-10-25-cdp-cheap-qbert.md#coefficient100-does-not-improve-the-fixed-budget-result) |200k /49,939|20m12s|809.375 /180.208|0/24 pyramids; lower coverage|
 | [Same coefficient1, six actions](results/2026-10-25-cdp-cheap-qbert.md#six-action-choices-run-faster-but-reduce-frozen-coverage) |200k /49,939|18m21s|605.208 /148.958|0/24 pyramids; lower coverage|

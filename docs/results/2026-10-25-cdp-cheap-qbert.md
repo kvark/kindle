@@ -3144,3 +3144,74 @@ Root`/x/Temp/kindle-qbert-expert100-capacity-20261028/full`,trial
 learning`e84006962525e7616052aa75e970176b28fe63e65704dcedc49f79369e1584e1`,
 comparison`5d816b773b39daae47b31005364e7ffb836f409559b0d4ca0dfd60d1e5c3b3d6`.
 See the [fixed protocol and receipts](../experiments/2026-10-28-cdp-qbert-expert100-capacity.md).
+
+
+## More experience at R8 costs more and lowers primary greedy quality
+
+Fresh12M48/B16/R8/expert100 completes **400k actions /1,599,459 emulator frames /
+12,489 updates in40m35s**, within its45-minute cap. Primary greedy frozen mean
+**10,042.708 /23of24 first pyramids** is16.20% below the retained200k/R16
+control's11,984.375/24,for33.28% more training time. Sampled mean improves10.31%,
+6759.375→7456.250,but first pyramids fall24→22. Both modes miss the unchanged
+mean15000 gate. Retain the shorter200k/R16 recipe;no extension,seed confirmation,
+nearby ratio retry or automatic successor is selected.
+
+| Fresh recipe | Actions / updates | Training | Greedy final / initial | Sampled final / initial |
+|---|---:|---:|---:|---:|
+|12M48/B16/R16/expert100|200k /12,477|30m27s|11984.375 /80.208|6759.375 /177.083|
+|12M48/B16/R8/expert100|400k /12,489|40m35s|10042.708 /80.208|7456.250 /177.083|
+
+Experience doubles and replay ratio halves together, preserving similar update
+counts while changing optimizer cadence,warmup in actions and visited experience.
+This does not isolate ratio or experience or match wall cost. Keep Auto/N8/T16/
+H15/coefficient1/actor-unimix0/full18/original rates,20% episode continuation/
+cap1920/expert100/all18 weights1/world gradients/all-state corrective labels.
+Native447fe50,runner,teacher and other saved config remain unchanged. No previous
+weights,replay,belief,games,RNG or bounded-check experience are reused. Seed4013
+and evaluation4000004013 are reused development inputs,not independent confirmation.
+
+All228 inputs remain unchanged. Scheduled recoveries100k/3114,200k/6239 and
+300k/9364 pass. All357 initial tensors match control and bounded check;the1139
+sampled/1101 greedy initial semantic events match their corresponding control
+exactly. All12,489 reports are finite,CNN/reward/actor/value change,and357 tensors
+remain invariant in each frozen arm. Full training label/input-pixel/action
+replay,four frozen outcome replays/videos,host guards,curves,coverage,exposure
+and comparison pass. Both plots are visually inspected. The higher final online
+curve includes teacher actions and does not overturn the lower frozen result.
+
+Each frozen arm selects first3 natural episodes per8 lanes=24,with guidance off,
+zero updates and zero truncations. Each final arm collects25 natural episodes;
+each initial collects24,with excess episodes and partial tails retained. Four
+arms total104,512 actions /417,903 frames /63.134s. Mean first-pyramid coverage
+is20.958/21 greedy and20.917/21 sampled,versus own2.500/4.917. One selected greedy
+episode reaches15000;none sampled does. Ordinary frozen logs lack live pixel
+hashes;their action/reward/frame/boundary replays cannot prove equality to
+unavailable live images.
+
+The20% episode rule selects85/388 starts and actually overrides161,639 actions
+(40.40975%). Labels comprise301,367 NOOP and98,633 hops,238,361 passive states
+and48,759 actual/teacher disagreements. All12,489 reports are supervised;
+2,994,362 labeled replay rows equal weight sums,max raw world/actor loss
+difference7e-7. The82 completed guided episodes average15,268.598 with82 first
+pyramids;298 unguided online episodes average3022.567 with147. There are23,487
+native actions after a selected episode reaches its cap. These changing online
+samples are not unaided frozen competence,teacher accuracy or a causal diagnosis.
+
+Main starts01:12:47 UTC/source90a9475 and succeeds02:16:04 on October29,
+whole1h03m17.041s;CPU postprocessing succeeds02:16:22,whole1h03m34.982s.
+Training time excludes construction,evaluation and CPU audits;the full training
+replay alone takes1222.256s. Recovery and replacement progress observers succeed.
+The original progress observer exits2 at launch on unsupported`--seconds`;its
+script,journal and failure are preserved. The private replacement and repaired
+collector pass without changing any228 pins or repeating a GPU stage. No cap
+changes. CPU observer repair.285s and retained Breakout analysis1.953s co-host
+with training;retain those timing caveats without correcting measured wall time.
+The device is idle at completion;the five-game goal remains unfinished.
+
+Root`/x/Temp/kindle-qbert-expert100-r8-20261029/full`,trial
+`qbert-12m-48-b16-r8-expert100-400k-seed4013`. Completion
+`1f3eba07f3be98b31e1557d2e22573d3176cecc1dc6d8d9f291c2e05f43bf1c6`,
+learning`baff95ce8d30350eeb15626b8a6664dc4e419c5bd50fe09384301e6c3ea2ae02`,
+comparison`dc4ad5388433147cc5c12fcc041f890b9d2cd3dc064adb5c69f5d21b8b1f4b42`,
+training replay`7175a47255f52be777c6840529ec6d9894d046e9587875af1030679e05f43054`.
+See the [fixed protocol and preserved observer failure](../experiments/2026-10-29-cdp-qbert-expert100-r8.md).
