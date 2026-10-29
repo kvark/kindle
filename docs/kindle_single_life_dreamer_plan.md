@@ -4,6 +4,19 @@ Updated October28,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+One compatible Qbert RGB control is now the bounded comparison before further
+nearby CDP tuning. Reuse the completed4M48/B8/R16/expert100/200k CDP control;do
+not retrain it. Select only8192 RGB actions/994 updates plus1024 frozen actions,
+with native447fe50 unchanged and exactly centered/loss settings changed;keep
+rates,exploration,supervision,seed4013 and pixel geometry. Require399 tensors/
+342 shared initial matches and the fixed conservative cost projection<=35min
+before separately selecting at most one fresh200k RGB learner. Full learner is
+not selected. Seven CPU preparation cases pass;two preparation corrections and
+original bytes remain,no GPU attempt. A negative/inconclusive controlled result
+ends this nearby tuning direction,without another learner to rescue it. See the
+qbert-rgb-control protocol for fixed budgets/evaluations/stopping criteria;check
+live state before GPU work.
+
 Qbert12M48/B16/R16/expert100 completes200k actions/799,742 frames/12,477
 updates in30m27s. Greedy11984.375/24 first pyramids improves4M/B8's9654.167/23
 by24.14%,for16.57% more training time;sampled6759.375/24 falls below7569.792/24.
