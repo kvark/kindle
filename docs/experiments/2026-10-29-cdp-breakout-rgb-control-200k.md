@@ -95,3 +95,16 @@ checks retained journal identity for terminal services. All212 learner pins
 and original process identity stay unchanged;no GPU stage repeats or cap changes.
 See the result's terminal-collection section. The repair observer invokes the
 pinned collector exactly once after success;do not manually repeat it.
+
+## Completed outcome
+
+200k actions/799,437 frames/12,477 updates take27m36s,+23.63% over CDP.
+Sampled10.625/greedy16.750 are below13.208/17.875;own initials1.417/2.208
+match andall0/24 two-wall successes. Retain CDP;no RGB extension or second seed.
+All212 original/266 repair pins,100k recovery,399 invariant tensors,342 shared
+initial values,800/795 matching initial semantic events,replays/guards/plots/
+exposure/comparison pass. Main succeeds18:45:25 UTC/source531ce35. Original
+postprocess fails18:45:46 on eager ALE import in the plot interpreter;separate
+CPU-only lazy-import repair and collection succeed18:49:22 in4.655s. Original
+failures remain;no GPU or curve repeats. All services terminal,no GPU allocation.
+Completion exists;do not rerun collectors. See the linked completed result.

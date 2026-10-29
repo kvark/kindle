@@ -32,32 +32,23 @@ H15/R16 control for6029. CPU co-hosting caveats remain;no time correction.
 Root`/x/Temp/kindle-qbert-h5-seed6029-20261029/full`. No Qbert extension,third
 learner or automatic successor selected. The five-game goal remains unfinished.
 
-The [Breakout reconstruction check](docs/results/2026-10-29-cdp-breakout-rgb-control.md) completes8192 actions/32,726 frames/489 updates in59.857s;1024 frozen/.866s,
-zero updates/no natural episodes. All399 finite/invariant tensors,342 shared
-initial tensors,loss/config/counter/parameter-change/full pixel-action-label
-replay/guard checks pass after a CPU-only schema-name repair. Original service
-fails17:57:08 UTC after both successful GPU stages;38 optimizer prefixes are
-corrected separately,original156 inputs retained,176 repair pins pass,no GPU
-repeat. Repair succeeds17:59:54,collection18:01:33/source2261a7a. Fixed200k
-projection26m47s passes35min. The [fresh200k RGB comparison](docs/experiments/2026-10-29-cdp-breakout-rgb-control-200k.md) starts18:14:45 UTC October29/source531ce35 after1.188s CPU preflight.
-MainPID324938/invocation`23da92f687b74243812a8007db61ac5a`,212 pins,35min training
-cap,100k recovery and four frozen arms. Startup18:15:01 validates399 finite
-initial tensors,399 matches to bounded RGB and342 shared CDP values,firstsix
-updates and90 finite supervised reports;all212 pins unchanged. Original
-bounded failure/CPU repair retained;native447fe50 unchanged,no experience
-reuse. Full root`/x/Temp/kindle-breakout-rgb-control-20261029/full`,trial
-`breakout-rgb12m-64-b16-r16-expert100-200k-seed1009`. The100k recovery passes
-18:28:50 UTC:6227 updates,399 finite tensors and6371 finite reports in the
-complete102,312-action prefix;all212 pins unchanged. Recovery observer exits
-success;main/progress/post remain active,original PID/invocation unchanged.
-Training/evaluation/replays/comparison remain unfinished. The read-only terminal
-collector is now automated by`kindle-breakout-rgb-control-collection-repair-20261029`,
-PID327156/invocation`94465c790a5448fe81cb000c83adc7df`,started18:37:31 UTC.
-Use`terminal-collection/cpu-repair`;the original18:35:31 CPU observer failure
-is retained. Eight identity cases and four actual states pass;212 learner inputs
-stay unchanged,no GPU stage repeats. It writes completion only after all four
-original services succeed;do not manually rerun the exclusive collector.
-Check live state before GPU work;do not launch concurrent work or restart.
+The [completed Breakout reconstruction comparison](docs/results/2026-10-29-cdp-breakout-rgb-control.md) finishes200k actions/799,437 frames/12,477 updates in27m36s,23.63% slower
+than retained CDP. Sampled10.625 versus13.208 andgreedy16.750 versus17.875
+are lower;own initials1.417/2.208 match,bothzero of24 two-wall successes.
+Retain CDP12M64/B16/T16/H15/R16/expert100;no RGB extension/confirmation.
+All212 original/266 repair pins,100k recovery,399 finite/invariant tensors,
+399 bounded-matching/342 shared initial values,800/795 matching initial semantic
+events,full pixel/action/label and frozen replays/videos,guards,curves,exposure
+and comparison pass. Main succeeds18:45:25 UTC October29/source531ce35.
+Original postprocess fails18:45:46 on an eager ALE import in the plot environment;
+separate4.655s CPU repair completes18:49:22,no GPU or curve repeat. Original
+bounded-schema/collection-observer failures remain retained. Completion exists;
+do not rerun collectors. All services terminal,no GPU allocation active.
+Actual overrides114,085 (57.0425%);guided207.779 is not frozen competence.
+Late expert CE.704 versus CDP.696 gives no training-fit improvement;not a
+causal diagnosis. Reused1009/cohort,changed objective/head parameter count,
+2.402s CPU co-host caveat retained. Root`/x/Temp/kindle-breakout-rgb-control-20261029/full`.
+The five-game goal remains unfinished;check live state before GPU work.
 
 The completed [Breakout kernel action readout](docs/results/2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy) takes1.824s CPU and scores49.25% overall/47.06% near-paddle teacher agreement,
 below linear50.58%/49.26% and recorded policy54.58%/53.68%. No evidence for this

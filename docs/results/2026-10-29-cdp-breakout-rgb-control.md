@@ -1,4 +1,99 @@
-# Breakout reconstruction passes the bounded execution and cost check
+# Pixel reconstruction lowers frozen Breakout quality and costs more
+
+## Completed matched200k comparison: retain CDP
+
+One fresh reconstruction learner completes **200,000 aggregate actions /
+799,437 emulator frames /12,477 updates in27m36s** (1655.704s),within its35min
+cap. Training costs **23.63% more** than the retained CDP learner's22m19s.
+Both fixed frozen action modes score lower;the original90%-two-wall gate
+remains unmet. Retain CDP;no RGB extension,second seed,checkpoint selection
+or successor allocation is selected.
+
+| Fixed frozen result | Retained CDP | Reconstruction |
+| --- | ---: | ---: |
+| Sampled final,primary |13.208|10.625|
+| Sampled own actual initial |1.417|1.417|
+| Greedy final |17.875|16.750|
+| Greedy own actual initial |2.208|2.208|
+| Final two-wall successes,each mode |0/24|0/24|
+| Original training time |22m19s|27m36s|
+
+Each arm selects the first3 natural episodes per8 lanes=24;extra episodes and
+partial tails remain retained. All four reconstruction arms total41,720 actions/
+166,730 emulator frames/27.511s,with zero learner updates or truncations.
+Guidance and labels are disabled. The comparison does not turn improved
+training curves or a score gain over initialization into task-gate success.
+
+Keep12M64/Auto/N8/B16/T16/H15/R16,full18,actor-unimix.01,all rates/warmup,
+action-effects1,replay100k,seed1009/evaluation4000001009,native447fe50 and
+the same feedback pixel teacher. Only centered true→false,reconstruction0→1
+and future prediction500→0 change. A matched RGB runner preserves CDP's split
+rates and exploration;stock RGB CLI would change them. Decoder/predictor heads
+and parameter counts differ:14,457,556 versus16,334,353. No training state or
+experience is reused. Native max-pooled frames receive one GPU64 resize.
+
+All399 finite initial/final and invariant frozen tensors pass,including399
+initial values matching the bounded RGB check and342 shared values matching
+CDP. Complete actual-initial sampled/greedy semantic traces match CDP exactly:
+800/795 events,excluding source/config/timing identity. Exact configs,counters,
+source/runtime pins,12,477 finite reports,positive reconstruction/zero future
+loss,changed CNN/reward/decoder/actor/value,100k recovery at6227 updates,full
+training pixel/action/corrective-label replay,frozen outcome replays/videos and
+all host guards pass. Both curve and comparison plots are visually inspected.
+Ordinary frozen logs have no live pixel hashes;that scope limit remains.
+
+The20% episode rule selects71/347 starts but overrides114,085 actions
+(**57.0425%**). There are85,915 passive labels,50,330 teacher/actual action
+disagreements and1367 native actions after guidance release. All12,477 reports
+are supervised;2,988,745 labeled replay rows equal their weight sum,with maximum
+raw world/actor expert-loss difference8e-7. Completed guided/unguided online
+means are207.779/5.262,not frozen competence. Final50k-action expert CE per
+valid label is.704287 versus CDP.695816;the alternative objective does not
+show a useful training-fit improvement on these changing replay distributions.
+
+Seed1009,the evaluation cohort and the CDP outcome were reused development
+evidence. This controls experience/settings,not parameter count or wall cost.
+The2.402s completed-life CPU analysis co-hosting remains a timing caveat with
+no subtraction. Neither this negative reconstruction result nor the earlier
+Qbert control establishes five-game CDP superiority or rules out other pixel
+objectives. Precise state information,teacher ambiguity and optimization remain
+possible issues;this comparison does not isolate the cause of weak control.
+
+## Full-run terminal state and CPU postprocessing repair
+
+The main service starts18:14:45 UTC October29/source`531ce35`,retaining
+PID324938/invocation`23da92f687b74243812a8007db61ac5a`. Training finishes18:42:26.
+All four frozen stages and full replay/audits finish successfully;main exits
+**18:45:25**,after30m40.163s total service wall time.
+
+The separate postprocessing service fails **18:45:46** after its curve succeeds.
+The copied checkpoint helper eagerly imports`summarize_cdp`,which indirectly
+requires`ale_py`;the plotting interpreter intentionally lacks that game package.
+The earlier CPU preflight used the Atari interpreter and missed this dependency.
+The automatic collector correctly stops18:46:02 on that failed postprocess.
+Its own earlier unloaded-invocation error and repair are retained below.
+
+A separate`full/cpu-repair` moves that import into the unused checkpoint-audit
+function. The comparison/invariance function ASTs remain identical. Preflight
+uses the actual plot interpreter,forbids ALE/native imports,and checks both
+trial readers,399 bounded and342 shared initial tensors. The repaired wrapper
+then runs only the pending comparison and exposure analysis;the successful
+curve,training,evaluations and replays are not repeated. All212 original inputs
+and266 repair pins remain unchanged. Repair and collection complete
+**18:49:22 UTC in4.655s**. Original failed services,journals,scripts and command
+receipts stay unchanged. All services are terminal;no GPU allocation is active.
+
+Full evidence root:`/x/Temp/kindle-breakout-rgb-control-20261029/full`,trial
+`breakout-rgb12m-64-b16-r16-expert100-200k-seed1009`. The exclusive completion
+receipt already exists;do not rerun the collectors.
+
+- Learning review:`219fba47adec727f78b2a3521576a94c8607f9f4b28086d4bf70931b45cd8bb6`.
+- Guided replay:`0af16134e01a885514affffd6dd746eac57335da6c2f8ba53917482fe41f39aa`.
+- Comparison:`a1f45cc06cbc1b86a74ff679653f572f2e285bc93d69debfbecc925fcc9e705f`.
+- CPU repair:`aab91e1e84122587feb79b1c1d1989073f4f471f378d255b558fe2afe6b56bf4`.
+- Completion:`c9875818e3e4c25e6c8610f7783344e1c9114182aa9f5c1396dc135d1a136aad`.
+
+## Earlier bounded execution and cost check
 
 The existing native reconstruction model completes **8,192 aggregate actions /
 32,726 emulator frames /489 updates in59.857s**. A1024-action/4096-frame greedy
@@ -97,7 +192,7 @@ evidence are pinned before launch. The selected training cap remains35min;
 this preflight is execution evidence,not a task outcome.
 
 
-## Fresh200k comparison active
+## Fresh200k launch and midpoint,now completed
 
 The selected fresh life starts18:14:45 UTC October29/source`531ce35`,main
 PID324938/invocation`23da92f687b74243812a8007db61ac5a`,under
@@ -105,14 +200,14 @@ PID324938/invocation`23da92f687b74243812a8007db61ac5a`,under
 the corrected schema and prior failure/repair. Training has a35min cap and
 100k recovery;four final/actual-initial sampled/greedy arms,full replays,
 curves,exposure and comparison follow automatically. No check/control
-experience is reused. The main and three observers are active.
+experience is reused. At startup,the main and three observers were active.
 
 Startup18:15:01 passes:399 finite initial tensors,399 matching bounded RGB
 initial values,342 shared CDP initial values,expected updates at376/392/408/
 424/440/456,1800 observed actions and90 finite supervised reports with positive
 reconstruction/zero future loss. All212 pins and original process identity
 match. These are startup checks,not frozen task results;training and audits
-remain unfinished. No extension,second seed or successor allocation selected.
+were unfinished at startup;completion is reported above. No extension,second seed or successor allocation selected.
 
 Root:`/x/Temp/kindle-breakout-rgb-control-20261029/full`,trial
 `breakout-rgb12m-64-b16-r16-expert100-200k-seed1009`.
@@ -154,10 +249,10 @@ journal identities and failures;all four actual service states also pass.
 
 Service`kindle-breakout-rgb-control-collection-repair-20261029` starts18:37:31
 UTC/source`cb09d72`,PID327156/invocation`94465c790a5448fe81cb000c83adc7df`.
-It is verified live;all11 collection pins and212 learner inputs remain unchanged,
-as does learner PID324938/invocation`23da92f687b74243812a8007db61ac5a`. It waits
-for the four original services to succeed,then invokes the existing pinned
-CPU collector once. An observation timeout never starts/stops/restarts a
+It was verified live;all11 collection pins and212 learner inputs remained unchanged,
+as does learner PID324938/invocation`23da92f687b74243812a8007db61ac5a`. It waited
+for the four original services to succeed,but correctly stopped18:46:02 on
+the postprocessing failure. The separate completion repair is reported above. An observation timeout never starts/stops/restarts a
 service or changes an allocation cap. Do not manually repeat the exclusive
 collector while this observer is pending or after completion exists.
 

@@ -62,6 +62,13 @@ results. Declaration SHA256
 `59095424e582115e51c11d6aa9b27c59ddb232d57bb9cab24845903713e98009`;
 review`008b4feff22b3034dcab88bfbd329e0c4edba904d56014375e4f199e04eeb89b`.
 
+The subsequently completed [matched reconstruction control](2026-10-29-cdp-breakout-rgb-control.md) has final50k-action expert CE.704287 versus CDP.695816,with lower
+frozen sampled/greedy scores10.625/16.750 versus13.208/17.875 and23.63% more
+training time. Its matched initial tensors/traces and all audits pass after
+a CPU-only plotting import repair. This supplies no evidence that this pixel
+objective fixes Breakout's training-fit/control gap. It does not isolate the
+cause or rule out other representation objectives;retain CDP.
+
 ## Breakout action readouts do not outperform its retained policy
 
 The [completed linear and nonlinear readouts](2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy)
