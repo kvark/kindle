@@ -136,5 +136,30 @@ matching both retained control and bounded check,and first updates at376/408/
 440/472/504/536 actions. The first checked864-action prefix has16 finite
 supervised reports. This is execution evidence only;final frozen task quality
 is pending. Main,progress,recovery and terminal CPU postprocessing services are
-active. No failed attempt or GPU stage repeat occurs. Keep the declared caps,
+active at launch. The read-only progress observer failure below is preserved;
+no GPU stage repeats. Keep the declared caps,
 recoveries and four final assessments;no additional learner is selected.
+
+## Read-only progress observer repaired without changing training
+
+The original progress service exits2 at01:12:47 UTC because its pinned launch
+command passes unsupported`--seconds 7200` to the retained positional-only
+observer. GPU-command parsing had passed,but did not cover this CPU observer
+command. Preserve the original launch script,observer bytes and failed journal;
+all228 experiment pins remain unchanged. The learner stays PID223970/invocation
+587396941e1c4312b91578919b1650c9;recovery and terminal CPU audit services continue.
+No GPU stage is stopped or repeated and no experiment cap changes.
+
+A private observer copy changes only its internal3600s wait to7200s and uses the
+supported positional CLI. Its actual parser and both repair scripts compile on
+CPU without native/environment construction. The preparation command reports
+.285s wall time while co-hosted with training;retain this caveat without timing
+correction. Replacement`kindle-qbert-expert100-r8-progress-repaired-20261029`
+starts01:15:17 UTC,PID224323/invocationb2eed45b57f34faea48f9993343b9657.
+
+Use`full/progress-repair/collect_repaired.py` at terminal completion. It requires
+successful main/postprocess/recovery/replacement progress services,verifies the
+original progress exit2 and repair pins,and retains that failure in the final
+completion review. The original pinned collector remains untouched. Repair
+receipt,launch and original journal are in`full/progress-repair`;no automatic
+retry of the learner,checkpoint selection or extension is authorized by this repair.

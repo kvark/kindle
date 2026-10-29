@@ -14,7 +14,11 @@ runner,teacher and other12M settings unchanged. No cap increase,retry,checkpoint
 selection,extension or automatic successor. The bounded48.107s check passes all
 45 pins/replays/guards;conservative400k estimate43m04s. Frozen benefit remains
 unmeasured. See`docs/experiments/2026-10-29-cdp-qbert-expert100-r8.md` and check
-live state before GPU work. No second learner may run concurrently.
+live state before GPU work. No second learner may run concurrently. The original
+CPU progress observer rejects an unsupported option;its failure is retained. A
+private replacement starts01:15:17 UTC with the same learner PID/invocation and
+all228 pins unchanged. Use`full/progress-repair/collect_repaired.py` at completion;
+no GPU stage repeats.
 
 The compatible RGB Qbert control completes200k actions/799,695 frames/24,970
 updates in28m41s. Greedy6090.625/24 first pyramids and sampled4335.417/23 are
