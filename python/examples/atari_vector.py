@@ -99,6 +99,8 @@ def main():
                         help="optional CDP world supervision from one replay start, without future observations")
     parser.add_argument("--open-loop-scale", type=float,
                         help="scale for open-loop supervision; requires open-loop-length, omitted: 1")
+    parser.add_argument("--breakout-centroid-scale", type=float,
+                        help="fresh Breakout CDP only: native training loss for a pixel-derived ball position")
     parser.add_argument("--train-ratio", type=float, default=256)
     parser.add_argument("--learning-rate", type=float, default=0.00004,
                         help="fresh base rate; CDP encoder/dynamics rates scale proportionally from default4e-5")
@@ -182,6 +184,12 @@ def main():
     if args.open_loop_length is not None and (not args.cdp or args.encoder_checkpoint
                                              or not 2 <= args.open_loop_length < args.batch_length):
         parser.error("open-loop-length requires learned CDP and 2 <= length < batch-length")
+    if args.breakout_centroid_scale is not None:
+        if not positive_f32(args.breakout_centroid_scale):
+            parser.error("breakout-centroid-scale must be positive finite F32")
+        if (args.environment != "ALE/Breakout-v5" or not args.cdp or args.encoder_checkpoint
+                or args.evaluate or args.observation_size not in (None, "native")):
+            parser.error("breakout-centroid-scale requires fresh Breakout CDP training with native frames")
     if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
         parser.error("GPU budget headroom must be positive")
     if args.greedy and not args.evaluate:
@@ -278,6 +286,7 @@ def main():
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
     training_options.update(("--open-loop-length", "--open-loop-scale"))
+    training_options.add("--breakout-centroid-scale")
     training_options.add("--behavior-learning-rate")
     training_options.add("--encoder-learning-rate")
     training_options.add("--cdp")
@@ -305,6 +314,8 @@ def main():
         parser.error("guidance world gradient requires native world-gradient support")
     if args.open_loop_length is not None and not getattr(kindle.VectorAgent, "SUPPORTS_OPEN_LOOP_SUPERVISION", False):
         parser.error("open-loop supervision requires native open-loop support")
+    if args.breakout_centroid_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COLOR_CENTROID_SUPERVISION", False):
+        parser.error("centroid supervision requires native color-centroid support")
     if args.restore and args.encoder:
         metadata = json.loads((args.restore / "metadata.json").read_text())
         if (metadata.get("perception") or {}).get("kind") != args.encoder:
@@ -402,6 +413,9 @@ def main():
                 scale=1.0 if args.open_loop_scale is None else args.open_loop_scale)
         if args.behavior_learning_rate is not None:
             config["behavior_learning_rate"] = args.behavior_learning_rate
+        if args.breakout_centroid_scale is not None:
+            config["color_centroid_supervision"] = dict(scale=args.breakout_centroid_scale,
+                channel=0, background_scale=1.5, region=[8/160, 90/210, 152/160, 185/210])
         if args.guidance_imitation_scale is not None:
             weights = [1.0] * actions
             noop = environments[0].action_meanings.index("NOOP")

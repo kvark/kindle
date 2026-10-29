@@ -207,6 +207,16 @@ pub struct FeatureStandardization {
     pub scale: Vec<f32>,
 }
 
+/// Training-only position targets derived from a color within a fixed image
+/// region. The region is [x0, y0, x1, y1] in full-image normalized coordinates.
+#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct ColorCentroidSupervision {
+    pub scale: f32,
+    pub channel: usize,
+    pub background_scale: f32,
+    pub region: [f32; 4],
+}
+
 /// Optional supervised actor targets from explicitly trusted executed actions.
 /// Weights are applied before averaging over all replay rows, not renormalized
 /// within each minibatch; rare actions therefore retain their relative weight.
@@ -272,6 +282,8 @@ pub struct DreamerConfig {
     pub world_microbatch_size: Option<usize>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub open_loop_supervision: Option<OpenLoopSupervision>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub color_centroid_supervision: Option<ColorCentroidSupervision>,
     pub replay_context: usize,
     /// Replay samples per action. Zero disables scheduled updates; explicit
     /// `DreamerCore::learn` remains available for isolated diagnostics.
@@ -361,6 +373,7 @@ impl DreamerConfig {
             world_backprop_length: 8,
             world_microbatch_size: None,
             open_loop_supervision: None,
+            color_centroid_supervision: None,
             replay_context: 1,
             train_ratio: 32.0,
             imagination_length: 15,
@@ -578,6 +591,33 @@ impl DreamerConfig {
                 }))
         {
             return Err("expert imitation requires positive finite scale and nonnegative finite action weights".into());
+        }
+        if let Some(centroid) = &self.color_centroid_supervision {
+            let [x0, y0, x1, y1] = centroid.region;
+            let side = self.observation_grid();
+            let contains_center = |low, high| {
+                (0..side).any(|i| {
+                    let center = (i as f32 + 0.5) / side as f32;
+                    center >= low && center < high
+                })
+            };
+            if !self.observation_kind.is_rgb()
+                || !centroid.scale.is_finite()
+                || centroid.scale <= 0.0
+                || centroid.channel >= 3
+                || !centroid.background_scale.is_finite()
+                || centroid.background_scale <= 0.0
+                || centroid
+                    .region
+                    .iter()
+                    .any(|x| !x.is_finite() || !(0.0..=1.0).contains(x))
+                || x0 >= x1
+                || y0 >= y1
+                || !contains_center(x0, x1)
+                || !contains_center(y0, y1)
+            {
+                return Err("color centroid requires RGB, positive finite scales, channel0..2 and a nonempty normalized region".into());
+            }
         }
         if self.cdp_centered
             && (!self.is_cdp()

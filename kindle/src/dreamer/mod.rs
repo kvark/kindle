@@ -30,8 +30,8 @@ pub use agent::{
     LearnTiming, ModelProvenance, VectorDreamerAgent, WorldMetrics,
 };
 pub use config::{
-    DreamerConfig, ExpertImitation, FeatureStandardization, LossScales, ModelSize, NetworkSize,
-    ObservationKind, OpenLoopSupervision, TrainingPrecision, VideoEncoder,
+    ColorCentroidSupervision, DreamerConfig, ExpertImitation, FeatureStandardization, LossScales,
+    ModelSize, NetworkSize, ObservationKind, OpenLoopSupervision, TrainingPrecision, VideoEncoder,
 };
 pub use replay::{FrameFlags, Reward};
 

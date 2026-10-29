@@ -113,6 +113,24 @@ def audit(path):
             check(open_loop["scale"] > 0 and config.get("observation_kind") in ("rgb32", "rgb48", "rgb64")
                   and config.get("loss_scales", {}).get("future_prediction", 0) > 0,
                   "open-loop supervision requires positive scale and CDP")
+        centroid = config.get("color_centroid_supervision")
+        if centroid is not None:
+            check(isinstance(centroid, dict) and set(centroid) == {
+                "scale", "channel", "background_scale", "region"}, "invalid centroid config")
+            require_numbers(centroid)
+            check(type(centroid["channel"]) is int and 0 <= centroid["channel"] < 3
+                  and centroid["scale"] > 0 and centroid["background_scale"] > 0,
+                  "invalid centroid channel/scales")
+            geometry = config.get("observation_kind")
+            check(geometry in ("rgb32", "rgb48", "rgb64"), "centroid requires RGB")
+            region = centroid["region"]
+            check(isinstance(region, list) and len(region) == 4
+                  and all(0 <= value <= 1 for value in region), "invalid centroid region")
+            x0, y0, x1, y1 = region
+            side = int(geometry[3:])
+            check(x0 < x1 and y0 < y1
+                  and all(any(low <= (i+.5)/side < high for i in range(side))
+                          for low, high in ((x0, x1), (y0, y1))), "empty centroid region")
         exploration = None
         guidance = False
         if header["protocol"] == EXPLORATION_PROTOCOL:
@@ -296,6 +314,15 @@ def audit(path):
                 check(event["run_step"] == actions and pending_updates > 0, "unexpected learner update")
                 report = event["report"]
                 require_numbers(report)
+                position = report.get("world", {}).get("color_centroid_supervision")
+                check((position is not None) == (centroid is not None), "centroid report/config mismatch")
+                if position is not None:
+                    check(isinstance(position, dict) and set(position) == {"loss", "valid_fraction"},
+                          "invalid centroid report")
+                    check(position["loss"] >= 0 and 0 <= position["valid_fraction"] <= 1,
+                          "invalid centroid loss/support")
+                    check(position["valid_fraction"] > 0 or position["loss"] == 0,
+                          "absent centroid rows have nonzero loss")
                 rollout = report.get("world", {}).get("open_loop_supervision")
                 check((rollout is not None) == (open_loop is not None), "open-loop report/config mismatch")
                 if rollout is not None:

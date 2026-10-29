@@ -133,6 +133,8 @@ pub struct WorldMetrics {
     pub expert_imitation_loss: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub open_loop_supervision: Option<OpenLoopMetrics>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub color_centroid_supervision: Option<ColorCentroidMetrics>,
     pub replay_reward_prediction_mean: f32,
     pub replay_reward_target_mean: f32,
     pub replay_reward_mae: f32,
@@ -151,6 +153,12 @@ pub struct WorldMetrics {
     pub replay_continuation_prediction_mean: f32,
     pub replay_continuation_target_mean: f32,
     pub replay_continuation_mae: f32,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct ColorCentroidMetrics {
+    pub loss: f32,
+    pub valid_fraction: f32,
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -1671,6 +1679,12 @@ impl DreamerCore {
                 #[cfg(test)]
                 meganeura::profiler::record_instant("phase:world_wait_done");
                 metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
+                if self.config.color_centroid_supervision.is_some() {
+                    let centroid = metrics.color_centroid_supervision.get_or_insert_default();
+                    centroid.loss += read_scalar(&self.world_train, world::LOSS_COLOR_CENTROID);
+                    centroid.valid_fraction +=
+                        read_scalar(&self.world_train, world::COLOR_CENTROID_VALID_FRACTION);
+                }
                 if self.config.open_loop_supervision.is_some() {
                     let rollout = metrics.open_loop_supervision.as_mut().unwrap();
                     rollout.total_loss += read_scalar(&self.world_train, world::LOSS_OPEN_LOOP);
@@ -1723,6 +1737,11 @@ impl DreamerCore {
         }
         let scale = 1.0 / pass_count as f32;
         metrics.total_loss *= scale;
+        if let Some(centroid) = &mut metrics.color_centroid_supervision {
+            centroid.loss *= scale;
+            centroid.valid_fraction *= scale;
+            assert!(centroid.loss.is_finite() && centroid.valid_fraction.is_finite());
+        }
         if let Some(rollout) = &mut metrics.open_loop_supervision {
             for value in [
                 &mut rollout.total_loss,

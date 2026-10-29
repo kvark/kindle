@@ -34,9 +34,12 @@ pub const LOSS_OPEN_LOOP: usize = 15;
 pub const LOSS_OPEN_LOOP_PREDICTION: usize = 16;
 pub const LOSS_OPEN_LOOP_REWARD: usize = 17;
 pub const LOSS_OPEN_LOOP_CONTINUATION: usize = 18;
+pub const LOSS_COLOR_CENTROID: usize = 19;
+pub const COLOR_CENTROID_VALID_FRACTION: usize = 20;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 mod cdp;
+mod color_centroid;
 mod open_loop;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
@@ -288,6 +291,16 @@ fn training_graph(
     let size = config.network();
     let mut graph = Graph::new();
     let model = WorldModel::new(&mut graph, config);
+    let centroid_head = config.color_centroid_supervision.as_ref().map(|_| {
+        MlpHead::new(
+            &mut graph,
+            "world.color_centroid",
+            config.feature_dim(),
+            size.units,
+            1,
+            2,
+        )
+    });
     let mut deter = graph.input("initial_deter", &[batch, size.deter]);
     let mut stoch = graph.input("initial_stoch", &[batch * size.stoch, size.classes]);
 
@@ -335,6 +348,8 @@ fn training_graph(
     let mut initial_policy_losses = Vec::new();
     let mut initial_value_losses = Vec::new();
     let mut expert_losses = Vec::new();
+    let mut centroid_losses = Vec::new();
+    let mut centroid_valid = Vec::new();
     let mut deters = Vec::new();
     let mut stochs = Vec::new();
     let mut actions = Vec::new();
@@ -503,6 +518,27 @@ fn training_graph(
             .expert_world_gradient()
             .then(|| target("expert_action_target", config.action_count));
         let reward_weight = graph.constant(vec![1.0; rows], &[rows, 1]);
+
+        if let (Some(head), Some(settings)) = (&centroid_head, &config.color_centroid_supervision) {
+            let start = group * time_batch_length;
+            let pixels = stack_time(
+                &mut graph,
+                &observations[start..start + chunk.len()],
+                batch,
+                config.observation_dim(),
+            );
+            let prediction = head.forward(&mut graph, state);
+            let (loss, valid) = color_centroid::loss(
+                &mut graph,
+                settings,
+                pixels,
+                prediction,
+                rows,
+                config.observation_grid(),
+            );
+            centroid_losses.push(loss);
+            centroid_valid.push(valid);
+        }
 
         if let Some(predictor) = &model.future_predictor {
             // Each row uses deter_t, before posterior_t consumes observation_t.
@@ -715,6 +751,18 @@ fn training_graph(
     } else {
         total
     };
+    let centroid = config.color_centroid_supervision.as_ref().map(|settings| {
+        let loss = sum(&mut graph, &centroid_losses);
+        let loss = graph.scale(loss, head_average);
+        let valid = sum(&mut graph, &centroid_valid);
+        let valid = graph.scale(valid, head_average);
+        (graph.scale(loss, settings.scale), loss, valid)
+    });
+    let total = if let Some((scaled, _, _)) = centroid {
+        graph.add(total, scaled)
+    } else {
+        total
+    };
     let mut outputs = vec![
         total,
         reconstruction,
@@ -749,6 +797,12 @@ fn training_graph(
             outputs.push(graph.scalar(0.0));
         }
         outputs.extend(losses.outputs);
+    }
+    if let Some((_, loss, valid)) = centroid {
+        while outputs.len() < LOSS_COLOR_CENTROID {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([loss, valid]);
     }
     if sample_posterior {
         outputs.push(stack_time(&mut graph, &deters, batch, size.deter));
