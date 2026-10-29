@@ -1,5 +1,17 @@
 # CDP handover — October25,2026
 
+The October29 learning diagnosis completes both48256-action frozen Qbert12M
+captures in207.599/207.409s, zero updates. Fifteen-step reward-sum MAE falls
+107.570 initial→37.499 trained; unrelated actions give69.538. Later-play errors
+are substantially larger, but forecasts remain useful through15 steps. All39
+pins,357 invariant tensors, recorded trajectories/pixel hashes and guards pass;
+service exits06:18:53 UTC. No new loss or training allocation is selected.
+Next diagnostic direction: critic calibration and actual alternative-action
+outcomes. The optional greedy-posterior draft is separate and still uncommitted;
+its CPU tests passed, but no new native runtime was built or GPU-tested.
+See [result and source audit](results/2026-10-29-cdp-learning-diagnosis.md).
+No GPU allocation is active; check live state before work.
+
 Breakout12M64/B16/R16/expert100 completes 200k actions /799,464 frames /12,477
 updates in22m19s. Frozen sampled13.208/greedy17.875 improve4M/B8's9.458/12.208
 by39.65%/46.42%, for25.72% more training time; own initials1.417/2.208.

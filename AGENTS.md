@@ -18,6 +18,17 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+The October29 architecture diagnosis is within the existing five-game goal.
+Retained Qbert12M frozen forecasts preserve useful15-step reward information:
+cumulative MAE107.570 initial→37.499 trained, versus69.538 with unrelated actions.
+Before/after-first-pyramid MAE2.347/45.259 identifies later-play weakness, with
+different reward distributions. Both48256-action captures preserve357 tensors;
+all39 pins/guards pass, zero updates, service exits06:18:53 UTC. Prioritize critic
+calibration and actual alternative-action outcomes before assuming a multi-step
+loss will solve the gap. No successor GPU allocation is selected. The separate
+greedy-posterior draft remains uncommitted and has no new native/GPU validation.
+See [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md); check live state.
+
 Training is the priority. Backend optimization, upstream porting and JAX parity
 are parked. The selected architecture is **centered CDP**, with a jointly learned
 CNN, categorical RSSM and imagined actor/critic. No pretrained DINO or Tiny JEPA

@@ -1,0 +1,139 @@
+# Qbert retains useful forecasts; later-game accuracy and policy use remain open
+
+The first investigation within the existing five-game goal finds useful
+action-conditioned15-step reward forecasts in the strongest retained Qbert
+learner. This does not support treating a wholesale collapse of imagination as
+the established cause of its11984.375 greedy score. Errors are substantially
+larger after the first pyramid, and prediction quality on recorded trajectories
+does not establish correct ranking of alternative actions.
+
+## Frozen forecast result
+
+Both the retained12M48/B16/R16/expert100 final model and its actual initial model
+re-observe the same48256 recorded actions /192980 emulator frames. Captures take
+207.599s and207.409s respectively, with zero updates. The128-action check takes
+3.700s. The complete service starts06:11:50 UTC and succeeds06:18:53 on October29,
+using native447fe50, Auto precision and the RX7900XT. No training is resumed.
+
+The first natural episode in each of eight lanes supplies calibration baselines;
+the next two supply16 evaluation episodes. One-step analysis covers27102 actions.
+The common-horizon comparison uses1681 origins with valid15-action futures within
+one episode. These are reused development trajectories from the retained greedy
+evaluation, not independent learner confirmation.
+
+| Measurement | Actual initial | Trained, recorded actions | Trained, unrelated actions |
+| --- | ---: | ---: | ---: |
+| One-step positive-reward AUC, all test actions | .500 | .978 | .972 |
+| 15-step endpoint positive-reward AUC | .500 | .938 | .673 |
+| 15-step cumulative reward MAE | 107.570 | 37.499 | 69.538 |
+
+Repeating the previous reward15 times gives cumulative MAE100.119; the
+calibration-mean baseline gives153.956. On common valid origins, cumulative MAE
+at horizons1/3/5/10/15 is2.569/7.096/11.583/24.234/37.499. Endpoint AUC is
+.976/.966/.954/.945/.938. Absolute cumulative error naturally grows with horizon;
+these measurements retain useful information through15 actions.
+
+The phase split identifies a more specific weakness:
+
+| Origin phase | One-step reward MAE | 15-step cumulative MAE | Mean actual15-step reward sum |
+| --- | ---: | ---: | ---: |
+| Before first pyramid | .176 | 2.347 | 50.822 |
+| After first pyramid | 3.123 | 45.259 | 120.098 |
+
+The15-step samples number304 before and1377 after. The reward distribution also
+changes, so this is not an isolated effect of reaching another level. Correcting
+the state with the actual target observation lowers15-step endpoint reward MAE
+from.345 to.254 before, and4.579 to2.603 after. Both head/state accuracy and
+free-running prediction warrant further inspection in later play.
+
+An exploratory magnitude grouping finds1584 test transitions with reward100:
+one-step prior and corrected-posterior predictions average85.855 and86.134.
+For1289 reward25 transitions they average21.089 and21.235. This localizes some
+reward underestimation even after observing the frame; it does not identify the
+mechanism or prove that this bias changes the preferred action.
+
+Terminal evidence is sparse:16 one-step terminations and only2 at the sampled
+15-step endpoints. One-step Brier score.000584 is only slightly below the
+always-continuing baseline.000590. AUC alone does not establish calibrated death
+risk, and the full-game terminal target does not label every lost life.
+
+## What is already in the loss
+
+Source inspection confirms that CDP predicts the detached current CNN encoding
+from the recurrent state before that observation is consumed. Successive
+training states then receive real observations. Reward and continuation heads
+train on these corrected posterior states. The imagined actor instead uses
+prior rollouts without those corrections. There is no direct multi-step
+free-running supervised loss against recorded future targets.
+
+The critic already combines imagined and real-replay losses; replay scale is.3.
+The latter bootstraps with imagined returns from replay states, including in
+the active GPU kernel `targets_returns.wgsl::replayed`. Consequently it is not
+an independent Monte Carlo validation of model-generated targets. Intrinsic
+disagreement rewards also enter these targets. No missing-loss bug or causal
+policy failure is established by this audit.
+
+## Measured update cost
+
+Summing the12477 saved learner timing records for each latest12M learner gives:
+
+| Recorded update phase | Qbert | Breakout |
+| --- | ---: | ---: |
+| Imagination and target generation | 46.62% | 40.68% |
+| World training | 27.34% | 30.92% |
+| Posterior-state preparation | 16.78% | 16.53% |
+| Behavior training | 5.80% | 5.62% |
+| Other recorded update work | 3.46% | 6.24% |
+
+Recorded update totals are1175.345s and1180.487s, within original training walls
+1826.985s and1339.198s. This is phase accounting, not GPU utilization or a
+breakdown of the remaining acting, adapter, checkpoint and logging time.
+Imagination is a major cost, making its contribution to policy improvement an
+important learning-efficiency question. Shortening it is not automatically a
+win; the previous Pong H5 comparison lost score.
+
+## Interpretation and next diagnostic direction
+
+Prioritize live-belief critic calibration and actual branched action outcomes,
+especially after the first pyramid. Good forecasts along recorded paths do not
+prove that selecting a different action improves actual returns. The unrelated
+actions above are a sensitivity control evaluated against the original outcomes;
+their true counterfactual outcomes were not collected.
+
+A multi-step world loss remains a reasonable candidate, but this result does not
+establish that adding it is the best next training allocation. A paired real/model
+update experiment must control behavior distribution and intrinsic targets; naive
+off-policy actor updates would confound the comparison. No new loss, extension,
+fresh learner or automatic successor allocation is selected by this result.
+
+## Validation and retained evidence
+
+All39 declared input pins remain unchanged. Both full captures preserve all357
+tensors byte-for-byte (280 world,66 behavior,11 slow-value), and all predictions
+are finite. Eight per-stream prefix checks, counters, recorded rewards/boundaries,
+frame counts and host guards pass. Final/initial input trajectories and pixel
+hashes match across all eight streams; stream0 also matches the retained replay
+video hash. Minimum sampled device-budget headroom is14.59GiB. No GPU stage is
+repeated and no host recovery occurs. The forecast helper's historical346 count
+assumption is removed while full tensor-key/shape/dtype/byte checks remain; all24
+forecast CPU tests pass. Native code is unchanged.
+
+Scalar re-observation uses different categorical draws from the original vector
+actor. The diagnostic does not reproduce its live beliefs, measure new frozen
+competence or improve the five-game result. The optional greedy-posterior draft
+is unused and remains separate; its130 Rust/612 Python CPU tests pass, but its
+new native implementation has not been built or GPU-tested.
+
+Protocol: [selected diagnosis](../experiments/2026-10-29-cdp-learning-diagnosis.md).
+Source8295d15. Evidence root `/x/Temp/kindle-learning-diagnosis-20261029` contains
+the immutable queues/controller, all captures, guard reviews, `comparison.json`,
+`training-timing-review.json`, exploratory `reward-magnitude-review.json`, and
+the inspected `forecast-comparison.png`/SVG. Main service
+`kindle-learning-diagnosis-20261029` is terminal success; no GPU allocation is active.
+
+SHA256:
+
+- declaration: `a1393fbc26caf730131291dbc09d9ed9ef8812772b5f135c38eda98f11dc87c9`
+- comparison: `8eac4db249557527b40154d24a1890f233f475e98d8f9197b4eb5bd49e792681`
+- timing review: `153b2baed2b0b4a5d73bd601fe09105e440bc30a9a754477fd031067e84fbaf9`
+- bounded review: `276b7282c3efb9f9de026b6471e728cfc1f7d88dd8bc0174d4b11af05ce73926`

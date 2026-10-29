@@ -4,6 +4,19 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+The October29 architecture diagnosis completes two48256-action frozen captures
+of the strongest Qbert12M model and its own initial weights, zero updates.
+Fifteen-step reward-sum MAE107.570→37.499 and endpoint AUC.500→.938 show useful
+predictive learning on recorded trajectories; unrelated actions give69.538/.673.
+Before/after-first-pyramid MAE2.347/45.259 motivates later-play diagnosis, while
+reward distributions differ. All39 pins,357 invariant tensors and guards pass;
+service exits06:18:53 UTC. Existing replay critic targets already include real
+rewards but bootstrap from imagination. Next inspect critic calibration and
+actual alternative-action ranking; no changed loss or new training is selected.
+Recorded imagination/target work consumes46.62%/40.68% of Qbert/Breakout update
+time. See [full diagnostic evidence](results/2026-10-29-cdp-learning-diagnosis.md).
+The five-game goal remains unfinished; no GPU allocation is active.
+
 Breakout12M64/B16/R16/expert100 completes 200k actions /799,464 frames /12,477
 updates in22m19s. Frozen sampled13.208/greedy17.875 improve4M/B8's9.458/12.208
 by39.65%/46.42%, for25.72% more training time; own initials1.417/2.208.
