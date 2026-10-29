@@ -4,6 +4,17 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+Separately select one Qbert12M48/B16/R8/expert100 bounded check:8192 actions/
+245 updates,first376/residual.25,then1024 greedy frozen actions. The previous
+RGB comparison is favorable but is not automatic promotion. This candidate
+would test400k/R8 versus retained200k/R16,similar replay work with more experience;
+original mean15000/90% gate remains. Fixed prospective training cap45min;require
+all bounded audits and`check_seconds*400000/8192*1.10<=2700` before full selection.
+No full learner selected. Native/runner/teacher unchanged,Auto precision,357
+matching initial/frozen tensors. CPU preparation passes two CLI boundaries,five
+config checks and accounting through400k;all190 control/195 previous pins verify.
+Protocol`docs/experiments/2026-10-29-cdp-qbert-expert100-r8.md`. Check live state.
+
 The compatible RGB Qbert control completes200k actions/799,695 frames/24,970
 updates in28m41s. Greedy6090.625/24 first pyramids and sampled4335.417/23 are
 below retained CDP's9654.167/23 and7569.792/24 in26m07s; both miss mean15000.
