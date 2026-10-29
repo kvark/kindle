@@ -52,6 +52,15 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
+One bounded Qbert12M48/B16/R16/expert1000 check is separately selected after
+terminal R8 audits. Only expert scale100→1000 changes versus retained200k/R16.
+CPU preflight passes two CLI boundaries,eight config checks,357-tensor schema
+and update accounting without native/environment construction. Check8192/489,
+then1024 frozen;caps180s/60s/180s audit/480s service. Require all audits and
+`check_seconds*200000/8192*1.10<=2100` before separately selecting any full life.
+No full learner or successor selected. See the expert1000 protocol;check live
+state before GPU work.
+
 Qbert12M48/B16/R8/expert100 completes400k actions/1,599,459 frames/12,489
 updates in40m35s. Greedy10042.708/23of24 first pyramids is16.20% below retained
 200k/R16's11984.375/24,for33.28% more training time;sampled7456.250/22 rises
