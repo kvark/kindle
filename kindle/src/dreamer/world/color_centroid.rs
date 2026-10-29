@@ -375,7 +375,7 @@ mod tests {
         session.read_output_by_index(1, &mut raw_loss);
         session.read_output_by_index(2, &mut valid_fraction);
         assert!((f64::from(raw_loss[0]) - expected_loss).abs() < 3e-6);
-        assert_eq!(valid_fraction, [0.5]);
+        assert!((valid_fraction[0] - 0.5).abs() <= f32::EPSILON);
         assert_eq!(session.read_params(&["prediction"])[0], predictions);
         eprintln!("F64 color centroid targets/loss/gradients and exact absent-row zeros pass");
     }

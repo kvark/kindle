@@ -81,3 +81,11 @@ and evidence directory with the same120-second cap and all original numerical
 assertions. This is a second execution of the isolated derivative fixture after
 a diagnosed validator defect,not a passing closure of the first check. No
 training is repeated and no full learner is selected.
+
+The second fixture also stops in.72s,after target,mask,F64 loss and derivative
+assertions pass,because its final valid-fraction check requires exact floating
+equality:the F32 reduction returns.49999997 instead of.5. Its source,binary,
+declaration and failure remain in`gradients-corrected`. Select a third isolated
+fixture with a one-F32-epsilon tolerance for this mean only. Exact per-row masks
+and absent gradients,and all earlier loss/derivative tolerances,remain unchanged.
+The production target/loss source remains byte-identical;no training has run.
