@@ -167,3 +167,9 @@ initial tensors. First six updates occur at248,256,264,272,280,288 actions;the
 initial checked prefix has79 finite/supervised reports. This is execution
 only;fixed final assessments and the locked comparison remain pending.
 Recovery,progress and terminal CPU audit/postprocessing observers are active.
+
+The100k recovery audit passes00:31:29 UTC:exactly12,470 saved updates,399 finite
+tensors,and12,623 finite reports through101,224 actions in its complete log
+prefix. Checkpoint digest`e6f6a1af6bac6eace374cbe556da79491130591c6ad4996b124afc6933d7a45f`;
+recovery review`2151a6feadc70ca94b1494de467feb09515e70d9a780832202f25cefeb24921c`. The observer exits successfully without changing the main
+service. Training continues;no interim frozen assessment or policy selection.

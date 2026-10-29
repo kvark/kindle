@@ -9,7 +9,8 @@ October29,source58dad39,PID219461/invocation2b57733b633540c88847636af3f62c86.
 All195 pins,startup config/counters,399 fresh RGB initial tensors and342 shared
 CDP initial tensors pass. First updates occur at248,256,264,272,280,288 actions.
 Keep4M48/Auto/N8/B8/T16/H15/R16/expert100 and the fixed matched settings;
-training cap35min,100k recovery,four final/own-initial assessments. No CDP learner
+training cap35min,four final/own-initial assessments. The100k recovery
+passes12,470 updates/399 finite tensors at00:31:29 UTC;training continues. No CDP learner
 is added;reuse its completed26m07s control. The locked greedy learning-per-minute
 comparison decides this nearby tuning direction;negative/inconclusive ends it.
 No rescue learner,cap increase,extension or automatic successor. Details in
