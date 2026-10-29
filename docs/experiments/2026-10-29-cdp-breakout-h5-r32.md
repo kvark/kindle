@@ -58,3 +58,13 @@ Service: `kindle-breakout-h5-r32-check-20261029`.
 The preceding modal assessment is terminal and explicitly protocol-failed;
 its closure and all saved host guards pass. No learner is active at selection.
 Recheck actual live state before launching; preserve that earlier failure.
+
+## Bounded check completes
+
+The check passes 8,192 actions /32,717 frames /978 updates in69.748s, followed
+by1,024 frozen actions in.895s with zero updates and no natural episodes.
+All41 pins,357 matched initial/invariant frozen tensors, finite reports,
+parameter changes, full guided replay and guards pass. Main succeeds19:24:32
+UTC October29/source60b505f; collection19:25:09. The31m13s conservative200k
+projection passes45min. No GPU stage repeats. See the [bounded result](../results/2026-10-29-cdp-breakout-h5-r32.md)
+and separately selected [fresh200k comparison](2026-10-29-cdp-breakout-h5-r32-200k.md).
