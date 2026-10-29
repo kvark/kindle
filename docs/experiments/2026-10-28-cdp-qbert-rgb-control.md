@@ -135,3 +135,23 @@ The controller and CPU-only outcome reader must implement the locked config,
 accounting and lane-block decision before launch. Preparation is next;no full
 GPU job is active at this selection. A negative/inconclusive controlled result
 ends this nearby tuning direction and is reported with the remaining task gaps.
+
+## Full-controller preparation
+
+CPU preflight completes in.203s:five actual CLI validation paths reach the
+pre-construction boundary,12 scripts compile,10 config acceptance/rejection
+checks exercise the real comparison/audit assertions,seven header-readiness
+cases protect recovery startup,and nine statistical decision cases pass.
+The deterministic20,000-resample reader rejects incomplete budgets/bad shapes,
+retains paired lanes,and enforces the separate absolute-score condition.
+All45 bounded inputs and342 shared initial tensors verify;100k/200k accounting
+is12,470/24,970 updates. Capability metadata is stubbed in these CPU command
+checks;no native module,agent or environment is constructed. No preparation
+failure or GPU stage occurs during full-controller preparation.
+
+The full service retains2100s training,300s per frozen arm,1500s CPU audit and
+5100s whole-service caps. Training replay has900s inner/930s outer caps;fixed
+frozen replays each have500s caps within the total audit bound. Recovery and
+progress observers cannot restart training. Terminal CPU postprocessing produces
+curves,coverage,supervision exposure and the locked comparison. All controllers,
+config,source/runtime and retained control evidence are pinned before launch.

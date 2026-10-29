@@ -10,7 +10,8 @@ CPU preparation corrections remain recorded;native447fe50 unchanged. Separately
 select one fresh RGB200k/24,970-update control,100k recovery,35-minute cap and
 four fixed final/own-initial assessments. Reuse the completed4M CDP evidence;
 no new CDP learner or check experience reuse. Controller/CPU outcome-reader
-preparation is next;no GPU job active. Negative/inconclusive controlled evidence
+preparation passes five CLI boundaries,10 config checks and nine statistical
+decision cases with no native construction;no GPU job active before launch. Negative/inconclusive controlled evidence
 ends this nearby tuning direction without a rescue learner. See qbert-rgb-control
 for exact settings,bootstrap decision and stopping criteria;check live state.
 
