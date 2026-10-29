@@ -1,27 +1,26 @@
 # CDP handover — October25,2026
 
-The fresh [Qbert25M/R16 200k comparison](experiments/2026-10-29-cdp-qbert-25m-r16-200k.md)
-is active from12:43:20 UTC October29/source `5d9d93e`,PID293701/invocation
-`a597cab72ab845b9ba8c3b3468096bc6`. Startup passes273 unchanged pins,357 finite
-initial tensors matching25M/R16 bounded and25M/R8 full,and92 finite supervised
-updates through1832 actions. The100k/6227 recovery audit passes13:04:57 UTC:
-all357 tensors finite;13:08:41 recheck confirms273 unchanged pins,matching
-checkpoint metadata/config and the same main invocation. Recovery observer
-exits successfully;main,progress and postprocessing remain active. No frozen
-competence result yet.
-200k/12,477 updates,100k recovery6227,45min cap;only exposed model size changes
-from12M/R16,supervision/native447fe50/control runner/teacher fixed. Greedy11984.375
-primary,sampled6759.375 secondary;25M/R8 supplies secondary replay comparison
-with matching initial tensors/paired initial evaluation traces required. No12M
-initial equality. Own initial/final24-episode arms and15000/90% gate fixed.
-Original CPU template-edit assertion/correction retained before declaration;
-no GPU repeat/experience reuse. Root `/x/Temp/kindle-qbert-25m-r16-20261029/full`.
-Reused development seed/cohort;no extension/automatic successor. Check live state.
+The [completed Qbert25M/R16 comparison](results/2026-10-29-cdp-qbert-25m-r16.md)
+finishes200k actions /799,730 frames /12,477 updates in42m51s,40.72% more training
+time than12M/R16. Primary greedy11984.375→9773.958 (−18.44%),both24/24 pyramids;
+sampled6759.375→8678.125 (+28.39%),24→22 pyramids. Own initials9.375/177.083
+clear none;both means still miss15000. Retain12M/R16;preserve sampled gain as
+a separate budget point. No extension,confirmation or automatic successor.
+All273 pins,100k recovery,357 matching25M bounded/R8 initial and invariant frozen
+tensors,paired initial traces,full replays/videos,guards,curves,coverage,exposure
+and three-arm comparison pass.25M/R16 also improves both modes over25M/R8.
+Only model size changes from12M/R16;geometry/initialization differs,no12M initial
+equality. Supervision/native447fe50/runner/teacher fixed. Actual guidance41.6855%.
+Main succeeds13:38:47 UTC October29/source5d9d93e,postprocessing13:38:55,
+collection13:39:32;all four services succeed. Original CPU preparation failure
+and2.290s co-host diagnosis retained;no GPU repeat. Root
+`/x/Temp/kindle-qbert-25m-r16-20261029/full`. Reused development seed/cohort.
+No GPU allocation active at completion;the five-game goal remains unfinished.
 
 The13:17:13 UTC CPU loss-floor diagnosis takes2.290s co-hosted on one low-priority
 core;all273 active pins and main invocation stay unchanged. It constructs no
 native agent and changes no run input. Preserve this timing caveat; details are
-in the live protocol and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md#late-latent-prediction-loss-remains-above-its-floor).
+in the comparison protocol and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md#late-latent-prediction-loss-remains-above-its-floor).
 
 The [completed Qbert25M/R16 bounded check](results/2026-10-29-cdp-qbert-25m-r16.md)
 passes8192 actions /32,757 frames /489 updates in100.299s,then1024 greedy frozen

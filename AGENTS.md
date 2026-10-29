@@ -805,20 +805,18 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
-Qbert25M48/B16/R16 200k comparison is active from12:43:20 UTC October29/source
-`5d9d93e`,PID293701/invocationa597cab72ab845b9ba8c3b3468096bc6. Startup passes273
-pins,357 finite initial tensors matching25M/R16 bounded/25M/R8 full,and92 finite
-supervised updates through1832 actions. Recovery100k/6227 passes13:04:57 UTC,
-357 finite tensors;13:08:41 recheck confirms273 pins,metadata/config and same
-main invocation. Recovery exits success;main/progress/postprocessing active.
-No frozen competence result yet.
-12,477 updates,recovery6227,45min cap;only model size changes from12M/R16.
-Supervision/native447fe50/control runner/teacher fixed. Greedy11984.375 primary,
-sampled6759.375 secondary;25M/R8 secondary comparison requires matching initial
-tensors/paired initial traces. No12M initial equality. Own initial/final24-episode
-arms and15000/90% gate fixed. CPU template-edit assertion/correction retained;
-no GPU repeat/experience reuse/extension/successor. See25M/R16-200k protocol and
-check actual live state;observer timeout is not a restart signal.
+Qbert25M48/B16/R16 completes200k actions /799,730 frames /12,477 updates in
+42m51s,40.72% more time than12M. Greedy11984.375→9773.958 (−18.44%),both24/24;
+sampled6759.375→8678.125 (+28.39%),24→22 pyramids. Own initials9.375/177.083
+clear none;both final means miss15000. Retain12M/R16;preserve sampled gain
+separately,no extension/confirmation/successor. All273 pins,100k recovery,
+357 matching25M bounded/R8 initial and invariant frozen tensors,paired initial
+traces,full replays/guards/curves/coverage/exposure/comparison pass. Only model
+size changes from12M;geometry/initialization differs,no12M initial equality.
+Actual guidance41.6855%. Main succeeds13:38:47 UTC October29/source5d9d93e,
+postprocessing13:38:55,collection13:39:32;all services succeed. CPU preparation
+failure and2.290s co-host diagnosis retained,no GPU repeat. No active allocation.
+See25M/R16 result;the five-game goal remains unfinished.
 
 The13:17:13 UTC CPU-only KL-floor diagnosis finds late mean dynamics KL5.491
 Qbert/11.357 Breakout,above floor1;per-state clipping/derivatives unmeasured.
