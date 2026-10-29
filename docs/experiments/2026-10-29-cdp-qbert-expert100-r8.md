@@ -125,3 +125,16 @@ Terminal postprocessing/progress observers have7500s service caps,with7200s
 internal waits;recovery has3600s service/3300s internal limits. None can restart
 training. Full outcome replays/videos,curve,coverage,exposure and comparison
 are automatic after the fixed evaluations;no interim policy selection.
+
+## Fresh full learner active
+
+Service`kindle-qbert-expert100-r8-400k-20261029` starts01:12:47 UTC on October29,
+source90a9475,PID223970/invocation587396941e1c4312b91578919b1650c9. Declaration
+`451ff89322d19b12e641960cf9418cc03555efb2e6038c6dff3359218cb9c490` pins228 inputs.
+Startup verifies all pins,exact config/fresh0/0 counters,357 initial tensors
+matching both retained control and bounded check,and first updates at376/408/
+440/472/504/536 actions. The first checked864-action prefix has16 finite
+supervised reports. This is execution evidence only;final frozen task quality
+is pending. Main,progress,recovery and terminal CPU postprocessing services are
+active. No failed attempt or GPU stage repeat occurs. Keep the declared caps,
+recoveries and four final assessments;no additional learner is selected.
