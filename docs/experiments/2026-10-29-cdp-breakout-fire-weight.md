@@ -44,3 +44,17 @@ The original centroid full learner remains `closed_protocol_failed`.
 
 Log audit: `/x/Temp/kindle-breakout-fire-supervision-20261029`.
 Bounded evidence: `/x/Temp/kindle-breakout-fire-weight-20261029`.
+
+## Completed bounded outcome
+
+The check succeeds22:27:25 UTC October29/sourcec4bb03b, with terminal collection
+22:27:54. Training8192 actions/32,736 frames/489 updates takes48.059s; frozen1024
+actions/4,076 frames takes.971s, zero updates. The eight short frozen natural
+episodes all score zero. All142 pins,372 initial/frozen tensors,357 shared control
+tensors,47 pre-update events, full guided replay and both host guards pass.
+Conservative200k projection21m31s passes30min; no gameplay gain or full learner
+is selected. The original command-preflight failure initialized the integrated
+GPU before rejecting a fake frame, with no actions, updates or checkpoint. Its
+source/receipt/kernel review remain; the corrected constructor harness passes
+before the guarded RX7900XT stages. No declared training/frozen stage repeats.
+See the [result](../results/2026-10-29-cdp-breakout-fire-weight.md).

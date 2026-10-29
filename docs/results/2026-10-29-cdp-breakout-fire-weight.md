@@ -59,9 +59,59 @@ and zero native construction attempts. The16 new cases exercise defaults,
 explicit1/4 weights, action-meaning lookup, world-gradient preservation,
 invalid/nonfinite/product-overflow inputs and frozen override rejection.
 
-[Fixed bounded protocol](../experiments/2026-10-29-cdp-breakout-fire-weight.md):
-8192 fresh actions/489 updates, then1024 frozen actions, exact initial/frozen
-tensors, full guided replay and host guards. The check has not yet run at this
-revision. No full learner or automatic successor is selected. The original
-centroid full learner remains `closed_protocol_failed`; this adjustment has no
-measured gameplay benefit.
+## The bounded FIRE-weight check passes execution and cost
+
+The [fixed bounded check](../experiments/2026-10-29-cdp-breakout-fire-weight.md)
+completes **8192 actions /32,736 frames /489 updates in48.059s**. Frozen restore
+then completes **1024 actions /4,076 frames in.971s**, with zero updates and
+all372 tensors unchanged. The short frozen arm has eight natural endings, all
+with zero reward; this is not a gameplay gain. No long frozen evaluation occurs.
+
+The conservative200k projection, with the predeclared10% allowance, is
+**1290.650s (21m31s)**, below the30-minute gate. This is an early cost estimate,
+not a measured full-run duration or speedup. Native2974160 and the16,990,739
+parameter architecture remain unchanged.
+
+All489 reports contain finite supervised and centroid metrics. The native
+weight sums verify **20,312 repeated FIRE replay targets** among117,054 labeled
+rows: `117054 + 3*20312 = 177990` total target weight. These counts follow from
+the single changed class weight; they are not distinct demonstrations or gradient
+norms. The maximum raw world/actor expert-loss difference is1.5e-6. All8192
+collected states receive labels, including1124 FIRE labels and4261 passive
+labels. Actual teacher overrides are3931/8192 (47.99%).
+
+All372 initial tensors match the previous centroid check;357 shared tensors
+match the retained control, and47 pre-update semantic events reproduce exactly.
+CNN, reward, centroid, actor and value parameters change. The full CPU replay
+verifies every training pixel, action, corrective label, reward, boundary, reset
+and frame count. All142 pins, both host guards, checkpoint schemas and terminal
+collection pass. The service starts **22:26:22 UTC October29**, source `c4bb03b`,
+and succeeds **22:27:25**; collection succeeds **22:27:54**. No declared training
+or frozen stage repeats, and no GPU allocation remains active at collection.
+
+### Preserved preflight harness failure
+
+Before the declared service, the first command preflight unexpectedly constructs
+a native agent: resolving `kindle.default_config` repopulates lazy native exports
+after the harness replaces `kindle.VectorAgent`. The fake frame then fails shape
+validation at `begin_episodes`. The constructed-device receipt identifies the
+integrated **AMD Ryzen5 9600X /RADV RAPHAEL_MENDOCINO**, not the intended RX7900XT.
+This initialization was unguarded and is not described as CPU-only.
+
+The original source, zero-step/zero-update memory receipt, empty run log and
+failure are retained. No initial checkpoint, action or learner update occurs.
+The process exits; a retained kernel-journal review finds no GPU fault/reset,
+and no host reset is performed. The corrected harness resolves the lazy exports
+first, replaces constructors in both public and native modules, and checks for
+GPU device descriptors. Both corrected command boundaries pass without native
+construction or real environments. The subsequent declared stages run on the
+explicit RX7900XT under their normal guards.
+
+Evidence: `/x/Temp/kindle-breakout-fire-weight-20261029`, with bounded artifacts
+under `check/`. No full learner, coefficient sweep or automatic successor is
+selected. The original centroid full learner remains `closed_protocol_failed`;
+this adjustment still has no measured gameplay benefit.
+
+- Bounded declaration: `c88778421b34165943749f0979c740b5461151a1d9ed7a0f04903d3e32354cf2`.
+- Bounded review: `ccf30109cdb3855f23d265630b0ef8f11786ec5ba75d589f58fba5d9e6ca21de`.
+- Completion: `4f9d01ec03e38a2f520c2103877d0e7a8d9c735f357e5a9167add9632b2576cc`.

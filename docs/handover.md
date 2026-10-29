@@ -1,15 +1,21 @@
 # CDP handover — October25,2026
 
-The [FIRE supervision audit](results/2026-10-29-cdp-breakout-fire-weight.md) finds23,317 FIRE labels and99.805% sampled-label
-coverage in centroid100 training. Late passive sampled FIRE agreement is78.35%;
-the longest passive FIRE-label run without a FIRE-bearing action is45, versus
-the verified frozen12,828-action wait. Exact full-pixel overlap is zero but does
-not prove perceptual novelty. All16 pins pass in2.668s CPU. A fresh8192-action/
-489-update FIRE-weight1→4 check is selected, retaining12M64/Auto/N8/B16/T16/
-H15/R16/centroid100/expert100 and native2974160. Its optional CLI flag passes699
-CPU checks with zero native construction attempts. The bounded GPU check has
-not launched at this revision; no full learner or automatic successor is selected.
-Evidence `/x/Temp/kindle-breakout-fire-weight-20261029`. Check live state before work.
+The [FIRE-weight4 bounded check](results/2026-10-29-cdp-breakout-fire-weight.md) completes8192 actions/32,736 frames/489 updates
+in48.059s; frozen1024/4,076 frames takes.971s with zero updates and eight natural
+zero-return episodes. All142 pins,372 matched initial/invariant frozen tensors,
+357 shared control tensors,47 pre-update events, full guided replay and both
+host guards pass. Conservative200k projection21m31s passes30min; no gameplay gain
+or full learner is selected. Service succeeds22:27:25 UTC October29/sourcec4bb03b,
+collection22:27:54. The699 CPU checks pass. An earlier preflight accidentally
+initializes the integrated GPU before rejecting a fake frame, with no actions,
+updates or checkpoint; source/receipt/kernel review are retained, no fault/reset
+is found, and corrected preflight passes before guarded RX7900XT execution.
+No declared training/frozen stage repeats. Native2974160/centroid100/expert100/
+12M64/Auto/N8/B16/T16/H15/R16 retained; only FIRE weight1→4 changes. The separate
+2.668s CPU audit finds23,317 FIRE labels,99.805% replay-label coverage and a longest
+45-action passive FIRE-label run, unlike the frozen12,828-action wait. Evidence
+`/x/Temp/kindle-breakout-fire-weight-20261029`. All services terminal; no automatic
+successor. Check live state before work; the five-game goal remains unfinished.
 
 The [CPU timeout diagnostic](results/2026-10-29-cdp-centroid-timeout.md) identifies a Breakout serving failure:
 12,828 actions without FIRE after a life loss, with two lives remaining.

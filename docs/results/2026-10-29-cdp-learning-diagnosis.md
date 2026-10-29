@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [FIRE supervision audit and bounded weighting check](2026-10-29-cdp-breakout-fire-weight.md)
+find labels present:23,317 FIRE targets and99.805% eligible replay coverage.
+Sampled training's longest passive FIRE-label run without FIRE is45 actions,
+far shorter than the frozen greedy stall. A fresh FIRE-weight1→4 check passes
+8192 actions/489 updates in48.059s with unchanged native/model sizes, matched
+initial tensors, full replay and frozen invariance. Its conservative200k cost
+projection is21m31s. The eight short frozen episodes all score zero; a gameplay
+benefit remains unmeasured and no full learner is selected. The first preflight's
+unintended integrated-GPU initialization is preserved separately; no actions,
+updates or checkpoint occurred, and the corrected guarded check completes.
+
 The [CPU timeout replay](2026-10-29-cdp-centroid-timeout.md) identifies a concrete
 Breakout serving failure:12,828 actions without FIRE after a life loss, with two
 lives remaining. FIRE launches a ball at two preselected earlier origins; at a
