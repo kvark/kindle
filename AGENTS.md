@@ -52,17 +52,20 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
-One fresh RGB Qbert200k/24,970-update control is active from00:16:54 UTC on
-October29,source58dad39,PID219461/invocation2b57733b633540c88847636af3f62c86.
-All195 pins,startup config/counters,399 fresh RGB initial tensors and342 shared
-CDP initial tensors pass. First updates occur at248,256,264,272,280,288 actions.
-Keep4M48/Auto/N8/B8/T16/H15/R16/expert100 and the fixed matched settings;
-training cap35min,four final/own-initial assessments. The100k recovery
-passes12,470 updates/399 finite tensors at00:31:29 UTC;training continues. No CDP learner
-is added;reuse its completed26m07s control. The locked greedy learning-per-minute
-comparison decides this nearby tuning direction;negative/inconclusive ends it.
-No rescue learner,cap increase,extension or automatic successor. Details in
-`docs/experiments/2026-10-28-cdp-qbert-rgb-control.md`;check live state before GPU work.
+The compatible RGB Qbert control completes200k actions/799,695 frames/24,970
+updates in28m41s. Greedy6090.625/24 first pyramids and sampled4335.417/23 are
+below retained CDP's9654.167/23 and7569.792/24 in26m07s; both miss mean15000.
+Own initials263.542greedy/182.292sampled,zero pyramids. The locked paired lane
+learning-per-minute decision favors this CDP recipe:mean CDP-minus-RGB156.359,
+95% interval[110.311,206.365],with higher absolute CDP mean and all audits passing.
+This is one reused development seed/cohort with strong supervision,not five-game
+superiority or independent confirmation. All195 pins,100k recovery,342 shared
+CDP/399 own initial tensors,399 invariant frozen tensors,paired initial semantic
+traces,full replays,guards,curves,coverage,exposure and comparison pass. Main exits
+00:57:02 UTC,postprocessing00:57:28 on October29;all services terminal success.
+No GPU repeat,cap change or full-run failure. Actual RGB guidance45.0985%.
+Retain the favorable comparison;no extension,confirmation or automatic successor
+selected. GPU idle;check live state before work. See [the completed comparison](docs/results/2026-10-29-cdp-qbert-rgb-control.md).
 
 Qbert12M48/B16/R16/expert100 completes200k actions/799,742 frames/12,477
 updates in30m27s. Greedy11984.375/24 first pyramids improves4M/B8's9654.167/23

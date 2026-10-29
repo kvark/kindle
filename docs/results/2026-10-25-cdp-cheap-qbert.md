@@ -1,5 +1,11 @@
 # Small-image Qbert gains score and coverage but completes no pyramid
 
+Latest: the [compatible RGB control](2026-10-29-cdp-qbert-rgb-control.md)
+favors retained CDP4M/expert100 on the fixed learning-per-minute comparison:
+greedy9,654.167 in26m07s versus RGB6,090.625 in28m41s. Both miss15k;one reused
+seed/cohort with strong supervision does not establish broad reliability.
+All audits pass;no successor is selected. Earlier development results follow.
+
 The fixed200k screen learns in19m45s: frozen809.375 versus actual initial180.2083.
 It reaches more of the first pyramid, but neither policy completes one. The
 existing15k/90%-first-pyramid gate fails; this is useful development progress,

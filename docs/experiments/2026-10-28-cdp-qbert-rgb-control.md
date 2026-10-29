@@ -1,5 +1,9 @@
 # One bounded RGB control before further Qbert tuning
 
+Completed October29: the locked comparison favors this CDP recipe, with both
+arms below the original Qbert score gate. No successor is selected. See the
+[complete result](../results/2026-10-29-cdp-qbert-rgb-control.md).
+
 Nearby CDP tuning has produced useful gains but no Qbert full-gate success.
 Stop that sweep while testing one compatible RGB control. Reuse the completed
 4M48/B8/R16/expert100 CDP200k learner:26m07s,greedy9654.167/23 first pyramids,
@@ -173,3 +177,26 @@ tensors,and12,623 finite reports through101,224 actions in its complete log
 prefix. Checkpoint digest`e6f6a1af6bac6eace374cbe556da79491130591c6ad4996b124afc6933d7a45f`;
 recovery review`2151a6feadc70ca94b1494de467feb09515e70d9a780832202f25cefeb24921c`. The observer exits successfully without changing the main
 service. Training continues;no interim frozen assessment or policy selection.
+
+## Full control and locked comparison complete
+
+Training completes200k actions/799,695 frames/24,970 updates in1720.979s
+(28m41s). Greedy6090.625/24 first pyramids versus own263.542/0;sampled4335.417/23
+versus own182.292/0. Retained CDP scores9654.167/23 greedy and7569.792/24 sampled
+in1567.221s (26m07s). Both miss mean15000. All195 pins,100k recovery,342 shared
+initial/399 own initial and invariant frozen tensors,paired initial semantic
+traces,finite reports,changed CNN/reward/decoder/actor/value,full replays/videos,
+guards,curves,coverage,exposure and comparison pass. Main exits00:57:02 UTC;
+CPU postprocessing00:57:28 on October29. All services terminal success,no GPU
+repeat,cap increase or full-run failure. Actual overrides90,197 (45.0985%).
+
+The fixed20,000 paired lane resamples produce mean CDP-minus-RGB improvement
+per training minute156.359 and95% interval[110.311,206.365]. All audits pass,
+the lower endpoint is positive and CDP's absolute greedy mean is higher,so the
+locked rule classifies this comparison as favorable to this CDP recipe. The
+conditional negative/inconclusive stop is not triggered. This does not establish
+independent seed reliability,task-gate success or five-game superiority. No
+extension,confirmation,extra learner or automatic successor is selected.
+Completion`eeed814d96facd579919016a92535823c85df78185d2977e60b4114939f6fded`;
+comparison`208ba0986c9a5d8cbd3d840d68b2420e56424110192846e96949e17ececbe21d`.
+Full measured cost,source identities,exposure and limits are in the linked result.
