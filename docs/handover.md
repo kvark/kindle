@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [fixed Breakout gradient diagnostic](experiments/2026-10-29-cdp-breakout-gradient-attribution.md) is selected after the completed
+FIRE-weight comparison shows no score gain. Two B16/T16 batches use512 native
+frames and32 preceding scalar posterior states from the retained control corpus;
+full20,960-action CPU replay verifies all pixels/labels in10.520s with zero native
+imports. All141 Rust CPU tests and strict Clippy pass after preserved fixture/
+loop failures. Test-only instrumentation will compare production and gated raw
+world gradients with the optimizer disabled, requiring357 invariant tensors.
+No new learner or policy evaluation is selected. GPU execution has not started;
+check live state before the guarded180s diagnostic. Root
+`/x/Temp/kindle-gradient-attribution-20261029`. The five-game goal is unfinished.
+
 The [completed FIRE-weight4 comparison](results/2026-10-29-cdp-breakout-fire-weight.md#full-comparison-completes-without-timeouts-but-does-not-improve-score) finishes 200k actions /
 799,434 frames / 12,477 updates in 22m07s. Sampled 12.375 / greedy 17.792 do not
 improve retained 13.208 / 17.875; all 0/24 two-wall successes. Own initials

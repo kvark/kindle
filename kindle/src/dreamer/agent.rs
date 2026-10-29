@@ -5,6 +5,8 @@ mod vector;
 #[cfg(test)]
 mod exploration;
 #[cfg(test)]
+mod gradient_contributions;
+#[cfg(test)]
 mod upstream_reference;
 pub use vector::{FeatureVectorAgent, VectorDreamerAgent};
 
