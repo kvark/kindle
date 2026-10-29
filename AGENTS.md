@@ -52,6 +52,18 @@ projection unchanged while Auto changes it; raw derivatives and the mechanism
 remain unmeasured. The completed F16/Auto B2/T64 lives do not justify extensions.
 See `docs/results/2026-10-25-cdp-amd-precision.md` for the evidence and limits.
 
+A bounded Breakout12M64/B16/R16/expert100 execution/cost check is selected after
+Qbert guidance3840 completes. Capacity4M→12M and batch/microbatch8→16 change
+together; keep64-pixel detail,Auto,N8,T16/H15,original rates and20%episode guidance/
+cap1920/all weights1/world gradients/corrective labels. Native447fe50,runner and
+teacher stay fixed. CPU preflight passes.524s with two actual CLI boundaries,
+ten config checks,357 expected schema tensors and489/6227/12,477 update accounting;
+no native/environment construction or preparation failure. Check8192 actions/489
+updates under180s plus1024 frozen/60s. Only if all audits and the conservative
+200k projection fit30min may a full learner be separately selected. No full life,
+automatic promotion,retry,cap increase or check-experience reuse is selected.
+See the expert100-capacity protocol;check live state before GPU work.
+
 Qbert guidance3840 completes200k actions/799,726 frames/12,477 updates in29m31s.
 Primary greedy8187.500/24 first pyramids falls31.68% below retained1920's11984.375,
 for3.04% less training time; sampled7051.042/23 rises4.31% from6759.375/24. Own
