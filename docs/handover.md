@@ -1,14 +1,17 @@
 # CDP handover — October25,2026
 
-The [bounded Qbert25M/R8 check](experiments/2026-10-29-cdp-qbert-25m-r8.md)
-is selected after the negative wait-weight comparison. Increase capacity12M→25M
-and reduce replay16→8 together;retainRGB48/B16/T16/H15/Auto/expert100/all weights1,
-world gradients/all-state labels and unchanged native447fe50/control runner/teacher.
-CPU-derived357-tensor geometry has31,636,273 trainable parameters;cross-model
-initial equality is not claimed.8192 actions/245 updates then1024 frozen,full
-audits/guards,180s training cap;200k projection×1.10 must fit35min before any
-separate full selection. Root`/x/Temp/kindle-qbert-25m-r8-20261029/native-check`.
-No full learner or automatic promotion selected;check live state before work.
+The [completed Qbert25M/R8 bounded check](results/2026-10-29-cdp-qbert-25m-r8.md)
+passes 8192 actions / 32,753 frames / 245 updates in 63.119s, then 1024 frozen
+/ 4096 frames in 1.148s, zero updates and no completed natural episodes. All 44
+pins, 357 finite/invariant frozen tensors, derived geometry/31,636,273 parameters,
+update checks, full training pixel/action/label replay and host guards pass.
+Capacity 12M→25M and replay16→8 change together; native447fe50/control runner/
+teacher and supervision remain fixed. No cross-model initial equality is claimed.
+Conservative 200k projection 28m15s passes the 35min cost gate; this is early cost,
+not competence. Service succeeds 11:32:49 UTC October29/source `aeee122`, terminal
+collection 11:33:20. Actual guidance 54.089% in this short check. No full learner
+or automatic promotion selected. Root `/x/Temp/kindle-qbert-25m-r8-20261029/native-check`.
+Check live state before GPU work.
 
 The [completed Qbert NOOP-weight comparison](results/2026-10-29-cdp-qbert-noop-weight.md)
 finishes200k actions/799,700 frames/12,477 updates in30m12s. Weight1→.25 lowers

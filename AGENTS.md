@@ -805,13 +805,16 @@ restores reject overrides. Do not restart completed training, old queues, broad
 seed campaigns or unchanged long extensions. Keep single-actor learning ahead
 of swarms/concurrent learners.
 
-A bounded Qbert25M48/B16/R8 check is selected after the negative wait-weight
-comparison. Capacity12M→25M and replay16→8 change together;retain expert100/all
-weights1/world gradients/all-state labels/native447fe50 and the matching runtime.
-8192 actions/245 updates then1024 frozen;CPU-derived357-tensor schema/31,636,273
-parameters,full replay/guards and35min conservative200k projection gate. No full
-learner or automatic promotion selected. See the25M/R8 protocol and check live
-state before GPU work.
+Qbert25M48/B16/R8 bounded check passes 8192 actions / 32,753 frames / 245 updates
+in 63.119s; 1024 frozen / 4096 frames take 1.148s, zero updates/no natural episodes.
+All 44 pins, 357 finite/invariant frozen tensors, derived geometry/31,636,273
+parameters, update checks, full guided replay and guards pass. Capacity12M→25M
+and replay16→8 change together; expert100/all weights1/world gradients/all-state
+labels/native447fe50 remain fixed. No cross-model initial equality is claimed.
+Conservative 200k projection 28m15s passes 35min; this is early cost, not competence.
+Actual short-check guidance54.089%. Service succeeds11:32:49 UTC October29/source
+`aeee122`; collection11:33:20. No full learner or automatic promotion selected.
+See the completed25M/R8 result; check live state before GPU work.
 
 Qbert NOOP-weight.25 completes200k actions/799,700 frames/12,477 updates in
 30m12s. Greedy9756.250/24 pyramids and sampled6120.833/22 fall18.59%/9.45%
