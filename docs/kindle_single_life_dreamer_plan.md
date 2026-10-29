@@ -1,5 +1,13 @@
 # Kindle: CDP learning roadmap
 
+A separately selected [Qbert B8/T32 check](experiments/2026-10-29-cdp-qbert-context32.md) tests longer temporal gradients
+against retained B16/T16 at256 positions/update andR16. Capacity12M48 and
+supervision/native447fe50 stay fixed. Batch diversity, warmup and behavior-target
+rows also change; no isolated memory effect is claimed. Budget8192 actions/481
+updates plus1024 frozen; conservative200k projection must fit45min before a
+separate full selection. No full learner, extension or sweep is selected.
+Evidence `/x/Temp/kindle-qbert-context32-20261029/native-check`; check live state.
+
 The [completed action-temperature assessment](results/2026-10-29-cdp-qbert-action-temperature.md)
 scores12389.583/24 first pyramids at0.5,3.38% above retained greedy11984.375/24;
 default sampled6759.375/24 reproduces exactly. Own initials177.083/0;mean15000
