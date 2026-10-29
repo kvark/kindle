@@ -1,4 +1,31 @@
-# Breakout H5/R32 passes its bounded execution and cost check
+# Breakout H5/R32: bounded check passes; fresh full comparison is active
+
+## Fresh200k learner is active
+
+The full comparison starts **19:29:30 UTC October29/source86eb300** under
+`kindle-breakout-h5-r32-200k-20261029`,PID330763/invocation
+`547224e0548644b089a790683a6c7c78`. Its200k-action/24,954-update target has a
+45-minute training cap,100k/12,454 recovery,and fixed final/actual-initial
+sampled and greedy evaluations. No full-run task outcome is available yet.
+
+Startup passes19:29:59 with169 declared pins unchanged,357 finite initial
+tensors matching the bounded check,and first updates at376,384,392,400,408,416
+actions. All369 reports in the completed3,328-action prefix are finite and
+supervised. These are execution checks, not evidence of gameplay improvement.
+Progress,recovery and postprocessing observers run independently and cannot
+restart the learner. No prior weights or check experience are reused.
+
+The full CPU preflight validates five actual commands,16 config cases,all14
+scripts,44 paths and observer/recovery boundaries. A separate check with the
+plotting interpreter reads the actual comparator/control and matches357 initial
+tensors with ALE/native imports forbidden. Native447fe50,runner and teacher
+remain unchanged. Full declaration SHA256:
+`7865cc633e3a36102896a71bb384ea469fa7d0eeb7247f209742470d0b32958f`.
+Evidence: `/x/Temp/kindle-breakout-h5-r32-20261029/full`, trial
+`breakout-12m-64-b16-h5-r32-expert100-200k-seed1009`.
+Check live state before GPU work; do not restart this selected life.
+
+## Bounded execution and early cost
 
 The fresh 12M64/H5/R32/expert100 check completes **8,192 actions /32,717
 emulator frames /978 updates in69.748s**. A1,024-action frozen restore takes

@@ -1,5 +1,18 @@
 # CDP handover — October25,2026
 
+The fresh [Breakout H5/R32 comparison](results/2026-10-29-cdp-breakout-h5-r32.md) is active from19:29:30 UTC October29/source`86eb300`:200k actions/24,954
+updates,12M64/Auto/N8/B16/T16/H5/R32/expert100,45-minute training cap.
+The preceding8192-action/978-update check takes69.748s;all41 pins,357 matched
+initial/invariant frozen tensors,full guided replay and guards pass,with31m13s
+conservative200k projection. Full startup passes169 pins,357 matching initial
+tensors and exact first-six update cadence;PID330763/invocation
+`547224e0548644b089a790683a6c7c78`. Recovery,progress and postprocessing observers
+are active. No frozen competence is measured yet. H15/R16→H5/R32 changes horizon,
+cadence,sampling,warmup and total work together;no isolated causal claim.
+Native447fe50,runner and teacher unchanged;no prior experience is reused.
+Root`/x/Temp/kindle-breakout-h5-r32-20261029/full`. Check live state before
+GPU work;do not restart this learner or the preceding failed posterior assessment.
+
 The [Breakout modal-posterior assessment](results/2026-10-29-cdp-greedy-posterior.md#breakout-trained-score-rises-slightly-the-paired-assessment-fails-its-protocol) is terminal and protocol-failed: trained sampled/modal means17.875/18.833 both
 have0/24 two-wall successes, while the actual-initial modal arm records five
 25,000-action time limits. Default final/initial traces reproduce; all357 frozen
