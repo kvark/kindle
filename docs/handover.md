@@ -1,5 +1,15 @@
 # CDP handover — October25,2026
 
+Select one [frozen temperature0.5 assessment](experiments/2026-10-29-cdp-qbert-h5-temperature.md) on the completed H5/R32 Qbert
+checkpoint. Four fixed final/own-initial default/temperature arms,zero updates,
+24 natural episodes each. Primary remains candidate0.5 versus retained greedy
+14050/23;sampled13331.250/23 stays separate. Require entire default trace parity,
+357 invariant tensors,replays and guards. Use qualifiede416696/runtime
+`/x/Temp/kindle-action-temperature-20261029/runtime`;no build or training.
+CPU preflight passes4 commands/357 finite source tensors/all229 source pins.
+Root`/x/Temp/kindle-qbert-h5-temperature-20261029`;check live state. No sweep,
+new learner,extension or automatic successor;the five-game goal remains open.
+
 The [completed Qbert H5/R32 comparison](results/2026-10-29-cdp-qbert-h5-r32.md) finishes200k actions/799,762 frames/
 24,954 updates in40m24s,+32.67% training time. Greedy14050/23 first pyramids
 improves11984.375/24 by17.24%;sampled13331.250/23 improves6759.375/24 by97.23%.
