@@ -71,3 +71,10 @@ MainPID324938/invocation`23da92f687b74243812a8007db61ac5a`,212 pins;startup
 18:15:01 passes399 finite/bounded-matching and342 shared initial tensors,
 firstsix updates and90 finite reports. All services are active;training and
 final audits remain pending. See the linked result for exact receipts.
+
+The18:21:37 UTC CPU-only completed-life expert-fit diagnostic co-hosts for2.402s
+on one low-priority CPU core. All212 active pins and original PID/invocation
+remain unchanged;no native agent/game or GPU work is created. Retain this as
+a timing caveat without wall-time correction. It reads the completed CDP
+Breakout and Qbert lives,not the active RGB loss trajectory. See the
+[diagnostic](../results/2026-10-29-cdp-learning-diagnosis.md#breakout-still-has-substantial-training-imitation-error).

@@ -119,3 +119,10 @@ Root:`/x/Temp/kindle-breakout-rgb-control-20261029/full`,trial
 Declaration:`cf3a4f45cd1ad497ce48d5acbae8314310c0bc630ac85bb567aab2959d1c8a45`.
 Launch:`d0b4787d58888f3daea9a46468fa834e965ba3ae4f2e137ff7ae9dd7c499b303`.
 Startup:`eda45ab6a2585596f4fdcb2c0ec74215449ab8a2572ca17efe4b9f1a77f48bb8`.
+
+The18:21:37 UTC CPU-only completed-life expert-fit diagnostic co-hosts for2.402s
+on one low-priority CPU core. All212 active pins and original PID/invocation
+remain unchanged;no native agent/game or GPU work is created. Retain this as
+a timing caveat without wall-time correction. It reads the completed CDP
+Breakout and Qbert lives,not the active RGB loss trajectory. See the
+[diagnostic](2026-10-29-cdp-learning-diagnosis.md#breakout-still-has-substantial-training-imitation-error).

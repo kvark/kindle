@@ -10,6 +10,58 @@ success for the fixed recipe on one learner,while retaining variation across
 the two learners. It does not identify which earlier recipe change caused the
 gain,replicate the H15/R16 comparison on6029,or establish broad reliability.
 
+## Breakout still has substantial training imitation error
+
+A CPU-only summary of completed lives checks the exact native447fe50 expert
+loss and all reports from the retained12M Breakout and two Qbert H5/R32 learners.
+All use expert scale100,world gradients and unit action weights. The actor loss
+is mean cross-entropy over all240 replay positions,including zero-weight boundary
+rows. Correcting for the number of valid labels gives:
+
+| Completed learner | First50k-action CE | Final50k-action CE | Final1000-update CE | Final50k geometric mean teacher probability |
+| --- | ---: | ---: | ---: | ---: |
+| Breakout1009,12M64/H15/R16 |1.364|.696|.670|.499|
+| Qbert4013,12M48/H5/R32 |.384|.0381|.0333|.963|
+| Qbert6029,12M48/H5/R32 |.376|.0387|.0375|.962|
+
+Breakout improves throughout all four fixed50k windows;it has not reached a
+measured plateau. Its final1000 updates still assign the teacher action only
+.512 geometric-mean probability on sampled replay states. This identifies
+substantial remaining training-label error alongside the previously observed
+frozen urgent-action disagreements. It does not distinguish missing precise
+state information,ambiguous teacher labels,insufficient optimization,or loss
+interference. The active reconstruction control tests one representation
+objective change;this diagnostic does not select another learner or intervention.
+
+These probabilities are`exp(-cross_entropy)`,not greedy agreement,sampled
+accuracy or calibrated action quality. Games,states,class mix,horizon,resolution
+and update counts differ:Qbert uses24,954 updates versus Breakout12,477. Its
+whole-training labels are74.6–75.1% NOOP,versus32.1% for Breakout;those online
+counts do not identify the replay-minibatch class distribution. Do not interpret
+the cross-game difference as an isolated architectural or optimization effect.
+
+In Breakout's final50k actions,the coefficient-weighted expert scalar averages
+69.483,while the mean absolute imagined-policy scalar is.003946. These scalar
+values do **not** measure gradient magnitudes,parameter updates or causal
+interference;the objectives use different state distributions and adaptive
+optimization. They do not establish that increasing the coefficient is a fix.
+The corresponding imagined-state entropy is.827,not replay-state entropy.
+
+Six mask-normalization checks pass;report counts,valid-label totals and aligned
+world/actor raw expert losses match the completed audits. All18 diagnostic pins
+and212 active RGB inputs remain unchanged. The original active PID324938/
+invocation`23da92f687b74243812a8007db61ac5a` is unchanged before/after. No agent,
+game or native module is constructed;no GPU work occurs. The2.402s analysis
+starts18:21:37 UTC October29/source`dd3fb58`,on one low-priority CPU core while
+RGB trains. Retain this co-hosting caveat without subtracting it from training
+time. No live RGB loss trajectory is used to select this analysis.
+
+Evidence:`/x/Temp/kindle-expert-fit-20261029`,including fixed protocol,exact
+447fe50 behavior/replay sources,script,declaration and full four-window/tail
+results. Declaration SHA256
+`59095424e582115e51c11d6aa9b27c59ddb232d57bb9cab24845903713e98009`;
+review`008b4feff22b3034dcab88bfbd329e0c4edba904d56014375e4f199e04eeb89b`.
+
 ## Breakout action readouts do not outperform its retained policy
 
 The [completed linear and nonlinear readouts](2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy)
