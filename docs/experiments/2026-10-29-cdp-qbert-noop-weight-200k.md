@@ -95,3 +95,20 @@ observers remain active. This verifies recoverable weights,not frozen competence
 Recovery review`28cda2bfc94c4918de75f82898a6d1bf0a68ea4c9bf7ab305209c1153d37bcb1`;
 checkpoint metadata`4ce18c54a9b9683b3978892ca0f7de3c8f32914b1d12ebecf4b52ee3a7d7a2c6`.
 The200k budget,35-minute training cap and fixed-final assessments remain unchanged.
+
+## Training and frozen execution complete; audits active
+
+Training completes200,000 actions/799,700 emulator frames/12,477 updates in
+1812.098s (30m12s),within2100s. Its guard passes at11:06:17 UTC October29. All
+four frozen arms finish by11:07:29,with zero updates and passing guards:sampled
+final30,664 actions/122,613 frames/18.254s,initial8728/34,881/5.324s;greedy
+final43,280/173,074/26.175s,initial8432/33,690/5.090s. Total91,104 actions/
+364,258 frames/54.843s. All230 declared inputs still match.
+
+The same main service/PID283869 remains active with CPU audit child287674.
+Checkpoint/trajectory replay audits and final postprocessing remain pending;
+no completed comparison or gate claim is made yet. Progress/postprocessing
+services remain active;the100k recovery observer already succeeded. No GPU
+stage repeats or caps change. A separate read-only status inspection briefly
+encounters an empty newly created greedy log;its failure/correction is recorded
+in`monitor-tail-empty-file.json`,with no worker or pinned observer change.

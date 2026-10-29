@@ -815,7 +815,10 @@ service`kindle-qbert-noop025-200k-20261029`. No extension or automatic successor
 check live state before work. All230 pins,357 matching initial tensors and125
 finite early reports pass startup. The100k/6227 recovery passes10:51:04 UTC,
 357 finite tensors/6254 finite prefix reports;recovery observer exits success.
-Main/progress/postprocessing remain active beyond104k actions,no frozen result.
+Training completes200k/799,700 frames/12,477 updates in30m12s;four frozen arms
+finish91,104 actions/364,258 frames/54.843s,zero updates,all guards passing.
+GPU stages finish11:07:29 UTC;main PID283869 continues CPU audits with child287674.
+All230 pins match;replay/comparison still pending,no completed gate result.
 See the NOOP-weight200k protocol.
 
 Qbert NOOP-weight.25 bounded check passes8192 actions/32,754 frames/489 updates
