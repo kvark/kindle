@@ -4,6 +4,14 @@ Updated October29,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
+A separate Breakout expert100 bounded check is selected after Qbert's terminal
+negative result. Only expert scale10→100 changes from the retained4M64/B8/R16
+corrective recipe; original rates, teacher and native remain fixed. Check8192
+learned/1024 frozen actions with a120s training cap; full200k requires every audit
+and a conservative25-minute cost gate. No full learner is selected yet. CPU
+preflight passes.585s with no native/environment construction. See the Breakout
+expert100 protocol and check live state before GPU work.
+
 Qbert12M48/B16/R16/expert1000 completes200k actions/799,697 frames/12,477
 updates in30m31s. Greedy10588.542/24of24 first pyramids and sampled6150/21
 fall11.65%/9.02% below retained expert100, for0.21% more training time. Own
