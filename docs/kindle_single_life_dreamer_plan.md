@@ -1,5 +1,16 @@
 # Kindle: CDP learning roadmap
 
+Select one [fresh6029 Qbert H5/R32 learner](experiments/2026-10-29-cdp-qbert-h5-seed6029.md),evaluation4000006029,with the
+same12M48/Auto/N8/B16/T16/H5/R32/expert100 recipe as4013. Fixed200k actions/
+24,954 updates,45min cap,100k recovery,four own-initial/final frozen arms;
+greedy primary,original15000/90% gate. No H15/R16 control for6029;this checks
+recipe performance on another learner,not an isolated gain. Native447fe50,
+runner,teacher fixed;no build,qualification repeat or experience reuse. Initial
+weights/trajectories may differ;require357 finite/invariant frozen tensors.
+CPU preflight passes5 commands/15 config checks/9 startup checks/3 observer checks,
+all229 reference pins. Root`/x/Temp/kindle-qbert-h5-seed6029-20261029/full`.
+Check live state;no extension,seed campaign or automatic successor selected.
+
 The [completed H5/R32 frozen temperature assessment](results/2026-10-29-cdp-qbert-h5-temperature.md) scores14025/22 first pyramids
 at0.5 versus retained greedy14050/23;default sampled13331.250/23 reproduces
 exactly. Both own initial arms177.083/0;all final means still miss15000. Retain
