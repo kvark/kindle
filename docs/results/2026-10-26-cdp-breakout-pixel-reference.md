@@ -1214,3 +1214,54 @@ Root `/x/Temp/kindle-breakout-expert100-capacity-20261029/full-repaired`, trial
 learning `4407b5d8fc1739ea1bae9c0830e2d928d85f923000f57ce5021c220c50e79bda`,
 comparison `94af7831d57e6f2331ee108daf6d2bf4cc67119f8279be3b11d8575f50310677`.
 [Fixed protocol, CPU launch failure and recovery evidence](../experiments/2026-10-29-cdp-breakout-expert100-capacity.md).
+
+## Larger frozen policy still disagrees on urgent paddle commands
+
+A33.384s CPU-only replay compares the retained4M and12M **greedy** policies with
+the unchanged feedback pixel teacher on their own recorded observations. Both
+full trajectories reproduce every action/outcome/reset/frame/task result and
+the previously retained episode/partial records. No agent is constructed and
+no learning or GPU work occurs. The replay covers35,336/20,960 actions and
+141,287/83,799 emulator frames for4M/12M. Agreement uses only the same first3
+natural episodes per8 lanes=24 selected episodes:16,133/16,443 actions.
+
+| Pixel-teacher phase |4M exact agreement|12M exact agreement|
+| --- | ---: | ---: |
+| All selected actions |7071/16133 (43.83%)|8747/16443 (53.20%)|
+| Ball not seen by tracker |768/4102 (18.72%)|1004/1415 (70.95%)|
+| Descending,ball-y below150 |1867/3561 (52.43%)|2185/4422 (49.41%)|
+| Descending,ball-y at least150 |1743/3158 (55.19%)|2046/3776 (54.18%)|
+| Ascending |2546/5005 (50.87%)|3333/6465 (51.55%)|
+
+The largest agreement gain is in states where the existing tracker does not
+see the ball and requests FIRE. That category also includes balls outside its
+vertical tracking crop; it does not prove that all such states await a serve.
+The improvement does not carry into near-paddle descending states. When the
+teacher requests movement there,4M/12M match962/1889 and1109/2301 requests;
+they choose the opposite direction315/1889 and254/2301 times. Remaining errors
+include stationary/FIRE commands where movement was requested.
+
+Both selected greedy policies emit only NOOP,FIRE,RIGHT andLEFT despite their
+full18 vocabulary. Redundant action aliases therefore do not explain these
+greedy disagreements. Counting only the horizontal command raises near-ball
+agreement slightly,to55.70%/54.71%. Across all states,it instead gives62.81%/
+54.79%,because this deliberately treats FIRE and NOOP as the same horizontal
+command. That aggregate is unsuitable as a complete action-quality metric.
+
+The retained frozen scores remain12.208/17.875,bothzero two-wall successes.
+Phases come from the teacher's pixel detector,not ground-truth ball trajectories
+or evidence of teacher accuracy. The policies visit different states; these
+counts do not isolate capacity's effect or distinguish weak representation
+from an ineffective policy objective. They support examining time-critical
+control rather than assuming that higher overall label agreement solves it.
+Ordinary frozen logs have no live pixel hashes;this is exact outcome replay,
+with newly recorded replay-input hashes,not a comparison to unavailable live
+images. Seeds/cohorts are reused development evidence.
+
+The analysis is affined to one CPU and co-hosts with active Qbert H3 training.
+All242 active inputs and the learner PID/invocation remain unchanged before/
+after;no timing correction or isolated speed claim is made. Evidence root:
+`/x/Temp/kindle-breakout-frozen-phase-20261029`. Review
+`7d6bba2f9e35985ff1ba7bc66b8b499eabe3682fa564ebef11c7497dd76ded70`;
+completion`d3a1b348632c32c784d71cb9dded9fefa87c75ac5e2bbeb70c82aa016199959a`.
+No new Breakout learner or changed teacher follows this diagnostic.
