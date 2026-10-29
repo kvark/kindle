@@ -1,12 +1,12 @@
-# Breakout representation diagnostic preparation
+# Breakout representation diagnostic
 
 The retained 12M greedy policy agrees with the pixel teacher on 54.18% of
 near-paddle decisions. The [completed phase analysis](../results/2026-10-26-cdp-breakout-pixel-reference.md#larger-frozen-policy-still-disagrees-on-urgent-paddle-commands)
 does not distinguish missing visual or motion information from weak policy
 learning. Prepare a frozen readout comparison within the five-game goal.
-This document selects the measurement design; native capture requires its
-own pinned declaration, CPU checks and a bounded check after the active Qbert
-comparison and audits have finished. No new learner is selected.
+The Qbert comparison and audits are now terminal success. Select one paired
+frozen diagnostic using the design below, with a pinned declaration and a
+128-action check before either full capture. No new learner is selected.
 
 ## Fixed states and targets
 
@@ -55,6 +55,14 @@ readout-only work. A128-action bounded capture must establish finite readouts,
 pixel/action replay and tensor invariance before the two full captures. Fix a
 120-second bounded cap,300 seconds per full capture and600 seconds for CPU
 readouts; no automatic retries, cap increases or new training.
+The implementation in `python/examples/probe_breakout_representation.py` passes
+17 CPU tests for these boundaries, including a subprocess that forbids native
+import while fitting. The two existing ridge/metric tests also pass, and the
+real corpus validates unchanged. Use a single1500-second service for the
+bounded check, two guarded full captures and CPU fit; stop at the first failed
+stage and retain its evidence. A failed audit is not authorization to repeat a
+completed GPU stage. Source/native/host/config and357-tensor invariance checks
+are required independently of readout quality.
 
 Good decoding would establish accessible information under this readout;
 poor linear decoding would not prove that the representation contains none.
