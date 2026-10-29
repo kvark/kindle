@@ -1102,3 +1102,39 @@ Root `/x/Temp/kindle-breakout-expert100-20261029/full`, trial
 learning `c9b158e828f2b5ac3bdcee4e4fbc9b1eb20bff5aa88b9919568aa967420f0881`,
 comparison `57243c1ac00ec3361fa06c414d1ff28b67887d15a174c8244c571d713b26dda1`.
 [Fixed protocol and bounded prerequisite](../experiments/2026-10-29-cdp-breakout-expert100.md).
+
+
+## Larger supervised Breakout passes execution and early-cost checks
+
+The12M64/B16/R16/expert100 bounded check completes **8192 actions /32,720 frames /
+489 updates in47.623s**. Its conservative200k projection is **21m19s**, below the
+fixed30-minute threshold. Frozen1024 actions/4096 frames take.877s withzero
+updates and no completed natural episodes. This is execution and early-cost
+evidence, not task competence or a promise of full-run time.
+
+Capacity4M→12M and batch/microbatch8→16 change together,halving optimizer cadence
+at the same ratio. Keep64-pixel geometry,Auto,N8,T16/H15,coefficient1,actor-unimix
+.01,full18,original rates,20% episode guidance/cap1920/expert100/all weights1/world
+gradients/all-state corrective labels. Native447fe50,runner and teacher remain
+unchanged. Seed1009/evaluation4000001009 remain reused development inputs.
+
+All56 pins,357 finite initial/final and invariant frozen tensors,16,334,353
+trainable parameters,489 finite supervised reports,changed CNN/reward/actor/value,
+complete guided replay and both host guards pass. The actual12M64 schema matches
+the CPU geometry derivation. Initial-value equality is not claimed against the
+different4M architecture. No weights or experience are reused. Actual overrides
+3841;passive labels4351;117,038 labeled replay rows equal weight sums,with maximum
+raw world/actor loss difference8e-7. These labels and overrides do not establish
+frozen competence.
+
+The service starts04:50:59 UTC/source d4200b2 and succeeds04:52:02 on October29,
+whole1m03.218s. CPU preflight passes.524s,two actual CLI boundaries andten config
+checks,without native/environment construction. No preparation/service failure,
+GPU repeat or cap change occurs. All work for this check is terminal; no full
+learner or automatic promotion is selected. The five-game goal remains unfinished.
+See the [fixed protocol and receipts](../experiments/2026-10-29-cdp-breakout-expert100-capacity.md).
+
+Root `/x/Temp/kindle-breakout-expert100-capacity-20261029/native-check`, trial
+`breakout-12m-64-b16-r16-expert100-check`; completion
+`90f5067865b24aa2fa75fad76e734eb1c44e2d1657a8c2d72230a3a138c8b7e4`,review
+`89c04f0a8722f5493beb5800eb2307ab9b24983b72d8a45faa9768b89409d0ea`.

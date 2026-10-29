@@ -78,3 +78,31 @@ its retained schema and unchanged native source. No preparation failure, native
 module load or construction attempt occurs. Preflight receipt
 `a50fb136685db2bc7cf586e7f070c42be7825fd686f43158d20c03c6f1551a06`.
 The bounded native check still has to verify execution, actual schema and cost.
+
+## Bounded check passes
+
+Service `kindle-breakout-expert100-capacity-check-20261029` starts04:50:59 UTC on
+October29,source d4200b2,PID241744/invocation537bb771f4074049af0dc650c9ed2438.
+It succeeds04:52:02 after1m03.218s. Training completes8192 actions/32,720 frames/
+489 updates in47.623s; frozen1024 actions/4096 frames take.877s,zero updates and
+no natural completed episodes. No task competence is inferred.
+
+All56 pins,exact config/counters,16,334,353 parameters,357 finite initial/final
+schema tensors,357 invariant frozen tensors,finite reports,changed CNN/reward/
+actor/value,full guided input-pixel/action/label replay and both host guards pass.
+First update376 and residual credit.5 match the declaration. All489 reports are
+supervised,with117,038 labeled replay rows equal weight sums; maximum raw world/
+actor loss difference8e-7. There are3841 overridden actions,4351 passive labels
+and4038 actual/teacher disagreements. No initial-value equality with the different
+4M architecture is claimed. The actual12M64 schema matches the CPU derivation.
+
+The conservative200k projection is1278.925s (21m19s), below1800s; unadjusted
+projection1162.659s. Both execution and early-cost gates pass. All work for this
+check is terminal; no failure,GPU repeat,cap increase,extension or full learner
+allocation occurs. No check experience is reused. A full life still requires
+its separate fixed declaration and preflight. The GPU is idle at completion.
+
+Completion `90f5067865b24aa2fa75fad76e734eb1c44e2d1657a8c2d72230a3a138c8b7e4`;
+review `89c04f0a8722f5493beb5800eb2307ab9b24983b72d8a45faa9768b89409d0ea`;
+guided replay `ecacacac0c147096cf78c3d144eeaa28fc2aae054e35988e79c8659a99e45931`;
+declaration `749b402123e8ce2cdd7f3b7c88a916fe9649c4dd1fd3f29f8c22c690e6a752f0`.

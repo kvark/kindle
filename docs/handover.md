@@ -1,16 +1,16 @@
 # CDP handover — October25,2026
 
-A bounded Breakout12M64/B16/R16/expert100 execution/cost check is selected after
-Qbert guidance3840 completes. Capacity4M→12M and batch/microbatch8→16 change
-together; keep64-pixel detail,Auto,N8,T16/H15,original rates and20%episode guidance/
-cap1920/all weights1/world gradients/corrective labels. Native447fe50,runner and
-teacher stay fixed. CPU preflight passes.524s with two actual CLI boundaries,
-ten config checks,357 expected schema tensors and489/6227/12,477 update accounting;
-no native/environment construction or preparation failure. Check8192 actions/489
-updates under180s plus1024 frozen/60s. Only if all audits and the conservative
-200k projection fit30min may a full learner be separately selected. No full life,
-automatic promotion,retry,cap increase or check-experience reuse is selected.
-See the expert100-capacity protocol;check live state before GPU work.
+Breakout12M64/B16/R16/expert100 bounded check passes8192 actions/32,720 frames/
+489 updates in47.623s; frozen1024/4096frames/.877s haszero updates/no natural
+completed episodes. All56 pins,357 finite/invariant tensors,16,334,353 parameters,
+finite supervised reports,changed CNN/reward/actor/value,3841 verified overrides,
+full guided replay and guards pass. Initial values are not compared with the
+4M architecture; actual12M64 shapes match the CPU derivation. Conservative200k
+projection21m19s passes30min; task competence remains unmeasured. Service succeeds
+04:52:02 UTC on October29/source d4200b2. No failure,GPU repeat,cap change,full
+learner,extension or automatic promotion occurs. Use the matching Breakout-era
+runtime; native447fe50 unchanged. No GPU allocation is active;check live state.
+See [the bounded result](results/2026-10-26-cdp-breakout-pixel-reference.md#larger-supervised-breakout-passes-execution-and-early-cost-checks).
 
 Qbert guidance3840 completes200k actions/799,726 frames/12,477 updates in29m31s.
 Primary greedy8187.500/24 first pyramids falls31.68% below retained1920's11984.375,
