@@ -9,7 +9,9 @@ cap. All five commands/14 scripts/config/startup/observer CPU checks pass. No
 bounded experience reuse,extension or automatic successor;check live state.
 Launched10:36:00 UTC October29/sourcebcaf51a,PID283869. All230 pins and357
 control/check initial tensors verify;2376 actions/125 finite reports pass startup.
-Main/progress/recovery/postprocessing services are active;no frozen score yet.
+The100k/6227 recovery passes at10:51:04 UTC with357 finite tensors and6254
+finite prefix reports;observer exits success. All230 pins remain unchanged.
+Main/progress/postprocessing continue beyond104k actions;no frozen score yet.
 
 The [bounded Qbert NOOP-weight check](results/2026-10-29-cdp-qbert-noop-weight.md)
 passes8192/489 in70.160s and1024 frozen/.783s,zero updates/no natural episodes.

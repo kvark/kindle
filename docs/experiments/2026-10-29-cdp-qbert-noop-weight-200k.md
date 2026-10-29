@@ -81,3 +81,17 @@ Declaration`bfb3e2864f87e5be79c20e21f5ea6278db76c0251483fcf12866ee60f9cc0c74`.
 The copied`full/fixed-protocol.md` and all executable inputs remain pinned; this
 status paragraph is outside that immutable declaration. Check live service state
 before any additional GPU work.
+
+## Midpoint recovery verified
+
+The100k checkpoint audit passes at10:51:04 UTC October29,with6227 updates,357
+finite tensors and matching config/metadata/tensor hashes. Its stable-file check
+passes;the complete100,440-action log prefix contains6254 finite reports. The
+recovery observer exits success without stopping training. The main learner
+keeps PID283869/invocation0522d3f2958a4f47880218d10aa18cac and advances beyond
+104k actions. All230 declared inputs still match;progress and postprocessing
+observers remain active. This verifies recoverable weights,not frozen competence.
+
+Recovery review`28cda2bfc94c4918de75f82898a6d1bf0a68ea4c9bf7ab305209c1153d37bcb1`;
+checkpoint metadata`4ce18c54a9b9683b3978892ca0f7de3c8f32914b1d12ebecf4b52ee3a7d7a2c6`.
+The200k budget,35-minute training cap and fixed-final assessments remain unchanged.

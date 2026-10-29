@@ -813,7 +813,9 @@ CPU command/config/startup/observer checks pass. Use the matching Breakout-era
 runtime and full-root pinned runner. Root`/x/Temp/kindle-qbert-noop-weight-20261029/full`,
 service`kindle-qbert-noop025-200k-20261029`. No extension or automatic successor;
 check live state before work. All230 pins,357 matching initial tensors and125
-finite early reports pass startup;all four services active,no frozen result.
+finite early reports pass startup. The100k/6227 recovery passes10:51:04 UTC,
+357 finite tensors/6254 finite prefix reports;recovery observer exits success.
+Main/progress/postprocessing remain active beyond104k actions,no frozen result.
 See the NOOP-weight200k protocol.
 
 Qbert NOOP-weight.25 bounded check passes8192 actions/32,754 frames/489 updates
