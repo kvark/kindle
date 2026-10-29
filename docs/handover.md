@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+One [bounded Qbert25M/R16 check](experiments/2026-10-29-cdp-qbert-25m-r16.md)
+is selected after the negative25M/R8 comparison. Keep the retained12M control's
+R16/B16/update schedule and supervision;only exposed model size12M→25M changes.
+8192 actions/489 updates then1024 greedy frozen;357 finite/invariant tensors,
+matching25M/R8 actual-initial tensors,full guided replay and guards required.
+No12M initial equality claimed. Native447fe50/control runner/teacher unchanged.
+Training180s cap;conservative200k projection must fit45min before any separate
+full selection. This new ceiling matches earlier larger-budget trials;no prior
+run is extended. No full learner or automatic promotion selected. Root
+`/x/Temp/kindle-qbert-25m-r16-20261029/native-check`. Check live state before work.
+
 The [completed Qbert25M/R8 comparison](results/2026-10-29-cdp-qbert-25m-r8.md)
 finishes200k actions /799,672 frames /6239 updates in26m24s,13.28% less training
 time. Greedy11984.375→5817.708 (−51.46%),both24/24 first pyramids;sampled6759.375
