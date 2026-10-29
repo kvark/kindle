@@ -126,3 +126,12 @@ remain unchanged;no native agent/game or GPU work is created. Retain this as
 a timing caveat without wall-time correction. It reads the completed CDP
 Breakout and Qbert lives,not the active RGB loss trajectory. See the
 [diagnostic](2026-10-29-cdp-learning-diagnosis.md#breakout-still-has-substantial-training-imitation-error).
+
+
+The100k recovery audit succeeds18:28:50 UTC October29:100,000 actions/6227
+updates and399 finite tensors. Its complete log prefix contains102,312 actions
+and6371 finite reports. All212 input pins remain unchanged and the original
+main PID324938/invocation`23da92f687b74243812a8007db61ac5a` stays active.
+The recovery observer exits successfully;main/progress/post continue. This is
+checkpoint integrity evidence,not frozen competence. Recovery-review SHA256
+`488f39780a830572131f4644d690e9203c1df4e4f01c9fde446b39b7e9de3913`.

@@ -28,9 +28,12 @@ initial tensors,399 matches to bounded RGB and342 shared CDP values,firstsix
 updates and90 finite supervised reports;all212 pins unchanged. Original
 bounded failure/CPU repair retained;native447fe50 unchanged,no experience
 reuse. Full root`/x/Temp/kindle-breakout-rgb-control-20261029/full`,trial
-`breakout-rgb12m-64-b16-r16-expert100-200k-seed1009`. Main/progress/recovery/post
-services are active;training/evaluation/replays/comparison remain unfinished.
-Check live state before GPU work;do not launch concurrent work or restart.
+`breakout-rgb12m-64-b16-r16-expert100-200k-seed1009`. The100k recovery passes
+18:28:50 UTC:6227 updates,399 finite tensors and6371 finite reports in the
+complete102,312-action prefix;all212 pins unchanged. Recovery observer exits
+success;main/progress/post remain active,original PID/invocation unchanged.
+Training/evaluation/replays/comparison remain unfinished. Check live state
+before GPU work;do not launch concurrent work or restart.
 
 The completed [Breakout kernel action readout](results/2026-10-29-cdp-breakout-representation.md#a-fixed-nonlinear-readout-also-trails-the-recorded-policy) takes1.824s CPU and scores49.25% overall/47.06% near-paddle teacher agreement,
 below linear50.58%/49.26% and recorded policy54.58%/53.68%. No evidence for this
