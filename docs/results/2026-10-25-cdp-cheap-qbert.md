@@ -3284,3 +3284,37 @@ learning `2fcb0d85b24044ea0af8a61478d3ee290b94463b35a01f8ffba775e82b3fb069`,
 comparison `2243636ff74833b2813b0ad4e3f0ebdb0c17ef3bbf1e03c5bf88e753929e0f47`,
 training replay `824aa035c01304fa3479124b7b474db0f5c5cc9ca4a281ba286a57acab26538a`.
 See the [fixed protocol](../experiments/2026-10-29-cdp-qbert-expert1000.md).
+
+
+## Retained Qbert episodes end soon after guidance release
+
+A CPU-only recount of the two completed12M200k learners separates the1920-action
+guided prefix from subsequent native actions. All44 completed guided episodes
+at expert100, and all45 at expert1000, reach the cap. The retained expert100
+episodes all terminate within512 further actions; their mean tail is241.864
+actions and182.386 reward, after a guided-prefix mean15001.705. Expert1000 tails
+average222.711 actions and195 reward;44of45 terminate within512 actions, all45
+within1024. Prefix mean there is15015.000.
+
+| Retained training log | Expert100 | Expert1000 |
+| --- | ---: | ---: |
+|Completed guided episodes reaching cap|44/44|45/45|
+|Median actions after release|264.5|174|
+|All released native actions, including tails|10,642 (5.321%)|10,022 (5.011%)|
+|Exact agreement on teacher hop labels after release|24.021%|21.091%|
+
+These observations motivate considering later-game exposure, but do not show
+that the cap causes the frozen-score gap. Release occurs at a particular game
+phase, and the policy changes throughout training. Teacher disagreement does
+not establish action incorrectness, teacher correctness or held-out accuracy.
+The guided-prefix scores are not unaided competence. No new learner, cap change,
+extension or automatic successor is selected by this analysis.
+
+Both complete200k logs reconcile with their verified replay, episode returns,
+lengths, labels and prior exposure totals. No environment, native agent or GPU
+work is constructed. The.894s affined CPU analysis co-hosts with the active
+Breakout expert100 learner; all69 pins and PID235051/invocation
+e8a6e8c36aa241f294f9b845645e770b remain unchanged. Retain that timing caveat
+without correcting Breakout's measured training time. Evidence:
+`/x/Temp/kindle-qbert-cap-release-20261029/{analyze.py,review.json}`; review
+`cc353f89b15aa95847784280710df080fe006fac2e29673a2fe42f90297f1171`.

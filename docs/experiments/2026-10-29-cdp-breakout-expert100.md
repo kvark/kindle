@@ -124,3 +124,9 @@ frozen assessments. Keep the25-minute training cap. No observer or GPU stage
 has failed or repeated. No task benefit is measured at startup and no additional
 learner, extension, checkpoint selection or successor is selected. Use this run's
 original `full/collect_full.py` only after all four services finish successfully.
+
+A separate.894s affined CPU recount of retained Qbert guidance-release logs
+co-hosts with training. It constructs no environment or native agent, changes no
+learner setting and preserves all69 pins and the same PID/invocation. Retain the
+co-host duration without correcting measured training time. This analysis
+selects no new GPU allocation; its evidence is in the cheap-Qbert report.
