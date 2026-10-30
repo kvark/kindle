@@ -1,16 +1,18 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Qbert encoder2e-5 comparison](experiments/2026-10-30-cdp-qbert-encoder-moderate-200k.md) selects200k actions/12,477 updates under35 minutes,with100k/6227 recovery and
-four final/own-initial sampled/greedy24-episode arms. Keep12M48/Auto/N8/B16/T16/
-H15/R16/expert100/native447fe50;only encoder6e-6→2e-5 as a learner setting,
-qualified optional-rate runner,Qbert teacher unchanged. The [bounded check](results/2026-10-30-cdp-qbert-encoder-moderate.md)
-passes8192/489 in70.203s and1024 frozen/.806s,zero updates/no natural episodes;
-212 pins,357 matched initial/invariant tensors,47 semantic events,replay and
-guards pass. Conservative projection31m25s passes35min. Full CPU preflight
-passes five commands,24 config cases and212/190 input pins;original copied
-recovery-assertion failure preserved before any full GPU work. No frozen benefit
-measured. Root`/x/Temp/kindle-qbert-encoder-moderate-20261030/full`;service
-`kindle-qbert-encoder-moderate-200k-20261030`. Check live state before GPU work.
+The [fresh Qbert encoder2e-5 comparison](experiments/2026-10-30-cdp-qbert-encoder-moderate-200k.md) starts01:34:55 UTC October30/source54b1b5d,PID373087/invocation
+`33e82ad2f0dc4025bac23ba8383d9c6a`. Train200k/12,477 updates under35min on
+12M48/Auto/N8/B16/T16/H15/R16/expert100;only encoder6e-6→2e-5 as a learner
+setting. Startup passes235 pins,357 matched initial tensors,47 pre-update
+transitions and73 finite reports through1544 actions. Progress,recovery,post-
+processing and terminal collection observers are active. Require100k/6227
+recovery and final/own-initial greedy/sampled24-episode assessments against
+11984.375/6759.375. No frozen result. Bounded8192/489 passes70.203s with212 pins;
+conservative200k projection31m25s. Original CPU recovery-assertion failure stays
+preserved. Native447fe50/Qbert teacher unchanged,qualified optional-rate runner.
+Root`/x/Temp/kindle-qbert-encoder-moderate-20261030/full`;service
+`kindle-qbert-encoder-moderate-200k-20261030`. Check live state;do not restart or
+schedule another GPU job while this learner is active. The goal is unfinished.
 
 The [completed encoder-rate diagnostic](results/2026-10-30-cdp-encoder-representation.md) finds better state and actor readouts on the exact control corpus: kernel
 combined ball x/y MAE12.053/10.211→7.554/6.515, still above pixel.059/.140 on555

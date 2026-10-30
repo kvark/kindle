@@ -50,3 +50,18 @@ terminal; check live state before GPU work. The five-game goal is unfinished.
 | `review.json` | `2829d0cf6f088aacd6acb6ff2fa5d9e1a511f84dbdbf62863ed23c40e810e1ac` |
 | `guidance-replay.json` | `e063a8751d7deda350a5779c88b17d2fe33be4efc8dc731ce553f14a368032fe` |
 | `completion-review.json` | `221aa39abccfe248cffec139e541e585c1953f535a70591de2113ef04f046b2c` |
+
+## Launched and startup checked
+
+The fresh learner starts01:34:55 UTC October30/source54b1b5d,PID373087,invocation
+`33e82ad2f0dc4025bac23ba8383d9c6a`. Startup at01:35:11 verifies all235 pins,
+357 initial tensors matching control and bounded check,47 pre-update training
+transitions,exact config and73 finite supervised reports through1544 actions.
+First six updates376/392/408/424/440/456 match the declared cadence. No frozen
+result is available. Progress,100k recovery,postprocessing and terminal-collection
+observers are active. Do not restart this learner or schedule another GPU job
+while it is active. The read-only.535s startup audit co-hosts with training;
+retain this as a timing caveat without correcting training wall time.
+
+Declaration`2da4231e56fac5f0382d2dd605ae7710fe49602e7a789abed1d15dfb9b77179b`;
+startup`d0f8bd3998520219d9f525a742cd1bbd773b05d506969de3d8d8ff65e0ce8c85`.
