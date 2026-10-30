@@ -213,7 +213,10 @@ def advance(agent, environment, row, *, last, action_count):
     return frame, cut
 
 
-def validate_capture_config(source_config, checkpoint_config, *, compare_centroid100=False):
+def validate_capture_config(source_config, checkpoint_config, *, compare_centroid100=False,
+                            compare_encoder2e5=False):
+    if compare_centroid100 and compare_encoder2e5:
+        raise ValueError('select only one comparison profile')
     source, checkpoint = dict(source_config), dict(checkpoint_config)
     if compare_centroid100:
         expected = dict(scale=100.0, channel=0, background_scale=1.5,
@@ -221,11 +224,16 @@ def validate_capture_config(source_config, checkpoint_config, *, compare_centroi
         if (source.pop('color_centroid_supervision', None) is not None
                 or checkpoint.pop('color_centroid_supervision', None) != expected):
             raise ValueError('requires an unsupervised source and fixed centroid100 checkpoint')
+    if compare_encoder2e5:
+        if (source.pop('encoder_learning_rate', None) != 6e-6
+                or checkpoint.pop('encoder_learning_rate', None) != 2e-5):
+            raise ValueError('requires encoder rates 6e-6 in the source and 2e-5 in the checkpoint')
     if checkpoint != source or checkpoint_config.get('observation_kind') not in ('rgb32', 'rgb48', 'rgb64'):
         raise ValueError('checkpoint configuration differs from source policy')
 
 
-def capture(corpus_path, checkpoint, manifest, output, smoke, *, compare_centroid100=False):
+def capture(corpus_path, checkpoint, manifest, output, smoke, *, compare_centroid100=False,
+            compare_encoder2e5=False):
     import ale_py
     import gymnasium as gym
     import kindle
@@ -245,7 +253,8 @@ def capture(corpus_path, checkpoint, manifest, output, smoke, *, compare_centroi
         raise ValueError('recorded source changed')
     header = source['start']
     checkpoint_config = json.loads((checkpoint/'metadata.json').read_text())['config']
-    validate_capture_config(header['config'], checkpoint_config, compare_centroid100=compare_centroid100)
+    validate_capture_config(header['config'], checkpoint_config, compare_centroid100=compare_centroid100,
+                            compare_encoder2e5=compare_encoder2e5)
     gym.register_envs(ale_py)
     verify_replay_identity(header, json.loads(manifest.read_text()), rom_identity(header['environment']))
     output.mkdir(exist_ok=False)
@@ -258,7 +267,7 @@ def capture(corpus_path, checkpoint, manifest, output, smoke, *, compare_centroi
                   native_sha256=sha(kindle._native.__file__), gpu_device=agent.gpu_device,
                   files=[], diagnostic_actions=0, actor_updates=0, collection_cuts=0, readback_checks=0,
                   belief='scalar re-observation; not original vector categorical draws',
-                  compare_centroid100=compare_centroid100)
+                  compare_centroid100=compare_centroid100, compare_encoder2e5=compare_encoder2e5)
 
     def save():
         (output/'result.json').write_text(json.dumps(result, indent=2, allow_nan=False)+'\n')
@@ -346,14 +355,17 @@ if __name__ == '__main__':
     for field in ('corpus', 'checkpoint', 'manifest', 'output'):
         native.add_argument(field, type=Path)
     native.add_argument('--smoke', action='store_true')
-    native.add_argument('--compare-centroid100', action='store_true',
-                        help='compare the fixed centroid100 checkpoint on the original control corpus')
+    comparison = native.add_mutually_exclusive_group()
+    comparison.add_argument('--compare-centroid100', action='store_true',
+                            help='compare the fixed centroid100 checkpoint on the original control corpus')
+    comparison.add_argument('--compare-encoder2e5', action='store_true',
+                            help='compare encoder rate2e-5 against the original rate6e-6 control corpus')
     cpu = modes.add_parser('fit')
     for field in ('corpus', 'final', 'initial', 'output'):
         cpu.add_argument(field, type=Path)
     args = parser.parse_args()
     if args.mode == 'capture':
         capture(args.corpus, args.checkpoint, args.manifest, args.output, args.smoke,
-                compare_centroid100=args.compare_centroid100)
+                compare_centroid100=args.compare_centroid100, compare_encoder2e5=args.compare_encoder2e5)
     else:
         fit(args.corpus, args.final, args.initial, args.output)

@@ -122,6 +122,42 @@ validate_capture_config(*json.loads(sys.argv[1]),compare_centroid100=True)
     assert result.returncode == 0, result.stderr
 
 
+def encoder_configs():
+    source = dict(observation_kind='rgb64', action_count=18, train_ratio=16,
+                  encoder_learning_rate=6e-6, dynamics_learning_rate=4e-4)
+    return source, dict(source, encoder_learning_rate=2e-5)
+
+
+def test_encoder_comparison_requires_explicit_mode_and_preserves_inputs():
+    source, candidate = encoder_configs()
+    originals = copy.deepcopy((source, candidate))
+    with pytest.raises(ValueError, match='configuration differs'):
+        validate_capture_config(source, candidate)
+    validate_capture_config(source, candidate, compare_encoder2e5=True)
+    assert (source, candidate) == originals
+    with pytest.raises(ValueError, match='only one comparison'):
+        validate_capture_config(source, candidate, compare_encoder2e5=True, compare_centroid100=True)
+
+
+@pytest.mark.parametrize('side,rate', [('source', 2e-5), ('source', None),
+    ('checkpoint', 6e-6), ('checkpoint', 4e-5), ('checkpoint', float('nan'))])
+def test_encoder_comparison_rejects_other_rates(side, rate):
+    source, candidate = encoder_configs()
+    (source if side == 'source' else candidate)['encoder_learning_rate'] = rate
+    with pytest.raises(ValueError, match='requires encoder rates'):
+        validate_capture_config(source, candidate, compare_encoder2e5=True)
+
+
+@pytest.mark.parametrize('field,value', [('train_ratio', 32), ('action_count', 6),
+    ('observation_kind', 'rgb48'), ('dynamics_learning_rate', 2e-4),
+    ('color_centroid_supervision', dict(scale=100)), ('unknown_option', True)])
+def test_encoder_comparison_rejects_other_configuration_changes(field, value):
+    source, candidate = encoder_configs()
+    candidate[field] = value
+    with pytest.raises(ValueError, match='configuration differs'):
+        validate_capture_config(source, candidate, compare_encoder2e5=True)
+
+
 @pytest.mark.parametrize('field,value', [('split', 'test'), ('step', 7), ('frames', 0),
     ('targets', [0, 0, 0, 1, 1, 0]), ('targets', [float('nan')]*6),
     ('reset_after', True), ('truncated', True)])

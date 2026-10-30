@@ -1,5 +1,14 @@
 # CDP handover — October25,2026
 
+The [frozen encoder-rate diagnostic](experiments/2026-10-30-cdp-encoder-representation.md) selects one128-action feature check,128-action
+native actor check and20,960-action capture from the completed2e-5 checkpoint.
+Reuse control trajectories,954/509/601 splits and fixed state/action readouts;
+all357 tensors must remain invariant,zero updates. Native447fe50 unchanged.
+The71 CPU checks and3.032s preflight pass; original receipt-status assertion
+remains preserved before GPU work. No new learner or policy evaluation. Root
+`/x/Temp/kindle-encoder-representation-20261030`;service
+`kindle-encoder-representation-20261030`. Check live state before GPU work.
+
 The [completed Breakout encoder2e-5 comparison](results/2026-10-30-cdp-breakout-encoder-moderate.md) finishes200k actions/799,511 frames/12,477 updates
 in22m27s,0.61% more time than6e-6 control. Sampled25.292/greedy42.625 improve
 13.208/17.875 by91.48%/138.46%;own initials1.417/2.208 match,all0/24 two-wall.
