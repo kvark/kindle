@@ -50,6 +50,11 @@ be selected separately with fresh experience and fixed final/actual-initial
 evaluations. No retry, cap increase, extension, rate sweep or automatic
 promotion follows this bounded declaration. The five-game goal is unfinished.
 
+A [separate fresh200k comparison](../experiments/2026-10-30-cdp-qbert-encoder-h5-200k.md)
+is now selected after these checks,with a45-minute cap,100k recovery and four
+fixed frozen arms against the retained H5/R32 control. No check experience is
+reused. The full run's correctness and gameplay outcome remain pending.
+
 | Artifact | SHA256 |
 |---|---|
 | `declaration.json` | `47e794bc8173ac21dc56fe3df4f72e53a8b0cd10eb0e4dfa6118b23b6162ee40` |

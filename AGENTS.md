@@ -18,7 +18,19 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [Qbert H5/R32 encoder2e-5 check](LINK) passes8192 actions/32,751 frames/
+The [fresh Qbert H5/R32 encoder2e-5 comparison](docs/experiments/2026-10-30-cdp-qbert-encoder-h5-200k.md) is selected after the
+bounded8192/978 check passes95.153s and conservative200k projection42m35s.
+Train200k/24,954 updates under45min,12M48/Auto/N8/B16/T16/H5/R32/expert100,
+with100k/12,454 recovery and fixed final/actual-initial sampled/greedy24-episode
+assessments. Primary H5/R32/6e-6 control:greedy14,050/sampled13,331.250,23/24
+first pyramids each. Original15k/90% gate unchanged. Native447fe50/qualified
+runner/teacher fixed;no experience reuse. Final CPU preflight1.513s passes five
+commands,24 config cases,288 bounded/229 control pins and357 tensors. Root
+`/x/Temp/kindle-qbert-encoder-h5-20261030/full`;service
+`kindle-qbert-encoder-h5-200k-20261030`. Recheck live state before launch;
+no retry,extension or automatic successor. Goal unfinished.
+
+The [Qbert H5/R32 encoder2e-5 check](docs/results/2026-10-30-cdp-qbert-encoder-h5.md) passes8192 actions/32,751 frames/
 978 updates in95.153s;1024 frozen/.798s haszero updates/no natural episodes.
 All288 pins,357 matching initial/invariant frozen tensors,47 pre-update events,
 full replay and guards pass. Conservative200k projection42m35s passes45min.
