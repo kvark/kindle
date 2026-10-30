@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [native optimizer qualification](experiments/2026-10-30-cdp-breakout-native-optimizer.md) is selected after the CPU estimate.
+Two independent disposable copies use the exact86 parameters/172 moments and
+12477 counter. A test-only linear graph must reproduce each saved raw gradient
+exactly, then apply one production-configured AGC/LaProp step per batch. Compare
+clipped gradients, moments and rounded parameter movement with fixed tolerances;
+no world-model backward, learner updates or gameplay. All141 Rust CPU tests,
+strict Clippy and4 comparison fixtures pass. Root
+`/x/Temp/kindle-optimizer-native-20261030`; guarded120s execution has not started.
+Check live state before launch; no new learner or setting is selected. The
+five-game goal remains unfinished.
+
 The [completed CPU optimizer attribution](results/2026-10-29-cdp-breakout-optimizer-attribution.md) estimates all12 encoder
 parameter tensors clipped on both fixed batches; encoder update/weight norm
 .00212–.00234% versus recurrent .1449–.1490%. Saved momentum changes total

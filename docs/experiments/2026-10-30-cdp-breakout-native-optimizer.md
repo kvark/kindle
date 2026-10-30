@@ -1,0 +1,53 @@
+# Native qualification of saved Breakout optimizer estimates
+
+The CPU estimate finds strong encoder clipping and a large inherited-momentum
+contribution on both qualified gradient batches. Before choosing a learner
+change, validate that estimate against native Meganeura423d373 AGC/LaProp.
+This is an optimizer diagnostic on disposable copies, not resumed learning or
+an assessment of gameplay benefit.
+
+Reuse both raw total-gradient captures from
+`/x/Temp/kindle-gradient-attribution-20261029/auto-corrected` and the completed
+CPU analysis at `/x/Temp/kindle-optimizer-attribution-20261029`. Verify all191
+prior pins and resolve any subsequently changed source from an exact retained
+copy/Git before execution. Preserve all original evidence.
+
+Prepare a diagnostic checkpoint containing the86 trainable world parameters and
+their172 saved moments, with logical shapes/types and Adam step12477 preserved.
+Require all258 tensor values to match the complete source exactly. This subset
+exists only to satisfy the backend's strict graph-layout checkpoint format;
+it is not a replacement learner checkpoint. The complete357 source tensors
+and original checkpoint files must remain unchanged.
+
+Construct a test-only native graph whose loss is the sum of parameter/gradient
+dot products, with the original parameter names/shapes. Its derivative is the
+captured raw gradient. For each batch independently, restore the same weights
+and moments, then run an optimizer-free backward pass and require every raw
+derivative exactly equal to the captured input. Configure Kindle's production
+optimizer with its saved learning rates/warmup, clipping and LaProp settings,
+then execute one synthetic backward/optimizer pass. Save before/after state and
+post-clipping gradients. Both batches must start at12477 and finish12478.
+Exactly two disposable optimizer steps/four synthetic backward passes occur;
+no world-model backward, learner update, environment action or policy evaluation.
+
+Before GPU work, pin the test executable, sources, derived checkpoint and CPU
+validator; run CPU tests and strict Clippy. Use the RX7900XT under the established
+host guard with a120-second cap and at least2GiB sampled memory headroom. Stop on
+device/numerical failure; no host recovery or automatic retry. Reuse completed
+GPU outputs for any CPU-only repair without repeating GPU stages.
+
+Compare each parameter's clipped gradient and moments against the existing F64
+formula. Require relative L2 error<=3e-5. Maximum error must be<=3e-6 times
+`1 + max(abs(reference))` for gradients/momentum, and<=3e-5 times
+`max(abs(reference)) + 1e-30` for variance. Check finite values and nonnegative
+variance everywhere. Compare stored parameters with the F64 estimate using an
+elementwise allowance of two F32 ULPs of both old/expected values plus3e-5 times
+the estimated movement magnitude. Additionally require group-level observed
+movement to match the F32-rounded estimate with relative L2<=1e-2. Preserve
+all errors and every declared group, without selecting favorable layers.
+
+These checks qualify the transformation of two captured gradients through the
+saved optimizer state. They do not validate arbitrary new coefficients,
+earlier training or gameplay improvement. No new learner or optimizer setting
+is selected. Record results, source hashes and terminal evidence outside Git.
+Evidence root: `/x/Temp/kindle-optimizer-native-20261030`.
