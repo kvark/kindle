@@ -11,7 +11,7 @@ def test_pinned_baseline_and_d3_defaults() -> None:
     assert config["world_backprop_length"] == 8
     assert config["world_microbatch_size"] is None
     assert config["imagination_length"] == 15
-    assert config["actor_unimix"] == 0.01
+    assert config["actor_unimix"] == 0.0
     assert config["train_ratio"] == 32.0
     assert config["loss_scales"]["reconstruction"] == 1.0
     assert config["loss_scales"]["future_prediction"] == 0.0
@@ -31,6 +31,10 @@ def test_unknown_size_is_rejected() -> None:
         assert "unknown model_size" in str(error)
     else:
         raise AssertionError("invalid model size was accepted")
+
+
+def test_intermediate_size_is_available_in_python() -> None:
+    assert kindle.default_config(18, "4m")["model_size"] == "size4_m"
 
 
 def test_invalid_action_count_is_a_python_error() -> None:

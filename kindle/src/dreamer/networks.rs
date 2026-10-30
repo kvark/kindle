@@ -2,10 +2,12 @@
 
 use meganeura::{Graph, graph::NodeId, nn};
 
-use super::config::DreamerConfig;
+use super::config::{DreamerConfig, ObservationKind};
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
 
 const DREAMER_NORM_EPSILON: f32 = 1e-4;
+
+mod rgb;
 
 pub(crate) fn concat_columns(
     graph: &mut Graph,
@@ -86,6 +88,15 @@ fn repeat_columns(
     } else {
         repeated
     }
+}
+
+pub(crate) fn repeat_rows(graph: &mut Graph, input: NodeId, repeats: usize) -> NodeId {
+    let shape = graph.node(input).ty.shape.clone();
+    let input = graph.reshape(input, &[shape[0] * shape[1], 1]);
+    let input = graph.broadcast_inner(input, repeats);
+    let input = graph.reshape(input, &[shape[0], shape[1], repeats]);
+    let input = graph.transpose(input);
+    graph.reshape(input, &[shape[0] * repeats, shape[1]])
 }
 
 fn grouped_rssm_input(
@@ -229,8 +240,8 @@ impl LinearNorm {
 }
 
 /// D3 BlockLinear expressed with one grouped weight and bias parameter.
-/// Individual block views feed ordinary matmuls, preserving upstream's
-/// parameter leaves for initialization, AGC, and checkpointing.
+/// Grouped products preserve upstream's parameter leaves for initialization,
+/// AGC, and checkpointing; batch-one keeps the serial GEMV path.
 struct BlockLinear {
     weight: NodeId,
     bias: NodeId,
@@ -260,9 +271,9 @@ impl BlockLinear {
     }
 
     fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        // Keep batch-one GEMV and large-batch cooperative imagination on
-        // their original arithmetic. This candidate targets small F32 batches.
-        if (2..=16).contains(&batch) {
+        // Replay batch width also multiplies the number of imagined starts.
+        // Do not silently return to sliced graphs when that width increases.
+        if batch > 1 {
             assert_eq!(
                 graph.node(input).ty.shape,
                 [batch, self.blocks * self.input_per_block]
@@ -457,13 +468,43 @@ impl Prior {
     }
 }
 
-pub(crate) struct ObservationEncoder {
+pub(crate) enum ObservationEncoder {
+    Features(FeatureEncoder),
+    Rgb(rgb::Encoder),
+}
+
+impl ObservationEncoder {
+    pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
+        match config.observation_kind {
+            ObservationKind::Features => Self::Features(FeatureEncoder::new(graph, config)),
+            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+                Self::Rgb(rgb::Encoder::new(graph, config))
+            }
+        }
+    }
+
+    pub(crate) fn output_dim(&self) -> usize {
+        match self {
+            Self::Features(encoder) => encoder.output_dim(),
+            Self::Rgb(encoder) => encoder.output_dim(),
+        }
+    }
+
+    pub(crate) fn forward(&self, graph: &mut Graph, observation: NodeId, batch: usize) -> NodeId {
+        match self {
+            Self::Features(encoder) => encoder.forward(graph, observation, batch),
+            Self::Rgb(encoder) => encoder.forward(graph, observation, batch),
+        }
+    }
+}
+
+pub(crate) struct FeatureEncoder {
     patch0: LinearNorm,
     patch1: LinearNorm,
     depth: usize,
 }
 
-impl ObservationEncoder {
+impl FeatureEncoder {
     pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let depth = config.network().vision_depth;
         Self {
@@ -567,8 +608,22 @@ pub(crate) fn mixed_probabilities(
     graph.add(probabilities, uniform)
 }
 
-/// Hard categorical sample with CPU-owned uniform draws. The row maximum uses
-/// an existing reduction; the prefix mask breaks exact ties at the first class.
+pub(crate) fn mixed_log_probabilities(
+    graph: &mut Graph,
+    logits: NodeId,
+    rows: usize,
+    classes: usize,
+    unimix: f32,
+) -> NodeId {
+    if unimix == 0.0 {
+        graph.log_softmax(logits)
+    } else {
+        let probabilities = mixed_probabilities(graph, logits, rows, classes, unimix);
+        graph.log(probabilities)
+    }
+}
+
+/// Hard categorical sample with supplied uniform draws and first-maximum ties.
 pub(crate) fn gumbel_sample(
     graph: &mut Graph,
     logits: NodeId,
@@ -577,34 +632,14 @@ pub(crate) fn gumbel_sample(
     classes: usize,
     unimix: f32,
 ) -> NodeId {
-    let probabilities = mixed_probabilities(graph, logits, rows, classes, unimix);
-    let log_probabilities = graph.log(probabilities);
+    let log_probabilities = mixed_log_probabilities(graph, logits, rows, classes, unimix);
     let uniforms = graph.clamp(uniforms, f32::MIN_POSITIVE, 1.0 - f32::EPSILON);
     let log_uniforms = graph.log(uniforms);
     let negative_log_uniforms = graph.neg(log_uniforms);
     let log_negative_log_uniforms = graph.log(negative_log_uniforms);
     let noise = graph.neg(log_negative_log_uniforms);
     let perturbed = graph.add(log_probabilities, noise);
-    let flat = graph.reshape(perturbed, &[rows * classes]);
-    let maximum = graph.max_pool_2d(
-        flat,
-        rows.try_into().unwrap(),
-        1,
-        1,
-        classes.try_into().unwrap(),
-        1,
-        classes.try_into().unwrap(),
-        1,
-        0,
-    );
-    let maximum = graph.reshape(maximum, &[rows, 1]);
-    let maximum = graph.broadcast_inner(maximum, classes);
-    let below_maximum = graph.greater(maximum, perturbed);
-    let negative = graph.neg(below_maximum);
-    let one = graph.constant(vec![1.0; rows * classes], &[rows, classes]);
-    let at_maximum = graph.add(negative, one);
-    let preceding = graph.exclusive_cumsum(at_maximum, false);
-    graph.greater(at_maximum, preceding)
+    graph.argmax_one_hot(perturbed)
 }
 
 pub(crate) fn straight_through_sample(
@@ -729,6 +764,85 @@ impl MlpHead {
         self.output.forward(graph, value)
     }
 
+    fn all_action_hidden(&self, graph: &mut Graph, state: NodeId, actions: usize) -> NodeId {
+        let shape = graph.node(state).ty.shape.clone();
+        let (rows, features) = (shape[0], shape[1]);
+        let first = &self.layers[0];
+        let units = graph.node(first.linear.weight).ty.shape[1];
+        assert!(actions > 0);
+        assert_eq!(
+            graph.node(first.linear.weight).ty.shape,
+            [features + actions, units]
+        );
+        let total = (features + actions) * units;
+        let state_weight = slice_columns(graph, first.linear.weight, 1, total, 0, features * units);
+        let state_weight = graph.reshape(state_weight, &[features, units]);
+        let action_weight = slice_columns(
+            graph,
+            first.linear.weight,
+            1,
+            total,
+            features * units,
+            actions * units,
+        );
+        let action_weight = graph.reshape(action_weight, &[actions * units]);
+        let projected = graph.matmul(state, state_weight);
+        let expanded = repeat_rows(graph, projected, actions);
+        let expanded = graph.reshape(expanded, &[rows, actions * units]);
+        let value = graph.bias_add(expanded, action_weight);
+        let mut value = graph.reshape(value, &[rows * actions, units]);
+        if let Some(bias) = first.linear.bias {
+            value = graph.bias_add(value, bias);
+        }
+        let value = first.norm.forward(graph, value);
+        let mut value = graph.silu(value);
+        for layer in &self.layers[1..] {
+            value = layer.forward(graph, value);
+        }
+        value
+    }
+
+    #[cfg(test)]
+    pub(crate) fn forward_all_actions(
+        &self,
+        graph: &mut Graph,
+        state: NodeId,
+        actions: usize,
+    ) -> NodeId {
+        let hidden = self.all_action_hidden(graph, state, actions);
+        self.output.forward(graph, hidden)
+    }
+
+    /// Center in the smaller hidden space, then project only the selected
+    /// action's effect. The final affine bias cancels. Actions must be one-hot
+    /// (including NOOP) or all zero for reset rows, as in Dreamer's replay/policy.
+    pub(crate) fn action_effect(
+        &self,
+        graph: &mut Graph,
+        state: NodeId,
+        action: NodeId,
+        actions: usize,
+    ) -> NodeId {
+        let rows = graph.node(state).ty.shape[0];
+        let hidden = self.all_action_hidden(graph, state, actions);
+        let units = graph.node(hidden).ty.shape[1];
+        let hidden = graph.reshape(hidden, &[rows, actions, units]);
+        let hidden = graph.transpose(hidden);
+        let hidden = graph.reshape(hidden, &[rows * units, actions]);
+        let weights = repeat_rows(graph, action, units);
+        let selected = graph.mul(hidden, weights);
+        let selected = graph.sum_inner(selected);
+        let total = graph.sum_inner(hidden);
+        let negative_mean = graph.scale(total, -1.0 / actions as f32);
+        // A zero-action reset must have zero bonus, not minus the all-action mean.
+        let mass = graph.sum_inner(action);
+        let mass = repeat_rows(graph, mass, units);
+        let negative_mean = graph.mul(negative_mean, mass);
+        let centered = graph.add(selected, negative_mean);
+        let centered = graph.reshape(centered, &[rows, units]);
+        graph.matmul(centered, self.output.weight)
+    }
+
     /// Forward pass with frozen weights and an input gradient.
     pub(crate) fn forward_frozen(&self, graph: &mut Graph, input: NodeId) -> NodeId {
         let mut value = input;
@@ -746,7 +860,37 @@ impl MlpHead {
     }
 }
 
-pub(crate) struct ObservationDecoder {
+pub(crate) enum ObservationDecoder {
+    Features(FeatureDecoder),
+    Rgb(rgb::Decoder),
+}
+
+impl ObservationDecoder {
+    pub(crate) fn new(
+        graph: &mut Graph,
+        config: &DreamerConfig,
+        name: &str,
+        input_dim: usize,
+    ) -> Self {
+        match config.observation_kind {
+            ObservationKind::Features => {
+                Self::Features(FeatureDecoder::new(graph, config, name, input_dim))
+            }
+            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+                Self::Rgb(rgb::Decoder::new(graph, config, name, input_dim))
+            }
+        }
+    }
+
+    pub(crate) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
+        match self {
+            Self::Features(decoder) => decoder.forward(graph, input, batch),
+            Self::Rgb(decoder) => decoder.forward(graph, input, batch),
+        }
+    }
+}
+
+pub(crate) struct FeatureDecoder {
     trunk: LinearNorm,
     spatial: nn::Linear,
     patch_norm: nn::RmsNorm,
@@ -754,7 +898,7 @@ pub(crate) struct ObservationDecoder {
     depth: usize,
 }
 
-impl ObservationDecoder {
+impl FeatureDecoder {
     pub(crate) fn new(
         graph: &mut Graph,
         config: &DreamerConfig,
@@ -829,9 +973,9 @@ mod block_matmul_tests {
     }
 
     #[test]
-    fn small_batch_blocks_preserve_parameters_and_reduce_dispatches() {
-        for batch in [2, 4, 6, 8, 16] {
-            for (input, output) in [(1024, 256), (256, 768)] {
+    fn grouped_blocks_preserve_parameters_and_reduce_dispatches() {
+        for batch in [2, 4, 6, 8, 16, 17, 64, 128, 256, 512] {
+            for (input, output) in [(1024, 256), (256, 768), (256, 64), (64, 192)] {
                 let candidate = graph(batch, input, output, true, false);
                 let control = graph(batch, input, output, false, false);
                 let parameters = |g: &Graph| {
@@ -883,16 +1027,14 @@ mod block_matmul_tests {
     }
 
     #[test]
-    fn gemv_and_large_batch_graphs_remain_exact() {
-        for batch in [1, 17, 64, 1024] {
-            let candidate = graph(batch, 5, 7, true, false);
-            let control = graph(batch, 5, 7, false, false);
-            assert_eq!(
-                serde_json::to_vec(candidate.nodes()).unwrap(),
-                serde_json::to_vec(control.nodes()).unwrap()
-            );
-            assert_eq!(candidate.outputs(), control.outputs());
-        }
+    fn gemv_graph_remains_exact() {
+        let candidate = graph(1, 5, 7, true, false);
+        let control = graph(1, 5, 7, false, false);
+        assert!(
+            serde_json::to_vec(candidate.nodes()).unwrap()
+                == serde_json::to_vec(control.nodes()).unwrap()
+        );
+        assert_eq!(candidate.outputs(), control.outputs());
     }
 
     #[test]
@@ -907,6 +1049,81 @@ mod block_matmul_tests {
         assert!(block_gradients.iter().all(|n| n.requires_full_precision));
         let (plan, _) = meganeura::compile_training_graph(&graph);
         assert_eq!(plan.param_grad_pairs.len(), 3);
+    }
+
+    #[test]
+    #[ignore = "requires exclusive GPU; independent F64 reference at imagination batch sizes"]
+    fn imagination_blocks_match_f64_forward() {
+        use rand::{Rng, SeedableRng, rngs::StdRng};
+        let gpu = std::sync::Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!gpu.device_information().is_software_emulated);
+        let mut rng = StdRng::seed_from_u64(7301);
+        for batch in [17, 64, 128, 256, 512] {
+            for (input_width, output_width) in [(256, 64), (64, 192), (1024, 256), (256, 768)] {
+                let graph = graph(batch, input_width, output_width, true, false);
+                let mut session =
+                    crate::dreamer::runtime::build_session(&graph, &gpu, Mode::Inference, false);
+                let memory = gpu.memory_stats();
+                assert!(memory.budget.saturating_sub(memory.usage) >= 2 << 30);
+                let input = (0..batch * 8 * input_width)
+                    .map(|_| rng.random_range(-1.0f32..1.0))
+                    .collect::<Vec<_>>();
+                let scale = (input_width as f32).sqrt().recip();
+                let weight = (0..8 * input_width * output_width)
+                    .map(|_| rng.random_range(-scale..scale))
+                    .collect::<Vec<_>>();
+                let bias = (0..8 * output_width)
+                    .map(|_| rng.random_range(-0.1f32..0.1))
+                    .collect::<Vec<_>>();
+                for (name, data) in [
+                    ("probe.input", &input),
+                    ("probe.block.weight", &weight),
+                    ("probe.block.bias", &bias),
+                ] {
+                    session.set_parameter(name, data);
+                }
+                session.step();
+                session.wait();
+                let actual = session.read_output(batch * 8 * output_width);
+                let (mut squared_error, mut squared_norm, mut max_error) = (0.0f64, 0.0f64, 0.0f64);
+                for row in 0..batch {
+                    for block in 0..8 {
+                        for col in 0..output_width {
+                            let mut expected = f64::from(bias[block * output_width + col]);
+                            for inner in 0..input_width {
+                                expected +=
+                                    f64::from(input[(row * 8 + block) * input_width + inner])
+                                        * f64::from(
+                                            weight[(block * input_width + inner) * output_width
+                                                + col],
+                                        );
+                            }
+                            let index = (row * 8 + block) * output_width + col;
+                            let error = (f64::from(actual[index]) - expected).abs();
+                            assert!(actual[index].is_finite());
+                            assert!(
+                                error <= 2e-6 * (1.0 + expected.abs()),
+                                "B{batch}/{input_width}/{output_width}[{index}]: {} != {expected}",
+                                actual[index]
+                            );
+                            squared_error += error * error;
+                            squared_norm += expected * expected;
+                            max_error = max_error.max(error);
+                        }
+                    }
+                }
+                let relative_l2 = (squared_error / squared_norm.max(1e-30)).sqrt();
+                assert!(relative_l2 <= 2e-5);
+                eprintln!(
+                    "F64 B{batch}/{input_width}/{output_width}: outputs={} max_abs={max_error:e} relative_l2={relative_l2:e}",
+                    actual.len()
+                );
+            }
+        }
     }
 
     #[test]

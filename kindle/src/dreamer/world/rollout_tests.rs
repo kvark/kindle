@@ -110,8 +110,10 @@ fn fused_rollout_graphs_have_full_horizons_and_no_trainable_sampling_parameters(
 
 #[test]
 fn categorical_reduction_dispatch_covers_every_row() {
-    for classes in [1, 4, 16, 18, 24] {
-        let rows = 16_384;
+    for (rows, classes) in [1, 255, 256, 16_383, 16_384, 16_385]
+        .into_iter()
+        .flat_map(|rows| [1, 4, 16, 18, 24].map(|classes| (rows, classes)))
+    {
         let mut graph = Graph::new();
         let logits = graph.input("logits", &[rows, classes]);
         let draws = graph.input("draws", &[rows, classes]);
@@ -121,10 +123,19 @@ fn categorical_reduction_dispatch_covers_every_row() {
         let reduction = plan
             .dispatches
             .iter()
-            .find(|d| d.shader == meganeura::compile::ShaderEntry::MaxPool2d)
+            .find(|dispatch| {
+                dispatch
+                    .reduction()
+                    .is_some_and(|kernel| kernel.op == meganeura::schedule::ReduceOp::ArgMax)
+            })
             .unwrap();
         assert_eq!(reduction.params[0], rows as u32);
-        assert_eq!(reduction.workgroups, [rows.div_ceil(256) as u32, 1, 1]);
+        assert_eq!(reduction.params[1], classes as u32);
+        let per_group = reduction.reduction().unwrap().rows_per_workgroup;
+        let [groups, y, z] = reduction.workgroups;
+        assert_eq!([y, z], [1, 1]);
+        assert!(groups * per_group >= rows as u32);
+        assert!((groups - 1) * per_group < rows as u32);
     }
 }
 

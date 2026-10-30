@@ -7,7 +7,7 @@ use meganeura::graph::Op;
 use meganeura::{Graph, Mode, Session, SessionConfig};
 use rand::{Rng, SeedableRng, rngs::StdRng};
 
-use super::config::DreamerConfig;
+use super::config::{DreamerConfig, TrainingPrecision};
 
 pub(crate) fn build_session(
     graph: &Graph,
@@ -15,14 +15,114 @@ pub(crate) fn build_session(
     mode: Mode,
     skip_full_optimize: bool,
 ) -> Session {
+    build_session_with_policy(
+        graph,
+        gpu,
+        mode,
+        skip_full_optimize,
+        meganeura::CoopPolicy::Auto,
+        TrainingPrecision::Auto,
+        Vec::new(),
+    )
+}
+
+pub(crate) fn build_training_session(
+    graph: &Graph,
+    gpu: &Arc<blade_graphics::Context>,
+    config: &DreamerConfig,
+) -> Session {
+    build_prepared_training_session(graph, gpu, config, Vec::new())
+}
+
+pub(crate) fn build_prepared_training_session(
+    graph: &Graph,
+    gpu: &Arc<blade_graphics::Context>,
+    config: &DreamerConfig,
+    prepare_outputs: Vec<usize>,
+) -> Session {
+    build_session_with_policy(
+        graph,
+        gpu,
+        Mode::Training,
+        config.skip_full_optimize,
+        config.training_precision.coop_policy(),
+        config.training_precision,
+        prepare_outputs,
+    )
+}
+
+pub(crate) fn build_learner_inference_session(
+    graph: &Graph,
+    gpu: &Arc<blade_graphics::Context>,
+    config: &DreamerConfig,
+) -> Session {
+    let bf16 = config.training_precision.uses_bf16();
+    build_session_with_policy(
+        graph,
+        gpu,
+        Mode::Inference,
+        false,
+        if bf16 {
+            meganeura::CoopPolicy::NativeF32
+        } else {
+            meganeura::CoopPolicy::Auto
+        },
+        config.training_precision,
+        Vec::new(),
+    )
+}
+
+fn build_session_with_policy(
+    graph: &Graph,
+    gpu: &Arc<blade_graphics::Context>,
+    mode: Mode,
+    skip_full_optimize: bool,
+    coop: meganeura::CoopPolicy,
+    precision: TrainingPrecision,
+    prepare_outputs: Vec<usize>,
+) -> Session {
+    let bf16 = precision.uses_bf16();
+    let converted;
+    let graph = if bf16 {
+        assert!(
+            gpu.capabilities().shader_bfloat16
+                && gpu
+                    .capabilities()
+                    .cooperative_matrix
+                    .bf16_f32_shapes
+                    .contains(&[16, 16, 16]),
+            "BF16 training needs native 16x16x16 BF16/F32 products"
+        );
+        converted = graph
+            .deep_clone()
+            .into_bf16_matmuls()
+            .into_bf16_convolutions();
+        &converted
+    } else {
+        graph
+    };
     meganeura::build(
         graph,
         SessionConfig {
             mode,
             gpu: Some(Arc::clone(gpu)),
+            options: meganeura::CompileOptions {
+                bf16_matrix_gradients: bf16,
+                conv_weight_splits: (mode == Mode::Training).then_some(
+                    meganeura::compile::ConvWeightSplits {
+                        workgroup_threshold: 256,
+                        reduction_chunk: 4096,
+                        max_partial_bytes: 128 << 20,
+                    },
+                ),
+                ..Default::default()
+            },
             skip_full_optimize: mode == Mode::Training && skip_full_optimize,
             runtime: meganeura::SessionOptions {
+                coop,
+                prepare_outputs,
                 gpu_timing: meganeura::GpuOptions::from_env().timing,
+                wgsl_dump_dir: std::env::var("KINDLE_PROFILE_SHADER_DIR").ok(),
                 ..Default::default()
             },
             ..SessionConfig::default()
@@ -32,6 +132,24 @@ pub(crate) fn build_session(
 }
 
 pub(crate) fn initialize_d3(session: &mut Session, graph: &Graph, seed: u64) {
+    // Conv2d's flat OIHW storage does not encode fan-in in its parameter shape.
+    let convolution_fans = graph
+        .nodes()
+        .iter()
+        .filter_map(|node| {
+            if let Op::Conv2d {
+                in_channels,
+                kernel_h,
+                kernel_w,
+                ..
+            } = node.op
+                && let Op::Parameter { ref name } = graph.node(node.inputs[1]).op
+            {
+                return Some((name.as_str(), (in_channels * kernel_h * kernel_w) as usize));
+            }
+            None
+        })
+        .collect::<HashMap<_, _>>();
     let shapes = graph
         .nodes()
         .iter()
@@ -66,7 +184,10 @@ pub(crate) fn initialize_d3(session: &mut Session, graph: &Graph, seed: u64) {
             } else {
                 1.0
             };
-            let fan_in = d3_fan_in(shape);
+            let fan_in = convolution_fans
+                .get(name.as_str())
+                .copied()
+                .unwrap_or_else(|| d3_fan_in(shape));
             // Match reconstruction's spatial-head initialization in the causal
             // ablation. Only the trunk's smaller deterministic input differs.
             let initialization_name = match name.strip_prefix("world.future_predictor.") {
@@ -188,24 +309,22 @@ pub(crate) fn sync_matching_many(source: &Session, targets: &mut [&mut Session],
     }
 }
 
-pub(crate) fn ema_matching(source: &Session, target: &mut Session, prefix: &str, rate: f32) {
+pub(crate) fn ema_matching(source: &mut Session, target: &mut Session, prefix: &str, rate: f32) {
     assert!((0.0..0.5).contains(&rate));
     let names = source
         .param_names()
         .into_iter()
         .filter(|name| name.starts_with(prefix))
         .filter(|name| source.param_size(name) == target.param_size(name))
+        .map(str::to_owned)
         .collect::<Vec<_>>();
-    let source_values = source.read_params(&names);
-    let target_values = target.read_params(&names);
-    for ((name, source_values), mut target_values) in
-        names.into_iter().zip(source_values).zip(target_values)
-    {
-        for (target, source) in target_values.iter_mut().zip(source_values) {
-            *target = rate * source + (1.0 - rate) * *target;
-        }
-        target.set_parameter(name, &target_values);
-    }
+    target
+        .blend_parameters_from(
+            source,
+            &names.iter().map(String::as_str).collect::<Vec<_>>(),
+            rate,
+        )
+        .expect("matching dense slow-critic parameters");
 }
 
 pub(crate) fn configure_d3_optimizer(
@@ -214,6 +333,19 @@ pub(crate) fn configure_d3_optimizer(
     learner_step: u64,
     learning_rate: f32,
 ) {
+    if let Some(rate) = config.encoder_learning_rate {
+        session.set_lr_multiplier("world.representation.encoder.", rate / config.learning_rate);
+    }
+    if let Some(rate) = config.dynamics_learning_rate {
+        for prefix in [
+            "world.dynamics.",
+            "world.representation.posterior.",
+            "world.future_predictor.",
+            "world.exploration.",
+        ] {
+            session.set_lr_multiplier(prefix, rate / config.learning_rate);
+        }
+    }
     session.set_laprop(
         d3_learning_rate(learning_rate, config.learning_rate_warmup, learner_step),
         config.optimizer_beta1,

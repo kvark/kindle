@@ -14,6 +14,8 @@ pub(crate) struct DeviceCopies {
     gpu: Arc<blade_graphics::Context>,
     encoder: blade_graphics::CommandEncoder,
     completion: Option<blade_graphics::SyncPoint>,
+    #[cfg(test)]
+    timing: bool,
 }
 
 impl DeviceCopies {
@@ -27,6 +29,8 @@ impl DeviceCopies {
             gpu,
             encoder,
             completion: None,
+            #[cfg(test)]
+            timing: meganeura::GpuOptions::from_env().timing,
         }
     }
 
@@ -115,6 +119,18 @@ impl DeviceCopies {
                     .expect("GPU device copy wait failed"),
                 "device copy did not complete"
             );
+            #[cfg(test)]
+            if self.timing && self.gpu.capabilities().timing {
+                let timings = self.encoder.last_timing();
+                meganeura::profiler::record_gpu_timings(&meganeura::profiler::GpuTimings {
+                    passes: timings
+                        .passes
+                        .iter()
+                        .map(|&(name, at)| (name.to_owned(), at))
+                        .collect(),
+                    done: Some(timings.done),
+                });
+            }
         }
     }
 }

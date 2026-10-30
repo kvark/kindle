@@ -8,10 +8,14 @@ from pathlib import Path
 import struct
 
 from ._exploration import EXPLORATION_PROTOCOL, PersistentExploration
+from ._qbert_guidance import CORRECTIVE_GUIDANCE_KIND, GUIDANCE_KINDS, QbertGuidance
+from ._breakout_guidance import (CORRECTIVE_GUIDANCE_KIND as BREAKOUT_CORRECTIVE_GUIDANCE_KIND,
+                                 GUIDANCE_KINDS as BREAKOUT_GUIDANCE_KINDS, BreakoutGuidance)
 
 
 VECTOR_PROTOCOL = "kindle-vector-v2"
-EPISODE_EVALUATION_PROTOCOL = "kindle-vector-v4"
+EPISODE_EVALUATION_PROTOCOL = "kindle-vector-v5"
+EPISODE_EVALUATION_PROTOCOLS = ("kindle-vector-v4", EPISODE_EVALUATION_PROTOCOL)
 
 
 def episode_summary(episodes):
@@ -54,7 +58,7 @@ def audit(path):
     with Path(path).open() as source:
         header = json.loads(next(source))
         check(header["event"] == "run_start" and header["protocol"] in (
-            "kindle-vector-v1", VECTOR_PROTOCOL, EXPLORATION_PROTOCOL, EPISODE_EVALUATION_PROTOCOL), "unknown vector protocol")
+            "kindle-vector-v1", VECTOR_PROTOCOL, EXPLORATION_PROTOCOL, *EPISODE_EVALUATION_PROTOCOLS), "unknown vector protocol")
         count, config = header["num_envs"], header["config"]
         check(type(count) is int and count > 0, "invalid stream count")
         check(type(header["steps"]) is int and header["steps"] > 0 and header["steps"] % count == 0, "invalid action budget")
@@ -70,8 +74,24 @@ def audit(path):
             check(type(header.get("sticky_actions")) in (int, float)
                   and header["sticky_actions"] in (0.0, 0.25), "invalid sticky action probability")
         check(header["mode"] in ("train", "evaluate_sample", "evaluate_greedy"), "unknown action mode")
+        if "action_temperature" in header:
+            temperature = header["action_temperature"]
+            check(type(temperature) in (int, float) and math.isfinite(temperature)
+                  and 2**-126 <= temperature <= float.fromhex('0x1.fffffep+127'),
+                  "invalid action temperature")
+            check(header["mode"] == "evaluate_sample" and header.get("restored_checkpoint") is not None,
+                  "action temperature requires sampled frozen restore")
+        posterior_mode = header.get("posterior_mode", "sample")
+        check(posterior_mode in ("sample", "greedy"), "unknown posterior mode")
+        if posterior_mode == "greedy":
+            check(header["mode"] != "train" and header.get("restored_checkpoint") is not None,
+                  "greedy posterior requires frozen restore")
+        behavior_probe = header.get("behavior_probe")
+        if behavior_probe is not None:
+            check(behavior_probe == "live-posterior-v1" and header["mode"] != "train",
+                  "behavior probe requires declared frozen evaluation")
         episode_target = None
-        if header["protocol"] == EPISODE_EVALUATION_PROTOCOL:
+        if header["protocol"] in EPISODE_EVALUATION_PROTOCOLS:
             episode_target = header["evaluation_episodes_per_stream"]
             check(type(episode_target) is int and episode_target > 0, "invalid episode budget")
             check(header["mode"] != "train" and header.get("restored_checkpoint") is not None,
@@ -82,22 +102,92 @@ def audit(path):
             check(type(config[field]) is int and config[field] > 0, f"invalid {field}")
         require_numbers(config["train_ratio"])
         check(config["train_ratio"] >= 0, "invalid train ratio")
+        open_loop = config.get("open_loop_supervision")
+        if open_loop is not None:
+            check(isinstance(open_loop, dict) and set(open_loop) == {"horizon", "scale"},
+                  "invalid open-loop config")
+            check(type(open_loop["horizon"]) is int
+                  and 2 <= open_loop["horizon"] < min(config["batch_length"], config.get("world_backprop_length", 0)),
+                  "invalid open-loop horizon")
+            require_numbers(open_loop["scale"])
+            check(open_loop["scale"] > 0 and config.get("observation_kind") in ("rgb32", "rgb48", "rgb64")
+                  and config.get("loss_scales", {}).get("future_prediction", 0) > 0,
+                  "open-loop supervision requires positive scale and CDP")
+        centroid = config.get("color_centroid_supervision")
+        if centroid is not None:
+            check(isinstance(centroid, dict) and set(centroid) == {
+                "scale", "channel", "background_scale", "region"}, "invalid centroid config")
+            require_numbers(centroid)
+            check(type(centroid["channel"]) is int and 0 <= centroid["channel"] < 3
+                  and centroid["scale"] > 0 and centroid["background_scale"] > 0,
+                  "invalid centroid channel/scales")
+            geometry = config.get("observation_kind")
+            check(geometry in ("rgb32", "rgb48", "rgb64"), "centroid requires RGB")
+            region = centroid["region"]
+            check(isinstance(region, list) and len(region) == 4
+                  and all(0 <= value <= 1 for value in region), "invalid centroid region")
+            x0, y0, x1, y1 = region
+            side = int(geometry[3:])
+            check(x0 < x1 and y0 < y1
+                  and all(any(low <= (i+.5)/side < high for i in range(side))
+                          for low, high in ((x0, x1), (y0, y1))), "empty centroid region")
         exploration = None
+        guidance = False
         if header["protocol"] == EXPLORATION_PROTOCOL:
             check(header["mode"] == "train", "frozen evaluation cannot contain exploration overrides")
-            exploration = PersistentExploration(header["exploration"], count, config["action_count"])
+            breakout_guidance = header["exploration"].get("kind") in BREAKOUT_GUIDANCE_KINDS
+            guidance = breakout_guidance or header["exploration"].get("kind") in GUIDANCE_KINDS
+            if guidance:
+                game = "ALE/Breakout-v5" if breakout_guidance else "ALE/Qbert-v5"
+                check(header["environment"] == game and header["atari_protocol"] == "published"
+                      and header["full_action_space"] is True and header["observation_size"] == "native"
+                      and header["observation_shape"] == [210, 160, 3]
+                      and header["noop_max"] == 0 and header["action_repeat"] == 4,
+                      "unsupported pixel guidance game or preprocessing")
+            cls = (BreakoutGuidance if breakout_guidance else QbertGuidance) if guidance else PersistentExploration
+            exploration = cls(header["exploration"], count, config["action_count"])
             check(exploration.config["seed"] == config["seed"] == header["seed"], "exploration seed differs")
-            from . import _exploration
-            expected_hash = hashlib.sha256(Path(_exploration.__file__).read_bytes()).hexdigest()
+            from . import _exploration, _qbert_guidance, _breakout_guidance
+            module = (_breakout_guidance if breakout_guidance else _qbert_guidance) if guidance else _exploration
+            expected_hash = hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()
             check(header["exploration_sha256"] == expected_hash, "exploration implementation differs")
+            if guidance:
+                from . import _pixel_guidance
+                schedule_hash = hashlib.sha256(Path(_pixel_guidance.__file__).read_bytes()).hexdigest()
+                check(header.get("guidance_schedule_sha256") == schedule_hash, "guidance schedule implementation differs")
         else:
             check(not {"exploration", "exploration_sha256"}.intersection(header), "undeclared exploration protocol")
+        expert = config.get("expert_imitation")
+        if expert is not None:
+            check(isinstance(expert, dict)
+                  and {"scale", "action_weights"} <= set(expert) <= {"scale", "action_weights", "world_gradient"},
+                  "invalid expert imitation config")
+            check(type(expert.get("world_gradient", False)) is bool, "invalid expert world gradient flag")
+            require_numbers(expert["scale"])
+            require_numbers(expert["action_weights"])
+            check(expert["scale"] > 0 and isinstance(expert["action_weights"], list)
+                  and len(expert["action_weights"]) == config["action_count"]
+                  and all(weight >= 0 for weight in expert["action_weights"])
+                  and any(weight > 0 for weight in expert["action_weights"]), "invalid expert imitation weights")
+            check(header["mode"] != "train" or guidance, "expert imitation requires trusted guidance")
+        expert_training = expert is not None and header["mode"] == "train"
+        corrective = guidance and header["exploration"]["kind"] in (CORRECTIVE_GUIDANCE_KIND, BREAKOUT_CORRECTIVE_GUIDANCE_KIND)
+        check(not corrective or expert_training, "corrective guidance requires expert imitation")
         training = header["mode"] == "train" and config["train_ratio"] > 0
         required = config["replay_context"] + config["batch_length"]
         samples = config["batch_size"] * config["batch_length"]
+        video = config.get("video_encoder")
+        check(video in (None, "frozen", "joint"), "unknown video encoder mode")
+        if video:
+            check(config["batch_length"] == 16 and config["replay_context"] == 1,
+                  "causal video replay requires T16/context1")
         credit_per_action = f32(f32(config["train_ratio"]) / samples)
         replay = deque(range(count))
         replay_lengths = [1] * count
+        # Reconstruct retained frame phases, independently of native slot/start
+        # bookkeeping. A phase-15 arrival needs all 16 frames and its context.
+        phases = [deque([0]) for _ in range(count)] if video else None
+        next_phase = [1] * count
         actions = updates = 0
         credit = 0.0
         started = False
@@ -108,16 +198,26 @@ def audit(path):
         episode_returns = [0.0] * count
         total_rewards = [0.0] * count
         episode_counts = [0] * count
+        natural_episode_counts = [0] * count
+        natural_budget = header["protocol"] == EPISODE_EVALUATION_PROTOCOL
+        budget_counts = natural_episode_counts if natural_budget else episode_counts
         last_frames = [0] * count
         last_flags = None
         final = None
         completed = []
 
-        def push(stream):
+        def push(stream, *, reset=False):
             if len(replay) == config["replay_capacity"]:
-                replay_lengths[replay.popleft()] -= 1
+                oldest = replay.popleft()
+                replay_lengths[oldest] -= 1
+                if phases is not None:
+                    phases[oldest].popleft()
             replay.append(stream)
             replay_lengths[stream] += 1
+            if phases is not None:
+                phase = 0 if reset else next_phase[stream]
+                phases[stream].append(phase)
+                next_phase[stream] = (phase + 1) % 16
 
         def settled():
             check(not pending_updates and not pending_episodes and not pending_resets, "incomplete vector round")
@@ -128,20 +228,55 @@ def audit(path):
             kind = event["event"]
             if kind == "transition":
                 settled()
-                check(episode_target is None or min(episode_counts) < episode_target,
+                check(episode_target is None or min(budget_counts) < episode_target,
                       "actions after episode budget was reached")
                 actions += count
                 check(event["run_step"] == actions and event["vector_tick"] == actions // count, "vector/action counter mismatch")
                 for field in ("actions", "rewards", "stored_rewards", "terminated", "truncated", "executed_action_frames"):
                     check(len(event[field]) == count, f"wrong {field} batch length")
+                for field in ("behavior_values", "behavior_intrinsic"):
+                    if behavior_probe:
+                        check(isinstance(event.get(field), list) and len(event[field]) == count,
+                              f"wrong {field} batch length")
+                        require_numbers(event[field])
+                    else:
+                        check(field not in event, "undeclared behavior probe")
+                if behavior_probe:
+                    check(all(value >= 0 for value in event["behavior_intrinsic"]), "negative exploration bonus")
                 if exploration:
-                    expected_overrides = exploration.actions()
                     overrides = event["action_overrides"]
                     check(isinstance(overrides, list) and len(overrides) == count, "wrong action override batch")
                     check(all(action is None or type(action) is int for action in overrides), "invalid action override type")
-                    check(overrides == expected_overrides, "exploration action history differs")
+                    if guidance:
+                        exploration.verify_actions(overrides)
+                        hashes = event["guidance_frame_sha256"]
+                        check(isinstance(hashes, list) and len(hashes) == count, "wrong guidance frame hash batch")
+                        for action, digest in zip(overrides, hashes):
+                            check(digest is None if action is None and not corrective else isinstance(digest, str) and len(digest) == 64
+                                  and all(c in "0123456789abcdef" for c in digest), "invalid guidance frame hash")
+                    else:
+                        check(overrides == exploration.actions(), "exploration action history differs")
                 else:
                     check("action_overrides" not in event, "undeclared action overrides")
+                if not guidance:
+                    check("guidance_frame_sha256" not in event, "undeclared guidance frame hashes")
+                if corrective:
+                    labels = event.get("expert_labels")
+                    check(isinstance(labels, list) and len(labels) == count
+                          and all(type(label) is int and label in ((0, 1, 3, 4) if breakout_guidance else (0, 2, 3, 4, 5)) for label in labels),
+                          "invalid corrective expert labels")
+                    check(all(action is None or action == label for action, label in zip(overrides, labels)),
+                          "guided override differs from expert label")
+                else:
+                    check("expert_labels" not in event, "undeclared corrective expert labels")
+                if expert_training:
+                    mask = event.get("expert_action_mask")
+                    check(isinstance(mask, list) and len(mask) == count
+                          and all(type(value) is bool for value in mask), "invalid expert action mask")
+                    check(mask == [action is not None for action in (labels if corrective else overrides)],
+                          "expert action mask differs from guidance")
+                else:
+                    check("expert_action_mask" not in event, "undeclared expert action mask")
                 for stream in range(count):
                     action = event["actions"][stream]
                     check(type(action) is int and 0 <= action < config["action_count"], "invalid executed action")
@@ -168,6 +303,9 @@ def audit(path):
                         pending_resets.add(stream)
                 last_flags = event["terminated"], event["truncated"]
                 ready = sum(max(0, length - required + 1) for length in replay_lengths) >= samples
+                if phases is not None:
+                    ready = sum(phase == 15 and index >= required - 1
+                                for history in phases for index, phase in enumerate(history)) >= config["batch_size"]
                 if training and ready:
                     if not started:
                         started, credit = True, 1.0
@@ -176,6 +314,26 @@ def audit(path):
                 check(event["run_step"] == actions and pending_updates > 0, "unexpected learner update")
                 report = event["report"]
                 require_numbers(report)
+                position = report.get("world", {}).get("color_centroid_supervision")
+                check((position is not None) == (centroid is not None), "centroid report/config mismatch")
+                if position is not None:
+                    check(isinstance(position, dict) and set(position) == {"loss", "valid_fraction"},
+                          "invalid centroid report")
+                    check(position["loss"] >= 0 and 0 <= position["valid_fraction"] <= 1,
+                          "invalid centroid loss/support")
+                    check(position["valid_fraction"] > 0 or position["loss"] == 0,
+                          "absent centroid rows have nonzero loss")
+                rollout = report.get("world", {}).get("open_loop_supervision")
+                check((rollout is not None) == (open_loop is not None), "open-loop report/config mismatch")
+                if rollout is not None:
+                    check(isinstance(rollout, dict) and set(rollout) == {
+                        "total_loss", "prediction_loss", "reward_loss", "continuation_loss", "valid_fraction"},
+                        "invalid open-loop report")
+                    check(0 <= rollout["valid_fraction"] <= 1, "invalid open-loop valid fraction")
+                    expected = open_loop["scale"] * sum(rollout[name + "_loss"] * config["loss_scales"][component]
+                        for name, component in (("prediction", "future_prediction"), ("reward", "reward"), ("continuation", "continuation")))
+                    check(math.isclose(rollout["total_loss"], expected, rel_tol=2e-5, abs_tol=2e-4),
+                          "open-loop loss reduction differs")
                 updates += 1
                 check(report["learner_step"] == header["starting_learner_step"] + updates, "learner counter mismatch")
                 check(report["replay_len"] == len(replay), "learner replay length mismatch")
@@ -191,6 +349,7 @@ def audit(path):
                 check((event["terminated"], event["truncated"]) == (last_flags[0][stream], last_flags[1][stream]), "episode flags mismatch")
                 pending_episodes.remove(stream)
                 episode_counts[stream] += 1
+                natural_episode_counts[stream] += event["terminated"] and not event["truncated"]
                 episode_lengths[stream] = 0
                 episode_returns[stream] = 0.0
                 completed.append(event)
@@ -199,7 +358,7 @@ def audit(path):
                 ids = event["streams"]
                 check(event["run_step"] == actions and len(ids) == len(set(ids)) and set(ids) == pending_resets, "wrong stream reset")
                 for stream in ids:
-                    push(stream)
+                    push(stream, reset=True)
                 if exploration:
                     exploration.reset(ids)
                 pending_resets.clear()
@@ -212,12 +371,21 @@ def audit(path):
                 check(event["training_debt"] == credit, "lost or invented training credit")
                 for field, expected in (("executed_action_frames", last_frames), ("total_rewards", total_rewards), ("episode_counts", episode_counts), ("partial_returns", episode_returns), ("partial_lengths", episode_lengths)):
                     check(event[field] == expected, f"{field} ledger mismatch")
+                if natural_budget:
+                    check(event["natural_episode_counts"] == natural_episode_counts,
+                          "natural episode ledger mismatch")
                 require_numbers(event["stage_seconds"])
                 if exploration:
                     check(event["overridden_actions"] == exploration.overridden_actions
                           and all(type(value) is int for value in event["overridden_actions"]), "exploration action counts differ")
                 else:
                     check("overridden_actions" not in event, "undeclared exploration counts")
+                if guidance:
+                    check(event["guidance_episodes"] == exploration.episode_counts, "guidance episode counts differ")
+                    check(all(type(n) is int for values in event["guidance_episodes"].values() for n in values),
+                          "invalid guidance episode count type")
+                else:
+                    check("guidance_episodes" not in event, "undeclared guidance episode counts")
                 check(event["elapsed_seconds"] > 0 and math.isfinite(event["elapsed_seconds"]), "invalid clock")
                 elapsed = event["elapsed_seconds"]
                 check(event["actions_per_second"] == actions / elapsed, "invalid action throughput")
@@ -226,7 +394,7 @@ def audit(path):
                 if kind == "run_end":
                     final = event
                     if episode_target is not None:
-                        expected_reason = ("episode_budget_complete" if min(episode_counts) >= episode_target
+                        expected_reason = ("episode_budget_complete" if min(budget_counts) >= episode_target
                                            else "action_cap_reached")
                         check(final["reason"] in (expected_reason, "interrupted"), "wrong episode-budget stop reason")
                         check(actions <= header["steps"] and (final["reason"] != "action_cap_reached"
@@ -237,7 +405,8 @@ def audit(path):
                     check(final["learner_updates"] == updates, "final counts mismatch")
             elif kind == "checkpoint":
                 settled()
-                check(episode_target is None, "episode-budget evaluation wrote a checkpoint")
+                check(episode_target is None or header.get("frozen_checkpoint_export") is True,
+                      "undeclared episode-budget checkpoint export")
                 check(event["run_step"] == actions and event["learner_step"] == header["starting_learner_step"] + updates, "checkpoint counters mismatch")
             else:
                 raise ValueError(f"unknown event {kind}")
@@ -259,9 +428,12 @@ def audit(path):
             check(final[field] == value and (field == "mean_completed_return" or type(final[field]) is int), "final score mismatch")
         exploration_result = (dict(exploration=exploration.config,
             exploration_sha256=header["exploration_sha256"],
-            overridden_actions=exploration.overridden_actions, exploration_ledger_verified=True)
+            overridden_actions=exploration.overridden_actions, exploration_ledger_verified=not guidance,
+            **(dict(guidance_episodes=exploration.episode_counts, exploration_schedule_verified=True,
+                    exploration_pixel_actions_verified=False) if guidance else {}))
             if exploration else {})
         evaluation_result = (dict(evaluation_episodes_per_stream=episode_target,
+            **(dict(evaluation_episode_kind="natural") if natural_budget else {}),
             episode_budget_complete=final["reason"] == "episode_budget_complete",
             action_cap_reached=actions == header["steps"]) if episode_target is not None else {})
         return dict(path=str(path), protocol=header["protocol"], actions=actions, updates=updates, num_envs=count,

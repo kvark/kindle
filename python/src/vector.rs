@@ -24,6 +24,44 @@ pub(super) fn validate_streams(streams: &[usize], count: usize, items: usize) ->
 
 #[pymethods]
 impl PyVectorAgent {
+    #[classattr]
+    const SUPPORTS_EXPERT_WORLD_GRADIENT: bool = true;
+
+    #[classattr]
+    const SUPPORTS_OPEN_LOOP_SUPERVISION: bool = true;
+
+    #[classattr]
+    const SUPPORTS_COLOR_CENTROID_SUPERVISION: bool = true;
+
+    #[classmethod]
+    fn learned_rgb(
+        _class: &Bound<'_, PyType>,
+        num_envs: usize,
+        config: &Bound<'_, PyAny>,
+    ) -> PyResult<Self> {
+        let encoded: String = config
+            .py()
+            .import("json")?
+            .call_method1("dumps", (config,))?
+            .extract()?;
+        let config: DreamerConfig =
+            serde_json::from_str(&encoded).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        let inner = VectorDreamerAgent::learned_rgb(config, num_envs)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        Ok(Self { inner })
+    }
+
+    #[classmethod]
+    fn restore_rgb(
+        _class: &Bound<'_, PyType>,
+        dreamer_checkpoint: &str,
+        num_envs: usize,
+    ) -> PyResult<Self> {
+        let inner = VectorDreamerAgent::restore_rgb(dreamer_checkpoint, num_envs)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        Ok(Self { inner })
+    }
+
     /// The config is the complete dictionary returned by kindle.default_config.
     #[new]
     #[pyo3(signature = (encoder_checkpoint, num_envs, config, *, encoder = "levjepa-tiny"))]
@@ -65,6 +103,18 @@ impl PyVectorAgent {
         Ok(Self { inner })
     }
 
+    fn use_greedy_posterior_for_evaluation(&mut self) -> PyResult<()> {
+        self.inner
+            .use_greedy_posterior_for_evaluation()
+            .map_err(PyValueError::new_err)
+    }
+
+    fn set_action_temperature_for_evaluation(&mut self, temperature: f32) -> PyResult<()> {
+        self.inner
+            .set_action_temperature_for_evaluation(temperature)
+            .map_err(PyValueError::new_err)
+    }
+
     fn begin_episodes(
         &mut self,
         streams: Vec<usize>,
@@ -80,17 +130,36 @@ impl PyVectorAgent {
         Ok(())
     }
 
-    #[pyo3(signature = (greedy = false, action_overrides = None))]
+    #[pyo3(signature = (greedy = false, action_overrides = None, *, expert_actions = None, expert_labels = None))]
     fn act(
         &mut self,
         greedy: bool,
         action_overrides: Option<Vec<Option<usize>>>,
+        expert_actions: Option<Vec<Option<usize>>>,
+        expert_labels: Option<Vec<Option<usize>>>,
     ) -> PyResult<Vec<usize>> {
         let mode = if greedy {
             ActionMode::Greedy
         } else {
             ActionMode::Sample
         };
+        if let Some(actions) = expert_actions {
+            if action_overrides.is_some() || expert_labels.is_some() {
+                return Err(PyValueError::new_err(
+                    "expert actions are mutually exclusive with ordinary overrides and passive labels",
+                ));
+            }
+            return self
+                .inner
+                .act_with_expert_actions(mode, &actions)
+                .map_err(PyValueError::new_err);
+        }
+        if let Some(labels) = expert_labels {
+            return self
+                .inner
+                .act_with_expert_labels(mode, &labels, action_overrides.as_deref())
+                .map_err(PyValueError::new_err);
+        }
         match action_overrides {
             Some(actions) => self
                 .inner
@@ -98,6 +167,13 @@ impl PyVectorAgent {
                 .map_err(PyValueError::new_err),
             None => Ok(self.inner.act(mode)),
         }
+    }
+
+    /// Read-only values and scaled bonuses, after act and before observe.
+    fn behavior_predictions(&mut self) -> PyResult<(Vec<f32>, Vec<f32>)> {
+        self.inner
+            .behavior_predictions()
+            .map_err(PyValueError::new_err)
     }
 
     fn observe(
@@ -152,6 +228,14 @@ impl PyVectorAgent {
         py: Python<'py>,
         maximum_updates: usize,
     ) -> PyResult<Bound<'py, PyAny>> {
+        if self.inner.posterior_mode() == ActionMode::Greedy {
+            return Err(PyValueError::new_err("greedy posterior is evaluation only"));
+        }
+        if self.inner.action_temperature().is_some() {
+            return Err(PyValueError::new_err(
+                "action temperature is evaluation only",
+            ));
+        }
         reports_to_python(py, &self.inner.learn_scheduled(maximum_updates))
     }
 

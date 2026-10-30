@@ -2,7 +2,11 @@
 
 use super::super::acting_gpu::ActingGpu;
 use super::*;
-use crate::vision::{levjepa::LeVJepaPerception, preprocess_gpu::GpuFrame};
+use crate::dreamer::ObservationKind;
+use crate::vision::{
+    levjepa::LeVJepaPerception,
+    preprocess_gpu::{GpuFrame, GpuPreprocessor},
+};
 
 struct LiveStream {
     policy_rng: StdRng,
@@ -10,15 +14,26 @@ struct LiveStream {
     active: bool,
     needs_reset: bool,
     pending_action: Option<usize>,
+    pending_expert: Option<usize>,
 }
 
 pub(super) struct VectorCore {
     acting: ActingGpu,
     copies: DeviceCopies,
-    pub(super) learner: DreamerCore,
+    pub(super) learner: Box<DreamerCore>,
     streams: Vec<LiveStream>,
     observe: Session,
     policy: Session,
+    diagnostics: Option<Session>,
+    posterior_mode: ActionMode,
+    action_temperature: Option<f32>,
+}
+
+fn check_action_temperature(temperature: f32) -> Result<(), &'static str> {
+    if !temperature.is_normal() || temperature <= 0.0 {
+        return Err("action temperature must be a positive normal finite F32 value");
+    }
+    Ok(())
 }
 
 fn check_capacity(config: &DreamerConfig, streams: usize) -> Result<(), &'static str> {
@@ -32,7 +47,17 @@ fn check_capacity(config: &DreamerConfig, streams: usize) -> Result<(), &'static
     }
     let needed = (config.replay_context + config.batch_length - 1)
         .checked_mul(streams)
-        .and_then(|context| context.checked_add(config.replay_warmup_sequences()));
+        .and_then(|context| {
+            let stride = if config.video_encoder.is_some() {
+                config.batch_length
+            } else {
+                1
+            };
+            config
+                .replay_warmup_sequences()
+                .checked_mul(stride)
+                .and_then(|items| context.checked_add(items))
+        });
     if needed.is_none_or(|needed| needed > config.replay_capacity) {
         return Err("replay capacity cannot warm up this many independent streams");
     }
@@ -53,6 +78,27 @@ fn check_action_overrides(
         .any(|&action| action >= action_count)
     {
         return Err("action override is outside the action vocabulary");
+    }
+    Ok(())
+}
+
+fn check_expert_labels(
+    config: &DreamerConfig,
+    streams: usize,
+    labels: &[Option<usize>],
+) -> Result<(), &'static str> {
+    if config.expert_imitation.is_none() {
+        return Err("expert labels require an imitation configuration");
+    }
+    if labels.len() != streams {
+        return Err("expert labels must have one entry per stream");
+    }
+    if labels
+        .iter()
+        .flatten()
+        .any(|&action| action >= config.action_count)
+    {
+        return Err("expert label is outside the action vocabulary");
     }
     Ok(())
 }
@@ -124,17 +170,41 @@ impl VectorCore {
                     active: false,
                     needs_reset: false,
                     pending_action: None,
+                    pending_expert: None,
                 }
             })
             .collect();
         Self {
             acting,
             copies,
-            learner,
+            learner: Box::new(learner),
             streams,
             observe,
             policy,
+            diagnostics: None,
+            posterior_mode: ActionMode::Sample,
+            action_temperature: None,
         }
+    }
+
+    fn use_greedy_posterior_for_evaluation(&mut self) -> Result<(), &'static str> {
+        if self.streams.iter().any(|stream| stream.active) {
+            return Err("posterior mode must be selected before the first observation");
+        }
+        self.posterior_mode = ActionMode::Greedy;
+        Ok(())
+    }
+
+    fn set_action_temperature_for_evaluation(
+        &mut self,
+        temperature: f32,
+    ) -> Result<(), &'static str> {
+        check_action_temperature(temperature)?;
+        if self.streams.iter().any(|stream| stream.active) {
+            return Err("action temperature must be selected before the first observation");
+        }
+        self.action_temperature = Some(temperature);
+        Ok(())
     }
 
     fn check_arrivals(&self, arrivals: impl Iterator<Item = (usize, FrameFlags, Reward)>) {
@@ -170,9 +240,9 @@ impl VectorCore {
         self.learner.replay.wait_device();
         let mut observations =
             vec![0.0; self.streams.len() * self.learner.config.observation_dim()];
+        let width = self.learner.config.observation_dim();
         for (id, observation, _, _) in &arrivals {
-            observations[id * Observation::LEN..(id + 1) * Observation::LEN]
-                .copy_from_slice(observation.as_slice());
+            observations[id * width..(id + 1) * width].copy_from_slice(observation.as_slice());
         }
         self.observe.set_input("observation", &observations);
         self.ingest_prepared(&arrivals.iter().map(|a| (a.0, a.2, a.3)).collect::<Vec<_>>())
@@ -206,6 +276,12 @@ impl VectorCore {
         if arrivals.is_empty() {
             return Vec::new();
         }
+        if self.learner.config.video_encoder.is_some() {
+            self.learner.replay.store_pixels(
+                perception.session(),
+                &arrivals.iter().map(|a| a.0).collect::<Vec<_>>(),
+            );
+        }
         self.copies.copy(&[DeviceCopy {
             source: (perception.session(), ExternalSlot::Output(0)),
             target: (&self.observe, "observation"),
@@ -228,7 +304,10 @@ impl VectorCore {
         for &(id, flags, _) in arrivals {
             active[id] = 1;
             for draw in &mut draws[id * size.stoch..(id + 1) * size.stoch] {
-                *draw = self.streams[id].posterior_rng.random();
+                *draw = match self.posterior_mode {
+                    ActionMode::Sample => self.streams[id].posterior_rng.random(),
+                    ActionMode::Greedy => 0.0,
+                };
             }
             if !flags.is_first {
                 actions[id * config.action_count + self.streams[id].pending_action.unwrap()] = 1.0;
@@ -248,13 +327,20 @@ impl VectorCore {
             self.observe.set_input(name, values);
         }
         self.observe.step();
-        self.acting
-            .posterior(&self.observe, &self.policy, &active, &draws);
+        self.acting.posterior(
+            &self.observe,
+            &self.policy,
+            &active,
+            &draws,
+            self.posterior_mode,
+        );
         let frames: Vec<_> = arrivals
             .iter()
             .map(|&(id, flags, reward)| {
                 let stream = &mut self.streams[id];
                 let previous_action = stream.pending_action.take();
+                let expert = std::mem::take(&mut stream.pending_expert);
+                assert!(expert.is_none() || (!flags.is_first && previous_action.is_some()));
                 stream.active = true;
                 stream.needs_reset = flags.is_last;
                 if !flags.is_first {
@@ -263,7 +349,7 @@ impl VectorCore {
                         config.train_ratio / (config.batch_size * config.batch_length) as f32,
                     );
                 }
-                (id, previous_action, reward, flags)
+                (id, previous_action, reward, flags, expert)
             })
             .collect();
         self.learner
@@ -287,6 +373,42 @@ impl VectorCore {
             self.learner.config.action_count,
         )?;
         Ok(self.act_inner(mode, Some(overrides), None))
+    }
+
+    fn act_with_expert_actions(
+        &mut self,
+        mode: ActionMode,
+        actions: &[Option<usize>],
+    ) -> Result<Vec<usize>, &'static str> {
+        if self.learner.config.expert_imitation.is_none() {
+            return Err("expert actions require an imitation configuration");
+        }
+        let selected = self.act_with_overrides(mode, actions)?;
+        for (stream, action) in self.streams.iter_mut().zip(actions) {
+            stream.pending_expert = *action;
+        }
+        Ok(selected)
+    }
+
+    fn act_with_expert_labels(
+        &mut self,
+        mode: ActionMode,
+        labels: &[Option<usize>],
+        overrides: Option<&[Option<usize>]>,
+    ) -> Result<Vec<usize>, &'static str> {
+        check_expert_labels(&self.learner.config, self.streams.len(), labels)?;
+        if let Some(actions) = overrides {
+            check_action_overrides(
+                actions,
+                self.streams.len(),
+                self.learner.config.action_count,
+            )?;
+        }
+        let selected = self.act_inner(mode, overrides, None);
+        for (stream, label) in self.streams.iter_mut().zip(labels) {
+            stream.pending_expert = *label;
+        }
+        Ok(selected)
     }
 
     pub(super) fn act_inner(
@@ -324,7 +446,13 @@ impl VectorCore {
                 ActionMode::Greedy => 0.0,
             })
             .collect();
-        let selected = self.acting.actions(&self.policy, &draws, mode, mask);
+        let selected = self.acting.actions(
+            &self.policy,
+            &draws,
+            mode,
+            mask,
+            self.action_temperature.unwrap_or(1.0),
+        );
         let mut actions = vec![0.0; self.streams.len()];
         self.learner
             .readback
@@ -342,20 +470,78 @@ impl VectorCore {
                 );
                 let action = overrides.and_then(|a| a[id]).unwrap_or(proposed as usize);
                 self.streams[id].pending_action = Some(action);
+                self.streams[id].pending_expert = None;
                 action
             })
             .collect()
     }
 
     pub(super) fn learn(&mut self) -> Option<LearnReport> {
+        assert!(
+            self.action_temperature.is_none(),
+            "action temperature is evaluation only"
+        );
+        assert_eq!(
+            self.posterior_mode,
+            ActionMode::Sample,
+            "greedy posterior is evaluation only"
+        );
         let mut report = self.learner.learn()?;
         self.sync_live(&mut report);
         Some(report)
     }
 
+    fn behavior_predictions(&mut self) -> Result<(Vec<f32>, Vec<f32>), &'static str> {
+        if self
+            .streams
+            .iter()
+            .any(|stream| !stream.active || stream.pending_action.is_none())
+        {
+            return Err("behavior predictions require a pending action in every stream");
+        }
+        let learner = &mut *self.learner;
+        let config = &learner.config;
+        let rows = self.streams.len();
+        let session = self.diagnostics.get_or_insert_with(|| {
+            let mut session = build_session(
+                &behavior::build_diagnostic_graph(config, rows),
+                &learner.gpu,
+                Mode::Inference,
+                false,
+            );
+            share_matching(&mut learner.behavior_train, &mut session, "behavior.value.");
+            share_matching(&mut learner.world_train, &mut session, "world.exploration.");
+            session
+        });
+        sync_matching(&learner.behavior_train, session, "behavior.value.");
+        sync_matching(&learner.world_train, session, "world.exploration.");
+        if config.uses_disagreement() {
+            let mut actions = vec![0.0; rows * config.action_count];
+            for (row, stream) in self.streams.iter().enumerate() {
+                actions[row * config.action_count + stream.pending_action.unwrap()] = 1.0;
+            }
+            session.set_input("action", &actions);
+        }
+        self.copies.copy(&[DeviceCopy {
+            source: (&self.policy, ExternalSlot::Input("feature")),
+            target: (session, "feature"),
+            target_offset_bytes: 0,
+        }]);
+        session.step();
+        let mut logits = vec![0.0; rows * config.value_bins];
+        let mut bonuses = vec![0.0; rows];
+        learner
+            .readback
+            .read_many(&mut [(session, 0, &mut logits), (session, 1, &mut bonuses)]);
+        for bonus in &mut bonuses {
+            *bonus *= config.intrinsic_reward_scale;
+        }
+        Ok((decode_rows(&logits, rows, &learner.bins), bonuses))
+    }
+
     pub(super) fn read_diagnostics(&mut self) {
         assert_eq!(self.streams.len(), 1);
-        let learner = &mut self.learner;
+        let learner = &mut *self.learner;
         learner.readback.read_regions(&mut [
             (
                 self.policy.input_buffer("feature").unwrap(),
@@ -382,6 +568,15 @@ impl VectorCore {
     }
 
     fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
+        assert!(
+            self.action_temperature.is_none(),
+            "action temperature is evaluation only"
+        );
+        assert_eq!(
+            self.posterior_mode,
+            ActionMode::Sample,
+            "greedy posterior is evaluation only"
+        );
         let mut reports = self.learner.learn_scheduled(maximum_updates);
         if let Some(last) = reports.last_mut() {
             self.sync_live(last);
@@ -420,6 +615,11 @@ impl FeatureVectorAgent {
     pub fn new(config: DreamerConfig, streams: usize) -> Result<Self, Box<dyn std::error::Error>> {
         config.check()?;
         check_capacity(&config, streams)?;
+        if config.observation_kind != ObservationKind::Features || config.video_encoder.is_some() {
+            return Err(
+                "FeatureVectorAgent requires supplied features, not pixel/causal replay".into(),
+            );
+        }
         Ok(Self {
             core: VectorCore::new(DreamerCore::new(config)?, streams),
         })
@@ -484,14 +684,183 @@ impl Drop for FeatureVectorAgent {
     }
 }
 
-/// Multiple independent environments using one frozen LeVJEPA and Dreamer learner.
-/// Dense perception, posterior and policy inference are batched on the GPU.
+enum VectorPerception {
+    Causal(Box<LeVJepaPerception>),
+    Learned(Box<GpuPreprocessor>),
+}
+
+impl VectorPerception {
+    fn ingest(
+        &mut self,
+        core: &mut VectorCore,
+        frames: &[(usize, &RgbFrame)],
+        metadata: &[(usize, FrameFlags, Reward)],
+    ) -> Vec<Reward> {
+        match self {
+            Self::Causal(perception) => {
+                let frames = frames
+                    .iter()
+                    .zip(metadata)
+                    .map(|(&(id, frame), &(_, flags, _))| (id, frame, flags.is_first))
+                    .collect::<Vec<_>>();
+                perception.submit_frames_rgb8(&frames);
+                core.ingest_encoded(perception, metadata)
+            }
+            Self::Learned(pixels) => {
+                core.acting.wait();
+                core.learner.replay.wait_device();
+                let frames = frames
+                    .iter()
+                    .map(|&(id, frame)| (id, frame.pixels(), frame.width(), frame.height()))
+                    .collect::<Vec<_>>();
+                pixels.cpu_frames(&mut core.observe, &frames);
+                core.ingest_prepared(metadata)
+            }
+        }
+    }
+}
+
+/// Independent environments sharing one batched GPU perception/policy and learner.
+/// Frozen LeVJEPA retains features; the jointly learned CNN retains RGB pixels.
 pub struct VectorDreamerAgent {
-    perception: LeVJepaPerception,
+    perception: VectorPerception,
+    history: Option<PixelHistory>,
     pub(super) core: VectorCore,
 }
 
+/// Only current-chunk pixels, on GPU. Updating Tiny invalidates all its KVs;
+/// replaying these prefixes rebuilds them without resetting any RSSM stream.
+struct PixelHistory {
+    gpu: Arc<blade_graphics::Context>,
+    buffer: blade_graphics::Buffer,
+    copies: DeviceCopies,
+    streams: usize,
+}
+
+impl PixelHistory {
+    fn new(gpu: Arc<blade_graphics::Context>, streams: usize) -> Self {
+        use crate::vision::levjepa::{FRAMES, joint::PIXELS};
+        let buffer = gpu.create_buffer(blade_graphics::BufferDesc {
+            name: "kindle_live_pixel_history",
+            size: (streams * FRAMES * PIXELS * 4) as u64,
+            memory: blade_graphics::Memory::Device,
+        });
+        Self {
+            copies: DeviceCopies::new(Arc::clone(&gpu)),
+            gpu,
+            buffer,
+            streams,
+        }
+    }
+
+    fn store(&mut self, perception: &LeVJepaPerception, streams: &[usize]) {
+        use crate::vision::levjepa::{FRAMES, joint::PIXELS};
+        let source = perception.session().input_buffer("patches").unwrap();
+        let copies = streams
+            .iter()
+            .map(|&stream| {
+                let phase = (perception.chunk_positions()[stream] + FRAMES - 1) % FRAMES;
+                let mut source = source;
+                source.offset += (stream * PIXELS * 4) as u64;
+                (
+                    source,
+                    self.buffer
+                        .at(((stream * FRAMES + phase) * PIXELS * 4) as u64),
+                    PIXELS * 4,
+                )
+            })
+            .collect::<Vec<_>>();
+        self.copies.copy_regions(&copies);
+    }
+
+    fn refresh(&mut self, perception: &mut LeVJepaPerception) {
+        use crate::vision::levjepa::{FRAMES, PATCHES, joint::PIXELS};
+        let positions = perception.chunk_positions().to_vec();
+        let session = perception.session_mut();
+        session.wait();
+        self.copies.wait();
+        for phase in 0..positions.iter().copied().max().unwrap_or(0) {
+            let destination = session.input_buffer("patches").unwrap();
+            let copies = (0..self.streams)
+                .filter(|&stream| phase < positions[stream])
+                .map(|stream| {
+                    let mut destination = destination;
+                    destination.offset += (stream * PIXELS * 4) as u64;
+                    (
+                        self.buffer
+                            .at(((stream * FRAMES + phase) * PIXELS * 4) as u64),
+                        destination,
+                        PIXELS * 4,
+                    )
+                })
+                .collect::<Vec<_>>();
+            self.copies.copy_regions(&copies);
+            for (stream, &position) in positions.iter().enumerate() {
+                // An inactive stream's unused next slot may be overwritten;
+                // its valid prefix and arrival counter are untouched.
+                let frame = phase.min(position);
+                session.set_input_u32(&format!("frame.{stream}"), &[frame as u32]);
+                session.set_input_u32(
+                    &format!("last_token.{stream}"),
+                    &[((frame + 1) * PATCHES - 1) as u32],
+                );
+            }
+            session.step();
+            session.wait();
+        }
+    }
+}
+
+impl Drop for PixelHistory {
+    fn drop(&mut self) {
+        self.copies.wait();
+        self.gpu.destroy_buffer(self.buffer);
+    }
+}
+
 impl VectorDreamerAgent {
+    pub fn learned_rgb(
+        config: DreamerConfig,
+        streams: usize,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        config.check()?;
+        check_capacity(&config, streams)?;
+        if !config.observation_kind.is_rgb() {
+            return Err("learned RGB requires observation_kind=rgb32, rgb48 or rgb64".into());
+        }
+        let side = config.observation_grid();
+        let learner = DreamerCore::new(config)?;
+        let pixels = GpuPreprocessor::rgb(Arc::clone(&learner.gpu), streams, side);
+        Ok(Self {
+            perception: VectorPerception::Learned(Box::new(pixels)),
+            history: None,
+            core: VectorCore::new(learner, streams),
+        })
+    }
+
+    pub fn restore_rgb(
+        checkpoint: impl AsRef<Path>,
+        streams: usize,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        let metadata = read_checkpoint_metadata(checkpoint.as_ref())?;
+        check_capacity(&metadata.config, streams)?;
+        if !metadata.config.observation_kind.is_rgb() || metadata.perception.is_some() {
+            return Err("checkpoint is not a jointly learned RGB model".into());
+        }
+        let gpu = Arc::new(crate::init_gpu_context()?);
+        let pixels = GpuPreprocessor::rgb(
+            Arc::clone(&gpu),
+            streams,
+            metadata.config.observation_grid(),
+        );
+        let learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
+        Ok(Self {
+            perception: VectorPerception::Learned(Box::new(pixels)),
+            history: None,
+            core: VectorCore::new(learner, streams),
+        })
+    }
+
     pub fn new(
         config: DreamerConfig,
         streams: usize,
@@ -513,24 +882,52 @@ impl VectorDreamerAgent {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         config.check()?;
         check_capacity(&config, streams)?;
+        if config.observation_kind != ObservationKind::Features {
+            return Err("frozen LeVJEPA requires feature observations".into());
+        }
         let architecture = kind
             .levjepa_architecture()
             .ok_or("vector perception requires LeVJEPA")?;
+        if config.video_encoder.is_some()
+            && architecture != crate::vision::levjepa::Architecture::Tiny
+        {
+            return Err("joint/re-encoded replay requires the complete Tiny encoder".into());
+        }
         let identity = kind.identity(crate::vision::checkpoint_sha256(
             encoder_checkpoint.as_ref(),
         )?);
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception = LeVJepaPerception::load_batched_with_architecture(
+        let mut perception = LeVJepaPerception::load_batched_with_architecture(
             architecture,
-            encoder_checkpoint,
+            encoder_checkpoint.as_ref(),
             streams,
             Some(Arc::clone(&gpu)),
             None,
         )?;
         let mut learner = DreamerCore::with_gpu(config, gpu);
         learner.perception_identity = Some(identity);
+        if learner.config.video_encoder.is_some() {
+            let model = meganeura::data::safetensors::SafeTensorsModel::load(
+                encoder_checkpoint.as_ref().to_path_buf(),
+            )?;
+            crate::vision::levjepa::load_weights(
+                &mut learner.world_train,
+                &model,
+                0,
+                architecture,
+            )?;
+            learner.sync_world_inference();
+            share_matching(
+                &mut learner.world_train,
+                perception.session_mut(),
+                "encoder.",
+            );
+        }
+        let history = (learner.config.video_encoder == Some(crate::dreamer::VideoEncoder::Joint))
+            .then(|| PixelHistory::new(Arc::clone(&learner.gpu), streams));
         Ok(Self {
-            perception,
+            perception: VectorPerception::Causal(Box::new(perception)),
+            history,
             core: VectorCore::new(learner, streams),
         })
     }
@@ -555,16 +952,26 @@ impl VectorDreamerAgent {
             .ok_or("vector perception requires LeVJEPA")?;
         identity.verify_file(encoder_checkpoint.as_ref())?;
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception = LeVJepaPerception::load_batched_with_architecture(
+        let mut perception = LeVJepaPerception::load_batched_with_architecture(
             architecture,
             encoder_checkpoint,
             streams,
             Some(Arc::clone(&gpu)),
             None,
         )?;
-        let learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
+        let mut learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
+        if learner.config.video_encoder.is_some() {
+            share_matching(
+                &mut learner.world_train,
+                perception.session_mut(),
+                "encoder.",
+            );
+        }
+        let history = (learner.config.video_encoder == Some(crate::dreamer::VideoEncoder::Joint))
+            .then(|| PixelHistory::new(Arc::clone(&learner.gpu), streams));
         Ok(Self {
-            perception,
+            perception: VectorPerception::Causal(Box::new(perception)),
+            history,
             core: VectorCore::new(learner, streams),
         })
     }
@@ -619,18 +1026,47 @@ impl VectorDreamerAgent {
         };
         self.core
             .check_arrivals(frames.iter().map(|(id, _)| (*id, flags, Reward::default())));
-        let arrivals: Vec<_> = frames
-            .iter()
-            .map(|(id, frame)| (*id, *frame, true))
-            .collect();
-        self.perception.submit_frames_rgb8(&arrivals);
-        self.core.ingest_encoded(
-            &self.perception,
+        self.perception.ingest(
+            &mut self.core,
+            frames,
             &frames
                 .iter()
                 .map(|(id, _)| (*id, flags, Reward::default()))
                 .collect::<Vec<_>>(),
         );
+        self.store_history(&frames.iter().map(|a| a.0).collect::<Vec<_>>());
+    }
+
+    /// Critic values and scaled intrinsic bonuses for the exact live beliefs and
+    /// selected actions. Call after act, before observe. No RNG or state update.
+    pub fn behavior_predictions(&mut self) -> Result<(Vec<f32>, Vec<f32>), &'static str> {
+        self.core.behavior_predictions()
+    }
+
+    /// Select each posterior category's mode without consuming posterior RNG.
+    /// Call before the first observation. This disables learning for this agent
+    /// instance; checkpoint configuration and weights remain unchanged. Restores
+    /// default to sampled posteriors, independently of action selection.
+    pub fn use_greedy_posterior_for_evaluation(&mut self) -> Result<(), &'static str> {
+        self.core.use_greedy_posterior_for_evaluation()
+    }
+
+    pub fn posterior_mode(&self) -> ActionMode {
+        self.core.posterior_mode
+    }
+
+    /// Set the action softmax temperature before the first observation. This
+    /// disables learning for this instance and leaves checkpoints unchanged.
+    /// Posterior sampling and the number of action RNG draws are unaffected.
+    pub fn set_action_temperature_for_evaluation(
+        &mut self,
+        temperature: f32,
+    ) -> Result<(), &'static str> {
+        self.core.set_action_temperature_for_evaluation(temperature)
+    }
+
+    pub fn action_temperature(&self) -> Option<f32> {
+        self.core.action_temperature
     }
 
     pub fn act(&mut self, mode: ActionMode) -> Vec<usize> {
@@ -647,6 +1083,27 @@ impl VectorDreamerAgent {
         self.core.act_with_overrides(mode, overrides)
     }
 
+    /// Execute trusted labels and retain them for the optional replay actor loss.
+    /// Ordinary overrides and action masks never imply expert supervision.
+    pub fn act_with_expert_actions(
+        &mut self,
+        mode: ActionMode,
+        actions: &[Option<usize>],
+    ) -> Result<Vec<usize>, &'static str> {
+        self.core.act_with_expert_actions(mode, actions)
+    }
+
+    /// Label the current beliefs without forcing the recommended actions.
+    /// Optional ordinary overrides affect executed transitions, not the labels.
+    pub fn act_with_expert_labels(
+        &mut self,
+        mode: ActionMode,
+        labels: &[Option<usize>],
+        overrides: Option<&[Option<usize>]>,
+    ) -> Result<Vec<usize>, &'static str> {
+        self.core.act_with_expert_labels(mode, labels, overrides)
+    }
+
     pub fn observe(&mut self, transitions: &[(usize, Transition)]) -> Vec<Reward> {
         self.observe_refs(
             &transitions
@@ -659,18 +1116,19 @@ impl VectorDreamerAgent {
     pub(super) fn observe_refs(&mut self, transitions: &[(usize, &Transition)]) -> Vec<Reward> {
         self.core
             .check_arrivals(transitions.iter().map(|(id, t)| (*id, t.flags(), t.reward)));
-        let arrivals: Vec<_> = transitions
-            .iter()
-            .map(|(id, t)| (*id, &t.frame, false))
-            .collect();
-        self.perception.submit_frames_rgb8(&arrivals);
-        self.core.ingest_encoded(
-            &self.perception,
+        let rewards = self.perception.ingest(
+            &mut self.core,
+            &transitions
+                .iter()
+                .map(|(id, t)| (*id, &t.frame))
+                .collect::<Vec<_>>(),
             &transitions
                 .iter()
                 .map(|(id, t)| (*id, t.flags(), t.reward))
                 .collect::<Vec<_>>(),
-        )
+        );
+        self.store_history(&transitions.iter().map(|a| a.0).collect::<Vec<_>>());
+        rewards
     }
 
     /// Context used by the complete perception/belief/policy pipeline.
@@ -687,20 +1145,67 @@ impl VectorDreamerAgent {
     ) -> Vec<Reward> {
         let metadata: Vec<_> = arrivals.iter().map(|a| (a.0, a.2, a.3)).collect();
         self.core.check_arrivals(metadata.iter().copied());
-        self.perception.submit_frames_gpu8(
-            &arrivals
-                .iter()
-                .map(|a| (a.0, a.1, a.2.is_first))
-                .collect::<Vec<_>>(),
-        );
-        let rewards = self.core.ingest_encoded(&self.perception, &metadata);
+        let frames = arrivals.iter().map(|a| (a.0, a.1)).collect::<Vec<_>>();
+        let rewards = match &mut self.perception {
+            VectorPerception::Causal(perception) => {
+                perception.submit_frames_gpu8(
+                    &arrivals
+                        .iter()
+                        .map(|a| (a.0, a.1, a.2.is_first))
+                        .collect::<Vec<_>>(),
+                );
+                self.core.ingest_encoded(perception, &metadata)
+            }
+            VectorPerception::Learned(pixels) => {
+                self.core.acting.wait();
+                self.core.learner.replay.wait_device();
+                pixels.gpu_frames(&mut self.core.observe, &frames);
+                self.core.ingest_prepared(&metadata)
+            }
+        };
         // GpuFrame's borrowed capture ownership ends on return. No data readback.
         self.core.acting.wait();
+        self.store_history(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>());
         rewards
     }
 
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
-        self.core.learn_scheduled(maximum_updates)
+        let mut reports = self.core.learn_scheduled(maximum_updates);
+        if let Some(last) = reports.last_mut() {
+            self.refresh_encoder(last);
+        }
+        reports
+    }
+
+    pub fn learn(&mut self) -> Option<LearnReport> {
+        let mut report = self.core.learn()?;
+        self.refresh_encoder(&mut report);
+        Some(report)
+    }
+
+    fn refresh_encoder(&mut self, report: &mut LearnReport) {
+        if let (Some(history), VectorPerception::Causal(perception)) =
+            (&mut self.history, &mut self.perception)
+        {
+            let started = Instant::now();
+            sync_matching(
+                &self.core.learner.world_train,
+                perception.session_mut(),
+                "encoder.",
+            );
+            history.refresh(perception);
+            let elapsed = started.elapsed().as_secs_f64();
+            report.timing.world_sync_seconds += elapsed;
+            report.timing.total_seconds += elapsed;
+        }
+    }
+
+    fn store_history(&mut self, streams: &[usize]) {
+        if let (Some(history), VectorPerception::Causal(perception)) =
+            (&mut self.history, &self.perception)
+        {
+            history.store(perception, streams);
+        }
     }
     pub fn save_checkpoint(&mut self, path: impl AsRef<Path>) -> io::Result<()> {
         self.core.learner.save_checkpoint(path)
@@ -709,9 +1214,306 @@ impl VectorDreamerAgent {
 
 impl Drop for VectorDreamerAgent {
     fn drop(&mut self) {
+        if let Some(history) = &mut self.history {
+            history.copies.wait();
+        }
         self.core.acting.wait();
         self.core.copies.wait();
         self.core.learner.replay.wait_device();
+    }
+}
+
+#[cfg(test)]
+mod joint_qualification {
+    use super::*;
+
+    #[test]
+    #[ignore = "requires declared GPU, oracle directory, KINDLE_JOINT_PROBE_MODE and fresh KINDLE_JOINT_PROBE_OUTPUT"]
+    fn full_video_updates() {
+        let mode = match std::env::var("KINDLE_JOINT_PROBE_MODE").unwrap().as_str() {
+            "joint" => crate::dreamer::VideoEncoder::Joint,
+            "frozen" => crate::dreamer::VideoEncoder::Frozen,
+            other => panic!("unknown probe mode {other}"),
+        };
+        let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let checkpoint = Path::new(manifest["checkpoint"].as_str().unwrap());
+        assert_eq!(
+            crate::vision::checkpoint_sha256(checkpoint).unwrap(),
+            manifest["checkpoint_sha256"].as_str().unwrap()
+        );
+        let output = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_PROBE_OUTPUT").unwrap());
+        std::fs::create_dir(&output).unwrap();
+        let mut config = DreamerConfig::new(18);
+        config.model_size = crate::dreamer::ModelSize::Size1M;
+        config.batch_size = 8;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.world_microbatch_size = Some(1);
+        config.replay_capacity = 8192;
+        config.seed = 1009;
+        config.video_encoder = Some(mode);
+        config.actor_critic_gradient = std::env::var_os("KINDLE_AC_GRADS").is_some();
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        config.validate();
+        eprintln!("full video probe: constructing {mode:?}");
+        let start = Instant::now();
+        let mut agent = VectorDreamerAgent::new(config.clone(), 8, checkpoint).unwrap();
+        let construction_seconds = start.elapsed().as_secs_f64();
+        let inspect = |agent: &VectorDreamerAgent| {
+            assert_eq!(
+                agent.gpu_device().device_name,
+                std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+            );
+            assert!(!agent.gpu_device().is_software_emulated);
+            let memory = agent.gpu_memory_budget();
+            assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+            serde_json::to_value(memory).unwrap()
+        };
+        let constructed_memory = inspect(&agent);
+        eprintln!("constructed in {construction_seconds:.3}s; memory={constructed_memory}");
+        let parameter = |agent: &mut VectorDreamerAgent| {
+            let name = "encoder.patch_embed.proj.weight";
+            let session = &mut agent.core.learner.world_train;
+            let mut values = vec![0.0; session.param_size(name).unwrap()];
+            session.read_param(name, &mut values);
+            values
+        };
+        let before = parameter(&mut agent);
+        let frame = |stream: usize, tick: usize| {
+            RgbFrame::new(
+                224,
+                224,
+                (0..224 * 224 * 3)
+                    .map(|i| ((i * 37 + tick * 13 + stream * 71) % 256) as u8)
+                    .collect(),
+            )
+        };
+        agent.begin_episodes(&(0..8).map(|s| (s, frame(s, 0))).collect::<Vec<_>>());
+        // Leave a live prefix so the timing includes actual cache refresh.
+        for tick in 1..35 {
+            assert!(agent.act(ActionMode::Sample).iter().all(|&a| a < 18));
+            agent.observe(
+                &(0..8)
+                    .map(|s| {
+                        (
+                            s,
+                            Transition {
+                                frame: frame(s, tick),
+                                reward: Reward {
+                                    extrinsic: if (tick + s).is_multiple_of(7) {
+                                        1.0
+                                    } else {
+                                        0.0
+                                    },
+                                    intrinsic: 0.0,
+                                },
+                                terminated: false,
+                                truncated: false,
+                            },
+                        )
+                    })
+                    .collect::<Vec<_>>(),
+            );
+        }
+        let mut reports = Vec::new();
+        eprintln!("replay populated; starting three full updates");
+        for _ in 0..3 {
+            let report = agent.learn().expect("eight complete causal replay chunks");
+            assert!(report.world.total_loss.is_finite());
+            assert!(report.world.encoder_spread.is_finite() && report.world.encoder_spread > 0.0);
+            assert!(report.behavior.total_loss.is_finite());
+            println!("{}", serde_json::to_string(&report).unwrap());
+            reports.push(report);
+            inspect(&agent);
+        }
+        let after = parameter(&mut agent);
+        assert!(after.iter().all(|x| x.is_finite()));
+        assert_eq!(before != after, mode == crate::dreamer::VideoEncoder::Joint);
+        let updated_memory = inspect(&agent);
+        let saved = output.join("checkpoint");
+        agent.save_checkpoint(&saved).unwrap();
+        let last_session_gpu_timings = [
+            ("posterior", agent.core.learner.posterior_session()),
+            ("world", &agent.core.learner.world_train),
+            ("imagination", &agent.core.learner.imagination),
+            ("behavior", &agent.core.learner.behavior_train),
+        ]
+        .map(|(name, session)| {
+            (
+                name,
+                session
+                    .gpu_timings()
+                    .into_iter()
+                    .map(|(label, time)| (label, time.as_secs_f64()))
+                    .collect::<Vec<_>>(),
+            )
+        });
+        std::fs::write(output.join("result.json"), serde_json::to_vec_pretty(&serde_json::json!({
+            "config": config, "streams": 8, "synthetic_actions": 272, "game_actions": 0,
+            "construction_seconds": construction_seconds, "reports": reports,
+            "constructed_memory": constructed_memory, "updated_memory": updated_memory,
+            "encoder_moved": before != after,
+            "last_session_gpu_timings": last_session_gpu_timings,
+            "limitations": ["three synthetic updates, not learning or steady-state throughput", "replay only partly populated", "restore is separately qualified", "last session timings are not whole-update or device utilization"]
+        })).unwrap()).unwrap();
+        if std::env::var_os("KINDLE_JOINT_PROBE_PROFILE").is_some() {
+            agent
+                .core
+                .learner
+                .profile_sessions(output.join("profiles"))
+                .unwrap();
+        }
+    }
+
+    #[test]
+    #[ignore = "requires declared GPU, oracle directory and KINDLE_JOINT_RESTORE_CHECKPOINT"]
+    fn video_checkpoint_restore_is_frozen() {
+        let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let saved =
+            std::path::PathBuf::from(std::env::var("KINDLE_JOINT_RESTORE_CHECKPOINT").unwrap());
+        let metadata = read_checkpoint_metadata(&saved).unwrap();
+        let tensors =
+            meganeura::data::safetensors::SafeTensorsModel::load(saved.join("world.safetensors"))
+                .unwrap();
+        let mut agent =
+            VectorDreamerAgent::restore(&saved, 8, manifest["checkpoint"].as_str().unwrap())
+                .unwrap();
+        assert_eq!(
+            agent.gpu_device().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!agent.gpu_device().is_software_emulated);
+        let memory = agent.gpu_memory_budget();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        assert_eq!(agent.learner_step(), metadata.learner_step);
+        assert_eq!(agent.environment_step(), metadata.environment_step);
+        let session = &mut agent.core.learner.world_train;
+        let names = session
+            .param_names()
+            .iter()
+            .filter(|n| n.starts_with("encoder."))
+            .map(|n| n.to_string())
+            .collect::<Vec<_>>();
+        assert_eq!(names.len(), 148);
+        for name in names {
+            let mut actual = vec![0.0; session.param_size(&name).unwrap()];
+            session.read_param(&name, &mut actual);
+            assert_eq!(actual, tensors.tensor_f32_auto(&name).unwrap(), "{name}");
+        }
+        agent.begin_episodes(
+            &(0..8)
+                .map(|s| {
+                    (
+                        s,
+                        RgbFrame::new(224, 224, vec![s as u8 * 17; 224 * 224 * 3]),
+                    )
+                })
+                .collect::<Vec<_>>(),
+        );
+        assert!(agent.act(ActionMode::Greedy).iter().all(|&a| a < 18));
+        assert_eq!(agent.learner_step(), metadata.learner_step);
+        println!(
+            "148 encoder tensors restored exactly; frozen action has zero updates; memory={memory:?}"
+        );
+    }
+
+    #[test]
+    #[ignore = "requires separately declared GPU and KINDLE_JOINT_TINY_REFERENCE oracle directory"]
+    fn joint_encoder_cache_matches_fresh_encoding_of_live_prefixes() {
+        let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let checkpoint = Path::new(manifest["checkpoint"].as_str().unwrap());
+        assert_eq!(
+            crate::vision::checkpoint_sha256(checkpoint).unwrap(),
+            manifest["checkpoint_sha256"].as_str().unwrap()
+        );
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let device = gpu.device_information();
+        assert_eq!(
+            device.device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!device.is_software_emulated);
+        let load = || {
+            LeVJepaPerception::load_batched_with_architecture(
+                crate::vision::levjepa::Architecture::Tiny,
+                checkpoint,
+                2,
+                Some(Arc::clone(&gpu)),
+                None,
+            )
+            .unwrap()
+        };
+        let mut actual = load();
+        let mut reference = load();
+        let mut history = PixelHistory::new(Arc::clone(&gpu), 2);
+        let memory = gpu.memory_stats();
+        assert!(memory.budget.saturating_sub(memory.usage) >= 2 << 30);
+        let frame = |stream: usize, tick: usize| {
+            RgbFrame::new(
+                224,
+                224,
+                (0..224 * 224 * 3)
+                    .map(|i| ((i * 37 + tick * 13 + stream * 71) % 256) as u8)
+                    .collect(),
+            )
+        };
+        let mut prefixes = [Vec::new(), Vec::new()];
+        for tick in 0..24 {
+            for (stream, prefix) in prefixes.iter_mut().enumerate() {
+                if stream == 1 && tick % 3 == 0 {
+                    continue;
+                }
+                let reset = prefix.is_empty() || (stream == 1 && tick == 11);
+                if reset || actual.chunk_positions()[stream] == 0 {
+                    prefix.clear();
+                }
+                prefix.push(frame(stream, tick));
+                actual.encode_frames_rgb8(&[(stream, prefix.last().unwrap(), reset)]);
+                history.store(&actual, &[stream]);
+            }
+        }
+        // Emulate an optimizer weight change; compare refresh to a separately
+        // rebuilt prefix using the original RGB, not PixelHistory's buffers.
+        let name = "encoder.patch_embed.proj.bias";
+        let mut bias = vec![0.0; 192];
+        actual.session().read_param(name, &mut bias);
+        for (i, value) in bias.iter_mut().enumerate() {
+            *value += (i % 5) as f32 * 0.007;
+        }
+        actual.session_mut().set_parameter(name, &bias);
+        reference.session_mut().set_parameter(name, &bias);
+        let positions = actual.chunk_positions().to_vec();
+        history.refresh(&mut actual);
+        assert_eq!(actual.chunk_positions(), positions);
+        for phase in 0..positions.iter().copied().max().unwrap() {
+            let arrivals = prefixes
+                .iter()
+                .enumerate()
+                .filter(|(stream, _)| phase < positions[*stream])
+                .map(|(stream, frames)| (stream, &frames[phase], phase == 0))
+                .collect::<Vec<_>>();
+            reference.encode_frames_rgb8(&arrivals);
+        }
+        for tick in 24..27 {
+            let next = [frame(0, tick), frame(1, tick)];
+            let arrivals = [(0, &next[0], false), (1, &next[1], tick == 26)];
+            let actual = actual.encode_frames_rgb8(&arrivals);
+            let reference = reference.encode_frames_rgb8(&arrivals);
+            for (a, b) in actual.iter().zip(&reference) {
+                for (&a, &b) in a.as_slice().iter().zip(b.as_slice()) {
+                    assert!((a - b).abs() < 1e-4 * b.abs() + 1e-5, "{a} != {b}");
+                }
+            }
+        }
+        // History must complete before its session-owned sources are dropped.
+        history.copies.wait();
     }
 }
 
@@ -720,11 +1522,701 @@ mod tests {
     use super::*;
 
     #[test]
+    fn evaluation_temperature_rejects_non_normal_or_nonpositive_values() {
+        for value in [
+            0.0,
+            -0.0,
+            -1.0,
+            f32::NAN,
+            f32::INFINITY,
+            f32::NEG_INFINITY,
+            f32::from_bits(1),
+        ] {
+            assert!(check_action_temperature(value).is_err());
+        }
+        for value in [f32::MIN_POSITIVE, 0.5, 1.0, 2.0, f32::MAX] {
+            assert!(check_action_temperature(value).is_ok());
+        }
+    }
+
+    #[test]
+    #[ignore = "requires GPU; action temperature, masks, RNG and frozen-only guards"]
+    fn action_temperature_matches_probabilities_and_blocks_learning() {
+        let mut config = config();
+        config.actor_unimix = 0.1;
+        assert_eq!(config.action_count, 3);
+        let mut agent = FeatureVectorAgent::new(config.clone(), 2).unwrap();
+        assert_eq!(agent.core.action_temperature, None);
+        for value in [0.0, -1.0, f32::NAN, f32::INFINITY, f32::from_bits(1)] {
+            assert!(
+                agent
+                    .core
+                    .set_action_temperature_for_evaluation(value)
+                    .is_err()
+            );
+            assert_eq!(agent.core.action_temperature, None);
+        }
+        agent
+            .core
+            .set_action_temperature_for_evaluation(1.0)
+            .unwrap();
+        for scheduled in [false, true] {
+            assert!(
+                std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    if scheduled {
+                        agent.core.learn_scheduled(1);
+                    } else {
+                        agent.core.learn();
+                    }
+                }))
+                .is_err()
+            );
+        }
+        agent
+            .core
+            .set_action_temperature_for_evaluation(0.5)
+            .unwrap();
+        agent.core.learner.behavior_train.set_parameter(
+            "behavior.actor.out.weight",
+            &vec![0.0; config.network().units * 3],
+        );
+        agent
+            .core
+            .learner
+            .behavior_train
+            .set_parameter("behavior.actor.out.bias", &[0.0, 0.5, -0.5]);
+        agent.begin_episodes((0..2).map(|id| (id, observation(id, 0))).collect());
+        assert!(
+            agent
+                .core
+                .set_action_temperature_for_evaluation(0.5)
+                .is_err()
+        );
+        agent.core.policy.step();
+        agent.core.policy.wait();
+        agent.core.acting.wait();
+        let mut logits = vec![0.0; 6];
+        agent.core.policy.read_output_by_index(0, &mut logits);
+        for row in logits.chunks(3) {
+            for (&actual, expected) in row.iter().zip([0.0, 0.5, -0.5]) {
+                assert!((actual - expected).abs() < 1e-5);
+            }
+        }
+        let expected =
+            |values: &[f32], draw: f32, temperature: f32, mask: Option<&[bool]>, mode| {
+                let allowed = |i| mask.is_none_or(|m| m[i]);
+                let maximum = values
+                    .iter()
+                    .enumerate()
+                    .filter(|(i, _)| allowed(*i))
+                    .map(|(_, &x)| f64::from(x))
+                    .fold(f64::NEG_INFINITY, f64::max);
+                let weights: Vec<f64> = values
+                    .iter()
+                    .enumerate()
+                    .map(|(i, &x)| {
+                        if allowed(i) {
+                            ((f64::from(x) - maximum) / f64::from(temperature)).exp()
+                        } else {
+                            0.0
+                        }
+                    })
+                    .collect();
+                let normalizer: f64 = weights.iter().sum();
+                let count = (0..values.len()).filter(|&i| allowed(i)).count();
+                let probabilities: Vec<f64> = weights
+                    .iter()
+                    .enumerate()
+                    .map(|(i, &weight)| {
+                        if allowed(i) {
+                            (1.0 - f64::from(config.actor_unimix)) * weight / normalizer
+                                + f64::from(config.actor_unimix) / count as f64
+                        } else {
+                            0.0
+                        }
+                    })
+                    .collect();
+                if mode == ActionMode::Greedy {
+                    let maximum = probabilities
+                        .iter()
+                        .copied()
+                        .fold(f64::NEG_INFINITY, f64::max);
+                    return probabilities.iter().position(|&p| p == maximum).unwrap();
+                }
+                let mut cumulative = 0.0;
+                for (i, p) in probabilities.iter().enumerate() {
+                    cumulative += p;
+                    if f64::from(draw) < cumulative {
+                        return i;
+                    }
+                }
+                unreachable!("normalized categorical draw");
+            };
+        let mask = [true, false, true, true, true, false];
+        for temperature in [f32::MIN_POSITIVE, 0.5, 1.0, 2.0, f32::MAX] {
+            for mode in [ActionMode::Sample, ActionMode::Greedy] {
+                for masked in [false, true] {
+                    for draw in [
+                        0.013, 0.097, 0.173, 0.281, 0.431, 0.589, 0.743, 0.887, 0.983,
+                    ] {
+                        let selected = agent.core.acting.actions(
+                            &agent.core.policy,
+                            &[draw; 2],
+                            mode,
+                            masked.then_some(&mask),
+                            temperature,
+                        );
+                        let mut actions = [0.0; 2];
+                        agent
+                            .core
+                            .learner
+                            .readback
+                            .read_regions(&mut [(selected, &mut actions)]);
+                        for (id, &action) in actions.iter().enumerate() {
+                            let expected = expected(
+                                &logits[id * 3..id * 3 + 3],
+                                draw,
+                                temperature,
+                                masked.then_some(&mask[id * 3..id * 3 + 3]),
+                                mode,
+                            );
+                            assert_eq!(
+                                action, expected as f32,
+                                "temperature={temperature} mask={masked} draw={draw}"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        for round in 0..2 {
+            let mut rngs: Vec<_> = agent
+                .core
+                .streams
+                .iter()
+                .map(|s| s.policy_rng.clone())
+                .collect();
+            let before_posterior: Vec<_> = agent
+                .core
+                .streams
+                .iter()
+                .map(|s| s.posterior_rng.clone().random::<u64>())
+                .collect();
+            let draws: Vec<f32> = rngs.iter_mut().map(|rng| rng.random()).collect();
+            let actions = agent.act(ActionMode::Sample);
+            for id in 0..2 {
+                assert_eq!(
+                    actions[id],
+                    expected(
+                        &logits[id * 3..id * 3 + 3],
+                        draws[id],
+                        0.5,
+                        None,
+                        ActionMode::Sample
+                    )
+                );
+                assert_eq!(
+                    agent.core.streams[id].policy_rng.clone().random::<u64>(),
+                    rngs[id].random::<u64>()
+                );
+                assert_eq!(
+                    agent.core.streams[id].posterior_rng.clone().random::<u64>(),
+                    before_posterior[id]
+                );
+            }
+            agent.observe(
+                (0..2)
+                    .map(|id| {
+                        (
+                            id,
+                            observation(id, 1),
+                            FrameFlags {
+                                is_last: true,
+                                is_terminal: true,
+                                ..Default::default()
+                            },
+                            Reward::default(),
+                        )
+                    })
+                    .collect(),
+            );
+            assert!(
+                agent
+                    .core
+                    .set_action_temperature_for_evaluation(1.0)
+                    .is_err()
+            );
+            if round == 0 {
+                agent.begin_episodes((0..2).map(|id| (id, observation(id, 100))).collect());
+            }
+        }
+        assert_eq!(agent.core.learner.config, config);
+        assert_eq!(agent.learner().learner_step(), 0);
+    }
+
+    #[test]
+    #[ignore = "requires GPU; posterior argmax, independent RNG and evaluation-only guards"]
+    fn greedy_posterior_matches_logits_without_consuming_rng() {
+        let config = config();
+        let size = config.network();
+        let mut agent = FeatureVectorAgent::new(config.clone(), 2).unwrap();
+        assert_eq!(agent.core.posterior_mode, ActionMode::Sample);
+        agent.core.use_greedy_posterior_for_evaluation().unwrap();
+        let posterior_rngs = |core: &VectorCore| {
+            core.streams
+                .iter()
+                .map(|stream| stream.posterior_rng.clone().random::<u64>())
+                .collect::<Vec<_>>()
+        };
+        let before_rng = posterior_rngs(&agent.core);
+        agent.begin_episodes((0..2).map(|id| (id, observation(id, 0))).collect());
+        assert!(agent.core.use_greedy_posterior_for_evaluation().is_err());
+        for time in 1..6 {
+            agent.core.observe.wait();
+            agent.core.acting.wait();
+            let mut logits = vec![0.0; 2 * size.stoch * size.classes];
+            agent.core.observe.read_output_by_index(1, &mut logits);
+            assert!(logits.iter().all(|value| value.is_finite()));
+            for id in 0..2 {
+                let feature = agent.core.feature(id);
+                for (category, onehot) in feature[size.deter..].chunks(size.classes).enumerate() {
+                    assert_eq!(onehot.iter().sum::<f32>(), 1.0);
+                    assert!(onehot.iter().all(|&value| value == 0.0 || value == 1.0));
+                    let selected = onehot.iter().position(|&value| value == 1.0).unwrap();
+                    let offset = (id * size.stoch + category) * size.classes;
+                    let values = &logits[offset..offset + size.classes];
+                    assert_eq!(
+                        values[selected],
+                        values.iter().copied().fold(f32::NEG_INFINITY, f32::max)
+                    );
+                }
+            }
+            agent.act(if time % 2 == 0 {
+                ActionMode::Greedy
+            } else {
+                ActionMode::Sample
+            });
+            let last = time == 3;
+            agent.observe(
+                (0..2)
+                    .map(|id| {
+                        (
+                            id,
+                            observation(id, time),
+                            FrameFlags {
+                                is_last: last,
+                                is_terminal: last,
+                                ..Default::default()
+                            },
+                            Reward::default(),
+                        )
+                    })
+                    .collect(),
+            );
+            if last {
+                assert!(agent.core.streams.iter().all(|stream| stream.needs_reset));
+                assert!(agent.core.use_greedy_posterior_for_evaluation().is_err());
+                agent.begin_episodes((0..2).map(|id| (id, observation(id, 100))).collect());
+            }
+        }
+        assert_eq!(posterior_rngs(&agent.core), before_rng);
+        assert_eq!(agent.learner().learner_step(), 0);
+        for scheduled in [false, true] {
+            let rejected = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                if scheduled {
+                    agent.core.learn_scheduled(1);
+                } else {
+                    agent.core.learn();
+                }
+            }));
+            assert!(rejected.is_err());
+        }
+        assert_eq!(agent.learner().learner_step(), 0);
+    }
+
+    #[test]
+    #[ignore = "requires GPU; batched read-only live values and action-aligned bonuses"]
+    fn tiny_live_behavior_predictions_match_existing_heads_without_state_changes() {
+        for exploration in [false, true] {
+            let mut config = DreamerConfig::tiny(3);
+            config.train_ratio = 0.0;
+            config.disagreement_bonus = exploration;
+            config.intrinsic_reward_scale = if exploration { 0.7 } else { 0.0 };
+            let mut agent = FeatureVectorAgent::new(config.clone(), 3).unwrap();
+            assert!(agent.core.behavior_predictions().is_err());
+            agent.begin_episodes((0..3).map(|id| (id, observation(id, 0))).collect());
+            assert!(agent.core.behavior_predictions().is_err());
+            let actions = agent.act(ActionMode::Sample);
+            let states = (0..3)
+                .flat_map(|id| agent.core.feature(id))
+                .collect::<Vec<_>>();
+            let rngs = |core: &VectorCore| {
+                core.streams
+                    .iter()
+                    .map(|s| {
+                        (
+                            s.policy_rng.clone().random::<u64>(),
+                            s.posterior_rng.clone().random::<u64>(),
+                            s.pending_action,
+                        )
+                    })
+                    .collect::<Vec<_>>()
+            };
+            let before_rng = rngs(&agent.core);
+            let before_counters = (
+                agent.learner().environment_step(),
+                agent.learner().learner_step(),
+                agent.learner().replay_len(),
+            );
+            let mut value = build_session(
+                &behavior::build_value_inference_graph(&config, 3),
+                &agent.core.learner.gpu,
+                Mode::Inference,
+                false,
+            );
+            let mut one_hot = vec![0.0; 9];
+            for (row, &action) in actions.iter().enumerate() {
+                one_hot[row * 3 + action] = 1.0;
+            }
+            for round in 0..2 {
+                // Also exercise synchronization after critic parameters change.
+                let mut bias = vec![0.0; config.value_bins];
+                bias[config.value_bins / 2 + 1] = 0.2 + round as f32;
+                agent
+                    .core
+                    .learner
+                    .behavior_train
+                    .set_parameter("behavior.value.out.bias", &bias);
+                let expected_bonus = if exploration {
+                    super::super::exploration::direct_bonus(
+                        &mut agent.core.learner,
+                        &states,
+                        &one_hot,
+                    )
+                    .into_iter()
+                    .map(|v| v * config.intrinsic_reward_scale)
+                    .collect::<Vec<_>>()
+                } else {
+                    vec![0.0; 3]
+                };
+                sync_matching(
+                    &agent.core.learner.behavior_train,
+                    &mut value,
+                    "behavior.value.",
+                );
+                value.set_input("feature", &states);
+                value.step();
+                value.wait();
+                let mut logits = vec![0.0; 3 * config.value_bins];
+                value.read_output_by_index(0, &mut logits);
+                let expected_value = decode_rows(&logits, 3, &agent.core.learner.bins);
+                let actual = agent.core.behavior_predictions().unwrap();
+                for (actual, expected) in actual
+                    .0
+                    .iter()
+                    .zip(&expected_value)
+                    .chain(actual.1.iter().zip(&expected_bonus))
+                {
+                    assert!(
+                        (actual - expected).abs() <= 2e-5 * expected.abs().max(1.0),
+                        "{actual} != {expected}"
+                    );
+                }
+                assert_eq!(actual, agent.core.behavior_predictions().unwrap());
+                assert_eq!(before_rng, rngs(&agent.core));
+                assert_eq!(
+                    before_counters,
+                    (
+                        agent.learner().environment_step(),
+                        agent.learner().learner_step(),
+                        agent.learner().replay_len()
+                    )
+                );
+                assert_eq!(
+                    states,
+                    (0..3)
+                        .flat_map(|id| agent.core.feature(id))
+                        .collect::<Vec<_>>()
+                );
+            }
+            agent.observe(
+                (0..3)
+                    .map(|id| {
+                        (
+                            id,
+                            observation(id, 1),
+                            FrameFlags::default(),
+                            Reward::default(),
+                        )
+                    })
+                    .collect(),
+            );
+            assert!(agent.core.behavior_predictions().is_err());
+        }
+    }
+
+    #[test]
+    fn video_capacity_accounts_for_nonoverlapping_chunks() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 8;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.video_encoder = Some(crate::dreamer::VideoEncoder::Joint);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        assert_eq!(config.replay_warmup_sequences(), 8);
+        assert_eq!(config.replay_warmup_frames(), 144);
+        config.replay_capacity = 255;
+        assert!(check_capacity(&config, 8).is_err());
+        config.replay_capacity = 256;
+        assert!(check_capacity(&config, 8).is_ok());
+        config.check().unwrap();
+        assert!(FeatureVectorAgent::new(config.clone(), 8).is_err());
+        assert!(
+            VectorDreamerAgent::with_perception(config, 8, PerceptionKind::LeVJepa, "unused")
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn rgb_configuration_refusals_precede_device_initialization() {
+        let config = DreamerConfig::tiny(3);
+        assert!(VectorDreamerAgent::learned_rgb(config.clone(), 2).is_err());
+        let mut rgb = config.clone();
+        rgb.observation_kind = ObservationKind::Rgb64;
+        assert!(VectorDreamerAgent::learned_rgb(rgb.clone(), 0).is_err());
+        assert!(FeatureVectorAgent::new(rgb.clone(), 2).is_err());
+        assert!(
+            VectorDreamerAgent::with_perception(
+                rgb.clone(),
+                2,
+                PerceptionKind::LeVJepaTiny,
+                "unused"
+            )
+            .is_err()
+        );
+        rgb.loss_scales.future_prediction = 0.25;
+        assert!(rgb.check().is_err());
+        rgb.loss_scales.future_prediction = 0.0;
+        rgb.visitation_bonus = true;
+        assert!(rgb.check().is_err());
+    }
+
+    #[test]
+    #[ignore = "requires GPU; joint RGB learning, pixel replay, stream isolation and restore"]
+    fn tiny_rgb_replay_is_reencoded_and_checkpoint_restores() {
+        check_rgb_replay_and_restore(false, false);
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; CDP encoder learning, pixel replay, stream isolation and restore"]
+    fn tiny_cdp_replay_is_reencoded_and_checkpoint_restores() {
+        check_rgb_replay_and_restore(true, false);
+    }
+
+    #[test]
+    #[ignore = "requires GPU; CDP disagreement weights, replay and frozen restore"]
+    fn tiny_cdp_disagreement_checkpoint_restores() {
+        check_rgb_replay_and_restore(true, true);
+    }
+
+    fn check_rgb_replay_and_restore(cdp: bool, exploration: bool) {
+        let checkpoint = check_rgb_vector_replay_and_restore(cdp, exploration);
+        check_rgb_single_restore(&checkpoint);
+        fs::remove_dir_all(checkpoint).unwrap();
+    }
+
+    fn check_rgb_vector_replay_and_restore(cdp: bool, exploration: bool) -> std::path::PathBuf {
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_kind = ObservationKind::Rgb64;
+        config.replay_capacity = 32;
+        config.train_ratio = 0.0;
+        config.disagreement_bonus = exploration;
+        config.intrinsic_reward_scale = f32::from(exploration);
+        if cdp {
+            config.loss_scales.reconstruction = 0.0;
+            config.loss_scales.future_prediction = 500.0;
+            config.encoder_learning_rate = Some(6e-6);
+            config.dynamics_learning_rate = Some(4e-4);
+        }
+        let mut agent = VectorDreamerAgent::learned_rgb(config.clone(), 2).unwrap();
+        if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
+            assert_eq!(agent.gpu_device().device_name, expected);
+            assert!(!agent.gpu_device().is_software_emulated);
+            let memory = agent.gpu_memory_budget();
+            assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        }
+        let frame = |id: usize, time: usize| {
+            RgbFrame::new(
+                19,
+                13,
+                (0..19 * 13 * 3)
+                    .map(|i| ((i * 17 + time * 11 + id * 31) % 256) as u8)
+                    .collect(),
+            )
+        };
+        agent.begin_episodes(&[(0, frame(0, 0)), (1, frame(1, 0))]);
+        for time in 1..12 {
+            agent.act(ActionMode::Sample);
+            agent.observe(
+                &(0..2)
+                    .map(|id| {
+                        (
+                            id,
+                            Transition {
+                                frame: frame(id, time),
+                                reward: Reward {
+                                    extrinsic: (time % 3) as f32,
+                                    intrinsic: 0.0,
+                                },
+                                terminated: time == 11 && id == 0,
+                                truncated: false,
+                            },
+                        )
+                    })
+                    .collect::<Vec<_>>(),
+            );
+        }
+        let untouched = agent.core.feature(1);
+        agent.begin_episodes(&[(0, frame(0, 12))]);
+        assert_eq!(untouched, agent.core.feature(1));
+        let sample = |agent: &mut VectorDreamerAgent| {
+            agent
+                .core
+                .learner
+                .replay
+                .sample(&config, &mut StdRng::seed_from_u64(773))
+                .unwrap()
+        };
+        // Fresh-arrival sampling is a consumable queue, independent of RNG.
+        // Exhaust it before comparing the same seeded random replay windows.
+        for _ in 0..agent.replay_len() {
+            sample(&mut agent);
+        }
+        let before = sample(&mut agent);
+        assert!(
+            before
+                .observations
+                .iter()
+                .all(|row| row.len() == config.batch_size * 12288
+                    && row.iter().all(|x| (-0.5..=0.5).contains(x)))
+        );
+        let names = agent
+            .core
+            .learner
+            .world_train
+            .param_names()
+            .into_iter()
+            .filter(|name| name.starts_with("world.representation.encoder."))
+            .map(str::to_owned)
+            .collect::<Vec<_>>();
+        let names = names.iter().map(String::as_str).collect::<Vec<_>>();
+        let weights = agent.core.learner.world_train.read_params(&names);
+        let encoder_output = |agent: &mut VectorDreamerAgent| {
+            agent.core.observe.step();
+            agent.core.observe.wait();
+            let mut values = vec![0.0; 2 * config.encoded_observation_dim()];
+            agent.core.observe.read_output_by_index(3, &mut values);
+            values
+        };
+        let encoded_before = encoder_output(&mut agent);
+        let report = agent.core.learn().unwrap();
+        assert!(report.world.total_loss.is_finite());
+        if cdp {
+            assert_eq!(report.world.reconstruction_loss, 0.0);
+            assert!(report.world.future_prediction_loss > 0.0);
+            assert!(
+                !agent
+                    .core
+                    .learner
+                    .world_train
+                    .param_names()
+                    .iter()
+                    .any(|n| n.starts_with("world.decoder."))
+            );
+        } else {
+            assert!(report.world.reconstruction_loss > 0.0);
+        }
+        let updated = agent.core.learner.world_train.read_params(&names);
+        assert!(
+            weights
+                .iter()
+                .zip(&updated)
+                .all(|(a, b)| a != b && b.iter().all(|x| x.is_finite()))
+        );
+        assert_ne!(encoded_before, encoder_output(&mut agent));
+        assert_eq!(before.observations, sample(&mut agent).observations);
+        let moments = agent.core.learner.world_train.read_adam_states(&names);
+        let checkpoint =
+            std::env::temp_dir().join(format!("kindle-rgb-test-{}", std::process::id()));
+        assert!(!checkpoint.exists());
+        agent.save_checkpoint(&checkpoint).unwrap();
+        drop(agent);
+        let mut restored = VectorDreamerAgent::restore_rgb(&checkpoint, 2).unwrap();
+        assert_eq!(restored.config(), &config);
+        assert_eq!(restored.replay_len(), 0);
+        assert_eq!(restored.learner_step(), 1);
+        assert_eq!(
+            updated,
+            restored.core.learner.world_train.read_params(&names)
+        );
+        assert_eq!(
+            moments,
+            restored.core.learner.world_train.read_adam_states(&names)
+        );
+        restored.begin_episodes(&[(0, frame(0, 0)), (1, frame(1, 0))]);
+        restored.act(ActionMode::Greedy);
+        assert_eq!(
+            updated,
+            restored.core.learner.world_train.read_params(&names)
+        );
+        assert_eq!(
+            moments,
+            restored.core.learner.world_train.read_adam_states(&names)
+        );
+        drop(restored);
+        checkpoint
+    }
+
+    fn check_rgb_single_restore(checkpoint: &Path) {
+        let mut single = DreamerAgent::restore_rgb(checkpoint).unwrap();
+        single.begin_episode(&RgbFrame::new(19, 13, vec![127; 19 * 13 * 3]));
+        let width = single.core().config().encoded_observation_dim();
+        assert_eq!(single.encoded_observation().len(), width);
+        let prediction_width = single.core().config().prediction_dim();
+        let prediction = single.observation_prediction();
+        assert_eq!(prediction.len(), prediction_width);
+        assert!(prediction.iter().all(|x| x.is_finite()));
+        let before = single.latent_feature().to_vec();
+        let forecast = single.prior_state_rollout(&[1, 2]);
+        assert!(forecast.1.iter().all(|row| row.len() == prediction_width));
+        assert_eq!(forecast, single.prior_state_rollout(&[1, 2]));
+        assert_eq!(before, single.latent_feature());
+        assert_eq!(single.core().learner_step(), 1);
+    }
+
+    #[test]
     fn action_overrides_validate_every_stream_before_mutation() {
         assert!(check_action_overrides(&[None, Some(2), Some(0)], 3, 3).is_ok());
         assert!(check_action_overrides(&[None], 3, 3).is_err());
         assert!(check_action_overrides(&[None, Some(3), None], 3, 3).is_err());
         assert!(check_action_overrides(&[Some(usize::MAX)], 1, 3).is_err());
+    }
+
+    #[test]
+    fn expert_labels_require_configuration_and_validate_every_stream() {
+        let mut config = DreamerConfig::tiny(3);
+        assert!(check_expert_labels(&config, 2, &[None, None]).is_err());
+        config.expert_imitation = Some(super::super::super::ExpertImitation {
+            scale: 1.0,
+            action_weights: vec![1.0; 3],
+            world_gradient: false,
+        });
+        assert!(check_expert_labels(&config, 2, &[Some(2), None]).is_ok());
+        assert!(check_expert_labels(&config, 2, &[None, None]).is_ok());
+        assert!(check_expert_labels(&config, 2, &[Some(0)]).is_err());
+        assert!(check_expert_labels(&config, 2, &[Some(0), Some(3)]).is_err());
+        assert!(check_expert_labels(&config, 2, &[Some(usize::MAX), None]).is_err());
     }
 
     #[test]
@@ -797,6 +2289,282 @@ mod tests {
         for (&a, &b) in left.iter().zip(right) {
             assert!((a - b).abs() < 1e-4, "{a} != {b}");
         }
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded expert replay/actor update check"]
+    fn expert_actions_are_explicit_and_train_the_replay_actor() {
+        check_expert_actions(false);
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded expert world update check"]
+    fn expert_world_loss_matches_the_preupdate_replay_actor_loss() {
+        check_expert_actions(true);
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded passive-label action/replay/update check"]
+    fn passive_labels_preserve_actions_beliefs_and_independent_replay_targets() {
+        let mut config = config();
+        config.learning_rate_warmup = 0;
+        config.loss_scales.policy = 0.0;
+        config.expert_imitation = Some(super::super::super::ExpertImitation {
+            scale: 1.0,
+            action_weights: vec![0.05, 1.0, 1.0],
+            world_gradient: true,
+        });
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let mut baseline =
+            VectorCore::new(DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu)), 2);
+        let mut labeled = VectorCore::new(DreamerCore::with_gpu(config.clone(), gpu), 2);
+        let first = FrameFlags {
+            is_first: true,
+            ..Default::default()
+        };
+        for vector in [&mut baseline, &mut labeled] {
+            vector.ingest(
+                (0..2)
+                    .map(|id| (id, observation(id, 0), first, Reward::default()))
+                    .collect(),
+            );
+        }
+        let before_rng: Vec<_> = labeled
+            .streams
+            .iter()
+            .map(|stream| stream.policy_rng.clone().random::<u64>())
+            .collect();
+        for labels in [vec![Some(0)], vec![None, Some(3)]] {
+            assert!(
+                labeled
+                    .act_with_expert_labels(ActionMode::Sample, &labels, None)
+                    .is_err()
+            );
+        }
+        assert!(
+            labeled
+                .act_with_expert_labels(ActionMode::Sample, &[Some(2), None], Some(&[Some(0)]))
+                .is_err()
+        );
+        assert!(
+            labeled
+                .streams
+                .iter()
+                .all(|stream| stream.pending_action.is_none() && stream.pending_expert.is_none())
+        );
+        assert_eq!(
+            before_rng,
+            labeled
+                .streams
+                .iter()
+                .map(|stream| stream.policy_rng.clone().random::<u64>())
+                .collect::<Vec<_>>()
+        );
+        let mut disagreements = 0;
+        for time in 1..9 {
+            let overrides = [if time % 3 == 0 { Some(0) } else { None }, None];
+            let expected = baseline
+                .act_with_overrides(ActionMode::Sample, &overrides)
+                .unwrap();
+            let actions = labeled
+                .act_with_expert_labels(ActionMode::Sample, &[Some(2), None], Some(&overrides))
+                .unwrap();
+            assert_eq!(actions, expected);
+            disagreements += usize::from(actions[0] != 2);
+            assert_eq!(labeled.streams[0].pending_expert, Some(2));
+            assert_eq!(labeled.streams[1].pending_expert, None);
+            for vector in [&mut baseline, &mut labeled] {
+                vector.ingest(
+                    (0..2)
+                        .map(|id| {
+                            (
+                                id,
+                                observation(id, time),
+                                FrameFlags::default(),
+                                Reward::default(),
+                            )
+                        })
+                        .collect(),
+                );
+            }
+        }
+        assert!(disagreements > 0);
+        let mut baseline_rng = StdRng::seed_from_u64(911);
+        let mut labeled_rng = baseline_rng.clone();
+        let mut supervised_sample_rng = None;
+        for _ in 0..16 {
+            let sample_rng = labeled_rng.clone();
+            let a = baseline
+                .learner
+                .replay
+                .sample(&config, &mut baseline_rng)
+                .unwrap();
+            let b = labeled
+                .learner
+                .replay
+                .sample(&config, &mut labeled_rng)
+                .unwrap();
+            assert_eq!(a.previous_actions, b.previous_actions);
+            assert_eq!(a.observations, b.observations);
+            assert_eq!(a.initial_deter, b.initial_deter);
+            assert_eq!(a.initial_stoch, b.initial_stoch);
+            assert!(
+                a.previous_expert_action
+                    .iter()
+                    .flatten()
+                    .all(Option::is_none)
+            );
+            let (targets, count) = b.expert_targets(&config);
+            if count > 0 && supervised_sample_rng.is_none() {
+                supervised_sample_rng = Some(sample_rng);
+            }
+            assert!(
+                targets
+                    .chunks(3)
+                    .all(|row| row == [0., 0., 0.] || row == [0., 0., 1.])
+            );
+        }
+        assert_eq!(
+            baseline.learner.environment_step,
+            labeled.learner.environment_step
+        );
+        assert_eq!(baseline.learner.learner_step, 0);
+        labeled.learner.rngs.replay = supervised_sample_rng.expect("sampled supervised replay");
+        let before = labeled
+            .learner
+            .behavior_train
+            .read_params(&["behavior.actor.out.bias"]);
+        let report = labeled.learn().unwrap();
+        let expert = report.behavior.expert_imitation.unwrap();
+        let world = report.world.expert_imitation_loss.unwrap();
+        assert!(expert.loss.is_finite() && expert.loss > 0. && expert.labeled_rows > 0);
+        assert!((expert.loss - world).abs() < 2e-4);
+        let after = labeled
+            .learner
+            .behavior_train
+            .read_params(&["behavior.actor.out.bias"]);
+        assert_ne!(before, after);
+        assert!(after.iter().flatten().all(|x| x.is_finite()));
+        println!(
+            "passive disagreements={disagreements} labels={} actor_loss={} world_loss={world}",
+            expert.labeled_rows, expert.loss
+        );
+    }
+
+    fn check_expert_actions(world_gradient: bool) {
+        let mut config = config();
+        config.learning_rate_warmup = 0;
+        config.loss_scales.policy = 0.0;
+        config.expert_imitation = Some(super::super::super::ExpertImitation {
+            scale: 2.0,
+            action_weights: vec![0.05, 1.0, 1.0],
+            world_gradient,
+        });
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let learner = DreamerCore::with_gpu(config, gpu);
+        let mut vector = VectorCore::new(learner, 2);
+        let first = FrameFlags {
+            is_first: true,
+            ..Default::default()
+        };
+        vector.ingest(
+            (0..2)
+                .map(|id| (id, observation(id, 0), first, Reward::default()))
+                .collect(),
+        );
+        assert!(
+            vector
+                .act_with_expert_actions(ActionMode::Sample, &[Some(0)])
+                .is_err()
+        );
+        assert!(
+            vector
+                .act_with_expert_actions(ActionMode::Sample, &[Some(99), None])
+                .is_err()
+        );
+        assert!(
+            vector
+                .streams
+                .iter()
+                .all(|stream| stream.pending_action.is_none() && stream.pending_expert.is_none())
+        );
+        for time in 1..9 {
+            if time == 2 {
+                vector
+                    .act_with_overrides(ActionMode::Sample, &[Some(0), Some(1)])
+                    .unwrap();
+                assert!(
+                    vector
+                        .streams
+                        .iter()
+                        .all(|stream| stream.pending_expert.is_none())
+                );
+            } else {
+                let actions = vector
+                    .act_with_expert_actions(ActionMode::Sample, &[Some(2), None])
+                    .unwrap();
+                assert_eq!(actions[0], 2);
+                assert!(
+                    vector.streams[0].pending_expert == Some(2)
+                        && vector.streams[1].pending_expert.is_none()
+                );
+            }
+            vector.ingest(
+                (0..2)
+                    .map(|id| {
+                        (
+                            id,
+                            observation(id, time),
+                            FrameFlags::default(),
+                            Reward::default(),
+                        )
+                    })
+                    .collect(),
+            );
+            assert!(
+                vector
+                    .streams
+                    .iter()
+                    .all(|stream| stream.pending_expert.is_none())
+            );
+        }
+        let mut before = vec![0.0; 3];
+        vector
+            .learner
+            .behavior_train
+            .read_param("behavior.actor.out.bias", &mut before);
+        let report = vector.learn().unwrap();
+        let expert = report.behavior.expert_imitation.unwrap();
+        assert!(expert.labeled_rows > 0 && expert.weight_sum > 0.0 && expert.loss > 0.0);
+        if world_gradient {
+            let world_loss = report.world.expert_imitation_loss.unwrap();
+            assert!(
+                (world_loss - expert.loss).abs() < 2e-4,
+                "{world_loss} != {}",
+                expert.loss
+            );
+        } else {
+            assert_eq!(report.world.expert_imitation_loss, None);
+        }
+        let mut after = vec![0.0; 3];
+        vector
+            .learner
+            .behavior_train
+            .read_param("behavior.actor.out.bias", &mut after);
+        assert_ne!(before, after);
+        assert!(after.iter().all(|x| x.is_finite()));
+        println!(
+            "expert labels={} weight_sum={} loss={}",
+            expert.labeled_rows, expert.weight_sum, expert.loss
+        );
     }
 
     #[test]

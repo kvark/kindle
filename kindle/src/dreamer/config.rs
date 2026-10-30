@@ -1,12 +1,75 @@
-use crate::vision::{OBSERVATION_CHANNELS, Observation};
+use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
 
-/// DreamerV3 scaling presets from the pinned upstream configuration.
+/// Values retained in replay and re-encoded by the current world model.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ObservationKind {
+    #[default]
+    Features,
+    /// One GPU resize to 64x64, channel-major RGB in [-0.5, 0.5].
+    Rgb64,
+    /// One GPU resize to 48x48, channel-major RGB in [-0.5, 0.5].
+    Rgb48,
+    /// One GPU resize to 32x32, channel-major RGB in [-0.5, 0.5].
+    Rgb32,
+}
+
+impl ObservationKind {
+    pub const fn is_rgb(self) -> bool {
+        !matches!(self, Self::Features)
+    }
+}
+
+/// Native-detail, phase-aligned causal replay. Both modes re-encode pixels;
+/// only Joint allows world/task gradients into the pretrained Tiny weights.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VideoEncoder {
+    Frozen,
+    Joint,
+}
+
+/// Matrix-product policy for training graphs. Parameters, optimizer state,
+/// reductions and accumulators remain f32; F16 permits reduced input precision
+/// in both forward and backward products, not half-storage checkpoints.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TrainingPrecision {
+    #[default]
+    Auto,
+    F32,
+    F16,
+    /// BF16 dense regions plus convolution operands and stored forward results.
+    /// Convolution derivatives and grouped products retain F32 arithmetic.
+    Bf16,
+    /// BF16 learner inference/behavior; F16-input, F32-storage world gradients.
+    Mixed,
+}
+
+impl TrainingPrecision {
+    pub(crate) fn coop_policy(self) -> meganeura::CoopPolicy {
+        match self {
+            Self::Auto => meganeura::CoopPolicy::Auto,
+            Self::F32 => meganeura::CoopPolicy::NativeF32,
+            Self::F16 => meganeura::CoopPolicy::AllowF16,
+            Self::Bf16 | Self::Mixed => meganeura::CoopPolicy::NativeF32,
+        }
+    }
+
+    pub(crate) fn uses_bf16(self) -> bool {
+        matches!(self, Self::Bf16 | Self::Mixed)
+    }
+}
+
+/// Model scaling presets, including the pinned DreamerV3 configurations.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ModelSize {
     /// CI and wiring preset only; not an upstream benchmark size.
     Tiny,
     Size1M,
+    /// Intermediate Kindle development preset; not an upstream benchmark size.
+    Size4M,
     #[default]
     Size12M,
     Size25M,
@@ -46,6 +109,15 @@ impl ModelSize {
                 blocks: 8,
                 units: 64,
                 vision_depth: 4,
+            },
+            Self::Size4M => NetworkSize {
+                deter: 1_024,
+                hidden: 128,
+                stoch: 32,
+                classes: 8,
+                blocks: 8,
+                units: 128,
+                vision_depth: 8,
             },
             Self::Size12M => NetworkSize {
                 deter: 2_048,
@@ -99,8 +171,8 @@ impl ModelSize {
 #[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct LossScales {
     pub reconstruction: f32,
-    /// Predict frozen observation features from the deterministic state before
-    /// the current observation enters the posterior. Zero disables the head.
+    /// Predict features from the deterministic prior. Feature observations use
+    /// squared error; RGB uses CDP cosine distance to detached CNN embeddings.
     #[serde(default)]
     pub future_prediction: f32,
     pub reward: f32,
@@ -128,16 +200,70 @@ impl Default for LossScales {
     }
 }
 
-/// Configuration of the D3 baseline.
-///
-/// Defaults mirror the pinned DreamerV3 configuration where the stack can
-/// express it directly. Kindle uses the upstream 12M preset for rapid local
-/// iteration; the pinned D3 default is 200M. Larger presets remain one enum
-/// change.
+/// Fixed statistics for predicting each visual feature in standardized units.
+#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct FeatureStandardization {
+    pub mean: Vec<f32>,
+    pub scale: Vec<f32>,
+}
+
+/// Training-only position targets derived from a color within a fixed image
+/// region. The region is [x0, y0, x1, y1] in full-image normalized coordinates.
+#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct ColorCentroidSupervision {
+    pub scale: f32,
+    pub channel: usize,
+    pub background_scale: f32,
+    pub region: [f32; 4],
+}
+
+/// Optional supervised actor targets from explicitly trusted executed actions.
+/// Weights are applied before averaging over all replay rows, not renormalized
+/// within each minibatch; rare actions therefore retain their relative weight.
+#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct ExpertImitation {
+    pub scale: f32,
+    pub action_weights: Vec<f32>,
+    /// Route the same trusted targets through the frozen actor into world state.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub world_gradient: bool,
+}
+
+fn is_false(value: &bool) -> bool {
+    !value
+}
+
+/// Prior-only predictions from the first posterior state of each training chunk.
+#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct OpenLoopSupervision {
+    pub horizon: usize,
+    pub scale: f32,
+}
+
+/// Configuration of the D3 baseline. Defaults use the upstream 12M preset;
+/// the pinned upstream default is 200M. Larger presets remain one enum change.
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DreamerConfig {
     pub action_count: usize,
     pub model_size: ModelSize,
+    #[serde(default)]
+    pub training_precision: TrainingPrecision,
+    #[serde(default)]
+    pub observation_kind: ObservationKind,
+    #[serde(default)]
+    pub video_encoder: Option<VideoEncoder>,
+    /// Fixed, training-only statistics for future-prediction targets. Does not
+    /// transform encoder/RSSM inputs. Diagnostics decode back to raw features.
+    #[serde(default)]
+    pub future_target_standardization: Option<FeatureStandardization>,
+    /// CDP ablation: center predictions and detached targets using the current
+    /// full replay batch's target mean. Acting/forecast outputs stay raw.
+    #[serde(default)]
+    pub cdp_centered: bool,
+    /// Optional feature targets for the full-posterior reconstruction head.
+    /// Separate from future targets; RGB reconstruction never uses these.
+    #[serde(default)]
+    pub reconstruction_target_standardization: Option<FeatureStandardization>,
     /// Per-patch hidden width immediately before the 64-channel feature decoder
     /// output. Fresh configs use 64 to avoid a hard affine rank bottleneck.
     /// Zero preserves the preset vision depth for legacy checkpoints.
@@ -154,6 +280,10 @@ pub struct DreamerConfig {
     /// changes peak activation memory without changing the effective D3 batch.
     #[serde(default)]
     pub world_microbatch_size: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub open_loop_supervision: Option<OpenLoopSupervision>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub color_centroid_supervision: Option<ColorCentroidSupervision>,
     pub replay_context: usize,
     /// Replay samples per action. Zero disables scheduled updates; explicit
     /// `DreamerCore::learn` remains available for isolated diagnostics.
@@ -175,6 +305,12 @@ pub struct DreamerConfig {
     pub slow_value_rate: f32,
     pub return_norm_rate: f32,
     pub learning_rate: f32,
+    /// Optional CNN/feature-adapter rate; defaults to the world learning rate.
+    #[serde(default)]
+    pub encoder_learning_rate: Option<f32>,
+    /// Optional RSSM (including posterior) and future-predictor learning rate.
+    #[serde(default)]
+    pub dynamics_learning_rate: Option<f32>,
     /// Optional actor/critic rate for optimization diagnostics. `None` keeps
     /// D3's shared world/behavior learning rate.
     #[serde(default)]
@@ -184,6 +320,8 @@ pub struct DreamerConfig {
     /// training while the actor parameters are gated.
     #[serde(default)]
     pub actor_learning_starts: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expert_imitation: Option<ExpertImitation>,
     pub learning_rate_warmup: u64,
     pub optimizer_beta1: f32,
     pub optimizer_beta2: f32,
@@ -197,8 +335,16 @@ pub struct DreamerConfig {
     /// The behavior critic is trained regardless of this switch.
     #[serde(default = "default_replay_value_gradient")]
     pub replay_value_gradient: bool,
+    /// Dreamer's optional `ac_grads`: actor and imagined-value losses shape
+    /// their initial posterior states. Future imagined states remain detached.
+    #[serde(default)]
+    pub actor_critic_gradient: bool,
     pub extrinsic_reward_scale: f32,
     pub intrinsic_reward_scale: f32,
+    /// Recompute disagreement about action effects on observation encodings in
+    /// imagination and replay. Zero intrinsic scale removes the ensemble.
+    #[serde(default)]
+    pub disagreement_bonus: bool,
     /// Add bounded fixed-feature visitation novelty to the intrinsic channel.
     /// Counts persist across episode boundaries and model checkpoints.
     #[serde(default)]
@@ -212,6 +358,12 @@ impl DreamerConfig {
         let config = Self {
             action_count,
             model_size: ModelSize::Size12M,
+            training_precision: TrainingPrecision::Auto,
+            observation_kind: ObservationKind::Features,
+            video_encoder: None,
+            future_target_standardization: None,
+            cdp_centered: false,
+            reconstruction_target_standardization: None,
             observation_decoder_depth: OBSERVATION_CHANNELS,
             // Full visual replay entries are intentionally compressed to a
             // fixed 7x7x64 map. 100k entries are ~1.25 GB before RSSM context.
@@ -220,6 +372,8 @@ impl DreamerConfig {
             batch_length: 64,
             world_backprop_length: 8,
             world_microbatch_size: None,
+            open_loop_supervision: None,
+            color_centroid_supervision: None,
             replay_context: 1,
             train_ratio: 32.0,
             imagination_length: 15,
@@ -229,13 +383,18 @@ impl DreamerConfig {
             dynamics_free_nats: None,
             unimix: 0.01,
             value_bins: 255,
-            actor_unimix: 0.01,
+            // Upstream's discrete Head.categorical constructs Categorical
+            // without unimix. Only the RSSM's OneHot uses the 1% mixture.
+            actor_unimix: 0.0,
             actor_entropy: 3e-4,
             slow_value_rate: 0.02,
             return_norm_rate: 0.01,
             learning_rate: 4e-5,
+            encoder_learning_rate: None,
+            dynamics_learning_rate: None,
             behavior_learning_rate: None,
             actor_learning_starts: 0,
+            expert_imitation: None,
             learning_rate_warmup: 1_000,
             optimizer_beta1: 0.9,
             optimizer_beta2: 0.999,
@@ -244,8 +403,10 @@ impl DreamerConfig {
             agc_pmin: 1e-3,
             loss_scales: LossScales::default(),
             replay_value_gradient: true,
+            actor_critic_gradient: false,
             extrinsic_reward_scale: 1.0,
             intrinsic_reward_scale: 0.0,
+            disagreement_bonus: false,
             visitation_bonus: false,
             seed: 0,
             skip_full_optimize: false,
@@ -272,13 +433,57 @@ impl DreamerConfig {
         self.model_size.network()
     }
 
+    pub fn uses_disagreement(&self) -> bool {
+        self.disagreement_bonus && self.intrinsic_reward_scale > 0.0
+    }
+
     pub fn feature_dim(&self) -> usize {
         let size = self.network();
         size.deter + size.stoch * size.classes
     }
 
     pub const fn observation_dim(&self) -> usize {
-        Observation::LEN
+        self.observation_grid() * self.observation_grid() * self.observation_channels()
+    }
+
+    pub const fn observation_grid(&self) -> usize {
+        match self.observation_kind {
+            ObservationKind::Features => OBSERVATION_GRID,
+            ObservationKind::Rgb64 => 64,
+            ObservationKind::Rgb48 => 48,
+            ObservationKind::Rgb32 => 32,
+        }
+    }
+
+    pub const fn observation_channels(&self) -> usize {
+        match self.observation_kind {
+            ObservationKind::Features => OBSERVATION_CHANNELS,
+            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => 3,
+        }
+    }
+
+    pub(crate) const fn observation_shape(&self, batch: usize) -> [usize; 2] {
+        match self.observation_kind {
+            ObservationKind::Features => [
+                batch * OBSERVATION_GRID * OBSERVATION_GRID,
+                OBSERVATION_CHANNELS,
+            ],
+            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+                [batch, self.observation_dim()]
+            }
+        }
+    }
+
+    pub(crate) fn encoded_observation_dim(&self) -> usize {
+        match self.observation_kind {
+            ObservationKind::Features => {
+                OBSERVATION_GRID * OBSERVATION_GRID * self.network().vision_depth
+            }
+            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+                let side = self.observation_grid() / 16;
+                side * side * self.network().vision_depth * 4
+            }
+        }
     }
 
     pub fn observation_decoder_depth(&self) -> usize {
@@ -291,6 +496,19 @@ impl DreamerConfig {
 
     pub fn behavior_learning_rate(&self) -> f32 {
         self.behavior_learning_rate.unwrap_or(self.learning_rate)
+    }
+
+    pub fn is_cdp(&self) -> bool {
+        self.observation_kind.is_rgb() && self.loss_scales.future_prediction > 0.0
+    }
+
+    /// CDP forecasts CNN embeddings, not RGB images or reconstructed features.
+    pub fn prediction_dim(&self) -> usize {
+        if self.is_cdp() {
+            self.encoded_observation_dim()
+        } else {
+            self.observation_dim()
+        }
     }
 
     pub fn world_microbatch_size(&self) -> usize {
@@ -311,17 +529,32 @@ impl DreamerConfig {
 
     /// Eligible replay items required before scheduled learning begins.
     pub fn replay_warmup_sequences(&self) -> usize {
-        self.batch_size * self.batch_length
+        if self.video_encoder.is_some() {
+            self.batch_size
+        } else {
+            self.batch_size * self.batch_length
+        }
     }
 
     /// Frames needed to expose [`Self::replay_warmup_sequences`] complete
     /// context-plus-training sequences.
     pub fn replay_warmup_frames(&self) -> usize {
-        self.replay_warmup_sequences() + self.replay_context + self.batch_length - 1
+        let stride = if self.video_encoder.is_some() {
+            self.batch_length
+        } else {
+            1
+        };
+        self.replay_warmup_sequences() * stride + self.replay_context + self.batch_length - 1
     }
 
     pub fn continuation_discount(&self) -> f32 {
         1.0 - 1.0 / self.horizon as f32
+    }
+
+    pub fn expert_world_gradient(&self) -> bool {
+        self.expert_imitation
+            .as_ref()
+            .is_some_and(|expert| expert.world_gradient)
     }
 
     pub fn validate(&self) {
@@ -332,6 +565,114 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         let size = self.network();
+        if let Some(rollout) = &self.open_loop_supervision
+            && (!self.is_cdp()
+                || rollout.horizon < 2
+                || rollout.horizon >= self.world_backprop_length
+                || !rollout.scale.is_finite()
+                || rollout.scale <= 0.0
+                || [
+                    self.loss_scales.future_prediction,
+                    self.loss_scales.reward,
+                    self.loss_scales.continuation,
+                ]
+                .iter()
+                .any(|weight| !(weight * rollout.scale).is_finite()))
+        {
+            return Err("open-loop supervision requires CDP, 2 <= horizon < world BPTT, and a positive finite scale".into());
+        }
+        if let Some(expert) = &self.expert_imitation
+            && (!expert.scale.is_finite()
+                || expert.scale <= 0.0
+                || expert.action_weights.len() != self.action_count
+                || !expert.action_weights.iter().any(|&weight| weight > 0.0)
+                || expert.action_weights.iter().any(|&weight| {
+                    !weight.is_finite() || weight < 0.0 || !(weight * expert.scale).is_finite()
+                }))
+        {
+            return Err("expert imitation requires positive finite scale and nonnegative finite action weights".into());
+        }
+        if let Some(centroid) = &self.color_centroid_supervision {
+            let [x0, y0, x1, y1] = centroid.region;
+            let side = self.observation_grid();
+            let contains_center = |low, high| {
+                (0..side).any(|i| {
+                    let center = (i as f32 + 0.5) / side as f32;
+                    center >= low && center < high
+                })
+            };
+            if !self.observation_kind.is_rgb()
+                || !centroid.scale.is_finite()
+                || centroid.scale <= 0.0
+                || centroid.channel >= 3
+                || !centroid.background_scale.is_finite()
+                || centroid.background_scale <= 0.0
+                || centroid
+                    .region
+                    .iter()
+                    .any(|x| !x.is_finite() || !(0.0..=1.0).contains(x))
+                || x0 >= x1
+                || y0 >= y1
+                || !contains_center(x0, x1)
+                || !contains_center(y0, y1)
+            {
+                return Err("color centroid requires RGB, positive finite scales, channel0..2 and a nonempty normalized region".into());
+            }
+        }
+        if self.cdp_centered
+            && (!self.is_cdp()
+                || self.world_backprop_length != self.batch_length
+                || self.world_microbatch_size() != self.batch_size
+                || self.batch_size.saturating_mul(self.batch_length) < 2)
+        {
+            return Err(
+                "centered CDP requires CDP with full-batch BPTT and at least two targets".into(),
+            );
+        }
+        for (statistics, enabled) in [
+            (
+                &self.future_target_standardization,
+                self.loss_scales.future_prediction > 0.0,
+            ),
+            (
+                &self.reconstruction_target_standardization,
+                self.loss_scales.reconstruction > 0.0,
+            ),
+        ] {
+            if let Some(stats) = statistics
+                && (self.observation_kind != ObservationKind::Features
+                    || !enabled
+                    || stats.mean.len() != self.observation_dim()
+                    || stats.scale.len() != self.observation_dim()
+                    || stats.mean.iter().any(|x| !x.is_finite())
+                    || stats
+                        .scale
+                        .iter()
+                        .any(|x| !x.is_finite() || *x <= 0.0 || !x.recip().is_finite()))
+            {
+                return Err("target standardization requires an enabled feature head, finite means and positive scales".into());
+            }
+        }
+        if self.video_encoder.is_some()
+            && (self.observation_kind != ObservationKind::Features
+                || self.batch_length != crate::vision::levjepa::FRAMES
+                || self.world_backprop_length != self.batch_length
+                || self.replay_context != 1
+                || self.loss_scales.reconstruction != 0.0
+                || self.loss_scales.future_prediction <= 0.0)
+        {
+            return Err(
+                "causal pixel replay requires feature prediction, full T16 BPTT and context1"
+                    .into(),
+            );
+        }
+        if self.observation_kind.is_rgb()
+            && (self.visitation_bonus
+                || (self.loss_scales.future_prediction > 0.0)
+                    == (self.loss_scales.reconstruction > 0.0))
+        {
+            return Err("RGB learning requires exactly one of reconstruction or CDP, without host visitation".into());
+        }
         if self.action_count <= 1 {
             return Err("action_count must be greater than one".into());
         }
@@ -405,11 +746,18 @@ impl DreamerConfig {
         if !self.learning_rate.is_finite() || self.learning_rate <= 0.0 {
             return Err("learning_rate must be finite and positive".into());
         }
-        if self
-            .behavior_learning_rate
-            .is_some_and(|rate| !rate.is_finite() || rate <= 0.0)
-        {
-            return Err("behavior_learning_rate must be finite and positive".into());
+        for (name, rate) in [
+            ("behavior_learning_rate", self.behavior_learning_rate),
+            ("encoder_learning_rate", self.encoder_learning_rate),
+            ("dynamics_learning_rate", self.dynamics_learning_rate),
+        ] {
+            if rate.is_some_and(|rate| {
+                !rate.is_finite() || rate <= 0.0 || !(rate / self.learning_rate).is_finite()
+            }) {
+                return Err(format!(
+                    "{name} must be finite and positive with a finite rate ratio"
+                ));
+            }
         }
         if !self.optimizer_beta1.is_finite()
             || !self.optimizer_beta2.is_finite()
@@ -447,6 +795,12 @@ impl DreamerConfig {
         if !self.extrinsic_reward_scale.is_finite() || !self.intrinsic_reward_scale.is_finite() {
             return Err("reward scales must be finite".into());
         }
+        if self.disagreement_bonus && (self.intrinsic_reward_scale < 0.0 || self.visitation_bonus) {
+            return Err(
+                "disagreement requires a non-negative intrinsic scale and no host visitation"
+                    .into(),
+            );
+        }
         Ok(())
     }
 }
@@ -458,6 +812,169 @@ const fn default_replay_value_gradient() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn expert_imitation_defaults_preserve_legacy_config_and_validate_weights() {
+        let mut config = DreamerConfig::tiny(3);
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert!(legacy.get("expert_imitation").is_none());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(legacy).unwrap(),
+            config
+        );
+        for (scale, weights) in [
+            (0.0, vec![1.0; 3]),
+            (f32::NAN, vec![1.0; 3]),
+            (f32::INFINITY, vec![1.0; 3]),
+            (1.0, vec![1.0; 2]),
+            (1.0, vec![0.0; 3]),
+            (1.0, vec![-1.0, 1.0, 1.0]),
+            (1.0, vec![f32::NAN, 1.0, 1.0]),
+            (f32::MAX, vec![2.0; 3]),
+        ] {
+            config.expert_imitation = Some(ExpertImitation {
+                scale,
+                action_weights: weights,
+                world_gradient: false,
+            });
+            assert!(config.check().unwrap_err().contains("expert imitation"));
+        }
+        config.expert_imitation = Some(ExpertImitation {
+            scale: 2.0,
+            action_weights: vec![0.05, 0.0, 1.0],
+            world_gradient: false,
+        });
+        config.check().unwrap();
+        let encoded = serde_json::to_value(&config).unwrap();
+        assert!(encoded.get("expert_imitation").is_some());
+        assert!(encoded["expert_imitation"].get("world_gradient").is_none());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(encoded).unwrap(),
+            config
+        );
+        config.expert_imitation.as_mut().unwrap().world_gradient = true;
+        assert!(config.expert_world_gradient());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(serde_json::to_value(&config).unwrap())
+                .unwrap(),
+            config
+        );
+    }
+
+    #[test]
+    fn cdp_configuration_and_split_rates_roundtrip() {
+        let mut config = DreamerConfig::new(18);
+        config.model_size = ModelSize::Size1M;
+        config.observation_kind = ObservationKind::Rgb64;
+        assert!(!config.is_cdp());
+        assert_eq!(config.prediction_dim(), 12288);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.encoder_learning_rate = Some(6e-6);
+        config.dynamics_learning_rate = Some(4e-4);
+        assert!(config.check().is_ok());
+        assert!(config.is_cdp());
+        assert_eq!(config.prediction_dim(), 256);
+        let json = serde_json::to_vec(&config).unwrap();
+        assert_eq!(
+            config,
+            serde_json::from_slice::<DreamerConfig>(&json).unwrap()
+        );
+        for rate in [0.0, -1.0, f32::INFINITY, f32::NAN] {
+            let mut invalid = config.clone();
+            invalid.encoder_learning_rate = Some(rate);
+            assert!(invalid.check().is_err());
+            invalid = config.clone();
+            invalid.dynamics_learning_rate = Some(rate);
+            assert!(invalid.check().is_err());
+        }
+        config.loss_scales.reconstruction = 1.0;
+        assert!(
+            config.check().is_err(),
+            "no undeclared hybrid RGB/CDP objective"
+        );
+    }
+
+    #[test]
+    fn centered_cdp_requires_one_full_target_batch() {
+        let mut config = DreamerConfig::tiny(3);
+        assert!(!config.cdp_centered);
+        config.cdp_centered = true;
+        assert!(config.check().is_err());
+        config.observation_kind = ObservationKind::Rgb64;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        assert!(config.check().is_ok());
+        let json = serde_json::to_vec(&config).unwrap();
+        assert_eq!(
+            config,
+            serde_json::from_slice::<DreamerConfig>(&json).unwrap()
+        );
+        config.world_microbatch_size = Some(1);
+        assert!(config.check().is_err());
+        config.world_microbatch_size = None;
+        config.world_backprop_length = 1;
+        assert!(config.check().is_err());
+    }
+
+    #[test]
+    fn feature_standardization_is_optional_validated_and_serialized() {
+        let mut config = DreamerConfig::tiny(3);
+        assert!(config.future_target_standardization.is_none());
+        config.loss_scales.future_prediction = 0.25;
+        config.future_target_standardization = Some(FeatureStandardization {
+            mean: vec![2.0; config.observation_dim()],
+            scale: vec![0.1; config.observation_dim()],
+        });
+        assert!(config.check().is_ok());
+        let roundtrip: DreamerConfig =
+            serde_json::from_str(&serde_json::to_string(&config).unwrap()).unwrap();
+        assert_eq!(roundtrip, config);
+        for invalid in [0.0, -1.0, f32::NAN, f32::INFINITY, f32::from_bits(1)] {
+            let mut bad = config.clone();
+            bad.future_target_standardization.as_mut().unwrap().scale[0] = invalid;
+            assert!(bad.check().is_err());
+        }
+        let mut bad = config.clone();
+        bad.future_target_standardization
+            .as_mut()
+            .unwrap()
+            .mean
+            .pop();
+        assert!(bad.check().is_err());
+        config.loss_scales.future_prediction = 0.0;
+        assert!(config.check().is_err());
+    }
+
+    #[test]
+    fn posterior_target_statistics_require_feature_reconstruction() {
+        let mut config = DreamerConfig::tiny(3);
+        assert!(config.reconstruction_target_standardization.is_none());
+        config.reconstruction_target_standardization = Some(FeatureStandardization {
+            mean: vec![2.0; config.observation_dim()],
+            scale: vec![0.1; config.observation_dim()],
+        });
+        assert!(config.check().is_ok());
+        let restored: DreamerConfig =
+            serde_json::from_str(&serde_json::to_string(&config).unwrap()).unwrap();
+        assert_eq!(config, restored);
+        config
+            .reconstruction_target_standardization
+            .as_mut()
+            .unwrap()
+            .scale[0] = 0.0;
+        assert!(config.check().is_err());
+        config
+            .reconstruction_target_standardization
+            .as_mut()
+            .unwrap()
+            .scale[0] = 0.1;
+        config.loss_scales.reconstruction = 0.0;
+        assert!(config.check().is_err());
+        config.loss_scales.reconstruction = 1.0;
+        config.observation_kind = ObservationKind::Rgb64;
+        assert!(config.check().is_err());
+    }
 
     #[test]
     fn upstream_size_presets_are_pinned() {
@@ -503,6 +1020,30 @@ mod tests {
     }
 
     #[test]
+    fn intermediate_cdp_configuration_roundtrips() {
+        let mut config = DreamerConfig::new(18);
+        config.model_size = ModelSize::Size4M;
+        config.observation_kind = ObservationKind::Rgb64;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.cdp_centered = true;
+        config.batch_size = 8;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.world_microbatch_size = Some(8);
+        config.train_ratio = 16.0;
+        assert!(config.check().is_ok());
+        assert_eq!(config.feature_dim(), 1_280);
+        assert_eq!(config.prediction_dim(), 512);
+        let encoded = serde_json::to_value(&config).unwrap();
+        assert_eq!(encoded["model_size"], "size4_m");
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(encoded).unwrap(),
+            config
+        );
+    }
+
+    #[test]
     fn d3_data_defaults_are_explicit() {
         let config = DreamerConfig::new(18);
         assert_eq!(config.action_count, 18);
@@ -523,7 +1064,7 @@ mod tests {
         assert_eq!(config.lambda, 0.95);
         assert_eq!(config.free_nats, 1.0);
         assert_eq!(config.unimix, 0.01);
-        assert_eq!(config.actor_unimix, 0.01);
+        assert_eq!(config.actor_unimix, 0.0);
         assert_eq!(config.actor_entropy, 3e-4);
         assert_eq!(config.slow_value_rate, 0.02);
         assert_eq!(config.return_norm_rate, 0.01);
@@ -607,15 +1148,19 @@ mod tests {
     #[test]
     fn older_configs_default_new_fields() {
         let mut value = serde_json::to_value(DreamerConfig::tiny(3)).unwrap();
+        assert!(value.get("open_loop_supervision").is_none());
         let object = value.as_object_mut().unwrap();
         object.remove("replay_value_gradient");
+        object.remove("actor_critic_gradient");
         object.remove("behavior_learning_rate");
         object.remove("dynamics_free_nats");
         object.remove("actor_learning_starts");
         object.remove("observation_decoder_depth");
         object.remove("world_microbatch_size");
+        object.remove("training_precision");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
+        assert!(!restored.actor_critic_gradient);
         assert_eq!(restored.behavior_learning_rate, None);
         assert_eq!(restored.behavior_learning_rate(), restored.learning_rate);
         assert_eq!(restored.dynamics_free_nats, None);
@@ -629,5 +1174,55 @@ mod tests {
         );
         assert_eq!(restored.world_microbatch_size, None);
         assert_eq!(restored.world_microbatch_size(), restored.batch_size);
+        assert_eq!(restored.training_precision, TrainingPrecision::Auto);
+        assert_eq!(restored.open_loop_supervision, None);
+    }
+
+    #[test]
+    fn open_loop_requires_cdp_valid_horizon_and_finite_weights() {
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_kind = ObservationKind::Rgb32;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.batch_length = 4;
+        config.world_backprop_length = 4;
+        config.open_loop_supervision = Some(OpenLoopSupervision {
+            horizon: 3,
+            scale: 1.0,
+        });
+        assert!(config.check().is_ok());
+        let restored: DreamerConfig =
+            serde_json::from_value(serde_json::to_value(&config).unwrap()).unwrap();
+        assert_eq!(config, restored);
+        for horizon in [0, 1, 4, usize::MAX] {
+            config.open_loop_supervision.as_mut().unwrap().horizon = horizon;
+            assert!(config.check().is_err());
+        }
+        config.open_loop_supervision.as_mut().unwrap().horizon = 3;
+        for scale in [0.0, -1.0, f32::NAN, f32::INFINITY, f32::MAX] {
+            config.open_loop_supervision.as_mut().unwrap().scale = scale;
+            assert!(config.check().is_err());
+        }
+        config.open_loop_supervision.as_mut().unwrap().scale = 1.0;
+        config.observation_kind = ObservationKind::Features;
+        assert!(config.check().is_err());
+    }
+
+    #[test]
+    fn training_precision_round_trips_and_selects_the_backend_policy() {
+        for (precision, policy) in [
+            (TrainingPrecision::Auto, meganeura::CoopPolicy::Auto),
+            (TrainingPrecision::F32, meganeura::CoopPolicy::NativeF32),
+            (TrainingPrecision::F16, meganeura::CoopPolicy::AllowF16),
+            (TrainingPrecision::Bf16, meganeura::CoopPolicy::NativeF32),
+            (TrainingPrecision::Mixed, meganeura::CoopPolicy::NativeF32),
+        ] {
+            let mut config = DreamerConfig::tiny(3);
+            config.training_precision = precision;
+            let restored: DreamerConfig =
+                serde_json::from_value(serde_json::to_value(&config).unwrap()).unwrap();
+            assert_eq!(restored, config);
+            assert_eq!(restored.training_precision.coop_policy(), policy);
+        }
     }
 }
