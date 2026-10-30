@@ -1,5 +1,10 @@
 # Breakout optimizer estimates: encoder clipping and inherited momentum matter
 
+The [native follow-up](2026-10-30-cdp-breakout-native-optimizer.md) measures similar
+group movement, but its full comparison remains protocol-failed on six scalar
+F64 rounding allowances. The source corpus is unaided greedy evaluation with
+offline teacher labels; earlier prose calling it teacher-guided was incorrect.
+
 A CPU calculation through the saved AGC/LaProp state changes the picture from
 [raw gradients](2026-10-29-cdp-breakout-gradient-attribution.md). All 12 encoder
 parameter tensors are clipped on both fixed batches. Their aggregate gradient
@@ -143,9 +148,9 @@ input pins are rechecked after analysis and during terminal collection.
 
 This is a mathematical estimate, not measured native movement. GPU reduction
 order, F32 rounding, shader contraction and final parameter-write rounding are
-not emulated. Both reused batches come from the final control checkpoint's
-teacher-guided diagnostic corpus. Earlier training, autonomous state coverage,
-other learners and gameplay effects remain unmeasured. A separate native check
+not emulated. Both reused batches come from the control's unaided final-greedy evaluation,
+with corrective teacher labels added offline. Earlier training, broader autonomous
+state coverage, other learners and gameplay effects remain unmeasured. A separate native check
 on disposable copies can qualify these estimates before an optimizer intervention;
 no training extension or coefficient sweep follows from this report.
 

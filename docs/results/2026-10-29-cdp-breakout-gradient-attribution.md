@@ -1,5 +1,10 @@
 # Breakout raw gradients: imitation is already a major representation objective
 
+The [native follow-up](2026-10-30-cdp-breakout-native-optimizer.md) measures similar
+group movement, but its full comparison remains protocol-failed on six scalar
+F64 rounding allowances. The source corpus is unaided greedy evaluation with
+offline teacher labels; earlier prose calling it teacher-guided was incorrect.
+
 Two fixed B16/T16 batches from the accepted Breakout control show larger weighted
 expert-imitation gradient norms than CDP in the CNN encoder, posterior and recurrent
 dynamics. Total-gradient alignment with imitation is 0.925–0.997 across those six
@@ -92,9 +97,10 @@ three representation groups and a nonzero derivative in its own head.
 These local directions leave several distinctions unresolved. AGC depends on
 parameter scales, and LaProp uses saved optimizer history; raw gradient size
 is not parameter movement. The diagnostic uses the final control checkpoint,
-fresh fixed sampling draws and a reused teacher-guided corpus. It does not
-measure the original training minibatches, earlier learning, the centroid/FIRE
-candidates, independent seeds, or policy-distribution effects. Opposing KL
+fresh fixed sampling draws and a reused unaided final-greedy evaluation corpus,
+with corrective teacher labels added offline. It does not measure the original
+training minibatches, earlier learning, the centroid/FIRE candidates, independent
+seeds, or broader policy-distribution effects. Opposing KL
 components are expected to trade off representation fitting and regularization;
 their signs alone do not justify reducing them.
 

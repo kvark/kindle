@@ -69,3 +69,14 @@ parameter, including the complete actual86-parameter manifest. All142 Rust CPU
 tests and strict Clippy pass; the four prior CPU comparison fixtures remain
 unchanged. Reuse the exact derived checkpoint and gradients, with the same
 120-second/memory/numerical limits. No backend or production learner change.
+
+## Terminal outcome
+
+The [result](../results/2026-10-30-cdp-breakout-native-optimizer.md) is
+`closed_protocol_failed`: both native steps and the host guard complete, but
+six scalar parameter values exceed the original F64 rounding allowance. All
+clipped-gradient/moment/group checks pass. CPU closure preserves every bound
+and both original service failures, with238/11 pins and no repeated GPU work.
+No passing full qualification, learner update or new optimizer setting exists.
+Terminal collection00:17:01 UTC October30; corpus provenance is corrected in
+the linked reports to unaided greedy evaluation with offline teacher labels.

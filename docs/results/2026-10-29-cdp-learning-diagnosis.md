@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [native optimizer replay](2026-10-30-cdp-breakout-native-optimizer.md) directly
+measures the small encoder movement estimated below. All clipped gradients,
+moments and group movements agree, but the declared full comparison fails six
+scalar F64 rounding allowances under momentum cancellation. The failed status
+and all bounds remain preserved; no GPU work repeats. This supplies descriptive
+native movement measurements, not an accepted full qualification or a gameplay
+fix. The source corpus is unaided final-greedy evaluation with teacher labels
+added offline; prior prose calling it teacher-guided is corrected.
+
 The [CPU optimizer follow-up](2026-10-29-cdp-breakout-optimizer-attribution.md)
 finds that AGC clips every encoder tensor on both saved batches. The F64 estimate
 of update/weight norm is .00212–.00234% for the encoder versus .1449–.1490% for

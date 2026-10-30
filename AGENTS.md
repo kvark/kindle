@@ -18,16 +18,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [native optimizer qualification](docs/experiments/2026-10-30-cdp-breakout-native-optimizer.md) preserves a00:05:44 UTC
-October30/source875718d graph-compilation failure: the diagnostic used a[1,1]
-root instead of scalar[1]. No batch, backward pass or optimizer step occurs;
-all219 pins and the failed service/guard remain retained. Corrected scalar
-reduction plus full86-parameter CPU compilation pass142 Rust tests/Clippy;
-4 comparison fixtures stay unchanged. Select a separate120s guarded execution
-under `/x/Temp/kindle-optimizer-native-20261030/scalar-corrected`, reusing the
-exact258-tensor diagnostic subset and both gradients. No completed stage repeats,
-learner update or new setting. Check live state before launch; no native update
-result yet. The five-game goal remains unfinished.
+The [native optimizer check](docs/results/2026-10-30-cdp-breakout-native-optimizer.md) completes both disposable steps, with
+exact raw gradients and all172 clipping/momentum/variance and8 group-movement
+checks passing. Observed encoder update/weight .00211656/.00233922% versus
+recurrent .149005/.144894%. The full comparison is protocol-failed: six scalar
+parameter differences3.20e-12–9.04e-12 exceed the original cancellation allowance.
+All29,376,512 parameter writes reproduce exactly from observed native momentum;
+this conditional check does not replace the failed F64 prediction. Native loop
+.808s/test1.57s; main fails00:10:08 UTC October30/source56d59fd. Separate CPU
+closure checks238/11 pins and preserves every bound, ending00:13:13; collection
+00:17:01. Original875718d graph-shape startup failure/219 pins also remain.
+No completed GPU stage repeats;142 Rust CPU tests/Clippy and4 fixtures pass.
+Corpus provenance corrected: unaided final-greedy trajectories, teacher labels
+offline. Root `/x/Temp/kindle-optimizer-native-20261030/scalar-corrected`.
+Both services terminal, no learner updates/new setting; check live state before
+GPU work. The five-game goal remains unfinished.
 
 The [completed CPU optimizer attribution](docs/results/2026-10-29-cdp-breakout-optimizer-attribution.md) estimates all12 encoder
 parameter tensors clipped on both fixed batches; encoder update/weight norm
