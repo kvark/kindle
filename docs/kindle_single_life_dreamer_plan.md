@@ -5,8 +5,10 @@ PID368028/invocationdec5a8235173426888097d71caa5c91e. Fresh200k/12,477 updates,
 30-minute cap;12M64/Auto/N8/B16/T16/H15/R16/expert100,native447fe50; only encoder
 6e-6→2e-5. Startup passes173 pins,357 matched control/check initial tensors,47
 pre-update transitions and94 finite reports through1864 actions. Main,progress,
-100k recovery,postprocessing and collection observers are active. No frozen
-result; require100k/6227 and final/actual-initial sampled/greedy24-episode arms.
+postprocessing and collection remain active;100k/6227 recovery passes00:45:00
+with357 finite tensors and6427 finite reports through103,208 actions. All173
+pins and original main identity reverify00:45:32; recovery observer succeeds.
+No frozen result; final/actual-initial sampled/greedy24-episode arms remain.
 The bounded check passes8192/489 in48.152s,projection21m33s; all153 pins/replay/
 guards pass. Earlier4M/expert10 rate increase hurt play; no causal benefit claim.
 Root`/x/Temp/kindle-breakout-encoder-moderate-20261030/full`;service

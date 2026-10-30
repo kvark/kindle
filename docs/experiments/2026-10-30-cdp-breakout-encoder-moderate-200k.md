@@ -77,3 +77,19 @@ correction or isolated speedup claim.
 
 Declaration`f81dd392fb1cdc9b93b90ca0c7c53119e43c75b245e24c27b7e7eef5884c8d44`;
 startup`2e54a150072b7b094c4aaef06a97269025dfc254e7c1b64780a5b8f7f9b5b99a`.
+
+## 100k recovery verified
+
+At00:45:00 UTC October30 the original recovery observer verifies100,000 actions/
+6227 updates and all357 finite checkpoint tensors. Its complete log prefix has
+103,208 actions/6427 finite learner reports; last progress102,400/6377 retains
+credit.5. The observer exits successfully. Read-only confirmation at00:45:32
+rechecks all173 declared pins and the original mainPID368028/invocation
+`dec5a8235173426888097d71caa5c91e`, still active. No learner interruption, new
+GPU work or frozen assessment occurs. Final200k and all four frozen arms remain
+pending. Existing CPU observer/co-hosting caveats stay without a time correction.
+
+Recovery review`9a6ae4dc291597193a4d239bf0fda88ec0e4816f6900c200e97513d1574529c1`;
+checkpoint identity`1e7c82de903b5c81336a548db1ff925eaade958ccf480314e59d1291113f6063`.
+Read-only state/pin confirmation is retained as`recovery-confirmation.json` in
+the full trial. This is checkpoint integrity evidence, not gameplay competence.

@@ -57,3 +57,19 @@ Main,progress,recovery,postprocessing and collection observers are active; no
 full frozen outcome is available. The.566s read-only startup audit co-hosts with
 training and is retained without time correction. Do not restart or overlap
 GPU work; require100k/6227 recovery and the four declared frozen assessments.
+
+## 100k recovery verified
+
+At00:45:00 UTC October30 the original recovery observer verifies100,000 actions/
+6227 updates and all357 finite checkpoint tensors. Its complete log prefix has
+103,208 actions/6427 finite learner reports; last progress102,400/6377 retains
+credit.5. The observer exits successfully. Read-only confirmation at00:45:32
+rechecks all173 declared pins and the original mainPID368028/invocation
+`dec5a8235173426888097d71caa5c91e`, still active. No learner interruption, new
+GPU work or frozen assessment occurs. Final200k and all four frozen arms remain
+pending. Existing CPU observer/co-hosting caveats stay without a time correction.
+
+Recovery review`9a6ae4dc291597193a4d239bf0fda88ec0e4816f6900c200e97513d1574529c1`;
+checkpoint identity`1e7c82de903b5c81336a548db1ff925eaade958ccf480314e59d1291113f6063`.
+Read-only state/pin confirmation is retained as`recovery-confirmation.json` in
+the full trial. This is checkpoint integrity evidence, not gameplay competence.
