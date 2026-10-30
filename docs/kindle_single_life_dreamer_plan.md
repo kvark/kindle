@@ -14,6 +14,16 @@ Root`/x/Temp/kindle-qbert-encoder-moderate-20261030/full`;service
 `kindle-qbert-encoder-moderate-200k-20261030`. Check live state;do not restart or
 schedule another GPU job while this learner is active. The goal is unfinished.
 
+The [completed Breakout own-trajectory replay](results/2026-10-30-cdp-encoder-representation.md#own-policy-trajectories-show-a-smaller-agreement-gain)
+finds near-descending teacher agreement54.18%→57.59%,versus50%→62.5% on the
+fixed control states. Different state distributions prevent causal subtraction;
+near opposite-direction fractions rise11.04%→13.86%,directional NOOP falls
+37.68%→23.24%. All28,808 actions/115,187 frames match retained outcomes;196
+analysis/235 active Qbert pins and original process identity pass. CPU18.108s,
+zero GPU work/updates,complete01:41:57 UTC October30/source d87b736. CPU co-host
+time is retained without correction. No new learner/loss selected. Qbert's
+original comparison above remains active;do not schedule another GPU job.
+
 The [completed encoder-rate diagnostic](results/2026-10-30-cdp-encoder-representation.md) finds better state and actor readouts on the exact control corpus: kernel
 combined ball x/y MAE12.053/10.211→7.554/6.515, still above pixel.059/.140 on555
 shared rows. Learned scalar actor agreement54.08%→60.90% overall and50%→62.5%

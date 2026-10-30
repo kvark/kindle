@@ -39,3 +39,14 @@ and eight per-lane metrics from20,960 saved rows. Original21 phase/173 learner
 pins and all235 active Qbert inputs remain unchanged,with the same live process.
 No native/emulator import occurs during preflight. Its CPU co-host time remains
 recorded without a training-time correction.
+
+## Completed
+
+The18.108s CPU replay completes01:41:57 UTC October30/sourced87b736. All28,808
+actions/115,187 frames match retained outcomes;24,858 actions belong to the
+selected24 natural episodes. Near-descending teacher agreement54.18%→57.59%
+on each policy's own states improves less than the fixed-state comparison;
+opposite-direction fractions rise while directional NOOP fractions fall.
+All196 analysis/235 active Qbert pins and original process identity pass;no
+native module,GPU work,learning,failure or stage repeat. See the
+[full result and limits](../results/2026-10-30-cdp-encoder-representation.md#own-policy-trajectories-show-a-smaller-agreement-gain).

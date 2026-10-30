@@ -1,5 +1,21 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The completed [moderate encoder-rate comparison](2026-10-30-cdp-breakout-encoder-moderate.md)
+now supplies a useful training improvement: sampled13.208→25.292 and
+greedy17.875→42.625 for0.61% more training time,with no two-wall successes.
+The [fixed-state follow-up](2026-10-30-cdp-encoder-representation.md) also improves
+ball/motion readouts and near-paddle scalar-actor teacher agreement50%→62.5%.
+This motivates further representation investigation without establishing a
+causal mechanism or resolving the earlier full optimizer-protocol failure.
+
+The [own-trajectory CPU replay](2026-10-30-cdp-encoder-representation.md#own-policy-trajectories-show-a-smaller-agreement-gain)
+finds a smaller near-descending teacher-agreement change54.18%→57.59%,with
+opposite-direction fractions rising and directional NOOP fractions falling.
+The policies encounter different states,so this is not a paired comparison.
+Substantial action error and position-readout error remain; a simple replacement
+head still has no supporting result. The18.108s CPU analysis preserves all196
+inputs and the active Qbert learner's235 inputs/process,with no GPU work.
+
 The [native optimizer replay](2026-10-30-cdp-breakout-native-optimizer.md) directly
 measures the small encoder movement estimated below. All clipped gradients,
 moments and group movements agree, but the declared full comparison fails six
