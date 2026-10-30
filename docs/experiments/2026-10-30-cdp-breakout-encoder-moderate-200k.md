@@ -93,3 +93,26 @@ Recovery review`9a6ae4dc291597193a4d239bf0fda88ec0e4816f6900c200e97513d1574529c1
 checkpoint identity`1e7c82de903b5c81336a548db1ff925eaade958ccf480314e59d1291113f6063`.
 Read-only state/pin confirmation is retained as`recovery-confirmation.json` in
 the full trial. This is checkpoint integrity evidence, not gameplay competence.
+
+## Completed comparison
+
+Fresh200k actions/799,511 frames/12,477 updates completes in1347.362s (22m27s),
+0.61% more time than control1339.198s. Sampled25.292/greedy42.625 improve
+13.208/17.875 by91.48%/138.46%; own initials1.417/2.208 match,all0/24 two-wall.
+Retain2e-5 as the stronger compact development point; no broad reliability or
+causal architecture conclusion. No extension,sweep,confirmation or successor.
+
+All173 pins,100k/6227 recovery,12,477 finite reports,357 matched initial/invariant
+frozen tensors,47 pre-update transitions,800/795 actual-initial semantic events,
+full replays/videos,guards,curves,exposure and comparison pass. All four frozen
+arms total62,016 actions/247,897 frames/40.291s,zero updates/truncations. Main
+succeeds00:59:07 UTC October30/source24f69b5,postprocessing00:59:27,collection
+01:00:00. All five services succeed; no full-run failure or GPU stage repeats.
+The earlier CPU preparation-key failure remains preserved. Training overrides
+53.644%; late replay expert CE.591 versus control.696 is not held-out accuracy.
+CPU co-hosting caveats remain without wall-time correction. No GPU allocation
+is active at closure; the five-game goal remains unfinished.
+
+Completion`bad2c98a356b7456499a4067c69600166818ba838f688c18a8ced7e5d418cc41`;
+comparison`d57ea1e053d3d4ecf8a4f2c5e2b2045791dd4da39aaffe4afa4fe3efb2d186fe`.
+[Completed result and limits](../results/2026-10-30-cdp-breakout-encoder-moderate.md).

@@ -18,21 +18,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [fresh Breakout encoder2e-5 comparison](docs/experiments/2026-10-30-cdp-breakout-encoder-moderate-200k.md) launches00:33:24.959 UTC October30/source24f69b5,
-PID368028/invocationdec5a8235173426888097d71caa5c91e. Fresh200k/12,477 updates,
-30-minute cap;12M64/Auto/N8/B16/T16/H15/R16/expert100,native447fe50; only encoder
-6e-6→2e-5. Startup passes173 pins,357 matched control/check initial tensors,47
-pre-update transitions and94 finite reports through1864 actions. Main,progress,
-postprocessing and collection remain active;100k/6227 recovery passes00:45:00
-with357 finite tensors and6427 finite reports through103,208 actions. All173
-pins and original main identity reverify00:45:32; recovery observer succeeds.
-No frozen result; final/actual-initial sampled/greedy24-episode arms remain.
-The bounded check passes8192/489 in48.152s,projection21m33s; all153 pins/replay/
-guards pass. Earlier4M/expert10 rate increase hurt play; no causal benefit claim.
-Root`/x/Temp/kindle-breakout-encoder-moderate-20261030/full`;service
-`kindle-breakout-encoder-moderate-200k-20261030`. Do not restart or overlap GPU
-work while active. CPU preflight-key failure preserved; startup.566s co-host
-caveat retained. See [bounded result](docs/results/2026-10-30-cdp-breakout-encoder-moderate.md).
+The [completed Breakout encoder2e-5 comparison](docs/results/2026-10-30-cdp-breakout-encoder-moderate.md) finishes200k actions/799,511 frames/12,477 updates
+in22m27s,0.61% more time than6e-6 control. Sampled25.292/greedy42.625 improve
+13.208/17.875 by91.48%/138.46%;own initials1.417/2.208 match,all0/24 two-wall.
+Retain2e-5 as stronger compact development point,not broad reliability. All173
+pins,100k/6227 recovery,357 matched initial/invariant frozen tensors,47 pre-update
+transitions,800/795 initial semantic events,full replays/videos,guards,curves,
+exposure and comparison pass. Main/post/collection succeed00:59:07/00:59:27/
+01:00:00 UTC October30/source24f69b5;all services terminal success,no GPU repeat.
+Earlier CPU preflight-key failure preserved. Only encoder6e-6→2e-5 changes in
+12M64/Auto/N8/B16/T16/H15/R16/expert100;native447fe50,teacher fixed,qualified
+optional-rate runner. Reused1009/cohort;no isolated architecture/reliability claim.
+Actual overrides53.644%,late replay CE.591 versus.696;neither is frozen competence.
+Root`/x/Temp/kindle-breakout-encoder-moderate-20261030/full`. CPU co-host caveats
+remain;no extension,sweep,confirmation or automatic successor. No active GPU
+allocation at closure;check live state. The five-game goal remains unfinished.
 
 The [native optimizer check](docs/results/2026-10-30-cdp-breakout-native-optimizer.md) completes both disposable steps, with
 exact raw gradients and all172 clipping/momentum/variance and8 group-movement
