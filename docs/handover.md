@@ -1,19 +1,22 @@
 # CDP handover — October25,2026
 
-The [fresh Qbert encoder2e-5 comparison](experiments/2026-10-30-cdp-qbert-encoder-moderate-200k.md) starts01:34:55 UTC October30/source54b1b5d,PID373087/invocation
-`33e82ad2f0dc4025bac23ba8383d9c6a`. Train200k/12,477 updates under35min on
-12M48/Auto/N8/B16/T16/H15/R16/expert100;only encoder6e-6→2e-5 as a learner
-setting. Startup passes235 pins,357 matched initial tensors,47 pre-update
-transitions and73 finite startup reports. At01:50:30 UTC100k/6227 recovery passes
-all357 finite tensors and6381 finite reports through102,472 actions;recovery
-observer succeeds. All235 pins and original process remain at01:51:16. Progress,
-postprocessing and terminal collection stay active. Final/own-initial greedy/
-sampled24-episode assessments against11984.375/6759.375 remain pending. Bounded8192/489 passes70.203s with212 pins;
-conservative200k projection31m25s. Original CPU recovery-assertion failure stays
-preserved. Native447fe50/Qbert teacher unchanged,qualified optional-rate runner.
-Root`/x/Temp/kindle-qbert-encoder-moderate-20261030/full`;service
-`kindle-qbert-encoder-moderate-200k-20261030`. Check live state;do not restart or
-schedule another GPU job while this learner is active. The goal is unfinished.
+The [completed Qbert encoder2e-5 comparison](results/2026-10-30-cdp-qbert-encoder-moderate.md) finishes200k actions/799,728 frames/12,477 updates
+in30m16s,.58% less training time than6e-6 control. Greedy13,785.417 and
+sampled9,987.500 improve11,984.375/6,759.375 by15.03%/47.76%;first pyramids
+24/24 and23/24,own initials80.208/177.083. Both means still miss15,000.
+Retain2e-5 as the stronger H15/R16 development point,not broad reliability.
+All235 pins,100k recovery,357 matched initial/invariant frozen tensors,47
+pre-update events,1139/1101 actual-initial traces,full replays/videos,guards,
+curves,coverage,exposure and comparison pass. Main/post/collection succeed
+02:17:51/02:17:59/02:18:31 UTC October30/source54b1b5d;all five services succeed.
+No GPU repeats. Earlier CPU preparation and ancillary observer/metadata errors
+remain preserved;the passing pipeline is unchanged. Only encoder6e-6→2e-5
+changes as a learner setting on12M48/Auto/N8/B16/T16/H15/R16/expert100;
+native447fe50/Qbert teacher fixed,qualified optional-rate runner. Reused4013/cohort;
+actual overrides39.667%,not frozen competence. CPU co-host timing caveats remain.
+Root`/x/Temp/kindle-qbert-encoder-moderate-20261030/full`. No extension,sweep,
+confirmation or automatic successor selected. No learner/GPU allocation active
+at closure;check live state before work. The five-game goal remains unfinished.
 
 The [completed Breakout own-trajectory replay](results/2026-10-30-cdp-encoder-representation.md#own-policy-trajectories-show-a-smaller-agreement-gain)
 finds near-descending teacher agreement54.18%→57.59%,versus50%→62.5% on the
@@ -22,8 +25,8 @@ near opposite-direction fractions rise11.04%→13.86%,directional NOOP falls
 37.68%→23.24%. All28,808 actions/115,187 frames match retained outcomes;196
 analysis/235 active Qbert pins and original process identity pass. CPU18.108s,
 zero GPU work/updates,complete01:41:57 UTC October30/source d87b736. CPU co-host
-time is retained without correction. No new learner/loss selected. Qbert's
-original comparison above remains active;do not schedule another GPU job.
+time is retained without correction. No new learner/loss selected. Qbert was
+active during this CPU diagnostic;its subsequent completion is recorded above.
 
 The [completed encoder-rate diagnostic](results/2026-10-30-cdp-encoder-representation.md) finds better state and actor readouts on the exact control corpus: kernel
 combined ball x/y MAE12.053/10.211→7.554/6.515, still above pixel.059/.140 on555

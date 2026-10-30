@@ -98,3 +98,22 @@ GPU job while this learner remains active.
 Recovery review`052c2e69dc3d8c536950fcc0ebcc761912191520b3ae29f89a7eabf52b27eecd`;
 checkpoint identity`7d00e39e549b47c442c16ca73082125985e193c9793ade8b4adfddb483ab5f6f`;
 confirmation`cac442a2a92e3c119b58c0abbcafc00418116d026b93226bd819f2acb92831cf`.
+
+## Completed outcome
+
+The fixed learner and all four frozen arms complete without GPU repetition.
+Training200k/799,728 frames/12,477 updates takes1816.429s (30m16s),.58% less
+than control. Greedy13,785.417/24 first pyramids improves11,984.375/24 by15.03%;
+sampled9,987.500/23 improves6,759.375/24 by47.76%. Own initials80.208/177.083
+clear none and both semantic traces match. The original15,000 mean gate still
+fails; retain2e-5 as a stronger cheaper development point,not broad reliability.
+
+All235 pins,recovery,357 initial/frozen tensors,finite reports,full replays,
+videos,guards,curves,coverage,exposure and comparison pass. Main/post/collection
+succeed02:17:51/02:17:59/02:18:31 UTC October30;all five services succeed.
+Separate ancillary observation/event-count metadata defects remain preserved
+and corrected from retained receipts,without repeating any stage or changing
+the passing pipeline. See the [completed result](../results/2026-10-30-cdp-qbert-encoder-moderate.md)
+for exact evidence,limitations and hashes. No extension,sweep,confirmation or
+automatic successor follows this declaration. No active allocation at closure;
+check live state. The five-game goal remains unfinished.

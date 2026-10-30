@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The completed [Qbert encoder-rate comparison](2026-10-30-cdp-qbert-encoder-moderate.md)
+also improves frozen gameplay at nearly unchanged training cost: greedy
+11,984.375→13,785.417 (+15.03%) and sampled6,759.375→9,987.500 (+47.76%) in
+30m16s versus30m27s. Greedy clears24/24 first pyramids and sampled23/24; both
+means still miss15,000. All235 pins,initial/frozen/recovery checks,replays and
+original services pass. This adds development evidence that encoder optimization
+can matter to useful learning across these two recipes,not a causal mechanism
+or a universal rate. Seed4013/cohort are reused,runner plumbing differs as
+disclosed,and combination with H5/R32 remains unmeasured. Retain the stronger
+cheaper Qbert point;no successor is selected by this result.
+
 The completed [moderate encoder-rate comparison](2026-10-30-cdp-breakout-encoder-moderate.md)
 now supplies a useful training improvement: sampled13.208→25.292 and
 greedy17.875→42.625 for0.61% more training time,with no two-wall successes.
