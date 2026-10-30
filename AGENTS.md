@@ -22,10 +22,11 @@ The [fresh Qbert encoder2e-5 comparison](docs/experiments/2026-10-30-cdp-qbert-e
 `33e82ad2f0dc4025bac23ba8383d9c6a`. Train200k/12,477 updates under35min on
 12M48/Auto/N8/B16/T16/H15/R16/expert100;only encoder6e-6→2e-5 as a learner
 setting. Startup passes235 pins,357 matched initial tensors,47 pre-update
-transitions and73 finite reports through1544 actions. Progress,recovery,post-
-processing and terminal collection observers are active. Require100k/6227
-recovery and final/own-initial greedy/sampled24-episode assessments against
-11984.375/6759.375. No frozen result. Bounded8192/489 passes70.203s with212 pins;
+transitions and73 finite startup reports. At01:50:30 UTC100k/6227 recovery passes
+all357 finite tensors and6381 finite reports through102,472 actions;recovery
+observer succeeds. All235 pins and original process remain at01:51:16. Progress,
+postprocessing and terminal collection stay active. Final/own-initial greedy/
+sampled24-episode assessments against11984.375/6759.375 remain pending. Bounded8192/489 passes70.203s with212 pins;
 conservative200k projection31m25s. Original CPU recovery-assertion failure stays
 preserved. Native447fe50/Qbert teacher unchanged,qualified optional-rate runner.
 Root`/x/Temp/kindle-qbert-encoder-moderate-20261030/full`;service
