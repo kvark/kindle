@@ -14,6 +14,48 @@ struct Manifest {
     learner_step: u64,
 }
 
+fn optimizer_graph(parameters: &[(String, Vec<usize>)]) -> Graph {
+    let mut graph = Graph::new();
+    let mut losses = Vec::new();
+    for (index, (name, shape)) in parameters.iter().enumerate() {
+        let parameter = graph.parameter(name, shape);
+        let gradient = graph.input(&format!("gradient_{index}"), shape);
+        let product = graph.mul(parameter, gradient);
+        losses.push(graph.sum_all(product));
+    }
+    let loss = super::super::networks::sum(&mut graph, &losses);
+    graph.set_outputs(vec![loss]);
+    graph
+}
+
+#[test]
+fn optimizer_graph_preserves_scalar_loss_and_parameters() {
+    let mut cases = vec![vec![
+        ("weight".into(), vec![2, 3]),
+        ("bias".into(), vec![3]),
+        ("kernel".into(), vec![2, 2, 2, 2]),
+    ]];
+    if let Some(path) = std::env::var_os("KINDLE_OPTIMIZER_CPU_INPUTS") {
+        let manifest: Manifest =
+            serde_json::from_slice(&fs::read(PathBuf::from(path).join("manifest.json")).unwrap())
+                .unwrap();
+        assert_eq!(manifest.parameters.len(), 86);
+        cases.push(manifest.parameters);
+    }
+    for parameters in cases {
+        let graph = optimizer_graph(&parameters);
+        assert_eq!(graph.node(graph.outputs()[0]).ty.shape, [1]);
+        let (plan, _) = meganeura::train::compile_training_graph(&graph);
+        assert_eq!(plan.param_grad_pairs.len(), parameters.len());
+        assert_eq!(plan.param_buffers.len(), parameters.len());
+        assert_eq!(plan.input_buffers.len(), parameters.len());
+        for (name, buffer) in &plan.param_buffers {
+            let (_, shape) = parameters.iter().find(|p| p.0 == *name).unwrap();
+            assert_eq!(&plan.param_types[buffer].shape, shape);
+        }
+    }
+}
+
 fn read_floats(path: &Path) -> Vec<f32> {
     let bytes = fs::read(path).unwrap();
     assert_eq!(bytes.len() % 4, 0);
@@ -55,17 +97,7 @@ fn recorded_gradients_match_optimizer_estimates() {
         .map(|(_, shape)| shape.iter().product::<usize>())
         .sum();
     assert_eq!(elements, 14_688_256);
-    let mut graph = Graph::new();
-    let mut losses = Vec::new();
-    for (index, (name, shape)) in manifest.parameters.iter().enumerate() {
-        let parameter = graph.parameter(name, shape);
-        let gradient = graph.input(&format!("gradient_{index}"), shape);
-        let product = graph.mul(parameter, gradient);
-        let flat = graph.reshape(product, &[1, shape.iter().product()]);
-        losses.push(graph.sum_inner(flat));
-    }
-    let loss = super::super::networks::sum(&mut graph, &losses);
-    graph.set_outputs(vec![loss]);
+    let graph = optimizer_graph(&manifest.parameters);
     fs::create_dir(&output).unwrap();
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     let device = crate::gpu_device_info(gpu.device_information());

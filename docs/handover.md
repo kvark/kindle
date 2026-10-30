@@ -1,15 +1,15 @@
 # CDP handover — October25,2026
 
-The [native optimizer qualification](experiments/2026-10-30-cdp-breakout-native-optimizer.md) is selected after the CPU estimate.
-Two independent disposable copies use the exact86 parameters/172 moments and
-12477 counter. A test-only linear graph must reproduce each saved raw gradient
-exactly, then apply one production-configured AGC/LaProp step per batch. Compare
-clipped gradients, moments and rounded parameter movement with fixed tolerances;
-no world-model backward, learner updates or gameplay. All141 Rust CPU tests,
-strict Clippy and4 comparison fixtures pass. Root
-`/x/Temp/kindle-optimizer-native-20261030`; guarded120s execution has not started.
-Check live state before launch; no new learner or setting is selected. The
-five-game goal remains unfinished.
+The [native optimizer qualification](experiments/2026-10-30-cdp-breakout-native-optimizer.md) preserves a00:05:44 UTC
+October30/source875718d graph-compilation failure: the diagnostic used a[1,1]
+root instead of scalar[1]. No batch, backward pass or optimizer step occurs;
+all219 pins and the failed service/guard remain retained. Corrected scalar
+reduction plus full86-parameter CPU compilation pass142 Rust tests/Clippy;
+4 comparison fixtures stay unchanged. Select a separate120s guarded execution
+under `/x/Temp/kindle-optimizer-native-20261030/scalar-corrected`, reusing the
+exact258-tensor diagnostic subset and both gradients. No completed stage repeats,
+learner update or new setting. Check live state before launch; no native update
+result yet. The five-game goal remains unfinished.
 
 The [completed CPU optimizer attribution](results/2026-10-29-cdp-breakout-optimizer-attribution.md) estimates all12 encoder
 parameter tensors clipped on both fixed batches; encoder update/weight norm

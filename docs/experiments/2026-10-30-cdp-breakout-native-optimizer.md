@@ -51,3 +51,21 @@ saved optimizer state. They do not validate arbitrary new coefficients,
 earlier training or gameplay improvement. No new learner or optimizer setting
 is selected. Record results, source hashes and terminal evidence outside Git.
 Evidence root: `/x/Temp/kindle-optimizer-native-20261030`.
+
+## Preserved graph-shape failure and corrected execution
+
+The original invocation starts00:05:42 and fails00:05:44 UTC October30,
+source875718d. The diagnostic's row reduction leaves a[1,1] root loss, while
+autodiff seeds the scalar[1] loss gradient. CPU graph compilation fails after
+GPU context creation, before session restore, either batch or any backward/
+optimizer step. All219 original pins are verified at closure; the empty native
+output directory, exact source, journal and failed guard remain preserved.
+No completed GPU stage is repeated and no host recovery occurs.
+
+Select a separate corrected execution under `scalar-corrected/`. Use the full
+scalar `sum_all` reduction, preserving the intended dot-product loss. A new CPU
+compile test checks scalar output, parameter shapes and one gradient/input per
+parameter, including the complete actual86-parameter manifest. All142 Rust CPU
+tests and strict Clippy pass; the four prior CPU comparison fixtures remain
+unchanged. Reuse the exact derived checkpoint and gradients, with the same
+120-second/memory/numerical limits. No backend or production learner change.
