@@ -57,3 +57,14 @@ accounting/cost cases, all229 H5 control and235 completed moderate-rate pins,
 agent or environment is constructed. Runtime, runner, teacher and schema are
 copied unchanged from the qualified rate experiment. No preparation failure or
 GPU stage has occurred at this point.
+
+## Completed bounded check
+
+The check completes8192 actions/32,751 frames/978 updates in95.153s,followed
+by1024 frozen actions/4096 frames in.798s with zero updates and no natural
+episodes. All288 pins,357 initial/frozen tensors,47 pre-update events,finite
+reports,parameter changes,full replay and guards pass. Conservative200k
+projection2555.387s (42m35s) passes45min. Main succeeds02:32:47 UTC October30,
+source8b9936a;terminal collection02:33:13. No failure or GPU repetition occurs.
+See the [result](../results/2026-10-30-cdp-qbert-encoder-h5.md). No full learner
+is selected by this bounded protocol; gameplay benefit remains unmeasured.
