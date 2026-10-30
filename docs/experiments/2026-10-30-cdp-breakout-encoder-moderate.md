@@ -61,3 +61,13 @@ update accounting, all132 retained control pins and357 actual initial schema
 tensors verified. No environment/native construction or native module load
 occurs. The qualified optional-rate runner diff is retained. No preparation
 failure or GPU work has occurred; the bounded check is ready for declaration.
+
+## Bounded check passes
+
+Training8192 actions/32,724 frames/489 updates takes48.152s; frozen1024/4096
+frames takes.872s, zero updates/no natural episodes. All153 pins,357 matched
+initial/invariant frozen tensors,47 pre-update events, full replay and guards
+pass. Service succeeds00:30:06 UTC October30/sourcef3acd99; collection00:30:25.
+Conservative200k projection21m33s passes30min. No failed stage or GPU repeat.
+See the [completed bounded result](../results/2026-10-30-cdp-breakout-encoder-moderate.md)
+and separately selected [fresh200k protocol](2026-10-30-cdp-breakout-encoder-moderate-200k.md).

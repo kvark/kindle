@@ -1,0 +1,64 @@
+# Fresh 200k Breakout comparison with a moderate encoder rate
+
+After the [bounded check](2026-10-30-cdp-breakout-encoder-moderate.md) passes all
+execution and cost requirements, select one fresh200k-action/12,477-update life.
+Encoder learning rate6e-6→2e-5 is the sole intended learner-setting change from
+the retained12M64/Auto/N8/B16/T16/H15/R16/expert100 control. Native447fe50 and its
+runtime, pixel teacher, guidance and other settings remain fixed. The previously
+qualified optional-rate runner adds only the flag, validation and assignment.
+No weights, replay, games, RNG, belief or bounded-check experience are reused.
+
+The check takes48.152s/8192 actions; its conservative200k projection21m33s passes
+the unchanged30-minute limit. Its1024 frozen actions take.872s with zero updates
+and no natural episodes. All153 pins,357 matched initial/invariant frozen tensors,
+47 pre-update events, full input-pixel/action/label replay and guards pass.
+This establishes execution and early cost, not gameplay benefit. The earlier
+4M/expert10 rate4e-5 comparison hurt gameplay; the new regime and smaller increase
+do not erase that evidence. The recent optimizer diagnostic's full numerical
+comparison remains protocol-failed and does not prove a causal encoder bottleneck.
+
+Keep the exact bounded configuration, base/actor4e-5, dynamics4e-4, warmup1000,
+20% episode guidance/cap1920, all-state corrective labels and expert-world
+gradients. Keep the original native max-pool/one-GPU-resize path atRGB64.
+Seeds1009/evaluation4000001009 and the evaluation cohort are reused development
+inputs, not independent confirmation. No centroid or open-loop loss is enabled.
+
+Training cap1800s; recovery at100k/6227; final200k/12,477; first update376 and
+residual credit.5. Assess fixed final and own actual initial in sampled and
+greedy modes, sampled primary, first3 natural episodes per8 lanes=24 per arm.
+Each frozen arm has300s/600k-action caps, zero updates, guidance/labels off,
+357 invariant tensors, zero truncations and the unchanged90% two-wall gate.
+Retained control scores13.208 sampled/17.875 greedy and own1.417/2.208, all0/24
+two-wall successes. Report each mode and training time separately.
+
+Require357 initial tensors matching bounded check and control, matching
+pre-update training events and both actual-initial frozen semantic traces,
+exact source/config/counters, finite reports, changed CNN/reward/actor/value,
+recovery validation, full training label/input-pixel/action replay, frozen
+outcome replays/videos, guards, curves, exposure and completed comparison.
+Ordinary frozen logs lack live pixel hashes; replay does not compare unavailable
+live images. Online guided returns and changing replay losses are not frozen
+competence. Keep1200s CPU audit/4500s whole main/5100s postprocessing caps.
+
+Before launch, CPU preflight must exercise all five actual CLI paths, actual
+audit/comparison config assertions with negative cases, observer parsers,
+header readiness, checkpoint schema and update accounting. Pin exact scripts,
+runtime, sources, control artifacts and protocol. Stop on real faults or
+nonfinite reports; no driver recovery, GPU retry, cap increase, checkpoint
+selection, extension, rate sweep, seed confirmation or automatic successor.
+CPU-only evidence repair must preserve any original failures and completed
+GPU stages. This comparison is within the existing unfinished five-game goal.
+
+Root `/x/Temp/kindle-breakout-encoder-moderate-20261030/full`;
+service `kindle-breakout-encoder-moderate-200k-20261030`.
+
+## CPU preparation passes
+
+Five actual CLI paths,24 actual audit/comparison config cases,44 resolved paths,
+15 compiled controllers,6 header-readiness cases,4 observer-parser cases and5
+recovery-body cases pass in.635s. All153 bounded/132 control pins,357 checkpoint
+schema tensors and8192/489,100k/6227,200k/12,477 accounting pass. Zero native
+construction attempts or environment creation. The original copied-key
+`initial_matches_reference` failure is preserved under`full/preparation-failure`;
+correcting it to the actual bounded key`initial_matches_control` repeats no GPU
+work and precedes any full declaration or launch. No gameplay benefit measured.
