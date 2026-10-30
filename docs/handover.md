@@ -1,16 +1,19 @@
 # CDP handover — October25,2026
 
-The [fresh Qbert H5/R32 encoder2e-5 comparison](experiments/2026-10-30-cdp-qbert-encoder-h5-200k.md) is selected after the
-bounded8192/978 check passes95.153s and conservative200k projection42m35s.
+The [fresh Qbert H5/R32 encoder2e-5 comparison](experiments/2026-10-30-cdp-qbert-encoder-h5-200k.md) starts02:43:36 UTC
+October30/source254c1bd,PID378851/invocation`f89e34b891a84b959ff05cd156fc4697`.
 Train200k/24,954 updates under45min,12M48/Auto/N8/B16/T16/H5/R32/expert100,
-with100k/12,454 recovery and fixed final/actual-initial sampled/greedy24-episode
-assessments. Primary H5/R32/6e-6 control:greedy14,050/sampled13,331.250,23/24
-first pyramids each. Original15k/90% gate unchanged. Native447fe50/qualified
-runner/teacher fixed;no experience reuse. Final CPU preflight1.513s passes five
-commands,24 config cases,288 bounded/229 control pins and357 tensors. Root
+with100k/12,454 recovery and four fixed final/actual-initial24-episode arms.
+Startup02:44:08 passes325 pins,357 control/bounded-matching initial tensors,
+47 pre-update transitions and287 finite supervised reports through2664 actions;
+first six updates376/384/392/400/408/416. Progress,recovery,postprocessing and
+terminal-collection observers are active. Primary H5/R32/6e-6 control is14,050
+greedy/13,331.250 sampled,23/24 pyramids each;original15k/90% gate unchanged.
+Native447fe50/qualified runner/teacher fixed,no experience reuse. Bounded check
+passes95.153s and conservative42m35s projection. Root
 `/x/Temp/kindle-qbert-encoder-h5-20261030/full`;service
-`kindle-qbert-encoder-h5-200k-20261030`. Recheck live state before launch;
-no retry,extension or automatic successor. Goal unfinished.
+`kindle-qbert-encoder-h5-200k-20261030`. No full frozen result yet. Check live
+state;do not restart or schedule another GPU job while it is active.
 
 The [Qbert H5/R32 encoder2e-5 check](results/2026-10-30-cdp-qbert-encoder-h5.md) passes8192 actions/32,751 frames/
 978 updates in95.153s;1024 frozen/.798s haszero updates/no natural episodes.

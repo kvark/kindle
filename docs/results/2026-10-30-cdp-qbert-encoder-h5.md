@@ -61,3 +61,18 @@ reused. The full run's correctness and gameplay outcome remain pending.
 | `review.json` | `f56588b6098933d6b649e30666dcc9d6bc5f8e216c5f0a55bf04346e6eb8023d` |
 | `guidance-replay.json` | `e38d17390c81502ba422f4ea41ffe3ebb71752ff3445b2584f4029025af5e605` |
 | `completion-review.json` | `7b03856705eb8695b44c1e509ba4e2f61e4d9bc0b319e7e7c95d4d86bdcc75df` |
+
+## Fresh learner launched and startup verified
+
+The fresh full comparison starts02:43:36 UTC October30/source254c1bd,main
+PID378851/invocation`f89e34b891a84b959ff05cd156fc4697`. At02:44:08 startup
+verifies all325 declared pins,357 initial tensors matching control and bounded
+check,47 pre-update transitions and287 finite supervised reports through2664
+actions. First six updates376/384/392/400/408/416 match the declared cadence.
+Progress,100k recovery,postprocessing and terminal-collection observers are
+active. No full frozen result is available. Do not restart this learner or
+schedule another GPU job while it is active. The read-only.803s startup audit
+co-hosts with learning;retain the timing caveat without wall-time correction.
+
+Declaration`893fc0ce97c0284f703c59f68bdda362da5ccd86e4b17b02c268c80a750b72d1`;
+startup`c7a04ee0d9c7626ecf0b0db178dfdb2c92995f292ebdbf220ce6fa4eb12b3c61`.
