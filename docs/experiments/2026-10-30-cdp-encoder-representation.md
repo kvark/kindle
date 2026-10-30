@@ -75,3 +75,13 @@ receipt, whose original successful status is`passed`. Its exact source and raw
 traceback remain under`preflight-failure`; the corrected reader requires the
 original exact status for each artifact. Existing resolved-source files are
 reverified without overwrite. No native/emulator import or GPU stage occurs.
+
+## Completed
+
+All three distinct frozen stages and both CPU analyses complete successfully;
+358 input pins and 357 invariant tensors per stage pass, with zero updates.
+Main succeeds 01:18:25 UTC October 30/source `c7cb852`, terminal collection
+01:21:22. State and learned-actor readouts improve on the fixed control corpus,
+with substantial remaining position error and no tested replacement-head gain.
+See the [completed result](../results/2026-10-30-cdp-encoder-representation.md)
+for exact metrics, limitations and artifact hashes. No new learner is selected.

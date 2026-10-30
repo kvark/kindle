@@ -20,6 +20,11 @@ Training wall excludes construction,evaluation,audits and earlier development;
 whole main-service time is25m42.183s. CPU observers and the.566s startup audit
 co-host with learning; no wall-time correction or isolated backend-speed claim.
 
+The subsequent [frozen state and actor diagnostic](2026-10-30-cdp-encoder-representation.md)
+finds better ball/motion readouts and near-descending teacher agreement
+50%→62.5% on the same control trajectories, with zero learning. This supports
+further representation investigation without establishing a causal mechanism.
+
 ## What changed and what this establishes
 
 Encoder learning rate6e-6→2e-5 is the sole intended learner-setting change.

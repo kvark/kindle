@@ -18,14 +18,18 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [frozen encoder-rate diagnostic](docs/experiments/2026-10-30-cdp-encoder-representation.md) selects one128-action feature check,128-action
-native actor check and20,960-action capture from the completed2e-5 checkpoint.
-Reuse control trajectories,954/509/601 splits and fixed state/action readouts;
-all357 tensors must remain invariant,zero updates. Native447fe50 unchanged.
-The71 CPU checks and3.032s preflight pass; original receipt-status assertion
-remains preserved before GPU work. No new learner or policy evaluation. Root
-`/x/Temp/kindle-encoder-representation-20261030`;service
-`kindle-encoder-representation-20261030`. Check live state before GPU work.
+The [completed encoder-rate diagnostic](docs/results/2026-10-30-cdp-encoder-representation.md) finds better state and actor readouts on the exact control corpus: kernel
+combined ball x/y MAE12.053/10.211→7.554/6.515, still above pixel.059/.140 on555
+shared rows. Learned scalar actor agreement54.08%→60.90% overall and50%→62.5%
+near descending; near opposite-direction choices19→7, overall81→88. Fixed
+linear/kernel action heads still trail the learned actor. All358 pins,357
+invariant tensors per stage,full20,960-action/83,799-frame replay,128 native actor
+checks and guards pass;71 CPU checks. Capture32.097s,CPU3.445s+1.533s,zero updates.
+Service succeeds01:18:25 UTC October30/sourcec7cb852;collection01:21:22. Original
+CPU receipt-status failure preserved;no GPU repeat. Reused control states and
+teacher estimates limit causal/reliability claims. No new learner or policy
+selected;root`/x/Temp/kindle-encoder-representation-20261030`. No active GPU
+allocation at closure;check live state. The five-game goal remains unfinished.
 
 The [completed Breakout encoder2e-5 comparison](docs/results/2026-10-30-cdp-breakout-encoder-moderate.md) finishes200k actions/799,511 frames/12,477 updates
 in22m27s,0.61% more time than6e-6 control. Sampled25.292/greedy42.625 improve
