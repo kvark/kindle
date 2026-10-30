@@ -18,6 +18,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+The [moderate Breakout encoder-rate check](docs/experiments/2026-10-30-cdp-breakout-encoder-moderate.md) selects one fresh8192-action/489-update execution/cost check:
+12M64/Auto/N8/B16/T16/H15/R16/expert100, encoder6e-6→2e-5, native447fe50.
+The native update disparity motivates a test, not a causal claim; the earlier
+4M/expert10 increase to4e-5 hurt gameplay and remains negative evidence. CPU
+preflight passes13 config cases,132 control pins and357 actual schema tensors
+in.269s with no native load. Require matched initial/pre-update traces, frozen
+invariance, replay/guards and the unchanged30-minute projected cost gate.
+No full learner, rate sweep or automatic successor is selected. Root
+`/x/Temp/kindle-breakout-encoder-moderate-20261030/native-check`; check live state.
+
 The [native optimizer check](docs/results/2026-10-30-cdp-breakout-native-optimizer.md) completes both disposable steps, with
 exact raw gradients and all172 clipping/momentum/variance and8 group-movement
 checks passing. Observed encoder update/weight .00211656/.00233922% versus
