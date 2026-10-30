@@ -68,3 +68,13 @@ shared corrective-label branch is selected by the unchanged Qbert flag. The
 Qbert teacher and native bytes stay fixed; matched initial traces and full
 label/pixel/action replay are required, without claiming complete cross-version
 learning parity. No native rebuild or GPU stage has occurred at preparation.
+
+## Completed bounded check
+
+8192 actions/32,754 frames/489 updates complete in70.203s;1024 frozen/4096
+frames in.806s,zero updates/no natural episodes. All212 pins,357 matching initial/
+invariant frozen tensors,47 initial semantic events,full replay and guards pass.
+Main succeeds01:31:01 UTC October30/source92bbc98,collection01:31:21. Conservative
+200k projection31m25s passes35min. No bounded failure or GPU repeat. See the
+[bounded result](../results/2026-10-30-cdp-qbert-encoder-moderate.md) and separately
+selected [fresh200k comparison](2026-10-30-cdp-qbert-encoder-moderate-200k.md).

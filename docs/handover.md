@@ -1,13 +1,16 @@
 # CDP handover — October25,2026
 
-The [Qbert encoder2e-5 bounded check](experiments/2026-10-30-cdp-qbert-encoder-moderate.md) is selected to test the same fixed rate that improved Breakout on the cheaper
-Qbert12M48/H15/R16/expert100 recipe. Train8192 actions/489 updates,then1024
-frozen actions;35-minute conservative200k cost gate. CPU preflight passes
-both CLI paths,13 config cases,190 control pins and357 schema tensors in.317s.
-Native447fe50 and Qbert teacher unchanged; qualified optional-rate runner.
-No full learner or cross-game benefit established. Root
-`/x/Temp/kindle-qbert-encoder-moderate-20261030/native-check`;service
-`kindle-qbert-encoder-moderate-check-20261030`. Check live state before GPU work.
+The [fresh Qbert encoder2e-5 comparison](experiments/2026-10-30-cdp-qbert-encoder-moderate-200k.md) selects200k actions/12,477 updates under35 minutes,with100k/6227 recovery and
+four final/own-initial sampled/greedy24-episode arms. Keep12M48/Auto/N8/B16/T16/
+H15/R16/expert100/native447fe50;only encoder6e-6→2e-5 as a learner setting,
+qualified optional-rate runner,Qbert teacher unchanged. The [bounded check](results/2026-10-30-cdp-qbert-encoder-moderate.md)
+passes8192/489 in70.203s and1024 frozen/.806s,zero updates/no natural episodes;
+212 pins,357 matched initial/invariant tensors,47 semantic events,replay and
+guards pass. Conservative projection31m25s passes35min. Full CPU preflight
+passes five commands,24 config cases and212/190 input pins;original copied
+recovery-assertion failure preserved before any full GPU work. No frozen benefit
+measured. Root`/x/Temp/kindle-qbert-encoder-moderate-20261030/full`;service
+`kindle-qbert-encoder-moderate-200k-20261030`. Check live state before GPU work.
 
 The [completed encoder-rate diagnostic](results/2026-10-30-cdp-encoder-representation.md) finds better state and actor readouts on the exact control corpus: kernel
 combined ball x/y MAE12.053/10.211→7.554/6.515, still above pixel.059/.140 on555
