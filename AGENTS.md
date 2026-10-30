@@ -18,16 +18,19 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [moderate encoder-rate check](docs/results/2026-10-30-cdp-breakout-encoder-moderate.md) passes8192 actions/32,724 frames/489 updates in48.152s;
-1024 frozen/.872s haszero updates/no natural episodes. All153 pins,357 matched
-initial/invariant frozen tensors,47 pre-update events,replay and guards pass.
-Service succeeds00:30:06 UTC October30/sourcef3acd99; collection00:30:25.
-Projection21m33s passes30min. A [separate fresh200k comparison](docs/experiments/2026-10-30-cdp-breakout-encoder-moderate-200k.md)
-is selected:12M64/Auto/N8/B16/T16/H15/R16/expert100, encoder6e-6→2e-5,native447fe50.
-Full CPU preflight passes five commands/24 config cases in.635s; original copied
-review-key failure preserved before any full GPU work. Require100k recovery and
-final/actual-initial sampled/greedy24-episode assessments; no benefit measured.
-Root`/x/Temp/kindle-breakout-encoder-moderate-20261030/full`; check live state.
+The [fresh Breakout encoder2e-5 comparison](docs/experiments/2026-10-30-cdp-breakout-encoder-moderate-200k.md) launches00:33:24.959 UTC October30/source24f69b5,
+PID368028/invocationdec5a8235173426888097d71caa5c91e. Fresh200k/12,477 updates,
+30-minute cap;12M64/Auto/N8/B16/T16/H15/R16/expert100,native447fe50; only encoder
+6e-6→2e-5. Startup passes173 pins,357 matched control/check initial tensors,47
+pre-update transitions and94 finite reports through1864 actions. Main,progress,
+100k recovery,postprocessing and collection observers are active. No frozen
+result; require100k/6227 and final/actual-initial sampled/greedy24-episode arms.
+The bounded check passes8192/489 in48.152s,projection21m33s; all153 pins/replay/
+guards pass. Earlier4M/expert10 rate increase hurt play; no causal benefit claim.
+Root`/x/Temp/kindle-breakout-encoder-moderate-20261030/full`;service
+`kindle-breakout-encoder-moderate-200k-20261030`. Do not restart or overlap GPU
+work while active. CPU preflight-key failure preserved; startup.566s co-host
+caveat retained. See [bounded result](docs/results/2026-10-30-cdp-breakout-encoder-moderate.md).
 
 The [native optimizer check](docs/results/2026-10-30-cdp-breakout-native-optimizer.md) completes both disposable steps, with
 exact raw gradients and all172 clipping/momentum/variance and8 group-movement

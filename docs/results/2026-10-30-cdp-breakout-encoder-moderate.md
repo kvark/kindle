@@ -46,3 +46,14 @@ script, failure receipt and explanation are retained under`full/preparation-fail
 The correction precedes any full declaration or GPU stage, with zero native
 construction attempts. No full learner result is available. The five-game goal
 remains unfinished. [Bounded protocol](../experiments/2026-10-30-cdp-breakout-encoder-moderate.md).
+
+## Fresh200k comparison active
+
+The separate fresh learner starts00:33:24.959 UTC/source24f69b5, PID368028,
+invocation`dec5a8235173426888097d71caa5c91e`. Startup at00:33:38 passes173 pins,
+357 matched control/check initial tensors,47 pre-update transitions and94 finite
+reports through1864 actions. First updates376/392/408/424/440/456 matchR16.
+Main,progress,recovery,postprocessing and collection observers are active; no
+full frozen outcome is available. The.566s read-only startup audit co-hosts with
+training and is retained without time correction. Do not restart or overlap
+GPU work; require100k/6227 recovery and the four declared frozen assessments.

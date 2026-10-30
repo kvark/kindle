@@ -62,3 +62,18 @@ construction attempts or environment creation. The original copied-key
 `initial_matches_reference` failure is preserved under`full/preparation-failure`;
 correcting it to the actual bounded key`initial_matches_control` repeats no GPU
 work and precedes any full declaration or launch. No gameplay benefit measured.
+
+## Launched and startup checked
+
+Main starts00:33:24.959 UTC October30/source24f69b5, PID368028, invocation
+`dec5a8235173426888097d71caa5c91e`. At00:33:38 startup validates all173 pins,
+357 initial tensors matching both bounded check and control,47 pre-update
+transitions, exact config and94 finite reports through1864 actions. First six
+updates occur at376/392/408/424/440/456. Main, progress,100k recovery, CPU
+postprocessing and terminal-collection observers are active. No frozen result
+is available. Do not restart this learner or schedule another GPU job while it
+is active. The read-only.566s startup audit co-hosts with training; no wall-time
+correction or isolated speedup claim.
+
+Declaration`f81dd392fb1cdc9b93b90ca0c7c53119e43c75b245e24c27b7e7eef5884c8d44`;
+startup`2e54a150072b7b094c4aaef06a97269025dfc254e7c1b64780a5b8f7f9b5b99a`.
