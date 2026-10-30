@@ -1,5 +1,14 @@
 # CDP handover — October25,2026
 
+The [Qbert encoder2e-5 bounded check](experiments/2026-10-30-cdp-qbert-encoder-moderate.md) is selected to test the same fixed rate that improved Breakout on the cheaper
+Qbert12M48/H15/R16/expert100 recipe. Train8192 actions/489 updates,then1024
+frozen actions;35-minute conservative200k cost gate. CPU preflight passes
+both CLI paths,13 config cases,190 control pins and357 schema tensors in.317s.
+Native447fe50 and Qbert teacher unchanged; qualified optional-rate runner.
+No full learner or cross-game benefit established. Root
+`/x/Temp/kindle-qbert-encoder-moderate-20261030/native-check`;service
+`kindle-qbert-encoder-moderate-check-20261030`. Check live state before GPU work.
+
 The [completed encoder-rate diagnostic](results/2026-10-30-cdp-encoder-representation.md) finds better state and actor readouts on the exact control corpus: kernel
 combined ball x/y MAE12.053/10.211→7.554/6.515, still above pixel.059/.140 on555
 shared rows. Learned scalar actor agreement54.08%→60.90% overall and50%→62.5%
