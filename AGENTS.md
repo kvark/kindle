@@ -30,16 +30,28 @@ collection/expert100/native447fe50/runner6c1b69f;H15/R16→H5/R24 jointly change
 horizon,cadence,sampling,warmup and work. Older H5/R32 was negative;no isolated
 effect or transfer is assumed. Startup matches357 initial tensors,47 pre-update
 transitions and first cadence,with1004 finite reports through11,088 actions.
-Original progress,recovery,postprocessing and collection observers are active.
-Supplemental CPU confirmations pass.838s qualification against the completed
-control,four scores/videos,five identities,four journal fixtures and301 active
-pins;observerPID777949/invocation641b2f823ea145579b9b92c00ec12ea7 starts09:44:54.
-It preserves100k metadata and confirms terminal evidence once;original pipeline
-stays unchanged. No full frozen result exists. Root
+The100k/9340 recovery passes09:53:47 UTC with357 finite tensors and9527 finite
+reports through102,000 actions. Independent.856s confirmation passes09:53:55,
+preserving exact100k metadata,all301 pins and original identity. Progress,
+postprocessing,collection and supplemental observerPID777949/invocation
+641b2f823ea145579b9b92c00ec12ea7 remain active;recovery is terminal success.
+No completed check repeats. Final frozen gameplay remains unmeasured. Root
 `/x/Temp/kindle-breakout-h5-r24-20261101/full`,service
 `kindle-breakout-h5-r24-200k-20261101`;check live identity,do not restart or run
 another GPU job while active. No extension,cap increase or automatic successor.
 The five-game goal remains unfinished;retain CPU co-host timing without correction.
+
+The [fresh Qbert H5/R24 seed10007 preparation](docs/experiments/2026-11-01-cdp-qbert-h5-r24-seed10007.md)
+passes3.729s CPU qualification (5.333s wrapper) at09:54:44 UTC November1:
+fiveCLI/26config/eightmode/15header/11recovery/fourparser cases,49paths/15scripts,
+357schema tensors and390bounded/401control pins. Seed10007/evaluation4000010007
+are absent from67 examined prior Qbert declarations. Same passing8039 recipe,
+200k/18,715 updates,35min cap and original15k/90% gate;no isolated seed mechanism
+or reliability claim. All301 active Breakout pins/identity remain unchanged.
+No native/emulator construction,GPU work,trial,queue,declaration or service.
+Root`/x/Temp/kindle-qbert-h5-r24-seed10007-20261101/full`;preparation is unselected,
+not an automatic successor. Review only after Breakout closure;do not rerun
+passed preparation/preflight. Retain CPU co-host time without correction.
 
 The [bounded Breakout H5/R24 check](docs/results/2026-11-01-cdp-breakout-h5-r24.md)
 passes8192 actions/32,723 frames/733 updates in50.971s;1024 frozen/4096frames/
