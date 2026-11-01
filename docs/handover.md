@@ -1,5 +1,13 @@
 # CDP handover — October25,2026
 
+The [CPU Breakout first-disagreement diagnostic](experiments/2026-11-01-cdp-breakout-first-disagreement.md)
+selects all120 early-window disagreements for one-command teacher/policy branches
+followed by the same teacher. Nineteen CPU tests pass;require exact source and
+old branch suffixes,eight reverse-order checks and317 active Qbert pins/PID755504.
+Root`/x/Temp/kindle-breakout-first-disagreement-20261101`,180s analysis/195s
+controller caps. No native/GPU work,new learner or intervention result yet.
+The original Qbert greedy-training learner continues;retain CPU co-host timing.
+
 The [fresh greedy-training Qbert comparison](experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 launches06:15:51 UTC November1/sourcec659423 within the existing five-game goal.
 Fresh200k/12,477 updates,35-minute cap,100k recovery,four fixed24-episode arms;

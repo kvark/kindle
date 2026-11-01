@@ -1,5 +1,11 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [CPU Breakout first-disagreement diagnostic](../experiments/2026-11-01-cdp-breakout-first-disagreement.md)
+separately tests the first exact command disagreement in every retained early
+loss window,then uses the same teacher controller. All120 windows qualify;
+19 CPU tests pass. This can identify local command effects at matched endpoints,
+not an architectural cause or new score. No result yet;Qbert training continues.
+
 The separately selected [fresh greedy-training comparison](../experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 tests whether changing live Qbert collection improves frozen play at200k/12,477
 updates within35min. The training readout identifies weaker later autonomous
