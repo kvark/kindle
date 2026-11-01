@@ -47,7 +47,13 @@ checks withzero native/emulator construction. Root
 `kindle-qbert-greedy-training-200k-20261101`. Recovery succeeds06:29:57 UTC;
 100k/6227 and357 finite tensors pass. Separate.788s CPU confirmation06:30:27
 preserves exact metadata,all tensor hashes,317 pins and original process identity.
-Progress/postprocessing/collection remain active. Terminal-verifier CPU preflight
+Training finishes200k/799,803 frames/12,477 updates in27m33s;all four frozen stages
+finish withzero updates/truncations and passing guards. Completed frozen replays
+select greedy15,515.625/sample11,989.583,each24/24 first pyramids;own initials
+80.208/177.083 clear none. Greedy meets the numerical15k/90% gate on this learner;
+full training pixel/action/label replay and postprocessing/collection remain
+pending under originalPID755504. No accepted full comparison or reliability yet.
+Terminal-verifier CPU preflight
 passes.056s after preserving an over-strict observer-accounting-row assertion;
 zero GPU/pipeline repeats. Do not rerun recovery confirmation.
 Startup.948s passes357 initial tensors,47 bounded-matching/47 control-different

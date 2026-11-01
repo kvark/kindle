@@ -19,11 +19,17 @@ collection sampled→greedy,keeping12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/
 expert100,native447fe50,teacher and losses. Require100k recovery and four fixed
 final/actual-initial24-episode assessments against14,028.125 greedy/11,522.917
 sampled;mean15k/90% gate unchanged. CPU preflight1.832s passes305 bounded/276
-control pins and CLI/audit/observer checks. No full gameplay result or automatic
+control pins and CLI/audit/observer checks. The full comparison is not yet accepted;no automatic
 successor exists. MainPID755504/invocation5fb0d30ffb5d47aca552009e586bb929;
 Recovery succeeds06:29:57 UTC at100k/6227 with357 finite tensors. Separate.788s
 confirmation06:30:27 verifies317 pins,original identity and tensor hashes,and
-preserves exact metadata. Three other observers remain active. Terminal-verifier
+preserves exact metadata. Training completes200k/799,803 frames/12,477 updates
+in27m33s. All four frozen stages finish withzero updates/truncations and passing
+guards;completed frozen replays select greedy15,515.625/sample11,989.583,each
+24/24 first pyramids. Own initials80.208/177.083 clear none. Greedy meets the
+numerical15k/90% gate on this learner;full training replay,postprocessing and
+collection remain pending. No accepted full comparison or reliability claim yet.
+Terminal-verifier
 preflight.056s passes;earlier optional-observer-accounting assertion is retained,
 zero original/GPU repeats. Startup.948s passes317 pins,357 initial tensors,
 47 bounded-matching/47 control-different events and105 finite reports through

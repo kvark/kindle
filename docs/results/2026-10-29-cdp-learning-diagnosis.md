@@ -24,7 +24,12 @@ actual command/audit/observer checks. Launch06:15:51 UTC November1/sourcec659423
 control-different events and105 finite reports through2048 actions. The original
 learner continues;100k/6227 recovery passes06:29:57 UTC with357 finite tensors.
 Separate.788s confirmation preserves exact metadata,317 pins and original process.
-Three other observers remain active;no full gameplay result is available.
+Training completes200k/12,477 in27m33s. Completed frozen replays selectgreedy
+15,515.625/sample11,989.583,each24/24 first pyramids;own initials80.208/177.083
+clear none. Greedy meets the numerical15k/90% gate on this learner. All four
+GPU stages havezero updates/truncations and passing guards;original full training
+pixel/action/label replay and postprocessing/collection remain pending. No accepted
+full comparison,coverage-cause or reliability claim yet.
 
 The [greedy-training execution check](2026-11-01-cdp-qbert-greedy-training.md)
 qualifies one collection-policy experiment:8192 actions/489 updates in66.241s,

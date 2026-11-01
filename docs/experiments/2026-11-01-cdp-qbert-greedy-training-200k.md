@@ -119,3 +119,23 @@ only after all original services finish;it has not run final mode yet.
 The completed CPU Breakout intervention and these confirmations co-host with
 training;retain their measured times without correction. Progress,postprocessing
 and collection observers continue. No full frozen result or successor is selected.
+
+## Training and frozen stages complete; CPU closure pending
+
+Training finishes200,000 actions/799,803 frames/12,477 updates in1652.576s
+(27m33s),below35 minutes. The training guard passes. All four frozen GPU stages
+finish withzero updates/truncations and passing guards: final sampled52,712
+actions/31.662s,actual-initial sampled8,728/5.321s,final greedy65,992/40.050s,
+actual-initial greedy8,432/5.092s.
+
+Their completed outcome replays select the fixed24 episodes per arm:
+greedy15,515.625 and sampled11,989.583,each24/24 first pyramids;actual initials
+80.208/177.083 clear none. The greedy mean exceeds the retained14,028.125 and
+the numerical15,000/90% gate on this learner. These are completed frozen replay
+measurements,not yet an accepted full comparison or independent reliability.
+
+The original full training pixel/action/teacher-label replay remains running
+under mainPID755504/invocation5fb0d30ffb5d47aca552009e586bb929. Learning review,
+postprocessing and terminal completion files do not yet exist. No GPU stage
+repeats or new allocation occurs. Keep the original pipeline running;do not
+rerun completed stages or execute terminal verification before all services finish.
