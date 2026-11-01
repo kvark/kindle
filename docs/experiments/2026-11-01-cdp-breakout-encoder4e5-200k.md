@@ -66,3 +66,23 @@ transitions,first updates376/392/408/424/440/456 and208 finite reports through
 The0.849s CPU startup command co-hosts with learning; retain this timing caveat
 without wall-time correction. No full frozen score or gameplay gain is available.
 Do not restart the learner or schedule another GPU job while it is active.
+
+## Halfway recovery verified
+
+The original recovery observer passes03:18:16 UTC November1 and exits success.
+Its100k-action/6227-update checkpoint has357 finite tensors;the complete log
+prefix has6447 finite reports through103,528 actions. The recorded102,400-action
+progress takes653.209s. Original main PID732902/invocation remains active.
+
+A.542s CPU confirmation at03:19:15 rechecks all227 declared inputs,original
+process identity,terminal recovery success and the exact checkpoint metadata
+identity. It preserves`recovery-metadata-100k.json` before the live final
+checkpoint is replaced at the declared200k boundary. This retains metadata and
+the existing tensor audit,not a separate copy of the100k tensor files. No GPU
+work,stage repetition,cap change or wall-time correction occurs. Progress,
+postprocessing and collection observers remain active;frozen competence is
+still unmeasured.
+
+Recovery review`0294fa0526ad22572633d16705eb89a627fa3dc63d1b3c0d4f44214f6da7dbb3`;
+checkpoint metadata identity`3022afbb0fcd26027fb5153ed9c5bd39d5945f62bcc331a5a5725713b54003c4`;
+confirmation`35ce8548c2d5ce8ea94206487b5a57eb1ec13359aef89fabf7b0ed8c3a69e2b7`.

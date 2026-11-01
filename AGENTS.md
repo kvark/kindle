@@ -24,9 +24,12 @@ source2f9af49,with227 pins and a30-minute training cap:200k actions/12,477 updat
 exact runner and teacher stay fixed. Startup passes357 control/check-matching
 initial tensors,47 pre-update events,correct cadence and208 finite reports
 through3704 actions. Main PID732902/invocation`c69d91c610d24751bc334966ab8057b5`;
-progress,recovery,postprocessing and collection observers are active. Require
-100k/6227 recovery and final/actual-initial sampled/greedy24-episode assessments
-against25.292/42.625,all0/24 two-wall. No full frozen result is available.
+progress,postprocessing and collection observers remain active. The100k/6227
+recovery passes03:18:16 with357 finite tensors and6447 finite reports through
+103,528 actions;its observer exits successfully. Confirmation preserves227 pins
+and checkpoint metadata identity in.542s CPU,with no GPU work or time correction.
+Final/actual-initial sampled/greedy24-episode assessments against25.292/42.625
+remain required,all retained0/24 two-wall. No full frozen result is available.
 Root`/x/Temp/kindle-breakout-encoder4e5-20261101/full`,service
 `kindle-breakout-encoder4e5-200k-20261101`. Do not restart this learner or schedule
 another GPU job while it is active;check live state. The [bounded check](docs/results/2026-11-01-cdp-breakout-encoder4e5.md)
