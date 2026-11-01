@@ -32,7 +32,12 @@ The [separate fresh200k confirmation](docs/experiments/2026-11-01-cdp-qbert-rgb6
 10007/4000010007→12011/4000012011;retainRGB64/12M/H5/R24/encoder4e-5/base
 behavior4e-5/greedy collection/expert100/native447fe50/runneraba4300d/teacherfa261.
 Fix200k/18,715 updates/30min,100k/9,340 recovery andfour final/own-initial24-episode
-frozen arms. No bounded experience reuse,full result or third learner selected.
+frozen arms. Full service launches20:23:42 UTC November1/source34c6a88 with562 pins,
+PID842010/invocationd37840f258104f9caf8b6bc5c0316899. Startup passes357 own-bounded
+initial tensors,47 pre-update transitions and258 finite reports through3128 actions;
+all47 pre-update events differ from10007,as expected for another seed. Progress,
+100k recovery,postprocessing and collection observers are active. No frozen result,
+bounded experience reuse or third learner selected. Do not restart or overlap it.
 Root`/x/Temp/kindle-qbert-rgb64-seed12011-20261101/full`;check live state before
 work. The five-game goal remains unfinished.
 
