@@ -10,33 +10,29 @@ November1/sourced139b43. Original23fe57f origin-order assertion fails before
 replay;preserved. Separate`order-repair` closure`complete_with_cpu_order_repair`,
 zero completed replay/GPU repeats. Root`/x/Temp/kindle-breakout-first-disagreement-20261101`;
 do not rerun. Original QbertPID755504/invocation5fb0d30ffb5d47aca552009e586bb929
-continues;retain CPU co-host timing. No new learner,loss or successor selected.
+was preserved;retain CPU co-host timing. No new learner,loss or successor selected.
 
-The [fresh greedy-training Qbert comparison](experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
-launches06:15:51 UTC November1/sourcec659423 within the existing five-game goal.
-Fresh200k/12,477 updates,35-minute cap,100k recovery,four fixed24-episode arms;
-only live collection changes sampled→greedy. Primary control14,028.125 greedy,
-secondary11,522.917 sampled;15k/90% gate unchanged. Native447fe50 and12M48/
-Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100 remain. CPU preflight1.832s passes
-305 bounded/276 control pins and command/audit/observer checks. Root
-`/x/Temp/kindle-qbert-greedy-training-20261101/full`,service
-`kindle-qbert-greedy-training-200k-20261101`. MainPID755504/invocation
-`5fb0d30ffb5d47aca552009e586bb929`,317 pins. Recovery succeeds06:29:57 UTC:
-100k/6227,357 finite tensors. Separate.788s confirmation06:30:27 verifies317 pins,
-original process and tensor hashes,preserving exact100k metadata. Training
-completes200k/799,803 frames/12,477 updates in27m33s. All four frozen stages
-finish withzero updates/truncations and passing guards. Completed frozen replays
-select greedy15,515.625/sample11,989.583,each24/24 first pyramids;own initials
-80.208/177.083 clear none. Greedy meets the numerical15k/90% gate on this learner;
-full training replay,postprocessing and collection remain pending under
-originalPID755504. No accepted full comparison or reliability claim yet.
-Terminal-verifier preflight.056s
-passes after preserving an overly strict observer-accounting-row assertion;
-zero original/GPU repeats. Do not rerun recovery confirmation.
-Startup.948s passes357 initial tensors,47 bounded-matching/47 control-different
-events,correct cadence and105 finite reports through2048 actions. Retain CPU
-co-host timing without correction. Check live state before work;
-do not restart or schedule another GPU job while active. No full result exists.
+The [completed greedy-training Qbert comparison](results/2026-11-01-cdp-qbert-greedy-training.md)
+finishes 200k actions / 799,803 frames / 12,477 updates in 27m33s. Primary frozen
+greedy 15,515.625 / 24 first pyramids passes the 15k/90% gate on this learner;
+sampled 11,989.583 / 24 improves but misses the score gate. Own initials
+80.208 / 177.083 clear none. Relative to sampled training, greedy improves
+10.60% and sampled 4.05%, at .51% less observed training time. Keep CPU co-host
+timing caveats; no causal speedup or coverage mechanism is established.
+Only live collection changes sampled to greedy; native447fe50, teacher, losses
+and 12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100 remain unchanged.
+All 317 pins, 100k/6227 recovery, 357 matching initial/invariant frozen tensors,
+full guided pixel/action/label replay, frozen replays/videos, guards, curves,
+coverage, exposure and comparison pass. All five original services succeed;
+main/post/collection finish 06:56:22/06:56:26/06:56:28 UTC November 1, sourcec659423.
+Separate .821s terminal confirmation passes 06:57:01. Preserve the ancillary
+CPU observer-accounting preflight failure; zero original pipeline/GPU repeats.
+Actual overrides 30.113%; guided online scores are not frozen competence.
+Reused4013/cohort gives one passing learner, not seed reliability. Retain this
+recipe for a separately declared fresh-seed check. Root
+`/x/Temp/kindle-qbert-greedy-training-20261101/full`; all services terminal,
+no allocation active at closure. Do not rerun completed stages or confirmations.
+The five-game goal remains unfinished; check live state before new work.
 
 The [completed greedy-training Qbert check](results/2026-11-01-cdp-qbert-greedy-training.md)
 finishes8192 actions/32,761 frames/489 updates in66.241s;1024 frozen/.798s haszero

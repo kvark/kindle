@@ -8,32 +8,29 @@ or architecture cause. Analysis39.271s completes06:24:01 UTC November1/source
 d139b43;all37,016 actions,6,905 old teacher-suffix rows,eight reverse checks,
 320 repair/317 active Qbert pins and22 tests pass. Original pre-replay origin-order
 failure is preserved;separateCPU closure`complete_with_cpu_order_repair`,zero
-completed replay/GPU repeats. Qbert continues;no new learner/loss/successor.
+completed replay/GPU repeats. Qbert identity was preserved; no new learner/loss followed this diagnostic.
 
-The [fresh greedy-training Qbert comparison](experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
-launches06:15:51 UTC November1/sourcec659423 within this five-game goal.
-The completed training-history readout
-motivates testing later autonomous experience; the bounded check qualifies
-execution/cost only. Fresh200k/12,477 updates under35min changes live training
-collection sampled→greedy,keeping12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/
-expert100,native447fe50,teacher and losses. Require100k recovery and four fixed
-final/actual-initial24-episode assessments against14,028.125 greedy/11,522.917
-sampled;mean15k/90% gate unchanged. CPU preflight1.832s passes305 bounded/276
-control pins and CLI/audit/observer checks. The full comparison is not yet accepted;no automatic
-successor exists. MainPID755504/invocation5fb0d30ffb5d47aca552009e586bb929;
-Recovery succeeds06:29:57 UTC at100k/6227 with357 finite tensors. Separate.788s
-confirmation06:30:27 verifies317 pins,original identity and tensor hashes,and
-preserves exact metadata. Training completes200k/799,803 frames/12,477 updates
-in27m33s. All four frozen stages finish withzero updates/truncations and passing
-guards;completed frozen replays select greedy15,515.625/sample11,989.583,each
-24/24 first pyramids. Own initials80.208/177.083 clear none. Greedy meets the
-numerical15k/90% gate on this learner;full training replay,postprocessing and
-collection remain pending. No accepted full comparison or reliability claim yet.
-Terminal-verifier
-preflight.056s passes;earlier optional-observer-accounting assertion is retained,
-zero original/GPU repeats. Startup.948s passes317 pins,357 initial tensors,
-47 bounded-matching/47 control-different events and105 finite reports through
-2048 actions. Preserve CPU co-host timing;check the original service before work.
+The [completed greedy-training Qbert comparison](results/2026-11-01-cdp-qbert-greedy-training.md)
+finishes 200k actions / 799,803 frames / 12,477 updates in 27m33s. Primary frozen
+greedy 15,515.625 / 24 first pyramids passes the 15k/90% gate on this learner;
+sampled 11,989.583 / 24 improves but misses the score gate. Own initials
+80.208 / 177.083 clear none. Relative to sampled training, greedy improves
+10.60% and sampled 4.05%, at .51% less observed training time. Keep CPU co-host
+timing caveats; no causal speedup or coverage mechanism is established.
+Only live collection changes sampled to greedy; native447fe50, teacher, losses
+and 12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100 remain unchanged.
+All 317 pins, 100k/6227 recovery, 357 matching initial/invariant frozen tensors,
+full guided pixel/action/label replay, frozen replays/videos, guards, curves,
+coverage, exposure and comparison pass. All five original services succeed;
+main/post/collection finish 06:56:22/06:56:26/06:56:28 UTC November 1, sourcec659423.
+Separate .821s terminal confirmation passes 06:57:01. Preserve the ancillary
+CPU observer-accounting preflight failure; zero original pipeline/GPU repeats.
+Actual overrides 30.113%; guided online scores are not frozen competence.
+Reused4013/cohort gives one passing learner, not seed reliability. Retain this
+recipe for a separately declared fresh-seed check. Root
+`/x/Temp/kindle-qbert-greedy-training-20261101/full`; all services terminal,
+no allocation active at closure. Do not rerun completed stages or confirmations.
+The five-game goal remains unfinished; check live state before new work.
 
 The [completed greedy-training Qbert check](results/2026-11-01-cdp-qbert-greedy-training.md)
 finishes8192 actions/32,761 frames/489 updates in66.241s;1024 frozen/.798s haszero
@@ -1798,7 +1795,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Compact12M64/B16/R16/expert100/encoder4e-5/200k:sampled56.292,greedy104.667 in21m28s;own initials1.417/2.208. Same recipe2e-5:25.292/42.625 in22m27s;6e-6:13.208/17.875 in22m19s. Reused development seed/cohort,not independent confirmation. Retained B8/T16:2M98.21,same weights AMD Auto67.58;AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes;reliability open |
-| Qbert | AMD12M48/B16/T16/H5/R32/expert100/200k seeds4013/6029:greedy14050/15792.708,sampled13331.250/15420.833,23/24 and24/24 first pyramids,in40m24s/40m22s. Same recipe;own initial controls and all audits pass. The cheaper H15/R16/encoder4e-5 point reaches14,028.125 greedy/11,522.917 sampled,24/24 first pyramids,in27m41s on reused4013;all original audits pass,with a separately repaired ancillary terminal identity check. | Original15k/90% gate passes on6029 in both modes,one of two H5 learners; broad reliability and reference193,220.77 remain open |
+| Qbert | AMD12M48/B16/T16/H5/R32/expert100/200k seeds4013/6029:greedy14050/15792.708,sampled13331.250/15420.833,23/24 and24/24 first pyramids,in40m24s/40m22s. Same recipe;own initial controls and all audits pass. The cheaper H15/R16/encoder4e-5/greedy-collection recipe reaches15,515.625 greedy/11,989.583 sampled,24/24 first pyramids,in27m33s on reused4013;all original audits and terminal confirmation pass. One learner of this recipe passes the greedy gate; fresh-seed confirmation remains open. | Original15k/90% gate passes on6029 in both modes,one of two H5 learners,and on4013 greedy with the cheaper collection recipe; broad reliability and reference193,220.77 remain open |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and

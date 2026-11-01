@@ -114,28 +114,27 @@ check still requires terminal success,unique original invocation and main end
 record,with exact collector-child output. No original pipeline stage repeats.
 Use the qualified scriptSHA256
 `131bee461b853a96936667aa10d60915609178b268343bc5fc3ca70529fc0eba`
-only after all original services finish;it has not run final mode yet.
+only after all original services finish; its successful final mode is recorded below.
 
 The completed CPU Breakout intervention and these confirmations co-host with
 training;retain their measured times without correction. Progress,postprocessing
 and collection observers continue. No full frozen result or successor is selected.
 
-## Training and frozen stages complete; CPU closure pending
+## Completed comparison
 
-Training finishes200,000 actions/799,803 frames/12,477 updates in1652.576s
-(27m33s),below35 minutes. The training guard passes. All four frozen GPU stages
-finish withzero updates/truncations and passing guards: final sampled52,712
-actions/31.662s,actual-initial sampled8,728/5.321s,final greedy65,992/40.050s,
-actual-initial greedy8,432/5.092s.
+The [accepted result](../results/2026-11-01-cdp-qbert-greedy-training.md)
+finishes 200k actions / 799,803 frames / 12,477 updates in 27m33s. Frozen greedy
+15,515.625 / 24 first pyramids passes the original gate; sampled 11,989.583 / 24
+improves but misses the mean gate. Actual initials 80.208 / 177.083 clear none.
+All four frozen arms have zero updates and truncations. The original full
+training replay verifies all pixel/action/teacher-label records and 138 episodes.
+All 317 pins, recovery, initial/frozen tensors, guards, curves, coverage, exposure
+and comparison pass. Main/postprocessing/collection succeed at
+06:56:22/06:56:26/06:56:28 UTC November 1; all five original services are terminal
+success. The .821s independent terminal confirmation passes 06:57:01.
 
-Their completed outcome replays select the fixed24 episodes per arm:
-greedy15,515.625 and sampled11,989.583,each24/24 first pyramids;actual initials
-80.208/177.083 clear none. The greedy mean exceeds the retained14,028.125 and
-the numerical15,000/90% gate on this learner. These are completed frozen replay
-measurements,not yet an accepted full comparison or independent reliability.
-
-The original full training pixel/action/teacher-label replay remains running
-under mainPID755504/invocation5fb0d30ffb5d47aca552009e586bb929. Learning review,
-postprocessing and terminal completion files do not yet exist. No GPU stage
-repeats or new allocation occurs. Keep the original pipeline running;do not
-rerun completed stages or execute terminal verification before all services finish.
+No original pipeline or GPU stage fails or repeats. Preserve the ancillary CPU
+preflight failure and co-host timing caveats. This accepts one reused development
+learner, not seed reliability or a causal coverage explanation. Retain the recipe
+for a separately declared fresh-seed check. No allocation remains active at this
+closure; do not rerun completed stages, collectors or terminal confirmation.

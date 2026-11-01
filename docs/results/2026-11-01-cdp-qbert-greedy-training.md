@@ -1,4 +1,74 @@
-# Greedy Qbert training passes execution and early cost checks
+# Greedy Qbert training clears the primary gate on one learner
+
+The [fresh 200k comparison](../experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
+completes 200,000 actions / 799,803 emulator frames / 12,477 updates in
+1652.576s (27m33s). Frozen greedy evaluation scores **15,515.625**, with all
+24 selected episodes clearing the first pyramid. This passes the unchanged
+15,000 / 90% gate on this learner. Sampled evaluation improves to 11,989.583
+with 24 first pyramids but remains below the score gate.
+
+| Fixed assessment | Sampled training control | Greedy training candidate |
+|---|---:|---:|
+| Frozen greedy return | 14,028.125 | 15,515.625 |
+| Frozen sampled return | 11,522.917 | 11,989.583 |
+| First pyramids, greedy / sampled | 24 / 24 | 24 / 24 |
+| Actual-initial greedy / sampled return | 80.208 / 177.083 | 80.208 / 177.083 |
+| Actual-initial first pyramids | 0 / 0 | 0 / 0 |
+| Training time | 27m41s | 27m33s |
+| Initial-subtracted greedy gain per training minute | 503.831 | 560.413 |
+| Actual training overrides | 76,800 (38.4%) | 60,226 (30.113%) |
+| Last-50k replay expert cross-entropy | .089268 | .082934 |
+
+Only live action collection changes sampled to greedy. Keep centered CDP,
+12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100, native447fe50, the teacher,
+losses, sampled posteriors and imagined actor sampling. Greedy return improves
+10.60% and sampled return 4.05%, at .51% less observed training time. CPU co-hosting
+remains a timing caveat; the small time difference is not an established speedup.
+Lower replay loss and aided online returns are not independent competence tests.
+
+This is a useful passing development point on reused learner seed4013 and
+evaluation4000004013. Collection changes exploration and visited states together;
+the result does not isolate later-state coverage as its cause or establish seed
+reliability. No control or bounded-check experience enters the fresh learner.
+Retain this recipe for a separately declared fresh-seed check. The five-game
+goal remains unfinished, including Breakout.
+
+All 317 original input hashes, the 100k / 6227 recovery, 357 matching initial
+tensors, 357 finite invariant tensors per frozen arm, full training
+pixel/action/teacher-label replay, frozen outcome replays and videos, host guards,
+curves, coverage, exposure and comparison pass. The training replay verifies
+138 episodes and all 60,226 overrides. Initial sampled/greedy traces match the
+control in 1139 / 1101 semantic events. The 47 pre-update training events match
+the greedy bounded check and differ from the sampled control as expected.
+Four frozen arms total 135,864 actions / 543,302 frames / 82.126s, with zero
+updates or truncations. Each score uses the first three natural episodes in
+each of eight lanes; excess episodes and partial tails remain retained.
+
+The five original services all succeed. Main finishes 06:56:22 UTC November 1,
+postprocessing 06:56:26, collection 06:56:28, sourcec659423. Original main
+PID755504 / invocation `5fb0d30ffb5d47aca552009e586bb929`. The independent .821s
+CPU terminal confirmation passes 06:57:01, verifying original identities,
+completion hashes and all eight control/candidate videos. No original pipeline
+stage fails or repeats. The earlier ancillary terminal-verifier CPU preflight
+failure remains preserved: successful short observers need not emit systemd
+accounting rows. Its qualified correction retains invocation and success checks;
+it does not repeat training, frozen assessment or collection.
+
+Root `/x/Temp/kindle-qbert-greedy-training-20261101/full`, trial
+`qbert-12m-48-b16-r16-encoder4e5-greedy-expert100-200k-seed4013`.
+All services are terminal and no allocation remains active at this closure.
+Do not rerun this learner, original collectors or terminal confirmation.
+
+| Full-run artifact | SHA256 |
+|---|---|
+| Declaration | `5b41d78540b8084e1ac3ae84f7009ce78bd156ec8101984ca32aa9a5c06da9a6` |
+| Learning review | `1b9b4fe0071a8e413f88a98c5f4a6c7319d196e6bef051866e02e3437c5b7683` |
+| Comparison | `2b4a950f4b26a9b30e40cbe1b46106ed60f335c2c45df75081c9d5330c8835d7` |
+| Original completion | `901da69e64cca301982611329b5d04bd548536ecdce77ac726212e4342825ab4` |
+| Final summary | `041d75e3ac9043bb3b4e159c267200bd6c260f91b2cc6da541b62c5a8029d940` |
+| Terminal confirmation | `761056e4a97f352de8e50a585a69f2fac49e03fcfe8d5938f8c42694c12d784f` |
+
+## Earlier execution and cost qualification
 
 Fresh greedy action collection completes8,192 actions /32,761 emulator frames /
 489 updates in66.241s. The1024-action frozen restore takes.798s,with4096 frames,

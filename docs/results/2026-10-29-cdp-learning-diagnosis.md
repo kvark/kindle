@@ -10,26 +10,29 @@ All37,016 actions,6,905 old teacher-suffix rows,eight reverse checks,320 repair/
 317 active Qbert pins and22 tests pass. Analysis39.271s completes06:24:01 UTC
 November1/sourced139b43. Original pre-replay origin-order failure is preserved;
 separateCPU closure`complete_with_cpu_order_repair`,zero completed replay/GPU
-repeats. Qbert continues;no new loss,learner or successor is selected.
+repeats. Qbert identity was preserved; no new loss or learner followed this diagnostic.
 
-The separately selected [fresh greedy-training comparison](../experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
-tests whether changing live Qbert collection improves frozen play at200k/12,477
-updates within35min. The training readout identifies weaker later autonomous
-movement fit; it does not prove a coverage cause. Keep native447fe50,losses,
-teacher and12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100. Primary control
-14,028.125 greedy,secondary11,522.917 sampled;100k recovery and four fixed24-episode
-arms are required. CPU preflight1.832s passes305 bounded/276 control pins and
-actual command/audit/observer checks. Launch06:15:51 UTC November1/sourcec659423,
-317 pins;startup.948s verifies357 initial tensors,47 bounded-matching/47
-control-different events and105 finite reports through2048 actions. The original
-learner continues;100k/6227 recovery passes06:29:57 UTC with357 finite tensors.
-Separate.788s confirmation preserves exact metadata,317 pins and original process.
-Training completes200k/12,477 in27m33s. Completed frozen replays selectgreedy
-15,515.625/sample11,989.583,each24/24 first pyramids;own initials80.208/177.083
-clear none. Greedy meets the numerical15k/90% gate on this learner. All four
-GPU stages havezero updates/truncations and passing guards;original full training
-pixel/action/label replay and postprocessing/collection remain pending. No accepted
-full comparison,coverage-cause or reliability claim yet.
+The [completed greedy-training Qbert comparison](2026-11-01-cdp-qbert-greedy-training.md)
+finishes 200k actions / 799,803 frames / 12,477 updates in 27m33s. Primary frozen
+greedy 15,515.625 / 24 first pyramids passes the 15k/90% gate on this learner;
+sampled 11,989.583 / 24 improves but misses the score gate. Own initials
+80.208 / 177.083 clear none. Relative to sampled training, greedy improves
+10.60% and sampled 4.05%, at .51% less observed training time. Keep CPU co-host
+timing caveats; no causal speedup or coverage mechanism is established.
+Only live collection changes sampled to greedy; native447fe50, teacher, losses
+and 12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100 remain unchanged.
+All 317 pins, 100k/6227 recovery, 357 matching initial/invariant frozen tensors,
+full guided pixel/action/label replay, frozen replays/videos, guards, curves,
+coverage, exposure and comparison pass. All five original services succeed;
+main/post/collection finish 06:56:22/06:56:26/06:56:28 UTC November 1, sourcec659423.
+Separate .821s terminal confirmation passes 06:57:01. Preserve the ancillary
+CPU observer-accounting preflight failure; zero original pipeline/GPU repeats.
+Actual overrides 30.113%; guided online scores are not frozen competence.
+Reused4013/cohort gives one passing learner, not seed reliability. Retain this
+recipe for a separately declared fresh-seed check. Root
+`/x/Temp/kindle-qbert-greedy-training-20261101/full`; all services terminal,
+no allocation active at closure. Do not rerun completed stages or confirmations.
+The five-game goal remains unfinished; check live state before new work.
 
 The [greedy-training execution check](2026-11-01-cdp-qbert-greedy-training.md)
 qualifies one collection-policy experiment:8192 actions/489 updates in66.241s,
