@@ -48,6 +48,17 @@ restart or allocate another GPU job while active. Prior3.729s controller and
 co-host timing. No retry,extension,cap increase or automatic successor.
 The five-game goal remains unfinished.
 
+The [completed CPU Breakout settling-cost check](docs/results/2026-11-01-cdp-breakout-edge-settling.md) lowers the retained
+edge-reset teacher185.375→80.375 on eight reused episodes,withonly2/8 lanes
+improving andzero two-wall successes. Retain the existing teacher;the fixed
+10%-mean/five-lane screen fails. No standard24 expansion,coefficient retry,
+native change or learner follows. Collection12,880actions/51,509frames takes
+24.952s;exact pixel/action/debug/outcome replay10.409s,controller40.337s completes
+10:47:56 UTC November1/sourced105cee. Four cost fixtures,5.174s preflight,all24
+inputs/442 active Qbert pins and scalar recount pass;original Qbert identity stays.
+Zero native/GPU work,updates,failures or repeats;retain CPU co-host time. Root
+`/x/Temp/kindle-breakout-edge-settling-20261101`;complete,do not rerun.
+
 The [completed CPU Breakout response-ambiguity diagnostic](docs/results/2026-11-01-cdp-breakout-response-ambiguity.md) finds4,597 of
 13,102 held-out rows in exact-input groups with different next paddle positions;
 near-descending514/2955,with2.512px RMS within-group pair differences. This shows

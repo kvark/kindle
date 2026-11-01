@@ -46,3 +46,11 @@ Root `/x/Temp/kindle-breakout-edge-settling-20261101`. Record selection source,
 input hashes, collection, replay, comparison and terminal receipts. Do not
 repeat passed preflight or completed earlier stages. No candidate outcome is
 available at selection.
+
+## Completed screen
+
+The candidate scores80.375 versus185.375,withtwo of eight lanes improving and
+zero two-wall successes. The fixed screen fails. All declared checks pass;no
+failed or repeated stage occurs. Retain the existing teacher. See the
+[completed result](../results/2026-11-01-cdp-breakout-edge-settling.md).
+No standard24 expansion,coefficient retry,native change or learner follows.
