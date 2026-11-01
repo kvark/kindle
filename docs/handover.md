@@ -1,5 +1,29 @@
 # CDP handover — October25,2026
 
+The [fresh Qbert H3/R24 comparison](experiments/2026-11-01-cdp-qbert-h3-r24-200k.md)
+launches14:13:06 UTC November1/source df3a75e with506 pins,mainPID803859/
+invocation798ad208226e40a3a73fa9e43fec8066;all four observers active. Startup
+14:13:34 in1.452s passes357 control/bounded-matching tensors,47 pre-update
+transitions,correct cadence and264 finite reports through3,192 actions. Change
+H5→3 at fixedR24/200k/18,715updates,12M48/encoder4e-5/greedy collection/expert100;
+native447fe50/runneraba4300d/teacher unchanged. Training cap35min,100k/9,340
+recovery with four files retained,final/actual-initial sampled/greedy24-episode
+arms against14,339.583 primary greedy/13,761.458 sampled. Original15k/90% gate.
+No frozen result yet;do not restart or allocate concurrent GPU work. No extension,
+retry,horizon sweep or automatic successor. Root`/x/Temp/kindle-qbert-h3-r24-20261101/full`,
+service`kindle-qbert-h3-r24-200k-20261101`.
+
+The [bounded H3 check](results/2026-11-01-cdp-qbert-h3-r24.md) completes8,192
+acts/32,760frames/733updates in64.175s;1,024 frozen/.806s haszero updates/no
+natural episodes. Conservative200k28m43s passes35min. All475 pins,357 matching/
+invariant tensors,47 events,full guided replay/guards pass;main14:08:14/collector
+14:08:26 UTC/source8dad414,no failure/repeat. Full CPU qualification3.225s covers
+five CLI paths,24 config/eight mode/14 header/four observer/ten recovery cases,
+six retention/two integration cases,50 paths and17 scripts. Plot import.044s
+passes. The earlier preparer fails only an exact wording replacement before any
+full output;its source/error remain. No native build or GPU repeats. Do not
+repeat passed qualification or reuse bounded experience.
+
 The [completed Qbert H5/R32 greedy comparison](results/2026-11-01-cdp-qbert-h5-r32-greedy.md)
 finishes200k actions/799,822frames/24,954updates in34m59.741s,+22.53% versus R24.
 Greedy14,057.292/23 first pyramids and sampled10,305.208/18 fall1.97%/25.12%
