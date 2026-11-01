@@ -1,14 +1,15 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [command-dependent Breakout response fit](2026-11-01-cdp-breakout-command-response.md) passes its fixed
-prediction screen: held-out MAE/RMSE 1.976923/3.287560 → 1.972683/3.173417;
-near descending 1.948802/3.283574 → 1.929132/3.157979. All 16 input hashes,
-37,448 original rows and prior metrics reproduce. Fit .470s / controller .614s
-completes 19:15:51 UTC November 1, source8de8a12; no emulator/GPU work or repeat.
-A separate bounded CPU teacher gameplay comparison is selected, requiring
-≥10% mean gain and improvements in at least five of eight lanes. Four policy
-fixture groups / .454s preflight pass; no gameplay result yet. Detector, native
-teacher and learner remain unchanged. No GPU allocation is selected.
+The [command-dependent Breakout teacher](2026-11-01-cdp-breakout-command-response.md) improves development
+return 225.083 → 295.333 (+31.21%), with six of eight lane means improved and
+zero of 24 two-wall successes in both arms. All 51,752 actions / 206,985 frames,
+live pixels, decisions and outcomes replay; all 32 inputs pass. Collection
+30.749s / replay41.522s / controller72.478s completes 19:21:02 UTC November 1,
+source2a1c9c4. The fixed prediction fit also passed; neither result is learned
+Kindle competence. A fresh paired CPU cohort at seed4000017029 is separately
+selected, with unchanged policies and a ≥10% mean/five-lane screen. Preflight
+.238s passes 39 inputs and seed/history checks. No fresh result, teacher
+integration or GPU learner yet. Do not rerun completed fit/development stages.
 
 The [completed Qbert encoder8e-5 comparison](2026-11-01-cdp-qbert-encoder8e5.md) lowers both frozen
 scores: greedy 14,339.583 → 12,435.417 (−13.28%) and sampled 13,761.458 →

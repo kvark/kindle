@@ -1,4 +1,4 @@
-# Command-dependent paddle response passes a small prediction screen
+# Command-dependent paddle response improves development teacher return
 
 The fixed 36-coefficient residual model passes its declared prediction screen.
 The gain is small: overall held-out MAE falls .21% and RMSE falls 3.47%; near
@@ -32,11 +32,39 @@ All 16 input hashes remain unchanged. No emulator/native import, GPU work,
 learner update, failure or repeated fit occurs. The fit is complete; do not
 rerun it.
 
-A [separate bounded CPU gameplay comparison](../experiments/2026-11-01-cdp-breakout-command-gameplay.md)
-is selected against the retained 225.083-point teacher. Four policy fixture
+## Development gameplay improves; the original task gate still fails
+
+The [separate bounded CPU gameplay comparison](../experiments/2026-11-01-cdp-breakout-command-gameplay.md)
+raises mean return **225.083 → 295.333 (+31.21%)**, improving six of eight lane
+means. Both arms have zero of 24 two-wall successes. Each arm selects three
+natural episodes per lane without truncations. The candidate passes the fixed
+10%/five-lane development screen, but this reused cohort informed its fit.
+
+| Lane | Retained teacher | Candidate |
+| --- | ---: | ---: |
+| 0 | 190.333 | 386.000 |
+| 1 | 96.667 | 239.333 |
+| 2 | 184.667 | 318.667 |
+| 3 | 221.000 | 304.000 |
+| 4 | 345.000 | 265.667 |
+| 5 | 363.667 | 241.667 |
+| 6 | 99.000 | 270.000 |
+| 7 | 300.333 | 337.333 |
+
+Candidate collection completes 51,752 actions / 206,985 frames in 30.749s.
+The 41.522s replay reproduces all actions, debug observations, live input/output
+pixel hashes, rewards, boundaries and episode outcomes. Four policy fixture
 groups and .454s preflight pass, including all 37,448 saved one-step predictions,
-scalar/vector rollout agreement and original-model embedding. No gameplay
-result, native teacher integration or GPU learner is selected yet.
+scalar/vector rollout agreement and original-model embedding. All 32 inputs
+remain unchanged; the controller completes in 72.478s at **19:21:02 UTC on
+November 1**, source2a1c9c4. No failure, stage repeat, control rerun, native/GPU
+work or learner update occurs. The development comparison is complete.
+
+A [fresh paired CPU cohort](../experiments/2026-11-01-cdp-breakout-command-fresh.md)
+is selected at evaluation seed4000017029, with unchanged coefficients and the
+same 10%/five-lane screen. Its .238s preflight passes 39 inputs, exact policy
+identity, common runner, seed-only header changes and episode resets. No fresh
+gameplay result or teacher integration is available yet; no learner is selected.
 
 Evidence: `/x/Temp/kindle-breakout-command-response-20261101`.
 The five-game goal remains unfinished.
@@ -44,3 +72,5 @@ The five-game goal remains unfinished.
 - Declaration: `fe210b4ad9a80c4b7d0b71894561307a411850266d3d7bbe35d891e456afb64f`.
 - Fit review: `7318e2a760a2fefaecbad91353693062b7d3072fe4dae9be9e5a369ac1998ea2`.
 - Predictions: `84ca28b05bc7ec46f7ff145c567b5440c3997148026fbcd6d291183f6805b258`.
+- Development comparison: `cddaba41b43982e88e5fc43052bd760abd77f1f78f2d9cdfbebad0b4a8659c37`.
+- Development completion: `ae308a2cc1ae61655fc01060d40383595e7fc212e91351a5dc43a7b46cd4f581`.
