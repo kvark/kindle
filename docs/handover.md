@@ -1,14 +1,18 @@
 # CDP handover — October25,2026
 
-The [optional native imitation decay](experiments/2026-11-01-cdp-expert-imitation-decay.md) is selected for qualification within
-the existing architecture-diagnosis goal. It holds the expert loss weight through
-one update boundary, then fades it to zero at another, in both actor and optional
-world losses. Teacher labels and online guidance stay fixed; raw losses remain
-reported. Legacy behavior is the default. The148 Rust CPU checks,38 focused
-Python checks and strict workspace/binding Clippy pass; the initial Python
-fixture failure is preserved. Native numerical validation, isolated packaging
-and the declared8192-action check remain pending. No full learner or gameplay
-benefit is established. Root`/x/Temp/kindle-expert-decay-20261101`.
+The [optional native imitation decay](results/2026-11-01-cdp-expert-imitation-decay.md) passes F64 loss/gradient checks at
+weights100/50/0 and fresh Breakout8192 actions/32,724 frames/489 updates in46.991s.
+Compressed decay128→256 gives234 zero-weight reports; raw expert losses remain
+reported. Frozen1024/.902s haszero updates,357 invariant tensors and one natural
+zero-return episode. All357 initial tensors,47 pre-update events,full guided replay,
+416 pins and host guards pass. Service succeeds02:22:36 UTC November1/source65ed45f;
+collection02:22:48,no GPU repeats. The148 Rust/804 packaged Python CPU checks and
+strict Clippy pass; initial Python fixture failure remains preserved. Runtime
+`/x/Temp/kindle-expert-decay-20261101/runtime`,nativeSHAcac21ef6,default off.
+Online teacher guidance/labels and optimizer history stay fixed. Early200k cost
+projection21m02s passes30min,but no gameplay benefit/full learner is established.
+All services terminal,no active GPU allocation. Root`/x/Temp/kindle-expert-decay-20261101`;
+check live state before work. Architecture diagnosis remains in the unfinished goal.
 
 The [Breakout action interventions](results/2026-10-30-cdp-encoder-representation.md#local-action-interventions-limit-the-teacher-disagreement-diagnosis)
 limit treating teacher disagreement as error. Of51 improved-policy disagreements,

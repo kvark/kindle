@@ -1,5 +1,7 @@
 # Optional native imitation decay before a new learner
 
+Completed: [numerical and bounded execution result](../results/2026-11-01-cdp-expert-imitation-decay.md). No full learner selected.
+
 The Breakout action interventions show that disagreement with the pixel teacher
 is not necessarily a worse local action. Earlier gradient attribution also
 found large imitation contributions. Select an optional native schedule that
