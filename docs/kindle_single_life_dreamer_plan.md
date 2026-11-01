@@ -1,5 +1,27 @@
 # Kindle: CDP learning roadmap
 
+The [current Qbert RGB64 action-ranking comparison](experiments/2026-11-01-cdp-qbert-rgb64-ranking.md)
+passes CPU qualification 22:13:29 UTC November 1, sourced08bcf2: 53 tests, four
+actual CLI paths, both357-tensor checkpoints and64 preceding critic pins. The
+single CPU oracle reproduces78,368 actions plus154,591 branch frames in30.410s,
+with128 fixed origins, eight reverse-order checks and unchanged parent states.
+All60 preparation pins verify; no native construction, failure or repeated oracle.
+
+Compare10007/12011 on identical recorded10007 greedy histories. Each128-action
+bounded capture must pass before the two78,368-action full captures. Rank18
+four-step action holds followed by recorded continuation through15 steps,
+against paired emulator outcomes;64 origins before and64 after the first pyramid.
+Keep native447fe50/35ad0db and each model's own config/RNG; the new explicit
+probe option permits only seed12011 to differ. Scalar posterior draws differ
+from each other and the original vector actor. No isolated weights, adaptive
+policy, expected-return or reliability claim; current H5 training horizon stays.
+
+Root `/x/Temp/kindle-qbert-rgb64-ranking-20261101`; service
+`kindle-qbert-rgb64-ranking-20261101`. GPU selection/launch follows the committed
+qualification. No learner, build, loss change, retry, cap increase, extension or
+automatic successor. Do not repeat the successful CPU oracle/preparation.
+The five-game goal remains unfinished; check live state before GPU work.
+
 The [completed Qbert RGB64 critic diagnostic](results/2026-11-01-cdp-qbert-rgb64-critic.md)
 finds useful predictions in both learners: sampled R² .689/.558 for 10007/12011,
 with RMSE 813.017/896.689 versus constant 1,460.945/1,351.585. Later biases differ:

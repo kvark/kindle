@@ -1,5 +1,9 @@
 # Current Qbert action rankings on shared observation histories
 
+**CPU qualification complete:** 53 tests, four actual CLI commands, both
+357-tensor checkpoints and the single new emulator oracle pass. GPU selection
+follows recording these results; no capture has run at this qualification point.
+
 The current RGB64 critics predict useful returns on their own policies, with
 different later-play biases. Test the current models' action-dependent forecasts
 on shared inputs before choosing a new loss or learner. This diagnostic belongs
@@ -79,3 +83,21 @@ Root `/x/Temp/kindle-qbert-rgb64-ranking-20261101`; main service
 One original allocation only: no retries, cap increases, repeated stages,
 extension, learner, loss change or automatic successor. The five-game goal
 remains unfinished.
+
+## CPU qualification complete
+
+Preparation succeeds 22:13:29.395 UTC November 1, sourced08bcf2, in32.442s.
+All53 ranking/config/forecast-ledger tests pass in.11s. Four actual CLI paths
+parse before native construction; both357-tensor RGB64 schemas and64 preceding
+critic pins verify. The60 preparation inputs are pinned. No native module,
+queue, declaration or service is created during preparation.
+
+The single shared CPU oracle replays78,368 actions and154,591 branch frames in
+30.410s (30.747s wrapper), with128 selected origins andeight reverse-order
+checks. All recorded-plan branches and full source transitions match; parent
+states stay unchanged. Eight complete pooled-pixel hashes are retained for the
+native comparison. No CPU failure or repeated oracle occurs. Do not repeat
+successful preparation or the oracle.
+
+Oracle SHA256 `3b5bbe0962a1453eca0ebab85878d95eceac7f287fb0cb53a9496bedb3de48ca`;
+preflight `a57bdcb590f0caabcedbe2e6d1afc40db4f2ad68ef8c54cdae2ae8253a6f94b3`.
