@@ -20,16 +20,20 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [bounded Qbert behavior-rate check](docs/experiments/2026-11-01-cdp-qbert-behavior8e5.md) is selected after completed H3
-closure:actor/critic4e-5→8e-5 at fixed12M48/Auto/N8/B16/T16/H5/R24/encoder4e-5/
-greedy collection/expert100. Use the qualified equivalent teacher overlay,
-native447fe50/runneraba4300d unchanged;teacherSHAfa261c53 and CPU cost differ.
-CPU preflight1.101s passes both CLI paths,18 config cases,357 schema tensors,
-442 control inputs and16 packaged files withzero constructions. Fix8192/733,
-frozen1024,180s train cap and35min conservative200k gate. No full learner yet.
-Root`/x/Temp/kindle-qbert-behavior8e5-20261101/native-check`;service
-`kindle-qbert-behavior8e5-check-20261101`. Check live state;do not restart it
-or overlap another GPU job. The five-game goal remains unfinished.
+The [fresh Qbert behavior-rate comparison](docs/experiments/2026-11-01-cdp-qbert-behavior8e5-200k.md) is selected after the
+[bounded check](docs/results/2026-11-01-cdp-qbert-behavior8e5.md) passes8192/32,761frames/733updates in47.940s;
+frozen1024/.803s haszero updates/no natural episodes. All496 pins,357 matching/
+invariant tensors,47 events,full replay/guards and original collector pass.
+Main15:14:46/collection15:15:08 UTC November1/sourceb735644. Full CPU3.395s passes
+five CLI paths,28 config/five teacher-identity/eight mode/16 header/four observer/
+11 recovery/six retention/two integration cases;zero constructions/failures.
+Fix fresh200k/18,715,35min cap,retained100k/9,340 recovery and four frozen24-episode
+arms against greedy14,339.583/sample13,761.458. Behavior4e-5→8e-5 at H5/R24;
+world/base/encoder4e-5,dynamics4e-4 unchanged. Native447fe50/runneraba4300d stay;
+qualified equivalent teacherSHAfa261c53 changes Python bytes/CPU cost. Root
+`/x/Temp/kindle-qbert-behavior8e5-20261101/full`;service
+`kindle-qbert-behavior8e5-200k-20261101`. Check live state;do not restart or overlap
+GPU work. No rate sweep,extension or automatic successor;goal remains unfinished.
 
 The [qualified Python Qbert teacher](docs/results/2026-11-01-cdp-qbert-teacher-cost.md)
 uses equivalent channel predicates. All130 CPU tests,472 exact snapshot decisions/

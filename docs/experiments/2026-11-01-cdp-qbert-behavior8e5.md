@@ -59,3 +59,13 @@ arezero. Source review catches the copied preparer's historical H3 protocol
 constant before selection;the explicit `select_behavior_check.py` entry point
 binds this protocol while preserving all CPU-qualified sources. No failed
 check or repeated preflight/GPU stage occurs.
+
+## Completion
+
+The check succeeds15:14:46 UTC November1/sourceb735644;original collection
+15:15:08. All496 inputs,357 matching/invariant tensors,47 events,733 finite
+supervised reports,full guided replay and guards pass. Training8,192/32,761frames/
+733updates takes47.940s;frozen1,024/4,096frames/.803s haszero updates/no natural
+episodes. Conservative200k21m27s passes35min. No failure or repeated stage.
+See the [result](../results/2026-11-01-cdp-qbert-behavior8e5.md) and
+[separately selected full learner](2026-11-01-cdp-qbert-behavior8e5-200k.md).
