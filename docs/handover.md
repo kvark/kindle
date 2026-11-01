@@ -21,6 +21,18 @@ bounded experience reuse or third learner selected. Do not restart or overlap it
 Root`/x/Temp/kindle-qbert-rgb64-seed12011-20261101/full`;check live state before
 work. The five-game goal remains unfinished.
 
+The [fixed current-pixel action readout](results/2026-11-01-cdp-breakout-pixel-action-readout.md) fails its screen:
+learned+pixel kernel57.40% overall/55.15% near-descending teacher agreement,
+versus learned-only56.91%/58.82% and actor62.56%/66.91%. Pixel-only48.25%/43.38%.
+Keep the actor;no native spatial path,head,loss,teacher or learner selected.
+All2064 aligned rows,51 diagnostic/562 active Qbert pins andsix CPU fixtures pass.
+Analysis.760s/controller3.410s completes20:30:08 UTC November1/source6a6ce27,
+preserving originalPID842010/invocationd37840f258104f9caf8b6bc5c0316899.
+No replay,native/emulator/GPU work,updates,failure or repeated fit. The additive
+kernel and reused teacher/cohort limit interpretation;no broad spatial-input
+claim. Retain CPU co-host timing. Root`/x/Temp/kindle-breakout-pixel-action-readout-20261101`
+is complete;do not rerun. Qbert confirmation continues;the five-game goal is open.
+
 The [completed Qbert12M/RGB64 comparison](results/2026-11-01-cdp-qbert-rgb64.md) reaches **15,710.417 greedy /24 first pyramids**,
 passing the unchanged15k/90% gate and improving RGB48's14,339.583 by9.56%.
 Sampled14,250/24 rises3.55% from13,761.458 but still misses15k. Own initials
