@@ -1,31 +1,21 @@
 # CDP handover — October25,2026
 
-The [fresh Qbert H5/R24 seed10007 learner](experiments/2026-11-01-cdp-qbert-h5-r24-seed10007.md)
-launches10:12:16 UTC November1/source0ebac01 with442 pins,MainPID781585/
-invocation539c22282c4e42c7a22bc150961ef963. Same passing8039 recipe:12M48/Auto/
-N8/B16/T16/H5/R24/encoder4e-5/greedy collection/expert100/native447fe50/runneraba4300d.
-Fix200k/18,715 updates,35min cap,100k/9340 recovery and final/actual-initial
-sampled/greedy24-episode arms;greedy primary,original15k/90% gate unchanged.
-Learner10007/evaluation4000010007 were absent from67 examined Qbert declarations;
-only seeds change,no prior experience or isolated seed-mechanism claim.
-Startup1.320s passes442pins,357finite same-shape tensors,48 initial differences
-(38world/sevenbehavior/threeslowvalue),correct cadence and519 finite supervised
-reports through5912 actions. The100k/9340 recovery passes10:26:52 with357 finite
-tensors and9545 finite reports through102,184 actions. Independent1.137s
-confirmation passes10:27:09,preserving exact metadata,all442 pins and original
-identity. Recovery is terminal success;progress,postprocess,collection and
-supplemental observerPID781776/invocation2ac890dae7314082b6bc41472f15322b remain
-active. No completed check repeats. Training finishes200k/799,841frames/18,715updates in
-1713.661s (28m34s) at10:40:54 UTC. Four frozen arms finish10:42:43 withzero
-updates/truncations. Provisional first-three-per-lane means aregreedy14,339.583/
-sampled13,761.458,own initials1.042/171.875;both final means miss15k. These are
-log arithmetic only:task successes,full replays,tensor audits and terminal
-confirmation remain pending. No accepted full result exists.
-Root`/x/Temp/kindle-qbert-h5-r24-seed10007-20261101/full`,service
-`kindle-qbert-h5-r24-seed10007-200k-20261101`;inspect original identity,do not
-restart or allocate another GPU job while active. Prior3.729s controller and
-1.285s terminal CPU qualifications pass;do not repeat passed checks. Retain CPU
-co-host timing. No retry,extension,cap increase or automatic successor.
+The [completed Qbert H5/R24 seed10007 confirmation](results/2026-11-01-cdp-qbert-h5-r24-seed10007.md)
+finishes200k/799,841frames/18,715updates in28m34s. Greedy14,339.583/
+24 first pyramids andsampled13,761.458/24 both miss15k;
+own initials1.042/171.875 clear none. Identical recipe8039 passes,
+10007 fails:one of two primary-greedy learners,not broad reliability. Same12M48/
+Auto/N8/B16/T16/H5/R24/encoder4e-5/greedy collection/expert100/native447fe50;
+only learner/cohort seeds change,no paired H15/R16 control or prior experience.
+All442 pins,100k/9340 recovery,357 finite/invariant tensors,48 initial differences,
+full training/frozen replays/videos,guards,curves,coverage,exposure and comparison
+pass. Main/post/collection finish10:54:21/10:54:30/10:55:23 UTC November1/source0ebac01;
+independent2.210s confirmation passes10:55:36. All six services succeed,
+zero failures or repeated stages. Actual overrides23.303%,not frozen
+competence. Retain CPU co-host timing. Root
+`/x/Temp/kindle-qbert-h5-r24-seed10007-20261101/full`;terminal,do not rerun.
+No extension,cap increase,third learner or automatic successor selected.
+No active learner/GPU allocation at closure;check live state before work.
 The five-game goal remains unfinished.
 
 The [completed CPU Breakout settling-cost check](results/2026-11-01-cdp-breakout-edge-settling.md) lowers the retained
