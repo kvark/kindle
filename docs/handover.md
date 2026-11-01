@@ -17,6 +17,16 @@ Root`/x/Temp/kindle-breakout-encoder8e5-20261101/full`,service
 `kindle-breakout-encoder8e5-200k-20261101`. Check live state;do not restart or
 schedule another GPU job while active. The five-game goal remains unfinished.
 
+The separate CPU terminal verifier is prepared at
+`/x/Temp/kindle-breakout-encoder8e5-20261101/review_terminal.py`; its.053s
+preflight recomputes the retained control's fixed episode scores/videos and
+verifies all five original service invocations. A successful short-lived
+collector need not have a systemd CPU-accounting line; require its exact
+completion object under the original invocation instead. Both successful
+preflight revisions are retained,with no failed check or GPU work. Run its
+`final` mode only after the existing original pipeline and collector succeed.
+Its co-host CPU time remains a caveat without training-time correction.
+
 The [completed Qbert encoder4e-5 comparison](results/2026-11-01-cdp-qbert-encoder4e5.md)
 finishes200k actions/799,739 frames/12,477 updates in27m41s,8.56% less observed
 training time than2e-5. Greedy14,028.125/sample11,522.917 improve1.76%/15.37%,

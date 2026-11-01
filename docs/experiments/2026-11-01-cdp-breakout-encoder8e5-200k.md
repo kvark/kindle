@@ -74,3 +74,13 @@ without correcting wall time. No full frozen outcome is available.
 Declaration`5009887d92a4e26c2ebe5836ef3734ec6027e888113beb61e1fc1729cb18d23e`.
 Do not restart this learner or schedule another GPU job while it remains active;
 inspect the original service and observers before further work.
+
+The separate CPU terminal verifier is prepared at
+`/x/Temp/kindle-breakout-encoder8e5-20261101/review_terminal.py`; its.053s
+preflight recomputes the retained control's fixed episode scores/videos and
+verifies all five original service invocations. A successful short-lived
+collector need not have a systemd CPU-accounting line; require its exact
+completion object under the original invocation instead. Both successful
+preflight revisions are retained,with no failed check or GPU work. Run its
+`final` mode only after the existing original pipeline and collector succeed.
+Its co-host CPU time remains a caveat without training-time correction.
