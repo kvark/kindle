@@ -1,21 +1,34 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Qbert encoder4e-5 comparison](experiments/2026-11-01-cdp-qbert-encoder4e5-200k.md) launches03:58:23 UTC November1/
-source7f794b0 with276 pins and35-minute training cap:200k actions/12,477 updates,
-12M48/Auto/N8/B16/T16/H15/R16/expert100. Only encoder2e-5→4e-5 changes;
-native447fe50,exact runner and teacher stay fixed. Startup passes357 control/
-bounded-matching initial tensors,47 pre-update transitions,correct cadence and
-94 finite reports through1880 actions. MainPID736977,invocation
-`48d20e8959f04654b6f5ff8932328d8d`;progress,postprocessing and terminal
-collection observers remain active;100k/6227 recovery passes04:12:29 UTC with
-357 finite tensors. Independent.607s CPU confirmation verifies tensor hashes
-and276 pins;the recovery observer is terminal success. Require fixed final/
-actual-initial greedy/sample24-episode arms against13,785.417/9,987.500;
-no full frozen result exists. CPU preflight1.372s and.815s co-host startup pass;
-reused4013/cohort,no experience reuse or reliability claim. Root
-`/x/Temp/kindle-qbert-encoder4e5-20261101/full`,service
-`kindle-qbert-encoder4e5-200k-20261101`. Check live state;do not restart this
-learner or schedule another GPU job while active. The five-game goal is unfinished.
+The [Qbert encoder4e-5 comparison](experiments/2026-11-01-cdp-qbert-encoder4e5-200k.md)
+finishes training at04:26:10 UTC:200k actions/799,739 frames/12,477 updates in
+27m41s. All four frozen GPU stages finish by04:27:41 with zero updates and
+truncations. Fixed24-episode replay scores are greedy14,028.125 and
+sampled11,522.917,each24/24 first pyramids,versus retained13,785.417/9,987.500.
+Both candidate means still miss15,000. **The original CPU training replay,
+postprocessing and terminal collection are still pending; no completed full
+comparison is claimed.** All frozen outcome replays are complete.
+
+Original main service `kindle-qbert-encoder4e5-200k-20261101`, PID736977,
+invocation `48d20e8959f04654b6f5ff8932328d8d`, source7f794b0,276 pinned inputs.
+Root `/x/Temp/kindle-qbert-encoder4e5-20261101/full`.
+Only encoder2e-5→4e-5 changes;12M48/Auto/N8/B16/T16/H15/R16/expert100,
+native447fe50,exact runner and teacher stay fixed. Startup matches357 initial
+tensors and47 pre-update events. Original100k/6227 recovery passes04:12:29;
+independent confirmation preserves exact metadata and hashes. CPU co-host caveats
+are recorded without time correction. Reused4013/cohort,no experience reuse.
+Check original service and observers; **do not restart or launch another GPU job
+until this pipeline and its terminal confirmation finish**.
+
+The [Breakout encoder8e-5 bounded check](experiments/2026-11-01-cdp-breakout-encoder8e5.md)
+is CPU-prepared only:8192 actions/489 updates then1024 frozen actions,changing
+only encoder4e-5→8e-5 from the qualified12M64 control. Preflight1.625s passes
+two actual CLI paths,14 config cases,357 schema tensors and227 control pins,
+with zero native/environment construction. No declaration or GPU launch yet.
+Selection requires completed Qbert evidence,an idle host and matching sources.
+Root `/x/Temp/kindle-breakout-encoder8e5-20261101/native-check`.
+This selects no full learner or automatic promotion.
+
 
 The [completed CPU Breakout teacher-takeover diagnostic](results/2026-11-01-cdp-breakout-recoverability.md) avoids108/120
 recorded losses from the early32-action-window origin versus26/120 from the

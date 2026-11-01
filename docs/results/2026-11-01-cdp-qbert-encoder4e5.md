@@ -90,3 +90,22 @@ The co-host receipt preserves the analysis hash and timings without correction.
 
 - Recovery review`949ab8d7dc7e9e2ea7b694622c993a5d17594330630fa98823d741c1b8051590`.
 - Metadata`aed08d98e6efd576d05d367c7ab0aeb1e4d1075121f421f1c6634ab4b9de4c0c`.
+
+## GPU stages complete; original CPU closure pending
+
+Training finishes04:26:10 UTC November1 at200k actions/799,739 frames/12,477
+updates in1661.025s (27m41s),below the35-minute cap. All four frozen stages
+finish by04:27:41 with zero updates and truncations. Completed frozen outcome
+replays select the fixed24 episodes: greedy14,028.125 and sampled11,522.917,
+each24/24 first pyramids; own initials80.208/177.083 clear none. Both trained
+means still miss15,000. Greedy improves six of eight lane means and sampled
+seven,with different trajectories and reused development inputs.
+
+The original training pixel/action/teacher-label replay remains active under
+mainPID736977/invocation48d20e8959f04654b6f5ff8932328d8d. Postprocessing and
+terminal collection still wait; no accepted full comparison is claimed yet.
+No GPU stage repeats or new GPU job occurs. The separate Breakout8e-5 CPU
+preparation takes1.625s after training/evaluation have finished; it does not
+alter recorded training time. Its selection waits for this pipeline's complete
+terminal evidence. Terminal-verifier preflight.041s used retained control
+artifacts only and co-hosted with training; retain that caveat without correction.

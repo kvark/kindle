@@ -77,3 +77,22 @@ recovery observer completes successfully while the original learner continues.
 CPU Breakout own-policy and teacher-takeover diagnostics preserve this learner's
 inputs/process; their separate co-host receipts and timing caveats are retained
 without correcting training wall time. No full frozen result is available.
+
+## GPU stages complete; original CPU closure pending
+
+Training finishes04:26:10 UTC November1 at200k actions/799,739 frames/12,477
+updates in1661.025s (27m41s),below the35-minute cap. All four frozen stages
+finish by04:27:41 with zero updates and truncations. Completed frozen outcome
+replays select the fixed24 episodes: greedy14,028.125 and sampled11,522.917,
+each24/24 first pyramids; own initials80.208/177.083 clear none. Both trained
+means still miss15,000. Greedy improves six of eight lane means and sampled
+seven,with different trajectories and reused development inputs.
+
+The original training pixel/action/teacher-label replay remains active under
+mainPID736977/invocation48d20e8959f04654b6f5ff8932328d8d. Postprocessing and
+terminal collection still wait; no accepted full comparison is claimed yet.
+No GPU stage repeats or new GPU job occurs. The separate Breakout8e-5 CPU
+preparation takes1.625s after training/evaluation have finished; it does not
+alter recorded training time. Its selection waits for this pipeline's complete
+terminal evidence. Terminal-verifier preflight.041s used retained control
+artifacts only and co-hosted with training; retain that caveat without correction.
