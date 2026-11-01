@@ -86,3 +86,14 @@ No400k learner,extension,ratio retry or automatic promotion is selected. Require
 the bounded result and original terminal collector before deciding whether a
 separate full comparison is justified. Reuse the exact qualified native and
 runner;no rebuild or prior experience reuse.
+
+## Completed bounded check
+
+All declared runtime checks and original collector pass. Training8,192 actions/
+32,723frames/245updates takes29.062s;1,024 frozen/.868s haszero updates/no natural
+episodes. Conservative400k projection26m01s passes35min. All259 pins,357 tensors,
+47 initial semantic events,full guided replay and guards pass. Main13:02:45 and
+collector13:03:34 UTC November1/source479f4c1;no failure or repeated stage.
+Do not rerun the check or its passed preflight. See the [result](../results/2026-11-01-cdp-breakout-r8.md).
+A [separate full protocol](2026-11-01-cdp-breakout-r8-400k.md) selects preparation
+of one fresh400k learner;full CPU qualification is required before allocation.

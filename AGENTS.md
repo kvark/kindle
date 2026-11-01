@@ -20,17 +20,25 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [Breakout R8 bounded check](docs/experiments/2026-11-01-cdp-breakout-r8.md#selected-after-qbert-closure)
-is separately selected after Qbert closure and an idle-Kindle check. Root
-`/x/Temp/kindle-breakout-r8-20261101/native-check`;service
-`kindle-breakout-r8-check-20261101`. Check live state for original launch identity;
-do not repeat passed CPU qualification or launch another GPU job while active.
+The [fresh Breakout400k/R8 comparison](docs/experiments/2026-11-01-cdp-breakout-r8-400k.md)
+is selected for preparation after the bounded check passes. Full CPU harness
+qualification is still required;no full trial,queue,declaration or GPU allocation
+exists. Prospective root`/x/Temp/kindle-breakout-r8-20261101/full`,service
+`kindle-breakout-r8-400k-20261101`. Check live state before declaration/launch.
 
-Only8,192 actions/245 updates plus1,024 frozen actions are selected,using
-12M64/Auto/N8/B16/T16/H15/R8/encoder4e-5/expert100/native447fe50/runner6c1b69fb.
-Caps180/60/180s train/frozen/audit,480s service;conservative400k projection≤35min.
-Require initial/frozen tensor comparisons,finite reports,full guided replay and
-host guards. No400k learner,extension or automatic promotion is selected.
+Keep12M64/Auto/N8/B16/T16/H15/encoder4e-5/expert100/native447fe50/runner6c1b69fb.
+Compare400k/R8 with retained200k/R16:12,489 versus12,477 updates,35-minute training
+cap,100k/200k/300k recovery audits and all four files retained at each milestone.
+Require final/actual-initial sampled/greedy24-episode assessments against
+56.292/104.667;sampled primary,original90%-two-wall gate. No bounded experience
+reuse,extension,ratio retry or automatic successor. Follow the full protocol.
+
+The [bounded R8 result](docs/results/2026-11-01-cdp-breakout-r8.md) passes8,192
+actions/32,723frames/245updates in29.062s;1,024 frozen/.868s haszero updates/no
+natural episodes. Conservative400k projection26m01s passes35min. All259 pins,
+357 matching/invariant tensors,47 pre-update events,finite reports,full guided
+replay and guards pass. Main13:02:45/collector13:03:34 UTC November1/source479f4c1;
+terminal,no failures or repeats. Do not rerun the check,collector or preflight.
 
 The [completed Qbert R32 comparison](docs/results/2026-11-01-cdp-qbert-h5-r32-greedy.md)
 finishes200k/24,954updates in34m59.741s,+22.53% versus R24. Greedy14,057.292/23

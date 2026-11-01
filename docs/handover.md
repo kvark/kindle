@@ -14,14 +14,21 @@ CPU co-host timings and earlier CPU preparer failures remain. No full/GPU failur
 or repeat. Root`/x/Temp/kindle-qbert-h5-r32-greedy-20261101/full`;complete,do not
 rerun stages. The five-game goal remains unfinished.
 
-The [Breakout R8 bounded check](experiments/2026-11-01-cdp-breakout-r8.md#selected-after-qbert-closure)
-is now separately selected after Qbert closure and an idle-Kindle check. Use the
-qualified8,192-action/245-update train plus1,024 frozen actions,exact native447fe50/
-runner6c1b69fb/teacher,with12M64/H15/encoder4e-5/Auto/N8/B16/T16/expert100.
-Keep180/60/180s train/frozen/audit caps and480s service cap;conservative400k cost
-projection must pass35min. No400k learner or automatic promotion is selected.
-Do not repeat passed CPU preflight. Root`/x/Temp/kindle-breakout-r8-20261101/native-check`;
-service`kindle-breakout-r8-check-20261101`. Check live state for launch identity.
+The [completed Breakout R8 bounded check](results/2026-11-01-cdp-breakout-r8.md)
+passes8,192 actions/32,723frames/245updates in29.062s;1,024 frozen/.868s haszero
+updates/no natural episodes. Conservative400k projection26m01s passes35min.
+All259 pins,357 matching/invariant tensors,47 pre-update events,finite supervised
+reports,full guided replay and guards pass. Main13:02:45/collector13:03:34 UTC
+November1/source479f4c1,originalPID797711/invocation768210bdaa1e457b92770f961380b47d.
+No failure,repeated stage or active allocation;do not rerun checks/collector.
+The [separate400k/R8 comparison](experiments/2026-11-01-cdp-breakout-r8-400k.md)
+is selected for preparation,with35min training cap,12,489 updates,three retained
+recovery milestones and final/actual-initial sampled/greedy24-episode arms against
+56.292/104.667. Same12M64/H15/encoder4e-5/Auto/N8/B16/T16/expert100/native447fe50/
+runner6c1b69fb/teacher;no old experience reuse. Full CPU harness qualification is
+required before declaration/launch;no full trial,queue or allocation exists.
+Root`/x/Temp/kindle-breakout-r8-20261101/full`;check live state before work.
+No extension,ratio retry or automatic successor;gameplay benefit is unmeasured.
 
 The [fixed Breakout upper-crop reference](results/2026-11-01-cdp-breakout-crop70.md)
 leaves all eight returns unchanged:mean185.375,zero two-wall successes. The
