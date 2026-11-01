@@ -79,3 +79,15 @@ Private runner SHAe161bf38c213a10b4e2719730969c2d953748c092dc849dedaaaad7d55222c
 adds exactly the12 qualified lines to Qbert runneraba4300d, with no removals or
 other edits. Production SHAfa124388 and its retained471-test qualification are
 unchanged. The GPU check remains unlaunched until separate guarded selection.
+
+
+## Original bounded launch
+
+The original main launches22:25:42.054 UTC November1/source1a1eceb with616
+pins, PID857526/invocation655eec1976bd483e9f5b780a773a69bc. Original terminal
+observerPID857531/invocationa0cc6a65e7e54a1d9b582e6791eac825 starts alongside.
+Declaration SHA85331eb6c7906f65d4023f297adcf13535f7ba8881d3b119a012c6ce88f7c41e.
+The live header confirms dynamics1e-4, encoder/base4e-5 and runnere161bf38;
+progress reaches4096 actions/349 updates in27.190s. No completed bounded result
+is available at this point. Preserve the original processes; do not overlap or
+restart this allocation.

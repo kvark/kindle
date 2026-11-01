@@ -21,7 +21,12 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Active work — November 1
 
 The [bounded Qbert dynamics-group1e-4 comparison](docs/experiments/2026-11-01-cdp-qbert-dynamics1e4.md)
-is CPU-qualified22:24:44 UTC November1/source213589e: two actual commands,
+launches22:25:42 UTC November1/source1a1eceb with616 pins. Original mainPID
+857526/invocation655eec1976bd483e9f5b780a773a69bc; collectorPID857531/invocation
+a0cc6a65e7e54a1d9b582e6791eac825. Live config confirms dynamics1e-4 and
+encoder/base4e-5;4096 actions/349 updates take27.190s. No completed result yet.
+
+CPU qualification22:24:44 UTC/source213589e passes two actual commands,
 22 config checks,357 schema tensors,562 retained-control/64 preceding-ranking
 pins,16 runtime files and733/9340/18715 cadence pass in1.542s. No native agent
 or emulator is constructed. Native447fe50/35ad0db and teacherfa261c53 stayfixed;
@@ -36,8 +41,8 @@ initial/invariant frozen tensors, pre-update semantic parity andfull guided
 replay/guards. Caps180s/60s/audit180s/main480s; conservative200k cost mustpass30min.
 
 Root `/x/Temp/kindle-qbert-dynamics1e4-20261101/native-check`; service
-`kindle-qbert-dynamics1e4-check-20261101`. Selection/launch follows committed
-qualification on the idle host. No full learner, retry, cap increase, rate sweep,
+`kindle-qbert-dynamics1e4-check-20261101`. Preserve original main/collector and do not
+overlap or restart the active allocation. No full learner, retry, cap increase, rate sweep,
 extension or automatic successor. Reused seed is not independent confirmation;
 the original12011 gate miss remains. The five-game goal is unfinished.
 
