@@ -38,6 +38,18 @@ service`kindle-qbert-encoder8e5-200k-20261101`. No full frozen result yet.
 Do not restart or overlap GPU work. No extension,sweep,confirmation or automatic
 successor. The five-game goal remains unfinished.
 
+The [Breakout full-width paddle diagnostic](docs/results/2026-11-01-cdp-breakout-paddle-crop.md) acceptszero of42,303
+selected decisions:24 initial/reset,37,960 extra-red,4,285 image-edge and34
+nonstandard exclusions. Thus old-crop bias remains unquantified;do not widen
+the teacher crop on this evidence. All52,072 recorded actions/208,254frames,
+original actions/debug/pixels/outcomes and208,254 prior raw annotations match.
+The source stays225.083/zero two-wall;no new score,policy,loss or learner.
+Eight CPU fixtures/47 diagnostic pins/528 active Qbert pins pass. Replay53.457s/
+controller56.159s completes18:41:41 UTC November1/source7433689,preserving
+originalPID831942/invocationbae3fe2dd4a24070ab2845a7828145fa. Retain CPU co-host
+cost without correction. No GPU work,failure or repeated stage;no relaxed filters.
+Root`/x/Temp/kindle-breakout-paddle-crop-20261101`;complete,do not rerun.
+
 The [completed Qbert300k comparison](docs/results/2026-11-01-cdp-qbert-300k.md)
 finishes300,000 actions/1,199,763frames/28,090 updates in31m18.803s,+9.64% time
 versus200k with the faster teacher. Greedy14,339.583→13,861.458 falls3.33%;
