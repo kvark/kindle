@@ -44,7 +44,12 @@ against14,028.125 primary greedy/11,522.917 sampled and unchanged15k/90% gate.
 CPU preflight1.832s passes305 bounded/276 control pins and actual CLI/audit/observer
 checks withzero native/emulator construction. Root
 `/x/Temp/kindle-qbert-greedy-training-20261101/full`;service
-`kindle-qbert-greedy-training-200k-20261101`. All four observers are active.
+`kindle-qbert-greedy-training-200k-20261101`. Recovery succeeds06:29:57 UTC;
+100k/6227 and357 finite tensors pass. Separate.788s CPU confirmation06:30:27
+preserves exact metadata,all tensor hashes,317 pins and original process identity.
+Progress/postprocessing/collection remain active. Terminal-verifier CPU preflight
+passes.056s after preserving an over-strict observer-accounting-row assertion;
+zero GPU/pipeline repeats. Do not rerun recovery confirmation.
 Startup.948s passes357 initial tensors,47 bounded-matching/47 control-different
 pre-update events,correct cadence and105 finite reports through2048 actions.
 Retain CPU co-host timing without correction. Check live state;never restart or

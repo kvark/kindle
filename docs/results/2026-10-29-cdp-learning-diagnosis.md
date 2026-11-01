@@ -22,7 +22,9 @@ arms are required. CPU preflight1.832s passes305 bounded/276 control pins and
 actual command/audit/observer checks. Launch06:15:51 UTC November1/sourcec659423,
 317 pins;startup.948s verifies357 initial tensors,47 bounded-matching/47
 control-different events and105 finite reports through2048 actions. The original
-learner and four observers are active;no full gameplay result is available.
+learner continues;100k/6227 recovery passes06:29:57 UTC with357 finite tensors.
+Separate.788s confirmation preserves exact metadata,317 pins and original process.
+Three other observers remain active;no full gameplay result is available.
 
 The [greedy-training execution check](2026-11-01-cdp-qbert-greedy-training.md)
 qualifies one collection-policy experiment:8192 actions/489 updates in66.241s,

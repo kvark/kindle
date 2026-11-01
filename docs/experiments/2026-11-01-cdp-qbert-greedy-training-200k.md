@@ -89,3 +89,33 @@ are finite and supervised. Configuration, sources and original process identity
 match. Keep CPU co-host timing without correcting training wall time.
 No full frozen result is available. Inspect this original run; never restart it
 or allocate another GPU job while it is active.
+
+## Halfway recovery checkpoint verified
+
+The original recovery observer succeeds06:29:57 UTC November1:100,000 actions /
+6,227 updates,357 finite tensors. Its complete-log-prefix check covers6,334 finite
+reports through101,712 actions while the original learner continues.
+
+A separate .788s CPU confirmation at06:30:27 verifies all317 pinned inputs,
+unchanged originalPID755504/invocation5fb0d30ffb5d47aca552009e586bb929,exact
+configuration and greedy-collection header,and all three checkpoint tensor-file
+hashes. Exact100k metadata is retained as `recovery-metadata-100k.json`,SHA256
+`74bfcfe034b1fb031bea07985e68f3dc1ab9285d8455fec255b9e31a6eb09e48`.
+Recovery reviewSHA256`6da37804fe8748a7979b813eae4728ebfc7cb757e89c0f2c2c0c19c537b7f215`.
+No GPU work or training restart occurs;do not repeat this confirmation.
+
+The independent `review_terminal.py` preflight passes in.056s using the retained
+control's four fixed24-episode evaluation arms and videos,and its five original
+service identities. Four journal fixtures cover null messages,duplicate starts,
+foreign invocations and failure messages. A prior CPU preflight assertion required
+a systemd accounting row from every observer;successful progress/recovery
+services have no such row. Preserve the original source and failure;the corrected
+check still requires terminal success,unique original invocation and main end
+record,with exact collector-child output. No original pipeline stage repeats.
+Use the qualified scriptSHA256
+`131bee461b853a96936667aa10d60915609178b268343bc5fc3ca70529fc0eba`
+only after all original services finish;it has not run final mode yet.
+
+The completed CPU Breakout intervention and these confirmations co-host with
+training;retain their measured times without correction. Progress,postprocessing
+and collection observers continue. No full frozen result or successor is selected.

@@ -21,7 +21,11 @@ final/actual-initial24-episode assessments against14,028.125 greedy/11,522.917
 sampled;mean15k/90% gate unchanged. CPU preflight1.832s passes305 bounded/276
 control pins and CLI/audit/observer checks. No full gameplay result or automatic
 successor exists. MainPID755504/invocation5fb0d30ffb5d47aca552009e586bb929;
-all four observers are active. Startup.948s passes317 pins,357 initial tensors,
+Recovery succeeds06:29:57 UTC at100k/6227 with357 finite tensors. Separate.788s
+confirmation06:30:27 verifies317 pins,original identity and tensor hashes,and
+preserves exact metadata. Three other observers remain active. Terminal-verifier
+preflight.056s passes;earlier optional-observer-accounting assertion is retained,
+zero original/GPU repeats. Startup.948s passes317 pins,357 initial tensors,
 47 bounded-matching/47 control-different events and105 finite reports through
 2048 actions. Preserve CPU co-host timing;check the original service before work.
 

@@ -21,7 +21,12 @@ Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100 remain. CPU preflight1.832s passes
 305 bounded/276 control pins and command/audit/observer checks. Root
 `/x/Temp/kindle-qbert-greedy-training-20261101/full`,service
 `kindle-qbert-greedy-training-200k-20261101`. MainPID755504/invocation
-`5fb0d30ffb5d47aca552009e586bb929`,317 pins;all four observers are active.
+`5fb0d30ffb5d47aca552009e586bb929`,317 pins. Recovery succeeds06:29:57 UTC:
+100k/6227,357 finite tensors. Separate.788s confirmation06:30:27 verifies317 pins,
+original process and tensor hashes,preserving exact100k metadata. Progress,
+postprocessing and collection remain active. Terminal-verifier preflight.056s
+passes after preserving an overly strict observer-accounting-row assertion;
+zero original/GPU repeats. Do not rerun recovery confirmation.
 Startup.948s passes357 initial tensors,47 bounded-matching/47 control-different
 events,correct cadence and105 finite reports through2048 actions. Retain CPU
 co-host timing without correction. Check live state before work;
