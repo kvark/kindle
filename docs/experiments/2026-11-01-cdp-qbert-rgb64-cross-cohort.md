@@ -1,9 +1,9 @@
 # Qbert RGB64: separate learner variation from evaluation-cohort variation
 
-**Selected and launched21:47:20 UTC November1/source63dd44a**, after original
-Breakout closure and idle-host/input checks. The four frozen arms are active;
-no crossed result is accepted yet. The CPU-only preparation below is retained
-historical qualification, not a pending request to repeat it.
+**Completed:**10007 stays ahead on both cohorts and passes15k in both;
+12011 misses15k in both, all24/24 first pyramids. Original services and all611
+inputs pass, withzero updates and no stage repeats. See the
+[accepted result](../results/2026-11-01-cdp-qbert-rgb64-cross-cohort.md).
 
 Prepare four frozen assessments within the existing five-game goal. The fixed
 RGB64 recipe scores15,710.417 on learner10007/cohort4000010007 and12,678.125
@@ -117,3 +117,19 @@ observerPID850986/invocation053db596d5a44ccab149a1d1f3063bb8 launches alongside.
 The exact prepared runtime, runner, checkpoint sources, four arms and caps stay
 unchanged. No CPU qualification, diagonal GPU assessment or learner repeats.
 Preserve these original services; do not overlap another GPU allocation.
+
+
+## Accepted terminal result
+
+The completed matrix is10007:15,710.417/16,218.750 versus12011:11,982.292/
+12,678.125, all24/24 first pyramids. Initial-subtracted gaps remain3,883.333/
+3,705.208. Cohort choice alone does not explain the learner difference;
+original12011 failure remains and no independent learner is added.
+
+All611 pins,357 invariant tensors per new arm, full outcome replays/videos,
+host guards andoriginal terminal collection pass. Four new arms total140,488
+actions/561,791 frames/117.899s,zero updates/truncations. Main/collector
+complete21:51:01/21:51:22 UTC November1/source63dd44a. Both original services
+succeed; no stage fails or repeats. No learner, build, extension, retry or
+automatic successor is selected. No GPU allocation remains at closure; do not
+rerun completed work. The five-game goal remains unfinished.
