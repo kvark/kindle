@@ -5,10 +5,17 @@ further improves sampled25.292→56.292 and greedy42.625→104.667,with training
 21m28s versus22m27s. Only encoder2e-5→4e-5 changes as a learner setting;
 native,exact runner and teacher stay fixed. Both modes improve substantially
 per training minute,with all audits passing,but remain0/24 two-wall successes.
-Retain4e-5 for this development recipe. This strengthens the case for encoder
-optimization without measuring the new candidate's representation precision,
-establishing a universal rate or identifying the remaining architectural cause.
-The earlier4M/expert10 rate4e-5 failure and reused seed/cohort limits remain.
+Retain4e-5 for this development recipe. The
+[fixed-state follow-up](2026-11-01-cdp-encoder4e5-representation.md) also improves
+combined-kernel ball x/y MAE7.554/6.515→6.028/4.192 source pixels and motion
+readouts. Near-descending teacher agreement rises62.50%→66.91%, but teacher
+probability falls.582→.573 and opposite-direction choices rise7→11 of89
+directional labels. All six replacement readouts still trail the learned actor.
+This strengthens the case for encoder optimization without identifying the
+remaining architectural cause, measuring candidate own-state coverage or
+establishing a universal rate. The earlier4M/expert10 rate4e-5 failure and reused
+seed/cohort limits remain. All473 diagnostic pins,357 invariant tensors per
+stage and full replay/host checks pass, with zero updates or repeated GPU work.
 
 The completed [Qbert encoder-rate comparison](2026-10-30-cdp-qbert-encoder-moderate.md)
 also improves frozen gameplay at nearly unchanged training cost: greedy

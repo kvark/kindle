@@ -62,3 +62,22 @@ Root`/x/Temp/kindle-encoder4e5-representation-20261101`,service
 `638cc43afd39fef14f6943242f6ee59dfd9d0e20c034c96df0880c794048f26b`.
 Use`/x/Temp/kindle-breakout-corrective-20261028/runtime`;check live state and
 host boot/driver pins before selection. No new learner is selected.
+
+## Completed result
+
+The [completed diagnostic](../results/2026-11-01-cdp-encoder4e5-representation.md)
+finds combined-kernel ball x/y MAE7.554/6.515→6.028/4.192 source pixels on555
+shared test rows, with better motion and response-target readouts. Near-descending
+teacher agreement rises62.50%→66.91%, but teacher-action probability falls.582→
+.573 and opposite-direction choices rise7→11 of89 directional labels. All six
+replacement readouts still trail the learned actor. No causal mechanism, head
+replacement or new learner is selected.
+
+All473 pins,357 invariant tensors per frozen stage, full20,960-action/83,799-frame
+replay, matched rows, original control/pixel metrics, prediction hashes and
+three host guards pass. Native actor qualification passes128/128 greedy choices,
+128 readbacks and16 prior feature rows, with maximum probability error8.515e-7
+against1e-4. Stage times are3.295/2.922/21.858s; CPU analyses3.333/1.539/.245s.
+Service succeeds03:44:02 UTC November1/sourcec17d723 after42.143s; original
+terminal collection succeeds03:44:41. Zero updates, failures or GPU repeats.
+No learner or GPU allocation is active at closure; check live state before work.

@@ -34,9 +34,17 @@ The earlier4M/B8/expert10 rate4e-5 failure remains negative evidence. This is a
 distinct12M/B16/expert100 regime on reusedseed1009/evaluation4000001009,not
 independent confirmation or a universal rate rule. The result supports encoder
 optimization as a productive direction at this budget. It does not identify the
-remaining architectural cause,measure this candidate's position readouts,resolve
-the earlier optimizer numerical-protocol failure or establish five-game reliability.
+remaining architectural cause, resolve the earlier optimizer numerical-protocol
+failure or establish five-game reliability.
 No extension,rate sweep,seed confirmation or automatic successor is selected.
+
+The subsequent [frozen representation diagnostic](2026-11-01-cdp-encoder4e5-representation.md)
+measures better combined-kernel ball x/y MAE7.554/6.515→6.028/4.192 and motion
+readouts on the same control states. Near-descending teacher agreement improves
+62.50%→66.91%, while teacher probability falls and opposite-direction choices
+increase. All473 pins,357 invariant tensors per stage and host/replay checks pass,
+with zero updates. This adds representation evidence without identifying the
+causal mechanism, measuring own-policy state coverage or selecting another learner.
 
 Final50k-action mask-corrected replay imitation CE falls.591395→.558097. These
 are changing replay distributions,not held-out accuracy or the cause of the

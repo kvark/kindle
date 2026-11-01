@@ -18,16 +18,22 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [selected frozen encoder4e-5 diagnostic](docs/experiments/2026-11-01-cdp-encoder4e5-representation.md) compares the stronger
-Breakout checkpoint with retained6e-6/2e-5 readouts on the exact20,960-action/
-83,799-frame control corpus. Keep954/509/601 splits and fixed linear/kernel
-readouts;reuse prior captures/fits. Three guarded stages require357 invariant
-tensors and zero updates;128 feature/128 actor/complete capture caps120/120/300s,
-three CPU analyses120s each,whole900s. The83 CPU checks and5.237s preflight pass
-three parsers,six profile rejections,seven actual config cases and55/289/358/227
-prior pins with zero native/emulator imports. Native447fe50 and actor math stay
-fixed. Root`/x/Temp/kindle-encoder4e5-representation-20261101`,same-named service.
-No new learner or gameplay evaluation;check live state before GPU work.
+The [completed encoder4e-5 representation diagnostic](docs/results/2026-11-01-cdp-encoder4e5-representation.md) finds more precise
+ball and motion readouts on the exact20,960-action/83,799-frame control corpus.
+Combined-kernel ball x/y MAE7.554/6.515→6.028/4.192 on555 shared test rows;
+pixel.059/.140 remains much more precise. Near-descending teacher agreement
+rises62.50%→66.91%,but teacher probability falls.582→.573 and opposite-direction
+choices rise7→11 of89 directional labels. All six replacement readouts trail
+the learned actor;no single causal mechanism or own-policy coverage is measured.
+All473 pins,357 invariant tensors per stage,128 native actor choices,16 prior
+feature rows,full replay,matched splits,predictions and three host guards pass.
+Stage times3.295/2.922/21.858s,CPU analyses3.333/1.539/.245s;service succeeds
+03:44:02 UTC November1/sourcec17d723 after42.143s,collection03:44:41. The83 CPU
+checks pass;native447fe50 and actor math stay fixed. Prior6e-6/2e-5 captures/fits
+are reused,zero updates/failures/GPU repeats. Root/service
+`kindle-encoder4e5-representation-20261101` under`/x/Temp`. No new learner,
+loss,head replacement or gameplay evaluation;five-game goal remains unfinished.
+No GPU allocation active at closure;check live state before work.
 
 The [completed Breakout encoder4e-5 comparison](docs/results/2026-11-01-cdp-breakout-encoder4e5.md) finishes200k actions/
 799,581 frames/12,477 updates in21m28s,4.43% less training time than2e-5 control.
