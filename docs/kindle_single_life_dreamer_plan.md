@@ -7,7 +7,7 @@ bae3fe2dd4a24070ab2845a7828145fa. Fix200k actions/18,715 updates within30min,
 expert100;native447fe50,runneraba4300d and faster teacherfa261c53 unchanged.
 Startup passes18:34:31:357 initial tensors match control and bounded check,
 47 pre-update events match,correct cadence and295 finite reports through3,528
-actions. Progress,recovery,postprocessing and collection observers are active.
+actions. Progress,postprocessing and collection remain active;recovery has passed.
 Require100k/9,340 four-file recovery and final/actual-initial greedy-primary
 and sampled24-episode arms against14,339.583/13,761.458,original15k/90% gate.
 The [bounded check and CPU qualification](results/2026-11-01-cdp-qbert-encoder8e5.md) pass;largest conservative
@@ -17,6 +17,13 @@ co-host timing remains without correction. Root`/x/Temp/kindle-qbert-encoder8e5-
 service`kindle-qbert-encoder8e5-200k-20261101`. No full frozen result yet.
 Do not restart or overlap GPU work. No extension,sweep,confirmation or automatic
 successor. The five-game goal remains unfinished.
+
+The original100k recovery passes18:44:43 UTC November1 at100,000 actions/
+9,340 updates,357 finite tensors. All four files are retained (179,536,495
+bytes) in.270s;the recovery observer is terminal success. Original main
+PID831942/invocationbae3fe2dd4a24070ab2845a7828145fa continues with final200k
+and all four frozen assessments pending. This verifies recovery,not gameplay.
+Do not rerun completed recovery or diagnostic stages. Retain CPU co-host timing.
 
 The [Breakout full-width paddle diagnostic](results/2026-11-01-cdp-breakout-paddle-crop.md) acceptszero of42,303
 selected decisions:24 initial/reset,37,960 extra-red,4,285 image-edge and34

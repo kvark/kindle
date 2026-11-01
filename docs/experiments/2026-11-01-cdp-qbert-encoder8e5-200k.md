@@ -77,3 +77,13 @@ postprocessing and collection observers are active. Retain1.534s startup CPU
 co-host time without correction. No full frozen score or gameplay benefit is
 established;do not restart this learner or overlap GPU work. Declaration
 SHA5eecf09e5a09678fab34da03cb2e904cec1e521a029b8e04d956b61cd2aeb7b0.
+
+The original100k recovery passes18:44:43 UTC November1 at100,000 actions/
+9,340 updates,357 finite tensors. All four files are retained (179,536,495
+bytes) in.270s;the recovery observer is terminal success. Original main
+PID831942/invocationbae3fe2dd4a24070ab2845a7828145fa continues with final200k
+and all four frozen assessments pending. This verifies recovery,not gameplay.
+Do not rerun completed recovery or diagnostic stages. Retain CPU co-host timing.
+
+Recovery metadata SHAaec77c4ee9f7904a83ffa1c856a52e7c5fbc7f5b877e062e025d01930166f750;
+retention SHA59c975dbda8f1d0f2fd2668c10c463c7810d3b014aa2349464d9faa40201ecc5.
