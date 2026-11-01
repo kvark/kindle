@@ -86,3 +86,23 @@ Declaration SHA`e4195829cfee830a49d3c033f7fc39a4dd3bc20f3d3af05d2aa17b9f9cc314c8
 startup SHA`9ba74c5828bcf72d8ae48d29ea5047f6bc58ff839b48f16fe5d022187dadb08a`.
 No frozen gameplay result is available. Do not restart the learner,repeat completed
 stages or schedule another GPU job while this original service is active.
+
+## First8192 actions match before the fade
+
+A separate CPU comparison fixes the first8192 full-learner actions,well before
+the declared100k fade boundary. All1024 transition records match,including8192
+actions,rewards,input pixel hashes,teacher labels and overrides. All489 learner
+reports,21 episode records and20 reset records match after excluding only wall
+clock fields,learner timing and the candidate's applied-weight field (required100).
+The original timing-inclusive comparison remains preserved; its observed
+differences are timing fields. Both passes use saved log prefixes,no native model
+or environment work. This establishes early recorded equivalence,not equality of
+uncaptured hidden state,gradients or parameters and not isolated causality.
+
+The original pass takes0.122s and semantic follow-up0.079s,
+co-hosted with the original learner;retain that cost without time correction.
+Evidence`/x/Temp/kindle-expert-decay-20261101/prefade-prefix-8192`;
+review SHA`b889bc5fcf3917c462b3219c8efab262470587dfc2763b06039dfacc215df13e`;
+semantic review SHA`3706f6962ea0d087d7537c51c27d73a39425a42a438549d7f60fae0ce53d5f5f`.
+The full learner remains active under its original PID/invocation;no GPU job,
+setting or declared input changes. Recovery and frozen gameplay remain pending.
