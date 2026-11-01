@@ -55,3 +55,16 @@ Root`/x/Temp/kindle-breakout-encoder8e5-20261101/native-check`,trial
 `kindle-breakout-encoder8e5-check-20261101`. Selection requires an idle host,
 clean source tree,matching boot/driver pins and completed original Qbert evidence.
 The five-game goal remains unfinished.
+
+## Completed bounded result
+
+The check launches04:43:09 UTC November1/source5e71622 only after the original
+Qbert pipeline and independent terminal confirmation pass. Service succeeds
+04:44:13; original collection04:44:36. Training8192 actions/32,725 frames/489
+updates takes46.730s; frozen1024 actions/4096 frames/.862s haszero updates and
+no natural episodes. All251 pins,357 matching initial/invariant frozen tensors,
+47 pre-update events,finite reports,full replay and both host guards pass.
+Conservative200k projection20m55s passes30min. No failure or GPU repeat occurs.
+See the [result](../results/2026-11-01-cdp-breakout-encoder8e5.md); no gameplay
+benefit or full learner is established. No GPU allocation remains active at
+closure;check live state before any separately selected next experiment.

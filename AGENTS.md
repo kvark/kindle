@@ -39,14 +39,17 @@ remain. Root`/x/Temp/kindle-qbert-encoder4e5-20261101/full`. No Qbert extension,
 confirmation or automatic successor;no active GPU allocation at closure.
 Check live state before work. The five-game goal remains unfinished.
 
-The [Breakout encoder8e-5 bounded check](docs/experiments/2026-11-01-cdp-breakout-encoder8e5.md)
-is CPU-prepared only:8192 actions/489 updates then1024 frozen actions,changing
-only encoder4e-5→8e-5 from the qualified12M64 control. Preflight1.625s passes
-two actual CLI paths,14 config cases,357 schema tensors and227 control pins,
-with zero native/environment construction. No declaration or GPU launch yet.
-Selection requires completed Qbert evidence,an idle host and matching sources.
-Root `/x/Temp/kindle-breakout-encoder8e5-20261101/native-check`.
-This selects no full learner or automatic promotion.
+The [completed Breakout encoder8e-5 check](docs/results/2026-11-01-cdp-breakout-encoder8e5.md)
+finishes8192 actions/32,725 frames/489 updates in46.730s;1024 frozen actions/
+4096 frames/.862s havezero updates and no natural episodes. All251 pins,357
+matching initial/invariant frozen tensors,47 pre-update events,finite reports,
+full input-pixel/action/label replay and both host guards pass. Conservative200k
+projection20m55s passes30min. Main succeeds04:44:13 UTC November1/source5e71622,
+original collection04:44:36;zero failures/GPU repeats. Only encoder4e-5→8e-5
+changes,native447fe50,exact runner,teacher and other12M64 settings fixed.
+Root`/x/Temp/kindle-breakout-encoder8e5-20261101/native-check`. Execution/cost
+are qualified;no gameplay benefit,full learner or automatic promotion selected.
+No GPU allocation remains active at closure;check live state before work.
 
 ## Direction and retained results
 

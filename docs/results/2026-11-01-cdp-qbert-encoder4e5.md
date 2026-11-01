@@ -23,6 +23,12 @@ seven. Greedy median15,037.5 exceeds its mean because of lower-scoring episodes;
 only13/24 individual greedy episodes reach15,000. These are descriptive
 development-cohort results,not confidence in superiority or a changed gate.
 
+On this same development seed,the primary greedy mean is close to the retained
+[H5/R32 point](2026-10-29-cdp-qbert-h5-r32.md)'s14,050,with about28 rather than
+40 minutes of training. H5/R32 still has the higher sampled mean13,331.250.
+This is a useful cost/quality tradeoff across recipes,not an isolated horizon,
+replay-ratio or encoder effect.
+
 ## What changed and what remains
 
 Only encoder2e-5→4e-5 changes in the retained12M48/Auto/N8/B16/T16/H15/R16/
