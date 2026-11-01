@@ -7,9 +7,12 @@ also improves frozen gameplay at nearly unchanged training cost: greedy
 means still miss15,000. All235 pins,initial/frozen/recovery checks,replays and
 original services pass. This adds development evidence that encoder optimization
 can matter to useful learning across these two recipes,not a causal mechanism
-or a universal rate. Seed4013/cohort are reused,runner plumbing differs as
-disclosed,and combination with H5/R32 remains unmeasured. Retain the stronger
-cheaper Qbert point;no successor is selected by this result.
+or a universal rate. Seed4013/cohort are reused and runner plumbing differs as
+disclosed. The subsequent [H5/R32 combination](2026-10-30-cdp-qbert-encoder-h5.md)
+does not improve its primary greedy score:14,050→13,889.583,while sampled
+13,331.250→13,738.542 improves slightly. Both means miss15,000. Retain6e-6 for
+the primary H5/R32 point and2e-5 for the cheaper H15/R16 point; their separate
+improvements do not establish a useful combined recipe.
 
 The completed [moderate encoder-rate comparison](2026-10-30-cdp-breakout-encoder-moderate.md)
 now supplies a useful training improvement: sampled13.208→25.292 and
@@ -18,6 +21,17 @@ The [fixed-state follow-up](2026-10-30-cdp-encoder-representation.md) also impro
 ball/motion readouts and near-paddle scalar-actor teacher agreement50%→62.5%.
 This motivates further representation investigation without establishing a
 causal mechanism or resolving the earlier full optimizer-protocol failure.
+
+The completed [late-imitation-decay comparison](2026-11-01-cdp-breakout-expert-decay.md)
+also narrows the objective question. Holding imitation through100k actions and
+fading it tozero by150k lowers sampled25.292→17.167 and greedy42.625→25.167 at
+the200k endpoint. The first100k recorded semantics match the constant control;
+online guidance and optimizer history remain. Retain constant expert100. Locally
+imperfect teacher actions and large imitation gradients did not imply that
+removing late imitation pressure would improve frozen control. The online
+last50-episode mean rises while frozen scores fall,so online returns remain
+unsuitable for selecting this aided learner. Native/runner differences and the
+reused development seed/cohort limit causal and reliability claims.
 
 The [own-trajectory CPU replay](2026-10-30-cdp-encoder-representation.md#own-policy-trajectories-show-a-smaller-agreement-gain)
 finds a smaller near-descending teacher-agreement change54.18%→57.59%,with
@@ -569,8 +583,10 @@ Source inspection confirms that CDP predicts the detached current CNN encoding
 from the recurrent state before that observation is consumed. Successive
 training states then receive real observations. Reward and continuation heads
 train on these corrected posterior states. The imagined actor instead uses
-prior rollouts without those corrections. There is no direct multi-step
-free-running supervised loss against recorded future targets.
+prior rollouts without those corrections. The retained recipe has no direct
+multi-step free-running supervised loss against recorded future targets. The
+optional three-step loss tested above is implemented but remains disabled after
+its negative gameplay and forecast comparisons.
 
 The critic already combines imagined and real-replay losses; replay scale is.3.
 The latter bootstraps with imagined returns from replay states, including in
@@ -598,7 +614,12 @@ Imagination is a major cost, making its contribution to policy improvement an
 important learning-efficiency question. Shortening it is not automatically a
 win; the previous Pong H5 comparison lost score.
 
-## Interpretation and next diagnostic direction
+## Initial interpretation and subsequent diagnostic direction
+
+The following interpretation preceded the completed critic-calibration,
+branched-action and three-step-loss tests recorded above. Those follow-ups now
+provide the counterfactual evidence and negative loss comparison; this is the
+historical rationale for them,not a request to repeat completed GPU stages.
 
 Prioritize live-belief critic calibration and actual branched action outcomes,
 especially after the first pyramid. Good forecasts along recorded paths do not
