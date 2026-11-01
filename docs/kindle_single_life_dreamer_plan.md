@@ -1,5 +1,23 @@
 # Kindle: CDP learning roadmap
 
+The [current Qbert RGB64 critic diagnostic](experiments/2026-11-01-cdp-qbert-rgb64-critic.md) is CPU-qualified
+for separate guarded selection. Capture new live values/bonuses on the retained
+10007/12011 sampled andgreedy trajectories, with exact semantic reproduction,
+357 invariant tensors andzero updates. One1024-action/120s check must pass
+before four24-episode arms at600k actions/300s each. Compare realized discounted
+returns with critic/constant/zero baselines before andafter the first pyramid;
+first episode perlane calibrates, nexttwo test. Sampled is primary for value
+calibration; greedy changes the behavior policy. No new learner or loss.
+
+Nine CPU tests pass; five actual CLI paths, both357-tensor sources and611 prior
+crossed-assessment inputs verify in5.165s (5.207s wrapper),22:00:36 UTC November1
+/source3011025. Zero native construction attempts; no build, queue or service.
+Use exact native447fe50/35ad0db andrunneraba4300d. Root
+`/x/Temp/kindle-qbert-rgb64-critic-20261101`; select only after clean committed
+sources andidle-host/input checks. Do not repeat successful preparation or
+completed ordinary assessments/replays. This collects previously absent values,
+not independent gameplay evidence. The five-game goal remains unfinished.
+
 The [completed Qbert RGB64 cross-cohort assessment](results/2026-11-01-cdp-qbert-rgb64-cross-cohort.md) keeps10007
 ahead on both cohorts:15,710.417/16,218.750 versus12011's11,982.292/12,678.125.
 Alltrained cells have24/24 first pyramids;10007 passes15k on both,12011 on
