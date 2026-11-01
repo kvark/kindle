@@ -1,7 +1,7 @@
 # CDP handover — October25,2026
 
 The [fresh Qbert25M/R16 comparison](experiments/2026-11-01-cdp-qbert-25m-r16-200k.md)
-launches16:54:10 UTC November1/source65f4cee with521 declared inputs. Startup
+launches16:54:11 UTC November1/source65f4cee with521 declared inputs. Startup
 passes16:54:28:357 initial tensors/47 pre-update transitions match the bounded
 25M check,correct cadence and96 finite supervised reports through1,912 actions.
 All47 cross-capacity control transitions differ;own actual initials are required.
