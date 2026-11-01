@@ -74,6 +74,10 @@ def audit(path):
             check(type(header.get("sticky_actions")) in (int, float)
                   and header["sticky_actions"] in (0.0, 0.25), "invalid sticky action probability")
         check(header["mode"] in ("train", "evaluate_sample", "evaluate_greedy"), "unknown action mode")
+        if "training_action_mode" in header:
+            check(header["training_action_mode"] in ("sample", "greedy"), "unknown training action mode")
+            check(header["mode"] == "train" and header.get("restored_checkpoint") is None,
+                  "training action mode requires fresh training")
         if "action_temperature" in header:
             temperature = header["action_temperature"]
             check(type(temperature) in (int, float) and math.isfinite(temperature)

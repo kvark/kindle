@@ -665,12 +665,13 @@ def test_episode_summary_requires_actual_boolean_boundaries(terminal, truncated)
 
 
 @pytest.mark.parametrize("behavior", ["default", "exploration", "ignored_override"])
+@pytest.mark.parametrize("training_action_mode", [None, "greedy"])
 @pytest.mark.parametrize("memory_enabled", [False, True])
 @pytest.mark.parametrize("encoder_kind,observation_size", [
     (None, None), (None, "64"), ("levjepa-tiny", None), ("levjepa-tiny", "64"),
     ("learned-cnn", None), ("cdp-disagreement", None)])
 @pytest.mark.parametrize("sticky_actions", [0.0, 0.25])
-def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled, encoder_kind, observation_size, sticky_actions):
+def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled, encoder_kind, observation_size, sticky_actions, training_action_mode):
     created = []
     learned = encoder_kind in ("learned-cnn", "cdp-disagreement")
     disagreement = encoder_kind == "cdp-disagreement"
@@ -727,6 +728,7 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
             self.replay_len += len(ids)
 
         def act(self, *, greedy, action_overrides=None):
+            assert greedy == (training_action_mode == "greedy")
             if behavior == "default":
                 assert action_overrides is None
                 self.selected = [0] * self.streams
@@ -767,6 +769,7 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
         *(["--cdp", "--cdp-centered", "--disagreement-scale", "1"] if disagreement else []),
         "--output", str(output), "--steps", "6", "--num-envs", "2", "--train-ratio", "0",
         "--sticky-actions", str(sticky_actions),
+        *(["--training-action-mode", training_action_mode] if training_action_mode else []),
         *(["--observation-size", observation_size] if observation_size else []),
         *(["--encoder", encoder_kind] if encoder_kind and not learned else []),
         *(["--min-gpu-budget-headroom-mib", "2048"] if memory_enabled else []),
@@ -791,6 +794,7 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     rows = [json.loads(line) for line in output.read_text().splitlines()]
     assert rows[0]["observation_size"] == (observation_size or "native")
     assert rows[0]["sticky_actions"] == sticky_actions
+    assert rows[0].get("training_action_mode") == training_action_mode
     assert rows[0]["wrapper_sha256"] == atari_vector.sha256_file(loaded_wrapper)
     assert ("learned_rgb_preprocessing" in rows[0]) == learned
     assert rows[0]["protocol"] == (VECTOR_PROTOCOL if behavior == "default" else EXPLORATION_PROTOCOL)

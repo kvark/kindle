@@ -120,6 +120,8 @@ def main():
     parser.add_argument("--restore", type=Path)
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--greedy", action="store_true")
+    parser.add_argument("--training-action-mode", choices=("sample", "greedy"),
+                        help="fresh training only: action selection for experience collection; default sample")
     parser.add_argument("--action-temperature", type=float,
                         help="sampled frozen restore only: positive native action softmax temperature")
     parser.add_argument("--greedy-posterior", action="store_true",
@@ -198,6 +200,9 @@ def main():
         parser.error("GPU budget headroom must be positive")
     if args.greedy and not args.evaluate:
         parser.error("greedy actions are only supported for frozen evaluation")
+    if args.training_action_mode is not None and (args.evaluate or args.restore):
+        parser.error("training-action-mode requires fresh training")
+    greedy_actions = args.greedy or args.training_action_mode == "greedy"
     if args.action_temperature is not None:
         if not math.isfinite(args.action_temperature) or not 2**-126 <= args.action_temperature <= float.fromhex('0x1.fffffep+127'):
             parser.error("action temperature must be a positive normal finite F32 value")
@@ -523,6 +528,7 @@ def main():
                   **(dict(learned_rgb_preprocessing=f"single GPU Pillow-equivalent antialiased bilinear resize to {agent.config['observation_kind'][3:]}x{agent.config['observation_kind'][3:]}, per-axis RGB8 rounding; CHW /255-0.5") if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
+                  **(dict(training_action_mode=args.training_action_mode) if args.training_action_mode is not None else {}),
                   **(dict(action_temperature=args.action_temperature) if args.action_temperature is not None else {}),
                   **(dict(posterior_mode="greedy") if args.greedy_posterior else {}),
                   **(dict(behavior_probe="live-posterior-v1") if args.probe_behavior else {}),
@@ -593,11 +599,11 @@ def main():
                              exploration.actions() if exploration else None)
                 override_argument = "expert_actions" if args.guidance_imitation_scale is not None else "action_overrides"
                 if corrective_labels:
-                    selected = agent.act(greedy=args.greedy, action_overrides=overrides,
+                    selected = agent.act(greedy=greedy_actions, action_overrides=overrides,
                                          expert_labels=exploration.expert_labels)
                 else:
-                    selected = (agent.act(greedy=args.greedy, **{override_argument: overrides})
-                                if exploration else agent.act(greedy=args.greedy))
+                    selected = (agent.act(greedy=greedy_actions, **{override_argument: overrides})
+                                if exploration else agent.act(greedy=greedy_actions))
                 if overrides is not None and any(forced is not None and selected[stream] != forced
                                                 for stream, forced in enumerate(overrides)):
                     raise ValueError("native action override was not honored")

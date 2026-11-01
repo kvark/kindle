@@ -123,7 +123,8 @@ def test_corrective_cli_rejects_old_native(monkeypatch,tmp_path,capsys):
         '--qbert-guidance-max-actions','1','--guidance-imitation-scale','1'],'native passive-label support')
 
 
-def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(monkeypatch,tmp_path):
+@pytest.mark.parametrize('training_action_mode', [None, 'sample', 'greedy'])
+def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(monkeypatch,tmp_path,training_action_mode):
     teachers=[];created=[];calls=[]
     class Teacher:
         pending=None
@@ -159,6 +160,7 @@ def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(mon
             obj=cls();obj.config=config;return obj
         def begin_episodes(self,ids,frames):self.replay_len+=len(ids)
         def act(self,greedy=False,action_overrides=None,*,expert_actions=None,expert_labels=None):
+            assert greedy == (training_action_mode == 'greedy')
             assert expert_actions is None and expert_labels is not None
             calls.append((list(action_overrides),list(expert_labels)))
             return [17 if forced is None else forced for forced in action_overrides]
@@ -174,11 +176,13 @@ def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(mon
     output=tmp_path/'run.jsonl'
     monkeypatch.setattr(sys,'argv',['atari_vector','ALE/Qbert-v5','--output',str(output),'--num-envs','2',
         '--steps','6','--train-ratio','0','--qbert-guidance-probability','1','--qbert-guidance-max-actions','1',
-        '--qbert-guidance-policy','continuation','--guidance-imitation-scale','1','--qbert-corrective-labels'])
+        '--qbert-guidance-policy','continuation','--guidance-imitation-scale','1','--qbert-corrective-labels',
+        *(['--training-action-mode',training_action_mode] if training_action_mode else [])])
     atari_vector.main()
     rows=[json.loads(line) for line in output.open()]
     assert rows[0]['gpu_device']==Agent.gpu_device and rows[0]['model_provenance']==Agent.provenance
     assert rows[0]['trainable_parameter_counts']==Agent.trainable_parameter_counts
+    assert rows[0].get('training_action_mode') == training_action_mode
     assert calls==[([0,0],[0,0]),([None,None],[2,2]),([3,3],[3,3])]
     assert [teacher.chosen for teacher in teachers]==[[(0,0),(2,17)],[(0,0),(2,17)],[(3,3)],[(3,3)]]
     assert [env.actions for env in created]==[[0,17,3],[0,17,3]]
