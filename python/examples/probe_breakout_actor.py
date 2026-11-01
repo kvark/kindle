@@ -81,7 +81,7 @@ def policy_metrics(probabilities, teacher, lanes, phases):
 
 
 def check_native(corpus_path, checkpoint, manifest, prior_smoke, output, *, compare_centroid100=False,
-                 compare_encoder2e5=False):
+                 compare_encoder2e5=False, compare_encoder4e5=False):
     import ale_py
     import gymnasium as gym
     import kindle
@@ -101,7 +101,7 @@ def check_native(corpus_path, checkpoint, manifest, prior_smoke, output, *, comp
     assert source['end'] == corpus['source_end'] and not source['accounting']['updates']
     config = json.loads((checkpoint/'metadata.json').read_text())['config']
     validate_capture_config(header['config'], config, compare_centroid100=compare_centroid100,
-                            compare_encoder2e5=compare_encoder2e5)
+                            compare_encoder2e5=compare_encoder2e5, compare_encoder4e5=compare_encoder4e5)
     assert config['actor_unimix'] == .01 and config['action_count'] == 18
     gym.register_envs(ale_py)
     verify_replay_identity(header, json.loads(manifest.read_text()), rom_identity(header['environment']))
@@ -166,7 +166,8 @@ def check_native(corpus_path, checkpoint, manifest, prior_smoke, output, *, comp
         previous_feature_rows=len(previous_features['indices']),unchanged_tensors=counts,
         probability_atol=PROBABILITY_ATOL,max_absolute_probability_error=difference,
         greedy_agreement=128,probabilities_sha256=sha(output/'probabilities.npz'),
-        compare_centroid100=compare_centroid100,compare_encoder2e5=compare_encoder2e5)
+        compare_centroid100=compare_centroid100,compare_encoder2e5=compare_encoder2e5,
+        compare_encoder4e5=compare_encoder4e5)
     write(output/'result.json',result)
     print(json.dumps(result),flush=True)
 
@@ -178,6 +179,8 @@ if __name__ == '__main__':
     comparison = parser.add_mutually_exclusive_group()
     comparison.add_argument('--compare-centroid100',action='store_true')
     comparison.add_argument('--compare-encoder2e5',action='store_true')
+    comparison.add_argument('--compare-encoder4e5',action='store_true')
     args=parser.parse_args()
     check_native(args.corpus,args.checkpoint,args.manifest,args.prior_smoke,args.output,
-                 compare_centroid100=args.compare_centroid100,compare_encoder2e5=args.compare_encoder2e5)
+                 compare_centroid100=args.compare_centroid100,compare_encoder2e5=args.compare_encoder2e5,
+                 compare_encoder4e5=args.compare_encoder4e5)

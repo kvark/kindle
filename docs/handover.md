@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [selected frozen encoder4e-5 diagnostic](experiments/2026-11-01-cdp-encoder4e5-representation.md) compares the stronger
+Breakout checkpoint with retained6e-6/2e-5 readouts on the exact20,960-action/
+83,799-frame control corpus. Keep954/509/601 splits and fixed linear/kernel
+readouts;reuse prior captures/fits. Three guarded stages require357 invariant
+tensors and zero updates;128 feature/128 actor/complete capture caps120/120/300s,
+three CPU analyses120s each,whole900s. The83 CPU checks and5.237s preflight pass
+three parsers,six profile rejections,seven actual config cases and55/289/358/227
+prior pins with zero native/emulator imports. Native447fe50 and actor math stay
+fixed. Root`/x/Temp/kindle-encoder4e5-representation-20261101`,same-named service.
+No new learner or gameplay evaluation;check live state before GPU work.
+
 The [completed Breakout encoder4e-5 comparison](results/2026-11-01-cdp-breakout-encoder4e5.md) finishes200k actions/
 799,581 frames/12,477 updates in21m28s,4.43% less training time than2e-5 control.
 Sampled56.292/greedy104.667 improve25.292/42.625 by122.57%/145.55%;own initials
