@@ -77,3 +77,13 @@ remains unfinished. Check live state before future work.
 | Original completion | `13a866441ccc836dbd9de52e0c2a2927a2a499daae50843533944b4657bf41e9` |
 | Private runner | `fe5cf3470e7fdaca69deecec0337909e66dd448d1d9ad30e57972378cab1dd07` |
 | Unchanged native | `35ad0db42fc7ed5dbaf6dacddff613fdc04d83ae6e0f38548532f6ab2c7812a2` |
+
+## Separate full comparison is CPU-qualified
+
+The [fresh200k protocol](../experiments/2026-11-01-cdp-breakout-dynamics1e4-200k.md)
+is now separately selected for preparation. Full CPU qualification passes in
+1.425s at21:14:22.950 UTC November1:five CLI commands,28 config cases,12 startup/
+four observer/eight recovery guards,four metadata/six retention/two actual-
+collector cases,44 paths/17 scripts andall250 bounded/227 control inputs.
+All357 bounded tensor shapes pass. The full runner equals the bounded runner;
+no native agent or emulator is constructed. No full learner has launched yet.

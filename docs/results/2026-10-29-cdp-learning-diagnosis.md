@@ -18,6 +18,16 @@ and6.533s CPU qualification pass. Root
 No full learner selected orGPU allocation active;check live state beforework.
 The five-game goal remains unfinished.
 
+The [separate fresh200k dynamics-group comparison](../experiments/2026-11-01-cdp-breakout-dynamics1e4-200k.md) is CPU-qualified for
+selection. Five CLI commands,28 config cases,12 startup/four observer/eight
+recovery guards,six retention/two actual-collector fixtures and44 paths/17 scripts
+pass in1.425s at21:14:22 UTC November1. All250 bounded/227 control inputs and357
+bounded tensors pass. Fix200k/12,477 updates/30min,retained100k/6,227 four-file
+recovery andfour final/actual-initial24-episode frozen arms against56.292/104.667.
+Keep the qualified runnerfe5cf347/native35ad0db andteacher;no bounded experience
+reuse,extension,cap change orautomatic successor. Fullroot
+`/x/Temp/kindle-breakout-dynamics1e4-20261101/full`;not launched yet.
+
 The [fresh Qbert RGB64 seed12011 confirmation](2026-11-01-cdp-qbert-rgb64-seed12011.md) completes but misses the
 unchanged15k gate: greedy12,678.125 andsampled12,093.750,each24/24 first pyramids.
 Own initials168.750/167.708 clear none. The fixed recipe passes onone of its two
