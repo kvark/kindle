@@ -16,10 +16,22 @@ frozen arms. Full service launches20:23:42 UTC November1/source34c6a88 with562 p
 PID842010/invocationd37840f258104f9caf8b6bc5c0316899. Startup passes357 own-bounded
 initial tensors,47 pre-update transitions and258 finite reports through3128 actions;
 all47 pre-update events differ from10007,as expected for another seed. Progress,
-100k recovery,postprocessing and collection observers are active. No frozen result,
-bounded experience reuse or third learner selected. Do not restart or overlap it.
+100k/9,340 recovery passes20:36:18 UTC:all357 finite tensors andfour retained
+files (206,067,159bytes) verify;metadata17ff65f5. The recovery observer succeeds;
+main/progress/postprocessing/collection continue with original identity. No frozen
+result,bounded experience reuse or third learner selected. Do not restart or overlap it.
 Root`/x/Temp/kindle-qbert-rgb64-seed12011-20261101/full`;check live state before
 work. The five-game goal remains unfinished.
+
+The [exact Breakout batched-policy capture](../experiments/2026-11-01-cdp-breakout-policy-readback.md) is CPU-qualified,
+not GPU-selected or launched. Reuse qualified readoutf864fe4b/native447fe50 plus
+readout only;preserve12M64/encoder4e-5/.01unimix andoriginal greedy actions.
+All37,016 actions/148,038frames,31,161 selected decisions and120 life-clipped
+windows/3,816 unique rows align. Six fixture groups/264 inputs pass in6.385s
+at20:37:04 UTC November1,with562 active Qbert pins andoriginal identity preserved.
+Require Qbert's complete terminal receipt andidle host before separate selection;
+no executable GPU queue or declaration exists yet. No new learner or native build.
+Root`/x/Temp/kindle-breakout-policy-readback-20261101`;retain CPU co-host timing.
 
 The [fixed current-pixel action readout](2026-11-01-cdp-breakout-pixel-action-readout.md) fails its screen:
 learned+pixel kernel57.40% overall/55.15% near-descending teacher agreement,
