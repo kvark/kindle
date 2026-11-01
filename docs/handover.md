@@ -1,17 +1,21 @@
 # CDP handover — October25,2026
 
 The [fresh Qbert 300k comparison](experiments/2026-11-01-cdp-qbert-300k-full.md)
-is selected after both cost projections pass the fixed 35-minute training cap.
-Retain 12M48/Auto/N8/B16/T16/H5/R24/encoder4e-5/base behavior4e-5/greedy
-collection/expert100 and the qualified faster teacher. Fix 300k/28,090 updates,
-100k/9,340 and 200k/18,715 four-file recoveries, then final/actual-initial greedy
-primary and sampled 24-episode assessments against retained14,339.583/13,761.458.
-All full CPU checks pass at17:41:16 UTC; no full learner has started at this
-review. Root `/x/Temp/kindle-qbert-300k-20261101/full`; service
-`kindle-qbert-300k-20261101`. Check live state; do not start overlapping GPU work.
-The bounded check is complete:8,192/733 in48.112s, frozen1,024/.819s, all497
-inputs/357 tensors/replays/guards pass, no failures or repeats. Main17:39:38/
-collection17:39:42 UTC/source257cc0e. No bounded experience is reused.
+is running from17:42:10 UTC November1/source7bd5001 with524 pinned inputs.
+Fix 300k/28,090 updates and a35-minute training cap at12M48/Auto/N8/B16/T16/
+H5/R24/encoder4e-5/base behavior4e-5/greedy collection/expert100, using the
+qualified faster teacher. Startup passes357 control/bounded-matching initial
+tensors,47 paired pre-update transitions,correct cadence and485 finite reports
+through5,544 actions. PID826399/invocation6947a8ed4d734296a1cff8e1af8113b6;
+original progress,recovery,postprocessing and collection services are active.
+Require100k/9,340 and200k/18,715 four-file recoveries,then fixed-final/actual-
+initial greedy-primary and sampled24-episode arms against14,339.583/13,761.458.
+No full frozen result exists. Root `/x/Temp/kindle-qbert-300k-20261101/full`;
+service `kindle-qbert-300k-20261101`. Do not restart or overlap GPU work.
+The bounded check is complete:8,192/733 in48.112s,frozen1,024/.819s;all497 inputs,
+357 tensors,replays/guards pass withzero failures or repeats. Main17:39:38/
+collection17:39:42/source257cc0e. No bounded experience is reused. The startup
+CPU check co-hosts1.545s without time correction. The five-game goal is unfinished.
 
 The [completed Qbert25M/R16 comparison](results/2026-11-01-cdp-qbert-25m-r16.md)
 finishes200k actions/799,786frames/12,477 updates in23m40.953s,17.08% less time

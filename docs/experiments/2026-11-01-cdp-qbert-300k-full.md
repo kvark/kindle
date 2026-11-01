@@ -69,3 +69,15 @@ retention fixtures, four retention/collector integration cases at both
 milestones, 51 resolved paths and 17 compiled scripts. All 497 bounded and
 442 control inputs and 357 initial schemas pass. No native agent or environment
 is constructed, and no preparation/qualification failure occurs.
+
+
+The full learner launches at17:42:10 UTC November1/source7bd5001 with524 pinned
+inputs, PID826399/invocation6947a8ed4d734296a1cff8e1af8113b6. Original progress,
+recovery,postprocessing and collection observers are active. Startup passes at
+17:42:48:357 initial tensors match both controls,all47 pre-update transitions
+match,first six updates follow376/392/400/408/424/432,and485 finite supervised
+reports cover5,544 actions. Declaration
+SHA7bd6d5a12991fcc74d003f06c40aa0dac4908aee9fa11797624c40190979fe51.
+The1.545s CPU startup wrapper co-hosts with training;retain without time correction.
+No failure or GPU-stage repeat occurs;no frozen gameplay result exists yet.
+Do not restart the learner or schedule another GPU allocation while it is active.
