@@ -1,7 +1,8 @@
 # CDP handover — October25,2026
 
-The [bounded Breakout dynamics-group1e-4 check](experiments/2026-11-01-cdp-breakout-dynamics1e4.md) is CPU-qualified for
-separate selection. Change only dynamics-group4e-4→1e-4;keep encoder/base/actor
+The [bounded Breakout dynamics-group1e-4 check](experiments/2026-11-01-cdp-breakout-dynamics1e4.md) launches21:07:40 UTC November1/sourcee333fa0
+with250 pins,PID847195/invocation03896c77109f470ea5f1097dc8b92477. Change only
+dynamics-group4e-4→1e-4;keep encoder/base/actor
 4e-5,12M64/Auto/B16/T16/H15/R16/expert100 andnative447fe50. The rate covers
 recurrent dynamics,posterior,prediction andexploration together;benefit is unknown.
 The runner exposes the existing native config with12 identical production/private
@@ -9,7 +10,9 @@ lines;471 vector tests pass. CPU preflight6.533s completes21:06:53 UTC November1
 two CLI paths,15 config cases,357 schema tensors,227 control inputs andcadence
 pass without native/emulator construction. Fix8192/489 then1024 frozen,180/60s
 caps;no full learner orautomatic successor. Root
-`/x/Temp/kindle-breakout-dynamics1e4-20261101/native-check`;check live state.
+`/x/Temp/kindle-breakout-dynamics1e4-20261101/native-check`;native header confirms
+all four rates andunchanged native35ad0db. Original service isactive;do not restart
+or overlap. No accepted bounded result yet.
 
 The [fresh Qbert RGB64 seed12011 confirmation](results/2026-11-01-cdp-qbert-rgb64-seed12011.md) completes but misses the
 unchanged15k gate: greedy12,678.125 andsampled12,093.750,each24/24 first pyramids.

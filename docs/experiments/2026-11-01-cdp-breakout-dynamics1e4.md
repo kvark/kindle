@@ -74,3 +74,11 @@ CPU preflight completes21:06:53.232 UTC November1 in6.533s: two actual CLI paths
 The private runner has exactly the same12 added lines as the production change,
 with no removed lines or other runner edits. No native module,agent or emulator
 is constructed. The check remains unlaunched until separate selection below.
+
+Separate selection passes250 pins;declaration SHA256
+`9df05e237d53a3520804812418521a39d7ed07ce05f9e262f3275a386b5b1c9b`.
+The original check launches21:07:40.819 UTC November1/sourcee333fa0,
+PID847195/invocation03896c77109f470ea5f1097dc8b92477. Its native header confirms
+base/encoder4e-5,dynamics1e-4,behavior unset,native35ad0db andprivate runnerfe5cf347.
+The original service is active; no bounded result is accepted yet. Do not overlap
+or restart it. The original CPU collector must run once after terminal success.
