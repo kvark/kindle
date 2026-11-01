@@ -1,5 +1,11 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fixed H5/R24 Qbert temperature0.5 assessment](2026-11-01-cdp-qbert-h5-r24-temperature.md)
+also lowers mean return:12,840.625 versus greedy14,339.583 and sampled13,761.458,
+each24/24 first pyramids. Exact default compatibility and all frozen/replay audits
+pass. Retain greedy;this inference change does not close the later-play score
+gap or establish an architectural cause. No learning or repeated stage occurs.
+
 The [completed400k/R8 comparison](2026-11-01-cdp-breakout-r8.md) doubles Breakout
 experience at almost fixed updates but adds12.06% time:sampled56.292→56.708,
 greedy104.667→97.583,allzero two-wall. Learning time stays near19min;acting and

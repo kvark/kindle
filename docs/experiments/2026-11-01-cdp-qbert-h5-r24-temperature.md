@@ -99,3 +99,10 @@ pinned inputs. Original mainPID801574/invocation6ce4cfed31e44e73aef685bb38ed64b7
 collectorPID801577/invocation9958da4efa804075953dee40d9f7b943. No qualification
 repeats. DeclarationSHA256`f646b008336c3796711ec765a0f46a01f403c096923df81c9d3b0c7abc11ae8a`.
 Inspect these original services;do not restart or repeat completed GPU stages.
+
+## Completed
+
+The fixed assessment closes successfully13:59:17 UTC. Temperature0.5 lowers
+mean score to12,840.625 versus retained greedy14,339.583;both24/24 first pyramids.
+Retain greedy. See the [complete result and limits](../results/2026-11-01-cdp-qbert-h5-r24-temperature.md).
+No retry,sweep,extension or automatic successor;do not repeat completed stages.

@@ -41,16 +41,17 @@ gameplay. Original unreceipted preflight/tool-output loss remains;separate compl
 service preflight passes. Root`/x/Temp/kindle-breakout-unseen-center-20261101/standard24`.
 Do not repeat completed stages. No GPU allocation is active;check live state.
 
-The [fixed Qbert R24 temperature assessment](docs/experiments/2026-11-01-cdp-qbert-h5-r24-temperature.md)
-is active from13:55:56 UTC November1/source1308ffb,558 pins. Original mainPID801574/
-invocation6ce4cfed31e44e73aef685bb38ed64b7;collectorPID801577. Service
-`kindle-qbert-h5-r24-temperature-20261101`,root`/x/Temp/kindle-qbert-h5-r24-temperature-20261101`.
-Four frozen default/temperature.5 arms require exact sampled compatibility,
-357 invariant tensors,24 natural episodes,full replays/videos/guards and the
-original15k/90% gate. Retained greedy14,339.583 is primary. Reuse qualified
-runtimee416696 and CPU preflight;zero learning,no build. Inspect this original
-process;do not restart,repeat passed stages or allocate concurrent GPU work.
-No inference result exists yet;no sweep,retry or automatic successor.
+The [completed Qbert R24 temperature assessment](docs/results/2026-11-01-cdp-qbert-h5-r24-temperature.md)
+scores12,840.625/24 first pyramids at0.5 versus greedy14,339.583/24;retain greedy.
+Default sampled13,761.458 reproduces exactly;own initials171.875/203.125 clear
+zero pyramids. All558 pins,357 invariant tensors per arm,default semantic traces,
+full replays/videos and guards pass. Four arms125,944actions/503,626frames/105.190s,
+zero updates/truncations;original28m34s training stays. Main/collector succeed
+13:59:10/13:59:17 UTC November1/source1308ffb,originalPID801574/invocation
+6ce4cfed31e44e73aef685bb38ed64b7. Both services terminal,no failure or repeat.
+Root`/x/Temp/kindle-qbert-h5-r24-temperature-20261101`;do not rerun completed
+stages. No sweep,retry or automatic successor. No active GPU allocation;
+check live state. The five-game goal remains unfinished.
 
 The [completed Qbert R32 comparison](docs/results/2026-11-01-cdp-qbert-h5-r32-greedy.md)
 finishes200k/24,954updates in34m59.741s,+22.53% versus R24. Greedy14,057.292/23
