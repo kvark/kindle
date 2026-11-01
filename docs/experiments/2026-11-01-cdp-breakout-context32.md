@@ -84,3 +84,12 @@ selects only8192/481 plus1024 frozen,no full learner or automatic promotion.
 Launch15:51:35 UTC November1/sourcec2f7abf,originalPID812306/invocation
 `c51dbe709ad14d8289d6a921769c621c`;261 inputs pinned. Service
 `kindle-breakout-context32-check-20261101` is active. No full learner selected.
+
+## Completed bounded result
+
+Main succeeds15:52:52 and original collection15:53:01 UTC November1. Training
+8,192/32,730frames/481updates takes53.799s;frozen1,024/.870s haszero updates/no
+natural episodes. Conservative200k24m04.805s passes30min. All261 inputs,357
+matching/invariant tensors,47 common-prefix events,full replay and guards pass.
+No failed or repeated GPU stage. No full learner or automatic promotion selected;
+host idle at closure. See the [completed result](../results/2026-11-01-cdp-breakout-context32.md).

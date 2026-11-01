@@ -15,21 +15,17 @@ source6089e8b. No failed or repeated GPU stage;CPU co-host caveats remain.
 Root`/x/Temp/kindle-qbert-behavior8e5-20261101/full`;complete,do not rerun.
 No Qbert extension,rate sweep or confirmation selected;the goal is unfinished.
 
-The [Breakout B8/T32 bounded check](experiments/2026-11-01-cdp-breakout-context32.md) is separately selected after
-completed Qbert closure and an idle-host check. Fix8,192 actions/481 updates,
-first504,then1,024 frozen actions;30min projected200k gate. Native447fe50/
-runner6c1b69fb/teacher and other encoder4e-5 settings stay fixed. Longer temporal
-gradients also change sequence diversity,target rows240→248 and warmup;cached
-recurrent history already exists. Old context negatives remain. CPU qualification
-passes both CLI paths,15 config cases,357 schema tensors,227 control inputs and
-four prefix fixtures in.663s;protected wrapper3.201s completes15:33:44 UTC.
-Do not repeat qualification. Root`/x/Temp/kindle-breakout-context32-20261101/native-check`,
-service`kindle-breakout-context32-check-20261101`;check live state before work.
-This selects only execution/cost measurement,no full learner or automatic successor.
-
-Launch15:51:35 UTC November1/sourcec2f7abf,originalPID812306/invocation
-`c51dbe709ad14d8289d6a921769c621c`;261 inputs pinned. Service
-`kindle-breakout-context32-check-20261101` is active. No full learner selected.
+The [completed Breakout B8/T32 bounded check](results/2026-11-01-cdp-breakout-context32.md) passes8,192 actions/
+32,730frames/481updates in53.799s;1,024 frozen/.870s haszero updates/no natural
+episodes. Conservative200k projection24m04.805s passes30min. All261 inputs,357
+matching initial/invariant frozen tensors,47 common-prefix events,481 finite
+supervised reports,full pixel/action/label replay and both host guards pass.
+Main15:52:52/original collection15:53:01 UTC November1/sourcec2f7abf;no failure,
+GPU repeat,cap change or native edit. Longer gradients also change diversity,
+target rows and warmup;cached recurrent history already exists. Native447fe50/
+runner6c1b69fb/teacher stay fixed. Root`/x/Temp/kindle-breakout-context32-20261101/native-check`.
+Complete,do not rerun. No full learner or automatic successor selected;the host
+is idle at closure. Gameplay benefit remains unmeasured;the goal is unfinished.
 
 The [saved Breakout takeover-state join](results/2026-11-01-cdp-breakout-takeover-states.md) finds onlytwo of21 earlier-only
 rescues have projected contact withinfive actions at delay16;14 already match
