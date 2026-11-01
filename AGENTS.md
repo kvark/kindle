@@ -20,6 +20,15 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [bounded Qbert H3/R24 check](docs/experiments/2026-11-01-cdp-qbert-h3-r24.md)
+is active from14:06:29 UTC November1/source8dad414,475 inputs,originalPID803406/
+invocation07ea5ce078ca457e8d610b205db5eefb. Service`kindle-qbert-h3-r24-check-20261101`,
+root`/x/Temp/kindle-qbert-h3-r24-20261101/native-check`. ChangeH5→3 only atR24;
+8,192 actions/733 updates then1,024 frozen,35min conservative200k cost gate.
+Native447fe50/runneraba4300d/teacher unchanged;CPU preflight passes. No full learner
+selected. Inspect this original process;do not restart or allocate concurrent
+GPU work. No sweep,retry,extension or automatic successor.
+
 The [completed Breakout400k/R8 comparison](docs/results/2026-11-01-cdp-breakout-r8.md)
 finishes400k/12,489updates in24m03.031s,+12.06% time. Sampled56.708 versus56.292
 is nearly unchanged;greedy97.583 versus104.667 falls6.77%,all0/24 two-wall.
