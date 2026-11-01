@@ -68,3 +68,19 @@ checkpoint selection,ratio sweep,confirmation learner or automatic successor.
 [Bounded result](../results/2026-11-01-cdp-qbert-h5-r32-greedy.md),
 [retained control](../results/2026-11-01-cdp-qbert-h5-r24-seed10007.md),
 [later-play diagnostic](../results/2026-11-01-cdp-qbert-h5-r24-phases.md).
+
+## Launch and startup
+
+The fresh comparison launches **12:10:19 UTC November1**,source
+`4a10fcc2b9453ca823b405c393a81efb7939cf3d`,with490 pins. Original mainPID792387/invocation
+`460e0220583948f4b088b5dc7c92956a`;progress,recovery,postprocessing and terminal
+collection observers run under their first invocations. Startup passes
+12:10:39 in1.474s wrapper:all490 pins,357 matching initial tensors against
+control and bounded check,47 identical pre-update semantic events,exact config
+and cadence376/384/392/400/408/416,and157 finite supervised reports through
+1,632 actions. No full frozen result is available. Retain this CPU co-host time
+without correction. Inspect the original process;do not restart it or allocate
+another GPU job while active. Require100k/12,454 recovery and all four fixed
+assessments. No extension,ratio sweep or automatic successor.
+
+DeclarationSHA256`e316c8006702248d861c31ef02357f0fedbfa882d9036627f107fd2bf4d6203c`.

@@ -53,3 +53,19 @@ unchanged gate. No full outcome,extension,ratio sweep or successor exists yet.
 | declaration.json | `2fffe6af5f7a97413fa1e0554b480c4f0d316a7211f0ac107c37144809bfb022` |
 | review.json | `8b73fc76eebb87b95fe098b5c52aa95c1db1e73a0aa775e570e62794806eb912` |
 | guidance-replay.json | `af5e995aed154a468adf9515acd349f3c5a6fd2e958f02b1da7ad7a9294d576a` |
+
+## Launch and startup
+
+The fresh comparison launches **12:10:19 UTC November1**,source
+`4a10fcc2b9453ca823b405c393a81efb7939cf3d`,with490 pins. Original mainPID792387/invocation
+`460e0220583948f4b088b5dc7c92956a`;progress,recovery,postprocessing and terminal
+collection observers run under their first invocations. Startup passes
+12:10:39 in1.474s wrapper:all490 pins,357 matching initial tensors against
+control and bounded check,47 identical pre-update semantic events,exact config
+and cadence376/384/392/400/408/416,and157 finite supervised reports through
+1,632 actions. No full frozen result is available. Retain this CPU co-host time
+without correction. Inspect the original process;do not restart it or allocate
+another GPU job while active. Require100k/12,454 recovery and all four fixed
+assessments. No extension,ratio sweep or automatic successor.
+
+DeclarationSHA256`e316c8006702248d861c31ef02357f0fedbfa882d9036627f107fd2bf4d6203c`.

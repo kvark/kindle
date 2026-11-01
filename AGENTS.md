@@ -27,15 +27,18 @@ All479 pins,357 matching/invariant tensors,47 pre-update events,full guided
 replay and guards pass. Main/collector12:07:15/12:07:53 UTC November1/source3bfce40,
 PID791920/invocatione48b450a02c64928be90711e05063f2a;terminal,no GPU repeat.
 CPU invalid-seed preflight failure and two preparer wording failures remain.
-The [separate fresh200k comparison](docs/experiments/2026-11-01-cdp-qbert-h5-r32-greedy-200k.md) is selected,not yet launched:
-R24→32 on reused10007,keep12M48/Auto/N8/B16/T16/H5/encoder4e-5/greedy collection/
+The [separate fresh200k comparison](docs/experiments/2026-11-01-cdp-qbert-h5-r32-greedy-200k.md) launches12:10:19 UTC/source4a10fcc with490 pins. MainPID792387/invocation
+460e0220583948f4b088b5dc7c92956a;all four observers active. Startup12:10:39
+passes357 control/bounded-matching tensors,47 pre-update events,correct cadence
+and157 finite reports through1632 actions. R24→32 on reused10007,keep12M48/Auto/N8/B16/T16/H5/encoder4e-5/greedy collection/
 expert100/native447fe50/runneraba4300d/teacher. Require100k/12454 recovery and
 final/actual-initial sampled/greedy24-episode assessments against13,761.458/
 14,339.583,each24 first pyramids;original15k/90% gate,45min training cap. Full
 CPU preflight3.400s and plot import.085s pass. Root
 `/x/Temp/kindle-qbert-h5-r32-greedy-20261101/full`;service
-`kindle-qbert-h5-r32-greedy-200k-20261101`. Check live state before work.
-No outcome,retry,extension,ratio sweep or automatic successor.
+`kindle-qbert-h5-r32-greedy-200k-20261101`. Check this original live process;
+do not restart it or allocate concurrent GPU work. No full outcome,retry,
+extension,ratio sweep or automatic successor.
 
 The [completed six-feature Breakout response-history fit](docs/results/2026-11-01-cdp-breakout-response-history.md)
 fails its fixed screen:held-out MAE1.976923→1.997426 overall and1.948802→1.958316
