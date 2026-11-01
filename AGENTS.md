@@ -37,6 +37,12 @@ The bounded check is complete:8,192/733 in48.112s,frozen1,024/.819s;all497 input
 collection17:39:42/source257cc0e. No bounded experience is reused. The startup
 CPU check co-hosts1.545s without time correction. The five-game goal is unfinished.
 
+The original100k/9,340 recovery passes17:52:47 UTC,with357 finite tensors and
+all four files retained (179,536,495 bytes). Retention takes.269s;the separate
+.086s hash check passes17:53:28 with the original learner identity unchanged.
+Keep CPU co-host time without correction. The200k recovery and full frozen
+results are pending;do not rerun the completed100k checks.
+
 A separate [CPU prefix comparison](docs/experiments/2026-11-01-cdp-qbert-budget-prefix.md)
 is selected with15 inputs after14 fixtures pass. It waits for the retained200k
 recovery,then compares all first200k transitions/reports/episodes and357 saved
