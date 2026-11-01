@@ -71,3 +71,18 @@ environment is constructed. Two CPU preparation failures are retained: a convert
 was imported as a module export although it is local to the audit function,and
 a service-name substitution also changed the historical control path. Both are
 corrected before declaration/launch,with zero repeated GPU stages.
+
+## Launched and startup verified
+
+The original service starts02:27:56 UTC November1,source90b1c7e,
+PID728595/invocation`2c767c73ae394a30b2ea792b28eb3aff`. Startup at02:28:22 UTC
+verifies236 pins,357 initial tensors matching bounded check and retained control,
+47 pre-update transitions,exact config/cadence and213 finite reports through3784
+actions. Applied imitation weight is100. Main,progress,recovery,postprocessing and
+terminal-collection observers are active. The read-only startup audit takes.965s
+co-hosted with training; retain that caveat without wall-time correction.
+
+Declaration SHA`e4195829cfee830a49d3c033f7fc39a4dd3bc20f3d3af05d2aa17b9f9cc314c8`;
+startup SHA`9ba74c5828bcf72d8ae48d29ea5047f6bc58ff839b48f16fe5d022187dadb08a`.
+No frozen gameplay result is available. Do not restart the learner,repeat completed
+stages or schedule another GPU job while this original service is active.

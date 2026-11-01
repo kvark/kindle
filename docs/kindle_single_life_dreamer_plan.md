@@ -9,17 +9,21 @@ loss comparisons have not established a better recipe. Compare any new learner
 by frozen gameplay gained per training minute,with bounded checks before a full
 allocation. Backend optimization and broad sweeps remain parked.
 
-The [fresh Breakout imitation-decay comparison](experiments/2026-11-01-cdp-breakout-expert-decay-200k.md) is selected after native
-qualification and the46.991s bounded check. Hold expert100 through update6227
-(100k actions),fade tozero by9352 (150k),then finish200k/12,477 under30min.
+The [fresh Breakout imitation-decay comparison](experiments/2026-11-01-cdp-breakout-expert-decay-200k.md) launches02:27:56 UTC November1
+/source90b1c7e with236 pins and a30-minute training cap. Hold expert100 through
+update6227 (100k actions),fade tozero by9352 (150k),then finish200k/12,477.
 Keep12M64/Auto/N8/B16/T16/H15/R16/encoder2e-5,teacher guidance and labels; native
 65ed45f and runner differ from retained447fe50,so no isolated causal claim.
-Require100k recovery and final/actual-initial sampled/greedy24-episode assessments
-against25.292/42.625,all0/24 two-wall. Five CLI paths,30 config cases,7 schedule
-cases,416 bounded/173 control pins and observer checks pass;two CPU preparation
-failures are retained without GPU work. Root`/x/Temp/kindle-expert-decay-20261101/full`,
-service`kindle-breakout-expert-decay-200k-20261101`. Check live state;do not restart
-or overlap an active learner. No gameplay result is available;goal unfinished.
+Startup verifies357 tensors matching control/check,47 pre-update transitions,
+correct cadence/weight and213 finite reports through3784 actions. MainPID728595,
+invocation2c767c73ae394a30b2ea792b28eb3aff; progress,recovery,postprocessing and
+collection observers are active. Require100k/6227 recovery and final/actual-initial
+sampled/greedy24-episode assessments against25.292/42.625,all0/24 two-wall.
+Two CPU preparation failures are preserved; no GPU stage repeats. The.965s CPU
+startup co-host caveat remains without time correction. Root
+`/x/Temp/kindle-expert-decay-20261101/full`,service`kindle-breakout-expert-decay-200k-20261101`.
+Check live state;do not restart or overlap this learner. No frozen result yet;
+the five-game goal remains unfinished.
 
 The [optional native imitation decay](results/2026-11-01-cdp-expert-imitation-decay.md) passes F64 loss/gradient checks at
 weights100/50/0 and fresh Breakout8192 actions/32,724 frames/489 updates in46.991s.
