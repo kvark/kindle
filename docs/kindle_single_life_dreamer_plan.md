@@ -10,16 +10,34 @@ Learner10007/evaluation4000010007 were absent from67 examined Qbert declarations
 only seeds change,no prior experience or isolated seed-mechanism claim.
 Startup1.320s passes442pins,357finite same-shape tensors,48 initial differences
 (38world/sevenbehavior/threeslowvalue),correct cadence and519 finite supervised
-reports through5912 actions. Original progress,recovery,postprocess and collection
-observers are active. Qualified supplemental observerPID781776/invocation
-2ac890dae7314082b6bc41472f15322b launches10:12:48;it preserves100k metadata and
-confirms terminal evidence once. No full frozen result exists.
+reports through5912 actions. The100k/9340 recovery passes10:26:52 with357 finite
+tensors and9545 finite reports through102,184 actions. Independent1.137s
+confirmation passes10:27:09,preserving exact metadata,all442 pins and original
+identity. Recovery is terminal success;progress,postprocess,collection and
+supplemental observerPID781776/invocation2ac890dae7314082b6bc41472f15322b remain
+active. No completed check repeats. No full frozen result exists.
 Root`/x/Temp/kindle-qbert-h5-r24-seed10007-20261101/full`,service
 `kindle-qbert-h5-r24-seed10007-200k-20261101`;inspect original identity,do not
 restart or allocate another GPU job while active. Prior3.729s controller and
 1.285s terminal CPU qualifications pass;do not repeat passed checks. Retain CPU
 co-host timing. No retry,extension,cap increase or automatic successor.
 The five-game goal remains unfinished.
+
+The [completed CPU Breakout teacher contact diagnostic](results/2026-11-01-cdp-breakout-teacher-contact-errors.md)
+records120 selected life losses;65 pass fixed geometry filters. Mean absolute
+landing/paddle errors1.852/4.943 pixels versus.370/2.317 on674 filtered successful
+contacts. In38 fitted losses,model offset is inside half the detected width but
+reconstructed offset is outside. Retain55 rejected losses/102 rejected success
+contacts;no unbiased failure probability or causal diagnosis. Prioritize response
+prediction/uncertainty checks;no teacher,loss or learner change selected.
+Full52,072-action/208,254-frame policy/debug/pixel/outcome and raw RGB-hash replay
+passes.44.731s replay/1.420s analysis/48.646s controller completes10:25:39 UTC
+November1/sourcef658f2a;16 CPU tests,34 diagnostic/442 active pins and.005s
+independent recount pass. Original QbertPID781585/invocation539c22282c4e42c7a22bc150961ef963
+stays unchanged;retain CPU co-host time. Zero native/GPU work,updates,failures or
+repeated original stages. Root`/x/Temp/kindle-breakout-teacher-contact-errors-20261101`;
+complete,do not rerun replay/analysis/qualification. No automatic successor.
+
 
 The [completed Breakout H5/R24 comparison](results/2026-11-01-cdp-breakout-h5-r24.md)
 finishes200k actions/799,605 frames/18,715 updates in22m50s,+6.42% training

@@ -74,3 +74,21 @@ New evidence/code root:
 `/x/Temp/kindle-breakout-teacher-contact-errors-20261101`.
 The new annotation replay supplies missing evidence; it does not rerun any
 completed original controller, collector or analysis stage.
+
+## Completed diagnostic
+
+The44.731s annotation replay and1.420s analysis complete10:25:39 UTC November1,
+sourcef658f2a,with48.646s total controller time. Full52,072-action/208,254-frame
+policy/debug/pixel/action/outcome replay and the original raw RGB hash pass.
+All34 diagnostic/442 active inputs and the original Qbert identity stay unchanged.
+No failure,retry,native import,GPU work or repeated original stage occurs.
+
+All120 selected life losses are retained;65 pass the fixed contact filters.
+Their mean absolute landing/paddle errors are1.852/4.943 pixels, versus.370/2.317
+on674 filtered successful contacts. In38 fitted losses, predicted offset is
+inside half the detected width while reconstructed offset is outside. Retain
+55 rejected losses and102 rejected prior-success contacts explicitly; this is
+not unbiased failure probability or causal diagnosis. The.005s independent
+JSON recount verifies24 episode life balances andten scalar means.
+See the [result and limits](../results/2026-11-01-cdp-breakout-teacher-contact-errors.md).
+No teacher/loss change or successor is selected. Do not repeat completed stages.
