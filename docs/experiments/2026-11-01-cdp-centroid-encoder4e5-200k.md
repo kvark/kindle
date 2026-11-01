@@ -63,3 +63,34 @@ Root `/x/Temp/kindle-centroid-encoder4e5-20261101/full`, prospective service
 `kindle-breakout-centroid-encoder4e5-200k-20261101`. At protocol preparation no
 full preflight, declaration, queue or service exists. Select only after all
 qualification passes. The five-game goal remains unfinished.
+
+## CPU qualification before selection
+
+Full command/audit/observer qualification passes at11:14:22 UTC November1 in
+2.610s (2.767s wrapper):five actual CLI paths,18 positive/negative configuration
+cases,seven startup cases,four observer parser cases,five recovery-body cases,
+46 resolved path checks and16 compiled scripts. The corrected372-tensor schema,
+357 shared initial values and489/6227/12477 update counts pass;302 bounded and
+227 control inputs remain unchanged. Native capabilities are stubbed, and native
+and environment constructors are forbidden. No agent or emulator is constructed.
+
+Separate qualification in the actual plotting interpreter passes at11:14:23 in
+.698s (.765s wrapper):plot/comparison/exposure/checkpoint imports, the retained
+control reader,357 shared initial values, a rendering fixture and the new bounded
+log's8,192-action/489-report guidance/centroid exposure accounting. Its outputs
+are isolated from the completed bounded trial. All201 qualified build-source
+hashes resolve, using the recorded2974160 Git blobs where current bytes differ.
+
+Preparation corrected stale dynamically assembled collector unit names before
+the first test, and added retention of all100k checkpoint files and exact metadata
+while the original learner continues. The collector verifies original invocation
+identities, the startup review and retained recovery hashes. The qualified runner,
+native binary and training recipe are unchanged. No failed qualification, repeat,
+native build or GPU allocation occurs during this preparation.
+
+Select the separately declared fresh learner next; no full declaration, queue or
+service exists at this qualification update. Do not rerun passed qualification.
+
+- `full-preflight.json`: `51296d7544152b4d0487c9838feb39c689caff650b34550dd441472ca9c7f5cc`.
+
+- `plot-exposure-preflight.json`: `ae52c23612dec85a2417282bc17230ce63bc2c7a91d7ab41e6613bca6c336541`.

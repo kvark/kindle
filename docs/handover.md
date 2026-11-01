@@ -28,10 +28,16 @@ or repeats. Conservative200k projection21m10s passes30min;competence unmeasured.
 Native2974160/exact runner unchanged;no build. Root
 `/x/Temp/kindle-centroid-encoder4e5-20261101/native-check`;complete,do not rerun.
 Next prepare the [separate fresh200k comparison](experiments/2026-11-01-cdp-centroid-encoder4e5-200k.md)
-against retained4e-5 sampled56.292/greedy104.667,all0/24 two-wall. Require full
-CPU qualification and historical source resolution before selection. No full
-preflight,declaration,queue or learner exists yet. No allocation is active;check
-live state. No retry,extension,cap increase or automatic successor.
+against retained4e-5 sampled56.292/greedy104.667,all0/24 two-wall. Full CPU
+qualification passes11:14:22 UTC:five commands,18 config cases,seven startup
+cases,four observer argument cases,five recovery cases,372 schema tensors,357
+shared values and exact schedules in2.610s. Plot/import/exposure qualification
+passes in.698s;all201 historical source hashes resolve. Before qualification,
+stale collector service names were corrected and100k checkpoint retention added.
+No native/emulator construction,build,failure or repeated check. Select the
+fresh200k learner under the fixed30-minute cap;no declaration,queue or GPU
+allocation exists at this preparation update. Check live state before launch.
+No retry,extension,cap increase or automatic successor.
 
 The [completed CPU Breakout settling-cost check](results/2026-11-01-cdp-breakout-edge-settling.md) lowers the retained
 edge-reset teacher185.375→80.375 on eight reused episodes,withonly2/8 lanes
