@@ -93,3 +93,22 @@ repeating original stages. The original pipeline and its deadlines are unchanged
 
 At24,576 actions/1513 updates,training elapsed151.225s. No full frozen result
 is available. Preserve the original learner;do not overlap GPU work.
+
+## Halfway recovery
+
+The original observer passes100k/6227 recovery08:06:11 UTC November1,with357
+finite tensors and6403 finite reports in the complete prefix through102,824
+actions. The independent confirmation observer runs its qualified recovery mode
+once at08:06:22 in.843s. Exact metadata and all tensor hashes,272 input pins and
+originalPID766156/invocationd07a6c26ba914fe9a6032d8ec765b0dd remain unchanged.
+
+Recovery review SHA256
+`61885097cbec0a0321c761c232636f697b3c737fd7f5d3af07c18c3a5f0de4e2`;preserved
+`recovery-metadata-100k.json` SHA256
+`b389d62e83b7431d46c4798eebb96fb14430d7a2c5fa76d56f41a125fa16f15c`.
+Do not rerun recovery confirmation;the same CPU observer awaits final closure.
+
+The completed8039 exposure recount and unselected cross-cohort CPU preparation
+co-host with training;retain their recorded durations and the first preparation
+checker failure without time correction. No new GPU allocation is selected.
+The original learner continues;final frozen gameplay remains unmeasured.

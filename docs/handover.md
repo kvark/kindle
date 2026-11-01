@@ -17,9 +17,29 @@ through2104 actions. Four original observers are active. Independent.799s CPU
 terminal preflight passes control scores/services,journal fixtures,272 active pins
 and original identity;one separate CPU observer will run recovery/final confirmation
 once after original prerequisites. Do not run these confirmations manually while
-that observer is active. Training reaches24,576 actions/1513 updates in151.225s;
-final task quality remains unmeasured. No experience reuse,extension,cap increase
-or automatic successor. Check live state;do not restart or overlap GPU jobs.
+that observer is active. Original100k/6227 recovery passes08:06:11 UTC,with357
+finite tensors and6403 finite reports through102,824 actions. Independent.843s
+confirmation passes08:06:22,preserving exact metadata,all tensor hashes,272 pins
+and the same original identity. Do not rerun recovery confirmation. Final task
+quality remains unmeasured. No experience reuse,extension,cap increase or
+automatic successor. Check live state;do not restart or overlap GPU jobs.
+
+An unselected Qbert cross-cohort diagnostic is CPU-prepared at
+`/x/Temp/kindle-qbert-cross-cohort-20261101`. Four new greedy arms would assess
+4013 final/actual-initial on4000008039 and8039 final/actual-initial on4000004013;
+reuse the completed diagonal assessments without repeating them. This could
+separate observed frozen-agent/cohort dependence,not overwrite8039's failed gate
+or isolate weights from checkpoint configuration/posterior randomness.
+Preflight5.637s/command5.671s passes08:06:08 UTC November1/source37e5f3c:four
+actual CLI paths,32 header cases,357 finite tensors in each of four source
+checkpoints,388 preparation/272 active Breakout pins and original identity.
+A first CPU check assumed newer optional CLI fields;its source/failure is retained
+in`preparation-failure`,and only checker defaults/explicit flag absence are fixed.
+Exact runneraba4300d/native447fe50 remain,no native/emulator construction or GPU
+work. No queue,declaration,assessment log or service exists. Do not rerun preparation.
+The private`protocol-draft.md` is unselected;guarded controller/collector and a
+separate repository protocol/declaration remain required after complete Breakout
+closure,independent confirmation and an idle host. No automatic allocation.
 
 The [completed bounded Breakout check](results/2026-11-01-cdp-breakout-greedy-training.md) passes8192 actions/32,740 frames/
 489 updates in46.633s;1024 frozen/4076 frames/.874s haszero updates and eight

@@ -17,9 +17,12 @@ through2104 actions. Four original observers are active. Independent.799s CPU
 terminal preflight passes control scores/services,journal fixtures,272 active pins
 and original identity;one separate CPU observer will run recovery/final confirmation
 once after original prerequisites. Do not run these confirmations manually while
-that observer is active. Training reaches24,576 actions/1513 updates in151.225s;
-final task quality remains unmeasured. No experience reuse,extension,cap increase
-or automatic successor. Check live state;do not restart or overlap GPU jobs.
+that observer is active. Original100k/6227 recovery passes08:06:11 UTC,with357
+finite tensors and6403 finite reports through102,824 actions. Independent.843s
+confirmation passes08:06:22,preserving exact metadata,all tensor hashes,272 pins
+and the same original identity. Do not rerun recovery confirmation. Final task
+quality remains unmeasured. No experience reuse,extension,cap increase or
+automatic successor. Check live state;do not restart or overlap GPU jobs.
 
 The [completed bounded Breakout check](2026-11-01-cdp-breakout-greedy-training.md) passes8192 actions/32,740 frames/
 489 updates in46.633s;1024 frozen/4076 frames/.874s haszero updates and eight
