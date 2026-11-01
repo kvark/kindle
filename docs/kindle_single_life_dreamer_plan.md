@@ -10,9 +10,12 @@ original8039's failed gate stays unchanged. Breakout is fully closed and the
 host idle at selection. CPU command/controller qualifications pass;their two
 checker failures and co-host timing remain preserved. Root
 `/x/Temp/kindle-qbert-cross-cohort-20261101`,service
-`kindle-qbert-cross-cohort-20261101`. No new learner,retry,cap increase or automatic
-successor. Do not rerun qualifications or completed diagonal GPU stages;check
-live state before work and do not overlap assessments.
+`kindle-qbert-cross-cohort-20261101`. Launch08:24:54 UTC November1/source63fce09,
+413 pins,originalPID770056/invocationd56c32f594864b018418ed008250835f;collector
+PID770059/invocatione17b21c8b78648fb8aeccf316d7cc5df. The first crossed final
+run and outcome replay finish;the full matrix remains pending. No new learner,
+retry,cap increase or automatic successor. Do not rerun qualifications or completed
+diagonal GPU stages;check live state before work and do not overlap assessments.
 
 The [completed Breakout greedy-collection comparison](results/2026-11-01-cdp-breakout-greedy-training.md) finishes200k/
 799,639 frames/12,477 updates in21m46s. Sampled39.042/greedy99.083 fall30.64%/

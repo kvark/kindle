@@ -67,3 +67,12 @@ Root `/x/Temp/kindle-qbert-cross-cohort-20261101`;main service
 do not rerun successful preflights. Launch once after the selection commit,
 clean-worktree,input-hash and idle-host checks. Cohort dependence is unmeasured
 at selection;the five-game goal remains unfinished.
+
+## Original launch
+
+Launch08:24:54 UTC November1,source63fce09,413 pinned inputs. MainPID770056/
+invocation`d56c32f594864b018418ed008250835f`;collectorPID770059/invocation
+`e17b21c8b78648fb8aeccf316d7cc5df`. The first4013-on8039 final run completes
+08:25:49 with a passing host guard;its outcome replay finishes08:26:13 with
+24 first pyramids. Remaining arms and terminal comparison are pending. No
+original stage repeats;keep this original process and collector running.
