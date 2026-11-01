@@ -1,17 +1,21 @@
 # CDP handover — October25,2026
 
-The [bounded Qbert encoder8e-5 check](experiments/2026-11-01-cdp-qbert-encoder8e5.md) is selected for preparation:
-8,192 actions/733 updates then1,024 frozen actions. Only encoder4e-5→8e-5
-changes as a learner setting at12M48/Auto/N8/B16/T16/H5/R24/base behavior4e-5/
-greedy collection/expert100. Native447fe50,runneraba4300d and faster teacher
-fa261c53 stay. Require both conservative200k estimates≤30min before considering
-a full learner;no full run is selected. CPU qualification passes18:28:48 UTC
-November1:2 CLI paths,19 config cases,357 schemas,442 control inputs,16 package
-files and exact schedules. Original redundant-replacement preparation failure
-is preserved;separate repair keeps six completed files unchanged. No GPU work
-has launched at this review. Root`/x/Temp/kindle-qbert-encoder8e5-20261101`;
-service`kindle-qbert-encoder8e5-check-20261101`. Check live state before launch.
-No rate sweep,extension,repeated life or automatic promotion. Goal unfinished.
+The [Qbert encoder8e-5 check](results/2026-11-01-cdp-qbert-encoder8e5.md) completes8,192 actions/32,759frames/
+733 updates in48.423s;1,024 frozen/.808s haszero updates/no natural episodes.
+All499 inputs,357 matching/invariant tensors,47 pre-update events,full replay
+and guards pass. Main succeeds18:30:47/collection18:30:52 UTC November1,
+source70f73e4. The larger conservative200k estimate22m57.614s passes30min.
+A [separate fresh200k comparison](experiments/2026-11-01-cdp-qbert-encoder8e5-200k.md) is selected for preparation:
+12M48/Auto/N8/B16/T16/H5/R24/encoder8e-5/base behavior4e-5/greedy collection/
+expert100;native447fe50,runneraba4300d and faster teacherfa261c53 stay.
+Require100k/9,340 recovery and four final/actual-initial24-episode arms against
+14,339.583 greedy/13,761.458 sampled,original15k/90% gate. CPU qualification
+passes18:32:52:five CLI paths,30 config cases,retention/collector integration,
+four exposure-budget cases,51 paths/17 scripts,499 bounded/442 control pins.
+Original preparation and CPU selector-test failures remain;one repaired full
+CPU preflight rerun passes,no GPU stage repeats. No full learner has launched
+at this review. Root`/x/Temp/kindle-qbert-encoder8e5-20261101`;check live state.
+No rate sweep,extension or automatic confirmation. Goal unfinished.
 
 The [completed Qbert300k comparison](results/2026-11-01-cdp-qbert-300k.md)
 finishes300,000 actions/1,199,763frames/28,090 updates in31m18.803s,+9.64% time

@@ -62,3 +62,10 @@ agent or environment is constructed. The timing-reference projection is
 initially stops on a redundant text-replacement assertion;original source and
 failure receipt remain. A separate repair verifies the six completed files
 unchanged and finishes preparation without repeating a GPU or qualified stage.
+
+The check completes18:30:47 UTC,original collection18:30:52:8,192 actions/
+32,759frames/733 updates in48.423s;1,024 frozen/.808s,zero updates/no natural
+episodes. All499 inputs,357 initial/invariant tensors,47 pre-update events,
+replay and guards pass,no GPU repeats. The larger200k estimate22m57.614s
+passes30min. See the [result](../results/2026-11-01-cdp-qbert-encoder8e5.md)
+and separately selected [full protocol](2026-11-01-cdp-qbert-encoder8e5-200k.md).
