@@ -1,26 +1,27 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
 The [current Qbert RGB64 action-ranking comparison](../experiments/2026-11-01-cdp-qbert-rgb64-ranking.md)
-passes CPU qualification 22:13:29 UTC November 1, sourced08bcf2: 53 tests, four
-actual CLI paths, both357-tensor checkpoints and64 preceding critic pins. The
-single CPU oracle reproduces78,368 actions plus154,591 branch frames in30.410s,
-with128 fixed origins, eight reverse-order checks and unchanged parent states.
-All60 preparation pins verify; no native construction, failure or repeated oracle.
+launches22:14:15 UTC November 1/source4aa6ac7 with64 pinned inputs. Original
+mainPID856594/invocation315da71b11fb44e49522fc7bf72708fa; collectorPID856597/
+invocation98afbe048fa74f398cfa851bbf02ce29. Both128-action bounded captures pass
+in3.458s/2.581s,19 forecasts each, repeated-plan/live-state checks,357 invariant
+tensors andhost guards,zero updates. The full pair is active; no ranking result
+is available yet. Preserve identities and do not overlap another GPU allocation.
 
-Compare10007/12011 on identical recorded10007 greedy histories. Each128-action
-bounded capture must pass before the two78,368-action full captures. Rank18
-four-step action holds followed by recorded continuation through15 steps,
-against paired emulator outcomes;64 origins before and64 after the first pyramid.
-Keep native447fe50/35ad0db and each model's own config/RNG; the new explicit
-probe option permits only seed12011 to differ. Scalar posterior draws differ
-from each other and the original vector actor. No isolated weights, adaptive
-policy, expected-return or reliability claim; current H5 training horizon stays.
+Compare10007/12011 on identical recorded10007 greedy histories:78,368 actions
+per capture,128 origins,18 four-step action holds followed by recorded actions
+through15 steps. Keep native447fe50/35ad0db and each model's own config/RNG; the
+explicit probe option permits only seed12011 to differ. Scalar posterior draws
+differ from each other and the original vector actor. No isolated weights,
+adaptive-policy, expected-return or reliability claim; H5 training stays fixed.
 
-Root `/x/Temp/kindle-qbert-rgb64-ranking-20261101`; service
-`kindle-qbert-rgb64-ranking-20261101`. GPU selection/launch follows the committed
-qualification. No learner, build, loss change, retry, cap increase, extension or
-automatic successor. Do not repeat the successful CPU oracle/preparation.
-The five-game goal remains unfinished; check live state before GPU work.
+All53 CPU tests, four CLI paths, both357-tensor source schemas and64 preceding
+critic pins pass. The single CPU oracle reproduces78,368 actions plus154,591
+branch frames in30.410s,128 origins/eight reverse-order checks, unchanged parent
+states. No failure or repeated oracle. Root
+`/x/Temp/kindle-qbert-rgb64-ranking-20261101`; service
+`kindle-qbert-rgb64-ranking-20261101`. No learner, build, loss change, retry,
+cap increase, extension or automatic successor. The five-game goal remains open.
 
 The [completed Qbert RGB64 critic diagnostic](2026-11-01-cdp-qbert-rgb64-critic.md)
 finds useful predictions in both learners: sampled R² .689/.558 for 10007/12011,

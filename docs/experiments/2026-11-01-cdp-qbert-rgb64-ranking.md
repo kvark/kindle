@@ -1,8 +1,8 @@
 # Current Qbert action rankings on shared observation histories
 
-**CPU qualification complete:** 53 tests, four actual CLI commands, both
-357-tensor checkpoints and the single new emulator oracle pass. GPU selection
-follows recording these results; no capture has run at this qualification point.
+**Running:** original service launches22:14:15 UTC November 1/source4aa6ac7.
+Both128-action bounded captures pass; the full pair is active. No complete
+ranking result is available yet. Preserve original main/collector identities.
 
 The current RGB64 critics predict useful returns on their own policies, with
 different later-play biases. Test the current models' action-dependent forecasts
@@ -101,3 +101,18 @@ successful preparation or the oracle.
 
 Oracle SHA256 `3b5bbe0962a1453eca0ebab85878d95eceac7f287fb0cb53a9496bedb3de48ca`;
 preflight `a57bdcb590f0caabcedbe2e6d1afc40db4f2ad68ef8c54cdae2ae8253a6f94b3`.
+
+
+## Original launch and bounded captures
+
+All64 selected pins pass; declaration SHA256
+`a7a76524c86bf304e17f6d3a1063ea9e356db6ebb56478f988f670d9dfac70ee`.
+Original main starts22:14:15.257 UTC November 1/source4aa6ac7, PID856594/
+invocation315da71b11fb44e49522fc7bf72708fa. Original collectorPID856597/
+invocation98afbe048fa74f398cfa851bbf02ce29 launches alongside.
+
+The10007/12011 bounded captures pass128 actions each in3.458s/2.581s. Each
+checks19 forecasts plus a repeated recorded plan, finite predictions, unchanged
+live state/probabilities/counters, all357 invariant tensors and host guard,
+withzero updates. No failure or repeated stage. The full pair proceeds under
+the fixed original controller. Do not overlap another GPU allocation.
