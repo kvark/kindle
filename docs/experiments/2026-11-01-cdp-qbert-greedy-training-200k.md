@@ -75,3 +75,17 @@ Root `/x/Temp/kindle-qbert-greedy-training-20261101/full`, trial
 `qbert-12m-48-b16-r16-encoder4e5-greedy-expert100-200k-seed4013`, service
 `kindle-qbert-greedy-training-200k-20261101`. This investigation is part of the
 existing five-game goal, which remains unfinished.
+
+## Launch and startup
+
+The original learner launches 06:15:51 UTC November1, sourcec659423, with317
+pinned inputs. MainPID755504, invocation `5fb0d30ffb5d47aca552009e586bb929`;
+progress, recovery, postprocessing and terminal-collection observers are active.
+The .948s read-only startup review verifies all357 initial tensors against both
+control and bounded check, all47 pre-update semantic events against the greedy
+bounded run, and records47 expected differences from sampled collection.
+First updates occur at376/392/408/424/440/456;105 reports through2048 actions
+are finite and supervised. Configuration, sources and original process identity
+match. Keep CPU co-host timing without correcting training wall time.
+No full frozen result is available. Inspect this original run; never restart it
+or allocate another GPU job while it is active.

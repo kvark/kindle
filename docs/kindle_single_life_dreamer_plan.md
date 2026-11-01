@@ -1,7 +1,8 @@
 # Kindle: CDP learning roadmap
 
 The [fresh greedy-training Qbert comparison](experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
-is selected within this five-game goal. The completed training-history readout
+launches06:15:51 UTC November1/sourcec659423 within this five-game goal.
+The completed training-history readout
 motivates testing later autonomous experience; the bounded check qualifies
 execution/cost only. Fresh200k/12,477 updates under35min changes live training
 collection sampled→greedy,keeping12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/
@@ -9,7 +10,10 @@ expert100,native447fe50,teacher and losses. Require100k recovery and four fixed
 final/actual-initial24-episode assessments against14,028.125 greedy/11,522.917
 sampled;mean15k/90% gate unchanged. CPU preflight1.832s passes305 bounded/276
 control pins and CLI/audit/observer checks. No full gameplay result or automatic
-successor exists. Check the original service before allocating GPU work.
+successor exists. MainPID755504/invocation5fb0d30ffb5d47aca552009e586bb929;
+all four observers are active. Startup.948s passes317 pins,357 initial tensors,
+47 bounded-matching/47 control-different events and105 finite reports through
+2048 actions. Preserve CPU co-host timing;check the original service before work.
 
 The [completed greedy-training Qbert check](results/2026-11-01-cdp-qbert-greedy-training.md)
 finishes8192 actions/32,761 frames/489 updates in66.241s;1024 frozen/.798s haszero

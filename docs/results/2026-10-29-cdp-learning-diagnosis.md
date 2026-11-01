@@ -7,7 +7,10 @@ movement fit; it does not prove a coverage cause. Keep native447fe50,losses,
 teacher and12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100. Primary control
 14,028.125 greedy,secondary11,522.917 sampled;100k recovery and four fixed24-episode
 arms are required. CPU preflight1.832s passes305 bounded/276 control pins and
-actual command/audit/observer checks. No full gameplay result is available.
+actual command/audit/observer checks. Launch06:15:51 UTC November1/sourcec659423,
+317 pins;startup.948s verifies357 initial tensors,47 bounded-matching/47
+control-different events and105 finite reports through2048 actions. The original
+learner and four observers are active;no full gameplay result is available.
 
 The [greedy-training execution check](2026-11-01-cdp-qbert-greedy-training.md)
 qualifies one collection-policy experiment:8192 actions/489 updates in66.241s,
