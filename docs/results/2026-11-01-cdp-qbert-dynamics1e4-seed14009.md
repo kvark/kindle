@@ -1,8 +1,9 @@
 # Fresh Qbert dynamics1e-4 seed14009 confirmation
 
 **Full confirmation is active**,launched23:27:17 UTC November1 with768 pins.
-Startup matches its bounded initialization and609 finite reports; final frozen
-results remain pending. The completed bounded qualification below isretained.
+Startup matches its bounded initialization and609 finite reports. The original
+100k/9,340 recovery passes with357 finite tensors andfour retained files;final
+frozen results remain pending. The completed bounded qualification below isretained.
 
 The [fixed bounded check](../experiments/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
 completes **8,192 actions / 32,755 frames / 733 updates in57.303s**. Frozen
@@ -102,3 +103,28 @@ Keep the fixed200k/18,715/30min budget,100k/9,340 recovery andfour frozen arms.
 No final frozen result isavailable. Preserve the original main andobservers;
 do not restart oroverlap another GPU allocation. Bounded experience isnot reused.
 Fresh confirmation andthe five-game goal remain unfinished.
+
+
+## Original100k recovery passes
+
+The original recovery observer completes **23:40:24.950 UTC November1** under
+PID863783/invocation`ff8f7644f9d041bfb9b494d6760f5088`. The100,000-action/
+9,340-update checkpoint has357 finite tensors. Itsfour retained files total
+206,067,158 bytes;retention takes.319s andpreserves the source. The observer
+also checks9,735 sequential finite reports through104,216 actions. Recovery
+metadataSHA256`af0a7d123c834a36aa36ae661812fccdc6c9722aa9042e22761986191c94a3e4`;
+retentionSHA256`eddcdd6e8111622dc4e97e52220e48e289618e8c7e38e175f75b7f30479ad0ba`.
+
+A separate2.216s read-only confirmation (2.236s wrapper) completes23:41:11 UTC,
+checks all768 active inputs,allfour retained hashes,exact original invocation
+andthe single recorded recovery audit/completion. It does not repeat the audit,
+copy,collector orGPU work. MainPID863643/invocation80c3cd392a2c45e68c200e362ab6c00c
+remainsactive;progress,postprocess andcollection continue. Keep co-host timing
+without correction. Final200k/18,715/30min andallfour frozen assessments remain
+unchanged andpending;no midpoint evaluation orcheckpoint selection occurs.
+
+The [prepared Breakout critic diagnostic](../experiments/2026-11-01-cdp-breakout-current-critic.md)
+adds9.541s repaired CPU preparation plus its retained test/argument failures
+while this learner continues. All768 inputs andoriginal identity stayfixed.
+No second GPU allocation orqueue iscreated;selection waits fororiginal Qbert
+closure andidlehost. Saved recovery omits replay,live beliefs,games andRNG.

@@ -2,12 +2,20 @@
 
 The [fresh Qbert dynamics1e-4 seed14009 confirmation](experiments/2026-11-01-cdp-qbert-dynamics1e4-seed14009-200k.md)
 launches23:27:17.442 UTC November1/source9cce545 with768 pins. MainPID863643/
-invocation80c3cd392a2c45e68c200e362ab6c00c andallfour original observers areactive.
+invocation80c3cd392a2c45e68c200e362ab6c00c remainsactive withprogress,postprocess
+andcollection;the original recovery observer isterminal success.
 Startup23:28:11 passes357 bounded-matching initial tensors,47 matching pre-update
 semantic events,correct cadence and609 finite supervised reports through6872
 actions. The47 reference startup differences are expected across seeds;no
 cross-seed initial equality isclaimed. CPU startup wrapper2.387s is retained
 without wall-time correction. No final frozen outcome isavailable.
+
+The original100k/9,340 recovery passes23:40:24 UTC November1 with357 finite
+tensors andfour retained files/206,067,158 bytes. Independent2.216s read-only
+confirmation verifies all768 pins,the original recovery journal andallfour
+hashes;no audit orcopy repeats. Metadataaf0a7d12/retentioneddcdd6e. Original
+recovery isterminal success;main,progress,postprocessing andcollection continue.
+No midpoint gameplay assessment;final frozen outcomes remainpending.
 
 Keep200k actions/18,715 updates/30-minute training cap,100k/9,340 recovery,and
 four final/actual-initial sampled/greedy24-episode assessments. Greedy primary
