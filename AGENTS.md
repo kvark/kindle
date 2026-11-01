@@ -20,33 +20,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [completed Qbert dynamics-group1e-4 comparison](docs/results/2026-11-01-cdp-qbert-dynamics1e4.md)
-finishes200k actions/799,807 frames/18,715 updates in25m40.027s (+.83% time).
-Greedy15,471.875/24 first pyramids passes15k/90%,up22.04% from12,678.125;
-sampled14,862.5/24 rises22.89% from12,093.75 but misses15k. Own initials
-168.750/167.708 match. Initial-subtracted return/min rises21.33% greedy/22.20%
-sampled. Retain1e-4 as a useful development point; reused12011 is not independent
-confirmation. Late imitation CE worsens.044040→.069685 despite better play.
+The [fresh Qbert dynamics1e-4 seed14009 check](docs/experiments/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
+is CPU-qualified23:19:30 UTC November1:two commands,23 config cases,357-tensor
+schema,733/9340/18715 cadence,16 runtime files and606 original/111 repair pins
+pass in2.163s,withzero native/emulator construction. Only learner/evaluation
+seeds change from the completed passing12011 dynamics1e-4 recipe. Keep12M64/
+Auto/N8/B16/T16/H5/R24/encoder-base4e-5/greedy/expert100,qualified447fe50 native,
+e161bf38 runner andfa261c53 teacher. The bounded plan is8192actions/733updates,
+1024 frozen/zero updates,andconservative200k projection≤30min. No full learner
+is selected. Root`/x/Temp/kindle-qbert-dynamics1e4-seed14009-20261101/native-check`.
+Check live state before launch;do not restart or reuse completed experience.
 
-All606 original/111 repair pins,100k/9,340 recovery,357 matching initial and
-invariant frozen tensors,1,176/1,223 paired initial semantic events,full pixel/
-action/label and frozen replays/videos,guards,curves,coverage andcomparison pass.
-Original main fails23:00:53 UTC November1 on undefinedCONTROL in CPU audit,
-after allfive GPU stages pass; original collector fails andboth remain failed.
-Separate CPU servicePID862557/invocatione48562cf43cd4ba8927950760ef61922 completes
-23:11:13 in297.912s with`complete_with_cpu_audit_repair`,SHA8f9d7c25. No original
-passing completion exists. Two repair-preparation failures and one supplemental
-journal-reader failure remain preserved; no GPU or completed replay/collector
-stage repeats. Native447fe50/35ad0db,teacherfa261c53 andrunnere161bf38 stay fixed.
-
-Only dynamics-group4e-4→1e-4 changes at12M64/Auto/N8/B16/T16/H5/R24/encoder-base
-4e-5/greedy/expert100; no isolated-core mechanism or broad reliability claim.
-Actual overrides47,700 (23.85%);online guided returns are not frozen competence.
-All original services andCPU repair are terminal;no Kindle GPU allocation is
-active at closure. Root`/x/Temp/kindle-qbert-dynamics1e4-20261101/full` iscomplete.
-Do not rerun original services,completed GPU/replay stages or collectors. No
-extension,rate sweep,confirmation or automatic successor is selected. The
-five-game goal remains unfinished;check live state before further GPU work.
+The [preceding dynamics1e-4 result](docs/results/2026-11-01-cdp-qbert-dynamics1e4.md)
+reachesgreedy15,471.875/24first pyramids in25m40s;sampled14,862.5 misses15k.
+Original main/collector remain failed from undefinedCONTROL after allfive GPU
+stages;separateCPU closure`complete_with_cpu_audit_repair` supplies missing
+audits without repeats. Fresh confirmation remains open. The new audit binding
+screen catches that exact old error. The five-game goal remains unfinished.
 
 The [current cost summary](docs/results/2026-11-01-cdp-current-training-cost.md)
 finds learning about81% of Qbert and88% of Breakout training wall time. Within
