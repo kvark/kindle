@@ -41,3 +41,15 @@ Retain sources, fixed protocol, declaration, all training counts and frozen
 episode rows, summary, review and execution receipt under
 `/x/Temp/kindle-qbert-rgb64-phases-20261101`. Preserve any failure; do not repeat
 completed analysis stages. The five-game goal remains unfinished.
+
+
+## Completed analysis
+
+The [result](../results/2026-11-01-cdp-qbert-rgb64-phases.md) completes21:27:09
+UTC November1/source3219fb7 in3.601s (3.622s wrapper), with all26 diagnostic/
+272 active inputs unchanged. All400k training actions/1,599,654 frames and96
+frozen episodes reconcile. The weaker learner has higher late native movement
+agreement; both have substantial later-phase exposure, and all frozen score
+differences follow equal550-point prefixes. No causal explanation or intervention
+is selected. No native/emulator/GPU work, replay, fitting, update, failure or
+repeat occurs. Evidence is complete; do not rerun.

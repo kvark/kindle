@@ -24,10 +24,12 @@ The [fresh200k Breakout dynamics-group comparison](docs/experiments/2026-11-01-c
 November1/sourceb9ce97f with272 pins. MainPID847728/invocation
 72a7b4600a4641bb8c93174668127f3f;service`kindle-breakout-dynamics1e4-200k-20261101`.
 Startup21:16:24 passes357 bounded/control initial tensors,47 pre-update events,
-correct cadence and232 finite reports through4072 actions. Allfour original
-progress/recovery/postprocess/collection observers areactive. Fix200k/12,477
-updates/30min,retained100k/6,227 four-file recovery andfour final/own-initial
-24-episode frozen arms against56.292/104.667. No full frozen result yet.
+correct cadence and232 finite reports through4072 actions. The100k/6,227
+recovery passes21:27:03 UTC with357 finite tensors and allfour files retained,
+206,067,160 bytes, source unchanged. Recovery observer succeeds; original main,
+progress, postprocessing and collection continue. Fix200k/12,477 updates/30min
+andfour final/own-initial24-episode frozen arms against56.292/104.667. No full
+frozen result yet.
 
 Only dynamics-group4e-4→1e-4 changes;encoder/base/actor4e-5,12M64/Auto/B16/T16/
 H15/R16/expert100,qualified runnerfe5cf347/native35ad0db andteacher stayfixed.
@@ -54,6 +56,21 @@ PID847728/invocation remain unchanged. CLI6.390s/controller6.405s (wrappers
 queue, declaration, service, failure or repeat. Root
 `/x/Temp/kindle-qbert-rgb64-cross-cohort-20261101`; keep unselected until all five
 original Breakout services and collection succeed and the host is idle.
+
+The [current Qbert RGB64 phase analysis](docs/results/2026-11-01-cdp-qbert-rgb64-phases.md) finds weaker12011 has
+higher final50k native movement agreement75.22% versus10007's70.35%, despite
+lower frozen greedy12,678.125 versus15,710.417. Both collect about78% of
+training actions after the first pyramid. All96 frozen prefixes score550;
+the gap develops afterward. Duration and reward rate differ, without an
+identified cause. No new loss, learner or coverage intervention is selected.
+
+All400k training actions/1,599,654 frames,235 completed episodes/16 tails and96
+frozen episodes reconcile. All26 diagnostic/272 active inputs, two sets of six
+boundary cases and hand-counted trace/partial/override fixtures pass. CPU3.601s
+(3.622s wrapper) completes21:27:09 UTC November1/source3219fb7, preserving the
+original Breakout PID/invocation. No native/emulator import, GPU work, replay,
+fitting, update, failure or repeat. Keep co-host time without correction.
+Root`/x/Temp/kindle-qbert-rgb64-phases-20261101` is complete; do not rerun.
 
 The [bounded Breakout dynamics-group1e-4 check](docs/results/2026-11-01-cdp-breakout-dynamics1e4.md) passes8192 actions/
 32,733frames/489 updates in47.413s;frozen1024/.856s haszero updates/no natural

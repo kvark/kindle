@@ -103,3 +103,24 @@ constructs no native agent/emulator and creates no GPU allocation or executable
 queue. Retain these co-host times without correcting training wall time. The
 Qbert assessment remains unselected until this original learner and all observers
 complete successfully and the host is idle.
+
+
+## Original100k recovery retained
+
+The original recovery observer passes **100,000 actions/6,227 updates at
+21:27:03 UTC November1**. All357 checkpoint tensors are finite, and allfour
+metadata/world/behavior/slow-value files are copied and verified,206,067,160
+bytes total, with source unchanged. The metadata SHA256 is
+`7f60beaee36c18ba0f2572066df4a936d4cac036b42949265dfda5c24bbf9bcd`; retention
+receipt SHA256 is`fc5c49363c632c98b8ab21428c7d04e37f53a68a99736d51dc079b3270f817ba`.
+The same audit checks6,420 sequential finite reports through103,096 actions.
+These are retained weights and metadata; replay, live beliefs, environments
+and RNG are not saved. No checkpoint selection or intermediate frozen score
+is introduced. The original recovery service exits successfully; main,
+progress, postprocessing and collection remain active under their original
+identities. Full final assessments remain pending.
+
+The separate current-Qbert saved-log analysis co-hosts for3.601s (3.622s wrapper)
+and completes21:27:09 UTC, preserving all272 active pins and originalPID847728/
+invocation72a7b4600a4641bb8c93174668127f3f. It uses no native/emulator/GPU work
+or updates; retain measured CPU time without correcting the learner's wall time.
