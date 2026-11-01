@@ -18,8 +18,10 @@ initial tensors,47 pre-update transitions and258 finite reports through3128 acti
 all47 pre-update events differ from10007,as expected for another seed. Progress,
 100k/9,340 recovery passes20:36:18 UTC:all357 finite tensors andfour retained
 files (206,067,159bytes) verify;metadata17ff65f5. The recovery observer succeeds;
-main/progress/postprocessing/collection continue with original identity. No frozen
-result,bounded experience reuse or third learner selected. Do not restart or overlap it.
+training completes200k actions/799,831frames/18,715 updates in25m27.366s at
+20:49:14 UTC,within30min,andthe training guard passes. Frozen assessments and
+original CPU audits/collectors remain active with original identity. No accepted
+full frozen result,bounded experience reuse or third learner selected. Do not restart or overlap it.
 Root`/x/Temp/kindle-qbert-rgb64-seed12011-20261101/full`;check live state before
 work. The five-game goal remains unfinished.
 
