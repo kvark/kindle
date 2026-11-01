@@ -20,6 +20,19 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [bounded Qbert H5/R32 greedy-collection check](docs/experiments/2026-11-01-cdp-qbert-h5-r32-greedy.md)
+is selected within the five-game goal after all preceding work closes. Change
+R24→32 on reused10007;keep12M48/Auto/N8/B16/T16/H5/encoder4e-5/greedy collection/
+expert100/native447fe50/runneraba4300d/teacher. Fresh8192 actions/978 updates
+then1024 frozen actions;execution/cost only,no full learner selected. Cost
+projection must stay under45min. Corrected CPU preflight passes1.136s,two CLI
+paths,15 config cases,357 tensors,442 control pins and978/12454/24954 schedules.
+Original1.111s invalid-seed CLI failure and sources remain;no native/emulator
+construction or GPU stage occurred. Root
+`/x/Temp/kindle-qbert-h5-r32-greedy-20261101/native-check`,service
+`kindle-qbert-h5-r32-greedy-check-20261101`. Check live state;no retry,extension,
+ratio sweep or automatic promotion. Full learner and frozen quality unmeasured.
+
 The [completed six-feature Breakout response-history fit](docs/results/2026-11-01-cdp-breakout-response-history.md)
 fails its fixed screen:held-out MAE1.976923→1.997426 overall and1.948802→1.958316
 near descending balls,despite lower RMSE. Six of eight lanes worsen MAE;recurrence
