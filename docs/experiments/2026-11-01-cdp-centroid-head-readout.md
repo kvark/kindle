@@ -35,3 +35,11 @@ all292 input hashes before/after. Record CPU co-host time without correction.
 No new loss,head replacement,learner or automatic successor is selected.
 Root`/x/Temp/kindle-centroid-head-readout-20261101`.
 
+
+## Completed execution
+
+The first CPU analysis completes16:21:52 UTC November1 in2.640s (2.696s wrapper).
+All29 diagnostic/292 active Breakout inputs and original process identity pass.
+No failure,replay,fitting,native/GPU work or updates occur. The [completed result](../results/2026-11-01-cdp-centroid-head-readout.md)
+reports5.460/5.275-pixel head MAE and its CPU/native,target-mask and model-age
+limits. No successor is selected;do not repeat this analysis.

@@ -1,5 +1,33 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed Breakout B8/T32 comparison](../results/2026-11-01-cdp-breakout-context32.md)
+finishes200k actions/799,549frames/12,469updates in23m12.128s,8.11% longer than
+B16/T16. Primary sampled56.292→48.583 falls13.69%;greedy104.667→130.417 rises
+24.60%,all0/24 two-wall. Retain B16/T16 for primary sampled performance and
+B8/T32 as a stronger greedy development point;no overall win or reliability.
+All292 inputs,357 matching/invariant tensors,retained100k/6,219 recovery,paired
+initial traces,full replays/videos,guards,curves,exposure and original collector
+pass. All five services succeed:main16:26:03/post16:26:09/collection16:26:47 UTC
+November1/source4f7b4c4. Zero failures,GPU repeats or repairs. Native447fe50,
+runner6c1b69fb and teacher stay fixed;batch,temporal gradients,diversity,target
+rows and warmup change together. CPU co-host caveats remain without correction.
+Root`/x/Temp/kindle-breakout-context32-20261101/full`;complete,do not rerun.
+No Kindle service or GPU allocation remains active. No extension,context retry,
+confirmation or automatic successor selected;the five-game goal is unfinished.
+
+The [saved centroid-head CPU diagnostic](../results/2026-11-01-cdp-centroid-head-readout.md)
+finds5.460/5.275-pixel ball x/y MAE versus9.267/8.064 for the earlier linear
+recurrent probe on555 shared test rows. The existing head recovers more precise
+position than those probes;substantial error remains. This is the old encoder6e-6
+centroid checkpoint,not the current learner;its original gameplay protocol
+failure stays. CPU F64 reconstruction has no independent native-forward check.
+Native target and pixel-reference crops differ by one boundary row;actual target
+accuracy is unmeasured. All29 diagnostic/292 then-active Breakout inputs and
+original process identity pass. Analysis2.640s (2.696s wrapper) completes16:21:52
+UTC November1/source5318dc9,zero new replay,fitting,GPU work,updates or failures.
+Retain co-host time;no new head,loss or learner selected. Root
+`/x/Temp/kindle-centroid-head-readout-20261101`;complete,do not rerun.
+
 The [saved Qbert behavior-rate outcome diagnostic](2026-11-01-cdp-qbert-behavior-phases.md) retains the425-point
 first-pyramid failure:its slot loses15,275 points while the other23 gain15,725,
 leaving only+18.75 official greedy mean. Twelve other slots improve,11 worsen;
@@ -10,7 +38,7 @@ first197 commands;no simple command-level cause is established. All96 rows,
 Analysis1.719s completes16:06:19 UTC November1/sourcec197078,zero replay/native/
 GPU work,updates,failures or repeats. Retain CPU co-host time;no new rate,loss
 or learner selected. Root`/x/Temp/kindle-qbert-behavior-phases-20261101`;complete,
-do not rerun. The active Breakout comparison continues.
+do not rerun. The Breakout comparison above subsequently completes.
 
 The [completed Qbert behavior-rate comparison](2026-11-01-cdp-qbert-behavior8e5.md)
 reduces observed training28m34s→20m52s (26.92%),with nearly unchanged greedy mean

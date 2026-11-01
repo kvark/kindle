@@ -1,5 +1,11 @@
 # Position-supervised Breakout has better recurrent readouts, with substantial remaining error
 
+The November1 [saved-head follow-up](2026-11-01-cdp-centroid-head-readout.md)
+reconstructs the existing auxiliary head on these saved states in CPU F64.
+Its5.460/5.275-pixel x/y MAE is better than the fitted probes below. This updates
+the accessible-position evidence,without establishing native forward equality,
+actor use or gameplay benefit. The old full protocol failure remains.
+
 On the same recorded control trajectories, the centroid100 checkpoint has lower
 recurrent linear ball-position error than the retained control: **12.878/10.918
 → 9.267/8.064 source pixels** for x/y, reductions of **28.04%/26.14%**. Both

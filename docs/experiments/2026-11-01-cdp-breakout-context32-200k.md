@@ -118,3 +118,16 @@ wall-time correction. Do not restart or overlap GPU work.
 Checkpoint metadataSHA256`d920bd57c102882a81731909ad72c0b087d3d9ee99bece7723b1b5176a93c483`,
 audit`c4cdab8dc53cd86cf3c8a8b003be0ff59ac5594d4d3f606f12a62c0d4c077979`,
 retention`8cdece586be17348b9f0253eafc957c2d0c55312fa9e80190c9fa3a09ee56352`.
+
+## Completed comparison
+
+All five original services finish successfully:main16:26:03,postprocessing
+16:26:09 and terminal collection16:26:47 UTC November1. The fresh learner uses
+200k actions/799,549frames/12,469updates in23m12.128s (+8.11%). Sampled48.583
+falls below56.292;greedy130.417 improves104.667,allzero of24 two-wall successes.
+All292 pins,357 matching/invariant tensors,retained100k recovery,paired initial
+traces,full replays/videos,guards,curves,exposure and comparison pass. No failure,
+repair,cap change or repeated GPU stage occurs. Retain the sampled control and
+the separate stronger greedy development point;no overall win or successor.
+See the [completed result and receipts](../results/2026-11-01-cdp-breakout-context32.md).
+The host has no active Kindle allocation at closure;do not repeat passed stages.
