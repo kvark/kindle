@@ -1,5 +1,24 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [saved Qbert behavior-rate outcome diagnostic](2026-11-01-cdp-qbert-behavior-phases.md) retains the425-point
+first-pyramid failure:its slot loses15,275 points while the other23 gain15,725,
+leaving only+18.75 official greedy mean. Twelve other slots improve,11 worsen;
+conditional successful mean14,964.130 still misses15k. Late replay CE rises
+.051060→.055250 (+8.21%). Five successful candidate episodes share the failure's
+first197 commands;no simple command-level cause is established. All96 rows,
+22 diagnostic/292 active Breakout inputs and originalPID812861/invocation stay.
+Analysis1.719s completes16:06:19 UTC November1/sourcec197078,zero replay/native/
+GPU work,updates,failures or repeats. Retain CPU co-host time;no new rate,loss
+or learner selected. Root`/x/Temp/kindle-qbert-behavior-phases-20261101`;complete,
+do not rerun. The active Breakout comparison continues.
+
+The [completed Qbert behavior-rate comparison](2026-11-01-cdp-qbert-behavior8e5.md)
+reduces observed training28m34s→20m52s (26.92%),with nearly unchanged greedy mean
+and3.00% higher sampled mean,both below15k. Acting/feedback566.324→184.264s accounts
+for82.83% of the time reduction. Native and runner stay fixed;equivalent teacher
+bytes and behavior rate change together,so this is not an isolated teacher,rate
+or backend-speed estimate. Retain the faster teacher,not a higher-rate default.
+
 The [saved Breakout takeover-state join](2026-11-01-cdp-breakout-takeover-states.md) finds onlytwo of21 earlier-only
 rescues have projected contact withinfive actions at delay16;14 already match
 the teacher command. Timing estimates and this imperfect teacher do not isolate
@@ -8,16 +27,16 @@ and524 active Qbert inputs pass;originalPID809245/invocation stays. Analysis2.76
 completes15:23:52 UTC November1/source0e77ede,recount15:24:44. Zero emulator/native/
 GPU work,updates,failures or repeats;retain CPU co-host timing. No new loss,teacher
 or learner selected. Root`/x/Temp/kindle-breakout-takeover-states-20261101`;complete,
-do not rerun. The existing Qbert behavior-rate comparison continues.
+do not rerun. The Qbert behavior-rate comparison subsequently completes;see above.
 
 The [Qbert teacher CPU diagnostic and equivalent predicate change](2026-11-01-cdp-qbert-teacher-cost.md)
 identify avoidable adapter work:RGB equality reductions consume53.78% of profiled
 snapshot time. Direct channel conjunctions preserve all472 snapshot decisions/
 states and200k recorded labels/trajectory outcomes,with CPU replay633.898→230.331s.
 The passing130-test/25-input qualification and unchanged native447fe50 runtime
-are packaged for future Qbert trials. This addresses compute cost;whole-training
-savings and game-score effects remain unmeasured. Original harness failure and
-timing limits remain;no new learner or GPU allocation follows.
+are packaged for future Qbert trials. This addresses compute cost;the subsequent whole-training comparison above
+measures lower cost with similar frozen quality. Original harness failure and
+timing limits remain;no isolated teacher-speed or behavior-rate claim follows.
 
 The [completed Qbert H3/R24 comparison](2026-11-01-cdp-qbert-h3-r24.md) reduces
 training time6.56% at fixed200k/18,715 updates,but lowers greedy14,339.583→13,823.958

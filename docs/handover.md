@@ -18,6 +18,18 @@ Root`/x/Temp/kindle-breakout-context32-20261101/full`;service
 GPU work. No extension,context retry,confirmation or automatic successor.
 Full frozen benefit remains unmeasured;the five-game goal remains unfinished.
 
+The [saved Qbert behavior-rate outcome diagnostic](results/2026-11-01-cdp-qbert-behavior-phases.md) retains the425-point
+first-pyramid failure:its slot loses15,275 points while the other23 gain15,725,
+leaving only+18.75 official greedy mean. Twelve other slots improve,11 worsen;
+conditional successful mean14,964.130 still misses15k. Late replay CE rises
+.051060→.055250 (+8.21%). Five successful candidate episodes share the failure's
+first197 commands;no simple command-level cause is established. All96 rows,
+22 diagnostic/292 active Breakout inputs and originalPID812861/invocation stay.
+Analysis1.719s completes16:06:19 UTC November1/sourcec197078,zero replay/native/
+GPU work,updates,failures or repeats. Retain CPU co-host time;no new rate,loss
+or learner selected. Root`/x/Temp/kindle-qbert-behavior-phases-20261101`;complete,
+do not rerun. The active Breakout comparison continues.
+
 The [completed Qbert behavior-rate comparison](results/2026-11-01-cdp-qbert-behavior8e5.md) finishes200k actions/
 799,828frames/18,715updates in20m52.376s,26.92% less training time than control.
 Greedy14,358.333/23 first pyramids versus14,339.583/24 is nearly unchanged;

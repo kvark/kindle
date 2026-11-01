@@ -147,3 +147,13 @@ co-hosts a3.201s CPU preflight wrapper at15:33:44 UTC. Both CLI paths,15 config
 cases,357 schema tensors,227 control inputs andfour common-prefix fixtures pass;
 all524 current inputs/original identity remain unchanged. No new GPU job is
 selected. Keep this co-host timing without correction.
+
+## Saved outcome follow-up
+
+The [CPU phase and failure diagnostic](2026-11-01-cdp-qbert-behavior-phases.md)
+shows one425-point first-pyramid failure offsets most of the other23 slots'
+aggregate gain. All24 outcomes remain in official means;even conditional23
+successful episodes average14,964.130. Late replay imitation CE rises8.21%.
+Five successful candidate episodes share the failure's first197 commands,so
+no simple command correction is selected. No new replay,GPU work or learner
+updates;all22 diagnostic/292 active Breakout inputs remain unchanged.
