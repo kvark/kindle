@@ -20,6 +20,17 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [selected bounded Qbert H5/R24 check](docs/experiments/2026-11-01-cdp-qbert-h5-r24.md) tests whether shorter imagined
+rollouts and50% more world/expert updates fit the35-minute200k budget. Keep
+12M48/Auto/N8/B16/T16/encoder4e-5/greedy collection/expert100 on reused8039;
+native447fe50/runneraba4300d/teacher unchanged. The.877s CPU preflight passes
+bothCLI paths,15 config cases,357 shapes and359 control pins,withzero native/
+emulator construction. Require8192/733 updates,1024 frozen/zero updates,357
+matched initial/invariant frozen tensors,pre-update traces,replay and guards.
+Root`/x/Temp/kindle-qbert-h5-r24-20261101/native-check`;service
+`kindle-qbert-h5-r24-check-20261101`. No full learner or automatic promotion.
+Check live state;the five-game goal remains unfinished.
+
 The [completed frozen Qbert cross-cohort diagnostic](docs/results/2026-11-01-cdp-qbert-cross-cohort.md) keeps4013
 stronger on both cohorts:15,515.625/14,370.833 versus8039's11,578.125/11,376.042.
 Only original4013/4013 clears15k;all first-pyramid counts24/24 except retained
