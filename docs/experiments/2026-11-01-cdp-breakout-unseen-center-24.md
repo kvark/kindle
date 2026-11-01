@@ -39,3 +39,21 @@ is selected by this protocol,even if the development screen passes.
 
 Root `/x/Temp/kindle-breakout-unseen-center-20261101/standard24`. Preserve all
 receipts and failures;do not repeat passing preflight or completed stages.
+
+## Selected after Breakout closure
+
+Select the fixed CPU assessment after the R8 learner and all five original
+services have completed successfully. Its400k comparison gives sampled56.708
+and greedy97.583,zero two-wall successes;retain the cheaper200k/R16 control.
+The eight-episode reference gain333.000 versus185.375 on every lane justifies
+this larger reference assessment. This selection does not change the native
+teacher or allocate a learner.
+
+CPU preflight passes13:49:33 UTC November1 in3.044s (3.167s wrapper),checking
+the completed learner receipts/315 pins,exact controller bytes and cohort diff,
+and reusing the eight passed fixtures. No emulator or native agent is constructed.
+The first invocation has no success receipt and its tool output was truncated;
+its exact sources and that limitation remain in`preflight-attempt1`. The original
+active-learner prerequisite is obsolete after normal closure. The separate
+passing preflight checks completed services and their evidence instead. No
+gameplay stage has repeated. All original assessment caps remain unchanged.
