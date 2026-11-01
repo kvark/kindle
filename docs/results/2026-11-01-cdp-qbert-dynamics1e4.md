@@ -64,3 +64,19 @@ receipt remain under `cpu-preparation-failure-1` and`full-preflight-execution.js
 Four unselected controller references are corrected; generator restores the
 protected control after all service-prefix substitutions. The repair receipt
 and original failure are retained and pinned. No bounded/GPU stage repeats.
+
+
+## Fresh full comparison is active
+
+The separate200k learner launches22:32:25.422 UTC November1/source0d8ec52 with
+606 pins, originalPID857991/invocation1e44edc5d824407b8a21cd62657f6ee2. All four
+original observers start. Startup22:33:29.495 passes357 bounded/control initial
+tensors,47 matching pre-update transitions, correct cadence and723 finite reports
+through8088 actions. Its1.711s CPU wrapper is retained as co-host timing, without
+correction. No final frozen result is available. The original bounded stages
+remain complete and are not repeated or used as training experience.
+
+Fullroot `/x/Temp/kindle-qbert-dynamics1e4-20261101/full`; service
+`kindle-qbert-dynamics1e4-200k-20261101`. Preserve original main/observers and
+fixed200k/30min,100k recovery and four24-episode assessments. Do not restart or
+overlap another GPU allocation. The five-game goal remains unfinished.

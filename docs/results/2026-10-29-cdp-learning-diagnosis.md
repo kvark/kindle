@@ -1,25 +1,29 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
 The [fresh Qbert dynamics-group1e-4 comparison](../experiments/2026-11-01-cdp-qbert-dynamics1e4-200k.md)
-is CPU-qualified22:30:48 UTC November1/sourcec268129 in4.011s: five CLI commands,
-32 config/five teacher/eight mode/17 header/four observer/12 recovery cases,
-six retention/two actual-collector fixtures,49 paths/17 scripts andall616 bounded/
-562 control pins pass. Original CPU path failure remains preserved; four
-unselected references and generator substitution order are repaired. No native
-agent/emulator is constructed and no bounded/GPU stage repeats.
+launches22:32:25 UTC November1/source0d8ec52 with606 pins. Original mainPID
+857991/invocation1e44edc5d824407b8a21cd62657f6ee2 and progress/recovery/post/
+collection observers are active. Startup22:33:29 passes357 bounded/control
+initial tensors,47 matching pre-update transitions, correct cadence and723 finite
+reports through8088 actions. No full frozen result is available. Preserve the
+original processes; do not restart or overlap another GPU allocation.
 
-Select fresh200k actions/18,715 updates/30min,100k/9,340 four-file recovery and
-four final/actual-initial sampled/greedy24-episode assessments. Only dynamics
+Fixed200k actions/18,715 updates/30min,100k/9,340 four-file recovery andfour
+final/actual-initial sampled/greedy24-episode assessments remain. Only dynamics
 4e-4→1e-4 changes recurrent/posterior/prediction/exploration rates together on
 reused12011 at12M64/Auto/N8/B16/T16/H5/R24/encoder-base4e-5/greedy/expert100.
-Native447fe50/35ad0db and teacherfa261c53 are fixed; runnere161bf38 adds only12
-qualified CLI lines. Compare primary greedy12,678.125 andsampled12,093.750;
+Native447fe50/35ad0db and teacherfa261c53 are unchanged; runnere161bf38 adds only
+12 qualified CLI lines. Compare primary greedy12,678.125 andsampled12,093.750;
 original15k/90% gate and failed confirmation remain. No reliability claim.
 
-Root `/x/Temp/kindle-qbert-dynamics1e4-20261101/full`; service
-`kindle-qbert-dynamics1e4-200k-20261101`. Full selection/launch follows committed
-qualification and idle-host check. No full learner has launched yet. No retry,
-cap increase, rate sweep, extension or automatic successor. Goal unfinished.
+Full CPU qualification passes4.011s after preserving/correcting one retained-
+control path failure: five CLI commands,32 config/five teacher/eight mode/17
+header/four observer/12 recovery cases,six retention/two collector fixtures,
+49 paths/17 scripts andall616 bounded/562 control pins. No GPU stage repeats.
+The1.711s startup CPU co-host cost stays uncorrected. Root
+`/x/Temp/kindle-qbert-dynamics1e4-20261101/full`; service
+`kindle-qbert-dynamics1e4-200k-20261101`. No retry, cap increase, rate sweep,
+extension or automatic successor. The five-game goal remains unfinished.
 
 The [completed bounded Qbert dynamics1e-4 check](2026-11-01-cdp-qbert-dynamics1e4.md)
 passes8192 actions/32,756 frames/733 updates in57.461s;1024 frozen/.853s haszero

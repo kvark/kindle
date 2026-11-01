@@ -1,5 +1,9 @@
 # Fresh200k Qbert comparison with dynamics-group rate1e-4
 
+**Running:** original learner launches22:32:25 UTC November1/source0d8ec52.
+Startup checks pass; recovery and all final/actual-initial assessments remain
+pending. Preserve original processes and do not overlap another GPU allocation.
+
 The [closed bounded check](../results/2026-11-01-cdp-qbert-dynamics1e4.md)
 passes all checks and projects25m43s conservatively, below30min. Select a separate
 fresh200k comparison of dynamics-group4e-4→1e-4 against retained RGB64 learner
@@ -91,3 +95,21 @@ order are corrected; `full-preparation-repair.json` records exact provenance.
 The failed receipt remains `full-preflight-execution.json`; the passing attempt
 is `full-preflight-repaired-execution.json`. No original bounded or GPU stage
 repeats. Require the repaired sources and failure provenance to remain pinned.
+
+
+## Original full launch and startup
+
+Selection passes606 pins; declaration SHA256
+`e918bae1a59788538bf09b4a2f9b70afcf185cab4e5cba5c875c8815bc6cee58`.
+Main launches22:32:25.422 UTC November1/source0d8ec52, PID857991/invocation
+1e44edc5d824407b8a21cd62657f6ee2. Original postprocess/progress/recovery/collection
+observers launch successfully; their identities remain in`observers.json` and
+`collection-observer.json`. No full learner or GPU stage has repeated.
+
+Startup22:33:29.495 verifies606 pins,357 tensors equal to both bounded and
+retained controls,47 matching pre-update transitions and723 finite reports
+through8088 actions. Firstsix updates occur at376/392/400/408/424/432. Native,
+runner,teacher/config and original PID/invocation match. The read-only startup
+wrapper takes1.711s; retain this co-host cost without correcting training wall.
+No final frozen task result is available. Keep200k/18,715 updates/30min,
+100k/9,340 recovery and four final/actual-initial24-episode arms unchanged.
