@@ -27,9 +27,12 @@ sampled collection;qualified native2974160/exact centroid runner unchanged.
 Startup passes372 bounded-matching/357 shared-control initial tensors,47 paired
 pre-update events,correct cadence and158 finite reports through2904 actions in
 1.467s CPU co-host time. MainPID787678/invocation709367befab94110b4afc489bd51d55c;
-progress,recovery,postprocessing and collection observers are active. Require
-100k/6227 retained recovery files and final/actual-initial sampled/greedy24-episode
-assessments against56.292/104.667,all0/24 two-wall. No frozen result yet. Native/
+progress,postprocessing and collection observers remain active. Recovery passes
+11:26:28 UTC at100k/6227;all372 finite tensors and213,946,193 retained bytes pass.
+The.190s retained-file/config confirmation passes11:27:05;recovery observer
+succeeds and original learner identity stays. Keep CPU co-host time. Require
+final/actual-initial sampled/greedy24-episode assessments against56.292/104.667,
+all0/24 two-wall. No frozen result yet. Native/
 runner differences limit causal claims;no prior experience reused. Root
 `/x/Temp/kindle-centroid-encoder4e5-20261101/full`;service
 `kindle-breakout-centroid-encoder4e5-200k-20261101`. Inspect the original live

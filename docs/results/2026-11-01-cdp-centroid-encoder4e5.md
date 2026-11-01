@@ -92,3 +92,22 @@ cap increase or automatic successor follows. The five-game goal is unfinished.
 - Full `launch.json`: `1311911a0bd9991cbb1c381e62dafc7e041aef7957cf88e45a82d473bb5fb49f`.
 
 - Full `startup-review.json`: `45412984de4bb30b885fff29c80c555228691cc014733e4e9c0ca4a8ec228e6f`.
+
+### The100k recovery snapshot is retained
+
+The original observer passes **100k actions /6,227 updates at11:26:28 UTC**,
+including372 finite tensors. It retains all four checkpoint files under
+`recovery-100k`:metadata,world,behavior andslow-value tensors, totaling
+**213,946,193 bytes**. The observer then exits successfully.
+
+An independent **.190s CPU** confirmation passes **11:27:05**:retained hashes
+match the original observer and the still-current source checkpoint, metadata
+counters/configuration match the declaration, and the original learner remains
+PID787678/invocation`709367befab94110b4afc489bd51d55c`. No restore, new GPU work or
+completed stage is repeated. Record the CPU co-host time without correction.
+The original learner,progress,postprocessing and collection observers continue;
+the final frozen comparison remains pending.
+
+- `checkpoint-review-100k.json`: `1200507c6a43b2f30305c68f86e1d3c2eca9b73c2cbf8a46ac6b79c74ea9cfef`.
+
+- `recovery-confirmation.json`: `2556b1187abd9241115537185aad01cd93d70565c5277895f436fd956f473b63`.
