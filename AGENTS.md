@@ -20,6 +20,18 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [bounded Qbert25M/R16 check](docs/experiments/2026-11-01-cdp-qbert-25m-r16.md)
+launches16:43:06 UTC November1/source d211ad3,originalPID820209/invocation
+`d4cb31854ee34f41bd30e296520ca13a`,501 pins. Fix8,192 actions/489 updates,
+180s training cap and1,024 frozen actions;future200k conservative cost gate35min.
+Capacity12M→25M and ratio24→16 change together;keepRGB48/B16/T16/H5/encoder4e-5/
+base behavior4e-5/greedy collection/expert100 and qualified faster teacher. Native
+447fe50/runneraba4300d unchanged. First CPU qualification1.151s passes both CLI
+paths,19 config cases,357 reference shapes,442 control inputs and16 package files;
+31,636,273 trainable parameters derived. No full learner or automatic successor.
+Root`/x/Temp/kindle-qbert-25m-r16-20261101/native-check`;service
+`kindle-qbert-25m-r16-check-20261101`. Check live state;do not restart or overlap GPU work.
+
 The [saved Qbert training-phase diagnostic](docs/results/2026-11-01-cdp-qbert-training-phases.md)
 finds76–77% of collected actions after the first pyramid across three H5/R24
 learners,rising to87–89% in the final50k. Late native movement agreement is100%
