@@ -37,18 +37,24 @@ The bounded check is complete:8,192/733 in48.112s,frozen1,024/.819s;all497 input
 collection17:39:42/source257cc0e. No bounded experience is reused. The startup
 CPU check co-hosts1.545s without time correction. The five-game goal is unfinished.
 
-The original100k/9,340 recovery passes17:52:47 UTC,with357 finite tensors and
-all four files retained (179,536,495 bytes). Retention takes.269s;the separate
-.086s hash check passes17:53:28 with the original learner identity unchanged.
-Keep CPU co-host time without correction. The200k recovery and full frozen
-results are pending;do not rerun the completed100k checks.
+Both original recovery checkpoints are retained:100k/9,340 passes17:52:47 UTC,
+and200k/18,715 passes18:03:18,each with357 finite tensors and all four files.
+The copies total179,536,495 and179,536,496 bytes;retention takes.269s/.275s.
+The recovery observer succeeds18:03:18. Original learner identity stays;full
+frozen results remain pending. Do not rerun the completed recovery checks.
 
-A separate [CPU prefix comparison](docs/experiments/2026-11-01-cdp-qbert-budget-prefix.md)
-is selected with15 inputs after14 fixtures pass. It waits for the retained200k
-recovery,then compares all first200k transitions/reports/episodes and357 saved
-arrays against the completed200k control. Divergence is an outcome,not a retry.
-No GPU work or learner mutation. Root `/x/Temp/kindle-qbert-budget-prefix-20261101`;
-analysis has not run. Preserve the pinned protocol and original recovery observers.
+The [completed CPU prefix comparison](docs/results/2026-11-01-cdp-qbert-budget-prefix.md)
+finds all25,000 transitions,18,715 non-timing reports and118 episode records
+identical through200k actions/799,841frames,with357 elementwise-equal200k arrays.
+The100k control has metadata only;serialized hashes differ at both milestones.
+Original bare-key failure is preserved;the group-qualified repair completes
+18:06:05 UTC in4.883s/4.921s wrapper. A separate.902s cumulative-frame-count
+correction completes18:08:25 without repeating the comparison. Final closure
+18:09:12 is `complete_with_cpu_reporting_repairs`. All25 repair/524 active pins
+and originalPID826399/invocation stay. No native/GPU work or updates;retain CPU
+co-host time without correction. Root `/x/Temp/kindle-qbert-budget-prefix-20261101`;
+complete,do not rerun. Extra experience and updates remain coupled;no new frozen
+score or independent reliability follows.
 
 The [completed Qbert25M/R16 comparison](docs/results/2026-11-01-cdp-qbert-25m-r16.md)
 finishes200k actions/799,786frames/12,477 updates in23m40.953s,17.08% less time
