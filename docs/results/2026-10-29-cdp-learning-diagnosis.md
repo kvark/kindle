@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [saved-frame pooling diagnostic](2026-11-01-cdp-breakout-pool-timing.md)
+finds exact two-frame midpoint paddle measurements on35,193 accepted pairs.
+Latest-frame discrepancy averages1.456px;the response model still has1.965px
+MAE against its calibrated pooled target on31,817 matched rows,versus2.875px
+against latest raw detections. This separates temporal averaging from the
+remaining prediction residual without identifying a causal gameplay limitation.
+All exclusions remain;no current-frame correction or teacher change is selected.
+The1.516s CPU analysis adds no emulator replay,GPU work or learning.
+
 The [fixed Breakout response-history fit](2026-11-01-cdp-breakout-response-history.md)
 also fails its prediction screen:adding one earlier displacement/command lowers
 RMSE but raises MAE in both held-out-all and near-descending subsets. Keep the

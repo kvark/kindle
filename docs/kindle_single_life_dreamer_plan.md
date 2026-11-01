@@ -20,6 +20,18 @@ CPU preflight3.400s and plot import.085s pass. Root
 do not restart it or allocate concurrent GPU work. No full outcome,retry,
 extension,ratio sweep or automatic successor.
 
+The [completed Breakout pooling diagnostic](results/2026-11-01-cdp-breakout-pool-timing.md) finds35,193/35,193 accepted
+pooled paddle centers exactly equal the last-two-raw-frame midpoint;latest-raw
+MAE1.456 over35,610 decisions. Shared model errors remain1.965 pooled versus
+2.875 latest-raw MAE (31,817 rows);near1.860/2.706. Raw targets change calibrated
+semantics;no correction,teacher change or gameplay check selected. All52,072
+actions/208,254 saved frames align;37,448 original pooled errors reproduce,all
+exclusions remain. Six CPU fixtures,16 inputs/490 active Qbert pins and original
+PID792387/invocation460e0220583948f4b088b5dc7c92956a pass. Analysis1.516s/controller
+4.475s completes12:18:04 UTC November1/source8c45350. No replay,native/GPU work,
+updates,failures or repeats;retain co-host time. Root
+`/x/Temp/kindle-breakout-pool-timing-20261101`;complete,do not rerun.
+
 The [completed six-feature Breakout response-history fit](results/2026-11-01-cdp-breakout-response-history.md)
 fails its fixed screen:held-out MAE1.976923→1.997426 overall and1.948802→1.958316
 near descending balls,despite lower RMSE. Six of eight lanes worsen MAE;recurrence
