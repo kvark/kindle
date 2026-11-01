@@ -65,3 +65,9 @@ matching initial tensors,47 common-prefix transitions and383 finite reports
 through6,632 actions. All five original services are active;full frozen benefit
 remains unmeasured. See the protocol for exact caps,assessments and recovery.
 Do not restart or overlap GPU work;startup1.047s CPU co-host caveat remains.
+
+The original full recovery observer subsequently succeeds16:10:44 UTC November1:
+100k/6,219,357 finite tensors,all four files/206,067,157 bytes retained with matching
+hashes and unchanged source (.310s). The original learner continues;no full
+frozen result. Weights/metadata omit replay,belief,games and RNG. No copy,audit
+or GPU stage repeats;keep CPU co-host timing without correction.

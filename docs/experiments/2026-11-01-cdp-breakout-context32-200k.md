@@ -101,3 +101,20 @@ Require retained midpoint and all four fixed assessments;no extension,context
 retry,confirmation or automatic successor.
 
 DeclarationSHA256`6ae1164b4365f74e563b2a89f589783acd4c33505b87b58ef7753925412f176e`.
+
+## Midpoint recovery retained
+
+The original recovery observer succeeds16:10:44 UTC November1. It verifies
+100,000 actions/6,219 updates and357 finite tensors,with6,503 finite reports
+through104,552 prefix actions. All four files/206,067,157 bytes are retained
+under`recovery-100k` in.310s,matching metadata/tensor hashes with source unchanged.
+The retained files are independently hash-read once;no audit,copy or GPU stage
+is repeated. Recovery contains weights/metadata,not replay,belief,games or RNG.
+Original mainPID812861/invocation258e9d9deb0b463a91d4206a198085e4 continues;
+progress,postprocessing and terminal collection remain active. No full frozen
+result yet. Keep recovery and saved Qbert-diagnostic CPU co-host timings without
+wall-time correction. Do not restart or overlap GPU work.
+
+Checkpoint metadataSHA256`d920bd57c102882a81731909ad72c0b087d3d9ee99bece7723b1b5176a93c483`,
+audit`c4cdab8dc53cd86cf3c8a8b003be0ff59ac5594d4d3f606f12a62c0d4c077979`,
+retention`8cdece586be17348b9f0253eafc957c2d0c55312fa9e80190c9fa3a09ee56352`.

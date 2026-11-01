@@ -26,7 +26,10 @@ November1/source4f7b4c4 with292 pins,originalPID812861/invocation
 100k/6,219 recovery and four final/actual-initial24-episode sampled/greedy arms
 against56.292/104.667,all0/24 two-wall. Startup15:59:27 passes357 matching initial
 tensors,47 common-prefix events,correct504/520/... cadence and383 finite
-supervised reports through6,632 actions. All five original services are active.
+supervised reports through6,632 actions. Recovery16:10:44 passes100k/6,219,
+357 finite tensors and6,503 finite reports through104,552 actions;four files/
+206,067,157 bytes retained in.310s with matching hashes and unchanged source.
+Recovery observer succeeds;main/progress/postprocess/collection remain active.
 Longer gradients change batch/diversity,target rows and warmup together;cached
 recurrent history already exists. Native447fe50/runner6c1b69fb/teacher and other
 encoder4e-5 settings stay fixed. Full CPU first attempt passes15:57:41 in1.434s/
