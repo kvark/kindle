@@ -1,21 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [selected frozen Qbert cross-cohort diagnostic](../experiments/2026-11-01-cdp-qbert-cross-cohort.md) assesses4013
-final/actual-initial on4000008039 and8039 final/actual-initial on4000004013.
-Reuse completed diagonal assessments;four new greedy arms,24 natural episodes
-per arm,600k actions/300s,zero updates/truncations,357 invariant tensors,replays/
-videos and guards. Native447fe50/runneraba4300d and checkpoint configs remain.
-This tests frozen-agent/cohort dependence,not isolated weights or reliability;
-original8039's failed gate stays unchanged. Breakout is fully closed and the
-host idle at selection. CPU command/controller qualifications pass;their two
-checker failures and co-host timing remain preserved. Root
-`/x/Temp/kindle-qbert-cross-cohort-20261101`,service
-`kindle-qbert-cross-cohort-20261101`. Launch08:24:54 UTC November1/source63fce09,
-413 pins,originalPID770056/invocationd56c32f594864b018418ed008250835f;collector
-PID770059/invocatione17b21c8b78648fb8aeccf316d7cc5df. The first crossed final
-run and outcome replay finish;the full matrix remains pending. No new learner,
-retry,cap increase or automatic successor. Do not rerun qualifications or completed
-diagonal GPU stages;check live state before work and do not overlap assessments.
+The [completed frozen Qbert cross-cohort diagnostic](../results/2026-11-01-cdp-qbert-cross-cohort.md) keeps4013
+stronger on both cohorts:15,515.625/14,370.833 versus8039's11,578.125/11,376.042.
+Only original4013/4013 clears15k;all first-pyramid counts24/24 except retained
+8039/8039's23/24. Own-initial subtraction preserves the ranking. Cohort alone
+does not explain the agent gap,but4013's passing margin does not hold on the
+alternate cohort. Original gate outcomes unchanged;no independent reliability or
+isolated-weight claim. All413 pins,357 finite invariant tensors per arm,full
+replays/videos,guards and original invocation pass. Four new arms131,080 actions/
+524,174 frames/97.911s,zero updates/truncations;four diagonal arms reused without
+GPU repeats. Main/collector succeed08:28:02/08:28:16 UTC November1/source63fce09.
+No assessment stage fails or repeats;two earlier CPU checker failures/co-host
+timing remain preserved. Root`/x/Temp/kindle-qbert-cross-cohort-20261101`;both
+services terminal,no active allocation at closure. Do not rerun assessment,
+collector,diagonal arms or preflights. No new learner,extension,cap increase or
+automatic successor. Check live state;the five-game goal remains unfinished.
 
 The [completed Breakout greedy-collection comparison](../results/2026-11-01-cdp-breakout-greedy-training.md) finishes200k/
 799,639 frames/12,477 updates in21m46s. Sampled39.042/greedy99.083 fall30.64%/

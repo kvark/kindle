@@ -1,21 +1,20 @@
 # Kindle: CDP learning roadmap
 
-The [selected frozen Qbert cross-cohort diagnostic](experiments/2026-11-01-cdp-qbert-cross-cohort.md) assesses4013
-final/actual-initial on4000008039 and8039 final/actual-initial on4000004013.
-Reuse completed diagonal assessments;four new greedy arms,24 natural episodes
-per arm,600k actions/300s,zero updates/truncations,357 invariant tensors,replays/
-videos and guards. Native447fe50/runneraba4300d and checkpoint configs remain.
-This tests frozen-agent/cohort dependence,not isolated weights or reliability;
-original8039's failed gate stays unchanged. Breakout is fully closed and the
-host idle at selection. CPU command/controller qualifications pass;their two
-checker failures and co-host timing remain preserved. Root
-`/x/Temp/kindle-qbert-cross-cohort-20261101`,service
-`kindle-qbert-cross-cohort-20261101`. Launch08:24:54 UTC November1/source63fce09,
-413 pins,originalPID770056/invocationd56c32f594864b018418ed008250835f;collector
-PID770059/invocatione17b21c8b78648fb8aeccf316d7cc5df. The first crossed final
-run and outcome replay finish;the full matrix remains pending. No new learner,
-retry,cap increase or automatic successor. Do not rerun qualifications or completed
-diagonal GPU stages;check live state before work and do not overlap assessments.
+The [completed frozen Qbert cross-cohort diagnostic](results/2026-11-01-cdp-qbert-cross-cohort.md) keeps4013
+stronger on both cohorts:15,515.625/14,370.833 versus8039's11,578.125/11,376.042.
+Only original4013/4013 clears15k;all first-pyramid counts24/24 except retained
+8039/8039's23/24. Own-initial subtraction preserves the ranking. Cohort alone
+does not explain the agent gap,but4013's passing margin does not hold on the
+alternate cohort. Original gate outcomes unchanged;no independent reliability or
+isolated-weight claim. All413 pins,357 finite invariant tensors per arm,full
+replays/videos,guards and original invocation pass. Four new arms131,080 actions/
+524,174 frames/97.911s,zero updates/truncations;four diagonal arms reused without
+GPU repeats. Main/collector succeed08:28:02/08:28:16 UTC November1/source63fce09.
+No assessment stage fails or repeats;two earlier CPU checker failures/co-host
+timing remain preserved. Root`/x/Temp/kindle-qbert-cross-cohort-20261101`;both
+services terminal,no active allocation at closure. Do not rerun assessment,
+collector,diagonal arms or preflights. No new learner,extension,cap increase or
+automatic successor. Check live state;the five-game goal remains unfinished.
 
 The [completed Breakout greedy-collection comparison](results/2026-11-01-cdp-breakout-greedy-training.md) finishes200k/
 799,639 frames/12,477 updates in21m46s. Sampled39.042/greedy99.083 fall30.64%/
@@ -1884,7 +1883,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Compact12M64/B16/R16/expert100/encoder4e-5/200k:sampled56.292,greedy104.667 in21m28s;own initials1.417/2.208. Same recipe2e-5:25.292/42.625 in22m27s;6e-6:13.208/17.875 in22m19s. Reused development seed/cohort,not independent confirmation. Retained B8/T16:2M98.21,same weights AMD Auto67.58;AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes;reliability open |
-| Qbert | AMD12M48/B16/T16/H5/R32/expert100/200k seeds4013/6029:greedy14050/15792.708,sampled13331.250/15420.833,23/24 and24/24 first pyramids,in40m24s/40m22s. Same recipe;own initial controls and all audits pass. The cheaper H15/R16/encoder4e-5/greedy-collection recipe reaches15,515.625 greedy/11,989.583 sampled,24/24 first pyramids,in27m33s on reused4013;all original audits and terminal confirmation pass. Fresh8039 reaches11,376.042 greedy/23 first pyramids and8,292.708 sampled/24 in27m34s,with all audits passing. One of two learners of this cheaper recipe passes the greedy gate; reliability remains open. | Original15k/90% gate passes on6029 in both modes,one of two H5 learners,and on4013 greedy with the cheaper collection recipe; broad reliability and reference193,220.77 remain open |
+| Qbert | AMD12M48/B16/T16/H5/R32/expert100/200k seeds4013/6029:greedy14050/15792.708,sampled13331.250/15420.833,23/24 and24/24 first pyramids,in40m24s/40m22s. Same recipe;own initial controls and all audits pass. The cheaper H15/R16/encoder4e-5/greedy-collection recipe reaches15,515.625 greedy/11,989.583 sampled,24/24 first pyramids,in27m33s on reused4013;all original audits and terminal confirmation pass. Fresh8039 reaches11,376.042 greedy/23 first pyramids and8,292.708 sampled/24 in27m34s,with all audits passing. One of two learners of this cheaper recipe passes the original greedy gate;cross-cohort scores14,370.833 for4013 and11,578.125 for8039 retain the ranking but neither passes15k. Reliability remains open. | Original15k/90% gate passes on6029 in both modes,one of two H5 learners,and on4013 greedy with the cheaper collection recipe; broad reliability and reference193,220.77 remain open |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and

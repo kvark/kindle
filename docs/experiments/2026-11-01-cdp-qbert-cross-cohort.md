@@ -76,3 +76,20 @@ invocation`d56c32f594864b018418ed008250835f`;collectorPID770059/invocation
 08:25:49 with a passing host guard;its outcome replay finishes08:26:13 with
 24 first pyramids. Remaining arms and terminal comparison are pending. No
 original stage repeats;keep this original process and collector running.
+
+## Accepted terminal result
+
+The [completed result](../results/2026-11-01-cdp-qbert-cross-cohort.md) keeps4013
+ahead on both cohorts:15,515.625/14,370.833 versus8039's11,578.125/11,376.042.
+First pyramids are24/24 throughout except retained8039/8039's23/24. Only the
+original4013/4013 cell passes15k;original8039's gate miss remains unchanged.
+The difference persists after actual-initial subtraction. This diagnoses
+frozen-agent/cohort dependence,not isolated weights or broad reliability.
+
+All413 pins,357 finite invariant tensors per arm,full outcome replays/videos,
+guards and original invocation checks pass. Four new arms total131,080 actions/
+524,174 frames/97.911s,zero updates/truncations;diagonal GPU stages do not repeat.
+Main/collector succeed08:28:02/08:28:16 UTC November1. No assessment stage fails
+or repeats;the earlier CPU checker failures remain preserved. Both services
+are terminal and the host is idle at closure. Do not rerun completed work.
+No new learner,extension,cap increase or automatic successor is selected.
