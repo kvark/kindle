@@ -68,6 +68,54 @@ Do not rerun this learner, original collectors or terminal confirmation.
 | Final summary | `041d75e3ac9043bb3b4e159c267200bd6c260f91b2cc6da541b62c5a8029d940` |
 | Terminal confirmation | `761056e4a97f352de8e50a585a69f2fac49e03fcfe8d5938f8c42694c12d784f` |
 
+## Greedy collection reaches more later autonomous training states
+
+A post-hoc CPU recount of the completed4013 learners confirms that later
+autonomous experience increases under greedy collection. It reuses the earlier
+sampled-control counts and the same input-state first-pyramid, episode-guidance
+and age definitions. Both learners already have teacher labels on all200k
+actions; these are experience counts, not sampled replay counts.
+
+| Training exposure | Sampled collection | Greedy collection |
+|---|---:|---:|
+| After first pyramid, wholly unguided episodes | 58,487 | 81,530 |
+| Unguided episode actions at age1920+ | 159 | 5,525 |
+| After guidance releases, all actions | 12,782 | 13,428 |
+| Last50k: after first pyramid, wholly unguided episodes | 20,829 | 31,625 |
+| Last50k: unguided episode actions at age1920+ | 159 | 4,541 |
+| Last50k: after guidance releases | 4,791 | 3,954 |
+
+The increase is concentrated in wholly unguided episodes, rather than only
+longer continuations after teacher guidance. This is consistent with the
+collection/coverage hypothesis that motivated the experiment. It does not prove
+that the changed exposure caused the frozen score gain: exploration, action
+sampling, visited states and subsequent learning all change together. Episode
+age is not a verified game-level identifier, and this is one reused learner seed.
+
+Actual last50k training-choice agreement on later movement labels rises
+63.84%→73.63% in unguided episodes and36.98%→47.06% after guidance releases.
+These are changing training policies on different states, with deliberately
+different action selection, not frozen-policy accuracy. Forced actions remain
+separate from those agreement denominators.
+
+The1.017s analysis completes07:21:44 UTC November1, source234ca3a. Candidate
+counts reconcile with the retained independent phase counter across all200k
+actions,799,803 frames,episode boundaries,partial tails,label totals and override
+counts. Original control counts are reused without repeating that recount.
+All332 diagnostic and359 active8039 inputs remain unchanged;original
+PID760870/invocationa0b219d7702b4c82a65e9b33498c3544 stays active. No native model,
+emulator, GPU work, learner update, failure or retry occurs. Preserve analysis
+and verification co-hosting without correcting training time.
+
+Root `/x/Temp/kindle-qbert-greedy-coverage-20261101`;complete,do not rerun.
+No new learner or objective change follows this descriptive recount.
+
+| Coverage artifact | SHA256 |
+|---|---|
+| Declaration | `a86e0291e7935fa093d0854099880631678c87ebbc03dfd04e4d41fc34290154` |
+| Review | `8bd7ae0e22f01181db7fa087306b46e1bb74a669e9b9bf31fb63a850c1ccb78e` |
+| Completion | `c4e60b88ace3f45fcd1e2482f692c3cce18e02d5fa37cda949895fbfb609a442` |
+
 ## Earlier execution and cost qualification
 
 Fresh greedy action collection completes8,192 actions /32,761 emulator frames /

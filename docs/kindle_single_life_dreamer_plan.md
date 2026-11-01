@@ -64,6 +64,11 @@ recipe for a separately declared fresh-seed check. Root
 `/x/Temp/kindle-qbert-greedy-training-20261101/full`; all services terminal,
 no allocation active at closure. Do not rerun completed stages or confirmations.
 The five-game goal remains unfinished; check live state before new work.
+The completed1.017s CPU coverage recount confirms later wholly unguided actions
+58,487→81,530 and age1920+159→5,525,with332 diagnostic/359 active pins unchanged
+at07:21:44 UTC/source234ca3a. This supports the coverage hypothesis without proving
+causal mediation;all actions already have labels. See the result's coverage section.
+No native/emulator/GPU work or new learner;retain CPU co-host timing.
 
 The [completed greedy-training Qbert check](results/2026-11-01-cdp-qbert-greedy-training.md)
 finishes8192 actions/32,761 frames/489 updates in66.241s;1024 frozen/.798s haszero

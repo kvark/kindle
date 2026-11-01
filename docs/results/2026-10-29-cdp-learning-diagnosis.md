@@ -55,6 +55,19 @@ recipe for a separately declared fresh-seed check. Root
 no allocation active at closure. Do not rerun completed stages or confirmations.
 The five-game goal remains unfinished; check live state before new work.
 
+Its [post-hoc exposure recount](2026-11-01-cdp-qbert-greedy-training.md#greedy-collection-reaches-more-later-autonomous-training-states)
+confirms later unguided actions58,487→81,530 and unguided age1920+159→5,525;
+last50k counts are20,829→31,625 and159→4,541. Released-guidance actions only rise
+12,782→13,428 overall and fall4,791→3,954 late. This locates the additional deep
+experience mainly in wholly unguided episodes. All actions already have labels;
+these are experience counts,not sampled replay counts. Exploration,collection
+and learning change together,so improved coverage is not established as the
+mediator of the score gain. Actual late movement agreement63.84%→73.63% is also
+not frozen-policy accuracy. The1.017s CPU analysis,332 diagnostic/359 active pins
+and exact boundary/label reconciliations pass07:21:44 UTC/source234ca3a;zero
+native/emulator/GPU work or updates. No new learner or loss follows.
+
+
 The [greedy-training execution check](2026-11-01-cdp-qbert-greedy-training.md)
 qualifies one collection-policy experiment:8192 actions/489 updates in66.241s,
 with357 matching initial/invariant frozen tensors,full replay and guards.
