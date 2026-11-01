@@ -21,19 +21,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Active work — November 1
 
 The [fresh Breakout encoder8e-5 comparison](docs/experiments/2026-11-01-cdp-breakout-encoder8e5-200k.md)
-is selected for preparation after the qualified bounded check:200k actions/
-12,477 updates under30 minutes,12M64/Auto/N8/B16/T16/H15/R16/expert100. Only
-encoder4e-5→8e-5 changes;native447fe50,exact runner,teacher and other settings
-stay fixed. Require100k/6227 recovery and fixed final/actual-initial sampled/
-greedy24-episode arms against56.292/104.667;all control arms have0/24 two-wall.
-CPU preflight1.375s passes five CLI paths,26 config cases,44 paths,15 scripts,
-nine header/four observer/seven recovery/four metadata-preservation cases,
-251 bounded/227 control pins and357 schema tensors without native/environment
-construction. Recovery automatically retains exact audited100k metadata; no
-learner behavior changes. No declaration or launch yet. Root
-`/x/Temp/kindle-breakout-encoder8e5-20261101/full`,service
-`kindle-breakout-encoder8e5-200k-20261101`. Check live state before launch;
-no experience reuse,retry,extension or automatic successor. Goal unfinished.
+launches04:49:29 UTC November1/source3897e74 with265 pins:200k actions/12,477
+updates under30 minutes,12M64/Auto/N8/B16/T16/H15/R16/expert100. Only encoder
+4e-5→8e-5 changes;native447fe50,exact runner,teacher and other settings fixed.
+Startup passes357 control/bounded-matching initial tensors,47 pre-update
+transitions,correct cadence and267 finite reports through4648 actions.
+MainPID742893,invocation`eccf5a76eed6458babd75b872c1704e4`;progress,recovery,
+postprocessing and collection observers are active. Require100k/6227 recovery
+and fixed final/actual-initial sampled/greedy24-episode arms against56.292/
+104.667,all control arms0/24 two-wall. Recovery automatically preserves the
+exact audited100k metadata before final replacement. CPU preflight1.375s and
+1.007s co-host startup pass;retain timing caveats without correction. No full
+frozen result exists;reused1009/cohort,no experience reuse or reliability claim.
+Root`/x/Temp/kindle-breakout-encoder8e5-20261101/full`,service
+`kindle-breakout-encoder8e5-200k-20261101`. Check live state;do not restart or
+schedule another GPU job while active. The five-game goal remains unfinished.
 
 The [completed Qbert encoder4e-5 comparison](docs/results/2026-11-01-cdp-qbert-encoder4e5.md)
 finishes200k actions/799,739 frames/12,477 updates in27m41s,8.56% less observed
