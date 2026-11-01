@@ -1,24 +1,22 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Breakout encoder4e-5 comparison](experiments/2026-11-01-cdp-breakout-encoder4e5-200k.md) launches03:07:11 UTC November1,
-source2f9af49,with227 pins and a30-minute training cap:200k actions/12,477 updates,
-12M64/Auto/N8/B16/T16/H15/R16/expert100,only encoder2e-5→4e-5. Native447fe50,
-exact runner and teacher stay fixed. Startup passes357 control/check-matching
-initial tensors,47 pre-update events,correct cadence and208 finite reports
-through3704 actions. Main PID732902/invocation`c69d91c610d24751bc334966ab8057b5`;
-progress,postprocessing and collection observers remain active. The100k/6227
-recovery passes03:18:16 with357 finite tensors and6447 finite reports through
-103,528 actions;its observer exits successfully. Confirmation preserves227 pins
-and checkpoint metadata identity in.542s CPU,with no GPU work or time correction.
-Final/actual-initial sampled/greedy24-episode assessments against25.292/42.625
-remain required,all retained0/24 two-wall. No full frozen result is available.
-Root`/x/Temp/kindle-breakout-encoder4e5-20261101/full`,service
-`kindle-breakout-encoder4e5-200k-20261101`. Do not restart this learner or schedule
-another GPU job while it is active;check live state. The [bounded check](results/2026-11-01-cdp-breakout-encoder4e5.md)
-passes8192 actions/32,721 frames/489 updates in46.899s,1024 frozen/.899s/zero
-updates,194 pins and all audits;conservative200k projection20m59s. Original CPU
-header-rate preparation failure remains preserved;no GPU repeats. Earlier
-4M/expert10 rate4e-5 failure and reused1009/cohort limits remain. Goal unfinished.
+The [completed Breakout encoder4e-5 comparison](results/2026-11-01-cdp-breakout-encoder4e5.md) finishes200k actions/
+799,581 frames/12,477 updates in21m28s,4.43% less training time than2e-5 control.
+Sampled56.292/greedy104.667 improve25.292/42.625 by122.57%/145.55%;own initials
+1.417/2.208 match,all0/24 two-wall. Initial-subtracted return/min rises1.063→2.557
+and1.800→4.774. Retain4e-5 for12M64/Auto/N8/B16/T16/H15/R16/expert100;only the
+encoder rate changes,native447fe50,exact runner and teacher fixed. All227 pins,
+100k/6227 recovery,357 matching/invariant tensors,47 pre-update events,800/795
+initial semantic events,full replays/videos,guards,curves,exposure and comparison
+pass. Main/post/collection succeed03:32:40/03:32:44/03:32:47 UTC November1,
+source2f9af49;all five original services terminal success,zero GPU repeats.
+Actual overrides49.6715%,late replay CE.558 versus.591 and online103.80 versus
+73.32 are not frozen competence/held-out accuracy. Earlier4M/expert10 rate4e-5
+failure,reused1009/cohort and CPU co-host caveats remain;no universal rate or
+reliability claim. Original CPU header-rate preparation failure is preserved.
+Root`/x/Temp/kindle-breakout-encoder4e5-20261101/full`;no extension,sweep,
+confirmation or automatic successor. No GPU allocation active at closure;
+check live state before work. The five-game goal remains unfinished.
 
 The current five-game goal includes architecture diagnosis. Prioritize the
 remaining Breakout control gap and Qbert later-game decisions using retained
@@ -893,6 +891,7 @@ is separate. Each row describes one learner or warm-start lineage, not broad rel
 | [Full18, corrective expert100/4M/B8/R16](results/2026-10-26-cdp-breakout-pixel-reference.md#stronger-imitation-improves-frozen-breakout-at-nearly-unchanged-cost) |200k /24,970|17m45s|Sampled9.458 /1.375; greedy12.208 /2.583|0/24 two-wall; one reused learner|
 | [Same supervision,12M/B16/R16](results/2026-10-26-cdp-breakout-pixel-reference.md#larger-capacity-improves-frozen-breakout-with-higher-cost) |200k /12,477|22m19s|Sampled13.208 /1.417; greedy17.875 /2.208|0/24 two-wall; higher scores for25.72% more time,one reused learner|
 | [Same12M/B16,encoder2e-5](results/2026-10-30-cdp-breakout-encoder-moderate.md) |200k /12,477|22m27s|Sampled25.292 /1.417; greedy42.625 /2.208|0/24 two-wall;91.48%/138.46% higher scores for0.61% more training time;one reused learner|
+| [Same12M/B16,encoder4e-5](results/2026-11-01-cdp-breakout-encoder4e5.md) |200k /12,477|21m28s|Sampled56.292 /1.417; greedy104.667 /2.208|0/24 two-wall;122.57%/145.55% higher scores than2e-5 for4.43% less training time;one reused learner|
 | [Same, four actions](results/2026-10-26-cdp-breakout-minimal-actions.md) |200k /49,939|20m59s|9.542 /1.167|0/24 two-wall successes|
 | [Four actions, coefficient1, actor/critic gradients](results/2026-10-26-cdp-breakout-minimal-actions.md#actorcritic-gradients-give-a-modest-unconfirmed-gain) |200k /49,939|20m41s|11.208 /1.167|0/24; modest unconfirmed gain|
 | [Same, coefficient .01](results/2026-10-26-cdp-breakout-minimal-actions.md#smaller-bonus-lowers-the-frozen-score) |200k /49,939|21m07s|5.042 /1.167|0/24; weaker frozen score|
@@ -1580,7 +1579,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
-| Breakout | Compact12M64/B16/R16/expert100/encoder2e-5/200k:sampled25.292,greedy42.625 in22m27s;own initials1.417/2.208. Original6e-6 control13.208/17.875 in22m19s; both single reused development learners. Retained B8/T16:2M98.21,same weights AMD Auto67.58;AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes;reliability open |
+| Breakout | Compact12M64/B16/R16/expert100/encoder4e-5/200k:sampled56.292,greedy104.667 in21m28s;own initials1.417/2.208. Same recipe2e-5:25.292/42.625 in22m27s;6e-6:13.208/17.875 in22m19s. Reused development seed/cohort,not independent confirmation. Retained B8/T16:2M98.21,same weights AMD Auto67.58;AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes;reliability open |
 | Qbert | AMD12M48/B16/T16/H5/R32/expert100/200k seeds4013/6029:greedy14050/15792.708,sampled13331.250/15420.833,23/24 and24/24 first pyramids,in40m24s/40m22s. Same recipe;own initial controls and all audits pass. The cheaper H15/R16/encoder2e-5 point reaches13,785.417 greedy/9,987.500 sampled,24/23 first pyramids,in30m16s on reused4013;all audits pass. | Original15k/90% gate passes on6029 in both modes,one of two H5 learners; broad reliability and reference193,220.77 remain open |
 
 These references are published long-run Dreamer scores, not equal-budget

@@ -1,5 +1,15 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The completed [Breakout encoder4e-5 comparison](2026-11-01-cdp-breakout-encoder4e5.md)
+further improves sampled25.292→56.292 and greedy42.625→104.667,with training
+21m28s versus22m27s. Only encoder2e-5→4e-5 changes as a learner setting;
+native,exact runner and teacher stay fixed. Both modes improve substantially
+per training minute,with all audits passing,but remain0/24 two-wall successes.
+Retain4e-5 for this development recipe. This strengthens the case for encoder
+optimization without measuring the new candidate's representation precision,
+establishing a universal rate or identifying the remaining architectural cause.
+The earlier4M/expert10 rate4e-5 failure and reused seed/cohort limits remain.
+
 The completed [Qbert encoder-rate comparison](2026-10-30-cdp-qbert-encoder-moderate.md)
 also improves frozen gameplay at nearly unchanged training cost: greedy
 11,984.375→13,785.417 (+15.03%) and sampled6,759.375→9,987.500 (+47.76%) in

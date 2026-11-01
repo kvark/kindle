@@ -86,3 +86,28 @@ still unmeasured.
 Recovery review`0294fa0526ad22572633d16705eb89a627fa3dc63d1b3c0d4f44214f6da7dbb3`;
 checkpoint metadata identity`3022afbb0fcd26027fb5153ed9c5bd39d5945f62bcc331a5a5725713b54003c4`;
 confirmation`35ce8548c2d5ce8ea94206487b5a57eb1ec13359aef89fabf7b0ed8c3a69e2b7`.
+
+## Completed comparison
+
+Fresh200k actions/799,581 frames/12,477 updates complete in1287.701s (21m28s),
+4.43% less training time than2e-5 control. Sampled56.292/greedy104.667 improve
+25.292/42.625 by122.57%/145.55%;own initials1.417/2.208 match,all0/24 two-wall.
+Own-initial-subtracted return per minute rises1.063→2.557 and1.800→4.774.
+Retain4e-5 as the stronger development point;no extension,sweep,confirmation or
+automatic successor. The five-game goal remains unfinished.
+
+All227 pins,100k recovery,357 matching/invariant tensors,47 pre-update events,
+800/795 initial semantic events,finite reports,full replays/videos,guards,curves,
+exposure and comparison pass. Four frozen arms total83,600 actions/334,244 frames/
+72.329s,zero updates/truncations. Main/post/collection succeed03:32:40/03:32:44/
+03:32:47 UTC November1;all five original services are terminal success. No GPU
+stage repeats. Initial CPU preparation failure and co-host timing caveats remain
+preserved. Native447fe50,runner and teacher stay fixed;reused1009/cohort is not
+independent confirmation or broad reliability. Actual overrides49.6715% and
+late replay CE.558 versus.591 are not unaided competence/held-out accuracy.
+
+Completion`57e5b798c505c1d139e385ae89b29bede091480abc67ff1203c6baff15719f35`;
+comparison`5bdc537bc71cf4cfd8321ac5c9f25c81c26b56ae6281b0c1de532e031d2ede57`.
+The comparison plot is visually inspected. See the
+[completed result](../results/2026-11-01-cdp-breakout-encoder4e5.md);no GPU
+allocation is active at closure. Check live state before further work.
