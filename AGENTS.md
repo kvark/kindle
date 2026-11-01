@@ -27,8 +27,10 @@ passes16:54:28:357 initial tensors/47 pre-update transitions match the bounded
 All47 cross-capacity control transitions differ;own actual initials are required.
 Fix200k/12,477 updates/35min,retained100k/6,227 recovery and four final/actual-
 initial24-episode greedy-primary/sampled arms against14,339.583/13,761.458.
-MainPID821599/invocation208ec1ae7b96453f927694fae11fa0ff;progress,recovery,
-postprocessing and terminal collection observers are active. No frozen result yet.
+MainPID821599/invocation208ec1ae7b96453f927694fae11fa0ff continues. Recovery
+passes17:06:17 UTC at100k/6,227,all357 finite tensors/four retained files verified;
+its observer succeeds. Progress,postprocessing and terminal collection stay
+active. No frozen result yet.
 Capacity12M→25M and ratio24→16 change together;native447fe50/runneraba4300d and
 qualified faster teacher stay. Bounded cost projection25m08s passes35min.
 First full CPU qualification passes16:48:06 in3.600s;separate one-basename
