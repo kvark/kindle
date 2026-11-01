@@ -33,11 +33,22 @@ observer is terminal success. Independent.835s CPU confirmation verifies all
 265 pins,live tensor hashes and original process identity. Require fixed final/
 actual-initial sampled/greedy24-episode arms against56.292/104.667,all control
 arms0/24 two-wall. CPU preflight1.375s and1.007s co-host startup pass;retain
-all co-host timing caveats without correction. No full
-frozen result exists;reused1009/cohort,no experience reuse or reliability claim.
+all co-host timing caveats without correction. Training now finishes200k actions/
+799,597 frames/12,477 updates in21m24s. Four frozen arms finish with raw fixed24
+means55.875 sampled/125.375 greedy and initials1.417/2.208;full replay/audit
+closure remains pending. Reused1009/cohort,no experience reuse or reliability claim.
 Root`/x/Temp/kindle-breakout-encoder8e5-20261101/full`,service
 `kindle-breakout-encoder8e5-200k-20261101`. Check live state;do not restart or
 schedule another GPU job while active. The five-game goal remains unfinished.
+
+The [CPU Qbert teacher-takeover diagnostic](docs/experiments/2026-11-01-cdp-qbert-recoverability.md)
+is prepared on32 losses in the first recorded episode of each lane:16,613
+source actions,eight episodes,up to32 actions before loss and64-action teacher
+follow-up. Eight CPU tests and3.331s preflight verify307 inputs and the original
+Breakout process/265 inputs. Raw-frame loss accounting handles bonus/loss pairs;
+recorded branches and eight reverse-order checks are required.180s analysis/
+195s controller caps;no new native/GPU work,learner or automatic successor.
+Root`/x/Temp/kindle-qbert-recoverability-20261101`;Breakout audits continue.
 
 The [completed CPU Qbert life/color replay](docs/results/2026-11-01-cdp-qbert-life-replay.md)
 finds all96 losses per retained2e-5/4e-5 policy occur after the first pyramid,

@@ -107,3 +107,14 @@ The Qbert CPU replay completes 05:07:23 UTC on November1 in49.272s analysis /
 inputs/original process identity unchanged. No native/GPU work or learner
 update occurs in that diagnostic. Retain this CPU co-host timing caveat without
 correcting training wall time;the original learner continues.
+
+## GPU stages complete; original CPU closure pending
+
+Training finishes200k actions/799,597 frames/12,477 updates in1284.126s
+(21m24s). All four frozen arms finish,with provisional fixed24 means55.875
+sampled/125.375 greedy and actual initials1.417/2.208. These are raw log
+summaries;the original full replay,host/checkpoint audits,postprocessing and
+collection must pass before accepting the comparison. The original main and
+observers remain active;do not repeat any stage. The separately prepared Qbert
+CPU intervention's eight tests take.035s and input preflight3.331s after these
+GPU stages. Preserve timing context without training-time correction.
