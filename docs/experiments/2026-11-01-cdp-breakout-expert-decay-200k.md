@@ -106,3 +106,34 @@ review SHA`b889bc5fcf3917c462b3219c8efab262470587dfc2763b06039dfacc215df13e`;
 semantic review SHA`3706f6962ea0d087d7537c51c27d73a39425a42a438549d7f60fae0ce53d5f5f`.
 The full learner remains active under its original PID/invocation;no GPU job,
 setting or declared input changes. Recovery and frozen gameplay remain pending.
+
+## 100k recovery and the start of fading verified
+
+The original recovery observer succeeds at02:39:01 UTC November1:100,000 actions/
+6,227 updates and357 finite tensors. Its complete prefix has103,288 actions/
+6,432 finite reports. Read-only confirmation at02:40:14 UTC preserves all236 pins
+and the original mainPID728595/invocation`2c767c73ae394a30b2ea792b28eb3aff`,still active.
+It checks7,132 scheduled reports through114,472 actions: weight100 at6227/action
+99,992;99.967995 at6228/action100,008;99.936005 at6229;99.904 at6230;71.04 at7132.
+The recovery observer exits successfully. The confirmation takes.659s CPU;
+retain co-host timing without correction. No GPU stage repeats or setting changes.
+
+Recovery review SHA`5f7af233a2d2d4cc2fff23931e5c7050d5ec64d4ab74b77a01ecc51568230e50`;
+checkpoint identity`76157e1a0548d9957188aa40a64ac773caf988b6f33898acf6f51908eba72f78`;
+confirmation SHA`c499776dfa6513246d6306e24ebce276a4f53acfaaa019f4b1703ed662d83f40`.
+
+The separately selected fixed100k prefix comparison also completes:all12,500
+transitions (100,000 actions,rewards,pixel hashes,labels and overrides),6,227
+learner reports,185 episodes and184 resets match the retained control after the
+same timing exclusions and requiring candidate weight100. Selection precedes
+the100k boundary;original timing-inclusive evidence is retained. This extends
+recorded equivalence through the final held-weight update. It does not compare
+uncaptured hidden state,gradients or intermediate parameter tensors.
+
+CPU comparison1.202s plus semantic review0.998s;
+zero native/environment work,co-host caveat retained. Evidence
+`/x/Temp/kindle-expert-decay-20261101/prefade-prefix-100k`,with selection
+`/x/Temp/kindle-expert-decay-20261101/prefade-100k-selection.json`.
+Semantic review SHA`53b6224396c67ff6a265fa901b0816a90ad1f730dc7319d66df14c4c79fdfaf0`.
+Training continues toward200k with the original process;zero-weight tail and
+all four frozen assessments remain pending. No competence claim or successor.

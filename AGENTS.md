@@ -18,21 +18,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [fresh Breakout imitation-decay comparison](docs/experiments/2026-11-01-cdp-breakout-expert-decay-200k.md) launches02:27:56 UTC November1
-/source90b1c7e with236 pins and a30-minute training cap. Hold expert100 through
-update6227 (100k actions),fade tozero by9352 (150k),then finish200k/12,477.
-Keep12M64/Auto/N8/B16/T16/H15/R16/encoder2e-5,teacher guidance and labels; native
-65ed45f and runner differ from retained447fe50,so no isolated causal claim.
-Startup verifies357 tensors matching control/check,47 pre-update transitions,
-correct cadence/weight and213 finite reports through3784 actions. MainPID728595,
-invocation2c767c73ae394a30b2ea792b28eb3aff; progress,recovery,postprocessing and
-collection observers are active. Require100k/6227 recovery and final/actual-initial
-sampled/greedy24-episode assessments against25.292/42.625,all0/24 two-wall.
-Two CPU preparation failures are preserved; no GPU stage repeats. The.965s CPU
-startup co-host caveat remains without time correction. Root
+The [fresh Breakout imitation-decay comparison](docs/experiments/2026-11-01-cdp-breakout-expert-decay-200k.md) verifies100k/6227 recovery
+at02:39:01 UTC November1,all357 finite tensors,236 pins and originalPID728595/
+invocation2c767c73ae394a30b2ea792b28eb3aff. Weight100 at6227 falls99.967995 at6228;
+7,132 checked reports through114,472 actions have exact scheduled weights,last71.04.
+All first100k actions match the control:12,500 transitions,6,227 non-timing learner
+reports,185 episodes and184 resets. Hidden states/gradients are not compared;
+native65ed45f/runner differ from447fe50,so no isolated causal or reliability claim.
+Main starts02:27:56 UTC/source90b1c7e;200k/12,477 under30min,decay ends9352/150k,
+12M64/Auto/N8/B16/T16/H15/R16/encoder2e-5,teacher guidance and labels retained.
+Recovery observer succeeds; main,progress,postprocessing and collection remain
+active. Four final/actual-initial sampled/greedy24-episode assessments against
+25.292/42.625,all0/24 two-wall remain pending. CPU preparation failures and
+co-host timing caveats stay preserved;zero GPU repeats. Root
 `/x/Temp/kindle-expert-decay-20261101/full`,service`kindle-breakout-expert-decay-200k-20261101`.
-Check live state;do not restart or overlap this learner. No frozen result yet;
-the five-game goal remains unfinished.
+Check live state;do not restart or overlap this learner. The five-game goal is unfinished.
 
 The [optional native imitation decay](docs/results/2026-11-01-cdp-expert-imitation-decay.md) passes F64 loss/gradient checks at
 weights100/50/0 and fresh Breakout8192 actions/32,724 frames/489 updates in46.991s.
