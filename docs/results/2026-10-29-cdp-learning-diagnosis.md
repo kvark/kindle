@@ -1,29 +1,30 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [Qbert12M/RGB64 bounded check](2026-11-01-cdp-qbert-rgb64.md) passes 8,192 actions / 733 updates
-in 57.956s, with frozen invariance, full guided replay and guards passing.
-Its conservative 200k estimate is 25m56.425s, within the 30-minute cap.
+The [completed Qbert12M/RGB64 comparison](2026-11-01-cdp-qbert-rgb64.md) reaches **15,710.417 greedy /24 first pyramids**,
+passing the unchanged15k/90% gate and improving RGB48's14,339.583 by9.56%.
+Sampled14,250/24 rises3.55% from13,761.458 but still misses15k. Own initials
+1.042 greedy/195.833 sampled clear none;cross-geometry traces differ. Retain this
+single-learner development point;reused10007/cohort does not establish reliability.
+No extension,automatic confirmation or successor is selected by this result.
 
-The fresh 200k / 18,715-update comparison launches **19:38:45 UTC November 1**,
-source b8de34f. Original main PID836919/invocation425aae9cee2541fe9623b753225af57f
-and the progress/postprocessing/collection observers are active. Startup review at 19:41:33 verifies all
-521 inputs, 357 bounded-matching initial tensors, 47 matching pre-update
-transitions, correct cadence and 2,074 finite reports through 22,504 actions.
-The 1.465s CPU review co-hosts without a wall-time correction. Require retained
-100k/9,340 recovery and final/actual-initial greedy plus sampled 24-episode
-assessments against 14,339.583/13,761.458 and the unchanged 15k/90% gate.
-The original recovery observer succeeds at 19:51:22 UTC: 100,000 actions /
-9,340 updates, all 357 finite tensors and 9,405 finite prefix reports pass.
-All four retained files match their hashes (206,067,159 bytes). No full frozen
-result is available; the original learner continues.
+Training completes200k actions/799,823frames/18,715 updates in**25m09.797s**,
+within30min. Total time falls11.90% versus the original slower-teacher control;
+initial-subtracted gain/min rises24.35% greedy/17.38% sampled. Recorded learning
+work rises16.73%;the faster teacher also changes acting cost,so no isolated
+resolution/native speed claim. Keep12M64/H5/R24/encoder4e-5/base behavior4e-5/
+greedy collection/expert100/native447fe50/runneraba4300d/teacherfa261c53.
+Geometry/head shapes/initialization change together;older4M64 negative remains.
+Late imitation CE.051060→.049491;44,600 actual overrides (22.3%) are not competence.
 
-Keep 12M64/H5/R24/encoder4e-5/base behavior4e-5/greedy collection/expert100,
-native447fe50/runneraba4300d/teacherfa261c53. Geometry/head shapes/initialization
-and teacher-cost differences limit causal claims; the older unaided4M64
-negative result remains. Root `/x/Temp/kindle-qbert-rgb64-20261101/full`,
-service `kindle-qbert-rgb64-200k-20261101`. Check live state; do not restart
-this learner, repeat completed stages or overlap GPU work.
-The five-game goal remains unfinished.
+All521 pins,357 bounded-matching initial/invariant frozen tensors,47 pre-update
+transitions,100k/9,340 retained four-file recovery,full replays/videos,guards,
+curves,coverage,exposure,comparison and original collector pass. All five services
+succeed:main20:11:19/post20:11:52/collection20:12:24 UTC November1/sourceb8de34f.
+Four frozen arms156,312 actions/625,086frames/146.320s,zero updates/truncations.
+No failure,cap change,GPU/replay/collector repeat or build. CPU co-host caveats
+remain without time correction. Root `/x/Temp/kindle-qbert-rgb64-20261101/full`
+is complete;do not restart it. No GPU allocation remains active at closure.
+Check live state before future work;the five-game goal remains unfinished.
 
 The [fixed Breakout one-step risk controller](2026-11-01-cdp-breakout-one-step-risk.md) lowers mean return
 225.083→184.417 (−18.07%), with three of eight lanes improved and both0/24
