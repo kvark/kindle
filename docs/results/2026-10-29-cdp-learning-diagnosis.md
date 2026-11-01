@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fixed Breakout upper-crop reference](2026-11-01-cdp-breakout-crop70.md)
+leaves all eight returns unchanged:mean185.375,zero two-wall successes. The
+10%/five-lane screen fails;retain the teacher,no crop retry or24-episode expansion.
+All16,280 actions/65,107 frames replay exactly;26 declared/490 active Qbert pins
+and original process identity pass. Seven fixtures,2.499s preflight,10.639s
+collection/13.219s replay/26.484s controller;complete12:41:57 UTC November1,
+source7b12a46. Separate.139s log comparison finds identical actions/pixel hashes/
+rewards/boundaries and zero accepted detections above y90;96 debug rows differ.
+No native/GPU work,updates,failures or repeated stages. Keep co-host timing;
+root`/x/Temp/kindle-breakout-crop70-20261101`. Do not rerun.
+
 The [saved-frame pooling diagnostic](2026-11-01-cdp-breakout-pool-timing.md)
 finds exact two-frame midpoint paddle measurements on35,193 accepted pairs.
 Latest-frame discrepancy averages1.456px;the response model still has1.965px

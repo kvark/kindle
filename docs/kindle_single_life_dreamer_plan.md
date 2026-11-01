@@ -33,6 +33,17 @@ No trial,queue,declaration,service or GPU allocation is selected. Review only
 after current Qbert closure;all490 active pins/original identity remain unchanged.
 Root`/x/Temp/kindle-breakout-r8-20261101/native-check`;do not repeat preflight.
 
+The [fixed Breakout upper-crop reference](results/2026-11-01-cdp-breakout-crop70.md)
+leaves all eight returns unchanged:mean185.375,zero two-wall successes. The
+10%/five-lane screen fails;retain the teacher,no crop retry or24-episode expansion.
+All16,280 actions/65,107 frames replay exactly;26 declared/490 active Qbert pins
+and original process identity pass. Seven fixtures,2.499s preflight,10.639s
+collection/13.219s replay/26.484s controller;complete12:41:57 UTC November1,
+source7b12a46. Separate.139s log comparison finds identical actions/pixel hashes/
+rewards/boundaries and zero accepted detections above y90;96 debug rows differ.
+No native/GPU work,updates,failures or repeated stages. Keep co-host timing;
+root`/x/Temp/kindle-breakout-crop70-20261101`. Do not rerun.
+
 The [completed Breakout pooling diagnostic](results/2026-11-01-cdp-breakout-pool-timing.md) finds35,193/35,193 accepted
 pooled paddle centers exactly equal the last-two-raw-frame midpoint;latest-raw
 MAE1.456 over35,610 decisions. Shared model errors remain1.965 pooled versus
