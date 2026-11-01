@@ -25,6 +25,19 @@ The1.711s startup CPU co-host cost stays uncorrected. Root
 `kindle-qbert-dynamics1e4-200k-20261101`. No retry, cap increase, rate sweep,
 extension or automatic successor. The five-game goal remains unfinished.
 
+The [current saved-log cost summary](results/2026-11-01-cdp-current-training-cost.md)
+finds learning81.14–81.31% of Qbert wall time and87.57–88.72% of Breakout;
+emulator stepping3.99–4.89%. Within updates,Qbert world training44.21–44.53%,
+posterior23.68–23.73%,imagination19.88–20.02%;Breakout imagination39.84–39.98%.
+These are wrapper/learner wall timers,not exclusive GPU costs or a selected
+optimization. All62,384 reports/39 completed receipt files,21 analysis pins and
+606 active inputs pass with originalPID857991/invocation unchanged. CPU analysis
+4.289s completes22:42:05 UTC/sourcea369f61 after preserving a1.894s failed wrapper
+that incorrectly required independently measured timers to sum exactly. Separate
+repair retains inter-stage residuals;no completed analysis or GPU stage repeats.
+Keep co-host costs uncorrected. Original Qbert learner/observers continue;no
+new allocation or successor. Root`/x/Temp/kindle-current-training-cost-20261101`.
+
 The [completed bounded Qbert dynamics1e-4 check](results/2026-11-01-cdp-qbert-dynamics1e4.md)
 passes8192 actions/32,756 frames/733 updates in57.461s;1024 frozen/.853s haszero
 updates/no natural episodes. Conservative200k projection25m43.153s clears30min.

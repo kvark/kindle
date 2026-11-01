@@ -80,3 +80,13 @@ Fullroot `/x/Temp/kindle-qbert-dynamics1e4-20261101/full`; service
 `kindle-qbert-dynamics1e4-200k-20261101`. Preserve original main/observers and
 fixed200k/30min,100k recovery and four24-episode assessments. Do not restart or
 overlap another GPU allocation. The five-game goal remains unfinished.
+
+
+The separate [current training-cost summary](2026-11-01-cdp-current-training-cost.md)
+reads four completed learners while this original run continues. Its first
+1.894s CPU wrapper fails on an overstrict timer-sum assertion;the separate
+4.289s analysis (4.308s wrapper) accounts explicitly for inter-stage time and
+passes22:42:05 UTC. All21 analysis/606 active inputs and originalPID857991/
+invocation1e44edc5d824407b8a21cd62657f6ee2 remain unchanged. No native/emulator
+import,GPU work,update or completed stage repeat occurs. Retain both co-host
+costs without correcting this learner's wall time.

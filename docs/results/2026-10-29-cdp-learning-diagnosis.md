@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [updated current-run timing summary](2026-11-01-cdp-current-training-cost.md)
+places81% of Qbert and88% of Breakout training wall time inside learning,versus
+4–5% in emulator stepping. Within current Qbert H5/R24 updates,world training
+is44%,posterior preparation24% andimagination20%;Breakout H15/R16 still spends
+40% on imagination. This replaces older timings for describing current cost,
+without claiming isolated GPU costs or a useful new optimization. The CPU-only
+review preserves all606 active Qbert inputs and original process;its original
+failed exact-timer-sum assertion and separate residual-accounting repair remain
+recorded. No GPU stage repeats or new learner is selected.
+
+
 The [fresh Qbert dynamics-group1e-4 comparison](../experiments/2026-11-01-cdp-qbert-dynamics1e4-200k.md)
 launches22:32:25 UTC November1/source0d8ec52 with606 pins. Original mainPID
 857991/invocation1e44edc5d824407b8a21cd62657f6ee2 and progress/recovery/post/
