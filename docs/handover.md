@@ -1,7 +1,7 @@
 # CDP handover — October25,2026
 
 The [fresh Qbert 300k comparison](experiments/2026-11-01-cdp-qbert-300k-full.md)
-is running from17:42:10 UTC November1/source7bd5001 with524 pinned inputs.
+is running from17:42:11 UTC November1/source7bd5001 with524 pinned inputs.
 Fix 300k/28,090 updates and a35-minute training cap at12M48/Auto/N8/B16/T16/
 H5/R24/encoder4e-5/base behavior4e-5/greedy collection/expert100, using the
 qualified faster teacher. Startup passes357 control/bounded-matching initial
