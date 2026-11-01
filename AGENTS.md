@@ -47,6 +47,18 @@ CPU closure`complete_with_cpu_audit_repair` supplies missing evidence. New sourc
 checks preserve that provenance. Supplemental bounded reader error/correction
 remain recorded. Fresh confirmation andthe five-game goal remain unfinished.
 
+CPU preparation for the [current Breakout critic comparison](docs/experiments/2026-11-01-cdp-breakout-current-critic.md)
+passes23:37:02 UTC November1 in8.958s:five actual commands,both357-tensor schemas,
+227/272 source pins and768 active Qbert pins;original Qbert identity staysfixed.
+Nine value tests pass after preserving the missing-runtime collection failure;
+a separate preflight repair handles the absent Qbert-only argparse field. No
+native/emulator construction,GPU queue,declaration orservice iscreated. Keep
+co-host costs uncorrected. Proposed four frozen arms use each exact Breakout
+runner andcomplete external+intrinsic returns;source logs put intrinsic mean
+atabout8–10% of imagined reward. This isnot gradient attribution. Root
+`/x/Temp/kindle-breakout-current-critic-20261101` isprepared only. Do not select
+orlaunch GPU work until current Qbert andall observers areterminal andclosed.
+
 The [current cost summary](docs/results/2026-11-01-cdp-current-training-cost.md)
 finds learning about81% of Qbert and88% of Breakout training wall time. Within
 Qbert updates,world training44%,posterior preparation24%,imagination20%;Breakout

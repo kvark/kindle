@@ -1,5 +1,17 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+CPU preparation for the [current Breakout critic comparison](../experiments/2026-11-01-cdp-breakout-current-critic.md)
+passes23:37:02 UTC November1 in8.958s:five actual commands,both357-tensor schemas,
+227/272 source pins and768 active Qbert pins;original Qbert identity staysfixed.
+Nine value tests pass after preserving the missing-runtime collection failure;
+a separate preflight repair handles the absent Qbert-only argparse field. No
+native/emulator construction,GPU queue,declaration orservice iscreated. Keep
+co-host costs uncorrected. Proposed four frozen arms use each exact Breakout
+runner andcomplete external+intrinsic returns;source logs put intrinsic mean
+atabout8–10% of imagined reward. This isnot gradient attribution. Root
+`/x/Temp/kindle-breakout-current-critic-20261101` isprepared only. Do not select
+orlaunch GPU work until current Qbert andall observers areterminal andclosed.
+
 The [current Qbert dynamics-group comparison](2026-11-01-cdp-qbert-dynamics1e4.md)
 raises greedy12,678.125→15,471.875 andsampled12,093.750→14,862.500,each24/24
 first pyramids,for.83% more time. Greedy passes15k; sampled does not. Late
