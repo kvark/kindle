@@ -123,3 +123,26 @@ native/runner differences remain. The30-minute cap is unchanged.
 service identity. This is provisional log evidence:the existing pipeline is
 continuing its fixed frozen arms and full replay/checkpoint audit. No new GPU
 job or checkpoint selection occurs, and no gameplay benefit is inferred yet.
+
+### Frozen logs and their replays finish; full pipeline remains pending
+
+The fixed final sampled mean is **35.542 versus control56.292 (−36.86%)**;
+greedy is **112.750 versus104.667 (+7.72%)**. Actual-initial sampled1.417 and
+greedy2.208 match the control means. Every selected arm haszero of24 two-wall
+successes. The unchanged sampled-primary result is lower;the separate greedy
+improvement does not establish an overall win or five-game success.
+
+Four arms total **80,320 actions /321,115 frames /73.707s**,zero updates andzero
+truncations across their complete logs. The completed frozen replays reproduce
+the source logs and selected24-episode scores/task outcomes. All excess episodes
+remain recorded:25 sampled-final,28 sampled-initial,28 greedy-final and27
+greedy-initial. No cap increase, retry or frozen-stage repeat occurs.
+
+The.071s CPU log/replay recount completes **11:40:22 UTC November1**,preserving
+the original active service identity. `frozen-log-progress.json` records this
+provisional evidence;the full training pixel/action/label replay,learning review,
+postprocessing and terminal collection are still pending. Do not treat this as
+a completed pipeline or select a successor. The original learner service is
+performing its CPU audit;do not restart it or repeat any completed GPU stage.
+
+- `frozen-log-progress.json`: `8800ba42298ac4947138cda0c3356c2f03b8db2b7d684de7f196a84dce2c117e`.
