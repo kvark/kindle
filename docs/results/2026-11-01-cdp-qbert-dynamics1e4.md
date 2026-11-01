@@ -1,30 +1,27 @@
-# Qbert dynamics-group1e-4: frozen gain awaits repaired CPU audit
+# Lower dynamics-group rate improves frozen Qbert at nearly unchanged cost
 
-The [Qbert dynamics-group1e-4 comparison](../experiments/2026-11-01-cdp-qbert-dynamics1e4-200k.md)
-finishes allfive GPU stages:200k actions/18,715 updates in25m40.027s,thenfour
-frozen arms. Preliminary selected24-episode means aregreedy15,471.875 and
-sampled14,862.5 versus12,678.125/12,093.75;own initials168.750/167.708 match.
-Pyramid/replay/final closure checks remain pending; do not claim an audited gate.
+**Completed with a separate CPU audit repair:** lowering dynamics-group rate
+4e-4→1e-4 raises greedy return **12,678.125→15,471.875 (+22.04%)** and sampled
+return **12,093.750→14,862.500 (+22.89%)**. Both final modes clear the first
+pyramid in24/24 episodes. Greedy passes the unchanged15k/90% gate; sampled
+still misses the mean threshold. Training takes **25m40.027s**, only.83% longer.
+Retain this useful development point; learner12011/evaluation4000012011 were
+reused,so this is not independent confirmation or broad reliability.
 
-Original mainPID857991/invocation1e44edc5d824407b8a21cd62657f6ee2 fails23:00:53
-UTC November1 in its CPU audit:undefined`CONTROL`,before any replay. Original
-collection fails;postprocess exits with`postprocess-incomplete.json`. Preserve
-these failures. No GPU stage failed or repeats; original100k/9,340 recovery passed.
+| Dynamics-group rate | Greedy primary | Sampled | Training time |
+| --- | ---: | ---: | ---: |
+| Retained4e-4 |12,678.125;24/24|12,093.750;24/24|25m27.366s|
+| Candidate1e-4 |**15,471.875;24/24;pass**|14,862.500;24/24|25m40.027s|
+| Actual initial,either rate |168.750;0/24|167.708;0/24|—|
 
-Separate CPU repair`kindle-qbert-dynamics1e4-cpu-repair-20261101` launches23:06:15
-UTC/source240bb89,PID862557/invocatione48562cf43cd4ba8927950760ef61922.
-Its3.959s qualification passes606 original/111 repair pins and verifies that
-CONTROL is the sole missing audit global. It injects the exact retained-control
-path without editing the original source; native/emulator construction is blocked
-in the parent. Missing frozen/training replays,plots andcomparison run once.
-Two failed preparation checks are preserved:import-versus-construction and raw
-journal JSON equality; corrected checks retain original journal bytes and compare
-decoded records. Original services stay failed; no original completion is created.
-Root`/x/Temp/kindle-qbert-dynamics1e4-20261101/full/cpu-repair`;declaration77ce1326.
-No new learner,confirmation,rate sweep,extension or GPU successor is selected.
-The five-game goal remains unfinished. Do not restart the original services or
-repeat completed training/evaluation/replay stages; check live repair state.
+The original main and collector remain failed because the CPU audit referenced
+an undefinedCONTROL path after allfive GPU stages completed. The separate
+297.912s CPU closure supplies all missing audits and reporting without repeating
+training or frozen evaluations. Its status is`complete_with_cpu_audit_repair`;
+there is no original passing completion. See the final section for exact failure
+and repair provenance. No successor learner is selected here.
 
+The bounded qualification below is historical and remains complete.
 
 The [fixed bounded check](../experiments/2026-11-01-cdp-qbert-dynamics1e4.md)
 completes8,192 actions/32,756 frames/733 updates in **57.461406s**. Frozen1,024
@@ -136,3 +133,79 @@ weights/metadata only; replay,live beliefs,games and RNG are not retained.
 No intermediate evaluation or checkpoint selection occurs. Final200k/18,715
 updates/30min and allfour frozen assessments remain unchanged and pending.
 Keep CPU co-host costs without wall-time correction; no restart or overlap.
+
+
+## Completed full comparison and repaired closure
+
+Fresh training completes200,000 actions/799,807 frames/18,715 updates in
+1,540.027384s versus1,527.365963s. The four frozen arms total138,760 actions /
+554,893 frames /144.341s,zero updates/truncations. Every score uses the first
+three natural episodes per eight lanes,guidance off. Actual-initial means and
+all1,176 sampled/1,223 greedy semantic events match the retained control.
+All357 initial tensors match both bounded and retained controls; all357 tensors
+remain invariant in every frozen arm. The100k/9,340 four-file recovery remains
+retained with verified hashes.
+
+Initial-subtracted return per training minute rises491.410→596.215 greedy
+(+21.33%) and468.494→572.514 sampled (+22.20%). The final50k-action replay
+imitation CE instead worsens.044040→.069685. Better frozen gameplay alongside
+worse imitation fit reinforces that aggregate training loss is not a competence
+measure; it does not identify the causal optimizer mechanism. The rate jointly
+changes recurrent dynamics,posterior,future-prediction andexploration groups.
+Native447fe50/SHA35ad0db,teacherfa261c53,model geometry,horizon,ratio andother
+settings stay fixed; private runnere161bf38 has only the qualified12 CLI lines.
+
+All18,715 reports are finite andsupervised,with4,488,424 labeled rows equal to
+target weight sum. World/actor expert losses agree within8e-7. CNN,reward,actor
+andvalue parameters change. Every training pixel,action,corrective label,reward,
+reset and outcome reproduces. Actual overrides47,700 (23.85%) exceed control
+44,539 (22.2695%) on their changing trajectories; online last50 means15,505.0/
+15,340.5 include this guidance and are not unaided scores. All frozen replays,
+videos,host guards,curves,coverage,exposure and fixed comparison pass. Ordinary
+frozen source logs lack live-image hashes; do not claim unavailable live-pixel
+parity. The comparison plot is inspected and labels online versus frozen results.
+
+Original main fails **23:00:53.476 UTC November1** on undefinedCONTROL while
+constructing the CPU audit result,before any replay. The original postprocess
+exits with its incomplete-review receipt; original collection fails explicitly.
+Those statuses,journals andsources remain unchanged. The qualification missed
+this free-global error; the repair now checks referenced audit globals before
+and after supplying the retained-control path. Original source bytes are not
+edited. CPU repair preparation preserves two further failed attempts: imports
+were incorrectly forbidden despite no construction,and raw JSON journal bytes
+were compared despite unstable field order. Constructor guards and decoded-row
+comparison fix these preparation checks without changing experiment data.
+
+The separately declared CPU service launches23:06:15/source240bb89 and succeeds
+**23:11:13.343 UTC**,PID862557/invocatione48562cf43cd4ba8927950760ef61922.
+Its **297.912s** controller completes missing audit288.804s,plot1.168s,coverage
+.019s,comparison4.311s andexposure.778s. All606 original/111 repair inputs remain
+unchanged,including completed logs/checkpoints/guards and original failure
+receipts. No completed GPU,replay,postprocess orcollector stage repeats.
+`full/cpu-repair/completion-review.json` is the separate closure; the original
+trial has no`completion-review.json` and original main/collection remain failed.
+
+A subsequent read-only terminal summary first fails because journalctl's default
+JSON output represents the long completion MESSAGE asnull. The failure andsource
+are retained. A separate reader uses`--all`,verifies the exact logged completion,
+all five repair stages,original identities/states,unchanged pins/files and the
+24-episode scores. It passes in2.050s at23:12:15 UTC; no original stage repeats.
+The earlier original-success summary remains unexecuted. CPU document/source
+review and the recorded timing diagnostic co-hosted training; preserve all
+measured wall times without correction. Repair and terminal-summary time occur
+after GPU work and do not alter the25m40.027s training cost.
+
+All original services andthe CPU repair are terminal;no Kindle GPU allocation
+is active atclosure. Retain1e-4 as a promising development recipe,but do not
+combine its reused12011 result with the distinct4e-4 seed10007 as two learners
+of one fixed recipe. Fresh-seed confirmation remains open. No extension,rate
+sweep orautomatic successor is selected. The five-game goal remains unfinished.
+Root`/x/Temp/kindle-qbert-dynamics1e4-20261101/full` iscomplete;do not rerun.
+
+| Artifact | SHA256 |
+| --- | --- |
+| Repaired learning review |`afd992829f94e45a417db803716c556f79e1aadcd25afc310ad3b62cbb2c315e`|
+| Full guidance replay |`3ee11705beb9bd650f400e9f4777f8fa380a8f4e6addf5c53b62c55a9c9f874d`|
+| Fixed comparison |`f733b7cba1c3d5794e9170e8d7a6a86d039b3d49f564caeb69d47376511d9815`|
+| Separate CPU closure |`8f9d7c25efd4a9f3ef2056792d7377995372ac84274f9d7648538f7fe1382397`|
+| Read-only terminal summary |`a82186f3a35373c8abb5f1b34e4efb8af1be9e5eaee20d126e5cf38d4399520e`|

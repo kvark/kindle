@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [current Qbert dynamics-group comparison](2026-11-01-cdp-qbert-dynamics1e4.md)
+raises greedy12,678.125→15,471.875 andsampled12,093.750→14,862.500,each24/24
+first pyramids,for.83% more time. Greedy passes15k; sampled does not. Late
+imitation CE worsens.044040→.069685,so lower training loss would have ranked
+these outcomes incorrectly. The4e-4→1e-4 rate change jointly affects recurrent,
+posterior,prediction andexploration groups;no isolated mechanism follows.
+Reused12011 is development evidence,not independent confirmation. All audits
+complete through a separately retained CPU repair after the original controller
+NameError; original main/collector remain failed,withzero repeated GPU stages.
+
+
 The [updated current-run timing summary](2026-11-01-cdp-current-training-cost.md)
 places81% of Qbert and88% of Breakout training wall time inside learning,versus
 4–5% in emulator stepping. Within current Qbert H5/R24 updates,world training

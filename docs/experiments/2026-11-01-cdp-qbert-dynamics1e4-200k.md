@@ -1,9 +1,11 @@
 # Fresh200k Qbert comparison with dynamics-group rate1e-4
 
-**CPU repair running:** allfive GPU stages complete, but the original main
-fails23:00:53 UTC November1 on undefined`CONTROL` in its audit, before any replay.
-Original collection also fails. The separately qualified CPU repair below
-completes missing evidence only; no original service or GPU stage restarts.
+**Completed with separate CPU repair:** greedy15,471.875/24 first pyramids
+passes15k/90%;sampled14,862.5/24 misses the mean threshold. Both improveabout22%
+for.83% more training time. Original main/collector remain failed after the
+undefinedCONTROL audit error; separate CPU closure succeeds23:11:13 UTC.
+No GPU or completed replay/collector stage repeats. See the
+[completed result](../results/2026-11-01-cdp-qbert-dynamics1e4.md).
 
 The [closed bounded check](../results/2026-11-01-cdp-qbert-dynamics1e4.md)
 passes all checks and projects25m43s conservatively, below30min. Select a separate
@@ -169,3 +171,15 @@ Repair root`full/cpu-repair`,declarationSHA256
 `77ce13260a4d0eda955cb232b175de3346b152b24bbd1edeed7f58a660a703b9`.
 The previously prepared supplemental original-success summary remains unexecuted
 because its assumptions no longer hold. No successor learner is selected.
+
+
+The separately declared repair completes23:11:13.343 UTC in297.912s with all606
+original/111 repair pins,all frozen/training replays andreporting checks passing.
+Original main/collector remain failed; original completion remains absent.
+Closure`complete_with_cpu_audit_repair`,SHA256
+`8f9d7c25efd4a9f3ef2056792d7377995372ac84274f9d7648538f7fe1382397`.
+The supplemental terminal reader's default-journal truncation failure is retained;
+its separate`--all` correction verifies the original closure without rerunning
+any stage. Greedy improves22.04%,sampled22.89%; training25m40.027s is+.83%.
+This reused development seed is not independent confirmation. No successor is
+selected; allservices are terminal andno Kindle GPU allocation remains active.

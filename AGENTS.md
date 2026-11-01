@@ -20,30 +20,33 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [Qbert dynamics-group1e-4 comparison](docs/results/2026-11-01-cdp-qbert-dynamics1e4.md)
-finishes allfive GPU stages:200k actions/18,715 updates in25m40.027s,thenfour
-frozen arms. Preliminary selected24-episode means aregreedy15,471.875 and
-sampled14,862.5 versus12,678.125/12,093.75;own initials168.750/167.708 match.
-Pyramid/replay/final closure checks remain pending; do not claim an audited gate.
+The [completed Qbert dynamics-group1e-4 comparison](docs/results/2026-11-01-cdp-qbert-dynamics1e4.md)
+finishes200k actions/799,807 frames/18,715 updates in25m40.027s (+.83% time).
+Greedy15,471.875/24 first pyramids passes15k/90%,up22.04% from12,678.125;
+sampled14,862.5/24 rises22.89% from12,093.75 but misses15k. Own initials
+168.750/167.708 match. Initial-subtracted return/min rises21.33% greedy/22.20%
+sampled. Retain1e-4 as a useful development point; reused12011 is not independent
+confirmation. Late imitation CE worsens.044040→.069685 despite better play.
 
-Original mainPID857991/invocation1e44edc5d824407b8a21cd62657f6ee2 fails23:00:53
-UTC November1 in its CPU audit:undefined`CONTROL`,before any replay. Original
-collection fails;postprocess exits with`postprocess-incomplete.json`. Preserve
-these failures. No GPU stage failed or repeats; original100k/9,340 recovery passed.
+All606 original/111 repair pins,100k/9,340 recovery,357 matching initial and
+invariant frozen tensors,1,176/1,223 paired initial semantic events,full pixel/
+action/label and frozen replays/videos,guards,curves,coverage andcomparison pass.
+Original main fails23:00:53 UTC November1 on undefinedCONTROL in CPU audit,
+after allfive GPU stages pass; original collector fails andboth remain failed.
+Separate CPU servicePID862557/invocatione48562cf43cd4ba8927950760ef61922 completes
+23:11:13 in297.912s with`complete_with_cpu_audit_repair`,SHA8f9d7c25. No original
+passing completion exists. Two repair-preparation failures and one supplemental
+journal-reader failure remain preserved; no GPU or completed replay/collector
+stage repeats. Native447fe50/35ad0db,teacherfa261c53 andrunnere161bf38 stay fixed.
 
-Separate CPU repair`kindle-qbert-dynamics1e4-cpu-repair-20261101` launches23:06:15
-UTC/source240bb89,PID862557/invocatione48562cf43cd4ba8927950760ef61922.
-Its3.959s qualification passes606 original/111 repair pins and verifies that
-CONTROL is the sole missing audit global. It injects the exact retained-control
-path without editing the original source; native/emulator construction is blocked
-in the parent. Missing frozen/training replays,plots andcomparison run once.
-Two failed preparation checks are preserved:import-versus-construction and raw
-journal JSON equality; corrected checks retain original journal bytes and compare
-decoded records. Original services stay failed; no original completion is created.
-Root`/x/Temp/kindle-qbert-dynamics1e4-20261101/full/cpu-repair`;declaration77ce1326.
-No new learner,confirmation,rate sweep,extension or GPU successor is selected.
-The five-game goal remains unfinished. Do not restart the original services or
-repeat completed training/evaluation/replay stages; check live repair state.
+Only dynamics-group4e-4→1e-4 changes at12M64/Auto/N8/B16/T16/H5/R24/encoder-base
+4e-5/greedy/expert100; no isolated-core mechanism or broad reliability claim.
+Actual overrides47,700 (23.85%);online guided returns are not frozen competence.
+All original services andCPU repair are terminal;no Kindle GPU allocation is
+active at closure. Root`/x/Temp/kindle-qbert-dynamics1e4-20261101/full` iscomplete.
+Do not rerun original services,completed GPU/replay stages or collectors. No
+extension,rate sweep,confirmation or automatic successor is selected. The
+five-game goal remains unfinished;check live state before further GPU work.
 
 The [current cost summary](docs/results/2026-11-01-cdp-current-training-cost.md)
 finds learning about81% of Qbert and88% of Breakout training wall time. Within
@@ -84,7 +87,7 @@ The **five-game goal is unfinished**:
 | Freeway |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | Pong |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
 | Breakout |Encoder4e-5/dynamics4e-4:sampled56.292/greedy104.667 in21m28s; dynamics1e-4:50.625/138.750 in21m48s|Mixed; retain4e-4 sampled primary;all0/24 two-wall;reused development seed|
-| Qbert |RGB64/H5/R24/encoder4e-5/greedy collection:greedy15,710.417 on10007 and12,678.125 on12011,24/24 first pyramids each,in25m10s/25m27s|15k/90% gate passes one of two; current dynamics-rate comparison remains unassessed|
+| Qbert |RGB64/H5/R24/dynamics1e-4 on12011:greedy15,471.875,sampled14,862.5,24/24 first pyramids each,in25m40s|Greedy passes on reused development seed;4e-4 recipe passes one of two;fresh confirmation remains open|
 
 Published long-run scores are aspirations,not matched-budget comparisons.
 Finite losses,short runs and backend speed do not establish mastery or CDP

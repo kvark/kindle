@@ -1,29 +1,32 @@
 # Kindle: CDP learning roadmap
 
-The [Qbert dynamics-group1e-4 comparison](results/2026-11-01-cdp-qbert-dynamics1e4.md)
-finishes allfive GPU stages:200k actions/18,715 updates in25m40.027s,thenfour
-frozen arms. Preliminary selected24-episode means aregreedy15,471.875 and
-sampled14,862.5 versus12,678.125/12,093.75;own initials168.750/167.708 match.
-Pyramid/replay/final closure checks remain pending; do not claim an audited gate.
+The [completed Qbert dynamics-group1e-4 comparison](results/2026-11-01-cdp-qbert-dynamics1e4.md)
+finishes200k actions/799,807 frames/18,715 updates in25m40.027s (+.83% time).
+Greedy15,471.875/24 first pyramids passes15k/90%,up22.04% from12,678.125;
+sampled14,862.5/24 rises22.89% from12,093.75 but misses15k. Own initials
+168.750/167.708 match. Initial-subtracted return/min rises21.33% greedy/22.20%
+sampled. Retain1e-4 as a useful development point; reused12011 is not independent
+confirmation. Late imitation CE worsens.044040→.069685 despite better play.
 
-Original mainPID857991/invocation1e44edc5d824407b8a21cd62657f6ee2 fails23:00:53
-UTC November1 in its CPU audit:undefined`CONTROL`,before any replay. Original
-collection fails;postprocess exits with`postprocess-incomplete.json`. Preserve
-these failures. No GPU stage failed or repeats; original100k/9,340 recovery passed.
+All606 original/111 repair pins,100k/9,340 recovery,357 matching initial and
+invariant frozen tensors,1,176/1,223 paired initial semantic events,full pixel/
+action/label and frozen replays/videos,guards,curves,coverage andcomparison pass.
+Original main fails23:00:53 UTC November1 on undefinedCONTROL in CPU audit,
+after allfive GPU stages pass; original collector fails andboth remain failed.
+Separate CPU servicePID862557/invocatione48562cf43cd4ba8927950760ef61922 completes
+23:11:13 in297.912s with`complete_with_cpu_audit_repair`,SHA8f9d7c25. No original
+passing completion exists. Two repair-preparation failures and one supplemental
+journal-reader failure remain preserved; no GPU or completed replay/collector
+stage repeats. Native447fe50/35ad0db,teacherfa261c53 andrunnere161bf38 stay fixed.
 
-Separate CPU repair`kindle-qbert-dynamics1e4-cpu-repair-20261101` launches23:06:15
-UTC/source240bb89,PID862557/invocatione48562cf43cd4ba8927950760ef61922.
-Its3.959s qualification passes606 original/111 repair pins and verifies that
-CONTROL is the sole missing audit global. It injects the exact retained-control
-path without editing the original source; native/emulator construction is blocked
-in the parent. Missing frozen/training replays,plots andcomparison run once.
-Two failed preparation checks are preserved:import-versus-construction and raw
-journal JSON equality; corrected checks retain original journal bytes and compare
-decoded records. Original services stay failed; no original completion is created.
-Root`/x/Temp/kindle-qbert-dynamics1e4-20261101/full/cpu-repair`;declaration77ce1326.
-No new learner,confirmation,rate sweep,extension or GPU successor is selected.
-The five-game goal remains unfinished. Do not restart the original services or
-repeat completed training/evaluation/replay stages; check live repair state.
+Only dynamics-group4e-4→1e-4 changes at12M64/Auto/N8/B16/T16/H5/R24/encoder-base
+4e-5/greedy/expert100; no isolated-core mechanism or broad reliability claim.
+Actual overrides47,700 (23.85%);online guided returns are not frozen competence.
+All original services andCPU repair are terminal;no Kindle GPU allocation is
+active at closure. Root`/x/Temp/kindle-qbert-dynamics1e4-20261101/full` iscomplete.
+Do not rerun original services,completed GPU/replay stages or collectors. No
+extension,rate sweep,confirmation or automatic successor is selected. The
+five-game goal remains unfinished;check live state before further GPU work.
 
 The [current saved-log cost summary](results/2026-11-01-cdp-current-training-cost.md)
 finds learning81.14–81.31% of Qbert wall time and87.57–88.72% of Breakout;
@@ -2720,7 +2723,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Compact12M64/B16/R16/expert100/encoder4e-5/200k:sampled56.292,greedy104.667 in21m28s;own initials1.417/2.208. Same recipe2e-5:25.292/42.625 in22m27s;6e-6:13.208/17.875 in22m19s. Reused development seed/cohort,not independent confirmation. Dynamics-group1e-4 now scores50.625 sampled/138.750 greedy in21m48.095s,allzero two-wall;mixed versus4e-4,which remains sampled primary. Retained B8/T16:2M98.21,same weights AMD Auto67.58;AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes;reliability open |
-| Qbert | AMD12M48/B16/T16/H5/R32/expert100/200k seeds4013/6029:greedy14050/15792.708,sampled13331.250/15420.833,23/24 and24/24 first pyramids,in40m24s/40m22s. Same recipe;own initial controls and all audits pass. The cheaper H15/R16/encoder4e-5/greedy-collection recipe reaches15,515.625 greedy/11,989.583 sampled,24/24 first pyramids,in27m33s on reused4013;all original audits and terminal confirmation pass. Fresh8039 reaches11,376.042 greedy/23 first pyramids and8,292.708 sampled/24 in27m34s,with all audits passing. One of two learners of this cheaper recipe passes the original greedy gate;cross-cohort scores14,370.833 for4013 and11,578.125 for8039 retain the ranking but neither passes15k. H5/R24 on reused8039 now reaches15,430.208 greedy/24 first pyramids and13,040.625 sampled/24 in28m47s;all audits pass. Fresh10007 reaches14,339.583 greedy/13,761.458 sampled,24/24 first pyramids in28m34s;all audits pass but both means miss15k. One of two RGB48 H5/R24 learners passes primary greedy. The RGB64 H5/R24 comparison on reused10007 reaches15,710.417 greedy/14,250 sampled,24 first pyramids each,in25m09.797s;all audits pass and greedy clears15k. FreshRGB64 seed12011 reaches12,678.125 greedy/12,093.750 sampled,24 first pyramids each,in25m27.366s;all original audits pass but neither mean reaches15k. One of two RGB64 learners passes greedy. Cross-cohort10007 scores16,218.750 and12011 scores11,982.292,each24 first pyramids;10007 passes on both cohorts and12011 on neither,with original gate outcomes unchanged. Geometry/head/initialization and faster-teacher cost still limit the earlier RGB48 comparison. Reliability remains open. | Original15k/90% gate passes on6029 in both modes,one of two H5 learners,on4013 greedy with the cheaper collection recipe,on8039 greedy with RGB48 H5/R24,and10007 greedy with RGB64 H5/R24; broad reliability and reference193,220.77 remain open |
+| Qbert | AMD12M48/B16/T16/H5/R32/expert100/200k seeds4013/6029:greedy14050/15792.708,sampled13331.250/15420.833,23/24 and24/24 first pyramids,in40m24s/40m22s. Same recipe;own initial controls and all audits pass. The cheaper H15/R16/encoder4e-5/greedy-collection recipe reaches15,515.625 greedy/11,989.583 sampled,24/24 first pyramids,in27m33s on reused4013;all original audits and terminal confirmation pass. Fresh8039 reaches11,376.042 greedy/23 first pyramids and8,292.708 sampled/24 in27m34s,with all audits passing. One of two learners of this cheaper recipe passes the original greedy gate;cross-cohort scores14,370.833 for4013 and11,578.125 for8039 retain the ranking but neither passes15k. H5/R24 on reused8039 now reaches15,430.208 greedy/24 first pyramids and13,040.625 sampled/24 in28m47s;all audits pass. Fresh10007 reaches14,339.583 greedy/13,761.458 sampled,24/24 first pyramids in28m34s;all audits pass but both means miss15k. One of two RGB48 H5/R24 learners passes primary greedy. The RGB64 H5/R24 comparison on reused10007 reaches15,710.417 greedy/14,250 sampled,24 first pyramids each,in25m09.797s;all audits pass and greedy clears15k. FreshRGB64 seed12011 reaches12,678.125 greedy/12,093.750 sampled,24 first pyramids each,in25m27.366s;all original audits pass but neither mean reaches15k. One of two RGB64 learners passes greedy. Cross-cohort10007 scores16,218.750 and12011 scores11,982.292,each24 first pyramids;10007 passes on both cohorts and12011 on neither,with original gate outcomes unchanged. Geometry/head/initialization and faster-teacher cost still limit the earlier RGB48 comparison. The completed dynamics-group1e-4 comparison on reused12011 reaches15,471.875 greedy/14,862.5 sampled,24 first pyramids each,in25m40.027s;greedy passes. Both scores riseabout22% for.83% more time. Separate CPU audit repair passes after the original undefined-CONTROL failure;original main/collector remain failed,no GPU stage repeats. This is one passing development learner of the1e-4 recipe,not independent confirmation. Reliability remains open. | Original15k/90% gate passes on6029 in both modes,one of two H5 learners,on4013 greedy with the cheaper collection recipe,on8039 greedy with RGB48 H5/R24,and10007 greedy with RGB64 H5/R24; broad reliability and reference193,220.77 remain open |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and
