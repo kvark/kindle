@@ -1,14 +1,20 @@
-# Lower dynamics-group rate passes execution and early-cost checks
+# Lower dynamics-group rate gives mixed frozen Breakout results
 
-**The separately selected fresh200k comparison is now running**, launched
-21:15:57 UTC November1/sourceb9ce97f. Startup passes; no full gameplay result yet.
-The bounded check below remains complete and is not reused as training experience.
+**Completed:** sampled50.625 is10.07% below the control56.292; greedy138.750 is
+32.56% above104.667. Training takes21m48.095s,1.58% longer. Allfour candidate
+arms havezero of24 two-wall successes. Retain the4e-4 sampled-primary recipe;
+1e-4 is a distinct greedy development point, not an overall winner or reliable
+task success. The original full learner, audits and collector all pass.
+
+The bounded check below remains complete and was not reused as training
+experience. Full results and terminal evidence appear at the end of this report.
 
 The fresh bounded Breakout check completes8,192 actions/32,733 frames/489
 updates in **47.412638s**. A1,024-action/4,096-frame frozen greedy restore takes
 .856243s withzero updates andno natural completed episodes. Both original
 stages, full training replay, audit and terminal collector pass. Gameplay
-benefit remains unmeasured; no short-run score is interpreted as competence.
+benefit was unmeasured at this bounded stage; no short-run score is interpreted
+as competence.
 
 The conservative200k projection, including10% margin, is **1,273.288629s
 (21m13.289s)**, below the30-minute limit. This is an early estimate, not a
@@ -139,3 +145,67 @@ The separate current-Qbert saved-log analysis co-hosts for3.601s (3.622s wrapper
 and completes21:27:09 UTC, preserving all272 active pins and originalPID847728/
 invocation72a7b4600a4641bb8c93174668127f3f. It uses no native/emulator/GPU work
 or updates; retain measured CPU time without correcting the learner's wall time.
+
+## Completed full comparison is mixed
+
+The fresh learner finishes200,000 actions/799,574 frames/12,477 updates in
+**1,308.094813s (21m48.095s)**, below the30-minute cap and1.58% longer than the
+control's1,287.700795s. Each frozen score uses the firstthree natural episodes
+per eight lanes,24 total, with guidance disabled andzero updates/truncations.
+
+| Dynamics-group rate | Sampled primary | Greedy | Training time | Two-wall successes |
+| --- | ---: | ---: | ---: | ---: |
+| Retained4e-4 | 56.292 | 104.667 | 21m27.701s | 0/24 in both modes |
+| Candidate1e-4 | 50.625 | 138.750 | 21m48.095s | 0/24 in both modes |
+| Actual initial, either config | 1.417 | 2.208 | — | 0/24 in both modes |
+
+Sampled return falls10.07%; greedy rises32.56%. Initial-subtracted return per
+training minute changes2.557→2.257 sampled and4.774→6.263 greedy. This remains
+mixed under the declared primary criterion. Keep4e-4 for sampled-primary
+development and retain the distinct1e-4 greedy point. No overall recipe winner,
+two-wall success, rate mechanism or seed reliability is established. No rate
+sweep, extension, confirmation or automatic successor follows.
+
+The final50k replay imitation CE worsens.558097→.670023. This metric uses
+changing replay data and does not identify why action modes differ. Actual
+overrides total103,637/200,000 (51.8185%); online scores include those actions
+and are not frozen competence. The native rate covers recurrent dynamics,
+posterior, prediction and exploration together. Native/teacher stay unchanged;
+the runner's qualified12-line flag addition remains disclosed. Learner1009 and
+the evaluation cohort were reused in development.
+
+All272 inputs,357 initial tensors matching bounded/control,47 pre-update
+transitions,12,477 finite supervised reports,100k/6,227 retained four-file
+recovery and changed CNN/reward/actor/value parameters pass. Every frozen arm
+preserves357 tensors. Actual-initial sampled/greedy traces reproduce all800/795
+retained semantic events. Full training pixel/action/corrective-label replay,
+four frozen outcome replays/videos, host guards, curves, exposure, comparison
+and the original terminal collector pass. Ordinary frozen logs lack live pixel
+hashes; their replay cannot establish unavailable live-image equality.
+
+Four frozen arms total85,792 actions/342,986 frames/98.702388s, withzero updates
+or truncations. Excess episodes and partial tails remain retained. Original
+main/postprocessing/collection succeed **21:42:21.564/21:42:32.189/21:43:05.642
+UTC November1**, sourceb9ce97f, originalPID847728/invocation
+72a7b4600a4641bb8c93174668127f3f. Allfive original services are terminal success;
+no original GPU, replay, audit or collector stage fails or repeats.
+
+Two supplemental read-only summary queries fail after original completion:
+one assumes Qbert's `supervision` key instead of Breakout's `supervision_windows`;
+the other applies a main-only resource-summary requirement to the short progress
+observer, which has no such journal line. Both notes remain in the package.
+Corrected read-only summary passes21:45:17.572 in.835s, using each observer's
+actual kind, preserving the original completion hash and repeating no original
+stage. This is a reporting repair, not a failed or repeated experiment.
+
+Root `/x/Temp/kindle-breakout-dynamics1e4-20261101/full` is complete. Retain all
+CPU co-host timings without wall-time correction. No GPU allocation is active
+at closure; check live state before the separately prepared Qbert assessment.
+The five-game goal remains unfinished.
+
+| Artifact | SHA256 |
+| --- | --- |
+| Full declaration | `89bb20be8462cf9fe73f048b1b2f1f562b6a8c566fedc31e44da6124129ac9ee` |
+| Full learning review | `08842299d54f08536589a7ce185a5ab764cfaf3cfa5880fae0bfbfa3e642d40d` |
+| Comparison | `7b055a54d65ce887f5b32aae9c657dac30e8b16a033c32c221d961583ca01dfd` |
+| Original completion | `a3a2bcd0e061d390c6c769ff0dc4bb7e5053ec97840d1c082a79d889113ff5e6` |

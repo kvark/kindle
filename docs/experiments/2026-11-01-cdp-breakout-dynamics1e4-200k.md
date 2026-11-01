@@ -1,5 +1,9 @@
 # Fresh 200k Breakout comparison with dynamics-group rate1e-4
 
+**Completed:** sampled50.625/greedy138.750 versus control56.292/104.667 is mixed,
+allzero of24 two-wall successes. Training21m48.095s costs1.58% more. All original
+audits and collection pass; see the [full result](../results/2026-11-01-cdp-breakout-dynamics1e4.md#completed-full-comparison-is-mixed).
+
 The [completed bounded check](../results/2026-11-01-cdp-breakout-dynamics1e4.md)
 passes8,192 actions/489 updates in47.413s, with matched initial tensors,
 frozen invariance, full guided replay andhost guards. Its conservative200k
@@ -124,3 +128,15 @@ The separate current-Qbert saved-log analysis co-hosts for3.601s (3.622s wrapper
 and completes21:27:09 UTC, preserving all272 active pins and originalPID847728/
 invocation72a7b4600a4641bb8c93174668127f3f. It uses no native/emulator/GPU work
 or updates; retain measured CPU time without correcting the learner's wall time.
+
+## Original terminal closure
+
+Main/postprocessing/collection succeed21:42:21/21:42:32/21:43:05 UTC November1.
+Allfive services are terminal success. All272 pins,357 matching initial/invariant
+frozen tensors,paired semantic traces,100k recovery,full replays/videos,guards,
+curves,exposure andcomparison pass. The original completion hash is
+`a3a2bcd0e061d390c6c769ff0dc4bb7e5053ec97840d1c082a79d889113ff5e6`.
+Two later reporting-query errors remain preserved and are corrected CPU-only;
+no original GPU/replay/audit/collector stage fails or repeats. Keep4e-4 sampled
+primary and the distinct1e-4 greedy point; no overall winner, extension,
+confirmation or automatic successor. No GPU allocation remains at closure.

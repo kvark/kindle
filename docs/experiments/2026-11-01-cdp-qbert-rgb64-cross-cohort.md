@@ -84,3 +84,19 @@ pins andidle host remains required. No cross-cohort score is available yet.
 | --- | --- |
 | `preflight.json` | `2fa08e6ea5e3314e968376aa5adc3d204467810014f71c8ea2aa3b2be01d7e96` |
 | `controller-preflight.json` | `3f124764b31e72d83a2dc137f664ed87e1415c13b1c2ff239fa057dd5c30a344` |
+
+## Preceding learner complete; ready for guarded selection
+
+The original Breakout comparison now completes allfive services and original
+collection at21:43:05 UTC November1. Its50.625 sampled/138.750 greedy result
+is mixed; the original primary decision andzero two-wall successes remain.
+The corrected read-only terminal summary confirms all272 inputs, original
+identities, retained recovery and completion hash unchanged, with no original
+stage repeated. The host is idle at this closure.
+
+Proceed with the prepared four-arm assessment only after the existing selector
+rechecks those original terminal services/completion, all593 preparation inputs,
+qualified controller sources, clean committed worktree and same idle host.
+Do not rerun CPU qualification or any retained diagonal assessment. All fixed
+arms, caps, gates and interpretation limits above remain unchanged. Selection
+and launch will retain their own declaration and original process identities.

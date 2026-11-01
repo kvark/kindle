@@ -20,27 +20,30 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [fresh200k Breakout dynamics-group comparison](docs/experiments/2026-11-01-cdp-breakout-dynamics1e4-200k.md) launches21:15:57 UTC
-November1/sourceb9ce97f with272 pins. MainPID847728/invocation
-72a7b4600a4641bb8c93174668127f3f;service`kindle-breakout-dynamics1e4-200k-20261101`.
-Startup21:16:24 passes357 bounded/control initial tensors,47 pre-update events,
-correct cadence and232 finite reports through4072 actions. The100k/6,227
-recovery passes21:27:03 UTC with357 finite tensors and allfour files retained,
-206,067,160 bytes, source unchanged. Recovery observer succeeds; original main,
-progress, postprocessing and collection continue. Fix200k/12,477 updates/30min
-andfour final/own-initial24-episode frozen arms against56.292/104.667. No full
-frozen result yet.
+The [completed Breakout dynamics-group comparison](docs/results/2026-11-01-cdp-breakout-dynamics1e4.md) is mixed:
+sampled50.625 falls10.07% from56.292, while greedy138.750 rises32.56% from104.667.
+Allfour candidate arms havezero of24 two-wall successes; own initials1.417/2.208
+match. Training200k actions/799,574 frames/12,477 updates takes21m48.095s,
+1.58% longer. Retain4e-4 for the sampled-primary recipe;1e-4 is a distinct greedy
+development point, not an overall winner or reliable task success.
 
-Only dynamics-group4e-4→1e-4 changes;encoder/base/actor4e-5,12M64/Auto/B16/T16/
-H15/R16/expert100,qualified runnerfe5cf347/native35ad0db andteacher stayfixed.
-The rate covers recurrent,posterior,prediction andexploration together. CPU
-qualification passes1.425s:five CLI commands,28 config cases,12 startup/four
-observer/eight recovery guards,six retention/two collector fixtures,44 paths/
-17 scripts,250 bounded/227 control inputs and357 bounded tensors. No native
-build,bounded experience reuse,extension,cap change orautomatic successor.
-Startup.949s CPU co-host timing remains. Root
-`/x/Temp/kindle-breakout-dynamics1e4-20261101/full`;do not restart oroverlap.
-The five-game goal remains unfinished;check original live state beforework.
+All272 pins,357 matching initial/invariant frozen tensors,47 pre-update events,
+800/795 initial semantic traces,100k/6,227 four-file recovery,full replays/videos,
+guards,curves,exposure,comparison andoriginal collector pass. Main/post/collection
+succeed21:42:21/21:42:32/21:43:05 UTC November1/sourceb9ce97f. Allfive services
+are terminal success. Two extra read-only summary queries fail on exposure-field
+and observer-journal assumptions; corrected summary passes without changing
+original completion or repeating any original stage. Actual overrides51.8185%;
+late replay expert CE worsens.558097→.670023. Guided scores are not competence.
+
+Only dynamics-group4e-4→1e-4 changes recurrent/posterior/prediction/exploration
+rates together;encoder/base/actor4e-5 and12M64/H15/R16/expert100 stayfixed.
+Native447fe50/35ad0db andteacher remain unchanged;runnerfe5cf347 has the qualified
+12-line CLI addition. Reused1009/cohort and CPU co-host caveats remain. No native
+build,extension,cap change,confirmation orautomatic successor. Root
+`/x/Temp/kindle-breakout-dynamics1e4-20261101/full` is complete; do not rerun.
+No GPU allocation remains at closure. The five-game goal remains unfinished;
+check live state before the separately prepared Qbert assessment.
 
 The [Qbert RGB64 cross-cohort assessment](docs/experiments/2026-11-01-cdp-qbert-rgb64-cross-cohort.md) has passed CPU preparation
 and remains unselected. Swap learners10007/12011's final and actual-initial
@@ -54,8 +57,9 @@ four journal fixtures. All593 preparation/272 active Breakout pins and original
 PID847728/invocation remain unchanged. CLI6.390s/controller6.405s (wrappers
 6.421s/7.115s) co-host without time correction. No agent/emulator construction,
 queue, declaration, service, failure or repeat. Root
-`/x/Temp/kindle-qbert-rgb64-cross-cohort-20261101`; keep unselected until all five
-original Breakout services and collection succeed and the host is idle.
+`/x/Temp/kindle-qbert-rgb64-cross-cohort-20261101`. Breakout now closes with all
+five original services successful. Guarded selection must recheck unchanged
+inputs, clean committed sources and the idle host before launch.
 
 The [current Qbert RGB64 phase analysis](docs/results/2026-11-01-cdp-qbert-rgb64-phases.md) finds weaker12011 has
 higher final50k native movement agreement75.22% versus10007's70.35%, despite
@@ -87,8 +91,8 @@ fails because children log;separate invocation review passes without changing
 original completion orrepeating anyGPU/replay/collector stage. All471 runner tests
 and6.533s CPU qualification pass. Root
 `/x/Temp/kindle-breakout-dynamics1e4-20261101/native-check` iscomplete;do not rerun.
-No full learner was selected by the bounded check;the separate full life above
-is now active.
+No full learner was selected by the bounded check; the separate full life above
+is now complete.
 The five-game goal remains unfinished.
 
 The [fresh Qbert RGB64 seed12011 confirmation](docs/results/2026-11-01-cdp-qbert-rgb64-seed12011.md) completes but misses the
