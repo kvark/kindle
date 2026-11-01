@@ -82,3 +82,22 @@ pins and357 checkpoint shapes remain unchanged. Schedules8192/481,100k/6219 and
 zero. Plot-environment imports pass in.135s without native/ALE modules. The
 17-script source preparation takes.028s;no failure,build or GPU work occurs.
 Do not repeat passed qualification. The exact native runner remains unchanged.
+
+## Launch and startup
+
+The fresh learner launches15:58:36 UTC November1/source4f7b4c4,with292 pinned
+inputs. Original mainPID812861/invocation`258e9d9deb0b463a91d4206a198085e4`;
+progress,recovery,postprocessing and terminal-collection observers are active
+under their first invocations. Recovery watches100k/6,219 and will audit and
+retain four files. Main service`kindle-breakout-context32-200k-20261101`.
+
+Startup passes15:59:27 UTC,1.047s CPU wrapper. All292 inputs,357 bounded/control-
+matching initial tensors,47 common pre-update transitions and the firstsix
+updates504/520/536/552/568/584 match. The complete prefix has6,632 actions and
+383 finite supervised reports. No full frozen result is available. Retain the
+startup CPU co-host time without wall-time correction. Inspect this original
+process;do not restart,repeat qualification or allocate concurrent GPU work.
+Require retained midpoint and all four fixed assessments;no extension,context
+retry,confirmation or automatic successor.
+
+DeclarationSHA256`6ae1164b4365f74e563b2a89f589783acd4c33505b87b58ef7753925412f176e`.

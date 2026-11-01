@@ -58,3 +58,10 @@ After reviewing the completed check and idle state,a [fresh200k comparison](../e
 is separately selected. Full CPU qualification passes15:57:41 UTC November1 on
 the first attempt,without native/emulator construction. It does not reuse this
 check's experience or repeat its stages. No full frozen result is available.
+
+The full learner subsequently launches15:58:36 UTC/source4f7b4c4,originalPID812861/
+invocation258e9d9deb0b463a91d4206a198085e4. Startup15:59:27 passes292 pins,357
+matching initial tensors,47 common-prefix transitions and383 finite reports
+through6,632 actions. All five original services are active;full frozen benefit
+remains unmeasured. See the protocol for exact caps,assessments and recovery.
+Do not restart or overlap GPU work;startup1.047s CPU co-host caveat remains.

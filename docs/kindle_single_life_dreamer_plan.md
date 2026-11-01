@@ -1,19 +1,22 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Breakout B8/T32 comparison](experiments/2026-11-01-cdp-breakout-context32-200k.md) is separately selected after
-the bounded check passes53.799s/8192actions/481updates and conservative200k24m05s.
-Fix200k/12,469,30min training cap,retained100k/6,219 recovery and four final/actual-
-initial24-episode sampled/greedy arms against56.292/104.667,all0/24 two-wall.
+The [fresh Breakout B8/T32 comparison](experiments/2026-11-01-cdp-breakout-context32-200k.md) launches15:58:36 UTC
+November1/source4f7b4c4 with292 pins,originalPID812861/invocation
+`258e9d9deb0b463a91d4206a198085e4`. Fix200k/12,469,30min training cap,retained
+100k/6,219 recovery and four final/actual-initial24-episode sampled/greedy arms
+against56.292/104.667,all0/24 two-wall. Startup15:59:27 passes357 matching initial
+tensors,47 common-prefix events,correct504/520/... cadence and383 finite
+supervised reports through6,632 actions. All five original services are active.
 Longer gradients change batch/diversity,target rows and warmup together;cached
 recurrent history already exists. Native447fe50/runner6c1b69fb/teacher and other
-encoder4e-5 settings stay fixed. Full CPU first attempt passes15:57:41 UTC
-November1 in1.434s/1.533s wrapper:five CLI paths,28 config/14 header/four observer/
-five recovery/six retention cases,44 paths,17 controllers,261 bounded/227 control
-pins and357 shapes,zero native/emulator constructions. Plot import.135s passes.
+encoder4e-5 settings stay fixed. Full CPU first attempt passes15:57:41 in1.434s/
+1.533s wrapper:five CLI paths,28 config/14 header/four observer/five recovery/six
+retention cases,44 paths,17 controllers,261 bounded/227 control pins and357 shapes,
+zero constructions. Plot import.135s passes;startup1.047s co-host caveat remains.
 Root`/x/Temp/kindle-breakout-context32-20261101/full`;service
-`kindle-breakout-context32-200k-20261101`. Check live state before launch;do not
-repeat qualification or bounded stages. No extension,context retry,confirmation
-or automatic successor. Full benefit remains unmeasured;goal remains unfinished.
+`kindle-breakout-context32-200k-20261101`. Check live state;do not restart or overlap
+GPU work. No extension,context retry,confirmation or automatic successor.
+Full frozen benefit remains unmeasured;the five-game goal remains unfinished.
 
 The [completed Qbert behavior-rate comparison](results/2026-11-01-cdp-qbert-behavior8e5.md) finishes200k actions/
 799,828frames/18,715updates in20m52.376s,26.92% less training time than control.
