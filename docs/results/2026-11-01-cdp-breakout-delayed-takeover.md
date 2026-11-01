@@ -63,3 +63,8 @@ existing recovery and frozen-assessment observers. The five-game goal is unfinis
 | Review | `ebff213b67ed586e76ed34bda2d167690d218fb4ddc9cc3425752055b92e0fe4` |
 | Full branch records | `086732ec8a30cb1ac1bbb64582a6f5dac89dfb8724b2f27ba772b730d13b21ae` |
 | Completion | `054035708fdb76673217feb9b6bbafc3346c20e26a7f88ae9ff4bbad79c97e00` |
+
+The [saved-state follow-up](2026-11-01-cdp-breakout-takeover-states.md) joins all480
+origins without repeating any branch. Earlier-only rescue losses are not confined
+to short teacher-estimated contact times;that proxy and immediate agreement do
+not identify the architectural cause.

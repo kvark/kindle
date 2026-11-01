@@ -18,6 +18,16 @@ MainPID809245/invocation361f29163c1e4b2896fd352f2b905ca8 and all four observers
 are active. Startup15:18:25 passes524 pins,357 matching tensors,47 events and314
 finite reports through3,728 actions;1.558s CPU co-host caveat. No frozen result yet.
 
+The [saved Breakout takeover-state join](results/2026-11-01-cdp-breakout-takeover-states.md) finds onlytwo of21 earlier-only
+rescues have projected contact withinfive actions at delay16;14 already match
+the teacher command. Timing estimates and this imperfect teacher do not isolate
+the cause. All480 origins/478 saved-branch survival recounts,nine declared inputs
+and524 active Qbert inputs pass;originalPID809245/invocation stays. Analysis2.766s
+completes15:23:52 UTC November1/source0e77ede,recount15:24:44. Zero emulator/native/
+GPU work,updates,failures or repeats;retain CPU co-host timing. No new loss,teacher
+or learner selected. Root`/x/Temp/kindle-breakout-takeover-states-20261101`;complete,
+do not rerun. The existing Qbert behavior-rate comparison continues.
+
 The [qualified Python Qbert teacher overlay](results/2026-11-01-cdp-qbert-teacher-cost.md)
 preserves472 snapshot decisions/states and the complete200k-action/799,841-frame
 training-label replay while reducing observed CPU replay633.898→230.331s.

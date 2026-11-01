@@ -1,5 +1,15 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [saved Breakout takeover-state join](2026-11-01-cdp-breakout-takeover-states.md) finds onlytwo of21 earlier-only
+rescues have projected contact withinfive actions at delay16;14 already match
+the teacher command. Timing estimates and this imperfect teacher do not isolate
+the cause. All480 origins/478 saved-branch survival recounts,nine declared inputs
+and524 active Qbert inputs pass;originalPID809245/invocation stays. Analysis2.766s
+completes15:23:52 UTC November1/source0e77ede,recount15:24:44. Zero emulator/native/
+GPU work,updates,failures or repeats;retain CPU co-host timing. No new loss,teacher
+or learner selected. Root`/x/Temp/kindle-breakout-takeover-states-20261101`;complete,
+do not rerun. The existing Qbert behavior-rate comparison continues.
+
 The [Qbert teacher CPU diagnostic and equivalent predicate change](2026-11-01-cdp-qbert-teacher-cost.md)
 identify avoidable adapter work:RGB equality reductions consume53.78% of profiled
 snapshot time. Direct channel conjunctions preserve all472 snapshot decisions/

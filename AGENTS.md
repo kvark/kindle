@@ -176,6 +176,11 @@ Latest qualified Breakout evidence:
   earlier control avoids108/120 recorded losses versus26/120 at the last
   near-descending state. This supports earlier-control investigation,not exact
   causal error attribution or optimal irrecoverability. CPU-only,293 pins pass.
+- [Delayed-takeover states](docs/results/2026-11-01-cdp-breakout-takeover-states.md):
+  onlytwo of21 earlier-only rescues project contact withinfive actions at delay16;
+  14 already match the teacher command. Timing estimates/imperfect teacher do not
+  isolate the cause. All480 joins/478 saved-branch recounts,nine inputs and524
+  active Qbert pins pass;CPU-only2.766s,complete15:23:52 UTC November1. Do not rerun.
 
 Completed negative results and protocol failures remain retained. Do not restart
 completed learners,old queues,failed assessments or collectors; no unchanged

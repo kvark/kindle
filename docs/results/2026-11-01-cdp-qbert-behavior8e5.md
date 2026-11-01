@@ -60,3 +60,8 @@ is available yet. Require retained100k/9,340 recovery and the fixed four arms.
 Do not restart this learner,repeat passed checks or allocate another GPU job.
 
 Full declarationSHA256`03a3ac6234dd23eee005c32c78bbb50af0903a00d1ee84924357931d10fc0650`.
+
+The CPU-only [Breakout takeover-state join](2026-11-01-cdp-breakout-takeover-states.md)
+co-hosts selection1.507s,analysis2.816s and independent recount2.581s wrappers.
+It preserves all524 learner inputs and original process identity,withzero GPU
+work or updates. Keep these times as co-host caveats without correction.
