@@ -30,9 +30,14 @@ runner6c1b69fb/teacher;no old experience reuse. Full CPU qualification passes
 five recovery,six retention cases,44 paths,17 controllers,259 bounded/227 control
 pins and357 shapes. Plot import.107s passes. Original.745s control-path preflight
 failure and failed command review remain with exact sources;no native/emulator
-construction or GPU stage occurs. No full trial,queue or allocation exists yet.
-Do not repeat passed qualifications;declaration/launch remain separate steps.
-Root`/x/Temp/kindle-breakout-r8-20261101/full`;check live state before work.
+construction or GPU stage occurs during preparation. The fresh full learner now
+launches13:14:30 UTC/source566a2a5 with315 pins,mainPID798240/invocation
+cc7e1c87ac4b478ab8d9f23644a5fa65;all four observers active. Startup13:15:03 in1.116s
+passes357 control/bounded-matching tensors,47 pre-update transitions,correct
+cadence and251 finite supervised reports through8,408 actions. No full frozen
+result exists. Do not repeat qualification,startup or prior stages. Root
+`/x/Temp/kindle-breakout-r8-20261101/full`;service`kindle-breakout-r8-400k-20261101`.
+Check this original process;do not restart or allocate concurrent GPU work.
 No extension,ratio retry or automatic successor;gameplay benefit is unmeasured.
 
 The [fixed Breakout upper-crop reference](results/2026-11-01-cdp-breakout-crop70.md)

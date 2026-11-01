@@ -63,3 +63,22 @@ only those paths,retaining the failure and pinning both attempt snapshots yields
 the passing second qualification. No full declaration or GPU allocation existed
 for either attempt. The qualified native runner remains byte-identical. Do not
 repeat the passing full or bounded qualifications.
+
+## Launch and startup
+
+The fresh400k learner launches **13:14:30 UTC November1**,source
+`566a2a564bd9ea620b5562bbd1d8f5596305bd59`,with315 pinned inputs. Original
+mainPID798240/invocation`cc7e1c87ac4b478ab8d9f23644a5fa65`,service
+`kindle-breakout-r8-400k-20261101`. Progress,recovery,postprocessing and collection
+observers run under their first invocations. Recovery watches100k/3,114,
+200k/6,239 and300k/9,364 and will retain four audited files at each milestone.
+
+Startup passes **13:15:03**,1.116s CPU wrapper:all315 inputs,357 control/bounded-
+matching initial tensors,47 identical pre-update transitions,exact update cadence
+376/408/440/472/504/536 and251 finite supervised reports through8,408 actions.
+No full frozen result is available. Retain startup CPU co-host time without
+wall-time correction. Inspect this original process;do not restart it,repeat
+passed checks or allocate concurrent GPU work. Require the three recoveries and
+all four fixed assessments. No extension,ratio retry or automatic successor.
+
+DeclarationSHA256`f40018a4b6ae48a09cb718435de5637d452336af1006e6cf331b1c60a2e1d542`.
