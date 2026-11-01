@@ -19,6 +19,20 @@ service`kindle-qbert-h5-r24-200k-20261101`. Check live identity;do not restart
 or schedule another GPU job while active. No extension or automatic successor;
 the five-game goal remains unfinished.
 
+The [fixed Breakout temperature0.5 assessment](experiments/2026-11-01-cdp-breakout-temperature.md)
+passes CPU preparation only at09:05:09 UTC November1/source6300c1d:7.996s,
+four actual CLI paths,32 header cases,four retained frozen audits,337 inputs and
+401 active Qbert pins. Original Qbert identity stays unchanged;zero native/
+emulator construction,replays,updates,failures or retries. Two historical runner
+references resolve to exact Git bytes. Keep co-host timing. No queue,declaration,
+service or GPU allocation is selected. Proposed four final/actual-initial default
+sample/temperature0.5 arms preserve actor-unimix.01 and require exact default
+semantic reproduction with qualifiede416696/runtime40872a3/runnerabc2c2b.
+Primary retained greedy104.667,secondary sampled56.292;original learner's primary
+result stays unchanged. Root`/x/Temp/kindle-breakout-temperature-20261101`.
+Do not rerun the passing preflight. Separate selection requires complete Qbert
+closure and an idle host;no automatic successor. Qbert H5/R24 remains active.
+
 The [completed CPU Breakout planning-cost diagnostic](results/2026-11-01-cdp-breakout-plan-costs.md) finds56.38% of
 12,521 horizontal disagreements have at most1 unit excess teacher-model cost;
 near-descending median1.483,with17.64% above16. Three of six teacher-only surviving

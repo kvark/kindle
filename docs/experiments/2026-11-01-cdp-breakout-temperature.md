@@ -1,0 +1,69 @@
+# Fixed frozen Breakout temperature assessment
+
+This is **CPU preparation only**. Qbert H5/R24 remains active. No Breakout
+assessment, GPU queue or service has been selected or launched.
+
+The retained encoder4e-5 learner scores 56.292 with sampled actions and 104.667
+with greedy actions after 200k actions / 12,477 updates in 21m28s. Both have zero
+two-wall successes in 24 episodes. One fixed action temperature of 0.5 will test
+an intermediate inference choice using the retained final and actual initial
+checkpoints. It adds no loss and performs no training.
+
+The primary comparison is final temperature0.5 versus retained greedy104.667;
+sampled56.292 is secondary. Report absolute means, two-wall rates, own-initial
+subtraction and return per original training minute. The original learner's
+sampled-primary result stays unchanged. Keep actor unimix0.01 and sampled
+posteriors. No temperature sweep or post-result primary switch is allowed.
+
+## Fixed assessment
+
+Run four arms: final default sample, final temperature0.5, actual-initial default
+sample and actual-initial temperature0.5. Keep learner1009/evaluation4000001009,
+eight lanes and the first three natural episodes per lane, full18, sticky0.25,
+repeat4, native-frame input and one GPU resize to64. Preserve the entire
+12M64/Auto/B16/T16/H15/R16/encoder4e-5/expert100 checkpoint configuration.
+Guidance and labels are off. Require zero updates and truncations, 357 finite
+invariant tensors per arm, full recorded-action/outcome/frame/reset replays and
+videos, original process identity and host guards. Retain the 90% both-walls/864
+task gate, without inventing a mean-return gate. Keep extra episodes and partial
+tails in the evidence. Ordinary frozen logs lack live pixel hashes.
+
+Use the qualified temperature runtime e416696 / SHA40872a3 at
+`/x/Temp/kindle-action-temperature-20261029/runtime` and exact runnerabc2c2b from
+its packaging receipt. No build or old qualification repeats. Both default
+sampled arms must exactly reproduce all retained semantic events and scores
+despite the runtime change. Stop on a mismatch; no retry or repeated GPU stage.
+Historical source pins that differ from current files are resolved to exact Git
+bytes and recorded separately.
+
+Each arm has a 600k-action / 300-second cap; each CPU replay has 180 seconds.
+The main service has 2400 seconds and its collector 2700 seconds. Separate
+selection requires all six Qbert services and the independent terminal
+confirmation complete, an idle host and unchanged pins. No training, extension,
+cap increase, checkpoint selection or automatic successor follows.
+
+## CPU qualification
+
+The preflight passes at **09:05:09 UTC November 1**, source6300c1d, in 7.996s
+(8.123s including its controller). It exercises all four actual CLI paths to the
+boundary before construction, checks 32 valid/invalid headers, and re-audits
+the four retained frozen arms, their scores, 357 invariant tensors, full replay
+receipts, videos and guards. All 337 inputs and 401 active Qbert inputs pass;
+Qbert PID771374/invocation82a217b818e24b5cb7c10801a2b3f237 remain unchanged.
+Two historical runner references resolve to identical abc2c2b bytes from Git.
+
+Native and emulator construction sentinels record zero attempts; no native
+module, environment, new replay, updates, failure or retry occurs. No queue,
+declaration or service is created. Retain CPU co-host timing without subtracting
+it from Qbert training time. Do not rerun this passing preflight.
+
+Root: `/x/Temp/kindle-breakout-temperature-20261101`.
+Proposed service: `kindle-breakout-temperature-20261101`.
+
+| Receipt | SHA256 |
+|---|---|
+| CPU preflight | `801c7af7334667dea86a6a556effbb66fb76940b6b34fcc272870604ccbef465` |
+| Execution | `233a570f22cf9f58fb9a8bef139a998814d6a809e559ade4a9bc55ef56e633fa` |
+| Exact runner | `abc2c2be23ef4c8c9b90e308a1d5a71a9e5201babebe29bd256e1f2395fe68fb` |
+| Controller | `65869ade83a52d557f68474ff0d9a2e11a30a6ae232dd68387ec6c871b0547b0` |
+| Preparation/closure | `5001434ecb73b35347886fc4bb33c2be540e1b6923681465038cdb73a608fcee` |
