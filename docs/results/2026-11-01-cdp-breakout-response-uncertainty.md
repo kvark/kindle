@@ -53,6 +53,11 @@ under its original observers. The five-game goal remains unfinished.
 Evidence root `/x/Temp/kindle-breakout-response-uncertainty-20261101` is complete;
 do not repeat the fit, preflight or collection.
 
+The subsequent [fixed one-step gameplay test](2026-11-01-cdp-breakout-one-step-risk.md)
+lowers mean return225.083→184.417 (−18.07%), with only three of eight lanes
+improved and zero two-wall successes. Its exact replay passes. Retain the
+original teacher; better prediction did not establish a useful risk penalty.
+
 | Artifact | SHA256 |
 | --- | --- |
 | Declaration | `ee77f59f9f6f85a571ffa7d877f6d4f5921ea2def3fd828c36e29089eea9322f` |

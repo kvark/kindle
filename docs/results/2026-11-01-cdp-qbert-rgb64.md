@@ -47,8 +47,8 @@ experience, full-run extension or automatic confirmation is selected.
 
 The full learner uses source b8de34f, original PID836919 and invocation
 425aae9cee2541fe9623b753225af57f in `kindle-qbert-rgb64-200k-20261101`.
-All four original progress/recovery/postprocessing/collection observers are
-active. Startup review at 19:41:33 passes all 521 pinned inputs, 357 initial
+Original progress/postprocessing/collection observers remain active; recovery
+has succeeded. Startup review at 19:41:33 passes all 521 pinned inputs, 357 initial
 tensors matching the bounded run, 47 matching pre-update transitions and
 2,074 finite supervised reports through 22,504 actions. First six update actions
 are 376/392/400/408/424/432. All 47 pre-update transitions differ from RGB48;
@@ -56,6 +56,14 @@ cross-geometry equality is not required. The review takes 1.465s on CPU while
 training runs; retain the co-host timing caveat without correction. This is a
 startup check, not a frozen gameplay result. Preserve the original process and
 observers; do not overlap another GPU job.
+
+The original 100k recovery observer succeeds at 19:51:22 UTC, with the declared
+100,000 actions / 9,340 updates, all 357 finite tensors and 9,405 finite reports
+through 100,696 logged actions. All four retained checkpoint files match their
+receipt hashes, totaling 206,067,159 bytes. Retention takes .907s without changing
+the live source. The checkpoint preserves weights/metadata, not replay, live
+belief, environments or RNG. No recovery stage is repeated; frozen gameplay
+remains unmeasured and the original learner continues.
 
 Full declaration SHA256:
 `3a1f56ed897d49ef58eedae0f315309452e2b8513d3eb7f601dcf23db025351e`.

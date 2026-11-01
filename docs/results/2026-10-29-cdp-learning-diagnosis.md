@@ -6,13 +6,16 @@ Its conservative 200k estimate is 25m56.425s, within the 30-minute cap.
 
 The fresh 200k / 18,715-update comparison launches **19:38:45 UTC November 1**,
 source b8de34f. Original main PID836919/invocation425aae9cee2541fe9623b753225af57f
-and all four observers are active. Startup review at 19:41:33 verifies all
+and the progress/postprocessing/collection observers are active. Startup review at 19:41:33 verifies all
 521 inputs, 357 bounded-matching initial tensors, 47 matching pre-update
 transitions, correct cadence and 2,074 finite reports through 22,504 actions.
 The 1.465s CPU review co-hosts without a wall-time correction. Require retained
 100k/9,340 recovery and final/actual-initial greedy plus sampled 24-episode
 assessments against 14,339.583/13,761.458 and the unchanged 15k/90% gate.
-No full frozen result is available.
+The original recovery observer succeeds at 19:51:22 UTC: 100,000 actions /
+9,340 updates, all 357 finite tensors and 9,405 finite prefix reports pass.
+All four retained files match their hashes (206,067,159 bytes). No full frozen
+result is available; the original learner continues.
 
 Keep 12M64/H5/R24/encoder4e-5/base behavior4e-5/greedy collection/expert100,
 native447fe50/runneraba4300d/teacherfa261c53. Geometry/head shapes/initialization
@@ -21,6 +24,21 @@ negative result remains. Root `/x/Temp/kindle-qbert-rgb64-20261101/full`,
 service `kindle-qbert-rgb64-200k-20261101`. Check live state; do not restart
 this learner, repeat completed stages or overlap GPU work.
 The five-game goal remains unfinished.
+
+The [fixed Breakout one-step risk controller](2026-11-01-cdp-breakout-one-step-risk.md) lowers mean return
+225.083→184.417 (−18.07%), with three of eight lanes improved and both0/24
+two-wall successes. Retain the original teacher;no fresh cohort,penalty retry,
+integration or learner. The penalty changes39 of1,355 eligible decisions on
+38,223 selected candidate states;this is not original-trajectory disagreement.
+All36 diagnostic/521 active Qbert inputs,43,056-action/172,188-frame exact
+action/debug/live-pixel/outcome replay and video pass. Six CPU fixtures pass;
+nonfatal test ResourceWarning retained. Collection26.617s/replay32.202s;
+controller61.624s completes19:52:07 UTC November1/source316a857, preserving
+originalQbertPID836919/invocation425aae9cee2541fe9623b753225af57f.
+No failure,repeat,native/GPU work or update;retain CPU co-host timing.
+Root`/x/Temp/kindle-breakout-one-step-risk-20261101` is complete,do not rerun.
+The error-prediction result remains;this use of it did not improve gameplay.
+Qbert RGB64 continues;the five-game goal remains unfinished.
 
 The [fixed Breakout response-error check](2026-11-01-cdp-breakout-response-uncertainty.md) passes its
 prediction screen: command-conditioned error-forecast MSE falls 5.04% overall
