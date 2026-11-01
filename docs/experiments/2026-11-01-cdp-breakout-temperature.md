@@ -94,3 +94,22 @@ All348 inputs are pinned;declaration SHA256
 Startup header matches the selected runtime,runner,evaluation seed and restored
 200k-action/12,477-update counters. No complete comparison is available yet.
 Do not restart the assessment or schedule another GPU job while it is active.
+
+## Completed assessment
+
+Temperature0.5 scores83.292,20.42% below retained primary greedy104.667 and47.96%
+above default sampled56.292. All0/24 two-wall;own temperature initial1.333. Both
+default sampled arms reproduce scores and4394/799 semantic events exactly.
+Retain greedy for this checkpoint;original sampled-primary result stays unchanged.
+
+All348 pins,357 finite/invariant tensors per arm,full replays/videos,guards and
+original terminal identity pass. Four arms81,016 actions/323,877 frames/72.156s,
+zero updates/truncations. Original21m28s training remains. Main/collector finish
+09:27:46/09:28:08 UTC November1,sourcea285376;both services succeed,zero failures
+or repeated stages. No new learner,sweep,extension,cap increase or automatic
+successor. See the [completed result](../results/2026-11-01-cdp-breakout-temperature.md).
+
+Comparison`5bea06e0f94c27793fb4408293ce926931d2e07daa9a4caab7fc008a1d1f90a6`;
+completion`101f8b1ca0fca32aaad8f95a35107298510c916f23edaf7c68d6c2367322e7cd`.
+The assessment is terminal;do not rerun arms,preflight or collector. Check live
+state before new GPU work;the five-game goal remains unfinished.

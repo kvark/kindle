@@ -20,22 +20,19 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [fixed frozen Breakout temperature0.5 assessment](docs/experiments/2026-11-01-cdp-breakout-temperature.md)
-launches09:25:25 UTC November1/sourcea285376 after all six Qbert services complete.
-MainPID776380/invocation33ea1a8cc3494d618ebffbe63ef1fa92;collectionPID776383/
-invocationb96831bc0e6f469281e7ca94e6c19e23. All348 inputs are pinned. Four
-final/actual-initial default-sampled/temperature0.5 arms preserve the12M64/
-Auto/B16/T16/H15/R16/encoder4e-5/expert100 weights and actor-unimix.01;zero
-updates. Primary retained greedy104.667,secondary sampled56.292;the original
-learner's sampled-primary result stays unchanged. Qualifiednativee416696/
-SHA40872a3/runnerabc2c2b;exact default semantic reproduction,357 finite invariant
-tensors,24 natural episodes,no truncations,full replays/videos and guards required.
-Startup header matches expected source/config/counters. No comparison result yet.
-Root`/x/Temp/kindle-breakout-temperature-20261101`,service
-`kindle-breakout-temperature-20261101`;check live identity,do not restart or
-schedule another GPU job while active. No new learner,temperature sweep,cap
-increase or automatic successor. Passing7.996s CPU qualification is retained
-without repeat. The five-game goal remains unfinished.
+The [completed frozen Breakout temperature0.5 assessment](docs/results/2026-11-01-cdp-breakout-temperature.md)
+scores83.292 versus retained greedy104.667 (−20.42%) and default sampled56.292
+(+47.96%);all0/24 two-wall successes. Own temperature initial1.333;default1.417
+reproduces. Retain greedy for this checkpoint;original sampled-primary result
+stays unchanged. Both default semantic sequences match exactly (4394/799 events).
+All348 pins,357 finite/invariant tensors per arm,full replays/videos,guards and
+original identity pass. Four arms81,016 actions/323,877 frames/72.156s,zero updates
+or truncations;original21m28s training remains. Main/collector succeed09:27:46/
+09:28:08 UTC November1/sourcea285376;zero failures or repeated stages. Qualified
+e416696/runtime40872a3/runnerabc2c2b,actor-unimix.01 preserved. Root
+`/x/Temp/kindle-breakout-temperature-20261101`;terminal,do not rerun arms,
+preflight or collector. No new learner,sweep,cap increase or automatic successor.
+No allocation active at closure;check live state. The five-game goal is unfinished.
 
 The [completed Qbert H5/R24 comparison](docs/results/2026-11-01-cdp-qbert-h5-r24.md)
 finishes 200k actions / 799,812 frames / 18,715 updates in 28m47s.
