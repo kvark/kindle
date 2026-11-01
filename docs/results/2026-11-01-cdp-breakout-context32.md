@@ -51,3 +51,10 @@ Do not repeat completed qualification,training,frozen pass,replay or collection.
 | Learning/frozen review |`9bd0ed162475b0ee4d46ec551cfc7ffd0c3942e7d9c812856124fafdb4853928`|
 | Full guided replay |`0e29cda9b7e2df2cec1258274d356eb22152217ce6c22bd866a0a69753d10df4`|
 | Original completion |`64e7ec1487c2d56a0591ae387ea02b977abbf46790f45c12d0dd2c43f31bcc85`|
+
+## Separately selected full comparison
+
+After reviewing the completed check and idle state,a [fresh200k comparison](../experiments/2026-11-01-cdp-breakout-context32-200k.md)
+is separately selected. Full CPU qualification passes15:57:41 UTC November1 on
+the first attempt,without native/emulator construction. It does not reuse this
+check's experience or repeat its stages. No full frozen result is available.

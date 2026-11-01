@@ -20,6 +20,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [fresh Breakout B8/T32 comparison](docs/experiments/2026-11-01-cdp-breakout-context32-200k.md) is separately selected after
+the bounded check passes53.799s/8192actions/481updates and conservative200k24m05s.
+Fix200k/12,469,30min training cap,retained100k/6,219 recovery and four final/actual-
+initial24-episode sampled/greedy arms against56.292/104.667,all0/24 two-wall.
+Longer gradients change batch/diversity,target rows and warmup together;cached
+recurrent history already exists. Native447fe50/runner6c1b69fb/teacher and other
+encoder4e-5 settings stay fixed. Full CPU first attempt passes15:57:41 UTC
+November1 in1.434s/1.533s wrapper:five CLI paths,28 config/14 header/four observer/
+five recovery/six retention cases,44 paths,17 controllers,261 bounded/227 control
+pins and357 shapes,zero native/emulator constructions. Plot import.135s passes.
+Root`/x/Temp/kindle-breakout-context32-20261101/full`;service
+`kindle-breakout-context32-200k-20261101`. Check live state before launch;do not
+repeat qualification or bounded stages. No extension,context retry,confirmation
+or automatic successor. Full benefit remains unmeasured;goal remains unfinished.
+
 The [completed Qbert behavior-rate comparison](docs/results/2026-11-01-cdp-qbert-behavior8e5.md) finishes200k actions/
 799,828frames/18,715updates in20m52.376s,26.92% less training time than control.
 Greedy14,358.333/23 first pyramids versus14,339.583/24 is nearly unchanged;
