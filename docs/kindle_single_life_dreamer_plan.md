@@ -1,17 +1,19 @@
 # Kindle: CDP learning roadmap
 
-A [bounded Qbert12M/RGB64 check](experiments/2026-11-01-cdp-qbert-rgb64.md) is selected for execution/cost
-qualification. Keep H5/R24/encoder4e-5/base behavior4e-5/greedy collection/
-expert100 and the faster teacher; only image geometry48→64 changes as a learner
-setting. Shape/head capacity and initialization also change; the older unaided
-4M/RGB64 negative result remains. CPU preflight passes two CLI paths, 19 config
-cases, schedules, both 357-tensor reference geometries and 442 control inputs
-at 19:31:37 UTC November 1 in 1.161s. Candidate16,334,353 parameters; no build.
-Fixed8192/733 training plus1024 frozen actions; require finite/invariant tensors,
-full replay and guards. Conservative200k projection must fit30min. No GPU
-result or full learner yet; native447fe50/runneraba4300d/teacherfa261c53 fixed.
-Root `/x/Temp/kindle-qbert-rgb64-20261101/native-check`. Check live state and
-never restart completed stages or overlap a live learner.
+The [Qbert12M/RGB64 bounded check](results/2026-11-01-cdp-qbert-rgb64.md) passes8192 actions/32,760frames/
+733 updates in57.956s;1024 frozen/.849s haszero updates/no natural episodes.
+All511 inputs,357 derived/invariant tensors,finite reports,full guided replay
+and guards pass. Main19:34:02/collection19:34:32 UTC November 1,source4c7293c;
+no failure or GPU-stage repeat. Conservative200k projection25m56.425s passes30min.
+A separate fresh200k/18,715 comparison is selected with100k/9,340 recovery and
+four24-episode frozen arms against14,339.583/13,761.458,original15k/90% gate.
+Full CPU qualification passes five CLI paths,28 config cases,49 paths/17 scripts
+and511 bounded/442 control inputs in3.493s. Keep12M64/H5/R24/encoder4e-5/base
+behavior4e-5/greedy collection/expert100/native447fe50/runneraba4300d/teacherfa261c53.
+Geometry/head shapes/initialization and teacher-cost differences limit causal
+claims;older unaided4M64 negative evidence remains. No full score yet. Root
+`/x/Temp/kindle-qbert-rgb64-20261101`;check live state,never restart completed
+stages or overlap GPU work. The five-game goal remains unfinished.
 
 The [command-dependent Breakout teacher comparison](results/2026-11-01-cdp-breakout-command-response.md) is complete.
 Fresh mean return 250.875 → 273.125 rises 8.87%, with five of eight lane means
