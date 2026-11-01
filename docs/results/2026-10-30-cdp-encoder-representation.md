@@ -197,3 +197,62 @@ GPU allocation is selected. Root`/x/Temp/kindle-encoder-policy-phase-20261030`.
 | `review.json` | `5bad26c16a258b03d927251f15acfcf1bdc108a30c4169f97e54eae0a75f5fee` |
 | `candidate-rows.jsonl` | `3a39c1f78c3b112f6775fc934083e94135c6f5241c30dc0ac562d03fef4851d7` |
 | `completion-review.json` | `26b98caceb58c9555dbdc4e62092f58ae2f87c9a300c0d4822fcc23d0a4b06ab` |
+
+## Saved action probabilities show uncertainty and confident disagreement
+
+The November1 CPU follow-up uses the existing actor-probability arrays,without
+repeating feature capture,actor inference,readout fitting or emulator replay.
+It asks whether the remaining greedy teacher disagreements occur mainly when
+the actor is uncertain. The fixed confidence bins are[0,.5),[.5,.75),[.75,.9)
+and[.9,1]. Confidence means the largest of the18 action probabilities; the
+chosen action is the argmax. Teacher disagreement is not optimal-action error.
+
+All2,064 row identities,labels,splits,phases and pixel hashes align with the
+retained corpus. Analysis uses the original601 test rows in lanes6/7,including
+136 near-descending rows. Original overall,near-descending and per-lane
+agreement,opposite-direction and directional-NOOP counts reproduce exactly.
+
+| Saved-state metric | Encoder6e-6 control | Encoder2e-5 candidate |
+|---|---:|---:|
+| Greedy teacher disagreements,all601 rows | 276 | 235 |
+| Mean largest action probability,all rows | .638 | .733 |
+| Disagreements with confidence≥.75 | 42 | 73 |
+| Disagreements among confidence≥.9 rows | 7/79 | 27/177 |
+| Greedy teacher disagreements,136 near-descending rows | 68 | 51 |
+| Near-descending disagreements with confidence≥.75 | 10 | 18 |
+| Near-descending disagreements among confidence≥.9 rows | 2/15 | 6/40 |
+
+The improved policy is more accurate against this teacher overall and more
+confident. Most remaining disagreements have confidence below.75:162/235
+overall and33/51 near the paddle. However,73/235 (31.1%) overall and18/51
+(35.3%) near-paddle disagreements have confidence at least.75. Among candidate
+states with confidence≥.9,teacher agreement is84.75% overall and85% near the
+paddle,despite mean confidence around96%. These are descriptive comparisons
+against an imperfect teacher,not a calibration claim against optimal actions.
+
+Both held-out lanes retain confident disagreement:48/130 and25/105 candidate
+disagreements have confidence≥.75;near-descending counts are13/27 and5/24.
+Among the27 overall candidate disagreements at≥.9 confidence,seven are exact
+opposite-direction choices;among the six near-descending ones,two are opposite.
+The remaining confusion counts and bin supports are retained in the review.
+
+This does not support explaining all remaining disagreement as random action
+sampling:these are already greedy choices. A positive scalar temperature
+preserves the action ranking at a fixed state,so it cannot change these argmax
+choices. Sampling or temperature could still change gameplay by changing
+visited states;neither is evaluated here. Representation quality,policy targets,
+teacher limitations and distribution shift remain candidates. No new loss,
+head,temperature setting or learner is selected from this diagnostic.
+
+The analysis finishes **01:49:34 UTC November1** in.205s,with all six pinned
+inputs/script unchanged,zero Kindle/emulator import attempts,zero model forward
+passes,zero fitting and zero learner/GPU work. It reuses control-policy states
+and temporally correlated rows from two lanes;it is not independent learner
+confirmation or the improved policy's own state distribution. No active GPU
+allocation co-hosts this analysis. Evidence root:
+`/x/Temp/kindle-encoder-confidence-20261101`.
+
+| Artifact | SHA256 |
+|---|---|
+| `declaration.json` | `d65f5d2b53b50f6c16fa37619e0f14fd238185e9d260c60b4cb21f9bfb55cc6e` |
+| `review.json` | `1c9273fa26286a965b6e664a8a29e569dc42d5b72b64c3eda75432922565f4cb` |

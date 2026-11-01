@@ -75,10 +75,35 @@ PID378851/invocation`f89e34b891a84b959ff05cd156fc4697`. At02:44:08 startup
 verifies all325 declared pins,357 initial tensors matching control and bounded
 check,47 pre-update transitions and287 finite supervised reports through2664
 actions. First six updates376/384/392/400/408/416 match the declared cadence.
-Progress,100k recovery,postprocessing and terminal-collection observers are
-active. No full frozen result is available. Do not restart this learner or
-schedule another GPU job while it is active. The read-only.803s startup audit
+Progress,100k recovery,postprocessing and terminal-collection observers were
+active at startup;all are now terminal. The read-only.803s startup audit
 co-hosts with learning;retain the timing caveat without wall-time correction.
 
 Declaration`893fc0ce97c0284f703c59f68bdda362da5ccd86e4b17b02c268c80a750b72d1`;
 startup`c7a04ee0d9c7626ecf0b0db178dfdb2c92995f292ebdbf220ce6fa4eb12b3c61`.
+
+
+## Completed comparison and repaired CPU closure
+
+The [full result](../results/2026-10-30-cdp-qbert-encoder-h5.md) completes200k
+/799,791 frames/24,954 updates in40m35s. Greedy13,889.583/23 first pyramids
+falls below control14,050/23;sampled13,738.542/24 improves13,331.250/23.
+Own initials80.208/177.083 clear none;both final means miss15,000. All four
+arms have zero updates/truncations. Retain6e-6 for primary H5/R32 and2e-5
+for cheaper H15/R16;no extension,rate sweep,confirmation or automatic successor.
+
+All325 pins,100k recovery,357 matching initial/invariant frozen tensors,
+47 pre-update transitions,1139/1101 initial semantic events,full replays/videos,
+guards,curves,coverage,exposure and comparison pass. Main succeeds03:37:08 UTC
+October30. Original postprocessing fails03:37:40 on a copied12,477-report
+expectation instead of24,954;collection fails03:37:42. Only the missing
+exposure report is run by a separate CPU repair,complete01:47:03 UTC November1
+in2.020s,with325 original/43 repair pins preserved and zero GPU,replay or plot
+repeats. The first CPU preparation AST-selection failure is retained.
+
+Closure`complete_with_cpu_audit_repair` lives under
+`/x/Temp/kindle-qbert-encoder-h5-20261030/cpu-closure-20261101`,completion hash
+`bb1dae01070f51dfbef18cb9a5efbd47e22c82d7a9401a365a919a8937bfef88`.
+Original failed services remain failed;there is no original passing completion.
+All services are terminal,no GPU allocation is active. Do not restart this
+learner or its failed observers. The five-game goal remains unfinished.

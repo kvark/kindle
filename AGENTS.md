@@ -18,20 +18,39 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [fresh Qbert H5/R32 encoder2e-5 comparison](docs/experiments/2026-10-30-cdp-qbert-encoder-h5-200k.md) starts02:43:36 UTC
-October30/source254c1bd,PID378851/invocation`f89e34b891a84b959ff05cd156fc4697`.
-Train200k/24,954 updates under45min,12M48/Auto/N8/B16/T16/H5/R32/expert100,
-with100k/12,454 recovery and four fixed final/actual-initial24-episode arms.
-Startup02:44:08 passes325 pins,357 control/bounded-matching initial tensors,
-47 pre-update transitions and287 finite supervised reports through2664 actions;
-first six updates376/384/392/400/408/416. Progress,recovery,postprocessing and
-terminal-collection observers are active. Primary H5/R32/6e-6 control is14,050
-greedy/13,331.250 sampled,23/24 pyramids each;original15k/90% gate unchanged.
-Native447fe50/qualified runner/teacher fixed,no experience reuse. Bounded check
-passes95.153s and conservative42m35s projection. Root
-`/x/Temp/kindle-qbert-encoder-h5-20261030/full`;service
-`kindle-qbert-encoder-h5-200k-20261030`. No full frozen result yet. Check live
-state;do not restart or schedule another GPU job while it is active.
+The [saved Breakout probability analysis](docs/results/2026-10-30-cdp-encoder-representation.md#saved-action-probabilities-show-uncertainty-and-confident-disagreement)
+finds235/601 greedy teacher disagreements for encoder2e-5,versus276 control;
+73 candidate disagreements have confidence≥.75. Near the paddle,18/51 have
+confidence≥.75 and6/40 states at≥.9 confidence disagree. These already-greedy
+choices leave representation/targets/teacher limitations unresolved;sampling
+alone cannot explain all disagreement. Fixed reused control states and two
+held-out lanes limit inference. All six pins and original row/metric checks
+pass in.205s CPU,complete01:49:34 UTC November1. No forward pass,fitting,replay,
+learner or GPU work;no new loss/policy selected. Root
+`/x/Temp/kindle-encoder-confidence-20261101`;the five-game goal remains active
+and unfinished. Architecture diagnosis is part of that goal.
+
+The [completed Qbert H5/R32 encoder2e-5 comparison](docs/results/2026-10-30-cdp-qbert-encoder-h5.md) finishes200k actions/799,791 frames/24,954 updates
+in40m35s,0.45% more training time than the H5/6e-6 control. Greedy13,889.583
+falls1.14% below14,050,both23/24 first pyramids;sampled13,738.542 rises3.06%
+from13,331.250,24/24 versus23/24. Own initials80.208/177.083 clear none;
+both final means still miss15,000. Retain6e-6 for primary H5/R32 and2e-5 for
+the cheaper H15/R16 point:the combination adds0.76% greedy score for34.04%
+more training time. All325 pins,100k/12,454 recovery,357 matching/invariant
+tensors,47 pre-update transitions,1139/1101 initial events,full replays/videos,
+guards,curves,coverage,exposure and comparison pass. Main succeeds03:37:08 UTC
+October30/source254c1bd;original postprocess/collection fail on a copied
+12,477-versus24,954 report-count assertion. Separate CPU closure completes
+01:47:03 UTC November1 in2.020s,preserving325 original/43 repair pins and all
+failed services,with zero GPU,replay or plot repeats. Status is
+`complete_with_cpu_audit_repair`;no original passing completion is fabricated.
+Actual overrides30.632%;guided returns/lower replay CE are not frozen competence.
+Native447fe50/qualified runner/teacher fixed,reused4013/cohort,no reliability
+claim. Root`/x/Temp/kindle-qbert-encoder-h5-20261030/full`,repair
+`/x/Temp/kindle-qbert-encoder-h5-20261030/cpu-closure-20261101`. All original
+services terminal,no GPU allocation active;do not restart the learner or failed
+observers. No extension,sweep,confirmation or automatic successor selected.
+Check live state before GPU work;the five-game goal remains unfinished.
 
 The [Qbert H5/R32 encoder2e-5 check](docs/results/2026-10-30-cdp-qbert-encoder-h5.md) passes8192 actions/32,751 frames/
 978 updates in95.153s;1024 frozen/.798s haszero updates/no natural episodes.
