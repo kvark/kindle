@@ -10,6 +10,8 @@ full replays/videos/guards and final/initial sampled/greedy24-episode arms again
 11,376.042 primary greedy/8,292.708 sampled. Full CPU preflight2.598s passes. Startup checks401 pins,357 initial tensors,47
 pre-update transitions and157 finite reports through2056 actions. MainPID771374/
 invocation82a217b818e24b5cb7c10801a2b3f237;all four observers active.
+Supplemental CPU recovery/terminal confirmations are also watched after2.159s
+qualification against the completed control;original pipeline remains unchanged.
 No full frozen result exists. Root`/x/Temp/kindle-qbert-h5-r24-20261101/full`,
 service`kindle-qbert-h5-r24-200k-20261101`. Check live identity;do not restart
 or schedule another GPU job while active. No extension or automatic successor;
