@@ -1,17 +1,26 @@
 # CDP handover — October25,2026
 
-The [selected Breakout greedy-collection check](experiments/2026-11-01-cdp-breakout-greedy-training.md) changes only live action
-collection in the retained12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100
-recipe. Fresh8192 actions/489 updates under180s,then1024 frozen actions/zero
-updates,with357 matched initial/invariant frozen tensors,full replay and guards.
-Conservative200k projection must pass30min. Native447fe50/qualified runner
-aba4300d remain;no build. Prior.648s CPU preflight passes227 control pins and
-actual CLI/config/mode/schema checks. Qbert8039 is fully closed and the host
-is idle at selection. Its gate miss limits cross-game confidence. Root
-`/x/Temp/kindle-breakout-greedy-training-20261101/native-check`,service
-`kindle-breakout-greedy-training-check-20261101`. Execution/cost only;no full
-learner,competence claim,retry,cap increase or automatic promotion. Check live
-state before work;do not overlap or restart the original check.
+The [selected fresh Breakout greedy-collection comparison](experiments/2026-11-01-cdp-breakout-greedy-training-200k.md) trains200k/
+12,477 updates under30min,with100k/6227 recovery and final/actual-initial sampled/
+greedy24-episode assessments against56.292/104.667,all0/24 two-wall. Only live
+collection changes;12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100,native447fe50,
+qualified runneraba4300d,teacher and losses remain. Reused1009/cohort;no isolated
+coverage cause or reliability claim. Full CPU preflight1.357s passes252 bounded/
+227 control pins,actual CLI/audit/observer checks and357 schema tensors. Original
+CPU control-path failure is preserved;no GPU repeats. Root
+`/x/Temp/kindle-breakout-greedy-training-20261101/full`,service
+`kindle-breakout-greedy-training-200k-20261101`. No experience reuse,extension,
+cap increase or automatic successor. Check live state;do not restart or overlap.
+
+The [completed bounded Breakout check](results/2026-11-01-cdp-breakout-greedy-training.md) passes8192 actions/32,740 frames/
+489 updates in46.633s;1024 frozen/4076 frames/.874s haszero updates and eight
+zero-return natural episodes. All252 pins,357 matching initial/invariant frozen
+tensors,47 expected initial semantic differences,full replay and guards pass.
+Conservative200k projection20m52s passes30min;no competence inferred. Original
+service succeeds07:51:36 UTC November1/sourceccb4387,collection07:51:45. No
+original stage fails or repeats. Root
+`/x/Temp/kindle-breakout-greedy-training-20261101/native-check`;terminal at closure,
+do not rerun. The full learner is a separate selection and uses no check experience.
 
 The [completed CPU delayed Breakout takeover](results/2026-11-01-cdp-breakout-delayed-takeover.md) records survival
 108/108/110/106/105/91 of120 at delays0/1/2/4/8/16 actions from first disagreement.

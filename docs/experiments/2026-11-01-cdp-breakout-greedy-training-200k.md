@@ -1,0 +1,65 @@
+# Fresh Breakout comparison with greedy live collection
+
+Select one fresh200k-action learner after the [bounded check](../results/2026-11-01-cdp-breakout-greedy-training.md)
+passes execution,full replay,checkpoint invariance and the conservative30-minute
+cost gate. Its20m52s projection leaves room under that cap. This is a separate
+decision within the existing five-game goal;no bounded experience is reused.
+
+The retained sampled-collection control scores56.292 sampled/104.667 greedy in
+21m28s,withzero two-wall successes in either24-episode assessment. Greedy live
+collection is an empirical candidate for improving visited training states and
+subsequent control. Qbert4013 improved with this change,but8039 misses its gate;
+one of two cheaper Qbert learners passes. Neither Qbert nor Breakout's takeover
+diagnostics establishes a coverage mechanism or promises a cross-game gain.
+
+Change only live collection sampled to greedy. Keep centered CDP12M64/Auto/N8/
+B16/T16/H15/R16/encoder4e-5/base4e-5/dynamics4e-4/expert100,actor unimix.01,
+all18 imitation weights1,world imitation gradients,all-state corrective labels,
+20% episode continuation guidance/cap1920,full18 actions,sticky.25,repeat4 and
+native64 resize. Posterior and imagined actor sampling remain unchanged.
+Use native447fe50 and exact qualified runneraba4300d. The runner adds the explicit
+fresh-training mode to the control runner;retain both exact hashes and its diff.
+No model,loss,teacher,preprocessing,build or backend change.
+
+Train200,000 aggregate actions/12,477 updates under1800s. First update376,
+residual credit.5. Preserve100k/6227 recovery before final checkpoint overwrite.
+Use fresh seed1009/evaluation4000001009;these are reused development inputs.
+No weights,replay,belief,game state,RNG or check experience is reused.
+
+Compare fixed final and actual-initial checkpoints in sampled and greedy modes,
+first three natural episodes per eight lanes (24 per arm). Sampled remains the
+primary assessment;retain greedy separately. Guidance and labels are off,
+updates and truncations must be zero. Keep the original90% two-wall-success
+gate. Each arm has300s and600k actions;no cap increase,checkpoint selection or
+retry if it fails its protocol. Preserve excess episodes and partial tails.
+
+Require357 initial tensors matching control and check,357 finite invariant
+tensors per frozen arm,finite supervised reports,correct raw losses/weights,
+changed CNN/reward/actor/value,full guided pixel/action/label replay,frozen
+outcome replays/videos,host guards,curves,exposure and comparison. The initial
+training prefix must match the greedy check and record differences from sampled
+control;actual-initial frozen semantic traces must match control. Ordinary
+frozen logs lack live pixel hashes,so their outcome replay is not live-image
+equality. Report actual override exposure and learning per training minute;
+guided online scores and replay fit do not substitute for frozen competence.
+
+CPU audit1200s,training replay600s,main service4500s. Original progress,recovery,
+postprocessing and terminal-collection observers are required. Preserve CPU
+co-host timing without correction. No extension,cap increase,seed confirmation,
+coefficient sweep or automatic successor follows this comparison.
+
+The1.357s CPU preflight passes five actual CLI paths,24 configuration cases,
+eight training-mode cases,11 startup-header cases,eight recovery-body cases,
+four observer-parser cases,45 resolved paths,15 compiled scripts,252 bounded
+and227 control pins,and357 schema tensors. Native capability metadata is
+stubbed;no native model or emulator is constructed. An initial CPU preflight
+fails before construction because a broad service-name replacement also changed
+the absolute control path. The exact four source snapshots and failure remain
+in `preparation-failure`;only that path is corrected before the passing check.
+No training or frozen stage repeats.
+
+Root `/x/Temp/kindle-breakout-greedy-training-20261101/full`,trial
+`breakout-12m-64-b16-r16-encoder4e5-greedy-expert100-200k-seed1009`,service
+`kindle-breakout-greedy-training-200k-20261101`. Launch once after the selection
+commit,clean-worktree,idle-host and input-hash checks. Do not restart or overlap
+the original learner. Final gameplay benefit remains unmeasured.

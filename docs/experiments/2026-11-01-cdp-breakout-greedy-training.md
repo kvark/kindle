@@ -46,3 +46,14 @@ service `kindle-breakout-greedy-training-check-20261101`. The declaration pins
 the accepted Qbert8039 completion and terminal confirmation. Launch once after
 the selection commit,clean-worktree and idle-host checks;collect the original
 terminal evidence once after success. No full learner is selected.
+
+## Completed check
+
+The [completed result](../results/2026-11-01-cdp-breakout-greedy-training.md) passes
+8192 actions/489 updates in46.633s and1024 frozen actions in.874s withzero updates.
+All252 pins,357 initial/invariant frozen tensors,full replay and guards pass;
+conservative200k projection20m52s passes30min. Main succeeds07:51:36 UTC November1,
+terminal collection07:51:45. No original stage fails or repeats. Frozen eight
+natural episodes scorezero;no gameplay benefit is inferred. Do not rerun.
+A [separate full comparison](2026-11-01-cdp-breakout-greedy-training-200k.md) is
+selected after this closure;no check experience is reused.
