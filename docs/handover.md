@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [bounded Qbert behavior-rate check](experiments/2026-11-01-cdp-qbert-behavior8e5.md) is selected after completed H3
+closure:actor/critic4e-5→8e-5 at fixed12M48/Auto/N8/B16/T16/H5/R24/encoder4e-5/
+greedy collection/expert100. Use the qualified equivalent teacher overlay,
+native447fe50/runneraba4300d unchanged;teacherSHAfa261c53 and CPU cost differ.
+CPU preflight1.101s passes both CLI paths,18 config cases,357 schema tensors,
+442 control inputs and16 packaged files withzero constructions. Fix8192/733,
+frozen1024,180s train cap and35min conservative200k gate. No full learner yet.
+Root`/x/Temp/kindle-qbert-behavior8e5-20261101/native-check`;service
+`kindle-qbert-behavior8e5-check-20261101`. Check live state;do not restart it
+or overlap another GPU job. The five-game goal remains unfinished.
+
 Use the [qualified Python Qbert teacher overlay](results/2026-11-01-cdp-qbert-teacher-cost.md)
 at`/x/Temp/kindle-qbert-color-masks-20261101/runtime` for future explicitly pinned
 Qbert trials. Equivalent channel predicates preserve472 snapshot decisions/states
