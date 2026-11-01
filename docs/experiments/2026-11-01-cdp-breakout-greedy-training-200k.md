@@ -112,3 +112,10 @@ The completed8039 exposure recount and unselected cross-cohort CPU preparation
 co-host with training;retain their recorded durations and the first preparation
 checker failure without time correction. No new GPU allocation is selected.
 The original learner continues;final frozen gameplay remains unmeasured.
+
+The unselected Qbert cross-cohort controller qualification passes08:12:20 UTC
+in4.387s (4.424s command),after a preserved6.628s CPU-only import-assertion failure.
+Its retained-diagonal audit uses no new GPU stages;all272 active inputs and the
+original Breakout identity remain unchanged. Keep this co-host timing without
+correction. Breakout reaches159,744 actions/9961 updates in1037.920s;no full
+frozen outcome is available and no second GPU job is selected.

@@ -37,9 +37,20 @@ A first CPU check assumed newer optional CLI fields;its source/failure is retain
 in`preparation-failure`,and only checker defaults/explicit flag absence are fixed.
 Exact runneraba4300d/native447fe50 remain,no native/emulator construction or GPU
 work. No queue,declaration,assessment log or service exists. Do not rerun preparation.
-The private`protocol-draft.md` is unselected;guarded controller/collector and a
-separate repository protocol/declaration remain required after complete Breakout
-closure,independent confirmation and an idle host. No automatic allocation.
+The private`protocol-draft.md` remains unselected. Guarded`assessment.py`,
+`launch.py` and`watch_collection.py` are now prepared;controller qualification
+passes08:12:20 UTC November1/sourcef8326c6 in4.387s (4.424s command). All four
+retained diagonal scores,357 finite/invariant tensors per arm,full stored replay/
+video/guard identities,four journal fixtures,388 preparation/272 active pins and
+original Breakout identity pass without rerunning a diagonal GPU stage or the
+completed CLI preflight. A first6.628s controller check fails only on forbidding
+ALE module import for replay identity;source/execution remain in`controller-failure`.
+The corrected test blocks both ALEInterface exports and gymnasium.make and
+recordszero construction attempts;production arm audit unchanged. Keep all CPU
+co-host timing without correction. No queue,declaration,assessment log or service
+exists. Do not rerun either successful preflight. A separate repository protocol/
+declaration and selection remain required after complete Breakout closure,
+independent confirmation and an idle host. No automatic allocation.
 
 The [completed bounded Breakout check](results/2026-11-01-cdp-breakout-greedy-training.md) passes8192 actions/32,740 frames/
 489 updates in46.633s;1024 frozen/4076 frames/.874s haszero updates and eight
