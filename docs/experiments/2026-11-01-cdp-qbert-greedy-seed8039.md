@@ -157,3 +157,19 @@ postprocessing and terminal collection remain pending;the full comparison is
 not yet accepted. No original stage repeats. Keep the original pipeline running;
 do not rerun completed stages,execute final confirmation early or allocate
 another GPU job before complete closure.
+
+## Accepted terminal result
+
+The [completed result](../results/2026-11-01-cdp-qbert-greedy-seed8039.md)
+retains the same frozen scores and gate miss. All359 pins,100k recovery,initial
+schema/differences,frozen invariance,training pixel/action/label replay,frozen
+replays/videos,guards,curves,coverage,exposure and comparison pass. All five
+original services succeed:main07:44:45 UTC,postprocessing07:45:00,collection
+07:45:02 November1. Independent.878s terminal confirmation passes07:45:29.
+There is no failed or repeated original stage. The cheaper recipe passes primary
+greedy on one of two learners;no sampled-training control exists for8039.
+
+All services are terminal and no allocation remains active at this closure.
+Do not rerun this learner,collectors or confirmations. No extension,cap increase,
+third Qbert learner or automatic successor follows. The five-game goal remains
+unfinished;check live state before new work.

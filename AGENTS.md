@@ -32,33 +32,22 @@ QbertPID760870/invocationa0b219d7702b4c82a65e9b33498c3544 remains unchanged;
 retain CPU timing. Root`/x/Temp/kindle-breakout-delayed-takeover-20261101`;
 complete,do not rerun. No new learner,loss or successor is selected.
 
-The [fresh Qbert seed8039 check](docs/experiments/2026-11-01-cdp-qbert-greedy-seed8039.md) selects one independent learner of the
-passing greedy-collection recipe:200k/12,477 updates under35min,100k/6227 recovery,
-and four final/actual-initial24-episode arms. Keep12M48/Auto/N8/B16/T16/H15/R16/
-encoder4e-5/expert100,native447fe50,exact runner,teacher and losses. Only learner/
-evaluation seeds change4013→8039/4000008039. Primary greedy gate15k/90% remains;
-no sampled-training control for8039 or isolated collection-mode effect is claimed.
-CPU preflight2.179s passes305 bounded/317 preceding pins,actual CLI/audit/observer
-checks and357 schema tensors,zero native/emulator construction. No new build or
-GPU qualification. Root`/x/Temp/kindle-qbert-greedy-seed8039-20261101/full`,service
-`kindle-qbert-greedy-seed8039-200k-20261101`. Original launch07:04:25 UTC
-November1/sourcecbee206,359 pins,mainPID760870/invocation
-`a0b219d7702b4c82a65e9b33498c3544`;four original observers launched. Startup1.032s
-passes357 finite initial tensors,48 recorded seed differences,correct cadence
-and105 finite supervised reports through2056 actions. Original100k/6227 recovery
-passes07:18:30 UTC,357 finite tensors and6,337 finite reports through101,768
-actions. Separate.888s CPU confirmation07:18:43 preserves exact recovery metadata,
-all tensor hashes,359 pins and original identity. Do not rerun it.
-Training completes200k/799,796 frames/12,477 updates in27m34s. All four frozen
-GPU stages finish withzero updates/truncations and passing guards. Completed
-outcome replays select greedy11,376.042/23 first pyramids and sampled8,292.708/24;
-own initials251.042/128.125 clear none. Both miss15k. Full training replay,
-postprocessing and collection remain pending under the original process;no accepted
-full8039 comparison yet. Stage-summary1.273s verifies359 pins and all four videos.
-No repeat,extension or third learner follows these preliminary results.
-Retain CPU co-host timing;check this original service before work. Do not restart
-or overlap GPU jobs. No retry,extension,cap increase,seed campaign or automatic
-successor. Goal unfinished.
+The [completed Qbert seed8039 check](docs/results/2026-11-01-cdp-qbert-greedy-seed8039.md) finishes200k/799,796 frames/
+12,477 updates in27m34s. Greedy11,376.042/23 first pyramids and sampled8,292.708/24
+miss15k;own initials251.042/128.125 clear none. Keep4013's15,515.625 passing point,
+but this same recipe passes primary greedy on one of two learners;reliability
+remains unresolved. Only learner/evaluation seeds change,no sampled-training
+control for8039 or isolated collection-mode effect. All359 pins,100k/6227 recovery,
+357 finite initial/invariant frozen tensors,48 initial differences,full guided
+pixel/action/label and frozen replays/videos,guards,curves,coverage,exposure and
+comparison pass. All five original services succeed;main/post/collection finish
+07:44:45/07:45:00/07:45:02 UTC November1/sourcecbee206. Independent.878s terminal
+confirmation passes07:45:29;zero failures or repeated original/GPU stages.
+Actual overrides32.0105%;lower late replay CE/higher aided online returns are not
+frozen competence. Root`/x/Temp/kindle-qbert-greedy-seed8039-20261101/full`;
+all services terminal,no active allocation at closure. Do not rerun this learner,
+collectors or confirmations. No extension,cap increase,third Qbert learner or
+automatic successor. Check live state before work;the five-game goal is unfinished.
 
 The [completed CPU Breakout first-disagreement diagnostic](docs/results/2026-11-01-cdp-breakout-first-disagreement.md)
 finds102 both/six teacher-only/six policy-only/six neither survive the matched

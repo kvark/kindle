@@ -10,21 +10,22 @@ no architectural cause. All478 new branches,37,016 source actions,334 diagnostic
 closing07:12:23 UTC/sourcec9fbf9f.240 baseline branches do not repeat;zero GPU
 work or updates. Original Qbert8039 identity stays unchanged;no successor selected.
 
-The [fresh8039 confirmation](../experiments/2026-11-01-cdp-qbert-greedy-seed8039.md)
-keeps the passing greedy-collection recipe fixed and changes learner/evaluation
-seeds. This tests a second learner at200k/35min with own initial controls and the
-original15k/90% gate; it does not isolate why collection changed performance.
-Launch07:04:25 UTC November1/sourcecbee206,359 pins,originalPID760870/invocation
-`a0b219d7702b4c82a65e9b33498c3544`;observers active. Startup1.032s passes357
-finite initial tensors,48 recorded seed differences and105 finite reports
-through2056 actions. Original100k/6227 recovery passes07:18:30 UTC with357 finite
-tensors;separate.888s confirmation07:18:43 preserves exact metadata,359 pins and
-original process identity. Training completes200k/12,477 in27m34s. Completed
-frozen outcome replays select greedy11,376.042/23 first pyramids and sampled
-8,292.708/24,versus own initials251.042/128.125 withzero pyramids. Both miss15k;
-the passing4013 result has not reproduced on8039. Full training replay,
-postprocessing and collection remain pending;no accepted full comparison or
-isolated collection-mode effect yet. Do not restart or overlap GPU work.
+The [completed Qbert seed8039 check](2026-11-01-cdp-qbert-greedy-seed8039.md) finishes200k/799,796 frames/
+12,477 updates in27m34s. Greedy11,376.042/23 first pyramids and sampled8,292.708/24
+miss15k;own initials251.042/128.125 clear none. Keep4013's15,515.625 passing point,
+but this same recipe passes primary greedy on one of two learners;reliability
+remains unresolved. Only learner/evaluation seeds change,no sampled-training
+control for8039 or isolated collection-mode effect. All359 pins,100k/6227 recovery,
+357 finite initial/invariant frozen tensors,48 initial differences,full guided
+pixel/action/label and frozen replays/videos,guards,curves,coverage,exposure and
+comparison pass. All five original services succeed;main/post/collection finish
+07:44:45/07:45:00/07:45:02 UTC November1/sourcecbee206. Independent.878s terminal
+confirmation passes07:45:29;zero failures or repeated original/GPU stages.
+Actual overrides32.0105%;lower late replay CE/higher aided online returns are not
+frozen competence. Root`/x/Temp/kindle-qbert-greedy-seed8039-20261101/full`;
+all services terminal,no active allocation at closure. Do not rerun this learner,
+collectors or confirmations. No extension,cap increase,third Qbert learner or
+automatic successor. Check live state before work;the five-game goal is unfinished.
 
 The [completed Breakout first-disagreement intervention](2026-11-01-cdp-breakout-first-disagreement.md)
 finds102 both/six teacher-only/six policy-only/six neither survive at the original
