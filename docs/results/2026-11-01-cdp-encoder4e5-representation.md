@@ -118,3 +118,78 @@ resolutions and original terminal journal are retained.
 - Review`9800c472544ff4e22f67f11db1fbf2dd0859e07fc3ba6424431374e46462d32d`.
 - Comparison`8674c0d5a20191f79c2d3ad7bb43d77c3b97efd1432a84a7c4abc0c11c251211`.
 - Completion`b4646de533388a873c02a61384fc13fb87a5be75330cd3e6e92b567256830f2d`.
+
+## Own-policy trajectories improve productivity and show a smaller agreement gain
+
+The [CPU follow-up](../experiments/2026-11-01-cdp-encoder4e5-policy-phase.md)
+replays the4e-5 policy's37,016 saved greedy actions/148,038 frames. All episode/
+task outcomes, partial tails, frame/reset counts and source identities reproduce
+exactly. The first3 natural episodes per8 lanes select31,161 actions, versus
+24,858 in the saved2e-5 cohort. Prior control rows and aggregates are reused
+without another emulator replay. This measures each policy's own encountered
+states; it does not pair identical inputs or establish independent reliability.
+
+The selected episodes last25.36% longer: mean1035.75→1298.375 actions. Total
+return rises1023→2512, equivalent to41.154→80.614 points per1000 actions, a95.88%
+increase. Median episode score rises38.5→76.5; ranges are16–103 and14–385.
+These describe the already-recorded greedy42.625→104.667 gain, with0/24 two-wall
+successes in both cohorts. No new gameplay assessment is performed.
+
+| Teacher-defined phase | Encoder2e-5 rows | Exact / horizontal agreement | Encoder4e-5 rows | Exact / horizontal agreement |
+|---|---:|---:|---:|---:|
+| All |24858|54.97% /55.33%|31161|59.04% /59.32%|
+| Ball unseen |1421|88.46% /89.94%|2288|91.87% /93.27%|
+| Velocity unavailable |602|49.34% /51.83%|884|55.77% /56.90%|
+| Far descending |6705|50.44% /50.48%|8048|52.40% /52.40%|
+| Near descending |5496|57.59% /57.91%|6582|59.86% /60.12%|
+| Ascending |10613|52.30% /52.61%|13334|57.22% /57.44%|
+| Stationary or ambiguous |21|57.14% /61.90%|25|64.00% /64.00%|
+
+Near-descending exact agreement improves on seven of eight lanes; lane4 falls
+59.49%→58.99%. Among directional teacher labels, opposite-direction choices
+fall476/3434 (13.86%)→429/4006 (10.71%), while literal NOOP choices rise798/3434
+(23.24%)→1147/4006 (28.63%). This differs from the fixed-control-state scalar
+actor comparison above, where opposite-direction counts rise. The states,
+sampling and posterior draws differ, so neither comparison isolates a mechanism.
+Full confusion counts and per-lane results remain retained.
+
+## Fixed windows locate lost lives without assigning a causal action error
+
+The replay additionally records ALE lives immediately before and after each
+action. All24 selected episodes lose five lives:120 loss events, including24
+terminal losses. Each loss has a teacher-detected near-descending ball within
+the fixed32-action window. The last such row is0–4 actions before81 losses and
+5–8 actions before39; none requires the older age bins. This establishes recent
+pixel-detector visibility, not that the native representation tracks the ball.
+
+At the last near-descending row,86/120 actions match the teacher. The34
+disagreements comprise10 FIRE commands where the teacher says RIGHT,12 NOOP
+commands where it says LEFT/RIGHT,two opposite-direction commands,and10
+directional commands where it says NOOP. The teacher's projected response-target
+distance from the current paddle has median8.046 source pixels at these rows.
+The target and phase remain estimates; a current target gap does not establish
+whether a bounce is avoidable or which earlier command caused the loss.
+
+These observations motivate examining the approach-to-paddle sequence and the
+time available for correction. Last-action imitation alone cannot classify the
+observed losses: most last near-descending actions already agree with this
+imperfect teacher. No counterfactual action or teacher takeover is tested here.
+The old control has no per-action life counts, so these windows describe only
+the4e-5 candidate. Windows may overlap and rows are temporally correlated.
+
+The23.375s CPU replay (24.583s controller wall) completes04:04:01 UTC November1,
+source3012999. Eight pure tests,265 analysis pins,all276 active Qbert inputs,
+originalPID736977/invocation48d20e8959f04654b6f5ff8932328d8d and all replay checks
+pass. The four original phase/metric/probe definitions are unchanged; the replay
+function changes only its probe factory to the life-counting subclass. No native
+module or GPU descriptor is opened, and no model forward pass or update occurs.
+CPU preflight2.883s, tests and replay co-host with Qbert; retain those timing
+caveats without correction. No failure, replay repeat or new learner is selected.
+
+Evidence root`/x/Temp/kindle-encoder4e5-policy-phase-20261101` retains all rows,
+120 indexed windows, per-lane/confusion results, test/source records and the
+separate post-hoc arithmetic in`derived-summary.json`.
+
+- Review`328868ff8004a1a26882e893f56ce73d2be99315ae8b2e6ed1d4ba032c7e0efe`.
+- Life windows`a859c4760e9a57f091f3b390160a35886e8c59810d0b78cc8e04b58eceafd5bd`.
+- Completion`5cb945814f38aad4d75c6cf4a3cc64dd76cbbb6ca34bc98f35f4999b03b2a45c`.

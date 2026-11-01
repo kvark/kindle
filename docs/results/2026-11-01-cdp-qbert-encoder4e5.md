@@ -64,3 +64,10 @@ and94 finite reports through1880 actions. The.815s CPU check co-hosts with
 learning; retain its timing caveat without wall-time correction. All four
 observers are active. No full frozen outcome is available; do not restart this
 learner or schedule another GPU job while it is active.
+
+The separate CPU Breakout own-policy analysis co-hosts with this learner:
+preflight2.883s, eight pure fixtures and23.375s replay (24.583s controller wall).
+It completes04:04:01 UTC with all276 inputs and the original Qbert process
+unchanged, no native/GPU work and no updates. Its timing remains a caveat without
+correcting this learner's training wall time; the retained co-host receipt links
+the exact analysis completion. No new Qbert outcome is inferred.

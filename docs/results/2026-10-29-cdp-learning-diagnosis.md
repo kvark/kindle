@@ -12,10 +12,20 @@ readouts. Near-descending teacher agreement rises62.50%→66.91%, but teacher
 probability falls.582→.573 and opposite-direction choices rise7→11 of89
 directional labels. All six replacement readouts still trail the learned actor.
 This strengthens the case for encoder optimization without identifying the
-remaining architectural cause, measuring candidate own-state coverage or
-establishing a universal rate. The earlier4M/expert10 rate4e-5 failure and reused
+remaining architectural cause or establishing a universal rate. The earlier
+4M/expert10 rate4e-5 failure and reused
 seed/cohort limits remain. All473 diagnostic pins,357 invariant tensors per
 stage and full replay/host checks pass, with zero updates or repeated GPU work.
+
+The subsequent [own-policy replay](2026-11-01-cdp-encoder4e5-representation.md#own-policy-trajectories-improve-productivity-and-show-a-smaller-agreement-gain)
+measures the4e-5 trajectory distribution: selected episodes last25.36% longer
+and earn95.88% more return per action. Near-descending teacher agreement rises
+57.59%→59.86%, with fewer opposite-direction and more NOOP choices on directional
+labels. All120 lost lives have a detected near-descending ball within eight
+actions;86 last such decisions match the teacher. This motivates examining the
+preceding control sequence and recoverability, without identifying a causal
+last-action error. All265 analysis/276 active Qbert pins and original process
+identity pass; the23.375s CPU replay performs no native inference or learning.
 
 The completed [Qbert encoder-rate comparison](2026-10-30-cdp-qbert-encoder-moderate.md)
 also improves frozen gameplay at nearly unchanged training cost: greedy

@@ -15,6 +15,18 @@ reused4013/cohort,no experience reuse or reliability claim. Root
 `kindle-qbert-encoder4e5-200k-20261101`. Check live state;do not restart this
 learner or schedule another GPU job while active. The five-game goal is unfinished.
 
+The [completed CPU Breakout own-policy replay](results/2026-11-01-cdp-encoder4e5-representation.md#own-policy-trajectories-improve-productivity-and-show-a-smaller-agreement-gain)
+reproduces37,016 actions/148,038 frames,with31,161 selected actions. Versus2e-5,
+episodes last25.36% longer and earn95.88% more reward/action;near-descending
+teacher agreement57.59%→59.86%,opposite-direction fractions fall,NOOP rises.
+All120 observed lost lives have a recent near-descending detection;86 last
+such decisions match the teacher. No causal last-action error or counterfactual
+outcome is identified. Eight tests,265 analysis/276 active Qbert pins and
+original process identity pass. CPU23.375s completes04:04:01 UTC November1/
+source3012999;zero native/GPU work,updates,failures or replay repeats. Root
+`/x/Temp/kindle-encoder4e5-policy-phase-20261101`;co-host timing caveats retained,
+no learner/loss/successor selected. The original Qbert learner continues.
+
 The [completed Qbert encoder4e-5 check](results/2026-11-01-cdp-qbert-encoder4e5.md) finishes8192 actions/32,754 frames/489
 updates in64.165s;1024 frozen/.800s haszero updates/no natural episodes.
 All257 pins,357 matching initial/invariant frozen tensors,47 pre-update events,

@@ -49,3 +49,19 @@ and preserve evidence; never restart or disturb the active learner.
 
 Root`/x/Temp/kindle-encoder4e5-policy-phase-20261101`. No architecture, loss,
 replacement head or successor GPU allocation is selected by this diagnostic.
+
+## Completed result
+
+The23.375s CPU replay completes04:04:01 UTC November1/source3012999. All37,016
+actions/148,038 frames reproduce retained outcomes;31,161 actions belong to the
+selected24 natural episodes. Near-descending teacher agreement rises57.59%→
+59.86% on each policy's own states; opposite-direction fractions fall and NOOP
+fractions rise. Selected episodes last25.36% longer and earn95.88% more points
+per action. All120 observed lost lives have a near-descending detection in the
+preceding eight actions;86 last such decisions already match the teacher.
+No action-level cause or counterfactual outcome is established.
+
+All265 analysis/276 active Qbert pins, original process identity and replay
+checks pass, with no native/GPU work, learner updates, failure or replay repeat.
+Tests and preflight/replay co-host timing caveats remain. See the
+[completed findings](../results/2026-11-01-cdp-encoder4e5-representation.md#own-policy-trajectories-improve-productivity-and-show-a-smaller-agreement-gain).
