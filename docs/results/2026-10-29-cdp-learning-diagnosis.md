@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed Breakout position-loss comparison](2026-11-01-cdp-centroid-encoder4e5.md)
+learns its auxiliary training target but lowers sampled-primary return56.292→35.542,
+while greedy rises104.667→112.750;all0/24 two-wall. Training costs21m47s,+1.50%.
+Retain the no-centroid control. Low auxiliary loss does not establish held-out
+position accuracy or better control;native/runner differences also prevent an
+isolated loss-effect claim. All original stages and541 inputs pass;the separate
+terminal verifier's journal-format failure is preserved and repaired CPU-only.
+No learner or allocation is active at closure;the five-game goal is unfinished.
+
 The [latest retained-log Qbert phase check](2026-11-01-cdp-qbert-h5-r24-phases.md)
 places the H5/R24 greedy seed score gap entirely after the first-pyramid crossing
 transition:both learners have identical1219-frame milestones and550-point
@@ -8,8 +17,8 @@ is established as the cause. On an older4013 failure-feature corpus,a
 [fixed lane-held-out linear readout](2026-11-01-cdp-qbert-failure-linear-readout.md)
 trails the actor on movement decisions41.02% versus52.34% and on every lane
 overall. This does not support that head replacement or establish information
-absence. Both checks are CPU-only and leave the active Breakout centroid4e-5
-comparison unchanged. See their reports for supervision,selection and co-host
+absence. Both checks were CPU-only and preserved the then-active Breakout centroid4e-5
+comparison. See their reports for supervision,selection and co-host
 limits;the newer H5/R24 representations are not measured by the old-feature probe.
 
 The [retained Breakout planning-cost analysis](2026-11-01-cdp-breakout-plan-costs.md)

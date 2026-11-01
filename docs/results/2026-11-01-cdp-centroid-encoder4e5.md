@@ -1,148 +1,126 @@
-# Position supervision at encoder4e-5 passes bounded execution and cost
+# Position loss at encoder4e-5 lowers sampled Breakout quality
 
-The fresh Breakout check completes **8,192 actions / 32,722 frames / 489 updates
-in 47.291s**. The following **1,024 greedy frozen actions / 4,096 frames** take
-0.883s, with zero updates and no completed natural episodes. This establishes
-execution and early cost; task competence remains unmeasured.
+The fresh200k comparison finishes **200,000 actions /799,590 frames /12,477
+updates in21m47s**, within its fixed30-minute cap. Sampled return falls
+**56.292→35.542 (−36.86%)**; greedy rises **104.667→112.750 (+7.72%)**. Both
+candidate modes still havezero of24 two-wall successes. Training takes1.50%
+more observed wall time than the retained control's21m28s.
 
-The fixed conservative projection is **21m10s per 200k actions**, including the
-10% margin, below the 30-minute cap. The retained no-centroid control takes
-21m28s for its completed 200k learner. Early projection and completed-run time
-do not isolate loss overhead or guarantee the candidate's full-run cost.
+| Frozen mode | No-centroid control | Centroid100 / encoder4e-5 | Own actual initial, both | Two-wall successes, both |
+| --- | ---: | ---: | ---: | ---: |
+| Sampled, primary | 56.292 | 35.542 | 1.417 | 0/24 |
+| Greedy | 104.667 | 112.750 | 2.208 | 0/24 |
 
-Use the existing scale100 position objective with encoder rate4e-5. Keep
-12M64/Auto/N8/B16/T16/H15/R16/expert100, sampled collection and posteriors,
-actor-unimix.01, the current corrective pixel teacher, 20% episode guidance
-capped at1920, full18/sticky.25/repeat4 and one GPU resize from native frames.
-Native2974160/SHAe7ba0d4 and the exact existing centroid runner are reused;
-no native build or new loss implementation occurs. Native and runner versions
-differ from the447fe50 control, limiting causal claims.
+Retain the existing no-centroid recipe. The sampled-primary result declines,
+and the separate greedy gain does not establish an overall win or task success.
+The original90%-two-wall/864 gate remains unchanged. No extension,coefficient
+sweep,cap increase,confirmation or automatic successor is selected. The five-game
+goal remains unfinished.
 
-All **372** initial tensors match the retained centroid initialization. All
-**357** shared tensors and **47** pre-update semantic events match the stronger
-no-centroid control. Every frozen tensor remains invariant. The16,990,739
-trainable parameters include656,386 in the training-only centroid head.
-The corrected schema includes its ten optimizer-moment tensors.
+## Recipe and learning interpretation
 
-All489 supervised reports are finite. CNN, reward, actor, value and both
-centroid weight layers change. Raw centroid loss averages0.097274, range
-0.037628–0.501080; valid fraction averages0.817884, range0.578125–0.980469.
-These are replay-training statistics, not held-out position accuracy.
-Actual guidance overrides3,795 actions (46.326%) and passively labels4,397.
-Complete pixel/action/teacher-label replay and both host guards pass.
+Use12M64/Auto/N8/B16/T16/H15/R16/expert100,base/actor/encoder4e-5,dynamics4e-4,
+centeredCDP/action-effects1,sampled collection and posteriors,actor-unimix.01,
+unit expert weights/world gradients,all-state corrective labels,20% episode
+guidance/cap1920,full18/sticky.25/repeat4 and one GPU resize from native pooled
+RGB. Add the existing scale100 current-pixel centroid objective. Its detached
+red-excess targets use the fixed color/crop prior;the target and656,386-parameter
+head are training-only. Total trainable parameters are16,990,739.
 
-The2.821s CPU preflight checks two commands, three negative CLI cases,13 config
-cases, the update schedule,372 schema entries and357 shared initial tensors.
-It preserves227 control,41 original-centroid and21 repair inputs, and verifies
-all six preceding Qbert services terminal. No native agent or emulator is
-constructed during qualification; expected CLI rejections are recorded.
+The qualified native2974160/SHAe7ba0d4 and byte-identical centroid runner are
+reused without a build. Native and runner differ from the447fe50 control;
+matching initial values/traces does not prove full learning parity or isolate
+the loss's causal effect. The teacher and schedule hashes match the control.
+Learner1009/evaluation4000001009 are reused development seeds. No weights,
+replay,beliefs,RNG,game state or bounded-check experience are reused.
 
-The service starts **11:02:50 UTC November1**, source`77866fc`, PID787070 /
-invocation`881d7709c8604708b02fa09881926e39`. It succeeds **11:03:56**; terminal
-collection completes **11:04:29**, verifying the original unique invocation
-and all302 declared inputs. No failure, retry or repeated stage occurs. Earlier
-centroid numerical, schema and full-evaluation failures remain preserved.
+Raw centroid loss falls from.044301 in the first50k window to.0006446 in the
+last50k;valid-target fraction rises.8363→.9146. These are changing replay-training
+statistics,not held-out position accuracy or a matched-state representation test.
+Late expert CE.559106 is nearly the control's.558097. The auxiliary target is
+learned without an improvement to the primary gameplay result;neither loss
+curve identifies why sampled and greedy results differ.
 
-No check experience may be reused by a full learner. A separate fresh200k
-comparison is now being prepared; it requires its own qualified controllers
-and selection. No full learner is selected at bounded closure. The original
-90%-two-wall gate remains unchanged, and the five-game goal remains unfinished.
-No learner or GPU allocation is active; inspect live state before new work.
+Actual guidance overrides87,259 actions (**43.6295%**),versus99,343 (49.6715%)
+in the control. Aided online last50 return84.68 is not frozen competence.
+Initial-subtracted return per training minute is1.567 sampled and5.074 greedy.
+Retain CPU co-host time and native/runner differences without wall-time correction.
 
-[Bounded protocol](../experiments/2026-11-01-cdp-centroid-encoder4e5.md).
-Root `/x/Temp/kindle-centroid-encoder4e5-20261101/native-check`, trial
-`breakout-12m-64-b16-r16-centroid100-encoder4e5-expert100-check`.
+## Complete verification and closure
 
-- Preflight: `246dea04f1b770f74378b40766f27c0a7ce2270d27a62b6f4df3f8329fdbeb16`.
-- Declaration: `bf7e648d7febfa2f1ba191c9866137f2d08c18a7afb156e9d410a510e45710ef`.
-- Review: `43a5482f9fb9fb23592442181ece5e93d20e656bb720e6b02671b3e55dc57059`.
-- Completion: `bb953beb006da1c7efd5a5b7e7dfcaa4becbe559bb27e5523bb383d28337396b`.
+All541 declared inputs,372 bounded-matching initial tensors,357 shared control
+values and47 pre-update semantic events pass. Final/actual-initial sampled and
+greedy assessments use the first three natural episodes per eight lanes. Their
+actual-initial semantic sequences match the control exactly:800 sampled and795
+greedy events. All372 tensors remain invariant in every frozen arm. Finite
+supervised/auxiliary reports and changed CNN,reward,actor,value and both centroid
+weight layers pass.
 
-Complete: do not rerun bounded stages, passed preflight or terminal collection.
+Four frozen arms total80,320 actions/321,115 frames/73.707s,zero updates andzero
+truncations across the complete arms. Full training pixel/action/teacher-label
+replay,frozen outcome/frame/reset replays/videos,host guards,curves,exposure and
+comparison pass. Ordinary frozen logs lack live image hashes,so frozen replay
+does not compare unavailable original images. The comparison plot is visually
+inspected and its labels/values match the completed review.
 
-## Fresh full comparison is active
+The100k/6,227 recovery audit passes11:26:28 UTC. All four checkpoint files are
+retained under `recovery-100k`, totaling213,946,193 bytes;the.190s independent
+retained-file/configuration confirmation passes11:27:05. No checkpoint is selected
+for evaluation from this recovery snapshot.
 
-The separately qualified200k comparison launches **11:15:21 UTC November1**,
-source`cd92f9f`, with **541 pins**, MainPID787678 / invocation
-`709367befab94110b4afc489bd51d55c`. Training is capped at30 minutes with12,477
-updates;100k/6227 recovery files will be retained. The existing teacher and
-schedule hashes match the no-centroid encoder4e-5 control. No prior experience
-is reused; native2974160 and the exact centroid runner remain unchanged.
+The original service starts11:15:21 UTC November1/source`cd92f9f`,PID787678 /
+invocation`709367befab94110b4afc489bd51d55c`. Main/postprocessing/collection finish
+**11:41:19/11:41:26/11:42:02**. All five original services succeed; no original
+pipeline or GPU stage fails or repeats. No learner/GPU allocation is active at
+closure;check live state before any new work.
 
-The startup check takes1.467s CPU time while training runs. It verifies all541
-inputs,372 tensors matching the bounded initial,357 shared control tensors,47
-matching pre-update events and the first six updates at376/392/408/424/440/456
-actions. The observed prefix has2,904 actions and158 finite reports. Record this
-CPU co-host time without adjusting measured training wall time.
+A separate terminal CPU verifier fails at11:42:27 because it requires a systemd
+Consumed summary for the lightweight progress observer. Its source,stderr and
+.214s execution receipt remain preserved. A separate corrected verifier accepts
+the exact worker-completion report,checks original invocation identities and
+passes in **1.553s at11:43:44**. The progress timestamp11:41:38 is explicitly a
+worker-completion report,not an exact process-exit timestamp. The original
+completion review is unchanged;this is an ancillary verifier repair,not a repaired
+training or evaluation run. Do not rerun either verifier or any completed stage.
 
-Main, progress, recovery, postprocessing and collection services are active.
-No final frozen result exists. Required assessments remain final/actual-initial
-sampled and greedy,24 natural episodes each,zero updates/truncations,full
-replays/videos,guards,curves,exposure and comparison against56.292/104.667,all
-zero two-wall. The earlier centroid evaluation failure is preserved.
+The provisional training/frozen log receipts remain unchanged beside the final
+reviews. CPU co-host caveats include startup/recovery reviews,the.314s Qbert phase
+analysis wrapper,the.514s Qbert linear-readout wrapper,and light source/document
+preparation. No time is subtracted from observed training duration.
 
-[Fixed full protocol](../experiments/2026-11-01-cdp-centroid-encoder4e5-200k.md).
-Root `/x/Temp/kindle-centroid-encoder4e5-20261101/full`; service
-`kindle-breakout-centroid-encoder4e5-200k-20261101`. Inspect the original learner;
-do not restart it or allocate another GPU job while active. No retry,extension,
-cap increase or automatic successor follows. The five-game goal is unfinished.
+## Bounded execution and qualification
 
-- Full `declaration.json`: `b2126cedf8c9794096b3fc660fbc59eb20e11dd48ee7657d44360e6f2761bda3`.
+The preceding fresh check completes8,192 actions/32,722 frames/489 updates in
+47.291s. Its1,024 frozen actions take.883s withzero updates andno natural episodes.
+All302 pins,372 matching centroid initial/invariant frozen tensors,357 shared
+control tensors,47 pre-update events,finite reports,full replay and guards pass.
+Main/collector succeed11:03:56/11:04:29 UTC November1/source77866fc,withzero
+failure or repeated stages. The conservative200k projection21m10s passes30min;
+that early projection does not guarantee the full-run cost or task quality.
 
-- Full `launch.json`: `1311911a0bd9991cbb1c381e62dafc7e041aef7957cf88e45a82d473bb5fb49f`.
+The bounded CPU preflight takes2.821s. Full qualification then passes five
+commands,18 configuration cases,seven startup cases,four observer argument
+cases,five recovery cases,372 schema tensors and fixed schedules in2.610s.
+Plot/import/exposure qualification takes.698s. All201 historical build-source
+hashes resolve. Stale collector names and explicit recovery retention were
+corrected before the first full qualification;no native rebuild occurs.
+Earlier centroid numerical/schema/full-evaluation failures remain preserved.
 
-- Full `startup-review.json`: `45412984de4bb30b885fff29c80c555228691cc014733e4e9c0ca4a8ec228e6f`.
+[Bounded protocol](../experiments/2026-11-01-cdp-centroid-encoder4e5.md),
+[fixed full protocol](../experiments/2026-11-01-cdp-centroid-encoder4e5-200k.md).
+Package `/x/Temp/kindle-centroid-encoder4e5-20261101`; full trial
+`full/breakout-12m-64-b16-r16-centroid100-encoder4e5-expert100-200k-seed1009`.
+The bounded trial and all full stages are terminal;do not restart them.
 
-### The100k recovery snapshot is retained
+| Full artifact | SHA256 |
+| --- | --- |
+| declaration.json | `b2126cedf8c9794096b3fc660fbc59eb20e11dd48ee7657d44360e6f2761bda3` |
+| learning-review.json | `6ddc5f2fdad27ae71eefc5a583b39a139c0ad4297afdd90c7ec60d498b41a248` |
+| postprocess-review.json | `3e3437900a6f31cf7be9013868b524ba63798d1209f4ea4a258dc5d50322b4b0` |
+| completion-review.json | `72330f4ba4a22ec1f2e39b1651ce1507641ca6f8f208aa9e529a2c0afdefcc83` |
+| exposure-comparison/comparison.json | `953e43cf45a1ec9dc403feeaad61483d2151f431e61cdeb70c43a5219f916802` |
+| terminal-confirmation.json | `fd9b6429529867a9f4ca3f8b42d12b265df730ef7b1c85808158f4a2daaebe6b` |
 
-The original observer passes **100k actions /6,227 updates at11:26:28 UTC**,
-including372 finite tensors. It retains all four checkpoint files under
-`recovery-100k`:metadata,world,behavior andslow-value tensors, totaling
-**213,946,193 bytes**. The observer then exits successfully.
-
-An independent **.190s CPU** confirmation passes **11:27:05**:retained hashes
-match the original observer and the still-current source checkpoint, metadata
-counters/configuration match the declaration, and the original learner remains
-PID787678/invocation`709367befab94110b4afc489bd51d55c`. No restore, new GPU work or
-completed stage is repeated. Record the CPU co-host time without correction.
-The original learner,progress,postprocessing and collection observers continue;
-the final frozen comparison remains pending.
-
-- `checkpoint-review-100k.json`: `1200507c6a43b2f30305c68f86e1d3c2eca9b73c2cbf8a46ac6b79c74ea9cfef`.
-
-- `recovery-confirmation.json`: `2556b1187abd9241115537185aad01cd93d70565c5277895f436fd956f473b63`.
-
-### Training log completes inside the fixed cap
-
-The original training log ends at **200,000 actions /799,590 frames /12,477
-updates in1,307.040s (21m47s)**, with residual credit.5. This is1.50% more
-observed training time than the retained control's1,287.701s;CPU co-host and
-native/runner differences remain. The30-minute cap is unchanged.
-
-`training-log-progress.json` preserves the terminal log record/hash and original
-service identity. This is provisional log evidence:the existing pipeline is
-continuing its fixed frozen arms and full replay/checkpoint audit. No new GPU
-job or checkpoint selection occurs, and no gameplay benefit is inferred yet.
-
-### Frozen logs and their replays finish; full pipeline remains pending
-
-The fixed final sampled mean is **35.542 versus control56.292 (−36.86%)**;
-greedy is **112.750 versus104.667 (+7.72%)**. Actual-initial sampled1.417 and
-greedy2.208 match the control means. Every selected arm haszero of24 two-wall
-successes. The unchanged sampled-primary result is lower;the separate greedy
-improvement does not establish an overall win or five-game success.
-
-Four arms total **80,320 actions /321,115 frames /73.707s**,zero updates andzero
-truncations across their complete logs. The completed frozen replays reproduce
-the source logs and selected24-episode scores/task outcomes. All excess episodes
-remain recorded:25 sampled-final,28 sampled-initial,28 greedy-final and27
-greedy-initial. No cap increase, retry or frozen-stage repeat occurs.
-
-The.071s CPU log/replay recount completes **11:40:22 UTC November1**,preserving
-the original active service identity. `frozen-log-progress.json` records this
-provisional evidence;the full training pixel/action/label replay,learning review,
-postprocessing and terminal collection are still pending. Do not treat this as
-a completed pipeline or select a successor. The original learner service is
-performing its CPU audit;do not restart it or repeat any completed GPU stage.
-
-- `frozen-log-progress.json`: `8800ba42298ac4947138cda0c3356c2f03b8db2b7d684de7f196a84dce2c117e`.
+Bounded declaration `bf7e648d7febfa2f1ba191c9866137f2d08c18a7afb156e9d410a510e45710ef`,
+review `43a5482f9fb9fb23592442181ece5e93d20e656bb720e6b02671b3e55dc57059`,
+completion `bb953beb006da1c7efd5a5b7e7dfcaa4becbe559bb27e5523bb383d28337396b`.

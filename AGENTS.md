@@ -20,29 +20,25 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [fresh centroid100/encoder4e-5 comparison](docs/experiments/2026-11-01-cdp-centroid-encoder4e5-200k.md)
-launches11:15:21 UTC November1/sourcecd92f9f with541 pins. Fresh200k/12,477updates,
-30-minute training cap,12M64/Auto/N8/B16/T16/H15/R16/expert100/current teacher,
-sampled collection;qualified native2974160/exact centroid runner unchanged.
-Startup passes372 bounded-matching/357 shared-control initial tensors,47 paired
-pre-update events,correct cadence and158 finite reports through2904 actions in
-1.467s CPU co-host time. MainPID787678/invocation709367befab94110b4afc489bd51d55c;
-progress,postprocessing and collection observers remain active. Recovery passes
-11:26:28 UTC at100k/6227;all372 finite tensors and213,946,193 retained bytes pass.
-The.190s retained-file/config confirmation passes11:27:05;recovery observer
-succeeds and original learner identity stays. Keep CPU co-host time. Require
-final/actual-initial sampled/greedy24-episode assessments against56.292/104.667,
-all0/24 two-wall. Training log completes200k/799,590frames/12,477updates in21m47s,
-1.50% more observed training time than control. Completed frozen logs/replays
-show sampled35.542 versus56.292 andgreedy112.750 versus104.667,all0/24 two-wall;
-own initials1.417/2.208. Four arms80,320actions/321,115frames/73.707s,zero updates
-or truncations. Full training replay,learning review,postprocessing and collection
-remain pending;no completed comparison or candidate selection yet. Native/
-runner differences limit causal claims;no prior experience reused. Root
-`/x/Temp/kindle-centroid-encoder4e5-20261101/full`;service
-`kindle-breakout-centroid-encoder4e5-200k-20261101`. Inspect the original live
-service;do not restart it or schedule another GPU job while active. No retry,
-extension,cap increase or automatic successor. The five-game goal is unfinished.
+The [completed centroid100/encoder4e-5 comparison](docs/results/2026-11-01-cdp-centroid-encoder4e5.md)
+finishes200k/799,590frames/12,477updates in21m47s,+1.50% observed training time.
+Sampled35.542 versus56.292 falls36.86%;greedy112.750 versus104.667 rises7.72%.
+Own initials1.417/2.208 match;all0/24 two-wall. Retain no-centroid control;sampled
+remains primary,no overall win or gate success. Late centroid loss.044301→.000645
+across first/last50k windows is training fit,not held-out accuracy. Expert CE
+.559106 versus.558097 is nearly unchanged;actual overrides43.6295% are not
+frozen competence. Native2974160/runner differ from control;no isolated cause.
+All541 pins,372 matching/invariant tensors,357 shared values,47 pre-update and
+800/795 initial semantic events,100k/6227 retained recovery,full training/frozen
+replays/videos,guards,curves,exposure and comparison pass. Main/post/collection
+finish11:41:19/11:41:26/11:42:02 UTC November1/sourcecd92f9f;all five original
+services succeed,zero original/GPU failures or repeats. Separate terminal CPU
+verifier failure on missing progress Consumed summary is preserved;1.553s
+corrected confirmation passes11:43:44 without repeating any original stage.
+Root`/x/Temp/kindle-centroid-encoder4e5-20261101/full`;terminal,do not rerun learner,
+collectors or confirmations. CPU co-host caveats remain. No active allocation,
+extension,coefficient sweep,cap increase,confirmation or automatic successor.
+Check live state before work;the five-game goal remains unfinished.
 
 The [completed CPU Qbert linear readout](docs/results/2026-11-01-cdp-qbert-failure-linear-readout.md)
 trails the original actor:held-out movement agreement41.02% versus52.34%,rescued
@@ -105,8 +101,8 @@ shared values and exact schedules in2.610s. Plot/import/exposure qualification
 passes in.698s;all201 historical source hashes resolve. Before qualification,
 stale collector service names were corrected and100k checkpoint retention added.
 No native/emulator construction,build,failure or repeated check. The separate
-fresh200k learner has now launched under the fixed30-minute cap;see active work
-above. Do not rerun passed qualification or the completed bounded check.
+fresh200k comparison is now complete;see the full result above. Do not rerun
+passed qualification or the completed bounded check.
 No retry,extension,cap increase or automatic successor.
 
 The [completed CPU Breakout settling-cost check](docs/results/2026-11-01-cdp-breakout-edge-settling.md) lowers the retained
