@@ -80,3 +80,15 @@ runtime identity,exact prefix geometry and all32 origins/1,024 labels without
 emulator or native construction. Root:
 `/x/Temp/kindle-qbert-policy-readback-20261101`. Source trajectories and checkpoints
 remain unchanged. No new loss, learner or automatic successor is selected.
+
+## Completion — November 1
+
+Sourcefd1c586,525 inputs. All three guarded stages and the original service
+succeed05:31:49 UTC after29.478s. The full capture takes17.631s,matching all20,584
+actions/82,324 frames withzero updates and357 invariant tensors;the128 opening
+actor comparisons differ by at most4.762e-10. Smoke/full prefix equality passes.
+The separate CPU collector's null-message failure is retained;the.661s repair
+completes05:34:08 without repeating GPU/capture/analysis stages. See the
+[completed result](../results/2026-11-01-cdp-qbert-policy-readback.md) for fixed
+metrics and the explicitly post-hoc NOOP/movement decomposition. No new learner
+or loss is selected. The build cache is released;all portable artifacts remain.

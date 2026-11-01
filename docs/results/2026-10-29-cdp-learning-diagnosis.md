@@ -1,5 +1,18 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [exact batched Qbert actor readout](2026-11-01-cdp-qbert-policy-readback.md)
+reproduces20,584 original greedy actions and saved pixel trajectories,withzero
+updates and357 invariant tensors. On1,024 fixed failure-window decisions,
+teacher agreement86.33% hides52.34% movement agreement versus97.66% NOOP;on
+teacher-rescued windows movement agreement is38.07%. Of122 movement disagreements,
+34 chooseNOOP and88 another action. Origins already agree31/32,and all224
+commands in unrescued windows agree. This identifies a later sequence/preference
+gap,not its architecture or a single causal command. The prior lower-NOOP-weight
+learner was worse;no weight retry or new loss follows. All525 pins and original
+GPU stages pass;only separate terminal CPU collection needs a preserved
+null-journal-message repair. The qualified read-only API preserves the original
+batched path;captured features remain available without fitting a new head.
+
 The [completed Breakout encoder8e-5 comparison](2026-11-01-cdp-breakout-encoder8e5.md)
 adds a mixed result:sampled56.292→55.875 (−.74%) and greedy104.667→125.375
 (+19.79%) at nearly unchanged21m24s training time. All0/24 two-wall;all265 pins,

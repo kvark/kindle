@@ -20,17 +20,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [frozen Qbert vector-policy readout](docs/experiments/2026-11-01-cdp-qbert-policy-readback.md)
-is prepared for the32 teacher-intervention failure windows. An additive read-only
-API copies exact batched actor inputs/logits after act;the isolated447fe50-based
-runtime passes130 Rust/585 packaged Python CPU tests and strict Clippy. One
-context-only backport check failure is preserved before the successful patch;
-no GPU work has occurred. Four analysis tests and2.243s preflight pass. Require
-one guarded native test,256-action prefix and20,584-action/82,324-frame capture,
-all original actions/pixels/outcomes,357 invariant tensors,zero updates and
-128 F64 actor matches.600s service cap;no new learner/loss/automatic successor.
-Roots`/x/Temp/kindle-vector-policy-readback-20261101` and
-`/x/Temp/kindle-qbert-policy-readback-20261101`. Check live state before launch.
+The [completed Qbert vector-policy readout](docs/results/2026-11-01-cdp-qbert-policy-readback.md)
+reproduces20,584 original actions/82,324 frames in17.631s,zero updates. In1,024
+failure-window decisions,teacher agreement is86.33% overall but52.34% for moves
+and97.66% for NOOP;rescued-window movement agreement is38.07%. Of122 movement
+disagreements,34 chooseNOOP and88 another action. Origins already agree31/32;
+no single-action causal or architecture claim. All525 pins,357 invariant tensors,
+128 F64 actor matches,exact smoke/full prefix,three guards and original service
+pass05:31:49 UTC November1/sourcefd1c586. A null journal-message field fails the
+separate CPU collector;original failure retained,.661s CPU repair completes
+05:34:08,zero GPU/capture repeats. Additive native readout447fe50+patch/SHAf864fe4
+passes130 Rust/585 Python CPU checks/Clippy and guarded state/RNG checks. Original
+context-only patch failure is retained;857MB cache released,wheels/source/test
+binary/runtime retained. Roots`/x/Temp/kindle-vector-policy-readback-20261101`
+and`/x/Temp/kindle-qbert-policy-readback-20261101`. No learner/GPU allocation,
+new loss or automatic successor;check live state. Five-game goal unfinished.
 
 The [completed Breakout encoder8e-5 comparison](docs/results/2026-11-01-cdp-breakout-encoder8e5.md)
 finishes200k actions/799,597 frames/12,477 updates in21m24s. Sampled55.875 falls
