@@ -1,8 +1,9 @@
 # Current Qbert action rankings on shared observation histories
 
-**Running:** original service launches22:14:15 UTC November 1/source4aa6ac7.
-Both128-action bounded captures pass; the full pair is active. No complete
-ranking result is available yet. Preserve original main/collector identities.
+**Complete:** original main/collector succeed22:17:28/22:17:35 UTC November 1,
+source4aa6ac7. Both full captures pass withzero updates. Point estimates favor
+10007 despite12011's lower reward error; paired lane intervals includezero.
+See the [result](../results/2026-11-01-cdp-qbert-rgb64-ranking.md). Do not rerun.
 
 The current RGB64 critics predict useful returns on their own policies, with
 different later-play biases. Test the current models' action-dependent forecasts
@@ -116,3 +117,24 @@ checks19 forecasts plus a repeated recorded plan, finite predictions, unchanged
 live state/probabilities/counters, all357 invariant tensors and host guard,
 withzero updates. No failure or repeated stage. The full pair proceeds under
 the fixed original controller. Do not overlap another GPU allocation.
+
+
+## Completed comparison
+
+Both full captures pass:78,368 actions each,128 origins/2,432 candidate-control
+forecasts each, all357 invariant tensors andeight shared CPU/native pixel
+hashes. Total156,736 actions/626,854 source frames/181.731365s,zero updates.
+All64 pins, exact source transitions, repeated forecasts, state/counter checks,
+host guards and original terminal collector pass. Main succeeds22:17:28.764 UTC;
+collection22:17:35.719. Both services are terminal success; no failure or repeat.
+
+All/before/after informative origins are38/25/13. Overall gain over uniform is
++6.726 for10007 versus−1.367 for12011; paired difference+8.092 has lane95%
+interval[−.562,19.772]. Later gains+2.227/+1.842 have paired difference+.385
+[−1.519,2.293]. Reward MAE is lower for12011,38.696→21.721 overall and
+56.163→26.914 later. Lower error does not establish better action selection;
+these limited short-plan results do not causally explain the full-game gap.
+
+No GPU allocation remains active, learner or loss is selected. Preserve original
+completion SHA0de0c50bee1e330a6ea703e3c07d6004526ac6720410d7c4168435cde4e1deaa.
+The five-game goal remains unfinished.
