@@ -37,6 +37,15 @@ or identify representation, forecasting, actor fitting or timing as the cause.
 All293 analysis/276 active Qbert pins and branch/source checks pass in36.589s
 of CPU-only analysis, with no native policy inference or GPU work. No new learner is selected.
 
+The completed [Qbert4e-5 follow-up](2026-11-01-cdp-qbert-encoder4e5.md) improves
+primary greedy13,785.417→14,028.125 (+1.76%) and sampled9,987.500→11,522.917
+(+15.37%),each24/24 first pyramids,in27m41s versus30m16s. Both means still miss
+15,000;the primary gain is modest and varies by lane. Late replay CE worsens
+.0814→.0893 and guided online returns fall,despite better frozen means. All
+original audits and services pass;an ancillary terminal identity assertion is
+separately corrected without repeating any original stage. Retain this cheaper
+development point,not a universal rate or independent reliability claim.
+
 The completed [Qbert encoder-rate comparison](2026-10-30-cdp-qbert-encoder-moderate.md)
 also improves frozen gameplay at nearly unchanged training cost: greedy
 11,984.375→13,785.417 (+15.03%) and sampled6,759.375→9,987.500 (+47.76%) in

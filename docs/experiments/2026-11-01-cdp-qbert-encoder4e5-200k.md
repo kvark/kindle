@@ -96,3 +96,18 @@ preparation takes1.625s after training/evaluation have finished; it does not
 alter recorded training time. Its selection waits for this pipeline's complete
 terminal evidence. Terminal-verifier preflight.041s used retained control
 artifacts only and co-hosted with training; retain that caveat without correction.
+
+## Completed comparison
+
+All original services succeed: main04:38:49 UTC November1,postprocessing
+04:38:58 and collection04:39:00. All276 pins,100k recovery,357 initial/frozen
+tensors,full replay/guard/curve/coverage/exposure/comparison checks pass.
+Training27m41s is8.56% shorter than control;greedy14,028.125 and sampled
+11,522.917 improve1.76%/15.37%,both24/24 pyramids and still below15,000.
+Retain4e-5 as a development point,not a reliability claim. No Qbert extension,
+confirmation or automatic successor is selected. A separate terminal verifier
+corrects its watcher-PID assumption in.597s,preserving the original failure
+and validating the collector child's exact completion object under the same
+original systemd invocation. No original stage repeats. See the [completed
+result](../results/2026-11-01-cdp-qbert-encoder4e5.md) for cost,loss and exposure
+limits. No GPU allocation remains active at this closure;check live state.

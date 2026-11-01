@@ -1,24 +1,23 @@
 # CDP handover — October25,2026
 
-The [Qbert encoder4e-5 comparison](experiments/2026-11-01-cdp-qbert-encoder4e5-200k.md)
-finishes training at04:26:10 UTC:200k actions/799,739 frames/12,477 updates in
-27m41s. All four frozen GPU stages finish by04:27:41 with zero updates and
-truncations. Fixed24-episode replay scores are greedy14,028.125 and
-sampled11,522.917,each24/24 first pyramids,versus retained13,785.417/9,987.500.
-Both candidate means still miss15,000. **The original CPU training replay,
-postprocessing and terminal collection are still pending; no completed full
-comparison is claimed.** All frozen outcome replays are complete.
-
-Original main service `kindle-qbert-encoder4e5-200k-20261101`, PID736977,
-invocation `48d20e8959f04654b6f5ff8932328d8d`, source7f794b0,276 pinned inputs.
-Root `/x/Temp/kindle-qbert-encoder4e5-20261101/full`.
-Only encoder2e-5→4e-5 changes;12M48/Auto/N8/B16/T16/H15/R16/expert100,
-native447fe50,exact runner and teacher stay fixed. Startup matches357 initial
-tensors and47 pre-update events. Original100k/6227 recovery passes04:12:29;
-independent confirmation preserves exact metadata and hashes. CPU co-host caveats
-are recorded without time correction. Reused4013/cohort,no experience reuse.
-Check original service and observers; **do not restart or launch another GPU job
-until this pipeline and its terminal confirmation finish**.
+The [completed Qbert encoder4e-5 comparison](results/2026-11-01-cdp-qbert-encoder4e5.md)
+finishes200k actions/799,739 frames/12,477 updates in27m41s,8.56% less observed
+training time than2e-5. Greedy14,028.125/sample11,522.917 improve1.76%/15.37%,
+each24/24 first pyramids;own initials80.208/177.083 clear none. Both means still
+miss15,000. Retain4e-5 as a development point,not independent reliability.
+All276 pins,100k/6227 recovery,357 matching/invariant tensors,47 pre-update and
+1139/1101 initial events,full replays/videos,guards,curves,coverage,exposure and
+comparison pass. Main/post/collection succeed04:38:49/04:38:58/04:39:00 UTC
+November1,source7f794b0;all five original services terminal success,zero repeats.
+Separate.597s terminal confirmation corrects an overly strict watcher-PID check:
+original collector output comes from a child in the same invocation. Preserve
+that ancillary failure;the original pipeline passes unchanged. Actual overrides
+38.4%;late replay CE.0893 versus.0814 and guided scores are not frozen competence.
+Native447fe50,exact runner and teacher fixed;only encoder2e-5→4e-5 changes in
+12M48/Auto/N8/B16/T16/H15/R16/expert100. Reused4013/cohort and CPU co-host caveats
+remain. Root`/x/Temp/kindle-qbert-encoder4e5-20261101/full`. No Qbert extension,
+confirmation or automatic successor;no active GPU allocation at closure.
+Check live state before work. The five-game goal remains unfinished.
 
 The [Breakout encoder8e-5 bounded check](experiments/2026-11-01-cdp-breakout-encoder8e5.md)
 is CPU-prepared only:8192 actions/489 updates then1024 frozen actions,changing
