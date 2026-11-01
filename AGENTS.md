@@ -20,30 +20,30 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [Qbert encoder8e-5 comparison](docs/experiments/2026-11-01-cdp-qbert-encoder8e5-200k.md) finishes training at200,000
-actions/799,800frames/18,715 updates in20m36.093s,within the30-minute cap.
-Training guard/queue stage succeeds18:54:48 UTC November1;frozen evaluations
-and full audits remain pending. Actual44,160 overrides (22.08%) and online
-scores are not frozen competence. No full gameplay result is accepted yet.
-The original sourceea34785/mainPID831942/invocationbae3fe2dd4a24070ab2845a7828145fa
-continues with528 pins. Keep12M48/Auto/N8/B16/T16/H5/R24/encoder8e-5/base
-behavior4e-5/greedy collection/expert100;native447fe50,runneraba4300d and faster
-teacherfa261c53 fixed. Final/actual-initial greedy-primary and sampled24-episode
-arms keep the original15k/90% gate,against14,339.583/13,761.458. Progress,
-postprocessing and collection are active;100k recovery succeeded. The
-[bounded check and startup](docs/results/2026-11-01-cdp-qbert-encoder8e5.md) pass357 matching/invariant tensors,
-47 pre-update events and correct cadence. Preparation/CPU selector failures
-remain;one CPU preflight rerun passes,no GPU repeat. CPU co-host caveats stay
-without correction. Root`/x/Temp/kindle-qbert-encoder8e5-20261101/full`;service
-`kindle-qbert-encoder8e5-200k-20261101`. Do not restart completed stages or
-launch another GPU job before closure. The five-game goal remains unfinished.
+The [completed Qbert encoder8e-5 comparison](docs/results/2026-11-01-cdp-qbert-encoder8e5.md) lowers both frozen
+scores: greedy 14,339.583 → 12,435.417 (−13.28%) and sampled 13,761.458 →
+11,213.542 (−18.51%), with 23/24 and 24/24 first pyramids. Both means miss
+15,000. Actual-initial scores 1.042/171.875 reproduce, with zero pyramids.
+Retain encoder4e-5 and the faster teacher. No rate extension, sweep,
+confirmation or successor is selected. Training completes 200k actions /
+799,800 frames / 18,715 updates in 20m36.093s. Time falls 27.87%; initial-
+subtracted gain/minute rises 20.22% greedy and 12.64% sampled, but teacher CPU
+cost also changes. This does not establish a rate-induced speed benefit.
+Late imitation CE rises .051060 → .052894. Actual 44,160 overrides (22.08%)
+and online guided scores are not frozen competence.
 
-The original100k recovery passes18:44:43 UTC November1 at100,000 actions/
-9,340 updates,357 finite tensors. All four files are retained (179,536,495
-bytes) in.270s;the recovery observer is terminal success. Original main
-PID831942/invocationbae3fe2dd4a24070ab2845a7828145fa continues with final200k
-and all four frozen assessments pending. This verifies recovery,not gameplay.
-Do not rerun completed recovery or diagnostic stages. Retain CPU co-host timing.
+All 528 inputs, 357 matching/invariant tensors, 47 pre-update events,
+100k/9,340 four-file recovery, full replays/videos, guards, curves, coverage,
+exposure, comparison and the original collector pass. All five services
+succeed: main 19:01:36, postprocessing 19:01:43 and collection 19:02:15 UTC on
+November 1, source ea34785. Pre-launch preparation and CPU selector failures
+remain preserved; one repaired CPU preflight rerun passes. No full-run or
+GPU/replay/collector failure or repeat occurs. Native447fe50, runneraba4300d,
+12M48/H5/R24/base behavior4e-5 remain fixed. The reused10007 cohort and teacher
+implementation change limit interpretation. Retain CPU co-host timing without
+correction. Root `/x/Temp/kindle-qbert-encoder8e5-20261101/full` is complete;
+do not rerun it. No Kindle service or GPU allocation is active. The five-game
+goal remains unfinished; check live state before future work.
 
 The [Breakout full-width paddle diagnostic](docs/results/2026-11-01-cdp-breakout-paddle-crop.md) acceptszero of42,303
 selected decisions:24 initial/reset,37,960 extra-red,4,285 image-edge and34

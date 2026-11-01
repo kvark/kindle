@@ -87,3 +87,11 @@ Do not rerun completed recovery or diagnostic stages. Retain CPU co-host timing.
 
 Recovery metadata SHAaec77c4ee9f7904a83ffa1c856a52e7c5fbc7f5b877e062e025d01930166f750;
 retention SHA59c975dbda8f1d0f2fd2668c10c463c7810d3b014aa2349464d9faa40201ecc5.
+
+The [completed result](../results/2026-11-01-cdp-qbert-encoder8e5.md) lowers
+greedy14,339.583→12,435.417 and sampled13,761.458→11,213.542,with23/24 and24/24
+first pyramids. Both means miss15k. Training20m36.093s meets30min;all528 inputs,
+100k recovery,357 initial/invariant tensors,replays,guards and original terminal
+collection pass. Main19:01:36/post19:01:43/collection19:02:15 UTC November1;
+all five services succeed,no GPU or completed-stage repeat. Retain encoder4e-5
+and the faster teacher;no extension,sweep,confirmation or successor selected.
