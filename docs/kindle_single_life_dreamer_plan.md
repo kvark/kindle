@@ -6,6 +6,9 @@ on all120 retained loss windows. Earlier full takeovers avoid108/120 losses;
 this narrower intervention will test a local command effect,not an architecture
 cause. Nineteen CPU tests pass;180s/195s caps,no native/GPU work,new learner or
 result yet. Preserve the original active Qbert learner and317 input hashes.
+Original source23fe57f fails before replay on origin list ordering;all240 records
+match by unique identity. The separate CPU repair preserves that failure,passes
+22 tests and keeps caps/selection/endpoints unchanged;zero replay/GPU repeats.
 
 The [fresh greedy-training Qbert comparison](experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 launches06:15:51 UTC November1/sourcec659423 within this five-game goal.

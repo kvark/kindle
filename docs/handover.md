@@ -7,6 +7,9 @@ old branch suffixes,eight reverse-order checks and317 active Qbert pins/PID75550
 Root`/x/Temp/kindle-breakout-first-disagreement-20261101`,180s analysis/195s
 controller caps. No native/GPU work,new learner or intervention result yet.
 The original Qbert greedy-training learner continues;retain CPU co-host timing.
+Original source23fe57f stops before replay on selection-versus-execution origin
+order;all240 records match by identity. Failure retained;separate`order-repair`
+passes22 CPU tests with unchanged caps andzero completed replay/GPU repeats.
 
 The [fresh greedy-training Qbert comparison](experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 launches06:15:51 UTC November1/sourcec659423 within the existing five-game goal.

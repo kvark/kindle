@@ -28,7 +28,10 @@ Require full37,016-action replay,old recorded/teacher suffixes and eight reverse
 branch checks. Nineteen CPU tests pass;180s/195s caps,one low-priority CPU core.
 Root`/x/Temp/kindle-breakout-first-disagreement-20261101`;no native/GPU work or
 learner. Preserve active QbertPID755504/invocation5fb0d30ffb5d47aca552009e586bb929
-and317 pins;retain CPU co-host timing. No intervention outcome is available yet.
+and317 pins;retain CPU co-host timing. Original source23fe57f fails before replay
+because240 identical origin records have different list order;failure preserved.
+Separate`order-repair` matches full records by unique identity and passes22 CPU
+tests,with unchanged caps andzero repeated replay/GPU stages. No outcome yet.
 
 The [fresh greedy-training Qbert comparison](docs/experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 launches06:15:51 UTC November1/sourcec659423 with317 pins,mainPID755504/invocation

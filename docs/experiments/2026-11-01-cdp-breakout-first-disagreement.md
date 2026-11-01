@@ -59,3 +59,20 @@ reused unchanged; all original evidence stays immutable.
 
 Root `/x/Temp/kindle-breakout-first-disagreement-20261101`. No Breakout learner,
 new loss, policy replacement or successor GPU allocation follows this protocol.
+
+## Preserved ordering failure and separate CPU repair
+
+The source23fe57f controller fails before replay or branching: a list-equality
+assertion assumes the old saved origins use selection order. They actually use
+execution order. All240 complete origin records are identical when indexed by
+stream/episode/step; no missing or changed origin exists. Original command
+SHA256`517f9b794bff154b4aa12072b4848b8b6f437e7a719106ee3c3f499b97a75cb1`
+and the original309 pins remain preserved. No original origin, replay, review
+or completion output exists; no emulator replay or branch has run.
+
+Select a separate CPU repair under `order-repair`. Compare complete origin
+records by their unique identities, rejecting duplicates and any changed field.
+Preflight now exercises this check on the real saved inputs. Twenty-two CPU
+tests pass, including order permutations, duplicate identities and changed
+records. Keep the same origins, source replay, branches, endpoints,180s/195s
+caps and active Qbert protection. No GPU stage or completed replay repeats.

@@ -5,6 +5,9 @@ separately tests the first exact command disagreement in every retained early
 loss window,then uses the same teacher controller. All120 windows qualify;
 19 CPU tests pass. This can identify local command effects at matched endpoints,
 not an architectural cause or new score. No result yet;Qbert training continues.
+The original source23fe57f fails before replay on origin list order;all240 full
+records match by identity. Separate CPU repair passes22 tests,retains original
+failure/caps and repeatszero completed replay/GPU stages.
 
 The separately selected [fresh greedy-training comparison](../experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 tests whether changing live Qbert collection improves frozen play at200k/12,477
