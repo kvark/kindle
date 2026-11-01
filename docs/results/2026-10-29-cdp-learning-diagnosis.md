@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [first-disagreement intervention](2026-11-01-cdp-qbert-first-disagreement.md)
+is a local causal check under the fixed feedback-aware teacher. At25 selected
+origins,teacher-first survives the original loss endpoint in25 cases versus20
+with policy-first;both then follow the same teacher. Four primary differences
+are between movements and one is movement versus NOOP. The other20 first
+choices remain recoverable under subsequent teacher control. This narrows the
+problem to some costly individual choices plus subsequent control,without
+identifying representation,training coverage or actor optimization as its cause.
+All source/branch/suffix checks,11 tests and552 pins pass in65.045s CPU;zero
+native/GPU work or updates. No new learner or loss is selected.
+
 The [exact batched Qbert actor readout](2026-11-01-cdp-qbert-policy-readback.md)
 reproduces20,584 original greedy actions and saved pixel trajectories,withzero
 updates and357 invariant tensors. On1,024 fixed failure-window decisions,

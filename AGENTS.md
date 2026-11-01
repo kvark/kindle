@@ -20,21 +20,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [completed Qbert vector-policy readout](docs/results/2026-11-01-cdp-qbert-policy-readback.md)
-reproduces20,584 original actions/82,324 frames in17.631s,zero updates. In1,024
-failure-window decisions,teacher agreement is86.33% overall but52.34% for moves
-and97.66% for NOOP;rescued-window movement agreement is38.07%. Of122 movement
-disagreements,34 chooseNOOP and88 another action. Origins already agree31/32;
-no single-action causal or architecture claim. All525 pins,357 invariant tensors,
-128 F64 actor matches,exact smoke/full prefix,three guards and original service
-pass05:31:49 UTC November1/sourcefd1c586. A null journal-message field fails the
-separate CPU collector;original failure retained,.661s CPU repair completes
-05:34:08,zero GPU/capture repeats. Additive native readout447fe50+patch/SHAf864fe4
-passes130 Rust/585 Python CPU checks/Clippy and guarded state/RNG checks. Original
-context-only patch failure is retained;857MB cache released,wheels/source/test
-binary/runtime retained. Roots`/x/Temp/kindle-vector-policy-readback-20261101`
-and`/x/Temp/kindle-qbert-policy-readback-20261101`. No learner/GPU allocation,
-new loss or automatic successor;check live state. Five-game goal unfinished.
+The [completed first-disagreement Qbert intervention](docs/results/2026-11-01-cdp-qbert-first-disagreement.md)
+finds five of 25 first-command differences change survival through the original
+loss endpoint: teacher-first survives 25, policy-first 20, with both then using
+the same feedback-aware teacher. Four differences are movement versus movement;
+one is movement versus NOOP. At the separate 64-action endpoint, paired outcomes
+are 16 both, seven teacher-only and two neither. This identifies local action
+effects under this controller, not an architectural cause or new game score.
+All 16,613 source actions / 66,440 frames, 1,373 retained teacher suffix rows,
+eight reverse-order checks, 11 tests and 552 input hashes pass. CPU analysis
+65.045s / controller 65.779s completes 05:44:58 UTC November 1, source8a8b433.
+No native/GPU work, learning, failures or retries; no new learner/loss or automatic
+successor. Root `/x/Temp/kindle-qbert-first-disagreement-20261101`. The five-game
+goal remains unfinished; check live state before new work.
+
+The [exact actor readout](docs/results/2026-11-01-cdp-qbert-policy-readback.md)
+remains qualified: 20,584 original actions reproduced, zero updates, 357 invariant
+tensors and 525 pins. Failure-window movement agreement is52.34% versus97.66%
+for NOOP. Read-only runtimef864fe4 passes130 Rust/585 Python checks and guards;
+original CPU collector failure and.661s repair remain retained. Build cache is
+released; runtime/wheels/source/test binary remain. No original stage repeats.
 
 The [completed Breakout encoder8e-5 comparison](docs/results/2026-11-01-cdp-breakout-encoder8e5.md)
 finishes200k actions/799,597 frames/12,477 updates in21m24s. Sampled55.875 falls

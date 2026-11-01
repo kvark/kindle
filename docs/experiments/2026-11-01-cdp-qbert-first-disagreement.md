@@ -59,3 +59,14 @@ teacher, not optimal actions, average-policy accuracy, independent reliability,
 representation sufficiency or an architectural cause. No training, GPU work,
 loss change, teacher change, retry, cap increase or automatic successor is
 selected. The five-game goal remains unfinished.
+
+## Completion — November 1
+
+Source `8a8b433`, 552 pinned inputs. Analysis completes in 65.045 seconds,
+controller in 65.779 seconds at 05:44:58 UTC. At the original loss endpoint,
+20 pairs both survive and five survive only with the teacher's first command.
+At 64 actions, 16 pairs both survive, seven teacher-only and two neither.
+All complete source/recorded replays, 1,373 retained teacher suffix rows, eight
+reverse-order checks and input hashes pass. See the
+[result](../results/2026-11-01-cdp-qbert-first-disagreement.md) for interpretation
+and limits. No native/GPU work, learning, failure, retry or successor occurs.

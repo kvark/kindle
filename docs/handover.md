@@ -1,5 +1,19 @@
 # CDP handover — October25,2026
 
+The [completed first-disagreement Qbert intervention](results/2026-11-01-cdp-qbert-first-disagreement.md)
+finds five of 25 first-command differences change survival through the original
+loss endpoint: teacher-first survives 25, policy-first 20, with both then using
+the same feedback-aware teacher. Four differences are movement versus movement;
+one is movement versus NOOP. At the separate 64-action endpoint, paired outcomes
+are 16 both, seven teacher-only and two neither. This identifies local action
+effects under this controller, not an architectural cause or new game score.
+All 16,613 source actions / 66,440 frames, 1,373 retained teacher suffix rows,
+eight reverse-order checks, 11 tests and 552 input hashes pass. CPU analysis
+65.045s / controller 65.779s completes 05:44:58 UTC November 1, source8a8b433.
+No native/GPU work, learning, failures or retries; no new learner/loss or automatic
+successor. Root `/x/Temp/kindle-qbert-first-disagreement-20261101`. The five-game
+goal remains unfinished; check live state before new work.
+
 The [completed Qbert vector-policy readout](results/2026-11-01-cdp-qbert-policy-readback.md)
 reproduces20,584 original actions/82,324 frames in17.631s,zero updates. In1,024
 failure-window decisions,teacher agreement is86.33% overall but52.34% for moves
