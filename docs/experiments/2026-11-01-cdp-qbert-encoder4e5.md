@@ -54,3 +54,15 @@ defects without repeating completed GPU work.
 Root `/x/Temp/kindle-qbert-encoder4e5-20261101/native-check`, trial
 `qbert-12m-48-b16-r16-encoder4e5-expert100-check`, service
 `kindle-qbert-encoder4e5-check-20261101`. No full learner is selected.
+
+## Completed bounded check
+
+The check succeeds03:55:47 UTC November1/sourcee2887ef; terminal collection
+succeeds03:56:06. Training8192 actions/32,754 frames/489 updates takes64.165s;
+frozen1024/4096 frames/.800s haszero updates and no natural completed episodes.
+All257 pins,357 matching initial/invariant frozen tensors,47 pre-update events,
+finite reports,full replay and guards pass. Conservative200k projection28m43s
+passes35 minutes. No failure or GPU repeat occurs. This establishes execution
+and early cost only; see the [result](../results/2026-11-01-cdp-qbert-encoder4e5.md).
+A separately selected [fresh200k comparison](2026-11-01-cdp-qbert-encoder4e5-200k.md)
+measures gameplay; no bounded-check experience is reused.

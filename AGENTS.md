@@ -18,15 +18,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [selected Qbert encoder4e-5 check](docs/experiments/2026-11-01-cdp-qbert-encoder4e5.md) changes only the encoder rate from
-the cheaper2e-5 recipe. Fresh8192 actions/489 updates,then1024 frozen actions,
-require357 initial/invariant tensors,exact traces/replay,finite reports and guards.
-CPU preflight.483s passes two CLI paths,13 config cases and235 control pins,
-with zero native/environment construction. Native447fe50,exact runner and
-teacher stay fixed;12M48/Auto/N8/B16/T16/H15/R16/expert100. Caps180/60/180/480s;
-conservative200k cost gate35min. Root`/x/Temp/kindle-qbert-encoder4e5-20261101/native-check`,
-service`kindle-qbert-encoder4e5-check-20261101`. No full learner or automatic
-successor selected;check live state before GPU work. Five-game goal unfinished.
+The [selected fresh Qbert encoder4e-5 comparison](docs/experiments/2026-11-01-cdp-qbert-encoder4e5-200k.md) targets200k actions/12,477
+updates under35min with100k/6227 recovery and fixed final/actual-initial
+greedy/sample24-episode arms against13,785.417/9,987.500. Only encoder2e-5→4e-5
+changes in12M48/Auto/N8/B16/T16/H15/R16/expert100;native447fe50,exact runner and
+teacher stay fixed. CPU preflight1.372s passes five CLI paths,24 config/49 path/
+15 script/eight header/four observer/seven recovery checks and257 bounded/235
+control pins,zero native/environment construction. Root
+`/x/Temp/kindle-qbert-encoder4e5-20261101/full`,service
+`kindle-qbert-encoder4e5-200k-20261101`. Fresh reused4013/cohort,no experience
+reuse or automatic successor;check live state before GPU work. Goal unfinished.
+
+The [completed Qbert encoder4e-5 check](docs/results/2026-11-01-cdp-qbert-encoder4e5.md) finishes8192 actions/32,754 frames/489
+updates in64.165s;1024 frozen/.800s haszero updates/no natural episodes.
+All257 pins,357 matching initial/invariant frozen tensors,47 pre-update events,
+finite reports,full replay and both guards pass. Conservative200k projection
+28m43s passes35min. Main succeeds03:55:47 UTC November1/sourcee2887ef,
+collection03:56:06;zero failures/GPU repeats. Native447fe50,runner and teacher
+fixed;this establishes execution/cost,not gameplay benefit. Root
+`/x/Temp/kindle-qbert-encoder4e5-20261101/native-check`. No allocation remains
+active at bounded closure;the full learner is selected separately above.
 
 The [completed encoder4e-5 representation diagnostic](docs/results/2026-11-01-cdp-encoder4e5-representation.md) finds more precise
 ball and motion readouts on the exact20,960-action/83,799-frame control corpus.
