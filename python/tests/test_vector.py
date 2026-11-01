@@ -114,6 +114,13 @@ import profile_atari_vector
     (["--encoder-learning-rate", "4e-5"], "encoder-learning-rate requires fresh CDP"),
     (["--restore", "unused", "--encoder-learning-rate", "4e-5"], "training overrides"),
     (["--restore", "unused", "--encoder-learning-rate=4e-5"], "training overrides"),
+    *[(["--dynamics-learning-rate", value], "dynamics-learning-rate must be finite and positive in F32")
+      for value in ("0", "-1", "nan", "inf", "1e300", "1e-300")],
+    (["--dynamics-learning-rate", "1e38"], "dynamics-learning-rate ratio must be finite and positive in F32"),
+    (["--learning-rate", "1e38", "--dynamics-learning-rate", "1e-38"], "dynamics-learning-rate ratio must be finite and positive in F32"),
+    (["--dynamics-learning-rate", "1e-4"], "dynamics-learning-rate requires fresh CDP"),
+    (["--restore", "unused", "--dynamics-learning-rate", "1e-4"], "training overrides"),
+    (["--restore", "unused", "--dynamics-learning-rate=1e-4"], "training overrides"),
     (["--restore", "unused", "--disagreement-scale", "1"], "training overrides"),
     (["--disagreement-scale", "-1"], "finite and non-negative"),
     (["--disagreement-scale", "nan"], "finite and non-negative"),
@@ -359,7 +366,8 @@ def test_runner_learning_rate_recipe_before_gpu(monkeypatch, tmp_path, rate, enc
 
 
 @pytest.mark.parametrize("rate,dynamics", [(4e-5, 4e-4), (8e-5, 8e-4)])
-def test_encoder_rate_override_preserves_other_cdp_rates(monkeypatch, tmp_path, rate, dynamics):
+@pytest.mark.parametrize("dynamics_override", [None, 1e-4])
+def test_encoder_rate_override_preserves_other_cdp_rates(monkeypatch, tmp_path, rate, dynamics, dynamics_override):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
@@ -367,7 +375,7 @@ def test_encoder_rate_override_preserves_other_cdp_rates(monkeypatch, tmp_path, 
 
     def construct(streams, config):
         assert config["encoder_learning_rate"] == 4e-5
-        assert config["dynamics_learning_rate"] == dynamics
+        assert config["dynamics_learning_rate"] == (dynamics if dynamics_override is None else dynamics_override)
         assert config["learning_rate"] == rate
         assert config["behavior_learning_rate"] == 2e-5
         assert config["learning_rate_warmup"] == 1000
@@ -376,7 +384,8 @@ def test_encoder_rate_override_preserves_other_cdp_rates(monkeypatch, tmp_path, 
     monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "encoder.jsonl"),
         "--cdp", "--cdp-centered", "--encoder-learning-rate", "4e-5",
-        "--learning-rate", str(rate), "--behavior-learning-rate", "2e-5"])
+        "--learning-rate", str(rate), "--behavior-learning-rate", "2e-5",
+        *(["--dynamics-learning-rate", str(dynamics_override)] if dynamics_override is not None else [])])
     with pytest.raises(RuntimeError, match="encoder override checked before GPU"):
         atari_vector.main()
 

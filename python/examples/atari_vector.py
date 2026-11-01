@@ -108,6 +108,8 @@ def main():
                         help="fresh actor/critic rate; omitted: native default follows the base rate")
     parser.add_argument("--encoder-learning-rate", type=float,
                         help="fresh CDP encoder rate; omitted: 6e-6 scaled with the base rate")
+    parser.add_argument("--dynamics-learning-rate", type=float,
+                        help="fresh CDP dynamics/posterior/prediction/exploration rate; omitted: 4e-4 scaled with the base rate")
     parser.add_argument("--actor-unimix", type=float, default=0.0,
                         help="native policy uniform mixture in [0,1); fresh default0, restore keeps checkpoint policy")
     parser.add_argument("--report-every", type=int, default=1000)
@@ -182,6 +184,11 @@ def main():
             parser.error("encoder-learning-rate must be finite and positive in F32")
         if not positive_f32(args.encoder_learning_rate / args.learning_rate):
             parser.error("encoder-learning-rate ratio must be finite and positive in F32")
+    if args.dynamics_learning_rate is not None:
+        if not positive_f32(args.dynamics_learning_rate):
+            parser.error("dynamics-learning-rate must be finite and positive in F32")
+        if not positive_f32(args.dynamics_learning_rate / args.learning_rate):
+            parser.error("dynamics-learning-rate ratio must be finite and positive in F32")
     if args.imagination_length is not None and args.imagination_length <= 0:
         parser.error("imagination-length must be positive")
     if args.open_loop_scale is not None and (args.open_loop_length is None or not positive_f32(args.open_loop_scale)
@@ -311,6 +318,7 @@ def main():
     training_options.add("--breakout-centroid-scale")
     training_options.add("--behavior-learning-rate")
     training_options.add("--encoder-learning-rate")
+    training_options.add("--dynamics-learning-rate")
     training_options.add("--cdp")
     training_options.add("--cdp-centered")
     training_options.add("--disagreement-scale")
@@ -354,12 +362,16 @@ def main():
         parser.error("CDP requires the learned CNN")
     if args.encoder_learning_rate is not None and not args.cdp:
         parser.error("encoder-learning-rate requires fresh CDP")
+    if args.dynamics_learning_rate is not None and not args.cdp:
+        parser.error("dynamics-learning-rate requires fresh CDP")
     if args.cdp:
         rate_scale = args.learning_rate / 4e-5
         cdp_rates = dict(encoder_learning_rate=6e-6 * rate_scale,
                          dynamics_learning_rate=4e-4 * rate_scale)
         if args.encoder_learning_rate is not None:
             cdp_rates["encoder_learning_rate"] = args.encoder_learning_rate
+        if args.dynamics_learning_rate is not None:
+            cdp_rates["dynamics_learning_rate"] = args.dynamics_learning_rate
         if not all(positive_f32(rate) for rate in cdp_rates.values()):
             parser.error("CDP learning rates must be finite and positive in F32")
     if args.cdp_centered and (not args.cdp or args.world_microbatch_size not in (None, args.batch_size)):
