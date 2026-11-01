@@ -27,7 +27,8 @@ H5/R24/encoder4e-5/base behavior4e-5/greedy collection/expert100, using the
 qualified faster teacher. Startup passes357 control/bounded-matching initial
 tensors,47 paired pre-update transitions,correct cadence and485 finite reports
 through5,544 actions. PID826399/invocation6947a8ed4d734296a1cff8e1af8113b6;
-original progress,recovery,postprocessing and collection services are active.
+original progress,postprocessing and collection services remain active; the
+recovery observer has succeeded.
 Require100k/9,340 and200k/18,715 four-file recoveries,then fixed-final/actual-
 initial greedy-primary and sampled24-episode arms against14,339.583/13,761.458.
 No full frozen result exists. Root `/x/Temp/kindle-qbert-300k-20261101/full`;
