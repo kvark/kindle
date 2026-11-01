@@ -77,3 +77,20 @@ four metadata/six retention/two actual-collector cases,44 paths/17 scripts,
 250 bounded/227 control inputs and357 bounded tensors. No native agent or
 emulator construction occurs. This preflight is complete;do not repeat it unless
 changed sources or a concrete failure require a separately retained repair.
+
+## Original launch and startup
+
+The full selector passes272 pins; declaration SHA256
+`89bb20be8462cf9fe73f048b1b2f1f562b6a8c566fedc31e44da6124129ac9ee`.
+Original service launches21:15:57.571 UTC November1/sourceb9ce97f,
+PID847728/invocation72a7b4600a4641bb8c93174668127f3f. Allfour original observers
+launch:progress847734,recovery847864,postprocess847731,collection847867.
+Startup audit passes21:16:24.945 (.949s command time):357 initial tensors match
+both bounded check andcontrol,47 pre-update transitions match,first updates
+376/392/408/424/440/456 and232 finite reports through4072 actions verify.
+All272 input hashes anddeclared config/native/runner/teacher values match.
+
+This startup CPU check co-hosts with training; retain its measured cost without
+correcting wall time. The100k recovery andfixed final assessments remain pending.
+No full gameplay result is available. Preserve the original service andobservers;
+never restart because an observation call times out oroverlap another GPU job.

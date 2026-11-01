@@ -1,5 +1,9 @@
 # Lower dynamics-group rate passes execution and early-cost checks
 
+**The separately selected fresh200k comparison is now running**, launched
+21:15:57 UTC November1/sourceb9ce97f. Startup passes; no full gameplay result yet.
+The bounded check below remains complete and is not reused as training experience.
+
 The fresh bounded Breakout check completes8,192 actions/32,733 frames/489
 updates in **47.412638s**. A1,024-action/4,096-frame frozen greedy restore takes
 .856243s withzero updates andno natural completed episodes. Both original
@@ -87,3 +91,21 @@ four observer/eight recovery guards,four metadata/six retention/two actual-
 collector cases,44 paths/17 scripts andall250 bounded/227 control inputs.
 All357 bounded tensor shapes pass. The full runner equals the bounded runner;
 no native agent or emulator is constructed. No full learner has launched yet.
+
+## Fresh full learner launches andpasses startup
+
+The separate full service launches21:15:57.571 UTC November1/sourceb9ce97f with
+272 pins,originalPID847728/invocation72a7b4600a4641bb8c93174668127f3f. Progress,
+recovery,postprocessing andterminal-collection observers all start successfully.
+Startup21:16:24.945 passes357 bounded/control initial tensors,47 pre-update
+semantic transitions and232 finite reports through4072 actions. Firstsix updates
+occur at376/392/408/424/440/456. Configuration,native/runner/teacher hashes and
+original live identity match the declaration. Startup command takes.949s CPU;
+retain that co-host timing without correcting training wall time.
+
+Fixed200k/12,477 updates/30min,100k/6,227 four-file recovery andfour final/
+actual-initial24-episode frozen arms remain unchanged. Fullroot
+`/x/Temp/kindle-breakout-dynamics1e4-20261101/full`,trial
+`breakout-12m-64-b16-r16-dynamics1e4-expert100-200k-seed1009`,service
+`kindle-breakout-dynamics1e4-200k-20261101`. No full frozen result is available;
+do not restart oroverlap. The five-game goal remains unfinished.

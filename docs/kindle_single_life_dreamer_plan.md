@@ -1,5 +1,25 @@
 # Kindle: CDP learning roadmap
 
+The [fresh200k Breakout dynamics-group comparison](experiments/2026-11-01-cdp-breakout-dynamics1e4-200k.md) launches21:15:57 UTC
+November1/sourceb9ce97f with272 pins. MainPID847728/invocation
+72a7b4600a4641bb8c93174668127f3f;service`kindle-breakout-dynamics1e4-200k-20261101`.
+Startup21:16:24 passes357 bounded/control initial tensors,47 pre-update events,
+correct cadence and232 finite reports through4072 actions. Allfour original
+progress/recovery/postprocess/collection observers areactive. Fix200k/12,477
+updates/30min,retained100k/6,227 four-file recovery andfour final/own-initial
+24-episode frozen arms against56.292/104.667. No full frozen result yet.
+
+Only dynamics-group4e-4→1e-4 changes;encoder/base/actor4e-5,12M64/Auto/B16/T16/
+H15/R16/expert100,qualified runnerfe5cf347/native35ad0db andteacher stayfixed.
+The rate covers recurrent,posterior,prediction andexploration together. CPU
+qualification passes1.425s:five CLI commands,28 config cases,12 startup/four
+observer/eight recovery guards,six retention/two collector fixtures,44 paths/
+17 scripts,250 bounded/227 control inputs and357 bounded tensors. No native
+build,bounded experience reuse,extension,cap change orautomatic successor.
+Startup.949s CPU co-host timing remains. Root
+`/x/Temp/kindle-breakout-dynamics1e4-20261101/full`;do not restart oroverlap.
+The five-game goal remains unfinished;check original live state beforework.
+
 The [bounded Breakout dynamics-group1e-4 check](results/2026-11-01-cdp-breakout-dynamics1e4.md) passes8192 actions/
 32,733frames/489 updates in47.413s;frozen1024/.856s haszero updates/no natural
 episodes. Conservative200k projection21m13.289s passes30min;gameplay benefit
@@ -15,18 +35,9 @@ fails because children log;separate invocation review passes without changing
 original completion orrepeating anyGPU/replay/collector stage. All471 runner tests
 and6.533s CPU qualification pass. Root
 `/x/Temp/kindle-breakout-dynamics1e4-20261101/native-check` iscomplete;do not rerun.
-No full learner selected orGPU allocation active;check live state beforework.
+No full learner was selected by the bounded check;the separate full life above
+is now active.
 The five-game goal remains unfinished.
-
-The [separate fresh200k dynamics-group comparison](experiments/2026-11-01-cdp-breakout-dynamics1e4-200k.md) is CPU-qualified for
-selection. Five CLI commands,28 config cases,12 startup/four observer/eight
-recovery guards,six retention/two actual-collector fixtures and44 paths/17 scripts
-pass in1.425s at21:14:22 UTC November1. All250 bounded/227 control inputs and357
-bounded tensors pass. Fix200k/12,477 updates/30min,retained100k/6,227 four-file
-recovery andfour final/actual-initial24-episode frozen arms against56.292/104.667.
-Keep the qualified runnerfe5cf347/native35ad0db andteacher;no bounded experience
-reuse,extension,cap change orautomatic successor. Fullroot
-`/x/Temp/kindle-breakout-dynamics1e4-20261101/full`;not launched yet.
 
 The [fresh Qbert RGB64 seed12011 confirmation](results/2026-11-01-cdp-qbert-rgb64-seed12011.md) completes but misses the
 unchanged15k gate: greedy12,678.125 andsampled12,093.750,each24/24 first pyramids.
