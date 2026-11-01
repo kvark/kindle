@@ -11,7 +11,11 @@ control inputs and357 shapes;plot imports.038s pass. No native/emulator construc
 Capacity12M→25M and ratio24→16 change together;native447fe50/runneraba4300d and
 qualified faster teacher stay. Own initials may differ across capacities.
 Root`/x/Temp/kindle-qbert-25m-r16-20261101/full`;check live state before launch.
-No full allocation exists at this selection;no extension or automatic successor.
+No full allocation exists yet. The first CPU selection fails on a report
+basename;the following launch stops before systemd because no declaration exists.
+Both failures remain retained. A one-basename repair passes16:50:50 UTC in1.386s,
+checks520 selection paths and preserves the queue;passed CPU/GPU stages are not
+repeated. No extension or automatic successor.
 
 The [bounded Qbert25M/R16 check](results/2026-11-01-cdp-qbert-25m-r16.md)
 completes8,192 actions/32,762frames/489updates in56.153s;1,024 frozen/1.159s
