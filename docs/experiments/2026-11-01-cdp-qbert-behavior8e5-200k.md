@@ -86,3 +86,15 @@ and collection remain active. No frozen result or new allocation follows.
 
 Recovery reviewSHA256`5eef8dfa59b5b3fd6a2d78cb31cd98d9f21617e2f0fd2cd976749a04face17fd`;
 retentionSHA256`11e11b50c823cbf04143fca9f5cadd997250e58067ae69bafc758aa908fe1995`.
+
+## Completed comparison
+
+All original services and audits succeed;main15:45:24,post15:45:34 and collection
+15:46:07 UTC November1. Training200k/799,828frames/18,715updates takes20m52.376s,
+26.92% less time. Greedy14,358.333/23 andsampled14,173.958/24 remain below15k;
+control14,339.583/24 and13,761.458/24. All524 pins,357 matching/invariant tensors,
+retained100k recovery,paired initial traces,replays/videos,guards,curves and
+original collector pass. No failed/repeated GPU stage or changed cap. Retain the
+faster qualified teacher;behavior-rate quality improvement remains unestablished.
+See the [completed result](../results/2026-11-01-cdp-qbert-behavior8e5.md).
+No Qbert extension,rate sweep or confirmation is selected. Do not rerun.

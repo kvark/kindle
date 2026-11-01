@@ -1,4 +1,66 @@
-# Qbert actor/critic rate: execution and cost pass
+# Qbert behavior rate: similar frozen quality with lower observed cost
+
+The fresh200k comparison completes in **20m52s**, versus **28m34s** for the
+retained H5/R24 control: **26.92% less training time**. Greedy score is essentially
+unchanged and sampled score rises3.00%;both still miss the original15,000 gate.
+Retain the qualified faster Python teacher. Doubling actor/critic rate does not
+establish a clear quality improvement or replace the better-supported base rate.
+
+| Frozen assessment,24 selected natural episodes | Control | Behavior8e-5 |
+|---|---:|---:|
+| Greedy mean |14,339.583|14,358.333|
+| Greedy first pyramids |24/24|23/24|
+| Sampled mean |13,761.458|14,173.958|
+| Sampled first pyramids |24/24|24/24|
+| Actual-initial greedy mean |1.042|1.042|
+| Actual-initial sampled mean |171.875|171.875|
+| Training seconds |1,713.661|1,252.376|
+
+Both initial policies clearzero first pyramids. Training is200,000 actions/
+799,828 executed frames/18,715 updates. Four frozen arms total128,480 actions/
+513,768 frames/109.844s,zero updates or truncations. Selection remains firstthree
+natural episodes per lane;the extra completed greedy episode is excluded.
+Initial-subtracted return/minute improves37.01% greedy and40.99% sampled on this
+reused development seed/cohort. These ratios do not establish seed reliability.
+
+The only learner-config change is behavior rate4e-5→8e-5,affecting actor and
+critic together. The separately qualified equivalent Python teacher also changes
+bytes and CPU cost. Native447fe50/runneraba4300d remain unchanged. Observed acting/
+feedback time falls566.324→184.264s,accounting for82.83% of total time reduction;
+learning time falls1,051.583→971.995s and environment time stays60.437→60.647s.
+The acting timer includes teacher and native work. This comparison does not
+isolate teacher speed,rate effects,actor versus critic,or native/backend speed.
+The exact label/pixel replay qualification supports retaining the faster teacher.
+
+All524 pins,357 matching initial/invariant frozen tensors,47 pre-update events,
+1,238 sampled/916 greedy actual-initial semantic events,retained100k/9,340 recovery,
+18,715 finite supervised reports,full training pixel/action/label replay,frozen
+outcome replays/videos,host guards,curves,coverage,exposure and comparison pass.
+The comparison plot is visually readable. Actual overrides47,421/200k=23.7105%;
+guided online returns and replay imitation fit are not frozen competence.
+
+Main launches15:17:59 UTC November1/source6089e8b,originalPID809245/invocation
+`361f29163c1e4b2896fd352f2b905ca8`. Training ends15:38:56,all GPU stages15:41:02,
+main15:45:24,postprocessing15:45:34 and original collection15:46:07. All five
+original services succeed;no failed or repeated GPU/stage. Full guided CPU replay
+takes200.637s. The host is idle at closure. Original CPU co-host timings below
+remain without wall-time correction. No extension,rate sweep,confirmation learner
+or automatic successor is selected;the five-game goal remains unfinished.
+
+Root`/x/Temp/kindle-qbert-behavior8e5-20261101/full`,trial
+`qbert-12m-48-b16-h5-r24-encoder4e5-behavior8e5-greedy-expert100-200k-seed10007`.
+The derived`final-summary.json`reads completed audits without repeating collection.
+
+| Completed full receipt | SHA256 |
+|---|---|
+| Declaration |`03a3ac6234dd23eee005c32c78bbb50af0903a00d1ee84924357931d10fc0650`|
+| Learning |`3b8915550c3a85a6cc675f45495ebe0aebd2b7c75c6606c922fdeeabc84c549e`|
+| Postprocessing |`c9234999b6eda79b96c5d733b6e6dfc2bac65d86d95f85350c3c94f1c5ab8ce0`|
+| Comparison |`c430ffd8bfc2020f83c815b2ed7cd1159259fbba34c1108ae13eaaff0314b084`|
+| Full training replay |`46d589f1f91e507c9f8b5e9fb1811c15c280959ea79f76cf942b9e06fd5b2032`|
+| Original completion |`aa66f0dd69f66e9ab1ac334d35394721b10cee91c2f1dcd9fa95d8b1cc3c58c9`|
+
+## Bounded execution and cost check
 
 The bounded behavior4e-5→8e-5 check completes8,192 actions/32,761 frames/
 733 updates in **47.940s**. Frozen1,024 actions/4,096 frames take.803s withzero

@@ -1,6 +1,7 @@
-# Prepared Breakout B8/T32 execution and cost check
+# Breakout B8/T32 bounded execution and cost check
 
-Prepare a possible bounded check while the Qbert behavior-rate learner runs.
+Initial preparation, before the separate selection recorded below:
+prepare a possible bounded check while the Qbert behavior-rate learner runs.
 This preparation selects no GPU allocation. Require completed Qbert assessments,
 original audits/collection and an idle host before separately selecting a check.
 No trial directory,queue or declaration is created by CPU preflight.
@@ -65,3 +66,17 @@ completed Qbert closure and idle state. The exact checkpoint schema,runner and
 controller sources are retained under the root above.
 
 PreflightSHA256`765be1794efc5643c32bddbcf44c18c7a3371ffa3d4e293657e37e8324b9aaaa`.
+
+## Selected after Qbert closure
+
+The Qbert behavior8e-5 comparison and all five original services complete
+successfully;original collector15:46:07 UTC November1,completionSHA256
+`aa66f0dd69f66e9ab1ac334d35394721b10cee91c2f1dcd9fa95d8b1cc3c58c9`.
+The host haszero running Kindle services at15:49:35. Its near-unchanged greedy
+quality does not select a Qbert rate sweep. Separately select the prepared short
+Breakout check above to measure the cost of longer training gradients in the
+stronger encoder4e-5 regime. Recent saved-state diagnostics leave the source of
+sustained-control error unresolved;they are not evidence that context is causal.
+Reuse the completed CPU qualification unchanged. Require idle host,exact source
+pins,clean committed selection and original service identity at launch. This
+selects only8192/481 plus1024 frozen,no full learner or automatic promotion.

@@ -1,35 +1,31 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Qbert behavior-rate comparison](experiments/2026-11-01-cdp-qbert-behavior8e5-200k.md) launches15:17:59 UTC November1/source6089e8b after the
-[bounded check](results/2026-11-01-cdp-qbert-behavior8e5.md) passes8192/32,761frames/733updates in47.940s;
-frozen1024/.803s haszero updates/no natural episodes. All496 pins,357 matching/
-invariant tensors,47 events,full replay/guards and original collector pass.
-Main15:14:46/collection15:15:08 UTC November1/sourceb735644. Full CPU3.395s passes
-five CLI paths,28 config/five teacher-identity/eight mode/16 header/four observer/
-11 recovery/six retention/two integration cases;zero constructions/failures.
-Fix fresh200k/18,715,35min cap,retained100k/9,340 recovery and four frozen24-episode
-arms against greedy14,339.583/sample13,761.458. Behavior4e-5→8e-5 at H5/R24;
-world/base/encoder4e-5,dynamics4e-4 unchanged. Native447fe50/runneraba4300d stay;
-qualified equivalent teacherSHAfa261c53 changes Python bytes/CPU cost. Root
-`/x/Temp/kindle-qbert-behavior8e5-20261101/full`;service
-`kindle-qbert-behavior8e5-200k-20261101`. Check live state;do not restart or overlap
-GPU work. No rate sweep,extension or automatic successor;goal remains unfinished.
-MainPID809245/invocation361f29163c1e4b2896fd352f2b905ca8 continues. Startup15:18:25
-passes524 pins,357 matching tensors,47 events and314 finite reports through3,728
-acts. Recovery15:28:35 passes100k/9,340,357 finite tensors andretains all four files
-(179,536,497 bytes,.265s);9,514 finite reports through101,864 actions. Recovery
-observer succeeds;progress/post/collection stay active. CPU co-host caveats remain;
-no frozen result yet.
+The [completed Qbert behavior-rate comparison](results/2026-11-01-cdp-qbert-behavior8e5.md) finishes200k actions/
+799,828frames/18,715updates in20m52.376s,26.92% less training time than control.
+Greedy14,358.333/23 first pyramids versus14,339.583/24 is nearly unchanged;
+sampled14,173.958/24 versus13,761.458/24 rises3.00%. Both means still miss15k.
+Retain the qualified faster teacher;doubled actor/critic rate does not establish
+clear quality improvement or a new default. Acting/feedback falls566.324→184.264s,
+accounting for82.83% of total time reduction;this includes Python teacher work,
+not an isolated native speed measurement. All524 inputs,357 matching/invariant
+tensors,paired initial traces,retained100k/9,340 four-file recovery,full replays/
+videos,guards,curves,coverage/exposure and original collector pass. All five
+services succeed:main15:45:24/post15:45:34/collection15:46:07 UTC November1,
+source6089e8b. No failed or repeated GPU stage;CPU co-host caveats remain.
+Root`/x/Temp/kindle-qbert-behavior8e5-20261101/full`;complete,do not rerun.
+No Qbert extension,rate sweep or confirmation selected;the goal is unfinished.
 
-The [prepared Breakout B8/T32 check](experiments/2026-11-01-cdp-breakout-context32.md) passes CPU qualification. It remains
-unselected: no trial,queue,declaration or GPU allocation. Both CLI paths,15 config
-cases,357 schema tensors,227 control inputs andfour prefix fixtures pass in.663s;
-protected wrapper3.201s completes15:33:44 UTC November1. All524 active Qbert inputs
-and original identity stay unchanged;retain co-host time. Prospective8192/481,
-first504,30min projected200k gate;native447fe50/runner6c1b69fb/teacher stay fixed.
-Longer gradients also change sequence diversity,target rows and warmup;old context
-negatives remain. Root`/x/Temp/kindle-breakout-context32-20261101/native-check`.
-Do not rerun qualification or launch before separately reviewed Qbert closure.
+The [Breakout B8/T32 bounded check](experiments/2026-11-01-cdp-breakout-context32.md) is separately selected after
+completed Qbert closure and an idle-host check. Fix8,192 actions/481 updates,
+first504,then1,024 frozen actions;30min projected200k gate. Native447fe50/
+runner6c1b69fb/teacher and other encoder4e-5 settings stay fixed. Longer temporal
+gradients also change sequence diversity,target rows240→248 and warmup;cached
+recurrent history already exists. Old context negatives remain. CPU qualification
+passes both CLI paths,15 config cases,357 schema tensors,227 control inputs and
+four prefix fixtures in.663s;protected wrapper3.201s completes15:33:44 UTC.
+Do not repeat qualification. Root`/x/Temp/kindle-breakout-context32-20261101/native-check`,
+service`kindle-breakout-context32-check-20261101`;check live state before work.
+This selects only execution/cost measurement,no full learner or automatic successor.
 
 The [saved Breakout takeover-state join](results/2026-11-01-cdp-breakout-takeover-states.md) finds onlytwo of21 earlier-only
 rescues have projected contact withinfive actions at delay16;14 already match
@@ -39,7 +35,7 @@ and524 active Qbert inputs pass;originalPID809245/invocation stays. Analysis2.76
 completes15:23:52 UTC November1/source0e77ede,recount15:24:44. Zero emulator/native/
 GPU work,updates,failures or repeats;retain CPU co-host timing. No new loss,teacher
 or learner selected. Root`/x/Temp/kindle-breakout-takeover-states-20261101`;complete,
-do not rerun. The existing Qbert behavior-rate comparison continues.
+do not rerun. The Qbert behavior-rate comparison above subsequently completes.
 
 The [qualified Python Qbert teacher overlay](results/2026-11-01-cdp-qbert-teacher-cost.md)
 preserves472 snapshot decisions/states and the complete200k-action/799,841-frame
@@ -49,7 +45,7 @@ only equivalent channel predicates and distribution RECORD change. Prefer
 `/x/Temp/kindle-qbert-color-masks-20261101/runtime`,same native447fe50/SHA35ad0db,
 teacherSHAfa261c53,for future explicitly pinned Qbert trials. Replay15:01:16/
 packaging15:03:33 UTC November1;old runtimes and CPU harness failure remain.
-Whole-training savings remain unmeasured;no new learner or GPU work is selected.
+Whole-training timing is now reported in the completed behavior-rate comparison above.
 Do not repeat completed qualification,replay or packaging. The goal is unfinished.
 
 The [fresh fixed Breakout centering cohort](results/2026-11-01-cdp-breakout-unseen-center-fresh.md)

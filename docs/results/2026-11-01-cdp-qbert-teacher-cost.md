@@ -108,3 +108,12 @@ qualification,candidate replay or packaging.
 - Candidate replay reviewSHA256`44ca35d0bcc59b137170bd9573339aac3c94027f8306e2029739205369975456`.
 - Full candidate replay`d2803231537538577fe1427285cbfda7d01a047d55724ca6f48895418b1cd8cf`.
 - Packaging receipt`37e38d689e085a255e6b3972059e395fdd681e49f9c97fba3a3a2bbe0287d25e`.
+
+## Subsequent whole-training measurement
+
+The [completed behavior-rate comparison](2026-11-01-cdp-qbert-behavior8e5.md)
+uses this qualified teacher and takes20m52s versus28m34s for the retained control.
+Acting/feedback falls566.324→184.264s and accounts for82.83% of total time reduction.
+Actor/critic rate also changes,so this is not an isolated teacher-speed estimate.
+Frozen greedy quality is essentially unchanged;sampled mean rises3.00%. Retain
+the faster equivalent implementation without claiming a rate or native speed win.
