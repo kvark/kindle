@@ -62,3 +62,18 @@ invocation identity and cost projection. A full learner remains unselected.
 Root `/x/Temp/kindle-breakout-h5-r24-20261101/native-check`,trial
 `breakout-12m-64-b16-h5-r24-encoder4e5-expert100-check`,service
 `kindle-breakout-h5-r24-check-20261101`.
+
+## Completed bounded check
+
+The original service launches09:35:39 and succeeds09:36:47 UTC November1,
+source1b4671b,PID777123/invocation0d189ef7da054ce0866a40c9b9a0cc4b.
+Training8192 actions/32,723 frames/733 updates takes50.971s;frozen1024/4096frames/
+.884s haszero updates/no natural episodes. All267 pins,357 matching/invariant
+finite tensors,47 initial semantic events,full replay and guards pass. Actual
+overrides3800=46.387%. Terminal collection succeeds09:37:06,zero failures/repeats.
+
+Conservative200k projection1368.859s (22m49s) passes30min. The check is complete;
+do not rerun stages or collection. A separately selected
+[fresh200k protocol](2026-11-01-cdp-breakout-h5-r24-200k.md) uses no check experience.
+See the [result](../results/2026-11-01-cdp-breakout-h5-r24.md). No full competence
+is measured at bounded closure;check live state before work.

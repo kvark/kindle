@@ -1,5 +1,22 @@
 # Kindle: CDP learning roadmap
 
+The [bounded Breakout H5/R24 check](results/2026-11-01-cdp-breakout-h5-r24.md)
+passes8192 actions/32,723 frames/733 updates in50.971s;1024 frozen/4096frames/
+.884s haszero updates/no natural episodes. All267 pins,357 matching/invariant
+finite tensors,47 pre-update events,full guided replay and guards pass. Main/
+collector succeed09:36:47/09:37:06 UTC November1/source1b4671b,originalPID777123/
+invocation0d189ef7da054ce0866a40c9b9a0cc4b. Zero failures/repeats;do not rerun.
+Conservative200k projection22m49s passes30min. The separately selected
+[fresh200k comparison](experiments/2026-11-01-cdp-breakout-h5-r24-200k.md)
+will compare sampled56.292/greedy104.667 with100k/9340 recovery and four frozen
+arms. Same12M64/Auto/N8/B16/T16/encoder4e-5/sampled collection/expert100/native447fe50/
+runner6c1b69f;H15/R16→H5/R24 changes horizon,cadence,sampling,warmup and work
+jointly. Earlier H5/R32 was negative;no transfer or isolated effect is assumed.
+Full CPU preflight1.433s passes fiveCLI/24config/10header/fourparser/sevenrecovery
+cases,44paths/15scripts and267bounded/227control pins. No full result exists.
+Root`/x/Temp/kindle-breakout-h5-r24-20261101`;check live state before GPU work.
+No extension,cap increase,confirmation or automatic successor;goal unfinished.
+
 The [completed frozen Breakout temperature0.5 assessment](results/2026-11-01-cdp-breakout-temperature.md)
 scores83.292 versus retained greedy104.667 (−20.42%) and default sampled56.292
 (+47.96%);all0/24 two-wall successes. Own temperature initial1.333;default1.417
