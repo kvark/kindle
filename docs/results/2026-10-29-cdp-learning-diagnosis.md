@@ -46,6 +46,16 @@ original audits and services pass;an ancillary terminal identity assertion is
 separately corrected without repeating any original stage. Retain this cheaper
 development point,not a universal rate or independent reliability claim.
 
+The [CPU Qbert life replay](2026-11-01-cdp-qbert-life-replay.md) locates all96
+losses per retained2e-5/4e-5 greedy policy after the first pyramid,withzero gains
+in each fixed24-episode cohort. The newer policy lasts21.13% longer but scores
+only1.76% higher,so reward/action falls15.99%. Losses at episode age1920+ rise
+5→33 of96;this is not matched training-state coverage or a causal guidance-cap
+effect. Complete recorded trajectories reproduce in49.272s CPU,with293 inputs
+and the active Breakout process/265 inputs unchanged. Raw cube-color histories
+are retained without claiming a general level detector. This narrows the next
+question to later-play decisions and progress;no new loss or learner is selected.
+
 The completed [Qbert encoder-rate comparison](2026-10-30-cdp-qbert-encoder-moderate.md)
 also improves frozen gameplay at nearly unchanged training cost: greedy
 11,984.375→13,785.417 (+15.03%) and sampled6,759.375→9,987.500 (+47.76%) in

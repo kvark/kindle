@@ -101,3 +101,9 @@ The separate CPU Qbert life/color diagnostic preparation co-hosts with this
 learner:five pure tests.028s and preflight3.036s. Its300s bounded replay remains
 CPU-only and preserves the original process and inputs. Retain timing caveats
 without correcting training wall time;frozen Breakout gameplay is unmeasured.
+
+The Qbert CPU replay completes 05:07:23 UTC on November1 in49.272s analysis /
+50.619s controller wall,with all293 diagnostic inputs and this learner's265
+inputs/original process identity unchanged. No native/GPU work or learner
+update occurs in that diagnostic. Retain this CPU co-host timing caveat without
+correcting training wall time;the original learner continues.

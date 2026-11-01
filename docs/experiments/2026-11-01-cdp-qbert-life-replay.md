@@ -48,3 +48,14 @@ No retry or budget increase follows a failure.
 Root`/x/Temp/kindle-qbert-life-replay-20261101`. Source trials remain under
 `/x/Temp/kindle-qbert-encoder-moderate-20261030/full` and
 `/x/Temp/kindle-qbert-encoder4e5-20261101/full`. The five-game goal is unfinished.
+
+## Completion — November 1
+
+Selected on source `aa80855`; the fixed replay completes 05:07:23 UTC with all
+293 diagnostic inputs and 265 active Breakout inputs unchanged. Analysis takes
+49.272s (50.619s controller wall), under both caps. The original Breakout process
+identity is preserved; no failure, retry, native model, GPU work or update occurs.
+Both policies lose all 96 lives after the first pyramid in their selected 24
+episodes, with no gains. See the [result](../results/2026-11-01-cdp-qbert-life-replay.md)
+for duration, scoring, age splits, complete replay evidence and interpretation
+limits. No successor is selected.

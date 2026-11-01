@@ -19,15 +19,18 @@ Root`/x/Temp/kindle-breakout-encoder8e5-20261101/full`,service
 `kindle-breakout-encoder8e5-200k-20261101`. Check live state;do not restart or
 schedule another GPU job while active. The five-game goal remains unfinished.
 
-The [CPU Qbert life/color replay](experiments/2026-11-01-cdp-qbert-life-replay.md)
-is prepared on the completed2e-5/4e-5 greedy logs:44,512/60,648 recorded actions,
-fixed24 episodes per policy. Five pure tests and3.036s preflight pass291 inputs
-and265 active Breakout pins;no native/environment construction. One low-priority
-CPU replay will record raw life gains/losses and cube-color changes without
-teacher/model decisions or training. Raw color histories are not a general
-level detector;age1920 is descriptive,not causal training coverage. Root
-`/x/Temp/kindle-qbert-life-replay-20261101`;300s analysis/315s controller caps,
-no new GPU work,learner or automatic successor. The original Breakout run continues.
+The [completed CPU Qbert life/color replay](results/2026-11-01-cdp-qbert-life-replay.md)
+finds all96 losses per retained2e-5/4e-5 policy occur after the first pyramid,
+withzero life gains in each fixed24-episode cohort. Candidate selected duration
+rises21.13%,score1.76%,and reward/action falls15.99%. Losses at episode age1920+
+rise5→33 of96;this is descriptive,not matched training coverage or a causal
+cap effect. Complete44,512/60,648-action replays reproduce all recorded outcomes.
+Five CPU tests,293 diagnostic/265 active Breakout pins and original process
+identity pass. Analysis49.272s/controller50.619s completes05:07:23 UTC November1,
+sourceaa80855,withzero native/GPU work or updates. Raw cube-color histories are
+retained without a general level detector. Root
+`/x/Temp/kindle-qbert-life-replay-20261101`;no new learner/loss or automatic
+successor. Retain CPU co-host timing caveats;the original Breakout run continues.
 
 The [completed Qbert encoder4e-5 comparison](results/2026-11-01-cdp-qbert-encoder4e5.md)
 finishes200k actions/799,739 frames/12,477 updates in27m41s,8.56% less observed
