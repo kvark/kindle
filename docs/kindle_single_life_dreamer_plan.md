@@ -22,6 +22,19 @@ service `kindle-qbert-rgb64-200k-20261101`. Check live state; do not restart
 this learner, repeat completed stages or overlap GPU work.
 The five-game goal remains unfinished.
 
+The [fixed Breakout response-error check](results/2026-11-01-cdp-breakout-response-uncertainty.md) passes its
+prediction screen: command-conditioned error-forecast MSE falls 5.04% overall
+and 4.49% near descending balls, with lower Gaussian NLL and both scores better
+in all eight lanes. Stationary-edge MSE worsens and predicted error²4.809 remains
+far below observed18.383. No controller or gameplay gain is established.
+All37,448 rows/control metrics,16 diagnostic and521 active Qbert inputs pass;
+.772s analysis/3.262s controller completes19:46:15 UTC November1/source1bbd75e,
+preserving originalPID836919/invocation425aae9cee2541fe9623b753225af57f.
+Four CPU fixture groups pass;no failure,repeat,native/emulator/GPU work or update.
+Keep CPU co-host timing. Root`/x/Temp/kindle-breakout-response-uncertainty-20261101`
+is complete;no controller,integration,sweep or learner is selected.
+Qbert RGB64 continues;the five-game goal remains unfinished.
+
 The [command-dependent Breakout teacher comparison](results/2026-11-01-cdp-breakout-command-response.md) is complete.
 Fresh mean return 250.875 → 273.125 rises 8.87%, with five of eight lane means
 improved, but misses the declared 10% requirement. Both arms have zero of 24
