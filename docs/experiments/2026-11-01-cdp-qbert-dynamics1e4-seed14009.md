@@ -79,3 +79,15 @@ CONTROL binding. No native module,agent or emulator is constructed. The single
 terminal observer is copied from the qualified bounded harness;only its service
 name changes,and both additional scripts compile. No bounded GPU work or full
 learner has launched at this preparation boundary.
+
+
+## Bounded check completes
+
+Original main/collector succeed23:24:04/23:24:09 UTC November1/source60f2142.
+Training8192 actions/32,755 frames/733 updates takes57.303s;frozen1024/.865s
+haszero updates/no natural episodes. All774 pins,357 own initial/invariant frozen
+tensors,full replay andguards pass. Conservative projection25m38.902s clears30min.
+The [result](../results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md) preserves
+completion hashes andthe supplemental reader error/correction. Do not rerun
+completed stages orreuse bounded experience. Separate full preparation is now
+qualified; it does not change this bounded protocol or claim game competence.

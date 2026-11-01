@@ -1,22 +1,29 @@
 # CDP handover — October25,2026
 
-The [fresh Qbert dynamics1e-4 seed14009 check](experiments/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
-is CPU-qualified23:19:30 UTC November1:two commands,23 config cases,357-tensor
-schema,733/9340/18715 cadence,16 runtime files and606 original/111 repair pins
-pass in2.163s,withzero native/emulator construction. Only learner/evaluation
-seeds change from the completed passing12011 dynamics1e-4 recipe. Keep12M64/
-Auto/N8/B16/T16/H5/R24/encoder-base4e-5/greedy/expert100,qualified447fe50 native,
-e161bf38 runner andfa261c53 teacher. The bounded plan is8192actions/733updates,
-1024 frozen/zero updates,andconservative200k projection≤30min. No full learner
-is selected. Root`/x/Temp/kindle-qbert-dynamics1e4-seed14009-20261101/native-check`.
-Check live state before launch;do not restart or reuse completed experience.
+The [fresh Qbert dynamics1e-4 seed14009 check](results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
+passes8192 actions/32,755 frames/733 updates in57.303s;1024 frozen/.865s haszero
+updates/no natural episodes. Conservative200k projection25m38.902s clears30min.
+All774 pins,357 initial-schema/invariant frozen tensors,finite reports,full
+pixel/action/label replay andhost guards pass. Original main/collector succeed
+23:24:04/23:24:09 UTC November1/source60f2142;no original stage fails orrepeats.
+A supplemental terminal-reader argument error andseparate2.091s correction
+remain recorded; original completion stays unchanged. No GPU allocation active.
 
-The [preceding dynamics1e-4 result](results/2026-11-01-cdp-qbert-dynamics1e4.md)
-reachesgreedy15,471.875/24first pyramids in25m40s;sampled14,862.5 misses15k.
-Original main/collector remain failed from undefinedCONTROL after allfive GPU
-stages;separateCPU closure`complete_with_cpu_audit_repair` supplies missing
-audits without repeats. Fresh confirmation remains open. The new audit binding
-screen catches that exact old error. The five-game goal remains unfinished.
+The [separate fresh200k confirmation](experiments/2026-11-01-cdp-qbert-dynamics1e4-seed14009-200k.md)
+is CPU-qualified23:25:46 UTC:five commands,32 config/five teacher/eight mode/
+17 header/four observer/12 recovery cases,six retention/two collector fixtures,
+51 paths/19 scripts andfive direct-global checks pass in6.895s,zero native or
+emulator construction. Keep12M64/Auto/N8/B16/T16/H5/R24/dynamics1e-4/encoder-base
+4e-5/greedy/expert100;only seeds change from12011. Full budget200k/18,715/30min,
+100k/9,340 recovery,four actual-initial/final24-episode sampled/greedy arms.
+Greedy primary15k/90% gate staysfixed. No full learner launched at qualification.
+Root`/x/Temp/kindle-qbert-dynamics1e4-seed14009-20261101/full`. Check live state.
+
+The preceding12011 result reachesgreedy15,471.875/24 in25m40s;sampled14,862.5
+misses15k. Its original main/collector remain failed after allfive GPU stages;
+separateCPU closure`complete_with_cpu_audit_repair` completes missing evidence.
+The new full controller explicitly verifies that provenance anddetects the old
+undefinedCONTROL error. No completed stages repeat. Five-game goal unfinished.
 
 The [completed Qbert dynamics-group1e-4 comparison](results/2026-11-01-cdp-qbert-dynamics1e4.md)
 finishes200k actions/799,807 frames/18,715 updates in25m40.027s (+.83% time).
