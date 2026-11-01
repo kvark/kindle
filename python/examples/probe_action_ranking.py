@@ -208,7 +208,19 @@ def oracle(log, replay, selection, output):
     write(output, result)
 
 
-def capture(log, replay, selection, checkpoint, output, *, smoke=False):
+def validate_ranking_checkpoint_config(source, checkpoint, comparison_seed=None):
+    """Permit a declared learner seed change while keeping the recipe fixed."""
+    if comparison_seed is not None:
+        if (type(comparison_seed) is not int or not 0 <= comparison_seed < 2**64
+                or checkpoint.get('seed') != comparison_seed
+                or type(source.get('seed')) is not int
+                or source['seed'] == comparison_seed):
+            raise ValueError('comparison requires the declared distinct checkpoint seed')
+        source = dict(source, seed=comparison_seed)
+    validate_checkpoint_config(source, checkpoint)
+
+
+def capture(log, replay, selection, checkpoint, output, *, smoke=False, comparison_seed=None):
     import kindle
     from fit_atari_probes import checked_memory
     from probe_fixed_latents import assert_frozen_tensors
@@ -218,7 +230,7 @@ def capture(log, replay, selection, checkpoint, output, *, smoke=False):
         raise ValueError('origin selection differs')
     output.mkdir(exist_ok=False)
     config = json.loads((checkpoint/'metadata.json').read_text())['config']
-    validate_checkpoint_config(run['start']['config'], config)
+    validate_ranking_checkpoint_config(run['start']['config'], config, comparison_seed)
     started = time.monotonic()
     agent = kindle.Agent.restore_rgb(str(checkpoint))
     validate_checkpoint_config(config, agent.config)
@@ -226,6 +238,8 @@ def capture(log, replay, selection, checkpoint, output, *, smoke=False):
     initial_actions, initial_updates = agent.environment_step, agent.learner_step
     result = dict(status='running', smoke=smoke, source_log_sha256=run['sha256'],
         selection_sha256=sha256_file(selection), checkpoint=checkpoint_identity(checkpoint),
+        source_config_seed=run['start']['config']['seed'], checkpoint_config_seed=config['seed'],
+        comparison_seed=comparison_seed,
         native_sha256=sha256_file(kindle._native.__file__), source_sha256=sha256_file(__file__),
         gpu_device=agent.gpu_device, actions=0, updates=0, origins=[], streams=[])
     selected = {(r['stream'], r['index']):r for r in chosen['origins']}
@@ -292,6 +306,8 @@ if __name__=='__main__':
     parser.add_argument('--output',type=Path)
     parser.add_argument('--checkpoint',type=Path)
     parser.add_argument('--smoke',action='store_true')
+    parser.add_argument('--compare-checkpoint-seed',type=int,
+        help='Allow only this distinct learner seed to differ from the source config; does not alter the checkpoint')
     args=parser.parse_args()
     if args.mode=='select':
         run,records=source_records(args.log,args.replay)
@@ -299,4 +315,5 @@ if __name__=='__main__':
     elif args.mode=='oracle':
         oracle(args.log,args.replay,args.selection,args.output)
     else:
-        capture(args.log,args.replay,args.selection,args.checkpoint,args.output,smoke=args.smoke)
+        capture(args.log,args.replay,args.selection,args.checkpoint,args.output,
+                smoke=args.smoke,comparison_seed=args.compare_checkpoint_seed)

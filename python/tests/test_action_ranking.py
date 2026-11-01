@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parents[1]/'examples'))
-from probe_action_ranking import ranking_metrics, select_origins
+from probe_action_ranking import ranking_metrics, select_origins, validate_ranking_checkpoint_config
 
 
 def test_model_ties_receive_uniform_outcome_and_half_pairwise_credit():
@@ -46,3 +46,23 @@ def test_origin_selection_ignores_rewards_and_excludes_reset_crossings():
     for i,row in enumerate(rows):
         row['reward'] = 999 if i%7==0 else -999
     assert select_origins([rows]) == selected
+
+
+def test_declared_seed_comparison_preserves_both_original_configs():
+    source = dict(seed=10007, observation_kind='rgb64', batch_size=16)
+    checkpoint = dict(source, seed=12011)
+    validate_ranking_checkpoint_config(source, checkpoint, 12011)
+    assert source['seed'] == 10007 and checkpoint['seed'] == 12011
+    validate_ranking_checkpoint_config(source, dict(source))
+
+
+@pytest.mark.parametrize('comparison,change', [
+    (None, {}), (10007, {}), (12012, {}), (True, {}), (-1, {}), (2**64, {}),
+    (12011, {'batch_size': 8}), (12011, {'observation_kind': 'rgb48'}),
+    (12011, {'learning_rate': 1e-5}),
+])
+def test_seed_comparison_rejects_undeclared_seed_or_other_recipe_changes(comparison, change):
+    source = dict(seed=10007, observation_kind='rgb64', batch_size=16)
+    checkpoint = dict(source, seed=12011, **change)
+    with pytest.raises(ValueError):
+        validate_ranking_checkpoint_config(source, checkpoint, comparison)
