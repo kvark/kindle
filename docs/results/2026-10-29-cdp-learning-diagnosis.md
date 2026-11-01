@@ -1,5 +1,18 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [selected Breakout greedy-collection check](../experiments/2026-11-01-cdp-breakout-greedy-training.md) changes only live action
+collection in the retained12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100
+recipe. Fresh8192 actions/489 updates under180s,then1024 frozen actions/zero
+updates,with357 matched initial/invariant frozen tensors,full replay and guards.
+Conservative200k projection must pass30min. Native447fe50/qualified runner
+aba4300d remain;no build. Prior.648s CPU preflight passes227 control pins and
+actual CLI/config/mode/schema checks. Qbert8039 is fully closed and the host
+is idle at selection. Its gate miss limits cross-game confidence. Root
+`/x/Temp/kindle-breakout-greedy-training-20261101/native-check`,service
+`kindle-breakout-greedy-training-check-20261101`. Execution/cost only;no full
+learner,competence claim,retry,cap increase or automatic promotion. Check live
+state before work;do not overlap or restart the original check.
+
 The [completed delayed-takeover diagnostic](2026-11-01-cdp-breakout-delayed-takeover.md)
 finds105/120 losses remain avoidable after eight recorded actions and91/120 after
 sixteen,versus108 immediate. Between8 and16,the pairs are84 both/21 earlier-only/

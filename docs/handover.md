@@ -1,5 +1,18 @@
 # CDP handover — October25,2026
 
+The [selected Breakout greedy-collection check](experiments/2026-11-01-cdp-breakout-greedy-training.md) changes only live action
+collection in the retained12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100
+recipe. Fresh8192 actions/489 updates under180s,then1024 frozen actions/zero
+updates,with357 matched initial/invariant frozen tensors,full replay and guards.
+Conservative200k projection must pass30min. Native447fe50/qualified runner
+aba4300d remain;no build. Prior.648s CPU preflight passes227 control pins and
+actual CLI/config/mode/schema checks. Qbert8039 is fully closed and the host
+is idle at selection. Its gate miss limits cross-game confidence. Root
+`/x/Temp/kindle-breakout-greedy-training-20261101/native-check`,service
+`kindle-breakout-greedy-training-check-20261101`. Execution/cost only;no full
+learner,competence claim,retry,cap increase or automatic promotion. Check live
+state before work;do not overlap or restart the original check.
+
 The [completed CPU delayed Breakout takeover](results/2026-11-01-cdp-breakout-delayed-takeover.md) records survival
 108/108/110/106/105/91 of120 at delays0/1/2/4/8/16 actions from first disagreement.
 Most early sequences remain recoverable under the teacher;later takeover reduces
@@ -11,15 +24,6 @@ branches do not repeat;zero native/GPU work,updates,failures or retries. Origina
 QbertPID760870/invocationa0b219d7702b4c82a65e9b33498c3544 remains unchanged;
 retain CPU timing. Root`/x/Temp/kindle-breakout-delayed-takeover-20261101`;
 complete,do not rerun. No new learner,loss or successor is selected.
-
-An unselected Breakout greedy-collection check is prepared under
-`/x/Temp/kindle-breakout-greedy-training-20261101/native-check`. Its.648s CPU
-preflight passes two actual CLI paths,13 configuration/five mode cases,357 schema
-tensors and227 control pins. Exact qualified runneraba4300d/native447fe50;only live
-collection would change. No trial,queue,declaration or service exists. The private
-`protocol-draft.md` and `preparation-review.json` preserve scope and359 active Qbert
-pins/identity. Selection requires complete8039 replay/collection/independent
-terminal confirmation and an idle host;it is not an automatic next allocation.
 
 The [completed Qbert seed8039 check](results/2026-11-01-cdp-qbert-greedy-seed8039.md) finishes200k/799,796 frames/
 12,477 updates in27m34s. Greedy11,376.042/23 first pyramids and sampled8,292.708/24
