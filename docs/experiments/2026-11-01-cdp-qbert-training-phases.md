@@ -34,3 +34,13 @@ new learner or automatic successor is selected by this diagnostic.
 
 Root`/x/Temp/kindle-qbert-training-phases-20261101`. Retain a fixed protocol,
 declaration,source hashes,per-episode/window counts,review and execution receipt.
+
+## Completed analysis
+
+The first analysis passes16:34:52 UTC November1/source2365121 in3.440s
+(3.463s wrapper), with all17 inputs unchanged and no native/emulator/GPU work,
+replay,updates,failures or retries. All600k actions,357 completed episodes and24
+partial tails reconcile. Later-phase exposure is76–77% overall and87–89% in
+the final50k,where native movement agreement remains70–72%. See the
+[completed result](../results/2026-11-01-cdp-qbert-training-phases.md) for exact
+denominators and limits. No intervention or learner is selected;do not rerun.

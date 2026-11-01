@@ -76,3 +76,8 @@ The five-game goal remains unfinished.
 | All96 episode rows |`106be57a2f17ae60aa512181c42fad04d0b558edad1338a10206660c8df6a033`|
 | Failure detail |`8b5a3770a4a3f0401bbf160c6cc0ebd94697f7ffc52c925c2b6693e2d1901303`|
 
+
+The separate [saved training-phase diagnostic](2026-11-01-cdp-qbert-training-phases.md)
+finds substantial later-phase collection but persistent native movement
+agreement gaps. It analyzes training exposure,not these frozen outcomes,and
+selects no new learner or causal explanation.

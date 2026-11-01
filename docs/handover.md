@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [saved Qbert training-phase diagnostic](results/2026-11-01-cdp-qbert-training-phases.md)
+finds76–77% of collected actions after the first pyramid across three H5/R24
+learners,rising to87–89% in the final50k. Late native movement agreement is100%
+before the milestone but70–72% afterward;overrides are excluded. Broad absence
+of later-phase exposure is unsupported,while difficult-state coverage,fitting,
+representation and teacher limitations remain unresolved. All600k actions,
+357 completed episodes,24 partial tails and17 inputs reconcile. CPU-only3.440s
+completes16:34:52 UTC November1/source2365121,zero replay,GPU work,updates or
+failures. No learner/intervention selected;host idle. Root
+`/x/Temp/kindle-qbert-training-phases-20261101`;complete,do not rerun.
+
 The [completed Breakout B8/T32 comparison](results/2026-11-01-cdp-breakout-context32.md)
 finishes200k actions/799,549frames/12,469updates in23m12.128s,8.11% longer than
 B16/T16. Primary sampled56.292→48.583 falls13.69%;greedy104.667→130.417 rises
