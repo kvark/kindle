@@ -17,13 +17,17 @@ service`kindle-qbert-h5-r24-200k-20261101`. Check live identity;do not restart
 or schedule another GPU job while active. No extension or automatic successor;
 the five-game goal remains unfinished.
 
-The [selected CPU Breakout planning-cost diagnostic](experiments/2026-11-01-cdp-breakout-plan-costs.md) reconstructs
-the unchanged243-plan objective on saved4e-5 trajectories and relates first-
-command cost gaps to120 retained interventions. No emulator replay,native/GPU
-work or learner change.3.229s preflight/eight scalar fixtures and265/320 prior/
-401 active Qbert pins pass. Root`/x/Temp/kindle-breakout-plan-costs-20261101`;
-60s analysis cap,original Qbert identity protected;retain CPU co-host timing.
-No loss,teacher change or automatic successor is selected.
+The [completed CPU Breakout planning-cost diagnostic](results/2026-11-01-cdp-breakout-plan-costs.md) finds56.38% of
+12,521 horizontal disagreements have at most1 unit excess teacher-model cost;
+near-descending median1.483,with17.64% above16. Three of six teacher-only surviving
+interventions also have gaps below1,so model cost alone does not justify softened
+or dropped labels. All34,429 planning rows reproduce exact plans/paths/costs/
+labels;331 analysis/401 active pins and original Qbert identity pass.4.606s CPU/
+6.342s controller completes08:50:43 UTC November1/source7d1ea69. Eight scalar
+fixtures and independent JSON recount pass;zero emulator/native/GPU work,
+updates,failures or retries. Root`/x/Temp/kindle-breakout-plan-costs-20261101`;
+complete,do not rerun. Retain CPU co-host timing;no loss,teacher change or
+successor selected. Qbert H5/R24 remains the active learner.
 
 The completed bounded check retains390 pins,357 matching initial/invariant
 frozen tensors,47 matching pre-update events,733 finite reports,full replay and

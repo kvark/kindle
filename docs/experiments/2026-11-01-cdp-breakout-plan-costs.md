@@ -53,3 +53,14 @@ emulator import attempts arezero. Require original QbertPID771374/invocation
 command caps60s/90s,one core/low priority;retain co-host timing without correction.
 Root`/x/Temp/kindle-breakout-plan-costs-20261101`. No retry,automatic successor,
 teacher change or GPU allocation. Qbert H5/R24 remains the only active learner.
+
+## Completion
+
+Source7d1ea69 completes4.606s analysis/6.342s controller at08:50:43 UTC November1.
+All34,429 planning rows reproduce exact saved labels,plans,paths and costs;
+331 diagnostic/401 active pins and original Qbert identity remain unchanged.
+56.38% of12,521 horizontal disagreements have excess model cost at most1,but
+three of six teacher-only surviving interventions also have gaps below1.
+Planning cost alone does not establish which labels can safely be softened.
+See the [result](../results/2026-11-01-cdp-breakout-plan-costs.md). No failures,
+emulator replays,native/GPU work,updates or successor. Do not rerun the analysis.

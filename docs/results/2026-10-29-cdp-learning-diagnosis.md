@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [retained Breakout planning-cost analysis](2026-11-01-cdp-breakout-plan-costs.md)
+finds56.38% of12,521 horizontal disagreements add at most1 teacher-model cost
+unit. Near-descending disagreements have a larger median/tail,while three of six
+teacher-only surviving first-command interventions also have gaps below1.
+Exact imitation agreement mixes weak and strong model preferences,but cost does
+not reliably identify harmless commands. Do not soften/drop labels solely from
+this proxy. All34,429 planning rows reproduce exactly;4.606s CPU,331 diagnostic/
+401 active Qbert pins,zero emulator/native/GPU work or updates. Original Qbert
+H5/R24 remains active;no new loss or successor is selected. See the report for
+correlated-row,imperfect-model and CPU co-host limits.
+
 The [completed frozen Qbert cross-cohort diagnostic](../results/2026-11-01-cdp-qbert-cross-cohort.md) keeps4013
 stronger on both cohorts:15,515.625/14,370.833 versus8039's11,578.125/11,376.042.
 Only original4013/4013 clears15k;all first-pyramid counts24/24 except retained
