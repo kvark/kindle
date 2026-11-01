@@ -1,21 +1,22 @@
 # Kindle: CDP learning roadmap
 
 The [fresh Qbert25M/R16 comparison](experiments/2026-11-01-cdp-qbert-25m-r16-200k.md)
-is separately selected after the completed bounded check projects25m08s under
-35min. Fix200k/12,477 updates,retained100k/6,227 recovery and four final/actual-
+launches16:54:10 UTC November1/source65f4cee with521 declared inputs. Startup
+passes16:54:28:357 initial tensors/47 pre-update transitions match the bounded
+25M check,correct cadence and96 finite supervised reports through1,912 actions.
+All47 cross-capacity control transitions differ;own actual initials are required.
+Fix200k/12,477 updates/35min,retained100k/6,227 recovery and four final/actual-
 initial24-episode greedy-primary/sampled arms against14,339.583/13,761.458.
-First full CPU qualification passes16:48:06 UTC November1 in3.600s,withfive CLI
-paths,28 config/five teacher/eight mode/16 header/four observer/11 recovery cases,
-six retention/two integration fixtures,49 paths,17 controllers,501 bounded/442
-control inputs and357 shapes;plot imports.038s pass. No native/emulator construction.
+MainPID821599/invocation208ec1ae7b96453f927694fae11fa0ff;progress,recovery,
+postprocessing and terminal collection observers are active. No frozen result yet.
 Capacity12M→25M and ratio24→16 change together;native447fe50/runneraba4300d and
-qualified faster teacher stay. Own initials may differ across capacities.
-Root`/x/Temp/kindle-qbert-25m-r16-20261101/full`;check live state before launch.
-No full allocation exists yet. The first CPU selection fails on a report
-basename;the following launch stops before systemd because no declaration exists.
-Both failures remain retained. A one-basename repair passes16:50:50 UTC in1.386s,
-checks520 selection paths and preserves the queue;passed CPU/GPU stages are not
-repeated. No extension or automatic successor.
+qualified faster teacher stay. Bounded cost projection25m08s passes35min.
+First full CPU qualification passes16:48:06 in3.600s;separate one-basename
+selection repair passes16:50:50 in1.386s with520 paths and identical queue.
+Original CPU selection and pre-systemd blocked-launch failures remain retained;
+no passed CPU/GPU stages repeat. Root`/x/Temp/kindle-qbert-25m-r16-20261101/full`.
+Check live state;do not restart,repeat stages or overlap GPU work. No extension
+or automatic successor;the five-game goal remains unfinished.
 
 The [bounded Qbert25M/R16 check](results/2026-11-01-cdp-qbert-25m-r16.md)
 completes8,192 actions/32,762frames/489updates in56.153s;1,024 frozen/1.159s
