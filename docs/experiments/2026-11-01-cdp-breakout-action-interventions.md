@@ -46,3 +46,23 @@ cap180s,service cap210s,per-branch cap5s;one low-priority CPU core. Preserve
 partial outputs and failures;do not repeat completed stages to fix reporting.
 No training,model-forward pass,temperature change,new loss or automatic learner
 is selected. Root`/x/Temp/kindle-breakout-action-interventions-20261101`.
+
+## Completed
+
+The CPU run completes01:59:51 UTC November1/source544c51e in17.081s,with136
+origins,234 distinct action branches and both reverse-order checks passing.
+All5,240 source actions/20,950 frames and every recorded continuation match.
+All25 pins and32 focused CPU tests pass;the initial test-path failure and first
+passing preflight are retained. Terminal collection completes02:01:35 with
+completion`3f986ce3e6d7850c14a204ece61c3a6c67677b612449acbdbf185db4ca7a58cb`.
+No native/model inference,learning or GPU work occurs.
+
+Among51 improved-policy disagreements,the teacher saves a life in5 cases,the
+policy in3,and43 tie. Among18 confident disagreements,the policy saves2,the
+teacher1,and15 tie;reward favors policy4,teacher1,and13 tie. These local
+teacher-continuation outcomes limit treating disagreement as error;they do not
+establish long-run policy superiority or adequate representation. See the
+[result](../results/2026-10-30-cdp-encoder-representation.md#local-action-interventions-limit-the-teacher-disagreement-diagnosis).
+The service is terminal success,no GPU allocation is active,and no learner or
+automatic successor is selected by this diagnostic. The five-game goal remains
+unfinished.

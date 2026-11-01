@@ -9,17 +9,18 @@ loss comparisons have not established a better recipe. Compare any new learner
 by frozen gameplay gained per training minute,with bounded checks before a full
 allocation. Backend optimization and broad sweeps remain parked.
 
-The [saved Breakout probability analysis](results/2026-10-30-cdp-encoder-representation.md#saved-action-probabilities-show-uncertainty-and-confident-disagreement)
-finds235/601 greedy teacher disagreements for encoder2e-5,versus276 control;
-73 candidate disagreements have confidence≥.75. Near the paddle,18/51 have
-confidence≥.75 and6/40 states at≥.9 confidence disagree. These already-greedy
-choices leave representation/targets/teacher limitations unresolved;sampling
-alone cannot explain all disagreement. Fixed reused control states and two
-held-out lanes limit inference. All six pins and original row/metric checks
-pass in.205s CPU,complete01:49:34 UTC November1. No forward pass,fitting,replay,
-learner or GPU work;no new loss/policy selected. Root
-`/x/Temp/kindle-encoder-confidence-20261101`;the five-game goal remains active
-and unfinished. Architecture diagnosis is part of that goal.
+The [Breakout action interventions](results/2026-10-30-cdp-encoder-representation.md#local-action-interventions-limit-the-teacher-disagreement-diagnosis)
+limit treating teacher disagreement as error. Of51 improved-policy disagreements,
+the teacher saves a life in5 cases,the policy3,and43 tie;among18 confident
+ones,the policy saves2,teacher1,and15 tie. Reward favors policy4/teacher1 with13
+ties in that confident group. These are one-action interventions with pixel-
+teacher continuation,not full-policy quality or optimal-action truth. All136
+origins,234 distinct branches,5,240 source actions/20,950 frames,25 pins,32 CPU
+tests and reverse-order checks pass. CPU17.081s,complete01:59:51 UTC November1
+/source544c51e,collection02:01:35. Initial test-path failure retained;zero GPU,
+model-forward or learner work. Root`/x/Temp/kindle-breakout-action-interventions-20261101`.
+Service terminal success,no GPU allocation active;no learner/loss selected by
+this diagnostic. Architecture diagnosis remains within the unfinished goal.
 
 The [completed Qbert H5/R32 encoder2e-5 comparison](results/2026-10-30-cdp-qbert-encoder-h5.md) finishes200k actions/799,791 frames/24,954 updates
 in40m35s,0.45% more training time than the H5/6e-6 control. Greedy13,889.583

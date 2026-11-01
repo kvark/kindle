@@ -256,3 +256,66 @@ allocation co-hosts this analysis. Evidence root:
 |---|---|
 | `declaration.json` | `d65f5d2b53b50f6c16fa37619e0f14fd238185e9d260c60b4cb21f9bfb55cc6e` |
 | `review.json` | `1c9273fa26286a965b6e664a8a29e569dc42d5b72b64c3eda75432922565f4cb` |
+
+## Local action interventions limit the teacher-disagreement diagnosis
+
+The [November1 intervention protocol](../experiments/2026-11-01-cdp-breakout-action-interventions.md)
+tests whether disagreement with the pixel teacher actually changes short-term
+outcomes. It uses all136 near-descending states from the same held-out lanes6/7,
+without selecting by confidence,reward or future outcome. At each origin,the
+teacher and both saved greedy actions are compared. Equal actions share a
+branch. Each branch takes one chosen action,then the same feedback-aware
+pixel-teacher rule for up to63 more actions,stopping at the first lost life or
+natural terminal. The rule is shared;future commands adapt to branch pixels.
+
+| Compared with the teacher action | States | Policy saves a life / same / teacher saves a life | Policy gains more reward / same / teacher gains more reward |
+|---|---:|---:|---:|
+| Control disagreements | 68 | 6 / 53 / 9 | 12 / 42 / 14 |
+| Improved-policy disagreements | 51 | 3 / 43 / 5 | 11 / 30 / 10 |
+| Improved-policy disagreements,confidence≥.75 | 18 | 2 / 15 / 1 | 4 / 13 / 1 |
+| Improved-policy disagreements,confidence≥.9 | 6 | 1 / 5 / 0 | 1 / 5 / 0 |
+
+For the improved policy,43/51 disagreements have the same life-loss outcome
+and30/51 the same reward. Mean policy-minus-teacher reward is−.078 across its
+51 disagreements;the two lanes differ,+.037 and−.208. Among the18 confident
+disagreements,it is+.444. These small,correlated,teacher-continuation results
+do not establish policy superiority. They do show that confident disagreement
+cannot simply be relabeled as a representation or policy error:some chosen
+actions have better local outcomes than the teacher action,and most life-loss
+outcomes tie. Stronger imitation is not justified by disagreement counts alone.
+
+This also does not prove the representation is adequate. One-action effects
+can be corrected by subsequent teacher actions;the64-action horizon can leave
+consequences unresolved. The diagnostic does not evaluate repeated native
+policy decisions,optimal actions,long-run scores or the improved policy's own
+state distribution. The earlier readout precision gap remains a separate
+observation. No new loss,temperature,policy replacement or learner is selected
+by this diagnostic.
+
+The CPU run completes **01:59:51 UTC November1** in17.081s,source`544c51e`,
+service`kindle-breakout-action-interventions-20261101`,PID720746/invocation
+`1989512070554832a3cdf5f3408df317`. It produces234 distinct action branches/
+54,548 frames,plus33,670 frames in the declared recorded-continuation and
+reverse-order checks. The complete two source streams replay5,240 actions/
+20,950 frames with matching input pixels,teacher labels,rewards,boundaries,
+frame counts and resets. Every origin's recorded continuation matches;both
+first-origin reverse-order checks pass. Process copies preserve sticky-action
+memory and teacher history;parent emulator and teacher state remain unchanged.
+
+All25 pins and32 focused CPU tests pass. An initial test-collection failure
+from the omitted source PYTHONPATH is preserved;no test or emulator stage ran
+in that failed invocation. The first passing preflight is retained before
+moving the protocol pin to its immutable evidence copy;final preflight.629s
+constructs no environment or agent. Terminal collection completes02:01:35,
+independently checking branch action/feedback sequences,life-loss stopping,
+pixel continuity,all metrics and the original invocation. No native learner
+import,GPU work,model forward pass or update occurs. No GPU allocation is
+active at completion. Evidence root:
+`/x/Temp/kindle-breakout-action-interventions-20261101`.
+
+| Artifact | SHA256 |
+|---|---|
+| `declaration.json` | `2b9c85b20829bffcdccf7af96591f31039a5f3f3e94be17dcc933f3fc4059803` |
+| `review.json` | `05f6c68a8059525412941b63bb617fb961938d59a3b5c86eda5dececbf1ab4c5` |
+| `origins.jsonl` | `145f515cb84fb9607e2a94cccfcafd663ec7e0bb4ef17cc278932f86311c5745` |
+| `completion-review.json` | `3f986ce3e6d7850c14a204ece61c3a6c67677b612449acbdbf185db4ca7a58cb` |
