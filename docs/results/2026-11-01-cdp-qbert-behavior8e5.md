@@ -65,3 +65,17 @@ The CPU-only [Breakout takeover-state join](2026-11-01-cdp-breakout-takeover-sta
 co-hosts selection1.507s,analysis2.816s and independent recount2.581s wrappers.
 It preserves all524 learner inputs and original process identity,withzero GPU
 work or updates. Keep these times as co-host caveats without correction.
+
+## Retained midpoint recovery
+
+The original observer succeeds15:28:35 UTC November1:100,000 actions/9,340
+updates,357 finite tensors and9,514 finite reports through101,864 complete-prefix
+actions. All four recovery files are retained at`recovery-100k`,179,536,497 bytes,
+with copied/source hashes and unchanged source. Retention takes.265s CPU;keep
+co-host time without correction. A read-only hash check confirms all four copies.
+Weights/metadata omit replay,live belief,games and RNG. The original learner
+PID809245/invocation361f29163c1e4b2896fd352f2b905ca8 continues;progress,postprocess
+and collection remain active. No frozen result or new allocation follows.
+
+Recovery reviewSHA256`5eef8dfa59b5b3fd6a2d78cb31cd98d9f21617e2f0fd2cd976749a04face17fd`;
+retentionSHA256`11e11b50c823cbf04143fca9f5cadd997250e58067ae69bafc758aa908fe1995`.

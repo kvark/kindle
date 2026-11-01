@@ -34,9 +34,12 @@ qualified equivalent teacherSHAfa261c53 changes Python bytes/CPU cost. Root
 `/x/Temp/kindle-qbert-behavior8e5-20261101/full`;service
 `kindle-qbert-behavior8e5-200k-20261101`. Check live state;do not restart or overlap
 GPU work. No rate sweep,extension or automatic successor;goal remains unfinished.
-MainPID809245/invocation361f29163c1e4b2896fd352f2b905ca8 and all four observers
-are active. Startup15:18:25 passes524 pins,357 matching tensors,47 events and314
-finite reports through3,728 actions;1.558s CPU co-host caveat. No frozen result yet.
+MainPID809245/invocation361f29163c1e4b2896fd352f2b905ca8 continues. Startup15:18:25
+passes524 pins,357 matching tensors,47 events and314 finite reports through3,728
+acts. Recovery15:28:35 passes100k/9,340,357 finite tensors andretains all four files
+(179,536,497 bytes,.265s);9,514 finite reports through101,864 actions. Recovery
+observer succeeds;progress/post/collection stay active. CPU co-host caveats remain;
+no frozen result yet.
 
 The [qualified Python Qbert teacher](docs/results/2026-11-01-cdp-qbert-teacher-cost.md)
 uses equivalent channel predicates. All130 CPU tests,472 exact snapshot decisions/

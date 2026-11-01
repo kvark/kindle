@@ -72,3 +72,17 @@ is available yet. Require retained100k/9,340 recovery and the fixed four arms.
 Do not restart this learner,repeat passed checks or allocate another GPU job.
 
 Full declarationSHA256`03a3ac6234dd23eee005c32c78bbb50af0903a00d1ee84924357931d10fc0650`.
+
+## Retained midpoint recovery
+
+The original observer succeeds15:28:35 UTC November1:100,000 actions/9,340
+updates,357 finite tensors and9,514 finite reports through101,864 complete-prefix
+actions. All four recovery files are retained at`recovery-100k`,179,536,497 bytes,
+with copied/source hashes and unchanged source. Retention takes.265s CPU;keep
+co-host time without correction. A read-only hash check confirms all four copies.
+Weights/metadata omit replay,live belief,games and RNG. The original learner
+PID809245/invocation361f29163c1e4b2896fd352f2b905ca8 continues;progress,postprocess
+and collection remain active. No frozen result or new allocation follows.
+
+Recovery reviewSHA256`5eef8dfa59b5b3fd6a2d78cb31cd98d9f21617e2f0fd2cd976749a04face17fd`;
+retentionSHA256`11e11b50c823cbf04143fca9f5cadd997250e58067ae69bafc758aa908fe1995`.
