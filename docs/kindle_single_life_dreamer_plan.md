@@ -1,5 +1,26 @@
 # Kindle: CDP learning roadmap
 
+The [fresh Qbert H5/R24 seed10007 learner](experiments/2026-11-01-cdp-qbert-h5-r24-seed10007.md)
+launches10:12:16 UTC November1/source0ebac01 with442 pins,MainPID781585/
+invocation539c22282c4e42c7a22bc150961ef963. Same passing8039 recipe:12M48/Auto/
+N8/B16/T16/H5/R24/encoder4e-5/greedy collection/expert100/native447fe50/runneraba4300d.
+Fix200k/18,715 updates,35min cap,100k/9340 recovery and final/actual-initial
+sampled/greedy24-episode arms;greedy primary,original15k/90% gate unchanged.
+Learner10007/evaluation4000010007 were absent from67 examined Qbert declarations;
+only seeds change,no prior experience or isolated seed-mechanism claim.
+Startup1.320s passes442pins,357finite same-shape tensors,48 initial differences
+(38world/sevenbehavior/threeslowvalue),correct cadence and519 finite supervised
+reports through5912 actions. Original progress,recovery,postprocess and collection
+observers are active. Qualified supplemental observerPID781776/invocation
+2ac890dae7314082b6bc41472f15322b launches10:12:48;it preserves100k metadata and
+confirms terminal evidence once. No full frozen result exists.
+Root`/x/Temp/kindle-qbert-h5-r24-seed10007-20261101/full`,service
+`kindle-qbert-h5-r24-seed10007-200k-20261101`;inspect original identity,do not
+restart or allocate another GPU job while active. Prior3.729s controller and
+1.285s terminal CPU qualifications pass;do not repeat passed checks. Retain CPU
+co-host timing. No retry,extension,cap increase or automatic successor.
+The five-game goal remains unfinished.
+
 The [completed Breakout H5/R24 comparison](results/2026-11-01-cdp-breakout-h5-r24.md)
 finishes200k actions/799,605 frames/18,715 updates in22m50s,+6.42% training
 time. Sampled42.333/greedy76.083 fall24.80%/27.31% below56.292/104.667;all0/24
@@ -16,22 +37,6 @@ Root`/x/Temp/kindle-breakout-h5-r24-20261101/full`;terminal,do not rerun learner
 collectors or confirmations. No extension,cap increase or automatic successor.
 Retain CPU co-host timing. No GPU allocation at closure;check live state.
 The five-game goal remains unfinished.
-
-The [fresh Qbert H5/R24 seed10007 check](experiments/2026-11-01-cdp-qbert-h5-r24-seed10007.md)
-is separately selected after complete Breakout closure10:09:38 UTC November1.
-Same passing8039 recipe:12M48/Auto/N8/B16/T16/H5/R24/encoder4e-5/greedy collection/
-expert100/native447fe50/runneraba4300d. Fix200k/18,715 updates,35min cap,
-100k/9340 recovery and four final/actual-initial24-episode arms;greedy primary,
-original15k/90% gate. Learner10007/evaluation4000010007 are absent from67 prior
-Qbert declarations;only seeds change,no experience reuse or isolated seed cause.
-CPU qualification3.729s passes fiveCLI/26config/eightmode/15header/11recovery/
-fourparser cases,49paths/15scripts,357schema and390bounded/401control pins.
-Supplemental verifier1.285s checks four control scores/videos,five identities,
-four journal/eight seed/config fixtures. No native/emulator construction.
-Root`/x/Temp/kindle-qbert-h5-r24-seed10007-20261101/full`;no learner or result
-at selection. Launch only with unchanged qualified inputs and idle host;do not
-rerun passed preparation/preflights or schedule concurrent GPU work. Retain CPU
-co-host timing. No retry,extension,cap increase or automatic successor.
 
 The [completed frozen Breakout temperature0.5 assessment](results/2026-11-01-cdp-breakout-temperature.md)
 scores83.292 versus retained greedy104.667 (−20.42%) and default sampled56.292
