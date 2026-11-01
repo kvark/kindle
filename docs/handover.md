@@ -1,5 +1,14 @@
 # CDP handover — October25,2026
 
+The [Qbert 300k cost qualification](experiments/2026-11-01-cdp-qbert-300k.md)
+selects one fresh 8,192-action check of retained 12M/H5/R24/base behavior4e-5
+with the qualified faster teacher. CPU qualification passes both CLI paths,
+18 configuration checks, 357 schemas and schedules through 300k/28,090 updates
+at 17:38:00 UTC. A future fresh 300k comparison must fit a fixed 35-minute
+training cap using both bounded and completed-run projections. No full learner
+is selected. Root `/x/Temp/kindle-qbert-300k-20261101/native-check`; service
+`kindle-qbert-300k-check-20261101`. Check live state; do not duplicate this check.
+
 The [completed Qbert25M/R16 comparison](results/2026-11-01-cdp-qbert-25m-r16.md)
 finishes200k actions/799,786frames/12,477 updates in23m40.953s,17.08% less time
 than12M/H5/R24. Primary greedy14,339.583→10,696.875 falls25.40%;sampled
