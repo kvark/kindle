@@ -81,3 +81,12 @@ SHA7bd6d5a12991fcc74d003f06c40aa0dac4908aee9fa11797624c40190979fe51.
 The1.545s CPU startup wrapper co-hosts with training;retain without time correction.
 No failure or GPU-stage repeat occurs;no frozen gameplay result exists yet.
 Do not restart the learner or schedule another GPU allocation while it is active.
+
+The run closes November1 with [lower frozen scores](../results/2026-11-01-cdp-qbert-300k.md):
+greedy13,861.458/24 and sampled8,668.750/18 versus14,339.583/24 and13,761.458/24.
+Training31m18.803s meets the35-minute cap;all GPU stages and full replays pass.
+Main succeeds18:22:35. Original postprocessor/collection remain failed after
+stale200k exposure assertions;separate CPU-only repair closes18:24:23 as
+`complete_with_cpu_postprocess_repair`,preserving524 pins/95 artifacts and
+repeating no completed stage. Retain200k and the faster teacher. No extension,
+confirmation or successor is selected;the five-game goal remains unfinished.

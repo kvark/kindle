@@ -1,24 +1,25 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Qbert 300k comparison](experiments/2026-11-01-cdp-qbert-300k-full.md)
-reports300,000 actions/1,199,763frames/28,090 updates in31m18.803s,within the
-35-minute training cap. This is9.637% more time than the retained200k control
-for50% more experience,using the faster teacher;the recorded first200k matches.
-Training guard/queue stage succeeds18:13:35 UTC;all four frozen GPU stages finish
-18:15:37. The original main process is auditing complete replays;no accepted
-full gameplay result or terminal closure exists yet. Keep12M48/Auto/N8/B16/T16/
-H5/R24/encoder4e-5/base behavior4e-5/greedy collection/expert100 as declared.
-OriginalPID826399/invocation6947a8ed4d734296a1cff8e1af8113b6,source7bd5001,
-524 inputs;progress,postprocessing and collection remain active,recovery succeeded.
-Root `/x/Temp/kindle-qbert-300k-20261101/full`;service
-`kindle-qbert-300k-20261101`. Do not repeat completed GPU stages or launch a
-successor before closure. The five-game goal remains unfinished.
-
-Both original recovery checkpoints are retained:100k/9,340 passes17:52:47 UTC,
-and200k/18,715 passes18:03:18,each with357 finite tensors and all four files.
-The copies total179,536,495 and179,536,496 bytes;retention takes.269s/.275s.
-The recovery observer succeeds18:03:18. Original learner identity stays;full
-frozen results remain pending. Do not rerun the completed recovery checks.
+The [completed Qbert300k comparison](results/2026-11-01-cdp-qbert-300k.md)
+finishes300,000 actions/1,199,763frames/28,090 updates in31m18.803s,+9.64% time
+versus200k with the faster teacher. Greedy14,339.583→13,861.458 falls3.33%;
+sampled13,761.458→8,668.750 falls37.01%. First pyramids are24/24 greedy and
+18/24 sampled;both means miss15k. Own initials1.042/171.875 reproduce,zero
+pyramids. Final50k-action imitation CE.051060→.037849 improves without frozen
+benefit. Retain200k/12M48/H5/R24/encoder4e-5/base behavior4e-5/greedy collection/
+expert100 and the faster teacher;no budget extension,confirmation or successor.
+All524 inputs,357 initial/invariant tensors,47 pre-update events,both100k/9,340
+and200k/18,715 recoveries,full replays/videos,guards,curves,coverage and comparison
+pass. Main succeeds18:22:35 UTC November1/source7bd5001. Original postprocessor
+fails18:22:46 on stale200k exposure assertions;collection records failure18:22:47.
+Separate6.491s CPU repair completes18:24:23,all9 repair pins/95 original artifacts
+unchanged,zero GPU or completed CPU-stage repeats. Original failed services and
+ancillary CPU reporting failures remain;closure`complete_with_cpu_postprocess_repair`.
+Actual56,103 overrides (18.701%) and online guided scores are not frozen competence.
+Extra experience and updates remain coupled on reused10007;no reliability claim.
+CPU co-host caveats stay without correction. Root`/x/Temp/kindle-qbert-300k-20261101`,
+authoritative`postprocess-repair/completion-review.json`. All services terminal;
+no GPU allocation active,no restart. The five-game goal remains unfinished.
 
 The [completed CPU prefix comparison](results/2026-11-01-cdp-qbert-budget-prefix.md)
 finds all25,000 transitions,18,715 non-timing reports and118 episode records
