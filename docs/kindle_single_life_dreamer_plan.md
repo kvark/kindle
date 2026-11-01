@@ -1,5 +1,26 @@
 # Kindle: CDP learning roadmap
 
+The [fresh Breakout H5/R24 comparison](experiments/2026-11-01-cdp-breakout-h5-r24-200k.md)
+launches09:42:11 UTC November1/sourcec4fa576,MainPID777532/invocation
+acf63b2de9614a9dab625bcc6f6cbe52,with301 pinned inputs. Fixed200k/18,715 updates,
+30-minute cap,100k/9340 recovery,and final/actual-initial sampled/greedy24-episode
+arms against sampled56.292/greedy104.667;sampled remains primary and the90%
+two-wall gate is unchanged. Same12M64/Auto/N8/B16/T16/encoder4e-5/sampled
+collection/expert100/native447fe50/runner6c1b69f;H15/R16→H5/R24 jointly changes
+horizon,cadence,sampling,warmup and work. Older H5/R32 was negative;no isolated
+effect or transfer is assumed. Startup matches357 initial tensors,47 pre-update
+transitions and first cadence,with1004 finite reports through11,088 actions.
+Original progress,recovery,postprocessing and collection observers are active.
+Supplemental CPU confirmations pass.838s qualification against the completed
+control,four scores/videos,five identities,four journal fixtures and301 active
+pins;observerPID777949/invocation641b2f823ea145579b9b92c00ec12ea7 starts09:44:54.
+It preserves100k metadata and confirms terminal evidence once;original pipeline
+stays unchanged. No full frozen result exists. Root
+`/x/Temp/kindle-breakout-h5-r24-20261101/full`,service
+`kindle-breakout-h5-r24-200k-20261101`;check live identity,do not restart or run
+another GPU job while active. No extension,cap increase or automatic successor.
+The five-game goal remains unfinished;retain CPU co-host timing without correction.
+
 The [bounded Breakout H5/R24 check](results/2026-11-01-cdp-breakout-h5-r24.md)
 passes8192 actions/32,723 frames/733 updates in50.971s;1024 frozen/4096frames/
 .884s haszero updates/no natural episodes. All267 pins,357 matching/invariant
