@@ -1,5 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed frozen Qbert training readout](2026-11-01-cdp-qbert-training-readout.md)
+replays200k actions/799,739 frames in128.729s,zero updates. Last50k later movement
+agreement is96.92% forced,85.56% in unguided episodes and75.10% after guidance
+releases;all passive83.79% versus59.31% original changing-policy agreement.
+These are different model times/contexts,not a causal sampling or coverage test.
+Only159 wholly unguided training actions reach age1920+,versus12,782 released
+actions;all200k actions already have labels. All562 pins,357 invariant tensors,
+128 F64 comparisons,98 repeated readbacks,exact smoke/full prefix,four tests,
+phase counts and guards pass. Service succeeds05:56:14 UTC November1/source5d53dac,
+original collector passes;zero failures/repeats. Roots
+`/x/Temp/kindle-qbert-training-coverage-20261101` and
+`/x/Temp/kindle-qbert-training-readout-20261101`. No active allocation or automatic
+successor;greedy training actions are a candidate requiring a separate bounded
+protocol. Five-game goal unfinished;check live state before work.
+
 The [first-disagreement intervention](2026-11-01-cdp-qbert-first-disagreement.md)
 is a local causal check under the fixed feedback-aware teacher. At25 selected
 origins,teacher-first survives the original loss endpoint in25 cases versus20

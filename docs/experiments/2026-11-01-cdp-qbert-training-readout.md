@@ -60,3 +60,14 @@ without the missing replay indices/contexts. This test narrows whether the final
 actor fits the collected live histories; it does not select a loss, teacher
 weight, replay change, new learner, retry or automatic successor. The five-game
 goal remains unfinished.
+
+## Completion — November 1
+
+Source5d53dac,562 pins. Smoke4.708s/full128.729s;200k original commands and
+799,739 frames match. All357 invariant tensors,128 F64 actor comparisons,
+98 repeated full readbacks,exact smoke/full prefix,phase recounts and guards
+pass. Service succeeds05:56:14 UTC after139.692s;original terminal collection
+passes. Later movement agreement on the last50k training actions is96.92%
+forced,85.56% unguided and75.10% after guidance release. See the
+[result](../results/2026-11-01-cdp-qbert-training-readout.md) for distributions
+and limits. Zero updates,failures,retries or automatic successor.
