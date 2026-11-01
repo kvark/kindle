@@ -36,6 +36,19 @@ runner differences limit causal claims;no prior experience reused. Root
 service;do not restart it or schedule another GPU job while active. No retry,
 extension,cap increase or automatic successor. The five-game goal is unfinished.
 
+The [completed CPU Qbert phase diagnostic](docs/results/2026-11-01-cdp-qbert-h5-r24-phases.md)
+finds both8039/10007 greedy policies clear the first pyramid at exactly1219frames
+with550 prefix points inall24 episodes. The full1090.625 mean gap occurs after
+the crossing action:later actions1958.542→1899.542 and reward/100actions
+759.760→725.943. Sampled10007 improves with shorter later duration/higher rate;
+no single causal mechanism or paired seed effect is established. All96 fixed
+selected episodes reconcile; six boundary fixtures and23 input pins pass.
+Analysis.258s/wrapper.314s completes11:20:53 UTC November1/source9da3385; original
+BreakoutPID787678/invocation709367befab94110b4afc489bd51d55c remains unchanged.
+No emulator/native/GPU work,updates,failures or repeats. Retain CPU co-host time.
+Root`/x/Temp/kindle-qbert-h5-r24-phases-20261101`;complete,do not rerun.
+No recipe,confirmation learner or automatic successor is selected.
+
 The [completed Qbert H5/R24 seed10007 confirmation](docs/results/2026-11-01-cdp-qbert-h5-r24-seed10007.md)
 finishes200k/799,841frames/18,715updates in28m34s. Greedy14,339.583/
 24 first pyramids andsampled13,761.458/24 both miss15k;
@@ -64,7 +77,7 @@ or repeats. Conservative200k projection21m10s passes30min;competence unmeasured.
 Native2974160/exact runner unchanged;no build. Root
 `/x/Temp/kindle-centroid-encoder4e5-20261101/native-check`;complete,do not rerun.
 The [separate fresh200k comparison](docs/experiments/2026-11-01-cdp-centroid-encoder4e5-200k.md)
-against retained4e-5 sampled56.292/greedy104.667,all0/24 two-wall. Full CPU
+compares against retained4e-5 sampled56.292/greedy104.667,all0/24 two-wall. Full CPU
 qualification passes11:14:22 UTC:five commands,18 config cases,seven startup
 cases,four observer argument cases,five recovery cases,372 schema tensors,357
 shared values and exact schedules in2.610s. Plot/import/exposure qualification
