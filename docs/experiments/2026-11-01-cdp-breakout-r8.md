@@ -1,4 +1,4 @@
-# Unselected CPU preparation for a lower-replay Breakout check
+# Lower-replay Breakout execution and cost check
 
 Prepare and qualify scripts only while the original Qbert H5/R32 learner runs.
 **No Breakout trial,queue,declaration,service or GPU allocation is selected.**
@@ -65,3 +65,24 @@ loading occurs. Original Qbert identity and490 pins remain unchanged. No
 prospective trial directory,queue,declaration or service exists. Sources and
 qualification are retained;do not repeat the passing preflight. Review selection
 only after the original Qbert comparison and audits close.
+
+## Selected after Qbert closure
+
+The original Qbert H5/R32 comparison and all five services have closed
+successfully. Its terminal collector passes12:59:27 UTC November1 with490
+unchanged inputs;completionSHA256
+`72d57f10e787f3e67c006c5ba68ece44ed16017151aae0a8461fede020d553ab`.
+No Kindle unit remains running at selection review.
+
+Select only the qualified8,192-action/245-update check followed by1,024 frozen
+actions,with the caps,settings,cost gate and audits specified above. The original
+CPU qualification remains valid and will not be repeated. This is a deliberate
+new execution/cost test after closure,not a queued successor. More replay work
+failed to improve either game's retained comparison;the possible lower-ratio
+Breakout direction instead changes experience coverage at roughly fixed update
+count. This motivation is not evidence of a benefit or an isolated causal claim.
+
+No400k learner,extension,ratio retry or automatic promotion is selected. Require
+the bounded result and original terminal collector before deciding whether a
+separate full comparison is justified. Reuse the exact qualified native and
+runner;no rebuild or prior experience reuse.

@@ -1,12 +1,13 @@
-# Qbert R32 with greedy collection: full frozen outcome pending audit closure
+# More replay work lowers frozen Qbert quality at higher cost
 
-**Current status:** all training and frozen GPU stages have finished;the original
-CPU audit pipeline remains active. Training completes200,000 actions/799,822
+**Complete:** the original learner,all four frozen assessments,full audits,
+postprocessing and terminal collection pass. Retain H5/R24;H5/R32 lowers both
+frozen means on this reused10007 learner. Training completes200,000 actions/799,822
 frames/24,954 updates in **2,099.741s (34m59.741s)**,22.53% longer than the
 same-seed R24 control's1,713.661s. No extension or repeated GPU stage occurs.
 
 All four frozen trajectories have replayed. Selecting the declared first three
-natural episodes per lane gives the following provisional comparison:
+natural episodes per lane gives the following audited comparison:
 
 | Mode | R24 control | R32 candidate | Candidate first pyramids | Actual initial |
 | --- | ---: | ---: | ---: | ---: |
@@ -14,11 +15,10 @@ natural episodes per lane gives the following provisional comparison:
 | Sampled |13,761.458|10,305.208|18/24 versus control24/24|171.875,both|
 
 Each arm performszero updates. Both candidate means miss15,000;sampled also
-misses90% first-pyramid success. The outcomes favor retaining R24,subject to
-completion of the original full guided training replay,learning review,
-postprocessing and terminal collection. No passing full-comparison closure
-exists yet. Inspect the original process;do not restart it or allocate another
-GPU job before closure.
+misses90% first-pyramid success. Greedy falls1.97% and sampled25.12% relative
+to R24. Retain R24;no extension,ratio retry,confirmation or automatic successor.
+The five-game goal remains unfinished. This comparison is terminal;do not
+restart the learner,assessments,audits or collectors.
 
 Measured training-stage times are1,428.410s learning and574.166s acting,versus
 1,051.583s and566.324s atR24. Environment stepping takes61.221s versus60.437s.
@@ -26,6 +26,33 @@ These are aggregate wall timers,not individual-kernel profiles;CPU co-host
 timings remain uncorrected. More replay work has not produced better frozen
 play on this reused development seed. It does not isolate a causal mechanism
 or establish that more data under another recipe would help.
+
+## Full comparison closure
+
+Main service succeeds **12:58:49 UTC November1**,postprocessing12:58:56 and
+original terminal collection12:59:27. All five original services are terminal
+success. Source4a10fcc and originalPID792387/invocation
+460e0220583948f4b088b5dc7c92956a remain the run identity. All490 pinned inputs,
+24,954 finite reports,357 matching initial and invariant frozen tensors,
+100k/12,454 audited recovery,full training pixel/action/corrective-label replay,
+four frozen replays/videos,host guards,curves,coverage,exposure and comparison
+pass. Initial sampled/greedy semantic traces match all1,238/916 events. No full
+GPU or audit stage fails or repeats.
+
+Actual guidance overrides40,616/200,000 actions (20.308%). Online guided returns
+and replay fitting are not unaided competence. The same native447fe50,runner
+aba4300d,teacher and other settings are retained;R24→32 also changes cadence,
+sampling,warmup duration and total work. The reused learner/evaluation cohort
+is not independent reliability evidence. Earlier CPU preparation failures below
+remain preserved;they are not relabeled as passing attempts.
+
+The four100k checkpoint files remain retained at`recovery-100k`. Full evidence
+root `/x/Temp/kindle-qbert-h5-r32-greedy-20261101/full`,trial
+`qbert-12m-48-b16-h5-r32-encoder4e5-greedy-expert100-200k-seed10007`.
+The terminal completionSHA256 is
+`72d57f10e787f3e67c006c5ba68ece44ed16017151aae0a8461fede020d553ab`;
+learning review`011b9724c3791214456dbc1adced884ba3eb144e102e1c16b783dd911c44b7ed`,
+comparison`664fc488d184aab5af9cf75217fc13aae57bdd9771b2295041ec3e03f94a1997`.
 
 ## Completed bounded check
 

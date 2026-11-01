@@ -1,42 +1,27 @@
 # CDP handover — October25,2026
 
-The [completed Qbert R32 greedy bounded check](results/2026-11-01-cdp-qbert-h5-r32-greedy.md)
-passes8192 actions/32,762frames/978updates in82.177s;1024 frozen/.807s haszero
-updates/no natural episodes. Conservative200k projection36m47s passes45min.
-All479 pins,357 matching/invariant tensors,47 pre-update events,full guided
-replay and guards pass. Main/collector12:07:15/12:07:53 UTC November1/source3bfce40,
-PID791920/invocatione48b450a02c64928be90711e05063f2a;terminal,no GPU repeat.
-CPU invalid-seed preflight failure and two preparer wording failures remain.
-The [separate fresh200k comparison](experiments/2026-11-01-cdp-qbert-h5-r32-greedy-200k.md) launches12:10:19 UTC/source4a10fcc with490 pins. MainPID792387/invocation
-460e0220583948f4b088b5dc7c92956a. Recovery passes12:27:55 at100k/12454 with357
-finite tensors;observer succeeds. All four files/179,536,496 bytes are retained
-at`recovery-100k`,hash-verified12:29:45 in1.390s with490 pins/main identity
-unchanged. No restore/GPU repeat;do not repeat recovery/retention. Other observers
-continue;check live state. Startup12:10:39
-passes357 control/bounded-matching tensors,47 pre-update events,correct cadence
-and157 finite reports through1632 actions. R24→32 on reused10007,keep12M48/Auto/N8/B16/T16/H5/encoder4e-5/greedy collection/
-expert100/native447fe50/runneraba4300d/teacher. Require100k/12454 recovery and
-final/actual-initial sampled/greedy24-episode assessments against13,761.458/
-14,339.583,each24 first pyramids;original15k/90% gate,45min training cap. Full
-CPU preflight3.400s and plot import.085s pass. Root
-`/x/Temp/kindle-qbert-h5-r32-greedy-20261101/full`;service
-`kindle-qbert-h5-r32-greedy-200k-20261101`. Check this original live process;
-do not restart it or allocate concurrent GPU work. Training has now finished
-200k/799,822frames/24,954updates in34m59.741s,+22.53% versus R24. All four frozen
-GPU arms finish withzero updates and their trajectories replay. Provisional
-first-three-per-lane sampled10,305.208/18 first pyramids andgreedy14,057.292/23
-trail controls13,761.458/24 and14,339.583/24;actual initials171.875/1.042 match.
-The original full guided training replay and downstream audits/collection remain
-active;no full closure exists. No retry,extension,ratio sweep or successor.
+The [completed Qbert H5/R32 greedy comparison](results/2026-11-01-cdp-qbert-h5-r32-greedy.md)
+finishes200k actions/799,822frames/24,954updates in34m59.741s,+22.53% versus R24.
+Greedy14,057.292/23 first pyramids and sampled10,305.208/18 fall1.97%/25.12%
+below controls14,339.583/24 and13,761.458/24. Actual initials1.042/171.875 match;
+original15k/90% gate still fails. Retain R24;no extension,ratio retry or confirmation.
+All490 pins,357 matching initial/invariant frozen tensors,1,238/916 matching
+initial semantic events,100k/12,454 retained recovery,full pixel/action/label and
+frozen replays/videos,guards,curves,coverage,exposure and comparison pass. All
+five original services succeed:main12:58:49,post12:58:56,collection12:59:27 UTC
+November1/source4a10fcc. Actual overrides20.308%;guided scores are not competence.
+CPU co-host timings and earlier CPU preparer failures remain. No full/GPU failure
+or repeat. Root`/x/Temp/kindle-qbert-h5-r32-greedy-20261101/full`;complete,do not
+rerun stages. The five-game goal remains unfinished.
 
-The [Breakout R8 CPU preparation](experiments/2026-11-01-cdp-breakout-r8.md) passes.676s preflight/3.127s wrapper
-at12:25:00 UTC November1:two CLI paths,13 config cases,357 shapes,227 control
-pins and245/3114/6239/9364/12489 schedules. A possible400k/R8 comparison would
-double experience at roughly the200k/R16 update count;no benefit established.
-Keep12M64/H15/encoder4e-5/sampled collection/expert100/native447fe50/runner6c1b69fb.
-No trial,queue,declaration,service or GPU allocation is selected. Review only
-after current Qbert closure;all490 active pins/original identity remain unchanged.
-Root`/x/Temp/kindle-breakout-r8-20261101/native-check`;do not repeat preflight.
+The [Breakout R8 bounded check](experiments/2026-11-01-cdp-breakout-r8.md#selected-after-qbert-closure)
+is now separately selected after Qbert closure and an idle-Kindle check. Use the
+qualified8,192-action/245-update train plus1,024 frozen actions,exact native447fe50/
+runner6c1b69fb/teacher,with12M64/H15/encoder4e-5/Auto/N8/B16/T16/expert100.
+Keep180/60/180s train/frozen/audit caps and480s service cap;conservative400k cost
+projection must pass35min. No400k learner or automatic promotion is selected.
+Do not repeat passed CPU preflight. Root`/x/Temp/kindle-breakout-r8-20261101/native-check`;
+service`kindle-breakout-r8-check-20261101`. Check live state for launch identity.
 
 The [fixed Breakout upper-crop reference](results/2026-11-01-cdp-breakout-crop70.md)
 leaves all eight returns unchanged:mean185.375,zero two-wall successes. The
