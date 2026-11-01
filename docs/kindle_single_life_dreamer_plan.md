@@ -46,15 +46,20 @@ receipt and its tool output is unavailable;exact sources/limitation remain.
 Separate3.044s completed-service preflight passes without repeating eight fixtures.
 Root`/x/Temp/kindle-breakout-unseen-center-20261101/standard24`;complete,do not rerun.
 
-The [Qbert H5/R24 temperature harness](experiments/2026-11-01-cdp-qbert-h5-r24-temperature.md)
-is CPU qualified but unselected. Four CLI/32 header cases,all550 inputs/315 active
-Breakout pins and all four retained frozen arms/tensors/replays/videos/guards
-pass13:22:10 UTC/sourcef2d8c56 in15.502s (15.602s wrapper). Two old runner
-references resolve to exact Git bytes. No native/emulator construction,new
-replay,queue,declaration,service,failure or repeated qualification. Retain co-host
-time;do not repeat preflight. A possible fixedtemperature0.5 assessment of the
-retained10007 H5/R24 learner remains unselected after Breakout closure;
-any assessment requires separate selection and an idle host. Root`/x/Temp/kindle-qbert-h5-r24-temperature-20261101`.
+The [fixed Qbert H5/R24 temperature assessment](experiments/2026-11-01-cdp-qbert-h5-r24-temperature.md)
+is separately selected and active from13:55:56 UTC November1/source1308ffb,
+with558 pinned inputs. MainPID801574/invocation6ce4cfed31e44e73aef685bb38ed64b7,
+collectorPID801577/invocation9958da4efa804075953dee40d9f7b943. Original R8 and
+CPU reference assessments close before launch;qualified CPU preflight is reused.
+Four fixed final/initial default/temperature.5 arms require exact sampled
+compatibility,357 invariant tensors,24 natural episodes,full replays/videos/
+guards and original15k/90% gate. Primary comparison is retained greedy14,339.583;
+original28m34s training stays. Runtimee416696/runnerabc2c2b differs from training,
+so each default arm must reproduce before its candidate. No result yet;zero
+learning,no build,sweep,retry or automatic successor. Root
+`/x/Temp/kindle-qbert-h5-r24-temperature-20261101`,service
+`kindle-qbert-h5-r24-temperature-20261101`. Check original process identity;
+do not restart or allocate concurrent GPU work.
 
 The [fixed Breakout upper-crop reference](results/2026-11-01-cdp-breakout-crop70.md)
 leaves all eight returns unchanged:mean185.375,zero two-wall successes. The
