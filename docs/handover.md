@@ -1,22 +1,18 @@
 # CDP handover — October25,2026
 
 The [fresh Qbert 300k comparison](experiments/2026-11-01-cdp-qbert-300k-full.md)
-is running from17:42:11 UTC November1/source7bd5001 with524 pinned inputs.
-Fix 300k/28,090 updates and a35-minute training cap at12M48/Auto/N8/B16/T16/
-H5/R24/encoder4e-5/base behavior4e-5/greedy collection/expert100, using the
-qualified faster teacher. Startup passes357 control/bounded-matching initial
-tensors,47 paired pre-update transitions,correct cadence and485 finite reports
-through5,544 actions. PID826399/invocation6947a8ed4d734296a1cff8e1af8113b6;
-original progress,postprocessing and collection services remain active; the
-recovery observer has succeeded.
-Require100k/9,340 and200k/18,715 four-file recoveries,then fixed-final/actual-
-initial greedy-primary and sampled24-episode arms against14,339.583/13,761.458.
-No full frozen result exists. Root `/x/Temp/kindle-qbert-300k-20261101/full`;
-service `kindle-qbert-300k-20261101`. Do not restart or overlap GPU work.
-The bounded check is complete:8,192/733 in48.112s,frozen1,024/.819s;all497 inputs,
-357 tensors,replays/guards pass withzero failures or repeats. Main17:39:38/
-collection17:39:42/source257cc0e. No bounded experience is reused. The startup
-CPU check co-hosts1.545s without time correction. The five-game goal is unfinished.
+reports300,000 actions/1,199,763frames/28,090 updates in31m18.803s,within the
+35-minute training cap. This is9.637% more time than the retained200k control
+for50% more experience,using the faster teacher;the recorded first200k matches.
+Training guard/queue stage succeeds18:13:35 UTC;all four frozen GPU stages finish
+18:15:37. The original main process is auditing complete replays;no accepted
+full gameplay result or terminal closure exists yet. Keep12M48/Auto/N8/B16/T16/
+H5/R24/encoder4e-5/base behavior4e-5/greedy collection/expert100 as declared.
+OriginalPID826399/invocation6947a8ed4d734296a1cff8e1af8113b6,source7bd5001,
+524 inputs;progress,postprocessing and collection remain active,recovery succeeded.
+Root `/x/Temp/kindle-qbert-300k-20261101/full`;service
+`kindle-qbert-300k-20261101`. Do not repeat completed GPU stages or launch a
+successor before closure. The five-game goal remains unfinished.
 
 Both original recovery checkpoints are retained:100k/9,340 passes17:52:47 UTC,
 and200k/18,715 passes18:03:18,each with357 finite tensors and all four files.
