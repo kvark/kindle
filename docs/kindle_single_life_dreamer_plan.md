@@ -27,6 +27,10 @@ Do not repeat qualification. Root`/x/Temp/kindle-breakout-context32-20261101/nat
 service`kindle-breakout-context32-check-20261101`;check live state before work.
 This selects only execution/cost measurement,no full learner or automatic successor.
 
+Launch15:51:35 UTC November1/sourcec2f7abf,originalPID812306/invocation
+`c51dbe709ad14d8289d6a921769c621c`;261 inputs pinned. Service
+`kindle-breakout-context32-check-20261101` is active. No full learner selected.
+
 The [saved Breakout takeover-state join](results/2026-11-01-cdp-breakout-takeover-states.md) finds onlytwo of21 earlier-only
 rescues have projected contact withinfive actions at delay16;14 already match
 the teacher command. Timing estimates and this imperfect teacher do not isolate

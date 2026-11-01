@@ -80,3 +80,7 @@ sustained-control error unresolved;they are not evidence that context is causal.
 Reuse the completed CPU qualification unchanged. Require idle host,exact source
 pins,clean committed selection and original service identity at launch. This
 selects only8192/481 plus1024 frozen,no full learner or automatic promotion.
+
+Launch15:51:35 UTC November1/sourcec2f7abf,originalPID812306/invocation
+`c51dbe709ad14d8289d6a921769c621c`;261 inputs pinned. Service
+`kindle-breakout-context32-check-20261101` is active. No full learner selected.

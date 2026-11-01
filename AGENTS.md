@@ -47,6 +47,10 @@ Do not repeat qualification. Root`/x/Temp/kindle-breakout-context32-20261101/nat
 service`kindle-breakout-context32-check-20261101`;check live state before work.
 This selects only execution/cost measurement,no full learner or automatic successor.
 
+Launch15:51:35 UTC November1/sourcec2f7abf,originalPID812306/invocation
+`c51dbe709ad14d8289d6a921769c621c`;261 inputs pinned. Service
+`kindle-breakout-context32-check-20261101` is active. No full learner selected.
+
 The [qualified Python Qbert teacher](docs/results/2026-11-01-cdp-qbert-teacher-cost.md)
 uses equivalent channel predicates. All130 CPU tests,472 exact snapshot decisions/
 states and a full200k/799,841-frame candidate replay pass. CPU replay takes230.331s
