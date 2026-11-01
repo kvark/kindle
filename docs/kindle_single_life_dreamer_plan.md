@@ -1,16 +1,25 @@
 # Kindle: CDP learning roadmap
 
-The [bounded Qbert25M/R16 check](experiments/2026-11-01-cdp-qbert-25m-r16.md)
-launches16:43:06 UTC November1/source d211ad3,originalPID820209/invocation
-`d4cb31854ee34f41bd30e296520ca13a`,501 pins. Fix8,192 actions/489 updates,
-180s training cap and1,024 frozen actions;future200k conservative cost gate35min.
-Capacity12M→25M and ratio24→16 change together;keepRGB48/B16/T16/H5/encoder4e-5/
-base behavior4e-5/greedy collection/expert100 and qualified faster teacher. Native
-447fe50/runneraba4300d unchanged. First CPU qualification1.151s passes both CLI
-paths,19 config cases,357 reference shapes,442 control inputs and16 package files;
-31,636,273 trainable parameters derived. No full learner or automatic successor.
-Root`/x/Temp/kindle-qbert-25m-r16-20261101/native-check`;service
-`kindle-qbert-25m-r16-check-20261101`. Check live state;do not restart or overlap GPU work.
+The [fresh Qbert25M/R16 comparison](experiments/2026-11-01-cdp-qbert-25m-r16-200k.md)
+is separately selected after the completed bounded check projects25m08s under
+35min. Fix200k/12,477 updates,retained100k/6,227 recovery and four final/actual-
+initial24-episode greedy-primary/sampled arms against14,339.583/13,761.458.
+First full CPU qualification passes16:48:06 UTC November1 in3.600s,withfive CLI
+paths,28 config/five teacher/eight mode/16 header/four observer/11 recovery cases,
+six retention/two integration fixtures,49 paths,17 controllers,501 bounded/442
+control inputs and357 shapes;plot imports.038s pass. No native/emulator construction.
+Capacity12M→25M and ratio24→16 change together;native447fe50/runneraba4300d and
+qualified faster teacher stay. Own initials may differ across capacities.
+Root`/x/Temp/kindle-qbert-25m-r16-20261101/full`;check live state before launch.
+No full allocation exists at this selection;no extension or automatic successor.
+
+The [bounded Qbert25M/R16 check](results/2026-11-01-cdp-qbert-25m-r16.md)
+completes8,192 actions/32,762frames/489updates in56.153s;1,024 frozen/1.159s
+haszero updates/no natural episodes. All501 inputs,357 derived/invariant tensors,
+finite reports,full pixel/action/label replay and guards pass. Main16:44:28/
+original collection16:44:45 UTC November1/source d211ad3;no failure,GPU repeat
+or repair.31,636,273 trainable parameters;no cross-capacity initial equality.
+Root`/x/Temp/kindle-qbert-25m-r16-20261101/native-check`;complete,do not rerun.
 
 The [saved Qbert training-phase diagnostic](results/2026-11-01-cdp-qbert-training-phases.md)
 finds76–77% of collected actions after the first pyramid across three H5/R24
