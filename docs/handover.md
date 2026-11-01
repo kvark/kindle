@@ -20,6 +20,15 @@ CPU preflight3.400s and plot import.085s pass. Root
 do not restart it or allocate concurrent GPU work. No full outcome,retry,
 extension,ratio sweep or automatic successor.
 
+The [Breakout R8 CPU preparation](experiments/2026-11-01-cdp-breakout-r8.md) passes.676s preflight/3.127s wrapper
+at12:25:00 UTC November1:two CLI paths,13 config cases,357 shapes,227 control
+pins and245/3114/6239/9364/12489 schedules. A possible400k/R8 comparison would
+double experience at roughly the200k/R16 update count;no benefit established.
+Keep12M64/H15/encoder4e-5/sampled collection/expert100/native447fe50/runner6c1b69fb.
+No trial,queue,declaration,service or GPU allocation is selected. Review only
+after current Qbert closure;all490 active pins/original identity remain unchanged.
+Root`/x/Temp/kindle-breakout-r8-20261101/native-check`;do not repeat preflight.
+
 The [completed Breakout pooling diagnostic](results/2026-11-01-cdp-breakout-pool-timing.md) finds35,193/35,193 accepted
 pooled paddle centers exactly equal the last-two-raw-frame midpoint;latest-raw
 MAE1.456 over35,610 decisions. Shared model errors remain1.965 pooled versus
