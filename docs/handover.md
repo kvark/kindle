@@ -1,14 +1,19 @@
 # CDP handover — October25,2026
 
-The [selected Breakout encoder4e-5 check](experiments/2026-11-01-cdp-breakout-encoder4e5.md) tests2e-5→4e-5 in the retained
-12M64/Auto/N8/B16/T16/H15/R16/expert100 recipe. Native447fe50,exact runner and
-teacher stay unchanged; the earlier4M/expert10 rate4e-5 failure remains negative
-evidence. CPU preflight passes two CLI paths,13 config cases,357 schema tensors
-and173 control pins in.425s,zero native construction/environment work. Select
-8192 actions/489 updates plus1024 frozen,180s/60s caps and conservative200k
-projection<=30min. No full learner or automatic promotion selected. Root
-`/x/Temp/kindle-breakout-encoder4e5-20261101/native-check`;service
-`kindle-breakout-encoder4e5-check-20261101`. Check live state before work;goal unfinished.
+The [fresh Breakout encoder4e-5 comparison](experiments/2026-11-01-cdp-breakout-encoder4e5-200k.md) is selected after the bounded
+check passes8192 actions/32,721 frames/489 updates in46.899s;frozen1024/.899s
+haszero updates/no natural episodes. All194 pins,357 matching/invariant tensors,
+47 pre-update events,full replay and guards pass;conservative200k projection
+20m59s passes30min. Main/collection succeed03:05:01/03:05:09 UTC November1,
+sourcee11932e,no GPU repeat. The full selection keeps12M64/Auto/N8/B16/T16/H15/
+R16/expert100 and changes only encoder2e-5→4e-5;native447fe50,exact runner and
+teacher fixed. Require100k/6227 recovery and final/actual-initial sampled/greedy
+24-episode assessments against25.292/42.625. Five CLI paths,24 config cases,
+8 header cases and194 bounded/173 control pins pass;initial CPU header-rate
+assertion failure preserved,zero full GPU stages before correction. Root
+`/x/Temp/kindle-breakout-encoder4e5-20261101/full`,service
+`kindle-breakout-encoder4e5-200k-20261101`. No full frozen result;check live state.
+See [bounded result](results/2026-11-01-cdp-breakout-encoder4e5.md);earlier4M/expert10 rate4e-5 failure remains retained.
 
 The [completed Breakout imitation-decay comparison](results/2026-11-01-cdp-breakout-expert-decay.md) finishes200k actions/
 799,518 frames/12,477 updates in21m30s,4.23% less training time than constant100.

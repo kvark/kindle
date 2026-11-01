@@ -47,3 +47,15 @@ paths,13 actual audit-config cases,the357-tensor schema and173 retained control
 pins in.425s,with zero native construction attempts or environment creation.
 The runner is byte-identical to the retained2e-5 control. The host is idle at
 preparation; recheck live state and boot/driver pins at selection and launch.
+
+## Bounded result
+
+The check succeeds03:05:01 UTC November1/sourcee11932e; collection03:05:09.
+Training8192 actions/32,721 frames/489 updates takes46.899s; frozen1024/4096
+frames/.899s haszero updates/no completed natural episodes. All194 pins,
+357 matching initial/invariant frozen tensors,47 pre-update events,full replay,
+finite reports and guards pass. Conservative200k projection20m59s passes30min.
+No GPU repeat or failure occurs. This qualifies execution/cost only; see the
+[result](../results/2026-11-01-cdp-breakout-encoder4e5.md). A separately selected
+[fresh200k comparison](2026-11-01-cdp-breakout-encoder4e5-200k.md) measures gameplay;
+no check experience is reused.
