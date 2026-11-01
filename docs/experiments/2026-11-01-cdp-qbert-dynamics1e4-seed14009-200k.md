@@ -73,3 +73,28 @@ direct-global checks pass. All774 bounded/606 reference/111 repair pins pass;
 no native or emulator construction. The reference's original failures remain
 preserved. See the [qualification result](../results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md).
 No full learner is launched at this preparation boundary.
+
+
+## Fresh full confirmation is active
+
+The separate200k learner launches **23:27:17.442 UTC November1**,source9cce545,
+with768 pins,mainPID863643/invocation`80c3cd392a2c45e68c200e362ab6c00c`.
+Allfour original observers start:postprocessPID863646/invocation
+`ea3bb7b2c5b5425b919202facbce10c8`,progressPID863649/invocation
+`447c3905d0cf4ffa9f4eca1926849d84`,recoveryPID863783/invocation
+`ff8f7644f9d041bfb9b494d6760f5088`,collectionPID863786/invocation
+`b6b024156b5f4684b61eeae7372ee8f2`.
+
+Startup23:28:11.937 verifies all768 pins,357 bounded/full matching initial
+tensors,47 identical pre-update semantic events,correct cadence and609 finite
+supervised reports through6,872 actions. All47 reference events differ across
+seeds; this is descriptive,not a failure or causal initialization result. No
+cross-seed initial-value equality isrequired. The2.387s CPU startup wrapper
+co-hosts withtraining; retain its cost without correcting training wall time.
+
+Declaration SHA256
+`6301683e1e1f5f0907d4b99489b36abfcf7b5ee5f2091a66d7381d6a1d98c57d`.
+Keep the fixed200k/18,715/30min budget,100k/9,340 recovery andfour frozen arms.
+No final frozen result isavailable. Preserve the original main andobservers;
+do not restart oroverlap another GPU allocation. Bounded experience isnot reused.
+Fresh confirmation andthe five-game goal remain unfinished.

@@ -1,29 +1,31 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Qbert dynamics1e-4 seed14009 check](results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
-passes8192 actions/32,755 frames/733 updates in57.303s;1024 frozen/.865s haszero
-updates/no natural episodes. Conservative200k projection25m38.902s clears30min.
-All774 pins,357 initial-schema/invariant frozen tensors,finite reports,full
-pixel/action/label replay andhost guards pass. Original main/collector succeed
-23:24:04/23:24:09 UTC November1/source60f2142;no original stage fails orrepeats.
-A supplemental terminal-reader argument error andseparate2.091s correction
-remain recorded; original completion stays unchanged. No GPU allocation active.
+The [fresh Qbert dynamics1e-4 seed14009 confirmation](experiments/2026-11-01-cdp-qbert-dynamics1e4-seed14009-200k.md)
+launches23:27:17.442 UTC November1/source9cce545 with768 pins. MainPID863643/
+invocation80c3cd392a2c45e68c200e362ab6c00c andallfour original observers areactive.
+Startup23:28:11 passes357 bounded-matching initial tensors,47 matching pre-update
+semantic events,correct cadence and609 finite supervised reports through6872
+actions. The47 reference startup differences are expected across seeds;no
+cross-seed initial equality isclaimed. CPU startup wrapper2.387s is retained
+without wall-time correction. No final frozen outcome isavailable.
 
-The [separate fresh200k confirmation](experiments/2026-11-01-cdp-qbert-dynamics1e4-seed14009-200k.md)
-is CPU-qualified23:25:46 UTC:five commands,32 config/five teacher/eight mode/
-17 header/four observer/12 recovery cases,six retention/two collector fixtures,
-51 paths/19 scripts andfive direct-global checks pass in6.895s,zero native or
-emulator construction. Keep12M64/Auto/N8/B16/T16/H5/R24/dynamics1e-4/encoder-base
-4e-5/greedy/expert100;only seeds change from12011. Full budget200k/18,715/30min,
-100k/9,340 recovery,four actual-initial/final24-episode sampled/greedy arms.
-Greedy primary15k/90% gate staysfixed. No full learner launched at qualification.
-Root`/x/Temp/kindle-qbert-dynamics1e4-seed14009-20261101/full`. Check live state.
+Keep200k actions/18,715 updates/30-minute training cap,100k/9,340 recovery,and
+four final/actual-initial sampled/greedy24-episode assessments. Greedy primary
+15k/90% gate staysfixed. Only learner/evaluation seeds12011/4000012011→14009/
+4000014009 change at12M64/Auto/N8/B16/T16/H5/R24/dynamics1e-4/encoder-base4e-5/
+greedy/expert100; native447fe50/35ad0db,runner e161bf38 andteacherfa261c53 stayfixed.
+No experience reused. Root`/x/Temp/kindle-qbert-dynamics1e4-seed14009-20261101/full`;
+service`kindle-qbert-dynamics1e4-seed14009-200k-20261101`. Do not restart this
+learner,repeat completed stages orschedule another GPU job while it isactive.
 
-The preceding12011 result reachesgreedy15,471.875/24 in25m40s;sampled14,862.5
-misses15k. Its original main/collector remain failed after allfive GPU stages;
-separateCPU closure`complete_with_cpu_audit_repair` completes missing evidence.
-The new full controller explicitly verifies that provenance anddetects the old
-undefinedCONTROL error. No completed stages repeat. Five-game goal unfinished.
+The [bounded qualification and CPU checks](results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
+pass8192/733 in57.303s,conservative25m38.902s;all774 pins andoriginal main/collector
+pass. Full preparation passesfive commands,32 config cases andfive audit-global
+screens withzero native/emulator construction. The preceding12011 result passes
+greedy15,471.875/24 in25m40s;its original main/collector remain failed andseparate
+CPU closure`complete_with_cpu_audit_repair` supplies missing evidence. New source
+checks preserve that provenance. Supplemental bounded reader error/correction
+remain recorded. Fresh confirmation andthe five-game goal remain unfinished.
 
 The [completed Qbert dynamics-group1e-4 comparison](results/2026-11-01-cdp-qbert-dynamics1e4.md)
 finishes200k actions/799,807 frames/18,715 updates in25m40.027s (+.83% time).
