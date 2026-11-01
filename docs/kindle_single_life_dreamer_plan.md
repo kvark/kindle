@@ -1,15 +1,23 @@
 # Kindle: CDP learning roadmap
 
-The [selected bounded Qbert H5/R24 check](experiments/2026-11-01-cdp-qbert-h5-r24.md) tests whether shorter imagined
-rollouts and50% more world/expert updates fit the35-minute200k budget. Keep
-12M48/Auto/N8/B16/T16/encoder4e-5/greedy collection/expert100 on reused8039;
-native447fe50/runneraba4300d/teacher unchanged. The.877s CPU preflight passes
-bothCLI paths,15 config cases,357 shapes and359 control pins,withzero native/
-emulator construction. Require8192/733 updates,1024 frozen/zero updates,357
-matched initial/invariant frozen tensors,pre-update traces,replay and guards.
-Root`/x/Temp/kindle-qbert-h5-r24-20261101/native-check`;service
-`kindle-qbert-h5-r24-check-20261101`. No full learner or automatic promotion.
-Check live state;the five-game goal remains unfinished.
+The [fresh Qbert H5/R24 comparison](experiments/2026-11-01-cdp-qbert-h5-r24-200k.md) is separately selected after the
+bounded8192/733 check takes67.815s and projects30m21s conservatively below35min.
+Fresh200k/18,715 updates on reused8039,12M48/Auto/N8/B16/T16/encoder4e-5/
+greedy collection/expert100;only H15/R16→H5/R24,with joint cadence/sampling/
+warmup changes. Native447fe50/runneraba4300d/teacher fixed. Require100k/9340
+recovery,357 matched initial/invariant frozen tensors,paired actual initials,
+full replays/videos/guards and final/initial sampled/greedy24-episode arms against
+11,376.042 primary greedy/8,292.708 sampled. Full CPU preflight2.598s passes;
+no full frozen result exists. Root`/x/Temp/kindle-qbert-h5-r24-20261101/full`,
+service`kindle-qbert-h5-r24-200k-20261101`. Check live identity;do not restart
+or schedule another GPU job while active. No extension or automatic successor;
+the five-game goal remains unfinished.
+
+The completed bounded check retains390 pins,357 matching initial/invariant
+frozen tensors,47 matching pre-update events,733 finite reports,full replay and
+guards.1024 frozen/.809s haszero updates/no natural episodes. Main succeeds
+08:39:25 UTC November1/sourcea2b8387,collector08:39:58;zero failures/repeats.
+Do not rerun bounded stages or collection;the full learner reuses no experience.
 
 The [completed frozen Qbert cross-cohort diagnostic](results/2026-11-01-cdp-qbert-cross-cohort.md) keeps4013
 stronger on both cohorts:15,515.625/14,370.833 versus8039's11,578.125/11,376.042.
