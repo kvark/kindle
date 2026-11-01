@@ -38,6 +38,18 @@ no passed CPU/GPU stages repeat. Root`/x/Temp/kindle-qbert-25m-r16-20261101/full
 Check live state;do not restart,repeat stages or overlap GPU work. No extension
 or automatic successor;the five-game goal remains unfinished.
 
+The [existing centroid-target CPU reference](docs/results/2026-11-01-cdp-centroid-target-precision.md)
+has ball x/y MAE.058/.225 pixels on555 shared test rows,versus saved-head error
+5.461/5.206 against that target. Both target and earlier pixel decoder miss the
+same2/557 reference balls;target haszero extra detections versus4. The crop
+difference does not explain most of this old encoder6e-6 head error;GPU readback,
+current-model accuracy and gameplay causality remain unmeasured. All20,960
+recorded actions/83,799frames,2,064 prior pixel predictions,27 inputs and521 active
+Qbert inputs pass;originalPID821599/invocation stays. CPU-only11.769s completes
+17:00:05 UTC November1/source79701cc,zero GPU work,updates,failures or repeats.
+Retain CPU co-host time;no crop,loss or learner selected. Root
+`/x/Temp/kindle-centroid-target-precision-20261101`;complete,do not rerun.
+
 The [bounded Qbert25M/R16 check](docs/results/2026-11-01-cdp-qbert-25m-r16.md)
 completes8,192 actions/32,762frames/489updates in56.153s;1,024 frozen/1.159s
 haszero updates/no natural episodes. All501 inputs,357 derived/invariant tensors,

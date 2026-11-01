@@ -1,5 +1,18 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [existing centroid-target CPU reference](2026-11-01-cdp-centroid-target-precision.md)
+has ball x/y MAE.058/.225 pixels on555 shared test rows,versus saved-head error
+5.461/5.206 against that target. Both target and earlier pixel decoder miss the
+same2/557 reference balls;target haszero extra detections versus4. The crop
+difference does not explain most of this old encoder6e-6 head error;GPU readback,
+current-model accuracy and gameplay causality remain unmeasured. All20,960
+recorded actions/83,799frames,2,064 prior pixel predictions,27 inputs and521 active
+Qbert inputs pass;originalPID821599/invocation stays. CPU-only11.769s completes
+17:00:05 UTC November1/source79701cc,zero GPU work,updates,failures or repeats.
+Retain CPU co-host time;no crop,loss or learner selected. Root
+`/x/Temp/kindle-centroid-target-precision-20261101`;complete,do not rerun.
+
+
 The [saved Qbert training-phase diagnostic](../results/2026-11-01-cdp-qbert-training-phases.md)
 finds76–77% of collected actions after the first pyramid across three H5/R24
 learners,rising to87–89% in the final50k. Late native movement agreement is100%

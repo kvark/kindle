@@ -36,3 +36,12 @@ Qbert25M inputs and originalPID821599/invocation208ec1ae7b96453f927694fae11fa0ff
 before/after. Preserve Qbert training and observers; no overlapping GPU work.
 Retain CPU co-host time without correction. Preserve failures without replaying
 completed stages. Root`/x/Temp/kindle-centroid-target-precision-20261101`.
+
+## Completed execution
+
+The first CPU replay completes17:00:05 UTC November1/source79701cc in11.769s
+(11.876s wrapper). All27 inputs,521 active Qbert inputs and original identity
+pass,with all20,960 actions/83,799 frames and2,064 saved pixel predictions exact.
+No failure,GPU work,updates or repeated stage occurs. The [completed result](../results/2026-11-01-cdp-centroid-target-precision.md)
+reports target error.058/.225 pixels versus learned-head error5.461/5.206 against
+the target. No crop,loss or learner change is selected;do not repeat the analysis.

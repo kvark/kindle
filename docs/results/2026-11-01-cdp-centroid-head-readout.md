@@ -75,3 +75,9 @@ features come from `/x/Temp/kindle-centroid-representation-20261029/candidate`.
 See the [fixed protocol](../experiments/2026-11-01-cdp-centroid-head-readout.md)
 and [original representation study](2026-10-29-cdp-centroid-representation.md).
 Complete; do not repeat this analysis.
+
+The subsequent [fixed target-formula CPU diagnostic](2026-11-01-cdp-centroid-target-precision.md)
+measures.058/.225-pixel target error on the same555 rows and5.461/5.206 head error
+against that target. The crop difference does not explain most of this old
+head's error. Direct GPU target/head readback and current-model accuracy remain
+unmeasured;the earlier analysis and original gameplay failure stay unchanged.
