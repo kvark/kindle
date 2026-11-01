@@ -1,5 +1,12 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fixed Breakout response-history fit](2026-11-01-cdp-breakout-response-history.md)
+also fails its prediction screen:adding one earlier displacement/command lowers
+RMSE but raises MAE in both held-out-all and near-descending subsets. Keep the
+current teacher;no gameplay test follows. This rejects one linear mean-response
+model,not the prior ambiguity finding or all history/uncertainty approaches.
+All56 inputs and seven tests pass,CPU-only,withno active learner at completion.
+
 The [completed Breakout position-loss comparison](2026-11-01-cdp-centroid-encoder4e5.md)
 learns its auxiliary training target but lowers sampled-primary return56.292→35.542,
 while greedy rises104.667→112.750;all0/24 two-wall. Training costs21m47s,+1.50%.

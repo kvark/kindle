@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [completed six-feature Breakout response-history fit](results/2026-11-01-cdp-breakout-response-history.md)
+fails its fixed screen:held-out MAE1.976923→1.997426 overall and1.948802→1.958316
+near descending balls,despite lower RMSE. Six of eight lanes worsen MAE;recurrence
+radius.165412 is stable. Retain current teacher;no gameplay check,integration or
+learner follows. All37,448 original rows/splits and46,122 predictions reproduce;
+one F64 fit uses19,146 training interiors and13,102 held-out rows. Seven CPU tests,
+.138s preflight and56 input pins pass. Analysis.853s/controller1.087s completes
+11:55:03 UTC November1/source885f9d1. No active learner,native/emulator/GPU work,
+updates,failures or repeated fit. Root`/x/Temp/kindle-breakout-response-history-20261101`;
+complete,do not rerun. No alternate fit,sweep or automatic successor selected.
+
 The [completed centroid100/encoder4e-5 comparison](results/2026-11-01-cdp-centroid-encoder4e5.md)
 finishes200k/799,590frames/12,477updates in21m47s,+1.50% observed training time.
 Sampled35.542 versus56.292 falls36.86%;greedy112.750 versus104.667 rises7.72%.
