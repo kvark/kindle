@@ -1,7 +1,8 @@
 # Fixed frozen Breakout temperature assessment
 
-This is **CPU preparation only**. Qbert H5/R24 remains active. No Breakout
-assessment, GPU queue or service has been selected or launched.
+After Qbert H5/R24 completes its original and supplemental audits, separately
+select one frozen Breakout assessment under the fixed protocol below. This
+selection adds no learner or training allocation.
 
 The retained encoder4e-5 learner scores 56.292 with sampled actions and 104.667
 with greedy actions after 200k actions / 12,477 updates in 21m28s. Both have zero
@@ -67,3 +68,18 @@ Proposed service: `kindle-breakout-temperature-20261101`.
 | Exact runner | `abc2c2be23ef4c8c9b90e308a1d5a71a9e5201babebe29bd256e1f2395fe68fb` |
 | Controller | `65869ade83a52d557f68474ff0d9a2e11a30a6ae232dd68387ec6c871b0547b0` |
 | Preparation/closure | `5001434ecb73b35347886fc4bb33c2be540e1b6923681465038cdb73a608fcee` |
+
+## Separate selection after Qbert closure
+
+Qbert's six services finish successfully, with independent terminal confirmation
+at09:23:42 UTC November1. Its accepted greedy15,430.208/24-pyramid result and all
+audit receipts are recorded separately. The host is checked idle before this
+selection, and the 337 prepared inputs are revalidated without rerunning the
+passing CPU qualification.
+
+Select the four fixed frozen arms to test whether temperature0.5 improves on
+the retained greedy104.667 point at unchanged training cost. Keep every setting,
+cap and rejection rule above. The source/runtime difference requires exact
+default-sampled compatibility in both final and actual-initial arms. No result
+is available at selection. Stop at any failed arm or audit; no retry, broader
+temperature sweep, new learner or automatic successor is selected.
