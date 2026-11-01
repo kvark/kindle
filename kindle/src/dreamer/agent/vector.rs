@@ -491,6 +491,25 @@ impl VectorCore {
         Some(report)
     }
 
+    fn policy_inputs_and_logits(&mut self) -> Result<(Vec<f32>, Vec<f32>), &'static str> {
+        if self
+            .streams
+            .iter()
+            .any(|stream| !stream.active || stream.pending_action.is_none())
+        {
+            return Err("policy readback requires a pending action in every stream");
+        }
+        let rows = self.streams.len();
+        let config = &self.learner.config;
+        let mut features = vec![0.0; rows * config.feature_dim()];
+        let mut logits = vec![0.0; rows * config.action_count];
+        self.learner.readback.read_regions(&mut [
+            (self.policy.input_buffer("feature").unwrap(), &mut features),
+            (self.policy.output_buffer(0).unwrap(), &mut logits),
+        ]);
+        Ok((features, logits))
+    }
+
     fn behavior_predictions(&mut self) -> Result<(Vec<f32>, Vec<f32>), &'static str> {
         if self
             .streams
@@ -1041,6 +1060,13 @@ impl VectorDreamerAgent {
     /// selected actions. Call after act, before observe. No RNG or state update.
     pub fn behavior_predictions(&mut self) -> Result<(Vec<f32>, Vec<f32>), &'static str> {
         self.core.behavior_predictions()
+    }
+
+    /// Read the exact live actor inputs and raw logits after act, before observe.
+    /// Both arrays are row-major by stream; logits precede temperature and unimix.
+    /// This only copies existing buffers: no forward pass, RNG or state update.
+    pub fn policy_inputs_and_logits(&mut self) -> Result<(Vec<f32>, Vec<f32>), &'static str> {
+        self.core.policy_inputs_and_logits()
     }
 
     /// Select each posterior category's mode without consuming posterior RNG.
@@ -1832,6 +1858,86 @@ mod tests {
             assert!(rejected.is_err());
         }
         assert_eq!(agent.learner().learner_step(), 0);
+    }
+
+    #[test]
+    #[ignore = "requires GPU; exact live actor buffers and readback state invariance"]
+    fn tiny_policy_readback_preserves_live_state_and_action_rng() {
+        let mut config = DreamerConfig::tiny(3);
+        config.train_ratio = 0.0;
+        let mut agent = FeatureVectorAgent::new(config.clone(), 3).unwrap();
+        assert!(agent.core.policy_inputs_and_logits().is_err());
+        agent.begin_episodes((0..3).map(|id| (id, observation(id, 0))).collect());
+        assert!(agent.core.policy_inputs_and_logits().is_err());
+        let rngs = |core: &VectorCore| {
+            core.streams
+                .iter()
+                .map(|stream| {
+                    (
+                        stream.policy_rng.clone().random::<u64>(),
+                        stream.posterior_rng.clone().random::<u64>(),
+                        stream.pending_action,
+                    )
+                })
+                .collect::<Vec<_>>()
+        };
+        for step in 0..3 {
+            let actions = match step {
+                0 => agent.act(ActionMode::Greedy),
+                1 => agent.act(ActionMode::Sample),
+                _ => agent
+                    .core
+                    .act_with_overrides(ActionMode::Greedy, &[Some(2); 3])
+                    .unwrap(),
+            };
+            let before_rng = rngs(&agent.core);
+            let before_counters = (
+                agent.learner().environment_step(),
+                agent.learner().learner_step(),
+                agent.learner().replay_len(),
+            );
+            let snapshot = agent.core.policy_inputs_and_logits().unwrap();
+            assert_eq!(snapshot.0.len(), 3 * config.feature_dim());
+            assert_eq!(snapshot.1.len(), 9);
+            assert!(snapshot.0.iter().chain(&snapshot.1).all(|v| v.is_finite()));
+            assert_eq!(snapshot, agent.core.policy_inputs_and_logits().unwrap());
+            assert_eq!(before_rng, rngs(&agent.core));
+            assert_eq!(
+                before_counters,
+                (
+                    agent.learner().environment_step(),
+                    agent.learner().learner_step(),
+                    agent.learner().replay_len(),
+                )
+            );
+            assert_eq!(
+                snapshot.0,
+                (0..3)
+                    .flat_map(|id| agent.core.feature(id))
+                    .collect::<Vec<_>>()
+            );
+            if step == 0 {
+                assert_eq!(
+                    actions,
+                    snapshot.1.chunks(3).map(argmax).collect::<Vec<_>>()
+                );
+            } else if step == 2 {
+                assert_eq!(actions, vec![2; 3]);
+            }
+            agent.observe(
+                (0..3)
+                    .map(|id| {
+                        (
+                            id,
+                            observation(id, step + 1),
+                            FrameFlags::default(),
+                            Reward::default(),
+                        )
+                    })
+                    .collect(),
+            );
+            assert!(agent.core.policy_inputs_and_logits().is_err());
+        }
     }
 
     #[test]

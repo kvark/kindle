@@ -179,6 +179,14 @@ impl PyVectorAgent {
             .map_err(PyValueError::new_err)
     }
 
+    /// Exact row-major actor inputs and raw logits, after act and before observe.
+    /// Logits precede temperature and unimix; this only copies existing buffers.
+    fn policy_inputs_and_logits(&mut self) -> PyResult<(Vec<f32>, Vec<f32>)> {
+        self.inner
+            .policy_inputs_and_logits()
+            .map_err(PyValueError::new_err)
+    }
+
     fn observe(
         &mut self,
         streams: Vec<usize>,
