@@ -1,5 +1,9 @@
 # Prepared exact batched actor readout on retained Breakout failure trajectories
 
+**Complete:** [original capture and analysis](../results/2026-11-01-cdp-breakout-policy-readback.md)
+pass, with37,016 original actions reproduced,zero updates and268 unchanged pins.
+The fixed protocol and launch history below remain preserved. No successor is selected.
+
 Prepare a frozen diagnostic of the stronger encoder4e-5 actor's actual original
 decisions. The completed scalar feature probes use different posterior draws,
 and the pixel-augmented action readout fails its screen. Neither establishes
@@ -104,3 +108,9 @@ launches20:57:55.126 withPID845612/invocation831e211938b14d1da284cdefb14e46c6.
 The256-action prefix passes in4.510s with357 invariant tensors,zero updates,
 all original actions, and128 CPU/native probability comparisons (max9.22e-7).
 Full capture and terminal collection remain pending. Do not restart or overlap.
+
+Original service succeeds20:58:35.048 UTC; CPU terminal collection completes
+20:58:53.597. Full capture30.672s andanalysis.074s pass; all268 pins,357 invariant
+tensors perstage,exact prefixes/trajectories andguards pass. No failure or repeat.
+Completion SHA256 `63c339a048122366e1757e61e3f45fd16ec7994f298535bd25ecbe9269db5703`.
+See the result for fixed probability measurements and their interpretation limits.

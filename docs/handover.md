@@ -19,17 +19,22 @@ CPU co-host timings remain without correction. Root
 No Kindle service or GPU allocation is active at closure. The five-game goal
 remains unfinished;check live state before the separately selected diagnostic.
 
-The [exact Breakout batched-policy capture](experiments/2026-11-01-cdp-breakout-policy-readback.md) launches20:57:55 UTC November1,
-after Qbert's original terminal completion and an idle-host check. Source8481d9c,
-268 pins,PID845612/invocation831e211938b14d1da284cdefb14e46c6;service
-`kindle-breakout-policy-readback-20261101`. The256-action prefix passes4.510s,
-128 F64/native probabilities differ by atmost9.22e-7,all original actions match,
-and357 tensors remain invariant withzero updates. Full37,016-action capture
-andoriginal terminal collection remain pending. No learner or native build.
-Preserve12M64/encoder4e-5/.01unimix;reuse qualified readoutf864fe4b. Fixed120
-life-clipped windows/3,816 unique rows and31,161 selected decisions. Six CPU
-fixtures/264 preparation pins previously pass6.385s;retain co-host timing.
-Root`/x/Temp/kindle-breakout-policy-readback-20261101`;do not restart or overlap.
+The [completed exact Breakout policy capture](results/2026-11-01-cdp-breakout-policy-readback.md) reproducesall37,016 actions/
+148,038frames in30.672s,zero updates. Across12,763 disagreements on31,161
+selected decisions,mean chosen/teacher probabilities are.634/.228;2,713 teacher
+commands getbelow.1. The120 life-clipped windows/3,816 rows show similar.634/.224
+on1,378 disagreements. Sustained earlier teacher rescue108/120 does not prove
+individual labels optimal or identify a loss change. Final window actions areall
+FIRE;do not interpret late aggregate agreement as improved paddle control.
+
+All268 pins,357 invariant tensors perstage,115 repeated readbacks,128 F64/native
+probabilities (max9.22e-7),exact smoke/full prefixes,pixels/outcomes/lives andguards
+pass. Eight final output images remain unrecorded. Six CPU fixtures pass;analysis
+.074s. Original service succeeds20:58:35/collection20:58:53 UTC November1,
+source8481d9c,PID845612/invocation831e211938b14d1da284cdefb14e46c6. No failure,
+build,retry,learning or repeated stage. Root`/x/Temp/kindle-breakout-policy-readback-20261101`
+is complete;do not rerun. No successor selected orGPU allocation active atclosure.
+The five-game goal remains unfinished;check live state before further work.
 
 The [fixed current-pixel action readout](results/2026-11-01-cdp-breakout-pixel-action-readout.md) fails its screen:
 learned+pixel kernel57.40% overall/55.15% near-descending teacher agreement,
