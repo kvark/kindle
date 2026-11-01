@@ -71,3 +71,41 @@ remains unfinished.
 | Raw components |`1ddbad15398fded48d74ffe65b1170609f868fc4a17e5f84ce784048c57b606e`|
 | Pooled observations |`801790c84883becde41779737d6ba35fa6a2fc56e302017a1ed8029047a482bc`|
 | Completion |`e26f3723cfc6dcf1dbc51655bfb971b5b3023318454e9a6374052d22c492592f`|
+
+## The existing right-edge rule does fire at extreme clipped observations
+
+A separate CPU join of the retained annotations completes at **19:13:14 UTC
+on November 1**, in .771s. It uses all 208,254 raw annotations and the same
+42,303 selected decisions, without another emulator replay or model fit.
+Require identical last-two cropped raw components, agreement with the logged
+teacher center, and zero logged pooled displacement (absolute value < .01).
+This identifies 9,594 matched stationary observations: 6,147 interior, 1,425
+touching the left crop and 2,022 touching the right crop.
+
+The original observed-state predicate (`x <= 16 or x >= 147`) fires on all
+1,425 left rows and 1,746 right rows. The latter include 1,743 rows with cropped
+width 8 and center 147.5, plus three width-9 rows at 147.0. Thus cropping does
+**not** prevent the original rule from firing at the extreme observed position.
+
+Another 276 stationary right-crop rows fall below the threshold: 72 at x146.5,
+139 at x146.0, six at x144.5, seven at x144.0 and 52 at x143.5. These are visible
+stationary components, not verified physical hard stops. Their existence does
+not justify widening the edge condition. The response rule also applies to
+simulated future states, which this observed-state join does not assess.
+
+The remaining selected decisions are 24 initial observations, 27,942 changing
+raw pairs, 4,725 with nonzero pooled displacement and 18 teacher/component
+disagreements. All counts reconcile; all six inputs remain unchanged. Per-lane
+counts and every untriggered cropped row are retained. No native/emulator
+imports, GPU work, policy change or new gameplay score occurs. The original
+full-width detector rejection and teacher remain unchanged.
+
+Evidence: `/x/Temp/kindle-breakout-edge-observation-20261101`.
+Declaration SHA `c31b2c24f7ac4c390f257cde77e072829ab389de63918b45f6674b526b13fdd4`;
+review SHA `e1770eabd815f044f8c4f63ba12f7ae72cc646e5c662fe41446b0e3350208bae`;
+row SHA `69136049b38ea7dad7ca897d0418530578143c3faa90205746e250dd2361b986`.
+This join is complete and should not be rerun.
+
+The separately selected [command-conditioned response fit](../experiments/2026-11-01-cdp-breakout-command-response.md)
+tests response prediction on existing episode-separated rows. It changes
+neither the detector nor this interpretation and selects no GPU learner.
