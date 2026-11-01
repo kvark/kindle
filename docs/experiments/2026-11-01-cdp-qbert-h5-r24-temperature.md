@@ -54,3 +54,23 @@ Keep failed attempts with their exact sources;do not repeat passing qualificatio
 Root `/x/Temp/kindle-qbert-h5-r24-temperature-20261101`;prospective service
 `kindle-qbert-h5-r24-temperature-20261101`. Current Breakout remains the sole
 Kindle GPU allocation. The five-game goal is unfinished.
+
+## CPU qualification complete; still unselected
+
+Preflight passes **13:22:10 UTC November1**,sourcef2d8c56,in15.502s/15.602s
+wrapper. Four actual CLI paths and32 valid/invalid headers pass. All four
+retained frozen arms,their scores,357 finite/invariant tensors,replay receipts,
+videos and guards are re-audited on CPU without a new emulator replay. All550
+prepared inputs and315 active Breakout inputs pass;originalPID798240/invocation
+cc7e1c87ac4b478ab8d9f23644a5fa65 remain unchanged. Two historical runner references
+resolve to the same exactabc2c2b bytes from Git,with both revisions recorded.
+
+Native/emulator construction sentinels recordzero attempts;no native module,
+queue,declaration,service,updates,failure or repeated qualification occurs. Keep
+CPU co-host timing without correction. Do not rerun this passing preflight.
+A future selection still requires completed Breakout audits,all five original
+services terminal,an idle Kindle host,unchanged inputs and a separate selection
+section in this protocol. No Qbert GPU allocation or automatic successor exists.
+
+PreflightSHA256`0361d838dfe20d91ca9e3560d80b49e60e36e5120ac4382a372089aebfcd4ee7`;
+execution`f8afcc8861695b72a698a78a01c78c2011054f54acfe19be43f458bfc53289cc`.

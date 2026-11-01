@@ -26,8 +26,10 @@ cc7e1c87ac4b478ab8d9f23644a5fa65. Root`/x/Temp/kindle-breakout-r8-20261101/full`
 service`kindle-breakout-r8-400k-20261101`. All four observers are active.
 Startup13:15:03 passes315 pins,357 control/bounded-matching tensors,47 pre-update
 transitions,correct cadence and251 finite supervised reports through8,408 actions.
-No full frozen result exists. Inspect this original process;do not restart it or
-allocate concurrent GPU work. Full CPU qualification and.107s plot import pass;
+First recovery passes13:20:35 at100k/3,114 with357 finite tensors;four audited
+files/206,067,153 bytes are retained in.305s with matching hashes/source unchanged.
+Recovery continues for200k/300k;do not repeat completed retention. No full frozen
+result exists. Inspect this original process;do not restart or allocate concurrent GPU work. Full CPU qualification and.107s plot import pass;
 the original control-path CPU failure remains preserved. Do not repeat checks.
 
 Keep12M64/Auto/N8/B16/T16/H15/encoder4e-5/expert100/native447fe50/runner6c1b69fb.
@@ -43,6 +45,12 @@ natural episodes. Conservative400k projection26m01s passes35min. All259 pins,
 357 matching/invariant tensors,47 pre-update events,finite reports,full guided
 replay and guards pass. Main13:02:45/collector13:03:34 UTC November1/source479f4c1;
 terminal,no failures or repeats. Do not rerun the check,collector or preflight.
+
+The [Qbert R24 temperature harness](docs/experiments/2026-11-01-cdp-qbert-h5-r24-temperature.md)
+is CPU qualified but unselected:four CLI/32 header cases,550 inputs/315 active
+Breakout pins and all retained frozen evidence pass13:22:10 in15.502s. No native/
+emulator construction,queue,declaration or service. Review only after Breakout
+closure;do not repeat preflight or promote automatically.
 
 The [completed Qbert R32 comparison](docs/results/2026-11-01-cdp-qbert-h5-r32-greedy.md)
 finishes200k/24,954updates in34m59.741s,+22.53% versus R24. Greedy14,057.292/23

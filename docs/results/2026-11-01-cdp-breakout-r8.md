@@ -82,3 +82,19 @@ passed checks or allocate concurrent GPU work. Require the three recoveries and
 all four fixed assessments. No extension,ratio retry or automatic successor.
 
 DeclarationSHA256`f40018a4b6ae48a09cb718435de5637d452336af1006e6cf331b1c60a2e1d542`.
+
+## First recovery retained
+
+The original recovery observer passes **13:20:35 UTC November1** at100,000
+actions/3,114 updates with357 finite tensors. Its complete log prefix verifies
+3,215 finite reports through103,256 actions. The same observer preserves all
+four files/206,067,153 bytes under`recovery-100k` in.305s copying time,with matching
+metadata/tensor hashes and unchanged source bytes/stat timestamps. No restore,
+learner update or GPU stage is repeated. The observer remains active for200k
+and300k;do not repeat the completed audit or retention.
+
+MetadataSHA256`0d52ea3d3553a2c3d23615fc2df7cae4a903c47a06d813730fc89e39ceb15811`,
+audit`fa67c1bba313d82f58e54031ca127fa2cabf46c545ce6162a588f45e736e5388`,
+retention`1cbde50cb59349c8c0f3f964b3c6fec27fce8de50d658dc0e8f6e2db531d3f1e`.
+Weights/metadata omit replay,belief,games and RNG;this is not uninterrupted
+training recovery. Retain CPU co-host time without wall-time correction.

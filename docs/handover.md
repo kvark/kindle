@@ -37,8 +37,22 @@ passes357 control/bounded-matching tensors,47 pre-update transitions,correct
 cadence and251 finite supervised reports through8,408 actions. No full frozen
 result exists. Do not repeat qualification,startup or prior stages. Root
 `/x/Temp/kindle-breakout-r8-20261101/full`;service`kindle-breakout-r8-400k-20261101`.
-Check this original process;do not restart or allocate concurrent GPU work.
-No extension,ratio retry or automatic successor;gameplay benefit is unmeasured.
+First recovery passes13:20:35 at100k/3,114 with357 finite tensors;complete prefix
+3,215 reports/103,256 actions. All four files/206,067,153 bytes are retained in
+.305s copying time with matching hashes/source unchanged. Observer continues
+for200k/300k;do not repeat completed recovery/retention. Check this original
+process;do not restart or allocate concurrent GPU work. No extension,ratio
+retry or automatic successor;gameplay benefit is unmeasured.
+
+The [Qbert H5/R24 temperature harness](experiments/2026-11-01-cdp-qbert-h5-r24-temperature.md)
+is CPU qualified but unselected. Four CLI/32 header cases,all550 inputs/315 active
+Breakout pins and all four retained frozen arms/tensors/replays/videos/guards
+pass13:22:10 UTC/sourcef2d8c56 in15.502s (15.602s wrapper). Two old runner
+references resolve to exact Git bytes. No native/emulator construction,new
+replay,queue,declaration,service,failure or repeated qualification. Retain co-host
+time;do not repeat preflight. A possible fixedtemperature0.5 assessment of the
+retained10007 H5/R24 learner requires separate selection only after Breakout
+closure and an idle host. Root`/x/Temp/kindle-qbert-h5-r24-temperature-20261101`.
 
 The [fixed Breakout upper-crop reference](results/2026-11-01-cdp-breakout-crop70.md)
 leaves all eight returns unchanged:mean185.375,zero two-wall successes. The
