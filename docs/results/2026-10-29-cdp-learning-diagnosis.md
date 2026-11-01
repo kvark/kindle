@@ -17,7 +17,9 @@ original15k/90% gate; it does not isolate why collection changed performance.
 Launch07:04:25 UTC November1/sourcecbee206,359 pins,originalPID760870/invocation
 `a0b219d7702b4c82a65e9b33498c3544`;observers active. Startup1.032s passes357
 finite initial tensors,48 recorded seed differences and105 finite reports
-through2056 actions. No frozen outcome yet;do not restart or overlap GPU work.
+through2056 actions. Original100k/6227 recovery passes07:18:30 UTC with357 finite
+tensors;separate.888s confirmation07:18:43 preserves exact metadata,359 pins and
+original process identity. No frozen outcome yet;do not restart or overlap GPU work.
 
 The [completed Breakout first-disagreement intervention](2026-11-01-cdp-breakout-first-disagreement.md)
 finds102 both/six teacher-only/six policy-only/six neither survive at the original

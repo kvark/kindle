@@ -12,6 +12,15 @@ QbertPID760870/invocationa0b219d7702b4c82a65e9b33498c3544 remains unchanged;
 retain CPU timing. Root`/x/Temp/kindle-breakout-delayed-takeover-20261101`;
 complete,do not rerun. No new learner,loss or successor is selected.
 
+An unselected Breakout greedy-collection check is prepared under
+`/x/Temp/kindle-breakout-greedy-training-20261101/native-check`. Its.648s CPU
+preflight passes two actual CLI paths,13 configuration/five mode cases,357 schema
+tensors and227 control pins. Exact qualified runneraba4300d/native447fe50;only live
+collection would change. No trial,queue,declaration or service exists. The private
+`protocol-draft.md` and `preparation-review.json` preserve scope and359 active Qbert
+pins/identity. Selection requires complete8039 replay/collection/independent
+terminal confirmation and an idle host;it is not an automatic next allocation.
+
 The [fresh Qbert seed8039 check](experiments/2026-11-01-cdp-qbert-greedy-seed8039.md) selects one independent learner of the
 passing greedy-collection recipe:200k/12,477 updates under35min,100k/6227 recovery,
 and four final/actual-initial24-episode arms. Keep12M48/Auto/N8/B16/T16/H15/R16/
@@ -25,7 +34,10 @@ GPU qualification. Root`/x/Temp/kindle-qbert-greedy-seed8039-20261101/full`,serv
 November1/sourcecbee206,359 pins,mainPID760870/invocation
 `a0b219d7702b4c82a65e9b33498c3544`;all four observers active. Startup1.032s
 passes357 finite initial tensors,48 recorded seed differences,correct cadence
-and105 finite supervised reports through2056 actions. No frozen result yet.
+and105 finite supervised reports through2056 actions. Original100k/6227 recovery
+passes07:18:30 UTC,357 finite tensors and6,337 finite reports through101,768
+actions. Separate.888s CPU confirmation07:18:43 preserves exact recovery metadata,
+all tensor hashes,359 pins and original identity. Do not rerun it. No frozen result yet.
 Retain CPU co-host timing;check this original service before work. Do not restart
 or overlap GPU jobs. No retry,extension,cap increase,seed campaign or automatic
 successor. Goal unfinished.

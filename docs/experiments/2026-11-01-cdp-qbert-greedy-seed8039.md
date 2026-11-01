@@ -100,5 +100,25 @@ service identities, plus the actual8039 header and48 initial tensor differences.
 Four journal and four negative seed-pair fixtures pass without native/emulator
 imports. The qualified scriptSHA256 is
 `2cb6414f6791370083b373ac1004d346cd705a7aa79bb45135b84efc36a57b69`.
-Use recovery mode only after the original100k observer completes, and final mode
-only after all original services finish; neither mode has run yet.
+Recovery mode completes below after the original100k observer. Use final mode
+only after all original services finish; it has not run yet.
+
+## Halfway recovery verified
+
+The original recovery observer succeeds07:18:30 UTC November1 at100,000 actions /
+6,227 updates,with357 finite tensors. Its complete-log-prefix check verifies6,337
+finite reports through101,768 actions while the original learner continues.
+
+Independent CPU confirmation passes in.888s at07:18:43. It preserves all359 pinned
+inputs,originalPID760870/invocationa0b219d7702b4c82a65e9b33498c3544,exact
+configuration/greedy header and all three checkpoint tensor-file hashes. Exact
+100k metadata is saved as `recovery-metadata-100k.json`, SHA256
+`657b61f6564990997f5006648598a9525e60940638c14e92c1350ea6c04d4e8e`.
+Recovery reviewSHA256`ee0b5c01899a6de1f08f0715610f95ddddbbe689ae9da1411b8a24a930b1d2c7`.
+No GPU work or learner restart occurs; do not repeat this confirmation.
+
+The completed55.638s CPU Breakout delayed-takeover diagnostic and the.648s
+unselected Breakout collection-check preflight co-host with training;retain CPU
+timing without correction. The latter creates no trial,queue,declaration or
+service. No new GPU allocation is selected. Final frozen task quality remains
+unmeasured; keep the original learner and its remaining observers running.

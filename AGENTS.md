@@ -45,7 +45,10 @@ GPU qualification. Root`/x/Temp/kindle-qbert-greedy-seed8039-20261101/full`,serv
 November1/sourcecbee206,359 pins,mainPID760870/invocation
 `a0b219d7702b4c82a65e9b33498c3544`;all four observers active. Startup1.032s
 passes357 finite initial tensors,48 recorded seed differences,correct cadence
-and105 finite supervised reports through2056 actions. No frozen result yet.
+and105 finite supervised reports through2056 actions. Original100k/6227 recovery
+passes07:18:30 UTC,357 finite tensors and6,337 finite reports through101,768
+actions. Separate.888s CPU confirmation07:18:43 preserves exact recovery metadata,
+all tensor hashes,359 pins and original identity. Do not rerun it. No frozen result yet.
 Retain CPU co-host timing;check this original service before work. Do not restart
 or overlap GPU jobs. No retry,extension,cap increase,seed campaign or automatic
 successor. Goal unfinished.
