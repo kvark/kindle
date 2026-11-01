@@ -38,6 +38,16 @@ No extension,cap increase,third learner or automatic successor selected.
 No active learner/GPU allocation at closure;check live state before work.
 The five-game goal remains unfinished.
 
+Next prepare the [bounded centroid100/encoder4e-5 check](docs/experiments/2026-11-01-cdp-centroid-encoder4e5.md) using the existing
+qualified2974160 runtime and centroid runner;no rebuild. Keep the stronger
+12M64/B16/T16/H15/R16/expert100 recipe and current teacher. Fix8192/489 plus1024
+frozen,372-tensor corrected schema and conservative200k projection≤30min.
+This tests the old position loss in the more responsive encoder regime;earlier
+centroid protocol failure and negative teacher variants remain. No preflight,
+queue,declaration or GPU job exists at protocol preparation. Require complete
+CPU qualification and idle host before selection;no full learner or automatic
+successor is selected. Root`/x/Temp/kindle-centroid-encoder4e5-20261101/native-check`.
+
 The [completed CPU Breakout settling-cost check](docs/results/2026-11-01-cdp-breakout-edge-settling.md) lowers the retained
 edge-reset teacher185.375→80.375 on eight reused episodes,withonly2/8 lanes
 improving andzero two-wall successes. Retain the existing teacher;the fixed
