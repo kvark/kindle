@@ -1,12 +1,16 @@
 # Kindle: CDP learning roadmap
 
-The [CPU delayed Breakout takeover](experiments/2026-11-01-cdp-breakout-delayed-takeover.md) is selected:all120 retained loss
-windows, fixed2/4/8/16-action delays,478 eligible teacher branches,matched original
-loss endpoints. Reuse0/1 baselines;keep two pre-takeover losses in the denominator.
-21 CPU tests/3.093s preflight pass332 diagnostic/359 active Qbert pins,zero
-native/emulator imports.180s/195s caps;no new outcome or GPU allocation yet.
-Original QbertPID760870/invocationa0b219d7702b4c82a65e9b33498c3544 continues;
-retain CPU timing. Root`/x/Temp/kindle-breakout-delayed-takeover-20261101`.
+The [completed CPU delayed Breakout takeover](results/2026-11-01-cdp-breakout-delayed-takeover.md) records survival
+108/108/110/106/105/91 of120 at delays0/1/2/4/8/16 actions from first disagreement.
+Most early sequences remain recoverable under the teacher;later takeover reduces
+aggregate rescue,with nonmonotonic cases. No architectural cause or game score.
+All478 new branches,37,016 source actions/148,038 frames,suffixes,eight reverse
+checks,334 diagnostic/359 active Qbert pins and21 CPU tests pass.55.638s analysis /
+57.311s controller closes07:12:23 UTC November1/sourcec9fbf9f.240 retained baseline
+branches do not repeat;zero native/GPU work,updates,failures or retries. Original
+QbertPID760870/invocationa0b219d7702b4c82a65e9b33498c3544 remains unchanged;
+retain CPU timing. Root`/x/Temp/kindle-breakout-delayed-takeover-20261101`;
+complete,do not rerun. No new learner,loss or successor is selected.
 
 The [fresh Qbert seed8039 check](experiments/2026-11-01-cdp-qbert-greedy-seed8039.md) selects one independent learner of the
 passing greedy-collection recipe:200k/12,477 updates under35min,100k/6227 recovery,

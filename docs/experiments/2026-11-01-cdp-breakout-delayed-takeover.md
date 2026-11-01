@@ -61,3 +61,18 @@ zero two-wall successes.
 Root `/x/Temp/kindle-breakout-delayed-takeover-20261101`. At selection, no new
 branch outcome exists. Qbert continues under its original bounded services;
 do not restart it or schedule overlapping GPU work.
+
+## Completed diagnostic
+
+The [completed result](../results/2026-11-01-cdp-breakout-delayed-takeover.md)
+records survival108/108/110/106/105/91 of120 at delays0/1/2/4/8/16. Two cases
+are already lost before16; none is excluded. Between8 and16,paired outcomes
+are84 both/21 earlier-only/seven later-only/eight neither. Most early command
+sequences remain recoverable under the teacher;later takeover reduces aggregate
+rescue,with nonmonotonic exceptions. No architectural cause is identified.
+
+All478 new branches,37,016 source actions/148,038 frames,recorded suffixes,eight
+reverse-order checks,334 diagnostic/359 active Qbert pins pass. Analysis55.638s /
+controller57.311s closes07:12:23 UTC November1/sourcec9fbf9f. The240 retained
+baseline branches do not repeat. Original Qbert process identity stays unchanged;
+zero native/GPU work,updates,failures or retries. No successor is selected.

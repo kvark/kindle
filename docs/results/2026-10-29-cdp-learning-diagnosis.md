@@ -1,10 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [selected CPU delayed-takeover diagnostic](../experiments/2026-11-01-cdp-breakout-delayed-takeover.md)
-keeps all120 Breakout loss windows and tests2/4/8/16 recorded actions before the
-same teacher takes over. Matched original endpoints and retained0/1 baselines
-separate further recorded control from a single early command.21 tests/preflight
-pass;no new branch outcome exists yet. Qbert8039 continues without GPU overlap.
+The [completed delayed-takeover diagnostic](2026-11-01-cdp-breakout-delayed-takeover.md)
+finds105/120 losses remain avoidable after eight recorded actions and91/120 after
+sixteen,versus108 immediate. Between8 and16,the pairs are84 both/21 earlier-only/
+seven later-only/eight neither. Most early sequences remain recoverable;later
+control remains a useful focus,but the nonmonotonic teacher outcomes identify
+no architectural cause. All478 new branches,37,016 source actions,334 diagnostic/
+359 active Qbert pins,21 tests and source/branch invariants pass in55.638s CPU,
+closing07:12:23 UTC/sourcec9fbf9f.240 baseline branches do not repeat;zero GPU
+work or updates. Original Qbert8039 identity stays unchanged;no successor selected.
 
 The [fresh8039 confirmation](../experiments/2026-11-01-cdp-qbert-greedy-seed8039.md)
 keeps the passing greedy-collection recipe fixed and changes learner/evaluation
