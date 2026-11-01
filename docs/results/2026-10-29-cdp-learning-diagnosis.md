@@ -1,5 +1,25 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed Qbert25M/R16 comparison](2026-11-01-cdp-qbert-25m-r16.md)
+finishes200k actions/799,786frames/12,477 updates in23m40.953s,17.08% less time
+than12M/H5/R24. Primary greedy14,339.583→10,696.875 falls25.40%;sampled
+13,761.458→11,967.708 falls13.03%;all24/24 first pyramids,both candidate means
+miss15k. Own initials39.583/173.958 clear none and differ across capacities.
+Own-initial-subtracted return/minute falls10.36% greedy and rises4.66% sampled.
+Retain12M/H5/R24 and the faster teacher;no larger-recipe promotion or extension.
+All521 inputs,357 bounded-matching/invariant tensors,retained100k/6,227 recovery,
+full replays/videos,guards,curves,coverage,exposure,comparison and original
+collector pass. All five services succeed:main17:25:24/post17:25:48/collection
+17:25:55 UTC November1/source65f4cee. Original CPU selection/blocked-launch
+failures and one-basename repair remain;no GPU or completed-stage repeat.
+Capacity,initialization,ratio,total work and teacher CPU cost change together;
+no isolated cause or reliability. Actual48,158 overrides (24.079%) are not
+frozen competence. CPU co-host caveats remain without correction. Root
+`/x/Temp/kindle-qbert-25m-r16-20261101/full`;complete,do not rerun. No Kindle
+service or GPU allocation remains active. No retry,confirmation or automatic
+successor selected;the five-game goal remains unfinished. Check live state.
+
+
 The [existing centroid-target CPU reference](2026-11-01-cdp-centroid-target-precision.md)
 has ball x/y MAE.058/.225 pixels on555 shared test rows,versus saved-head error
 5.461/5.206 against that target. Both target and earlier pixel decoder miss the

@@ -1,24 +1,23 @@
 # CDP handover — October25,2026
 
-The [fresh Qbert25M/R16 comparison](experiments/2026-11-01-cdp-qbert-25m-r16-200k.md)
-launches16:54:11 UTC November1/source65f4cee with521 declared inputs. Startup
-passes16:54:28:357 initial tensors/47 pre-update transitions match the bounded
-25M check,correct cadence and96 finite supervised reports through1,912 actions.
-All47 cross-capacity control transitions differ;own actual initials are required.
-Fix200k/12,477 updates/35min,retained100k/6,227 recovery and four final/actual-
-initial24-episode greedy-primary/sampled arms against14,339.583/13,761.458.
-MainPID821599/invocation208ec1ae7b96453f927694fae11fa0ff continues. Recovery
-passes17:06:17 UTC at100k/6,227,all357 finite tensors/four retained files verified;
-its observer succeeds. Progress,postprocessing and terminal collection stay
-active. No frozen result yet.
-Capacity12M→25M and ratio24→16 change together;native447fe50/runneraba4300d and
-qualified faster teacher stay. Bounded cost projection25m08s passes35min.
-First full CPU qualification passes16:48:06 in3.600s;separate one-basename
-selection repair passes16:50:50 in1.386s with520 paths and identical queue.
-Original CPU selection and pre-systemd blocked-launch failures remain retained;
-no passed CPU/GPU stages repeat. Root`/x/Temp/kindle-qbert-25m-r16-20261101/full`.
-Check live state;do not restart,repeat stages or overlap GPU work. No extension
-or automatic successor;the five-game goal remains unfinished.
+The [completed Qbert25M/R16 comparison](results/2026-11-01-cdp-qbert-25m-r16.md)
+finishes200k actions/799,786frames/12,477 updates in23m40.953s,17.08% less time
+than12M/H5/R24. Primary greedy14,339.583→10,696.875 falls25.40%;sampled
+13,761.458→11,967.708 falls13.03%;all24/24 first pyramids,both candidate means
+miss15k. Own initials39.583/173.958 clear none and differ across capacities.
+Own-initial-subtracted return/minute falls10.36% greedy and rises4.66% sampled.
+Retain12M/H5/R24 and the faster teacher;no larger-recipe promotion or extension.
+All521 inputs,357 bounded-matching/invariant tensors,retained100k/6,227 recovery,
+full replays/videos,guards,curves,coverage,exposure,comparison and original
+collector pass. All five services succeed:main17:25:24/post17:25:48/collection
+17:25:55 UTC November1/source65f4cee. Original CPU selection/blocked-launch
+failures and one-basename repair remain;no GPU or completed-stage repeat.
+Capacity,initialization,ratio,total work and teacher CPU cost change together;
+no isolated cause or reliability. Actual48,158 overrides (24.079%) are not
+frozen competence. CPU co-host caveats remain without correction. Root
+`/x/Temp/kindle-qbert-25m-r16-20261101/full`;complete,do not rerun. No Kindle
+service or GPU allocation remains active. No retry,confirmation or automatic
+successor selected;the five-game goal remains unfinished. Check live state.
 
 The [existing centroid-target CPU reference](results/2026-11-01-cdp-centroid-target-precision.md)
 has ball x/y MAE.058/.225 pixels on555 shared test rows,versus saved-head error
