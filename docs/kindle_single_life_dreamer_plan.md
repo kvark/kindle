@@ -1,5 +1,26 @@
 # Kindle: CDP learning roadmap
 
+The [bounded Qbert dynamics-group1e-4 comparison](experiments/2026-11-01-cdp-qbert-dynamics1e4.md)
+is CPU-qualified22:24:44 UTC November1/source213589e: two actual commands,
+22 config checks,357 schema tensors,562 retained-control/64 preceding-ranking
+pins,16 runtime files and733/9340/18715 cadence pass in1.542s. No native agent
+or emulator is constructed. Native447fe50/35ad0db and teacherfa261c53 stayfixed;
+private runnere161bf38 adds only the12 previously qualified dynamics-rate lines
+to retained Qbert runneraba4300d. Production471-test evidence remains unchanged.
+
+Change only dynamics-group4e-4→1e-4 on reused12011 at12M64/Auto/N8/B16/T16/
+H5/R24/encoder-base4e-5/greedy collection/expert100. This changes recurrent,
+posterior,prediction andexploration rates together; benefit and mechanism are
+unmeasured. Require8192 actions/733 updates,1024 frozen/zero updates,357 matching
+initial/invariant frozen tensors, pre-update semantic parity andfull guided
+replay/guards. Caps180s/60s/audit180s/main480s; conservative200k cost mustpass30min.
+
+Root `/x/Temp/kindle-qbert-dynamics1e4-20261101/native-check`; service
+`kindle-qbert-dynamics1e4-check-20261101`. Selection/launch follows committed
+qualification on the idle host. No full learner, retry, cap increase, rate sweep,
+extension or automatic successor. Reused seed is not independent confirmation;
+the original12011 gate miss remains. The five-game goal is unfinished.
+
 The [completed Qbert RGB64 action-ranking comparison](results/2026-11-01-cdp-qbert-rgb64-ranking.md)
 finds10007/12011 overall gain over uniform+6.726/−1.367 on shared10007 histories;
 paired difference+8.092 has lane95% interval[−.562,19.772]. Later gains+2.227/
