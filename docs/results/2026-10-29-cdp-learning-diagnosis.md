@@ -1,5 +1,19 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed400k/R8 comparison](2026-11-01-cdp-breakout-r8.md) doubles Breakout
+experience at almost fixed updates but adds12.06% time:sampled56.292→56.708,
+greedy104.667→97.583,allzero two-wall. Learning time stays near19min;acting and
+environment costs roughly double. Retain200k/R16;more experience at this cadence
+does not improve learning per minute. Changed sampling,warmup and exposure
+prevent an isolated coverage conclusion.
+
+The [CPU unseen-ball centering reference](2026-11-01-cdp-breakout-unseen-center.md)
+raises expanded24 mean225.083→269.833,but the gain comes from the original eight
+screening episodes. The added16 average244.938→238.250,andboth controllers still
+clearzero two-wall tasks. This identifies a useful earlier-positioning lead,
+not independent evidence for changing the training teacher. Exact replay passes;
+no native/GPU work or learner updates. Keep the qualified teacher unchanged.
+
 The [fixed Breakout upper-crop reference](2026-11-01-cdp-breakout-crop70.md)
 leaves all eight returns unchanged:mean185.375,zero two-wall successes. The
 10%/five-lane screen fails;retain the teacher,no crop retry or24-episode expansion.

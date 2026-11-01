@@ -20,36 +20,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [fresh Breakout400k/R8 comparison](docs/experiments/2026-11-01-cdp-breakout-r8-400k.md)
-is running:source566a2a5,launched13:14:30 UTC November1,mainPID798240/invocation
-cc7e1c87ac4b478ab8d9f23644a5fa65. Root`/x/Temp/kindle-breakout-r8-20261101/full`,
-service`kindle-breakout-r8-400k-20261101`. All four observers are active.
-Startup13:15:03 passes315 pins,357 control/bounded-matching tensors,47 pre-update
-transitions,correct cadence and251 finite supervised reports through8,408 actions.
-First recovery passes13:20:35 at100k/3,114 with357 finite tensors;four audited
-files/206,067,153 bytes are retained in.305s with matching hashes/source unchanged.
-Recovery continues for200k/300k;do not repeat completed retention. No full frozen
-result exists. Inspect this original process;do not restart or allocate concurrent GPU work. Full CPU qualification and.107s plot import pass;
-the original control-path CPU failure remains preserved. Do not repeat checks.
+The [completed Breakout400k/R8 comparison](docs/results/2026-11-01-cdp-breakout-r8.md)
+finishes400k/12,489updates in24m03.031s,+12.06% time. Sampled56.708 versus56.292
+is nearly unchanged;greedy97.583 versus104.667 falls6.77%,all0/24 two-wall.
+Retain200k/R16. All315 pins,357 matching/invariant tensors,three retained
+recoveries,paired initial traces,full replays,guards,curves,exposure and original
+collectors pass. Main/post/collection succeed13:44:22/13:44:36/13:45:11 UTC
+November1/source566a2a5;all five original services terminal,no full/GPU failure
+or repeat. Root`/x/Temp/kindle-breakout-r8-20261101/full`. No extension,ratio retry
+or automatic successor. Do not rerun completed checks,learner or collectors.
 
-Keep12M64/Auto/N8/B16/T16/H15/encoder4e-5/expert100/native447fe50/runner6c1b69fb.
-Compare400k/R8 with retained200k/R16:12,489 versus12,477 updates,35-minute training
-cap,100k/200k/300k recovery audits and all four files retained at each milestone.
-Require final/actual-initial sampled/greedy24-episode assessments against
-56.292/104.667;sampled primary,original90%-two-wall gate. No bounded experience
-reuse,extension,ratio retry or automatic successor. Follow the full protocol.
-
-The [bounded R8 result](docs/results/2026-11-01-cdp-breakout-r8.md) passes8,192
-actions/32,723frames/245updates in29.062s;1,024 frozen/.868s haszero updates/no
-natural episodes. Conservative400k projection26m01s passes35min. All259 pins,
-357 matching/invariant tensors,47 pre-update events,finite reports,full guided
-replay and guards pass. Main13:02:45/collector13:03:34 UTC November1/source479f4c1;
-terminal,no failures or repeats. Do not rerun the check,collector or preflight.
+The [completed CPU centering reference](docs/results/2026-11-01-cdp-breakout-unseen-center.md)
+improves225.083→269.833 on expanded24,five of eight lane means better,zero two-wall.
+The selected eight screen episodes improve185.375→333.000;the additional16
+average244.938→238.250. Overall development gain does not establish independent
+improvement. Keep the native teacher;no integration or learner selected. All31
+pins/315 completed R8 inputs and full exact replay/video pass;68.302s CPU controller
+completes13:51:07 UTC/sourcebd3ce22 after R8 closure. No GPU work/updates or repeated
+gameplay. Original unreceipted preflight/tool-output loss remains;separate completed-
+service preflight passes. Root`/x/Temp/kindle-breakout-unseen-center-20261101/standard24`.
+Do not repeat completed stages. No GPU allocation is active;check live state.
 
 The [Qbert R24 temperature harness](docs/experiments/2026-11-01-cdp-qbert-h5-r24-temperature.md)
 is CPU qualified but unselected:four CLI/32 header cases,550 inputs/315 active
 Breakout pins and all retained frozen evidence pass13:22:10 in15.502s. No native/
-emulator construction,queue,declaration or service. Review only after Breakout
+emulator construction,queue,declaration or service. It remains unselected after Breakout
 closure;do not repeat preflight or promote automatically.
 
 The [completed Qbert R32 comparison](docs/results/2026-11-01-cdp-qbert-h5-r32-greedy.md)

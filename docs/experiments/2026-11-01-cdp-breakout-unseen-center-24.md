@@ -57,3 +57,8 @@ its exact sources and that limitation remain in`preflight-attempt1`. The origina
 active-learner prerequisite is obsolete after normal closure. The separate
 passing preflight checks completed services and their evidence instead. No
 gameplay stage has repeated. All original assessment caps remain unchanged.
+
+## Completion
+
+The fixed assessment is complete. See the [result and retained limitations](../results/2026-11-01-cdp-breakout-unseen-center.md).
+Do not repeat completed stages;no automatic successor is selected.

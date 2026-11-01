@@ -14,35 +14,37 @@ CPU co-host timings and earlier CPU preparer failures remain. No full/GPU failur
 or repeat. Root`/x/Temp/kindle-qbert-h5-r32-greedy-20261101/full`;complete,do not
 rerun stages. The five-game goal remains unfinished.
 
-The [completed Breakout R8 bounded check](results/2026-11-01-cdp-breakout-r8.md)
-passes8,192 actions/32,723frames/245updates in29.062s;1,024 frozen/.868s haszero
-updates/no natural episodes. Conservative400k projection26m01s passes35min.
-All259 pins,357 matching/invariant tensors,47 pre-update events,finite supervised
-reports,full guided replay and guards pass. Main13:02:45/collector13:03:34 UTC
-November1/source479f4c1,originalPID797711/invocation768210bdaa1e457b92770f961380b47d.
-No failure,repeated stage or active allocation;do not rerun checks/collector.
-The [separate400k/R8 comparison](experiments/2026-11-01-cdp-breakout-r8-400k.md)
-is selected for preparation,with35min training cap,12,489 updates,three retained
-recovery milestones and final/actual-initial sampled/greedy24-episode arms against
-56.292/104.667. Same12M64/H15/encoder4e-5/Auto/N8/B16/T16/expert100/native447fe50/
-runner6c1b69fb/teacher;no old experience reuse. Full CPU qualification passes
-13:12:29 UTC in1.415s/1.531s wrapper:five CLI,24 config,10 header,four observer,
-five recovery,six retention cases,44 paths,17 controllers,259 bounded/227 control
-pins and357 shapes. Plot import.107s passes. Original.745s control-path preflight
-failure and failed command review remain with exact sources;no native/emulator
-construction or GPU stage occurs during preparation. The fresh full learner now
-launches13:14:30 UTC/source566a2a5 with315 pins,mainPID798240/invocation
-cc7e1c87ac4b478ab8d9f23644a5fa65;all four observers active. Startup13:15:03 in1.116s
-passes357 control/bounded-matching tensors,47 pre-update transitions,correct
-cadence and251 finite supervised reports through8,408 actions. No full frozen
-result exists. Do not repeat qualification,startup or prior stages. Root
-`/x/Temp/kindle-breakout-r8-20261101/full`;service`kindle-breakout-r8-400k-20261101`.
-First recovery passes13:20:35 at100k/3,114 with357 finite tensors;complete prefix
-3,215 reports/103,256 actions. All four files/206,067,153 bytes are retained in
-.305s copying time with matching hashes/source unchanged. Observer continues
-for200k/300k;do not repeat completed recovery/retention. Check this original
-process;do not restart or allocate concurrent GPU work. No extension,ratio
-retry or automatic successor;gameplay benefit is unmeasured.
+The [completed Breakout400k/R8 comparison](results/2026-11-01-cdp-breakout-r8.md)
+finishes400k actions/1,599,156frames/12,489updates in24m03.031s,+12.06% versus
+200k/R16. Sampled56.708 versus56.292 rises.74%;greedy97.583 versus104.667 falls
+6.77%;all0/24 two-wall. Own initials1.417/2.208 match. Retain the cheaper200k/R16;
+no extension,ratio retry or automatic successor. All315 pins,357 matching/invariant
+tensors,800/795 initial semantic events,three audited/retained four-file recoveries,
+full guided/frozen replays/videos,guards,curves,exposure and comparison pass.
+Recoveries100k/3,114,200k/6,239,300k/9,364 complete13:20:35/13:26:36/13:33:07.
+Main/post/collection succeed13:44:22/13:44:36/13:45:11 UTC November1/source566a2a5;
+all five original services terminal,zero full/GPU failures or repeats. Actual
+overrides176,191 (44.04775%) are guidance,not frozen competence. Learning time stays
+near19min;acting/environment costs roughly double. Experience,cadence,sampling,
+warmup and exposure change together on reused1009;no isolated coverage claim.
+CPU co-host caveats and earlier preparation failures remain. Root
+`/x/Temp/kindle-breakout-r8-20261101/full`;do not rerun learner,collectors or checks.
+No GPU allocation remains at closure;the five-game goal is unfinished.
+
+The [completed CPU unseen-ball centering reference](results/2026-11-01-cdp-breakout-unseen-center.md)
+improves185.375→333.000 on eight screening episodes,then225.083→269.833 (+19.88%)
+on the expanded24,five of eight lane means better;allzero two-wall. The original
+eight reproduce;the additional16 average244.938→238.250,so the overall gain is
+concentrated in the selected screen. This passes the development screen without
+establishing independent improvement. Keep the native teacher;no integration,
+learner,parameter retry or automatic successor selected. Exact controller bytes,
+31 declared/315 completed learner inputs and full pixel/action/debug replay/video
+pass. Expanded50,832actions/203,290frames take29.754s plus36.850s replay;68.302s
+controller completes13:51:07 UTC November1/sourcebd3ce22,after R8 closure. CPU-only,
+zero updates;no gameplay stage fails or repeats. Prior preflight lacks a success
+receipt and its tool output is unavailable;exact sources/limitation remain.
+Separate3.044s completed-service preflight passes without repeating eight fixtures.
+Root`/x/Temp/kindle-breakout-unseen-center-20261101/standard24`;complete,do not rerun.
 
 The [Qbert H5/R24 temperature harness](experiments/2026-11-01-cdp-qbert-h5-r24-temperature.md)
 is CPU qualified but unselected. Four CLI/32 header cases,all550 inputs/315 active
@@ -51,8 +53,8 @@ pass13:22:10 UTC/sourcef2d8c56 in15.502s (15.602s wrapper). Two old runner
 references resolve to exact Git bytes. No native/emulator construction,new
 replay,queue,declaration,service,failure or repeated qualification. Retain co-host
 time;do not repeat preflight. A possible fixedtemperature0.5 assessment of the
-retained10007 H5/R24 learner requires separate selection only after Breakout
-closure and an idle host. Root`/x/Temp/kindle-qbert-h5-r24-temperature-20261101`.
+retained10007 H5/R24 learner remains unselected after Breakout closure;
+any assessment requires separate selection and an idle host. Root`/x/Temp/kindle-qbert-h5-r24-temperature-20261101`.
 
 The [fixed Breakout upper-crop reference](results/2026-11-01-cdp-breakout-crop70.md)
 leaves all eight returns unchanged:mean185.375,zero two-wall successes. The

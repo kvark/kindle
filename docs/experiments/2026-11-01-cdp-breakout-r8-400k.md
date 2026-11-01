@@ -121,3 +121,8 @@ audit`fa67c1bba313d82f58e54031ca127fa2cabf46c545ce6162a588f45e736e5388`,
 retention`1cbde50cb59349c8c0f3f964b3c6fec27fce8de50d658dc0e8f6e2db531d3f1e`.
 Weights/metadata omit replay,belief,games and RNG;this is not uninterrupted
 training recovery. Retain CPU co-host time without wall-time correction.
+
+## Completion
+
+The fixed assessment is complete. See the [result and retained limitations](../results/2026-11-01-cdp-breakout-r8.md).
+Do not repeat completed stages;no automatic successor is selected.
