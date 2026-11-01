@@ -17,6 +17,14 @@ service`kindle-qbert-h5-r24-200k-20261101`. Check live identity;do not restart
 or schedule another GPU job while active. No extension or automatic successor;
 the five-game goal remains unfinished.
 
+The [selected CPU Breakout planning-cost diagnostic](experiments/2026-11-01-cdp-breakout-plan-costs.md) reconstructs
+the unchanged243-plan objective on saved4e-5 trajectories and relates first-
+command cost gaps to120 retained interventions. No emulator replay,native/GPU
+work or learner change.3.229s preflight/eight scalar fixtures and265/320 prior/
+401 active Qbert pins pass. Root`/x/Temp/kindle-breakout-plan-costs-20261101`;
+60s analysis cap,original Qbert identity protected;retain CPU co-host timing.
+No loss,teacher change or automatic successor is selected.
+
 The completed bounded check retains390 pins,357 matching initial/invariant
 frozen tensors,47 matching pre-update events,733 finite reports,full replay and
 guards.1024 frozen/.809s haszero updates/no natural episodes. Main succeeds
