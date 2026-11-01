@@ -1,5 +1,17 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [latest retained-log Qbert phase check](2026-11-01-cdp-qbert-h5-r24-phases.md)
+places the H5/R24 greedy seed score gap entirely after the first-pyramid crossing
+transition:both learners have identical1219-frame milestones and550-point
+prefixes inall24 episodes. Later duration and reward rate both vary;neither
+is established as the cause. On an older4013 failure-feature corpus,a
+[fixed lane-held-out linear readout](2026-11-01-cdp-qbert-failure-linear-readout.md)
+trails the actor on movement decisions41.02% versus52.34% and on every lane
+overall. This does not support that head replacement or establish information
+absence. Both checks are CPU-only and leave the active Breakout centroid4e-5
+comparison unchanged. See their reports for supervision,selection and co-host
+limits;the newer H5/R24 representations are not measured by the old-feature probe.
+
 The [retained Breakout planning-cost analysis](2026-11-01-cdp-breakout-plan-costs.md)
 finds56.38% of12,521 horizontal disagreements add at most1 teacher-model cost
 unit. Near-descending disagreements have a larger median/tail,while three of six

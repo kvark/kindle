@@ -39,6 +39,19 @@ runner differences limit causal claims;no prior experience reused. Root
 service;do not restart it or schedule another GPU job while active. No retry,
 extension,cap increase or automatic successor. The five-game goal is unfinished.
 
+The [completed CPU Qbert linear readout](docs/results/2026-11-01-cdp-qbert-failure-linear-readout.md)
+trails the original actor:held-out movement agreement41.02% versus52.34%,rescued
+movement27.92% versus38.07%,overall66.70% versus86.33%. The actor wins all eight
+held-out lanes;no replacement-head benefit or feature-information absence is
+established. Fixed ridge1,training-fold normalization,all1024 older4013 failure
+rows/eight folds;not the new H5/R24 representations. Three numerical fixtures,
+finite fits/residuals,disjoint folds and11 hashes pass. Fits.357s/analysis.425s/
+wrapper.514s complete11:32:26 UTC November1/source8d539db;original Breakout
+PID787678/invocation709367befab94110b4afc489bd51d55c stays. Zero native/emulator/
+GPU work,updates,failures or repeated fits;retain CPU co-host time. Root
+`/x/Temp/kindle-qbert-failure-linear-readout-20261101`;complete,do not rerun.
+No alternate head,sweep,loss,learner or automatic successor selected.
+
 The [completed CPU Qbert phase diagnostic](docs/results/2026-11-01-cdp-qbert-h5-r24-phases.md)
 finds both8039/10007 greedy policies clear the first pyramid at exactly1219frames
 with550 prefix points inall24 episodes. The full1090.625 mean gap occurs after
