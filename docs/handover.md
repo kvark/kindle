@@ -1,5 +1,18 @@
 # CDP handover — October25,2026
 
+The [bounded Qbert encoder8e-5 check](experiments/2026-11-01-cdp-qbert-encoder8e5.md) is selected for preparation:
+8,192 actions/733 updates then1,024 frozen actions. Only encoder4e-5→8e-5
+changes as a learner setting at12M48/Auto/N8/B16/T16/H5/R24/base behavior4e-5/
+greedy collection/expert100. Native447fe50,runneraba4300d and faster teacher
+fa261c53 stay. Require both conservative200k estimates≤30min before considering
+a full learner;no full run is selected. CPU qualification passes18:28:48 UTC
+November1:2 CLI paths,19 config cases,357 schemas,442 control inputs,16 package
+files and exact schedules. Original redundant-replacement preparation failure
+is preserved;separate repair keeps six completed files unchanged. No GPU work
+has launched at this review. Root`/x/Temp/kindle-qbert-encoder8e5-20261101`;
+service`kindle-qbert-encoder8e5-check-20261101`. Check live state before launch.
+No rate sweep,extension,repeated life or automatic promotion. Goal unfinished.
+
 The [completed Qbert300k comparison](results/2026-11-01-cdp-qbert-300k.md)
 finishes300,000 actions/1,199,763frames/28,090 updates in31m18.803s,+9.64% time
 versus200k with the faster teacher. Greedy14,339.583→13,861.458 falls3.33%;
