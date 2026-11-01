@@ -1,19 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [Qbert12M/RGB64 bounded check](2026-11-01-cdp-qbert-rgb64.md) passes8192 actions/32,760frames/
-733 updates in57.956s;1024 frozen/.849s haszero updates/no natural episodes.
-All511 inputs,357 derived/invariant tensors,finite reports,full guided replay
-and guards pass. Main19:34:02/collection19:34:32 UTC November 1,source4c7293c;
-no failure or GPU-stage repeat. Conservative200k projection25m56.425s passes30min.
-A separate fresh200k/18,715 comparison is selected with100k/9,340 recovery and
-four24-episode frozen arms against14,339.583/13,761.458,original15k/90% gate.
-Full CPU qualification passes five CLI paths,28 config cases,49 paths/17 scripts
-and511 bounded/442 control inputs in3.493s. Keep12M64/H5/R24/encoder4e-5/base
-behavior4e-5/greedy collection/expert100/native447fe50/runneraba4300d/teacherfa261c53.
-Geometry/head shapes/initialization and teacher-cost differences limit causal
-claims;older unaided4M64 negative evidence remains. No full score yet. Root
-`/x/Temp/kindle-qbert-rgb64-20261101`;check live state,never restart completed
-stages or overlap GPU work. The five-game goal remains unfinished.
+The [Qbert12M/RGB64 bounded check](2026-11-01-cdp-qbert-rgb64.md) passes 8,192 actions / 733 updates
+in 57.956s, with frozen invariance, full guided replay and guards passing.
+Its conservative 200k estimate is 25m56.425s, within the 30-minute cap.
+
+The fresh 200k / 18,715-update comparison launches **19:38:45 UTC November 1**,
+source b8de34f. Original main PID836919/invocation425aae9cee2541fe9623b753225af57f
+and all four observers are active. Startup review at 19:41:33 verifies all
+521 inputs, 357 bounded-matching initial tensors, 47 matching pre-update
+transitions, correct cadence and 2,074 finite reports through 22,504 actions.
+The 1.465s CPU review co-hosts without a wall-time correction. Require retained
+100k/9,340 recovery and final/actual-initial greedy plus sampled 24-episode
+assessments against 14,339.583/13,761.458 and the unchanged 15k/90% gate.
+No full frozen result is available.
+
+Keep 12M64/H5/R24/encoder4e-5/base behavior4e-5/greedy collection/expert100,
+native447fe50/runneraba4300d/teacherfa261c53. Geometry/head shapes/initialization
+and teacher-cost differences limit causal claims; the older unaided4M64
+negative result remains. Root `/x/Temp/kindle-qbert-rgb64-20261101/full`,
+service `kindle-qbert-rgb64-200k-20261101`. Check live state; do not restart
+this learner, repeat completed stages or overlap GPU work.
+The five-game goal remains unfinished.
 
 The [command-dependent Breakout teacher comparison](2026-11-01-cdp-breakout-command-response.md) is complete.
 Fresh mean return 250.875 → 273.125 rises 8.87%, with five of eight lane means
