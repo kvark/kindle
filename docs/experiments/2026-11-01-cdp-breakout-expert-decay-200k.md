@@ -1,5 +1,7 @@
 # Fresh 200k Breakout comparison with late imitation decay
 
+Completed: [late decay lowers both frozen scores](../results/2026-11-01-cdp-breakout-expert-decay.md). Retain constant expert100; all services terminal, no active GPU allocation.
+
 Select one fresh200k-action/12,477-update learner after the
 [numerical and bounded qualification](../results/2026-11-01-cdp-expert-imitation-decay.md)
 passes. The intended learner-setting change from the retained22m27s control is
@@ -137,3 +139,26 @@ zero native/environment work,co-host caveat retained. Evidence
 Semantic review SHA`53b6224396c67ff6a265fa901b0816a90ad1f730dc7319d66df14c4c79fdfaf0`.
 Training continues toward200k with the original process;zero-weight tail and
 all four frozen assessments remain pending. No competence claim or successor.
+
+## Completed comparison
+
+The full learner completes200k actions/799,518 frames/12,477 updates in1290.345s
+(21m30s),4.23% less time than control1347.362s. Sampled17.167/greedy25.167 fall
+32.13%/40.96% from25.292/42.625;own1.417/2.208 match,allzero of24 two-wall.
+Own-initial-subtracted frozen return per minute falls1.063→.732 sampled and
+1.800→1.068 greedy. Retain constant expert100;no extension,sweep,confirmation
+or automatic successor is selected.
+
+All236 pins,100k recovery,357 matching initial/invariant frozen tensors,exact
+schedule/3,126 zero-weight reports,800/795 actual-initial semantic events,full
+replays/videos,guards,curves,exposure and comparison pass. All four frozen arms
+total51,168 actions/204,500 frames/33.755s,zero updates/truncations. Main succeeds
+02:52:26 UTC November1,postprocessing02:52:59,collection02:53:02;all five services
+succeed,no full-run failure or GPU repeat. Preparation import/path failures,
+auxiliary summary correction and CPU co-hosting caveats remain retained. Actual
+overrides53.315%;online77.78 versus73.32 does not establish frozen competence.
+Native/runner differ,reused seed/cohort,no isolated causal/reliability claim.
+No active GPU allocation remains;the five-game goal is unfinished.
+
+Completion SHA`ad2d80f9e7a4e99668fb785aa203a11beff825415deaf25951c8431fbcded8b8`;
+comparison SHA`edc2883ac600d79645f33934d56e58fb74a9e2697d77e7eea738cfebf485dc62`.

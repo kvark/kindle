@@ -18,21 +18,22 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
-The [fresh Breakout imitation-decay comparison](docs/experiments/2026-11-01-cdp-breakout-expert-decay-200k.md) verifies100k/6227 recovery
-at02:39:01 UTC November1,all357 finite tensors,236 pins and originalPID728595/
-invocation2c767c73ae394a30b2ea792b28eb3aff. Weight100 at6227 falls99.967995 at6228;
-7,132 checked reports through114,472 actions have exact scheduled weights,last71.04.
-All first100k actions match the control:12,500 transitions,6,227 non-timing learner
-reports,185 episodes and184 resets. Hidden states/gradients are not compared;
-native65ed45f/runner differ from447fe50,so no isolated causal or reliability claim.
-Main starts02:27:56 UTC/source90b1c7e;200k/12,477 under30min,decay ends9352/150k,
-12M64/Auto/N8/B16/T16/H15/R16/encoder2e-5,teacher guidance and labels retained.
-Recovery observer succeeds; main,progress,postprocessing and collection remain
-active. Four final/actual-initial sampled/greedy24-episode assessments against
-25.292/42.625,all0/24 two-wall remain pending. CPU preparation failures and
-co-host timing caveats stay preserved;zero GPU repeats. Root
-`/x/Temp/kindle-expert-decay-20261101/full`,service`kindle-breakout-expert-decay-200k-20261101`.
-Check live state;do not restart or overlap this learner. The five-game goal is unfinished.
+The [completed Breakout imitation-decay comparison](docs/results/2026-11-01-cdp-breakout-expert-decay.md) finishes200k actions/
+799,518 frames/12,477 updates in21m30s,4.23% less training time than constant100.
+Sampled17.167/greedy25.167 fall32.13%/40.96% below25.292/42.625;own initials
+1.417/2.208 match,all0/24 two-wall. Retain constant100;no extension,sweep,
+confirmation or automatic successor. All236 pins,100k/6227 recovery,357 matching/
+invariant tensors,exact12,477 scheduled reports (3,126 atzero),800/795 initial
+semantic events,full replays/videos,guards,curves,exposure and comparison pass.
+All first100k recorded semantics also match control before fading;hidden states/
+gradients are not compared. Main/post/collection succeed02:52:26/02:52:59/02:53:02
+UTC November1/source90b1c7e;all five services terminal success,zero GPU repeats.
+Online last50 rises73.32→77.78 despite weaker frozen play;53.315% actual overrides
+and late replay CE.824 versus.591 are not competence/held-out accuracy. Native
+65ed45f/runner differ from447fe50,reused1009/cohort;no isolated causal/reliability
+claim. Earlier CPU preparation failures,auxiliary-summary correction and co-host
+timing caveats are preserved. Root`/x/Temp/kindle-expert-decay-20261101/full`.
+No active GPU allocation at closure;check live state before work. Goal unfinished.
 
 The [optional native imitation decay](docs/results/2026-11-01-cdp-expert-imitation-decay.md) passes F64 loss/gradient checks at
 weights100/50/0 and fresh Breakout8192 actions/32,724 frames/489 updates in46.991s.

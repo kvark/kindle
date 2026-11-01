@@ -89,4 +89,4 @@ would be needed to test whether later fading improves frozen gameplay per minute
 Do not reuse this check's experience or restart its completed stages. The service
 is terminal, no GPU allocation remains active, and the five-game goal is unfinished.
 
-The separately declared [fresh200k comparison](../experiments/2026-11-01-cdp-breakout-expert-decay-200k.md) now tests the late schedule; see that protocol for live state.
+The separately declared [fresh200k comparison](2026-11-01-cdp-breakout-expert-decay.md) completes with lower sampled and greedy scores; retain constant imitation.
