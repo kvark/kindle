@@ -1,7 +1,7 @@
 # Fresh200k Qbert comparison with dynamics-group rate1e-4
 
 **Running:** original learner launches22:32:25 UTC November1/source0d8ec52.
-Startup checks pass; recovery and all final/actual-initial assessments remain
+Startup and100k/9,340 recovery pass; all final/actual-initial assessments remain
 pending. Preserve original processes and do not overlap another GPU allocation.
 
 The [closed bounded check](../results/2026-11-01-cdp-qbert-dynamics1e4.md)
@@ -113,3 +113,23 @@ runner,teacher/config and original PID/invocation match. The read-only startup
 wrapper takes1.711s; retain this co-host cost without correcting training wall.
 No final frozen task result is available. Keep200k/18,715 updates/30min,
 100k/9,340 recovery and four final/actual-initial24-episode arms unchanged.
+
+
+## Original100k recovery passes
+
+The original recovery observer succeeds22:45:31 UTC November1. The declared
+100,000-action/9,340-update checkpoint has357 finite tensors. Allfour retained
+files total206,067,159 bytes and preserve the source; retention takes.308s.
+MetadataSHA256`dc674aca3829e78eee532d2df278c997669d7b54a5d594cac31cd4f1b860e4e0`,
+retention receiptSHA256`768d710980f8109c863c75ae829d612597f8b808dbb3ee05f4dee0a33f4da749`.
+The observer also checks9,663 sequential finite reports through103,448 actions.
+A separate read-only check verifies allfour retained hashes and the original
+invocation32e0b7e1cf72435388c4a7225db0e41c journal's single audit/completion.
+No copy,audit,collector or GPU stage repeats.
+
+Recovery service is terminal success; original mainPID857991/invocation
+1e44edc5d824407b8a21cd62657f6ee2 and remaining observers continue. These are
+weights/metadata only; replay,live beliefs,games and RNG are not retained.
+No intermediate evaluation or checkpoint selection occurs. Final200k/18,715
+updates/30min and allfour frozen assessments remain unchanged and pending.
+Keep CPU co-host costs without wall-time correction; no restart or overlap.

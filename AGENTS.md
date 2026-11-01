@@ -22,11 +22,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 The [fresh Qbert dynamics-group1e-4 comparison](docs/experiments/2026-11-01-cdp-qbert-dynamics1e4-200k.md)
 launches22:32:25 UTC November1/source0d8ec52 with606 pins. Original mainPID
-857991/invocation1e44edc5d824407b8a21cd62657f6ee2 and progress/recovery/post/
-collection observers are active. Startup22:33:29 passes357 bounded/control
+857991/invocation1e44edc5d824407b8a21cd62657f6ee2 and progress/post/collection
+observers remain active; original recovery observer succeeds22:45:31 UTC. Startup22:33:29 passes357 bounded/control
 initial tensors,47 matching pre-update transitions, correct cadence and723 finite
-reports through8088 actions. No full frozen result is available. Preserve the
-original processes; do not restart or overlap another GPU allocation.
+reports through8088 actions. The100k/9,340 recovery passes357 finite tensors
+andfour retained files/206,067,159 bytes;9,663 sequential finite reports through
+103,448 actions pass. RetentionSHA768d7109,metadataSHAdc674aca; allfour retained
+hashes and original recovery invocation32e0b7e1cf72435388c4a7225db0e41c verify.
+Weights/metadata only,no replay/live state/games/RNG or intermediate evaluation.
+No full frozen result is available. Preserve original processes; do not restart
+or overlap another GPU allocation.
 
 Fixed200k actions/18,715 updates/30min,100k/9,340 four-file recovery andfour
 final/actual-initial sampled/greedy24-episode assessments remain. Only dynamics
