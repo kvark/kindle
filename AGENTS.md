@@ -20,24 +20,25 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [fresh Qbert H5/R24 comparison](docs/experiments/2026-11-01-cdp-qbert-h5-r24-200k.md) launches08:41:14 UTC November1/source64c2e89 after the
-bounded8192/733 check takes67.815s and projects30m21s conservatively below35min.
-Fresh200k/18,715 updates on reused8039,12M48/Auto/N8/B16/T16/encoder4e-5/
-greedy collection/expert100;only H15/R16→H5/R24,with joint cadence/sampling/
-warmup changes. Native447fe50/runneraba4300d/teacher fixed. The100k/9340 recovery passes08:55:50 UTC,357 finite tensors. Independent1.042s
-confirmation passes08:55:58,401 pins/original identity unchanged. Require357
-matched initial/invariant frozen tensors,paired actual initials,
-full replays/videos/guards and final/initial sampled/greedy24-episode arms against
-11,376.042 primary greedy/8,292.708 sampled. Full CPU preflight2.598s passes. Startup checks401 pins,357 initial tensors,47
-pre-update transitions and157 finite reports through2056 actions. MainPID771374/
-invocation82a217b818e24b5cb7c10801a2b3f237;progress/postprocess/collection active,
-recovery terminal success.
-Supplemental CPU recovery/terminal confirmations are also watched after2.159s
-qualification against the completed control;original pipeline remains unchanged.
-No full frozen result exists. Root`/x/Temp/kindle-qbert-h5-r24-20261101/full`,
-service`kindle-qbert-h5-r24-200k-20261101`. Check live identity;do not restart
-or schedule another GPU job while active. No extension or automatic successor;
-the five-game goal remains unfinished.
+The [completed Qbert H5/R24 comparison](docs/results/2026-11-01-cdp-qbert-h5-r24.md)
+finishes 200k actions / 799,812 frames / 18,715 updates in 28m47s.
+Greedy 15,430.208 / 24 first pyramids passes the 15k/90% gate,
+up 35.64% from 11,376.042 / 23; sampled 13,040.625 / 24 rises
+57.25% from 8,292.708 / 24 but still misses 15k. Training takes 4.44% longer.
+Own initials 251.042 / 128.125 match and clear none. Retain H5/R24 as a passing
+8039 development point, not seed reliability or an isolated horizon effect.
+H15/R16→H5/R24 changes cadence, sampling, warmup and work together; native447fe50,
+runneraba4300d and teacher stay fixed. All 401 pins, 100k/9340 recovery, 357 matched
+initial/invariant frozen tensors, paired initial traces, full training pixel/action/
+label and frozen replays/videos, guards, curves, coverage, exposure and comparison
+pass. Main/post/collection finish 09:23:12/09:23:20/09:23:21 UTC November1,
+source64c2e89; independent 1.397s terminal confirmation passes 09:23:42.
+All six services succeed; no failures or repeated original/GPU stages. Actual
+training overrides 27.944% and aided online returns are not frozen
+competence. CPU co-host timing remains without correction. Root
+`/x/Temp/kindle-qbert-h5-r24-20261101/full`; terminal, do not rerun its learner,
+collectors or confirmations. No extension, cap increase, confirmation learner or
+automatic successor is selected. Check live state; the five-game goal is unfinished.
 
 The [fixed Breakout temperature0.5 assessment](docs/experiments/2026-11-01-cdp-breakout-temperature.md)
 passes CPU preparation only at09:05:09 UTC November1/source6300c1d:7.996s,
@@ -50,8 +51,9 @@ sample/temperature0.5 arms preserve actor-unimix.01 and require exact default
 semantic reproduction with qualifiede416696/runtime40872a3/runnerabc2c2b.
 Primary retained greedy104.667,secondary sampled56.292;original learner's primary
 result stays unchanged. Root`/x/Temp/kindle-breakout-temperature-20261101`.
-Do not rerun the passing preflight. Separate selection requires complete Qbert
-closure and an idle host;no automatic successor. Qbert H5/R24 remains active.
+Do not rerun the passing preflight. Qbert closure is complete; separate
+selection still requires an idle host. No Breakout assessment or automatic
+successor is selected.
 
 The [completed CPU Breakout planning-cost diagnostic](docs/results/2026-11-01-cdp-breakout-plan-costs.md) finds56.38% of
 12,521 horizontal disagreements have at most1 unit excess teacher-model cost;
@@ -63,7 +65,7 @@ labels;331 analysis/401 active pins and original Qbert identity pass.4.606s CPU/
 fixtures and independent JSON recount pass;zero emulator/native/GPU work,
 updates,failures or retries. Root`/x/Temp/kindle-breakout-plan-costs-20261101`;
 complete,do not rerun. Retain CPU co-host timing;no loss,teacher change or
-successor selected. Qbert H5/R24 remains the active learner.
+successor selected. The Qbert H5/R24 learner has since completed.
 
 The completed bounded check retains390 pins,357 matching initial/invariant
 frozen tensors,47 matching pre-update events,733 finite reports,full replay and

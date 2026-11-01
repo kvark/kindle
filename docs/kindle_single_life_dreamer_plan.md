@@ -1,23 +1,24 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Qbert H5/R24 comparison](experiments/2026-11-01-cdp-qbert-h5-r24-200k.md) launches08:41:14 UTC November1/source64c2e89 after the
-bounded8192/733 check takes67.815s and projects30m21s conservatively below35min.
-Fresh200k/18,715 updates on reused8039,12M48/Auto/N8/B16/T16/encoder4e-5/
-greedy collection/expert100;only H15/R16→H5/R24,with joint cadence/sampling/
-warmup changes. Native447fe50/runneraba4300d/teacher fixed. The100k/9340 recovery passes08:55:50 UTC,357 finite tensors. Independent1.042s
-confirmation passes08:55:58,401 pins/original identity unchanged. Require357
-matched initial/invariant frozen tensors,paired actual initials,
-full replays/videos/guards and final/initial sampled/greedy24-episode arms against
-11,376.042 primary greedy/8,292.708 sampled. Full CPU preflight2.598s passes. Startup checks401 pins,357 initial tensors,47
-pre-update transitions and157 finite reports through2056 actions. MainPID771374/
-invocation82a217b818e24b5cb7c10801a2b3f237;progress/postprocess/collection active,
-recovery terminal success.
-Supplemental CPU recovery/terminal confirmations are also watched after2.159s
-qualification against the completed control;original pipeline remains unchanged.
-No full frozen result exists. Root`/x/Temp/kindle-qbert-h5-r24-20261101/full`,
-service`kindle-qbert-h5-r24-200k-20261101`. Check live identity;do not restart
-or schedule another GPU job while active. No extension or automatic successor;
-the five-game goal remains unfinished.
+The [completed Qbert H5/R24 comparison](results/2026-11-01-cdp-qbert-h5-r24.md)
+finishes 200k actions / 799,812 frames / 18,715 updates in 28m47s.
+Greedy 15,430.208 / 24 first pyramids passes the 15k/90% gate,
+up 35.64% from 11,376.042 / 23; sampled 13,040.625 / 24 rises
+57.25% from 8,292.708 / 24 but still misses 15k. Training takes 4.44% longer.
+Own initials 251.042 / 128.125 match and clear none. Retain H5/R24 as a passing
+8039 development point, not seed reliability or an isolated horizon effect.
+H15/R16→H5/R24 changes cadence, sampling, warmup and work together; native447fe50,
+runneraba4300d and teacher stay fixed. All 401 pins, 100k/9340 recovery, 357 matched
+initial/invariant frozen tensors, paired initial traces, full training pixel/action/
+label and frozen replays/videos, guards, curves, coverage, exposure and comparison
+pass. Main/post/collection finish 09:23:12/09:23:20/09:23:21 UTC November1,
+source64c2e89; independent 1.397s terminal confirmation passes 09:23:42.
+All six services succeed; no failures or repeated original/GPU stages. Actual
+training overrides 27.944% and aided online returns are not frozen
+competence. CPU co-host timing remains without correction. Root
+`/x/Temp/kindle-qbert-h5-r24-20261101/full`; terminal, do not rerun its learner,
+collectors or confirmations. No extension, cap increase, confirmation learner or
+automatic successor is selected. Check live state; the five-game goal is unfinished.
 
 The [fixed Breakout temperature0.5 assessment](experiments/2026-11-01-cdp-breakout-temperature.md)
 passes CPU preparation only at09:05:09 UTC November1/source6300c1d:7.996s,
@@ -30,8 +31,9 @@ sample/temperature0.5 arms preserve actor-unimix.01 and require exact default
 semantic reproduction with qualifiede416696/runtime40872a3/runnerabc2c2b.
 Primary retained greedy104.667,secondary sampled56.292;original learner's primary
 result stays unchanged. Root`/x/Temp/kindle-breakout-temperature-20261101`.
-Do not rerun the passing preflight. Separate selection requires complete Qbert
-closure and an idle host;no automatic successor. Qbert H5/R24 remains active.
+Do not rerun the passing preflight. Qbert closure is complete; separate
+selection still requires an idle host. No Breakout assessment or automatic
+successor is selected.
 
 The [completed CPU Breakout planning-cost diagnostic](results/2026-11-01-cdp-breakout-plan-costs.md) finds56.38% of
 12,521 horizontal disagreements have at most1 unit excess teacher-model cost;
@@ -43,7 +45,7 @@ labels;331 analysis/401 active pins and original Qbert identity pass.4.606s CPU/
 fixtures and independent JSON recount pass;zero emulator/native/GPU work,
 updates,failures or retries. Root`/x/Temp/kindle-breakout-plan-costs-20261101`;
 complete,do not rerun. Retain CPU co-host timing;no loss,teacher change or
-successor selected. Qbert H5/R24 remains the active learner.
+successor selected. The Qbert H5/R24 learner has since completed.
 
 The completed bounded check retains390 pins,357 matching initial/invariant
 frozen tensors,47 matching pre-update events,733 finite reports,full replay and
@@ -1934,7 +1936,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
 | Breakout | Compact12M64/B16/R16/expert100/encoder4e-5/200k:sampled56.292,greedy104.667 in21m28s;own initials1.417/2.208. Same recipe2e-5:25.292/42.625 in22m27s;6e-6:13.208/17.875 in22m19s. Reused development seed/cohort,not independent confirmation. Retained B8/T16:2M98.21,same weights AMD Auto67.58;AMD B2/T64:2M10.04 | Reference381.81;zero two-wall successes;reliability open |
-| Qbert | AMD12M48/B16/T16/H5/R32/expert100/200k seeds4013/6029:greedy14050/15792.708,sampled13331.250/15420.833,23/24 and24/24 first pyramids,in40m24s/40m22s. Same recipe;own initial controls and all audits pass. The cheaper H15/R16/encoder4e-5/greedy-collection recipe reaches15,515.625 greedy/11,989.583 sampled,24/24 first pyramids,in27m33s on reused4013;all original audits and terminal confirmation pass. Fresh8039 reaches11,376.042 greedy/23 first pyramids and8,292.708 sampled/24 in27m34s,with all audits passing. One of two learners of this cheaper recipe passes the original greedy gate;cross-cohort scores14,370.833 for4013 and11,578.125 for8039 retain the ranking but neither passes15k. Reliability remains open. | Original15k/90% gate passes on6029 in both modes,one of two H5 learners,and on4013 greedy with the cheaper collection recipe; broad reliability and reference193,220.77 remain open |
+| Qbert | AMD12M48/B16/T16/H5/R32/expert100/200k seeds4013/6029:greedy14050/15792.708,sampled13331.250/15420.833,23/24 and24/24 first pyramids,in40m24s/40m22s. Same recipe;own initial controls and all audits pass. The cheaper H15/R16/encoder4e-5/greedy-collection recipe reaches15,515.625 greedy/11,989.583 sampled,24/24 first pyramids,in27m33s on reused4013;all original audits and terminal confirmation pass. Fresh8039 reaches11,376.042 greedy/23 first pyramids and8,292.708 sampled/24 in27m34s,with all audits passing. One of two learners of this cheaper recipe passes the original greedy gate;cross-cohort scores14,370.833 for4013 and11,578.125 for8039 retain the ranking but neither passes15k. H5/R24 on reused8039 now reaches15,430.208 greedy/24 first pyramids and13,040.625 sampled/24 in28m47s;all audits pass. One learner of this recipe passes greedy;reliability remains open. | Original15k/90% gate passes on6029 in both modes,one of two H5 learners,on4013 greedy with the cheaper collection recipe,and on8039 greedy with H5/R24; broad reliability and reference193,220.77 remain open |
 
 These references are published long-run Dreamer scores, not equal-budget
 controls. Five-game supremacy is **not achieved**. Report matched-frame and
