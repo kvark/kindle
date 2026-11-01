@@ -65,3 +65,24 @@ Prospective root `/x/Temp/kindle-breakout-r8-20261101/full`,trial
 `breakout-12m-64-b16-r8-encoder4e5-expert100-400k-seed1009`,service
 `kindle-breakout-r8-400k-20261101`. No full trial,queue or allocation exists at
 this protocol's selection. Check current live state before declaration/launch.
+
+## Full CPU harness qualification
+
+The full harness passes **13:12:29 UTC November1**,1.415s test body/1.531s
+wrapper. It exercises all five actual CLI paths,24 config rejection cases,
+10 startup-header cases,four observer-parser cases,five recovery-body cases,
+six checkpoint-retention fixtures,44 resolved paths,17 compiled controllers,
+259 bounded/227 control pins and357 checkpoint shapes. Recovery schedules
+100k/3,114,200k/6,239,300k/9,364 and final400k/12,489 pass;all three observer
+milestones and declared service caps are checked. No native agent or emulator
+is constructed. Plot-environment import passes.107s without native/ALE loading.
+The actual bounded metadata hash agrees with the retention contract.
+
+The initial generated-command review and first CPU preflight fail because a
+service-name substitution rebases the retained control path into the new root.
+The.745s preflight failure,exact original generator/controllers and separate
+command-review failure record remain under`full-preflight-attempt1`. Correcting
+only those paths,retaining the failure and pinning both attempt snapshots yields
+the passing second qualification. No full declaration or GPU allocation existed
+for either attempt. The qualified native runner remains byte-identical. Do not
+repeat the passing full or bounded qualifications.

@@ -21,9 +21,11 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Active work — November 1
 
 The [fresh Breakout400k/R8 comparison](docs/experiments/2026-11-01-cdp-breakout-r8-400k.md)
-is selected for preparation after the bounded check passes. Full CPU harness
-qualification is still required;no full trial,queue,declaration or GPU allocation
-exists. Prospective root`/x/Temp/kindle-breakout-r8-20261101/full`,service
+is selected after bounded closure. Full CPU qualification passes1.415s:five CLI
+paths,24 config/10 header/four observer/five recovery/six retention cases,44 paths,
+17 controllers,259 bounded/227 control pins and357 shapes. Plot import.107s passes.
+Original control-path CPU failure and exact sources remain preserved. Do not repeat
+passed checks. No full trial,queue,declaration or GPU allocation exists yet. Prospective root`/x/Temp/kindle-breakout-r8-20261101/full`,service
 `kindle-breakout-r8-400k-20261101`. Check live state before declaration/launch.
 
 Keep12M64/Auto/N8/B16/T16/H15/encoder4e-5/expert100/native447fe50/runner6c1b69fb.

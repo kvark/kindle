@@ -25,8 +25,13 @@ The [separate400k/R8 comparison](experiments/2026-11-01-cdp-breakout-r8-400k.md)
 is selected for preparation,with35min training cap,12,489 updates,three retained
 recovery milestones and final/actual-initial sampled/greedy24-episode arms against
 56.292/104.667. Same12M64/H15/encoder4e-5/Auto/N8/B16/T16/expert100/native447fe50/
-runner6c1b69fb/teacher;no old experience reuse. Full CPU harness qualification is
-required before declaration/launch;no full trial,queue or allocation exists.
+runner6c1b69fb/teacher;no old experience reuse. Full CPU qualification passes
+13:12:29 UTC in1.415s/1.531s wrapper:five CLI,24 config,10 header,four observer,
+five recovery,six retention cases,44 paths,17 controllers,259 bounded/227 control
+pins and357 shapes. Plot import.107s passes. Original.745s control-path preflight
+failure and failed command review remain with exact sources;no native/emulator
+construction or GPU stage occurs. No full trial,queue or allocation exists yet.
+Do not repeat passed qualifications;declaration/launch remain separate steps.
 Root`/x/Temp/kindle-breakout-r8-20261101/full`;check live state before work.
 No extension,ratio retry or automatic successor;gameplay benefit is unmeasured.
 
