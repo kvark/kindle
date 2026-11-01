@@ -79,3 +79,9 @@ and collection remain active. No frozen result or new allocation follows.
 
 Recovery reviewSHA256`5eef8dfa59b5b3fd6a2d78cb31cd98d9f21617e2f0fd2cd976749a04face17fd`;
 retentionSHA256`11e11b50c823cbf04143fca9f5cadd997250e58067ae69bafc758aa908fe1995`.
+
+The unselected [Breakout B8/T32 preparation](../experiments/2026-11-01-cdp-breakout-context32.md)
+co-hosts a3.201s CPU preflight wrapper at15:33:44 UTC. Both CLI paths,15 config
+cases,357 schema tensors,227 control inputs andfour common-prefix fixtures pass;
+all524 current inputs/original identity remain unchanged. No new GPU job is
+selected. Keep this co-host timing without correction.

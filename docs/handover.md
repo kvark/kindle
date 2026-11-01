@@ -21,6 +21,16 @@ acts. Recovery15:28:35 passes100k/9,340,357 finite tensors andretains all four f
 observer succeeds;progress/post/collection stay active. CPU co-host caveats remain;
 no frozen result yet.
 
+The [prepared Breakout B8/T32 check](experiments/2026-11-01-cdp-breakout-context32.md) passes CPU qualification. It remains
+unselected: no trial,queue,declaration or GPU allocation. Both CLI paths,15 config
+cases,357 schema tensors,227 control inputs andfour prefix fixtures pass in.663s;
+protected wrapper3.201s completes15:33:44 UTC November1. All524 active Qbert inputs
+and original identity stay unchanged;retain co-host time. Prospective8192/481,
+first504,30min projected200k gate;native447fe50/runner6c1b69fb/teacher stay fixed.
+Longer gradients also change sequence diversity,target rows and warmup;old context
+negatives remain. Root`/x/Temp/kindle-breakout-context32-20261101/native-check`.
+Do not rerun qualification or launch before separately reviewed Qbert closure.
+
 The [saved Breakout takeover-state join](results/2026-11-01-cdp-breakout-takeover-states.md) finds onlytwo of21 earlier-only
 rescues have projected contact withinfive actions at delay16;14 already match
 the teacher command. Timing estimates and this imperfect teacher do not isolate

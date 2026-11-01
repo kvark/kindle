@@ -41,6 +41,16 @@ acts. Recovery15:28:35 passes100k/9,340,357 finite tensors andretains all four f
 observer succeeds;progress/post/collection stay active. CPU co-host caveats remain;
 no frozen result yet.
 
+The [prepared Breakout B8/T32 check](docs/experiments/2026-11-01-cdp-breakout-context32.md) passes CPU qualification. It remains
+unselected: no trial,queue,declaration or GPU allocation. Both CLI paths,15 config
+cases,357 schema tensors,227 control inputs andfour prefix fixtures pass in.663s;
+protected wrapper3.201s completes15:33:44 UTC November1. All524 active Qbert inputs
+and original identity stay unchanged;retain co-host time. Prospective8192/481,
+first504,30min projected200k gate;native447fe50/runner6c1b69fb/teacher stay fixed.
+Longer gradients also change sequence diversity,target rows and warmup;old context
+negatives remain. Root`/x/Temp/kindle-breakout-context32-20261101/native-check`.
+Do not rerun qualification or launch before separately reviewed Qbert closure.
+
 The [qualified Python Qbert teacher](docs/results/2026-11-01-cdp-qbert-teacher-cost.md)
 uses equivalent channel predicates. All130 CPU tests,472 exact snapshot decisions/
 states and a full200k/799,841-frame candidate replay pass. CPU replay takes230.331s
