@@ -50,3 +50,15 @@ No full learner,extension,retry,cap increase or automatic promotion is selected.
 A later separately selected comparison would need fresh200k training,100k
 recovery and final/actual-initial sampled/greedy24-episode evaluation against
 14,028.125 primary greedy /11,522.917 sampled,with the unchanged15k/90% gate.
+
+## Completion — November 1
+
+Sourcec806de5,305 pins. Training8192/32,761 frames/489 updates takes66.241s;
+1024 frozen/.798s haszero updates and no natural episodes. Conservative200k
+projection29m39s passes35min. All357 matching initial/invariant frozen tensors,
+47 recorded initial semantic differences,finite reports,full guided replay and
+guards pass. Main succeeds06:05:29,original collection06:06:03. A supplemental
+silent-parent journal assertion is preserved and corrected in.638s CPU,without
+repeating any original stage. See the
+[result](../results/2026-11-01-cdp-qbert-greedy-training.md). No full learner or
+automatic promotion is selected.

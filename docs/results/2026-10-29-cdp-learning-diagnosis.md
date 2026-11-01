@@ -1,5 +1,12 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [greedy-training execution check](2026-11-01-cdp-qbert-greedy-training.md)
+qualifies one collection-policy experiment:8192 actions/489 updates in66.241s,
+with357 matching initial/invariant frozen tensors,full replay and guards.
+Conservative200k projection29m39s passes35min. It changes action collection only;
+no new loss or model. Task benefit and later-state exposure remain unmeasured,
+and no full learner or automatic promotion is selected.
+
 The [completed frozen Qbert training readout](2026-11-01-cdp-qbert-training-readout.md)
 replays200k actions/799,739 frames in128.729s,zero updates. Last50k later movement
 agreement is96.92% forced,85.56% in unguided episodes and75.10% after guidance

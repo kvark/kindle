@@ -20,6 +20,20 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [completed greedy-training Qbert check](docs/results/2026-11-01-cdp-qbert-greedy-training.md)
+finishes8192 actions/32,761 frames/489 updates in66.241s;1024 frozen/.798s haszero
+updates and no natural episodes. Conservative200k projection29m39s passes35min.
+Only training collection changes sampled→greedy;native447fe50,teacher,losses and
+12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100 remain. Explicit fresh-training
+CLI mode/default compatibility pass637 source/34 private CPU checks. All305 pins,
+357 matching initial/invariant frozen tensors,47 expected initial trace differences,
+full guided replay and guards pass. Main succeeds06:05:29 UTC November1/sourcec806de5,
+original collector06:06:03. Supplemental silent-parent journal assertion fails;
+retained.638s CPU correction closes06:06:50,zero original/GPU repeats. Test-path/
+old-audit CPU failures also remain preserved. Root
+`/x/Temp/kindle-qbert-greedy-training-20261101/native-check`. No active allocation,
+full learner or automatic promotion;execution/cost only. Five-game goal unfinished.
+
 The [completed frozen Qbert training readout](docs/results/2026-11-01-cdp-qbert-training-readout.md)
 replays200k actions/799,739 frames in128.729s,zero updates. Last50k later movement
 agreement is96.92% forced,85.56% in unguided episodes and75.10% after guidance
@@ -116,18 +130,6 @@ Native447fe50,exact runner and teacher fixed;only encoder2e-5→4e-5 changes in
 remain. Root`/x/Temp/kindle-qbert-encoder4e5-20261101/full`. No Qbert extension,
 confirmation or automatic successor;no active GPU allocation at closure.
 Check live state before work. The five-game goal remains unfinished.
-
-The [completed Breakout encoder8e-5 check](docs/results/2026-11-01-cdp-breakout-encoder8e5.md)
-finishes8192 actions/32,725 frames/489 updates in46.730s;1024 frozen actions/
-4096 frames/.862s havezero updates and no natural episodes. All251 pins,357
-matching initial/invariant frozen tensors,47 pre-update events,finite reports,
-full input-pixel/action/label replay and both host guards pass. Conservative200k
-projection20m55s passes30min. Main succeeds04:44:13 UTC November1/source5e71622,
-original collection04:44:36;zero failures/GPU repeats. Only encoder4e-5→8e-5
-changes,native447fe50,exact runner,teacher and other12M64 settings fixed.
-Root`/x/Temp/kindle-breakout-encoder8e5-20261101/native-check`. Execution/cost
-are qualified;no gameplay benefit,full learner or automatic promotion selected.
-No GPU allocation remains active at closure;check live state before work.
 
 ## Direction and retained results
 

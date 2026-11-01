@@ -1,5 +1,19 @@
 # CDP handover — October25,2026
 
+The [completed greedy-training Qbert check](results/2026-11-01-cdp-qbert-greedy-training.md)
+finishes8192 actions/32,761 frames/489 updates in66.241s;1024 frozen/.798s haszero
+updates and no natural episodes. Conservative200k projection29m39s passes35min.
+Only training collection changes sampled→greedy;native447fe50,teacher,losses and
+12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100 remain. Explicit fresh-training
+CLI mode/default compatibility pass637 source/34 private CPU checks. All305 pins,
+357 matching initial/invariant frozen tensors,47 expected initial trace differences,
+full guided replay and guards pass. Main succeeds06:05:29 UTC November1/sourcec806de5,
+original collector06:06:03. Supplemental silent-parent journal assertion fails;
+retained.638s CPU correction closes06:06:50,zero original/GPU repeats. Test-path/
+old-audit CPU failures also remain preserved. Root
+`/x/Temp/kindle-qbert-greedy-training-20261101/native-check`. No active allocation,
+full learner or automatic promotion;execution/cost only. Five-game goal unfinished.
+
 The [completed frozen Qbert training readout](results/2026-11-01-cdp-qbert-training-readout.md)
 replays200k actions/799,739 frames in128.729s,zero updates. Last50k later movement
 agreement is96.92% forced,85.56% in unguided episodes and75.10% after guidance
