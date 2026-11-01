@@ -35,13 +35,30 @@ tensors and9545 finite reports through102,184 actions. Independent1.137s
 confirmation passes10:27:09,preserving exact metadata,all442 pins and original
 identity. Recovery is terminal success;progress,postprocess,collection and
 supplemental observerPID781776/invocation2ac890dae7314082b6bc41472f15322b remain
-active. No completed check repeats. No full frozen result exists.
+active. No completed check repeats. Training finishes200k/799,841frames/18,715updates in
+1713.661s (28m34s) at10:40:54 UTC. Four frozen arms finish10:42:43 withzero
+updates/truncations. Provisional first-three-per-lane means aregreedy14,339.583/
+sampled13,761.458,own initials1.042/171.875;both final means miss15k. These are
+log arithmetic only:task successes,full replays,tensor audits and terminal
+confirmation remain pending. No accepted full result exists.
 Root`/x/Temp/kindle-qbert-h5-r24-seed10007-20261101/full`,service
 `kindle-qbert-h5-r24-seed10007-200k-20261101`;inspect original identity,do not
 restart or allocate another GPU job while active. Prior3.729s controller and
 1.285s terminal CPU qualifications pass;do not repeat passed checks. Retain CPU
 co-host timing. No retry,extension,cap increase or automatic successor.
 The five-game goal remains unfinished.
+
+The [completed CPU Breakout response-ambiguity diagnostic](docs/results/2026-11-01-cdp-breakout-response-ambiguity.md) finds4,597 of
+13,102 held-out rows in exact-input groups with different next paddle positions;
+near-descending514/2955,with2.512px RMS within-group pair differences. This shows
+ambiguity in the teacher's four logged inputs,not irreducible noise,a learned-state
+information limit or a causal mechanism. Interior states also vary;pair weighting,
+sticky controls,pooling and measurement remain caveats.2.433s analysis/2.518s
+controller completes10:42:08 UTC November1/source20b1208;four fixed fixtures,
+seven diagnostic/442 active Qbert pins and.083s independent histogram recount pass.
+Original Qbert identity unchanged;retain CPU co-host timing. Zero emulator/native/
+GPU work,updates,failures or repeats. No teacher,loss,learner or successor selected.
+Root`/x/Temp/kindle-breakout-response-ambiguity-20261101`;complete,do not rerun.
 
 The [completed CPU Breakout response refit](docs/results/2026-11-01-cdp-breakout-response-refit.md) fails its fixed screen:
 held-out MAE rises1.976923→2.004710 overall and1.948802→1.977556 near descending

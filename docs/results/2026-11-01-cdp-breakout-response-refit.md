@@ -61,3 +61,7 @@ Evidence: `/x/Temp/kindle-breakout-response-refit-20261101`.
   input hashes and the independent scalar verification.
 
 Complete: do not rerun the fit, passed tests, preflight or recount.
+
+A separate [exact-input ambiguity analysis](2026-11-01-cdp-breakout-response-ambiguity.md)
+finds different next observations at identical logged response inputs. It performs
+no alternate fit and does not change this rejection or the retained teacher.
