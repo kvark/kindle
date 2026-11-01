@@ -111,3 +111,15 @@ the final frozen comparison remains pending.
 - `checkpoint-review-100k.json`: `1200507c6a43b2f30305c68f86e1d3c2eca9b73c2cbf8a46ac6b79c74ea9cfef`.
 
 - `recovery-confirmation.json`: `2556b1187abd9241115537185aad01cd93d70565c5277895f436fd956f473b63`.
+
+### Training log completes inside the fixed cap
+
+The original training log ends at **200,000 actions /799,590 frames /12,477
+updates in1,307.040s (21m47s)**, with residual credit.5. This is1.50% more
+observed training time than the retained control's1,287.701s;CPU co-host and
+native/runner differences remain. The30-minute cap is unchanged.
+
+`training-log-progress.json` preserves the terminal log record/hash and original
+service identity. This is provisional log evidence:the existing pipeline is
+continuing its fixed frozen arms and full replay/checkpoint audit. No new GPU
+job or checkpoint selection occurs, and no gameplay benefit is inferred yet.

@@ -32,7 +32,8 @@ progress,postprocessing and collection observers remain active. Recovery passes
 The.190s retained-file/config confirmation passes11:27:05;recovery observer
 succeeds and original learner identity stays. Keep CPU co-host time. Require
 final/actual-initial sampled/greedy24-episode assessments against56.292/104.667,
-all0/24 two-wall. No frozen result yet. Native/
+all0/24 two-wall. Training log completes200k/799,590frames/12,477updates in21m47s,
+1.50% more observed training time than control. Frozen arms/full audits pending. Native/
 runner differences limit causal claims;no prior experience reused. Root
 `/x/Temp/kindle-centroid-encoder4e5-20261101/full`;service
 `kindle-breakout-centroid-encoder4e5-200k-20261101`. Inspect the original live
