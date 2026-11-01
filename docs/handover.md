@@ -1,54 +1,37 @@
 # CDP handover — October25,2026
 
-The [fresh Breakout H5/R24 comparison](experiments/2026-11-01-cdp-breakout-h5-r24-200k.md)
-launches09:42:11 UTC November1/sourcec4fa576,MainPID777532/invocation
-acf63b2de9614a9dab625bcc6f6cbe52,with301 pinned inputs. Fixed200k/18,715 updates,
-30-minute cap,100k/9340 recovery,and final/actual-initial sampled/greedy24-episode
-arms against sampled56.292/greedy104.667;sampled remains primary and the90%
-two-wall gate is unchanged. Same12M64/Auto/N8/B16/T16/encoder4e-5/sampled
-collection/expert100/native447fe50/runner6c1b69f;H15/R16→H5/R24 jointly changes
-horizon,cadence,sampling,warmup and work. Older H5/R32 was negative;no isolated
-effect or transfer is assumed. Startup matches357 initial tensors,47 pre-update
-transitions and first cadence,with1004 finite reports through11,088 actions.
-The100k/9340 recovery passes09:53:47 UTC with357 finite tensors and9527 finite
-reports through102,000 actions. Independent.856s confirmation passes09:53:55,
-preserving exact100k metadata,all301 pins and original identity. Progress,
-postprocessing,collection and supplemental observerPID777949/invocation
-641b2f823ea145579b9b92c00ec12ea7 remain active;recovery is terminal success.
-No completed check repeats. Final frozen gameplay remains unmeasured. Root
-`/x/Temp/kindle-breakout-h5-r24-20261101/full`,service
-`kindle-breakout-h5-r24-200k-20261101`;check live identity,do not restart or run
-another GPU job while active. No extension,cap increase or automatic successor.
-The five-game goal remains unfinished;retain CPU co-host timing without correction.
+The [completed Breakout H5/R24 comparison](results/2026-11-01-cdp-breakout-h5-r24.md)
+finishes200k actions/799,605 frames/18,715 updates in22m50s,+6.42% training
+time. Sampled42.333/greedy76.083 fall24.80%/27.31% below56.292/104.667;all0/24
+two-wall. Own initials1.417/2.208 match. Late replay expert CE.558097→.380887
+improves without gameplay gain;retain H15/R16. H15/R16→H5/R24 changes horizon,
+cadence,sampling,warmup and work together on reused1009;no isolated cause or
+reliability. All301 pins,100k/9340 recovery,357 matching/invariant tensors,paired
+initial traces,full replays/videos,guards,curves,exposure and comparison pass.
+Main/post/collection finish10:08:37/10:08:46/10:09:18 UTC November1;
+independent2.171s confirmation passes10:09:38. All six services succeed,
+zero failures or repeated stages. Sourcec4fa576,originalPID777532/invocation
+acf63b2de9614a9dab625bcc6f6cbe52;actual overrides43.471%,not frozen competence.
+Root`/x/Temp/kindle-breakout-h5-r24-20261101/full`;terminal,do not rerun learner,
+collectors or confirmations. No extension,cap increase or automatic successor.
+Retain CPU co-host timing. No GPU allocation at closure;check live state.
+The five-game goal remains unfinished.
 
-The [fresh Qbert H5/R24 seed10007 preparation](experiments/2026-11-01-cdp-qbert-h5-r24-seed10007.md)
-passes3.729s CPU qualification (5.333s wrapper) at09:54:44 UTC November1:
-fiveCLI/26config/eightmode/15header/11recovery/fourparser cases,49paths/15scripts,
-357schema tensors and390bounded/401control pins. Seed10007/evaluation4000010007
-are absent from67 examined prior Qbert declarations. Same passing8039 recipe,
-200k/18,715 updates,35min cap and original15k/90% gate;no isolated seed mechanism
-or reliability claim. All301 active Breakout pins/identity remain unchanged.
-No native/emulator construction,GPU work,trial,queue,declaration or service.
-Root`/x/Temp/kindle-qbert-h5-r24-seed10007-20261101/full`;preparation is unselected,
-not an automatic successor. Review only after Breakout closure;do not rerun
-passed preparation/preflight. Retain CPU co-host time without correction.
-
-The [bounded Breakout H5/R24 check](results/2026-11-01-cdp-breakout-h5-r24.md)
-passes8192 actions/32,723 frames/733 updates in50.971s;1024 frozen/4096frames/
-.884s haszero updates/no natural episodes. All267 pins,357 matching/invariant
-finite tensors,47 pre-update events,full guided replay and guards pass. Main/
-collector succeed09:36:47/09:37:06 UTC November1/source1b4671b,originalPID777123/
-invocation0d189ef7da054ce0866a40c9b9a0cc4b. Zero failures/repeats;do not rerun.
-Conservative200k projection22m49s passes30min. The separately selected
-[fresh200k comparison](experiments/2026-11-01-cdp-breakout-h5-r24-200k.md)
-will compare sampled56.292/greedy104.667 with100k/9340 recovery and four frozen
-arms. Same12M64/Auto/N8/B16/T16/encoder4e-5/sampled collection/expert100/native447fe50/
-runner6c1b69f;H15/R16→H5/R24 changes horizon,cadence,sampling,warmup and work
-jointly. Earlier H5/R32 was negative;no transfer or isolated effect is assumed.
-Full CPU preflight1.433s passes fiveCLI/24config/10header/fourparser/sevenrecovery
-cases,44paths/15scripts and267bounded/227control pins. No full result exists.
-Root`/x/Temp/kindle-breakout-h5-r24-20261101`;check live state before GPU work.
-No extension,cap increase,confirmation or automatic successor;goal unfinished.
+The [fresh Qbert H5/R24 seed10007 check](experiments/2026-11-01-cdp-qbert-h5-r24-seed10007.md)
+is separately selected after complete Breakout closure10:09:38 UTC November1.
+Same passing8039 recipe:12M48/Auto/N8/B16/T16/H5/R24/encoder4e-5/greedy collection/
+expert100/native447fe50/runneraba4300d. Fix200k/18,715 updates,35min cap,
+100k/9340 recovery and four final/actual-initial24-episode arms;greedy primary,
+original15k/90% gate. Learner10007/evaluation4000010007 are absent from67 prior
+Qbert declarations;only seeds change,no experience reuse or isolated seed cause.
+CPU qualification3.729s passes fiveCLI/26config/eightmode/15header/11recovery/
+fourparser cases,49paths/15scripts,357schema and390bounded/401control pins.
+Supplemental verifier1.285s checks four control scores/videos,five identities,
+four journal/eight seed/config fixtures. No native/emulator construction.
+Root`/x/Temp/kindle-qbert-h5-r24-seed10007-20261101/full`;no learner or result
+at selection. Launch only with unchanged qualified inputs and idle host;do not
+rerun passed preparation/preflights or schedule concurrent GPU work. Retain CPU
+co-host timing. No retry,extension,cap increase or automatic successor.
 
 The [completed frozen Breakout temperature0.5 assessment](results/2026-11-01-cdp-breakout-temperature.md)
 scores83.292 versus retained greedy104.667 (−20.42%) and default sampled56.292
