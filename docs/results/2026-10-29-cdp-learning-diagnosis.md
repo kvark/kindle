@@ -1,5 +1,11 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fresh8039 confirmation](../experiments/2026-11-01-cdp-qbert-greedy-seed8039.md)
+keeps the passing greedy-collection recipe fixed and changes learner/evaluation
+seeds. This tests a second learner at200k/35min with own initial controls and the
+original15k/90% gate; it does not isolate why collection changed performance.
+CPU preparation passes; no8039 launch or outcome exists at selection.
+
 The [completed Breakout first-disagreement intervention](2026-11-01-cdp-breakout-first-disagreement.md)
 finds102 both/six teacher-only/six policy-only/six neither survive at the original
 loss endpoint;both arms108/120 when followed by the same teacher. Thus the first

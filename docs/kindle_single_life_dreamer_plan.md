@@ -1,5 +1,18 @@
 # Kindle: CDP learning roadmap
 
+The [fresh Qbert seed8039 check](experiments/2026-11-01-cdp-qbert-greedy-seed8039.md) selects one independent learner of the
+passing greedy-collection recipe:200k/12,477 updates under35min,100k/6227 recovery,
+and four final/actual-initial24-episode arms. Keep12M48/Auto/N8/B16/T16/H15/R16/
+encoder4e-5/expert100,native447fe50,exact runner,teacher and losses. Only learner/
+evaluation seeds change4013→8039/4000008039. Primary greedy gate15k/90% remains;
+no sampled-training control for8039 or isolated collection-mode effect is claimed.
+CPU preflight2.179s passes305 bounded/317 preceding pins,actual CLI/audit/observer
+checks and357 schema tensors,zero native/emulator construction. No new build or
+GPU qualification. Root`/x/Temp/kindle-qbert-greedy-seed8039-20261101/full`,service
+`kindle-qbert-greedy-seed8039-200k-20261101`. No learner launched or result exists
+at selection. Check live state;do not restart or overlap GPU jobs. No retry,
+extension,cap increase,seed campaign or automatic successor. Goal unfinished.
+
 The [completed CPU Breakout first-disagreement diagnostic](results/2026-11-01-cdp-breakout-first-disagreement.md)
 finds102 both/six teacher-only/six policy-only/six neither survive at the original
 loss endpoint,both arms108/120. First disagreements usually remain recoverable
