@@ -148,6 +148,8 @@ def main():
                         help="fresh Breakout imitation: edge-corrected teacher labels all states with actual-action feedback")
     parser.add_argument("--guidance-imitation-scale", type=float,
                         help="fresh guided training only: native supervised actor loss on expert actions")
+    parser.add_argument("--guidance-imitation-decay", type=int, nargs=2, metavar=("START_UPDATE", "END_UPDATE"),
+                        help="hold imitation scale through START_UPDATE, then linearly fade to zero at END_UPDATE")
     parser.add_argument("--guidance-noop-weight", type=float,
                         help="relative NOOP target weight for expert imitation; default1")
     parser.add_argument("--guidance-fire-weight", type=float,
@@ -246,6 +248,12 @@ def main():
             parser.error("guidance NOOP weight requires imitation")
         if not positive_f32(args.guidance_noop_weight) or args.guidance_noop_weight > 1:
             parser.error("guidance NOOP weight must be positive F32 and at most1")
+    if args.guidance_imitation_decay is not None:
+        if args.guidance_imitation_scale is None:
+            parser.error("guidance imitation decay requires imitation")
+        start, end = args.guidance_imitation_decay
+        if not 0 <= start < end < 2**64:
+            parser.error("guidance imitation decay requires 0 <= start < end within u64")
     if args.guidance_fire_weight is not None:
         if args.guidance_imitation_scale is None:
             parser.error("guidance FIRE weight requires imitation")
@@ -290,6 +298,7 @@ def main():
     training_options.add("--qbert-corrective-labels")
     training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions", "--breakout-corrective-labels"))
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-fire-weight", "--guidance-world-gradient"))
+    training_options.add("--guidance-imitation-decay")
     training_options.add("--image-size")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
@@ -320,6 +329,8 @@ def main():
         parser.error("corrective labels require native passive-label support")
     if args.guidance_world_gradient and not getattr(kindle.VectorAgent, "SUPPORTS_EXPERT_WORLD_GRADIENT", False):
         parser.error("guidance world gradient requires native world-gradient support")
+    if args.guidance_imitation_decay is not None and not getattr(kindle.VectorAgent, "SUPPORTS_EXPERT_IMITATION_DECAY", False):
+        parser.error("guidance imitation decay requires native decay support")
     if args.open_loop_length is not None and not getattr(kindle.VectorAgent, "SUPPORTS_OPEN_LOOP_SUPERVISION", False):
         parser.error("open-loop supervision requires native open-loop support")
     if args.breakout_centroid_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COLOR_CENTROID_SUPERVISION", False):
@@ -433,6 +444,9 @@ def main():
             config["expert_imitation"] = dict(scale=args.guidance_imitation_scale, action_weights=weights)
             if args.guidance_world_gradient:
                 config["expert_imitation"]["world_gradient"] = True
+            if args.guidance_imitation_decay is not None:
+                start, end = args.guidance_imitation_decay
+                config["expert_imitation"]["decay"] = dict(start_update=start, end_update=end)
         if learned_rgb:
             config["observation_kind"] = f"rgb{args.image_size or 64}"
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)

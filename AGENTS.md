@@ -18,6 +18,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+The [optional native imitation decay](docs/experiments/2026-11-01-cdp-expert-imitation-decay.md) is selected for qualification within
+the existing architecture-diagnosis goal. It holds the expert loss weight through
+one update boundary, then fades it to zero at another, in both actor and optional
+world losses. Teacher labels and online guidance stay fixed; raw losses remain
+reported. Legacy behavior is the default. The148 Rust CPU checks,38 focused
+Python checks and strict workspace/binding Clippy pass; the initial Python
+fixture failure is preserved. Native numerical validation, isolated packaging
+and the declared8192-action check remain pending. No full learner or gameplay
+benefit is established. Root`/x/Temp/kindle-expert-decay-20261101`.
+
 The [Breakout action interventions](docs/results/2026-10-30-cdp-encoder-representation.md#local-action-interventions-limit-the-teacher-disagreement-diagnosis)
 limit treating teacher disagreement as error. Of51 improved-policy disagreements,
 the teacher saves a life in5 cases,the policy3,and43 tie;among18 confident

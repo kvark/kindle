@@ -650,6 +650,7 @@ mod tests {
             scale: 2.0,
             action_weights: vec![0.05, 1.0, 2.0],
             world_gradient: false,
+            decay: None,
         });
         let mut batch = SequenceBatch {
             previous_actions: vec![vec![0.0; 6]; 4],

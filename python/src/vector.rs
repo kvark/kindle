@@ -28,6 +28,9 @@ impl PyVectorAgent {
     const SUPPORTS_EXPERT_WORLD_GRADIENT: bool = true;
 
     #[classattr]
+    const SUPPORTS_EXPERT_IMITATION_DECAY: bool = true;
+
+    #[classattr]
     const SUPPORTS_OPEN_LOOP_SUPERVISION: bool = true;
 
     #[classattr]

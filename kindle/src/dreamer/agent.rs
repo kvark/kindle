@@ -180,6 +180,9 @@ pub struct ExpertImitationMetrics {
     pub loss: f32,
     pub labeled_rows: usize,
     pub weight_sum: f32,
+    /// Scheduled scale before the separate actor-update gate; absent for legacy constant weighting.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scale: Option<f32>,
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -1411,6 +1414,15 @@ impl DreamerCore {
         posterior: &PosteriorBatch,
         behavior: &mut BehaviorTrainingBatch,
     ) -> WorldMetrics {
+        if self.config.expert_world_gradient()
+            && let Some(expert) = &self.config.expert_imitation
+            && expert.decay.is_some()
+        {
+            self.world_train.set_input(
+                "expert_imitation_scale",
+                &[expert.scale_at_update(self.learner_step + 1)],
+            );
+        }
         if self.config.actor_critic_gradient || self.config.expert_world_gradient() {
             self.world_train.set_input(
                 "actor_update_scale",
@@ -2274,6 +2286,16 @@ impl DreamerCore {
 
     fn train_behavior(&mut self, batch: &BehaviorTrainingBatch) -> BehaviorMetrics {
         let actor_update_scale = self.config.actor_update_scale(self.learner_step);
+        let expert_scale = self.config.expert_imitation.as_ref().and_then(|expert| {
+            expert
+                .decay
+                .as_ref()
+                .map(|_| expert.scale_at_update(self.learner_step + 1))
+        });
+        if let Some(scale) = expert_scale {
+            self.behavior_train
+                .set_input("expert_imitation_scale", &[scale]);
+        }
         if self.config.expert_imitation.is_some() {
             self.behavior_train
                 .set_input("expert_action_target", &batch.expert_action_target);
@@ -2327,6 +2349,7 @@ impl DreamerCore {
                 loss,
                 weight_sum,
                 labeled_rows: batch.expert_labeled_rows,
+                scale: expert_scale,
             }
         });
         let metrics = BehaviorMetrics {

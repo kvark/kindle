@@ -730,10 +730,10 @@ fn training_graph(
         scale(&mut graph, loss, head_average)
     });
     let total = if let Some(loss) = expert_loss {
-        let scaled = scale(
+        let scaled = behavior::scale_expert_loss(
             &mut graph,
             loss,
-            config.expert_imitation.as_ref().unwrap().scale,
+            config.expert_imitation.as_ref().unwrap(),
         );
         let scaled = graph.mul(scaled, actor_scale.unwrap());
         graph.add(total, scaled)
@@ -1442,6 +1442,7 @@ mod tests {
             scale: 1.0,
             action_weights: vec![0.05, 1.0, 1.0],
             world_gradient: true,
+            decay: None,
         });
         config
     }
@@ -1510,6 +1511,14 @@ mod tests {
             }
         }
         config.actor_critic_gradient = false;
+        config.expert_imitation.as_mut().unwrap().decay =
+            Some(super::super::ExpertImitationDecay {
+                start_update: 10,
+                end_update: 20,
+            });
+        let scheduled = build_training_graph(&config, 2);
+        assert_eq!(scheduled.nodes().iter().filter(|node|
+            matches!(&node.op, Op::Input { name } if name == "expert_imitation_scale")).count(),1);
         config.expert_imitation.as_mut().unwrap().world_gradient = false;
         let disabled = build_training_graph(&config, 2);
         config.expert_imitation = None;

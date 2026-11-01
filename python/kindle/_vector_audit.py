@@ -160,7 +160,7 @@ def audit(path):
         expert = config.get("expert_imitation")
         if expert is not None:
             check(isinstance(expert, dict)
-                  and {"scale", "action_weights"} <= set(expert) <= {"scale", "action_weights", "world_gradient"},
+                  and {"scale", "action_weights"} <= set(expert) <= {"scale", "action_weights", "world_gradient", "decay"},
                   "invalid expert imitation config")
             check(type(expert.get("world_gradient", False)) is bool, "invalid expert world gradient flag")
             require_numbers(expert["scale"])
@@ -170,6 +170,12 @@ def audit(path):
                   and all(weight >= 0 for weight in expert["action_weights"])
                   and any(weight > 0 for weight in expert["action_weights"]), "invalid expert imitation weights")
             check(header["mode"] != "train" or guidance, "expert imitation requires trusted guidance")
+            decay = expert.get("decay")
+            if decay is not None:
+                check(isinstance(decay, dict) and set(decay) == {"start_update", "end_update"},
+                      "invalid expert imitation decay")
+                check(all(type(value) is int and 0 <= value < 2**64 for value in decay.values())
+                      and decay["start_update"] < decay["end_update"], "invalid expert imitation decay interval")
         expert_training = expert is not None and header["mode"] == "train"
         corrective = guidance and header["exploration"]["kind"] in (CORRECTIVE_GUIDANCE_KIND, BREAKOUT_CORRECTIVE_GUIDANCE_KIND)
         check(not corrective or expert_training, "corrective guidance requires expert imitation")
@@ -314,6 +320,16 @@ def audit(path):
                 check(event["run_step"] == actions and pending_updates > 0, "unexpected learner update")
                 report = event["report"]
                 require_numbers(report)
+                if expert is not None and expert.get("decay") is not None:
+                    decay = expert["decay"]
+                    update = header["starting_learner_step"] + updates + 1
+                    factor = (1.0 if update <= decay["start_update"] else
+                              0.0 if update >= decay["end_update"] else
+                              float(decay["end_update"] - update) / float(decay["end_update"] - decay["start_update"]))
+                    expected = f32(f32(expert["scale"]) * f32(factor))
+                    applied = report.get("behavior", {}).get("expert_imitation", {}).get("scale")
+                    check(type(applied) in (int, float) and f32(applied) == expected,
+                          "expert imitation scale/counter mismatch")
                 position = report.get("world", {}).get("color_centroid_supervision")
                 check((position is not None) == (centroid is not None), "centroid report/config mismatch")
                 if position is not None:

@@ -2211,6 +2211,7 @@ mod tests {
             scale: 1.0,
             action_weights: vec![1.0; 3],
             world_gradient: false,
+            decay: None,
         });
         assert!(check_expert_labels(&config, 2, &[Some(2), None]).is_ok());
         assert!(check_expert_labels(&config, 2, &[None, None]).is_ok());
@@ -2313,6 +2314,7 @@ mod tests {
             scale: 1.0,
             action_weights: vec![0.05, 1.0, 1.0],
             world_gradient: true,
+            decay: None,
         });
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         assert_eq!(
@@ -2463,6 +2465,7 @@ mod tests {
             scale: 2.0,
             action_weights: vec![0.05, 1.0, 1.0],
             world_gradient,
+            decay: None,
         });
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         assert_eq!(

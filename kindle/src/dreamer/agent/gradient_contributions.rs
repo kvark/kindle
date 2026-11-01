@@ -420,6 +420,7 @@ fn diagnostic_gates_preserve_original_graph_prefix() {
         scale: 100.0,
         action_weights: vec![1.0; 18],
         world_gradient: true,
+        decay: None,
     });
     let original = world::build_training_graph(&config, config.world_backprop_length);
     assert!(original.nodes().iter().any(|node| matches!(&node.op,

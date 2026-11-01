@@ -2,7 +2,7 @@
 
 use meganeura::{Graph, graph::NodeId};
 
-use super::config::DreamerConfig;
+use super::config::{DreamerConfig, ExpertImitation};
 use super::networks::{MlpHead, mixed_log_probabilities, scale, sum, weighted_cross_entropy};
 
 pub const LOSS_TOTAL: usize = 0;
@@ -98,6 +98,19 @@ pub(crate) fn action_cross_entropy(
     graph.neg(loss)
 }
 
+pub(crate) fn scale_expert_loss(
+    graph: &mut Graph,
+    loss: NodeId,
+    expert: &ExpertImitation,
+) -> NodeId {
+    if expert.decay.is_some() {
+        let scale = graph.input("expert_imitation_scale", &[1]);
+        graph.mul(loss, scale)
+    } else {
+        scale(graph, loss, expert.scale)
+    }
+}
+
 /// Joint actor/value update over imagined states plus D3's replay-value loss.
 pub fn build_training_graph(
     config: &DreamerConfig,
@@ -164,7 +177,7 @@ pub fn build_training_graph(
             config.actor_unimix,
         );
         let loss = action_cross_entropy(&mut graph, log_probabilities, target);
-        losses.push(scale(&mut graph, loss, expert.scale));
+        losses.push(scale_expert_loss(&mut graph, loss, expert));
         loss
     });
     let total = sum(&mut graph, &losses);
@@ -277,6 +290,7 @@ mod tests {
             scale: 1.0,
             action_weights: vec![0.05, 1.0, 1.0],
             world_gradient: false,
+            decay: None,
         });
         let expert = build_training_graph(&config, 12, 6);
         let parameters = |graph: &Graph| {
@@ -296,6 +310,23 @@ mod tests {
         assert_eq!(baseline.outputs().len(), LOSS_EXPERT);
         assert_eq!(expert.outputs().len(), LOSS_EXPERT + 1);
         let (plan, _) = meganeura::compile_training_graph(&expert);
+        assert!(!plan.dispatches.is_empty());
+        config.expert_imitation.as_mut().unwrap().decay =
+            Some(super::super::ExpertImitationDecay {
+                start_update: 10,
+                end_update: 20,
+            });
+        let scheduled = build_training_graph(&config, 12, 6);
+        assert_eq!(parameters(&scheduled), parameters(&expert));
+        assert_eq!(scheduled.outputs().len(), expert.outputs().len());
+        let scales = |graph: &Graph| {
+            graph.nodes().iter().filter(|node|
+            matches!(&node.op, meganeura::graph::Op::Input { name } if name == "expert_imitation_scale")).count()
+        };
+        assert_eq!(scales(&baseline), 0);
+        assert_eq!(scales(&expert), 0);
+        assert_eq!(scales(&scheduled), 1);
+        let (plan, _) = meganeura::compile_training_graph(&scheduled);
         assert!(!plan.dispatches.is_empty());
     }
 
@@ -360,6 +391,112 @@ mod tests {
                 }
             }
             assert!((f64::from(actual_loss[0]) - expected_loss).abs() < 2e-5);
+        }
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded Vulkan imitation-decay gradient check"]
+    fn decayed_expert_loss_preserves_raw_metric_and_other_gradients() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let rows = 120;
+        let actions = 18;
+        let unimix = 0.01;
+        let expert = ExpertImitation {
+            scale: 100.0,
+            action_weights: vec![1.0; actions],
+            world_gradient: true,
+            decay: Some(super::super::ExpertImitationDecay {
+                start_update: 10,
+                end_update: 14,
+            }),
+        };
+        let mut graph = Graph::new();
+        let parameter = graph.parameter("logits", &[rows, actions]);
+        let target_node = graph.input("target", &[rows, actions]);
+        let logp = mixed_log_probabilities(&mut graph, parameter, rows, actions, unimix);
+        let raw_loss = action_cross_entropy(&mut graph, logp, target_node);
+        let weighted = scale_expert_loss(&mut graph, raw_loss, &expert);
+        let square = graph.mul(parameter, parameter);
+        let auxiliary = graph.mean_all(square);
+        let auxiliary = scale(&mut graph, auxiliary, 0.125);
+        let total = graph.add(weighted, auxiliary);
+        graph.set_outputs(vec![total, raw_loss, auxiliary]);
+        let mut session = build_session(&graph, &gpu, Mode::Training, false);
+        let logits = (0..rows * actions)
+            .map(|i| (i as f32 * 0.13).sin())
+            .collect::<Vec<_>>();
+        let mut target = vec![0.0; logits.len()];
+        for row in 0..rows {
+            target[row * actions + row % actions] = match row % 4 {
+                0 => 0.0,
+                1 => 0.05,
+                _ => 1.0,
+            };
+        }
+        let mut expected_raw = 0.0;
+        let expected_auxiliary = logits
+            .iter()
+            .map(|&x| 0.125 * f64::from(x).powi(2))
+            .sum::<f64>()
+            / logits.len() as f64;
+        let mut expert_gradient = vec![0.0; logits.len()];
+        for row in 0..rows {
+            let probabilities = logits[row * actions..(row + 1) * actions]
+                .iter()
+                .map(|&x| f64::from(x).exp())
+                .collect::<Vec<_>>();
+            let sum = probabilities.iter().sum::<f64>();
+            let chosen = row % actions;
+            let weight = f64::from(target[row * actions + chosen]);
+            let mixed = (1.0 - f64::from(unimix)) * probabilities[chosen] / sum
+                + f64::from(unimix) / actions as f64;
+            expected_raw -= weight * mixed.ln() / rows as f64;
+            for action in 0..actions {
+                expert_gradient[row * actions + action] = weight / rows as f64
+                    * ((1.0 - f64::from(unimix)) * probabilities[chosen] / sum / mixed)
+                    * (probabilities[action] / sum - f64::from(action == chosen));
+            }
+        }
+        let mut prior_raw = None;
+        for update in [10, 12, 14] {
+            let applied = expert.scale_at_update(update);
+            session.set_parameter("logits", &logits);
+            session.set_input("target", &target);
+            session.set_input("expert_imitation_scale", &[applied]);
+            session.wait();
+            session.step();
+            session.wait();
+            let mut total = [0.0];
+            let mut raw = [0.0];
+            let mut auxiliary = [0.0];
+            session.read_output_by_index(0, &mut total);
+            session.read_output_by_index(1, &mut raw);
+            session.read_output_by_index(2, &mut auxiliary);
+            let mut gradients = vec![0.0; logits.len()];
+            session.read_param_grad("logits", &mut gradients);
+            assert!((f64::from(raw[0]) - expected_raw).abs() < 2e-5);
+            assert!((f64::from(auxiliary[0]) - expected_auxiliary).abs() < 2e-6);
+            assert!(
+                (f64::from(total[0]) - (f64::from(applied) * expected_raw + expected_auxiliary))
+                    .abs()
+                    < 2e-4
+            );
+            if let Some(previous) = prior_raw {
+                assert_eq!(raw[0], previous);
+            }
+            prior_raw = Some(raw[0]);
+            for (index, &actual) in gradients.iter().enumerate() {
+                let expected = f64::from(applied) * expert_gradient[index]
+                    + 0.25 * f64::from(logits[index]) / logits.len() as f64;
+                assert!(
+                    (f64::from(actual) - expected).abs() < 2e-6 + 2e-5 * expected.abs(),
+                    "update{update} gradient{index}: {actual} versus{expected}"
+                );
+            }
         }
     }
 
