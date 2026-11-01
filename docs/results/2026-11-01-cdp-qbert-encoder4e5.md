@@ -52,3 +52,15 @@ selects no automatic promotion. After its completed correctness/cost checks,
 a [separate fresh200k comparison](../experiments/2026-11-01-cdp-qbert-encoder4e5-200k.md)
 tests gameplay against retained greedy13,785.417/sampled9,987.500. No check
 experience is reused. The five-game goal remains unfinished.
+
+## Separately selected full comparison is active
+
+Fresh200k training launches03:58:23 UTC November1/source7f794b0 with276 pins,
+mainPID736977/invocation`48d20e8959f04654b6f5ff8932328d8d`. The35-minute cap,
+100k/6227 recovery and final/actual-initial greedy/sample24-episode assessments
+are fixed. Native447fe50, exact runner and teacher remain unchanged. Startup
+passes357 matching initial tensors,47 pre-update transitions, correct cadence
+and94 finite reports through1880 actions. The.815s CPU check co-hosts with
+learning; retain its timing caveat without wall-time correction. All four
+observers are active. No full frozen outcome is available; do not restart this
+learner or schedule another GPU job while it is active.

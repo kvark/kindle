@@ -1,15 +1,19 @@
 # Kindle: CDP learning roadmap
 
-The [selected fresh Qbert encoder4e-5 comparison](experiments/2026-11-01-cdp-qbert-encoder4e5-200k.md) targets200k actions/12,477
-updates under35min with100k/6227 recovery and fixed final/actual-initial
-greedy/sample24-episode arms against13,785.417/9,987.500. Only encoder2e-5→4e-5
-changes in12M48/Auto/N8/B16/T16/H15/R16/expert100;native447fe50,exact runner and
-teacher stay fixed. CPU preflight1.372s passes five CLI paths,24 config/49 path/
-15 script/eight header/four observer/seven recovery checks and257 bounded/235
-control pins,zero native/environment construction. Root
+The [fresh Qbert encoder4e-5 comparison](experiments/2026-11-01-cdp-qbert-encoder4e5-200k.md) launches03:58:23 UTC November1/
+source7f794b0 with276 pins and35-minute training cap:200k actions/12,477 updates,
+12M48/Auto/N8/B16/T16/H15/R16/expert100. Only encoder2e-5→4e-5 changes;
+native447fe50,exact runner and teacher stay fixed. Startup passes357 control/
+bounded-matching initial tensors,47 pre-update transitions,correct cadence and
+94 finite reports through1880 actions. MainPID736977,invocation
+`48d20e8959f04654b6f5ff8932328d8d`;progress,recovery,postprocessing and terminal
+collection observers are active. Require100k/6227 recovery and fixed final/
+actual-initial greedy/sample24-episode arms against13,785.417/9,987.500;
+no full frozen result exists. CPU preflight1.372s and.815s co-host startup pass;
+reused4013/cohort,no experience reuse or reliability claim. Root
 `/x/Temp/kindle-qbert-encoder4e5-20261101/full`,service
-`kindle-qbert-encoder4e5-200k-20261101`. Fresh reused4013/cohort,no experience
-reuse or automatic successor;check live state before GPU work. Goal unfinished.
+`kindle-qbert-encoder4e5-200k-20261101`. Check live state;do not restart this
+learner or schedule another GPU job while active. The five-game goal is unfinished.
 
 The [completed Qbert encoder4e-5 check](results/2026-11-01-cdp-qbert-encoder4e5.md) finishes8192 actions/32,754 frames/489
 updates in64.165s;1024 frozen/.800s haszero updates/no natural episodes.

@@ -57,3 +57,15 @@ Original control pins match without historical source substitutions.
 Root`/x/Temp/kindle-qbert-encoder4e5-20261101/full`,trial
 `qbert-12m-48-b16-r16-encoder4e5-expert100-200k-seed4013`,service
 `kindle-qbert-encoder4e5-200k-20261101`. The five-game goal remains unfinished.
+
+## Launch and startup
+
+The fresh learner launches03:58:23 UTC November1/source7f794b0 with276 pinned
+inputs, mainPID736977/invocation`48d20e8959f04654b6f5ff8932328d8d`. Progress,
+recovery, postprocessing and terminal-collection observers are active. Read-only
+startup.815s verifies357 initial tensors against both control and bounded check,
+47 pre-update transitions, exact source/config, first updates376/392/408/424/
+440/456 and94 finite supervised reports through1880 actions. Retain the CPU
+co-host timing caveat without correcting training wall time. No full frozen
+result is available. Do not restart the learner or schedule another GPU job
+while it is active; inspect the original process and observers.
