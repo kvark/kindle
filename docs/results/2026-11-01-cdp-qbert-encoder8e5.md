@@ -1,4 +1,16 @@
-# Qbert encoder8e-5 passes execution and early-cost checks
+# Qbert encoder8e-5: fresh 200k comparison running
+
+The full learner launches18:34:07 UTC November1/sourceea34785 with528 pinned
+inputs,originalPID831942/invocationbae3fe2dd4a24070ab2845a7828145fa. Startup
+passes18:34:31:357 matching control/bounded initial tensors,47 identical
+pre-update events,first six updates376/392/400/408/424/432,and295 finite
+supervised reports through3,528 actions. Original progress,recovery,
+postprocessing and collection observers are active. Retain1.534s startup CPU
+co-host time without correction. No full frozen score or gameplay benefit is
+established;do not restart this learner or overlap GPU work. Declaration
+SHA5eecf09e5a09678fab34da03cb2e904cec1e521a029b8e04d956b61cd2aeb7b0.
+
+## Completed bounded check and CPU qualification
 
 The bounded check completes**8,192 actions/32,759 frames/733 updates in48.423s**.
 The1,024-action/4,096-frame frozen stage takes**.808s**,withzero updates and no
