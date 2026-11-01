@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [fresh greedy-training Qbert comparison](experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
+is selected within the existing five-game goal after the completed bounded check.
+Fresh200k/12,477 updates,35-minute cap,100k recovery,four fixed24-episode arms;
+only live collection changes sampled→greedy. Primary control14,028.125 greedy,
+secondary11,522.917 sampled;15k/90% gate unchanged. Native447fe50 and12M48/
+Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100 remain. CPU preflight1.832s passes
+305 bounded/276 control pins and command/audit/observer checks. Root
+`/x/Temp/kindle-qbert-greedy-training-20261101/full`,service
+`kindle-qbert-greedy-training-200k-20261101`. Check live state before work;
+do not restart or schedule another GPU job while active. No full result exists.
+
 The [completed greedy-training Qbert check](results/2026-11-01-cdp-qbert-greedy-training.md)
 finishes8192 actions/32,761 frames/489 updates in66.241s;1024 frozen/.798s haszero
 updates and no natural episodes. Conservative200k projection29m39s passes35min.

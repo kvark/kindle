@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The separately selected [fresh greedy-training comparison](../experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
+tests whether changing live Qbert collection improves frozen play at200k/12,477
+updates within35min. The training readout identifies weaker later autonomous
+movement fit; it does not prove a coverage cause. Keep native447fe50,losses,
+teacher and12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100. Primary control
+14,028.125 greedy,secondary11,522.917 sampled;100k recovery and four fixed24-episode
+arms are required. CPU preflight1.832s passes305 bounded/276 control pins and
+actual command/audit/observer checks. No full gameplay result is available.
+
 The [greedy-training execution check](2026-11-01-cdp-qbert-greedy-training.md)
 qualifies one collection-policy experiment:8192 actions/489 updates in66.241s,
 with357 matching initial/invariant frozen tensors,full replay and guards.

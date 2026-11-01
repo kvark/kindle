@@ -20,6 +20,18 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [fresh greedy-training Qbert comparison](docs/experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
+is selected after the completed bounded check. Train fresh200k/12,477 under35min,
+12M48/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100;only live collection changes
+sampled→greedy. Native447fe50,losses,teacher and posterior/imagined sampling remain.
+Require100k/6227 recovery and final/actual-initial sampled/greedy24-episode arms
+against14,028.125 primary greedy/11,522.917 sampled and unchanged15k/90% gate.
+CPU preflight1.832s passes305 bounded/276 control pins and actual CLI/audit/observer
+checks withzero native/emulator construction. Root
+`/x/Temp/kindle-qbert-greedy-training-20261101/full`;service
+`kindle-qbert-greedy-training-200k-20261101`. Check live state;never restart or
+schedule another GPU job while active. No full result or successor is selected.
+
 The [completed greedy-training Qbert check](docs/results/2026-11-01-cdp-qbert-greedy-training.md)
 finishes8192 actions/32,761 frames/489 updates in66.241s;1024 frozen/.798s haszero
 updates and no natural episodes. Conservative200k projection29m39s passes35min.
