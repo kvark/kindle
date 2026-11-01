@@ -84,3 +84,22 @@ another GPU job while active. Require100k/12,454 recovery and all four fixed
 assessments. No extension,ratio sweep or automatic successor.
 
 DeclarationSHA256`e316c8006702248d861c31ef02357f0fedbfa882d9036627f107fd2bf4d6203c`.
+
+## Halfway checkpoint verified and retained
+
+The original recovery observer passes **12:27:55 UTC November1** at100,000
+actions/12,454 updates with357 finite tensors. Its complete log prefix verifies
+12,491 finite reports through100,304 actions. The observer is terminal success;
+the original learner continues underPID792387/invocation460e0220583948f4b088b5dc7c92956a.
+
+At **12:29:45**,a1.390s CPU copy preserves all four audited checkpoint files
+(179,536,496 bytes) under`recovery-100k`. Copied hashes match the original audit
+and native metadata;source bytes/stat timestamps,all490 pins and main identity
+remain unchanged. No restore,learner update or GPU stage occurs. Checkpoints
+omit replay,live belief,games and RNG;retaining weights does not provide
+uninterrupted-training recovery. Keep this co-host time without correction.
+No full frozen result is available;do not repeat recovery audit or retention.
+
+MetadataSHA256`205b827d20abb2a6214aab05b1a46ad5702254a6236c1e0a5319b096fbaa2016`;
+original auditSHA256`a9ec1f3f714f8805b0fd9aac300c257ae3eaf884082ec3d815f1edf7eb0c0d8e`.
+The retained`recovery-retention.json` lists all four file hashes.

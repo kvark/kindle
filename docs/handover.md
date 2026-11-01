@@ -8,7 +8,11 @@ replay and guards pass. Main/collector12:07:15/12:07:53 UTC November1/source3bfc
 PID791920/invocatione48b450a02c64928be90711e05063f2a;terminal,no GPU repeat.
 CPU invalid-seed preflight failure and two preparer wording failures remain.
 The [separate fresh200k comparison](experiments/2026-11-01-cdp-qbert-h5-r32-greedy-200k.md) launches12:10:19 UTC/source4a10fcc with490 pins. MainPID792387/invocation
-460e0220583948f4b088b5dc7c92956a;all four observers active. Startup12:10:39
+460e0220583948f4b088b5dc7c92956a. Recovery passes12:27:55 at100k/12454 with357
+finite tensors;observer succeeds. All four files/179,536,496 bytes are retained
+at`recovery-100k`,hash-verified12:29:45 in1.390s with490 pins/main identity
+unchanged. No restore/GPU repeat;do not repeat recovery/retention. Other observers
+continue;check live state. Startup12:10:39
 passes357 control/bounded-matching tensors,47 pre-update events,correct cadence
 and157 finite reports through1632 actions. R24→32 on reused10007,keep12M48/Auto/N8/B16/T16/H5/encoder4e-5/greedy collection/
 expert100/native447fe50/runneraba4300d/teacher. Require100k/12454 recovery and

@@ -32,8 +32,11 @@ expert100/native447fe50/runneraba4300d/teacher. Fixed200k/24,954 updates,45-minu
 training cap,100k/12,454 recovery and final/actual-initial sampled/greedy24-episode
 assessments against13,761.458/14,339.583,each24 first pyramids. Original15k/90%
 gate remains. Startup passes490 pins,357 matching tensors,47 pre-update events,
-correct cadence and finite reports. All four original observers are active;
-check live state for progress and recovery. No full result is available.
+correct cadence and finite reports. Recovery passes12:27:55 at100k/12,454
+with357 finite tensors;its observer succeeds. All four audited files are retained
+at`recovery-100k` (179,536,496 bytes),hash-verified12:29:45 in1.390s with490 pins/
+original process unchanged. Do not repeat recovery or retention. Progress,
+postprocessing and collection continue;check live state. No full result is available.
 [Bounded result and current evidence](docs/results/2026-11-01-cdp-qbert-h5-r32-greedy.md).
 
 The [Breakout R8 harness](docs/experiments/2026-11-01-cdp-breakout-r8.md) is CPU
