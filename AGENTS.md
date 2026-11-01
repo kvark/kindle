@@ -20,23 +20,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [fresh Qbert encoder8e-5 comparison](docs/experiments/2026-11-01-cdp-qbert-encoder8e5-200k.md) launches18:34:07 UTC
-November1/sourceea34785 with528 inputs,PID831942/invocation
-bae3fe2dd4a24070ab2845a7828145fa. Fix200k actions/18,715 updates within30min,
-12M48/Auto/N8/B16/T16/H5/R24/encoder8e-5/base behavior4e-5/greedy collection/
-expert100;native447fe50,runneraba4300d and faster teacherfa261c53 unchanged.
-Startup passes18:34:31:357 initial tensors match control and bounded check,
-47 pre-update events match,correct cadence and295 finite reports through3,528
-actions. Progress,postprocessing and collection remain active;recovery has passed.
-Require100k/9,340 four-file recovery and final/actual-initial greedy-primary
-and sampled24-episode arms against14,339.583/13,761.458,original15k/90% gate.
-The [bounded check and CPU qualification](docs/results/2026-11-01-cdp-qbert-encoder8e5.md) pass;largest conservative
-200k estimate22m57.614s. Preparation and CPU test-selector failures stay
-preserved;one full CPU preflight rerun passes,no GPU repeat. Startup1.534s
-co-host timing remains without correction. Root`/x/Temp/kindle-qbert-encoder8e5-20261101/full`;
-service`kindle-qbert-encoder8e5-200k-20261101`. No full frozen result yet.
-Do not restart or overlap GPU work. No extension,sweep,confirmation or automatic
-successor. The five-game goal remains unfinished.
+The [Qbert encoder8e-5 comparison](docs/experiments/2026-11-01-cdp-qbert-encoder8e5-200k.md) finishes training at200,000
+actions/799,800frames/18,715 updates in20m36.093s,within the30-minute cap.
+Training guard/queue stage succeeds18:54:48 UTC November1;frozen evaluations
+and full audits remain pending. Actual44,160 overrides (22.08%) and online
+scores are not frozen competence. No full gameplay result is accepted yet.
+The original sourceea34785/mainPID831942/invocationbae3fe2dd4a24070ab2845a7828145fa
+continues with528 pins. Keep12M48/Auto/N8/B16/T16/H5/R24/encoder8e-5/base
+behavior4e-5/greedy collection/expert100;native447fe50,runneraba4300d and faster
+teacherfa261c53 fixed. Final/actual-initial greedy-primary and sampled24-episode
+arms keep the original15k/90% gate,against14,339.583/13,761.458. Progress,
+postprocessing and collection are active;100k recovery succeeded. The
+[bounded check and startup](docs/results/2026-11-01-cdp-qbert-encoder8e5.md) pass357 matching/invariant tensors,
+47 pre-update events and correct cadence. Preparation/CPU selector failures
+remain;one CPU preflight rerun passes,no GPU repeat. CPU co-host caveats stay
+without correction. Root`/x/Temp/kindle-qbert-encoder8e5-20261101/full`;service
+`kindle-qbert-encoder8e5-200k-20261101`. Do not restart completed stages or
+launch another GPU job before closure. The five-game goal remains unfinished.
 
 The original100k recovery passes18:44:43 UTC November1 at100,000 actions/
 9,340 updates,357 finite tensors. All four files are retained (179,536,495

@@ -1,4 +1,14 @@
-# Qbert encoder8e-5: fresh 200k comparison running
+# Qbert encoder8e-5: training complete, frozen assessments and audits pending
+
+Training finishes200,000 actions/799,800frames/18,715 updates in20m36.093s,
+within30min. The training guard and queue stage pass18:54:48 UTC November1;
+original final/actual-initial sampled and greedy assessments follow. No accepted
+full gameplay result or terminal closure exists yet. Actual44,160 teacher
+overrides (22.08%) and online guided returns are not frozen competence.
+Keep the original process and fixed protocol;do not repeat completed stages.
+
+## Launch and startup (historical)
+
 
 The full learner launches18:34:07 UTC November1/sourceea34785 with528 pinned
 inputs,originalPID831942/invocationbae3fe2dd4a24070ab2845a7828145fa. Startup
