@@ -9,8 +9,17 @@ coverage cause or reliability claim. Full CPU preflight1.357s passes252 bounded/
 227 control pins,actual CLI/audit/observer checks and357 schema tensors. Original
 CPU control-path failure is preserved;no GPU repeats. Root
 `/x/Temp/kindle-breakout-greedy-training-20261101/full`,service
-`kindle-breakout-greedy-training-200k-20261101`. No experience reuse,extension,
-cap increase or automatic successor. Check live state;do not restart or overlap.
+`kindle-breakout-greedy-training-200k-20261101`. Launch07:55:05 UTC November1/
+sourcebd51be9,272 pins,originalPID766156/invocationd07a6c26ba914fe9a6032d8ec765b0dd.
+Startup passes357 finite matching initial tensors,47 matching bounded training
+transitions/47 expected control differences,correct cadence and108 finite reports
+through2104 actions. Four original observers are active. Independent.799s CPU
+terminal preflight passes control scores/services,journal fixtures,272 active pins
+and original identity;one separate CPU observer will run recovery/final confirmation
+once after original prerequisites. Do not run these confirmations manually while
+that observer is active. Training reaches24,576 actions/1513 updates in151.225s;
+final task quality remains unmeasured. No experience reuse,extension,cap increase
+or automatic successor. Check live state;do not restart or overlap GPU jobs.
 
 The [completed bounded Breakout check](2026-11-01-cdp-breakout-greedy-training.md) passes8192 actions/32,740 frames/
 489 updates in46.633s;1024 frozen/4076 frames/.874s haszero updates and eight

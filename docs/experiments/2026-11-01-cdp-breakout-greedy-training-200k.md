@@ -63,3 +63,33 @@ Root `/x/Temp/kindle-breakout-greedy-training-20261101/full`,trial
 `kindle-breakout-greedy-training-200k-20261101`. Launch once after the selection
 commit,clean-worktree,idle-host and input-hash checks. Do not restart or overlap
 the original learner. Final gameplay benefit remains unmeasured.
+
+## Original launch and startup
+
+Launch07:55:05 UTC November1,sourcebd51be9,272 pinned inputs. Original main
+PID766156/invocation`d07a6c26ba914fe9a6032d8ec765b0dd`;all four original observers
+launch successfully. Startup07:55:21 passes357 finite initial tensors matching
+control and check,47 matching bounded pre-update transitions/47 expected sampled
+control differences,correct first six updates and108 finite supervised reports
+through2104 actions. The original process remains active.
+
+Independent CPU terminal preflight completes07:56:34 in.799s. It checks all four
+retained control scores/videos,five original control service identities,four
+journal fixtures,the Breakout exposure/gate schema,all272 active pins and the
+original live identity. It constructs no native model or emulator. Keep this
+CPU co-host time without correcting training time. Verifier
+`/x/Temp/kindle-breakout-greedy-training-20261101/review_terminal.py` SHA256
+`0fba3175a3ab746e4a19cc5968342b8c685a8d532a461556e1dbf129c2f2b243`.
+
+One separate CPU confirmation observer launches07:57:41,service
+`kindle-breakout-greedy-training-confirmation-20261101`,PID766527/invocation
+`f8fce805f4eb413187067ab39d730232`. It waits for the original100k recovery review,
+then preserves exact metadata/tensor hashes with the qualified verifier once.
+After all five original services succeed,it runs terminal confirmation once.
+It cannot start,stop,resume or modify the learner. Its source/verifier/declaration
+hashes and launch identity are retained privately. No manual recovery/final
+confirmation while this observer is active;inspect retained failures without
+repeating original stages. The original pipeline and its deadlines are unchanged.
+
+At24,576 actions/1513 updates,training elapsed151.225s. No full frozen result
+is available. Preserve the original learner;do not overlap GPU work.
