@@ -74,3 +74,22 @@ Root `/x/Temp/kindle-qbert-greedy-seed8039-20261101/full`, trial
 `kindle-qbert-greedy-seed8039-200k-20261101`. At protocol selection, no8039
 learner has launched and no result exists. Inspect live state before work;
 do not schedule another GPU job while this learner is active.
+
+## Launch and startup
+
+The original learner launches07:04:25 UTC November1, sourcecbee206, with359
+pinned inputs. MainPID760870, invocation`a0b219d7702b4c82a65e9b33498c3544`.
+Progress, recovery, postprocessing and terminal-collection observers are active;
+the main preflight passes before training starts.
+
+The1.032s read-only startup check passes all359 pins,357 finite initial tensors,
+exact configuration/sources/seeds, original process identity and first updates
+at376/392/408/424/440/456. It records48 seed-dependent tensor differences from4013
+(38 world,seven behavior,three slow value),with equal shapes. All105 reports
+through2056 actions are finite and supervised. Initial traces are deliberately
+not required to match across seeds. Startup is not a task result.
+
+DeclarationSHA256`9130cf1713fd7d26fb96ae257fdc868720e3242c3f3bf61f30bc19858e5d00ab`.
+Retain CPU co-host timing without correction. No frozen outcome is available.
+Inspect this original run; do not restart it or allocate another GPU job while
+active. Require the100k recovery and complete final/actual-initial assessments.

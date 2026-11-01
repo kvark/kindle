@@ -9,9 +9,14 @@ no sampled-training control for8039 or isolated collection-mode effect is claime
 CPU preflight2.179s passes305 bounded/317 preceding pins,actual CLI/audit/observer
 checks and357 schema tensors,zero native/emulator construction. No new build or
 GPU qualification. Root`/x/Temp/kindle-qbert-greedy-seed8039-20261101/full`,service
-`kindle-qbert-greedy-seed8039-200k-20261101`. No learner launched or result exists
-at selection. Check live state;do not restart or overlap GPU jobs. No retry,
-extension,cap increase,seed campaign or automatic successor. Goal unfinished.
+`kindle-qbert-greedy-seed8039-200k-20261101`. Original launch07:04:25 UTC
+November1/sourcecbee206,359 pins,mainPID760870/invocation
+`a0b219d7702b4c82a65e9b33498c3544`;all four observers active. Startup1.032s
+passes357 finite initial tensors,48 recorded seed differences,correct cadence
+and105 finite supervised reports through2056 actions. No frozen result yet.
+Retain CPU co-host timing;check this original service before work. Do not restart
+or overlap GPU jobs. No retry,extension,cap increase,seed campaign or automatic
+successor. Goal unfinished.
 
 The [completed CPU Breakout first-disagreement diagnostic](results/2026-11-01-cdp-breakout-first-disagreement.md)
 finds102 both/six teacher-only/six policy-only/six neither survive at the original

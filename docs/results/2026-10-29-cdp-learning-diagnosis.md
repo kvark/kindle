@@ -4,7 +4,10 @@ The [fresh8039 confirmation](../experiments/2026-11-01-cdp-qbert-greedy-seed8039
 keeps the passing greedy-collection recipe fixed and changes learner/evaluation
 seeds. This tests a second learner at200k/35min with own initial controls and the
 original15k/90% gate; it does not isolate why collection changed performance.
-CPU preparation passes; no8039 launch or outcome exists at selection.
+Launch07:04:25 UTC November1/sourcecbee206,359 pins,originalPID760870/invocation
+`a0b219d7702b4c82a65e9b33498c3544`;observers active. Startup1.032s passes357
+finite initial tensors,48 recorded seed differences and105 finite reports
+through2056 actions. No frozen outcome yet;do not restart or overlap GPU work.
 
 The [completed Breakout first-disagreement intervention](2026-11-01-cdp-breakout-first-disagreement.md)
 finds102 both/six teacher-only/six policy-only/six neither survive at the original
