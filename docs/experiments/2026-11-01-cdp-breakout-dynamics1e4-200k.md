@@ -94,3 +94,12 @@ This startup CPU check co-hosts with training; retain its measured cost without
 correcting wall time. The100k recovery andfixed final assessments remain pending.
 No full gameplay result is available. Preserve the original service andobservers;
 never restart because an observation call times out oroverlap another GPU job.
+
+
+The separate Qbert RGB64 cross-cohort CPU preparation completes21:23:00/21:23:12
+UTC November1 in6.390s/6.405s (6.421s/7.115s wrappers), preserving all272 active
+inputs andoriginalPID847728/invocation72a7b4600a4641bb8c93174668127f3f. It
+constructs no native agent/emulator and creates no GPU allocation or executable
+queue. Retain these co-host times without correcting training wall time. The
+Qbert assessment remains unselected until this original learner and all observers
+complete successfully and the host is idle.

@@ -40,6 +40,21 @@ Startup.949s CPU co-host timing remains. Root
 `/x/Temp/kindle-breakout-dynamics1e4-20261101/full`;do not restart oroverlap.
 The five-game goal remains unfinished;check original live state beforework.
 
+The [Qbert RGB64 cross-cohort assessment](docs/experiments/2026-11-01-cdp-qbert-rgb64-cross-cohort.md) has passed CPU preparation
+and remains unselected. Swap learners10007/12011's final and actual-initial
+greedy checkpoints onto the other evaluation cohort, reusing completed diagonal
+arms. This tests whether15,710.417 versus12,678.125 persists on matched cohorts.
+The original confirmation failure remains; this adds no independent learner.
+
+CPU checks pass21:23:00/21:23:12 UTC November1/source8439f27: four CLI paths,
+32 header cases,357 finite/invariant tensors per arm, four retained scores and
+four journal fixtures. All593 preparation/272 active Breakout pins and original
+PID847728/invocation remain unchanged. CLI6.390s/controller6.405s (wrappers
+6.421s/7.115s) co-host without time correction. No agent/emulator construction,
+queue, declaration, service, failure or repeat. Root
+`/x/Temp/kindle-qbert-rgb64-cross-cohort-20261101`; keep unselected until all five
+original Breakout services and collection succeed and the host is idle.
+
 The [bounded Breakout dynamics-group1e-4 check](docs/results/2026-11-01-cdp-breakout-dynamics1e4.md) passes8192 actions/
 32,733frames/489 updates in47.413s;frozen1024/.856s haszero updates/no natural
 episodes. Conservative200k projection21m13.289s passes30min;gameplay benefit
