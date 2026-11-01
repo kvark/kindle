@@ -39,15 +39,17 @@ CPU co-host timings remain without correction. Root
 No Kindle service or GPU allocation is active at closure. The five-game goal
 remains unfinished;check live state before the separately selected diagnostic.
 
-The [exact Breakout batched-policy capture](docs/experiments/2026-11-01-cdp-breakout-policy-readback.md) is CPU-qualified,
-not GPU-selected or launched. Reuse qualified readoutf864fe4b/native447fe50 plus
-readout only;preserve12M64/encoder4e-5/.01unimix andoriginal greedy actions.
-All37,016 actions/148,038frames,31,161 selected decisions and120 life-clipped
-windows/3,816 unique rows align. Six fixture groups/264 inputs pass in6.385s
-at20:37:04 UTC November1,with562 active Qbert pins andoriginal identity preserved.
-Require Qbert's complete terminal receipt andidle host before separate selection;
-no executable GPU queue or declaration exists yet. No new learner or native build.
-Root`/x/Temp/kindle-breakout-policy-readback-20261101`;retain CPU co-host timing.
+The [exact Breakout batched-policy capture](docs/experiments/2026-11-01-cdp-breakout-policy-readback.md) launches20:57:55 UTC November1,
+after Qbert's original terminal completion and an idle-host check. Source8481d9c,
+268 pins,PID845612/invocation831e211938b14d1da284cdefb14e46c6;service
+`kindle-breakout-policy-readback-20261101`. The256-action prefix passes4.510s,
+128 F64/native probabilities differ by atmost9.22e-7,all original actions match,
+and357 tensors remain invariant withzero updates. Full37,016-action capture
+andoriginal terminal collection remain pending. No learner or native build.
+Preserve12M64/encoder4e-5/.01unimix;reuse qualified readoutf864fe4b. Fixed120
+life-clipped windows/3,816 unique rows and31,161 selected decisions. Six CPU
+fixtures/264 preparation pins previously pass6.385s;retain co-host timing.
+Root`/x/Temp/kindle-breakout-policy-readback-20261101`;do not restart or overlap.
 
 The [fixed current-pixel action readout](docs/results/2026-11-01-cdp-breakout-pixel-action-readout.md) fails its screen:
 learned+pixel kernel57.40% overall/55.15% near-descending teacher agreement,

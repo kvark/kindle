@@ -7,7 +7,7 @@ the confidence of the original vector policy on its own failed trajectories.
 The existing teacher takeover avoids108/120 selected losses from earlier states,
 but does not identify an optimal command at each intermediate decision.
 
-**CPU qualification is complete; no GPU allocation is selected yet.** Do not
+**At preparation, CPU qualification was complete without a GPU selection.** Do not
 select or launch while Qbert RGB64 seed12011 or its collectors remain active.
 Require its complete original terminal receipt, an idle host and unchanged pins
 before a separate selection. Do not interrupt, restart or overlap that learner.
@@ -98,3 +98,9 @@ The host haszero active Kindle services. Select the fixed two-stage frozen
 Breakout capture above, after the selector rechecks all264 prepared inputs,
 Qbert completion files and same-host qualification. No settings or limits change.
 This selection does not select a learner, new loss, architecture or teacher.
+
+The selector passes268 pins at20:57:52 UTC, source8481d9c. Original service
+launches20:57:55.126 withPID845612/invocation831e211938b14d1da284cdefb14e46c6.
+The256-action prefix passes in4.510s with357 invariant tensors,zero updates,
+all original actions, and128 CPU/native probability comparisons (max9.22e-7).
+Full capture and terminal collection remain pending. Do not restart or overlap.
