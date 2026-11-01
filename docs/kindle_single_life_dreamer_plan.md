@@ -1,5 +1,13 @@
 # Kindle: CDP learning roadmap
 
+The [CPU delayed Breakout takeover](experiments/2026-11-01-cdp-breakout-delayed-takeover.md) is selected:all120 retained loss
+windows, fixed2/4/8/16-action delays,478 eligible teacher branches,matched original
+loss endpoints. Reuse0/1 baselines;keep two pre-takeover losses in the denominator.
+21 CPU tests/3.093s preflight pass332 diagnostic/359 active Qbert pins,zero
+native/emulator imports.180s/195s caps;no new outcome or GPU allocation yet.
+Original QbertPID760870/invocationa0b219d7702b4c82a65e9b33498c3544 continues;
+retain CPU timing. Root`/x/Temp/kindle-breakout-delayed-takeover-20261101`.
+
 The [fresh Qbert seed8039 check](experiments/2026-11-01-cdp-qbert-greedy-seed8039.md) selects one independent learner of the
 passing greedy-collection recipe:200k/12,477 updates under35min,100k/6227 recovery,
 and four final/actual-initial24-episode arms. Keep12M48/Auto/N8/B16/T16/H15/R16/

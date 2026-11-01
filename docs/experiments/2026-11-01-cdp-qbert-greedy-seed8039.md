@@ -93,3 +93,12 @@ DeclarationSHA256`9130cf1713fd7d26fb96ae257fdc868720e3242c3f3bf61f30bc19858e5d00
 Retain CPU co-host timing without correction. No frozen outcome is available.
 Inspect this original run; do not restart it or allocate another GPU job while
 active. Require the100k recovery and complete final/actual-initial assessments.
+
+The independent terminal-verifier CPU preflight passes in.058s. It checks the
+completed4013 control's four fixed assessment arms/videos and five original
+service identities, plus the actual8039 header and48 initial tensor differences.
+Four journal and four negative seed-pair fixtures pass without native/emulator
+imports. The qualified scriptSHA256 is
+`2cb6414f6791370083b373ac1004d346cd705a7aa79bb45135b84efc36a57b69`.
+Use recovery mode only after the original100k observer completes, and final mode
+only after all original services finish; neither mode has run yet.
