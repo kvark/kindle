@@ -1,8 +1,10 @@
 # Current Qbert RGB64 critics against realized returns
 
-**Running:** original service launches22:01:52 UTC November1/sourcee6340ac.
-The bounded value-probe check passes; four full captures follow under the
-original controller. No complete calibration comparison is available yet.
+**Complete:** original main/collector succeed 22:06:42/22:06:52 UTC November 1,
+sourcee6340ac. All four captures reproduce retained trajectories, preserve 357
+tensors each and perform zero updates. Both sampled critics beat the constant
+baseline; later biases differ. See the [result](../results/2026-11-01-cdp-qbert-rgb64-critic.md).
+No learner, loss change or automatic successor is selected. Do not rerun.
 
 The completed crossed evaluation keeps learner10007 ahead of12011 on both
 retained cohorts. Both reach later play frequently during training, and the
@@ -127,3 +129,21 @@ The1,024-action/4,096-frame bounded capture completes1.023900s withzero updates,
 values/nonnegative bonuses andpassing host guard. No failure or repeated stage.
 Full captures proceed under the fixed four-arm controller. Preserve original
 identities and do not overlap another GPU allocation.
+
+## Completed execution
+
+All four captures subsequently finish under the original identities, totaling
+252,312 actions / 1,009,070 frames / 263.020464s, with zero updates/truncations.
+All 64 pins, 31,743 original semantic events, 357 invariant tensors per arm,
+finite values/nonnegative bonuses, host guards and original terminal collection
+pass. Main succeeds 22:06:42.192 UTC; collector completes 22:06:52.699. Both
+services are terminal success; no failure or stage repeat occurs. The unchanged
+source replays are reused after exact trajectory and log-hash checks.
+
+Sampled R² is .689/.558 for 10007/12011; critic RMSE 813.017/896.689 improves
+constant 1,460.945/1,351.585. Later biases are −99.585/+211.312. These are
+own-policy states and noisy realized returns, not a causal comparison or proof
+of correct alternative-action ranking. Original gameplay and one-of-two learner
+gate outcome remain unchanged. No GPU allocation remains active. Preserve
+`completion-review.json` SHA0960522055f8af85ba943a7c55ce9de16f2f545b4d2d2ce5ec12e020d6b936d1.
+The five-game goal remains unfinished.

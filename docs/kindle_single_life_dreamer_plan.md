@@ -1,26 +1,28 @@
 # Kindle: CDP learning roadmap
 
-The [current Qbert RGB64 critic diagnostic](experiments/2026-11-01-cdp-qbert-rgb64-critic.md) launches22:01:52 UTC
-November1/sourcee6340ac with64 pinned inputs. MainPID852818/invocation
-8b849586cc3241a2a52e5317e2f10c88;collectorPID852821/invocation
-b1d7e4ee3e494e428ea7744230ce2ddd. The1024-action/4096-frame check passes1.024s,
-128 exact retained semantic events,357 invariant tensors,finite live values/
-bonuses,zero updates andhost guard. The four full trained-policy captures are
-active; no critic-calibration result is available yet.
+The [completed Qbert RGB64 critic diagnostic](results/2026-11-01-cdp-qbert-rgb64-critic.md)
+finds useful predictions in both learners: sampled R² .689/.558 for 10007/12011,
+with RMSE 813.017/896.689 versus constant 1,460.945/1,351.585. Later biases differ:
+−99.585/+211.312. Both underestimate before the first pyramid. These own-policy
+states and noisy returns do not establish a causal control limitation or correct
+alternative-action ranking. Mean intrinsic returns are .041–.051% of total;
+this is not gradient attribution or a selected coefficient change.
 
-Capture10007/12011 sampled andgreedy trajectories with exact reproduction and
-357 invariant tensors,24 natural episodes at600k actions/300s per arm. Compare
-realized discounted returns with critic/constant/zero baselines before/after the
-first pyramid; first episode perlane calibrates, nexttwo test. Sampled is primary
-for value calibration; greedy changes behavior. Own-state distributions differ;
-no matched-state or causal claim. Nine CPU tests andfive CLI paths pass, both
-357-tensor sources and611 prior pins verify in5.165s. Exact native447fe50/35ad0db
-andrunneraba4300d stay fixed; no learner, build orloss change.
+Four captures exactly reproduce original trajectories/scores: 252,312 actions /
+1,009,070 frames / 263.020s, zero updates/truncations. All 64 pins, 31,743 semantic
+events, 357 invariant tensors per arm, finite live values/bonuses, host guards
+and original collector pass. The preceding 1,024-action check and nine CPU tests
+pass. Native447fe50/35ad0db and runneraba4300d stay fixed; source replays are
+reused only after exact semantics and log hashes match. No live-image equality
+is claimed where source logs lack pixel hashes.
 
-Root`/x/Temp/kindle-qbert-rgb64-critic-20261101`; service
-`kindle-qbert-rgb64-critic-20261101`. Preserve original main/collector and do not
-overlap another GPU allocation. No retry, cap increase, extension or automatic
-successor. The five-game goal remains unfinished.
+Main/collection succeed 22:06:42/22:06:52 UTC November 1, sourcee6340ac, original
+PID852818/invocation8b849586cc3241a2a52e5317e2f10c88. Both services are terminal
+success; no failure, repeated stage, learner or build. Original training times
+25m09.797s/25m27.366s and one-of-two gate outcome remain unchanged. Root
+`/x/Temp/kindle-qbert-rgb64-critic-20261101` is complete; do not rerun. No GPU
+allocation remains active at closure. No loss change, retry, extension, cap
+increase or automatic successor is selected. The five-game goal remains open.
 
 The [completed Qbert RGB64 cross-cohort assessment](results/2026-11-01-cdp-qbert-rgb64-cross-cohort.md) keeps10007
 ahead on both cohorts:15,710.417/16,218.750 versus12011's11,982.292/12,678.125.
