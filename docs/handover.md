@@ -1,5 +1,21 @@
 # CDP handover — October25,2026
 
+The [Qbert RGB64 cross-cohort assessment](experiments/2026-11-01-cdp-qbert-rgb64-cross-cohort.md) launches21:47:20 UTC
+November1/source63dd44a after complete Breakout closure and idle-host checks.
+MainPID850983/invocationef4177111f444dea8f2d905f7f800544;collectorPID850986/
+invocation053db596d5a44ccab149a1d1f3063bb8. All611 selected inputs pass. Service
+`kindle-qbert-rgb64-cross-cohort-20261101`; four frozen greedy arms swap10007/
+12011 final andactual-initial checkpoints onto the other environment cohort.
+Reuse completed diagonal arms15,710.417/12,678.125 without repeating them.
+
+Keep24 natural episodes per arm, sampled posteriors, zero updates/truncations,
+600k actions/300s per arm, original15k/90% gate, qualified native447fe50/35ad0db
+andrunneraba4300d. No learner, build, extension, retry or automatic successor.
+The original12011 confirmation failure remains; crossed scores cannot replace
+its declared cohort or establish independent reliability. Full crossed results
+are pending. Root`/x/Temp/kindle-qbert-rgb64-cross-cohort-20261101`; preserve
+both original services and do not overlap another GPU allocation.
+
 The [completed Breakout dynamics-group comparison](results/2026-11-01-cdp-breakout-dynamics1e4.md) is mixed:
 sampled50.625 falls10.07% from56.292, while greedy138.750 rises32.56% from104.667.
 Allfour candidate arms havezero of24 two-wall successes; own initials1.417/2.208
@@ -24,22 +40,6 @@ build,extension,cap change,confirmation orautomatic successor. Root
 `/x/Temp/kindle-breakout-dynamics1e4-20261101/full` is complete; do not rerun.
 No GPU allocation remains at closure. The five-game goal remains unfinished;
 check live state before the separately prepared Qbert assessment.
-
-The [Qbert RGB64 cross-cohort assessment](experiments/2026-11-01-cdp-qbert-rgb64-cross-cohort.md) has passed CPU preparation
-and remains unselected. Swap learners10007/12011's final and actual-initial
-greedy checkpoints onto the other evaluation cohort, reusing completed diagonal
-arms. This tests whether15,710.417 versus12,678.125 persists on matched cohorts.
-The original confirmation failure remains; this adds no independent learner.
-
-CPU checks pass21:23:00/21:23:12 UTC November1/source8439f27: four CLI paths,
-32 header cases,357 finite/invariant tensors per arm, four retained scores and
-four journal fixtures. All593 preparation/272 active Breakout pins and original
-PID847728/invocation remain unchanged. CLI6.390s/controller6.405s (wrappers
-6.421s/7.115s) co-host without time correction. No agent/emulator construction,
-queue, declaration, service, failure or repeat. Root
-`/x/Temp/kindle-qbert-rgb64-cross-cohort-20261101`. Breakout now closes with all
-five original services successful. Guarded selection must recheck unchanged
-inputs, clean committed sources and the idle host before launch.
 
 The [current Qbert RGB64 phase analysis](results/2026-11-01-cdp-qbert-rgb64-phases.md) finds weaker12011 has
 higher final50k native movement agreement75.22% versus10007's70.35%, despite

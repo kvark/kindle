@@ -1,5 +1,10 @@
 # Qbert RGB64: separate learner variation from evaluation-cohort variation
 
+**Selected and launched21:47:20 UTC November1/source63dd44a**, after original
+Breakout closure and idle-host/input checks. The four frozen arms are active;
+no crossed result is accepted yet. The CPU-only preparation below is retained
+historical qualification, not a pending request to repeat it.
+
 Prepare four frozen assessments within the existing five-game goal. The fixed
 RGB64 recipe scores15,710.417 on learner10007/cohort4000010007 and12,678.125
 on learner12011/cohort4000012011. Both clear24/24 first pyramids, but only the
@@ -100,3 +105,15 @@ qualified controller sources, clean committed worktree and same idle host.
 Do not rerun CPU qualification or any retained diagonal assessment. All fixed
 arms, caps, gates and interpretation limits above remain unchanged. Selection
 and launch will retain their own declaration and original process identities.
+
+
+## Original selection and launch
+
+Selector passes611 pinned inputs and writes declaration SHA256
+`b3daecda9ced211e70ee1ca60cf2f3bf0eacb8f4de3ba4e8a86ddb1f740f2b75`.
+Original main launches21:47:20.921 UTC November1, source63dd44a,
+PID850983/invocationef4177111f444dea8f2d905f7f800544. Original collection
+observerPID850986/invocation053db596d5a44ccab149a1d1f3063bb8 launches alongside.
+The exact prepared runtime, runner, checkpoint sources, four arms and caps stay
+unchanged. No CPU qualification, diagonal GPU assessment or learner repeats.
+Preserve these original services; do not overlap another GPU allocation.
