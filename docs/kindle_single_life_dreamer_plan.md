@@ -1,13 +1,14 @@
 # Kindle: CDP learning roadmap
 
-A [fixed command-conditioned Breakout response fit](experiments/2026-11-01-cdp-breakout-command-response.md) is selected
-for CPU analysis. It preserves the earlier 19,146 training / 13,102 held-out
-rows and tests one 36-coefficient ridge residual model. Four CPU fixture groups
-and .865s preflight pass. Require lower MAE and RMSE both overall and near
-descending balls before considering a separate gameplay comparison. The
-stationary-observation join confirms that the current right-edge condition
-fires at the extreme clipped position; it selects no detector correction.
-No GPU learner or native change is selected. Check live state before GPU work.
+The [command-dependent Breakout response fit](results/2026-11-01-cdp-breakout-command-response.md) passes its fixed
+prediction screen: held-out MAE/RMSE 1.976923/3.287560 → 1.972683/3.173417;
+near descending 1.948802/3.283574 → 1.929132/3.157979. All 16 input hashes,
+37,448 original rows and prior metrics reproduce. Fit .470s / controller .614s
+completes 19:15:51 UTC November 1, source8de8a12; no emulator/GPU work or repeat.
+A separate bounded CPU teacher gameplay comparison is selected, requiring
+≥10% mean gain and improvements in at least five of eight lanes. Four policy
+fixture groups / .454s preflight pass; no gameplay result yet. Detector, native
+teacher and learner remain unchanged. No GPU allocation is selected.
 
 The [completed Qbert encoder8e-5 comparison](results/2026-11-01-cdp-qbert-encoder8e5.md) lowers both frozen
 scores: greedy 14,339.583 → 12,435.417 (−13.28%) and sampled 13,761.458 →
