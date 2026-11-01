@@ -1,5 +1,15 @@
 # CDP handover — October25,2026
 
+The [selected Breakout encoder4e-5 check](experiments/2026-11-01-cdp-breakout-encoder4e5.md) tests2e-5→4e-5 in the retained
+12M64/Auto/N8/B16/T16/H15/R16/expert100 recipe. Native447fe50,exact runner and
+teacher stay unchanged; the earlier4M/expert10 rate4e-5 failure remains negative
+evidence. CPU preflight passes two CLI paths,13 config cases,357 schema tensors
+and173 control pins in.425s,zero native construction/environment work. Select
+8192 actions/489 updates plus1024 frozen,180s/60s caps and conservative200k
+projection<=30min. No full learner or automatic promotion selected. Root
+`/x/Temp/kindle-breakout-encoder4e5-20261101/native-check`;service
+`kindle-breakout-encoder4e5-check-20261101`. Check live state before work;goal unfinished.
+
 The [completed Breakout imitation-decay comparison](results/2026-11-01-cdp-breakout-expert-decay.md) finishes200k actions/
 799,518 frames/12,477 updates in21m30s,4.23% less training time than constant100.
 Sampled17.167/greedy25.167 fall32.13%/40.96% below25.292/42.625;own initials

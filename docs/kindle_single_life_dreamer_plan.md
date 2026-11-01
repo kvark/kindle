@@ -1,5 +1,15 @@
 # Kindle: CDP learning roadmap
 
+The [selected Breakout encoder4e-5 check](experiments/2026-11-01-cdp-breakout-encoder4e5.md) tests2e-5→4e-5 in the retained
+12M64/Auto/N8/B16/T16/H15/R16/expert100 recipe. Native447fe50,exact runner and
+teacher stay unchanged; the earlier4M/expert10 rate4e-5 failure remains negative
+evidence. CPU preflight passes two CLI paths,13 config cases,357 schema tensors
+and173 control pins in.425s,zero native construction/environment work. Select
+8192 actions/489 updates plus1024 frozen,180s/60s caps and conservative200k
+projection<=30min. No full learner or automatic promotion selected. Root
+`/x/Temp/kindle-breakout-encoder4e5-20261101/native-check`;service
+`kindle-breakout-encoder4e5-check-20261101`. Check live state before work;goal unfinished.
+
 The current five-game goal includes architecture diagnosis. Prioritize the
 remaining Breakout control gap and Qbert later-game decisions using retained
 checkpoints and trajectories. Distinguish state representation,action ranking,
