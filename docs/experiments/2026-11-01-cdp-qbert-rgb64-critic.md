@@ -1,5 +1,9 @@
 # Current Qbert RGB64 critics against realized returns
 
+**Running:** original service launches22:01:52 UTC November1/sourcee6340ac.
+The bounded value-probe check passes; four full captures follow under the
+original controller. No complete calibration comparison is available yet.
+
 The completed crossed evaluation keeps learner10007 ahead of12011 on both
 retained cohorts. Both reach later play frequently during training, and the
 weaker learner has higher late online teacher agreement. Those findings leave
@@ -108,3 +112,18 @@ The fixed final50k summary covers4,687 reports per learner:
 These aggregate means do not show the intrinsic term dominating predicted
 reward. They do not measure per-action tails, gradients, target accuracy or
 causality, and do not select an intrinsic-coefficient change.
+
+
+## Original launch and bounded value-probe check
+
+Selector passes64 inputs; declaration SHA256
+`bef6dcdb38fe52d1b928d6bf48710ba0c075d2f2cac6d052ca92fc25f8a6cd17`.
+Main starts22:01:52.140 UTC November1/sourcee6340ac, PID852818/invocation
+8b849586cc3241a2a52e5317e2f10c88. Original collectorPID852821/invocation
+b1d7e4ee3e494e428ea7744230ce2ddd launches alongside.
+
+The1,024-action/4,096-frame bounded capture completes1.023900s withzero updates,
+128 exact retained semantic events,357 invariant tensors,finite batched live
+values/nonnegative bonuses andpassing host guard. No failure or repeated stage.
+Full captures proceed under the fixed four-arm controller. Preserve original
+identities and do not overlap another GPU allocation.
