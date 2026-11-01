@@ -1,15 +1,19 @@
 # CDP handover — October25,2026
 
-The [command-dependent Breakout teacher](results/2026-11-01-cdp-breakout-command-response.md) improves development
-return 225.083 → 295.333 (+31.21%), with six of eight lane means improved and
-zero of 24 two-wall successes in both arms. All 51,752 actions / 206,985 frames,
-live pixels, decisions and outcomes replay; all 32 inputs pass. Collection
-30.749s / replay41.522s / controller72.478s completes 19:21:02 UTC November 1,
-source2a1c9c4. The fixed prediction fit also passed; neither result is learned
-Kindle competence. A fresh paired CPU cohort at seed4000017029 is separately
-selected, with unchanged policies and a ≥10% mean/five-lane screen. Preflight
-.238s passes 39 inputs and seed/history checks. No fresh result, teacher
-integration or GPU learner yet. Do not rerun completed fit/development stages.
+The [command-dependent Breakout teacher comparison](results/2026-11-01-cdp-breakout-command-response.md) is complete.
+Fresh mean return 250.875 → 273.125 rises 8.87%, with five of eight lane means
+improved, but misses the declared 10% requirement. Both arms have zero of 24
+two-wall successes. Retain the current teacher; no integration, retry, further
+cohort or learner is selected. Development 225.083 → 295.333 (+31.21%, six
+lanes) remains a separate reused-cohort result. All 41 fresh inputs, unchanged
+policy/response bytes, exact action/debug/live-pixel/outcome replays and both
+videos pass. Control55,280 actions/221,090 frames/32.304s; candidate64,560/
+258,195/35.377s. Full controller144.403s completes 19:26:13 UTC November 1,
+sourcef24cd1a. No failure, refit, cap change, repeated stage, native/GPU work or
+update. The .470s fixed prediction fit and 72.478s development comparison also
+remain complete. Do not rerun these stages. Root
+`/x/Temp/kindle-breakout-command-fresh-20261101`; no active allocation.
+The five-game goal remains unfinished; check live state before future work.
 
 The [completed Qbert encoder8e-5 comparison](results/2026-11-01-cdp-qbert-encoder8e5.md) lowers both frozen
 scores: greedy 14,339.583 → 12,435.417 (−13.28%) and sampled 13,761.458 →

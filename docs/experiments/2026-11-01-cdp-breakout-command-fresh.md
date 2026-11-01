@@ -42,3 +42,9 @@ a separately qualified teacher integration and bounded learning test.
 
 Root: `/x/Temp/kindle-breakout-command-fresh-20261101`.
 The five-game goal remains unfinished.
+
+The [completed comparison](../results/2026-11-01-cdp-breakout-command-response.md)
+raises mean 250.875 → 273.125 (+8.87%), with five of eight lanes improved, but
+misses the fixed 10% requirement. Both arms have zero two-wall successes.
+All 41 inputs and both full replays pass; closure completes 19:26:13 UTC on
+November 1 in 144.403s. Retain the current teacher; no integration or learner.
