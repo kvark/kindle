@@ -68,3 +68,52 @@ goal remains unfinished,including Qbert reliability and Breakout.
 | Original completion | `9b02964a14e57bec5d237f88a59dbcfccb54848e3c30ae37895bd2e12dae7cef` |
 | Final summary | `95a86337317cf61b555bcb11781ebae23414c73d7d83f9e21aea2401ed04b82a` |
 | Terminal confirmation | `c7ce25eaef7ff25c77b189717219a2241f35cdc31f8b57c4b685f83dfc94e82e` |
+
+## Similar total later exposure, fewer long autonomous continuations
+
+The [fixed CPU recount](../experiments/2026-11-01-cdp-qbert-seed8039-coverage.md)
+finds that8039 has only1.84% fewer later actions in wholly unguided episodes
+overall,but46.12% fewer unguided actions at episode age1920+. The difference
+is larger late in training:14.94% fewer later unguided actions and52.32% fewer
+unguided age1920+ actions. Longer continuation after teacher guidance increases.
+
+| Training exposure | Development4013 | Fresh8039 |
+|---|---:|---:|
+| After first pyramid, wholly unguided episodes | 81,530 | 80,031 |
+| Unguided episode actions at age1920+ | 5,525 | 2,977 |
+| After guidance releases | 13,428 | 14,358 |
+| Last50k: after first pyramid, wholly unguided episodes | 31,625 | 26,900 |
+| Last50k: unguided episode actions at age1920+ | 4,541 | 2,165 |
+| Last50k: after guidance releases | 3,954 | 4,809 |
+| Last50k later unguided movement agreement | 73.63% | 71.78% |
+| Last50k later released-guidance movement agreement | 47.06% | 43.32% |
+
+These results localize an exposure difference to long autonomous continuations;
+they do not show that it caused the frozen score gap. Weaker control can itself
+shorten training episodes. Aggregate later exposure is quite similar,and the
+learners and frozen evaluation cohorts differ. Episode age is not a verified
+game-level identifier. The movement agreement rows describe changing training
+policies on their own visited states,not frozen-policy accuracy or teacher
+correctness. All200k actions already carry labels;these are experience counts,
+not sampled replay counts. The original8039 gate miss remains unchanged.
+
+Only8039 is newly recounted. Exact retained phase-counter,row-reconstruction
+and grouping functions are reused;4013's completed counts are reused without
+repeating their analysis. All200k actions/799,796 frames,boundaries,partial tails,
+teacher-label totals and64,021 overrides reconcile with the verified replay and
+independent phase aggregation. The same recipe except seed is checked.
+
+Analysis completes08:00:47 UTC November1,sourceafa6ae6,in.847s;the full command
+takes5.579s including verification. All381 diagnostic and272 active Breakout
+pins remain unchanged,as does originalPID766156/invocation
+`d07a6c26ba914fe9a6032d8ec765b0dd`. No native model,emulator,GPU work,learner update,
+failure or retry occurs. Retain CPU co-host timing without correction. Root
+`/x/Temp/kindle-qbert-seed8039-coverage-20261101`;complete,do not rerun. No third
+Qbert learner,loss change or automatic successor follows this descriptive result.
+
+| Diagnostic artifact | SHA256 |
+|---|---|
+| Declaration | `4bd5d19c5540065134749177c50de88cb1e2b46df4f4a56defd08fa4a2019352` |
+| Review | `e907067dd8ee882bd164b0b393b48138497168b70f94fb3a815838951a2561ad` |
+| Completion | `33006ff380154ac816a625de4aff674869d6b10a0890555eaa49c5f671c2cba0` |
+| Execution | `def6505fb67611ccec9881dd006ccc9aaed3affd9c43da7cf7267ad5babcd7d0` |

@@ -80,6 +80,17 @@ all services terminal,no active allocation at closure. Do not rerun this learner
 collectors or confirmations. No extension,cap increase,third Qbert learner or
 automatic successor. Check live state before work;the five-game goal is unfinished.
 
+The completed8039 CPU exposure recount finds later wholly unguided actions
+81,530→80,031 versus4013,but unguided age1920+5525→2977;last50k31,625→26,900
+and4541→2165. Released-guidance exposure increases. This localizes a difference
+to long autonomous continuations without proving a cause;both learner and frozen
+cohort differ. All381 diagnostic/272 active Breakout pins,original process identity,
+200k actions/799,796 frames,boundaries,labels and overrides pass. Analysis.847s /
+command5.579s completes08:00:47 UTC November1/sourceafa6ae6. Prior4013 counts are
+reused;no native/emulator/GPU work,updates or failures. See the result's exposure
+section. Root`/x/Temp/kindle-qbert-seed8039-coverage-20261101`;do not rerun. Retain
+CPU co-host timing;no new learner,loss or automatic successor is selected.
+
 The [completed CPU Breakout first-disagreement diagnostic](docs/results/2026-11-01-cdp-breakout-first-disagreement.md)
 finds102 both/six teacher-only/six policy-only/six neither survive the matched
 original loss endpoint;both arms total108/120. At64 actions,86/10/11/13;not the
