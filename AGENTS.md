@@ -20,31 +20,37 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [bounded Qbert dynamics-group1e-4 comparison](docs/experiments/2026-11-01-cdp-qbert-dynamics1e4.md)
-launches22:25:42 UTC November1/source1a1eceb with616 pins. Original mainPID
-857526/invocation655eec1976bd483e9f5b780a773a69bc; collectorPID857531/invocation
-a0cc6a65e7e54a1d9b582e6791eac825. Live config confirms dynamics1e-4 and
-encoder/base4e-5;4096 actions/349 updates take27.190s. No completed result yet.
+The [fresh Qbert dynamics-group1e-4 comparison](docs/experiments/2026-11-01-cdp-qbert-dynamics1e4-200k.md)
+is CPU-qualified22:30:48 UTC November1/sourcec268129 in4.011s: five CLI commands,
+32 config/five teacher/eight mode/17 header/four observer/12 recovery cases,
+six retention/two actual-collector fixtures,49 paths/17 scripts andall616 bounded/
+562 control pins pass. Original CPU path failure remains preserved; four
+unselected references and generator substitution order are repaired. No native
+agent/emulator is constructed and no bounded/GPU stage repeats.
 
-CPU qualification22:24:44 UTC/source213589e passes two actual commands,
-22 config checks,357 schema tensors,562 retained-control/64 preceding-ranking
-pins,16 runtime files and733/9340/18715 cadence pass in1.542s. No native agent
-or emulator is constructed. Native447fe50/35ad0db and teacherfa261c53 stayfixed;
-private runnere161bf38 adds only the12 previously qualified dynamics-rate lines
-to retained Qbert runneraba4300d. Production471-test evidence remains unchanged.
+Select fresh200k actions/18,715 updates/30min,100k/9,340 four-file recovery and
+four final/actual-initial sampled/greedy24-episode assessments. Only dynamics
+4e-4→1e-4 changes recurrent/posterior/prediction/exploration rates together on
+reused12011 at12M64/Auto/N8/B16/T16/H5/R24/encoder-base4e-5/greedy/expert100.
+Native447fe50/35ad0db and teacherfa261c53 are fixed; runnere161bf38 adds only12
+qualified CLI lines. Compare primary greedy12,678.125 andsampled12,093.750;
+original15k/90% gate and failed confirmation remain. No reliability claim.
 
-Change only dynamics-group4e-4→1e-4 on reused12011 at12M64/Auto/N8/B16/T16/
-H5/R24/encoder-base4e-5/greedy collection/expert100. This changes recurrent,
-posterior,prediction andexploration rates together; benefit and mechanism are
-unmeasured. Require8192 actions/733 updates,1024 frozen/zero updates,357 matching
-initial/invariant frozen tensors, pre-update semantic parity andfull guided
-replay/guards. Caps180s/60s/audit180s/main480s; conservative200k cost mustpass30min.
+Root `/x/Temp/kindle-qbert-dynamics1e4-20261101/full`; service
+`kindle-qbert-dynamics1e4-200k-20261101`. Full selection/launch follows committed
+qualification and idle-host check. No full learner has launched yet. No retry,
+cap increase, rate sweep, extension or automatic successor. Goal unfinished.
 
-Root `/x/Temp/kindle-qbert-dynamics1e4-20261101/native-check`; service
-`kindle-qbert-dynamics1e4-check-20261101`. Preserve original main/collector and do not
-overlap or restart the active allocation. No full learner, retry, cap increase, rate sweep,
-extension or automatic successor. Reused seed is not independent confirmation;
-the original12011 gate miss remains. The five-game goal is unfinished.
+The [completed bounded Qbert dynamics1e-4 check](docs/results/2026-11-01-cdp-qbert-dynamics1e4.md)
+passes8192 actions/32,756 frames/733 updates in57.461s;1024 frozen/.853s haszero
+updates/no natural episodes. Conservative200k projection25m43.153s clears30min.
+All616 pins,357 matching initial/invariant frozen tensors,47 pre-update events,
+finite supervised reports, full pixel/action/label replay andhost guards pass.
+Main/collector succeed22:27:02/22:27:09 UTC November1/source1a1eceb, original
+PID857526/invocation655eec1976bd483e9f5b780a773a69bc. Both services are terminal
+success; no original stage fails or repeats. No GPU allocation remains active.
+Root `/x/Temp/kindle-qbert-dynamics1e4-20261101/native-check` iscomplete; do not
+rerun or reuse its training experience. Gameplay benefit remains unmeasured.
 
 The [completed Qbert RGB64 action-ranking comparison](docs/results/2026-11-01-cdp-qbert-rgb64-ranking.md)
 finds10007/12011 overall gain over uniform+6.726/−1.367 on shared10007 histories;

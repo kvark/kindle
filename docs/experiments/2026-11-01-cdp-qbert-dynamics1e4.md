@@ -1,5 +1,10 @@
 # Bounded Qbert RGB64 check with dynamics-group rate1e-4
 
+**Complete:** original main/collection succeed22:27:02/22:27:09 UTC November1.
+All checks pass; conservative200k projection25m43s clears30min. See the
+[result](../results/2026-11-01-cdp-qbert-dynamics1e4.md) and separately selected
+[full protocol](2026-11-01-cdp-qbert-dynamics1e4-200k.md). Do not rerun.
+
 Select one fresh execution and early-cost check, changing only dynamics-group
 learning rate4e-4→1e-4 from retained RGB64 learner12011. Encoder/base/actor rates
 stay4e-5. This tests learning balance without adding parameters or update work.
