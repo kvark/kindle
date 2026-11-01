@@ -1,5 +1,21 @@
 # Kindle: CDP learning roadmap
 
+The [fresh centroid100/encoder4e-5 comparison](experiments/2026-11-01-cdp-centroid-encoder4e5-200k.md)
+launches11:15:21 UTC November1/sourcecd92f9f with541 pins. Fresh200k/12,477updates,
+30-minute training cap,12M64/Auto/N8/B16/T16/H15/R16/expert100/current teacher,
+sampled collection;qualified native2974160/exact centroid runner unchanged.
+Startup passes372 bounded-matching/357 shared-control initial tensors,47 paired
+pre-update events,correct cadence and158 finite reports through2904 actions in
+1.467s CPU co-host time. MainPID787678/invocation709367befab94110b4afc489bd51d55c;
+progress,recovery,postprocessing and collection observers are active. Require
+100k/6227 retained recovery files and final/actual-initial sampled/greedy24-episode
+assessments against56.292/104.667,all0/24 two-wall. No frozen result yet. Native/
+runner differences limit causal claims;no prior experience reused. Root
+`/x/Temp/kindle-centroid-encoder4e5-20261101/full`;service
+`kindle-breakout-centroid-encoder4e5-200k-20261101`. Inspect the original live
+service;do not restart it or schedule another GPU job while active. No retry,
+extension,cap increase or automatic successor. The five-game goal is unfinished.
+
 The [completed Qbert H5/R24 seed10007 confirmation](results/2026-11-01-cdp-qbert-h5-r24-seed10007.md)
 finishes200k/799,841frames/18,715updates in28m34s. Greedy14,339.583/
 24 first pyramids andsampled13,761.458/24 both miss15k;
@@ -27,16 +43,16 @@ Main succeeds11:03:56 UTC November1/source77866fc;collector11:04:29,zero failure
 or repeats. Conservative200k projection21m10s passes30min;competence unmeasured.
 Native2974160/exact runner unchanged;no build. Root
 `/x/Temp/kindle-centroid-encoder4e5-20261101/native-check`;complete,do not rerun.
-Next prepare the [separate fresh200k comparison](experiments/2026-11-01-cdp-centroid-encoder4e5-200k.md)
+The [separate fresh200k comparison](experiments/2026-11-01-cdp-centroid-encoder4e5-200k.md)
 against retained4e-5 sampled56.292/greedy104.667,all0/24 two-wall. Full CPU
 qualification passes11:14:22 UTC:five commands,18 config cases,seven startup
 cases,four observer argument cases,five recovery cases,372 schema tensors,357
 shared values and exact schedules in2.610s. Plot/import/exposure qualification
 passes in.698s;all201 historical source hashes resolve. Before qualification,
 stale collector service names were corrected and100k checkpoint retention added.
-No native/emulator construction,build,failure or repeated check. Select the
-fresh200k learner under the fixed30-minute cap;no declaration,queue or GPU
-allocation exists at this preparation update. Check live state before launch.
+No native/emulator construction,build,failure or repeated check. The separate
+fresh200k learner has now launched under the fixed30-minute cap;see active work
+above. Do not rerun passed qualification or the completed bounded check.
 No retry,extension,cap increase or automatic successor.
 
 The [completed CPU Breakout settling-cost check](results/2026-11-01-cdp-breakout-edge-settling.md) lowers the retained

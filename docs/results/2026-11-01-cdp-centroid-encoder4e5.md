@@ -59,3 +59,36 @@ Root `/x/Temp/kindle-centroid-encoder4e5-20261101/native-check`, trial
 - Completion: `bb953beb006da1c7efd5a5b7e7dfcaa4becbe559bb27e5523bb383d28337396b`.
 
 Complete: do not rerun bounded stages, passed preflight or terminal collection.
+
+## Fresh full comparison is active
+
+The separately qualified200k comparison launches **11:15:21 UTC November1**,
+source`cd92f9f`, with **541 pins**, MainPID787678 / invocation
+`709367befab94110b4afc489bd51d55c`. Training is capped at30 minutes with12,477
+updates;100k/6227 recovery files will be retained. The existing teacher and
+schedule hashes match the no-centroid encoder4e-5 control. No prior experience
+is reused; native2974160 and the exact centroid runner remain unchanged.
+
+The startup check takes1.467s CPU time while training runs. It verifies all541
+inputs,372 tensors matching the bounded initial,357 shared control tensors,47
+matching pre-update events and the first six updates at376/392/408/424/440/456
+actions. The observed prefix has2,904 actions and158 finite reports. Record this
+CPU co-host time without adjusting measured training wall time.
+
+Main, progress, recovery, postprocessing and collection services are active.
+No final frozen result exists. Required assessments remain final/actual-initial
+sampled and greedy,24 natural episodes each,zero updates/truncations,full
+replays/videos,guards,curves,exposure and comparison against56.292/104.667,all
+zero two-wall. The earlier centroid evaluation failure is preserved.
+
+[Fixed full protocol](../experiments/2026-11-01-cdp-centroid-encoder4e5-200k.md).
+Root `/x/Temp/kindle-centroid-encoder4e5-20261101/full`; service
+`kindle-breakout-centroid-encoder4e5-200k-20261101`. Inspect the original learner;
+do not restart it or allocate another GPU job while active. No retry,extension,
+cap increase or automatic successor follows. The five-game goal is unfinished.
+
+- Full `declaration.json`: `b2126cedf8c9794096b3fc660fbc59eb20e11dd48ee7657d44360e6f2761bda3`.
+
+- Full `launch.json`: `1311911a0bd9991cbb1c381e62dafc7e041aef7957cf88e45a82d473bb5fb49f`.
+
+- Full `startup-review.json`: `45412984de4bb30b885fff29c80c555228691cc014733e4e9c0ca4a8ec228e6f`.
