@@ -84,3 +84,7 @@ replay,analysis or qualification. The five-game goal remains unfinished.
 | Analysis |`d9b442742dd790327d6227229c8af94cc286972f95f1c103c3821500aaf2a6f0`|
 | Completion |`e64e88b0af786f9e48365a3a20ffd795d77aaff0fdad95ceae3a370de07fa595`|
 | Independent recount |`7ac1f4305eeb971ada40d1891f2b321c6733cb7b88126a67fd66e4f64cbfd39c`|
+
+The subsequent [fixed episode-separated response refit](2026-11-01-cdp-breakout-response-refit.md)
+raises held-out MAE despite slightly lower RMSE. It fails its declared screen;
+the existing teacher remains unchanged and no gameplay comparison follows.

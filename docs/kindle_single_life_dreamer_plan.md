@@ -23,6 +23,18 @@ restart or allocate another GPU job while active. Prior3.729s controller and
 co-host timing. No retry,extension,cap increase or automatic successor.
 The five-game goal remains unfinished.
 
+The [completed CPU Breakout response refit](results/2026-11-01-cdp-breakout-response-refit.md) fails its fixed screen:
+held-out MAE rises1.976923→2.004710 overall and1.948802→1.977556 near descending
+balls,despite lower RMSE. All eight lanes show that tradeoff;retain the existing
+teacher. One four-feature F64 fit uses19,146 interior rows from episodes0/1;
+13,102 episode2 rows stay held out. Fit.596s/controller2.880s completes10:34:29 UTC
+November1/source2b54693;all44 diagnostic/442 active Qbert pins and original
+PID781585/invocation539c22282c4e42c7a22bc150961ef963 remain unchanged. Eight CPU
+tests,2.192s preflight and.186s independent scalar recount pass. No emulator,
+native/GPU work,updates,failures or repeats. Retain CPU co-host timing. No
+alternate fit,gameplay test,teacher change or automatic successor is selected.
+Root`/x/Temp/kindle-breakout-response-refit-20261101`;complete,do not rerun.
+
 The [completed CPU Breakout teacher contact diagnostic](results/2026-11-01-cdp-breakout-teacher-contact-errors.md)
 records120 selected life losses;65 pass fixed geometry filters. Mean absolute
 landing/paddle errors1.852/4.943 pixels versus.370/2.317 on674 filtered successful
