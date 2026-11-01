@@ -87,3 +87,14 @@ declaration; those are written only after Qbert closes and the host is idle.
 Root `/x/Temp/kindle-breakout-policy-readback-20261101`; prepared service name
 `kindle-breakout-policy-readback-20261101`. No loss, architecture, head, teacher
 or successor learner is selected. The five-game goal remains unfinished.
+
+## Separate selection after Qbert terminal closure
+
+The fresh Qbert confirmation closes through its original collector at20:56:51
+UTC November1. All562 pins and allfive terminal services pass; it scores
+12,678.125 greedy/12,093.750 sampled, both24/24 first pyramids but below15k.
+Completion SHA256 `786b4e35dbfe2d63ab7b9ca76282cbc038af624666fc2af37c18d7ef0c164e3b`.
+The host haszero active Kindle services. Select the fixed two-stage frozen
+Breakout capture above, after the selector rechecks all264 prepared inputs,
+Qbert completion files and same-host qualification. No settings or limits change.
+This selection does not select a learner, new loss, architecture or teacher.

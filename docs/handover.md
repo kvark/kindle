@@ -1,29 +1,23 @@
 # CDP handover — October25,2026
 
-The [fresh Qbert RGB64 seed12011 check](results/2026-11-01-cdp-qbert-rgb64-seed12011.md) completes8192 actions/
-32,763frames/733 updates in58.040s;frozen1024/.847s haszero updates/no natural
-episodes. All568 pins,357 initial/invariant tensors,full guided replay and guards
-pass. Main succeeds20:20:00/collection20:22:04 UTC November1/source314e071.
-Conservative200k projection25m58.703s passes30min;no gameplay result yet.
+The [fresh Qbert RGB64 seed12011 confirmation](results/2026-11-01-cdp-qbert-rgb64-seed12011.md) completes but misses the
+unchanged15k gate: greedy12,678.125 andsampled12,093.750,each24/24 first pyramids.
+Own initials168.750/167.708 clear none. The fixed recipe passes onone of its two
+learners (10007greedy15,710.417); no reliable Qbert success or third learner is
+selected. Only learner/evaluation seeds change;this is not a paired geometry test.
+Training200k actions/799,831frames/18,715 updates takes25m27.366s,within30min.
 
-The [separate fresh200k confirmation](experiments/2026-11-01-cdp-qbert-rgb64-seed12011-200k.md) is selected after
-3.864s CPU qualification:five CLI paths,30 config cases,retention/observer checks,
-568 bounded/521 control pins and357 bounded tensors pass. Only seeds change
-10007/4000010007→12011/4000012011;retainRGB64/12M/H5/R24/encoder4e-5/base
-behavior4e-5/greedy collection/expert100/native447fe50/runneraba4300d/teacherfa261.
-Fix200k/18,715 updates/30min,100k/9,340 recovery andfour final/own-initial24-episode
-frozen arms. Full service launches20:23:42 UTC November1/source34c6a88 with562 pins,
-PID842010/invocationd37840f258104f9caf8b6bc5c0316899. Startup passes357 own-bounded
-initial tensors,47 pre-update transitions and258 finite reports through3128 actions;
-all47 pre-update events differ from10007,as expected for another seed. Progress,
-100k/9,340 recovery passes20:36:18 UTC:all357 finite tensors andfour retained
-files (206,067,159bytes) verify;metadata17ff65f5. The recovery observer succeeds;
-training completes200k actions/799,831frames/18,715 updates in25m27.366s at
-20:49:14 UTC,within30min,andthe training guard passes. Frozen assessments and
-original CPU audits/collectors remain active with original identity. No accepted
-full frozen result,bounded experience reuse or third learner selected. Do not restart or overlap it.
-Root`/x/Temp/kindle-qbert-rgb64-seed12011-20261101/full`;check live state before
-work. The five-game goal remains unfinished.
+All562 pins,357 own-bounded initial/invariant frozen tensors,47 pre-update events,
+18,715 finite reports,100k/9,340 retained four-file recovery,full replays/videos,
+guards,curves,coverage,exposure,comparison andoriginal terminal collector pass.
+Four frozen arms131,048 actions/524,038frames/111.169s havezero updates/truncations.
+Main/post/collection succeed20:55:58/20:56:18/20:56:51 UTC November1/source34c6a88.
+No failure,extension,cap change,GPU/replay/collector repeat or build. Actual
+44,539 overrides (22.2695%) and online scores are not frozen competence.
+CPU co-host timings remain without correction. Root
+`/x/Temp/kindle-qbert-rgb64-seed12011-20261101/full` is complete;do not restart it.
+No Kindle service or GPU allocation is active at closure. The five-game goal
+remains unfinished;check live state before the separately selected diagnostic.
 
 The [exact Breakout batched-policy capture](experiments/2026-11-01-cdp-breakout-policy-readback.md) is CPU-qualified,
 not GPU-selected or launched. Reuse qualified readoutf864fe4b/native447fe50 plus
