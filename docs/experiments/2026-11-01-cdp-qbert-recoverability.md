@@ -57,3 +57,13 @@ Root: `/x/Temp/kindle-qbert-recoverability-20261101`. Source trajectories:
 `/x/Temp/kindle-qbert-life-replay-20261101`, from the completed Qbert4e-5 learner.
 The existing Breakout8e-5 comparison retains PID742893 / invocation
 `eccf5a76eed6458babd75b872c1704e4`; its frozen/audit pipeline remains authoritative.
+
+## Completion — November 1
+
+Source1a4fffe,309 pinned inputs. The diagnostic completes05:16:04 UTC in63.910s
+analysis/65.230s controller wall. All32 origins,16,613 source actions/66,440 frames,
+recorded branches,eight reverse-order checks and original Breakout terminal
+identity pass. The teacher avoids25/32 losses through their original endpoints;
+23 survive64 actions. Rewards stop at an earlier teacher loss. See the
+[result](../results/2026-11-01-cdp-qbert-recoverability.md) for complete outcomes
+and limits. No failure,retry,native/GPU work,updates or successor occurs.

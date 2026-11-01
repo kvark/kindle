@@ -118,3 +118,20 @@ collection must pass before accepting the comparison. The original main and
 observers remain active;do not repeat any stage. The separately prepared Qbert
 CPU intervention's eight tests take.035s and input preflight3.331s after these
 GPU stages. Preserve timing context without training-time correction.
+
+## Accepted completion — November 1
+
+All original stages and five services succeed:main05:14:41,postprocessing05:15:03
+and collection05:15:06 UTC. Separate.872s terminal confirmation passes05:15:35
+without repeating any original stage. All265 pins,recovery,initial/frozen checks,
+full replays/videos,guards,curves,exposure and comparison pass. Fixed sampled
+55.875 is.74% below56.292;greedy125.375 is19.79% above104.667,withall0/24 two-wall.
+Training21m24s is.28% shorter. Retain4e-5 as sampled point and8e-5 as a separate
+greedy option;do not switch the primary mode or claim an overall win. See the
+[completed result](../results/2026-11-01-cdp-breakout-encoder8e5.md). No failure,
+GPU repeat,extension,rate queue,confirmation or automatic successor occurs.
+
+The separate Qbert CPU intervention completes63.910s analysis/65.230s controller
+after this main service is terminal,with309 diagnostic/265 protected inputs and
+original invocation unchanged. Its brief overlap with CPU postprocessing and
+terminal confirmation is retained without training-time correction.

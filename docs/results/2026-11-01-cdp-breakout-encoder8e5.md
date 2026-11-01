@@ -1,4 +1,85 @@
-# Breakout encoder8e-5 passes execution and early cost checks
+# Breakout encoder8e-5 improves greedy play but leaves sampled play flat
+
+The fresh 200k-action comparison completes in **21m24s**, with frozen
+**sampled55.875 / greedy125.375**, versus **56.292 / 104.667** at encoder4e-5.
+Sampled, the declared primary mode, falls0.74%; greedy improves19.79%. Training
+time differs by only−0.28%. All final arms remain0/24 two-wall successes.
+Retain4e-5 as the sampled development point and8e-5 as a separate greedy option;
+do not change the declared primary mode or claim an overall comparison win.
+
+| Fixed24-episode result | Encoder4e-5 control | Encoder8e-5 candidate |
+|---|---:|---:|
+| Sampled final / actual initial |56.292 /1.417|55.875 /1.417|
+| Greedy final / actual initial |104.667 /2.208|125.375 /2.208|
+| Two-wall successes, sampled / greedy |0 /0|0 /0|
+| Training wall time |21m28s|21m24s|
+| Initial-subtracted sampled return / training minute |2.5569|2.5445|
+| Initial-subtracted greedy return / training minute |4.7740|5.7549|
+| Actual training action overrides |49.6715%|44.4695%|
+| Final50k-action replay expert CE |.5581|.5252|
+| Guided online last50-episode mean |103.80|97.94|
+
+Only encoder4e-5→8e-5 changes as a learner setting in
+12M64/Auto/N8/B16/T16/H15/R16/expert100. Native447fe50, exact runner, teacher,
+base/actor4e-5, dynamics4e-4, actor-unimix.01, action-effects1, all-state corrective
+labels, world imitation gradients,20% episode guidance/cap1920 and one GPU resize
+remain fixed. No control or bounded-check experience enters the fresh learner.
+Seeds1009/eval4000001009 remain reused development inputs. This is not an
+independent reliability result, a universal rate choice or an isolated speedup.
+
+Lower late replay CE accompanies better greedy but flat sampled performance;
+guided online returns fall. These metrics do not establish the cause of the
+difference or replace frozen gameplay. No extension, rate queue, seed
+confirmation, cap increase or automatic successor follows. The five-game goal
+remains unfinished.
+
+## Full comparison closure
+
+The [fixed protocol](../experiments/2026-11-01-cdp-breakout-encoder8e5-200k.md)
+finishes200,000 actions /799,597 frames /12,477 updates in1284.126s, under1800s.
+The original100k/6227 recovery passes, preserving exact metadata automatically.
+All265 input hashes,357 initial tensors matching control and bounded check,
+47 pre-update transitions,finite reports,changed CNN/reward/actor/value and
+full training input-pixel/action/label replay pass. Actual88,939 overrides are
+training exposure,not unaided competence.
+
+Four final/actual-initial sampled/greedy arms total87,512 actions /349,889 frames
+in56.606s, withzero updates or truncations. Each selects the first3 natural
+episodes per8 lanes=24, retaining excess episodes and partial tails. All357
+frozen tensors per arm remain invariant;800 sampled and795 greedy initial
+semantic events match the control. Full recorded-action/outcome/frame/reset
+replays, videos, host guards, curves, exposure and comparison pass. Frozen logs
+lack live pixel hashes; no equality with unavailable live images is claimed.
+
+Main succeeds05:14:41 UTC November1, postprocessing05:15:03 and original terminal
+collection05:15:06. All five original services are terminal success under their
+original invocations; no failure, GPU repeat, replay/plot repeat or collector
+repeat occurs. Source3897e74, mainPID742893/invocation
+`eccf5a76eed6458babd75b872c1704e4`. The separately prepared terminal verifier
+passes in.872s at05:15:35, rechecking original service identity, recovery metadata,
+all completion hashes and the fixed scores/videos without repeating a stage.
+Plots and a lane0 greedy contact sheet are visually inspected; qualitative video
+frames do not determine task success.
+
+CPU preflight, startup, halfway confirmation and Qbert life replay co-hosting
+remain recorded below. The Qbert takeover preflight takes3.331s after GPU stages;
+its63.910s analysis starts after the main service finishes and briefly overlaps
+CPU postprocessing/terminal confirmation. Retain these timing distinctions
+without correcting training wall time. No learner or GPU allocation is active
+at closure; check live state before new GPU work.
+
+Full root: `/x/Temp/kindle-breakout-encoder8e5-20261101/full`, trial
+`breakout-12m-64-b16-r16-encoder8e5-expert100-200k-seed1009`.
+
+| Full artifact | SHA256 |
+|---|---|
+| Learning review |`a4be8f1a59cd6a2fdfd99100709e764d4a2ba6bf323b2fb82e30bd872b180b7b`|
+| Completion |`36a74fa7f8148f169d5819e3f20778a649bb6e6772c592cd15c97f33103f5730`|
+| Comparison |`506149ab1026563d51191118f374cdd23715873543e453c0762b19fc8d2343f4`|
+| Final summary |`095b392f487a7dbb166963e686f323542c04bbc21b20d085f6d21b94a85ce6f0`|
+| Terminal confirmation |`b35667ebf831aeb50508cd63cd375b6669690fc0613f48360fd3b125931f93b4`|
+
+## Earlier bounded execution and cost check
 
 The fresh12M64/Auto/N8/B16/T16/H15/R16/expert100 check completes8192 actions/
 32,725 emulator frames/489 updates in46.730s. Restored greedy evaluation takes

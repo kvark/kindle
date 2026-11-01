@@ -1,5 +1,13 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed Breakout encoder8e-5 comparison](2026-11-01-cdp-breakout-encoder8e5.md)
+adds a mixed result:sampled56.292→55.875 (−.74%) and greedy104.667→125.375
+(+19.79%) at nearly unchanged21m24s training time. All0/24 two-wall;all265 pins,
+recovery,initial/frozen checks,replays,guards and original services pass. Retain
+4e-5 as sampled point and8e-5 as a separate greedy option;sampled remains primary,
+so no overall win or automatic higher-rate successor follows. Lower late replay
+CE.5581→.5252 does not identify the cause or establish reliable transfer.
+
 The completed [Breakout encoder4e-5 comparison](2026-11-01-cdp-breakout-encoder4e5.md)
 further improves sampled25.292→56.292 and greedy42.625→104.667,with training
 21m28s versus22m27s. Only encoder2e-5→4e-5 changes as a learner setting;
@@ -55,6 +63,16 @@ effect. Complete recorded trajectories reproduce in49.272s CPU,with293 inputs
 and the active Breakout process/265 inputs unchanged. Raw cube-color histories
 are retained without claiming a general level detector. This narrows the next
 question to later-play decisions and progress;no new loss or learner is selected.
+
+The [Qbert teacher-takeover diagnostic](2026-11-01-cdp-qbert-recoverability.md)
+avoids25/32 selected later-play losses from learner states when control begins
+up to32 actions earlier;23 survive64 actions. Exact16,613-action source replay,
+recorded branches,eight reverse-order checks,eight tests and309 pins pass in
+63.910s CPU,withzero native/GPU work or updates. This establishes useful teacher
+continuations on many failure states;the whole-sequence intervention does not
+identify representation,forecasting,actor fitting or coverage as the cause.
+The first episode per lane is a reused development subset,not a new game score
+or reliability result. No new learner,loss or successor is selected.
 
 The completed [Qbert encoder-rate comparison](2026-10-30-cdp-qbert-encoder-moderate.md)
 also improves frozen gameplay at nearly unchanged training cost: greedy

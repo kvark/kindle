@@ -20,35 +20,34 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [fresh Breakout encoder8e-5 comparison](docs/experiments/2026-11-01-cdp-breakout-encoder8e5-200k.md)
-launches04:49:29 UTC November1/source3897e74 with265 pins:200k actions/12,477
-updates under30 minutes,12M64/Auto/N8/B16/T16/H15/R16/expert100. Only encoder
-4e-5→8e-5 changes;native447fe50,exact runner,teacher and other settings fixed.
-Startup passes357 control/bounded-matching initial tensors,47 pre-update
-transitions,correct cadence and267 finite reports through4648 actions.
-MainPID742893,invocation`eccf5a76eed6458babd75b872c1704e4`;progress,
-postprocessing and collection remain active. Original100k/6227 recovery passes
-05:00:35 UTC with357 finite tensors and automatically preserved metadata;its
-observer is terminal success. Independent.835s CPU confirmation verifies all
-265 pins,live tensor hashes and original process identity. Require fixed final/
-actual-initial sampled/greedy24-episode arms against56.292/104.667,all control
-arms0/24 two-wall. CPU preflight1.375s and1.007s co-host startup pass;retain
-all co-host timing caveats without correction. Training now finishes200k actions/
-799,597 frames/12,477 updates in21m24s. Four frozen arms finish with raw fixed24
-means55.875 sampled/125.375 greedy and initials1.417/2.208;full replay/audit
-closure remains pending. Reused1009/cohort,no experience reuse or reliability claim.
-Root`/x/Temp/kindle-breakout-encoder8e5-20261101/full`,service
-`kindle-breakout-encoder8e5-200k-20261101`. Check live state;do not restart or
-schedule another GPU job while active. The five-game goal remains unfinished.
+The [completed Breakout encoder8e-5 comparison](docs/results/2026-11-01-cdp-breakout-encoder8e5.md)
+finishes200k actions/799,597 frames/12,477 updates in21m24s. Sampled55.875 falls
+.74% versus56.292;greedy125.375 improves19.79% versus104.667. All0/24 two-wall;
+own initials1.417/2.208 match. Retain4e-5 as sampled development point and8e-5 as
+separate greedy option;sampled remains primary,no overall win or reliability.
+All265 pins,100k/6227 recovery,357 matching/invariant tensors,47 pre-update and
+800/795 initial semantic events,replays/videos,guards,curves,exposure and comparison
+pass. Main/post/collection succeed05:14:41/05:15:03/05:15:06 UTC November1;
+all five original services succeed,zero failures/repeats. Separate.872s terminal
+confirmation passes05:15:35. Source3897e74;only encoder4e-5→8e-5 changes in
+12M64/Auto/N8/B16/T16/H15/R16/expert100,native447fe50/exact runner/teacher fixed.
+Actual guidance44.4695%;late CE.5252 versus.5581 is not frozen competence.
+Reused1009/cohort and CPU timing caveats remain. Root
+`/x/Temp/kindle-breakout-encoder8e5-20261101/full`;no extension,rate queue,
+confirmation or automatic successor. No learner/GPU allocation remains active
+at closure;check live state. The five-game goal remains unfinished.
 
-The [CPU Qbert teacher-takeover diagnostic](docs/experiments/2026-11-01-cdp-qbert-recoverability.md)
-is prepared on32 losses in the first recorded episode of each lane:16,613
-source actions,eight episodes,up to32 actions before loss and64-action teacher
-follow-up. Eight CPU tests and3.331s preflight verify307 inputs and the original
-Breakout process/265 inputs. Raw-frame loss accounting handles bonus/loss pairs;
-recorded branches and eight reverse-order checks are required.180s analysis/
-195s controller caps;no new native/GPU work,learner or automatic successor.
-Root`/x/Temp/kindle-qbert-recoverability-20261101`;Breakout audits continue.
+The [completed CPU Qbert teacher takeovers](docs/results/2026-11-01-cdp-qbert-recoverability.md)
+avoid25/32 selected recorded losses at their original endpoint;23 survive the
+separate64-action follow-up. First episode per8 lanes,all32 losses;origins begin
+up to32 actions earlier within the same life. This establishes useful teacher
+continuations on many selected learner states,not an architectural cause or
+new game score. All16,613 source actions/66,440 frames,recorded branches,eight
+reverse-order checks,eight tests,309 diagnostic/265 protected Breakout pins and
+original terminal identity pass. CPU63.910s/controller65.230s completes05:16:04
+UTC November1/source1a4fffe,after Breakout training/main completion. No native/GPU
+work,updates,failures or retries. Root`/x/Temp/kindle-qbert-recoverability-20261101`;
+no new learner/loss or automatic successor. Preserve CPU overlap timing.
 
 The [completed CPU Qbert life/color replay](docs/results/2026-11-01-cdp-qbert-life-replay.md)
 finds all96 losses per retained2e-5/4e-5 policy occur after the first pyramid,
@@ -121,7 +120,7 @@ The **five-game goal is unfinished**:
 | Boxing |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
 | Freeway |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | Pong |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
-| Breakout |12M64/B16/R16/expert100/encoder4e-5:sampled56.292,greedy104.667,in21m28s|All0/24 two-wall successes; reused development seed|
+| Breakout |Encoder4e-5:sampled56.292/greedy104.667 in21m28s;encoder8e-5:55.875/125.375 in21m24s|Sampled remains primary;all0/24 two-wall;reused development seed|
 | Qbert |H5/R32:greedy14,050/15,792.708 on4013/6029,23/24 and24/24 pyramids,inabout40m each|15k/90% gate passes one of two; cheaper4e-5 H15/R16 scores14,028.125 in27m41s and still misses15k|
 
 Published long-run scores are aspirations,not matched-budget comparisons.
