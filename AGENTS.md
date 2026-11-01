@@ -20,15 +20,17 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [fresh Qbert H5/R24 comparison](docs/experiments/2026-11-01-cdp-qbert-h5-r24-200k.md) is separately selected after the
+The [fresh Qbert H5/R24 comparison](docs/experiments/2026-11-01-cdp-qbert-h5-r24-200k.md) launches08:41:14 UTC November1/source64c2e89 after the
 bounded8192/733 check takes67.815s and projects30m21s conservatively below35min.
 Fresh200k/18,715 updates on reused8039,12M48/Auto/N8/B16/T16/encoder4e-5/
 greedy collection/expert100;only H15/R16→H5/R24,with joint cadence/sampling/
 warmup changes. Native447fe50/runneraba4300d/teacher fixed. Require100k/9340
 recovery,357 matched initial/invariant frozen tensors,paired actual initials,
 full replays/videos/guards and final/initial sampled/greedy24-episode arms against
-11,376.042 primary greedy/8,292.708 sampled. Full CPU preflight2.598s passes;
-no full frozen result exists. Root`/x/Temp/kindle-qbert-h5-r24-20261101/full`,
+11,376.042 primary greedy/8,292.708 sampled. Full CPU preflight2.598s passes. Startup checks401 pins,357 initial tensors,47
+pre-update transitions and157 finite reports through2056 actions. MainPID771374/
+invocation82a217b818e24b5cb7c10801a2b3f237;all four observers active.
+No full frozen result exists. Root`/x/Temp/kindle-qbert-h5-r24-20261101/full`,
 service`kindle-qbert-h5-r24-200k-20261101`. Check live identity;do not restart
 or schedule another GPU job while active. No extension or automatic successor;
 the five-game goal remains unfinished.
