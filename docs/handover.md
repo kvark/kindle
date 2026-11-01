@@ -1,6 +1,6 @@
 # CDP handover — October25,2026
 
-The [fresh Qbert behavior-rate comparison](experiments/2026-11-01-cdp-qbert-behavior8e5-200k.md) is selected after the
+The [fresh Qbert behavior-rate comparison](experiments/2026-11-01-cdp-qbert-behavior8e5-200k.md) launches15:17:59 UTC November1/source6089e8b after the
 [bounded check](results/2026-11-01-cdp-qbert-behavior8e5.md) passes8192/32,761frames/733updates in47.940s;
 frozen1024/.803s haszero updates/no natural episodes. All496 pins,357 matching/
 invariant tensors,47 events,full replay/guards and original collector pass.
@@ -14,6 +14,9 @@ qualified equivalent teacherSHAfa261c53 changes Python bytes/CPU cost. Root
 `/x/Temp/kindle-qbert-behavior8e5-20261101/full`;service
 `kindle-qbert-behavior8e5-200k-20261101`. Check live state;do not restart or overlap
 GPU work. No rate sweep,extension or automatic successor;goal remains unfinished.
+MainPID809245/invocation361f29163c1e4b2896fd352f2b905ca8 and all four observers
+are active. Startup15:18:25 passes524 pins,357 matching tensors,47 events and314
+finite reports through3,728 actions;1.558s CPU co-host caveat. No frozen result yet.
 
 Use the [qualified Python Qbert teacher overlay](results/2026-11-01-cdp-qbert-teacher-cost.md)
 at`/x/Temp/kindle-qbert-color-masks-20261101/runtime` for future explicitly pinned

@@ -46,3 +46,17 @@ five teacher-identity,eight mode,16 header,four observer,11 recovery-body,six
 retention andtwo actual observer/collector integration cases,51 resolved paths
 and17 scripts. All496 bounded/442 control inputs pass. No production/native edit,
 build,failure or repeated qualification occurs.
+
+## Full launch and startup
+
+The separately selected200k learner launches15:17:59 UTC November1/source6089e8b
+with524 pinned inputs. MainPID809245/invocation
+`361f29163c1e4b2896fd352f2b905ca8`;original progress,recovery,postprocess and
+collection observers are active. Startup passes15:18:25:357 control/bounded-
+matching initial tensors,47 equal pre-update transitions,correct R24 cadence
+and314 finite supervised reports through3,728 actions. The1.558s CPU startup
+wrapper co-hosts training;retain its time without correction. No frozen result
+is available yet. Require retained100k/9,340 recovery and the fixed four arms.
+Do not restart this learner,repeat passed checks or allocate another GPU job.
+
+Full declarationSHA256`03a3ac6234dd23eee005c32c78bbb50af0903a00d1ee84924357931d10fc0650`.

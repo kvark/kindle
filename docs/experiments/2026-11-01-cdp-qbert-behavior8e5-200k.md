@@ -58,3 +58,17 @@ Root`/x/Temp/kindle-qbert-behavior8e5-20261101/full`,trial
 service`kindle-qbert-behavior8e5-200k-20261101`. Require idle host and completed
 bounded evidence before declaration/launch. No extension,retry,cap increase,
 rate sweep,confirmation learner or automatic successor is selected.
+
+## Full launch and startup
+
+The separately selected200k learner launches15:17:59 UTC November1/source6089e8b
+with524 pinned inputs. MainPID809245/invocation
+`361f29163c1e4b2896fd352f2b905ca8`;original progress,recovery,postprocess and
+collection observers are active. Startup passes15:18:25:357 control/bounded-
+matching initial tensors,47 equal pre-update transitions,correct R24 cadence
+and314 finite supervised reports through3,728 actions. The1.558s CPU startup
+wrapper co-hosts training;retain its time without correction. No frozen result
+is available yet. Require retained100k/9,340 recovery and the fixed four arms.
+Do not restart this learner,repeat passed checks or allocate another GPU job.
+
+Full declarationSHA256`03a3ac6234dd23eee005c32c78bbb50af0903a00d1ee84924357931d10fc0650`.
