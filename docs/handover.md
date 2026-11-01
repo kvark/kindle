@@ -1,28 +1,21 @@
 # CDP handover — October25,2026
 
-The [selected fresh Breakout greedy-collection comparison](experiments/2026-11-01-cdp-breakout-greedy-training-200k.md) trains200k/
-12,477 updates under30min,with100k/6227 recovery and final/actual-initial sampled/
-greedy24-episode assessments against56.292/104.667,all0/24 two-wall. Only live
-collection changes;12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/expert100,native447fe50,
-qualified runneraba4300d,teacher and losses remain. Reused1009/cohort;no isolated
-coverage cause or reliability claim. Full CPU preflight1.357s passes252 bounded/
-227 control pins,actual CLI/audit/observer checks and357 schema tensors. Original
-CPU control-path failure is preserved;no GPU repeats. Root
-`/x/Temp/kindle-breakout-greedy-training-20261101/full`,service
-`kindle-breakout-greedy-training-200k-20261101`. Launch07:55:05 UTC November1/
-sourcebd51be9,272 pins,originalPID766156/invocationd07a6c26ba914fe9a6032d8ec765b0dd.
-Startup passes357 finite matching initial tensors,47 matching bounded training
-transitions/47 expected control differences,correct cadence and108 finite reports
-through2104 actions. Four original observers are active. Independent.799s CPU
-terminal preflight passes control scores/services,journal fixtures,272 active pins
-and original identity;one separate CPU observer will run recovery/final confirmation
-once after original prerequisites. Do not run these confirmations manually while
-that observer is active. Original100k/6227 recovery passes08:06:11 UTC,with357
-finite tensors and6403 finite reports through102,824 actions. Independent.843s
-confirmation passes08:06:22,preserving exact metadata,all tensor hashes,272 pins
-and the same original identity. Do not rerun recovery confirmation. Final task
-quality remains unmeasured. No experience reuse,extension,cap increase or
-automatic successor. Check live state;do not restart or overlap GPU jobs.
+The [completed Breakout greedy-collection comparison](results/2026-11-01-cdp-breakout-greedy-training.md) finishes200k/
+799,639 frames/12,477 updates in21m46s. Sampled39.042/greedy99.083 fall30.64%/
+5.33% below retained56.292/104.667;all0/24 two-wall. Own initials1.417/2.208 match.
+Training takes1.41% longer;retain sampled collection. All272 pins,100k/6227
+recovery,357 matched initial/invariant frozen tensors,paired initial semantic
+traces,full training pixel/action/label and frozen replays/videos,guards,curves,
+exposure and comparison pass. Main/post/collection succeed08:20:54/08:21:10/
+08:21:42 UTC November1/sourcebd51be9. Independent2.048s terminal confirmation
+and its observer succeed08:22:04. No original/GPU stage or confirmation repeats;
+prior CPU preparation path failure and co-host timing remain. Actual overrides
+40.8625%;higher aided online125.64 is not frozen competence. Reused1009/cohort;
+no isolated coverage cause or reliability claim. Root
+`/x/Temp/kindle-breakout-greedy-training-20261101/full`;all services terminal,
+no allocation active at closure. Do not rerun learner,collectors or confirmations.
+No extension,cap increase,confirmation learner or automatic successor. Check live
+state before GPU work;the five-game goal remains unfinished.
 
 An unselected Qbert cross-cohort diagnostic is CPU-prepared at
 `/x/Temp/kindle-qbert-cross-cohort-20261101`. Four new greedy arms would assess

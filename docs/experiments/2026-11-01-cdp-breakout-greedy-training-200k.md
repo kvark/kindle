@@ -119,3 +119,18 @@ Its retained-diagonal audit uses no new GPU stages;all272 active inputs and the
 original Breakout identity remain unchanged. Keep this co-host timing without
 correction. Breakout reaches159,744 actions/9961 updates in1037.920s;no full
 frozen outcome is available and no second GPU job is selected.
+
+## Accepted terminal result
+
+The [completed result](../results/2026-11-01-cdp-breakout-greedy-training.md) accepts
+a negative comparison:sampled39.042/greedy99.083 versus56.292/104.667,both0/24
+two-wall. Training200k/12,477 takes21m46s,+1.41%. All272 pins,recovery,initial
+and frozen tensors,full training/frozen replays/videos,guards,curves,exposure and
+comparison pass. All five original services succeed;main/post/collection finish
+08:20:54/08:21:10/08:21:42 UTC November1. Independent2.048s terminal confirmation
+and its observer succeed08:22:04. No original/GPU stage or confirmation repeats.
+Retain sampled collection;no extension,cap increase or confirmation learner.
+
+All services are terminal and the host is idle at closure. Do not rerun completed
+stages or confirmations. Preserve the earlier CPU preparation failure and co-host
+timing. The five-game goal remains unfinished;check live state before new work.
