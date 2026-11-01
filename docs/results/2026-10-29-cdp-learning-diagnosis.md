@@ -19,7 +19,12 @@ Launch07:04:25 UTC November1/sourcecbee206,359 pins,originalPID760870/invocation
 finite initial tensors,48 recorded seed differences and105 finite reports
 through2056 actions. Original100k/6227 recovery passes07:18:30 UTC with357 finite
 tensors;separate.888s confirmation07:18:43 preserves exact metadata,359 pins and
-original process identity. No frozen outcome yet;do not restart or overlap GPU work.
+original process identity. Training completes200k/12,477 in27m34s. Completed
+frozen outcome replays select greedy11,376.042/23 first pyramids and sampled
+8,292.708/24,versus own initials251.042/128.125 withzero pyramids. Both miss15k;
+the passing4013 result has not reproduced on8039. Full training replay,
+postprocessing and collection remain pending;no accepted full comparison or
+isolated collection-mode effect yet. Do not restart or overlap GPU work.
 
 The [completed Breakout first-disagreement intervention](2026-11-01-cdp-breakout-first-disagreement.md)
 finds102 both/six teacher-only/six policy-only/six neither survive at the original

@@ -32,12 +32,19 @@ checks and357 schema tensors,zero native/emulator construction. No new build or
 GPU qualification. Root`/x/Temp/kindle-qbert-greedy-seed8039-20261101/full`,service
 `kindle-qbert-greedy-seed8039-200k-20261101`. Original launch07:04:25 UTC
 November1/sourcecbee206,359 pins,mainPID760870/invocation
-`a0b219d7702b4c82a65e9b33498c3544`;all four observers active. Startup1.032s
+`a0b219d7702b4c82a65e9b33498c3544`;four original observers launched. Startup1.032s
 passes357 finite initial tensors,48 recorded seed differences,correct cadence
 and105 finite supervised reports through2056 actions. Original100k/6227 recovery
 passes07:18:30 UTC,357 finite tensors and6,337 finite reports through101,768
 actions. Separate.888s CPU confirmation07:18:43 preserves exact recovery metadata,
-all tensor hashes,359 pins and original identity. Do not rerun it. No frozen result yet.
+all tensor hashes,359 pins and original identity. Do not rerun it.
+Training completes200k/799,796 frames/12,477 updates in27m34s. All four frozen
+GPU stages finish withzero updates/truncations and passing guards. Completed
+outcome replays select greedy11,376.042/23 first pyramids and sampled8,292.708/24;
+own initials251.042/128.125 clear none. Both miss15k. Full training replay,
+postprocessing and collection remain pending under the original process;no accepted
+full8039 comparison yet. Stage-summary1.273s verifies359 pins and all four videos.
+No repeat,extension or third learner follows these preliminary results.
 Retain CPU co-host timing;check this original service before work. Do not restart
 or overlap GPU jobs. No retry,extension,cap increase,seed campaign or automatic
 successor. Goal unfinished.

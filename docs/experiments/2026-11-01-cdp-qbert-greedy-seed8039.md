@@ -122,3 +122,38 @@ unselected Breakout collection-check preflight co-host with training;retain CPU
 timing without correction. The latter creates no trial,queue,declaration or
 service. No new GPU allocation is selected. Final frozen task quality remains
 unmeasured; keep the original learner and its remaining observers running.
+
+## Training and frozen stages complete; CPU closure pending
+
+Training finishes200,000 actions/799,796 frames/12,477 updates in1654.009s
+(27m34s),below35 minutes. Training ends07:32:03 UTC November1 with its guard
+passing. The four frozen GPU stages finish by07:33:34,withzero updates or
+truncated episodes and passing guards. Together they execute121,768 actions /
+486,909 frames in73.164s,excluding load/guard overhead.
+
+All four original outcome replays complete by07:34:30. They select the fixed
+first three natural episodes per lane:
+
+| Frozen mode | Final mean | First pyramids | Actual initial mean | Initial pyramids |
+|---|---:|---:|---:|---:|
+| Greedy, primary | 11,376.042 | 23/24 | 251.042 | 0/24 |
+| Sampled | 8,292.708 | 24/24 | 128.125 | 0/24 |
+
+Both final means miss15,000. The passing4013 greedy result does not reproduce on
+this fresh seed. Different learner/evaluation seeds and own initial outcomes are
+intentional; there is no sampled-training control for8039. No extension,cap
+increase,third learner or automatic successor is selected.
+
+A1.273s read-only stage summary verifies all359 pins,zero frozen updates and
+truncations,all guards,the exact selected episode IDs and four video hashes.
+`gpu-stage-summary.json` SHA256
+`3e02510b013445f25f771aa1267daf164e88b45b00022a2e2793ef8100f9897d`
+is explicitly `gpu_stages_complete_cpu_closure_pending`. Training uses64,021
+actual overrides (32.0105%);online returns are aided,not frozen competence.
+
+The original full training pixel/action/teacher-label replay continues under
+PID760870/invocationa0b219d7702b4c82a65e9b33498c3544. Learning review,
+postprocessing and terminal collection remain pending;the full comparison is
+not yet accepted. No original stage repeats. Keep the original pipeline running;
+do not rerun completed stages,execute final confirmation early or allocate
+another GPU job before complete closure.
