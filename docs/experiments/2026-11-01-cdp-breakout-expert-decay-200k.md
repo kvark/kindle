@@ -1,0 +1,73 @@
+# Fresh 200k Breakout comparison with late imitation decay
+
+Select one fresh200k-action/12,477-update learner after the
+[numerical and bounded qualification](../results/2026-11-01-cdp-expert-imitation-decay.md)
+passes. The intended learner-setting change from the retained22m27s control is
+constant expert100 to a hold-and-fade schedule. Keep100 through update6227
+(100k actions), linearly reach zero at9352 (150k), then stay zero through12477.
+The endpoint itself has zero weight:3,126 reports from9352 through12477.
+Apply the same weight to actor and optional world imitation. Online teacher
+guidance, corrective labels and optimizer history remain; this does not remove
+all teacher assistance or establish that imitation caused the remaining gap.
+
+Keep12M64/Auto/N8/B16/T16/H15/R16/expert100/encoder2e-5,base/actor4e-5,
+dynamics4e-4,warmup1000,actor-unimix.01,full18 actions,20% episode guidance/cap1920,
+all-state corrective labels and expert-world gradients. No centroid or open-loop
+loss is enabled. Preserve the native max-pool/one-GPU-resize path. Use qualified
+native65ed45f/SHA`cac21ef6949f55c7ef3ff8d5a8a2d34eeb8c13f5106c217f2c289f2fae3b9028`
+and its packaged runtime. Native and runner differ from retained447fe50; even
+matching initial tensors/traces would not establish an isolated causal effect.
+
+The bounded check completes8,192 actions/489 updates in46.991s,with exact
+compressed128→256 scheduling and234 zero-weight reports. Its conservative200k
+projection21m02s passes the unchanged30-minute cap. Frozen1,024/.902s haszero
+updates and357 invariant tensors;all357 initial tensors,47 pre-update events,
+full training replay,416 pins and host guards pass. This establishes execution
+and early cost,not gameplay benefit.
+
+No weights,replay,games,RNG,belief or bounded-check experience are reused.
+Seed1009/evaluation4000001009 and the evaluation cohort are reused development
+inputs,not independent confirmation. Training cap1800s; recovery at100k/6227;
+final200k/12,477; first update376 and residual credit.5. Keep1200s CPU-audit,
+4500s main-service and5100s postprocessing caps. Never repeat completed GPU
+stages to repair CPU evidence.
+
+Assess fixed final and own actual initial in sampled and greedy modes,sampled
+primary,first3 natural episodes per8 lanes=24 per arm. Each frozen arm has300s/
+600k-action caps,zero updates,guidance/labels off,357 invariant tensors,zero
+truncations and the unchanged90% two-wall gate. Retained control sampled25.292/
+greedy42.625 and own initials1.417/2.208 all havezero of24 two-wall successes.
+Report scores and training time by mode,including own-initial-subtracted frozen
+return per training minute. Online guided returns and replay CE are not frozen
+competence. No checkpoint selection based on outcomes.
+
+Require357 initial tensors matching bounded check and control,matching pre-update
+training events and both actual-initial frozen semantic traces,exact source/
+config/counters,finite reports and applied schedule,raw world/actor expert-loss
+alignment,changed CNN/reward/actor/value,recovery validation,full training
+pixel/action/label replay,frozen outcome replays/videos,guards,curves,exposure
+and completed comparison. Ordinary frozen logs lack live pixel hashes; replay
+does not compare unavailable live images.
+
+Before launch,CPU preflight exercises all five actual CLI paths,actual audit/
+comparison config assertions and negative cases,observer parsers,header readiness,
+checkpoint schema,update accounting and schedule endpoints. Pin exact scripts,
+runtime,control artifacts and protocol. Stop on real faults or nonfinite reports;
+no driver recovery,GPU retry,cap increase,extension,coefficient sweep,seed
+confirmation or automatic successor. This is a deliberate new comparison within
+the existing unfinished five-game goal.
+
+Root`/x/Temp/kindle-expert-decay-20261101/full`;
+service`kindle-breakout-expert-decay-200k-20261101`.
+
+## CPU preparation passes
+
+Five actual CLI paths,30 actual audit/comparison config cases,44 resolved paths,
+16 compiled controllers,6 header-readiness cases,4 observer-parser cases,5 recovery
+body cases and7 schedule cases pass in.984s. All416 bounded and173 control pins
+remain unchanged;357 checkpoint-schema tensors and100k/6227,200k/12,477 accounting
+pass. The declared schedule has3,126 zero-weight reports. No native agent or
+environment is constructed. Two CPU preparation failures are retained: a converter
+was imported as a module export although it is local to the audit function,and
+a service-name substitution also changed the historical control path. Both are
+corrected before declaration/launch,with zero repeated GPU stages.

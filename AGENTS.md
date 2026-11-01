@@ -18,6 +18,18 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active direction
 
+The [fresh Breakout imitation-decay comparison](docs/experiments/2026-11-01-cdp-breakout-expert-decay-200k.md) is selected after native
+qualification and the46.991s bounded check. Hold expert100 through update6227
+(100k actions),fade tozero by9352 (150k),then finish200k/12,477 under30min.
+Keep12M64/Auto/N8/B16/T16/H15/R16/encoder2e-5,teacher guidance and labels; native
+65ed45f and runner differ from retained447fe50,so no isolated causal claim.
+Require100k recovery and final/actual-initial sampled/greedy24-episode assessments
+against25.292/42.625,all0/24 two-wall. Five CLI paths,30 config cases,7 schedule
+cases,416 bounded/173 control pins and observer checks pass;two CPU preparation
+failures are retained without GPU work. Root`/x/Temp/kindle-expert-decay-20261101/full`,
+service`kindle-breakout-expert-decay-200k-20261101`. Check live state;do not restart
+or overlap an active learner. No gameplay result is available;goal unfinished.
+
 The [optional native imitation decay](docs/results/2026-11-01-cdp-expert-imitation-decay.md) passes F64 loss/gradient checks at
 weights100/50/0 and fresh Breakout8192 actions/32,724 frames/489 updates in46.991s.
 Compressed decay128→256 gives234 zero-weight reports; raw expert losses remain
