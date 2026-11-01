@@ -20,6 +20,20 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [selected frozen Qbert cross-cohort diagnostic](docs/experiments/2026-11-01-cdp-qbert-cross-cohort.md) assesses4013
+final/actual-initial on4000008039 and8039 final/actual-initial on4000004013.
+Reuse completed diagonal assessments;four new greedy arms,24 natural episodes
+per arm,600k actions/300s,zero updates/truncations,357 invariant tensors,replays/
+videos and guards. Native447fe50/runneraba4300d and checkpoint configs remain.
+This tests frozen-agent/cohort dependence,not isolated weights or reliability;
+original8039's failed gate stays unchanged. Breakout is fully closed and the
+host idle at selection. CPU command/controller qualifications pass;their two
+checker failures and co-host timing remain preserved. Root
+`/x/Temp/kindle-qbert-cross-cohort-20261101`,service
+`kindle-qbert-cross-cohort-20261101`. No new learner,retry,cap increase or automatic
+successor. Do not rerun qualifications or completed diagonal GPU stages;check
+live state before work and do not overlap assessments.
+
 The [completed Breakout greedy-collection comparison](docs/results/2026-11-01-cdp-breakout-greedy-training.md) finishes200k/
 799,639 frames/12,477 updates in21m46s. Sampled39.042/greedy99.083 fall30.64%/
 5.33% below retained56.292/104.667;all0/24 two-wall. Own initials1.417/2.208 match.

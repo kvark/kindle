@@ -1,5 +1,19 @@
 # CDP handover — October25,2026
 
+The [selected frozen Qbert cross-cohort diagnostic](experiments/2026-11-01-cdp-qbert-cross-cohort.md) assesses4013
+final/actual-initial on4000008039 and8039 final/actual-initial on4000004013.
+Reuse completed diagonal assessments;four new greedy arms,24 natural episodes
+per arm,600k actions/300s,zero updates/truncations,357 invariant tensors,replays/
+videos and guards. Native447fe50/runneraba4300d and checkpoint configs remain.
+This tests frozen-agent/cohort dependence,not isolated weights or reliability;
+original8039's failed gate stays unchanged. Breakout is fully closed and the
+host idle at selection. CPU command/controller qualifications pass;their two
+checker failures and co-host timing remain preserved. Root
+`/x/Temp/kindle-qbert-cross-cohort-20261101`,service
+`kindle-qbert-cross-cohort-20261101`. No new learner,retry,cap increase or automatic
+successor. Do not rerun qualifications or completed diagonal GPU stages;check
+live state before work and do not overlap assessments.
+
 The [completed Breakout greedy-collection comparison](results/2026-11-01-cdp-breakout-greedy-training.md) finishes200k/
 799,639 frames/12,477 updates in21m46s. Sampled39.042/greedy99.083 fall30.64%/
 5.33% below retained56.292/104.667;all0/24 two-wall. Own initials1.417/2.208 match.
@@ -16,34 +30,6 @@ no isolated coverage cause or reliability claim. Root
 no allocation active at closure. Do not rerun learner,collectors or confirmations.
 No extension,cap increase,confirmation learner or automatic successor. Check live
 state before GPU work;the five-game goal remains unfinished.
-
-An unselected Qbert cross-cohort diagnostic is CPU-prepared at
-`/x/Temp/kindle-qbert-cross-cohort-20261101`. Four new greedy arms would assess
-4013 final/actual-initial on4000008039 and8039 final/actual-initial on4000004013;
-reuse the completed diagonal assessments without repeating them. This could
-separate observed frozen-agent/cohort dependence,not overwrite8039's failed gate
-or isolate weights from checkpoint configuration/posterior randomness.
-Preflight5.637s/command5.671s passes08:06:08 UTC November1/source37e5f3c:four
-actual CLI paths,32 header cases,357 finite tensors in each of four source
-checkpoints,388 preparation/272 active Breakout pins and original identity.
-A first CPU check assumed newer optional CLI fields;its source/failure is retained
-in`preparation-failure`,and only checker defaults/explicit flag absence are fixed.
-Exact runneraba4300d/native447fe50 remain,no native/emulator construction or GPU
-work. No queue,declaration,assessment log or service exists. Do not rerun preparation.
-The private`protocol-draft.md` remains unselected. Guarded`assessment.py`,
-`launch.py` and`watch_collection.py` are now prepared;controller qualification
-passes08:12:20 UTC November1/sourcef8326c6 in4.387s (4.424s command). All four
-retained diagonal scores,357 finite/invariant tensors per arm,full stored replay/
-video/guard identities,four journal fixtures,388 preparation/272 active pins and
-original Breakout identity pass without rerunning a diagonal GPU stage or the
-completed CLI preflight. A first6.628s controller check fails only on forbidding
-ALE module import for replay identity;source/execution remain in`controller-failure`.
-The corrected test blocks both ALEInterface exports and gymnasium.make and
-recordszero construction attempts;production arm audit unchanged. Keep all CPU
-co-host timing without correction. No queue,declaration,assessment log or service
-exists. Do not rerun either successful preflight. A separate repository protocol/
-declaration and selection remain required after complete Breakout closure,
-independent confirmation and an idle host. No automatic allocation.
 
 The [completed bounded Breakout check](results/2026-11-01-cdp-breakout-greedy-training.md) passes8192 actions/32,740 frames/
 489 updates in46.633s;1024 frozen/4076 frames/.874s haszero updates and eight
