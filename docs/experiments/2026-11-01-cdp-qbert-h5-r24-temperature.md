@@ -74,3 +74,20 @@ section in this protocol. No Qbert GPU allocation or automatic successor exists.
 
 PreflightSHA256`0361d838dfe20d91ca9e3560d80b49e60e36e5120ac4382a372089aebfcd4ee7`;
 execution`f8afcc8861695b72a698a78a01c78c2011054f54acfe19be43f458bfc53289cc`.
+
+## Selected after Breakout closure
+
+Select the fixed four-arm frozen assessment on the now-idle host. The original
+Breakout R8 learner and all five services closed successfully at13:45:11 UTC;
+the subsequent CPU reference assessment also completed at13:51:07. No Kindle
+service or native learner is running. Reuse the passed CPU qualification and
+qualified temperature runtime without rebuilding or repeating checks.
+
+Qbert10007 remains below15k with both greedy and default-sampled actions,while
+R32 adds cost and lowers both means. Testing exactly temperature0.5 is a bounded
+way to assess another action choice at the original28m34s training cost. Prior
+positive and negative temperature results remain relevant;they do not predict
+this outcome. Keep retained greedy14,339.583 as the primary comparison and all
+original gates,caps,checkpoint/config identities and default-compatibility
+requirements unchanged. This is development inference tuning,not a new learner
+or independent confirmation. No retry,temperature sweep or automatic successor.
