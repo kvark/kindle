@@ -20,17 +20,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [fresh Qbert RGB64 seed12011 qualification](docs/experiments/2026-11-01-cdp-qbert-rgb64-seed12011.md) is separately selected
-after10007's completed greedy gate pass. Keep the exact RGB64/12M/H5/R24/
-encoder4e-5/base behavior4e-5/greedy collection/expert100 recipe and447fe50/
-aba4300d/fa261c53 runtime. Only learner/evaluation seeds change to12011/
-4000012011. CPU preflight passes two CLI paths,21 config cases,733/9340/18715
-cadence,all357+357 retained shapes,521 control inputs and16 runtime files in1.251s.
-Fix8192 training/733 updates plus1024 frozen actions;require the conservative
-200k estimate below30min before separately selecting the full confirmation.
-No bounded experience reuse or full learner selected yet. Root
-`/x/Temp/kindle-qbert-rgb64-seed12011-20261101`;check live state before work.
-The five-game goal remains unfinished.
+The [fresh Qbert RGB64 seed12011 check](docs/results/2026-11-01-cdp-qbert-rgb64-seed12011.md) completes8192 actions/
+32,763frames/733 updates in58.040s;frozen1024/.847s haszero updates/no natural
+episodes. All568 pins,357 initial/invariant tensors,full guided replay and guards
+pass. Main succeeds20:20:00/collection20:22:04 UTC November1/source314e071.
+Conservative200k projection25m58.703s passes30min;no gameplay result yet.
+
+The [separate fresh200k confirmation](docs/experiments/2026-11-01-cdp-qbert-rgb64-seed12011-200k.md) is selected after
+3.864s CPU qualification:five CLI paths,30 config cases,retention/observer checks,
+568 bounded/521 control pins and357 bounded tensors pass. Only seeds change
+10007/4000010007→12011/4000012011;retainRGB64/12M/H5/R24/encoder4e-5/base
+behavior4e-5/greedy collection/expert100/native447fe50/runneraba4300d/teacherfa261.
+Fix200k/18,715 updates/30min,100k/9,340 recovery andfour final/own-initial24-episode
+frozen arms. No bounded experience reuse,full result or third learner selected.
+Root`/x/Temp/kindle-qbert-rgb64-seed12011-20261101/full`;check live state before
+work. The five-game goal remains unfinished.
 
 The [completed Qbert12M/RGB64 comparison](docs/results/2026-11-01-cdp-qbert-rgb64.md) reaches **15,710.417 greedy /24 first pyramids**,
 passing the unchanged15k/90% gate and improving RGB48's14,339.583 by9.56%.
