@@ -53,3 +53,7 @@ check. A full comparison needs a separate decision against retained sampled
 56.292/greedy104.667,with actual-initial controls and no check experience reuse.
 No GPU allocation remains active at closure;check live state before work.
 The five-game goal remains unfinished.
+
+After completed bounded closure,a [separately selected fresh200k comparison](../experiments/2026-11-01-cdp-breakout-encoder8e5-200k.md)
+will test frozen gameplay against retained56.292/104.667. It reuses no bounded
+experience and retains the30-minute cap and original two-wall criterion.

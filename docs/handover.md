@@ -1,5 +1,20 @@
 # CDP handover — October25,2026
 
+The [fresh Breakout encoder8e-5 comparison](experiments/2026-11-01-cdp-breakout-encoder8e5-200k.md)
+is selected for preparation after the qualified bounded check:200k actions/
+12,477 updates under30 minutes,12M64/Auto/N8/B16/T16/H15/R16/expert100. Only
+encoder4e-5→8e-5 changes;native447fe50,exact runner,teacher and other settings
+stay fixed. Require100k/6227 recovery and fixed final/actual-initial sampled/
+greedy24-episode arms against56.292/104.667;all control arms have0/24 two-wall.
+CPU preflight1.375s passes five CLI paths,26 config cases,44 paths,15 scripts,
+nine header/four observer/seven recovery/four metadata-preservation cases,
+251 bounded/227 control pins and357 schema tensors without native/environment
+construction. Recovery automatically retains exact audited100k metadata; no
+learner behavior changes. No declaration or launch yet. Root
+`/x/Temp/kindle-breakout-encoder8e5-20261101/full`,service
+`kindle-breakout-encoder8e5-200k-20261101`. Check live state before launch;
+no experience reuse,retry,extension or automatic successor. Goal unfinished.
+
 The [completed Qbert encoder4e-5 comparison](results/2026-11-01-cdp-qbert-encoder4e5.md)
 finishes200k actions/799,739 frames/12,477 updates in27m41s,8.56% less observed
 training time than2e-5. Greedy14,028.125/sample11,522.917 improve1.76%/15.37%,
