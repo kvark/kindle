@@ -1,5 +1,22 @@
 # Kindle: CDP learning roadmap
 
+The [fixed frozen Breakout temperature0.5 assessment](experiments/2026-11-01-cdp-breakout-temperature.md)
+launches09:25:25 UTC November1/sourcea285376 after all six Qbert services complete.
+MainPID776380/invocation33ea1a8cc3494d618ebffbe63ef1fa92;collectionPID776383/
+invocationb96831bc0e6f469281e7ca94e6c19e23. All348 inputs are pinned. Four
+final/actual-initial default-sampled/temperature0.5 arms preserve the12M64/
+Auto/B16/T16/H15/R16/encoder4e-5/expert100 weights and actor-unimix.01;zero
+updates. Primary retained greedy104.667,secondary sampled56.292;the original
+learner's sampled-primary result stays unchanged. Qualifiednativee416696/
+SHA40872a3/runnerabc2c2b;exact default semantic reproduction,357 finite invariant
+tensors,24 natural episodes,no truncations,full replays/videos and guards required.
+Startup header matches expected source/config/counters. No comparison result yet.
+Root`/x/Temp/kindle-breakout-temperature-20261101`,service
+`kindle-breakout-temperature-20261101`;check live identity,do not restart or
+schedule another GPU job while active. No new learner,temperature sweep,cap
+increase or automatic successor. Passing7.996s CPU qualification is retained
+without repeat. The five-game goal remains unfinished.
+
 The [completed Qbert H5/R24 comparison](results/2026-11-01-cdp-qbert-h5-r24.md)
 finishes 200k actions / 799,812 frames / 18,715 updates in 28m47s.
 Greedy 15,430.208 / 24 first pyramids passes the 15k/90% gate,
@@ -19,21 +36,6 @@ competence. CPU co-host timing remains without correction. Root
 `/x/Temp/kindle-qbert-h5-r24-20261101/full`; terminal, do not rerun its learner,
 collectors or confirmations. No extension, cap increase, confirmation learner or
 automatic successor is selected. Check live state; the five-game goal is unfinished.
-
-The [fixed Breakout temperature0.5 assessment](experiments/2026-11-01-cdp-breakout-temperature.md)
-passes CPU preparation only at09:05:09 UTC November1/source6300c1d:7.996s,
-four actual CLI paths,32 header cases,four retained frozen audits,337 inputs and
-401 active Qbert pins. Original Qbert identity stays unchanged;zero native/
-emulator construction,replays,updates,failures or retries. Two historical runner
-references resolve to exact Git bytes. Keep co-host timing. No queue,declaration,
-service or GPU allocation is selected. Proposed four final/actual-initial default
-sample/temperature0.5 arms preserve actor-unimix.01 and require exact default
-semantic reproduction with qualifiede416696/runtime40872a3/runnerabc2c2b.
-Primary retained greedy104.667,secondary sampled56.292;original learner's primary
-result stays unchanged. Root`/x/Temp/kindle-breakout-temperature-20261101`.
-Do not rerun the passing preflight. Qbert closure is complete; separate
-selection still requires an idle host. No Breakout assessment or automatic
-successor is selected.
 
 The [completed CPU Breakout planning-cost diagnostic](results/2026-11-01-cdp-breakout-plan-costs.md) finds56.38% of
 12,521 horizontal disagreements have at most1 unit excess teacher-model cost;

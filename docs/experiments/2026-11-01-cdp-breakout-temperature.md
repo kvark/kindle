@@ -83,3 +83,14 @@ cap and rejection rule above. The source/runtime difference requires exact
 default-sampled compatibility in both final and actual-initial arms. No result
 is available at selection. Stop at any failed arm or audit; no retry, broader
 temperature sweep, new learner or automatic successor is selected.
+
+## Launch
+
+The separately selected assessment launches **09:25:25 UTC November1**,
+source`a285376`, mainPID776380/invocation33ea1a8cc3494d618ebffbe63ef1fa92.
+The collector hasPID776383/invocationb96831bc0e6f469281e7ca94e6c19e23.
+All348 inputs are pinned;declaration SHA256
+`c61000f0934e09853feeaada426d920d033e8549270c3ff67f5fd0770e78374b`.
+Startup header matches the selected runtime,runner,evaluation seed and restored
+200k-action/12,477-update counters. No complete comparison is available yet.
+Do not restart the assessment or schedule another GPU job while it is active.
