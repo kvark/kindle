@@ -27,22 +27,19 @@ cohort sweep. All31 declared/506 active Qbert inputs,original Qbert identity and
 full exact replays/videos pass. CPU-only135.931s completes14:26:31 UTC November1/
 sourceb7edcf8,zero updates/failures/repeats;retain co-host timing. Root
 `/x/Temp/kindle-breakout-unseen-center-fresh-20261101`;complete,do not rerun.
-The sole Qbert H3 learner below remains active;no additional GPU work is selected.
+The Qbert H3 comparison below also closes;check live state before GPU work.
 
-The [fresh Qbert H3/R24 comparison](docs/experiments/2026-11-01-cdp-qbert-h3-r24-200k.md)
-is active from14:13:06 UTC November1/source df3a75e,506 inputs,originalPID803859/
-invocation798ad208226e40a3a73fa9e43fec8066. Service`kindle-qbert-h3-r24-200k-20261101`,
-root`/x/Temp/kindle-qbert-h3-r24-20261101/full`. Main/post/progress/collection remain
-active. Original recovery observer succeeds14:26:42:100k/9,340,357 finite tensors,
-all four files retained (179,536,495bytes,.269s). Do not repeat audit or retention.
-Startup14:13:34 passes357 control/bounded-matching tensors,47 pre-update
-transitions,correct R24 cadence and264 finite supervised reports through3,192
-acts. Fixed200k/18,715updates,35min cap;require100k/9,340 audit with automatic
-four-file retention and final/actual-initial sampled/greedy24-episode assessments.
-Greedy14,339.583 is primary,sampled13,761.458 secondary;original15k/90% gate.
-H5→3 only;native447fe50/runneraba4300d/teacher unchanged. No frozen result yet.
-Inspect this original process;do not restart,repeat checks or allocate concurrent
-GPU work. No extension,retry,horizon sweep or automatic successor.
+The [completed Qbert H3/R24 comparison](docs/results/2026-11-01-cdp-qbert-h3-r24.md)
+finishes200k/799,802frames/18,715updates in26m41s,6.56% less time than H5.
+Greedy13,823.958/sample11,277.083 trail14,339.583/13,761.458;all trained arms
+24/24 first pyramids but miss15k. Retain H5 for stronger absolute primary score;
+H3 is a cheaper development point with slightly higher greedy return/minute.
+All506 inputs,357 matching/invariant tensors,retained100k recovery,paired initial
+traces,full replays/videos,guards,curves,coverage/exposure and original collector
+pass. Main/post/collection succeed14:53:25/14:53:42/14:53:44 UTC November1/source
+df3a75e;all five original services terminal,zero original/GPU failures or repeats.
+Root`/x/Temp/kindle-qbert-h3-r24-20261101/full`. Do not rerun;no extension,horizon
+sweep,confirmation or automatic successor. No GPU allocation remains active.
 
 The [bounded H3 result](docs/results/2026-11-01-cdp-qbert-h3-r24.md) passes8,192
 acts/32,760frames/733updates in64.175s;1,024 frozen/.806s haszero updates/no

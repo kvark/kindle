@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed Qbert H3/R24 comparison](2026-11-01-cdp-qbert-h3-r24.md) reduces
+training time6.56% at fixed200k/18,715 updates,but lowers greedy14,339.583→13,823.958
+and sampled13,761.458→11,277.083,each24/24 first pyramids. Both still miss15k.
+Initial-subtracted greedy return/minute rises3.18%,while sampled falls12.54%;
+retain H5 for stronger absolute primary score and H3 as a cheaper point. This
+narrows the short-imagination tradeoff without identifying a model-error or
+credit-assignment cause. All506 inputs,recovery,frozen/replay audits and original
+services pass;complete14:53:44 UTC November1,zero GPU repeats or successor.
+
 The [fresh fixed Breakout centering cohort](2026-11-01-cdp-breakout-unseen-center-fresh.md)
 scores209.833→212.042 (+1.05%),withfour of eight lane means better andzero two-wall
 for both controllers. It fails the10%/five-lane screen;the old cohort's19.88%
