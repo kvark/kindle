@@ -23,6 +23,11 @@ TILES = tuple((r, c) for r, xs in enumerate(ROW_X) for c in range(len(xs)))
 MOVES = ((3, 1, 1), (5, 1, 0), (4, -1, -1), (2, -1, 0))
 
 
+def rgb_mask(image, color):
+    return ((image[..., 0] == color[0]) & (image[..., 1] == color[1])
+            & (image[..., 2] == color[2]))
+
+
 def components(mask):
     ys, xs = np.where(mask)
     remaining = set(zip(xs.tolist(), ys.tolist()))
@@ -59,13 +64,13 @@ class PixelPolicy:
             r, c = tile
             x, y = round(ROW_X[r][c]), ROW_Y[r]
             patch = frame[y-2:y+3, x-10:x+10]
-            yellow = int(np.all(patch == [210, 210, 64], axis=-1).sum())
-            blue = int(np.all(patch == [45, 87, 176], axis=-1).sum())
+            yellow = int(rgb_mask(patch, (210, 210, 64)).sum())
+            blue = int(rgb_mask(patch, (45, 87, 176)).sum())
             if yellow >= 8:
                 self.lit[tile] = True
             elif blue >= 8:
                 self.lit[tile] = False
-        mask = np.all(frame == [181, 83, 40], axis=-1)
+        mask = rgb_mask(frame, (181, 83, 40))
         mask[:16] = False
         candidates = [v for v in components(mask) if v['count'] >= 6
                       and 5 <= v['box'][3] - v['box'][1] + 1 <= 28
@@ -152,7 +157,7 @@ class _AvoidingPixelPolicy(_RepeatingPixelPolicy):
         action = super().action(frame)
         if not action or self.age != 0 or self.previous is None:
             return action
-        mask = np.all(frame == [146, 70, 192], axis=-1)
+        mask = rgb_mask(frame, (146, 70, 192))
         mask[:20] = False
         enemies = set()
         for sprite in components(mask):
@@ -228,9 +233,9 @@ class ContinuationPixelPolicy:
             self.candidate = None
             self.stable = 0
         observed = frame.copy()
-        observed[np.all(frame == BLUE, axis=-1) | np.all(frame == YELLOW, axis=-1)] = [0, 0, 0]
-        observed[np.all(frame == self.base, axis=-1)] = BLUE
-        observed[np.all(frame == self.goal, axis=-1)] = YELLOW
+        observed[rgb_mask(frame, BLUE) | rgb_mask(frame, YELLOW)] = [0, 0, 0]
+        observed[rgb_mask(frame, self.base)] = BLUE
+        observed[rgb_mask(frame, self.goal)] = YELLOW
         action = self.policy.action(observed)
         if all(self.policy.lit.values()):
             self.flips += 1
