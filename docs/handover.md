@@ -1,15 +1,16 @@
 # CDP handover — October25,2026
 
-The [CPU Breakout first-disagreement diagnostic](experiments/2026-11-01-cdp-breakout-first-disagreement.md)
-selects all120 early-window disagreements for one-command teacher/policy branches
-followed by the same teacher. Nineteen CPU tests pass;require exact source and
-old branch suffixes,eight reverse-order checks and317 active Qbert pins/PID755504.
-Root`/x/Temp/kindle-breakout-first-disagreement-20261101`,180s analysis/195s
-controller caps. No native/GPU work,new learner or intervention result yet.
-The original Qbert greedy-training learner continues;retain CPU co-host timing.
-Original source23fe57f stops before replay on selection-versus-execution origin
-order;all240 records match by identity. Failure retained;separate`order-repair`
-passes22 CPU tests with unchanged caps andzero completed replay/GPU repeats.
+The [completed CPU Breakout first-disagreement diagnostic](results/2026-11-01-cdp-breakout-first-disagreement.md)
+finds102 both/six teacher-only/six policy-only/six neither at the original loss
+endpoint:both arms108/120. First disagreement usually remains recoverable under
+the teacher;no aggregate survival gain or architecture cause. All37,016 actions/
+148,038 frames,6,905 old teacher-suffix rows,eight reverse checks,320 repair/317
+active Qbert pins and22 tests pass. Analysis39.271s completes06:24:01 UTC
+November1/sourced139b43. Original23fe57f origin-order assertion fails before
+replay;preserved. Separate`order-repair` closure`complete_with_cpu_order_repair`,
+zero completed replay/GPU repeats. Root`/x/Temp/kindle-breakout-first-disagreement-20261101`;
+do not rerun. Original QbertPID755504/invocation5fb0d30ffb5d47aca552009e586bb929
+continues;retain CPU co-host timing. No new learner,loss or successor selected.
 
 The [fresh greedy-training Qbert comparison](experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 launches06:15:51 UTC November1/sourcec659423 within the existing five-game goal.

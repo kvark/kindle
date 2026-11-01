@@ -1,13 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [CPU Breakout first-disagreement diagnostic](../experiments/2026-11-01-cdp-breakout-first-disagreement.md)
-separately tests the first exact command disagreement in every retained early
-loss window,then uses the same teacher controller. All120 windows qualify;
-19 CPU tests pass. This can identify local command effects at matched endpoints,
-not an architectural cause or new score. No result yet;Qbert training continues.
-The original source23fe57f fails before replay on origin list order;all240 full
-records match by identity. Separate CPU repair passes22 tests,retains original
-failure/caps and repeatszero completed replay/GPU stages.
+The [completed Breakout first-disagreement intervention](2026-11-01-cdp-breakout-first-disagreement.md)
+finds102 both/six teacher-only/six policy-only/six neither survive at the original
+loss endpoint;both arms108/120 when followed by the same teacher. Thus the first
+disagreement usually remains recoverable and does not explain the full teacher-
+takeover benefit. Examine sustained subsequent control without claiming an
+architectural cause. Separate64-action pairs86/10/11/13 use a new origin endpoint.
+All37,016 actions,6,905 old teacher-suffix rows,eight reverse checks,320 repair/
+317 active Qbert pins and22 tests pass. Analysis39.271s completes06:24:01 UTC
+November1/sourced139b43. Original pre-replay origin-order failure is preserved;
+separateCPU closure`complete_with_cpu_order_repair`,zero completed replay/GPU
+repeats. Qbert continues;no new loss,learner or successor is selected.
 
 The separately selected [fresh greedy-training comparison](../experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 tests whether changing live Qbert collection improves frozen play at200k/12,477

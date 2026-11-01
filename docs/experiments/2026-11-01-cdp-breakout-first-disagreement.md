@@ -76,3 +76,18 @@ Preflight now exercises this check on the real saved inputs. Twenty-two CPU
 tests pass, including order permutations, duplicate identities and changed
 records. Keep the same origins, source replay, branches, endpoints,180s/195s
 caps and active Qbert protection. No GPU stage or completed replay repeats.
+
+## Completed CPU repair
+
+Sourced139b43 completes06:24:01 UTC November1. Analysis39.271s/controller40.843s,
+320 repair pins,22 CPU tests and3.456s preflight. All37,016 source actions/148,038
+frames,6,905 old teacher-suffix rows,eight reverse-order checks and317 active
+Qbert inputs pass;original PID/invocation stays unchanged. No native/GPU work.
+
+Matched survival pairs are102 both/six teacher-only/six policy-only/six neither;
+both arms total108/120. Separate64-action pairs86/10/11/13 total96/97 survivors.
+The first disagreement usually remains recoverable under subsequent teacher
+control;there is no aggregate first-command survival advantage or architecture
+cause. See the [result](../results/2026-11-01-cdp-breakout-first-disagreement.md).
+Closure`complete_with_cpu_order_repair`;original failure remains preserved,
+zero completed replay/GPU repeats. Do not rerun either controller. Qbert continues.

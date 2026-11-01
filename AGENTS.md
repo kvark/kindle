@@ -20,18 +20,19 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
-The [CPU Breakout first-disagreement diagnostic](docs/experiments/2026-11-01-cdp-breakout-first-disagreement.md)
-selects all120 early-window disagreements from the retained24-episode cohort.
-Compare one teacher/policy command,then the same feedback-aware teacher;primary
-endpoint is the original loss action,64-action survival remains separate.
-Require full37,016-action replay,old recorded/teacher suffixes and eight reversed
-branch checks. Nineteen CPU tests pass;180s/195s caps,one low-priority CPU core.
-Root`/x/Temp/kindle-breakout-first-disagreement-20261101`;no native/GPU work or
-learner. Preserve active QbertPID755504/invocation5fb0d30ffb5d47aca552009e586bb929
-and317 pins;retain CPU co-host timing. Original source23fe57f fails before replay
-because240 identical origin records have different list order;failure preserved.
-Separate`order-repair` matches full records by unique identity and passes22 CPU
-tests,with unchanged caps andzero repeated replay/GPU stages. No outcome yet.
+The [completed CPU Breakout first-disagreement diagnostic](docs/results/2026-11-01-cdp-breakout-first-disagreement.md)
+finds102 both/six teacher-only/six policy-only/six neither survive the matched
+original loss endpoint;both arms total108/120. At64 actions,86/10/11/13;not the
+old window-origin endpoint. First disagreements usually remain recoverable under
+the teacher;no aggregate first-command survival gain or architecture cause.
+All37,016 source actions/148,038 frames,6,905 old teacher-suffix rows,eight reverse
+checks,320 repair/317 active Qbert pins and22 CPU tests pass. Analysis39.271s /
+controller40.843s completes06:24:01 UTC November1/sourced139b43. Original23fe57f
+origin-order assertion fails before replay and remains preserved;separate
+`order-repair` closure is`complete_with_cpu_order_repair`,zero completed replay/
+GPU repeats. Root`/x/Temp/kindle-breakout-first-disagreement-20261101`;do not rerun.
+Original QbertPID755504/invocation5fb0d30ffb5d47aca552009e586bb929 continues;
+retain CPU co-host timing. No new learner,loss or successor is selected.
 
 The [fresh greedy-training Qbert comparison](docs/experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 launches06:15:51 UTC November1/sourcec659423 with317 pins,mainPID755504/invocation

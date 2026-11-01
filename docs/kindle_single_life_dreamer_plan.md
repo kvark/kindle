@@ -1,14 +1,14 @@
 # Kindle: CDP learning roadmap
 
-The selected [CPU Breakout first-disagreement diagnostic](experiments/2026-11-01-cdp-breakout-first-disagreement.md)
-tests one earlier teacher/policy command followed by the same feedback controller
-on all120 retained loss windows. Earlier full takeovers avoid108/120 losses;
-this narrower intervention will test a local command effect,not an architecture
-cause. Nineteen CPU tests pass;180s/195s caps,no native/GPU work,new learner or
-result yet. Preserve the original active Qbert learner and317 input hashes.
-Original source23fe57f fails before replay on origin list ordering;all240 records
-match by unique identity. The separate CPU repair preserves that failure,passes
-22 tests and keeps caps/selection/endpoints unchanged;zero replay/GPU repeats.
+The [completed CPU Breakout first-disagreement diagnostic](results/2026-11-01-cdp-breakout-first-disagreement.md)
+finds102 both/six teacher-only/six policy-only/six neither survive at the original
+loss endpoint,both arms108/120. First disagreements usually remain recoverable
+under subsequent teacher control;no aggregate first-command survival benefit
+or architecture cause. Analysis39.271s completes06:24:01 UTC November1/source
+d139b43;all37,016 actions,6,905 old teacher-suffix rows,eight reverse checks,
+320 repair/317 active Qbert pins and22 tests pass. Original pre-replay origin-order
+failure is preserved;separateCPU closure`complete_with_cpu_order_repair`,zero
+completed replay/GPU repeats. Qbert continues;no new learner/loss/successor.
 
 The [fresh greedy-training Qbert comparison](experiments/2026-11-01-cdp-qbert-greedy-training-200k.md)
 launches06:15:51 UTC November1/sourcec659423 within this five-game goal.
