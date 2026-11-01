@@ -20,10 +20,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [fresh-cohort Breakout centering reference](docs/results/2026-11-01-cdp-breakout-unseen-center-fresh.md)
+fails the fixed screen:209.833→212.042 (+1.05%),four of eight lane means improve,
+both0/24 two-wall. Keep the native teacher;no integration,parameter retry or
+cohort sweep. All31 declared/506 active Qbert inputs,original Qbert identity and
+full exact replays/videos pass. CPU-only135.931s completes14:26:31 UTC November1/
+sourceb7edcf8,zero updates/failures/repeats;retain co-host timing. Root
+`/x/Temp/kindle-breakout-unseen-center-fresh-20261101`;complete,do not rerun.
+The sole Qbert H3 learner below remains active;no additional GPU work is selected.
+
 The [fresh Qbert H3/R24 comparison](docs/experiments/2026-11-01-cdp-qbert-h3-r24-200k.md)
 is active from14:13:06 UTC November1/source df3a75e,506 inputs,originalPID803859/
 invocation798ad208226e40a3a73fa9e43fec8066. Service`kindle-qbert-h3-r24-200k-20261101`,
-root`/x/Temp/kindle-qbert-h3-r24-20261101/full`. All four observers are active.
+root`/x/Temp/kindle-qbert-h3-r24-20261101/full`. Main/post/progress/collection remain
+active. Original recovery observer succeeds14:26:42:100k/9,340,357 finite tensors,
+all four files retained (179,536,495bytes,.269s). Do not repeat audit or retention.
 Startup14:13:34 passes357 control/bounded-matching tensors,47 pre-update
 transitions,correct R24 cadence and264 finite supervised reports through3,192
 acts. Fixed200k/18,715updates,35min cap;require100k/9,340 audit with automatic

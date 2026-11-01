@@ -1,5 +1,11 @@
 # Centering during unseen-ball intervals helps the reused reference cohort
 
+The [subsequent fixed fresh-cohort comparison](2026-11-01-cdp-breakout-unseen-center-fresh.md)
+scores209.833→212.042,onlyfour of eight lane means improve,andboth remain0/24
+two-wall. It fails the predeclared10%/five-lane screen. Keep the native teacher;
+the earlier development gain below is not confirmed at that threshold. No further
+cohort sweep,parameter retry or integration is selected.
+
 The fixed CPU reference improves **185.375→333.000** on the eight screening
 episodes,then **225.083→269.833 (+19.88%)** on the expanded24. Eight of eight
 screening lanes and five of eight expanded lane means improve. Both versions

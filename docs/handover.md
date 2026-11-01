@@ -1,8 +1,19 @@
 # CDP handover — October25,2026
 
+The [fresh fixed Breakout centering cohort](results/2026-11-01-cdp-breakout-unseen-center-fresh.md)
+fails the10%/five-lane screen:209.833→212.042 (+1.05%),four of eight lane means
+improve,both0/24 two-wall. Keep the native teacher;no integration,parameter retry
+or cohort sweep follows. Both full exact replays/videos,31 declared/506 active
+Qbert inputs and original Qbert identity pass. CPU-only135.931s completes14:26:31
+UTC November1/sourceb7edcf8,zero updates/failures/repeats. Retain CPU co-host time.
+Root`/x/Temp/kindle-breakout-unseen-center-fresh-20261101`;complete,do not rerun.
+The Qbert H3 learner below remains the sole active GPU allocation.
+
 The [fresh Qbert H3/R24 comparison](experiments/2026-11-01-cdp-qbert-h3-r24-200k.md)
 launches14:13:06 UTC November1/source df3a75e with506 pins,mainPID803859/
-invocation798ad208226e40a3a73fa9e43fec8066;all four observers active. Startup
+invocation798ad208226e40a3a73fa9e43fec8066. Main/post/progress/collection remain active;
+original recovery observer succeeds14:26:42 with100k/9,340,357 finite tensors and
+all four files retained (179,536,495bytes,.269s). Do not repeat audit/retention. Startup
 14:13:34 in1.452s passes357 control/bounded-matching tensors,47 pre-update
 transitions,correct cadence and264 finite reports through3,192 actions. Change
 H5→3 at fixedR24/200k/18,715updates,12M48/encoder4e-5/greedy collection/expert100;

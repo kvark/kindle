@@ -1,5 +1,15 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fresh fixed Breakout centering cohort](2026-11-01-cdp-breakout-unseen-center-fresh.md)
+scores209.833→212.042 (+1.05%),withfour of eight lane means better andzero two-wall
+for both controllers. It fails the10%/five-lane screen;the old cohort's19.88%
+gain does not carry over at the declared threshold. Keep the qualified teacher;
+no integration,parameter retry or cohort sweep follows. Both full exact replays,
+31 declared/506 active learner inputs and original Qbert identity pass. CPU-only
+135.931s completes14:26:31 UTC November1/sourceb7edcf8,zero updates/failures/repeats.
+This tests a fixed reference change,not learned-policy improvement or a general
+claim against earlier positioning. Retain CPU co-host time without correction.
+
 The [fixed H5/R24 Qbert temperature0.5 assessment](2026-11-01-cdp-qbert-h5-r24-temperature.md)
 also lowers mean return:12,840.625 versus greedy14,339.583 and sampled13,761.458,
 each24/24 first pyramids. Exact default compatibility and all frozen/replay audits
