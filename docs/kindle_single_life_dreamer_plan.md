@@ -1,19 +1,21 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Breakout encoder4e-5 comparison](experiments/2026-11-01-cdp-breakout-encoder4e5-200k.md) is selected after the bounded
-check passes8192 actions/32,721 frames/489 updates in46.899s;frozen1024/.899s
-haszero updates/no natural episodes. All194 pins,357 matching/invariant tensors,
-47 pre-update events,full replay and guards pass;conservative200k projection
-20m59s passes30min. Main/collection succeed03:05:01/03:05:09 UTC November1,
-sourcee11932e,no GPU repeat. The full selection keeps12M64/Auto/N8/B16/T16/H15/
-R16/expert100 and changes only encoder2e-5→4e-5;native447fe50,exact runner and
-teacher fixed. Require100k/6227 recovery and final/actual-initial sampled/greedy
-24-episode assessments against25.292/42.625. Five CLI paths,24 config cases,
-8 header cases and194 bounded/173 control pins pass;initial CPU header-rate
-assertion failure preserved,zero full GPU stages before correction. Root
-`/x/Temp/kindle-breakout-encoder4e5-20261101/full`,service
-`kindle-breakout-encoder4e5-200k-20261101`. No full frozen result;check live state.
-See [bounded result](results/2026-11-01-cdp-breakout-encoder4e5.md);earlier4M/expert10 rate4e-5 failure remains retained.
+The [fresh Breakout encoder4e-5 comparison](experiments/2026-11-01-cdp-breakout-encoder4e5-200k.md) launches03:07:11 UTC November1,
+source2f9af49,with227 pins and a30-minute training cap:200k actions/12,477 updates,
+12M64/Auto/N8/B16/T16/H15/R16/expert100,only encoder2e-5→4e-5. Native447fe50,
+exact runner and teacher stay fixed. Startup passes357 control/check-matching
+initial tensors,47 pre-update events,correct cadence and208 finite reports
+through3704 actions. Main PID732902/invocation`c69d91c610d24751bc334966ab8057b5`;
+progress,recovery,postprocessing and collection observers are active. Require
+100k/6227 recovery and final/actual-initial sampled/greedy24-episode assessments
+against25.292/42.625,all0/24 two-wall. No full frozen result is available.
+Root`/x/Temp/kindle-breakout-encoder4e5-20261101/full`,service
+`kindle-breakout-encoder4e5-200k-20261101`. Do not restart this learner or schedule
+another GPU job while it is active;check live state. The [bounded check](results/2026-11-01-cdp-breakout-encoder4e5.md)
+passes8192 actions/32,721 frames/489 updates in46.899s,1024 frozen/.899s/zero
+updates,194 pins and all audits;conservative200k projection20m59s. Original CPU
+header-rate preparation failure remains preserved;no GPU repeats. Earlier
+4M/expert10 rate4e-5 failure and reused1009/cohort limits remain. Goal unfinished.
 
 The current five-game goal includes architecture diagnosis. Prioritize the
 remaining Breakout control gap and Qbert later-game decisions using retained

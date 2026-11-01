@@ -54,3 +54,15 @@ Root`/x/Temp/kindle-breakout-encoder4e5-20261101/full`,trial
 `breakout-12m-64-b16-r16-encoder4e5-expert100-200k-seed1009`,service
 `kindle-breakout-encoder4e5-200k-20261101`. Recheck live state and host pins at
 selection and launch; no full frozen result exists at declaration.
+
+## Launch and startup
+
+The learner launches03:07:11 UTC November1/source2f9af49,PID732902/invocation
+`c69d91c610d24751bc334966ab8057b5`. Declaration pins227 inputs; SHA
+`aae0c85102e3518464c312a5b93d4b030837798c9a78f7323db9c3b8bcb42db0`.
+Startup verifies357 initial tensors matching control/check,47 matching pre-update
+transitions,first updates376/392/408/424/440/456 and208 finite reports through
+3704 actions. All five services are active with the original process identity.
+The0.849s CPU startup command co-hosts with learning; retain this timing caveat
+without wall-time correction. No full frozen score or gameplay gain is available.
+Do not restart the learner or schedule another GPU job while it is active.
