@@ -1,34 +1,29 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Qbert dynamics-group1e-4 comparison](experiments/2026-11-01-cdp-qbert-dynamics1e4-200k.md)
-launches22:32:25 UTC November1/source0d8ec52 with606 pins. Original mainPID
-857991/invocation1e44edc5d824407b8a21cd62657f6ee2 and progress/post/collection
-observers remain active; original recovery observer succeeds22:45:31 UTC. Startup22:33:29 passes357 bounded/control
-initial tensors,47 matching pre-update transitions, correct cadence and723 finite
-reports through8088 actions. The100k/9,340 recovery passes357 finite tensors
-andfour retained files/206,067,159 bytes;9,663 sequential finite reports through
-103,448 actions pass. RetentionSHA768d7109,metadataSHAdc674aca; allfour retained
-hashes and original recovery invocation32e0b7e1cf72435388c4a7225db0e41c verify.
-Weights/metadata only,no replay/live state/games/RNG or intermediate evaluation.
-No full frozen result is available. Preserve original processes; do not restart
-or overlap another GPU allocation.
+The [Qbert dynamics-group1e-4 comparison](results/2026-11-01-cdp-qbert-dynamics1e4.md)
+finishes allfive GPU stages:200k actions/18,715 updates in25m40.027s,thenfour
+frozen arms. Preliminary selected24-episode means aregreedy15,471.875 and
+sampled14,862.5 versus12,678.125/12,093.75;own initials168.750/167.708 match.
+Pyramid/replay/final closure checks remain pending; do not claim an audited gate.
 
-Fixed200k actions/18,715 updates/30min,100k/9,340 four-file recovery andfour
-final/actual-initial sampled/greedy24-episode assessments remain. Only dynamics
-4e-4→1e-4 changes recurrent/posterior/prediction/exploration rates together on
-reused12011 at12M64/Auto/N8/B16/T16/H5/R24/encoder-base4e-5/greedy/expert100.
-Native447fe50/35ad0db and teacherfa261c53 are unchanged; runnere161bf38 adds only
-12 qualified CLI lines. Compare primary greedy12,678.125 andsampled12,093.750;
-original15k/90% gate and failed confirmation remain. No reliability claim.
+Original mainPID857991/invocation1e44edc5d824407b8a21cd62657f6ee2 fails23:00:53
+UTC November1 in its CPU audit:undefined`CONTROL`,before any replay. Original
+collection fails;postprocess exits with`postprocess-incomplete.json`. Preserve
+these failures. No GPU stage failed or repeats; original100k/9,340 recovery passed.
 
-Full CPU qualification passes4.011s after preserving/correcting one retained-
-control path failure: five CLI commands,32 config/five teacher/eight mode/17
-header/four observer/12 recovery cases,six retention/two collector fixtures,
-49 paths/17 scripts andall616 bounded/562 control pins. No GPU stage repeats.
-The1.711s startup CPU co-host cost stays uncorrected. Root
-`/x/Temp/kindle-qbert-dynamics1e4-20261101/full`; service
-`kindle-qbert-dynamics1e4-200k-20261101`. No retry, cap increase, rate sweep,
-extension or automatic successor. The five-game goal remains unfinished.
+Separate CPU repair`kindle-qbert-dynamics1e4-cpu-repair-20261101` launches23:06:15
+UTC/source240bb89,PID862557/invocatione48562cf43cd4ba8927950760ef61922.
+Its3.959s qualification passes606 original/111 repair pins and verifies that
+CONTROL is the sole missing audit global. It injects the exact retained-control
+path without editing the original source; native/emulator construction is blocked
+in the parent. Missing frozen/training replays,plots andcomparison run once.
+Two failed preparation checks are preserved:import-versus-construction and raw
+journal JSON equality; corrected checks retain original journal bytes and compare
+decoded records. Original services stay failed; no original completion is created.
+Root`/x/Temp/kindle-qbert-dynamics1e4-20261101/full/cpu-repair`;declaration77ce1326.
+No new learner,confirmation,rate sweep,extension or GPU successor is selected.
+The five-game goal remains unfinished. Do not restart the original services or
+repeat completed training/evaluation/replay stages; check live repair state.
 
 The [current saved-log cost summary](results/2026-11-01-cdp-current-training-cost.md)
 finds learning81.14–81.31% of Qbert wall time and87.57–88.72% of Breakout;

@@ -1,8 +1,9 @@
 # Fresh200k Qbert comparison with dynamics-group rate1e-4
 
-**Running:** original learner launches22:32:25 UTC November1/source0d8ec52.
-Startup and100k/9,340 recovery pass; all final/actual-initial assessments remain
-pending. Preserve original processes and do not overlap another GPU allocation.
+**CPU repair running:** allfive GPU stages complete, but the original main
+fails23:00:53 UTC November1 on undefined`CONTROL` in its audit, before any replay.
+Original collection also fails. The separately qualified CPU repair below
+completes missing evidence only; no original service or GPU stage restarts.
 
 The [closed bounded check](../results/2026-11-01-cdp-qbert-dynamics1e4.md)
 passes all checks and projects25m43s conservatively, below30min. Select a separate
@@ -133,3 +134,38 @@ weights/metadata only; replay,live beliefs,games and RNG are not retained.
 No intermediate evaluation or checkpoint selection occurs. Final200k/18,715
 updates/30min and allfour frozen assessments remain unchanged and pending.
 Keep CPU co-host costs without wall-time correction; no restart or overlap.
+
+
+## Separate CPU closure after the original audit failure
+
+Allfive GPU stages and host guards pass. Training200k/18,715 updates takes
+1,540.027384s; allfour frozen arms end naturally withzero truncations. The
+original audit's result construction references`CONTROL` without defining it;
+main service fails23:00:53.476 UTC, followed by original collection. Postprocess
+retains its incomplete-review receipt and does no plotting. No frozen or guided
+replay had started. Preserve original journals, sources, states and failures.
+
+The separate repair supplies only the retained control path:
+`/x/Temp/kindle-qbert-rgb64-seed12011-20261101/full/qbert-12m-64-b16-h5-r24-encoder4e5-greedy-expert100-200k-seed12011`.
+The original audit source remains byte-identical. Symbol-table qualification
+finds exactlyone missing global before injection andnone after. All606 original
+pins and111 repair pins preserve completed logs/checkpoints/guards and failure
+provenance. Original two repair-preparation failures remain: a module-import
+assertion confused import with construction, and byte comparison of journal
+JSON rejected equivalent field ordering. The corrected check blocks all seven
+native constructors and ALE construction in the audit parent, allows CPU replay
+subprocesses, and preserves original journal bytes while comparing parsed rows.
+Qualification passes23:05:53 UTC in3.959s; original artifacts remain unchanged.
+
+The CPU-only service launches23:06:15 UTC/source240bb89,PID862557/invocation
+e48562cf43cd4ba8927950760ef61922,unit
+`kindle-qbert-dynamics1e4-cpu-repair-20261101`,cap2400s. It runs the unfinished
+audit under its original1800s cap and missing postprocess commands under120s
+caps. Existing replay caps and all game criteria remain unchanged. Original
+main/collection stay failed; no original passing completion will be manufactured.
+Use a separate`complete_with_cpu_audit_repair` closure if all missing checks pass.
+No completed training,evaluation,replay,postprocess or collector repeats.
+Repair root`full/cpu-repair`,declarationSHA256
+`77ce13260a4d0eda955cb232b175de3346b152b24bbd1edeed7f58a660a703b9`.
+The previously prepared supplemental original-success summary remains unexecuted
+because its assumptions no longer hold. No successor learner is selected.

@@ -1,4 +1,30 @@
-# Qbert dynamics-group1e-4 passes execution and early-cost checks
+# Qbert dynamics-group1e-4: frozen gain awaits repaired CPU audit
+
+The [Qbert dynamics-group1e-4 comparison](../experiments/2026-11-01-cdp-qbert-dynamics1e4-200k.md)
+finishes allfive GPU stages:200k actions/18,715 updates in25m40.027s,thenfour
+frozen arms. Preliminary selected24-episode means aregreedy15,471.875 and
+sampled14,862.5 versus12,678.125/12,093.75;own initials168.750/167.708 match.
+Pyramid/replay/final closure checks remain pending; do not claim an audited gate.
+
+Original mainPID857991/invocation1e44edc5d824407b8a21cd62657f6ee2 fails23:00:53
+UTC November1 in its CPU audit:undefined`CONTROL`,before any replay. Original
+collection fails;postprocess exits with`postprocess-incomplete.json`. Preserve
+these failures. No GPU stage failed or repeats; original100k/9,340 recovery passed.
+
+Separate CPU repair`kindle-qbert-dynamics1e4-cpu-repair-20261101` launches23:06:15
+UTC/source240bb89,PID862557/invocatione48562cf43cd4ba8927950760ef61922.
+Its3.959s qualification passes606 original/111 repair pins and verifies that
+CONTROL is the sole missing audit global. It injects the exact retained-control
+path without editing the original source; native/emulator construction is blocked
+in the parent. Missing frozen/training replays,plots andcomparison run once.
+Two failed preparation checks are preserved:import-versus-construction and raw
+journal JSON equality; corrected checks retain original journal bytes and compare
+decoded records. Original services stay failed; no original completion is created.
+Root`/x/Temp/kindle-qbert-dynamics1e4-20261101/full/cpu-repair`;declaration77ce1326.
+No new learner,confirmation,rate sweep,extension or GPU successor is selected.
+The five-game goal remains unfinished. Do not restart the original services or
+repeat completed training/evaluation/replay stages; check live repair state.
+
 
 The [fixed bounded check](../experiments/2026-11-01-cdp-qbert-dynamics1e4.md)
 completes8,192 actions/32,756 frames/733 updates in **57.461406s**. Frozen1,024
