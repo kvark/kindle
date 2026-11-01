@@ -177,6 +177,11 @@ imperfect teacher. No counterfactual action or teacher takeover is tested here.
 The old control has no per-action life counts, so these windows describe only
 the4e-5 candidate. Windows may overlap and rows are temporally correlated.
 
+The subsequent [teacher-takeover intervention](2026-11-01-cdp-breakout-recoverability.md)
+tests these failures directly: early control avoids108/120 losses at their
+recorded endpoint, versus26/120 at the last near-descending state. This narrows
+the timing question while leaving the precise architectural cause unresolved.
+
 The23.375s CPU replay (24.583s controller wall) completes04:04:01 UTC November1,
 source3012999. Eight pure tests,265 analysis pins,all276 active Qbert inputs,
 originalPID736977/invocation48d20e8959f04654b6f5ff8932328d8d and all replay checks

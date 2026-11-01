@@ -27,6 +27,16 @@ preceding control sequence and recoverability, without identifying a causal
 last-action error. All265 analysis/276 active Qbert pins and original process
 identity pass; the23.375s CPU replay performs no native inference or learning.
 
+The [teacher-takeover follow-up](2026-11-01-cdp-breakout-recoverability.md)
+avoids108/120 of those recorded losses when control begins at the early window
+origin, versus26/120 at the last near-descending state. Both are measured at
+the original loss action endpoint. Paired outcomes are85 early-only,three
+late-only,23 both and nine neither. This supports investigating earlier control
+sequences and anticipation; it does not prove late states optimally irrecoverable
+or identify representation, forecasting, actor fitting or timing as the cause.
+All293 analysis/276 active Qbert pins and branch/source checks pass in36.589s
+of CPU-only analysis, with no native policy inference or GPU work. No new learner is selected.
+
 The completed [Qbert encoder-rate comparison](2026-10-30-cdp-qbert-encoder-moderate.md)
 also improves frozen gameplay at nearly unchanged training cost: greedy
 11,984.375→13,785.417 (+15.03%) and sampled6,759.375→9,987.500 (+47.76%) in

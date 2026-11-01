@@ -24,14 +24,28 @@ source7f794b0 with276 pins and35-minute training cap:200k actions/12,477 updates
 native447fe50,exact runner and teacher stay fixed. Startup passes357 control/
 bounded-matching initial tensors,47 pre-update transitions,correct cadence and
 94 finite reports through1880 actions. MainPID736977,invocation
-`48d20e8959f04654b6f5ff8932328d8d`;progress,recovery,postprocessing and terminal
-collection observers are active. Require100k/6227 recovery and fixed final/
+`48d20e8959f04654b6f5ff8932328d8d`;progress,postprocessing and terminal
+collection observers remain active;100k/6227 recovery passes04:12:29 UTC with
+357 finite tensors. Independent.607s CPU confirmation verifies tensor hashes
+and276 pins;the recovery observer is terminal success. Require fixed final/
 actual-initial greedy/sample24-episode arms against13,785.417/9,987.500;
 no full frozen result exists. CPU preflight1.372s and.815s co-host startup pass;
 reused4013/cohort,no experience reuse or reliability claim. Root
 `/x/Temp/kindle-qbert-encoder4e5-20261101/full`,service
 `kindle-qbert-encoder4e5-200k-20261101`. Check live state;do not restart this
 learner or schedule another GPU job while active. The five-game goal is unfinished.
+
+The [completed CPU Breakout teacher-takeover diagnostic](docs/results/2026-11-01-cdp-breakout-recoverability.md) avoids108/120
+recorded losses from the early32-action-window origin versus26/120 from the
+last near-descending state,measured at the original loss endpoint. Paired23 both/
+85 early-only/three late-only/nine neither;separate64-action survival97/22.
+This supports investigating earlier control,not an exact causal error or optimal
+irrecoverability. All240 origins,37,016 source actions/148,038 frames,source/
+branch replays,eight reverse-order checks,11 tests and293 analysis/276 active
+Qbert pins pass. CPU36.589s completes04:14:23 UTC November1/source10846aa,
+same QbertPID/invocation;zero native model/GPU work,updates or failures.
+Root`/x/Temp/kindle-breakout-recoverability-20261101`;co-host timing retained,
+no new learner/loss/successor selected. The original Qbert run continues.
 
 The [completed CPU Breakout own-policy replay](docs/results/2026-11-01-cdp-encoder4e5-representation.md#own-policy-trajectories-improve-productivity-and-show-a-smaller-agreement-gain)
 reproduces37,016 actions/148,038 frames,with31,161 selected actions. Versus2e-5,

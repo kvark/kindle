@@ -69,3 +69,11 @@ startup.815s verifies357 initial tensors against both control and bounded check,
 co-host timing caveat without correcting training wall time. No full frozen
 result is available. Do not restart the learner or schedule another GPU job
 while it is active; inspect the original process and observers.
+
+The100k/6227 recovery audit passes04:12:29 UTC with357 finite tensors. A separate
+.607s CPU confirmation verifies all276 pins, original process identity, actual
+metadata/config and all tensor hashes; exact100k metadata is retained. The
+recovery observer completes successfully while the original learner continues.
+CPU Breakout own-policy and teacher-takeover diagnostics preserve this learner's
+inputs/process; their separate co-host receipts and timing caveats are retained
+without correcting training wall time. No full frozen result is available.

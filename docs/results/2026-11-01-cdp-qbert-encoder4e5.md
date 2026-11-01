@@ -62,7 +62,7 @@ are fixed. Native447fe50, exact runner and teacher remain unchanged. Startup
 passes357 matching initial tensors,47 pre-update transitions, correct cadence
 and94 finite reports through1880 actions. The.815s CPU check co-hosts with
 learning; retain its timing caveat without wall-time correction. All four
-observers are active. No full frozen outcome is available; do not restart this
+observers attach at startup. No full frozen outcome is available; do not restart this
 learner or schedule another GPU job while it is active.
 
 The separate CPU Breakout own-policy analysis co-hosts with this learner:
@@ -71,3 +71,22 @@ It completes04:04:01 UTC with all276 inputs and the original Qbert process
 unchanged, no native/GPU work and no updates. Its timing remains a caveat without
 correcting this learner's training wall time; the retained co-host receipt links
 the exact analysis completion. No new Qbert outcome is inferred.
+
+### Halfway recovery passes
+
+The original recovery observer passes04:12:29 UTC at100k actions/6227 updates,
+with357 finite tensors and6353 finite reports in the complete102,024-action
+log prefix. The observer is terminal success; the main learner, progress,
+postprocessing and collection observers continue. Independent.607s CPU
+confirmation checks all276 pins, original process identity, actual checkpoint
+configuration and all three tensor-file hashes against the saved metadata.
+The exact100k metadata is retained before the final checkpoint replaces it.
+This verifies recovery, not frozen gameplay.
+
+The separate [Breakout teacher-takeover analysis](2026-11-01-cdp-breakout-recoverability.md)
+also co-hosts: preflight2.507s, tests.137s and36.589s analysis (37.941s controller
+wall), ending04:14:23. All276 Qbert pins and its original process stay unchanged.
+The co-host receipt preserves the analysis hash and timings without correction.
+
+- Recovery review`949ab8d7dc7e9e2ea7b694622c993a5d17594330630fa98823d741c1b8051590`.
+- Metadata`aed08d98e6efd576d05d367c7ab0aeb1e4d1075121f421f1c6634ab4b9de4c0c`.

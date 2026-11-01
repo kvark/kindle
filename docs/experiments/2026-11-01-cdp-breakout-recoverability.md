@@ -58,3 +58,17 @@ Native and emulator imports are forbidden in these fixtures/preflight.
 
 Root`/x/Temp/kindle-breakout-recoverability-20261101`. No new learner, loss,
 policy replacement or successor GPU allocation is selected.
+
+## Completed result
+
+The36.589s CPU analysis completes04:14:23 UTC November1/source10846aa. Early
+teacher takeover avoids108/120 recorded losses at the original action endpoint;
+late takeover avoids26/120. Paired outcomes are23 both,85 early-only,three
+late-only and nine neither. Separate64-action survival is97/120 and22/120.
+No exact causal action error or optimal irrecoverability is established.
+
+All240 origins,37,016 source actions/148,038 frames,full source/recorded branch
+replays,eight reversed-order checks and293 analysis/276 active Qbert pins pass.
+Original Qbert process identity remains unchanged; no failure,native policy
+inference,GPU context or learner update occurs. Co-host timing caveats remain.
+See the [completed result](../results/2026-11-01-cdp-breakout-recoverability.md).
