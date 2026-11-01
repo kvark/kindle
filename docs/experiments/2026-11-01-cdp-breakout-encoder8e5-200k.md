@@ -84,3 +84,20 @@ completion object under the original invocation instead. Both successful
 preflight revisions are retained,with no failed check or GPU work. Run its
 `final` mode only after the existing original pipeline and collector succeed.
 Its co-host CPU time remains a caveat without training-time correction.
+
+## Halfway recovery passes
+
+The original observer passes05:00:35 UTC November1 at100k actions/6227 updates,
+with357 finite tensors and6445 finite reports in the complete103,496-action
+prefix. It saves exact100k metadata automatically and exits success. Independent
+.835s CPU confirmation verifies metadata identity,all three current tensor-file
+hashes,265 input pins and original mainPID/invocation;no GPU stage repeats.
+
+- Recovery review`7c2b3f3d32c329ce6dd996bd398c71cbc69e7f9b0b700cb4f3ee492470f4c1dc`.
+- Metadata`c9b354d3d69824724337420d26db9d0848b405eecfe3554c0977b82ff770dc67`.
+- Confirmation`016bc65ab1e9756198ba5f2bc8d604278a5283f7eb034ce461b9d3cc55f34697`.
+
+The separate CPU Qbert life/color diagnostic preparation co-hosts with this
+learner:five pure tests.028s and preflight3.036s. Its300s bounded replay remains
+CPU-only and preserves the original process and inputs. Retain timing caveats
+without correcting training wall time;frozen Breakout gameplay is unmeasured.
