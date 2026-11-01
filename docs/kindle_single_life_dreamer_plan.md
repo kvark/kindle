@@ -21,8 +21,13 @@ final/actual-initial sampled/greedy24-episode assessments against13,761.458/
 CPU preflight3.400s and plot import.085s pass. Root
 `/x/Temp/kindle-qbert-h5-r32-greedy-20261101/full`;service
 `kindle-qbert-h5-r32-greedy-200k-20261101`. Check this original live process;
-do not restart it or allocate concurrent GPU work. No full outcome,retry,
-extension,ratio sweep or automatic successor.
+do not restart it or allocate concurrent GPU work. Training has now finished
+200k/799,822frames/24,954updates in34m59.741s,+22.53% versus R24. All four frozen
+GPU arms finish withzero updates and their trajectories replay. Provisional
+first-three-per-lane sampled10,305.208/18 first pyramids andgreedy14,057.292/23
+trail controls13,761.458/24 and14,339.583/24;actual initials171.875/1.042 match.
+The original full guided training replay and downstream audits/collection remain
+active;no full closure exists. No retry,extension,ratio sweep or successor.
 
 The [Breakout R8 CPU preparation](experiments/2026-11-01-cdp-breakout-r8.md) passes.676s preflight/3.127s wrapper
 at12:25:00 UTC November1:two CLI paths,13 config cases,357 shapes,227 control

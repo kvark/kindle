@@ -21,7 +21,7 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Active work — November 1
 
 The [Qbert H5/R32 greedy comparison](docs/experiments/2026-11-01-cdp-qbert-h5-r32-greedy-200k.md)
-is running: source4a10fcc, launched12:10:19 UTC, mainPID792387/invocation
+is auditing: source4a10fcc, launched12:10:19 UTC, mainPID792387/invocation
 460e0220583948f4b088b5dc7c92956a. Service
 `kindle-qbert-h5-r32-greedy-200k-20261101`; root
 `/x/Temp/kindle-qbert-h5-r32-greedy-20261101/full`. Check this original live
@@ -35,8 +35,13 @@ gate remains. Startup passes490 pins,357 matching tensors,47 pre-update events,
 correct cadence and finite reports. Recovery passes12:27:55 at100k/12,454
 with357 finite tensors;its observer succeeds. All four audited files are retained
 at`recovery-100k` (179,536,496 bytes),hash-verified12:29:45 in1.390s with490 pins/
-original process unchanged. Do not repeat recovery or retention. Progress,
-postprocessing and collection continue;check live state. No full result is available.
+original process unchanged. Do not repeat recovery or retention. Training completes
+200k/24,954 updates in34m59.741s (+22.53% versus R24);all four frozen GPU arms
+finish withzero updates. Replayed first-three-per-lane scores are sampled
+10,305.208/18 first pyramids andgreedy14,057.292/23,below control13,761.458/24
+and14,339.583/24. Actual initials171.875/1.042 match. These outcomes are provisional:
+the original full guided training replay and downstream audits/collection remain
+active. Do not restart or allocate a successor before closure;check live state.
 [Bounded result and current evidence](docs/results/2026-11-01-cdp-qbert-h5-r32-greedy.md).
 
 The [Breakout R8 harness](docs/experiments/2026-11-01-cdp-breakout-r8.md) is CPU

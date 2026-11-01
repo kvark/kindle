@@ -1,4 +1,33 @@
-# Qbert R32 with greedy collection passes execution and early cost checks
+# Qbert R32 with greedy collection: full frozen outcome pending audit closure
+
+**Current status:** all training and frozen GPU stages have finished;the original
+CPU audit pipeline remains active. Training completes200,000 actions/799,822
+frames/24,954 updates in **2,099.741s (34m59.741s)**,22.53% longer than the
+same-seed R24 control's1,713.661s. No extension or repeated GPU stage occurs.
+
+All four frozen trajectories have replayed. Selecting the declared first three
+natural episodes per lane gives the following provisional comparison:
+
+| Mode | R24 control | R32 candidate | Candidate first pyramids | Actual initial |
+| --- | ---: | ---: | ---: | ---: |
+| Greedy,primary |14,339.583|14,057.292|23/24 versus control24/24|1.042,both|
+| Sampled |13,761.458|10,305.208|18/24 versus control24/24|171.875,both|
+
+Each arm performszero updates. Both candidate means miss15,000;sampled also
+misses90% first-pyramid success. The outcomes favor retaining R24,subject to
+completion of the original full guided training replay,learning review,
+postprocessing and terminal collection. No passing full-comparison closure
+exists yet. Inspect the original process;do not restart it or allocate another
+GPU job before closure.
+
+Measured training-stage times are1,428.410s learning and574.166s acting,versus
+1,051.583s and566.324s atR24. Environment stepping takes61.221s versus60.437s.
+These are aggregate wall timers,not individual-kernel profiles;CPU co-host
+timings remain uncorrected. More replay work has not produced better frozen
+play on this reused development seed. It does not isolate a causal mechanism
+or establish that more data under another recipe would help.
+
+## Completed bounded check
 
 The fresh bounded check completes **8,192 actions / 32,762 emulator frames /
 978 updates in82.177s**. Its1,024-action frozen restore takes.807s with4,096
