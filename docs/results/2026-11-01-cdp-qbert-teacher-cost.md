@@ -4,8 +4,11 @@ Direct channel comparisons preserve the teacher's decisions on the fixed59-frame
 diagnostic and reduce its unprofiled472-call time **2.911s→.274s**. This10.64×
 sequential snapshot timing is not a whole-training speedup:the inputs are selected
 historical failure/goal images,each repeated eight times from a fresh teacher,
-and the two timings occur at different times. Full candidate validation against
-the retained200k-action training log is still running;no learner uses the change.
+and the two timings occur at different times. The full200k-action candidate
+replay now passes with every label and trajectory outcome unchanged,in
+**230.331s versus the retained633.898s** (2.75× faster CPU replay). The Python
+overlay is packaged for future Qbert trials;whole-training savings remain
+unmeasured and no new learner is selected.
 
 ## Why inspect the Python teacher
 
@@ -71,3 +74,37 @@ input pixels' provenance,decisions,source pins,tests and qualification receipts.
 - Qualification`524486ad64cd5d79c683a1872c194490da12172125f62063bc76f8e7ba0930da`.
 - Original teacher`6a2c1dc3bc8fe1986da6984854410318d6d27cc1f41333c9b9eddf04ed536a6c`.
 - Candidate teacher`fa261c53991c329236bcc167745f309fe6e568547fe2d8c6e29da3d5bc7c3e5d`.
+
+## Full candidate replay and packaged runtime
+
+The candidate teacher reproduces all200,000 actions/799,841 emulator frames of
+the completed H5/R24 seed10007 training log. Every recorded input-pixel hash,
+corrective expert label,override,executed action,reward,termination/truncation,
+reset,episode/task outcome,partial tail and aggregate count matches. The wrapper
+explicitly records candidate teacher bytes alongside the original source header,
+manifest and unchanged original replay. No original learner or completed GPU
+stage is rerun. All25 declared and506 completed H3 inputs stay unchanged.
+
+Replay230.331s/controller232.831s completes **15:01:16 UTC November1**,source
+3c11831,within the900s cap. The retained original replay took633.898s;these are
+sequential measurements with different CPU co-host histories,not an isolated
+teacher-only benchmark or whole-training speedup. Candidate replay starts after
+all H3 services close. No GPU/native loading,learning,failed replay or retry occurs.
+
+Packaging2.463s completes **15:03:33 UTC** at
+`/x/Temp/kindle-qbert-color-masks-20261101/runtime`. All16 packaged files are
+verified;only the qualified teacher and its distribution `RECORD` entry differ
+from the retained runtime. The native447fe50 binary remains exactly
+`35ad0db42fc7ed5dbaf6dacddff613fdc04d83ae6e0f38548532f6ab2c7812a2`.
+The original runtime and506 H3 inputs remain unchanged. No native build,game or
+GPU context is constructed during packaging;no build cache is created.
+
+Prefer this explicitly pinned Python overlay for future Qbert development and
+measure actual training cost there. Retain the original runtime for reproducing
+older declarations. This qualified speed change does not itself improve game
+scores or finish the five-game goal. Complete;do not repeat the profile,passed
+qualification,candidate replay or packaging.
+
+- Candidate replay reviewSHA256`44ca35d0bcc59b137170bd9573339aac3c94027f8306e2029739205369975456`.
+- Full candidate replay`d2803231537538577fe1427285cbfda7d01a047d55724ca6f48895418b1cd8cf`.
+- Packaging receipt`37e38d689e085a255e6b3972059e395fdd681e49f9c97fba3a3a2bbe0287d25e`.

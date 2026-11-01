@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [Qbert teacher CPU diagnostic and equivalent predicate change](2026-11-01-cdp-qbert-teacher-cost.md)
+identify avoidable adapter work:RGB equality reductions consume53.78% of profiled
+snapshot time. Direct channel conjunctions preserve all472 snapshot decisions/
+states and200k recorded labels/trajectory outcomes,with CPU replay633.898→230.331s.
+The passing130-test/25-input qualification and unchanged native447fe50 runtime
+are packaged for future Qbert trials. This addresses compute cost;whole-training
+savings and game-score effects remain unmeasured. Original harness failure and
+timing limits remain;no new learner or GPU allocation follows.
+
 The [completed Qbert H3/R24 comparison](2026-11-01-cdp-qbert-h3-r24.md) reduces
 training time6.56% at fixed200k/18,715 updates,but lowers greedy14,339.583→13,823.958
 and sampled13,761.458→11,277.083,each24/24 first pyramids. Both still miss15k.

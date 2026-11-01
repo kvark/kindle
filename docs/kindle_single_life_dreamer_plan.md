@@ -1,5 +1,16 @@
 # Kindle: CDP learning roadmap
 
+The [qualified Python Qbert teacher overlay](results/2026-11-01-cdp-qbert-teacher-cost.md)
+preserves472 snapshot decisions/states and the complete200k-action/799,841-frame
+training-label replay while reducing observed CPU replay633.898→230.331s.
+All130 CPU tests,25 declared/506 completed H3 inputs and16 package files pass;
+only equivalent channel predicates and distribution RECORD change. Prefer
+`/x/Temp/kindle-qbert-color-masks-20261101/runtime`,same native447fe50/SHA35ad0db,
+teacherSHAfa261c53,for future explicitly pinned Qbert trials. Replay15:01:16/
+packaging15:03:33 UTC November1;old runtimes and CPU harness failure remain.
+Whole-training savings remain unmeasured;no new learner or GPU work is selected.
+Do not repeat completed qualification,replay or packaging. The goal is unfinished.
+
 The [fresh fixed Breakout centering cohort](results/2026-11-01-cdp-breakout-unseen-center-fresh.md)
 fails the10%/five-lane screen:209.833→212.042 (+1.05%),four of eight lane means
 improve,both0/24 two-wall. Keep the native teacher;no integration,parameter retry

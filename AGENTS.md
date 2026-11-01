@@ -20,6 +20,18 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 1
 
+The [qualified Python Qbert teacher](docs/results/2026-11-01-cdp-qbert-teacher-cost.md)
+uses equivalent channel predicates. All130 CPU tests,472 exact snapshot decisions/
+states and a full200k/799,841-frame candidate replay pass. CPU replay takes230.331s
+versus retained633.898s;whole-training savings unmeasured. All25 declared/506
+completed H3 inputs stay unchanged. Replay15:01:16/packaging15:03:33 UTC November1;
+no GPU work,learning or replay failure/retry. Original CPU harness failure remains.
+Prefer`/x/Temp/kindle-qbert-color-masks-20261101/runtime` for future Qbert trials,
+explicitly pinning its teacherSHAfa261c53. Same native447fe50/SHA35ad0db;only teacher
+and distribution RECORD change among16 package files. Old runtimes remain intact.
+Do not repeat completed qualification/replay/packaging. No learner is selected
+or GPU allocation active;the five-game goal remains unfinished.
+
 The [fresh-cohort Breakout centering reference](docs/results/2026-11-01-cdp-breakout-unseen-center-fresh.md)
 fails the fixed screen:209.833→212.042 (+1.05%),four of eight lane means improve,
 both0/24 two-wall. Keep the native teacher;no integration,parameter retry or

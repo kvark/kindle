@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+Use the [qualified Python Qbert teacher overlay](results/2026-11-01-cdp-qbert-teacher-cost.md)
+at`/x/Temp/kindle-qbert-color-masks-20261101/runtime` for future explicitly pinned
+Qbert trials. Equivalent channel predicates preserve472 snapshot decisions/states
+and every label/pixel/action/outcome of200k actions/799,841 frames. CPU replay
+230.331s versus633.898s is2.75× faster;whole-training savings unmeasured. All130
+CPU tests and25 declared/506 completed H3 inputs pass. Replay closes15:01:16,
+packaging15:03:33 UTC November1;all16 package files checked,only teacher/RECORD
+change. Native447fe50/SHA35ad0db stays;teacherSHAfa261c53. Original runtimes and
+first blocked-constructor CPU harness failure remain. Zero GPU work,updates or
+replay retries. Complete,do not rerun;no learner or GPU allocation is selected.
+
 The [fresh fixed Breakout centering cohort](results/2026-11-01-cdp-breakout-unseen-center-fresh.md)
 fails the10%/five-lane screen:209.833→212.042 (+1.05%),four of eight lane means
 improve,both0/24 two-wall. Keep the native teacher;no integration,parameter retry
