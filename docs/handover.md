@@ -1,17 +1,21 @@
 # CDP handover — October25,2026
 
-The [bounded Qbert H5/R32 greedy-collection check](experiments/2026-11-01-cdp-qbert-h5-r32-greedy.md)
-is selected within the five-game goal after all preceding work closes. Change
-R24→32 on reused10007;keep12M48/Auto/N8/B16/T16/H5/encoder4e-5/greedy collection/
-expert100/native447fe50/runneraba4300d/teacher. Fresh8192 actions/978 updates
-then1024 frozen actions;execution/cost only,no full learner selected. Cost
-projection must stay under45min. Corrected CPU preflight passes1.136s,two CLI
-paths,15 config cases,357 tensors,442 control pins and978/12454/24954 schedules.
-Original1.111s invalid-seed CLI failure and sources remain;no native/emulator
-construction or GPU stage occurred. Root
-`/x/Temp/kindle-qbert-h5-r32-greedy-20261101/native-check`,service
-`kindle-qbert-h5-r32-greedy-check-20261101`. Check live state;no retry,extension,
-ratio sweep or automatic promotion. Full learner and frozen quality unmeasured.
+The [completed Qbert R32 greedy bounded check](results/2026-11-01-cdp-qbert-h5-r32-greedy.md)
+passes8192 actions/32,762frames/978updates in82.177s;1024 frozen/.807s haszero
+updates/no natural episodes. Conservative200k projection36m47s passes45min.
+All479 pins,357 matching/invariant tensors,47 pre-update events,full guided
+replay and guards pass. Main/collector12:07:15/12:07:53 UTC November1/source3bfce40,
+PID791920/invocatione48b450a02c64928be90711e05063f2a;terminal,no GPU repeat.
+CPU invalid-seed preflight failure and two preparer wording failures remain.
+The [separate fresh200k comparison](experiments/2026-11-01-cdp-qbert-h5-r32-greedy-200k.md) is selected,not yet launched:
+R24→32 on reused10007,keep12M48/Auto/N8/B16/T16/H5/encoder4e-5/greedy collection/
+expert100/native447fe50/runneraba4300d/teacher. Require100k/12454 recovery and
+final/actual-initial sampled/greedy24-episode assessments against13,761.458/
+14,339.583,each24 first pyramids;original15k/90% gate,45min training cap. Full
+CPU preflight3.400s and plot import.085s pass. Root
+`/x/Temp/kindle-qbert-h5-r32-greedy-20261101/full`;service
+`kindle-qbert-h5-r32-greedy-200k-20261101`. Check live state before work.
+No outcome,retry,extension,ratio sweep or automatic successor.
 
 The [completed six-feature Breakout response-history fit](results/2026-11-01-cdp-breakout-response-history.md)
 fails its fixed screen:held-out MAE1.976923→1.997426 overall and1.948802→1.958316

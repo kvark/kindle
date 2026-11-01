@@ -68,3 +68,13 @@ to the declared4000010007;the separate corrected preflight passes in1.136s
 schema tensors,442 control pins and all three schedules. No GPU stage occurs
 or repeats. The failed receipt and source snapshots enter the declared pins.
 Both completed CPU checks remain retained;do not repeat the passing preflight.
+
+## Completion
+
+The check completes8192 actions/32,762frames/978updates in82.177s;1024 frozen
+actions/.807s producezero updates/no natural episodes. All479 pins,357 matching
+initial/invariant frozen tensors,47 pre-update events,full replay and guards
+pass. Main/collector succeed12:07:15/12:07:53 UTC November1/source3bfce40,
+zero GPU failures/repeats. Conservative200k projection36m47s passes45min.
+See the [result](../results/2026-11-01-cdp-qbert-h5-r32-greedy.md) and separately
+selected fresh comparison. No check experience is reused;do not rerun.
