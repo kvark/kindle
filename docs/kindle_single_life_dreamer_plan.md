@@ -1,5 +1,17 @@
 # Kindle: CDP learning roadmap
 
+The [fresh Qbert RGB64 seed12011 qualification](experiments/2026-11-01-cdp-qbert-rgb64-seed12011.md) is separately selected
+after10007's completed greedy gate pass. Keep the exact RGB64/12M/H5/R24/
+encoder4e-5/base behavior4e-5/greedy collection/expert100 recipe and447fe50/
+aba4300d/fa261c53 runtime. Only learner/evaluation seeds change to12011/
+4000012011. CPU preflight passes two CLI paths,21 config cases,733/9340/18715
+cadence,all357+357 retained shapes,521 control inputs and16 runtime files in1.251s.
+Fix8192 training/733 updates plus1024 frozen actions;require the conservative
+200k estimate below30min before separately selecting the full confirmation.
+No bounded experience reuse or full learner selected yet. Root
+`/x/Temp/kindle-qbert-rgb64-seed12011-20261101`;check live state before work.
+The five-game goal remains unfinished.
+
 The [completed Qbert12M/RGB64 comparison](results/2026-11-01-cdp-qbert-rgb64.md) reaches **15,710.417 greedy /24 first pyramids**,
 passing the unchanged15k/90% gate and improving RGB48's14,339.583 by9.56%.
 Sampled14,250/24 rises3.55% from13,761.458 but still misses15k. Own initials
