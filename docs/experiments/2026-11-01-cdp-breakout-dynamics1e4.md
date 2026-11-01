@@ -1,5 +1,9 @@
 # Bounded Breakout check with a lower dynamics-group rate
 
+**Complete:** the [original bounded result](../results/2026-11-01-cdp-breakout-dynamics1e4.md)
+passes47.413s training and.856s frozen restore. The21m13.289s conservative200k
+projection clears30min. No full learner is selected by this protocol.
+
 Select one fresh execution and early-cost check of dynamics learning rate
 4e-4→1e-4, retaining encoder/base/behavior4e-5. The existing native optimizer
 applies this setting to four prefixes: `world.dynamics.`,
