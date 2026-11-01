@@ -17,6 +17,13 @@ The bounded check is complete:8,192/733 in48.112s,frozen1,024/.819s;all497 input
 collection17:39:42/source257cc0e. No bounded experience is reused. The startup
 CPU check co-hosts1.545s without time correction. The five-game goal is unfinished.
 
+A separate [CPU prefix comparison](experiments/2026-11-01-cdp-qbert-budget-prefix.md)
+is selected with15 inputs after14 fixtures pass. It waits for the retained200k
+recovery,then compares all first200k transitions/reports/episodes and357 saved
+arrays against the completed200k control. Divergence is an outcome,not a retry.
+No GPU work or learner mutation. Root `/x/Temp/kindle-qbert-budget-prefix-20261101`;
+analysis has not run. Preserve the pinned protocol and original recovery observers.
+
 The [completed Qbert25M/R16 comparison](results/2026-11-01-cdp-qbert-25m-r16.md)
 finishes200k actions/799,786frames/12,477 updates in23m40.953s,17.08% less time
 than12M/H5/R24. Primary greedy14,339.583→10,696.875 falls25.40%;sampled
