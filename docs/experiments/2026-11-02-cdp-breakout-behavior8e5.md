@@ -1,5 +1,10 @@
 # Bounded Breakout check with a doubled actor/critic rate
 
+**Complete:** bounded training47.149s/frozen.867s passesall252 pins andoriginal
+services. Conservative200k projection21m06.197s clears30min. See the
+[result](../results/2026-11-02-cdp-breakout-behavior8e5.md) andseparate full protocol.
+The launch statements below arehistorical; no completed stage isrepeated.
+
 Select one fresh execution and early-cost check of the shared behavior learning
 rate4e-5→8e-5. Keep base/encoder4e-5 and dynamics4e-4. The existing native
 setting changes actor andcritic optimizer rates together, including the actor

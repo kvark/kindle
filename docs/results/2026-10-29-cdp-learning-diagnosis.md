@@ -1,21 +1,24 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [bounded Breakout behavior-rate check](../experiments/2026-11-02-cdp-breakout-behavior8e5.md)
-is separately selected after CPU qualification. Only actor/critic rate changes
-fromeffective4e-5 to8e-5; base/encoder4e-5,dynamics4e-4 and12M64/Auto/N8/B16/T16/
-H15/R16/expert100/sampled collection remainfixed. Native447fe50/35ad0db,teacher
-andretained runner6c1b69fb areunchanged. This tests actor/critic learning together,
-not an isolated critic mechanism ornew loss. No experience isreused.
+The [fresh Breakout actor/critic-rate comparison](../experiments/2026-11-02-cdp-breakout-behavior8e5-200k.md)
+is separately selected after the bounded check andfull CPU qualification.
+Only behavior rate changes fromeffective4e-5 to8e-5; base/encoder4e-5,dynamics4e-4
+and12M64/Auto/N8/B16/T16/H15/R16/expert100/sampled collection stayfixed.
+Native447fe50/35ad0db,teacher andrunner6c1b69fb areunchanged. Actor/critic rates
+change together; no isolated mechanism ornew loss isclaimed. No experience reused.
 
-CPU preparation passes.657s: two actual commands,15 config cases,357 schema
-and227 control pins; seven global screens/three observer fixtures also pass,
-withzero native/emulator construction andno failure. Keep8,192/489/180s training,
-1,024 frozen/zero updates/60s, full replay and357 matching initial/invariant
-frozen tensors. Require conservative200k projection≤30min before a separate
-full selection. Root `/x/Temp/kindle-breakout-behavior8e5-20261102/native-check`;
-service`kindle-breakout-behavior8e5-check-20261102`. Bounded launch ispending;
-no full learner,rate sweep,extension,retry orautomatic successor isselected.
-
+The [bounded check](../results/2026-11-02-cdp-breakout-behavior8e5.md) passes
+8,192/489 in47.149s;frozen1,024/.867s,zero updates/no episodes. All252 pins,
+357 matching initial/invariant tensors,47 pre-update events,full replay andguards
+pass;original main/collector succeed00:26:32/00:26:39 UTC November2. Conservative
+projection21m06.197s clears30min. Full preparation passes1.399s:five commands,
+28 config cases,18 scripts,seven globals,retention/observer/collector checks,
+all252 bounded/227 control pins andzero native/emulator construction. No failures
+orrepeated stages. Keep200k/12,477/30min,100k/6,227 recovery andfour actual-initial/
+final sampled/greedy24-episode arms against56.292/104.667,allzero two-wall.
+Root `/x/Temp/kindle-breakout-behavior8e5-20261102/full`;service
+`kindle-breakout-behavior8e5-200k-20261102`. Full launch ispending. No retry,
+extension,rate sweep,confirmation orautomatic successor isselected.
 
 The [fresh Qbert confirmation](2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
 finishes25m09.906s with14,770.833 greedy/14,254.167 sampled and24/24 first pyramids
