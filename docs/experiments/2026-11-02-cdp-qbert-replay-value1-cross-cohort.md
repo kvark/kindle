@@ -81,3 +81,18 @@ Do not repeat successful preparation unless a concrete change requires a separat
 recorded check. Guarded selection remains conditional on allfive original Breakout
 services and collection succeeding, an idle host, clean committed sources and
 unchanged prepared/reference pins. No cross-cohort result is available yet.
+
+## Preceding learner closes; ready for separate selection
+
+The original Breakout learner and allfour observers now succeed; collection
+completes03:39:37.809 UTC November2. Its final70.750 sampled/143.667 greedy
+improves the retained control but keepszero two-wall successes. The separate
+terminal reader passes03:40:38.280, preserving all338 pins, original identities,
+recovery and completionSHA6254f729. The host is idle at closure.
+
+Proceed with separate guarded selection only after rechecking allfive terminal
+services, original completion files,939 preparation inputs, qualified controller
+sources, clean committed worktree and idle host. Do not repeat successful CPU
+qualification or any retained diagonal GPU assessment. Fixed arms, caps, gates
+and interpretation limits remain unchanged. Selection and the first launch
+will retain their own declaration and original process identities.

@@ -1,5 +1,15 @@
 # Fresh Breakout replay-value comparison at the fixed 200k budget
 
+**Completed:** sampled70.750/greedy143.667 improve59.000/117.292 by19.92%/22.49%
+in21m27.910s (1.27% less training time). Initial-subtracted return/min improves
+21.96%/24.50%; retain scale1 as stronger development, with allzero of24 two-wall
+successes and no reliability claim. All338 pins and original stages pass; the
+CPU preparation failures/repairs remain preserved. Main/post/collection succeed
+03:39:28.406/03:39:34.988/03:39:37.809 UTC November2. The terminal reader passes
+03:40:38.280 without repeating any stage. See the [result](../results/2026-11-02-cdp-breakout-replay-value1.md).
+The protocol and milestones below are historical; do not rerun. No extension,
+sweep, confirmation or automatic successor is selected.
+
 Select one fresh 200k learner after the [bounded check](../results/2026-11-02-cdp-breakout-replay-value1.md)
 passes 8,192 actions / 489 updates in 47.690s, with a conservative 200k projection
 of 21m20.729s. Its original main, collector and terminal reader are closed. The
