@@ -96,3 +96,29 @@ Run recovery confirmation only after the original100k audit and retention
 complete; run the terminal reader only after all original services and full
 comparison succeed. Neither reader has executed its final stage. Retain CPU
 co-host durations without wall-time correction. No failure or GPU repeat occurs.
+
+## Saved-log coverage follow-up
+
+Prepare one CPU-only coverage reader while the original learner runs. Execute
+its final stage only after the original full comparison and terminal reader
+succeed. Read this learner's training and four frozen logs once, using the
+qualified cumulative-frame parser. Reuse the completed12M control from
+`kindle-breakout-score-coverage-20261102/review.json`, `trials.candidate`,
+without recounting its trajectories or repeating any emulator replay.
+
+Keep pre-action score bins0–215,216–431,432–647,648–863 and864+. Reconcile
+completed episodes,partial tails,resets,rewards and cumulative frame differences;
+count actual teacher overrides and native actions separately. Frozen summaries
+use the original first three natural episodes per lane; extras and tails remain
+accounting evidence. Score fractions are not verified wall boundaries or
+equivalent states, and exposure does not isolate a capacity/coverage mechanism.
+
+Validate the actual25M configuration against12M,including rejection cases, and
+check the parser's200k/12,477 counter assertion before outcomes. Retain the five
+qualified boundary cases without repeating them. Pin the reader,helper,protocol,
+prior evidence and active declaration; preserve original process identity and
+all420 active pins before/after preparation. Use one low-priority CPU under60s,
+without native/emulator imports,GPU work or updates. Record co-host duration
+without correcting training time. Root is the existing25M package; output
+`score-coverage-review.json`. No new learner,guidance change,sweep,extension or
+automatic successor is selected by this diagnostic.
