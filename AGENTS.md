@@ -33,8 +33,11 @@ andfour journal fixtures; all991 pins/original identity stayfixed. ReaderSHAef55
 Reused16001/original4000016001;
 240k/R20/18721 versus200k/R24/18715 changes experience,cadence andsampling together.
 Keep12M64/H5/dynamics1e-4/replay-value1,native447fe50,runnere304af89 andteacher.
-Require100k/7784 and200k/15596 retained recoveries andfinal/actual-initial sampled/
-greedy24-episode arms; controlgreedy14913.542/sample14745.833,original15k/90% gate.
+100k/7784 recovery passes04:26:11 UTC:357 finite tensors,four retained files/
+206067158 bytes. Separate2.904s confirmation passes04:26:32.839,all991 pins and
+original identity unchanged; reviewSHA87f84782/retentionSHA3d420485. Require200k/
+15596 recovery andfinal/actual-initial sampled/greedy24-episode arms; control
+isgreedy14913.542/sample14745.833,original15k/90% gate. Do not repeat100k reader.
 The prelaunch exposure-schema correction andinitial CPU fixture failure remain
 retained. Root`/x/Temp/kindle-qbert-r20-240k-20261102/full`;
 main`kindle-qbert-r20-240k-20261102`. Check live identity; no restart,overlap,

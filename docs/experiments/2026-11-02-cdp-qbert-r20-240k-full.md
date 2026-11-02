@@ -105,3 +105,15 @@ unchanged original learner identity. ScriptSHAef55a64b47d71697d489023e6331e48fe8
 `recovery 100000`, `recovery 200000` and`terminal` modes. Invokeeach once after
 its original evidence exists. No GPU work or learning occurs inqualification;
 co-host cost isretained without correction. Frozen results remain pending.
+
+The original100k recovery passes04:26:11.296 UTC:7,784 updates,357 finite tensors,
+7,997 finite reports inits complete log prefix. Four recovery files totaling
+206,067,158 bytes are retained at04:26:11.598. ReviewSHA
+87f84782b1153a98814f53554ae5c64e452d06d5d6001a6640d62f86fe9b74a0;
+retentionSHA3d4204857cbe3362cea82bce6a75b978bc9b7a2a2c1719350bd66e586c0d8d27;
+metadataSHAd60dcb8d7c4eb9175109d69fde9105ab6a06bbb5137999538d1aef1c4c98861d.
+Separate confirmation passes04:26:32.839 in2.904s (2.925s wrapper), preserving
+all991 pins andoriginalPID893328/invocation575d8e40b325408e8d4220bfd3b61bb8.
+Its SHA isbeb1784219eda2d039ac28190a01fef43ef67b3b36691b7cf341271108ca1143.
+No GPU work,stage repeat or timing correction. Do not rerun100k confirmation;
+200k recovery andfixed final frozen results remain pending.
