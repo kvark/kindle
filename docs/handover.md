@@ -12,9 +12,17 @@ Startup passes all**912 pins**,357 finite schema-matching initial tensors with
 48 differences from development,correct cadence and247 finite reports through
 3,016 actions. All47 pre-update transitions differ,as expected across seeds.
 MainPID882846/invocationd78987afbb3344c3b65b84d3652ceb79 remains active with
-postprocess,progress,recovery andcollection observers. DeclarationSHA384851cb;
+postprocess,progress andcollection observers; recovery is complete below.
+DeclarationSHA384851cb;
 startup completes02:17:53.763 UTC,2.649s CPU wrapper co-host cost uncorrected.
 No full frozen result orconfirmation outcome exists yet.
+
+The original100k/9,340 recovery succeeds**02:30:04.880 UTC**:357 finite tensors
+and four retained files totaling206,067,159 bytes. Separate read-only confirmation
+passes02:30:39.931 in2.524s (2.542s wrapper),verifying all912 pins,metadata,file
+hashes andoriginal invocation. The learner remainsPID882846/invocationd78987af;
+postprocess/progress/collection continue. No checkpoint,audit,copy orGPU stage
+repeats. Recovery metadataSHA356bd3b7,retentionSHA158aa03c,confirmationSHAddffac5c.
 
 No additional bounded learner: unchanged native447fe50/35ad0db, runnere304af89,
 teacherfa261c53 andrecipe already completed one. Measured full cost plus10%

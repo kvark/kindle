@@ -2,7 +2,8 @@
 
 Launched **02:17:27.588 UTC November2/sourcebff6eb4** with912 pins;
 mainPID882846/invocationd78987afbb3344c3b65b84d3652ceb79 and allfour observers
-are active. Startup passes357 finite initial tensors,48 differences from
+active at startup. The recovery observer has since succeeded; the learner and
+other observers continue. Startup passes357 finite initial tensors,48 differences from
 14009,47 differing pre-update transitions,correct cadence and247 finite
 reports through3,016 actions. DeclarationSHA384851cb. Startup completes
 02:17:53.763 UTC;2.649s CPU wrapper is a co-host timing caveat. No frozen
@@ -130,5 +131,24 @@ retained in `terminal-reader-preflight.json`. After all original services are
 terminal, run `review_full_terminal.py terminal` once through `run_cpu.py` to
 verify completion files, journals, recovery and comparison before reporting the
 confirmation outcome. This reader does not repeat an experiment or collector.
-The separate `review_recovery.py` is prepared for the100k milestone and has not
-run yet. CPU co-host cost remains uncorrected; the original learner continues.
+The separate `review_recovery.py` was prepared for the100k milestone; its
+subsequent successful readout is recorded below. CPU co-host cost remains uncorrected; the original learner continues.
+
+## Retained100k recovery
+
+The original recovery observer succeeds **02:30:04.880 UTC November2**, with
+100,000 actions/9,340 updates and357 finite tensors. Its audit covers a complete
+log prefix of100,560 actions/9,392 finite reports. Four files totaling206,067,159
+bytes are retained before final overwrite. Replay, live belief, game state and
+RNG are not included, so this is not an uninterrupted restart state.
+
+Separate read-only confirmation passes **02:30:39.931** in2.524s (2.542s wrapper).
+All912 declaration pins, retained-file hashes, metadata/configuration and the
+original recovery invocation/journal payload pass. The original learner identity
+is unchanged before and after. Recovery is terminal success; training and the
+remaining observers continue. No original audit, copy, checkpoint or GPU stage
+is repeated. CPU co-host costs remain uncorrected.
+
+MetadataSHA356bd3b7; checkpoint-reviewSHAded4637d; retentionSHA158aa03c;
+confirmationSHAddffac5c. Frozen task performance remains unmeasured at this
+milestone; the original200k budget and four frozen assessments remain fixed.
