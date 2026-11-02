@@ -62,21 +62,24 @@ def source_records(log, replay):
     return run, records
 
 
-def select_origins(records):
-    """Four evenly spaced valid origins per phase and test episode, never by reward."""
+def select_origins(records, schedule='phase-balanced'):
+    """Select fixed evenly spaced test origins, without inspecting rewards."""
+    if schedule not in ('phase-balanced', 'episode-uniform'):
+        raise ValueError('unknown origin schedule')
     selected = []
     for stream, rows in enumerate(records):
         episodes = sorted({row['episode'] for row in rows if row['split'] == 1})
         for episode in episodes:
-            for phase in (0, 1):
+            for phase in ((0, 1) if schedule == 'phase-balanced' else (None,)):
                 eligible = [i for i in range(0, len(rows)-HORIZON+1, 16)
                     if rows[i]['episode'] == rows[i+HORIZON-1]['episode'] == episode
-                    and rows[i]['split'] == 1 and rows[i]['phase'] == phase]
-                if len(eligible) < 4:
-                    raise ValueError('need four origins per selected episode/phase')
-                for rank in np.linspace(0, len(eligible)-1, 4, dtype=int):
+                    and rows[i]['split'] == 1 and (phase is None or rows[i]['phase'] == phase)]
+                count = 4 if schedule == 'phase-balanced' else 8
+                if len(eligible) < count:
+                    raise ValueError('insufficient origins for the selected schedule')
+                for rank in np.linspace(0, len(eligible)-1, count, dtype=int):
                     index = eligible[rank]
-                    selected.append(dict(stream=stream, index=index, episode=episode, phase=phase))
+                    selected.append(dict(stream=stream, index=index, episode=episode, phase=rows[index]['phase']))
     return selected
 
 
@@ -169,7 +172,7 @@ def step_recorded(environment, row):
 def oracle(log, replay, selection, output):
     run, records = source_records(log, replay)
     chosen = json.loads(selection.read_text())
-    if chosen['source_log_sha256'] != run['sha256'] or chosen['origins'] != select_origins(records):
+    if chosen['source_log_sha256'] != run['sha256'] or chosen['origins'] != select_origins(records, chosen.get('origin_selection', 'phase-balanced')):
         raise ValueError('origin selection differs')
     started = time.monotonic()
     result = dict(status='running', source_log_sha256=run['sha256'], selection_sha256=sha256_file(selection),
@@ -208,8 +211,10 @@ def oracle(log, replay, selection, output):
     write(output, result)
 
 
-def validate_ranking_checkpoint_config(source, checkpoint, comparison_seed=None):
-    """Permit a declared learner seed change while keeping the recipe fixed."""
+def validate_ranking_checkpoint_config(source, checkpoint, comparison_seed=None, comparison_dynamics_rate=None):
+    """Permit one declared config difference; keep every other field fixed."""
+    if comparison_seed is not None and comparison_dynamics_rate is not None:
+        raise ValueError('only one declared comparison field is permitted')
     if comparison_seed is not None:
         if (type(comparison_seed) is not int or not 0 <= comparison_seed < 2**64
                 or checkpoint.get('seed') != comparison_seed
@@ -217,20 +222,27 @@ def validate_ranking_checkpoint_config(source, checkpoint, comparison_seed=None)
                 or source['seed'] == comparison_seed):
             raise ValueError('comparison requires the declared distinct checkpoint seed')
         source = dict(source, seed=comparison_seed)
+    if comparison_dynamics_rate is not None:
+        if (type(comparison_dynamics_rate) is not float or not np.isfinite(comparison_dynamics_rate)
+                or comparison_dynamics_rate <= 0
+                or checkpoint.get('dynamics_learning_rate') != comparison_dynamics_rate
+                or source.get('dynamics_learning_rate') == comparison_dynamics_rate):
+            raise ValueError('comparison requires the declared distinct dynamics learning rate')
+        source = dict(source, dynamics_learning_rate=comparison_dynamics_rate)
     validate_checkpoint_config(source, checkpoint)
 
 
-def capture(log, replay, selection, checkpoint, output, *, smoke=False, comparison_seed=None):
+def capture(log, replay, selection, checkpoint, output, *, smoke=False, comparison_seed=None, comparison_dynamics_rate=None):
     import kindle
     from fit_atari_probes import checked_memory
     from probe_fixed_latents import assert_frozen_tensors
     run, records = source_records(log, replay)
     chosen = json.loads(selection.read_text())
-    if chosen['source_log_sha256'] != run['sha256'] or chosen['origins'] != select_origins(records):
+    if chosen['source_log_sha256'] != run['sha256'] or chosen['origins'] != select_origins(records, chosen.get('origin_selection', 'phase-balanced')):
         raise ValueError('origin selection differs')
     output.mkdir(exist_ok=False)
     config = json.loads((checkpoint/'metadata.json').read_text())['config']
-    validate_ranking_checkpoint_config(run['start']['config'], config, comparison_seed)
+    validate_ranking_checkpoint_config(run['start']['config'], config, comparison_seed, comparison_dynamics_rate)
     started = time.monotonic()
     agent = kindle.Agent.restore_rgb(str(checkpoint))
     validate_checkpoint_config(config, agent.config)
@@ -240,6 +252,8 @@ def capture(log, replay, selection, checkpoint, output, *, smoke=False, comparis
         selection_sha256=sha256_file(selection), checkpoint=checkpoint_identity(checkpoint),
         source_config_seed=run['start']['config']['seed'], checkpoint_config_seed=config['seed'],
         comparison_seed=comparison_seed,
+        comparison_dynamics_rate=comparison_dynamics_rate,
+        origin_selection=chosen.get('origin_selection', 'phase-balanced'),
         native_sha256=sha256_file(kindle._native.__file__), source_sha256=sha256_file(__file__),
         gpu_device=agent.gpu_device, actions=0, updates=0, origins=[], streams=[])
     selected = {(r['stream'], r['index']):r for r in chosen['origins']}
@@ -308,12 +322,18 @@ if __name__=='__main__':
     parser.add_argument('--smoke',action='store_true')
     parser.add_argument('--compare-checkpoint-seed',type=int,
         help='Allow only this distinct learner seed to differ from the source config; does not alter the checkpoint')
+    parser.add_argument('--compare-dynamics-learning-rate',type=float,
+        help='Allow only this distinct dynamics rate to differ from the source config; does not alter the checkpoint')
+    parser.add_argument('--origin-selection', choices=('phase-balanced', 'episode-uniform'), default='phase-balanced',
+        help='Selection mode: four origins per phase or eight per test episode, without reward filtering')
     args=parser.parse_args()
     if args.mode=='select':
         run,records=source_records(args.log,args.replay)
-        write(args.selection,dict(source_log_sha256=run['sha256'],horizon=HORIZON,hold=HOLD,origins=select_origins(records)))
+        write(args.selection,dict(source_log_sha256=run['sha256'],horizon=HORIZON,hold=HOLD,
+            origin_selection=args.origin_selection,origins=select_origins(records,args.origin_selection)))
     elif args.mode=='oracle':
         oracle(args.log,args.replay,args.selection,args.output)
     else:
         capture(args.log,args.replay,args.selection,args.checkpoint,args.output,
-                smoke=args.smoke,comparison_seed=args.compare_checkpoint_seed)
+                smoke=args.smoke,comparison_seed=args.compare_checkpoint_seed,
+                comparison_dynamics_rate=args.compare_dynamics_learning_rate)

@@ -56,6 +56,44 @@ def test_declared_seed_comparison_preserves_both_original_configs():
     validate_ranking_checkpoint_config(source, dict(source))
 
 
+def test_uniform_origins_work_without_a_second_game_milestone():
+    rows = [dict(episode=i//256, split=0 if i<256 else 1, phase=0, reward=i)
+            for i in range(768)]
+    selected = select_origins([rows], 'episode-uniform')
+    assert len(selected) == 16 and len({r['index'] for r in selected}) == 16
+    assert all(r['episode'] in (1,2) and r['index']%16==0 for r in selected)
+    assert all(rows[r['index']]['episode']==rows[r['index']+14]['episode'] for r in selected)
+    for row in rows:
+        row['reward'] = -999
+    assert select_origins([rows], 'episode-uniform') == selected
+    with pytest.raises(ValueError):
+        select_origins([rows])
+    with pytest.raises(ValueError):
+        select_origins([rows], 'unknown')
+
+
+def test_declared_dynamics_comparison_preserves_original_configs():
+    source = dict(seed=1009, observation_kind='rgb64', dynamics_learning_rate=4e-4, learning_rate=4e-5)
+    checkpoint = dict(source, dynamics_learning_rate=1e-4)
+    validate_ranking_checkpoint_config(source, checkpoint, comparison_dynamics_rate=1e-4)
+    assert source['dynamics_learning_rate'] == 4e-4
+    assert checkpoint['dynamics_learning_rate'] == 1e-4
+
+
+@pytest.mark.parametrize('rate,change,seed', [
+    (None, {}, None), (4e-4, {}, None), (2e-4, {}, None),
+    (True, {}, None), (0.0, {}, None), (-1.0, {}, None),
+    (float('nan'), {}, None), (float('inf'), {}, None),
+    (1e-4, {'learning_rate': 8e-5}, None),
+    (1e-4, {'seed': 4013}, None), (1e-4, {'seed': 4013}, 4013),
+])
+def test_dynamics_comparison_rejects_undeclared_or_additional_changes(rate, change, seed):
+    source = dict(seed=1009, observation_kind='rgb64', dynamics_learning_rate=4e-4, learning_rate=4e-5)
+    checkpoint = dict(source, dynamics_learning_rate=1e-4, **change)
+    with pytest.raises(ValueError):
+        validate_ranking_checkpoint_config(source, checkpoint, seed, rate)
+
+
 @pytest.mark.parametrize('comparison,change', [
     (None, {}), (10007, {}), (12012, {}), (True, {}), (-1, {}), (2**64, {}),
     (12011, {'batch_size': 8}), (12011, {'observation_kind': 'rgb48'}),
