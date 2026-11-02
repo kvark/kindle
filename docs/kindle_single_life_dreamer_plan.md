@@ -1,5 +1,18 @@
 # Kindle: CDP learning roadmap
 
+The [replay-value critic diagnostic](experiments/2026-11-02-cdp-breakout-replay-value-critic.md) is selected after H30/R12 closes.
+Measure the missing live values/bonuses for the completed behavior8e-5 models
+at replay-value0.3 and1.0, sampled and greedy: four original24-episode cohorts,
+zero updates, exact source trajectories and357 invariant tensors. Keep native
+447fe50 and exact runners6c1b69fb/cf4ea238. No build ornew learner.
+CPU preparation passes5.834s: five commands,both schemas,282/338 source and422
+preceding pins; nine unchanged arithmetic tests are retained without repetition.
+Root `/x/Temp/kindle-breakout-replay-value-critic-20261102`; main
+`kindle-breakout-replay-value-critic-20261102`, collector
+`kindle-breakout-replay-value-critic-collection-20261102`. Require idle-host
+selection/launch and1,024-action check before four capped frozen arms. No
+retry,overlap,loss change orautomatic successor. Check live state before work.
+
 The [completed Breakout H30/R12 comparison](results/2026-11-02-cdp-breakout-h30-r12.md) scores **58.917 sampled /
 124.708 greedy**, below70.750/143.667 by16.73%/13.20%, in **23m15.641s**
 (+8.36%). Initial-subtracted return/min falls23.47%/20.09%; all0/24 two-wall.
