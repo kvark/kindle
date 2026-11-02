@@ -16,6 +16,11 @@ places the entire frozen score gap after the identical550-point first-pyramid
 prefix. Both learners have substantial later-play training exposure and similar
 late movement agreement. It does not change either gate or identify a cause.
 
+The subsequent [crossed assessment](2026-11-02-cdp-qbert-replay-value1-cross-cohort.md)
+scores16001 at15163.542 on14009's cohort, while14009 stays ahead on both cohorts.
+Cohort choice affects the near-threshold gate, but this original confirmation
+still fails; no favorable-cohort substitution or new learner is introduced.
+
 | Fixed recipe / learner | Greedy mean | Sampled mean | First pyramids, both modes | Training time | Greedy gate |
 | --- | ---: | ---: | ---: | ---: | --- |
 | Development14009 |16,525.000|14,882.292|24/24|25m36.935s|Pass|

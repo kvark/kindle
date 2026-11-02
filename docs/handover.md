@@ -1,21 +1,25 @@
 # CDP handover — October25,2026
 
-The [Qbert replay-value1 crossed assessment](experiments/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md) launches
-03:43:03.876 UTC November2/sourceb883162 after complete Breakout closure and
-idle-host checks. Original mainPID890878/invocation68f3f48fbc714bfbbb4a0701a1ea3799
-andcollector890881/ae591eeba4444a5cafe8c9f13d8b7aa3 areactive. DeclarationSHA7e472c0b
-pins957 inputs; first crossed header passes greedy/cohort4000016001/config14009/
-replay-value1/starting18715 updates. No full crossed result exists yet.
+The [completed Qbert replay-value1 crossed assessment](results/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md) keeps14009
+ahead onboth cohorts:16525.000/15906.250 versus16001's15163.542/14913.542,all
+24/24 first pyramids. Cohort choice changes16001's near-threshold gate,while
+learner gaps1361.458/992.708 remain. Original fresh16001 confirmation staysfailed;
+no favorable-cohort selection or new independent learner. The original recipe
+still passes primary greedy onone of two learners.
 
-Four new greedy final/own-initial arms cross14009/16001 cohorts; completed
-diagonal GPU arms are reused without repeats. Original fresh16001 failure remains;
-no favorable-cohort selection or new learner. Native447fe50/35ad0db, runnere304af89,
-checkpoint configs,24 natural episodes perarm,300s/600k caps and15k/90% gates
-stayfixed. Require357 finite/invariant tensors,replays/videos,guards andoriginal
-collection. Preparation939pins/four CLI paths/32headers/controller/journal checks
-pass; no stage fails orrepeats. Root`/x/Temp/kindle-qbert-replay-value1-cross-cohort-20261102`.
-Check live state; do not overlap,restart,extend orchange caps. No automatic
-successor. The five-game goal remains unfinished.
+All957 pins,357 finite/invariant tensors,new-arm replays/videos,guards,matrix
+andoriginal services pass. Four new arms138952 actions/555639 frames/115.406s,
+zero updates; four completed diagonal GPU arms are reused. Main/collector
+succeed03:46:51.221/03:47:07.244 UTC November2/sourceb883162. Separate3.310s
+reader passes03:47:46.833; completionSHAcd59f0ff/summarySHAf92533f6. No stage
+fails orrepeats. Native447fe50/35ad0db,runnere304af89,configs,training times,
+24 natural episodes perarm and15k/90% gates stayfixed. No isolated weight,
+policy or population reliability claim.
+
+Root`/x/Temp/kindle-qbert-replay-value1-cross-cohort-20261102` isclosed. Do not
+repeat crossed arms,diagonals,preparation,collector orreader. No learner,loss
+change,extension,retry orautomatic successor isselected. No allocation remains
+atclosure;check live state. The five-game goal remains unfinished.
 
 The [completed Breakout replay-value1 comparison](results/2026-11-02-cdp-breakout-replay-value1.md) scores
 70.750 sampled/143.667 greedy versus59.000/117.292, improving19.92%/22.49% in

@@ -1,9 +1,12 @@
 # Separate Qbert replay-value1 learner and evaluation-cohort differences
 
-**Running:** the separate guarded selection passes957 pinned inputs after complete
-Breakout closure. Original mainPID890878/invocation68f3f48fbc714bfbbb4a0701a1ea3799
-launches03:43:03.876 UTC November2/sourceb883162. The original collection observer
-is active. No completed crossed result exists yet; do not overlap or restart.
+**Completed:**14009 stays ahead on both cohorts, scoring16525.000/15906.250;
+16001 scores15163.542/14913.542 and passes15k only on the alternate cohort.
+Allfour trained cells have24/24 first pyramids. Original16001 confirmation remains
+failed. All957 pins,357 finite/invariant tensors,replays,guards and original
+services pass; no stage repeats. See the [result](../results/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md).
+The protocol and preparation/launch records below are historical; do not rerun.
+No learner, extension, retry or automatic successor is selected.
 
 Prepare four frozen crossed assessments within the existing five-game goal.
 Development14009 scores16525.000 greedy on cohort4000014009; fresh16001 scores
