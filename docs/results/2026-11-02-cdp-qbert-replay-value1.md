@@ -1,5 +1,11 @@
 # Qbert replay-value scale1 improves greedy score and passes the short-budget gate
 
+The subsequent [fresh16001 confirmation](2026-11-02-cdp-qbert-replay-value1-seed16001.md)
+scores14,913.542 greedy/14,745.833 sampled in24m45.754s,both24/24 first pyramids
+butbelow15,000. All audits pass. This recipe now passes greedy onone of two
+learners; the development result below remains valid,without successful fresh
+confirmation or broad reliability. No unchanged extension orthird learner.
+
 The fresh200k comparison completes **200,000 actions /799,786 frames /18,715
 updates in25m36.935s**. Greedy mean **16,525.000** improves14,770.833 by11.88%
 and passes the fixed15k/90% gate with24/24 first pyramids. Sampled14,882.292

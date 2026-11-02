@@ -1,40 +1,28 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh Qbert replay-value1 confirmation](../experiments/2026-11-02-cdp-qbert-replay-value1-seed16001.md) launches at
-**02:17:27.588 UTC November2/sourcebff6eb4**, seed16001/evaluation4000016001.
-Only seeds change from the fixed development recipe:12M64/Auto/N8/B16/T16/H5/
-R24/dynamics1e-4/base-encoder-behavior4e-5/replay-value1/greedy/expert100. Require
-fresh200k actions/18,715 updates within30min,100k/9,340 recovery and four frozen
-final/own-initial sampled/greedy24-episode arms. Greedy remains primary against
-15k/90%; development14009 scored16,525/24 andsampled14,882.292/24 in25m36.935s.
+The [completed Qbert replay-value1 confirmation](2026-11-02-cdp-qbert-replay-value1-seed16001.md) scores
+**14,913.542 greedy /14,745.833 sampled**, each24/24 first pyramids. Both means
+miss15,000. Fresh16001 completes200k actions/799,817 frames/18,715 updates in
+**24m45.754s**; own initials86.458/148.958 clear none. Development14009 remains
+16,525/14,882.292 in25m36.935s. The fixed recipe passes primary greedy onone of
+two learners; it has no successful fresh confirmation or broad reliability.
 
-Startup passes all**912 pins**,357 finite schema-matching initial tensors with
-48 differences from development,correct cadence and247 finite reports through
-3,016 actions. All47 pre-update transitions differ,as expected across seeds.
-MainPID882846/invocationd78987afbb3344c3b65b84d3652ceb79 remains active with
-postprocess,progress andcollection observers; recovery is complete below.
-DeclarationSHA384851cb;
-startup completes02:17:53.763 UTC,2.649s CPU wrapper co-host cost uncorrected.
-No full frozen result orconfirmation outcome exists yet.
+All912 pins,100k/9,340 recovery,357 finite/invariant tensors,48 initial tensor
+and47 pre-update differences,full replays/videos,guards,curves,coverage,exposure
+andcomparison pass. Main/post/collection succeed02:49:22.758/02:49:37.668/
+02:50:08.343 UTC November2/sourcebff6eb4. Allfive original services succeed;
+no training,frozen,replay,audit orcollector stage fails orrepeats. Separate
+5.166s terminal reader passes02:50:48.666;completionSHA587f591e/summarySHA8d825bdf.
+CPU preparation failures andseparate repairs remain preserved.
 
-The original100k/9,340 recovery succeeds**02:30:04.880 UTC**:357 finite tensors
-and four retained files totaling206,067,159 bytes. Separate read-only confirmation
-passes02:30:39.931 in2.524s (2.542s wrapper),verifying all912 pins,metadata,file
-hashes andoriginal invocation. The learner remainsPID882846/invocationd78987af;
-postprocess/progress/collection continue. No checkpoint,audit,copy orGPU stage
-repeats. Recovery metadataSHA356bd3b7,retentionSHA158aa03c,confirmationSHAddffac5c.
-
-No additional bounded learner: unchanged native447fe50/35ad0db, runnere304af89,
-teacherfa261c53 andrecipe already completed one. Measured full cost plus10%
-projects28m10.628s. No prior experience is reused. CPU qualification passes
-9.724s; original generated-path, historical-review-filename andfinisher-import
-failures remain,with separate CPU repairs before the first GPU launch.
-
-Root `/x/Temp/kindle-qbert-replay-value1-seed16001-20261102/full`; main
-`kindle-qbert-replay-value1-seed16001-200k-20261102`. Check live state; do not
-restart this learner orschedule another GPU job while active. No tuning,retry,
-cap increase,extension,seed substitution orautomatic successor. The five-game
-goal remains unfinished.
+Only learner/evaluation seeds change. Keep12M64/Auto/N8/B16/T16/H5/R24/dynamics
+1e-4/base-encoder-behavior4e-5/replay-value1/greedy/expert100,native447fe50/35ad0db,
+runnere304af89 andteacherfa261c53. Actual overrides24.0885%;online15,187 and
+late replay CE.068976 are not frozen competence. CPU co-host costs remain
+uncorrected. Root`/x/Temp/kindle-qbert-replay-value1-seed16001-20261102` isclosed.
+No extension,retry,third learner,tuning,seed substitution orautomatic successor
+is selected. Do not repeat completed stages orreaders. No active allocation
+remains atclosure;check live state. The five-game goal remains unfinished.
 
 The [completed Breakout real-trajectory value diagnostic](2026-11-02-cdp-breakout-value-consistency.md) finds
 sampled one-step residual RMSE.732/.941 and15-step2.546/3.121,while complete-return

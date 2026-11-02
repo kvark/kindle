@@ -1,13 +1,12 @@
 # Qbert replay-value scale1: fresh-seed confirmation
 
-Launched **02:17:27.588 UTC November2/sourcebff6eb4** with912 pins;
-mainPID882846/invocationd78987afbb3344c3b65b84d3652ceb79 and allfour observers
-active at startup. The recovery observer has since succeeded; the learner and
-other observers continue. Startup passes357 finite initial tensors,48 differences from
-14009,47 differing pre-update transitions,correct cadence and247 finite
-reports through3,016 actions. DeclarationSHA384851cb. Startup completes
-02:17:53.763 UTC;2.649s CPU wrapper is a co-host timing caveat. No frozen
-confirmation result yet. Do not restart or overlap another GPU job.
+Completed:200k actions/799,817 frames/18,715 updates in24m45.754s. Greedy
+14,913.542 andsampled14,745.833 eachclear24/24 first pyramids butmiss15,000.
+The fixed recipe passes greedy onone of two learners. All912 pins andoriginal
+services pass;terminal reader completes02:50:48.666 UTC November2. No stage
+repeats;CPU preparation failures/repairs remain. No extension,retry,third learner,
+tuning,seed substitution orautomatic successor.
+[Completed result](../results/2026-11-02-cdp-qbert-replay-value1-seed16001.md).
 
 Selected November 2 after the [development comparison](../results/2026-11-02-cdp-qbert-replay-value1.md)
 passed the greedy gate on reused seed14009: 16,525 mean return and 24/24 first
