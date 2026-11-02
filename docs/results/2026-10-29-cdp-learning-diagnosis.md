@@ -25,6 +25,15 @@ Terminal readerSHA04ce2848 passes its separate.106s CPU preparation; wait for
 original completion before terminal mode. No automatic successor is selected.
 The five-game goal remains unfinished.
 
+The [Qbert replay-value1 phase diagnosis](2026-11-02-cdp-qbert-replay-value1-phases.md) locates the entire
+frozen score gap after identical550-point first-pyramid prefixes inall96 episodes.
+Both learners collect about76% later actions; late native movement agreement is
+77.50%/77.07%. Greedy median gap150 is smaller than mean1611.458; fresh scores
+range11175–15650 versus14800–22025. These are descriptive cohort differences,
+not an isolated cause or changed gate. All27 diagnostic/338 active pins and
+fixtures pass in4.038s CPU at03:19:44.467/source305d145; original Breakout identity
+stays unchanged. No GPU work,replay repeat,loss change or new learner. Do not rerun.
+
 The [completed Qbert replay-value1 confirmation](2026-11-02-cdp-qbert-replay-value1-seed16001.md) scores
 **14,913.542 greedy /14,745.833 sampled**, each24/24 first pyramids. Both means
 miss15,000. Fresh16001 completes200k actions/799,817 frames/18,715 updates in

@@ -1,5 +1,12 @@
 # Locate the remaining Qbert replay-value1 score gap in saved trajectories
 
+**Completed:** all96 frozen prefixes equal550; the greedy gap lies afterward.
+Both learners collect about76% of training actions after the milestone and
+late movement agreement is77.50%/77.07%. All27 diagnostic/338 active pins and
+fixtures pass in4.038s, with the original Breakout identity unchanged. No GPU
+work or original stage repeats. See the [result](../results/2026-11-02-cdp-qbert-replay-value1-phases.md).
+The protocol below is historical; do not rerun.
+
 Analyze the completed fixed recipe's development14009 and fresh16001 logs while
 the original Breakout replay-value1 learner runs. Greedy means16525.000 and
 14913.542 pass/fail the unchanged15k gate, with24/24 first pyramids each. Sampled

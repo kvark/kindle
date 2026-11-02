@@ -11,6 +11,11 @@ replay-value0.3→1 remains valid on14009; this confirmation does not establish
 two-learner success or broad reliability. No extension, retry, seed substitution,
 third learner, tuning or automatic successor is selected.
 
+The subsequent [saved-log phase diagnosis](2026-11-02-cdp-qbert-replay-value1-phases.md)
+places the entire frozen score gap after the identical550-point first-pyramid
+prefix. Both learners have substantial later-play training exposure and similar
+late movement agreement. It does not change either gate or identify a cause.
+
 | Fixed recipe / learner | Greedy mean | Sampled mean | First pyramids, both modes | Training time | Greedy gate |
 | --- | ---: | ---: | ---: | ---: | --- |
 | Development14009 |16,525.000|14,882.292|24/24|25m36.935s|Pass|
