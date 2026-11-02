@@ -1,5 +1,23 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [Breakout replay-value1 bounded check](../experiments/2026-11-02-cdp-breakout-replay-value1.md) is separately selected after
+Qbert's closure. Only replay-value0.3→1 changes from the behavior8e-5 control's
+59.000 sampled/117.292 greedy,allzero two-wall. Keep12M64/Auto/N8/B16/T16/H15/
+R16/base-encoder4e-5/behavior8e-5/dynamics4e-4/expert100,sampled collection,
+actorunimix.01 andteacher. Native447fe50/35ad0db isunchanged; runnercf4ea238 adds
+only ten fresh-CLI lines. Existing targets remain; critic andrepresentation
+weights change together. No isolated mechanism orbenefit is established.
+
+The23 private CPU tests and2.186s preparation pass,including both actual commands,
+17 config cases,357 control shapes,cadence and282 control pins. Require8192
+training actions/489 updates within180s and1024 frozen/zero updates within60s,
+matched initial values/pre-update traces,full guided replay andguards. A10%
+margin on the200k projection must clear30min; this establishes execution/cost
+only. No full learner,extension,retry,sweep orautomatic promotion is selected.
+Root`/x/Temp/kindle-breakout-replay-value1-20261102/native-check`; main
+`kindle-breakout-replay-value1-check-20261102`. Check live state; no overlap or
+restart. The five-game goal remains unfinished.
+
 The [completed Qbert replay-value1 confirmation](2026-11-02-cdp-qbert-replay-value1-seed16001.md) scores
 **14,913.542 greedy /14,745.833 sampled**, each24/24 first pyramids. Both means
 miss15,000. Fresh16001 completes200k actions/799,817 frames/18,715 updates in
