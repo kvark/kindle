@@ -1,5 +1,12 @@
 # Breakout action rankings on shared retained histories
 
+**Complete:** both full captures finish74,032 actions/296,076 source frames in
+115.848s,zero updates. Only8/128 origins distinguish the candidates; neither
+model demonstrates gain over uniform. All original audits andservices pass,
+withno repeated stage. Main succeeds00:18:33 UTC November2,collector completion
+00:18:46. See the [result](../results/2026-11-02-cdp-breakout-current-ranking.md).
+Preparation andactive-launch statements below arehistorical; do not rerun.
+
 Select CPU preparation within the five-game goal. The completed critic capture
 finds weak sampled value calibration, but does not measure alternative-action
 ranking. No learner or loss change follows directly from that observation.

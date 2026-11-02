@@ -22,21 +22,23 @@ The earlier12011 original main/collector failures and separate CPU repair remain
 preserved. Do not restart either learner or completed collectors. The five-game
 goal is unfinished; no Qbert successor is selected.
 
-The [Breakout shared-history action-ranking comparison](experiments/2026-11-02-cdp-breakout-current-ranking.md)
-is separately selected after CPU qualification. Both retained dynamics4e-4/1e-4
-models receive the same4e-4 greedy trajectory, with128 fixed uniform origins and
-18 four-step action holds followed by recorded continuation through15 steps.
-This measures short external-reward ranking, excluding intrinsic reward and
-critic bootstrap; no complete actor-objective orcausal gameplay claim follows.
-CPU qualification passes66 tests,four commands,both357-tensor schemas andsource
-closures. The single21.987s oracle checks37,016 actions/153,132 branch frames,
-128 exact recorded plans andeight reversed orders. Two CPU fixture failures
-andtheir corrections remain preserved; no successful oracle repeats. Root
-`/x/Temp/kindle-breakout-current-ranking-20261102`; native447fe50/35ad0db unchanged.
-No learner orloss change isselected. Frozen capture launches00:16:26 UTC November2/sourcefc5032a with71 pins.
-MainPID871905/invocation9ed47a38d0d342ac836ed4b91ee019a1 and original
-collectorPID871908/invocation8299622f9c054bf3afc5bdb3f4a5bff9 areactive.
-No full ranking result isavailable. Do not restart oroverlap another GPU job.
+The [completed Breakout action-ranking comparison](results/2026-11-02-cdp-breakout-current-ranking.md)
+finds only8/128 origins with distinct15-step rewards. Pairwise agreement63.24%/
+66.67% for dynamics4e-4/1e-4 doesnot translate into selected-return gain:−.027775/
+−.035356 versus uniform, withlane intervals crossingzero. Paired difference
++.007581[−.015094,.030325] establishesno advantage. Short external-reward ranking
+omits intrinsic reward andcritic bootstrap; long-term control remains unresolved.
+No new learner,loss,inference planner,origin replacement orsuccessor isselected.
+
+Both full captures total74,032 actions/296,076 source frames/115.848s,zero updates.
+All71 pins,357 invariant tensors percapture,eight shared pixel hashes,128 origins/
+2,432 candidate-control forecasts permodel,repeated-plan/live-state checks and
+host guards pass. Original main succeeds00:18:33 UTC November2 andcollector
+completion is00:18:46; both services areterminal success. No original stage fails
+orrepeats. Native447fe50/35ad0db unchanged;66 CPU tests andsingle21.987s oracle
+pass,withtwo earlier fixture failures preserved. Root
+`/x/Temp/kindle-breakout-current-ranking-20261102` isclosed; no active allocation.
+The five-game goal remains unfinished. Checklive state before GPU work.
 
 The [completed Breakout critic diagnostic](results/2026-11-02-cdp-breakout-current-critic.md)
 finds weak sampled return prediction: correlation .105/.097 and R²−.031/−.267
