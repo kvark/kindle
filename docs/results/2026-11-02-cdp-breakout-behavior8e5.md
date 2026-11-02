@@ -104,3 +104,24 @@ This verifies startup only. No full frozen score or gameplay gain is available.
 Retain the original service and four observers,100k/6,227 recovery and final/
 actual-initial sampled/greedy assessments. Do not restart or overlap GPU work.
 No extension, rate sweep, confirmation or automatic successor is selected.
+
+
+## Terminal reader prepared while the original learner runs
+
+A separate read-only result reader passes preparation at **00:37:52.447 UTC
+November 2** in0.087s (0.113s wrapper). It reproduces all four retained control
+scores from the first three natural episodes per lane and rejects four altered
+score/gate/environment cases. It checks existing replay/log/video hashes without
+constructing a native agent or emulator. The original learner identity remains
+unchanged before and after the check; retain this CPU co-host cost without time
+correction.
+
+After the original main, postprocessing, progress, recovery and collection
+services become terminal, run the package's `review_full_terminal.py terminal`
+once through `run_cpu.py` with a new receipt name. It verifies all282 inputs,
+completion-file hashes, original invocation journals, the collector payload,
+retained100k checkpoint, paired initial traces, four frozen scores and the
+preserved CPU prelaunch failure. Preparation is not a terminal result, and the
+reader must not replace or rerun any original experiment stage. ReaderSHA
+`ba571025beca4480f21224292cb0f1e08e9faa67c94c181dd281174060c76f28`;
+identity-helperSHA131bee46. Preparation receipt: `terminal-reader-preflight.json`.

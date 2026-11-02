@@ -24,6 +24,14 @@ service `kindle-breakout-behavior8e5-200k-20261102`. Do not restart this learner
 or schedule another GPU job while it is active. No extension, rate sweep,
 confirmation or automatic successor is selected. The five-game goal is unfinished.
 
+A read-only terminal result reader is prepared at package
+`/x/Temp/kindle-breakout-behavior8e5-20261102/review_full_terminal.py`.
+Its five score cases and retained-control recount pass00:37:52 UTC in0.087s;
+original learner identity stays fixed. After all five original services are
+terminal, run its `terminal` command once through the package's `run_cpu.py`
+with a fresh receipt name. No terminal summary exists yet. Preserve the original
+CPU prelaunch failure and do not rerun successful experiment stages.
+
 The [fresh Qbert confirmation](results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
 completes 200,000 actions / 799,795 frames / 18,715 updates in **25m09.906s**.
 Greedy **14,770.833** and sampled **14,254.167** each clear 24/24 first pyramids
