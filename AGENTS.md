@@ -20,37 +20,34 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 2
 
-The [completed Qbert replay-value scale1 comparison](docs/results/2026-11-02-cdp-qbert-replay-value1.md) finishes200k actions /
-799,786 frames /18,715 updates in**25m36.935s**. Greedy**16,525.000** improves
-14,770.833 by11.88% andpasses15k/90% with24/24 first pyramids. Sampled14,882.292
-improves14,254.167 by4.41%,also24/24 pyramids,but still misses15k. Training+1.79%;
-initial-subtracted return/min+10.03% greedy/+2.63% sampled. Own initials147.917/
-205.208 andzero pyramids match. Retain scale1 asstronger primary development;
-reused14009 isnot independent confirmation. The five-game goal remains unfinished.
+The [fresh Qbert replay-value1 confirmation](docs/experiments/2026-11-02-cdp-qbert-replay-value1-seed16001.md) is selected on learner
+seed16001/evaluation4000016001. Only seeds change from the completed development
+recipe:12M64/Auto/N8/B16/T16/H5/R24/dynamics1e-4/base-encoder-behavior4e-5/
+replay-value1/greedy/expert100. Development14009 scores16,525 greedy/24 first
+pyramids and14,882.292 sampled/24 in25m36.935s. Greedy is the fixed primary;
+the original15k/90% gate and four final/own-initial frozen arms remain.
 
-All859 pins,100k/9,340 recovery,357 control/bounded initial andinvariant frozen
-tensors,47 pre-update events,1306/1338 paired initial semantic events,full replays/
-videos,guards,curves,coverage,exposure,comparison andoriginal collector pass.
-Main/post/collection succeed01:54:44.234/01:55:18.718/01:55:48.439 UTC November2,
-source3a6655a. Allfive original services areterminal success; no GPU,replay or
-collection stage fails orrepeats. Separate5.947s terminal reader passes01:56:36.021;
-completionSHA048abefc,summarySHAf359e215. Preparation failures/repairs remain.
+No additional bounded learner is needed for this unchanged runtime and recipe.
+Measured full cost plus10% projects28m10.628s under the30-minute training cap.
+Fresh200k actions/18,715 updates require100k/9,340 recovery and357 finite own
+initial tensors that match the schema and differ from development. No prior
+experience is reused. Native447fe50/35ad0db, runnere304af89 and teacherfa261c53
+remain fixed. CPU qualification passes9.724s; original controller-path failure
+and separate repair remain. No GPU work has started at selection.
 
-Only replay-value0.3→1 changes at12M64/Auto/N8/B16/T16/H5/R24/dynamics1e-4/base-
-encoder-behavior4e-5/greedy/expert100. Critic andrepresentation gradients change;
-real rewards/boundaries andH5 imagined-return bootstraps already supply targets.
-No isolated path ormissing-loss defect isestablished. Native447fe50/35ad0db,
-teacherfa261c53 andrunnere304af89 fixed. Actual overrides28.263%;online scores
-andlower late imitation CE are not causal explanations. CPU co-host costs remain
-uncorrected. Root`/x/Temp/kindle-qbert-replay-value1-20261102/full` isclosed.
-No confirmation,extension,sweep,cap increase orautomatic successor isselected.
-Do not repeat learner,observers,collector orfinal reader. No active allocation
-remains atclosure; checklive state before GPU work.
+Root `/x/Temp/kindle-qbert-replay-value1-seed16001-20261102/full`; main
+`kindle-qbert-replay-value1-seed16001-200k-20261102`. Check live state before work;
+do not overlap another GPU job or restart active or terminal stages. No tuning,
+retry, cap increase, extension, seed substitution or automatic successor.
+The five-game goal remains unfinished; this confirmation has no frozen result.
 
-The completed Breakout behavior8e-5 comparison scores59.000 sampled/117.292
-greedy in21m45s,modest gains,allzero two-wall. Its original services and reader
-are closed; do not repeat them. Qbert replay-value1 passes on reused14009;
-fresh confirmation remains open. The five-game goal is unfinished.
+The [completed development comparison](docs/results/2026-11-02-cdp-qbert-replay-value1.md)
+passes all859 pins, recovery, initial/frozen checks, full replays and original
+services. Its reused14009 pass selected this recipe; it is not independent
+confirmation. All original stages and terminal reader are closed. Earlier
+replay-value0.3 passed one of two learners; that failure remains recorded.
+Breakout's latest behavior8e-5 comparison scores59.000 sampled/117.292 greedy
+in21m45s, allzero two-wall successes. Its original stages are also closed.
 
 ## Direction and retained results
 

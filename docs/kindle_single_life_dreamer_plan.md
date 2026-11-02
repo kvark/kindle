@@ -1,5 +1,26 @@
 # Kindle: CDP learning roadmap
 
+The [fresh Qbert replay-value1 confirmation](experiments/2026-11-02-cdp-qbert-replay-value1-seed16001.md) is selected on learner
+seed16001/evaluation4000016001. Only seeds change from the completed development
+recipe:12M64/Auto/N8/B16/T16/H5/R24/dynamics1e-4/base-encoder-behavior4e-5/
+replay-value1/greedy/expert100. Development14009 scores16,525 greedy/24 first
+pyramids and14,882.292 sampled/24 in25m36.935s. Greedy is the fixed primary;
+the original15k/90% gate and four final/own-initial frozen arms remain.
+
+No additional bounded learner is needed for this unchanged runtime and recipe.
+Measured full cost plus10% projects28m10.628s under the30-minute training cap.
+Fresh200k actions/18,715 updates require100k/9,340 recovery and357 finite own
+initial tensors that match the schema and differ from development. No prior
+experience is reused. Native447fe50/35ad0db, runnere304af89 and teacherfa261c53
+remain fixed. CPU qualification passes9.724s; original controller-path failure
+and separate repair remain. No GPU work has started at selection.
+
+Root `/x/Temp/kindle-qbert-replay-value1-seed16001-20261102/full`; main
+`kindle-qbert-replay-value1-seed16001-200k-20261102`. Check live state before work;
+do not overlap another GPU job or restart active or terminal stages. No tuning,
+retry, cap increase, extension, seed substitution or automatic successor.
+The five-game goal remains unfinished; this confirmation has no frozen result.
+
 The [completed Qbert replay-value scale1 comparison](results/2026-11-02-cdp-qbert-replay-value1.md) finishes200k actions /
 799,786 frames /18,715 updates in**25m36.935s**. Greedy**16,525.000** improves
 14,770.833 by11.88% andpasses15k/90% with24/24 first pyramids. Sampled14,882.292
