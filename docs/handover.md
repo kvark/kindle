@@ -1,8 +1,14 @@
 # CDP handover — October25,2026
 
-The [fresh Qbert replay-value scale1 comparison](experiments/2026-11-02-cdp-qbert-replay-value1-200k.md) is selected after the
-bounded cost check passes:200k actions/18,715 updates/30-minute training cap,
-100k/9,340 recovery andfour final/actual-initial sampled/greedy24-episode arms.
+The [fresh Qbert replay-value scale1 comparison](experiments/2026-11-02-cdp-qbert-replay-value1-200k.md) launches01:21:38.183
+UTC November2/source3a6655a with859 pins:200k actions/18,715 updates/30-minute
+training cap,100k/9,340 recovery andfour final/actual-initial sampled/greedy
+24-episode arms. MainPID878107/invocation9f50698bb9894737a8cc8d64c471ade3;
+postprocess,progress,recovery andcollection observers areactive. Startup passes
+01:22:00.519:357 control/bounded-matching initial tensors,47 identical pre-update
+transitions,correct cadence and205 finite reports through2568 actions. The2.621s
+CPU startup wrapper isretained asco-host cost without time correction.
+
 Only replay-value scale0.3→1 changes on reused14009 at12M64/Auto/N8/B16/T16/H5/
 R24/dynamics1e-4/base-encoder-behavior4e-5/greedy/expert100. Critic andrepresentation
 gradients both change; existing bootstrapped targets remain. This isdevelopment,
@@ -11,14 +17,13 @@ teacherfa261c53 andqualified runnere304af89 fixed. No prior experience reused.
 
 Allfive commands,36 config cases,three actual preflight cases,19 header checks,
 recovery/retention/observer cases and815 bounded/768 control pins pass;20 scripts
-compile. CPU qualification8.757s, no environment ornative agent. Original generator
-indentation failure isretained; separate corrected generation passes before GPU.
-Require357 initial/frozen tensors,47 pre-update events,paired initial traces,
-full replays,guards,curves,exposure andoriginal terminal collection. Compare
-control14,770.833 greedy/14,254.167 sampled,both24/24 pyramids,in25m09.906s;
-keep15k/90% gate. No gameplay result yet. Root
-`/x/Temp/kindle-qbert-replay-value1-20261102/full`;check live state anddo not
-overlap orrestart. No extension,sweep,cap increase orautomatic successor.
+compile. CPU qualification8.757s. Original generator indentation failure and
+separate corrected generation remain. Require recovery,357 invariant frozen
+tensors,paired initial traces,full replays,guards,curves,exposure andoriginal
+terminal collection. Compare14,770.833 greedy/14,254.167 sampled,both24/24 pyramids,
+in25m09.906s;keep15k/90% gate. No full frozen result yet. Root
+`/x/Temp/kindle-qbert-replay-value1-20261102/full`;check live state. Do not overlap
+orrestart this learner. No extension,sweep,cap increase orautomatic successor.
 
 The [completed Qbert replay-value scale1 check](results/2026-11-02-cdp-qbert-replay-value1.md) passes8192 actions /
 32,755 frames /733 updates in57.202s;1024 frozen/.855s haszero updates andno
