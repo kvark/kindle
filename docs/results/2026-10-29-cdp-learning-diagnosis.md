@@ -7,6 +7,17 @@ gate remain fixed. All1,046 startup pins,357 finite initial tensors and274
 finite reports pass. No frozen result yet; this tests confirmation rather than
 an isolated architecture mechanism. No concurrent GPU allocation or repeat.
 
+The [Breakout ascending-centering reference](2026-11-02-cdp-breakout-ascending-center.md) fails its expanded24-episode
+screen:233.208 versus225.083 (+3.61%),four ofeight lane means improve,all0/24
+two-wall. The earlier eight-episode gain46.93%/six lanes remains recorded;
+all16,425 first-episode semantic events reproduce. Retain the original teacher;
+no fresh cohort,integration,learner or sweep is selected. All31 diagnostic/1,046
+active Qbert pins,full pixel/action/debug replay and original learner identity
+pass. CPU collection35.990s/replay45.402s/controller87.435s completes06:06:24.338
+UTC November2/sourcef8e4931,with no GPU work or updates. Root
+`/x/Temp/kindle-breakout-ascending-center-20261102/standard24` is complete;
+do not repeat stages. CPU co-host cost remains uncorrected.
+
 The [completed Breakout greedy-collection comparison](2026-11-02-cdp-breakout-greedy-training.md)
 finishes200k actions /799,661 frames /12,477 updates in21m44.645s. Primary
 sampled78.542 improves70.750 by11.01%, with9.81% more initial-subtracted return

@@ -10,14 +10,17 @@ from16001; keep240k/18,721 updates,12M64/Auto/N8/B16/T16/H5/R20/dynamics1e-4/
 replay-value1/expert100/greedy collection,native447fe50,runnere304af89 andteacher.
 Greedy15000/90% stays primary; sampled results remain separate. No frozen result.
 
-Require100k/7,784 and200k/15,596 recoveries and four final/own-initial24-episode
+The100k/7,784 recovery passes06:01:43.727 and independent confirmation06:04:00.243
+preserves1,046 pins andoriginal main identity. Four files/206,067,159 bytes and
+357 finite tensors pass; reviewSHAebb84be5/retentionSHA7db7f5ff. Do not repeat
+100k confirmation. Require200k/15,596 recovery and four final/own-initial24-episode
 assessments. CPU qualification passes21 scripts,1,046 declaration paths,eight
 actual preflight/four initialization cases. Original summary-key preparation
 failure and prequalification path correction remain; no GPU stage repeats.
 Terminal readerSHA5ca4b27b qualifies05:52:28 in4.809s,with two decision fixtures,
-both control recoveries and unchanged main identity. Its recovery100000,
-recovery200000 andterminal modes remain pending; run each once only after its
-original evidence exists. No startup,qualification,collector or stage repeats.
+both control recoveries and unchanged main identity. Its recovery100000 mode
+is complete; recovery200000 andterminal modes remain pending. Run each pending
+mode once only after its original evidence exists. No startup,qualification,collector or stage repeats.
 Root `/x/Temp/kindle-qbert-r20-seed18013-20261102/full`; declarationSHAb6e10968.
 Check live state; no overlap,restart,extension,seed substitution or automatic
 successor. Prior R24 confirmation failures remain; the five-game goal is unfinished.
@@ -27,6 +30,17 @@ PR31's previous65,451-character dashboard is preserved at
 Its replacement keeps active work, retained results and26 checked report links;
 the publication receipt and exact body remain beside the snapshot. Full results
 stay in the roadmap/reports. Use the current PR body for subsequent status edits.
+
+The [Breakout ascending-centering reference](results/2026-11-02-cdp-breakout-ascending-center.md) fails its expanded24-episode
+screen:233.208 versus225.083 (+3.61%),four ofeight lane means improve,all0/24
+two-wall. The earlier eight-episode gain46.93%/six lanes remains recorded;
+all16,425 first-episode semantic events reproduce. Retain the original teacher;
+no fresh cohort,integration,learner or sweep is selected. All31 diagnostic/1,046
+active Qbert pins,full pixel/action/debug replay and original learner identity
+pass. CPU collection35.990s/replay45.402s/controller87.435s completes06:06:24.338
+UTC November2/sourcef8e4931,with no GPU work or updates. Root
+`/x/Temp/kindle-breakout-ascending-center-20261102/standard24` is complete;
+do not repeat stages. CPU co-host cost remains uncorrected.
 
 The [completed Breakout greedy-collection comparison](results/2026-11-02-cdp-breakout-greedy-training.md)
 finishes200k actions /799,661 frames /12,477 updates in21m44.645s. Primary

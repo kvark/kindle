@@ -1,4 +1,58 @@
-# Ascending-ball centering passes the eight-episode reference screen
+# Ascending-ball centering fails the expanded reference screen
+
+The unchanged candidate scores **233.208 versus 225.083 (+3.61%)** over the
+fixed24 natural episodes, with **four of eight lane means improving**. Both
+controllers have **zero of24 two-wall successes**. It fails both the predeclared
+10% mean-gain and five-improved-lane criteria. Retain the original teacher;
+no fresh cohort, native integration, learner, target or velocity-window sweep
+is selected. The positive eight-episode screen remains recorded below.
+
+| Lane | Retained teacher mean | Ascending-centering mean |
+|---|---:|---:|
+|0|190.333|127.667|
+|1|96.667|256.333|
+|2|184.667|260.333|
+|3|221.000|121.333|
+|4|345.000|420.667|
+|5|363.667|277.333|
+|6|99.000|203.000|
+|7|300.333|199.000|
+
+The [expanded protocol](../experiments/2026-11-02-cdp-breakout-ascending-center-24.md)
+keeps the policy and response-model bytes unchanged and selects the first three
+natural episodes per lane. The eight earlier first episodes reproduce exactly,
+including16,425 semantic events with input/output pixel hashes, actions, policy
+debug information, rewards, frames, resets and outcomes. This is an overlapping,
+heavily reused development cohort, not an independent confirmation. The native
+teacher and original90%-two-wall task gate remain unchanged.
+
+Collection covers **60,704 actions /242,767 frames in35.990s**. All selected
+episodes terminate naturally; extra episodes and partial tails are excluded
+from the score. Full recorded-action and exact live-pixel replay, recomputed
+policy/debug checks and video pass in45.402s. The original retained24-episode
+control is reused without rerunning it. Two new first-episode-prefix fixtures
+pass; the13 completed policy fixtures are reused without repetition.
+
+Preflight passes at06:03:46.172 UTC November2 in11.928s. The controller completes
+at **06:06:24.338**, in87.435s, sourcef8e4931. All31 diagnostic inputs and1,046
+active Qbert inputs remain unchanged, preserving original mainPID901816 and
+invocation976a1ed5007f4ce8b343732f91c38cf9 before and after. No failed or repeated
+stage, native module import, GPU work, learner update or RAM input occurs.
+Retain the CPU co-host durations without correcting Qbert training time.
+
+Root `/x/Temp/kindle-breakout-ascending-center-20261102/standard24` is complete.
+Do not repeat its preflight, selection, collection or replay. This rejects this
+fixed controller change under its development criterion; it does not isolate
+Kindle's architectural limitation or prove that earlier positioning cannot help.
+
+| Artifact | SHA256 |
+|---|---|
+| Declaration |`150b2ea3abb7b1a9cdb41b2a4d3748396f63c8f6214479e530bbe6aa66d03c2e`|
+| Replay review |`3b2fdc1ec5debef542fe07789cc1fe6646a6d96c1339e6cba2487489883f30d8`|
+| Comparison |`5207acd49bbd3d885687bf885dd0fe8276f4f2daf0ea77e8ca4e9beb1444c82d`|
+| Completion |`973d8ca708a94580c2fe9fa051fd6d076fef7e6e14b96973911f7418e88c5426`|
+
+## Earlier eight-episode screen
 
 The fixed CPU candidate raises mean return **185.375→272.375 (+46.93%)**,
 with **six of eight lanes improving**. Both controllers have **zero of eight
