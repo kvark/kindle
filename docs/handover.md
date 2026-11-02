@@ -1,5 +1,16 @@
 # CDP handover — October25,2026
 
+The [Breakout lower-dynamics/replay-value1 bounded check](experiments/2026-11-02-cdp-breakout-value1-dynamics1e4.md) is separately
+selected for8,192 actions/489 updates,then1,024 frozen actions. Onlydynamics4e-4→
+1e-4 changes fromthe70.750 sampled/143.667 greedy control; keepbehavior8e-5,
+replay-value1,12M64/Auto/N8/B16/T16/H15/R16/expert100 andsampled collection.
+Native447fe50 andteacher stayfixed; private runnerSHAea2bf8c6 adds thequalified
+12-line dynamics option. All32 targeted CPU tests,two actual commands,17 config
+cases,357 tensor shapes/cadence and338 control pins pass. Original source-generator
+failure andseparate correction remain; no GPU work yet. Root
+`/x/Temp/kindle-breakout-value1-dynamics1e4-20261102/native-check`. No full learner,
+retry,extension orautomatic promotion isselected. Check live state before launch.
+
 The [completed Qbert R20 fresh-seed confirmation](results/2026-11-02-cdp-qbert-r20-seed18013.md)
 scores15,931.250 greedy/24 first pyramids on18013 in26m23.114s,versus development
 16001's15,279.167/24 in25m57.740s. Both pass the original15k/90% gate within30min:
