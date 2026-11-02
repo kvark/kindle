@@ -90,3 +90,18 @@ original successful diagnostic's pin. Source adaptation completes in.063s,
 with no preparation failure, build or repeated stage. The two models' final50k
 summaries each include3,125 reports; these descriptive means remain separate
 from the forthcoming complete-return calibration.
+
+## Original launch and bounded capture
+
+The original main916432/invocation628c655e44284a00ab7ecd46b019125d launches
+**08:20:22.182 UTC November2/sourced982167**, with74 pins. Original collector
+916435/invocation4fe85dbc943542098062105aa841e1d4 is active. DeclarationSHA
+`a533cbd83dfc7a23eefca0b483a06287915278ccabea7987bdb06875708f9a58`.
+The bounded1,024-action/4,096-frame capture passes in1.025s, matching128 original
+semantic events with357 invariant tensors,zero updates andpassing host guard.
+Four full arms are active; do not restart oroverlap this allocation.
+
+After both original services succeed and completion exists, the read-only
+`review_terminal.py` runs once via `run_cpu.py terminal-summary`. No original
+stage,collector,CPU qualification or completed capture should repeat. Existing
+training times and score gates stay unchanged; no new learner is selected.
