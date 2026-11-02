@@ -1,7 +1,12 @@
 # CDP handover — October25,2026
 
-The [fresh Breakout H30/R12 comparison](experiments/2026-11-02-cdp-breakout-h30-r12-200k.md) isselected afterthe bounded
-check closes successfully:8,192 actions/367 updates in51.413s,1,024 frozen/.892s
+The [fresh Breakout H30/R12 comparison](experiments/2026-11-02-cdp-breakout-h30-r12-200k.md) launches
+07:31:11.304 UTC November2/source538ef64 with422 pins and30-minute training cap.
+Original main912196/invocation5bfcdae0db9f4682a7e9e6c72c98adcd andallfour observers
+areactive. Startup passes357 matching initial tensors,47 pre-update transitions,
+correct cadence and494 finite reports through10,920 actions. No frozen result.
+
+The bounded check closes successfully:8,192 actions/367 updates in51.413s,1,024 frozen/.892s
 withzero updates/natural episodes;all382 pins,tensors,traces,replay andguards
 pass. Terminal reader07:26:54.448/completionSHA697e58e0. Do not repeat thecheck.
 Conservative200k projection23m00.725s passes30min; no experience isreused.
@@ -18,6 +23,14 @@ Prior short-Breakout/long-Qbert negatives remain;no isolated causal claim.
 Root `/x/Temp/kindle-breakout-h30-r12-20261102/full`;service
 `kindle-breakout-h30-r12-200k-20261102`. Checklive state;no overlap,restart,
 retry,cap increase,extension,confirmation orautomatic successor.
+
+Terminal readerSHAdfee5cc5 qualifies07:32:36.085 in2.371s withfive score cases,
+422 pins andoriginal identity unchanged. Recovery readerSHA99a8e23b remains
+pending afteroriginal100k retention/recovery success; runonce while main active
+via `run_cpu.py recovery`. Afterallfive services succeed andcompletion exists,
+run `review_full_terminal.py terminal` once via `run_cpu.py full-terminal`.
+No startup,qualification,stage orcollector repeats. CPU co-host costs remain
+uncorrected. DeclarationSHAaa57e4a5; no full frozen outcome isavailable.
 
 The [completed lower-dynamics/replay-value1 comparison](results/2026-11-02-cdp-breakout-value1-dynamics1e4.md)
 scores **42.917 sampled /112.125 greedy**, below70.750/143.667 by39.34%/21.95%,
