@@ -1,37 +1,29 @@
 # CDP handover — October25,2026
 
-The [fresh Qbert R20 seed18013 confirmation](experiments/2026-11-02-cdp-qbert-r20-seed18013.md)
-launches05:50:36.392 UTC November2/source0a4892a with1,046 pins and30-minute
-training cap. Original mainPID901816/invocation976a1ed5007f4ce8b343732f91c38cf9
-and allfour observers are active. Startup passes357 finite initial tensors,
-48 recorded initialization differences,47 pre-update transitions,correct cadence
-and274 finite reports through3,872 actions. Only learner/evaluation seeds change
-from16001; keep240k/18,721 updates,12M64/Auto/N8/B16/T16/H5/R20/dynamics1e-4/
-replay-value1/expert100/greedy collection,native447fe50,runnere304af89 andteacher.
-Greedy15000/90% stays primary; sampled results remain separate. No frozen result.
+The [completed Qbert R20 fresh-seed confirmation](results/2026-11-02-cdp-qbert-r20-seed18013.md)
+scores15,931.250 greedy/24 first pyramids on18013 in26m23.114s,versus development
+16001's15,279.167/24 in25m57.740s. Both pass the original15k/90% gate within30min:
+one passing development learner andone fresh confirmation,not broad reliability.
+Sampled14,976.042/24 and12,972.917/24 both fail15k; own fresh initials142.708
+greedy/198.958 sampled clear none. Retain240k/R20 withgreedy evaluation.
+Earlier R24 confirmations remain failed; Breakout andthe five-game goal remain
+unfinished. No Qbert extension,third learner orautomatic successor isselected.
 
-The100k/7,784 recovery passes06:01:43.727 and independent confirmation06:04:00.243
-preserves1,046 pins andoriginal main identity. Four files/206,067,159 bytes and
-357 finite tensors pass; reviewSHAebb84be5/retentionSHA7db7f5ff. Do not repeat
-100k confirmation. The200k recovery is also complete below; four final/own-initial
-24-episode assessments remain pending. CPU qualification passes21 scripts,1,046 declaration paths,eight
-actual preflight/four initialization cases. Original summary-key preparation
-failure and prequalification path correction remain; no GPU stage repeats.
-Terminal readerSHA5ca4b27b qualifies05:52:28 in4.809s,with two decision fixtures,
-both control recoveries and unchanged main identity. Its recovery100000
-and recovery200000 modes are complete; only terminal remains pending. Run it
-once after all original completion evidence exists. No startup,qualification,collector or stage repeats.
-The200k/15,596 recovery passes06:12:45.572 UTC November2,with four files /
-206,067,168 bytes and357 finite tensors. The qualified reader confirms it once
-at06:13:25.188 in3.055s (3.873s wrapper), preserving1,046 pins andoriginal main
-identity. ReviewSHA7e9db790,retentionSHAaec85ecc andmetadataSHA10a33c34 remain
-retained. Both recovery confirmations are complete; do not repeat them. The
-four frozen arms and terminal reader remain pending. CPU co-host cost remains
-uncorrected; checkpoint weights do not include uninterrupted restart state.
+Fresh240k actions/959,784 frames/18,721 updates keep12M64/Auto/N8/B16/T16/H5/R20/
+dynamics1e-4/replay-value1/expert100/greedy collection,native447fe50,runnere304af89
+andteacher fixed; onlylearner/evaluation seeds change. All1,046 pins,both100k/7,784
+and200k/15,596 recoveries,357 finite/invariant frozen tensors,48 recorded initial
+differences,full replays/videos,guards,curves,exposure,coverage andcomparison pass.
+Allfive original services succeed; main/post/collection finish06:25:18.233 /
+06:25:49.125 /06:26:21.455 UTC November2/source0a4892a. Original main901816 /
+976a1ed5007f4ce8b343732f91c38cf9 isterminal. Reader completes once06:27:04.671 in
+9.806s; completionSHA3fb594a7/summarySHAc41ca062. No full-run stage fails orrepeats;
+original CPU preparation failure andseparate correction remain preserved.
 
-Root `/x/Temp/kindle-qbert-r20-seed18013-20261102/full`; declarationSHAb6e10968.
-Check live state; no overlap,restart,extension,seed substitution or automatic
-successor. Prior R24 confirmation failures remain; the five-game goal is unfinished.
+Root `/x/Temp/kindle-qbert-r20-seed18013-20261102/full` isclosed. Both recovery
+readers andterminal reader arecomplete; do not repeat stages,collectors orreaders.
+Actual overrides25.3096% andguided16,043.5 are not frozen competence. CPU co-host
+cost staysuncorrected. No Kindle allocation isactive atclosure; checklive state.
 
 PR31's previous65,451-character dashboard is preserved at
 `/x/Temp/kindle-pr31-dashboard-20261102/pr-before-condensation.json`.
