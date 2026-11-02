@@ -31,6 +31,11 @@ regressions remain relevant. Root`/x/Temp/kindle-qbert-r20-240k-20261102/native-
 main`kindle-qbert-r20-check-20261102`. Check live state; no overlapping GPU job,
 retry,cap increase,nearby-ratio sweep orautomatic successor.
 
+The bounded service launches04:03:55 UTC November2/source8f7888a with940 pins.
+Original mainPID892720/invocation11f63ab7b11c450186b6e4a8193d79d1 andcollector
+892723/b08ef5d431b5457a9cd0ac663088a18d areactive. Startup reaches361 learner
+reports; final audit andcost gate remain pending. Do not restart oroverlap.
+
 The [Qbert replay-value1 crossed assessment](docs/results/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md)
 is complete. Learner14009 stays ahead on both cohorts:16525.000/15906.250 versus
 16001's15163.542/14913.542,all24/24 first pyramids. Cohort choice changes16001's
