@@ -1,6 +1,6 @@
 # Kindle: CDP learning roadmap
 
-The [fresh200k posterior-bootstrap comparison](experiments/2026-11-02-cdp-breakout-posterior-bootstrap-200k.md) is selected after
+The [fresh200k posterior-bootstrap comparison](experiments/2026-11-02-cdp-breakout-posterior-bootstrap-200k.md) launches **09:28:02.911 UTC November2/sourceb40979f** after
 successful bounded qualification. It keeps12M64/Auto/N8/B16/T16/H15/R16,
 encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100 and sampled
 collection. Only the intended replay-bootstrap setting changes imagined→posterior;
@@ -16,10 +16,14 @@ and final/actual-initial sampled/greedy24-episode assessments against retained
 70.750/143.667 in21m27.910s. Training cap30min; sampled is primary.
 
 Root `/x/Temp/kindle-replay-bootstrap-20261102/full`; service
-`kindle-breakout-posterior-bootstrap-200k-20261102`. Preparation is complete;
-launch and startup verification remain. Check live state before launch and
-never overlap another GPU job. No extension,cap increase,restart,sweep or
-automatic successor. The five-game goal remains unfinished.
+`kindle-breakout-posterior-bootstrap-200k-20261102`, original PID928259/
+invocation7aac1e71b2de47f9934cb67d2f7ee1ef. Allfour observers are active.
+Startup passes **09:28:19.243** with412 pins,357 matching initial tensors,
+47 pre-update events,correct cadence and94 finite reports through1,880 actions.
+The1.512s CPU startup wrapper co-hosts with learning; no timing correction.
+No frozen gameplay result is available. Check live state; never restart this
+learner or overlap another GPU job. No extension,cap increase,sweep or automatic
+successor. The five-game goal remains unfinished.
 
 The [closed bounded check](results/2026-11-02-cdp-breakout-posterior-bootstrap.md) passes8,192 actions/489 updates in46.900s,
 with a conservative20m59.510s projection. All373 pins,357 initial/invariant

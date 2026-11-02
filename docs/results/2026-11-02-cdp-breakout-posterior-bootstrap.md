@@ -90,3 +90,39 @@ remains unfinished.
 | Bounded declaration | `c712da89c139a1032e06aa0c5b6d20719538e7d06c90a266e062d54641589050` |
 | Original completion | `efbe8f3b78b3902cf84d33749310b9c57ce3112db35aabe4a8b886e3bfa0301e` |
 | Terminal summary | `efc898c83bfa1f6719a64e9382bbd1f7629b61fb6d48caf37854a2abe043d235` |
+
+## Fresh200k gameplay comparison is running
+
+The separately selected [full protocol](../experiments/2026-11-02-cdp-breakout-posterior-bootstrap-200k.md)
+launches **09:28:02.911 UTC November2/sourceb40979f**. Fresh learner1009 keeps
+12M64/Auto/N8/B16/T16/H15/R16, encoder4e-5/behavior8e-5/dynamics4e-4,
+replay-value1/expert100, sampled collection and the retained teacher. The
+intended setting change is imagined→posterior replay bootstrap; native and
+runner differ, so no isolated causal claim follows. No prior experience is reused.
+
+The fixed budget is200k actions/12,477 updates and a30-minute training cap,
+with retained100k/6,227 recovery. Four final/actual-initial sampled/greedy arms
+retain24 natural episodes and the original90%-two-wall gate. Compare against
+retained70.750/143.667 in21m27.910s; sampled is primary. All full-run outcomes
+remain pending.
+
+Before launch, allfive actual commands,18 controllers,34 configuration cases,
+15 startup-header cases,seven prelaunch cases,11 recovery cases and retention/
+collector checks pass in2.366s. All373 bounded and338 control pins remain intact.
+Selection pins412 inputs; declaration SHA
+`681c5c61fee8ed9c7b5547ba3a19d467e27118ace46b16804b6b396bd76f550a`.
+No agent or environment is constructed during CPU preparation.
+
+Main service `kindle-breakout-posterior-bootstrap-200k-20261102` retains original
+PID928259/invocation7aac1e71b2de47f9934cb67d2f7ee1ef. Postprocessing,progress,
+recovery and collection observers are active. Startup review passes
+**09:28:19.243** with412 unchanged pins,357 initial tensors matching both bounded
+and retained-control models,47 pre-update semantic events and correct cadence.
+Its complete prefix has1,880 actions and94 finite supervised reports. The1.512s
+CPU startup wrapper co-hosts with learning; retain this caveat without correcting
+training time. No failure, repeated stage or runtime change occurs at startup.
+
+Root `/x/Temp/kindle-replay-bootstrap-20261102/full` is active. Check live state;
+do not restart the learner or schedule overlapping GPU work. No extension,
+cap increase,sweep,confirmation or automatic successor is selected. Breakout
+and the five-game goal remain unfinished.
