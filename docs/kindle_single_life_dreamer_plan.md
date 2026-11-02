@@ -25,11 +25,19 @@ score cases,422 pins andoriginal identity unchanged. The recovery reader passes
 once06:55:54.958 in1.291s (1.311s wrapper):422 pins,206,067,163 retained bytes,
 6,391 finite reports through102,632 actions andoriginal main identity unchanged.
 Recovery confirmationSHAa79ff50d; weights/metadata omit replay,belief,games/RNG.
-CPU co-host time remains uncorrected. Onlythe terminal reader remains pending;
+CPU co-host time remains uncorrected. The terminal reader remains pending;
 run once afterallfive original services succeed andcompletion exists. Do not
 repeat recovery, startup, qualification, stages orcollectors. Root
 `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102/full`; declarationSHAc14ab341.
 Check live state; no overlap,restart,extension orautomatic successor.
+
+A separate saved-log coverage reader qualifies06:59:46.515/source03d7df9 in
+2.462s:four configuration cases,48 diagnostic/422 active pins andoriginal
+identity pass. Five prior boundary fixtures andthe completed control analysis
+are reused without repeat. Afterthe terminal summary,run `review_score_coverage.py
+terminal` once via `run_cpu.py score-coverage-terminal`. ReaderSHA18eca0be,
+declarationSHA174ee79f; fixedscore bins are not verified wall boundaries.
+No GPU work or new learner; both final readers remain pending.
 
 The [completed Qbert R20 fresh-seed confirmation](results/2026-11-02-cdp-qbert-r20-seed18013.md)
 scores15,931.250 greedy/24 first pyramids on18013 in26m23.114s,versus development

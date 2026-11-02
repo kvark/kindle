@@ -119,3 +119,31 @@ succeed and completion exists. Final frozen gameplay remains unmeasured.
 | Original checkpoint review |`24c9da83b7fea696bf64ae859d18178bba3fd4cc38597e04825a64dc2b4cf4b5`|
 | Retention |`244ff20072ddd064ce7b084a0e775a8797f03572d581d9e5359460961081a1c1`|
 | Separate confirmation |`a79ff50d3b899ba3483601c7338c19307bff5322fa7f7f3e2ba7d8e0aaae6f33`|
+
+## Qualified saved-log coverage follow-up
+
+Before final outcomes, a separate CPU reader qualifies **06:59:46.515 UTC
+November 2/source03d7df9**, in 2.462s (2.482s wrapper). Four cases validate the
+actual configuration and reject wrong dynamics rate, behavior rate and action
+mode. The parent's five passing score/cap/frame boundary fixtures are retained
+without repetition. All 48 diagnostic pins, 422 active inputs and the original
+learner identity remain unchanged. Source preparation takes .017s; no failure,
+native or emulator import, GPU work, replay or learning occurs.
+
+After original completion and the terminal summary pass, read only this new
+learner's training and four frozen logs once. Reuse the completed scale1 control
+analysis from `kindle-breakout-score-coverage-20261102/review.json`,
+`trials.candidate`. Keep pre-action score ranges 0–215,216–431,432–647,648–863,
+864+, actual overrides/native actions and all completed/partial episodes.
+Frozen summaries retain the original first three natural episodes per lane.
+These score fractions do not identify wall boundaries or isolate the cause of
+an outcome. The sampled-primary metric and original task gate stay unchanged.
+
+Root `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102` contains
+`review_score_coverage.py` (SHA18eca0beec0c6869e201274a3e55f2cacee988bd9f1b65c9482ebb4c4ece2c9e)
+and `score-coverage-declaration.json` (SHA174ee79f0c51ec71adb01073556f3f46e701cb6ab99d30dd72c673ce587b9d83).
+Preflight is complete; do not repeat it. Run terminal mode once via
+`run_cpu.py score-coverage-terminal` after `full-terminal-summary.json` passes.
+Output `score-coverage-review.json`. Preserve CPU co-host cost without training
+time correction; no old analysis, environment replay or successful stage repeat.
+No new learner, guidance change or successor is selected by this diagnostic.
