@@ -1,5 +1,10 @@
 # Breakout critic consistency on saved real trajectories
 
+Completed02:27:46.302 UTC November2: sampled one-step residual RMSE.732/.941,
+15-step2.546/3.121,complete-return6.682/6.691. All32 diagnostic/73 source/912
+active pins pass; no GPU work. Original import failure and runtime repair remain.
+[Result and limits](../results/2026-11-02-cdp-breakout-value-consistency.md).
+
 This CPU-only diagnostic is part of the five-game learning diagnosis. The
 [completed critic captures](../results/2026-11-02-cdp-breakout-current-critic.md)
 show weak sampled complete-return prediction, with correlations.105/.097 for

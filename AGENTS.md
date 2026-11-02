@@ -93,6 +93,11 @@ competence. Keep detailed results in the roadmap and linked reports,not a
 growing history in this file.
 
 Latest qualified Breakout evidence:
+- [Value consistency](docs/results/2026-11-02-cdp-breakout-value-consistency.md):
+  sampled one-step RMSE.732/.941 versus complete-return6.682/6.691. Short targets
+  use the same critic's bootstrap; terminal slices are outcome-conditioned.
+  All32 diagnostic/73 source/912 active pins pass;6.366s CPU-only,original Qbert
+  identity preserved. Import failure/repair retained; no new loss orlearner.
 - [Encoder4e-5](docs/results/2026-11-01-cdp-breakout-encoder4e5.md):
   sampled/greedy56.292/104.667 versus25.292/42.625 at2e-5;21m28s versus22m27s.
   All227 pins,recovery,initial/frozen tensors,replays,guards and original

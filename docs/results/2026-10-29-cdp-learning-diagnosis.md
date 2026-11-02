@@ -28,6 +28,15 @@ restart this learner orschedule another GPU job while active. No tuning,retry,
 cap increase,extension,seed substitution orautomatic successor. The five-game
 goal remains unfinished.
 
+The [completed Breakout real-trajectory value diagnostic](2026-11-02-cdp-breakout-value-consistency.md) finds
+sampled one-step residual RMSE.732/.941 and15-step2.546/3.121,while complete-return
+RMSE remains6.682/6.691. Short targets bootstrap with the same critic; they do
+not prove calibrated value or native-target fitting. Last15 sampled mean values
+14.782/19.343 exceed realized.377/.592,an outcome-conditioned slice,not causal
+proof. All32 diagnostic/73 source/912 active pins pass;6.366s CPU-only analysis
+completes02:27:46.302/source9010df1. Original import failure/repair remain;
+Qbert's original identity is unchanged. No new loss orlearner is selected.
+
 The [completed Qbert replay-value scale1 comparison](2026-11-02-cdp-qbert-replay-value1.md) finishes200k actions /
 799,786 frames /18,715 updates in**25m36.935s**. Greedy**16,525.000** improves
 14,770.833 by11.88% andpasses15k/90% with24/24 first pyramids. Sampled14,882.292
