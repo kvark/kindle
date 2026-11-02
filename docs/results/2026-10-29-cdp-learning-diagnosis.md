@@ -1,21 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [Qbert replay-value scale1 check](../experiments/2026-11-02-cdp-qbert-replay-value1.md) is selected within the existing
-five-game goal:8192 actions/733 updates,180s training plus1024 frozen/zero updates.
+The [completed Qbert replay-value scale1 check](2026-11-02-cdp-qbert-replay-value1.md) passes8192 actions /
+32,755 frames /733 updates in57.202s;1024 frozen/.855s haszero updates andno
+natural completed episodes. Conservative200k projection25m36.196s clears30min.
+All815 pins,357 control-matching initial/invariant frozen tensors,47 pre-update
+semantic events,finite reports,full pixel/action/label replay andhost guards pass.
+Main/collector succeed01:15:11.906/01:15:18.703 UTC November2/source921ad96;
+originalPID877568/invocation7245ee2b08064c578610357b76b6fe60. Both services are
+terminal success; no original GPU/replay/collector stage fails orrepeats.
+
 Only existing replay-value scale0.3→1 changes at12M64/Auto/N8/B16/T16/H5/R24,
 dynamics1e-4/base-encoder-behavior4e-5/greedy/expert100 on reused14009. Critic and
-representation objectives both change; bootstrapped targets remain. No isolated
-critic cause or independent confirmation is claimed. Native447fe50/35ad0db and
-teacherfa261c53 stay fixed; runner e304af89 adds only the fresh CLI option.
+representation objectives both change; bootstrapped targets remain. Native
+447fe50/35ad0db,teacherfa261c53 fixed; runner e304af89 adds only the fresh CLI.
+No isolated critic cause,independent confirmation orgameplay gain is established.
+All27 production/private CPU tests pass; original fixture/anchor failures and
+separate repairs remain. Terminal readout2.769s passes01:15:58.242.
 
-All27 focused CPU tests pass in production and private runner; both commands,
-ten config checks,357 shapes and cadence pass; all768 control pins remain.
-Original CPU fixture/source-anchor failures and separate repairs are retained.
-Require initial/frozen tensors,pre-update semantics,full replay and host guards.
-Conservative200k projection must fit30min before a separate full-run selection.
-No full learner,extension,sweep or automatic successor is selected. Root
-`/x/Temp/kindle-qbert-replay-value1-20261102/native-check`; check live state before
-GPU work and do not overlap an active learner. Gameplay benefit is unmeasured.
+Root `/x/Temp/kindle-qbert-replay-value1-20261102/native-check` isclosed;
+completionSHA91b0870d. No full learner,extension,sweep orautomatic successor is
+selected. Do not repeat this check,collector orreader. No active allocation
+remains; check live state before GPU work. The five-game goal isunfinished.
 
 The [completed Breakout actor/critic-rate comparison](../results/2026-11-02-cdp-breakout-behavior8e5.md) finishes
 200k actions /799,577 frames /12,477 updates in **21m44.517s**. Sampled **59.000**

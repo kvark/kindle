@@ -1,5 +1,12 @@
 # Qbert: bounded replay-value scale1 comparison
 
+Completed November2:8192 actions/733 updates in57.202s;1024 frozen/.855s,
+zero updates. All815 pins,357 initial/frozen tensors,47 pre-update events,replay
+andguards pass; original main/collector succeed01:15:11.906/01:15:18.703 UTC.
+Conservative projection25m36.196s clears30min; gameplay benefit remains unmeasured.
+[Completed result](../results/2026-11-02-cdp-qbert-replay-value1.md). No full learner
+or automatic successor is selected; do not repeat completed stages.
+
 Selected November2 within the unfinished five-game goal. One bounded execution
 and cost check is selected; a full learner requires a separate decision after
 this check closes. No old experience or completed stage is reused.
