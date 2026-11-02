@@ -1,5 +1,34 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed Breakout H30/R12 comparison](2026-11-02-cdp-breakout-h30-r12.md) scores **58.917 sampled /
+124.708 greedy**, below70.750/143.667 by16.73%/13.20%, in **23m15.641s**
+(+8.36%). Initial-subtracted return/min falls23.47%/20.09%; all0/24 two-wall.
+Retain H15/R16 with12M64/Auto/N8/B16/T16/encoder4e-5/behavior8e-5/dynamics4e-4/
+replay-value1/expert100 and sampled collection. Horizon and ratio change rollout
+length,cadence,sampling,warmup and relative work together; reused1009/cohort
+provides no isolated mechanism or independent reliability claim.
+
+All422 pins,100k/4,670 recovery,357 matching initial/invariant frozen tensors,
+47 pre-update and800/795 actual-initial semantic events,replays/videos,guards,
+curves,exposure and comparison pass. Allfive original services succeed: main/
+post/collection **07:58:54.411/07:59:16.112/07:59:20.722 UTC November2**,
+launch source538ef64. Terminal reader passes once08:00:10.140 in2.623s;
+completionSHAac50672c/summarySHA5d7058c4. No original stage fails or repeats.
+
+The separate CPU coverage reader fails on its obsolete12,477-update assertion;
+preserve that failure. A separately qualified9,358-update repair completes
+08:03:41.018 in2.918s, with52 original/11 repair/422 full pins. All288,800 actions
+and1,154,554 frames reconcile; completed control analysis is reused. Native
+216–431 exposure falls1,262→1,157 (.631%→.5785%), with none at432+. Score
+fractions do not establish walls or a causal mechanism. CoverageSHA41792f03.
+
+Root `/x/Temp/kindle-breakout-h30-r12-20261102/full` is closed. Recovery,terminal
+and repaired coverage readers are complete; do not repeat stages,collectors,
+qualification or readers. No learner or GPU allocation is active at closure;
+check live state. No extension,confirmation,sweep or automatic successor is
+selected. CPU co-host costs remain uncorrected. Breakout and the five-game goal
+remain unfinished. Detailed evidence stays in the linked result and protocol.
+
 The [completed lower-dynamics/replay-value1 comparison](2026-11-02-cdp-breakout-value1-dynamics1e4.md)
 scores **42.917 sampled /112.125 greedy**, below70.750/143.667 by39.34%/21.95%,
 in21m36.378s (+0.66%). Initial-subtracted return/min falls40.54%/22.81%; all0/24

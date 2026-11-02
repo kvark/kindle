@@ -6,44 +6,36 @@ and [PR31](https://github.com/kvark/kindle/pull/31) for the live dashboard.
 The five-game goal remains unfinished. Detailed experiment history belongs in
 those reports; historical “next” paragraphs do not authorize restarting jobs.
 
-## Active work — November 2
+## Current work — November 2
 
-The [fresh Breakout H30/R12 comparison](experiments/2026-11-02-cdp-breakout-h30-r12-200k.md) remains active after its
-verified **100,000-action / 4,670-update recovery**. Original main912196 /
-invocation5bfcdae0db9f4682a7e9e6c72c98adcd continues unchanged; postprocessing,
-progress and collection observers remain active. Launch07:31:11.304 UTC
-November2/source538ef64,422 pins,30-minute training cap. No frozen outcome yet.
+The [completed Breakout H30/R12 comparison](results/2026-11-02-cdp-breakout-h30-r12.md) scores **58.917 sampled /
+124.708 greedy**, below70.750/143.667 by16.73%/13.20%, in **23m15.641s**
+(+8.36%). Initial-subtracted return/min falls23.47%/20.09%; all0/24 two-wall.
+Retain H15/R16 with12M64/Auto/N8/B16/T16/encoder4e-5/behavior8e-5/dynamics4e-4/
+replay-value1/expert100 and sampled collection. Horizon and ratio change rollout
+length,cadence,sampling,warmup and relative work together; reused1009/cohort
+provides no isolated mechanism or independent reliability claim.
 
-The original recovery service succeeds **07:42:47.665**. The separate reader
-passes once **07:43:12.544**, in1.285s (1.304s wrapper):422 pins,357 finite tensors,
-four retained files/206,067,161 bytes,4,705 finite reports through100,752 actions,
-matching configuration and original process identity. ConfirmationSHA327621dd.
-Do not repeat startup, recovery, qualification or completed stages.
+All422 pins,100k/4,670 recovery,357 matching initial/invariant frozen tensors,
+47 pre-update and800/795 actual-initial semantic events,replays/videos,guards,
+curves,exposure and comparison pass. Allfive original services succeed: main/
+post/collection **07:58:54.411/07:59:16.112/07:59:20.722 UTC November2**,
+launch source538ef64. Terminal reader passes once08:00:10.140 in2.623s;
+completionSHAac50672c/summarySHA5d7058c4. No original stage fails or repeats.
 
-Train200k/9,358 updates, then four final/actual-initial24-episode sampled/greedy
-arms against70.750/143.667. Sampled stays primary; the90%-two-wall gate stays
-fixed. H15/R16→H30/R12 changes rollout length,cadence,sampling,warmup andrelative
-work. Keep12M64/Auto/N8/B16/T16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/
-expert100,sampled collection,exact runnercf4ea238/native447fe50/teacher.
-No isolated causal claim or experience reuse. The bounded check is closed:
-8,192 actions/367 updates/51.413s,382 pins,conservative23m00.725s projection;
-its frozen1,024 actions have zero updates/no natural episodes. Do not repeat it.
+The separate CPU coverage reader fails on its obsolete12,477-update assertion;
+preserve that failure. A separately qualified9,358-update repair completes
+08:03:41.018 in2.918s, with52 original/11 repair/422 full pins. All288,800 actions
+and1,154,554 frames reconcile; completed control analysis is reused. Native
+216–431 exposure falls1,262→1,157 (.631%→.5785%), with none at432+. Score
+fractions do not establish walls or a causal mechanism. CoverageSHA41792f03.
 
-Full CPU qualification and startup pass; terminal readerSHAdfee5cc5 is qualified.
-After all five original services succeed and completion exists, run
-`review_full_terminal.py terminal` once via `run_cpu.py full-terminal`.
-The saved-log coverage readerSHA7d346078 qualifies07:40:38.302 in2.428s:
-six configuration cases,52 diagnostic/422 active pins; five old boundary cases
-are retained without repetition. After the full terminal summary, run
-`review_score_coverage.py terminal` once via `run_cpu.py score-coverage-terminal`.
-Reuse the completed control analysis; no new gameplay or GPU work. Score
-fractions do not establish walls or isolate a coverage/horizon mechanism.
-
-Root `/x/Temp/kindle-breakout-h30-r12-20261102/full`; service
-`kindle-breakout-h30-r12-200k-20261102`. Check live state; no overlap,restart,
-retry,cap increase,extension,confirmation or automatic successor. Preserve CPU
-co-host durations without correcting training time. DeclarationSHAaa57e4a5;
-coverage declarationSHA9d98d514. Breakout and the five-game goal remain unfinished.
+Root `/x/Temp/kindle-breakout-h30-r12-20261102/full` is closed. Recovery,terminal
+and repaired coverage readers are complete; do not repeat stages,collectors,
+qualification or readers. No learner or GPU allocation is active at closure;
+check live state. No extension,confirmation,sweep or automatic successor is
+selected. CPU co-host costs remain uncorrected. Breakout and the five-game goal
+remain unfinished. Detailed evidence stays in the linked result and protocol.
 
 ## Current AMD runtime and retained position
 
@@ -63,7 +55,7 @@ decision-equivalent teacher. Python is `/x/Code/kindle/python/.venv/bin/python`
 (CPython3.13). Declarations pin exact sources, binaries, runners, teachers,
 configuration and environment. Do not mix optional runtime overlays.
 
-The active guard records boot `a8648671-8577-4f42-9b46-a4345d3ac297` and kernel
+The latest completed guard records boot `a8648671-8577-4f42-9b46-a4345d3ac297` and kernel
 `7.0.0-38-generic`, with no host recovery performed. Check live state before
 GPU work; preserve guard stops on actual faults or nonfinite values. An observer
 timeout does not prove the learner stopped. Do not reset/reload/reboot the GPU.
