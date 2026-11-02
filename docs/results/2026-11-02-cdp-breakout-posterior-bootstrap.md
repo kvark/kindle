@@ -1,4 +1,91 @@
-# Posterior replay bootstraps pass execution and early cost checks
+# Posterior replay bootstrap lowers sampled Breakout and fails the paired protocol
+
+Retain the imagined replay bootstrap. The candidate's accepted sampled score
+falls **70.750→53.708 (−24.09%)**, while training takes **21m37.556s**,
+**0.75% longer** than the control's21m27.910s. Initial-subtracted sampled return
+per training minute falls **25.14%**. The actual-initial sampled mean1.417
+matches. The greedy final arm records two25,000-action timeouts, so the full
+comparison is **closed_protocol_failed**, not an accepted paired result.
+
+| Fixed assessment | Retained imagined bootstrap | Posterior bootstrap |
+| --- | ---: | ---: |
+| Sampled final mean,24 natural episodes |70.750|53.708|
+| Sampled actual-initial mean |1.417|1.417|
+| Greedy final accepted mean |143.667|Not accepted: two timeouts|
+| Greedy actual-initial mean |2.208|2.208|
+| Training time |21m27.910s|21m37.556s|
+| Sampled initial-subtracted return/min |3.230|2.418|
+
+The greedy natural-only cohort mean117.917 is retained solely as a censored
+diagnostic. All four natural cohorts have0/24 two-wall successes. Its two
+truncated episodes occur in lanes4/5 at aggregate actions200,000/235,008,
+with returns46/48 and lengths25,000 each. The arm ultimately finishes three
+natural episodes perlane in238,952 actions/226.218s, within its original cap.
+Do not discard either timeout or redefine acceptance after seeing the result.
+
+The [full protocol](../experiments/2026-11-02-cdp-breakout-posterior-bootstrap-200k.md)
+keeps12M64/Auto/N8/B16/T16/H15/R16,encoder4e-5/behavior8e-5/dynamics4e-4,
+replay-value1/expert100,sampled collection and teacher fixed. It changes the
+intended replay bootstrap imagined→posterior for both critic and representation
+losses. Native11373c1/runner8952f81f differ from retained447fe50/cf4ea238.
+Reused1009/cohort and changed sources prevent isolated causal or seed-reliability
+claims. This result does not support the target change or identify a single
+cause of the critic's earlier calibration error.
+
+## Completed evidence and preserved failures
+
+Training completes **200,000 actions /799,562 frames /12,477 updates**. All
+**412 original inputs**,100k/6,227 retained recovery,357 matching initial tensors,
+357 invariant frozen tensors perarm,800/795 actual-initial semantic events,
+finite reports,replays/videos,host guards,curves and exposure checks pass.
+The four frozen arms total **285,280 actions /1,140,815 frames /261.765s**,
+with zero updates. Guided training replay verifies full pixel/action/label
+consistency; ordinary frozen replay verifies recorded outcomes/frames/resets,
+without unavailable live pixel hashes.
+
+Actual training overrides87,981 actions (**43.9905%**). Final50k replay imitation
+CE is0.561238 versus control0.560514; these training-fit values do not establish
+a policy mechanism. Guided online scores remain separate from unaided competence.
+CPU startup,reader qualification and recovery co-host costs remain uncorrected.
+
+Original main928259/invocation7aac1e71b2de47f9934cb67d2f7ee1ef fails
+**09:54:47.194 UTC November2** at the declared zero-truncation assertion,
+after allfive GPU stages finish. Collection fails**09:55:09.359**. Original
+postprocessing,progress and recovery terminate successfully. Every host guard
+passes. The original sampled-final and sampled-initial replays/videos are
+complete before the audit rejects the greedy arm; neither replay is repeated.
+
+The [separate CPU closure](../experiments/2026-11-02-cdp-breakout-posterior-bootstrap-closure.md)
+preserves534 inputs and runs only the three missing replays: final-greedy,
+initial-greedy and guided training. They all succeed. The closure then fails
+**10:06:17.630** on an overly strict assertion rejecting ALE imports:
+`audit_atari_tasks.py` imports ALE for score/replay identity checks. Its source,
+declaration,successful replay outputs and failed service remain unchanged.
+
+A separate repair reuses **every completed replay**, preserves **553 inputs**,
+and corrects that import-only check while still requiring no native Kindle
+import. It finishes summaries,exposure and explicitly failure-labeled curves
+in **10.403s**, completing **10:11:27.827 UTC**; the10.437s wrapper exits0.
+Terminal confirmation passes once**10:12:01.748**, verifying22 artifacts and
+that no Kindle allocation remains active. The curve is visually reviewed.
+No GPU stage,successful replay or original collector repeats. The original
+main,collection and first CPU-closure services remain failed; no original
+passing learning review,postprocess review,comparison or completion is created.
+
+Evidence root `/x/Temp/kindle-replay-bootstrap-20261102`; failed CPU attempt in
+`cpu-closure`, completed failure closure in`cpu-closure-repair`. Do not repeat
+training,frozen captures,replays,collectors,terminal readers or qualification.
+No extension,cap increase,retry,confirmation or automatic successor is selected.
+Check live state before new work. Breakout and the five-game goal remain unfinished.
+
+| Closure artifact | SHA256 |
+| --- | --- |
+| Original CPU closure declaration |`a5fce034abd4ef7efcdccc98a1b2c9a7134b3b9794aed208c669b9753b0ec86e`|
+| Repair declaration |`d736288bf8cae2437a5a87cc89b1e2d0591f68db82b5bca3ae33fc3e0386f464`|
+| Closed protocol-failure review |`de4c7aaddd1a9b45f967f3c3578121c0af5a1a69e8ee99949b64105130abe173`|
+| Diagnostic summary |`211847531eba0ee4a9a42d1f86d491ec82cd13e322c49fce9106d8ac83c6da25`|
+
+## Earlier bounded qualification
 
 The optional observed-state bootstrap completes **8,192 actions / 32,726 frames /
 489 updates in46.900s**. Its conservative200k projection is **20m59.510s**,
@@ -6,7 +93,8 @@ below the30-minute training cap. The following1,024 frozen actions take.879s,
 with zero updates and no natural completed episodes. This establishes execution
 and early cost; no gameplay benefit is established. The separately selected
 [fresh200k comparison](../experiments/2026-11-02-cdp-breakout-posterior-bootstrap-200k.md)
-will measure frozen gameplay without reusing this bounded experience.
+subsequently measures frozen gameplay without reusing this bounded experience;
+its protocol failure and lower sampled score are reported above.
 
 The [fixed protocol](../experiments/2026-11-02-cdp-breakout-posterior-bootstrap.md)
 tests a specific value-target hypothesis after the [calibration diagnostic](2026-11-02-cdp-breakout-value-calibration.md).
@@ -91,7 +179,7 @@ remains unfinished.
 | Original completion | `efbe8f3b78b3902cf84d33749310b9c57ce3112db35aabe4a8b886e3bfa0301e` |
 | Terminal summary | `efc898c83bfa1f6719a64e9382bbd1f7629b61fb6d48caf37854a2abe043d235` |
 
-## Fresh200k gameplay comparison is running
+## Fresh200k launch and initial checks
 
 The separately selected [full protocol](../experiments/2026-11-02-cdp-breakout-posterior-bootstrap-200k.md)
 launches **09:28:02.911 UTC November2/sourceb40979f**. Fresh learner1009 keeps
@@ -103,8 +191,8 @@ runner differ, so no isolated causal claim follows. No prior experience is reuse
 The fixed budget is200k actions/12,477 updates and a30-minute training cap,
 with retained100k/6,227 recovery. Four final/actual-initial sampled/greedy arms
 retain24 natural episodes and the original90%-two-wall gate. Compare against
-retained70.750/143.667 in21m27.910s; sampled is primary. All full-run outcomes
-remain pending.
+retained70.750/143.667 in21m27.910s; sampled is primary. At launch, all full-run outcomes
+remained pending.
 
 Before launch, allfive actual commands,18 controllers,34 configuration cases,
 15 startup-header cases,seven prelaunch cases,11 recovery cases and retention/
@@ -115,14 +203,14 @@ No agent or environment is constructed during CPU preparation.
 
 Main service `kindle-breakout-posterior-bootstrap-200k-20261102` retains original
 PID928259/invocation7aac1e71b2de47f9934cb67d2f7ee1ef. Postprocessing,progress,
-recovery and collection observers are active. Startup review passes
+recovery and collection observers are started. Startup review passes
 **09:28:19.243** with412 unchanged pins,357 initial tensors matching both bounded
 and retained-control models,47 pre-update semantic events and correct cadence.
 Its complete prefix has1,880 actions and94 finite supervised reports. The1.512s
 CPU startup wrapper co-hosts with learning; retain this caveat without correcting
 training time. No failure, repeated stage or runtime change occurs at startup.
 
-Root `/x/Temp/kindle-replay-bootstrap-20261102/full` is active. Check live state;
+At startup, `/x/Temp/kindle-replay-bootstrap-20261102/full` is active. Check live state;
 do not restart the learner or schedule overlapping GPU work. No extension,
 cap increase,sweep,confirmation or automatic successor is selected. Breakout
 and the five-game goal remain unfinished.
@@ -136,7 +224,7 @@ the retained evidence and reject incorrect scores, native/runner identities,
 teacher identity, bootstrap mode and behavior rate. It imports neither native
 Kindle nor ALE and performs zero GPU work or learning updates.
 
-The reader will verify allfive original service identities and terminal states,
+The success-only reader was prepared to verify allfive original service identities and terminal states,
 completion hashes,100k retained weights,initial/frozen invariants,complete
 replays/videos and the exact comparison before summarizing results. Its SHA is
 `81d834e5ffbe17ac1e5df1d5e017bc77426a4145bb5cadfc57d26425132e945f`.
@@ -145,7 +233,8 @@ The separately prepared recovery reader has SHA
 Both remain outside the active controller tree; no runtime,teacher,queue,
 controller,checkpoint or observer is changed. Retain CPU co-host time without
 correcting training time. At qualification, recovery and terminal execution remain pending. Do not repeat
-their qualification or any completed stage.
+their qualification or any completed stage. It is not executed after the original
+comparison fails; the separate protocol-failure closure is described above.
 
 ## Halfway recovery is retained
 
@@ -163,9 +252,10 @@ The original journal contains exactly one checkpoint pass and a successful
 watcher completion. Checkpoint review SHAe7ee50c9, retention SHAb17957d5,
 metadata SHAc66c8d3c. The recovery observer is terminal; do not restart or repeat it.
 
-Main PID928259/invocation7aac1e71b2de47f9934cb67d2f7ee1ef continues unchanged;
-postprocessing,progress and terminal collection remain active. No GPU work,
+At recovery confirmation, main PID928259/invocation7aac1e71b2de47f9934cb67d2f7ee1ef
+continues unchanged; postprocessing,progress and terminal collection remain active. No GPU work,
 learner update, replay or observer is repeated by the confirmation. Retain its
 CPU co-host cost without correcting training time. The retained checkpoint
 omits replay,belief,games and RNG and is a warm start, not an uninterrupted
-snapshot. Final200k learning and allfour frozen outcomes remain pending.
+snapshot. At that milestone, final200k learning and allfour frozen outcomes
+remain pending; their terminal outcome is reported above.

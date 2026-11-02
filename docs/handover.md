@@ -8,45 +8,43 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 2
 
-The [fresh200k posterior-bootstrap comparison](experiments/2026-11-02-cdp-breakout-posterior-bootstrap-200k.md) launches **09:28:02.911 UTC November2/sourceb40979f** after
-successful bounded qualification. It keeps12M64/Auto/N8/B16/T16/H15/R16,
-encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100 and sampled
-collection. Only the intended replay-bootstrap setting changes imagined→posterior;
-native11373c1/runner8952f81f differ from retained447fe50/cf4ea238, so no isolated
-causal claim follows. Teacher and original two-wall gate stay fixed.
+The [posterior-bootstrap comparison](results/2026-11-02-cdp-breakout-posterior-bootstrap.md) is **closed_protocol_failed**.
+Training completes200k actions/799,562 frames/12,477 updates in **21m37.556s**
+(+.75%). Accepted sampled53.708 falls24.09% below70.750; initial-subtracted
+return/min falls25.14%. Own initial1.417 matches. Greedy has two25,000-action
+timeouts; natural-only117.917 is censored diagnostic,not an accepted score.
+Own initial-greedy2.208 matches; all natural cohorts have0/24 two-wall successes.
+Retain imagined bootstrap with12M64/Auto/N8/B16/T16/H15/R16,
+encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100 and sampled collection.
+Native11373c1/runner8952f81f differ from retained447fe50/cf4ea238; reused1009/cohort
+supports no isolated causal or seed-reliability claim.
 
-Allfive actual commands and18 controllers pass CPU preflight, including34
-config cases,15 startup-header cases,seven prelaunch cases,11 recovery cases
-and retention/collector checks. All373 bounded/338 control pins remain intact;
-no native agent or environment is constructed. Preflight completes09:26:27.230
-UTC November2 in2.366s. Require100k/6,227 retained recovery,200k/12,477 final,
-and final/actual-initial sampled/greedy24-episode assessments against retained
-70.750/143.667 in21m27.910s. Training cap30min; sampled is primary.
+All412 original/553 repair pins,100k/6,227 retained recovery,357 matching initial
+and invariant frozen tensors,800/795 actual-initial semantic events,full
+replays/videos,guards,curves and exposure checks pass. Four frozen arms total
+285,280 actions/1,140,815 frames/261.765s,zero updates. Actual overrides87,981
+(43.9905%); guided online returns are not frozen competence.
 
-Root `/x/Temp/kindle-replay-bootstrap-20261102/full`; service
-`kindle-breakout-posterior-bootstrap-200k-20261102`, original PID928259/
-invocation7aac1e71b2de47f9934cb67d2f7ee1ef. Original recovery succeeds
-**09:39:09.306 UTC**;100k/6,227 weights and metadata are retained (206,067,205
-bytes). Confirmation passes09:39:49.658 with412 pins and357 finite tensors;
-6384 finite reports through102,504 actions are checked. Terminal-reader
-preflight passes09:34:44.522 withfive score/six config cases. Both CPU wrappers
-co-host for2.438/2.437s; no timing correction. Main and remainingthree observers
-continue unchanged; do not repeat recovery or reader qualification.
-Startup passes **09:28:19.243** with412 pins,357 matching initial tensors,
-47 pre-update events,correct cadence and94 finite reports through1,880 actions.
-The1.512s CPU startup wrapper co-hosts with learning; no timing correction.
-No frozen gameplay result is available. Check live state; never restart this
-learner or overlap another GPU job. No extension,cap increase,sweep or automatic
-successor. The five-game goal remains unfinished.
+Original main928259/7aac1e71b2de47f9934cb67d2f7ee1ef and collection fail
+**09:54:47.194/09:55:09.359 UTC November2**, after allfive GPU stages finish.
+The separate CPU closure fails10:06:17.630 on an overly strict ALE-import
+assertion after its three missing replays finish. Preserve every failure.
+A separate10.403s CPU repair completes **10:11:27.827** and terminal confirmation
+passes10:12:01.748; no GPU stage,successful replay or collector repeats. Original
+main/collection/CPU-closure services remain failed. No original passing review
+or completion is created; closureSHAde4c7aad/summarySHA21184753.
 
-The [closed bounded check](results/2026-11-02-cdp-breakout-posterior-bootstrap.md) passes8,192 actions/489 updates in46.900s,
-with a conservative20m59.510s projection. All373 pins,357 initial/invariant
-frozen tensors,47 pre-update events,replays and guards pass. Default restore
-matches128 events/357 tensors. Runtime11373c1 passes150 Rust/628 Python CPU
-checks and both strict Clippy checks; its2.989GiB cache is released. Original
-main/collector/terminal reader succeed09:08:00.345/09:08:08.088/09:08:31.094.
-Do not repeat qualification, compatibility, learner, replay,collector or reader.
-No full frozen gameplay benefit is available yet.
+Root `/x/Temp/kindle-replay-bootstrap-20261102`, closure in`cpu-closure-repair`.
+All services are terminal; no Kindle allocation is active at confirmation.
+Do not repeat training,frozen captures,replays,collectors,readers or qualification.
+No extension,cap increase,retry,confirmation or automatic successor is selected.
+Check live state before new work. The five-game goal remains unfinished.
+
+The earlier bounded qualification remains valid:8,192 actions/489 updates in
+46.900s; native11373c1 passes150 Rust/628 Python CPU checks and both strict
+Clippy checks. Default restore matches128 events/357 tensors. Its2.989GiB cache
+is released; wheel/native/test binary/evidence remain. Optional posterior mode
+is not retained as the learning recipe; default imagined bootstrap is unchanged.
 
 The [earlier scalar calibration](results/2026-11-02-cdp-breakout-value-calibration.md)
 recovers only a small sampled-value signal (affineRMSE7.698 versus constant7.855).
