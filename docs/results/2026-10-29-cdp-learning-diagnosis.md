@@ -1,46 +1,32 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh Breakout crop comparison](../experiments/2026-11-02-cdp-breakout-playfield-crop-200k.md)
-launches12:26:48.481 UTC November2/source53a75d7 with413 pins,200k actions/
-12,477 updates and30-minute training cap. Native crop0/32/160/168 keeps12M64/
-Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/
-expert100; teacher unchanged, HUD information removed. Startup passes357 matching
-initial tensors,47 bounded-crop transitions and882 finite updates through14,488
-actions. MainPID950033/invocation7bc8fe9931bd4f3fbee1f43739efb056 remains active;
-original postprocessing,progress and collection observers are active; recovery
-succeeds12:37:54.838 UTC and retains100k/6,227 with357 finite tensors. The
-read-only confirmation passes12:38:39.553 in2.003s, all413 pins unchanged,
-206,067,317 checkpoint bytes retained. Do not repeat that reader.
-Require100k/6,227 recovery and actual-initial/final sampled/greedy24-episode
-assessments against70.750/143.667 and the original90%-two-wall gate. No full
-frozen result yet. Nativeacb175f/runner046aa5bc differ from447fe50/cf4ea238;
-no isolated causal claim. Terminal confirmation remains pending. CPU coverage
-reader qualifies12:34:24.544 in2.459s with54 diagnostic/413 active pins, six
-configuration/three counter cases and prior boundary fixtures reused. Its final
-stage remains pending original full success; no trajectory analysis repeats.
-Root `/x/Temp/kindle-playfield-crop-20261102/full`, service
-`kindle-breakout-playfield-crop-200k-20261102`. Check live state; do not restart,
-repeat closed stages or schedule another GPU job while this learner is active.
+The [completed Breakout crop comparison](2026-11-02-cdp-breakout-playfield-crop.md)
+scores47.042 sampled/114.833 greedy, below full-frame70.750/143.667 by33.51%/
+20.07%, in21m49.159s (+1.65%). Own initials1.375/1.917; all0/24 two-wall.
+Initial-subtracted return/min falls35.20%/21.47%. Retain full-frame12M64/Auto/N8/
+B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100
+and sampled collection. Crop0/32/160/168 removes HUD information; nativeacb175f/
+runner046aa5bc differ from447fe50/cf4ea238. No isolated cause or reliability claim.
 
-The [optional playfield crop](2026-11-02-cdp-breakout-playfield-crop.md)
-passes8,192 actions/32,725 frames/489 updates in47.995s;1,024 frozen actions
-in.882s have zero updates and no natural episodes. Conservative200k projection
-21m28.933s fits30min. Native crop0/32/160/168 keeps RGB64/12M, one GPU resize
-and the unchanged native-pixel teacher; it removes HUD information. Gameplay
-benefit is unmeasured; retain full-frame learning and keep the crop default-off.
+All413 pins,100k/6,227 retained recovery,357 matched initial/invariant frozen
+tensors,47 bounded-crop transitions,full replays/videos,guards,curves,exposure
+and comparison pass. Main/postprocess/collection succeed12:52:52.604/12:53:23.251/
+12:53:27.613 UTC November2/source53a75d7; allfive original services succeed.
+Terminal reader completes12:54:38.573 in2.282s; coverage12:55:05.372 in3.053s,
+with54 diagnostic/413 full pins and283,824 actions/1,134,745 frames reconciled.
+CompletionSHA701b9246/summarySHA26d91aa1/coverageSHA92d30ffb. No full-run failure
+or stage repeat. Earlier bounded compile/packaging failures remain preserved.
 
-All374 pins,357 matching initial/invariant frozen tensors,full native-pixel/
-action/label replay and guards pass. Geometry32/48/64 passes; default restore
-matches128 events/357 tensors. Nativeacb175f/SHAa97bca1 passes153 Rust/642
-Python CPU tests and strict Clippy. Initial compile and final binary-lookup
-failures remain preserved; separate CPU repairs repeat no completed stage.
-Main/collection succeed12:13:29.808/12:13:34.786 UTC November2; terminal reader
-completes12:14:29.788. Source review identifies no label indexing bug, not proof
-of absence. Root `/x/Temp/kindle-playfield-crop-20261102` is closed; no GPU
-allocation remains active. Disposable2.76GiB cache released, pinned test binary/
-wheel/runtime retained. Do not repeat completed checks, replay or collectors.
-No full learner, extension, crop sweep or automatic successor is selected;
-check live state before work. The five-game goal remains unfinished.
+Native216–431 actions fall1,262→1,057, none432+; score bins are not verified walls
+or causal coverage. Late expert CE improves.560514→.543409 despite worse play.
+Actual guidance41.9085% and online80.18 are not competence. Keep crop default-off;
+its153 Rust/642 Python CPU checks,geometry/default compatibility and47.995s
+bounded training remain qualified. CPU co-host times stay uncorrected.
+Root `/x/Temp/kindle-playfield-crop-20261102/full` is closed. Recovery,terminal
+and coverage readers are complete; do not repeat completed stages or collectors.
+No Kindle allocation is active at closure. No extension,confirmation,crop sweep
+or automatic successor is selected. Check live state before new GPU work;
+Breakout and the five-game goal remain unfinished.
 
 The [completed Breakout 25M comparison](2026-11-02-cdp-breakout-capacity25m.md)
 scores **49.958 sampled /104.292 greedy**, below12M70.750/143.667 by29.39%/

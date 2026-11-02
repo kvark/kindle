@@ -1,4 +1,93 @@
-# Native playfield crop passes geometry, compatibility and bounded training
+# Playfield crop lowers frozen Breakout scores at similar cost
+
+Retain the full-frame input. The separately selected
+[200k-action comparison](../experiments/2026-11-02-cdp-breakout-playfield-crop-200k.md)
+finishes successfully but lowers sampled return **33.51%** and greedy return
+**20.07%**, for **1.65% more training time**. All arms still have zero of24
+two-wall successes. The crop remains optional and default-off; no extension,
+confirmation, crop sweep or automatic successor is selected.
+
+| Input | Sampled final / own initial | Greedy final / own initial | Two-wall successes | Training time |
+|---|---:|---:|---:|---:|
+| Retained full frame |70.750 /1.417|143.667 /2.208|0/24 in each arm|21m27.910s|
+| Crop0/32/160/168 |47.042 /1.375|114.833 /1.917|0/24 in each arm|21m49.159s|
+
+Initial-subtracted return per training minute falls **3.230→2.093 sampled**
+(−35.20%) and **6.590→5.175 greedy** (−21.47%). Both learners use200,000
+aggregate actions /12,477 updates; the crop executes799,600 emulator frames.
+No long extension or checkpoint selection follows this result.
+
+## Full comparison and interpretation
+
+The crop changes input pixels at the same RGB64/12M model dimensions. It enlarges
+vertical playfield features and removes HUD score/life information. The teacher
+continues to receive the original native max-pooled frame. All learning settings
+remain fixed: Auto/N8/B16/T16/H15/R16, encoder4e-5, behavior8e-5, dynamics4e-4,
+replay-value1 with imagined bootstrap, expert100 and20% episode guidance/cap1920.
+The source/native and runner differ from retained447fe50/cf4ea238. Bounded default
+compatibility does not establish full default learning equivalence or isolate
+which input difference matters. Reused seed1009/cohort4000001009 is development
+evidence, not independent confirmation or a general conclusion about cropping.
+
+All357 initial tensors match both the same-preset control and bounded crop check.
+The47 pre-update transitions match the bounded crop run. Actual-initial frozen
+traces differ from full-frame control as permitted: sampled798 versus800 events,
+greedy744 versus795. Own initial scores are therefore retained separately.
+
+Final50k replay expert cross entropy improves slightly **.560514→.543409**, while
+both frozen scores decline. Actual guidance is83,817/200,000 (**41.9085%**),
+versus86,117/200,000 for the control. The guided online last50-episode mean80.18
+versus67.78 is not unaided competence. Neither lower replay loss nor higher guided
+return justifies choosing the crop.
+
+The saved-log analysis reuses the completed full-frame control without recounting
+its trajectories. Candidate counts reconcile across283,824 actions /1,134,745
+frames, including training and four frozen captures. For pre-action scores216–431,
+all training actions fall5,947→5,560 and native actions fall **1,262→1,057**
+(.631%→.5285% of all training). Neither learner has training exposure at432+.
+The crop's selected sampled episodes reach at most94 points; greedy reaches364,
+with2/24 episodes reaching216 and none432. These score fractions are not verified
+wall boundaries, equivalent states or causal coverage evidence.
+
+## Full execution and retained artifacts
+
+All **413 full pins**, exact crop configuration/architecture, finite reports and
+checkpoints, changed CNN/reward/actor/value,100k/6,227 retained recovery, full
+training pixel/action/label replay, four frozen outcome replays/videos, host
+guards, curves, exposure and comparison pass. Each frozen arm preserves357
+tensors with zero updates and truncations. The four captures total83,824 actions /
+335,145 frames /82.821s. Ordinary frozen logs lack live pixel hashes; their replay
+cannot prove unavailable live-image equality.
+
+All five original services succeed. Main PID950033/invocation
+`7bc8fe9931bd4f3fbee1f43739efb056`, launched12:26:48.481 UTC/source53a75d7,
+finishes **12:52:52.604 UTC November2**. Postprocessing and collection finish
+**12:53:23.251 /12:53:27.613**. The100k recovery and its separate confirmation
+are already complete; no observer, learner, GPU stage or successful replay repeats.
+No full-run preparation or execution failure occurs. The earlier bounded build
+and packaging failures remain preserved in their separate qualification evidence.
+
+The prepared terminal reader completes once **12:54:38.573** in2.282s
+(2.305s wrapper). The prepared coverage reader completes once **12:55:05.372**
+in3.053s (3.087s wrapper), with54 diagnostic/413 full pins unchanged. CPU co-host
+times remain recorded without training-time correction. All services are terminal;
+no Kindle GPU allocation remains active at closure.
+
+Full root: `/x/Temp/kindle-playfield-crop-20261102/full`.
+Trial: `breakout-12m-64-b16-r16-playfieldcrop-expert100-200k-seed1009`.
+Package-root `full-terminal-summary.json` and `score-coverage-review.json` are
+complete. Do not rerun the recovery, terminal or coverage readers, collectors,
+training, assessments or replays. The five-game goal remains unfinished.
+
+| Full artifact | SHA256 |
+|---|---|
+| Learning review |`21a086def8e81b4fcaa5132c123ee910a6f77598c7cc59fe9be17ef701702d22`|
+| Completion |`701b92466aa9fbf4b3c5d39c22b41994e206e6a1c460197e6a6e015e2aaedfa7`|
+| Comparison |`b147e227145827ea1aaf76cb10b1531294338d0eddac6fa6c8dd7c7bce248f56`|
+| Terminal summary |`26d91aa162fb2359e029e1bb808ba3c40b782effd5f633d949e446bebbeb0bbd`|
+| Coverage review |`92d30ffb3d845661a8164fdfbedfd57460dad34ef813e9d36afad56fb408efb1`|
+
+## Preceding bounded qualification
 
 The optional Breakout crop completes **8,192 actions / 32,725 emulator frames /
 489 updates in 47.995 seconds**. Frozen restore completes **1,024 actions /
@@ -119,12 +208,11 @@ retained wheels, isolated runtime, test executables and evidence. One 248,640,31
 original test executable remains at its pinned cache path. The separate cache
 release receipt records this; the historical packaging receipt is unchanged.
 
-## Decision
+## Retained decision
 
-The optional crop is qualified for execution and early cost. Keep it default-off
-and retain the current full-frame learner. No full comparison, crop sweep,
-extension, cap increase or automatic successor is selected. Do not repeat the
-completed geometry, compatibility, bounded training, replay or collectors.
-A separately selected full comparison would need own actual-initial controls
-and24 natural episodes per sampled/greedy arm against the retained scores,
-with the original two-wall criterion. The five-game goal remains unfinished.
+The earlier bounded check established execution and early cost. The subsequent
+full comparison above lowers both frozen scores at slightly higher training cost.
+Keep the full-frame learner and crop default-off. No retry, extension, cap increase,
+crop sweep, confirmation or automatic successor is selected. Check live state
+before new work; Breakout's original two-wall gate and the five-game goal remain
+unfinished.

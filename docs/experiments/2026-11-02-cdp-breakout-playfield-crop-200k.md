@@ -162,3 +162,33 @@ Recovery review SHA prefix `b9bf4518`, retention `d0036cce`, metadata `10eaab13`
 full hashes are in the trial's `recovery-confirmation.json`. Do not repeat this
 reader. Terminal and coverage final stages remain pending original completion;
 the fixed200k/30-minute budget and all evaluation gates stay unchanged.
+
+## Completed comparison and final readers
+
+The original learner completes200k actions/799,600 frames/12,477 updates in
+**21m49.159s**. Sampled **47.042** and greedy **114.833** are below retained
+full-frame70.750/143.667 by33.51%/20.07%, for1.65% more training time. Own
+initials1.375/1.917 are retained separately; all arms have0/24 two-wall successes.
+Initial-subtracted return/min falls35.20%/21.47%. Retain full-frame input and
+keep crop default-off; no extension, confirmation, crop sweep or successor.
+
+All413 pins,100k retained recovery,357 matching initial/invariant frozen tensors,
+47 bounded-crop transitions, finite reports, full replays/videos, guards, curves,
+exposure and comparison pass. Main/postprocess/collection succeed
+**12:52:52.604 /12:53:23.251 /12:53:27.613 UTC November2**. All five original
+services succeed. No full-run preparation or execution failure occurs, and no
+original stage repeats. Earlier bounded compile/packaging failures remain intact.
+
+The terminal reader completes once12:54:38.573 in2.282s; coverage completes once
+12:55:05.372 in3.053s with54 diagnostic/413 full pins and283,824 actions /
+1,134,745 frames reconciled. Completed control analysis is reused. Native actions
+at scores216–431 fall1,262→1,057, with none432+; these are descriptive score bins,
+not verified walls or a causal mechanism. Final50k expert CE improves.560514→
+.543409 while frozen scores fall. Actual guidance41.9085% and guided online80.18
+do not establish unaided competence. CPU co-host durations remain uncorrected.
+
+Recovery, terminal and coverage readers are complete; do not repeat them or any
+learner, assessment, replay or collector. No Kindle allocation remains active at
+closure; check live state before new work. See the
+[completed result](../results/2026-11-02-cdp-breakout-playfield-crop.md) for full
+hashes and limits. Breakout and the five-game goal remain unfinished.
