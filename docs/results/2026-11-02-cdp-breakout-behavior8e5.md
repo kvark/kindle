@@ -138,3 +138,26 @@ preserved CPU prelaunch failure. Preparation is not a terminal result, and the
 reader must not replace or rerun any original experiment stage. ReaderSHA
 `ba571025beca4480f21224292cb0f1e08e9faa67c94c181dd281174060c76f28`;
 identity-helperSHA131bee46. Preparation receipt: `terminal-reader-preflight.json`.
+
+
+## 100k recovery retained; original training continues
+
+The original recovery observer completes at **00:45:30.437 UTC November 2**,
+with100,000 actions/6,227 updates,357 finite tensors and206,067,163 retained
+bytes. Its complete log prefix contains103,064 actions/6,419 finite reports;
+latest progress is102,400/6,377 at656.434 training seconds. The copy takes0.307s
+and preserves the source. Weights and metadata are retained; replay, live belief,
+games and RNG are not an uninterrupted restart state.
+
+Separate read-only confirmation passes **00:46:33.271** in0.870s (0.890s wrapper):
+all282 declaration pins, four retained files, exact saved metadata/configuration,
+original recovery invocation and complete journal payload pass. MainPID873316/
+invocation56e692c47ef348ff8acd60089b7b46df is unchanged before and after the check.
+The original recovery observer is terminal success; learner, progress,
+postprocessing and collection continue. No observer, GPU stage or checkpoint
+creation is repeated. CPU co-host costs remain uncorrected.
+
+Recovery review SHA118856b1, retention SHAf9cf5bd5, metadata SHA65a62fc9.
+Confirmation is `recovery-confirmation.json` in the trial. No frozen gameplay
+result is available; the fixed200k learner and four final/actual-initial
+assessments continue under the original caps.

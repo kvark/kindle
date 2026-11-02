@@ -23,9 +23,12 @@ available. Only the user merges PRs; commits and pushes are allowed.
 The [fresh Breakout actor/critic-rate comparison](docs/experiments/2026-11-02-cdp-breakout-behavior8e5-200k.md) is active.
 It launches at **00:34:24.392 UTC November 2**, source3099ff7, with282 pins.
 MainPID873316/invocation`56e692c47ef348ff8acd60089b7b46df`; original progress,
-recovery, postprocessing and terminal-collection observers are active. Startup
-passes at00:34:37.150:357 matching control/bounded initial tensors,47 identical
-pre-update transitions, correct cadence and77 finite reports through1,608 actions.
+postprocessing and terminal-collection observers remain active. The recovery
+observer succeeds **00:45:30.437**, retaining100k actions/6,227 updates and357
+finite tensors. Its prefix check covers6,419 finite reports through103,064 actions.
+Separate0.870s CPU confirmation verifies all282 pins, retained files/metadata,
+original recovery journal and unchanged learner identity at00:46:33.271.
+Startup also matches357 control/bounded tensors and47 pre-update transitions.
 No full frozen gameplay result is available.
 
 Only the shared actor/critic rate changes from effective4e-5 to8e-5. Keep

@@ -103,3 +103,13 @@ transitions, updates at376/392/408/424/440/456 and77 finite supervised reports
 through1,608 actions. Original process identity, native/runner/teacher, exact
 configuration and fresh counters pass. No full frozen result is available.
 Keep the original process and observers; do not restart or overlap GPU work.
+
+
+## Recovery milestone
+
+The original100k/6,227 recovery observer succeeds00:45:30.437 UTC November2.
+357 finite tensors and6,419 finite reports through103,064 actions pass. Separate
+0.870s CPU confirmation at00:46:33.271 verifies all282 inputs, retained files,
+metadata and the original recovery journal while the same learner remains active.
+No checkpoint creation, observer or GPU stage repeats. Continue the fixed run;
+no full frozen result is available.
