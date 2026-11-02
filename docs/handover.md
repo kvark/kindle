@@ -1,5 +1,22 @@
 # CDP handover — October25,2026
 
+The [Qbert replay-value scale1 check](experiments/2026-11-02-cdp-qbert-replay-value1.md) is selected within the existing
+five-game goal:8192 actions/733 updates,180s training plus1024 frozen/zero updates.
+Only existing replay-value scale0.3→1 changes at12M64/Auto/N8/B16/T16/H5/R24,
+dynamics1e-4/base-encoder-behavior4e-5/greedy/expert100 on reused14009. Critic and
+representation objectives both change; bootstrapped targets remain. No isolated
+critic cause or independent confirmation is claimed. Native447fe50/35ad0db and
+teacherfa261c53 stay fixed; runner e304af89 adds only the fresh CLI option.
+
+All27 focused CPU tests pass in production and private runner; both commands,
+ten config checks,357 shapes and cadence pass; all768 control pins remain.
+Original CPU fixture/source-anchor failures and separate repairs are retained.
+Require initial/frozen tensors,pre-update semantics,full replay and host guards.
+Conservative200k projection must fit30min before a separate full-run selection.
+No full learner,extension,sweep or automatic successor is selected. Root
+`/x/Temp/kindle-qbert-replay-value1-20261102/native-check`; check live state before
+GPU work and do not overlap an active learner. Gameplay benefit is unmeasured.
+
 The [completed Breakout actor/critic-rate comparison](results/2026-11-02-cdp-breakout-behavior8e5.md) finishes
 200k actions /799,577 frames /12,477 updates in **21m44.517s**. Sampled **59.000**
 and greedy **117.292** improve56.292/104.667 by4.81%/12.06%, for1.31% more

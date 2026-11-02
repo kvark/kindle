@@ -106,6 +106,8 @@ def main():
                         help="fresh base rate; CDP encoder/dynamics rates scale proportionally from default4e-5")
     parser.add_argument("--behavior-learning-rate", type=float,
                         help="fresh actor/critic rate; omitted: native default follows the base rate")
+    parser.add_argument("--replay-value-scale", type=float,
+                        help="fresh training only: real-replay value loss scale; omitted: native default")
     parser.add_argument("--encoder-learning-rate", type=float,
                         help="fresh CDP encoder rate; omitted: 6e-6 scaled with the base rate")
     parser.add_argument("--dynamics-learning-rate", type=float,
@@ -174,6 +176,11 @@ def main():
         parser.error("world-microbatch-size must be positive")
     if not positive_f32(args.learning_rate):
         parser.error("learning-rate must be finite and positive in F32")
+    if args.replay_value_scale is not None:
+        if not positive_f32(args.replay_value_scale):
+            parser.error("replay-value-scale must be finite and positive in F32")
+        if args.evaluate:
+            parser.error("replay-value-scale requires fresh training")
     if args.behavior_learning_rate is not None:
         if not positive_f32(args.behavior_learning_rate):
             parser.error("behavior-learning-rate must be finite and positive in F32")
@@ -317,6 +324,7 @@ def main():
     training_options.update(("--open-loop-length", "--open-loop-scale"))
     training_options.add("--breakout-centroid-scale")
     training_options.add("--behavior-learning-rate")
+    training_options.add("--replay-value-scale")
     training_options.add("--encoder-learning-rate")
     training_options.add("--dynamics-learning-rate")
     training_options.add("--cdp")
@@ -449,6 +457,8 @@ def main():
                 scale=1.0 if args.open_loop_scale is None else args.open_loop_scale)
         if args.behavior_learning_rate is not None:
             config["behavior_learning_rate"] = args.behavior_learning_rate
+        if args.replay_value_scale is not None:
+            config["loss_scales"]["replay_value"] = args.replay_value_scale
         if args.breakout_centroid_scale is not None:
             config["color_centroid_supervision"] = dict(scale=args.breakout_centroid_scale,
                 channel=0, background_scale=1.5, region=[8/160, 90/210, 152/160, 185/210])

@@ -390,6 +390,48 @@ def test_encoder_rate_override_preserves_other_cdp_rates(monkeypatch, tmp_path, 
         atari_vector.main()
 
 
+@pytest.mark.parametrize("args,message", [
+    *[(["--replay-value-scale", value], "finite and positive in F32")
+      for value in ("0", "-1", "nan", "inf", "1e300", "1e-300")],
+    (["--restore", "unused", "--replay-value-scale", "1"], "training overrides"),
+    (["--restore", "unused", "--replay-value-scale=1"], "training overrides"),
+    (["--evaluate", "--replay-value-scale", "1"], "requires fresh training"),
+])
+def test_replay_value_override_rejects_invalid_runs(monkeypatch, tmp_path, capsys, args, message):
+    output = tmp_path / "never.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2 and not output.exists()
+    assert message in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("cdp", [False, True])
+def test_replay_value_override_changes_only_requested_loss(monkeypatch, tmp_path, cdp):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    configs = []
+
+    def construct(streams, config):
+        configs.append(copy.deepcopy(config))
+        raise RuntimeError("config checked before GPU")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    for scale in (None, 1.0):
+        monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / f"loss-{scale}.jsonl"),
+            *(["--cdp", "--cdp-centered"] if cdp else []),
+            *(["--replay-value-scale", str(scale)] if scale is not None else [])])
+        with pytest.raises(RuntimeError, match="config checked before GPU"):
+            atari_vector.main()
+    default, overridden = configs
+    assert default["loss_scales"]["replay_value"] == kindle.default_config(18)["loss_scales"]["replay_value"]
+    assert overridden["loss_scales"]["replay_value"] == 1.0
+    overridden["loss_scales"]["replay_value"] = default["loss_scales"]["replay_value"]
+    assert overridden == default
+
+
 def test_feature_vector_rejects_invalid_config_before_gpu():
     config = kindle.default_config(6, "tiny")
     with pytest.raises(ValueError, match="at least one"):
