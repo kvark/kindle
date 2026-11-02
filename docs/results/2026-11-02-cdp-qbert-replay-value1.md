@@ -2,7 +2,8 @@
 
 After this bounded completion, a [separate fresh200k comparison](../experiments/2026-11-02-cdp-qbert-replay-value1-200k.md)
 launches01:21:38 UTC November2 with the fixed30-minute cap and four frozen arms.
-Startup initial tensors,47 pre-update transitions and205 finite reports pass. No bounded-check
+Startup passes;100k/9,340 recovery isretained and independently confirmed with
+all859 pins and357 finite tensors. No full frozen result yet. No bounded-check
 experience is reused; gameplay benefit remains unmeasured.
 
 The bounded check completes8,192 actions /32,755 frames /733 updates in
@@ -57,8 +58,9 @@ environment,derivatives or accuracy measurements are involved. Evidence
 `/x/Temp/kindle-qbert-replay-value1-20261102/replay-value-target-source-review.json`;
 co-host duration is retained without wall-time correction. Separate readout
 preparation completes01:24:50.427 in.011s (.029s wrapper), withfive actual config
-assertion cases and unchanged original identity. Recovery/final readers are
-prepared but have not yet been invoked.
+assertion cases and unchanged original identity. The recovery reader subsequently passes01:35:04.128 in2.412s (2.431s wrapper),
+verifying the original audit/copy without repeating either. The final reader
+remains prepared and uninvoked.
 
 ## Evidence
 

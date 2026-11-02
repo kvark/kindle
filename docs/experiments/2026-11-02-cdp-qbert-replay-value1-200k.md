@@ -1,11 +1,19 @@
 # Qbert replay-value scale1: fresh200k development comparison
 
 Launched01:21:38.183 UTC November2/source3a6655a; declaration859 pins/SHA8ba2436a.
-Original mainPID878107/invocation`9f50698bb9894737a8cc8d64c471ade3`; postprocess,
-progress,recovery andcollection observers areactive. Startup passes01:22:00.519:
-357 control/bounded initial tensors,47 identical pre-update transitions,correct
-cadence and205 finite reports through2568 actions. CPU startup wrapper2.621s
-is uncorrected co-host cost. No full frozen result yet; do not restart or overlap.
+Original mainPID878107/invocation`9f50698bb9894737a8cc8d64c471ade3` continues;
+postprocess,progress andcollection observers remain active. Recovery succeeds
+01:34:45.325 at100k actions/9,340 updates,357 finite tensors andfour retained
+files/206,067,159 bytes. Its prefix has9643 finite reports through103240 actions.
+Separate2.412s confirmation passes01:35:04.128:all859 pins,metadata,file hashes and
+original recovery journal identity verified;no audit,copy orGPU stage repeated.
+RecoverySHA41be214e,retentionSHA610a7660,metadataSHAa8a525d7,confirmationSHA26572242.
+
+Startup passes357 control/bounded initial tensors,47 identical pre-update events
+andcorrect cadence. CPU wrappers:startup2.621s,readout preparation.029s,pinned
+source review.033s,recovery confirmation2.431s;retain uncorrected co-host costs.
+The final reader isprepared but not invoked. No full frozen result yet;do not
+restart oroverlap the original learner.
 
 Selected November2 after the [bounded check](../results/2026-11-02-cdp-qbert-replay-value1.md)
 closes successfully. Its8,192 actions /733 updates take57.202s, with a conservative

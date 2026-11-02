@@ -4,10 +4,17 @@ The [fresh Qbert replay-value scale1 comparison](../experiments/2026-11-02-cdp-q
 UTC November2/source3a6655a with859 pins:200k actions/18,715 updates/30-minute
 training cap,100k/9,340 recovery andfour final/actual-initial sampled/greedy
 24-episode arms. MainPID878107/invocation9f50698bb9894737a8cc8d64c471ade3;
-postprocess,progress,recovery andcollection observers areactive. Startup passes
-01:22:00.519:357 control/bounded-matching initial tensors,47 identical pre-update
-transitions,correct cadence and205 finite reports through2568 actions. The2.621s
-CPU startup wrapper isretained asco-host cost without time correction.
+postprocess,progress andcollection observers remain active. Recovery succeeds
+01:34:45.325:100k actions/9,340 updates,357 finite tensors,four retained files /
+206,067,159 bytes,9643 finite reports through103240 actions. Separate2.412s
+confirmation passes01:35:04.128:all859 pins,metadata,file hashes andoriginal
+journal identity unchanged;no audit,copy orGPU repeat. RecoverySHA41be214e,
+retentionSHA610a7660,metadataSHAa8a525d7. Original main continues.
+
+Startup had357 control/bounded initial tensors and47 matching pre-update events.
+CPU startup2.621s,readout preparation.029s,target-source review.033s andrecovery
+confirmation2.431s wrappers remain uncorrected co-host costs. Final reader isready
+but hasnot run; no full frozen result exists yet.
 
 Only replay-value scale0.3→1 changes on reused14009 at12M64/Auto/N8/B16/T16/H5/
 R24/dynamics1e-4/base-encoder-behavior4e-5/greedy/expert100. Critic andrepresentation
@@ -18,7 +25,7 @@ teacherfa261c53 andqualified runnere304af89 fixed. No prior experience reused.
 Allfive commands,36 config cases,three actual preflight cases,19 header checks,
 recovery/retention/observer cases and815 bounded/768 control pins pass;20 scripts
 compile. CPU qualification8.757s. Original generator indentation failure and
-separate corrected generation remain. Require recovery,357 invariant frozen
+separate corrected generation remain. Require357 invariant frozen
 tensors,paired initial traces,full replays,guards,curves,exposure andoriginal
 terminal collection. Compare14,770.833 greedy/14,254.167 sampled,both24/24 pyramids,
 in25m09.906s;keep15k/90% gate. No full frozen result yet. Root
