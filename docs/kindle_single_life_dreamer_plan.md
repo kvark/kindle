@@ -1,5 +1,18 @@
 # Kindle: CDP learning roadmap
 
+The [fresh Breakout greedy-collection comparison](experiments/2026-11-02-cdp-breakout-greedy-training-200k.md) is selected after
+its completed bounded prerequisite. Train200k actions/12,477 updates within30min,
+retain100k/6,227 recovery, then final/actual-initial sampled/greedy24-episode
+assessments against70.750/143.667. Sampled remains primary; original90% two-wall
+gate stays fixed. Only live collection changes; native447fe50,runner6e03d739,
+12M64/H15/R16/replay-value1/rates/unimix.01 and teacher remain as qualified.
+Full CPU qualification passes in2.326s: five commands,seven prelaunch cases,
+32 config/16 header/12 recovery cases,805 dynamic input paths and all387 bounded/
+338 control pins. No new preparation failure or GPU stage occurs before launch.
+Root `/x/Temp/kindle-breakout-greedy-training-20261102/full`; main
+`kindle-breakout-greedy-training-200k-20261102`. Check live state before work;
+no restart,overlap,extension,cap increase or automatic successor.
+
 The [Breakout greedy-collection check](results/2026-11-02-cdp-breakout-greedy-training.md) completes
 8,192 actions /32,738 frames /489 updates in47.418s. Frozen1,024 actions take
 .869s with zero updates and no natural episodes. Conservative200k projection
