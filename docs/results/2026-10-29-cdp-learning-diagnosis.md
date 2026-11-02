@@ -1,5 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed scalar value calibration diagnostic](2026-11-02-cdp-breakout-value-calibration.md)
+finds a small recoverable signal in the stronger Breakout critic. An affine
+correction fitted on eight earlier episodes reduces sampled RMSE9.231→7.698
+on sixteen later episodes, versus constant7.855; offset alone scores8.313.
+Six of eight lanes improve; the conditional lane MSE interval is[−5.359,−.471].
+Correlation stays.231, so most return variation remains unexplained. No
+inference correction, loss change or new learner is selected.
+
+All20 diagnostic/74 original pins and seven fixture groups pass. CPU analysis
+completes **08:44:53.508 UTC November2/source6a90267** in.918s, with zero GPU
+work, native/ALE imports, updates, failures or repeated stages. Root
+`/x/Temp/kindle-breakout-value-calibration-20261102` is closed; do not rerun.
+No Kindle allocation is active at closure. Prioritize actual target construction
+and fitting; the five-game goal remains unfinished.
+
 The [completed replay-value critic diagnostic](2026-11-02-cdp-breakout-replay-value-critic.md) finds that the
 stronger Breakout model still has weak sampled-return calibration: correlation
 .231/R²−.439, criticRMSE9.231 versus earlier-episode constant7.855. The0.3 model

@@ -1,5 +1,14 @@
 # Breakout: distinguish value offset and scale from state discrimination
 
+**Complete.** Earlier-episode affine correction reduces replay-value1 sampled
+RMSE9.231→7.698, slightly below constant7.855; offset alone scores8.313. Its
+conditional lane MSE-difference interval is[−5.359,−.471], six of eight lanes
+improve, and correlation stays.231. No gameplay or training change follows.
+All20 diagnostic/74 original pins and seven fixture groups pass. Analysis
+completes08:44:53.508 UTC November2/source6a90267 in.918s, with no native/ALE
+import, GPU work, failure or stage repeat. Do not rerun. [Result](../results/2026-11-02-cdp-breakout-value-calibration.md).
+The selection below records the fixed protocol.
+
 Select a CPU-only analysis of the four completed replay-value critic captures.
 The latest sampled critics trail a constant despite improved gameplay. Determine
 whether a correction fitted on earlier episodes generalizes to later episodes.
