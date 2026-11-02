@@ -96,3 +96,12 @@ progress893334,recovery893472 andcollection893475 areactive. Startup passes
 match,correct first six updates and294 finite reports through4128 actions.
 Startup CPU wrapper3.032s co-host time isretained without timing correction.
 Frozen gameplay andterminal completion remain pending. Do not restart oroverlap.
+
+The separate CPU terminal reader qualifies04:21:12 UTC in5.164s (5.220s wrapper).
+It reproduces the retained16001 scores/cost/recovery, checks an exact190k–240k
+last50k fixture andfour original-journal cases, andverifies991 active pins and
+unchanged original learner identity. ScriptSHAef55a64b47d71697d489023e6331e48fe8bff390c88f1cd8c6b2b02fa30638f1;
+`/x/Temp/kindle-qbert-r20-240k-20261102/review_full_terminal.py` has separate
+`recovery 100000`, `recovery 200000` and`terminal` modes. Invokeeach once after
+its original evidence exists. No GPU work or learning occurs inqualification;
+co-host cost isretained without correction. Frozen results remain pending.

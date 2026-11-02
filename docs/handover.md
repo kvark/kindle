@@ -5,7 +5,12 @@ launches04:15:04.189 UTC November2/source55ead06 with991 pins and30-minute
 training cap. Original mainPID893328/invocation575d8e40b325408e8d4220bfd3b61bb8;
 allfour observers areactive. Startup passes357 control/bounded-matching initial
 tensors,47 pre-update transitions,correct cadence and294 finite reports through
-4128 actions at04:15:34.903. No frozen result yet. Reused16001/original4000016001;
+4128 actions at04:15:34.903. The separate terminal reader qualifies04:21:12
+in5.164s CPU, reproducing control scores/recovery andchecking exact late50k bounds
+andfour journal fixtures; all991 pins/original identity stayfixed. ReaderSHAef55a64b,
+`/x/Temp/kindle-qbert-r20-240k-20261102/review_full_terminal.py`; useits recovery
+100000/200000 andterminal modes once whenready. No frozen result yet.
+Reused16001/original4000016001;
 240k/R20/18721 versus200k/R24/18715 changes experience,cadence andsampling together.
 Keep12M64/H5/dynamics1e-4/replay-value1,native447fe50,runnere304af89 andteacher.
 Require100k/7784 and200k/15596 retained recoveries andfinal/actual-initial sampled/
