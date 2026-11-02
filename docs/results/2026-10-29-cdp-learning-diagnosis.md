@@ -1,5 +1,25 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fresh Qbert replay-value scale1 comparison](../experiments/2026-11-02-cdp-qbert-replay-value1-200k.md) is selected after the
+bounded cost check passes:200k actions/18,715 updates/30-minute training cap,
+100k/9,340 recovery andfour final/actual-initial sampled/greedy24-episode arms.
+Only replay-value scale0.3→1 changes on reused14009 at12M64/Auto/N8/B16/T16/H5/
+R24/dynamics1e-4/base-encoder-behavior4e-5/greedy/expert100. Critic andrepresentation
+gradients both change; existing bootstrapped targets remain. This isdevelopment,
+not independent confirmation or an isolated critic cause. Native447fe50/35ad0db,
+teacherfa261c53 andqualified runnere304af89 fixed. No prior experience reused.
+
+Allfive commands,36 config cases,three actual preflight cases,19 header checks,
+recovery/retention/observer cases and815 bounded/768 control pins pass;20 scripts
+compile. CPU qualification8.757s, no environment ornative agent. Original generator
+indentation failure isretained; separate corrected generation passes before GPU.
+Require357 initial/frozen tensors,47 pre-update events,paired initial traces,
+full replays,guards,curves,exposure andoriginal terminal collection. Compare
+control14,770.833 greedy/14,254.167 sampled,both24/24 pyramids,in25m09.906s;
+keep15k/90% gate. No gameplay result yet. Root
+`/x/Temp/kindle-qbert-replay-value1-20261102/full`;check live state anddo not
+overlap orrestart. No extension,sweep,cap increase orautomatic successor.
+
 The [completed Qbert replay-value scale1 check](2026-11-02-cdp-qbert-replay-value1.md) passes8192 actions /
 32,755 frames /733 updates in57.202s;1024 frozen/.855s haszero updates andno
 natural completed episodes. Conservative200k projection25m36.196s clears30min.

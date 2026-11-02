@@ -1,5 +1,9 @@
 # Qbert replay-value scale1 passes execution and early cost checks
 
+After this bounded completion, a [separate fresh200k comparison](../experiments/2026-11-02-cdp-qbert-replay-value1-200k.md)
+is selected with the fixed30-minute cap and four frozen arms. No bounded-check
+experience is reused; gameplay benefit remains unmeasured.
+
 The bounded check completes8,192 actions /32,755 frames /733 updates in
 **57.202s**. A1,024-action frozen greedy arm takes0.855s with zero updates and
 no completed natural episodes. The conservative200k projection is

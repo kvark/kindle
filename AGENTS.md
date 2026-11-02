@@ -20,27 +20,25 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 2
 
-The [completed Qbert replay-value scale1 check](docs/results/2026-11-02-cdp-qbert-replay-value1.md) passes8192 actions /
-32,755 frames /733 updates in57.202s;1024 frozen/.855s haszero updates andno
-natural completed episodes. Conservative200k projection25m36.196s clears30min.
-All815 pins,357 control-matching initial/invariant frozen tensors,47 pre-update
-semantic events,finite reports,full pixel/action/label replay andhost guards pass.
-Main/collector succeed01:15:11.906/01:15:18.703 UTC November2/source921ad96;
-originalPID877568/invocation7245ee2b08064c578610357b76b6fe60. Both services are
-terminal success; no original GPU/replay/collector stage fails orrepeats.
+The [fresh Qbert replay-value scale1 comparison](docs/experiments/2026-11-02-cdp-qbert-replay-value1-200k.md) is selected after the
+bounded cost check passes:200k actions/18,715 updates/30-minute training cap,
+100k/9,340 recovery andfour final/actual-initial sampled/greedy24-episode arms.
+Only replay-value scale0.3→1 changes on reused14009 at12M64/Auto/N8/B16/T16/H5/
+R24/dynamics1e-4/base-encoder-behavior4e-5/greedy/expert100. Critic andrepresentation
+gradients both change; existing bootstrapped targets remain. This isdevelopment,
+not independent confirmation or an isolated critic cause. Native447fe50/35ad0db,
+teacherfa261c53 andqualified runnere304af89 fixed. No prior experience reused.
 
-Only existing replay-value scale0.3→1 changes at12M64/Auto/N8/B16/T16/H5/R24,
-dynamics1e-4/base-encoder-behavior4e-5/greedy/expert100 on reused14009. Critic and
-representation objectives both change; bootstrapped targets remain. Native
-447fe50/35ad0db,teacherfa261c53 fixed; runner e304af89 adds only the fresh CLI.
-No isolated critic cause,independent confirmation orgameplay gain is established.
-All27 production/private CPU tests pass; original fixture/anchor failures and
-separate repairs remain. Terminal readout2.769s passes01:15:58.242.
-
-Root `/x/Temp/kindle-qbert-replay-value1-20261102/native-check` isclosed;
-completionSHA91b0870d. No full learner,extension,sweep orautomatic successor is
-selected. Do not repeat this check,collector orreader. No active allocation
-remains; check live state before GPU work. The five-game goal isunfinished.
+Allfive commands,36 config cases,three actual preflight cases,19 header checks,
+recovery/retention/observer cases and815 bounded/768 control pins pass;20 scripts
+compile. CPU qualification8.757s, no environment ornative agent. Original generator
+indentation failure isretained; separate corrected generation passes before GPU.
+Require357 initial/frozen tensors,47 pre-update events,paired initial traces,
+full replays,guards,curves,exposure andoriginal terminal collection. Compare
+control14,770.833 greedy/14,254.167 sampled,both24/24 pyramids,in25m09.906s;
+keep15k/90% gate. No gameplay result yet. Root
+`/x/Temp/kindle-qbert-replay-value1-20261102/full`;check live state anddo not
+overlap orrestart. No extension,sweep,cap increase orautomatic successor.
 
 The completed Breakout behavior8e-5 comparison scores59.000 sampled/117.292
 greedy in21m45s,modest gains,allzero two-wall. Its original services and reader
