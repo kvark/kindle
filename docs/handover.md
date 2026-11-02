@@ -13,14 +13,22 @@ Greedy15000/90% stays primary; sampled results remain separate. No frozen result
 The100k/7,784 recovery passes06:01:43.727 and independent confirmation06:04:00.243
 preserves1,046 pins andoriginal main identity. Four files/206,067,159 bytes and
 357 finite tensors pass; reviewSHAebb84be5/retentionSHA7db7f5ff. Do not repeat
-100k confirmation. Require200k/15,596 recovery and four final/own-initial24-episode
-assessments. CPU qualification passes21 scripts,1,046 declaration paths,eight
+100k confirmation. The200k recovery is also complete below; four final/own-initial
+24-episode assessments remain pending. CPU qualification passes21 scripts,1,046 declaration paths,eight
 actual preflight/four initialization cases. Original summary-key preparation
 failure and prequalification path correction remain; no GPU stage repeats.
 Terminal readerSHA5ca4b27b qualifies05:52:28 in4.809s,with two decision fixtures,
-both control recoveries and unchanged main identity. Its recovery100000 mode
-is complete; recovery200000 andterminal modes remain pending. Run each pending
-mode once only after its original evidence exists. No startup,qualification,collector or stage repeats.
+both control recoveries and unchanged main identity. Its recovery100000
+and recovery200000 modes are complete; only terminal remains pending. Run it
+once after all original completion evidence exists. No startup,qualification,collector or stage repeats.
+The200k/15,596 recovery passes06:12:45.572 UTC November2,with four files /
+206,067,168 bytes and357 finite tensors. The qualified reader confirms it once
+at06:13:25.188 in3.055s (3.873s wrapper), preserving1,046 pins andoriginal main
+identity. ReviewSHA7e9db790,retentionSHAaec85ecc andmetadataSHA10a33c34 remain
+retained. Both recovery confirmations are complete; do not repeat them. The
+four frozen arms and terminal reader remain pending. CPU co-host cost remains
+uncorrected; checkpoint weights do not include uninterrupted restart state.
+
 Root `/x/Temp/kindle-qbert-r20-seed18013-20261102/full`; declarationSHAb6e10968.
 Check live state; no overlap,restart,extension,seed substitution or automatic
 successor. Prior R24 confirmation failures remain; the five-game goal is unfinished.
