@@ -1,39 +1,30 @@
 # CDP handover — October25,2026
 
-The [fresh Breakout actor/critic-rate comparison](experiments/2026-11-02-cdp-breakout-behavior8e5-200k.md) is active.
-It launches at **00:34:24.392 UTC November 2**, source3099ff7, with282 pins.
-MainPID873316/invocation`56e692c47ef348ff8acd60089b7b46df`; original progress,
-postprocessing and terminal-collection observers remain active. The recovery
-observer succeeds **00:45:30.437**, retaining100k actions/6,227 updates and357
-finite tensors. Its prefix check covers6,419 finite reports through103,064 actions.
-Separate0.870s CPU confirmation verifies all282 pins, retained files/metadata,
-original recovery journal and unchanged learner identity at00:46:33.271.
-Startup also matches357 control/bounded tensors and47 pre-update transitions.
-No full frozen gameplay result is available.
+The [completed Breakout actor/critic-rate comparison](results/2026-11-02-cdp-breakout-behavior8e5.md) finishes
+200k actions /799,577 frames /12,477 updates in **21m44.517s**. Sampled **59.000**
+and greedy **117.292** improve56.292/104.667 by4.81%/12.06%, for1.31% more
+training time. Own initials1.417/2.208 match; all0/24 two-wall. Initial-subtracted
+return/min improves3.58%/10.87%. Retain8e-5 as an incremental development option
+and higher sampled point, not seed reliability or an isolated actor/critic cause.
+The separate dynamics1e-4/behavior4e-5 point remains stronger greedy138.750.
 
-Only the shared actor/critic rate changes from effective4e-5 to8e-5. Keep
-base/encoder4e-5, dynamics4e-4,12M64/Auto/N8/B16/T16/H15/R16/expert100 and sampled
-collection. Native447fe50/35ad0db, teacher and runner6c1b69fb are unchanged.
-Keep200k actions/12,477 updates/30min,100k/6,227 recovery and four final/actual-
-initial sampled/greedy24-episode arms against56.292/104.667, allzero two-wall.
-No experience is reused; actor and critic effects are not separated.
+All282 pins,100k/6,227 recovery,357 matched initial/invariant frozen tensors,
+800/795 initial semantic events, full training/frozen replays/videos, guards,
+curves, exposure, comparison and original collector pass. Main/post/collection
+succeed **01:00:07.889/01:00:31.461/01:01:01.857 UTC November2**, source3099ff7.
+All five original services are terminal success; no GPU or collection stage
+repeats. Original CPU prelaunch failure and separate repair remain preserved.
+Terminal reader passes1.979s; completionSHA7e0389c2, summarySHA76dfd6e3.
 
-The [bounded check and preparation](results/2026-11-02-cdp-breakout-behavior8e5.md) pass. The first CPU prelaunch
-fails before service creation on a copied dynamics CLI assertion; separate2.911s
-repair executes the corrected preflight and rejects wrong/missing behavior rates.
-Original failure, sources and qualification coverage gap remain preserved; no
-GPU stage repeats. Root `/x/Temp/kindle-breakout-behavior8e5-20261102/full`;
-service `kindle-breakout-behavior8e5-200k-20261102`. Do not restart this learner
-or schedule another GPU job while it is active. No extension, rate sweep,
-confirmation or automatic successor is selected. The five-game goal is unfinished.
-
-A read-only terminal result reader is prepared at package
-`/x/Temp/kindle-breakout-behavior8e5-20261102/review_full_terminal.py`.
-Its five score cases and retained-control recount pass00:37:52 UTC in0.087s;
-original learner identity stays fixed. After all five original services are
-terminal, run its `terminal` command once through the package's `run_cpu.py`
-with a fresh receipt name. No terminal summary exists yet. Preserve the original
-CPU prelaunch failure and do not rerun successful experiment stages.
+Only behavior4e-5→8e-5 changes; base/encoder4e-5, dynamics4e-4,12M64/Auto/N8/
+B16/T16/H15/R16/expert100, sampled collection, native447fe50/35ad0db, teacher and
+runner6c1b69fb stay fixed. Both actor and critic change; their frozen copies also
+supply representation gradients. Actual overrides40.959%; late expert CE.551145
+and aided online66.0 are not frozen competence. CPU co-host costs are uncorrected.
+Root `/x/Temp/kindle-breakout-behavior8e5-20261102/full` is closed. Do not rerun
+this learner, observers or terminal reader. No extension, rate sweep,
+confirmation or automatic successor is selected. No Kindle GPU allocation remains
+active at closure; check live state before work. The five-game goal is unfinished.
 
 The [fresh Qbert confirmation](results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
 completes 200,000 actions / 799,795 frames / 18,715 updates in **25m09.906s**.

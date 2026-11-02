@@ -1,5 +1,14 @@
 # Fresh Breakout actor/critic-rate comparison at the fixed 200k budget
 
+**Completed:** the original learner, four frozen arms, audits, postprocessing
+and collector succeed. Sampled59.000/greedy117.292 improve56.292/104.667 by4.81%/
+12.06%, for1.31% more training time (21m44.517s). All0/24 two-wall successes.
+All282 pins and required checks pass; the CPU prelaunch failure remains
+preserved, with no repeated GPU stage. See the [completed result](../results/2026-11-02-cdp-breakout-behavior8e5.md).
+No extension, rate sweep, confirmation or automatic successor is selected.
+The protocol and milestone record below are historical; do not rerun them.
+
+
 Select preparation of one fresh200k learner after the [bounded check](2026-11-02-cdp-breakout-behavior8e5.md)
 passes8,192 actions/489 updates in47.149s, conservative21m06.197s. Its original
 main andcollector complete successfully; all252 pins andaudits pass. Full
@@ -93,7 +102,7 @@ successful qualification stages. The fixed 200k comparison remains selected.
 
 The corrected, repinned declaration launches at **00:34:24.392 UTC November 2**,
 source3099ff7. MainPID873316/invocation`56e692c47ef348ff8acd60089b7b46df` and all
-four original observers are active. Declaration SHAd8d4f582 pins282 inputs,
+four original observers were active at launch. Declaration SHAd8d4f582 pins282 inputs,
 including the original CPU failure and separate repair. This is the first actual
 GPU launch; the earlier failed invocation created no service.
 
@@ -101,8 +110,8 @@ Startup passes at00:34:37.150 in1.019s wrapper: all282 pins,357 finite initial
 tensors matching both control and bounded initialization,47 identical pre-update
 transitions, updates at376/392/408/424/440/456 and77 finite supervised reports
 through1,608 actions. Original process identity, native/runner/teacher, exact
-configuration and fresh counters pass. No full frozen result is available.
-Keep the original process and observers; do not restart or overlap GPU work.
+configuration and fresh counters passed. Frozen gameplay was unmeasured at
+startup; the original process and observers subsequently completed. Do not rerun.
 
 
 ## Recovery milestone
@@ -110,6 +119,6 @@ Keep the original process and observers; do not restart or overlap GPU work.
 The original100k/6,227 recovery observer succeeds00:45:30.437 UTC November2.
 357 finite tensors and6,419 finite reports through103,064 actions pass. Separate
 0.870s CPU confirmation at00:46:33.271 verifies all282 inputs, retained files,
-metadata and the original recovery journal while the same learner remains active.
-No checkpoint creation, observer or GPU stage repeats. Continue the fixed run;
-no full frozen result is available.
+metadata and the original recovery journal while the same learner remained active.
+No checkpoint creation, observer or GPU stage repeated. The fixed run subsequently
+completed; its final result is linked above.
