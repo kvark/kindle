@@ -1,5 +1,18 @@
 # Kindle: CDP learning roadmap
 
+The [bounded Breakout greedy-collection check](experiments/2026-11-02-cdp-breakout-greedy-training.md) is selected after the
+completed Qbert R20 closure. Only live training action selection changes;
+12M64/Auto/N8/B16/T16/H15/R16, replay-value1, behavior8e-5, encoder4e-5,
+dynamics4e-4, actor unimix .01, teacher and native447fe50 stay fixed. All45 CPU
+tests pass; the subsequent import-sentinel failure and separate qualification
+are retained without repeating tests. Actual-command preflight passes two
+commands,17 config/four mode cases,357 tensor shapes and338 control pins in1.048s.
+Require8192 actions/489 updates,1024 frozen/zero updates,initial/invariant tensors,
+full replay and host guards. Conservative200k cost must fit30min. No gameplay
+benefit or full learner is selected. Root
+`/x/Temp/kindle-breakout-greedy-training-20261102/native-check`; no restart,
+overlap,cap increase or automatic successor. Check live state before work.
+
 The [Qbert 240k/R20 comparison](results/2026-11-02-cdp-qbert-r20-240k.md) completes 240,000 actions,
 959,778 frames and 18,721 updates in 25m57.740s. Greedy 15,279.167 with 24/24
 first pyramids passes the 15k/90% gate, versus retained 14,913.542/24. Sampled
