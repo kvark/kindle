@@ -1,5 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [Qbert 240k/R20 comparison](2026-11-02-cdp-qbert-r20-240k.md) completes 240,000 actions,
+959,778 frames and 18,721 updates in 25m57.740s. Greedy 15,279.167 with 24/24
+first pyramids passes the 15k/90% gate, versus retained 14,913.542/24. Sampled
+12,972.917/24 falls from 14,745.833/24 and fails 15k. Greedy score rises 2.45%
+and training time rises 4.85%, so initial-subtracted return/min falls 2.27%
+(sampled: −16.21%). Retain this passing development budget point with its measured efficiency cost;
+independent confirmation remains open. Seed 16001 and its original
+cohort are reused. R24→20 and 200k→240k change experience, cadence and sampling
+together. Native 447fe50, runner e304af89, teacher and other settings stay fixed.
+The earlier R24 confirmation remains failed.
+
+All 991 pins, both recoveries, 357 initial/invariant frozen tensors, paired
+traces, replays/videos, guards, curves, coverage and original services pass.
+Main/post/collection succeed at 04:48:55.980/04:49:14.933/04:49:46.075 UTC
+November 2, source 55ead06. The terminal reader completes at 04:50:26.168;
+completion SHA7423739f, summary SHA7f721710. Original CPU preparation failures
+and corrections remain preserved; no GPU stage repeats. Root
+`/x/Temp/kindle-qbert-r20-240k-20261102/full` is closed. No allocation is active,
+and no extension, confirmation, sweep or successor is selected. Do not repeat
+completed stages/readers. Check live state; the five-game goal remains unfinished.
+
 The [saved Breakout score-coverage diagnostic](2026-11-02-cdp-breakout-score-coverage.md)
 finds97.03% ofcandidate training actions below216 points andzero at432+,with
 maximum408 versus control418. Of5947 candidate actions at216–431,4685 areteacher
@@ -17,7 +38,8 @@ projection27m09.558s. Learning uses81.49%/81.23% ofretained full Qbert training
 time;240k/R20 would keep update count nearlyfixed against200k/R24. This is a
 budget hypothesis for later-play improvement,not an isolated architecture cause
 or measured gameplay benefit. All940 pins/tensors/replay/guards andoriginal
-services pass; no full learner orautomatic successor isselected atclosure.
+services pass. This prerequisite preceded the completed full comparison above;
+its projection did not establish gameplay benefit.
 
 The [completed Qbert replay-value1 crossed assessment](2026-11-02-cdp-qbert-replay-value1-cross-cohort.md) keeps14009
 ahead onboth cohorts:16525.000/15906.250 versus16001's15163.542/14913.542,all

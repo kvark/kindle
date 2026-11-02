@@ -20,30 +20,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 2
 
-The [fresh Qbert240k/R20 comparison](docs/experiments/2026-11-02-cdp-qbert-r20-240k-full.md)
-launches04:15:04.189 UTC November2/source55ead06 with991 pins and30-minute
-training cap. Original mainPID893328/invocation575d8e40b325408e8d4220bfd3b61bb8;
-allfour observers areactive. Startup passes357 control/bounded-matching initial
-tensors,47 pre-update transitions,correct cadence and294 finite reports through
-4128 actions at04:15:34.903. The separate terminal reader qualifies04:21:12
-in5.164s CPU, reproducing control scores/recovery andchecking exact late50k bounds
-andfour journal fixtures; all991 pins/original identity stayfixed. ReaderSHAef55a64b,
-`/x/Temp/kindle-qbert-r20-240k-20261102/review_full_terminal.py`; useits recovery
-100000/200000 andterminal modes once whenready. No frozen result yet.
-Reused16001/original4000016001;
-240k/R20/18721 versus200k/R24/18715 changes experience,cadence andsampling together.
-Keep12M64/H5/dynamics1e-4/replay-value1,native447fe50,runnere304af89 andteacher.
-Both recoveries pass:100k/7784 at04:26:11 and200k/15596 at04:37:12 UTC,
-each357 finite tensors/four retained files. Separate confirmations04:26:32.839/
-04:37:39.701 preserve all991 pins/original identity;200k reviewSHA9520a951 and
-retentionSHA1742cab8. Final/actual-initial sampled/greedy24-episode arms remain
-pending againstcontrolgreedy14913.542/sample14745.833,original15k/90% gate.
-Do not repeat recovery readers. Breakout CPU coverage work retains2.836s failed/
-9.075s corrected co-host costs without timing correction.
-The prelaunch exposure-schema correction andinitial CPU fixture failure remain
-retained. Root`/x/Temp/kindle-qbert-r20-240k-20261102/full`;
-main`kindle-qbert-r20-240k-20261102`. Check live identity; no restart,overlap,
-cap increase,extension orautomatic successor whilethis allocation isactive.
+The [Qbert 240k/R20 comparison](docs/results/2026-11-02-cdp-qbert-r20-240k.md) completes 240,000 actions,
+959,778 frames and 18,721 updates in 25m57.740s. Greedy 15,279.167 with 24/24
+first pyramids passes the 15k/90% gate, versus retained 14,913.542/24. Sampled
+12,972.917/24 falls from 14,745.833/24 and fails 15k. Greedy score rises 2.45%
+and training time rises 4.85%, so initial-subtracted return/min falls 2.27%
+(sampled: −16.21%). Retain this passing development budget point with its measured efficiency cost;
+independent confirmation remains open. Seed 16001 and its original
+cohort are reused. R24→20 and 200k→240k change experience, cadence and sampling
+together. Native 447fe50, runner e304af89, teacher and other settings stay fixed.
+The earlier R24 confirmation remains failed.
+
+All 991 pins, both recoveries, 357 initial/invariant frozen tensors, paired
+traces, replays/videos, guards, curves, coverage and original services pass.
+Main/post/collection succeed at 04:48:55.980/04:49:14.933/04:49:46.075 UTC
+November 2, source 55ead06. The terminal reader completes at 04:50:26.168;
+completion SHA7423739f, summary SHA7f721710. Original CPU preparation failures
+and corrections remain preserved; no GPU stage repeats. Root
+`/x/Temp/kindle-qbert-r20-240k-20261102/full` is closed. No allocation is active,
+and no extension, confirmation, sweep or successor is selected. Do not repeat
+completed stages/readers. Check live state; the five-game goal remains unfinished.
 
 The [saved Breakout score-coverage diagnostic](docs/results/2026-11-02-cdp-breakout-score-coverage.md)
 finds97.03% ofcandidate training actions below216 points andzero at432+,with
@@ -56,7 +52,7 @@ repair/991 active pins reconcile. Original cumulative-counter failure remains;
 separate9.051s CPU analysis completes04:37:06.430/sourceb608d35 withno GPU work.
 Root`/x/Temp/kindle-breakout-score-coverage-20261102` iscomplete; do not rerun.
 
-The [Qbert R20 bounded check](docs/results/2026-11-02-cdp-qbert-r20-240k.md)
+The earlier [Qbert R20 bounded check](docs/results/2026-11-02-cdp-qbert-r20-240k.md)
 completes8192 actions/32760 frames/611 updates in50.566s;1024 frozen/.868s has
 zero updates/no natural episodes. Conservative240k projection27m09.558s passes
 30min. All940 pins,357 matched initial/invariant frozen tensors,47 pre-update
@@ -64,10 +60,9 @@ semantic events,finite reports,replay andguards pass. Main/collector succeed
 04:05:09.369/04:05:13.602 UTC/source8f7888a; terminal reader04:05:26.383.
 No stage fails orrepeats. OnlyR24→20 changes onreused16001, with native447fe50,
 runnere304af89,teacher andcurrent12M64/H5/dynamics1e-4/replay-value1 fixed.
-A separately selected240k life would add20% experience with18721 versus18715
-updates; gameplay benefit remains unmeasured. Earlier larger-budget regressions
-remain relevant. No full learner,retry,cap increase orautomatic successor is
-selected. Root`/x/Temp/kindle-qbert-r20-240k-20261102/native-check` isclosed;
+This prerequisite preceded the separately selected full comparison above.
+Its early cost projection did not establish gameplay benefit. Earlier
+larger-budget regressions remain relevant. Root`/x/Temp/kindle-qbert-r20-240k-20261102/native-check` isclosed;
 completionSHAdf02e12d/summarySHA15fb8ccd. No active allocation atclosure; check
 live state. Do not repeat the check,collector orreader.
 
@@ -94,10 +89,10 @@ passes03:40:38.280; completionSHA6254f729/summarySHAb55b2016. Original CPU
 preparation failures/repairs remain; no GPU stage repeats. Root
 `/x/Temp/kindle-breakout-replay-value1-20261102/full` isclosed; do not restart.
 
-Completed allocations remain closed. The separately selected240k/R20 comparison
-above is current; no automatic successor. Check live state before work.
-The five-game goal remains unfinished. Qbert passes its original greedy gate
-onone of two latest learners; Breakout remains below the two-wall gate.
+All current allocations are closed. No learner or successor is selected.
+Check live state before work. The five-game goal remains unfinished. Qbert has
+passing development points on two seeds across different recipes, without
+independent R20 confirmation. Breakout remains below the two-wall gate.
 The [Qbert phase diagnosis](docs/results/2026-11-02-cdp-qbert-replay-value1-phases.md)
 places its score gap after identical550-point first-pyramid prefixes and finds
 substantial later-play exposure. This does not identify an architectural cause.
@@ -130,7 +125,7 @@ The **five-game goal is unfinished**:
 | Freeway |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | Pong |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
 | Breakout |Replay-value1/behavior8e-5/dynamics4e-4:sampled70.750/greedy143.667 in21m28s; scale0.3 control59.000/117.292 in21m45s|21.96%/24.50% higher learning/min; all0/24 two-wall; reused development seed|
-| Qbert |RGB64/H5/R24/dynamics1e-4/replay-value1:greedy16,525.000,sampled14,882.292,both24/24 first pyramids,in25m36.935s|Fresh16001 scores14,913.542/14,745.833 in24m45.754s,both miss15k;scale1 passes original greedy one of two. Alternate cohort15163.542 passes without changing the original failure|
+| Qbert |R24/14009 greedy16,525;R20/240k/16001 greedy15,279.167 in25m58s,each24/24 first pyramids|R24/16001 remains failed;R20 is reused-seed development,not independent confirmation. Its greedy learning/min falls2.27%;sampled12,972.917 fails15k|
 
 Published long-run scores are aspirations,not matched-budget comparisons.
 Finite losses,short runs and backend speed do not establish mastery or CDP

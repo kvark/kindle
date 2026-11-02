@@ -1,5 +1,13 @@
 # Qbert: fresh 240k/R20 comparison
 
+Completed: 240k actions / 18,721 updates in 25m57.740s. Greedy 15,279.167 with
+24/24 first pyramids passes 15k/90%; sampled 12,972.917/24 misses 15k. Training
+time rises 4.85%, greedy score rises 2.45%, and greedy learning/min falls 2.27%.
+All 991 pins, recoveries, tensors, replays and original services pass.
+[Completed result](../results/2026-11-02-cdp-qbert-r20-240k.md).
+No successor is selected; do not repeat completed stages or readers. Selection,
+launch and progress entries below describe the original completed run.
+
 Selected November 2 within the unfinished five-game goal, following the
 [completed bounded check](../results/2026-11-02-cdp-qbert-r20-240k.md).
 That check passes8,192 actions/611 updates in50.566s, with all940 pins,
