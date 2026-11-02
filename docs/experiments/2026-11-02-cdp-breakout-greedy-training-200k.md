@@ -90,3 +90,40 @@ assembled declaration inputs resolve, allowing only explicitly named future
 outputs. All387 bounded and338 control pins stay unchanged. No native module,
 agent or emulator is constructed. Preflight SHA256:
 `0868dd6def87573ff8a0452838bef1e0a0ff1135900df15e57858f33973a5923`.
+
+## Original launch and startup
+
+The first GPU launch occurs **05:10:17.676 UTC November2/source9247ffa**,
+main PID898543/invocation `5c69e7d837e34226bb4f323739c29a0f`. Declaration
+SHAe7fbcc67 pins427 inputs. Original observers are postprocess898546/
+`0e0e19fc1e564942ab78ac2255533a98`, progress898549/
+`702ab57b1e454d02b1817774fb5442af`, recovery898680/
+`296d81bbd5954d99be8559f39115bac8`, collection898683/
+`8109e9c97ef648b282842d59aaef2f23`. All are active at launch; do not restart them.
+
+Startup passes **05:10:42.743** (1.485s wrapper): all427 pins,357 finite initial
+tensors matching control and bounded check,47 matching greedy-check transitions
+and47 differences from sampled control, correct first six updates at
+376/392/408/424/440/456,208 finite supervised reports through3,704 actions.
+Native, runner, teacher, exact configuration, modes and fresh counters match.
+No frozen gameplay result is available yet.
+
+The separate terminal reader qualifies **05:11:30.095** in2.407s (2.429s wrapper).
+It reproduces retained control scores, passes five score fixtures and verifies
+all427 inputs before/after while the original main identity remains unchanged.
+No native model or emulator is constructed; no replay or training stage repeats.
+Keep startup and reader CPU co-host time without subtracting it from training.
+
+Read-only helpers under `/x/Temp/kindle-breakout-greedy-training-20261102`:
+
+- `review_recovery.py`, SHAb29381fd: run once after the original100k recovery
+  observer succeeds, while the original learner remains active. It verifies the
+  four retained files, metadata, checkpoint review, original journal and pins.
+- `review_full_terminal.py`, SHAc787fe18: preflight is already complete. Run its
+  `terminal` mode once after original collection succeeds. It checks all five
+  original service identities, scores, replays/videos, tensors, recovery,
+  comparison arithmetic and the preserved bounded CPU wrapper failure.
+
+The helper source receipts and preflight live beside the execution receipts.
+Use the existing `run_cpu.py` wrapper with new receipt names; do not overwrite
+or rerun completed preparation, startup or reader-preflight stages.

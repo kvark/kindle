@@ -1,17 +1,22 @@
 # CDP handover — October25,2026
 
-The [fresh Breakout greedy-collection comparison](experiments/2026-11-02-cdp-breakout-greedy-training-200k.md) is selected after
-its completed bounded prerequisite. Train200k actions/12,477 updates within30min,
-retain100k/6,227 recovery, then final/actual-initial sampled/greedy24-episode
-assessments against70.750/143.667. Sampled remains primary; original90% two-wall
-gate stays fixed. Only live collection changes; native447fe50,runner6e03d739,
-12M64/H15/R16/replay-value1/rates/unimix.01 and teacher remain as qualified.
-Full CPU qualification passes in2.326s: five commands,seven prelaunch cases,
-32 config/16 header/12 recovery cases,805 dynamic input paths and all387 bounded/
-338 control pins. No new preparation failure or GPU stage occurs before launch.
+The [fresh Breakout greedy-collection comparison](experiments/2026-11-02-cdp-breakout-greedy-training-200k.md) launches at
+05:10:17.676 UTC November2, source9247ffa, with427 pins and a30-minute training
+cap. Main PID898543/invocation5c69e7d837e34226bb4f323739c29a0f and all four
+original observers are active. Startup passes357 initial tensors matching both
+control and bounded check,47 bounded-matching transitions/47 control differences,
+correct cadence and208 finite reports through3,704 actions. Only live collection
+changes; native447fe50,runner6e03d739,12M64/H15/R16/replay-value1,rates,unimix.01
+and teacher remain qualified. Require100k/6,227 recovery and final/actual-initial
+sampled/greedy24-episode assessments against70.750/143.667; sampled stays primary,
+original90% two-wall gate unchanged. No full frozen result yet.
+The separate terminal reader qualifies five score cases at05:11:30.095 in2.407s,
+preserving427 pins and original main identity. ReaderSHAc787fe18; recovery reader
+SHAb29381fd. Run each once at its milestone, without repeating original stages.
 Root `/x/Temp/kindle-breakout-greedy-training-20261102/full`; main
-`kindle-breakout-greedy-training-200k-20261102`. Check live state before work;
-no restart,overlap,extension,cap increase or automatic successor.
+`kindle-breakout-greedy-training-200k-20261102`. Check live state; no restart,
+overlap,extension,cap increase or automatic successor. CPU co-host times remain
+uncorrected; the five-game goal remains unfinished.
 
 The [Breakout greedy-collection check](results/2026-11-02-cdp-breakout-greedy-training.md) completes
 8,192 actions /32,738 frames /489 updates in47.418s. Frozen1,024 actions take
