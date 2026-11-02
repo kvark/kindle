@@ -1,5 +1,12 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+A [fresh Qbert R20 confirmation](../experiments/2026-11-02-cdp-qbert-r20-seed18013.md)
+is active from05:50:36.392 UTC November2/source0a4892a. Only learner/evaluation
+seeds change16001→18013; the passing240k/R20 recipe and original greedy15k/90%
+gate remain fixed. All1,046 startup pins,357 finite initial tensors and274
+finite reports pass. No frozen result yet; this tests confirmation rather than
+an isolated architecture mechanism. No concurrent GPU allocation or repeat.
+
 The [completed Breakout greedy-collection comparison](2026-11-02-cdp-breakout-greedy-training.md)
 finishes200k actions /799,661 frames /12,477 updates in21m44.645s. Primary
 sampled78.542 improves70.750 by11.01%, with9.81% more initial-subtracted return

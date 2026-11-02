@@ -1,18 +1,26 @@
 # Kindle: CDP learning roadmap
 
 The [fresh Qbert R20 seed18013 confirmation](experiments/2026-11-02-cdp-qbert-r20-seed18013.md)
-is selected for preparation within the five-game goal. Keep the passing16001
-recipe fixed:240k/18,721 updates,12M64/Auto/N8/B16/T16/H5/R20/dynamics1e-4/
-replay-value1/expert100/greedy collection; only learner/evaluation seeds change.
-Greedy15000/90% is primary, with four final/own-initial24-episode frozen arms.
-Development cost25m57.740 plus10% projects28m33.514 under30min; no extra bounded
-learner. Require100k/7,784 and200k/15,596 recoveries. CPU qualification passes
-05:49:34.573 UTC November2 in12.251s:21 scripts,1,046 declaration paths,eight
-actual preflight/four initialization cases,940 bounded/991 control pins.
-Original summary-key preparation failure and prequalification path correction
-remain retained; no GPU work yet. Root `/x/Temp/kindle-qbert-r20-seed18013-20261102/full`.
-Check live state, declare and launch once; no overlap,retry,extension,seed
-substitution or automatic successor. Prior R24 confirmation failures remain.
+launches05:50:36.392 UTC November2/source0a4892a with1,046 pins and30-minute
+training cap. Original mainPID901816/invocation976a1ed5007f4ce8b343732f91c38cf9
+and allfour observers are active. Startup passes357 finite initial tensors,
+48 recorded initialization differences,47 pre-update transitions,correct cadence
+and274 finite reports through3,872 actions. Only learner/evaluation seeds change
+from16001; keep240k/18,721 updates,12M64/Auto/N8/B16/T16/H5/R20/dynamics1e-4/
+replay-value1/expert100/greedy collection,native447fe50,runnere304af89 andteacher.
+Greedy15000/90% stays primary; sampled results remain separate. No frozen result.
+
+Require100k/7,784 and200k/15,596 recoveries and four final/own-initial24-episode
+assessments. CPU qualification passes21 scripts,1,046 declaration paths,eight
+actual preflight/four initialization cases. Original summary-key preparation
+failure and prequalification path correction remain; no GPU stage repeats.
+Terminal readerSHA5ca4b27b qualifies05:52:28 in4.809s,with two decision fixtures,
+both control recoveries and unchanged main identity. Its recovery100000,
+recovery200000 andterminal modes remain pending; run each once only after its
+original evidence exists. No startup,qualification,collector or stage repeats.
+Root `/x/Temp/kindle-qbert-r20-seed18013-20261102/full`; declarationSHAb6e10968.
+Check live state; no overlap,restart,extension,seed substitution or automatic
+successor. Prior R24 confirmation failures remain; the five-game goal is unfinished.
 
 The [completed Breakout greedy-collection comparison](results/2026-11-02-cdp-breakout-greedy-training.md)
 finishes200k actions /799,661 frames /12,477 updates in21m44.645s. Primary
