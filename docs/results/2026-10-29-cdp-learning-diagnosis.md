@@ -1,14 +1,24 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [optional playfield crop](../experiments/2026-11-02-cdp-breakout-playfield-crop.md)
-is selected for implementation and bounded qualification: native rectangle
-0/32/160/168, sameRGB64/12M input tensor/model, one GPU resize, teacher unchanged.
-Source review finds no expert-label indexing error; most guided control episodes
-end before the existing cap. Crop support is default-off and records its geometry
-with a distinct checkpoint architecture tag. CPU/native qualification is pending;
-no GPU check or learner has started. Root `/x/Temp/kindle-playfield-crop-20261102`.
-Require pixel-geometry/default compatibility checks before the fresh8,192-action
-cost screen. No full learner or automatic successor is selected.
+The [optional playfield crop](2026-11-02-cdp-breakout-playfield-crop.md)
+passes8,192 actions/32,725 frames/489 updates in47.995s;1,024 frozen actions
+in.882s have zero updates and no natural episodes. Conservative200k projection
+21m28.933s fits30min. Native crop0/32/160/168 keeps RGB64/12M, one GPU resize
+and the unchanged native-pixel teacher; it removes HUD information. Gameplay
+benefit is unmeasured; retain full-frame learning and keep the crop default-off.
+
+All374 pins,357 matching initial/invariant frozen tensors,full native-pixel/
+action/label replay and guards pass. Geometry32/48/64 passes; default restore
+matches128 events/357 tensors. Nativeacb175f/SHAa97bca1 passes153 Rust/642
+Python CPU tests and strict Clippy. Initial compile and final binary-lookup
+failures remain preserved; separate CPU repairs repeat no completed stage.
+Main/collection succeed12:13:29.808/12:13:34.786 UTC November2; terminal reader
+completes12:14:29.788. Source review identifies no label indexing bug, not proof
+of absence. Root `/x/Temp/kindle-playfield-crop-20261102` is closed; no GPU
+allocation remains active. Disposable2.76GiB cache released, pinned test binary/
+wheel/runtime retained. Do not repeat completed checks, replay or collectors.
+No full learner, extension, crop sweep or automatic successor is selected;
+check live state before work. The five-game goal remains unfinished.
 
 The [completed Breakout 25M comparison](2026-11-02-cdp-breakout-capacity25m.md)
 scores **49.958 sampled /104.292 greedy**, below12M70.750/143.667 by29.39%/
