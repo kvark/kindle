@@ -2158,6 +2158,10 @@ impl DreamerCore {
         let mut replay_weight = vec![0.0; replay_rows];
         let mut replay_value_target = vec![0.0; replay_rows * self.config.value_bins];
         let mut replay_slow_target = vec![0.0; replay_rows * self.config.value_bins];
+        let bootstrap_values = self
+            .config
+            .replay_value_bootstrap
+            .values(&values[0], &returns[0]);
         for batch_row in 0..self.config.batch_size {
             let last = (0..self.config.batch_length)
                 .map(|time| f32::from(batch.flags[time][batch_row].is_last))
@@ -2179,7 +2183,7 @@ impl DreamerCore {
                 .map(|time| values[0][time * self.config.batch_size + batch_row])
                 .collect::<Vec<_>>();
             let bootstrap = (0..self.config.batch_length)
-                .map(|time| returns[0][time * self.config.batch_size + batch_row])
+                .map(|time| bootstrap_values[time * self.config.batch_size + batch_row])
                 .collect::<Vec<_>>();
             let replay_return = lambda_returns(
                 &last,

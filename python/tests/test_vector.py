@@ -68,6 +68,10 @@ import profile_atari_vector
     (["--imagination-length", "1.5"], "invalid int value"),
     (["--restore", "unused", "--imagination-length", "5"], "training overrides"),
     (["--restore", "unused", "--imagination-length=15"], "training overrides"),
+    (["--replay-value-bootstrap", "unknown"], "invalid choice"),
+    (["--restore", "unused", "--replay-value-bootstrap", "posterior"], "training overrides"),
+    (["--restore", "unused", "--replay-value-bootstrap=imagined"], "training overrides"),
+    (["--evaluate", "--replay-value-bootstrap", "posterior"], "requires fresh training"),
     (["--actor-unimix", "-0.1"], "actor-unimix must be finite and in [0, 1)"),
     (["--actor-unimix", "1"], "actor-unimix must be finite and in [0, 1)"),
     (["--actor-unimix", "nan"], "actor-unimix must be finite and in [0, 1)"),
@@ -430,6 +434,44 @@ def test_replay_value_override_changes_only_requested_loss(monkeypatch, tmp_path
     assert overridden["loss_scales"]["replay_value"] == 1.0
     overridden["loss_scales"]["replay_value"] = default["loss_scales"]["replay_value"]
     assert overridden == default
+
+
+@pytest.mark.parametrize("cdp", [False, True])
+def test_replay_bootstrap_override_changes_only_requested_target(monkeypatch, tmp_path, cdp):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    configs = []
+
+    def construct(streams, config):
+        configs.append(copy.deepcopy(config))
+        raise RuntimeError("config checked before GPU")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct,
+                       SUPPORTS_REPLAY_VALUE_BOOTSTRAP=True))
+    for mode in (None, "imagined", "posterior"):
+        monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / f"bootstrap-{mode}.jsonl"),
+            *(["--cdp", "--cdp-centered"] if cdp else []),
+            *(["--replay-value-bootstrap", mode] if mode is not None else [])])
+        with pytest.raises(RuntimeError, match="config checked before GPU"):
+            atari_vector.main()
+    default, imagined, posterior = configs
+    assert default["replay_value_bootstrap"] == "imagined" and imagined == default
+    assert posterior["replay_value_bootstrap"] == "posterior"
+    posterior["replay_value_bootstrap"] = "imagined"
+    assert posterior == default
+
+
+def test_replay_bootstrap_rejects_older_runtime_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("environment constructed"))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "unsupported.jsonl"),
+                                    "--replay-value-bootstrap", "posterior"])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert "requires native bootstrap support" in capsys.readouterr().err
 
 
 def test_feature_vector_rejects_invalid_config_before_gpu():

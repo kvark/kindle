@@ -108,6 +108,8 @@ def main():
                         help="fresh actor/critic rate; omitted: native default follows the base rate")
     parser.add_argument("--replay-value-scale", type=float,
                         help="fresh training only: real-replay value loss scale; omitted: native default")
+    parser.add_argument("--replay-value-bootstrap", choices=("imagined", "posterior"),
+                        help="fresh training only: bootstrap replay targets with imagined returns or observed-state values")
     parser.add_argument("--encoder-learning-rate", type=float,
                         help="fresh CDP encoder rate; omitted: 6e-6 scaled with the base rate")
     parser.add_argument("--dynamics-learning-rate", type=float,
@@ -181,6 +183,8 @@ def main():
             parser.error("replay-value-scale must be finite and positive in F32")
         if args.evaluate:
             parser.error("replay-value-scale requires fresh training")
+    if args.replay_value_bootstrap is not None and args.evaluate:
+        parser.error("replay-value-bootstrap requires fresh training")
     if args.behavior_learning_rate is not None:
         if not positive_f32(args.behavior_learning_rate):
             parser.error("behavior-learning-rate must be finite and positive in F32")
@@ -325,6 +329,7 @@ def main():
     training_options.add("--breakout-centroid-scale")
     training_options.add("--behavior-learning-rate")
     training_options.add("--replay-value-scale")
+    training_options.add("--replay-value-bootstrap")
     training_options.add("--encoder-learning-rate")
     training_options.add("--dynamics-learning-rate")
     training_options.add("--cdp")
@@ -356,6 +361,8 @@ def main():
         parser.error("open-loop supervision requires native open-loop support")
     if args.breakout_centroid_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COLOR_CENTROID_SUPERVISION", False):
         parser.error("centroid supervision requires native color-centroid support")
+    if args.replay_value_bootstrap is not None and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_VALUE_BOOTSTRAP", False):
+        parser.error("replay-value-bootstrap requires native bootstrap support")
     if args.restore and args.encoder:
         metadata = json.loads((args.restore / "metadata.json").read_text())
         if (metadata.get("perception") or {}).get("kind") != args.encoder:
@@ -459,6 +466,8 @@ def main():
             config["behavior_learning_rate"] = args.behavior_learning_rate
         if args.replay_value_scale is not None:
             config["loss_scales"]["replay_value"] = args.replay_value_scale
+        if args.replay_value_bootstrap is not None:
+            config["replay_value_bootstrap"] = args.replay_value_bootstrap
         if args.breakout_centroid_scale is not None:
             config["color_centroid_supervision"] = dict(scale=args.breakout_centroid_scale,
                 channel=0, background_scale=1.5, region=[8/160, 90/210, 152/160, 185/210])

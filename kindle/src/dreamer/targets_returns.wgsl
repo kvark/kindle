@@ -1,6 +1,6 @@
 struct Params {
     starts: u32, horizon: u32, batch: u32, length: u32,
-    bins: u32, actions: u32, intrinsic: u32, padding: u32,
+    bins: u32, actions: u32, intrinsic: u32, posterior_bootstrap: u32,
     lambda: f32, discount: f32, bonus_scale: f32, rate: f32,
     rows: u32, offset: u32, padding2: u32, padding3: u32,
 }
@@ -39,6 +39,10 @@ fn pair_scale(a: vec2<f32>, b: f32) -> vec2<f32> {
     let high = a.x * b;
     let low = fma(a.x, b, -high) + a.y * b;
     return two_sum(high, low);
+}
+
+fn replay_bootstrap(row: u32) -> f32 {
+    return select(returns[row], values[row], params.posterior_bootstrap != 0u);
 }
 
 @compute @workgroup_size(64)
@@ -80,7 +84,7 @@ fn replayed(@builtin(global_invocation_id) id: vec3<u32>) {
     let batch = id.x;
     if batch >= params.batch { return; }
     let final_row = (params.length - 1u) * params.batch + batch;
-    var next = vec2<f32>(returns[final_row], 0.0f);
+    var next = vec2<f32>(replay_bootstrap(final_row), 0.0f);
     var okay = valid(next.x);
     for (var t = params.length - 1u; t > 0u; t--) {
         let arrival = t * params.batch + batch;
@@ -93,7 +97,7 @@ fn replayed(@builtin(global_invocation_id) id: vec3<u32>) {
         }
         let live = (1.0f - replay[2u * params.starts + arrival]) * params.discount;
         let trace = (1.0f - replay[params.starts + arrival]) * params.lambda;
-        let bootstrap = pair_scale(pair_scale(vec2<f32>(returns[arrival], 0.0f), 1.0f - trace), live);
+        let bootstrap = pair_scale(pair_scale(vec2<f32>(replay_bootstrap(arrival), 0.0f), 1.0f - trace), live);
         let carried = pair_scale(pair_scale(next, trace), live);
         next = pair_add(pair_add(reward, bootstrap), carried);
         replay_returns[row] = next.x;

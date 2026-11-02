@@ -226,7 +226,9 @@ impl TargetsGpu {
                 config.value_bins as u32,
                 config.action_count as u32,
                 u32::from(config.uses_disagreement()),
-                0,
+                u32::from(
+                    config.replay_value_bootstrap == super::config::ReplayValueBootstrap::Posterior,
+                ),
                 config.lambda.to_bits(),
                 config.continuation_discount().to_bits(),
                 config.intrinsic_reward_scale.to_bits(),

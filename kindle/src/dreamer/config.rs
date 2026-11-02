@@ -29,6 +29,25 @@ pub enum VideoEncoder {
     Joint,
 }
 
+/// Bootstrap used by the real-replay value target; imagined learning is unchanged.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReplayValueBootstrap {
+    #[default]
+    Imagined,
+    Posterior,
+}
+
+impl ReplayValueBootstrap {
+    pub(crate) fn values<'a>(self, posterior: &'a [f32], imagined: &'a [f32]) -> &'a [f32] {
+        assert_eq!(posterior.len(), imagined.len());
+        match self {
+            Self::Imagined => imagined,
+            Self::Posterior => posterior,
+        }
+    }
+}
+
 /// Matrix-product policy for training graphs. Parameters, optimizer state,
 /// reductions and accumulators remain f32; F16 permits reduced input precision
 /// in both forward and backward products, not half-storage checkpoints.
@@ -316,6 +335,8 @@ pub struct DreamerConfig {
     pub imagination_length: usize,
     pub horizon: usize,
     pub lambda: f32,
+    #[serde(default)]
+    pub replay_value_bootstrap: ReplayValueBootstrap,
     /// Free-nat floor for the representation KL and, by default, dynamics KL.
     pub free_nats: f32,
     /// Optional dynamics-only floor. `None` preserves D3's shared floor;
@@ -404,6 +425,7 @@ impl DreamerConfig {
             imagination_length: 15,
             horizon: 333,
             lambda: 0.95,
+            replay_value_bootstrap: ReplayValueBootstrap::Imagined,
             free_nats: 1.0,
             dynamics_free_nats: None,
             unimix: 0.01,
@@ -1243,6 +1265,7 @@ mod tests {
         assert!(value.get("open_loop_supervision").is_none());
         let object = value.as_object_mut().unwrap();
         object.remove("replay_value_gradient");
+        object.remove("replay_value_bootstrap");
         object.remove("actor_critic_gradient");
         object.remove("behavior_learning_rate");
         object.remove("dynamics_free_nats");
@@ -1252,6 +1275,10 @@ mod tests {
         object.remove("training_precision");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
+        assert_eq!(
+            restored.replay_value_bootstrap,
+            ReplayValueBootstrap::Imagined
+        );
         assert!(!restored.actor_critic_gradient);
         assert_eq!(restored.behavior_learning_rate, None);
         assert_eq!(restored.behavior_learning_rate(), restored.learning_rate);
@@ -1268,6 +1295,25 @@ mod tests {
         assert_eq!(restored.world_microbatch_size(), restored.batch_size);
         assert_eq!(restored.training_precision, TrainingPrecision::Auto);
         assert_eq!(restored.open_loop_supervision, None);
+    }
+
+    #[test]
+    fn replay_bootstrap_roundtrips_and_rejects_unknown_modes() {
+        let mut config = DreamerConfig::tiny(3);
+        assert_eq!(
+            config.replay_value_bootstrap,
+            ReplayValueBootstrap::Imagined
+        );
+        config.replay_value_bootstrap = ReplayValueBootstrap::Posterior;
+        let mut value = serde_json::to_value(&config).unwrap();
+        assert_eq!(value["replay_value_bootstrap"], "posterior");
+        let restored: DreamerConfig = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(
+            restored.replay_value_bootstrap,
+            ReplayValueBootstrap::Posterior
+        );
+        value["replay_value_bootstrap"] = serde_json::json!("unknown");
+        assert!(serde_json::from_value::<DreamerConfig>(value).is_err());
     }
 
     #[test]
