@@ -8,17 +8,21 @@ stay in the roadmap/reports. Use the current PR body for subsequent status edits
 
 The [fresh Breakout greedy-collection comparison](experiments/2026-11-02-cdp-breakout-greedy-training-200k.md) launches at
 05:10:17.676 UTC November2, source9247ffa, with427 pins and a30-minute training
-cap. Main PID898543/invocation5c69e7d837e34226bb4f323739c29a0f and all four
-original observers are active. Startup passes357 initial tensors matching both
+cap. Main PID898543/invocation5c69e7d837e34226bb4f323739c29a0f continues;
+the original100k recovery observer succeeds and the remaining observers continue. Startup passes357 initial tensors matching both
 control and bounded check,47 bounded-matching transitions/47 control differences,
 correct cadence and208 finite reports through3,704 actions. Only live collection
 changes; native447fe50,runner6e03d739,12M64/H15/R16/replay-value1,rates,unimix.01
-and teacher remain qualified. Require100k/6,227 recovery and final/actual-initial
-sampled/greedy24-episode assessments against70.750/143.667; sampled stays primary,
+and teacher remain qualified. The100k/6,227 recovery passes at05:21:23.347,
+with357 finite tensors/four files (206,067,161 bytes). Independent confirmation
+at05:21:50.207 preserves427 pins and original main identity; review SHAd527ee09,
+retention SHA33052ef0. Do not repeat the recovery reader. Final/actual-initial
+sampled/greedy24-episode assessments remain pending against70.750/143.667; sampled stays primary,
 original90% two-wall gate unchanged. No full frozen result yet.
 The separate terminal reader qualifies five score cases at05:11:30.095 in2.407s,
 preserving427 pins and original main identity. ReaderSHAc787fe18; recovery reader
-SHAb29381fd. Run each once at its milestone, without repeating original stages.
+SHAb29381fd. Recovery confirmation is complete; run terminal mode once after
+original collection, without repeating completed stages.
 A separate CPU score-coverage reader qualifies at05:15:41.903 in2.496s,
 with five boundary fixtures,43 diagnostic pins and427 unchanged active inputs.
 Use `review_score_coverage.py terminal` once after the original terminal reader

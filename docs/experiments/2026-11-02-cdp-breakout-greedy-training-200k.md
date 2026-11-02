@@ -156,3 +156,25 @@ run `terminal` mode once after `full-terminal-summary.json` exists and passes.
 The output will be `score-coverage-review.json`. No replay, control analysis or
 completed stage is repeated; no learner, guidance change or successor is selected.
 Retain the CPU co-host duration without correcting training wall time.
+
+## Retained100k recovery
+
+The original observer audits100,000 actions /6,227 updates at
+**05:21:23.347 UTC November2** and retains the four files at05:21:23.657.
+All357 tensors are finite; the complete contemporaneous log prefix contains
+6,442 finite reports through103,448 actions. The retained files total206,067,161
+bytes. Original observer898680/invocation296d81bbd5954d99be8559f39115bac8
+terminates successfully at05:21:23.675.
+
+The separately qualified reader confirms the saved milestone once at
+**05:21:50.207**, in1.918s (1.936s wrapper). It checks all427 input pins, four
+file hashes, metadata/configuration, the original recovery journal and unchanged
+main PID898543/invocation5c69e7d837e34226bb4f323739c29a0f before/after. No observer,
+checkpoint copy or GPU stage repeats. Recovery review SHAd527ee09, retention
+SHA33052ef0 and metadata SHAe9d56911 are retained. Recovery confirmation is now
+complete; do not rerun the reader.
+
+The original learner continues toward200k. Frozen results remain unavailable.
+Checkpoint contents omit replay, live belief, games and RNG; no uninterrupted
+restart claim is made. Keep the1.918s confirmation co-host cost without correcting
+training duration, alongside the2.496s coverage-reader qualification.
