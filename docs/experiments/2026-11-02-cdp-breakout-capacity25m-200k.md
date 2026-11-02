@@ -122,3 +122,27 @@ without native/emulator imports,GPU work or updates. Record co-host duration
 without correcting training time. Root is the existing25M package; output
 `score-coverage-review.json`. No new learner,guidance change,sweep,extension or
 automatic successor is selected by this diagnostic.
+
+The first coverage preflight fails10:55:41.798 UTC in1.397s because its new AST
+selector matches both training and frozen learner-counter assertions. No
+coverage declaration or analysis output is created. Preserve the original
+reader,generator,protocol snapshot and failed receipt. The learner remains the
+original933689/d3457431b99a41aebd2ec054df3f4d7d.
+
+A separate reader correction restricts that fixture selector to the assertion
+containing both `run_step` and `learner_updates`; parsing,metrics,thresholds,
+selection and actual counters remain unchanged. Qualify the corrected reader
+against the same six config/three counter cases,without repeating old trajectory
+analysis or boundary fixtures. Use `review_score_coverage_repaired.py` and
+`score-coverage-repair-declaration.json`. The final stage remains pending original
+full success and writes the new `score-coverage-review.json` once. Preserve the
+CPU co-host cost and all original inputs; no learner/observer/GPU stage changes.
+
+Corrected coverage qualification passes **10:57:05.358 UTC November2** in2.673s
+(2.699s wrapper): six actual configuration cases,three actual counter cases,
+five retained boundary fixtures without repetition,and all420 active pins.
+Original main933689/d3457431b99a41aebd2ec054df3f4d7d stays active. Nine unchanged
+reader functions match their original AST; parser,metrics and thresholds remain
+byte-identical. Original failureSHA2e759ebe is retained; repaired readerSHAfa452cfc.
+Do not repeat either preflight or run the failed reader. Final coverage analysis
+remains unexecuted,conditional on original full success and terminal confirmation.
