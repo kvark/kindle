@@ -30,14 +30,22 @@ remain fixed. Startup matches357 bounded25M initial tensors/47 pre-update
 transitions and163 finite reports through2,984 actions. Different12M initial
 values are not compared for equality. Frozen gameplay is unmeasured.
 
-Original progress,recovery,postprocess and collection observers are active.
-Root `/x/Temp/kindle-breakout-capacity25m-20261102/full`;service
-`kindle-breakout-capacity25m-200k-20261102`. Check live identity; do not restart
-or overlap this learner. Preserve the fixed final/actual-initial sampled and
-greedy24-episode assessments against12M70.750/143.667 and the90%-two-wall gate.
-Report absolute scores and initial-subtracted return per training minute.
-Read-only recovery/terminal readers are qualified but their final stages have
-not executed. No extension,cap increase,retry or automatic successor is selected.
+The original recovery observer succeeds **11:05:29.736 UTC**; read-only
+confirmation passes **11:06:26.188** in1.492s CPU. The100k/6,227 checkpoint has
+357 finite tensors and461,432,010 retained bytes; all420 pins and6,296 finite
+reports through101,112 actions pass. Original main identity is unchanged.
+Recovery confirmation is complete; do not repeat it. Progress,postprocess and
+collection observers continue. Root
+`/x/Temp/kindle-breakout-capacity25m-20261102/full`;service
+`kindle-breakout-capacity25m-200k-20261102`. Do not restart or overlap this learner.
+
+Preserve the fixed final/actual-initial sampled and greedy24-episode assessments
+against12M70.750/143.667 and the90%-two-wall gate. Report absolute scores and
+initial-subtracted return per training minute. Terminal and saved-log coverage
+readers remain pending full success. The coverage reader's first CPU fixture
+failure is preserved; its separate correction passes six config/three counter
+cases and55 pins, without changing parsing or metrics. Keep CPU co-host times
+uncorrected. No extension,cap increase,retry or automatic successor is selected.
 The five-game goal remains unfinished.
 
 The [bounded25M check](docs/results/2026-11-02-cdp-breakout-capacity25m.md)

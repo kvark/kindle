@@ -4,8 +4,12 @@ A separately selected [fresh200k comparison](../experiments/2026-11-02-cdp-break
 starts10:47:21.939 UTC November2/source0e69b83,main933689/invocation
 `d3457431b99a41aebd2ec054df3f4d7d`,with a45-minute training cap and420 pins.
 Startup matches357 bounded initial tensors/47 pre-update transitions and records
-163 finite reports through2,984 actions. Original progress,recovery,postprocessing
-and collection observers are active. Full frozen results are not available.
+163 finite reports through2,984 actions. The original100k/6,227 recovery observer
+succeeds11:05:29.736 UTC; read-only confirmation passes11:06:26.188 in1.492s.
+All420 pins,357 finite tensors and461,432,010 retained bytes verify, with6,296
+finite reports through101,112 actions. Recovery confirmation is complete.
+The original learner,progress,postprocessing and collection remain active.
+Full frozen results are not available; terminal and coverage analysis remain pending.
 The bounded result below is complete; do not repeat it or overlap the new learner.
 
 The existing 25M preset completes the declared **8,192 actions / 32,722 frames /

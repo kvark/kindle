@@ -94,8 +94,30 @@ wrapper, preserving the original active main identity. Reader sources are
 SHA9f5abf2d (recovery) /3bdfcaae (terminal),with a separate provenance receipt.
 Run recovery confirmation only after the original100k audit and retention
 complete; run the terminal reader only after all original services and full
-comparison succeed. Neither reader has executed its final stage. Retain CPU
-co-host durations without wall-time correction. No failure or GPU repeat occurs.
+comparison succeed. At startup neither reader has executed its final stage.
+Retain CPU co-host durations without wall-time correction. No learner or GPU
+failure or stage repeat occurs.
+
+## Retained halfway checkpoint
+
+The original recovery observer succeeds **11:05:29.736 UTC November2**, under
+PID933835/invocation`b8e295c002c64f3eb4287187c5254b98`. Its100k/6,227 checkpoint
+passes357 finite tensors and retains461,432,010 bytes across metadata,world,
+behavior and slow-value files. The complete log prefix contains6,296 finite
+reports through101,112 actions. All420 declaration pins remain unchanged.
+
+The prepared read-only recovery confirmation runs once and passes
+**11:06:26.188 UTC**, in1.492s CPU/1.510s wrapper. It verifies the original
+observer's single audit payload,terminal success,all retained hashes and exact
+metadata/configuration. Original main933689/d3457431b99a41aebd2ec054df3f4d7d
+remains active before/after; no observer,learner,replay or GPU stage repeats.
+Retained recovery omits replay,belief,games and RNG. No frozen competence is
+measured. Keep CPU co-host duration without correcting training time.
+
+Recovery reviewSHA41839203,retentionSHA9e8a40ce,metadataSHAd3e6d8ff; full hashes
+and confirmation are in the trial's `recovery-confirmation.json`. Do not repeat
+this reader. Terminal and saved-log coverage final stages remain pending original
+full success; fixed200k/45-minute limits and all assessment gates stay unchanged.
 
 ## Saved-log coverage follow-up
 
