@@ -117,3 +117,22 @@ control means from saved replay episodes. It constructs no native or emulator
 and repeats no capture or replay. Retain this CPU co-host cost without correction.
 ReaderSHA04ce2848/helperSHA131bee46; run its terminal mode only after original
 collection succeeds. The five-game goal remains unfinished.
+
+## Recovery milestone and CPU co-hosting
+
+The original100k/6,227 recovery observer succeeds **03:25:06.808 UTC November2**.
+All357 tensors are finite; its complete log prefix contains6422 finite reports
+through103128 actions. The four retained files total206067162 bytes. Metadata
+SHA536d4cdf, checkpoint-reviewSHAe86217ed and retentionSHAdd3dc662 are retained.
+
+A separate read-only confirmation passes **03:25:45.442** in3.650s (3.669s
+wrapper), checking all338 pins, retained files, metadata and the original recovery
+journal. MainPID887827/invocation4b67c053d030409f8734e6bfbdab6707 remains active
+and unchanged before/after. No checkpoint copy, observer or GPU stage repeats.
+The weights omit replay, belief, games and RNG; no uninterrupted restart is implied.
+The original learner continues; full frozen results remain unmeasured.
+
+The separate [Qbert saved-log diagnosis](../results/2026-11-02-cdp-qbert-replay-value1-phases.md)
+co-hosts4.038s CPU (4.061s wrapper) at03:19:44.467. It preserves all338 pins and
+the same main identity, with no native/emulator import, GPU work or replay repeat.
+Retain this cost and the recovery confirmation cost without wall-time correction.

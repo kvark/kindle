@@ -2,10 +2,13 @@
 
 The [fresh Breakout replay-value1 comparison](experiments/2026-11-02-cdp-breakout-replay-value1-200k.md) launches
 03:14:00.615 UTC November2/source45cd1ab, mainPID887827/invocation
-`4b67c053d030409f8734e6bfbdab6707`. Allfour original observers are active.
+`4b67c053d030409f8734e6bfbdab6707`. Original100k/6,227 recovery succeeds
+03:25:06.808 with357 finite tensors; all338 pins andretained hashes pass a
+separate3.650s confirmation03:25:45.442. Same main remains active; other original
+observers continue. No observer,checkpoint copy orGPU stage repeats.
 Startup passes338 pins,357 control/bounded matching initial tensors,47 equal
 pre-update transitions and111 finite updates through2136 actions. Train200k/
-12,477 updates within30min; require100k/6,227 recovery and final/actual-initial
+12,477 updates within30min; require final/actual-initial
 sampled/greedy24-episode assessments against59.000/117.292. Sampled remains
 primary; original90% two-wall gate stays fixed. No full frozen result exists.
 
