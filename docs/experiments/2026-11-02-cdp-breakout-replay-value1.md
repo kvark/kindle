@@ -1,5 +1,12 @@
 # Breakout replay-value scale1: bounded development check
 
+Completed:8192 actions/32,727 frames/489 updates in47.690s;1024 frozen/.872s,
+zero updates/no natural episodes. Conservative200k projection21m20.729s clears
+30min. All320 pins andoriginal services pass;no stage fails orrepeats.
+Main03:02:34.926 UTC November2/source70b7567,collector completion03:02:40.372,
+terminal reader03:03:34.459. No full learner isselected atclosure.
+[Completed result](../results/2026-11-02-cdp-breakout-replay-value1.md).
+
 Select one8,192-action check after the Qbert confirmation's original closure.
 The [current sampled control](../results/2026-11-02-cdp-breakout-behavior8e5.md)
 scores59.000 sampled/117.292 greedy in21m44.517s, withzero two-wall successes.

@@ -1,22 +1,23 @@
 # CDP handover — October25,2026
 
-The [Breakout replay-value1 bounded check](experiments/2026-11-02-cdp-breakout-replay-value1.md) is separately selected after
-Qbert's closure. Only replay-value0.3→1 changes from the behavior8e-5 control's
-59.000 sampled/117.292 greedy,allzero two-wall. Keep12M64/Auto/N8/B16/T16/H15/
-R16/base-encoder4e-5/behavior8e-5/dynamics4e-4/expert100,sampled collection,
-actorunimix.01 andteacher. Native447fe50/35ad0db isunchanged; runnercf4ea238 adds
-only ten fresh-CLI lines. Existing targets remain; critic andrepresentation
-weights change together. No isolated mechanism orbenefit is established.
+The [completed Breakout replay-value1 check](results/2026-11-02-cdp-breakout-replay-value1.md) passes8192 actions /
+32,727 frames /489 updates in47.690s;1024 frozen/.872s haszero updates andno
+natural episodes. Conservative200k projection21m20.729s clears30min. All320
+pins,357 matching initial/invariant frozen tensors,47 pre-update events,finite
+reports,full guided replay andguards pass. Main succeeds03:02:34.926 UTC
+November2/source70b7567;original collector completion03:02:40.372 isterminal
+success. Separate1.289s reader passes03:03:34.459. No stage fails orrepeats.
 
-The23 private CPU tests and2.186s preparation pass,including both actual commands,
-17 config cases,357 control shapes,cadence and282 control pins. Require8192
-training actions/489 updates within180s and1024 frozen/zero updates within60s,
-matched initial values/pre-update traces,full guided replay andguards. A10%
-margin on the200k projection must clear30min; this establishes execution/cost
-only. No full learner,extension,retry,sweep orautomatic promotion is selected.
-Root`/x/Temp/kindle-breakout-replay-value1-20261102/native-check`; main
-`kindle-breakout-replay-value1-check-20261102`. Check live state; no overlap or
-restart. The five-game goal remains unfinished.
+Only replay-value0.3→1 changes from behavior8e-5's59.000 sampled/117.292 greedy.
+Keep12M64/Auto/N8/B16/T16/H15/R16/base-encoder4e-5/behavior8e-5/dynamics4e-4/
+expert100,sampled collection,actorunimix.01,native447fe50/35ad0db andteacher.
+Runnercf4ea238 adds ten fresh-CLI lines;23 CPU tests and2.186s preparation pass.
+Critic andrepresentation gradients change together; gameplay benefit isunmeasured.
+Root`/x/Temp/kindle-breakout-replay-value1-20261102/native-check` isclosed,
+completionSHA56cd5cba/summarySHAcfc4b639. No active allocation remains;check live
+state. No full learner,extension,retry,sweep,automatic promotion orcheck-experience
+reuse isselected atclosure. Do not repeat completed stages orreader.
+The five-game goal remains unfinished.
 
 The [completed Qbert replay-value1 confirmation](results/2026-11-02-cdp-qbert-replay-value1-seed16001.md) scores
 **14,913.542 greedy /14,745.833 sampled**, each24/24 first pyramids. Both means
