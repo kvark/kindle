@@ -83,3 +83,28 @@ Recovery metadata, retention and collector checks pass; all374 bounded and338
 control pins verify,357 initial tensors match and18 scripts compile. No native
 agent or environment is constructed. The selector's actual input list is
 resolved separately before launch; no earlier qualification stage repeats.
+
+## Original learner launched
+
+Main starts **12:26:48.481 UTC November2**, source `53a75d7`, PID950033,
+invocation `7bc8fe9931bd4f3fbee1f43739efb056`. Declaration SHA256
+`57bd2e670bc3120b7e10c0262470018d728af51d4baf77fa6765ecdfd073d189`
+pins413 inputs. The selector resolves410 existing files and three declared
+outputs before launch. Original postprocessing, progress, recovery and collection
+observers are active. Do not restart or overlap this learner.
+
+The startup audit passes **12:28:20.927 UTC**, in1.462s including its wrapper.
+All413 pins, exact configuration/cadence and357 initial tensors match. The first
+47 transitions match the bounded crop check; full-frame input traces are not
+required to match. The complete log prefix has882 finite supervised updates
+through14,488 actions. No full frozen result is available.
+
+Separate read-only recovery and success-only terminal readers are prepared at
+the package root. Terminal-reader qualification passes five score cases and
+seven crop/native/configuration cases in.043s (.062s wrapper), preserving the
+original live process identity. Source preparation takes.005s. Recovery reader
+SHA prefix `bc1a6f0c`; terminal reader `30763238`. Run recovery confirmation
+only after the original100k audit/retention completes, and terminal confirmation
+only after all original services and comparison succeed. Neither final reader
+has run. Preserve CPU co-host time without correcting training duration.
+No preparation failure, learner failure or repeated GPU stage occurs at startup.

@@ -1,17 +1,21 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
 The [fresh Breakout crop comparison](../experiments/2026-11-02-cdp-breakout-playfield-crop-200k.md)
-is separately selected after bounded geometry/default-compatibility/cost pass:
-200k actions/12,477 updates,30-minute training cap,native crop0/32/160/168 at
-retained12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/
-replay-value1/expert100. Teacher unchanged; HUD information is removed. Require
-100k/6,227 recovery and actual-initial/final sampled/greedy24-episode assessments
-against70.750/143.667 and the original90%-two-wall gate. Nativeacb175f/runner046aa5bc
-differ from447fe50/cf4ea238; no isolated causal claim. CPU preflight passes five
-commands,38 configuration cases and recovery/observer checks in2.345s;374 bounded/
-338 control pins verify. Root `/x/Temp/kindle-playfield-crop-20261102/full`;
-service `kindle-breakout-playfield-crop-200k-20261102`. Check live state before
-launch; do not repeat closed checks or overlap GPU jobs. No full outcome yet.
+launches12:26:48.481 UTC November2/source53a75d7 with413 pins,200k actions/
+12,477 updates and30-minute training cap. Native crop0/32/160/168 keeps12M64/
+Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/
+expert100; teacher unchanged, HUD information removed. Startup passes357 matching
+initial tensors,47 bounded-crop transitions and882 finite updates through14,488
+actions. MainPID950033/invocation7bc8fe9931bd4f3fbee1f43739efb056 remains active;
+original postprocessing,progress,recovery and collection observers are active.
+Require100k/6,227 recovery and actual-initial/final sampled/greedy24-episode
+assessments against70.750/143.667 and the original90%-two-wall gate. No full
+frozen result yet. Nativeacb175f/runner046aa5bc differ from447fe50/cf4ea238;
+no isolated causal claim. Read-only recovery/terminal readers are prepared;
+terminal qualification passes five score/seven configuration cases in.043s.
+Root `/x/Temp/kindle-playfield-crop-20261102/full`, service
+`kindle-breakout-playfield-crop-200k-20261102`. Check live state; do not restart,
+repeat closed stages or schedule another GPU job while this learner is active.
 
 The [optional playfield crop](2026-11-02-cdp-breakout-playfield-crop.md)
 passes8,192 actions/32,725 frames/489 updates in47.995s;1,024 frozen actions
