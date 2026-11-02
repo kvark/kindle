@@ -1,5 +1,16 @@
 # Breakout: observed-state bootstrap for replay value targets
 
+**Bounded check complete.** Native11373c1/SHAf1cf4317 passes150 Rust CPU and628
+packaged Python checks, both strict Clippy checks, legacy default1,024-action
+compatibility, and fresh8,192 actions/489 updates in46.900s. All373 pins,
+357 matching initial/invariant frozen tensors,47 pre-update events, guided
+replay and host guards pass. Conservative200k projection20m59.510s clears30min.
+Original main/collector succeed09:08:00.345/09:08:08.088 UTC November2; terminal
+reader passes once09:08:31.094. No failure or stage repeat. No full learner or
+GPU allocation is active at closure. Do not rerun completed stages.
+[Completed result](../results/2026-11-02-cdp-breakout-posterior-bootstrap.md).
+The selection below records the protocol; a full comparison remains unselected.
+
 Select one optional native target variant within the five-game goal. The
 retained replay-value1 critic has weak sampled-return calibration; a fixed
 scalar correction recovers only a small gain over a constant. This does not

@@ -1,5 +1,28 @@
 # Kindle: CDP learning roadmap
 
+The [optional posterior replay bootstrap](results/2026-11-02-cdp-breakout-posterior-bootstrap.md)
+passes8,192 fresh actions/32,726 frames/489 updates in46.900s; conservative200k
+projection **20m59.510s** clears30min. All373 pins,357 matching initial/invariant
+frozen tensors,47 pre-update events, finite reports, guided replay and guards
+pass. Frozen1,024 actions/.879s have zero updates and no natural episodes.
+No gameplay benefit or full learner is selected.
+
+Native11373c1/SHAf1cf4317 passes150 Rust CPU/628 packaged Python checks and
+both strict Clippy checks. The new runtime first matches128 legacy-default
+semantic events and357 frozen tensors on1,024 actions. Use the isolated
+`/x/Temp/kindle-replay-bootstrap-20261102/runtime` for this optional mode;
+the default remains imagined bootstrap. Auto/host targets and teacher stay fixed.
+Resident-target shaders validate offline; that unavailable path is not GPU-qualified.
+
+Original main927572/ff26aa4f6e07412ab2254b7549a12080 andcollector927575/
+19991e85029a4d70a5a2fcb728ff764e succeed **09:08:00.345/09:08:08.088 UTC
+November2**. Terminal reader passes once09:08:31.094; completionSHAefbe8f3b.
+All stages succeed without repeats. The2.989GiB cache is released; wheel,
+native, validation binary and evidence remain. No allocation is active at closure.
+Do not repeat qualification, compatibility, learner, replay, collector or reader.
+A fresh200k comparison still requires separate selection; the five-game goal
+remains unfinished. Root `/x/Temp/kindle-replay-bootstrap-20261102`.
+
 The [completed scalar value calibration diagnostic](results/2026-11-02-cdp-breakout-value-calibration.md)
 finds a small recoverable signal in the stronger Breakout critic. An affine
 correction fitted on eight earlier episodes reduces sampled RMSE9.231→7.698

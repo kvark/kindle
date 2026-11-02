@@ -8,25 +8,33 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 2
 
-The [completed scalar value calibration diagnostic](results/2026-11-02-cdp-breakout-value-calibration.md)
-finds a small recoverable signal in the stronger Breakout critic. An affine
-correction fitted on eight earlier episodes reduces sampled RMSE9.231→7.698
-on sixteen later episodes, versus constant7.855; offset alone scores8.313.
-Six of eight lanes improve; the conditional lane MSE interval is[−5.359,−.471].
-Correlation stays.231, so most return variation remains unexplained. No
-inference correction, loss change or new learner is selected.
+The [optional posterior replay bootstrap](results/2026-11-02-cdp-breakout-posterior-bootstrap.md)
+passes8,192 fresh actions/32,726 frames/489 updates in46.900s; conservative200k
+projection **20m59.510s** clears30min. All373 pins,357 matching initial/invariant
+frozen tensors,47 pre-update events, finite reports, guided replay and guards
+pass. Frozen1,024 actions/.879s have zero updates and no natural episodes.
+No gameplay benefit or full learner is selected.
 
-All20 diagnostic/74 original pins and seven fixture groups pass. CPU analysis
-completes **08:44:53.508 UTC November2/source6a90267** in.918s, with zero GPU
-work, native/ALE imports, updates, failures or repeated stages. Root
-`/x/Temp/kindle-breakout-value-calibration-20261102` is closed; do not rerun.
-No Kindle allocation is active at closure. Prioritize actual target construction
-and fitting; the five-game goal remains unfinished.
+Native11373c1/SHAf1cf4317 passes150 Rust CPU/628 packaged Python checks and
+both strict Clippy checks. The new runtime first matches128 legacy-default
+semantic events and357 frozen tensors on1,024 actions. Use the isolated
+`/x/Temp/kindle-replay-bootstrap-20261102/runtime` for this optional mode;
+the default remains imagined bootstrap. Auto/host targets and teacher stay fixed.
+Resident-target shaders validate offline; that unavailable path is not GPU-qualified.
 
-The [preceding frozen critic captures](results/2026-11-02-cdp-breakout-replay-value-critic.md)
-are complete with74 pins,357 invariant tensors per arm and original trajectories
-preserved. Keep all original gameplay scores and costs; no capture or collector
-should repeat. The detailed report retains service identities and closure evidence.
+Original main927572/ff26aa4f6e07412ab2254b7549a12080 andcollector927575/
+19991e85029a4d70a5a2fcb728ff764e succeed **09:08:00.345/09:08:08.088 UTC
+November2**. Terminal reader passes once09:08:31.094; completionSHAefbe8f3b.
+All stages succeed without repeats. The2.989GiB cache is released; wheel,
+native, validation binary and evidence remain. No allocation is active at closure.
+Do not repeat qualification, compatibility, learner, replay, collector or reader.
+A fresh200k comparison still requires separate selection; the five-game goal
+remains unfinished. Root `/x/Temp/kindle-replay-bootstrap-20261102`.
+
+The [earlier scalar calibration](results/2026-11-02-cdp-breakout-value-calibration.md)
+recovers only a small sampled-value signal (affineRMSE7.698 versus constant7.855).
+It does not identify a causal critic defect or establish a gameplay correction.
+Keep all original scores and completed evidence; no diagnostic should repeat.
 
 The [completed Breakout H30/R12 comparison](results/2026-11-02-cdp-breakout-h30-r12.md) scores **58.917 sampled /
 124.708 greedy**, below70.750/143.667 by16.73%/13.20%, in **23m15.641s**
