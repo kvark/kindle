@@ -20,21 +20,30 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 2
 
-The [Breakout 25M bounded check](docs/results/2026-11-02-cdp-breakout-capacity25m.md)
-passes8,192 actions/32,722 frames/489 updates in **84.864s**;1,024 frozen actions
-in1.343s have zero updates/no natural episodes. All380 pins,357 actual schema/
-finite/invariant frozen tensors,full guided replay and guards pass. Parameters
-rise16,334,353→36,608,401; only the preset changes at64/Auto/N8/B16/T16/H15/R16/
-encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100. Native447fe50,
-runnercf4ea238 and teacher stay fixed. Different architectures have different
-initial values; no12M initial equality is claimed. Conservative200k projection
-**37m59s** passes45min, but short training costs **77.95% more**. Gameplay benefit
-is unmeasured. Main/collection succeed **10:39:11.653/10:39:18.624 UTC November2**,
-sourcea8144ec; terminal confirmation10:40:52.368. No failure or stage repeat.
-Root `/x/Temp/kindle-breakout-capacity25m-20261102` is closed; no full learner or
-GPU allocation is active at closure. Do not repeat checks,collectors or readers.
-No automatic promotion,extension,retry or capacity sweep is selected. Check live
-state before further work. The five-game goal remains unfinished.
+The [fresh Breakout 25M comparison](docs/experiments/2026-11-02-cdp-breakout-capacity25m-200k.md)
+launches **10:47:21.939 UTC November2**, source0e69b83,main **PID933689 /
+invocationd3457431b99a41aebd2ec054df3f4d7d**,with420 pins and a **45-minute**
+training cap:200k actions/12,477 updates,100k/6,227 retained recovery. Only preset
+12M→25M changes at64/Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/
+dynamics4e-4/replay-value1/expert100. Native447fe50,runnercf4ea238 and teacher
+remain fixed. Startup matches357 bounded25M initial tensors/47 pre-update
+transitions and163 finite reports through2,984 actions. Different12M initial
+values are not compared for equality. Frozen gameplay is unmeasured.
+
+Original progress,recovery,postprocess and collection observers are active.
+Root `/x/Temp/kindle-breakout-capacity25m-20261102/full`;service
+`kindle-breakout-capacity25m-200k-20261102`. Check live identity; do not restart
+or overlap this learner. Preserve the fixed final/actual-initial sampled and
+greedy24-episode assessments against12M70.750/143.667 and the90%-two-wall gate.
+Report absolute scores and initial-subtracted return per training minute.
+Read-only recovery/terminal readers are qualified but their final stages have
+not executed. No extension,cap increase,retry or automatic successor is selected.
+The five-game goal remains unfinished.
+
+The [bounded25M check](docs/results/2026-11-02-cdp-breakout-capacity25m.md)
+is complete:8,192 actions/489 updates in84.864s,357 actual/invariant frozen tensors,
+380 pins and all guards/replays pass. Conservative200k projection37m59s fits45min;
+short training costs77.95% more than12M. No stage repeats or gameplay claim.
 
 The [saved crop-gap diagnostic](docs/results/2026-11-02-cdp-breakout-crop-gap.md)
 finds the ball visible before all103 available loss crossings; all98 nearby

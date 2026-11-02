@@ -1,5 +1,25 @@
 # Kindle: CDP learning roadmap
 
+The [fresh Breakout 25M comparison](experiments/2026-11-02-cdp-breakout-capacity25m-200k.md)
+launches **10:47:21.939 UTC November2**, source0e69b83,main **PID933689 /
+invocationd3457431b99a41aebd2ec054df3f4d7d**,with420 pins and a **45-minute**
+training cap:200k actions/12,477 updates,100k/6,227 retained recovery. Only preset
+12M→25M changes at64/Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/
+dynamics4e-4/replay-value1/expert100. Native447fe50,runnercf4ea238 and teacher
+remain fixed. Startup matches357 bounded25M initial tensors/47 pre-update
+transitions and163 finite reports through2,984 actions. Different12M initial
+values are not compared for equality. Frozen gameplay is unmeasured.
+
+Original progress,recovery,postprocess and collection observers are active.
+Root `/x/Temp/kindle-breakout-capacity25m-20261102/full`;service
+`kindle-breakout-capacity25m-200k-20261102`. Check live identity; do not restart
+or overlap this learner. Preserve the fixed final/actual-initial sampled and
+greedy24-episode assessments against12M70.750/143.667 and the90%-two-wall gate.
+Report absolute scores and initial-subtracted return per training minute.
+Read-only recovery/terminal readers are qualified but their final stages have
+not executed. No extension,cap increase,retry or automatic successor is selected.
+The five-game goal remains unfinished.
+
 The [Breakout 25M bounded check](results/2026-11-02-cdp-breakout-capacity25m.md)
 passes8,192 actions/32,722 frames/489 updates in **84.864s**;1,024 frozen actions
 in1.343s have zero updates/no natural episodes. All380 pins,357 actual schema/

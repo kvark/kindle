@@ -1,5 +1,13 @@
 # Breakout 25M passes bounded learning and restore, at higher cost
 
+A separately selected [fresh200k comparison](../experiments/2026-11-02-cdp-breakout-capacity25m-200k.md)
+starts10:47:21.939 UTC November2/source0e69b83,main933689/invocation
+`d3457431b99a41aebd2ec054df3f4d7d`,with a45-minute training cap and420 pins.
+Startup matches357 bounded initial tensors/47 pre-update transitions and records
+163 finite reports through2,984 actions. Original progress,recovery,postprocessing
+and collection observers are active. Full frozen results are not available.
+The bounded result below is complete; do not repeat it or overlap the new learner.
+
 The existing 25M preset completes the declared **8,192 actions / 32,722 frames /
 489 updates in84.864s**. Its **1,024-action /4,096-frame frozen restore takes
 1.343s**, with zero updates and no completed natural episodes. Execution and

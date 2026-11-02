@@ -73,3 +73,26 @@ initial tensors match the25M schema,and18 scripts compile. The selector's actual
 input list resolves414 existing files plus its six explicitly deferred outputs;
 44 source path checks also pass. No native/environment construction or GPU work
 occurs. Source preparation and qualification have no failures or repeated stages.
+
+## Original learner launched
+
+Main starts **10:47:21.939 UTC November2**, source`0e69b83`,PID933689/invocation
+`d3457431b99a41aebd2ec054df3f4d7d`. DeclarationSHA1985ac2c pins420 inputs;
+the actual prelaunch command check passes before the original service starts.
+Postprocessing,progress,recovery and collection observers are active under their
+original identities. Do not restart or overlap this learner.
+
+The1.707s startup wrapper passes all420 pins,exact config,cadence and357 initial
+tensors matching the bounded25M checkpoint. All47 pre-update transitions match;
+163 finite supervised reports appear through2,984 actions. No12M initial-value
+equality is claimed. Startup review is retained in the trial; frozen gameplay
+is unmeasured and the fixed200k/45-minute budget remains unchanged.
+
+Read-only recovery and success-only terminal readers are prepared under the
+package root. The terminal reader's five score cases pass in.087s CPU/.105s
+wrapper, preserving the original active main identity. Reader sources are
+SHA9f5abf2d (recovery) /3bdfcaae (terminal),with a separate provenance receipt.
+Run recovery confirmation only after the original100k audit and retention
+complete; run the terminal reader only after all original services and full
+comparison succeed. Neither reader has executed its final stage. Retain CPU
+co-host durations without wall-time correction. No failure or GPU repeat occurs.
