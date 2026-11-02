@@ -52,7 +52,7 @@ Root `/x/Temp/kindle-breakout-behavior8e5-20261102/full`; trial
 `kindle-breakout-behavior8e5-200k-20261102`, with original progress,recovery,
 postprocessing andterminal-collection observers. Main cap4500s,audit1200s;
 observers retain their fixed declared deadlines. No automatic successor,
-confirmation, extension, retry or cap increase. Full launch ispending.
+confirmation, extension, retry or cap increase. The first GPU launch and startup are recorded below.
 
 
 ## Full CPU qualification and separate selection
@@ -66,7 +66,7 @@ pass; no native/emulator construction orfailure. PreflightSHA256
 
 Separately select the fixed200k learner after these checks andan idle-host
 verification. The bounded original main/collector areterminal success andclosed.
-Native,teacher,runner,settings andcaps remainfixed. Full launch ispending.
+Native,teacher,runner,settings andcaps remainfixed. The first GPU launch and startup are recorded below.
 
 
 ## CPU prelaunch failure and correction
@@ -87,3 +87,19 @@ sources, declaration and failure remain in the package's `prelaunch-failure/`
 directory and `full-launch-execution.json`. Repin the corrected controller and
 repair evidence before the first actual GPU launch; do not rerun selection or
 successful qualification stages. The fixed 200k comparison remains selected.
+
+
+## First GPU launch and startup
+
+The corrected, repinned declaration launches at **00:34:24.392 UTC November 2**,
+source3099ff7. MainPID873316/invocation`56e692c47ef348ff8acd60089b7b46df` and all
+four original observers are active. Declaration SHAd8d4f582 pins282 inputs,
+including the original CPU failure and separate repair. This is the first actual
+GPU launch; the earlier failed invocation created no service.
+
+Startup passes at00:34:37.150 in1.019s wrapper: all282 pins,357 finite initial
+tensors matching both control and bounded initialization,47 identical pre-update
+transitions, updates at376/392/408/424/440/456 and77 finite supervised reports
+through1,608 actions. Original process identity, native/runner/teacher, exact
+configuration and fresh counters pass. No full frozen result is available.
+Keep the original process and observers; do not restart or overlap GPU work.

@@ -1,27 +1,28 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh Breakout actor/critic-rate comparison](../experiments/2026-11-02-cdp-breakout-behavior8e5-200k.md)
-is separately selected after the bounded check andfull CPU qualification.
-Only behavior rate changes fromeffective4e-5 to8e-5; base/encoder4e-5,dynamics4e-4
-and12M64/Auto/N8/B16/T16/H15/R16/expert100/sampled collection stayfixed.
-Native447fe50/35ad0db,teacher andrunner6c1b69fb areunchanged. Actor/critic rates
-change together; no isolated mechanism ornew loss isclaimed. No experience reused.
+The [fresh Breakout actor/critic-rate comparison](../experiments/2026-11-02-cdp-breakout-behavior8e5-200k.md) is active.
+It launches at **00:34:24.392 UTC November 2**, source3099ff7, with282 pins.
+MainPID873316/invocation`56e692c47ef348ff8acd60089b7b46df`; original progress,
+recovery, postprocessing and terminal-collection observers are active. Startup
+passes at00:34:37.150:357 matching control/bounded initial tensors,47 identical
+pre-update transitions, correct cadence and77 finite reports through1,608 actions.
+No full frozen gameplay result is available.
 
-The [bounded check](../results/2026-11-02-cdp-breakout-behavior8e5.md) passes
-8,192/489 in47.149s;frozen1,024/.867s,zero updates/no episodes. All252 pins,
-357 matching initial/invariant tensors,47 pre-update events,full replay andguards
-pass;original main/collector succeed00:26:32/00:26:39 UTC November2. Conservative
-projection21m06.197s clears30min. Full preparation passes1.399s:five commands,
-28 config cases,18 scripts,seven globals,retention/observer/collector checks,
-all252 bounded/227 control pins andzero native/emulator construction. The first
-launch preflight fails before service creation on a copied dynamics CLI check;
-separate2.911s CPU repair validates the actual preflight andrejects two wrong
-behavior-rate commands. Original sources,receipt andcoverage gap remain preserved;
-no GPU stage starts orrepeats. Keep200k/12,477/30min,100k/6,227 recovery andfour actual-initial/
-final sampled/greedy24-episode arms against56.292/104.667,allzero two-wall.
-Root `/x/Temp/kindle-breakout-behavior8e5-20261102/full`;service
-`kindle-breakout-behavior8e5-200k-20261102`. Full launch ispending. No retry,
-extension,rate sweep,confirmation orautomatic successor isselected.
+Only the shared actor/critic rate changes from effective4e-5 to8e-5. Keep
+base/encoder4e-5, dynamics4e-4,12M64/Auto/N8/B16/T16/H15/R16/expert100 and sampled
+collection. Native447fe50/35ad0db, teacher and runner6c1b69fb are unchanged.
+Keep200k actions/12,477 updates/30min,100k/6,227 recovery and four final/actual-
+initial sampled/greedy24-episode arms against56.292/104.667, allzero two-wall.
+No experience is reused; actor and critic effects are not separated.
+
+The [bounded check and preparation](../results/2026-11-02-cdp-breakout-behavior8e5.md) pass. The first CPU prelaunch
+fails before service creation on a copied dynamics CLI assertion; separate2.911s
+repair executes the corrected preflight and rejects wrong/missing behavior rates.
+Original failure, sources and qualification coverage gap remain preserved; no
+GPU stage repeats. Root `/x/Temp/kindle-breakout-behavior8e5-20261102/full`;
+service `kindle-breakout-behavior8e5-200k-20261102`. Do not restart this learner
+or schedule another GPU job while it is active. No extension, rate sweep,
+confirmation or automatic successor is selected. The five-game goal is unfinished.
 
 The [fresh Qbert confirmation](2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
 finishes25m09.906s with14,770.833 greedy/14,254.167 sampled and24/24 first pyramids

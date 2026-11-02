@@ -60,8 +60,8 @@ No native or emulator construction, failure orrepeated successful stage occurs.
 Preflight SHA256`3268fe898cf6cb569377f99115c2c5fa973900794bfc0cafd8c36a0759b1fc7b`.
 
 The full learner is separately selected after this qualification andanother
-idle-host check. Launch ispending. No earlier weights, replay, beliefs, games,
-RNG orbounded experience will be reused. No retry, rate sweep, extension,
+idle-host check. Its first actual GPU launch follows the CPU repair below.
+No earlier weights, replay, beliefs, games, RNG orbounded experience are reused. No retry, rate sweep, extension,
 confirmation orautomatic successor. The five-game goal remains unfinished.
 
 
@@ -83,3 +83,24 @@ The full directory snapshot, original declaration, controller and failed preflig
 are retained under `prelaunch-failure/`; failure receipt SHAe4cb42a2. Corrected
 controller SHA3441f72b. Repin this correction and evidence before the first GPU
 launch. The training recipe and all caps remain unchanged.
+
+
+## Fresh 200k learner active; gameplay result pending
+
+The first GPU launch is **00:34:24.392 UTC November 2/source3099ff7**. Main
+PID873316/invocation`56e692c47ef348ff8acd60089b7b46df` remains active. Original
+postprocessing/progress/recovery/collection PIDs are873319/873322/873451/873454,
+with identities retained in `observers.json`. All training/evaluation caps and
+settings remain fixed. Declaration SHAd8d4f582 pins282 inputs, including the
+preserved original CPU failure and separate correction.
+
+The read-only startup check passes **00:34:37.150** in1.019s wrapper. All282 pins,
+357 finite control/bounded-matching initial tensors,47 matching pre-update
+transitions, exact configuration/native/runner/teacher, original process identity
+and fresh counters pass. First six updates occur at376/392/408/424/440/456;
+77 finite supervised reports cover the complete prefix through1,608 actions.
+This verifies startup only. No full frozen score or gameplay gain is available.
+
+Retain the original service and four observers,100k/6,227 recovery and final/
+actual-initial sampled/greedy assessments. Do not restart or overlap GPU work.
+No extension, rate sweep, confirmation or automatic successor is selected.
