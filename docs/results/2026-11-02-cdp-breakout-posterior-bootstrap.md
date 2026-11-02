@@ -126,3 +126,46 @@ Root `/x/Temp/kindle-replay-bootstrap-20261102/full` is active. Check live state
 do not restart the learner or schedule overlapping GPU work. No extension,
 cap increase,sweep,confirmation or automatic successor is selected. Breakout
 and the five-game goal remain unfinished.
+
+## Terminal reader prepared during training
+
+The separate CPU reader passes its qualification **09:34:44.522 UTC November2**
+in2.417s (2.438s wrapper), while the original learner remains active. All412
+inputs remain unchanged. Five score cases and six configuration cases accept
+the retained evidence and reject incorrect scores, native/runner identities,
+teacher identity, bootstrap mode and behavior rate. It imports neither native
+Kindle nor ALE and performs zero GPU work or learning updates.
+
+The reader will verify allfive original service identities and terminal states,
+completion hashes,100k retained weights,initial/frozen invariants,complete
+replays/videos and the exact comparison before summarizing results. Its SHA is
+`81d834e5ffbe17ac1e5df1d5e017bc77426a4145bb5cadfc57d26425132e945f`.
+The separately prepared recovery reader has SHA
+`d2bfa62a51bc69ee43206e510018f2113315634a5562d583fb0e5617af3cfa0c`.
+Both remain outside the active controller tree; no runtime,teacher,queue,
+controller,checkpoint or observer is changed. Retain CPU co-host time without
+correcting training time. At qualification, recovery and terminal execution remain pending. Do not repeat
+their qualification or any completed stage.
+
+## Halfway recovery is retained
+
+The original recovery observer PID928398/invocation81257011a0fd44459734d819a75f5a9a
+succeeds **09:39:09.306 UTC November2**. It preserves the100,000-action/
+6,227-update checkpoint before final overwrite: metadata plus world,behavior
+and slow-value tensors, **206,067,205 bytes**. All357 tensors are finite. Its
+complete audited training prefix has102,504 actions and6,384 finite reports.
+These are the observer's prefix counters, not the checkpoint's counters.
+
+The separate read-only confirmation passes once **09:39:49.658** in2.418s
+(2.437s wrapper), preserving412 inputs, all retained file hashes, matching
+metadata/configuration and the original main process identity before and after.
+The original journal contains exactly one checkpoint pass and a successful
+watcher completion. Checkpoint review SHAe7ee50c9, retention SHAb17957d5,
+metadata SHAc66c8d3c. The recovery observer is terminal; do not restart or repeat it.
+
+Main PID928259/invocation7aac1e71b2de47f9934cb67d2f7ee1ef continues unchanged;
+postprocessing,progress and terminal collection remain active. No GPU work,
+learner update, replay or observer is repeated by the confirmation. Retain its
+CPU co-host cost without correcting training time. The retained checkpoint
+omits replay,belief,games and RNG and is a warm start, not an uninterrupted
+snapshot. Final200k learning and allfour frozen outcomes remain pending.

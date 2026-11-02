@@ -17,7 +17,13 @@ and final/actual-initial sampled/greedy24-episode assessments against retained
 
 Root `/x/Temp/kindle-replay-bootstrap-20261102/full`; service
 `kindle-breakout-posterior-bootstrap-200k-20261102`, original PID928259/
-invocation7aac1e71b2de47f9934cb67d2f7ee1ef. Allfour observers are active.
+invocation7aac1e71b2de47f9934cb67d2f7ee1ef. Original recovery succeeds
+**09:39:09.306 UTC**;100k/6,227 weights and metadata are retained (206,067,205
+bytes). Confirmation passes09:39:49.658 with412 pins and357 finite tensors;
+6384 finite reports through102,504 actions are checked. Terminal-reader
+preflight passes09:34:44.522 withfive score/six config cases. Both CPU wrappers
+co-host for2.438/2.437s; no timing correction. Main and remainingthree observers
+continue unchanged; do not repeat recovery or reader qualification.
 Startup passes **09:28:19.243** with412 pins,357 matching initial tensors,
 47 pre-update events,correct cadence and94 finite reports through1,880 actions.
 The1.512s CPU startup wrapper co-hosts with learning; no timing correction.
