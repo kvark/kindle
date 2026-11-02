@@ -1,5 +1,19 @@
 # CDP handover — October25,2026
 
+The [Breakout H30/R12 bounded check](experiments/2026-11-02-cdp-breakout-h30-r12.md)
+is selected for execution/cost validation. CPU preflight passes07:24:07.354 UTC
+November2 in1.041s:two actual commands,20 configuration cases,357 schema tensors,
+338 control pins andderived367/4,670/9,358 update counts. No native/emulator
+construction. Use exact runnercf4ea238/native447fe50/teacher; keep12M64/Auto/N8/
+B16/T16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100,sampled
+collection. H15/R16→H30/R12 changes rollout length,cadence,sampling,warmup andwork
+together; prior short-Breakout/long-Qbert negatives remain. No isolated cause.
+Train8,192/367 then1,024 frozen; requirematched357 initial/invariant tensors,
+47 pre-update events,full replay/guards andconservative200k projection≤30min.
+No full learner,extension,sweep orautomatic promotion. Root
+`/x/Temp/kindle-breakout-h30-r12-20261102/native-check`;service
+`kindle-breakout-h30-r12-check-20261102`. Check live state; do not overlap orrestart.
+
 The [completed lower-dynamics/replay-value1 comparison](results/2026-11-02-cdp-breakout-value1-dynamics1e4.md)
 scores **42.917 sampled /112.125 greedy**, below70.750/143.667 by39.34%/21.95%,
 in21m36.378s (+0.66%). Initial-subtracted return/min falls40.54%/22.81%; all0/24
