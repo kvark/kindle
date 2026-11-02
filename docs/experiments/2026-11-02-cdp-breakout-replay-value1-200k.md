@@ -91,4 +91,29 @@ bounded completion and pins; resolves every declaration input; records a repair
 receipt and pins the failure, repair and updated protocol. It completes the
 declaration without recreating the queue or modifying any qualified source.
 Settings, native, runner, teacher and caps stay fixed. No successful GPU or
-analysis stage is repeated. Launch remains conditional on this repair passing.
+analysis stage is repeated. The repair passes03:13:50.169 in.872s (1.833s
+declaration-completion wrapper), with all320 bounded pins and original qualified
+scripts unchanged. DeclarationSHAe3b25b65 pins338 inputs.
+
+## First GPU launch and startup
+
+The original learner launches **03:14:00.615 UTC November2/source45cd1ab**,
+mainPID887827/invocation`4b67c053d030409f8734e6bfbdab6707`. Original observers:
+post887830/`a37807efc05c40748c6c5c646ed1e8a6`, progress887833/
+`3436645ff3fc43bba94ad2bc495093f4`, recovery887965/
+`58ade220dcec4041bd5358b42a934869`, collection887968/
+`d3e4d5ced30b4e6faca8fcfc76c5f145`. All are active at launch. This is the first
+GPU launch; both earlier preparation failures started no service.
+
+Startup passes03:14:17.336 (1.270s wrapper): all338 pins,357 finite initial
+tensors matching both control and bounded check,47 equal pre-update transitions,
+updates at376/392/408/424/440/456 and111 finite supervised reports through2136
+actions. Native, runner, teacher, exact config and fresh counters match. Frozen
+task benefit remains unmeasured. Do not restart this learner or its observers.
+
+The terminal-reader preparation passes five score fixtures03:14:59.674 in.106s
+(.125s wrapper), preserving the original main identity and reconstructing all
+control means from saved replay episodes. It constructs no native or emulator
+and repeats no capture or replay. Retain this CPU co-host cost without correction.
+ReaderSHA04ce2848/helperSHA131bee46; run its terminal mode only after original
+collection succeeds. The five-game goal remains unfinished.

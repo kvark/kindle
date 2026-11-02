@@ -1,26 +1,28 @@
 # Kindle: CDP learning roadmap
 
-The [fresh Breakout replay-value1 comparison](experiments/2026-11-02-cdp-breakout-replay-value1-200k.md) is selected after
-1.917s full CPU qualification and the completed47.690s bounded check. Train
-200k actions/12,477 updates within30min, retain100k/6,227 recovery and assess
-final/actual-initial sampled/greedy24 natural episodes per arm against control
-59.000/117.292. Sampled remains primary; original90% two-wall gate stays fixed.
+The [fresh Breakout replay-value1 comparison](experiments/2026-11-02-cdp-breakout-replay-value1-200k.md) launches
+03:14:00.615 UTC November2/source45cd1ab, mainPID887827/invocation
+`4b67c053d030409f8734e6bfbdab6707`. Allfour original observers are active.
+Startup passes338 pins,357 control/bounded matching initial tensors,47 equal
+pre-update transitions and111 finite updates through2136 actions. Train200k/
+12,477 updates within30min; require100k/6,227 recovery and final/actual-initial
+sampled/greedy24-episode assessments against59.000/117.292. Sampled remains
+primary; original90% two-wall gate stays fixed. No full frozen result exists.
 
 Only replay-value0.3→1 changes at12M64/Auto/N8/B16/T16/H15/R16/base-encoder4e-5/
 behavior8e-5/dynamics4e-4/expert100,sampled collection. Native447fe50/35ad0db and
 teacher stay fixed; runnercf4ea238 adds ten fresh-CLI lines to control6c1b69fb.
 Critic and representation gradients change together; gameplay benefit remains
-unmeasured. All320 bounded/282 control pins and actual commands/config/header/
-recovery/observer/retention checks pass. An in-memory generator indentation
-failure and corrected preparation are preserved. The first declaration then
-fails on a stale CPU evidence filename before any service starts; a separate
-input-list repair preserves the existing queue and qualified sources. No GPU
-stage has repeated.
+unmeasured. The47.690s bounded check and1.917s full qualification pass. Original
+in-memory generator and declaration-filename failures remain preserved; separate
+CPU repairs pass before the first GPU launch. No GPU stage has repeated.
 
 Root`/x/Temp/kindle-breakout-replay-value1-20261102/full`; main
-`kindle-breakout-replay-value1-200k-20261102`. First launch is pending. Check live
-state; no overlap, restart, extension, sweep, check-experience reuse or automatic
-successor. The bounded original stages remain closed; do not repeat them.
+`kindle-breakout-replay-value1-200k-20261102`; declarationSHAe3b25b65. Check live
+state; do not overlap, restart, extend or reuse check experience. Original progress,
+recovery, postprocessing and collection observers are responsible for this run.
+Terminal readerSHA04ce2848 passes its separate.106s CPU preparation; wait for
+original completion before terminal mode. No automatic successor is selected.
 The five-game goal remains unfinished.
 
 The [completed Qbert replay-value1 confirmation](results/2026-11-02-cdp-qbert-replay-value1-seed16001.md) scores
