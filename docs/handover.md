@@ -1,15 +1,21 @@
 # CDP handover — October25,2026
 
-The [Breakout lower-dynamics/replay-value1 bounded check](experiments/2026-11-02-cdp-breakout-value1-dynamics1e4.md) is separately
-selected for8,192 actions/489 updates,then1,024 frozen actions. Onlydynamics4e-4→
-1e-4 changes fromthe70.750 sampled/143.667 greedy control; keepbehavior8e-5,
-replay-value1,12M64/Auto/N8/B16/T16/H15/R16/expert100 andsampled collection.
-Native447fe50 andteacher stayfixed; private runnerSHAea2bf8c6 adds thequalified
-12-line dynamics option. All32 targeted CPU tests,two actual commands,17 config
-cases,357 tensor shapes/cadence and338 control pins pass. Original source-generator
-failure andseparate correction remain; no GPU work yet. Root
-`/x/Temp/kindle-breakout-value1-dynamics1e4-20261102/native-check`. No full learner,
-retry,extension orautomatic promotion isselected. Check live state before launch.
+The [fresh Breakout lower-dynamics/replay-value1 comparison](experiments/2026-11-02-cdp-breakout-value1-dynamics1e4-200k.md) is separately
+selected for200k actions/12,477 updates within30min,with100k/6,227 recovery and
+four final/own-initial24-episode frozen arms. Onlydynamics4e-4→1e-4 changes from
+70.750 sampled/143.667 greedy; keepbehavior8e-5,replay-value1,12M64/Auto/N8/B16/
+T16/H15/R16/expert100,sampled collection,native447fe50 andteacher. RunnerSHAea2bf8c6.
+The preceding bounded check passes8,192 actions/489 updates in48.489s;1,024 frozen/
+.861s haszero updates/no natural episodes. All382 pins,tensors,traces,replay,
+guards andoriginal services pass; terminal reader06:40:38.369,completionSHA16baa2c6.
+Do not repeat the bounded check,collector orreader; no experience isreused.
+
+Full CPU qualification passes18 scripts,800 declaration paths,five commands,
+32 config/seven actual preflight/16 startup/11 recovery-body cases andretention
+fixtures in2.260s. All382 bounded/338 control pins remain unchanged. The original
+bounded preparation failure andseparate correction remain; full preparation has
+no failure. Root `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102/full`.
+Check live state before launch; no overlap,retry,extension orautomatic successor.
 
 The [completed Qbert R20 fresh-seed confirmation](results/2026-11-02-cdp-qbert-r20-seed18013.md)
 scores15,931.250 greedy/24 first pyramids on18013 in26m23.114s,versus development

@@ -79,3 +79,13 @@ help-text snippet differs from the qualified source. Its.022s failure and exact
 source remain retained. The separate corrected generator uses the exact snippet
 and completes in.029s. No successful test or experiment stage repeats. All
 completed CPU qualification is retained; do not rerun it.
+
+## Completed bounded check
+
+The [result](../results/2026-11-02-cdp-breakout-value1-dynamics1e4.md) passes8,192
+actions/489 updates in48.489s;1,024 frozen/.861s haszero updates/no natural episodes.
+All382 pins,tensors,pre-update traces,full replay andguards pass. Main/collector
+succeed06:39:55.422/06:40:01.115 UTC November2/sourcef15e58e; terminal reader
+passes once06:40:38.369. No stage repeats. The separately selected
+[fresh200k comparison](2026-11-02-cdp-breakout-value1-dynamics1e4-200k.md) uses
+no check experience. Completed qualification,stages andreaders must not repeat.
