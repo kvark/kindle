@@ -33,7 +33,9 @@ Fresh200k actions/18,715 updates require100k/9,340 recovery and357 finite own
 initial tensors that match the schema and differ from development. No prior
 experience is reused. Native447fe50/35ad0db, runnere304af89 and teacherfa261c53
 remain fixed. CPU qualification passes9.724s; original controller-path failure
-and separate repair remain. No GPU work has started at selection.
+and separate repair remain. A historical review filename also stops the first
+CPU declaration attempt; its receipt remains and a separate finisher verifies
+existing queue/manifest files. No GPU work has started at selection.
 
 Root `/x/Temp/kindle-qbert-replay-value1-seed16001-20261102/full`; main
 `kindle-qbert-replay-value1-seed16001-200k-20261102`. Check live state before work;

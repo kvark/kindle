@@ -88,6 +88,14 @@ generated controller paths. Original sources and failure receipt remain under
 path repair passes. This occurred before selection or GPU work. No completed
 training, replay or collection stage is repeated.
 
+The first declaration attempt then stops while hashing a historical full-run
+`review.json`; that trial uses `learning-review.json`. No declaration or GPU
+stage exists at failure. A separate CPU finisher uses the correct existing
+review, verifies the already-written queue/manifest and completes the declaration
+without repeating those writes. The original selection receipt and source,
+repair script and prior CPU failures are pinned. The fixed protocol snapshot
+retains the version copied before this documentation-only failure note.
+
 Evidence: `/x/Temp/kindle-qbert-replay-value1-seed16001-20261102/full`.
 Trial: `qbert-12m-64-b16-h5-r24-dynamics1e4-replayvalue1-expert100-200k-seed16001`.
 Main: `kindle-qbert-replay-value1-seed16001-200k-20261102`, with postprocess,
