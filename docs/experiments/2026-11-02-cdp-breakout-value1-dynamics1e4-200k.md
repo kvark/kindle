@@ -67,3 +67,32 @@ collector-retention cases andfour metadata cases. All382 bounded/338 control
 pins and357 tensor shapes remain unchanged. No native agent or environment
 is constructed. Source preparation succeeds in.028s; no full preparation stage
 fails or repeats. The earlier bounded source-generator failure remains retained.
+
+## Original launch and startup
+
+The first launch is **06:44:30.656 UTC November2/sourcec691416**,with422 pins
+and declarationSHAc14ab341372b82c6c5b971cdc790826bdb2c6764f7346de9a63b59cb0321b859.
+Main907551/47b00c7eccad47d6a116a2792b0a6f8b andall original observers are active:
+postprocess907554/542a7c1be918475389fc39e292eca17d,progress907557/
+e35cac0f9d5e46e5b4d67abe3448ffb5,recovery907686/ffcc2c76fdfe43389e50814923f093b5,
+collection907689/e4b2e9d35bbc47b89a8feb3137c3942b. Do not restart or overlap them.
+
+Startup passes **06:44:55.788** (1.489s wrapper):422 pins,357 finite initial
+tensors matching both bounded andretained control,47 matching pre-update
+transitions,first six updates376/392/408/424/440/456 and200 finite supervised
+reports through3,576 actions. Fresh counters,configuration andsource identities
+match. No frozen result orbenefit isavailable.
+
+The separate terminal reader qualifies **06:45:41.914** in2.383s (2.404s wrapper),
+reproducing allfour control scores andrejecting four corrupted score cases. All
+422 pins andoriginal main identity remain unchanged; no native or emulator
+module isimported. Record both CPU co-host costs without correcting training
+time. Reader preparation succeeds in.016s; no successful stage repeats.
+
+Pending readers live in `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102`:
+`review_recovery.py` (SHAcb71ef3c) runs once afterthe original100k retention and
+recovery service succeed,while main remains active. `review_full_terminal.py
+terminal` (SHAa8c0632e) runs once afterallfive services succeed andoriginal
+completion exists. Use `run_cpu.py recovery` and `run_cpu.py full-terminal`
+respectively for unique receipts. The terminal-reader preflight isalready
+complete; do not rerun it, startup, completed checks orcollectors.

@@ -1,21 +1,29 @@
 # CDP handover — October25,2026
 
-The [fresh Breakout lower-dynamics/replay-value1 comparison](experiments/2026-11-02-cdp-breakout-value1-dynamics1e4-200k.md) is separately
-selected for200k actions/12,477 updates within30min,with100k/6,227 recovery and
-four final/own-initial24-episode frozen arms. Onlydynamics4e-4→1e-4 changes from
-70.750 sampled/143.667 greedy; keepbehavior8e-5,replay-value1,12M64/Auto/N8/B16/
+The [fresh Breakout lower-dynamics/replay-value1 comparison](experiments/2026-11-02-cdp-breakout-value1-dynamics1e4-200k.md) launches
+06:44:30.656 UTC November2/sourcec691416 with422 pins and30-minute training cap.
+Original mainPID907551/invocation47b00c7eccad47d6a116a2792b0a6f8b andallfour
+observers areactive. Startup passes357 matching initial tensors,47 matching
+pre-update transitions,correct cadence and200 finite reports through3,576 actions.
+Train200k/12,477 updates; require100k/6,227 recovery andfour final/own-initial
+24-episode frozen arms against70.750 sampled/143.667 greedy. No frozen result.
+Onlydynamics4e-4→1e-4 changes; keepbehavior8e-5,replay-value1,12M64/Auto/N8/B16/
 T16/H15/R16/expert100,sampled collection,native447fe50 andteacher. RunnerSHAea2bf8c6.
+
 The preceding bounded check passes8,192 actions/489 updates in48.489s;1,024 frozen/
 .861s haszero updates/no natural episodes. All382 pins,tensors,traces,replay,
 guards andoriginal services pass; terminal reader06:40:38.369,completionSHA16baa2c6.
 Do not repeat the bounded check,collector orreader; no experience isreused.
-
 Full CPU qualification passes18 scripts,800 declaration paths,five commands,
 32 config/seven actual preflight/16 startup/11 recovery-body cases andretention
 fixtures in2.260s. All382 bounded/338 control pins remain unchanged. The original
 bounded preparation failure andseparate correction remain; full preparation has
-no failure. Root `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102/full`.
-Check live state before launch; no overlap,retry,extension orautomatic successor.
+no failure. Terminal readerSHAa8c0632e qualifies06:45:41.914 in2.383s withfive
+score cases,422 pins andoriginal identity unchanged. Recovery andterminal readers
+remain pending; run each once afterits original evidence exists. No startup,
+qualification,stage orcollector repeats. Root
+`/x/Temp/kindle-breakout-value1-dynamics1e4-20261102/full`; declarationSHAc14ab341.
+Check live state; no overlap,restart,extension orautomatic successor.
 
 The [completed Qbert R20 fresh-seed confirmation](results/2026-11-02-cdp-qbert-r20-seed18013.md)
 scores15,931.250 greedy/24 first pyramids on18013 in26m23.114s,versus development
