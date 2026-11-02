@@ -1,5 +1,16 @@
 # Breakout: critic calibration after the replay-value gain
 
+**Complete.** Both sampled critics trail their earlier-episode constant baseline:
+weight0.3 RMSE9.891 versus8.384, weight1 RMSE9.231 versus7.855. Weight1 correlation
+.231/R²−.439 leaves value calibration unresolved despite the retained gameplay
+gain. All74 pins,tensors,source trajectories andguards pass;151,384 actions/
+605,381 frames/171.911s,zero updates. Original main/collector succeed
+08:23:41.562/08:23:43.655 UTC November2,terminal reader08:24:19.771. No failure
+ororiginal stage repeat. No learner orGPU allocation isactive atclosure; check
+live state. Do not repeat completed captures,qualification,collector orreader.
+[Completed result](../results/2026-11-02-cdp-breakout-replay-value-critic.md).
+The selection andlaunch below record the original protocol.
+
 Select one frozen diagnostic within the existing five-game goal after the
 H30/R12 learner and its separate CPU coverage repair close. No Kindle service
 is active at selection review. Qualify the adapted CPU controller before
@@ -95,13 +106,13 @@ from the forthcoming complete-return calibration.
 
 The original main916432/invocation628c655e44284a00ab7ecd46b019125d launches
 **08:20:22.182 UTC November2/sourced982167**, with74 pins. Original collector
-916435/invocation4fe85dbc943542098062105aa841e1d4 is active. DeclarationSHA
+916435/invocation4fe85dbc943542098062105aa841e1d4 starts with it. DeclarationSHA
 `a533cbd83dfc7a23eefca0b483a06287915278ccabea7987bdb06875708f9a58`.
 The bounded1,024-action/4,096-frame capture passes in1.025s, matching128 original
 semantic events with357 invariant tensors,zero updates andpassing host guard.
-Four full arms are active; do not restart oroverlap this allocation.
+The four full arms subsequently complete as recorded above; do not repeat them.
 
-After both original services succeed and completion exists, the read-only
-`review_terminal.py` runs once via `run_cpu.py terminal-summary`. No original
+After both original services succeed, the read-only `review_terminal.py`
+completes once08:24:19.771 via `run_cpu.py terminal-summary`, in1.074s. No original
 stage,collector,CPU qualification or completed capture should repeat. Existing
 training times and score gates stay unchanged; no new learner is selected.

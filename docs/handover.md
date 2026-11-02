@@ -8,24 +8,28 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 2
 
-The [replay-value critic diagnostic](experiments/2026-11-02-cdp-breakout-replay-value-critic.md) launches **08:20:22.182 UTC
-November2/sourced982167**, with74 pins. Original main916432/invocation
-628c655e44284a00ab7ecd46b019125d and collector916435/
-4fe85dbc943542098062105aa841e1d4 are active. The1,024-action check passes in
-1.025s:128 original semantic events,357 invariant tensors,zero updates and
-host guard pass. Four full captures are running; do not restart or overlap.
+The [completed replay-value critic diagnostic](results/2026-11-02-cdp-breakout-replay-value-critic.md) finds that the
+stronger Breakout model still has weak sampled-return calibration: correlation
+.231/R²−.439, criticRMSE9.231 versus earlier-episode constant7.855. The0.3 model
+also trails its constant (9.891 versus8.384); its correlation is.218/R²−.421.
+Weight1 sampled mean prediction12.282 underestimates realized16.527; greedy
+16.420 versus29.685 has larger bias but changes the target policy. Different
+own-policy states prevent causal attribution. Keep the measured gameplay gain;
+no new loss weight,target,architecture orlearner is selected.
 
-Measure missing live values/bonuses for completed behavior8e-5 models at
-replay-value0.3/1.0, sampled/greedy, using their original24-episode cohorts.
-Keep native447fe50 and exact runners6c1b69fb/cf4ea238; no build ornew learner.
-CPU preparation passes5.834s: five commands,both schemas,282/338 source and422
-preceding pins; nine unchanged arithmetic tests are retained without repetition.
-Root `/x/Temp/kindle-breakout-replay-value-critic-20261102`; main
-`kindle-breakout-replay-value-critic-20261102`, collector
-`kindle-breakout-replay-value-critic-collection-20261102`. After both original
-services succeed and completion exists, run `review_terminal.py` once via
-`run_cpu.py terminal-summary`. No retry,loss change orautomatic successor.
-Check live state; the five-game goal remains unfinished.
+All74 pins,357 invariant tensors perarm,original trajectories with4,030/5,122/
+4,496/5,478 semantic events,finite values/bonuses,guards andreturn decomposition
+pass. Four captures151,384 actions/605,381 frames/171.911s havezero updates.
+Original main916432/628c655e44284a00ab7ecd46b019125d andcollector916435/
+4fe85dbc943542098062105aa841e1d4 succeed **08:23:41.562/08:23:43.655 UTC
+November2**, launch sourced982167. Reader passes once08:24:19.771 in1.074s;
+completionSHA7d26970f/summarySHA4f127fcd. No preparation,capture orcollector
+fails orrepeats. Native447fe50/exact runners6c1b69fb/cf4ea238 stayunchanged.
+
+Root `/x/Temp/kindle-breakout-replay-value-critic-20261102` is closed. Do not
+repeat captures,qualification,collector orterminal reader. No Kindle GPU
+allocation isactive atclosure; checklive state. No automatic successor is
+selected. Breakout andthe five-game goal remain unfinished.
 
 The [completed Breakout H30/R12 comparison](results/2026-11-02-cdp-breakout-h30-r12.md) scores **58.917 sampled /
 124.708 greedy**, below70.750/143.667 by16.73%/13.20%, in **23m15.641s**
