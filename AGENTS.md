@@ -20,37 +20,42 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 2
 
-The [fresh Breakout H30/R12 comparison](docs/experiments/2026-11-02-cdp-breakout-h30-r12-200k.md) launches
-07:31:11.304 UTC November2/source538ef64 with422 pins and30-minute training cap.
-Original main912196/invocation5bfcdae0db9f4682a7e9e6c72c98adcd andallfour observers
-areactive. Startup passes357 matching initial tensors,47 pre-update transitions,
-correct cadence and494 finite reports through10,920 actions. No frozen result.
+The [fresh Breakout H30/R12 comparison](docs/experiments/2026-11-02-cdp-breakout-h30-r12-200k.md) remains active after its
+verified **100,000-action / 4,670-update recovery**. Original main912196 /
+invocation5bfcdae0db9f4682a7e9e6c72c98adcd continues unchanged; postprocessing,
+progress and collection observers remain active. Launch07:31:11.304 UTC
+November2/source538ef64,422 pins,30-minute training cap. No frozen outcome yet.
 
-The bounded check closes successfully:8,192 actions/367 updates in51.413s,1,024 frozen/.892s
-withzero updates/natural episodes;all382 pins,tensors,traces,replay andguards
-pass. Terminal reader07:26:54.448/completionSHA697e58e0. Do not repeat thecheck.
-Conservative200k projection23m00.725s passes30min; no experience isreused.
+The original recovery service succeeds **07:42:47.665**. The separate reader
+passes once **07:43:12.544**, in1.285s (1.304s wrapper):422 pins,357 finite tensors,
+four retained files/206,067,161 bytes,4,705 finite reports through100,752 actions,
+matching configuration and original process identity. ConfirmationSHA327621dd.
+Do not repeat startup, recovery, qualification or completed stages.
 
-Full CPU qualification passes07:30:14.885 in2.378s:18 scripts,800 declaration
-paths,five commands,36 config/nine actual preflight/20 startup/13 recovery-body
-cases andretention fixtures. All382 bounded/338 control pins stayunchanged.
-Train200k/9,358 updates with100k/4,670 recovery andfour final/actual-initial
-24-episode frozen arms against70.750 sampled/143.667 greedy;sampled staysprimary.
-H15/R16→H30/R12 changes rollout length,cadence,sampling,warmup andrelative work.
-Keep12M64/Auto/N8/B16/T16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/
+Train200k/9,358 updates, then four final/actual-initial24-episode sampled/greedy
+arms against70.750/143.667. Sampled stays primary; the90%-two-wall gate stays
+fixed. H15/R16→H30/R12 changes rollout length,cadence,sampling,warmup andrelative
+work. Keep12M64/Auto/N8/B16/T16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/
 expert100,sampled collection,exact runnercf4ea238/native447fe50/teacher.
-Prior short-Breakout/long-Qbert negatives remain;no isolated causal claim.
-Root `/x/Temp/kindle-breakout-h30-r12-20261102/full`;service
-`kindle-breakout-h30-r12-200k-20261102`. Checklive state;no overlap,restart,
-retry,cap increase,extension,confirmation orautomatic successor.
+No isolated causal claim or experience reuse. The bounded check is closed:
+8,192 actions/367 updates/51.413s,382 pins,conservative23m00.725s projection;
+its frozen1,024 actions have zero updates/no natural episodes. Do not repeat it.
 
-Terminal readerSHAdfee5cc5 qualifies07:32:36.085 in2.371s withfive score cases,
-422 pins andoriginal identity unchanged. Recovery readerSHA99a8e23b remains
-pending afteroriginal100k retention/recovery success; runonce while main active
-via `run_cpu.py recovery`. Afterallfive services succeed andcompletion exists,
-run `review_full_terminal.py terminal` once via `run_cpu.py full-terminal`.
-No startup,qualification,stage orcollector repeats. CPU co-host costs remain
-uncorrected. DeclarationSHAaa57e4a5; no full frozen outcome isavailable.
+Full CPU qualification and startup pass; terminal readerSHAdfee5cc5 is qualified.
+After all five original services succeed and completion exists, run
+`review_full_terminal.py terminal` once via `run_cpu.py full-terminal`.
+The saved-log coverage readerSHA7d346078 qualifies07:40:38.302 in2.428s:
+six configuration cases,52 diagnostic/422 active pins; five old boundary cases
+are retained without repetition. After the full terminal summary, run
+`review_score_coverage.py terminal` once via `run_cpu.py score-coverage-terminal`.
+Reuse the completed control analysis; no new gameplay or GPU work. Score
+fractions do not establish walls or isolate a coverage/horizon mechanism.
+
+Root `/x/Temp/kindle-breakout-h30-r12-20261102/full`; service
+`kindle-breakout-h30-r12-200k-20261102`. Check live state; no overlap,restart,
+retry,cap increase,extension,confirmation or automatic successor. Preserve CPU
+co-host durations without correcting training time. DeclarationSHAaa57e4a5;
+coverage declarationSHA9d98d514. Breakout and the five-game goal remain unfinished.
 
 The [completed lower-dynamics/replay-value1 comparison](docs/results/2026-11-02-cdp-breakout-value1-dynamics1e4.md)
 scores **42.917 sampled /112.125 greedy**, below70.750/143.667 by39.34%/21.95%,
