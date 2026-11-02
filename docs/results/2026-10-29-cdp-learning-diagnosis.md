@@ -7,12 +7,17 @@ Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/
 expert100; teacher unchanged, HUD information removed. Startup passes357 matching
 initial tensors,47 bounded-crop transitions and882 finite updates through14,488
 actions. MainPID950033/invocation7bc8fe9931bd4f3fbee1f43739efb056 remains active;
-original postprocessing,progress,recovery and collection observers are active.
+original postprocessing,progress and collection observers are active; recovery
+succeeds12:37:54.838 UTC and retains100k/6,227 with357 finite tensors. The
+read-only confirmation passes12:38:39.553 in2.003s, all413 pins unchanged,
+206,067,317 checkpoint bytes retained. Do not repeat that reader.
 Require100k/6,227 recovery and actual-initial/final sampled/greedy24-episode
 assessments against70.750/143.667 and the original90%-two-wall gate. No full
 frozen result yet. Nativeacb175f/runner046aa5bc differ from447fe50/cf4ea238;
-no isolated causal claim. Read-only recovery/terminal readers are prepared;
-terminal qualification passes five score/seven configuration cases in.043s.
+no isolated causal claim. Terminal confirmation remains pending. CPU coverage
+reader qualifies12:34:24.544 in2.459s with54 diagnostic/413 active pins, six
+configuration/three counter cases and prior boundary fixtures reused. Its final
+stage remains pending original full success; no trajectory analysis repeats.
 Root `/x/Temp/kindle-playfield-crop-20261102/full`, service
 `kindle-breakout-playfield-crop-200k-20261102`. Check live state; do not restart,
 repeat closed stages or schedule another GPU job while this learner is active.

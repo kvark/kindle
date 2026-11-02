@@ -108,3 +108,57 @@ only after the original100k audit/retention completes, and terminal confirmation
 only after all original services and comparison succeed. Neither final reader
 has run. Preserve CPU co-host time without correcting training duration.
 No preparation failure, learner failure or repeated GPU stage occurs at startup.
+
+## Saved-log coverage follow-up
+
+Prepare one CPU-only reader while the original learner remains active. Run its
+final stage only after the original full comparison and terminal confirmation
+succeed. Reuse the completed full-frame control analysis from
+`/x/Temp/kindle-breakout-score-coverage-20261102/review.json`, `trials.candidate`;
+do not recount its trajectories or repeat emulator/native stages.
+
+Keep pre-action score bins0–215,216–431,432–647,648–863 and864+. Reconcile
+completed episodes, partial tails, resets, rewards and cumulative emulator-frame
+differences. Count teacher overrides and native actions separately. Frozen
+summaries use the original first three natural episodes per lane; extra episodes
+and tails remain accounting evidence. These score fractions are not verified
+wall boundaries, equivalent states or a causal account of learning quality.
+
+Reuse the qualified cumulative-frame parser and its retained five boundary
+fixtures. Check the actual crop configuration and200k/12,477 counter assertion
+before outcomes, including rejection cases; do not repeat prior trajectory
+analysis or fixture execution. Pin the new reader, helper, protocol snapshot,
+prior evidence and active declaration. Verify all413 active pins and original
+process identity around preparation. Use one low-priority CPU, no native/ALE
+imports, no GPU work and no updates; retain co-host duration without correction.
+Output `score-coverage-review.json` is written once. This diagnostic selects no
+learner, guidance change, extension or automatic successor.
+
+Coverage qualification passes **12:34:24.544 UTC November2**, in2.459s
+(2.480s wrapper), with six configuration and three actual counter cases.
+All54 diagnostic inputs and413 active pins verify; the original main identity
+is preserved. Five retained parser boundary fixtures are reused without repeat.
+Reader SHA prefix `2aed450b`, declaration `00d34473`. The final analysis remains
+unexecuted and conditional on original full success and terminal confirmation.
+No GPU work, trajectory recount, failure or learner change occurs in preparation.
+
+## Halfway checkpoint retained
+
+The original recovery observer succeeds **12:37:54.838 UTC November2**, under
+PID950173/invocation `f27736e9ecee44a7b98d91d89c1c82ab`. The100k/6,227 checkpoint
+contains357 finite tensors and retains206,067,317 bytes of weights/metadata.
+The complete log prefix contains6,380 finite reports through102,456 actions.
+All413 declaration inputs remain unchanged.
+
+The prepared read-only recovery confirmation passes once at **12:38:39.553**,
+in2.003s (2.023s wrapper), verifying retained hashes, exact metadata/configuration,
+the original observer's single audit payload and its terminal success. Main
+PID950033/invocation `7bc8fe9931bd4f3fbee1f43739efb056` remains active before and
+after. No learner, observer, replay or GPU stage repeats. Retained checkpoints
+omit replay, live beliefs, games and RNG; no frozen competence is measured here.
+Retain CPU co-host time without correcting training duration.
+
+Recovery review SHA prefix `b9bf4518`, retention `d0036cce`, metadata `10eaab13`;
+full hashes are in the trial's `recovery-confirmation.json`. Do not repeat this
+reader. Terminal and coverage final stages remain pending original completion;
+the fixed200k/30-minute budget and all evaluation gates stay unchanged.
