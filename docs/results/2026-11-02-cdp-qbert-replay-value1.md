@@ -26,6 +26,40 @@ missing loss caused Qbert's shortfall. Reusing14009 makes any following comparis
 development, not independent confirmation. There are no extra parameters or
 scheduled updates; actual parameter count remains16,334,353.
 
+## What the existing replay value term already uses
+
+The pinned native447fe50 source already trains value targets from **observed
+rewards and actual episode boundaries**. With B16/T16, each update constructs240
+replay targets. Rewards include the existing replay intrinsic bonus. Lambda is.95
+and the continuation discount is1−1/333. Each replay posterior state also supplies
+its first imagined lambda return as the bootstrap; this experiment usesH5.
+This follows the [target construction](https://github.com/kvark/kindle/blob/447fe5013b6442c477fc7bfef7eab4122082bc54/kindle/src/dreamer/agent.rs#L2034)
+and [return helper](https://github.com/kvark/kindle/blob/447fe5013b6442c477fc7bfef7eab4122082bc54/kindle/src/dreamer/distributions.rs#L142).
+
+Thus real experience is already part of this loss, while the targets still depend
+on imagined outcomes and value predictions. Termination removes the continuation
+term; episode boundaries stop the lambda trace. The helper's separately supplied
+`value` array is length-checked but unused in the calculation: its `bootstrap`
+array determines the mixture and trace initialization. This is source semantics,
+not evidence of a defect or of the targets' empirical accuracy.
+
+The0.3→1 coefficient weights replay critic cross-entropy plus slow-value
+regularization and the corresponding world-state loss through frozen value
+logits. It does not change target construction. Increasing its weight therefore
+tests a different question from replacing the bootstrap or using complete
+observed-episode returns. No alternative target or loss is selected while this
+learner runs; the gameplay outcome remains the decision evidence.
+
+The source-only review completes01:29:18.309 UTC November2 in.014s (.033s
+wrapper), matching four declared sources to exact447fe50 and retaining the fifth
+return-helper source. MainPID878107/invocation remain unchanged. No model,
+environment,derivatives or accuracy measurements are involved. Evidence
+`/x/Temp/kindle-qbert-replay-value1-20261102/replay-value-target-source-review.json`;
+co-host duration is retained without wall-time correction. Separate readout
+preparation completes01:24:50.427 in.011s (.029s wrapper), withfive actual config
+assertion cases and unchanged original identity. Recovery/final readers are
+prepared but have not yet been invoked.
+
 ## Evidence
 
 - All815 declared pins stay unchanged, including768 control inputs. Native and

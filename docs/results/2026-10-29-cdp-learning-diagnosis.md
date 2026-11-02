@@ -25,6 +25,13 @@ in25m09.906s;keep15k/90% gate. No full frozen result yet. Root
 `/x/Temp/kindle-qbert-replay-value1-20261102/full`;check live state. Do not overlap
 orrestart this learner. No extension,sweep,cap increase orautomatic successor.
 
+The [pinned replay-target source review](2026-11-02-cdp-qbert-replay-value1.md#what-the-existing-replay-value-term-already-uses)
+confirms240 real-replay targets/update already use observed rewards,intrinsic
+bonus andactual last/terminal flags, withH5 imagined-return bootstraps andlambda.95.
+Scale0.3→1 changes loss weighting,not targets; no missing-loss defect,target
+accuracy or gameplay cause is established. Source-only.014s/.033s wrapper,
+original process unchanged; no new model orGPU work. Existing learner continues.
+
 The [completed Qbert replay-value scale1 check](2026-11-02-cdp-qbert-replay-value1.md) passes8192 actions /
 32,755 frames /733 updates in57.202s;1024 frozen/.855s haszero updates andno
 natural completed episodes. Conservative200k projection25m36.196s clears30min.
