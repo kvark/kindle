@@ -849,7 +849,12 @@ impl VectorDreamerAgent {
         }
         let side = config.observation_grid();
         let learner = DreamerCore::new(config)?;
-        let pixels = GpuPreprocessor::rgb(Arc::clone(&learner.gpu), streams, side);
+        let pixels = GpuPreprocessor::rgb(
+            Arc::clone(&learner.gpu),
+            streams,
+            side,
+            learner.config.observation_crop,
+        );
         Ok(Self {
             perception: VectorPerception::Learned(Box::new(pixels)),
             history: None,
@@ -871,6 +876,7 @@ impl VectorDreamerAgent {
             Arc::clone(&gpu),
             streams,
             metadata.config.observation_grid(),
+            metadata.config.observation_crop,
         );
         let learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
         Ok(Self {

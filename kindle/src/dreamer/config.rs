@@ -294,6 +294,9 @@ pub struct DreamerConfig {
     pub training_precision: TrainingPrecision,
     #[serde(default)]
     pub observation_kind: ObservationKind,
+    /// Optional native-frame rectangle for the learned-RGB GPU preprocessor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub observation_crop: Option<crate::vision::preprocess_gpu::FrameCrop>,
     #[serde(default)]
     pub video_encoder: Option<VideoEncoder>,
     /// Fixed, training-only statistics for future-prediction targets. Does not
@@ -406,6 +409,7 @@ impl DreamerConfig {
             model_size: ModelSize::Size12M,
             training_precision: TrainingPrecision::Auto,
             observation_kind: ObservationKind::Features,
+            observation_crop: None,
             video_encoder: None,
             future_target_standardization: None,
             cdp_centered: false,
@@ -612,6 +616,14 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         let size = self.network();
+        if let Some(crop) = self.observation_crop {
+            crop.check().map_err(str::to_owned)?;
+            if !self.observation_kind.is_rgb() || self.color_centroid_supervision.is_some() {
+                return Err(
+                    "image crop requires learned RGB without color-centroid supervision".into(),
+                );
+            }
+        }
         if let Some(rollout) = &self.open_loop_supervision
             && (!self.is_cdp()
                 || rollout.horizon < 2
@@ -1263,6 +1275,7 @@ mod tests {
     fn older_configs_default_new_fields() {
         let mut value = serde_json::to_value(DreamerConfig::tiny(3)).unwrap();
         assert!(value.get("open_loop_supervision").is_none());
+        assert!(value.get("observation_crop").is_none());
         let object = value.as_object_mut().unwrap();
         object.remove("replay_value_gradient");
         object.remove("replay_value_bootstrap");
@@ -1295,6 +1308,43 @@ mod tests {
         assert_eq!(restored.world_microbatch_size(), restored.batch_size);
         assert_eq!(restored.training_precision, TrainingPrecision::Auto);
         assert_eq!(restored.open_loop_supervision, None);
+        assert_eq!(restored.observation_crop, None);
+    }
+
+    #[test]
+    fn image_crop_roundtrips_and_requires_compatible_pixels() {
+        use crate::vision::preprocess_gpu::FrameCrop;
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_crop = Some(FrameCrop {
+            x: 0,
+            y: 32,
+            width: 160,
+            height: 168,
+        });
+        assert!(config.check().is_err());
+        config.observation_kind = ObservationKind::Rgb64;
+        assert!(config.check().is_ok());
+        let value = serde_json::to_value(&config).unwrap();
+        assert_eq!(value["observation_crop"]["y"], 32);
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(value).unwrap(),
+            config
+        );
+        config.color_centroid_supervision = Some(ColorCentroidSupervision {
+            scale: 1.0,
+            channel: 0,
+            background_scale: 1.5,
+            region: [0.0, 0.0, 1.0, 1.0],
+        });
+        assert!(
+            config
+                .check()
+                .unwrap_err()
+                .contains("without color-centroid")
+        );
+        config.color_centroid_supervision = None;
+        config.observation_crop.as_mut().unwrap().width = 0;
+        assert!(config.check().is_err());
     }
 
     #[test]

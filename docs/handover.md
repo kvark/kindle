@@ -8,6 +8,16 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 2
 
+The [optional playfield crop](experiments/2026-11-02-cdp-breakout-playfield-crop.md)
+is selected for implementation and bounded qualification: native rectangle
+0/32/160/168, sameRGB64/12M input tensor/model, one GPU resize, teacher unchanged.
+Source review finds no expert-label indexing error; most guided control episodes
+end before the existing cap. Crop support is default-off and records its geometry
+with a distinct checkpoint architecture tag. CPU/native qualification is pending;
+no GPU check or learner has started. Root `/x/Temp/kindle-playfield-crop-20261102`.
+Require pixel-geometry/default compatibility checks before the fresh8,192-action
+cost screen. No full learner or automatic successor is selected.
+
 The [completed Breakout 25M comparison](results/2026-11-02-cdp-breakout-capacity25m.md)
 scores **49.958 sampled /104.292 greedy**, below12M70.750/143.667 by29.39%/
 27.41%, in **36m08.795s** (+68.40% training time). Own initials1.458/1.583;

@@ -59,6 +59,15 @@ def require_gpu_device(snapshot, expected):
         raise ValueError(f"expected native device {expected}, got {snapshot}")
 
 
+def rgb_preprocessing(config):
+    side = config['observation_kind'][3:]
+    description = f"single GPU Pillow-equivalent antialiased bilinear resize to {side}x{side}, per-axis RGB8 rounding; CHW /255-0.5"
+    crop = config.get('observation_crop')
+    if crop is not None:
+        description = 'native crop ' + ','.join(f'{name}={crop[name]}' for name in ('x', 'y', 'width', 'height')) + '; ' + description
+    return description
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--encoder-checkpoint", help="opt into causal JEPA (frozen unless encoder-training=joint); omitted: jointly learned RGB")
@@ -72,6 +81,8 @@ def main():
                         help="learned CNN with cosine feature prediction instead of RGB reconstruction; CDP split learning rates")
     parser.add_argument("--image-size", type=int, choices=(32, 48, 64),
                         help="learned RGB/CDP GPU resize side; fresh default64, restore uses checkpoint geometry")
+    parser.add_argument("--image-crop", type=int, nargs=4, metavar=("X", "Y", "WIDTH", "HEIGHT"),
+                        help="fresh learned RGB/CDP: native-pixel crop before the single GPU resize; restore uses checkpoint crop")
     parser.add_argument("--cdp-centered", action="store_true",
                         help="CDP ablation: center cosine predictions/targets over the full replay batch")
     parser.add_argument("--disagreement-scale", type=float, default=0.0,
@@ -323,6 +334,7 @@ def main():
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-fire-weight", "--guidance-world-gradient"))
     training_options.add("--guidance-imitation-decay")
     training_options.add("--image-size")
+    training_options.add("--image-crop")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
     training_options.update(("--open-loop-length", "--open-loop-scale"))
@@ -369,10 +381,25 @@ def main():
             parser.error("encoder selection differs from restored checkpoint")
     if args.restore and args.observation_size is None:
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
+    if args.restore and (args.restore / "metadata.json").is_file():
+        metadata = json.loads((args.restore / "metadata.json").read_text())
+        if (metadata.get("config", {}).get("observation_crop") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_CROP", False)):
+            parser.error("cropped checkpoint requires native RGB crop support")
     args.observation_size = args.observation_size or "native"
     learned_rgb = args.encoder_checkpoint is None
     if args.image_size is not None and not learned_rgb:
         parser.error("image-size requires the learned RGB/CNN frontend")
+    if args.image_crop is not None:
+        if not learned_rgb:
+            parser.error("image-crop requires the learned RGB/CNN frontend")
+        x, y, width, height = args.image_crop
+        if not (0 <= x < x + width <= 160 and 0 <= y < y + height <= 210):
+            parser.error("image-crop must be a nonempty rectangle within native160x210 Atari frames")
+        if args.breakout_centroid_scale is not None:
+            parser.error("image-crop cannot combine with color-centroid supervision")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_RGB_CROP", False):
+            parser.error("image-crop requires native RGB crop support")
     if args.cdp and not learned_rgb:
         parser.error("CDP requires the learned CNN")
     if args.encoder_learning_rate is not None and not args.cdp:
@@ -485,6 +512,8 @@ def main():
                 config["expert_imitation"]["decay"] = dict(start_update=start, end_update=end)
         if learned_rgb:
             config["observation_kind"] = f"rgb{args.image_size or 64}"
+            if args.image_crop is not None:
+                config["observation_crop"] = dict(zip(("x", "y", "width", "height"), args.image_crop))
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
             if args.cdp:
                 config["loss_scales"].update(reconstruction=0.0, future_prediction=500.0)
@@ -556,7 +585,7 @@ def main():
                   noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
                   full_action_space=protocol.full_action_space, sticky_actions=args.sticky_actions,
                   observation_size=args.observation_size, observation_shape=list(initial[0].shape),
-                  **(dict(learned_rgb_preprocessing=f"single GPU Pillow-equivalent antialiased bilinear resize to {agent.config['observation_kind'][3:]}x{agent.config['observation_kind'][3:]}, per-axis RGB8 rounding; CHW /255-0.5") if learned_rgb else {}),
+                  **(dict(learned_rgb_preprocessing=rgb_preprocessing(agent.config)) if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
                   **(dict(training_action_mode=args.training_action_mode) if args.training_action_mode is not None else {}),

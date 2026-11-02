@@ -51,6 +51,7 @@ use crate::vision::{Observation, PROJECTION_SEED, PerceptionIdentity, Perception
 
 const CHECKPOINT_FORMAT: u32 = 3;
 const CHECKPOINT_ARCHITECTURE: &str = "dreamerv3-visual-features";
+const CROPPED_CHECKPOINT_ARCHITECTURE: &str = "dreamerv3-visual-features-rgb-crop-v1";
 const CHECKPOINT_METADATA: &str = "metadata.json";
 const RNG_POLICY: u64 = 0x706f_6c69_6379_0001;
 const RNG_LIVE_POSTERIOR: u64 = 0x6c69_7665_706f_7374;
@@ -90,6 +91,14 @@ struct CheckpointMetadata {
 
 fn single_stream() -> usize {
     1
+}
+
+fn checkpoint_architecture(config: &DreamerConfig) -> &'static str {
+    if config.observation_crop.is_some() {
+        CROPPED_CHECKPOINT_ARCHITECTURE
+    } else {
+        CHECKPOINT_ARCHITECTURE
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -1027,7 +1036,7 @@ impl DreamerCore {
         let (return_low, return_high) = self.return_normalizer.state();
         let metadata = CheckpointMetadata {
             format: CHECKPOINT_FORMAT,
-            architecture: CHECKPOINT_ARCHITECTURE.to_owned(),
+            architecture: checkpoint_architecture(&self.config).to_owned(),
             dreamerv3_revision: DREAMERV3_UPSTREAM_REV.to_owned(),
             meganeura_revision: MEGANEURA_REV.to_owned(),
             blade_revision: BLADE_REV.to_owned(),
@@ -2570,7 +2579,7 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
     let expected = [
         (
             "architecture",
-            CHECKPOINT_ARCHITECTURE,
+            checkpoint_architecture(&metadata.config),
             metadata.architecture.as_str(),
         ),
         (
@@ -3188,6 +3197,39 @@ mod tests {
         let mut wrong_blade = valid_checkpoint_metadata();
         wrong_blade.blade_revision = "wrong-revision".to_owned();
         validate_checkpoint_metadata(&wrong_blade).unwrap();
+    }
+
+    #[test]
+    fn cropped_checkpoints_require_a_distinct_input_architecture_tag() {
+        let mut metadata = valid_checkpoint_metadata();
+        metadata.perception = None;
+        metadata.config.observation_kind = super::super::ObservationKind::Rgb64;
+        metadata.observation_grid = 64;
+        metadata.observation_channels = 3;
+        metadata.config.observation_crop = Some(crate::vision::preprocess_gpu::FrameCrop {
+            x: 0,
+            y: 32,
+            width: 160,
+            height: 168,
+        });
+        assert!(
+            validate_checkpoint_metadata(&metadata)
+                .unwrap_err()
+                .to_string()
+                .contains("architecture")
+        );
+        metadata.architecture = checkpoint_architecture(&metadata.config).to_owned();
+        assert_ne!(metadata.architecture, CHECKPOINT_ARCHITECTURE);
+        validate_checkpoint_metadata(&metadata).unwrap();
+        metadata.config.observation_crop = None;
+        assert!(
+            validate_checkpoint_metadata(&metadata)
+                .unwrap_err()
+                .to_string()
+                .contains("architecture")
+        );
+        metadata.architecture = checkpoint_architecture(&metadata.config).to_owned();
+        validate_checkpoint_metadata(&metadata).unwrap();
     }
 
     #[test]

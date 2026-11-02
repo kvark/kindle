@@ -81,6 +81,12 @@ import profile_atari_vector
     (["--image-size", "33"], "invalid choice"),
     (["--restore", "unused", "--image-size", "32"], "training overrides"),
     (["--encoder-checkpoint", "unused", "--image-size", "48"], "image-size requires"),
+    (["--restore", "unused", "--image-crop", "0", "32", "160", "168"], "training overrides"),
+    (["--encoder-checkpoint", "unused", "--image-crop", "0", "32", "160", "168"], "image-crop requires the learned"),
+    *[(["--image-crop", *values], "nonempty rectangle") for values in (
+        ["0", "0", "0", "10"], ["0", "0", "10", "0"], ["-1", "0", "10", "10"],
+        ["0", "-1", "10", "10"], ["1", "0", "160", "210"], ["0", "33", "160", "178"],
+    )],
     (["--restore", "unused", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
     (["--evaluate", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
     (["--checkpoint", "fresh", "--initial-checkpoint", "fresh"], "separate fresh path"),
@@ -331,6 +337,62 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, ba
                                     *(['--actor-critic-gradient'] if actor_critic_gradient else [])])
     with pytest.raises(RuntimeError, match='CDP recipe checked'):
         atari_vector.main()
+
+
+def test_runner_crop_requires_native_support_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: pytest.fail('must reject before environment'))
+    output = tmp_path / 'never.jsonl'
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(output), '--image-crop', '0', '32', '160', '168'])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert 'requires native RGB crop support' in capsys.readouterr().err
+    assert not output.exists()
+
+
+def test_cropped_restore_rejects_old_native_before_environment(monkeypatch, tmp_path, capsys):
+    checkpoint = tmp_path/'checkpoint'
+    checkpoint.mkdir()
+    (checkpoint/'metadata.json').write_text(json.dumps(dict(config=dict(
+        observation_crop=dict(x=0, y=32, width=160, height=168)))))
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: pytest.fail('must reject before environment'))
+    output = tmp_path/'never.jsonl'
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(output), '--evaluate',
+        '--restore', str(checkpoint), '--observation-size', 'native'])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert 'cropped checkpoint requires native RGB crop support' in capsys.readouterr().err
+    assert not output.exists()
+
+
+@pytest.mark.parametrize('side', [32, 48, 64])
+def test_runner_crop_recipe_and_description_before_gpu(monkeypatch, tmp_path, side):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18), reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, 'DreamerAtariPreprocessing', lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config['observation_crop'] == dict(x=0, y=32, width=160, height=168)
+        assert config['observation_kind'] == f'rgb{side}'
+        description = atari_vector.rgb_preprocessing(config)
+        assert description.startswith('native crop x=0,y=32,width=160,height=168; ')
+        assert description.endswith(atari_vector.rgb_preprocessing(dict(observation_kind=f'rgb{side}')))
+        raise RuntimeError('crop recipe checked before GPU')
+
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct, SUPPORTS_RGB_CROP=True))
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path/'crop.jsonl'),
+        '--cdp', '--image-size', str(side), '--image-crop', '0', '32', '160', '168'])
+    with pytest.raises(RuntimeError, match='crop recipe checked'):
+        atari_vector.main()
+
+
+def test_full_frame_preprocessing_description_stays_unchanged():
+    assert atari_vector.rgb_preprocessing(dict(observation_kind='rgb64')) == (
+        'single GPU Pillow-equivalent antialiased bilinear resize to 64x64, '
+        'per-axis RGB8 rounding; CHW /255-0.5')
 
 
 @pytest.mark.parametrize("rate,encoder,dynamics", [
