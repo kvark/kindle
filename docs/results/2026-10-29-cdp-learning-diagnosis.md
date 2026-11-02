@@ -1,5 +1,19 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [saved Breakout crop-gap diagnostic](2026-11-02-cdp-breakout-crop-gap.md)
+finds a visible ball at the preceding decision for all 103 losses with an
+available inferred paddle crossing; 17 crossings remain unavailable. All 98
+nearby missing-ball gap starts occur afterward. Six of 776 fitted successful
+contacts have a one-decision gap just before crossing. This does not support
+changing the teacher's fallback; fitted timing and differing event filters
+limit causal interpretation. Retain the teacher and current learning recipe.
+All 14 CPU fixture cases and 17 pins pass; the saved 52,072 actions / 208,254
+frames reconcile. Analysis completes **10:28:57.759 UTC November 2**, source
+`04c30c6`, in **0.387s**, with no new trajectory, emulator/native import, GPU
+work, learner update, failure or repeated stage. Evidence is closed under
+`/x/Temp/kindle-breakout-crop-gap-20261102`; do not rerun. No Kindle allocation
+is active at closure. The five-game goal remains unfinished.
+
 The [posterior-bootstrap comparison](2026-11-02-cdp-breakout-posterior-bootstrap.md) is **closed_protocol_failed**.
 Training completes200k actions/799,562 frames/12,477 updates in **21m37.556s**
 (+.75%). Accepted sampled53.708 falls24.09% below70.750; initial-subtracted

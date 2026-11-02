@@ -8,43 +8,34 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 2
 
-The [posterior-bootstrap comparison](results/2026-11-02-cdp-breakout-posterior-bootstrap.md) is **closed_protocol_failed**.
-Training completes200k actions/799,562 frames/12,477 updates in **21m37.556s**
-(+.75%). Accepted sampled53.708 falls24.09% below70.750; initial-subtracted
-return/min falls25.14%. Own initial1.417 matches. Greedy has two25,000-action
-timeouts; natural-only117.917 is censored diagnostic,not an accepted score.
-Own initial-greedy2.208 matches; all natural cohorts have0/24 two-wall successes.
-Retain imagined bootstrap with12M64/Auto/N8/B16/T16/H15/R16,
-encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100 and sampled collection.
-Native11373c1/runner8952f81f differ from retained447fe50/cf4ea238; reused1009/cohort
-supports no isolated causal or seed-reliability claim.
+The [saved Breakout crop-gap diagnostic](results/2026-11-02-cdp-breakout-crop-gap.md)
+finds a visible ball at the preceding decision for all 103 losses with an
+available inferred paddle crossing; 17 crossings remain unavailable. All 98
+nearby missing-ball gap starts occur afterward. Six of 776 fitted successful
+contacts have a one-decision gap just before crossing. This does not support
+changing the teacher's fallback; fitted timing and differing event filters
+limit causal interpretation. Retain the teacher and current learning recipe.
+All 14 CPU fixture cases and 17 pins pass; the saved 52,072 actions / 208,254
+frames reconcile. Analysis completes **10:28:57.759 UTC November 2**, source
+`04c30c6`, in **0.387s**, with no new trajectory, emulator/native import, GPU
+work, learner update, failure or repeated stage. Evidence is closed under
+`/x/Temp/kindle-breakout-crop-gap-20261102`; do not rerun. No Kindle allocation
+is active at closure. The five-game goal remains unfinished.
 
-All412 original/553 repair pins,100k/6,227 retained recovery,357 matching initial
-and invariant frozen tensors,800/795 actual-initial semantic events,full
-replays/videos,guards,curves and exposure checks pass. Four frozen arms total
-285,280 actions/1,140,815 frames/261.765s,zero updates. Actual overrides87,981
-(43.9905%); guided online returns are not frozen competence.
-
-Original main928259/7aac1e71b2de47f9934cb67d2f7ee1ef and collection fail
-**09:54:47.194/09:55:09.359 UTC November2**, after allfive GPU stages finish.
-The separate CPU closure fails10:06:17.630 on an overly strict ALE-import
-assertion after its three missing replays finish. Preserve every failure.
-A separate10.403s CPU repair completes **10:11:27.827** and terminal confirmation
-passes10:12:01.748; no GPU stage,successful replay or collector repeats. Original
-main/collection/CPU-closure services remain failed. No original passing review
-or completion is created; closureSHAde4c7aad/summarySHA21184753.
-
-Root `/x/Temp/kindle-replay-bootstrap-20261102`, closure in`cpu-closure-repair`.
-All services are terminal; no Kindle allocation is active at confirmation.
-Do not repeat training,frozen captures,replays,collectors,readers or qualification.
-No extension,cap increase,retry,confirmation or automatic successor is selected.
-Check live state before new work. The five-game goal remains unfinished.
-
-The earlier bounded qualification remains valid:8,192 actions/489 updates in
-46.900s; native11373c1 passes150 Rust/628 Python CPU checks and both strict
-Clippy checks. Default restore matches128 events/357 tensors. Its2.989GiB cache
-is released; wheel/native/test binary/evidence remain. Optional posterior mode
-is not retained as the learning recipe; default imagined bootstrap is unchanged.
+The [posterior-bootstrap comparison](results/2026-11-02-cdp-breakout-posterior-bootstrap.md)
+remains **closed_protocol_failed**: accepted sampled53.708 is below70.750 in
+21m37.556s (+.75%); two greedy timeouts invalidate that arm. Retain imagined
+bootstrap with12M64/Auto/N8/B16/T16/H15/R16, encoder4e-5/behavior8e-5/
+dynamics4e-4/replay-value1/expert100 and sampled collection. All412 original/
+553 repair pins pass. Original main,collection and first CPU closure remain
+failed; the separate CPU repair completes10:11:27.827, terminal confirmation
+10:12:01.748. No GPU stage or successful replay repeats. Root
+`/x/Temp/kindle-replay-bootstrap-20261102/cpu-closure-repair` is closed; preserve
+all failures and do not repeat training,captures,replays,collectors or readers.
+The optional qualified implementation remains default-off; its2.989GiB build
+cache is released, with wheel/native/test binary and evidence retained.
+No teacher variant, learner, extension or automatic successor is selected.
+Check live state before new work; detailed evidence stays in the linked reports.
 
 The [earlier scalar calibration](results/2026-11-02-cdp-breakout-value-calibration.md)
 recovers only a small sampled-value signal (affineRMSE7.698 versus constant7.855).
