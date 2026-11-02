@@ -1,5 +1,16 @@
 # Kindle: CDP learning roadmap
 
+The [Qbert R20 prerequisite](experiments/2026-11-02-cdp-qbert-r20-240k.md)
+selects one fresh8192-action/611-update check onreused16001, changing onlyR24→20
+at current12M64/H5/dynamics1e-4/replay-value1. CPU command/config/schema/cadence
+checks and912 control pins pass. The intended separately selected240k comparison
+would add20% experience with18721 versus18715 updates; full learner not selected.
+Require `check_seconds*240000/8192*1.10<=1800`,357 initial/invariant tensors,
+replay/guards andoriginal terminal collection. Earlier300k/R24 and400k/R8
+regressions remain relevant. Root`/x/Temp/kindle-qbert-r20-240k-20261102/native-check`;
+main`kindle-qbert-r20-check-20261102`. Check live state; no overlapping GPU job,
+retry,cap increase,nearby-ratio sweep orautomatic successor.
+
 The [completed Qbert replay-value1 crossed assessment](results/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md) keeps14009
 ahead onboth cohorts:16525.000/15906.250 versus16001's15163.542/14913.542,all
 24/24 first pyramids. Cohort choice changes16001's near-threshold gate,while

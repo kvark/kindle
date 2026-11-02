@@ -20,6 +20,17 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 2
 
+The [Qbert R20 prerequisite](docs/experiments/2026-11-02-cdp-qbert-r20-240k.md)
+selects one fresh8192-action/611-update check onreused16001, changing onlyR24→20
+at current12M64/H5/dynamics1e-4/replay-value1. CPU command/config/schema/cadence
+checks and912 control pins pass. The intended separately selected240k comparison
+would add20% experience with18721 versus18715 updates; full learner not selected.
+Require `check_seconds*240000/8192*1.10<=1800`,357 initial/invariant tensors,
+replay/guards andoriginal terminal collection. Earlier300k/R24 and400k/R8
+regressions remain relevant. Root`/x/Temp/kindle-qbert-r20-240k-20261102/native-check`;
+main`kindle-qbert-r20-check-20261102`. Check live state; no overlapping GPU job,
+retry,cap increase,nearby-ratio sweep orautomatic successor.
+
 The [Qbert replay-value1 crossed assessment](docs/results/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md)
 is complete. Learner14009 stays ahead on both cohorts:16525.000/15906.250 versus
 16001's15163.542/14913.542,all24/24 first pyramids. Cohort choice changes16001's
@@ -43,8 +54,8 @@ passes03:40:38.280; completionSHA6254f729/summarySHAb55b2016. Original CPU
 preparation failures/repairs remain; no GPU stage repeats. Root
 `/x/Temp/kindle-breakout-replay-value1-20261102/full` isclosed; do not restart.
 
-No learner,extension,sweep,confirmation orautomatic successor is selected.
-No Kindle GPU allocation remains atclosure; check live state before new work.
+Those completed allocations remain closed; the separately selected R20 bounded
+check above is the current work. No full learner orautomatic successor is selected.
 The five-game goal remains unfinished. Qbert passes its original greedy gate
 onone of two latest learners; Breakout remains below the two-wall gate.
 The [Qbert phase diagnosis](docs/results/2026-11-02-cdp-qbert-replay-value1-phases.md)
