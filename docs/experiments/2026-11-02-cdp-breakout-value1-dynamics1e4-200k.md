@@ -1,5 +1,13 @@
 # Breakout: fresh200k lower-dynamics/replay-value1 comparison
 
+**Complete:** sampled42.917/greedy112.125 regress from70.750/143.667, all0/24
+two-wall, in21m36.378s (+0.66%). Retain dynamics4e-4. All422 pins,recovery,
+replays,guards andfive original services pass; main/post/collection finish
+07:10:06.890/07:10:34.218/07:11:08.882 UTC November2. Terminal andcoverage readers
+complete once07:11:52.749/07:12:03.388. All readers andstages below areclosed;
+do not repeat them. No extension,confirmation orautomatic successor.
+[Full result and coverage](../results/2026-11-02-cdp-breakout-value1-dynamics1e4.md).
+
 Select one fresh200k comparison after the [bounded check](../results/2026-11-02-cdp-breakout-value1-dynamics1e4.md)
 and both original services close successfully. Its48.489s/8,192-action result
 projects21m42.198s conservatively, below the unchanged30-minute training cap.

@@ -1,5 +1,12 @@
 # Breakout training rarely reaches high scores, even with guidance
 
+The later [lower-dynamics/value1 follow-up](2026-11-02-cdp-breakout-value1-dynamics1e4.md#higher-score-experience-remains-scarce)
+also fails to expand native high-score experience:216–431 actions fall from
+1,262 to927 (0.631%→0.4635% oftraining), withnone at432+. Both frozen scores
+regress. Its separate2.969s saved-log reader passes all48 diagnostic/422 full
+pins; the completed control analysis is reused without recount. This is
+descriptive coverage evidence, not an isolated cause or verified wall boundary.
+
 The completed [greedy-collection follow-up](#greedy-collection-follow-up) nearly
 doubles native training actions at216–431, but only to1.191% of training.
 Neither collection recipe reaches432. The original scale comparison below is

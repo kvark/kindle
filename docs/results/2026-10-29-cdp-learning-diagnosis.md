@@ -1,5 +1,34 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed lower-dynamics/replay-value1 comparison](2026-11-02-cdp-breakout-value1-dynamics1e4.md)
+scores **42.917 sampled /112.125 greedy**, below70.750/143.667 by39.34%/21.95%,
+in21m36.378s (+0.66%). Initial-subtracted return/min falls40.54%/22.81%; all0/24
+two-wall. Retain dynamics4e-4 withbehavior8e-5/replay-value1 andsampled collection.
+Onlydynamics4e-4→1e-4 changes at12M64/Auto/N8/B16/T16/H15/R16/expert100,
+native447fe50/runner ea2bf8c6/teacher fixed. Reused1009/cohort isdevelopment
+evidence,not independent reliability or an isolated architecture cause.
+
+All422 pins,100k/6,227 recovery,357 matching initial/invariant frozen tensors,
+47 pre-update events,800/795 initial semantic events,replays/videos,guards,
+curves,exposure andcomparison pass. Allfive original services succeed; main/
+post/collection finish07:10:06.890/07:10:34.218/07:11:08.882 UTC November2,
+launch sourcec691416. Terminal reader completes once07:11:52.749 in2.877s;
+completionSHA5f2cd92c/summarySHA8ca4e947. Original bounded preparation failure
+andseparate correction remain; no full stage fails orrepeats.
+
+The saved-log coverage follow-up completes07:12:03.388 in2.969s with48 diagnostic/
+422 full pins: native actions at216–431 fall1,262→927 (.631%→.4635% oftraining),
+none at432+. All283,208 new actions/1,132,245 frames reconcile; the completed
+control isreused without recount. Score fractions are not verified walls or
+an isolated causal test. Coverage reviewSHA65b130da. Actual overrides48.841%,
+late expert CE.662474 andguided71.18 are separate from frozen competence.
+
+Root `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102/full` isclosed. Recovery,
+terminal andcoverage readers arecomplete; do not repeat stages,collectors or
+readers. No Kindle allocation isactive atclosure; no extension,confirmation,
+rate sweep orautomatic successor isselected. CPU co-host costs remain uncorrected.
+Check live state; Breakout andthe five-game goal remain unfinished.
+
 The [completed Qbert R20 fresh-seed confirmation](2026-11-02-cdp-qbert-r20-seed18013.md)
 scores15,931.250 greedy/24 first pyramids on18013 in26m23.114s,versus development
 16001's15,279.167/24 in25m57.740s. Both pass the original15k/90% gate within30min:
