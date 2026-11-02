@@ -89,3 +89,10 @@ Root `/x/Temp/kindle-playfield-crop-20261102`. Check live state before every
 GPU allocation and do not overlap jobs. Stop on real faults/nonfinite values;
 no driver recovery. Preserve failures and inspect completed stages before any
 separate CPU repair. The five-game goal remains unfinished.
+
+The first CPU build at sourcec275c1e fails before running tests: the existing
+gradient diagnostic helper still calls the three-argument RGB constructor.
+The original declaration,24.924s failed compile receipt/log and exact helper
+source remain retained. A separate correction explicitly passes `None` for
+that unchanged full-frame fixture. No GPU work or completed test stage repeats;
+resume qualification in a separate attempt, reusing only the compiler cache.

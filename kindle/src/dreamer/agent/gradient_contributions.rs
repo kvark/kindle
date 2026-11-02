@@ -131,7 +131,7 @@ fn batch(core: &mut DreamerCore, directory: &Path, index: usize) -> (SequenceBat
     graph.set_outputs(vec![output]);
     let mut session = build_session(&graph, &core.gpu, Mode::Inference, false);
     let mut resize =
-        crate::vision::preprocess_gpu::GpuPreprocessor::rgb(Arc::clone(&core.gpu), rows, 64);
+        crate::vision::preprocess_gpu::GpuPreprocessor::rgb(Arc::clone(&core.gpu), rows, 64, None);
     let mut maximum_error = 0.0_f32;
     for time in 0..length {
         let frames = (0..rows)
