@@ -1,5 +1,10 @@
 # Fresh Qbert dynamics1e-4 confirmation on seed14009
 
+**Complete:** fresh14009 finishes25m09.906s, scores14,770.833 greedy and14,254.167
+sampled, each24/24 first pyramids, but misses15k. All original services and audits
+pass. One of two learners passes; no extension or third learner is selected.
+See the [final result](../results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md#full-confirmation-completes-below-the-score-gate).
+
 Select CPU preparation for one fresh200k learner after the
 [bounded check](2026-11-01-cdp-qbert-dynamics1e4-seed14009.md) passes execution
 and cost. Seed12011's retained dynamics1e-4 development result is greedy
@@ -75,7 +80,7 @@ preserved. See the [qualification result](../results/2026-11-01-cdp-qbert-dynami
 No full learner is launched at this preparation boundary.
 
 
-## Fresh full confirmation is active
+## Full launch and startup (historical)
 
 The separate200k learner launches **23:27:17.442 UTC November1**,source9cce545,
 with768 pins,mainPID863643/invocation`80c3cd392a2c45e68c200e362ab6c00c`.

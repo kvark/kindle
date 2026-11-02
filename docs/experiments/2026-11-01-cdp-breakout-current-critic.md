@@ -1,5 +1,14 @@
 # Current Breakout critics against complete realized returns
 
+**Frozen diagnostic selected November2 after original Qbert closure.** The CPU
+preparation below is complete. The fresh Qbert main, postprocessing and original
+collector succeed00:00:06/00:00:27/00:00:58 UTC, and all five services are terminal.
+Its completion SHA is9a56dbdaa703690d573d25ae80d69eeca4155d0bd5eaf3425093e97a666826e8;
+the host has no active Kindle service. Select the unchanged bounded check and
+four frozen arms described below, with fixed caps and no new learner. Pin this
+selection and require the same idle-host check immediately before launch.
+Earlier CPU-only selection boundaries below are historical. Launch is pending.
+
 Select CPU preparation within the existing five-game goal. The fresh Qbert
 seed14009 learner remains active; **no GPU declaration, queue, service or launch
 is selected while it runs**. Any frozen capture requires separate selection

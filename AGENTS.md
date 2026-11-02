@@ -18,54 +18,41 @@ available. Only the user merges PRs; commits and pushes are allowed.
 - [GPU incident](docs/results/2026-10-23-cdp-context64-gpu-fault.md):
   initialization failures on the original machine and their limits.
 
-## Active work — November 1
+## Active work — November 2
 
-The [fresh Qbert dynamics1e-4 seed14009 confirmation](docs/experiments/2026-11-01-cdp-qbert-dynamics1e4-seed14009-200k.md)
-launches23:27:17.442 UTC November1/source9cce545 with768 pins. MainPID863643/
-invocation80c3cd392a2c45e68c200e362ab6c00c remainsactive withprogress,postprocess
-andcollection;the original recovery observer isterminal success.
-Startup23:28:11 passes357 bounded-matching initial tensors,47 matching pre-update
-semantic events,correct cadence and609 finite supervised reports through6872
-actions. The47 reference startup differences are expected across seeds;no
-cross-seed initial equality isclaimed. CPU startup wrapper2.387s is retained
-without wall-time correction. No final frozen outcome isavailable.
+The [fresh Qbert confirmation](docs/results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
+completes 200,000 actions / 799,795 frames / 18,715 updates in **25m09.906s**.
+Greedy **14,770.833** and sampled **14,254.167** each clear 24/24 first pyramids
+but miss the fixed 15,000 mean gate. Actual initials score 147.917/205.208 and
+clear none. The unchanged dynamics1e-4 recipe therefore passes greedy on **one
+of two learners** (development12011 passes; fresh14009 fails), not two-seed
+confirmation. No extension, seed substitution, retry or third learner is selected.
 
-The original100k/9,340 recovery passes23:40:24 UTC November1 with357 finite
-tensors andfour retained files/206,067,158 bytes. Independent2.216s read-only
-confirmation verifies all768 pins,the original recovery journal andallfour
-hashes;no audit orcopy repeats. Metadataaf0a7d12/retentioneddcdd6e. Original
-recovery isterminal success;main,progress,postprocessing andcollection continue.
-No midpoint gameplay assessment;final frozen outcomes remainpending.
+All 768 pins, 100k/9,340 recovery, 357 bounded-matching initial and invariant
+frozen tensors, full training/frozen replays and videos, host guards, curves,
+exposure and comparison pass. Main/postprocessing/collection succeed at
+00:00:06/00:00:27/00:00:58 UTC November2 under the original identities; all five
+services are terminal success. No original stage fails or repeats. Completion
+SHA9a56dbda. Native447fe50/35ad0db, runner e161bf38 and teacher fa261c53 remain
+fixed. Only learner/evaluation seeds change. Actual guidance is 59,478 actions
+(29.739%); online scores are aided. CPU co-host costs remain uncorrected.
 
-Keep200k actions/18,715 updates/30-minute training cap,100k/9,340 recovery,and
-four final/actual-initial sampled/greedy24-episode assessments. Greedy primary
-15k/90% gate staysfixed. Only learner/evaluation seeds12011/4000012011→14009/
-4000014009 change at12M64/Auto/N8/B16/T16/H5/R24/dynamics1e-4/encoder-base4e-5/
-greedy/expert100; native447fe50/35ad0db,runner e161bf38 andteacherfa261c53 stayfixed.
-No experience reused. Root`/x/Temp/kindle-qbert-dynamics1e4-seed14009-20261101/full`;
-service`kindle-qbert-dynamics1e4-seed14009-200k-20261101`. Do not restart this
-learner,repeat completed stages orschedule another GPU job while it isactive.
+Root `/x/Temp/kindle-qbert-dynamics1e4-seed14009-20261101/full` is closed.
+The earlier12011 original main/collector failures and separate CPU repair remain
+preserved. Do not restart either learner or completed collectors. The five-game
+goal is unfinished; no Qbert successor is selected.
 
-The [bounded qualification and CPU checks](docs/results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
-pass8192/733 in57.303s,conservative25m38.902s;all774 pins andoriginal main/collector
-pass. Full preparation passesfive commands,32 config cases andfive audit-global
-screens withzero native/emulator construction. The preceding12011 result passes
-greedy15,471.875/24 in25m40s;its original main/collector remain failed andseparate
-CPU closure`complete_with_cpu_audit_repair` supplies missing evidence. New source
-checks preserve that provenance. Supplemental bounded reader error/correction
-remain recorded. Fresh confirmation andthe five-game goal remain unfinished.
-
-CPU preparation for the [current Breakout critic comparison](docs/experiments/2026-11-01-cdp-breakout-current-critic.md)
-passes23:37:02 UTC November1 in8.958s:five actual commands,both357-tensor schemas,
-227/272 source pins and768 active Qbert pins;original Qbert identity staysfixed.
-Nine value tests pass after preserving the missing-runtime collection failure;
-a separate preflight repair handles the absent Qbert-only argparse field. No
-native/emulator construction,GPU queue,declaration orservice iscreated. Keep
-co-host costs uncorrected. Proposed four frozen arms use each exact Breakout
-runner andcomplete external+intrinsic returns;source logs put intrinsic mean
-atabout8–10% of imagined reward. This isnot gradient attribution. Root
-`/x/Temp/kindle-breakout-current-critic-20261101` isprepared only. Do not select
-orlaunch GPU work until current Qbert andall observers areterminal andclosed.
+The [current Breakout critic comparison](docs/experiments/2026-11-01-cdp-breakout-current-critic.md)
+is selected separately after Qbert's original closure and an idle-host check.
+Its CPU qualification passes five actual commands, both357-tensor schemas,
+227/272 source pins and nine value-target tests; the two CPU preparation failures
+remain preserved. Use the existing native probe and each exact source runner
+for one1,024-action check followed by four frozen arms (145,632 source actions,
+zero updates). Compare critic values with complete external plus intrinsic
+returns. Sampled arms are primary; greedy changes the target policy. Different
+visited states prevent a matched-state causal comparison. No learner, loss
+change or backend work is selected. Root
+`/x/Temp/kindle-breakout-current-critic-20261101`; launch is pending.
 
 The [current cost summary](docs/results/2026-11-01-cdp-current-training-cost.md)
 finds learning about81% of Qbert and88% of Breakout training wall time. Within
@@ -106,7 +93,7 @@ The **five-game goal is unfinished**:
 | Freeway |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | Pong |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
 | Breakout |Encoder4e-5/dynamics4e-4:sampled56.292/greedy104.667 in21m28s; dynamics1e-4:50.625/138.750 in21m48s|Mixed; retain4e-4 sampled primary;all0/24 two-wall;reused development seed|
-| Qbert |RGB64/H5/R24/dynamics1e-4 on12011:greedy15,471.875,sampled14,862.5,24/24 first pyramids each,in25m40s|Greedy passes on reused development seed;4e-4 recipe passes one of two;fresh confirmation remains open|
+| Qbert |RGB64/H5/R24/dynamics1e-4:greedy15,471.875 on12011 and14,770.833 onfresh14009;both24/24 first pyramids,in25m40s/25m10s|One of two passes15k;fresh confirmation fails;no extension or third learner selected|
 
 Published long-run scores are aspirations,not matched-budget comparisons.
 Finite losses,short runs and backend speed do not establish mastery or CDP

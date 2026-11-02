@@ -1,16 +1,24 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-CPU preparation for the [current Breakout critic comparison](../experiments/2026-11-01-cdp-breakout-current-critic.md)
-passes23:37:02 UTC November1 in8.958s:five actual commands,both357-tensor schemas,
-227/272 source pins and768 active Qbert pins;original Qbert identity staysfixed.
-Nine value tests pass after preserving the missing-runtime collection failure;
-a separate preflight repair handles the absent Qbert-only argparse field. No
-native/emulator construction,GPU queue,declaration orservice iscreated. Keep
-co-host costs uncorrected. Proposed four frozen arms use each exact Breakout
-runner andcomplete external+intrinsic returns;source logs put intrinsic mean
-atabout8–10% of imagined reward. This isnot gradient attribution. Root
-`/x/Temp/kindle-breakout-current-critic-20261101` isprepared only. Do not select
-orlaunch GPU work until current Qbert andall observers areterminal andclosed.
+The [fresh Qbert confirmation](2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
+finishes25m09.906s with14,770.833 greedy/14,254.167 sampled and24/24 first pyramids
+each. Both miss15k. Dynamics1e-4 therefore passes greedy onone of two learners,
+with no extension or substitute seed selected. Late imitation CE is lower than
+the passing development seed (.064864 versus.069685), reinforcing that replay
+fit alone does not rank frozen competence. All original services and audits pass;
+no original stage fails or repeats. The five-game goal remains unfinished.
+
+The [current Breakout critic comparison](../experiments/2026-11-01-cdp-breakout-current-critic.md)
+is selected separately after Qbert's original closure and an idle-host check.
+Its CPU qualification passes five actual commands, both357-tensor schemas,
+227/272 source pins and nine value-target tests; the two CPU preparation failures
+remain preserved. Use the existing native probe and each exact source runner
+for one1,024-action check followed by four frozen arms (145,632 source actions,
+zero updates). Compare critic values with complete external plus intrinsic
+returns. Sampled arms are primary; greedy changes the target policy. Different
+visited states prevent a matched-state causal comparison. No learner, loss
+change or backend work is selected. Root
+`/x/Temp/kindle-breakout-current-critic-20261101`; launch is pending.
 
 The [current Qbert dynamics-group comparison](2026-11-01-cdp-qbert-dynamics1e4.md)
 raises greedy12,678.125→15,471.875 andsampled12,093.750→14,862.500,each24/24

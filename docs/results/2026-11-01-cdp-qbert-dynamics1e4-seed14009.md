@@ -1,9 +1,10 @@
 # Fresh Qbert dynamics1e-4 seed14009 confirmation
 
-**Full confirmation is active**,launched23:27:17 UTC November1 with768 pins.
-Startup matches its bounded initialization and609 finite reports. The original
-100k/9,340 recovery passes with357 finite tensors andfour retained files;final
-frozen results remain pending. The completed bounded qualification below isretained.
+**Full confirmation is complete and misses the score gate.** Fresh14009 scores
+14,770.833 greedy and14,254.167 sampled, each24/24 first pyramids, after25m09.906s.
+Only one of two learners passes the fixed15k gate. All original full services and
+audits pass; no GPU stage repeats. Earlier preparation/startup milestones below
+are historical; the final result is at the end of this report.
 
 The [fixed bounded check](../experiments/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
 completes **8,192 actions / 32,755 frames / 733 updates in57.303s**. Frozen
@@ -80,7 +81,7 @@ seed substitution,extension orautomatic successor is selected. The five-game
 goal remains unfinished.
 
 
-## Fresh full confirmation is active
+## Full launch and startup (historical)
 
 The separate200k learner launches **23:27:17.442 UTC November1**,source9cce545,
 with768 pins,mainPID863643/invocation`80c3cd392a2c45e68c200e362ab6c00c`.
@@ -128,3 +129,50 @@ adds9.541s repaired CPU preparation plus its retained test/argument failures
 while this learner continues. All768 inputs andoriginal identity stayfixed.
 No second GPU allocation orqueue iscreated;selection waits fororiginal Qbert
 closure andidlehost. Saved recovery omits replay,live beliefs,games andRNG.
+
+
+## Full confirmation completes below the score gate
+
+The original full run completes **200,000 actions / 799,795 frames / 18,715
+updates in 1,509.906s (25m09.906s)**, within its fixed 30-minute cap.
+
+| Learner seed | Greedy mean / first pyramids | Sampled mean / first pyramids | Training |
+| --- | ---: | ---: | ---: |
+| Development12011 |15,471.875 /24 of24|14,862.500 /24 of24|25m40.027s|
+| Fresh14009 |14,770.833 /24 of24|14,254.167 /24 of24|25m09.906s|
+
+Fresh14009's actual-initial means are147.917 greedy and205.208 sampled, withzero
+first pyramids. Both final means miss15,000 despite24/24 first pyramids. Thus
+**one of two learners passes the primary greedy gate**; this confirmation does
+not establish reliable success. The training recipe, native, runner and teacher
+are unchanged; only learner/evaluation seeds differ. Initialization and evaluation
+trajectories change together. No matched-state causal claim follows.
+
+All768 pins,100k/9,340 recovery,357 own bounded/full initial tensors and357
+invariant frozen tensors perarm pass. Full pixel/action/label training replay,
+all four frozen replays/videos,host guards,curves,exposure andcomparison pass.
+Cross-seed initial traces differ as expected; their equality is not required.
+Actual guidance is59,478 actions (29.739%), and the aided online last50 mean is
+15,280.5. Late50k replay expert CE is.064864 versus development.069685; this
+lower loss does not imply better frozen play. The comparison plot was inspected.
+
+Original main succeeds **00:00:06.318 UTC November2**, postprocessing
+**00:00:27.036**, collection **00:00:58.833**. Progress and recovery also succeed;
+all five original services are terminal. No original stage fails or repeats.
+The prepared read-only terminal summary takes6.056s (6.075s wrapper), verifies
+all original identities, pins, completion files and the prior12011 repaired
+closure, and constructs no native agent or emulator. Earlier bounded reader
+and CPU preparation errors remain recorded above; none changes this original
+full completion. All CPU co-host costs remain uncorrected.
+
+| Full artifact | SHA256 |
+| --- | --- |
+| Learning review | `144d0e638b32f067166b7542ee06e956a6681ce9c1d0983f9ea656700dfdfe39` |
+| Original completion | `9a56dbdaa703690d573d25ae80d69eeca4155d0bd5eaf3425093e97a666826e8` |
+| Comparison | `fc9414a89658e9d06588caf448407e5d20000ba89ff39b049bfbd00b268358db` |
+| Read-only summary | `956a7394f7598d3b48eb32c9a36e72e254c4f89d986afa015e8264d4e7c94702` |
+
+Retain this completed result without extending its budget, substituting seeds,
+repeating stages or selecting a third learner. No Qbert successor is selected.
+The five-game goal remains unfinished. Breakout's separately prepared frozen
+critic diagnostic can now be considered on the idle host.
