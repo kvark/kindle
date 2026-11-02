@@ -1,20 +1,19 @@
 # Kindle: CDP learning roadmap
 
-The [Qbert R20 prerequisite](experiments/2026-11-02-cdp-qbert-r20-240k.md)
-selects one fresh8192-action/611-update check onreused16001, changing onlyR24→20
-at current12M64/H5/dynamics1e-4/replay-value1. CPU command/config/schema/cadence
-checks and912 control pins pass. The intended separately selected240k comparison
-would add20% experience with18721 versus18715 updates; full learner not selected.
-Require `check_seconds*240000/8192*1.10<=1800`,357 initial/invariant tensors,
-replay/guards andoriginal terminal collection. Earlier300k/R24 and400k/R8
-regressions remain relevant. Root`/x/Temp/kindle-qbert-r20-240k-20261102/native-check`;
-main`kindle-qbert-r20-check-20261102`. Check live state; no overlapping GPU job,
-retry,cap increase,nearby-ratio sweep orautomatic successor.
-
-The bounded service launches04:03:55 UTC November2/source8f7888a with940 pins.
-Original mainPID892720/invocation11f63ab7b11c450186b6e4a8193d79d1 andcollector
-892723/b08ef5d431b5457a9cd0ac663088a18d areactive. Startup reaches361 learner
-reports; final audit andcost gate remain pending. Do not restart oroverlap.
+The [Qbert R20 bounded check](results/2026-11-02-cdp-qbert-r20-240k.md)
+completes8192 actions/32760 frames/611 updates in50.566s;1024 frozen/.868s has
+zero updates/no natural episodes. Conservative240k projection27m09.558s passes
+30min. All940 pins,357 matched initial/invariant frozen tensors,47 pre-update
+semantic events,finite reports,replay andguards pass. Main/collector succeed
+04:05:09.369/04:05:13.602 UTC/source8f7888a; terminal reader04:05:26.383.
+No stage fails orrepeats. OnlyR24→20 changes onreused16001, with native447fe50,
+runnere304af89,teacher andcurrent12M64/H5/dynamics1e-4/replay-value1 fixed.
+A separately selected240k life would add20% experience with18721 versus18715
+updates; gameplay benefit remains unmeasured. Earlier larger-budget regressions
+remain relevant. No full learner,retry,cap increase orautomatic successor is
+selected. Root`/x/Temp/kindle-qbert-r20-240k-20261102/native-check` isclosed;
+completionSHAdf02e12d/summarySHA15fb8ccd. No active allocation atclosure; check
+live state. Do not repeat the check,collector orreader.
 
 The [completed Qbert replay-value1 crossed assessment](results/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md) keeps14009
 ahead onboth cohorts:16525.000/15906.250 versus16001's15163.542/14913.542,all

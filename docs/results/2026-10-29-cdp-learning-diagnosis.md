@@ -1,5 +1,13 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [November2 R20 bounded check](2026-11-02-cdp-qbert-r20-240k.md) passes
+execution andearly cost:8192 actions/611 updates in50.566s, conservative240k
+projection27m09.558s. Learning uses81.49%/81.23% ofretained full Qbert training
+time;240k/R20 would keep update count nearlyfixed against200k/R24. This is a
+budget hypothesis for later-play improvement,not an isolated architecture cause
+or measured gameplay benefit. All940 pins/tensors/replay/guards andoriginal
+services pass; no full learner orautomatic successor isselected atclosure.
+
 The [completed Qbert replay-value1 crossed assessment](2026-11-02-cdp-qbert-replay-value1-cross-cohort.md) keeps14009
 ahead onboth cohorts:16525.000/15906.250 versus16001's15163.542/14913.542,all
 24/24 first pyramids. Cohort choice changes16001's near-threshold gate,while
