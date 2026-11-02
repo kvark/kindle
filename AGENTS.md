@@ -48,6 +48,17 @@ Terminal readerSHA04ce2848 passes its separate.106s CPU preparation; wait for
 original completion before terminal mode. No automatic successor is selected.
 The five-game goal remains unfinished.
 
+The [Qbert replay-value1 crossed assessment](docs/experiments/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md) is prepared
+but unselected: four new greedy final/own-initial arms cross14009/16001 cohorts;
+four completed diagonal arms will be reused without GPU repeats. Original
+fresh16001 failure remains; no favorable-cohort selection or new learner.
+Command/controller checks pass10.229s/8.404s at03:29:47/03:29:56/sourcec3b160f:
+four CLI paths,32 headers,357 finite/invariant tensors,939 preparation/338 active
+pins andfour original-journal fixtures. Same Breakout identity stays active.
+No queue,declaration,service orGPU work occurs. Do not repeat preparation.
+Require complete original Breakout closure,unchanged pins andidle host before
+separate selection. Root`/x/Temp/kindle-qbert-replay-value1-cross-cohort-20261102`.
+
 The [Qbert replay-value1 phase diagnosis](docs/results/2026-11-02-cdp-qbert-replay-value1-phases.md) locates the entire
 frozen score gap after identical550-point first-pyramid prefixes inall96 episodes.
 Both learners collect about76% later actions; late native movement agreement is

@@ -136,3 +136,9 @@ The separate [Qbert saved-log diagnosis](../results/2026-11-02-cdp-qbert-replay-
 co-hosts4.038s CPU (4.061s wrapper) at03:19:44.467. It preserves all338 pins and
 the same main identity, with no native/emulator import, GPU work or replay repeat.
 Retain this cost and the recovery confirmation cost without wall-time correction.
+
+The unselected [Qbert crossed-assessment preparation](2026-11-02-cdp-qbert-replay-value1-cross-cohort.md)
+co-hosts10.229s command and8.404s controller qualification at03:29:47/03:29:56.
+All338 active inputs and the same main identity remain unchanged. No native
+agent/emulator is constructed and no GPU stage, queue or successor declaration
+is created. Retain both timings without correcting this learner's wall time.

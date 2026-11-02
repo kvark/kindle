@@ -60,3 +60,24 @@ Root `/x/Temp/kindle-qbert-replay-value1-cross-cohort-20261102`. No learner,
 extension, retry, mode sweep, intermediate-checkpoint selection or automatic
 successor. Earlier RGB48/RGB64 crossed assessments and their failures/results
 remain closed. The five-game goal remains unfinished.
+
+## CPU preparation passes; assessment remains unselected
+
+Command qualification completes03:29:47.760 UTC November2/sourcec3b160f in
+10.229s (10.265s wrapper): four actual CLI paths,32 header cases,357 finite
+tensors per source checkpoint,939 preparation pins and338 active Breakout pins.
+Controller qualification completes03:29:56.219 in8.404s (8.446s wrapper): four
+retained diagonal audits reproduce16525.000/147.917 and14913.542/86.458, with357
+invariant tensors per arm, full stored replay/video/guard checks andfour original
+journal fixtures. Both checks pass on their first execution.
+
+The original BreakoutPID887827/invocation4b67c053d030409f8734e6bfbdab6707 remains
+active and unchanged. No native agent or emulator is constructed. Controller
+qualification imports ALE for identity checks and blocks construction explicitly.
+Retain both CPU co-host timings without correcting Breakout's training time.
+No queue, declaration, service, native build, training update or GPU stage occurs.
+
+Do not repeat successful preparation unless a concrete change requires a separate
+recorded check. Guarded selection remains conditional on allfive original Breakout
+services and collection succeeding, an idle host, clean committed sources and
+unchanged prepared/reference pins. No cross-cohort result is available yet.
