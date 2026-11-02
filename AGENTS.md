@@ -53,7 +53,10 @@ closures. The single21.987s oracle checks37,016 actions/153,132 branch frames,
 128 exact recorded plans andeight reversed orders. Two CPU fixture failures
 andtheir corrections remain preserved; no successful oracle repeats. Root
 `/x/Temp/kindle-breakout-current-ranking-20261102`; native447fe50/35ad0db unchanged.
-No learner orloss change isselected. Frozen launch ispending.
+No learner orloss change isselected. Frozen capture launches00:16:26 UTC November2/sourcefc5032a with71 pins.
+MainPID871905/invocation9ed47a38d0d342ac836ed4b91ee019a1 and original
+collectorPID871908/invocation8299622f9c054bf3afc5bdb3f4a5bff9 areactive.
+No full ranking result isavailable. Do not restart oroverlap another GPU job.
 
 The [completed Breakout critic diagnostic](docs/results/2026-11-02-cdp-breakout-current-critic.md)
 finds weak sampled return prediction: correlation .105/.097 and R²−.031/−.267

@@ -93,4 +93,9 @@ withzero construction attempts. No emulator oracle orGPU stage isrepeated.
 Select the fixed bounded pair andfull pair after original critic closure and
 another idle-host check. The worktree iscommitted before selection; all inputs
 are pinned before launch. Caps,origins,candidates andanalysis remain asdeclared.
-No learner,loss change,retry orautomatic successor. Launch ispending.
+No learner,loss change,retry orautomatic successor. Frozen capture launches00:16:26 UTC November2/sourcefc5032a with71 pins.
+MainPID871905/invocation9ed47a38d0d342ac836ed4b91ee019a1 and original
+collectorPID871908/invocation8299622f9c054bf3afc5bdb3f4a5bff9 areactive.
+No full ranking result isavailable. Do not restart oroverlap another GPU job.
+Declaration SHA256
+`a94e57ecea32816c2dd0b822178220533bf76d75cb026c28eeae288412dc50c2`.
