@@ -1,5 +1,13 @@
 # Qbert replay-value scale1: fresh-seed confirmation
 
+Launched **02:17:27.588 UTC November2/sourcebff6eb4** with912 pins;
+mainPID882846/invocationd78987afbb3344c3b65b84d3652ceb79 and allfour observers
+are active. Startup passes357 finite initial tensors,48 differences from
+14009,47 differing pre-update transitions,correct cadence and247 finite
+reports through3,016 actions. DeclarationSHA384851cb. Startup completes
+02:17:53.763 UTC;2.649s CPU wrapper is a co-host timing caveat. No frozen
+confirmation result yet. Do not restart or overlap another GPU job.
+
 Selected November 2 after the [development comparison](../results/2026-11-02-cdp-qbert-replay-value1.md)
 passed the greedy gate on reused seed14009: 16,525 mean return and 24/24 first
 pyramids in 25m36.935s. Sampled return was 14,882.292, below the 15,000 gate.
@@ -94,7 +102,13 @@ stage exists at failure. A separate CPU finisher uses the correct existing
 review, verifies the already-written queue/manifest and completes the declaration
 without repeating those writes. The original selection receipt and source,
 repair script and prior CPU failures are pinned. The fixed protocol snapshot
-retains the version copied before this documentation-only failure note.
+retains the version copied before this documentation-only failure note. The
+first finisher then fails before selection because its controller import path
+is absent. Its original source and receipt remain pinned; adding that import
+path completes selection in11.586s. No GPU stage is repeated. The subsequent
+actual launch preflight passes all912 pins, then starts the single learner and
+its original observers. No production or qualified controller source changes
+after successful CPU qualification.
 
 Evidence: `/x/Temp/kindle-qbert-replay-value1-seed16001-20261102/full`.
 Trial: `qbert-12m-64-b16-h5-r24-dynamics1e4-replayvalue1-expert100-200k-seed16001`.
