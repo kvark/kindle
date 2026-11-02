@@ -20,73 +20,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Active work — November 2
 
-The [fresh Qbert confirmation](docs/results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
-completes 200,000 actions / 799,795 frames / 18,715 updates in **25m09.906s**.
-Greedy **14,770.833** and sampled **14,254.167** each clear 24/24 first pyramids
-but miss the fixed 15,000 mean gate. Actual initials score 147.917/205.208 and
-clear none. The unchanged dynamics1e-4 recipe therefore passes greedy on **one
-of two learners** (development12011 passes; fresh14009 fails), not two-seed
-confirmation. No extension, seed substitution, retry or third learner is selected.
+The [bounded Breakout behavior-rate check](docs/experiments/2026-11-02-cdp-breakout-behavior8e5.md)
+is separately selected after CPU qualification. Only actor/critic rate changes
+fromeffective4e-5 to8e-5; base/encoder4e-5,dynamics4e-4 and12M64/Auto/N8/B16/T16/
+H15/R16/expert100/sampled collection remainfixed. Native447fe50/35ad0db,teacher
+andretained runner6c1b69fb areunchanged. This tests actor/critic learning together,
+not an isolated critic mechanism ornew loss. No experience isreused.
 
-All 768 pins, 100k/9,340 recovery, 357 bounded-matching initial and invariant
-frozen tensors, full training/frozen replays and videos, host guards, curves,
-exposure and comparison pass. Main/postprocessing/collection succeed at
-00:00:06/00:00:27/00:00:58 UTC November2 under the original identities; all five
-services are terminal success. No original stage fails or repeats. Completion
-SHA9a56dbda. Native447fe50/35ad0db, runner e161bf38 and teacher fa261c53 remain
-fixed. Only learner/evaluation seeds change. Actual guidance is 59,478 actions
-(29.739%); online scores are aided. CPU co-host costs remain uncorrected.
+CPU preparation passes.657s: two actual commands,15 config cases,357 schema
+and227 control pins; seven global screens/three observer fixtures also pass,
+withzero native/emulator construction andno failure. Keep8,192/489/180s training,
+1,024 frozen/zero updates/60s, full replay and357 matching initial/invariant
+frozen tensors. Require conservative200k projection≤30min before a separate
+full selection. Root `/x/Temp/kindle-breakout-behavior8e5-20261102/native-check`;
+service`kindle-breakout-behavior8e5-check-20261102`. Bounded launch ispending;
+no full learner,rate sweep,extension,retry orautomatic successor isselected.
 
-Root `/x/Temp/kindle-qbert-dynamics1e4-seed14009-20261101/full` is closed.
-The earlier12011 original main/collector failures and separate CPU repair remain
-preserved. Do not restart either learner or completed collectors. The five-game
-goal is unfinished; no Qbert successor is selected.
-
-The [completed Breakout action-ranking comparison](docs/results/2026-11-02-cdp-breakout-current-ranking.md)
-finds only8/128 origins with distinct15-step rewards. Pairwise agreement63.24%/
-66.67% for dynamics4e-4/1e-4 doesnot translate into selected-return gain:−.027775/
-−.035356 versus uniform, withlane intervals crossingzero. Paired difference
-+.007581[−.015094,.030325] establishesno advantage. Short external-reward ranking
-omits intrinsic reward andcritic bootstrap; long-term control remains unresolved.
-No new learner,loss,inference planner,origin replacement orsuccessor isselected.
-
-Both full captures total74,032 actions/296,076 source frames/115.848s,zero updates.
-All71 pins,357 invariant tensors percapture,eight shared pixel hashes,128 origins/
-2,432 candidate-control forecasts permodel,repeated-plan/live-state checks and
-host guards pass. Original main succeeds00:18:33 UTC November2 andcollector
-completion is00:18:46; both services areterminal success. No original stage fails
-orrepeats. Native447fe50/35ad0db unchanged;66 CPU tests andsingle21.987s oracle
-pass,withtwo earlier fixture failures preserved. Root
-`/x/Temp/kindle-breakout-current-ranking-20261102` isclosed; no active allocation.
-The five-game goal remains unfinished. Checklive state before GPU work.
-
-The [completed Breakout critic diagnostic](docs/results/2026-11-02-cdp-breakout-current-critic.md)
-finds weak sampled return prediction: correlation .105/.097 and R²−.031/−.267
-for dynamics4e-4/1e-4. Both beat an earlier-episode constant, but neither beats
-the hindsight test mean in squared error. Intrinsic rewards contribute13.51%/
-11.50% of mean sampled discounted return. Greedy changes the target policy;
-its bias−11.11/−12.94 is not a matched-policy training diagnosis. Different
-visited states and noisy realized returns limit causal claims. No loss or new
-learner is selected by this result.
-
-Four frozen arms total145,632 actions/582,380 frames/154.699s,zero updates.
-All73 pins,357 invariant tensors perarm,complete source semantics,source replay
-hashes andhost guards pass. Original main succeeds00:06:14 UTC November2 and
-collector completion is00:06:33; both services are terminal success. No stage
-fails or repeats. Native447fe50/35ad0db andexact source runners stayfixed.
-Root `/x/Temp/kindle-breakout-current-critic-20261101` isclosed; no active Kindle
-allocation remains. No successor isselected; checklive state before GPU work.
-
-The [current cost summary](docs/results/2026-11-01-cdp-current-training-cost.md)
-finds learning about81% of Qbert and88% of Breakout training wall time. Within
-Qbert updates,world training44%,posterior preparation24%,imagination20%;Breakout
-imagination40%. These are wall timers,not exclusive GPU costs. The completed
-CPU analysis and its separate timer-accounting repair remain in that report.
-No optimization or additional allocation is selected by these measurements.
-
-Completed comparisons and diagnostics are in the roadmap,handover and linked
-reports. Historical “next” paragraphs do not select successors. Replace this
-active-work block when state changes; do not append a completed-results ledger.
+Completed Qbert confirmation, Breakout critic/ranking diagnostics and cost
+measurements remain in the roadmap, handover and linked reports. Qbert's fresh
+seed misses15k; the recipe passes one of two. Breakout haszero two-wall successes;
+critic correlation isweak andonly8/128 short ranking origins distinguish actions.
+These findings do not select a new loss. Replace this active block asstate changes.
 
 ## Direction and retained results
 

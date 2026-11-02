@@ -1,5 +1,22 @@
 # CDP handover — October25,2026
 
+The [bounded Breakout behavior-rate check](experiments/2026-11-02-cdp-breakout-behavior8e5.md)
+is separately selected after CPU qualification. Only actor/critic rate changes
+fromeffective4e-5 to8e-5; base/encoder4e-5,dynamics4e-4 and12M64/Auto/N8/B16/T16/
+H15/R16/expert100/sampled collection remainfixed. Native447fe50/35ad0db,teacher
+andretained runner6c1b69fb areunchanged. This tests actor/critic learning together,
+not an isolated critic mechanism ornew loss. No experience isreused.
+
+CPU preparation passes.657s: two actual commands,15 config cases,357 schema
+and227 control pins; seven global screens/three observer fixtures also pass,
+withzero native/emulator construction andno failure. Keep8,192/489/180s training,
+1,024 frozen/zero updates/60s, full replay and357 matching initial/invariant
+frozen tensors. Require conservative200k projection≤30min before a separate
+full selection. Root `/x/Temp/kindle-breakout-behavior8e5-20261102/native-check`;
+service`kindle-breakout-behavior8e5-check-20261102`. Bounded launch ispending;
+no full learner,rate sweep,extension,retry orautomatic successor isselected.
+
+
 The [fresh Qbert confirmation](results/2026-11-01-cdp-qbert-dynamics1e4-seed14009.md)
 completes 200,000 actions / 799,795 frames / 18,715 updates in **25m09.906s**.
 Greedy **14,770.833** and sampled **14,254.167** each clear 24/24 first pyramids
