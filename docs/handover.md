@@ -9,7 +9,7 @@ tensors,47 pre-update transitions,correct cadence and294 finite reports through
 240k/R20/18721 versus200k/R24/18715 changes experience,cadence andsampling together.
 Keep12M64/H5/dynamics1e-4/replay-value1,native447fe50,runnere304af89 andteacher.
 Require100k/7784 and200k/15596 retained recoveries andfinal/actual-initial sampled/
-greedy24-episode arms against14913.542/14745.833; original15k/90% gate staysfixed.
+greedy24-episode arms; controlgreedy14913.542/sample14745.833,original15k/90% gate.
 The prelaunch exposure-schema correction andinitial CPU fixture failure remain
 retained. Root`/x/Temp/kindle-qbert-r20-240k-20261102/full`;
 main`kindle-qbert-r20-240k-20261102`. Check live identity; no restart,overlap,
