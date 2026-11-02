@@ -20,49 +20,42 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 2
 
-The [fresh Breakout greedy-collection comparison](docs/experiments/2026-11-02-cdp-breakout-greedy-training-200k.md) launches at
-05:10:17.676 UTC November2, source9247ffa, with427 pins and a30-minute training
-cap. Main PID898543/invocation5c69e7d837e34226bb4f323739c29a0f continues;
-the original100k recovery observer succeeds and the remaining observers continue. Startup passes357 initial tensors matching both
-control and bounded check,47 bounded-matching transitions/47 control differences,
-correct cadence and208 finite reports through3,704 actions. Only live collection
-changes; native447fe50,runner6e03d739,12M64/H15/R16/replay-value1,rates,unimix.01
-and teacher remain qualified. The100k/6,227 recovery passes at05:21:23.347,
-with357 finite tensors/four files (206,067,161 bytes). Independent confirmation
-at05:21:50.207 preserves427 pins and original main identity; review SHAd527ee09,
-retention SHA33052ef0. Do not repeat the recovery reader. Final/actual-initial
-sampled/greedy24-episode assessments remain pending against70.750/143.667; sampled stays primary,
-original90% two-wall gate unchanged. No full frozen result yet.
-The separate terminal reader qualifies five score cases at05:11:30.095 in2.407s,
-preserving427 pins and original main identity. ReaderSHAc787fe18; recovery reader
-SHAb29381fd. Recovery confirmation is complete; run terminal mode once after
-original collection, without repeating completed stages.
-A separate CPU score-coverage reader qualifies at05:15:41.903 in2.496s,
-with five boundary fixtures,43 diagnostic pins and427 unchanged active inputs.
-Use `review_score_coverage.py terminal` once after the original terminal reader
-completes; reuse the saved control analysis and read only the new candidate.
-Thresholds216/432/648/864 remain score ranges, not verified wall boundaries.
-Declaration SHA f3f3358b; reader SHA859435b1. No new GPU work or successor.
-Root `/x/Temp/kindle-breakout-greedy-training-20261102/full`; main
-`kindle-breakout-greedy-training-200k-20261102`. Check live state; no restart,
-overlap,extension,cap increase or automatic successor. CPU co-host times remain
-uncorrected; the five-game goal remains unfinished.
+The [completed Breakout greedy-collection comparison](docs/results/2026-11-02-cdp-breakout-greedy-training.md)
+finishes200k actions /799,661 frames /12,477 updates in21m44.645s. Primary
+sampled78.542 improves70.750 by11.01%, with9.81% more initial-subtracted return
+per training minute. Greedy90.042 falls37.33% from143.667; all0/24 two-wall.
+Retain this sampled development point and the stronger greedy control. Only live
+collection changes at12M64/H15/R16/replay-value1; native447fe50,runner6e03d739,
+rates,teacher and other settings stay qualified. Reused1009/cohort provides no
+independent reliability claim; guided131.780 is not frozen competence.
 
-The [Breakout greedy-collection check](docs/results/2026-11-02-cdp-breakout-greedy-training.md) completes
-8,192 actions /32,738 frames /489 updates in47.418s. Frozen1,024 actions take
-.869s with zero updates and no natural episodes. Conservative200k projection
-21m13.430s passes30min; gameplay benefit remains unmeasured. All387 pins,357
-control-matching initial/invariant frozen tensors,47 recorded pre-update
-semantic differences,finite reports,full guided replay and host guards pass.
-Only live collection changes; native447fe50,12M64/H15/R16/replay-value1,rates,
-actor unimix .01 and teacher stay fixed. Original CPU wrapper-sentinel failure
-and separate qualification remain;45 tests pass with no repeat. Main/collector
-succeed05:03:51.035/05:03:56.103 UTC November2, sourceb2105b9; terminal reader
-05:04:16.073. Completion SHAfc5ef001, summary SHA86262978. Root
-`/x/Temp/kindle-breakout-greedy-training-20261102/native-check` is closed.
-No active allocation, full learner or automatic successor is selected. Do not
-repeat completed stages/readers. Check live state; the five-game goal remains
-unfinished.
+All427 pins,100k/6,227 recovery,357 matching initial/invariant frozen tensors,
+paired traces,replays/videos,guards,curves,exposure and comparison pass. Main/
+post/collection succeed05:36:00.508/05:36:21.599/05:36:57.105 UTC November2,
+source9247ffa. Allfive original services succeed; no GPU stage repeats. Terminal
+reader completes once05:39:32.077 in1.844s; completionSHA8ceba70a, summarySHAf9ba2112.
+The original bounded CPU wrapper failure and separate qualification remain.
+
+The [coverage follow-up](docs/results/2026-11-02-cdp-breakout-score-coverage.md#greedy-collection-follow-up)
+finds native actions at216–431 rising1,262→2,382 (0.631%→1.191% of training),
+with zero actions at432+. Three completed unguided episodes reach216 versus
+none incontrol. Training maxima408→424 still miss later score ranges. These
+are not verified wall boundaries or an isolated cause. All43 diagnostic/427
+full pins and292,528 new actions reconcile; the saved control is reused.
+CPU reader completes once05:39:43.053 in2.967s, reviewSHA19787de1; no GPU work.
+
+Root `/x/Temp/kindle-breakout-greedy-training-20261102/full` is closed. No learner
+or GPU allocation remains active at closure. Do not repeat completed stages,
+collectors or readers. No extension, confirmation, cap increase or automatic
+successor is selected. Check live state; the five-game goal remains unfinished.
+
+The earlier [greedy-collection prerequisite](docs/results/2026-11-02-cdp-breakout-greedy-training.md#earlier-bounded-prerequisite)
+passes8,192 actions/489 updates in47.418s;1,024 frozen actions/.869s havezero
+updates/no natural episodes. All387 pins,tensors,replay,guards andoriginal
+services pass. It precedes the separately selected full comparison above; its
+experience is not reused. The45 CPU tests and separate wrapper qualification
+remain retained. Native-check completionSHAfc5ef001/summarySHA86262978;
+do not repeat the bounded check or its readers.
 
 The [Qbert 240k/R20 comparison](docs/results/2026-11-02-cdp-qbert-r20-240k.md) completes 240,000 actions,
 959,778 frames and 18,721 updates in 25m57.740s. Greedy 15,279.167 with 24/24

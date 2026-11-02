@@ -1,5 +1,13 @@
 # Breakout: fresh 200k comparison with greedy training actions
 
+**Closed November2:** [full result](../results/2026-11-02-cdp-breakout-greedy-training.md).
+200k actions /12,477 updates finish in21m44.645s. Sampled78.542 improves70.750
+and initial-subtracted return/min rises9.81%; greedy90.042 falls from143.667.
+All0/24 two-wall. Original services and both terminal readers pass; coverage
+remains below432 points. Retain the sampled development point and stronger
+greedy control. No extension, confirmation or automatic successor is selected.
+The instructions below describe the completed protocol; do not rerun its stages.
+
 Select one fresh learner within the unfinished five-game goal. The
 [bounded check](../results/2026-11-02-cdp-breakout-greedy-training.md) passes
 8,192 actions /489 updates in47.418s, with a conservative200k projection of
