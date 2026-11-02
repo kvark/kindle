@@ -127,3 +127,32 @@ Read-only helpers under `/x/Temp/kindle-breakout-greedy-training-20261102`:
 The helper source receipts and preflight live beside the execution receipts.
 Use the existing `run_cpu.py` wrapper with new receipt names; do not overwrite
 or rerun completed preparation, startup or reader-preflight stages.
+
+## Qualified CPU coverage follow-up
+
+Before final outcomes, the separate `review_score_coverage.py` is qualified at
+**05:15:41.903 UTC November2/source0c1f61e** in2.496s (2.517s wrapper). Five
+new hand-counted/error fixtures combine score crossing, cumulative frame counts,
+the exact1,920-action guidance cutoff and native-action totals. The original
+seven fixtures and completed control analysis are not rerun. All43 diagnostic
+pins and427 active inputs remain unchanged, with original PID/invocation intact.
+No native, emulator or numerical fitting library is imported.
+
+This reader reuses `trials.candidate` from the completed scale1 coverage review
+as the current sampled-collection control, verifying its source hashes and saved
+scores. It calls the unchanged corrected coverage helper only on this new
+learner's training and four frozen logs after original collection and the
+terminal reader complete. It reconciles all completed episodes and partial
+tails; frozen score summaries keep the original24 episodes. Pre-action score
+bins remain0–215,216–431,432–647,648–863,864+, with actual overrides and native
+actions reported separately. These are score ranges, not verified wall boundaries
+or an isolated causal test. The original gates and primary sampled metric stay
+unchanged. No gameplay finding exists at qualification.
+
+Root `/x/Temp/kindle-breakout-greedy-training-20261102` contains
+`score-coverage-declaration.json` (SHAf3f3358b), `review_score_coverage.py`
+(SHA859435b1) and `score-coverage-preflight-execution.json`. Preflight is complete;
+run `terminal` mode once after `full-terminal-summary.json` exists and passes.
+The output will be `score-coverage-review.json`. No replay, control analysis or
+completed stage is repeated; no learner, guidance change or successor is selected.
+Retain the CPU co-host duration without correcting training wall time.

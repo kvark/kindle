@@ -1,5 +1,11 @@
 # CDP handover — October25,2026
 
+PR31's previous65,451-character dashboard is preserved at
+`/x/Temp/kindle-pr31-dashboard-20261102/pr-before-condensation.json`.
+Its replacement keeps active work, retained results and26 checked report links;
+the publication receipt and exact body remain beside the snapshot. Full results
+stay in the roadmap/reports. Use the current PR body for subsequent status edits.
+
 The [fresh Breakout greedy-collection comparison](experiments/2026-11-02-cdp-breakout-greedy-training-200k.md) launches at
 05:10:17.676 UTC November2, source9247ffa, with427 pins and a30-minute training
 cap. Main PID898543/invocation5c69e7d837e34226bb4f323739c29a0f and all four
@@ -13,6 +19,12 @@ original90% two-wall gate unchanged. No full frozen result yet.
 The separate terminal reader qualifies five score cases at05:11:30.095 in2.407s,
 preserving427 pins and original main identity. ReaderSHAc787fe18; recovery reader
 SHAb29381fd. Run each once at its milestone, without repeating original stages.
+A separate CPU score-coverage reader qualifies at05:15:41.903 in2.496s,
+with five boundary fixtures,43 diagnostic pins and427 unchanged active inputs.
+Use `review_score_coverage.py terminal` once after the original terminal reader
+completes; reuse the saved control analysis and read only the new candidate.
+Thresholds216/432/648/864 remain score ranges, not verified wall boundaries.
+Declaration SHA f3f3358b; reader SHA859435b1. No new GPU work or successor.
 Root `/x/Temp/kindle-breakout-greedy-training-20261102/full`; main
 `kindle-breakout-greedy-training-200k-20261102`. Check live state; no restart,
 overlap,extension,cap increase or automatic successor. CPU co-host times remain

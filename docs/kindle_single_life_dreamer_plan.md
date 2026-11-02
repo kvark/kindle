@@ -13,6 +13,12 @@ original90% two-wall gate unchanged. No full frozen result yet.
 The separate terminal reader qualifies five score cases at05:11:30.095 in2.407s,
 preserving427 pins and original main identity. ReaderSHAc787fe18; recovery reader
 SHAb29381fd. Run each once at its milestone, without repeating original stages.
+A separate CPU score-coverage reader qualifies at05:15:41.903 in2.496s,
+with five boundary fixtures,43 diagnostic pins and427 unchanged active inputs.
+Use `review_score_coverage.py terminal` once after the original terminal reader
+completes; reuse the saved control analysis and read only the new candidate.
+Thresholds216/432/648/864 remain score ranges, not verified wall boundaries.
+Declaration SHA f3f3358b; reader SHA859435b1. No new GPU work or successor.
 Root `/x/Temp/kindle-breakout-greedy-training-20261102/full`; main
 `kindle-breakout-greedy-training-200k-20261102`. Check live state; no restart,
 overlap,extension,cap increase or automatic successor. CPU co-host times remain
