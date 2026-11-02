@@ -1,5 +1,17 @@
 # Kindle: CDP learning roadmap
 
+The [fresh Qbert240k/R20 comparison](experiments/2026-11-02-cdp-qbert-r20-240k-full.md)
+is selected after the bounded27m09.558s projection passes30min. Reused16001 /
+original4000016001 cohort;240k/18721 versus retained200k/R24/18715 changes
+experience,cadence andsampling together. Keep12M64/H5/dynamics1e-4/replay-value1,
+native447fe50,runnere304af89 andteacher fixed. Require100k/7784 and200k/15596
+recoveries,final/actual-initial sampled/greedy24-episode assessments,original
+15k/90% gate and30-minute training cap. CPU command/config/observer/retention
+checks pass; stale exposure-budget assertions/bins are separately corrected before
+launch,with original fixture failure retained. No GPU work yet. Root
+`/x/Temp/kindle-qbert-r20-240k-20261102/full`;main`kindle-qbert-r20-240k-20261102`.
+Check live state; no overlap,retry,cap increase,extension orautomatic successor.
+
 The [Qbert R20 bounded check](results/2026-11-02-cdp-qbert-r20-240k.md)
 completes8192 actions/32760 frames/611 updates in50.566s;1024 frozen/.868s has
 zero updates/no natural episodes. Conservative240k projection27m09.558s passes
