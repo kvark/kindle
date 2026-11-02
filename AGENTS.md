@@ -21,16 +21,19 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 2
 
 The [fresh Qbert240k/R20 comparison](docs/experiments/2026-11-02-cdp-qbert-r20-240k-full.md)
-is selected after the bounded27m09.558s projection passes30min. Reused16001 /
-original4000016001 cohort;240k/18721 versus retained200k/R24/18715 changes
-experience,cadence andsampling together. Keep12M64/H5/dynamics1e-4/replay-value1,
-native447fe50,runnere304af89 andteacher fixed. Require100k/7784 and200k/15596
-recoveries,final/actual-initial sampled/greedy24-episode assessments,original
-15k/90% gate and30-minute training cap. CPU command/config/observer/retention
-checks pass; stale exposure-budget assertions/bins are separately corrected before
-launch,with original fixture failure retained. No GPU work yet. Root
-`/x/Temp/kindle-qbert-r20-240k-20261102/full`;main`kindle-qbert-r20-240k-20261102`.
-Check live state; no overlap,retry,cap increase,extension orautomatic successor.
+launches04:15:04.189 UTC November2/source55ead06 with991 pins and30-minute
+training cap. Original mainPID893328/invocation575d8e40b325408e8d4220bfd3b61bb8;
+allfour observers areactive. Startup passes357 control/bounded-matching initial
+tensors,47 pre-update transitions,correct cadence and294 finite reports through
+4128 actions at04:15:34.903. No frozen result yet. Reused16001/original4000016001;
+240k/R20/18721 versus200k/R24/18715 changes experience,cadence andsampling together.
+Keep12M64/H5/dynamics1e-4/replay-value1,native447fe50,runnere304af89 andteacher.
+Require100k/7784 and200k/15596 retained recoveries andfinal/actual-initial sampled/
+greedy24-episode arms against14913.542/14745.833; original15k/90% gate staysfixed.
+The prelaunch exposure-schema correction andinitial CPU fixture failure remain
+retained. Root`/x/Temp/kindle-qbert-r20-240k-20261102/full`;
+main`kindle-qbert-r20-240k-20261102`. Check live identity; no restart,overlap,
+cap increase,extension orautomatic successor whilethis allocation isactive.
 
 The [Qbert R20 bounded check](docs/results/2026-11-02-cdp-qbert-r20-240k.md)
 completes8192 actions/32760 frames/611 updates in50.566s;1024 frozen/.868s has

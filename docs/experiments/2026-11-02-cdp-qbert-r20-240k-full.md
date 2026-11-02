@@ -87,3 +87,12 @@ trial `qbert-12m-64-b16-h5-r20-dynamics1e4-replayvalue1-expert100-240k-seed16001
 main `kindle-qbert-r20-240k-20261102`, with matching postprocess, progress,
 recovery and collection observers. Check live state before launch and never
 overlap another GPU allocation.
+
+Launched04:15:04.189 UTC November2/source55ead06, declarationSHA
+7a9d5272df6b9a8ec4ce45d5ca35002b214ca6aba8bfcb53a1d133521e155627,991 pins.
+MainPID893328/invocation575d8e40b325408e8d4220bfd3b61bb8; postprocess893331,
+progress893334,recovery893472 andcollection893475 areactive. Startup passes
+04:15:34.903:357 initial tensors match control/check,47 pre-update transitions
+match,correct first six updates and294 finite reports through4128 actions.
+Startup CPU wrapper3.032s co-host time isretained without timing correction.
+Frozen gameplay andterminal completion remain pending. Do not restart oroverlap.
