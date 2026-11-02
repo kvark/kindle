@@ -1,5 +1,12 @@
 # Current Breakout critics against complete realized returns
 
+**Complete:** four frozen arms finish145,632 actions/582,380 frames in154.699s,
+withzero updates andalloriginal audits passing. Sampled critic correlations
+.105/.097 andR²−.031/−.267 showweak return prediction; no causal gameplay claim
+ornew learner follows. Main succeeds00:06:14 UTC November2,original collector
+completion00:06:33. Both areterminal success. See the [result](../results/2026-11-02-cdp-breakout-current-critic.md).
+Selection andstartup statements below arehistorical; do not rerun.
+
 **Frozen diagnostic selected November2 after original Qbert closure.** The CPU
 preparation below is complete. The fresh Qbert main, postprocessing and original
 collector succeed00:00:06/00:00:27/00:00:58 UTC, and all five services are terminal.

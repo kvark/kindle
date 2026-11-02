@@ -42,22 +42,22 @@ The earlier12011 original main/collector failures and separate CPU repair remain
 preserved. Do not restart either learner or completed collectors. The five-game
 goal is unfinished; no Qbert successor is selected.
 
-The [current Breakout critic comparison](docs/experiments/2026-11-01-cdp-breakout-current-critic.md)
-is selected separately after Qbert's original closure and an idle-host check.
-Its CPU qualification passes five actual commands, both357-tensor schemas,
-227/272 source pins and nine value-target tests; the two CPU preparation failures
-remain preserved. Use the existing native probe and each exact source runner
-for one1,024-action check followed by four frozen arms (145,632 source actions,
-zero updates). Compare critic values with complete external plus intrinsic
-returns. Sampled arms are primary; greedy changes the target policy. Different
-visited states prevent a matched-state causal comparison. No learner, loss
-change or backend work is selected. Root
-`/x/Temp/kindle-breakout-current-critic-20261101`. It launches00:03:12 UTC
-November2/source1b6bed9 with73 pins, mainPID868111/invocation
-b1dacd51b17b40849c8345ec02504658 and original collectorPID868114/invocation
-798fa2c7916e4965a10e810cef33a9f0. The1,024-action check passes in1.022s with128
-matching semantic events,357 invariant tensors andzero updates. Full captures
-are active; do not restart or overlap another GPU allocation.
+The [completed Breakout critic diagnostic](docs/results/2026-11-02-cdp-breakout-current-critic.md)
+finds weak sampled return prediction: correlation .105/.097 and R²−.031/−.267
+for dynamics4e-4/1e-4. Both beat an earlier-episode constant, but neither beats
+the hindsight test mean in squared error. Intrinsic rewards contribute13.51%/
+11.50% of mean sampled discounted return. Greedy changes the target policy;
+its bias−11.11/−12.94 is not a matched-policy training diagnosis. Different
+visited states and noisy realized returns limit causal claims. No loss or new
+learner is selected by this result.
+
+Four frozen arms total145,632 actions/582,380 frames/154.699s,zero updates.
+All73 pins,357 invariant tensors perarm,complete source semantics,source replay
+hashes andhost guards pass. Original main succeeds00:06:14 UTC November2 and
+collector completion is00:06:33; both services are terminal success. No stage
+fails or repeats. Native447fe50/35ad0db andexact source runners stayfixed.
+Root `/x/Temp/kindle-breakout-current-critic-20261101` isclosed; no active Kindle
+allocation remains. No successor isselected; checklive state before GPU work.
 
 The [current cost summary](docs/results/2026-11-01-cdp-current-training-cost.md)
 finds learning about81% of Qbert and88% of Breakout training wall time. Within
