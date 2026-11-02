@@ -1,5 +1,22 @@
 # Kindle: CDP learning roadmap
 
+The [Qbert replay-value1 crossed assessment](experiments/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md) launches
+03:43:03.876 UTC November2/sourceb883162 after complete Breakout closure and
+idle-host checks. Original mainPID890878/invocation68f3f48fbc714bfbbb4a0701a1ea3799
+andcollector890881/ae591eeba4444a5cafe8c9f13d8b7aa3 areactive. DeclarationSHA7e472c0b
+pins957 inputs; first crossed header passes greedy/cohort4000016001/config14009/
+replay-value1/starting18715 updates. No full crossed result exists yet.
+
+Four new greedy final/own-initial arms cross14009/16001 cohorts; completed
+diagonal GPU arms are reused without repeats. Original fresh16001 failure remains;
+no favorable-cohort selection or new learner. Native447fe50/35ad0db, runnere304af89,
+checkpoint configs,24 natural episodes perarm,300s/600k caps and15k/90% gates
+stayfixed. Require357 finite/invariant tensors,replays/videos,guards andoriginal
+collection. Preparation939pins/four CLI paths/32headers/controller/journal checks
+pass; no stage fails orrepeats. Root`/x/Temp/kindle-qbert-replay-value1-cross-cohort-20261102`.
+Check live state; do not overlap,restart,extend orchange caps. No automatic
+successor. The five-game goal remains unfinished.
+
 The [completed Breakout replay-value1 comparison](results/2026-11-02-cdp-breakout-replay-value1.md) scores
 70.750 sampled/143.667 greedy versus59.000/117.292, improving19.92%/22.49% in
 21m27.910s (1.27% less training time). Initial-subtracted return/min improves
@@ -23,17 +40,6 @@ CPU co-host costs remain uncorrected. Root`/x/Temp/kindle-breakout-replay-value1
 isclosed. Do not repeat stages orreaders. No extension,sweep,confirmation or
 automatic successor isselected; no allocation remains atclosure,check live state.
 The five-game goal remains unfinished.
-
-The [Qbert replay-value1 crossed assessment](experiments/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md) is prepared
-but unselected: four new greedy final/own-initial arms cross14009/16001 cohorts;
-four completed diagonal arms will be reused without GPU repeats. Original
-fresh16001 failure remains; no favorable-cohort selection or new learner.
-Command/controller checks pass10.229s/8.404s at03:29:47/03:29:56/sourcec3b160f:
-four CLI paths,32 headers,357 finite/invariant tensors,939 preparation/338 active
-pins andfour original-journal fixtures. Same Breakout identity stays active.
-No queue,declaration,service orGPU work occurs. Do not repeat preparation.
-Original Breakout closure now passes; require unchanged pins,clean committed
-sources andidle host before separate selection. Root`/x/Temp/kindle-qbert-replay-value1-cross-cohort-20261102`.
 
 The [Qbert replay-value1 phase diagnosis](results/2026-11-02-cdp-qbert-replay-value1-phases.md) locates the entire
 frozen score gap after identical550-point first-pyramid prefixes inall96 episodes.

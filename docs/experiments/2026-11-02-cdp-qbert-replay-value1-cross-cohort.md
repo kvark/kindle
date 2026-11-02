@@ -1,5 +1,10 @@
 # Separate Qbert replay-value1 learner and evaluation-cohort differences
 
+**Running:** the separate guarded selection passes957 pinned inputs after complete
+Breakout closure. Original mainPID890878/invocation68f3f48fbc714bfbbb4a0701a1ea3799
+launches03:43:03.876 UTC November2/sourceb883162. The original collection observer
+is active. No completed crossed result exists yet; do not overlap or restart.
+
 Prepare four frozen crossed assessments within the existing five-game goal.
 Development14009 scores16525.000 greedy on cohort4000014009; fresh16001 scores
 14913.542 on4000016001. Both clear24/24 first pyramids, but the latter misses
@@ -96,3 +101,20 @@ sources, clean committed worktree and idle host. Do not repeat successful CPU
 qualification or any retained diagonal GPU assessment. Fixed arms, caps, gates
 and interpretation limits remain unchanged. Selection and the first launch
 will retain their own declaration and original process identities.
+
+## Separate selection and first launch
+
+Selection passes6.103s wrapper and writes declarationSHA
+`7e472c0b7288fab9a4efda90b239f1184d93abeedf920893e0c9066527de8c8c`, with957 pins.
+All original Breakout services/completion, prepared sources, source checkpoints,
+clean committed worktree and idle host pass. No successful preparation or
+retained diagonal GPU arm is repeated.
+
+Original main launches **03:43:03.876 UTC November2/sourceb883162**,
+PID890878/invocation`68f3f48fbc714bfbbb4a0701a1ea3799`. Collection observer
+PID890881/invocation`ae591eeba4444a5cafe8c9f13d8b7aa3` launches alongside.
+The first arm header passes03:43:52.700: greedy evaluation, environment
+seed4000016001, retained config seed14009/replay-value1 and starting18715 updates.
+This is a header check, not a completed gameplay or invariance result. The exact
+prepared runner, native, checkpoints, four arms, caps and gates stay fixed.
+No new learner, training update, retry, extension or automatic successor.
