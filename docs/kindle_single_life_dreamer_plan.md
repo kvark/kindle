@@ -1,18 +1,23 @@
 # Kindle: CDP learning roadmap
 
-The [Breakout H30/R12 bounded check](experiments/2026-11-02-cdp-breakout-h30-r12.md)
-is selected for execution/cost validation. CPU preflight passes07:24:07.354 UTC
-November2 in1.041s:two actual commands,20 configuration cases,357 schema tensors,
-338 control pins andderived367/4,670/9,358 update counts. No native/emulator
-construction. Use exact runnercf4ea238/native447fe50/teacher; keep12M64/Auto/N8/
-B16/T16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100,sampled
-collection. H15/R16→H30/R12 changes rollout length,cadence,sampling,warmup andwork
-together; prior short-Breakout/long-Qbert negatives remain. No isolated cause.
-Train8,192/367 then1,024 frozen; requirematched357 initial/invariant tensors,
-47 pre-update events,full replay/guards andconservative200k projection≤30min.
-No full learner,extension,sweep orautomatic promotion. Root
-`/x/Temp/kindle-breakout-h30-r12-20261102/native-check`;service
-`kindle-breakout-h30-r12-check-20261102`. Check live state; do not overlap orrestart.
+The [fresh Breakout H30/R12 comparison](experiments/2026-11-02-cdp-breakout-h30-r12-200k.md) isselected afterthe bounded
+check closes successfully:8,192 actions/367 updates in51.413s,1,024 frozen/.892s
+withzero updates/natural episodes;all382 pins,tensors,traces,replay andguards
+pass. Terminal reader07:26:54.448/completionSHA697e58e0. Do not repeat thecheck.
+Conservative200k projection23m00.725s passes30min; no experience isreused.
+
+Full CPU qualification passes07:30:14.885 in2.378s:18 scripts,800 declaration
+paths,five commands,36 config/nine actual preflight/20 startup/13 recovery-body
+cases andretention fixtures. All382 bounded/338 control pins stayunchanged.
+Train200k/9,358 updates with100k/4,670 recovery andfour final/actual-initial
+24-episode frozen arms against70.750 sampled/143.667 greedy;sampled staysprimary.
+H15/R16→H30/R12 changes rollout length,cadence,sampling,warmup andrelative work.
+Keep12M64/Auto/N8/B16/T16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/
+expert100,sampled collection,exact runnercf4ea238/native447fe50/teacher.
+Prior short-Breakout/long-Qbert negatives remain;no isolated causal claim.
+Root `/x/Temp/kindle-breakout-h30-r12-20261102/full`;service
+`kindle-breakout-h30-r12-200k-20261102`. Checklive state;no overlap,restart,
+retry,cap increase,extension,confirmation orautomatic successor.
 
 The [completed lower-dynamics/replay-value1 comparison](results/2026-11-02-cdp-breakout-value1-dynamics1e4.md)
 scores **42.917 sampled /112.125 greedy**, below70.750/143.667 by39.34%/21.95%,

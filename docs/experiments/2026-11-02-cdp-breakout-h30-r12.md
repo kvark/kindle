@@ -1,5 +1,12 @@
 # Breakout H30/R12 bounded execution and cost check
 
+**Complete:**8,192 actions/367 updates in51.413s;1,024 frozen/.892s,zero updates/
+natural episodes. All382 pins,tensors,traces,replay,guards andoriginal services
+pass;terminal reader completes07:26:54.448 UTC November2. Conservative200k
+projection23m00.725s passes30min. Do not repeat completed stages orreader.
+[Result](../results/2026-11-02-cdp-breakout-h30-r12.md);a separately selected
+[fresh200k comparison](2026-11-02-cdp-breakout-h30-r12-200k.md) reusesno experience.
+
 Select one fresh bounded check after the lower-dynamics/value1 comparison
 closes. Retain its stronger dynamics4e-4 control:70.750 sampled/143.667 greedy
 in21m27.910s, withzero of24 two-wall successes. The lower-dynamics combination
