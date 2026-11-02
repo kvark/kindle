@@ -57,185 +57,14 @@ retry,cap increase,extension,confirmation or automatic successor. Preserve CPU
 co-host durations without correcting training time. DeclarationSHAaa57e4a5;
 coverage declarationSHA9d98d514. Breakout and the five-game goal remain unfinished.
 
-The [completed lower-dynamics/replay-value1 comparison](docs/results/2026-11-02-cdp-breakout-value1-dynamics1e4.md)
-scores **42.917 sampled /112.125 greedy**, below70.750/143.667 by39.34%/21.95%,
-in21m36.378s (+0.66%). Initial-subtracted return/min falls40.54%/22.81%; all0/24
-two-wall. Retain dynamics4e-4 withbehavior8e-5/replay-value1 andsampled collection.
-Onlydynamics4e-4→1e-4 changes at12M64/Auto/N8/B16/T16/H15/R16/expert100,
-native447fe50/runner ea2bf8c6/teacher fixed. Reused1009/cohort isdevelopment
-evidence,not independent reliability or an isolated architecture cause.
-
-All422 pins,100k/6,227 recovery,357 matching initial/invariant frozen tensors,
-47 pre-update events,800/795 initial semantic events,replays/videos,guards,
-curves,exposure andcomparison pass. Allfive original services succeed; main/
-post/collection finish07:10:06.890/07:10:34.218/07:11:08.882 UTC November2,
-launch sourcec691416. Terminal reader completes once07:11:52.749 in2.877s;
-completionSHA5f2cd92c/summarySHA8ca4e947. Original bounded preparation failure
-andseparate correction remain; no full stage fails orrepeats.
-
-The saved-log coverage follow-up completes07:12:03.388 in2.969s with48 diagnostic/
-422 full pins: native actions at216–431 fall1,262→927 (.631%→.4635% oftraining),
-none at432+. All283,208 new actions/1,132,245 frames reconcile; the completed
-control isreused without recount. Score fractions are not verified walls or
-an isolated causal test. Coverage reviewSHA65b130da. Actual overrides48.841%,
-late expert CE.662474 andguided71.18 are separate from frozen competence.
-
-Root `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102/full` isclosed. Recovery,
-terminal andcoverage readers arecomplete; do not repeat stages,collectors or
-readers. No Kindle allocation isactive atclosure; no extension,confirmation,
-rate sweep orautomatic successor isselected. CPU co-host costs remain uncorrected.
-Check live state; Breakout andthe five-game goal remain unfinished.
-
-The [completed Qbert R20 fresh-seed confirmation](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md)
-scores15,931.250 greedy/24 first pyramids on18013 in26m23.114s,versus development
-16001's15,279.167/24 in25m57.740s. Both pass the original15k/90% gate within30min:
-one passing development learner andone fresh confirmation,not broad reliability.
-Sampled14,976.042/24 and12,972.917/24 both fail15k; own fresh initials142.708
-greedy/198.958 sampled clear none. Retain240k/R20 withgreedy evaluation.
-Earlier R24 confirmations remain failed; Breakout andthe five-game goal remain
-unfinished. No Qbert extension,third learner orautomatic successor isselected.
-
-Fresh240k actions/959,784 frames/18,721 updates keep12M64/Auto/N8/B16/T16/H5/R20/
-dynamics1e-4/replay-value1/expert100/greedy collection,native447fe50,runnere304af89
-andteacher fixed; onlylearner/evaluation seeds change. All1,046 pins,both100k/7,784
-and200k/15,596 recoveries,357 finite/invariant frozen tensors,48 recorded initial
-differences,full replays/videos,guards,curves,exposure,coverage andcomparison pass.
-Allfive original services succeed; main/post/collection finish06:25:18.233 /
-06:25:49.125 /06:26:21.455 UTC November2/source0a4892a. Original main901816 /
-976a1ed5007f4ce8b343732f91c38cf9 isterminal. Reader completes once06:27:04.671 in
-9.806s; completionSHA3fb594a7/summarySHAc41ca062. No full-run stage fails orrepeats;
-original CPU preparation failure andseparate correction remain preserved.
-
-Root `/x/Temp/kindle-qbert-r20-seed18013-20261102/full` isclosed. Both recovery
-readers andterminal reader arecomplete; do not repeat stages,collectors orreaders.
-Actual overrides25.3096% andguided16,043.5 are not frozen competence. CPU co-host
-cost staysuncorrected. No Kindle allocation isactive atclosure; checklive state.
-
-The [Breakout ascending-centering reference](docs/results/2026-11-02-cdp-breakout-ascending-center.md) fails its expanded24-episode
-screen:233.208 versus225.083 (+3.61%),four ofeight lane means improve,all0/24
-two-wall. The earlier eight-episode gain46.93%/six lanes remains recorded;
-all16,425 first-episode semantic events reproduce. Retain the original teacher;
-no fresh cohort,integration,learner or sweep is selected. All31 diagnostic/1,046
-active Qbert pins,full pixel/action/debug replay and original learner identity
-pass. CPU collection35.990s/replay45.402s/controller87.435s completes06:06:24.338
-UTC November2/sourcef8e4931,with no GPU work or updates. Root
-`/x/Temp/kindle-breakout-ascending-center-20261102/standard24` is complete;
-do not repeat stages. CPU co-host cost remains uncorrected.
-
-The [completed Breakout greedy-collection comparison](docs/results/2026-11-02-cdp-breakout-greedy-training.md)
-finishes200k actions /799,661 frames /12,477 updates in21m44.645s. Primary
-sampled78.542 improves70.750 by11.01%, with9.81% more initial-subtracted return
-per training minute. Greedy90.042 falls37.33% from143.667; all0/24 two-wall.
-Retain this sampled development point and the stronger greedy control. Only live
-collection changes at12M64/H15/R16/replay-value1; native447fe50,runner6e03d739,
-rates,teacher and other settings stay qualified. Reused1009/cohort provides no
-independent reliability claim; guided131.780 is not frozen competence.
-
-All427 pins,100k/6,227 recovery,357 matching initial/invariant frozen tensors,
-paired traces,replays/videos,guards,curves,exposure and comparison pass. Main/
-post/collection succeed05:36:00.508/05:36:21.599/05:36:57.105 UTC November2,
-source9247ffa. Allfive original services succeed; no GPU stage repeats. Terminal
-reader completes once05:39:32.077 in1.844s; completionSHA8ceba70a, summarySHAf9ba2112.
-The original bounded CPU wrapper failure and separate qualification remain.
-
-The [coverage follow-up](docs/results/2026-11-02-cdp-breakout-score-coverage.md#greedy-collection-follow-up)
-finds native actions at216–431 rising1,262→2,382 (0.631%→1.191% of training),
-with zero actions at432+. Three completed unguided episodes reach216 versus
-none incontrol. Training maxima408→424 still miss later score ranges. These
-are not verified wall boundaries or an isolated cause. All43 diagnostic/427
-full pins and292,528 new actions reconcile; the saved control is reused.
-CPU reader completes once05:39:43.053 in2.967s, reviewSHA19787de1; no GPU work.
-
-Root `/x/Temp/kindle-breakout-greedy-training-20261102/full` is closed. No learner
-or GPU allocation remains active at closure. Do not repeat completed stages,
-collectors or readers. No extension, confirmation, cap increase or automatic
-successor is selected. Check live state; the five-game goal remains unfinished.
-
-The earlier [greedy-collection prerequisite](docs/results/2026-11-02-cdp-breakout-greedy-training.md#earlier-bounded-prerequisite)
-passes8,192 actions/489 updates in47.418s;1,024 frozen actions/.869s havezero
-updates/no natural episodes. All387 pins,tensors,replay,guards andoriginal
-services pass. It precedes the separately selected full comparison above; its
-experience is not reused. The45 CPU tests and separate wrapper qualification
-remain retained. Native-check completionSHAfc5ef001/summarySHA86262978;
-do not repeat the bounded check or its readers.
-
-The [Qbert 240k/R20 comparison](docs/results/2026-11-02-cdp-qbert-r20-240k.md) completes 240,000 actions,
-959,778 frames and 18,721 updates in 25m57.740s. Greedy 15,279.167 with 24/24
-first pyramids passes the 15k/90% gate, versus retained 14,913.542/24. Sampled
-12,972.917/24 falls from 14,745.833/24 and fails 15k. Greedy score rises 2.45%
-and training time rises 4.85%, so initial-subtracted return/min falls 2.27%
-(sampled: −16.21%). Retain this passing development budget point with its measured efficiency cost;
-independent confirmation remains open. Seed 16001 and its original
-cohort are reused. R24→20 and 200k→240k change experience, cadence and sampling
-together. Native 447fe50, runner e304af89, teacher and other settings stay fixed.
-The earlier R24 confirmation remains failed.
-
-All 991 pins, both recoveries, 357 initial/invariant frozen tensors, paired
-traces, replays/videos, guards, curves, coverage and original services pass.
-Main/post/collection succeed at 04:48:55.980/04:49:14.933/04:49:46.075 UTC
-November 2, source 55ead06. The terminal reader completes at 04:50:26.168;
-completion SHA7423739f, summary SHA7f721710. Original CPU preparation failures
-and corrections remain preserved; no GPU stage repeats. Root
-`/x/Temp/kindle-qbert-r20-240k-20261102/full` is closed. No allocation is active,
-and no extension, confirmation, sweep or successor is selected. Do not repeat
-completed stages/readers. Check live state; the five-game goal remains unfinished.
-
-The [saved Breakout score-coverage diagnostic](docs/results/2026-11-02-cdp-breakout-score-coverage.md)
-finds97.03% ofcandidate training actions below216 points andzero at432+,with
-maximum408 versus control418. Of5947 candidate actions at216–431,4685 areteacher
-overrides; native exposure there is1262 actions (0.63% oftraining). Frozen greedy
-means117.292→143.667 still havezero432+ episodes. Score fractions are not verified
-wall boundaries; this locates scarce experience,not an isolated cause orselected
-change. All400k training/175144 frozen actions,seven fixtures,31 original/six
-repair/991 active pins reconcile. Original cumulative-counter failure remains;
-separate9.051s CPU analysis completes04:37:06.430/sourceb608d35 withno GPU work.
-Root`/x/Temp/kindle-breakout-score-coverage-20261102` iscomplete; do not rerun.
-
-The earlier [Qbert R20 bounded check](docs/results/2026-11-02-cdp-qbert-r20-240k.md)
-completes8192 actions/32760 frames/611 updates in50.566s;1024 frozen/.868s has
-zero updates/no natural episodes. Conservative240k projection27m09.558s passes
-30min. All940 pins,357 matched initial/invariant frozen tensors,47 pre-update
-semantic events,finite reports,replay andguards pass. Main/collector succeed
-04:05:09.369/04:05:13.602 UTC/source8f7888a; terminal reader04:05:26.383.
-No stage fails orrepeats. OnlyR24→20 changes onreused16001, with native447fe50,
-runnere304af89,teacher andcurrent12M64/H5/dynamics1e-4/replay-value1 fixed.
-This prerequisite preceded the separately selected full comparison above.
-Its early cost projection did not establish gameplay benefit. Earlier
-larger-budget regressions remain relevant. Root`/x/Temp/kindle-qbert-r20-240k-20261102/native-check` isclosed;
-completionSHAdf02e12d/summarySHA15fb8ccd. No active allocation atclosure; check
-live state. Do not repeat the check,collector orreader.
-
-The [Qbert replay-value1 crossed assessment](docs/results/2026-11-02-cdp-qbert-replay-value1-cross-cohort.md)
-is complete. Learner14009 stays ahead on both cohorts:16525.000/15906.250 versus
-16001's15163.542/14913.542,all24/24 first pyramids. Cohort choice changes16001's
-near-threshold gate; its original fresh confirmation remains failed. Do not
-substitute the favorable cohort or count reused checkpoints as new learners.
-All957 pins,357 finite/invariant tensors,replays,guards,matrix andoriginal services
-pass; four new arms take115.406s withzero updates. Main/collector succeed
-03:46:51.221/03:47:07.244 UTC/sourceb883162; terminal reader passes03:47:46.833.
-Root`/x/Temp/kindle-qbert-replay-value1-cross-cohort-20261102` isclosed;
-completionSHAcd59f0ff/summarySHAf92533f6. Do not repeat its stages orreader.
-
-The [Breakout replay-value1 comparison](docs/results/2026-11-02-cdp-breakout-replay-value1.md)
-completes200k/12477 updates in21m27.910s. Sampled70.750/greedy143.667 improve
-59.000/117.292 by19.92%/22.49%; initial-subtracted return/min improves21.96%/
-24.50%. Retain scale1 as stronger development; allzero of24 two-wall successes.
-Only replay-value0.3→1 changes onreused1009, affecting critic andrepresentation
-jointly; no isolated mechanism orreliability claim. All338 pins,recovery,initial/
-frozen tensors,replays,guards andfive original services pass. Main/post/collection
-succeed03:39:28.406/03:39:34.988/03:39:37.809 UTC/source45cd1ab. Terminal reader
-passes03:40:38.280; completionSHA6254f729/summarySHAb55b2016. Original CPU
-preparation failures/repairs remain; no GPU stage repeats. Root
-`/x/Temp/kindle-breakout-replay-value1-20261102/full` isclosed; do not restart.
-
-Earlier allocations are closed; the fresh Breakout comparison above is active.
-No automatic successor is selected.
-Check live state before work. The five-game goal remains unfinished. Qbert's
-fixed240k/R20 recipe has one passing development learner andone fresh greedy
-confirmation. Breakout remains below the two-wall gate.
-The [Qbert phase diagnosis](docs/results/2026-11-02-cdp-qbert-replay-value1-phases.md)
-places its score gap after identical550-point first-pyramid prefixes and finds
-substantial later-play exposure. This does not identify an architectural cause.
+Earlier allocations are closed. The completed
+[lower-dynamics comparison](docs/results/2026-11-02-cdp-breakout-value1-dynamics1e4.md)
+regresses both Breakout scores; retain dynamics4e-4 with replay-value1 and
+behavior8e-5. Qbert's fixed240k/R20 recipe passes on its development learner and
+[one fresh greedy confirmation](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md).
+Breakout remains below the two-wall gate. Do not repeat completed learners,
+checks, replays, observers or readers; no automatic successor is selected.
+The roadmap and linked reports retain detailed outcomes, failures and limits.
 
 ## Direction and retained results
 
@@ -369,7 +198,7 @@ original machine; exact counters and paths are in the handover.
 Old incident/optimization ledgers and detailed data remain on
 `archive/phase2-before-cleanup-20261025`; current reports stay here.
 Earlier expanded instructions remain in Git at34b1e74; the recent experiment
-ledger is preserved at113ecde (and earlier8b1ba49) and in the handover/roadmap. Historical “next”
+ledger is preserved at52c2174 (and earlier113ecde/8b1ba49) and in the roadmap/reports. Historical “next”
 paragraphs are not active instructions. Preserve user-authored TASK.md and
 docs/cdp-claude-feedback.md as context; subsequent CDP decisions and measured
 results supersede their older architecture/performance assumptions. Do not
