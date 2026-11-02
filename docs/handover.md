@@ -1,5 +1,19 @@
 # CDP handover — October25,2026
 
+The [fresh Qbert R20 seed18013 confirmation](experiments/2026-11-02-cdp-qbert-r20-seed18013.md)
+is selected for preparation within the five-game goal. Keep the passing16001
+recipe fixed:240k/18,721 updates,12M64/Auto/N8/B16/T16/H5/R20/dynamics1e-4/
+replay-value1/expert100/greedy collection; only learner/evaluation seeds change.
+Greedy15000/90% is primary, with four final/own-initial24-episode frozen arms.
+Development cost25m57.740 plus10% projects28m33.514 under30min; no extra bounded
+learner. Require100k/7,784 and200k/15,596 recoveries. CPU qualification passes
+05:49:34.573 UTC November2 in12.251s:21 scripts,1,046 declaration paths,eight
+actual preflight/four initialization cases,940 bounded/991 control pins.
+Original summary-key preparation failure and prequalification path correction
+remain retained; no GPU work yet. Root `/x/Temp/kindle-qbert-r20-seed18013-20261102/full`.
+Check live state, declare and launch once; no overlap,retry,extension,seed
+substitution or automatic successor. Prior R24 confirmation failures remain.
+
 PR31's previous65,451-character dashboard is preserved at
 `/x/Temp/kindle-pr31-dashboard-20261102/pr-before-condensation.json`.
 Its replacement keeps active work, retained results and26 checked report links;
