@@ -1,5 +1,12 @@
 # Breakout: bounded check of greedy training actions
 
+Completed:8,192 actions/489 updates in47.418s;1,024 frozen/.869s with zero
+updates and no natural episodes. All387 pins,initial/frozen tensors,full replay,
+guards and original services pass. Conservative200k projection21m13.430s passes
+30min. [Completed result](../results/2026-11-02-cdp-breakout-greedy-training.md).
+No full learner selected; do not repeat completed stages. The original selection
+and fixed bounds follow.
+
 Select one fresh 8,192-action check within the unfinished five-game goal.
 The retained [replay-value1 learner](../results/2026-11-02-cdp-breakout-replay-value1.md)
 scores 70.750 sampled and 143.667 greedy, with zero of 24 two-wall successes.

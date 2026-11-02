@@ -1,5 +1,21 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [Breakout greedy-collection check](2026-11-02-cdp-breakout-greedy-training.md) completes
+8,192 actions /32,738 frames /489 updates in47.418s. Frozen1,024 actions take
+.869s with zero updates and no natural episodes. Conservative200k projection
+21m13.430s passes30min; gameplay benefit remains unmeasured. All387 pins,357
+control-matching initial/invariant frozen tensors,47 recorded pre-update
+semantic differences,finite reports,full guided replay and host guards pass.
+Only live collection changes; native447fe50,12M64/H15/R16/replay-value1,rates,
+actor unimix .01 and teacher stay fixed. Original CPU wrapper-sentinel failure
+and separate qualification remain;45 tests pass with no repeat. Main/collector
+succeed05:03:51.035/05:03:56.103 UTC November2, sourceb2105b9; terminal reader
+05:04:16.073. Completion SHAfc5ef001, summary SHA86262978. Root
+`/x/Temp/kindle-breakout-greedy-training-20261102/native-check` is closed.
+No active allocation, full learner or automatic successor is selected. Do not
+repeat completed stages/readers. Check live state; the five-game goal remains
+unfinished.
+
 The [Qbert 240k/R20 comparison](2026-11-02-cdp-qbert-r20-240k.md) completes 240,000 actions,
 959,778 frames and 18,721 updates in 25m57.740s. Greedy 15,279.167 with 24/24
 first pyramids passes the 15k/90% gate, versus retained 14,913.542/24. Sampled
