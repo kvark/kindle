@@ -1,5 +1,11 @@
 # Breakout: saved-log score coverage
 
+Completed04:37:06.430 UTC after a separate cumulative-frame-counter correction;
+original failed attempt retained. All31 original/six repair/991 active pins and
+seven fixtures pass. Candidate97.03% below216 andzero432+ training actions;
+[completed result](../results/2026-11-02-cdp-breakout-score-coverage.md). No GPU
+work, replay repeat ornew learner; do not rerun this completed diagnostic.
+
 Selected within the five-game goal while the original Qbert240k/R20 learner
 continues. This CPU-only diagnostic reads the completed Breakout replay-value1
 comparison and its behavior8e-5 control. No agent, emulator, GPU allocation,

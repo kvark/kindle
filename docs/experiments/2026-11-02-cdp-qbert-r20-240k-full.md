@@ -117,3 +117,16 @@ all991 pins andoriginalPID893328/invocation575d8e40b325408e8d4220bfd3b61bb8.
 Its SHA isbeb1784219eda2d039ac28190a01fef43ef67b3b36691b7cf341271108ca1143.
 No GPU work,stage repeat or timing correction. Do not rerun100k confirmation;
 200k recovery andfixed final frozen results remain pending.
+
+The original200k/15,596 recovery passes04:37:12.272 UTC, retainingfour files /
+206,067,167 bytes and357 finite tensors at04:37:12.583. ReviewSHA
+9520a951c17ec26b52e9fdb13f28d502b48d5353647125de660bc2ee0d824b99;
+retentionSHA1742cab8041a1d3172d643e379dba75837969f56dd6ee94d1d0390c4d23a46df;
+metadataSHA61db98b6d54ce544643b93173425b4d1dcdc581a877e3530bfd4bcaea6608f51.
+Separate confirmation passes04:37:39.701 in2.927s (2.951s wrapper), all991 pins
+andoriginal process identity unchanged; confirmationSHA
+9913696d4246162b86a9ba1b889a44f432f2f530be66d211af8e084df7e0cb29.
+Both recovery milestones arecomplete; the original recovery observer succeeds.
+Do not repeat either reader. The saved-log Breakout coverage diagnostic co-hosts
+2.836s failed and9.075s corrected CPU wrappers; retain these costs without
+correction. No overlapping GPU work orrepeated learner stage occurs.

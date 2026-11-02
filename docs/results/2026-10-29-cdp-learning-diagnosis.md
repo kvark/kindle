@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [saved Breakout score-coverage diagnostic](2026-11-02-cdp-breakout-score-coverage.md)
+finds97.03% ofcandidate training actions below216 points andzero at432+,with
+maximum408 versus control418. Of5947 candidate actions at216–431,4685 areteacher
+overrides; native exposure there is1262 actions (0.63% oftraining). Frozen greedy
+means117.292→143.667 still havezero432+ episodes. Score fractions are not verified
+wall boundaries; this locates scarce experience,not an isolated cause orselected
+change. All400k training/175144 frozen actions,seven fixtures,31 original/six
+repair/991 active pins reconcile. Original cumulative-counter failure remains;
+separate9.051s CPU analysis completes04:37:06.430/sourceb608d35 withno GPU work.
+Root`/x/Temp/kindle-breakout-score-coverage-20261102` iscomplete; do not rerun.
+
 The [November2 R20 bounded check](2026-11-02-cdp-qbert-r20-240k.md) passes
 execution andearly cost:8192 actions/611 updates in50.566s, conservative240k
 projection27m09.558s. Learning uses81.49%/81.23% ofretained full Qbert training

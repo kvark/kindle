@@ -13,15 +13,28 @@ andfour journal fixtures; all991 pins/original identity stayfixed. ReaderSHAef55
 Reused16001/original4000016001;
 240k/R20/18721 versus200k/R24/18715 changes experience,cadence andsampling together.
 Keep12M64/H5/dynamics1e-4/replay-value1,native447fe50,runnere304af89 andteacher.
-100k/7784 recovery passes04:26:11 UTC:357 finite tensors,four retained files/
-206067158 bytes. Separate2.904s confirmation passes04:26:32.839,all991 pins and
-original identity unchanged; reviewSHA87f84782/retentionSHA3d420485. Require200k/
-15596 recovery andfinal/actual-initial sampled/greedy24-episode arms; control
-isgreedy14913.542/sample14745.833,original15k/90% gate. Do not repeat100k reader.
+Both recoveries pass:100k/7784 at04:26:11 and200k/15596 at04:37:12 UTC,
+each357 finite tensors/four retained files. Separate confirmations04:26:32.839/
+04:37:39.701 preserve all991 pins/original identity;200k reviewSHA9520a951 and
+retentionSHA1742cab8. Final/actual-initial sampled/greedy24-episode arms remain
+pending againstcontrolgreedy14913.542/sample14745.833,original15k/90% gate.
+Do not repeat recovery readers. Breakout CPU coverage work retains2.836s failed/
+9.075s corrected co-host costs without timing correction.
 The prelaunch exposure-schema correction andinitial CPU fixture failure remain
 retained. Root`/x/Temp/kindle-qbert-r20-240k-20261102/full`;
 main`kindle-qbert-r20-240k-20261102`. Check live identity; no restart,overlap,
 cap increase,extension orautomatic successor whilethis allocation isactive.
+
+The [saved Breakout score-coverage diagnostic](results/2026-11-02-cdp-breakout-score-coverage.md)
+finds97.03% ofcandidate training actions below216 points andzero at432+,with
+maximum408 versus control418. Of5947 candidate actions at216–431,4685 areteacher
+overrides; native exposure there is1262 actions (0.63% oftraining). Frozen greedy
+means117.292→143.667 still havezero432+ episodes. Score fractions are not verified
+wall boundaries; this locates scarce experience,not an isolated cause orselected
+change. All400k training/175144 frozen actions,seven fixtures,31 original/six
+repair/991 active pins reconcile. Original cumulative-counter failure remains;
+separate9.051s CPU analysis completes04:37:06.430/sourceb608d35 withno GPU work.
+Root`/x/Temp/kindle-breakout-score-coverage-20261102` iscomplete; do not rerun.
 
 The [Qbert R20 bounded check](results/2026-11-02-cdp-qbert-r20-240k.md)
 completes8192 actions/32760 frames/611 updates in50.566s;1024 frozen/.868s has
