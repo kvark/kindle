@@ -69,3 +69,28 @@ Root `/x/Temp/kindle-breakout-current-ranking-20261102`; proposed main
 `kindle-breakout-current-ranking-collection-20261102`. This boundary selects
 CPU preparation only. No learner, retry, cap increase, origin replacement,
 extension or automatic successor. The five-game goal remains unfinished.
+
+
+## CPU qualification and separate frozen selection
+
+CPU preparation passes00:15:02.990 UTC November2/source3d31ccd in25.071s
+(25.120s wrapper). It checks four actual commands, both357-tensor schemas,
+227/272 learner pins and73 preceding critic pins. The single CPU oracle takes
+21.987s for37,016 source actions and153,132 branch frames, with128 recorded-plan
+matches andeight reverse-order checks. No native module isloaded. The66-input
+preflight SHA is`39702dc199625fff5706263b69ebef7aca88e6f161ba998ca66028cf84dd8c77`;
+oracle SHA is`27ed4a178b74478cf9c94f67a108e0e72a7504fd55425fcc13145e7ceaac1f00`.
+
+All66 origin/config/ranking/forecast-ledger tests pass in.09s. The first run
+has65 passes andone failure because the new valid-rate fixture omitted required
+`observation_kind`; the fixture iscorrected, with production validator unchanged.
+The original source andfailure receipt remain in`test-fixture-failure`. A separate
+controller fixture incorrectly forbids importingALE, which the adapter imports
+without constructing a game. Its failure isretained; corrected review blocks
+construction andpasses ten direct-global screens andsynthetic ranking arithmetic,
+withzero construction attempts. No emulator oracle orGPU stage isrepeated.
+
+Select the fixed bounded pair andfull pair after original critic closure and
+another idle-host check. The worktree iscommitted before selection; all inputs
+are pinned before launch. Caps,origins,candidates andanalysis remain asdeclared.
+No learner,loss change,retry orautomatic successor. Launch ispending.

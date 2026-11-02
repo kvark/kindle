@@ -42,6 +42,19 @@ The earlier12011 original main/collector failures and separate CPU repair remain
 preserved. Do not restart either learner or completed collectors. The five-game
 goal is unfinished; no Qbert successor is selected.
 
+The [Breakout shared-history action-ranking comparison](docs/experiments/2026-11-02-cdp-breakout-current-ranking.md)
+is separately selected after CPU qualification. Both retained dynamics4e-4/1e-4
+models receive the same4e-4 greedy trajectory, with128 fixed uniform origins and
+18 four-step action holds followed by recorded continuation through15 steps.
+This measures short external-reward ranking, excluding intrinsic reward and
+critic bootstrap; no complete actor-objective orcausal gameplay claim follows.
+CPU qualification passes66 tests,four commands,both357-tensor schemas andsource
+closures. The single21.987s oracle checks37,016 actions/153,132 branch frames,
+128 exact recorded plans andeight reversed orders. Two CPU fixture failures
+andtheir corrections remain preserved; no successful oracle repeats. Root
+`/x/Temp/kindle-breakout-current-ranking-20261102`; native447fe50/35ad0db unchanged.
+No learner orloss change isselected. Frozen launch ispending.
+
 The [completed Breakout critic diagnostic](docs/results/2026-11-02-cdp-breakout-current-critic.md)
 finds weak sampled return prediction: correlation .105/.097 and R²−.031/−.267
 for dynamics4e-4/1e-4. Both beat an earlier-episode constant, but neither beats
