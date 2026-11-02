@@ -52,7 +52,12 @@ zero updates). Compare critic values with complete external plus intrinsic
 returns. Sampled arms are primary; greedy changes the target policy. Different
 visited states prevent a matched-state causal comparison. No learner, loss
 change or backend work is selected. Root
-`/x/Temp/kindle-breakout-current-critic-20261101`; launch is pending.
+`/x/Temp/kindle-breakout-current-critic-20261101`. It launches00:03:12 UTC
+November2/source1b6bed9 with73 pins, mainPID868111/invocation
+b1dacd51b17b40849c8345ec02504658 and original collectorPID868114/invocation
+798fa2c7916e4965a10e810cef33a9f0. The1,024-action check passes in1.022s with128
+matching semantic events,357 invariant tensors andzero updates. Full captures
+are active; do not restart or overlap another GPU allocation.
 
 The [current cost summary](docs/results/2026-11-01-cdp-current-training-cost.md)
 finds learning about81% of Qbert and88% of Breakout training wall time. Within

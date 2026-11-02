@@ -7,7 +7,14 @@ Its completion SHA is9a56dbdaa703690d573d25ae80d69eeca4155d0bd5eaf3425093e97a666
 the host has no active Kindle service. Select the unchanged bounded check and
 four frozen arms described below, with fixed caps and no new learner. Pin this
 selection and require the same idle-host check immediately before launch.
-Earlier CPU-only selection boundaries below are historical. Launch is pending.
+Earlier CPU-only selection boundaries below are historical. The frozen assessment
+launches00:03:12 UTC November2/source1b6bed9 with73 pins, mainPID868111/invocation
+b1dacd51b17b40849c8345ec02504658 and original collectorPID868114/invocation
+798fa2c7916e4965a10e810cef33a9f0. DeclarationSHA256
+`1d46e9bf0bf05f43a7f3ec2d779c38580489b6c64b675dc31cd481fece622160`.
+The1,024-action check passes in1.022s with128 matching semantic events,357
+invariant tensors,zero updates andpassing host guard. Four full captures are
+active; do not restart or overlap this allocation.
 
 Select CPU preparation within the existing five-game goal. The fresh Qbert
 seed14009 learner remains active; **no GPU declaration, queue, service or launch
