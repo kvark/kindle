@@ -22,11 +22,13 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 The [fresh Breakout lower-dynamics/replay-value1 comparison](docs/experiments/2026-11-02-cdp-breakout-value1-dynamics1e4-200k.md) launches
 06:44:30.656 UTC November2/sourcec691416 with422 pins and30-minute training cap.
-Original mainPID907551/invocation47b00c7eccad47d6a116a2792b0a6f8b andallfour
-observers areactive. Startup passes357 matching initial tensors,47 matching
+Original mainPID907551/invocation47b00c7eccad47d6a116a2792b0a6f8b andthree
+observers remain active; recovery succeeds06:55:37.842. Startup passes357
+matching initial tensors,47 matching
 pre-update transitions,correct cadence and200 finite reports through3,576 actions.
-Train200k/12,477 updates; require100k/6,227 recovery andfour final/own-initial
-24-episode frozen arms against70.750 sampled/143.667 greedy. No frozen result.
+Train200k/12,477 updates; the100k/6,227 recovery passes with357 finite tensors
+andfour retained files. Requirefour final/own-initial24-episode frozen arms
+against70.750 sampled/143.667 greedy. No frozen result.
 Onlydynamics4e-4→1e-4 changes; keepbehavior8e-5,replay-value1,12M64/Auto/N8/B16/
 T16/H15/R16/expert100,sampled collection,native447fe50 andteacher. RunnerSHAea2bf8c6.
 
@@ -39,9 +41,13 @@ Full CPU qualification passes18 scripts,800 declaration paths,five commands,
 fixtures in2.260s. All382 bounded/338 control pins remain unchanged. The original
 bounded preparation failure andseparate correction remain; full preparation has
 no failure. Terminal readerSHAa8c0632e qualifies06:45:41.914 in2.383s withfive
-score cases,422 pins andoriginal identity unchanged. Recovery andterminal readers
-remain pending; run each once afterits original evidence exists. No startup,
-qualification,stage orcollector repeats. Root
+score cases,422 pins andoriginal identity unchanged. The recovery reader passes
+once06:55:54.958 in1.291s (1.311s wrapper):422 pins,206,067,163 retained bytes,
+6,391 finite reports through102,632 actions andoriginal main identity unchanged.
+Recovery confirmationSHAa79ff50d; weights/metadata omit replay,belief,games/RNG.
+CPU co-host time remains uncorrected. Onlythe terminal reader remains pending;
+run once afterallfive original services succeed andcompletion exists. Do not
+repeat recovery, startup, qualification, stages orcollectors. Root
 `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102/full`; declarationSHAc14ab341.
 Check live state; no overlap,restart,extension orautomatic successor.
 

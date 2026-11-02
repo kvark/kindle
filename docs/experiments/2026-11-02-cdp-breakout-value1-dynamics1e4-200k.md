@@ -89,10 +89,33 @@ reproducing allfour control scores andrejecting four corrupted score cases. All
 module isimported. Record both CPU co-host costs without correcting training
 time. Reader preparation succeeds in.016s; no successful stage repeats.
 
-Pending readers live in `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102`:
+Qualified readers live in `/x/Temp/kindle-breakout-value1-dynamics1e4-20261102`:
 `review_recovery.py` (SHAcb71ef3c) runs once afterthe original100k retention and
 recovery service succeed,while main remains active. `review_full_terminal.py
 terminal` (SHAa8c0632e) runs once afterallfive services succeed andoriginal
 completion exists. Use `run_cpu.py recovery` and `run_cpu.py full-terminal`
 respectively for unique receipts. The terminal-reader preflight isalready
 complete; do not rerun it, startup, completed checks orcollectors.
+
+## Verified 100k recovery
+
+The original recovery observer succeeds **06:55:37.842 UTC November 2**.
+The checkpoint contains **100,000 actions /6,227 updates**, with 357 finite
+tensors and all four files retained (206,067,163 bytes). Its audited complete
+log prefix contains 6,391 finite reports through 102,632 actions.
+
+The separate recovery reader passes once at **06:55:54.958**, in 1.291s
+(1.311s wrapper). All 422 pins, retained hashes, original observer journal and
+main PID907551/invocation47b00c7eccad47d6a116a2792b0a6f8b pass. The original
+learner remains active. Recovery stores weights and metadata; replay, belief,
+game and RNG state are omitted. Record CPU co-host time without correction.
+
+Recovery confirmation is complete; do not repeat its reader or observer.
+Only the terminal reader remains pending, after all five original services
+succeed and completion exists. Final frozen gameplay remains unmeasured.
+
+| Recovery artifact | SHA256 |
+| --- | --- |
+| Original checkpoint review |`24c9da83b7fea696bf64ae859d18178bba3fd4cc38597e04825a64dc2b4cf4b5`|
+| Retention |`244ff20072ddd064ce7b084a0e775a8797f03572d581d9e5359460961081a1c1`|
+| Separate confirmation |`a79ff50d3b899ba3483601c7338c19307bff5322fa7f7f3e2ba7d8e0aaae6f33`|
