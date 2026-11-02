@@ -8,6 +8,19 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 2
 
+The [fresh Breakout crop comparison](experiments/2026-11-02-cdp-breakout-playfield-crop-200k.md)
+is separately selected after bounded geometry/default-compatibility/cost pass:
+200k actions/12,477 updates,30-minute training cap,native crop0/32/160/168 at
+retained12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/
+replay-value1/expert100. Teacher unchanged; HUD information is removed. Require
+100k/6,227 recovery and actual-initial/final sampled/greedy24-episode assessments
+against70.750/143.667 and the original90%-two-wall gate. Nativeacb175f/runner046aa5bc
+differ from447fe50/cf4ea238; no isolated causal claim. CPU preflight passes five
+commands,38 configuration cases and recovery/observer checks in2.345s;374 bounded/
+338 control pins verify. Root `/x/Temp/kindle-playfield-crop-20261102/full`;
+service `kindle-breakout-playfield-crop-200k-20261102`. Check live state before
+launch; do not repeat closed checks or overlap GPU jobs. No full outcome yet.
+
 The [optional playfield crop](results/2026-11-02-cdp-breakout-playfield-crop.md)
 passes8,192 actions/32,725 frames/489 updates in47.995s;1,024 frozen actions
 in.882s have zero updates and no natural episodes. Conservative200k projection
