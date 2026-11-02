@@ -67,3 +67,23 @@ pass; no native/emulator construction orfailure. PreflightSHA256
 Separately select the fixed200k learner after these checks andan idle-host
 verification. The bounded original main/collector areterminal success andclosed.
 Native,teacher,runner,settings andcaps remainfixed. Full launch ispending.
+
+
+## CPU prelaunch failure and correction
+
+The first launch invocation stops at 00:32:12.591 UTC November 2 before creating
+any service or GPU allocation. The separate preflight still expected the copied
+`--dynamics-learning-rate 1e-4` flag. The retained runner instead uses its fixed
+4e-4 dynamics default and the selected `--behavior-learning-rate 8e-5`. The
+original qualification parsed all actual commands but omitted this preflight
+assertion; preserve that coverage gap and the original passing receipt.
+
+Only this CPU assertion changes. A separate 2.911s repair qualification completes
+00:33:24.500 UTC (3.012s wrapper), executes the actual corrected preflight and
+rejects wrong and missing behavior-rate flags. The other 270 original pins,
+queue, native, runner, teacher, settings and caps are unchanged. No native or
+emulator construction, service start or repeated GPU stage occurs. Original
+sources, declaration and failure remain in the package's `prelaunch-failure/`
+directory and `full-launch-execution.json`. Repin the corrected controller and
+repair evidence before the first actual GPU launch; do not rerun selection or
+successful qualification stages. The fixed 200k comparison remains selected.

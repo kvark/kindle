@@ -13,8 +13,11 @@ The [bounded check](../results/2026-11-02-cdp-breakout-behavior8e5.md) passes
 pass;original main/collector succeed00:26:32/00:26:39 UTC November2. Conservative
 projection21m06.197s clears30min. Full preparation passes1.399s:five commands,
 28 config cases,18 scripts,seven globals,retention/observer/collector checks,
-all252 bounded/227 control pins andzero native/emulator construction. No failures
-orrepeated stages. Keep200k/12,477/30min,100k/6,227 recovery andfour actual-initial/
+all252 bounded/227 control pins andzero native/emulator construction. The first
+launch preflight fails before service creation on a copied dynamics CLI check;
+separate2.911s CPU repair validates the actual preflight andrejects two wrong
+behavior-rate commands. Original sources,receipt andcoverage gap remain preserved;
+no GPU stage starts orrepeats. Keep200k/12,477/30min,100k/6,227 recovery andfour actual-initial/
 final sampled/greedy24-episode arms against56.292/104.667,allzero two-wall.
 Root `/x/Temp/kindle-breakout-behavior8e5-20261102/full`;service
 `kindle-breakout-behavior8e5-200k-20261102`. Full launch ispending. No retry,

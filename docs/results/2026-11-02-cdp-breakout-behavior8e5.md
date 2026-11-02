@@ -63,3 +63,23 @@ The full learner is separately selected after this qualification andanother
 idle-host check. Launch ispending. No earlier weights, replay, beliefs, games,
 RNG orbounded experience will be reused. No retry, rate sweep, extension,
 confirmation orautomatic successor. The five-game goal remains unfinished.
+
+
+## Prelaunch CPU assertion repaired before any GPU allocation
+
+The first full launch invocation fails at 00:32:12.591 UTC November 2/source
+7dfa470, before service creation. A copied preflight assertion requires the old
+`--dynamics-learning-rate 1e-4` flag, absent from the unchanged control runner.
+The original CPU preparation parsed actual commands but did not execute this
+separate preflight check. Its passing receipt remains historical, with this
+coverage gap recorded.
+
+The correction checks the intended `--behavior-learning-rate 8e-5` flag instead;
+dynamics remains the bounded-verified 4e-4 default. Separate actual-preflight
+qualification passes at 00:33:24.500 in 2.911s (3.012s wrapper), including rejection
+of wrong and missing behavior rates. All other 270 original pins stay unchanged.
+No native or emulator is constructed, no service starts and no GPU stage repeats.
+The full directory snapshot, original declaration, controller and failed preflight
+are retained under `prelaunch-failure/`; failure receipt SHAe4cb42a2. Corrected
+controller SHA3441f72b. Repin this correction and evidence before the first GPU
+launch. The training recipe and all caps remain unchanged.
