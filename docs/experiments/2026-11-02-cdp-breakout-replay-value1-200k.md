@@ -75,3 +75,20 @@ post/progress5100s, recovery3000s, collection5400s; declared internal deadlines
 remain unchanged. Pin sources, schemas, protocols, queue, runtime and reference
 evidence before launch. No overlap, retry, extension, cap increase, confirmation
 or automatic successor. Record the first GPU launch and startup below.
+
+## CPU declaration repair before launch
+
+The first declaration attempt fails03:12:28.944 UTC after writing the queue and
+replay manifest, before writing a declaration or starting any service. Its input
+list carries the predecessor's `controller-cpu-review.json` name; this bounded
+package instead uses `preflight.json`. The earlier CPU qualification checked
+script paths and actual commands but did not resolve this dynamically built
+evidence filename. Preserve the original failure and passing qualification.
+
+The separate `complete_full_selection.py` changes only that input-list name.
+It verifies all original qualified scripts, the existing queue, replay manifest,
+bounded completion and pins; resolves every declaration input; records a repair
+receipt and pins the failure, repair and updated protocol. It completes the
+declaration without recreating the queue or modifying any qualified source.
+Settings, native, runner, teacher and caps stay fixed. No successful GPU or
+analysis stage is repeated. Launch remains conditional on this repair passing.

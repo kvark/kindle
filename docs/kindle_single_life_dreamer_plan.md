@@ -12,7 +12,10 @@ teacher stay fixed; runnercf4ea238 adds ten fresh-CLI lines to control6c1b69fb.
 Critic and representation gradients change together; gameplay benefit remains
 unmeasured. All320 bounded/282 control pins and actual commands/config/header/
 recovery/observer/retention checks pass. An in-memory generator indentation
-failure and corrected preparation are preserved; no GPU stage has repeated.
+failure and corrected preparation are preserved. The first declaration then
+fails on a stale CPU evidence filename before any service starts; a separate
+input-list repair preserves the existing queue and qualified sources. No GPU
+stage has repeated.
 
 Root`/x/Temp/kindle-breakout-replay-value1-20261102/full`; main
 `kindle-breakout-replay-value1-200k-20261102`. First launch is pending. Check live
