@@ -14,6 +14,19 @@ SHA35ad0db, original teacher andrunner6c1b69fb areunchanged byte-for-byte.
 There isno new loss, build or per-update computation. Actor andcritic effects
 are not separated; the reused1009 seed/cohort doesnot establish reliability.
 
+A read-only review of the exact native source447fe50 clarifies the scope: the
+behavior rate feeds the shared LaProp optimizer. The actor objective includes
+imagined policy loss and replay imitation; the critic includes imagined and
+replay value losses. The updated heads are synchronized into the world graph,
+where their weights are frozen while gradients can flow to the representation.
+Thus fixed world learning rates do not isolate representation changes. This is
+source inspection, not a measured gradient effect or causal diagnosis. See
+[behavior optimizer](https://github.com/kvark/kindle/blob/447fe5013b6442c477fc7bfef7eab4122082bc54/kindle/src/dreamer/agent.rs#L2197),
+[behavior objective](https://github.com/kvark/kindle/blob/447fe5013b6442c477fc7bfef7eab4122082bc54/kindle/src/dreamer/behavior.rs#L151)
+and [frozen world heads](https://github.com/kvark/kindle/blob/447fe5013b6442c477fc7bfef7eab4122082bc54/kindle/src/dreamer/world.rs#L574).
+The package's `behavior-rate-scope-review.json` records source hashes and the
+unchanged live process at00:40:38 UTC;0.012s CPU, no GPU work or time correction.
+
 All252 pinned inputs,357 matching control/own initial tensors,47 identical
 pre-update transitions,489 finite supervised reports,changed CNN/reward/actor/
 value tensors,357 invariant frozen tensors,complete training pixel/action/label
