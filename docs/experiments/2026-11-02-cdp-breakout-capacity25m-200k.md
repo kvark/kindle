@@ -168,3 +168,32 @@ reader functions match their original AST; parser,metrics and thresholds remain
 byte-identical. Original failureSHA2e759ebe is retained; repaired readerSHAfa452cfc.
 Do not repeat either preflight or run the failed reader. Final coverage analysis
 remains unexecuted,conditional on original full success and terminal confirmation.
+
+## Completed comparison and readers
+
+The original learner completes200k actions/799,572 frames/12,477 updates in
+36m08.795s. Frozen sampled49.958/greedy104.292 are below12M70.750/143.667 by
+29.39%/27.41%, for68.40% more training time. Own initials1.458/1.583 differ
+from12M as expected; all0/24 two-wall. Initial-subtracted return/min falls
+58.46%/56.88%. Retain12M and the existing recipe; no extension,confirmation,
+capacity sweep,retuning or automatic successor is selected.
+
+All420 pins,100k retained recovery,357 bounded-matching initial/invariant frozen
+tensors,47 pre-update transitions,finite reports,full replays/videos,guards,
+curves,exposure and comparison pass. Main/post/collection succeed
+11:28:52.929/11:29:26.592/11:29:35.005 UTC November2. Allfive original services
+are terminal success. Terminal confirmation completes11:30:31.187 in3.019s;
+repaired coverage completes11:30:39.622 in3.214s with55 diagnostic/420 full pins,
+290,216 actions/1,160,239 frames reconciled and no repeated trajectory analysis.
+
+Native216–431 actions fall1,262→307,with none at432+. These score fractions are
+not verified walls or causal coverage evidence. Expert CE improves.561→.499
+while frozen scores fall. All original coverage-preflight failure evidence is
+preserved. No original learner,observer or GPU stage repeats; no original
+full-pipeline failure or cap change occurs. CPU co-host costs remain uncorrected.
+
+Recovery,terminal and coverage readers are complete; do not repeat them. No
+Kindle allocation is active at closure; check live state. See the
+[completed result](../results/2026-11-02-cdp-breakout-capacity25m.md) for exact
+scores,limitations and artifact hashes. Breakout and the five-game goal remain
+unfinished.

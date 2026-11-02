@@ -8,33 +8,35 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 2
 
-The [fresh Breakout 25M comparison](experiments/2026-11-02-cdp-breakout-capacity25m-200k.md)
-launches **10:47:21.939 UTC November2**, source0e69b83,main **PID933689 /
-invocationd3457431b99a41aebd2ec054df3f4d7d**,with420 pins and a **45-minute**
-training cap:200k actions/12,477 updates,100k/6,227 retained recovery. Only preset
-12M→25M changes at64/Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/
-dynamics4e-4/replay-value1/expert100. Native447fe50,runnercf4ea238 and teacher
-remain fixed. Startup matches357 bounded25M initial tensors/47 pre-update
-transitions and163 finite reports through2,984 actions. Different12M initial
-values are not compared for equality. Frozen gameplay is unmeasured.
+The [completed Breakout 25M comparison](results/2026-11-02-cdp-breakout-capacity25m.md)
+scores **49.958 sampled /104.292 greedy**, below12M70.750/143.667 by29.39%/
+27.41%, in **36m08.795s** (+68.40% training time). Own initials1.458/1.583;
+all0/24 two-wall. Initial-subtracted return/min falls58.46%/56.88%. Retain12M64/
+Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/
+expert100 and sampled collection. Preset12M→25M expands several components
+with different initial values on reused1009/cohort; no isolated capacity cause.
 
-The original recovery observer succeeds **11:05:29.736 UTC**; read-only
-confirmation passes **11:06:26.188** in1.492s CPU. The100k/6,227 checkpoint has
-357 finite tensors and461,432,010 retained bytes; all420 pins and6,296 finite
-reports through101,112 actions pass. Original main identity is unchanged.
-Recovery confirmation is complete; do not repeat it. Progress,postprocess and
-collection observers continue. Root
-`/x/Temp/kindle-breakout-capacity25m-20261102/full`;service
-`kindle-breakout-capacity25m-200k-20261102`. Do not restart or overlap this learner.
+All420 pins,100k/6,227 retained recovery,357 matching bounded initial/invariant
+frozen tensors,47 pre-update transitions,full replays/videos,guards,curves,
+exposure and comparison pass. Allfive original services succeed: main/post/
+collection **11:28:52.929/11:29:26.592/11:29:35.005 UTC November2**, launchsource
+0e69b83. Terminal confirmation completes11:30:31.187 in3.019s; completionSHA
+1988e621/summarySHAb80dc809. No original learner,observer or GPU stage repeats.
 
-Preserve the fixed final/actual-initial sampled and greedy24-episode assessments
-against12M70.750/143.667 and the90%-two-wall gate. Report absolute scores and
-initial-subtracted return per training minute. Terminal and saved-log coverage
-readers remain pending full success. The coverage reader's first CPU fixture
-failure is preserved; its separate correction passes six config/three counter
-cases and55 pins, without changing parsing or metrics. Keep CPU co-host times
-uncorrected. No extension,cap increase,retry or automatic successor is selected.
-The five-game goal remains unfinished.
+The separately corrected CPU coverage reader completes11:30:39.622 in3.214s,
+with55 diagnostic/420 full pins and290,216 actions/1,160,239 frames reconciled.
+Native216–431 exposure falls1,262→307,with none at432+. Score fractions are
+not verified walls or causal coverage evidence. Final50k expert CE improves
+.561→.499 despite lower frozen scores; actual overrides41.812%,guided online
+79.7 is not competence. Original coverage fixture failure remains preserved;
+no preflight,trajectory or replay repeats. CoverageSHA7f2efd01.
+
+Root `/x/Temp/kindle-breakout-capacity25m-20261102/full` is closed. Recovery,
+terminal and repaired coverage readers are complete; do not repeat them.
+Native447fe50,runnercf4ea238 and teacher remain unchanged. No Kindle allocation
+is active at closure; check live state before new work. No extension,confirmation,
+capacity sweep or automatic successor is selected. CPU co-host times remain
+uncorrected. Breakout and the five-game goal remain unfinished.
 
 The [bounded25M check](results/2026-11-02-cdp-breakout-capacity25m.md)
 is complete:8,192 actions/489 updates in84.864s,357 actual/invariant frozen tensors,
