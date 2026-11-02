@@ -1,22 +1,23 @@
 # Kindle: CDP learning roadmap
 
-The [completed Breakout replay-value1 check](results/2026-11-02-cdp-breakout-replay-value1.md) passes8192 actions /
-32,727 frames /489 updates in47.690s;1024 frozen/.872s haszero updates andno
-natural episodes. Conservative200k projection21m20.729s clears30min. All320
-pins,357 matching initial/invariant frozen tensors,47 pre-update events,finite
-reports,full guided replay andguards pass. Main succeeds03:02:34.926 UTC
-November2/source70b7567;original collector completion03:02:40.372 isterminal
-success. Separate1.289s reader passes03:03:34.459. No stage fails orrepeats.
+The [fresh Breakout replay-value1 comparison](experiments/2026-11-02-cdp-breakout-replay-value1-200k.md) is selected after
+1.917s full CPU qualification and the completed47.690s bounded check. Train
+200k actions/12,477 updates within30min, retain100k/6,227 recovery and assess
+final/actual-initial sampled/greedy24 natural episodes per arm against control
+59.000/117.292. Sampled remains primary; original90% two-wall gate stays fixed.
 
-Only replay-value0.3→1 changes from behavior8e-5's59.000 sampled/117.292 greedy.
-Keep12M64/Auto/N8/B16/T16/H15/R16/base-encoder4e-5/behavior8e-5/dynamics4e-4/
-expert100,sampled collection,actorunimix.01,native447fe50/35ad0db andteacher.
-Runnercf4ea238 adds ten fresh-CLI lines;23 CPU tests and2.186s preparation pass.
-Critic andrepresentation gradients change together; gameplay benefit isunmeasured.
-Root`/x/Temp/kindle-breakout-replay-value1-20261102/native-check` isclosed,
-completionSHA56cd5cba/summarySHAcfc4b639. No active allocation remains;check live
-state. No full learner,extension,retry,sweep,automatic promotion orcheck-experience
-reuse isselected atclosure. Do not repeat completed stages orreader.
+Only replay-value0.3→1 changes at12M64/Auto/N8/B16/T16/H15/R16/base-encoder4e-5/
+behavior8e-5/dynamics4e-4/expert100,sampled collection. Native447fe50/35ad0db and
+teacher stay fixed; runnercf4ea238 adds ten fresh-CLI lines to control6c1b69fb.
+Critic and representation gradients change together; gameplay benefit remains
+unmeasured. All320 bounded/282 control pins and actual commands/config/header/
+recovery/observer/retention checks pass. An in-memory generator indentation
+failure and corrected preparation are preserved; no GPU stage has repeated.
+
+Root`/x/Temp/kindle-breakout-replay-value1-20261102/full`; main
+`kindle-breakout-replay-value1-200k-20261102`. First launch is pending. Check live
+state; no overlap, restart, extension, sweep, check-experience reuse or automatic
+successor. The bounded original stages remain closed; do not repeat them.
 The five-game goal remains unfinished.
 
 The [completed Qbert replay-value1 confirmation](results/2026-11-02-cdp-qbert-replay-value1-seed16001.md) scores
