@@ -63,3 +63,17 @@ unchanged cadence gives376 first update /489 check updates /6,227 at100k /
 342 changed shapes and **36,608,401 trainable parameters**. The exact retained
 runner is unchanged. No native or environment construction occurs. This is CPU
 preparation only; actual 25M execution, learning, restore and cost remain unmeasured.
+
+## Bounded result
+
+The check completes8,192 actions/32,722 frames/489 updates in84.864s;
+1,024 frozen actions/4,096 frames take1.343s with zero updates and no natural
+episodes. All380 pins,357 actual schema/finite/invariant frozen tensors,
+finite supervision,parameter changes,full guided replay and guards pass.
+Main/collection succeed10:39:11.653/10:39:18.624 UTC November2, sourcea8144ec;
+terminal confirmation10:40:52.368. No failures or stages repeat.
+Conservative200k projection37m59.071s passes45min, but short training costs
+77.95% more than12M. [Result and receipts](../results/2026-11-02-cdp-breakout-capacity25m.md).
+Both services are terminal; no allocation or full learner is active at closure.
+Do not repeat this check,collector or confirmation. A full comparison remains
+a separate decision; no gameplay benefit is established.

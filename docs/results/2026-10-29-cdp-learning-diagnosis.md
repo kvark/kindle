@@ -1,5 +1,21 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [Breakout 25M bounded check](2026-11-02-cdp-breakout-capacity25m.md)
+passes8,192 actions/32,722 frames/489 updates in **84.864s**;1,024 frozen actions
+in1.343s have zero updates/no natural episodes. All380 pins,357 actual schema/
+finite/invariant frozen tensors,full guided replay and guards pass. Parameters
+rise16,334,353→36,608,401; only the preset changes at64/Auto/N8/B16/T16/H15/R16/
+encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100. Native447fe50,
+runnercf4ea238 and teacher stay fixed. Different architectures have different
+initial values; no12M initial equality is claimed. Conservative200k projection
+**37m59s** passes45min, but short training costs **77.95% more**. Gameplay benefit
+is unmeasured. Main/collection succeed **10:39:11.653/10:39:18.624 UTC November2**,
+sourcea8144ec; terminal confirmation10:40:52.368. No failure or stage repeat.
+Root `/x/Temp/kindle-breakout-capacity25m-20261102` is closed; no full learner or
+GPU allocation is active at closure. Do not repeat checks,collectors or readers.
+No automatic promotion,extension,retry or capacity sweep is selected. Check live
+state before further work. The five-game goal remains unfinished.
+
 The [saved Breakout crop-gap diagnostic](2026-11-02-cdp-breakout-crop-gap.md)
 finds a visible ball at the preceding decision for all 103 losses with an
 available inferred paddle crossing; 17 crossings remain unavailable. All 98
