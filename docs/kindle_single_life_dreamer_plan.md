@@ -1,27 +1,34 @@
 # Kindle: CDP learning roadmap
 
-The [optional posterior replay bootstrap](results/2026-11-02-cdp-breakout-posterior-bootstrap.md)
-passes8,192 fresh actions/32,726 frames/489 updates in46.900s; conservative200k
-projection **20m59.510s** clears30min. All373 pins,357 matching initial/invariant
-frozen tensors,47 pre-update events, finite reports, guided replay and guards
-pass. Frozen1,024 actions/.879s have zero updates and no natural episodes.
-No gameplay benefit or full learner is selected.
+The [fresh200k posterior-bootstrap comparison](experiments/2026-11-02-cdp-breakout-posterior-bootstrap-200k.md) is selected after
+successful bounded qualification. It keeps12M64/Auto/N8/B16/T16/H15/R16,
+encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100 and sampled
+collection. Only the intended replay-bootstrap setting changes imagined→posterior;
+native11373c1/runner8952f81f differ from retained447fe50/cf4ea238, so no isolated
+causal claim follows. Teacher and original two-wall gate stay fixed.
 
-Native11373c1/SHAf1cf4317 passes150 Rust CPU/628 packaged Python checks and
-both strict Clippy checks. The new runtime first matches128 legacy-default
-semantic events and357 frozen tensors on1,024 actions. Use the isolated
-`/x/Temp/kindle-replay-bootstrap-20261102/runtime` for this optional mode;
-the default remains imagined bootstrap. Auto/host targets and teacher stay fixed.
-Resident-target shaders validate offline; that unavailable path is not GPU-qualified.
+Allfive actual commands and18 controllers pass CPU preflight, including34
+config cases,15 startup-header cases,seven prelaunch cases,11 recovery cases
+and retention/collector checks. All373 bounded/338 control pins remain intact;
+no native agent or environment is constructed. Preflight completes09:26:27.230
+UTC November2 in2.366s. Require100k/6,227 retained recovery,200k/12,477 final,
+and final/actual-initial sampled/greedy24-episode assessments against retained
+70.750/143.667 in21m27.910s. Training cap30min; sampled is primary.
 
-Original main927572/ff26aa4f6e07412ab2254b7549a12080 andcollector927575/
-19991e85029a4d70a5a2fcb728ff764e succeed **09:08:00.345/09:08:08.088 UTC
-November2**. Terminal reader passes once09:08:31.094; completionSHAefbe8f3b.
-All stages succeed without repeats. The2.989GiB cache is released; wheel,
-native, validation binary and evidence remain. No allocation is active at closure.
-Do not repeat qualification, compatibility, learner, replay, collector or reader.
-A fresh200k comparison still requires separate selection; the five-game goal
-remains unfinished. Root `/x/Temp/kindle-replay-bootstrap-20261102`.
+Root `/x/Temp/kindle-replay-bootstrap-20261102/full`; service
+`kindle-breakout-posterior-bootstrap-200k-20261102`. Preparation is complete;
+launch and startup verification remain. Check live state before launch and
+never overlap another GPU job. No extension,cap increase,restart,sweep or
+automatic successor. The five-game goal remains unfinished.
+
+The [closed bounded check](results/2026-11-02-cdp-breakout-posterior-bootstrap.md) passes8,192 actions/489 updates in46.900s,
+with a conservative20m59.510s projection. All373 pins,357 initial/invariant
+frozen tensors,47 pre-update events,replays and guards pass. Default restore
+matches128 events/357 tensors. Runtime11373c1 passes150 Rust/628 Python CPU
+checks and both strict Clippy checks; its2.989GiB cache is released. Original
+main/collector/terminal reader succeed09:08:00.345/09:08:08.088/09:08:31.094.
+Do not repeat qualification, compatibility, learner, replay,collector or reader.
+No full frozen gameplay benefit is available yet.
 
 The [completed scalar value calibration diagnostic](results/2026-11-02-cdp-breakout-value-calibration.md)
 finds a small recoverable signal in the stronger Breakout critic. An affine

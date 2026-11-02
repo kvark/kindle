@@ -4,7 +4,9 @@ The optional observed-state bootstrap completes **8,192 actions / 32,726 frames 
 489 updates in46.900s**. Its conservative200k projection is **20m59.510s**,
 below the30-minute training cap. The following1,024 frozen actions take.879s,
 with zero updates and no natural completed episodes. This establishes execution
-and early cost; no gameplay benefit or full learner is selected.
+and early cost; no gameplay benefit is established. The separately selected
+[fresh200k comparison](../experiments/2026-11-02-cdp-breakout-posterior-bootstrap-200k.md)
+will measure frozen gameplay without reusing this bounded experience.
 
 The [fixed protocol](../experiments/2026-11-02-cdp-breakout-posterior-bootstrap.md)
 tests a specific value-target hypothesis after the [calibration diagnostic](2026-11-02-cdp-breakout-value-calibration.md).
