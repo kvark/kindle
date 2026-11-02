@@ -115,3 +115,20 @@ Trial: `qbert-12m-64-b16-h5-r24-dynamics1e4-replayvalue1-expert100-200k-seed1600
 Main: `kindle-qbert-replay-value1-seed16001-200k-20261102`, with postprocess,
 progress, recovery and collection observers. Recheck live host before launch;
 do not overlap another GPU job, restart this learner or repeat terminal stages.
+
+## Result-reader preparation while training runs
+
+The separate `review_full_terminal.py preflight` passes at02:20:42.892 UTC
+in2.485s (2.510s wrapper). It verifies all912 active pins and reproduces the
+development learner's four fixed-cohort scores using the existing score reader.
+The fresh-seed decision uses its own greedy gate, regardless of whether its
+score exceeds the development mean. OriginalPID882846/invocationd78987af stays
+unchanged before and after; no native module or emulator is imported.
+
+ReaderSHA054976eb, score-helperSHAafe4018f and identity-helperSHA131bee46 are
+retained in `terminal-reader-preflight.json`. After all original services are
+terminal, run `review_full_terminal.py terminal` once through `run_cpu.py` to
+verify completion files, journals, recovery and comparison before reporting the
+confirmation outcome. This reader does not repeat an experiment or collector.
+The separate `review_recovery.py` is prepared for the100k milestone and has not
+run yet. CPU co-host cost remains uncorrected; the original learner continues.
