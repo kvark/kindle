@@ -1,43 +1,38 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh Qbert replay-value scale1 comparison](../experiments/2026-11-02-cdp-qbert-replay-value1-200k.md) launches01:21:38.183
-UTC November2/source3a6655a with859 pins:200k actions/18,715 updates/30-minute
-training cap,100k/9,340 recovery andfour final/actual-initial sampled/greedy
-24-episode arms. MainPID878107/invocation9f50698bb9894737a8cc8d64c471ade3;
-postprocess,progress andcollection observers remain active. Recovery succeeds
-01:34:45.325:100k actions/9,340 updates,357 finite tensors,four retained files /
-206,067,159 bytes,9643 finite reports through103240 actions. Separate2.412s
-confirmation passes01:35:04.128:all859 pins,metadata,file hashes andoriginal
-journal identity unchanged;no audit,copy orGPU repeat. RecoverySHA41be214e,
-retentionSHA610a7660,metadataSHAa8a525d7. Original main continues.
+The [completed Qbert replay-value scale1 comparison](2026-11-02-cdp-qbert-replay-value1.md) finishes200k actions /
+799,786 frames /18,715 updates in**25m36.935s**. Greedy**16,525.000** improves
+14,770.833 by11.88% andpasses15k/90% with24/24 first pyramids. Sampled14,882.292
+improves14,254.167 by4.41%,also24/24 pyramids,but still misses15k. Training+1.79%;
+initial-subtracted return/min+10.03% greedy/+2.63% sampled. Own initials147.917/
+205.208 andzero pyramids match. Retain scale1 asstronger primary development;
+reused14009 isnot independent confirmation. The five-game goal remains unfinished.
 
-Startup had357 control/bounded initial tensors and47 matching pre-update events.
-CPU startup2.621s,readout preparation.029s,target-source review.033s andrecovery
-confirmation2.431s wrappers remain uncorrected co-host costs. Final reader isready
-but hasnot run; no full frozen result exists yet.
+All859 pins,100k/9,340 recovery,357 control/bounded initial andinvariant frozen
+tensors,47 pre-update events,1306/1338 paired initial semantic events,full replays/
+videos,guards,curves,coverage,exposure,comparison andoriginal collector pass.
+Main/post/collection succeed01:54:44.234/01:55:18.718/01:55:48.439 UTC November2,
+source3a6655a. Allfive original services areterminal success; no GPU,replay or
+collection stage fails orrepeats. Separate5.947s terminal reader passes01:56:36.021;
+completionSHA048abefc,summarySHAf359e215. Preparation failures/repairs remain.
 
-Only replay-value scale0.3→1 changes on reused14009 at12M64/Auto/N8/B16/T16/H5/
-R24/dynamics1e-4/base-encoder-behavior4e-5/greedy/expert100. Critic andrepresentation
-gradients both change; existing bootstrapped targets remain. This isdevelopment,
-not independent confirmation or an isolated critic cause. Native447fe50/35ad0db,
-teacherfa261c53 andqualified runnere304af89 fixed. No prior experience reused.
-
-Allfive commands,36 config cases,three actual preflight cases,19 header checks,
-recovery/retention/observer cases and815 bounded/768 control pins pass;20 scripts
-compile. CPU qualification8.757s. Original generator indentation failure and
-separate corrected generation remain. Require357 invariant frozen
-tensors,paired initial traces,full replays,guards,curves,exposure andoriginal
-terminal collection. Compare14,770.833 greedy/14,254.167 sampled,both24/24 pyramids,
-in25m09.906s;keep15k/90% gate. No full frozen result yet. Root
-`/x/Temp/kindle-qbert-replay-value1-20261102/full`;check live state. Do not overlap
-orrestart this learner. No extension,sweep,cap increase orautomatic successor.
+Only replay-value0.3→1 changes at12M64/Auto/N8/B16/T16/H5/R24/dynamics1e-4/base-
+encoder-behavior4e-5/greedy/expert100. Critic andrepresentation gradients change;
+real rewards/boundaries andH5 imagined-return bootstraps already supply targets.
+No isolated path ormissing-loss defect isestablished. Native447fe50/35ad0db,
+teacherfa261c53 andrunnere304af89 fixed. Actual overrides28.263%;online scores
+andlower late imitation CE are not causal explanations. CPU co-host costs remain
+uncorrected. Root`/x/Temp/kindle-qbert-replay-value1-20261102/full` isclosed.
+No confirmation,extension,sweep,cap increase orautomatic successor isselected.
+Do not repeat learner,observers,collector orfinal reader. No active allocation
+remains atclosure; checklive state before GPU work.
 
 The [pinned replay-target source review](2026-11-02-cdp-qbert-replay-value1.md#what-the-existing-replay-value-term-already-uses)
 confirms240 real-replay targets/update already use observed rewards,intrinsic
 bonus andactual last/terminal flags, withH5 imagined-return bootstraps andlambda.95.
 Scale0.3→1 changes loss weighting,not targets; no missing-loss defect,target
 accuracy or gameplay cause is established. Source-only.014s/.033s wrapper,
-original process unchanged; no new model orGPU work. Existing learner continues.
+original process unchanged; no new model orGPU work. The source review preceded the now-completed comparison.
 
 The [completed Qbert replay-value scale1 check](2026-11-02-cdp-qbert-replay-value1.md) passes8192 actions /
 32,755 frames /733 updates in57.202s;1024 frozen/.855s haszero updates andno
