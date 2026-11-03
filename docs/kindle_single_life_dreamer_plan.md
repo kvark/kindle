@@ -1,11 +1,20 @@
 # Kindle: CDP learning roadmap
 
+The [optional life-loss aid passes its bounded native check](results/2026-11-03-cdp-breakout-life-penalty.md):
+8,192 actions/489 updates in47.317s,118 independently replayed penalties,raw
+scores preserved,all408 pins and357 matchedinitial/invariant frozen tensors.
+Frozen1,024/.891s haszero updates/episodes. Main/collector succeed; repaired CPU
+fixture/path/terminal-reader failures remainpreserved,no originalstage repeats.
+Conservative200k projection21m10.713s passes30min. Separately select the [fresh200k comparison](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md);
+full preparation andlaunch areunfinished. Native447fe50/teacher fixed; no active
+allocation atclosure andno gameplay benefit established. The five-game goal remainsunfinished.
+
 The [optional life-loss aid passes CPU qualification](results/2026-11-03-cdp-breakout-life-penalty.md):
 57 tests / 365 pins and both bounded commands, config/prefix/cadence/schema
 checks pass. The separate Python overlay preserves raw score accounting and
 default-off semantics; native447fe50 stays exact. Two CPU fixture/path failures
-are preserved. Next is one declared 8,192-action check; no gameplay benefit or
-full learner is established. No GPU work occurred during qualification.
+are preserved. This preceded the bounded check above; no gameplay benefit is
+established. No GPU work occurred during CPU qualification.
 
 The [saved Breakout life-feedback diagnostic](results/2026-11-03-cdp-breakout-life-feedback.md)
 finds zero immediate reward at all 120 selected lost lives, 96 nonterminal.
@@ -16,8 +25,8 @@ a causal defect. The next [bounded development](experiments/2026-11-03-cdp-break
 tests an optional one-point training penalty per observed lost life, after CPU
 qualification of explicit raw-versus-training reward accounting. Preserve raw
 scores, real episode boundaries, default-off behavior and shaping-free frozen
-evaluation. CPU implementation is now qualified; no GPU check has passed and no full learner is
-selected. Retained 70.750/143.667 scores and the two-wall gate remain unchanged.
+evaluation. CPU implementation and the bounded GPU check now pass; a full learner
+is selected but has not launched. Retained 70.750/143.667 scores and the two-wall gate remain unchanged.
 The saved-data diagnostic is closed; no Kindle allocation is active at closure.
 
 The [completed replay16k comparison](results/2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000

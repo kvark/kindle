@@ -1,8 +1,14 @@
 # Optional sparse life-loss feedback: bounded Breakout check
 
-CPU qualification and bounded preflight now pass; see the
+**Complete:** the native check passes8,192 actions/489 updates in47.317s; all408
+pins,357 matchedinitial/invariant tensors,118 independently replayed penalties,
+raw scores andguards pass. Frozen1,024/.891s haszero updates/episodes. Original
+main/collector succeed; CPU fixture/path/terminal-reader failures arepreserved.
+No originalstage repeats. The root isclosed; do not repeat stages orreaders.
+Separately select the [fresh200k comparison](2026-11-03-cdp-breakout-life-penalty-200k.md);
+full preparation andlaunch remainunfinished. See the
 [implementation result](../results/2026-11-03-cdp-breakout-life-penalty.md).
-The original bounded requirements below remain fixed. No full learner is selected.
+The original bounded requirements and selection state below are retained.
 
 Select development and qualification of one default-off training aid after the
 [saved reward-visibility result](../results/2026-11-03-cdp-breakout-life-feedback.md).

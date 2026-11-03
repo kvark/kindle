@@ -16,8 +16,11 @@ Next qualify the [optional one-point training aid](../experiments/2026-11-03-cdp
 with explicit separate raw and training rewards, life/reset accounting, default
 off and frozen shaping off. Native learning remains unchanged. CPU qualification
 precedes one fresh bounded check; a full learner needs a separate selection.
-The [CPU implementation now passes qualification](2026-11-03-cdp-breakout-life-penalty.md);
-the GPU check is unfinished. Retained gameplay and acceptance
+The [bounded implementation now passes](2026-11-03-cdp-breakout-life-penalty.md):
+8,192 actions/489 updates in47.317s,118 independently replayed penalties,raw
+scores preserved,and357 matchedinitial/invariant frozen tensors. Frozen1,024
+actions complete no natural episodes. The [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
+is separately selected; preparation andlaunch areunfinished. Retained gameplay and acceptance
 gates stay unchanged; the saved-data diagnostic is closed and must not repeat.
 
 The [completed replay16k comparison](2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000

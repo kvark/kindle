@@ -1,5 +1,39 @@
 # Optional Breakout life-loss feedback
 
+The bounded native check passes **8,192 actions / 32,730 frames / 489 updates
+in 47.317s**. All **118 observed lost lives** produce negative training feedback;
+independent ALE replay verifies life counts and training rewards while raw game
+scores remain unchanged. The **1,024-action / 4,096-frame frozen check takes
+.891s**, makes zero updates and preserves all **357 tensors**. It completes no
+natural episodes, so this is not evidence of gameplay benefit.
+
+All **408 pins**, 357 control-matching initial tensors, 47 matching pre-update
+semantic events, finite learning reports, changed CNN/reward/actor/value weights,
+complete pixel/action/teacher-label/life/reward replay and host guards pass.
+Actual training overrides are 3,937 / 48.059%; guided returns are not unaided
+competence. The conservative 200k projection is **21m10.713s**, below the fixed
+30-minute training cap. Native447fe50 and the teacher remain unchanged.
+
+Main and original collector succeed **06:06:19.889 / 06:06:24.949 UTC November 3**,
+launch source `2594ab5`; main982587/invocationd62fb9aff31b447bae4b1033709deff8,
+collector982590/invocationab4606f96627424e9b39906fc0804d30. Independent terminal
+confirmation completes **06:07:15.464**, in 1.620s (1.638s wrapper), with both
+original journal identities and all pins verified. Its first attempt wrongly
+expected systemd to retain InvocationID after termination; that failed reader
+is preserved, and the corrected reader verifies the journal. No training,
+frozen stage, replay or original collector repeats. The earlier CPU fixture and
+schema-path failures below also remain preserved.
+
+The bounded root is closed; do not repeat its stages or readers. No Kindle
+allocation is active at closure. Separately select the [fresh 200k comparison](../experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
+to measure frozen gameplay; full-run preparation and launch remain unfinished.
+Retained 70.750 sampled / 143.667 greedy and zero two-wall successes stay unchanged.
+
+Completion SHA `251c82e094f6cdd5874d8fa597a11ac02243f29993cbc338273154be069efee3`;
+terminal summary SHA `dc938474eddcdf5c06c39124b04e6b4aa3ce99c05aca823d7bc51c5c0b90e752`.
+
+## CPU qualification preceding the check
+
 The separate Python overlay passes CPU qualification. It subtracts one training
 point per observed net lost life while preserving raw rewards, game scores,
 actual termination/truncation flags and policy observations. Frozen evaluation
@@ -40,7 +74,7 @@ bounded preflight omitted `.safetensors` from a schema-component filename; only
 that reader was repaired. Production reward, runner, auditor and replay sources
 are identical before and after both repairs. No GPU stage has failed or repeated.
 
-At this qualification milestone, no native check or full learner has run. The
+At that CPU qualification milestone, no native check or full learner had run. The
 next bounded check keeps 12M64/Auto/N8/B16/T16/H15/R16/lambda.95/encoder4e-5/
 behavior8e-5/dynamics4e-4/replay-value1/expert100, sampled collection and replay100k.
 Require real ALE life/reward replay, finite training, unchanged frozen weights
