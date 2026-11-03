@@ -2,12 +2,15 @@
 
 The [fresh lambda1 learner](../experiments/2026-11-03-cdp-breakout-lambda1-200k.md)
 is active from04:13:38.340 UTC November3/source958d622. Fixed200k actions and
-30-minute training cap,100k recovery andfour final/actual-initial frozen arms
-will test gameplay against70.750/143.667; no result yet. Startup passes448 pins,
-357 matched initial tensors,47 pre-update events and241 finite reports. Only
+30-minute training cap andfour final/actual-initial frozen arms will test gameplay
+against70.750/143.667; no result yet. The100k/6,227 recovery succeeds04:24:44.552;
+confirmation04:25:14.741 passes357 finite tensors,448 unchanged pins and6,377
+finite reports through102,408 actions. Startup retains357 matched initial
+tensors and47 pre-update events. Terminal/coverage readers are qualified before
+outcomes, reusing completed control coverage without another replay. Only
 lambda.95→1 changes both imagined/replay traces,retaining endpoint bootstrap;
-no isolated mechanism claim. Main972800/44e2a4cbb446493f9db029c194c27300 andfour
-observers are active. Preserve the prelaunch CPU date-wiring failure/repair;
+no isolated mechanism claim. Main972800/44e2a4cbb446493f9db029c194c27300 andthree
+observers remain active; recovery isterminal success. Preserve the prelaunch CPU date-wiring failure/repair;
 no GPU repeat. Do not restart or overlap the existing learner.
 
 The [return-lambda1 check](2026-11-03-cdp-breakout-lambda1.md) passes8,192

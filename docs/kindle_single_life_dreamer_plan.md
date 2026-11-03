@@ -2,11 +2,14 @@
 
 The [fresh lambda1 comparison](experiments/2026-11-03-cdp-breakout-lambda1-200k.md)
 launches04:13:38.340 UTC November3/source958d622,200k actions/12,477 updates,
-30-minute training cap. Main972800/44e2a4cbb446493f9db029c194c27300 andfour
-observers are active. All448 startup pins,357 control/bounded initial tensors,
-47 pre-update transitions and241 finite reports through4,232 actions pass.
-Require100k recovery andfour final/actual-initial sampled/greedy24-episode arms
-against70.750/143.667 andoriginal two-wall gate. No gameplay result yet.
+30-minute training cap. Main972800/44e2a4cbb446493f9db029c194c27300 andthree
+observers remain active; recovery succeeds04:24:44.552. Independent confirmation
+passes04:25:14.741:100k/6,227 weights/metadata,357 finite tensors,448 unchanged
+pins and6,377 finite reports through102,408 actions. Startup's357 matched
+initial tensors and47 pre-update transitions remain. Four final/actual-initial
+sampled/greedy24-episode arms against70.750/143.667 andoriginal two-wall gate
+are pending. Terminal/coverage readers are qualified before outcomes; fixed
+score-bin counts reuse the completed control. No recovery orGPU stage repeats.
 Native447fe50/runner9eb21cca/teacher fixed; onlylambda changes both target paths.
 Original CPU observer-date failure remains,separate prelaunch correction passes.
 Root`/x/Temp/kindle-breakout-lambda1-20261103/full`; do not restart or overlap

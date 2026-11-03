@@ -76,3 +76,48 @@ six updates are376/392/408/424/440/456; logged4,096 actions/233 updates take
 Retain1.500s CPU wrapper co-host time without correction. No full frozen result
 or100k recovery exists atthis review; follow the original services without
 restarting oroverlapping GPU work.
+
+## Read-only result preparation
+
+The separate recovery and terminal readers are prepared while the original
+learner runs. Terminal preflight completes04:19:53.388 UTC in2.422s (2.448s
+wrapper), checking all448 pins, allfive original process identities, the sole
+lambda configuration difference andfive score validation cases. Its summary
+SHA is`214de6ebf14d204ea987c049bac08976c7b183389e92173e99c0cb2d822cfaa3`.
+These readers do not rerun the recovery observer, training, assessments,
+replays, postprocessing or terminal collector.
+
+Before any frozen outcomes, a fixed CPU coverage follow-up is qualified at
+04:20:27.325 UTC in2.441s (2.462s wrapper), with50 diagnostic/448 active pins
+andfive configuration cases. It retains five already qualified boundary cases
+without repeating them. After original completion and terminal confirmation,
+count only the new candidate's training andfour frozen logs, using pre-action
+score bins216/432/648/864. Reuse the completed replay-value1 control counts:
+1,262 native actions in216–431 andnone at432+. Reconcile all candidate actions,
+frames andepisodes against original replay outputs; keep fixed first-three-per-
+lane frozen scores separate from extra episodes andtails. These bins describe
+exposure, not verified wall boundaries or a causal learning bottleneck.
+
+The selected coverage declarationSHA is
+`544781deea3362c52024b7d9fea3515c025ed68e6aacda5bc713e5be0e041c15`,
+under`/x/Temp/kindle-breakout-lambda1-20261103`. No new GPU work, learning,
+emulator replay or successor is selected. CPU co-host times remain uncorrected.
+Run the new terminal andcoverage readers once after their prerequisites;
+the completed preflights andsource preparations must not repeat.
+
+## Retained recovery
+
+The original recovery observer succeeds **04:24:44.552 UTC November 3**.
+The checkpoint contains exactly **100,000 actions / 6,227 updates**, 357 finite
+tensors and matching metadata, with 206,067,161 bytes retained. Independent
+confirmation passes **04:25:14.741** in 1.770s (1.788s wrapper), verifying all
+448 pins and the original observer's journal identity. The complete log prefix
+has 6,377 finite reports through 102,408 actions. Recovery-review SHA is
+`e460e8299549cba433ef5e944909cf803ccb140ce60c1ca0ca942c74897779e7`;
+retention SHA is`d7b719421c22422ebc2e4f240eee8497cf62310fc3df195577bfd41c83612266`.
+
+Only weights and metadata are retained; replay, live belief, games and RNG are
+omitted. The original main process remains active with the same PID/invocation;
+frozen gameplay is pending. No recovery observer, training or GPU stage repeats.
+Do not repeat the completed recovery confirmation. Retain CPU co-host cost
+without correcting training time.

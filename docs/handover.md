@@ -11,11 +11,16 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The [fresh lambda1 comparison](experiments/2026-11-03-cdp-breakout-lambda1-200k.md)
 is active: launched04:13:38.340 UTC November3/source958d622 with448 pins,
 200k actions/12,477 updates and30-minute training cap. MainPID972800,
-invocation44e2a4cbb446493f9db029c194c27300; progress,recovery,postprocessing and
-collection observers are active. Startup passes357 control/bounded matching
-initial tensors,47 pre-update transitions and241 finite reports through4,232
-actions. Require100k/6,227 recovery and final/actual-initial sampled/greedy24-
-episode assessments against70.750/143.667 and the original two-wall gate.
+invocation44e2a4cbb446493f9db029c194c27300; progress,postprocessing andcollection
+observers remain active. The original recovery observer succeeds04:24:44.552;
+100k/6,227 weights andmetadata pass with357 finite tensors. Independent recovery
+confirmation passes04:25:14.741 with448 unchanged pins and6,377 finite reports
+through102,408 actions; no observer orGPU stage repeats. Startup retains357
+control/bounded matching initial tensors and47 pre-update transitions. Final/
+actual-initial sampled/greedy24-episode assessments remain pending against
+70.750/143.667 and the original two-wall gate. Terminal/coverage readers are
+qualified;50 coverage pins, fixed score bins andretained control counts. Run
+each once after original completion; do not repeat completed preflights orrecovery.
 Only lambda.95→1 changes both imagined/replay targets; native447fe50,runner
 9eb21cca andteacher fixed. CPU preflight's stale collector-date failure is
 preserved; correction passes before launch,no GPU repeat. No full result yet.

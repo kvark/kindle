@@ -3,13 +3,27 @@
 The separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-lambda1-200k.md)
 launches **04:13:38.340 UTC November3/source958d622**, with a30-minute training
 cap and448 pins. MainPID972800/invocation44e2a4cbb446493f9db029c194c27300 and
-progress,recovery,postprocessing andcollection observers are active. Startup
+progress,postprocessing andcollection observers remain active. Startup
 matches357 initial tensors against both retained control and bounded candidate,
 plus47 pre-update transitions. All241 reports through4,232 actions are finite;
 the first six updates follow376,392,408,424,440,456 actions. Startup checking
 takes1.500s CPU wrapper time, retained without training-time correction.
-Full frozen gameplay and100k recovery remain pending. Do not restart or overlap
-this learner; root`/x/Temp/kindle-breakout-lambda1-20261103/full`.
+
+The original recovery observer succeeds **04:24:44.552 UTC**. Its retained
+**100,000-action / 6,227-update** weights and metadata pass, with 357 finite
+tensors and 206,067,161 bytes retained. Independent confirmation completes
+**04:25:14.741** in 1.770s (1.788s wrapper): all 448 pins and exact metadata
+match, and 6,377 finite reports cover the complete prefix through 102,408
+actions. Recovery is weights and metadata only; replay, live belief, games and
+RNG state are omitted. No observer or GPU stage repeats.
+
+Terminal and coverage readers pass preparation before frozen outcomes, in
+2.448s and 2.462s wrapper time. Coverage retains 50 diagnostic pins and the
+fixed score bins, reusing completed control counts. These CPU co-host times
+remain uncorrected. Run the new terminal and coverage readers once after their
+prerequisites; the completed recovery confirmation and preflights must not
+repeat. Full frozen gameplay remains pending. Do not restart or overlap this
+learner; root`/x/Temp/kindle-breakout-lambda1-20261103/full`.
 
 The fresh lambda1 candidate completes **8,192 actions /32,727 frames /489
 updates in50.121s**. A1,024-action/4,096-frame frozen check takes.868s with
@@ -64,7 +78,8 @@ collectorPID972194/invocatione57b4accf7f648ac9eac2cde52232bd0 succeeds
 **04:07:43.412**. The read-only terminal summary completes once **04:08:34.276**
 in1.619s (1.638s wrapper), checking both original identities, all pins, completion
 files, counters and cost arithmetic. No bounded learner, frozen stage, replay,
-collector or final reader fails or repeats. No Kindle allocation remains active.
+collector or final reader fails or repeats. At bounded closure, no Kindle
+allocation remained active; the separately selected full learner is now running.
 
 Root `/x/Temp/kindle-breakout-lambda1-20261103/native-check` is closed. Do not
 repeat completed bounded stages. The separately selected full comparison retains
