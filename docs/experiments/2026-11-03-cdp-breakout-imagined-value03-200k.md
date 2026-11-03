@@ -66,3 +66,27 @@ Original sources and receipts are pinned. Corrections change preparation checks
 and observer wiring, not the coefficient, learner, teacher or bounded stages.
 The first bounded CLI fixture's separate unintended native initialization remains
 recorded in the bounded report; no full learner has run before this qualification.
+
+## Original launch and startup
+
+The main launches **08:18:30.071 UTC November3**, source
+`44f2cb481e6ae22035fb75f6181dfcefdc0fd2e3`, PID994988/invocation
+`a1dbb6587e484fdf90a7b99ae093c03a`, with448 pins. Declaration SHA
+`41ab9c3761c35be3dbcd15ddfd0e7bb9181746780ff5d3788370fd4026bf033f`.
+Unit `kindle-breakout-imagined-value03-200k-20261103`; original progress,
+recovery, postprocessing and collection observers are attached. Do not restart
+this learner, repeat completed stages or overlap another GPU allocation.
+
+Startup passes08:18:53.565:357 matching initial tensors against bounded/control
+starts,47 matching pre-update events, exact configuration and first-six update
+cadence,179 finite reports through3,232 actions. The later8,192-action progress
+point takes48.022s with489 updates and residual.5. This is early cost only;
+full training cost and frozen gameplay remain unmeasured.
+
+The terminal reader qualifies08:19:30.509 in2.410s with5 score cases and all448
+pins. Fixed descriptive coverage qualifies08:19:43.141 in3.546s with7 config
+cases, reusing5 retained boundary fixtures. Thresholds216/432/648/864 describe
+raw-score exposure, not verified wall transitions or causal coverage. Both retain
+the original process identity. Keep CPU co-host timings without correction.
+Confirm original100k recovery once after its observer; run terminal and coverage
+readers once after original completion. No full outcome is available yet.

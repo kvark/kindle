@@ -20,6 +20,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [fresh imagined-value0.3 comparison](docs/experiments/2026-11-03-cdp-breakout-imagined-value03-200k.md)
+launches08:18:30.071 UTC November3/source44f2cb48, with448 pins and a30-minute
+training cap:200k actions/12,477 updates,12M64/Auto/N8/B16/T16/H15/R16/lambda.95/
+encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100. Only imagined-value
+weight1→.3 changes; actor/critic representation gradients remainoff. MainPID994988,
+invocationa1dbb6587e484fdf90a7b99ae093c03a. Original progress,recovery,postprocessing
+and collection observers areactive. Startup passes357 matching initial tensors,
+47 pre-update events and179 finite reports through3,232 actions. At8,192 actions,
+489 updates take48.022s. No full frozen outcome isavailable.
+
+Require100k/6,227 recovery and fixed final/actual-initial sampled/greedy24-episode
+arms against70.750/143.667,all0/24 two-wall. Root
+`/x/Temp/kindle-breakout-imagined-value03-20261103/full`;service
+`kindle-breakout-imagined-value03-200k-20261103`. Do not restart,repeat completed
+stages or overlapanother GPU allocation. Terminal/coverage readers qualify with
+448 unchanged pins and originalidentity,5 score/7 config cases and5 retained
+boundary fixtures. Run recovery confirmation onceafter its originalobserver;
+terminal/coverage readers onceaftercompletion. Keep CPU co-host timings. Native
+447fe50/teacher fixed; runner76440d32 adds12 CLI lines. Five prelaunchCPU failures
+and bounded fixture initialization remainpreserved. No extension,sweep orautomatic
+successor. Breakout and the five-gamegoal remainunfinished.
+
 The [imagined-value0.3 bounded check](docs/results/2026-11-03-cdp-breakout-imagined-value03.md)
 passes8,192 actions/32,727 frames/489 updates in47.892s; frozen1,024/.879s has
 zero updates/no natural episodes. All393 pins,357 matching initial/invariant
