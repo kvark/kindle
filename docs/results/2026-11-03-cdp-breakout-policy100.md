@@ -86,3 +86,24 @@ recovery confirmation only after the original100k observer succeeds while the
 learner remains active. Run terminal and coverage summaries once after their
 required original completion artifacts exist. Their private sources/provenance
 are fixed before frozen outcomes.
+
+## Recovery retained while the original learner continues
+
+The original100k observer succeeds **09:45:29.841 UTC November3**, retaining
+100,000 actions/6,227 updates,357 finite tensors and four files/206,067,164 bytes.
+Its audit also verifies6,373 finite reports through102,344 actions. Independent
+confirmation passes once **09:45:50.268** in1.291s (1.309s wrapper), checking all
+436 input pins,original service identity,metadata and retained file hashes.
+No restore,observer restart or repeated checkpoint audit occurs.
+
+MainPID1000011/invocationdbf3484b87e947cfa048d424a144d958 remains active and
+unchanged. The recovery observer is terminal success; progress,postprocessing
+and collection continue. Frozen gameplay remains unmeasured. Retained weights
+and metadata omit replay,belief,games and RNG; they are not uninterrupted
+training recovery. Keep CPU co-host time without correction.
+
+Recovery reviewSHA`ba51d1417b97567ddb218b5411ee3f04df149524e3c470bbe35282a0d305a18d`;
+retentionSHA`400d91b82609cb9d87644d47941e34318d412dac67442cc4ed2c9bef6c62e7f7`;
+metadataSHA`b73b9a62f7945a8d64d0fc86b4814f00fc0f67a03ac09925a1449997fdb8118f`;
+confirmationSHA`abf7c27de7215c4a1bb481505775063c23333bea87f8116721e6ad1a51e33949`.
+Do not repeat the completed recovery reader.

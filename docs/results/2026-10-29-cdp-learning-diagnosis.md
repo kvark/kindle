@@ -2,10 +2,12 @@
 
 The [fresh200k policy-weight100 comparison](../experiments/2026-11-03-cdp-breakout-policy100-200k.md)
 is running from09:34:23.440 UTC November3/source0c40e657 with436 pins. MainPID1000011,
-invocationdbf3484b87e947cfa048d424a144d958; original progress,recovery,postprocessing
-and terminal-collection observers are active. Startup passes357 matching initial
+invocationdbf3484b87e947cfa048d424a144d958; original progress,postprocessing and
+terminal-collection observers are active. The100k/6,227 recovery succeeds
+09:45:29.841 UTC; independent confirmation09:45:50.268 verifies436 pins,357 finite
+tensors and all four retained files/206,067,164 bytes. Do not repeat either reader. Startup passes357 matching initial
 tensors,47 pre-update transitions,correct cadence and250 finite reports through
-4,360 actions. Require100k/6,227 recovery and final/actual-initial sampled/greedy
+4,360 actions. Require final/actual-initial sampled/greedy
 24-episode arms against70.750/143.667,all0/24 two-wall,within30min training.
 No frozen result is available. Root `/x/Temp/kindle-breakout-policy100-20261103/full`,
 service `kindle-breakout-policy100-200k-20261103`. Check this original live process;
