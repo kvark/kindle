@@ -1,26 +1,29 @@
 # Kindle: CDP learning roadmap
 
-The [completed current actor-gradient diagnostic](results/2026-11-03-cdp-breakout-actor-gradients.md)
-finds weighted imitation norms6,721×/10,925× imagined score-function on two fixed
-B16/T16 sampled-history batches. Total/imitation cosines are.999999989/.999999996;
-score/imitation.015193/−.028276. These are raw derivatives before AGC/LaProp,
-not optimizer movement or an explanation of the policy100 regression. Retain
-policy1/expert100/critic1/1. Saved gradients/moments permit a CPU follow-up;
-no learner or coefficient change is selected.
+The [completed current actor optimizer attribution](results/2026-11-03-cdp-breakout-actor-optimizer.md)
+finds conditional imitation contributions **7,493× /10,928×** imagined score-function
+on two fixed final-checkpoint batches. Clipping/preconditioning retain the raw
+imbalance; saved momentum also substantially affects the full estimate. These
+F64 estimates are not measured native movement or proof of a gameplay cause.
+All13 fixtures,210 current/158 prior pins,22 parameters and1,646,097 elements pass.
+Analysis takes1.027s CPU, completes10:34:37.510 UTC November3/source71840bbc;
+terminal10:36:51.527 takes1.928s. No failure, repeated stage, native import,
+emulator/GPU work or learner update occurs. ResultSHA4f08d5d7/completionSHAff81959f.
+Root `/x/Temp/kindle-actor-optimizer-20261103` is closed; do not repeat readers.
 
-Production/gated gradients match exactly; component sums,F64 matrices,cross-head
-zeros,512 GPU/reference frames,158 pins and357 source/before/after tensors pass.
-Counters stay200k/12,477,zero updates. Native loop.601s/test3.55s; original service
-succeeds10:24:44.106 UTC November3/source7dbbc29b,terminal10:26:06.728. Native447fe50
-plus test-only instrumentation passes132 CPU tests,strict Clippy and nine fixtures.
-The preceding35,552-action context capture takes34.280s,all36 pins/357 tensors;
-both original services succeed. No GPU stage fails or repeats. Preparation,
-build/schema and path corrections remain preserved in the report.
+The preceding [raw actor-gradient capture](results/2026-11-03-cdp-breakout-actor-gradients.md)
+finds imitation/score norms6,721×/10,925×. Production/gated gradients match exactly;
+158 pins,357 invariant tensors,F64 matrices and cross-head zeros pass. Context
+capture34.280s/native backward.601s complete with zero updates and no GPU repeat.
+Its root `/x/Temp/kindle-breakout-actor-gradients-20261103` and readers are closed.
 
-Root `/x/Temp/kindle-breakout-actor-gradients-20261103` is closed. Do not repeat
-capture,backward,audit or terminal readers. ReviewSHA96d85189/terminalSHAf5cb3cc7.
-No Kindle GPU allocation remains active; check live state before work. No
-coefficient sweep or automatic successor GPU job. The five-game goal is unfinished.
+Retain policy1/expert100/critic1/1 and the current gameplay control. Next selected
+development is default-off actor-only imitation decay, preserving world-model
+imitation, with numerical and short-run qualification before any full learner.
+The previous shared decay weakened both on an older recipe and regressed; it
+does not test this separation. No full learner, sweep or extension is selected.
+No Kindle GPU allocation is active at closure; check live state before GPU work.
+The five-game goal remains unfinished.
 
 The [completed policy-weight100 comparison](results/2026-11-03-cdp-breakout-policy100.md)
 lowers sampled **70.750→38.250** and greedy **143.667→92.125**, all0/24 two-wall,
@@ -28,8 +31,8 @@ in **21m49.372s** (+1.67% training time). Initial-subtracted score/min falls
 47.75%/37.48%. Retain policy1, expert100, critic1/1 and actor/critic representation
 gradients off. Only policy1→100 changes, scaling score-function and entropy
 together; native447fe50 and teacher stay fixed, runner5a86e224 adds12 CLI lines.
-Current actor-gradient dominance remains unmeasured; reused seed/cohort limits
-reliability. Slightly lower replay expert CE does not establish gameplay benefit.
+Current actor-gradient dominance is measured in the diagnostics above; reused
+seed/cohort limits reliability. Slightly lower replay expert CE does not establish gameplay benefit.
 
 All436 pins,100k/6,227 recovery,357 matching initial/invariant frozen tensors,
 47 pre-update events,800/795 initial semantic events,replays/videos,guards,curves,
