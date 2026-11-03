@@ -134,3 +134,24 @@ reviewSHA48dde4b6,retentionSHA1b0b634a. No retention or GPU stage repeats and no
 frozen result is produced. The full content/semantic comparison stays scheduled
 at200k;100k is not independently promoted. CPU co-host time is uncorrected.
 Observation: `/x/Temp/kindle-breakout-budget400k-20261103/recovery100k-observation.json`.
+
+
+## Common 200k prefix passes
+
+The original recovery observer retains200,000 actions/12,477 updates and passes
+the common-prefix comparison at14:53:46.448 UTC. All357 tensors match at initial,
+100k and200k, including optimizer state. Raw-file integrity and canonical header/
+payload identities pass. All38,050 common events match:25,000 transitions,12,477
+learner reports,263 episodes,259 resets,48 progress records,two checkpoints and
+one header. The declared timing,budget/path and serialization normalization is
+unchanged. This verifies the recorded prefix and checkpoint contents,not full
+live replay/RNG/belief state equality. No stop or repeated GPU stage is needed.
+
+The fixed read-only observation passes once14:54:06.583 in1.602s (1.630s wrapper),
+checking both recoveries,446 original/11 repair pins and all five original service
+identities. Prefix receiptSHA`c346f20bbaf519d48549b6e62b06f0bad629d1b11b9d331e31202cf7371a20af`;
+normalized semanticSHA`225cbe82ad4b403ca15a730506462c8e81a6ab9044dae6590f49df8767335b24`.
+The observer's full comparison,retention and GPU stages are not repeated.
+Evidence: `/x/Temp/kindle-breakout-budget400k-20261103/recovery200k-observation.json`.
+The learner continues toward300k recovery and the fixed400k endpoint. No frozen
+result or successor is available; CPU co-host costs remain uncorrected.
