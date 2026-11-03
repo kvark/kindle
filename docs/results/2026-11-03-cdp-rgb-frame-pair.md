@@ -17,8 +17,9 @@ selects one fresh200k-action/12,477-update comparison, after bounded closure,
 with a30-minute training cap. It launches **23:33:53.049 UTC November3**, source
 `8ea3268158763bee64dac060ee7db5d8b4e66c37`, main PID1087230/invocation
 `675fde529a5a4dc080adc6d655f2312b`. Root is `full/` beneath the package root;
-unit `kindle-breakout-rgb-pair-200k-20261103`. Recovery observer PID1087236 and
-terminal observer PID1087233 are active. No full frozen result is available.
+unit `kindle-breakout-rgb-pair-200k-20261103`. Recovery observer PID1087236
+finishes successfully after the100k verification; terminal observer PID1087233
+remains active. No full frozen result is available.
 Do not restart this learner or schedule overlapping GPU work.
 
 Keep12M64/Auto/N8/B16/T16/H15/R16/context1,20% guidance/cap1920/all-state labels,
@@ -53,6 +54,33 @@ training wall time. At the recorded live check,190 finite reports reach3416
 actions and the original main/recovery/terminal identities remain active.
 Require the read-only100k/6,227 recovery and full final/initial frozen assessments,
 replays/videos, curves, exposure and comparison before drawing a result.
+
+### The 100k recovery passes while the original learner continues
+
+The main observer saves100,000 actions /6,227 updates and checks the read-only
+checkpoint at23:45:51.707 UTC, taking0.310s. The independent observer passes at
+**23:45:53.602 UTC November3** in0.343s (0.414s including its wrapper), with all
+114 pins unchanged and357 finite tensors:280 world,66 behavior,11 slow value.
+It verifies geometry, optimizer arrays, metadata hashes and0555-directory/0444-
+file modes while preserving original main PID1087230/invocation675fde529a5a4dc080adc6d655f2312b.
+Recovery contains weights/moments, not replay, games, live beliefs or full RNG.
+The recovery service is terminal success; main and terminal collector remain live.
+
+A subsequent observation reaches113,592 actions/7,077 updates, with replay length
+100,000. The memory snapshot at113,600 actions records **5.019GiB** remaining
+GPU budget. This is above the actual2GiB guard but below the bounded6.097GiB
+projection; filling replay can coincide with other allocations. It is an observed
+snapshot, not the final minimum or proof that all later work fits. The existing
+memory guard remains active and no cap or recipe changes.
+
+Two optional CPU status-readback attempts fail before producing their summaries:
+one uses the run-end `learner_updates` key on a progress row; the other searches
+for spaced JSON in compact JSONL. Their receipts are retained as
+`full/live-observer-2339-failure.json` and `full/post-recovery-readback-failure.json`.
+The corrected readback uses parsed rows and confirms the same active identity;
+`full/post-recovery-observation.json` records its observation. These are separate
+from the passing recovery service. No learner, observer or GPU stage restarts.
+CPU co-host times remain in measured wall time without correction.
 
 ## Implementation and package
 

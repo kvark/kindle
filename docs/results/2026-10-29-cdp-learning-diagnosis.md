@@ -1,12 +1,19 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh200k RGB frame-pair comparison](../experiments/2026-11-03-cdp-breakout-rgb-frame-pair-200k.md) launches23:33:53 UTC
-November3/source8ea32681 with114 pins and a30-minute training cap. Startup passes
-357 bounded-matching initial tensors,47 pre-update semantic events, correct
-cadence and190 finite reports through3416 actions. Main PID1087230, invocation
-675fde529a5a4dc080adc6d655f2312b; independent recovery/terminal observers are active.
-No full frozen result is available. Require100k/6227 recovery and final/actual-
-initial sampled/greedy24-episode assessments against retained70.750/143.667.
+The [fresh200k RGB frame-pair comparison](../experiments/2026-11-03-cdp-breakout-rgb-frame-pair-200k.md) remains active after
+its100k/6,227 recovery passes independent verification at23:45:53.602 UTC
+November3. All357 tensors are finite, optimizer moments/read-only modes and114
+pins pass; the0.343s CPU check keeps original PID1087230/invocation
+675fde529a5a4dc080adc6d655f2312b. Recovery observer succeeds; terminal observer
+remains active. Readback reaches113,592 actions/7,077 finite updates, with full
+100k replay and5.019GiB observed GPU headroom. No full frozen result is available.
+
+Launch23:33:53 UTC/source8ea32681,30min training cap; startup matches357 bounded
+initial tensors and47 pre-update semantic events. Require final/actual-initial
+sampled/greedy24-episode assessments against retained70.750/143.667. The measured
+full-replay headroom is lower than the early6.097GiB projection; actual2GiB guards
+remain enforced. CPU status-formatting failures are preserved separately; no
+learner, observer or GPU stage restarts.
 
 Use qualified native24e701bc/SHA b451bc9,12M64/Auto/N8/B16/T16/H15/R16/context1,
 20% guidance/expert100/replay-value1 and rates4e-5/4e-4/8e-5. Frame pairs change
