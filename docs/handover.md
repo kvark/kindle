@@ -8,6 +8,23 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [CPU replay-actor target audit](results/2026-11-03-cdp-breakout-replay-actor-targets.md) confirms no direct
+return-weighted actor update on executed replay actions. Reusing existing critic
+targets gives241 positive states of480; removing short-window external rewards
+leaves200 and83.32% of normalized positive weight. Imagined bootstraps and
+intrinsic bonuses stay fixed; this is arithmetic dependence,not a causal learning
+fraction. No gameplay benefit or new loss is selected. Completed real-outcome
+target accounting remains the next design question.
+
+All17 fixtures,20 current/158 original pins,512 incoming and480 teacher alignments
+pass. Approximate value recovery matches final native normalizer state to2.339e-7;
+fixed sensitivity leaves the broad result unchanged. Analysis completes15:42:20.331
+UTC November3/source934053ae in.436s CPU; independent recount15:43:34.993 in.202s.
+No failure,model forward,emulator,GPU work,update or prior-stage repeat. Root
+`/x/Temp/kindle-breakout-replay-actor-targets-20261103` is closed; do not rerun.
+No Kindle service is active at closure. Keep the retained200k/400k budget points;
+Breakout and the five-game goal remain unfinished. Check live state before work.
+
 The [completed400k/R16 Breakout comparison](results/2026-11-03-cdp-breakout-budget400k.md)
 raises sampled70.750→92.792 (+31.15%) andgreedy143.667→173.708 (+20.91%),all0/24
 two-wall,in43m36.578s (+103.16%) for400k actions/1,599,381 frames/24,977 updates.
