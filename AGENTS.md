@@ -20,31 +20,32 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
-The [fresh200k context9 comparison](docs/experiments/2026-11-03-cdp-breakout-context9-200k.md)
-launches13:20:44.166 UTC November3/source55f0a46a with667 pins. MainPID1029287,
-invocationda2979f074bf4fe4b740d734ad33f6cd; progress,postprocessing and
-collection remain active. Original recovery succeeds13:32:50.987 UTC. Startup passes357 matching initial tensors,
-47 common pre-update transitions and503 finite supervised reports through8,488
-actions;8,192 actions/485 updates take50.380s. First update440 and prefix timing
-pass. Training cap30min,200k/12,473 updates,100k/6,223 recovery and four fixed
-24-episode frozen arms against70.750/143.667,all0/24 two-wall. No full result yet.
+The [completed context9 comparison](docs/results/2026-11-03-cdp-breakout-context9.md)
+lowers sampled **70.750→46.583** and greedy **143.667→91.167**, all **0/24
+two-wall**, in **23m30.959s (+9.55%)** for200k actions/799,606 frames/12,473
+updates. Initial-subtracted score/min falls40.54%/42.60%. Retain context1 and
+constant expert100/critic1/1. Prefix recomputation totals101.886s,8.169ms/update
+and7.22% of training wall. Late CE.560514→.559628 barely changes; guided online
+67.78→72.46 is not unaided competence. No improved state accuracy is established.
 
-Independent recovery reading passes13:33:51.402 UTC in2.317s wrapper: all667
-pins,100k/6,223 metadata,357 finite tensors and all four retained files totaling
-206,067,205 bytes. The observer's complete prefix has103,000 actions/6,410 finite
-reports. Original learner identity remains active; no stage repeats. Recovery
-reading is closed; fixed terminal reading and frozen gameplay remain pending.
+All667 pins,100k/6,223 recovery,357 matching initial/invariant frozen tensors,
+47 common pre-update and800/795 initial frozen events,full replays/videos,guards,
+curves,exposure and comparison pass. All five original services succeed;
+main/post/collection finish **13:48:19.732 /13:48:49.527 /13:48:54.418 UTC
+November3**, source55f0a46a. Fixed independent terminal reading passes once
+**13:49:17.338** in1.766s wrapper. No full-run stage fails or repeats. An ad-hoc
+poll rejects the unloaded recovery unit's empty invocation; original journal
+identity and success pass. Earlier bounded failures/repairs remain preserved.
 
 Context9 adds eight forward-only observed steps before16 learning steps with
 12M64/Auto/N8/B16/T16/H15/R16,retained rates/teacher/constant expert100/critic1/1.
-Sampling/warmup/runtime differ; no isolated cause. Native65dd69b4/runtime and
-bounded runner reused; no prior experience or successful stage repeat. CPU
-preflight2.667s and startup1.866s pass without failure. Recovery/terminal readers
-are fixed13:21:07.426 before outcomes; terminal preflight passes13:21:31.180 in
-3.218s with five score-tamper cases. Keep CPU co-host timings without correction.
-Root `/x/Temp/kindle-replay-context-20261103/full`,service
-`kindle-breakout-context9-200k-20261103`. Check original live state; do not restart
-this learner or overlap GPU work. The five-game goal remains unfinished.
+Sampling,warmup,total work and native/runner differ from447fe50; no isolated
+cache-age cause or independent reliability claim. Native65dd69b4/runtime and
+bounded runner are reused without a build. Keep CPU co-host times uncorrected.
+Root `/x/Temp/kindle-replay-context-20261103/full` and all readers are closed;
+do not repeat stages or readers. No Kindle allocation remains active at closure.
+Check live state before GPU work. No extension,sweep,confirmation or automatic
+successor is selected. Breakout and the five-game goal remain unfinished.
 
 The [optional replay-state recomputation check](docs/results/2026-11-03-cdp-replay-context.md)
 passes8,192 actions/32,730 frames/485 updates in50.564s. Context9 adds eight
@@ -66,8 +67,8 @@ All601 original/631 repair pins pass; collection completes13:11:47.928 in2.590s,
 closure`complete_with_cpu_controller_repair`. Original service remains failed;
 no training/frozen/replay stage repeats. Runtime/source differs447fe50,not an
 isolated cause. Root `/x/Temp/kindle-replay-context-20261103` and readers are
-closed; no full learner/sweep/successor selected. No active GPU allocation;
-check live state before work. The five-game goal remains unfinished.
+closed. No full learner was selected at that bounded closure; the separately
+selected full comparison is completed above. The five-game goal remains unfinished.
 
 The [CPU replay-context age reconstruction](docs/results/2026-11-03-cdp-breakout-replay-age.md)
 matches all12,477 logged updates and199,632 sampled starts in.387s CPU.

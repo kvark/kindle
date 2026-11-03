@@ -129,3 +129,36 @@ are not included. No restore,learning,evaluation,observer or successful-reader
 stage repeats. Keep CPU co-host time without correction. Recovery reading is
 closed. Terminal reading and frozen gameplay remain pending; no successor is
 selected and the five-game goal remains unfinished.
+
+## Completed comparison — November 3
+
+The [full result](../results/2026-11-03-cdp-breakout-context9.md) completes200,000
+actions/799,606 frames/12,473 updates in **23m30.959s (+9.55%)**. Sampled
+**46.583** and greedy **91.167** fall below retained70.750/143.667, all0/24
+two-wall. Initial-subtracted return/min falls40.54%/42.60%. Own initials1.417/
+2.208 and800/795 semantic events match. Retain context1; no extension,sweep,
+confirmation or automatic successor is selected. The five-game goal is unfinished.
+
+All667 pins,100k/6,223 recovery,357 matching initial/invariant frozen tensors,
+finite reports,positive prefix timing,full replays/videos,guards,curves,exposure
+and comparison pass. Prefix totals101.886s/8.169ms per update. Late CE.559628
+and44.342% actual overrides do not establish unaided competence or state accuracy.
+All five original services succeed, with main/post/collection terminal at
+13:48:19.732/13:48:49.527/13:48:54.418 UTC. Original mainPID1029287 and invocation
+da2979f074bf4fe4b740d734ad33f6cd remain the only learner identity.
+
+The fixed independent terminal reader passes once13:49:17.338 UTC in1.706s
+body/1.766s wrapper. Summary SHA256:
+`624700fe0d397d90f6b5021088364cf4ed9ddd891ba626349ca3fd66a02eaabc`.
+Completion SHA256:
+`2599a36ed6b57d3919e02a2a62cc58d71d725f621e40c7294dee1ed15bfa60f7`.
+The private declaration/protocol and all original pins remain unchanged.
+
+No full-run stage fails or repeats. An ad-hoc observation assertion rejects an
+empty invocation after the successful recovery unit is unloaded; the fixed
+reader verifies its original identity and success from the journal. No restart
+or repair to the experiment follows that poll. Earlier bounded failures and
+separate repairs remain preserved. CPU co-host times remain uncorrected;
+sampling,warmup,work,native and runner differences prevent an isolated causal
+claim. All stages and readers are closed; do not repeat them. No Kindle
+allocation remains active at closure. Check live state before future GPU work.

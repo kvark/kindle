@@ -1,5 +1,10 @@
 # Replay-state recomputation passes execution and early cost checks
 
+The separately selected [full comparison](2026-11-03-cdp-breakout-context9.md)
+subsequently lowers sampled70.750→46.583 and greedy143.667→91.167, all0/24
+two-wall, in23m30.959s (+9.55%). Retain context1. The completed bounded
+qualification below establishes execution and early cost, not a gameplay gain.
+
 An optional eight-step observed prefix completes a fresh Breakout check of
 **8,192 actions / 32,730 frames / 485 updates in 50.564s**. The conservative
 200k-action projection is **22m37.921s**, below the declared 30-minute gate.
@@ -10,7 +15,8 @@ The motivation is the [replay-context age reconstruction](2026-11-03-cdp-breakou
 late sampled starting states had a median age of246 model updates. That age
 does not measure latent error or identify the cause of weak Breakout control.
 The retained gameplay control remains sampled70.750/greedy143.667, all0/24
-two-wall successes. No full learner, sweep or automatic successor is selected.
+two-wall successes. No full learner was selected at this bounded closure; the
+separately selected full comparison is linked above.
 
 ## What the option changes
 
