@@ -8,50 +8,40 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [fresh imagined-value0.3 comparison](experiments/2026-11-03-cdp-breakout-imagined-value03-200k.md)
-launches08:18:30.071 UTC November3/source44f2cb48, with448 pins and a30-minute
-training cap:200k actions/12,477 updates,12M64/Auto/N8/B16/T16/H15/R16/lambda.95/
-encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100. Only imagined-value
-weight1→.3 changes; actor/critic representation gradients remainoff. MainPID994988,
-invocationa1dbb6587e484fdf90a7b99ae093c03a. Original progress,recovery,postprocessing
-and collection observers areactive. Startup passes357 matching initial tensors,
-47 pre-update events and179 finite reports through3,232 actions. At8,192 actions,
-489 updates take48.022s. No full frozen outcome isavailable.
+The [imagined-value weighting comparison](experiments/2026-11-03-cdp-breakout-imagined-value03-200k.md)
+is running. It launched at **08:18:30.071 UTC November 3**, source `44f2cb48`,
+with 448 pins, PID `994988` and invocation `a1dbb6587e484fdf90a7b99ae093c03a`.
+The budget is 200,000 actions / 12,477 updates within 30 minutes. Only
+`loss_scales.value` changes from 1 to 0.3; replay-value stays 1 and actor/critic
+representation gradients stay off. Native `447fe50` and the teacher are fixed;
+runner `76440d32` adds the coefficient option. Other retained settings remain
+12M64/Auto/N8/B16/T16/H15/R16/lambda .95/encoder4e-5/behavior8e-5/dynamics4e-4/
+expert100/replay100k with sampled collection.
 
-Require100k/6,227 recovery and fixed final/actual-initial sampled/greedy24-episode
-arms against70.750/143.667,all0/24 two-wall. Root
-`/x/Temp/kindle-breakout-imagined-value03-20261103/full`;service
-`kindle-breakout-imagined-value03-200k-20261103`. Do not restart,repeat completed
-stages or overlapanother GPU allocation. Terminal/coverage readers qualify with
-448 unchanged pins and originalidentity,5 score/7 config cases and5 retained
-boundary fixtures. Run recovery confirmation onceafter its originalobserver;
-terminal/coverage readers onceaftercompletion. Keep CPU co-host timings. Native
-447fe50/teacher fixed; runner76440d32 adds12 CLI lines. Five prelaunchCPU failures
-and bounded fixture initialization remainpreserved. No extension,sweep orautomatic
-successor. Breakout and the five-gamegoal remainunfinished.
+Startup passes: 357 matching initial tensors, 47 paired pre-update events,
+correct cadence and 179 finite reports through 3,232 actions. The 8,192-action
+progress point takes 48.022s for 489 updates. **No full frozen result is available.**
+Require the original 100k/6,227 recovery checkpoint and fixed final/actual-initial
+sampled/greedy 24-episode assessments against retained 70.750/143.667, all 0/24
+two-wall. The original progress, recovery, postprocessing and collection observers
+are attached. Terminal and coverage readers are qualified; run each once at its
+specified milestone. Score bins describe exposure, not verified wall transitions.
 
-The [imagined-value0.3 bounded check](results/2026-11-03-cdp-breakout-imagined-value03.md)
-passes8,192 actions/32,727 frames/489 updates in47.892s; frozen1,024/.879s has
-zero updates/no natural episodes. All393 pins,357 matching initial/invariant
-frozen tensors,47 pre-update events,replay and guards pass. Main/collector
-succeed08:12:43.805/08:12:49.826 UTC November3/source30793299; terminal review
-completes once08:14:11.721. Conservative200k projection21m26.159s clears30min.
-The bounded root is closed; do not repeat stages/readers. An earlier CLI fixture
-constructs one native agent before rejecting a dummy frame; no updates or policy
-evaluation occur. Preserve that failure, correction and journal.
+Root `/x/Temp/kindle-breakout-imagined-value03-20261103/full`; service
+`kindle-breakout-imagined-value03-200k-20261103`. **Check live state; do not restart
+this learner, repeat completed stages or overlap another GPU allocation.**
+Five preparation failures and corrections remain pinned. Keep CPU co-host timings
+without correction. No extension, coefficient sweep or automatic successor is
+selected. Breakout and the five-game goal remain unfinished.
 
-A [separate fresh200k comparison](experiments/2026-11-03-cdp-breakout-imagined-value03-200k.md)
-is selected, with a30-minute training cap,100k recovery and fixed final/actual-
-initial sampled/greedy24-episode arms against70.750/143.667. Only imagined-value
-weight1→.3 changes; replay-value1 and actor/critic representation gradients off
-remain. Both imagined return fitting and slow-value regularization are scaled;
-replay targets still bootstrap from imagined returns. Native447fe50/teacher fixed,
-runner76440d32 adds12 CLI lines. No bounded experience transfers. CPU qualification
-passes18 scripts/5 commands/38 config cases; five preparation failures/corrections
-remain pinned. No full gameplay outcome is available. Root
-`/x/Temp/kindle-breakout-imagined-value03-20261103/full`; check live state before
-work. No overlap,retry,cap increase,sweep or automatic successor. The five-game
-goal remains unfinished.
+The [bounded check](results/2026-11-03-cdp-breakout-imagined-value03.md)
+is closed: 8,192 actions / 32,727 frames / 489 updates in 47.892s, with a
+conservative 200k projection of 21m26.159s. All 393 pins, initial/frozen tensors,
+semantic traces, replay and guards pass. Main/collector finish at
+08:12:43.805/08:12:49.826 UTC; terminal review completes once at 08:14:11.721.
+No bounded experience transfers. An earlier CLI fixture unintentionally constructs
+one native agent before rejecting a dummy frame, with no update or policy
+evaluation; its failure, correction and kernel journal remain preserved.
 
 The [completed actor/critic-gradient comparison](results/2026-11-03-cdp-breakout-acgrads-value1.md) lowers sampled
 70.750→54.958 and greedy143.667→117.833 in21m56.980s (+2.26% training time),
