@@ -8,27 +8,33 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [fresh 200k completed-return actor comparison](experiments/2026-11-03-cdp-episodic-actor-200k.md)
-launches **16:24:19 UTC November 3**, source783852b2. Bonus-off control trains
-first, then the scale100 candidate, with no overlap or experience transfer.
-Both use12M64/Auto/N8/B16/T16/H15/R16/context1, expert100 and the qualified
-e3b02163 runtime. Each gets200k actions/12,477 updates and a30-minute training
-cap, a retained100k/6,227 checkpoint, and final/actual-initial sampled/greedy
-24-episode assessments. Original864/90%-two-wall gate and retained results stay.
+The [completed-return actor comparison](experiments/2026-11-03-cdp-episodic-actor-200k.md)
+has a fully assessed bonus-off control:200k actions/799,575 frames/12,477 updates
+in17m05.486s, sampled46.458/greedy65.208 versus actual initials1.417/2.208,
+all0/24 two-wall. This costs20.38% less than retained action-effects1 but scores
+lower than70.750/143.667; different runtime/objective, not an isolated bonus
+claim. All five control GPU phases,100k recovery,261 tensors, full replays/videos,
+curves,exposure and coverage pass. The paired candidate remains to be assessed.
 
-Main service `kindle-episodic-actor-200k-20261103`, PID1049147, invocation
-`fcc4bc49735445638173a45196bddd44`, is active. Its controller owns progress,
-startup/recovery checks, phase audits, replays and comparison; the separate
-`-collect` observer is active. All307 preparation pins and CPU preflight pass.
-Control startup passes261 initial arrays matching bounded/retained shared
-values,47 pre-update events and first update376. Its100k/6,227 recovery passes
-16:32:53.148 UTC:261 finite/schema-checked tensors and file hashes, retained
-read-only by checkpoint history. All307 pins and original process identity
-remain verified. Control training continues; candidate has not started and no
-full frozen result exists.
-Root `/x/Temp/kindle-episodic-actor-20261103/full`. Check live state; do not
-restart this pair or schedule another GPU job while it is active. No extension,
-third learner or automatic confirmation follows. The five-game goal is unfinished.
+Original mainPID1049147/invocationfcc4bc49735445638173a45196bddd44 and collector
+remain failed after the16:45:24 UTC November3 CPU postprocess error: a copied
+helper expected400k/24,977 and older expert-metric fields. Separate CPU repair
+passes eight fixtures/historical metrics and finishes control postprocessing
+16:49:21.889 in3.458s. All307 original/22 repair pins and69 completed-control
+files remain preserved. No successful GPU,learning,frozen or full replay repeats.
+
+Only the unstarted candidate launches **16:51:24 UTC**, sourcedc29240b, under
+`kindle-episodic-actor-200k-resume-20261103`, PID1051198, invocation
+`2e7e3aa5b60947f199c0d3264da02ebf`; its `-collect` observer is active.
+Same qualified nativee3b02163/runner,scale100,seed1009,200k/12,477,30-minute cap,
+100k recovery and four final/actual-initial sampled/greedy24-episode arms.
+Original overall deadlines are retained. Startup passes261 matched tensors,
+47 pre-update events and update376; positive targets start1224. No candidate
+frozen result or complete paired comparison exists. [Evidence and limits](results/2026-11-03-cdp-episodic-actor.md).
+Root `/x/Temp/kindle-episodic-actor-20261103/full`, continuation under `repair`.
+Check live state; do not restart either service or overlap another GPU job.
+No extension,third learner or automatic confirmation. The original864/90%
+two-wall gate stays; the five-game goal is unfinished.
 
 The [closed bounded pair](results/2026-11-03-cdp-episodic-actor.md)
 passed8192 actions/489 updates in36.677s control/38.277s candidate (+4.36%),

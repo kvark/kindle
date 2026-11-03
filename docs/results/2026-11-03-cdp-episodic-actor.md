@@ -1,4 +1,4 @@
-# Completed-return actor learning passes native and bounded checks
+# Completed-return actor: control assessed, candidate running
 
 Kindle now has an optional direct actor loss on completed real experience.
 The [implementation](../experiments/2026-11-03-cdp-episodic-actor.md) is off by
@@ -103,52 +103,87 @@ root. No Kindle service was active at that closure. The retained200k70.750/143.6
 and400k92.792/173.708 gameplay results remain unchanged,all zero of24 two-wall
 successes. The five-game goal remains unfinished.
 
-## Full comparison is running
+## Full control is assessed; candidate is running
 
 The [fresh200k comparison](../experiments/2026-11-03-cdp-episodic-actor-200k.md)
-launches **16:24:19 UTC November3**, source783852b2. One fresh bonus-off control
-precedes one fresh scale100 candidate; each gets200k actions/12,477 updates,
-a30-minute training cap, a100k/6,227 recovery and final/actual-initial sampled/
-greedy24-episode assessments. The candidate differs only in the optional actor
-loss within this pair. The retained action-effects1 result is historical context
-with a different runtime/runner and objective. No bounded experience is reused.
+launches16:24:19 UTC November3/source783852b2. Its bonus-off control completes
+**200k actions /799,575 frames /12,477 updates in17m05.486s**, within30min.
+This is20.38% less training time than retained action-effects1's21m27.910s, but
+both frozen means are lower. Runtime/runner and bonus/ensemble differ from that
+historical result; no isolated bonus or actor-loss conclusion follows.
 
-All **307 input pins** pass. CPU preflight completes16:23:54.273 in1.400s,
-checking queues/caps,261 tensor schemas/shared initial arrays, bounded loss
-accounting, corrupt-loss rejection, retained lane scores, fixed bootstrap and
-plotting imports. No native construction or GPU work occurs during preflight.
-The fresh control startup passes261 matching initial arrays,47 common pre-update
-semantic events and first update376. Its.254s checkpoint/startup observer shares
-the host; report actual elapsed training time without correction.
+| Control evaluation | Mean return | Two-wall successes | Updates |
+| --- | ---: | ---: | ---: |
+| Final sampled |46.458|0/24|0|
+| Actual-initial sampled |1.417|0/24|0|
+| Final greedy |65.208|0/24|0|
+| Actual-initial greedy |2.208|0/24|0|
 
-Service `kindle-episodic-actor-200k-20261103`, PID1049147, invocation
-`fcc4bc49735445638173a45196bddd44`, owns the sequential pair. Its controller
-checks live reports, retains checkpoint history directly, validates each phase
-before the next GPU stage, then performs full replays/videos, curves, exposure,
-coverage and paired eight-lane comparison. Bootstrap is fixed at10000 resamples,
-seed0; greedy is primary. The independent `-collect` observer is active. Full
-root `/x/Temp/kindle-episodic-actor-20261103/full` is active, not completed.
-There is no full frozen score or selected gameplay benefit yet. Do not restart
-this pair, repeat bounded stages or overlap another GPU job. No extension,
-third learner or automatic seed confirmation follows. The original864/90%
-two-wall gate and unfinished five-game goal remain.
+All arms complete the fixed24 natural episodes with zero truncations,full
+recorded-action replays/videos and261 invariant tensors. Retained sampled/
+greedy means remain70.750/143.667. The control's initial-subtracted score per
+training minute is2.635 sampled/3.686 greedy. The candidate will be compared
+against this paired control and the historical result under the fixed lane
+bootstrap and original864/90%-two-wall gate.
 
-Control's100k/6,227 recovery passes **16:32:53.148 UTC**, with261 finite
-schema-checked tensors and matching checkpoint file hashes. Checkpoint history
-retains the directory and files read-only. The observer costs.243s on the host;
-no wall-time correction applies. Independent read-only verification confirms
-the recovery hashes, permissions, all307 pins and original live main/collector
-identities at16:33:21.615. Control continues; candidate is still queued. This
-checks saved weights/moments, not complete replay/game/RNG resumption.
-Recovery review SHA256:
-`9aee1175e50b6f312f7a0ce653fdd43a8ca82600c8d1bd891ef1742a7b23d4ac`.
-Metadata SHA256:
-`4ad55cef5848ae95d7c7381301251db1cbbe7b5be4a1e9320e38570b591ad862`.
+Training passes all report/counter/schema checks, changed CNN/reward/actor/value,
+matched261 initial arrays and47 pre-update events. The100k/6,227 recovery passes
+16:32:53.148, retaining read-only files and matching hashes. Full CPU training
+replay verifies pixels,actions,corrective labels and86,538 overrides (43.269%).
+Its258 completed episodes and training maximum399 do not establish frozen
+competence. Only709 native actions occur at pre-action scores216–431; none is
+at432 or higher. These are cumulative-score bands, not verified wall events.
 
-Full declaration SHA256:
-`b48da6eae51aad8fe7761437c77e7a8612db89908b3643612b96756a5c2e5c51`.
-Preflight SHA256:
-`80421785f172244e4927534ce6ee6d202e96541a9f4106f2da60585095a3d293`.
+All307 preparation pins and1.400s CPU preflight pass. However, that preflight
+did not exercise the copied exposure helper against the new full-run review.
+After all five control GPU phases and their audits succeed, the original main
+service **fails16:45:24 UTC** in CPU postprocessing: the helper still expects
+400k/24,977 and an older `expert_metrics` review field. Original service
+`kindle-episodic-actor-200k-20261103`, PID1049147/invocation
+`fcc4bc49735445638173a45196bddd44`, and its original collector remain failed.
+The collector preserves `terminal-failure.json` at16:46:04.558. There is no
+original passing completion. No candidate stage had started.
+
+A separate repair preserves69 completed-control files and every original pin.
+It adds independent teacher-label/loss accounting and corrects only the CPU
+exposure assumptions. Two valid fixtures,six corruption rejections and exact
+historical metric reproduction pass in1.128s. Control metrics,exposure and
+previously unstarted plots then complete **16:49:21.889 in3.458s**. No agent,
+GPU work,learning,frozen assessment or full replay repeats. All22 repair pins
+pass. The original files and failed services stay intact. The control curve
+was inspected and retains its explicit guided-online/frozen distinction.
+
+Only the previously selected,unstarted candidate launches **16:51:24.578 UTC**,
+sourcedc29240b, under `kindle-episodic-actor-200k-resume-20261103`, PID1051198,
+invocation`2e7e3aa5b60947f199c0d3264da02ebf`. Its collectorPID1051201/invocation
+`aab25cf7344c4f89b9cb743364d2d4f3` is active. Nativee3b02163,runner,seed1009,
+scale100,200k/12,477,30min,100k recovery and all four frozen queues are unchanged.
+The original absolute main/collector deadlines are retained, not restarted.
+No control phase is present in the continuation queue.
+
+Candidate startup passes261 initial arrays matching the bounded and control
+initials,47 common pre-update events and first update376. Positive targets
+start at1224; through7784 actions,463 finite reports expose53,337 completed and
+31,470 positive replay rows across405 positive updates. These are repeated
+replay exposures, not unique experience. No candidate frozen score or complete
+paired comparison exists yet. The continuation's startup observer takes.317s;
+control startup/recovery observers take.254/.243s. Host housekeeping and status
+reads also occur; retain actual elapsed wall times without correction.
+
+Root `/x/Temp/kindle-episodic-actor-20261103/full`; CPU repair and continuation
+are under `repair`. A successful pair would close as
+`complete_with_cpu_postprocess_repair`, while the original services stay failed.
+That closure is not yet present. Do not restart either service or overlap a
+new GPU job. No extension,third learner or automatic confirmation follows.
+The five-game goal remains unfinished.
+
+| Full/repair artifact | SHA256 |
+| --- | --- |
+| Original declaration |`b48da6eae51aad8fe7761437c77e7a8612db89908b3643612b96756a5c2e5c51`|
+| Original preflight |`80421785f172244e4927534ce6ee6d202e96541a9f4106f2da60585095a3d293`|
+| Control100k recovery review |`9aee1175e50b6f312f7a0ce653fdd43a8ca82600c8d1bd891ef1742a7b23d4ac`|
+| Repaired control postprocessing |`1d7c12609f8073e0b4a2f9bdcd524d92615f16200ed53c467024b895a147d4c0`|
+| Continuation declaration |`cebc98ad879d3734fdd506b846d5ce3a3e98f9bdf6c63ce95c4fa2e4f671541d`|
 
 | Artifact | SHA256 |
 | --- | --- |
