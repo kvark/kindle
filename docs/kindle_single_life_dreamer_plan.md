@@ -6,6 +6,11 @@ from06:16:18.414 UTC/sourceb80194e,453 pins. Startup passes357 initial tensors,
 actions. Training life-loss accounting isverified; raw scores remain unchanged.
 No100k recovery orfrozen result yet. Original observers areactive; no overlapping
 GPU job,restart,extension orcap increase. The five-game goal remainsunfinished.
+Terminal/recovery readers andfixed raw-score coverage areprepared before frozen
+outcomes. Five score/six feedback cases andeight coverage-config cases pass;
+453 active/50 diagnostic pins remain unchanged. Coverage reuses the completed
+control andcounts only new candidate logs afteroriginal completion. Keep CPU
+co-host times; these preparations do not establish gameplay benefit.
 
 The [fresh life-loss comparison](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
 passes CPU preparation:five commands,34 config/24 startup/seven prefix/12 recovery

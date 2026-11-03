@@ -103,3 +103,25 @@ Original observers:post983166/invocation3a2e4714c1bb463fb74b2928b021f4a1,
 progress983169/82c8677727184601a907b308a44c42dc,
 recovery983304/87e7d42b5eab48d288f5120d1c043403,
 collection983307/235dab3abb3a4e189c05af8f6bb2cd84. Follow these identities.
+
+## Read-only result preparation
+
+Terminal-reader preflight passes06:19:26.520 UTC in2.457s (2.478s wrapper),
+with all453 pins,allfive original identities,five score cases andsix feedback
+cases. ProvenanceSHA148984df/preflightSHAce7f24e6. The separate recovery reader
+is prepared; run it only after the original100k observer succeeds. Neither
+reader changes active controllers orrepeats original stages.
+
+Before frozen outcomes, fixed raw-score coverage qualifies06:20:09.659 in2.464s
+(2.484s wrapper),with50 diagnostic/453 active pins,eight configuration cases
+andfive retained boundary fixtures. DeclarationSHAafdab4f3. Afteroriginal
+completion andterminal confirmation, count only the candidate train/four frozen
+logs using pre-action raw-score bins216/432/648/864. Training penalties never
+enter these bins. Reuse completed control coverage:1,262 native actions at216–431,
+none432+. Reconcile all candidate actions,frames andepisodes against original
+replays,keeping fixed first-three-natural-episode means separate from extras/tails.
+
+These are exposure bins,not verified walls,visual coverage orcausal evidence.
+No new replay,assessment,learner orGPU allocation isselected. Run each reader
+once after its prerequisites; do not repeat completed preparation. Retain CPU
+co-host timings without wall-time correction. Frozen gameplay remains pending.

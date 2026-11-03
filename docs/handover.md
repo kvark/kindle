@@ -17,6 +17,14 @@ initial tensors,47 pairedpre-update events,113 finite reports/2,184 actions and
 `/x/Temp/kindle-breakout-life-penalty-20261103/full` contains launch/observer
 identities andstartup review. No100k recovery orfrozen result yet. Do not restart
 the learner orschedule overlapping GPU work; retain the fixed30min cap.
+Read-only readers areprepared under the package root: `review_recovery.py`
+afteroriginal100k success, `review_full_terminal.py terminal` afteroriginal
+completion, then `review_score_coverage.py terminal`. Terminal preflight
+06:19:26.520 passesfive score/six feedback cases/453 pins; coverage preflight
+06:20:09.659 passeseight config/five retained boundary cases/50 diagnostic pins.
+Both preserve original identities. No reader mayrepeat completed stages or
+replay. Preparation iscomplete; retain CPU co-host caveats. Evidence andexact
+commands arein the linked protocol; frozen outcomes remainpending.
 
 Full [life-loss comparison preparation](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
 passes06:14:37.261 UTC/source2eafbf2:five commands,34 config/24 startup/seven

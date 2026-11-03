@@ -29,6 +29,11 @@ verified life-loss penalties. No100k recovery orfrozen result yet. Require the
 fixed200k/12,477updates/30min andfour24-episode assessments. Root
 `/x/Temp/kindle-breakout-life-penalty-20261103/full`; do not restart oroverlap GPU
 work. Only the declared training reward aid changes; raw scores stay unchanged.
+Read-only terminal preparation passes06:19:26.520:five score/six feedback cases,
+all453 pins/five identities. Fixed coverage preparation passes06:20:09.659:
+50 diagnostic/453 active pins,eight config/five retained boundary cases. Run
+recovery,terminal andcoverage readers once after their original prerequisites;
+do not repeat preparation oractive stages. Keep CPU co-host caveats.
 
 The [life-loss 200k comparison](docs/experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
 passes CPU preparation at06:14:37.261 UTC November3/source2eafbf2:five actual
