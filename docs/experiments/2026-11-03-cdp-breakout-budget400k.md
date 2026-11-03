@@ -1,5 +1,11 @@
 # Fresh400k Breakout comparison at the retained replay ratio
 
+**Completed:** sampled92.792/greedy173.708,all0/24 two-wall,in43m36.578s.
+All original services and terminal verification pass; closure preserves the CPU
+launch-wrapper failure as`complete_with_cpu_launch_repair`. See the
+[full result](../results/2026-11-03-cdp-breakout-budget400k.md). The selection
+and live-stage records below are historical; no allocation or successor is active.
+
 Select one fresh400,000-action learner after the [halfway assessment](../results/2026-11-03-cdp-breakout-halfway.md)
 finds22.125→70.750 sampled and33.250→143.667 greedy from100k to200k, with all
 eight lane means improving in both modes. Initial-subtracted score per minute

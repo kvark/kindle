@@ -1,33 +1,32 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh400k/R16 budget comparison](../experiments/2026-11-03-cdp-breakout-budget400k.md)
-launches14:31:26.282 UTC November3/source4bb0d101 with446 pins; mainPID1034231,
-invocation13c5fb9a8be543deb2c279522c8498a2. Keep retained12M64/Auto/N8/B16/T16/
-H15/R16/context1,rates/teacher/expert100/critic1/1,native447fe50/runnercf4ea238.
-Fresh400k/24,977 updates,50-minute training cap; no experience transfers or
-completed-stage repeats. Require100k/6,227,200k/12,477 and300k/18,727 recovery,
-200k common-prefix content/semantic agreement and four fixed24-episode frozen
-arms. More learning work,not a wall-time speedup or independent confirmation.
+The [completed400k/R16 Breakout comparison](2026-11-03-cdp-breakout-budget400k.md)
+raises sampled70.750→92.792 (+31.15%) andgreedy143.667→173.708 (+20.91%),all0/24
+two-wall,in43m36.578s (+103.16%) for400k actions/1,599,381 frames/24,977 updates.
+Initial-subtracted score/min falls35.13%/40.33%. Retain200k as the cheaper baseline
+and400k as a higher-score budget point; no extension,confirmation or automatic
+successor is selected. Final50k teacher CE falls.560514→.411859; guided116.0
+is not unaided competence. Training maximum408/zero432+ and only2,397 native
+actions at216–431 (0.59925% of all actions) show limited later-score exposure,
+not verified wall boundaries or a causal diagnosis.
 
-The CPU launch wrapper fails on initial serialized-file hashes; all357 tensors,
-payload bytes and parsed headers match. JSON header ordering explains the file
-hashes. A separate six-case CPU repair checks actual raw-file integrity and
-canonical content identity, preserving exact tensor/semantic comparisons and
-the original failure. No native/runner/learner restart or GPU repeat occurs.
-Startup passes14:34:41 through30,008 actions/1,853 finite reports,357 matching
-initial tensors and47 pre-update transitions. All100k/6,227,200k/12,477 and
-300k/18,727 recoveries pass with357 finite tensors each. The200k comparison
-passes14:53:46.448:357 exact tensors at initial/100k/200k and38,050 common
-semantic events,including25,000 transitions/12,477 reports. Only declared
-timing,budget/path and serialization ordering are normalized; full replay/RNG/
-live-state equality is not asserted.
-The original recovery observer succeeds15:04:28.160 UTC. One final recovery
-observation passes15:05:24.225 in2.999s,checking all three retained checkpoints,
-446 original/11 repair pins,its terminal journal identity and the unchanged
-active main/progress/postprocessing/collection services. Final frozen results
-remain pending; no earlier stage or reader repeats.
-Root `/x/Temp/kindle-breakout-budget400k-20261103/full`, separate`cpu-repair`.
-Check live state; do not restart this learner or overlap GPU jobs.
+All446 pins,three recoveries,357 matching initial/invariant frozen tensors,
+38,050 exact common200k semantic events,initial800/795 traces,full replays/videos,
+guards,curves,exposure,coverage and comparison pass. Initial/100k/200k tensors
+and canonical content match the retained control; full live replay/RNG equality
+is not asserted. Same12M64/Auto/N8/B16/T16/H15/R16/context1,rates/teacher/expert100/
+critic1/1,native447fe50/runnercf4ea238; fresh life but reused1009/cohort.
+
+Original mainPID1034231/invocation13c5fb9a8be543deb2c279522c8498a2 and all observers
+succeed; main/post/collection finish15:21:22.175/15:21:33.374/15:22:02.467 UTC
+November3/source4bb0d101. Independent terminal reading and repair closure pass
+once15:22:18.072 in2.689s (2.708s wrapper). Closure`complete_with_cpu_launch_repair`
+preserves the original serialized-file-hash launch-wrapper failure; six-case CPU
+repair retains raw integrity and exact header/payload checks. All11 repair pins
+pass. No learner restart,native change or successful GPU/reader/collector repeat.
+CPU co-host costs remain uncorrected. Root`/x/Temp/kindle-breakout-budget400k-20261103`
+is closed; no Kindle GPU allocation remains active. Check live state before
+separately selected work. Breakout and the five-game goal remain unfinished.
 
 The [completed frozen halfway assessment](2026-11-03-cdp-breakout-halfway.md)
 finds **22.125→70.750 sampled /33.250→143.667 greedy** from100k to200k; all eight
