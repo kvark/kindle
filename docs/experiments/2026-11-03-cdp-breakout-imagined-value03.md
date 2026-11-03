@@ -6,7 +6,9 @@ conservative200k projection. All393 pins,357 initial/frozen tensors,47 pre-updat
 events,replay and guards pass. Main/collector succeed08:12:43.805/08:12:49.826
 UTC November3; terminal review completes once08:14:11.721. No bounded stage
 repeats. The preparation fixture's unintended native initialization is preserved.
-A separate fresh full comparison is selected; no bounded experience transfers.
+A separate fresh full comparison completes at35.708 sampled/102.000 greedy,
+below70.750/143.667, in21m44.356s; retain the control. No bounded experience
+transfers. See the completed result for full closure and preserved failures.
 
 Select one fresh bounded check after the actor/critic representation-gradient
 comparison closes. That change lowers both frozen scores, so retain gradients

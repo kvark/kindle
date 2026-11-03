@@ -1,5 +1,16 @@
 # Fresh Breakout imagined-value weight0.3 comparison
 
+**Closed:** the [completed result](../results/2026-11-03-cdp-breakout-imagined-value03.md)
+scores 35.708 sampled/102.000 greedy, below retained70.750/143.667, in21m44.356s
+(+1.28% training time), all0/24 two-wall. Retain imagined-value1/replay-value1
+and actor/critic representation gradients off. All448 pins,recovery,tensors,
+semantic traces,replays,guards and five original services pass. Main/post/collection
+succeed08:44:22.585/08:44:33.979/08:45:10.209 UTC November3; terminal/coverage
+readers complete once08:45:43.886/08:45:54.789. No full-run failure or GPU repeat.
+Five prelaunch CPU failures/corrections and the bounded initialization fixture
+remain preserved. All stages/readers are closed; do not repeat them. No extension,
+sweep,confirmation or automatic successor. The five-game goal remains unfinished.
+
 Separately select one fresh200k-action learner after the bounded check passes
 execution and a conservative21m26s projection. Test whether reducing imagined
 critic weighting improves frozen gameplay against retained70.750 sampled/
