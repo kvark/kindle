@@ -8,6 +8,20 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [replay16k bounded check](experiments/2026-11-03-cdp-breakout-replay16k.md) is selected for CPU qualification and
+bounded execution; no GPU stage has launched yet. Change only shared replay
+capacity100,000→16,384, retaining lambda0.95 and the70.750/143.667 control.
+Native447fe50, runnercf4ea238 andteacher stay exact. Fixed24,576 actions/1,513
+updates test eviction within240s; require16k pre-eviction semantic equality,
+357 initial/invariant tensors,1,024 frozen actions andfull guided replay/guards.
+CPU preflight passes04:50:14.518 UTC November3 in1.033s: two commands,20 config
+cases,357-tensor schema,saturated cadence and338 control pins. Exact source
+review confirms cached recurrent context andsampled refresh, but cache age and
+causal staleness remain unmeasured. Recency,diversity,reuse andcoverage change
+together. Root`/x/Temp/kindle-breakout-replay16k-20261103/native-check`; no full
+learner,capacity sweep orautomatic promotion selected. Check live state before
+launch; do not repeat completed preflight orpreceding lambda1 stages.
+
 The [completed lambda1 comparison](results/2026-11-03-cdp-breakout-lambda1.md) scores **45.667 sampled /
 90.292 greedy**, below retained lambda0.95's70.750/143.667 by35.45%/37.15%,
 in **21m52.277s** (+1.89%). Both final arms have0/24 two-wall successes.
