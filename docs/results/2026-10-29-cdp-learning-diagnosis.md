@@ -22,6 +22,15 @@ service`kindle-breakout-guidance50-200k-20261103`. Check live state; do not rest
 overlap orrepeat this learner. No extension, probability sweep orautomatic
 successor isselected. The five-game goal remains unfinished.
 
+A redundant comparison assertion still requires equal guidance probabilities,
+contradicting the declared change. Original pinned work stays untouched. The
+[separate CPU correction](../experiments/2026-11-03-cdp-breakout-guidance50-cpu-comparison.md)
+qualifies1.218s before frozen outcomes: actual original entry rejects the declared
+pair; corrected entry accepts it andrejects eight corrupt headers. Fourteen repair
+pins are prepared. Wait for original main/collector terminal outcomes, then finish
+only the missing comparison; no GPU, replay, plot oraudit repeats. No repair has
+executed andno original passing completion isclaimed.
+
 The [50% episode-guidance Breakout check](2026-11-03-cdp-breakout-guidance50.md) passes
 8,192 actions /32,746 frames /489 updates in **48.271s**,1.22% above the retained
 20% guidance check. Padded200k projection **21m36.346s** clears30min. Frozen1024/

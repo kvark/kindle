@@ -30,6 +30,15 @@ service`kindle-breakout-guidance50-200k-20261103`. Check live state; do not rest
 overlap orrepeat this learner. No extension, probability sweep orautomatic
 successor isselected. The five-game goal remains unfinished.
 
+A redundant comparison assertion still requires equal guidance probabilities,
+contradicting the declared change. Original pinned work stays untouched. The
+[separate CPU correction](experiments/2026-11-03-cdp-breakout-guidance50-cpu-comparison.md)
+qualifies1.218s before frozen outcomes: actual original entry rejects the declared
+pair; corrected entry accepts it andrejects eight corrupt headers. Fourteen repair
+pins are prepared. Wait for original main/collector terminal outcomes, then finish
+only the missing comparison; no GPU, replay, plot oraudit repeats. No repair has
+executed andno original passing completion isclaimed.
+
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
 The expanded November3 working guide and handover remain in Git at

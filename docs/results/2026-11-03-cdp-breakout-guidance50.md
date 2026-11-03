@@ -16,6 +16,19 @@ Greedy is primary against143.667; sampled70.750 is secondary. No full result is
 available. Do not restart oroverlap this learner. The bounded evidence below
 remains closed.
 
+Source review before frozen outcomes finds a redundant `exploration` equality
+assertion in the original comparison, despite the preceding complete-header
+validator requiring .20→.50. The original qualification covered those components
+separately and missed the combined path. The [isolated CPU correction](../experiments/2026-11-03-cdp-breakout-guidance50-cpu-comparison.md)
+passes1.218s: actual original entry reproduces `AssertionError('exploration')`,
+corrected entry accepts the declared pair andrejects eight wrong headers using
+synthetic final results. No candidate frozen outcome isread. All117 current/338
+retained pins andactive process identity pass;14 repair pins are prepared.
+Original scripts/services stay unchanged. After original terminal outcomes,
+complete only the missing comparison separately andpreserve any original failure.
+No correction hasexecuted; no training, frozen assessment orsuccessful CPU stage
+will repeat. This CPU co-host qualification cost remains uncorrected.
+
 Full helper qualification passes3.211s at22:19:09.599, reproducing saved expert/
 exposure metrics and checking eight expert, nine header, five intervention and
 four selection cases plus corrupted-loss rejection. Five actual queued commands
