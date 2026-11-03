@@ -1,5 +1,19 @@
 # Kindle: CDP learning roadmap
 
+The [fixed subaction diagnostic](results/2026-11-03-cdp-breakout-subaction.md) finds no extra rescues from one
+mid-action command switch: three constant commands and nine two-frame pairs
+both avoid34/120 recorded losses, zero gain in every lane. Retain four-frame
+control; no shorter-interval learner or automatic successor is selected. This
+uses late loss states of the older104.667 greedy policy and a shared recorded
+continuation, not a repeated-feedback policy or the latest143.667 control.
+All302 pins,360 wrapper parity checks,120 recorded controls,eight reversed orders
+and37,016-action/148,038-frame source replay pass. Eight CPU tests;35.736s analysis
+completes07:10:16.312 UTC November3/sourceba52b20, controller07:10:17.145 and
+independent recount07:11:01.186. No failure,GPU work or updates. Root
+`/x/Temp/kindle-breakout-subaction-20261103` is closed; do not repeat stages or
+readers. ReviewSHA8b92a0c2/completionSHA7e72eafb. No allocation active at closure;
+check live state. Breakout and the five-game goal remain unfinished.
+
 The [completed life-loss comparison](results/2026-11-03-cdp-breakout-life-penalty.md) lowers sampled70.750→42.542
 and greedy143.667→90.875 in21m39.349s (+0.89% training time), all0/24 two-wall.
 Initial-subtracted return/min falls41.21%/37.87%. Retain raw training rewards

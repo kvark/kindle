@@ -1,5 +1,12 @@
 # Breakout: local headroom from two-frame command changes
 
+**Complete:** both families avoid34/120 recorded losses, with zero additional
+split-command rescues in all eight lanes. The fixed screen fails. All302 pins,
+360 constant-pair parity checks,120 recorded controls,eight reversed orders and
+the complete source replay pass. No learner or shorter-interval implementation
+is selected. [Result and limits](../results/2026-11-03-cdp-breakout-subaction.md).
+The following is the fixed protocol; do not repeat completed stages.
+
 Select one CPU counterfactual diagnostic after the completed life-loss comparison.
 Earlier teacher takeovers avoided many more recorded losses than late takeovers;
 the retained controller and Kindle both hold commands for four emulator frames.
@@ -52,3 +59,17 @@ per-branch5s. No native model, GPU descriptors, learner updates or RAM policy
 inputs. Life counts are outcome measurements only. Preserve failures and partial
 results. Root `/x/Temp/kindle-breakout-subaction-20261103`. No new learner,
 teacher integration or automatic successor is selected by this protocol.
+
+## Completion
+
+Eight CPU tests and preflight pass07:09:08.824 UTC November3. Selection source
+ba52b20 preserves302 inputs and all120 prior origins. Analysis completes
+07:10:16.312 in35.736s; controller closes07:10:17.145 in36.606s. The new1,080
+candidate branches execute23,421 frames; validation branches execute12,172.
+Complete37,016-action/148,038-frame replay reproduces prior rowsSHA62fb6761 and
+the original task ledger. All parent states and inputs remain unchanged.
+Independent recount passes07:11:01.186 in.637s, deriving34 constant/34 split/zero
+additional rescues from the trajectories. ReviewSHA8b92a0c2/completionSHA7e72eafb.
+No failure,GPU work,updates or old experiment repeat occurs. The package is
+closed; retain four-frame control and the original task gate. No automatic
+successor is selected; the five-game goal remains unfinished.
