@@ -1,5 +1,10 @@
 # Four-action guided Breakout cuts early training time by13.75%
 
+A separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-minimal-guided-200k.md)
+launches20:37:08 UTC/source1917a4de after closure of the bounded work below.
+Startup passes357 tensors/47 events; recovery andfour frozen arms remain pending.
+No full gameplay result isavailable. Do not restart oroverlap the active learner.
+
 The fresh four-action check completes **8192 actions/32,728 frames/489 updates
 in41.133s**, versus47.690s for the closed full18 check: **13.75% less training
 time**. Its1.1-padded200k projection is18m24.645s, below30min. This establishes
