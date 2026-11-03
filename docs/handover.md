@@ -9,15 +9,19 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 3
 
 The [optional completed-return actor](experiments/2026-11-03-cdp-episodic-actor.md) is implemented and awaiting
-isolated packaging/native qualification. Replay finalizes observed discounted
+bounded learning qualification. Replay finalizes observed discounted
 returns at true terminals; positive-advantage weights update only the existing
 actor. Timeouts,unfinished episodes and reset crossings remain masked. Default
 off; no added parameters. It rejects model-derived disagreement bonuses and
 resident device targets,so a candidate also disables action-effects1. A bonus-off
-control is required before any actor-loss attribution. Initial163+5 Rust CPU and55
-Python checks pass; native derivatives,legacy restore and bounded cost/learning
-remain unmeasured. No GPU allocation or full learner is selected yet. Evidence
-root`/x/Temp/kindle-episodic-actor-20261103`; check live state before GPU work.
+control is required before any actor-loss attribution. Nativee3b02163/SHA d406629f
+passes163+5 Rust/1006 packaged Python CPU checks,strict Clippy and12 F64 native
+loss/gradient cases;221 pins/guards pass15:59:04.487 UTC November3. No fixture
+failure or repeat. The [bounded pair](experiments/2026-11-03-cdp-episodic-actor-check.md) is selected: legacy1024 greedy,
+then fresh bonus-off control/candidate8192 actions/489 updates and1024 frozen each.
+Scale100 candidate; no full learner. Check service`kindle-episodic-actor-check-20261103`
+and root`/x/Temp/kindle-episodic-actor-20261103/check` before GPU work; never overlap
+or repeat stages. Runtime/wheels/validation binary retained; build cache retained.
 
 The [CPU replay-actor target audit](results/2026-11-03-cdp-breakout-replay-actor-targets.md) confirms no direct
 return-weighted actor update on executed replay actions. Reusing existing critic
