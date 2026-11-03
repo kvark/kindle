@@ -269,10 +269,13 @@ fn check_encoder_reference(frame_pair: bool, capture: bool) {
             .unwrap();
         assert!(gradient[lane].is_finite() && gradient[lane].abs() > 1e-6);
         let original = parameters[&name][lane];
-        parameters.get_mut(&name).unwrap()[lane] = original + 1e-4;
+        // The paired fixture crosses max-pool boundaries at 1e-4; 1e-5 and
+        // 1e-6 converge without changing winners in the independent reference.
+        let step = if frame_pair { 1e-5 } else { 1e-4 };
+        parameters.get_mut(&name).unwrap()[lane] = original + step;
         let plus = scalar_loss(&parameters);
         let high = parameters[&name][lane];
-        parameters.get_mut(&name).unwrap()[lane] = original - 1e-4;
+        parameters.get_mut(&name).unwrap()[lane] = original - step;
         let minus = scalar_loss(&parameters);
         let low = parameters[&name][lane];
         parameters.get_mut(&name).unwrap()[lane] = original;

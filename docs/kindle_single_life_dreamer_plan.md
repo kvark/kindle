@@ -1,13 +1,16 @@
 # Kindle: CDP learning roadmap
 
-The [optional native RGB frame-pair prototype](experiments/2026-11-03-cdp-rgb-frame-pair.md)
-is selected for implementation andbounded qualification, default off. It supplies
-previous/current resized images as six CHW channels, duplicates the first image
-onreset andpreserves independent stream histories onGPU. Only the first CNN layer
-widens (+2,400 weights at12M); later dimensions stay fixed. Pair pixels enter
-replay together. CPU tests/build, guarded geometry/derivative/replay/restore
-checks andbounded cost/headroom evidence are pending. No GPU check ornew learner
-haslaunched. Package root`/x/Temp/kindle-rgb-frame-pair-20261103`.
+The [optional native RGB frame-pair prototype](results/2026-11-03-cdp-rgb-frame-pair.md) passes
+171 Kindle/5 gym Rust CPU tests, 993 packaged Python tests and strict Clippy.
+The default-off input provides previous/current RGB images as six CHW channels,
+with reset duplication and independent GPU stream history. Only the first CNN
+layer widens (+2,400 weights at12M); pair pixels enter replay together.
+GPU geometry passes at32/48/64. The original derivative fixture fails because
+its1e-4 perturbation crosses max-pool boundaries; a separate captured-gradient
+analysis converges at1e-5/1e-6 with unchanged tolerances. Original GPU failure
+and CPU diagnostic-preparation failures remain preserved. Corrected derivatives,
+replay/restore, legacy compatibility and bounded cost/headroom remain pending.
+No Atari learner has launched. Root`/x/Temp/kindle-rgb-frame-pair-20261103`.
 
 The failed fixed motion readout does not provide positive evidence for this
 jointly trained input; gameplay benefit isunmeasured. Retain20% guidance,
