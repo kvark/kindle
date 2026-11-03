@@ -46,3 +46,7 @@ committed selection, no active Kindle allocation,60s/1GiB CPU cap, all input pin
 unchanged and one independent recount. No native/emulator import,replay,GPU work,
 learner update or automatic successor. Root
 `/x/Temp/kindle-breakout-paddle-contact-timing-20261103`. The five-game goal is open.
+
+Completed once; the [result](../results/2026-11-03-cdp-breakout-paddle-contact-timing.md)
+passes the fixed screen with modest gains and worse tails. The private pinned
+protocol preserves the exact pre-result text. No stage should be repeated.

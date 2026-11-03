@@ -8,31 +8,29 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [fixed next-position timing conversion](results/2026-11-03-cdp-breakout-response-timing.md)
-passes its CPU prediction screen: episode2 MAE2.901→2.628 pixels overall and
-2.722→2.577 near descending, with lower RMSE and all eight lane MAEs improved.
-The formula uses only the recorded next-pooled prediction and current center;
-response coefficients and teacher remain unchanged. Tail errors worsen and
-held-out RMSE within one action of contact is essentially unchanged. This does
-not establish better interception or gameplay. Ball/paddle timestamps must agree;
-constant-velocity shifts can cancel in contact calculations.
+The [consistent contact-timing diagnostic](results/2026-11-03-cdp-breakout-paddle-contact-timing.md)
+passes its CPU screen: episode2 loss-contact paddle MAE6.101→5.757 pixels and
+successful-contact MAE2.376→2.283, with lower RMSE and seven improved lane means.
+Some tail errors worsen; no gameplay gain follows from this saved-plan result.
+All24 pins, five new/eight reused fixtures and739-row/875-metric recount pass.
+Analysis completes09:10:22.541 UTC November3/sourceb7bafe64 in.314s; controller
+09:10:22.591, recount09:11:34.480. No failed/repeated stage, emulator/native import,
+GPU work or update. Root `/x/Temp/kindle-breakout-paddle-contact-timing-20261103`
+is closed; reviewSHAd1e457ca/completionSHA872ae5de. Do not repeat stages.
 
-All21 pins,4 new/8 reused fixtures and the31,817-row/400-metric recount pass.
-Analysis completes09:02:26.168 UTC November3/sourceb7ed09f6 in.945s; controller
-09:02:26.232,recount09:02:52.834. The source52,072 actions/208,254 frames and
-original exclusions reconcile. Root `/x/Temp/kindle-breakout-response-timing-20261103`
-is closed; do not repeat stages. No failure,old replay/analysis repeat,native or
-emulator import,GPU work or update occurs. ReviewSHA8952fec2/completionSHAb5c49aa0.
-No contact-time test,teacher integration,learner or automatic successor is selected.
-No allocation is active at closure; check live state. The five-game goal is open.
+Select the [separate eight-episode CPU gameplay comparison](experiments/2026-11-03-cdp-breakout-contact-timing-policy.md)
+of corrected near-contact plan scoring. The original teacher/runtime stay fixed.
+Require exact replay, unchanged pins and the predeclared10%/five-lane/no-worse-
+success screen before considering a separately specified24-episode assessment.
+No integration or learner is selected. Root
+`/x/Temp/kindle-breakout-contact-timing-policy-20261103`; check live state before
+execution. The five-game goal remains open.
 
-The [preceding current-position estimate](results/2026-11-03-cdp-breakout-paddle-timing.md)
-also passes: `center + displacement/8` lowers episode2 MAE1.435→.975 overall
-and1.470→.963 near descending. All14 pins,8 fixtures and35,610-row/400-metric
-recount pass; source1cc31e3a, completion08:55:44.059 UTC November3. Its root
-`/x/Temp/kindle-breakout-paddle-timing-20261103` is closed with no repeated stages.
-Both diagnostics reuse teacher states and development episodes; neither is an
-independent gameplay result or a native representation measurement.
+The preceding [current-position](results/2026-11-03-cdp-breakout-paddle-timing.md)
+and [next-position](results/2026-11-03-cdp-breakout-response-timing.md)
+conversions also pass their fixed prediction screens, with worse tails in the
+latter. Both roots are closed. All three diagnostics reuse development episodes
+and teacher states; none measures native representation quality or gameplay.
 
 The [completed imagined-value0.3 comparison](results/2026-11-03-cdp-breakout-imagined-value03.md)
 lowers sampled **70.750→35.708** and greedy **143.667→102.000**, all 0/24
