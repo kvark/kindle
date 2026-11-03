@@ -8,6 +8,22 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [actor/critic representation-gradient check](results/2026-11-03-cdp-breakout-acgrads-value1.md) passes 8,192 actions /
+489 updates in 47.297s; its conservative 200k projection is 21m10s. All 379
+pins, 357 initial/frozen tensors, 47 pre-update events, active losses, full
+replay and guards pass. Original main/collection succeed 07:21:24.245 /
+07:21:30.568 UTC November 3; terminal reader completes once 07:24:10.295.
+Bounded stages are closed. A separate fresh 200k comparison is selected with
+30-minute training cap, 100k recovery and four fixed frozen arms against
+70.750 sampled / 143.667 greedy, all zero two-wall. Only the existing
+`actor_critic_gradient` flag changes; native447fe50, runnercf4ea238 and teacher
+stay exact. No gameplay gain is established. Full CPU qualification passes
+five commands, 34 config checks, nine command cases and retention/observer
+checks. Two pre-launch CPU failures (collector date and parser fixture) are
+preserved and corrected; no GPU stage repeats. Root
+`/x/Temp/kindle-breakout-acgrads-value1-20261103`; check live state before work.
+Breakout and the five-game goal remain unfinished.
+
 The [fixed subaction diagnostic](results/2026-11-03-cdp-breakout-subaction.md) finds no extra rescues from one
 mid-action command switch: three constant commands and nine two-frame pairs
 both avoid34/120 recorded losses, zero gain in every lane. Retain four-frame

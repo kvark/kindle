@@ -57,3 +57,12 @@ Root `/x/Temp/kindle-breakout-acgrads-value1-20261103`, runtime remains
 native implementation, global default, coefficient sweep or automatic successor
 changes. Reused development seeds and coupled policy/value representation
 gradients preclude isolated causal or seed-reliability claims.
+
+## Closure
+
+The [bounded result](../results/2026-11-03-cdp-breakout-acgrads-value1.md) passes
+8,192 actions / 489 updates in 47.297s, all 379 pins and active-loss checks.
+Original main/collection succeed 07:21:24.245 / 07:21:30.568 UTC November 3;
+the independent terminal reader completes once at 07:24:10.295. No stages repeat.
+The 21m10s conservative projection passes; a separate
+[fresh 200k protocol](2026-11-03-cdp-breakout-acgrads-value1-200k.md) is selected.
