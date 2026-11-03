@@ -1,20 +1,25 @@
 # Kindle: CDP learning roadmap
 
-The [fresh200k RGB frame-pair comparison](experiments/2026-11-03-cdp-breakout-rgb-frame-pair-200k.md) is separately selected
-for preparation after the [completed bounded check](results/2026-11-03-cdp-rgb-frame-pair.md):51.357s for8192
-fresh actions/489 updates, padded22m59s projection and6.097GiB conservative full
-replay headroom. Native/legacy checks pass; original failures remain preserved.
-Use the same qualified runtime,12M64/Auto/N8/B16/T16/H15/R16/context1,20% guidance,
-expert100/replay-value1 and rates4e-5/4e-4/8e-5. Require100k/6227 recovery and final/
-actual-initial sampled/greedy24-episode assessments against70.750/143.667.
+The [fresh200k RGB frame-pair comparison](experiments/2026-11-03-cdp-breakout-rgb-frame-pair-200k.md) launches23:33:53 UTC
+November3/source8ea32681 with114 pins and a30-minute training cap. Startup passes
+357 bounded-matching initial tensors,47 pre-update semantic events, correct
+cadence and190 finite reports through3416 actions. Main PID1087230, invocation
+675fde529a5a4dc080adc6d655f2312b; independent recovery/terminal observers are active.
+No full frozen result is available. Require100k/6227 recovery and final/actual-
+initial sampled/greedy24-episode assessments against retained70.750/143.667.
 
-Both-frame input changes first-layer geometry/initialization and replay storage;
-native, runner and optional-action teacher/schedule source bytes also differ
-from the retained control. Verify full18 default paths; no isolated causal claim.
-No full learner has launched yet. Root`/x/Temp/kindle-rgb-frame-pair-20261103/full`;
-service`kindle-breakout-rgb-pair-200k-20261103`,30min training cap. No extension,
-second learner orautomatic successor. Check live state before GPU work.
-The original864/90%-two-wall gate and five-game goal remain unfinished.
+Use qualified native24e701bc/SHA b451bc9,12M64/Auto/N8/B16/T16/H15/R16/context1,
+20% guidance/expert100/replay-value1 and rates4e-5/4e-4/8e-5. Frame pairs change
+first-layer geometry/initialization and replay storage. Native, runner and
+teacher/schedule source differ from the retained control; full18 default policy
+source and2048 synthetic actions agree. No isolated causal claim. The original
+CPU teacher-fixture failure and all prior qualification failures remain retained.
+[Bounded evidence and active details](results/2026-11-03-cdp-rgb-frame-pair.md). Root
+`/x/Temp/kindle-rgb-frame-pair-20261103/full`; service
+`kindle-breakout-rgb-pair-200k-20261103`. Do not restart, repeat earlier lives or
+schedule another GPU job while this learner is active. No extension, second
+learner orautomatic successor. The original864/90%-two-wall gate and five-game
+goal remain unfinished.
 
 The [completed50% episode-guidance Breakout comparison](results/2026-11-03-cdp-breakout-guidance50.md)
 finishes200k actions /799,731 frames /12,477 updates in21m37.887s (+.77%).

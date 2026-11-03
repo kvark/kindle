@@ -4,10 +4,55 @@ The optional six-channel input passes implementation, legacy compatibility and
 bounded execution/cost checks. Training8192 actions /489 updates takes51.357s,
 7.69% more than the retained single-image check; padded200k projection is22m59s.
 Conservative full-replay headroom is6.097GiB. Frozen1024 actions contain no natural
-episodes, so gameplay benefit remains unmeasured. No full learner is selected.
+episodes, so gameplay benefit remains unmeasured. That qualification selected
+no full learner; the separately selected comparison below is now active.
 This work is part of the existing five-game goal; Breakout retains70.750 sampled/
 143.667 greedy and its original864/90%-two-wall gate.
 See the [fixed protocol](../experiments/2026-11-03-cdp-rgb-frame-pair.md).
+
+## Fresh 200k comparison is active
+
+The [separate full protocol](../experiments/2026-11-03-cdp-breakout-rgb-frame-pair-200k.md)
+selects one fresh200k-action/12,477-update comparison, after bounded closure,
+with a30-minute training cap. It launches **23:33:53.049 UTC November3**, source
+`8ea3268158763bee64dac060ee7db5d8b4e66c37`, main PID1087230/invocation
+`675fde529a5a4dc080adc6d655f2312b`. Root is `full/` beneath the package root;
+unit `kindle-breakout-rgb-pair-200k-20261103`. Recovery observer PID1087236 and
+terminal observer PID1087233 are active. No full frozen result is available.
+Do not restart this learner or schedule overlapping GPU work.
+
+Keep12M64/Auto/N8/B16/T16/H15/R16/context1,20% guidance/cap1920/all-state labels,
+expert100/replay-value1 and base/encoder4e-5,dynamics4e-4,behavior8e-5. Sampled
+collection and posteriors remain. Primary frozen evaluation is greedy, with
+sampled secondary, final and actual-initial24-episode arms each. Compare against
+retained143.667 greedy/70.750 sampled, using each model's own initial and actual
+training time. The original864/90%-two-wall gate stays unchanged. No extension,
+second learner or automatic successor is selected.
+
+Full18 teacher policies have identical AST definitions and schedule methods;
+the newer source adds optional four-action support. CPU checks cover2048
+synthetic actions, ordinary episode selection/resets, feedback and bounded caps,
+with no emulator/native construction. The first fixture incorrectly omitted a
+required cap for the older bounded guidance kind; its source/error remain in
+`full/teacher-preparation-failure.json`, and the corrected check passes0.509s.
+This does not establish complete training equivalence or a causal frame-pair
+effect: native, runner, teacher and schedule source hashes differ from control.
+
+Changed helper qualification passes3.207s, including the complete comparison
+entry point with synthetic outcomes and10 corrupted-header rejections. It also
+checks accounting, own-initial comparison rules, replay argv/manifest paths and
+null terminal journal messages. The five actual queued commands pass0.302s
+without real native/emulator construction or GPU descriptors. All114 declaration
+pins are verified. Historical source resolution preserves the exact old replay
+script without rewriting its original declaration.
+
+Startup passes all357 initial tensors against the paired bounded check,47
+pre-update semantic events and first-update action376. It does not claim equality
+with the three-channel initial model. The1.915s startup CPU audit remains in
+training wall time. At the recorded live check,190 finite reports reach3416
+actions and the original main/recovery/terminal identities remain active.
+Require the read-only100k/6,227 recovery and full final/initial frozen assessments,
+replays/videos, curves, exposure and comparison before drawing a result.
 
 ## Implementation and package
 
