@@ -38,8 +38,10 @@ Require exact config/cadence,finite reports,all357 matching initial tensors and
 pre-update semantics,changed CNN/reward/actor/value parameters,raw actor/world CE
 alignment,full training pixel/action/label replay,host guards and unchanged357
 frozen tensors with zero updates. A separate legacy frozen restore must reproduce
-the retained control's fixed1,024-action prefix with no new config fields or
-updates. Checkpoint layout must come from the retained actual357-tensor schema.
+the retained control's fixed1,024-action prefix with no newly enabled options or
+updates. The later native config serializes the existing default
+`replay_value_bootstrap=imagined`; allow exactly that known default addition when
+comparing with447fe50 config, and record it explicitly. Checkpoint layout must come from the retained actual357-tensor schema.
 Do not claim source equivalence to447fe50: the new binary contains intervening
 default-off changes. Require conservative training_seconds*200000/8192*1.10
 <=1800 before considering a full learner.
