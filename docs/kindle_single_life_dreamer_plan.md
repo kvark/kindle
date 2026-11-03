@@ -1,5 +1,17 @@
 # Kindle: CDP learning roadmap
 
+The [fresh200k context9 comparison](experiments/2026-11-03-cdp-breakout-context9-200k.md)
+is selected after the bounded check passes its cost/correctness gates. Use eight
+forward-only prefix steps then16 learning steps,12M64/Auto/N8/B16/T16/H15/R16,
+retained rates/teacher/constant expert100/critic1/1. Cap30min,first update440,
+12,473 final updates,100k/6,223 recovery and four fixed24-episode frozen arms
+against70.750/143.667,all0/24 two-wall. Sampling/warmup/runtime differ; no isolated
+cause. Native65dd69b4/runtime and bounded runner reused; no prior experience.
+CPU controller preparation is pending; no full learner has started. Root
+`/x/Temp/kindle-replay-context-20261103/full`,service
+`kindle-breakout-context9-200k-20261103`. No GPU allocation active at selection;
+check live state before work. Five-game goal unfinished.
+
 The [optional replay-state recomputation check](results/2026-11-03-cdp-replay-context.md)
 passes8,192 actions/32,730 frames/485 updates in50.564s. Context9 adds eight
 forward-only steps before16 learning steps; no new parameters or prefix targets.
