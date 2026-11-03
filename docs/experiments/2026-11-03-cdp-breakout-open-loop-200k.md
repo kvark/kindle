@@ -122,3 +122,26 @@ the earlier bounded collector failure and separate CPU repair. Terminal mode
 remains pending until all five original services and completion evidence finish.
 Keep these CPU co-host times without correction. No gameplay conclusion,
 extension or automatic successor follows from passing preparation/startup.
+
+## Halfway recovery — November 3
+
+The original recovery observer succeeds **12:01:22.587269 UTC**, without stopping
+the learner. The fixed independent reader runs once and passes
+**12:01:38.194060 UTC**, in1.300s body/1.319s wrapper. It verifies all644 pins,
+100,000-action/6,227-update metadata and357 finite tensors, and hashes all four
+retained files totaling206,067,280 bytes. The audited complete training prefix
+contains100,648 actions and6,268 finite reports. Both the observer and learner
+retain their original invocation identities; the main remains active.
+
+`checkpoint-review-100k.json` SHA256 is
+`48553be090adca31b6c84a252313e64be42166ea328c4483948738fff185cce2`;
+`recovery-retention-100k.json` SHA256 is
+`84997973b10d4493c1069995665be889a5601f61c14c92e8313af245bd8f1239`.
+`recovery-confirmation.json` SHA256 is
+`75873da952bfa52877464aa94ea496fd9aac60b0373d3f9b6ecb5c60de989813`.
+The metadata SHA256 is
+`c8c0798398b7669f70af83da601016ec211dd2ef6231ab031295798492949962`.
+The retained checkpoint contains weights and metadata; replay,RNG,games and
+live belief are not included. No restore,learning,evaluation or observer stage
+is repeated. Keep the CPU co-host time without correction. Recovery reading is
+closed; terminal reading and frozen gameplay remain pending.

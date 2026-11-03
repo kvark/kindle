@@ -14,13 +14,15 @@ training cap. Keep constant actor/world imitation100 and retained12M64/Auto/N8/
 B16/T16/H15/R16; add the qualified three-step world objective. Startup passes
 357 matching initial tensors,47 pre-update events and442 finite reports through
 7,448 actions. Original main **PID1020432/invocation7c92d99e93bb4780a04e64d685c6d714**
-and all four observers remain active at11:55 UTC; progress40,712 actions/2,521
-updates at11:54:45 is not a frozen result.
+continues unchanged at12:01:38 UTC. The original100k recovery observer succeeds
+12:01:22.587; independent reading passes once12:01:38.194 in1.319s wrapper:
+100,000 actions/6,227 updates,357 finite tensors,four retained files and644 pins.
+All6,268 reports through100,648 actions are finite; frozen results remain pending.
 
-Require100k/6,227 recovery and final/actual-initial sampled/greedy24-episode
+Require final/actual-initial sampled/greedy24-episode
 assessments against70.750/143.667,all0/24 two-wall. CPU controller qualification
-passes before launch; recovery/terminal readers are fixed before outcomes,
-and terminal-reader preflight passes five tamper cases/all644 pins. Native
+passes before launch; terminal reading remains pending after its passing
+preflight. Recovery reading is complete; do not repeat it. Native
 c2d627f3/runner8946f5f3 differ from retained447fe50/cf4ea238; no isolated cause.
 Root `/x/Temp/kindle-breakout-open-loop-20261103/full`; main service
 `kindle-breakout-open-loop-200k-20261103`. Check live state; do not restart,
