@@ -52,3 +52,36 @@ Record actual guidance exposure, curves and CPU co-host timings without time
 correction. Reused development seed/cohort and jointly changed policy/value
 gradients preclude isolated mechanism or seed-reliability claims. No gameplay
 gain is available at selection; Breakout and the five-game goal remain unfinished.
+
+## Qualification and launch
+
+The full CPU harness passes at 07:26:56.798 UTC November 3 in 2.382s:
+19 scripts, five actual commands, 34 config checks, nine prelaunch-command
+cases, 17 startup-header cases, four observer-parser cases, 12 recovery cases,
+six retention fixtures, two collector-retention cases, four metadata cases,
+44 literal paths and 806 declaration-path entries. All 379 bounded / 338 control
+pins remain unchanged. Two earlier CPU failures are preserved: the adapted
+collector used the old date, then the parser fixture expected a dynamics CLI
+attribute absent from the byte-identical runner. Both are corrected before
+selection. No native agent or environment is constructed during qualification.
+
+The original main launches at **07:27:43.538 UTC November 3**, source
+`286c54bddb6857384401feac94e506cedf325cf0`, PID **990350**, invocation
+`9aa43ad5b82b4f25a97817f22593d39d`, with **428 pins**. Declaration SHA
+`416bccea8c93522005c74e4a6c0666d5154ea2f8541dcbc7af5646dad12bb185`.
+Unit `kindle-breakout-acgrads-value1-200k-20261103`; original progress,
+recovery, postprocessing and collection services are attached. Do not restart
+it, repeat earlier stages or overlap another GPU allocation.
+
+Startup passes at 07:28:15.393: 357 matching initial tensors against both starts,
+47 paired pre-update events, exact config and first-six update cadence,
+270 finite/active-loss reports through 4,696 actions. The 4,096-action progress
+sample takes 23.024s; no full-run cost or frozen gameplay result is available.
+The once-only terminal reader is qualified at 07:28:48.039 in 2.305s with five
+score cases, all 428 pins and unchanged original process. Fixed descriptive
+coverage qualifies at 07:29:28.982 in 2.436s, before frozen outcomes: five new
+configuration cases reuse five retained boundary fixtures, score thresholds
+216/432/648/864 and the existing control analysis. These are descriptive score
+bins, not verified walls or causal evidence. Retain startup/reader CPU co-host
+timings without correcting training time. Run recovery confirmation once after
+the original 100k observer; terminal and coverage readers once after completion.

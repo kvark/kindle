@@ -13,15 +13,22 @@ The [actor/critic representation-gradient check](results/2026-11-03-cdp-breakout
 pins, 357 initial/frozen tensors, 47 pre-update events, active losses, full
 replay and guards pass. Original main/collection succeed 07:21:24.245 /
 07:21:30.568 UTC November 3; terminal reader completes once 07:24:10.295.
-Bounded stages are closed. A separate fresh 200k comparison is selected with
+Bounded stages are closed. The separate fresh 200k comparison launches at
+07:27:43.538 UTC November 3/source286c54b with 428 pins, PID990350, invocation
+`9aa43ad5b82b4f25a97817f22593d39d`; original observers are attached. Startup
+passes 357 matching initial tensors, 47 pre-update events and 270 finite reports
+through 4,696 actions. Do not restart or overlap this active learner. Keep the
 30-minute training cap, 100k recovery and four fixed frozen arms against
 70.750 sampled / 143.667 greedy, all zero two-wall. Only the existing
 `actor_critic_gradient` flag changes; native447fe50, runnercf4ea238 and teacher
-stay exact. No gameplay gain is established. Full CPU qualification passes
+stay exact. No full frozen result or gameplay gain is established. Full CPU qualification passes
 five commands, 34 config checks, nine command cases and retention/observer
 checks. Two pre-launch CPU failures (collector date and parser fixture) are
 preserved and corrected; no GPU stage repeats. Root
-`/x/Temp/kindle-breakout-acgrads-value1-20261103`; check live state before work.
+`/x/Temp/kindle-breakout-acgrads-value1-20261103`. Terminal/coverage readers
+qualify once at 07:28:48.039 / 07:29:28.982 with all 428 active pins; retain
+CPU co-host timings. Recovery confirmation, terminal and coverage results
+remain outstanding; check live state before work.
 Breakout and the five-game goal remain unfinished.
 
 The [fixed subaction diagnostic](results/2026-11-03-cdp-breakout-subaction.md) finds no extra rescues from one

@@ -49,3 +49,16 @@ Retain the 12M64/Auto/N8/B16/T16/H15/R16/lambda.95/encoder4e-5/behavior8e-5/
 dynamics4e-4/replay-value1/expert100/replay100k control pending frozen results.
 Reused development seeds limit reliability claims; policy and value gradients
 change together. The original 90% two-wall gate and five-game goal remain unmet.
+
+## Fresh comparison active
+
+The separately selected full learner launches at 07:27:43.538 UTC November 3,
+source286c54b, PID990350 / invocation `9aa43ad5b82b4f25a97817f22593d39d`, with
+428 pins and original recovery/progress/postprocessing/collection observers.
+Startup passes 357 matched initial tensors, 47 paired semantic events and 270
+finite reports through 4,696 actions. The 200k/12,477-update training cap is
+30 minutes; 100k recovery and all four frozen assessments remain required.
+The full CPU harness and terminal/coverage readers are qualified. Two pre-launch
+CPU failures are preserved and corrected; no GPU stage repeats. See the
+[full protocol](../experiments/2026-11-03-cdp-breakout-acgrads-value1-200k.md)
+for exact qualification and identities. No full frozen result is available.
