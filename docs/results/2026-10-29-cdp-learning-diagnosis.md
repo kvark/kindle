@@ -1,19 +1,27 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [optional completed-return actor](../experiments/2026-11-03-cdp-episodic-actor.md) is implemented and awaiting
-bounded learning qualification. Replay finalizes observed discounted
-returns at true terminals; positive-advantage weights update only the existing
-actor. Timeouts,unfinished episodes and reset crossings remain masked. Default
-off; no added parameters. It rejects model-derived disagreement bonuses and
-resident device targets,so a candidate also disables action-effects1. A bonus-off
-control is required before any actor-loss attribution. Nativee3b02163/SHA d406629f
-passes163+5 Rust/1006 packaged Python CPU checks,strict Clippy and12 F64 native
-loss/gradient cases;221 pins/guards pass15:59:04.487 UTC November3. No fixture
-failure or repeat. The [bounded pair](../experiments/2026-11-03-cdp-episodic-actor-check.md) is selected: legacy1024 greedy,
-then fresh bonus-off control/candidate8192 actions/489 updates and1024 frozen each.
-Scale100 candidate; no full learner. Check service`kindle-episodic-actor-check-20261103`
-and root`/x/Temp/kindle-episodic-actor-20261103/check` before GPU work; never overlap
-or repeat stages. Runtime/wheels/validation binary retained; build cache retained.
+The [completed-return actor bounded pair](2026-11-03-cdp-episodic-actor.md) passes: bonus-off control
+8192 actions/489 updates in36.677s versus scale100 candidate38.277s (+4.36%).
+Candidate33105 positive replay rows across431 updates start at action1224;
+conservative200k projection17m07.959s passes30min. Both1024 frozen arms havezero
+updates/no natural episodes. Execution and early cost pass; gameplay is unmeasured.
+Default-off nativee3b02163/SHA d406629f adds no parameters; bonus-off removes96
+ensemble tensors,leaving261. Completed returns mask unfinished/time-limited
+episodes and detach this actor-only term. Model disagreement/resident targets
+are rejected. All163+5 Rust/1006 Python CPU checks,Clippy,12 F64 native cases,
+221 native/255 bounded/338 retained pins,261 matching/invariant tensors,47
+pre-update events,full guided replays and legacy357 tensors/128 events pass.
+
+Original servicePID1048190/invocation12873b06470242aeb15a4fb4bf3ec483 succeeds
+16:07:03 UTC November3/source3018736f; independent terminal collection16:08:58.335
+passes in.645s. No GPU/learner/replay/reader failure or repeat. Bounded root
+`/x/Temp/kindle-episodic-actor-20261103/check` is closed; do not rerun. Runtime,
+wheels,validation binary and1.008GB cache retained. No Kindle allocation active.
+The [fresh200k control/candidate pair](../experiments/2026-11-03-cdp-episodic-actor-200k.md) is selected for preparation,
+not launched: same bonus-off recipe,30min per learner,100k recovery and final/
+actual-initial sampled/greedy24-episode assessments. Keep retained gameplay and
+original864/90%-two-wall gate. No bounded experience reuse,extension or automatic
+confirmation. Check live state before work; the five-game goal is unfinished.
 
 The [CPU replay-actor target audit](2026-11-03-cdp-breakout-replay-actor-targets.md) confirms no direct
 return-weighted actor update on executed replay actions. Reusing existing critic
