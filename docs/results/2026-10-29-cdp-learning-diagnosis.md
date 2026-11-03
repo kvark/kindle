@@ -1,15 +1,27 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [optional replay-state recomputation qualification](../experiments/2026-11-03-cdp-replay-context.md)
-is selected. Context9 recomputes eight preceding observations with current world
-weights before the unchanged16 learning steps; context1 retains its old path.
-No new parameters or prefix targets are added. Sampling and warmup change:
-first update440,485 updates at8,192 and12,473 at200k. Implementation and CPU
-qualification are in progress; native numerical,legacy and bounded8,192-action
-checks remain pending. No full learner or gameplay benefit is established.
-Root `/x/Temp/kindle-replay-context-20261103`; protocol source5eda02cb. No GPU
-allocation is active at selection; check live state before GPU work. Historical
-closed stages remain closed. The five-game goal remains unfinished.
+The [optional replay-state recomputation check](../results/2026-11-03-cdp-replay-context.md)
+passes8,192 actions/32,730 frames/485 updates in50.564s. Context9 adds eight
+forward-only steps before16 learning steps; no new parameters or prefix targets.
+Prefix time is3.234s/6.668ms per update. Conservative200k projection22m37.921s
+passes30min; gameplay benefit remains unmeasured. First update440,all485 finite
+reports,357 matching initials/invariant frozen tensors,47 common pre-update
+and128 legacy events,full pixel/action/label replay and guards pass. Frozen1024
+in.914s haszero updates/no natural episodes. Keep the70.750/143.667 control.
+
+Native65dd69b4/SHA7b15cb69 passes155+5 Rust/983 packaged Python CPU checks and
+strict Clippy. CPU target-shape/unused-helper failures and a failed RGB fixture
+remain. Test-only694c64bd passes156+5 CPU checks and the repaired device fixture;
+production/runtime unchanged,passing posterior fixture not repeated. All235
+native pins/guards pass. Original bounded service fails13:08:10 UTC November3
+only on its stale489-vs-declared485 queue assertion; the unstarted frozen stage
+continues once. A separate CPU repair handles omitted decay-only scale fields.
+All601 original/631 repair pins pass; collection completes13:11:47.928 in2.590s,
+closure`complete_with_cpu_controller_repair`. Original service remains failed;
+no training/frozen/replay stage repeats. Runtime/source differs447fe50,not an
+isolated cause. Root `/x/Temp/kindle-replay-context-20261103` and readers are
+closed; no full learner/sweep/successor selected. No active GPU allocation;
+check live state before work. The five-game goal remains unfinished.
 
 The [CPU replay-context age reconstruction](../results/2026-11-03-cdp-breakout-replay-age.md)
 matches all12,477 logged updates and199,632 sampled starts in.387s CPU.
