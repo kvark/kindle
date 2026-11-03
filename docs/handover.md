@@ -8,33 +8,28 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [fresh200k actor-only decay comparison](experiments/2026-11-03-cdp-breakout-actor-only-decay-200k.md)
-launches11:02:01.359 UTC November3/source18d493e6 with649 pins. Original main
-PID1015785/invocationb5f028d5fc304d1ea304ddd47e544b6d and all four observers are
-active; recovery succeeds11:13:07.765 UTC with100k/6,227,357 finite tensors and
-four retained files. Independent confirmation11:13:49.130 verifies649 pins and
-original identity. The fixed pre-fade comparisons match all12,500 transitions,
-6,227 reports,170 episodes,167 resets and all357 tensors/51,502,659 elements
-exactly through100k. Trace/tensor readers complete11:14:31.209/11:14:30.090;
-reviews550f0fb1/c11f2469. No full-state or broad runtime equivalence claim.
-Startup passes357 initial tensors,47 events and correct cadence. Hold actor imitation100
-through6227 (100k),fade to0 at9352 (150k),world100 throughout; retain12M64/Auto/
-N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/policy1/critic1/1 and teacher.
-Fresh200k/12,477,30-minute cap,100k recovery,four fixed24-episode final/actual-initial
-sampled/greedy assessments against70.750/143.667,all0/24 two-wall. No frozen result
-or successor is available. Nativec2d627f3/runner8946f5f3 differ from447fe50;
-no isolated causal claim.
+The [completed actor-only imitation-decay comparison](results/2026-11-03-cdp-breakout-actor-only-decay.md)
+lowers frozen sampled **70.750→51.833** and greedy **143.667→104.750**, all0/24
+two-wall, in **21m42.074s** (+1.10%). Initial-subtracted score/min falls28.07%/
+28.30%. Retain constant actor/world imitation100 and the70.750/143.667 control.
+The actor holds100 through100k, fades to0 by150k and stays0 for3,126 reports;
+world stays100. Guided online67.78→74.68 is not unaided competence.
 
-CPU preflight passes; original converter-import failure and pre-test F32 fixture
-correction remain retained. Startup1.575s,terminal-reader qualification2.524s and
-fixed100k-prefix selection1.334s co-host costs remain uncorrected. Recovery
-confirmation1.375s,checkpoint selection3.519s and overlapping trace/tensor analyses
-4.442s/3.255s also remain uncorrected. These completed readers are closed; do not
-repeat them. Actor weight is52.064003 at123,960 actions;world stays100. Final
-training/zero-weight tail/frozen assessments remain pending;no additional GPU work. Root `/x/Temp/kindle-actor-only-decay-20261103/full`;
-service`kindle-breakout-actor-only-decay-200k-20261103`. Check live state; do not
-restart,repeat completed stages or overlap another GPU job. The five-game goal
-remains unfinished.
+All649 pins,100k recovery,357 matching initial/invariant frozen tensors,paired
+initial traces,full replays/videos,guards,curves,exposure and comparison pass.
+The fixed pre-fade checks match12,500 transitions,6,227 reports,170 episodes,
+167 resets and all357 tensors/51,502,659 elements exactly at100k. Nativec2d627f3/
+runner8946f5f3 still differ from447fe50; no full-state, broad runtime or isolated
+causal claim. All five original services succeed; main/post/collection finish
+11:28:15.248/11:28:35.619/11:28:40.720 UTC November3, source18d493e6. Independent
+terminal reading passes once11:29:04.321 in1.512s wrapper. No full-run failure,
+GPU repeat or collector/reader repeat. Earlier CPU preparation failures and
+co-host timings remain preserved without time correction.
+
+Root `/x/Temp/kindle-actor-only-decay-20261103/full` and all its readers are
+closed; do not repeat them. No allocation remains active at closure; check live
+state before GPU work. No extension,sweep,confirmation or automatic successor
+is selected. Breakout and the five-game goal remain unfinished.
 
 The [actor-only imitation-decay qualification](results/2026-11-03-cdp-actor-only-imitation-decay.md)
 passes F64 loss/derivatives and fresh Breakout8,192 actions/32,725 frames/489

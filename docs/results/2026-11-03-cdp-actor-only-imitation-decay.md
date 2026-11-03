@@ -13,6 +13,11 @@ signal on two batches. The [earlier shared fade](2026-11-01-cdp-breakout-expert-
 weakened both actor and world imitation on an older recipe and regressed. This
 option permits a different test; neither diagnostic proves a gameplay cause.
 
+The subsequent [fresh200k comparison](2026-11-03-cdp-breakout-actor-only-decay.md)
+is complete: sampled51.833/greedy104.750 regress from70.750/143.667, all0/24
+two-wall, in21m42.074s. Retain constant imitation; the qualification below
+establishes execution and numerical behavior, not gameplay benefit.
+
 ## Native change and qualification
 
 Native source `c2d627f3ddee08bc222b546a4614776720f421bd` adds

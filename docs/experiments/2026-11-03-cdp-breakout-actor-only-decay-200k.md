@@ -92,15 +92,15 @@ finite reports through5,480 actions. Actor/world weights remain100. The1.575s
 CPU wrapper co-hosts with training; keep that timing without correction.
 
 DeclarationSHA`8118fc778be64e576de7ae7d6ad91c7aa4df3195adad855940d88070d3642396`.
-No frozen gameplay result is available. Do not restart the original learner,
-repeat completed stages or schedule overlapping GPU work.
+At startup, no frozen gameplay result was available. The completed outcome is
+recorded below. Do not restart the original learner or repeat completed stages.
 
 The independent terminal reader qualifies five score checks at11:03:43.994
 in2.503s CPU/2.524s wrapper,verifying649 pins and the original live identity.
 Recovery and terminal readers are fixed before frozen outcomes. A separate
 first100k-action saved-prefix comparison is selected11:05:36.936,seven fixtures/
 six diagnostic pins/all649 learner pins,in1.315s CPU/1.334s wrapper. After the
-original recovery succeeds,it will compare recorded transitions,learner reports,
+original recovery succeeds,the fixed reader compares transitions,learner reports,
 episodes and resets through100k;exclude only timestamps,episode wall time,
 learner timing,and the candidate's two scale fields,each required100. Retain
 differences as evidence; do not use them to trigger a rerun or alter this learner.
@@ -144,7 +144,21 @@ and the original learner identity stay unchanged. Checkpoints omit replay,belief
 games and RNG; these results do not prove full-state equivalence or broad runtime
 equivalence. They strengthen the comparison before the actor schedule diverges.
 
-Actor imitation is now fading while world remains100:at123,960 actions/update7,725,
-the reported actor weight is52.064003. The original learner continues toward200k;
-zero-weight tail and all four frozen assessments are still pending. No GPU stage,
-observer or reader repeats; no extension or successor is selected.
+## Completed outcome
+
+The original comparison completes200,000 actions/799,600 frames/12,477 updates
+in21m42.074s (+1.10% versus control). Sampled51.833/greedy104.750 fall26.74%/
+27.09% below70.750/143.667; own initials1.417/2.208 match. All0/24 two-wall.
+All3,126 zero-actor reports retain world100. Keep constant actor/world imitation.
+See the [completed result](../results/2026-11-03-cdp-breakout-actor-only-decay.md)
+for learning per minute, exact pre-fade evidence, validation and limits.
+
+All649 pins,recovery,initial/frozen tensors,paired initial traces,replays/videos,
+guards,curves,exposure and comparison pass. All five original services succeed;
+main/post/collection finish11:28:15.248/11:28:35.619/11:28:40.720 UTC November3.
+Independent terminal reading completes once11:29:04.321 in1.488s CPU/1.512s wrapper.
+No full-run failure,GPU repeat or original collector/reader repeat occurs.
+Earlier CPU preparation failures and co-host costs remain recorded without
+training-time correction. No extension,sweep,confirmation or successor is selected.
+The package and all readers are closed; no allocation is active at closure.
+Check live state before new GPU work. The five-game goal remains unfinished.
