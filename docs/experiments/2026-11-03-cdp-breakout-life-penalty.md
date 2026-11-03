@@ -1,5 +1,9 @@
 # Optional sparse life-loss feedback: bounded Breakout check
 
+CPU qualification and bounded preflight now pass; see the
+[implementation result](../results/2026-11-03-cdp-breakout-life-penalty.md).
+The original bounded requirements below remain fixed. No full learner is selected.
+
 Select development and qualification of one default-off training aid after the
 [saved reward-visibility result](../results/2026-11-03-cdp-breakout-life-feedback.md).
 Its120 selected lost lives all have zero immediate reward;96 do not end the

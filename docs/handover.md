@@ -8,6 +8,16 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [life-loss feedback overlay](results/2026-11-03-cdp-breakout-life-penalty.md)
+passes 57 CPU tests / 365 pins at 06:00:51.313 UTC and bounded preflight at
+06:03:31.852. Both actual commands, nine config assertions, five prefix cases,
+cadence and the 357-tensor schema pass. Two CPU fixture/path failures are preserved;
+production reward code is unchanged across repairs. Root
+`/x/Temp/kindle-breakout-life-penalty-20261103` contains the isolated runtime,
+source receipts, tests and `native-check` controllers. Native447fe50 stays exact.
+Next select/launch only the declared 8,192-action check on an idle host. No GPU
+stage or full learner has run at this CPU milestone; do not repeat qualification.
+
 The [saved life-feedback diagnostic](results/2026-11-03-cdp-breakout-life-feedback.md)
 is complete at 05:46:57.594 UTC, source cbdf048. All 120 selected lost lives have
 zero immediate reward; 96 are nonterminal. Eleven fixtures and 14 input pins
@@ -22,7 +32,7 @@ Keep raw rewards and scores separate from declared training rewards; preserve
 episode boundaries and retained runtimes. Qualify the accounting, refusals,
 default-off compatibility and replay audit on CPU before one fresh 8,192-action
 check. Frozen evaluation has shaping off. Native 447fe50 and retained replay100k
-settings stay fixed. No implementation, GPU check or full learner has passed;
+settings stay fixed. CPU implementation is qualified; no GPU check or full learner has passed;
 no Kindle service is active at closure. Check live state before allocating work.
 
 The [completed replay16k comparison](results/2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000

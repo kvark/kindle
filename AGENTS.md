@@ -20,14 +20,22 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [optional life-loss aid passes CPU qualification](docs/results/2026-11-03-cdp-breakout-life-penalty.md):
+57 tests / 365 pins, including 338 control pins, plus both bounded commands,
+nine config assertions, five prefix cases and the 357-tensor schema. Native
+447fe50 stays byte-identical; runtime `/x/Temp/kindle-breakout-life-penalty-20261103/runtime`.
+Two repaired CPU fixture/path failures remain preserved; production code is
+unchanged across repairs. Next run only the declared 8,192-action native check;
+no full learner is selected. No Kindle job is active at this CPU milestone.
+
 The [saved life-feedback analysis](docs/results/2026-11-03-cdp-breakout-life-feedback.md)
 is complete: all 120 selected lost lives have zero immediate reward, including
 96 nonterminal losses. It reuses 37,016 recorded actions with no emulator or GPU
 work; 11 fixtures and 14 input pins pass. This does not establish a causal defect.
 Next develop the [optional one-point life-loss training aid](docs/experiments/2026-11-03-cdp-breakout-life-penalty.md):
 explicit raw/training reward accounting, default off, frozen shaping off, and
-CPU qualification before one bounded check. No implementation or GPU check has
-passed yet. Preserve retained runtimes and raw scores; no full learner is selected.
+CPU qualification before one bounded check. The CPU implementation is now qualified;
+the GPU check remains unfinished. Preserve retained runtimes and raw scores; no full learner is selected.
 The diagnostic is closed; do not repeat it. No Kindle job is active at closure.
 
 The [completed replay16k comparison](docs/results/2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000

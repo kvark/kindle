@@ -16,7 +16,8 @@ Next qualify the [optional one-point training aid](../experiments/2026-11-03-cdp
 with explicit separate raw and training rewards, life/reset accounting, default
 off and frozen shaping off. Native learning remains unchanged. CPU qualification
 precedes one fresh bounded check; a full learner needs a separate selection.
-No implementation or GPU check has passed. Retained gameplay and acceptance
+The [CPU implementation now passes qualification](2026-11-03-cdp-breakout-life-penalty.md);
+the GPU check is unfinished. Retained gameplay and acceptance
 gates stay unchanged; the saved-data diagnostic is closed and must not repeat.
 
 The [completed replay16k comparison](2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000

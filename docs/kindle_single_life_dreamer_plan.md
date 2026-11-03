@@ -1,5 +1,12 @@
 # Kindle: CDP learning roadmap
 
+The [optional life-loss aid passes CPU qualification](results/2026-11-03-cdp-breakout-life-penalty.md):
+57 tests / 365 pins and both bounded commands, config/prefix/cadence/schema
+checks pass. The separate Python overlay preserves raw score accounting and
+default-off semantics; native447fe50 stays exact. Two CPU fixture/path failures
+are preserved. Next is one declared 8,192-action check; no gameplay benefit or
+full learner is established. No GPU work occurred during qualification.
+
 The [saved Breakout life-feedback diagnostic](results/2026-11-03-cdp-breakout-life-feedback.md)
 finds zero immediate reward at all 120 selected lost lives, 96 nonterminal.
 It reuses 37,016 recorded actions from an older greedy policy; 11 fixtures and
@@ -9,7 +16,7 @@ a causal defect. The next [bounded development](experiments/2026-11-03-cdp-break
 tests an optional one-point training penalty per observed lost life, after CPU
 qualification of explicit raw-versus-training reward accounting. Preserve raw
 scores, real episode boundaries, default-off behavior and shaping-free frozen
-evaluation. No implementation or GPU check has passed and no full learner is
+evaluation. CPU implementation is now qualified; no GPU check has passed and no full learner is
 selected. Retained 70.750/143.667 scores and the two-wall gate remain unchanged.
 The saved-data diagnostic is closed; no Kindle allocation is active at closure.
 
