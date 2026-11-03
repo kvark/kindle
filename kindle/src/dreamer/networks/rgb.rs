@@ -115,6 +115,7 @@ impl ConvNorm {
 
 pub(crate) struct Encoder {
     layers: Vec<ConvNorm>,
+    input_channels: usize,
     channels: usize,
     side: usize,
 }
@@ -123,7 +124,8 @@ impl Encoder {
     pub(super) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let depth = config.network().vision_depth;
         let side = config.observation_grid();
-        let mut channels = 3;
+        let input_channels = config.observation_channels();
+        let mut channels = input_channels;
         let layers = [2, 3, 4, 4]
             .into_iter()
             .enumerate()
@@ -142,6 +144,7 @@ impl Encoder {
             .collect();
         Self {
             layers,
+            input_channels,
             channels,
             side,
         }
@@ -152,7 +155,10 @@ impl Encoder {
     }
 
     pub(super) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        let mut value = graph.reshape(input, &[batch * 3 * self.side * self.side]);
+        let mut value = graph.reshape(
+            input,
+            &[batch * self.input_channels * self.side * self.side],
+        );
         for layer in &self.layers {
             value = layer.forward(graph, value, batch, true);
         }

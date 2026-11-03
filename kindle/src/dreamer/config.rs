@@ -305,6 +305,9 @@ pub struct DreamerConfig {
     pub training_precision: TrainingPrecision,
     #[serde(default)]
     pub observation_kind: ObservationKind,
+    /// CDP input is the previous and current resized RGB image, oldest first.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_frame_pair: bool,
     /// Optional native-frame rectangle for the learned-RGB GPU preprocessor.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub observation_crop: Option<crate::vision::preprocess_gpu::FrameCrop>,
@@ -433,6 +436,7 @@ impl DreamerConfig {
             model_size: ModelSize::Size12M,
             training_precision: TrainingPrecision::Auto,
             observation_kind: ObservationKind::Features,
+            rgb_frame_pair: false,
             observation_crop: None,
             video_encoder: None,
             future_target_standardization: None,
@@ -536,7 +540,9 @@ impl DreamerConfig {
     pub const fn observation_channels(&self) -> usize {
         match self.observation_kind {
             ObservationKind::Features => OBSERVATION_CHANNELS,
-            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => 3,
+            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+                if self.rgb_frame_pair { 6 } else { 3 }
+            }
         }
     }
 
@@ -666,6 +672,9 @@ impl DreamerConfig {
             return Err("auxiliary actor boundaries require observed lower-bound mode and nonnegative reward scales".into());
         }
         let size = self.network();
+        if self.rgb_frame_pair && (!self.is_cdp() || self.color_centroid_supervision.is_some()) {
+            return Err("RGB frame pairs require CDP without color-centroid supervision".into());
+        }
         if let Some(crop) = self.observation_crop {
             crop.check().map_err(str::to_owned)?;
             if !self.observation_kind.is_rgb() || self.color_centroid_supervision.is_some() {
@@ -944,6 +953,61 @@ const fn default_replay_value_gradient() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn rgb_frame_pairs_preserve_legacy_config_and_require_cdp() {
+        let mut config = DreamerConfig::tiny(3);
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert!(legacy.get("rgb_frame_pair").is_none());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(legacy).unwrap(),
+            config
+        );
+        config.rgb_frame_pair = true;
+        assert!(
+            config
+                .check()
+                .unwrap_err()
+                .contains("frame pairs require CDP")
+        );
+        config.observation_kind = ObservationKind::Rgb64;
+        assert!(
+            config
+                .check()
+                .unwrap_err()
+                .contains("frame pairs require CDP")
+        );
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        for (kind, side) in [
+            (ObservationKind::Rgb32, 32),
+            (ObservationKind::Rgb48, 48),
+            (ObservationKind::Rgb64, 64),
+        ] {
+            config.observation_kind = kind;
+            assert!(config.check().is_ok());
+            assert_eq!(config.observation_channels(), 6);
+            assert_eq!(config.observation_dim(), 6 * side * side);
+            let encoded = serde_json::to_value(&config).unwrap();
+            assert_eq!(encoded["rgb_frame_pair"], true);
+            assert_eq!(
+                serde_json::from_value::<DreamerConfig>(encoded).unwrap(),
+                config
+            );
+        }
+        config.color_centroid_supervision = Some(ColorCentroidSupervision {
+            scale: 1.0,
+            channel: 0,
+            background_scale: 1.0,
+            region: [0.0, 0.0, 1.0, 1.0],
+        });
+        assert!(
+            config
+                .check()
+                .unwrap_err()
+                .contains("without color-centroid")
+        );
+    }
 
     #[test]
     fn completed_return_actor_config_is_optional_and_requires_observed_rewards() {

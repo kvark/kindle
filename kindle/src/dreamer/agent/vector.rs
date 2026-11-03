@@ -757,6 +757,11 @@ impl VectorPerception {
             Self::Learned(pixels) => {
                 core.acting.wait();
                 core.learner.replay.wait_device();
+                pixels.reset_rgb_history(
+                    metadata
+                        .iter()
+                        .filter_map(|&(id, flags, _)| flags.is_first.then_some(id)),
+                );
                 let frames = frames
                     .iter()
                     .map(|&(id, frame)| (id, frame.pixels(), frame.width(), frame.height()))
@@ -878,12 +883,15 @@ impl VectorDreamerAgent {
         }
         let side = config.observation_grid();
         let learner = DreamerCore::new(config)?;
-        let pixels = GpuPreprocessor::rgb(
+        let mut pixels = GpuPreprocessor::rgb(
             Arc::clone(&learner.gpu),
             streams,
             side,
             learner.config.observation_crop,
         );
+        if learner.config.rgb_frame_pair {
+            pixels = pixels.with_frame_pair();
+        }
         Ok(Self {
             perception: VectorPerception::Learned(Box::new(pixels)),
             history: None,
@@ -901,12 +909,15 @@ impl VectorDreamerAgent {
             return Err("checkpoint is not a jointly learned RGB model".into());
         }
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let pixels = GpuPreprocessor::rgb(
+        let mut pixels = GpuPreprocessor::rgb(
             Arc::clone(&gpu),
             streams,
             metadata.config.observation_grid(),
             metadata.config.observation_crop,
         );
+        if metadata.config.rgb_frame_pair {
+            pixels = pixels.with_frame_pair();
+        }
         let learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
         Ok(Self {
             perception: VectorPerception::Learned(Box::new(pixels)),
@@ -1244,6 +1255,11 @@ impl VectorDreamerAgent {
             VectorPerception::Learned(pixels) => {
                 self.core.acting.wait();
                 self.core.learner.replay.wait_device();
+                pixels.reset_rgb_history(
+                    metadata
+                        .iter()
+                        .filter_map(|&(id, flags, _)| flags.is_first.then_some(id)),
+                );
                 pixels.gpu_frames(&mut self.core.observe, &frames);
                 self.core.ingest_prepared(&metadata)
             }
@@ -2185,15 +2201,28 @@ mod tests {
         check_rgb_replay_and_restore(true, true);
     }
 
-    fn check_rgb_replay_and_restore(cdp: bool, exploration: bool) {
-        let checkpoint = check_rgb_vector_replay_and_restore(cdp, exploration);
+    #[test]
+    #[ignore = "requires guarded GPU; frame-pair replay, learning and frozen restore"]
+    fn tiny_cdp_frame_pair_replay_and_checkpoint_restore() {
+        let checkpoint = check_rgb_vector_replay_and_restore(true, true, true);
         check_rgb_single_restore(&checkpoint);
         fs::remove_dir_all(checkpoint).unwrap();
     }
 
-    fn check_rgb_vector_replay_and_restore(cdp: bool, exploration: bool) -> std::path::PathBuf {
+    fn check_rgb_replay_and_restore(cdp: bool, exploration: bool) {
+        let checkpoint = check_rgb_vector_replay_and_restore(cdp, exploration, false);
+        check_rgb_single_restore(&checkpoint);
+        fs::remove_dir_all(checkpoint).unwrap();
+    }
+
+    fn check_rgb_vector_replay_and_restore(
+        cdp: bool,
+        exploration: bool,
+        frame_pair: bool,
+    ) -> std::path::PathBuf {
         let mut config = DreamerConfig::tiny(3);
         config.observation_kind = ObservationKind::Rgb64;
+        config.rgb_frame_pair = frame_pair;
         config.replay_capacity = 32;
         config.train_ratio = 0.0;
         config.disagreement_bonus = exploration;
@@ -2216,7 +2245,10 @@ mod tests {
                 19,
                 13,
                 (0..19 * 13 * 3)
-                    .map(|i| ((i * 17 + time * 11 + id * 31) % 256) as u8)
+                    .map(|i| {
+                        (((if frame_pair { i % 3 } else { i }) * 17 + time * 11 + id * 31) % 256)
+                            as u8
+                    })
                     .collect(),
             )
         };
@@ -2259,13 +2291,47 @@ mod tests {
             sample(&mut agent);
         }
         let before = sample(&mut agent);
-        assert!(
-            before
-                .observations
-                .iter()
-                .all(|row| row.len() == config.batch_size * 12288
-                    && row.iter().all(|x| (-0.5..=0.5).contains(x)))
-        );
+        assert!(before.observations.iter().all(|row| row.len()
+            == config.batch_size * config.observation_dim()
+            && row.iter().all(|x| (-0.5..=0.5).contains(x))));
+        if frame_pair {
+            let color = |id, time| {
+                (0..3)
+                    .map(|channel| {
+                        ((channel * 17 + time * 11 + id * 31) % 256) as f32 / 255.0 - 0.5
+                    })
+                    .collect::<Vec<_>>()
+            };
+            let mut allowed = Vec::new();
+            for id in 0..2 {
+                for time in 0..12 {
+                    let mut pair = color(id, if time == 0 { 0 } else { time - 1 });
+                    pair.extend(color(id, time));
+                    allowed.push(pair);
+                }
+            }
+            let mut reset = color(0, 12);
+            reset.extend(color(0, 12));
+            allowed.push(reset);
+            for row in &before.observations {
+                for pair in row.chunks_exact(config.observation_dim()) {
+                    let colors = pair
+                        .chunks_exact(64 * 64)
+                        .map(|plane| {
+                            assert!(plane.iter().all(|&value| value == plane[0]));
+                            plane[0]
+                        })
+                        .collect::<Vec<_>>();
+                    assert!(
+                        allowed.iter().any(|expected| expected
+                            .iter()
+                            .zip(&colors)
+                            .all(|(expected, actual)| (expected - actual).abs() < 2e-6)),
+                        "replay pair crossed stream or reset: {colors:?}"
+                    );
+                }
+            }
+        }
         let names = agent
             .core
             .learner

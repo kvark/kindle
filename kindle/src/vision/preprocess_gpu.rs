@@ -169,6 +169,11 @@ impl gpu::ShaderData for Bindings {
     }
 }
 
+struct RgbPair {
+    previous: gpu::Buffer,
+    valid: Vec<bool>,
+}
+
 pub(crate) struct GpuPreprocessor {
     gpu: Arc<gpu::Context>,
     pipeline: gpu::ComputePipeline,
@@ -182,6 +187,7 @@ pub(crate) struct GpuPreprocessor {
     input: &'static str,
     centered_rgb: bool,
     crop: Option<FrameCrop>,
+    rgb_pair: Option<RgbPair>,
 }
 
 impl GpuPreprocessor {
@@ -215,6 +221,7 @@ impl GpuPreprocessor {
             input: "patches",
             centered_rgb: false,
             crop: None,
+            rgb_pair: None,
         }
     }
 
@@ -235,6 +242,29 @@ impl GpuPreprocessor {
         pixels.centered_rgb = true;
         pixels.crop = crop;
         pixels
+    }
+
+    pub fn with_frame_pair(mut self) -> Self {
+        assert!(self.centered_rgb && self.rgb_pair.is_none());
+        let bytes = self.streams as u64 * u64::from(self.elements()) * 4;
+        assert!(bytes * 2 <= u64::from(u32::MAX));
+        self.rgb_pair = Some(RgbPair {
+            previous: self.gpu.create_buffer(gpu::BufferDesc {
+                name: "kindle_previous_rgb",
+                size: bytes,
+                memory: gpu::Memory::Device,
+            }),
+            valid: vec![false; self.streams],
+        });
+        self
+    }
+
+    pub fn reset_rgb_history(&mut self, streams: impl Iterator<Item = usize>) {
+        if let Some(pair) = &mut self.rgb_pair {
+            for stream in streams {
+                pair.valid[stream] = false;
+            }
+        }
     }
 
     pub fn cpu_frames(&mut self, session: &mut Session, frames: &[(usize, &[u8], usize, usize)]) {
@@ -340,7 +370,12 @@ impl GpuPreprocessor {
         );
         assert_eq!(
             session.slot_size(ExternalSlot::Input(self.input)),
-            Some(self.streams * self.elements() as usize * size_of::<f32>())
+            Some(
+                self.streams
+                    * self.elements() as usize
+                    * size_of::<f32>()
+                    * if self.rgb_pair.is_some() { 2 } else { 1 }
+            )
         );
         session.wait();
         session
@@ -418,10 +453,14 @@ impl GpuPreprocessor {
                 height as u32,
                 x as u32,
                 y as u32,
-                u32::try_from(stream)
-                    .unwrap()
-                    .checked_mul(self.elements())
-                    .expect("patch offset overflow"),
+                u32::try_from(if self.rgb_pair.is_some() {
+                    stream * 2 + 1
+                } else {
+                    stream
+                })
+                .unwrap()
+                .checked_mul(self.elements())
+                .expect("patch offset overflow"),
                 u32::from(self.centered_rgb),
                 0,
                 0,
@@ -432,11 +471,29 @@ impl GpuPreprocessor {
     fn submit(&mut self, target: gpu::BufferPiece, bindings: &[Bindings]) {
         self.wait();
         self.encoder.start();
+        let frame_bytes = u64::from(self.elements()) * 4;
         if bindings.len() != self.streams {
-            let bytes = self.streams as u64 * u64::from(self.elements()) * 4;
+            let bytes =
+                self.streams as u64 * frame_bytes * if self.rgb_pair.is_some() { 2 } else { 1 };
             self.encoder
                 .transfer("clear_inactive_patches")
                 .fill_buffer(target, bytes, 0);
+        }
+        if let Some(pair) = &self.rgb_pair {
+            let mut transfer = self.encoder.transfer("previous_rgb_to_pair");
+            for binding in bindings {
+                let current_offset = u64::from(binding.params[12]) * 4;
+                let stream = (current_offset / (2 * frame_bytes)) as usize;
+                if pair.valid[stream] {
+                    let mut previous = target;
+                    previous.offset += current_offset - frame_bytes;
+                    transfer.copy_buffer_to_buffer(
+                        pair.previous.at(stream as u64 * frame_bytes),
+                        previous,
+                        frame_bytes,
+                    );
+                }
+            }
         }
         {
             let mut pass = self.encoder.compute("pixels_to_patches");
@@ -444,6 +501,26 @@ impl GpuPreprocessor {
             for binding in bindings {
                 dispatch.bind(0, binding);
                 dispatch.dispatch([(self.size * self.size).div_ceil(64), 1, 1]);
+            }
+        }
+        if let Some(pair) = &mut self.rgb_pair {
+            let mut transfer = self.encoder.transfer("retain_current_rgb");
+            for binding in bindings {
+                let current_offset = u64::from(binding.params[12]) * 4;
+                let stream = (current_offset / (2 * frame_bytes)) as usize;
+                let mut current = target;
+                current.offset += current_offset;
+                if !pair.valid[stream] {
+                    let mut previous = current;
+                    previous.offset -= frame_bytes;
+                    transfer.copy_buffer_to_buffer(current, previous, frame_bytes);
+                }
+                transfer.copy_buffer_to_buffer(
+                    current,
+                    pair.previous.at(stream as u64 * frame_bytes),
+                    frame_bytes,
+                );
+                pair.valid[stream] = true;
             }
         }
         self.completion = Some(self.gpu.submit(&mut self.encoder));
@@ -465,6 +542,9 @@ impl GpuPreprocessor {
 impl Drop for GpuPreprocessor {
     fn drop(&mut self) {
         self.wait();
+        if let Some(pair) = self.rgb_pair.take() {
+            self.gpu.destroy_buffer(pair.previous);
+        }
         if let Some(buffer) = self.upload.take() {
             self.gpu.destroy_buffer(buffer);
         }
@@ -901,6 +981,120 @@ mod tests {
                         uploaded
                     );
                     pixels.wait();
+                    gpu.destroy_buffer(buffer);
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "requires guarded GPU; RGB pairs across subset arrivals and resets"]
+    fn gpu_rgb_pairs_preserve_stream_history_and_repeat_episode_first_frames() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        for side in [32, 48, 64] {
+            let elements = 3 * side * side;
+            let mut graph = meganeura::Graph::new();
+            let input = graph.input("observation", &[3, 2 * elements]);
+            let output = graph.neg(input);
+            graph.set_outputs(vec![output]);
+            let mut session = meganeura::build(
+                &graph,
+                meganeura::SessionConfig {
+                    mode: meganeura::Mode::Inference,
+                    gpu: Some(Arc::clone(&gpu)),
+                    ..Default::default()
+                },
+            )
+            .0;
+            let mut pixels =
+                GpuPreprocessor::rgb(Arc::clone(&gpu), 3, side, None).with_frame_pair();
+            let mut previous: Vec<Option<Vec<f32>>> = vec![None; 3];
+            for (step, (arrivals, resets)) in [
+                (vec![(0, 0), (1, 0)], vec![]),
+                (vec![(1, 1), (2, 0)], vec![]),
+                (vec![(0, 1)], vec![]),
+                (vec![(1, 7), (2, 1)], vec![1]),
+                (vec![(1, 8)], vec![]),
+            ]
+            .into_iter()
+            .enumerate()
+            {
+                pixels.reset_rgb_history(resets.iter().copied());
+                for stream in resets {
+                    previous[stream] = None;
+                }
+                let frames = arrivals
+                    .iter()
+                    .map(|&(stream, time)| {
+                        (
+                            stream,
+                            (0..19 * 13 * 3)
+                                .map(|i| ((i * 37 + i / 43 + stream * 53 + time * 17) % 256) as u8)
+                                .collect::<Vec<_>>(),
+                        )
+                    })
+                    .collect::<Vec<_>>();
+                let mut expected = vec![0.0; 3 * 2 * elements];
+                for (stream, frame) in &frames {
+                    let resized = rgb_filter::reference(frame, 19, 13, side);
+                    let mut current = vec![0.0; elements];
+                    for channel in 0..3 {
+                        for pixel in 0..side * side {
+                            current[channel * side * side + pixel] =
+                                f32::from(resized[3 * pixel + channel]) / 255.0 - 0.5;
+                        }
+                    }
+                    let offset = stream * 2 * elements;
+                    expected[offset..offset + elements]
+                        .copy_from_slice(previous[*stream].as_ref().unwrap_or(&current));
+                    expected[offset + elements..offset + 2 * elements].copy_from_slice(&current);
+                    previous[*stream] = Some(current);
+                }
+                let mut buffers = Vec::new();
+                if step % 2 == 0 {
+                    pixels.cpu_frames(
+                        &mut session,
+                        &frames
+                            .iter()
+                            .map(|(stream, frame)| (*stream, frame.as_slice(), 19, 13))
+                            .collect::<Vec<_>>(),
+                    );
+                } else {
+                    for (_, bytes) in &frames {
+                        let buffer = gpu.create_buffer(gpu::BufferDesc {
+                            name: "rgb_pair_test_source",
+                            size: bytes.len().next_multiple_of(4) as u64,
+                            memory: gpu::Memory::Shared,
+                        });
+                        unsafe {
+                            std::ptr::write_bytes(buffer.data(), 0, buffer.size() as usize);
+                            std::ptr::copy_nonoverlapping(
+                                bytes.as_ptr(),
+                                buffer.data(),
+                                bytes.len(),
+                            );
+                        }
+                        buffers.push(buffer);
+                    }
+                    let resident = frames
+                        .iter()
+                        .zip(&buffers)
+                        .map(|((stream, _), buffer)| {
+                            (*stream, unsafe {
+                                GpuFrame::from_buffer(
+                                    &gpu,
+                                    buffer,
+                                    0,
+                                    FrameLayout::new(19, 13, 57, PixelFormat::Rgb8),
+                                )
+                            })
+                        })
+                        .collect::<Vec<_>>();
+                    pixels.gpu_frames(&mut session, &resident);
+                }
+                check_patches(&mut session, &expected, "RGB pair history");
+                pixels.wait();
+                for buffer in buffers {
                     gpu.destroy_buffer(buffer);
                 }
             }

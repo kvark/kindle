@@ -67,6 +67,8 @@ def rgb_preprocessing(config):
     crop = config.get('observation_crop')
     if crop is not None:
         description = 'native crop ' + ','.join(f'{name}={crop[name]}' for name in ('x', 'y', 'width', 'height')) + '; ' + description
+    if config.get('rgb_frame_pair', False):
+        description += '; previous/current RGB pair on GPU, repeat first image on reset'
     return description
 
 
@@ -83,6 +85,8 @@ def main():
                         help="learned CNN with cosine feature prediction instead of RGB reconstruction; CDP split learning rates")
     parser.add_argument("--image-size", type=int, choices=(32, 48, 64),
                         help="learned RGB/CDP GPU resize side; fresh default64, restore uses checkpoint geometry")
+    parser.add_argument("--rgb-frame-pair", action="store_true",
+                        help="fresh CDP: encode previous/current resized RGB images as six channels")
     parser.add_argument("--image-crop", type=int, nargs=4, metavar=("X", "Y", "WIDTH", "HEIGHT"),
                         help="fresh learned RGB/CDP: native-pixel crop before the single GPU resize; restore uses checkpoint crop")
     parser.add_argument("--cdp-centered", action="store_true",
@@ -377,6 +381,7 @@ def main():
     training_options.add("--guidance-imitation-decay")
     training_options.add("--guidance-actor-only-decay")
     training_options.add("--image-size")
+    training_options.add("--rgb-frame-pair")
     training_options.add("--image-crop")
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
@@ -451,8 +456,18 @@ def main():
         if (metadata.get("config", {}).get("observation_crop") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_CROP", False)):
             parser.error("cropped checkpoint requires native RGB crop support")
+        if (metadata.get("config", {}).get("rgb_frame_pair", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_FRAME_PAIR", False)):
+            parser.error("frame-pair checkpoint requires native RGB frame-pair support")
     args.observation_size = args.observation_size or "native"
     learned_rgb = args.encoder_checkpoint is None
+    if args.rgb_frame_pair:
+        if not learned_rgb or not args.cdp:
+            parser.error("rgb-frame-pair requires fresh CDP with the learned CNN")
+        if args.breakout_centroid_scale is not None:
+            parser.error("rgb-frame-pair cannot combine with color-centroid supervision")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_RGB_FRAME_PAIR", False):
+            parser.error("rgb-frame-pair requires native RGB frame-pair support")
     if args.image_size is not None and not learned_rgb:
         parser.error("image-size requires the learned RGB/CNN frontend")
     if args.image_crop is not None:
@@ -596,6 +611,8 @@ def main():
                     config["expert_imitation"]["decay"]["actor_only"] = True
         if learned_rgb:
             config["observation_kind"] = f"rgb{args.image_size or 64}"
+            if args.rgb_frame_pair:
+                config["rgb_frame_pair"] = True
             if args.image_crop is not None:
                 config["observation_crop"] = dict(zip(("x", "y", "width", "height"), args.image_crop))
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)

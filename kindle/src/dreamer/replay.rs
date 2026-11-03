@@ -1216,7 +1216,9 @@ mod tests {
     fn frame(index: usize, config: &DreamerConfig) -> ReplayFrame {
         let size = config.network();
         let values = vec![index as f32; config.observation_dim()];
-        let observation = if config.observation_kind.is_rgb() {
+        let observation = if config.rgb_frame_pair {
+            Observation::rgb_pair(values, config.observation_grid())
+        } else if config.observation_kind.is_rgb() {
             Observation::rgb(values, config.observation_grid())
         } else {
             Observation::from_vec(values)
@@ -1249,6 +1251,11 @@ mod tests {
         ] {
             config.observation_kind = kind;
             frame(7, &config).validate(&config);
+            if kind.is_rgb() {
+                config.rgb_frame_pair = true;
+                frame(7, &config).validate(&config);
+                config.rgb_frame_pair = false;
+            }
         }
     }
 

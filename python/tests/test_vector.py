@@ -86,6 +86,9 @@ import profile_atari_vector
     (["--restore", "unused", "--actor-unimix", ".01"], "training overrides"),
     (["--restore", "unused", "--actor-unimix=0"], "training overrides"),
     (["--image-size", "33"], "invalid choice"),
+    (["--rgb-frame-pair"], "rgb-frame-pair requires fresh CDP"),
+    (["--rgb-frame-pair", "--cdp", "--encoder-checkpoint", "unused"], "rgb-frame-pair requires fresh CDP"),
+    (["--restore", "unused", "--rgb-frame-pair"], "training overrides"),
     (["--restore", "unused", "--image-size", "32"], "training overrides"),
     (["--encoder-checkpoint", "unused", "--image-size", "48"], "image-size requires"),
     (["--restore", "unused", "--image-crop", "0", "32", "160", "168"], "training overrides"),
@@ -452,6 +455,58 @@ def test_full_frame_preprocessing_description_stays_unchanged():
     assert atari_vector.rgb_preprocessing(dict(observation_kind='rgb64')) == (
         'single GPU Pillow-equivalent antialiased bilinear resize to 64x64, '
         'per-axis RGB8 rounding; CHW /255-0.5')
+
+
+@pytest.mark.parametrize('restore', [False, True])
+def test_frame_pairs_reject_old_native_before_environment(monkeypatch, tmp_path, capsys, restore):
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: pytest.fail('must reject before environment'))
+    output = tmp_path/'never.jsonl'
+    args = ['--cdp', '--rgb-frame-pair']
+    if restore:
+        checkpoint = tmp_path/'checkpoint'
+        checkpoint.mkdir()
+        (checkpoint/'metadata.json').write_text(json.dumps(dict(config=dict(rgb_frame_pair=True))))
+        args = ['--evaluate', '--restore', str(checkpoint), '--observation-size', 'native']
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert 'requires native RGB frame-pair support' in capsys.readouterr().err
+    assert not output.exists()
+
+
+@pytest.mark.parametrize('side', [32, 48, 64])
+def test_frame_pair_recipe_and_description_before_gpu(monkeypatch, tmp_path, side):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18), reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, 'DreamerAtariPreprocessing', lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config['rgb_frame_pair'] is True
+        assert config['observation_kind'] == f'rgb{side}'
+        assert config['loss_scales']['reconstruction'] == 0
+        assert config['loss_scales']['future_prediction'] > 0
+        assert atari_vector.rgb_preprocessing(config).endswith(
+            '; previous/current RGB pair on GPU, repeat first image on reset')
+        raise RuntimeError('frame-pair recipe checked before GPU')
+
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct, SUPPORTS_RGB_FRAME_PAIR=True))
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path/'pair.jsonl'),
+        '--cdp', '--image-size', str(side), '--rgb-frame-pair'])
+    with pytest.raises(RuntimeError, match='frame-pair recipe checked'):
+        atari_vector.main()
+
+
+def test_frame_pairs_reject_centroid_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(SUPPORTS_COLOR_CENTROID_SUPERVISION=True,
+                                                            SUPPORTS_RGB_FRAME_PAIR=True))
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: pytest.fail('must reject before environment'))
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', 'ALE/Breakout-v5', '--output', str(tmp_path/'never.jsonl'),
+        '--cdp', '--rgb-frame-pair', '--breakout-centroid-scale', '1'])
+    with pytest.raises(SystemExit):
+        atari_vector.main()
+    assert 'cannot combine with color-centroid' in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("rate,encoder,dynamics", [

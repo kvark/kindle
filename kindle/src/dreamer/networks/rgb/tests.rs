@@ -88,7 +88,8 @@ fn smaller_rgb_graphs_keep_shapes_and_cdp_gradients() {
 // Independent scalar cross-correlation, max-pool, per-pixel channel RMS and SiLU.
 fn reference(input: &[f32], parameters: &HashMap<String, Vec<f32>>) -> Vec<f64> {
     let mut values = input.iter().map(|&x| f64::from(x)).collect::<Vec<_>>();
-    let (mut side, mut channels) = (64, 3);
+    let input_channels = parameters["world.representation.encoder.cnn0.weight"].len() / (8 * 25);
+    let (mut side, mut channels) = (64, input_channels);
     for (layer, output) in [8, 12, 16, 16].into_iter().enumerate() {
         let name = format!("world.representation.encoder.cnn{layer}");
         let weights = &parameters[&format!("{name}.weight")];
@@ -167,11 +168,22 @@ fn reference(input: &[f32], parameters: &HashMap<String, Vec<f32>>) -> Vec<f64> 
 #[test]
 #[ignore = "requires GPU; independent scalar CNN values and finite-difference gradients"]
 fn tiny_rgb_encoder_matches_independent_reference() {
+    check_encoder_reference(false);
+}
+
+#[test]
+#[ignore = "requires guarded GPU; six-channel scalar CNN and both-frame derivatives"]
+fn tiny_rgb_frame_pair_encoder_matches_independent_reference() {
+    check_encoder_reference(true);
+}
+
+fn check_encoder_reference(frame_pair: bool) {
     let mut config = DreamerConfig::tiny(3);
     config.observation_kind = ObservationKind::Rgb64;
+    config.rgb_frame_pair = frame_pair;
     let mut graph = Graph::new();
     let encoder = Encoder::new(&mut graph, &config);
-    let input = graph.input("pixels", &[2, 12_288]);
+    let input = graph.input("pixels", &[2, config.observation_dim()]);
     let output = encoder.forward(&mut graph, input, 2);
     let squared = graph.mul(output, output);
     let loss = graph.mean_all(squared);
@@ -191,7 +203,7 @@ fn tiny_rgb_encoder_matches_independent_reference() {
         session.read_param(&name, &mut values);
         parameters.insert(name, values);
     }
-    let pixels = (0..2 * 12_288)
+    let pixels = (0..2 * config.observation_dim())
         .map(|i| ((i * 37 + i / 43) % 256) as f32 / 255.0 - 0.5)
         .collect::<Vec<_>>();
     session.set_input("pixels", &pixels);
@@ -208,16 +220,22 @@ fn tiny_rgb_encoder_matches_independent_reference() {
         values.iter().map(|x| x * x).sum::<f64>() / values.len() as f64
     };
     assert!((f64::from(session.read_loss()) - scalar_loss(&parameters)).abs() < 3e-4);
-    for suffix in [
-        "cnn0.weight",
-        "cnn1.bias",
-        "cnn2.norm.weight",
-        "cnn3.weight",
-    ] {
+    let mut checks = vec![
+        ("cnn0.weight", None),
+        ("cnn1.bias", None),
+        ("cnn2.norm.weight", None),
+        ("cnn3.weight", None),
+    ];
+    if frame_pair {
+        checks[0].1 = Some(0);
+        checks.push(("cnn0.weight", Some(1)));
+    }
+    for (suffix, image) in checks {
         let name = format!("world.representation.encoder.{suffix}");
         let mut gradient = vec![0.0; parameters[&name].len()];
         session.read_param_grad(&name, &mut gradient);
         let lane = (0..gradient.len())
+            .filter(|&i| image.is_none_or(|image| (i / 25) % 6 / 3 == image))
             .max_by(|&a, &b| gradient[a].abs().total_cmp(&gradient[b].abs()))
             .unwrap();
         assert!(gradient[lane].is_finite() && gradient[lane].abs() > 1e-6);
@@ -235,6 +253,47 @@ fn tiny_rgb_encoder_matches_independent_reference() {
             "{name}: {} != {expected}",
             gradient[lane]
         );
+    }
+}
+
+#[test]
+fn rgb_frame_pair_graph_preserves_latent_width_and_adds_first_layer_weights() {
+    for (kind, side) in [
+        (ObservationKind::Rgb32, 32),
+        (ObservationKind::Rgb48, 48),
+        (ObservationKind::Rgb64, 64),
+    ] {
+        let mut config = DreamerConfig::tiny(18);
+        config.model_size = crate::ModelSize::Size12M;
+        config.observation_kind = kind;
+        config.rgb_frame_pair = true;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        assert!(config.check().is_ok());
+        let mut graph = Graph::new();
+        let encoder = Encoder::new(&mut graph, &config);
+        let parameters = graph
+            .nodes()
+            .iter()
+            .filter(|node| matches!(node.op, meganeura::graph::Op::Parameter { .. }));
+        assert_eq!(
+            parameters.map(|node| node.ty.num_elements()).sum::<usize>(),
+            220_416 + 3 * 25 * 32
+        );
+        let pixels = graph.input("pixels", &[2, 6 * side * side]);
+        let output = encoder.forward(&mut graph, pixels, 2);
+        assert_eq!(
+            graph.node(output).ty.shape,
+            [2, config.encoded_observation_dim()]
+        );
+        let square = graph.mul(output, output);
+        let loss = graph.mean_all(square);
+        graph.set_outputs(vec![loss]);
+        let derivatives = meganeura::autodiff::differentiate(&graph);
+        assert!(derivatives.nodes().len() > graph.nodes().len());
+        let world = crate::dreamer::world::build_training_graph(&config, 4);
+        let derivatives = meganeura::autodiff::differentiate(&world);
+        assert!(derivatives.nodes().len() > world.nodes().len());
     }
 }
 

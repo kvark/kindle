@@ -156,6 +156,13 @@ impl Observation {
         Self::checked(values)
     }
 
+    /// Previous/current centered CHW images for the optional CDP pair input.
+    pub fn rgb_pair(values: Vec<f32>, side: usize) -> Self {
+        assert!(matches!(side, 32 | 48 | 64));
+        assert_eq!(values.len(), 6 * side * side);
+        Self::checked(values)
+    }
+
     fn checked(values: Vec<f32>) -> Self {
         assert!(values.iter().all(|value| value.is_finite()));
         Self {

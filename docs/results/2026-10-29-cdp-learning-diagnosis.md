@@ -1,5 +1,22 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [optional native RGB frame-pair prototype](../experiments/2026-11-03-cdp-rgb-frame-pair.md)
+is selected for implementation andbounded qualification, default off. It supplies
+previous/current resized images as six CHW channels, duplicates the first image
+onreset andpreserves independent stream histories onGPU. Only the first CNN layer
+widens (+2,400 weights at12M); later dimensions stay fixed. Pair pixels enter
+replay together. CPU tests/build, guarded geometry/derivative/replay/restore
+checks andbounded cost/headroom evidence are pending. No GPU check ornew learner
+haslaunched. Package root`/x/Temp/kindle-rgb-frame-pair-20261103`.
+
+The failed fixed motion readout does not provide positive evidence for this
+jointly trained input; gameplay benefit isunmeasured. Retain20% guidance,
+70.750 sampled/143.667 greedy andthe original864/90%-two-wall gate. The completed
+50% guidance comparison andits preserved CPU failures remain in the linked
+[result](2026-11-03-cdp-breakout-guidance50.md). No full learner, extension,
+sweep orautomatic successor isselected. Check live state before GPU work.
+The five-game goal remains unfinished.
+
 The [completed50% episode-guidance Breakout comparison](2026-11-03-cdp-breakout-guidance50.md)
 finishes200k actions /799,731 frames /12,477 updates in21m37.887s (+.77%).
 Greedy50.583/sample34.417 fall64.79%/51.35% from143.667/70.750; all0/24 two-wall.

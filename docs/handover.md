@@ -8,28 +8,22 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [completed50% episode-guidance Breakout comparison](results/2026-11-03-cdp-breakout-guidance50.md)
-finishes200k actions /799,731 frames /12,477 updates in21m37.887s (+.77%).
-Greedy50.583/sample34.417 fall64.79%/51.35% from143.667/70.750; all0/24 two-wall.
-Greedy gain/min falls66.07%, paired difference−4.354[−6.127,−2.718]; sampled
-falls52.77%. Own initials2.208/1.417 match. Retain20% guidance andthe existing
-B16/T16 recipe. Actual overrides rise43.0585%→73.15%; late labelCE improves
-.560514→.541246, without gameplay benefit. Only1,774 native actions occur at
-scores216–431; none reaches432. This reused1009/cohort result does not isolate
-a mechanism or establish seed reliability.
+The [optional native RGB frame-pair prototype](experiments/2026-11-03-cdp-rgb-frame-pair.md)
+is selected for implementation andbounded qualification, default off. It supplies
+previous/current resized images as six CHW channels, duplicates the first image
+onreset andpreserves independent stream histories onGPU. Only the first CNN layer
+widens (+2,400 weights at12M); later dimensions stay fixed. Pair pixels enter
+replay together. CPU tests/build, guarded geometry/derivative/replay/restore
+checks andbounded cost/headroom evidence are pending. No GPU check ornew learner
+haslaunched. Package root`/x/Temp/kindle-rgb-frame-pair-20261103`.
 
-All117 original/338 retained pins,100k/6,227 recovery,357 matching initial/
-invariant frozen tensors,47 bounded/799–794 initial events, full replays/videos,
-guards, curves, exposure andcoverage pass. Original main/collector fail
-22:45:58/22:46:28 UTC November3/source2e1e70de on a redundant guidance-header
-assertion. Separate4.137s CPU correction completes22:47:34.594, preserving98
-artifacts and20 repair pins; an earlier null-journal-message wrapper failure
-isretained. No GPU orsuccessful CPU stage repeats. Closure is
-`complete_with_cpu_audit_repair`; original services remain failed. Full root
-`/x/Temp/kindle-breakout-guidance50-20261103/full`, separate correction under
-`cpu-comparison-repair`. No extension, probability sweep, confirmation orautomatic
-successor isselected. No Kindle allocation isactive atclosure; check live state.
-The original864/90%-two-wall gate andfive-game goal remain unfinished.
+The failed fixed motion readout does not provide positive evidence for this
+jointly trained input; gameplay benefit isunmeasured. Retain20% guidance,
+70.750 sampled/143.667 greedy andthe original864/90%-two-wall gate. The completed
+50% guidance comparison andits preserved CPU failures remain in the linked
+[result](results/2026-11-03-cdp-breakout-guidance50.md). No full learner, extension,
+sweep orautomatic successor isselected. Check live state before GPU work.
+The five-game goal remains unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
