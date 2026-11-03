@@ -1,6 +1,99 @@
-# Conservative completed-return actor passes native and short training checks
+# Conservative completed-return actor does not improve retained Breakout efficiency
 
-## Fresh200k assessment is running
+## Completed200k comparison: retain the existing recipe
+
+The [fresh assessment](../experiments/2026-11-03-cdp-conservative-actor-200k.md)
+finishes200k actions /799,546 frames /12,477 updates in **21m46.724s**,1.46%
+longer than the retained control. Greedy144.750 is only.75% above143.667;
+sampled49.167 falls30.51% below70.750. All final arms have **0/24 two-wall
+successes**. The candidate fails the declared learning-per-minute selection
+rule and the original mean864/90%-two-wall gate. Retain the existing200k recipe;
+the five-game goal remains unfinished.
+
+| Frozen assessment | Retained control | Conservative actor100 |
+| --- | ---: | ---: |
+| Final greedy mean |143.667|144.750|
+| Final sampled mean |70.750|49.167|
+| Actual-initial greedy mean |2.208|2.208|
+| Actual-initial sampled mean |1.417|1.417|
+| Greedy initial-subtracted score / training minute |6.590|6.545|
+| Sampled initial-subtracted score / training minute |3.230|2.193|
+| Training time |21m27.910s|21m46.724s|
+
+Each score selects the first three natural episodes from each of eight lanes,
+24 per arm, with guidance off and zero updates. The actual-initial arrays and
+sampled/greedy semantic traces match the retained control. Four new frozen
+arms total88,856 actions /355,263 frames /89.179s; their357 tensors remain
+unchanged. The retained full control is reused without another execution.
+
+The fixed10,000-resample paired lane bootstrap gives greedy return difference
+**1.083 [−53.750,58.127]** and initial-subtracted score/min difference
+**−.045 [−2.574,2.589]**. Sampled differences are−21.583 [−38.375,−1.082]
+and−1.038 [−1.813,−.090], respectively. Greedy and sampled gain/min point
+estimates fall.68% and32.12%. These intervals resample eight lanes on one reused
+evaluation cohort; they do not establish training-seed reliability.
+
+This is one fresh learner, with no experience or weight transfer. It keeps
+12M64/Auto/N8/B16/T16/full BPTT/micro16/H15/R16/context1,
+encoder4e-5/dynamics4e-4/behavior8e-5,expert100 with world gradient,
+policy1/critic1/1 and disagreement1. The candidate adds actor100 with explicit
+observed lower-bound mode. Teacher,20% guidance/cap1920,full18/sticky.25/repeat4,
+sampled collection/posteriors,native RGB/one GPU64 resize,seed1009 and evaluation
+seed4000001009 stay fixed. Native3f6c6648 and the runner differ from the older
+retained full control. The exact short-control compatibility below does not
+turn this into an isolated full-life loss comparison.
+
+## What the loss and exposure measurements show
+
+The actor loss has1,010,324 positive rows out of2,530,338 completed replay rows,
+weight521,808.032 and raw loss sum2,243.982. It is positive on12,403 updates,
+first at1224 actions. Imagined/replay bonus means sum86.969/86.971 across reports.
+All coefficient checks pass. These are repeated replay exposures, not unique
+examples, and establish target activity without a useful frozen gain.
+
+Final50k-action teacher cross entropy is.559403 versus retained.560514, a small
+training-fit difference without improved efficiency. Actual overrides total
+92,858 actions (46.429%). Guided online returns are not unaided competence;
+the target can reinforce teacher-influenced or stochastic successful sequences
+without identifying causal action credit.
+
+The maximum training score, including unfinished tails, is377. Of200k actions,
+194,831 occur below216 points and5,169 at216–431; only939 of the latter are
+native actions (.4695% of all actions). No training action reaches432 or above.
+These are cumulative-score bands, not verified wall events. Limited later-score
+exposure remains a diagnostic lead, without establishing the cause of weak
+control or selecting a new learner, sweep or extension.
+
+Reported learning calls take1152.559s of1306.724s (88.20%); acting63.332s and
+environment stepping62.620s take4.85% and4.79%. The learning timer includes
+native/host work and synchronization; it is not a GPU-kernel profile. The
+retained control also spends88.04% in learning calls. CPU co-host costs remain
+in actual elapsed training time without subtraction.
+
+## Completion, launch and recovery evidence
+
+All308 current and338 retained pins,100k/6,227 recovery,357 finite/matching
+initial and invariant frozen tensors,47 pre-update events,799/794 initial
+semantic events,full training pixel/action/label and frozen replays/videos,
+host guards,curves,exposure and paired comparison pass. The original main
+completes **18:38:09.815 UTC November3**, and its original terminal collector
+completes **18:38:40.403**, both successfully. All five GPU stages run once;
+there is no full-pipeline failure, repair or repeated stage. The earlier
+prelaunch copy-script failure remains preserved.
+
+`full/completion.json` pins51 result files and records `status=complete`.
+The2.768s terminal collector checks the original main PID/invocation and
+journal, all input/result hashes, recovery/frozen hashes and independently
+recomputed actor totals. Both services are terminal; no Kindle GPU allocation
+or successor is active. The experiment root is closed; do not rerun it.
+Check live state before separately selected work.
+
+| Artifact under `full/` | SHA256 |
+| --- | --- |
+| `declaration.json` |`2607f955ede0399db2a1f964a713a6ef77958b42001f4b6c4fcedb045ff2efa2`|
+| `comparison.json` |`04b2274f26f8cedb2a1f30b8b06ffbef12c166aec39bcea04d35a6b28849caaa`|
+| `completion.json` |`c5d8aab0287f49159ebc82699e2d0b25e6b663cab130cb9d8e88cbaa9966597f`|
+| `terminal-summary.json` |`f95a181db904157bbfa31fb3d296e9e82e3ac15d40b3b2ea12285c512bd76c05`|
 
 The [selected assessment](../experiments/2026-11-03-cdp-conservative-actor-200k.md)
 launches **18:11:37 UTC November3**, sourcecf8c53fc, with308 input pins and a
@@ -8,16 +101,14 @@ launches **18:11:37 UTC November3**, sourcecf8c53fc, with308 input pins and a
 `d9abb71b942440559ae740a11c7ee1bc`, service
 `kindle-conservative-actor-200k-20261103`, runs one fresh200k/12,477-update
 candidate followed by final/actual-initial sampled/greedy24-episode assessments.
-The100k/6,227 recovery is saved and independently verified; the terminal
-collector remains active. No full frozen result is available and the five-game
-goal remains unfinished.
+The original collectorPID1057482/invocation
+`77d94bf8309b4eb7bc9679f28a4a2ba9` follows it through completion.
 
 Startup verifies357 exact initial tensors,47 pre-update events and first
 update376. An early read at18:12:51.734 finds11,768 actions/712 reports,
 653 positive-target updates,first positive1224,and all308 pins unchanged.
 The.333s startup check and.548s host review remain in actual wall time.
-Root `/x/Temp/kindle-conservative-actor-20261103/full` is active; do not restart
-it, repeat earlier stages or schedule another GPU job while it runs.
+Root `/x/Temp/kindle-conservative-actor-20261103/full` retains all evidence.
 
 The recovery observer completes **18:22:27.826 UTC** in.330s. Independent CPU
 verification completes **18:24:21.872** in.614s: counters100k/6,227,357 finite

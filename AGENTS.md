@@ -20,19 +20,29 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
-The [fresh200k conservative-actor assessment](docs/experiments/2026-11-03-cdp-conservative-actor-200k.md) launches18:11:37 UTC
-November3/sourcecf8c53fc with308 pins and a30-minute training cap. MainPID1057479,
-invocation`d9abb71b942440559ae740a11c7ee1bc`,service`kindle-conservative-actor-200k-20261103`.
-Startup passes357 exact initial tensors,47 pre-update events and first update376.
-The100k/6,227 recovery is saved18:22:27.826 UTC and independently verified
-18:24:21.872:357 finite tensors/51,502,659 elements,matching config/schema/hashes,
-read-only files/directory and all308 pins unchanged. Main identity stays fixed;
-.330s observer/.614s CPU review remain in wall time. At18:24:59 training reaches
-122,880 actions/7,657 updates. The terminal collector remains active.
-Require final/actual-initial sampled/greedy24-episode assessments against retained
-70.750/143.667; no full result yet. Root`/x/Temp/kindle-conservative-actor-20261103/full`.
-Do not restart it,repeat earlier stages or schedule another GPU job while active.
-The five-game goal remains unfinished; check live state.
+The [completed200k conservative-actor comparison](docs/results/2026-11-03-cdp-conservative-actor.md)
+finishes200k actions /799,546 frames /12,477 updates in21m46.724s (+1.46%).
+Greedy144.750 versus143.667 is nearly flat; sampled49.167 versus70.750 falls30.51%.
+All0/24 two-wall; own initials1.417/2.208 match. Greedy initial-subtracted score/min
+falls.68%,paired lane difference−.045 [−2.574,2.589]. The declared selection rule
+fails: retain the existing200k recipe. One reused seed/cohort and different
+native/runner revisions do not establish an isolated effect or reliability.
+The original864/90%-two-wall gate and five-game goal remain unfinished.
+
+The loss has1,010,324 positive repeated rows on12,403 updates, with bonuses active.
+Final50k teacher CE.559403 versus.560514 does not yield better frozen efficiency.
+Training max377 and only939 native actions at216–431 show limited later-score
+exposure; no432+ action occurs. These are score bands,not verified wall events
+or causal evidence. Actual overrides46.429%; guided returns are not competence.
+
+All308 current/338 retained pins,100k/6,227 recovery,357 initial/frozen tensors,
+47 pre-update and799/794 initial semantic events,replays/videos,guards,curves,
+exposure and comparison pass. Main completes18:38:09.815 UTC November3/sourcecf8c53fc;
+original collector completes18:38:40.403. Both services succeed,all five GPU
+stages run once; no full-pipeline failure or repair. Earlier prelaunch copy-script
+failure remains. Root`/x/Temp/kindle-conservative-actor-20261103/full` is closed;
+no restart,extension,confirmation or automatic successor. No Kindle allocation
+is active at closure; check live state before separately selected work.
 
 The [completed bounded check](docs/results/2026-11-03-cdp-conservative-actor.md) passes8192/489 in47.402s control/50.754s
 candidate (+7.07%),with33,588 positive targets and the bonus active. Padded200k
