@@ -1,5 +1,18 @@
 # Kindle: CDP learning roadmap
 
+The [current-critic Breakout B8/T32 check](results/2026-11-03-cdp-breakout-value1-context32.md) passes8192 actions /32,722 frames /
+481 updates in51.909s; padded200k projection23m14.028s clears30min. Frozen1024/
+.875s haszero updates/no natural episodes. All357 initial/invariant tensors,
+47 shared prefix events,full pixel/action/label replay andboth guards pass.
+Native447fe50/runnercf4ea238 remain unchanged; behavior8e-5/replay-value1 fixed.
+Original main/collector fail21:16:10 UTC November3/source9de712d1 on the replay
+manifest path. Separate9.605s CPU repair closes21:19:14.395,readback21:20:20.243,
+with67 original/7 repair pins and39 outputs unchanged; no GPU orsuccessful replay
+repeats. Earlier CPU schema-fixture failure remains preserved. Closure is
+`complete_with_cpu_audit_repair` under`/x/Temp/kindle-breakout-value1-context32-20261103/cpu-repair`.
+No full learner orautomatic successor isselected; no allocation remains active.
+Retain70.750/143.667; gameplay benefit andthe five-game goal remain unfinished.
+
 The [completed four-action Breakout comparison](results/2026-11-03-cdp-breakout-minimal-guided.md#full-200k-comparison) finishes
 200k actions /799,580 frames /12,477 updates in **18m36.686s**,13.29% less training
 time than full18. Sampled **55.958** andgreedy **91.500** fall20.91%/36.31% from
