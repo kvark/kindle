@@ -168,16 +168,22 @@ fn reference(input: &[f32], parameters: &HashMap<String, Vec<f32>>) -> Vec<f64> 
 #[test]
 #[ignore = "requires GPU; independent scalar CNN values and finite-difference gradients"]
 fn tiny_rgb_encoder_matches_independent_reference() {
-    check_encoder_reference(false);
+    check_encoder_reference(false, false);
 }
 
 #[test]
 #[ignore = "requires guarded GPU; six-channel scalar CNN and both-frame derivatives"]
 fn tiny_rgb_frame_pair_encoder_matches_independent_reference() {
-    check_encoder_reference(true);
+    check_encoder_reference(true, false);
 }
 
-fn check_encoder_reference(frame_pair: bool) {
+#[test]
+#[ignore = "requires guarded GPU and KINDLE_RGB_PAIR_DERIVATIVES output path"]
+fn capture_tiny_rgb_frame_pair_encoder_derivatives() {
+    check_encoder_reference(true, true);
+}
+
+fn check_encoder_reference(frame_pair: bool, capture: bool) {
     let mut config = DreamerConfig::tiny(3);
     config.observation_kind = ObservationKind::Rgb64;
     config.rgb_frame_pair = frame_pair;
@@ -220,6 +226,29 @@ fn check_encoder_reference(frame_pair: bool) {
         values.iter().map(|x| x * x).sum::<f64>() / values.len() as f64
     };
     assert!((f64::from(session.read_loss()) - scalar_loss(&parameters)).abs() < 3e-4);
+    if capture {
+        let mut gradients = HashMap::new();
+        for (name, values) in &parameters {
+            let mut gradient = vec![0.0; values.len()];
+            session.read_param_grad(name, &mut gradient);
+            assert!(gradient.iter().all(|value| value.is_finite()));
+            gradients.insert(name, gradient);
+        }
+        let path = std::env::var_os("KINDLE_RGB_PAIR_DERIVATIVES")
+            .expect("explicit derivative capture path");
+        let file = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(path)
+            .unwrap();
+        serde_json::to_writer(file, &serde_json::json!({
+            "seed": 103, "input_channels": 6, "batch": 2, "side": 64,
+            "normalization_epsilon": DREAMER_NORM_EPSILON, "precision": config.training_precision,
+            "pixels": pixels, "parameters": parameters, "gradients": gradients,
+            "gpu_outputs": actual, "scalar_outputs": expected, "gpu_loss": session.read_loss(),
+        })).unwrap();
+        return;
+    }
     let mut checks = vec![
         ("cnn0.weight", None),
         ("cnn1.bias", None),
