@@ -1,5 +1,13 @@
 # Breakout: bounded imagined-value weight0.3 check
 
+**Closed:** the [bounded result](../results/2026-11-03-cdp-breakout-imagined-value03.md)
+passes8,192 actions/32,727 frames/489 updates in47.892s, with a21m26.159s
+conservative200k projection. All393 pins,357 initial/frozen tensors,47 pre-update
+events,replay and guards pass. Main/collector succeed08:12:43.805/08:12:49.826
+UTC November3; terminal review completes once08:14:11.721. No bounded stage
+repeats. The preparation fixture's unintended native initialization is preserved.
+A separate fresh full comparison is selected; no bounded experience transfers.
+
 Select one fresh bounded check after the actor/critic representation-gradient
 comparison closes. That change lowers both frozen scores, so retain gradients
 off. The current replay-value1 control improves gameplay over replay-value.3,

@@ -1,5 +1,28 @@
 # Kindle: CDP learning roadmap
 
+The [imagined-value0.3 bounded check](results/2026-11-03-cdp-breakout-imagined-value03.md)
+passes8,192 actions/32,727 frames/489 updates in47.892s; frozen1,024/.879s has
+zero updates/no natural episodes. All393 pins,357 matching initial/invariant
+frozen tensors,47 pre-update events,replay and guards pass. Main/collector
+succeed08:12:43.805/08:12:49.826 UTC November3/source30793299; terminal review
+completes once08:14:11.721. Conservative200k projection21m26.159s clears30min.
+The bounded root is closed; do not repeat stages/readers. An earlier CLI fixture
+constructs one native agent before rejecting a dummy frame; no updates or policy
+evaluation occur. Preserve that failure, correction and journal.
+
+A [separate fresh200k comparison](experiments/2026-11-03-cdp-breakout-imagined-value03-200k.md)
+is selected, with a30-minute training cap,100k recovery and fixed final/actual-
+initial sampled/greedy24-episode arms against70.750/143.667. Only imagined-value
+weight1→.3 changes; replay-value1 and actor/critic representation gradients off
+remain. Both imagined return fitting and slow-value regularization are scaled;
+replay targets still bootstrap from imagined returns. Native447fe50/teacher fixed,
+runner76440d32 adds12 CLI lines. No bounded experience transfers. CPU qualification
+passes18 scripts/5 commands/38 config cases; five preparation failures/corrections
+remain pinned. No full gameplay outcome is available. Root
+`/x/Temp/kindle-breakout-imagined-value03-20261103/full`; check live state before
+work. No overlap,retry,cap increase,sweep or automatic successor. The five-game
+goal remains unfinished.
+
 The [completed actor/critic-gradient comparison](results/2026-11-03-cdp-breakout-acgrads-value1.md) lowers sampled
 70.750→54.958 and greedy143.667→117.833 in21m56.980s (+2.26% training time),
 all0/24 two-wall. Initial-subtracted score/min falls24.48%/20.07%. Retain the

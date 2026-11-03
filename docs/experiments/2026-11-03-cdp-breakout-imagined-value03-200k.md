@@ -1,0 +1,68 @@
+# Fresh Breakout imagined-value weight0.3 comparison
+
+Separately select one fresh200k-action learner after the bounded check passes
+execution and a conservative21m26s projection. Test whether reducing imagined
+critic weighting improves frozen gameplay against retained70.750 sampled/
+143.667 greedy, each0/24 two-wall. No full outcome is available at selection.
+
+Only `loss_scales.value` changes1→.3; replay-value stays1 and
+`actor_critic_gradient` staysfalse. This scales imagined-return fitting and its
+slow-value regularizer together. Replay lambda targets still use imagined-return
+bootstraps. This is neither complete-observed-return learning nor a demonstrated
+bug repair. The bounded protocol records the NanoDreamer motivation and limits.
+
+Keep centered CDP12M64/Auto/N8/B16/T16/fullBPTT/micro16/H15/R16/lambda.95/
+discount333/base+encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100,
+unit expert action weights/world gradients/all-state corrective labels, sampled
+collection/posteriors, unimix.01, action-effects1, replay100k, warmup1000,
+20% episode guidance/cap1920, seed1009/evaluation4000001009, full18/sticky.25/
+repeat4/noops0/native pooled RGB/one GPU64 resize. Preserve raw rewards and
+true boundaries. Native447fe50/SHA35ad0db and teacher remain unchanged;
+qualified runner76440d32 adds only the fresh-CDP imagined-value option.
+Transfer no weights, replay, beliefs, game/RNG state or bounded experience.
+
+Require200k actions/12,477 updates, first376 and residual.5, within1,800s.
+Retain100k/6,227-update recovery and actual initial/final checkpoints. Require
+357 matching initial/invariant frozen tensors,47 paired pre-update events,
+finite reports, changed CNN/reward/actor/value, full training pixel/action/label
+replay and host guards. Do not infer independent derivative correctness.
+
+Assess fixed final and actual-initial checkpoints with sampled and greedy
+actions: first3 natural episodes per8 lanes,24 perarm, guidance/labels off,
+zero updates/truncations,357 invariant tensors and recorded-action replays/videos.
+Preserve the90% two-wall gate. Sampled is primary; report greedy separately,
+absolute scores and initial-subtracted return per training minute. Do not choose
+checkpoints or evaluation settings after seeing outcomes. Ordinary frozen logs
+lack live pixel hashes; their replay verifies actions/rewards/frames/boundaries.
+
+Qualify all5 actual commands, exact configurations, flag handling, startup and
+recovery observers, source paths, schema and checkpoint retention on CPU before
+declaration/launch. Train1800s, each frozen arm300s, audit1200s, main4500s.
+Launch once with original progress/recovery/postprocessing/collection observers.
+No overlap, retry, extension, cap increase, coefficient sweep, confirmation or
+automatic successor. Preserve failures and completed stages during any CPU repair.
+
+Root `/x/Temp/kindle-breakout-imagined-value03-20261103/full`; runtime remains
+`/x/Temp/kindle-breakout-corrective-20261028/runtime`. Pin exact qualified sources,
+bounded closure, control, commands and host. Record guidance exposure, curves and
+CPU co-host timings without correction. Reused seed/cohort and coupled critic
+terms limit mechanism and reliability claims. Breakout and the goal are unfinished.
+
+## Full qualification
+
+The CPU harness passes08:17:44.844 UTC November3 in2.407s (2.512s wrapper):
+18 scripts,5 commands,38 config checks,10 command cases,19 startup-header cases,
+4 observer-parser cases,14 recovery cases,6 retention fixtures,2 collector
+retention cases,4 metadata cases,44 literal paths and826 declaration-path entries.
+All393 bounded/338 control pins and357 tensor shapes remain unchanged. No native
+module,agent or environment is constructed during this qualification.
+
+Preserve five earlier preparation failures: an old date in the copied collection
+observer; an over-broad source guard that also matched the valid old control path;
+a preflight invocation after generation had failed and produced no script; the
+exact command assertion expecting `0.3` where the qualified command spells `.3`;
+and a receipt-existence check before its wrapper could create that receipt.
+Original sources and receipts are pinned. Corrections change preparation checks
+and observer wiring, not the coefficient, learner, teacher or bounded stages.
+The first bounded CLI fixture's separate unintended native initialization remains
+recorded in the bounded report; no full learner has run before this qualification.
