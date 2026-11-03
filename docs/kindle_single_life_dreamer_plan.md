@@ -1,5 +1,23 @@
 # Kindle: CDP learning roadmap
 
+The [fixed causal paddle-timing diagnostic](results/2026-11-03-cdp-breakout-paddle-timing.md)
+passes its prediction screen. Using only current pooled center and observed
+paddle displacement, `center + displacement/8` lowers episode2 MAE1.435→.975
+pixels overall and1.470→.963 near descending; RMSE also falls and all eight lane
+MAEs improve. This is a reused teacher-state holdout, not independent gameplay
+or a native representation result. The existing response model predicts pooled
+positions; no correction is integrated and no response-model fit or learner is
+selected. Ball timing and closed-loop benefit remain unmeasured.
+
+All14 pins,8 CPU fixtures and the independent35,610-row/400-metric recount pass.
+Analysis takes.785s and completes08:55:43.996 UTC November3/source1cc31e3a;
+controller08:55:44.059,recount08:56:25.832. The source52,072 actions/208,254
+frames and all prior exclusions reconcile without repeating old stages. No failure,
+emulator replay,native import,GPU work or update occurs. Root
+`/x/Temp/kindle-breakout-paddle-timing-20261103` is closed; do not repeat stages.
+No allocation is active at closure; check live state. No automatic successor is
+selected. ReviewSHA7edba75e/completionSHA469e8e1c. The five-game goal is unfinished.
+
 The [completed imagined-value0.3 comparison](results/2026-11-03-cdp-breakout-imagined-value03.md)
 lowers sampled **70.750→35.708** and greedy **143.667→102.000**, all 0/24
 two-wall, in **21m44.356s** (+1.28% training time). Initial-subtracted score/min

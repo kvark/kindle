@@ -1,5 +1,13 @@
 # Fixed causal estimate of the latest paddle position
 
+**Complete:** the [result](../results/2026-11-03-cdp-breakout-paddle-timing.md)
+passes the fixed screen: held-out overall MAE1.435→.975 and near-descending
+1.470→.963, with lower RMSE and all eight lane MAEs improved. Eight CPU fixtures,
+14 pins and the400-metric independent recount pass. Analysis completes once
+08:55:43.996 UTC November3 in.785s; no failure,replay,GPU work or update occurs.
+No teacher change,response-model fit,gameplay test or automatic successor is
+selected. The root is closed; do not repeat stages. The goal remains unfinished.
+
 Select one CPU-only analysis after the imagined-value comparison closes. The
 retained pool-timing diagnostic finds that accepted pooled paddle centers equal
 the midpoint of the last two raw-frame centers, while pooled-versus-latest MAE
