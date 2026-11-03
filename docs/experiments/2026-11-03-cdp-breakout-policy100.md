@@ -86,4 +86,5 @@ and final provenance remain under the private root.
 
 The [bounded result](../results/2026-11-03-cdp-breakout-policy100.md) passes once,
 with no bounded stage repeated. Its private protocol snapshot preserves the
-pre-result declaration. A separately specified fresh200k comparison follows.
+pre-result declaration. The separately specified fresh200k comparison is now
+complete and lowers both frozen scores; retain policy1. See the result above.

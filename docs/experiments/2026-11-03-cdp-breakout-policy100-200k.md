@@ -1,5 +1,14 @@
 # Fresh200k Breakout comparison with imagined-policy weight100
 
+**Complete:** sampled70.750→38.250 and greedy143.667→92.125, all0/24 two-wall,
+in21m49.372s (+1.67% training time). Retain policy1. All436 pins, recovery,
+initial/frozen invariants,replays,guards and five original services pass;
+terminal/coverage readers complete once10:02:01.134/10:05:11.888 UTC November3.
+The [result](../results/2026-11-03-cdp-breakout-policy100.md) records final scores,
+provenance, preserved CPU qualification failures and limits. No GPU stage repeats,
+extension,coefficient sweep or automatic successor. The private protocol snapshot
+preserves the original selection; the declaration below records that design.
+
 Select one full comparison after the [bounded check](2026-11-03-cdp-breakout-policy100.md)
 passes8,192 actions/489 updates in46.910s and a20m59.778s conservative projection.
 All396 pins,357 matching/invariant tensors,47 pre-update events,full guided replay,
@@ -65,11 +74,11 @@ invocation`dbf3484b87e947cfa048d424a144d958`; service
 recovery/collection services start once. Startup passes **09:34:53.761**
 (1.505s wrapper):357 bounded/control-matching initial tensors,47 pre-update
 transitions,first updates376/392/408/424/440/456,and250 finite reports through
-4,360 actions. No full frozen result is available. No restart,overlap or extension.
+4,360 actions. No restart,overlap or extension occurs; the completed outcome is above.
 
 DeclarationSHA`377c240b0aae298a1ff87300019d415a7deabce7aca3c65bf419c7127a685ebf`.
-The100k recovery,all four assessments and original terminal collection remain
-pending. No full preparation failure or repeated GPU stage occurs.
+The100k recovery,all four assessments and original terminal collection subsequently
+pass. No full preparation failure or repeated GPU stage occurs.
 
 The independent terminal reader qualifies five score checks at09:35:51.569,
 3.545s body/3.572s wrapper. Coverage qualification first fails in2.440s because
@@ -80,13 +89,13 @@ failure;52 diagnostic/436 active pins,seven config cases and five retained
 boundary fixtures pass09:36:34.672 in2.439s (2.460s wrapper). Original process
 identity stays unchanged. No terminal analysis,emulator or GPU stage repeats.
 
-Keep these CPU co-host timings without correcting learner wall time. Run the
-recovery confirmation only after the original100k observer succeeds while the
-learner remains active. Run terminal and coverage summaries once after their
-required original completion artifacts exist. Their private sources/provenance
-are fixed before frozen outcomes.
+Keep these CPU co-host timings without correcting learner wall time. Recovery
+confirmation ran once after the original100k observer succeeded, while the
+learner remained active. Terminal and coverage summaries each ran once after
+their required original completion artifacts existed. Their private sources
+and provenance were fixed before frozen outcomes; do not repeat the readers.
 
-## Recovery retained while the original learner continues
+## Recovery retained during the original learner
 
 The original100k observer succeeds **09:45:29.841 UTC November3**, retaining
 100,000 actions/6,227 updates,357 finite tensors and four files/206,067,164 bytes.
@@ -95,11 +104,10 @@ confirmation passes once **09:45:50.268** in1.291s (1.309s wrapper), checking al
 436 input pins,original service identity,metadata and retained file hashes.
 No restore,observer restart or repeated checkpoint audit occurs.
 
-MainPID1000011/invocationdbf3484b87e947cfa048d424a144d958 remains active and
-unchanged. The recovery observer is terminal success; progress,postprocessing
-and collection continue. Frozen gameplay remains unmeasured. Retained weights
-and metadata omit replay,belief,games and RNG; they are not uninterrupted
-training recovery. Keep CPU co-host time without correction.
+MainPID1000011/invocationdbf3484b87e947cfa048d424a144d958 remained unchanged
+through recovery confirmation; all original services are now terminal success.
+Retained weights and metadata omit replay,belief,games and RNG; they are not
+uninterrupted training recovery. Keep CPU co-host time without correction.
 
 Recovery reviewSHA`ba51d1417b97567ddb218b5411ee3f04df149524e3c470bbe35282a0d305a18d`;
 retentionSHA`400d91b82609cb9d87644d47941e34318d412dac67442cc4ed2c9bef6c62e7f7`;

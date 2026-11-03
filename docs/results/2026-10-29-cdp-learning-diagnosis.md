@@ -1,34 +1,30 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh200k policy-weight100 comparison](../experiments/2026-11-03-cdp-breakout-policy100-200k.md)
-is running from09:34:23.440 UTC November3/source0c40e657 with436 pins. MainPID1000011,
-invocationdbf3484b87e947cfa048d424a144d958; original progress,postprocessing and
-terminal-collection observers are active. The100k/6,227 recovery succeeds
-09:45:29.841 UTC; independent confirmation09:45:50.268 verifies436 pins,357 finite
-tensors and all four retained files/206,067,164 bytes. Do not repeat either reader. Startup passes357 matching initial
-tensors,47 pre-update transitions,correct cadence and250 finite reports through
-4,360 actions. Require final/actual-initial sampled/greedy
-24-episode arms against70.750/143.667,all0/24 two-wall,within30min training.
-No frozen result is available. Root `/x/Temp/kindle-breakout-policy100-20261103/full`,
-service `kindle-breakout-policy100-200k-20261103`. Check this original live process;
-do not restart it,repeat passing stages or schedule another GPU job while active.
+The [completed policy-weight100 comparison](../results/2026-11-03-cdp-breakout-policy100.md)
+lowers sampled **70.750→38.250** and greedy **143.667→92.125**, all0/24 two-wall,
+in **21m49.372s** (+1.67% training time). Initial-subtracted score/min falls
+47.75%/37.48%. Retain policy1, expert100, critic1/1 and actor/critic representation
+gradients off. Only policy1→100 changes, scaling score-function and entropy
+together; native447fe50 and teacher stay fixed, runner5a86e224 adds12 CLI lines.
+Current actor-gradient dominance remains unmeasured; reused seed/cohort limits
+reliability. Slightly lower replay expert CE does not establish gameplay benefit.
 
-Only policy loss1→100 changes, scaling score-function and entropy together while
-retaining expert100/world imitation,critic1/1 and actor/critic representation
-gradients off. Native447fe50/teacher stay fixed; runner5a86e224 adds12 CLI lines.
-The [bounded check](../results/2026-11-03-cdp-breakout-policy100.md) passes8,192 actions/
-489 updates in46.910s; conservative200k projection20m59.778s. All396 pins,357
-initial/frozen tensors,47 events,report arithmetic,replay and guards pass; bounded
-root is closed. Main/collector09:30:47.023/09:30:52.508,terminal09:31:21.424.
-Do not repeat bounded stages. Two earlier CPU fixture corrections remain preserved.
-Full CPU qualification passes18 scripts,five commands and38 config cases.
+All436 pins,100k/6,227 recovery,357 matching initial/invariant frozen tensors,
+47 pre-update events,800/795 initial semantic events,replays/videos,guards,curves,
+exposure and comparison pass. Main/post/collection succeed **10:00:29.787 /
+10:00:57.364 /10:01:01.652 UTC November3**, source0c40e657; allfive original services
+succeed. Independent terminal/coverage readers complete once10:02:01.134/
+10:05:11.888. All52 diagnostic/436 full pins reconcile273,544 actions/1,093,592
+frames. Native training actions at raw scores216–431 fall1,262→1,196,none432+;
+these descriptive bins do not identify wall boundaries or a causal limitation.
+Actual guidance overrides are44.545%; guided online67.68 is not frozen competence.
 
-Recovery/terminal/coverage readers are prepared for this original run. Terminal
-reader qualification passes09:35:51.569;52-pin/seven-config coverage qualification
-passes09:36:34.672 after a preserved missing-generator-path failure and CPU-only
-correction. Original main identity and436 pins remain unchanged. Retain CPU
-co-host costs without wall-time correction. Coverage must wait for original
-completion and the independent terminal reader; do not repeat old control analysis.
+Root `/x/Temp/kindle-breakout-policy100-20261103/full` is closed. Bounded,recovery,
+terminal and coverage readers are complete; do not repeat stages or observers.
+No full-run failure or GPU repeat occurs. Two earlier bounded CPU fixture failures
+and the coverage-reader provenance-path failure/CPU repair remain preserved.
+CompletionSHA38776056/terminalSHA26e0da3d/coverageSHAab72765d. Keep CPU co-host
+costs uncorrected. No Kindle allocation remains active at closure; check live state.
 No extension,coefficient sweep,confirmation or automatic successor is selected.
 Breakout and the five-game goal remain unfinished.
 
