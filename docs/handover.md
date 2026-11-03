@@ -8,6 +8,18 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [completed-return/bonus CPU audit](results/2026-11-03-cdp-completed-return-bonus-audit.md) finds390 positive targets among480
+fixed retained states,all eight lanes,weight94.779770/effective228.457. Observed
+completed returns can give a conservative actor weight against the combined
+critic because omitted disagreement bonuses are nonnegative. This is not a
+true-value bound or gameplay benefit. All15 fixtures,17 current/20 prior/158
+original pins,512 arrival/480 outgoing alignments and independent terminal sums
+pass; closure17:41:24.245 UTC November3/source4d2463e0. No model,emulator,GPU,
+update or repeated prior stage. Root`/x/Temp/kindle-completed-return-bonus-audit-20261103`
+is closed. An explicit conservative-mode implementation and bounded check are
+next design candidates; neither implementation nor a GPU job is selected here.
+Retained gameplay results stay; Breakout and the five-game goal remain unfinished.
+
 The [completed-return actor pair](results/2026-11-03-cdp-episodic-actor.md) closes with a useful bonus-off
 result:sampled46.458→56.542 (+21.70%),greedy65.208→95.375 (+46.26%),all0/24
 two-wall,in17m05.486s→17m12.959s (+.729%) for200k actions/12,477 updates each.
