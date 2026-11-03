@@ -1,25 +1,29 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh200k Breakout H3/scale1 comparison](../experiments/2026-11-03-cdp-breakout-open-loop-200k.md)
-launches **11:50:15.735 UTC November3/sourceffc4a26d**, with644 pins and a30-minute
-training cap. Keep constant actor/world imitation100 and retained12M64/Auto/N8/
-B16/T16/H15/R16; add the qualified three-step world objective. Startup passes
-357 matching initial tensors,47 pre-update events and442 finite reports through
-7,448 actions. Original main **PID1020432/invocation7c92d99e93bb4780a04e64d685c6d714**
-continues unchanged at12:01:38 UTC. The original100k recovery observer succeeds
-12:01:22.587; independent reading passes once12:01:38.194 in1.319s wrapper:
-100,000 actions/6,227 updates,357 finite tensors,four retained files and644 pins.
-All6,268 reports through100,648 actions are finite; frozen results remain pending.
+The [completed Breakout H3/scale1 comparison](../results/2026-11-03-cdp-breakout-open-loop.md)
+lowers frozen sampled **70.750→60.875** and greedy **143.667→104.625**, all
+**0/24 two-wall**, in **22m06.821s (+3.02%)** for 200k actions / 799,552 frames /
+12,477 updates. Initial-subtracted score/min falls **16.76% / 29.72%**.
+Retain the control without H3, constant actor/world imitation100 and critic1/1.
+Late replay expert CE rises .560514→.648492; guided online67.78→84.74 is not
+unaided competence. No improved forecasts or isolated loss mechanism is proven.
 
-Require final/actual-initial sampled/greedy24-episode
-assessments against70.750/143.667,all0/24 two-wall. CPU controller qualification
-passes before launch; terminal reading remains pending after its passing
-preflight. Recovery reading is complete; do not repeat it. Native
-c2d627f3/runner8946f5f3 differ from retained447fe50/cf4ea238; no isolated cause.
-Root `/x/Temp/kindle-breakout-open-loop-20261103/full`; main service
-`kindle-breakout-open-loop-200k-20261103`. Check live state; do not restart,
-repeat completed stages/readers or overlap another GPU job. No extension,sweep
-or automatic successor. The five-game goal remains unfinished.
+All644 pins,100k/6,227 recovery,357 matching initial/invariant frozen tensors,
+47 pre-update events,800/795 initial frozen events,finite weighted auxiliary
+reports,full replays/videos,guards,curves,exposure and comparison pass. All five
+original services succeed; main/post/collection finish **12:16:22.850 /
+12:16:49.658 /12:16:54.736 UTC November3**, sourceffc4a26d. Independent terminal
+reading passes once **12:17:22.865** in1.404s wrapper. No full-run failure or
+GPU/replay/collector/reader repeat. Earlier bounded CPU collection failure and
+repair remain preserved. Keep CPU co-host timings without correction.
+
+Nativec2d627f3/runner8946f5f3 differ from retained447fe50/cf4ea238; the explicit
+imagined-bootstrap default is normalized. Reused1009/cohort does not establish
+an isolated cause or independent reliability. Root
+`/x/Temp/kindle-breakout-open-loop-20261103/full` and all its readers are closed.
+No allocation remains active at closure; check live state before GPU work.
+No extension,sweep,confirmation or automatic successor is selected.
+Breakout and the five-game goal remain unfinished.
 
 The [Breakout H3 world-supervision check](../results/2026-11-03-cdp-breakout-open-loop.md)
 passes8,192 actions/32,717 frames/489 updates in48.603s; conservative200k

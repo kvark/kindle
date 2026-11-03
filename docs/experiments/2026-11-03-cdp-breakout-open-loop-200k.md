@@ -145,3 +145,28 @@ The retained checkpoint contains weights and metadata; replay,RNG,games and
 live belief are not included. No restore,learning,evaluation or observer stage
 is repeated. Keep the CPU co-host time without correction. Recovery reading is
 closed; terminal reading and frozen gameplay remain pending.
+
+## Original terminal result — November 3
+
+The [completed comparison](../results/2026-11-03-cdp-breakout-open-loop.md)
+finishes200,000 actions/799,552 frames/12,477 updates in22m06.821s,3.02% slower
+than the control. Sampled70.750→60.875 and greedy143.667→104.625 both decline;
+all final/initial arms havezero of24 two-wall successes. Own initials1.417/
+2.208 match. Initial-subtracted score/min falls16.76%/29.72%. Retain the control
+without H3, constant actor/world imitation100 and critic1/1.
+
+All644 pins,recovery,357 matched initial/invariant frozen tensors,47 pre-update
+and800/795 initial frozen events,all12,477 finite auxiliary reports,replays/
+videos,guards,curves,exposure and comparison pass. All five original services
+succeed; main/post/collection finish12:16:22.850/12:16:49.658/12:16:54.736 UTC.
+The fixed terminal reader runs once and passes12:17:22.865 in1.404s wrapper;
+no full-run failure,GPU stage,collector or reader repeats. Original bounded CPU
+collection failure and separate repair remain preserved. No time correction.
+
+Completion SHA256 is
+`2f8503990218a6e6604571eb544cdee1fa429b45785f860823ea6ffa2d44474b`;
+independent terminal summary SHA256 is
+`3c7c8d75bb65d3a3a41fc37bf0d39cbd3823be9116eebc5761ec17076647bbf0`.
+The original learner,observers and all readers are closed; do not repeat them.
+No allocation remains active at closure. No extension,sweep,confirmation or
+automatic successor is selected. The five-game goal remains unfinished.

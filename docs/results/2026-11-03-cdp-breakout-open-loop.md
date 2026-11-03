@@ -1,4 +1,114 @@
-# Breakout three-step world supervision passes execution and early cost
+# Three-step world supervision worsens frozen Breakout at the short budget
+
+The fresh H3/scale1 comparison lowers sampled **70.750→60.875 (−13.96%)**
+and greedy **143.667→104.625 (−27.18%)**, with **zero of 24 two-wall successes**
+in every arm. Training takes **22m06.821s**, **3.02% longer** than the retained
+control. Initial-subtracted score per training minute falls **16.76% / 29.72%**.
+Retain the control without H3 and constant actor/world imitation100. No
+extension, coefficient sweep, confirmation learner or automatic successor is
+selected from this result.
+
+| Fixed evaluation | Retained control | H3/scale1 | Two-wall successes |
+| --- | ---: | ---: | --- |
+| Final sampled, primary | 70.750 | 60.875 | 0/24 each |
+| Final greedy | 143.667 | 104.625 | 0/24 each |
+| Actual initial sampled | 1.417 | 1.417 | 0/24 each |
+| Actual initial greedy | 2.208 | 2.208 | 0/24 each |
+| Sampled initial-subtracted score/min | 3.230038 | 2.688757 | — |
+| Greedy initial-subtracted score/min | 6.590132 | 4.631370 | — |
+| Training time | 21m27.910s | 22m06.821s | — |
+
+Both learners complete 200,000 aggregate actions and 12,477 updates; candidate
+raw frames are 799,552 versus 799,595. Each frozen arm selects the first three
+natural episodes in each of eight lanes. There are no truncated selected
+episodes or learner updates. The candidate's four arms total 83,272 actions,
+332,902 raw frames and 67.401s, with all 357 tensors invariant in each arm.
+The unchanged gate requires 90% success at clearing both walls (864 points);
+it remains unmet. The initial frozen semantic traces match the control at
+800 sampled and 795 greedy events, and both initial video hashes match.
+
+The [fixed full protocol](../experiments/2026-11-03-cdp-breakout-open-loop-200k.md)
+adds `open_loop_supervision={horizon:3,scale:1}` to the retained centered CDP
+12M64/Auto/N8/B16/T16/H15/R16 recipe, with encoder4e-5, behavior8e-5,
+dynamics4e-4, policy1 and imagined/replay critic1/1. Actor/world imitation stays
+100 throughout. Teacher guidance and corrective labels are unchanged.
+There is no imitation decay, crop, centroid loss, added parameter or inference
+input. No weights, replay, belief, games or experience transfer from the bounded
+check or another life.
+
+From one posterior start per sequence, the auxiliary objective rolls recorded
+actions through three prior steps without intervening observations. Detached
+centered CNN targets supervise steps2–3; reward and continuation targets
+supervise steps1–3, with component weights500/1/1 and global scale1. Reset
+crossings and invalid tails are masked. This is a training objective, not an
+evaluation-only comparison.
+
+All 12,477 auxiliary reports pass finite-value, weighting and mask checks.
+Mean prediction/reward/continuation losses are .155537/.296153/.030939,
+giving mean weighted total78.095699. Mean valid fraction is .996540, with
+range [.875,1]. These are fitting metrics; forecast accuracy and action ranking
+were not measured in this comparison.
+
+Late 50k-action replay imitation CE rises **.560514→.648492**. All 12,477 updates
+have supervision, with 2,989,310 repeated labeled replay rows and equal weight
+sum; maximum raw world/actor CE difference is 8e-7. Actual guidance overrides
+97,749 actions (**48.8745%**) versus 86,117 (**43.0585%**) in the control.
+The remaining 102,251 actions receive passive labels. Guided online last50
+mean rises **67.78→84.74**, while frozen quality falls. Neither guided returns
+nor replay fitting establish unaided competence or an isolated failure mechanism.
+
+Nativec2d627f3/SHA0015dff7 and runner8946f5f3 differ from the retained
+447fe50/cf4ea238 control. The current explicit
+`replay_value_bootstrap=imagined` is the old implicit default and is the only
+configuration normalization besides H3. Initial values match all357 tensors
+against both bounded check and control; 47 pre-update events also match.
+These scoped checks do not establish broad runtime equivalence or isolate
+the causal effect of the loss. Seed1009 and its evaluation cohort are reused
+development data, not an independent confirmation. This result does not rule
+out other forms of multi-step supervision.
+
+## Full comparison closure
+
+All **644 pins**, first-update/cadence checks, finite reports, changed
+CNN/reward/actor/value, full training pixel/action/label replay, frozen
+action/outcome/frame/boundary replays and videos, host guards, curves, exposure
+and comparison pass. The training replay verifies 275 completed episodes.
+Ordinary frozen logs lack live pixel hashes; their replay does not establish
+unrecorded live-image equality.
+
+The original100k recovery observer succeeds12:01:22.587 UTC November3.
+Independent reading passes once12:01:38.194, verifying100,000 actions/6,227
+updates,357 finite tensors and four retained files. These retain weights and
+metadata, not replay,RNG,games or live belief. The original learner continues
+unchanged after this check.
+
+All five original services succeed. Main/postprocessing/collection finish
+**12:16:22.850 /12:16:49.658 /12:16:54.736 UTC November3**, source
+`ffc4a26dc8d46d3138cbefb2c8f359b4e68fd746`. MainPID1020432 has invocation
+`7c92d99e93bb4780a04e64d685c6d714`; full observer identities remain in the
+protocol and private launch records. The predeclared independent terminal
+reader passes once **12:17:22.865** in1.382s CPU/1.404s wrapper.
+
+There is no full preparation or run failure, changed cap, repeated GPU stage,
+replay, collector or final reader. The earlier bounded collector's parent-PID
+assertion failure and separate CPU repair remain preserved below. Startup,
+reader preflight and recovery CPU co-host costs remain uncorrected. No new
+native build or repeated numerical/legacy capture occurs.
+
+Root `/x/Temp/kindle-breakout-open-loop-20261103/full` and all its readers are
+closed; do not repeat them. No Kindle allocation remains active at closure.
+Check live state before further GPU work. Breakout and the five-game goal
+remain unfinished.
+
+| Full artifact | SHA256 |
+| --- | --- |
+| Declaration | `0bce56751ed8248c09de1cf643a0d3c34ffe0c09008161b8d1257977e4e0366a` |
+| Learning review | `106fe1c879a6223e67234d59016dd615d2d0936326aeba9f50f2ca2cdb7c82e5` |
+| Comparison | `bec1d7f7010710e4ea329634d8664c9106adea7c1fa21030c24387caee57c502` |
+| Completion | `2f8503990218a6e6604571eb544cdee1fa429b45785f860823ea6ffa2d44474b` |
+| Independent terminal summary | `3c7c8d75bb65d3a3a41fc37bf0d39cbd3823be9116eebc5761ec17076647bbf0` |
+
+## Earlier bounded execution and cost check
 
 The fresh H3/scale1 check completes **8,192 actions /32,717 frames /489 updates
 in48.603s**. Its conservative200k projection is **21m45.264s**, below the fixed
@@ -67,7 +177,8 @@ goal remains unfinished.
 The passing cost check now supports a separately declared
 [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-open-loop-200k.md).
 Its protocol selects preparation with fixed recovery and four frozen arms;
-no full service has launched yet. No bounded experience will transfer.
+the original full comparison subsequently launches and completes as reported
+above. No bounded experience transfers.
 
 | Artifact | SHA256 |
 | --- | --- |
