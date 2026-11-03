@@ -1,4 +1,94 @@
-# Completed-return actor: control assessed, candidate running
+# Completed-return actor improves its paired Breakout control
+
+Adding the optional completed-return actor loss raises frozen greedy
+**65.208→95.375 (+46.26%)** and sampled **46.458→56.542 (+21.70%)** at the same
+200k-action budget. Training takes **17m12.959s versus17m05.486s (+0.729%)**.
+Both actual-initial controls match1.417 sampled/2.208 greedy. Every final arm
+still has **zero of24 two-wall successes**; the original mean864/90% gate fails.
+
+This is a useful result for the bonus-off recipe on one reused development
+seed/cohort. It does not displace the retained action-effects1 recipe, whose
+means are70.750 sampled/143.667 greedy in21m27.910s. The actor candidate is
+19.80% cheaper in training time but has lower point estimates for both absolute
+scores and initial-subtracted score/minute. Retain the existing primary baseline
+and this cheaper bonus-off development point. No extension,third learner or
+automatic confirmation follows. The five-game goal remains unfinished.
+
+| Recipe | Sampled mean | Greedy mean | Training time | Sampled gain/min | Greedy gain/min |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Paired bonus-off control |46.458|65.208|17m05.486s|2.635|3.686|
+| Completed-return actor100 |56.542|95.375|17m12.959s|3.202|5.412|
+| Retained action-effects1 |70.750|143.667|21m27.910s|3.230|6.590|
+
+Gain/min subtracts each actual-initial mean. All eight new frozen arms complete
+24 selected natural episodes,zero truncations and zero learner updates. The
+paired recipes share the qualified e3b02163 runtime,runner,teacher,initial arrays
+and all learning settings except `replay_actor_scale=100`; both disable model
+disagreement. The retained comparison changes runtime/runner and bonus/ensemble
+alongside the new loss, so it does not isolate an actor-loss or bonus effect.
+
+## Fixed paired comparison
+
+The [protocol](../experiments/2026-11-03-cdp-episodic-actor-200k.md) fixes greedy
+as primary, sampled as secondary, and10,000 paired lane-bootstrap resamples
+with seed0. Each of eight lanes contributes its first three natural episodes.
+The intervals quantify variation in this reused evaluation cohort; they do not
+establish training-seed reliability or erase prior development selection.
+
+| Candidate minus reference | Return difference,95% interval | Gain/min difference,95% interval |
+| --- | ---: | ---: |
+| Paired control,greedy |30.167 [2.167,60.001]|1.726 [.095,3.462]|
+| Paired control,sampled |10.083 [.542,19.333]|.567 [.011,1.104]|
+| Retained,greedy |−48.292 [−99.626,2.000]|−1.178 [−3.783,1.364]|
+| Retained,sampled |−14.208 [−30.042,.961]|−.028 [−.855,.774]|
+
+Six of eight greedy lane means and five of eight sampled lane means improve
+over the paired control. Initial-subtracted score/min rises46.81% greedy/21.50%
+sampled. Relative to retained action-effects1, its point estimate falls17.88%
+greedy/.87% sampled; neither historical-comparison interval excludes zero.
+The prespecified comparison supports development value within the bonus-off
+pair, not an accepted improvement over the retained recipe or task mastery.
+
+The final lane means are:
+
+| Recipe / mode | Lane0 | Lane1 | Lane2 | Lane3 | Lane4 | Lane5 | Lane6 | Lane7 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Control greedy |70.000|53.333|38.667|58.667|75.333|80.000|82.667|63.000|
+| Actor100 greedy |76.667|59.000|136.000|102.333|62.667|54.333|118.000|154.000|
+| Retained greedy |150.333|129.333|59.667|105.667|238.667|172.667|113.000|180.000|
+| Control sampled |57.000|48.333|42.333|54.000|54.333|39.333|38.333|38.000|
+| Actor100 sampled |50.000|72.000|35.000|50.333|72.000|64.667|44.667|63.667|
+| Retained sampled |89.667|51.000|81.333|49.667|78.000|57.000|81.000|78.333|
+
+## Target activity and training exposure
+
+The candidate receives2,526,690 completed replay rows and1,167,144 positive
+rows across12,477 updates. Positive targets start at action1224 and occur in
+12,406 updates. Normalized weight sums658,641.525; raw actor loss sums2643.097.
+Loss-coefficient accounting passes on every update. These are repeated replay
+exposures, not unique experiences or independent observations.
+
+| Action window | Updates | Completed rows | Positive rows | Weight sum | Raw loss sum |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 0–50000 |3102|528,017|274,470|241,960.690|1,518.179|
+| 50000–100000 |3125|662,206|352,386|202,753.776|644.707|
+| 100000–150000 |3125|669,820|288,083|124,344.291|297.944|
+| 150000–200000 |3125|666,647|252,205|89,582.769|182.268|
+
+Control/candidate actual overrides are86,538 (43.269%)/91,135 (45.5675%).
+Both training trajectories contain258 completed episodes and pass full pixel,
+action and corrective-label replay. Final50k teacher cross entropy is.552791/
+.545749; changing visited-state distributions prevent a held-out accuracy
+interpretation. Guided last50 returns191.08/222.74 and unguided online41.68/38.32
+are not the frozen competence results above.
+
+Training maxima are399/415 points,including partial tails. Native actions at
+pre-action scores216–431 rise709→1065,only.3545%/.5325% of all actions. Guided
+actions in that band are4123/6105. Neither learner visits scores432 or higher.
+These score-band exposure counts are not verified wall boundaries or proof
+that coverage alone explains the remaining task failure.
+
+## Bounded qualification retained
 
 Kindle now has an optional direct actor loss on completed real experience.
 The [implementation](../experiments/2026-11-03-cdp-episodic-actor.md) is off by
@@ -15,7 +105,7 @@ passes for both a bonus-off control and the same recipe with actor scale100.
 The candidate adds **4.36%** training time. Its conservative200k projection is
 **17m07.959s**, below the30-minute development cap. This is an early projection,
 not a measured full-run cost. Neither short frozen arm completes a natural
-episode, so **gameplay benefit remains unmeasured**.
+episode, so these bounded checks alone do not measure gameplay benefit.
 
 The candidate receives56,138 completed target rows and33,105 positive rows over
 489 updates. Positive targets first occur at action1,224 and appear in431
@@ -49,9 +139,9 @@ no parameters. Resident device-target mode is rejected for this experimental
 path; AMD Auto already constructs targets on CPU and learns through native GPU
 graphs. Stored visitation rewards remain supported.
 
-These changes matter for comparison: a future gain against the retained recipe
-cannot be attributed solely to the actor loss. The separately selected full
-comparison uses a bonus-off control. The objective is a clipped, normalized
+These changes matter for comparison: the completed pair uses a bonus-off
+control. Its historical comparison with the retained recipe cannot isolate
+the actor loss because the bonus, ensemble and runtime also differ. The objective is a clipped, normalized
 positive-advantage imitation variant inspired by
 [Self-Imitation Learning](https://proceedings.mlr.press/v80/oh18b/oh18b.pdf),
 not an exact reproduction. Completed outcomes can include guidance overrides;
@@ -103,102 +193,88 @@ root. No Kindle service was active at that closure. The retained200k70.750/143.6
 and400k92.792/173.708 gameplay results remain unchanged,all zero of24 two-wall
 successes. The five-game goal remains unfinished.
 
-## Full control is assessed; candidate is running
+## Full execution and two preserved CPU failures
 
-The [fresh200k comparison](../experiments/2026-11-03-cdp-episodic-actor-200k.md)
-launches16:24:19 UTC November3/source783852b2. Its bonus-off control completes
-**200k actions /799,575 frames /12,477 updates in17m05.486s**, within30min.
-This is20.38% less training time than retained action-effects1's21m27.910s, but
-both frozen means are lower. Runtime/runner and bonus/ensemble differ from that
-historical result; no isolated bonus or actor-loss conclusion follows.
+The original full pair launches16:24:19 UTC November3/source783852b2.
+Control training completes17m05.486s for200k actions/799,575 frames/12,477 updates.
+Its100k/6,227 recovery passes16:32:53.148 with261 finite tensors,expected schema,
+verified file hashes and read-only history files. Startup matches261 shared
+initial arrays,47 pre-update events and first update376. All five control GPU
+phases and their full training/frozen replays pass.
 
-| Control evaluation | Mean return | Two-wall successes | Updates |
-| --- | ---: | ---: | ---: |
-| Final sampled |46.458|0/24|0|
-| Actual-initial sampled |1.417|0/24|0|
-| Final greedy |65.208|0/24|0|
-| Actual-initial greedy |2.208|0/24|0|
+After those phases, the original service fails **16:45:24 UTC** in CPU exposure
+analysis: a copied helper expects400k/24,977 and an older `expert_metrics` field.
+Original `kindle-episodic-actor-200k-20261103`, PID1049147/invocation
+`fcc4bc49735445638173a45196bddd44`, and its collector remain failed. The original
+preflight passed queues,schemas,loss accounting and imports but did not exercise
+that exposure helper against the new full review. Original failure/journal files
+are preserved; there is no original passing completion.
 
-All arms complete the fixed24 natural episodes with zero truncations,full
-recorded-action replays/videos and261 invariant tensors. Retained sampled/
-greedy means remain70.750/143.667. The control's initial-subtracted score per
-training minute is2.635 sampled/3.686 greedy. The candidate will be compared
-against this paired control and the historical result under the fixed lane
-bootstrap and original864/90%-two-wall gate.
+Separate repair preserves69 completed-control files and all307 original pins.
+Two valid fixtures,six corruption rejections and exact historical metric
+reproduction pass in1.128s. Independent teacher metrics,corrected exposure
+analysis and previously unstarted control plots finish **16:49:21.889 in3.458s**.
+All22 repair pins pass. No GPU,learning,frozen assessment or full replay repeats.
 
-Training passes all report/counter/schema checks, changed CNN/reward/actor/value,
-matched261 initial arrays and47 pre-update events. The100k/6,227 recovery passes
-16:32:53.148, retaining read-only files and matching hashes. Full CPU training
-replay verifies pixels,actions,corrective labels and86,538 overrides (43.269%).
-Its258 completed episodes and training maximum399 do not establish frozen
-competence. Only709 native actions occur at pre-action scores216–431; none is
-at432 or higher. These are cumulative-score bands, not verified wall events.
+Only the unstarted candidate launches **16:51:24.578 UTC**, sourcedc29240b,
+under `kindle-episodic-actor-200k-resume-20261103`, PID1051198/invocation
+`2e7e3aa5b60947f199c0d3264da02ebf`. Native,runner,seed1009,scale100,200k/12,477,
+30min,100k recovery and all four frozen queues stay fixed. Original absolute
+main/collector deadlines are retained. Its100k/6,227 recovery passes17:00:00.910;
+training finishes **17:08:43**,17m12.959s for799,595 frames. All five candidate
+GPU phases,replays,exposure and curves pass; final initial-greedy replay passes
+17:12:47. Both full training audits take110.366/109.735s including CPU replay.
 
-All307 preparation pins and1.400s CPU preflight pass. However, that preflight
-did not exercise the copied exposure helper against the new full-run review.
-After all five control GPU phases and their audits succeed, the original main
-service **fails16:45:24 UTC** in CPU postprocessing: the helper still expects
-400k/24,977 and an older `expert_metrics` review field. Original service
-`kindle-episodic-actor-200k-20261103`, PID1049147/invocation
-`fcc4bc49735445638173a45196bddd44`, and its original collector remain failed.
-The collector preserves `terminal-failure.json` at16:46:04.558. There is no
-original passing completion. No candidate stage had started.
+The continuation then fails **17:12:50 UTC** in the final CPU comparison. The
+initial-trace reader removed `unix_time` but still compared episode
+`elapsed_seconds` across runs. Exactly28 sampled and27 greedy episode durations
+differ; all other transition/episode/reset fields match. The continuation and
+its collector remain failed, with their original failures/journals preserved.
+No completed stage is restarted and no failed assessment is silently replaced.
 
-A separate repair preserves69 completed-control files and every original pin.
-It adds independent teacher-label/loss accounting and corrects only the CPU
-exposure assumptions. Two valid fixtures,six corruption rejections and exact
-historical metric reproduction pass in1.128s. Control metrics,exposure and
-previously unstarted plots then complete **16:49:21.889 in3.458s**. No agent,
-GPU work,learning,frozen assessment or full replay repeats. All22 repair pins
-pass. The original files and failed services stay intact. The control curve
-was inspected and retains its explicit guided-online/frozen distinction.
+A separate closure preserves154 completed-candidate files. Two valid fixtures
+and eight action/reward/boundary/reset/time corruptions validate the corrected
+reader in1.423s. It excludes only episode elapsed time in addition to the existing
+wall timestamp removal. All **799 sampled /794 greedy initial semantic events**
+match. All261 initial arrays match and every frozen arm preserves261 tensors.
+The original307/first-repair22/closure10 pins and retained338 pins pass.
 
-Only the previously selected,unstarted candidate launches **16:51:24.578 UTC**,
-sourcedc29240b, under `kindle-episodic-actor-200k-resume-20261103`, PID1051198,
-invocation`2e7e3aa5b60947f199c0d3264da02ebf`. Its collectorPID1051201/invocation
-`aab25cf7344c4f89b9cb743364d2d4f3` is active. Nativee3b02163,runner,seed1009,
-scale100,200k/12,477,30min,100k recovery and all four frozen queues are unchanged.
-The original absolute main/collector deadlines are retained, not restarted.
-No control phase is present in the continuation queue.
+The fixed comparison and standalone figure complete **17:19:25.280 in6.984s**.
+Independent terminal verification finishes **17:19:38.264 in2.865s**, confirming
+both original main identities/failures,all input/artifact hashes and all eight
+paired intervals by a separate sum/quantile calculation. Closure is
+`complete_with_cpu_postprocess_repair`; all four original services remain failed.
+The successful result is the separate CPU closure, not a rewritten original run.
 
-Candidate startup passes261 initial arrays matching the bounded and control
-initials,47 common pre-update events and first update376. Positive targets
-start at1224. Through the fixed first50k actions,3102 finite reports expose
-528,017 completed and274,470 positive replay rows;3042 updates have positive
-targets (98.07%). Positive rows are51.98% of completed rows, normalized weight
-sums241,960.690 and raw loss sums1518.179. Coefficient accounting passes. These
-are repeated replay exposures, not unique experience or evidence of gameplay
-benefit.
+The pair totals400k training actions/1,599,170 frames/24,954 updates. Eight frozen
+arms total153,040 actions/611,832 frames/126.880s withzero updates. There areten
+successful GPU stages andzero repeats. No native/GPU/learner/replay failure
+occurs. Training times are actual runner elapsed times; startup/recovery
+observers (.254/.243s control,.317/.241s candidate),housekeeping and read-only
+status checks share the host,with no wall-time correction or kernel timing claim.
+Checkpoint checks establish saved weights/moments,not full replay/game/RNG resume.
 
-Candidate100k/6,227 recovery passes **17:00:00.910 UTC**, with261 finite tensors,
-expected schema and verified file hashes. Checkpoint history retains its files
-and directory read-only. A separate read at17:00:44.604 confirms hashes,
-permissions,307 original/22 repair pins,69 preserved control files and the
-original continuation process identity. Candidate training continues; no
-candidate frozen score or complete paired comparison exists yet. Its startup/
-recovery observers take.317/.241s; control observers take.254/.243s. Host
-housekeeping and status reads also occur; retain actual elapsed wall times
-without correction. These are saved weight/moment checks, not complete
-replay/game/RNG resumption tests.
+Root `/x/Temp/kindle-episodic-actor-20261103/full` is closed. CPU repairs are
+under `repair` and `closure`. Do not rerun learners,assessments,replays,collectors
+or completed analyses. No Kindle GPU allocation or successor is active at
+closure; check live state before separately selected work. Keep the original
+gate and retained primary recipe. The five-game goal remains unfinished.
 
-Root `/x/Temp/kindle-episodic-actor-20261103/full`; CPU repair and continuation
-are under `repair`. A successful pair would close as
-`complete_with_cpu_postprocess_repair`, while the original services stay failed.
-That closure is not yet present. Do not restart either service or overlap a
-new GPU job. No extension,third learner or automatic confirmation follows.
-The five-game goal remains unfinished.
+## Retained artifacts
 
-| Full/repair artifact | SHA256 |
-| --- | --- |
-| Original declaration |`b48da6eae51aad8fe7761437c77e7a8612db89908b3643612b96756a5c2e5c51`|
-| Original preflight |`80421785f172244e4927534ce6ee6d202e96541a9f4106f2da60585095a3d293`|
-| Control100k recovery review |`9aee1175e50b6f312f7a0ce653fdd43a8ca82600c8d1bd891ef1742a7b23d4ac`|
-| Candidate100k recovery review |`f189830cc36e895124f55adcd309eb0198878e2e364b1d18178eb511c18ab02c`|
-| Repaired control postprocessing |`1d7c12609f8073e0b4a2f9bdcd524d92615f16200ed53c467024b895a147d4c0`|
-| Continuation declaration |`cebc98ad879d3734fdd506b846d5ce3a3e98f9bdf6c63ce95c4fa2e4f671541d`|
+The full comparison is `comparison.json`; all lane means are also exported in
+`closure/lane-means.csv`. The inspected figure is `closure/comparison.png` with
+an SVG companion. Actual logs,checkpoints,replays,videos,curves and failures
+remain under the root above. Large evidence stays out of Git.
 
 | Artifact | SHA256 |
 | --- | --- |
+| Original full declaration |`b48da6eae51aad8fe7761437c77e7a8612db89908b3643612b96756a5c2e5c51`|
+| First repair declaration |`cebc98ad879d3734fdd506b846d5ce3a3e98f9bdf6c63ce95c4fa2e4f671541d`|
+| Closure declaration |`dc6302f731775d5544b8446860fa0c81d28c63eabe0acf5a5e7b0a09bad93747`|
+| Full comparison |`68dd1f937529d139f3779308587b7474f5252d0be1c65045f4a657f4b89c4c92`|
+| Repaired completion |`962ab4f70fe80a6d973aaca2080b4cc9ee71b59f8cf6ad92b17777bd2a6f7016`|
+| Independent terminal summary |`2e9059e4a502f034a89581bb41c03f2fb39c3bf0ed07d9c6f877520845b00f32`|
 | Bounded declaration |`e1b2af39cc225ef2f72bf63117cb5a14d15b68831f48cddfad8f8fbde40a7ad4`|
 | Bounded completion |`2c689d078d334c3fe86725f81f6f63bdee3db2345a8720a4c4d702083269ab77`|
-| Terminal summary |`9ca2f36456a276e3d4c0290c511dbb95a7f98c01a3dab89f72a07825eb3441eb`|
+| Bounded terminal summary |`9ca2f36456a276e3d4c0290c511dbb95a7f98c01a3dab89f72a07825eb3441eb`|
