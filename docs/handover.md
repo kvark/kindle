@@ -24,7 +24,11 @@ canonical content identity, preserving exact tensor/semantic comparisons and
 the original failure. No native/runner/learner restart or GPU repeat occurs.
 Startup passes14:34:41 through30,008 actions/1,853 finite reports,357 matching
 initial tensors and47 pre-update transitions. Original main/progress/postprocess
-and newly started recovery/collection observers are active. No frozen result.
+and newly started recovery/collection observers are active. The100k/6,227
+recovery passes with four retained files/357 finite tensors. One CPU observation
+passes14:42:59.826 in1.385s with446 original/11 repair pins and all five original
+service identities unchanged. The200k comparison and final frozen results remain
+pending; no earlier stage or reader repeats.
 Root `/x/Temp/kindle-breakout-budget400k-20261103/full`, separate`cpu-repair`.
 Check live state; do not restart this learner or overlap GPU jobs.
 

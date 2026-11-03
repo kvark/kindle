@@ -122,3 +122,15 @@ uncorrected. No final frozen result or successor is available.
 Repair evidence: `/x/Temp/kindle-breakout-budget400k-20261103/cpu-repair`.
 At terminal closure, verify its fixed script/qualification and preserved original
 launch failure alongside the original collector and independent result reader.
+
+
+## First retained checkpoint
+
+The original recovery observer retains100,000 actions/6,227 updates, all four
+files/206,067,162 bytes and357 finite tensors. A separate read of those existing
+artifacts passes14:42:59.826 UTC in1.385s, checking446 original pins,11 repair
+pins and all five original service identities. Retained metadataSHA60c3210e,
+reviewSHA48dde4b6,retentionSHA1b0b634a. No retention or GPU stage repeats and no
+frozen result is produced. The full content/semantic comparison stays scheduled
+at200k;100k is not independently promoted. CPU co-host time is uncorrected.
+Observation: `/x/Temp/kindle-breakout-budget400k-20261103/recovery100k-observation.json`.
