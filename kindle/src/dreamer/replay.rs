@@ -940,13 +940,12 @@ mod tests {
         }
         let (targets, count) = batch.expert_targets(&config);
         assert_eq!(count, 240);
-        for time in 0..16 {
+        assert_eq!(targets.len(), 240 * 3);
+        for time in 0..15 {
             for row in 0..16 {
                 let target = &targets[(time * 16 + row) * 3..(time * 16 + row + 1) * 3];
-                assert_eq!(target.iter().sum::<f32>(), f32::from(time < 15));
-                if time < 15 {
-                    assert_eq!(target[(time + 10) % 3], 1.0);
-                }
+                assert_eq!(target.iter().sum::<f32>(), 1.0);
+                assert_eq!(target[(time + 10) % 3], 1.0);
             }
         }
         let size = config.network();
