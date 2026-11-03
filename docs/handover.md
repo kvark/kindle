@@ -8,29 +8,33 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [consistent contact-timing diagnostic](results/2026-11-03-cdp-breakout-paddle-contact-timing.md)
-passes its CPU screen: episode2 loss-contact paddle MAE6.101→5.757 pixels and
+The [completed contact-timing CPU teacher comparison](results/2026-11-03-cdp-breakout-contact-timing-policy.md)
+lowers mean185.375→125.875, with only2/8 improved lanes and zero two-wall successes
+in both arms. The fixed10%/five-lane screen fails. Retain the original teacher;
+no24-episode extension, integration, coefficient search or learner is selected.
+All16 CPU fixture cases,211 pins, exact pixel/action/debug replay and independent
+ledger recount pass. Collection13,352 actions/53,396 frames takes8.838s, replay
+10.789s; controller completes09:20:01.737 UTC November3/source334972c8 in19.811s.
+Recount09:20:24.966 verifies2,552 corrected near-contact decisions, zero time clamps.
+No failure, repeated emulator stage, GPU work or learner update occurs. Root
+`/x/Temp/kindle-breakout-contact-timing-policy-20261103` is closed; do not repeat
+stages or readers. ReviewSHA17202d2d/completionSHAb915684a. No Kindle allocation is
+active at closure; check live state. Breakout and the five-game goal remain open.
+
+The preceding [saved contact-timing diagnostic](results/2026-11-03-cdp-breakout-paddle-contact-timing.md)
+passes its fixed prediction screen: episode2 loss-contact MAE6.101→5.757 pixels,
 successful-contact MAE2.376→2.283, with lower RMSE and seven improved lane means.
-Some tail errors worsen; no gameplay gain follows from this saved-plan result.
-All24 pins, five new/eight reused fixtures and739-row/875-metric recount pass.
-Analysis completes09:10:22.541 UTC November3/sourceb7bafe64 in.314s; controller
-09:10:22.591, recount09:11:34.480. No failed/repeated stage, emulator/native import,
-GPU work or update. Root `/x/Temp/kindle-breakout-paddle-contact-timing-20261103`
-is closed; reviewSHAd1e457ca/completionSHA872ae5de. Do not repeat stages.
+Some tails worsen. All24 pins, five new/eight reused fixtures and739-row/875-metric
+recount pass; sourceb7bafe64, completion09:10:22.591 UTC November3. Its root is
+closed, with no failed/repeated stage, emulator/native import, GPU work or update.
+The later gameplay failure shows why this aggregate error gain was insufficient
+for teacher integration. It does not diagnose the native learner's causal limit.
 
-Select the [separate eight-episode CPU gameplay comparison](experiments/2026-11-03-cdp-breakout-contact-timing-policy.md)
-of corrected near-contact plan scoring. The original teacher/runtime stay fixed.
-Require exact replay, unchanged pins and the predeclared10%/five-lane/no-worse-
-success screen before considering a separately specified24-episode assessment.
-No integration or learner is selected. Root
-`/x/Temp/kindle-breakout-contact-timing-policy-20261103`; check live state before
-execution. The five-game goal remains open.
-
-The preceding [current-position](results/2026-11-03-cdp-breakout-paddle-timing.md)
+The [current-position](results/2026-11-03-cdp-breakout-paddle-timing.md)
 and [next-position](results/2026-11-03-cdp-breakout-response-timing.md)
-conversions also pass their fixed prediction screens, with worse tails in the
-latter. Both roots are closed. All three diagnostics reuse development episodes
-and teacher states; none measures native representation quality or gameplay.
+saved-data screens also pass; their roots are closed. All timing diagnostics
+reuse development episodes and teacher states. The original runtime teacher
+and retained native learner remain unchanged.
 
 The [completed imagined-value0.3 comparison](results/2026-11-03-cdp-breakout-imagined-value03.md)
 lowers sampled **70.750→35.708** and greedy **143.667→102.000**, all 0/24

@@ -41,3 +41,8 @@ and no active Kindle allocation. Preflight must construct no emulator or native
 agent. Preserve all failures. Verify pins afterward and independently recount
 the ledger, timing debug, eight returns and screen without repeating emulator
 stages. Root `/x/Temp/kindle-breakout-contact-timing-policy-20261103`.
+
+Completed once at source334972c8. The [result](../results/2026-11-03-cdp-breakout-contact-timing-policy.md)
+fails the fixed screen:125.875 versus185.375,2/8 improved lanes, zero two-wall
+successes. Retain the original teacher; no extension or integration is selected.
+The private pinned protocol preserves the pre-result declaration.

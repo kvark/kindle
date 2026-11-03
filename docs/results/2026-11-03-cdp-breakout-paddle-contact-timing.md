@@ -45,8 +45,9 @@ controller completes **09:10:22.591** in.407s. Recount completes
 `/x/Temp/kindle-breakout-paddle-contact-timing-20261103` is closed.
 
 The separately selected [eight-episode gameplay protocol](../experiments/2026-11-03-cdp-breakout-contact-timing-policy.md)
-tests choosing plans with this correction. The existing teacher and native
-runtime remain unchanged; no learner is selected. The five-game goal stays open.
+subsequently [lowers mean gameplay return185.375→125.875](2026-11-03-cdp-breakout-contact-timing-policy.md),
+with only2/8 improved lanes. Retain the existing teacher and native runtime; no
+extension, integration or learner is selected. The five-game goal stays open.
 
 | Artifact | SHA256 |
 | --- | --- |
