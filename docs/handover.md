@@ -18,9 +18,11 @@ bounded andretained controls,47 bounded pre-update events and first update376.
 The complete training-header check allows only the declared guidance change
 apart from timing/checkpoint metadata; no shared .20 training prefix is claimed.
 
-MainPID1075974/invocation`48b67b1c5a9f4582ae045aa5602d1b48`; recovery andterminal
-observers are active. Require read-only100k/6,227 recovery andfour final/actual-
-initial24-natural-episode arms. Greedy primary143.667, sampled secondary70.750;
+MainPID1075974/invocation`48b67b1c5a9f4582ae045aa5602d1b48` andterminal observer
+remain active. Read-only100k/6,227 recovery passes22:31:13.695 UTC:357 finite
+tensors,117 unchanged pins andoriginal process identity; independent CPU check
+.452s, wrapper.514s. Recovery observer succeeds; four final/actual-initial
+24-natural-episode arms remain. Greedy primary143.667, sampled secondary70.750;
 original864/90%-two-wall gate unchanged. No full result isavailable. CPU helpers
 pass3.211s andfive actual-command/replay-input checks pass.551s, withzero native
 agent/emulator constructions. Root`/x/Temp/kindle-breakout-guidance50-20261103/full`;
@@ -75,6 +77,8 @@ The full 3,188-line handover and 376-line working guide before the November2 con
 remain in Git at `52c2174e2bc6e3cd9ff6ae5ae9b598308e9a8f51`; the roadmap and
 linked results preserve experiment details. PR31's earlier expanded dashboard
 is retained at `/x/Temp/kindle-pr31-dashboard-20261102/pr-before-condensation.json`.
+The November3 dashboard before condensation is separately saved at
+`/x/Temp/kindle-pr31-dashboard-20261103/pr-before-condensation.json`.
 No artifact, checkpoint or experiment source is removed by this documentation
 change. The retained original transfer/build instructions below are historical;
 current active declarations take precedence.

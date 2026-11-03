@@ -4,8 +4,14 @@ A separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-break
 launches22:20:13 UTC November3/source2e1e70de with117 pins. Startup passes all357
 initial tensors against both controls,47 bounded pre-update semantic events and
 first update376. MainPID1075974/invocation`48b67b1c5a9f4582ae045aa5602d1b48` and
-its recovery/terminal observers are active. Fixed200k/12,477 updates/30min;
-read-only100k/6,227 recovery andfour final/actual-initial24-episode arms remain.
+its terminal observer remain active. Fixed200k/12,477 updates/30min;
+read-only100k/6,227 recovery passes22:31:13.695 UTC with357 finite tensors,
+117 unchanged pins andoriginal main identity. The independent CPU check takes
+.452s (.514s wrapper); its original observer succeeds. Four final/actual-initial
+24-episode arms remain. Recovery stores weights andoptimizer moments, without
+replay, games, live belief orfull RNG continuation. CPU co-host time is retained.
+Recovery receipt SHA256 is
+`74f8f5ca9c0f21319556db343441deb66dbbb1bc301d6214acda16625cd05166`.
 Greedy is primary against143.667; sampled70.750 is secondary. No full result is
 available. Do not restart oroverlap this learner. The bounded evidence below
 remains closed.
