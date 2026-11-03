@@ -1,35 +1,32 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh 200k life-bounded actor comparison](../experiments/2026-11-03-cdp-life-return-actor-200k.md)
-launches **19:24:44 UTC November 3**, source `e6e5f4ba`, with 330 pins and a
-30-minute training cap. Native `ec12d41e`, the qualified runtime and runner stay
-unchanged. Keep 12M64/Auto/N8/B16/T16/H15/R16, actor100/lower-bound with life
-boundaries, expert100/world gradients, disagreement1 and the retained rates.
-Transfer no weights or experience. Main PID **1063215**, invocation
-`335925ab865f49d280efb8eaa211fc55`; terminal observer remains active.
+The [completed life-bounded actor comparison](2026-11-03-cdp-life-return-actor.md#full-200k-comparison-does-not-improve-the-retained-recipe)
+finishes 200k actions / 799,589 frames / 12,477 updates in **21m41.269s** (+1.04%).
+Sampled **62.417** and greedy **137.542** fall from retained70.750/143.667 by
+11.78%/4.26%; all0/24 two-wall. Own initials1.417/2.208 match. Greedy gain/min
+falls5.31%, with paired difference−.350 [−2.534,2.012]. The declared selection
+rule fails; the interval spans zero and does not establish reliable harm.
+**Retain the existing200k recipe.** Against the contextual whole-game actor,
+sampled rises26.95% but primary greedy falls4.98%; that comparison also fails.
 
-Startup passes all 357 matched initial tensors and 47 pre-update events.
-The independent .497s CPU observation validates finite reports through
-7,864 actions / 468 updates, first positive actor targets at568, and118 raw-life
-boundary actions. All330 pins stay unchanged; retain CPU co-host time without
-correction. No frozen result is available. Final/actual-initial sampled/greedy
-24-episode assessments, full pixel/label/life
-replay, guards, curves, exposure and comparisons. Primary retained greedy143.667
-and sampled70.750 remain; whole-game actor144.750/49.167 is contextual evidence.
+All330 current/338 retained pins, 100k/6,227 recovery, 357 initial/frozen tensors,
+47 pre-update and799/794 actual-initial semantic events, full replays/videos,
+guards, curves, exposure and comparisons pass. Independent replay verifies
+1,288 raw life losses, including1,032 nonterminal boundaries. The loss has
+613,108 positive repeated rows on11,932 updates. Late expert CE.543307 improves
+without a frozen gain; native exposure at scores216–431 is only1,201 actions,
+with none at432+. These are descriptive counts, not causal architecture evidence.
+
+Original main completes **19:50:54.540 UTC November3**, source`e6e5f4ba`, and
+terminal collector completes **19:51:02.459** in3.231s. Main, recovery and collector
+all succeed; no full-run failure, repair, GPU/replay repeat or cap change occurs.
+The preceding bounded CPU collection failure/repair remain preserved. Root
+`/x/Temp/kindle-life-return-actor-20261103/full` is closed; do not restart the
+learner or repeat its observers. The optional mode remains default-off in
+qualified native`ec12d41e`.
+No extension, coefficient sweep, confirmation or automatic successor is selected.
+No Kindle allocation remains active at closure; check live state before work.
 The original864/90%-two-wall gate and five-game goal remain unfinished.
-
-The 100k/6,227 recovery is retained read-only and passes its original observer
-at19:35:36.137 UTC. Independent CPU verification passes19:35:44.899 in.681s,
-with all357 finite tensors,51,502,659 elements, matching metadata and330 unchanged
-pins. Its observer exits successfully; do not repeat the verifier. The original
-learner continues past102,400 actions/6,377 updates. These weights/moments omit
-replay, games, beliefs and full RNG state; they are not exact-resume state.
-
-Root `/x/Temp/kindle-life-return-actor-20261103/full`; service
-`kindle-life-return-actor-200k-20261103`. Check original process/invocation state;
-**do not restart this learner, repeat completed stages or schedule another GPU
-allocation while it is active**. The preceding bounded check and CPU repair stay
-closed. No cap extension, second learner or automatic successor is selected.
 
 The [optional life-bounded actor qualification](2026-11-03-cdp-life-return-actor.md)
 passes 8,192 actions / 32,725 frames / 489 updates in **49.039s**, versus the

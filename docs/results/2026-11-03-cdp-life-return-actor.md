@@ -1,4 +1,8 @@
-# Life-bounded actor targets pass native and short-run qualification
+# Life-bounded actor does not improve retained Breakout at 200k
+
+The [completed full comparison](#full-200k-comparison-does-not-improve-the-retained-recipe)
+scores62.417 sampled/137.542 greedy in21m41.269s, below retained70.750/143.667
+at slightly higher cost. Keep the retained recipe; the five-game goal is unfinished.
 
 The optional life-bounded observed-return actor completes 8,192 Breakout actions,
 32,725 emulator frames and 489 updates in **49.039 seconds**. The retained
@@ -135,3 +139,125 @@ initial controls; execution success and target counts cannot select a recipe.
 | Independent pixel/life replay | `6946aded6dfe3c8e0ea25f662e5734abb647fdcb5d3ca02a52f510eee986b1d4` |
 | Main completion | `83b72adc547d5a8227a06185e5b2ddb323e1aed4130d65b930778e6a82b715cd` |
 | Repaired terminal summary | `3f2f56d300d3e9a707902f143cf50f38009d3a9f1f57ca9237803bc8a797e43e` |
+
+## Full 200k comparison does not improve the retained recipe
+
+The separately selected [full protocol](../experiments/2026-11-03-cdp-life-return-actor-200k.md)
+completes200,000 actions /799,589 frames /12,477 updates in **21m41.269s**.
+Compared with the retained recipe, sampled62.417 falls11.78% and greedy137.542
+falls4.26%, while training takes1.04% longer. Initial-subtracted score per
+training minute falls12.92% sampled and5.31% greedy. All final arms still have
+zero of24 two-wall successes. **Retain the existing200k recipe.**
+
+| Recipe | Sampled mean | Greedy mean | Training time | Greedy gain/min |
+|---|---:|---:|---:|---:|
+| Retained, auxiliary actor off | 70.750 | 143.667 | 21m27.910s | 6.590132 |
+| Whole-game actor100/lower-bound | 49.167 | 144.750 | 21m46.724s | 6.544994 |
+| Life-bounded actor100/lower-bound | 62.417 | 137.542 | 21m41.269s | 6.240065 |
+
+Each final arm selects the first three natural episodes in each of eight lanes.
+Own actual-initial means are1.416667 sampled and2.208333 greedy, exactly matching
+the retained and whole-game controls. Greedy is the primary mode. Its paired
+candidate-minus-retained mean difference is−6.125, lane-bootstrap95% interval
+[−53.168,44.917]; gain/min difference−.350067 has interval[−2.533782,2.011629].
+Sampled differences are−8.333333 [−34.666667,21.208333] and−.417398 gain/min
+[−1.636540,.950374]. These reused-cohort intervals span zero; the point estimates
+and declared selection rule reject promotion, without establishing reliable harm.
+
+Against the contextual whole-game actor, sampled mean rises26.95% while greedy
+falls4.98%, for.42% less training time. Sampled return difference13.25 has
+interval[−5,31], and gain/min difference.620134 has interval[−.219829,1.439705].
+Greedy return difference−7.208333 has interval[−67.75,47.626042]; gain/min
+difference−.304929 has interval[−3.088359,2.219088]. This contextual comparison
+also fails its primary greedy selection rule. All bootstrap estimates use10,000
+fixed paired lane resamples, seed0; none estimates training-seed reliability.
+
+### Targets, fit and exposure
+
+The optional loss executes throughout training with positive targets on11,932
+updates, first at action568. There are2,729,915 completed-return rows and613,108
+positive rows, counting repeated replay exposure; clipped weight sum336,860.554861
+and unscaled auxiliary loss sum1,584.539574. Imagined/replay bonus report sums
+80.933067/81.225762 remain positive. All12,477 finite reports pass loss-component
+and expert-world accounting. CNN, reward projection, actor and critic weights
+change. No prior experience or weights transfer.
+
+Independent108.880s CPU replay verifies every training pixel input, action,
+corrective label, reward, frame count, episode/reset and raw life change:
+**1,288 losses, zero gains, 1,032 nonterminal boundaries and256 terminal
+boundaries**, with zero timeout boundaries. The per50k loss counts are
+517/322/234/215. These observed counts mix changing policy, guidance and episode
+duration; they do not isolate a survival improvement caused by the new objective.
+
+The whole-game actor had1,010,324 positive repeated rows and12,403 positive
+updates. In the final50k window, the life-bounded actor has90,251 positive rows
+and31,697.224460 clipped weight, versus220,960 and75,527.439039 for whole-game
+targets. These are different learned trajectories and batches, not paired
+counterfactual targets. More conservative credit is active, but better gameplay
+does not follow at this budget.
+
+Late teacher-label cross-entropy improves to.543307 from the retained.560514 and
+whole-game.559403. Guided online last50 return is83.26, with91,607 actual action
+overrides (45.8035%). These fitting and aided-play measures do not replace the
+lower frozen scores. Training reaches a maximum raw score419;1,201 native
+actions occur at pre-action scores216–431 (.6005% of training), and none at432+.
+The retained control had1,262 such native actions and the whole-game actor939.
+Score bands are not verified wall events, and these observations do not establish
+the architecture's causal limitation.
+
+Native learn calls consume1,147.828s, or88.21% of training elapsed time; acting
+and environment stepping take63.266s/63.123s. These are stage timers, not a kernel
+profile. Preserve the .306s startup check, .497s early CPU review, .294s recovery
+observer, .681s independent recovery verification and ordinary status reads as
+co-hosting caveats. No training-time correction is applied.
+
+### Full evidence and closure
+
+Use the same qualified native `ec12d41e`, runtime and byte-identical bounded
+runner. Settings remain12M64/Auto/N8/B16/T16/H15/R16/context1, retained split
+rates, expert100/world gradients, disagreement1 and actor100/lower-bound with
+life boundaries. Development seed1009 and evaluation cohort4000001009 are
+reused. Native/runner revisions differ from both historical full controls;
+exact bounded/initial compatibility is narrower than full execution equivalence.
+
+All330 current and338 retained pins pass. All357 initial tensors match the
+bounded candidate and historical controls. The47 pre-update events match the
+bounded candidate including life fields; comparison with older runs excludes
+only those added boundary fields. Both actual-initial frozen traces reproduce
+799/794 semantic events against both controls, excluding only wall clocks.
+
+The original100k/6,227 checkpoint is read-only, with357 finite tensors and
+51,502,659 elements. Independent verification succeeds19:35:44.899 UTC while
+the original learner continues. Recovery preserves weights and optimizer
+moments, but omits replay, game state, beliefs and full RNG state; it is not an
+exact-resume checkpoint. Do not repeat the completed verification.
+
+Four frozen arms total92,552 actions /370,036 frames /70.341s, with zero
+updates or truncated episodes and357 invariant tensors per arm. All full
+recorded-action replays, videos, source/ROM/host guards, learning curves,
+guidance exposure, score coverage and paired comparisons pass. The completed
+learning figure is visually checked; its curve is aided online return and its
+caption reports the separate sampled frozen score.
+
+Original main PID1063215, invocation`335925ab865f49d280efb8eaa211fc55`, completes
+**19:50:54.540 UTC November3**, source`e6e5f4ba`. Original terminal collector
+PID1063218/invocation`297599e0fc9f4180bb9adee0a4e9ef41` succeeds
+**19:51:02.459** in3.231s. Main, recovery and collector services all terminate
+successfully. The five GPU stages each execute once. There is no full-run
+failure, repair, cap change or repeated training/evaluation/replay/collector.
+The preceding bounded CPU collection failure and repair remain preserved.
+
+Root `/x/Temp/kindle-life-return-actor-20261103/full` is closed. Do not restart
+this learner, repeat its stages or rerun its observers. No Kindle allocation
+remains active at closure; check live state before new work. No extension,
+coefficient sweep, confirmation or automatic successor is selected. The original
+mean864/90%-two-wall gate and five-game goal remain unfinished.
+
+| Full-run evidence | SHA256 |
+|---|---|
+| Declaration | `5803f807e0a5a02e792eea42387e123ea2261c849606e1fcdc272a8c8f8d67d9` |
+| Pixel/life replay | `178ade2922cfddeadfd3d605f1483c8972832078ba70f6b4848edd6238ab9afa` |
+| Score coverage | `11092b98c5007640aea99e7c014adc3b1f9ff581c8abe70905e962a8901a5284` |
+| Comparison | `57b587d433c1f49c16d4ebf49470d16602bae3f1223ca1cd44180cc26589e201` |
+| Main completion | `2dd9f9ceaafcb7351ad83144720c6bcf938aef5ccca09d74ed28314ec8f1ba28` |
+| Terminal summary | `1fa2c6912b18dad732ced185b14e8360209ccc1084d3da359c9e93f5f6652559` |
