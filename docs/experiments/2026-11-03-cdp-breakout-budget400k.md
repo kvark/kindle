@@ -155,3 +155,24 @@ The observer's full comparison,retention and GPU stages are not repeated.
 Evidence: `/x/Temp/kindle-breakout-budget400k-20261103/recovery200k-observation.json`.
 The learner continues toward300k recovery and the fixed400k endpoint. No frozen
 result or successor is available; CPU co-host costs remain uncorrected.
+
+
+## All recovery checkpoints pass
+
+The original recovery observer retains300,000 actions/18,727 updates and exits
+successfully15:04:28.160 UTC. All100k/6,227,200k/12,477 and300k/18,727 retained
+checkpoints pass their four-file integrity and357-finite-tensor requirements;
+the200k common-prefix receipt remains unchanged. The terminal service has been
+unloaded, so its original invocation is verified from its journal, not an empty
+live InvocationID field. No service restart occurs.
+
+A single read-only final recovery review passes15:05:24.225 in2.999s (3.018s
+wrapper),checking all three checkpoint metadata/configurations and files,
+446 original/11 repair pins,original recovery identity and unchanged active
+main/progress/postprocessing/collection identities. Recovery completionSHA
+`27dd453c407d7e85ce05459a7f880bacf555d9ab970ef9596c75603bf2f006e6`;
+300k reviewSHA`f50e87e64907e0ec27f1329bb314af53943bb4ce231f81b657b136600aa2d996`.
+Evidence: `/x/Temp/kindle-breakout-budget400k-20261103/recovery300k-observation.json`.
+No full tensor/semantic comparison,retention or GPU stage repeats. CPU co-host
+cost remains uncorrected. Main training continues to the declared400k endpoint;
+final frozen outcomes and terminal collection remain pending.
