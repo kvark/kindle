@@ -1,5 +1,23 @@
 # Kindle: CDP learning roadmap
 
+The [completed return/life audit](results/2026-11-03-cdp-breakout-return-life-audit.md)
+finds390→143 positive targets among480 fixed retained states when returns stop
+at the next life loss;70.74% of clipped weight disappears. Within16 actions of
+loss,30 positives becomezero,but that subset is only3.49% of original weight.
+Full-game returns remain valid for game-total reward; this arithmetic does not
+identify causal errors or prove that a life-bounded target would help. These are
+retained frozen states,not the conservative learner's online batches. No native
+change or learner is selected; per-life credit design remains a concrete question.
+
+All252 pins,16 CPU fixtures,35,552 actions/142,169-frame annotation replay,
+eight pixel-sequence hashes,512 selected pixels,480 original returns/weights
+and independent recount pass.142 raw life losses,zero gains; one historical
+file resolves exactly fromGit. Replay15.018s/analysis.639s/recount.273s close
+18:52:33.129 UTC November3/source0dc11ba4. No failure,GPU work,model forward,
+update or prior-stage repeat. Root`/x/Temp/kindle-breakout-return-life-audit-20261103`
+is closed; do not rerun. Retain70.750/143.667 and the original task gate;
+the five-game goal remains unfinished. Check live state before new work.
+
 The [completed200k conservative-actor comparison](results/2026-11-03-cdp-conservative-actor.md)
 finishes200k actions /799,546 frames /12,477 updates in21m46.724s (+1.46%).
 Greedy144.750 versus143.667 is nearly flat; sampled49.167 versus70.750 falls30.51%.
