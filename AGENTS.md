@@ -20,6 +20,22 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [fresh200k actor-only decay comparison](docs/experiments/2026-11-03-cdp-breakout-actor-only-decay-200k.md)
+is selected after numerical/bounded qualification. Hold actor imitation100 through
+update6227 (100k actions),fade to0 at9352 (150k),world100 throughout; retain the
+12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/policy1/critic1/1
+recipe and teacher. Fresh200k/12,477,30-minute cap,100k recovery,four fixed24-episode
+final/actual-initial sampled/greedy assessments against70.750/143.667,all0/24
+two-wall. No experience reuse,extension,sweep or automatic successor. Native
+c2d627f3/runner8946f5f3 differ from447fe50;no isolated causal claim.
+
+All CPU command/config/observer/retention/schedule checks pass with599 bounded/
+338 control pins. The original converter-import failure and pre-test F32 fixture
+correction remain retained;no GPU work during preparation. Root
+`/x/Temp/kindle-actor-only-decay-20261103/full`;service
+`kindle-breakout-actor-only-decay-200k-20261103`. Check live state; do not duplicate
+or restart a selected learner. The five-game goal remains unfinished.
+
 The [actor-only imitation-decay qualification](docs/results/2026-11-03-cdp-actor-only-imitation-decay.md)
 passes F64 loss/derivatives and fresh Breakout8,192 actions/32,725 frames/489
 updates in47.329s. Actor scale100 reaches zero at256 (234 zero-weight reports);
