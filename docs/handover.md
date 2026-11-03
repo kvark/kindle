@@ -8,19 +8,26 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [replay16k bounded check](experiments/2026-11-03-cdp-breakout-replay16k.md) is selected for CPU qualification and
-bounded execution; no GPU stage has launched yet. Change only shared replay
-capacity100,000→16,384, retaining lambda0.95 and the70.750/143.667 control.
-Native447fe50, runnercf4ea238 andteacher stay exact. Fixed24,576 actions/1,513
-updates test eviction within240s; require16k pre-eviction semantic equality,
-357 initial/invariant tensors,1,024 frozen actions andfull guided replay/guards.
-CPU preflight passes04:50:14.518 UTC November3 in1.033s: two commands,20 config
-cases,357-tensor schema,saturated cadence and338 control pins. Exact source
-review confirms cached recurrent context andsampled refresh, but cache age and
-causal staleness remain unmeasured. Recency,diversity,reuse andcoverage change
-together. Root`/x/Temp/kindle-breakout-replay16k-20261103/native-check`; no full
-learner,capacity sweep orautomatic promotion selected. Check live state before
-launch; do not repeat completed preflight orpreceding lambda1 stages.
+The [replay16k bounded check](results/2026-11-03-cdp-breakout-replay16k.md) completes24,576 actions/98,167 frames/
+1,513 updates in158.358s;1,024 frozen/.903s haszero updates/no natural episodes.
+Conservative200k projection23m37.590s clears30min. All378 original/408 repair
+pins,357 matching initial/invariant tensors,47 pre-update events,515 saturated
+reports,16k/2,078-event semantic prefix,full guided replay andguards pass.
+Native447fe50/runnercf4ea238/teacher remain exact; only shared capacity100k→16,384.
+Recency,diversity,reuse andcoverage change together; cache age/benefit unmeasured.
+
+Original main976085/af346c90f72b4c26bbee0fa9333738bf andcollector976088/
+c96a1d9b2ced4483b1ed81f4aa0b7615 fail04:54:31.441/04:54:39.720 UTC November3
+/source1e277a5 aftersuccessful GPU stages: the CPU prefix audit compared40
+wall-clock fields. Separate17.639s CPU closure completes04:59:11.269,including
+previously unrun12.906s replay; eight repair fixtures pass. Original services
+remain failed; closure`complete_with_cpu_audit_repair`,SHAfa2de49f. Status-tail
+parser failure isalso retained. No GPU stage,successful replay orcollector repeats.
+Root`/x/Temp/kindle-breakout-replay16k-20261103/cpu-audit-repair` isclosed;
+do not repeat qualification,training,frozen,replay,repair orcollectors. Original
+success-only terminal reader remainsunrun. No full learner,capacity sweep or
+successor selected. No allocation active atclosure; check live state beforework.
+The five-game goal remains unfinished.
 
 The [completed lambda1 comparison](results/2026-11-03-cdp-breakout-lambda1.md) scores **45.667 sampled /
 90.292 greedy**, below retained lambda0.95's70.750/143.667 by35.45%/37.15%,

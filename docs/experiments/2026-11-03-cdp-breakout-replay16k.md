@@ -1,5 +1,14 @@
 # Breakout replay16k: bounded execution and cost check
 
+**Closed with CPU audit repair:**24,576 actions/98,167 frames/1,513 updates
+in158.358s;1,024 frozen/.903s,zero updates/no natural episodes.515 saturated
+reports,16k semantic prefix and378 original/408 repair pins pass. Conservative
+200k projection23m37.590s clears30min. Original main/collector remain failed
+after an over-specific wall-time comparison; separate CPU closure succeeds
+04:59:11.269 UTC November3. No GPU stage repeats. No full learner is selected.
+See the [result and preserved failure](../results/2026-11-03-cdp-breakout-replay16k.md).
+The selection and launch sections below describe historical states.
+
 Select one fresh check changing replay capacity100,000→16,384 stored frames
 from the retained lambda0.95/replay-value1 control. Its frozen means remain
 70.750 sampled/143.667 greedy, with zero two-wall successes. The completed
@@ -81,3 +90,35 @@ The GPU audit also requires final replay length16,384 and at least512 reports
 with saturated replay, as well as the fixed16,000-action semantic prefix.
 Source preparation takes.036s. No failed preparation or GPU allocation occurs
 at qualification; full learning andgameplay benefit remain unmeasured.
+
+## Launch
+
+The check launches04:51:39.595 UTC November3/source1e277a5 with378 pins,
+declarationSHA`c70548faa4622c1154babe39a7c8a6fe99bb96a39d2322dcdc957a283cef3178`.
+Main976085/invocationaf346c90f72b4c26bbee0fa9333738bf andcollector976088/
+invocationc96a1d9b2ced4483b1ed81f4aa0b7615 areactive atstartup. Actual header
+matches the selected config/native/runner. Aread-only status scan attempts to
+parse the partial first line of a tail buffer andfails; its separate receipt is
+preserved. The corrected observation excludes partial lines. No experiment
+stage fails orrepeats, andthe original process identities remain unchanged.
+
+## CPU repair and closure
+
+Both GPU stages complete within their original bounds, but the long-prefix
+audit also compares episode `elapsed_seconds`. The first mismatch is action1,224;
+all40 differences in2,078 events are wall-clock fields. Original main/collector
+fail04:54:31.441/04:54:39.720 UTC andremain failed. No original review orcompletion
+exists. The separate repair excludes wall-clock time from semantic equality,
+retaining all gameplay fields andthe fixed16k boundary; eight fixture cases pass.
+
+Corrected CPU audit completes04:59:11.269 in17.639s, including the previously
+unrun12.906s guided replay. All378 original/408 repair pins,357 initial/invariant
+tensors,47 pre-update events,1,513 finite reports,515 saturated replay reports,
+2,078 matching prefix events andguards pass. Training24,576/98,167frames/158.358s
+andfrozen1,024/4,096frames/.903s areunchanged,withzero frozen updates/no natural
+episodes. Conservative200k projection1,417.590s passes1,800s; gameplay remains
+unmeasured. Closure`complete_with_cpu_audit_repair`,SHAfa2de49f; no GPU stage,
+successful replay ororiginal collector repeats. Original success-only terminal
+reader staysunrun. Bothroots areclosed; no full learner orallocation isactive.
+Do not repeat completed stages; preserve all original failures andcheck live
+state before separately selected work. The five-game goal remains unfinished.
