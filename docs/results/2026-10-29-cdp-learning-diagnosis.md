@@ -1,17 +1,24 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh lambda1 learner](../experiments/2026-11-03-cdp-breakout-lambda1-200k.md)
-is active from04:13:38.340 UTC November3/source958d622. Fixed200k actions and
-30-minute training cap andfour final/actual-initial frozen arms will test gameplay
-against70.750/143.667; no result yet. The100k/6,227 recovery succeeds04:24:44.552;
-confirmation04:25:14.741 passes357 finite tensors,448 unchanged pins and6,377
-finite reports through102,408 actions. Startup retains357 matched initial
-tensors and47 pre-update events. Terminal/coverage readers are qualified before
-outcomes, reusing completed control coverage without another replay. Only
-lambda.95→1 changes both imagined/replay traces,retaining endpoint bootstrap;
-no isolated mechanism claim. Main972800/44e2a4cbb446493f9db029c194c27300 andthree
-observers remain active; recovery isterminal success. Preserve the prelaunch CPU date-wiring failure/repair;
-no GPU repeat. Do not restart or overlap the existing learner.
+The [completed lambda1 comparison](2026-11-03-cdp-breakout-lambda1.md) lowers
+sampled70.750→45.667 andgreedy143.667→90.292 in21m52.277s (+1.89%), allzero
+of24 two-wall successes. Retain lambda0.95. Using the entire available trace
+before endpoint bootstrap does not improve this recipe; both imagined/replay
+targets change, so it does not isolate intermediate-value bias, variance or
+imagined-reward error as the cause. One reused development seed/cohort limits
+reliability. Expert CE improves.560514→.536404 andnative216–431 exposure rises
+1,262→1,434 (.631%→.717%), withnone432+. These descriptive measures do not
+establish the mechanism anddo not substitute for frozen gameplay.
+
+All448 pins,recovery,357 matched/invariant tensors,paired initial traces,full
+replays/videos,guards,curves,exposure andcomparison pass. Main/post/collection
+succeed04:39:49.589/04:40:12.443/04:40:16.846 UTC November3/source958d622.
+Terminal andcoverage readers complete04:40:46.018/04:40:51.786; allfive original
+services succeed,no full-run failure orstage repeat. Earlier CPU import and
+prelaunch date-wiring failures remain. Root`/x/Temp/kindle-breakout-lambda1-20261103/full`
+isclosed; do not repeat completed stages/readers. Native447fe50/teacher remain
+unchanged; runner9eb21cca adds10 CLI lines. No new allocation orautomatic
+successor isselected; the five-game goal remains unfinished. Check live state.
 
 The [return-lambda1 check](2026-11-03-cdp-breakout-lambda1.md) passes8,192
 actions/489 updates in50.121s and1,024 frozen/.868s withzero updates/no natural

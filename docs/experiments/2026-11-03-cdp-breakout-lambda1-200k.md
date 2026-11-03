@@ -1,5 +1,12 @@
 # Fresh 200k Breakout comparison with return lambda1
 
+**Complete:** lambda1 scores45.667 sampled/90.292 greedy versus retained
+lambda0.95's70.750/143.667 in21m52.277s (+1.89%), allzero of24 two-wall.
+Retain lambda0.95; no extension,confirmation,sweep orautomatic successor.
+All original services andterminal/coverage readers pass. This protocol's
+selection,launch andrecovery sections below are historical; the root isclosed.
+See the [completed result](../results/2026-11-03-cdp-breakout-lambda1.md).
+
 Separately select one full learner after the [bounded lambda1 check](../results/2026-11-03-cdp-breakout-lambda1.md)
 passes execution, restore, trajectory and cost validation. Its8,192 actions/489
 updates take50.121s; conservative200k projection22m26.028s is below30minutes.
@@ -121,3 +128,31 @@ omitted. The original main process remains active with the same PID/invocation;
 frozen gameplay is pending. No recovery observer, training or GPU stage repeats.
 Do not repeat the completed recovery confirmation. Retain CPU co-host cost
 without correcting training time.
+
+## Completion
+
+The learner finishes 200,000 actions / 799,566 frames / 12,477 updates in
+1,312.277s. All four fixed frozen arms complete with zero updates/truncations;
+candidate sampled/greedy45.667/90.292 fall35.45%/37.15% below70.750/143.667,
+and initial-subtracted return/min falls37.36%/38.89%. Own initials1.417/2.208
+match control; all arms have zero two-wall successes. Retain lambda0.95.
+
+All448 pins,100k recovery,357 matching initial/invariant frozen tensors,
+800/795 paired initial semantic events,full replays/videos,guards,curves,
+exposure andcomparison pass. Main/postprocess/collection succeed04:39:49.589/
+04:40:12.443/04:40:16.846 UTC November3; allfive original services succeed.
+Terminal confirmation04:40:46.018 takes1.987s; coverage04:40:51.786 takes2.956s.
+All50 coverage/448 full pins pass;282,720 actions/1,130,258 frames reconcile.
+Native216–431 actions rise1,262→1,434,none432+; these are score bins, not
+verified wall boundaries or causal coverage. Late expert CE falls.560514→.536404
+despite lower frozen scores. Actual overrides45.3985%; guided81.54 isnot
+unaided competence. All CPU co-host timings remain uncorrected.
+
+CompletionSHA`17c06d5d8d3998191d2add3d4aaa0b67ec42f11782c6155acd4bb5930b00e6f8`;
+terminalSHA`4145274a5451ab098d0ce0a67207e55b40c3d5b38fb2b01db4935e141447ab11`;
+coverageSHA`eabe5271bad6879381c114286204cc72491070eba1988d1baa7616ded02524ad`.
+No full-run failure orstage repeat. Earlier CPU import/date-wiring failures
+andrepair remain. All completed learners,assessments,replays,collectors,
+preflights andreaders must not repeat. No allocation isactive atclosure;
+check live state before newwork. No automatic successor isselected, andthe
+five-game goal remains unfinished.

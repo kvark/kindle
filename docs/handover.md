@@ -8,25 +8,29 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [fresh lambda1 comparison](experiments/2026-11-03-cdp-breakout-lambda1-200k.md)
-is active: launched04:13:38.340 UTC November3/source958d622 with448 pins,
-200k actions/12,477 updates and30-minute training cap. MainPID972800,
-invocation44e2a4cbb446493f9db029c194c27300; progress,postprocessing andcollection
-observers remain active. The original recovery observer succeeds04:24:44.552;
-100k/6,227 weights andmetadata pass with357 finite tensors. Independent recovery
-confirmation passes04:25:14.741 with448 unchanged pins and6,377 finite reports
-through102,408 actions; no observer orGPU stage repeats. Startup retains357
-control/bounded matching initial tensors and47 pre-update transitions. Final/
-actual-initial sampled/greedy24-episode assessments remain pending against
-70.750/143.667 and the original two-wall gate. Terminal/coverage readers are
-qualified;50 coverage pins, fixed score bins andretained control counts. Run
-each once after original completion; do not repeat completed preflights orrecovery.
-Only lambda.95→1 changes both imagined/replay targets; native447fe50,runner
-9eb21cca andteacher fixed. CPU preflight's stale collector-date failure is
-preserved; correction passes before launch,no GPU repeat. No full result yet.
-Root`/x/Temp/kindle-breakout-lambda1-20261103/full`,service
-`kindle-breakout-lambda1-200k-20261103`. Check live state; do not restart this
-learner or schedule another GPU job while it is active.
+The [completed lambda1 comparison](results/2026-11-03-cdp-breakout-lambda1.md) scores **45.667 sampled /
+90.292 greedy**, below retained lambda0.95's70.750/143.667 by35.45%/37.15%,
+in **21m52.277s** (+1.89%). Both final arms have0/24 two-wall successes.
+Retain lambda0.95 with12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/
+dynamics4e-4/replay-value1/expert100 and sampled collection. Lambda changes
+both imagined/replay targets; no isolated mechanism or seed-reliability claim.
+
+All448 pins,100k/6,227 recovery,357 matching initial/invariant frozen tensors,
+paired initial traces,replays/videos,guards,curves,exposure andcomparison pass.
+Main/postprocess/collection succeed04:39:49.589/04:40:12.443/04:40:16.846 UTC
+November3/source958d622; allfive original services succeed. Terminal confirmation
+04:40:46.018 andcoverage04:40:51.786 pass once;50 diagnostic/448 full pins,
+282,720 actions/1,130,258 frames reconciled. Native216–431 actions rise1,262→1,434,
+none432+; score bins are not verified walls or causal coverage. Expert CE falls
+.560514→.536404 despite worseplay; actual overrides45.3985% are not competence.
+
+Root`/x/Temp/kindle-breakout-lambda1-20261103/full` isclosed. Recovery,terminal
+andcoverage readers arecomplete; do not repeat them orcompleted stages. Earlier
+CPU import/date-wiring failures andrepair remain; no full-run failure orrepeat.
+Native447fe50/teacher unchanged; qualifiedrunner9eb21cca adds10 CLI lines.
+Keep CPU co-host caveats. No extension,confirmation,sweep orautomatic successor
+selected. No Kindle allocation isactive atclosure; check live state beforework.
+The five-game goal remains unfinished.
 
 The [lambda1 bounded check](results/2026-11-03-cdp-breakout-lambda1.md)
 passes8,192 actions/32,727 frames/489 updates in50.121s; frozen1,024/.868s has
