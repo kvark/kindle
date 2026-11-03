@@ -1,35 +1,27 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh 50% episode-guidance Breakout comparison](../experiments/2026-11-03-cdp-breakout-guidance50-200k.md)
-is **running**, launched22:20:13 UTC November3/source2e1e70de with117 pins.
-Fixed200k actions /12,477 updates /30min, retained12M64/Auto/N8/B16/T16/H15/R16,
-behavior8e-5/replay-value1/expert100/full18. Only episode guidance probability
-.20→.50 changes; teacher,1920-action cap, all-state labels, native447fe50 and
-runnercf4ea238 remain fixed. Startup passes357 initial tensors against both
-bounded andretained controls,47 bounded pre-update events and first update376.
-The complete training-header check allows only the declared guidance change
-apart from timing/checkpoint metadata; no shared .20 training prefix is claimed.
+The [completed50% episode-guidance Breakout comparison](2026-11-03-cdp-breakout-guidance50.md)
+finishes200k actions /799,731 frames /12,477 updates in21m37.887s (+.77%).
+Greedy50.583/sample34.417 fall64.79%/51.35% from143.667/70.750; all0/24 two-wall.
+Greedy gain/min falls66.07%, paired difference−4.354[−6.127,−2.718]; sampled
+falls52.77%. Own initials2.208/1.417 match. Retain20% guidance andthe existing
+B16/T16 recipe. Actual overrides rise43.0585%→73.15%; late labelCE improves
+.560514→.541246, without gameplay benefit. Only1,774 native actions occur at
+scores216–431; none reaches432. This reused1009/cohort result does not isolate
+a mechanism or establish seed reliability.
 
-MainPID1075974/invocation`48b67b1c5a9f4582ae045aa5602d1b48` andterminal observer
-remain active. Read-only100k/6,227 recovery passes22:31:13.695 UTC:357 finite
-tensors,117 unchanged pins andoriginal process identity; independent CPU check
-.452s, wrapper.514s. Recovery observer succeeds; four final/actual-initial
-24-natural-episode arms remain. Greedy primary143.667, sampled secondary70.750;
-original864/90%-two-wall gate unchanged. No full result isavailable. CPU helpers
-pass3.211s andfive actual-command/replay-input checks pass.551s, withzero native
-agent/emulator constructions. Root`/x/Temp/kindle-breakout-guidance50-20261103/full`;
-service`kindle-breakout-guidance50-200k-20261103`. Check live state; do not restart,
-overlap orrepeat this learner. No extension, probability sweep orautomatic
-successor isselected. The five-game goal remains unfinished.
-
-A redundant comparison assertion still requires equal guidance probabilities,
-contradicting the declared change. Original pinned work stays untouched. The
-[separate CPU correction](../experiments/2026-11-03-cdp-breakout-guidance50-cpu-comparison.md)
-qualifies1.218s before frozen outcomes: actual original entry rejects the declared
-pair; corrected entry accepts it andrejects eight corrupt headers. Fourteen repair
-pins are prepared. Wait for original main/collector terminal outcomes, then finish
-only the missing comparison; no GPU, replay, plot oraudit repeats. No repair has
-executed andno original passing completion isclaimed.
+All117 original/338 retained pins,100k/6,227 recovery,357 matching initial/
+invariant frozen tensors,47 bounded/799–794 initial events, full replays/videos,
+guards, curves, exposure andcoverage pass. Original main/collector fail
+22:45:58/22:46:28 UTC November3/source2e1e70de on a redundant guidance-header
+assertion. Separate4.137s CPU correction completes22:47:34.594, preserving98
+artifacts and20 repair pins; an earlier null-journal-message wrapper failure
+isretained. No GPU orsuccessful CPU stage repeats. Closure is
+`complete_with_cpu_audit_repair`; original services remain failed. Full root
+`/x/Temp/kindle-breakout-guidance50-20261103/full`, separate correction under
+`cpu-comparison-repair`. No extension, probability sweep, confirmation orautomatic
+successor isselected. No Kindle allocation isactive atclosure; check live state.
+The original864/90%-two-wall gate andfive-game goal remain unfinished.
 
 The [50% episode-guidance Breakout check](2026-11-03-cdp-breakout-guidance50.md) passes
 8,192 actions /32,746 frames /489 updates in **48.271s**,1.22% above the retained

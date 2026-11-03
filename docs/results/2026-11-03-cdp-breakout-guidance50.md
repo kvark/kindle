@@ -1,42 +1,118 @@
-# More guided Breakout episodes pass execution and early cost checks
+# More guided Breakout episodes lower frozen performance
 
-A separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-guidance50-200k.md)
-launches22:20:13 UTC November3/source2e1e70de with117 pins. Startup passes all357
-initial tensors against both controls,47 bounded pre-update semantic events and
-first update376. MainPID1075974/invocation`48b67b1c5a9f4582ae045aa5602d1b48` and
-its terminal observer remain active. Fixed200k/12,477 updates/30min;
-read-only100k/6,227 recovery passes22:31:13.695 UTC with357 finite tensors,
-117 unchanged pins andoriginal main identity. The independent CPU check takes
-.452s (.514s wrapper); its original observer succeeds. Four final/actual-initial
-24-episode arms remain. Recovery stores weights andoptimizer moments, without
-replay, games, live belief orfull RNG continuation. CPU co-host time is retained.
-Recovery receipt SHA256 is
-`74f8f5ca9c0f21319556db343441deb66dbbb1bc301d6214acda16625cd05166`.
-Greedy is primary against143.667; sampled70.750 is secondary. No full result is
-available. Do not restart oroverlap this learner. The bounded evidence below
-remains closed.
+The fresh200k comparison completes **200,000 actions /799,731 frames /12,477
+updates in21m37.887s**,0.77% more training time than retained20% guidance.
+Primary greedy score falls **143.667→50.583 (−64.79%)**; sampled falls
+**70.750→34.417 (−51.35%)**. Both final arms have **0/24 two-wall successes**.
+Retain20% episode guidance andthe existing200k recipe. The original864/90% gate
+andfive-game goal remain unfinished.
 
-Source review before frozen outcomes finds a redundant `exploration` equality
-assertion in the original comparison, despite the preceding complete-header
-validator requiring .20→.50. The original qualification covered those components
-separately and missed the combined path. The [isolated CPU correction](../experiments/2026-11-03-cdp-breakout-guidance50-cpu-comparison.md)
-passes1.218s: actual original entry reproduces `AssertionError('exploration')`,
-corrected entry accepts the declared pair andrejects eight wrong headers using
-synthetic final results. No candidate frozen outcome isread. All117 current/338
-retained pins andactive process identity pass;14 repair pins are prepared.
-Original scripts/services stay unchanged. After original terminal outcomes,
-complete only the missing comparison separately andpreserve any original failure.
-No correction hasexecuted; no training, frozen assessment orsuccessful CPU stage
-will repeat. This CPU co-host qualification cost remains uncorrected.
+| Measurement | Retained20% | Candidate50% |
+| --- | ---: | ---: |
+| Greedy final /actual initial |143.667 /2.208|50.583 /2.208|
+| Sampled final /actual initial |70.750 /1.417|34.417 /1.417|
+| Training time |21m27.910s|21m37.887s|
+| Greedy initial-subtracted score/min |6.590132|2.236327|
+| Sampled initial-subtracted score/min |3.230038|1.525557|
+| Actual overridden actions |43.0585%|73.1500%|
+| Late cross entropy on labeled replay rows |.560514|.541246|
 
-Full helper qualification passes3.211s at22:19:09.599, reproducing saved expert/
-exposure metrics and checking eight expert, nine header, five intervention and
-four selection cases plus corrupted-loss rejection. Five actual queued commands
-and both actual replay inputs pass.551s at22:19:40.926, withzero native agent/
-emulator constructions orGPU descriptors. The exact header comparison permits
-only guidance probability .20→.50 aside from timing/checkpoint metadata; initial
-training trajectories need only match the bounded .50 run. The selected protocol
-and native/runner/teacher remain unchanged.
+Greedy gain/min falls66.07%; sampled falls52.77%. Paired candidate-minus-control
+score differences are−93.083 with95% lane interval[−131.167,−57.958] greedy and
+−36.333[−45.751,−25.667] sampled. Gain/min differences are−4.353804
+[−6.127161,−2.717523] and−1.704481[−2.142799,−1.209478]. All eight lane means
+fall in both modes. The fixed10,000-resample/seed0 rule rejects the candidate.
+These intervals describe one reused development learner/cohort, not training-
+seed reliability. No probability sweep, extension orconfirmation isselected.
+
+## Full comparison and interpretation
+
+The [full protocol](../experiments/2026-11-03-cdp-breakout-guidance50-200k.md)
+changes only episode guidance probability .20→.50. Teacher,1920-action cap,
+all-state corrective labels, native447fe50/SHA35ad0db andrunnercf4ea238 stay
+unchanged. Keep12M64/Auto/N8/B16/T16/H15/R16/context1, encoder/base4e-5,
+dynamics4e-4, behavior8e-5, policy1/critic1/replay-value1, expert100 andfull18.
+Fresh seed1009/evaluation4000001009 reuses the development choices without
+transferring weights, replay, games, beliefs orRNG. Native construction takes
+2.451s separately. Learning takes1144.038s (88.15% of training); acting and
+emulation total126.283s (9.73%). These timers do not isolate GPU kernels.
+
+Actual overrides total146,300;53,700 actions still receive passive corrective
+labels. There are2,991,426 repeated labeled replay rows andall12,477 reports
+are finite/supervised; maximum world/behavior expert-loss difference is8e-7.
+Late imitation fit improves, yet unaided gameplay regresses. Selected guided
+online episodes average201.8 in their last50; the overall online last50 mean
+is129.96. Neither is frozen competence. The existing curve is visually checked
+and correctly labels the separate34.42/1.42 sampled final/initial means.
+
+Only1,774 native actions (.887%) occur at pre-action scores216–431. No training
+action reaches432; the maximum cumulative score including tails is417. Guidance
+changes the visited-state distribution, andits episode selection probability is
+not its actual action fraction. These measurements do not isolate why this
+setting hurts learning orprove all forms of guidance harmful.
+
+## Full validation and preserved CPU failures
+
+Launch is22:20:13 UTC November3/source2e1e70de, mainPID1075974/invocation
+`48b67b1c5a9f4582ae045aa5602d1b48`. All117 original/338 retained pins pass, with
+one exact historical replay-source resolution. All357 initial tensors match
+both bounded andretained controls;47 bounded pre-update events andfirst update376
+match. The .20 and.50 training trajectories are not claimed equal.
+
+The read-only100k/6,227 recovery passes22:31:13.695, retaining357 finite tensors,
+117 pins andoriginal process identity. Its independent CPU check takes.452s
+(.514s wrapper). Recovery preserves weights andoptimizer moments, without
+replay, games, live belief orcomplete RNG continuation.
+
+All four frozen arms complete24 selected natural episodes withzero updates or
+truncations and357 invariant tensors each. They total68,784 actions /274,977
+frames /59.478s. Actual-initial sampled/greedy controls reproduce1.417/2.208 and
+799/794 semantic events. Full training pixel/action/label replay takes107.891s
+across186 natural episodes. Frozen recorded-action/outcome/frame/boundary replays,
+videos, all five guards, finite/changed learning tensors, curves, exposure and
+coverage pass. Ordinary frozen logs lack live pixel hashes; no unavailable
+live-image equality isclaimed.
+
+Before frozen outcomes, source inspection finds a redundant `exploration`
+equality assertion after the correct complete-header validator. Original helper
+qualification tested components separately and missed this combined path.
+The [isolated correction](../experiments/2026-11-03-cdp-breakout-guidance50-cpu-comparison.md)
+removes only that redundant equality; all other fields, fixed selection rules
+andthe exact declared probability change remain checked. Actual-entry fixtures
+reproduce the original rejection andaccept the corrected header pair while
+rejecting eight invalid headers, using synthetic final results. Qualification
+passes1.218s withno candidate outcomes read, native agent oremulator constructed.
+Its CPU co-host cost, startup.359s andrecovery costs remain uncorrected.
+
+Original main andcollector fail **22:45:58 /22:46:28 UTC** after all GPU and
+replay/audit stages finish, with`AssertionError: exploration` preserved in the
+original journal. A first CPU repair wrapper stops before comparison because
+one journal record has`MESSAGE:null`; its source, stdout/stderr andfailure
+receipt remain unchanged. A separate corrected wrapper filters non-string
+messages andqualifies against the actual saved journal. No comparison had run
+in that first wrapper attempt.
+
+The corrected comparison completes once at **22:47:34.594 UTC**, in4.137s CPU.
+All98 original artifacts,117 original/338 retained pins and20 repair pins remain
+unchanged. Closure is`complete_with_cpu_audit_repair`. Original main/collector
+remain failed; no original passing completion isfabricated. No training, frozen
+assessment, replay, plot, successful audit orcollector repeats. The recovery
+observer remains successful. No Kindle allocation isactive atclosure; check live
+state before further work. No automatic successor isselected.
+
+Full root:`/x/Temp/kindle-breakout-guidance50-20261103/full`; correction:
+`/x/Temp/kindle-breakout-guidance50-20261103/cpu-comparison-repair`.
+
+| Full artifact | SHA256 |
+| --- | --- |
+| Learning review |`ff6d05bd6cd90a34fb5ec3b2dd27294431ab197e890dc5ab8c4a59b2c8bfc152`|
+| Training replay |`28dd16da85398693c695d8ef86cac1f251761f57c30043c4dac0504779cef3e4`|
+| Corrected comparison |`44b0e874ac799c3264724967b4e1d022edbec10d47f9c554b464f600b73f98c1`|
+| Repair completion |`71a62548d46cbb083f8ac30422e827aadac6c1c3ad6012583019ed9617a59f73`|
+| Original terminal failure |`ede0c6a30c2c3e3bf362a2328bf55c6751f59446eab54b8734b68d6ab4e7e4bb`|
+| Repair declaration |`b33ae25093a8bc46fc1bfeedbf3b9daf00b2a96840428025636a5acb08118f4a`|
+
+## Bounded prerequisite
 
 The fresh 50% episode-guidance check completes **8,192 actions /32,746 frames /
 489 updates in 48.271s**, versus retained 20% guidance's 47.690s (+1.22%). The
