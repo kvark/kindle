@@ -342,6 +342,8 @@ pub struct DreamerConfig {
     pub open_loop_supervision: Option<OpenLoopSupervision>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub color_centroid_supervision: Option<ColorCentroidSupervision>,
+    /// One cached state plus optional forward-only observations before the
+    /// training sequence. The default of 1 performs no state recomputation.
     pub replay_context: usize,
     /// Replay samples per action. Zero disables scheduled updates; explicit
     /// `DreamerCore::learn` remains available for isolated diagnostics.
@@ -768,8 +770,8 @@ impl DreamerConfig {
         if size.units == 0 || size.vision_depth == 0 {
             return Err("head and vision dimensions must be non-zero".into());
         }
-        if self.replay_context != 1 {
-            return Err("the baseline pins D3's one-step replay context".into());
+        if self.replay_context == 0 {
+            return Err("replay_context must include a cached state".into());
         }
         if self.batch_size == 0 || self.batch_length <= 1 {
             return Err("batch_size must be positive and batch_length must exceed one".into());
@@ -787,7 +789,17 @@ impl DreamerConfig {
         {
             return Err("world_microbatch_size must be a positive divisor of batch_size".into());
         }
-        if self.replay_capacity < self.replay_warmup_frames() {
+        let stride = if self.video_encoder.is_some() {
+            self.batch_length
+        } else {
+            1
+        };
+        let warmup_frames = self
+            .replay_warmup_sequences()
+            .checked_mul(stride)
+            .and_then(|frames| frames.checked_add(self.replay_context))
+            .and_then(|frames| frames.checked_add(self.batch_length - 1));
+        if warmup_frames.is_none_or(|frames| frames > self.replay_capacity) {
             return Err("replay_capacity cannot satisfy the D3 learner warmup gate".into());
         }
         if !self.train_ratio.is_finite() || self.train_ratio < 0.0 {
@@ -895,6 +907,37 @@ const fn default_replay_value_gradient() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn replay_context_validates_prefix_capacity_and_preserves_default() {
+        let mut config = DreamerConfig::tiny(3);
+        assert_eq!(config.replay_context, 1);
+        let default = serde_json::to_value(&config).unwrap();
+        assert_eq!(default["replay_context"], 1);
+        let original_warmup = config.replay_warmup_frames();
+        for context in [2, 9] {
+            config.replay_context = context;
+            config.replay_capacity = original_warmup + context - 1;
+            config.check().unwrap();
+            assert_eq!(config.replay_warmup_frames(), config.replay_capacity);
+            let encoded = serde_json::to_value(&config).unwrap();
+            assert_eq!(
+                serde_json::from_value::<DreamerConfig>(encoded).unwrap(),
+                config
+            );
+            config.replay_capacity -= 1;
+            assert!(config.check().unwrap_err().contains("warmup"));
+        }
+        config.replay_context = 0;
+        assert!(config.check().unwrap_err().contains("cached state"));
+        config.replay_context = usize::MAX;
+        assert!(config.check().unwrap_err().contains("warmup"));
+        config.replay_context = 9;
+        config.video_encoder = Some(VideoEncoder::Joint);
+        config.batch_length = crate::vision::levjepa::FRAMES;
+        config.world_backprop_length = config.batch_length;
+        assert!(config.check().is_err());
+    }
 
     #[test]
     fn expert_imitation_defaults_preserve_legacy_config_and_validate_weights() {

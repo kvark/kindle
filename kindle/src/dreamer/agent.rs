@@ -56,6 +56,7 @@ const CHECKPOINT_METADATA: &str = "metadata.json";
 const RNG_POLICY: u64 = 0x706f_6c69_6379_0001;
 const RNG_LIVE_POSTERIOR: u64 = 0x6c69_7665_706f_7374;
 const RNG_REPLAY: u64 = 0x7265_706c_6179_0001;
+const RNG_REPLAY_PREFIX: u64 = 0x7265_706c_7072_6566;
 const RNG_TRAIN_POSTERIOR: u64 = 0x7472_6169_6e70_6f73;
 const RNG_IMAGINATION: u64 = 0x696d_6167_696e_6501;
 const RNG_OPEN_LOOP: u64 = 0x6f70_656e_6c6f_6f70;
@@ -234,6 +235,8 @@ pub struct LearnReport {
 #[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct LearnTiming {
     pub replay_seconds: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub replay_context_seconds: Option<f64>,
     pub posterior_seconds: f64,
     pub imagination_seconds: f64,
     pub world_train_seconds: f64,
@@ -336,6 +339,7 @@ struct DreamerRngs {
     policy: StdRng,
     live_posterior: StdRng,
     replay: StdRng,
+    replay_prefix: ChaCha12Rng,
     train_posterior: ChaCha12Rng,
     imagination: ChaCha12Rng,
     open_loop: ChaCha12Rng,
@@ -347,6 +351,7 @@ impl DreamerRngs {
             policy: StdRng::seed_from_u64(seed ^ RNG_POLICY),
             live_posterior: StdRng::seed_from_u64(seed ^ RNG_LIVE_POSTERIOR),
             replay: StdRng::seed_from_u64(seed ^ RNG_REPLAY),
+            replay_prefix: ChaCha12Rng::seed_from_u64(seed ^ RNG_REPLAY_PREFIX),
             train_posterior: ChaCha12Rng::seed_from_u64(seed ^ RNG_TRAIN_POSTERIOR),
             imagination: ChaCha12Rng::seed_from_u64(seed ^ RNG_IMAGINATION),
             open_loop: ChaCha12Rng::seed_from_u64(seed ^ RNG_OPEN_LOOP),
@@ -411,6 +416,7 @@ pub struct DreamerCore {
     return_normalizer: PercentileNormalizer,
     world_train: Session,
     world_posterior: Option<Session>,
+    replay_prefix: Option<Session>,
     world_observe_live: Session,
     imagination: Session,
     world_transition_live: Session,
@@ -538,6 +544,13 @@ impl DreamerCore {
                 &config,
             )
         });
+        let mut replay_prefix = (config.replay_context > 1).then(|| {
+            super::runtime::build_learner_inference_session(
+                &world::build_replay_prefix_graph(&config),
+                &gpu,
+                &config,
+            )
+        });
         let mut world_observe_live =
             build_session(&world_observe_live_graph, &gpu, Mode::Inference, false);
         let mut imagination =
@@ -569,6 +582,10 @@ impl DreamerCore {
         if let Some(posterior) = &mut world_posterior {
             share_matching(&mut world_train, posterior, "world.");
             share_matching(&mut world_train, posterior, "encoder.");
+        }
+        if let Some(prefix) = &mut replay_prefix {
+            share_matching(&mut world_train, prefix, "world.");
+            share_matching(&mut world_train, prefix, "encoder.");
         }
         share_matching(&mut behavior_train, &mut imagination, "behavior.");
         sync_matching(&behavior_train, &mut behavior_slow, "behavior.value.");
@@ -622,6 +639,7 @@ impl DreamerCore {
             perception_identity: None,
             world_train,
             world_posterior,
+            replay_prefix,
             world_observe_live,
             imagination,
             world_transition_live,
@@ -1251,11 +1269,16 @@ impl DreamerCore {
     pub fn learn(&mut self) -> Option<LearnReport> {
         let started = Instant::now();
         let stage = Instant::now();
-        let batch = self.replay.sample(&self.config, &mut self.rngs.replay)?;
+        let mut batch = self.replay.sample(&self.config, &mut self.rngs.replay)?;
         let mut timing = LearnTiming {
             replay_seconds: stage.elapsed().as_secs_f64(),
             ..LearnTiming::default()
         };
+        if batch.prefix.is_some() {
+            let stage = Instant::now();
+            self.recompute_replay_context(&mut batch);
+            timing.replay_context_seconds = Some(stage.elapsed().as_secs_f64());
+        }
         let stage = Instant::now();
         let posterior = self.sample_posterior_batch(&batch);
         timing.posterior_seconds = stage.elapsed().as_secs_f64();
@@ -1354,7 +1377,47 @@ impl DreamerCore {
         }
     }
 
+    fn recompute_replay_context(&mut self, batch: &mut SequenceBatch) {
+        let prefix = batch.prefix.take().expect("replay prefix missing");
+        let session = self.replay_prefix.as_mut().expect("prefix session missing");
+        let config = &self.config;
+        let size = config.network();
+        let length = config.replay_context - 1;
+        assert_eq!(prefix.observations.len(), length);
+        session.set_input("initial_deter", &batch.initial_deter);
+        session.set_input("initial_stoch", &batch.initial_stoch);
+        let mut uniform_targets = Vec::with_capacity(length);
+        for time in 0..length {
+            let (keep_deter, keep_stoch, keep_action) =
+                flag_keep_masks(&prefix.flags[time], 0, config.batch_size, config);
+            for (name, values) in [
+                ("observation", &prefix.observations[time]),
+                ("previous_action", &prefix.previous_actions[time]),
+                ("keep_deter", &keep_deter),
+                ("keep_stoch", &keep_stoch),
+                ("keep_action", &keep_action),
+            ] {
+                session.set_input(&format!("{name}_{time}"), values);
+            }
+            uniform_targets.push((
+                session.input_buffer(&format!("uniforms_{time}")).unwrap(),
+                config.batch_size * size.stoch * size.classes,
+            ));
+        }
+        self.uniforms_gpu
+            .fill(&mut self.rngs.replay_prefix, &uniform_targets);
+        session.step();
+        self.readback.read(
+            session,
+            &mut [(0, &mut batch.initial_deter), (1, &mut batch.initial_stoch)],
+        );
+    }
+
     fn sample_posterior_batch(&mut self, batch: &SequenceBatch) -> PosteriorBatch {
+        assert!(
+            batch.prefix.is_none(),
+            "recompute replay prefix before posterior sampling"
+        );
         let size = self.config.network();
         let rows = self.config.batch_size;
         let length = self.config.batch_length;
@@ -1862,6 +1925,9 @@ impl DreamerCore {
         ];
         if let Some(posterior) = &mut self.world_posterior {
             targets.push(posterior);
+        }
+        if let Some(prefix) = &mut self.replay_prefix {
+            targets.push(prefix);
         }
         if let Some(decoder) = &mut self.world_prediction_live {
             targets.push(decoder);
@@ -2677,6 +2743,15 @@ fn keep_masks_range(
     row_count: usize,
     config: &DreamerConfig,
 ) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
+    flag_keep_masks(&batch.flags[time], first_row, row_count, config)
+}
+
+fn flag_keep_masks(
+    flags: &[FrameFlags],
+    first_row: usize,
+    row_count: usize,
+    config: &DreamerConfig,
+) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
     let end_row = first_row
         .checked_add(row_count)
         .expect("keep-mask row range overflowed");
@@ -2686,7 +2761,11 @@ fn keep_masks_range(
     let mut stoch = vec![0.0; row_count * size.stoch * size.classes];
     let mut action = vec![0.0; row_count * config.action_count];
     for local_row in 0..row_count {
-        let keep = batch.keep(time, first_row + local_row);
+        let keep = if flags[first_row + local_row].is_first {
+            0.0
+        } else {
+            1.0
+        };
         deter[local_row * size.deter..(local_row + 1) * size.deter].fill(keep);
         let width = size.stoch * size.classes;
         stoch[local_row * width..(local_row + 1) * width].fill(keep);
@@ -3548,6 +3627,61 @@ mod tests {
                 .get("open_loop_supervision")
                 .is_none()
         );
+    }
+
+    #[test]
+    fn replay_prefix_randomness_and_timing_leave_defaults_unchanged() {
+        let mut baseline = DreamerRngs::new(42);
+        let mut changed = DreamerRngs::new(42);
+        for _ in 0..1024 {
+            let _ = changed.replay_prefix.random::<u64>();
+        }
+        for _ in 0..16 {
+            assert_eq!(
+                baseline.policy.random::<u64>(),
+                changed.policy.random::<u64>()
+            );
+            assert_eq!(
+                baseline.live_posterior.random::<u64>(),
+                changed.live_posterior.random::<u64>()
+            );
+            assert_eq!(
+                baseline.replay.random::<u64>(),
+                changed.replay.random::<u64>()
+            );
+            assert_eq!(
+                baseline.train_posterior.random::<u64>(),
+                changed.train_posterior.random::<u64>()
+            );
+            assert_eq!(
+                baseline.imagination.random::<u64>(),
+                changed.imagination.random::<u64>()
+            );
+            assert_eq!(
+                baseline.open_loop.random::<u64>(),
+                changed.open_loop.random::<u64>()
+            );
+        }
+        assert!(
+            serde_json::to_value(LearnTiming::default())
+                .unwrap()
+                .get("replay_context_seconds")
+                .is_none()
+        );
+        let config = DreamerConfig::tiny(3);
+        let flags = [
+            FrameFlags {
+                is_first: true,
+                ..Default::default()
+            },
+            FrameFlags::default(),
+        ];
+        let (deter, stoch, action) = flag_keep_masks(&flags, 0, 2, &config);
+        for values in [deter, stoch, action] {
+            let width = values.len() / 2;
+            assert!(values[..width].iter().all(|&value| value == 0.0));
+            assert!(values[width..].iter().all(|&value| value == 1.0));
+        }
     }
 
     #[test]

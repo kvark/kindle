@@ -327,7 +327,8 @@ impl SequenceReplay {
         }
         let size = config.network();
         let batch = config.batch_size;
-        let length = config.batch_length;
+        let prefix_length = config.replay_context - 1;
+        let length = prefix_length + config.batch_length;
         let mut initial_deter = vec![0.0; batch * size.deter];
         let mut initial_stoch = vec![0.0; batch * size.stoch * size.classes];
         let mut observations = (0..length)
@@ -388,7 +389,7 @@ impl SequenceReplay {
                 "fresh replay start is invalid"
             );
             let frames = &self.streams[stream].frames;
-            let context = &frames[start + config.replay_context - 1];
+            let context = &frames[start];
             let stoch_width = size.stoch * size.classes;
             let deter_target = &mut initial_deter[row * size.deter..(row + 1) * size.deter];
             let stoch_target = &mut initial_stoch[row * stoch_width..(row + 1) * stoch_width];
@@ -423,7 +424,7 @@ impl SequenceReplay {
             }
 
             for time in 0..length {
-                let index = start + config.replay_context + time;
+                let index = start + 1 + time;
                 let frame = &frames[index];
                 match &frame.values {
                     FrameValues::Host { observation, .. } => observations[time]
@@ -482,9 +483,31 @@ impl SequenceReplay {
             }
         }
 
+        let prefix = if prefix_length == 0 {
+            None
+        } else {
+            assert!(pixels.is_none(), "causal video replay requires context1");
+            let training_observations = observations.split_off(prefix_length);
+            let training_actions = previous_actions.split_off(prefix_length);
+            let training_flags = flags.split_off(prefix_length);
+            let prefix = ReplayPrefix {
+                observations,
+                previous_actions,
+                flags,
+            };
+            observations = training_observations;
+            previous_actions = training_actions;
+            flags = training_flags;
+            previous_expert_action = previous_expert_action.split_off(prefix_length);
+            rewards = rewards.split_off(prefix_length);
+            frame_indices = frame_indices.split_off(prefix_length);
+            Some(prefix)
+        };
+
         Some(SequenceBatch {
             initial_deter,
             initial_stoch,
+            prefix,
             observations,
             pixels,
             previous_actions,
@@ -538,6 +561,7 @@ impl SequenceReplay {
 pub struct SequenceBatch {
     pub initial_deter: Vec<f32>,
     pub initial_stoch: Vec<f32>,
+    pub prefix: Option<ReplayPrefix>,
     pub observations: Vec<Vec<f32>>,
     pub pixels: Option<Vec<Vec<f32>>>,
     pub previous_actions: Vec<Vec<f32>>,
@@ -545,6 +569,12 @@ pub struct SequenceBatch {
     pub rewards: Vec<Vec<f32>>,
     pub flags: Vec<Vec<FrameFlags>>,
     frame_indices: Vec<Vec<(usize, usize)>>,
+}
+
+pub struct ReplayPrefix {
+    pub observations: Vec<Vec<f32>>,
+    pub previous_actions: Vec<Vec<f32>>,
+    pub flags: Vec<Vec<FrameFlags>>,
 }
 
 impl SequenceBatch {
@@ -842,6 +872,251 @@ mod tests {
         assert_eq!(batch.observations[0][0], 1.0);
         assert_eq!(batch.rewards[0][0], 51.0);
         assert_eq!(batch.previous_actions[0], vec![0.0, 1.0, 0.0]);
+        assert!(batch.prefix.is_none());
+    }
+
+    #[test]
+    fn prefix_preserves_boundaries_and_refreshes_only_training_rows() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 16;
+        config.batch_length = 16;
+        config.replay_context = 9;
+        config.intrinsic_reward_scale = 0.0;
+        config.expert_imitation = Some(super::super::ExpertImitation {
+            scale: 1.0,
+            action_weights: vec![1.0; 3],
+            world_gradient: false,
+            decay: None,
+        });
+        let mut replay = SequenceReplay::new(32);
+        for index in 0..25 {
+            let mut arrival = frame(index, &config);
+            if index == 4 {
+                arrival.flags.is_last = true;
+                arrival.flags.is_terminal = true;
+            } else if index == 5 {
+                arrival.flags.is_first = true;
+                arrival.previous_action = None;
+            }
+            replay.push(arrival, &config);
+            replay.streams[0]
+                .frames
+                .back_mut()
+                .unwrap()
+                .previous_expert_action = Some(index % 3);
+        }
+        assert_eq!(replay.valid_sequence_count(&config), 1);
+        let batch = replay
+            .sample(&config, &mut StdRng::seed_from_u64(13))
+            .unwrap();
+        let prefix = batch.prefix.as_ref().unwrap();
+        assert_eq!(prefix.observations.len(), 8);
+        assert!(batch.initial_deter.iter().all(|&value| value == 0.0));
+        for time in 0..8 {
+            assert!(
+                prefix.observations[time]
+                    .iter()
+                    .all(|&value| value == (time + 1) as f32)
+            );
+            for row in 0..16 {
+                let action = &prefix.previous_actions[time][row * 3..(row + 1) * 3];
+                assert_eq!(action.iter().sum::<f32>(), f32::from(time != 4));
+                assert_eq!(prefix.flags[time][row].is_first, time == 4);
+                assert_eq!(prefix.flags[time][row].is_terminal, time == 3);
+            }
+        }
+        for time in 0..16 {
+            assert!(
+                batch.observations[time]
+                    .iter()
+                    .all(|&value| value == (time + 9) as f32)
+            );
+            assert_eq!(batch.rewards[time], vec![(time + 9) as f32; 16]);
+            assert_eq!(batch.frame_indices[time], vec![(0, time + 9); 16]);
+            assert_eq!(
+                batch.previous_expert_action[time],
+                vec![Some((time + 9) % 3); 16]
+            );
+        }
+        let (targets, count) = batch.expert_targets(&config);
+        assert_eq!(count, 240);
+        for time in 0..16 {
+            for row in 0..16 {
+                let target = &targets[(time * 16 + row) * 3..(time * 16 + row + 1) * 3];
+                assert_eq!(target.iter().sum::<f32>(), f32::from(time < 15));
+                if time < 15 {
+                    assert_eq!(target[(time + 10) % 3], 1.0);
+                }
+            }
+        }
+        let size = config.network();
+        replay.update_context(
+            &batch,
+            &vec![vec![123.0; 16 * size.deter]; 16],
+            &vec![vec![456.0; 16 * size.stoch * size.classes]; 16],
+            &config,
+        );
+        for (index, stored) in replay.streams[0].frames.iter().enumerate() {
+            let FrameValues::Host { deter, stoch, .. } = &stored.values else {
+                panic!("host fixture")
+            };
+            assert!(
+                deter
+                    .iter()
+                    .all(|&value| value == if index < 9 { index as f32 } else { 123.0 })
+            );
+            assert!(
+                stoch
+                    .iter()
+                    .all(|&value| value == if index < 9 { index as f32 } else { 456.0 })
+            );
+        }
+    }
+
+    #[test]
+    fn replay_prefix_stays_with_its_stream_after_eviction() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 8;
+        config.batch_length = 3;
+        config.replay_context = 3;
+        let mut replay = SequenceReplay::with_streams(25, 3);
+        for tick in 0..40 {
+            for stream in 0..3 {
+                if stream == 2 && tick % 2 == 0 {
+                    continue;
+                }
+                let index = replay.streams[stream].total_frames as usize;
+                replay.push_stream(stream, frame(stream * 100 + index, &config), &config);
+            }
+        }
+        let mut rng = StdRng::seed_from_u64(19);
+        for _ in 0..20 {
+            let batch = replay.sample(&config, &mut rng).unwrap();
+            let prefix = batch.prefix.as_ref().unwrap();
+            for row in 0..8 {
+                let (stream, index) = batch.frame_indices[0][row];
+                assert!(index >= 3);
+                let first = batch.observations[0][row * config.observation_dim()];
+                assert_eq!(first as usize / 100, stream);
+                assert_eq!(
+                    batch.initial_deter[row * config.network().deter],
+                    first - 3.0
+                );
+                for time in 0..2 {
+                    assert_eq!(
+                        prefix.observations[time][row * config.observation_dim()],
+                        first - 2.0 + time as f32
+                    );
+                }
+                for time in 0..3 {
+                    assert_eq!(batch.frame_indices[time][row], (stream, index + time));
+                    assert_eq!(
+                        batch.observations[time][row * config.observation_dim()],
+                        first + time as f32
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; device prefix readback, eviction and refresh match stored host rows"]
+    fn device_replay_prefix_matches_host_storage() {
+        use std::sync::Arc;
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
+            let info = gpu.device_information();
+            assert_eq!(info.device_name, expected);
+            assert!(!info.is_software_emulated);
+            let memory = gpu.memory_stats();
+            assert!(memory.budget.saturating_sub(memory.usage) >= 2 << 30);
+        }
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_kind = super::super::ObservationKind::Rgb32;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.replay_context = 9;
+        config.replay_capacity = 64;
+        let size = config.network();
+        let latent = size.stoch * size.classes;
+        let mut graph = meganeura::Graph::new();
+        let observations = graph.input("observation", &[2, config.observation_dim()]);
+        let deters = graph.input("previous_deter", &[2, size.deter]);
+        let stochs = graph.input("previous_stoch", &[2, latent]);
+        graph.set_outputs(vec![observations, deters, stochs]);
+        let mut session =
+            super::super::runtime::build_session(&graph, &gpu, meganeura::Mode::Inference, false);
+        let mut host = SequenceReplay::with_streams(64, 2);
+        let mut device = SequenceReplay::with_streams(64, 2);
+        device.enable_device(Arc::clone(&gpu), &config);
+        for time in 0..40 {
+            let mut observations = Vec::new();
+            let mut deters = Vec::new();
+            let mut stochs = Vec::new();
+            let mut arrivals = Vec::new();
+            for stream in 0..2 {
+                let mut arrival = frame(stream * 100 + time, &config);
+                if time == 0 || (stream == 1 && time == 14) {
+                    arrival.flags.is_first = true;
+                    arrival.previous_action = None;
+                }
+                let label = Some((time + stream) % 3);
+                arrivals.push((
+                    stream,
+                    arrival.previous_action,
+                    arrival.reward,
+                    arrival.flags,
+                    label,
+                ));
+                observations.extend_from_slice(arrival.observation.as_slice());
+                deters.extend_from_slice(&arrival.deter);
+                stochs.extend_from_slice(&arrival.stoch);
+                host.push_stream(stream, arrival, &config);
+                host.streams[stream]
+                    .frames
+                    .back_mut()
+                    .unwrap()
+                    .previous_expert_action = label;
+            }
+            session.set_input("observation", &observations);
+            session.set_input("previous_deter", &deters);
+            session.set_input("previous_stoch", &stochs);
+            device.push_device(&session, &arrivals, &config);
+            device.wait_device();
+        }
+        let mut host_rng = StdRng::seed_from_u64(73);
+        let mut device_rng = host_rng.clone();
+        let mut resets = 0;
+        for _ in 0..16 {
+            let left = host.sample(&config, &mut host_rng).unwrap();
+            let right = device.sample(&config, &mut device_rng).unwrap();
+            assert_eq!(left.initial_deter, right.initial_deter);
+            assert_eq!(left.initial_stoch, right.initial_stoch);
+            assert_eq!(left.observations, right.observations);
+            assert_eq!(left.previous_actions, right.previous_actions);
+            assert_eq!(left.previous_expert_action, right.previous_expert_action);
+            assert_eq!(left.rewards, right.rewards);
+            assert_eq!(left.flags, right.flags);
+            assert_eq!(left.frame_indices, right.frame_indices);
+            let (lp, rp) = (
+                left.prefix.as_ref().unwrap(),
+                right.prefix.as_ref().unwrap(),
+            );
+            assert_eq!(lp.observations, rp.observations);
+            assert_eq!(lp.previous_actions, rp.previous_actions);
+            assert_eq!(lp.flags, rp.flags);
+            resets += lp
+                .flags
+                .iter()
+                .flatten()
+                .filter(|flag| flag.is_first)
+                .count();
+            let deters = vec![vec![123.0; 2 * size.deter]; 16];
+            let stochs = vec![vec![456.0; 2 * latent]; 16];
+            host.update_context(&left, &deters, &stochs, &config);
+            device.update_context(&right, &deters, &stochs, &config);
+        }
+        assert!(resets > 0);
     }
 
     #[test]
@@ -907,6 +1182,26 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(1);
         let batch = replay.sample(&config, &mut rng).unwrap();
         assert_eq!(batch.frame_indices[0], vec![(0, 2), (0, 6)]);
+    }
+
+    #[test]
+    fn replay_prefix_fresh_starts_skip_whole_prefix_and_training_windows() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 2;
+        config.batch_length = 3;
+        config.replay_context = 9;
+        let mut replay = SequenceReplay::new(32);
+        for index in 0..25 {
+            replay.push(frame(index, &config), &config);
+        }
+        assert_eq!(replay.valid_sequence_count(&config), 14);
+        let batch = replay
+            .sample(&config, &mut StdRng::seed_from_u64(1))
+            .unwrap();
+        assert_eq!(batch.initial_deter[0], 1.0);
+        assert_eq!(batch.initial_deter[config.network().deter], 13.0);
+        assert_eq!(batch.frame_indices[0], vec![(0, 10), (0, 22)]);
+        assert!(replay.fresh_starts.is_empty());
     }
 
     #[test]

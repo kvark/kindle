@@ -924,16 +924,24 @@ fn sum_or_zero(graph: &mut Graph, values: &[NodeId]) -> NodeId {
 /// Unrolled posterior sampling. CPU draws and sequence inputs are installed
 /// before submission; recurrence and categorical sampling never visit the host.
 pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
+    posterior_graph(config, config.batch_length, false)
+}
+
+/// Recompute the context without targets or gradients, returning its last state.
+pub fn build_replay_prefix_graph(config: &DreamerConfig) -> Graph {
+    assert!(config.replay_context > 1);
+    posterior_graph(config, config.replay_context - 1, true)
+}
+
+fn posterior_graph(config: &DreamerConfig, length: usize, last_only: bool) -> Graph {
     config.validate();
     let batch = config.batch_size;
-    let length = config.batch_length;
     let size = config.network();
     let mut graph = Graph::new();
     let core = RssmCore::new(&mut graph, config);
     let representation = Representation::new(&mut graph, config);
-    let exploration = config
-        .uses_disagreement()
-        .then(|| Disagreement::new(&mut graph, config));
+    let exploration =
+        (!last_only && config.uses_disagreement()).then(|| Disagreement::new(&mut graph, config));
     let mut deter = graph.input("initial_deter", &[batch, size.deter]);
     let mut stoch = graph.input("initial_stoch", &[batch * size.stoch, size.classes]);
     let observations = replay_observations(&mut graph, config, length);
@@ -1003,8 +1011,10 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
         deters.push(deter);
         stochs.push(stoch);
     }
-    let deter = stack_time(&mut graph, &deters, batch, size.deter);
-    let stoch = stack_time(&mut graph, &stochs, batch, size.stoch * size.classes);
+    if !last_only {
+        deter = stack_time(&mut graph, &deters, batch, size.deter);
+        stoch = stack_time(&mut graph, &stochs, batch, size.stoch * size.classes);
+    }
     let mut outputs = vec![deter, stoch];
     if let Some(ensemble) = exploration {
         let state = stack_time(&mut graph, &exploration_states, batch, config.feature_dim());

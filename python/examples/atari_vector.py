@@ -103,6 +103,8 @@ def main():
                         help="bf16 uses native reduced dense/convolution storage; mixed uses F16-input/F32-storage world gradients with BF16 elsewhere; masters and optimizer stay F32")
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--batch-length", type=int, default=64)
+    parser.add_argument("--replay-context", type=int,
+                        help="fresh training: one cached state plus forward-only prefix frames; default1")
     parser.add_argument("--world-microbatch-size", type=int)
     parser.add_argument("--imagination-length", type=int,
                         help="fresh imagined rollout steps; omitted: native default, restore keeps checkpoint length")
@@ -191,6 +193,11 @@ def main():
         parser.error("initial-checkpoint requires fresh training")
     if args.world_microbatch_size is not None and args.world_microbatch_size <= 0:
         parser.error("world-microbatch-size must be positive")
+    if args.replay_context is not None:
+        if not 0 < args.replay_context < args.replay_capacity:
+            parser.error("replay-context must be positive and smaller than replay-capacity")
+        if args.encoder_training and args.replay_context != 1:
+            parser.error("causal encoder training requires replay-context1")
     if not positive_f32(args.learning_rate):
         parser.error("learning-rate must be finite and positive in F32")
     if args.replay_value_scale is not None:
@@ -350,6 +357,7 @@ def main():
     training_options.add("--actor-unimix")
     training_options.add("--imagination-length")
     training_options.update(("--open-loop-length", "--open-loop-scale"))
+    training_options.add("--replay-context")
     training_options.add("--breakout-centroid-scale")
     training_options.add("--behavior-learning-rate")
     training_options.add("--replay-value-scale")
@@ -390,6 +398,8 @@ def main():
         parser.error("centroid supervision requires native color-centroid support")
     if args.replay_value_bootstrap is not None and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_VALUE_BOOTSTRAP", False):
         parser.error("replay-value-bootstrap requires native bootstrap support")
+    if args.replay_context is not None and args.replay_context > 1 and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_CONTEXT", False):
+        parser.error("replay-context requires native prefix support")
     if args.restore and args.encoder:
         metadata = json.loads((args.restore / "metadata.json").read_text())
         if (metadata.get("perception") or {}).get("kind") != args.encoder:
@@ -501,6 +511,8 @@ def main():
                       learning_rate_warmup=1000, agc=0.3)
         if args.imagination_length is not None:
             config["imagination_length"] = args.imagination_length
+        if args.replay_context is not None:
+            config["replay_context"] = args.replay_context
         if args.open_loop_length is not None:
             config["open_loop_supervision"] = dict(horizon=args.open_loop_length,
                 scale=1.0 if args.open_loop_scale is None else args.open_loop_scale)

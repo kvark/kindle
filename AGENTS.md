@@ -20,6 +20,17 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [optional replay-state recomputation qualification](docs/experiments/2026-11-03-cdp-replay-context.md)
+is selected. Context9 recomputes eight preceding observations with current world
+weights before the unchanged16 learning steps; context1 retains its old path.
+No new parameters or prefix targets are added. Sampling and warmup change:
+first update440,485 updates at8,192 and12,473 at200k. Implementation and CPU
+qualification are in progress; native numerical,legacy and bounded8,192-action
+checks remain pending. No full learner or gameplay benefit is established.
+Root `/x/Temp/kindle-replay-context-20261103`; protocol source5eda02cb. No GPU
+allocation is active at selection; check live state before GPU work. Historical
+closed stages remain closed. The five-game goal remains unfinished.
+
 The [CPU replay-context age reconstruction](docs/results/2026-11-03-cdp-breakout-replay-age.md)
 matches all12,477 logged updates and199,632 sampled starts in.387s CPU.
 Final50k unmasked contexts have median246/mean365.099/p99 1,776 updates since
@@ -28,8 +39,8 @@ context before a reset. This measures age,not latent error or a gameplay cause.
 All15 fixtures and27 diagnostic/338 control pins pass; review completes
 12:35:19.800 UTC November3/sourceb729ab23. No GPU work,learner,emulator,failure
 or prior stage repeat. Root `/x/Temp/kindle-breakout-replay-age-20261103` is
-closed. Earlier replay16k and B8/T32 results remain; no new buffer,burn-in,loss
-or learner is selected. Retain the70.750/143.667 control; goal unfinished.
+closed. Earlier replay16k and B8/T32 results remain; this age audit alone
+did not select a new buffer,prefix,loss or learner. Retain the70.750/143.667 control; goal unfinished.
 
 The [completed Breakout H3/scale1 comparison](docs/results/2026-11-03-cdp-breakout-open-loop.md)
 lowers frozen sampled **70.750→60.875** and greedy **143.667→104.625**, all

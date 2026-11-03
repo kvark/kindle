@@ -45,6 +45,163 @@ fn close(actual: &[f32], expected: &[f32]) {
     }
 }
 
+#[test]
+fn replay_prefix_has_only_state_outputs_and_preserves_training_parameters() {
+    let parameters = |graph: &Graph| {
+        graph
+            .nodes()
+            .iter()
+            .filter_map(|node| {
+                if let meganeura::graph::Op::Parameter { name } = &node.op {
+                    Some((name.clone(), node.ty.clone()))
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>()
+    };
+    for kind in [
+        crate::dreamer::ObservationKind::Features,
+        crate::dreamer::ObservationKind::Rgb32,
+    ] {
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_kind = kind;
+        let original = parameters(&build_training_graph(&config, config.batch_length));
+        let posterior = parameters(&build_posterior_graph(&config));
+        for context in [2, 9] {
+            config.replay_context = context;
+            let prefix = build_replay_prefix_graph(&config);
+            assert_eq!(parameters(&prefix), posterior);
+            assert_eq!(
+                parameters(&build_training_graph(&config, config.batch_length)),
+                original
+            );
+            assert_eq!(prefix.outputs().len(), 2);
+            let size = config.network();
+            assert_eq!(
+                prefix.node(prefix.outputs()[0]).ty.shape,
+                [config.batch_size, size.deter]
+            );
+            assert_eq!(
+                prefix.node(prefix.outputs()[1]).ty.shape,
+                [config.batch_size * size.stoch, size.classes]
+            );
+            let inputs = prefix
+                .nodes()
+                .iter()
+                .filter_map(|node| {
+                    if let meganeura::graph::Op::Input { name } = &node.op {
+                        Some(name.as_str())
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(
+                inputs
+                    .iter()
+                    .filter(|name| name.starts_with("uniforms_"))
+                    .count(),
+                context - 1
+            );
+            assert!(
+                inputs
+                    .iter()
+                    .all(|name| !name.contains("target") && !name.contains("reward"))
+            );
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires separately guarded GPU; prefix/posterior agreement with reset and unchanged parameters"]
+fn replay_prefix_matches_long_posterior_with_reset() {
+    let gpu = gpu();
+    let mut config = DreamerConfig::tiny(3);
+    config.observation_kind = crate::dreamer::ObservationKind::Rgb32;
+    config.batch_length = 16;
+    config.world_backprop_length = 16;
+    config.replay_context = 9;
+    let batch = config.batch_size;
+    let size = config.network();
+    let latent = size.stoch * size.classes;
+    let graph = build_posterior_graph(&config);
+    let mut posterior = build_session(&graph, &gpu, Mode::Inference, false);
+    initialize_d3(&mut posterior, &graph, 29);
+    let mut prefix = build_session(
+        &build_replay_prefix_graph(&config),
+        &gpu,
+        Mode::Inference,
+        false,
+    );
+    sync_matching(&posterior, &mut prefix, "world.");
+    sync_matching(&posterior, &mut prefix, "encoder.");
+    posterior.wait();
+    prefix.wait();
+    let names = prefix
+        .param_names()
+        .into_iter()
+        .map(str::to_owned)
+        .collect::<Vec<_>>();
+    let names = names.iter().map(String::as_str).collect::<Vec<_>>();
+    let weights = prefix.read_params(&names);
+    let mut rng = StdRng::seed_from_u64(31);
+    let deter = vec![0.1; batch * size.deter];
+    let mut stoch = vec![0.0; batch * latent];
+    for row in stoch.chunks_exact_mut(size.classes) {
+        row[0] = 1.0;
+    }
+    for session in [&mut posterior, &mut prefix] {
+        session.set_input("initial_deter", &deter);
+        session.set_input("initial_stoch", &stoch);
+    }
+    for time in 0..16 {
+        let keep = [f32::from(time != 0), f32::from(time != 4)];
+        let mask = |width| {
+            keep.iter()
+                .flat_map(|&value| vec![value; width])
+                .collect::<Vec<_>>()
+        };
+        for (name, data) in [
+            (
+                "observation",
+                (0..batch * config.observation_dim())
+                    .map(|_| rng.random::<f32>() - 0.5)
+                    .collect(),
+            ),
+            ("previous_action", vec![1.0, 0.0, 0.0, 0.0, 1.0, 0.0]),
+            ("keep_deter", mask(size.deter)),
+            ("keep_stoch", mask(latent)),
+            ("keep_action", mask(3)),
+            (
+                "uniforms",
+                (0..batch * latent).map(|_| rng.random::<f32>()).collect(),
+            ),
+        ] {
+            posterior.set_input(&format!("{name}_{time}"), &data);
+            if time < 8 {
+                prefix.set_input(&format!("{name}_{time}"), &data);
+            }
+        }
+    }
+    posterior.step();
+    prefix.step();
+    let mut readback = Readback::new(Arc::clone(&gpu));
+    let all_deter = output(&posterior, 0, 16 * batch * size.deter, &mut readback);
+    let all_stoch = output(&posterior, 1, 16 * batch * latent, &mut readback);
+    close(
+        &output(&prefix, 0, batch * size.deter, &mut readback),
+        &all_deter[7 * batch * size.deter..8 * batch * size.deter],
+    );
+    assert_eq!(
+        output(&prefix, 1, batch * latent, &mut readback),
+        all_stoch[7 * batch * latent..8 * batch * latent]
+    );
+    assert_eq!(weights, prefix.read_params(&names));
+    assert_eq!(weights, posterior.read_params(&names));
+    check_memory(&gpu);
+}
+
 fn sample(logits: &[f32], draws: &[f32], classes: usize, unimix: f32) -> Vec<f32> {
     assert_eq!(logits.len(), draws.len());
     let mut output = vec![0.0; logits.len()];

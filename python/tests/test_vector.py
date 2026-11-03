@@ -56,6 +56,13 @@ import profile_atari_vector
     (["--encoder-training", "joint", "--encoder-checkpoint", "unused", "--batch-length", "16",
       "--observation-size", "64"], "native frames"),
     (["--replay-capacity", "0"], "replay-capacity must be positive"),
+    (["--replay-context", "0"], "replay-context must be positive"),
+    (["--replay-context", "-1"], "replay-context must be positive"),
+    (["--replay-context", "100000"], "smaller than replay-capacity"),
+    (["--replay-context", "1.5"], "invalid int value"),
+    (["--replay-context", "9", "--encoder-training", "joint"], "causal encoder training requires replay-context1"),
+    (["--restore", "unused", "--replay-context", "9"], "training overrides"),
+    (["--restore", "unused", "--replay-context=1"], "training overrides"),
     (["--restore", "unused", "--encoder-training", "joint"], "training overrides"),
     (["--restore", "unused", "--replay-capacity", "512"], "training overrides"),
     (["--restore", "unused", "--actor-critic-gradient"], "training overrides"),
@@ -173,6 +180,33 @@ def test_return_lambda_reaches_native_without_default_changes(monkeypatch, tmp_p
     monkeypatch.setattr(sys, "argv", args)
     with pytest.raises(RuntimeError, match="configuration reached native boundary"):
         atari_vector.main()
+
+
+@pytest.mark.parametrize("context", [None, 1, 2, 9])
+def test_replay_context_reaches_native_without_changing_training_rows(monkeypatch, tmp_path, context):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    def construct(streams, config):
+        assert config["replay_context"] == (1 if context is None else context)
+        assert config["batch_size"] == config["batch_length"] == config["world_backprop_length"] == 16
+        assert config["world_microbatch_size"] == 16
+        raise RuntimeError("checked before GPU")
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct, SUPPORTS_REPLAY_CONTEXT=True))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"), "--batch-length", "16",
+                                    *(["--replay-context", str(context)] if context is not None else [])])
+    with pytest.raises(RuntimeError, match="checked before GPU"):
+        atari_vector.main()
+
+
+def test_replay_context_rejects_old_native_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("environment constructed"))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "never.jsonl"), "--replay-context", "9"])
+    with pytest.raises(SystemExit):
+        atari_vector.main()
+    assert "requires native prefix support" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("length,scale", [(None, None), (3, None), (3, .25)])
