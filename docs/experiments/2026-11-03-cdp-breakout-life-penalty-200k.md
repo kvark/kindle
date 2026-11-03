@@ -69,3 +69,15 @@ Prospective root `/x/Temp/kindle-breakout-life-penalty-20261103/full`, trial
 `kindle-breakout-life-penalty-200k-20261103`. Full-run preparation and launch are
 unfinished at selection. Gameplay benefit is unmeasured; the five-game goal
 remains unfinished.
+
+## CPU preparation
+
+Full preflight passes **06:14:37.261 UTC November 3**, source `2eafbf2`, in
+2.237s (2.340s wrapper). Five actual commands, 34 exact configuration cases,
+24 startup-header cases, seven pre-update comparisons, 12 recovery-body cases,
+four observer-parser cases, eight prelaunch command cases, four metadata cases,
+six retention cases and two collector-retention cases pass. All 19 scripts
+compile and 834 declaration path entries resolve. The 408 bounded and 338
+control pins remain unchanged. Native/teacher/qualified runner remain exact;
+no native or emulator is constructed. No preparation failure or repeated
+successful stage occurs. Full selection and launch remain pending at this milestone.

@@ -20,6 +20,13 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [life-loss 200k comparison](docs/experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
+passes CPU preparation at06:14:37.261 UTC November3/source2eafbf2:five actual
+commands,34 config/24 startup/seven prefix/12 recovery cases,observer/prelaunch/
+retention checks,19 scripts and834 declaration entries. All408 bounded/338
+control pins stay unchanged; no failure orGPU work. Next select andlaunch the
+declared fresh200k learner; no allocation active atthis preparation milestone.
+
 The [life-loss feedback bounded check](docs/results/2026-11-03-cdp-breakout-life-penalty.md)
 passes8,192 actions/32,730 frames/489 updates in47.317s; frozen1,024/.891s has
 zero updates/episodes and357 invariant tensors. All408 pins,357 matchedinitial,

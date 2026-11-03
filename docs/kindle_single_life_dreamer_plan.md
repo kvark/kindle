@@ -1,5 +1,11 @@
 # Kindle: CDP learning roadmap
 
+The [fresh life-loss comparison](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
+passes CPU preparation:five commands,34 config/24 startup/seven prefix/12 recovery
+cases andobserver/prelaunch/retention checks;19 scripts/834 path entries,408
+bounded/338 control pins unchanged. No failure orGPU work. Separate selection
+andlaunch are next; gameplay remains unmeasured.
+
 The [optional life-loss aid passes its bounded native check](results/2026-11-03-cdp-breakout-life-penalty.md):
 8,192 actions/489 updates in47.317s,118 independently replayed penalties,raw
 scores preserved,all408 pins and357 matchedinitial/invariant frozen tensors.

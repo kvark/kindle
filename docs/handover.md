@@ -8,6 +8,14 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+Full [life-loss comparison preparation](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
+passes06:14:37.261 UTC/source2eafbf2:five commands,34 config/24 startup/seven
+prefix/12 recovery cases,observer/prelaunch/retention checks,19 scripts and834
+declaration entries. All408 bounded/338 control pins remain unchanged. No
+preparation failure orGPU work. Full sources are under
+`/x/Temp/kindle-breakout-life-penalty-20261103/full`; next run separate selection
+then launch on an idle host. Do not repeat completed preflight.
+
 The [life-loss feedback bounded check](results/2026-11-03-cdp-breakout-life-penalty.md)
 is closed:8,192 actions/32,730 frames/489 updates in47.317s; frozen1,024/.891s
 haszero updates/episodes and357 invariant tensors. All408 pins,357 matchedinitial,
