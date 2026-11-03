@@ -1,5 +1,15 @@
 # Fresh Breakout actor/critic representation-gradient comparison
 
+**Closed:** the [completed result](../results/2026-11-03-cdp-breakout-acgrads-value1.md)
+scores54.958 sampled/117.833 greedy, below70.750/143.667 in21m56.980s
+(+2.26%), all0/24 two-wall. Retain the control. All428 pins, recovery, initial/
+frozen tensors, semantic traces, replays, guards and original services pass.
+Main/post/collection succeed07:54:00.102/07:54:18.504/07:54:52.283 UTC November3;
+independent terminal/coverage readers complete once07:55:21.963/07:55:30.341.
+No full-run failure or GPU repeat; two pre-launch CPU corrections remain.
+All stages/readers are closed. No extension, confirmation or automatic successor.
+No allocation active at closure; check live state. The five-game goal is unfinished.
+
 Separately select one fresh 200,000-action learner after the bounded check
 passes execution, active-loss validation and a conservative 21m10s projection.
 The question is whether the existing optional representation-gradient path

@@ -1,10 +1,11 @@
 # Breakout actor/critic representation gradients with replay-value1
 
-The existing optional actor/critic representation-gradient path passes its
-bounded execution and early-cost check. This establishes that the losses run
-within budget; it does not establish gameplay improvement. The separately
-selected [fresh comparison](../experiments/2026-11-03-cdp-breakout-acgrads-value1-200k.md)
-will assess that against the retained 70.750 sampled / 143.667 greedy control.
+The completed [fresh comparison](../experiments/2026-11-03-cdp-breakout-acgrads-value1-200k.md)
+lowers frozen Breakout scores to **54.958 sampled / 117.833 greedy**, versus
+the retained **70.750 / 143.667** control, in **21m56.980s** (+2.26% training
+time). Both final arms have zero of 24 two-wall successes. Retain the control
+with actor/critic representation gradients off. No extension, coefficient
+sweep, confirmation learner or automatic successor is selected.
 
 Only `actor_critic_gradient` changes false→true. Initial imagined policy and
 value losses now also train the representation through frozen behavior heads
@@ -43,29 +44,72 @@ Source `cdd97446e2a8d21da5c0d8228245acbfd51df9d9`; declaration
 review `2125dfca8b80d55fef4c76f513b28cbd01225c72714adc8258152dcdc6d727ad`;
 completion `c612e6aee7c4c8293a04dc4addc467764480342565e576573b009b8afd6bfcac`.
 The bounded stages and reader are closed; do not repeat them. The full
-comparison needs its own declaration, CPU qualification and fresh experience.
+comparison subsequently receives its own declaration, CPU qualification and fresh experience.
 
 Retain the 12M64/Auto/N8/B16/T16/H15/R16/lambda.95/encoder4e-5/behavior8e-5/
-dynamics4e-4/replay-value1/expert100/replay100k control pending frozen results.
+dynamics4e-4/replay-value1/expert100/replay100k control after the full result below.
 Reused development seeds limit reliability claims; policy and value gradients
 change together. The original 90% two-wall gate and five-game goal remain unmet.
 
-## Fresh comparison active
+## Completed fixed-budget comparison
 
-The separately selected full learner launches at 07:27:43.538 UTC November 3,
-source286c54b, PID990350 / invocation `9aa43ad5b82b4f25a97817f22593d39d`, with
-428 pins and original recovery/progress/postprocessing/collection observers.
-Startup passes 357 matched initial tensors, 47 paired semantic events and 270
-finite reports through 4,696 actions. The 200k/12,477-update training cap is
-30 minutes; 100k recovery and all four frozen assessments remain required.
-The full CPU harness and terminal/coverage readers are qualified. Two pre-launch
-CPU failures are preserved and corrected; no GPU stage repeats. See the
-[full protocol](../experiments/2026-11-03-cdp-breakout-acgrads-value1-200k.md)
-for exact qualification and identities. No full frozen result is available.
+| Measure | Retained control | Actor/critic representation gradients |
+| --- | ---: | ---: |
+| Sampled final mean | 70.750 | 54.958 (−22.32%) |
+| Greedy final mean | 143.667 | 117.833 (−17.98%) |
+| Actual-initial sampled / greedy | 1.417 / 2.208 | 1.417 / 2.208 |
+| Two-wall successes, each final arm | 0/24 | 0/24 |
+| Training time | 21m27.910s | 21m56.980s (+2.26%) |
+| Initial-subtracted sampled score/min | 3.230038 | 2.439292 (−24.48%) |
+| Initial-subtracted greedy score/min | 6.590132 | 5.267732 (−20.07%) |
+| Final 50k-action replay expert CE | .560514 | .550341 |
+| Actual guided-action fraction | 43.0585% | 44.8745% |
 
-The original 100k recovery succeeds 07:38:49.967 UTC November 3; independent
-confirmation passes once 07:39:20.788 in 1.284s CPU. All 428 pins, original main
-identity, 357 finite tensors and 206,067,161 retained checkpoint bytes match.
-The checkpoint has 6,227 updates; the observer checks 6,370 finite reports
-through 102,296 actions. The original learner continues. Do not repeat the
-recovery observer or confirmation; terminal and coverage results remain pending.
+The learner completes 200,000 actions / 799,582 frames / 12,477 updates.
+All 12,477 reports contain nonzero initial policy loss and positive initial
+value loss; their sums are 35.780350 and 1,441.671402. The additional losses
+are active, but finite loss reports do not independently validate derivatives
+or explain the regression. Policy and value representation gradients change
+together. The slightly lower replay expert CE does not outweigh worse frozen
+gameplay. Online last-50 mean64.28 includes 89,749 teacher overrides across
+training and is not unaided competence.
+
+Fixed descriptive coverage reconciles all 285,024 training/frozen actions and
+1,139,517 frames with 48 diagnostic and 428 full input pins. Native training
+actions at raw scores216–431 fall from1,262 to828 (.414% of all actions), with
+none432+ in either learner. Five of24 selected greedy episodes reach216,
+none432; sampled reaches neither. These are score bins, not verified wall
+transitions or a causal diagnosis of the architecture. The retained teacher
+and raw reward/boundary semantics are unchanged.
+
+The source remains286c54b, original PID990350 / invocation
+`9aa43ad5b82b4f25a97817f22593d39d`. All 428 pins, 357 matching initial tensors,
+47 pre-update events, 800/795 actual-initial sampled/greedy semantic events,
+357 invariant frozen tensors per arm, full pixel/action/label and frozen
+replays/videos, host guards, curves, exposure and comparison pass. Four frozen
+arms total85,024 actions /339,935 frames /65.659s with zero updates/truncations.
+
+Original recovery succeeds07:38:49.967 UTC November3; independent confirmation
+passes once07:39:20.788 in1.284s CPU, retaining206,067,161 bytes at100k/6,227
+updates. Main/postprocessing/collection succeed **07:54:00.102 /07:54:18.504 /
+07:54:52.283**. All five original services are terminal success. Independent
+terminal and fixed coverage readers complete once **07:55:21.963 /07:55:30.341**
+in1.333s/4.276s CPU. No full-run failure, collector repeat or GPU-stage repeat
+occurs. Two earlier full CPU preparation failures (collector date and parser
+fixture) remain preserved; both were corrected before launch. Keep startup,
+reader and recovery CPU co-host timings without wall-time correction.
+
+All stages and readers are closed. No Kindle allocation remains active at
+closure; check live state before work. Do not restart this learner or repeat
+its observers, evaluations, replays or readers. Reused seed1009 and evaluation
+cohort4000001009 limit reliability; this result does not establish that all
+actor/critic representation supervision is harmful. The original90% two-wall
+gate remains unchanged, and Breakout and the five-game goal remain unfinished.
+
+| Artifact | SHA256 |
+| --- | --- |
+| Full declaration | `416bccea8c93522005c74e4a6c0666d5154ea2f8541dcbc7af5646dad12bb185` |
+| Learning review | `312f7245d8c5dddbcd9a010a912025013ff43dcbac63770fef13f4510e57454b` |
+| Original completion | `b029cb5ed67c1b78ca30a847fc7bf828e57a4d8403b810e76469e6b74c6d75ad` |
+| Independent terminal summary | `074d990ef592ee20abbe88a204ec046154fcd50b6402ffb0872cc4ebb2a25f7a` |
+| Fixed coverage | `f8b8ac82526d079b7f6a25dc3166ce655ce5899f64f7a15595266cf710faacc0` |

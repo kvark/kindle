@@ -1,30 +1,31 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [actor/critic representation-gradient check](2026-11-03-cdp-breakout-acgrads-value1.md) passes 8,192 actions /
-489 updates in 47.297s; its conservative 200k projection is 21m10s. All 379
-pins, 357 initial/frozen tensors, 47 pre-update events, active losses, full
-replay and guards pass. Original main/collection succeed 07:21:24.245 /
-07:21:30.568 UTC November 3; terminal reader completes once 07:24:10.295.
-Bounded stages are closed. The separate fresh 200k comparison launches at
-07:27:43.538 UTC November 3/source286c54b with 428 pins, PID990350, invocation
-`9aa43ad5b82b4f25a97817f22593d39d`; original observers are attached. Startup
-passes 357 matching initial tensors, 47 pre-update events and 270 finite reports
-through 4,696 actions. Do not restart or overlap this active learner. Keep the
-30-minute training cap, 100k recovery and four fixed frozen arms against
-70.750 sampled / 143.667 greedy, all zero two-wall. Only the existing
-`actor_critic_gradient` flag changes; native447fe50, runnercf4ea238 and teacher
-stay exact. No full frozen result or gameplay gain is established. Full CPU qualification passes
-five commands, 34 config checks, nine command cases and retention/observer
-checks. Two pre-launch CPU failures (collector date and parser fixture) are
-preserved and corrected; no GPU stage repeats. Root
-`/x/Temp/kindle-breakout-acgrads-value1-20261103`. Terminal/coverage readers
-qualify once at 07:28:48.039 / 07:29:28.982 with all 428 active pins; retain
-CPU co-host timings. Original recovery succeeds 07:38:49.967; independent
-confirmation passes once 07:39:20.788 with all 428 pins, 357 finite tensors
-and 206,067,161 retained bytes at 100k/6,227 updates. The original learner
-continues; terminal and coverage results remain outstanding. Do not repeat
-the recovery observer or confirmation; check live state before work.
-Breakout and the five-game goal remain unfinished.
+The [completed actor/critic-gradient comparison](2026-11-03-cdp-breakout-acgrads-value1.md) lowers sampled
+70.750→54.958 and greedy143.667→117.833 in21m56.980s (+2.26% training time),
+all0/24 two-wall. Initial-subtracted score/min falls24.48%/20.07%. Retain the
+raw-reward control with actor_critic_gradient off and12M64/Auto/N8/B16/T16/
+H15/R16/lambda.95/encoder4e-5/behavior8e-5/dynamics4e-4/replay-value1/expert100/
+replay100k. Only initial imagined policy/value representation gradients change;
+native447fe50, runnercf4ea238 and teacher stay exact. Active losses and slightly
+lower replay expert CE do not establish gameplay benefit or an isolated cause.
+
+All428 pins,100k/6,227 recovery,357 matched initial/invariant frozen tensors,
+47 pre-update events,800/795 paired initial traces,full replays/videos,guards,
+curves,exposure and comparison pass. Main/post/collection succeed07:54:00.102/
+07:54:18.504/07:54:52.283 UTC November3/source286c54b. Terminal and coverage
+readers complete once07:55:21.963/07:55:30.341;48 diagnostic/428 full pins
+reconcile285,024 actions/1,139,517 frames. Native training actions at raw scores
+216–431 fall1,262→828,none432+; bins are descriptive,not verified walls or
+causal evidence. Actual44.8745% overrides and online64.28 are not competence.
+
+Root`/x/Temp/kindle-breakout-acgrads-value1-20261103/full` is closed. Allfive
+original services and recovery/terminal/coverage readers are complete; do not
+repeat them. No full-run failure or GPU repeat;two pre-launch CPU corrections
+remain preserved. CompletionSHAb029cb5e/terminalSHA074d990e/coverageSHAf8b8ac82.
+No allocation is active at closure; check live state. No extension,coefficient
+sweep,confirmation or automatic successor. Keep CPU co-host timings uncorrected.
+Reused1009/cohort limits reliability. Breakout and the five-game goal remain
+unfinished.
 
 The [fixed subaction diagnostic](2026-11-03-cdp-breakout-subaction.md) finds no extra rescues from one
 mid-action command switch: three constant commands and nine two-frame pairs
