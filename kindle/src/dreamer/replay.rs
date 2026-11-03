@@ -627,14 +627,6 @@ impl SequenceBatch {
         }
         (targets, labeled)
     }
-
-    pub fn keep(&self, time: usize, row: usize) -> f32 {
-        if self.flags[time][row].is_first {
-            0.0
-        } else {
-            1.0
-        }
-    }
 }
 
 #[cfg(test)]
@@ -1148,10 +1140,6 @@ mod tests {
         assert_eq!(batch.previous_actions[0], vec![0.0, 1.0, 0.0]);
         assert_eq!(batch.previous_actions[1], vec![0.0, 0.0, 0.0]);
         assert_eq!(batch.previous_actions[2], vec![1.0, 0.0, 0.0]);
-        assert_eq!(
-            [batch.keep(0, 0), batch.keep(1, 0), batch.keep(2, 0)],
-            [1.0, 0.0, 1.0]
-        );
     }
 
     #[test]
