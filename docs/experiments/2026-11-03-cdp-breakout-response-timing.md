@@ -1,5 +1,14 @@
 # Fixed timing conversion of the next paddle-position forecast
 
+**Complete:** the [result](../results/2026-11-03-cdp-breakout-response-timing.md)
+passes the screen: held-out MAE2.901→2.628 overall and2.722→2.577 near descending,
+with lower RMSE and eight lane MAEs improved. Tail errors worsen, and held-out
+RMSE within one action of contact is essentially unchanged. Four new/eight reused
+fixtures,21 pins and the400-metric recount pass. Analysis completes once
+09:02:26.168 UTC November3 in.945s, with no failure,replay,GPU work or updates.
+No contact-time assessment,teacher change,gameplay test or automatic successor
+is selected. The root is closed; do not repeat stages. The goal remains open.
+
 Select one saved-data CPU analysis after the causal current-position estimate
 passes. Test whether the same fixed temporal conversion improves the existing
 response model's next-position forecast against latest raw pixel detections:
