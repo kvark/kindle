@@ -8,15 +8,24 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-A [fresh200k Breakout H3/scale1 comparison](experiments/2026-11-03-cdp-breakout-open-loop-200k.md)
-is selected for preparation after the passing bounded cost check. Keep constant
-actor/world imitation100 and the retained12M64/Auto/N8/B16/T16/H15/R16 recipe;
-add only the qualified three-step world objective. Fix30min training cap,
-100k/6,227 recovery and final/actual-initial sampled/greedy24-episode assessments
-against70.750/143.667,all0/24 two-wall. Nativec2d627f3 and runner8946f5f3 are fixed.
-No full service has launched; qualify controllers and check live state first.
-Root `/x/Temp/kindle-breakout-open-loop-20261103/full`; planned service
-`kindle-breakout-open-loop-200k-20261103`. No extension,sweep or automatic successor.
+The [fresh200k Breakout H3/scale1 comparison](experiments/2026-11-03-cdp-breakout-open-loop-200k.md)
+launches **11:50:15.735 UTC November3/sourceffc4a26d**, with644 pins and a30-minute
+training cap. Keep constant actor/world imitation100 and retained12M64/Auto/N8/
+B16/T16/H15/R16; add the qualified three-step world objective. Startup passes
+357 matching initial tensors,47 pre-update events and442 finite reports through
+7,448 actions. Original main **PID1020432/invocation7c92d99e93bb4780a04e64d685c6d714**
+and all four observers remain active at11:55 UTC; progress40,712 actions/2,521
+updates at11:54:45 is not a frozen result.
+
+Require100k/6,227 recovery and final/actual-initial sampled/greedy24-episode
+assessments against70.750/143.667,all0/24 two-wall. CPU controller qualification
+passes before launch; recovery/terminal readers are fixed before outcomes,
+and terminal-reader preflight passes five tamper cases/all644 pins. Native
+c2d627f3/runner8946f5f3 differ from retained447fe50/cf4ea238; no isolated cause.
+Root `/x/Temp/kindle-breakout-open-loop-20261103/full`; main service
+`kindle-breakout-open-loop-200k-20261103`. Check live state; do not restart,
+repeat completed stages/readers or overlap another GPU job. No extension,sweep
+or automatic successor. The five-game goal remains unfinished.
 
 The [Breakout H3 world-supervision check](results/2026-11-03-cdp-breakout-open-loop.md)
 passes8,192 actions/32,717 frames/489 updates in48.603s; conservative200k
