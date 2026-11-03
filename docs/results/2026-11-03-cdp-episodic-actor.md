@@ -163,12 +163,23 @@ No control phase is present in the continuation queue.
 
 Candidate startup passes261 initial arrays matching the bounded and control
 initials,47 common pre-update events and first update376. Positive targets
-start at1224; through7784 actions,463 finite reports expose53,337 completed and
-31,470 positive replay rows across405 positive updates. These are repeated
-replay exposures, not unique experience. No candidate frozen score or complete
-paired comparison exists yet. The continuation's startup observer takes.317s;
-control startup/recovery observers take.254/.243s. Host housekeeping and status
-reads also occur; retain actual elapsed wall times without correction.
+start at1224. Through the fixed first50k actions,3102 finite reports expose
+528,017 completed and274,470 positive replay rows;3042 updates have positive
+targets (98.07%). Positive rows are51.98% of completed rows, normalized weight
+sums241,960.690 and raw loss sums1518.179. Coefficient accounting passes. These
+are repeated replay exposures, not unique experience or evidence of gameplay
+benefit.
+
+Candidate100k/6,227 recovery passes **17:00:00.910 UTC**, with261 finite tensors,
+expected schema and verified file hashes. Checkpoint history retains its files
+and directory read-only. A separate read at17:00:44.604 confirms hashes,
+permissions,307 original/22 repair pins,69 preserved control files and the
+original continuation process identity. Candidate training continues; no
+candidate frozen score or complete paired comparison exists yet. Its startup/
+recovery observers take.317/.241s; control observers take.254/.243s. Host
+housekeeping and status reads also occur; retain actual elapsed wall times
+without correction. These are saved weight/moment checks, not complete
+replay/game/RNG resumption tests.
 
 Root `/x/Temp/kindle-episodic-actor-20261103/full`; CPU repair and continuation
 are under `repair`. A successful pair would close as
@@ -182,6 +193,7 @@ The five-game goal remains unfinished.
 | Original declaration |`b48da6eae51aad8fe7761437c77e7a8612db89908b3643612b96756a5c2e5c51`|
 | Original preflight |`80421785f172244e4927534ce6ee6d202e96541a9f4106f2da60585095a3d293`|
 | Control100k recovery review |`9aee1175e50b6f312f7a0ce653fdd43a8ca82600c8d1bd891ef1742a7b23d4ac`|
+| Candidate100k recovery review |`f189830cc36e895124f55adcd309eb0198878e2e364b1d18178eb511c18ab02c`|
 | Repaired control postprocessing |`1d7c12609f8073e0b4a2f9bdcd524d92615f16200ed53c467024b895a147d4c0`|
 | Continuation declaration |`cebc98ad879d3734fdd506b846d5ce3a3e98f9bdf6c63ce95c4fa2e4f671541d`|
 

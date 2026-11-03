@@ -21,8 +21,11 @@ Only the unstarted candidate launches **16:51:24 UTC**, sourcedc29240b, under
 Same qualified nativee3b02163/runner,scale100,seed1009,200k/12,477,30-minute cap,
 100k recovery and four final/actual-initial sampled/greedy24-episode arms.
 Original overall deadlines are retained. Startup passes261 matched tensors,
-47 pre-update events and update376; positive targets start1224. No candidate
-frozen result or complete paired comparison exists. [Evidence and limits](results/2026-11-03-cdp-episodic-actor.md).
+47 pre-update events and update376; positive targets start1224. Candidate100k/
+6,227 recovery passes17:00:00.910 UTC:261 finite/schema-checked tensors and
+verified file hashes, retained read-only. Original/repair pins and69 control
+files remain unchanged; candidate training continues. No candidate frozen
+result or complete paired comparison exists. [Evidence and limits](results/2026-11-03-cdp-episodic-actor.md).
 Root `/x/Temp/kindle-episodic-actor-20261103/full`, continuation under `repair`.
 Check live state; do not restart either service or overlap another GPU job.
 No extension,third learner or automatic confirmation. The original864/90%
