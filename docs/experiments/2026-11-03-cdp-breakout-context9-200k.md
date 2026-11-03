@@ -108,3 +108,24 @@ passes once at **13:21:31.180 UTC**, in3.171s body/3.218s wrapper, with five sco
 cases,all667 pins and original identity. No native learner or emulator is built.
 Keep these CPU co-host costs without time correction. Source hashes and execution
 receipts remain under the experiment root. The five-game goal is unfinished.
+
+## Halfway recovery — November 3
+
+The original recovery observer succeeds **13:32:50.987435 UTC**, retaining the
+100,000-action/6,223-update checkpoint while the learner continues. The fixed
+independent reader runs once and passes **13:33:51.401802 UTC**, in2.246s body/
+2.317s wrapper. All667 pins,357 finite tensors and all four files totaling
+206,067,205 bytes pass. The observer's complete log prefix contains103,000 actions
+and6,410 finite reports. MainPID1029287/invocationda2979f074bf4fe4b740d734ad33f6cd
+remains active; recovery retains its original invocationecca019c954b4a588714594f1cfce4de.
+
+- Observer review: `90880718ae7f019c3cf9ec3f6d9123fd013dfee27210d115f6bd1adef9a9cf4a`.
+- Retention: `84fb0b9a78ab630d53f97f7be19572123952981061433a8f98ec2dfc2b99e376`.
+- Independent confirmation: `3b392be208b7dc890b8aba186e64b4058aaf67e8e1154c7de665c7c32abfb93d`.
+- Metadata: `56da6bf2760a7a40825dd42699b10e628d1f09a3102fa491c4d0284d3896ac49`.
+
+The checkpoint retains weights and metadata; replay,RNG,games and live belief
+are not included. No restore,learning,evaluation,observer or successful-reader
+stage repeats. Keep CPU co-host time without correction. Recovery reading is
+closed. Terminal reading and frozen gameplay remain pending; no successor is
+selected and the five-game goal remains unfinished.

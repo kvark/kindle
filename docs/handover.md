@@ -10,12 +10,18 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 The [fresh200k context9 comparison](experiments/2026-11-03-cdp-breakout-context9-200k.md)
 launches13:20:44.166 UTC November3/source55f0a46a with667 pins. MainPID1029287,
-invocationda2979f074bf4fe4b740d734ad33f6cd; progress,recovery,postprocessing and
-collection observers are active. Startup passes357 matching initial tensors,
+invocationda2979f074bf4fe4b740d734ad33f6cd; progress,postprocessing and
+collection remain active. Original recovery succeeds13:32:50.987 UTC. Startup passes357 matching initial tensors,
 47 common pre-update transitions and503 finite supervised reports through8,488
 actions;8,192 actions/485 updates take50.380s. First update440 and prefix timing
 pass. Training cap30min,200k/12,473 updates,100k/6,223 recovery and four fixed
 24-episode frozen arms against70.750/143.667,all0/24 two-wall. No full result yet.
+
+Independent recovery reading passes13:33:51.402 UTC in2.317s wrapper: all667
+pins,100k/6,223 metadata,357 finite tensors and all four retained files totaling
+206,067,205 bytes. The observer's complete prefix has103,000 actions/6,410 finite
+reports. Original learner identity remains active; no stage repeats. Recovery
+reading is closed; fixed terminal reading and frozen gameplay remain pending.
 
 Context9 adds eight forward-only observed steps before16 learning steps with
 12M64/Auto/N8/B16/T16/H15/R16,retained rates/teacher/constant expert100/critic1/1.
