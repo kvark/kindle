@@ -20,6 +20,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [current actor-gradient diagnostic](docs/experiments/2026-11-03-cdp-breakout-actor-gradients.md)
+selects a frozen context capture from the retained policy1/replay-value1 sampled
+trajectory:35,552 actions,32 fixed preceding states and512 raw frames for two
+B16/T16 batches. Eight selection cases,32 pins and338 retained learner inputs
+pass CPU preparation in3.338s with zero native construction. A source-mode
+assertion failure and pre-execution memory-helper correction remain preserved.
+Native447fe50 and teacher stay unchanged; no learner or gameplay evaluation.
+Root `/x/Temp/kindle-breakout-actor-gradients-20261103`; service
+`kindle-breakout-actor-contexts-20261103`. Check live state before work. Capture
+is capped at240s and must preserve357 tensors with zero updates. Do not repeat
+completed capture stages. The later backward-only stage is not yet qualified
+or selected; it must measure actor score-function,entropy and imitation on
+shared inputs and verify production/component agreement before interpretation.
+The five-game goal remains unfinished.
+
 The [completed policy-weight100 comparison](docs/results/2026-11-03-cdp-breakout-policy100.md)
 lowers sampled **70.750→38.250** and greedy **143.667→92.125**, all0/24 two-wall,
 in **21m49.372s** (+1.67% training time). Initial-subtracted score/min falls
