@@ -12,11 +12,14 @@ The [fresh four-action Breakout200k comparison](experiments/2026-11-03-cdp-break
 20:37:08 UTC November3/source1917a4de with169 pins. Keep200k actions/12,477
 updates andthe30min training cap,12M64/Auto/N8/B16/T16/H15/R16/expert100,
 minimal4 adapter andthe qualified native447fe50/runtime. Startup passes357
-bounded-matching initial tensors,47 pre-update events andcorrect cadence;
-15,608 actions/953 updates are recorded. MainPID1067864,invocation
-`62b85df574b7486e961cd488cd3c9137`; recovery andterminal observers are active.
-Require read-only100k/6,227 recovery andfour final/actual-initial sampled/greedy
-24-natural-episode assessments against retained70.750/143.667. No full result
+bounded-matching initial tensors,47 pre-update events andcorrect cadence.
+Read-only100k/6,227 recovery passes20:46:39 UTC:357 finite tensors,169 unchanged
+pins andthe original active process identity; independent CPU verification takes
+.434s (.514s observer process),with zero model forwards or updates. The recovery
+service succeeds; mainPID1067864/invocation`62b85df574b7486e961cd488cd3c9137`
+andterminal collector remain active beyond106,496 actions/6,633 updates. Require
+four final/actual-initial sampled/greedy24-natural-episode assessments against
+retained70.750/143.667. No full result
 or gameplay gain isavailable. Root`/x/Temp/kindle-breakout-minimal-guided-20261103/full`;
 service`kindle-breakout-minimal-guided-200k-20261103`. Check live state; do not
 restart it orschedule another GPU job while active. The original864/90%-two-wall

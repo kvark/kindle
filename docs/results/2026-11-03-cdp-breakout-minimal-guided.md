@@ -2,8 +2,13 @@
 
 A separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-minimal-guided-200k.md)
 launches20:37:08 UTC/source1917a4de after closure of the bounded work below.
-Startup passes357 tensors/47 events; recovery andfour frozen arms remain pending.
-No full gameplay result isavailable. Do not restart oroverlap the active learner.
+Startup passes357 tensors/47 events. Read-only100k/6,227 recovery passes
+20:46:39 UTC with357 finite tensors and169 unchanged pins; independent CPU
+verification takes.434s (.514s observer process),zero model forwards/updates.
+The recovery service succeeds; original mainPID1067864 andterminal collector
+remain active beyond106,496 actions/6,633 updates. Four final/actual-initial
+sampled/greedy24-episode arms remain pending. No full gameplay result isavailable.
+Do not restart oroverlap the active learner.
 
 The fresh four-action check completes **8192 actions/32,728 frames/489 updates
 in41.133s**, versus47.690s for the closed full18 check: **13.75% less training
