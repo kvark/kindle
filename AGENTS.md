@@ -20,6 +20,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [fresh replay16k comparison](docs/experiments/2026-11-03-cdp-breakout-replay16k-200k.md)
+is separately selected:200k actions/12,477 updates with a30-minute training cap,
+100k/6,227 retained recovery and final/actual-initial sampled/greedy24-episode
+assessments against70.750/143.667,all0/24 two-wall. Only shared replay capacity
+100k→16,384 changes; native447fe50,runnercf4ea238,teacher and other settings
+stay fixed. No experience transfers. Recency,diversity,reuse andcoverage change
+together; cache age and gameplay benefit remain unmeasured.
+
+CPU preparation passes05:07:30.979 UTC November3 in3.683s (3.800s wrapper):
+five commands,36 config cases,20 startup cases,13 recovery cases,four observer
+cases,seven prelaunch cases,six retention/two collector cases,19 scripts and
+1,209 declaration entries. All378 original/408 repaired bounded pins and338
+control pins match. The exact corrected prefix reader andits eight retained
+fixtures are reused. Original bounded services remain failed; their separate
+CPU closure is required. No successful check stage or reader repeats.
+Root`/x/Temp/kindle-breakout-replay16k-20261103/full`,service
+`kindle-breakout-replay16k-200k-20261103`. Check live state; once launched,do not
+restart it or overlap GPU work. No extension,sweep,confirmation orautomatic
+successor selected. The five-game goal remains unfinished.
+
 The [replay16k bounded check](docs/results/2026-11-03-cdp-breakout-replay16k.md) completes24,576 actions/98,167 frames/
 1,513 updates in158.358s;1,024 frozen/.903s haszero updates/no natural episodes.
 Conservative200k projection23m37.590s clears30min. All378 original/408 repair
