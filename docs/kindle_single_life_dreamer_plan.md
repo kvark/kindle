@@ -4,7 +4,9 @@ The [fresh life-loss learner is running](experiments/2026-11-03-cdp-breakout-lif
 from06:16:18.414 UTC/sourceb80194e,453 pins. Startup passes357 initial tensors,
 47 pairedpre-update events,correct cadence and113 finite reports through2,184
 actions. Training life-loss accounting isverified; raw scores remain unchanged.
-No100k recovery orfrozen result yet. Original observers areactive; no overlapping
+The100k/6,227 recovery passes06:27:40.709,with357 finite tensors and453 unchanged
+pins; weights/metadata retained,no stage repeated. No frozen result yet.
+Remaining original observers areactive; no overlapping
 GPU job,restart,extension orcap increase. The five-game goal remainsunfinished.
 Terminal/recovery readers andfixed raw-score coverage areprepared before frozen
 outcomes. Five score/six feedback cases andeight coverage-config cases pass;

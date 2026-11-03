@@ -11,14 +11,17 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The [fresh life-loss learner](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
 is active from06:16:18.414 UTC/sourceb80194e. Main983163/invocation
 0191b9d7c0fe47acbe15c6db9845f519,service`kindle-breakout-life-penalty-200k-20261103`.
-Allfour original observers areactive. Startup06:16:35.584 passes453 pins,357
+Progress,postprocessing andcollection areactive; recovery succeeds06:27:24.862.
+Startup06:16:35.584 passes453 pins,357
 initial tensors,47 pairedpre-update events,113 finite reports/2,184 actions and
 46 verified lost lives. DeclarationSHA028a1250. Fullroot
 `/x/Temp/kindle-breakout-life-penalty-20261103/full` contains launch/observer
-identities andstartup review. No100k recovery orfrozen result yet. Do not restart
+identities andstartup review. Recovery confirmation06:27:40.709 verifies100k/
+6,227 updates,357 finite tensors,206,067,162 retained bytes and453 unchanged
+pins. No frozen result yet. Do not restart
 the learner orschedule overlapping GPU work; retain the fixed30min cap.
-Read-only readers areprepared under the package root: `review_recovery.py`
-afteroriginal100k success, `review_full_terminal.py terminal` afteroriginal
+Read-only `review_recovery.py` iscomplete; do not repeat it. Remaining readers
+under the package root are `review_full_terminal.py terminal` afteroriginal
 completion, then `review_score_coverage.py terminal`. Terminal preflight
 06:19:26.520 passesfive score/six feedback cases/453 pins; coverage preflight
 06:20:09.659 passeseight config/five retained boundary cases/50 diagnostic pins.

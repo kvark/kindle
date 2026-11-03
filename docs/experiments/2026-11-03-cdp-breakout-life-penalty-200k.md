@@ -125,3 +125,16 @@ These are exposure bins,not verified walls,visual coverage orcausal evidence.
 No new replay,assessment,learner orGPU allocation isselected. Run each reader
 once after its prerequisites; do not repeat completed preparation. Retain CPU
 co-host timings without wall-time correction. Frozen gameplay remains pending.
+
+## Retained recovery
+
+The original recovery observer succeeds **06:27:24.862 UTC November3**.
+Independent confirmation passes **06:27:40.709**, in1.868s (1.890s wrapper),
+verifying all453 pins,the original observer journal identity,and a retained
+**100,000-action /6,227-update** checkpoint with357 finite tensors and
+206,067,162 bytes. The audited complete log prefix contains6,421 finite reports
+through103,112 actions. Recovery-reviewSHA41f86c4d/retentionSHAf8529f6f/
+metadataSHA72a9068e. Weights andmetadata are retained; replay,belief,games andRNG
+are omitted. The original main983163/invocation0191b9d7c0fe47acbe15c6db9845f519
+remains active. No stage orobserver repeats; do not repeat this confirmation.
+Frozen gameplay ispending. Keep CPU co-host time without correction.
