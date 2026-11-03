@@ -80,3 +80,30 @@ review corrects one endpoint-neighbor fixture to the retained native report's
 F32 value. Production code,runtime and schedule arithmetic remain unchanged;
 no GPU stage occurs during preparation. Exact prior sources and receipts remain
 under the private package.
+
+## Launch and startup
+
+The learner launches **11:02:01.359 UTC November3**, source
+`18d493e6`, with649 pins. Original mainPID1015785/invocation
+`b5f028d5fc304d1ea304ddd47e544b6d`; all four original observers start once.
+Startup passes **11:02:37.174**:357 initial tensors match bounded check/control,
+47 pre-update transitions match,first updates376/392/408/424/440/456,and320
+finite reports through5,480 actions. Actor/world weights remain100. The1.575s
+CPU wrapper co-hosts with training; keep that timing without correction.
+
+DeclarationSHA`8118fc778be64e576de7ae7d6ad91c7aa4df3195adad855940d88070d3642396`.
+No frozen gameplay result is available. Do not restart the original learner,
+repeat completed stages or schedule overlapping GPU work.
+
+The independent terminal reader qualifies five score checks at11:03:43.994
+in2.503s CPU/2.524s wrapper,verifying649 pins and the original live identity.
+Recovery and terminal readers are fixed before frozen outcomes. A separate
+first100k-action saved-prefix comparison is selected11:05:36.936,seven fixtures/
+six diagnostic pins/all649 learner pins,in1.315s CPU/1.334s wrapper. After the
+original recovery succeeds,it will compare recorded transitions,learner reports,
+episodes and resets through100k;exclude only timestamps,episode wall time,
+learner timing,and the candidate's two scale fields,each required100. Retain
+differences as evidence; do not use them to trigger a rerun or alter this learner.
+This does not compare uncaptured hidden state,gradients or intermediate weights.
+All CPU co-host timings remain uncorrected. Private selection and source remain
+under`/x/Temp/kindle-actor-only-decay-20261103/prefade-100k` and`review_prefade.py`.

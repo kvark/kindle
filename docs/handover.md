@@ -9,20 +9,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 3
 
 The [fresh200k actor-only decay comparison](experiments/2026-11-03-cdp-breakout-actor-only-decay-200k.md)
-is selected after numerical/bounded qualification. Hold actor imitation100 through
-update6227 (100k actions),fade to0 at9352 (150k),world100 throughout; retain the
-12M64/Auto/N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/policy1/critic1/1
-recipe and teacher. Fresh200k/12,477,30-minute cap,100k recovery,four fixed24-episode
-final/actual-initial sampled/greedy assessments against70.750/143.667,all0/24
-two-wall. No experience reuse,extension,sweep or automatic successor. Native
-c2d627f3/runner8946f5f3 differ from447fe50;no isolated causal claim.
+launches11:02:01.359 UTC November3/source18d493e6 with649 pins. Original main
+PID1015785/invocationb5f028d5fc304d1ea304ddd47e544b6d and all four observers are
+active. Startup passes357 matching initial tensors,47 pre-update events,correct
+cadence and320 finite reports through5,480 actions. Hold actor imitation100
+through6227 (100k),fade to0 at9352 (150k),world100 throughout; retain12M64/Auto/
+N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/policy1/critic1/1 and teacher.
+Fresh200k/12,477,30-minute cap,100k recovery,four fixed24-episode final/actual-initial
+sampled/greedy assessments against70.750/143.667,all0/24 two-wall. No frozen result
+or successor is available. Nativec2d627f3/runner8946f5f3 differ from447fe50;
+no isolated causal claim.
 
-All CPU command/config/observer/retention/schedule checks pass with599 bounded/
-338 control pins. The original converter-import failure and pre-test F32 fixture
-correction remain retained;no GPU work during preparation. Root
-`/x/Temp/kindle-actor-only-decay-20261103/full`;service
-`kindle-breakout-actor-only-decay-200k-20261103`. Check live state; do not duplicate
-or restart a selected learner. The five-game goal remains unfinished.
+CPU preflight passes; original converter-import failure and pre-test F32 fixture
+correction remain retained. Startup1.575s,terminal-reader qualification2.524s and
+fixed100k-prefix selection1.334s co-host costs remain uncorrected. The prefix
+comparison and recovery/terminal readers are declared before frozen outcomes;
+no additional GPU work. Root `/x/Temp/kindle-actor-only-decay-20261103/full`;
+service`kindle-breakout-actor-only-decay-200k-20261103`. Check live state; do not
+restart,repeat completed stages or overlap another GPU job. The five-game goal
+remains unfinished.
 
 The [actor-only imitation-decay qualification](results/2026-11-03-cdp-actor-only-imitation-decay.md)
 passes F64 loss/derivatives and fresh Breakout8,192 actions/32,725 frames/489
