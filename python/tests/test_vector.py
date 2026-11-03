@@ -131,6 +131,11 @@ import profile_atari_vector
     (["--dynamics-learning-rate", "1e-4"], "dynamics-learning-rate requires fresh CDP"),
     (["--restore", "unused", "--dynamics-learning-rate", "1e-4"], "training overrides"),
     (["--restore", "unused", "--dynamics-learning-rate=1e-4"], "training overrides"),
+    *[(["--return-lambda", value], "return-lambda must be finite and in [0, 1]")
+      for value in ("-0.1", "1.1", "nan", "inf", "1e300")],
+    (["--evaluate", "--return-lambda", "1"], "return-lambda requires fresh training"),
+    (["--restore", "unused", "--return-lambda", "1"], "training overrides"),
+    (["--restore", "unused", "--return-lambda=0.95"], "training overrides"),
     (["--restore", "unused", "--disagreement-scale", "1"], "training overrides"),
     (["--disagreement-scale", "-1"], "finite and non-negative"),
     (["--disagreement-scale", "nan"], "finite and non-negative"),
@@ -148,6 +153,26 @@ def test_joint_encoder_recipe_refusals_precede_outputs(monkeypatch, tmp_path, ca
     assert error.value.code == 2
     assert message in capsys.readouterr().err
     assert not output.exists()
+
+
+@pytest.mark.parametrize("return_lambda", [None, 0., .95, 1.])
+def test_return_lambda_reaches_native_without_default_changes(monkeypatch, tmp_path, return_lambda):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    expected = kindle.default_config(18, "12m")["lambda"] if return_lambda is None else return_lambda
+    def construct(streams, config):
+        assert config["lambda"] == expected
+        assert config["loss_scales"]["replay_value"] == kindle.default_config(18, "12m")["loss_scales"]["replay_value"]
+        raise RuntimeError("configuration reached native boundary")
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    args = ["atari_vector.py", "--output", str(tmp_path / "run.jsonl")]
+    if return_lambda is not None:
+        args.extend(["--return-lambda", str(return_lambda)])
+    monkeypatch.setattr(sys, "argv", args)
+    with pytest.raises(RuntimeError, match="configuration reached native boundary"):
+        atari_vector.main()
 
 
 @pytest.mark.parametrize("length,scale", [(None, None), (3, None), (3, .25)])

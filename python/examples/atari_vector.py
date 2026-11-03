@@ -119,6 +119,8 @@ def main():
                         help="fresh actor/critic rate; omitted: native default follows the base rate")
     parser.add_argument("--replay-value-scale", type=float,
                         help="fresh training only: real-replay value loss scale; omitted: native default")
+    parser.add_argument("--return-lambda", type=float,
+                        help="fresh training only: imagined and replay return trace mixture in [0,1]; omitted: native default")
     parser.add_argument("--replay-value-bootstrap", choices=("imagined", "posterior"),
                         help="fresh training only: bootstrap replay targets with imagined returns or observed-state values")
     parser.add_argument("--encoder-learning-rate", type=float,
@@ -211,6 +213,11 @@ def main():
             parser.error("dynamics-learning-rate must be finite and positive in F32")
         if not positive_f32(args.dynamics_learning_rate / args.learning_rate):
             parser.error("dynamics-learning-rate ratio must be finite and positive in F32")
+    if args.return_lambda is not None:
+        if not math.isfinite(args.return_lambda) or not 0 <= args.return_lambda <= 1:
+            parser.error("return-lambda must be finite and in [0, 1]")
+        if args.evaluate:
+            parser.error("return-lambda requires fresh training")
     if args.imagination_length is not None and args.imagination_length <= 0:
         parser.error("imagination-length must be positive")
     if args.open_loop_scale is not None and (args.open_loop_length is None or not positive_f32(args.open_loop_scale)
@@ -341,6 +348,7 @@ def main():
     training_options.add("--breakout-centroid-scale")
     training_options.add("--behavior-learning-rate")
     training_options.add("--replay-value-scale")
+    training_options.add("--return-lambda")
     training_options.add("--replay-value-bootstrap")
     training_options.add("--encoder-learning-rate")
     training_options.add("--dynamics-learning-rate")
@@ -493,6 +501,8 @@ def main():
             config["behavior_learning_rate"] = args.behavior_learning_rate
         if args.replay_value_scale is not None:
             config["loss_scales"]["replay_value"] = args.replay_value_scale
+        if args.return_lambda is not None:
+            config["lambda"] = args.return_lambda
         if args.replay_value_bootstrap is not None:
             config["replay_value_bootstrap"] = args.replay_value_bootstrap
         if args.breakout_centroid_scale is not None:
