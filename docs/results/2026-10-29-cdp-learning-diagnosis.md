@@ -1,21 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [current actor-gradient input capture](../results/2026-11-03-cdp-breakout-actor-gradients.md)
-completes35,552 sampled-history actions/142,169 frames in34.280s,zero updates,
-357 invariant tensors and32 invariant readbacks. All36 pins and512 raw/reference
-frames pass; original service succeeds10:14:48.099 UTC November3/sourceef390a4c,
-terminal collection10:17:29.526. Root `/x/Temp/kindle-breakout-actor-gradients-20261103`.
-The capture is closed; do not repeat it or its terminal reader.
+The [completed current actor-gradient diagnostic](../results/2026-11-03-cdp-breakout-actor-gradients.md)
+finds weighted imitation norms6,721×/10,925× imagined score-function on two fixed
+B16/T16 sampled-history batches. Total/imitation cosines are.999999989/.999999996;
+score/imitation.015193/−.028276. These are raw derivatives before AGC/LaProp,
+not optimizer movement or an explanation of the policy100 regression. Retain
+policy1/expert100/critic1/1. Saved gradients/moments permit a CPU follow-up;
+no learner or coefficient change is selected.
 
-The separately [qualified backward-only probe](../experiments/2026-11-03-cdp-breakout-actor-gradients-backward.md)
-is selected with155 inputs,132 Rust CPU tests,strict Clippy,nine arithmetic
-fixtures and75 exact447fe50 source files plus test-only instrumentation. It
-uses3840 imagined/240 replay rows and preserves policy1/expert100/critic1/1.
-One180s guarded service `kindle-breakout-actor-gradients-20261103` must verify
-production/component gradients and all357 tensors before interpretation. Check
-this service's live state; no overlapping GPU work or repeated completed stage.
-Preparation/build/schema and exclusive-output-path corrections remain preserved.
-No learner or coefficient change is selected; the five-game goal is unfinished.
+Production/gated gradients match exactly; component sums,F64 matrices,cross-head
+zeros,512 GPU/reference frames,158 pins and357 source/before/after tensors pass.
+Counters stay200k/12,477,zero updates. Native loop.601s/test3.55s; original service
+succeeds10:24:44.106 UTC November3/source7dbbc29b,terminal10:26:06.728. Native447fe50
+plus test-only instrumentation passes132 CPU tests,strict Clippy and nine fixtures.
+The preceding35,552-action context capture takes34.280s,all36 pins/357 tensors;
+both original services succeed. No GPU stage fails or repeats. Preparation,
+build/schema and path corrections remain preserved in the report.
+
+Root `/x/Temp/kindle-breakout-actor-gradients-20261103` is closed. Do not repeat
+capture,backward,audit or terminal readers. ReviewSHA96d85189/terminalSHAf5cb3cc7.
+No Kindle GPU allocation remains active; check live state before work. No
+coefficient sweep or automatic successor GPU job. The five-game goal is unfinished.
 
 The [completed policy-weight100 comparison](../results/2026-11-03-cdp-breakout-policy100.md)
 lowers sampled **70.750→38.250** and greedy **143.667→92.125**, all0/24 two-wall,
