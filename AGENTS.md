@@ -23,8 +23,13 @@ available. Only the user merges PRs; commits and pushes are allowed.
 The [fresh200k actor-only decay comparison](docs/experiments/2026-11-03-cdp-breakout-actor-only-decay-200k.md)
 launches11:02:01.359 UTC November3/source18d493e6 with649 pins. Original main
 PID1015785/invocationb5f028d5fc304d1ea304ddd47e544b6d and all four observers are
-active. Startup passes357 matching initial tensors,47 pre-update events,correct
-cadence and320 finite reports through5,480 actions. Hold actor imitation100
+active; recovery succeeds11:13:07.765 UTC with100k/6,227,357 finite tensors and
+four retained files. Independent confirmation11:13:49.130 verifies649 pins and
+original identity. The fixed pre-fade comparisons match all12,500 transitions,
+6,227 reports,170 episodes,167 resets and all357 tensors/51,502,659 elements
+exactly through100k. Trace/tensor readers complete11:14:31.209/11:14:30.090;
+reviews550f0fb1/c11f2469. No full-state or broad runtime equivalence claim.
+Startup passes357 initial tensors,47 events and correct cadence. Hold actor imitation100
 through6227 (100k),fade to0 at9352 (150k),world100 throughout; retain12M64/Auto/
 N8/B16/T16/H15/R16/encoder4e-5/behavior8e-5/dynamics4e-4/policy1/critic1/1 and teacher.
 Fresh200k/12,477,30-minute cap,100k recovery,four fixed24-episode final/actual-initial
@@ -34,9 +39,11 @@ no isolated causal claim.
 
 CPU preflight passes; original converter-import failure and pre-test F32 fixture
 correction remain retained. Startup1.575s,terminal-reader qualification2.524s and
-fixed100k-prefix selection1.334s co-host costs remain uncorrected. The prefix
-comparison and recovery/terminal readers are declared before frozen outcomes;
-no additional GPU work. Root `/x/Temp/kindle-actor-only-decay-20261103/full`;
+fixed100k-prefix selection1.334s co-host costs remain uncorrected. Recovery
+confirmation1.375s,checkpoint selection3.519s and overlapping trace/tensor analyses
+4.442s/3.255s also remain uncorrected. These completed readers are closed; do not
+repeat them. Actor weight is52.064003 at123,960 actions;world stays100. Final
+training/zero-weight tail/frozen assessments remain pending;no additional GPU work. Root `/x/Temp/kindle-actor-only-decay-20261103/full`;
 service`kindle-breakout-actor-only-decay-200k-20261103`. Check live state; do not
 restart,repeat completed stages or overlap another GPU job. The five-game goal
 remains unfinished.

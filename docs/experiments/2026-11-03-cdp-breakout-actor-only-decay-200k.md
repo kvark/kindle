@@ -107,3 +107,44 @@ differences as evidence; do not use them to trigger a rerun or alter this learne
 This does not compare uncaptured hidden state,gradients or intermediate weights.
 All CPU co-host timings remain uncorrected. Private selection and source remain
 under`/x/Temp/kindle-actor-only-decay-20261103/prefade-100k` and`review_prefade.py`.
+
+## 100k recovery and pre-fade equivalence
+
+The original recovery observer succeeds **11:13:07.765 UTC November3**, retaining
+100,000 actions/6,227 updates,357 finite tensors and four files/206,067,315 bytes.
+Its audit checks6,399 finite reports through102,760 actions. Independent confirmation
+passes once **11:13:49.130** in1.357s CPU/1.375s wrapper; all649 pins and original
+mainPID1015785/invocationb5f028d5fc304d1ea304ddd47e544b6d remain unchanged.
+Recovery reviewSHAabc36a7b/retentionSHA0f76b715/confirmationSHA8315793a.
+
+The declared first100k-action trace comparison completes **11:14:31.209**. All
+12,500 transitions,6,227 learner reports,170 episode records and167 resets match
+exactly after the declared timing exclusions and removal of candidate actor/world
+scale fields,each required100. Actions,rewards,pixel hashes,labels and overrides
+are included. There are zero differing or unpaired records. CPU wrapper4.442s;
+reviewSHA`550f0fb18982c0074638c46901c941caff21d4ae39a06bc682e985ff5aeaab3e`.
+The snapshot comparison is complete; do not rerun it.
+
+A complementary retained-tensor comparison is selected **11:10:48.661**, before
+the candidate milestone exists:five fixtures,ten diagnostic pins and649 learner
+pins pass in3.519s wrapper. It compares every tensor in both100k retained
+checkpoints,with exact schema/config/counter and file-hash checks. Completion
+**11:14:30.090**,3.255s wrapper,finds **all357 tensors /51,502,659 elements exactly
+equal**, including parameters,optimizer moments and slow values. World280,
+behavior66 and slow-value11 havezero differing tensors/elements andzero maximum
+absolute/L2 differences. Serialized file equality is not the criterion. ReviewSHA
+`c11f24696b3fc9317f0bf41d439d5c1d7e9f6e8993577d8710933e6324ca904e`.
+Evidence lives in`prefade-checkpoint-100k` with its fixed reader/selection;do not
+repeat this completed analysis.
+
+Both comparisons use saved evidence only,with zero updates or GPU/emulator work;
+their analysis wrappers overlap,so keep each measured co-host duration without
+summing them as an exclusive interval or correcting training time. All inputs
+and the original learner identity stay unchanged. Checkpoints omit replay,belief,
+games and RNG; these results do not prove full-state equivalence or broad runtime
+equivalence. They strengthen the comparison before the actor schedule diverges.
+
+Actor imitation is now fading while world remains100:at123,960 actions/update7,725,
+the reported actor weight is52.064003. The original learner continues toward200k;
+zero-weight tail and all four frozen assessments are still pending. No GPU stage,
+observer or reader repeats; no extension or successor is selected.
