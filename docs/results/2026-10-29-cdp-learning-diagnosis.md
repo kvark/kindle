@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [optional completed-return actor](../experiments/2026-11-03-cdp-episodic-actor.md) is implemented and awaiting
+isolated packaging/native qualification. Replay finalizes observed discounted
+returns at true terminals; positive-advantage weights update only the existing
+actor. Timeouts,unfinished episodes and reset crossings remain masked. Default
+off; no added parameters. It rejects model-derived disagreement bonuses and
+resident device targets,so a candidate also disables action-effects1. A bonus-off
+control is required before any actor-loss attribution. Initial163+5 Rust CPU and55
+Python checks pass; native derivatives,legacy restore and bounded cost/learning
+remain unmeasured. No GPU allocation or full learner is selected yet. Evidence
+root`/x/Temp/kindle-episodic-actor-20261103`; check live state before GPU work.
+
 The [CPU replay-actor target audit](2026-11-03-cdp-breakout-replay-actor-targets.md) confirms no direct
 return-weighted actor update on executed replay actions. Reusing existing critic
 targets gives241 positive states of480; removing short-window external rewards

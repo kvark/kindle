@@ -121,6 +121,8 @@ def main():
                         help="fresh actor/critic rate; omitted: native default follows the base rate")
     parser.add_argument("--replay-value-scale", type=float,
                         help="fresh training only: real-replay value loss scale; omitted: native default")
+    parser.add_argument("--replay-actor-scale", type=float,
+                        help="fresh training: positive-advantage imitation of completed observed returns; requires disagreement-scale0")
     parser.add_argument("--return-lambda", type=float,
                         help="fresh training only: imagined and replay return trace mixture in [0,1]; omitted: native default")
     parser.add_argument("--replay-value-bootstrap", choices=("imagined", "posterior"),
@@ -207,6 +209,15 @@ def main():
             parser.error("replay-value-scale requires fresh training")
     if args.replay_value_bootstrap is not None and args.evaluate:
         parser.error("replay-value-bootstrap requires fresh training")
+    if args.replay_actor_scale is not None:
+        if not positive_f32(args.replay_actor_scale):
+            parser.error("replay-actor-scale must be finite and positive in F32")
+        if args.restore or args.evaluate:
+            parser.error("replay-actor-scale requires fresh training")
+        if args.disagreement_scale != 0:
+            parser.error("replay-actor-scale requires disagreement-scale0")
+        if "KINDLE_DEVICE_TARGETS" in os.environ:
+            parser.error("replay-actor-scale requires CPU target construction")
     if args.behavior_learning_rate is not None:
         if not positive_f32(args.behavior_learning_rate):
             parser.error("behavior-learning-rate must be finite and positive in F32")
@@ -361,6 +372,7 @@ def main():
     training_options.add("--breakout-centroid-scale")
     training_options.add("--behavior-learning-rate")
     training_options.add("--replay-value-scale")
+    training_options.add("--replay-actor-scale")
     training_options.add("--return-lambda")
     training_options.add("--replay-value-bootstrap")
     training_options.add("--encoder-learning-rate")
@@ -398,6 +410,8 @@ def main():
         parser.error("centroid supervision requires native color-centroid support")
     if args.replay_value_bootstrap is not None and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_VALUE_BOOTSTRAP", False):
         parser.error("replay-value-bootstrap requires native bootstrap support")
+    if args.replay_actor_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False):
+        parser.error("replay-actor-scale requires native completed-return actor support")
     if args.replay_context is not None and args.replay_context > 1 and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_CONTEXT", False):
         parser.error("replay-context requires native prefix support")
     if args.restore and args.encoder:
@@ -408,6 +422,9 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     if args.restore and (args.restore / "metadata.json").is_file():
         metadata = json.loads((args.restore / "metadata.json").read_text())
+        if (metadata.get("config", {}).get("replay_actor_scale") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False)):
+            parser.error("completed-return actor checkpoint requires native support")
         if (metadata.get("config", {}).get("observation_crop") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_CROP", False)):
             parser.error("cropped checkpoint requires native RGB crop support")
@@ -520,6 +537,8 @@ def main():
             config["behavior_learning_rate"] = args.behavior_learning_rate
         if args.replay_value_scale is not None:
             config["loss_scales"]["replay_value"] = args.replay_value_scale
+        if args.replay_actor_scale is not None:
+            config["replay_actor_scale"] = args.replay_actor_scale
         if args.return_lambda is not None:
             config["lambda"] = args.return_lambda
         if args.replay_value_bootstrap is not None:

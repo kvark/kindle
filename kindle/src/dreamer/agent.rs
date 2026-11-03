@@ -199,6 +199,14 @@ pub struct ExpertImitationMetrics {
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct ReplayActorMetrics {
+    pub loss: f32,
+    pub completed_rows: usize,
+    pub positive_rows: usize,
+    pub weight_sum: f32,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct BehaviorMetrics {
     pub total_loss: f32,
     pub policy_loss: f32,
@@ -206,6 +214,8 @@ pub struct BehaviorMetrics {
     pub actor_update_scale: f32,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expert_imitation: Option<ExpertImitationMetrics>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub replay_actor: Option<ReplayActorMetrics>,
     pub value_loss: f32,
     pub replay_value_loss: f32,
     /// Mean categorical entropy before trajectory weighting.
@@ -254,6 +264,9 @@ struct PosteriorBatch {
 
 #[derive(Default)]
 struct BehaviorTrainingBatch {
+    replay_actor_target: Vec<f32>,
+    replay_actor_completed_rows: usize,
+    replay_actor_positive_rows: usize,
     expert_action_target: Vec<f32>,
     expert_labeled_rows: usize,
     action_target: Vec<f32>,
@@ -499,6 +512,11 @@ impl DreamerCore {
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
         config.validate();
+        assert!(
+            config.replay_actor_scale.is_none()
+                || std::env::var_os("KINDLE_DEVICE_TARGETS").is_none(),
+            "completed-return actor requires CPU target construction"
+        );
         let starts = config.batch_size * config.batch_length;
         let imagined_rows = starts * config.imagination_length;
         let replay_rows = config.batch_size * (config.batch_length - 1);
@@ -2304,7 +2322,12 @@ impl DreamerCore {
             }
         }
 
+        let (replay_actor_target, replay_actor_completed_rows, replay_actor_positive_rows) =
+            batch.replay_actor_targets(&self.config, &values[0], return_scale);
         BehaviorTrainingBatch {
+            replay_actor_target,
+            replay_actor_completed_rows,
+            replay_actor_positive_rows,
             expert_action_target: Vec::new(),
             expert_labeled_rows: 0,
             action_target,
@@ -2391,6 +2414,10 @@ impl DreamerCore {
             self.behavior_train
                 .set_input("expert_action_target", &batch.expert_action_target);
         }
+        if self.config.replay_actor_scale.is_some() {
+            self.behavior_train
+                .set_input("replay_actor_target", &batch.replay_actor_target);
+        }
         if self.targets_gpu.is_none() {
             self.behavior_train
                 .set_input("action_target", &batch.action_target);
@@ -2445,6 +2472,20 @@ impl DreamerCore {
         });
         let metrics = BehaviorMetrics {
             expert_imitation,
+            replay_actor: self.config.replay_actor_scale.map(|_| {
+                let loss = read_scalar(
+                    &self.behavior_train,
+                    behavior::replay_actor_output(&self.config),
+                );
+                let weight_sum = batch.replay_actor_target.iter().sum::<f32>();
+                assert!(loss.is_finite() && weight_sum.is_finite());
+                ReplayActorMetrics {
+                    loss,
+                    completed_rows: batch.replay_actor_completed_rows,
+                    positive_rows: batch.replay_actor_positive_rows,
+                    weight_sum,
+                }
+            }),
             total_loss: read_scalar(&self.behavior_train, behavior::LOSS_TOTAL),
             policy_loss: read_scalar(&self.behavior_train, behavior::LOSS_POLICY),
             actor_update_scale,

@@ -13,6 +13,10 @@ pub const LOSS_REPLAY_VALUE: usize = 3;
 pub const POLICY_ENTROPY: usize = 4;
 pub const WEIGHTED_POLICY_ENTROPY: usize = 5;
 
+pub fn replay_actor_output(config: &DreamerConfig) -> usize {
+    LOSS_EXPERT + usize::from(config.expert_imitation.is_some())
+}
+
 struct BehaviorModel {
     actor: MlpHead,
     value: MlpHead,
@@ -180,6 +184,22 @@ pub fn build_training_graph(
         losses.push(scale_expert_loss(&mut graph, loss, expert));
         loss
     });
+    let replay_actor_loss = config.replay_actor_scale.map(|coefficient| {
+        let target = graph.input("replay_actor_target", &[replay_rows, config.action_count]);
+        let feature = graph.stop_gradient(replay_feature);
+        let target = graph.stop_gradient(target);
+        let logits = model.actor.forward(&mut graph, feature);
+        let log_probabilities = mixed_log_probabilities(
+            &mut graph,
+            logits,
+            replay_rows,
+            config.action_count,
+            config.actor_unimix,
+        );
+        let loss = action_cross_entropy(&mut graph, log_probabilities, target);
+        losses.push(scale(&mut graph, loss, coefficient));
+        loss
+    });
     let total = sum(&mut graph, &losses);
     let mut outputs = vec![
         total,
@@ -190,6 +210,10 @@ pub fn build_training_graph(
         weighted_entropy,
     ];
     if let Some(loss) = expert_loss {
+        outputs.push(loss);
+    }
+    if let Some(loss) = replay_actor_loss {
+        assert_eq!(outputs.len(), replay_actor_output(config));
         outputs.push(loss);
     }
     graph.set_outputs(outputs);
@@ -281,6 +305,148 @@ mod tests {
 
     use super::*;
     use crate::dreamer::runtime::{build_session, configure_d3_optimizer, initialize_d3};
+
+    #[test]
+    fn completed_return_actor_preserves_parameters_and_detaches_replay_inputs() {
+        let mut config = DreamerConfig::tiny(3);
+        let baseline = build_training_graph(&config, 12, 6);
+        let parameters = |graph: &Graph| {
+            graph
+                .nodes()
+                .iter()
+                .filter_map(|node| {
+                    if let meganeura::graph::Op::Parameter { name } = &node.op {
+                        Some((name.clone(), node.ty.shape.clone()))
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>()
+        };
+        for expert in [false, true] {
+            config.replay_actor_scale = Some(100.0);
+            config.expert_imitation = expert.then(|| ExpertImitation {
+                scale: 1.0,
+                action_weights: vec![1.0; 3],
+                world_gradient: false,
+                decay: None,
+            });
+            let candidate = build_training_graph(&config, 12, 6);
+            assert_eq!(parameters(&candidate), parameters(&baseline));
+            assert_eq!(candidate.outputs().len(), replay_actor_output(&config) + 1);
+            let detached = candidate
+                .nodes()
+                .iter()
+                .filter(|node| matches!(node.op, meganeura::graph::Op::StopGradient))
+                .count();
+            assert!(detached >= 2);
+            let (plan, _) = meganeura::compile_training_graph(&candidate);
+            assert!(!plan.dispatches.is_empty());
+        }
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded completed-return actor gradient qualification"]
+    fn completed_return_actor_matches_f64_bias_derivatives_and_zero_masks() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let (rows, actions) = (6, 18);
+        let logits: Vec<_> = (0..actions).map(|i| (i as f32 * 0.17).sin()).collect();
+        let mut cases = 0;
+        for unimix in [0.0, 0.01] {
+            for expert in [false, true] {
+                let mut config = DreamerConfig::tiny(actions);
+                config.actor_unimix = unimix;
+                config.replay_actor_scale = Some(100.0);
+                config.expert_imitation = expert.then(|| ExpertImitation {
+                    scale: 100.0,
+                    action_weights: vec![1.0; actions],
+                    world_gradient: false,
+                    decay: None,
+                });
+                let graph = build_training_graph(&config, 12, rows);
+                let mut session = build_session(&graph, &gpu, Mode::Training, false);
+                session.clear_optimizer();
+                session.disable_grad_clip();
+                let mut parameters = Vec::new();
+                for node in graph.nodes() {
+                    match &node.op {
+                        meganeura::graph::Op::Parameter { name } => {
+                            let values = if name == "behavior.actor.out.bias" {
+                                logits.clone()
+                            } else {
+                                vec![0.0; node.ty.num_elements()]
+                            };
+                            session.set_parameter(name, &values);
+                            parameters.push((name.clone(), values));
+                        }
+                        meganeura::graph::Op::Input { name } => {
+                            session.set_input(name, &vec![0.0; node.ty.num_elements()]);
+                        }
+                        _ => {}
+                    }
+                }
+                for weights in [[0., 0.05, 1., 0.6, 0., 0.2], [0.; 6], [1.; 6]] {
+                    let mut targets = vec![0.0; rows * actions];
+                    for row in 0..rows {
+                        targets[row * actions + row] = weights[row];
+                    }
+                    session.set_input("replay_actor_target", &targets);
+                    session.zero_grad();
+                    session.step();
+                    session.wait();
+                    let p: Vec<_> = logits.iter().map(|&x| (x as f64).exp()).collect();
+                    let sum: f64 = p.iter().sum();
+                    let mut expected_loss = 0.0;
+                    let mut expected_gradient = vec![0.0; actions];
+                    for row in 0..rows {
+                        let probability = p[row] / sum;
+                        let mixed =
+                            (1.0 - unimix as f64) * probability + unimix as f64 / actions as f64;
+                        expected_loss -= weights[row] as f64 * mixed.ln() / rows as f64;
+                        for action in 0..actions {
+                            expected_gradient[action] += 100.0 * weights[row] as f64 / rows as f64
+                                * (1.0 - unimix as f64)
+                                * probability
+                                / mixed
+                                * (p[action] / sum - f64::from(action == row));
+                        }
+                    }
+                    let mut loss = [0.0];
+                    session.read_output_by_index(replay_actor_output(&config), &mut loss);
+                    assert!((loss[0] as f64 - expected_loss).abs() < 2e-5);
+                    session.read_output_by_index(LOSS_TOTAL, &mut loss);
+                    assert!((loss[0] as f64 - 100.0 * expected_loss).abs() < 2e-3);
+                    for (name, before) in &parameters {
+                        let mut gradient = vec![0.0; before.len()];
+                        session.read_param_grad(name, &mut gradient);
+                        for (index, &value) in gradient.iter().enumerate() {
+                            let expected = if name == "behavior.actor.out.bias" {
+                                expected_gradient[index]
+                            } else {
+                                0.0
+                            };
+                            assert!(
+                                value.is_finite()
+                                    && (value as f64 - expected).abs()
+                                        < 2e-5 * (1.0 + expected.abs()),
+                                "{name}[{index}]: {value} versus {expected}"
+                            );
+                        }
+                        assert_eq!(session.read_params(&[name])[0], *before);
+                    }
+                    cases += 1;
+                }
+            }
+        }
+        assert_eq!(cases, 12);
+        println!(
+            "completed-return actor: 12 F64 loss/gradient cases; actor/critic parameters unchanged"
+        );
+    }
 
     #[test]
     fn expert_imitation_reuses_actor_parameters_and_is_absent_by_default() {

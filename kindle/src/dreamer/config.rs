@@ -384,6 +384,9 @@ pub struct DreamerConfig {
     pub actor_learning_starts: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expert_imitation: Option<ExpertImitation>,
+    /// Positive-advantage actor imitation of completed observed episode returns.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub replay_actor_scale: Option<f32>,
     pub learning_rate_warmup: u64,
     pub optimizer_beta1: f32,
     pub optimizer_beta2: f32,
@@ -459,6 +462,7 @@ impl DreamerConfig {
             behavior_learning_rate: None,
             actor_learning_starts: 0,
             expert_imitation: None,
+            replay_actor_scale: None,
             learning_rate_warmup: 1_000,
             optimizer_beta1: 0.9,
             optimizer_beta2: 0.999,
@@ -628,6 +632,11 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if let Some(scale) = self.replay_actor_scale
+            && (!scale.is_finite() || scale <= 0.0 || self.uses_disagreement())
+        {
+            return Err("completed-return actor requires a positive finite scale and no model-derived disagreement bonus".into());
+        }
         let size = self.network();
         if let Some(crop) = self.observation_crop {
             crop.check().map_err(str::to_owned)?;
@@ -909,6 +918,34 @@ mod tests {
     use super::*;
 
     #[test]
+    fn completed_return_actor_config_is_optional_and_requires_observed_rewards() {
+        let mut config = DreamerConfig::tiny(3);
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert!(legacy.get("replay_actor_scale").is_none());
+        assert!(
+            serde_json::from_value::<DreamerConfig>(legacy)
+                .unwrap()
+                .replay_actor_scale
+                .is_none()
+        );
+        for scale in [0.0, -1.0, f32::NAN, f32::INFINITY] {
+            config.replay_actor_scale = Some(scale);
+            assert!(config.check().is_err());
+        }
+        config.replay_actor_scale = Some(100.0);
+        config.check().unwrap();
+        let restored: DreamerConfig =
+            serde_json::from_value(serde_json::to_value(&config).unwrap()).unwrap();
+        assert_eq!(restored.replay_actor_scale, Some(100.0));
+        config.disagreement_bonus = true;
+        config.intrinsic_reward_scale = 1.0;
+        assert!(config.check().unwrap_err().contains("model-derived"));
+        config.disagreement_bonus = false;
+        config.visitation_bonus = true;
+        config.check().unwrap();
+    }
+
+    #[test]
     fn replay_context_validates_prefix_capacity_and_preserves_default() {
         let mut config = DreamerConfig::tiny(3);
         assert_eq!(config.replay_context, 1);
@@ -944,6 +981,7 @@ mod tests {
         let mut config = DreamerConfig::tiny(3);
         let legacy = serde_json::to_value(&config).unwrap();
         assert!(legacy.get("expert_imitation").is_none());
+        assert!(legacy.get("replay_actor_scale").is_none());
         assert_eq!(
             serde_json::from_value::<DreamerConfig>(legacy).unwrap(),
             config

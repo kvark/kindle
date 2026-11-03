@@ -25,6 +25,9 @@ pub(super) fn validate_streams(streams: &[usize], count: usize, items: usize) ->
 #[pymethods]
 impl PyVectorAgent {
     #[classattr]
+    const SUPPORTS_COMPLETED_RETURN_ACTOR: bool = true;
+
+    #[classattr]
     const SUPPORTS_EXPERT_WORLD_GRADIENT: bool = true;
 
     #[classattr]

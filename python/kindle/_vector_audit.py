@@ -106,6 +106,12 @@ def audit(path):
             check(type(config[field]) is int and config[field] > 0, f"invalid {field}")
         require_numbers(config["train_ratio"])
         check(config["train_ratio"] >= 0, "invalid train ratio")
+        replay_actor_scale = config.get("replay_actor_scale")
+        if replay_actor_scale is not None:
+            require_numbers(replay_actor_scale)
+            check(replay_actor_scale > 0 and not (
+                config.get("disagreement_bonus", False) and config.get("intrinsic_reward_scale", 0) > 0),
+                "completed-return actor requires positive scale and observed rewards")
         open_loop = config.get("open_loop_supervision")
         if open_loop is not None:
             check(isinstance(open_loop, dict) and set(open_loop) == {"horizon", "scale"},
@@ -328,6 +334,23 @@ def audit(path):
                 check(event["run_step"] == actions and pending_updates > 0, "unexpected learner update")
                 report = event["report"]
                 require_numbers(report)
+                replay_actor = report.get("behavior", {}).get("replay_actor")
+                check((replay_actor is not None) == (replay_actor_scale is not None),
+                      "completed-return actor report/config mismatch")
+                if replay_actor is not None:
+                    check(isinstance(replay_actor, dict) and set(replay_actor) == {
+                        "loss", "completed_rows", "positive_rows", "weight_sum"},
+                        "invalid completed-return actor report")
+                    available = config["batch_size"] * (config["batch_length"] - 1)
+                    check(type(replay_actor["completed_rows"]) is int
+                          and type(replay_actor["positive_rows"]) is int
+                          and 0 <= replay_actor["positive_rows"] <= replay_actor["completed_rows"] <= available
+                          and 0 <= replay_actor["weight_sum"] <= replay_actor["positive_rows"] + 1e-5
+                          and replay_actor["loss"] >= 0,
+                          "invalid completed-return actor counts/weights/loss")
+                    check(replay_actor["positive_rows"] != 0 or (
+                        replay_actor["weight_sum"] == 0 and replay_actor["loss"] == 0),
+                        "empty completed-return actor target has nonzero loss/weight")
                 if expert is not None and expert.get("decay") is not None:
                     decay = expert["decay"]
                     update = header["starting_learner_step"] + updates + 1
