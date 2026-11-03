@@ -20,6 +20,8 @@ command for two raw frames and the second for two, with normal sticky probabilit
 .25 and the original final-two-frame max pooling. The three identical pairs are
 the constant-four-frame family. Then execute the same recorded continuation
 until the original loss endpoint or the first new lost life/terminal/cutoff.
+Observe life counts at ordinary four-frame wrapper boundaries; natural terminal
+and episode time limits stop immediately, as in the retained wrapper.
 Do not reset a branch. Include a separate exact recorded-action continuation.
 This oracle chooses after observing outcomes; no controller has this information.
 
