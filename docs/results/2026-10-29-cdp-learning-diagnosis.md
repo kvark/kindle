@@ -1,16 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [optional native RGB frame-pair prototype](2026-11-03-cdp-rgb-frame-pair.md) passes
-171 Kindle/5 gym Rust CPU tests, 993 packaged Python tests and strict Clippy.
-The default-off input provides previous/current RGB images as six CHW channels,
-with reset duplication and independent GPU stream history. Only the first CNN
-layer widens (+2,400 weights at12M); pair pixels enter replay together.
-GPU geometry passes at32/48/64. The original derivative fixture fails because
-its1e-4 perturbation crosses max-pool boundaries; a separate captured-gradient
-analysis converges at1e-5/1e-6 with unchanged tolerances. Original GPU failure
-and CPU diagnostic-preparation failures remain preserved. Corrected derivatives,
-replay/restore, legacy compatibility and bounded cost/headroom remain pending.
-No Atari learner has launched. Root`/x/Temp/kindle-rgb-frame-pair-20261103`.
+The [optional native RGB frame-pair check](2026-11-03-cdp-rgb-frame-pair.md) completes
+8192 actions /32,713 frames /489 updates in51.357s,7.69% above the retained
+single-image check. Padded200k projection22m59s passes30min; conservative full
+100k replay headroom is6.097GiB. Frozen1024/.877s has zero updates and no natural
+episodes. All42 bounded pins,357 finite/invariant frozen tensors, full training
+pixel/action/label replay and host guards pass. No gameplay benefit is measured.
+
+Native geometry, corrected derivatives, paired replay/learning/restore and both
+legacy initial/final1024-action checks pass. Original derivative and CPU audit
+failures remain preserved; no successful GPU stage repeats.171 Kindle/5 gym Rust
+CPU tests,993 Python tests and strict Clippy pass. Native24e701bc/SHA b451bc9,
+corrected test sourceb58333ca; runtime/wheels/tests retained,996MB apparent build
+cache released. Complete23:23:19 UTC November3; no GPU allocation remains active.
+Root`/x/Temp/kindle-rgb-frame-pair-20261103`. No full comparison is selected;
+its decision must use this bounded evidence. Check live state before GPU work.
 
 The failed fixed motion readout does not provide positive evidence for this
 jointly trained input; gameplay benefit isunmeasured. Retain20% guidance,
