@@ -1,27 +1,30 @@
 # Kindle: CDP learning roadmap
 
-The [completed-return actor bounded pair](results/2026-11-03-cdp-episodic-actor.md) passes: bonus-off control
-8192 actions/489 updates in36.677s versus scale100 candidate38.277s (+4.36%).
-Candidate33105 positive replay rows across431 updates start at action1224;
-conservative200k projection17m07.959s passes30min. Both1024 frozen arms havezero
-updates/no natural episodes. Execution and early cost pass; gameplay is unmeasured.
-Default-off nativee3b02163/SHA d406629f adds no parameters; bonus-off removes96
-ensemble tensors,leaving261. Completed returns mask unfinished/time-limited
-episodes and detach this actor-only term. Model disagreement/resident targets
-are rejected. All163+5 Rust/1006 Python CPU checks,Clippy,12 F64 native cases,
-221 native/255 bounded/338 retained pins,261 matching/invariant tensors,47
-pre-update events,full guided replays and legacy357 tensors/128 events pass.
+The [fresh 200k completed-return actor comparison](experiments/2026-11-03-cdp-episodic-actor-200k.md)
+launches **16:24:19 UTC November 3**, source783852b2. Bonus-off control trains
+first, then the scale100 candidate, with no overlap or experience transfer.
+Both use12M64/Auto/N8/B16/T16/H15/R16/context1, expert100 and the qualified
+e3b02163 runtime. Each gets200k actions/12,477 updates and a30-minute training
+cap, a retained100k/6,227 checkpoint, and final/actual-initial sampled/greedy
+24-episode assessments. Original864/90%-two-wall gate and retained results stay.
 
-Original servicePID1048190/invocation12873b06470242aeb15a4fb4bf3ec483 succeeds
-16:07:03 UTC November3/source3018736f; independent terminal collection16:08:58.335
-passes in.645s. No GPU/learner/replay/reader failure or repeat. Bounded root
-`/x/Temp/kindle-episodic-actor-20261103/check` is closed; do not rerun. Runtime,
-wheels,validation binary and1.008GB cache retained. No Kindle allocation active.
-The [fresh200k control/candidate pair](experiments/2026-11-03-cdp-episodic-actor-200k.md) is selected for preparation,
-not launched: same bonus-off recipe,30min per learner,100k recovery and final/
-actual-initial sampled/greedy24-episode assessments. Keep retained gameplay and
-original864/90%-two-wall gate. No bounded experience reuse,extension or automatic
-confirmation. Check live state before work; the five-game goal is unfinished.
+Main service `kindle-episodic-actor-200k-20261103`, PID1049147, invocation
+`fcc4bc49735445638173a45196bddd44`, is active. Its controller owns progress,
+startup/recovery checks, phase audits, replays and comparison; the separate
+`-collect` observer is active. All307 preparation pins and CPU preflight pass.
+Control startup passes261 initial arrays matching bounded/retained shared
+values,47 pre-update events and first update376. No full frozen result exists.
+Root `/x/Temp/kindle-episodic-actor-20261103/full`. Check live state; do not
+restart this pair or schedule another GPU job while it is active. No extension,
+third learner or automatic confirmation follows. The five-game goal is unfinished.
+
+The [closed bounded pair](results/2026-11-03-cdp-episodic-actor.md)
+passed8192 actions/489 updates in36.677s control/38.277s candidate (+4.36%),
+with33105 positive replay rows and no natural frozen episodes. All native/CPU,
+legacy, tensor, replay and terminal checks pass; no failed or repeated stage.
+Native e3b02163/SHA d406629f adds no parameters; disabling disagreement removes96
+ensemble tensors, leaving261. Runtime,wheels,validation binary and1.008GB cache
+remain. Bounded root `check` is closed; never reuse its experience or rerun it.
 
 The [CPU replay-actor target audit](results/2026-11-03-cdp-breakout-replay-actor-targets.md) confirms no direct
 return-weighted actor update on executed replay actions. Reusing existing critic

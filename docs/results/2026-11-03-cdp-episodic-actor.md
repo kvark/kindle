@@ -99,14 +99,44 @@ the short runs; wall times are not corrected and are not kernel timings.
 
 Root `/x/Temp/kindle-episodic-actor-20261103/check` is closed. Do not rerun its
 stages. Runtime,wheels,test executable and build cache remain under the parent
-root. No Kindle service is active at closure. The retained200k70.750/143.667
+root. No Kindle service was active at that closure. The retained200k70.750/143.667
 and400k92.792/173.708 gameplay results remain unchanged,all zero of24 two-wall
 successes. The five-game goal remains unfinished.
 
+## Full comparison is running
+
 The [fresh200k comparison](../experiments/2026-11-03-cdp-episodic-actor-200k.md)
-is selected for preparation after this successful closure; it has not launched.
-No bounded experience is reused, and no extension or seed confirmation follows
-automatically.
+launches **16:24:19 UTC November3**, source783852b2. One fresh bonus-off control
+precedes one fresh scale100 candidate; each gets200k actions/12,477 updates,
+a30-minute training cap, a100k/6,227 recovery and final/actual-initial sampled/
+greedy24-episode assessments. The candidate differs only in the optional actor
+loss within this pair. The retained action-effects1 result is historical context
+with a different runtime/runner and objective. No bounded experience is reused.
+
+All **307 input pins** pass. CPU preflight completes16:23:54.273 in1.400s,
+checking queues/caps,261 tensor schemas/shared initial arrays, bounded loss
+accounting, corrupt-loss rejection, retained lane scores, fixed bootstrap and
+plotting imports. No native construction or GPU work occurs during preflight.
+The fresh control startup passes261 matching initial arrays,47 common pre-update
+semantic events and first update376. Its.254s checkpoint/startup observer shares
+the host; report actual elapsed training time without correction.
+
+Service `kindle-episodic-actor-200k-20261103`, PID1049147, invocation
+`fcc4bc49735445638173a45196bddd44`, owns the sequential pair. Its controller
+checks live reports, retains checkpoint history directly, validates each phase
+before the next GPU stage, then performs full replays/videos, curves, exposure,
+coverage and paired eight-lane comparison. Bootstrap is fixed at10000 resamples,
+seed0; greedy is primary. The independent `-collect` observer is active. Full
+root `/x/Temp/kindle-episodic-actor-20261103/full` is active, not completed.
+There is no full frozen score or selected gameplay benefit yet. Do not restart
+this pair, repeat bounded stages or overlap another GPU job. No extension,
+third learner or automatic seed confirmation follows. The original864/90%
+two-wall gate and unfinished five-game goal remain.
+
+Full declaration SHA256:
+`b48da6eae51aad8fe7761437c77e7a8612db89908b3643612b96756a5c2e5c51`.
+Preflight SHA256:
+`80421785f172244e4927534ce6ee6d202e96541a9f4106f2da60585095a3d293`.
 
 | Artifact | SHA256 |
 | --- | --- |
