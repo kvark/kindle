@@ -119,4 +119,5 @@ def test_actor_only_reports_preserve_world_weight(tmp_path,mutation):
     if mutation is None:
         assert audit(write_log(tmp_path,rows))['updates']==3
     else:
-        with pytest.raises(ValueError,match='expert imitation'):audit(write_log(tmp_path,rows))
+        message='non-finite or non-numeric' if mutation=='world_boolean' else 'expert imitation'
+        with pytest.raises(ValueError,match=message):audit(write_log(tmp_path,rows))
