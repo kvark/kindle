@@ -1,19 +1,23 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-Select the [bounded policy-weight100 check](../experiments/2026-11-03-cdp-breakout-policy100.md)
-to increase imagined-policy pressure while retaining expert100 and world imitation.
-Only policy loss1→100 changes, scaling score-function and entropy together;
-critic weights1/1, actor/critic representation gradients off and the retained
-12M64/Auto/N8/B16/T16/H15/R16 recipe stay fixed. Native447fe50/teacher are unchanged;
-private runner5a86e224 adds12 CLI lines. CPU qualification passes actual commands,
-20 config cases,357 shapes,338 control pins and12 arithmetic cases. Two fixture
-failures/corrections remain preserved; no native agent is constructed.
+Select the [fresh200k policy-weight100 comparison](../experiments/2026-11-03-cdp-breakout-policy100-200k.md)
+after its [bounded execution/cost check](../results/2026-11-03-cdp-breakout-policy100.md)
+passes8,192 actions/32,728 frames/489 updates in46.910s and a20m59.778s conservative
+projection. Frozen1,024 actions/.889s has zero updates and no natural episodes.
+All396 pins,357 matching/invariant tensors,47 pre-update events,policy100 report
+arithmetic,replay and guards pass. Main/collector succeed09:30:47.023/09:30:52.508
+UTC November3/sourcee5ebbaee; independent terminal09:31:21.424. The bounded root
+is closed; do not repeat stages. Two CPU fixture corrections remain preserved.
 
-Require8,192 actions/489 updates,1,024 frozen actions,357 matched/invariant tensors,
-47 pre-update events, exact replay, reported policy100 arithmetic and host guards.
-Root `/x/Temp/kindle-breakout-policy100-20261103/native-check`; check live state
-before launch. Conservative200k projection must pass30min before any separately
-selected full learner. No full learner, extension or coefficient sweep is selected.
+Only policy loss1→100 changes, scaling score-function and entropy together while
+retaining expert100/world imitation,critic1/1 and actor/critic representation
+gradients off. Native447fe50/teacher stay unchanged; runner5a86e224 adds12 CLI lines.
+Full CPU qualification passes18 scripts,five commands,38 configs,19 headers,
+14 recovery bodies and all396/338 pins, with no native/emulator construction.
+Require fresh200k/12,477 updates,100k/6,227 recovery,four final/actual-initial24-
+episode arms and30min training cap against70.750/143.667,all0/24 two-wall.
+Root `/x/Temp/kindle-breakout-policy100-20261103/full`; check live state before
+launch. No gameplay gain,extension,coefficient sweep or confirmation is selected.
 The five-game goal remains unfinished.
 
 The [completed contact-timing CPU teacher comparison](../results/2026-11-03-cdp-breakout-contact-timing-policy.md)

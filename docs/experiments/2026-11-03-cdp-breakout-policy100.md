@@ -83,3 +83,7 @@ two actual commands,20 exact-config cases, first376/489/6227/12477 cadence,357
 tensor shapes and338 retained control pins. No native module, agent or emulator
 is constructed during this preflight. The exact preparation failures, sources
 and final provenance remain under the private root.
+
+The [bounded result](../results/2026-11-03-cdp-breakout-policy100.md) passes once,
+with no bounded stage repeated. Its private protocol snapshot preserves the
+pre-result declaration. A separately specified fresh200k comparison follows.
