@@ -1,16 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [completed-return/bonus CPU audit](2026-11-03-cdp-completed-return-bonus-audit.md) finds390 positive targets among480
-fixed retained states,all eight lanes,weight94.779770/effective228.457. Observed
-completed returns can give a conservative actor weight against the combined
-critic because omitted disagreement bonuses are nonnegative. This is not a
-true-value bound or gameplay benefit. All15 fixtures,17 current/20 prior/158
-original pins,512 arrival/480 outgoing alignments and independent terminal sums
-pass; closure17:41:24.245 UTC November3/source4d2463e0. No model,emulator,GPU,
-update or repeated prior stage. Root`/x/Temp/kindle-completed-return-bonus-audit-20261103`
-is closed. An explicit conservative-mode implementation and bounded check are
-next design candidates; neither implementation nor a GPU job is selected here.
-Retained gameplay results stay; Breakout and the five-game goal remain unfinished.
+The [conservative completed-return actor](2026-11-03-cdp-conservative-actor.md) passes its fresh bounded
+comparison: 8192 actions/489 updates in47.402s control/50.754s candidate (+7.07%).
+Positive targets occur on431 updates with33,588 positive rows; the disagreement
+bonus remains active. Padded200k projection22m43s passes30min. Both1024-action
+frozen arms have zero updates/no natural episodes; gameplay benefit is unmeasured.
+Native3f6c6648 passes1018 Python/169 Rust CPU checks,Clippy and12 F64 cases.
+All258 current/338 retained pins,215 preserved sources,357 matching initial/
+invariant frozen tensors,replays and five GPU stages pass. A separate CPU check
+matches all357 final control arrays and1065 events to the retained short control.
+Main completes17:56:08 UTC November3,terminal collection17:58:00.438,compatibility
+17:58:41.844. CPU fixture/path failures remain; no GPU stage repeats.
+Root`/x/Temp/kindle-conservative-actor-20261103/check` is closed. The [fresh200k
+assessment](../experiments/2026-11-03-cdp-conservative-actor-200k.md) is selected with a30-minute training cap and retained
+24-episode controls; its full harness is not prepared or launched yet. No Kindle
+GPU allocation is active. Check live state before work; the five-game goal remains unfinished.
 
 The [completed-return actor pair](2026-11-03-cdp-episodic-actor.md) closes with a useful bonus-off
 result:sampled46.458→56.542 (+21.70%),greedy65.208→95.375 (+46.26%),all0/24
