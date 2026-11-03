@@ -144,6 +144,9 @@ pub struct WorldMetrics {
     /// Trusted-action loss through the frozen actor, before scale/warmup gating.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expert_imitation_loss: Option<f32>,
+    /// World scale before actor-update gating, reported for actor-only decay.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expert_imitation_scale: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub open_loop_supervision: Option<OpenLoopMetrics>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1429,7 +1432,7 @@ impl DreamerCore {
         {
             self.world_train.set_input(
                 "expert_imitation_scale",
-                &[expert.scale_at_update(self.learner_step + 1)],
+                &[expert.world_scale_at_update(self.learner_step + 1)],
             );
         }
         if self.config.actor_critic_gradient || self.config.expert_world_gradient() {
@@ -1453,7 +1456,16 @@ impl DreamerCore {
                 .set_grad_accumulate(pass_count.try_into().unwrap());
             self.world_train.zero_grad();
         }
-        let mut metrics = WorldMetrics::default();
+        let mut metrics = WorldMetrics {
+            expert_imitation_scale: self.config.expert_imitation.as_ref().and_then(|expert| {
+                expert
+                    .decay
+                    .as_ref()
+                    .filter(|decay| decay.actor_only && expert.world_gradient)
+                    .map(|_| expert.world_scale_at_update(self.learner_step + 1))
+            }),
+            ..WorldMetrics::default()
+        };
 
         for chunk in 0..chunk_count {
             let start = chunk * chunk_length;

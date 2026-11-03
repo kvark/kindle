@@ -171,6 +171,8 @@ def main():
                         help="fresh guided training only: native supervised actor loss on expert actions")
     parser.add_argument("--guidance-imitation-decay", type=int, nargs=2, metavar=("START_UPDATE", "END_UPDATE"),
                         help="hold imitation scale through START_UPDATE, then linearly fade to zero at END_UPDATE")
+    parser.add_argument("--guidance-actor-only-decay", action="store_true",
+                        help="fade only actor imitation; retain the base world-imitation scale")
     parser.add_argument("--guidance-noop-weight", type=float,
                         help="relative NOOP target weight for expert imitation; default1")
     parser.add_argument("--guidance-fire-weight", type=float,
@@ -295,6 +297,8 @@ def main():
         start, end = args.guidance_imitation_decay
         if not 0 <= start < end < 2**64:
             parser.error("guidance imitation decay requires 0 <= start < end within u64")
+    if args.guidance_actor_only_decay and (args.guidance_imitation_decay is None or not args.guidance_world_gradient):
+        parser.error("actor-only imitation decay requires a decay interval and world gradient")
     if args.guidance_fire_weight is not None:
         if args.guidance_imitation_scale is None:
             parser.error("guidance FIRE weight requires imitation")
@@ -340,6 +344,7 @@ def main():
     training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions", "--breakout-corrective-labels"))
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-fire-weight", "--guidance-world-gradient"))
     training_options.add("--guidance-imitation-decay")
+    training_options.add("--guidance-actor-only-decay")
     training_options.add("--image-size")
     training_options.add("--image-crop")
     training_options.add("--actor-unimix")
@@ -377,6 +382,8 @@ def main():
         parser.error("guidance world gradient requires native world-gradient support")
     if args.guidance_imitation_decay is not None and not getattr(kindle.VectorAgent, "SUPPORTS_EXPERT_IMITATION_DECAY", False):
         parser.error("guidance imitation decay requires native decay support")
+    if args.guidance_actor_only_decay and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_ONLY_IMITATION_DECAY", False):
+        parser.error("actor-only imitation decay requires native actor-only decay support")
     if args.open_loop_length is not None and not getattr(kindle.VectorAgent, "SUPPORTS_OPEN_LOOP_SUPERVISION", False):
         parser.error("open-loop supervision requires native open-loop support")
     if args.breakout_centroid_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COLOR_CENTROID_SUPERVISION", False):
@@ -520,6 +527,8 @@ def main():
             if args.guidance_imitation_decay is not None:
                 start, end = args.guidance_imitation_decay
                 config["expert_imitation"]["decay"] = dict(start_update=start, end_update=end)
+                if args.guidance_actor_only_decay:
+                    config["expert_imitation"]["decay"]["actor_only"] = True
         if learned_rgb:
             config["observation_kind"] = f"rgb{args.image_size or 64}"
             if args.image_crop is not None:

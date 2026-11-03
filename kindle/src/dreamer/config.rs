@@ -255,6 +255,9 @@ pub struct ExpertImitation {
 pub struct ExpertImitationDecay {
     pub start_update: u64,
     pub end_update: u64,
+    /// Fade actor imitation while retaining the base world-imitation scale.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub actor_only: bool,
 }
 
 impl ExpertImitation {
@@ -269,6 +272,14 @@ impl ExpertImitation {
                 let duration = (decay.end_update - decay.start_update) as f64;
                 self.scale * (remaining / duration) as f32
             }
+        }
+    }
+
+    pub fn world_scale_at_update(&self, update: u64) -> f32 {
+        if self.decay.as_ref().is_some_and(|decay| decay.actor_only) {
+            self.scale
+        } else {
+            self.scale_at_update(update)
         }
     }
 }
@@ -659,6 +670,11 @@ impl DreamerConfig {
         {
             return Err("expert imitation decay requires end_update > start_update".into());
         }
+        if self.expert_imitation.as_ref().is_some_and(|expert| {
+            !expert.world_gradient && expert.decay.as_ref().is_some_and(|decay| decay.actor_only)
+        }) {
+            return Err("actor-only expert imitation decay requires world_gradient".into());
+        }
         if let Some(centroid) = &self.color_centroid_supervision {
             let [x0, y0, x1, y1] = centroid.region;
             let side = self.observation_grid();
@@ -939,6 +955,7 @@ mod tests {
             action_weights: vec![1.0; 3],
             world_gradient: true,
             decay: Some(ExpertImitationDecay {
+                actor_only: false,
                 start_update: 10,
                 end_update: 14,
             }),
@@ -960,14 +977,17 @@ mod tests {
             (u64::MAX, 0.0),
         ] {
             assert_eq!(expert.scale_at_update(update), scale);
+            assert_eq!(expert.world_scale_at_update(update), scale);
         }
         let expert = config.expert_imitation.as_mut().unwrap();
         expert.decay = Some(ExpertImitationDecay {
+            actor_only: false,
             start_update: u64::MAX - 4,
             end_update: u64::MAX,
         });
         assert_eq!(expert.scale_at_update(u64::MAX - 2), 50.0);
         expert.decay = Some(ExpertImitationDecay {
+            actor_only: false,
             start_update: 0,
             end_update: 1,
         });
@@ -975,6 +995,7 @@ mod tests {
         assert_eq!(expert.scale_at_update(1), 0.0);
         for (start_update, end_update) in [(0, 0), (10, 10), (11, 10)] {
             config.expert_imitation.as_mut().unwrap().decay = Some(ExpertImitationDecay {
+                actor_only: false,
                 start_update,
                 end_update,
             });
@@ -985,6 +1006,62 @@ mod tests {
                     .contains("expert imitation decay")
             );
         }
+    }
+
+    #[test]
+    fn actor_only_decay_preserves_world_scale_and_legacy_serialization() {
+        let mut config = DreamerConfig::tiny(3);
+        config.expert_imitation = Some(ExpertImitation {
+            scale: 100.0,
+            action_weights: vec![1.0; 3],
+            world_gradient: true,
+            decay: Some(ExpertImitationDecay {
+                start_update: 10,
+                end_update: 14,
+                actor_only: false,
+            }),
+        });
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert_eq!(
+            legacy["expert_imitation"]["decay"],
+            serde_json::json!({
+                "start_update": 10, "end_update": 14
+            })
+        );
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(legacy).unwrap(),
+            config
+        );
+        config
+            .expert_imitation
+            .as_mut()
+            .unwrap()
+            .decay
+            .as_mut()
+            .unwrap()
+            .actor_only = true;
+        config.check().unwrap();
+        let restored: DreamerConfig =
+            serde_json::from_value(serde_json::to_value(&config).unwrap()).unwrap();
+        assert_eq!(restored, config);
+        let expert = restored.expert_imitation.unwrap();
+        for (update, actor) in [
+            (0, 100.0),
+            (10, 100.0),
+            (12, 50.0),
+            (14, 0.0),
+            (u64::MAX, 0.0),
+        ] {
+            assert_eq!(expert.scale_at_update(update), actor);
+            assert_eq!(expert.world_scale_at_update(update), 100.0);
+        }
+        config.expert_imitation.as_mut().unwrap().world_gradient = false;
+        assert!(
+            config
+                .check()
+                .unwrap_err()
+                .contains("requires world_gradient")
+        );
     }
 
     #[test]

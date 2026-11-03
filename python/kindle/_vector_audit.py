@@ -176,9 +176,13 @@ def audit(path):
             check(header["mode"] != "train" or guidance, "expert imitation requires trusted guidance")
             decay = expert.get("decay")
             if decay is not None:
-                check(isinstance(decay, dict) and set(decay) == {"start_update", "end_update"},
+                check(isinstance(decay, dict)
+                      and {"start_update", "end_update"} <= set(decay) <= {"start_update", "end_update", "actor_only"},
                       "invalid expert imitation decay")
-                check(all(type(value) is int and 0 <= value < 2**64 for value in decay.values())
+                check(type(decay.get("actor_only", False)) is bool
+                      and (not decay.get("actor_only", False) or expert.get("world_gradient", False)),
+                      "invalid actor-only expert imitation decay")
+                check(all(type(decay[key]) is int and 0 <= decay[key] < 2**64 for key in ("start_update", "end_update"))
                       and decay["start_update"] < decay["end_update"], "invalid expert imitation decay interval")
         expert_training = expert is not None and header["mode"] == "train"
         corrective = guidance and header["exploration"]["kind"] in (CORRECTIVE_GUIDANCE_KIND, BREAKOUT_CORRECTIVE_GUIDANCE_KIND)
@@ -334,6 +338,10 @@ def audit(path):
                     applied = report.get("behavior", {}).get("expert_imitation", {}).get("scale")
                     check(type(applied) in (int, float) and f32(applied) == expected,
                           "expert imitation scale/counter mismatch")
+                    if decay.get("actor_only", False):
+                        world_scale = report.get("world", {}).get("expert_imitation_scale")
+                        check(type(world_scale) in (int, float) and f32(world_scale) == f32(expert["scale"]),
+                              "world expert imitation scale mismatch during actor-only decay")
                 position = report.get("world", {}).get("color_centroid_supervision")
                 check((position is not None) == (centroid is not None), "centroid report/config mismatch")
                 if position is not None:

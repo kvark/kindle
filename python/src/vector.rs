@@ -31,6 +31,9 @@ impl PyVectorAgent {
     const SUPPORTS_EXPERT_IMITATION_DECAY: bool = true;
 
     #[classattr]
+    const SUPPORTS_ACTOR_ONLY_IMITATION_DECAY: bool = true;
+
+    #[classattr]
     const SUPPORTS_OPEN_LOOP_SUPERVISION: bool = true;
 
     #[classattr]

@@ -1513,13 +1513,37 @@ mod tests {
         config.actor_critic_gradient = false;
         config.expert_imitation.as_mut().unwrap().decay =
             Some(super::super::ExpertImitationDecay {
+                actor_only: false,
                 start_update: 10,
                 end_update: 20,
             });
         let scheduled = build_training_graph(&config, 2);
         assert_eq!(scheduled.nodes().iter().filter(|node|
             matches!(&node.op, Op::Input { name } if name == "expert_imitation_scale")).count(),1);
+        config
+            .expert_imitation
+            .as_mut()
+            .unwrap()
+            .decay
+            .as_mut()
+            .unwrap()
+            .actor_only = true;
+        let actor_only = build_training_graph(&config, 2);
+        assert_eq!(scheduled.outputs(), actor_only.outputs());
+        assert_eq!(
+            format!("{:?}", scheduled.nodes()),
+            format!("{:?}", actor_only.nodes())
+        );
+        config
+            .expert_imitation
+            .as_mut()
+            .unwrap()
+            .decay
+            .as_mut()
+            .unwrap()
+            .actor_only = false;
         config.expert_imitation.as_mut().unwrap().world_gradient = false;
+        config.check().unwrap();
         let disabled = build_training_graph(&config, 2);
         config.expert_imitation = None;
         let baseline = build_training_graph(&config, 2);

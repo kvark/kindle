@@ -313,6 +313,7 @@ mod tests {
         assert!(!plan.dispatches.is_empty());
         config.expert_imitation.as_mut().unwrap().decay =
             Some(super::super::ExpertImitationDecay {
+                actor_only: false,
                 start_update: 10,
                 end_update: 20,
             });
@@ -397,6 +398,17 @@ mod tests {
     #[test]
     #[ignore = "requires a separately guarded Vulkan imitation-decay gradient check"]
     fn decayed_expert_loss_preserves_raw_metric_and_other_gradients() {
+        check_decayed_expert_gradients(false, false);
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded Vulkan actor-only decay gradient check"]
+    fn actor_only_decay_keeps_world_gradients_after_actor_fades() {
+        check_decayed_expert_gradients(true, false);
+        check_decayed_expert_gradients(true, true);
+    }
+
+    fn check_decayed_expert_gradients(actor_only: bool, world: bool) {
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         assert_eq!(
             gpu.device_information().device_name,
@@ -410,6 +422,7 @@ mod tests {
             action_weights: vec![1.0; actions],
             world_gradient: true,
             decay: Some(super::super::ExpertImitationDecay {
+                actor_only,
                 start_update: 10,
                 end_update: 14,
             }),
@@ -463,7 +476,11 @@ mod tests {
         }
         let mut prior_raw = None;
         for update in [10, 12, 14] {
-            let applied = expert.scale_at_update(update);
+            let applied = if world {
+                expert.world_scale_at_update(update)
+            } else {
+                expert.scale_at_update(update)
+            };
             session.set_parameter("logits", &logits);
             session.set_input("target", &target);
             session.set_input("expert_imitation_scale", &[applied]);
