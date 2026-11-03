@@ -26,17 +26,24 @@ launches **19:24:44 UTC November 3**, source `e6e5f4ba`, with 330 pins and a
 unchanged. Keep 12M64/Auto/N8/B16/T16/H15/R16, actor100/lower-bound with life
 boundaries, expert100/world gradients, disagreement1 and the retained rates.
 Transfer no weights or experience. Main PID **1063215**, invocation
-`335925ab865f49d280efb8eaa211fc55`; recovery and terminal observers are active.
+`335925ab865f49d280efb8eaa211fc55`; terminal observer remains active.
 
 Startup passes all 357 matched initial tensors and 47 pre-update events.
 The independent .497s CPU observation validates finite reports through
 7,864 actions / 468 updates, first positive actor targets at568, and118 raw-life
 boundary actions. All330 pins stay unchanged; retain CPU co-host time without
-correction. No frozen result is available. Require100k/6,227 recovery and final/
-actual-initial sampled/greedy24-episode assessments, full pixel/label/life
+correction. No frozen result is available. Final/actual-initial sampled/greedy
+24-episode assessments, full pixel/label/life
 replay, guards, curves, exposure and comparisons. Primary retained greedy143.667
 and sampled70.750 remain; whole-game actor144.750/49.167 is contextual evidence.
 The original864/90%-two-wall gate and five-game goal remain unfinished.
+
+The 100k/6,227 recovery is retained read-only and passes its original observer
+at19:35:36.137 UTC. Independent CPU verification passes19:35:44.899 in.681s,
+with all357 finite tensors,51,502,659 elements, matching metadata and330 unchanged
+pins. Its observer exits successfully; do not repeat the verifier. The original
+learner continues past102,400 actions/6,377 updates. These weights/moments omit
+replay, games, beliefs and full RNG state; they are not exact-resume state.
 
 Root `/x/Temp/kindle-life-return-actor-20261103/full`; service
 `kindle-life-return-actor-200k-20261103`. Check original process/invocation state;
