@@ -6,7 +6,19 @@ and [PR31](https://github.com/kvark/kindle/pull/31) for the live dashboard.
 The five-game goal remains unfinished. Detailed experiment history belongs in
 those reports; historical “next” paragraphs do not authorize restarting jobs.
 
-## Current work — November 2
+## Current work — November 3
+
+The [fixed pixel-motion readout](results/2026-11-03-cdp-breakout-pixel-motion-readout.md)
+fails its screen: learned-plus-motion teacher agreement55.91% overall/55.88%
+near descending trails actor62.56%/66.91%. One new CPU predecessor capture
+matches20,960 actions/83,799 frames and2,064 saved current pixel predictions;
+existing features and baseline fits are reused. Six fixtures/75 pins pass;
+capture12.177s+fit.950s, completion03:56:34.670 UTC November3/sourcec91dcfa.
+No failure,GPU work or updates. Root`/x/Temp/kindle-breakout-pixel-motion-20261103`
+is closed; do not repeat capture,fits or qualification. No temporal-input
+prototype or learner is selected. Reused older control states/readout geometry
+limit interpretation; no general temporal-input or causal defect claim.
+No Kindle service is active at closure; check live state before new work.
 
 The [completed Breakout crop comparison](results/2026-11-02-cdp-breakout-playfield-crop.md)
 scores47.042 sampled/114.833 greedy, below full-frame70.750/143.667 by33.51%/

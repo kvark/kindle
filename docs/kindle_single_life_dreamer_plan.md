@@ -1,5 +1,16 @@
 # Kindle: CDP learning roadmap
 
+The [fixed pixel-motion readout](results/2026-11-03-cdp-breakout-pixel-motion-readout.md)
+fails its screen: learned-plus-motion teacher agreement55.91% overall/55.88%
+near descending trails actor62.56%/66.91%. One new CPU predecessor capture
+matches20,960 actions/83,799 frames and2,064 saved current pixel predictions;
+existing features and baseline fits are reused. Six fixtures/75 pins pass;
+capture12.177s+fit.950s, completion03:56:34.670 UTC November3/sourcec91dcfa.
+No failure,GPU work or updates. No temporal-input prototype or learner selected;
+reused older control states and readout geometry limit interpretation. Root
+`/x/Temp/kindle-breakout-pixel-motion-20261103` is closed; completed stages must
+not repeat. No service is active at closure; the five-game goal remains unfinished.
+
 The [completed Breakout crop comparison](results/2026-11-02-cdp-breakout-playfield-crop.md)
 scores47.042 sampled/114.833 greedy, below full-frame70.750/143.667 by33.51%/
 20.07%, in21m49.159s (+1.65%). Own initials1.375/1.917; all0/24 two-wall.

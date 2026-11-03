@@ -1,5 +1,17 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fixed pixel-motion readout](2026-11-03-cdp-breakout-pixel-motion-readout.md)
+fails its screen: learned-plus-motion teacher agreement55.91% overall/55.88%
+near descending trails actor62.56%/66.91%. Pixel/motion alone improves over
+current pixels alone54.08% versus48.25%, but the augmented readout falls below
+its saved current-pixel baseline57.40%. This does not support the proposed
+temporal-input prototype or establish a general limitation of temporal inputs.
+One new CPU predecessor capture matches20,960 actions/83,799 frames and2,064
+saved current positions; old features/fits are reused. Six fixtures/75 pins pass
+in13.330s, complete03:56:34.670 UTC November3/sourcec91dcfa. No failure,GPU work
+or updates. Root`/x/Temp/kindle-breakout-pixel-motion-20261103` is complete;
+do not repeat stages. No new learner or automatic successor is selected.
+
 The [completed Breakout crop comparison](2026-11-02-cdp-breakout-playfield-crop.md)
 scores47.042 sampled/114.833 greedy, below full-frame70.750/143.667 by33.51%/
 20.07%, in21m49.159s (+1.65%). Own initials1.375/1.917; all0/24 two-wall.
