@@ -20,6 +20,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [saved life-feedback analysis](docs/results/2026-11-03-cdp-breakout-life-feedback.md)
+is complete: all 120 selected lost lives have zero immediate reward, including
+96 nonterminal losses. It reuses 37,016 recorded actions with no emulator or GPU
+work; 11 fixtures and 14 input pins pass. This does not establish a causal defect.
+Next develop the [optional one-point life-loss training aid](docs/experiments/2026-11-03-cdp-breakout-life-penalty.md):
+explicit raw/training reward accounting, default off, frozen shaping off, and
+CPU qualification before one bounded check. No implementation or GPU check has
+passed yet. Preserve retained runtimes and raw scores; no full learner is selected.
+The diagnostic is closed; do not repeat it. No Kindle job is active at closure.
+
 The [completed replay16k comparison](docs/results/2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000
 andgreedy143.667→57.625 in21m44.359s (+1.28% training time),all0/24 two-wall.
 Initial-subtracted return/min falls53.60%/61.32%. Retain shared replay100k with

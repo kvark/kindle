@@ -8,6 +8,23 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [saved life-feedback diagnostic](results/2026-11-03-cdp-breakout-life-feedback.md)
+is complete at 05:46:57.594 UTC, source cbdf048. All 120 selected lost lives have
+zero immediate reward; 96 are nonterminal. Eleven fixtures and 14 input pins
+pass. The analysis reuses 37,016 actions / 148,038 frames from the older
+encoder4e5/behavior4e5/value.3 greedy cohort, without emulator or GPU work.
+It does not establish the cause of weak control or measure a learning benefit.
+Root `/x/Temp/kindle-breakout-life-feedback-20261103` is closed; do not repeat it.
+Review SHA `bf3b7bafdcf187db74fdf81dd07eab3d82200cbfbbbc8f8122cfc8836035451b`.
+
+Next develop the [optional one-point life-loss training aid](experiments/2026-11-03-cdp-breakout-life-penalty.md).
+Keep raw rewards and scores separate from declared training rewards; preserve
+episode boundaries and retained runtimes. Qualify the accounting, refusals,
+default-off compatibility and replay audit on CPU before one fresh 8,192-action
+check. Frozen evaluation has shaping off. Native 447fe50 and retained replay100k
+settings stay fixed. No implementation, GPU check or full learner has passed;
+no Kindle service is active at closure. Check live state before allocating work.
+
 The [completed replay16k comparison](results/2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000
 andgreedy143.667→57.625 in21m44.359s (+1.28% training time),all0/24 two-wall.
 Initial-subtracted return/min falls53.60%/61.32%. Retain shared replay100k with

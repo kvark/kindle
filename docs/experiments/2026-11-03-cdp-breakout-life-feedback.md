@@ -1,5 +1,12 @@
 # Breakout life-loss reward visibility in saved trajectories
 
+Completed **05:46:57.594 UTC November 3**, source cbdf048; see the
+[result](../results/2026-11-03-cdp-breakout-life-feedback.md). All 11 fixtures and
+14 input pins pass, with no emulator or GPU work and no repeated stage. The
+analysis is closed. Its separate [next development](2026-11-03-cdp-breakout-life-penalty.md)
+selects an optional training aid, not a full learner. The original protocol
+below is retained.
+
 Select one CPU-only analysis of existing life-annotated trajectories before
 adding a training signal. The latest replay16k comparison is closed and failed
 to improve gameplay. No learner or GPU job is selected by this analysis.

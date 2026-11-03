@@ -1,5 +1,18 @@
 # Kindle: CDP learning roadmap
 
+The [saved Breakout life-feedback diagnostic](results/2026-11-03-cdp-breakout-life-feedback.md)
+finds zero immediate reward at all 120 selected lost lives, 96 nonterminal.
+It reuses 37,016 recorded actions from an older greedy policy; 11 fixtures and
+14 input pins pass in .301s, with no emulator, GPU work or learning. Life loss
+already reduces future scoring opportunities; these counts do not establish
+a causal defect. The next [bounded development](experiments/2026-11-03-cdp-breakout-life-penalty.md)
+tests an optional one-point training penalty per observed lost life, after CPU
+qualification of explicit raw-versus-training reward accounting. Preserve raw
+scores, real episode boundaries, default-off behavior and shaping-free frozen
+evaluation. No implementation or GPU check has passed and no full learner is
+selected. Retained 70.750/143.667 scores and the two-wall gate remain unchanged.
+The saved-data diagnostic is closed; no Kindle allocation is active at closure.
+
 The [completed replay16k comparison](results/2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000
 andgreedy143.667→57.625 in21m44.359s (+1.28% training time),all0/24 two-wall.
 Initial-subtracted return/min falls53.60%/61.32%. Retain shared replay100k with

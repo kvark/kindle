@@ -1,5 +1,24 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [saved life-feedback analysis](2026-11-03-cdp-breakout-life-feedback.md)
+finds zero immediate reward at all 120 selected lost lives, including 96 that
+do not end the game. All 37,016 saved actions join to original raw rewards and
+episode boundaries; 11 fixtures and 14 input pins pass. This reuses an older
+encoder4e5/behavior4e5/value.3 greedy policy, not the latest retained learner.
+No emulator, model or training stage runs. A hypothetical unit penalty changes
+the selected undiscounted total by exactly five points per episode; this is
+arithmetic, not an evaluated policy gain. Discounting and target timing could
+still change learning. Lost future rewards and actual game-over targets already
+provide indirect consequences, so this is not evidence of a missing standard
+RL loss or a causal explanation for weak control.
+
+Next qualify the [optional one-point training aid](../experiments/2026-11-03-cdp-breakout-life-penalty.md)
+with explicit separate raw and training rewards, life/reset accounting, default
+off and frozen shaping off. Native learning remains unchanged. CPU qualification
+precedes one fresh bounded check; a full learner needs a separate selection.
+No implementation or GPU check has passed. Retained gameplay and acceptance
+gates stay unchanged; the saved-data diagnostic is closed and must not repeat.
+
 The [completed replay16k comparison](2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000
 andgreedy143.667→57.625 in21m44.359s (+1.28% training time),all0/24 two-wall.
 Initial-subtracted return/min falls53.60%/61.32%. Retain shared replay100k with
