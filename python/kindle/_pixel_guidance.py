@@ -9,7 +9,7 @@ class EpisodePixelGuidance:
     """Bernoulli choice per episode, not per action; reset only completed lanes."""
 
     def __init__(self, config, streams, action_count, *, game, kinds, bounded_kind,
-                 seed_xor, policy_factory, valid_actions):
+                 seed_xor, policy_factory, valid_actions, expected_action_count=18):
         self._game = game
         self._policy_factory = policy_factory
         self._valid_actions = valid_actions
@@ -30,8 +30,9 @@ class EpisodePixelGuidance:
         if (type(probability) not in (int, float) or not math.isfinite(probability)
                 or not 0 < probability <= 1):
             raise ValueError(f"{self._game} guidance probability must be in (0, 1]")
-        if type(streams) is not int or streams <= 0 or type(action_count) is not int or action_count != 18:
-            raise ValueError(f"{self._game} guidance requires positive streams and the full18 actions")
+        if (type(streams) is not int or streams <= 0 or type(action_count) is not int
+                or action_count != expected_action_count):
+            raise ValueError(f"{self._game} guidance requires positive streams and {expected_action_count} declared actions")
         if type(config["seed"]) is not int or not 0 <= config["seed"] < 2**64:
             raise ValueError(f"{self._game} guidance seed must be an unsigned 64-bit integer")
         self._config = dict(config)

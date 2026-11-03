@@ -108,7 +108,7 @@ def test_accounting_and_replay_reader_reject_invalid_guidance(tmp_path,mutation)
     (['--qbert-guidance-probability','.05'],'cannot combine'),
     (['--exploration-probability','.05'],'cannot combine'),
     (['--observation-size','64'],'native pixels'),
-    (['--atari-protocol','published-minimal'],'full18'),
+    (['--atari-protocol','current'],'published action protocol'),
     (['--encoder-checkpoint','unused'],'learned RGB')])
 def test_cli_refuses_unsupported_combinations_before_environment(monkeypatch,tmp_path,capsys,args,message):
     monkeypatch.setattr(atari_vector.gym,'make',lambda *a,**kw:pytest.fail('environment constructed'))

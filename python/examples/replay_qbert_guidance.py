@@ -86,13 +86,15 @@ def main():
     rom = rom_identity(header['environment'])
     verify_replay_identity(header, manifest, rom)
     cls = BreakoutGuidance if header['exploration']['kind'] in BREAKOUT_GUIDANCE_KINDS else QbertGuidance
-    guidance = cls(header['exploration'], header['num_envs'], header['config']['action_count'])
+    guidance = cls(header['exploration'], header['num_envs'], header['config']['action_count'],
+                   **(dict(action_meanings=header['action_meanings'])
+                      if cls is BreakoutGuidance and header['atari_protocol'] == 'published-minimal' else {}))
     environments, monitors, frames = [], [], []
     with ExitStack() as stack:
         for seed in header['environment_seeds']:
             raw = stack.enter_context(closing(gym.make(header['environment'], frameskip=1,
                                                        repeat_action_probability=header['sticky_actions'],
-                                                       full_action_space=True)))
+                                                       full_action_space=header['full_action_space'])))
             monitor = TaskMonitor(raw, header['environment'], rom['sha256'])
             env = atari.DreamerAtariPreprocessing(monitor, noop_max=0, max_episode_frames=100000, screen_size=None)
             require(list(env.action_meanings) == header['action_meanings'], "changed guidance action vocabulary")

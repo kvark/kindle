@@ -309,9 +309,9 @@ def main():
             parser.error("frozen evaluation must not use Breakout guidance")
         if args.exploration_probability or args.qbert_guidance_probability:
             parser.error("Breakout guidance cannot combine with another action aid")
-        if (args.environment != "ALE/Breakout-v5" or args.atari_protocol != "published"
+        if (args.environment != "ALE/Breakout-v5" or args.atari_protocol not in ("published", "published-minimal")
                 or args.observation_size not in (None, "native") or args.encoder_checkpoint is not None):
-            parser.error("Breakout guidance requires Breakout/full18/native pixels/learned RGB")
+            parser.error("Breakout guidance requires Breakout/published action protocol/native pixels/learned RGB")
     if args.guidance_imitation_scale is not None:
         if not positive_f32(args.guidance_imitation_scale):
             parser.error("guidance imitation scale must be positive finite F32")
@@ -621,7 +621,9 @@ def main():
             exploration = BreakoutGuidance(dict(kind=(breakout_guidance_module.CORRECTIVE_GUIDANCE_KIND
                 if args.breakout_corrective_labels else breakout_guidance_module.GUIDANCE_KIND),
                 probability=args.breakout_guidance_probability, seed=args.seed,
-                max_actions=args.breakout_guidance_max_actions), args.num_envs, actions)
+                max_actions=args.breakout_guidance_max_actions), args.num_envs, actions,
+                **(dict(action_meanings=environments[0].action_meanings)
+                   if args.atari_protocol == "published-minimal" else {}))
         guidance = isinstance(exploration, (QbertGuidance, BreakoutGuidance))
         selected_guidance_module = breakout_guidance_module if isinstance(exploration, BreakoutGuidance) else guidance_module
         current_frames = initial

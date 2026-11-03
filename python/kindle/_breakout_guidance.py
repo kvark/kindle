@@ -16,6 +16,8 @@ CORRECTIVE_GUIDANCE_KIND = "bounded-episode-breakout-corrective-pixels-v1"
 GUIDANCE_KINDS = (GUIDANCE_KIND, CORRECTIVE_GUIDANCE_KIND)
 GUIDANCE_SEED_XOR = 0x4252_4541_4B50_5801
 ACTION_IDS = {"NOOP": 0, "FIRE": 1, "RIGHT": 3, "LEFT": 4}
+MINIMAL_ACTION_MEANINGS = ("NOOP", "FIRE", "RIGHT", "LEFT")
+MINIMAL_TO_FULL = (0, 1, 3, 4)
 RESPONSE_WEIGHTS = np.array([-0.20973869463450853, 0.1227875991027573,
                              8.681938841928321, 11.996340450736303])
 ACTION_PLANS = np.array(list(itertools.product((0, -1, 1), repeat=5)), dtype=float)
@@ -162,17 +164,44 @@ class FeedbackPixelPolicy:
         self.pending = None
 
 
+class _MinimalPolicy:
+    """Translate the adapter vocabulary around the unchanged full18 teacher."""
+
+    def __init__(self, factory):
+        self.policy = factory()
+
+    def action(self, frame):
+        return MINIMAL_TO_FULL.index(self.policy.action(frame))
+
+    def propose(self, frame):
+        return MINIMAL_TO_FULL.index(self.policy.propose(frame))
+
+    @property
+    def pending(self):
+        return None if self.policy.pending is None else MINIMAL_TO_FULL.index(self.policy.pending)
+
+    def feedback(self, action):
+        self.policy.feedback(MINIMAL_TO_FULL[action])
+
+
 class BreakoutGuidance(EpisodePixelGuidance):
     """Breakout episode selection with the original pixel rule and random schedule."""
 
-    def __init__(self, config, streams, action_count):
+    def __init__(self, config, streams, action_count, *, action_meanings=None):
         self.corrective_labels = isinstance(config, dict) and config.get("kind") == CORRECTIVE_GUIDANCE_KIND
         self.expert_labels = []
+        self._action_count = action_count
+        factory = FeedbackPixelPolicy if self.corrective_labels else PixelPolicy
+        minimal = action_meanings is not None
+        if minimal and (not isinstance(action_meanings, (list, tuple)) or action_count != 4
+                        or tuple(action_meanings) != MINIMAL_ACTION_MEANINGS):
+            raise ValueError("Breakout guidance requires the declared NOOP/FIRE/RIGHT/LEFT vocabulary")
         super().__init__(config, streams, action_count, game="Breakout", kinds=GUIDANCE_KINDS,
                          bounded_kind=CORRECTIVE_GUIDANCE_KIND if self.corrective_labels else GUIDANCE_KIND,
                          seed_xor=GUIDANCE_SEED_XOR,
-                         policy_factory=FeedbackPixelPolicy if self.corrective_labels else PixelPolicy,
-                         valid_actions=(0, 1, 3, 4))
+                         policy_factory=(lambda: _MinimalPolicy(factory)) if minimal else factory,
+                         valid_actions=(0, 1, 2, 3) if minimal else (0, 1, 3, 4),
+                         expected_action_count=4 if minimal else 18)
         self.expert_labels = [None] * len(self._policies)
 
     def reset(self, streams):
@@ -203,7 +232,7 @@ class BreakoutGuidance(EpisodePixelGuidance):
         if not self.corrective_labels:
             raise ValueError('Action feedback requires corrective guidance')
         if (not isinstance(actions, list) or len(actions) != len(self._policies)
-                or any(type(action) is not int or not 0 <= action < 18 for action in actions)
+                or any(type(action) is not int or not 0 <= action < self._action_count for action in actions)
                 or any(policy.pending is None for policy in self._policies)):
             raise ValueError('Invalid Breakout action feedback batch')
         for policy, action in zip(self._policies, actions):

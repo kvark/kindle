@@ -105,7 +105,8 @@ def test_cli_rejects_invalid_setup_before_environment(monkeypatch,tmp_path,capsy
     assert error.value.code==2 and message in capsys.readouterr().err
 
 
-def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(monkeypatch,tmp_path):
+@pytest.mark.parametrize('minimal', [False, True])
+def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(monkeypatch,tmp_path,minimal):
     teachers=[];created=[];calls=[]
     class Teacher:
         pending=None
@@ -118,8 +119,8 @@ def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(mon
             self.chosen.append((self.pending,action));self.pending=None
     monkeypatch.setattr(module,'FeedbackPixelPolicy',Teacher)
     class Environment:
-        action_space=SimpleNamespace(n=18)
-        action_meanings=['NOOP']+[str(n) for n in range(1,18)]
+        action_space=SimpleNamespace(n=4 if minimal else 18)
+        action_meanings=list(module.MINIMAL_ACTION_MEANINGS) if minimal else ['NOOP']+[str(n) for n in range(1,18)]
         executed_action_frames=reset_noop_frames=emulator_resets=0
         def __init__(self):self.actions=[];self.returned=0.
         def reset(self,seed=None):
@@ -143,12 +144,13 @@ def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(mon
         def act(self,greedy=False,action_overrides=None,*,expert_actions=None,expert_labels=None):
             assert expert_actions is None and expert_labels is not None
             calls.append((list(action_overrides),list(expert_labels)))
-            return [17 if forced is None else forced for forced in action_overrides]
+            return [(3 if minimal else 17) if forced is None else forced for forced in action_overrides]
         def observe(self,ids,frames,rewards,terminated,truncated):
             self.environment_step+=len(ids);self.replay_len+=len(ids)
             return [[reward,0.] for reward in rewards]
         def learn_scheduled(self):return []
     def make(*args,**kwargs):
+        assert kwargs['full_action_space'] is (not minimal)
         env=Environment();created.append(env);return env
     monkeypatch.setattr(atari_vector.gym,'make',make)
     monkeypatch.setattr(atari_vector,'DreamerAtariPreprocessing',lambda env,**kw:env)
@@ -156,18 +158,22 @@ def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(mon
     output=tmp_path/'run.jsonl'
     monkeypatch.setattr(sys,'argv',['atari_vector','ALE/Breakout-v5','--output',str(output),'--num-envs','2',
         '--steps','6','--train-ratio','0','--breakout-guidance-probability','1','--breakout-guidance-max-actions','1',
-        '--guidance-imitation-scale','1','--breakout-corrective-labels'])
+        '--guidance-imitation-scale','1','--breakout-corrective-labels',
+        '--atari-protocol','published-minimal' if minimal else 'published'])
     atari_vector.main()
     rows=[json.loads(line) for line in output.open()]
     assert rows[0]['gpu_device']==Agent.gpu_device and rows[0]['model_provenance']==Agent.provenance
     assert rows[0]['trainable_parameter_counts']==Agent.trainable_parameter_counts
-    assert calls==[([0,0],[0,0]),([None,None],[3,3]),([4,4],[4,4])]
-    assert [teacher.chosen for teacher in teachers]==[[(0,0),(3,17)],[(0,0),(3,17)],[(4,4)],[(4,4)]]
-    assert [env.actions for env in created]==[[0,17,4],[0,17,4]]
+    right,left,passive=(2,3,3) if minimal else (3,4,17)
+    assert calls==[([0,0],[0,0]),([None,None],[right,right]),([left,left],[left,left])]
+    full_passive=4 if minimal else 17
+    assert [teacher.chosen for teacher in teachers]==[[(0,0),(3,full_passive)],[(0,0),(3,full_passive)],[(4,4)],[(4,4)]]
+    assert [env.actions for env in created]==[[0,passive,left],[0,passive,left]]
     assert audit(output)['actions']==6
     envs=[Environment(),Environment()]
     frames=[env.reset(seed=1009+i)[0] for i,env in enumerate(envs)]
     monitors=[SimpleNamespace(task=SimpleNamespace(result=lambda *_,env=env:dict(episode_score=env.returned))) for env in envs]
     episodes,_=replay_qbert_guidance.replay_rows([json.dumps(row) for row in rows[1:]],envs,monitors,frames,
-        module.BreakoutGuidance(rows[0]['exploration'],2,18),float('inf'))
-    assert len(episodes)==2 and [env.actions for env in envs]==[[0,17,4],[0,17,4]]
+        module.BreakoutGuidance(rows[0]['exploration'],2,Environment.action_space.n,
+            **(dict(action_meanings=Environment.action_meanings) if minimal else {})),float('inf'))
+    assert len(episodes)==2 and [env.actions for env in envs]==[[0,passive,left],[0,passive,left]]

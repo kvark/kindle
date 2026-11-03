@@ -167,15 +167,19 @@ def audit(path):
             check(header["mode"] == "train", "frozen evaluation cannot contain exploration overrides")
             breakout_guidance = header["exploration"].get("kind") in BREAKOUT_GUIDANCE_KINDS
             guidance = breakout_guidance or header["exploration"].get("kind") in GUIDANCE_KINDS
+            minimal = False
             if guidance:
                 game = "ALE/Breakout-v5" if breakout_guidance else "ALE/Qbert-v5"
-                check(header["environment"] == game and header["atari_protocol"] == "published"
-                      and header["full_action_space"] is True and header["observation_size"] == "native"
+                minimal = breakout_guidance and header["atari_protocol"] == "published-minimal"
+                check(header["environment"] == game and (minimal or header["atari_protocol"] == "published")
+                      and header["full_action_space"] is (not minimal) and header["observation_size"] == "native"
                       and header["observation_shape"] == [210, 160, 3]
                       and header["noop_max"] == 0 and header["action_repeat"] == 4,
                       "unsupported pixel guidance game or preprocessing")
             cls = (BreakoutGuidance if breakout_guidance else QbertGuidance) if guidance else PersistentExploration
-            exploration = cls(header["exploration"], count, config["action_count"])
+            exploration = cls(header["exploration"], count, config["action_count"],
+                              **(dict(action_meanings=header["action_meanings"])
+                                 if guidance and minimal else {}))
             check(exploration.config["seed"] == config["seed"] == header["seed"], "exploration seed differs")
             from . import _exploration, _qbert_guidance, _breakout_guidance
             module = (_breakout_guidance if breakout_guidance else _qbert_guidance) if guidance else _exploration
@@ -316,7 +320,7 @@ def audit(path):
                 if corrective:
                     labels = event.get("expert_labels")
                     check(isinstance(labels, list) and len(labels) == count
-                          and all(type(label) is int and label in ((0, 1, 3, 4) if breakout_guidance else (0, 2, 3, 4, 5)) for label in labels),
+                          and all(type(label) is int and label in exploration._valid_actions for label in labels),
                           "invalid corrective expert labels")
                     check(all(action is None or action == label for action, label in zip(overrides, labels)),
                           "guided override differs from expert label")
