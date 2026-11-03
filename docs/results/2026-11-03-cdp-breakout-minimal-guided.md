@@ -1,19 +1,95 @@
-# Four-action guided Breakout cuts early training time by13.75%
+# Four-action guided Breakout trains faster but scores lower
 
-A separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-minimal-guided-200k.md)
-launches20:37:08 UTC/source1917a4de after closure of the bounded work below.
-Startup passes357 tensors/47 events. Read-only100k/6,227 recovery passes
-20:46:39 UTC with357 finite tensors and169 unchanged pins; independent CPU
-verification takes.434s (.514s observer process),zero model forwards/updates.
-The recovery service succeeds; original mainPID1067864 andterminal collector
-remain active beyond106,496 actions/6,633 updates. Four final/actual-initial
-sampled/greedy24-episode arms remain pending. No full gameplay result isavailable.
-Do not restart oroverlap the active learner.
+The fresh200k comparison cuts training time **13.29%**, but greedy frozen score
+falls **36.31%** and initial-subtracted return per minute falls **29.20%**.
+**Retain the full18-action recipe.** Four actions fail both the declared primary
+replacement rule and the separate cheaper-budget rule. The original mean864 /
+90%-two-wall gate and five-game goal remain unfinished.
+
+## Full 200k comparison
+
+| Measurement | Retained full18 | Guided minimal4 |
+| --- | ---: | ---: |
+| Training time |21m27.910s|18m36.686s|
+| Native construction, recorded separately |2.404s|2.321s|
+| Learning stage |1133.927s|965.508s|
+| Sampled frozen mean |70.750|55.958|
+| Greedy frozen mean, primary |143.667|91.500|
+| Actual-initial sampled / greedy |1.417 /2.208|1.250 /4.667|
+| Sampled initial-subtracted return/min |3.230|2.940|
+| Greedy initial-subtracted return/min |6.590|4.666|
+| Two-wall successes, either final mode |0/24|0/24|
+
+The paired lane-bootstrap greedy return difference is−52.167,95% interval
+[−94.708,−16.499]; the gain/min difference is−1.925 [−3.907,−.192]. Both favor the
+retained full18 recipe on this reused evaluation cohort. These10,000 resamples,
+seed0, quantify lane variation, not training-seed reliability. Sampled return
+falls20.91%; sampled gain/min falls8.99%, with difference−.291 [−.852,.362].
+The faster candidate therefore fails the separately fixed cheaper-budget rule
+as well as the primary replacement rule. No confirmation or extension follows.
+
+The [fixed protocol](../experiments/2026-11-03-cdp-breakout-minimal-guided-200k.md)
+keeps12M64/Auto/N8/B16/T16/H15/R16/context1,encoder4e-5,dynamics4e-4,behavior8e-5,
+policy1/critic1/replay-value1,disagreement1,expert100 andsampled collection.
+It starts fresh atseed1009/evaluation4000001009,with no transferred experience.
+The full18 teacher is unchanged internally; the explicit adapter translates
+NOOP/FIRE/RIGHT/LEFT. Native447fe50 is unchanged. Action dimensions,
+initialization, uniform mixture and action-effect centering change together;
+this does not isolate an output-layer or exploration mechanism. Actual initial
+scores differ, so each learner uses its own control in gain/min accounting.
+
+The learner completes200,000 actions /799,580 emulator frames /12,477 updates
+inside the30min training cap. Most measured saving lies in the learning stage;
+acting62.578s andemulation62.662s are close to retained63.126s/62.988s. Timings
+compare one fresh candidate with a historical control,not a paired kernel
+benchmark. Parameters fall only21,518 (.132%) to16,312,835. CPU observer time
+remains in training wall time; no correction is applied.
+
+All169 current and338 retained inputs verify,with the declared exact historical
+replay-source resolution. All357 actual-initial tensors match the bounded
+minimal4 check and47 pre-update semantic events match. Full18 initial equality
+is explicitly not claimed. The read-only100k/6,227 recovery passes independently,
+including weights and moments; it does not preserve replay,games,beliefs orall
+RNG state for exact continuation. CNN,reward,actor andvalue parameters change.
+
+Full training pixel/action/label replay passes. Each of four frozen arms selects
+the first three natural episodes per eight lanes,24 total,with no truncations,
+zero updates andall357 tensors unchanged. Full recorded-action replays,videos,
+host guards,curves,exposure andcomparison pass. The four arms total83,296 actions /
+333,044 frames /62.439s. The online curve is visually checked and remains clearly
+labeled as online rather than frozen performance.
+
+Actual overrides total84,232/200,000 (42.116%); all12,477 updates include expert
+labels,with2,989,756 repeated labeled replay rows. Late label CE is.567343 versus
+retained.560514. The candidate reaches a maximum training score406 andhas only
+1,222 native actions at pre-action scores216–431,with none at432+. These are
+changing-policy exposure and fitting counts; neither they nor aided returns
+identify a causal architecture limitation or establish unaided competence.
+
+The original main succeeds **20:59:55.332 UTC November3**, launchsource`1917a4de`,
+PID1067864/invocation`62b85df574b7486e961cd488cd3c9137`. The original terminal
+collector succeeds **21:00:26.026** in2.408s. Main,recovery andcollector all
+succeed; no full-run stage fails,repeats orchanges its cap. The bounded preflight
+andCPU collector failures below remain preserved. No Kindle allocation remains
+active atclosure; check live state before new work. No automatic successor is
+selected. Evidence is under`/x/Temp/kindle-breakout-minimal-guided-20261103/full`.
+The fixed protocol bytes andall original declarations remain unchanged.
+
+| Full-run artifact | SHA256 |
+| --- | --- |
+| Declaration |`29952d0284f3bd25e7150547bb158f613fddef99f9c88340a47c10b48c4e82ac`|
+| Learning review |`277c4afcd91f94f9fbeceb1eb940c7eb4e63cf157e33325fb2040872bbf3797b`|
+| Training replay |`4cff05ae689d5dfaa9e657a84e306b79a712576f4e464f0f53082178296fb2cb`|
+| Comparison |`02b0af2872e8653d7d30b2931badb0f86940b8a98295f59b3a258d9c5e4f0317`|
+| Main completion |`36aaa1aa9df2265bb6e8477f5cffb06837d21974a28c46d7d437c99fe5388d57`|
+| Terminal closure |`df923d19776453a485638f67b3a7eda92af5dd9bd3f6ce6caafbd6ac85c19b9b`|
+
+## Bounded execution and cost check
 
 The fresh four-action check completes **8192 actions/32,728 frames/489 updates
 in41.133s**, versus47.690s for the closed full18 check: **13.75% less training
-time**. Its1.1-padded200k projection is18m24.645s, below30min. This establishes
-execution and early cost; no full learner or gameplay improvement is selected.
+time**. Its1.1-padded200k projection is18m24.645s, below30min. This short check established
+execution and early cost; the full comparison above addresses gameplay.
 
 | Clock | Retained full18 check | Guided minimal4 check |
 | --- | ---: | ---: |
@@ -84,8 +160,9 @@ The original command preflight accidentally constructs a real native agent
 because lazy metadata loading replaces its mock. It stops before any emulator
 step or update; its unguarded initialization, zero-update checkpoint and failure
 are preserved. The repaired CPU check does not erase that incident. The intended
-guarded check uses the separate `bounded-check` directory and passes. No full
-learner or gameplay gain is selected. See the protocol for the boundary repair.
+guarded check uses the separate `bounded-check` directory and passes. That
+qualification did not establish gameplay benefit; the full comparison above
+closes the separately selected learner. See the protocol for the boundary repair.
 
 Evidence: `/x/Temp/kindle-breakout-minimal-guided-20261103`, including
 `action-review.json`, source snapshots, original failure and repaired preflight.

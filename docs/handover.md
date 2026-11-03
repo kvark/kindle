@@ -8,22 +8,27 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [fresh four-action Breakout200k comparison](experiments/2026-11-03-cdp-breakout-minimal-guided-200k.md) is **running**, launched
-20:37:08 UTC November3/source1917a4de with169 pins. Keep200k actions/12,477
-updates andthe30min training cap,12M64/Auto/N8/B16/T16/H15/R16/expert100,
-minimal4 adapter andthe qualified native447fe50/runtime. Startup passes357
-bounded-matching initial tensors,47 pre-update events andcorrect cadence.
-Read-only100k/6,227 recovery passes20:46:39 UTC:357 finite tensors,169 unchanged
-pins andthe original active process identity; independent CPU verification takes
-.434s (.514s observer process),with zero model forwards or updates. The recovery
-service succeeds; mainPID1067864/invocation`62b85df574b7486e961cd488cd3c9137`
-andterminal collector remain active beyond106,496 actions/6,633 updates. Require
-four final/actual-initial sampled/greedy24-natural-episode assessments against
-retained70.750/143.667. No full result
-or gameplay gain isavailable. Root`/x/Temp/kindle-breakout-minimal-guided-20261103/full`;
-service`kindle-breakout-minimal-guided-200k-20261103`. Check live state; do not
-restart it orschedule another GPU job while active. The original864/90%-two-wall
-andfive-game goal remain unfinished; no extension orautomatic successor.
+The [completed four-action Breakout comparison](results/2026-11-03-cdp-breakout-minimal-guided.md#full-200k-comparison) finishes
+200k actions /799,580 frames /12,477 updates in **18m36.686s**,13.29% less training
+time than full18. Sampled **55.958** andgreedy **91.500** fall20.91%/36.31% from
+retained70.750/143.667; all0/24 two-wall. Own initials1.250/4.667 differ fromfull18.
+Greedy initial-subtracted gain/min falls29.20%,with paired difference−1.925
+[−3.907,−.192]. Both primary replacement andcheaper-budget selection rules fail.
+**Retain full18 andthe existing200k recipe.** This is one reused development
+seed/cohort,not a training-seed reliability orisolated mechanism result.
+
+All169 current/338 retained pins,read-only100k/6,227 recovery,357 bounded-matching
+initial/invariant frozen tensors,47 pre-update events,full pixel/action/label
+replays/videos,guards,curves,exposure andcomparison pass. Actual overrides42.116%;
+late expert CE.567343 andonly1,222 native actions at scores216–431 do not establish
+a causal limitation. No training action reaches432. Main succeeds20:59:55.332 UTC
+November3/source1917a4de; terminal collector succeeds21:00:26.026 in2.408s.
+All three services succeed; no full-run stage fails orrepeats. Earlier bounded
+preflight andCPU collector failures remain preserved. Native447fe50 unchanged;
+root`/x/Temp/kindle-breakout-minimal-guided-20261103/full` isclosed. Do not restart
+it orrepeat its observers. No extension,confirmation orautomatic successor is
+selected. No Kindle allocation remains active; check live state before work.
+The original864/90%-two-wall gate andfive-game goal remain unfinished.
 
 The [four-action guided Breakout check](results/2026-11-03-cdp-breakout-minimal-guided.md) completes8192 actions /
 32,728 frames /489 updates in **41.133s versus47.690s**,13.75% less early training
