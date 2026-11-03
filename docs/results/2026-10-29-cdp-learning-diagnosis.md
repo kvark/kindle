@@ -13,7 +13,11 @@ Main service `kindle-episodic-actor-200k-20261103`, PID1049147, invocation
 startup/recovery checks, phase audits, replays and comparison; the separate
 `-collect` observer is active. All307 preparation pins and CPU preflight pass.
 Control startup passes261 initial arrays matching bounded/retained shared
-values,47 pre-update events and first update376. No full frozen result exists.
+values,47 pre-update events and first update376. Its100k/6,227 recovery passes
+16:32:53.148 UTC:261 finite/schema-checked tensors and file hashes, retained
+read-only by checkpoint history. All307 pins and original process identity
+remain verified. Control training continues; candidate has not started and no
+full frozen result exists.
 Root `/x/Temp/kindle-episodic-actor-20261103/full`. Check live state; do not
 restart this pair or schedule another GPU job while it is active. No extension,
 third learner or automatic confirmation follows. The five-game goal is unfinished.

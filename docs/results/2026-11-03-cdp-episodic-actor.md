@@ -133,6 +133,18 @@ this pair, repeat bounded stages or overlap another GPU job. No extension,
 third learner or automatic seed confirmation follows. The original864/90%
 two-wall gate and unfinished five-game goal remain.
 
+Control's100k/6,227 recovery passes **16:32:53.148 UTC**, with261 finite
+schema-checked tensors and matching checkpoint file hashes. Checkpoint history
+retains the directory and files read-only. The observer costs.243s on the host;
+no wall-time correction applies. Independent read-only verification confirms
+the recovery hashes, permissions, all307 pins and original live main/collector
+identities at16:33:21.615. Control continues; candidate is still queued. This
+checks saved weights/moments, not complete replay/game/RNG resumption.
+Recovery review SHA256:
+`9aee1175e50b6f312f7a0ce653fdd43a8ca82600c8d1bd891ef1742a7b23d4ac`.
+Metadata SHA256:
+`4ad55cef5848ae95d7c7381301251db1cbbe7b5be4a1e9320e38570b591ad862`.
+
 Full declaration SHA256:
 `b48da6eae51aad8fe7761437c77e7a8612db89908b3643612b96756a5c2e5c51`.
 Preflight SHA256:
