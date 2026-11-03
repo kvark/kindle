@@ -8,74 +8,31 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [fresh life-loss learner](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
-is active from06:16:18.414 UTC/sourceb80194e. Main983163/invocation
-0191b9d7c0fe47acbe15c6db9845f519,service`kindle-breakout-life-penalty-200k-20261103`.
-Progress,postprocessing andcollection areactive; recovery succeeds06:27:24.862.
-Startup06:16:35.584 passes453 pins,357
-initial tensors,47 pairedpre-update events,113 finite reports/2,184 actions and
-46 verified lost lives. DeclarationSHA028a1250. Fullroot
-`/x/Temp/kindle-breakout-life-penalty-20261103/full` contains launch/observer
-identities andstartup review. Recovery confirmation06:27:40.709 verifies100k/
-6,227 updates,357 finite tensors,206,067,162 retained bytes and453 unchanged
-pins. No frozen result yet. Do not restart
-the learner orschedule overlapping GPU work; retain the fixed30min cap.
-Read-only `review_recovery.py` iscomplete; do not repeat it. Remaining readers
-under the package root are `review_full_terminal.py terminal` afteroriginal
-completion, then `review_score_coverage.py terminal`. Terminal preflight
-06:19:26.520 passesfive score/six feedback cases/453 pins; coverage preflight
-06:20:09.659 passeseight config/five retained boundary cases/50 diagnostic pins.
-Both preserve original identities. No reader mayrepeat completed stages or
-replay. Preparation iscomplete; retain CPU co-host caveats. Evidence andexact
-commands arein the linked protocol; frozen outcomes remainpending.
+The [completed life-loss comparison](results/2026-11-03-cdp-breakout-life-penalty.md) lowers sampled70.750→42.542
+and greedy143.667→90.875 in21m39.349s (+0.89% training time), all0/24 two-wall.
+Initial-subtracted return/min falls41.21%/37.87%. Retain raw training rewards
+with12M64/Auto/N8/B16/T16/H15/R16/lambda.95/encoder4e-5/behavior8e-5/dynamics4e-4/
+replay-value1/expert100/replay100k and sampled collection. Only the optional
+one-point life-loss aid changes; raw scores, native447fe50 and teacher stay fixed.
+All1,290 losses/negative rewards independently replay; online94.72 is guided
+and does not outweigh worse frozen play. Reused1009/cohort limits reliability.
 
-Full [life-loss comparison preparation](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
-passes06:14:37.261 UTC/source2eafbf2:five commands,34 config/24 startup/seven
-prefix/12 recovery cases,observer/prelaunch/retention checks,19 scripts and834
-declaration entries. All408 bounded/338 control pins remain unchanged. No
-preparation failure orGPU work. Full sources are under
-`/x/Temp/kindle-breakout-life-penalty-20261103/full`; next run separate selection
-then launch on an idle host. Do not repeat completed preflight.
+All453 pins,100k/6,227 recovery,357 matched initial/invariant frozen tensors,
+paired initial traces, full replays/videos, guards, curves, exposure and comparison
+pass. Main/post/collection succeed06:42:06.048/06:42:24.088/06:42:57.559 UTC
+November3/sourceb80194e. Independent terminal06:56:45.055 and coverage06:56:53.724
+pass once;50 diagnostic/453 full pins reconcile277,592 actions/1,109,787 frames.
+Native actions at raw scores216–431 barely rise1,262→1,297, with none432+.
+These are descriptive score bins, not verified walls or a causal explanation.
 
-The [life-loss feedback bounded check](results/2026-11-03-cdp-breakout-life-penalty.md)
-is closed:8,192 actions/32,730 frames/489 updates in47.317s; frozen1,024/.891s
-haszero updates/episodes and357 invariant tensors. All408 pins,357 matchedinitial,
-47 pairedpre-update events,118 replayed penalties,raw-score accounting,full
-pixel/action/label replay andguards pass. Main/collector succeed06:06:19.889/
-06:06:24.949 UTC November3/source2594ab5. Corrected terminal reader passes
-06:07:15.464; its original cleared-InvocationID assertion failure ispreserved,
-alongside earlier CPU fixture/path failures. No originalstage orGPU repeat.
-Root `/x/Temp/kindle-breakout-life-penalty-20261103/native-check` must not rerun.
-CompletionSHA251c82e0/terminalSHAdc938474. Projection21m10.713s passes30min.
-Next prepare the separately selected [fresh200k comparison](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md);
-full controllers andlaunch remainunfinished. Native447fe50/teacher exact,
-runtime under the same package. No active allocation atclosure; check live state.
-
-The [life-loss feedback overlay](results/2026-11-03-cdp-breakout-life-penalty.md)
-passes 57 CPU tests / 365 pins at 06:00:51.313 UTC and bounded preflight at
-06:03:31.852. Both actual commands, nine config assertions, five prefix cases,
-cadence and the 357-tensor schema pass. Two CPU fixture/path failures are preserved;
-production reward code is unchanged across repairs. Root
-`/x/Temp/kindle-breakout-life-penalty-20261103` contains the isolated runtime,
-source receipts, tests and `native-check` controllers. Native447fe50 stays exact.
-That CPU milestone preceded the completed bounded check above; do not repeat qualification.
-
-The [saved life-feedback diagnostic](results/2026-11-03-cdp-breakout-life-feedback.md)
-is complete at 05:46:57.594 UTC, source cbdf048. All 120 selected lost lives have
-zero immediate reward; 96 are nonterminal. Eleven fixtures and 14 input pins
-pass. The analysis reuses 37,016 actions / 148,038 frames from the older
-encoder4e5/behavior4e5/value.3 greedy cohort, without emulator or GPU work.
-It does not establish the cause of weak control or measure a learning benefit.
-Root `/x/Temp/kindle-breakout-life-feedback-20261103` is closed; do not repeat it.
-Review SHA `bf3b7bafdcf187db74fdf81dd07eab3d82200cbfbbbc8f8122cfc8836035451b`.
-
-Next develop the [optional one-point life-loss training aid](experiments/2026-11-03-cdp-breakout-life-penalty.md).
-Keep raw rewards and scores separate from declared training rewards; preserve
-episode boundaries and retained runtimes. Qualify the accounting, refusals,
-default-off compatibility and replay audit on CPU before one fresh 8,192-action
-check. Frozen evaluation has shaping off. Native 447fe50 and retained replay100k
-settings stay fixed. CPU implementation and the bounded GPU check now pass;
-no Kindle service is active at closure. Check live state before allocating work.
+Root`/x/Temp/kindle-breakout-life-penalty-20261103/full` is closed. All five
+original services and recovery/terminal/coverage readers are complete; do not
+repeat them or completed stages. No full-run failure or GPU repeat occurs.
+Three earlier bounded CPU failures/corrections remain preserved. Completion
+SHA4d276268/terminalSHA4e848210/coverageSHA96930bc4. No Kindle allocation is active
+at closure; check live state before work. Keep CPU co-host timings uncorrected.
+No penalty sweep, extension, confirmation or automatic successor is selected.
+Breakout and the five-game goal remain unfinished.
 
 The [completed replay16k comparison](results/2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000
 andgreedy143.667→57.625 in21m44.359s (+1.28% training time),all0/24 two-wall.

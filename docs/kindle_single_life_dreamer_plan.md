@@ -1,53 +1,30 @@
 # Kindle: CDP learning roadmap
 
-The [fresh life-loss learner is running](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
-from06:16:18.414 UTC/sourceb80194e,453 pins. Startup passes357 initial tensors,
-47 pairedpre-update events,correct cadence and113 finite reports through2,184
-actions. Training life-loss accounting isverified; raw scores remain unchanged.
-The100k/6,227 recovery passes06:27:40.709,with357 finite tensors and453 unchanged
-pins; weights/metadata retained,no stage repeated. No frozen result yet.
-Remaining original observers areactive; no overlapping
-GPU job,restart,extension orcap increase. The five-game goal remainsunfinished.
-Terminal/recovery readers andfixed raw-score coverage areprepared before frozen
-outcomes. Five score/six feedback cases andeight coverage-config cases pass;
-453 active/50 diagnostic pins remain unchanged. Coverage reuses the completed
-control andcounts only new candidate logs afteroriginal completion. Keep CPU
-co-host times; these preparations do not establish gameplay benefit.
+The [completed life-loss comparison](results/2026-11-03-cdp-breakout-life-penalty.md) lowers sampled70.750→42.542
+and greedy143.667→90.875 in21m39.349s (+0.89% training time), all0/24 two-wall.
+Initial-subtracted return/min falls41.21%/37.87%. Retain raw training rewards
+with12M64/Auto/N8/B16/T16/H15/R16/lambda.95/encoder4e-5/behavior8e-5/dynamics4e-4/
+replay-value1/expert100/replay100k and sampled collection. Only the optional
+one-point life-loss aid changes; raw scores, native447fe50 and teacher stay fixed.
+All1,290 losses/negative rewards independently replay; online94.72 is guided
+and does not outweigh worse frozen play. Reused1009/cohort limits reliability.
 
-The [fresh life-loss comparison](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
-passes CPU preparation:five commands,34 config/24 startup/seven prefix/12 recovery
-cases andobserver/prelaunch/retention checks;19 scripts/834 path entries,408
-bounded/338 control pins unchanged. No failure orGPU work. Separate selection
-andlaunch are next; gameplay remains unmeasured.
+All453 pins,100k/6,227 recovery,357 matched initial/invariant frozen tensors,
+paired initial traces, full replays/videos, guards, curves, exposure and comparison
+pass. Main/post/collection succeed06:42:06.048/06:42:24.088/06:42:57.559 UTC
+November3/sourceb80194e. Independent terminal06:56:45.055 and coverage06:56:53.724
+pass once;50 diagnostic/453 full pins reconcile277,592 actions/1,109,787 frames.
+Native actions at raw scores216–431 barely rise1,262→1,297, with none432+.
+These are descriptive score bins, not verified walls or a causal explanation.
 
-The [optional life-loss aid passes its bounded native check](results/2026-11-03-cdp-breakout-life-penalty.md):
-8,192 actions/489 updates in47.317s,118 independently replayed penalties,raw
-scores preserved,all408 pins and357 matchedinitial/invariant frozen tensors.
-Frozen1,024/.891s haszero updates/episodes. Main/collector succeed; repaired CPU
-fixture/path/terminal-reader failures remainpreserved,no originalstage repeats.
-Conservative200k projection21m10.713s passes30min. Separately select the [fresh200k comparison](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md);
-full preparation andlaunch areunfinished. Native447fe50/teacher fixed; no active
-allocation atclosure andno gameplay benefit established. The five-game goal remainsunfinished.
-
-The [optional life-loss aid passes CPU qualification](results/2026-11-03-cdp-breakout-life-penalty.md):
-57 tests / 365 pins and both bounded commands, config/prefix/cadence/schema
-checks pass. The separate Python overlay preserves raw score accounting and
-default-off semantics; native447fe50 stays exact. Two CPU fixture/path failures
-are preserved. This preceded the bounded check above; no gameplay benefit is
-established. No GPU work occurred during CPU qualification.
-
-The [saved Breakout life-feedback diagnostic](results/2026-11-03-cdp-breakout-life-feedback.md)
-finds zero immediate reward at all 120 selected lost lives, 96 nonterminal.
-It reuses 37,016 recorded actions from an older greedy policy; 11 fixtures and
-14 input pins pass in .301s, with no emulator, GPU work or learning. Life loss
-already reduces future scoring opportunities; these counts do not establish
-a causal defect. The next [bounded development](experiments/2026-11-03-cdp-breakout-life-penalty.md)
-tests an optional one-point training penalty per observed lost life, after CPU
-qualification of explicit raw-versus-training reward accounting. Preserve raw
-scores, real episode boundaries, default-off behavior and shaping-free frozen
-evaluation. CPU implementation and the bounded GPU check now pass; a full learner
-is selected but has not launched. Retained 70.750/143.667 scores and the two-wall gate remain unchanged.
-The saved-data diagnostic is closed; no Kindle allocation is active at closure.
+Root`/x/Temp/kindle-breakout-life-penalty-20261103/full` is closed. All five
+original services and recovery/terminal/coverage readers are complete; do not
+repeat them or completed stages. No full-run failure or GPU repeat occurs.
+Three earlier bounded CPU failures/corrections remain preserved. Completion
+SHA4d276268/terminalSHA4e848210/coverageSHA96930bc4. No Kindle allocation is active
+at closure; check live state before work. Keep CPU co-host timings uncorrected.
+No penalty sweep, extension, confirmation or automatic successor is selected.
+Breakout and the five-game goal remain unfinished.
 
 The [completed replay16k comparison](results/2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000
 andgreedy143.667→57.625 in21m44.359s (+1.28% training time),all0/24 two-wall.

@@ -1,10 +1,13 @@
 # Fresh 200k Breakout comparison with one-point life-loss feedback
 
-**Running:** launch06:16:18.414 UTC November3/source`b80194e`,453 pins,
-declarationSHA`028a12503e0ebaef1fdd3e75889c179aa736e930ed30033f52b5ba36ec1828e9`.
-Main983163/invocation0191b9d7c0fe47acbe15c6db9845f519; the original progress,
-recovery,postprocessing andterminal-collection observers areactive. No frozen
-gameplay result exists yet. Do not restart this learner oroverlap GPU work.
+**Complete; retain the raw-reward control.** Frozen sampled42.542/greedy90.875
+fall39.87%/36.75% from70.750/143.667, all0/24 two-wall. Training completes200k
+/799,584 frames/12,477 updates in21m39.349s, within the original30min cap.
+All453 pins, recovery, paired initial/frozen checks and original services pass.
+Terminal and fixed coverage readers are complete once; no stage repeats or new
+allocation follows. [Full result](../results/2026-11-03-cdp-breakout-life-penalty.md).
+The five-game goal remains unfinished. The following is the fixed protocol
+and historical preparation record; do not repeat completed work.
 
 Separately select one fresh learner after the [bounded native check](../results/2026-11-03-cdp-breakout-life-penalty.md)
 passes 8,192 actions / 489 updates in 47.317s. All 408 pins, 357 matching initial
@@ -124,7 +127,7 @@ replays,keeping fixed first-three-natural-episode means separate from extras/tai
 These are exposure bins,not verified walls,visual coverage orcausal evidence.
 No new replay,assessment,learner orGPU allocation isselected. Run each reader
 once after its prerequisites; do not repeat completed preparation. Retain CPU
-co-host timings without wall-time correction. Frozen gameplay remains pending.
+co-host timings without wall-time correction. Frozen gameplay was pending at preparation.
 
 ## Retained recovery
 
@@ -136,5 +139,31 @@ verifying all453 pins,the original observer journal identity,and a retained
 through103,112 actions. Recovery-reviewSHA41f86c4d/retentionSHAf8529f6f/
 metadataSHA72a9068e. Weights andmetadata are retained; replay,belief,games andRNG
 are omitted. The original main983163/invocation0191b9d7c0fe47acbe15c6db9845f519
-remains active. No stage orobserver repeats; do not repeat this confirmation.
-Frozen gameplay ispending. Keep CPU co-host time without correction.
+was active at this recovery review. No stage or observer repeats; do not repeat
+this confirmation. Frozen gameplay was pending then. Keep CPU co-host time
+without correction.
+
+## Original completion
+
+Original main983163/invocation0191b9d7c0fe47acbe15c6db9845f519 succeeds
+06:42:06.048 UTC November3; postprocessing06:42:24.088 and collection06:42:57.559
+also succeed. All five original services are terminal success. Independent
+terminal confirmation06:56:45.055 takes1.304s (1.323s wrapper); fixed coverage
+06:56:53.724 takes2.995s (3.016s wrapper). All453 full/50 diagnostic pins,
+100k/6,227 recovery,357 matching initial/invariant frozen tensors,47 pre-update
+and800/795 paired initial events, full pixel/action/label/life/reward replay,
+frozen replays/videos, guards, curves, exposure and comparison pass. All1,290
+observed life losses produce independently verified negative training rewards;
+raw game scores remain unchanged. Four frozen arms total77,592 actions/
+310,203 frames/67.331s, zero updates/truncations. Fixed coverage reconciles
+277,592 actions/1,109,787 frames and reuses the completed control without recount.
+
+Sampled/greedy initial-subtracted return per minute falls41.21%/37.87%; observed
+training time rises0.89%. Native training exposure at raw scores216–431 changes
+1,262→1,297, none432+, despite guided online mean67.78→94.72. Retain raw rewards;
+no penalty sweep, extension, confirmation or automatic successor. Earlier
+bounded CPU failures remain preserved; no full-run failure or repeated stage,
+collector or completed reader occurs. Keep co-host timings uncorrected.
+CompletionSHA4d276268/terminalSHA4e848210/coverageSHA96930bc4. The package is
+closed and no Kindle allocation is active at closure. Check live state before
+separately selected work. Full hashes and interpretation are in the result.

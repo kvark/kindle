@@ -1,5 +1,100 @@
 # Optional Breakout life-loss feedback
 
+The completed fresh 200k comparison lowers frozen scores to **42.542 sampled /
+90.875 greedy**, from retained **70.750 / 143.667**: declines of **39.87% /
+36.75%**. Training takes **21m39.349s**, 0.89% longer than the control. Both
+final arms have **0/24 two-wall successes**. Retain the raw-reward control;
+no penalty sweep, extension, confirmation or automatic successor is selected.
+Breakout and the five-game goal remain unfinished.
+
+| Measurement | Raw-reward control | One-point life-loss aid |
+| --- | ---: | ---: |
+| Sampled frozen mean |70.750|42.542|
+| Greedy frozen mean |143.667|90.875|
+| Own initial sampled / greedy |1.417 / 2.208|1.417 / 2.208|
+| Final sampled / greedy two-wall successes |0/24 / 0/24|0/24 / 0/24|
+| Training seconds |1,287.910|1,299.349|
+| Initial-subtracted sampled return/min |3.230038|1.899028|
+| Initial-subtracted greedy return/min |6.590132|4.094359|
+
+Initial-subtracted return per training minute falls **41.21% / 37.87%**.
+Both learners use 200,000 actions / 12,477 updates; candidate raw frames total
+799,584 versus control 799,595. Four candidate frozen captures total 77,592
+actions / 310,203 frames / 67.331s, with zero updates or truncations. Scores
+use the original first three natural episodes per eight lanes, 24 per arm;
+extra episodes and partial tails remain separately recorded. Guidance, labels
+and reward shaping are off in every frozen arm.
+
+## Full comparison and interpretation
+
+The [fixed full protocol](../experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
+adds one training point penalty per net observed lost life. Raw game rewards,
+scores, actual episode boundaries and policy observations remain unchanged.
+Independent ALE replay verifies **1,290 lost lives and 1,290 negative training
+rewards**, alongside every pixel, action and teacher label. Native447fe50/
+SHA35ad0db and the teacher remain exact; qualified runner9ff2552b adds the
+declared reward handling to retained runnercf4ea238. This is an explicit
+training aid, not an extra actor input or a repaired native loss.
+
+Keep centered CDP12M64/Auto/N8/B16/T16/fullBPTT/microbatch16/H15/R16/lambda.95,
+encoder/base4e-5, behavior8e-5, dynamics4e-4, replay-value1, expert100/unit
+weights/world gradients/all-state corrective labels, sampled collection and
+posteriors, replay100k and the existing guidance schedule. Seed1009 and
+evaluation4000001009 are reused development choices. No weights, replay,
+belief, games, RNG or bounded-check experience transfer occurs. The outcome
+rejects this aid for this recipe; it does not establish an isolated mechanism,
+independent seed reliability or that all life-loss feedback is harmful.
+
+The raw online last50 mean rises **67.78→94.72** while frozen scores fall.
+Actual overrides rise **86,117 / 43.0585%→87,960 / 43.98%**. Final50k replay
+expert cross-entropy falls slightly, **.560514→.551947**, on different visited
+and replayed states. Guided online scores and lower replay loss do not establish
+better unaided control.
+
+Fixed raw-score coverage counts only candidate logs and reuses the completed
+control analysis. Training actions at pre-action scores216–431 rise5,947→7,530,
+but overrides rise4,685→6,233, leaving native actions **1,262→1,297**
+(.631%→.6485% of all training). Neither learner reaches432+ during training.
+Candidate training maximum is431; selected frozen maxima are83 sampled and253
+greedy, with only one greedy episode reaching216. These are descriptive score
+bins, not verified wall boundaries or causal evidence about missing experience.
+Training penalties never enter the raw-score bins.
+
+## Full validation and closure
+
+All **453 pins**, 100k/6,227 recovery, 357 control/bounded-matching initial and
+invariant frozen tensors, 47 paired pre-update events, 800 sampled/795 greedy
+actual-initial semantic events, finite supervised reports, changed CNN/reward/
+actor/value weights, full guided and frozen replays/videos, host guards,
+curves, exposure and comparison pass. The comparison plot is reviewed.
+All five original services succeed: main **06:42:06.048**, postprocessing
+**06:42:24.088**, collection **06:42:57.559 UTC November3**, sourceb80194e.
+Original main983163/invocation0191b9d7c0fe47acbe15c6db9845f519 is never restarted.
+
+Recovery confirmation already passed06:27:40.709. Independent terminal
+confirmation completes once **06:56:45.055**, in1.304s (1.323s wrapper).
+Fixed coverage completes once **06:56:53.724**, in2.995s (3.016s wrapper),
+with50 diagnostic/453 full pins and277,592 actions/1,109,787 frames reconciled.
+No full-run preparation or original stage fails, and no GPU, replay, original
+collector or completed reader repeats. The three earlier bounded CPU failures
+and corrections below remain preserved. Keep CPU co-host timings without
+correcting training wall time.
+
+Root `/x/Temp/kindle-breakout-life-penalty-20261103/full` is closed. All original
+services and recovery/terminal/coverage readers are complete; do not repeat
+them. No Kindle learner or GPU allocation is active at closure. Check live
+state before separately selected work.
+
+| Full artifact | SHA256 |
+| --- | --- |
+| Declaration |`028a12503e0ebaef1fdd3e75889c179aa736e930ed30033f52b5ba36ec1828e9`|
+| Learning review |`3b4e8c21ac253e7589fcd2341b9ab7145d10d20441a3cbe58a89c0747641c5bb`|
+| Original completion |`4d2762686bfba2a73261e8d7e1e89cd00d8c356ca552200cd636fb654d3a0d9f`|
+| Terminal summary |`4e848210411fba17552b2051866e681d093f936fd9ad33cb2bd3e78aedae2f75`|
+| Fixed coverage review |`96930bc4d7fbd6a98142f54ad434c820322fcfbb89ab0ac3e1a8fbea03eb754e`|
+
+## Historical bounded check
+
 The bounded native check passes **8,192 actions / 32,730 frames / 489 updates
 in 47.317s**. All **118 observed lost lives** produce negative training feedback;
 independent ALE replay verifies life counts and training rewards while raw game
@@ -25,9 +120,9 @@ frozen stage, replay or original collector repeats. The earlier CPU fixture and
 schema-path failures below also remain preserved.
 
 The bounded root is closed; do not repeat its stages or readers. No Kindle
-allocation is active at closure. Separately select the [fresh 200k comparison](../experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
-to measure frozen gameplay; full-run preparation and launch remain unfinished.
-Retained 70.750 sampled / 143.667 greedy and zero two-wall successes stay unchanged.
+allocation was active at that closure. The separately selected fresh 200k
+comparison is now complete above. Retained 70.750 sampled / 143.667 greedy
+and zero two-wall successes stay unchanged.
 
 Completion SHA `251c82e094f6cdd5874d8fa597a11ac02243f29993cbc338273154be069efee3`;
 terminal summary SHA `dc938474eddcdf5c06c39124b04e6b4aa3ce99c05aca823d7bc51c5c0b90e752`.

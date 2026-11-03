@@ -20,59 +20,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
-The [fresh life-loss comparison](docs/experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
-is running since06:16:18.414 UTC November3/sourceb80194e,453 pins. Main983163/
-0191b9d7c0fe47acbe15c6db9845f519; progress,postprocessing andcollection
-observers areactive; recovery succeeds06:27:24.862. Startup passes357 initial tensors,47 pairedpre-update
-events,correct cadence and113 finite reports through2,184 actions,including46
-verified life-loss penalties. Recovery confirmation06:27:40.709 verifies100k/
-6,227 updates,357 finite tensors,206,067,162 retained bytes and453 unchanged
-pins; no repeated stage orobserver. No frozen result yet. Require the
-fixed200k/12,477updates/30min andfour24-episode assessments. Root
-`/x/Temp/kindle-breakout-life-penalty-20261103/full`; do not restart oroverlap GPU
-work. Only the declared training reward aid changes; raw scores stay unchanged.
-Read-only terminal preparation passes06:19:26.520:five score/six feedback cases,
-all453 pins/five identities. Fixed coverage preparation passes06:20:09.659:
-50 diagnostic/453 active pins,eight config/five retained boundary cases. Run
-recovery,terminal andcoverage readers once after their original prerequisites;
-do not repeat preparation oractive stages. Keep CPU co-host caveats.
+The [completed life-loss comparison](docs/results/2026-11-03-cdp-breakout-life-penalty.md) lowers sampled70.750→42.542
+and greedy143.667→90.875 in21m39.349s (+0.89% training time), all0/24 two-wall.
+Initial-subtracted return/min falls41.21%/37.87%. Retain raw training rewards
+with12M64/Auto/N8/B16/T16/H15/R16/lambda.95/encoder4e-5/behavior8e-5/dynamics4e-4/
+replay-value1/expert100/replay100k and sampled collection. Only the optional
+one-point life-loss aid changes; raw scores, native447fe50 and teacher stay fixed.
+All1,290 losses/negative rewards independently replay; online94.72 is guided
+and does not outweigh worse frozen play. Reused1009/cohort limits reliability.
 
-The [life-loss 200k comparison](docs/experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
-passes CPU preparation at06:14:37.261 UTC November3/source2eafbf2:five actual
-commands,34 config/24 startup/seven prefix/12 recovery cases,observer/prelaunch/
-retention checks,19 scripts and834 declaration entries. All408 bounded/338
-control pins stay unchanged; no failure orGPU work. Next select andlaunch the
-declared fresh200k learner; no allocation active atthis preparation milestone.
+All453 pins,100k/6,227 recovery,357 matched initial/invariant frozen tensors,
+paired initial traces, full replays/videos, guards, curves, exposure and comparison
+pass. Main/post/collection succeed06:42:06.048/06:42:24.088/06:42:57.559 UTC
+November3/sourceb80194e. Independent terminal06:56:45.055 and coverage06:56:53.724
+pass once;50 diagnostic/453 full pins reconcile277,592 actions/1,109,787 frames.
+Native actions at raw scores216–431 barely rise1,262→1,297, with none432+.
+These are descriptive score bins, not verified walls or a causal explanation.
 
-The [life-loss feedback bounded check](docs/results/2026-11-03-cdp-breakout-life-penalty.md)
-passes8,192 actions/32,730 frames/489 updates in47.317s; frozen1,024/.891s has
-zero updates/episodes and357 invariant tensors. All408 pins,357 matchedinitial,
-47 pairedpre-update events,118 independently replayed penalties,raw scores,
-full pixel/action/label replay andguards pass. Main/collector succeed06:06:19.889/
-06:06:24.949 UTC November3/source2594ab5; terminal confirmation06:07:15.464.
-Three CPU fixture/path/terminal-reader corrections are preserved; no original
-stage repeats. Conservative200k projection21m10.713s passes30min. The bounded
-root isclosed; do not repeat stages/readers. Separately select the [fresh200k comparison](docs/experiments/2026-11-03-cdp-breakout-life-penalty-200k.md);
-full preparation andlaunch areunfinished. No allocation isactive atclosure;
-check live state. Native447fe50/teacher unchanged; gameplay benefit unmeasured.
-
-The [optional life-loss aid passes CPU qualification](docs/results/2026-11-03-cdp-breakout-life-penalty.md):
-57 tests / 365 pins, including 338 control pins, plus both bounded commands,
-nine config assertions, five prefix cases and the 357-tensor schema. Native
-447fe50 stays byte-identical; runtime `/x/Temp/kindle-breakout-life-penalty-20261103/runtime`.
-Two repaired CPU fixture/path failures remain preserved; production code is
-unchanged across repairs. This CPU milestone preceded the completed bounded check
-above; do not repeat qualification.
-
-The [saved life-feedback analysis](docs/results/2026-11-03-cdp-breakout-life-feedback.md)
-is complete: all 120 selected lost lives have zero immediate reward, including
-96 nonterminal losses. It reuses 37,016 recorded actions with no emulator or GPU
-work; 11 fixtures and 14 input pins pass. This does not establish a causal defect.
-Next develop the [optional one-point life-loss training aid](docs/experiments/2026-11-03-cdp-breakout-life-penalty.md):
-explicit raw/training reward accounting, default off, frozen shaping off, and
-CPU qualification before one bounded check. The CPU implementation is now qualified;
-the bounded GPU check now passes. Preserve retained runtimes and raw scores.
-The diagnostic is closed; do not repeat it. No Kindle job is active at closure.
+Root`/x/Temp/kindle-breakout-life-penalty-20261103/full` is closed. All five
+original services and recovery/terminal/coverage readers are complete; do not
+repeat them or completed stages. No full-run failure or GPU repeat occurs.
+Three earlier bounded CPU failures/corrections remain preserved. Completion
+SHA4d276268/terminalSHA4e848210/coverageSHA96930bc4. No Kindle allocation is active
+at closure; check live state before work. Keep CPU co-host timings uncorrected.
+No penalty sweep, extension, confirmation or automatic successor is selected.
+Breakout and the five-game goal remain unfinished.
 
 The [completed replay16k comparison](docs/results/2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000
 andgreedy143.667→57.625 in21m44.359s (+1.28% training time),all0/24 two-wall.

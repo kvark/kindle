@@ -1,27 +1,30 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [saved life-feedback analysis](2026-11-03-cdp-breakout-life-feedback.md)
-finds zero immediate reward at all 120 selected lost lives, including 96 that
-do not end the game. All 37,016 saved actions join to original raw rewards and
-episode boundaries; 11 fixtures and 14 input pins pass. This reuses an older
-encoder4e5/behavior4e5/value.3 greedy policy, not the latest retained learner.
-No emulator, model or training stage runs. A hypothetical unit penalty changes
-the selected undiscounted total by exactly five points per episode; this is
-arithmetic, not an evaluated policy gain. Discounting and target timing could
-still change learning. Lost future rewards and actual game-over targets already
-provide indirect consequences, so this is not evidence of a missing standard
-RL loss or a causal explanation for weak control.
+The [completed one-point life-loss comparison](2026-11-03-cdp-breakout-life-penalty.md)
+lowers sampled70.750→42.542 and greedy143.667→90.875 at nearly unchanged
+training cost21m39.349s (+0.89%), all0/24 two-wall. Retain the raw-reward
+control. Independent replay verifies all1,290 observed losses and negative
+training rewards; raw scores, episode boundaries and native configuration
+remain unchanged. All453 pins, recovery, initial/frozen tensors, full replays
+and original services pass; terminal and fixed coverage readers are complete.
+No new penalty sweep, extension or automatic successor is selected.
 
-Next qualify the [optional one-point training aid](../experiments/2026-11-03-cdp-breakout-life-penalty.md)
-with explicit separate raw and training rewards, life/reset accounting, default
-off and frozen shaping off. Native learning remains unchanged. CPU qualification
-precedes one fresh bounded check; a full learner needs a separate selection.
-The [bounded implementation now passes](2026-11-03-cdp-breakout-life-penalty.md):
-8,192 actions/489 updates in47.317s,118 independently replayed penalties,raw
-scores preserved,and357 matchedinitial/invariant frozen tensors. Frozen1,024
-actions complete no natural episodes. The [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
-is separately selected; preparation andlaunch areunfinished. Retained gameplay and acceptance
-gates stay unchanged; the saved-data diagnostic is closed and must not repeat.
+The earlier [saved-data diagnostic](2026-11-03-cdp-breakout-life-feedback.md)
+found zero immediate reward at120 lost lives,96 nonterminal, using an older
+policy. Lost future rewards and game-over targets already provide indirect
+consequences. The new training result rejects this particular extra aid locally;
+it neither establishes a missing standard RL loss nor proves all such feedback
+harmful. Reused development seed/cohort limits reliability and causal claims.
+
+Guided raw online last50 improves67.78→94.72 and replay expert CE falls
+.560514→.551947 despite worse unaided play. Native training actions at raw
+scores216–431 barely rise1,262→1,297, none432+. Neither guided returns, replay
+fit nor these descriptive score bins substitute for frozen competence or
+identify the cause. Original main/post/collection succeed06:42:06.048/
+06:42:24.088/06:42:57.559 UTC November3; independent terminal06:56:45.055 and
+coverage06:56:53.724 pass once. All stages/readers are closed, with no GPU
+repeat or active allocation. Keep CPU co-host caveats and the three earlier
+bounded CPU corrections. Breakout and the five-game goal remain unfinished.
 
 The [completed replay16k comparison](2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000
 andgreedy143.667→57.625 in21m44.359s (+1.28% training time),all0/24 two-wall.
