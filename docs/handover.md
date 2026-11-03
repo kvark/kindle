@@ -14,9 +14,11 @@ launched21:30:20 UTC November3/source06c873c2 with122 pins. Fixed200k actions /
 expert100,full18,native447fe50/runnercf4ea238. Startup passes357 initial tensors
 against both bounded andretained controls,63 bounded/47 shared pre-update events,
 andfirst update504. MainPID1071673/invocation`2cecc3ab00f9498795197cf1de25639a`;
-recovery andterminal observers are active. Require read-only100k/6,219 recovery
-andfour final/actual-initial24-natural-episode arms;greedy primary, sampled
-secondary,against retained143.667/70.750. No full result isavailable. Root
+the terminal observer remains active. Read-only 100k/6,219 recovery passes
+21:42:21.105 UTC: all 357 finite tensors and 122 pins, original learner identity
+unchanged; independent CPU verification takes .478s. Four final/actual-initial
+24-natural-episode arms remain pending; greedy primary, sampled secondary,
+against retained143.667/70.750. No full result is available. Root
 `/x/Temp/kindle-breakout-value1-context32-20261103/full`;service
 `kindle-breakout-value1-context32-200k-20261103`. Check live state;do not restart
 oroverlap this learner. Bounded CPU failures remain preserved. No extension or

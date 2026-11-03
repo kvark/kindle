@@ -3,9 +3,12 @@
 A separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-value1-context32-200k.md)
 launches21:30:20 UTC November3/source06c873c2 with122 pins. Startup passes357
 initial tensors against both controls,63 bounded/47 shared semantic events and
-first update504. MainPID1071673; read-only100k/6,219 recovery andfour final/
-actual-initial24-episode arms are pending. Greedy remains primary against143.667,
-with sampled70.750 secondary. No full result isavailable; do not restart or
+first update504. MainPID1071673 remains active. Read-only 100k/6,219 recovery
+passes 21:42:21.105 UTC with all 357 finite tensors and 122 pins unchanged; the
+independent CPU check takes .478s and preserves the original process identity.
+Recovery contains weights and optimizer moments, without replay, games, live
+beliefs or complete RNG state. Four final/actual-initial 24-episode arms remain
+pending. Greedy remains primary against143.667, with sampled70.750 secondary. No full result isavailable; do not restart or
 overlap the active learner. The bounded evidence andoriginal failures below
 remain closed.
 
