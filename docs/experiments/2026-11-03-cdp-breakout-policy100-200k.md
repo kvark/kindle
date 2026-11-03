@@ -55,3 +55,33 @@ coverage from new logs. Reuse the retained control coverage without rerunning it
 No extension,coefficient sweep,confirmation learner or automatic successor is
 selected. Root `/x/Temp/kindle-breakout-policy100-20261103/full`. The five-game
 goal remains unfinished regardless of a passing execution audit.
+
+## Launch and startup
+
+The full comparison launches **09:34:23.440 UTC November3**, source
+`0c40e657b3f9d9c7e79038ca0c81f8f1a011c852`, with436 pins. MainPID1000011/
+invocation`dbf3484b87e947cfa048d424a144d958`; service
+`kindle-breakout-policy100-200k-20261103`. Original postprocessing/progress/
+recovery/collection services start once. Startup passes **09:34:53.761**
+(1.505s wrapper):357 bounded/control-matching initial tensors,47 pre-update
+transitions,first updates376/392/408/424/440/456,and250 finite reports through
+4,360 actions. No full frozen result is available. No restart,overlap or extension.
+
+DeclarationSHA`377c240b0aae298a1ff87300019d415a7deabce7aca3c65bf419c7127a685ebf`.
+The100k recovery,all four assessments and original terminal collection remain
+pending. No full preparation failure or repeated GPU stage occurs.
+
+The independent terminal reader qualifies five score checks at09:35:51.569,
+3.545s body/3.572s wrapper. Coverage qualification first fails in2.440s because
+the copied reader pins a separate prepare_coverage.py, while this package uses
+one combined prepare_readers.py. Preserve that source/failure and the.019s
+CPU repair. The corrected reader pins the actual generator,original source and
+failure;52 diagnostic/436 active pins,seven config cases and five retained
+boundary fixtures pass09:36:34.672 in2.439s (2.460s wrapper). Original process
+identity stays unchanged. No terminal analysis,emulator or GPU stage repeats.
+
+Keep these CPU co-host timings without correcting learner wall time. Run the
+recovery confirmation only after the original100k observer succeeds while the
+learner remains active. Run terminal and coverage summaries once after their
+required original completion artifacts exist. Their private sources/provenance
+are fixed before frozen outcomes.

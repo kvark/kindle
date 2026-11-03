@@ -1,24 +1,34 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-Select the [fresh200k policy-weight100 comparison](../experiments/2026-11-03-cdp-breakout-policy100-200k.md)
-after its [bounded execution/cost check](../results/2026-11-03-cdp-breakout-policy100.md)
-passes8,192 actions/32,728 frames/489 updates in46.910s and a20m59.778s conservative
-projection. Frozen1,024 actions/.889s has zero updates and no natural episodes.
-All396 pins,357 matching/invariant tensors,47 pre-update events,policy100 report
-arithmetic,replay and guards pass. Main/collector succeed09:30:47.023/09:30:52.508
-UTC November3/sourcee5ebbaee; independent terminal09:31:21.424. The bounded root
-is closed; do not repeat stages. Two CPU fixture corrections remain preserved.
+The [fresh200k policy-weight100 comparison](../experiments/2026-11-03-cdp-breakout-policy100-200k.md)
+is running from09:34:23.440 UTC November3/source0c40e657 with436 pins. MainPID1000011,
+invocationdbf3484b87e947cfa048d424a144d958; original progress,recovery,postprocessing
+and terminal-collection observers are active. Startup passes357 matching initial
+tensors,47 pre-update transitions,correct cadence and250 finite reports through
+4,360 actions. Require100k/6,227 recovery and final/actual-initial sampled/greedy
+24-episode arms against70.750/143.667,all0/24 two-wall,within30min training.
+No frozen result is available. Root `/x/Temp/kindle-breakout-policy100-20261103/full`,
+service `kindle-breakout-policy100-200k-20261103`. Check this original live process;
+do not restart it,repeat passing stages or schedule another GPU job while active.
 
 Only policy loss1→100 changes, scaling score-function and entropy together while
 retaining expert100/world imitation,critic1/1 and actor/critic representation
-gradients off. Native447fe50/teacher stay unchanged; runner5a86e224 adds12 CLI lines.
-Full CPU qualification passes18 scripts,five commands,38 configs,19 headers,
-14 recovery bodies and all396/338 pins, with no native/emulator construction.
-Require fresh200k/12,477 updates,100k/6,227 recovery,four final/actual-initial24-
-episode arms and30min training cap against70.750/143.667,all0/24 two-wall.
-Root `/x/Temp/kindle-breakout-policy100-20261103/full`; check live state before
-launch. No gameplay gain,extension,coefficient sweep or confirmation is selected.
-The five-game goal remains unfinished.
+gradients off. Native447fe50/teacher stay fixed; runner5a86e224 adds12 CLI lines.
+The [bounded check](../results/2026-11-03-cdp-breakout-policy100.md) passes8,192 actions/
+489 updates in46.910s; conservative200k projection20m59.778s. All396 pins,357
+initial/frozen tensors,47 events,report arithmetic,replay and guards pass; bounded
+root is closed. Main/collector09:30:47.023/09:30:52.508,terminal09:31:21.424.
+Do not repeat bounded stages. Two earlier CPU fixture corrections remain preserved.
+Full CPU qualification passes18 scripts,five commands and38 config cases.
+
+Recovery/terminal/coverage readers are prepared for this original run. Terminal
+reader qualification passes09:35:51.569;52-pin/seven-config coverage qualification
+passes09:36:34.672 after a preserved missing-generator-path failure and CPU-only
+correction. Original main identity and436 pins remain unchanged. Retain CPU
+co-host costs without wall-time correction. Coverage must wait for original
+completion and the independent terminal reader; do not repeat old control analysis.
+No extension,coefficient sweep,confirmation or automatic successor is selected.
+Breakout and the five-game goal remain unfinished.
 
 The [completed contact-timing CPU teacher comparison](../results/2026-11-03-cdp-breakout-contact-timing-policy.md)
 lowers mean185.375→125.875, with only2/8 improved lanes and zero two-wall successes
