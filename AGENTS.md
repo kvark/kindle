@@ -20,6 +20,30 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [fresh 200k life-bounded actor comparison](docs/experiments/2026-11-03-cdp-life-return-actor-200k.md)
+launches **19:24:44 UTC November 3**, source `e6e5f4ba`, with 330 pins and a
+30-minute training cap. Native `ec12d41e`, the qualified runtime and runner stay
+unchanged. Keep 12M64/Auto/N8/B16/T16/H15/R16, actor100/lower-bound with life
+boundaries, expert100/world gradients, disagreement1 and the retained rates.
+Transfer no weights or experience. Main PID **1063215**, invocation
+`335925ab865f49d280efb8eaa211fc55`; recovery and terminal observers are active.
+
+Startup passes all 357 matched initial tensors and 47 pre-update events.
+The independent .497s CPU observation validates finite reports through
+7,864 actions / 468 updates, first positive actor targets at568, and118 raw-life
+boundary actions. All330 pins stay unchanged; retain CPU co-host time without
+correction. No frozen result is available. Require100k/6,227 recovery and final/
+actual-initial sampled/greedy24-episode assessments, full pixel/label/life
+replay, guards, curves, exposure and comparisons. Primary retained greedy143.667
+and sampled70.750 remain; whole-game actor144.750/49.167 is contextual evidence.
+The original864/90%-two-wall gate and five-game goal remain unfinished.
+
+Root `/x/Temp/kindle-life-return-actor-20261103/full`; service
+`kindle-life-return-actor-200k-20261103`. Check original process/invocation state;
+**do not restart this learner, repeat completed stages or schedule another GPU
+allocation while it is active**. The preceding bounded check and CPU repair stay
+closed. No cap extension, second learner or automatic successor is selected.
+
 The [optional life-bounded actor qualification](docs/results/2026-11-03-cdp-life-return-actor.md)
 passes 8,192 actions / 32,725 frames / 489 updates in **49.039s**, versus the
 retained whole-game short check's 50.754s. Frozen 1,024 actions take .903s with
