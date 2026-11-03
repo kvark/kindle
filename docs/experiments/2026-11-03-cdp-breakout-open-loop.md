@@ -65,3 +65,15 @@ evidence once after authoritative service completion.
 
 Root `/x/Temp/kindle-breakout-open-loop-20261103/native-check`; service
 `kindle-breakout-open-loop-check-20261103`. The five-game goal remains unfinished.
+
+## Completed bounded outcome
+
+The check passes8,192 actions/32,717 frames/489 updates in48.603s, with1,024
+frozen actions/.893s andzero updates. Conservative200k cost21m45.264s passes
+30min. All602 pins,357 matching/invariant tensors,47 initial events,weighted
+auxiliary reports,full guided replay and guards pass. Original service succeeds
+11:41:09.152 UTC November3/source63c347f9. The original collector fails a
+parent-PID logging assertion; separate CPU collection repair completes11:43:00.131
+with all original inputs unchanged. No GPU or replay stage repeats. See the
+[result](../results/2026-11-03-cdp-breakout-open-loop.md) for metrics, qualification
+reuse and preserved failure. No full learner is allocated by this bounded check.

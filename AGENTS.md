@@ -20,16 +20,24 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
-The [Breakout H3 world-supervision check](docs/experiments/2026-11-03-cdp-breakout-open-loop.md)
-is selected for CPU preparation, then one fresh8,192-action/489-update check and
-1,024 frozen actions. Keep constant actor/world imitation100 and the retained
-12M64/Auto/N8/B16/T16/H15/R16 recipe; add only open-loop H3/scale1. Reuse native
-c2d627f3 and its completed numerical/disabled-mode compatibility evidence;
-no build or repeated compatibility stage. Require conservative200k cost within
-30min before considering a full learner. Root `/x/Temp/kindle-breakout-open-loop-20261103`;
-no full learner,extension,sweep or automatic successor selected. Check live state
-before launch. This tests execution/cost, not gameplay benefit; earlier Qbert H3
-regressed. The five-game goal remains unfinished.
+The [Breakout H3 world-supervision check](docs/results/2026-11-03-cdp-breakout-open-loop.md)
+passes8,192 actions/32,717 frames/489 updates in48.603s; conservative200k
+projection21m45.264s passes30min. Frozen1,024 actions/.893s haszero updates
+and no natural episodes. All602 pins,357 matching initial/invariant frozen
+tensors,47 pre-update events,finite weighted auxiliary reports,full guided
+replay and guards pass. Keep actor/world imitation100; only H3/scale1 world
+supervision is added. Nativec2d627f3/runner8946f5f3 are reused without a build
+or repeated numerical/legacy capture; gameplay benefit remains unmeasured.
+
+Original mainPID1019894/invocation7b942f6a912842eea2e3c49f11e24cc4 succeeds
+11:41:09.152 UTC November3/source63c347f9. The original collector's parent-PID
+logging assertion fails; separate CPU repair passes11:43:00.131 in1.065s with
+six identity fixtures/seven repair pins. Original failure and all602 pins remain;
+closure`complete_with_cpu_collection_repair`. No GPU,frozen or replay repeat.
+Root `/x/Temp/kindle-breakout-open-loop-20261103/native-check` and its readers
+are closed. No allocation is active at closure; check live state before work.
+No full learner,extension,sweep or automatic successor is selected by this check.
+The five-game goal remains unfinished.
 
 The [completed actor-only imitation-decay comparison](docs/results/2026-11-03-cdp-breakout-actor-only-decay.md)
 lowers frozen sampled **70.750→51.833** and greedy **143.667→104.750**, all0/24
