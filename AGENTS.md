@@ -20,6 +20,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [four-action guided Breakout check](docs/results/2026-11-03-cdp-breakout-minimal-guided.md) completes8192 actions /
+32,728 frames /489 updates in **41.133s versus47.690s**,13.75% less early training
+time. Including separate construction gives44.072s versus50.094s (−12.02%).
+All118 inputs,357 finite/invariant tensors,correct cadence,full training pixel/
+action/label replay andboth guards pass. Frozen1024/.918s haszero updates and
+five natural episodes; no24-episode gameplay gain is established. Native447fe50
+is unchanged; explicit adapter mapping preserves the full18 teacher internally.
+
+Main completes20:21:17.038 UTC November3/source11023a19; terminal closure at
+20:22:44.473 is `complete_with_cpu_terminal_repair`. The original preflight
+accidentally initializes a native agent on synthetic pixels before failing with
+zero emulator steps/updates; its unguarded work andcheckpoint remain preserved.
+Repaired CPU qualification passes161 tests/zero agent constructions; source
+qualification passes258 tests. A later CPU collector failure on cleared systemd
+InvocationID is preserved and repaired using the original journal identity.
+No declared learner/frozen/replay stage repeats. Root
+`/x/Temp/kindle-breakout-minimal-guided-20261103/bounded-check` is closed; do not
+rerun it. No active allocation orfull learner isselected;18m24.645s projected
+cost clears30min,but competence and the original864/90%-two-wall gate remain
+unmeasured/unfinished. Retain70.750/143.667 andthe existing five-game goal.
+
 The [completed life-bounded actor comparison](docs/results/2026-11-03-cdp-life-return-actor.md#full-200k-comparison-does-not-improve-the-retained-recipe)
 finishes 200k actions / 799,589 frames / 12,477 updates in **21m41.269s** (+1.04%).
 Sampled **62.417** and greedy **137.542** fall from retained70.750/143.667 by

@@ -1,5 +1,14 @@
 # Four-action guided Breakout: bounded execution and cost check
 
+**Complete:**8192 actions/32,728 frames/489 updates in41.133s,13.75% less than
+the retained full18 check. Frozen1024/4,081 frames/.918s haszero updates andfive
+natural episodes. All118 inputs,357 tensors,full replay andguards pass; main
+completes20:21:17 UTC/source11023a19. Original preflight andCPU collector failures
+remain; separateCPU terminal repair closes20:22:44.473. No declared GPU stage
+repeats. [Result](../results/2026-11-03-cdp-breakout-minimal-guided.md).
+No full learner or gameplay gain selected; bounded work is closed,do not rerun.
+The exact launch protocol remains in`fixed-protocol.md` under the evidence root.
+
 Investigate action-space cost within the existing five-game goal. The retained
 200k policy scores70.750 sampled/143.667 greedy, all0/24 two-wall. Preliminary
 saved-log counts show no excluded action among43,424 greedy decisions, so an
