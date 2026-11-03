@@ -21,11 +21,15 @@ expert100/replay100k with sampled collection.
 Startup passes: 357 matching initial tensors, 47 paired pre-update events,
 correct cadence and 179 finite reports through 3,232 actions. The 8,192-action
 progress point takes 48.022s for 489 updates. **No full frozen result is available.**
-Require the original 100k/6,227 recovery checkpoint and fixed final/actual-initial
-sampled/greedy 24-episode assessments against retained 70.750/143.667, all 0/24
-two-wall. The original progress, recovery, postprocessing and collection observers
-are attached. Terminal and coverage readers are qualified; run each once at its
-specified milestone. Score bins describe exposure, not verified wall transitions.
+The original 100k/6,227 recovery observer succeeds at 08:29:36.892 UTC;
+independent confirmation passes once at 08:30:32.422 in 1.281s CPU. All 448 pins,
+357 finite tensors and four retained files (206,067,161 bytes) match. Do not repeat
+the recovery observer or confirmation. The original learner continues unchanged.
+Fixed final/actual-initial sampled/greedy 24-episode assessments remain pending
+against retained 70.750/143.667, all 0/24 two-wall. Progress, postprocessing and
+collection observers are attached. Terminal and coverage readers are qualified;
+run each once after original completion. Score bins describe exposure, not verified
+wall transitions. Recovery retention SHA `c576858a`; metadata SHA `cc59c98e`.
 
 Root `/x/Temp/kindle-breakout-imagined-value03-20261103/full`; service
 `kindle-breakout-imagined-value03-200k-20261103`. **Check live state; do not restart

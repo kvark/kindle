@@ -90,3 +90,21 @@ raw-score exposure, not verified wall transitions or causal coverage. Both retai
 the original process identity. Keep CPU co-host timings without correction.
 Confirm original100k recovery once after its observer; run terminal and coverage
 readers once after original completion. No full outcome is available yet.
+
+## Recovery retained
+
+The original recovery observer succeeds at **08:29:36.892 UTC November 3**.
+Independent confirmation completes once at **08:30:32.422**, in 1.281s CPU
+(1.301s wrapper), preserving the original main PID/invocation and all 448 pins.
+The 100k-action/6,227-update checkpoint contains 357 finite tensors. Its four
+retained files total 206,067,161 bytes and match the original hashes. The observer
+checks 6,384 finite reports through a complete prefix of 102,520 actions.
+
+This retains weights and metadata; replay, belief, games and RNG are omitted.
+The learner continues unchanged, and frozen gameplay remains unmeasured.
+Recovery retention SHA
+`c576858a78dbaefeef736d8666d0b1267cc5d38190c84f11c6f200bdd3d94d15`;
+metadata SHA
+`cc59c98edabce321e34729e2f26c6814aecbd797711b57603dde627d3470ad4e`.
+Do not repeat the recovery observer or confirmation. Terminal and coverage readers
+remain pending until the original full completion. Keep CPU co-host time uncorrected.
