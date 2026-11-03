@@ -1,61 +1,29 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh replay16k comparison](../experiments/2026-11-03-cdp-breakout-replay16k-200k.md)
-launches05:08:40.375 UTC November3/source9cfd8cc:200k actions/12,477 updates
-with a30-minute training cap,
-100k/6,227 retained recovery and final/actual-initial sampled/greedy24-episode
-assessments against70.750/143.667,all0/24 two-wall. Only shared replay capacity
-100k→16,384 changes; native447fe50,runnercf4ea238,teacher and other settings
-stay fixed. No experience transfers. Recency,diversity,reuse andcoverage change
-together; cache age and gameplay benefit remain unmeasured.
+The [completed replay16k comparison](2026-11-03-cdp-breakout-replay16k.md) lowers sampled70.750→34.000
+andgreedy143.667→57.625 in21m44.359s (+1.28% training time),all0/24 two-wall.
+Initial-subtracted return/min falls53.60%/61.32%. Retain shared replay100k with
+12M64/Auto/N8/B16/T16/H15/R16/lambda.95/encoder4e-5/behavior8e-5/dynamics4e-4/
+replay-value1/expert100 andsampled collection. Onlycapacity100k→16,384 changes;
+native447fe50,runnercf4ea238 andteacher remainexact. Recency,diversity,reuse and
+coverage change together; cache age andisolated cause remainunmeasured.
 
-CPU preparation passes05:07:30.979 UTC November3 in3.683s (3.800s wrapper):
-five commands,36 config cases,20 startup cases,13 recovery cases,four observer
-cases,seven prelaunch cases,six retention/two collector cases,19 scripts and
-1,209 declaration entries. All378 original/408 repaired bounded pins and338
-control pins match. The exact corrected prefix reader andits eight retained
-fixtures are reused. Original bounded services remain failed; their separate
-CPU closure is required. No successful check stage or reader repeats.
-Startup05:08:57.566 passes445 pins,357 matched initial tensors,47 pre-update
-transitions,correct cadence and119 finite reports through2,280 actions. Main
-977721/invocation84334254aa564f5ab49a4907f2d9e950 remainsactive with original
-postprocess,progress andcollection observers. Original recovery succeeds
-05:19:46.992 UTC; independent confirmation05:19:54.953 verifies100k/6,227,
-357 finite tensors,206,067,161 retained bytes andall445 pins. The checked log
-prefix has6,385 finite reports through102,536 actions. Recovery-reviewSHAb8421bda,
-retentionSHA64322cb0. No observer orGPU stage repeats; do not repeat confirmation.
-Full frozen gameplay remains pending. Keep1.636s startup and1.902s recovery
-confirmation CPU wrapper co-host times uncorrected.
-Read-only terminal preparation passes05:11:24.713 in2.806s (2.828s wrapper),
-verifying all445 pins,five original identities andfive score cases. Fixed score
-coverage isqualified05:11:33.246 in2.859s (2.884s wrapper),with50 diagnostic/
-445 full pins,six config cases andfive retained boundary fixtures. Reuse saved
-control counts; only countnew candidate logs afteroriginal terminal completion.
-No native/emulator work orstage repeats; CPU co-host times stayuncorrected.
-Root`/x/Temp/kindle-breakout-replay16k-20261103/full`,service
-`kindle-breakout-replay16k-200k-20261103`. Check live state; once launched,do not
-restart it or overlap GPU work. No extension,sweep,confirmation orautomatic
-successor selected. The five-game goal remains unfinished.
+All445 pins,100k/6,227 recovery,357 matchedinitial/invariant frozen tensors,
+16k/2,078-event semantic prefix,paired initial traces,full replays/videos,guards,
+curves,exposure andcomparison pass. Main/post/collection succeed05:34:16.487/
+05:34:44.611/05:35:19.248 UTC November3/source9cfd8cc; allfive originals succeed.
+Terminal05:35:33.562 andcoverage05:35:39.907 pass once;50 diagnostic/445 full
+pins,270,920 actions/1,083,085 frames reconciled. Native216–431 actions fall
+1,262→878,none432+; score bins are not verified walls orcausal coverage. Late
+replay expert CE falls.560514→.381669 onchanged replay despite worsegameplay.
+Actual45.4125% overrides/online54.42 are not unaided competence.
 
-The [replay16k bounded check](2026-11-03-cdp-breakout-replay16k.md) completes24,576 actions/98,167 frames/
-1,513 updates in158.358s;1,024 frozen/.903s haszero updates/no natural episodes.
-Conservative200k projection23m37.590s clears30min. All378 original/408 repair
-pins,357 matching initial/invariant tensors,47 pre-update events,515 saturated
-reports,16k/2,078-event semantic prefix,full guided replay andguards pass.
-Native447fe50/runnercf4ea238/teacher remain exact; only shared capacity100k→16,384.
-Recency,diversity,reuse andcoverage change together; cache age/benefit unmeasured.
-
-Original main976085/af346c90f72b4c26bbee0fa9333738bf andcollector976088/
-c96a1d9b2ced4483b1ed81f4aa0b7615 fail04:54:31.441/04:54:39.720 UTC November3
-/source1e277a5 aftersuccessful GPU stages: the CPU prefix audit compared40
-wall-clock fields. Separate17.639s CPU closure completes04:59:11.269,including
-previously unrun12.906s replay; eight repair fixtures pass. Original services
-remain failed; closure`complete_with_cpu_audit_repair`,SHAfa2de49f. Status-tail
-parser failure isalso retained. No GPU stage,successful replay orcollector repeats.
-Root`/x/Temp/kindle-breakout-replay16k-20261103/cpu-audit-repair` isclosed;
-do not repeat qualification,training,frozen,replay,repair orcollectors. Original
-success-only terminal reader remainsunrun. No full learner,capacity sweep or
-successor selected. No allocation active atclosure; check live state beforework.
+Root`/x/Temp/kindle-breakout-replay16k-20261103/full` isclosed. Allreaders and
+original stages arecomplete; do not repeat them. No full-run failure orGPU repeat.
+Earlier bounded main/collector failures andseparate CPU repair remainpreserved;
+original bounded services stayfailed. CompletionSHA2e48b8b0/summarySHAba7fd117/
+coverageSHA25a8eb80. No allocation active atclosure; check live state. No capacity
+sweep,extension,confirmation orautomatic successor. Keep CPU co-host caveats.
 The five-game goal remains unfinished.
 
 The [completed lambda1 comparison](2026-11-03-cdp-breakout-lambda1.md) lowers

@@ -1,5 +1,12 @@
 # Fresh 200k Breakout comparison with replay capacity16,384
 
+**Complete:** replay16k scores34.000 sampled/57.625 greedy versus70.750/143.667
+forretained replay100k,in21m44.359s (+1.28%),all0/24 two-wall. Retainreplay100k;
+no capacity sweep,extension,confirmation orautomatic successor. Alloriginal
+services,recovery,replays andfinal readers pass withoutfull-run failure orrepeat.
+The following selection,launch andrecovery sections describe historical states;
+theroot isclosed. See the [completed result](../results/2026-11-03-cdp-breakout-replay16k.md).
+
 Separately select one full learner after the [bounded replay16k check](../results/2026-11-03-cdp-breakout-replay16k.md)
 establishes execution and cost. It completes24,576 actions/1,513 updates in
 158.358s, including515 reports after saturation; conservative200k projection
@@ -129,3 +136,27 @@ Recovery preserves weights andmetadata only; replay,belief,games andRNG remain
 omitted. No training,observer orGPU stage repeats. Do not repeat the completed
 recovery confirmation. Frozen gameplay remains pending; retain CPU co-host time
 without correcting training time.
+
+## Completion
+
+The candidate finishes200,000 actions/799,573 frames/12,477 updates in1,304.359s.
+Fixed finalsampled/greedy means34.000/57.625 fall51.94%/59.89% belowcontrol;
+initial-subtracted return/min falls53.60%/61.32%. Owninitials1.417/2.208 match,
+all0/24 two-wall. Fourfrozen captures total70,920 actions/283,512 frames/61.452s,
+zero updates/truncations. Retainreplay100k; no follow-up sweep orextension.
+
+All445 pins,100k recovery,357 matchedinitial/invariant frozen tensors,16k semantic
+prefix,800/795 pairedinitial events,replays/videos,guards,curves,exposure and
+comparison pass. Originalmain/post/collection succeed05:34:16.487/05:34:44.611/
+05:35:19.248 UTC November3. Allfive originalservices succeed. Terminalreview
+05:35:33.562 andcoverage05:35:39.907 pass once;50 diagnostic/445 fullpins and
+270,920 actions/1,083,085 frames reconcile. Native216–431 trainingactions fall
+1,262→878,none432+; descriptivescore bins donot establishcausality. ExpertCE
+falls.560514→.381669 onthe changedreplay distribution despiteworsefrozenplay.
+Actualoverrides90,825/45.4125% andonline54.42 arenot unaidedcompetence.
+
+No full-run preparationfailure,GPU stage,replay ororiginalcollector repeat.
+Earlier boundedfailures andseparate CPUrepair remainpreserved; theiroriginal
+services remainfailed. KeepCPU co-host times uncorrected. Allreaders andstages
+arecomplete; donot repeat them. No allocationactive atclosure orautomatic
+successor selected. Thefive-game goal remainsunfinished; checklivestate.

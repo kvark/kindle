@@ -7,6 +7,9 @@ reports,16k semantic prefix and378 original/408 repair pins pass. Conservative
 after an over-specific wall-time comparison; separate CPU closure succeeds
 04:59:11.269 UTC November3. No GPU stage repeats. No full learner is selected.
 See the [result and preserved failure](../results/2026-11-03-cdp-breakout-replay16k.md).
+The separately selected full200k comparison subsequently completes34.000 sampled/
+57.625 greedy, below70.750/143.667; retainreplay100k. Its originalservices and
+finalreaders pass. See the [full protocol](2026-11-03-cdp-breakout-replay16k-200k.md).
 The selection and launch sections below describe historical states.
 
 Select one fresh check changing replay capacity100,000→16,384 stored frames
