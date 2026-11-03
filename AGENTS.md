@@ -24,8 +24,11 @@ The [fresh200k conservative-actor assessment](docs/experiments/2026-11-03-cdp-co
 November3/sourcecf8c53fc with308 pins and a30-minute training cap. MainPID1057479,
 invocation`d9abb71b942440559ae740a11c7ee1bc`,service`kindle-conservative-actor-200k-20261103`.
 Startup passes357 exact initial tensors,47 pre-update events and first update376.
-At18:12:51,11,768 actions/712 reports include653 positive-target updates; first
-positive1224. The100k/6,227 recovery observer and terminal collector are active.
+The100k/6,227 recovery is saved18:22:27.826 UTC and independently verified
+18:24:21.872:357 finite tensors/51,502,659 elements,matching config/schema/hashes,
+read-only files/directory and all308 pins unchanged. Main identity stays fixed;
+.330s observer/.614s CPU review remain in wall time. At18:24:59 training reaches
+122,880 actions/7,657 updates. The terminal collector remains active.
 Require final/actual-initial sampled/greedy24-episode assessments against retained
 70.750/143.667; no full result yet. Root`/x/Temp/kindle-conservative-actor-20261103/full`.
 Do not restart it,repeat earlier stages or schedule another GPU job while active.

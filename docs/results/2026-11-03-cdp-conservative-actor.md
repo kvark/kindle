@@ -8,8 +8,9 @@ launches **18:11:37 UTC November3**, sourcecf8c53fc, with308 input pins and a
 `d9abb71b942440559ae740a11c7ee1bc`, service
 `kindle-conservative-actor-200k-20261103`, runs one fresh200k/12,477-update
 candidate followed by final/actual-initial sampled/greedy24-episode assessments.
-The100k/6,227 recovery observer and terminal collector are active. No full
-frozen result is available and the five-game goal remains unfinished.
+The100k/6,227 recovery is saved and independently verified; the terminal
+collector remains active. No full frozen result is available and the five-game
+goal remains unfinished.
 
 Startup verifies357 exact initial tensors,47 pre-update events and first
 update376. An early read at18:12:51.734 finds11,768 actions/712 reports,
@@ -17,6 +18,18 @@ update376. An early read at18:12:51.734 finds11,768 actions/712 reports,
 The.333s startup check and.548s host review remain in actual wall time.
 Root `/x/Temp/kindle-conservative-actor-20261103/full` is active; do not restart
 it, repeat earlier stages or schedule another GPU job while it runs.
+
+The recovery observer completes **18:22:27.826 UTC** in.330s. Independent CPU
+verification completes **18:24:21.872** in.614s: counters100k/6,227,357 finite
+tensors/51,502,659 elements, exact config/schema and metadata/file hashes,
+read-only0444 files/0555 directory,all308 pins unchanged. MainPID/invocation
+remain identical before and after. This retains weights and optimizer moments,
+not replay, live games, beliefs or all RNG state. CPU co-host time remains in
+actual wall time. At18:24:59 the learner reaches122,880 actions/7,657 updates.
+Verification receipt SHA
+`13e911dd3532670203774894235914404a47388e7f657f34aa3a0e07744fa7c8`;
+recovery metadata SHA
+`a49c406693ca12925adc5f4243c71832896dededae1e07de29fbd2ce5d176c0e`.
 
 Actual CPU postprocessing passes on a separate retained-data fixture before
 launch:200k exposure accounting, exact teacher metrics and curve generation.
