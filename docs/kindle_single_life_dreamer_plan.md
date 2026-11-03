@@ -1,13 +1,37 @@
 # Kindle: CDP learning roadmap
 
+The [optional life-bounded actor qualification](results/2026-11-03-cdp-life-return-actor.md)
+passes 8,192 actions / 32,725 frames / 489 updates in **49.039s**, versus the
+retained whole-game short check's 50.754s. Frozen 1,024 actions take .903s with
+zero updates, no completed natural episodes and all 357 tensors unchanged.
+All 123 raw-frame life-loss boundaries reproduce in independent pixel/action/
+label replay. Targets become positive at action 568; 34,261 positive repeated
+rows appear on 469 updates. These are execution results, not gameplay gains.
+
+Default-off native `ec12d41e` passes 174 Rust / 1,044 packaged Python CPU tests,
+strict Clippy and 12 F64 derivative cases. All 263 current / 338 retained pins,
+214 preserved sources, 357 matched initial tensors and 47 pre-update events pass.
+The original main service succeeds 19:15:26.762 UTC November 3. Its CPU collector
+fails on a list/dictionary manifest mismatch; a separate 1.213s repair closes
+19:16:56.676 as `complete_with_cpu_collection_repair`, preserving that failure.
+No GPU or replay repeats. Runtime and evidence remain under
+`/x/Temp/kindle-life-return-actor-20261103`; bounded subdirectory `check` is closed.
+
+The padded 200k projection is 21m56.964s, below 30 minutes. No full learner,
+extension or coefficient sweep is selected by this qualification. Keep retained
+sampled70.750/greedy143.667 and the original 864/90%-two-wall gate. No Kindle
+allocation remains active at closure; check live state before new work.
+The five-game goal remains unfinished.
+
 The [completed return/life audit](results/2026-11-03-cdp-breakout-return-life-audit.md)
 finds390→143 positive targets among480 fixed retained states when returns stop
 at the next life loss;70.74% of clipped weight disappears. Within16 actions of
 loss,30 positives becomezero,but that subset is only3.49% of original weight.
 Full-game returns remain valid for game-total reward; this arithmetic does not
 identify causal errors or prove that a life-bounded target would help. These are
-retained frozen states,not the conservative learner's online batches. No native
-change or learner is selected; per-life credit design remains a concrete question.
+retained frozen states,not the conservative learner's online batches. At that
+audit's closure, no native change or learner was selected; the later optional
+prototype is reported above.
 
 All252 pins,16 CPU fixtures,35,552 actions/142,169-frame annotation replay,
 eight pixel-sequence hashes,512 selected pixels,480 original returns/weights
