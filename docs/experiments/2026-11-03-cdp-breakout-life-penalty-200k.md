@@ -1,5 +1,11 @@
 # Fresh 200k Breakout comparison with one-point life-loss feedback
 
+**Running:** launch06:16:18.414 UTC November3/source`b80194e`,453 pins,
+declarationSHA`028a12503e0ebaef1fdd3e75889c179aa736e930ed30033f52b5ba36ec1828e9`.
+Main983163/invocation0191b9d7c0fe47acbe15c6db9845f519; the original progress,
+recovery,postprocessing andterminal-collection observers areactive. No frozen
+gameplay result exists yet. Do not restart this learner oroverlap GPU work.
+
 Separately select one fresh learner after the [bounded native check](../results/2026-11-03-cdp-breakout-life-penalty.md)
 passes 8,192 actions / 489 updates in 47.317s. All 408 pins, 357 matching initial
 and invariant frozen tensors, raw-score/life/reward accounting, full guided
@@ -81,3 +87,19 @@ compile and 834 declaration path entries resolve. The 408 bounded and 338
 control pins remain unchanged. Native/teacher/qualified runner remain exact;
 no native or emulator is constructed. No preparation failure or repeated
 successful stage occurs. Full selection and launch remain pending at this milestone.
+
+## Startup
+
+Startup review06:16:35.584 UTC passes453 pins,357 initial tensors matching both
+bounded candidate andretained control,47 complete candidate/bounded pre-update
+events and47 normalized raw-control events. All shaping fields remain in the
+candidate/bounded comparison; control normalization changes only declared
+extrinsic feedback. The firstsix update actions376/392/408/424/440/456 match.
+There are113 finite supervised reports through2,184 actions and46 observed lost
+lives with verified training reward accounting. No100k recovery orfrozen result
+is available atstartup. Keep1.509s CPU startup wrapper co-hosting uncorrected.
+
+Original observers:post983166/invocation3a2e4714c1bb463fb74b2928b021f4a1,
+progress983169/82c8677727184601a907b308a44c42dc,
+recovery983304/87e7d42b5eab48d288f5120d1c043403,
+collection983307/235dab3abb3a4e189c05af8f6bb2cd84. Follow these identities.

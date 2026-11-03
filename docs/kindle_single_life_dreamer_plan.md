@@ -1,5 +1,12 @@
 # Kindle: CDP learning roadmap
 
+The [fresh life-loss learner is running](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
+from06:16:18.414 UTC/sourceb80194e,453 pins. Startup passes357 initial tensors,
+47 pairedpre-update events,correct cadence and113 finite reports through2,184
+actions. Training life-loss accounting isverified; raw scores remain unchanged.
+No100k recovery orfrozen result yet. Original observers areactive; no overlapping
+GPU job,restart,extension orcap increase. The five-game goal remainsunfinished.
+
 The [fresh life-loss comparison](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
 passes CPU preparation:five commands,34 config/24 startup/seven prefix/12 recovery
 cases andobserver/prelaunch/retention checks;19 scripts/834 path entries,408

@@ -8,6 +8,16 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [fresh life-loss learner](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
+is active from06:16:18.414 UTC/sourceb80194e. Main983163/invocation
+0191b9d7c0fe47acbe15c6db9845f519,service`kindle-breakout-life-penalty-200k-20261103`.
+Allfour original observers areactive. Startup06:16:35.584 passes453 pins,357
+initial tensors,47 pairedpre-update events,113 finite reports/2,184 actions and
+46 verified lost lives. DeclarationSHA028a1250. Fullroot
+`/x/Temp/kindle-breakout-life-penalty-20261103/full` contains launch/observer
+identities andstartup review. No100k recovery orfrozen result yet. Do not restart
+the learner orschedule overlapping GPU work; retain the fixed30min cap.
+
 Full [life-loss comparison preparation](experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
 passes06:14:37.261 UTC/source2eafbf2:five commands,34 config/24 startup/seven
 prefix/12 recovery cases,observer/prelaunch/retention checks,19 scripts and834

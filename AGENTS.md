@@ -20,6 +20,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [fresh life-loss comparison](docs/experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
+is running since06:16:18.414 UTC November3/sourceb80194e,453 pins. Main983163/
+0191b9d7c0fe47acbe15c6db9845f519; progress,recovery,postprocessing andcollection
+observers areactive. Startup passes357 initial tensors,47 pairedpre-update
+events,correct cadence and113 finite reports through2,184 actions,including46
+verified life-loss penalties. No100k recovery orfrozen result yet. Require the
+fixed200k/12,477updates/30min andfour24-episode assessments. Root
+`/x/Temp/kindle-breakout-life-penalty-20261103/full`; do not restart oroverlap GPU
+work. Only the declared training reward aid changes; raw scores stay unchanged.
+
 The [life-loss 200k comparison](docs/experiments/2026-11-03-cdp-breakout-life-penalty-200k.md)
 passes CPU preparation at06:14:37.261 UTC November3/source2eafbf2:five actual
 commands,34 config/24 startup/seven prefix/12 recovery cases,observer/prelaunch/
