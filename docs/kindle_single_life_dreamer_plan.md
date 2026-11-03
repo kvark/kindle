@@ -1,5 +1,17 @@
 # Kindle: CDP learning roadmap
 
+The [lambda1 bounded check](results/2026-11-03-cdp-breakout-lambda1.md)
+passes8,192 actions/32,727 frames/489 updates in50.121s; frozen1,024/.868s has
+zero updates/no natural episodes. Conservative200k projection22m26.028s clears
+30min. All385 pins,357 matched initial/invariant tensors,47 pre-update events,
+full replay andguards pass; main/collector succeed04:07:39.518/04:07:43.412 UTC
+November3/sourcef466942. Terminal summary04:08:34.276, no bounded stage repeats.
+Native447fe50/teacher fixed; runner adds10 CLI lines.515 current/22 private
+Python checks,eight refusals,four exact-source scalar Rust cases pass; initial
+import failure retained. Lambda changesboth imagined/replay traces; gameplay
+is unmeasured. Root`/x/Temp/kindle-breakout-lambda1-20261103/native-check` is
+closed, no full learner orallocation active; do not repeat completed stages.
+
 The [fixed pixel-motion readout](results/2026-11-03-cdp-breakout-pixel-motion-readout.md)
 fails its screen: learned-plus-motion teacher agreement55.91% overall/55.88%
 near descending trails actor62.56%/66.91%. One new CPU predecessor capture

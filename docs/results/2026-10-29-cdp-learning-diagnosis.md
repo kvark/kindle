@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [return-lambda1 check](2026-11-03-cdp-breakout-lambda1.md) passes8,192
+actions/489 updates in50.121s and1,024 frozen/.868s withzero updates/no natural
+episodes. Conservative200k projection22m26.028s clears30min. All385 pins,357
+matched initial/invariant tensors,47 pre-update events,replay andguards pass;
+original services succeed04:07:39.518/04:07:43.412 UTC November3/sourcef466942.
+Four exact-source scalar cases confirm continuing,terminal andtimeout semantics.
+Lambda.95→1 changesboth imagined andreal-replay targets,retaining endpoint
+bootstraps; neither gameplay benefit norcause isestablished. Native unchanged,
+no full learner selected. Completed stages must not repeat; initial CPU test
+import failure remains preserved. No GPU allocation active atclosure.
+
 The [fixed pixel-motion readout](2026-11-03-cdp-breakout-pixel-motion-readout.md)
 fails its screen: learned-plus-motion teacher agreement55.91% overall/55.88%
 near descending trails actor62.56%/66.91%. Pixel/motion alone improves over

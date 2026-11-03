@@ -8,6 +8,20 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [lambda1 bounded check](results/2026-11-03-cdp-breakout-lambda1.md)
+passes8,192 actions/32,727 frames/489 updates in50.121s; frozen1,024/.868s has
+zero updates/no natural episodes. Conservative200k projection22m26.028s clears
+30min. All385 pins,357 control-matching initial/invariant frozen tensors,47
+pre-update events,replay andguards pass. Main/collector succeed04:07:39.518/
+04:07:43.412 UTC November3/sourcef466942; terminal summary04:08:34.276.
+Native447fe50/teacher stayfixed; runner9eb21cca adds10 CLI lines.515 current/
+22 private Python checks,eight refusals andfour exact-source scalar Rust cases
+pass; initial import failure remains. No bounded stage fails orrepeats.
+Root`/x/Temp/kindle-breakout-lambda1-20261103/native-check` isclosed. No full
+learner orsuccessor isselected; gameplay remains unmeasured. Lambda changes
+both imagined/replay targets; no causal claim. No allocation active atclosure;
+check live state anddo not repeat completed stages/readers.
+
 The [fixed pixel-motion readout](results/2026-11-03-cdp-breakout-pixel-motion-readout.md)
 fails its screen: learned-plus-motion teacher agreement55.91% overall/55.88%
 near descending trails actor62.56%/66.91%. One new CPU predecessor capture

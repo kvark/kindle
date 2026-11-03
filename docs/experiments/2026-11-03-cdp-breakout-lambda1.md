@@ -1,5 +1,15 @@
 # Breakout fixed-budget return-lambda1 check
 
+**Bounded check complete.** Fresh8,192 actions/489 updates take50.121s;
+1,024 frozen actions/.868s havezero updates/no natural episodes. Conservative
+200k projection22m26.028s clears30min. All385 pins,357 matched initial/invariant
+frozen tensors,47 pre-update events,replay andguards pass. Original main and
+collector succeed04:07:39.518/04:07:43.412 UTC November3/sourcef466942;
+terminal summary completes04:08:34.276. No bounded stage fails orrepeats.
+Initial test-environment import failure remains preserved. No full learner or
+GPU allocation isactive atclosure. [Result](../results/2026-11-03-cdp-breakout-lambda1.md).
+The selection below is retained; completed checks must not repeat.
+
 The retained replay-value1 critic remains weak on complete sampled-policy
 returns. Changing replay bootstrap to posterior values did not improve its
 accepted sampled result. Select one distinct existing native setting: return
