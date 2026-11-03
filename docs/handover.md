@@ -8,6 +8,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [50% episode-guidance Breakout check](results/2026-11-03-cdp-breakout-guidance50.md) passes
+8,192 actions /32,746 frames /489 updates in **48.271s**,1.22% above the retained
+20% guidance check. Padded200k projection **21m36.346s** clears30min. Frozen1024/
+.891s has zero updates, no natural episodes and357 invariant tensors. All56
+current/338 retained pins,357 matching initial tensors, first-episode selection,
+finite reports, full pixel/action/label replay and both guards pass. Actual
+interventions are6,272/8,192 (76.5625%); guided episode probability is.50, not
+that action fraction. Teacher,1920-action cap, labels, B16/T16 recipe and
+native447fe50/runnercf4ea238 stay fixed. No gameplay benefit is established.
+
+CPU qualification passes2.236s with30 rejection cases and zero native agent/
+emulator constructions. Main/collector succeed22:11:15.870/22:11:22.558 UTC
+November3/source7f711b49; no stage fails or repeats. Root
+`/x/Temp/kindle-breakout-guidance50-20261103/check` is closed; do not rerun it.
+No full learner, probability sweep, extension or automatic successor is selected.
+No Kindle allocation remains active at closure; check live state before work.
+Retain70.750 sampled/143.667 greedy; original864/90%-two-wall andfive-game goal
+remain unfinished.
+
 The [completed current-critic B8/T32 Breakout comparison](results/2026-11-03-cdp-breakout-value1-context32.md#full-200k-comparison)
 finishes 200k actions /799,554 frames /12,469 updates in **23m06.548s**,7.66% more
 training time. Primary greedy **116.667** falls 18.79% from 143.667; sampled
