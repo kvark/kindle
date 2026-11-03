@@ -20,29 +20,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
-The [optional native RGB frame-pair check](docs/results/2026-11-03-cdp-rgb-frame-pair.md) completes
-8192 actions /32,713 frames /489 updates in51.357s,7.69% above the retained
-single-image check. Padded200k projection22m59s passes30min; conservative full
-100k replay headroom is6.097GiB. Frozen1024/.877s has zero updates and no natural
-episodes. All42 bounded pins,357 finite/invariant frozen tensors, full training
-pixel/action/label replay and host guards pass. No gameplay benefit is measured.
+The [fresh200k RGB frame-pair comparison](docs/experiments/2026-11-03-cdp-breakout-rgb-frame-pair-200k.md) is separately selected
+for preparation after the [completed bounded check](docs/results/2026-11-03-cdp-rgb-frame-pair.md):51.357s for8192
+fresh actions/489 updates, padded22m59s projection and6.097GiB conservative full
+replay headroom. Native/legacy checks pass; original failures remain preserved.
+Use the same qualified runtime,12M64/Auto/N8/B16/T16/H15/R16/context1,20% guidance,
+expert100/replay-value1 and rates4e-5/4e-4/8e-5. Require100k/6227 recovery and final/
+actual-initial sampled/greedy24-episode assessments against70.750/143.667.
 
-Native geometry, corrected derivatives, paired replay/learning/restore and both
-legacy initial/final1024-action checks pass. Original derivative and CPU audit
-failures remain preserved; no successful GPU stage repeats.171 Kindle/5 gym Rust
-CPU tests,993 Python tests and strict Clippy pass. Native24e701bc/SHA b451bc9,
-corrected test sourceb58333ca; runtime/wheels/tests retained,996MB apparent build
-cache released. Complete23:23:19 UTC November3; no GPU allocation remains active.
-Root`/x/Temp/kindle-rgb-frame-pair-20261103`. No full comparison is selected;
-its decision must use this bounded evidence. Check live state before GPU work.
-
-The failed fixed motion readout does not provide positive evidence for this
-jointly trained input; gameplay benefit isunmeasured. Retain20% guidance,
-70.750 sampled/143.667 greedy andthe original864/90%-two-wall gate. The completed
-50% guidance comparison andits preserved CPU failures remain in the linked
-[result](docs/results/2026-11-03-cdp-breakout-guidance50.md). No full learner, extension,
-sweep orautomatic successor isselected. Check live state before GPU work.
-The five-game goal remains unfinished.
+Both-frame input changes first-layer geometry/initialization and replay storage;
+native, runner and optional-action teacher/schedule source bytes also differ
+from the retained control. Verify full18 default paths; no isolated causal claim.
+No full learner has launched yet. Root`/x/Temp/kindle-rgb-frame-pair-20261103/full`;
+service`kindle-breakout-rgb-pair-200k-20261103`,30min training cap. No extension,
+second learner orautomatic successor. Check live state before GPU work.
+The original864/90%-two-wall gate and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
