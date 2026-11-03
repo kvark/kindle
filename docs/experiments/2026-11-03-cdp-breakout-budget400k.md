@@ -60,8 +60,31 @@ original identities and stop on failures. Repair CPU processing separately;
 never repeat completed GPU stages because an observer or audit failed.
 
 Root `/x/Temp/kindle-breakout-budget400k-20261103/full`, intended service
-`kindle-breakout-budget400k-20261103`. Selection only: CPU harness qualification
-and launch are pending. Check live state before work; no overlapping GPU jobs.
+`kindle-breakout-budget400k-20261103`. CPU harness qualification passes; launch is pending. Check live state before work; no overlapping GPU jobs.
 No extension,coefficient sweep,fresh-seed confirmation or automatic successor
 is selected. This reused seed/cohort cannot establish independent reliability.
 Breakout and the five-game goal remain unfinished.
+
+
+## CPU qualification and fixed service wiring
+
+The first CPU preflight passes62 cases and all five actual CLI paths in4.757s
+(4.814s wrapper). No native agent or emulator is constructed. It validates the
+400k accounting, three retained checkpoints, common-prefix failure cases,
+score coverage, frozen scorer, journal identities, transient poll retry and
+plot-environment imports. The retained200k semantic reader covers38,050 events,
+including25,000 transitions and12,477 learner reports;357 initial tensors are
+finite. All338 control/413 halfway pins pass. Sources, original generation
+receipt and the fixed terminal reader are retained under the private root.
+No failed preparation or GPU work occurs in this qualification.
+
+The main service runs training first, then requires all recovery checks before
+starting the four frozen arms. A mismatch stops that original learner for
+diagnosis; it cannot start a replacement. Recovery observation expires at3,900s
+without changing the learner. Transient polling errors are retried. Service
+limits are7,800s main,4,000s recovery,8,100s progress/postprocessing and8,400s
+collection; training itself remains capped at3,000s. Original process identities
+are recorded at launch. Startup checks all initial tensors,47 common pre-update
+transitions, first six update counters and finite reports. Final collection and
+the separately fixed terminal reader validate outputs and original journals;
+CPU processing failure never authorizes repeating a completed GPU stage.

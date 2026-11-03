@@ -9,7 +9,8 @@ conservative measured projection47m13.403s. Preserve100k/6,227,200k/12,477 and
 four fixed24-episode frozen arms. No prior experience transfers or completed
 stage repeats.
 This tests more learning work,not a wall-time speedup or independent seed.
-CPU harness qualification and launch are pending; no learner is active.
+CPU qualification passes62 cases/five actual CLI paths in4.757s; launch remains
+pending and no learner is active.
 Root `/x/Temp/kindle-breakout-budget400k-20261103/full`. Check live state before
 work; do not restart closed services or overlap GPU allocations.
 
