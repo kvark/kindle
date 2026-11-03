@@ -831,8 +831,14 @@ mod tests {
 
     fn frame(index: usize, config: &DreamerConfig) -> ReplayFrame {
         let size = config.network();
+        let values = vec![index as f32; config.observation_dim()];
+        let observation = if config.observation_kind.is_rgb() {
+            Observation::rgb(values, config.observation_grid())
+        } else {
+            Observation::from_vec(values)
+        };
         ReplayFrame {
-            observation: Observation::from_vec(vec![index as f32; config.observation_dim()]),
+            observation,
             previous_action: (index > 0).then_some(index % config.action_count),
             reward: Reward {
                 extrinsic: index as f32,
@@ -844,6 +850,21 @@ mod tests {
             },
             deter: vec![index as f32; size.deter].into_boxed_slice(),
             stoch: vec![index as f32; size.stoch * size.classes].into_boxed_slice(),
+        }
+    }
+
+    #[test]
+    fn replay_fixture_supports_feature_and_rgb_geometry() {
+        use super::super::ObservationKind;
+        let mut config = DreamerConfig::tiny(3);
+        for kind in [
+            ObservationKind::Features,
+            ObservationKind::Rgb32,
+            ObservationKind::Rgb48,
+            ObservationKind::Rgb64,
+        ] {
+            config.observation_kind = kind;
+            frame(7, &config).validate(&config);
         }
     }
 
