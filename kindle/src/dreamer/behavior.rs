@@ -348,16 +348,22 @@ mod tests {
     #[test]
     #[ignore = "requires separately guarded completed-return actor gradient qualification"]
     fn completed_return_actor_matches_f64_bias_derivatives_and_zero_masks() {
-        check_completed_return_actor_derivatives(false);
+        check_completed_return_actor_derivatives(false, false);
     }
 
     #[test]
     #[ignore = "requires separately guarded conservative-return actor gradient qualification"]
     fn conservative_return_actor_matches_f64_bias_derivatives_and_zero_masks() {
-        check_completed_return_actor_derivatives(true);
+        check_completed_return_actor_derivatives(true, false);
     }
 
-    fn check_completed_return_actor_derivatives(lower_bound: bool) {
+    #[test]
+    #[ignore = "requires separately guarded segmented-return actor gradient qualification"]
+    fn segmented_return_actor_matches_f64_bias_derivatives_and_zero_masks() {
+        check_completed_return_actor_derivatives(true, true);
+    }
+
+    fn check_completed_return_actor_derivatives(lower_bound: bool, auxiliary_boundaries: bool) {
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         assert_eq!(
             gpu.device_information().device_name,
@@ -372,6 +378,7 @@ mod tests {
                 config.actor_unimix = unimix;
                 config.replay_actor_scale = Some(100.0);
                 config.replay_actor_observed_lower_bound = lower_bound;
+                config.replay_actor_auxiliary_boundaries = auxiliary_boundaries;
                 config.disagreement_bonus = lower_bound;
                 config.intrinsic_reward_scale = f32::from(lower_bound);
                 config.expert_imitation = expert.then(|| ExpertImitation {

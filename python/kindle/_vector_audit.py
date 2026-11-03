@@ -116,6 +116,22 @@ def audit(path):
             require_numbers(replay_actor_scale)
             check(replay_actor_scale > 0 and (not disagreement or lower_bound),
                 "completed-return actor requires positive scale and observed rewards or explicit lower-bound mode")
+        auxiliary_boundaries = config.get("replay_actor_auxiliary_boundaries", False)
+        check(type(auxiliary_boundaries) is bool, "invalid auxiliary actor boundaries")
+        check(not auxiliary_boundaries or (lower_bound and config.get("extrinsic_reward_scale", 1) >= 0
+                                          and config.get("intrinsic_reward_scale", 0) >= 0),
+              "auxiliary actor boundaries require lower-bound mode and nonnegative reward scales")
+        life_boundaries = header.get("actor_return_boundary_kind")
+        if life_boundaries is not None:
+            check(life_boundaries == "breakout-raw-frame-life-loss-v1" and auxiliary_boundaries
+                  and header["mode"] == "train" and header["environment"] == "ALE/Breakout-v5"
+                  and header.get("restored_checkpoint") is None, "invalid life-boundary protocol")
+            expected_hash = hashlib.sha256(Path(__file__).with_name("_return_boundaries.py").read_bytes()).hexdigest()
+            check(header.get("actor_return_boundary_sha256") == expected_hash,
+                  "life-boundary implementation differs")
+        else:
+            check("actor_return_boundary_sha256" not in header, "undeclared life-boundary source")
+            check(not auxiliary_boundaries or header["mode"] != "train", "undeclared life boundaries")
         open_loop = config.get("open_loop_supervision")
         if open_loop is not None:
             check(isinstance(open_loop, dict) and set(open_loop) == {"horizon", "scale"},
@@ -258,6 +274,19 @@ def audit(path):
                 check(event["run_step"] == actions and event["vector_tick"] == actions // count, "vector/action counter mismatch")
                 for field in ("actions", "rewards", "stored_rewards", "terminated", "truncated", "executed_action_frames"):
                     check(len(event[field]) == count, f"wrong {field} batch length")
+                for field in ("actor_return_boundaries", "actor_return_losses", "actor_return_gains"):
+                    if life_boundaries:
+                        check(isinstance(event.get(field), list) and len(event[field]) == count,
+                              f"wrong {field} batch length")
+                    else:
+                        check(field not in event, "undeclared actor-return boundaries")
+                if life_boundaries:
+                    check(all(type(value) is bool for value in event["actor_return_boundaries"]),
+                          "invalid actor-return boundary flag")
+                    check(all(type(value) is int and value >= 0 for field in ("actor_return_losses", "actor_return_gains")
+                              for value in event[field]), "invalid life-change count")
+                    check(event["actor_return_boundaries"] == [value > 0 for value in event["actor_return_losses"]],
+                          "actor-return boundaries differ from life losses")
                 for field in ("behavior_values", "behavior_intrinsic"):
                     if behavior_probe:
                         check(isinstance(event.get(field), list) and len(event[field]) == count,
@@ -311,6 +340,9 @@ def audit(path):
                     require_numbers(event["stored_rewards"][stream])
                     check(len(event["stored_rewards"][stream]) == 2, "stored reward must separate extrinsic and intrinsic")
                     check(event["stored_rewards"][stream][0] == reward, "stored extrinsic reward differs")
+                    if auxiliary_boundaries:
+                        check(all(value >= 0 for value in event["stored_rewards"][stream]),
+                              "auxiliary actor boundaries require nonnegative observed rewards")
                     terminal, truncated = event["terminated"][stream], event["truncated"][stream]
                     check(type(terminal) is bool and type(truncated) is bool, "invalid boundary flags")
                     frames = event["executed_action_frames"][stream]

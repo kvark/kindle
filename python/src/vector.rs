@@ -31,6 +31,9 @@ impl PyVectorAgent {
     const SUPPORTS_CONSERVATIVE_RETURN_ACTOR: bool = true;
 
     #[classattr]
+    const SUPPORTS_ACTOR_RETURN_BOUNDARIES: bool = true;
+
+    #[classattr]
     const SUPPORTS_EXPERT_WORLD_GRADIENT: bool = true;
 
     #[classattr]
@@ -205,6 +208,7 @@ impl PyVectorAgent {
             .map_err(PyValueError::new_err)
     }
 
+    #[pyo3(signature = (streams, frames, rewards, terminated, truncated, *, actor_boundaries = None))]
     fn observe(
         &mut self,
         streams: Vec<usize>,
@@ -212,6 +216,7 @@ impl PyVectorAgent {
         rewards: Vec<f32>,
         terminated: Vec<bool>,
         truncated: Vec<bool>,
+        actor_boundaries: Option<Vec<bool>>,
     ) -> PyResult<Vec<(f32, f32)>> {
         validate_streams(&streams, self.inner.stream_count(), frames.len())?;
         let count = frames.len();
@@ -222,6 +227,18 @@ impl PyVectorAgent {
         }
         if !rewards.iter().all(|r| r.is_finite()) {
             return Err(PyValueError::new_err("rewards must be finite"));
+        }
+        if let Some(boundaries) = &actor_boundaries {
+            if !self.inner.config().replay_actor_auxiliary_boundaries {
+                return Err(PyValueError::new_err(
+                    "auxiliary actor boundaries are not enabled",
+                ));
+            }
+            if boundaries.len() != count || rewards.iter().any(|&reward| reward < 0.0) {
+                return Err(PyValueError::new_err(
+                    "actor boundaries require one boolean per arrival and nonnegative rewards",
+                ));
+            }
         }
         let transitions = streams
             .into_iter()
@@ -242,9 +259,14 @@ impl PyVectorAgent {
                 ))
             })
             .collect::<PyResult<Vec<_>>>()?;
-        Ok(self
-            .inner
-            .observe(&transitions)
+        let stored = match actor_boundaries {
+            Some(boundaries) => self
+                .inner
+                .observe_with_actor_boundaries(&transitions, &boundaries)
+                .map_err(PyValueError::new_err)?,
+            None => self.inner.observe(&transitions),
+        };
+        Ok(stored
             .into_iter()
             .map(|r| (r.extrinsic, r.intrinsic))
             .collect())

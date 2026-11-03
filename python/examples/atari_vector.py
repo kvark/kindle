@@ -29,6 +29,8 @@ import kindle._breakout_guidance as breakout_guidance_module
 from kindle._breakout_guidance import BreakoutGuidance
 from kindle._qbert_guidance import BOUNDED_GUIDANCE_KIND, GUIDANCE_KIND, QbertGuidance
 import kindle._exploration as exploration_module
+import kindle._return_boundaries as return_boundaries_module
+from kindle._return_boundaries import LIFE_BOUNDARY_KIND, LifeBoundaryMonitor
 from kindle._exploration import EXPLORATION_KIND, EXPLORATION_PROTOCOL, PersistentExploration
 from atari import (
     ATARI_ACTION_REPEAT, ATARI_PROTOCOLS, DreamerAtariPreprocessing,
@@ -125,6 +127,8 @@ def main():
                         help="fresh training: positive-advantage imitation of completed observed returns")
     parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
                         help="with replay-actor-scale and active disagreement: conservatively compare observed returns with the combined critic")
+    parser.add_argument("--breakout-return-life-boundaries", action="store_true",
+                        help="fresh Breakout training: stop auxiliary observed actor returns at raw-frame life losses")
     parser.add_argument("--return-lambda", type=float,
                         help="fresh training only: imagined and replay return trace mixture in [0,1]; omitted: native default")
     parser.add_argument("--replay-value-bootstrap", choices=("imagined", "posterior"),
@@ -214,6 +218,10 @@ def main():
     if args.replay_actor_observed_lower_bound and (
             args.replay_actor_scale is None or not positive_f32(args.disagreement_scale)):
         parser.error("observed lower-bound mode requires replay-actor-scale and positive disagreement-scale")
+    if args.breakout_return_life_boundaries and (
+            args.environment != "ALE/Breakout-v5" or args.restore or args.evaluate
+            or not args.replay_actor_observed_lower_bound):
+        parser.error("return life boundaries require fresh Breakout training with observed lower-bound mode")
     if args.replay_actor_scale is not None:
         if not positive_f32(args.replay_actor_scale):
             parser.error("replay-actor-scale must be finite and positive in F32")
@@ -419,6 +427,8 @@ def main():
         parser.error("replay-actor-scale requires native completed-return actor support")
     if args.replay_actor_observed_lower_bound and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False):
         parser.error("observed lower-bound mode requires native conservative-return actor support")
+    if args.breakout_return_life_boundaries and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RETURN_BOUNDARIES", False):
+        parser.error("return life boundaries require native actor-return boundary support")
     if args.replay_context is not None and args.replay_context > 1 and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_CONTEXT", False):
         parser.error("replay-context requires native prefix support")
     if args.restore and args.encoder:
@@ -435,6 +445,9 @@ def main():
         if (metadata.get("config", {}).get("replay_actor_observed_lower_bound", False)
                 and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False)):
             parser.error("observed lower-bound checkpoint requires native conservative-return actor support")
+        if (metadata.get("config", {}).get("replay_actor_auxiliary_boundaries", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RETURN_BOUNDARIES", False)):
+            parser.error("auxiliary-boundary checkpoint requires native actor-return boundary support")
         if (metadata.get("config", {}).get("observation_crop") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_CROP", False)):
             parser.error("cropped checkpoint requires native RGB crop support")
@@ -487,6 +500,7 @@ def main():
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     gym.register_envs(ale_py)
     environments = []
+    life_monitors = []
     output = args.output.open("x")
     memory_output = None
 
@@ -517,13 +531,19 @@ def main():
         env_seeds = [(args.seed + stream * 1_000_003) % 2**32 for stream in range(args.num_envs)]
         initial = []
         for seed in env_seeds:
-            env = DreamerAtariPreprocessing(gym.make(
+            env = gym.make(
                 args.environment, frameskip=1, repeat_action_probability=args.sticky_actions,
                 full_action_space=protocol.full_action_space,
-            ), noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
+            )
+            if args.breakout_return_life_boundaries:
+                env = LifeBoundaryMonitor(env)
+                life_monitors.append(env)
+            env = DreamerAtariPreprocessing(env, noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
                 screen_size=None if args.observation_size == "native" else 64)
             environments.append(env)
             initial.append(env.reset(seed=seed)[0])
+            if args.breakout_return_life_boundaries:
+                life_monitors[-1].take_changes()
         actions = int(environments[0].action_space.n)
         config = kindle.default_config(actions, args.model_size)
         config.update(seed=args.seed, batch_size=args.batch_size, batch_length=args.batch_length,
@@ -551,6 +571,8 @@ def main():
             config["replay_actor_scale"] = args.replay_actor_scale
         if args.replay_actor_observed_lower_bound:
             config["replay_actor_observed_lower_bound"] = True
+        if args.breakout_return_life_boundaries:
+            config["replay_actor_auxiliary_boundaries"] = True
         if args.return_lambda is not None:
             config["lambda"] = args.return_lambda
         if args.replay_value_bootstrap is not None:
@@ -654,6 +676,9 @@ def main():
                   **(dict(action_temperature=args.action_temperature) if args.action_temperature is not None else {}),
                   **(dict(posterior_mode="greedy") if args.greedy_posterior else {}),
                   **(dict(behavior_probe="live-posterior-v1") if args.probe_behavior else {}),
+                  **(dict(actor_return_boundary_kind=LIFE_BOUNDARY_KIND,
+                          actor_return_boundary_sha256=sha256_file(return_boundaries_module.__file__))
+                     if args.breakout_return_life_boundaries else {}),
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,
                   cpu_worker_threads=agent.cpu_worker_threads,
                   trainable_parameter_counts=agent.trainable_parameter_counts,
@@ -746,7 +771,17 @@ def main():
                 frames, rewards, terminated, truncated, _ = map(list, zip(*results))
                 current_frames = frames
                 before = time.perf_counter()
-                stored_rewards = agent.observe(ids, frames, rewards, terminated, truncated)
+                boundary_fields = {}
+                if life_monitors:
+                    changes = [monitor.take_changes() for monitor in life_monitors]
+                    boundaries = [losses > 0 for losses, _ in changes]
+                    boundary_fields = dict(actor_return_boundaries=boundaries,
+                        actor_return_losses=[losses for losses, _ in changes],
+                        actor_return_gains=[gains for _, gains in changes])
+                    stored_rewards = agent.observe(ids, frames, rewards, terminated, truncated,
+                                                   actor_boundaries=boundaries)
+                else:
+                    stored_rewards = agent.observe(ids, frames, rewards, terminated, truncated)
                 timing["observe"] += time.perf_counter() - before
                 check_memory("observe", run_actions + args.num_envs)
                 run_actions += args.num_envs
@@ -754,6 +789,7 @@ def main():
                           actions=selected, rewards=rewards, stored_rewards=stored_rewards,
                           terminated=terminated, truncated=truncated,
                           executed_action_frames=[env.executed_action_frames for env in environments],
+                          **boundary_fields,
                           **behavior,
                           **(dict(guidance_frame_sha256=exploration.frame_sha256) if guidance else {}),
                           **(dict(action_overrides=overrides) if exploration else {}),
@@ -792,6 +828,8 @@ def main():
                     agent.begin_episodes(resets, reset_frames)
                     for stream, frame in zip(resets, reset_frames):
                         current_frames[stream] = frame
+                        if life_monitors:
+                            life_monitors[stream].take_changes()
                     check_memory("reset", run_actions)
                     if exploration:
                         exploration.reset(resets)

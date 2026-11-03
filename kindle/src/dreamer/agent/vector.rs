@@ -82,6 +82,30 @@ fn check_action_overrides(
     Ok(())
 }
 
+fn check_actor_boundaries(
+    config: &DreamerConfig,
+    count: usize,
+    boundaries: &[bool],
+    rewards: impl Iterator<Item = Reward>,
+) -> Result<(), &'static str> {
+    if !config.replay_actor_auxiliary_boundaries {
+        return Err("auxiliary actor boundaries are not enabled");
+    }
+    if boundaries.len() != count {
+        return Err("actor boundaries must have one entry per arrival");
+    }
+    for reward in rewards {
+        if !reward.extrinsic.is_finite()
+            || !reward.intrinsic.is_finite()
+            || reward.extrinsic < 0.0
+            || reward.intrinsic < 0.0
+        {
+            return Err("auxiliary actor boundaries require finite nonnegative rewards");
+        }
+    }
+    Ok(())
+}
+
 fn check_expert_labels(
     config: &DreamerConfig,
     streams: usize,
@@ -213,6 +237,11 @@ impl VectorCore {
             assert!(id < seen.len() && !seen[id], "invalid or repeated stream");
             seen[id] = true;
             assert!(reward.extrinsic.is_finite() && reward.intrinsic.is_finite());
+            assert!(
+                !self.learner.config.replay_actor_auxiliary_boundaries
+                    || (reward.extrinsic >= 0.0 && reward.intrinsic >= 0.0),
+                "auxiliary actor boundaries require nonnegative rewards"
+            );
             assert!(!flags.is_terminal || flags.is_last);
             let stream = &self.streams[id];
             if flags.is_first {
@@ -1143,6 +1172,30 @@ impl VectorDreamerAgent {
                 .map(|(id, t)| (*id, t))
                 .collect::<Vec<_>>(),
         )
+    }
+
+    /// Close auxiliary actor returns without changing episode or critic flags.
+    pub fn observe_with_actor_boundaries(
+        &mut self,
+        transitions: &[(usize, Transition)],
+        boundaries: &[bool],
+    ) -> Result<Vec<Reward>, &'static str> {
+        check_actor_boundaries(
+            &self.core.learner.config,
+            transitions.len(),
+            boundaries,
+            transitions.iter().map(|(_, transition)| transition.reward),
+        )?;
+        let rewards = self.observe(transitions);
+        for ((stream, _), &boundary) in transitions.iter().zip(boundaries) {
+            if boundary {
+                self.core
+                    .learner
+                    .replay
+                    .mark_actor_return_boundary(*stream, &self.core.learner.config);
+            }
+        }
+        Ok(rewards)
     }
 
     pub(super) fn observe_refs(&mut self, transitions: &[(usize, &Transition)]) -> Vec<Reward> {
@@ -2330,6 +2383,32 @@ mod tests {
         assert!(check_expert_labels(&config, 2, &[Some(0)]).is_err());
         assert!(check_expert_labels(&config, 2, &[Some(0), Some(3)]).is_err());
         assert!(check_expert_labels(&config, 2, &[Some(usize::MAX), None]).is_err());
+    }
+
+    #[test]
+    fn actor_boundary_arguments_are_checked_before_observation() {
+        let mut config = DreamerConfig::tiny(3);
+        let good = Reward::default();
+        assert!(check_actor_boundaries(&config, 1, &[true], [good].into_iter()).is_err());
+        config.replay_actor_auxiliary_boundaries = true;
+        assert!(check_actor_boundaries(&config, 2, &[false, true], [good; 2].into_iter()).is_ok());
+        assert!(check_actor_boundaries(&config, 2, &[false], [good; 2].into_iter()).is_err());
+        for value in [-1.0, f32::NAN, f32::INFINITY] {
+            for reward in [
+                Reward {
+                    extrinsic: value,
+                    ..good
+                },
+                Reward {
+                    intrinsic: value,
+                    ..good
+                },
+            ] {
+                assert!(
+                    check_actor_boundaries(&config, 1, &[false], [reward].into_iter()).is_err()
+                );
+            }
+        }
     }
 
     #[test]

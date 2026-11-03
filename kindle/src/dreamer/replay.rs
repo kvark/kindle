@@ -78,6 +78,7 @@ pub struct SequenceReplay {
 struct StoredFrame {
     values: FrameValues,
     completed_return: Option<f32>,
+    actor_return_boundary: bool,
     previous_expert_action: Option<usize>,
     previous_action: Option<usize>,
     reward: Reward,
@@ -114,6 +115,27 @@ struct ReplayStream {
 impl ReplayStream {
     fn oldest_frame(&self) -> u64 {
         self.total_frames - self.frames.len() as u64
+    }
+
+    fn complete_actor_returns(&mut self, config: &DreamerConfig) {
+        let mut next = 0.0_f64;
+        for (offset, frame) in self.frames.iter_mut().rev().enumerate() {
+            if offset > 0 && frame.flags.is_last {
+                break;
+            }
+            // A live boundary arrival starts the next segment, whose outgoing
+            // return remains unknown until that segment ends.
+            if offset > 0 || frame.flags.is_terminal {
+                let value = next as f32;
+                assert!(value.is_finite(), "completed observed return overflowed");
+                frame.completed_return = Some(value);
+            }
+            if frame.flags.is_first || (offset > 0 && frame.actor_return_boundary) {
+                break;
+            }
+            next =
+                frame.reward.combined(config) as f64 + config.continuation_discount() as f64 * next;
+        }
     }
 }
 
@@ -180,12 +202,30 @@ impl SequenceReplay {
                 },
                 previous_expert_action: None,
                 completed_return: None,
+                actor_return_boundary: false,
                 previous_action: frame.previous_action,
                 reward: frame.reward,
                 flags: frame.flags,
             },
             config,
         );
+    }
+
+    pub(super) fn mark_actor_return_boundary(&mut self, stream: usize, config: &DreamerConfig) {
+        assert!(config.replay_actor_auxiliary_boundaries);
+        let history = &mut self.streams[stream];
+        let arrival = history
+            .frames
+            .back_mut()
+            .expect("boundary needs an arrival");
+        assert!(!arrival.flags.is_first && arrival.previous_action.is_some());
+        assert!(!arrival.actor_return_boundary, "duplicate actor boundary");
+        arrival.actor_return_boundary = true;
+        // Real terminals have already completed their segment; timeouts remain
+        // ineligible even if a life loss coincides with the cutoff.
+        if !arrival.flags.is_last {
+            history.complete_actor_returns(config);
+        }
     }
 
     pub(super) fn enable_device(
@@ -245,6 +285,7 @@ impl SequenceReplay {
                     previous_action,
                     previous_expert_action,
                     completed_return: None,
+                    actor_return_boundary: false,
                     reward,
                     flags,
                 },
@@ -278,20 +319,7 @@ impl SequenceReplay {
         history.next_encoder_phase = (phase + 1) % crate::vision::levjepa::FRAMES;
         history.frames.push_back(frame);
         if complete {
-            let mut next = 0.0_f64;
-            for (offset, frame) in history.frames.iter_mut().rev().enumerate() {
-                if offset > 0 && frame.flags.is_last {
-                    break;
-                }
-                let value = next as f32;
-                assert!(value.is_finite(), "completed episode return overflowed");
-                frame.completed_return = Some(value);
-                if frame.flags.is_first {
-                    break;
-                }
-                next = frame.reward.combined(config) as f64
-                    + config.continuation_discount() as f64 * next;
-            }
+            history.complete_actor_returns(config);
         }
 
         history.total_frames = history
@@ -590,7 +618,7 @@ pub struct SequenceBatch {
     pub pixels: Option<Vec<Vec<f32>>>,
     pub previous_actions: Vec<Vec<f32>>,
     pub previous_expert_action: Vec<Vec<Option<usize>>>,
-    /// Return from each state through a known true terminal; absent otherwise.
+    /// Return through a known terminal or auxiliary boundary; absent otherwise.
     pub completed_returns: Vec<Vec<Option<f32>>>,
     pub rewards: Vec<Vec<f32>>,
     pub flags: Vec<Vec<FrameFlags>>,
@@ -742,6 +770,118 @@ mod tests {
                 .iter()
                 .all(|f| f.completed_return.is_none())
         );
+    }
+
+    #[test]
+    fn auxiliary_boundary_keeps_arrival_pending_and_preserves_prior_segment() {
+        let mut config = DreamerConfig::tiny(3);
+        config.horizon = 2;
+        config.replay_actor_scale = Some(1.0);
+        config.replay_actor_auxiliary_boundaries = true;
+        let mut replay = SequenceReplay::new(32);
+        for index in 0..3 {
+            replay.push(frame(index, &config), &config);
+        }
+        replay.mark_actor_return_boundary(0, &config);
+        let values = |r: &SequenceReplay| {
+            r.streams[0]
+                .frames
+                .iter()
+                .map(|f| f.completed_return)
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(values(&replay), [Some(2.0), Some(2.0), None]);
+        assert!(!replay.streams[0].frames[2].flags.is_last);
+        replay.push(frame(3, &config), &config);
+        let mut terminal = frame(4, &config);
+        terminal.flags.is_last = true;
+        terminal.flags.is_terminal = true;
+        replay.push(terminal, &config);
+        replay.mark_actor_return_boundary(0, &config);
+        assert_eq!(
+            values(&replay),
+            [Some(2.0), Some(2.0), Some(5.0), Some(4.0), Some(0.0)]
+        );
+        assert_eq!(replay.len(), 5);
+        assert_eq!(replay.streams[0].total_frames, 5);
+    }
+
+    #[test]
+    fn adjacent_actor_cuts_do_not_finalize_timeout_or_cross_reset() {
+        let mut config = DreamerConfig::tiny(3);
+        config.replay_actor_scale = Some(1.0);
+        config.replay_actor_auxiliary_boundaries = true;
+        let mut replay = SequenceReplay::new(32);
+        replay.push(frame(0, &config), &config);
+        for index in 1..3 {
+            replay.push(frame(index, &config), &config);
+            replay.mark_actor_return_boundary(0, &config);
+        }
+        let mut timeout = frame(3, &config);
+        timeout.flags.is_last = true;
+        replay.push(timeout, &config);
+        replay.mark_actor_return_boundary(0, &config);
+        replay.push(frame(0, &config), &config);
+        let mut terminal = frame(9, &config);
+        terminal.flags.is_last = true;
+        terminal.flags.is_terminal = true;
+        replay.push(terminal, &config);
+        assert_eq!(
+            replay.streams[0]
+                .frames
+                .iter()
+                .map(|f| f.completed_return)
+                .collect::<Vec<_>>(),
+            [Some(1.0), Some(2.0), None, None, Some(9.0), Some(0.0)]
+        );
+    }
+
+    #[test]
+    fn segmented_replay_matches_forward_returns_without_changing_samples() {
+        let mut config = DreamerConfig::tiny(3);
+        config.horizon = 7;
+        config.replay_context = 3;
+        config.replay_actor_scale = Some(1.0);
+        config.replay_actor_auxiliary_boundaries = true;
+        let mut replay = SequenceReplay::with_streams(30, 2);
+        let mut control = SequenceReplay::with_streams(30, 2);
+        for index in 0..30 {
+            for lane in 0..2 {
+                let mut arrival = frame(index, &config);
+                arrival.reward.extrinsic = (index * (lane + 1)) as f32;
+                arrival.flags.is_last = index == 29;
+                arrival.flags.is_terminal = index == 29;
+                replay.push_stream(lane, arrival.clone(), &config);
+                control.push_stream(lane, arrival, &config);
+                if index > 0 && index % (4 + lane) == 0 {
+                    replay.mark_actor_return_boundary(lane, &config);
+                }
+            }
+        }
+        for lane in 0..2 {
+            for (offset, stored) in replay.streams[lane].frames.iter().enumerate() {
+                let index = replay.streams[lane].oldest_frame() as usize + offset;
+                let end = (index + 1..30).find(|i| i % (4 + lane) == 0).unwrap_or(29);
+                let expected = (index + 1..=end)
+                    .enumerate()
+                    .map(|(offset, i)| {
+                        (i * (lane + 1)) as f64
+                            * (config.continuation_discount() as f64).powi(offset as i32)
+                    })
+                    .sum::<f64>() as f32;
+                assert_eq!(stored.completed_return, Some(expected));
+            }
+        }
+        let mut rng = StdRng::seed_from_u64(91);
+        let mut other_rng = rng.clone();
+        for _ in 0..10 {
+            let batch = replay.sample(&config, &mut rng).unwrap();
+            let other = control.sample(&config, &mut other_rng).unwrap();
+            assert_eq!(batch.observations, other.observations);
+            assert_eq!(batch.previous_actions, other.previous_actions);
+            assert_eq!(batch.flags, other.flags);
+            assert_eq!(batch.rewards, other.rewards);
+        }
     }
 
     #[test]
@@ -1024,6 +1164,7 @@ mod tests {
                         previous_action: (!first).then_some(0),
                         previous_expert_action: None,
                         completed_return: None,
+                        actor_return_boundary: false,
                         reward: Reward::default(),
                         flags: FrameFlags {
                             is_first: first,

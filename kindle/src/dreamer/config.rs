@@ -391,6 +391,10 @@ pub struct DreamerConfig {
     /// critic also includes nonnegative model-derived disagreement rewards.
     #[serde(default, skip_serializing_if = "is_false")]
     pub replay_actor_observed_lower_bound: bool,
+    /// Allow caller-supplied boundaries for the auxiliary observed-return actor.
+    /// These do not end game episodes or change model/critic continuation.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub replay_actor_auxiliary_boundaries: bool,
     pub learning_rate_warmup: u64,
     pub optimizer_beta1: f32,
     pub optimizer_beta2: f32,
@@ -468,6 +472,7 @@ impl DreamerConfig {
             expert_imitation: None,
             replay_actor_scale: None,
             replay_actor_observed_lower_bound: false,
+            replay_actor_auxiliary_boundaries: false,
             learning_rate_warmup: 1_000,
             optimizer_beta1: 0.9,
             optimizer_beta2: 0.999,
@@ -652,6 +657,13 @@ impl DreamerConfig {
             && (self.replay_actor_scale.is_none() || !self.uses_disagreement())
         {
             return Err("observed lower-bound mode requires completed-return actor learning and active disagreement".into());
+        }
+        if self.replay_actor_auxiliary_boundaries
+            && (!self.replay_actor_observed_lower_bound
+                || self.extrinsic_reward_scale < 0.0
+                || self.intrinsic_reward_scale < 0.0)
+        {
+            return Err("auxiliary actor boundaries require observed lower-bound mode and nonnegative reward scales".into());
         }
         let size = self.network();
         if let Some(crop) = self.observation_crop {
@@ -982,6 +994,30 @@ mod tests {
             config.replay_actor_scale = Some(scale);
             assert!(config.check().is_err());
         }
+    }
+
+    #[test]
+    fn auxiliary_actor_boundaries_require_lower_bound_and_preserve_defaults() {
+        let mut config = DreamerConfig::tiny(3);
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert!(legacy.get("replay_actor_auxiliary_boundaries").is_none());
+        assert!(
+            !serde_json::from_value::<DreamerConfig>(legacy)
+                .unwrap()
+                .replay_actor_auxiliary_boundaries
+        );
+        config.replay_actor_auxiliary_boundaries = true;
+        assert!(config.check().is_err());
+        config.replay_actor_scale = Some(100.0);
+        config.replay_actor_observed_lower_bound = true;
+        config.disagreement_bonus = true;
+        config.intrinsic_reward_scale = 1.0;
+        config.check().unwrap();
+        let restored: DreamerConfig =
+            serde_json::from_value(serde_json::to_value(&config).unwrap()).unwrap();
+        assert_eq!(restored, config);
+        config.extrinsic_reward_scale = -1.0;
+        assert!(config.check().is_err());
     }
 
     #[test]
