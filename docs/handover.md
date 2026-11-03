@@ -8,21 +8,29 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
-The [fresh current-critic B8/T32 Breakout comparison](experiments/2026-11-03-cdp-breakout-value1-context32-200k.md) is **running**,
-launched21:30:20 UTC November3/source06c873c2 with122 pins. Fixed200k actions /
-12,469 updates /30min,12M64/Auto/N8/B8/T32/H15/R16,behavior8e-5/replay-value1/
-expert100,full18,native447fe50/runnercf4ea238. Startup passes357 initial tensors
-against both bounded andretained controls,63 bounded/47 shared pre-update events,
-andfirst update504. MainPID1071673/invocation`2cecc3ab00f9498795197cf1de25639a`;
-the terminal observer remains active. Read-only 100k/6,219 recovery passes
-21:42:21.105 UTC: all 357 finite tensors and 122 pins, original learner identity
-unchanged; independent CPU verification takes .478s. Four final/actual-initial
-24-natural-episode arms remain pending; greedy primary, sampled secondary,
-against retained143.667/70.750. No full result is available. Root
-`/x/Temp/kindle-breakout-value1-context32-20261103/full`;service
-`kindle-breakout-value1-context32-200k-20261103`. Check live state;do not restart
-oroverlap this learner. Bounded CPU failures remain preserved. No extension or
-automatic successor;the original864/90%-two-wall andfive-game goal remain unfinished.
+The [completed current-critic B8/T32 Breakout comparison](results/2026-11-03-cdp-breakout-value1-context32.md#full-200k-comparison)
+finishes 200k actions /799,554 frames /12,469 updates in **23m06.548s**,7.66% more
+training time. Primary greedy **116.667** falls 18.79% from 143.667; sampled
+**94.583** rises 33.69% from 70.750. All 0/24 two-wall; own initials 2.208/1.417 match.
+Greedy gain/min falls 24.84%, paired difference −1.637 [−3.928,.686]; sampled
+rises 24.82%, difference +.802 [−.517,2.496]. Both intervals span zero. The fixed
+primary improvement rule fails; retain B16/T16 and the existing recipe. No
+reliable harm, sampled advantage, isolated memory effect or seed reliability
+is established.
+
+All 122 current/338 retained pins, 100k/6,219 recovery, 357 matched initial/invariant
+frozen tensors, 63 bounded/47 shared pre-update and 799/794 actual-initial semantic
+events, full replays/videos, guards, curves, exposure and comparison pass.
+Native 447fe50/runnercf4ea238 stay unchanged. Actual overrides 46.948%; late expert
+CE .610334 versus .560514 and 1,598 native actions at scores 216–431 are descriptive,
+not causal evidence. No training action reaches 432. Main succeeds 21:58:08.786 UTC
+November 3/source06c873c2; terminal collector succeeds 21:58:53.098 in 2.466s.
+All three services succeed; no full stage fails or repeats. Bounded CPU failures
+remain preserved. Root `/x/Temp/kindle-breakout-value1-context32-20261103/full`
+is closed; do not restart or repeat observers. No extension, confirmation,
+context sweep or automatic successor is selected. No Kindle allocation remains
+active at closure; check live state before work. The original 864/90%-two-wall
+and five-game goal remain unfinished.
 
 The [current-critic Breakout B8/T32 check](results/2026-11-03-cdp-breakout-value1-context32.md) passes8192 actions /32,722 frames /
 481 updates in51.909s; padded200k projection23m14.028s clears30min. Frozen1024/
