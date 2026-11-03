@@ -1,7 +1,8 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
 The [fresh replay16k comparison](../experiments/2026-11-03-cdp-breakout-replay16k-200k.md)
-is separately selected:200k actions/12,477 updates with a30-minute training cap,
+launches05:08:40.375 UTC November3/source9cfd8cc:200k actions/12,477 updates
+with a30-minute training cap,
 100k/6,227 retained recovery and final/actual-initial sampled/greedy24-episode
 assessments against70.750/143.667,all0/24 two-wall. Only shared replay capacity
 100k→16,384 changes; native447fe50,runnercf4ea238,teacher and other settings
@@ -15,6 +16,11 @@ cases,seven prelaunch cases,six retention/two collector cases,19 scripts and
 control pins match. The exact corrected prefix reader andits eight retained
 fixtures are reused. Original bounded services remain failed; their separate
 CPU closure is required. No successful check stage or reader repeats.
+Startup05:08:57.566 passes445 pins,357 matched initial tensors,47 pre-update
+transitions,correct cadence and119 finite reports through2,280 actions. Main
+977721/invocation84334254aa564f5ab49a4907f2d9e950 remainsactive with original
+postprocess,progress,recovery andcollection observers. No100k recovery orfull
+frozen result isavailable. Keep1.636s CPU startup co-host time uncorrected.
 Root`/x/Temp/kindle-breakout-replay16k-20261103/full`,service
 `kindle-breakout-replay16k-200k-20261103`. Check live state; once launched,do not
 restart it or overlap GPU work. No extension,sweep,confirmation orautomatic

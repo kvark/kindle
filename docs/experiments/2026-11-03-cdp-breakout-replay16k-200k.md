@@ -73,3 +73,19 @@ pass. All19 scripts compile and1,209 declaration path entries resolve. Original
 378/repair408 bounded pins and338 control pins stay unchanged; the prefix
 reader is structurally identical to the repaired reader with eight retained
 fixtures. No new failure or repeated successful stage occurs before selection.
+
+## Launch and startup
+
+Launch05:08:40.375 UTC November3/source9cfd8cc selects445 pins; declarationSHA
+`75d022883e179433719403cc039faf86506ce535e5c35d7ff92c46c71be972fd`.
+Main977721/invocation84334254aa564f5ab49a4907f2d9e950,post977724/
+253fdc1765274039b00deb8e25f5a609,progress977727/e702b9e4ff894fb3aead7afb68c2eaf8,
+recovery977862/20514ed2ac8c44e8af047343bcd812b1 andcollection977865/
+eec7db69ce684cf4a3973d1c1223107d are active atstartup.
+
+Startup review05:08:57.566 passes all445 pins,357 initial tensors matching both
+bounded candidate andretained control,47 matching pre-update transitions and
+119 finite supervised reports through2,280 actions. The firstsix updates are
+376/392/408/424/440/456. No100k recovery orfull frozen result exists atthis
+review. Keep1.636s CPU startup wrapper co-hosting without correction. Follow
+these original identities; do not restart oroverlap GPU work.
