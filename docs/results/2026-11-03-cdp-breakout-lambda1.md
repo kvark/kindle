@@ -1,10 +1,22 @@
-# Return-lambda1 passes bounded Breakout execution and cost checks
+# Return-lambda1: bounded checks pass and the full comparison is active
+
+The separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-lambda1-200k.md)
+launches **04:13:38.340 UTC November3/source958d622**, with a30-minute training
+cap and448 pins. MainPID972800/invocation44e2a4cbb446493f9db029c194c27300 and
+progress,recovery,postprocessing andcollection observers are active. Startup
+matches357 initial tensors against both retained control and bounded candidate,
+plus47 pre-update transitions. All241 reports through4,232 actions are finite;
+the first six updates follow376,392,408,424,440,456 actions. Startup checking
+takes1.500s CPU wrapper time, retained without training-time correction.
+Full frozen gameplay and100k recovery remain pending. Do not restart or overlap
+this learner; root`/x/Temp/kindle-breakout-lambda1-20261103/full`.
 
 The fresh lambda1 candidate completes **8,192 actions /32,727 frames /489
 updates in50.121s**. A1,024-action/4,096-frame frozen check takes.868s with
 zero updates and no natural completed episodes. The conservative200k projection
 is **22m26.028s**, below the30-minute cap. This establishes execution and early
-cost; gameplay benefit remains unmeasured and no full learner is selected yet.
+cost; gameplay benefit remains unmeasured. The bounded closure preceded the
+separate full selection above.
 
 The [fixed protocol](../experiments/2026-11-03-cdp-breakout-lambda1.md) changes
 only return lambda.95→1 against the retained replay-value1/behavior8e-5 control.
@@ -55,10 +67,13 @@ files, counters and cost arithmetic. No bounded learner, frozen stage, replay,
 collector or final reader fails or repeats. No Kindle allocation remains active.
 
 Root `/x/Temp/kindle-breakout-lambda1-20261103/native-check` is closed. Do not
-repeat completed stages. A full200k comparison needs its own selection with100k
-recovery,final/actual-initial sampled andgreedy24-episode assessments against
-70.750/143.667 and the original two-wall gate. No cap increase, sweep, extension
-or automatic successor follows. The five-game goal remains unfinished.
+repeat completed bounded stages. The separately selected full comparison retains
+100k recovery andfinal/actual-initial sampled andgreedy24-episode assessments
+against70.750/143.667 and the original two-wall gate. Its original CPU preflight
+fails on a stale collector-date suffix before model/environment construction;
+the preserved failure anddate-only observer repair precede the passing2.247s
+preflight andfull launch. No cap increase,sweep,extension or automatic successor
+follows. The five-game goal remains unfinished.
 
 | Artifact | SHA256 |
 | --- | --- |

@@ -61,3 +61,18 @@ cases,12 recovery-body cases,four metadata cases,six retention andtwo collector
 corruption cases,18 scripts and826 declaration path entries. All385 bounded/
 338 control pins match. No successful experiment stage repeats; no GPU work
 has occurred during this preparation.
+
+## Launch and startup
+
+Launch04:13:38.340 UTC November3/source958d622 selects448 pins; declarationSHA
+`aa991176cb6cc06fd585f52ceb3c2d4ccdb96e915208a8d0c6268e892a0410c8`.
+MainPID972800/invocation44e2a4cbb446493f9db029c194c27300,post972803/f4656a088f74416083015c395da92a10,
+progress972806/379160324b634c1a937ef77b003b10f9,recovery972938/d4a54f459ce54965a211d9e7ceab0eab,
+collection972941/c9711214ef3141c58edad6f03511000c are active atstartup review.
+All357 initial tensors match both bounded andcontrol checkpoints;47 pre-update
+transitions matchcontrol and241 finite reports cover4,232 actions. The first
+six updates are376/392/408/424/440/456; logged4,096 actions/233 updates take
+22.950s. StartupSHA`7e9c8e0411af08f6336264163b5fec9bdbe5eb984cba4c3885f6451785030bf8`.
+Retain1.500s CPU wrapper co-host time without correction. No full frozen result
+or100k recovery exists atthis review; follow the original services without
+restarting oroverlapping GPU work.

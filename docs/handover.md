@@ -8,6 +8,21 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+The [fresh lambda1 comparison](experiments/2026-11-03-cdp-breakout-lambda1-200k.md)
+is active: launched04:13:38.340 UTC November3/source958d622 with448 pins,
+200k actions/12,477 updates and30-minute training cap. MainPID972800,
+invocation44e2a4cbb446493f9db029c194c27300; progress,recovery,postprocessing and
+collection observers are active. Startup passes357 control/bounded matching
+initial tensors,47 pre-update transitions and241 finite reports through4,232
+actions. Require100k/6,227 recovery and final/actual-initial sampled/greedy24-
+episode assessments against70.750/143.667 and the original two-wall gate.
+Only lambda.95→1 changes both imagined/replay targets; native447fe50,runner
+9eb21cca andteacher fixed. CPU preflight's stale collector-date failure is
+preserved; correction passes before launch,no GPU repeat. No full result yet.
+Root`/x/Temp/kindle-breakout-lambda1-20261103/full`,service
+`kindle-breakout-lambda1-200k-20261103`. Check live state; do not restart this
+learner or schedule another GPU job while it is active.
+
 The [lambda1 bounded check](results/2026-11-03-cdp-breakout-lambda1.md)
 passes8,192 actions/32,727 frames/489 updates in50.121s; frozen1,024/.868s has
 zero updates/no natural episodes. Conservative200k projection22m26.028s clears
