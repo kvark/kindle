@@ -20,6 +20,17 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [CPU replay-context age reconstruction](docs/results/2026-11-03-cdp-breakout-replay-age.md)
+matches all12,477 logged updates and199,632 sampled starts in.387s CPU.
+Final50k unmasked contexts have median246/mean365.099/p99 1,776 updates since
+their last computation;98.66% of labeled actor rows can depend on initial
+context before a reset. This measures age,not latent error or a gameplay cause.
+All15 fixtures and27 diagnostic/338 control pins pass; review completes
+12:35:19.800 UTC November3/sourceb729ab23. No GPU work,learner,emulator,failure
+or prior stage repeat. Root `/x/Temp/kindle-breakout-replay-age-20261103` is
+closed. Earlier replay16k and B8/T32 results remain; no new buffer,burn-in,loss
+or learner is selected. Retain the70.750/143.667 control; goal unfinished.
+
 The [completed Breakout H3/scale1 comparison](docs/results/2026-11-03-cdp-breakout-open-loop.md)
 lowers frozen sampled **70.750→60.875** and greedy **143.667→104.625**, all
 **0/24 two-wall**, in **22m06.821s (+3.02%)** for 200k actions / 799,552 frames /
