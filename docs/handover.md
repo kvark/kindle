@@ -29,6 +29,12 @@ transitions,correct cadence and119 finite reports through2,280 actions. Main
 977721/invocation84334254aa564f5ab49a4907f2d9e950 remainsactive with original
 postprocess,progress,recovery andcollection observers. No100k recovery orfull
 frozen result isavailable. Keep1.636s CPU startup co-host time uncorrected.
+Read-only terminal preparation passes05:11:24.713 in2.806s (2.828s wrapper),
+verifying all445 pins,five original identities andfive score cases. Fixed score
+coverage isqualified05:11:33.246 in2.859s (2.884s wrapper),with50 diagnostic/
+445 full pins,six config cases andfive retained boundary fixtures. Reuse saved
+control counts; only countnew candidate logs afteroriginal terminal completion.
+No native/emulator work orstage repeats; CPU co-host times stayuncorrected.
 Root`/x/Temp/kindle-breakout-replay16k-20261103/full`,service
 `kindle-breakout-replay16k-200k-20261103`. Check live state; once launched,do not
 restart it or overlap GPU work. No extension,sweep,confirmation orautomatic

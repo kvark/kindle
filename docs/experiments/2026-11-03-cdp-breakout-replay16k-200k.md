@@ -89,3 +89,26 @@ bounded candidate andretained control,47 matching pre-update transitions and
 376/392/408/424/440/456. No100k recovery orfull frozen result exists atthis
 review. Keep1.636s CPU startup wrapper co-hosting without correction. Follow
 these original identities; do not restart oroverlap GPU work.
+
+## Read-only result preparation
+
+Terminal-reader preflight completes05:11:24.713 UTC November3 in2.806s
+(2.828s wrapper), checking all445 full pins,allfive original identities,the
+capacity-only configuration andfive score validation cases. Its source and
+provenance are pinned separately; no active controller changes. The recovery
+reader isprepared but must run only afterthe original100k observer succeeds.
+
+Before frozen outcomes, fixed score coverage qualifies05:11:33.246 in2.859s
+(2.884s wrapper),with50 diagnostic/445 full pins,six configuration cases and
+five retained boundary fixtures. Afteroriginal completion andterminal review,
+count only the new candidate's train andfour frozen logs using unchanged
+pre-action score bins216/432/648/864. Reuse the completed control analysis:
+1,262 native actions at216–431 andnone432+. Reconcile all actions,frames and
+episodes against original replay artifacts; preserve the fixed first-three-
+natural-episodes-per-lane cohort separately from extra episodes andtails.
+
+These bins describe exposure, not verified wall boundaries, visual coverage or
+a causal replay mechanism. CPU co-host times remain uncorrected. No GPU work,
+learning,emulator replay orcompleted stage repeats. Run recovery,terminal and
+coverage readers once aftertheir respective prerequisites; completed preparation
+andpreflight must not repeat. Keep bounded failure andCPU repair provenance.
