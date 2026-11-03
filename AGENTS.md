@@ -20,6 +20,17 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [Breakout H3 world-supervision check](docs/experiments/2026-11-03-cdp-breakout-open-loop.md)
+is selected for CPU preparation, then one fresh8,192-action/489-update check and
+1,024 frozen actions. Keep constant actor/world imitation100 and the retained
+12M64/Auto/N8/B16/T16/H15/R16 recipe; add only open-loop H3/scale1. Reuse native
+c2d627f3 and its completed numerical/disabled-mode compatibility evidence;
+no build or repeated compatibility stage. Require conservative200k cost within
+30min before considering a full learner. Root `/x/Temp/kindle-breakout-open-loop-20261103`;
+no full learner,extension,sweep or automatic successor selected. Check live state
+before launch. This tests execution/cost, not gameplay benefit; earlier Qbert H3
+regressed. The five-game goal remains unfinished.
+
 The [completed actor-only imitation-decay comparison](docs/results/2026-11-03-cdp-breakout-actor-only-decay.md)
 lowers frozen sampled **70.750→51.833** and greedy **143.667→104.750**, all0/24
 two-wall, in **21m42.074s** (+1.10%). Initial-subtracted score/min falls28.07%/
