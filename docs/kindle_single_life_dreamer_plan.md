@@ -1,18 +1,24 @@
 # Kindle: CDP learning roadmap
 
 The [fresh400k/R16 budget comparison](experiments/2026-11-03-cdp-breakout-budget400k.md)
-is separately selected after the halfway evidence below. Keep the retained
-12M64/Auto/N8/B16/T16/H15/R16/context1, rates/teacher/expert100/critic1/1 and
-native447fe50/runnercf4ea238. Fresh400k/24,977 updates,50-minute training cap;
-conservative measured projection47m13.403s. Preserve100k/6,227,200k/12,477 and
-300k/18,727 recovery,require200k common-prefix tensor/semantic agreement,and
-four fixed24-episode frozen arms. No prior experience transfers or completed
-stage repeats.
-This tests more learning work,not a wall-time speedup or independent seed.
-CPU qualification passes62 cases/five actual CLI paths in4.757s; launch remains
-pending and no learner is active.
-Root `/x/Temp/kindle-breakout-budget400k-20261103/full`. Check live state before
-work; do not restart closed services or overlap GPU allocations.
+launches14:31:26.282 UTC November3/source4bb0d101 with446 pins; mainPID1034231,
+invocation13c5fb9a8be543deb2c279522c8498a2. Keep retained12M64/Auto/N8/B16/T16/
+H15/R16/context1,rates/teacher/expert100/critic1/1,native447fe50/runnercf4ea238.
+Fresh400k/24,977 updates,50-minute training cap; no experience transfers or
+completed-stage repeats. Require100k/6,227,200k/12,477 and300k/18,727 recovery,
+200k common-prefix content/semantic agreement and four fixed24-episode frozen
+arms. More learning work,not a wall-time speedup or independent confirmation.
+
+The CPU launch wrapper fails on initial serialized-file hashes; all357 tensors,
+payload bytes and parsed headers match. JSON header ordering explains the file
+hashes. A separate six-case CPU repair checks actual raw-file integrity and
+canonical content identity, preserving exact tensor/semantic comparisons and
+the original failure. No native/runner/learner restart or GPU repeat occurs.
+Startup passes14:34:41 through30,008 actions/1,853 finite reports,357 matching
+initial tensors and47 pre-update transitions. Original main/progress/postprocess
+and newly started recovery/collection observers are active. No frozen result.
+Root `/x/Temp/kindle-breakout-budget400k-20261103/full`, separate`cpu-repair`.
+Check live state; do not restart this learner or overlap GPU jobs.
 
 The [completed frozen halfway assessment](results/2026-11-03-cdp-breakout-halfway.md)
 finds **22.125→70.750 sampled /33.250→143.667 greedy** from100k to200k; all eight

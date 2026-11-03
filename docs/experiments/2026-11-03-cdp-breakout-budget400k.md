@@ -60,7 +60,8 @@ original identities and stop on failures. Repair CPU processing separately;
 never repeat completed GPU stages because an observer or audit failed.
 
 Root `/x/Temp/kindle-breakout-budget400k-20261103/full`, intended service
-`kindle-breakout-budget400k-20261103`. CPU harness qualification passes; launch is pending. Check live state before work; no overlapping GPU jobs.
+`kindle-breakout-budget400k-20261103`. The original learner is active; the CPU launch-wrapper failure and separate
+serialization-identity repair below remain recorded. Check live state before work; no overlapping GPU jobs.
 No extension,coefficient sweep,fresh-seed confirmation or automatic successor
 is selected. This reused seed/cohort cannot establish independent reliability.
 Breakout and the five-game goal remain unfinished.
@@ -88,3 +89,36 @@ are recorded at launch. Startup checks all initial tensors,47 common pre-update
 transitions, first six update counters and finite reports. Final collection and
 the separately fixed terminal reader validate outputs and original journals;
 CPU processing failure never authorizes repeating a completed GPU stage.
+
+
+## Original launch and CPU identity repair
+
+The original learner launches14:31:26.282 UTC November3/source4bb0d101, with446
+pins,PID1034231/invocation13c5fb9a8be543deb2c279522c8498a2. Its launch wrapper
+fails14:31:31 on raw initial-checkpoint file-hash equality after starting the
+main,progress and postprocessing services. The learner keeps running. Inspection
+finds all357 initial tensors equal, every safetensors payload byte equal and
+parsed headers equal; only JSON header ordering changes serialized file hashes.
+Metadata differs only in those file hashes. This is a CPU comparison defect,
+not a measured learning mismatch. Preserve the original failure/log/receipt.
+
+A separate CPU repair qualifies six cases and the38,050-event reference reader
+in4.257s (4.478s wrapper). It verifies each recorded raw hash against its actual
+retained file, then compares sorted-header plus exact payload identities and
+canonical metadata. No payload,shape,value,configuration or semantic field is
+ignored. All357 tensors remain exactly compared at initial/100k/200k. This
+explicit amendment replaces serialized-byte identity with content identity;
+the original private protocol and scripts stay unchanged. A content or training
+semantic mismatch still stops the original learner, without a GPU retry.
+
+The recovery and collection observers start once14:34:38 UTC; original main,
+progress and postprocessing identities are preserved. Startup passes14:34:41
+through30,008 actions/1,853 finite reports,357 matching/finite initial tensors,
+47 common pre-update transitions,first update376 and residual credit.5. Recovery,
+postprocessing,progress and collection are active. No completed GPU stage repeats
+and native/runner/training commands are unchanged. CPU co-host time remains
+uncorrected. No final frozen result or successor is available.
+
+Repair evidence: `/x/Temp/kindle-breakout-budget400k-20261103/cpu-repair`.
+At terminal closure, verify its fixed script/qualification and preserved original
+launch failure alongside the original collector and independent result reader.
