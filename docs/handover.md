@@ -9,16 +9,24 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 3
 
 The [fresh200k context9 comparison](experiments/2026-11-03-cdp-breakout-context9-200k.md)
-is selected after the bounded check passes its cost/correctness gates. Use eight
-forward-only prefix steps then16 learning steps,12M64/Auto/N8/B16/T16/H15/R16,
-retained rates/teacher/constant expert100/critic1/1. Cap30min,first update440,
-12,473 final updates,100k/6,223 recovery and four fixed24-episode frozen arms
-against70.750/143.667,all0/24 two-wall. Sampling/warmup/runtime differ; no isolated
-cause. Native65dd69b4/runtime and bounded runner reused; no prior experience.
-CPU controller preparation is pending; no full learner has started. Root
-`/x/Temp/kindle-replay-context-20261103/full`,service
-`kindle-breakout-context9-200k-20261103`. No GPU allocation active at selection;
-check live state before work. Five-game goal unfinished.
+launches13:20:44.166 UTC November3/source55f0a46a with667 pins. MainPID1029287,
+invocationda2979f074bf4fe4b740d734ad33f6cd; progress,recovery,postprocessing and
+collection observers are active. Startup passes357 matching initial tensors,
+47 common pre-update transitions and503 finite supervised reports through8,488
+actions;8,192 actions/485 updates take50.380s. First update440 and prefix timing
+pass. Training cap30min,200k/12,473 updates,100k/6,223 recovery and four fixed
+24-episode frozen arms against70.750/143.667,all0/24 two-wall. No full result yet.
+
+Context9 adds eight forward-only observed steps before16 learning steps with
+12M64/Auto/N8/B16/T16/H15/R16,retained rates/teacher/constant expert100/critic1/1.
+Sampling/warmup/runtime differ; no isolated cause. Native65dd69b4/runtime and
+bounded runner reused; no prior experience or successful stage repeat. CPU
+preflight2.667s and startup1.866s pass without failure. Recovery/terminal readers
+are fixed13:21:07.426 before outcomes; terminal preflight passes13:21:31.180 in
+3.218s with five score-tamper cases. Keep CPU co-host timings without correction.
+Root `/x/Temp/kindle-replay-context-20261103/full`,service
+`kindle-breakout-context9-200k-20261103`. Check original live state; do not restart
+this learner or overlap GPU work. The five-game goal remains unfinished.
 
 The [optional replay-state recomputation check](results/2026-11-03-cdp-replay-context.md)
 passes8,192 actions/32,730 frames/485 updates in50.564s. Context9 adds eight

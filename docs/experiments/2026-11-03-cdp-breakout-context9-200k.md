@@ -64,3 +64,47 @@ Root `/x/Temp/kindle-replay-context-20261103/full`; service
 overlap,driver recovery,cap increase or successful stage repeat. Preserve
 failures and repair CPU processing separately. No extension,confirmation,
 sweep or automatic successor is selected. The five-game goal remains unfinished.
+
+## Original launch and fixed readers — November 3
+
+The declared comparison launches once at **13:20:44.166 UTC**, source
+`55f0a46a5af7a5fda099f8a8d47540fd1848352d`, with667 pins. Declaration SHA256:
+`32cd53f38f4ccab9dbd13338c0d8c020879b96dfa5583ab22a8b7ebd79100a48`.
+The private fixed protocol is unchanged. No training,evaluation or successful
+qualification stage repeats.
+
+CPU preflight passes at13:19:20.990 UTC in2.510s body/2.667s wrapper, with zero
+native/emulator construction. It checks five CLI paths,50 config assertions,
+14 launch-command cases including wrong training/frozen update counts,23 header
+cases,four observer-parser cases,14 recovery-body/four metadata cases,eight
+prefix-timing cases,six retention/two collector-corruption cases,43 embedded
+paths and19 compiled scripts. All601 bounded and338 retained-control pins pass.
+Source generation,selection and launch succeed without failure. Selection takes
+6.420s and the single five-service launch takes9.074s.
+
+| Original service suffix | PID | Invocation |
+| --- | ---: | --- |
+| 200k |1029287|`da2979f074bf4fe4b740d734ad33f6cd`|
+| postprocess |1029290|`8fa92dbb5aef47a9aee9e1e092e09921`|
+| progress |1029293|`5a3c98ba26884f81819f6fb70a78f180`|
+| recovery |1029435|`ecca019c954b4a588714594f1cfce4de`|
+| collection |1029438|`1145552d80eb4ebbbef91cc6af91c73b`|
+
+Service names are `kindle-breakout-context9-{suffix}-20261103`. Preserve these
+original identities; do not restart or overlap GPU work.
+
+Startup reading passes once at **13:21:42.199 UTC**, in1.866s wrapper. All667
+pins,357 initial tensors matching bounded/control,47 common pre-update events,
+first updates440/456/472/488/504/520 and503 finite supervised reports through
+8,488 actions pass. Prefix timings are positive. The8,192-action progress record
+has485 updates,50.380s elapsed and residual credit.5. No frozen task result exists.
+
+Recovery and terminal readers are fixed **13:21:07.426 UTC**, before recovery
+or frozen outcomes. `readers-provenance.json` pins their exact sources and
+original process. Run `review_recovery.py` once after the original100k observer
+succeeds while the same main remains active. Run `review_full_terminal.py terminal`
+once after all original services and completion evidence finish. Its preflight
+passes once at **13:21:31.180 UTC**, in3.171s body/3.218s wrapper, with five score
+cases,all667 pins and original identity. No native learner or emulator is built.
+Keep these CPU co-host costs without time correction. Source hashes and execution
+receipts remain under the experiment root. The five-game goal is unfinished.
