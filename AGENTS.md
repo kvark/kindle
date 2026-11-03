@@ -20,6 +20,20 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
+The [fresh current-critic B8/T32 Breakout comparison](docs/experiments/2026-11-03-cdp-breakout-value1-context32-200k.md) is **running**,
+launched21:30:20 UTC November3/source06c873c2 with122 pins. Fixed200k actions /
+12,469 updates /30min,12M64/Auto/N8/B8/T32/H15/R16,behavior8e-5/replay-value1/
+expert100,full18,native447fe50/runnercf4ea238. Startup passes357 initial tensors
+against both bounded andretained controls,63 bounded/47 shared pre-update events,
+andfirst update504. MainPID1071673/invocation`2cecc3ab00f9498795197cf1de25639a`;
+recovery andterminal observers are active. Require read-only100k/6,219 recovery
+andfour final/actual-initial24-natural-episode arms;greedy primary, sampled
+secondary,against retained143.667/70.750. No full result isavailable. Root
+`/x/Temp/kindle-breakout-value1-context32-20261103/full`;service
+`kindle-breakout-value1-context32-200k-20261103`. Check live state;do not restart
+oroverlap this learner. Bounded CPU failures remain preserved. No extension or
+automatic successor;the original864/90%-two-wall andfive-game goal remain unfinished.
+
 The [current-critic Breakout B8/T32 check](docs/results/2026-11-03-cdp-breakout-value1-context32.md) passes8192 actions /32,722 frames /
 481 updates in51.909s; padded200k projection23m14.028s clears30min. Frozen1024/
 .875s haszero updates/no natural episodes. All357 initial/invariant tensors,

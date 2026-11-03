@@ -1,11 +1,20 @@
 # Longer Breakout sequences pass execution and early cost checks
 
+A separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-value1-context32-200k.md)
+launches21:30:20 UTC November3/source06c873c2 with122 pins. Startup passes357
+initial tensors against both controls,63 bounded/47 shared semantic events and
+first update504. MainPID1071673; read-only100k/6,219 recovery andfour final/
+actual-initial24-episode arms are pending. Greedy remains primary against143.667,
+with sampled70.750 secondary. No full result isavailable; do not restart or
+overlap the active learner. The bounded evidence andoriginal failures below
+remain closed.
+
 The current-critic B8/T32 check completes **8,192 actions /32,722 frames /
 481 updates in51.909s**. Its conservative200k projection is **23m14.028s**,
 below the fixed30-minute limit. Frozen1,024 actions /4,096 frames take.875s,
 with zero updates, no natural completed episodes and all357 tensors unchanged.
-This establishes execution and early cost, not a gameplay improvement or a
-selected full learner. Retain sampled70.750/greedy143.667 and the original
+This establishes execution and early cost; it does not measure gameplay
+improvement. Retain sampled70.750/greedy143.667 and the original
 mean864 /90%-two-wall gate; the five-game goal remains unfinished.
 
 | Measurement | Current B8/T32 check |
