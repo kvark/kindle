@@ -28,6 +28,9 @@ impl PyVectorAgent {
     const SUPPORTS_COMPLETED_RETURN_ACTOR: bool = true;
 
     #[classattr]
+    const SUPPORTS_CONSERVATIVE_RETURN_ACTOR: bool = true;
+
+    #[classattr]
     const SUPPORTS_EXPERT_WORLD_GRADIENT: bool = true;
 
     #[classattr]

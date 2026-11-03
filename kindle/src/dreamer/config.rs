@@ -387,6 +387,10 @@ pub struct DreamerConfig {
     /// Positive-advantage actor imitation of completed observed episode returns.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub replay_actor_scale: Option<f32>,
+    /// Use observed completed returns as a conservative lower bound when the
+    /// critic also includes nonnegative model-derived disagreement rewards.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub replay_actor_observed_lower_bound: bool,
     pub learning_rate_warmup: u64,
     pub optimizer_beta1: f32,
     pub optimizer_beta2: f32,
@@ -463,6 +467,7 @@ impl DreamerConfig {
             actor_learning_starts: 0,
             expert_imitation: None,
             replay_actor_scale: None,
+            replay_actor_observed_lower_bound: false,
             learning_rate_warmup: 1_000,
             optimizer_beta1: 0.9,
             optimizer_beta2: 0.999,
@@ -633,9 +638,20 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         if let Some(scale) = self.replay_actor_scale
-            && (!scale.is_finite() || scale <= 0.0 || self.uses_disagreement())
+            && (!scale.is_finite() || scale <= 0.0)
         {
-            return Err("completed-return actor requires a positive finite scale and no model-derived disagreement bonus".into());
+            return Err("completed-return actor requires a positive finite scale".into());
+        }
+        if self.replay_actor_scale.is_some()
+            && self.uses_disagreement()
+            && !self.replay_actor_observed_lower_bound
+        {
+            return Err("completed-return actor with model-derived disagreement requires explicit observed lower-bound mode".into());
+        }
+        if self.replay_actor_observed_lower_bound
+            && (self.replay_actor_scale.is_none() || !self.uses_disagreement())
+        {
+            return Err("observed lower-bound mode requires completed-return actor learning and active disagreement".into());
         }
         let size = self.network();
         if let Some(crop) = self.observation_crop {
@@ -922,6 +938,7 @@ mod tests {
         let mut config = DreamerConfig::tiny(3);
         let legacy = serde_json::to_value(&config).unwrap();
         assert!(legacy.get("replay_actor_scale").is_none());
+        assert!(legacy.get("replay_actor_observed_lower_bound").is_none());
         assert!(
             serde_json::from_value::<DreamerConfig>(legacy)
                 .unwrap()
@@ -943,6 +960,28 @@ mod tests {
         config.disagreement_bonus = false;
         config.visitation_bonus = true;
         config.check().unwrap();
+    }
+
+    #[test]
+    fn completed_return_lower_bound_requires_both_actor_and_disagreement() {
+        let mut config = DreamerConfig::tiny(3);
+        config.replay_actor_observed_lower_bound = true;
+        assert!(config.check().is_err());
+        config.replay_actor_scale = Some(100.0);
+        assert!(config.check().is_err());
+        config.disagreement_bonus = true;
+        config.intrinsic_reward_scale = 1.0;
+        config.check().unwrap();
+        let restored: DreamerConfig =
+            serde_json::from_value(serde_json::to_value(&config).unwrap()).unwrap();
+        assert_eq!(restored, config);
+        config.intrinsic_reward_scale = 0.0;
+        assert!(config.check().is_err());
+        config.intrinsic_reward_scale = 1.0;
+        for scale in [0.0, -1.0, f32::NAN, f32::INFINITY] {
+            config.replay_actor_scale = Some(scale);
+            assert!(config.check().is_err());
+        }
     }
 
     #[test]

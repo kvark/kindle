@@ -348,6 +348,16 @@ mod tests {
     #[test]
     #[ignore = "requires separately guarded completed-return actor gradient qualification"]
     fn completed_return_actor_matches_f64_bias_derivatives_and_zero_masks() {
+        check_completed_return_actor_derivatives(false);
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded conservative-return actor gradient qualification"]
+    fn conservative_return_actor_matches_f64_bias_derivatives_and_zero_masks() {
+        check_completed_return_actor_derivatives(true);
+    }
+
+    fn check_completed_return_actor_derivatives(lower_bound: bool) {
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         assert_eq!(
             gpu.device_information().device_name,
@@ -361,12 +371,16 @@ mod tests {
                 let mut config = DreamerConfig::tiny(actions);
                 config.actor_unimix = unimix;
                 config.replay_actor_scale = Some(100.0);
+                config.replay_actor_observed_lower_bound = lower_bound;
+                config.disagreement_bonus = lower_bound;
+                config.intrinsic_reward_scale = f32::from(lower_bound);
                 config.expert_imitation = expert.then(|| ExpertImitation {
                     scale: 100.0,
                     action_weights: vec![1.0; actions],
                     world_gradient: false,
                     decay: None,
                 });
+                config.check().unwrap();
                 let graph = build_training_graph(&config, 12, rows);
                 let mut session = build_session(&graph, &gpu, Mode::Training, false);
                 session.clear_optimizer();

@@ -122,7 +122,9 @@ def main():
     parser.add_argument("--replay-value-scale", type=float,
                         help="fresh training only: real-replay value loss scale; omitted: native default")
     parser.add_argument("--replay-actor-scale", type=float,
-                        help="fresh training: positive-advantage imitation of completed observed returns; requires disagreement-scale0")
+                        help="fresh training: positive-advantage imitation of completed observed returns")
+    parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
+                        help="with replay-actor-scale and active disagreement: conservatively compare observed returns with the combined critic")
     parser.add_argument("--return-lambda", type=float,
                         help="fresh training only: imagined and replay return trace mixture in [0,1]; omitted: native default")
     parser.add_argument("--replay-value-bootstrap", choices=("imagined", "posterior"),
@@ -209,13 +211,16 @@ def main():
             parser.error("replay-value-scale requires fresh training")
     if args.replay_value_bootstrap is not None and args.evaluate:
         parser.error("replay-value-bootstrap requires fresh training")
+    if args.replay_actor_observed_lower_bound and (
+            args.replay_actor_scale is None or not positive_f32(args.disagreement_scale)):
+        parser.error("observed lower-bound mode requires replay-actor-scale and positive disagreement-scale")
     if args.replay_actor_scale is not None:
         if not positive_f32(args.replay_actor_scale):
             parser.error("replay-actor-scale must be finite and positive in F32")
         if args.restore or args.evaluate:
             parser.error("replay-actor-scale requires fresh training")
-        if args.disagreement_scale != 0:
-            parser.error("replay-actor-scale requires disagreement-scale0")
+        if args.disagreement_scale != 0 and not args.replay_actor_observed_lower_bound:
+            parser.error("replay-actor-scale requires disagreement-scale0 or explicit observed lower-bound mode")
         if "KINDLE_DEVICE_TARGETS" in os.environ:
             parser.error("replay-actor-scale requires CPU target construction")
     if args.behavior_learning_rate is not None:
@@ -412,6 +417,8 @@ def main():
         parser.error("replay-value-bootstrap requires native bootstrap support")
     if args.replay_actor_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False):
         parser.error("replay-actor-scale requires native completed-return actor support")
+    if args.replay_actor_observed_lower_bound and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False):
+        parser.error("observed lower-bound mode requires native conservative-return actor support")
     if args.replay_context is not None and args.replay_context > 1 and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_CONTEXT", False):
         parser.error("replay-context requires native prefix support")
     if args.restore and args.encoder:
@@ -425,6 +432,9 @@ def main():
         if (metadata.get("config", {}).get("replay_actor_scale") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False)):
             parser.error("completed-return actor checkpoint requires native support")
+        if (metadata.get("config", {}).get("replay_actor_observed_lower_bound", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False)):
+            parser.error("observed lower-bound checkpoint requires native conservative-return actor support")
         if (metadata.get("config", {}).get("observation_crop") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_CROP", False)):
             parser.error("cropped checkpoint requires native RGB crop support")
@@ -539,6 +549,8 @@ def main():
             config["loss_scales"]["replay_value"] = args.replay_value_scale
         if args.replay_actor_scale is not None:
             config["replay_actor_scale"] = args.replay_actor_scale
+        if args.replay_actor_observed_lower_bound:
+            config["replay_actor_observed_lower_bound"] = True
         if args.return_lambda is not None:
             config["lambda"] = args.return_lambda
         if args.replay_value_bootstrap is not None:

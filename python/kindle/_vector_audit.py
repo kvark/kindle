@@ -107,11 +107,15 @@ def audit(path):
         require_numbers(config["train_ratio"])
         check(config["train_ratio"] >= 0, "invalid train ratio")
         replay_actor_scale = config.get("replay_actor_scale")
+        lower_bound = config.get("replay_actor_observed_lower_bound", False)
+        check(type(lower_bound) is bool, "invalid observed lower-bound mode")
+        disagreement = config.get("disagreement_bonus", False) and config.get("intrinsic_reward_scale", 0) > 0
+        check(not lower_bound or (replay_actor_scale is not None and disagreement),
+              "observed lower-bound mode requires actor learning and active disagreement")
         if replay_actor_scale is not None:
             require_numbers(replay_actor_scale)
-            check(replay_actor_scale > 0 and not (
-                config.get("disagreement_bonus", False) and config.get("intrinsic_reward_scale", 0) > 0),
-                "completed-return actor requires positive scale and observed rewards")
+            check(replay_actor_scale > 0 and (not disagreement or lower_bound),
+                "completed-return actor requires positive scale and observed rewards or explicit lower-bound mode")
         open_loop = config.get("open_loop_supervision")
         if open_loop is not None:
             check(isinstance(open_loop, dict) and set(open_loop) == {"horizon", "scale"},

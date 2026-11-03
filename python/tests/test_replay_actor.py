@@ -22,6 +22,10 @@ def command(tmp_path, extra):
     (['--replay-actor-scale', '100', '--disagreement-scale', '1'], 'disagreement-scale0'),
     (['--replay-actor-scale', '100', '--restore', 'unused'], 'fresh training'),
     (['--replay-actor-scale', '100', '--evaluate'], 'fresh training'),
+    (['--replay-actor-observed-lower-bound'], 'requires replay-actor-scale'),
+    (['--replay-actor-scale', '100', '--replay-actor-observed-lower-bound'], 'positive disagreement-scale'),
+    (['--replay-actor-scale', '100', '--replay-actor-observed-lower-bound', '--disagreement-scale', '-1'], 'positive disagreement-scale'),
+    (['--replay-actor-scale', '100', '--replay-actor-observed-lower-bound', '--disagreement-scale', '1', '--evaluate'], 'fresh training'),
 ])
 def test_invalid_actor_options_fail_before_environment(monkeypatch, tmp_path, capsys, extra, message):
     monkeypatch.setattr(atari_vector.gym, 'make', lambda *a, **kw: pytest.fail('environment constructed'))
@@ -50,8 +54,8 @@ def test_old_native_cannot_silently_ignore_actor_loss(monkeypatch, tmp_path, cap
     assert 'native completed-return actor support' in capsys.readouterr().err
 
 
-@pytest.mark.parametrize('scale', [None, '100'])
-def test_exact_native_config_and_default_omission(monkeypatch, tmp_path, scale):
+@pytest.mark.parametrize('scale,lower_bound', [(None, False), ('100', False), ('100', True)])
+def test_exact_native_config_and_default_omission(monkeypatch, tmp_path, scale, lower_bound):
     env = SimpleNamespace(action_space=SimpleNamespace(n=18), action_meanings=['NOOP']+list(map(str, range(1,18))),
                           reset=lambda **kw: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, 'make', lambda *a, **kw: env)
@@ -61,11 +65,19 @@ def test_exact_native_config_and_default_omission(monkeypatch, tmp_path, scale):
         if scale is None:
             assert 'replay_actor_scale' not in config
         else:
-            assert config['replay_actor_scale'] == 100. and config['disagreement_bonus'] is False
+            assert config['replay_actor_scale'] == 100. and config['disagreement_bonus'] is lower_bound
+        if lower_bound:
+            assert config['replay_actor_observed_lower_bound'] is True
+        else:
+            assert 'replay_actor_observed_lower_bound' not in config
         raise RuntimeError('checked native boundary')
     monkeypatch.setitem(kindle.__dict__, 'VectorAgent', SimpleNamespace(learned_rgb=construct,
-        SUPPORTS_COMPLETED_RETURN_ACTOR=True, act=lambda action_overrides=None, expert_actions=None: None))
-    monkeypatch.setattr(sys, 'argv', command(tmp_path, [] if scale is None else ['--replay-actor-scale', scale]))
+        SUPPORTS_COMPLETED_RETURN_ACTOR=True, SUPPORTS_CONSERVATIVE_RETURN_ACTOR=True,
+        act=lambda action_overrides=None, expert_actions=None: None))
+    extra = [] if scale is None else ['--replay-actor-scale', scale]
+    if lower_bound:
+        extra += ['--replay-actor-observed-lower-bound', '--disagreement-scale', '1', '--cdp']
+    monkeypatch.setattr(sys, 'argv', command(tmp_path, extra))
     with pytest.raises(RuntimeError, match='checked native boundary'):
         atari_vector.main()
 
@@ -95,3 +107,43 @@ def test_completed_return_actor_report_accounting(tmp_path, mutation):
     else:
         with pytest.raises(ValueError):
             audit(write_log(tmp_path, rows))
+
+
+@pytest.mark.parametrize('restore', [False, True])
+def test_lower_bound_requires_specific_native_capability(monkeypatch, tmp_path, capsys, restore):
+    import json
+    monkeypatch.setitem(kindle.__dict__, 'VectorAgent', SimpleNamespace(
+        SUPPORTS_COMPLETED_RETURN_ACTOR=True, act=lambda action_overrides=None, expert_actions=None: None))
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *a, **kw: pytest.fail('environment constructed'))
+    if restore:
+        checkpoint = tmp_path/'checkpoint'
+        checkpoint.mkdir()
+        (checkpoint/'metadata.json').write_text(json.dumps(dict(config=dict(
+            replay_actor_scale=100., replay_actor_observed_lower_bound=True))))
+        extra = ['--restore', str(checkpoint), '--observation-size', 'native', '--evaluate']
+    else:
+        extra = ['--replay-actor-scale', '100', '--replay-actor-observed-lower-bound', '--disagreement-scale', '1']
+    monkeypatch.setattr(sys, 'argv', command(tmp_path, extra))
+    with pytest.raises(SystemExit):
+        atari_vector.main()
+    assert 'native conservative-return actor support' in capsys.readouterr().err
+
+
+@pytest.mark.parametrize('mutation', [None, 'not_boolean', 'no_actor', 'no_bonus', 'zero_bonus'])
+def test_lower_bound_report_requires_explicit_compatible_config(tmp_path, mutation):
+    rows = corrective_events()
+    config = rows[0]['config']
+    config.update(replay_actor_scale=100., replay_actor_observed_lower_bound=True,
+                  disagreement_bonus=True, intrinsic_reward_scale=1.)
+    for event in rows:
+        if event['event'] == 'learner':
+            event['report']['behavior'] = dict(replay_actor=dict(
+                loss=.5, completed_rows=1, positive_rows=1, weight_sum=.5))
+    if mutation == 'not_boolean': config['replay_actor_observed_lower_bound'] = 1
+    elif mutation == 'no_actor': del config['replay_actor_scale']
+    elif mutation == 'no_bonus': config['disagreement_bonus'] = False
+    elif mutation == 'zero_bonus': config['intrinsic_reward_scale'] = 0
+    if mutation is None:
+        assert audit(write_log(tmp_path, rows))['updates'] == 3
+    else:
+        with pytest.raises(ValueError): audit(write_log(tmp_path, rows))
