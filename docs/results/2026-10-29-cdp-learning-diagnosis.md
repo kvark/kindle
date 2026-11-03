@@ -1,28 +1,37 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [completed current actor optimizer attribution](../results/2026-11-03-cdp-breakout-actor-optimizer.md)
-finds conditional imitation contributions **7,493× /10,928×** imagined score-function
-on two fixed final-checkpoint batches. Clipping/preconditioning retain the raw
-imbalance; saved momentum also substantially affects the full estimate. These
+The [actor-only imitation-decay qualification](../results/2026-11-03-cdp-actor-only-imitation-decay.md)
+passes F64 loss/derivatives and fresh Breakout8,192 actions/32,725 frames/489
+updates in47.329s. Actor scale100 reaches zero at256 (234 zero-weight reports);
+world stays100. All599 pins,357 matching initial/invariant frozen tensors,47
+pre-update events,full pixel/action/label replay and guards pass. Legacy1,024
+frozen actions reproduce128 control events with357 invariant tensors; candidate
+frozen1,024 actions take.879s,zero updates/no natural episodes. Conservative200k
+projection21m11s passes30min. Execution/cost are qualified; gameplay is unmeasured.
+
+Nativec2d627f3/SHA0015dff7 at `/x/Temp/kindle-actor-only-decay-20261103/runtime`
+passes149 Kindle+5 gym CPU tests,971 packaged Python checks and strict Clippy.
+An original Boolean-error-message fixture failure is preserved;5c6526fc repairs
+only its expectation,with no rebuild/production change. Packaging closure is
+`complete_with_cpu_test_repair`. Before GPU work,349b53ea clarifies the explicit
+legacy `replay_value_bootstrap=imagined` default addition. Numerical.74s/228 pins
+passes10:50:21.863 UTC; original bounded service succeeds10:52:27 November3,
+PID1015127/invocationcc77dbd06adf48fc9a01aec6a179b5db/source5c6526fc.
+Terminal10:52:49.664 takes1.144s. No GPU stage fails/repeats. All stages/readers
+are closed; do not rerun them. ReviewSHAf9b8ca51/completionSHA5097159b.
+
+The preceding [actor optimizer attribution](../results/2026-11-03-cdp-breakout-actor-optimizer.md)
+finds conditional imitation contributions7,493×/10,928× imagined score-function
+on two fixed final-checkpoint batches; momentum also affects the full estimate.
+All13 fixtures,210 current/158 prior pins pass in1.027s CPU,zero updates/GPUwork.
 F64 estimates are not measured native movement or proof of a gameplay cause.
-All13 fixtures,210 current/158 prior pins,22 parameters and1,646,097 elements pass.
-Analysis takes1.027s CPU, completes10:34:37.510 UTC November3/source71840bbc;
-terminal10:36:51.527 takes1.928s. No failure, repeated stage, native import,
-emulator/GPU work or learner update occurs. ResultSHA4f08d5d7/completionSHAff81959f.
-Root `/x/Temp/kindle-actor-optimizer-20261103` is closed; do not repeat readers.
+Its root and the earlier raw-gradient capture/backward readers are closed.
 
-The preceding [raw actor-gradient capture](../results/2026-11-03-cdp-breakout-actor-gradients.md)
-finds imitation/score norms6,721×/10,925×. Production/gated gradients match exactly;
-158 pins,357 invariant tensors,F64 matrices and cross-head zeros pass. Context
-capture34.280s/native backward.601s complete with zero updates and no GPU repeat.
-Its root `/x/Temp/kindle-breakout-actor-gradients-20261103` and readers are closed.
-
-Retain policy1/expert100/critic1/1 and the current gameplay control. Next selected
-development is default-off actor-only imitation decay, preserving world-model
-imitation, with numerical and short-run qualification before any full learner.
-The previous shared decay weakened both on an older recipe and regressed; it
-does not test this separation. No full learner, sweep or extension is selected.
-No Kindle GPU allocation is active at closure; check live state before GPU work.
+Retain policy1/expert100/critic1/1 and the70.750/143.667 gameplay control,all0/24
+two-wall. The optional actor-only fade preserves world imitation; the earlier
+shared fade weakened both on an older recipe and regressed. No full learner,
+sweep,extension or automatic successor is selected by this qualification.
+No Kindle GPU allocation is active at closure; check live state before work.
 The five-game goal remains unfinished.
 
 The [completed policy-weight100 comparison](../results/2026-11-03-cdp-breakout-policy100.md)
