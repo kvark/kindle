@@ -8,6 +8,22 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+Select the [bounded policy-weight100 check](experiments/2026-11-03-cdp-breakout-policy100.md)
+to increase imagined-policy pressure while retaining expert100 and world imitation.
+Only policy loss1→100 changes, scaling score-function and entropy together;
+critic weights1/1, actor/critic representation gradients off and the retained
+12M64/Auto/N8/B16/T16/H15/R16 recipe stay fixed. Native447fe50/teacher are unchanged;
+private runner5a86e224 adds12 CLI lines. CPU qualification passes actual commands,
+20 config cases,357 shapes,338 control pins and12 arithmetic cases. Two fixture
+failures/corrections remain preserved; no native agent is constructed.
+
+Require8,192 actions/489 updates,1,024 frozen actions,357 matched/invariant tensors,
+47 pre-update events, exact replay, reported policy100 arithmetic and host guards.
+Root `/x/Temp/kindle-breakout-policy100-20261103/native-check`; check live state
+before launch. Conservative200k projection must pass30min before any separately
+selected full learner. No full learner, extension or coefficient sweep is selected.
+The five-game goal remains unfinished.
+
 The [completed contact-timing CPU teacher comparison](results/2026-11-03-cdp-breakout-contact-timing-policy.md)
 lowers mean185.375→125.875, with only2/8 improved lanes and zero two-wall successes
 in both arms. The fixed10%/five-lane screen fails. Retain the original teacher;
