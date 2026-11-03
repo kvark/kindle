@@ -1,5 +1,24 @@
 # More guided Breakout episodes pass execution and early cost checks
 
+A separately selected [fresh200k comparison](../experiments/2026-11-03-cdp-breakout-guidance50-200k.md)
+launches22:20:13 UTC November3/source2e1e70de with117 pins. Startup passes all357
+initial tensors against both controls,47 bounded pre-update semantic events and
+first update376. MainPID1075974/invocation`48b67b1c5a9f4582ae045aa5602d1b48` and
+its recovery/terminal observers are active. Fixed200k/12,477 updates/30min;
+read-only100k/6,227 recovery andfour final/actual-initial24-episode arms remain.
+Greedy is primary against143.667; sampled70.750 is secondary. No full result is
+available. Do not restart oroverlap this learner. The bounded evidence below
+remains closed.
+
+Full helper qualification passes3.211s at22:19:09.599, reproducing saved expert/
+exposure metrics and checking eight expert, nine header, five intervention and
+four selection cases plus corrupted-loss rejection. Five actual queued commands
+and both actual replay inputs pass.551s at22:19:40.926, withzero native agent/
+emulator constructions orGPU descriptors. The exact header comparison permits
+only guidance probability .20→.50 aside from timing/checkpoint metadata; initial
+training trajectories need only match the bounded .50 run. The selected protocol
+and native/runner/teacher remain unchanged.
+
 The fresh 50% episode-guidance check completes **8,192 actions /32,746 frames /
 489 updates in 48.271s**, versus retained 20% guidance's 47.690s (+1.22%). The
 padded 200k projection is **21m36.346s**, below the fixed 30-minute prerequisite.
