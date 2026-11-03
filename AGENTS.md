@@ -20,21 +20,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 3
 
-The [conservative completed-return actor](docs/results/2026-11-03-cdp-conservative-actor.md) passes its fresh bounded
-comparison: 8192 actions/489 updates in47.402s control/50.754s candidate (+7.07%).
-Positive targets occur on431 updates with33,588 positive rows; the disagreement
-bonus remains active. Padded200k projection22m43s passes30min. Both1024-action
-frozen arms have zero updates/no natural episodes; gameplay benefit is unmeasured.
+The [fresh200k conservative-actor assessment](docs/experiments/2026-11-03-cdp-conservative-actor-200k.md) launches18:11:37 UTC
+November3/sourcecf8c53fc with308 pins and a30-minute training cap. MainPID1057479,
+invocation`d9abb71b942440559ae740a11c7ee1bc`,service`kindle-conservative-actor-200k-20261103`.
+Startup passes357 exact initial tensors,47 pre-update events and first update376.
+At18:12:51,11,768 actions/712 reports include653 positive-target updates; first
+positive1224. The100k/6,227 recovery observer and terminal collector are active.
+Require final/actual-initial sampled/greedy24-episode assessments against retained
+70.750/143.667; no full result yet. Root`/x/Temp/kindle-conservative-actor-20261103/full`.
+Do not restart it,repeat earlier stages or schedule another GPU job while active.
+The five-game goal remains unfinished; check live state.
+
+The [completed bounded check](docs/results/2026-11-03-cdp-conservative-actor.md) passes8192/489 in47.402s control/50.754s
+candidate (+7.07%),with33,588 positive targets and the bonus active. Padded200k
+projection22m43s passes30min; frozen1024 has zero updates/no natural episodes.
 Native3f6c6648 passes1018 Python/169 Rust CPU checks,Clippy and12 F64 cases.
-All258 current/338 retained pins,215 preserved sources,357 matching initial/
-invariant frozen tensors,replays and five GPU stages pass. A separate CPU check
-matches all357 final control arrays and1065 events to the retained short control.
-Main completes17:56:08 UTC November3,terminal collection17:58:00.438,compatibility
-17:58:41.844. CPU fixture/path failures remain; no GPU stage repeats.
-Root`/x/Temp/kindle-conservative-actor-20261103/check` is closed. The [fresh200k
-assessment](docs/experiments/2026-11-03-cdp-conservative-actor-200k.md) is selected with a30-minute training cap and retained
-24-episode controls; its full harness is not prepared or launched yet. No Kindle
-GPU allocation is active. Check live state before work; the five-game goal remains unfinished.
+All258 current/338 retained pins,215 preserved sources,357 initial/frozen tensors,
+replays and five GPU stages pass. A CPU comparison matches357 final control
+arrays/1065 events to the old short control. Closed17:58:41.844 UTC November3;
+CPU fixture/path failures remain,no GPU repeats. Bounded root`check` is closed.
+Actual full CPU postprocessing and queued-config preflights pass before launch;
+one private copy-script assertion is preserved. See the result for evidence.
 
 The [completed-return actor pair](docs/results/2026-11-03-cdp-episodic-actor.md) closes with a useful bonus-off
 result:sampled46.458→56.542 (+21.70%),greedy65.208→95.375 (+46.26%),all0/24

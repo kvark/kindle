@@ -1,5 +1,33 @@
 # Conservative completed-return actor passes native and short training checks
 
+## Fresh200k assessment is running
+
+The [selected assessment](../experiments/2026-11-03-cdp-conservative-actor-200k.md)
+launches **18:11:37 UTC November3**, sourcecf8c53fc, with308 input pins and a
+30-minute training cap. MainPID1057479,invocation
+`d9abb71b942440559ae740a11c7ee1bc`, service
+`kindle-conservative-actor-200k-20261103`, runs one fresh200k/12,477-update
+candidate followed by final/actual-initial sampled/greedy24-episode assessments.
+The100k/6,227 recovery observer and terminal collector are active. No full
+frozen result is available and the five-game goal remains unfinished.
+
+Startup verifies357 exact initial tensors,47 pre-update events and first
+update376. An early read at18:12:51.734 finds11,768 actions/712 reports,
+653 positive-target updates,first positive1224,and all308 pins unchanged.
+The.333s startup check and.548s host review remain in actual wall time.
+Root `/x/Temp/kindle-conservative-actor-20261103/full` is active; do not restart
+it, repeat earlier stages or schedule another GPU job while it runs.
+
+Actual CPU postprocessing passes on a separate retained-data fixture before
+launch:200k exposure accounting, exact teacher metrics and curve generation.
+Six teacher-data corruptions,five trace corruptions and three decision cases
+pass; the exact queued CLI configuration,357-tensor schema and bounded target
+accounting also pass. Helpers take1.868s and queue preflight1.097s. A private
+copy-script count assertion fails before execution and remains recorded; the
+copy is corrected before these passing checks. No learner/GPU stage repeats.
+
+## Completed bounded qualification
+
 The optional completed-return actor now works with the retained model
 disagreement bonus. A fresh8192-action candidate takes **50.754s versus47.402s
 (+7.07%)**, receives33,588 positive replay targets, and preserves the bonus.
@@ -90,9 +118,8 @@ Runtime `/x/Temp/kindle-conservative-actor-20261103/runtime` contains native SHA
 Wheels,validation binary,build cache and previous source snapshots remain.
 Bounded root `check` and its terminal collector are closed; do not rerun them.
 
-The separately selected [fresh200k assessment](../experiments/2026-11-03-cdp-conservative-actor-200k.md)
-will compare against retained gameplay evidence. No full learner has launched
-at this bounded closure. Breakout and the five-game goal remain unfinished.
+The full assessment above is separately selected after this bounded closure.
+Breakout and the five-game goal remain unfinished.
 
 | Artifact | SHA256 |
 | --- | --- |
