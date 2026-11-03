@@ -54,8 +54,7 @@ original start/end, consistent invocation and successful service state, completi
 **11:43:00.131** in1.065s wrapper. All602 original pins remain unchanged. Closure
 is `complete_with_cpu_collection_repair`; the failed original collector is not
 relabelled successful or restarted. No learning, frozen evaluation or replay
-repeats. A subsequent read-only status extraction before completion also reported
-the expected missing completion file; it performed no experiment work.
+repeats.
 
 Root `/x/Temp/kindle-breakout-open-loop-20261103/native-check` is closed. Keep
 the original declaration/review, repair declaration and both execution receipts.
@@ -64,6 +63,11 @@ full learner, extension, coefficient sweep or automatic successor is selected
 by this check. A separately declared full comparison is needed to measure
 gameplay against70.750/143.667 and the unchanged90% two-wall gate. The five-game
 goal remains unfinished.
+
+The passing cost check now supports a separately declared
+[fresh200k comparison](../experiments/2026-11-03-cdp-breakout-open-loop-200k.md).
+Its protocol selects preparation with fixed recovery and four frozen arms;
+no full service has launched yet. No bounded experience will transfer.
 
 | Artifact | SHA256 |
 | --- | --- |

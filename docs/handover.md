@@ -8,6 +8,16 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 3
 
+A [fresh200k Breakout H3/scale1 comparison](experiments/2026-11-03-cdp-breakout-open-loop-200k.md)
+is selected for preparation after the passing bounded cost check. Keep constant
+actor/world imitation100 and the retained12M64/Auto/N8/B16/T16/H15/R16 recipe;
+add only the qualified three-step world objective. Fix30min training cap,
+100k/6,227 recovery and final/actual-initial sampled/greedy24-episode assessments
+against70.750/143.667,all0/24 two-wall. Nativec2d627f3 and runner8946f5f3 are fixed.
+No full service has launched; qualify controllers and check live state first.
+Root `/x/Temp/kindle-breakout-open-loop-20261103/full`; planned service
+`kindle-breakout-open-loop-200k-20261103`. No extension,sweep or automatic successor.
+
 The [Breakout H3 world-supervision check](results/2026-11-03-cdp-breakout-open-loop.md)
 passes8,192 actions/32,717 frames/489 updates in48.603s; conservative200k
 projection21m45.264s passes30min. Frozen1,024 actions/.893s haszero updates
