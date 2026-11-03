@@ -112,3 +112,20 @@ a causal replay mechanism. CPU co-host times remain uncorrected. No GPU work,
 learning,emulator replay orcompleted stage repeats. Run recovery,terminal and
 coverage readers once aftertheir respective prerequisites; completed preparation
 andpreflight must not repeat. Keep bounded failure andCPU repair provenance.
+
+## Retained recovery
+
+The original recovery observer succeeds05:19:46.992 UTC November3. Its saved
+checkpoint contains exactly100,000 actions/6,227 updates,357 finite tensors
+and206,067,161 retained bytes. Independent confirmation passes05:19:54.953 in
+1.884s (1.902s wrapper),verifying all445 input pins,matching metadata andfiles,
+andthe original observer journal identity. The checked log prefix contains
+6,385 finite reports through102,536 actions. Recovery-reviewSHA
+`b8421bdaf8a4eea287075d023f01625ee72e927226a3aaf31d920cd97c7fd63e`,
+retentionSHA`64322cb0bfb7140917faa7de0c2ce9d5e95950cd426e49b2609f475023232ce9`.
+
+The original main977721/invocation84334254aa564f5ab49a4907f2d9e950 remains active.
+Recovery preserves weights andmetadata only; replay,belief,games andRNG remain
+omitted. No training,observer orGPU stage repeats. Do not repeat the completed
+recovery confirmation. Frozen gameplay remains pending; retain CPU co-host time
+without correcting training time.

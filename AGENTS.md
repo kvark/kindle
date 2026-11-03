@@ -39,8 +39,13 @@ CPU closure is required. No successful check stage or reader repeats.
 Startup05:08:57.566 passes445 pins,357 matched initial tensors,47 pre-update
 transitions,correct cadence and119 finite reports through2,280 actions. Main
 977721/invocation84334254aa564f5ab49a4907f2d9e950 remainsactive with original
-postprocess,progress,recovery andcollection observers. No100k recovery orfull
-frozen result isavailable. Keep1.636s CPU startup co-host time uncorrected.
+postprocess,progress andcollection observers. Original recovery succeeds
+05:19:46.992 UTC; independent confirmation05:19:54.953 verifies100k/6,227,
+357 finite tensors,206,067,161 retained bytes andall445 pins. The checked log
+prefix has6,385 finite reports through102,536 actions. Recovery-reviewSHAb8421bda,
+retentionSHA64322cb0. No observer orGPU stage repeats; do not repeat confirmation.
+Full frozen gameplay remains pending. Keep1.636s startup and1.902s recovery
+confirmation CPU wrapper co-host times uncorrected.
 Read-only terminal preparation passes05:11:24.713 in2.806s (2.828s wrapper),
 verifying all445 pins,five original identities andfive score cases. Fixed score
 coverage isqualified05:11:33.246 in2.859s (2.884s wrapper),with50 diagnostic/
