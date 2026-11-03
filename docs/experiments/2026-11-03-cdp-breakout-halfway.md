@@ -59,3 +59,22 @@ Root `/x/Temp/kindle-breakout-halfway-20261103`. The context9 allocation is
 terminal and no Kindle service is running at selection; recheck before launch.
 No learner, extension, sweep or automatic successor is selected. Breakout and
 the five-game goal remain unfinished.
+
+## Completion — November 3
+
+The [result](../results/2026-11-03-cdp-breakout-halfway.md) is complete:
+100k sampled22.125/greedy33.250 versus200k70.750/143.667,all0/24 two-wall.
+All eight lane means improve in both modes; paired200k-minus100k intervals
+[36.333,61.042]/[80.292,145.875] are positive on this reused cohort. Halfway
+training time is bounded629.382–655.956s; original200k1287.910s is unchanged.
+
+CPU preflight passes17 fixtures,two actual CLI paths and357 checkpoint tensors
+at14:01:49.764 UTC in3.369s wrapper. Sourceca6bc06e selects413 pins and launches
+14:02:21.424,PID1032697/invocationc47bd45edffe4af5871bef32e1714dac. The two arms
+complete51,048 actions/204,112 frames/52.534s,zero updates,all357 tensors invariant,
+full replays/videos and guards passing. Original final/initial stages do not repeat.
+Service succeeds14:03:53.486; terminal collection passes once14:04:28.611 in1.015s.
+No stage fails or repeats. Declaration18715475/comparisona8e20334/completion61cf85c7
+full hashes are retained in the report. All stages are closed; no GPU allocation
+remains at closure. The separately selected fresh400k protocol requires its own
+CPU qualification before launch. The five-game goal remains unfinished.

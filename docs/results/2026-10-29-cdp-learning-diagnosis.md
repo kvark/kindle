@@ -1,5 +1,37 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fresh400k/R16 budget comparison](../experiments/2026-11-03-cdp-breakout-budget400k.md)
+is separately selected after the halfway evidence below. Keep the retained
+12M64/Auto/N8/B16/T16/H15/R16/context1, rates/teacher/expert100/critic1/1 and
+native447fe50/runnercf4ea238. Fresh400k/24,977 updates,50-minute training cap;
+conservative measured projection47m13.403s. Preserve100k/6,227,200k/12,477 and
+300k/18,727 recovery,require200k common-prefix tensor/semantic agreement,and
+four fixed24-episode frozen arms. No prior experience transfers or completed
+stage repeats.
+This tests more learning work,not a wall-time speedup or independent seed.
+CPU harness qualification and launch are pending; no learner is active.
+Root `/x/Temp/kindle-breakout-budget400k-20261103/full`. Check live state before
+work; do not restart closed services or overlap GPU allocations.
+
+The [completed frozen halfway assessment](2026-11-03-cdp-breakout-halfway.md)
+finds **22.125→70.750 sampled /33.250→143.667 greedy** from100k to200k; all eight
+lane means improve in both modes. Paired lane intervals are[36.333,61.042] and
+[80.292,145.875]. Initial-subtracted score/min rises1.894–1.974→3.230 sampled
+and2.839–2.959→6.590 greedy. Halfway time is bracketed10m29.382s–10m55.956s;
+final21m27.910s remains unchanged. All0/24 two-wall. Two checkpoints establish
+progress over that interval,not a slope at200k,optimal budget or future success.
+
+Both new frozen arms total51,048 actions/204,112 frames/52.534s,zero updates.
+All413 pins,357 finite/invariant tensors per arm,full replays/videos,guards and
+paired comparison pass; original final/initial evaluations are reused without
+another execution.17 fixtures/two actual CLI paths pass in3.369s preflight.
+ServicePID1032697/invocationc47bd45edffe4af5871bef32e1714dac succeeds
+14:03:53.486 UTC November3/sourceca6bc06e; fixed terminal collection succeeds
+14:04:28.611 in1.015s. No failure,build,training or prior-stage repeat.
+Root `/x/Temp/kindle-breakout-halfway-20261103` is closed; do not repeat its
+stages. The original200k evaluation rule is unchanged. Reused learner/cohort
+limits reliability; Breakout and the five-game goal remain unfinished.
+
 The [completed context9 comparison](2026-11-03-cdp-breakout-context9.md)
 lowers sampled **70.750→46.583** and greedy **143.667→91.167**, all **0/24
 two-wall**, in **23m30.959s (+9.55%)** for200k actions/799,606 frames/12,473
