@@ -85,3 +85,17 @@ configuration cases reuse five retained boundary fixtures, score thresholds
 bins, not verified walls or causal evidence. Retain startup/reader CPU co-host
 timings without correcting training time. Run recovery confirmation once after
 the original 100k observer; terminal and coverage readers once after completion.
+
+## Recovery retained
+
+The original recovery observer succeeds at 07:38:49.967 UTC November 3.
+Independent confirmation completes once at 07:39:20.788 in 1.284s CPU
+(1.303s wrapper), preserving the original main PID/invocation and all 428 pins.
+The 100k/6,227-update checkpoint contains 357 finite tensors; all four retained
+files total 206,067,161 bytes and match their original hashes. The observer's
+complete prefix contains 102,296 actions and 6,370 finite reports. This is
+weights/metadata recovery only; replay, belief, games and RNG are omitted.
+Training continues unchanged. No observer or GPU stage repeats, and frozen
+competence remains unmeasured. Retention SHA
+`e6aed7de87ba5783e6a7b064cc22879eac301b4f1b14ef47883d8dda52581e87`;
+metadata SHA `3a9f8ba1720c27714203b651b4f650d5c3d09056d8a163de93e0d12be994ad7c`.

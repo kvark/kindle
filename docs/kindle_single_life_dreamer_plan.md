@@ -19,8 +19,11 @@ checks. Two pre-launch CPU failures (collector date and parser fixture) are
 preserved and corrected; no GPU stage repeats. Root
 `/x/Temp/kindle-breakout-acgrads-value1-20261103`. Terminal/coverage readers
 qualify once at 07:28:48.039 / 07:29:28.982 with all 428 active pins; retain
-CPU co-host timings. Recovery confirmation, terminal and coverage results
-remain outstanding; check live state before work.
+CPU co-host timings. Original recovery succeeds 07:38:49.967; independent
+confirmation passes once 07:39:20.788 with all 428 pins, 357 finite tensors
+and 206,067,161 retained bytes at 100k/6,227 updates. The original learner
+continues; terminal and coverage results remain outstanding. Do not repeat
+the recovery observer or confirmation; check live state before work.
 Breakout and the five-game goal remain unfinished.
 
 The [fixed subaction diagnostic](results/2026-11-03-cdp-breakout-subaction.md) finds no extra rescues from one

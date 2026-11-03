@@ -62,3 +62,10 @@ The full CPU harness and terminal/coverage readers are qualified. Two pre-launch
 CPU failures are preserved and corrected; no GPU stage repeats. See the
 [full protocol](../experiments/2026-11-03-cdp-breakout-acgrads-value1-200k.md)
 for exact qualification and identities. No full frozen result is available.
+
+The original 100k recovery succeeds 07:38:49.967 UTC November 3; independent
+confirmation passes once 07:39:20.788 in 1.284s CPU. All 428 pins, original main
+identity, 357 finite tensors and 206,067,161 retained checkpoint bytes match.
+The checkpoint has 6,227 updates; the observer checks 6,370 finite reports
+through 102,296 actions. The original learner continues. Do not repeat the
+recovery observer or confirmation; terminal and coverage results remain pending.
