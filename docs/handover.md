@@ -8,29 +8,33 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [bounded discount100 check](experiments/2026-11-04-cdp-breakout-discount100.md) is selected after the completed
-negative dynamics-scale3 comparison. Change only native return discount horizon
-333→100 (F32 gamma.996997→.99); imagination stays15. The retained critic's weak
-complete-return calibration motivates more local credit, with loss of distant
-reward information as a tradeoff. This is a learning hypothesis, not a causal fix.
+The [bounded discount100 check](results/2026-11-04-cdp-breakout-discount100.md) passes8,192 actions/32,729 frames/
+489 updates in47.055s; padded200k21m03.687s passes30min. Frozen1,024 actions/
+4,096 frames/.874s haszero updates,357 invariant tensors and no natural episodes.
+All82 current/338 retained pins,357 matching initials,47 pre-update events,
+finite weighted losses,full pixel/action/label replay and guards pass. Main/
+collector complete18:39:21.965/18:39:27.158 UTC November4/sourcea5c9093a;
+independent2.481s closure18:39:55.770 retains102 artifact hashes. Both original
+services succeed; no GPU stage repeats. Original CPU source-name assertion and
+repair remain. Do not restart the bounded check or collectors.
 
-Both canonical/private CLI suites pass14 cases; actual-command preflight passes
-1.560s with zero agent/emulator construction,357-tensor schema,47 pre-update
-events and correct489/6,227/12,477 schedules. Exact native source and CPU F32
-arithmetic pass. The original source-review input-name assertion and repair are
-preserved; no GPU work has occurred in preparation. Native447fe50/SHA35ad0db
-and teacher stay fixed; qualified runner112be6c4 adds ten CLI lines.
+Select one [fresh200k discount100 comparison](experiments/2026-11-04-cdp-breakout-discount100-200k.md) after this pass.
+Only return discount horizon333→100 changes; imagination stays15. Retained
+complete-return critic error motivates testing more local credit, with distant
+reward loss as a tradeoff; no causal mechanism or gameplay gain is established.
+Keep12M64/Auto/N8/B16/T16/H15/R16/expert100 and other retained settings,
+native447fe50/SHA35ad0db,teacher and qualified runner112be6c4. Full helper,
+comparison and plot qualification passes3.667s with zero native/GPU work.
 
-Require8,192 actions/489 updates within180s,then1,024 frozen actions/zero updates,
-exact357 initial/invariant tensors,full guided replay and guards. Padded200k
-projection must fit30min before a separate full learner may be selected. Retain
-all other12M64/Auto/N8/B16/T16/H15/R16/expert100 settings,seed1009 and the
-143.667 greedy/70.750 sampled baseline. No experience reuse,discount sweep,
-extension or automatic successor. Root
-`/x/Temp/kindle-breakout-discount100-20261104`;service
-`kindle-breakout-discount100-check-20261104`. Prepared for launch;check live
-identity before work. Original864/90%-two-wall and the five-game goal remain
-unfinished.
+Require30-minute training cap,200k/12,477 updates,100k/6,227 read-only recovery
+and four actual-initial/final sampled/greedy24-natural-episode assessments.
+Greedy is primary; favor higher raw score and own-initial gain/min with a positive
+paired interval. No bounded experience transfer,discount sweep,extension,
+second learner or automatic successor. Full root
+`/x/Temp/kindle-breakout-discount100-20261104/full`; service
+`kindle-breakout-discount100-200k-20261104`. Preparation pending;no allocation
+active at selection. Check live state before launch. Retain143.667 greedy/
+70.750 sampled;original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
