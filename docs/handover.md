@@ -8,28 +8,20 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed Breakout terminal replay audit](results/2026-11-04-cdp-breakout-terminal-replay.md) finds5,376 terminal
-exposures among3,194,112 replay rows (.1683%), from263 observed game endings.
-Terminal targets are present in the existing continuation loss. In the final50k
-window,76.352% of updates contain no terminal rows;205 terminal-containing
-batches have a conservative mean prediction bound below.5,10 above.5 and524
-remain unresolved. The final-window aggregate terminal mean lies in
-[.106423,.669123], not an exact estimate or confidence interval. Some replay
-fitting is established; its changing posterior states differ from the frozen
-one-step prior diagnostic, whose mean terminal prediction remains.952850.
+The [paired Breakout arrival-head diagnostic](experiments/2026-11-04-cdp-breakout-arrival-head.md) is selected after13 CPU tests and
+preflight verification of606 prior pins and22 artifacts. One guarded180s frozen
+capture re-observes43,424 source actions and exports predicted/observed states
+at120 fixed life-loss arrivals, including24 game endings. Offline F64 continuation
+head analysis must match all120 native priors within1e-4; no native rebuild or
+learning is selected. Require exact prior/pixel/transition parity,357 invariant
+tensors,zero updates,independent recount and original-service closure.
 
-The CPU-only analysis takes.493s;16 tests, all606 pins,12,477-report independent
-Decimal recount,263 terminal/episode joins and22 final artifact hashes pass.
-Sourcebf2011ee,analysisPID1102416;3.710s closure completes03:17:31 UTC November4
-without failures,repairs or repeated stages. Root
-`/x/Temp/kindle-breakout-terminal-replay-20261104` is closed. Native,emulator,
-checkpoint and training remain unchanged; no GPU work or new learning occurs.
-
-A paired final-model prediction before/after observing the same arrival is the
-next diagnostic question; no new allocation,loss,sampler or learner is selected.
-No learner or GPU allocation is active. Do not repeat completed stages; check
-live state before work. Retain70.750 sampled/143.667 greedy and20% episode
-guidance. The original864/90%-two-wall and five-game goal remain unfinished.
+Root `/x/Temp/kindle-breakout-arrival-head-20261104`, service
+`kindle-breakout-arrival-head-20261104`. Check live state; do not restart an active
+or completed stage or schedule another GPU job while it runs. Prior replay audit
+and ending-feedback captures remain closed. Retain70.750 sampled/143.667 greedy;
+the original864/90%-two-wall and five-game goal remain unfinished. No successor
+loss,sampler or learner is selected.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

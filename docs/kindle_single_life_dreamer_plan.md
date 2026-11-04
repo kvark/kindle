@@ -1,5 +1,13 @@
 # Kindle: CDP learning roadmap
 
+The [paired arrival-head diagnostic](experiments/2026-11-04-cdp-breakout-arrival-head.md)
+is selected: one guarded180s frozen state capture at120 saved life-loss arrivals,
+then offline continuation-head analysis and independent closure. Thirteen CPU
+tests and preflight pass;606 prior pins and22 artifacts remain unchanged. No
+native change or learning. Root `/x/Temp/kindle-breakout-arrival-head-20261104`;
+check its service before work and do not repeat completed stages. Original game
+gates remain unchanged.
+
 The [completed Breakout terminal replay audit](results/2026-11-04-cdp-breakout-terminal-replay.md) finds5,376 terminal
 exposures among3,194,112 replay rows (.1683%), from263 observed game endings.
 Terminal targets are present in the existing continuation loss. In the final50k
