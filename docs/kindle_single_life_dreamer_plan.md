@@ -1,5 +1,33 @@
 # Kindle: CDP learning roadmap
 
+The [selected trained-policy posterior comparison](experiments/2026-11-04-cdp-breakout-value1-modal.md) will assess the retained
+Breakout replay-value1 final checkpoint with sampled versus modal posterior
+states, keeping actions greedy and all weights frozen. It selects two final-model
+arms only: no new learner or initial-model GPU assessment. The older four-arm
+Breakout assessment remains protocol-failed and will not restart.
+
+Both actual commands pass CPU qualification with native/game construction
+blocked,19 invalid audit fixtures rejected and six decision fixtures checked.
+All69 qualification/338 retained inputs and357 finite tensors pass; saved initial
+tensors match the old model on CPU, without assigning an accepted modal initial
+score. The final CPU check takes3.784s. The earlier successful check is retained;
+queue acceptance was narrowed to runtime completion so an otherwise auditable
+capped arm can be replayed before protocol rejection. No cap changes or GPU work.
+
+Require the sampled-posterior arm to reproduce retained greedy143.667 and its
+full semantic trajectory/counters before modal execution. Both arms require
+24 natural episodes, zero truncations/updates,357 invariant tensors, full replay/
+video and host guards. Each has600k actions/300s; no retry or extension. Favor
+modal only with at least10% higher mean, positive paired lane-bootstrap95%
+interval and no fewer two-wall successes. Original training stays200k/12,477/
+21m27.910s. This is inference evidence, not a paired learning-gain/min claim.
+
+Use qualified nativeb76f91c/SHA7555bf9 and runnerfac1ff7. Root
+`/x/Temp/kindle-breakout-value1-modal-20261104`; service
+`kindle-breakout-value1-modal-eval-20261104`. No GPU allocation is active at
+selection; check live state before launch. The encoder8e-5 comparison is closed
+and rejected. The original864/90%-two-wall and five-game goal remain unfinished.
+
 The [completed encoder8e-5/current-critic comparison](results/2026-11-04-cdp-breakout-value1-encoder8e5.md) finishes200k
 actions/799,555 frames/12,477 updates in21m13.443s (−1.12%). Greedy103.583
 falls27.90% below retained143.667; sampled74.000 rises4.59% from70.750.

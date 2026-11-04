@@ -8,29 +8,33 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed encoder8e-5/current-critic comparison](results/2026-11-04-cdp-breakout-value1-encoder8e5.md) finishes200k
-actions/799,555 frames/12,477 updates in21m13.443s (−1.12%). Greedy103.583
-falls27.90% below retained143.667; sampled74.000 rises4.59% from70.750.
-All0/24 two-wall. Greedy gain/min falls27.52%, paired difference−1.814
-[−4.055,1.152]; sampled difference+.190[−.534,1.026]. Both intervals span zero.
-The fixed improvement rule fails: retain encoder4e-5 and the existing recipe.
-Only encoder rate changes; native447fe50/runnercf4ea238/teacher stay fixed.
-Earlier neighboring-recipe benefit does not carry over in this development
-comparison; no isolated mechanism, reliable harm or seed-reliability claim.
+The [selected trained-policy posterior comparison](experiments/2026-11-04-cdp-breakout-value1-modal.md) will assess the retained
+Breakout replay-value1 final checkpoint with sampled versus modal posterior
+states, keeping actions greedy and all weights frozen. It selects two final-model
+arms only: no new learner or initial-model GPU assessment. The older four-arm
+Breakout assessment remains protocol-failed and will not restart.
 
-All120 original/12 CPU-repair/338 retained inputs,100k recovery,357 matched
-initial/invariant frozen tensors,47 pre-update and799/794 initial evaluation
-semantic events, full replays/videos, guards, curves, exposure and comparison
-pass. Minimum11.159GiB headroom across75,262 snapshots clears2GiB. Late expert
-CE improves.560514→.548159 without primary gameplay gain. Original main/collector
-succeed00:45:07/00:45:34 UTC November4/source6543be61; all services are terminal
-success, withno GPU or completed-stage repeat. The pre-launch CPU fixture
-failure and separate correction remain preserved; original receipts stay intact.
+Both actual commands pass CPU qualification with native/game construction
+blocked,19 invalid audit fixtures rejected and six decision fixtures checked.
+All69 qualification/338 retained inputs and357 finite tensors pass; saved initial
+tensors match the old model on CPU, without assigning an accepted modal initial
+score. The final CPU check takes3.784s. The earlier successful check is retained;
+queue acceptance was narrowed to runtime completion so an otherwise auditable
+capped arm can be replayed before protocol rejection. No cap changes or GPU work.
 
-Root`/x/Temp/kindle-breakout-value1-encoder8e5-20261104/full` is closed; no GPU
-allocation remains active. Do not restart completed stages. No extension,
-confirmation, rate queue or automatic successor isselected. Check live state
-before future work. The original864/90%-two-wall and five-game goal remain unfinished.
+Require the sampled-posterior arm to reproduce retained greedy143.667 and its
+full semantic trajectory/counters before modal execution. Both arms require
+24 natural episodes, zero truncations/updates,357 invariant tensors, full replay/
+video and host guards. Each has600k actions/300s; no retry or extension. Favor
+modal only with at least10% higher mean, positive paired lane-bootstrap95%
+interval and no fewer two-wall successes. Original training stays200k/12,477/
+21m27.910s. This is inference evidence, not a paired learning-gain/min claim.
+
+Use qualified nativeb76f91c/SHA7555bf9 and runnerfac1ff7. Root
+`/x/Temp/kindle-breakout-value1-modal-20261104`; service
+`kindle-breakout-value1-modal-eval-20261104`. No GPU allocation is active at
+selection; check live state before launch. The encoder8e-5 comparison is closed
+and rejected. The original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
