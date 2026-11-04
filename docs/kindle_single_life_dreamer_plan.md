@@ -1,5 +1,23 @@
 # Kindle: CDP learning roadmap
 
+The [fresh200k prior-continuation comparison](experiments/2026-11-04-cdp-breakout-prior-continuation-200k.md)
+is active, launched08:03:00 UTC November4/sourceae754547 with389 pins and30min
+training cap. MainPID1148345/invocation5e9d868e14e04ebb8c703bab0177aaa5; recovery
+and terminal observers are active. Startup passes357 bounded/retained matching
+initial tensors,47 pre-update events and first update376. It has passed10k actions;
+no full frozen result exists yet. Do not restart it or schedule another GPU job.
+
+Keep12M64/Auto/N8/B16/T16/H15/R16,replay-value1/expert100 and retained rates/guidance;
+add prior-continuation scale1. Native07873e7c/SHAaeecf9e7 and runtime remain fixed.
+Fresh200k/12,477, no experience transfer; require100k/6,227 recovery and final/
+actual-initial sampled/greedy24-episode assessments against70.750/143.667,all0/24
+two-wall. Primary greedy return and gain/min use paired eight-lane10k bootstrap.
+Original864/90%-two-wall gate remains. Native/runner/wrapper differences and reused
+cohort limit causal/reliability claims. No extension,second learner or automatic
+successor. Root`/x/Temp/kindle-prior-continuation-20261104/full`;
+service`kindle-breakout-prior-continuation-200k-20261104`. Check live identity;
+an observer timeout never authorizes restart. The five-game goal remains unfinished.
+
 The [one-step prior continuation bounded check](results/2026-11-04-cdp-breakout-prior-continuation.md)
 passes8,192 actions/32,728 frames/489 updates in47.016s. Conservative200k projection
 21m32.945s passes30min; frozen1,024 actions/.892s haszero updates/no natural episodes.
