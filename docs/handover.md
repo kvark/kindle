@@ -8,42 +8,31 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [fresh 200k catch-reward comparison](experiments/2026-11-04-cdp-breakout-catch-reward1-200k.md) starts at
-16:51:43 UTC November 4, source `318591c9`. One fresh Breakout learner adds
-+1 training point for each causal pixel-detected catch. Native configuration,
-teacher and the qualified runner stay fixed. Main PID **1164587**, invocation
-`873fae9edd444c15be0db8fcffa5812c`, is active with the terminal observer.
-Independent 100k recovery is verified. No final frozen result is available.
+The [completed catch-reward comparison](results/2026-11-04-cdp-breakout-catch-reward1.md#full-200k-comparison)
+finishes 200k actions /799,557 frames /12,477 updates in **21m51.733s**,
+1.85% above the retained control. Adding one training point per causal pixel
+catch lowers greedy143.667→86.417 and sampled70.750→68.458; all0/24 two-wall.
+Primary initial-subtracted gain/min falls41.55%; its paired difference−2.738356
+has95% lane interval[−4.825834,−.559765]. The locked preference rule fails.
+Retain the unshaped recipe. This reused development learner/cohort does not
+identify the learning mechanism or establish broad reliability.
 
-All 473 declaration pins and five queued commands pass preflight. Startup
-matches all 357 initial tensors to both bounded and retained controls, plus
-47 pre-update events to each permitted comparison. At 16:52:28 UTC, the original
-process has reached 7,000 actions with 414 finite reports; first update is 376.
-The startup observer costs .310s and publication reader .022s on the CPU;
-retain co-host work in measured training time without correction.
+All473 current/338 retained pins,100k/6,227 recovery,357 matched initial/invariant
+frozen tensors,47 pre-update and799/794 initial semantic events,full replays/videos,
+guards,curves,coverage,exposure and comparison pass. Independent replay verifies
+5,231 catches:raw reward13,151,training reward18,382. Actual overrides42.932%;
+guided returns and reward exposure are not frozen competence.
 
-The 100k/6,227 checkpoint passes at 17:02:44.724 UTC: all 357 finite arrays,
-473 unchanged pins and read-only weights/moments verify in 1.379s. The recovery
-observer exits successfully under its original invocation; the learner continues.
-A supplemental journal reader incorrectly expects parent-process stdout; its
-preserved failure is resolved by checking the actual verifier child in the same
-invocation. No original stage repeats. Recovery is weights/moments only, not a
-complete live-state resume; CPU co-host work remains in training time.
+Main/collector succeed17:17:51.351/17:18:02.038 UTC November4/source318591c9;
+terminal audit takes3.661s. Recovery succeeds earlier. All original services
+finish successfully with no repeated GPU stage. Supplemental publication readers'
+parent-versus-child journal and historical-field lookup errors remain preserved,
+with separate read-only corrections;the original pipeline is unaffected.
 
-The [bounded check](results/2026-11-04-cdp-breakout-catch-reward1.md) remains closed: 8,192 actions /489 updates
-in 47.580s, with 139 replay-verified catches and a padded 200k projection of
-21m17.777s. Its original CPU preparation failures and repairs remain preserved.
-No bounded experience is reused. The full run has a 30-minute training cap,
-100k/6,227 recovery and four actual-initial/final sampled/greedy 24-episode
-assessments, with catch rewards, guidance and labels disabled in evaluation.
-
-Root `/x/Temp/kindle-breakout-catch-reward1-20261104/full`; service
-`kindle-breakout-catch-reward1-200k-20261104`. Do not restart this learner or
-schedule another GPU job while it is active. Primary greedy raw score and
-initial-subtracted gain/min must improve with a positive paired interval.
-Retain 143.667 greedy/70.750 sampled pending that decision. No extension,
-coefficient sweep or automatic successor. The original 864/90%-two-wall gate
-and five-game goal remain unfinished.
+Root `/x/Temp/kindle-breakout-catch-reward1-20261104/full` is closed. No GPU
+allocation is active at review;check live state before work. No extension,
+coefficient sweep,second learner or automatic successor is selected. The original
+864/90%-two-wall gate and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
