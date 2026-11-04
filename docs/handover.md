@@ -12,8 +12,12 @@ The [fresh200k terminal-replay comparison](experiments/2026-11-04-cdp-breakout-t
 sourcef5540278, with343 pins and a30-minute training cap. MainPID1114966,
 invocation`f812d2f076de4e0a9ff50d60a30199ba`, is active. Startup passes357
 bounded/retained initial tensors,47 pre-update semantic events andcorrect first
-update376;336 reports are finite andexposure-audited through5752 actions.
-The100k recovery andoriginal terminal observers are active. No frozen result exists.
+update376. The100k/6,227 recovery passes; all357 tensors arefinite andweights/
+moments remain read-only. Independent.570s CPU verification preserves the original
+live identity; the recovery observer isterminal success. Through102,400 actions,
+6377 reports arefinite/exposure-audited, with26,431 terminal rows and6284 updates
+containing endings. The learner andoriginal terminal observer remain active.
+No frozen gameplay result exists; CPU co-host time stays included without correction.
 
 Use12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100,terminal mixture.25 and
 continuation1. Require200k/12,477 within30min,100k/6,227 recovery andfour actual-
