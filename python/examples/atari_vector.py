@@ -127,6 +127,8 @@ def main():
                         help="fresh actor/critic rate; omitted: native default follows the base rate")
     parser.add_argument("--replay-value-scale", type=float,
                         help="fresh training only: real-replay value loss scale; omitted: native default")
+    parser.add_argument("--continuation-scale", type=float,
+                        help="fresh training only: world continuation loss scale; omitted: native default")
     parser.add_argument("--replay-actor-scale", type=float,
                         help="fresh training: positive-advantage imitation of completed observed returns")
     parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
@@ -219,6 +221,11 @@ def main():
             parser.error("replay-value-scale must be finite and positive in F32")
         if args.evaluate:
             parser.error("replay-value-scale requires fresh training")
+    if args.continuation_scale is not None:
+        if not positive_f32(args.continuation_scale):
+            parser.error("continuation-scale must be finite and positive in F32")
+        if args.evaluate:
+            parser.error("continuation-scale requires fresh training")
     if args.replay_value_bootstrap is not None and args.evaluate:
         parser.error("replay-value-bootstrap requires fresh training")
     if args.replay_actor_observed_lower_bound and (
@@ -397,6 +404,7 @@ def main():
     training_options.add("--breakout-centroid-scale")
     training_options.add("--behavior-learning-rate")
     training_options.add("--replay-value-scale")
+    training_options.add("--continuation-scale")
     training_options.add("--replay-actor-scale")
     training_options.add("--return-lambda")
     training_options.add("--replay-value-bootstrap")
@@ -589,6 +597,8 @@ def main():
             config["behavior_learning_rate"] = args.behavior_learning_rate
         if args.replay_value_scale is not None:
             config["loss_scales"]["replay_value"] = args.replay_value_scale
+        if args.continuation_scale is not None:
+            config["loss_scales"]["continuation"] = args.continuation_scale
         if args.replay_actor_scale is not None:
             config["replay_actor_scale"] = args.replay_actor_scale
         if args.replay_actor_observed_lower_bound:

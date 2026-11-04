@@ -1,5 +1,13 @@
 # Kindle: CDP learning roadmap
 
+The [bounded continuation10 check](experiments/2026-11-04-cdp-breakout-continuation10.md)
+is selected after34 canonical/34 packaged CPU checks and actual-command preflight.
+It raises existing world continuation BCE scale1→10, with the retained native,
+architecture, guidance and remaining recipe unchanged. One8192-action check and
+1024 frozen actions assess execution/cost; no full learner is selected. Root
+`/x/Temp/kindle-breakout-continuation10-20261104`; check the original service
+before work and do not repeat completed stages. Original game gates remain fixed.
+
 The [completed Breakout arrival-head diagnostic](results/2026-11-04-cdp-breakout-arrival-head.md) lowers mean terminal
 continuation from.952850 before observation to.759636 after the actual arrival,
 against target zero. Only5/24 observed endings fall below.5;20 errors decrease
