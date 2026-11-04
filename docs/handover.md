@@ -8,29 +8,29 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [selected dynamics-scale3 check](experiments/2026-11-04-cdp-breakout-dynamics-scale3.md) increases prior-fitting KL
-weight1→3 while keeping posterior KL.1 and both free-nat floors1. Retained late
-raw KL11.815355 versus clipped11.815389 gives little support for the floor as
-the main late fitting limit; aggregate means do not identify individual states
-or a gameplay cause. The independent.317s CPU recount covers12,477 reports.
+The [bounded dynamics-scale3 check](results/2026-11-04-cdp-breakout-dynamics-scale3.md) passes8,192 actions/32,719 frames/
+489 updates in46.855s; padded200k projection20m58.323s passes30min. Frozen1,024/
+4,096 frames/.881s haszero updates,357 invariant tensors,no natural episodes.
+All76 current/338 retained pins,357 matching initials,47 initial events,weighted
+losses,changed CNN/reward/continuation/actor/value,full replay and guards pass.
+Execution/cost only; gameplay benefit remains unmeasured.
 
-Keep12M64/Auto/N8/B16/T16/H15/R16/expert100 and other retained settings.
-Native447fe50/SHA35ad0db is unchanged; runner52593379 adds only the CLI option.
-Both canonical/private runner tests pass12 cases each, then actual-command
-preflight passes1.458s with zero native-agent/emulator/GPU construction.
-The first canonical import failed before test collection because the retained
-package lacks a current Python helper. Its source/stderr are preserved; the
-corrected CPU harness resolves canonical helpers from the repository.
+Native447fe50/SHA35ad0db stays fixed; runner52593379 exposes dynamics KL1→3.
+Posterior KL.1/free-nat floors1 and the retained12M64/Auto/N8/B16/T16/H15/R16/
+expert100 recipe stay fixed. Both12-case CLI suites and1.458s preflight pass.
+Exploratory JSON-reader and canonical import failures/CPU repairs remain preserved.
+Main/collector succeed17:56:39.956/17:56:46.344 UTC November4/sourced7f8847a;
+independent2.528s closure17:57:15.344 retains92 artifact hashes. No GPU repeat.
 
-Require8,192 actions/489 updates,first376,357 matching initial/invariant frozen
-tensors,47 shared initial events,finite weighted losses,full replay and guards.
-Training180s/frozen60s; padded200k cost must fit30min. This targets learning
-quality,not a required throughput improvement. Root
-`/x/Temp/kindle-breakout-dynamics-scale3-20261104`; service
-`kindle-breakout-dynamics-scale3-check-20261104`, prepared but not launched at
-review. No full learner,coefficient sweep or automatic successor is selected.
-Check live state before work. Retain143.667 greedy/70.750 sampled; original
-864/90%-two-wall and the five-game goal remain unfinished.
+Select the [fresh200k comparison](experiments/2026-11-04-cdp-breakout-dynamics-scale3-200k.md), with30-minute training cap,
+100k/6,227 recovery and four actual-initial/final sampled/greedy24-episode arms.
+Greedy remains primary; favor only improved raw score and own-initial gain/min
+with positive paired interval. Full preparation pending;no learner active yet.
+Root `/x/Temp/kindle-breakout-dynamics-scale3-20261104/full`; service
+`kindle-breakout-dynamics-scale3-200k-20261104`. Check live state before work;
+do not repeat the bounded check or transfer its experience. No sweep,extension,
+second learner or automatic successor. Retain143.667 greedy/70.750 sampled;
+original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

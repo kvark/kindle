@@ -1,16 +1,28 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-Select the [bounded dynamics-scale3 check](../experiments/2026-11-04-cdp-breakout-dynamics-scale3.md): prior-fitting KL1→3,
-posterior KL.1 and free-nat floors1 unchanged. The independent.317s retained-log
-recount finds late raw/clipped KL11.815355/11.815389; this does not identify a
-causal gameplay limit. Native447fe50 stays fixed; private runner52593379 exposes
-the existing coefficient. Both12-case CLI suites and1.458s actual-command
-preflight pass with no native agent/emulator. The canonical helper-import failure
-and CPU repair remain preserved. Require8,192/489,357 matched initial/invariant
-frozen tensors,47 initial events,full replay/guards and padded200k cost≤30min.
-Root `/x/Temp/kindle-breakout-dynamics-scale3-20261104` is prepared,not launched
-at review. No full learner,sweep or automatic successor;check live state.
-The original Breakout gate and five-game goal remain unfinished.
+The [bounded dynamics-scale3 check](2026-11-04-cdp-breakout-dynamics-scale3.md) passes8,192 actions/32,719 frames/
+489 updates in46.855s; padded200k projection20m58.323s passes30min. Frozen1,024/
+4,096 frames/.881s haszero updates,357 invariant tensors,no natural episodes.
+All76 current/338 retained pins,357 matching initials,47 initial events,weighted
+losses,changed CNN/reward/continuation/actor/value,full replay and guards pass.
+Execution/cost only; gameplay benefit remains unmeasured.
+
+Native447fe50/SHA35ad0db stays fixed; runner52593379 exposes dynamics KL1→3.
+Posterior KL.1/free-nat floors1 and the retained12M64/Auto/N8/B16/T16/H15/R16/
+expert100 recipe stay fixed. Both12-case CLI suites and1.458s preflight pass.
+Exploratory JSON-reader and canonical import failures/CPU repairs remain preserved.
+Main/collector succeed17:56:39.956/17:56:46.344 UTC November4/sourced7f8847a;
+independent2.528s closure17:57:15.344 retains92 artifact hashes. No GPU repeat.
+
+Select the [fresh200k comparison](../experiments/2026-11-04-cdp-breakout-dynamics-scale3-200k.md), with30-minute training cap,
+100k/6,227 recovery and four actual-initial/final sampled/greedy24-episode arms.
+Greedy remains primary; favor only improved raw score and own-initial gain/min
+with positive paired interval. Full preparation pending;no learner active yet.
+Root `/x/Temp/kindle-breakout-dynamics-scale3-20261104/full`; service
+`kindle-breakout-dynamics-scale3-200k-20261104`. Check live state before work;
+do not repeat the bounded check or transfer its experience. No sweep,extension,
+second learner or automatic successor. Retain143.667 greedy/70.750 sampled;
+original864/90%-two-wall and five-game goal remain unfinished.
 
 The [completed B32/T8 check](2026-11-04-cdp-breakout-b32-t8.md) takes46.818s for8,192 actions/
 32,723 frames/493 updates:1.83% below retained47.690s, missing the required5%.
