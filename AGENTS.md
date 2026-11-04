@@ -30,11 +30,13 @@ return and gain/min with paired lane interval determine development preference;
 original864/90%-two-wall gate remains unchanged.
 
 All774 launch pins and five queued-command checks pass. Startup verifies357
-matching initial tensors,47 pre-update events and first update376. At09:15:01,
-the original learner is active through8,216 actions/490 updates. MainPID1152865,
-invocation`80605bcd9c744663bf4ee9f4e0cb82f5`; unit
-`kindle-breakout-representation001-200k-20261104`. Recovery and terminal
-observers are active. Root`/x/Temp/kindle-breakout-representation001-20261104/full`.
+matching initial tensors,47 pre-update events and first update376. The100k/
+6,227 recovery passes09:24:53 UTC; independent2.047s verification passes09:25:10
+with357 finite tensors,774 unchanged pins and read-only checkpoint files.
+The recovery service succeeds; the original learner and terminal observer stay
+active. MainPID1152865,invocation`80605bcd9c744663bf4ee9f4e0cb82f5`; unit
+`kindle-breakout-representation001-200k-20261104`. A09:26:01 receipt/process review
+confirms the same learner. Root`/x/Temp/kindle-breakout-representation001-20261104/full`.
 No full frozen result exists. Do not restart this learner or schedule another
 GPU job while it is active; check actual service/process state.
 
@@ -42,8 +44,9 @@ Full CPU helper qualification preserves an exact-float sum assertion failure
 (max difference9.095e-13); a tolerance repair resumes only unfinished checks.
 Original failure/source and successful repair remain pinned. The earlier bounded
 CPU fixture spelling failure also remains; no completed GPU stage repeats.
-Startup observer.327s and read-only live observation.023s remain included without
-time correction. Require100k/6,227 recovery and all four frozen assessments.
+Startup observer.327s,initial live observation.023s,recovery observer.343s,
+independent verification2.047s and receipt review.012s remain included without
+time correction. All four frozen assessments remain pending.
 No extension,second learner,sweep or automatic successor is selected.
 The five-game goal remains unfinished.
 
