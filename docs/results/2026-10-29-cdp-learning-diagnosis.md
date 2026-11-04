@@ -1,26 +1,32 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [frozen terminal-weight arrival diagnostic](../experiments/2026-11-04-cdp-breakout-terminal-weight-arrivals.md) is selected. Reuse the
-control's saved120 endpoints (24 true game endings/96 intermediate life losses)
-and re-observe43,424 actions/173,660 frames once with the completed weight10 model.
-Primary is observed-terminal posterior squared-error change; report prior and
-intermediate-life errors separately with fixed paired lane intervals. This tests
-whether the intended prediction changed after gameplay failed to improve. No
-population calibration, causal gameplay diagnosis or model promotion is implied.
+The [completed terminal-weight arrival diagnostic](2026-11-04-cdp-breakout-terminal-weight-arrivals.md) finds terminal
+posterior MSE.644558→.054219, paired difference−.590339 with lane interval
+[−.718137,−.451811]. All24 terminal errors improve; below-.5 outputs rise5/24→22/24.
+Terminal prior MSE.911006→.423453 also improves. But intermediate-life posterior
+MSE.003178→.099410 and prior.001530→.153795 worsen, with false below-.5 outputs
+0→11/96 posterior and0→23/96 prior. All eight lane means show both tradeoffs.
 
-Reuse3672a21a/SHAa8b483a3 and final200k/12,477 weights from the completed learner;
-control capture is not repeated. Require120 exact joins/repeated queries, full
-pixel/action/reward/frame/reset reproduction,357 invariant tensors/zero updates,
-F64-to-native prior agreement and guards. Posterior head outputs are offline
-F64 estimates on each model's own features.16 CPU checks pass; preserve existing
-full/bounded evidence and failures. Capture180s, analysis60s, service300s caps.
+The targeted loss changes predictions on the intended terminal states, while
+increasing false ending indications at other life losses. The outcome-conditioned
+control-policy cohort does not establish population calibration or a causal
+explanation for gameplay. Remaining-life information, discrimination, probability
+levels and use of continuation in imagined behavior remain unresolved. Retain
+143.667 greedy/70.750 sampled over weight10's120.542/66.375, all0/24 two-wall.
+No new loss, correction, weight sweep, learner or automatic successor is selected.
 
-Root`/x/Temp/kindle-terminal-weight-arrivals-20261104`;service
-`kindle-breakout-terminal-weight-arrivals-20261104`. Preparation is in progress;
-no GPU allocation is active yet. Check live state before launch; do not repeat
-completed stages. Retain143.667 greedy/70.750 sampled over120.542/66.375 from
-weight10, all0/24 two-wall. No new learner, loss variant, weight sweep or automatic
-successor is selected. Original864/90%-two-wall and five-game goal remain unfinished.
+One50.596s frozen capture re-observes43,424 actions/173,660 frames,zero updates,
+357 invariant tensors. All120 source/repeated queries,pixels/actions/rewards/
+frames/resets and guards pass. F64/native prior error≤1.606e−7; deterministic
+features match exactly. Posterior outputs are offline estimates.16 CPU tests,
+1,085 pins and.272s CPU analysis pass. Sourceba1ae856/native3672a21a unchanged;
+main succeeds07:13:01 UTC November4. Independent4.290s CPU closure completes
+07:14:59, verifying44 artifacts and all arithmetic. No failure, repair or repeat.
+
+Root`/x/Temp/kindle-terminal-weight-arrivals-20261104` is closed. No learner or
+GPU allocation is active at closure; check live state before work. Do not repeat
+completed captures, analyses or learners. Original864/90%-two-wall and five-game
+goal remain unfinished.
 
 The [completed terminal-weight10 comparison](2026-11-04-cdp-breakout-terminal-weight.md) scores120.542 greedy/66.375
 sampled versus143.667/70.750 retained, all0/24 two-wall. It finishes200k actions/
@@ -37,7 +43,7 @@ full pixel/action/label and frozen replays/videos,guards,coverage,curves and
 comparison pass. Terminal exposure5,257/3,194,112 rows versus5,376 retained;
 8,250 versus8,105 updates contain no ending. Late expert CE.546991 versus.560514
 on own replay does not yield a gameplay gain. Actual overrides43.4255% and guided
-194.642 returns are not frozen competence. Ending-prediction benefit is unmeasured.
+194.642 returns are not frozen competence. The separate matched-arrival diagnostic finds lower ending error but worse intermediate-life predictions.
 
 Source8ee590c5/native3672a21a/SHAa8b483a3; same12M64/Auto/N8/B16/T16/H15/R16/
 replay-value1/expert100 and retained rates/guidance. Only true terminal continuation

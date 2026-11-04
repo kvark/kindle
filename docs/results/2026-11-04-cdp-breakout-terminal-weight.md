@@ -58,7 +58,7 @@ mixture sampling report appears. Mean continuation row weight is1.014813 over
 the full run and1.009270 in the final50k actions; each terminal row still receives10.
 Counts describe repeated training exposures, not unique examples. The candidate's
 weighted continuation loss is not directly comparable with retained unweighted
-BCE. This gameplay test does not measure whether ending predictions improved.
+BCE. This gameplay test does not measure whether ending predictions improved. The subsequent [matched-arrival diagnostic](2026-11-04-cdp-breakout-terminal-weight-arrivals.md) finds terminal posterior MSE.644558→.054219, but intermediate-life posterior MSE.003178→.099410 and more false ending indications.
 
 Late teacher-label cross entropy is.546991 versus.560514 retained on their own
 replay distributions, without a frozen gameplay gain. Actual overrides are
