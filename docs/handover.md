@@ -8,18 +8,30 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-Select one [CPU-only terminal-weight ranking and fixed inverse diagnostic](experiments/2026-11-04-cdp-breakout-terminal-weight-ranking.md).
-Reuse120 saved matched arrivals; no model/emulator execution or new GPU work.
-Primary posterior AUC and secondary prior AUC use2,304 pairs and5,000 whole-lane
-bootstrap draws. A fixed analytic inverse of weight10 separately checks probability
-levels; no fitted calibration, threshold search, policy change or learner follows.
+The [completed terminal-weight ranking diagnostic](results/2026-11-04-cdp-breakout-terminal-weight-ranking.md)
+finds posterior AUC.952691→.946615, difference−.006076 with lane95% interval
+[−.040365,.028646]; no demonstrated improvement or equivalence. One-step prior
+AUC.791667→.696615 has difference−.095052[−.188379,−.013455]. Posterior162/prior639
+pair orders change; this is not a pure monotone shift of control outputs.
 
-All24 CPU tests and preflight verification of1,085 prior pins/44 prior artifacts
-pass. The new preflight contains1,124 pins; source is committed before the one
-bounded analysis. Root`/x/Temp/kindle-terminal-weight-ranking-20261104`.
-No learner or GPU service is active at selection. Completed captures and learners
-must not repeat. Retain143.667 greedy/70.750 sampled over weight10's120.542/66.375,
-all0/24 two-wall. Original864/90%-two-wall and five-game goal remain unfinished.
+The fixed analytic inverse of weight10 preserves all rankings and reduces false
+below-.5 outputs from11→3/96 posterior and23→2/96 prior. It still leaves higher
+intermediate-life MSE than control (.026632 versus.003178 posterior;.022044
+versus.001530 prior). Terminal error rises versus raw weight10 but remains below
+control. No calibration fit or threshold search occurs. The outcome-conditioned
+control-policy cohort cannot establish population calibration or a causal gameplay
+bottleneck; transforming saved outputs does not change the learned actor.
+
+All24 CPU tests and1,125 pins pass. One2.060s single-core CPU analysis completes
+07:27:01 UTC November4/source db4840bd/PID1144889. Independent4.073s closure
+completes07:27:22, verifying16 artifacts,13,824 pair orders,240 transformed outputs
+and all arithmetic. No failure, repair, repeat, model/emulator execution or GPU
+work occurs. Root`/x/Temp/kindle-terminal-weight-ranking-20261104` is closed.
+
+Retain143.667 greedy/70.750 sampled over weight10's120.542/66.375, all0/24 two-wall.
+No correction, loss, learner or automatic successor is selected. No learner or
+GPU allocation is active at closure; check live state. Do not repeat completed
+captures or learners. Original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
