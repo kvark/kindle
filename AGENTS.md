@@ -20,30 +20,22 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [one-step prior continuation bounded check](docs/results/2026-11-04-cdp-breakout-prior-continuation.md)
-passes8,192 actions/32,728 frames/489 updates in47.016s. Conservative200k projection
-21m32.945s passes30min; frozen1,024 actions/.892s haszero updates/no natural episodes.
-This default-off scale1 native loss trains the shared head on sampled one-step
-priors with actual terminal targets, equal row weights and reset masks. No new
-parameters or change to acting, forecasts, sampler or posterior loss. Gameplay
-benefit remains unmeasured; no full learner or automatic successor is selected.
+Select one [fresh200k prior-continuation comparison](docs/experiments/2026-11-04-cdp-breakout-prior-continuation-200k.md)
+after the [bounded check](docs/results/2026-11-04-cdp-breakout-prior-continuation.md) passes47.016s/489 updates and its21m32.945s conservative projection.
+Keep12M64/Auto/N8/B16/T16/H15/R16,replay-value1/expert100,retained rates/guidance;
+add prior-continuation scale1 only. Native07873e7c/SHAaeecf9e7 and its qualified
+runner/runtime are reused unchanged. Fresh seed1009: no checkpoint or experience
+transfer. Train200k/12,477 with30min cap; require100k/6,227 recovery and four final/
+actual-initial sampled/greedy24-episode assessments against70.750/143.667.
 
-All184 Rust/5 gym CPU tests,1,064 packaged Python checks,strict Clippy,two guarded
-F64/gradient fixtures,314 current/338 retained pins,357 initial/invariant frozen
-tensors,47 initial/128 disabled semantic events,full training replay and guards
-pass. Auxiliary mean.090883,valid fraction.997276,341 reported masked rows;
-sampled row identities are not independently logged. All489 totals pass, maximum
-error.0001106. Only B16/micro16 is GPU-qualified here. Original CPU centered-CDP/
-BPTT fixture failure is preserved; corrected fixture and all GPU stages pass.
-
-Source07873e7c/native SHAaeecf9e7; runtime`/x/Temp/kindle-prior-continuation-20261104/runtime`.
-Main/collector succeed07:51:09/07:51:19 UTC November4. Independent1.881s closure
-completes07:51:43, verifying66 artifacts; separate.018s auxiliary arithmetic passes.
-No bounded failure or GPU repeat. Closure`complete_with_cpu_fixture_repair`.
-Root`/x/Temp/kindle-prior-continuation-20261104` is closed through the bounded check;
-cache/runtime/evidence retained. No learner or GPU allocation is active; check
-live state before work. Retain143.667 greedy/70.750 sampled,all0/24 two-wall.
-Original864/90%-two-wall and five-game goal remain unfinished.
+Primary is greedy return and own-initial-subtracted gain/min, with paired eight-
+lane10k bootstrap. Original864/90%-two-wall gate remains. No coefficient sweep,
+extension,second learner or automatic successor. Frozen assessment/curve/replay/
+coverage/guard requirements and all caps are fixed in the protocol before launch.
+Helpers and actual command preflights gate launch on an idle host. No learner or
+GPU allocation is active at selection. Root`/x/Temp/kindle-prior-continuation-20261104/full`;
+service`kindle-breakout-prior-continuation-200k-20261104`. Check live state before
+work; never restart after an observer timeout. The five-game goal remains unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
