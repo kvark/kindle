@@ -8,38 +8,34 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [fresh200k dynamics-scale3 comparison](experiments/2026-11-04-cdp-breakout-dynamics-scale3-200k.md) launches18:01:29.253 UTC
-November4/sourceb222c0c8 with145 pins and a30-minute training cap. Change only
-prior-fitting KL1→3; posterior KL.1/free-nat floors1 and retained12M64/Auto/N8/
-B16/T16/H15/R16/expert100 settings stay fixed. Native447fe50/SHA35ad0db and
-teacher stay unchanged; qualified runner52593379 exposes the coefficient.
+The [completed dynamics-scale3 comparison](results/2026-11-04-cdp-breakout-dynamics-scale3.md#full-200k-comparison)
+finishes 200k actions /799,607 frames /12,477 updates in **21m33.324s**, 0.42%
+above the retained control. Increasing prior-fitting KL1→3 lowers greedy
+143.667→105.667 and sampled70.750→62.208; all0/24 two-wall successes.
+Primary own-initial gain/min falls27.17%; its paired difference−1.790483 has95%
+lane interval[−3.243235,−.399936]. Retain dynamics scale1 and the143.667/70.750
+baseline. No extension, coefficient sweep, second learner or automatic successor.
 
-Startup passes357 initial tensors matching bounded/retained controls,47 shared
-pre-update events and first update376. Independent100k/6,227 recovery passes
-18:12:29.915 UTC in.458s (.514s observer wrapper):357 finite tensors,145 unchanged
-pins,0555 directory/0444 files,zero model calls. The recovery observer succeeds;
-original child-journal/receipt review passes separately in.076s without repeating
-the verifier. The.300s publication-reader preparation review also co-hosts;retain
-all CPU time in measured training wall time without correction.
+Late raw KL rises11.815355→13.872131. These own-replay means, shared recurrent
+gradients and changing experience do not identify a causal bottleneck. Native
+447fe50/SHA35ad0db and teacher remain unchanged; runner52593379 exposes the
+coefficient. Other retained12M64/Auto/N8/B16/T16/H15/R16/expert100 settings stay
+fixed. Reused1009/cohort does not establish seed reliability.
 
-MainPID1169640/invocation5606b6db548e450bbbe94b4565f3a2b7 and original terminal
-collector remain active at18:13 review. Require final200k/12,477 updates,then
-actual-initial/final sampled/greedy24-natural-episode frozen assessments.
-Favor only improved primary greedy raw score and own-initial gain/min with a
-positive paired interval. Original864/90%-two-wall gate remains fixed.
+All145 current/338 retained pins,100k/6,227 recovery,357 matched initial/invariant
+frozen tensors,47 pre-update and799/794 initial semantic events,full replays/videos,
+guards,curves,coverage,exposure and comparison pass. Actual overrides42.418%;
+guided returns are not frozen competence. CPU co-host time stays uncorrected.
+Earlier exploratory JSON-reader and canonical import failures/CPU repairs remain;
+no full-run stage fails or repeats.
 
-Full helper/plot/comparison qualification passes3.867s; all five actual queued
-commands pass.523s with zero native-agent/emulator construction. The earlier
-[bounded check](results/2026-11-04-cdp-breakout-dynamics-scale3.md) passes8,192/489 in46.855s and padded200k20m58.323s;
-its76 current/338 retained pins,replays,tensors and original services pass.
-Exploratory JSON-reader and canonical Python import failures/CPU repairs remain
-preserved. No bounded experience transfers and no completed GPU stage repeats.
-
-Root `/x/Temp/kindle-breakout-dynamics-scale3-20261104/full`; service
-`kindle-breakout-dynamics-scale3-200k-20261104`. Check live identity; do not restart,
-overlap or alter the active learner. No extension,sweep,second learner or
-automatic successor. Retain143.667 greedy/70.750 sampled until assessed;
-the five-game goal remains unfinished.
+Main/collector complete18:27:07.476/18:27:46.942 UTC November4/sourceb222c0c8;
+all three original services succeed. Independent2.635s publication review closes
+18:28:08.346 with55 completion artifacts. Root
+`/x/Temp/kindle-breakout-dynamics-scale3-20261104/full` is closed, with no active
+GPU allocation at review. Do not restart its learner or collectors; check live
+state before work. The original864/90%-two-wall gate and five-game goal remain
+unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

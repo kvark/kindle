@@ -1,4 +1,113 @@
-# Stronger prior fitting passes bounded execution and cost checks
+# Stronger prior fitting lowers frozen Breakout scores at the same cost
+
+The [fresh200k comparison](../experiments/2026-11-04-cdp-breakout-dynamics-scale3-200k.md)
+finishes **200,000 actions /799,607 emulator frames /12,477 updates in21m33.324s**.
+Increasing dynamics KL scale1→3 lowers greedy143.667→105.667 and
+sampled70.750→62.208, with all zero of24 two-wall successes. Training takes0.42%
+longer. Retain dynamics scale1; the original864/90%-two-wall gate and five-game
+goal remain unfinished. No extension, coefficient sweep, second learner or
+automatic successor is selected.
+
+## Full 200k comparison
+
+| Measurement | Retained scale1 | Candidate scale3 |
+|---|---:|---:|
+| Training time |21m27.910s|21m33.324s|
+| Frozen greedy mean |143.667|105.667|
+| Actual-initial greedy mean |2.208|2.208|
+| Greedy gain/min above own initial |6.590132|4.799649|
+| Frozen sampled mean |70.750|62.208|
+| Actual-initial sampled mean |1.417|1.417|
+| Sampled gain/min above own initial |3.230038|2.820253|
+| Two-wall successes, either final mode |0/24|0/24|
+
+Primary greedy score falls26.45%, and initial-subtracted gain/min falls27.17%.
+The paired lane difference is−38.000 points,95% interval[−69.167,−8.083]; the
+gain/min difference is−1.790483, interval[−3.243235,−.399936]. Sampled score falls
+12.07%; its−8.542-point interval[−16.964,.667] crosses zero. The locked preference
+rule fails. These10,000 seed0 bootstrap resamples cover eight reused evaluation
+lanes, not independent training seeds or broad reliability.
+
+Both actual-initial semantic traces reproduce the retained control:799 sampled
+and794 greedy events. Each of four arms selects the first three natural episodes
+per eight lanes, with zero updates/truncations and357 invariant tensors. Together
+the captures take88,584 actions/354,176 frames/56.403s. Full recorded-action,
+outcome, frame-count and boundary replays/videos pass. Ordinary frozen logs lack
+live pixel hashes; no equality to unavailable live images is claimed.
+
+### Losses and cost
+
+Late raw KL rises from11.815355 to13.872131 despite the stronger fitting weight.
+The candidate's final50k clipped dynamics KL also averages13.872131, versus
+11.815389 retained. The publication reader independently recounts all12,477
+candidate reports and reuses the already verified retained review. These are
+means on each learner's changing replay, with jointly changing representations
+and shared recurrent gradients. They do not establish held-out prediction error
+or explain the gameplay regression. This result gives no support for adopting
+the higher coefficient, or for claiming that a larger weight fixes prior fitting.
+
+| Action window | Retained raw KL | Candidate raw KL |
+|---|---:|---:|
+|0–50k|6.215493|7.323053|
+|50–100k|11.217215|12.776863|
+|100–150k|11.457282|13.793472|
+|150–200k|11.815355|13.872131|
+
+Candidate imitation cross-entropy on labeled rows falls1.208124→.568945 across
+the run; the retained late mean is.560514. Replay fitting is not frozen competence.
+Actual teacher overrides are84,836/200,000 (42.418%), versus43.0585% retained.
+Guided online returns remain separate from the frozen scores.
+
+Construction takes2.550s separately. Recorded stages take1,148.626s learning,
+63.181s acting,62.778s environment,12.402s observation,1.086s reset and.552s
+checkpointing. These wrapper timers do not isolate GPU kernels. Startup,
+recovery and publication preparation CPU work co-hosts with training; retain its
+time without correction. The100k verifier takes.458s (.514s observer wrapper),
+its separate journal/receipt review.076s and publication preparation review.300s.
+
+### Completion and evidence
+
+Full helper,plot and comparison qualification passes3.867s; all five actual
+queued commands pass.523s with no native-agent/emulator construction.
+
+All145 current/338 retained pins,357 initial tensors matching bounded/retained
+controls,47 pre-update events,finite weighted losses,correct cadence and
+100k/6,227 read-only recovery pass. First update is376; residual credit is.5.
+CNN,reward,continuation,actor and value arrays change. The108.214s training replay
+verifies all recorded pixels,actions,labels and overrides. Guards,curves,coverage,
+exposure and comparison pass. The curve was visually reviewed after completion.
+
+The main service launches18:01:29.253 UTC November4 at source
+`b222c0c8b112e92520efc3877f2d3c48552a3e36`, PID1169640/invocation
+`5606b6db548e450bbbe94b4565f3a2b7`, and reports completion18:27:07.476.
+Original collectorPID1169643/invocation`d88f36a9084b42909401fd104227af19`
+completes18:27:46.942 after2.464s terminal audit. Recovery succeeds earlier.
+The separate2.635s publication review completes18:28:08.346, verifies55 completion
+artifacts and original journal identities, and independently checks means,
+preference and the original gate. All three original services are terminal success.
+No full-run stage fails or repeats. The earlier exploratory reader and canonical
+Python import failures and their CPU repairs remain preserved below.
+
+Native447fe50/SHA35ad0db,teacher and retained settings stay fixed; private
+runner52593379 exposes the coefficient. Shared recurrent gradients and subsequent
+experience change, so this is not an isolated prior-head intervention. The bounded
+experience is not transferred. Root
+`/x/Temp/kindle-breakout-dynamics-scale3-20261104/full` is closed; no GPU allocation
+is active at review. Do not restart the learner or collectors. Check live state
+before any separately justified work.
+
+| Full artifact | SHA256 |
+|---|---|
+| `declaration.json` |`1c584615c7cc11224224c1c88b0fa679d974e48f8e6361bfe8d88e5ea335269a`|
+| `recovery-verification.json` |`5c07f606c5f94b26f71c328a9dd8406bf28fa8a7da9a062d352427ec933f1172`|
+| `candidate/learning-review.json` |`5c11048f46f656b693a12d018c886557aee1ea115ea32c7effacdbba2d16924a`|
+| `candidate/guidance-replay.json` |`0acd8f4e7ef9d4eeeb9925e94aecf534a6b14053f676acd66e2e78d679441da1`|
+| `comparison.json` |`1ec6b49dbbd55da344c3a873e41dbca8fdd36f900199ac775c6042e32e96f174`|
+| `completion.json` |`c69abfe2b7a64d45770c077bce459e91dd0b7fe9e8d8d47607bd69b8f1ae4e2c`|
+| `terminal-summary.json` |`35f09ea473d198611346017edfd131563da67c17ba74494100454ed9eb3fd056`|
+| `publication-review.json` |`bb31472bc04952d04527ff3036b54f2e173fc634085875335bfe1f3fe4dd96d7`|
+
+## Earlier bounded execution and cost check
 
 The [bounded dynamics-scale3 protocol](../experiments/2026-11-04-cdp-breakout-dynamics-scale3.md)
 completes **8,192 actions /32,719 emulator frames /489 updates in46.855s**.
@@ -7,13 +116,12 @@ Frozen restore completes1,024 actions/4,096 frames in.881s, with zero updates,
 357 invariant tensors and no natural completed episodes. This establishes
 execution and early cost, not gameplay benefit or a reliable speed improvement.
 
-Select a separate [fresh200k comparison](../experiments/2026-11-04-cdp-breakout-dynamics-scale3-200k.md)
-after this pass. Preparation is pending at bounded publication; no full learner
-is running yet. The retained result remains143.667 greedy/70.750 sampled, all
-zero of24 two-wall successes. The original864/90%-two-wall gate and five-game
-goal remain unfinished. No check experience transfers to the fresh learner.
+This pass selected the separate fresh200k comparison reported above. At bounded
+publication its preparation was pending; no check experience transferred to the
+fresh learner. The retained result remains143.667 greedy/70.750 sampled, all
+zero of24 two-wall successes.
 
-## Hypothesis and change
+### Hypothesis and change
 
 Increase only `loss_scales.dynamics` from1 to3. Native dynamics KL fits the
 prior to a stopped posterior; the coefficient also changes gradients through
@@ -40,7 +148,7 @@ SHA52593379 adds only `--dynamics-scale` to exact retainedcf4ea238; the reposito
 runner exposes the same option. Defaults and checkpoint-controlled restore stay
 unchanged. No new native graph rule, parameters, build or runtime overlay.
 
-## Execution and qualification
+### Execution and qualification
 
 All76 current/338 retained pins,357 matching initial tensors,47 shared pre-update
 events,489 finite reports,correct cadence and weighted world losses pass.
