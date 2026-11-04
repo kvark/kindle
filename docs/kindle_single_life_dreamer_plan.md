@@ -1,29 +1,32 @@
 # Kindle: CDP learning roadmap
 
-The [completed B32/T16 check](results/2026-11-04-cdp-breakout-batch32.md) takes44.142s for8,192 actions/32,725 frames/
+The [fresh B32/T16 comparison](experiments/2026-11-04-cdp-breakout-batch32-200k.md) launches **19:25:06.367 UTC November4**,
+source00e548d3,137 pins, mainPID1177510/invocation211f0f44377640a6be39905f3c0df65a.
+It is active:200k actions/6,231 updates,30-minute training cap,100k/3,106 recovery
+and four final/actual-initial sampled/greedy24-natural-episode assessments.
+Original main,recovery and terminal observers are active. Do not restart this
+learner or schedule another GPU allocation while it runs.
+
+Startup passes357 matched initial tensors,79 bounded and47 retained pre-update
+semantic events,first update632 and correct32-action cadence. All69 reports
+through2,840 actions are finite. Full queue CPU preflight passes in.518s; helpers
+pass in4.012s. A pre-execution fixture-count correction preserves its prior
+source/declaration and changes no production code; no stage fails or repeats.
+No full frozen result is available. Batch/world microbatch16→32 changes centering,
+diversity,cadence and update-based warmup together; T16/R16 and rates stay fixed.
+Native447fe50/SHA35ad0db,runnercf4ea238,teacher unchanged. Root
+`/x/Temp/kindle-breakout-batch32-20261104/full`; check original live state.
+
+The [completed bounded check](results/2026-11-04-cdp-breakout-batch32.md) takes44.142s for8,192 actions/32,725 frames/
 237 updates,7.44% below retained47.690s; padded200k19m45.465s passes30min.
 Later warmup gives3.07% fewer sampled positions; learning time per position
 falls3.11%. This is early cost evidence, not sustained speed or gameplay.
 Frozen1,024/.873s haszero updates,357 unchanged tensors and no natural episodes.
-
-All64 current/338 retained pins,357 matching initials,47 common initial events,
-237 finite weighted reports,632-first-update/32-action cadence/.25 residual,
-full training pixel/action/label replay and guards pass. Main/collector succeed
-19:19:42.848/19:19:52.374 UTC November4/source7e669f3b; independent2.506s closure
-19:20:43.278 retains79 artifact hashes. No stage fails or repeats; bounded root
-`/x/Temp/kindle-breakout-batch32-20261104` is closed. Do not restart it.
-
-Select one [fresh200k comparison](experiments/2026-11-04-cdp-breakout-batch32-200k.md): same qualified B32/T16,100k/3,106
-recovery,200k/6,231 final,30-minute training cap and four24-natural-episode frozen
-arms. Its CPU helpers pass in4.012s, including actual comparison/exposure/plot
-paths and357-tensor schema. Full queue preparation remains pending; no learner
-or GPU allocation is active at selection. Batch/world microbatch16→32 changes
-centering,diversity,cadence and update-based warmup together; T16/R16 and rates
-stay fixed. Native447fe50/SHA35ad0db,runnercf4ea238,teacher unchanged.
-No experience transfer,batch sweep,extension or automatic successor. Full root
-`/x/Temp/kindle-breakout-batch32-20261104/full`; check live state before launch.
-Retain143.667 greedy/70.750 sampled,horizon333 and the original864/90%-two-wall
-gate. The five-game goal remains unfinished.
+All64 current/338 retained pins,replays and guards pass. Main/collector succeed
+19:19:42.848/19:19:52.374;2.506s closure19:20:43.278 retains79 hashes. Bounded
+stages are closed and must not repeat. Retain143.667 greedy/70.750 sampled,
+horizon333 and the original864/90%-two-wall gate. No experience transfer,batch
+sweep,extension or automatic successor. The five-game goal remains unfinished.
 
 The [completed discount100 comparison](results/2026-11-04-cdp-breakout-discount100.md#full-200k-comparison) finishes
 200k actions /799,569 frames /12,477 updates in **21m23.435s**, 0.35% less time

@@ -62,9 +62,29 @@ hashes. No qualification, training, frozen, replay, audit or collector stage
 fails or repeats. Both services are terminal; no GPU allocation remains active.
 Root`/x/Temp/kindle-breakout-batch32-20261104` is closed; do not rerun it.
 
-Select one [fresh full comparison](../experiments/2026-11-04-cdp-breakout-batch32-200k.md)
-after this cost pass. Preparation is pending; no full learner is active at
-selection. No batch sweep, experience transfer, extension or automatic successor.
+## Full 200k comparison is active
+
+The separately selected [fresh full comparison](../experiments/2026-11-04-cdp-breakout-batch32-200k.md)
+launches **19:25:06.367 UTC November4**, source`00e548d3`,137 immutable pins.
+MainPID1177510/invocation`211f0f44377640a6be39905f3c0df65a`; original recovery and
+terminal observers are active. Startup passes357 matching initial tensors,
+79 bounded and47 retained initial semantic events,first update632 and correct
+32-action cadence. All69 reports through2,840 actions are finite. No full
+frozen gameplay result is available.
+
+CPU helper qualification takes4.012s and actual-five-command preflight.518s.
+Source review catches one stale fixture expectation before queue preflight:
+invalid batch16/microbatch32 rejects before constructing guidance, so the
+expected constructor count is one rather than the prior discount test's two.
+Original private source/helper manifest/declaration and the separate correction
+receipt remain preserved. The final declaration pins all corrected and original
+bytes. No production code changes, failed stage or repeated qualification occurs.
+
+Use200k/6,231 endpoint,100k/3,106 recovery and four24-natural-episode final/
+actual-initial assessments within the fixed30-minute training cap. No bounded
+experience transfers. Full root`/x/Temp/kindle-breakout-batch32-20261104/full`;
+service`kindle-breakout-batch32-200k-20261104`. Check original live process identity;
+do not restart or overlap it. No batch sweep, extension or automatic successor.
 The five-game goal remains unfinished.
 
 | Artifact | SHA256 |
