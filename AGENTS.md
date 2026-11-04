@@ -20,26 +20,20 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed continuation10 arrival comparison](docs/results/2026-11-04-cdp-breakout-continuation10-arrivals.md) finds observed-terminal
-continuation.759636→.730320, both5/24 below.5, against target0. Primary paired
-MSE difference−.043530 has interval[−.212505,.123448]; no improvement is established.
-Prior terminal.952850→.938323 also has an interval spanning zero. Intermediate-life
-prior MSE.001530→.009264 worsens, paired interval[.002367,.013707]. This fixed
-outcome-conditioned cohort does not establish population calibration or explain
-the gameplay regression. Retain scale1 and70.750 sampled/143.667 greedy.
+The [fixed terminal-state readout](docs/experiments/2026-11-04-cdp-breakout-terminal-readout.md) is selected after17 CPU tests and
+886-input preflight pass. Use the existing120 arrivals with leave-one-lane-out
+class-balanced ridge, one fixed penalty and training-only preprocessing. Primary
+is the retained posterior; candidate posterior and both priors are secondary.
+Compare held-out balanced MSE, class recalls and ranking with saved heads and
+constants. Positive results can show linearly accessible information; negative
+results cannot prove information absent or identify a causal architecture defect.
 
-The candidate-only capture takes50.752s for43,424 actions/173,660 frames,zero
-updates. All841 pins,357 invariant tensors,120 source/repeated-query checks,full
-pixel/transition parity and guards pass. F64 prior/native error≤1.398e-7; posterior
-outputs remain reference estimates. Fifteen CPU tests and independent4.224s
-closure pass; all52 final artifacts verify. Source91924e08; main succeeds04:26:05
-UTC November4, closure04:27:01. No failure, repair or completed-stage repeat.
-
-Root `/x/Temp/kindle-breakout-continuation10-arrivals-20261104` is closed. No learner
-or GPU allocation is active; check live state before work. Do not repeat its
-capture, analysis or closure. No new learner, coefficient sweep, loss, sampler or
-automatic successor is selected. Original864/90%-two-wall and five-game goal remain
-unfinished.
+Root `/x/Temp/kindle-breakout-terminal-readout-20261104`; one single-core/nice10
+CPU pass under60s, with native/emulator imports blocked. Independently verify
+saved normal equations, predictions and metrics without refitting. No model,
+emulator or GPU execution; no new learner, loss, sampler or automatic successor.
+Retain scale1 and70.750 sampled/143.667 greedy. Original864/90%-two-wall and
+five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

@@ -1,5 +1,20 @@
 # Kindle: CDP learning roadmap
 
+The [fixed terminal-state readout](experiments/2026-11-04-cdp-breakout-terminal-readout.md) is selected after17 CPU tests and
+886-input preflight pass. Use the existing120 arrivals with leave-one-lane-out
+class-balanced ridge, one fixed penalty and training-only preprocessing. Primary
+is the retained posterior; candidate posterior and both priors are secondary.
+Compare held-out balanced MSE, class recalls and ranking with saved heads and
+constants. Positive results can show linearly accessible information; negative
+results cannot prove information absent or identify a causal architecture defect.
+
+Root `/x/Temp/kindle-breakout-terminal-readout-20261104`; one single-core/nice10
+CPU pass under60s, with native/emulator imports blocked. Independently verify
+saved normal equations, predictions and metrics without refitting. No model,
+emulator or GPU execution; no new learner, loss, sampler or automatic successor.
+Retain scale1 and70.750 sampled/143.667 greedy. Original864/90%-two-wall and
+five-game goal remain unfinished.
+
 The [completed continuation10 arrival comparison](results/2026-11-04-cdp-breakout-continuation10-arrivals.md) finds observed-terminal
 continuation.759636→.730320, both5/24 below.5, against target0. Primary paired
 MSE difference−.043530 has interval[−.212505,.123448]; no improvement is established.
