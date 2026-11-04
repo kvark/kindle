@@ -12,8 +12,8 @@ The [fresh 200k catch-reward comparison](experiments/2026-11-04-cdp-breakout-cat
 16:51:43 UTC November 4, source `318591c9`. One fresh Breakout learner adds
 +1 training point for each causal pixel-detected catch. Native configuration,
 teacher and the qualified runner stay fixed. Main PID **1164587**, invocation
-`873fae9edd444c15be0db8fcffa5812c`, is active; recovery and terminal observers
-are active. No final frozen result is available.
+`873fae9edd444c15be0db8fcffa5812c`, is active with the terminal observer.
+Independent 100k recovery is verified. No final frozen result is available.
 
 All 473 declaration pins and five queued commands pass preflight. Startup
 matches all 357 initial tensors to both bounded and retained controls, plus
@@ -21,6 +21,14 @@ matches all 357 initial tensors to both bounded and retained controls, plus
 process has reached 7,000 actions with 414 finite reports; first update is 376.
 The startup observer costs .310s and publication reader .022s on the CPU;
 retain co-host work in measured training time without correction.
+
+The 100k/6,227 checkpoint passes at 17:02:44.724 UTC: all 357 finite arrays,
+473 unchanged pins and read-only weights/moments verify in 1.379s. The recovery
+observer exits successfully under its original invocation; the learner continues.
+A supplemental journal reader incorrectly expects parent-process stdout; its
+preserved failure is resolved by checking the actual verifier child in the same
+invocation. No original stage repeats. Recovery is weights/moments only, not a
+complete live-state resume; CPU co-host work remains in training time.
 
 The [bounded check](results/2026-11-04-cdp-breakout-catch-reward1.md) remains closed: 8,192 actions /489 updates
 in 47.580s, with 139 replay-verified catches and a padded 200k projection of

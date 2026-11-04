@@ -102,7 +102,8 @@ The selected fresh learner starts at **16:51:43 UTC November 4**, source
 `318591c9`, with all 473 declaration pins verified. Main PID1164587/invocation
 `873fae9edd444c15be0db8fcffa5812c`, collector PID1164590/invocation
 `b1ac122f67744881a163af11b53956ff`, and recovery observer PID1164593/invocation
-`6e074f4b87304631833165b2ddc2f8df` are active. The evidence root is the bounded
+`6e074f4b87304631833165b2ddc2f8df` launch together. Main and collector remain
+active; the recovery observer has since completed successfully. The evidence root is the bounded
 root's `full/` directory; service `kindle-breakout-catch-reward1-200k-20261104`.
 No final frozen result is available; do not restart or overlap the allocation.
 
@@ -123,7 +124,24 @@ publication reader at16:52:28 UTC verifies the original PID/invocation and414
 finite reports through7,000 actions. Startup observer .310s and publication
 reader .022s are CPU co-host work; no wall-time correction is applied.
 
-The independent observer will verify100k/6,227 recovery once. Training remains
+The100k/6,227 checkpoint passes the runner's .329s check at17:02:40.534 UTC.
+Independent verification finishes17:02:44.724 in1.379s: all357 tensors are finite,
+all473 declaration pins are unchanged, and checkpoint files/directories are
+read-only. The recovery service exits successfully under its original invocation;
+main PID1164587/invocation873fae9edd444c15be0db8fcffa5812c continues unchanged.
+This retains weights and optimizer moments,not replay,games,beliefs or full RNG.
+
+A supplemental publication reader initially asserts that recovery parentPID1164593
+must write journal output. The parent waits silently and launches verifier child
+PID1165576,which writes the report. The failed assertion is preserved in
+`publication-recovery-reader-error.json`; a separate .015s reader verifies the
+child command,original service invocation,exact report,successful terminal state
+and still-active original learner. Original observer/verifier work does not
+repeat or change. All co-host costs remain in actual training time;the first
+ad hoc reader's duration is unmeasured. Recovery review SHA256:
+`f84109f604f3853656fabffda8ad8fc250df22b3d5f9246c0c3ada9f0ef69e39`.
+
+Training remains
 capped at1,800s for200k actions/12,477 updates,followed by complete training replay
 and four unaided actual-initial/final sampled/greedy assessments with raw scores.
 The locked greedy score/gain-per-minute/paired-interval rule and original
