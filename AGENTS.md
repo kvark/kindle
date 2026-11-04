@@ -20,27 +20,24 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed trained-policy posterior comparison](docs/results/2026-11-04-cdp-breakout-value1-modal.md) scores modal175.708
-versus sampled143.667 with greedy actions in both arms (+22.30%). Paired lane
-return difference+32.042 has95% interval[−25.750,78.959]; all0/24 two-wall.
-The preset improvement rule fails: retain sampled posteriors. This reused model/
-cohort does not establish a reliable modal gain, a global inference default or
-an isolated mechanism. No learner or initial-model GPU assessment runs; original
-200k/12,477-update training stays21m27.910s, withno learning-gain/min claim.
+The [selected CPU teacher-takeover comparison](docs/experiments/2026-11-04-cdp-breakout-command-takeovers.md) tests the saved command-
+dependent paddle predictor on the retained143.667-point policy's life-loss states.
+Its older fresh full-game teacher screen remains failed; this is a new paired
+intervention question, withno coefficient change, learner or teacher promotion.
 
-All431 current/69 qualification/338 retained pins,357 finite/invariant tensors
-per arm,5,478 exact default semantic events and final counters/tails, full replays/
-videos and host guards pass. Two arms total87,968 actions/351,799 frames/56.610s,
-zero updates/truncations. Minimum14.526GiB headroom across33,050 snapshots passes.
-Original main/collector succeed01:06:38/01:06:43 UTC November4/source2afd0dc5;
-all25 completion artifacts verify, withno GPU or completed-stage repeat.
+One annotation replay fixes every loss in the first24 natural episodes; each
+origin is eight decisions before that loss, bounded by the current life start.
+From identical copied states, both teachers act for32 decisions, stopping at
+life loss or terminal. Require at least10 percentage points more survival and
+improvement in five lanes. Exact recorded branches, reverse-order checks and
+parent-state/pixel/action/reward/frame/life replay guard the comparison.
 
-Root`/x/Temp/kindle-breakout-value1-modal-20261104` isclosed. Both services are
-terminal success; no GPU allocation remains active. The older four-arm modal
-assessment remains protocol-failed; its saved initial tensors match on CPU,
-without assigning an accepted modal initial score. No retry, initial assessment,
-inference sweep or automatic successor isselected. Check live state before
-future GPU work. The original864/90%-two-wall and five-game goal remain unfinished.
+All12 CPU fixtures pass, including feedback history, origin selection, horizon/
+decision checks and real ALE process-copy parity. Preflight takes3.188s with468
+pins, no native import or GPU work. The two replay stages are capped120s/300s;
+no completed stage repeats. Root`/x/Temp/kindle-breakout-command-takeovers-20261104`.
+No GPU allocation or learner isselected. The existing sampled-posterior recipe,
+original864/90%-two-wall gate and five-game goal remain unchanged andunfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
