@@ -8,35 +8,31 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [fresh200k representation-KL comparison](experiments/2026-11-04-cdp-breakout-representation001-200k.md)
-starts09:14:08 UTC November4/sourceca33c9fd after the completed bounded check.
-Change only posterior KL scale0.1→0.01; keep native447fe50/runtime and retained
-CDP12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 settings fixed. Train
-200k actions/12,477 updates within30min,then final/actual-initial sampled/greedy
-24-episode assessments against retained143.667 greedy/70.750 sampled. Greedy
-return and gain/min with paired lane interval determine development preference;
-original864/90%-two-wall gate remains unchanged.
+The [completed representation-KL comparison](results/2026-11-04-cdp-breakout-representation001.md#full200k-comparison)
+finishes200k actions/799,591 frames/12,477 updates in21m23.007s,close to retained
+21m27.910s. Reducing posterior KL scale0.1→0.01 lowers greedy143.667→93.208
+and sampled70.750→35.792;all0/24 two-wall. Primary gain/min falls35.42%; its
+paired difference−2.334505 has95% lane interval[−3.921731,−.481545]. The locked
+preference rule fails. Retain representation scale0.1; no mechanism or broad
+reliability claim follows from one reused development learner/cohort.
 
-All774 launch pins and five queued-command checks pass. Startup verifies357
-matching initial tensors,47 pre-update events and first update376. The100k/
-6,227 recovery passes09:24:53 UTC; independent2.047s verification passes09:25:10
-with357 finite tensors,774 unchanged pins and read-only checkpoint files.
-The recovery service succeeds; the original learner and terminal observer stay
-active. MainPID1152865,invocation`80605bcd9c744663bf4ee9f4e0cb82f5`; unit
-`kindle-breakout-representation001-200k-20261104`. A09:26:01 receipt/process review
-confirms the same learner. Root`/x/Temp/kindle-breakout-representation001-20261104/full`.
-No full frozen result exists. Do not restart this learner or schedule another
-GPU job while it is active; check actual service/process state.
+All774 current/338 retained pins,100k/6,227 recovery,357 matching initial/
+invariant frozen tensors,47 pre-update and799/794 initial semantic events,
+full replays/videos,guards,curves,coverage,exposure and comparison pass. Late
+raw KL rises11.815355→16.080293 while reported expert loss falls.559936→.541684;
+own-replay fitting does not establish gameplay benefit. Actual overrides42.074%.
 
-Full CPU helper qualification preserves an exact-float sum assertion failure
-(max difference9.095e-13); a tolerance repair resumes only unfinished checks.
-Original failure/source and successful repair remain pinned. The earlier bounded
-CPU fixture spelling failure also remains; no completed GPU stage repeats.
-Startup observer.327s,initial live observation.023s,recovery observer.343s,
-independent verification2.047s and receipt review.012s remain included without
-time correction. All four frozen assessments remain pending.
-No extension,second learner,sweep or automatic successor is selected.
-The five-game goal remains unfinished.
+Main/collector succeed09:39:32/09:39:42 UTC November4; separate4.155s saved-result
+review completes09:41:35,verifying57 artifacts. All three original services
+succeed. Original prelaunch exact-float CPU assertion and separate suffix repair
+remain preserved,along with the earlier bounded flag-spelling fixture failure.
+No training,evaluation,replay or collector stage fails or repeats. CPU co-host
+costs remain included. Sourceca33c9fd/native447fe50/runtime unchanged.
+
+Root`/x/Temp/kindle-breakout-representation001-20261104/full` is closed.
+No GPU allocation is active at closure; check live state. No extension,coefficient
+sweep,second learner or automatic successor is selected. Retain143.667 greedy/
+70.750 sampled. Original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
