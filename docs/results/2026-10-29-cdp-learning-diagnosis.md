@@ -1,5 +1,24 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fresh200k block-guidance comparison](../experiments/2026-11-04-cdp-breakout-block32-200k.md) is selected after the passing
+8192-action/489-update check. It tests50% independent32-action teacher blocks,
+cap1920, against retained20% whole-episode guidance. Native447fe50, the teacher,
+12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 and all-state labels remain
+fixed. Probability and temporal distribution change together; no isolated claim.
+
+Fresh200k/12,477 updates have a30-minute cap,100k/6,227 recovery and four fixed
+24-natural-episode final/actual-initial arms. Greedy is primary against143.667;
+sampled70.750 is secondary. Require initial tensors/traces, full replays/videos,
+independent block accounting, action/reward exposure, curves and host guards.
+Changed CPU helpers pass in3.764s, including the complete comparison entry,
+11 corrupt-header cases and actual bounded/retained exposure fixtures. Five
+actual queued commands must pass before launch. No GPU work has begun.
+
+Root`/x/Temp/kindle-breakout-block32-20261104/full`, service
+`kindle-breakout-block32-200k-20261104`. Check live state; do not overlap or restart
+this allocation. No repeated stage, second learner, sweep, extension or automatic
+successor. Original864/90%-two-wall and five-game goal remain unfinished.
+
 The [completed bounded block-guidance check](2026-11-04-cdp-breakout-block32.md) passes8192 actions/32,736 frames/
 489 updates in46.934s. The1024-action frozen restore takes.884s with zero updates
 and no completed natural episodes. All357 initial/invariant arrays,32 initial

@@ -8,27 +8,24 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed bounded block-guidance check](results/2026-11-04-cdp-breakout-block32.md) passes8192 actions/32,736 frames/
-489 updates in46.934s. The1024-action frozen restore takes.884s with zero updates
-and no completed natural episodes. All357 initial/invariant arrays,32 initial
-semantic transitions, full pixel/action/label replay, independent block ledger,
-guards and61 current/338 retained pins pass. Original main/collector succeed
-01:41:42/01:41:50 UTC November4, sourcee7c3598b; no GPU stage repeats.
+The [fresh200k block-guidance comparison](experiments/2026-11-04-cdp-breakout-block32-200k.md) is selected after the passing
+8192-action/489-update check. It tests50% independent32-action teacher blocks,
+cap1920, against retained20% whole-episode guidance. Native447fe50, the teacher,
+12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 and all-state labels remain
+fixed. Probability and temporal distribution change together; no isolated claim.
 
-The schedule chooses50% of32-action blocks before episode age1920, with unchanged
-teacher/native447fe50 and retained12M64/Auto/N8/B16/T16/H15/R16/replay-value1/
-expert100. Actual overrides4050/8192 (49.4385%); within episodes,61 transitions
-return native control to the teacher and65 release it. Probability and temporal
-distribution change together. Canonical94/packaged41 tests and1.753s actual-command
-preflight pass;1170 legacy actions match. Original unrelated bootstrap metadata
-and packaged-constructor/CLI-fixture failures remain recorded in the report.
+Fresh200k/12,477 updates have a30-minute cap,100k/6,227 recovery and four fixed
+24-natural-episode final/actual-initial arms. Greedy is primary against143.667;
+sampled70.750 is secondary. Require initial tensors/traces, full replays/videos,
+independent block accounting, action/reward exposure, curves and host guards.
+Changed CPU helpers pass in3.764s, including the complete comparison entry,
+11 corrupt-header cases and actual bounded/retained exposure fixtures. Five
+actual queued commands must pass before launch. No GPU work has begun.
 
-Padded200k projection21m00.426s passes30min. Execution and early cost are
-established; frozen gameplay benefit is unmeasured. Runtime/evidence remain at
-`/x/Temp/kindle-breakout-block32-20261104`; both services are terminal success and
-no learner or GPU allocation is active. No full learner, sweep, extension or
-automatic successor is selected. Check live state before work. The original
-864/90%-two-wall and five-game goal remain unfinished.
+Root`/x/Temp/kindle-breakout-block32-20261104/full`, service
+`kindle-breakout-block32-200k-20261104`. Check live state; do not overlap or restart
+this allocation. No repeated stage, second learner, sweep, extension or automatic
+successor. Original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
