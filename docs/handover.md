@@ -8,33 +8,18 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed terminal-weight arrival diagnostic](results/2026-11-04-cdp-breakout-terminal-weight-arrivals.md) finds terminal
-posterior MSE.644558→.054219, paired difference−.590339 with lane interval
-[−.718137,−.451811]. All24 terminal errors improve; below-.5 outputs rise5/24→22/24.
-Terminal prior MSE.911006→.423453 also improves. But intermediate-life posterior
-MSE.003178→.099410 and prior.001530→.153795 worsen, with false below-.5 outputs
-0→11/96 posterior and0→23/96 prior. All eight lane means show both tradeoffs.
+Select one [CPU-only terminal-weight ranking and fixed inverse diagnostic](experiments/2026-11-04-cdp-breakout-terminal-weight-ranking.md).
+Reuse120 saved matched arrivals; no model/emulator execution or new GPU work.
+Primary posterior AUC and secondary prior AUC use2,304 pairs and5,000 whole-lane
+bootstrap draws. A fixed analytic inverse of weight10 separately checks probability
+levels; no fitted calibration, threshold search, policy change or learner follows.
 
-The targeted loss changes predictions on the intended terminal states, while
-increasing false ending indications at other life losses. The outcome-conditioned
-control-policy cohort does not establish population calibration or a causal
-explanation for gameplay. Remaining-life information, discrimination, probability
-levels and use of continuation in imagined behavior remain unresolved. Retain
-143.667 greedy/70.750 sampled over weight10's120.542/66.375, all0/24 two-wall.
-No new loss, correction, weight sweep, learner or automatic successor is selected.
-
-One50.596s frozen capture re-observes43,424 actions/173,660 frames,zero updates,
-357 invariant tensors. All120 source/repeated queries,pixels/actions/rewards/
-frames/resets and guards pass. F64/native prior error≤1.606e−7; deterministic
-features match exactly. Posterior outputs are offline estimates.16 CPU tests,
-1,085 pins and.272s CPU analysis pass. Sourceba1ae856/native3672a21a unchanged;
-main succeeds07:13:01 UTC November4. Independent4.290s CPU closure completes
-07:14:59, verifying44 artifacts and all arithmetic. No failure, repair or repeat.
-
-Root`/x/Temp/kindle-terminal-weight-arrivals-20261104` is closed. No learner or
-GPU allocation is active at closure; check live state before work. Do not repeat
-completed captures, analyses or learners. Original864/90%-two-wall and five-game
-goal remain unfinished.
+All24 CPU tests and preflight verification of1,085 prior pins/44 prior artifacts
+pass. The new preflight contains1,124 pins; source is committed before the one
+bounded analysis. Root`/x/Temp/kindle-terminal-weight-ranking-20261104`.
+No learner or GPU service is active at selection. Completed captures and learners
+must not repeat. Retain143.667 greedy/70.750 sampled over weight10's120.542/66.375,
+all0/24 two-wall. Original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
