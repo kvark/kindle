@@ -1,5 +1,27 @@
 # Kindle: CDP learning roadmap
 
+The [Breakout ending-feedback diagnostic](experiments/2026-11-04-cdp-breakout-ending-feedback.md) is selected after18 CPU
+checks and553 current pins pass, including all506 prior pins and43 prior closure
+artifacts. It reuses the same120 failure windows and the unchanged447fe50
+checkpoint/runtime. One frozen capture will query1,080 forecasts as real
+observations arrive, comparing nine-step endpoint continuation with one-step
+prediction immediately before the same24 game-overs. Keep96 intermediate-life
+losses separate; the native continuation target ends only at natural game-over.
+
+Require120 exact saved first-step/actor-probability matches,120 repeated endpoint
+queries,full43,424-action/173,660-frame pixel/transition/trajectory parity and357
+invariant tensors withzero updates. Scalar posterior draws differ from the
+original vector actor; observations,horizon andlater diagnostic draws change
+together. No teacher-branch replay,native build,new learner orautomatic successor.
+Capture cap180s/controller600s; no new forecast result is available yet.
+
+Root `/x/Temp/kindle-breakout-ending-feedback-20261104`; service
+`kindle-breakout-ending-feedback-20261104`. CPU preparation passes02:52:38 UTC
+November4. Check live state before GPU work. Retain70.750 sampled/143.667 greedy
+and20% episode guidance. The original864/90%-two-wall andfive-game goal remain
+unfinished.
+
+
 The [completed Breakout rescue forecasts](results/2026-11-04-cdp-breakout-rescue-forecasts.md) favor the surviving sequence
 in 12 of 18 game-over comparisons, but predict mean continuation mass .971526
 on 24 recorded endings, close to discount-only .973295 rather than actual zero.
