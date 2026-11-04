@@ -348,6 +348,11 @@ pub struct DreamerConfig {
     /// One cached state plus optional forward-only observations before the
     /// training sequence. The default of 1 performs no state recomputation.
     pub replay_context: usize,
+    /// After fresh sequences, draw this fraction from sequences containing a
+    /// true terminal in the training rows. This deliberately changes the replay
+    /// distribution for all objectives, without importance correction.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub terminal_replay_fraction: Option<f32>,
     /// Replay samples per action. Zero disables scheduled updates; explicit
     /// `DreamerCore::learn` remains available for isolated diagnostics.
     pub train_ratio: f32,
@@ -453,6 +458,7 @@ impl DreamerConfig {
             open_loop_supervision: None,
             color_centroid_supervision: None,
             replay_context: 1,
+            terminal_replay_fraction: None,
             train_ratio: 32.0,
             imagination_length: 15,
             horizon: 333,
@@ -818,6 +824,14 @@ impl DreamerConfig {
         }
         if self.replay_context == 0 {
             return Err("replay_context must include a cached state".into());
+        }
+        if let Some(fraction) = self.terminal_replay_fraction {
+            if !fraction.is_finite() || !(0.0..=1.0).contains(&fraction) {
+                return Err("terminal_replay_fraction must be finite and in [0, 1]".into());
+            }
+            if self.video_encoder.is_some() {
+                return Err("terminal replay does not support causal video sequences".into());
+            }
         }
         if self.batch_size == 0 || self.batch_length <= 1 {
             return Err("batch_size must be positive and batch_length must exceed one".into());

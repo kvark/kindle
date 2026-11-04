@@ -94,6 +94,8 @@ def main():
     parser.add_argument("--disagreement-scale", type=float, default=0.0,
                         help="CDP exploration: current latent disagreement in imagined and replay returns; zero disables the ensemble")
     parser.add_argument("--replay-capacity", type=int, default=100000)
+    parser.add_argument("--terminal-replay-fraction", type=float,
+                        help="fresh non-video training: terminal-containing fraction of non-fresh replay sequences")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--num-envs", type=int, default=4)
@@ -214,6 +216,11 @@ def main():
             parser.error("replay-context must be positive and smaller than replay-capacity")
         if args.encoder_training and args.replay_context != 1:
             parser.error("causal encoder training requires replay-context1")
+    if args.terminal_replay_fraction is not None:
+        if not math.isfinite(args.terminal_replay_fraction) or not 0 <= args.terminal_replay_fraction <= 1:
+            parser.error("terminal-replay-fraction must be finite and in [0, 1]")
+        if args.restore or args.evaluate or args.encoder_training:
+            parser.error("terminal-replay-fraction requires fresh non-video training")
     if not positive_f32(args.learning_rate):
         parser.error("learning-rate must be finite and positive in F32")
     if args.replay_value_scale is not None:
@@ -401,6 +408,7 @@ def main():
     training_options.add("--imagination-length")
     training_options.update(("--open-loop-length", "--open-loop-scale"))
     training_options.add("--replay-context")
+    training_options.add("--terminal-replay-fraction")
     training_options.add("--breakout-centroid-scale")
     training_options.add("--behavior-learning-rate")
     training_options.add("--replay-value-scale")
@@ -451,6 +459,8 @@ def main():
         parser.error("return life boundaries require native actor-return boundary support")
     if args.replay_context is not None and args.replay_context > 1 and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_CONTEXT", False):
         parser.error("replay-context requires native prefix support")
+    if args.terminal_replay_fraction is not None and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_REPLAY", False):
+        parser.error("terminal-replay-fraction requires native terminal-replay support")
     if args.restore and args.encoder:
         metadata = json.loads((args.restore / "metadata.json").read_text())
         if (metadata.get("perception") or {}).get("kind") != args.encoder:
@@ -459,6 +469,9 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     if args.restore and (args.restore / "metadata.json").is_file():
         metadata = json.loads((args.restore / "metadata.json").read_text())
+        if (metadata.get("config", {}).get("terminal_replay_fraction") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_REPLAY", False)):
+            parser.error("terminal replay checkpoint requires native terminal-replay support")
         if (metadata.get("config", {}).get("replay_actor_scale") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False)):
             parser.error("completed-return actor checkpoint requires native support")
@@ -590,6 +603,8 @@ def main():
             config["imagination_length"] = args.imagination_length
         if args.replay_context is not None:
             config["replay_context"] = args.replay_context
+        if args.terminal_replay_fraction is not None:
+            config["terminal_replay_fraction"] = args.terminal_replay_fraction
         if args.open_loop_length is not None:
             config["open_loop_supervision"] = dict(horizon=args.open_loop_length,
                 scale=1.0 if args.open_loop_scale is None else args.open_loop_scale)

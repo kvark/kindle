@@ -236,6 +236,8 @@ pub struct BehaviorMetrics {
 pub struct LearnReport {
     pub learner_step: u64,
     pub replay_len: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub replay_sampling: Option<super::replay::ReplaySamplingReport>,
     pub world: WorldMetrics,
     pub behavior: BehaviorMetrics,
     pub timing: LearnTiming,
@@ -1331,6 +1333,7 @@ impl DreamerCore {
         Some(LearnReport {
             learner_step: self.learner_step,
             replay_len: self.replay.len(),
+            replay_sampling: batch.sampling,
             world,
             behavior,
             timing,

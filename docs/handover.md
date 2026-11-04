@@ -8,25 +8,26 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed fixed terminal-state readout](results/2026-11-04-cdp-breakout-terminal-readout.md) finds retained posterior
-ending information: held-out balanced MSE.131485 versus saved head.323868 and
-balanced constant.248501, paired interval[−.251523,−.130600]. It detects20/24
-endings but falsely ends10/96 continuing life losses at gamma/2. The saved head
-has higher posterior AUC.952691 versus.917752, with fewer detections andzero
-false positives. All four fixed views pass the diagnostic screen; primary stays
-retained posterior. This supports usable information on the selected cohort,
-not calibrated acting probabilities, a replacement head or gameplay gain.
+The optional [terminal replay mixture](experiments/2026-11-04-cdp-breakout-terminal-mixture.md) is implemented and under CPU/package
+qualification. It preserves fresh-sequence priority, then selects25% of remaining
+sequences uniformly from valid windows containing a true terminal in training
+rows. Default off; continuation scale1 and all existing targets stay fixed.
+It changes every objective's sampling distribution without importance correction;
+no calibrated-probability or gameplay gain is claimed. Reports record actual
+routes and terminal rows, checked against continuation targets.
 
-One4.368s CPU-only analysis,17 tests and887 pins pass. Independent4.242s closure
-verifies32 saved folds without refitting, maximum normal-equation residual2.010e-14,
-and all19 final artifacts. Sourceb8f670c8; analysis completes04:36:18 UTC November4,
-closure04:37:28. No failure, repair or completed-stage repeat. Root
-`/x/Temp/kindle-breakout-terminal-readout-20261104` is closed; no native model,
-emulator, GPU work or learner update occurs. Do not repeat its fit or closure.
+All177 Rust library/5 gym CPU tests pass, including six sampler/config tests.
+The source Python run passes567 checks, including22 new checks, but two existing
+bootstrap tests fail because the checkout imports the older native default config.
+That failure is preserved; validate against the newly packaged runtime without
+weakening the tests. Native build, strict Clippy and packaged Python checks are
+next. No GPU work or learner has started. Root
+`/x/Temp/kindle-terminal-replay-20261104`; the bounded protocol requires default-off
+frozen compatibility, then8192-action learning/frozen/audits before any full learner.
 
-Retain scale1 and70.750 sampled/143.667 greedy. No new learner, loss, sampler,
-inference correction or automatic successor is selected. Check live state before
-work. Original864/90%-two-wall and five-game goal remain unfinished.
+Retain70.750 sampled/143.667 greedy and the original864/90%-two-wall gate.
+No full learner, extension or sweep is selected. The five-game goal is unfinished.
+Check live state before GPU work; completed prior stages remain closed.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

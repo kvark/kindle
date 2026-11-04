@@ -110,6 +110,7 @@ struct ReplayStream {
     total_frames: u64,
     next_encoder_phase: usize,
     video_starts: VecDeque<u64>,
+    terminal_frames: VecDeque<u64>,
 }
 
 impl ReplayStream {
@@ -302,6 +303,13 @@ impl SequenceReplay {
             self.streams[oldest].frames.pop_front();
             let oldest_frame = self.streams[oldest].oldest_frame();
             while self.streams[oldest]
+                .terminal_frames
+                .front()
+                .is_some_and(|&index| index < oldest_frame)
+            {
+                self.streams[oldest].terminal_frames.pop_front();
+            }
+            while self.streams[oldest]
                 .video_starts
                 .front()
                 .is_some_and(|&start| start < oldest_frame)
@@ -311,6 +319,9 @@ impl SequenceReplay {
         }
         self.arrival_order.push_back(stream);
         let history = &mut self.streams[stream];
+        if frame.flags.is_terminal {
+            history.terminal_frames.push_back(history.total_frames);
+        }
         let complete = config.replay_actor_scale.is_some() && frame.flags.is_terminal;
         if frame.flags.is_first {
             history.next_encoder_phase = 0;
@@ -356,6 +367,39 @@ impl SequenceReplay {
         }
     }
 
+    /// Disjoint inclusive start ranges, so a sequence with several terminals
+    /// has the same probability as any other eligible sequence.
+    fn terminal_start_ranges(&self, config: &DreamerConfig) -> Vec<(usize, u64, u64)> {
+        let required = (config.replay_context + config.batch_length) as u64;
+        let mut ranges: Vec<(usize, u64, u64)> = Vec::new();
+        for (stream, history) in self.streams.iter().enumerate() {
+            if history.frames.len() < required as usize {
+                continue;
+            }
+            let oldest = history.oldest_frame();
+            let latest = history.total_frames - required;
+            for &terminal in &history.terminal_frames {
+                let Some(last) = terminal.checked_sub(config.replay_context as u64) else {
+                    continue;
+                };
+                let first = terminal.saturating_sub(required - 1).max(oldest);
+                let last = last.min(latest);
+                if first > last {
+                    continue;
+                }
+                if let Some((previous_stream, _, previous_last)) = ranges.last_mut()
+                    && *previous_stream == stream
+                    && first <= *previous_last + 1
+                {
+                    *previous_last = last;
+                } else {
+                    ranges.push((stream, first, last));
+                }
+            }
+        }
+        ranges
+    }
+
     pub fn sample(&mut self, config: &DreamerConfig, rng: &mut impl Rng) -> Option<SequenceBatch> {
         let required = config.replay_context + config.batch_length;
         let counts: Vec<_> = self
@@ -373,6 +417,22 @@ impl SequenceReplay {
         if valid_count == 0 {
             return None;
         }
+        let terminal_fraction = config.terminal_replay_fraction.unwrap_or(0.0);
+        let terminal_ranges = if config.terminal_replay_fraction.is_some() {
+            self.terminal_start_ranges(config)
+        } else {
+            Vec::new()
+        };
+        let terminal_count = terminal_ranges
+            .iter()
+            .map(|&(_, first, last)| (last - first + 1) as usize)
+            .sum::<usize>();
+        let mut sampling = config
+            .terminal_replay_fraction
+            .map(|_| ReplaySamplingReport {
+                eligible_terminal_sequences: terminal_count,
+                ..ReplaySamplingReport::default()
+            });
         let size = config.network();
         let batch = config.batch_size;
         let prefix_length = config.replay_context - 1;
@@ -413,8 +473,36 @@ impl SequenceReplay {
                 }
             };
             let (stream, start) = if let Some(fresh) = fresh {
+                if let Some(report) = &mut sampling {
+                    report.fresh_sequences += 1;
+                }
                 fresh
+            } else if terminal_fraction > 0.0
+                && terminal_count > 0
+                && rng.random_bool(terminal_fraction as f64)
+            {
+                let mut index = rng.random_range(0..terminal_count);
+                let &(stream, first, _) = terminal_ranges
+                    .iter()
+                    .find(|&&(_, first, last)| {
+                        let count = (last - first + 1) as usize;
+                        if index < count {
+                            true
+                        } else {
+                            index -= count;
+                            false
+                        }
+                    })
+                    .unwrap();
+                sampling.as_mut().unwrap().terminal_sequences += 1;
+                (
+                    stream,
+                    (first - self.streams[stream].oldest_frame()) as usize + index,
+                )
             } else {
+                if let Some(report) = &mut sampling {
+                    report.uniform_sequences += 1;
+                }
                 let mut start = rng.random_range(0..valid_count);
                 let stream = counts
                     .iter()
@@ -555,7 +643,15 @@ impl SequenceReplay {
             Some(prefix)
         };
 
+        if let Some(report) = &mut sampling {
+            report.terminal_rows = flags
+                .iter()
+                .flatten()
+                .filter(|flag| flag.is_terminal)
+                .count();
+        }
         Some(SequenceBatch {
+            sampling,
             initial_deter,
             initial_stoch,
             prefix,
@@ -611,6 +707,7 @@ impl SequenceReplay {
 
 #[cfg_attr(test, derive(Default))]
 pub struct SequenceBatch {
+    pub sampling: Option<ReplaySamplingReport>,
     pub initial_deter: Vec<f32>,
     pub initial_stoch: Vec<f32>,
     pub prefix: Option<ReplayPrefix>,
@@ -623,6 +720,15 @@ pub struct SequenceBatch {
     pub rewards: Vec<Vec<f32>>,
     pub flags: Vec<Vec<FrameFlags>>,
     frame_indices: Vec<Vec<(usize, usize)>>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct ReplaySamplingReport {
+    pub fresh_sequences: usize,
+    pub uniform_sequences: usize,
+    pub terminal_sequences: usize,
+    pub eligible_terminal_sequences: usize,
+    pub terminal_rows: usize,
 }
 
 pub struct ReplayPrefix {
@@ -725,6 +831,10 @@ impl SequenceBatch {
         (targets, labeled)
     }
 }
+
+#[cfg(test)]
+#[path = "replay/terminal_tests.rs"]
+mod terminal_tests;
 
 #[cfg(test)]
 mod tests {
@@ -1213,7 +1323,7 @@ mod tests {
         SequenceReplay::new(32).push(frame(0, &config), &config);
     }
 
-    fn frame(index: usize, config: &DreamerConfig) -> ReplayFrame {
+    pub(super) fn frame(index: usize, config: &DreamerConfig) -> ReplayFrame {
         let size = config.network();
         let values = vec![index as f32; config.observation_dim()];
         let observation = if config.rgb_frame_pair {

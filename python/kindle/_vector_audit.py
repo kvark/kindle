@@ -46,6 +46,39 @@ def require_numbers(value):
         raise ValueError("learner report contains a non-finite or non-numeric value")
 
 
+def audit_terminal_replay(config, report):
+    fraction = config.get("terminal_replay_fraction")
+    sampling = report.get("replay_sampling")
+    if fraction is None:
+        if sampling is not None:
+            raise ValueError("undeclared terminal replay report")
+        return
+    require_numbers(fraction)
+    if not 0 <= fraction <= 1 or config.get("video_encoder") is not None:
+        raise ValueError("invalid terminal replay configuration")
+    fields = {"fresh_sequences", "uniform_sequences", "terminal_sequences",
+              "eligible_terminal_sequences", "terminal_rows"}
+    if (not isinstance(sampling, dict) or set(sampling) != fields
+            or any(type(n) is not int or n < 0 for n in sampling.values())):
+        raise ValueError("invalid terminal replay report")
+    batch, length = config["batch_size"], config["batch_length"]
+    selected = sampling["terminal_sequences"]
+    if sampling["fresh_sequences"] + sampling["uniform_sequences"] + selected != batch:
+        raise ValueError("terminal replay route counts differ from batch size")
+    if selected and (fraction == 0 or sampling["eligible_terminal_sequences"] == 0):
+        raise ValueError("terminal replay selected an unavailable route")
+    if not selected <= sampling["terminal_rows"] <= batch * length:
+        raise ValueError("terminal replay row count is inconsistent")
+    if fraction == 1 and sampling["eligible_terminal_sequences"] and sampling["uniform_sequences"]:
+        raise ValueError("terminal-only replay used the uniform route")
+    gamma = struct.unpack("f", struct.pack("f", 1 - 1 / config["horizon"]))[0]
+    expected = gamma * (1 - sampling["terminal_rows"] / (batch * length))
+    target = report["world"]["replay_continuation_target_mean"]
+    require_numbers(target)
+    if abs(target - expected) > 5e-5:
+        raise ValueError("terminal replay rows differ from continuation targets")
+
+
 def audit(path):
     def check(condition, message):
         if not condition:
@@ -373,6 +406,7 @@ def audit(path):
                 check(event["run_step"] == actions and pending_updates > 0, "unexpected learner update")
                 report = event["report"]
                 require_numbers(report)
+                audit_terminal_replay(config, report)
                 replay_actor = report.get("behavior", {}).get("replay_actor")
                 check((replay_actor is not None) == (replay_actor_scale is not None),
                       "completed-return actor report/config mismatch")

@@ -34,7 +34,7 @@ pub use config::{
     FeatureStandardization, LossScales, ModelSize, NetworkSize, ObservationKind,
     OpenLoopSupervision, ReplayValueBootstrap, TrainingPrecision, VideoEncoder,
 };
-pub use replay::{FrameFlags, Reward};
+pub use replay::{FrameFlags, ReplaySamplingReport, Reward};
 
 /// Upstream DreamerV3 revision used as the behavioral contract.
 pub const DREAMERV3_UPSTREAM_REV: &str = "e3f02248693a79dc8b0ebd62c93683888ddaccfe";
