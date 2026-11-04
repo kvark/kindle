@@ -20,36 +20,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed terminal-weight10 comparison](docs/results/2026-11-04-cdp-breakout-terminal-weight.md) scores120.542 greedy/66.375
-sampled versus143.667/70.750 retained, all0/24 two-wall. It finishes200k actions/
-799,593 frames/12,477 updates in21m37.140s,+.72% time. Greedy gain/min falls16.94%;
-paired difference−1.116550 has interval[−3.490321,1.371544], so reliable harm or
-equality is not established. The locked improvement rule fails. Retain existing
-sampler/continuation1 with terminal weighting off; no sweep, second learner,
-extension or automatic successor. Original864/90%-two-wall and five-game goal
-remain unfinished.
+The [frozen terminal-weight arrival diagnostic](docs/experiments/2026-11-04-cdp-breakout-terminal-weight-arrivals.md) is selected. Reuse the
+control's saved120 endpoints (24 true game endings/96 intermediate life losses)
+and re-observe43,424 actions/173,660 frames once with the completed weight10 model.
+Primary is observed-terminal posterior squared-error change; report prior and
+intermediate-life errors separately with fixed paired lane intervals. This tests
+whether the intended prediction changed after gameplay failed to improve. No
+population calibration, causal gameplay diagnosis or model promotion is implied.
 
-All370 current/338 retained pins,100k/6,227 recovery,357 initial/invariant frozen
-tensors,47 pre-update events,799/794 actual-initial semantic events, finite losses,
-full pixel/action/label and frozen replays/videos,guards,coverage,curves and
-comparison pass. Terminal exposure5,257/3,194,112 rows versus5,376 retained;
-8,250 versus8,105 updates contain no ending. Late expert CE.546991 versus.560514
-on own replay does not yield a gameplay gain. Actual overrides43.4255% and guided
-194.642 returns are not frozen competence. Ending-prediction benefit is unmeasured.
+Reuse3672a21a/SHAa8b483a3 and final200k/12,477 weights from the completed learner;
+control capture is not repeated. Require120 exact joins/repeated queries, full
+pixel/action/reward/frame/reset reproduction,357 invariant tensors/zero updates,
+F64-to-native prior agreement and guards. Posterior head outputs are offline
+F64 estimates on each model's own features.16 CPU checks pass; preserve existing
+full/bounded evidence and failures. Capture180s, analysis60s, service300s caps.
 
-Source8ee590c5/native3672a21a/SHAa8b483a3; same12M64/Auto/N8/B16/T16/H15/R16/
-replay-value1/expert100 and retained rates/guidance. Only true terminal continuation
-rows receive10; continuing rows1, unchanged sampler/global continuation1. Enabled
-stable-logit BCE,native/runner/wrapper versions and later experience differ from
-retained447fe50; no isolated coefficient, calibration or reliability claim.
-Main succeeds07:02:09 UTC November4,collector07:02:43; independent3.346s CPU
-closure completes07:03:46, verifying53 artifacts and the decision. All services
-succeed; no full-stage failure/repair or GPU repeat. Earlier bounded CPU failures
-remain preserved. CPU co-host costs stay included without correction.
-
-Root`/x/Temp/kindle-terminal-weight-20261104/full` is closed. No learner or GPU
-allocation is active at closure; check live state before future work. Do not
-restart completed stages. Retain runtime, checkpoints, logs, videos and build cache.
+Root`/x/Temp/kindle-terminal-weight-arrivals-20261104`;service
+`kindle-breakout-terminal-weight-arrivals-20261104`. Preparation is in progress;
+no GPU allocation is active yet. Check live state before launch; do not repeat
+completed stages. Retain143.667 greedy/70.750 sampled over120.542/66.375 from
+weight10, all0/24 two-wall. No new learner, loss variant, weight sweep or automatic
+successor is selected. Original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

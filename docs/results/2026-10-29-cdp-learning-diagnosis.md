@@ -1,5 +1,27 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [frozen terminal-weight arrival diagnostic](../experiments/2026-11-04-cdp-breakout-terminal-weight-arrivals.md) is selected. Reuse the
+control's saved120 endpoints (24 true game endings/96 intermediate life losses)
+and re-observe43,424 actions/173,660 frames once with the completed weight10 model.
+Primary is observed-terminal posterior squared-error change; report prior and
+intermediate-life errors separately with fixed paired lane intervals. This tests
+whether the intended prediction changed after gameplay failed to improve. No
+population calibration, causal gameplay diagnosis or model promotion is implied.
+
+Reuse3672a21a/SHAa8b483a3 and final200k/12,477 weights from the completed learner;
+control capture is not repeated. Require120 exact joins/repeated queries, full
+pixel/action/reward/frame/reset reproduction,357 invariant tensors/zero updates,
+F64-to-native prior agreement and guards. Posterior head outputs are offline
+F64 estimates on each model's own features.16 CPU checks pass; preserve existing
+full/bounded evidence and failures. Capture180s, analysis60s, service300s caps.
+
+Root`/x/Temp/kindle-terminal-weight-arrivals-20261104`;service
+`kindle-breakout-terminal-weight-arrivals-20261104`. Preparation is in progress;
+no GPU allocation is active yet. Check live state before launch; do not repeat
+completed stages. Retain143.667 greedy/70.750 sampled over120.542/66.375 from
+weight10, all0/24 two-wall. No new learner, loss variant, weight sweep or automatic
+successor is selected. Original864/90%-two-wall and five-game goal remain unfinished.
+
 The [completed terminal-weight10 comparison](2026-11-04-cdp-breakout-terminal-weight.md) scores120.542 greedy/66.375
 sampled versus143.667/70.750 retained, all0/24 two-wall. It finishes200k actions/
 799,593 frames/12,477 updates in21m37.140s,+.72% time. Greedy gain/min falls16.94%;
