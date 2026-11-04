@@ -8,29 +8,24 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed200k block-guidance comparison](results/2026-11-04-cdp-breakout-block32.md) scores74.875 greedy/41.250
-sampled, below retained143.667/70.750. Training200k actions/799,610 frames/
-12,477 updates takes21m11.408s (−1.28% time), but primary greedy gain/min falls
-47.96%. Paired greedy return interval[−104.542,−38.625] and gain/min interval
-[−4.826,−1.759] are negative; all0/24 two-wall. Retain20% whole-episode guidance.
-No extension, second learner, probability/block-length sweep or automatic successor.
+The [frozen Breakout rescue-forecast diagnostic](experiments/2026-11-04-cdp-breakout-rescue-forecasts.md) is selected after12 CPU
+checks and505 input pins pass. It reuses all120 saved losing/teacher sequences
+from the retained143.667-point greedy policy:92 teacher rescues atnine actions,
+including18 avoided game-overs among24 final-life origins. The continuation
+head predicts game-over, not intermediate life loss. Keep those strata separate.
 
-The candidate chooses50% of32-action blocks; actual overrides51.493%. Native
-score216–431 exposure is468 actions versus1262 retained, and neither reaches432.
-Late own-replay expert CE.552 versus.561 does not yield frozen improvement.
-Probability and temporal distribution change together, with different experience;
-no isolated mechanism or training-seed reliability claim. Teacher/native447fe50,
-12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 remain fixed.
+One guarded43,424-action/173,660-frame scalar re-observation will query paired
+nine-step rewards, continuations and values, withzero updates andall357 tensors
+invariant. Scalar posterior draws differ from the original vector policy. Reuse
+the completed CPU branch outcomes; do not repeat the oracle. Native447fe50 and
+the retained checkpoint/runtime are unchanged. Capture cap180s/controller600s;
+no new learner,loss change or automatic successor. Check live state before work.
 
-All126 current/338 retained pins,100k/6227 recovery,357 matched initial/invariant
-frozen arrays,47 bounded pre-update and799/794 initial semantic events, full
-replays/videos, guards, curves, block accounting, exposure and comparison pass.
-Sourceb07ebbcc; original main/collector succeed02:15:09/02:15:35 UTC November4.
-All three services succeed, with zero failures or repeated GPU stages. Bounded
-CPU qualification failures remain preserved in the report. Root
-`/x/Temp/kindle-breakout-block32-20261104/full` isclosed. No learner or GPU allocation
-is active; check live state before work. Do not restart this learner or collectors.
-Original864/90%-two-wall and five-game goal remain unfinished.
+Root `/x/Temp/kindle-breakout-rescue-forecasts-20261104`; service
+`kindle-breakout-rescue-forecasts-20261104`. CPU preparation passes02:35:29 UTC
+November4. No frozen result is available yet. Retain20% episode guidance and
+sampled70.750/greedy143.667 in21m28s; the completedblock32 comparison isnegative.
+The original864/90%-two-wall gate andfive-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
