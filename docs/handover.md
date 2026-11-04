@@ -8,24 +8,30 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [frozen Breakout rescue-forecast diagnostic](experiments/2026-11-04-cdp-breakout-rescue-forecasts.md) is selected after12 CPU
-checks and505 input pins pass. It reuses all120 saved losing/teacher sequences
-from the retained143.667-point greedy policy:92 teacher rescues atnine actions,
-including18 avoided game-overs among24 final-life origins. The continuation
-head predicts game-over, not intermediate life loss. Keep those strata separate.
+The [completed Breakout rescue forecasts](results/2026-11-04-cdp-breakout-rescue-forecasts.md) favor the surviving sequence
+in 12 of 18 game-over comparisons, but predict mean continuation mass .971526
+on 24 recorded endings, close to discount-only .973295 rather than actual zero.
+The paired lane interval [33.33%,100%] is wide. Reward plus endpoint value favors
+64 of 92 short rescues; all 240 nine-action branches have zero external reward.
+Partial discrimination and weak ending forecasts do not identify a causal defect.
 
-One guarded43,424-action/173,660-frame scalar re-observation will query paired
-nine-step rewards, continuations and values, withzero updates andall357 tensors
-invariant. Scalar posterior draws differ from the original vector policy. Reuse
-the completed CPU branch outcomes; do not repeat the oracle. Native447fe50 and
-the retained checkpoint/runtime are unchanged. Capture cap180s/controller600s;
-no new learner,loss change or automatic successor. Check live state before work.
+The unchanged native447fe50/checkpoint completes 43,424 actions /173,660 frames
+in 52.471s with zero updates. All 506 pins, 357 invariant tensors, full input/output
+pixels and transitions, 120 repeated forecasts, 19 identical-plan pairs and host
+guards pass. Scalar posterior draws differ from the original vector policy;
+continuation means game-over, not intermediate life loss. Twelve CPU checks pass.
+Main1100615/invocationcdcca768df77488db2db2ec90726a4a2/sourcee40b7acd succeeds
+02:37:57 UTC November4. Independent recount passes; its own-stdout manifest
+error is preserved and separately repaired at02:40:46, with all 43 final artifacts
+verified. Closure`complete_with_cpu_manifest_repair`; no GPU stage, analysis or
+recount repeats.
 
-Root `/x/Temp/kindle-breakout-rescue-forecasts-20261104`; service
-`kindle-breakout-rescue-forecasts-20261104`. CPU preparation passes02:35:29 UTC
-November4. No frozen result is available yet. Retain20% episode guidance and
-sampled70.750/greedy143.667 in21m28s; the completedblock32 comparison isnegative.
-The original864/90%-two-wall gate andfive-game goal remain unfinished.
+Root `/x/Temp/kindle-breakout-rescue-forecasts-20261104` is closed. No learner or
+GPU allocation is active; do not restart the capture, oracle or collectors. Check
+live state before work. The next diagnostic question is whether short forecasts
+with intervening real observations recognize the same endings; no new allocation,
+loss or learner is selected. Retain70.750 sampled/143.667 greedy and20% episode
+guidance. The original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

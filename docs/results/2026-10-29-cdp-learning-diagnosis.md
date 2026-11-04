@@ -1,5 +1,30 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed Breakout rescue forecasts](2026-11-04-cdp-breakout-rescue-forecasts.md) favor the surviving sequence
+in 12 of 18 game-over comparisons, but predict mean continuation mass .971526
+on 24 recorded endings, close to discount-only .973295 rather than actual zero.
+The paired lane interval [33.33%,100%] is wide. Reward plus endpoint value favors
+64 of 92 short rescues; all 240 nine-action branches have zero external reward.
+Partial discrimination and weak ending forecasts do not identify a causal defect.
+
+The unchanged native447fe50/checkpoint completes 43,424 actions /173,660 frames
+in 52.471s with zero updates. All 506 pins, 357 invariant tensors, full input/output
+pixels and transitions, 120 repeated forecasts, 19 identical-plan pairs and host
+guards pass. Scalar posterior draws differ from the original vector policy;
+continuation means game-over, not intermediate life loss. Twelve CPU checks pass.
+Main1100615/invocationcdcca768df77488db2db2ec90726a4a2/sourcee40b7acd succeeds
+02:37:57 UTC November4. Independent recount passes; its own-stdout manifest
+error is preserved and separately repaired at02:40:46, with all 43 final artifacts
+verified. Closure`complete_with_cpu_manifest_repair`; no GPU stage, analysis or
+recount repeats.
+
+Root `/x/Temp/kindle-breakout-rescue-forecasts-20261104` is closed. No learner or
+GPU allocation is active; do not restart the capture, oracle or collectors. Check
+live state before work. The next diagnostic question is whether short forecasts
+with intervening real observations recognize the same endings; no new allocation,
+loss or learner is selected. Retain70.750 sampled/143.667 greedy and20% episode
+guidance. The original864/90%-two-wall and five-game goal remain unfinished.
+
 The [completed200k block-guidance comparison](2026-11-04-cdp-breakout-block32.md) scores74.875 greedy/41.250
 sampled, below retained143.667/70.750. Training200k actions/799,610 frames/
 12,477 updates takes21m11.408s (−1.28% time), but primary greedy gain/min falls
