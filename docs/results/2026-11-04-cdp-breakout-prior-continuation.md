@@ -8,6 +8,12 @@ minute rises2.22%, but its paired interval crosses zero; sampled performance fal
 Retain the existing recipe with this optional loss off. The original864/90%
 two-wall gate and five-game goal remain unfinished.
 
+The subsequent [matched-arrival diagnostic](2026-11-04-cdp-breakout-prior-continuation-arrivals.md)
+finds lower true-ending prior MSE (.911006→.162000), but higher intermediate-life
+MSE (.001530→.178824) and29/96 false below-.5 predictions. Prior AUC.791667→.807726
+has a paired interval crossing zero. It establishes a prediction tradeoff, not a
+causal explanation of gameplay or an accepted improvement.
+
 ## Full200k comparison
 
 The [fixed full protocol](../experiments/2026-11-04-cdp-breakout-prior-continuation-200k.md)
