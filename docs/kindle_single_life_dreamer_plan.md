@@ -1,18 +1,18 @@
 # Kindle: CDP learning roadmap
 
-Select the [bounded B32/T8 check](experiments/2026-11-04-cdp-breakout-b32-t8.md) to test more independent
-sequences and shorter unrolls at256 positions/update. Retain the unshaped recipe
-and exact native/runner. CPU preflight passes1.498s after the preserved
-argparse-negative-fixture repair; no native agent, emulator or GPU work occurs.
-All26 source pins pass. Require8,192 actions/493 updates, first312,357 matched
-initial/invariant frozen tensors,39 initial events,full replay and guards.
-Training must cost≤95% of retained47.690s and project≤30min for200k with10% padding.
-Root `/x/Temp/kindle-breakout-b32-t8-20261104`, service
-`kindle-breakout-b32-t8-check-20261104`, prepared but not launched at this review.
-B32/T8 also changes gradients,diversity,warmup and target rows; no isolated
-mechanism or gameplay claim. No full learner, sweep or automatic successor is
-selected. Check live state; the original Breakout gate and five-game goal remain
-unfinished. The completed catch-reward comparison below remains rejected.
+The [completed B32/T8 check](results/2026-11-04-cdp-breakout-b32-t8.md) takes46.818s for8,192 actions/
+32,723 frames/493 updates:1.83% below retained47.690s, missing the required5%.
+The padded200k projection20m57.311s passes30min, but both cost conditions were
+required. Retain B16/T16; no full learner,retry,sweep or automatic successor.
+Learning40.471s is almost unchanged from40.495s; sustained speed/gameplay remain
+unmeasured. Frozen1,024/.875s haszero updates,357 invariant tensors,no episodes.
+All67 current/338 retained pins,357 matching initials,39 initial events,493 finite
+reports,weighted losses,full replay and guards pass. Original CPU argparse-fixture
+failure and repair remain;no native/runner changes or repeated GPU stages.
+Main/collector succeed17:43:44.620/17:43:52.229 UTC November4/sourcec6ec7a95;
+independent2.425s closure17:44:20.894 retains80 artifact hashes. Root
+`/x/Temp/kindle-breakout-b32-t8-20261104` is closed;no GPU allocation is active at
+review. Check live state. Original Breakout gate and five-game goal unfinished.
 
 The [completed catch-reward comparison](results/2026-11-04-cdp-breakout-catch-reward1.md#full-200k-comparison)
 finishes 200k actions /799,557 frames /12,477 updates in **21m51.733s**,

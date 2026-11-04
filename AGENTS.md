@@ -20,32 +20,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [selected B32/T8 check](docs/experiments/2026-11-04-cdp-breakout-b32-t8.md) tests more independent sequences and
-shorter unrolls at the same256 sampled positions/update. The current B8/T32
-comparison costs more and lowers primary greedy score; the opposite allocation
-has not been measured. Keep the retained unshaped12M64/Auto/N8/H15/R16/expert100
-recipe, native447fe50/SHA35ad0db and runnercf4ea238 unchanged. This jointly changes
-temporal gradients, diversity, sampling, warmup and target rows240→224.
+The [completed B32/T8 check](docs/results/2026-11-04-cdp-breakout-b32-t8.md) passes8,192 actions/32,723 frames/
+493 updates in46.818s, only1.83% below retained47.690s. The required5% reduction
+fails; padded200k projection20m57.311s passes its separate30-minute limit.
+Both were required. Retain B16/T16; no full learner, retry, sequence sweep or
+automatic successor is selected. Learning takes40.471s (86.44% of training),
+almost unchanged from40.495s. Single historical short timing does not establish
+sustained speed or gameplay quality.
 
-CPU preflight passes in1.498s: both exact queued commands,357-tensor schema,
-39 shared initial events, schedule493/6,231/12,481 updates and negative fixtures.
-The original negative-command fixture exited through argparse instead of the
-exception handler. Its source/error are preserved; the repaired CPU preflight
-reruns those fixtures. No native agent, emulator or GPU work occurs in preflight.
-All26 preflight source pins remain unchanged at selection review.
+Frozen1,024 actions/4,096 frames/.875s has zero updates,357 invariant tensors
+and no natural completed episodes. All67 current/338 retained pins,357 matching
+initial tensors,39 shared pre-update events,493 finite reports/full weighted
+losses,changed CNN/reward/continuation/actor/value,full training pixel/action/
+label/override replay and guards pass. Actual overrides45.349% are not competence.
 
-Bounded training is8,192 actions/493 updates, first update312, within180s;
-frozen1,024 greedy actions within60s must preserve357 tensors with zero updates.
-Require the full replay and host guards, and training time≤95% of retained
-47.690s plus a padded200k projection≤30min. Main/collector caps600/650s.
-This is an early cost screen, not a gameplay or reliable speedup result.
+The original CPU negative-command fixture mishandled argparse exit2; its source
+and failed receipt remain preserved. Corrected preflight passes1.498s, rerunning
+CPU fixtures but constructing no native agent/emulator. Native447fe50/SHA35ad0db
+and runnercf4ea238 stay unchanged. No production or native build change occurs.
 
-Root `/x/Temp/kindle-breakout-b32-t8-20261104`; service
-`kindle-breakout-b32-t8-check-20261104`. Prepared, not launched at this review;
-check live identity before work. No full learner, extension, sequence sweep or
-automatic successor is selected. The [catch-reward comparison](docs/results/2026-11-04-cdp-breakout-catch-reward1.md#full-200k-comparison) is closed
-and rejected; retain143.667 greedy/70.750 sampled. The original864/90%-two-wall
-gate and five-game goal remain unfinished.
+Main/collector succeed17:43:44.620/17:43:52.229 UTC November4/sourcec6ec7a95;
+independent2.425s audit closes17:44:20.894 with80 artifact hashes. All original
+services succeed with no repeated GPU stage. Root
+`/x/Temp/kindle-breakout-b32-t8-20261104` is closed. No GPU allocation is active
+at review;check live state before work. Retain143.667 greedy/70.750 sampled;
+the original864/90%-two-wall gate and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
