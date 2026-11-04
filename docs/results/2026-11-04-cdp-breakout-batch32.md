@@ -67,10 +67,19 @@ Root`/x/Temp/kindle-breakout-batch32-20261104` is closed; do not rerun it.
 The separately selected [fresh full comparison](../experiments/2026-11-04-cdp-breakout-batch32-200k.md)
 launches **19:25:06.367 UTC November4**, source`00e548d3`,137 immutable pins.
 MainPID1177510/invocation`211f0f44377640a6be39905f3c0df65a`; original recovery and
-terminal observers are active. Startup passes357 matching initial tensors,
+terminal observers were launched; the recovery observer now succeeds. Startup passes357 matching initial tensors,
 79 bounded and47 retained initial semantic events,first update632 and correct
 32-action cadence. All69 reports through2,840 actions are finite. No full
 frozen gameplay result is available.
+
+The100k/3,106 recovery is independently verified **19:35:07.155 UTC** in.589s:
+357 finite tensors,137 unchanged pins,0555 directory/0444 files and zero model
+calls. Original recovery observer succeeds; its.665s wrapper and.224s saved-
+receipt/journal review19:35:41.509 remain CPU co-host costs without correction.
+The completed verifier is not repeated. MainPID1177510/invocation remains active.
+An ancillary inline progress-reader syntax error occurs before Python execution;
+its receipt and corrected read-only observation are retained. The original
+training/recovery pipeline is unaffected; no GPU stage fails or repeats.
 
 CPU helper qualification takes4.012s and actual-five-command preflight.518s.
 Source review catches one stale fixture expectation before queue preflight:

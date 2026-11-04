@@ -12,14 +12,23 @@ The [fresh B32/T16 comparison](experiments/2026-11-04-cdp-breakout-batch32-200k.
 source00e548d3,137 pins, mainPID1177510/invocation211f0f44377640a6be39905f3c0df65a.
 It is active:200k actions/6,231 updates,30-minute training cap,100k/3,106 recovery
 and four final/actual-initial sampled/greedy24-natural-episode assessments.
-Original main,recovery and terminal observers are active. Do not restart this
+Original main and terminal observers are active; recovery succeeds. Do not restart this
 learner or schedule another GPU allocation while it runs.
+
+The100k/3,106 recovery is independently verified **19:35:07.155 UTC** in.589s:
+357 finite tensors,137 unchanged pins,0555 directory/0444 files and zero model
+calls. Original recovery observer succeeds; its.665s wrapper and.224s saved-
+receipt/journal review19:35:41.509 remain CPU co-host costs without correction.
+The completed verifier is not repeated. MainPID1177510/invocation remains active.
+An ancillary inline progress-reader syntax error occurs before Python execution;
+its receipt and corrected read-only observation are retained. The original
+training/recovery pipeline is unaffected; no GPU stage fails or repeats.
 
 Startup passes357 matched initial tensors,79 bounded and47 retained pre-update
 semantic events,first update632 and correct32-action cadence. All69 reports
 through2,840 actions are finite. Full queue CPU preflight passes in.518s; helpers
 pass in4.012s. A pre-execution fixture-count correction preserves its prior
-source/declaration and changes no production code; no stage fails or repeats.
+source/declaration and changes no production code; no original stage fails or repeats.
 No full frozen result is available. Batch/world microbatch16→32 changes centering,
 diversity,cadence and update-based warmup together; T16/R16 and rates stay fixed.
 Native447fe50/SHA35ad0db,runnercf4ea238,teacher unchanged. Root
