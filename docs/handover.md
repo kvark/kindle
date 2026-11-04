@@ -12,8 +12,11 @@ The [fresh200k continuation10 comparison](experiments/2026-11-04-cdp-breakout-co
 source6a05eb02, mainPID1103691/invocatione7fdd5217d244d6e8e05ffdb0f081e97.
 All761 declaration pins and five queued-command CPU checks pass before launch.
 Startup passes357 initial tensors against bounded and retained controls,47
-pre-update events and first update376. At03:51:30,1,796 learner reports reach
-29,096 actions; original main, recovery and terminal observers remain active.
+pre-update events and first update376. The100k/6,227 recovery passes at03:59:27:
+all357 finite tensors, read-only weights/moments and761 unchanged pins. Its
+independent1.972s CPU verifier preserves the original main identity; the recovery
+service succeeds. At03:59:41 training passes102,400 actions/6,377 updates; the
+original main and terminal observer remain active. CPU co-host time stays counted.
 No full frozen outcome is available. The preceding bounded check is closed:
 8192 actions/489 updates in46.764s, projected200k20m55.877s, all audits passing.
 
