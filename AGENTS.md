@@ -20,42 +20,33 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [fresh B32/T16 comparison](docs/experiments/2026-11-04-cdp-breakout-batch32-200k.md) launches **19:25:06.367 UTC November4**,
-source00e548d3,137 pins, mainPID1177510/invocation211f0f44377640a6be39905f3c0df65a.
-It is active:200k actions/6,231 updates,30-minute training cap,100k/3,106 recovery
-and four final/actual-initial sampled/greedy24-natural-episode assessments.
-Original main and terminal observers are active; recovery succeeds. Do not restart this
-learner or schedule another GPU allocation while it runs.
+The [completed B32/T16 comparison](docs/results/2026-11-04-cdp-breakout-batch32.md#full-200k-comparison) finishes200k actions/799,541 frames/
+6,231 updates in **19m20.785s**,9.87% less training time than retained. Greedy
+143.667→73.333 and sampled70.750→47.750 both fall; all0/24 two-wall. Primary
+own-initial gain/min falls44.21%; paired difference−2.913742 has95% lane interval
+[−5.157081,−.748597]. Retain B16/T16 and143.667/70.750. No batch sweep,rate
+compensation,extension,second learner or automatic successor is selected.
 
-The100k/3,106 recovery is independently verified **19:35:07.155 UTC** in.589s:
-357 finite tensors,137 unchanged pins,0555 directory/0444 files and zero model
-calls. Original recovery observer succeeds; its.665s wrapper and.224s saved-
-receipt/journal review19:35:41.509 remain CPU co-host costs without correction.
-The completed verifier is not repeated. MainPID1177510/invocation remains active.
-An ancillary inline progress-reader syntax error occurs before Python execution;
-its receipt and corrected read-only observation are retained. The original
-training/recovery pipeline is unaffected; no GPU stage fails or repeats.
+Full sampled positions fall only.12%,while learning-stage time falls1133.927→
+1023.134s. Batch/world microbatch16→32 changes centering,diversity,cadence and
+update-based warmup together; no isolated mechanism or reliable speed claim.
+Late labeled-row imitation CE is.613392 versus.560514. Actual overrides52.277%;
+own-replay fitting and guided returns are not frozen competence. Native447fe50/
+SHA35ad0db,runnercf4ea238,teacher,T16/R16 and rates stay fixed.
 
-Startup passes357 matched initial tensors,79 bounded and47 retained pre-update
-semantic events,first update632 and correct32-action cadence. All69 reports
-through2,840 actions are finite. Full queue CPU preflight passes in.518s; helpers
-pass in4.012s. A pre-execution fixture-count correction preserves its prior
-source/declaration and changes no production code; no original stage fails or repeats.
-No full frozen result is available. Batch/world microbatch16→32 changes centering,
-diversity,cadence and update-based warmup together; T16/R16 and rates stay fixed.
-Native447fe50/SHA35ad0db,runnercf4ea238,teacher unchanged. Root
-`/x/Temp/kindle-breakout-batch32-20261104/full`; check original live state.
+All137 current/338 retained pins,100k/3,106 recovery,357 matching initial/invariant
+frozen tensors,79 bounded/47 retained initial events,799/794 frozen initial
+semantics,6,231 finite reports,full replays/videos,guards,curves,coverage,exposure
+and comparison pass. Main/collector succeed19:48:24.902/19:49:09.145 UTC November4,
+source00e548d3; recovery succeeds earlier. Separate2.529s publication review
+closes19:49:35.865 with55 completion artifacts. Pre-execution fixture correction
+and ancillary progress-reader syntax error remain preserved; no original
+pipeline stage fails or repeats. CPU co-host time stays uncorrected.
 
-The [completed bounded check](docs/results/2026-11-04-cdp-breakout-batch32.md) takes44.142s for8,192 actions/32,725 frames/
-237 updates,7.44% below retained47.690s; padded200k19m45.465s passes30min.
-Later warmup gives3.07% fewer sampled positions; learning time per position
-falls3.11%. This is early cost evidence, not sustained speed or gameplay.
-Frozen1,024/.873s haszero updates,357 unchanged tensors and no natural episodes.
-All64 current/338 retained pins,replays and guards pass. Main/collector succeed
-19:19:42.848/19:19:52.374;2.506s closure19:20:43.278 retains79 hashes. Bounded
-stages are closed and must not repeat. Retain143.667 greedy/70.750 sampled,
-horizon333 and the original864/90%-two-wall gate. No experience transfer,batch
-sweep,extension or automatic successor. The five-game goal remains unfinished.
+Root`/x/Temp/kindle-breakout-batch32-20261104/full` is closed; all three services
+succeed and no GPU allocation is active at closure. Do not restart the learner
+or collectors; check live state before work. Original864/90%-two-wall and the
+five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
