@@ -8,25 +8,30 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [B32/T16 cost check](experiments/2026-11-04-cdp-breakout-batch32.md) is CPU-qualified and selected for one fresh
-8,192-action/237-update run, followed by1,024 frozen actions. Only effective
-batch/world microbatch16→32 changes; T16 and replay ratio16 stay fixed. This
-halves steady-state update frequency while doubling sampled rows. Centering,
-diversity, update-based warmup and optimizer cadence change together; no speed
-or gameplay benefit is established. Native447fe50/runnercf4ea238/teacher fixed.
+The [completed B32/T16 check](results/2026-11-04-cdp-breakout-batch32.md) takes44.142s for8,192 actions/32,725 frames/
+237 updates,7.44% below retained47.690s; padded200k19m45.465s passes30min.
+Later warmup gives3.07% fewer sampled positions; learning time per position
+falls3.11%. This is early cost evidence, not sustained speed or gameplay.
+Frozen1,024/.873s haszero updates,357 unchanged tensors and no natural episodes.
 
-The1.481s CPU preflight passes both actual commands,14 invalid configurations,
-source-derived632-first-update/237-update/.25-residual cadence,480-label bounds,
-357-tensor schema,47 initial semantic events and terminal collector fixture.
-No native agent or emulator is constructed. Require at least5% lower early cost
-than47.690s and a padded200k projection below30min before selecting any full
-comparison. No full learner, batch sweep or automatic successor is selected.
-Root`/x/Temp/kindle-breakout-batch32-20261104`; service
-`kindle-breakout-batch32-check-20261104`. Check live state before GPU work.
+All64 current/338 retained pins,357 matching initials,47 common initial events,
+237 finite weighted reports,632-first-update/32-action cadence/.25 residual,
+full training pixel/action/label replay and guards pass. Main/collector succeed
+19:19:42.848/19:19:52.374 UTC November4/source7e669f3b; independent2.506s closure
+19:20:43.278 retains79 artifact hashes. No stage fails or repeats; bounded root
+`/x/Temp/kindle-breakout-batch32-20261104` is closed. Do not restart it.
 
-Retain horizon333 and Breakout143.667 greedy/70.750 sampled after the
-[completed discount100 regression](results/2026-11-04-cdp-breakout-discount100.md). The original864/90%-two-wall gate
-and five-game goal remain unfinished.
+Select one [fresh200k comparison](experiments/2026-11-04-cdp-breakout-batch32-200k.md): same qualified B32/T16,100k/3,106
+recovery,200k/6,231 final,30-minute training cap and four24-natural-episode frozen
+arms. Its CPU helpers pass in4.012s, including actual comparison/exposure/plot
+paths and357-tensor schema. Full queue preparation remains pending; no learner
+or GPU allocation is active at selection. Batch/world microbatch16→32 changes
+centering,diversity,cadence and update-based warmup together; T16/R16 and rates
+stay fixed. Native447fe50/SHA35ad0db,runnercf4ea238,teacher unchanged.
+No experience transfer,batch sweep,extension or automatic successor. Full root
+`/x/Temp/kindle-breakout-batch32-20261104/full`; check live state before launch.
+Retain143.667 greedy/70.750 sampled,horizon333 and the original864/90%-two-wall
+gate. The five-game goal remains unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
