@@ -1,5 +1,21 @@
 # Kindle: CDP learning roadmap
 
+The [frozen continuation10 arrival comparison](experiments/2026-11-04-cdp-breakout-continuation10-arrivals.md) is selected after15 CPU
+checks and source/artifact preflight pass. Reuse the control's saved120 arrivals;
+only the completed candidate is re-observed on the exact43,424-action/173,660-frame
+cohort. Primary is candidate-minus-control observed-terminal MSE on24 endings;
+prior forecasts and96 intermediate life losses remain separate. This tests whether
+the higher weight improves fixed-cohort recognition despite its gameplay regression.
+
+Native447fe50/corrective runtime stay fixed. Require357 invariant tensors,zero
+updates,full pixel/transition parity,120 repeated own forecasts,qualified F64 head
+readouts and a single180s guarded capture. No control capture or completed stage
+repeats. Root `/x/Temp/kindle-breakout-continuation10-arrivals-20261104`, service
+`kindle-breakout-continuation10-arrivals-20261104`. Check live state before work;
+no new learner, coefficient sweep or automatic successor. Retain scale1 and
+70.750 sampled/143.667 greedy regardless of this diagnostic. Original864/90%-two-wall
+and five-game goal remain unfinished.
+
 The [completed200k continuation10 comparison](results/2026-11-04-cdp-breakout-continuation10.md#full200k-comparison)
 lowers primary greedy143.667→55.833 and sampled70.750→35.250, all0/24 two-wall.
 Training200k actions/799,592 frames/12,477 updates takes21m28.116s, only+.016%

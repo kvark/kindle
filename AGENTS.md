@@ -20,24 +20,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed200k continuation10 comparison](docs/results/2026-11-04-cdp-breakout-continuation10.md#full200k-comparison)
-lowers greedy143.667→55.833 and sampled70.750→35.250, all0/24 two-wall.
-Training200k actions/799,592 frames/12,477 updates takes21m28.116s, effectively
-unchanged cost; greedy gain/min falls62.10%, paired interval[−5.832,−2.306].
-Retain continuation scale1, native447fe50 and the existing recipe. Slightly lower
-own-replay continuation and imitation losses do not establish better terminal
-calibration or explain the gameplay regression. Reused1009/cohort; no seed
-reliability or isolated mechanism claim.
+The [frozen continuation10 arrival comparison](docs/experiments/2026-11-04-cdp-breakout-continuation10-arrivals.md) is selected after15 CPU
+checks and source/artifact preflight pass. Reuse the control's saved120 arrivals;
+only the completed candidate is re-observed on the exact43,424-action/173,660-frame
+cohort. Primary is candidate-minus-control observed-terminal MSE on24 endings;
+prior forecasts and96 intermediate life losses remain separate. This tests whether
+the higher weight improves fixed-cohort recognition despite its gameplay regression.
 
-All761 current/338 retained pins,100k recovery,357 matched initial/invariant
-frozen tensors,47 pre-update and799/794 initial semantic events, full replays/
-videos, guards, curves, exposure and comparison pass. Source6a05eb02; original
-main/collector succeed04:13:52/04:13:59 UTC November4. All three services and56
-completion artifacts pass, without failures, repairs or repeated stages.
-Root `/x/Temp/kindle-breakout-continuation10-20261104/full` is closed. No learner
-or GPU allocation is active; check live state before work. Do not restart its
-stages or collectors. No extension, coefficient sweep, second learner or automatic
-successor is selected. Original864/90%-two-wall and five-game goal remain unfinished.
+Native447fe50/corrective runtime stay fixed. Require357 invariant tensors,zero
+updates,full pixel/transition parity,120 repeated own forecasts,qualified F64 head
+readouts and a single180s guarded capture. No control capture or completed stage
+repeats. Root `/x/Temp/kindle-breakout-continuation10-arrivals-20261104`, service
+`kindle-breakout-continuation10-arrivals-20261104`. Check live state before work;
+no new learner, coefficient sweep or automatic successor. Retain scale1 and
+70.750 sampled/143.667 greedy regardless of this diagnostic. Original864/90%-two-wall
+and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
