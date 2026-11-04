@@ -8,33 +8,37 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [bounded discount100 check](results/2026-11-04-cdp-breakout-discount100.md) passes8,192 actions/32,729 frames/
-489 updates in47.055s; padded200k21m03.687s passes30min. Frozen1,024 actions/
-4,096 frames/.874s haszero updates,357 invariant tensors and no natural episodes.
-All82 current/338 retained pins,357 matching initials,47 pre-update events,
-finite weighted losses,full pixel/action/label replay and guards pass. Main/
-collector complete18:39:21.965/18:39:27.158 UTC November4/sourcea5c9093a;
-independent2.481s closure18:39:55.770 retains102 artifact hashes. Both original
-services succeed; no GPU stage repeats. Original CPU source-name assertion and
-repair remain. Do not restart the bounded check or collectors.
+The [fresh200k discount100 comparison](experiments/2026-11-04-cdp-breakout-discount100-200k.md) launches18:43:09.877 UTC
+November4/source11477bc7 with151 pins and a30-minute training cap. Change only
+return discount horizon333→100; imagination stays15 and other retained12M64/
+Auto/N8/B16/T16/H15/R16/expert100 settings stay fixed. Native447fe50/SHA35ad0db,
+teacher and qualified runner112be6c4 remain unchanged from the bounded check.
 
-Select one [fresh200k discount100 comparison](experiments/2026-11-04-cdp-breakout-discount100-200k.md) after this pass.
-Only return discount horizon333→100 changes; imagination stays15. Retained
-complete-return critic error motivates testing more local credit, with distant
-reward loss as a tradeoff; no causal mechanism or gameplay gain is established.
-Keep12M64/Auto/N8/B16/T16/H15/R16/expert100 and other retained settings,
-native447fe50/SHA35ad0db,teacher and qualified runner112be6c4. Full helper,
-comparison and plot qualification passes3.667s with zero native/GPU work.
+Startup passes357 initial tensors matching bounded/retained controls,47 shared
+pre-update events and first update376;233 updates/4,096 actions are observed.
+MainPID1173630/invocationba245c2b52b44d84b58322ec2008dbc3 is active. Original
+recovery and terminal observers are attached. Require100k/6,227 read-only recovery,
+final200k/12,477 and four actual-initial/final sampled/greedy24-natural-episode
+assessments. No full frozen result is available. Greedy remains primary; favor
+higher raw score and own-initial gain/min with a positive paired interval.
 
-Require30-minute training cap,200k/12,477 updates,100k/6,227 read-only recovery
-and four actual-initial/final sampled/greedy24-natural-episode assessments.
-Greedy is primary; favor higher raw score and own-initial gain/min with a positive
-paired interval. No bounded experience transfer,discount sweep,extension,
-second learner or automatic successor. Full root
-`/x/Temp/kindle-breakout-discount100-20261104/full`; service
-`kindle-breakout-discount100-200k-20261104`. Preparation pending;no allocation
-active at selection. Check live state before launch. Retain143.667 greedy/
-70.750 sampled;original864/90%-two-wall and the five-game goal remain unfinished.
+Full helper/comparison/plot qualification passes3.667s and all five actual queued
+commands pass.541s with zero agent/emulator constructions. Startup CPU review
+costs.360s; publication-reader preparation.005s. Keep co-host time uncorrected.
+The final publication reader is prepared but must run only after all original
+services finish successfully. No GPU stage repeats or bounded experience transfer.
+
+The [bounded check](results/2026-11-04-cdp-breakout-discount100.md) passes8,192/32,729frames/489 in47.055s; padded200k
+21m03.687s passes30min. Frozen1,024/.874s haszero updates,357 invariant tensors,
+no episodes. All82 current/338 retained pins,replays and original services pass;
+independent2.481s closure18:39:55.770 retains102 hashes. Original CPU source-name
+assertion and repair remain preserved. Do not repeat the check or collectors.
+
+Full root `/x/Temp/kindle-breakout-discount100-20261104/full`; service
+`kindle-breakout-discount100-200k-20261104`. Check live identity;do not restart,
+overlap or alter the active learner. No discount sweep,extension,second learner
+or automatic successor. Retain143.667 greedy/70.750 sampled until assessed.
+Original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
