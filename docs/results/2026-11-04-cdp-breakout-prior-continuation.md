@@ -1,12 +1,111 @@
 # One-step prior continuation investigation
 
+The full comparison does **not** pass its predeclared improvement rule. Direct
+one-step prior continuation supervision scores **147.625 greedy / 49.167 sampled**,
+versus **143.667 / 70.750** retained, with zero of24 two-wall successes in every
+arm. Training takes **21m35.191s**, .57% longer than the control. Greedy gain per
+minute rises2.22%, but its paired interval crosses zero; sampled performance falls.
+Retain the existing recipe with this optional loss off. The original864/90%
+two-wall gate and five-game goal remain unfinished.
+
+## Full200k comparison
+
+The [fixed full protocol](../experiments/2026-11-04-cdp-breakout-prior-continuation-200k.md)
+adds only `prior_continuation_scale=1` to the retained learning configuration:
+12M64/Auto/N8/B16/T16/H15/R16, replay-value1/expert100 and the same learning
+rates, labels and guidance. It starts fresh on development seed1009; no bounded
+experience or weights are transferred. There are no new parameters, class weights,
+terminal replay mixture or multi-step auxiliary targets. Native/runner versions
+and qualified guidance wrapper files differ from the historical control, so this
+is not an isolated causal estimate.
+
+| Measurement | Retained control | Prior continuation1 |
+|---|---:|---:|
+| Training actions / updates |200,000 /12,477|200,000 /12,477|
+| Emulator frames |799,595|799,588|
+| Training time |21m27.910s|21m35.191s|
+| Greedy mean return |143.667|147.625|
+| Sampled mean return |70.750|49.167|
+| Own initial greedy / sampled |2.208 /1.417|2.208 /1.417|
+| Greedy gain per training minute |6.590132|6.736457|
+| Sampled gain per training minute |3.230038|2.212029|
+| Two-wall successes, each mode |0/24|0/24|
+
+Each assessment uses the first three natural episodes in each ofeight lanes,
+with guidance, labels and updates off and zero truncations. The primary greedy
+return difference is+3.958, paired lane95% interval[−55.338,58.333]. Its gain/min
+difference is+.146325[−2.613242,2.672747]. The lower endpoint does not exceed zero,
+so the locked improvement rule fails. This does not establish equivalence or harm
+in greedy play. Sampled return falls30.51%, difference−21.583[−36.667,−7.292];
+sampled gain/min falls31.52%. These are eight-lane,10,000-resample intervals on a
+reused development cohort, not training-seed reliability estimates.
+
+The auxiliary objective executes throughout all12,477 updates. Independent
+recount reproduces every world total, loss mean.028900, valid fraction.998330 and
+5,333 native-reported masked rows out of3,194,112. Sampled row identities are not
+logged; the masked count is not an independent reconstruction of those identities.
+
+| Training actions | Auxiliary loss mean | Valid fraction | Masked rows | Terminal rows | Updates without terminal rows |
+|---|---:|---:|---:|---:|---:|
+|0–50k|.041464|.997565|1,934|1,921|1,652/3,102|
+|50k–100k|.027094|.998214|1,429|1,416|1,988/3,125|
+|100k–150k|.024262|.998631|1,095|1,095|2,199/3,125|
+|150k–200k|.022871|.998906|875|882|2,347/3,125|
+
+Terminal exposure totals5,314 rows (.16637%) across4,291 updates, versus5,376
+rows across4,372 updates in the control. Equal row weights and the original
+sampler remain active. Loss decline alone does not demonstrate better ending
+discrimination, probability calibration or imagined action ranking; matched
+forecast quality has not been measured for this learner.
+
+Late expert-label cross entropy is.558399 versus.560514 control, without an
+accepted gameplay gain. Actual guidance overrides89,849 actions (44.9245%). Of
+7,832 actions at pre-action scores216–431,6,894 are guided and938 native; none
+reaches432 and maximum score including tails is408. Guided online returns and
+these score bands are not frozen competence or verified wall events. The reviewed
+curve retains its online last50-episode mean82.48 separately from frozen scores.
+Learning calls take1,150.420s of1,295.191s total; wrapper timers do not isolate
+individual GPU kernels.
+
+All389 current/338 retained pins,100k/6,227 recovery,357 matching initial and
+invariant frozen tensors,47 pre-update events,799/794 actual-initial semantic
+events, finite reports, parameter changes, full training pixel/action/label and
+frozen action/outcome/frame replays, videos, guards, coverage and curves pass.
+The independent recovery check takes.579s while preserving the original active
+process. CPU observer costs remain in wall time; no correction is applied.
+
+Source`ae754547336f835028d0f87ed3651c55e5903808` launches08:03:00 UTC November4,
+PID1148345/invocation`5e9d868e14e04ebb8c703bab0177aaa5`. The main service succeeds
+08:28:41, original collector08:29:18. Independent3.342s CPU closure completes
+08:29:38.010925, verifying55 completion artifacts, all exposure arithmetic and
+both frozen comparisons. All three original services succeed. No full-run failure,
+repair, cap change or repeated stage occurs; the earlier bounded CPU fixture
+rejection remains preserved below.
+
+Evidence remains at `/x/Temp/kindle-prior-continuation-20261104/full`. Native
+`07873e7c` and its qualified runtime remain unchanged. No GPU allocation is active
+at closure; check live state before work. No extension, second learner, coefficient
+sweep or automatic successor is selected.
+
+| Full artifact | SHA256 |
+|---|---|
+|`declaration.json`|`e4fdaecac5c4dc83a601c6d590cf4c7d347323da1d3fa6f9e5c17ff4021f6654`|
+|`comparison.json`|`d61b1c4532f3724e9d05794ead05863364316c454b4f89c28e51ec4257e2a5fd`|
+|`completion.json`|`0ab0c5248041b34821a14c06d366ddc1a2f701874470802c7e6f33a8029a033d`|
+|`terminal-summary.json`|`0f524a76ebef68577284515300a4373081a5c55324c30b2836601b6bc9090fc0`|
+|`closure.json`|`07729cc263dfc89477b2457a8f0f23c18dfcf25805ee17882224c45653e3e570`|
+|`candidate/learning-review.json`|`704bbafda6661c777e2666ba803d950006929d2969b62c6e467ab7dc0c6d07ea`|
+
+## Bounded qualification before the full comparison
+
 The bounded test passes8,192 actions/32,728 frames/489 updates in **47.016s**.
 It directly supervises continuation on sampled one-step prior states with the
 shared native head, real terminal flags, equal row weights and scale1. The option
 defaults to off and adds no parameters. The conservative200k projection is
 **21m32.945s**, below the30-minute gate. A1,024-action frozen restore takes.892s
-with zero updates and no completed natural episodes. Execution and early cost
-are established; gameplay benefit remains unmeasured. No full learner is selected.
+with zero updates and no completed natural episodes. At that stage, execution
+and early cost were established; gameplay benefit was unmeasured and no full
+learner had yet been selected.
 
 The [protocol](../experiments/2026-11-04-cdp-breakout-prior-continuation.md) and all
 completed stages remain fixed. Do not repeat them.
@@ -117,10 +216,10 @@ an early estimate, not a full training measurement.
 
 Root`/x/Temp/kindle-prior-continuation-20261104` is closed through the bounded check;
 runtime,wheel,test executable,build cache and all evidence remain retained.
-No learner or GPU allocation is active at closure; check live state before work.
-Retain143.667 greedy/70.750 sampled,all0/24 two-wall. No full learner, extension or
-automatic successor is selected. Original864/90%-two-wall and five-game goal
-remain unfinished.
+No learner or GPU allocation was active at bounded closure. Retain143.667
+greedy/70.750 sampled,all0/24 two-wall. The separately declared full comparison
+above follows this completed check; no bounded stage repeats. Original864/90%
+two-wall and five-game goal remain unfinished.
 
 | Artifact | SHA256 |
 |---|---|

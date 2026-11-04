@@ -1,30 +1,35 @@
 # Kindle: CDP learning roadmap
 
-The [fresh200k prior-continuation comparison](experiments/2026-11-04-cdp-breakout-prior-continuation-200k.md)
-is active, launched08:03:00 UTC November4/sourceae754547 with389 pins and30min
-training cap. MainPID1148345/invocation5e9d868e14e04ebb8c703bab0177aaa5; recovery
-and terminal observers are active. Startup passes357 bounded/retained matching
-initial tensors,47 pre-update events and first update376. It has passed10k actions;
-no full frozen result exists yet. Do not restart it or schedule another GPU job.
+The [completed prior-continuation comparison](results/2026-11-04-cdp-breakout-prior-continuation.md#full200k-comparison)
+finishes 200k actions / 799,588 frames / 12,477 updates in21m35.191s, .57% longer
+than control. Greedy147.625 versus143.667 rises2.76%; sampled49.167 versus70.750
+falls30.51%. All0/24 two-wall. Primary gain/min rises2.22%, but its paired difference
++.146325 has95% lane interval[−2.613242,2.672747]. The locked improvement rule fails;
+retain the control with this optional loss off. No equivalence or broad reliability
+claim follows from one reused development learner/cohort.
 
-Keep12M64/Auto/N8/B16/T16/H15/R16,replay-value1/expert100 and retained rates/guidance;
-add prior-continuation scale1. Native07873e7c/SHAaeecf9e7 and runtime remain fixed.
-Fresh200k/12,477, no experience transfer; require100k/6,227 recovery and final/
-actual-initial sampled/greedy24-episode assessments against70.750/143.667,all0/24
-two-wall. Primary greedy return and gain/min use paired eight-lane10k bootstrap.
-Original864/90%-two-wall gate remains. Native/runner/wrapper differences and reused
-cohort limit causal/reliability claims. No extension,second learner or automatic
-successor. Root`/x/Temp/kindle-prior-continuation-20261104/full`;
-service`kindle-breakout-prior-continuation-200k-20261104`. Check live identity;
-an observer timeout never authorizes restart. The five-game goal remains unfinished.
+All389 current/338 retained pins,100k/6,227 recovery,357 matching initial/invariant
+frozen tensors,47 pre-update and799/794 initial semantic events,full replays/videos,
+guards,curves,coverage and comparison pass. Auxiliary loss mean.028900 and5,333
+native-reported masked rows reproduce; sampled row identities are not logged.
+Main/collector succeed08:28:41/08:29:18 UTC November4; independent3.342s CPU closure
+completes08:29:38, verifying55 artifacts. All three original services succeed;
+no full-run failure,repair or repeated stage. Earlier bounded CPU fixture failure
+remains preserved. Sourceae754547/native07873e7c/runtime unchanged.
+
+Root`/x/Temp/kindle-prior-continuation-20261104/full` is closed. No GPU allocation
+is active at closure; check live state before work. No extension,second learner,
+coefficient sweep or automatic successor is selected. Native/runner/wrapper
+differences,changed experience and CPU co-hosting limit interpretation.
+The original864/90%-two-wall gate and five-game goal remain unfinished.
 
 The [one-step prior continuation bounded check](results/2026-11-04-cdp-breakout-prior-continuation.md)
 passes8,192 actions/32,728 frames/489 updates in47.016s. Conservative200k projection
 21m32.945s passes30min; frozen1,024 actions/.892s haszero updates/no natural episodes.
 This default-off scale1 native loss trains the shared head on sampled one-step
 priors with actual terminal targets, equal row weights and reset masks. No new
-parameters or change to acting, forecasts, sampler or posterior loss. Gameplay
-benefit remains unmeasured; no full learner or automatic successor is selected.
+parameters or change to acting, forecasts, sampler or posterior loss. At bounded
+closure, gameplay benefit was unmeasured; the separate full comparison is above.
 
 All184 Rust/5 gym CPU tests,1,064 packaged Python checks,strict Clippy,two guarded
 F64/gradient fixtures,314 current/338 retained pins,357 initial/invariant frozen
@@ -39,8 +44,8 @@ Main/collector succeed07:51:09/07:51:19 UTC November4. Independent1.881s closure
 completes07:51:43, verifying66 artifacts; separate.018s auxiliary arithmetic passes.
 No bounded failure or GPU repeat. Closure`complete_with_cpu_fixture_repair`.
 Root`/x/Temp/kindle-prior-continuation-20261104` is closed through the bounded check;
-cache/runtime/evidence retained. No learner or GPU allocation is active; check
-live state before work. Retain143.667 greedy/70.750 sampled,all0/24 two-wall.
+cache/runtime/evidence retained. No learner or GPU allocation was active at that
+closure. Retain143.667 greedy/70.750 sampled,all0/24 two-wall.
 Original864/90%-two-wall and five-game goal remain unfinished.
 
 The [completed terminal-weight ranking diagnostic](results/2026-11-04-cdp-breakout-terminal-weight-ranking.md)
