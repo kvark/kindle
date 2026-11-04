@@ -1,5 +1,30 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed200k continuation10 comparison](2026-11-04-cdp-breakout-continuation10.md#full200k-comparison)
+lowers primary greedy143.667→55.833 and sampled70.750→35.250, all0/24 two-wall.
+Training200k actions/799,592 frames/12,477 updates takes21m28.116s, only+.016%
+time. Greedy gain/min falls62.10%; paired return interval[−125.171,−49.498] and
+gain/min interval[−5.832,−2.306] are negative. Retain continuation scale1 and the
+existing native447fe50/12M64/B16/T16/H15/R16/replay-value1/expert100 recipe.
+
+Late own-replay continuation BCE.022457→.022325 and expert CE.560514→.542827
+fall slightly without gameplay benefit. These changing-state summaries do not
+establish terminal-specific calibration or explain the regression. Actual
+overrides44.825%; native score216–431 exposure689 versus1262, neither learner
+reaches432. No isolated mechanism or seed-reliability claim on reused1009/cohort.
+
+All761 current/338 retained pins,100k/6227 recovery,357 matched initial/invariant
+frozen tensors,47 pre-update and799/794 initial semantic events, full replays/
+videos, guards, curves, exposure and comparison pass. Source6a05eb02; original
+main/collector succeed04:13:52/04:13:59 UTC November4. All three services and56
+completion artifacts pass; no experiment-stage failure, repair or repeat occurs.
+Separate3.910s read-only report review completes04:15:30. CPU co-host costs remain.
+
+Root `/x/Temp/kindle-breakout-continuation10-20261104/full` is closed. No learner
+or GPU allocation is active; check live state before work. Do not restart its
+stages or collectors. No extension, coefficient sweep, second learner or automatic
+successor is selected. Original864/90%-two-wall and five-game goal remain unfinished.
+
 The [completed Breakout arrival-head diagnostic](2026-11-04-cdp-breakout-arrival-head.md) lowers mean terminal
 continuation from.952850 before observation to.759636 after the actual arrival,
 against target zero. Only5/24 observed endings fall below.5;20 errors decrease

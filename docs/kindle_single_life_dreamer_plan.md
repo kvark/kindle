@@ -1,30 +1,29 @@
 # Kindle: CDP learning roadmap
 
-The [fresh200k continuation10 comparison](experiments/2026-11-04-cdp-breakout-continuation10-200k.md) launches03:48:24 UTC November4,
-source6a05eb02, mainPID1103691/invocatione7fdd5217d244d6e8e05ffdb0f081e97.
-All761 declaration pins and five queued-command CPU checks pass before launch.
-Startup passes357 initial tensors against bounded and retained controls,47
-pre-update events and first update376. The100k/6,227 recovery passes at03:59:27:
-all357 finite tensors, read-only weights/moments and761 unchanged pins. Its
-independent1.972s CPU verifier preserves the original main identity; the recovery
-service succeeds. At03:59:41 training passes102,400 actions/6,377 updates; the
-original main and terminal observer remain active. CPU co-host time stays counted.
-No full frozen outcome is available. The preceding bounded check is closed:
-8192 actions/489 updates in46.764s, projected200k20m55.877s, all audits passing.
+The [completed200k continuation10 comparison](results/2026-11-04-cdp-breakout-continuation10.md#full200k-comparison)
+lowers primary greedy143.667→55.833 and sampled70.750→35.250, all0/24 two-wall.
+Training200k actions/799,592 frames/12,477 updates takes21m28.116s, only+.016%
+time. Greedy gain/min falls62.10%; paired return interval[−125.171,−49.498] and
+gain/min interval[−5.832,−2.306] are negative. Retain continuation scale1 and the
+existing native447fe50/12M64/B16/T16/H15/R16/replay-value1/expert100 recipe.
 
-Only existing world continuation BCE scale1→10 changes. Native447fe50,
-12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100, rates and20% episode
-guidance stay fixed. This weights terminal and nonterminal targets; no isolated
-mechanism or gameplay gain is established. No native build or H3 supervision.
+Late own-replay continuation BCE.022457→.022325 and expert CE.560514→.542827
+fall slightly without gameplay benefit. These changing-state summaries do not
+establish terminal-specific calibration or explain the regression. Actual
+overrides44.825%; native score216–431 exposure689 versus1262, neither learner
+reaches432. No isolated mechanism or seed-reliability claim on reused1009/cohort.
 
-Root `/x/Temp/kindle-breakout-continuation10-20261104/full`, service
-`kindle-breakout-continuation10-200k-20261104`. Require fresh200k/12,477 updates
-within30min,100k/6,227 recovery,357 matched initial/invariant frozen tensors and
-four fixed24-episode final/actual-initial sampled/greedy assessments. Greedy is
-primary against143.667, sampled secondary against70.750. Check live state; do
-not restart stages or schedule another GPU job while active. No extension,
-second learner or automatic successor. Original864/90%-two-wall and five-game
-goal remain unfinished.
+All761 current/338 retained pins,100k/6227 recovery,357 matched initial/invariant
+frozen tensors,47 pre-update and799/794 initial semantic events, full replays/
+videos, guards, curves, exposure and comparison pass. Source6a05eb02; original
+main/collector succeed04:13:52/04:13:59 UTC November4. All three services and56
+completion artifacts pass; no experiment-stage failure, repair or repeat occurs.
+Separate3.910s read-only report review completes04:15:30. CPU co-host costs remain.
+
+Root `/x/Temp/kindle-breakout-continuation10-20261104/full` is closed. No learner
+or GPU allocation is active; check live state before work. Do not restart its
+stages or collectors. No extension, coefficient sweep, second learner or automatic
+successor is selected. Original864/90%-two-wall and five-game goal remain unfinished.
 
 The [bounded continuation10 result](results/2026-11-04-cdp-breakout-continuation10.md)
 passes46.764s training/.872s frozen,34 canonical/34 packaged CPU checks,699 pins
