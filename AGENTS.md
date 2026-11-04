@@ -20,11 +20,14 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [fresh200k continuation10 comparison](docs/experiments/2026-11-04-cdp-breakout-continuation10-200k.md) is selected after the bounded
-check completes8192 actions/489 updates in46.764s, projected200k20m55.877s.
-All699 bounded pins,357 matching/invariant tensors,47 pre-update events,weighted
-world losses,full replay and original services pass. The bounded root is closed.
-Full helpers and the complete comparison entry pass on CPU before outcomes.
+The [fresh200k continuation10 comparison](docs/experiments/2026-11-04-cdp-breakout-continuation10-200k.md) launches03:48:24 UTC November4,
+source6a05eb02, mainPID1103691/invocatione7fdd5217d244d6e8e05ffdb0f081e97.
+All761 declaration pins and five queued-command CPU checks pass before launch.
+Startup passes357 initial tensors against bounded and retained controls,47
+pre-update events and first update376. At03:51:30,1,796 learner reports reach
+29,096 actions; original main, recovery and terminal observers remain active.
+No full frozen outcome is available. The preceding bounded check is closed:
+8192 actions/489 updates in46.764s, projected200k20m55.877s, all audits passing.
 
 Only existing world continuation BCE scale1→10 changes. Native447fe50,
 12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100, rates and20% episode
