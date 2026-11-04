@@ -133,6 +133,8 @@ def main():
                         help="fresh training only: world continuation loss scale; omitted: native default")
     parser.add_argument("--representation-scale", type=float,
                         help="fresh training only: posterior representation KL loss scale; omitted: native default")
+    parser.add_argument("--dynamics-scale", type=float,
+                        help="fresh training only: prior dynamics KL loss scale; omitted: native default")
     parser.add_argument("--terminal-continuation-weight", type=float,
                         help="fresh CDP only: posterior continuation loss multiplier for true game-over rows")
     parser.add_argument("--prior-continuation-scale", type=float,
@@ -244,6 +246,11 @@ def main():
             parser.error("representation-scale must be finite and positive in F32")
         if args.evaluate:
             parser.error("representation-scale requires fresh training")
+    if args.dynamics_scale is not None:
+        if not positive_f32(args.dynamics_scale):
+            parser.error("dynamics-scale must be finite and positive in F32")
+        if args.evaluate:
+            parser.error("dynamics-scale requires fresh training")
     if args.terminal_continuation_weight is not None:
         if not positive_f32(args.terminal_continuation_weight):
             parser.error("terminal-continuation-weight must be finite and positive in F32")
@@ -440,6 +447,7 @@ def main():
     training_options.add("--replay-value-scale")
     training_options.add("--continuation-scale")
     training_options.add("--representation-scale")
+    training_options.add("--dynamics-scale")
     training_options.add("--terminal-continuation-weight")
     training_options.add("--prior-continuation-scale")
     training_options.add("--replay-actor-scale")
@@ -655,6 +663,8 @@ def main():
             config["loss_scales"]["continuation"] = args.continuation_scale
         if args.representation_scale is not None:
             config["loss_scales"]["representation"] = args.representation_scale
+        if args.dynamics_scale is not None:
+            config["loss_scales"]["dynamics"] = args.dynamics_scale
         if args.terminal_continuation_weight is not None:
             config["terminal_continuation_weight"] = args.terminal_continuation_weight
         if args.prior_continuation_scale is not None:

@@ -20,31 +20,29 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed B32/T8 check](docs/results/2026-11-04-cdp-breakout-b32-t8.md) passes8,192 actions/32,723 frames/
-493 updates in46.818s, only1.83% below retained47.690s. The required5% reduction
-fails; padded200k projection20m57.311s passes its separate30-minute limit.
-Both were required. Retain B16/T16; no full learner, retry, sequence sweep or
-automatic successor is selected. Learning takes40.471s (86.44% of training),
-almost unchanged from40.495s. Single historical short timing does not establish
-sustained speed or gameplay quality.
+The [selected dynamics-scale3 check](docs/experiments/2026-11-04-cdp-breakout-dynamics-scale3.md) increases prior-fitting KL
+weight1→3 while keeping posterior KL.1 and both free-nat floors1. Retained late
+raw KL11.815355 versus clipped11.815389 gives little support for the floor as
+the main late fitting limit; aggregate means do not identify individual states
+or a gameplay cause. The independent.317s CPU recount covers12,477 reports.
 
-Frozen1,024 actions/4,096 frames/.875s has zero updates,357 invariant tensors
-and no natural completed episodes. All67 current/338 retained pins,357 matching
-initial tensors,39 shared pre-update events,493 finite reports/full weighted
-losses,changed CNN/reward/continuation/actor/value,full training pixel/action/
-label/override replay and guards pass. Actual overrides45.349% are not competence.
+Keep12M64/Auto/N8/B16/T16/H15/R16/expert100 and other retained settings.
+Native447fe50/SHA35ad0db is unchanged; runner52593379 adds only the CLI option.
+Both canonical/private runner tests pass12 cases each, then actual-command
+preflight passes1.458s with zero native-agent/emulator/GPU construction.
+The first canonical import failed before test collection because the retained
+package lacks a current Python helper. Its source/stderr are preserved; the
+corrected CPU harness resolves canonical helpers from the repository.
 
-The original CPU negative-command fixture mishandled argparse exit2; its source
-and failed receipt remain preserved. Corrected preflight passes1.498s, rerunning
-CPU fixtures but constructing no native agent/emulator. Native447fe50/SHA35ad0db
-and runnercf4ea238 stay unchanged. No production or native build change occurs.
-
-Main/collector succeed17:43:44.620/17:43:52.229 UTC November4/sourcec6ec7a95;
-independent2.425s audit closes17:44:20.894 with80 artifact hashes. All original
-services succeed with no repeated GPU stage. Root
-`/x/Temp/kindle-breakout-b32-t8-20261104` is closed. No GPU allocation is active
-at review;check live state before work. Retain143.667 greedy/70.750 sampled;
-the original864/90%-two-wall gate and five-game goal remain unfinished.
+Require8,192 actions/489 updates,first376,357 matching initial/invariant frozen
+tensors,47 shared initial events,finite weighted losses,full replay and guards.
+Training180s/frozen60s; padded200k cost must fit30min. This targets learning
+quality,not a required throughput improvement. Root
+`/x/Temp/kindle-breakout-dynamics-scale3-20261104`; service
+`kindle-breakout-dynamics-scale3-check-20261104`, prepared but not launched at
+review. No full learner,coefficient sweep or automatic successor is selected.
+Check live state before work. Retain143.667 greedy/70.750 sampled; original
+864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

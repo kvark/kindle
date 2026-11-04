@@ -1,5 +1,17 @@
 # Kindle: CDP learning roadmap
 
+Select the [bounded dynamics-scale3 check](experiments/2026-11-04-cdp-breakout-dynamics-scale3.md): prior-fitting KL1→3,
+posterior KL.1 and free-nat floors1 unchanged. The independent.317s retained-log
+recount finds late raw/clipped KL11.815355/11.815389; this does not identify a
+causal gameplay limit. Native447fe50 stays fixed; private runner52593379 exposes
+the existing coefficient. Both12-case CLI suites and1.458s actual-command
+preflight pass with no native agent/emulator. The canonical helper-import failure
+and CPU repair remain preserved. Require8,192/489,357 matched initial/invariant
+frozen tensors,47 initial events,full replay/guards and padded200k cost≤30min.
+Root `/x/Temp/kindle-breakout-dynamics-scale3-20261104` is prepared,not launched
+at review. No full learner,sweep or automatic successor;check live state.
+The original Breakout gate and five-game goal remain unfinished.
+
 The [completed B32/T8 check](results/2026-11-04-cdp-breakout-b32-t8.md) takes46.818s for8,192 actions/
 32,723 frames/493 updates:1.83% below retained47.690s, missing the required5%.
 The padded200k projection20m57.311s passes30min, but both cost conditions were
