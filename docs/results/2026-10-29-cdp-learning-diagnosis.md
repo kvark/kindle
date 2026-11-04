@@ -1,28 +1,32 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-Select one [fresh200k terminal-replay comparison](../experiments/2026-11-04-cdp-breakout-terminal-mixture-200k.md) after the bounded
-check's46.900s/8192 actions and20m59.517s conservative projection pass30min.
-Use the same12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 recipe with
-terminal mixture.25 andcontinuation1. Require200k/12,477 within30min,100k/6,227
-recovery andfour actual-initial/final sampled/greedy24-episode assessments against
-retained70.750/143.667 in21m27.910s,all0/24 two-wall. No experience transfer,
-mixture sweep, extension, second learner or automatic successor.
+The [fresh200k terminal-replay comparison](../experiments/2026-11-04-cdp-breakout-terminal-mixture-200k.md) launches05:18:25 UTC November4,
+sourcef5540278, with343 pins and a30-minute training cap. MainPID1114966,
+invocation`f812d2f076de4e0a9ff50d60a30199ba`, is active. Startup passes357
+bounded/retained initial tensors,47 pre-update semantic events andcorrect first
+update376;336 reports are finite andexposure-audited through5752 actions.
+The100k recovery andoriginal terminal observers are active. No frozen result exists.
+
+Use12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100,terminal mixture.25 and
+continuation1. Require200k/12,477 within30min,100k/6,227 recovery andfour actual-
+initial/final sampled/greedy24-episode assessments against70.750/143.667 in21m28s,
+all0/24 two-wall. Root`/x/Temp/kindle-terminal-replay-20261104/full`;service
+`kindle-breakout-terminal-mixture-200k-20261104`. Do not restart this learner or
+schedule another GPU job while it is active. No extension, sweep, second learner
+or automatic successor is selected. The original864/90%-two-wall gate remains.
 
 Native2b5a3eea/SHA5ce1b443 andbounded runner are reused. Native, runner andguidance
-wrapper bytes differ from447fe50. Three pixel-policy ASTs/constants match; the
-active full18 episode path passes4001 steps/eight lanes,41 synthetic pixel batches
-andfive partial resets withmatching RNG/schedules. Optional block/minimal modes
-remain off. This scoped CPU evidence isnot byte equality or broad trajectory parity.
-The sampler changes all objectives' data distribution without importance correction.
+wrapper bytes differ from447fe50. Three pixel-policy ASTs/constants match;4001
+full18 episode steps/eight lanes,41 synthetic pixel batches andfive partial resets
+match schedules/RNG. Optional block/minimal modes are off. This scoped evidence
+isnot byte equality or broad trajectory parity. The sampler changes all objectives'
+data distribution without importance correction; no causal or calibration claim.
 
-Full helper/comparison qualification passes in3.490s,including corrupted loss,
-terminal count, header andselection cases;274 bounded/338 retained pins pass.
-All five actual queue preflights remain required before launch. Root
-`/x/Temp/kindle-terminal-replay-20261104/full`;service
-`kindle-breakout-terminal-mixture-200k-20261104`. No learner orGPU allocation is
-active yet; check live state before launch. Bounded stages remain closed, including
-the preserved source-Python mismatch andsupplementary CPU-reader failure/repair.
-The original864/90%-two-wall andfive-game goal remain unfinished.
+Full helpers/comparison pass3.490s andall five actual queue preflights pass.732s,
+withzero native-agent/emulator construction;343 current/338 retained pins pass.
+No full-stage failure or repeat has occurred. Earlier bounded source-Python and
+supplementary CPU-reader failures/repair remain preserved. The five-game goal is
+unfinished. Check the original live identity before any work.
 
 The [completed fixed terminal-state readout](2026-11-04-cdp-breakout-terminal-readout.md) finds retained posterior
 ending information: held-out balanced MSE.131485 versus saved head.323868 and
