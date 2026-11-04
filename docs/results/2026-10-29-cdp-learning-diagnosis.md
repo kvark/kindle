@@ -1,5 +1,25 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [B32/T16 cost check](../experiments/2026-11-04-cdp-breakout-batch32.md) is CPU-qualified and selected for one fresh
+8,192-action/237-update run, followed by1,024 frozen actions. Only effective
+batch/world microbatch16→32 changes; T16 and replay ratio16 stay fixed. This
+halves steady-state update frequency while doubling sampled rows. Centering,
+diversity, update-based warmup and optimizer cadence change together; no speed
+or gameplay benefit is established. Native447fe50/runnercf4ea238/teacher fixed.
+
+The1.481s CPU preflight passes both actual commands,14 invalid configurations,
+source-derived632-first-update/237-update/.25-residual cadence,480-label bounds,
+357-tensor schema,47 initial semantic events and terminal collector fixture.
+No native agent or emulator is constructed. Require at least5% lower early cost
+than47.690s and a padded200k projection below30min before selecting any full
+comparison. No full learner, batch sweep or automatic successor is selected.
+Root`/x/Temp/kindle-breakout-batch32-20261104`; service
+`kindle-breakout-batch32-check-20261104`. Check live state before GPU work.
+
+Retain horizon333 and Breakout143.667 greedy/70.750 sampled after the
+[completed discount100 regression](2026-11-04-cdp-breakout-discount100.md). The original864/90%-two-wall gate
+and five-game goal remain unfinished.
+
 The [completed discount100 comparison](2026-11-04-cdp-breakout-discount100.md#full-200k-comparison) finishes
 200k actions /799,569 frames /12,477 updates in **21m23.435s**, 0.35% less time
 than retained. Shortening return discount horizon333→100 lowers greedy

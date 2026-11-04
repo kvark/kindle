@@ -8,33 +8,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed discount100 comparison](results/2026-11-04-cdp-breakout-discount100.md#full-200k-comparison) finishes
-200k actions /799,569 frames /12,477 updates in **21m23.435s**, 0.35% less time
-than retained. Shortening return discount horizon333→100 lowers greedy
-143.667→70.250 and sampled70.750→56.083; all0/24 two-wall successes. Primary
-own-initial gain/min falls51.73%; paired difference−3.409216 has95% lane interval
-[−4.516728,−2.234156]. All eight greedy lane means are lower. Retain horizon333
-and143.667/70.750; no discount sweep,extension,second learner or automatic successor.
+The [B32/T16 cost check](experiments/2026-11-04-cdp-breakout-batch32.md) is CPU-qualified and selected for one fresh
+8,192-action/237-update run, followed by1,024 frozen actions. Only effective
+batch/world microbatch16→32 changes; T16 and replay ratio16 stay fixed. This
+halves steady-state update frequency while doubling sampled rows. Centering,
+diversity, update-based warmup and optimizer cadence change together; no speed
+or gameplay benefit is established. Native447fe50/runnercf4ea238/teacher fixed.
 
-Late labeled-row imitation CE improves.560514→.546030 despite worse frozen play.
-Own-replay fitting is not competence; new critic calibration is unmeasured.
-Continuation targets,imagined/replay credit and experience change together,
-without an isolated causal mechanism or seed-reliability claim. Imagination15,
-native447fe50/SHA35ad0db and teacher stay fixed; runner112be6c4 exposes horizon.
+The1.481s CPU preflight passes both actual commands,14 invalid configurations,
+source-derived632-first-update/237-update/.25-residual cadence,480-label bounds,
+357-tensor schema,47 initial semantic events and terminal collector fixture.
+No native agent or emulator is constructed. Require at least5% lower early cost
+than47.690s and a padded200k projection below30min before selecting any full
+comparison. No full learner, batch sweep or automatic successor is selected.
+Root`/x/Temp/kindle-breakout-batch32-20261104`; service
+`kindle-breakout-batch32-check-20261104`. Check live state before GPU work.
 
-All151 current/338 retained pins,100k/6,227 recovery,357 matched initial/invariant
-frozen tensors,47 pre-update and799/794 actual-initial semantic events,full
-replays/videos,guards,curves,coverage,exposure and comparison pass. Actual
-overrides44.156%; guided returns are not frozen competence. CPU co-host time
-stays uncorrected. The earlier CPU source-name assertion and repair remain;
-no full-run stage fails or repeats.
-
-Main/collector complete19:08:30.521/19:08:42.614 UTC November4/source11477bc7;
-all three original services succeed. Separate2.919s publication review closes
-19:09:01.626 with55 completion artifacts. Root
-`/x/Temp/kindle-breakout-discount100-20261104/full` is closed, with no active GPU
-allocation at review. Do not restart its learner or collectors;check live state
-before work. Original864/90%-two-wall and the five-game goal remain unfinished.
+Retain horizon333 and Breakout143.667 greedy/70.750 sampled after the
+[completed discount100 regression](results/2026-11-04-cdp-breakout-discount100.md). The original864/90%-two-wall gate
+and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
