@@ -8,31 +8,30 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The optional [terminal replay mixture](experiments/2026-11-04-cdp-breakout-terminal-mixture.md) is implemented and packaged. It preserves fresh-sequence priority, then selects25% of remaining
-sequences uniformly from valid windows containing a true terminal in training
-rows. Default off; continuation scale1 and all existing targets stay fixed.
-It changes every objective's sampling distribution without importance correction;
-no calibrated-probability or gameplay gain is claimed. Reports record actual
-routes and terminal rows, checked against continuation targets.
+The [bounded terminal replay mixture](results/2026-11-04-cdp-breakout-terminal-mixture.md) passes8192 actions/32,722 frames/
+489 updates in46.900s; conservative200k projection20m59.517s clears30min.
+At the same early budget, terminal rows322→1918 (.2572%→1.5321%) and updates
+containing endings225→435. Fresh480/uniform5695/terminal1649 routes reconcile;
+all489 target means independently match counts. This establishes exposure/cost,
+not gameplay benefit. The sampler changes all objectives' data distribution
+without importance correction; continuation scale1 remains fixed.
 
-All177 Rust library/5 gym CPU tests, strict workspace/binding Clippy and1028
-packaged Python checks pass, including six new Rust/22 Python checks. The initial
-source Python run's two bootstrap failures remain preserved: it imported the
-older native default config. Both pass against the matching package without test
-changes. Native source2b5a3eea/SHA5ce1b443 is packaged at
-`/x/Temp/kindle-terminal-replay-20261104/runtime`; source/wheel/test receipts remain.
+Default-off frozen compatibility matches128 semantic events/357 invariant tensors.
+Candidate initial357 tensors/47 events match; frozen1024/.894s haszero updates,
+357 invariant tensors andno natural episodes. Full guided pixel/action/label
+replay,274 current/338 retained pins andall guards pass. Native2b5a3eea/SHA5ce1b443,
+main/source27e00df2 andoriginal collector succeed05:04:16/05:04:27 UTC November4.
+All66 artifacts verify. The supplementary CPU reader's manifest-lookup failure is
+preserved; separate1.808s repair closes05:07:21 with no repeated GPU or original
+collection stage. Initial source Python's two old-native bootstrap failures also
+remain;177 Rust/5 gym/1028 packaged Python checks andstrict Clippy pass.
 
-Actual three-command preflight passes in.974s with zero agent/emulator construction,
-357 schema tensors,47 retained initial events and338 retained pins. Select the
-fixed bounded default-off frozen compatibility, then8192-action/489-update learner
-and1024 frozen actions with full audits. Root
-`/x/Temp/kindle-terminal-replay-20261104/bounded`; service
-`kindle-breakout-terminal-mixture-check-20261104`. Launch is pending. No full
-learner is selected; require the original cost and evidence gates first.
-
-Retain70.750 sampled/143.667 greedy and the original864/90%-two-wall gate.
-No full learner, extension or sweep is selected. The five-game goal is unfinished.
-Check live state before GPU work; completed prior stages remain closed.
+Runtime`/x/Temp/kindle-terminal-replay-20261104/runtime`; bounded root ends`/bounded`.
+The1.008GB build cache is released; wheel/runtime/test executable remain. Both
+services are terminal success; no GPU allocation remains. Do not repeat completed
+stages. Retain70.750 sampled/143.667 greedy andthe original864/90%-two-wall gate.
+No full learner, extension, sweep or automatic successor is selected. The five-game
+goal is unfinished; check live state before work.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
