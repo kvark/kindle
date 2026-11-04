@@ -1,5 +1,19 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+Select the [bounded B32/T8 check](../experiments/2026-11-04-cdp-breakout-b32-t8.md) to test more independent
+sequences and shorter unrolls at256 positions/update. Retain the unshaped recipe
+and exact native/runner. CPU preflight passes1.498s after the preserved
+argparse-negative-fixture repair; no native agent, emulator or GPU work occurs.
+All26 source pins pass. Require8,192 actions/493 updates, first312,357 matched
+initial/invariant frozen tensors,39 initial events,full replay and guards.
+Training must cost≤95% of retained47.690s and project≤30min for200k with10% padding.
+Root `/x/Temp/kindle-breakout-b32-t8-20261104`, service
+`kindle-breakout-b32-t8-check-20261104`, prepared but not launched at this review.
+B32/T8 also changes gradients,diversity,warmup and target rows; no isolated
+mechanism or gameplay claim. No full learner, sweep or automatic successor is
+selected. Check live state; the original Breakout gate and five-game goal remain
+unfinished. The completed catch-reward comparison below remains rejected.
+
 The [completed catch-reward comparison](2026-11-04-cdp-breakout-catch-reward1.md#full-200k-comparison)
 finishes 200k actions /799,557 frames /12,477 updates in **21m51.733s**,
 1.85% above the retained control. Adding one training point per causal pixel
