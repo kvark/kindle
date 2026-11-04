@@ -8,20 +8,31 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [paired Breakout arrival-head diagnostic](experiments/2026-11-04-cdp-breakout-arrival-head.md) is selected after13 CPU tests and
-preflight verification of606 prior pins and22 artifacts. One guarded180s frozen
-capture re-observes43,424 source actions and exports predicted/observed states
-at120 fixed life-loss arrivals, including24 game endings. Offline F64 continuation
-head analysis must match all120 native priors within1e-4; no native rebuild or
-learning is selected. Require exact prior/pixel/transition parity,357 invariant
-tensors,zero updates,independent recount and original-service closure.
+The [completed Breakout arrival-head diagnostic](results/2026-11-04-cdp-breakout-arrival-head.md) lowers mean terminal
+continuation from.952850 before observation to.759636 after the actual arrival,
+against target zero. Only5/24 observed endings fall below.5;20 errors decrease
+and4 increase. Paired MSE difference−.266448 has lane interval[−.401298,−.154655].
+All eight lane means improve, but substantial observed-terminal error remains.
+Intermediate-life MSE rises.001530→.003178, with mean.979477→.979466.
 
-Root `/x/Temp/kindle-breakout-arrival-head-20261104`, service
-`kindle-breakout-arrival-head-20261104`. Check live state; do not restart an active
-or completed stage or schedule another GPU job while it runs. Prior replay audit
-and ending-feedback captures remain closed. Retain70.750 sampled/143.667 greedy;
-the original864/90%-two-wall and five-game goal remain unfinished. No successor
-loss,sampler or learner is selected.
+Posterior outputs are offline F64 head estimates. All120 prior estimates match
+native within1.178e-7; deterministic states match exactly, while categorical draws
+and observation conditioning differ. This outcome-conditioned cohort does not
+establish calibration or isolate representation,rare-example fitting or forecast
+optimization. No new loss,sampler,coefficient or learner is selected.
+
+The50.457s frozen capture completes43,424 actions/173,660 frames withzero updates.
+All634 pins,357 invariant tensors,120 saved/repeated predictions,full pixel and
+transition parity,13 CPU tests andhost guards pass. Source8754f65d,
+main1102754/invocationc114e5e2e92442ebbf08136138683b22 succeeds03:28:26 UTC
+November4. Independent3.691s closure completes03:28:57;all52 final artifacts
+verify,without failures,repairs or repeated stages.
+
+Root `/x/Temp/kindle-breakout-arrival-head-20261104` is closed. No learner or GPU
+allocation is active;do not restart its capture or collectors. Check live state
+before work. Terminal-state fitting is a concrete learning question; no successor
+allocation is selected. Retain70.750 sampled/143.667 greedy and20% episode
+guidance. The original864/90%-two-wall andfive-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

@@ -1,12 +1,30 @@
 # Kindle: CDP learning roadmap
 
-The [paired arrival-head diagnostic](experiments/2026-11-04-cdp-breakout-arrival-head.md)
-is selected: one guarded180s frozen state capture at120 saved life-loss arrivals,
-then offline continuation-head analysis and independent closure. Thirteen CPU
-tests and preflight pass;606 prior pins and22 artifacts remain unchanged. No
-native change or learning. Root `/x/Temp/kindle-breakout-arrival-head-20261104`;
-check its service before work and do not repeat completed stages. Original game
-gates remain unchanged.
+The [completed Breakout arrival-head diagnostic](results/2026-11-04-cdp-breakout-arrival-head.md) lowers mean terminal
+continuation from.952850 before observation to.759636 after the actual arrival,
+against target zero. Only5/24 observed endings fall below.5;20 errors decrease
+and4 increase. Paired MSE difference−.266448 has lane interval[−.401298,−.154655].
+All eight lane means improve, but substantial observed-terminal error remains.
+Intermediate-life MSE rises.001530→.003178, with mean.979477→.979466.
+
+Posterior outputs are offline F64 head estimates. All120 prior estimates match
+native within1.178e-7; deterministic states match exactly, while categorical draws
+and observation conditioning differ. This outcome-conditioned cohort does not
+establish calibration or isolate representation,rare-example fitting or forecast
+optimization. No new loss,sampler,coefficient or learner is selected.
+
+The50.457s frozen capture completes43,424 actions/173,660 frames withzero updates.
+All634 pins,357 invariant tensors,120 saved/repeated predictions,full pixel and
+transition parity,13 CPU tests andhost guards pass. Source8754f65d,
+main1102754/invocationc114e5e2e92442ebbf08136138683b22 succeeds03:28:26 UTC
+November4. Independent3.691s closure completes03:28:57;all52 final artifacts
+verify,without failures,repairs or repeated stages.
+
+Root `/x/Temp/kindle-breakout-arrival-head-20261104` is closed. No learner or GPU
+allocation is active;do not restart its capture or collectors. Check live state
+before work. Terminal-state fitting is a concrete learning question; no successor
+allocation is selected. Retain70.750 sampled/143.667 greedy and20% episode
+guidance. The original864/90%-two-wall andfive-game goal remain unfinished.
 
 The [completed Breakout terminal replay audit](results/2026-11-04-cdp-breakout-terminal-replay.md) finds5,376 terminal
 exposures among3,194,112 replay rows (.1683%), from263 observed game endings.
