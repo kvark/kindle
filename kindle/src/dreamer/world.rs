@@ -12,6 +12,7 @@ use super::networks::{
     straight_through_sample, sum, weighted_cross_entropy,
 };
 use crate::vision::levjepa::joint;
+mod terminal_continuation;
 #[cfg(test)]
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
 
@@ -593,7 +594,16 @@ fn training_graph(
             reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / rows as f32));
         }
 
-        let (reward, continuation) = model.heads.forward(&mut graph, state);
+        let reward = model.heads.reward.forward(&mut graph, state);
+        let continuation_logits = model.heads.continuation.forward(&mut graph, state);
+        let terminal_weight = config
+            .terminal_continuation_weight
+            .filter(|&weight| weight != 1.0);
+        let continuation = if terminal_weight.is_some() {
+            continuation_logits
+        } else {
+            graph.sigmoid(continuation_logits)
+        };
         // Keep the reduction explicit because this value is composed into the
         // joint loss and exported as a metric. The fused backend loss stores
         // per-row partials and is only scalar when used as a terminal output.
@@ -603,12 +613,17 @@ fn training_graph(
             reward_target,
             reward_weight,
         ));
-        continuation_losses.push(mean_binary_cross_entropy(
-            &mut graph,
-            continuation,
-            continuation_target,
-            rows,
-        ));
+        continuation_losses.push(match terminal_weight {
+            Some(weight) => terminal_continuation::loss(
+                &mut graph,
+                continuation,
+                continuation_target,
+                rows,
+                config.continuation_discount(),
+                weight,
+            ),
+            None => mean_binary_cross_entropy(&mut graph, continuation, continuation_target, rows),
+        });
         let replay_value_state = if config.replay_value_gradient {
             state
         } else {

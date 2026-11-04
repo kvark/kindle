@@ -1,5 +1,30 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [bounded terminal-only continuation check](../experiments/2026-11-04-cdp-breakout-terminal-weight.md) is selected. Add optional
+`terminal_continuation_weight`, default absent/off; test10 on true game-over rows
+and1 on continuing rows, with the existing sampler and continuation scale1.
+Intermediate life losses remain continuing. This leaves other objectives' replay
+distribution unchanged at sampling; later learning/experience can differ. Both
+whole-loss scale10 and terminal-mixture.25 regress; this new change is unproven.
+
+Native implementation passes181 Rust/5 gym CPU checks and18 focused Python
+adapter checks. The default/explicit1 graph matches; the weighted graph compiles.
+The first Python invocation imports an older package missing a guidance module;
+its failure remains, and the qualified-package path passes unchanged assertions.
+Packaging, strict Clippy, packaged tests and guarded F64 loss/gradient checks
+remain before learning. No GPU allocation or full learner is active.
+
+Require default-off1024-action frozen compatibility, then fresh8192 actions/
+489 updates and1024 frozen actions,357 matching/invariant tensors, correct
+cadence, full pixel/action/label replay and guards. Keep12M64/Auto/N8/B16/T16/
+H15/R16/replay-value1/expert100 and retained rates/guidance; mixture and open-loop
+supervision stay off. Project200k cost conservatively against30min. No full learner,
+sweep, extension, repeat or automatic successor is selected.
+
+Root`/x/Temp/kindle-terminal-weight-20261104`. Check live state before GPU work.
+Retain70.750 sampled/143.667 greedy and the existing recipe pending a full gameplay
+comparison. Original864/90%-two-wall and five-game goal remain unfinished.
+
 The [completed terminal ranking check](2026-11-04-cdp-breakout-terminal-ranking.md) finds posterior AUC
 .952691→.897569, paired difference−.055122 with lane interval[−.141927,.008257].
 Prior AUC falls .791667→.734809, interval[−.205306,.085938]. Both intervals cross

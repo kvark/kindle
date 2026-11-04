@@ -353,6 +353,10 @@ pub struct DreamerConfig {
     /// distribution for all objectives, without importance correction.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub terminal_replay_fraction: Option<f32>,
+    /// Multiply only true-terminal posterior continuation losses, keeping the
+    /// ordinary row denominator. `None` and `Some(1.0)` keep the legacy graph.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub terminal_continuation_weight: Option<f32>,
     /// Replay samples per action. Zero disables scheduled updates; explicit
     /// `DreamerCore::learn` remains available for isolated diagnostics.
     pub train_ratio: f32,
@@ -459,6 +463,7 @@ impl DreamerConfig {
             color_centroid_supervision: None,
             replay_context: 1,
             terminal_replay_fraction: None,
+            terminal_continuation_weight: None,
             train_ratio: 32.0,
             imagination_length: 15,
             horizon: 333,
@@ -833,6 +838,17 @@ impl DreamerConfig {
                 return Err("terminal replay does not support causal video sequences".into());
             }
         }
+        if let Some(weight) = self.terminal_continuation_weight
+            && (!self.is_cdp()
+                || self.open_loop_supervision.is_some()
+                || self.horizon <= 1
+                || !weight.is_finite()
+                || weight <= 0.0
+                || !(weight * self.loss_scales.continuation).is_finite()
+                || !((weight - 1.0) / self.continuation_discount()).is_finite())
+        {
+            return Err("terminal continuation weight requires CDP without open-loop supervision, horizon > 1, and positive finite effective weight".into());
+        }
         if self.batch_size == 0 || self.batch_length <= 1 {
             return Err("batch_size must be positive and batch_length must exceed one".into());
         }
@@ -967,6 +983,48 @@ const fn default_replay_value_gradient() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn terminal_continuation_weight_preserves_defaults_and_checks_scope() {
+        let mut config = DreamerConfig::tiny(3);
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert!(legacy.get("terminal_continuation_weight").is_none());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(legacy).unwrap(),
+            config
+        );
+        config.terminal_continuation_weight = Some(10.0);
+        assert!(config.check().is_err());
+        config.observation_kind = ObservationKind::Rgb32;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        for weight in [0.5, 1.0, 10.0] {
+            config.terminal_continuation_weight = Some(weight);
+            config.check().unwrap();
+            let serialized = serde_json::to_value(&config).unwrap();
+            assert_eq!(serialized["terminal_continuation_weight"], weight);
+            assert_eq!(
+                serde_json::from_value::<DreamerConfig>(serialized).unwrap(),
+                config
+            );
+        }
+        for weight in [0.0, -1.0, f32::NAN, f32::INFINITY, f32::MAX] {
+            config.terminal_continuation_weight = Some(weight);
+            assert!(config.check().is_err());
+        }
+        config.terminal_continuation_weight = Some(10.0);
+        config.open_loop_supervision = Some(OpenLoopSupervision {
+            horizon: 3,
+            scale: 1.0,
+        });
+        assert!(config.check().is_err());
+        config.open_loop_supervision = None;
+        config.horizon = 1;
+        assert!(config.check().is_err());
+        config.horizon = 333;
+        config.loss_scales.continuation = f32::MAX;
+        assert!(config.check().is_err());
+    }
 
     #[test]
     fn rgb_frame_pairs_preserve_legacy_config_and_require_cdp() {
