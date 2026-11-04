@@ -1,4 +1,101 @@
-# Shorter return discount passes bounded execution and cost checks
+# Shorter return discount lowers frozen Breakout scores
+
+The [fresh200k comparison](../experiments/2026-11-04-cdp-breakout-discount100-200k.md)
+finishes **200,000 actions /799,569 emulator frames /12,477 updates in21m23.435s**.
+Reducing return discount horizon333→100 lowers greedy143.667→70.250 and
+sampled70.750→56.083, with all zero of24 two-wall successes. Training takes0.35%
+less time. Retain horizon333; the original864/90%-two-wall gate and five-game
+goal remain unfinished. No discount sweep,extension,second learner or automatic
+successor is selected.
+
+## Full 200k comparison
+
+| Measurement | Retained333 | Candidate100 |
+|---|---:|---:|
+| Training time |21m27.910s|21m23.435s|
+| Frozen greedy mean |143.667|70.250|
+| Actual-initial greedy mean |2.208|2.208|
+| Greedy gain/min above own initial |6.590132|3.180916|
+| Frozen sampled mean |70.750|56.083|
+| Actual-initial sampled mean |1.417|1.417|
+| Sampled gain/min above own initial |3.230038|2.555641|
+| Two-wall successes, either final mode |0/24|0/24|
+
+Primary greedy score falls51.10%, and own-initial gain/min falls51.73%. All
+eight greedy lane means are lower. The paired score difference is−73.416667,
+95% interval[−97.209375,−48.207292]; gain/min difference−3.409216 has interval
+[−4.516728,−2.234156]. Sampled score falls20.73%; its−14.666667-point interval
+[−27.916667,−1.708333] also lies below zero. The locked preference rule fails.
+These10,000 seed0 resamples cover eight reused evaluation lanes, not independent
+training seeds or broad reliability.
+
+Both actual-initial semantic traces reproduce the retained controls:799 sampled
+and794 greedy events. Each of four arms selects the first three natural episodes
+per eight lanes, with zero updates/truncations and357 invariant tensors. Together
+the captures take79,480 actions/317,755 frames/51.674s. Full recorded-action,
+outcome,frame-count,boundary replays and videos pass. Ordinary frozen logs lack
+live pixel hashes; equality to unavailable live images is not claimed.
+
+### Interpretation and cost
+
+The native configuration changes only return horizon333→100. Imagination stays15,
+and continuation targets,imagined/replay credit and subsequent experience change
+together. This comparison does not identify which of those changes explains the
+regression. New held-out critic calibration was not measured, so it does not
+establish whether the shorter-horizon value target became easier to fit.
+
+Replay imitation cross-entropy on labeled rows falls1.193900→.546030 across
+the run, slightly below the retained late.560514, despite worse frozen play.
+These own-replay measures do not establish generalization or competence.
+Actual teacher overrides are88,312/200,000 (44.156%), versus43.0585% retained.
+Guided online returns remain separate from the frozen scores. Reused1009/cohort
+and historical control timing remain development limitations.
+
+Construction takes2.607s separately. Recorded stages take1,138.607s learning,
+63.075s acting,62.891s environment,12.461s observation,1.096s reset and.581s
+checkpointing. These wrapper timers do not isolate GPU kernels. Retain CPU
+co-host time without correction:startup.360s,100k verifier.635s (.715s wrapper),
+separate recovery receipt/journal review.077s and publication preparation.005s.
+
+### Completion and evidence
+
+Full helper,comparison and plot qualification passes3.667s; all five actual
+queued commands pass.541s with zero native-agent/emulator construction.
+All151 current/338 retained pins,357 initial tensors matching bounded/retained
+controls,47 pre-update events,finite weighted reports,correct cadence and
+100k/6,227 read-only recovery pass. First update376,residual.5. CNN,reward,
+continuation,actor and value arrays change. The107.869s training replay verifies
+all recorded pixels,actions,labels and overrides. Guards,curves,coverage,
+exposure and comparison pass. The curve was visually reviewed after completion.
+
+MainPID1173630/invocation`ba245c2b52b44d84b58322ec2008dbc3` launches18:43:09.877
+UTC November4/source`11477bc7ae422ab3266b913036c4eae6258668ca`, completes
+19:08:30.521. Original collectorPID1173633/invocation
+`9021e661bc79456bb66e71bdb46aafc1` completes19:08:42.614 after2.515s terminal
+audit. Recovery succeeds earlier. The separate2.919s publication review closes
+19:09:01.626, verifying55 completion artifacts,original journal identities,
+24-episode means,config,cadence,preference and the original gate. All three
+original services are terminal success. No full-run stage fails or repeats.
+The earlier CPU source-name assertion and repair remain preserved below.
+
+Native447fe50/SHA35ad0db and teacher remain unchanged; qualified runner112be6c4
+exposes the discount. No build,new parameter,experience transfer or optional
+loss is added. Full root `/x/Temp/kindle-breakout-discount100-20261104/full` is
+closed, with no active GPU allocation at review. Do not restart the learner or
+collectors; check live state before any separately justified work.
+
+| Full artifact | SHA256 |
+|---|---|
+| `declaration.json` |`b49d48e3cd307d10ea27bba54c30495785cbd50a6f004868d9cf1d0f9f8f7096`|
+| `recovery-verification.json` |`64971cf98005270543329b05d64e920f19a84e14c94bb1b64f8a7be5bd59f502`|
+| `candidate/learning-review.json` |`0e2af56b128a1209dc4b99c92d1f5e5d8b770fb257631759db45eeabbd56d433`|
+| `candidate/guidance-replay.json` |`7594ec9d97a0116adfea164ffc5a8f1f3c96572b48b62c9632daecdecf9f3176`|
+| `comparison.json` |`1dd5ac2c42079453ba50916f457af4f464dc53cf01e4e0d664c9cc53490a3c84`|
+| `completion.json` |`031f895c3c30e56bf206d5c5c94fb3037423240d4ded9c3a127bcf82dc203ccc`|
+| `terminal-summary.json` |`4f7a9647a32f3c16d15454a84655e80e690cc3ce1974be54170a84e45341b53c`|
+| `publication-review.json` |`545c34ce0bd432f38d9fbc2eadf75a52332f285b7c9524a0daefa6655e090d2a`|
+
+## Earlier bounded execution and cost check
 
 The [bounded discount100 check](../experiments/2026-11-04-cdp-breakout-discount100.md)
 completes **8,192 actions /32,729 emulator frames /489 updates in47.055s**.
@@ -6,12 +103,11 @@ The padded200k projection is **21m03.687s**, below30min. Frozen1,024 actions/
 4,096 frames take.874s with zero updates,357 invariant tensors and no natural
 episodes. This establishes execution and early cost; gameplay is unmeasured.
 
-Select the separate [fresh200k comparison](../experiments/2026-11-04-cdp-breakout-discount100-200k.md)
-after this pass. No bounded experience transfers. At bounded publication full
-preparation is pending; retain143.667 greedy/70.750 sampled and the original
-864/90%-two-wall gate. The five-game goal remains unfinished.
+This pass selected the separate fresh200k comparison reported above. At bounded
+publication its preparation was pending. No bounded experience transferred;
+the original864/90%-two-wall gate and five-game goal remain unfinished.
 
-## Change and rationale
+### Change and rationale
 
 Only native `horizon` changes333→100; imagination length stays15. The retained
 critic's complete-return sampled RMSE9.231 trails its earlier-episode constant's
@@ -45,7 +141,7 @@ replay100k,full18/sticky.25/repeat4/noops0,native pooled RGB/one GPU64 resize.
 Fresh seed1009/frozen4000001009. Native447fe50/SHA35ad0db and teacher stay fixed;
 private runner112be6c4 adds ten CLI lines to retainedcf4ea238. No build.
 
-## Verification and completion
+### Verification and completion
 
 Both canonical/private CLI suites pass14 cases. Default/explicit333 configs
 match;100 changes only horizon. Boundary cases preserve nondegenerate F32

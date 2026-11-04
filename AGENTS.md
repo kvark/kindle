@@ -20,43 +20,33 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [fresh200k discount100 comparison](docs/experiments/2026-11-04-cdp-breakout-discount100-200k.md) launches18:43:09.877 UTC
-November4/source11477bc7 with151 pins and a30-minute training cap. Change only
-return discount horizon333→100; imagination stays15 and other retained12M64/
-Auto/N8/B16/T16/H15/R16/expert100 settings stay fixed. Native447fe50/SHA35ad0db,
-teacher and qualified runner112be6c4 remain unchanged from the bounded check.
+The [completed discount100 comparison](docs/results/2026-11-04-cdp-breakout-discount100.md#full-200k-comparison) finishes
+200k actions /799,569 frames /12,477 updates in **21m23.435s**, 0.35% less time
+than retained. Shortening return discount horizon333→100 lowers greedy
+143.667→70.250 and sampled70.750→56.083; all0/24 two-wall successes. Primary
+own-initial gain/min falls51.73%; paired difference−3.409216 has95% lane interval
+[−4.516728,−2.234156]. All eight greedy lane means are lower. Retain horizon333
+and143.667/70.750; no discount sweep,extension,second learner or automatic successor.
 
-Startup passes357 initial tensors matching bounded/retained controls,47 shared
-pre-update events and first update376. Independent100k/6,227 recovery passes
-18:54:10.725 UTC in.635s (.715s observer wrapper):357 finite tensors,151 unchanged
-pins,0555 directory/0444 files,zero model calls. The recovery observer succeeds;
-separate.077s receipt/journal review matches verifier childPID1174568 under its
-original invocation without repeating tensor verification. Keep CPU time
-uncorrected; the checkpoint omits replay,games,beliefs and complete RNG state.
+Late labeled-row imitation CE improves.560514→.546030 despite worse frozen play.
+Own-replay fitting is not competence; new critic calibration is unmeasured.
+Continuation targets,imagined/replay credit and experience change together,
+without an isolated causal mechanism or seed-reliability claim. Imagination15,
+native447fe50/SHA35ad0db and teacher stay fixed; runner112be6c4 exposes horizon.
 
-MainPID1173630/invocationba245c2b52b44d84b58322ec2008dbc3 and original terminal
-collector remain active at18:55 review. Require final200k/12,477 and four
-actual-initial/final sampled/greedy24-natural-episode assessments. No full frozen
-result is available. Greedy remains primary; favor higher raw score and
-own-initial gain/min with a positive paired interval.
+All151 current/338 retained pins,100k/6,227 recovery,357 matched initial/invariant
+frozen tensors,47 pre-update and799/794 actual-initial semantic events,full
+replays/videos,guards,curves,coverage,exposure and comparison pass. Actual
+overrides44.156%; guided returns are not frozen competence. CPU co-host time
+stays uncorrected. The earlier CPU source-name assertion and repair remain;
+no full-run stage fails or repeats.
 
-Full helper/comparison/plot qualification passes3.667s and all five actual queued
-commands pass.541s with zero agent/emulator constructions. Startup CPU review
-costs.360s; publication-reader preparation.005s. Keep co-host time uncorrected.
-The final publication reader is prepared but must run only after all original
-services finish successfully. No GPU stage repeats or bounded experience transfer.
-
-The [bounded check](docs/results/2026-11-04-cdp-breakout-discount100.md) passes8,192/32,729frames/489 in47.055s; padded200k
-21m03.687s passes30min. Frozen1,024/.874s haszero updates,357 invariant tensors,
-no episodes. All82 current/338 retained pins,replays and original services pass;
-independent2.481s closure18:39:55.770 retains102 hashes. Original CPU source-name
-assertion and repair remain preserved. Do not repeat the check or collectors.
-
-Full root `/x/Temp/kindle-breakout-discount100-20261104/full`; service
-`kindle-breakout-discount100-200k-20261104`. Check live identity;do not restart,
-overlap or alter the active learner. No discount sweep,extension,second learner
-or automatic successor. Retain143.667 greedy/70.750 sampled until assessed.
-Original864/90%-two-wall and the five-game goal remain unfinished.
+Main/collector complete19:08:30.521/19:08:42.614 UTC November4/source11477bc7;
+all three original services succeed. Separate2.919s publication review closes
+19:09:01.626 with55 completion artifacts. Root
+`/x/Temp/kindle-breakout-discount100-20261104/full` is closed, with no active GPU
+allocation at review. Do not restart its learner or collectors;check live state
+before work. Original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
