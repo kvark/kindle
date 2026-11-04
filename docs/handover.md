@@ -15,11 +15,16 @@ B16/T16/H15/R16/expert100 settings stay fixed. Native447fe50/SHA35ad0db and
 teacher stay unchanged; qualified runner52593379 exposes the coefficient.
 
 Startup passes357 initial tensors matching bounded/retained controls,47 shared
-pre-update events and first update376. At the18:01 startup review,128 finite
-reports reach2,424 actions; this is progress,not a gameplay result. MainPID1169640,
-invocation5606b6db548e450bbbe94b4565f3a2b7. Original recovery and terminal observers
-are active. Require100k/6,227 read-only recovery and final200k/12,477 updates,
-then actual-initial/final sampled/greedy24-natural-episode frozen assessments.
+pre-update events and first update376. Independent100k/6,227 recovery passes
+18:12:29.915 UTC in.458s (.514s observer wrapper):357 finite tensors,145 unchanged
+pins,0555 directory/0444 files,zero model calls. The recovery observer succeeds;
+original child-journal/receipt review passes separately in.076s without repeating
+the verifier. The.300s publication-reader preparation review also co-hosts;retain
+all CPU time in measured training wall time without correction.
+
+MainPID1169640/invocation5606b6db548e450bbbe94b4565f3a2b7 and original terminal
+collector remain active at18:13 review. Require final200k/12,477 updates,then
+actual-initial/final sampled/greedy24-natural-episode frozen assessments.
 Favor only improved primary greedy raw score and own-initial gain/min with a
 positive paired interval. Original864/90%-two-wall gate remains fixed.
 
