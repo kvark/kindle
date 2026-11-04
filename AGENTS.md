@@ -20,24 +20,25 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [bounded Breakout continuation10 check](docs/experiments/2026-11-04-cdp-breakout-continuation10.md) is selected after34 canonical/34 packaged CPU checks and actual queued
-command/audit/collector preflight. Only existing continuation BCE scale1→10
-changes; both terminal and nonterminal targets are weighted. Native447fe50,
-12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 and20% episode guidance
-stay fixed. No new objective or native build. This tests execution and early
-cost, not gameplay benefit or a proven failure mechanism.
+The [fresh200k continuation10 comparison](docs/experiments/2026-11-04-cdp-breakout-continuation10-200k.md) is selected after the bounded
+check completes8192 actions/489 updates in46.764s, projected200k20m55.877s.
+All699 bounded pins,357 matching/invariant tensors,47 pre-update events,weighted
+world losses,full replay and original services pass. The bounded root is closed.
+Full helpers and the complete comparison entry pass on CPU before outcomes.
 
-Root `/x/Temp/kindle-breakout-continuation10-20261104`, service
-`kindle-breakout-continuation10-check-20261104`. One fresh8192-action/489-update
-check and1024 frozen actions require357 matched initial/invariant tensors,
-47 pre-update events, weighted loss reports, full replay and host guards.
-Caps180s training/60s frozen; padded200k cost must fit30min before a separate
-full selection. Check live state; do not restart stages or schedule another GPU
-job while active. No full learner, extension or automatic successor is selected.
+Only existing world continuation BCE scale1→10 changes. Native447fe50,
+12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100, rates and20% episode
+guidance stay fixed. This weights terminal and nonterminal targets; no isolated
+mechanism or gameplay gain is established. No native build or H3 supervision.
 
-The arrival-head diagnostic remains closed: observed terminal mean.759636
-versus prior.952850,target zero. Retain70.750 sampled/143.667 greedy;
-the original864/90%-two-wall and five-game goal remain unfinished.
+Root `/x/Temp/kindle-breakout-continuation10-20261104/full`, service
+`kindle-breakout-continuation10-200k-20261104`. Require fresh200k/12,477 updates
+within30min,100k/6,227 recovery,357 matched initial/invariant frozen tensors and
+four fixed24-episode final/actual-initial sampled/greedy assessments. Greedy is
+primary against143.667, sampled secondary against70.750. Check live state; do
+not restart stages or schedule another GPU job while active. No extension,
+second learner or automatic successor. Original864/90%-two-wall and five-game
+goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

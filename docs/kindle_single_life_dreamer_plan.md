@@ -1,12 +1,30 @@
 # Kindle: CDP learning roadmap
 
-The [bounded continuation10 check](experiments/2026-11-04-cdp-breakout-continuation10.md)
-is selected after34 canonical/34 packaged CPU checks and actual-command preflight.
-It raises existing world continuation BCE scale1→10, with the retained native,
-architecture, guidance and remaining recipe unchanged. One8192-action check and
-1024 frozen actions assess execution/cost; no full learner is selected. Root
-`/x/Temp/kindle-breakout-continuation10-20261104`; check the original service
-before work and do not repeat completed stages. Original game gates remain fixed.
+The [fresh200k continuation10 comparison](experiments/2026-11-04-cdp-breakout-continuation10-200k.md) is selected after the bounded
+check completes8192 actions/489 updates in46.764s, projected200k20m55.877s.
+All699 bounded pins,357 matching/invariant tensors,47 pre-update events,weighted
+world losses,full replay and original services pass. The bounded root is closed.
+Full helpers and the complete comparison entry pass on CPU before outcomes.
+
+Only existing world continuation BCE scale1→10 changes. Native447fe50,
+12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100, rates and20% episode
+guidance stay fixed. This weights terminal and nonterminal targets; no isolated
+mechanism or gameplay gain is established. No native build or H3 supervision.
+
+Root `/x/Temp/kindle-breakout-continuation10-20261104/full`, service
+`kindle-breakout-continuation10-200k-20261104`. Require fresh200k/12,477 updates
+within30min,100k/6,227 recovery,357 matched initial/invariant frozen tensors and
+four fixed24-episode final/actual-initial sampled/greedy assessments. Greedy is
+primary against143.667, sampled secondary against70.750. Check live state; do
+not restart stages or schedule another GPU job while active. No extension,
+second learner or automatic successor. Original864/90%-two-wall and five-game
+goal remain unfinished.
+
+The [bounded continuation10 result](results/2026-11-04-cdp-breakout-continuation10.md)
+passes46.764s training/.872s frozen,34 canonical/34 packaged CPU checks,699 pins
+and independent5.398s closure at03:43:00 UTC November4. All84 final artifacts
+verify, with no experiment-stage failure or repeat. Full selection is separate;
+no bounded experience transfers and no gameplay benefit is established.
 
 The [completed Breakout arrival-head diagnostic](results/2026-11-04-cdp-breakout-arrival-head.md) lowers mean terminal
 continuation from.952850 before observation to.759636 after the actual arrival,
