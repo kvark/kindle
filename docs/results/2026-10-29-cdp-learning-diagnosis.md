@@ -1,36 +1,35 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh terminal-weight10 comparison](../experiments/2026-11-04-cdp-breakout-terminal-weight-200k.md) is selected after the bounded
-check passes46.934s/8,192 actions/489 updates and conservative21m00.438s200k cost.
-Test one fresh200k-action/12,477-update learner with30-minute training cap,100k
-recovery and final/actual-initial sampled/greedy24-episode assessments. Retain
-12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100, rates and guidance.
-Only true terminal continuation rows receive10; continuing rows retain1, with
-existing sampler/global continuation1. Stable-logit BCE and native/runner versions
-also differ from retained447fe50; no isolated coefficient or calibration claim.
+The [completed terminal-weight10 comparison](2026-11-04-cdp-breakout-terminal-weight.md) scores120.542 greedy/66.375
+sampled versus143.667/70.750 retained, all0/24 two-wall. It finishes200k actions/
+799,593 frames/12,477 updates in21m37.140s,+.72% time. Greedy gain/min falls16.94%;
+paired difference−1.116550 has interval[−3.490321,1.371544], so reliable harm or
+equality is not established. The locked improvement rule fails. Retain existing
+sampler/continuation1 with terminal weighting off; no sweep, second learner,
+extension or automatic successor. Original864/90%-two-wall and five-game goal
+remain unfinished.
 
-Reuse qualified3672a21a/SHAa8b483a3 runtime and bounded runner. Packaged teacher
-bytes match the prior qualified package, so reuse its scoped source/fixture evidence.
-Require exact initialization/semantics, finite losses, full replays, guards and
-independent recovery/terminal checks. Greedy return and own-initial-subtracted
-return/min are primary against70.750 sampled/143.667 greedy; use the locked lane
-bootstrap decision. Original864/90%-two-wall and five-game goal remain unfinished.
-No result, sweep, second learner, extension or automatic successor is implied.
+All370 current/338 retained pins,100k/6,227 recovery,357 initial/invariant frozen
+tensors,47 pre-update events,799/794 actual-initial semantic events, finite losses,
+full pixel/action/label and frozen replays/videos,guards,coverage,curves and
+comparison pass. Terminal exposure5,257/3,194,112 rows versus5,376 retained;
+8,250 versus8,105 updates contain no ending. Late expert CE.546991 versus.560514
+on own replay does not yield a gameplay gain. Actual overrides43.4255% and guided
+194.642 returns are not frozen competence. Ending-prediction benefit is unmeasured.
 
-Root`/x/Temp/kindle-terminal-weight-20261104/full`;service
-`kindle-breakout-terminal-weight-200k-20261104` launches06:36:25 UTC November4,
-source8ee590c5,370 pins,PID1141191/invocation6a601955edc441c98fa39c453d177faa.
-Startup passes357 bounded/retained initial tensors,47 pre-update events and
-first update376. CPU helper/comparison checks3.448s and allfive actual-command
-preflights.729s pass, with no native/emulator construction. The100k/6,227 recovery
-passes06:47:12 UTC; independent.552s CPU verification completes06:47:26 with357
-finite tensors/370 unchanged pins and read-only weights/moments. Original learner
-identity is preserved. Recovery observer succeeds; main and terminal collector
-remain active, with102,400 actions/6,377 updates observed in656.989s. No frozen
-result exists. A new independent closure reader reproduces retained scores and
-terminal exposure in.305s CPU; co-host costs remain uncorrected. Check live state;
-do not restart this learner or schedule another GPU job while it is active.
-Preserve completed bounded stages and their CPU repairs.
+Source8ee590c5/native3672a21a/SHAa8b483a3; same12M64/Auto/N8/B16/T16/H15/R16/
+replay-value1/expert100 and retained rates/guidance. Only true terminal continuation
+rows receive10; continuing rows1, unchanged sampler/global continuation1. Enabled
+stable-logit BCE,native/runner/wrapper versions and later experience differ from
+retained447fe50; no isolated coefficient, calibration or reliability claim.
+Main succeeds07:02:09 UTC November4,collector07:02:43; independent3.346s CPU
+closure completes07:03:46, verifying53 artifacts and the decision. All services
+succeed; no full-stage failure/repair or GPU repeat. Earlier bounded CPU failures
+remain preserved. CPU co-host costs stay included without correction.
+
+Root`/x/Temp/kindle-terminal-weight-20261104/full` is closed. No learner or GPU
+allocation is active at closure; check live state before future work. Do not
+restart completed stages. Retain runtime, checkpoints, logs, videos and build cache.
 
 The [terminal-only continuation check](2026-11-04-cdp-breakout-terminal-weight.md) passes8,192 actions/32,722 frames/489 updates in46.934s.
 Conservative200k projection21m00.438s passes30min; gameplay benefit is unmeasured.
