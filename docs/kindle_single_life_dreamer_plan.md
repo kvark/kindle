@@ -1,5 +1,26 @@
 # Kindle: CDP learning roadmap
 
+The [CPU-only catch-signal diagnostic](results/2026-11-04-cdp-breakout-catch-signal.md)
+finds a fixed causal pooled-pixel detector matches all776 fitted contact
+candidates,including674 accepted-error fits,in24 saved teacher episodes.
+It emits1,476 signals;700 have no neighbor in the filtered,incomplete reference
+and remain unresolved. Mean detection delay is5.550 raw frames;all1,476 arrivals
+have zero game reward. This is reference coverage,not detector precision,
+current-policy validation or evidence that a catch reward improves gameplay.
+
+All16 CPU fixtures,23 unchanged pins,prior evidence links and independent output
+recount pass. Analysis/recount take.435/.143s;controller.615s completes16:07:08.888
+UTC November4/sourceed155372,with18 completion artifacts. No failure,repair,
+repeated stage,ALE/native import,learner update or GPU work occurs. Root
+`/x/Temp/kindle-breakout-catch-signal-20261104` is closed;no running Kindle service
+is observed before or afterward. Check live state before any GPU work.
+
+No reward coefficient,training change or automatic successor is selected.
+Unmatched signals and current-policy misses/serves need validation before a
+training aid. Retain Breakout143.667 greedy/70.750 sampled and representation
+scale0.1 after the [lower-KL regression](results/2026-11-04-cdp-breakout-representation001.md#full200k-comparison). Original864/90%-two-wall
+and the five-game goal remain unfinished.
+
 The [completed representation-KL comparison](results/2026-11-04-cdp-breakout-representation001.md#full200k-comparison)
 finishes200k actions/799,591 frames/12,477 updates in21m23.007s,close to retained
 21m27.910s. Reducing posterior KL scale0.1→0.01 lowers greedy143.667→93.208

@@ -8,31 +8,26 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed representation-KL comparison](results/2026-11-04-cdp-breakout-representation001.md#full200k-comparison)
-finishes200k actions/799,591 frames/12,477 updates in21m23.007s,close to retained
-21m27.910s. Reducing posterior KL scale0.1→0.01 lowers greedy143.667→93.208
-and sampled70.750→35.792;all0/24 two-wall. Primary gain/min falls35.42%; its
-paired difference−2.334505 has95% lane interval[−3.921731,−.481545]. The locked
-preference rule fails. Retain representation scale0.1; no mechanism or broad
-reliability claim follows from one reused development learner/cohort.
+The [CPU-only catch-signal diagnostic](results/2026-11-04-cdp-breakout-catch-signal.md)
+finds a fixed causal pooled-pixel detector matches all776 fitted contact
+candidates,including674 accepted-error fits,in24 saved teacher episodes.
+It emits1,476 signals;700 have no neighbor in the filtered,incomplete reference
+and remain unresolved. Mean detection delay is5.550 raw frames;all1,476 arrivals
+have zero game reward. This is reference coverage,not detector precision,
+current-policy validation or evidence that a catch reward improves gameplay.
 
-All774 current/338 retained pins,100k/6,227 recovery,357 matching initial/
-invariant frozen tensors,47 pre-update and799/794 initial semantic events,
-full replays/videos,guards,curves,coverage,exposure and comparison pass. Late
-raw KL rises11.815355→16.080293 while reported expert loss falls.559936→.541684;
-own-replay fitting does not establish gameplay benefit. Actual overrides42.074%.
+All16 CPU fixtures,23 unchanged pins,prior evidence links and independent output
+recount pass. Analysis/recount take.435/.143s;controller.615s completes16:07:08.888
+UTC November4/sourceed155372,with18 completion artifacts. No failure,repair,
+repeated stage,ALE/native import,learner update or GPU work occurs. Root
+`/x/Temp/kindle-breakout-catch-signal-20261104` is closed;no running Kindle service
+is observed before or afterward. Check live state before any GPU work.
 
-Main/collector succeed09:39:32/09:39:42 UTC November4; separate4.155s saved-result
-review completes09:41:35,verifying57 artifacts. All three original services
-succeed. Original prelaunch exact-float CPU assertion and separate suffix repair
-remain preserved,along with the earlier bounded flag-spelling fixture failure.
-No training,evaluation,replay or collector stage fails or repeats. CPU co-host
-costs remain included. Sourceca33c9fd/native447fe50/runtime unchanged.
-
-Root`/x/Temp/kindle-breakout-representation001-20261104/full` is closed.
-No GPU allocation is active at closure; check live state. No extension,coefficient
-sweep,second learner or automatic successor is selected. Retain143.667 greedy/
-70.750 sampled. Original864/90%-two-wall and the five-game goal remain unfinished.
+No reward coefficient,training change or automatic successor is selected.
+Unmatched signals and current-policy misses/serves need validation before a
+training aid. Retain Breakout143.667 greedy/70.750 sampled and representation
+scale0.1 after the [lower-KL regression](results/2026-11-04-cdp-breakout-representation001.md#full200k-comparison). Original864/90%-two-wall
+and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
