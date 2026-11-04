@@ -22,10 +22,15 @@ Root`/x/Temp/kindle-terminal-weight-20261104/full`;service
 source8ee590c5,370 pins,PID1141191/invocation6a601955edc441c98fa39c453d177faa.
 Startup passes357 bounded/retained initial tensors,47 pre-update events and
 first update376. CPU helper/comparison checks3.448s and allfive actual-command
-preflights.729s pass, with no native/emulator construction. Main,100k recovery
-observer and terminal collector are active; no full frozen result exists yet.
-Check live state; do not restart this learner or schedule another GPU job while
-it is active. Preserve completed bounded stages and their CPU repairs.
+preflights.729s pass, with no native/emulator construction. The100k/6,227 recovery
+passes06:47:12 UTC; independent.552s CPU verification completes06:47:26 with357
+finite tensors/370 unchanged pins and read-only weights/moments. Original learner
+identity is preserved. Recovery observer succeeds; main and terminal collector
+remain active, with102,400 actions/6,377 updates observed in656.989s. No frozen
+result exists. A new independent closure reader reproduces retained scores and
+terminal exposure in.305s CPU; co-host costs remain uncorrected. Check live state;
+do not restart this learner or schedule another GPU job while it is active.
+Preserve completed bounded stages and their CPU repairs.
 
 The [terminal-only continuation check](2026-11-04-cdp-breakout-terminal-weight.md) passes8,192 actions/32,722 frames/489 updates in46.934s.
 Conservative200k projection21m00.438s passes30min; gameplay benefit is unmeasured.
