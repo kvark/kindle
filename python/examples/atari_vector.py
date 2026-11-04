@@ -69,6 +69,8 @@ def rgb_preprocessing(config):
         description = 'native crop ' + ','.join(f'{name}={crop[name]}' for name in ('x', 'y', 'width', 'height')) + '; ' + description
     if config.get('rgb_frame_pair', False):
         description += '; previous/current RGB pair on GPU, repeat first image on reset'
+    if config.get('rgb_coordinates', False):
+        description += '; encoder appends fixed x/y pixel-center coordinates in [-0.5,0.5]'
     return description
 
 
@@ -87,6 +89,8 @@ def main():
                         help="learned RGB/CDP GPU resize side; fresh default64, restore uses checkpoint geometry")
     parser.add_argument("--rgb-frame-pair", action="store_true",
                         help="fresh CDP: encode previous/current resized RGB images as six channels")
+    parser.add_argument("--rgb-coordinates", action="store_true",
+                        help="fresh learned RGB: append fixed x/y coordinate channels inside the CNN")
     parser.add_argument("--image-crop", type=int, nargs=4, metavar=("X", "Y", "WIDTH", "HEIGHT"),
                         help="fresh learned RGB/CDP: native-pixel crop before the single GPU resize; restore uses checkpoint crop")
     parser.add_argument("--cdp-centered", action="store_true",
@@ -477,6 +481,7 @@ def main():
     training_options.add("--cdp-centered")
     training_options.add("--disagreement-scale")
     training_options.add("--training-precision")
+    training_options.add("--rgb-coordinates")
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
@@ -552,8 +557,16 @@ def main():
         if (metadata.get("config", {}).get("rgb_frame_pair", False)
                 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_FRAME_PAIR", False)):
             parser.error("frame-pair checkpoint requires native RGB frame-pair support")
+        if (metadata.get("config", {}).get("rgb_coordinates", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_COORDINATES", False)):
+            parser.error("coordinate checkpoint requires native RGB coordinate support")
     args.observation_size = args.observation_size or "native"
     learned_rgb = args.encoder_checkpoint is None
+    if args.rgb_coordinates:
+        if not learned_rgb or args.evaluate:
+            parser.error("rgb-coordinates requires fresh training with the learned CNN")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_RGB_COORDINATES", False):
+            parser.error("rgb-coordinates requires native RGB coordinate support")
     if args.rgb_frame_pair:
         if not learned_rgb or not args.cdp:
             parser.error("rgb-frame-pair requires fresh CDP with the learned CNN")
@@ -722,6 +735,8 @@ def main():
             config["observation_kind"] = f"rgb{args.image_size or 64}"
             if args.rgb_frame_pair:
                 config["rgb_frame_pair"] = True
+            if args.rgb_coordinates:
+                config["rgb_coordinates"] = True
             if args.image_crop is not None:
                 config["observation_crop"] = dict(zip(("x", "y", "width", "height"), args.image_crop))
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)

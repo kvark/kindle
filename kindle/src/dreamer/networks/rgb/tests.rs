@@ -168,25 +168,32 @@ fn reference(input: &[f32], parameters: &HashMap<String, Vec<f32>>) -> Vec<f64> 
 #[test]
 #[ignore = "requires GPU; independent scalar CNN values and finite-difference gradients"]
 fn tiny_rgb_encoder_matches_independent_reference() {
-    check_encoder_reference(false, false);
+    check_encoder_reference(false, false, false);
 }
 
 #[test]
 #[ignore = "requires guarded GPU; six-channel scalar CNN and both-frame derivatives"]
 fn tiny_rgb_frame_pair_encoder_matches_independent_reference() {
-    check_encoder_reference(true, false);
+    check_encoder_reference(true, false, false);
 }
 
 #[test]
 #[ignore = "requires guarded GPU and KINDLE_RGB_PAIR_DERIVATIVES output path"]
 fn capture_tiny_rgb_frame_pair_encoder_derivatives() {
-    check_encoder_reference(true, true);
+    check_encoder_reference(true, false, true);
 }
 
-fn check_encoder_reference(frame_pair: bool, capture: bool) {
+#[test]
+#[ignore = "requires guarded GPU; coordinate CNN values and RGB/x/y weight derivatives"]
+fn tiny_rgb_coordinate_encoder_matches_independent_reference() {
+    check_encoder_reference(false, true, false);
+}
+
+fn check_encoder_reference(frame_pair: bool, coordinates: bool, capture: bool) {
     let mut config = DreamerConfig::tiny(3);
     config.observation_kind = ObservationKind::Rgb64;
     config.rgb_frame_pair = frame_pair;
+    config.rgb_coordinates = coordinates;
     let mut graph = Graph::new();
     let encoder = Encoder::new(&mut graph, &config);
     let input = graph.input("pixels", &[2, config.observation_dim()]);
@@ -215,14 +222,31 @@ fn check_encoder_reference(frame_pair: bool, capture: bool) {
     session.set_input("pixels", &pixels);
     session.step();
     session.wait();
-    let expected = reference(&pixels, &parameters);
+    let reference_pixels = if coordinates {
+        let mut augmented = Vec::new();
+        for frame in pixels.chunks_exact(config.observation_dim()) {
+            augmented.extend_from_slice(frame);
+            for axis in 0..2 {
+                for y in 0..64 {
+                    for x in 0..64 {
+                        let position = if axis == 0 { x } else { y };
+                        augmented.push(((2 * position + 1) as f64 / 128.0 - 0.5) as f32);
+                    }
+                }
+            }
+        }
+        augmented
+    } else {
+        pixels.clone()
+    };
+    let expected = reference(&reference_pixels, &parameters);
     let mut actual = vec![0.0; expected.len()];
     session.read_output_by_index(1, &mut actual);
     for (&a, &b) in actual.iter().zip(&expected) {
         assert!((f64::from(a) - b).abs() < 3e-4, "{a} != {b}");
     }
     let scalar_loss = |p: &HashMap<String, Vec<f32>>| {
-        let values = reference(&pixels, p);
+        let values = reference(&reference_pixels, p);
         values.iter().map(|x| x * x).sum::<f64>() / values.len() as f64
     };
     assert!((f64::from(session.read_loss()) - scalar_loss(&parameters)).abs() < 3e-4);
@@ -259,19 +283,40 @@ fn check_encoder_reference(frame_pair: bool, capture: bool) {
         checks[0].1 = Some(0);
         checks.push(("cnn0.weight", Some(1)));
     }
+    if coordinates {
+        checks[0].1 = Some(0);
+        checks.extend([("cnn0.weight", Some(1)), ("cnn0.weight", Some(2))]);
+    }
     for (suffix, image) in checks {
         let name = format!("world.representation.encoder.{suffix}");
         let mut gradient = vec![0.0; parameters[&name].len()];
         session.read_param_grad(&name, &mut gradient);
         let lane = (0..gradient.len())
-            .filter(|&i| image.is_none_or(|image| (i / 25) % 6 / 3 == image))
+            .filter(|&i| {
+                image.is_none_or(|image| {
+                    if coordinates {
+                        let channel = (i / 25) % 5;
+                        if image == 0 {
+                            channel < 3
+                        } else {
+                            channel == image + 2
+                        }
+                    } else {
+                        (i / 25) % 6 / 3 == image
+                    }
+                })
+            })
             .max_by(|&a, &b| gradient[a].abs().total_cmp(&gradient[b].abs()))
             .unwrap();
         assert!(gradient[lane].is_finite() && gradient[lane].abs() > 1e-6);
         let original = parameters[&name][lane];
         // The paired fixture crosses max-pool boundaries at 1e-4; 1e-5 and
         // 1e-6 converge without changing winners in the independent reference.
-        let step = if frame_pair { 1e-5 } else { 1e-4 };
+        let step = if frame_pair || coordinates {
+            1e-5
+        } else {
+            1e-4
+        };
         parameters.get_mut(&name).unwrap()[lane] = original + step;
         let plus = scalar_loss(&parameters);
         let high = parameters[&name][lane];
@@ -285,6 +330,59 @@ fn check_encoder_reference(frame_pair: bool, capture: bool) {
             "{name}: {} != {expected}",
             gradient[lane]
         );
+    }
+}
+
+#[test]
+fn rgb_coordinate_planes_and_graph_preserve_replay_geometry() {
+    for (kind, side) in [
+        (ObservationKind::Rgb32, 32),
+        (ObservationKind::Rgb48, 48),
+        (ObservationKind::Rgb64, 64),
+    ] {
+        let planes = coordinate_planes(side);
+        assert_eq!(planes.len(), 2 * side * side);
+        for y in 0..side {
+            for x in 0..side {
+                let index = y * side + x;
+                assert!(
+                    (f64::from(planes[index]) - ((x as f64 + 0.5) / side as f64 - 0.5)).abs()
+                        < 3e-8
+                );
+                assert!(
+                    (f64::from(planes[side * side + index])
+                        - ((y as f64 + 0.5) / side as f64 - 0.5))
+                        .abs()
+                        < 3e-8
+                );
+            }
+        }
+        let mut config = DreamerConfig::tiny(18);
+        config.model_size = crate::ModelSize::Size12M;
+        config.observation_kind = kind;
+        config.rgb_coordinates = true;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.cdp_centered = true;
+        assert!(config.check().is_ok());
+        assert_eq!(config.observation_dim(), 3 * side * side);
+        let mut graph = Graph::new();
+        let encoder = Encoder::new(&mut graph, &config);
+        let count: usize = graph
+            .nodes()
+            .iter()
+            .filter(|node| matches!(node.op, meganeura::graph::Op::Parameter { .. }))
+            .map(|node| node.ty.num_elements())
+            .sum();
+        assert_eq!(count, 220_416 + 2 * 25 * 32);
+        let pixels = graph.input("pixels", &config.observation_shape(2));
+        let output = encoder.forward(&mut graph, pixels, 2);
+        assert_eq!(
+            graph.node(output).ty.shape,
+            [2, config.encoded_observation_dim()]
+        );
+        let world = crate::dreamer::world::build_training_graph(&config, 4);
+        assert!(meganeura::autodiff::differentiate(&world).nodes().len() > world.nodes().len());
     }
 }
 

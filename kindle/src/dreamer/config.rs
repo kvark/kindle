@@ -308,6 +308,9 @@ pub struct DreamerConfig {
     /// CDP input is the previous and current resized RGB image, oldest first.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_frame_pair: bool,
+    /// Append fixed x/y pixel-center coordinates inside the learned RGB encoder.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_coordinates: bool,
     /// Optional native-frame rectangle for the learned-RGB GPU preprocessor.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub observation_crop: Option<crate::vision::preprocess_gpu::FrameCrop>,
@@ -449,6 +452,7 @@ impl DreamerConfig {
             training_precision: TrainingPrecision::Auto,
             observation_kind: ObservationKind::Features,
             rgb_frame_pair: false,
+            rgb_coordinates: false,
             observation_crop: None,
             video_encoder: None,
             future_target_standardization: None,
@@ -687,6 +691,10 @@ impl DreamerConfig {
             return Err("auxiliary actor boundaries require observed lower-bound mode and nonnegative reward scales".into());
         }
         let size = self.network();
+        if self.rgb_coordinates && (!self.observation_kind.is_rgb() || self.video_encoder.is_some())
+        {
+            return Err("RGB coordinates require the learned RGB encoder".into());
+        }
         if self.rgb_frame_pair && (!self.is_cdp() || self.color_centroid_supervision.is_some()) {
             return Err("RGB frame pairs require CDP without color-centroid supervision".into());
         }
@@ -1076,6 +1084,36 @@ mod tests {
         config.open_loop_supervision = None;
         config.horizon = 1;
         assert!(config.check().is_err());
+    }
+
+    #[test]
+    fn rgb_coordinates_preserve_observations_and_legacy_config() {
+        let mut config = DreamerConfig::tiny(3);
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert!(legacy.get("rgb_coordinates").is_none());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(legacy).unwrap(),
+            config
+        );
+        config.rgb_coordinates = true;
+        assert!(config.check().unwrap_err().contains("coordinates require"));
+        for (kind, side) in [
+            (ObservationKind::Rgb32, 32),
+            (ObservationKind::Rgb48, 48),
+            (ObservationKind::Rgb64, 64),
+        ] {
+            config.observation_kind = kind;
+            assert!(config.check().is_ok());
+            assert_eq!(config.observation_dim(), 3 * side * side);
+            let encoded = serde_json::to_value(&config).unwrap();
+            assert_eq!(encoded["rgb_coordinates"], true);
+            assert_eq!(
+                serde_json::from_value::<DreamerConfig>(encoded).unwrap(),
+                config
+            );
+        }
+        config.video_encoder = Some(VideoEncoder::Frozen);
+        assert!(config.check().unwrap_err().contains("coordinates require"));
     }
 
     #[test]

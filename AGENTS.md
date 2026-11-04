@@ -20,26 +20,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed categorical-mixing comparison](docs/results/2026-11-04-cdp-breakout-latent-unimix001.md#full-200k-comparison) finishes 200k actions /
-799,612 frames /12,477 updates in **21m19.046s**. Latent `unimix` .01→.001
-lowers greedy **143.667→67.208** and sampled **70.750→51.583**; all0/24 two-wall.
-Primary own-initial gain/min falls53.46%, with paired difference −3.523393 and
-95% lane interval[−5.303444,−1.906890]. Retain latent mixing.01 and143.667/70.750.
-The original864/90% gate and the five-game goal remain unfinished.
+The [optional RGB coordinate-channel experiment](docs/experiments/2026-11-04-cdp-rgb-coordinates.md) is selected for native
+qualification and a bounded learning check. Append fixed x/y pixel-center
+coordinates inside the first CNN layer; add1,600 weights at12M, with unchanged
+RGB replay, one GPU resize, latent width and CDP/actor/critic structure. Default
+off; no object labels or emulator state enter the model. Image position may help
+learning, but a perceptual cause or gameplay benefit is not established.
 
-All154 current/338 retained pins,100k/6,227 recovery,357 matching initial/
-invariant frozen tensors,finite reports,full replays/videos,guards,curves and
-comparison pass. Changed initial trajectories are recorded, and actual-initial
-scores are used. Main/collector succeed20:45:02.471/20:45:24.864 UTC November4,
-sourceb3a49b5b. All three original services succeed. A separate2.669s CPU
-publication repair closes20:46:39.251 after a stale source-manifest filename;
-original reader/failure remain. No production stage repeats. Earlier bounded
-CLI-validation and stdout-manifest failures also remain preserved.
+Implementation and11 CPU CLI tests are ready. Initial installed-package import
+failure and one incomplete restore-fixture failure remain preserved; the
+corrected fixture passes with no GPU/emulator construction. Next build/package
+and qualify CPU/native values/derivatives, then declare the fixed8,192-action
+check. No GPU allocation or full learner is active or selected. Root
+`/x/Temp/kindle-rgb-coordinates-20261104`; consult the protocol before execution.
 
-Root`/x/Temp/kindle-breakout-latent-unimix001-20261104/full` is closed. No Kindle
-allocation is active at closure; check live state before work. Native447fe50/
-SHA35ad0db and runner4070a0b8 remain qualified; the CLI default stays unchanged.
-No sweep,extension,confirmation learner or automatic successor is selected.
+The completed lower-latent-mixing learner remains closed: greedy67.208/sample51.583
+regress143.667/70.750; retain latent mixing.01. Original864/90%-two-wall and the
+five-game goal remain unfinished. Do not repeat its completed stages or collectors.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

@@ -116,6 +116,7 @@ impl ConvNorm {
 pub(crate) struct Encoder {
     layers: Vec<ConvNorm>,
     input_channels: usize,
+    coordinates: bool,
     channels: usize,
     side: usize,
 }
@@ -125,7 +126,7 @@ impl Encoder {
         let depth = config.network().vision_depth;
         let side = config.observation_grid();
         let input_channels = config.observation_channels();
-        let mut channels = input_channels;
+        let mut channels = input_channels + if config.rgb_coordinates { 2 } else { 0 };
         let layers = [2, 3, 4, 4]
             .into_iter()
             .enumerate()
@@ -145,6 +146,7 @@ impl Encoder {
         Self {
             layers,
             input_channels,
+            coordinates: config.rgb_coordinates,
             channels,
             side,
         }
@@ -159,6 +161,22 @@ impl Encoder {
             input,
             &[batch * self.input_channels * self.side * self.side],
         );
+        if self.coordinates {
+            let width = self.side * self.side;
+            let positions = graph.constant(
+                coordinate_planes(self.side).repeat(batch),
+                &[batch, 2 * width],
+            );
+            value = concat_columns(
+                graph,
+                value,
+                positions,
+                batch,
+                self.input_channels * width,
+                2 * width,
+            );
+            value = graph.reshape(value, &[batch * (self.input_channels + 2) * width]);
+        }
         for layer in &self.layers {
             value = layer.forward(graph, value, batch, true);
         }
@@ -171,6 +189,19 @@ impl Encoder {
         );
         graph.reshape(value, &[batch, self.output_dim()])
     }
+}
+
+fn coordinate_planes(side: usize) -> Vec<f32> {
+    (0..2 * side * side)
+        .map(|index| {
+            let coordinate = if index < side * side {
+                index % side
+            } else {
+                (index / side) % side
+            };
+            (coordinate as f32 + 0.5) / side as f32 - 0.5
+        })
+        .collect()
 }
 
 pub(crate) struct Decoder {
