@@ -1,29 +1,28 @@
 # Kindle: CDP learning roadmap
 
-The [bounded terminal replay mixture](results/2026-11-04-cdp-breakout-terminal-mixture.md) passes8192 actions/32,722 frames/
-489 updates in46.900s; conservative200k projection20m59.517s clears30min.
-At the same early budget, terminal rows322→1918 (.2572%→1.5321%) and updates
-containing endings225→435. Fresh480/uniform5695/terminal1649 routes reconcile;
-all489 target means independently match counts. This establishes exposure/cost,
-not gameplay benefit. The sampler changes all objectives' data distribution
-without importance correction; continuation scale1 remains fixed.
+Select one [fresh200k terminal-replay comparison](experiments/2026-11-04-cdp-breakout-terminal-mixture-200k.md) after the bounded
+check's46.900s/8192 actions and20m59.517s conservative projection pass30min.
+Use the same12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 recipe with
+terminal mixture.25 andcontinuation1. Require200k/12,477 within30min,100k/6,227
+recovery andfour actual-initial/final sampled/greedy24-episode assessments against
+retained70.750/143.667 in21m27.910s,all0/24 two-wall. No experience transfer,
+mixture sweep, extension, second learner or automatic successor.
 
-Default-off frozen compatibility matches128 semantic events/357 invariant tensors.
-Candidate initial357 tensors/47 events match; frozen1024/.894s haszero updates,
-357 invariant tensors andno natural episodes. Full guided pixel/action/label
-replay,274 current/338 retained pins andall guards pass. Native2b5a3eea/SHA5ce1b443,
-main/source27e00df2 andoriginal collector succeed05:04:16/05:04:27 UTC November4.
-All66 artifacts verify. The supplementary CPU reader's manifest-lookup failure is
-preserved; separate1.808s repair closes05:07:21 with no repeated GPU or original
-collection stage. Initial source Python's two old-native bootstrap failures also
-remain;177 Rust/5 gym/1028 packaged Python checks andstrict Clippy pass.
+Native2b5a3eea/SHA5ce1b443 andbounded runner are reused. Native, runner andguidance
+wrapper bytes differ from447fe50. Three pixel-policy ASTs/constants match; the
+active full18 episode path passes4001 steps/eight lanes,41 synthetic pixel batches
+andfive partial resets withmatching RNG/schedules. Optional block/minimal modes
+remain off. This scoped CPU evidence isnot byte equality or broad trajectory parity.
+The sampler changes all objectives' data distribution without importance correction.
 
-Runtime`/x/Temp/kindle-terminal-replay-20261104/runtime`; bounded root ends`/bounded`.
-The1.008GB build cache is released; wheel/runtime/test executable remain. Both
-services are terminal success; no GPU allocation remains. Do not repeat completed
-stages. Retain70.750 sampled/143.667 greedy andthe original864/90%-two-wall gate.
-No full learner, extension, sweep or automatic successor is selected. The five-game
-goal is unfinished; check live state before work.
+Full helper/comparison qualification passes in3.490s,including corrupted loss,
+terminal count, header andselection cases;274 bounded/338 retained pins pass.
+All five actual queue preflights remain required before launch. Root
+`/x/Temp/kindle-terminal-replay-20261104/full`;service
+`kindle-breakout-terminal-mixture-200k-20261104`. No learner orGPU allocation is
+active yet; check live state before launch. Bounded stages remain closed, including
+the preserved source-Python mismatch andsupplementary CPU-reader failure/repair.
+The original864/90%-two-wall andfive-game goal remain unfinished.
 
 The [completed fixed terminal-state readout](results/2026-11-04-cdp-breakout-terminal-readout.md) finds retained posterior
 ending information: held-out balanced MSE.131485 versus saved head.323868 and

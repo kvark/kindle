@@ -46,6 +46,16 @@ importance correction; this is not a calibrated continuation-probability claim.
 The native and runner differ from447fe50, and later experience changes. The small
 historical timing difference is not an established speedup or isolated effect.
 
+The subsequent full-stage source review clarifies that the **pixel-policy code
+and selected guidance configuration** are unchanged, while the packaged teacher
+and scheduler files have later optional block/minimal-action wrappers. Their
+hashes are498f8f7b/951dd367 versus retained5120d021/12f671f5. Three policy-class
+ASTs and constants match; the unchanged scheduler methods and active full18 episode
+path pass a.545s paired CPU check over4001 steps/eight lanes,41 synthetic pixel
+batches andfive partial-reset batches. This is scoped behavior evidence, not
+byte equality or a replay of every trajectory. The [separate full protocol](../experiments/2026-11-04-cdp-breakout-terminal-mixture-200k.md)
+records these source differences explicitly.
+
 ## Compatibility, execution and closure
 
 Native source`2b5a3eea` packages at
