@@ -1,36 +1,32 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh200k terminal-replay comparison](../experiments/2026-11-04-cdp-breakout-terminal-mixture-200k.md) launches05:18:25 UTC November4,
-sourcef5540278, with343 pins and a30-minute training cap. MainPID1114966,
-invocation`f812d2f076de4e0a9ff50d60a30199ba`, is active. Startup passes357
-bounded/retained initial tensors,47 pre-update semantic events andcorrect first
-update376. The100k/6,227 recovery passes; all357 tensors arefinite andweights/
-moments remain read-only. Independent.570s CPU verification preserves the original
-live identity; the recovery observer isterminal success. Through102,400 actions,
-6377 reports arefinite/exposure-audited, with26,431 terminal rows and6284 updates
-containing endings. The learner andoriginal terminal observer remain active.
-No frozen gameplay result exists; CPU co-host time stays included without correction.
+The [completed terminal-replay comparison](2026-11-04-cdp-breakout-terminal-mixture.md) increases ending exposure
+9.43× but lowers frozen Breakout: sampled70.750→65.708 and primary greedy
+143.667→85.250, all0/24 two-wall. The fresh200k/12,477-update learner takes
+21m19.292s versus retained21m27.910s. Greedy gain/min falls40.90%, with paired
+difference interval[−4.987,−.700]. Retain the existing sampler and continuation1;
+the optional mixture stays off. Original864/90%-two-wall and five-game goal remain
+unfinished. No extension, mixture sweep, second learner or automatic successor
+is selected.
 
-Use12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100,terminal mixture.25 and
-continuation1. Require200k/12,477 within30min,100k/6,227 recovery andfour actual-
-initial/final sampled/greedy24-episode assessments against70.750/143.667 in21m28s,
-all0/24 two-wall. Root`/x/Temp/kindle-terminal-replay-20261104/full`;service
-`kindle-breakout-terminal-mixture-200k-20261104`. Do not restart this learner or
-schedule another GPU job while it is active. No extension, sweep, second learner
-or automatic successor is selected. The original864/90%-two-wall gate remains.
+Terminal rows rise5,376→50,706; updates without endings fall8,105→161. Late
+expert CE falls.560514→.480124 without gameplay gain. All objectives receive the
+changed replay distribution without importance correction; matched frozen terminal
+calibration remains unmeasured. Native, runner and guidance-wrapper sources differ
+from retained447fe50. Scoped policy-AST/CPU fixtures support the active full18 path,
+not byte equality or broad trajectory parity; reused1009/cohort limits reliability.
 
-Native2b5a3eea/SHA5ce1b443 andbounded runner are reused. Native, runner andguidance
-wrapper bytes differ from447fe50. Three pixel-policy ASTs/constants match;4001
-full18 episode steps/eight lanes,41 synthetic pixel batches andfive partial resets
-match schedules/RNG. Optional block/minimal modes are off. This scoped evidence
-isnot byte equality or broad trajectory parity. The sampler changes all objectives'
-data distribution without importance correction; no causal or calibration claim.
+All343 current/338 retained pins,100k/6,227 read-only recovery,357 matching initial/
+invariant frozen tensors,799/794 actual-initial semantic events, full training and
+frozen replays/videos, guards, exposure, coverage, curves and comparison pass.
+Main succeeds05:43:42 UTC November4/sourcef5540278; original collector succeeds
+05:43:58 with52 artifacts and an independent exposure recount. All three services
+are terminal success; no full-stage failure, repair or repeat. Earlier bounded
+failures/repair remain preserved. CPU co-host time remains included without correction.
 
-Full helpers/comparison pass3.490s andall five actual queue preflights pass.732s,
-withzero native-agent/emulator construction;343 current/338 retained pins pass.
-No full-stage failure or repeat has occurred. Earlier bounded source-Python and
-supplementary CPU-reader failures/repair remain preserved. The five-game goal is
-unfinished. Check the original live identity before any work.
+Root`/x/Temp/kindle-terminal-replay-20261104/full` is closed. No learner or GPU
+allocation remains active. Check live state before future work; do not restart
+completed training, assessments, replays or collectors.
 
 The [completed fixed terminal-state readout](2026-11-04-cdp-breakout-terminal-readout.md) finds retained posterior
 ending information: held-out balanced MSE.131485 versus saved head.323868 and
