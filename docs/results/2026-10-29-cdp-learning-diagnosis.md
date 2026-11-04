@@ -1,20 +1,29 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [one-step prior continuation test](2026-11-04-cdp-breakout-prior-continuation.md)
-is selected under its [bounded protocol](../experiments/2026-11-04-cdp-breakout-prior-continuation.md).
-It adds a default-off native loss on sampled one-step prior states, using real
-terminal targets, equal row weights and scale1. No new parameters, actor change,
-class weighting or full learner is selected. Existing posterior loss stays.
+The [one-step prior continuation bounded check](2026-11-04-cdp-breakout-prior-continuation.md)
+passes8,192 actions/32,728 frames/489 updates in47.016s. Conservative200k projection
+21m32.945s passes30min; frozen1,024 actions/.892s haszero updates/no natural episodes.
+This default-off scale1 native loss trains the shared head on sampled one-step
+priors with actual terminal targets, equal row weights and reset masks. No new
+parameters or change to acting, forecasts, sampler or posterior loss. Gameplay
+benefit remains unmeasured; no full learner or automatic successor is selected.
 
-The preceding CPU training-report review finds stronger proportional attenuation
-under weight10 but larger late weighted absolute advantage; overall actor-signal
-collapse is unsupported. Prior ranking remains a specific unresolved gap.
-All184 Rust/5 gym CPU tests and18 focused Python checks pass. The initial centered-
-CDP/BPTT fixture rejection is retained; only the fixture was repaired. Production
-code and assertions are unchanged. Packaging and guarded numerical/bounded GPU
-qualification remain pending. No learner/GPU service is active at selection.
-Root`/x/Temp/kindle-prior-continuation-20261104`. Retain143.667 greedy/70.750 sampled,
-all0/24 two-wall. Original864/90%-two-wall and five-game goal remain unfinished.
+All184 Rust/5 gym CPU tests,1,064 packaged Python checks,strict Clippy,two guarded
+F64/gradient fixtures,314 current/338 retained pins,357 initial/invariant frozen
+tensors,47 initial/128 disabled semantic events,full training replay and guards
+pass. Auxiliary mean.090883,valid fraction.997276,341 reported masked rows;
+sampled row identities are not independently logged. All489 totals pass, maximum
+error.0001106. Only B16/micro16 is GPU-qualified here. Original CPU centered-CDP/
+BPTT fixture failure is preserved; corrected fixture and all GPU stages pass.
+
+Source07873e7c/native SHAaeecf9e7; runtime`/x/Temp/kindle-prior-continuation-20261104/runtime`.
+Main/collector succeed07:51:09/07:51:19 UTC November4. Independent1.881s closure
+completes07:51:43, verifying66 artifacts; separate.018s auxiliary arithmetic passes.
+No bounded failure or GPU repeat. Closure`complete_with_cpu_fixture_repair`.
+Root`/x/Temp/kindle-prior-continuation-20261104` is closed through the bounded check;
+cache/runtime/evidence retained. No learner or GPU allocation is active; check
+live state before work. Retain143.667 greedy/70.750 sampled,all0/24 two-wall.
+Original864/90%-two-wall and five-game goal remain unfinished.
 
 The [completed terminal-weight ranking diagnostic](2026-11-04-cdp-breakout-terminal-weight-ranking.md)
 finds posterior AUC.952691→.946615, difference−.006076 with lane95% interval

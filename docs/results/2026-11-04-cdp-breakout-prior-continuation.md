@@ -1,11 +1,15 @@
 # One-step prior continuation investigation
 
-The next selected bounded test directly supervises continuation on sampled
-one-step prior states. It uses the shared native head and real terminal flags,
-equal row weights and scale1. The option defaults to off and adds no parameters.
-The [protocol](../experiments/2026-11-04-cdp-breakout-prior-continuation.md) requires
-numerical and execution checks before any separate full learner is considered.
-No gameplay benefit is established.
+The bounded test passes8,192 actions/32,728 frames/489 updates in **47.016s**.
+It directly supervises continuation on sampled one-step prior states with the
+shared native head, real terminal flags, equal row weights and scale1. The option
+defaults to off and adds no parameters. The conservative200k projection is
+**21m32.945s**, below the30-minute gate. A1,024-action frozen restore takes.892s
+with zero updates and no completed natural episodes. Execution and early cost
+are established; gameplay benefit remains unmeasured. No full learner is selected.
+
+The [protocol](../experiments/2026-11-04-cdp-breakout-prior-continuation.md) and all
+completed stages remain fixed. Do not repeat them.
 
 ## Continuation is used in both targets and loss weights
 
@@ -55,9 +59,76 @@ only the fixture to batch2/BPTT2 preserves production code and assertions. All
 184 Rust library/5 gym CPU tests then pass in13.334s wrapper;18 focused Python
 tests pass in.203s. Graph dependency checks exclude the arrival observation and
 posterior sample, verify prior/head gradient paths, unchanged parameters/inference
-and compilation of ordinary/staged training. No GPU fixture has run yet.
+and compilation of ordinary/staged training. Existing CPU microbatch partition
+and graph-size checks pass; this bounded GPU run uses B16/micro16. Numerical
+parity across other microbatch configurations is not established here.
 
-Runtime packaging, guarded numerics and the declared8,192-action check remain
-pending. No full learner is selected. Root`/x/Temp/kindle-prior-continuation-20261104`.
-Retain143.667 greedy/70.750 sampled,all0/24 two-wall. Original864/90%-two-wall and
-five-game goal remain unfinished.
+Strict workspace/binding Clippy and1,064 packaged Python checks pass, with10
+GPU-construction tests deselected by the CPU harness. Native
+`07873e7c4b19fc7c863fb418dc15932912d1f7fb`, SHA256
+`aeecf9e7d04cd27b03a9b8660e2d1531e8ca96d1a4c23c1f2e0ea623a5f1d254`,
+is packaged at `/x/Temp/kindle-prior-continuation-20261104/runtime`.
+
+Two guarded GPU fixtures pass without a retry. Masked BCE loss/logit derivatives
+agree with F64 at1,17,256,513 rows, including logits±30 and masked terminals:
+maximum loss error1.023e−7, derivative error1.716e−9. Masked derivatives are zero.
+The complete prior-loss graph has finite nonzero gradients in dynamics, prior
+and continuation head, loss.828785, exact invariance to changed arrival image/
+posterior sample, and exact zero loss under reset masks. Native inference remains
+unchanged; the fixtures are training checks, not gameplay evidence.
+
+## Bounded execution and closure
+
+All314 current/338 retained pins,357 matching initial/invariant frozen tensors,
+47 pre-update semantic events,first update376/residual credit.5,489 finite reports,
+changed CNN/reward/continuation/actor/value,full training pixel/action/label replay
+and guards pass. Disabled frozen compatibility matches128 semantic events and
+357 tensors. The guided training replay verifies21 natural episodes and3,788
+actual overrides (46.2402%). Guided scores are not unaided competence.
+
+Auxiliary loss mean is.090883; native valid fraction mean.997276/minimum.9765625,
+corresponding to341 masked replay rows out of125,184. The loss uses the same
+keep-action input whose native producer zeros replay `is_first` boundaries;
+the graph and numerical fixtures verify that mask routing. Sampled row identities
+were not logged, so the masked-row count is a native report, not an independent
+reconstruction of those sampled identities. Terminal exposure is343 rows across
+238 updates versus322/225 in the retained bounded check. The other251 updates
+have no terminal rows. No class weighting or sampling mixture is active.
+
+Every world total includes scale1 times the auxiliary loss, with maximum
+recomputed arithmetic error.0001106 within the fixed relative tolerance. A
+separate.018s CPU reader reproduces all489 totals, loss/valid-fraction means,
+minimum valid fraction and masked-row count from the immutable reports.
+
+The main service`kindle-breakout-prior-continuation-check-20261104` launches
+07:49:57 UTC November4, PID1146962, invocation`d2acf1e299084ff49fb54b32965fb1bd`.
+It succeeds07:51:09; original collector succeeds07:51:19. Independent1.881s
+CPU closure completes07:51:43.704520, verifying66 final artifacts, all pins,
+process identities, exposure, invariance and the cost decision. Both services
+are terminal success. No bounded preparation/run/collector failure or repeated
+GPU stage occurs; the earlier CPU fixture rejection remains preserved.
+Closure status is`complete_with_cpu_fixture_repair`.
+
+The retained bounded reference took47.690s. The slight timing difference is not
+an isolated speed effect: native/runner versions and later trajectories differ.
+This check uses12M64/Auto/N8/B16/T16/H15/R16,replay-value1/expert100 and retained
+learning rates/guidance. Its projection uses exactly25×bounded time×1.10; it is
+an early estimate, not a full training measurement.
+
+Root`/x/Temp/kindle-prior-continuation-20261104` is closed through the bounded check;
+runtime,wheel,test executable,build cache and all evidence remain retained.
+No learner or GPU allocation is active at closure; check live state before work.
+Retain143.667 greedy/70.750 sampled,all0/24 two-wall. No full learner, extension or
+automatic successor is selected. Original864/90%-two-wall and five-game goal
+remain unfinished.
+
+| Artifact | SHA256 |
+|---|---|
+|`build-receipt.json`|`71b8fdec84ba06a1ff8aecdadcfe6e6e71510d31011899532dff8dc9d20cded6`|
+|`numerics/review.json`|`5ba54f093c3e0b794bd02ed548418e478fd1b204b696c5e0b8413d49ec276bc2`|
+|`bounded/declaration.json`|`320458a3a3b872f8dc51aa95899038a6c2503b0eb21c5144572b3b6e18589bba`|
+|`bounded/check/review.json`|`1188c389e2f7844ebc8ca8a7cab4e8661368a97915e460582f92867616dbf095`|
+|`bounded/check/completion.json`|`0ae4c323b7790e9f2df8ae5340c793816fd40761931388f6563b854a2aaae1cb`|
+|`bounded/check/terminal-review.json`|`78b04720f0173d9dcf7450a50567c5a420a7b0d6c52ca98f39021eed07907759`|
+|`bounded/closure.json`|`2e308de92cd89af33d8f87331d2d10cbb40359bd469b079d0ffe9ab38ba497af`|
+|`bounded/auxiliary-arithmetic-review.json`|`09a361aba2726778f3c0265a025cca4e085d82ccd10c2b2c44a42b2dd0a25f2a`|
