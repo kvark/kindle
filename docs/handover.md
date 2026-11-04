@@ -8,33 +8,27 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed terminal-replay comparison](results/2026-11-04-cdp-breakout-terminal-mixture.md) increases ending exposure
-9.43× but lowers frozen Breakout: sampled70.750→65.708 and primary greedy
-143.667→85.250, all0/24 two-wall. The fresh200k/12,477-update learner takes
-21m19.292s versus retained21m27.910s. Greedy gain/min falls40.90%, with paired
-difference interval[−4.987,−.700]. Retain the existing sampler and continuation1;
-the optional mixture stays off. Original864/90%-two-wall and five-game goal remain
-unfinished. No extension, mixture sweep, second learner or automatic successor
-is selected.
+The [terminal-mixture arrival diagnostic](experiments/2026-11-04-cdp-breakout-terminal-mixture-arrivals.md) is selected after the closed
+200k mixture raises ending exposure9.43× but lowers greedy143.667→85.250.
+One frozen candidate capture will reuse the existing120-endpoint cohort/control:
+24 game endings and96 intermediate life losses,43,424 actions/173,660 frames.
+Compare the candidate's own continuation head before/after observing each arrival;
+primary is paired observed-terminal MSE, with fixed lane bootstrap. The gameplay
+decision stays unchanged: retain the existing sampler and continuation1.
 
-Terminal rows rise5,376→50,706; updates without endings fall8,105→161. Late
-expert CE falls.560514→.480124 without gameplay gain. All objectives receive the
-changed replay distribution without importance correction; matched frozen terminal
-calibration remains unmeasured. Native, runner and guidance-wrapper sources differ
-from retained447fe50. Scoped policy-AST/CPU fixtures support the active full18 path,
-not byte equality or broad trajectory parity; reused1009/cohort limits reliability.
+Sixteen CPU checks pass and2.375s preflight verifies634 control/343 candidate pins,
+all endpoint joins, exact config/native identities and zero native-agent/emulator
+construction. Use qualified2b5a3eea/SHA5ce1b443; no rebuild or new learner. Native
+sources differ from447fe50, and this selected cohort does not measure population
+calibration or isolate a sampler/head cause. Require357 invariant tensors, zero
+updates, exact pixel/transition parity,120 repeated queries and F64/native checks.
 
-All343 current/338 retained pins,100k/6,227 read-only recovery,357 matching initial/
-invariant frozen tensors,799/794 actual-initial semantic events, full training and
-frozen replays/videos, guards, exposure, coverage, curves and comparison pass.
-Main succeeds05:43:42 UTC November4/sourcef5540278; original collector succeeds
-05:43:58 with52 artifacts and an independent exposure recount. All three services
-are terminal success; no full-stage failure, repair or repeat. Earlier bounded
-failures/repair remain preserved. CPU co-host time remains included without correction.
-
-Root`/x/Temp/kindle-terminal-replay-20261104/full` is closed. No learner or GPU
-allocation remains active. Check live state before future work; do not restart
-completed training, assessments, replays or collectors.
+Root`/x/Temp/kindle-terminal-mixture-arrivals-20261104`;service
+`kindle-breakout-terminal-mixture-arrivals-20261104`. One180s guarded capture,
+60s CPU analysis and300s main cap; independent closure follows. Preparation is
+complete; check live state before launch or other GPU work. No completed stage
+may repeat and no automatic successor is selected. The original864/90%-two-wall
+and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
