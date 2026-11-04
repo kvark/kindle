@@ -7,7 +7,11 @@ arms. Only encoder4e-5→8e-5 changes; keep retained single-image12M64/Auto/N8/
 B16/T16/H15/R16/expert100/behavior8e-5/value1, native447fe50/runnercf4ea238 and
 teacher fixed. Startup passes357 control/bounded-matching initial tensors,
 47 pre-update events and first update376. MainPID1091232/invocation
-`0dd5518ac0c94b879959da7818f66c36`; recovery and terminal observers are active.
+`0dd5518ac0c94b879959da7818f66c36`; the terminal observer remains active.
+Recovery100k/6227 passes00:30:02 UTC; independent.455s verification passes
+00:30:17 with120 unchanged pins,357 finite tensors and0555/0444 retained files.
+Original learner identity stays unchanged. After replay reaches100k capacity,
+one live observation retains11.159GiB headroom; this is not a whole-run minimum.
 No full frozen result is available. Earlier benefit under behavior4e-5/value.3
 may not transfer; retain143.667 greedy/70.750 sampled pending the comparison.
 

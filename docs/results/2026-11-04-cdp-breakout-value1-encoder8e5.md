@@ -64,3 +64,25 @@ stage repeats. `preflight-repair-declaration.json` and
 `launch_qualified.py` verifies them before the sole launch. Original120 runtime
 pins stay unchanged. This CPU fixture correction changes no production source,
 command, model, cap or evaluation rule.
+
+## The original 100k recovery passes while learning continues
+
+The main observer saves and verifies100k actions/6227 updates at00:30:02.503 UTC
+November4 in.319s. The independent verifier passes00:30:17.292 in.455s
+(.514s wrapper), preserving all120 declared inputs and the original active
+PID1091232/invocation0dd5518ac0c94b879959da7818f66c36. Its original observer
+service is terminal success; the learner and terminal collector continue.
+
+All357 tensors are finite:280 world/66 behavior/11 slow-value, with45,710,865/
+4,938,291/853,503 elements including optimizer state. Exact metadata and file
+hashes, counters, configuration and0555 directory/0444 files pass. Verification
+makeszero model calls/updates; recovery omits replay, games, live beliefs and
+complete RNG state. These CPU co-host times remain in measured training time.
+
+A separate.013s read-only observation at00:31:12.137 confirms replay capacity
+100k and11.159GiB GPU headroom, above the2GiB floor, while the same learner is
+active. This single observation does not establish the full-run minimum.
+`recovery-verification.json` SHA
+`4a49d2554b5259c36b6068b13b7b1ca726aba2e824c0a85bf3849f4001980a9f` and
+`post-recovery-observation.json` retain the evidence. No experiment stage
+repeats and no full frozen result is yet available.
