@@ -152,6 +152,10 @@ pub struct WorldMetrics {
     pub open_loop_supervision: Option<OpenLoopMetrics>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color_centroid_supervision: Option<ColorCentroidMetrics>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prior_continuation_loss: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prior_continuation_valid_fraction: Option<f32>,
     pub replay_reward_prediction_mean: f32,
     pub replay_reward_target_mean: f32,
     pub replay_reward_mae: f32,
@@ -1725,6 +1729,19 @@ impl DreamerCore {
                     }
                 }
 
+                if self.config.prior_continuation_scale.is_some() {
+                    let uniforms = (0..chunk_length)
+                        .map(|time| {
+                            (
+                                self.world_train
+                                    .input_buffer(&format!("prior_continuation_uniforms_{time}"))
+                                    .unwrap(),
+                                microbatch_rows * stochastic_width,
+                            )
+                        })
+                        .collect::<Vec<_>>();
+                    self.uniforms_gpu.fill(&mut self.rngs.open_loop, &uniforms);
+                }
                 if let Some(rollout) = &self.config.open_loop_supervision {
                     let weights =
                         batch.open_loop_weights(start, rollout.horizon, first_row, microbatch_rows);
@@ -1800,6 +1817,12 @@ impl DreamerCore {
                 #[cfg(test)]
                 meganeura::profiler::record_instant("phase:world_wait_done");
                 metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
+                if self.config.prior_continuation_scale.is_some() {
+                    *metrics.prior_continuation_loss.get_or_insert(0.0) +=
+                        read_scalar(&self.world_train, world::LOSS_PRIOR_CONTINUATION);
+                    *metrics.prior_continuation_valid_fraction.get_or_insert(0.0) +=
+                        read_scalar(&self.world_train, world::PRIOR_CONTINUATION_VALID_FRACTION);
+                }
                 if self.config.color_centroid_supervision.is_some() {
                     let centroid = metrics.color_centroid_supervision.get_or_insert_default();
                     centroid.loss += read_scalar(&self.world_train, world::LOSS_COLOR_CENTROID);
@@ -1858,6 +1881,16 @@ impl DreamerCore {
         }
         let scale = 1.0 / pass_count as f32;
         metrics.total_loss *= scale;
+        for value in [
+            &mut metrics.prior_continuation_loss,
+            &mut metrics.prior_continuation_valid_fraction,
+        ]
+        .into_iter()
+        .flatten()
+        {
+            *value *= scale;
+            assert!(value.is_finite());
+        }
         if let Some(centroid) = &mut metrics.color_centroid_supervision {
             centroid.loss *= scale;
             centroid.valid_fraction *= scale;

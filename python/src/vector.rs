@@ -59,6 +59,8 @@ impl PyVectorAgent {
 
     #[classattr]
     const SUPPORTS_TERMINAL_CONTINUATION_WEIGHT: bool = true;
+    #[classattr]
+    const SUPPORTS_PRIOR_CONTINUATION: bool = true;
 
     #[classattr]
     const SUPPORTS_RGB_CROP: bool = true;

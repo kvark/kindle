@@ -1,5 +1,21 @@
 # Kindle: CDP learning roadmap
 
+The [one-step prior continuation test](results/2026-11-04-cdp-breakout-prior-continuation.md)
+is selected under its [bounded protocol](experiments/2026-11-04-cdp-breakout-prior-continuation.md).
+It adds a default-off native loss on sampled one-step prior states, using real
+terminal targets, equal row weights and scale1. No new parameters, actor change,
+class weighting or full learner is selected. Existing posterior loss stays.
+
+The preceding CPU training-report review finds stronger proportional attenuation
+under weight10 but larger late weighted absolute advantage; overall actor-signal
+collapse is unsupported. Prior ranking remains a specific unresolved gap.
+All184 Rust/5 gym CPU tests and18 focused Python checks pass. The initial centered-
+CDP/BPTT fixture rejection is retained; only the fixture was repaired. Production
+code and assertions are unchanged. Packaging and guarded numerical/bounded GPU
+qualification remain pending. No learner/GPU service is active at selection.
+Root`/x/Temp/kindle-prior-continuation-20261104`. Retain143.667 greedy/70.750 sampled,
+all0/24 two-wall. Original864/90%-two-wall and five-game goal remain unfinished.
+
 The [completed terminal-weight ranking diagnostic](results/2026-11-04-cdp-breakout-terminal-weight-ranking.md)
 finds posterior AUC.952691→.946615, difference−.006076 with lane95% interval
 [−.040365,.028646]; no demonstrated improvement or equivalence. One-step prior

@@ -12,6 +12,7 @@ use super::networks::{
     straight_through_sample, sum, weighted_cross_entropy,
 };
 use crate::vision::levjepa::joint;
+mod prior_continuation;
 mod terminal_continuation;
 #[cfg(test)]
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
@@ -37,6 +38,8 @@ pub const LOSS_OPEN_LOOP_REWARD: usize = 17;
 pub const LOSS_OPEN_LOOP_CONTINUATION: usize = 18;
 pub const LOSS_COLOR_CENTROID: usize = 19;
 pub const COLOR_CENTROID_VALID_FRACTION: usize = 20;
+pub const LOSS_PRIOR_CONTINUATION: usize = 21;
+pub const PRIOR_CONTINUATION_VALID_FRACTION: usize = 22;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 mod cdp;
@@ -353,6 +356,9 @@ fn training_graph(
     let mut centroid_valid = Vec::new();
     let mut deters = Vec::new();
     let mut stochs = Vec::new();
+    let mut prior_states = Vec::new();
+    let mut prior_continuation_losses = Vec::new();
+    let mut prior_continuation_valid = Vec::new();
     let mut actions = Vec::new();
 
     for time in 0..length {
@@ -393,6 +399,15 @@ fn training_graph(
             batch,
         );
         let prior_logits = model.dynamics.prior.forward(&mut graph, deter, batch);
+        if config.prior_continuation_scale.is_some() {
+            prior_states.push(prior_continuation::state(
+                &mut graph,
+                config,
+                deter,
+                prior_logits,
+                time,
+            ));
+        }
         let posterior_logits =
             model
                 .representation
@@ -624,6 +639,25 @@ fn training_graph(
             ),
             None => mean_binary_cross_entropy(&mut graph, continuation, continuation_target, rows),
         });
+        if config.prior_continuation_scale.is_some() {
+            let start = group * time_batch_length;
+            let prior = stack_time(
+                &mut graph,
+                &prior_states[start..start + chunk.len()],
+                batch,
+                config.feature_dim(),
+            );
+            let logits = model.heads.continuation.forward(&mut graph, prior);
+            let keep = graph.sum_inner(keep_action);
+            let keep = graph.scale(keep, 1.0 / config.action_count as f32);
+            prior_continuation_losses.push(prior_continuation::loss(
+                &mut graph,
+                logits,
+                continuation_target,
+                keep,
+            ));
+            prior_continuation_valid.push(graph.mean_all(keep));
+        }
         let replay_value_state = if config.replay_value_gradient {
             state
         } else {
@@ -778,6 +812,18 @@ fn training_graph(
     } else {
         total
     };
+    let prior_continuation = config.prior_continuation_scale.map(|scale| {
+        let loss = sum(&mut graph, &prior_continuation_losses);
+        let loss = graph.scale(loss, head_average);
+        let valid = sum(&mut graph, &prior_continuation_valid);
+        let valid = graph.scale(valid, head_average);
+        (graph.scale(loss, scale), loss, valid)
+    });
+    let total = if let Some((scaled, _, _)) = prior_continuation {
+        graph.add(total, scaled)
+    } else {
+        total
+    };
     let mut outputs = vec![
         total,
         reconstruction,
@@ -815,6 +861,12 @@ fn training_graph(
     }
     if let Some((_, loss, valid)) = centroid {
         while outputs.len() < LOSS_COLOR_CENTROID {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([loss, valid]);
+    }
+    if let Some((_, loss, valid)) = prior_continuation {
+        while outputs.len() < LOSS_PRIOR_CONTINUATION {
             outputs.push(graph.scalar(0.0));
         }
         outputs.extend([loss, valid]);

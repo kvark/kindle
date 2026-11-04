@@ -20,30 +20,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed terminal-weight ranking diagnostic](docs/results/2026-11-04-cdp-breakout-terminal-weight-ranking.md)
-finds posterior AUC.952691→.946615, difference−.006076 with lane95% interval
-[−.040365,.028646]; no demonstrated improvement or equivalence. One-step prior
-AUC.791667→.696615 has difference−.095052[−.188379,−.013455]. Posterior162/prior639
-pair orders change; this is not a pure monotone shift of control outputs.
+The [one-step prior continuation test](docs/results/2026-11-04-cdp-breakout-prior-continuation.md)
+is selected under its [bounded protocol](docs/experiments/2026-11-04-cdp-breakout-prior-continuation.md).
+It adds a default-off native loss on sampled one-step prior states, using real
+terminal targets, equal row weights and scale1. No new parameters, actor change,
+class weighting or full learner is selected. Existing posterior loss stays.
 
-The fixed analytic inverse of weight10 preserves all rankings and reduces false
-below-.5 outputs from11→3/96 posterior and23→2/96 prior. It still leaves higher
-intermediate-life MSE than control (.026632 versus.003178 posterior;.022044
-versus.001530 prior). Terminal error rises versus raw weight10 but remains below
-control. No calibration fit or threshold search occurs. The outcome-conditioned
-control-policy cohort cannot establish population calibration or a causal gameplay
-bottleneck; transforming saved outputs does not change the learned actor.
-
-All24 CPU tests and1,125 pins pass. One2.060s single-core CPU analysis completes
-07:27:01 UTC November4/source db4840bd/PID1144889. Independent4.073s closure
-completes07:27:22, verifying16 artifacts,13,824 pair orders,240 transformed outputs
-and all arithmetic. No failure, repair, repeat, model/emulator execution or GPU
-work occurs. Root`/x/Temp/kindle-terminal-weight-ranking-20261104` is closed.
-
-Retain143.667 greedy/70.750 sampled over weight10's120.542/66.375, all0/24 two-wall.
-No correction, loss, learner or automatic successor is selected. No learner or
-GPU allocation is active at closure; check live state. Do not repeat completed
-captures or learners. Original864/90%-two-wall and five-game goal remain unfinished.
+The preceding CPU training-report review finds stronger proportional attenuation
+under weight10 but larger late weighted absolute advantage; overall actor-signal
+collapse is unsupported. Prior ranking remains a specific unresolved gap.
+All184 Rust/5 gym CPU tests and18 focused Python checks pass. The initial centered-
+CDP/BPTT fixture rejection is retained; only the fixture was repaired. Production
+code and assertions are unchanged. Packaging and guarded numerical/bounded GPU
+qualification remain pending. No learner/GPU service is active at selection.
+Root`/x/Temp/kindle-prior-continuation-20261104`. Retain143.667 greedy/70.750 sampled,
+all0/24 two-wall. Original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

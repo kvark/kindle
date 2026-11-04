@@ -133,6 +133,8 @@ def main():
                         help="fresh training only: world continuation loss scale; omitted: native default")
     parser.add_argument("--terminal-continuation-weight", type=float,
                         help="fresh CDP only: posterior continuation loss multiplier for true game-over rows")
+    parser.add_argument("--prior-continuation-scale", type=float,
+                        help="fresh CDP only: auxiliary continuation loss on sampled one-step priors")
     parser.add_argument("--replay-actor-scale", type=float,
                         help="fresh training: positive-advantage imitation of completed observed returns")
     parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
@@ -243,6 +245,13 @@ def main():
             parser.error("terminal-continuation-weight requires fresh CDP without open-loop supervision")
         if args.continuation_scale is not None and not positive_f32(args.terminal_continuation_weight * args.continuation_scale):
             parser.error("effective terminal-continuation weight must be finite and positive in F32")
+    if args.prior_continuation_scale is not None:
+        if not positive_f32(args.prior_continuation_scale):
+            parser.error("prior-continuation-scale must be finite and positive in F32")
+        if (args.restore or args.evaluate or not args.cdp or args.encoder_training
+                or args.open_loop_length is not None or args.open_loop_scale is not None
+                or args.terminal_continuation_weight is not None):
+            parser.error("prior-continuation-scale requires fresh CDP without open-loop or terminal weighting")
     if args.replay_value_bootstrap is not None and args.evaluate:
         parser.error("replay-value-bootstrap requires fresh training")
     if args.replay_actor_observed_lower_bound and (
@@ -424,6 +433,7 @@ def main():
     training_options.add("--replay-value-scale")
     training_options.add("--continuation-scale")
     training_options.add("--terminal-continuation-weight")
+    training_options.add("--prior-continuation-scale")
     training_options.add("--replay-actor-scale")
     training_options.add("--return-lambda")
     training_options.add("--replay-value-bootstrap")
@@ -470,6 +480,8 @@ def main():
         parser.error("return life boundaries require native actor-return boundary support")
     if args.replay_context is not None and args.replay_context > 1 and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_CONTEXT", False):
         parser.error("replay-context requires native prefix support")
+    if args.prior_continuation_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_CONTINUATION", False):
+        parser.error("prior-continuation scale requires native prior-continuation support")
     if args.terminal_continuation_weight is not None and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_CONTINUATION_WEIGHT", False):
         parser.error("terminal-continuation weight requires native terminal-weight support")
     if args.terminal_replay_fraction is not None and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_REPLAY", False):
@@ -482,6 +494,9 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     if args.restore and (args.restore / "metadata.json").is_file():
         metadata = json.loads((args.restore / "metadata.json").read_text())
+        if (metadata.get("config", {}).get("prior_continuation_scale") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_CONTINUATION", False)):
+            parser.error("prior-continuation checkpoint requires native prior-continuation support")
         if (metadata.get("config", {}).get("terminal_replay_fraction") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_REPLAY", False)):
             parser.error("terminal replay checkpoint requires native terminal-replay support")
@@ -632,6 +647,8 @@ def main():
             config["loss_scales"]["continuation"] = args.continuation_scale
         if args.terminal_continuation_weight is not None:
             config["terminal_continuation_weight"] = args.terminal_continuation_weight
+        if args.prior_continuation_scale is not None:
+            config["prior_continuation_scale"] = args.prior_continuation_scale
         if args.replay_actor_scale is not None:
             config["replay_actor_scale"] = args.replay_actor_scale
         if args.replay_actor_observed_lower_bound:
