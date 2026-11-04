@@ -8,37 +8,27 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [selected trained-policy posterior comparison](experiments/2026-11-04-cdp-breakout-value1-modal.md) will assess the retained
-Breakout replay-value1 final checkpoint with sampled versus modal posterior
-states, keeping actions greedy and all weights frozen. It selects two final-model
-arms only: no new learner or initial-model GPU assessment. The older four-arm
-Breakout assessment remains protocol-failed and will not restart.
+The [completed trained-policy posterior comparison](results/2026-11-04-cdp-breakout-value1-modal.md) scores modal175.708
+versus sampled143.667 with greedy actions in both arms (+22.30%). Paired lane
+return difference+32.042 has95% interval[−25.750,78.959]; all0/24 two-wall.
+The preset improvement rule fails: retain sampled posteriors. This reused model/
+cohort does not establish a reliable modal gain, a global inference default or
+an isolated mechanism. No learner or initial-model GPU assessment runs; original
+200k/12,477-update training stays21m27.910s, withno learning-gain/min claim.
 
-Both actual commands pass CPU qualification with native/game construction
-blocked,19 invalid audit fixtures rejected and six decision fixtures checked.
-All69 qualification/338 retained inputs and357 finite tensors pass; saved initial
-tensors match the old model on CPU, without assigning an accepted modal initial
-score. The final CPU check takes3.784s. The earlier successful check is retained;
-queue acceptance was narrowed to runtime completion so an otherwise auditable
-capped arm can be replayed before protocol rejection. No cap changes or GPU work.
+All431 current/69 qualification/338 retained pins,357 finite/invariant tensors
+per arm,5,478 exact default semantic events and final counters/tails, full replays/
+videos and host guards pass. Two arms total87,968 actions/351,799 frames/56.610s,
+zero updates/truncations. Minimum14.526GiB headroom across33,050 snapshots passes.
+Original main/collector succeed01:06:38/01:06:43 UTC November4/source2afd0dc5;
+all25 completion artifacts verify, withno GPU or completed-stage repeat.
 
-Require the sampled-posterior arm to reproduce retained greedy143.667 and its
-full semantic trajectory/counters before modal execution. Both arms require
-24 natural episodes, zero truncations/updates,357 invariant tensors, full replay/
-video and host guards. Each has600k actions/300s; no retry or extension. Favor
-modal only with at least10% higher mean, positive paired lane-bootstrap95%
-interval and no fewer two-wall successes. Original training stays200k/12,477/
-21m27.910s. This is inference evidence, not a paired learning-gain/min claim.
-
-Use qualified nativeb76f91c/SHA7555bf9 and runnerfac1ff7. Root
-`/x/Temp/kindle-breakout-value1-modal-20261104`; service
-`kindle-breakout-value1-modal-eval-20261104` launches01:04:49 UTC November4,
-source2afd0dc5, with431 pins. Main PID1094832/invocation
-e1d8c3006ec94c1ca8a7498712765526 and its original terminal observer are active.
-The sampled-posterior arm restores the expected checkpoint/runtime withzero
-updates; no completed comparison is available. Do not restart or schedule
-another GPU job while this assessment is active. The encoder8e-5 comparison
-isclosed and rejected. The original864/90%-two-wall and five-game goal remain unfinished.
+Root`/x/Temp/kindle-breakout-value1-modal-20261104` isclosed. Both services are
+terminal success; no GPU allocation remains active. The older four-arm modal
+assessment remains protocol-failed; its saved initial tensors match on CPU,
+without assigning an accepted modal initial score. No retry, initial assessment,
+inference sweep or automatic successor isselected. Check live state before
+future GPU work. The original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
