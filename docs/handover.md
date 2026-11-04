@@ -17,7 +17,7 @@ Main/collector succeed20:15:10.517/20:15:17.166 UTC November4/source480e87df.
 Original CLI validation failures and the separate terminal stdout manifest
 repair remain preserved; no completed GPU or collector stage repeats.
 
-A [fresh200k comparison](experiments/2026-11-04-cdp-breakout-latent-unimix001-200k.md) is separately selected and being prepared.
+A [fresh200k comparison](experiments/2026-11-04-cdp-breakout-latent-unimix001-200k.md) launches20:19:52.116 UTC November4/sourceb3a49b5b with154 pins.
 Only native latent `unimix` .01→.001 changes; actor-unimix.01 and sampled states
 remain. This affects posterior/prior sampling, KL, derivatives and experience;
 no isolated perception or gameplay claim. Reuse native447fe50/SHA35ad0db and
@@ -27,7 +27,10 @@ Retain143.667/70.750 until full evidence; original864/90% remains unfinished.
 
 Root`/x/Temp/kindle-breakout-latent-unimix001-20261104/full`; service
 `kindle-breakout-latent-unimix001-200k-20261104`. Check live identity before work;
-no overlapping GPU allocation or repeat of the completed bounded check. No full
+mainPID1181844/invocation246f4252235945f5b29e4edc8206c04b remains active.
+Startup verifies357 initial tensors and47 bounded pre-update events; recovery
+and terminal observers are active. No overlapping GPU job or completed-stage
+repeat. No full
 outcome exists yet. The five-game goal remains active and unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)

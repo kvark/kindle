@@ -7,7 +7,7 @@ matching initial/invariant frozen tensors,47 paired initial events,finite
 reports,full replay and guards pass. Main/collector succeed20:15:10.517/
 20:15:17.166 UTC November4/source480e87df. CLI F32-validation failures and a
 separate terminal stdout manifest repair remain preserved; no completed stage
-repeats. A separately selected fresh200k comparison is being prepared, with
+repeats. A separately selected fresh200k comparison launches20:19:52.116 UTC/sourceb3a49b5b with154 pins,
 100k recovery and four actual-initial/final assessments. Only latent uniform
 mixing.01→.001 changes; sampled states and actor-unimix.01 remain. This changes
 prior/posterior sampling, KL, derivatives and experience together. No gameplay

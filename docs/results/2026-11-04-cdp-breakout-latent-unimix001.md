@@ -62,3 +62,19 @@ not transfer.
 | Learning review |`72bb0056293b6586b861acec55eff487303a7a4c6e2855336a60ba89e43d81e8`|
 | Completion |`4ca48992cd5ce9c3736a13ea277c5073879fc50ef15119297f5fef1ca87ed880`|
 | Original terminal summary |`edf2a59a29084da861dd87a276f991179329378ca20e63a1a172c8f2897b0bd5`|
+
+## Fresh200k comparison is active
+
+The separately fixed [full protocol](../experiments/2026-11-04-cdp-breakout-latent-unimix001-200k.md)
+launches **20:19:52.116 UTC November4**, source`b3a49b5b`, with154 immutable
+pins. MainPID1181844/invocation`246f4252235945f5b29e4edc8206c04b`; collector
+PID1181847/invocation4f3b6f1778054a3595de1796982abe77 and recoveryPID1181850/
+invocationbe6ae73d1c614eb4b29f9d7a82136f17 start once. Startup passes at
+20:19:57.852 in.321s, with357 exact bounded/control initial tensors,47 matching
+bounded pre-update semantic events and the declared config/runner changes.
+
+CPU helper qualification3.451s and actual five-command qualification.534s
+pass before launch, with no new full-preparation failure. The changed-mixing
+initial comparison explicitly records differing/unpaired events; actual-initial
+controls remain required. No full frozen result is available yet. Do not restart
+or overlap the learner; check its live identity. Root ends in`/full`.
