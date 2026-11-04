@@ -8,20 +8,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [fixed terminal-state readout](experiments/2026-11-04-cdp-breakout-terminal-readout.md) is selected after17 CPU tests and
-886-input preflight pass. Use the existing120 arrivals with leave-one-lane-out
-class-balanced ridge, one fixed penalty and training-only preprocessing. Primary
-is the retained posterior; candidate posterior and both priors are secondary.
-Compare held-out balanced MSE, class recalls and ranking with saved heads and
-constants. Positive results can show linearly accessible information; negative
-results cannot prove information absent or identify a causal architecture defect.
+The [completed fixed terminal-state readout](results/2026-11-04-cdp-breakout-terminal-readout.md) finds retained posterior
+ending information: held-out balanced MSE.131485 versus saved head.323868 and
+balanced constant.248501, paired interval[−.251523,−.130600]. It detects20/24
+endings but falsely ends10/96 continuing life losses at gamma/2. The saved head
+has higher posterior AUC.952691 versus.917752, with fewer detections andzero
+false positives. All four fixed views pass the diagnostic screen; primary stays
+retained posterior. This supports usable information on the selected cohort,
+not calibrated acting probabilities, a replacement head or gameplay gain.
 
-Root `/x/Temp/kindle-breakout-terminal-readout-20261104`; one single-core/nice10
-CPU pass under60s, with native/emulator imports blocked. Independently verify
-saved normal equations, predictions and metrics without refitting. No model,
-emulator or GPU execution; no new learner, loss, sampler or automatic successor.
-Retain scale1 and70.750 sampled/143.667 greedy. Original864/90%-two-wall and
-five-game goal remain unfinished.
+One4.368s CPU-only analysis,17 tests and887 pins pass. Independent4.242s closure
+verifies32 saved folds without refitting, maximum normal-equation residual2.010e-14,
+and all19 final artifacts. Sourceb8f670c8; analysis completes04:36:18 UTC November4,
+closure04:37:28. No failure, repair or completed-stage repeat. Root
+`/x/Temp/kindle-breakout-terminal-readout-20261104` is closed; no native model,
+emulator, GPU work or learner update occurs. Do not repeat its fit or closure.
+
+Retain scale1 and70.750 sampled/143.667 greedy. No new learner, loss, sampler,
+inference correction or automatic successor is selected. Check live state before
+work. Original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

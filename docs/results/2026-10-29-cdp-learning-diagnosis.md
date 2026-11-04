@@ -1,5 +1,25 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed fixed terminal-state readout](2026-11-04-cdp-breakout-terminal-readout.md) finds retained posterior
+ending information: held-out balanced MSE.131485 versus saved head.323868 and
+balanced constant.248501, paired interval[−.251523,−.130600]. It detects20/24
+endings but falsely ends10/96 continuing life losses at gamma/2. The saved head
+has higher posterior AUC.952691 versus.917752, with fewer detections andzero
+false positives. All four fixed views pass the diagnostic screen; primary stays
+retained posterior. This supports usable information on the selected cohort,
+not calibrated acting probabilities, a replacement head or gameplay gain.
+
+One4.368s CPU-only analysis,17 tests and887 pins pass. Independent4.242s closure
+verifies32 saved folds without refitting, maximum normal-equation residual2.010e-14,
+and all19 final artifacts. Sourceb8f670c8; analysis completes04:36:18 UTC November4,
+closure04:37:28. No failure, repair or completed-stage repeat. Root
+`/x/Temp/kindle-breakout-terminal-readout-20261104` is closed; no native model,
+emulator, GPU work or learner update occurs. Do not repeat its fit or closure.
+
+Retain scale1 and70.750 sampled/143.667 greedy. No new learner, loss, sampler,
+inference correction or automatic successor is selected. Check live state before
+work. Original864/90%-two-wall and five-game goal remain unfinished.
+
 The [completed continuation10 arrival comparison](2026-11-04-cdp-breakout-continuation10-arrivals.md) finds observed-terminal
 continuation.759636→.730320, both5/24 below.5, against target0. Primary paired
 MSE difference−.043530 has interval[−.212505,.123448]; no improvement is established.
