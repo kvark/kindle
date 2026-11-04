@@ -20,32 +20,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [terminal-only continuation check](docs/results/2026-11-04-cdp-breakout-terminal-weight.md) passes8,192 actions/32,722 frames/489 updates in46.934s.
-Conservative200k projection21m00.438s passes30min; gameplay benefit is unmeasured.
-Weight10 applies only to true terminal continuation rows, with continuing weight1,
-ordinary row denominator, existing sampler and global continuation1. Keep12M64/
-Auto/N8/B16/T16/H15/R16/replay-value1/expert100 and retained guidance/rates.
-Mixture and open-loop supervision stay off. The stable-logit path also differs
-from older probability BCE; no isolated coefficient or calibration claim.
+The [fresh terminal-weight10 comparison](docs/experiments/2026-11-04-cdp-breakout-terminal-weight-200k.md) is selected after the bounded
+check passes46.934s/8,192 actions/489 updates and conservative21m00.438s200k cost.
+Test one fresh200k-action/12,477-update learner with30-minute training cap,100k
+recovery and final/actual-initial sampled/greedy24-episode assessments. Retain
+12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100, rates and guidance.
+Only true terminal continuation rows receive10; continuing rows retain1, with
+existing sampler/global continuation1. Stable-logit BCE and native/runner versions
+also differ from retained447fe50; no isolated coefficient or calibration claim.
 
-Native3672a21a/SHAa8b483a3 passes181 Rust/5 gym CPU checks,1,046 packaged Python
-checks, strict Clippy and10 guarded F64 loss/gradient cases. Maximum loss error
-3.94e−7/derivative1.08e−8; continuing derivatives stay unchanged by the weight.
-Default-off1,024-action compatibility matches128 events/357 invariant tensors.
-Fresh357 initial tensors/47 events, finite reports, cadence, changed parameters,
-full pixel/action/label replay and guards pass. Frozen1,024 actions take.882s,
-zero updates/no natural episodes. Terminal exposure345/125,184 rows versus322
-retained; no replay mixture. Actual overrides45.4956% are not frozen competence.
+Reuse qualified3672a21a/SHAa8b483a3 runtime and bounded runner. Packaged teacher
+bytes match the prior qualified package, so reuse its scoped source/fixture evidence.
+Require exact initialization/semantics, finite losses, full replays, guards and
+independent recovery/terminal checks. Greedy return and own-initial-subtracted
+return/min are primary against70.750 sampled/143.667 greedy; use the locked lane
+bootstrap decision. Original864/90%-two-wall and five-game goal remain unfinished.
+No result, sweep, second learner, extension or automatic successor is implied.
 
-Main/collector succeed06:29:25/06:29:36 UTC November4; separate1.782s CPU closure
-completes06:30:07, verifying66 artifacts and298 current/338 retained pins. Original
-Python import, numerical-reader and invalid-argument-helper failures remain;
-qualified path/helper repairs pass, with no GPU repeats. Closure is
-`complete_with_cpu_preflight_repairs`. Root`/x/Temp/kindle-terminal-weight-20261104`;
-matching runtime/wheel/test executable and build cache remain. Do not rerun stages.
-No full learner, sweep, extension or automatic successor is selected. No learner
-or GPU allocation is active at closure; check live state before work. Retain70.750
-sampled/143.667 greedy; original864/90%-two-wall and five-game goal remain unfinished.
+Root`/x/Temp/kindle-terminal-weight-20261104/full`;service
+`kindle-breakout-terminal-weight-200k-20261104`. CPU preparation is in progress;
+no full learner is active yet. Check live state before work. Preserve all completed
+bounded stages and their CPU qualification failures/repairs; do not repeat them.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

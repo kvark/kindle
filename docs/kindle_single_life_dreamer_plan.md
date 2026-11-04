@@ -1,5 +1,27 @@
 # Kindle: CDP learning roadmap
 
+The [fresh terminal-weight10 comparison](experiments/2026-11-04-cdp-breakout-terminal-weight-200k.md) is selected after the bounded
+check passes46.934s/8,192 actions/489 updates and conservative21m00.438s200k cost.
+Test one fresh200k-action/12,477-update learner with30-minute training cap,100k
+recovery and final/actual-initial sampled/greedy24-episode assessments. Retain
+12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100, rates and guidance.
+Only true terminal continuation rows receive10; continuing rows retain1, with
+existing sampler/global continuation1. Stable-logit BCE and native/runner versions
+also differ from retained447fe50; no isolated coefficient or calibration claim.
+
+Reuse qualified3672a21a/SHAa8b483a3 runtime and bounded runner. Packaged teacher
+bytes match the prior qualified package, so reuse its scoped source/fixture evidence.
+Require exact initialization/semantics, finite losses, full replays, guards and
+independent recovery/terminal checks. Greedy return and own-initial-subtracted
+return/min are primary against70.750 sampled/143.667 greedy; use the locked lane
+bootstrap decision. Original864/90%-two-wall and five-game goal remain unfinished.
+No result, sweep, second learner, extension or automatic successor is implied.
+
+Root`/x/Temp/kindle-terminal-weight-20261104/full`;service
+`kindle-breakout-terminal-weight-200k-20261104`. CPU preparation is in progress;
+no full learner is active yet. Check live state before work. Preserve all completed
+bounded stages and their CPU qualification failures/repairs; do not repeat them.
+
 The [terminal-only continuation check](results/2026-11-04-cdp-breakout-terminal-weight.md) passes8,192 actions/32,722 frames/489 updates in46.934s.
 Conservative200k projection21m00.438s passes30min; gameplay benefit is unmeasured.
 Weight10 applies only to true terminal continuation rows, with continuing weight1,
