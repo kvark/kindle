@@ -56,6 +56,12 @@ life losses, particularly before observing the arrival. This motivates studying
 how the model distinguishes a lost life from the end of the game before another
 learner is selected.
 
+The subsequent [saved-output ranking check](2026-11-04-cdp-breakout-terminal-ranking.md)
+finds posterior AUC.952691→.897569 with paired interval[−.141927,.008257], and261
+reversed terminal/continuing pair orders. The interval does not establish lower
+discrimination, but the changed orders mean a strict monotone output shift alone
+cannot fully describe the observed tradeoff. No correction is selected.
+
 These selected life-loss states are not ordinary ongoing play or a population
 calibration set. A below-.5 count is a diagnostic threshold, not a validated acting
 rule. The sampler changes all training objectives' data distribution without

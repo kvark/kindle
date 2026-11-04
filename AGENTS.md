@@ -20,30 +20,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed terminal-mixture arrival diagnostic](docs/results/2026-11-04-cdp-breakout-terminal-mixture-arrivals.md) finds a tradeoff:
-terminal posterior MSE falls .644558→.252775, paired interval[−.506700,−.274697],
-and below-.5 predictions rise5/24→17/24. Terminal prior mean falls .952850→.512441.
-But intermediate-life prior MSE rises .001530→.170491, interval[.106436,.241616],
-with21/96 below.5 versus0/96; posterior error also worsens. This selected cohort
-shows better terminal recognition alongside more false ending indications, not
-population calibration or a causal explanation for weaker gameplay.
+The [completed terminal ranking check](docs/results/2026-11-04-cdp-breakout-terminal-ranking.md) finds posterior AUC
+.952691→.897569, paired difference−.055122 with lane interval[−.141927,.008257].
+Prior AUC falls .791667→.734809, interval[−.205306,.085938]. Both intervals cross
+zero; neither decline nor equality is established on this reused cohort. There
+are261 posterior/707 prior reversed class-pair orders, with no ties. A strict
+monotone output shift alone cannot fully describe the change; no correction or
+new training setting is selected.
 
-Retain the existing sampler/continuation1 and70.750 sampled/143.667 greedy;
-the completed mixture remains65.708/85.250, all0/24 two-wall. Distinguishing lost
-lives from game endings is the next diagnostic question. No new learner, loss,
-threshold, mixture setting or automatic successor is selected.
+The prior arrival result remains: better game-ending predictions, but more false
+ending indications at intermediate life losses. Retain the existing sampler,
+continuation1 and70.750 sampled/143.667 greedy; mixture65.708/85.250 remains
+weaker, all0/24 two-wall. Remaining-life information and use of continuation in
+imagined behavior remain unresolved, without a causal gameplay claim.
 
-The51.327s frozen candidate-only capture completes43,424 actions/173,660 frames,
-zero updates. Sixteen CPU tests,1,052 pins,357 invariant tensors,120 exact endpoint/
-repeated-query checks, full pixel/transition parity and guards pass. F64/native
-prior error≤2.104e-7; posterior outputs remain reference estimates. Source6dda986d;
-main succeeds05:53:02 UTC November4, independent4.265s closure05:53:33 with52
-artifacts. No failure, repair or completed-stage repeat occurs.
+One2.082s CPU-only analysis,11 tests and1,097 pins pass. Source9deeeb19/process
+1118658 completes06:03:28 UTC November4. The independent verifier recounts9,216
+pair orders and saves its summary, then exits1 on a missing import in final output.
+The original failure remains; separate1.992s CPU repair completes06:04:44, verifying
+17 artifacts without repeating analysis or arithmetic. Closure is
+`complete_with_cpu_output_repair`.
 
-Root`/x/Temp/kindle-terminal-mixture-arrivals-20261104` is closed. No learner or
-GPU allocation is active. Do not repeat its capture, analysis or closure; check
-live state before future work. Native2b5a3eea differs from control447fe50 and the
-cohort is reused. Original864/90%-two-wall and five-game goal remain unfinished.
+Root`/x/Temp/kindle-terminal-ranking-20261104` is closed. No model/emulator/GPU
+execution or learner update occurs. Do not rerun analysis, closure or repair;
+check live state before future work. No learner or GPU allocation is active.
+The original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
