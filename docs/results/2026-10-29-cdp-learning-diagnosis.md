@@ -1,5 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed continuation10 arrival comparison](2026-11-04-cdp-breakout-continuation10-arrivals.md) finds observed-terminal
+continuation.759636→.730320, both5/24 below.5, against target0. Primary paired
+MSE difference−.043530 has interval[−.212505,.123448]; no improvement is established.
+Prior terminal.952850→.938323 also has an interval spanning zero. Intermediate-life
+prior MSE.001530→.009264 worsens, paired interval[.002367,.013707]. This fixed
+outcome-conditioned cohort does not establish population calibration or explain
+the gameplay regression. Retain scale1 and70.750 sampled/143.667 greedy.
+
+The candidate-only capture takes50.752s for43,424 actions/173,660 frames,zero
+updates. All841 pins,357 invariant tensors,120 source/repeated-query checks,full
+pixel/transition parity and guards pass. F64 prior/native error≤1.398e-7; posterior
+outputs remain reference estimates. Fifteen CPU tests and independent4.224s
+closure pass; all52 final artifacts verify. Source91924e08; main succeeds04:26:05
+UTC November4, closure04:27:01. No failure, repair or completed-stage repeat.
+
+Root `/x/Temp/kindle-breakout-continuation10-arrivals-20261104` is closed. No learner
+or GPU allocation is active; check live state before work. Do not repeat its
+capture, analysis or closure. No new learner, coefficient sweep, loss, sampler or
+automatic successor is selected. Original864/90%-two-wall and five-game goal remain
+unfinished.
+
 The [completed200k continuation10 comparison](2026-11-04-cdp-breakout-continuation10.md#full200k-comparison)
 lowers primary greedy143.667→55.833 and sampled70.750→35.250, all0/24 two-wall.
 Training200k actions/799,592 frames/12,477 updates takes21m28.116s, only+.016%

@@ -8,21 +8,26 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [frozen continuation10 arrival comparison](experiments/2026-11-04-cdp-breakout-continuation10-arrivals.md) is selected after15 CPU
-checks and source/artifact preflight pass. Reuse the control's saved120 arrivals;
-only the completed candidate is re-observed on the exact43,424-action/173,660-frame
-cohort. Primary is candidate-minus-control observed-terminal MSE on24 endings;
-prior forecasts and96 intermediate life losses remain separate. This tests whether
-the higher weight improves fixed-cohort recognition despite its gameplay regression.
+The [completed continuation10 arrival comparison](results/2026-11-04-cdp-breakout-continuation10-arrivals.md) finds observed-terminal
+continuation.759636→.730320, both5/24 below.5, against target0. Primary paired
+MSE difference−.043530 has interval[−.212505,.123448]; no improvement is established.
+Prior terminal.952850→.938323 also has an interval spanning zero. Intermediate-life
+prior MSE.001530→.009264 worsens, paired interval[.002367,.013707]. This fixed
+outcome-conditioned cohort does not establish population calibration or explain
+the gameplay regression. Retain scale1 and70.750 sampled/143.667 greedy.
 
-Native447fe50/corrective runtime stay fixed. Require357 invariant tensors,zero
-updates,full pixel/transition parity,120 repeated own forecasts,qualified F64 head
-readouts and a single180s guarded capture. No control capture or completed stage
-repeats. Root `/x/Temp/kindle-breakout-continuation10-arrivals-20261104`, service
-`kindle-breakout-continuation10-arrivals-20261104`. Check live state before work;
-no new learner, coefficient sweep or automatic successor. Retain scale1 and
-70.750 sampled/143.667 greedy regardless of this diagnostic. Original864/90%-two-wall
-and five-game goal remain unfinished.
+The candidate-only capture takes50.752s for43,424 actions/173,660 frames,zero
+updates. All841 pins,357 invariant tensors,120 source/repeated-query checks,full
+pixel/transition parity and guards pass. F64 prior/native error≤1.398e-7; posterior
+outputs remain reference estimates. Fifteen CPU tests and independent4.224s
+closure pass; all52 final artifacts verify. Source91924e08; main succeeds04:26:05
+UTC November4, closure04:27:01. No failure, repair or completed-stage repeat.
+
+Root `/x/Temp/kindle-breakout-continuation10-arrivals-20261104` is closed. No learner
+or GPU allocation is active; check live state before work. Do not repeat its
+capture, analysis or closure. No new learner, coefficient sweep, loss, sampler or
+automatic successor is selected. Original864/90%-two-wall and five-game goal remain
+unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

@@ -49,8 +49,10 @@ lanes, not training-seed reliability. The fixed candidate preference rule fails.
 Overall replay continuation summaries are slightly lower, while frozen gameplay
 is substantially worse. These are averages on each changing model's own replay,
 dominated by nonterminal rows; they do not establish improved terminal-specific
-or held-out calibration. A matched frozen arrival diagnostic on the candidate
-has not been performed.
+or held-out calibration. The separate [matched frozen arrival diagnostic](2026-11-04-cdp-breakout-continuation10-arrivals.md)
+finds no demonstrated terminal-recognition improvement: observed-terminal MSE
+difference−.043530 has interval[−.212505,.123448], both models5/24 below.5.
+Intermediate-life prior error worsens on that fixed cohort.
 
 | Training window | Retained continuation BCE | Candidate BCE | Retained continuation MAE | Candidate MAE |
 |---|---:|---:|---:|---:|
