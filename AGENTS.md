@@ -20,33 +20,32 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed B32/T16 comparison](docs/results/2026-11-04-cdp-breakout-batch32.md#full-200k-comparison) finishes200k actions/799,541 frames/
-6,231 updates in **19m20.785s**,9.87% less training time than retained. Greedy
-143.667→73.333 and sampled70.750→47.750 both fall; all0/24 two-wall. Primary
-own-initial gain/min falls44.21%; paired difference−2.913742 has95% lane interval
-[−5.157081,−.748597]. Retain B16/T16 and143.667/70.750. No batch sweep,rate
-compensation,extension,second learner or automatic successor is selected.
+The [completed corrective-label timing audit](docs/results/2026-11-04-cdp-breakout-label-timing.md) finds late sampled
+collection agrees best with the current teacher command: **52.73%**, versus
+43.02% for the preceding command, on 24,998 identical unaided directional
+windows. Every tested shift from −4 through +4, excluding zero, lowers agreement
+in all eight lanes. Current-command switches also favor zero offset. This does
+not support a simple fixed-delay explanation; it does not identify the remaining
+perception, memory, optimization or teacher-quality limitation.
 
-Full sampled positions fall only.12%,while learning-stage time falls1133.927→
-1023.134s. Batch/world microbatch16→32 changes centering,diversity,cadence and
-update-based warmup together; no isolated mechanism or reliable speed claim.
-Late labeled-row imitation CE is.613392 versus.560514. Actual overrides52.277%;
-own-replay fitting and guided returns are not frozen competence. Native447fe50/
-SHA35ad0db,runnercf4ea238,teacher,T16/R16 and rates stay fixed.
+The exact native447fe50/runnercf4ea238 source review finds no off-by-one mismatch
+in the inspected corrective-label path. Training-policy associations are not
+frozen gameplay or causal latency. Retain B16/T16 and frozen greedy143.667 /
+sampled70.750; no label shift, teacher change, learner or automatic successor.
 
-All137 current/338 retained pins,100k/3,106 recovery,357 matching initial/invariant
-frozen tensors,79 bounded/47 retained initial events,799/794 frozen initial
-semantics,6,231 finite reports,full replays/videos,guards,curves,coverage,exposure
-and comparison pass. Main/collector succeed19:48:24.902/19:49:09.145 UTC November4,
-source00e548d3; recovery succeeds earlier. Separate2.529s publication review
-closes19:49:35.865 with55 completion artifacts. Pre-execution fixture correction
-and ancillary progress-reader syntax error remain preserved; no original
-pipeline stage fails or repeats. CPU co-host time stays uncorrected.
+Eight CPU fixtures, all18 input hashes, complete200k-action/799,595-frame
+accounting and an independent recount of52,477 anchors/54 group-offset results
+pass. Analysis completes20:02:57.209 UTC November4 in1.067s; recount closes
+20:03:15.242 in1.198s, source185e3180. No failure, completed-stage repeat,
+emulator action, native import, GPU work or learning update occurs. Root
+`/x/Temp/kindle-breakout-label-timing-20261104` is closed; do not rerun.
 
-Root`/x/Temp/kindle-breakout-batch32-20261104/full` is closed; all three services
-succeed and no GPU allocation is active at closure. Do not restart the learner
-or collectors; check live state before work. Original864/90%-two-wall and the
-five-game goal remain unfinished.
+The preceding [B32/T16 learner](docs/results/2026-11-04-cdp-breakout-batch32.md#full-200k-comparison) trained9.87% faster but lowered greedy
+143.667→73.333 and sampled70.750→47.750; retain B16/T16. Its original learner,
+recovery and collector are terminal success. No batch/rate compensation sweep
+or restart is selected. No Kindle service is active at this review; check live
+state before separately selected work. Original864/90%-two-wall and the five-game
+goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

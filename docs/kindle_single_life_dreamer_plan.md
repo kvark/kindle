@@ -1,5 +1,23 @@
 # Kindle: CDP learning roadmap
 
+The [saved corrective-label timing audit](results/2026-11-04-cdp-breakout-label-timing.md) finds the retained learner's
+late sampled actions align best with current labels: **52.73%**, versus43.02%
+with preceding labels, on24,998 identical unaided directional windows. All
+nonzero offsets−4…+4 lower agreement in every lane; current-label switches show
+the same pattern. The exact native447fe50/runnercf4ea238 source review finds no
+off-by-one mismatch in the inspected path. This does not support a simple fixed
+delay; representation precision, recurrent state, optimization and teacher
+quality remain unresolved. Evolving training policies and feedback-dependent
+labels limit causal interpretation; no frozen score or loss changes.
+
+Eight CPU fixtures,18 pins, all200k actions/799,595 frames and the independent
+52,477-anchor/54-group-offset recount pass. Analysis1.067s completes20:02:57.209
+UTC November4/source185e3180; recount1.198s closes20:03:15.242. No failed or
+repeated stage, native/emulator import, GPU work or update. Root
+`/x/Temp/kindle-breakout-label-timing-20261104` is closed; no successor selected.
+Retain143.667/70.750 and B16/T16; original864/90% and the five-game goal remain
+unfinished. No Kindle service is active at closure; check live state before work.
+
 The [completed B32/T16 comparison](results/2026-11-04-cdp-breakout-batch32.md#full-200k-comparison) finishes200k actions/799,541 frames/
 6,231 updates in **19m20.785s**,9.87% less training time than retained. Greedy
 143.667→73.333 and sampled70.750→47.750 both fall; all0/24 two-wall. Primary
