@@ -20,26 +20,30 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [Breakout ending-feedback diagnostic](docs/experiments/2026-11-04-cdp-breakout-ending-feedback.md) is selected after18 CPU
-checks and553 current pins pass, including all506 prior pins and43 prior closure
-artifacts. It reuses the same120 failure windows and the unchanged447fe50
-checkpoint/runtime. One frozen capture will query1,080 forecasts as real
-observations arrive, comparing nine-step endpoint continuation with one-step
-prediction immediately before the same24 game-overs. Keep96 intermediate-life
-losses separate; the native continuation target ends only at natural game-over.
+The [completed Breakout ending-feedback diagnostic](docs/results/2026-11-04-cdp-breakout-ending-feedback.md) lowers mean
+terminal-transition continuation from .996255 at nine steps to .952850 at one
+step after actual observations, while the target is zero. All 24 terminal errors
+fall; paired MSE difference −.081526 has lane interval [−.112610,−.053525]. The
+96 intermediate-life predictions also fall, .997175→.979477 against target
+.996997, so this is not a general forecast improvement. Weak ending prediction
+persists at short range. Continuation on actual posterior arrivals and its
+class-specific training fit remain unmeasured; no causal defect is identified.
 
-Require120 exact saved first-step/actor-probability matches,120 repeated endpoint
-queries,full43,424-action/173,660-frame pixel/transition/trajectory parity and357
-invariant tensors withzero updates. Scalar posterior draws differ from the
-original vector actor; observations,horizon andlater diagnostic draws change
-together. No teacher-branch replay,native build,new learner orautomatic successor.
-Capture cap180s/controller600s; no new forecast result is available yet.
+The unchanged native447fe50/checkpoint completes 43,424 actions /173,660 frames /
+1,080 queries in52.878s with zero updates. All 554 pins, 357 invariant tensors,
+full pixel/transition/trajectory parity, 120 saved-prefix/actor-probability
+matches, 120 repeated endpoint queries and host guards pass. Eighteen CPU checks
+pass. Main1101025/invocationc782fcb701a646e7991130fabef5e24e/source714bb790
+succeeds02:54:31 UTC November4; independent3.434s closure completes02:56:00.
+All 39 final artifacts verify, with zero failures, repairs or repeated stages.
 
-Root `/x/Temp/kindle-breakout-ending-feedback-20261104`; service
-`kindle-breakout-ending-feedback-20261104`. CPU preparation passes02:52:38 UTC
-November4. Check live state before GPU work. Retain70.750 sampled/143.667 greedy
-and20% episode guidance. The original864/90%-two-wall andfive-game goal remain
-unfinished.
+Root `/x/Temp/kindle-breakout-ending-feedback-20261104` is closed. No learner or
+GPU allocation is active; do not restart its capture or collectors. Check live
+state before work. Observations, horizon and later diagnostic draws change
+together; this outcome-conditioned reused cohort does not establish population
+calibration. No native change, loss, learner or automatic successor is selected.
+Retain70.750 sampled/143.667 greedy and20% episode guidance. The original
+864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
