@@ -1,19 +1,26 @@
 # Kindle: CDP learning roadmap
 
-The [latent-unimix.001 bounded check](results/2026-11-04-cdp-breakout-latent-unimix001.md) passes8,192 actions/32,725 frames/
-489 updates in46.880s, projecting20m58.976s conservatively for200k. Frozen1,024
-haszero updates/no natural episodes. All81 current/338 retained pins,357
-matching initial/invariant frozen tensors,47 paired initial events,finite
-reports,full replay and guards pass. Main/collector succeed20:15:10.517/
-20:15:17.166 UTC November4/source480e87df. CLI F32-validation failures and a
-separate terminal stdout manifest repair remain preserved; no completed stage
-repeats. A separately selected fresh200k comparison launches20:19:52.116 UTC/sourceb3a49b5b with154 pins,
-100k recovery and four actual-initial/final assessments. Only latent uniform
-mixing.01→.001 changes; sampled states and actor-unimix.01 remain. This changes
-prior/posterior sampling, KL, derivatives and experience together. No gameplay
-benefit is established. Retain143.667/70.750 and the original864/90% gate.
-Root`/x/Temp/kindle-breakout-latent-unimix001-20261104/full`; check live state.
-The five-game goal remains unfinished.
+The [completed categorical-mixing comparison](results/2026-11-04-cdp-breakout-latent-unimix001.md#full-200k-comparison) finishes 200k actions /
+799,612 frames /12,477 updates in **21m19.046s**. Lower latent mixing.001 scores
+**67.208 greedy /51.583 sampled**, below retained.01's143.667/70.750; all0/24
+two-wall. Primary own-initial gain/min falls53.46%; paired difference−3.523393
+has95% lane interval[−5.303444,−1.906890]. Retain.01. The.69% shorter wall time
+comes with essentially unchanged learning-stage time1133.956/1133.927s.
+Late own-replay imitation CE improves.560514→.535996 despite worse gameplay;
+raw KL rises11.815355→12.406710. Sampling,KL,derivatives and experience change
+together, so no isolated noise mechanism or seed reliability is established.
+
+All154 current/338 retained pins,100k/6,227 recovery,357 matching initial/
+invariant frozen tensors,47 bounded initial events,finite reports,full replays/
+videos,guards,curves,exposure and comparison pass. Actual-initial trajectories
+differ as allowed; candidate greedy initial1.833 is used. Actual overrides43.823%.
+Main/collector succeed20:45:02.471/20:45:24.864 UTC November4/sourceb3a49b5b;
+all three original services succeed. A separate2.669s publication reader repair
+closes20:46:39.251 after a stale manifest filename. Original failure and bounded
+CLI-validation/stdout-manifest repairs remain; no production stage repeats.
+Root`/x/Temp/kindle-breakout-latent-unimix001-20261104/full` is closed, with no
+active Kindle allocation at closure. No sweep,extension,confirmation or automatic
+successor is selected. Original864/90% and the five-game goal remain unfinished.
 
 The [saved corrective-label timing audit](results/2026-11-04-cdp-breakout-label-timing.md) finds the retained learner's
 late sampled actions align best with current labels: **52.73%**, versus43.02%

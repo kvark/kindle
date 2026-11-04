@@ -20,30 +20,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [lower categorical-mixing check](docs/results/2026-11-04-cdp-breakout-latent-unimix001.md) passes8,192 actions /32,725 frames /
-489 updates in **46.880s**. Its conservative200k projection is20m58.976s,
-within30min. Frozen1,024 actions take.875s withzero updates/no natural episodes.
-All81 current/338 retained pins,357 matching initial/invariant frozen tensors,
-47 paired initial events,finite weighted reports,full replay and guards pass.
-Main/collector succeed20:15:10.517/20:15:17.166 UTC November4/source480e87df.
-Original CLI validation failures and the separate terminal stdout manifest
-repair remain preserved; no completed GPU or collector stage repeats.
+The [completed categorical-mixing comparison](docs/results/2026-11-04-cdp-breakout-latent-unimix001.md#full-200k-comparison) finishes 200k actions /
+799,612 frames /12,477 updates in **21m19.046s**. Latent `unimix` .01→.001
+lowers greedy **143.667→67.208** and sampled **70.750→51.583**; all0/24 two-wall.
+Primary own-initial gain/min falls53.46%, with paired difference −3.523393 and
+95% lane interval[−5.303444,−1.906890]. Retain latent mixing.01 and143.667/70.750.
+The original864/90% gate and the five-game goal remain unfinished.
 
-A [fresh200k comparison](docs/experiments/2026-11-04-cdp-breakout-latent-unimix001-200k.md) launches20:19:52.116 UTC November4/sourceb3a49b5b with154 pins.
-Only native latent `unimix` .01→.001 changes; actor-unimix.01 and sampled states
-remain. This affects posterior/prior sampling, KL, derivatives and experience;
-no isolated perception or gameplay claim. Reuse native447fe50/SHA35ad0db and
-runner4070a0b8. Require100k/6227 recovery and final/actual-initial sampled/greedy
-24-episode assessments. Initial trajectories may differ after mixing changes.
-Retain143.667/70.750 until full evidence; original864/90% remains unfinished.
+All154 current/338 retained pins,100k/6,227 recovery,357 matching initial/
+invariant frozen tensors,finite reports,full replays/videos,guards,curves and
+comparison pass. Changed initial trajectories are recorded, and actual-initial
+scores are used. Main/collector succeed20:45:02.471/20:45:24.864 UTC November4,
+sourceb3a49b5b. All three original services succeed. A separate2.669s CPU
+publication repair closes20:46:39.251 after a stale source-manifest filename;
+original reader/failure remain. No production stage repeats. Earlier bounded
+CLI-validation and stdout-manifest failures also remain preserved.
 
-Root`/x/Temp/kindle-breakout-latent-unimix001-20261104/full`; service
-`kindle-breakout-latent-unimix001-200k-20261104`. Check live identity before work;
-mainPID1181844/invocation246f4252235945f5b29e4edc8206c04b remains active.
-Startup verifies357 initial tensors and47 bounded pre-update events; recovery
-and terminal observers are active. No overlapping GPU job or completed-stage
-repeat. No full
-outcome exists yet. The five-game goal remains active and unfinished.
+Root`/x/Temp/kindle-breakout-latent-unimix001-20261104/full` is closed. No Kindle
+allocation is active at closure; check live state before work. Native447fe50/
+SHA35ad0db and runner4070a0b8 remain qualified; the CLI default stays unchanged.
+No sweep,extension,confirmation learner or automatic successor is selected.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
