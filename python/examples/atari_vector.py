@@ -155,6 +155,8 @@ def main():
                         help="fresh CDP encoder rate; omitted: 6e-6 scaled with the base rate")
     parser.add_argument("--dynamics-learning-rate", type=float,
                         help="fresh CDP dynamics/posterior/prediction/exploration rate; omitted: 4e-4 scaled with the base rate")
+    parser.add_argument("--latent-unimix", type=float,
+                        help="fresh training only: categorical posterior/prior uniform mixing; omitted: native default")
     parser.add_argument("--actor-unimix", type=float, default=0.0,
                         help="native policy uniform mixture in [0,1); fresh default0, restore keeps checkpoint policy")
     parser.add_argument("--report-every", type=int, default=1000)
@@ -428,6 +430,13 @@ def main():
             parser.error("Qbert guidance requires Qbert/full18/native pixels/learned RGB")
     if args.exploration_hold <= 0:
         parser.error("exploration hold must be positive")
+    if args.latent_unimix is not None:
+        if (not math.isfinite(args.latent_unimix) or not 0 <= args.latent_unimix < 1
+                or (args.latent_unimix > 0 and not positive_f32(args.latent_unimix))
+                or struct.unpack("=f", struct.pack("=f", args.latent_unimix))[0] >= 1):
+            parser.error("latent-unimix must be representable in F32 and in [0, 1)")
+        if args.evaluate:
+            parser.error("latent-unimix requires fresh training")
     if not math.isfinite(args.actor_unimix) or not 0 <= args.actor_unimix < 1:
         parser.error("actor-unimix must be finite and in [0, 1)")
     if args.evaluate and args.exploration_probability:
@@ -445,6 +454,7 @@ def main():
     training_options.add("--rgb-frame-pair")
     training_options.add("--image-crop")
     training_options.add("--actor-unimix")
+    training_options.add("--latent-unimix")
     training_options.add("--imagination-length")
     training_options.update(("--open-loop-length", "--open-loop-scale"))
     training_options.add("--replay-context")
@@ -654,6 +664,8 @@ def main():
                       disagreement_bonus=args.disagreement_scale > 0,
                       intrinsic_reward_scale=args.disagreement_scale,
                       learning_rate_warmup=1000, agc=0.3)
+        if args.latent_unimix is not None:
+            config["unimix"] = args.latent_unimix
         if args.imagination_length is not None:
             config["imagination_length"] = args.imagination_length
         if args.discount_horizon is not None:
