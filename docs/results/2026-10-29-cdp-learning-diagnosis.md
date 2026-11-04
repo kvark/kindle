@@ -24,9 +24,13 @@ interval and no fewer two-wall successes. Original training stays200k/12,477/
 
 Use qualified nativeb76f91c/SHA7555bf9 and runnerfac1ff7. Root
 `/x/Temp/kindle-breakout-value1-modal-20261104`; service
-`kindle-breakout-value1-modal-eval-20261104`. No GPU allocation is active at
-selection; check live state before launch. The encoder8e-5 comparison is closed
-and rejected. The original864/90%-two-wall and five-game goal remain unfinished.
+`kindle-breakout-value1-modal-eval-20261104` launches01:04:49 UTC November4,
+source2afd0dc5, with431 pins. Main PID1094832/invocation
+e1d8c3006ec94c1ca8a7498712765526 and its original terminal observer are active.
+The sampled-posterior arm restores the expected checkpoint/runtime withzero
+updates; no completed comparison is available. Do not restart or schedule
+another GPU job while this assessment is active. The encoder8e-5 comparison
+isclosed and rejected. The original864/90%-two-wall and five-game goal remain unfinished.
 
 The [completed encoder8e-5/current-critic comparison](2026-11-04-cdp-breakout-value1-encoder8e5.md) finishes200k
 actions/799,555 frames/12,477 updates in21m13.443s (−1.12%). Greedy103.583
