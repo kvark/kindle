@@ -1,28 +1,32 @@
 # Kindle: CDP learning roadmap
 
-The [bounded dynamics-scale3 check](results/2026-11-04-cdp-breakout-dynamics-scale3.md) passes8,192 actions/32,719 frames/
-489 updates in46.855s; padded200k projection20m58.323s passes30min. Frozen1,024/
-4,096 frames/.881s haszero updates,357 invariant tensors,no natural episodes.
-All76 current/338 retained pins,357 matching initials,47 initial events,weighted
-losses,changed CNN/reward/continuation/actor/value,full replay and guards pass.
-Execution/cost only; gameplay benefit remains unmeasured.
+The [fresh200k dynamics-scale3 comparison](experiments/2026-11-04-cdp-breakout-dynamics-scale3-200k.md) launches18:01:29.253 UTC
+November4/sourceb222c0c8 with145 pins and a30-minute training cap. Change only
+prior-fitting KL1→3; posterior KL.1/free-nat floors1 and retained12M64/Auto/N8/
+B16/T16/H15/R16/expert100 settings stay fixed. Native447fe50/SHA35ad0db and
+teacher stay unchanged; qualified runner52593379 exposes the coefficient.
 
-Native447fe50/SHA35ad0db stays fixed; runner52593379 exposes dynamics KL1→3.
-Posterior KL.1/free-nat floors1 and the retained12M64/Auto/N8/B16/T16/H15/R16/
-expert100 recipe stay fixed. Both12-case CLI suites and1.458s preflight pass.
-Exploratory JSON-reader and canonical import failures/CPU repairs remain preserved.
-Main/collector succeed17:56:39.956/17:56:46.344 UTC November4/sourced7f8847a;
-independent2.528s closure17:57:15.344 retains92 artifact hashes. No GPU repeat.
+Startup passes357 initial tensors matching bounded/retained controls,47 shared
+pre-update events and first update376. At the18:01 startup review,128 finite
+reports reach2,424 actions; this is progress,not a gameplay result. MainPID1169640,
+invocation5606b6db548e450bbbe94b4565f3a2b7. Original recovery and terminal observers
+are active. Require100k/6,227 read-only recovery and final200k/12,477 updates,
+then actual-initial/final sampled/greedy24-natural-episode frozen assessments.
+Favor only improved primary greedy raw score and own-initial gain/min with a
+positive paired interval. Original864/90%-two-wall gate remains fixed.
 
-Select the [fresh200k comparison](experiments/2026-11-04-cdp-breakout-dynamics-scale3-200k.md), with30-minute training cap,
-100k/6,227 recovery and four actual-initial/final sampled/greedy24-episode arms.
-Greedy remains primary; favor only improved raw score and own-initial gain/min
-with positive paired interval. Full preparation pending;no learner active yet.
+Full helper/plot/comparison qualification passes3.867s; all five actual queued
+commands pass.523s with zero native-agent/emulator construction. The earlier
+[bounded check](results/2026-11-04-cdp-breakout-dynamics-scale3.md) passes8,192/489 in46.855s and padded200k20m58.323s;
+its76 current/338 retained pins,replays,tensors and original services pass.
+Exploratory JSON-reader and canonical Python import failures/CPU repairs remain
+preserved. No bounded experience transfers and no completed GPU stage repeats.
+
 Root `/x/Temp/kindle-breakout-dynamics-scale3-20261104/full`; service
-`kindle-breakout-dynamics-scale3-200k-20261104`. Check live state before work;
-do not repeat the bounded check or transfer its experience. No sweep,extension,
-second learner or automatic successor. Retain143.667 greedy/70.750 sampled;
-original864/90%-two-wall and five-game goal remain unfinished.
+`kindle-breakout-dynamics-scale3-200k-20261104`. Check live identity; do not restart,
+overlap or alter the active learner. No extension,sweep,second learner or
+automatic successor. Retain143.667 greedy/70.750 sampled until assessed;
+the five-game goal remains unfinished.
 
 The [completed B32/T8 check](results/2026-11-04-cdp-breakout-b32-t8.md) takes46.818s for8,192 actions/
 32,723 frames/493 updates:1.83% below retained47.690s, missing the required5%.
