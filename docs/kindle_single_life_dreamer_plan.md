@@ -18,9 +18,14 @@ bootstrap decision. Original864/90%-two-wall and five-game goal remain unfinishe
 No result, sweep, second learner, extension or automatic successor is implied.
 
 Root`/x/Temp/kindle-terminal-weight-20261104/full`;service
-`kindle-breakout-terminal-weight-200k-20261104`. CPU preparation is in progress;
-no full learner is active yet. Check live state before work. Preserve all completed
-bounded stages and their CPU qualification failures/repairs; do not repeat them.
+`kindle-breakout-terminal-weight-200k-20261104` launches06:36:25 UTC November4,
+source8ee590c5,370 pins,PID1141191/invocation6a601955edc441c98fa39c453d177faa.
+Startup passes357 bounded/retained initial tensors,47 pre-update events and
+first update376. CPU helper/comparison checks3.448s and allfive actual-command
+preflights.729s pass, with no native/emulator construction. Main,100k recovery
+observer and terminal collector are active; no full frozen result exists yet.
+Check live state; do not restart this learner or schedule another GPU job while
+it is active. Preserve completed bounded stages and their CPU repairs.
 
 The [terminal-only continuation check](results/2026-11-04-cdp-breakout-terminal-weight.md) passes8,192 actions/32,722 frames/489 updates in46.934s.
 Conservative200k projection21m00.438s passes30min; gameplay benefit is unmeasured.
