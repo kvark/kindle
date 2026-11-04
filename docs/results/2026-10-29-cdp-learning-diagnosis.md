@@ -14,9 +14,19 @@ parent-state/pixel/action/reward/frame/life replay guard the comparison.
 
 All12 CPU fixtures pass, including feedback history, origin selection, horizon/
 decision checks and real ALE process-copy parity. Preflight takes3.188s with468
-pins, no native import or GPU work. The two replay stages are capped120s/300s;
+pins, no native import or GPU work. The original controller exits1 before any
+emulator/data stage: its cohort import pulls a newer runner into the preserved
+runtime, which lacks that runner's return-boundary module. Keep the original
+.100s failure and1.415s execution unchanged; no replay was started.
+
+Separate`cpu-import-repair` extracts the exact unchanged cohort function and
+replaces only the private analysis import. Four repair checks pass in2.831s,
+including the actual annotation entrypoint stopped before game construction;
+all470 original and488 repair inputs pass. No coefficient, selection rule,
+cap or production source changes. Both replay stages remain capped120s/300s;
 no completed stage repeats. Root`/x/Temp/kindle-breakout-command-takeovers-20261104`.
-No GPU allocation or learner isselected. The existing sampled-posterior recipe,
+The original controller remains failed; the repair has no result yet. No GPU
+allocation or learner isselected. The existing sampled-posterior recipe,
 original864/90%-two-wall gate and five-game goal remain unchanged andunfinished.
 
 The [completed trained-policy posterior comparison](2026-11-04-cdp-breakout-value1-modal.md) scores modal175.708
