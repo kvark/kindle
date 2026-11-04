@@ -1,5 +1,19 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [encoder8e-5/current-critic bounded check](../experiments/2026-11-04-cdp-breakout-value1-encoder8e5.md) is selected after the
+completed paired-RGB comparison. Earlier encoder8e-5 improves greedy play on
+behavior4e-5/replay-value.3; benefit with the retained behavior8e-5/value1 recipe
+is unmeasured. Change only encoder4e-5→8e-5; keep single-image12M64/Auto/N8/
+B16/T16/H15/R16/expert100, native447fe50/runnercf4ea238 and teacher fixed.
+Fresh8192/489 then1024 frozen;180s/60s caps and padded200k projection≤30min.
+CPU qualification passes5.511s: two actual commands,33 rejection cases,357
+control shapes,338 retained inputs and the actual collector fixture, with zero
+native agent/emulator construction and no GPU descriptor. No full learner is
+selected. Root`/x/Temp/kindle-breakout-value1-encoder8e5-20261104`, service
+`kindle-breakout-value1-encoder8e5-check-20261104`. Check live state; do not
+repeat stages or queue a concurrent learner. Retain143.667 greedy/70.750
+sampled; original864/90%-two-wall and five-game goal remain unfinished.
+
 The [completed RGB frame-pair comparison](2026-11-03-cdp-rgb-frame-pair.md#full-200k-comparison-retains-single-image-input)
 finishes200k actions /799,579 frames /12,477 updates in24m17.046s (+13.13%).
 Greedy114.000/sample39.208 fall20.65%/44.58% below retained143.667/70.750;

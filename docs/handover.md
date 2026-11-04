@@ -8,27 +8,19 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed RGB frame-pair comparison](results/2026-11-03-cdp-rgb-frame-pair.md#full-200k-comparison-retains-single-image-input)
-finishes200k actions /799,579 frames /12,477 updates in24m17.046s (+13.13%).
-Greedy114.000/sample39.208 fall20.65%/44.58% below retained143.667/70.750;
-all0/24 two-wall. Greedy gain/min falls29.68%, paired difference−1.956
-[−3.884,.191]; the primary interval spans zero. Retain single-image input and
-the existing recipe; no extension, confirmation orautomatic successor isselected.
-Late labelCE improves.560514→.539096 without a frozen gameplay gain.
-
-All114 current/338 retained pins,100k/6227 recovery,357 bounded-matching initial/
-invariant frozen tensors,47 pre-update events, full replays/videos, guards,
-curves, exposure and comparison pass. Own initials1.542 sampled/1.458 greedy
-differ from the three-channel control. Actual minimum GPU headroom5.019GiB passes
-2GiB across75,250 snapshots. Main/collector succeed00:02:43/00:03:10 UTC November4,
-source8ea32681; all services are terminal success, with no full-stage or GPU repeat.
-Original numerical and CPU qualification/status/report failures remain preserved.
-
-Geometry/initialization, native, runner and teacher/schedule source differ from
-control; full18 teacher defaults agree, but no isolated effect or seed-reliability
-claim. Root`/x/Temp/kindle-rgb-frame-pair-20261103/full` isclosed. No GPU allocation
-remains active; check live state before work. The original864/90%-two-wall gate
-and five-game goal remain unfinished.
+The [encoder8e-5/current-critic bounded check](experiments/2026-11-04-cdp-breakout-value1-encoder8e5.md) is selected after the
+completed paired-RGB comparison. Earlier encoder8e-5 improves greedy play on
+behavior4e-5/replay-value.3; benefit with the retained behavior8e-5/value1 recipe
+is unmeasured. Change only encoder4e-5→8e-5; keep single-image12M64/Auto/N8/
+B16/T16/H15/R16/expert100, native447fe50/runnercf4ea238 and teacher fixed.
+Fresh8192/489 then1024 frozen;180s/60s caps and padded200k projection≤30min.
+CPU qualification passes5.511s: two actual commands,33 rejection cases,357
+control shapes,338 retained inputs and the actual collector fixture, with zero
+native agent/emulator construction and no GPU descriptor. No full learner is
+selected. Root`/x/Temp/kindle-breakout-value1-encoder8e5-20261104`, service
+`kindle-breakout-value1-encoder8e5-check-20261104`. Check live state; do not
+repeat stages or queue a concurrent learner. Retain143.667 greedy/70.750
+sampled; original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
