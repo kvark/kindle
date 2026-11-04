@@ -1,5 +1,29 @@
 # Kindle: CDP learning roadmap
 
+The [bounded discount100 check](experiments/2026-11-04-cdp-breakout-discount100.md) is selected after the completed
+negative dynamics-scale3 comparison. Change only native return discount horizon
+333→100 (F32 gamma.996997→.99); imagination stays15. The retained critic's weak
+complete-return calibration motivates more local credit, with loss of distant
+reward information as a tradeoff. This is a learning hypothesis, not a causal fix.
+
+Both canonical/private CLI suites pass14 cases; actual-command preflight passes
+1.560s with zero agent/emulator construction,357-tensor schema,47 pre-update
+events and correct489/6,227/12,477 schedules. Exact native source and CPU F32
+arithmetic pass. The original source-review input-name assertion and repair are
+preserved; no GPU work has occurred in preparation. Native447fe50/SHA35ad0db
+and teacher stay fixed; qualified runner112be6c4 adds ten CLI lines.
+
+Require8,192 actions/489 updates within180s,then1,024 frozen actions/zero updates,
+exact357 initial/invariant tensors,full guided replay and guards. Padded200k
+projection must fit30min before a separate full learner may be selected. Retain
+all other12M64/Auto/N8/B16/T16/H15/R16/expert100 settings,seed1009 and the
+143.667 greedy/70.750 sampled baseline. No experience reuse,discount sweep,
+extension or automatic successor. Root
+`/x/Temp/kindle-breakout-discount100-20261104`;service
+`kindle-breakout-discount100-check-20261104`. Prepared for launch;check live
+identity before work. Original864/90%-two-wall and the five-game goal remain
+unfinished.
+
 The [completed dynamics-scale3 comparison](results/2026-11-04-cdp-breakout-dynamics-scale3.md#full-200k-comparison)
 finishes 200k actions /799,607 frames /12,477 updates in **21m33.324s**, 0.42%
 above the retained control. Increasing prior-fitting KL1→3 lowers greedy

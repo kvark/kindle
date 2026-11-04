@@ -8,33 +8,28 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [completed dynamics-scale3 comparison](results/2026-11-04-cdp-breakout-dynamics-scale3.md#full-200k-comparison)
-finishes 200k actions /799,607 frames /12,477 updates in **21m33.324s**, 0.42%
-above the retained control. Increasing prior-fitting KL1→3 lowers greedy
-143.667→105.667 and sampled70.750→62.208; all0/24 two-wall successes.
-Primary own-initial gain/min falls27.17%; its paired difference−1.790483 has95%
-lane interval[−3.243235,−.399936]. Retain dynamics scale1 and the143.667/70.750
-baseline. No extension, coefficient sweep, second learner or automatic successor.
+The [bounded discount100 check](experiments/2026-11-04-cdp-breakout-discount100.md) is selected after the completed
+negative dynamics-scale3 comparison. Change only native return discount horizon
+333→100 (F32 gamma.996997→.99); imagination stays15. The retained critic's weak
+complete-return calibration motivates more local credit, with loss of distant
+reward information as a tradeoff. This is a learning hypothesis, not a causal fix.
 
-Late raw KL rises11.815355→13.872131. These own-replay means, shared recurrent
-gradients and changing experience do not identify a causal bottleneck. Native
-447fe50/SHA35ad0db and teacher remain unchanged; runner52593379 exposes the
-coefficient. Other retained12M64/Auto/N8/B16/T16/H15/R16/expert100 settings stay
-fixed. Reused1009/cohort does not establish seed reliability.
+Both canonical/private CLI suites pass14 cases; actual-command preflight passes
+1.560s with zero agent/emulator construction,357-tensor schema,47 pre-update
+events and correct489/6,227/12,477 schedules. Exact native source and CPU F32
+arithmetic pass. The original source-review input-name assertion and repair are
+preserved; no GPU work has occurred in preparation. Native447fe50/SHA35ad0db
+and teacher stay fixed; qualified runner112be6c4 adds ten CLI lines.
 
-All145 current/338 retained pins,100k/6,227 recovery,357 matched initial/invariant
-frozen tensors,47 pre-update and799/794 initial semantic events,full replays/videos,
-guards,curves,coverage,exposure and comparison pass. Actual overrides42.418%;
-guided returns are not frozen competence. CPU co-host time stays uncorrected.
-Earlier exploratory JSON-reader and canonical import failures/CPU repairs remain;
-no full-run stage fails or repeats.
-
-Main/collector complete18:27:07.476/18:27:46.942 UTC November4/sourceb222c0c8;
-all three original services succeed. Independent2.635s publication review closes
-18:28:08.346 with55 completion artifacts. Root
-`/x/Temp/kindle-breakout-dynamics-scale3-20261104/full` is closed, with no active
-GPU allocation at review. Do not restart its learner or collectors; check live
-state before work. The original864/90%-two-wall gate and five-game goal remain
+Require8,192 actions/489 updates within180s,then1,024 frozen actions/zero updates,
+exact357 initial/invariant tensors,full guided replay and guards. Padded200k
+projection must fit30min before a separate full learner may be selected. Retain
+all other12M64/Auto/N8/B16/T16/H15/R16/expert100 settings,seed1009 and the
+143.667 greedy/70.750 sampled baseline. No experience reuse,discount sweep,
+extension or automatic successor. Root
+`/x/Temp/kindle-breakout-discount100-20261104`;service
+`kindle-breakout-discount100-check-20261104`. Prepared for launch;check live
+identity before work. Original864/90%-two-wall and the five-game goal remain
 unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)

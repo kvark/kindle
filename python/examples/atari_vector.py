@@ -116,6 +116,8 @@ def main():
     parser.add_argument("--world-microbatch-size", type=int)
     parser.add_argument("--imagination-length", type=int,
                         help="fresh imagined rollout steps; omitted: native default, restore keeps checkpoint length")
+    parser.add_argument("--discount-horizon", type=int,
+                        help="fresh training: return discount is 1-1/horizon; distinct from imagination length")
     parser.add_argument("--open-loop-length", type=int,
                         help="optional CDP world supervision from one replay start, without future observations")
     parser.add_argument("--open-loop-scale", type=float,
@@ -231,6 +233,11 @@ def main():
             parser.error("terminal-replay-fraction requires fresh non-video training")
     if not positive_f32(args.learning_rate):
         parser.error("learning-rate must be finite and positive in F32")
+    if args.discount_horizon is not None:
+        if not 1 < args.discount_horizon < 2**25 - 1:
+            parser.error("discount-horizon must be between 2 and 33554430 for a nondegenerate F32 discount")
+        if args.evaluate:
+            parser.error("discount-horizon requires fresh training")
     if args.replay_value_scale is not None:
         if not positive_f32(args.replay_value_scale):
             parser.error("replay-value-scale must be finite and positive in F32")
@@ -448,6 +455,7 @@ def main():
     training_options.add("--continuation-scale")
     training_options.add("--representation-scale")
     training_options.add("--dynamics-scale")
+    training_options.add("--discount-horizon")
     training_options.add("--terminal-continuation-weight")
     training_options.add("--prior-continuation-scale")
     training_options.add("--replay-actor-scale")
@@ -648,6 +656,8 @@ def main():
                       learning_rate_warmup=1000, agc=0.3)
         if args.imagination_length is not None:
             config["imagination_length"] = args.imagination_length
+        if args.discount_horizon is not None:
+            config["horizon"] = args.discount_horizon
         if args.replay_context is not None:
             config["replay_context"] = args.replay_context
         if args.terminal_replay_fraction is not None:
