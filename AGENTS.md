@@ -20,24 +20,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [fresh encoder8e-5/current-critic comparison](docs/experiments/2026-11-04-cdp-breakout-value1-encoder8e5-200k.md) is selected for
-200k actions/12,477 updates under30min, with100k/6227 recovery and final/actual-
-initial greedy/sampled24-episode arms. Only encoder4e-5→8e-5 changes; keep the
-retained single-image12M64/Auto/N8/B16/T16/H15/R16/expert100/behavior8e-5/value1
-recipe, native447fe50/runnercf4ea238 and teacher fixed. Earlier greedy benefit
-under behavior4e-5/value.3 may not transfer; no gameplay result is available.
+The [fresh encoder8e-5/current-critic comparison](docs/experiments/2026-11-04-cdp-breakout-value1-encoder8e5-200k.md) launches00:19:16 UTC
+November4/source6543be61 with120 pins. Fresh200k actions/12,477 updates under
+30min, with100k/6227 recovery and final/actual-initial greedy/sampled24-episode
+arms. Only encoder4e-5→8e-5 changes; keep retained single-image12M64/Auto/N8/
+B16/T16/H15/R16/expert100/behavior8e-5/value1, native447fe50/runnercf4ea238 and
+teacher fixed. Startup passes357 control/bounded-matching initial tensors,
+47 pre-update events and first update376. MainPID1091232/invocation
+`0dd5518ac0c94b879959da7818f66c36`; recovery and terminal observers are active.
+No full frozen result is available. Earlier benefit under behavior4e-5/value.3
+may not transfer; retain143.667 greedy/70.750 sampled pending the comparison.
 
 The [bounded check](docs/results/2026-11-04-cdp-breakout-value1-encoder8e5.md) closes8192 actions/32,722 frames/489 updates in
 48.178s, padded200k projection21m33.842s. Frozen1024/.920s haszero updates/no
-episodes. All56 current/338 retained inputs,357 matching initial/invariant
-frozen tensors,47 pre-update events, full replay and guards pass. Main/collector
-succeed00:15:09/00:15:13 UTC November4/source507b773d; no failure or repeat.
-Full helper qualification passes3.245s, including actual comparison entry and
-corrupted headers; no native module is loaded. Root
-`/x/Temp/kindle-breakout-value1-encoder8e5-20261104/full`, service
-`kindle-breakout-value1-encoder8e5-200k-20261104`. Check live state before work;
-no overlapping learner, extension or automatic successor. Retain143.667 greedy/
-70.750 sampled; original864/90%-two-wall and five-game goal remain unfinished.
+episodes. All56 current/338 retained inputs, initial/frozen tensors, full replay
+and guards pass. Main/collector succeed00:15:09/00:15:13/source507b773d withno
+stage failure or repeat. Full helpers pass3.245s. The original CPU queue
+preflight fails on its mocked-guidance count after correctly rejecting a wrong
+encoder rate; separate.525s fixture correction passes before the sole GPU launch.
+Original source/declaration/failure stay preserved; no successful stage repeats.
+
+Root`/x/Temp/kindle-breakout-value1-encoder8e5-20261104/full`, service
+`kindle-breakout-value1-encoder8e5-200k-20261104`. Check live identity; do not
+restart this learner or run another GPU allocation while it is active.
+No extension or automatic successor isselected. The original864/90%-two-wall
+and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

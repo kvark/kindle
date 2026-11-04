@@ -40,3 +40,27 @@ greedy initial-subtracted return per training minute, with sampled outcomes
 and the original864/90%-two-wall gate also reported. No bounded experience
 transfers. Reused1009/cohort cannot establish independent reliability; the
 five-game goal remains unfinished.
+
+## Fresh full comparison is running
+
+The separate200k comparison launches00:19:16.636 UTC November4/source6543be61,
+mainPID1091232/invocation`0dd5518ac0c94b879959da7818f66c36`, with120 fixed inputs.
+Startup confirms357 matching control/bounded initial tensors,47 paired
+pre-update semantic events and first update376. Its.375s CPU check co-hosts
+with learning and remains in measured wall time. Original recovery and terminal
+observers are active. No full frozen result or gameplay improvement is yet known.
+Root`/x/Temp/kindle-breakout-value1-encoder8e5-20261104/full` must not restart.
+
+Full helper qualification passes3.245s. The original queue preflight fails
+before GPU work: its wrong-rate CLI fixture correctly rejects at the native
+configuration boundary after constructing a second mocked guidance object,
+while the copied assertion expects one. The original preflight source,
+declaration, stderr and exit1 remain unchanged. Separate`preflight_repaired.py`
+expects two matching mocked guidance objects; all five actual commands and
+three wrong-command/four replay-input cases pass in.525s (.620s wrapper),
+withzero real native agents/emulators/GPU descriptors. No successful helper
+stage repeats. `preflight-repair-declaration.json` and
+`preflight-repair-review.json` pin original failure and corrected CPU source;
+`launch_qualified.py` verifies them before the sole launch. Original120 runtime
+pins stay unchanged. This CPU fixture correction changes no production source,
+command, model, cap or evaluation rule.
