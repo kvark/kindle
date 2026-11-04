@@ -1,21 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The optional [terminal replay mixture](../experiments/2026-11-04-cdp-breakout-terminal-mixture.md) is implemented and under CPU/package
-qualification. It preserves fresh-sequence priority, then selects25% of remaining
+The optional [terminal replay mixture](../experiments/2026-11-04-cdp-breakout-terminal-mixture.md) is implemented and packaged. It preserves fresh-sequence priority, then selects25% of remaining
 sequences uniformly from valid windows containing a true terminal in training
 rows. Default off; continuation scale1 and all existing targets stay fixed.
 It changes every objective's sampling distribution without importance correction;
 no calibrated-probability or gameplay gain is claimed. Reports record actual
 routes and terminal rows, checked against continuation targets.
 
-All177 Rust library/5 gym CPU tests pass, including six sampler/config tests.
-The source Python run passes567 checks, including22 new checks, but two existing
-bootstrap tests fail because the checkout imports the older native default config.
-That failure is preserved; validate against the newly packaged runtime without
-weakening the tests. Native build, strict Clippy and packaged Python checks are
-next. No GPU work or learner has started. Root
-`/x/Temp/kindle-terminal-replay-20261104`; the bounded protocol requires default-off
-frozen compatibility, then8192-action learning/frozen/audits before any full learner.
+All177 Rust library/5 gym CPU tests, strict workspace/binding Clippy and1028
+packaged Python checks pass, including six new Rust/22 Python checks. The initial
+source Python run's two bootstrap failures remain preserved: it imported the
+older native default config. Both pass against the matching package without test
+changes. Native source2b5a3eea/SHA5ce1b443 is packaged at
+`/x/Temp/kindle-terminal-replay-20261104/runtime`; source/wheel/test receipts remain.
+
+Actual three-command preflight passes in.974s with zero agent/emulator construction,
+357 schema tensors,47 retained initial events and338 retained pins. Select the
+fixed bounded default-off frozen compatibility, then8192-action/489-update learner
+and1024 frozen actions with full audits. Root
+`/x/Temp/kindle-terminal-replay-20261104/bounded`; service
+`kindle-breakout-terminal-mixture-check-20261104`. Launch is pending. No full
+learner is selected; require the original cost and evidence gates first.
 
 Retain70.750 sampled/143.667 greedy and the original864/90%-two-wall gate.
 No full learner, extension or sweep is selected. The five-game goal is unfinished.
