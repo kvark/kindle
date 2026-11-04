@@ -8,27 +8,30 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [terminal-mixture arrival diagnostic](experiments/2026-11-04-cdp-breakout-terminal-mixture-arrivals.md) is selected after the closed
-200k mixture raises ending exposure9.43× but lowers greedy143.667→85.250.
-One frozen candidate capture will reuse the existing120-endpoint cohort/control:
-24 game endings and96 intermediate life losses,43,424 actions/173,660 frames.
-Compare the candidate's own continuation head before/after observing each arrival;
-primary is paired observed-terminal MSE, with fixed lane bootstrap. The gameplay
-decision stays unchanged: retain the existing sampler and continuation1.
+The [completed terminal-mixture arrival diagnostic](results/2026-11-04-cdp-breakout-terminal-mixture-arrivals.md) finds a tradeoff:
+terminal posterior MSE falls .644558→.252775, paired interval[−.506700,−.274697],
+and below-.5 predictions rise5/24→17/24. Terminal prior mean falls .952850→.512441.
+But intermediate-life prior MSE rises .001530→.170491, interval[.106436,.241616],
+with21/96 below.5 versus0/96; posterior error also worsens. This selected cohort
+shows better terminal recognition alongside more false ending indications, not
+population calibration or a causal explanation for weaker gameplay.
 
-Sixteen CPU checks pass and2.375s preflight verifies634 control/343 candidate pins,
-all endpoint joins, exact config/native identities and zero native-agent/emulator
-construction. Use qualified2b5a3eea/SHA5ce1b443; no rebuild or new learner. Native
-sources differ from447fe50, and this selected cohort does not measure population
-calibration or isolate a sampler/head cause. Require357 invariant tensors, zero
-updates, exact pixel/transition parity,120 repeated queries and F64/native checks.
+Retain the existing sampler/continuation1 and70.750 sampled/143.667 greedy;
+the completed mixture remains65.708/85.250, all0/24 two-wall. Distinguishing lost
+lives from game endings is the next diagnostic question. No new learner, loss,
+threshold, mixture setting or automatic successor is selected.
 
-Root`/x/Temp/kindle-terminal-mixture-arrivals-20261104`;service
-`kindle-breakout-terminal-mixture-arrivals-20261104`. One180s guarded capture,
-60s CPU analysis and300s main cap; independent closure follows. Preparation is
-complete; check live state before launch or other GPU work. No completed stage
-may repeat and no automatic successor is selected. The original864/90%-two-wall
-and five-game goal remain unfinished.
+The51.327s frozen candidate-only capture completes43,424 actions/173,660 frames,
+zero updates. Sixteen CPU tests,1,052 pins,357 invariant tensors,120 exact endpoint/
+repeated-query checks, full pixel/transition parity and guards pass. F64/native
+prior error≤2.104e-7; posterior outputs remain reference estimates. Source6dda986d;
+main succeeds05:53:02 UTC November4, independent4.265s closure05:53:33 with52
+artifacts. No failure, repair or completed-stage repeat occurs.
+
+Root`/x/Temp/kindle-terminal-mixture-arrivals-20261104` is closed. No learner or
+GPU allocation is active. Do not repeat its capture, analysis or closure; check
+live state before future work. Native2b5a3eea differs from control447fe50 and the
+cohort is reused. Original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

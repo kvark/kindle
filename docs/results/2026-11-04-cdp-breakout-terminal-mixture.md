@@ -62,8 +62,10 @@ without endings, versus .1034% and 76.352% retained.
 Late expert-label cross entropy falls .560514→.480124 on each learner's own
 replay, without a frozen gameplay gain. The mixture changes the data distribution
 for **all** objectives without importance correction; it does not isolate the
-continuation head. This comparison does not measure matched frozen terminal
-calibration or establish that the actor's ending predictions improved.
+continuation head. The subsequent [matched frozen arrival diagnostic](2026-11-04-cdp-breakout-terminal-mixture-arrivals.md)
+finds lower terminal posterior MSE.644558→.252775, but higher intermediate-life
+prior MSE.001530→.170491. This selected-cohort tradeoff does not establish population
+calibration or explain the gameplay regression.
 
 Actual overrides are 91,453/200,000 actions (45.7265%), versus 43.0585% retained.
 The 55 completed episodes with teacher actions average 210.218; 204 without
