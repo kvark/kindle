@@ -1,5 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [latent-unimix.001 bounded check](2026-11-04-cdp-breakout-latent-unimix001.md) passes8,192 actions/32,725 frames/
+489 updates in46.880s, projecting20m58.976s conservatively for200k. Frozen1,024
+haszero updates/no natural episodes. All81 current/338 retained pins,357
+matching initial/invariant frozen tensors,47 paired initial events,finite
+reports,full replay and guards pass. Main/collector succeed20:15:10.517/
+20:15:17.166 UTC November4/source480e87df. CLI F32-validation failures and a
+separate terminal stdout manifest repair remain preserved; no completed stage
+repeats. A separately selected fresh200k comparison is being prepared, with
+100k recovery and four actual-initial/final assessments. Only latent uniform
+mixing.01→.001 changes; sampled states and actor-unimix.01 remain. This changes
+prior/posterior sampling, KL, derivatives and experience together. No gameplay
+benefit is established. Retain143.667/70.750 and the original864/90% gate.
+Root`/x/Temp/kindle-breakout-latent-unimix001-20261104/full`; check live state.
+The five-game goal remains unfinished.
+
 The [saved corrective-label timing audit](2026-11-04-cdp-breakout-label-timing.md) finds the retained learner's
 late sampled actions align best with current labels: **52.73%**, versus43.02%
 with preceding labels, on24,998 identical unaided directional windows. All

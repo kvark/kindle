@@ -20,32 +20,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed corrective-label timing audit](docs/results/2026-11-04-cdp-breakout-label-timing.md) finds late sampled
-collection agrees best with the current teacher command: **52.73%**, versus
-43.02% for the preceding command, on 24,998 identical unaided directional
-windows. Every tested shift from −4 through +4, excluding zero, lowers agreement
-in all eight lanes. Current-command switches also favor zero offset. This does
-not support a simple fixed-delay explanation; it does not identify the remaining
-perception, memory, optimization or teacher-quality limitation.
+The [lower categorical-mixing check](docs/results/2026-11-04-cdp-breakout-latent-unimix001.md) passes8,192 actions /32,725 frames /
+489 updates in **46.880s**. Its conservative200k projection is20m58.976s,
+within30min. Frozen1,024 actions take.875s withzero updates/no natural episodes.
+All81 current/338 retained pins,357 matching initial/invariant frozen tensors,
+47 paired initial events,finite weighted reports,full replay and guards pass.
+Main/collector succeed20:15:10.517/20:15:17.166 UTC November4/source480e87df.
+Original CLI validation failures and the separate terminal stdout manifest
+repair remain preserved; no completed GPU or collector stage repeats.
 
-The exact native447fe50/runnercf4ea238 source review finds no off-by-one mismatch
-in the inspected corrective-label path. Training-policy associations are not
-frozen gameplay or causal latency. Retain B16/T16 and frozen greedy143.667 /
-sampled70.750; no label shift, teacher change, learner or automatic successor.
+A [fresh200k comparison](docs/experiments/2026-11-04-cdp-breakout-latent-unimix001-200k.md) is separately selected and being prepared.
+Only native latent `unimix` .01→.001 changes; actor-unimix.01 and sampled states
+remain. This affects posterior/prior sampling, KL, derivatives and experience;
+no isolated perception or gameplay claim. Reuse native447fe50/SHA35ad0db and
+runner4070a0b8. Require100k/6227 recovery and final/actual-initial sampled/greedy
+24-episode assessments. Initial trajectories may differ after mixing changes.
+Retain143.667/70.750 until full evidence; original864/90% remains unfinished.
 
-Eight CPU fixtures, all18 input hashes, complete200k-action/799,595-frame
-accounting and an independent recount of52,477 anchors/54 group-offset results
-pass. Analysis completes20:02:57.209 UTC November4 in1.067s; recount closes
-20:03:15.242 in1.198s, source185e3180. No failure, completed-stage repeat,
-emulator action, native import, GPU work or learning update occurs. Root
-`/x/Temp/kindle-breakout-label-timing-20261104` is closed; do not rerun.
-
-The preceding [B32/T16 learner](docs/results/2026-11-04-cdp-breakout-batch32.md#full-200k-comparison) trained9.87% faster but lowered greedy
-143.667→73.333 and sampled70.750→47.750; retain B16/T16. Its original learner,
-recovery and collector are terminal success. No batch/rate compensation sweep
-or restart is selected. No Kindle service is active at this review; check live
-state before separately selected work. Original864/90%-two-wall and the five-game
-goal remain unfinished.
+Root`/x/Temp/kindle-breakout-latent-unimix001-20261104/full`; service
+`kindle-breakout-latent-unimix001-200k-20261104`. Check live identity before work;
+no overlapping GPU allocation or repeat of the completed bounded check. No full
+outcome exists yet. The five-game goal remains active and unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
