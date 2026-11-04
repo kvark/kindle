@@ -1,5 +1,34 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [bounded one-point catch-reward check](2026-11-04-cdp-breakout-catch-reward1.md)
+passes8,192 actions/32,725 frames/489 updates in47.580s;frozen1,024 actions/
+4,096 frames/.897s has zero updates,357 invariant tensors and no natural
+completed episodes. Independent replay verifies139 catches:raw reward189,
+training reward328. The padded200k projection21m17.777s passes30min;execution
+and early cost do not establish gameplay benefit or a speed improvement.
+
+All405 current/338 retained pins,357 matching initial tensors,47 shared pre-update
+events,finite losses,changed CNN/reward/continuation/actor/value,full training
+pixel/action/label/catch/reward replay,frozen outcome replay and guards pass.
+All18 CPU fixtures and43,392 saved arrivals pass;default-off accounting exactly
+matches the retained200k log. Original test import-path and old-report field
+lookup failures remain preserved;separate repairs repeat no completed checks.
+Native447fe50/SHA35ad0db and teacher unchanged;private runner25327009.
+
+Main/collector succeed16:35:56.085/16:36:07.631 UTC November4/source69b14f45.
+Separate3.713s review closes16:36:31.546 with47 artifacts. Both original services
+are terminal;no GPU stage or original collector fails/repeats. Root
+`/x/Temp/kindle-breakout-catch-reward1-20261104` is closed;do not repeat the check.
+
+Select one [fresh200k catch-reward comparison](../experiments/2026-11-04-cdp-breakout-catch-reward1-200k.md) after this cost pass.
+Preparation is pending;no full learner or GPU allocation is active yet. Use the
+exact qualified overlay,30-minute cap,100k/6,227 recovery and four actual-initial/
+final sampled/greedy24-episode assessments. Primary greedy raw score and
+initial-subtracted gain/min must improve with a positive paired interval.
+No bounded experience transfer,coefficient sweep,extension or automatic successor.
+Check live state before launch. Retain143.667 greedy/70.750 sampled;original
+864/90%-two-wall and the five-game goal remain unfinished.
+
 The [completed raw-motion catch validation](2026-11-04-cdp-breakout-catch-validation.md)
 finds unique near-paddle reversals for all1,476 teacher and1,132 retained-policy
 signals,including all700 previously unresolved teacher detections. All arrivals

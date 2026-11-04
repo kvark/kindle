@@ -20,31 +20,34 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed raw-motion catch validation](docs/results/2026-11-04-cdp-breakout-catch-validation.md)
-finds unique near-paddle reversals for all1,476 teacher and1,132 retained-policy
-signals,including all700 previously unresolved teacher detections. All arrivals
-have zero raw reward;neither cohort has a signal within16 raw frames of its120
-selected life losses or in the first eight episode decisions. Spatial support
-is1,294/1,476 and961/1,132. A separate post-hoc reader finds all182/171 exclusions
-involve crop-edge paddle components;the fixed matching rule is unchanged.
-Pixel witnesses do not establish exact collision truth or gameplay benefit.
+The [bounded one-point catch-reward check](docs/results/2026-11-04-cdp-breakout-catch-reward1.md)
+passes8,192 actions/32,725 frames/489 updates in47.580s;frozen1,024 actions/
+4,096 frames/.897s has zero updates,357 invariant tensors and no natural
+completed episodes. Independent replay verifies139 catches:raw reward189,
+training reward328. The padded200k projection21m17.777s passes30min;execution
+and early cost do not establish gameplay benefit or a speed improvement.
 
-One instrumented CPU replay reproduces43,424 retained-policy actions/173,660
-frames,including all prior pixel/action/reward/boundary records,in44.848s.
-Analysis/recount take1.405/.481s;controller46.947s completes16:19:04.097 UTC
-November4/sourcee012286e. All12 new fixtures,16 retained detector fixtures,
-58 unchanged pins and14 completion artifacts pass. The separate.099s exclusion
-reader completes16:20:33.403. No failure,repair,repeated completed stage,native
-import,learner update or GPU work occurs. Root
-`/x/Temp/kindle-breakout-catch-validation-20261104` is closed;check live state.
+All405 current/338 retained pins,357 matching initial tensors,47 shared pre-update
+events,finite losses,changed CNN/reward/continuation/actor/value,full training
+pixel/action/label/catch/reward replay,frozen outcome replay and guards pass.
+All18 CPU fixtures and43,392 saved arrivals pass;default-off accounting exactly
+matches the retained200k log. Original test import-path and old-report field
+lookup failures remain preserved;separate repairs repeat no completed checks.
+Native447fe50/SHA35ad0db and teacher unchanged;private runner25327009.
 
-Next selected development is the [bounded one-point catch-reward check](docs/experiments/2026-11-04-cdp-breakout-catch-reward1-check.md).
-Implementation and CPU qualification are pending,followed by one fresh8,192-action
-check and1,024 frozen actions. Default off;training-only explicit pixel reward;
-raw game scores and all frozen assessments remain unaided. Native447fe50 and
-teacher unchanged. No full learner,extension,coefficient sweep or automatic
-successor. No GPU allocation is active at selection. Retain143.667 greedy/
-70.750 sampled;original864/90%-two-wall and the five-game goal remain unfinished.
+Main/collector succeed16:35:56.085/16:36:07.631 UTC November4/source69b14f45.
+Separate3.713s review closes16:36:31.546 with47 artifacts. Both original services
+are terminal;no GPU stage or original collector fails/repeats. Root
+`/x/Temp/kindle-breakout-catch-reward1-20261104` is closed;do not repeat the check.
+
+Select one [fresh200k catch-reward comparison](docs/experiments/2026-11-04-cdp-breakout-catch-reward1-200k.md) after this cost pass.
+Preparation is pending;no full learner or GPU allocation is active yet. Use the
+exact qualified overlay,30-minute cap,100k/6,227 recovery and four actual-initial/
+final sampled/greedy24-episode assessments. Primary greedy raw score and
+initial-subtracted gain/min must improve with a positive paired interval.
+No bounded experience transfer,coefficient sweep,extension or automatic successor.
+Check live state before launch. Retain143.667 greedy/70.750 sampled;original
+864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
