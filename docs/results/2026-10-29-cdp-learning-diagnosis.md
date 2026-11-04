@@ -1,5 +1,30 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [bounded representation-KL check](2026-11-04-cdp-breakout-representation001.md)
+changes only posterior KL scale0.1→0.01 and passes8,192 actions/32,719 frames/
+489 updates in47.300s, versus retained47.690s. Conservative200k projection
+21m10.262s passes30min; gameplay benefit is unmeasured. Frozen1,024 actions/.872s
+has zero updates,357 invariant tensors and no completed natural episodes.
+
+All706 current/338 retained pins,357 matching initial tensors,47 pre-update
+semantic events,489 finite weighted-loss reports,full pixel/action/label replay
+and guards pass. Original canonical CPU fixture has34 passes/one unsupported
+flag-spelling failure; its source/receipt remain preserved. Only that failed
+fixture is repaired; all35 packaged cases and preflight pass. Production source
+is unchanged by the repair; no GPU or completed audit stage repeats.
+
+Main/collector succeed09:04:06/09:04:18 UTC November4/sourceae529140. Independent
+6.424s CPU closure completes09:04:41, verifying89 artifacts; the saved-report
+summary takes.025s. Raw KL mean rises2.687→3.942 while early expert CE is nearly
+unchanged; own-replay fitting is not gameplay evidence. Native447fe50/runtime
+unchanged. Root`/x/Temp/kindle-breakout-representation001-20261104` is closed.
+No GPU allocation is active at closure; check live state before work.
+
+No full learner,extension,sweep or automatic successor is selected. Retain
+143.667 greedy/70.750 sampled,all0/24 two-wall. Any full comparison requires
+fresh experience,100k recovery and four24-episode frozen arms. Original864/90%
+and the full five-game goal remain unfinished.
+
 The [matched prior-continuation arrival diagnostic](2026-11-04-cdp-breakout-prior-continuation-arrivals.md)
 finds true-ending prior MSE.911006→.162000, all24 errors lower, but intermediate-life
 MSE.001530→.178824 and false below-.5 predictions0→29/96. Prior AUC.791667→.807726

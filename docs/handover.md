@@ -8,30 +8,30 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 4
 
-The [matched prior-continuation arrival diagnostic](results/2026-11-04-cdp-breakout-prior-continuation-arrivals.md)
-finds true-ending prior MSE.911006→.162000, all24 errors lower, but intermediate-life
-MSE.001530→.178824 and false below-.5 predictions0→29/96. Prior AUC.791667→.807726
-has difference+.016059 with paired lane95% interval[−.107216,.132389]; no improved
-discrimination or equivalence is established. Posterior errors show the same
-tradeoff. The fixed control-policy life-loss cohort does not establish population
-calibration or explain the sampled/greedy gameplay gap causally.
+The [bounded representation-KL check](results/2026-11-04-cdp-breakout-representation001.md)
+changes only posterior KL scale0.1→0.01 and passes8,192 actions/32,719 frames/
+489 updates in47.300s, versus retained47.690s. Conservative200k projection
+21m10.262s passes30min; gameplay benefit is unmeasured. Frozen1,024 actions/.872s
+has zero updates,357 invariant tensors and no completed natural episodes.
 
-One50.803s capture re-observes43,424 actions/173,660 frames with zero updates and357
-invariant tensors. All19 CPU checks,1,108 pins,120 joins/repeated queries,full
-pixel/action/reward/frame/reset replay and guards pass. F64/native prior error
-is at most1.697e−7. Analysis takes.329s; independent4.353s CPU closure verifies
-head arithmetic,4,608 ranking pairs and intervals. Original service succeeds
-08:40:44.594 UTC November4/sourcece299c0e; closure completes08:41:29.381.
-A subsequent outer display KeyError is preserved; separate.107s saved-result
-reader completes08:42:31.075, verifies55 artifacts and repeats no capture,
-analysis or closure stage. Original closure stays passed.
+All706 current/338 retained pins,357 matching initial tensors,47 pre-update
+semantic events,489 finite weighted-loss reports,full pixel/action/label replay
+and guards pass. Original canonical CPU fixture has34 passes/one unsupported
+flag-spelling failure; its source/receipt remain preserved. Only that failed
+fixture is repaired; all35 packaged cases and preflight pass. Production source
+is unchanged by the repair; no GPU or completed audit stage repeats.
 
-Root`/x/Temp/kindle-prior-continuation-arrivals-20261104` is closed; native07873e7c,
-runtime and source checkpoint remain unchanged. Retain143.667 greedy/70.750
-sampled over prior-loss147.625/49.167, whose locked improvement rule failed;
-all0/24 two-wall. No GPU allocation is active at closure; check live state.
-No new learner,extension,sweep or automatic successor is selected.
-Original864/90%-two-wall and the full five-game goal remain unfinished.
+Main/collector succeed09:04:06/09:04:18 UTC November4/sourceae529140. Independent
+6.424s CPU closure completes09:04:41, verifying89 artifacts; the saved-report
+summary takes.025s. Raw KL mean rises2.687→3.942 while early expert CE is nearly
+unchanged; own-replay fitting is not gameplay evidence. Native447fe50/runtime
+unchanged. Root`/x/Temp/kindle-breakout-representation001-20261104` is closed.
+No GPU allocation is active at closure; check live state before work.
+
+No full learner,extension,sweep or automatic successor is selected. Retain
+143.667 greedy/70.750 sampled,all0/24 two-wall. Any full comparison requires
+fresh experience,100k recovery and four24-episode frozen arms. Original864/90%
+and the full five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
