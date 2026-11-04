@@ -1,5 +1,32 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fresh200k representation-KL comparison](../experiments/2026-11-04-cdp-breakout-representation001-200k.md)
+starts09:14:08 UTC November4/sourceca33c9fd after the completed bounded check.
+Change only posterior KL scale0.1→0.01; keep native447fe50/runtime and retained
+CDP12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 settings fixed. Train
+200k actions/12,477 updates within30min,then final/actual-initial sampled/greedy
+24-episode assessments against retained143.667 greedy/70.750 sampled. Greedy
+return and gain/min with paired lane interval determine development preference;
+original864/90%-two-wall gate remains unchanged.
+
+All774 launch pins and five queued-command checks pass. Startup verifies357
+matching initial tensors,47 pre-update events and first update376. At09:15:01,
+the original learner is active through8,216 actions/490 updates. MainPID1152865,
+invocation`80605bcd9c744663bf4ee9f4e0cb82f5`; unit
+`kindle-breakout-representation001-200k-20261104`. Recovery and terminal
+observers are active. Root`/x/Temp/kindle-breakout-representation001-20261104/full`.
+No full frozen result exists. Do not restart this learner or schedule another
+GPU job while it is active; check actual service/process state.
+
+Full CPU helper qualification preserves an exact-float sum assertion failure
+(max difference9.095e-13); a tolerance repair resumes only unfinished checks.
+Original failure/source and successful repair remain pinned. The earlier bounded
+CPU fixture spelling failure also remains; no completed GPU stage repeats.
+Startup observer.327s and read-only live observation.023s remain included without
+time correction. Require100k/6,227 recovery and all four frozen assessments.
+No extension,second learner,sweep or automatic successor is selected.
+The five-game goal remains unfinished.
+
 The [bounded representation-KL check](2026-11-04-cdp-breakout-representation001.md)
 changes only posterior KL scale0.1→0.01 and passes8,192 actions/32,719 frames/
 489 updates in47.300s, versus retained47.690s. Conservative200k projection
