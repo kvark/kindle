@@ -20,34 +20,32 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [selected CPU teacher-takeover comparison](docs/experiments/2026-11-04-cdp-breakout-command-takeovers.md) tests the saved command-
-dependent paddle predictor on the retained143.667-point policy's life-loss states.
-Its older fresh full-game teacher screen remains failed; this is a new paired
-intervention question, withno coefficient change, learner or teacher promotion.
+The [completed CPU teacher-takeover comparison](docs/results/2026-11-04-cdp-breakout-command-takeovers.md) finds32-action survival
+84/120 with the existing teacher versus79/120 with the saved command-dependent
+predictor. Net−5 rescues (−4.17 percentage points), onlytwo improved lanes, fails
+the fixed12-net/five-lane screen. Retain the existing teacher; no integration,
+coefficient/window retry or learner isselected. Its older fresh full-game screen
+remains failed. This outcome-conditioned student-state test is not a full-game
+score, seed-reliability claim or causal architecture diagnosis.
 
-One annotation replay fixes every loss in the first24 natural episodes; each
-origin is eight decisions before that loss, bounded by the current life start.
-From identical copied states, both teachers act for32 decisions, stopping at
-life loss or terminal. Require at least10 percentage points more survival and
-improvement in five lanes. Exact recorded branches, reverse-order checks and
-parent-state/pixel/action/reward/frame/life replay guard the comparison.
+The existing teacher avoids the original loss endpoint in92/120 cases, candidate
+89/120; both survive32 decisions in67, existing-only17, candidate-only12, neither24.
+All120 origins,240 teacher/120 recorded branches, eight reverse-order checks,
+full43,424-action/173,660-frame source replays and independent recount pass.
+Policies receive pixels/executed commands only; no life-count input or GPU work.
 
-All12 CPU fixtures pass, including feedback history, origin selection, horizon/
-decision checks and real ALE process-copy parity. Preflight takes3.188s with468
-pins, no native import or GPU work. The original controller exits1 before any
-emulator/data stage: its cohort import pulls a newer runner into the preserved
-runtime, which lacks that runner's return-boundary module. Keep the original
-.100s failure and1.415s execution unchanged; no replay was started.
+Annotation20.830s andbranch47.276s complete under the fixed caps. Corrected
+controller succeeds01:24:46 UTC November4/source16ddeae1; separate1.406s recount
+andclosure complete01:25:18. All470 original/490 repair pins pass. The original
+pre-replay import failure remains; exact cohort extraction passesfour repair
+checks and changes no policy, method or cap. Closure`complete_with_cpu_import_repair`;
+original controller stays failed, withno completed-stage repeat.
 
-Separate`cpu-import-repair` extracts the exact unchanged cohort function and
-replaces only the private analysis import. Four repair checks pass in2.831s,
-including the actual annotation entrypoint stopped before game construction;
-all470 original and488 repair inputs pass. No coefficient, selection rule,
-cap or production source changes. Both replay stages remain capped120s/300s;
-no completed stage repeats. Root`/x/Temp/kindle-breakout-command-takeovers-20261104`.
-The original controller remains failed; the repair has no result yet. No GPU
-allocation or learner isselected. The existing sampled-posterior recipe,
-original864/90%-two-wall gate and five-game goal remain unchanged andunfinished.
+Root`/x/Temp/kindle-breakout-command-takeovers-20261104/cpu-import-repair` isclosed.
+No learner or GPU allocation isactive. Existing supervision still rescues many
+current-policy failures; how to turn it into stable learned control remains open.
+No automatic successor isselected. Check live state before future work. The
+original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
