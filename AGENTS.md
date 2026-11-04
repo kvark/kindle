@@ -20,26 +20,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [CPU-only catch-signal diagnostic](docs/results/2026-11-04-cdp-breakout-catch-signal.md)
-finds a fixed causal pooled-pixel detector matches all776 fitted contact
-candidates,including674 accepted-error fits,in24 saved teacher episodes.
-It emits1,476 signals;700 have no neighbor in the filtered,incomplete reference
-and remain unresolved. Mean detection delay is5.550 raw frames;all1,476 arrivals
-have zero game reward. This is reference coverage,not detector precision,
-current-policy validation or evidence that a catch reward improves gameplay.
+The [completed raw-motion catch validation](docs/results/2026-11-04-cdp-breakout-catch-validation.md)
+finds unique near-paddle reversals for all1,476 teacher and1,132 retained-policy
+signals,including all700 previously unresolved teacher detections. All arrivals
+have zero raw reward;neither cohort has a signal within16 raw frames of its120
+selected life losses or in the first eight episode decisions. Spatial support
+is1,294/1,476 and961/1,132. A separate post-hoc reader finds all182/171 exclusions
+involve crop-edge paddle components;the fixed matching rule is unchanged.
+Pixel witnesses do not establish exact collision truth or gameplay benefit.
 
-All16 CPU fixtures,23 unchanged pins,prior evidence links and independent output
-recount pass. Analysis/recount take.435/.143s;controller.615s completes16:07:08.888
-UTC November4/sourceed155372,with18 completion artifacts. No failure,repair,
-repeated stage,ALE/native import,learner update or GPU work occurs. Root
-`/x/Temp/kindle-breakout-catch-signal-20261104` is closed;no running Kindle service
-is observed before or afterward. Check live state before any GPU work.
+One instrumented CPU replay reproduces43,424 retained-policy actions/173,660
+frames,including all prior pixel/action/reward/boundary records,in44.848s.
+Analysis/recount take1.405/.481s;controller46.947s completes16:19:04.097 UTC
+November4/sourcee012286e. All12 new fixtures,16 retained detector fixtures,
+58 unchanged pins and14 completion artifacts pass. The separate.099s exclusion
+reader completes16:20:33.403. No failure,repair,repeated completed stage,native
+import,learner update or GPU work occurs. Root
+`/x/Temp/kindle-breakout-catch-validation-20261104` is closed;check live state.
 
-No reward coefficient,training change or automatic successor is selected.
-Unmatched signals and current-policy misses/serves need validation before a
-training aid. Retain Breakout143.667 greedy/70.750 sampled and representation
-scale0.1 after the [lower-KL regression](docs/results/2026-11-04-cdp-breakout-representation001.md#full200k-comparison). Original864/90%-two-wall
-and the five-game goal remain unfinished.
+Next selected development is the [bounded one-point catch-reward check](docs/experiments/2026-11-04-cdp-breakout-catch-reward1-check.md).
+Implementation and CPU qualification are pending,followed by one fresh8,192-action
+check and1,024 frozen actions. Default off;training-only explicit pixel reward;
+raw game scores and all frozen assessments remain unaided. Native447fe50 and
+teacher unchanged. No full learner,extension,coefficient sweep or automatic
+successor. No GPU allocation is active at selection. Retain143.667 greedy/
+70.750 sampled;original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

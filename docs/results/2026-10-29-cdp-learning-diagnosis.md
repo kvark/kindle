@@ -1,5 +1,31 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [completed raw-motion catch validation](2026-11-04-cdp-breakout-catch-validation.md)
+finds unique near-paddle reversals for all1,476 teacher and1,132 retained-policy
+signals,including all700 previously unresolved teacher detections. All arrivals
+have zero raw reward;neither cohort has a signal within16 raw frames of its120
+selected life losses or in the first eight episode decisions. Spatial support
+is1,294/1,476 and961/1,132. A separate post-hoc reader finds all182/171 exclusions
+involve crop-edge paddle components;the fixed matching rule is unchanged.
+Pixel witnesses do not establish exact collision truth or gameplay benefit.
+
+One instrumented CPU replay reproduces43,424 retained-policy actions/173,660
+frames,including all prior pixel/action/reward/boundary records,in44.848s.
+Analysis/recount take1.405/.481s;controller46.947s completes16:19:04.097 UTC
+November4/sourcee012286e. All12 new fixtures,16 retained detector fixtures,
+58 unchanged pins and14 completion artifacts pass. The separate.099s exclusion
+reader completes16:20:33.403. No failure,repair,repeated completed stage,native
+import,learner update or GPU work occurs. Root
+`/x/Temp/kindle-breakout-catch-validation-20261104` is closed;check live state.
+
+Next selected development is the [bounded one-point catch-reward check](../experiments/2026-11-04-cdp-breakout-catch-reward1-check.md).
+Implementation and CPU qualification are pending,followed by one fresh8,192-action
+check and1,024 frozen actions. Default off;training-only explicit pixel reward;
+raw game scores and all frozen assessments remain unaided. Native447fe50 and
+teacher unchanged. No full learner,extension,coefficient sweep or automatic
+successor. No GPU allocation is active at selection. Retain143.667 greedy/
+70.750 sampled;original864/90%-two-wall and the five-game goal remain unfinished.
+
 The [CPU-only catch-signal diagnostic](2026-11-04-cdp-breakout-catch-signal.md)
 finds a fixed causal pooled-pixel detector matches all776 fitted contact
 candidates,including674 accepted-error fits,in24 saved teacher episodes.
