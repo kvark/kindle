@@ -1,5 +1,34 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fresh 200k catch-reward comparison](../experiments/2026-11-04-cdp-breakout-catch-reward1-200k.md) starts at
+16:51:43 UTC November 4, source `318591c9`. One fresh Breakout learner adds
++1 training point for each causal pixel-detected catch. Native configuration,
+teacher and the qualified runner stay fixed. Main PID **1164587**, invocation
+`873fae9edd444c15be0db8fcffa5812c`, is active; recovery and terminal observers
+are active. No final frozen result is available.
+
+All 473 declaration pins and five queued commands pass preflight. Startup
+matches all 357 initial tensors to both bounded and retained controls, plus
+47 pre-update events to each permitted comparison. At 16:52:28 UTC, the original
+process has reached 7,000 actions with 414 finite reports; first update is 376.
+The startup observer costs .310s and publication reader .022s on the CPU;
+retain co-host work in measured training time without correction.
+
+The [bounded check](2026-11-04-cdp-breakout-catch-reward1.md) remains closed: 8,192 actions /489 updates
+in 47.580s, with 139 replay-verified catches and a padded 200k projection of
+21m17.777s. Its original CPU preparation failures and repairs remain preserved.
+No bounded experience is reused. The full run has a 30-minute training cap,
+100k/6,227 recovery and four actual-initial/final sampled/greedy 24-episode
+assessments, with catch rewards, guidance and labels disabled in evaluation.
+
+Root `/x/Temp/kindle-breakout-catch-reward1-20261104/full`; service
+`kindle-breakout-catch-reward1-200k-20261104`. Do not restart this learner or
+schedule another GPU job while it is active. Primary greedy raw score and
+initial-subtracted gain/min must improve with a positive paired interval.
+Retain 143.667 greedy/70.750 sampled pending that decision. No extension,
+coefficient sweep or automatic successor. The original 864/90%-two-wall gate
+and five-game goal remain unfinished.
+
 The [bounded one-point catch-reward check](2026-11-04-cdp-breakout-catch-reward1.md)
 passes8,192 actions/32,725 frames/489 updates in47.580s;frozen1,024 actions/
 4,096 frames/.897s has zero updates,357 invariant tensors and no natural

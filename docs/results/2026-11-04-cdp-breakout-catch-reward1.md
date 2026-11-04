@@ -12,8 +12,9 @@ The fixed padded projection is **21m17.777s for200k actions**,below the30-minute
 cap. The retained bounded control takes47.690s; the small timing difference does
 not establish a speed improvement. Select one separately declared
 [fresh200k comparison](../experiments/2026-11-04-cdp-breakout-catch-reward1-200k.md)
-to measure raw frozen gameplay. Its preparation is pending;no full learner is
-active. Retain70.750 sampled/143.667 greedy until that comparison passes its rule.
+to measure raw frozen gameplay. It starts at16:51:43 UTC November4 and is
+currently training;see the full-run section below. Retain70.750 sampled/143.667
+greedy until that comparison passes its rule.
 The original864/90%-two-wall gate and the five-game goal remain unfinished.
 
 ## Intervention
@@ -95,13 +96,53 @@ timers do not isolate GPU kernels. The short check cannot establish long-run
 cost or competence,and a positive catch reward could favor rallies without
 better brick clearance. The full comparison keeps original raw-score gates.
 
+## Full 200k comparison: training in progress
+
+The selected fresh learner starts at **16:51:43 UTC November 4**, source
+`318591c9`, with all 473 declaration pins verified. Main PID1164587/invocation
+`873fae9edd444c15be0db8fcffa5812c`, collector PID1164590/invocation
+`b1ac122f67744881a163af11b53956ff`, and recovery observer PID1164593/invocation
+`6e074f4b87304631833165b2ddc2f8df` are active. The evidence root is the bounded
+root's `full/` directory; service `kindle-breakout-catch-reward1-200k-20261104`.
+No final frozen result is available; do not restart or overlap the allocation.
+
+CPU qualification passes full audit, exposure, comparison and terminal-state
+helpers in5.582s. Additional catch accounting checks reject seven corrupted
+catch/header/native-reward cases and independently recount all8,192 bounded
+actions:139 catches,raw189/shaped328. The actual plot environment reads the
+bounded raw-score curve successfully. All five exact queued commands reach
+mocked construction with the intended configuration; no native agent, emulator
+or GPU descriptor is created during preflight. Three altered training commands,
+four replay-path cases and11 comparison-header cases are rejected. Queue
+preflight takes2.301s,with no full-preparation failure or repeated GPU stage.
+
+Startup verifies all357 initial tensors against both controls and both47-event
+pre-update comparisons,permitting only the declared catch fields and extrinsic
+reward differences against the unshaped control. First update is376. A live
+publication reader at16:52:28 UTC verifies the original PID/invocation and414
+finite reports through7,000 actions. Startup observer .310s and publication
+reader .022s are CPU co-host work; no wall-time correction is applied.
+
+The independent observer will verify100k/6,227 recovery once. Training remains
+capped at1,800s for200k actions/12,477 updates,followed by complete training replay
+and four unaided actual-initial/final sampled/greedy assessments with raw scores.
+The locked greedy score/gain-per-minute/paired-interval rule and original
+864/90%-two-wall gate remain unchanged. No bounded experience transfer,
+extension,coefficient sweep,second learner or automatic successor is selected.
+
+Full declaration SHA256:
+`abc92ca53cea3f8de41e09f5a52cdc4938fac38c21cbf7d4f4bb5658b504f1ee`.
+Queue preflight SHA256:
+`c77fcfb9b4ca6ee1b83b14bcd5abb533c3074212684a56e9177eed07f603cd16`.
+Startup,launch,qualification and observer receipts remain under `full/`.
+
 ## Evidence
 
 Root `/x/Temp/kindle-breakout-catch-reward1-20261104` contains source-segment
 provenance,private runtime/diffs,CPU failures and repairs,commands,declaration,
 initial/final/frozen weights,logs,replays,guards and terminal reviews. Both
-services are terminal;no GPU allocation is active at closure. Check live state
-before the separately selected full comparison. Do not repeat this check.
+bounded services are terminal;no GPU allocation was active at bounded closure.
+The separate full comparison above is now active. Do not repeat this check.
 
 | Artifact | SHA256 |
 |---|---|

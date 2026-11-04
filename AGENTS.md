@@ -20,34 +20,34 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [bounded one-point catch-reward check](docs/results/2026-11-04-cdp-breakout-catch-reward1.md)
-passes8,192 actions/32,725 frames/489 updates in47.580s;frozen1,024 actions/
-4,096 frames/.897s has zero updates,357 invariant tensors and no natural
-completed episodes. Independent replay verifies139 catches:raw reward189,
-training reward328. The padded200k projection21m17.777s passes30min;execution
-and early cost do not establish gameplay benefit or a speed improvement.
+The [fresh 200k catch-reward comparison](docs/experiments/2026-11-04-cdp-breakout-catch-reward1-200k.md) starts at
+16:51:43 UTC November 4, source `318591c9`. One fresh Breakout learner adds
++1 training point for each causal pixel-detected catch. Native configuration,
+teacher and the qualified runner stay fixed. Main PID **1164587**, invocation
+`873fae9edd444c15be0db8fcffa5812c`, is active; recovery and terminal observers
+are active. No final frozen result is available.
 
-All405 current/338 retained pins,357 matching initial tensors,47 shared pre-update
-events,finite losses,changed CNN/reward/continuation/actor/value,full training
-pixel/action/label/catch/reward replay,frozen outcome replay and guards pass.
-All18 CPU fixtures and43,392 saved arrivals pass;default-off accounting exactly
-matches the retained200k log. Original test import-path and old-report field
-lookup failures remain preserved;separate repairs repeat no completed checks.
-Native447fe50/SHA35ad0db and teacher unchanged;private runner25327009.
+All 473 declaration pins and five queued commands pass preflight. Startup
+matches all 357 initial tensors to both bounded and retained controls, plus
+47 pre-update events to each permitted comparison. At 16:52:28 UTC, the original
+process has reached 7,000 actions with 414 finite reports; first update is 376.
+The startup observer costs .310s and publication reader .022s on the CPU;
+retain co-host work in measured training time without correction.
 
-Main/collector succeed16:35:56.085/16:36:07.631 UTC November4/source69b14f45.
-Separate3.713s review closes16:36:31.546 with47 artifacts. Both original services
-are terminal;no GPU stage or original collector fails/repeats. Root
-`/x/Temp/kindle-breakout-catch-reward1-20261104` is closed;do not repeat the check.
+The [bounded check](docs/results/2026-11-04-cdp-breakout-catch-reward1.md) remains closed: 8,192 actions /489 updates
+in 47.580s, with 139 replay-verified catches and a padded 200k projection of
+21m17.777s. Its original CPU preparation failures and repairs remain preserved.
+No bounded experience is reused. The full run has a 30-minute training cap,
+100k/6,227 recovery and four actual-initial/final sampled/greedy 24-episode
+assessments, with catch rewards, guidance and labels disabled in evaluation.
 
-Select one [fresh200k catch-reward comparison](docs/experiments/2026-11-04-cdp-breakout-catch-reward1-200k.md) after this cost pass.
-Preparation is pending;no full learner or GPU allocation is active yet. Use the
-exact qualified overlay,30-minute cap,100k/6,227 recovery and four actual-initial/
-final sampled/greedy24-episode assessments. Primary greedy raw score and
+Root `/x/Temp/kindle-breakout-catch-reward1-20261104/full`; service
+`kindle-breakout-catch-reward1-200k-20261104`. Do not restart this learner or
+schedule another GPU job while it is active. Primary greedy raw score and
 initial-subtracted gain/min must improve with a positive paired interval.
-No bounded experience transfer,coefficient sweep,extension or automatic successor.
-Check live state before launch. Retain143.667 greedy/70.750 sampled;original
-864/90%-two-wall and the five-game goal remain unfinished.
+Retain 143.667 greedy/70.750 sampled pending that decision. No extension,
+coefficient sweep or automatic successor. The original 864/90%-two-wall gate
+and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
