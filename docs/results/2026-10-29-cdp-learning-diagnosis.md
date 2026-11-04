@@ -1,27 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [bounded Breakout block-guidance check](../experiments/2026-11-04-cdp-breakout-block32.md) is selected for launch:
-8192 fresh actions/489 updates with50% independent32-action teacher blocks,
-cap1920, on the retained12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100
-recipe. Native447fe50 and all three teacher classes remain unchanged. The
-whole-episode probability and temporal distribution change together; no isolated
-mechanism or gameplay gain is established. Existing labels/actual-action feedback
-continue through native blocks. Original864/90%-two-wall goal remains unfinished.
+The [completed bounded block-guidance check](2026-11-04-cdp-breakout-block32.md) passes8192 actions/32,736 frames/
+489 updates in46.934s. The1024-action frozen restore takes.884s with zero updates
+and no completed natural episodes. All357 initial/invariant arrays,32 initial
+semantic transitions, full pixel/action/label replay, independent block ledger,
+guards and61 current/338 retained pins pass. Original main/collector succeed
+01:41:42/01:41:50 UTC November4, sourcee7c3598b; no GPU stage repeats.
 
-Canonical94 and packaged41 relevant CPU tests pass. Initial broad testing has714
-passes andtwo optional-bootstrap metadata failures, reproduced on unchanged HEAD.
-The first packaged test attempt catches an old-base constructor mismatch; the
-full18-compatible call is corrected. All original outputs remain. CPU command/
-replay/collector preflight passes in1.753s, with1170 matched legacy-schedule actions,
-zero real agent/emulator constructions and no GPU descriptor. No native build.
+The schedule chooses50% of32-action blocks before episode age1920, with unchanged
+teacher/native447fe50 and retained12M64/Auto/N8/B16/T16/H15/R16/replay-value1/
+expert100. Actual overrides4050/8192 (49.4385%); within episodes,61 transitions
+return native control to the teacher and65 release it. Probability and temporal
+distribution change together. Canonical94/packaged41 tests and1.753s actual-command
+preflight pass;1170 legacy actions match. Original unrelated bootstrap metadata
+and packaged-constructor/CLI-fixture failures remain recorded in the report.
 
-Root`/x/Temp/kindle-breakout-block32-20261104`, service
-`kindle-breakout-block32-check-20261104`. Initial/final/frozen checkpoints,357
-initial/invariant arrays, first32 shared lane decisions, complete pixel/action/
-label replay, independent block accounting and guards are required. A padded200k
-projection must fit30 minutes before a full comparison is separately selected.
-No full learner, repeated stage, extension or automatic successor is selected.
-Check live identity before GPU work; do not overlap or restart this allocation.
+Padded200k projection21m00.426s passes30min. Execution and early cost are
+established; frozen gameplay benefit is unmeasured. Runtime/evidence remain at
+`/x/Temp/kindle-breakout-block32-20261104`; both services are terminal success and
+no learner or GPU allocation is active. No full learner, sweep, extension or
+automatic successor is selected. Check live state before work. The original
+864/90%-two-wall and five-game goal remain unfinished.
 
 The [completed CPU teacher-takeover comparison](2026-11-04-cdp-breakout-command-takeovers.md) finds32-action survival
 84/120 with the existing teacher versus79/120 with the saved command-dependent
