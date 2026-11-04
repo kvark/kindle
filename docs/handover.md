@@ -15,12 +15,18 @@ Auto/N8/B16/T16/H15/R16/expert100 settings stay fixed. Native447fe50/SHA35ad0db,
 teacher and qualified runner112be6c4 remain unchanged from the bounded check.
 
 Startup passes357 initial tensors matching bounded/retained controls,47 shared
-pre-update events and first update376;233 updates/4,096 actions are observed.
-MainPID1173630/invocationba245c2b52b44d84b58322ec2008dbc3 is active. Original
-recovery and terminal observers are attached. Require100k/6,227 read-only recovery,
-final200k/12,477 and four actual-initial/final sampled/greedy24-natural-episode
-assessments. No full frozen result is available. Greedy remains primary; favor
-higher raw score and own-initial gain/min with a positive paired interval.
+pre-update events and first update376. Independent100k/6,227 recovery passes
+18:54:10.725 UTC in.635s (.715s observer wrapper):357 finite tensors,151 unchanged
+pins,0555 directory/0444 files,zero model calls. The recovery observer succeeds;
+separate.077s receipt/journal review matches verifier childPID1174568 under its
+original invocation without repeating tensor verification. Keep CPU time
+uncorrected; the checkpoint omits replay,games,beliefs and complete RNG state.
+
+MainPID1173630/invocationba245c2b52b44d84b58322ec2008dbc3 and original terminal
+collector remain active at18:55 review. Require final200k/12,477 and four
+actual-initial/final sampled/greedy24-natural-episode assessments. No full frozen
+result is available. Greedy remains primary; favor higher raw score and
+own-initial gain/min with a positive paired interval.
 
 Full helper/comparison/plot qualification passes3.667s and all five actual queued
 commands pass.541s with zero agent/emulator constructions. Startup CPU review
