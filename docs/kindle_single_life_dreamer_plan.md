@@ -1,32 +1,26 @@
 # Kindle: CDP learning roadmap
 
-The [fresh200k RGB frame-pair comparison](experiments/2026-11-03-cdp-breakout-rgb-frame-pair-200k.md) remains active after
-its100k/6,227 recovery passes independent verification at23:45:53.602 UTC
-November3. All357 tensors are finite, optimizer moments/read-only modes and114
-pins pass; the0.343s CPU check keeps original PID1087230/invocation
-675fde529a5a4dc080adc6d655f2312b. Recovery observer succeeds; terminal observer
-remains active. Readback reaches113,592 actions/7,077 finite updates, with full
-100k replay and5.019GiB observed GPU headroom. No full frozen result is available.
+The [completed RGB frame-pair comparison](results/2026-11-03-cdp-rgb-frame-pair.md#full-200k-comparison-retains-single-image-input)
+finishes200k actions /799,579 frames /12,477 updates in24m17.046s (+13.13%).
+Greedy114.000/sample39.208 fall20.65%/44.58% below retained143.667/70.750;
+all0/24 two-wall. Greedy gain/min falls29.68%, paired difference−1.956
+[−3.884,.191]; the primary interval spans zero. Retain single-image input and
+the existing recipe; no extension, confirmation orautomatic successor isselected.
+Late labelCE improves.560514→.539096 without a frozen gameplay gain.
 
-Launch23:33:53 UTC/source8ea32681,30min training cap; startup matches357 bounded
-initial tensors and47 pre-update semantic events. Require final/actual-initial
-sampled/greedy24-episode assessments against retained70.750/143.667. The measured
-full-replay headroom is lower than the early6.097GiB projection; actual2GiB guards
-remain enforced. CPU status-formatting failures are preserved separately; no
-learner, observer or GPU stage restarts.
+All114 current/338 retained pins,100k/6227 recovery,357 bounded-matching initial/
+invariant frozen tensors,47 pre-update events, full replays/videos, guards,
+curves, exposure and comparison pass. Own initials1.542 sampled/1.458 greedy
+differ from the three-channel control. Actual minimum GPU headroom5.019GiB passes
+2GiB across75,250 snapshots. Main/collector succeed00:02:43/00:03:10 UTC November4,
+source8ea32681; all services are terminal success, with no full-stage or GPU repeat.
+Original numerical and CPU qualification/status/report failures remain preserved.
 
-Use qualified native24e701bc/SHA b451bc9,12M64/Auto/N8/B16/T16/H15/R16/context1,
-20% guidance/expert100/replay-value1 and rates4e-5/4e-4/8e-5. Frame pairs change
-first-layer geometry/initialization and replay storage. Native, runner and
-teacher/schedule source differ from the retained control; full18 default policy
-source and2048 synthetic actions agree. No isolated causal claim. The original
-CPU teacher-fixture failure and all prior qualification failures remain retained.
-[Bounded evidence and active details](results/2026-11-03-cdp-rgb-frame-pair.md). Root
-`/x/Temp/kindle-rgb-frame-pair-20261103/full`; service
-`kindle-breakout-rgb-pair-200k-20261103`. Do not restart, repeat earlier lives or
-schedule another GPU job while this learner is active. No extension, second
-learner orautomatic successor. The original864/90%-two-wall gate and five-game
-goal remain unfinished.
+Geometry/initialization, native, runner and teacher/schedule source differ from
+control; full18 teacher defaults agree, but no isolated effect or seed-reliability
+claim. Root`/x/Temp/kindle-rgb-frame-pair-20261103/full` isclosed. No GPU allocation
+remains active; check live state before work. The original864/90%-two-wall gate
+and five-game goal remain unfinished.
 
 The [completed50% episode-guidance Breakout comparison](results/2026-11-03-cdp-breakout-guidance50.md)
 finishes200k actions /799,731 frames /12,477 updates in21m37.887s (+.77%).

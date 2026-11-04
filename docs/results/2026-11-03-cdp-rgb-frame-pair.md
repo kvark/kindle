@@ -1,86 +1,111 @@
 # Native RGB frame pairs: implementation qualification
 
-The optional six-channel input passes implementation, legacy compatibility and
-bounded execution/cost checks. Training8192 actions /489 updates takes51.357s,
-7.69% more than the retained single-image check; padded200k projection is22m59s.
-Conservative full-replay headroom is6.097GiB. Frozen1024 actions contain no natural
-episodes, so gameplay benefit remains unmeasured. That qualification selected
-no full learner; the separately selected comparison below is now active.
-This work is part of the existing five-game goal; Breakout retains70.750 sampled/
-143.667 greedy and its original864/90%-two-wall gate.
-See the [fixed protocol](../experiments/2026-11-03-cdp-rgb-frame-pair.md).
+The full comparison does not improve the retained Breakout recipe. Paired RGB
+scores **114.000 greedy /39.208 sampled**, versus143.667/70.750, while training
+costs13.13% more. Both final modes have0/24 two-wall successes. Retain single-image
+input. The original864/90%-two-wall gate and five-game goal remain unfinished.
+The default-off implementation passes qualification and remains available; no
+extension, confirmation or automatic successor is selected.
 
-## Fresh 200k comparison is active
+## Full 200k comparison retains single-image input
 
-The [separate full protocol](../experiments/2026-11-03-cdp-breakout-rgb-frame-pair-200k.md)
-selects one fresh200k-action/12,477-update comparison, after bounded closure,
-with a30-minute training cap. It launches **23:33:53.049 UTC November3**, source
-`8ea3268158763bee64dac060ee7db5d8b4e66c37`, main PID1087230/invocation
-`675fde529a5a4dc080adc6d655f2312b`. Root is `full/` beneath the package root;
-unit `kindle-breakout-rgb-pair-200k-20261103`. Recovery observer PID1087236
-finishes successfully after the100k verification; terminal observer PID1087233
-remains active. No full frozen result is available.
-Do not restart this learner or schedule overlapping GPU work.
+The [separate fixed protocol](../experiments/2026-11-03-cdp-breakout-rgb-frame-pair-200k.md)
+starts one fresh learner after bounded closure, without reusing its experience.
+It keeps12M64/Auto/N8/B16/T16/H15/R16/context1,20% guidance/cap1920/all-state labels,
+expert100/replay-value1, base/encoder4e-5,dynamics4e-4,behavior8e-5, sampled
+collection/posteriors and full18 actions. Previous/current images enter the CNN
+as six channels. The widened first layer adds2,400 parameters and changes its
+initialization; later widths remain fixed. Native, runner and teacher/schedule
+source bytes also differ from the retained447fe50 recipe. This reused1009/cohort
+comparison is not an isolated architectural effect or training-seed reliability.
 
-Keep12M64/Auto/N8/B16/T16/H15/R16/context1,20% guidance/cap1920/all-state labels,
-expert100/replay-value1 and base/encoder4e-5,dynamics4e-4,behavior8e-5. Sampled
-collection and posteriors remain. Primary frozen evaluation is greedy, with
-sampled secondary, final and actual-initial24-episode arms each. Compare against
-retained143.667 greedy/70.750 sampled, using each model's own initial and actual
-training time. The original864/90%-two-wall gate stays unchanged. No extension,
-second learner or automatic successor is selected.
+| Measurement | Paired RGB | Retained single image |
+|---|---:|---:|
+| Training actions /updates |200,000 /12,477|200,000 /12,477|
+| Training time |24m17.046s|21m27.910s|
+| Frozen greedy mean |114.000|143.667|
+| Frozen sampled mean |39.208|70.750|
+| Own initial greedy /sampled |1.458 /1.542|2.208 /1.417|
+| Final two-wall successes, each mode |0/24|0/24|
+| Greedy initial-subtracted return/min |4.634|6.590|
+| Sampled initial-subtracted return/min |1.551|3.230|
+
+Training completes799,579 emulator frames in1,457.046s, with construction
+separately2.413s. Greedy return falls20.65% and sampled44.58%; training time rises
+13.13%. Greedy gain/min falls29.68%, sampled51.98%. The locked greedy improvement
+rule fails. Paired lane-bootstrap greedy return difference is−29.667 with95%
+interval[−74.042,22.126]; gain/min difference is−1.956[−3.884,.191]. Both primary
+intervals include zero, so this does not establish broad harm. Secondary sampled
+return difference is−31.542[−43.668,−20.791], gain/min−1.679[−2.226,−1.177]. These
+are10,000 seed0 lane resamples of a reused evaluation cohort, not seed intervals.
+
+Each of the four frozen arms selects24 natural episodes, with zero updates or
+truncations and all357 tensors unchanged. Combined frozen work is91,184 actions /
+364,525 frames /86.138s. Actual-initial policies are measured separately because
+the six-channel model has different geometry; no retained initial equality is
+claimed. All357 initial tensors and47 pre-update semantic events match the paired
+bounded check. Full training and frozen recorded-action/frame/boundary replays
+and videos pass; training pixel/label/override replay takes98.492s. Learning
+curves, guidance exposure, score coverage and the complete comparison pass. The
+curve is visually checked; its online aided score is distinct from frozen play.
+
+The100k/6,227 checkpoint is retained read-only, with all357 finite tensors and
+optimizer state. The independent CPU observer passes at23:45:53.602 UTC November3
+in.343s (.414s wrapper), with114 pins unchanged and original main identity
+preserved. The main checkpoint observer takes.310s; startup validation takes
+1.915s. Recovery is weights/moments, not replay, games, beliefs or full RNG.
+All co-host CPU time remains in actual training wall time without correction.
+
+All75,250 memory snapshots retain at least2GiB. Actual minimum headroom is
+**5,388,877,824 bytes (5.019GiB)** at100,024 actions, below the bounded6.097GiB
+projection. That early calculation deducted full replay growth but did not bound
+all other allocations. Measured full-run headroom, not the projection, closes
+this check. Learning consumes1,300.681s (89.27% of training), acting63.088s and
+environments62.953s. No backend optimization claim follows from these timings.
+
+Actual overrides are88,337/200,000 (**44.1685%**), versus retained43.0585%.
+All12,477 reports are finite and supervised, with2,989,797 repeated labeled
+replay rows. Late50k label cross-entropy improves.560514→.539096 without better
+frozen gameplay. The50 selected guided episodes average232.3; online aided
+returns are not unaided competence. Native actions at pre-action scores216–431
+number2,026 (1.013%); none reaches432, and maximum score including tails is418.
+These distributions do not isolate the reason for weak control.
+
+Source `8ea3268158763bee64dac060ee7db5d8b4e66c37` launches23:33:53.049 UTC November3,
+main PID1087230/invocation`675fde529a5a4dc080adc6d655f2312b`. Main completes
+**00:02:43.572 UTC November4**, terminal collection **00:03:10.692**, with all114
+current and338 retained pins and52 completion artifacts verified. Main, recovery
+and collector are terminal success; no full-run stage fails or repeats. Root
+`/x/Temp/kindle-rgb-frame-pair-20261103/full`; service
+`kindle-breakout-rgb-pair-200k-20261103`. Original receipts remain unchanged. Do
+not restart the learner, collectors or completed assessments. No GPU allocation
+remains active at closure; check live state before any further work.
+
+### Source qualification and preserved CPU failures
 
 Full18 teacher policies have identical AST definitions and schedule methods;
 the newer source adds optional four-action support. CPU checks cover2048
-synthetic actions, ordinary episode selection/resets, feedback and bounded caps,
-with no emulator/native construction. The first fixture incorrectly omitted a
-required cap for the older bounded guidance kind; its source/error remain in
-`full/teacher-preparation-failure.json`, and the corrected check passes0.509s.
-This does not establish complete training equivalence or a causal frame-pair
-effect: native, runner, teacher and schedule source hashes differ from control.
+synthetic actions, episode selection/resets, feedback and bounded caps, without
+an emulator or native agent. The first fixture omits a required cap for the older
+bounded kind and is rejected; its source/error remain in
+`full/teacher-preparation-failure.json`. The corrected check passes.509s. This
+is default-path evidence, not complete training equivalence or a gameplay result.
 
-Changed helper qualification passes3.207s, including the complete comparison
-entry point with synthetic outcomes and10 corrupted-header rejections. It also
-checks accounting, own-initial comparison rules, replay argv/manifest paths and
-null terminal journal messages. The five actual queued commands pass0.302s
-without real native/emulator construction or GPU descriptors. All114 declaration
-pins are verified. Historical source resolution preserves the exact old replay
-script without rewriting its original declaration.
+Changed helpers pass3.207s, including the complete comparison entry point with
+synthetic outcomes and10 corrupted-header rejections, accounting, own-initial
+rules, replay argv/manifest paths and null terminal journal messages. All five
+actual commands pass.302s without real native/emulator construction or GPU
+descriptors. Historical source resolution preserves the exact old replay helper.
 
-Startup passes all357 initial tensors against the paired bounded check,47
-pre-update semantic events and first-update action376. It does not claim equality
-with the three-channel initial model. The1.915s startup CPU audit remains in
-training wall time. At the recorded live check,190 finite reports reach3416
-actions and the original main/recovery/terminal identities remain active.
-Require the read-only100k/6,227 recovery and full final/initial frozen assessments,
-replays/videos, curves, exposure and comparison before drawing a result.
-
-### The 100k recovery passes while the original learner continues
-
-The main observer saves100,000 actions /6,227 updates and checks the read-only
-checkpoint at23:45:51.707 UTC, taking0.310s. The independent observer passes at
-**23:45:53.602 UTC November3** in0.343s (0.414s including its wrapper), with all
-114 pins unchanged and357 finite tensors:280 world,66 behavior,11 slow value.
-It verifies geometry, optimizer arrays, metadata hashes and0555-directory/0444-
-file modes while preserving original main PID1087230/invocation675fde529a5a4dc080adc6d655f2312b.
-Recovery contains weights/moments, not replay, games, live beliefs or full RNG.
-The recovery service is terminal success; main and terminal collector remain live.
-
-A subsequent observation reaches113,592 actions/7,077 updates, with replay length
-100,000. The memory snapshot at113,600 actions records **5.019GiB** remaining
-GPU budget. This is above the actual2GiB guard but below the bounded6.097GiB
-projection; filling replay can coincide with other allocations. It is an observed
-snapshot, not the final minimum or proof that all later work fits. The existing
-memory guard remains active and no cap or recipe changes.
-
-Two optional CPU status-readback attempts fail before producing their summaries:
-one uses the run-end `learner_updates` key on a progress row; the other searches
-for spaced JSON in compact JSONL. Their receipts are retained as
-`full/live-observer-2339-failure.json` and `full/post-recovery-readback-failure.json`.
-The corrected readback uses parsed rows and confirms the same active identity;
-`full/post-recovery-observation.json` records its observation. These are separate
-from the passing recovery service. No learner, observer or GPU stage restarts.
-CPU co-host times remain in measured wall time without correction.
+Separate optional CPU status/report readers encounter formatting/schema errors:
+a progress/run-end field mismatch, spaced-text matching on compact JSONL, an
+ad hoc Python keyword typo, and `windows` versus saved `supervision_windows`.
+Their original sources/logs or failure receipts are preserved under`full/`;
+corrected readbacks change no model, original result or original completion.
+The final read-only summary takes.162s and is recorded in`closure-summary.json`.
+These readers are separate from the passing original main/recovery/collector.
+No successful GPU, replay, plot or comparison stage repeats. Earlier native
+qualification failures remain below.
 
 ## Implementation and package
 
@@ -223,7 +248,6 @@ diagnostic binaries remain pinned. Original build receipt and all failures
 remain immutable. No GPU allocation remains active at closure; check live state
 before any new work.
 
-A full frozen gameplay comparison is the remaining question for this input.
-The failed fixed action readout did not provide positive evidence for it, and
-this short check establishes execution and cost only. A separately justified
-comparison must keep the original Breakout gate and actual-initial controls.
+At bounded closure, gameplay benefit remained unmeasured. The separately selected
+full comparison above answers that question negatively for this recipe and
+retains the single-image control; the original Breakout gate stays unfinished.
