@@ -106,7 +106,8 @@ def test_cli_rejects_invalid_setup_before_environment(monkeypatch,tmp_path,capsy
 
 
 @pytest.mark.parametrize('minimal', [False, True])
-def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(monkeypatch,tmp_path,minimal):
+@pytest.mark.parametrize('blocks', [False, True])
+def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(monkeypatch,tmp_path,minimal,blocks):
     teachers=[];created=[];calls=[]
     class Teacher:
         pending=None
@@ -159,7 +160,8 @@ def test_runner_and_replay_keep_distinct_recommendations_feedback_and_resets(mon
     monkeypatch.setattr(sys,'argv',['atari_vector','ALE/Breakout-v5','--output',str(output),'--num-envs','2',
         '--steps','6','--train-ratio','0','--breakout-guidance-probability','1','--breakout-guidance-max-actions','1',
         '--guidance-imitation-scale','1','--breakout-corrective-labels',
-        '--atari-protocol','published-minimal' if minimal else 'published'])
+        '--atari-protocol','published-minimal' if minimal else 'published',
+        *(['--breakout-guidance-block-length','1'] if blocks else [])])
     atari_vector.main()
     rows=[json.loads(line) for line in output.open()]
     assert rows[0]['gpu_device']==Agent.gpu_device and rows[0]['model_provenance']==Agent.provenance

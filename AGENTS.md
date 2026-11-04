@@ -20,32 +20,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [completed CPU teacher-takeover comparison](docs/results/2026-11-04-cdp-breakout-command-takeovers.md) finds32-action survival
-84/120 with the existing teacher versus79/120 with the saved command-dependent
-predictor. Net−5 rescues (−4.17 percentage points), onlytwo improved lanes, fails
-the fixed12-net/five-lane screen. Retain the existing teacher; no integration,
-coefficient/window retry or learner isselected. Its older fresh full-game screen
-remains failed. This outcome-conditioned student-state test is not a full-game
-score, seed-reliability claim or causal architecture diagnosis.
+The [bounded Breakout block-guidance check](docs/experiments/2026-11-04-cdp-breakout-block32.md) is selected for launch:
+8192 fresh actions/489 updates with50% independent32-action teacher blocks,
+cap1920, on the retained12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100
+recipe. Native447fe50 and all three teacher classes remain unchanged. The
+whole-episode probability and temporal distribution change together; no isolated
+mechanism or gameplay gain is established. Existing labels/actual-action feedback
+continue through native blocks. Original864/90%-two-wall goal remains unfinished.
 
-The existing teacher avoids the original loss endpoint in92/120 cases, candidate
-89/120; both survive32 decisions in67, existing-only17, candidate-only12, neither24.
-All120 origins,240 teacher/120 recorded branches, eight reverse-order checks,
-full43,424-action/173,660-frame source replays and independent recount pass.
-Policies receive pixels/executed commands only; no life-count input or GPU work.
+Canonical94 and packaged41 relevant CPU tests pass. Initial broad testing has714
+passes andtwo optional-bootstrap metadata failures, reproduced on unchanged HEAD.
+The first packaged test attempt catches an old-base constructor mismatch; the
+full18-compatible call is corrected. All original outputs remain. CPU command/
+replay/collector preflight passes in1.753s, with1170 matched legacy-schedule actions,
+zero real agent/emulator constructions and no GPU descriptor. No native build.
 
-Annotation20.830s andbranch47.276s complete under the fixed caps. Corrected
-controller succeeds01:24:46 UTC November4/source16ddeae1; separate1.406s recount
-andclosure complete01:25:18. All470 original/490 repair pins pass. The original
-pre-replay import failure remains; exact cohort extraction passesfour repair
-checks and changes no policy, method or cap. Closure`complete_with_cpu_import_repair`;
-original controller stays failed, withno completed-stage repeat.
-
-Root`/x/Temp/kindle-breakout-command-takeovers-20261104/cpu-import-repair` isclosed.
-No learner or GPU allocation isactive. Existing supervision still rescues many
-current-policy failures; how to turn it into stable learned control remains open.
-No automatic successor isselected. Check live state before future work. The
-original864/90%-two-wall and five-game goal remain unfinished.
+Root`/x/Temp/kindle-breakout-block32-20261104`, service
+`kindle-breakout-block32-check-20261104`. Initial/final/frozen checkpoints,357
+initial/invariant arrays, first32 shared lane decisions, complete pixel/action/
+label replay, independent block accounting and guards are required. A padded200k
+projection must fit30 minutes before a full comparison is separately selected.
+No full learner, repeated stage, extension or automatic successor is selected.
+Check live identity before GPU work; do not overlap or restart this allocation.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

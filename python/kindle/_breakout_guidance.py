@@ -13,7 +13,8 @@ from ._pixel_guidance import EpisodePixelGuidance
 
 GUIDANCE_KIND = "bounded-episode-breakout-pixels-v1"
 CORRECTIVE_GUIDANCE_KIND = "bounded-episode-breakout-corrective-pixels-v1"
-GUIDANCE_KINDS = (GUIDANCE_KIND, CORRECTIVE_GUIDANCE_KIND)
+BLOCK_CORRECTIVE_GUIDANCE_KIND = "bounded-block-breakout-corrective-pixels-v1"
+GUIDANCE_KINDS = (GUIDANCE_KIND, CORRECTIVE_GUIDANCE_KIND, BLOCK_CORRECTIVE_GUIDANCE_KIND)
 GUIDANCE_SEED_XOR = 0x4252_4541_4B50_5801
 ACTION_IDS = {"NOOP": 0, "FIRE": 1, "RIGHT": 3, "LEFT": 4}
 MINIMAL_ACTION_MEANINGS = ("NOOP", "FIRE", "RIGHT", "LEFT")
@@ -185,10 +186,19 @@ class _MinimalPolicy:
 
 
 class BreakoutGuidance(EpisodePixelGuidance):
-    """Breakout episode selection with the original pixel rule and random schedule."""
+    """Capped episode or block selection with the existing pixel teacher."""
 
     def __init__(self, config, streams, action_count, *, action_meanings=None):
-        self.corrective_labels = isinstance(config, dict) and config.get("kind") == CORRECTIVE_GUIDANCE_KIND
+        kind = config.get("kind") if isinstance(config, dict) else None
+        self.corrective_labels = kind in (CORRECTIVE_GUIDANCE_KIND, BLOCK_CORRECTIVE_GUIDANCE_KIND)
+        self._block_length = None
+        self._ever_guided = None
+        schedule = config
+        if kind == BLOCK_CORRECTIVE_GUIDANCE_KIND:
+            self._block_length = config.get("block_length")
+            if type(self._block_length) is not int or not 0 < self._block_length < 2**32:
+                raise ValueError("Breakout guidance block_length must be a positive u32")
+            schedule = {key: value for key, value in config.items() if key != "block_length"}
         self.expert_labels = []
         self._action_count = action_count
         factory = FeedbackPixelPolicy if self.corrective_labels else PixelPolicy
@@ -196,22 +206,66 @@ class BreakoutGuidance(EpisodePixelGuidance):
         if minimal and (not isinstance(action_meanings, (list, tuple)) or action_count != 4
                         or tuple(action_meanings) != MINIMAL_ACTION_MEANINGS):
             raise ValueError("Breakout guidance requires the declared NOOP/FIRE/RIGHT/LEFT vocabulary")
-        super().__init__(config, streams, action_count, game="Breakout", kinds=GUIDANCE_KINDS,
-                         bounded_kind=CORRECTIVE_GUIDANCE_KIND if self.corrective_labels else GUIDANCE_KIND,
+        super().__init__(schedule, streams, action_count, game="Breakout", kinds=GUIDANCE_KINDS,
+                         bounded_kind=kind,
                          seed_xor=GUIDANCE_SEED_XOR,
                          policy_factory=(lambda: _MinimalPolicy(factory)) if minimal else factory,
                          valid_actions=(0, 1, 2, 3) if minimal else (0, 1, 3, 4),
-                         expected_action_count=4 if minimal else 18)
+                         **(dict(expected_action_count=4) if minimal else {}))
         self.expert_labels = [None] * len(self._policies)
+        self._config = dict(config)
+
+    @property
+    def selected_episodes(self):
+        return list(self._ever_guided) if self._block_length else super().selected_episodes
+
+    @property
+    def episode_counts(self):
+        counts = super().episode_counts
+        if self._block_length:
+            counts.update(started_blocks=list(self._blocks), guided_blocks=list(self._guided_blocks))
+        return counts
 
     def reset(self, streams):
         super().reset(streams)
+        if self._block_length:
+            if self._ever_guided is None:
+                self._ever_guided = [False] * len(self._rngs)
+                self._block_indices = [0] * len(self._rngs)
+                self._blocks = [0] * len(self._rngs)
+                self._guided_blocks = [0] * len(self._rngs)
+            for lane in streams:
+                self._ever_guided[lane] = self._selected[lane]
+                self._block_indices[lane] = 0
+                self._blocks[lane] += 1
+                self._guided_blocks[lane] += self._selected[lane]
         if self.corrective_labels:
             for lane in streams:
                 if self._policies[lane] is None:
                     self._policies[lane] = self._policy_factory()
                 if self.expert_labels:
                     self.expert_labels[lane] = None
+
+    def _prepare_blocks(self):
+        if not self._block_length:
+            return
+        for lane, age in enumerate(self._episode_actions):
+            if age >= self._max_actions:
+                continue
+            block = age // self._block_length
+            if block != self._block_indices[lane]:
+                self._selected[lane] = self._rngs[lane].random() < self._config["probability"]
+                self._block_indices[lane] = block
+                self._blocks[lane] += 1
+                self._guided_blocks[lane] += self._selected[lane]
+                if self._selected[lane] and not self._ever_guided[lane]:
+                    self._ever_guided[lane] = True
+                    self._guided_episodes[lane] += 1
+
+    def verify_actions(self, overrides):
+        # Draw only when the next action is requested, never after a terminal action.
+        self._prepare_blocks()
+        super().verify_actions(overrides)
 
     def actions(self, frames):
         if not self.corrective_labels:
@@ -222,6 +276,7 @@ class BreakoutGuidance(EpisodePixelGuidance):
             raise ValueError('Previous proposals need action feedback')
         if any(frame.shape != (210, 160, 3) or frame.dtype != np.uint8 for frame in frames):
             raise ValueError('Native RGB8 required')
+        self._prepare_blocks()
         self.expert_labels = [policy.propose(frame) for policy, frame in zip(self._policies, frames)]
         self.frame_sha256 = [hashlib.sha256(frame.tobytes()).hexdigest() for frame in frames]
         overrides = [label if active else None for label, active in zip(self.expert_labels, self.active_guidance)]

@@ -179,6 +179,8 @@ def main():
                         help="fresh Breakout/full18 only: probability of pixel-guided episodes")
     parser.add_argument("--breakout-guidance-max-actions", type=int,
                         help="required action cap for each selected Breakout episode")
+    parser.add_argument("--breakout-guidance-block-length", type=int,
+                        help="fresh corrective Breakout only: redraw guidance for blocks of this many actions")
     parser.add_argument("--breakout-corrective-labels", action="store_true",
                         help="fresh Breakout imitation: edge-corrected teacher labels all states with actual-action feedback")
     parser.add_argument("--guidance-imitation-scale", type=float,
@@ -345,6 +347,11 @@ def main():
     if args.breakout_corrective_labels and (not args.breakout_guidance_probability
                                             or args.guidance_imitation_scale is None):
         parser.error("Breakout corrective labels require Breakout guidance and imitation")
+    if args.breakout_guidance_block_length is not None:
+        if not 0 < args.breakout_guidance_block_length < 2**32:
+            parser.error("Breakout guidance block-length must be a positive u32")
+        if not args.breakout_corrective_labels:
+            parser.error("Breakout guidance blocks require corrective labels")
     if args.qbert_corrective_labels and (args.qbert_guidance_policy != "continuation"
                                          or args.guidance_imitation_scale is None):
         parser.error("Qbert corrective labels require continuation guidance and imitation")
@@ -376,7 +383,7 @@ def main():
     training_options.add("--qbert-guidance-max-actions")
     training_options.add("--qbert-guidance-policy")
     training_options.add("--qbert-corrective-labels")
-    training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions", "--breakout-corrective-labels"))
+    training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions", "--breakout-corrective-labels", "--breakout-guidance-block-length"))
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-fire-weight", "--guidance-world-gradient"))
     training_options.add("--guidance-imitation-decay")
     training_options.add("--guidance-actor-only-decay")
@@ -635,10 +642,14 @@ def main():
                 guidance_config["kind"] = guidance_module.CORRECTIVE_GUIDANCE_KIND
             exploration = QbertGuidance(guidance_config, args.num_envs, actions)
         if args.breakout_guidance_probability:
-            exploration = BreakoutGuidance(dict(kind=(breakout_guidance_module.CORRECTIVE_GUIDANCE_KIND
+            guidance_config = dict(kind=(breakout_guidance_module.CORRECTIVE_GUIDANCE_KIND
                 if args.breakout_corrective_labels else breakout_guidance_module.GUIDANCE_KIND),
                 probability=args.breakout_guidance_probability, seed=args.seed,
-                max_actions=args.breakout_guidance_max_actions), args.num_envs, actions,
+                max_actions=args.breakout_guidance_max_actions)
+            if args.breakout_guidance_block_length is not None:
+                guidance_config.update(kind=breakout_guidance_module.BLOCK_CORRECTIVE_GUIDANCE_KIND,
+                                       block_length=args.breakout_guidance_block_length)
+            exploration = BreakoutGuidance(guidance_config, args.num_envs, actions,
                 **(dict(action_meanings=environments[0].action_meanings)
                    if args.atari_protocol == "published-minimal" else {}))
         guidance = isinstance(exploration, (QbertGuidance, BreakoutGuidance))

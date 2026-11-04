@@ -1,5 +1,28 @@
 # Kindle: CDP learning roadmap
 
+The [bounded Breakout block-guidance check](experiments/2026-11-04-cdp-breakout-block32.md) is selected for launch:
+8192 fresh actions/489 updates with50% independent32-action teacher blocks,
+cap1920, on the retained12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100
+recipe. Native447fe50 and all three teacher classes remain unchanged. The
+whole-episode probability and temporal distribution change together; no isolated
+mechanism or gameplay gain is established. Existing labels/actual-action feedback
+continue through native blocks. Original864/90%-two-wall goal remains unfinished.
+
+Canonical94 and packaged41 relevant CPU tests pass. Initial broad testing has714
+passes andtwo optional-bootstrap metadata failures, reproduced on unchanged HEAD.
+The first packaged test attempt catches an old-base constructor mismatch; the
+full18-compatible call is corrected. All original outputs remain. CPU command/
+replay/collector preflight passes in1.753s, with1170 matched legacy-schedule actions,
+zero real agent/emulator constructions and no GPU descriptor. No native build.
+
+Root`/x/Temp/kindle-breakout-block32-20261104`, service
+`kindle-breakout-block32-check-20261104`. Initial/final/frozen checkpoints,357
+initial/invariant arrays, first32 shared lane decisions, complete pixel/action/
+label replay, independent block accounting and guards are required. A padded200k
+projection must fit30 minutes before a full comparison is separately selected.
+No full learner, repeated stage, extension or automatic successor is selected.
+Check live identity before GPU work; do not overlap or restart this allocation.
+
 The [completed CPU teacher-takeover comparison](results/2026-11-04-cdp-breakout-command-takeovers.md) finds32-action survival
 84/120 with the existing teacher versus79/120 with the saved command-dependent
 predictor. Net−5 rescues (−4.17 percentage points), onlytwo improved lanes, fails

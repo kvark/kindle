@@ -8,9 +8,8 @@ from pathlib import Path
 import struct
 
 from ._exploration import EXPLORATION_PROTOCOL, PersistentExploration
-from ._qbert_guidance import CORRECTIVE_GUIDANCE_KIND, GUIDANCE_KINDS, QbertGuidance
-from ._breakout_guidance import (CORRECTIVE_GUIDANCE_KIND as BREAKOUT_CORRECTIVE_GUIDANCE_KIND,
-                                 GUIDANCE_KINDS as BREAKOUT_GUIDANCE_KINDS, BreakoutGuidance)
+from ._qbert_guidance import GUIDANCE_KINDS, QbertGuidance
+from ._breakout_guidance import GUIDANCE_KINDS as BREAKOUT_GUIDANCE_KINDS, BreakoutGuidance
 
 
 VECTOR_PROTOCOL = "kindle-vector-v2"
@@ -215,7 +214,7 @@ def audit(path):
                 check(all(type(decay[key]) is int and 0 <= decay[key] < 2**64 for key in ("start_update", "end_update"))
                       and decay["start_update"] < decay["end_update"], "invalid expert imitation decay interval")
         expert_training = expert is not None and header["mode"] == "train"
-        corrective = guidance and header["exploration"]["kind"] in (CORRECTIVE_GUIDANCE_KIND, BREAKOUT_CORRECTIVE_GUIDANCE_KIND)
+        corrective = guidance and exploration.corrective_labels
         check(not corrective or expert_training, "corrective guidance requires expert imitation")
         training = header["mode"] == "train" and config["train_ratio"] > 0
         required = config["replay_context"] + config["batch_length"]
