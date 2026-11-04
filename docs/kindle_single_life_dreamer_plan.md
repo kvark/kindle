@@ -1,48 +1,28 @@
 # Kindle: CDP learning roadmap
 
-The [fresh200k block-guidance comparison](experiments/2026-11-04-cdp-breakout-block32-200k.md) is running, launched01:50:02 UTC
-November4/sourceb07ebbcc. MainPID1096988, invocationa6f5a52d4afa44e79327ef980528934a;
-recovery and terminal observers are active. Startup passes357 initial arrays
-against both controls and47 bounded pre-update events. Through8192 actions,
-489 updates take46.723s with4050 overrides; no full frozen result is available.
+The [completed200k block-guidance comparison](results/2026-11-04-cdp-breakout-block32.md) scores74.875 greedy/41.250
+sampled, below retained143.667/70.750. Training200k actions/799,610 frames/
+12,477 updates takes21m11.408s (−1.28% time), but primary greedy gain/min falls
+47.96%. Paired greedy return interval[−104.542,−38.625] and gain/min interval
+[−4.826,−1.759] are negative; all0/24 two-wall. Retain20% whole-episode guidance.
+No extension, second learner, probability/block-length sweep or automatic successor.
 
-It tests50% independent32-action teacher blocks, cap1920, against retained20%
-whole-episode guidance. Native447fe50, teacher,12M64/Auto/N8/B16/T16/H15/R16/
-replay-value1/expert100 and all-state labels remain fixed. Probability and temporal
-distribution change together. Fresh200k/12,477 updates have a30-minute cap,
-100k/6,227 recovery and four fixed24-natural-episode final/actual-initial arms.
-Greedy is primary against143.667; sampled70.750 is secondary. Initial traces,
-full replays/videos, independent block accounting, exposure, curves and guards
-are required. Changed helper/complete-comparison checks pass3.764s; all five
-actual commands pass. The declaration pins126 inputs.
+The candidate chooses50% of32-action blocks; actual overrides51.493%. Native
+score216–431 exposure is468 actions versus1262 retained, and neither reaches432.
+Late own-replay expert CE.552 versus.561 does not yield frozen improvement.
+Probability and temporal distribution change together, with different experience;
+no isolated mechanism or training-seed reliability claim. Teacher/native447fe50,
+12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 remain fixed.
 
-Root`/x/Temp/kindle-breakout-block32-20261104/full`, service
-`kindle-breakout-block32-200k-20261104`. Check original live identity; do not overlap,
-restart this learner or schedule another GPU job while it is active. No repeated
-stage, cap increase, sweep, second learner, extension or automatic successor.
+All126 current/338 retained pins,100k/6227 recovery,357 matched initial/invariant
+frozen arrays,47 bounded pre-update and799/794 initial semantic events, full
+replays/videos, guards, curves, block accounting, exposure and comparison pass.
+Sourceb07ebbcc; original main/collector succeed02:15:09/02:15:35 UTC November4.
+All three services succeed, with zero failures or repeated GPU stages. Bounded
+CPU qualification failures remain preserved in the report. Root
+`/x/Temp/kindle-breakout-block32-20261104/full` isclosed. No learner or GPU allocation
+is active; check live state before work. Do not restart this learner or collectors.
 Original864/90%-two-wall and five-game goal remain unfinished.
-
-The [completed bounded block-guidance check](results/2026-11-04-cdp-breakout-block32.md) passes8192 actions/32,736 frames/
-489 updates in46.934s. The1024-action frozen restore takes.884s with zero updates
-and no completed natural episodes. All357 initial/invariant arrays,32 initial
-semantic transitions, full pixel/action/label replay, independent block ledger,
-guards and61 current/338 retained pins pass. Original main/collector succeed
-01:41:42/01:41:50 UTC November4, sourcee7c3598b; no GPU stage repeats.
-
-The schedule chooses50% of32-action blocks before episode age1920, with unchanged
-teacher/native447fe50 and retained12M64/Auto/N8/B16/T16/H15/R16/replay-value1/
-expert100. Actual overrides4050/8192 (49.4385%); within episodes,61 transitions
-return native control to the teacher and65 release it. Probability and temporal
-distribution change together. Canonical94/packaged41 tests and1.753s actual-command
-preflight pass;1170 legacy actions match. Original unrelated bootstrap metadata
-and packaged-constructor/CLI-fixture failures remain recorded in the report.
-
-Padded200k projection21m00.426s passes30min. Execution and early cost are
-established; frozen gameplay benefit is unmeasured. Runtime/evidence remain at
-`/x/Temp/kindle-breakout-block32-20261104`; both services are terminal success and
-no learner or GPU allocation is active. No full learner, sweep, extension or
-automatic successor is selected. Check live state before work. The original
-864/90%-two-wall and five-game goal remain unfinished.
 
 The [completed CPU teacher-takeover comparison](results/2026-11-04-cdp-breakout-command-takeovers.md) finds32-action survival
 84/120 with the existing teacher versus79/120 with the saved command-dependent
@@ -4139,7 +4119,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Boxing | AMD1M/RGB32/R32/500k seeds2017/4013 score76.83/79.17;24/24 wins each in28m22s/28m13s | Reference99.61; broad reliability remains open |
 | Pong | AMD12M48/B16/R16/500k: retained1009/4013 greedy15.208/15.208 and24/24 wins each; sampled15.625/14.833. Training41m28s/41m31s; four-arm greedy service adds3m33s, no training | Reference20.45; both greedy point estimates pass narrowly, sampled one of two; broad reliability open |
 | Freeway | AMD1M/RGB32/R32/aided500k seeds1009/4013:31.04/32.00,24/24 successes each in28m17s/28m50s; historical aided cohort32.10,72/72 | Reference33.40; broad seed reliability remains open |
-| Breakout | Retain 12M64/Auto/B16/T16/H15/R16, encoder4e-5/behavior8e-5/dynamics4e-4, expert100, critic1/1: 200k scores70.750 sampled/143.667 greedy in21m27.910s. Fresh400k scores92.792/173.708 in43m36.578s, with lower gain/min. [Budget comparison](results/2026-11-03-cdp-breakout-budget400k.md). Current-critic B8/T32 scores94.583/116.667 in23m06.548s: greedy gain/min falls24.84%, while the sampled rise has an interval spanning zero. Retain B16/T16. [Sequence comparison](results/2026-11-03-cdp-breakout-value1-context32.md#full-200k-comparison). Increasing episode guidance20%→50% scores34.417/50.583 in21m37.887s; retain20%. [Guidance result](results/2026-11-03-cdp-breakout-guidance50.md). All final modes remain0/24 two-wall; earlier negative comparisons remain linked in the diagnosis. | Original mean864/90%-two-wall gate remains unfinished. Reference381.81 is a published long-run aspiration, not a matched-budget control; reliability remains open. |
+| Breakout | Retain 12M64/Auto/B16/T16/H15/R16, encoder4e-5/behavior8e-5/dynamics4e-4, expert100, critic1/1: 200k scores70.750 sampled/143.667 greedy in21m27.910s. Fresh400k scores92.792/173.708 in43m36.578s, with lower gain/min. [Budget comparison](results/2026-11-03-cdp-breakout-budget400k.md). Current-critic B8/T32 scores94.583/116.667 in23m06.548s: greedy gain/min falls24.84%, while the sampled rise has an interval spanning zero. Retain B16/T16. [Sequence comparison](results/2026-11-03-cdp-breakout-value1-context32.md#full-200k-comparison). Increasing episode guidance20%→50% scores34.417/50.583 in21m37.887s; retain20%. [Guidance result](results/2026-11-03-cdp-breakout-guidance50.md). Intermittent50%32-action blocks also regress to41.250/74.875 in21m11.408s; retain20% episode guidance. [Block comparison](results/2026-11-04-cdp-breakout-block32.md#full200k-comparison). All final modes remain0/24 two-wall; earlier negative comparisons remain linked in the diagnosis. | Original mean864/90%-two-wall gate remains unfinished. Reference381.81 is a published long-run aspiration, not a matched-budget control; reliability remains open. |
 | Qbert | Retain AMD 12M64/Auto/B16/T16/H5/R20, dynamics 1e-4, base/encoder/behavior 4e-5, replay-value 1, expert 100 and greedy collection/evaluation. Fixed 240k learners 16001/18013 score 15,279.167/15,931.250 greedy with 24/24 first pyramids each, in 25m57.740s/26m23.114s. Both own initial controls clear none; all frozen arms have zero updates/truncations and 357 invariant tensors. [Development result](results/2026-11-02-cdp-qbert-r20-240k.md), [fresh confirmation](results/2026-11-02-cdp-qbert-r20-seed18013.md). | Original 15k/90% gate passes on the development learner and one fresh confirmation. Sampled 12,972.917/14,976.042 both miss 15k. Broad reliability and reference 193,220.77 remain open; earlier failed recipes remain in the linked reports. |
 
 These references are published long-run Dreamer scores, not equal-budget

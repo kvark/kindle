@@ -20,26 +20,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 4
 
-The [fresh200k block-guidance comparison](docs/experiments/2026-11-04-cdp-breakout-block32-200k.md) is running, launched01:50:02 UTC
-November4/sourceb07ebbcc. MainPID1096988, invocationa6f5a52d4afa44e79327ef980528934a;
-recovery and terminal observers are active. Startup passes357 initial arrays
-against both controls and47 bounded pre-update events. Through8192 actions,
-489 updates take46.723s with4050 overrides; no full frozen result is available.
+The [completed200k block-guidance comparison](docs/results/2026-11-04-cdp-breakout-block32.md) scores74.875 greedy/41.250
+sampled, below retained143.667/70.750. Training200k actions/799,610 frames/
+12,477 updates takes21m11.408s (−1.28% time), but primary greedy gain/min falls
+47.96%. Paired greedy return interval[−104.542,−38.625] and gain/min interval
+[−4.826,−1.759] are negative; all0/24 two-wall. Retain20% whole-episode guidance.
+No extension, second learner, probability/block-length sweep or automatic successor.
 
-It tests50% independent32-action teacher blocks, cap1920, against retained20%
-whole-episode guidance. Native447fe50, teacher,12M64/Auto/N8/B16/T16/H15/R16/
-replay-value1/expert100 and all-state labels remain fixed. Probability and temporal
-distribution change together. Fresh200k/12,477 updates have a30-minute cap,
-100k/6,227 recovery and four fixed24-natural-episode final/actual-initial arms.
-Greedy is primary against143.667; sampled70.750 is secondary. Initial traces,
-full replays/videos, independent block accounting, exposure, curves and guards
-are required. Changed helper/complete-comparison checks pass3.764s; all five
-actual commands pass. The declaration pins126 inputs.
+The candidate chooses50% of32-action blocks; actual overrides51.493%. Native
+score216–431 exposure is468 actions versus1262 retained, and neither reaches432.
+Late own-replay expert CE.552 versus.561 does not yield frozen improvement.
+Probability and temporal distribution change together, with different experience;
+no isolated mechanism or training-seed reliability claim. Teacher/native447fe50,
+12M64/Auto/N8/B16/T16/H15/R16/replay-value1/expert100 remain fixed.
 
-Root`/x/Temp/kindle-breakout-block32-20261104/full`, service
-`kindle-breakout-block32-200k-20261104`. Check original live identity; do not overlap,
-restart this learner or schedule another GPU job while it is active. No repeated
-stage, cap increase, sweep, second learner, extension or automatic successor.
+All126 current/338 retained pins,100k/6227 recovery,357 matched initial/invariant
+frozen arrays,47 bounded pre-update and799/794 initial semantic events, full
+replays/videos, guards, curves, block accounting, exposure and comparison pass.
+Sourceb07ebbcc; original main/collector succeed02:15:09/02:15:35 UTC November4.
+All three services succeed, with zero failures or repeated GPU stages. Bounded
+CPU qualification failures remain preserved in the report. Root
+`/x/Temp/kindle-breakout-block32-20261104/full` isclosed. No learner or GPU allocation
+is active; check live state before work. Do not restart this learner or collectors.
 Original864/90%-two-wall and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
