@@ -2,7 +2,7 @@
 
 The bounded check passes execution and cost gates, with **31.350% more training
 time** than retained. Gameplay benefit remains unmeasured; a separately declared
-fresh200k comparison is now selected. [Bounded results](#bounded-learning-cost-check-complete).
+fresh200k comparison is now running. Startup passes; final gameplay is pending. [Bounded results](#bounded-learning-cost-check-complete).
 
 The [development protocol](../experiments/2026-11-06-cdp-actor-expected-value.md)
 implements `actor_expected_value`, default false. It replaces the sampled-action
@@ -160,3 +160,22 @@ native module or emulator is constructed. Exact five-command qualification and
 launch remain next; no learner is active at this declaration. Root
 `/x/Temp/kindle-actor-expected-value-20261106/full` retains its source copies and
 historical source resolution. No old stage or failed queue is repeated.
+
+## Fresh200k comparison running
+
+The exact five queued commands pass CPU qualification in.379s including wrapper,
+with zero native/emulator construction and365 pinned inputs. The guarded service
+launches **13:14:33.501 UTC November6**, source
+`2de5bd0f41f2eb00dc6524dfa25d4e2986aa8777`; mainPID1491004, invocation
+`9cf81a2d7f52454a9bec3ef5685633b8`. Collector1491007 and recovery observer1491010
+run independently against that original identity. Preparation/qualification/
+launch pass without failure or repeated GPU stage.
+
+Startup verifies all357 initial tensors/moments against both bounded and retained,
+all47 pre-update semantic events and first update at376 actions. The exact header
+change is only the expected-value flag plus explicit existing bootstrap default
+and declared source hashes. Learning is active with finite reports. No final
+score or gain/min result exists yet. The100k recovery check, all four frozen
+arms, full action replays, curves, exposure and terminal collection remain pending.
+An observation timeout is not a stopped learner; inspect the original service and
+process before any action. No successor or extension is selected.

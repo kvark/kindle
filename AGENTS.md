@@ -31,13 +31,17 @@ interval criterion. These reused development choices do not establish reliabilit
 The option replaces sampled-action policy loss with a detached expectation over
 all18 one-step action values. Entropy, imitation, critic and original imagination
 remain; no learned parameters or image changes. Horizon and start distribution
-change with the estimator. CPU helper/comparison/plot checks pass; next declare
-and qualify the exact five queued commands before launching one guarded learner.
-Require357 initial tensor and47 pre-update event matches to bounded/retained,
-matching initial frozen traces,100k recovery, full replays and terminal collection.
+change with the estimator. CPU helper/comparison/plot and all five exact queued
+command checks pass,365 pins. The guarded learner is active; startup matches all
+357 initial tensors and47 pre-update events to bounded/retained. First update376
+passes. Matching initial frozen traces,100k recovery, full replays, final gameplay
+comparison and original terminal collection remain pending.
 
 Root `/x/Temp/kindle-actor-expected-value-20261106/full`; service
-`kindle-breakout-actor-expected-value-200k-20261106`. No learner is active yet.
+`kindle-breakout-actor-expected-value-200k-20261106`, mainPID1491004/invocation
+`9cf81a2d7f52454a9bec3ef5685633b8`, source2de5bd0f, launched13:14:33 UTC.
+Collector1491007 and recovery observer1491010 are active. Inspect these original
+identities; an observer timeout does not authorize a restart.
 Original CPU compile failure stays preserved; corrected CPU/native/bounded stages
 pass, with no repeated GPU stage. No extension, sweep or automatic successor.
 Keep the default off and retain ordinary inference,32×16 and143.667 greedy/70.750
