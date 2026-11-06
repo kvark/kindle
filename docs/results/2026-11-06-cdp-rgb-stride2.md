@@ -8,7 +8,7 @@ latent/control dimensions remain unchanged. Decoder graphs remain exact.
 
 The encoder convolutions compute one quarter of their former output positions;
 no encoder max-pool follows them. This changes sampling and nonlinear reduction,
-so it is neither a behavior-preserving optimization nor a measured speedup.
+so behavior can change. The operation count alone does not establish speedup.
 Learning quality remains unmeasured; the bounded training-cost result below is
 a historical comparison, not a paired timing benchmark. Native max-pooled
 RGB and the existing single GPU resize remain; no labels or emulator state enter
