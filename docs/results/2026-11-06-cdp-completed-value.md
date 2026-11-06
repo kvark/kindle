@@ -119,3 +119,23 @@ A separately declared fresh fixed-budget comparison can now assess useful frozen
 learning per minute against both the bonus-off reference and primary retained
 recipe. No full learner, sweep, extension or automatic successor is selected.
 Original 864/90% two-wall and the five-game goal remain unfinished.
+
+## Full200k comparison selected
+
+The [separate fixed protocol](../experiments/2026-11-06-cdp-completed-value-200k.md)
+selects one fresh200k learner after bounded execution/activity/cost gates pass.
+No bounded experience transfers. Compare the matching historical bonus-off
+control and the stronger retained bonus-on primary, with four frozen24-natural-
+episode arms, exact initial controls,100k recovery, replay and independent
+collection. Relative to bonus-off, only the new boolean differs in effective
+learning config; native/runner/guidance-wrapper identities differ as disclosed.
+No gameplay result exists yet; preparation remains CPU-only. No extension,
+second learner or automatic successor is selected.
+
+The initial full CPU helper preflight fails before GPU launch: it assumes an
+episode record precedes a learner report at the same action. The original
+`helpers-execution.json` and `before-target-order-repair-util.txt` are retained.
+A separate action-counter audit repair finishes only the unreached checks in
+1.759393s (wrapper1.850254s), including four corrupted-activity cases and the
+complete comparison entry. Passed helper stages are not repeated. This changes
+no learner, target or native code. The original failure is not relabeled passed.

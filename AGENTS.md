@@ -20,25 +20,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [completed replay-value option](docs/results/2026-11-06-cdp-completed-value.md#completed-bounded-activity-and-cost-check)
-passes its bounded check: 8,192 actions / 32,729 frames / 489 updates in36.403s,
-versus saved bonus-off36.677s. Completed targets replace56,061 rows on434 updates,
-first at action1,224. All261 initial/frozen tensors,47 pre-update transitions,
-weighted losses, complete replays and guards pass. This establishes activity
-and early cost, not gameplay benefit.
+The [fresh200k completed replay-value comparison](docs/experiments/2026-11-06-cdp-completed-value-200k.md) is selected after
+native and bounded checks pass. It tests whether observed completed returns
+improve frozen learning per minute. Use the exact d0e7bb79/SHA3146e0dc runtime,
+12M64/Auto/N8/B16/T16/H15/R16, CDP500, original guidance and bonus off; add only
+completed replay values relative to the historical bonus-off learning config.
+No build, overlay or bounded experience transfer.
 
-Padded200k projection16m17.620s and conservative11.920GiB full-replay headroom
-clear the declared gates. Controller closes19:42:33.689 UTC November6; independent
-CPU recount at19:42:54.153 verifies57 pins,46 artifacts andnine tensor files.
-Both GPU children are terminal; no learner or render holder remains. Native
-d0e7bb79/SHA3146e0dc, execution20dc4d43; root
-`/x/Temp/kindle-completed-value-20261106/bounded` is closed. Original packaged
-Python fixture failures remain preserved with their separate repair.
+Root `/x/Temp/kindle-completed-value-20261106/full`; service
+`kindle-breakout-completed-value-200k-20261106`. One fresh200k/12,477-update learner,
+100k recovery, four24-natural-episode frozen arms and independent collection.
+Compare both bonus-off65.208/46.458 and retained143.667/70.750; the weaker control
+alone cannot justify adoption. Native/runner/wrapper versions differ from the
+historical control; core teacher ASTs and initial tensors/traces are qualified.
+Preparation is CPU-only; no full learner has launched yet.
 
-No full learner, coefficient sweep, extension or automatic successor is selected.
-Do not repeat completed stages or reuse this check's experience. Retain original
-guidance, CDP500 and primary Breakout143.667 greedy/70.750 sampled; original
-864/90% two-wall and the five-game goal remain unfinished.
+The bounded root is closed:36.403s,56,061 target-row exposures,977.620s projected
+full cost and11.920GiB conservative replay headroom. Do not repeat it. Prior
+packaged fixture failures and separate repair remain preserved. Retain the
+current primary and original864/90% two-wall gate; five-game goal unfinished.
+No second learner, extension, sweep or automatic successor is selected.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
