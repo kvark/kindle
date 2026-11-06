@@ -1,30 +1,26 @@
 # Kindle: CDP learning roadmap
 
-The [fresh RGB96 comparison](experiments/2026-11-06-cdp-breakout-rgb96-200k.md) is selected to test whether increased
-visual spatial capacity improves frozen learning enough to offset its cost.
-The closed bounded check takes66.690s versus47.690s (+39.842%); its29m51s padded
-projection and3.757GiB conservative headroom pass the35-minute/2GiB gates.
+The [RGB96 full comparison](results/2026-11-06-cdp-rgb96.md#full-200k-comparison) is complete and
+fails retention:74.708 greedy/60.417 sampled versus143.667/70.750. Fresh200k
+actions/799,574 frames/12,477 updates take30m52.756s,43.857% more training time.
+Primary own-initial gain/min falls63.984%,6.590132→2.373492; its paired95%
+difference interval[-5.582483,-2.893938] is negative. All final modes are0/24
+two-wall. Geometry, capacity and initialization change together; no isolated
+perceptual cause or broad reliability follows.
 
-One fresh200k-action/12,477-update learner, seed1009, uses the qualified native
-7704d25c and matching runner/teacher. RGB96 increases trainable parameters
-16,334,353→24,862,993 through visual embedding, posterior, CDP predictor and
-disagreement capacity. Other effective settings remain retained; optional actor
-paths stay off. This is a joint geometry/capacity test, not a perceptual finding.
-Require exact own-bounded initial tensors/pre-update events and four24-episode
-frozen arms with own actual-initial controls. Greedy gain/min is primary.
+All357 own-bounded initial tensors/47 pre-update events, weighted/finite reports,
+100k recovery, four24-natural-episode frozen arms with357 invariant tensors,
+full replays/videos, curves,367 current/338 retained pins and56 completion
+artifacts pass. Own-initial sampled1.333/greedy1.417 differ from retained controls.
+Original main/collector complete15:19:49.164/15:20:13.484 UTC November6;
+publication closure15:20:59.477 confirms all original services/children terminal,
+no Kindle service/render holder and no full-stage failure/repeat.
 
-Changed CPU helpers and complete comparison/plot entry checks pass in3.991s,
-with no native/emulator construction; all five exact queues pass in.503s.
-Root /x/Temp/kindle-rgb96-20261106/full is active from14:44:55 UTC November6,
-sourcecf007696. Startup passes all357 own-bounded initial tensors and47 pre-update
-events; first update376. All367 pins and original main/collector/recovery service
-identities pass at14:45:48. The100k/6,227 recovery independently passes15:00:25
-with all357 finite tensors/read-only files and367 unchanged pins; its observer
-exits successfully. Original main/collector remain active. No frozen gameplay
-result yet; observe the same allocation through fixed assessments and collection.
-Original Python/two native fixture failures remain preserved with separate repairs.
-No bounded experience transfers and no completed stage repeats or extends.
-Retain RGB64,32×16,143.667 greedy/70.750 sampled pending evidence.
+Root /x/Temp/kindle-rgb96-20261106/full is closed, execution sourcecf007696,
+native7704d25c. Original Python/two native fixture failures remain preserved with
+separate repairs. Keep useful checkpoints/package artifacts; build cache was
+already released. Retain RGB64,32×16,143.667 greedy/70.750 sampled and optional
+actor paths off. No GPU allocation, extension or automatic successor is selected.
 Original864/90%-two-wall and the five-game goal remain unfinished.
 
 The [full enumerated one-step actor comparison](results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
