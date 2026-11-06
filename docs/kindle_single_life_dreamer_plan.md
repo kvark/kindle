@@ -1,20 +1,23 @@
 # Kindle: CDP learning roadmap
 
-One [fresh200k CDP prediction-scale1000 comparison](experiments/2026-11-06-cdp-breakout-cdp1000-200k.md) is selected
-after the completed bounded check passes execution/cost gates. Change only
-prediction loss500→1000, with retained native447fe50, original encoder, teacher
-and learning recipe. Fresh seed1009;100k recovery and four frozen24-natural-
-episode arms. Greedy raw return and own-initial gain/min are primary, including
-a positive lower paired gain/min interval. No native build or experience transfer.
+The [fresh200k CDP prediction-scale1000 comparison](results/2026-11-06-cdp-breakout-cdp1000.md#fresh200k-comparison-selected) is running.
+Only prediction loss500→1000 changes; retain native447fe50, original encoder,
+teacher and learning recipe. All357 initial tensors and47 pre-update events
+match bounded/retained; first update376. Exact five-command preflight passes
+with137 pins and zero native/emulator construction. No gameplay result yet.
 
-The first full CPU helper preflight fails at a stale plot-fixture path. Preserve
-its failure and source bytes; a separate1.187419s CPU repair completes the
-missing plot/source checks without native import or GPU work. Earlier bounded
-canonical import failure and repair also remain retained. [Evidence](results/2026-11-06-cdp-breakout-cdp1000.md#fresh200k-comparison-selected).
-Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`; actual queue preflight and
-launch preparation are next. No GPU allocation is active yet. Do not repeat
-completed stages; no extension, second learner or automatic successor.
+Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`, source5b8d21a1. Main service
+`kindle-breakout-cdp1000-200k-20261106`, PID1532223,
+invocation`d6760fb8ef014cd194dd90a70cb5c0e5`, starts18:25:01.109 UTC November6.
+Recovery observer1532229 and terminal collector1532226 are active. Monitor the
+original identities; do not restart after an observer timeout. Training,100k
+recovery and four frozen24-natural-episode arms remain pending. See the
+[fixed protocol](experiments/2026-11-06-cdp-breakout-cdp1000-200k.md); greedy raw return and own-initial gain/min are
+primary, with a positive lower paired gain/min interval required for retention.
 
+Original canonical import failure and full CPU plot-fixture failure remain
+preserved with separate repairs. No completed GPU stage repeats; no native
+build, experience transfer, extension, second learner or automatic successor.
 Retain143.667 greedy/70.750 sampled. Original864/90% two-wall and the five-game
 goal remain unfinished. The completed stride-two option stays off.
 

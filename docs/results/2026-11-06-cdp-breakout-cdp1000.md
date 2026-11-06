@@ -6,7 +6,7 @@ one fresh8,192-action/489-update check of prediction scale500→1000. Only
 convolution/max-pool encoder, teacher, geometry and learning schedule remain
 fixed. No native build is needed. After the completed bounded check, a separate
 [fresh200k comparison](../experiments/2026-11-06-cdp-breakout-cdp1000-200k.md)
-is selected below; it has not started yet.
+is now running; its startup checks pass. Frozen gameplay results remain pending.
 
 Earlier gradient attribution found imitation already a major representation
 objective, partly aligned with CDP. This does not establish that stronger CDP
@@ -118,6 +118,22 @@ completed GPU stage. `helpers-review.json` explicitly records
 `passed_with_plot_fixture_repair`, linked to the preserved failure and separate
 repair. The original canonical-package import failure also remains preserved.
 
-Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`; the five actual queue
-commands and launch declaration are being prepared. No new GPU allocation is
-active yet. No extension, second learner or automatic successor is selected.
+The exact five-command preflight passes in0.343291s with137 declared pins,
+zero native/emulator construction attempts and zero GPU descriptors. It checks
+the fresh config and four restore paths, rejects three changed training
+commands and four invalid replay paths, and validates checkpoint cadence/schema.
+
+Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`, execution source
+`5b8d21a1af8d5a486aea28dc00815413720fd3b7`. Service
+`kindle-breakout-cdp1000-200k-20261106` starts18:25:01.109 UTC November6,
+main PID1532223/invocation`d6760fb8ef014cd194dd90a70cb5c0e5`.
+Collector PID1532226/invocation`1cb0ccb509dc447ab99ba05768e358b8` and
+recovery observer PID1532229/invocation`4915905c186149cb8881badc97bb90a7`
+are independently active.
+
+Startup passes18:25:07.766 UTC: all357 initial tensors match bounded and
+retained, all47 pre-update events match, first update376 and exact declared
+header/config change. The startup observer takes.335182s, included in training
+wall time. Training,100k recovery, complete replay and frozen outcomes remain
+pending. Observe these original identities; a timeout is not a stopped job.
+No extension, second learner or automatic successor is selected.
