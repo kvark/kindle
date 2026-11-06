@@ -20,30 +20,25 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [fresh200k completed replay-value comparison](docs/experiments/2026-11-06-cdp-completed-value-200k.md) is selected after
-native and bounded checks pass. It tests whether observed completed returns
-improve frozen learning per minute. Use the exact d0e7bb79/SHA3146e0dc runtime,
-12M64/Auto/N8/B16/T16/H15/R16, CDP500, original guidance and bonus off; add only
-completed replay values relative to the historical bonus-off learning config.
-No build, overlay or bounded experience transfer.
+The [completed replay-value comparison](docs/results/2026-11-06-cdp-completed-value.md#full200k-comparison) finishes200k actions /799,584
+frames /12,477 updates in17m03.021s. Frozen greedy89.958/sample50.500 improve
+point scores over bonus-off65.208/46.458, but both paired gain/min intervals
+span zero. Against primary143.667/70.750, greedy gain/min falls21.906% despite
+20.567% less training time. Keep the option off and retain primary; all0/24
+two-wall and original864/90% gate unfinished.
 
-Root `/x/Temp/kindle-completed-value-20261106/full`; service
-`kindle-breakout-completed-value-200k-20261106`. One fresh200k/12,477-update learner,
-100k recovery, four24-natural-episode frozen arms and independent collection.
-Compare both bonus-off65.208/46.458 and retained143.667/70.750; the weaker control
-alone cannot justify adoption. Native/runner/wrapper versions differ from the
-historical control; core teacher ASTs and initial tensors/traces are qualified.
-Launched19:57:02.775 UTC November6 from39324619, controller1543615/
-invocationf0806cb2c90e47aaa5aa60c4541fb751. All425 pins and five mocked
-command paths pass;261 actual-initial arrays and47 pre-update events match.
-The original CPU log-order failure and separate missing-check repair remain
-preserved. Training and independent recovery/terminal observers are active.
+All261 initial/frozen tensors,47 pre-update events, complete replays, weighted
+losses,100k recovery and original services pass. Completed labels supply2,531,238
+row exposures on12,422 updates, first at action1,224. Independent CPU closure
+20:19:20.913 UTC November6 verifies425 active/338 retained pins,55 completion
+artifacts,28 checkpoint files and384 candidate/reference episodes. Prior packaged
+fixture and full helper log-order failures remain preserved with separate repairs.
 
-The bounded root is closed:36.403s,56,061 target-row exposures,977.620s projected
-full cost and11.920GiB conservative replay headroom. Do not repeat it. Prior
-packaged fixture failures and separate repair remain preserved. Retain the
-current primary and original864/90% two-wall gate; five-game goal unfinished.
-No second learner, extension, sweep or automatic successor is selected.
+Root `/x/Temp/kindle-completed-value-20261106/full` is closed; execution39324619,
+native d0e7bb79/SHA3146e0dc. All five GPU children and main/recovery/collector
+services are terminal; no render holder remains. No extension, second learner,
+sweep or automatic successor is selected. Do not repeat completed stages.
+The five-game goal remains unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

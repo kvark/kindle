@@ -152,3 +152,20 @@ that a pure-imitation learner would be better. Useful action values and their
 measured policy effect remain unresolved. The later enumerated one-step actor
 comparison also fails its fixed learning-efficiency criterion. Its distinct
 objective is recorded above; no closed learner is repeated or extended.
+
+A separate [completed replay-value comparison](2026-11-06-cdp-completed-value.md#full200k-comparison)
+now tests stronger grounding in observed outcomes without a new actor objective.
+It scores89.958 greedy/50.500 sampled in17m03.021s, above bonus-off65.208/46.458
+point scores but with both paired gain/min intervals spanning zero. It remains
+below primary143.667/70.750 and has21.906% lower primary gain/min. Keep it off.
+The comparison includes2,531,238 completed-target row exposures and passes all
+learning, replay, recovery and independent closure checks; it measures no new
+calibration diagnostic. Observed-return targets also follow the collecting
+actor/teacher mixture. This does not establish a corrected critic or a
+SuperMimic-like gain.
+
+In this run,86.011% of training wall time is spent learning and6.053% stepping
+Atari. That limits the available gain from accelerating environment simulation
+alone. The practical architectural objective remains better frozen policy
+improvement per model update and training minute, with direct actor gradients
+kept as an optional native capability. No successor allocation is selected.
