@@ -1,5 +1,22 @@
 # Kindle: CDP learning roadmap
 
+The [CDP prediction-scale1000 check](results/2026-11-06-cdp-breakout-cdp1000.md) is selected for one fixed
+8,192-action/489-update cost and restore check. Only the existing prediction
+loss weight changes500→1000; retain native447fe50, the original encoder,
+teacher and learning recipe. No native build or full learner is selected.
+
+Canonical39/private38 CPU tests pass, with one private unsupported-feature
+skip and zero native construction attempts. The original canonical import
+failure is preserved; a separate matching-Python CPU fixture repairs it without
+changing the GPU runtime. Exact queue preflight passes with zero native/emulator
+construction. Root `/x/Temp/kindle-breakout-cdp1000-20261106`; consult the
+[fixed protocol](experiments/2026-11-06-cdp-breakout-cdp1000.md). GPU queue prepared, not yet run.
+
+The [completed stride-two comparison](results/2026-11-06-cdp-rgb-stride2.md) remains closed and negative;
+keep it off. Retain143.667 greedy/70.750 sampled. Original864/90% two-wall
+and the five-game goal remain unfinished. No automatic successor or repeated
+completed stage.
+
 The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) comparison is complete and negative.
 Fresh200k scores16.458 greedy/13.000 sampled versus143.667/70.750 retained.
 Training takes19m22.697s versus21m27.910s (9.722% less), but primary own-initial

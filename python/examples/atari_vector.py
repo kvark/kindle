@@ -97,6 +97,8 @@ def main():
                         help="fresh learned RGB: downsample with stride-two convolutions without max-pooling")
     parser.add_argument("--image-crop", type=int, nargs=4, metavar=("X", "Y", "WIDTH", "HEIGHT"),
                         help="fresh learned RGB/CDP: native-pixel crop before the single GPU resize; restore uses checkpoint crop")
+    parser.add_argument("--cdp-scale", type=float,
+                        help="fresh CDP: cosine prediction loss scale; omitted: 500")
     parser.add_argument("--cdp-centered", action="store_true",
                         help="CDP ablation: center cosine predictions/targets over the full replay batch")
     parser.add_argument("--disagreement-scale", type=float, default=0.0,
@@ -255,6 +257,11 @@ def main():
             parser.error("terminal-replay-fraction must be finite and in [0, 1]")
         if args.restore or args.evaluate or args.encoder_training:
             parser.error("terminal-replay-fraction requires fresh non-video training")
+    if args.cdp_scale is not None:
+        if not positive_f32(args.cdp_scale):
+            parser.error("cdp-scale must be finite and positive in F32")
+        if args.evaluate or args.encoder_checkpoint or (not args.cdp and not args.restore):
+            parser.error("cdp-scale requires fresh CDP with the learned CNN")
     if not positive_f32(args.learning_rate):
         parser.error("learning-rate must be finite and positive in F32")
     if args.discount_horizon is not None:
@@ -376,7 +383,7 @@ def main():
     if args.imagination_length is not None and args.imagination_length <= 0:
         parser.error("imagination-length must be positive")
     if args.open_loop_scale is not None and (args.open_loop_length is None or not positive_f32(args.open_loop_scale)
-                                            or not positive_f32(500 * args.open_loop_scale)):
+                                            or not positive_f32((args.cdp_scale if args.cdp_scale is not None else 500) * args.open_loop_scale)):
         parser.error("open-loop-scale requires open-loop-length and a positive finite scaled F32 loss")
     if args.open_loop_length is not None and (not args.cdp or args.encoder_checkpoint
                                              or not 2 <= args.open_loop_length < args.batch_length):
@@ -557,6 +564,7 @@ def main():
     training_options.add("--dynamics-learning-rate")
     training_options.add("--cdp")
     training_options.add("--cdp-centered")
+    training_options.add("--cdp-scale")
     training_options.add("--disagreement-scale")
     training_options.add("--training-precision")
     training_options.add("--rgb-coordinates")
@@ -874,7 +882,7 @@ def main():
                 config["observation_crop"] = dict(zip(("x", "y", "width", "height"), args.image_crop))
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
             if args.cdp:
-                config["loss_scales"].update(reconstruction=0.0, future_prediction=500.0)
+                config["loss_scales"].update(reconstruction=0.0, future_prediction=args.cdp_scale if args.cdp_scale is not None else 500.0)
                 config.update(**cdp_rates, cdp_centered=args.cdp_centered)
         else:
             config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)

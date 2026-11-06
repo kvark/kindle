@@ -8,23 +8,22 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) comparison is complete and negative.
-Fresh200k scores16.458 greedy/13.000 sampled versus143.667/70.750 retained.
-Training takes19m22.697s versus21m27.910s (9.722% less), but primary own-initial
-gain/min falls88.580%; all eight lanes regress in both modes. Keep stride-two
-off and retain the original convolution/max-pool encoder. Sampling/nonlinearity
-change together; the result does not isolate a perceptual cause.
+The [CDP prediction-scale1000 check](results/2026-11-06-cdp-breakout-cdp1000.md) is selected for one fixed
+8,192-action/489-update cost and restore check. Only the existing prediction
+loss weight changes500→1000; retain native447fe50, the original encoder,
+teacher and learning recipe. No native build or full learner is selected.
 
-All12,477 updates,357 initial/frozen tensors, full action/label replays,100k
-recovery,372 active/338 retained pins and original services pass. Independent
-CPU closure recounts192 candidate/control episodes,55 completion artifacts and
-28 checkpoint files. Original CPU fixture compile failure remains preserved;
-no GPU stage repeats. Root `/x/Temp/kindle-rgb-stride2-20261106/full`, source
-`8d4ab88d`, native `cde123e1`; closure17:57:14.858 UTC November6.
-Main, recovery and terminal services are complete; no render holder or learner
-is active. No successor is selected. Do not repeat completed stages. Keep
-retained143.667 greedy/70.750 sampled; original864/90% two-wall and five-game
-goal remain unfinished.
+Canonical39/private38 CPU tests pass, with one private unsupported-feature
+skip and zero native construction attempts. The original canonical import
+failure is preserved; a separate matching-Python CPU fixture repairs it without
+changing the GPU runtime. Exact queue preflight passes with zero native/emulator
+construction. Root `/x/Temp/kindle-breakout-cdp1000-20261106`; consult the
+[fixed protocol](experiments/2026-11-06-cdp-breakout-cdp1000.md). GPU queue prepared, not yet run.
+
+The [completed stride-two comparison](results/2026-11-06-cdp-rgb-stride2.md) remains closed and negative;
+keep it off. Retain143.667 greedy/70.750 sampled. Original864/90% two-wall
+and the five-game goal remain unfinished. No automatic successor or repeated
+completed stage.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
