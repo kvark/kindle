@@ -1,14 +1,22 @@
 # Kindle: CDP learning roadmap
 
 The [frozen action-path probe](results/2026-11-06-cdp-breakout-action-path-derivatives.md)
-passes its separately declared fixture repair:18 F64 derivatives,both objectives,
-frozen inputs and Tiny forward parity (relative error1.180303e-6),774 pins and
-host guard pass. Native.81s/controller3.193s, complete07:04:52.759 UTC November6.
-Original scalar/vector construction failure and earlier preparation failures
-remain preserved. Sourceb7d45c32/SHAf564ec90; two serial production jobs are now
-selected,120 origins/eight paired draws per model,180s each,zero learner updates
-or Atari actions. Root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair`.
-Qualification establishes numerical behavior, not useful model derivatives.
+is closed. Recorded-plan return gradients favor81/92 known short rescues for
+control and80/92 for candidate; full-plan predictions favor71/92 and73/92.
+Survival gradients favor12/18 and8/18 differing game-over rescues, with local/
+finite agreement10/18 and7/18. Actual-terminal plans still receive.970267/.967395
+discounted survival. These findings do not show globally reversed return gradients
+or isolate the failed learner's cause; fixed plans omit actor feedback/optimizer
+interactions and short rescues lack complete alternative returns.
+
+All775 production pins,43 invariant frozen GPU inputs per model,checkpoint hashes,
+19 identical-plan zero checks and guards pass. Native1.676s/.949s,controller6.029s,
+complete07:06:43.521 UTC November6; CPU analysis.417s/closure07:11:32.503. Zero Atari
+actions or learner/optimizer updates; no failed/repeated production stage. The
+original toy-shape qualification failure and separate passing repair remain.
+Root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair` is closed; both
+binaries retained,5,610,733,853 logical cache bytes released. No active allocation
+or successor selected. Keep actor dynamics off and the retained baseline.
 
 The [matched action-derivative context capture](results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
 is complete:120 latent origins per model,43,424 actions/173,660 frames each,

@@ -10,10 +10,13 @@ new path adds22.39% bounded wall time. A separately declared
 is now complete and negative:85.708 greedy/51.625 sampled in26m38.517s,
 below retained143.667/70.750 in21m27.910s. Keep the option off; this coefficient
 and seed do not establish useful extra learning or rule out all such recipes.
-[Matched frozen contexts](2026-11-06-cdp-breakout-action-derivative-contexts.md)
-are now captured at120 known rescue origins for each model, with zero updates
-and all audits passing. They support a separately qualified derivative-quality
-probe; the capture itself does not measure gradient usefulness. The independent
+The [completed frozen action-path probe](2026-11-06-cdp-breakout-action-path-derivatives.md)
+finds recorded-plan return gradients favor81/92 known short rescues for control
+and80/92 for candidate. Survival directions favor12/18 and8/18 differing game-over
+rescues, while actual-terminal plans still receive about.97 discounted survival.
+This does not show generally reversed return gradients or isolate the full learner
+regression; actor feedback, other losses and optimizer interactions are omitted.
+No successor allocation is selected. The independent
 [coordinate-channel comparison](2026-11-06-cdp-rgb-coordinates.md) is now closed
 and regresses both frozen modes; it does not test this actor-gradient proposal.
 
@@ -88,5 +91,5 @@ alternative estimator,not equivalent to multi-step differentiable imagination;
 it has separate compute andmodel-bias tradeoffs.
 
 The retained Breakout70.750sampled/143.667greedy control andoriginal864/90% gate
-remain unchanged. No claimed speedup,no completed experiment andno successor
-allocation follow from this source review.
+remain unchanged. No speedup, completed five-game goal or successor allocation follows from the
+paper alone; the implemented comparison and diagnostic results are linked above.

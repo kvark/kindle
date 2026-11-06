@@ -8,27 +8,29 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [frozen action-path derivative probe](results/2026-11-06-cdp-breakout-action-path-derivatives.md)
-passes its separate fixture repair and is selected for two serial frozen
-production jobs. Each uses120 saved origins/eight paired latent draws, two fixed
-plans and explicit survival/endpoint-return objectives. No actor feedback,
-optimizer updates, learner or Atari actions. Native sourceb7d45c32/SHAf564ec90,
-root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair`;180s per model.
-Consult the protocol and current process identity before execution.
+The [frozen action-path probe](results/2026-11-06-cdp-breakout-action-path-derivatives.md)
+is closed. At92 short rescues, recorded-plan return gradients favor teacher81/92
+control and80/92 candidate; full-plan predictions favor71/92 and73/92. At18
+differing game-over origins, survival gradients favor12/18 and8/18, agreeing
+with finite plan differences10/18 and7/18. Recorded terminal plans still receive
+.970267/.967395 discounted survival despite actual zero. This does not show
+generally reversed return gradients or isolate the full learner regression.
 
-Qualification passes18 F64 derivatives,both objectives,frozen inputs and Tiny
-forward parity (maximum relative error1.180303e-6), with774 pins and host guard
-passing. Native test.81s/controller3.193s, complete07:04:52.759 UTC November6.
-The original scalar/vector fixture construction fails before forward/backward;
-its guard,binary,source and earlier preparation failures remain preserved.
-The repair adds CPU construction coverage; both changed CPU checks and Clippy
-pass, with190 Kindle/5 gym and4 analysis tests passing before the repair.
+All775 production pins,43 frozen GPU input tensors per model,checkpoint hashes,
+19 identical-plan zero checks and guards pass. Native1.676s/.949s; controller6.029s
+complete07:06:43.521 UTC November6, CPU analysis.417s and closure07:11:32.503.
+Zero Atari actions, learner or optimizer updates; no failed/repeated production
+stage. Root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair`, source
+b7d45c32/SHAf564ec90, selection65f1a9ac. No active allocation or successor selected.
 
-Reuse the [captured contexts](results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
-and saved92 short rescues/18 differing game-over outcomes. No capture or old
-collector repeats. This diagnostic cannot alone isolate the learner regression.
-Retain `actor_dynamics_scale=None`, coordinates off and143.667/70.750 control;
-original864/90%-two-wall and five-game gates remain unfinished.
+Original toy-shape qualification failure and separate repair remain preserved.
+Repaired18 F64 derivatives and Tiny forward checks pass; earlier CPU/Clippy and
+preparation failures remain linked. Both packaged binaries are retained; the
+5,610,733,853-logical-byte disposable build cache is released. Never rerun the
+probe, old captures or collectors. Fixed plans omit actor feedback and optimizer
+interactions; those remain unresolved. Retain `actor_dynamics_scale=None`,
+coordinates off and143.667/70.750 control. Original864/90%-two-wall and five-game
+gates remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
