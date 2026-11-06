@@ -68,8 +68,12 @@ on sourcecb9a0499, with124 fixed pins. MainPID1386077, invocation
 `c11b782f30804e6f951712401a64d0d8`; service
 `kindle-breakout-rgb-coordinates-200k-20261106`. All357 initial tensors match the
 bounded architecture and47 pre-update events match. The first update occurs
-at376 actions. Recovery andterminal observers are active; no frozen full result
-is available. Check live process identity before any further GPU work.
+at376 actions. The100k/6,227-update recovery passes **04:40:58.783 UTC**:
+357 finite tensors/51,507,459 elements,124 unchanged pins,read-only directory
+andfiles. Independent verification takes.349s (.414s observer wrapper), with
+zero model forwards/updates; CPU co-host time remains uncorrected. The recovery
+service succeeds. Original learner andterminal observer remain active; no full
+frozen result is available. Check live process identity before further GPU work.
 
 Full CPU preparation first fails only in its plot fixture, which retained the
 previous experiment's path andlatent-mixing expectation. Both are corrected in

@@ -36,8 +36,9 @@ benefit or isolated perceptual cause is established. Source2d651cb0/nativeb91364
 andrunnera0ffbe46 differ fromretained447fe50; baseline initial equality is not
 required. Root`/x/Temp/kindle-rgb-coordinates-20261104/full`. The fresh learner
 launches04:30:28.229 UTC November6/sourcecb9a0499, with124 pins; mainPID1386077/invocationc11b782f30804e6f951712401a64d0d8. Startup passes357
-bounded-matching initial tensors and47 pre-update events. Recovery/terminal
-observers are active. Check live identity; do not restart or launch another GPU
+bounded-matching initial tensors and47 pre-update events. The100k/6,227 recovery
+passes independent verification04:40:58.783 UTC:357 finite tensors,124 unchanged
+pins andread-only files. Original learner andterminal observer remain active. Check live identity; do not restart or launch another GPU
 job while this learner is active.
 
 The [SuperMimic source review](docs/results/2026-11-06-supermimic-architecture-review.md) identifies

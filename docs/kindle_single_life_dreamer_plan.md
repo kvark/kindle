@@ -14,8 +14,9 @@ initial equality orisolated mechanism is claimed. Nativeb9136467/runnera0ffbe46.
 The SuperMimic actor-gradient direction is a separate proposal, not this change.
 The fresh learner launches04:30:28.229 UTC November6/sourcecb9a0499 with124pins,
 mainPID1386077/invocationc11b782f30804e6f951712401a64d0d8. Startup passes357initial
-tensors and47events; recovery/terminal observers are active. Full frozen benefit
-is pending. The [SuperMimic source review](results/2026-11-06-supermimic-architecture-review.md)
+tensors and47events. The100k/6,227 recovery passes04:40:58.783 UTC, with357finite
+tensors and124unchanged pins; original learner andterminal observer remain
+active. Full frozen benefit is pending. The [SuperMimic source review](results/2026-11-06-supermimic-architecture-review.md)
 records the separate connected-actor-graph proposal. The original864/90% gate
 andfive-game goal remain unfinished. Check live state; no concurrent GPU job.
 
