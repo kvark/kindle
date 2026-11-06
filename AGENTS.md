@@ -20,22 +20,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [initial-episode guidance experiment](docs/experiments/2026-11-06-cdp-breakout-initial-guidance.md) is CPU-qualified and selected
-for one bounded8,192-action learner plus1,024 frozen greedy actions. Force each
-lane's first two natural episodes, retaining cap1,920, then resume20% episode
-selection. Preserve one random draw per episode and all-state labels/feedback.
-Keep RGB64,12M,T16,R16 and every native loss/rate/teacher unchanged. This changes
-guidance timing, amount and state distribution together; no benefit is established.
+The [fresh initial-episode guidance comparison](docs/experiments/2026-11-06-cdp-breakout-initial-guidance-200k.md) is selected after the
+[bounded check](docs/results/2026-11-06-cdp-breakout-initial-guidance.md) passes:8,192 actions/489 updates in46.584s versus47.690s,
+with all357 initial tensors equal retained and all357 frozen tensors invariant.
+All eight lanes stayed in their first episode; all actions were guided. The
+20m51s padded projection and11.22GiB conservative headroom pass feasibility gates.
+No learning benefit or live phase-exit coverage follows from the short check.
 
-The corrected CPU fixture and affected block tests pass41 checks; earlier
-schedule/replay/legacy checks pass, with two incomplete CLI-mock attempts retained
-separately. Both actual queued commands reach mocked native boundaries with zero
-native/emulator construction attempts; independent recount covers asynchronous
-phase exit and cap release. Reuse qualified native7704d25c with exact current
-Python sources; no rebuild. All357 initial tensors must match retained, while
-initial action traces intentionally change. Root /x/Temp/kindle-breakout-initial-guidance-20261106.
-No full learner, extension or automatic successor is selected. Retain143.667
-greedy/70.750 sampled; original864/90% and the five-game goal remain unfinished.
+One fresh200k-action/12,477-update learner uses exact bounded native7704d25c and
+runner/teacher, seed1009. Force each lane's first two episodes, retain cap1,920,
+then resume20% selection with one random draw per episode. RGB64/12M/T16/R16,
+losses/rates and all-state labels remain; timing, amount and state distribution
+change together. Require independent phase/cap recount and four24-natural-episode
+frozen arms against actual-initial controls. Greedy gain/min is primary.
+
+Full helpers, comparison/plot entry checks and negative cases pass in3.872s,
+without native/emulator construction. Root
+/x/Temp/kindle-breakout-initial-guidance-20261106/full is prepared; exact queue
+preflight and guarded launch follow. The bounded controller/children are terminal,
+302 pins pass and GPU is idle. Two incomplete CLI mocks and prior native fixture
+failures remain preserved. No bounded experience transfers, completed stage
+repeats, extension, second learner or automatic successor. Retain143.667 greedy/
+70.750 sampled pending evidence; original864/90% and five-game gates unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
