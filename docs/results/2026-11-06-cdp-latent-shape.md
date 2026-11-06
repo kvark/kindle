@@ -179,3 +179,11 @@ No frozen initial or final score has been measured yet. The original service is
 active; no new source/runtime edit, repeat, extension or successor is selected.
 Follow its original identity and observers through completion rather than
 restarting after an observation timeout. The fixed protocol remains unchanged.
+
+The original recovery observer completes successfully at11:27:40.863 UTC in.357s:
+100k actions/6,227 updates,357 finite tensors and356 unchanged pins, with original
+main identity preserved throughout. Files/directories are read-only; verification
+performs zero forwards or updates. Main training and terminal collection continue.
+A manual status poll initially assumes the completed observer still exposes its
+active invocation ID; systemd clears it on completion. Direct service/journal
+inspection confirms success and the unchanged live learner. No job is restarted.
