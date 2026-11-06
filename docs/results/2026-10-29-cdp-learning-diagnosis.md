@@ -1,39 +1,32 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh200k actor-width512 comparison](../experiments/2026-11-06-cdp-breakout-actor-width-200k.md)
-is selected after [bounded qualification](2026-11-06-cdp-actor-width.md). Actor-only capacity is untested;
-whole25M changed the world/critic too. Keep12M64/Auto/N8/B16/T16/H15/R16,
-encoder4e-5/dynamics4e-4/behavior8e-5,critic1/1,expert100/world gradients and
-20% guided episodes. Width512 adds1,054,720 trainable actor parameters; other
-widths/losses stay fixed. Coordinates and actor dynamics stay off.
+The [full actor-width512 comparison](2026-11-06-cdp-actor-width.md#full-200k-comparison)
+is complete and negative. Fresh200k actions/799,552 frames/12,477 updates take
+**24m14.355s**,12.924% longer than retained21m27.910s. Greedy **87.125** and
+sampled **39.958** regress143.667/70.750; all0/24 two-wall. Primary own-initial
+gain/min falls **46.293%**,6.590132→3.539370. Paired eight-lane difference
+−3.050762 has95% interval[−5.029410,−.914726]; this reused cohort does not
+establish seed reliability. Keep actor width absent/preset256, coordinates off
+and actor dynamics off. No extension, sweep, confirmation or successor.
 
-One fresh seed1009 learner receives200k actions/12,477 updates and100k recovery,
-with no bounded experience/weight transfer. Four frozen final/actual-initial
-sampled/greedy arms select24 natural episodes each. Judge raw greedy return
-and own-initial gain/min against143.667/6.590132, with the predeclared paired
-lane interval. Initial actor values/actions differ from retained; require313
-non-actor initial matches and exact357 tensors/47 events against the bounded
-run. CPU helper/comparison/plot checks pass in3.541s; all five queued command
-paths pass in.414s without native/emulator construction. The original learner
-starts08:27:14.431 UTC November6/source91647453/PID1432519/invocation
-`6e0453060296495b8d1062b0dadc9b37`, with347 pins and recovery/terminal observers.
-Startup passes08:27:20.152:357 bounded initial tensors/47 events and313 retained
-non-actor tensors match;11 retained initial events differ as allowed. Root
-`/x/Temp/kindle-actor-width-20261106/full`, service
-`kindle-breakout-actor-width-200k-20261106`, is active. The100k/6,227 checkpoint
-passes its original audit08:39:19.911 UTC and independent CPU verification
-08:39:45.022 in.372s:357 finite tensors,347 unchanged pins and read-only files.
-The verifier performs no model forward/update; original learner identity stays
-unchanged and the recovery observer succeeds. Recovery omits replay, games,
-live beliefs and full RNG. Frozen scores remain pending. Check original live
-identity; no extension, sweep, second learner or automatic successor. Original
-864/90%-two-wall and five-game gates remain.
+Actual-initial sampled1.666667/greedy1.333333 differ from retained1.416667/2.208333;
+comparison uses own-initial scores. All357 initial tensors/47 pre-update events
+match the bounded candidate, and313 non-actor initial tensors match retained.
+Four frozen arms select24 natural episodes each, zero selected truncations or
+updates,357 invariant tensors per arm. All347 current/338 retained pins,100k
+recovery,weighted losses,full training/frozen replays/videos,guards,curves,
+exposure and terminal collection pass. No preparation/production stage fails
+or repeats. Main/collector complete **08:55:25.209 /08:55:47.274 UTC November6**,
+source91647453; all three services succeed. Publication reader passes in.049s.
 
-The completed bounded run takes53.270s for8,192 actions/32,715 frames/489 updates,
-11.702% longer than retained; padded200k projection23m50.597s and11.214GiB
-conservative replay headroom pass. Native/CPU/restore/replay/guard checks pass
-without repeated or failed stages. Packaged runtime remains after4.807GB logical
-cache release. No bounded stage or old collector should repeat.
+Late own-replay labeled imitation CE improves.560514→.553252 despite worse
+frozen quality; experience differs. Training spends96.826% of actions below216
+points and none at432 or above. These fitting/coverage measurements do not
+isolate a capacity cause. Native/runner differ from the historical control;
+scoped qualification does not establish broad runtime equivalence. Root
+`/x/Temp/kindle-actor-width-20261106/full` is closed, with no allocation selected.
+The bounded cost check remains passed; packaged runtime retained after prior
+4.807GB logical cache release. Original864/90%-two-wall and five-game goal remain.
 
 The [completed actor-update diagnostic](2026-11-06-cdp-dynamics-actor-update.md) finds dynamics.5 changes
 the full estimated update by.01136%/.01702% at two retained200k batches;

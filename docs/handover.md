@@ -8,41 +8,26 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [fresh200k actor-width comparison](experiments/2026-11-06-cdp-breakout-actor-width-200k.md)
-is selected after the [bounded cost check](results/2026-11-06-cdp-actor-width.md) passes.
-Test actor512 versus256 with unchanged CNN/RSSM/critic widths and losses;
-add1,054,720 trainable parameters. Retain the12M64/Auto/N8/B16/T16/H15/R16
-recipe, expert100/all-state labels/20% guided episodes, coordinates and actor
-dynamics off. Fresh seed1009,200k actions/12,477 updates,100k recovery; no
-weights or experience transfer. Root `/x/Temp/kindle-actor-width-20261106/full`.
+The [actor-width512 comparison](results/2026-11-06-cdp-actor-width.md#full-200k-comparison)
+is complete and negative. Greedy87.125/sample39.958 regress143.667/70.750;
+200k actions take24m14.355s versus21m27.910s,12.924% longer. Primary own-initial
+gain/min falls46.293%. All0/24 two-wall. Retain the preset256 actor with optional
+width absent, coordinates off and actor dynamics off. One reused development
+seed does not establish a general capacity cause or reliability.
 
-Greedy frozen return and own-initial gain/min are primary, against143.667 and
-6.590132. Evaluate final and actual-initial sampled/greedy policies on24 natural
-episodes each. Initial actor values differ from retained; require313 matching
-non-actor tensors and exact357-tensor/47-event matches to the bounded run.
-CPU helpers/comparison/plot checks pass in3.541s; all five actual queued CLI
-paths pass in.414s without native/emulator construction. The original learner
-starts08:27:14.431 UTC November6, source91647453/PID1432519/invocation
-`6e0453060296495b8d1062b0dadc9b37`, with347 pins and recovery/terminal observers.
-Startup passes at08:27:20.152:357 bounded initial tensors/47 events and313
-retained non-actor tensors match;11 retained initial events differ as allowed.
-Service `kindle-breakout-actor-width-200k-20261106` is active; inspect the original
-process identity before further work. The100k/6,227 checkpoint passes its
-original audit08:39:19.911 UTC and independent CPU verification08:39:45.022:
-357 finite tensors,347 unchanged pins and read-only recovery files. The verifier
-takes.372s with zero model forwards/updates; original learner identity is
-unchanged. Recovery observer succeeds; frozen scores remain pending.
+All347 current/338 retained pins,100k recovery,357 matching bounded initial/
+invariant frozen tensors,313 retained non-actor initial tensors,weighted losses,
+full replays/videos,guards,curves and original services pass. Main/collector
+finish08:55:25.209/08:55:47.274 UTC November6, source91647453. No stage fails
+or repeats. Initial actor values/actions differ, and own-initial controls are
+used. Root `/x/Temp/kindle-actor-width-20261106/full` is closed; no GPU allocation
+or successor is selected. Packaged runtime remains; build cache was released
+after bounded qualification. Do not repeat its stages or collectors.
 
-No capacity cause is established. No sweep, unchanged extension, second learner
-or automatic successor is selected. Completed bounded/native stages remain
-closed; no rebuild is needed. Original864/90%-two-wall and the five-game goal
-remain unfinished.
-
-The [closed actor-update diagnostic](results/2026-11-06-cdp-dynamics-actor-update.md)
-finds only.01136%/.01702% changes in estimated retained-checkpoint updates.
-Its original CPU launcher failure and separate repair remain preserved. Keep
-actor dynamics off, coordinates off and143.667/70.750 retained control. Original
-864/90%-two-wall and the five-game goal remain unfinished.
+The [protocol](experiments/2026-11-06-cdp-breakout-actor-width-200k.md)
+retains exact budgets and comparisons. No extension, width sweep, confirmation
+or automatic successor. Original864/90%-two-wall and the five-game goal remain
+unfinished. A new experiment needs a separately justified hypothesis.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
