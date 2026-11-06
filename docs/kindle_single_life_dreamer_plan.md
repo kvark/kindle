@@ -7,11 +7,14 @@ pass. Both original services succeed; independent closure recounts489 reports
 and seals86 artifacts at22:39:54.108 UTC November6. No bounded-stage failure or
 repeat; earlier qualification CPU failures remain preserved with separate repairs.
 
-The [fresh200k comparison](experiments/2026-11-06-cdp-breakout-prior-reward-200k.md) is separately selected on seed22003 against its retained control,
+The [fresh200k comparison](experiments/2026-11-06-cdp-breakout-prior-reward-200k.md) is running on seed22003 against its retained control,
 with unchanged teacher/recipe except prior reward CE scale1 and the qualified
 native/runner. Primary greedy own-initial gain/min,100k recovery and four24-episode
-frozen arms remain fixed. Helpers pass CPU qualification; actual-command pinning/
-preflight and launch remain. No gameplay benefit or five-game completion claim.
+frozen arms remain fixed. Helpers and all five actual commands pass CPU checks;
+startup review passes. Original main PID1562317/invocation
+`3fbc09cb5f2947459016bc52a123e6f8`, collector and recovery observer are active,
+execution source`dda5bf6f`. The archived prelaunch recovery-unit correction
+requires no GPU repeat. No gameplay benefit or five-game completion claim.
 
 The [completed reward-supervision comparison](results/2026-11-06-cdp-breakout-reward10.md#full200k-comparison) fails retention. Only
 reward loss1→10 changes against retained22003:greedy52.167/sample42.625 versus

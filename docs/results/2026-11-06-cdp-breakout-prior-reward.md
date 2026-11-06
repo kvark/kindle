@@ -6,7 +6,7 @@ a default-off frozen restore. The original CPU graph assertion failure and
 subsequent CPU reporting failure remain preserved with separate repairs. No GPU
 stage repeats. The fixed8,192-action cost check is complete and passes. A separately declared
 [full200k comparison](../experiments/2026-11-06-cdp-breakout-prior-reward-200k.md)
-is selected. No gameplay benefit is established.
+is running. No gameplay benefit is established.
 
 The new loss applies the existing reward head to sampled one-step prior states
 before the arrival image enters the posterior. It uses the same real reward
@@ -110,6 +110,17 @@ No bounded preparation/run failure, repeated GPU stage, learner or collector.
 Earlier qualification CPU failures remain preserved above.
 
 The bounded allocation is closed. The [fixed200k comparison](../experiments/2026-11-06-cdp-breakout-prior-reward-200k.md)
-is separately selected against matched22003 with actual-initial controls and
-four24-episode frozen arms. Retain the current recipe pending its outcome.
+is running against matched22003 with actual-initial controls and four24-episode
+frozen arms. CPU helper qualification and all five actual commands pass; startup
+review passes. Original main PID1562317/invocation
+`3fbc09cb5f2947459016bc52a123e6f8`, execution source`dda5bf6f`, collector and
+recovery observer are active. Root is`/mnt/data/kindle-breakout-prior-reward-20261106/full`.
+
+Before launch, static review found a copied recovery-verifier service name still
+pointing to the closed reward10 allocation. The original declaration, verifier
+and passing preflight remain in`preparation-revision1`; the correction receipt
+records a CPU fixture of the actual systemctl command. After correcting the
+literal and repinning, all five actual commands pass again in2.848325s, without
+native/emulator construction. This preparation correction causes no GPU repeat.
+Retain the current recipe pending the full comparison's outcome.
 Original864/90%-two-wall and the full five-game goal remain unfinished.

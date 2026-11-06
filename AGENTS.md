@@ -26,7 +26,7 @@ match retained22003; frozen restore retains357 tensors with zero updates. Full
 replay, weighted losses, mask bounds,783 pins and original services pass. Native
 qualification's original CPU failures remain preserved; no bounded stage repeats.
 
-The [fresh200k comparison](docs/experiments/2026-11-06-cdp-breakout-prior-reward-200k.md) is separately selected against matched22003.
+The [fresh200k comparison](docs/experiments/2026-11-06-cdp-breakout-prior-reward-200k.md) is running against matched22003.
 Add only prior reward CE scale1; posterior reward stays1. Nativea89b0b8e/SHA19b6f46
 and the exact bounded runner/runtime retain the original teacher/adapters. Keep
 all other settings fixed, seed22003, frozen cohort4000022003, primary greedy
@@ -34,7 +34,10 @@ own-initial gain/min,100k recovery and four24-episode frozen arms. Original864/
 90%-two-wall and the full five-game goal remain unfinished.
 
 Root `/mnt/data/kindle-breakout-prior-reward-20261106/full`. CPU helper qualification
-passes; prepare/pin actual commands before launch. No full learner is active yet.
+and all five actual commands pass. Original main PID1562317, invocation
+`3fbc09cb5f2947459016bc52a123e6f8`, source`dda5bf6f`; startup review passes.
+The main, collector and recovery observer are active. A stale recovery-unit
+literal was corrected and archived before launch; no GPU stage repeats.
 The bounded and native qualification stages are closed. No extension, sweep,
 second learner or automatic successor. Retain the existing recipe until outcome.
 
