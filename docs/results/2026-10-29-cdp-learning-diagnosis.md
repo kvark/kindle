@@ -1,7 +1,7 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
 The [enumerated one-step actor experiment](../experiments/2026-11-06-cdp-actor-expected-value.md)
-is implemented and passes CPU qualification. It replaces sampled-action policy
+is implemented and passes CPU/Tiny native qualification. It replaces sampled-action policy
 loss with an expectation over all discrete actions at replay posterior starts,
 using detached predicted reward/bonus/continuation/critic values. Entropy,
 imitation and critic training remain. No new learned parameters or optimizer
@@ -10,11 +10,12 @@ no gameplay or efficiency gain is established.
 
 [CPU checks](2026-11-06-cdp-actor-expected-value.md) pass207 Kindle/5 adapter tests,
 192 focused Python tests plus20 guard checks (15 overlap), and strict workspace/
-binding Clippy. The packaged runtime passes1194 Python checks,10 deselected,
-with zero native construction. The original fixture compile failure is preserved.
-Two separately declared guarded Tiny native checks are selected: values, actor
-derivatives, branch routing, snapshots and restore, with two synthetic learner
-updates and zero Atari actions. No bounded cost check or full learner is selected.
+binding Clippy. Packaged Python passes1194 checks,10 deselected. Both guarded
+Tiny native checks pass: objective/derivatives, all24 action branches, shared
+draws, pre-update snapshots, two learner updates and exact optimizer restore.
+All259 pins and guards pass; zero Atari actions and no live GPU child. The
+original compile failure is preserved. A separate8,192-action learning-cost
+check plus1,024 frozen actions is selected; no full learner is selected.
 
 Root `/x/Temp/kindle-actor-expected-value-20261106`; default off. Retain ordinary
 inference,32×16 and143.667 greedy/70.750 sampled. The [closed averaging comparison](2026-11-06-cdp-actor-posterior-average.md#fixed-trained-policy-comparison-complete)

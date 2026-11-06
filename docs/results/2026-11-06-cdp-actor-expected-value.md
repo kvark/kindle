@@ -69,3 +69,25 @@ The [separate native protocol](../experiments/2026-11-06-cdp-actor-expected-valu
 selects the two prepared fixtures once, with the existing AMD host guard. Two
 synthetic optimizer steps and two Tiny learner updates, zero Atari actions.
 A bounded cost check and full learner remain unselected.
+
+## Native qualification complete
+
+Both exact fixtures pass on AMD RX7900XT/RADV, source `bd22618f97fde749008314030161cf893dc39a0d`.
+The objective fixture takes.71s and the branch/update/restore fixture.77s; guarded
+controller3.467s. All259 pins remain unchanged. Independent F64 objective and
+six derivatives meet2e-5 absolute tolerance; all24 branches per update, selected
+ordinary-imagination branches and reconstructed objective meet declared1e-3
+relative-plus-absolute tolerance. Private pre-update snapshots and shared inputs
+are exact; two learner updates and exact parameter/moment restore pass.
+
+Children1489300/1489350 exit0; host guards, terminal checks and idle render/service
+checks pass at13:02:05.115 UTC November6. Two synthetic optimizer steps, two Tiny
+learner updates, zero Atari actions. The original CPU compile failure remains
+preserved; no native fixture fails or repeats. This is correctness evidence,
+not a gameplay or efficiency result.
+
+The [separate bounded protocol](../experiments/2026-11-06-cdp-actor-expected-value-bounded.md)
+now selects8,192 fresh learning actions and1,024 frozen actions with this package.
+The one-step expectation removes the sampled-action term but preserves entropy,
+imitation, critic and ordinary imagination; its extra branch cost is unmeasured.
+No full learner is selected. Keep the retained recipe pending measured outcomes.
