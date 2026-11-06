@@ -8,26 +8,27 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [matched action-derivative contexts](results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
-are captured and closed:120 latent states per model,43,424 actions/173,660 frames
-each,50.591s control/50.498s candidate. Both use qualified native744dd793/SHA876ed0c
-and the same retained-control history. All16 CPU checks,537 pins,exact source
-transitions,357 invariant tensors per model and host guards pass. Zero updates,
-zero multi-step forecasts; no failed or repeated stage. Controller completes
-06:42:29.897 UTC November6, CPU closure06:43:18.395; no active GPU allocation.
+The [frozen action-path derivative probe](experiments/2026-11-06-cdp-breakout-action-path-derivatives.md)
+is implemented as test-only native code and selected for numerical qualification.
+It differentiates survival and endpoint critic-bootstrapped return with respect
+to fixed action plans, with frozen world/critic inputs and no optimizer updates.
+The existing latent straight-through surrogate remains explicit; this is not the
+full actor objective. The independent F64 recurrent fixture checks18 derivatives;
+a separate existing-inference path checks forward values before production.
 
-Root `/x/Temp/kindle-breakout-action-derivatives-20261106` retains both result files
-and the closure manifest. Reuse these states and the existing92 short rescues/18
-differing game-over outcomes. Do not repeat the capture or old branch/forecast
-collectors. A native fixed-plan derivative probe still needs its separately
-declared objective,surrogate,paired draws and numerical qualification; no derivative
-GPU stage or new learner is selected by this completed capture.
+All190 Kindle/5 gym CPU tests,4 analysis tests,strict Clippy and the release test
+build pass. An initial missing historical-receipt lookup and two missing closure
+index annotations are preserved as preparation failures; neither allocated GPU.
+Root `/x/Temp/kindle-breakout-action-path-20261106`. Qualification cap180s; no
+production allocation or new learner is selected until qualification passes.
 
-The [full dynamics-gradient learner](results/2026-11-06-cdp-actor-dynamics.md#full-200k-comparison)
-remains closed and negative:85.708 greedy/51.625 sampled in26m38.517s versus
-retained143.667/70.750 in21m27.910s. Retain `actor_dynamics_scale=None` and
-coordinates off. Correct numerical derivatives have not established useful
-model gradients. Original864/90%-two-wall and the five-game goal remain unfinished.
+The [completed contexts](results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
+provide120 origins per model. Reuse them and the saved92 short rescues/18 differing
+game-over outcomes; never repeat the capture or old collectors. Retain the
+original control and `actor_dynamics_scale=None`, coordinates off. The [full
+dynamics-gradient learner](results/2026-11-06-cdp-actor-dynamics.md#full-200k-comparison)
+remains closed and negative85.708/51.625 versus143.667/70.750, at24.117% more
+training cost. Original864/90%-two-wall and five-game gates remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

@@ -1,5 +1,13 @@
 # Kindle: CDP learning roadmap
 
+The [frozen action-path derivative probe](experiments/2026-11-06-cdp-breakout-action-path-derivatives.md)
+is implemented and selected for native numerical qualification after190 Kindle/5
+gym CPU tests,4 analysis tests,strict Clippy and the release build pass. It keeps
+model/critic weights fixed, differentiates two explicit fixed-plan objectives and
+uses the declared biased latent surrogate. Original preparation lookup/type
+failures remain. Root `/x/Temp/kindle-breakout-action-path-20261106`; no production
+allocation or learner is selected before the independent numerical checks pass.
+
 The [matched action-derivative context capture](results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
 is complete:120 latent origins per model,43,424 actions/173,660 frames each,
 50.591s control/50.498s candidate. All16 CPU tests,537 pins,357 invariant tensors
