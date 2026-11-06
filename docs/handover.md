@@ -8,34 +8,27 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [full reward-supervision comparison](experiments/2026-11-06-cdp-breakout-reward10-200k.md) selects one fresh200k-action
-seed22003 learner against its retained matching control/cohort4000022003. Only
-reward-prediction loss1→10 changes; rewards, teacher, architecture and other
-losses stay fixed. Native447fe50/SHA35ad0db needs no rebuild. Primary is greedy
-own-initial gain per training minute; original864/90% and five-game gates remain.
+The [reward-supervision comparison](results/2026-11-06-cdp-breakout-reward10.md#full200k-comparison) is complete and negative. Reward
+loss1→10 scores52.167 greedy/42.625 sampled versus matched22003's75.250/44.708,
+in21m20.465s versus21m30.822s. Primary own-initial gain/min falls31.086%; its
+paired95% interval is entirely negative. Sampled falls4.094% with an interval
+crossing zero. All0/24 two-wall. Retain reward scale1; no general causal claim.
 
-The [bounded check](results/2026-11-06-cdp-breakout-reward10.md) completes8,192 actions/32,730 frames/489 updates
-in46.723s; padded200k projection20m54.778s passes30 minutes. Initial/frozen357
-tensors,47 pre-update events, weighted losses, replay and both guards pass.
-Both runners pass34 targeted CPU cases. Initial full-helper qualification rejects
-a closure stdout hash sealed before its final line; separate semantic resolution
-and corrected helper checks pass, preserving the failure. No GPU stage repeats.
+The run completes200k actions/799,583 frames/12,477 updates. All263 allocation/
+338 original retained pins,55 completion artifacts,28 checkpoint files,100k
+recovery, initial/frozen tensor checks, full replays and original services pass.
+Independent CPU closure recounts192 evaluation episodes and all learner totals;
+complete22:03:43.920 UTC November6, execution source3be21d90. Original CPU
+preparation/import failures remain preserved with separate repairs. No GPU repeat.
 
-Root `/mnt/data/kindle-breakout-reward10-20261106/full`, service
-`kindle-breakout-reward10-200k-20261106` is running from source3be21d90,
-original PID1552095/invocationf6402af01ae946019805b26479f206de. All357 initial
-tensors and47 pre-update events match22003. Exact five-command CPU qualification
-passes after a separate missing-test-double-signature repair; the original
-failure remains. Training code/queues/limits are unchanged. The100k/6,227 recovery
-passes independent CPU verification21:48:13.435 UTC:357 finite tensors,263 pins,
-read-only checkpoint and unchanged learner identity; zero forwards/updates.
-Training continues past104k; four24-episode frozen arms remain pending.
-No extension, sweep or automatic successor.
-Promising changes require fresh-seed confirmation. The bounded check is closed.
+Root `/mnt/data/kindle-breakout-reward10-20261106/full` is closed. No active
+learner, collector or render holder. No extension, coefficient sweep, second
+learner or automatic successor is selected. Original864/90% two-wall and the
+full five-game goal remain unfinished. Do not repeat completed stages.
 
 The pre-contact shot predictor stays closed and failed; keep the original
-teacher. Fresh22003's retained75.250/44.708 and1009's94.625/70.500 on the same
-cohort show material seed variation; all0/24 two-wall. Do not repeat old stages.
+teacher. Retained22003's75.250/44.708 and1009's94.625/70.500 on the shared cohort
+show material seed variation. Keep the retained recipe; do not promote a seed.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

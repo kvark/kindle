@@ -1,23 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [full reward-supervision comparison](../experiments/2026-11-06-cdp-breakout-reward10-200k.md) selects one fresh200k
-seed22003 learner against the matching retained22003/cohort4000022003 control.
-Only existing reward loss1→10 changes. The [bounded check](2026-11-06-cdp-breakout-reward10.md) completes
-8,192 actions/32,730 frames/489 updates in46.723s, passing the20m54.778s padded
-projection. Tensor/trace/weighted-loss/replay/guard checks pass. Original closure
-stdout pin rejection remains preserved with separate semantic resolution and
-corrected full-helper checks; no GPU repeat. Native447fe50/SHA35ad0db unchanged.
-No extension, sweep or automatic successor; assess frozen gain/min and preserve
-the original864/90% and full five-game gates. Root
-`/mnt/data/kindle-breakout-reward10-20261106/full` is running from source3be21d90,
-original PID1552095/invocationf6402af01ae946019805b26479f206de. All357 initial
-tensors and47 pre-update events match22003. Five-command CPU qualification
-passes after a separate test-double signature repair; its original failure is
-preserved and execution code/queues/limits are unchanged. The100k/6,227 recovery
-passes independent CPU verification21:48:13.435 UTC:357 finite tensors,263 pins,
-read-only files and original learner identity. Zero forwards/updates; training
-continues past104k. A reward-loss bottleneck or benefit is not established;
-await frozen evaluation.
+The [completed reward-supervision comparison](2026-11-06-cdp-breakout-reward10.md#full200k-comparison) fails retention. Only
+reward loss1→10 changes against retained22003:greedy52.167/sample42.625 versus
+75.250/44.708,21m20.465s versus21m30.822s. Primary own-initial gain/min falls
+31.086%, paired95% difference[−1.936771,−.046998]; sampled falls4.094% with its
+interval crossing zero. All0/24 two-wall. Retain reward1. One reused seed/cohort
+and changed subsequent experience do not identify a causal mechanism.
+
+All200k actions/799,583 frames/12,477 updates,100k recovery, initial/frozen tensors,
+full replays,263 allocation/338 original retained pins and original services pass.
+Independent closure recounts192 episodes, both paired intervals,55 completion
+artifacts and28 checkpoint files; complete22:03:43.920 UTC November6, source3be21d90.
+Original CPU preparation/import failures remain preserved with separate repairs;
+no GPU stage repeats. Root `/mnt/data/kindle-breakout-reward10-20261106/full` is
+closed. No extension, sweep, second learner or automatic successor is selected.
+Original864/90% two-wall and full five-game goals remain unfinished.
 
 The [pre-contact shot predictor](2026-11-06-cdp-breakout-causal-shot.md) is complete and fails its fixed
 screen. Adding planned contact offset lowers holdout slope MAE.691547→.601837
