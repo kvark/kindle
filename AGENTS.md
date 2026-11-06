@@ -20,23 +20,25 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [optional RGB96 geometry](docs/results/2026-11-06-cdp-rgb96.md) is packaged and
-native-qualified after two test-fixture repairs. Resize/scalar encoder values
-and derivatives/two Tiny updates with exact restore pass. Reuse the passed resize;
-original inactive-stream/reference-layout failures and Python fixture failure
-remain preserved. Production native7704d25c is unchanged by those repairs.
+The [RGB96 bounded check](docs/results/2026-11-06-cdp-rgb96.md#bounded-check-complete)
+completes8,192 actions/32,713 frames/489 updates in66.690s versus47.690s retained,
+**39.842% more training time**. Its padded200k projection29m51s passes the35-minute
+cap; conservative projected headroom3.757GiB passes2GiB. Native header confirms
+24,862,993 trainable parameters. All357 frozen tensors, full replays, finite/
+weighted reports,256 source/51 execution/14 qualification pins and guards pass.
 
-The [bounded protocol](docs/experiments/2026-11-06-cdp-rgb96-bounded.md) now selects
-one fresh8,192-action/489-update learner and1,024 frozen greedy actions. All prior
-children are terminal; no full learner is selected. Actual commands and schema
-pass CPU preflight. RGB96 expands the12M preset to24,862,993 trainable parameters
-and full replay to12,083,200,000 bytes; keep the35-minute padded200k and2GiB
-conservative headroom gates. Root `/x/Temp/kindle-rgb96-20261106/bounded`.
+Source8558353c; controller/children terminal, no Kindle service/render holder.
+Completion14:30:34.959 UTC November6; publication closure14:32:04.248. Root
+`/x/Temp/kindle-rgb96-20261106/bounded` is closed. Original Python/two native
+fixture failures and separate test-only repairs remain preserved. Native7704d25c
+is unchanged. Useful package/test artifacts remain; disposable build cache released.
 
-A perception or gameplay benefit is unestablished. The [enumerated actor comparison](docs/results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
-remains closed negative. Retain RGB64,32×16 and143.667 greedy/70.750 sampled;
-keep optional actor paths off. Original864/90%-two-wall and five-game goal remain
-unfinished. No full learner, extension or automatic successor follows.
+No full learner or automatic successor is selected. The [protocol](docs/experiments/2026-11-06-cdp-rgb96-bounded.md)
+permits considering a separately justified fresh comparison; bounded experience
+must not transfer. The short frozen action budget completes no natural episode,
+so no gameplay or learning-efficiency gain is established. Retain RGB64,32×16,
+143.667 greedy/70.750 sampled and optional actor paths off. Original864/90%-two-wall
+and five-game goal remain unfinished. Do not repeat completed stages.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
