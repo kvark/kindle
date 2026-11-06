@@ -32,9 +32,14 @@ Greedy frozen return and own-initial gain/min are primary, against143.667 and
 6.590132. Evaluate final and actual-initial sampled/greedy policies on24 natural
 episodes each. Initial actor values differ from retained; require313 matching
 non-actor tensors and exact357-tensor/47-event matches to the bounded run.
-The CPU helpers/comparison/plot checks pass in3.541s without native construction.
-Next declare and qualify the exact queues, then launch the single learner under
-host guards. Service `kindle-breakout-actor-width-200k-20261106`.
+CPU helpers/comparison/plot checks pass in3.541s; all five actual queued CLI
+paths pass in.414s without native/emulator construction. The original learner
+starts08:27:14.431 UTC November6, source91647453/PID1432519/invocation
+`6e0453060296495b8d1062b0dadc9b37`, with347 pins and recovery/terminal observers.
+Startup passes at08:27:20.152:357 bounded initial tensors/47 events and313
+retained non-actor tensors match;11 retained initial events differ as allowed.
+Service `kindle-breakout-actor-width-200k-20261106` is active; inspect the original
+process identity before further work. Recovery and frozen scores remain pending.
 
 No capacity cause is established. No sweep, unchanged extension, second learner
 or automatic successor is selected. Completed bounded/native stages remain
