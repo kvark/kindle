@@ -1,4 +1,4 @@
-# Frozen actor posterior averaging: implementation and CPU checks
+# Frozen actor posterior averaging: qualification and bounded audit failure
 
 The [development protocol](../experiments/2026-11-06-cdp-actor-posterior-average.md)
 selects eight additional categorical draws for the actor's current decision.
@@ -116,3 +116,50 @@ imports or native/emulator construction. The saved ordinary prefix contains
 512 semantic events. Runtime/source/checkpoint identity, frozen tensors, full
 replays and ≤2× observed per-action cost must pass before any separately declared
 gameplay comparison. No learner, count sweep or automatic successor is selected.
+
+
+## Bounded control complete; original pipeline failed
+
+The declared two-arm pipeline on sourced645e262 remains **failed**. Its ordinary
+GPU child1478799 exits successfully after **4,096 actions /16,384 emulator frames**,
+with **2.734722s acting /2.926305s construction**, zero updates and no completed
+natural episode. The host guard passes with no unfinished child or recovery.
+The subsequent CPU audit fails at `guard['child_pid']`: `gpu_host_guard.audit()`
+verifies the sealed child identity but does not return that field. The eight-sample
+candidate never starts. Original execution takes9.427889s and exits1; its failure,
+source, declaration and log remain unchanged. No per-action cost ratio exists.
+
+The [separate CPU repair](../experiments/2026-11-06-cdp-actor-posterior-average-bounded-control-repair.md)
+reads the PID from the verified sealed guard result, then completes and saves the
+ordinary audit and its first full recorded-action replay/video. All **357 finite
+tensors**, including moments, remain identical. All **512 semantic events** match
+the retained ordinary prefix exactly. Configuration differs only by the declared
+explicit `replay_value_bootstrap=imagined` serialization default. Rewards,
+actions, frames and boundaries replay exactly; frozen logs do not carry live image
+hashes, so this does not claim unrecorded image equality or prefix competence.
+
+That repair execution also **fails**, after saving the complete audit/replay:
+its replay-only subprocess restriction intercepts the final `systemctl` read.
+The5.973390s failed receipt is retained. A separate read-only closure uses the
+saved review/replay and verifies their identities without repeating either one.
+It completes at **12:24:32.045 UTC November6** in **2.415133s** (2.470204s wrapper).
+All **616 original allocation pins**, **30 repair inputs** and **35 closure inputs**
+pass. Both original failures remain failed. The original controller and GPU child
+are gone; no Kindle service or render holder remains. Closure performs zero GPU
+or emulator work. No production stage, replay or completed audit is repeated.
+
+Ordinary compatibility is established for this prefix. Averaging compatibility,
+its cost and gameplay benefit remain unmeasured; this repair cannot pass the
+original two-arm protocol. No full evaluation, learner, count sweep or successor
+is selected. Keep averaging off and retain143.667 greedy/70.750 sampled. Any new
+candidate check needs a separate corrected declaration, reusing the saved control
+without restarting the failed queue. The original864/90% and five-game gates
+remain unfinished.
+
+| Artifact | SHA256 |
+|---|---|
+|`bounded/failure.json`|`c46f87605c04bd6a1c9df902d62440b557f75c87d778761a3c09bbe7733e538f`|
+|`bounded-execution-execution.json`|`83947243d6963316356afc42eeb2fef0cb768605a450dad3565d495d7d259a34`|
+|`bounded/control-review.json`|`88b4b4413e2a45c02d52ec2a8105b9600488f66b9160074b41a51f17a979b288`|
+|`bounded-control-repair-execution.json`|`58666587803db464d764e15edc3779f5b626b11207e7dcb7855c1fe5c28369af`|
+|`bounded-control-closure/completion.json`|`37716513fa31ff7ee5d5c31772d54fdad32129905f9a4161c8ca51d185243e09`|

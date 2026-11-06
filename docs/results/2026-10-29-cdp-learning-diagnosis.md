@@ -1,28 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [actor posterior averaging experiment](../experiments/2026-11-06-cdp-actor-posterior-average.md) passes implementation, CPU
-and separately guarded Tiny native qualification. It averages eight conditional actor distributions while
-preserving the original sampled recurrent state and RNG streams. Frozen-only,
-default off; no training loss, parameters, encoder geometry or checkpoint change.
-The earlier modal result motivates this test but does not establish a noise cause.
+The [actor posterior averaging experiment](2026-11-06-cdp-actor-posterior-average.md#bounded-control-complete-original-pipeline-failed)
+passes CPU and Tiny native qualification, but its bounded two-arm pipeline is
+**failed**. The ordinary child completed 4,096 actions/16,384 frames in2.735s
+(2.926s construction), with zero updates. The audit then requested a child PID
+from the wrong mapping; the averaging child never started.
 
-CPU checks pass 204 Kindle/5 adapter tests, 161 Python tests and strict workspace/binding
-Clippy; packaged fddf48ba/native960667d1 passes 1,174 installed tests with zero
-construction attempts. The separately guarded Tiny fixture passes in 1.19s:
-independent probability means/actions, shared parameters, identical original RNGs
-and recurrent states under forced actions, frozen moments and learning guards.
-All 254 pins pass; zero learner updates or Atari actions. Native qualification
-closes at 12:06:09.504 UTC November 6; no failed or repeated declared stage.
+A separate CPU repair saves the complete ordinary audit/replay/video, then fails
+its final service check because its replay-only subprocess restriction also
+intercepts that query. A separate read-only closure passes at12:24:32.045 UTC:
+all616 original pins,30 repair inputs,35 closure inputs,357 finite invariant
+tensors and512 matching semantic events pass; original failures remain failed.
+Child1478799 is terminal; no Kindle service/render holder remains. No GPU,
+replay or completed audit was repeated. Averaging compatibility, cost and gameplay
+remain unmeasured. No GPU allocation, learner or successor is selected.
 
-The separately declared [bounded 12M check](../experiments/2026-11-06-cdp-actor-posterior-average-bounded.md)
-selects two frozen 4,096-action runs, ordinary then eight-sample averaging.
-CPU preflight passes both actual CLI paths, rejection fixtures, all 338 retained
-pins and 357 finite checkpoint tensors, with zero native/emulator construction.
-Require exact ordinary-prefix events, frozen tensors, full replays and ≤2×
-per-action cost; 120s per child. No learner or full gameplay comparison is selected.
-Root `/x/Temp/kindle-actor-posterior-average-20261106/bounded` retains exclusive
-receipts. Packaged artifacts remain after 5.136GB verified cache release.
-Tiny qualification does not establish Atari benefit or speed; retain the recipe.
+Root `/x/Temp/kindle-actor-posterior-average-20261106` retains sourcefddf48ba/
+native960667d1, packaged artifacts and exclusive failure/repair receipts.
+Eight-sample averaging stays frozen-only and default off. Retain32×16 and
+143.667 greedy/70.750 sampled; original864/90%-two-wall and five-game gates remain
+unfinished. A new candidate allocation would need a separate corrected protocol;
+do not restart the failed two-arm queue or repeat the ordinary control.
 
 The [64×8 latent comparison](2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
 is complete and fails the primary retention criterion. Fresh 200k actions/
