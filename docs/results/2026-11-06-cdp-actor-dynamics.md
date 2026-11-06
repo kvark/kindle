@@ -92,10 +92,29 @@ in76.369s; the outer execution receipt succeeds in76.404s. Root
 `/x/Temp/kindle-actor-dynamics-20261106/bounded` is closed. No Atari cost check,
 synthetic fixture, frozen arm or collector should repeat.
 
-No full learner, extension, sweep or automatic successor is selected. This
+At bounded closure, no full learner, extension, sweep or automatic successor
+was selected. This
 establishes native execution and cost feasibility, not useful policy derivatives,
 gameplay improvement or a SuperMimic-like efficiency gain. The next substantive
 learning comparison would need a separately declared fresh budget and frozen
 actual-initial controls, judged by return gained per training minute. Keep
 coordinates off and Breakout143.667 greedy/70.750 sampled; original864/90%-two-wall
 and five-game gates remain unfinished.
+
+## Selected fresh200k learning comparison
+
+The separate [full protocol](../experiments/2026-11-06-cdp-breakout-actor-dynamics-200k.md)
+selects one fresh seed1009 learner at coefficient.5 and the retained recipe,
+with no bounded weights or experience transfer. The22.39% bounded cost increase
+is within budget and motivates a direct test of frozen learning per minute;
+no useful-gradient or gameplay benefit is assumed. Greedy is primary, using
+actual-initial controls and the retained143.667/6.590132gain/min control.
+
+CPU helper qualification passes in3.674s with no native-module import, emulator
+construction or GPU work. It checks the real comparison entry, gain/min decision,
+new weighted actor loss and snapshot timing, corruptions, retained exposure and
+plot inputs. Root `/x/Temp/kindle-actor-dynamics-20261106/full`; exact queues and
+command qualification precede launch. One200k/12,477 learner with1,800s cap,
+100k recovery and four frozen24-episode arms is selected. No extension, sweep,
+second learner or automatic successor is selected. Previous failures remain
+preserved; no completed old stage is repeated.

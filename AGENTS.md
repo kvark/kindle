@@ -20,35 +20,33 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [optional dynamics-gradient actor](docs/experiments/2026-11-06-cdp-actor-dynamics.md) has passed native
-qualification. Implementation adds a default-off normalized return loss through
-frozen world/critic inputs, with straight-through categorical derivatives and
-one actor optimizer. World snapshots are private GPU inputs; existing rollout
-states, draws and detached disagreement values are reused. No new trainable
-weights or checkpoint tensors are added. See the [implementation record](docs/results/2026-11-06-cdp-actor-dynamics.md).
+One [fresh200k Breakout dynamics-gradient comparison](docs/experiments/2026-11-06-cdp-breakout-actor-dynamics-200k.md)
+is selected at `actor_dynamics_scale=.5`, retaining12M64/Auto/N8/B16/T16/H15/R16,
+encoder4e-5, dynamics4e-4, behavior8e-5, critic1/1 and expert100/all-state labels/
+20%-episode guidance. Coordinates stay off. The hypothesis is more useful actor
+learning per update; added backward cost must be repaid in frozen gain/min.
+Greedy is primary against retained143.667/6.590132gain/min, with own-initial
+controls and a positive paired eight-lane95% lower bound. Original864/90%-two-wall
+and five-game gates remain unfinished.
 
-Qualification passes188 Kindle+5 gym tests,1,108 packaged Python tests, strict
-workspace/binding Clippy and both guarded F64/production/snapshot/restore
-fixtures. Default-off final/initial policies reproduce2,048 frozen actions and
-preserve357 tensors per arm. All preparation failures remain recorded; no GPU
-stage repeats. Build cache is released after verified packaging.
+The [bounded check](docs/results/2026-11-06-cdp-actor-dynamics.md#completed-bounded-cost-and-numerics-check)
+passes8,192 actions/489 updates in58.369s,22.39% above retained47.690s; padded
+200k projection26m07.522s and10.67GiB conservative replay headroom pass. Native
+source744dd793/SHA876ed0c, derivative/snapshot/restore qualification and357
+matching initial tensors/47 pre-update events are retained. Earlier preparation
+failures remain recorded. No completed qualification or bounded stage repeats.
 
-The [bounded cost check](docs/results/2026-11-06-cdp-actor-dynamics.md#completed-bounded-cost-and-numerics-check)
-is complete:8,192 actions/32,725 frames/489 updates in58.369s,22.39% longer than
-retained47.690s. Padded200k projection26m07.522s and10.67GiB conservative replay
-headroom pass. All357 initial tensors/47 pre-update events,weighted losses,
-full pixel/action replay and357 frozen tensors pass. Main completes05:40:12.457
-UTC November6 with no failed/repeated stage. Behavior training accounts for the
-added cost; no gameplay benefit is established.
+Root `/x/Temp/kindle-actor-dynamics-20261106/full`; service
+`kindle-breakout-actor-dynamics-200k-20261106`. CPU helper checks pass; the fresh
+learner is not yet launched. Declare exact queues and qualify their commands
+before launch. One learner,200k actions/12,477 updates,1,800s cap; retain100k
+recovery and four frozen24-episode arms. Consult the protocol before execution.
+No extension, sweep, second learner or automatic successor is selected. Check
+original process/invocation before interpreting an observer timeout.
 
-Root `/x/Temp/kindle-actor-dynamics-20261106/bounded` is closed. No full learner,
-extension, sweep or automatic successor is selected; no GPU allocation remains
-active at closure. A learning-benefit comparison needs a separate declaration.
-
-The [coordinate comparison](docs/results/2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison) is closed and
-negative: 66.333 greedy / 35.917 sampled in20m58.414s. Retain coordinates off and
-143.667 / 70.750. No extension or automatic successor to that run is selected.
-The original 864/90%-two-wall gate and five-game goal remain unfinished.
+The [coordinate comparison](docs/results/2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison)
+remains closed and negative66.333/35.917. Retain coordinates off and the
+143.667 greedy/70.750 sampled control until a qualified improvement is measured.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

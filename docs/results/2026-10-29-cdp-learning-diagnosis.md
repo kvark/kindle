@@ -1,5 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+A separately declared [fresh200k dynamics-gradient comparison](../experiments/2026-11-06-cdp-breakout-actor-dynamics-200k.md)
+is selected after the bounded cost/numerics check passes. Fix coefficient.5 and
+the retained12M64/Auto/N8/B16/T16/H15/R16 recipe, seed1009/evaluation4000001009;
+coordinates off. The added actor gradients must improve frozen own-initial gain
+per training minute over retained143.667/6.590132, with a positive paired95% lane
+interval. One learner,1,800s training cap,100k recovery and four frozen24-episode
+arms; no experience transfer or automatic successor. CPU helper checks pass;
+exact queue declaration and command qualification precede launch. Root
+`/x/Temp/kindle-actor-dynamics-20261106/full`. Original864/90% and five-game gates
+remain unfinished; no gameplay benefit is established.
+
 The [optional dynamics-gradient actor](../experiments/2026-11-06-cdp-actor-dynamics.md) is implemented and natively qualified. A private pre-update world snapshot receives the same
 initial states/draws as imagination; actor gradients traverse dynamics and frozen
 reward/continuation/critic heads. Categorical straight-through derivatives are
@@ -18,8 +29,8 @@ projection and10.67GiB conservative replay headroom pass. All357 initial tensors
 47 pre-update events,weighted losses,full pixel/action replay,357 frozen tensors,
 45 allocation/237 source pins and guards pass. No failed or repeated stage.
 Controller closes05:40:12.457 UTC November6/source7609cd4a/native744dd793.
-Root `/x/Temp/kindle-actor-dynamics-20261106/bounded` is closed; no full learner,
-extension or automatic successor is selected. Numerical correctness and cost
+Root `/x/Temp/kindle-actor-dynamics-20261106/bounded` is closed; no successor was
+selected by that check. The separate full comparison above is now declared. Numerical correctness and cost
 feasibility do not establish gameplay improvement or useful model derivatives.
 Original Breakout864/90% and five-game gates remain unfinished.
 

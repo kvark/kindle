@@ -5,8 +5,9 @@ its actor on imagined trajectories, but does not differentiate the imagined
 return through the dynamics into the actor. SuperMimic's corresponding path is
 a meaningful architectural proposal within the five-game goal. The [optional implementation](2026-11-06-cdp-actor-dynamics.md) has passed
 native qualification and the separately declared8,192-action cost check. The
-new path adds22.39% bounded wall time; no full Atari learner or gameplay benefit
-is established. The independent
+new path adds22.39% bounded wall time. A separately declared
+[fresh200k comparison](../experiments/2026-11-06-cdp-breakout-actor-dynamics-200k.md)
+is selected; no gameplay benefit is established. The independent
 [coordinate-channel comparison](2026-11-06-cdp-rgb-coordinates.md) is now closed
 and regresses both frozen modes; it does not test this actor-gradient proposal.
 
