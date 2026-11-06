@@ -1,17 +1,16 @@
 # Kindle: CDP learning roadmap
 
-The [residual actor development](experiments/2026-11-06-cdp-residual-actor.md)
-selects a distinct routing hypothesis after the negative dynamics/width recipes
-and measured imitation dominance. Add a zero-initialized affine correction to
-base actor logits, with imagined policy/entropy gradients only in the correction
-and expert gradients only in the base. It adds46,098 parameters at12M/full18;
-CNN/RSSM/critic and world expert supervision remain unchanged. Default off.
-Implementation/CPU qualification pass196 Kindle/5 adapter tests, strict Clippy
-and17 focused CLI cases. Packaging/1,125 installed Python checks pass with zero native construction.
-Two separately declared guarded Tiny fixtures are selected; no Atari learner. First CLI fixture failure (positional environment incorrectly passed
-as `--environment`) is preserved. Root `/x/Temp/kindle-residual-actor-20261106`.
-Separate native and bounded declarations follow only passing qualification.
-Retain143.667 greedy/70.750 sampled; original864/90% and five-game goal unfinished.
+The [residual actor development](results/2026-11-06-cdp-residual-actor.md)
+passes196 Kindle/5 adapter CPU tests, strict workspace/binding Clippy and1,125
+installed Python checks. The original native derivative fixture passes in.73s,
+but the learning fixture fails before its first transition on a test observation
+constructor mismatch. The separate test-only repair now passes three affected
+CPU tests, strict Clippy and release compilation; production/native bytes remain
+unchanged. Only missing synthetic learning/restore is selected for qualification.
+The passed derivative stage remains closed. Root
+`/x/Temp/kindle-residual-actor-20261106/learning-fixture-repair`.
+No Atari cost check or full learner is selected. Retain143.667 greedy/70.750
+sampled; original864/90%-two-wall and the five-game goal remain unfinished.
 
 The [full actor-width512 comparison](results/2026-11-06-cdp-actor-width.md#full-200k-comparison)
 is complete and negative. Fresh200k actions/799,552 frames/12,477 updates take

@@ -20,28 +20,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [residual actor experiment](docs/experiments/2026-11-06-cdp-residual-actor.md)
-is selected for implementation and CPU qualification. A zero-initialized linear
-logit correction receives imagined policy/entropy gradients; the existing base
-actor receives expert imitation. The separate parameters have separate optimizer
-moments. At12M/full18 it adds46,098 trainable parameters; CNN/RSSM/critic remain
-unchanged. Default off. Routing, native execution, cost and gameplay benefit are
-not yet established. The separate native qualification is selected; no Atari learner is selected.
+The [residual actor experiment](docs/results/2026-11-06-cdp-residual-actor.md)
+is implemented and packaged, default off. A zero-initialized linear correction
+receives imagined policy/entropy gradients; the base actor receives imitation.
+It adds46,098 trainable parameters at12M/full18, with separate parameter moments
+and unchanged CNN/RSSM/critic. CPU checks and1,125 installed Python checks pass.
 
-Root `/x/Temp/kindle-residual-actor-20261106`; consult the protocol before execution.
-The first CLI test run fails because its new fixture incorrectly spells the
-positional environment as `--environment`; original sources/logs are preserved.
-The repaired checks pass196 Kindle/5 adapter tests, strict workspace Clippy and
-17 focused CLI cases. Rust fixture type/borrow errors and later CLI cap/action-name
-failures remain preserved in the [report](docs/results/2026-11-06-cdp-residual-actor.md).
-Packaging and1,125 installed Python checks pass with zero native construction.
-Two guarded Tiny fixtures are selected under the [native protocol](docs/experiments/2026-11-06-cdp-residual-actor-native.md).
+The original native derivative fixture passes in.73s. The learning fixture fails
+before its first transition because it used the fixed-feature constructor for
+RGB32. That failed native stage remains preserved. A separate
+[fixture-only repair](docs/experiments/2026-11-06-cdp-residual-actor-fixture-repair.md)
+fixes observation construction, adds CPU coverage and is being compiled. Native
+runtime/production math are unchanged; the completed derivative fixture stays
+closed. No Atari cost check or full learner is selected.
 
-The [width512 comparison](docs/results/2026-11-06-cdp-actor-width.md#full-200k-comparison)
-remains closed and negative:87.125/39.958 versus143.667/70.750, with46.293% lower
-primary gain/min. Keep the preset256 base, coordinates and actor dynamics off.
-Do not repeat closed stages. Original864/90%-two-wall and five-game gates remain
-unfinished. No coefficient/width sweep or automatic successor learner.
+Root `/x/Temp/kindle-residual-actor-20261106`, repair subdirectory
+`learning-fixture-repair`; consult the protocol before execution. Keep the
+preset256 base, coordinates and actor dynamics off. Width512 remains
+[closed negative](docs/results/2026-11-06-cdp-actor-width.md#full-200k-comparison).
+Retain143.667 greedy/70.750 sampled; original864/90%-two-wall and five-game gates
+remain unfinished. No old-stage repeat, sweep or automatic successor learner.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

@@ -1,5 +1,26 @@
 use super::*;
 
+fn observation(config: &DreamerConfig, stream: usize, time: usize) -> Observation {
+    Observation::rgb(
+        (0..config.observation_dim())
+            .map(|i| ((i + stream * 11 + time * 7) % 31) as f32 / 31.0)
+            .collect(),
+        config.observation_grid(),
+    )
+}
+
+#[test]
+fn residual_synthetic_observations_use_rgb_geometry() {
+    let config = super::super::residual_actor_tests::config();
+    for stream in 0..2 {
+        for time in 0..=16 {
+            let frame = observation(&config, stream, time);
+            assert_eq!(frame.as_slice().len(), 3 * 32 * 32);
+            assert!(frame.as_slice().iter().all(|&x| (0.0..1.0).contains(&x)));
+        }
+    }
+}
+
 #[test]
 #[ignore = "requires separately declared guarded residual actor qualification"]
 fn residual_native_learning_sharing_and_restore() {
@@ -18,19 +39,12 @@ fn residual_native_learning_sharing_and_restore() {
     ];
     let initial = vector.learner.behavior_train.read_params(&names);
     assert!(initial[1].iter().all(|&x| x == 0.0));
-    let observation = |stream: usize, time: usize| {
-        Observation::from_vec(
-            (0..config.observation_dim())
-                .map(|i| ((i + stream * 11 + time * 7) % 31) as f32 / 31.0)
-                .collect(),
-        )
-    };
     vector.ingest(
         (0..2)
             .map(|stream| {
                 (
                     stream,
-                    observation(stream, 0),
+                    observation(&config, stream, 0),
                     FrameFlags {
                         is_first: true,
                         ..Default::default()
@@ -53,7 +67,7 @@ fn residual_native_learning_sharing_and_restore() {
                 .map(|stream| {
                     (
                         stream,
-                        observation(stream, time),
+                        observation(&config, stream, time),
                         FrameFlags::default(),
                         Reward {
                             extrinsic: if time % 3 == 0 { 1.0 } else { 0.0 },
