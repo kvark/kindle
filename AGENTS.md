@@ -35,9 +35,11 @@ are the retention criteria. Initial tensors match; encoder outputs may differ.
 Root `/x/Temp/kindle-rgb-stride2-20261106/full`; source `8d4ab88d`.
 CPU helpers and all five queued commands pass with zero model/emulator
 construction. Main PID1528001/invocation `6304e163ba8d4aa5a831bfa602f2eb77`
-started17:32:44 UTC November6; recovery and terminal observers are attached.
-Startup passes357 initial tensors and47 same-stride pre-update events; first
-update at376. Inspect live service identity before acting; no restart on timeout.
+started17:32:44 UTC November6; terminal collector remains attached. Startup
+passes357 initial tensors/47 same-stride events, first update376. The100k/6,227
+recovery passes an independent CPU check at17:42:45 UTC:357 finite tensors,
+372 pins and read-only files; original learner identity unchanged. Recovery
+observer is complete. Inspect live service identity; no restart on timeout.
 No extension, second learner or automatic successor. Keep retained143.667
 greedy/70.750 sampled; original864/90% two-wall and five-game goal unfinished.
 

@@ -174,6 +174,16 @@ PID1528004 are attached. Startup passes all357 bounded/retained initial tensors,
 Compared to retained pre-update behavior,15/47 events match and32 differ, as
 allowed by the changed encoder computation. No causal performance claim follows.
 
-Training and frozen outcomes remain pending. Inspect live service/child identity
-before any action; observer timeout is not a stopped learner. No automatic
+The100k checkpoint is saved at6,227 updates and passes the independent CPU
+recovery check at **17:42:45.048 UTC November6**. All357 tensors/51,502,659
+values are finite, shapes/config/counts and stored hashes match,372 source/input
+pins are unchanged, and directory/files are0555/0444. Verification takes.355s
+(.414s observer command), with zero model forwards/learner updates. Original
+main PID/invocation is unchanged before and after; recovery service exits0.
+This preserves weights and moments, not replay, live games/beliefs or complete
+RNG state. At the following live observation, training has passed105,832 actions/
+6,591 updates; the terminal collector remains attached.
+
+Training completion and frozen outcomes remain pending. Inspect live service/child
+identity before any action; observer timeout is not a stopped learner. No automatic
 extension, second learner or successor is selected; retained default unchanged.
