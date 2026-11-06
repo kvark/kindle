@@ -3,10 +3,12 @@
 The [actor-only width experiment](../experiments/2026-11-06-cdp-actor-width.md) adds a default-absent actor width
 override, selecting512 versus256 at12M with1,054,720 extra actor parameters.
 All194 Kindle/5 adapter tests,1,116 packaged Python checks and strict
-workspace/binding Clippy pass. Native packaging is complete. One two-update
-Tiny synchronization/restore qualification is next, before a separately
-declared8,192-action cost check. No full learner
-or GPU allocation is selected yet. Prior larger-world and shorter-imagination
+workspace/binding Clippy pass. The original native Tiny qualification passes
+in2.820s: two updates, exact actor sharing/restore,243 unchanged pins and zero
+Atari actions. The [separately declared8,192-action/489-update cost check](../experiments/2026-11-06-cdp-actor-width-bounded.md) and
+1,024-action frozen restore are selected. Actual CLI and non-actor audit
+fixtures pass CPU preflight in.167s with zero native/emulator constructions.
+No full learner is selected. Prior larger-world and shorter-imagination
 failures do not test this actor-only hypothesis; no capacity cause is claimed.
 
 The [completed actor-update diagnostic](2026-11-06-cdp-dynamics-actor-update.md) finds dynamics.5 changes

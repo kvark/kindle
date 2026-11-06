@@ -17,11 +17,13 @@ whole-model capacity failed, so actor-only capacity remains an unproven narrower
 hypothesis, not an established bottleneck.
 
 Implementation,194 Kindle/5 adapter CPU tests,1,116 packaged Python checks
-and strict workspace/binding Clippy pass. Native wheel and test executable are
-packaged. One new guarded two-update Tiny restore/synchronization check is next. No Atari
-learner or GPU allocation is active. Root `/x/Temp/kindle-actor-width-20261106`.
-Only after qualification declare the8,192-action cost check; no full learner,
-coefficient sweep or old-stage repeat is selected.
+and strict workspace/binding Clippy pass. The original guarded two-update Tiny
+restore/synchronization check passes in2.820s with243 unchanged pins and zero
+Atari actions. The [separately declared8,192-action cost check](experiments/2026-11-06-cdp-actor-width-bounded.md) is selected, with
+1,024 frozen actions; actual command paths and non-actor invariance audit pass
+CPU preflight with zero native/emulator construction. Root
+`/x/Temp/kindle-actor-width-20261106`. No full learner, coefficient sweep or
+old-stage repeat is selected; consult the bounded protocol before execution.
 
 The [closed actor-update diagnostic](results/2026-11-06-cdp-dynamics-actor-update.md)
 finds only.01136%/.01702% changes in estimated retained-checkpoint updates.
