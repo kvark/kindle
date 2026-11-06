@@ -1,22 +1,25 @@
 # Kindle: CDP learning roadmap
 
-The [separate candidate check](experiments/2026-11-06-cdp-actor-posterior-average-candidate-bounded.md)
-selects the first4,096-action frozen execution of eight-sample actor averaging.
-Reuse the completed ordinary control; do not restart its failed two-arm queue.
-The corrected controller reads child identity from the verified sealed result
-and leaves subprocess APIs intact. CPU preflight passes the actual CLI, seven
-invalid guard-result fixtures and the final service query with zero native or
-emulator construction. Require357 invariant tensors, full replay and≤2× the
-saved ordinary per-action cost, with120s child cap. No learner or full evaluation
-is selected.
+The [fixed actor-averaging evaluation](experiments/2026-11-06-cdp-actor-posterior-average-candidate-evaluation.md)
+selects one24-natural-episode frozen greedy comparison against retained143.667.
+Eight posterior samples, unchanged live sampled state, no training. Require≥10%
+higher mean, positive paired eight-lane95% interval, no fewer two-wall successes
+and≤2× saved ordinary per-action cost. Cohort4000001009 is reused development
+experience; this serving comparison does not establish training-seed reliability
+or initial-subtracted learning efficiency. Child cap300s/600k actions; no sweep
+or automatic successor.
 
-The [original pipeline and repair failures](results/2026-11-06-cdp-actor-posterior-average.md#bounded-control-complete-original-pipeline-failed)
-remain failed. Saved ordinary control:4,096 actions/16,384 frames in2.735s,
-357 finite invariant tensors and512 exact semantic events; original child is
-terminal. New root `/x/Temp/kindle-actor-posterior-average-20261106/candidate-bounded`.
-Packagefddf48ba/native960667d1; eight-sample averaging stays frozen-only and
-default off. Atari benefit is unmeasured. Retain32×16 and143.667 greedy/70.750
-sampled; original864/90%-two-wall and five-game gates remain unfinished.
+The [new bounded candidate](results/2026-11-06-cdp-actor-posterior-average.md#separate-candidate-compatibility-check-complete)
+passes at12:30:43.268 UTC:4,096 actions/16,384 frames in2.785s,1.018472× saved
+ordinary cost,2.797s construction,357 unchanged finite tensors, full replay and
+all653 pins. Child1479179 is terminal. The original two-arm and CPU-repair
+failures remain failed; no completed stage is repeated. Full-command CPU preflight
+passes with zero native import/construction. No learner is selected.
+
+Root `/x/Temp/kindle-actor-posterior-average-20261106/candidate-evaluation`,
+packagefddf48ba/native960667d1. Averaging stays frozen-only/default-off pending
+results. Retain32×16 and143.667 greedy/70.750 sampled; original864/90%-two-wall
+and five-game gates remain unfinished.
 
 The [64×8 latent comparison](results/2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
 is complete and fails the primary retention criterion. Fresh 200k actions/

@@ -176,3 +176,30 @@ rejections, seven invalid guard-result cases and the final service query.
 Zero native import or native/emulator construction. The original failures remain
 failed. No full evaluation or learner is selected; unchanged357 tensors, complete
 replay and≤2× saved per-action cost must pass under the separate declaration.
+
+
+## Separate candidate compatibility check complete
+
+The new candidate-only declaration passes on sourceab1f5c21. It completes
+**4,096 actions /16,384 emulator frames** with zero learner updates in
+**2.785238s**, versus the saved ordinary2.734722s: **1.018472× observed per-action
+cost**. Construction takes2.796826s versus ordinary2.926305s. These cold short
+runs have different trajectories; this does not establish a general speed ratio.
+No natural episode completes; partial returns are not competence scores.
+
+All357 checkpoint tensors, including moments, remain finite and identical.
+Configuration/inference/native metadata and full recorded-action replay/video
+pass. All653 pins and the host guard pass; original child1479179 exits0 and no
+render holder/Kindle service remains. Controller completes **12:30:43.268 UTC
+November6** in14.435928s, wrapper14.583356s. No new declared stage fails or repeats;
+the earlier pipeline and CPU-repair failures remain failed. This establishes
+compatibility/cost for the new declaration only.
+
+The [separately fixed full evaluation](../experiments/2026-11-06-cdp-actor-posterior-average-candidate-evaluation.md)
+now selects one trained-checkpoint greedy24-natural-episode comparison, with
+no learner or initial-model arm. Before execution, actual-command CPU preflight
+passes in3.427866s with zero native import or native/emulator construction.
+Favor averaging only at≥10% higher mean with positive paired eight-lane95%
+interval, no fewer two-wall successes and≤2× saved ordinary per-action cost.
+Original864/90%-two-wall and five-game gates remain unchanged. Gameplay benefit
+is still unmeasured at this declaration; no automatic successor is selected.
