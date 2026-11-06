@@ -147,6 +147,8 @@ def main():
                         help="fresh CDP only: auxiliary continuation loss on sampled one-step priors")
     parser.add_argument("--actor-dynamics-scale", type=float,
                         help="add normalized return gradients through frozen imagined dynamics; default off")
+    parser.add_argument("--actor-hidden-units", type=int,
+                        help="fresh training only: actor MLP width; world and critic keep the model preset")
     parser.add_argument("--replay-actor-scale", type=float,
                         help="fresh training: positive-advantage imitation of completed observed returns")
     parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
@@ -306,6 +308,11 @@ def main():
             parser.error("actor-dynamics-scale requires fresh training")
         if "KINDLE_DEVICE_TARGETS" in os.environ:
             parser.error("actor-dynamics-scale requires CPU target construction")
+    if args.actor_hidden_units is not None:
+        if not 0 < args.actor_hidden_units < 2**64:
+            parser.error("actor-hidden-units must be a positive unsigned 64-bit integer")
+        if args.restore or args.evaluate:
+            parser.error("actor-hidden-units requires fresh training")
     if args.behavior_learning_rate is not None:
         if not positive_f32(args.behavior_learning_rate):
             parser.error("behavior-learning-rate must be finite and positive in F32")
@@ -483,6 +490,7 @@ def main():
     training_options.add("--prior-continuation-scale")
     training_options.add("--replay-actor-scale")
     training_options.add("--actor-dynamics-scale")
+    training_options.add("--actor-hidden-units")
     training_options.add("--return-lambda")
     training_options.add("--replay-value-bootstrap")
     training_options.add("--encoder-learning-rate")
@@ -525,6 +533,8 @@ def main():
         parser.error("replay-actor-scale requires native completed-return actor support")
     if args.actor_dynamics_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_DYNAMICS", False):
         parser.error("actor-dynamics-scale requires native actor dynamics support")
+    if args.actor_hidden_units is not None and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_HIDDEN_UNITS", False):
+        parser.error("actor-hidden-units requires native actor width support")
     if args.replay_actor_observed_lower_bound and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False):
         parser.error("observed lower-bound mode requires native conservative-return actor support")
     if args.breakout_return_life_boundaries and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RETURN_BOUNDARIES", False):
@@ -550,6 +560,9 @@ def main():
                 parser.error("actor dynamics checkpoint requires native actor dynamics support")
             if "KINDLE_DEVICE_TARGETS" in os.environ:
                 parser.error("actor dynamics checkpoint requires CPU target construction")
+        if (metadata.get("config", {}).get("actor_hidden_units") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_HIDDEN_UNITS", False)):
+            parser.error("actor width checkpoint requires native actor width support")
         if (metadata.get("config", {}).get("prior_continuation_scale") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_CONTINUATION", False)):
             parser.error("prior-continuation checkpoint requires native prior-continuation support")
@@ -725,6 +738,8 @@ def main():
             config["replay_actor_scale"] = args.replay_actor_scale
         if args.actor_dynamics_scale is not None:
             config["actor_dynamics_scale"] = args.actor_dynamics_scale
+        if args.actor_hidden_units is not None:
+            config["actor_hidden_units"] = args.actor_hidden_units
         if args.replay_actor_observed_lower_bound:
             config["replay_actor_observed_lower_bound"] = True
         if args.breakout_return_life_boundaries:

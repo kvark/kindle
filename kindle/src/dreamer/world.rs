@@ -219,7 +219,7 @@ impl WorldModel {
                     graph,
                     "behavior.actor",
                     config.feature_dim(),
-                    units,
+                    config.actor_hidden_units(),
                     3,
                     config.action_count,
                 )
@@ -1108,7 +1108,7 @@ pub fn build_imagination_graph(config: &DreamerConfig) -> Graph {
         &mut graph,
         "behavior.actor",
         config.feature_dim(),
-        size.units,
+        config.actor_hidden_units(),
         3,
         config.action_count,
     );

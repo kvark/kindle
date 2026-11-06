@@ -3,6 +3,8 @@
 mod vector;
 
 #[cfg(test)]
+mod actor_width_tests;
+#[cfg(test)]
 mod dynamics_gradients;
 #[cfg(test)]
 mod dynamics_tests;

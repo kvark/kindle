@@ -8,26 +8,26 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [actor-update diagnostic](results/2026-11-06-cdp-dynamics-actor-update.md)
-is closed. On two archived retained200k batches, dynamics.5 changes the full
-estimated actor update by only.01136%/.01702%; update cosines exceed.99999998.
-Conditional imitation is4782×/3282× the new term. Critic gradients and estimated
-updates remain exactly unchanged. This does not explain the failed learner's
-early trajectory or justify a coefficient sweep. Keep actor dynamics off,
-coordinates off and retained143.667/70.750 control.
+The [actor-only width experiment](experiments/2026-11-06-cdp-actor-width.md)
+is selected for native qualification and a bounded cost check. Add optional
+`actor_hidden_units`; test512 versus the12M preset's256, with1,054,720 extra
+trainable actor parameters. CNN, RSSM, critic widths, losses and optimizer
+ownership stay fixed. Default absent; restore preserves the width. Larger
+whole-model capacity failed, so actor-only capacity remains an unproven narrower
+hypothesis, not an established bottleneck.
 
-All archived actions, features and normalized targets reconstruct exactly.
-All419 native pins,22 behavior parameters,32 frozen world inputs and guards pass;
-zero Atari actions, learner updates or optimizer steps. Native.369s/controller
-3.986s complete07:38:44.292 UTC November6, sourcec041afea/SHA51c5332c. Original
-CPU analysis launcher collision remains failed; separate unchanged-arithmetic
-repair completes in.698s with454 pins. Closure07:43:01.701 seals92 files; no live
-allocation. Root `/x/Temp/kindle-dynamics-actor-update-20261106`.
+Implementation,194 Kindle/5 adapter CPU tests,1,116 packaged Python checks
+and strict workspace/binding Clippy pass. Native wheel and test executable are
+packaged. One new guarded two-update Tiny restore/synchronization check is next. No Atari
+learner or GPU allocation is active. Root `/x/Temp/kindle-actor-width-20261106`.
+Only after qualification declare the8,192-action cost check; no full learner,
+coefficient sweep or old-stage repeat is selected.
 
-The packaged executable is retained and4,688,112,504logical bytes of disposable
-build cache released. Do not rerun this diagnostic, old captures or collectors.
-Full dynamics.5 and fixed-plan probes remain closed; no successor selected.
-Original864/90%-two-wall and the five-game goal remain unfinished.
+The [closed actor-update diagnostic](results/2026-11-06-cdp-dynamics-actor-update.md)
+finds only.01136%/.01702% changes in estimated retained-checkpoint updates.
+Its original CPU launcher failure and separate repair remain preserved. Keep
+actor dynamics off, coordinates off and143.667/70.750 retained control. Original
+864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

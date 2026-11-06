@@ -36,7 +36,7 @@ impl BehaviorModel {
                 graph,
                 "behavior.actor",
                 config.feature_dim(),
-                units,
+                config.actor_hidden_units(),
                 3,
                 config.action_count,
             ),
@@ -264,7 +264,7 @@ pub fn build_actor_inference_graph(config: &DreamerConfig, batch: usize) -> Grap
         &mut graph,
         "behavior.actor",
         config.feature_dim(),
-        config.network().units,
+        config.actor_hidden_units(),
         3,
         config.action_count,
     );

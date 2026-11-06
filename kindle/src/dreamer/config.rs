@@ -382,6 +382,9 @@ pub struct DreamerConfig {
     pub value_bins: usize,
     pub actor_unimix: f32,
     pub actor_entropy: f32,
+    /// Override only the actor MLP hidden width; world and critic keep the preset.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub actor_hidden_units: Option<usize>,
     /// Auxiliary normalized lambda-return gradient through frozen imagined dynamics.
     /// Categorical draws use straight-through derivatives; disagreement and
     /// trajectory weights remain detached. Added to the existing actor objective.
@@ -491,6 +494,7 @@ impl DreamerConfig {
             actor_unimix: 0.0,
             actor_entropy: 3e-4,
             actor_dynamics_scale: None,
+            actor_hidden_units: None,
             slow_value_rate: 0.02,
             return_norm_rate: 0.01,
             learning_rate: 4e-5,
@@ -624,6 +628,10 @@ impl DreamerConfig {
         self.world_microbatch_size.unwrap_or(self.batch_size)
     }
 
+    pub fn actor_hidden_units(&self) -> usize {
+        self.actor_hidden_units.unwrap_or(self.network().units)
+    }
+
     pub const fn actor_update_scale(&self, learner_step: u64) -> f32 {
         if learner_step >= self.actor_learning_starts {
             1.0
@@ -673,6 +681,9 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if self.actor_hidden_units == Some(0) {
+            return Err("actor_hidden_units must be positive".into());
+        }
         if let Some(scale) = self.actor_dynamics_scale
             && (!scale.is_finite()
                 || scale <= 0.0

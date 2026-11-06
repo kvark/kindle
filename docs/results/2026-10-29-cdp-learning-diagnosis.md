@@ -1,5 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [actor-only width experiment](../experiments/2026-11-06-cdp-actor-width.md) adds a default-absent actor width
+override, selecting512 versus256 at12M with1,054,720 extra actor parameters.
+All194 Kindle/5 adapter tests,1,116 packaged Python checks and strict
+workspace/binding Clippy pass. Native packaging is complete. One two-update
+Tiny synchronization/restore qualification is next, before a separately
+declared8,192-action cost check. No full learner
+or GPU allocation is selected yet. Prior larger-world and shorter-imagination
+failures do not test this actor-only hypothesis; no capacity cause is claimed.
+
 The [completed actor-update diagnostic](2026-11-06-cdp-dynamics-actor-update.md) finds dynamics.5 changes
 the full estimated update by.01136%/.01702% at two retained200k batches;
 cosines exceed.99999998. Conditional imitation exceeds the auxiliary term
