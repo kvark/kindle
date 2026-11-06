@@ -1,5 +1,19 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [coordinate-channel check](2026-11-06-cdp-rgb-coordinates.md) completes
+8,192 actions/32,713 frames/489 updates in47.565s; frozen1,024/.882s haszero
+updates/no natural episodes. Native F64 derivatives,legacy compatibility,357
+invariant tensors,47 original/24 repair pins andfull replay pass. After explicit
+resume,a6.995s CPU import-path repair closes04:25:53.730 UTC November6, preserving
+the original failed audit andpause receipts; no GPU stage repeats. Conservative
+200k projection21m17.383s passes30min. Gameplay benefit remains unmeasured.
+A [fresh200k comparison](../experiments/2026-11-06-cdp-breakout-rgb-coordinates-200k.md)
+is separately selected with100k recovery andfour24-episode frozen arms. Fixed
+coordinates add1,600 first-layer weights andchange initialization; no baseline
+initial equality orisolated mechanism is claimed. Nativeb9136467/runnera0ffbe46.
+The SuperMimic actor-gradient direction is a separate proposal, not this change.
+The original864/90% gate andfive-game goal remain unfinished. Check live state.
+
 The [completed categorical-mixing comparison](2026-11-04-cdp-breakout-latent-unimix001.md#full-200k-comparison) finishes 200k actions /
 799,612 frames /12,477 updates in **21m19.046s**. Lower latent mixing.001 scores
 **67.208 greedy /51.583 sampled**, below retained.01's143.667/70.750; all0/24

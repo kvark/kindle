@@ -6,25 +6,29 @@ and [PR31](https://github.com/kvark/kindle/pull/31) for the live dashboard.
 The five-game goal remains unfinished. Detailed experiment history belongs in
 those reports; historical “next” paragraphs do not authorize restarting jobs.
 
-## Current work — November 4
+## Current work — November 6
 
-The [optional RGB coordinate-channel experiment](experiments/2026-11-04-cdp-rgb-coordinates.md) is selected for native
-qualification and a bounded learning check. Append fixed x/y pixel-center
-coordinates inside the first CNN layer; add1,600 weights at12M, with unchanged
-RGB replay, one GPU resize, latent width and CDP/actor/critic structure. Default
-off; no object labels or emulator state enter the model. Image position may help
-learning, but a perceptual cause or gameplay benefit is not established.
+The [RGB coordinate-channel bounded check](results/2026-11-06-cdp-rgb-coordinates.md)
+passes8,192 actions/32,713 frames/489 updates in47.565s; frozen1,024 takes.882s
+withzero updates/no completed episodes. Native derivatives,legacy compatibility,
+357 invariant tensors,47 original/24 repair pins andfull replay pass. The original
+CPU import failure remains; a6.995s CPU repair closes04:25:53.730 UTC November6
+following explicit resume. No GPU stage repeats. The pause timing and all earlier
+qualification failures are recorded in the result.
 
-Implementation and11 CPU CLI tests are ready. Initial installed-package import
-failure and one incomplete restore-fixture failure remain preserved; the
-corrected fixture passes with no GPU/emulator construction. Next build/package
-and qualify CPU/native values/derivatives, then declare the fixed8,192-action
-check. No GPU allocation or full learner is active or selected. Root
-`/x/Temp/kindle-rgb-coordinates-20261104`; consult the protocol before execution.
+One [fresh200k comparison](experiments/2026-11-06-cdp-breakout-rgb-coordinates-200k.md)
+is selected, with30-minute training cap,100k recovery and final/actual-initial
+sampled/greedy24-episode assessments. Coordinates add1,600 first-layer weights;
+RGB replay,one GPU resize andother retained settings stay fixed. No gameplay
+benefit or isolated perceptual cause is established. Source2d651cb0/nativeb9136467
+andrunnera0ffbe46 differ fromretained447fe50; baseline initial equality is not
+required. Root`/x/Temp/kindle-rgb-coordinates-20261104/full`. Check live state
+before work; no learner has launched at this update.
 
-The completed lower-latent-mixing learner remains closed: greedy67.208/sample51.583
-regress143.667/70.750; retain latent mixing.01. Original864/90%-two-wall and the
-five-game goal remain unfinished. Do not repeat its completed stages or collectors.
+The SuperMimic review identifies direct dynamics-gradient actor training as a
+separate architectural lead within the same goal. It remains a proposal; this
+coordinate comparison does not change actor training. Retain143.667greedy/
+70.750sampled andthe original864/90%-two-wall gate. The five-game goal is unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
