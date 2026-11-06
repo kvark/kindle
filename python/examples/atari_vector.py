@@ -147,6 +147,8 @@ def main():
                         help="fresh CDP only: auxiliary continuation loss on sampled one-step priors")
     parser.add_argument("--actor-dynamics-scale", type=float,
                         help="add normalized return gradients through frozen imagined dynamics; default off")
+    parser.add_argument("--actor-expected-value", action="store_true",
+                        help="fresh training: replace sampled policy loss with an enumerated one-step value expectation")
     parser.add_argument("--actor-hidden-units", type=int,
                         help="fresh training only: actor MLP width; world and critic keep the model preset")
     parser.add_argument("--actor-residual", action="store_true",
@@ -314,6 +316,14 @@ def main():
             parser.error("actor-dynamics-scale requires fresh training")
         if "KINDLE_DEVICE_TARGETS" in os.environ:
             parser.error("actor-dynamics-scale requires CPU target construction")
+    if args.actor_expected_value:
+        if args.restore or args.evaluate:
+            parser.error("actor-expected-value requires fresh training")
+        if (args.actor_residual or args.actor_dynamics_scale is not None
+                or args.replay_actor_scale is not None or args.actor_critic_gradient):
+            parser.error("actor-expected-value cannot combine with other actor experiments")
+        if "KINDLE_DEVICE_TARGETS" in os.environ:
+            parser.error("actor-expected-value requires CPU target construction")
     if args.actor_hidden_units is not None:
         if not 0 < args.actor_hidden_units < 2**64:
             parser.error("actor-hidden-units must be a positive unsigned 64-bit integer")
@@ -524,6 +534,7 @@ def main():
     training_options.add("--prior-continuation-scale")
     training_options.add("--replay-actor-scale")
     training_options.add("--actor-dynamics-scale")
+    training_options.add("--actor-expected-value")
     training_options.add("--actor-hidden-units")
     training_options.add("--actor-residual")
     training_options.add("--return-lambda")
@@ -568,6 +579,8 @@ def main():
         parser.error("replay-actor-scale requires native completed-return actor support")
     if args.actor_dynamics_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_DYNAMICS", False):
         parser.error("actor-dynamics-scale requires native actor dynamics support")
+    if args.actor_expected_value and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_EXPECTED_VALUE", False):
+        parser.error("actor-expected-value requires native expected-value actor support")
     if args.actor_hidden_units is not None and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_HIDDEN_UNITS", False):
         parser.error("actor-hidden-units requires native actor width support")
     if args.actor_residual and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RESIDUAL", False):
@@ -594,6 +607,11 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     if args.restore and (args.restore / "metadata.json").is_file():
         metadata = json.loads((args.restore / "metadata.json").read_text())
+        if metadata.get("config", {}).get("actor_expected_value", False):
+            if not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_EXPECTED_VALUE", False):
+                parser.error("checkpoint requires native expected-value actor support")
+            if "KINDLE_DEVICE_TARGETS" in os.environ:
+                parser.error("expected-value actor checkpoint requires CPU target construction")
         if (metadata.get("config", {}).get("latent_shape") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_LATENT_SHAPE", False)):
             parser.error("checkpoint requires native latent shape support")
@@ -785,6 +803,8 @@ def main():
             config["replay_actor_scale"] = args.replay_actor_scale
         if args.actor_dynamics_scale is not None:
             config["actor_dynamics_scale"] = args.actor_dynamics_scale
+        if args.actor_expected_value:
+            config["actor_expected_value"] = True
         if args.actor_hidden_units is not None:
             config["actor_hidden_units"] = args.actor_hidden_units
         if args.actor_residual:

@@ -8,33 +8,27 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [actor posterior averaging comparison](results/2026-11-06-cdp-actor-posterior-average.md#fixed-trained-policy-comparison-complete)
-is complete and fails the declared retention criterion. Eight-sample greedy
-return175.500 exceeds ordinary143.667 by22.158%, but the paired eight-lane95%
-interval is[-15.417,83.792], only4/8 lanes improve and both have0/24 two-wall.
-Keep ordinary inference; averaging stays frozen-only and default off. This
-fixed-checkpoint serving result does not establish a training-efficiency gain,
-a posterior-noise cause or training-seed reliability.
+The [enumerated one-step actor experiment](experiments/2026-11-06-cdp-actor-expected-value.md)
+is implemented and passes CPU qualification. It replaces sampled-action policy
+loss with an expectation over all discrete actions at replay posterior starts,
+using detached predicted reward/bonus/continuation/critic values. Entropy,
+imitation and critic training remain. No new learned parameters or optimizer
+slots. This changes horizon and state distribution as well as the estimator;
+no gameplay or efficiency gain is established.
 
-The fixed24-natural-episode cohort is selected from25 completed episodes, with
-zero updates/truncations.45,128 actions/180,472 frames take29.068s, construction
-2.936s. All357 tensors remain finite/invariant; full replay/video,681 pins and
-the guard pass. Comparison completes12:33:57.992 UTC November6,
-publication recount12:35:07.674; original child1479392 is terminal.
-No Kindle service/render holder remains. The separate bounded candidate passed
-at1.018472× observed ordinary per-action cost. Original pipeline/CPU-repair
-failures remain failed; no completed stage was repeated.
+[CPU checks](results/2026-11-06-cdp-actor-expected-value.md) pass207 Kindle/5 adapter tests,
+192 focused Python tests plus20 guard checks (15 overlap), and strict workspace/
+binding Clippy. The original native-fixture compile failure is preserved; its
+explicit index-type repair passes. Two ignored native fixtures compile but have
+not executed. Next package and separately qualify native values, actor derivatives,
+branch routing, snapshots and restore before a bounded learning-cost check.
+No GPU allocation or learner is active or selected.
 
-Root `/x/Temp/kindle-actor-posterior-average-20261106/candidate-evaluation` is
-closed; no GPU allocation, learner, count/seed sweep or successor is selected.
-Retain32×16 and143.667 greedy/70.750 sampled; original864/90%-two-wall and
-five-game gates remain unfinished. Consult a separately justified new protocol
-before further GPU work; do not restart this comparison or its failed queue.
-
-The [completed 64×8 grouping comparison](results/2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
-remains closed: greedy 136.958/sample 77.875 versus retained 143.667/70.750,
-with 4.295% lower primary gain/min and both paired intervals spanning zero.
-Keep preset 32×16. Original 864/90%-two-wall and five-game gates remain unfinished.
+Root `/x/Temp/kindle-actor-expected-value-20261106`; default off. Retain ordinary
+inference,32×16 and143.667 greedy/70.750 sampled. The [closed averaging comparison](results/2026-11-06-cdp-actor-posterior-average.md#fixed-trained-policy-comparison-complete)
+raised the mean to175.500 but failed its interval criterion, all0/24 two-wall.
+Original864/90%-two-wall and the five-game goal remain unfinished; no closed
+stage, failed queue or automatic successor may repeat.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

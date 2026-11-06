@@ -27,6 +27,8 @@ impl PyVectorAgent {
     #[classattr]
     const SUPPORTS_ACTOR_DYNAMICS: bool = true;
     #[classattr]
+    const SUPPORTS_ACTOR_EXPECTED_VALUE: bool = true;
+    #[classattr]
     const SUPPORTS_ACTOR_HIDDEN_UNITS: bool = true;
     #[classattr]
     const SUPPORTS_ACTOR_RESIDUAL: bool = true;

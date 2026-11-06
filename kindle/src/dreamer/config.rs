@@ -403,6 +403,10 @@ pub struct DreamerConfig {
     /// trajectory weights remain detached. Added to the existing actor objective.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub actor_dynamics_scale: Option<f32>,
+    /// Replace sampled-action policy gradients with a detached one-step
+    /// action-value expectation at replay posterior starts.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub actor_expected_value: bool,
     pub slow_value_rate: f32,
     pub return_norm_rate: f32,
     pub learning_rate: f32,
@@ -508,6 +512,7 @@ impl DreamerConfig {
             actor_unimix: 0.0,
             actor_entropy: 3e-4,
             actor_dynamics_scale: None,
+            actor_expected_value: false,
             actor_hidden_units: None,
             actor_residual: false,
             slow_value_rate: 0.02,
@@ -734,6 +739,16 @@ impl DreamerConfig {
         }
         if self.actor_hidden_units == Some(0) {
             return Err("actor_hidden_units must be positive".into());
+        }
+        if self.actor_expected_value
+            && (self.actor_residual
+                || self.actor_dynamics_scale.is_some()
+                || self.replay_actor_scale.is_some()
+                || self.actor_critic_gradient
+                || !self.loss_scales.policy.is_finite()
+                || self.loss_scales.policy <= 0.0)
+        {
+            return Err("expected-value actor requires positive policy scale without other actor experiments".into());
         }
         if let Some(scale) = self.actor_dynamics_scale
             && (!scale.is_finite()

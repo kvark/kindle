@@ -147,6 +147,12 @@ def audit(path):
         check(config["train_ratio"] >= 0, "invalid train ratio")
         replay_actor_scale = config.get("replay_actor_scale")
         actor_dynamics_scale = config.get("actor_dynamics_scale")
+        actor_expected_value = config.get("actor_expected_value", False)
+        check(type(actor_expected_value) is bool, "invalid expected-value actor mode")
+        check(not actor_expected_value or (
+            not config.get("actor_residual", False) and actor_dynamics_scale is None
+            and replay_actor_scale is None and not config.get("actor_critic_gradient", False)),
+            "expected-value actor combines incompatible objectives")
         if actor_dynamics_scale is not None:
             require_numbers(actor_dynamics_scale)
             check(actor_dynamics_scale > 0, "invalid actor dynamics scale")
@@ -419,6 +425,14 @@ def audit(path):
                 require_numbers(report)
                 audit_terminal_replay(config, report)
                 dynamics_loss = report.get("behavior", {}).get("dynamics_actor_loss")
+                expected_value_loss = report.get("behavior", {}).get("expected_value_actor_loss")
+                check((expected_value_loss is not None) == actor_expected_value,
+                      "expected-value actor loss differs from configuration")
+                if expected_value_loss is not None:
+                    require_numbers(expected_value_loss)
+                    snapshot = report.get("timing", {}).get("expected_value_snapshot_seconds")
+                    require_numbers(snapshot)
+                    check(snapshot >= 0, "invalid expected-value snapshot time")
                 check((dynamics_loss is not None) == (actor_dynamics_scale is not None),
                       "actor dynamics report/config mismatch")
                 if dynamics_loss is not None:

@@ -6,8 +6,11 @@ use super::config::{DreamerConfig, ExpertImitation};
 use super::networks::{MlpHead, mixed_log_probabilities, scale, sum, weighted_cross_entropy};
 
 mod dynamics;
+mod expected_value;
 mod posterior_average;
 mod residual;
+#[cfg(test)]
+pub(crate) use expected_value::build_values_graph as build_expected_values_graph;
 pub(crate) use posterior_average::build_actor_posterior_average_graph;
 pub(crate) use residual::Actor;
 
@@ -25,6 +28,10 @@ pub fn replay_actor_output(config: &DreamerConfig) -> usize {
 
 pub(crate) fn dynamics_actor_output(config: &DreamerConfig) -> usize {
     replay_actor_output(config) + usize::from(config.replay_actor_scale.is_some())
+}
+
+pub(crate) fn expected_value_actor_output(config: &DreamerConfig) -> usize {
+    dynamics_actor_output(config) + usize::from(config.actor_dynamics_scale.is_some())
 }
 
 struct BehaviorModel {
@@ -130,7 +137,14 @@ pub fn build_training_graph(
     let model = BehaviorModel::new(&mut graph, config);
 
     let imagined_feature = graph.input("imagined_feature", &[imagined_rows, config.feature_dim()]);
-    let action_target = graph.input("action_target", &[imagined_rows, config.action_count]);
+    let action_target = if config.actor_expected_value {
+        graph.constant(
+            vec![0.0; imagined_rows * config.action_count],
+            &[imagined_rows, config.action_count],
+        )
+    } else {
+        graph.input("action_target", &[imagined_rows, config.action_count])
+    };
     let imagined_weight = graph.input("imagined_weight", &[imagined_rows, 1]);
     let imagined_value_target =
         graph.input("imagined_value_target", &[imagined_rows, config.value_bins]);
@@ -147,6 +161,21 @@ pub fn build_training_graph(
         imagined_weight,
         imagined_rows,
     );
+    let expected_value_loss = config.actor_expected_value.then(|| {
+        expected_value::loss(
+            &mut graph,
+            config,
+            &model.actor.base,
+            &model.value,
+            imagined_weight,
+        )
+    });
+    let policy = if let Some(loss) = expected_value_loss {
+        let entropy = scale(&mut graph, weighted_entropy, -config.actor_entropy);
+        graph.add(loss, entropy)
+    } else {
+        policy
+    };
     let value = value_loss(
         &mut graph,
         value_logits,
@@ -232,6 +261,10 @@ pub fn build_training_graph(
     }
     if let Some(loss) = dynamics_loss {
         assert_eq!(outputs.len(), dynamics_actor_output(config));
+        outputs.push(loss);
+    }
+    if let Some(loss) = expected_value_loss {
+        assert_eq!(outputs.len(), expected_value_actor_output(config));
         outputs.push(loss);
     }
     graph.set_outputs(outputs);

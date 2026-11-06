@@ -18,7 +18,7 @@ use crate::dreamer::{
 
 /// Pair opposite support bins before summing. Uniform logits then decode to
 /// exact zero even with the large raw-value endpoints of Dreamer's support.
-fn scalar_mean(graph: &mut Graph, logits: NodeId, bins: &TwoHotBins) -> NodeId {
+pub(super) fn scalar_mean(graph: &mut Graph, logits: NodeId, bins: &TwoHotBins) -> NodeId {
     let rows = graph.node(logits).ty.shape[0];
     let half = bins.len() / 2;
     let probabilities = graph.softmax(logits);

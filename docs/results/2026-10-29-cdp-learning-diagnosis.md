@@ -1,5 +1,27 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [enumerated one-step actor experiment](../experiments/2026-11-06-cdp-actor-expected-value.md)
+is implemented and passes CPU qualification. It replaces sampled-action policy
+loss with an expectation over all discrete actions at replay posterior starts,
+using detached predicted reward/bonus/continuation/critic values. Entropy,
+imitation and critic training remain. No new learned parameters or optimizer
+slots. This changes horizon and state distribution as well as the estimator;
+no gameplay or efficiency gain is established.
+
+[CPU checks](2026-11-06-cdp-actor-expected-value.md) pass207 Kindle/5 adapter tests,
+192 focused Python tests plus20 guard checks (15 overlap), and strict workspace/
+binding Clippy. The original native-fixture compile failure is preserved; its
+explicit index-type repair passes. Two ignored native fixtures compile but have
+not executed. Next package and separately qualify native values, actor derivatives,
+branch routing, snapshots and restore before a bounded learning-cost check.
+No GPU allocation or learner is active or selected.
+
+Root `/x/Temp/kindle-actor-expected-value-20261106`; default off. Retain ordinary
+inference,32×16 and143.667 greedy/70.750 sampled. The [closed averaging comparison](2026-11-06-cdp-actor-posterior-average.md#fixed-trained-policy-comparison-complete)
+raised the mean to175.500 but failed its interval criterion, all0/24 two-wall.
+Original864/90%-two-wall and the five-game goal remain unfinished; no closed
+stage, failed queue or automatic successor may repeat.
+
 The [actor posterior averaging comparison](2026-11-06-cdp-actor-posterior-average.md#fixed-trained-policy-comparison-complete)
 is complete and fails the declared retention criterion. Eight-sample greedy
 return175.500 exceeds ordinary143.667 by22.158%, but the paired eight-lane95%
