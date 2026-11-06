@@ -26,8 +26,11 @@ Root `/mnt/data/kindle-breakout-reward10-20261106/full`, service
 original PID1552095/invocationf6402af01ae946019805b26479f206de. All357 initial
 tensors and47 pre-update events match22003. Exact five-command CPU qualification
 passes after a separate missing-test-double-signature repair; the original
-failure remains. Training code/queues/limits are unchanged. Retain100k recovery
-and four24-episode frozen arms. No extension, sweep or automatic successor.
+failure remains. Training code/queues/limits are unchanged. The100k/6,227 recovery
+passes independent CPU verification21:48:13.435 UTC:357 finite tensors,263 pins,
+read-only checkpoint and unchanged learner identity; zero forwards/updates.
+Training continues past104k; four24-episode frozen arms remain pending.
+No extension, sweep or automatic successor.
 Promising changes require fresh-seed confirmation. The bounded check is closed.
 
 The pre-contact shot predictor stays closed and failed; keep the original

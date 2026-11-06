@@ -13,8 +13,11 @@ the original864/90% and full five-game gates. Root
 original PID1552095/invocationf6402af01ae946019805b26479f206de. All357 initial
 tensors and47 pre-update events match22003. Five-command CPU qualification
 passes after a separate test-double signature repair; its original failure is
-preserved and execution code/queues/limits are unchanged. A reward-loss bottleneck
-or benefit is not established; await frozen evaluation.
+preserved and execution code/queues/limits are unchanged. The100k/6,227 recovery
+passes independent CPU verification21:48:13.435 UTC:357 finite tensors,263 pins,
+read-only files and original learner identity. Zero forwards/updates; training
+continues past104k. A reward-loss bottleneck or benefit is not established;
+await frozen evaluation.
 
 The [pre-contact shot predictor](2026-11-06-cdp-breakout-causal-shot.md) is complete and fails its fixed
 screen. Adding planned contact offset lowers holdout slope MAE.691547→.601837

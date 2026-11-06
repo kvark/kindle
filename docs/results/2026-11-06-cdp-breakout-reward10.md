@@ -47,8 +47,12 @@ original864/90%-two-wall and full five-game goals remain unfinished.
 Execution source3be21d90 launches21:37:11.656 UTC November6, original PID1552095 /
 invocationf6402af01ae946019805b26479f206de. All263 allocation pins verify. Initial
 357 tensors and47 pre-update actions exactly match retained22003; first update376.
-The100k recovery observer and terminal collector monitor this original service.
-No frozen gameplay result exists yet.
+The100k/6,227 recovery passes independent CPU verification at21:48:13.435 UTC
+in1.569s:357 finite tensors/moments,263 unchanged pins,0555 directory/0444 files
+and unchanged original learner identity. The verifier performs zero model
+forwards or learner updates. The recovery observer terminates successfully;
+training continues past104k and the terminal collector remains active. No
+frozen gameplay result exists yet.
 
 Full-helper checks pass in4.343s. The first actual-command preflight fails before
 native/emulator construction because its forbidden-API test double lacks the
@@ -58,3 +62,8 @@ removed. All five commands and four wrong-command checks pass in1.110s with zero
 native/emulator construction and no GPU descriptor. Original source/failure/logs
 remain pinned. The separate launch qualification verifies repair provenance,
 then calls the unchanged declared launcher; no training code, queue or cap changes.
+
+A read-only live-publication reader initially used system Python, which lacks
+NumPy; it stopped on import before verification or writes. The failure receipt
+is preserved. The corrected reader uses the declared Python environment and
+verifies the running identity and pins; no learner or collector is affected.
