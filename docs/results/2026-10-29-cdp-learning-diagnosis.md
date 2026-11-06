@@ -1,22 +1,25 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fixed-width latent regrouping development](../experiments/2026-11-06-cdp-latent-shape.md) selects an optional
-64×8 categorical state in place of32×16 at12M. Flattened state, CNN, parameter
-shapes/counts and actor/critic widths stay fixed; sampling, KL and one-hot
-activity change together. This is a representation hypothesis, not evidence
-that capacity caused earlier failures. Default remains the retained32×16.
+The [optional fixed-width latent grouping](2026-11-06-cdp-latent-shape.md) completes CPU/native
+qualification with a separate test readback repair. At12M,64×8 replaces32×16
+with unchanged512-entry width and parameter shapes/counts. Sampling, KL and
+one-hot activity change together; no gameplay benefit is established.
 
-CPU/package qualification passes202 Kindle/5 adapter,36 focused Python and
-1,139 installed-package tests. Original native qualification fails on a fixture
-readback API mismatch before derivative checks or learner updates. Preserve its
-failed guard/log/binary. A separate test-only indexed-read repair passes five CPU
-checks and strict Clippy; release compilation and guarded qualification are next.
-Original production native2c9c6e6f stays unchanged. Root
-`/x/Temp/kindle-latent-shape-20261106/readback-repair`; no Atari learner or bounded
-check is selected. Keep actor dynamics,
-residual actor and coordinates off, and retain143.667 greedy/70.750 sampled.
-Original864/90%-two-wall and five-game gates remain unfinished. Completed stages
-stay closed; no unchanged extension, sweep or old-stage repeat.
+CPU/package checks pass202 Kindle/5 adapter,36 focused Python and1,139 installed
+Python tests. Original native qualification fails on a fixture API mismatch;
+keep that failure. Test-only indexed reads then pass all F64 categorical values/
+derivatives/samples and two Tiny vector updates, sharing and exact restore.
+Both repaired guards and255 pins pass at11:04:01.865 UTC November6,3.672s wrapper.
+Sourceacc24213 changes only the fixture; original native536012d5/2c9c6e6f remains.
+
+Root `/x/Temp/kindle-latent-shape-20261106`; original and repaired stages are
+closed. CPU closure verifies terminal children/no GPU holders;6.411GB logical
+build cache released with all four package artifacts retained. No GPU allocation,
+Atari learner or bounded check is selected. Next requires a separately declared
+8,192-action cost/replay check; do not repeat qualification or old stages.
+Retain143.667 greedy/70.750 sampled, latent grouping absent/preset32×16,
+actor dynamics/residual/coordinates off. Original864/90%-two-wall and five-game
+gates remain unfinished; no unchanged extension or sweep.
 
 The [frozen residual serving ablation](2026-11-06-cdp-residual-actor-serving-ablation.md) is complete and inconclusive.
 Zeroing two correction parameters raises greedy117.625→131.750 and sampled

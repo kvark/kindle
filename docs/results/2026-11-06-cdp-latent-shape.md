@@ -1,5 +1,10 @@
 # Fixed-width categorical regrouping development
 
+Native qualification is complete with a separate test readback repair. The
+original qualification remains failed. The repaired categorical fixture and
+previously unexecuted Tiny learning/restore fixture both pass; details and
+limits follow below. No Atari learner or gameplay benefit is established.
+
 The [development protocol](../experiments/2026-11-06-cdp-latent-shape.md) selects
 an optional64×8 latent grouping at12M instead of32×16, with the same512 flattened
 entries and network parameter shapes/counts. Sampling, active one-hot entries
@@ -61,3 +66,40 @@ F64 oracle, thresholds, production math and original packaged native remain
 unchanged. Five affected CPU tests and strict Clippy pass. A separate release
 executable and new output/checkpoint paths will qualify the repaired derivative
 fixture and previously unexecuted learning/restore fixture. No Atari learner.
+
+## Completed separate repair and qualification closure
+
+At11:04:01.865 UTC November6, the repaired controller succeeds in3.518s
+(3.672s wrapper), sourceacc24213. Its executable SHA256 is
+`550934ce0f77de6abcdb940ec7766a1a395021e72992381e58313a9a39b08035`.
+Only `agent/latent_shape_tests.rs` differs among246 original source pins;
+production native2c9c6e6f and all original package artifacts remain unchanged.
+
+The categorical fixture passes in.75s: six declared forward/backward cases at
+32×16/64×8 match independent F64 values and all parameter derivatives, including
+free-nat clamping and stopped routes. Supplied-draw samples match exactly;
+parameters and optimizer counters stay unchanged. The previously unexecuted
+Tiny8×2 learning fixture passes in.59s: exactly two finite vector updates change
+encoder/reward/actor/critic, all11 actor parameters share correctly, live groups
+are one-hot, and checkpoint weights/moments/configuration/counters restore exactly
+with empty replay. Both guards and255 pins pass. Zero Atari actions.
+
+The separate CPU closure finishes11:05:07.150 in.037s, confirming original and
+repaired child identities are terminal, no Kindle service/render holder remains,
+and the original failed guard still records exit101. It verifies the isolated
+fixture change and byte-identical production package. The subsequent cache
+release preserves the wheel, original native, original test executable and
+repaired executable while freeing6,411,078,903 logical bytes. No completed
+native fixture or original failed queue was repeated unchanged.
+
+`qualification-review.json` records `complete_with_test_readback_repair` and
+`qualified=true`; the original qualification remains failed. Original execution
+SHA256 `61f74b84aeb211095c7ff2494b09c239371db0c8d69b28333cd48893abbf2232`;
+repaired execution `1118a7009213e5c47e982811c2ebbebd7e891b9ad5d021f44c6b993457dc3370`;
+repaired native review `489fc055003e0591b7c35d7c292bb80c6267d3a0fb4bce4b1d00b07f10a5e5e9`.
+
+These results establish the declared numerical and Tiny learning/restore fixtures,
+not12M Atari learning, initialized-tensor equivalence or improved efficiency.
+A separate fixed8,192-action cost/replay protocol is the next substantive check;
+no such allocation or full learner is selected here. Keep retained143.667/70.750
+and all original gates unchanged. Do not repeat the closed qualification stages.
