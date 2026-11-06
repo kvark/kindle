@@ -59,3 +59,27 @@ identical synthetic values. CPU coverage constructs all34 observations. A separa
 test executable and new output path will qualify only missing learning/restore;
 original package/runtime/production math stay unchanged. The original native
 qualification remains failed even if the separate repair passes.
+
+The repair passes three affected CPU tests, strict Clippy and release compilation.
+Only `agent/vector/residual_tests.rs` differs among243 source pins from the
+original package. Its separate test executable completes the missing native
+learning/restore fixture at09:34:22.254 UTC in2.970s wrapper, with248 unchanged
+pins and a passing host guard. Two synthetic updates change base/residual/critic;
+scalar/vector/imagination synchronization and exact weights/moments restore pass.
+No completed derivative fixture, emulator or learner stage is repeated.
+
+`qualification-review.json` records `complete_with_native_fixture_repair`, while
+the original native qualification remains failed. The wheel/native and both
+original/repaired test executables remain retained. A separate cache-release
+receipt removes disposable build files after verifying those four artifacts.
+
+## Selected bounded check
+
+The [fixed8,192-action protocol](../experiments/2026-11-06-cdp-residual-actor-bounded.md)
+selects one fresh Breakout learner plus1,024 frozen actions, retaining all baseline
+settings except the residual actor. CPU preflight passes in.217s wrapper with
+zero native/emulator constructions, both exact queued commands, missing-flag
+rejection and changed/extra/missing initial-tensor cases. It requires357 matching
+legacy initial tensors, six zero residual additions,47 matching initial events,
+363 frozen invariant tensors, complete replays and finite weighted losses.
+Native3003151f/package7e0bb827 remain unchanged. No full learner is selected.

@@ -21,25 +21,24 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 6
 
 The [residual actor experiment](docs/results/2026-11-06-cdp-residual-actor.md)
-is implemented and packaged, default off. A zero-initialized linear correction
-receives imagined policy/entropy gradients; the base actor receives imitation.
-It adds46,098 trainable parameters at12M/full18, with separate parameter moments
-and unchanged CNN/RSSM/critic. CPU checks and1,125 installed Python checks pass.
+is qualified through native execution, with the original fixture failure retained.
+A zero-initialized linear correction receives imagined policy/entropy gradients;
+the base actor receives imitation. It adds46,098 trainable parameters at12M/full18,
+with separate moments and unchanged CNN/RSSM/critic. Default off.
 
-The original native derivative fixture passes in.73s. The learning fixture fails
-before its first transition because it used the fixed-feature constructor for
-RGB32. That failed native stage remains preserved. A separate
-[fixture-only repair](docs/experiments/2026-11-06-cdp-residual-actor-fixture-repair.md)
-fixes observation construction, adds CPU coverage and is being compiled. Native
-runtime/production math are unchanged; the completed derivative fixture stays
-closed. No Atari cost check or full learner is selected.
+The original derivative fixture passes; the learning fixture fails before its
+first transition on an RGB constructor mismatch. The separate test-only repair
+passes two synthetic updates, sharing and exact restore in2.970s with248 pins.
+Production/native bytes stay unchanged; completed derivative work is not repeated.
+CPU/package checks and the bounded command preflight pass. The
+[fixed8,192-action cost check](docs/experiments/2026-11-06-cdp-residual-actor-bounded.md)
+and1,024-action frozen restore are now selected. No full learner is selected.
 
-Root `/x/Temp/kindle-residual-actor-20261106`, repair subdirectory
-`learning-fixture-repair`; consult the protocol before execution. Keep the
-preset256 base, coordinates and actor dynamics off. Width512 remains
-[closed negative](docs/results/2026-11-06-cdp-actor-width.md#full-200k-comparison).
-Retain143.667 greedy/70.750 sampled; original864/90%-two-wall and five-game gates
-remain unfinished. No old-stage repeat, sweep or automatic successor learner.
+Root `/x/Temp/kindle-residual-actor-20261106/bounded`; consult the protocol before
+execution. Both test binaries/package remain after disposable cache release.
+Keep the preset256 base, coordinates and actor dynamics off. Retain143.667
+greedy/70.750 sampled; original864/90%-two-wall and five-game gates remain
+unfinished. No old-stage repeat, sweep or automatic successor learner.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

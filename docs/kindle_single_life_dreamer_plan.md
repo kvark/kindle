@@ -1,16 +1,14 @@
 # Kindle: CDP learning roadmap
 
-The [residual actor development](results/2026-11-06-cdp-residual-actor.md)
-passes196 Kindle/5 adapter CPU tests, strict workspace/binding Clippy and1,125
-installed Python checks. The original native derivative fixture passes in.73s,
-but the learning fixture fails before its first transition on a test observation
-constructor mismatch. The separate test-only repair now passes three affected
-CPU tests, strict Clippy and release compilation; production/native bytes remain
-unchanged. Only missing synthetic learning/restore is selected for qualification.
-The passed derivative stage remains closed. Root
-`/x/Temp/kindle-residual-actor-20261106/learning-fixture-repair`.
-No Atari cost check or full learner is selected. Retain143.667 greedy/70.750
-sampled; original864/90%-two-wall and the five-game goal remain unfinished.
+The [residual actor qualification](results/2026-11-06-cdp-residual-actor.md)
+completes with a preserved native fixture failure: original derivative checks
+pass, original learning fixture fails before its first transition on an RGB
+constructor mismatch, and a separate test-only repair passes two updates,
+sharing and exact restore in2.970s with248 pins. Production/package bytes remain
+unchanged. The fixed8,192-action cost check and1,024 frozen restore are selected
+following passing CPU command/configuration preflight. No full learner is selected.
+Root `/x/Temp/kindle-residual-actor-20261106/bounded`; default off. Retain143.667
+greedy/70.750 sampled and the original864/90%-two-wall/five-game gates.
 
 The [full actor-width512 comparison](results/2026-11-06-cdp-actor-width.md#full-200k-comparison)
 is complete and negative. Fresh200k actions/799,552 frames/12,477 updates take
