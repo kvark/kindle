@@ -1,21 +1,23 @@
 # Kindle: CDP learning roadmap
 
-The [CDP prediction-scale1000 check](results/2026-11-06-cdp-breakout-cdp1000.md) is selected for one fixed
-8,192-action/489-update cost and restore check. Only the existing prediction
-loss weight changes500→1000; retain native447fe50, the original encoder,
-teacher and learning recipe. No native build or full learner is selected.
+The [CDP prediction-scale1000 bounded check](results/2026-11-06-cdp-breakout-cdp1000.md) is complete and passes
+execution/cost gates:8,192 actions/32,728 frames/489 updates in46.680678s versus
+saved47.689684s. The2.116% lower observed time is not a paired speed result.
+Only prediction loss500→1000 changes; retain native447fe50 and the original
+encoder/teacher/recipe. No native build or full learner is selected.
 
-Canonical39/private38 CPU tests pass, with one private unsupported-feature
-skip and zero native construction attempts. The original canonical import
-failure is preserved; a separate matching-Python CPU fixture repairs it without
-changing the GPU runtime. Exact queue preflight passes with zero native/emulator
-construction. Root `/x/Temp/kindle-breakout-cdp1000-20261106`; consult the
-[fixed protocol](experiments/2026-11-06-cdp-breakout-cdp1000.md). GPU queue prepared, not yet run.
+All357 initial/frozen tensors,47 pre-update events, weighted loss sums and full
+action/label replay pass. Frozen restore1,024 actions/4,096 frames takes.922426s,
+with no completed natural episodes; no competence claim. Projection1253.631s
+and conservative11.222GiB headroom pass. All49 pins/four experiment source files,
+53 completion artifacts and terminal identities pass; no learner/render holder
+is active. Original CPU import failure and separate repair remain preserved.
+Root `/x/Temp/kindle-breakout-cdp1000-20261106`; closure18:15:32.218 UTC November6,
+source957bed96. Consult the [fixed protocol](experiments/2026-11-06-cdp-breakout-cdp1000.md); do not repeat stages.
 
 The [completed stride-two comparison](results/2026-11-06-cdp-rgb-stride2.md) remains closed and negative;
 keep it off. Retain143.667 greedy/70.750 sampled. Original864/90% two-wall
-and the five-game goal remain unfinished. No automatic successor or repeated
-completed stage.
+and the five-game goal remain unfinished. No automatic successor.
 
 The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) comparison is complete and negative.
 Fresh200k scores16.458 greedy/13.000 sampled versus143.667/70.750 retained.

@@ -45,9 +45,49 @@ Native SHA256:
 `35ad0db42fc7ed5dbaf6dacddff613fdc04d83ae6e0f38548532f6ab2c7812a2`.
 The source-copy receipt and preflight pin the exact commands and audit sources.
 
-The bounded GPU queue is prepared, not yet run. It declares8,192 training
-actions followed by1,024 frozen restore actions, full action/label replay,
-initial/frozen tensor checks, host guards and fixed cost/headroom gates.
-No natural-episode competence evaluation or fresh200k allocation is selected.
-Retain143.667 greedy/70.750 sampled; original864/90% two-wall and the five-game
-goal remain unfinished. No automatic successor or repeated completed stage.
+## Completed bounded check
+
+The queue completes once at source957bed96. Training takes46.680678s for
+8,192 aggregate actions/32,728 emulator frames and489 updates, versus the saved
+47.689684s control (2.116% less observed time). This is not a paired speed result.
+Construction takes2.352502s separately; the padded200k projection is1253.631498s
+against the1800s gate. Conservative full-replay headroom is11.221905GiB against
+the2GiB gate. Both gates pass.
+
+All489 reports are finite and satisfy the1000-weight world loss and behavior
+loss arithmetic. First update376 and residual credit.5 match the declaration.
+All357 actual-initial tensors and47 pre-update events match retained. Encoder,
+reward, continuation, actor and value weights change. Full independent replay
+verifies all8,192 actions, pixels, frames, rewards, boundaries and expert labels,
+including3,804 overrides (46.436% of actions;20% is the episode-selection rate).
+
+Frozen restore completes1,024 actions/4,096 frames in0.922426s, with zero updates,
+no guidance, preserved1000-weight config and all357 tensors unchanged. Its128
+ticks per lane complete no natural episodes; this is not competence evidence.
+
+| Training stage | Seconds |
+|---|---:|
+| Learning |40.404433|
+| Acting |2.466933|
+| Environment |2.506276|
+| Observe |0.500698|
+| Reset |0.094614|
+| Checkpoint |0.262006|
+
+Reported learner timing totals40.348870s, including posterior6.156417,
+world training13.647480, imagination16.570146 and behavior training2.508965s.
+These are wrapper/session timings, not isolated kernel costs.
+
+The controller completes in65.909064s at18:14:27.545 UTC November6. Both host
+guards pass, both GPU children exit0, and all49 declared pins plus four experiment
+source files remain exact. Independent0.337578s CPU publication closure at
+18:15:32.218 UTC verifies53 completion artifacts and terminal controller/child
+identities1531541/1531549/1531722. No active Kindle service or render holder
+remains. The completed GPU stages, audits and replays are not repeated.
+
+Evidence is in `bounded/check/completion.json`, `review.json`, guidance/frozen
+replays and guards, with `bounded/publication-closure.json` sealing source,
+artifact and terminal checks. The original CPU import failure remains preserved.
+No full learner is selected. A separately declared learning comparison would
+still be needed to assess benefit. Retain143.667 greedy/70.750 sampled; original
+864/90% two-wall and the five-game goal remain unfinished. No automatic successor.
