@@ -163,3 +163,16 @@ remain unfinished.
 |`bounded/control-review.json`|`88b4b4413e2a45c02d52ec2a8105b9600488f66b9160074b41a51f17a979b288`|
 |`bounded-control-repair-execution.json`|`58666587803db464d764e15edc3779f5b626b11207e7dcb7855c1fe5c28369af`|
 |`bounded-control-closure/completion.json`|`37716513fa31ff7ee5d5c31772d54fdad32129905f9a4161c8ca51d185243e09`|
+
+
+## Separate candidate compatibility check selected
+
+The [new candidate-only protocol](../experiments/2026-11-06-cdp-actor-posterior-average-candidate-bounded.md)
+selects the first4,096-action averaging execution, reusing the saved ordinary
+control. The corrected controller reads the child PID from the audited sealed
+result and leaves subprocess APIs unchanged. CPU preflight passes in3.498950s
+(3.670944s wrapper), including the actual command, existing metadata/selection
+rejections, seven invalid guard-result cases and the final service query.
+Zero native import or native/emulator construction. The original failures remain
+failed. No full evaluation or learner is selected; unchanged357 tensors, complete
+replay and≤2× saved per-action cost must pass under the separate declaration.
