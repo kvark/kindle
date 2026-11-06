@@ -20,21 +20,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [64×8 latent comparison](docs/results/2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
-is complete and fails the primary retention criterion. Fresh 200k actions/
-799,594 frames/12,477 updates take 21m25.849s versus retained 21m27.910s.
-Greedy 136.958 trails 143.667; sampled 77.875 exceeds 70.750. Primary own-initial
-gain/min falls 4.295%; both paired intervals span zero. All frozen modes have
-0/24 two-wall successes. Keep preset 32×16 and retained 143.667/70.750.
+The [actor posterior averaging experiment](docs/experiments/2026-11-06-cdp-actor-posterior-average.md) is selected for implementation
+and CPU qualification. It averages eight conditional actor distributions while
+preserving the original sampled recurrent state and RNG streams. Frozen-only,
+default off; no training loss, parameters, encoder geometry or checkpoint change.
+The earlier modal result motivates this test but does not establish a noise cause.
 
-All four frozen arms select 24 natural episodes with zero updates/truncations
-and 357 invariant tensors. Initial equality, 100k recovery, complete replays,
-guards, curves, exposure and 356 current/338 retained pins pass. Original services
-close at 11:42:01.706/11:42:12.947 UTC November 6, source eda94b80. The original
-native qualification failure and separate successful test repair remain preserved.
-Root `/x/Temp/kindle-latent-shape-20261106/full` is closed; no GPU allocation,
-extension, stage repeat or successor is selected. Original 864/90%-two-wall and
-five-game gates remain unfinished.
+CPU checks pass 204 Kindle/5 adapter tests, 161 Python tests and strict workspace/binding
+Clippy. A nonuniform native fixture is prepared but has not run. Next package and
+separately qualify native values, shared parameters, recurrent-state/RNG equality
+under forced actions, frozen moments and learning guards. No GPU allocation or
+learner is active or selected. Root `/x/Temp/kindle-actor-posterior-average-20261106`;
+consult the protocol before execution.
+
+The [completed 64×8 grouping comparison](docs/results/2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
+remains closed: greedy 136.958/sample 77.875 versus retained 143.667/70.750,
+with 4.295% lower primary gain/min and both paired intervals spanning zero.
+Keep preset 32×16. Original 864/90%-two-wall and five-game gates remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

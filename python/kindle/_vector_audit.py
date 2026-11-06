@@ -119,6 +119,13 @@ def audit(path):
                   "action temperature requires sampled frozen restore")
         posterior_mode = header.get("posterior_mode", "sample")
         check(posterior_mode in ("sample", "greedy"), "unknown posterior mode")
+        if "actor_posterior_samples" in header:
+            samples = header["actor_posterior_samples"]
+            check(type(samples) is int and 2 <= samples <= 16, "invalid actor posterior sample count")
+            check(header["mode"] != "train" and header.get("restored_checkpoint") is not None,
+                  "actor posterior averaging requires frozen restore")
+            check(posterior_mode == "sample" and "action_temperature" not in header,
+                  "actor posterior averaging requires sampled live posteriors and no action temperature")
         if posterior_mode == "greedy":
             check(header["mode"] != "train" and header.get("restored_checkpoint") is not None,
                   "greedy posterior requires frozen restore")

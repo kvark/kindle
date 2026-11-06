@@ -187,6 +187,8 @@ def main():
                         help="sampled frozen restore only: positive native action softmax temperature")
     parser.add_argument("--greedy-posterior", action="store_true",
                         help="frozen restore only: use categorical posterior modes independently of action sampling")
+    parser.add_argument("--actor-posterior-samples", type=int,
+                        help="frozen restore only: average native actor probabilities over 2–16 extra posterior draws")
     parser.add_argument("--probe-behavior", action="store_true",
                         help="frozen diagnostic: log live critic values and scaled action-effects bonuses")
     parser.add_argument("--episodes-per-env", type=int,
@@ -376,6 +378,15 @@ def main():
     if args.training_action_mode is not None and (args.evaluate or args.restore):
         parser.error("training-action-mode requires fresh training")
     greedy_actions = args.greedy or args.training_action_mode == "greedy"
+    if args.actor_posterior_samples is not None:
+        if not 2 <= args.actor_posterior_samples <= 16:
+            parser.error("actor posterior samples must be between 2 and 16")
+        if not args.evaluate or not args.restore:
+            parser.error("actor posterior averaging requires frozen restore")
+        if args.greedy_posterior or args.action_temperature is not None:
+            parser.error("actor posterior averaging requires sampled live posteriors and no action temperature")
+        if not hasattr(kindle.VectorAgent, "set_actor_posterior_samples_for_evaluation"):
+            parser.error("native runtime does not support actor posterior averaging")
     if args.action_temperature is not None:
         if not math.isfinite(args.action_temperature) or not 2**-126 <= args.action_temperature <= float.fromhex('0x1.fffffep+127'):
             parser.error("action temperature must be a positive normal finite F32 value")
@@ -865,6 +876,8 @@ def main():
             agent.use_greedy_posterior_for_evaluation()
         if args.action_temperature is not None:
             agent.set_action_temperature_for_evaluation(args.action_temperature)
+        if args.actor_posterior_samples is not None:
+            agent.set_actor_posterior_samples_for_evaluation(args.actor_posterior_samples)
         started = time.perf_counter()
         agent.begin_episodes(ids, initial)
         check_memory("initialized", 0)
@@ -894,6 +907,7 @@ def main():
                   **(dict(training_action_mode=args.training_action_mode) if args.training_action_mode is not None else {}),
                   **(dict(action_temperature=args.action_temperature) if args.action_temperature is not None else {}),
                   **(dict(posterior_mode="greedy") if args.greedy_posterior else {}),
+                  **(dict(actor_posterior_samples=args.actor_posterior_samples) if args.actor_posterior_samples is not None else {}),
                   **(dict(behavior_probe="live-posterior-v1") if args.probe_behavior else {}),
                   **(dict(actor_return_boundary_kind=LIFE_BOUNDARY_KIND,
                           actor_return_boundary_sha256=sha256_file(return_boundaries_module.__file__))

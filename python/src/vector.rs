@@ -162,6 +162,12 @@ impl PyVectorAgent {
             .map_err(PyValueError::new_err)
     }
 
+    fn set_actor_posterior_samples_for_evaluation(&mut self, samples: usize) -> PyResult<()> {
+        self.inner
+            .set_actor_posterior_samples_for_evaluation(samples)
+            .map_err(PyValueError::new_err)
+    }
+
     fn begin_episodes(
         &mut self,
         streams: Vec<usize>,
@@ -308,6 +314,11 @@ impl PyVectorAgent {
         if self.inner.action_temperature().is_some() {
             return Err(PyValueError::new_err(
                 "action temperature is evaluation only",
+            ));
+        }
+        if self.inner.actor_posterior_samples().is_some() {
+            return Err(PyValueError::new_err(
+                "actor posterior averaging is evaluation only",
             ));
         }
         reports_to_python(py, &self.inner.learn_scheduled(maximum_updates))

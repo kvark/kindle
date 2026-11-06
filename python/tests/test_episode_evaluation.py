@@ -27,6 +27,7 @@ def frozen_run(monkeypatch, tmp_path, request):
     exports = []
     greedy_posterior = False
     action_temperature = None
+    actor_posterior_samples = None
 
     class Environment:
         action_space = SimpleNamespace(n=2)
@@ -84,6 +85,7 @@ def frozen_run(monkeypatch, tmp_path, request):
 
         posterior_selected = False
         temperature_selected = None
+        actor_samples_selected = None
 
         def use_greedy_posterior_for_evaluation(self):
             assert self.replay_len == 0, 'posterior mode must precede first observation'
@@ -94,9 +96,15 @@ def frozen_run(monkeypatch, tmp_path, request):
             assert value == action_temperature
             self.temperature_selected = value
 
+        def set_actor_posterior_samples_for_evaluation(self, value):
+            assert self.replay_len == 0, 'actor samples must precede first observation'
+            assert value == actor_posterior_samples
+            self.actor_samples_selected = value
+
         def begin_episodes(self, ids, frames):
             assert self.posterior_selected == greedy_posterior
             assert self.temperature_selected == action_temperature
+            assert self.actor_samples_selected == actor_posterior_samples
             self.replay_len += len(ids)
 
         def act(self, *, greedy):
@@ -128,12 +136,14 @@ def frozen_run(monkeypatch, tmp_path, request):
     monkeypatch.setattr(kindle, 'VectorAgent', Agent)
 
     def run(target=2, cap=100, interrupted=False, memory=False, export=False,
-            timeouts_forever=False, both_flags=False, posterior=False, temperature=None):
+            timeouts_forever=False, both_flags=False, posterior=False, temperature=None,
+            actor_samples=None):
         nonlocal interrupt, export_checkpoint, all_timeouts, terminal_timeout, greedy_posterior
-        nonlocal action_temperature
+        nonlocal action_temperature, actor_posterior_samples
         interrupt = interrupted
         greedy_posterior = posterior
         action_temperature = temperature
+        actor_posterior_samples = actor_samples
         export_checkpoint = export
         all_timeouts, terminal_timeout = timeouts_forever, both_flags
         output = tmp_path / f'vector-{target}-{cap}.jsonl'
@@ -147,6 +157,8 @@ def frozen_run(monkeypatch, tmp_path, request):
             args += ['--greedy-posterior']
         if temperature is not None:
             args += ['--action-temperature', str(temperature)]
+        if actor_samples is not None:
+            args += ['--actor-posterior-samples', str(actor_samples)]
         if memory:
             args += ['--min-gpu-budget-headroom-mib', '2048']
         if export:

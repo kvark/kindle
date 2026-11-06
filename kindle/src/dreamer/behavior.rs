@@ -6,7 +6,9 @@ use super::config::{DreamerConfig, ExpertImitation};
 use super::networks::{MlpHead, mixed_log_probabilities, scale, sum, weighted_cross_entropy};
 
 mod dynamics;
+mod posterior_average;
 mod residual;
+pub(crate) use posterior_average::build_actor_posterior_average_graph;
 pub(crate) use residual::Actor;
 
 pub const LOSS_TOTAL: usize = 0;

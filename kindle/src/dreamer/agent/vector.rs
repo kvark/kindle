@@ -3,9 +3,11 @@
 use super::super::acting_gpu::ActingGpu;
 use super::*;
 #[cfg(test)]
-mod residual_tests;
-#[cfg(test)]
 mod latent_shape_tests;
+#[cfg(test)]
+mod posterior_average_tests;
+#[cfg(test)]
+mod residual_tests;
 use crate::dreamer::ObservationKind;
 use crate::vision::{
     levjepa::LeVJepaPerception,
@@ -21,6 +23,19 @@ struct LiveStream {
     pending_expert: Option<usize>,
 }
 
+struct ActorPosteriorAverage {
+    samples: usize,
+    rngs: Vec<StdRng>,
+    draws: Vec<f32>,
+}
+
+fn check_actor_posterior_samples(samples: usize) -> Result<(), &'static str> {
+    if !(2..=16).contains(&samples) {
+        return Err("actor posterior samples must be between 2 and 16");
+    }
+    Ok(())
+}
+
 pub(super) struct VectorCore {
     acting: ActingGpu,
     copies: DeviceCopies,
@@ -31,6 +46,7 @@ pub(super) struct VectorCore {
     diagnostics: Option<Session>,
     posterior_mode: ActionMode,
     action_temperature: Option<f32>,
+    actor_posterior_average: Option<ActorPosteriorAverage>,
 }
 
 fn check_action_temperature(temperature: f32) -> Result<(), &'static str> {
@@ -212,10 +228,14 @@ impl VectorCore {
             diagnostics: None,
             posterior_mode: ActionMode::Sample,
             action_temperature: None,
+            actor_posterior_average: None,
         }
     }
 
     fn use_greedy_posterior_for_evaluation(&mut self) -> Result<(), &'static str> {
+        if self.actor_posterior_average.is_some() {
+            return Err("actor posterior averaging requires sampled live posteriors");
+        }
         if self.streams.iter().any(|stream| stream.active) {
             return Err("posterior mode must be selected before the first observation");
         }
@@ -228,10 +248,53 @@ impl VectorCore {
         temperature: f32,
     ) -> Result<(), &'static str> {
         check_action_temperature(temperature)?;
+        if self.actor_posterior_average.is_some() {
+            return Err("actor posterior averaging cannot combine with action temperature");
+        }
         if self.streams.iter().any(|stream| stream.active) {
             return Err("action temperature must be selected before the first observation");
         }
         self.action_temperature = Some(temperature);
+        Ok(())
+    }
+
+    fn set_actor_posterior_samples_for_evaluation(
+        &mut self,
+        samples: usize,
+    ) -> Result<(), &'static str> {
+        check_actor_posterior_samples(samples)?;
+        if self.streams.iter().any(|stream| stream.active) {
+            return Err("actor posterior samples must be selected before the first observation");
+        }
+        if self.posterior_mode != ActionMode::Sample || self.action_temperature.is_some() {
+            return Err(
+                "actor posterior averaging requires sampled live posteriors and no action temperature",
+            );
+        }
+        let config = &self.learner.config;
+        let count = self.streams.len();
+        let mut policy = build_session(
+            &behavior::build_actor_posterior_average_graph(config, count, samples),
+            &self.learner.gpu,
+            Mode::Inference,
+            false,
+        );
+        share_matching(
+            &mut self.learner.behavior_train,
+            &mut policy,
+            "behavior.actor.",
+        );
+        self.policy.wait();
+        self.policy = policy;
+        self.actor_posterior_average = Some(ActorPosteriorAverage {
+            samples,
+            rngs: (0..count)
+                .map(|id| {
+                    StdRng::seed_from_u64(config.seed.wrapping_add(id as u64) ^ 0x4d415247494e414c)
+                })
+                .collect(),
+            draws: vec![0.0; count * samples * config.network().stoch * config.network().classes],
+        });
         Ok(())
     }
 
@@ -470,6 +533,21 @@ impl VectorCore {
                 "observe every pending action first"
             );
         }
+        if let Some(average) = &mut self.actor_posterior_average {
+            let width = average.draws.len() / self.streams.len();
+            for (rng, draws) in average.rngs.iter_mut().zip(average.draws.chunks_mut(width)) {
+                for draw in draws {
+                    *draw = rng.random();
+                }
+            }
+            self.policy.wait();
+            self.policy.set_input("posterior_uniforms", &average.draws);
+            self.copies.copy(&[DeviceCopy {
+                source: (&self.observe, ExternalSlot::Output(1)),
+                target: (&self.policy, "posterior_logits"),
+                target_offset_bytes: 0,
+            }]);
+        }
         self.policy.step();
         let draws: Vec<f32> = self
             .streams
@@ -510,6 +588,10 @@ impl VectorCore {
     }
 
     pub(super) fn learn(&mut self) -> Option<LearnReport> {
+        assert!(
+            self.actor_posterior_average.is_none(),
+            "actor posterior averaging is evaluation only"
+        );
         assert!(
             self.action_temperature.is_none(),
             "action temperature is evaluation only"
@@ -620,6 +702,10 @@ impl VectorCore {
     }
 
     fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
+        assert!(
+            self.actor_posterior_average.is_none(),
+            "actor posterior averaging is evaluation only"
+        );
         assert!(
             self.action_temperature.is_none(),
             "action temperature is evaluation only"
@@ -1143,6 +1229,23 @@ impl VectorDreamerAgent {
 
     pub fn action_temperature(&self) -> Option<f32> {
         self.core.action_temperature
+    }
+
+    /// Average conditional actor probabilities over extra posterior draws.
+    /// This does not replace the live recurrent state or consume its RNG stream.
+    pub fn set_actor_posterior_samples_for_evaluation(
+        &mut self,
+        samples: usize,
+    ) -> Result<(), &'static str> {
+        self.core
+            .set_actor_posterior_samples_for_evaluation(samples)
+    }
+
+    pub fn actor_posterior_samples(&self) -> Option<usize> {
+        self.core
+            .actor_posterior_average
+            .as_ref()
+            .map(|average| average.samples)
     }
 
     pub fn act(&mut self, mode: ActionMode) -> Vec<usize> {
