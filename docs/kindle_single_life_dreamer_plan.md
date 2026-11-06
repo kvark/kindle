@@ -1,5 +1,22 @@
 # Kindle: CDP learning roadmap
 
+The [initial-episode guidance experiment](experiments/2026-11-06-cdp-breakout-initial-guidance.md) is CPU-qualified and selected
+for one bounded8,192-action learner plus1,024 frozen greedy actions. Force each
+lane's first two natural episodes, retaining cap1,920, then resume20% episode
+selection. Preserve one random draw per episode and all-state labels/feedback.
+Keep RGB64,12M,T16,R16 and every native loss/rate/teacher unchanged. This changes
+guidance timing, amount and state distribution together; no benefit is established.
+
+The corrected CPU fixture and affected block tests pass41 checks; earlier
+schedule/replay/legacy checks pass, with two incomplete CLI-mock attempts retained
+separately. Both actual queued commands reach mocked native boundaries with zero
+native/emulator construction attempts; independent recount covers asynchronous
+phase exit and cap release. Reuse qualified native7704d25c with exact current
+Python sources; no rebuild. All357 initial tensors must match retained, while
+initial action traces intentionally change. Root /x/Temp/kindle-breakout-initial-guidance-20261106.
+No full learner, extension or automatic successor is selected. Retain143.667
+greedy/70.750 sampled; original864/90% and the five-game goal remain unfinished.
+
 The [RGB96 full comparison](results/2026-11-06-cdp-rgb96.md#full-200k-comparison) is complete and
 fails retention:74.708 greedy/60.417 sampled versus143.667/70.750. Fresh200k
 actions/799,574 frames/12,477 updates take30m52.756s,43.857% more training time.

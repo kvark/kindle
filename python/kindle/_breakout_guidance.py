@@ -14,7 +14,9 @@ from ._pixel_guidance import EpisodePixelGuidance
 GUIDANCE_KIND = "bounded-episode-breakout-pixels-v1"
 CORRECTIVE_GUIDANCE_KIND = "bounded-episode-breakout-corrective-pixels-v1"
 BLOCK_CORRECTIVE_GUIDANCE_KIND = "bounded-block-breakout-corrective-pixels-v1"
-GUIDANCE_KINDS = (GUIDANCE_KIND, CORRECTIVE_GUIDANCE_KIND, BLOCK_CORRECTIVE_GUIDANCE_KIND)
+INITIAL_CORRECTIVE_GUIDANCE_KIND = "bounded-initial-episodes-breakout-corrective-pixels-v1"
+GUIDANCE_KINDS = (GUIDANCE_KIND, CORRECTIVE_GUIDANCE_KIND, BLOCK_CORRECTIVE_GUIDANCE_KIND,
+                  INITIAL_CORRECTIVE_GUIDANCE_KIND)
 GUIDANCE_SEED_XOR = 0x4252_4541_4B50_5801
 ACTION_IDS = {"NOOP": 0, "FIRE": 1, "RIGHT": 3, "LEFT": 4}
 MINIMAL_ACTION_MEANINGS = ("NOOP", "FIRE", "RIGHT", "LEFT")
@@ -190,8 +192,10 @@ class BreakoutGuidance(EpisodePixelGuidance):
 
     def __init__(self, config, streams, action_count, *, action_meanings=None):
         kind = config.get("kind") if isinstance(config, dict) else None
-        self.corrective_labels = kind in (CORRECTIVE_GUIDANCE_KIND, BLOCK_CORRECTIVE_GUIDANCE_KIND)
+        self.corrective_labels = kind in (CORRECTIVE_GUIDANCE_KIND, BLOCK_CORRECTIVE_GUIDANCE_KIND,
+                                         INITIAL_CORRECTIVE_GUIDANCE_KIND)
         self._block_length = None
+        self._initial_episodes = None
         self._ever_guided = None
         schedule = config
         if kind == BLOCK_CORRECTIVE_GUIDANCE_KIND:
@@ -199,6 +203,11 @@ class BreakoutGuidance(EpisodePixelGuidance):
             if type(self._block_length) is not int or not 0 < self._block_length < 2**32:
                 raise ValueError("Breakout guidance block_length must be a positive u32")
             schedule = {key: value for key, value in config.items() if key != "block_length"}
+        if kind == INITIAL_CORRECTIVE_GUIDANCE_KIND:
+            self._initial_episodes = config.get("initial_episodes")
+            if type(self._initial_episodes) is not int or not 0 < self._initial_episodes < 2**32:
+                raise ValueError("Breakout guidance initial_episodes must be a positive u32")
+            schedule = {key: value for key, value in config.items() if key != "initial_episodes"}
         self.expert_labels = []
         self._action_count = action_count
         factory = FeedbackPixelPolicy if self.corrective_labels else PixelPolicy
@@ -228,6 +237,12 @@ class BreakoutGuidance(EpisodePixelGuidance):
 
     def reset(self, streams):
         super().reset(streams)
+        if self._initial_episodes:
+            for lane in streams:
+                if self._episodes[lane] <= self._initial_episodes:
+                    # Preserve the ordinary per-episode draw, then force the initial selection.
+                    self._guided_episodes[lane] += not self._selected[lane]
+                    self._selected[lane] = True
         if self._block_length:
             if self._ever_guided is None:
                 self._ever_guided = [False] * len(self._rngs)

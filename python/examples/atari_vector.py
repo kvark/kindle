@@ -213,6 +213,8 @@ def main():
                         help="required action cap for each selected Breakout episode")
     parser.add_argument("--breakout-guidance-block-length", type=int,
                         help="fresh corrective Breakout only: redraw guidance for blocks of this many actions")
+    parser.add_argument("--breakout-guidance-initial-episodes", type=int,
+                        help="fresh corrective Breakout only: force selection for each lane's first episodes, retaining the action cap")
     parser.add_argument("--breakout-corrective-labels", action="store_true",
                         help="fresh Breakout imitation: edge-corrected teacher labels all states with actual-action feedback")
     parser.add_argument("--guidance-imitation-scale", type=float,
@@ -471,6 +473,13 @@ def main():
             parser.error("Breakout guidance block-length must be a positive u32")
         if not args.breakout_corrective_labels:
             parser.error("Breakout guidance blocks require corrective labels")
+    if args.breakout_guidance_initial_episodes is not None:
+        if not 0 < args.breakout_guidance_initial_episodes < 2**32:
+            parser.error("Breakout guidance initial-episodes must be a positive u32")
+        if not args.breakout_corrective_labels:
+            parser.error("Breakout initial guidance requires corrective labels")
+        if args.breakout_guidance_block_length is not None:
+            parser.error("Breakout initial guidance cannot combine with block guidance")
     if args.qbert_corrective_labels and (args.qbert_guidance_policy != "continuation"
                                          or args.guidance_imitation_scale is None):
         parser.error("Qbert corrective labels require continuation guidance and imitation")
@@ -510,6 +519,7 @@ def main():
     training_options.add("--qbert-guidance-policy")
     training_options.add("--qbert-corrective-labels")
     training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions", "--breakout-corrective-labels", "--breakout-guidance-block-length"))
+    training_options.add("--breakout-guidance-initial-episodes")
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-fire-weight", "--guidance-world-gradient"))
     training_options.add("--guidance-imitation-decay")
     training_options.add("--guidance-actor-only-decay")
@@ -874,6 +884,9 @@ def main():
             if args.breakout_guidance_block_length is not None:
                 guidance_config.update(kind=breakout_guidance_module.BLOCK_CORRECTIVE_GUIDANCE_KIND,
                                        block_length=args.breakout_guidance_block_length)
+            if args.breakout_guidance_initial_episodes is not None:
+                guidance_config.update(kind=breakout_guidance_module.INITIAL_CORRECTIVE_GUIDANCE_KIND,
+                                       initial_episodes=args.breakout_guidance_initial_episodes)
             exploration = BreakoutGuidance(guidance_config, args.num_envs, actions,
                 **(dict(action_meanings=environments[0].action_meanings)
                    if args.atari_protocol == "published-minimal" else {}))
