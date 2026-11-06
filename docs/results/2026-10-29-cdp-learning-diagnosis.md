@@ -1,22 +1,22 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [completed replay-value implementation](../results/2026-11-06-cdp-completed-value.md) is packaged and selected
-for [bounded native qualification](../experiments/2026-11-06-cdp-completed-value-native.md). Default-off targets use completed
-observed game returns where available, preserving the existing lambda target
-elsewhere. No new graph operations or parameters; model-derived disagreement
-and auxiliary life boundaries are incompatible.
+The [completed replay-value option](../results/2026-11-06-cdp-completed-value.md) passes native qualification and
+is selected for one [8,192-action activity/cost check](../experiments/2026-11-06-cdp-completed-value-bounded.md). The Tiny
+fixture passes in2.767s with277 pins; default-off frozen prefixes reproduce all
+128 transitions per arm and357 invariant tensors. Both guards and40 pins pass.
+Original packaged Python fixture failures remain preserved with their repair.
 
-Rust passes 220 Kindle / five gym tests and both strict Clippy checks. Original
-packaged Python records 1,158 passes / 12 fixture failures / ten deselections;
-the separate fixture-only repair passes all 12 affected cases with zero native
-construction. Preserve the original failure. Native d0e7bb79/SHA3146e0dc and the
-wheel/test binary are retained after verified disposable-cache release.
+The new check enables completed observed replay-value targets with the model
+bonus off, preserving original targets where returns are unavailable. Its CPU
+preflight passes both command paths with zero native/emulator construction and
+unchanged core teacher ASTs. Compare with the saved bonus-off36.677s cost point;
+verify261 initial/frozen tensors and47 pre-update transitions. Consult the fixed
+protocol before execution. Native d0e7bb79/SHA3146e0dc, root
+`/x/Temp/kindle-completed-value-20261106/bounded`.
 
-Root `/x/Temp/kindle-completed-value-20261106`. Next execute the single guarded
-Tiny target/restore fixture, then two default-off frozen compatibility prefixes.
-No cost-check learner or full training is selected. Keep the original teacher,
-CDP scale 500 and learned Breakout 143.667 greedy / 70.750 sampled. Original
-864/90% two-wall and the five-game goal remain unfinished.
+No full learner, coefficient sweep or automatic successor is selected. Keep
+original guidance, CDP500 and primary Breakout143.667 greedy/70.750 sampled.
+Original864/90% two-wall and the five-game goal remain unfinished.
 
 The [sparse-wall brick-aiming teacher comparison](2026-11-06-cdp-breakout-brick-aim.md) is complete and
 fails retention: 208.458 versus 225.083 (−7.386%), only 1/8 improved lanes and

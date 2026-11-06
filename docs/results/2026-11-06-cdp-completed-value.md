@@ -1,8 +1,7 @@
 # Completed replay-value targets: implementation and qualification
 
 The [optional implementation](../experiments/2026-11-06-cdp-completed-value.md)
-is packaged; the [native qualification](../experiments/2026-11-06-cdp-completed-value-native.md)
-is selected next. No Atari learner or gameplay benefit is established.
+is packaged and natively qualified. One [bounded activity/cost check](../experiments/2026-11-06-cdp-completed-value-bounded.md) is selected next. No full learner or gameplay benefit is established.
 
 `replay_value_completed`, default false, substitutes completed observed game
 returns for available replay-value labels. Incomplete rows retain the original
@@ -41,3 +40,28 @@ historical actor/teacher mixture, with variance and policy-mismatch limits.
 Keep primary Breakout 143.667 greedy / 70.750 sampled; original 864/90% two-wall
 and the five-game goal remain unfinished. No full learner or automatic successor
 is selected.
+
+## Native qualification and default-off compatibility
+
+The guarded Tiny fixture passes in **2.766637s** at **19:32:33.930 UTC November6**,
+with all277 pins unchanged. Initial parameter names/values and unchanged imagined
+labels/masks/slow targets match the control. Available completed labels reach the
+native behavior loss; an unavailable label retains its original target. The two
+direct behavior steps produce different critic weights, and the candidate's two
+full synthetic updates remain finite. Config and world/behavior parameters
+restore with empty replay. No Atari environment is constructed.
+
+Default-off final and actual-initial restores then complete1,024 actions each
+in.898828s/.903966s, with zero updates. All128 transition rows per arm reproduce
+the retained semantic prefixes exactly, and all357 checkpoint tensors remain
+unchanged. The two guards and40 pins pass. Queue11.715211s; review.911104s,
+complete19:33:09.491 UTC. All original children are terminal; no GPU failure or
+stage repeat occurs. Production native remainsd0e7bb79/SHA3146e0dc.
+
+The separate bounded protocol now selects8,192 fresh actions with the bonus off
+and completed replay values on, followed by1,024 frozen actions. Its CPU entry
+preflight passes in.360673s with26 pins, both real command paths mocked, zero
+native/emulator construction and unchanged tracking/predictive/feedback policy
+ASTs. Native and runner versions differ from the saved bonus-off control; exact
+initial weights and pre-update traces must match before a paired claim. No full
+learner or gameplay improvement follows from these qualification checks.
