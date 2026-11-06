@@ -129,10 +129,12 @@ not establish that unrelated Atari games should share a single dynamics model.
 These are architectural directions within the existing goal, not permission
 to repeat closed experiments or a claim of a SuperMimic-sized efficiency gain.
 
-A distinct [residual actor experiment](2026-11-06-cdp-residual-actor.md) now tests
-whether separating imagined policy/entropy parameters and moments from imitation
-helps at the fixed200k budget. The zero-initialized correction preserves the
-initial policy and adds46,098 parameters; its bounded run passes at46.535s versus
-47.690s. A fresh learner is running, with dynamics gradients still off. This
-follows the measured update-interference hypothesis; it is not a SuperMimic
-reproduction or evidence that its efficiency ratios transfer to Atari.
+The distinct [residual actor experiment](2026-11-06-cdp-residual-actor.md#full-200k-comparison)
+also fails retention:117.625 greedy/49.333 sampled versus143.667/70.750, with
+17.792% lower primary gain/min despite.751% less training time. The zero-initialized
+46,098-parameter correction separates imagined policy/entropy updates from
+imitation, preserving actual-initial scores and traces. Dynamics gradients stay
+off. Its primary paired interval spans zero; this single recipe neither isolates
+a gradient-conflict cause nor rejects every independent reward head. Keep it off.
+This is not a SuperMimic reproduction or evidence that its ratios transfer to
+Atari. No successor allocation follows automatically.

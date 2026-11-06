@@ -1,5 +1,10 @@
 # Residual actor development and qualification
 
+The [full200k comparison](#full-200k-comparison) is now complete:117.625 greedy/
+49.333 sampled in21m18.238s, below retained143.667/70.750 in21m27.910s.
+It fails retention; keep the optional residual actor off. Qualification and
+original fixture failures remain below, followed by the completed learning result.
+
 The [development protocol](../experiments/2026-11-06-cdp-residual-actor.md) selects
 an optional independent reward-learning correction to the imitation actor.
 `actor_residual=true` adds a zero-initialized affine recurrent-feature-to-logit
@@ -135,3 +140,83 @@ training-option rejections and both replay argv paths checked. Startup passes
 at09:51:20.255: all363 bounded tensors,357 retained tensors plus six zeros,
 and both47-event pre-update traces match. Training is active; no final gameplay
 result exists yet. The fixed protocol and declaration stay unchanged.
+
+## Full 200k comparison
+
+The [fixed fresh protocol](../experiments/2026-11-06-cdp-breakout-residual-actor-200k.md)
+completes and fails its retention criteria. The correction gives imagined
+policy/entropy gradients independent parameters and moments, while imitation
+trains the base. That recipe does not improve frozen gameplay per minute at
+this budget. Keep residual actor off, base width256, coordinates and dynamics
+gradients off. Retain the original control; no extension, confirmation, sweep
+or automatic successor is selected.
+
+| Measurement | Retained control | Residual actor |
+| --- | ---: | ---: |
+| Aggregate training actions |200,000|200,000|
+| Training time |21m27.910s|21m18.238s|
+| Greedy return,24 natural episodes |143.667|117.625|
+| Sampled return,24 natural episodes |70.750|49.333|
+| Actual-initial greedy return |2.208333|2.208333|
+| Actual-initial sampled return |1.416667|1.416667|
+| Greedy own-initial gain/min |6.590132|5.417615|
+| Sampled own-initial gain/min |3.230038|2.249190|
+| Two-wall successes, each final arm |0/24|0/24|
+
+Training covers799,615 emulator frames and12,477 updates, ending10:12:37.118 UTC
+November6. Construction costs2.547s. The0.751% observed timing reduction does
+not offset lower returns: greedy gain/min falls17.792%, sampled30.366%.
+The paired eight-lane greedy raw difference is−26.041667,95% interval
+[−74.083333,27.500000]; gain/min difference−1.172517 has interval
+[−3.413039,1.330529]. Three of eight greedy lane means improve. Sampled raw
+difference−21.416667 has interval[−32.834375,−8.040625], and gain/min difference
+−.980848 has interval[−1.514898,−.355244]; one of eight lanes improves. These
+10,000-resample,seed0 intervals reuse development lanes and do not assess
+training-seed reliability. The primary point estimates and positive-lower-bound
+retention requirements fail; original mean864/90%-two-wall remains unfinished.
+
+All363 initial tensors match the bounded candidate. All357 retained tensors
+match exactly, with six zero residual parameter/moment additions. Both47-event
+pre-update traces match. Actual-initial sampled799/greedy794 semantic events
+also match retained, excluding declared wall-clock fields. Each frozen arm
+selects the first3 natural episodes per8 lanes, with zero selected truncations
+or learning updates and363 invariant tensors. Full action/outcome/frame/boundary
+replays and videos pass; frozen logs still lack live image hashes.
+
+The independent100k/6,227-update recovery passes in.358s with351 unchanged pins,
+finite363 tensors, matching saved hashes and read-only file modes, while the
+original learner identity stays active. Weights/moments are retained, not live
+replay/games/beliefs/RNG. Full training pixel/action/label/override replay,
+12,477 finite reports, both weighted losses, actor sharing and parameter-change
+checks pass. Every residual weight/bias changes, as do the checked base actor,
+CNN, reward, continuation and critic parameters. All five host guards pass.
+
+Late base-only imitation CE is.557574 versus retained.560514. These use different
+own-replay distributions and do not measure imitation of the combined residual
+policy. Guidance overrides43.300% of actions under the unchanged20%-episode rule.
+There are192,188 actions below216 cumulative points (96.094%),7,812 at216–431,
+and none at432 or above;1,388 actions in216–431 are native. These score bands
+are coverage observations, not wall events or frozen competence. Learning takes
+1,134.265s of1,278.238s training; acting62.995s and environment62.266s. No CPU
+observer time is subtracted.
+
+Main pipeline and original terminal collector finish **10:16:34.650** and
+**10:16:47.324 UTC November6** on declared sourcee22b94df. All351 current and338
+retained pins pass, with exact original service/invocation lineage. Main,
+recovery and terminal services all exit successfully. The separate read-only
+publication helper passes in.026s with18 unchanged helper sources. No full-run
+preparation/production stage fails, no GPU stage or learner update repeats,
+and no device reset occurs. Original CPU/native fixture failures and the
+separate repaired qualification remain preserved; full success does not erase
+them. The packaged runtime and checkpoints stay retained after the earlier
+cache release.
+
+Artifacts remain at `/x/Temp/kindle-residual-actor-20261106/full`: declaration,
+fixed protocol, queues, recovery receipt, `candidate/learning-review.json`,
+replays/videos, curves/exposure/coverage, `comparison.json`, `completion.json`,
+original-service journal, `terminal-summary.json` and `publication-execution.json`.
+Completion SHA256 `d0244af9c40911510a3ead9105052d9753fc9af23ebb4c6e0296b7628bc12f19`.
+Native/runner bytes differ from the historical control; scoped checks and equal
+initial traces do not isolate every runtime effect. This single recipe does not
+prove imitation interference absent, nor that all independent reward heads fail.
+The five-game goal remains active and unfinished.

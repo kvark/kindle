@@ -1,22 +1,30 @@
 # Kindle: CDP learning roadmap
 
-The [residual actor bounded check](results/2026-11-06-cdp-residual-actor.md) is complete:8,192 actions/32,734
-frames/489 updates in46.535s versus retained47.690s. All357 retained initial
-tensors/47 events match; six residual additions are zero,363 frozen tensors are
-invariant, both full replays/guards and finite weighted losses pass. Padded200k
-projection20m49.712s and conservative12.049GB headroom pass. No natural frozen
-episode completes in the1,024-action check; no gameplay benefit is established.
+The [full residual actor comparison](results/2026-11-06-cdp-residual-actor.md#full-200k-comparison)
+is complete and fails retention. Fresh200k actions/799,615 frames/12,477 updates
+take **21m18.238s**,0.751% less observed time than retained21m27.910s. Greedy
+**117.625** and sampled **49.333** regress the143.667/70.750 point estimates;
+all0/24 two-wall. Own-initial greedy gain/min falls **17.792%**,6.590132→5.417615.
+Paired eight-lane difference−1.172517 has95% interval[−3.413039,1.330529]; this
+reused cohort does not establish seed reliability. Keep residual actor off,
+preset256 base, coordinates and dynamics gradients off.
 
-The [separate fresh200k residual comparison](experiments/2026-11-06-cdp-breakout-residual-actor-200k.md) is running from sourcee22b94df after
-passing CPU helpers and all five exact queued commands (351 pins, no native or
-emulator construction). Startup matches363 bounded/357 retained initial tensors,
-six zero additions and47 initial events. Imagined policy/entropy train a46,098-parameter
-correction; imitation trains the unchanged base actor with separate moments.
-Greedy own-initial gain/min is primary; use the same200k budget, recipe and
-24-natural-episode frozen cohorts. Original main service PID1448396/invocationde33e733 remains the owner.
-Original native fixture failure and separate passing repair remain preserved.
-Root `/x/Temp/kindle-residual-actor-20261106/full`; default off, no repeated stage
-or automatic successor. Retain143.667/70.750 and original864/90%/five-game gates.
+Own initials1.416667 sampled/2.208333 greedy and all799/794 initial semantic
+events match retained. All363 bounded initial tensors/47 pre-update events match;
+all357 retained tensors match plus six zero residual additions. Four frozen
+arms select24 natural episodes each, with zero updates/truncations and363
+invariant tensors. All351 current/338 retained pins,100k recovery,weighted
+losses,full replays/videos,guards,curves,exposure and original services pass.
+Main/terminal complete **10:16:34.650 /10:16:47.324 UTC November6**, sourcee22b94df.
+Publication reader passes in.026s. No full preparation/production stage fails
+or repeats; original native fixture failure and separate repair remain preserved.
+
+Base-only late imitation CE is.557574 versus retained.560514 on different own
+replay; it does not measure the combined residual policy's imitation. Training
+spends96.094% of actions below216 points and none at432 or above. These results
+do not isolate a gradient-conflict or representation cause. Root
+`/x/Temp/kindle-residual-actor-20261106/full` is closed, with no successor selected.
+Retain143.667/70.750; original864/90%-two-wall and five-game gates remain unfinished.
 
 The [full actor-width512 comparison](results/2026-11-06-cdp-actor-width.md#full-200k-comparison)
 is complete and negative. Fresh200k actions/799,552 frames/12,477 updates take

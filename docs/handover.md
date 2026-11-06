@@ -8,27 +8,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [residual actor bounded check](results/2026-11-06-cdp-residual-actor.md) passes:8,192 actions/489 updates
-in46.535s, versus retained47.690s. All357 legacy initial tensors and47 initial
-events match, six residual tensors start at zero, and363 frozen tensors remain
-invariant. Full replays, finite weighted losses and both guards pass. Projected
-200k cost20m49.712s and conservative memory headroom12.049GB pass the screens;
-this short historical comparison does not establish gameplay or speed gains.
+The [full residual actor comparison](results/2026-11-06-cdp-residual-actor.md#full-200k-comparison)
+is complete and fails its retention criteria. Fresh200k actions/799,615 frames/
+12,477 updates take21m18.238s,0.751% less observed time than retained21m27.910s.
+Greedy117.625 and sampled49.333 fall below143.667/70.750; all0/24 two-wall.
+Greedy own-initial gain/min falls17.792%. Its paired eight-lane difference
+interval spans zero; this reused seed/cohort does not establish reliability.
+Keep residual actor off, preset256 base, coordinates and actor dynamics off.
 
-A [separate fresh200k comparison](experiments/2026-11-06-cdp-breakout-residual-actor-200k.md) is running from sourcee22b94df. The zero-initialized
-linear correction receives imagined policy/entropy gradients; imitation trains
-the base actor, with separate parameter moments. It adds46,098 parameters at12M,
-with unchanged CNN/RSSM/critic. CPU helpers and all five exact queued commands pass,
-with351 pins and zero native/emulator construction. Startup passes363 matching
-bounded tensors,357 matching retained tensors, six zero additions and47 events. Original native fixture failure and separate
-passing test-only repair remain preserved. No completed stage repeats.
+All363 bounded initial tensors/357 retained tensors plus six zeros and47 initial
+events match. Both actual-initial frozen traces match retained. All351 current/
+338 retained pins,100k recovery,weighted losses,training/frozen replays,videos,
+guards and original services pass. Main/terminal complete10:16:34.650/10:16:47.324
+UTC November6 from sourcee22b94df. Original native fixture failure and separate
+passing test-only repair remain preserved; no full stage fails or repeats.
 
-Root `/x/Temp/kindle-residual-actor-20261106/full`; fixed200k actions, then24
-natural episodes per final/actual-initial sampled/greedy arm. Greedy gain per
-training minute is primary. Keep preset256 base, coordinates and actor dynamics
-off. Retain143.667 greedy/70.750 sampled until comparison completes. Original
-864/90%-two-wall and five-game gates remain unfinished. No extension, sweep or
-automatic successor learner.
+Root `/x/Temp/kindle-residual-actor-20261106/full` is closed. No GPU allocation or
+successor is selected. Retain143.667 greedy/70.750 sampled; original864/90%-two-wall
+and five-game gates remain unfinished. No unchanged extension, sweep or old-stage
+repeat. Consult the linked protocols before a separately justified experiment.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
