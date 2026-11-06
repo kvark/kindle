@@ -39,8 +39,10 @@ failures remain recorded. No completed qualification or bounded stage repeats.
 Root `/x/Temp/kindle-actor-dynamics-20261106/full`; service
 `kindle-breakout-actor-dynamics-200k-20261106`. The original learner is active since05:49:07.298 UTC, sourcef3be4bd4,
 PID1397920/invocation96e0f92ec2784b0f84cc8c37c45ae0d7. All345 pins,357 initial
-tensors and47 pre-update events pass; recovery and terminal observers are live.
-CPU helper and exact-queue checks pass with no native/emulator construction. One learner,200k actions/12,477 updates,1,800s cap; retain100k
+tensors and47 pre-update events pass. The100k/6,227 recovery verifies at
+06:02:37.883 UTC:357 finite tensors/moments,345 unchanged pins and read-only
+files; the recovery observer succeeds. Original learner and terminal observer
+remain active. CPU helper and exact-queue checks pass with no native/emulator construction. One learner,200k actions/12,477 updates,1,800s cap; retain100k
 recovery and four frozen24-episode arms. Consult the protocol before execution.
 No extension, sweep, second learner or automatic successor is selected. Check
 original process/invocation before interpreting an observer timeout.

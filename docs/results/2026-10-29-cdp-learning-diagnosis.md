@@ -9,7 +9,10 @@ interval. One learner,1,800s training cap,100k recovery and four frozen24-episod
 arms; no experience transfer or automatic successor. CPU helper and exact-queue checks pass;
 the original learner is active since05:49:07.298 UTC/sourcef3be4bd4, PID1397920/
 invocation96e0f92ec2784b0f84cc8c37c45ae0d7. All345 pins,357 matching initial
-tensors and47 pre-update events pass; recovery and terminal observers are live. Root
+tensors and47 pre-update events pass. Independent100k/6,227 recovery verification
+passes06:02:37.883 UTC in.357s:357 finite tensors/moments,345 unchanged pins and
+read-only files. Recovery observer succeeds; original learner/collector remain
+active. Root
 `/x/Temp/kindle-actor-dynamics-20261106/full`. Original864/90% and five-game gates
 remain unfinished; no gameplay benefit is established.
 

@@ -128,3 +128,14 @@ At05:49:50.823, original main, recovery and terminal observer process identities
 are verified live; no stage failed or repeated. No frozen learning score is
 available yet. These process identities, not stale logs or observer timeouts,
 identify the running allocation.
+
+The100k/6,227 recovery checkpoint is saved and checked at06:02:19.684 UTC;
+independent CPU verification passes **06:02:37.883 UTC** in.357s. All357 tensors
+and optimizer-state entries are finite, all345 allocation pins match, and the
+recovery directory/files retain0555/0444 modes. It contains45,710,865 world,
+4,938,291 behavior and853,503 slow-value elements including optimizer storage.
+The verifier performs zero model forwards and zero learner updates. The original
+learner process/invocation remains active throughout; the recovery observer
+finishes successfully in.414s. No stage or collector is repeated. Replay, live
+games, beliefs and full RNG state are not restored by this retained checkpoint.
+The200k learner and terminal collector remain active; no frozen score is available.
