@@ -12,8 +12,10 @@ with unchanged teacher/recipe except prior reward CE scale1 and the qualified
 native/runner. Primary greedy own-initial gain/min,100k recovery and four24-episode
 frozen arms remain fixed. Helpers and all five actual commands pass CPU checks;
 startup review passes. Original main PID1562317/invocation
-`3fbc09cb5f2947459016bc52a123e6f8`, collector and recovery observer are active,
-execution source`dda5bf6f`. The archived prelaunch recovery-unit correction
+`3fbc09cb5f2947459016bc52a123e6f8` and collector are active, execution source
+`dda5bf6f`. The independent100k/6,227-update recovery passes in1.700s with357
+finite tensors and854 unchanged pins; its original observer succeeds while
+the learner continues. The archived prelaunch recovery-unit correction
 requires no GPU repeat. No gameplay benefit or five-game completion claim.
 
 The [completed reward-supervision comparison](2026-11-06-cdp-breakout-reward10.md#full200k-comparison) fails retention. Only

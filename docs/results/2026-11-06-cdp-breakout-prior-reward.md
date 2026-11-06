@@ -113,8 +113,16 @@ The bounded allocation is closed. The [fixed200k comparison](../experiments/2026
 is running against matched22003 with actual-initial controls and four24-episode
 frozen arms. CPU helper qualification and all five actual commands pass; startup
 review passes. Original main PID1562317/invocation
-`3fbc09cb5f2947459016bc52a123e6f8`, execution source`dda5bf6f`, collector and
-recovery observer are active. Root is`/mnt/data/kindle-breakout-prior-reward-20261106/full`.
+`3fbc09cb5f2947459016bc52a123e6f8`, execution source`dda5bf6f`, and collector
+are active. Root is`/mnt/data/kindle-breakout-prior-reward-20261106/full`.
+
+The independent100k/6,227-update recovery check passes at22:57:49.284 UTC in
+1.700331s. All357 tensors, including weights and optimizer moments, match their
+hashes and schema and are finite;854 declaration pins remain unchanged.
+Checkpoint directory/files are sealed0555/0444. The original main PID/invocation
+is active throughout the check; the observer exits successfully. This preserves
+weights/moments, not replay, live games/beliefs or full RNG state. Its CPU co-host
+time remains included in training wall time. Frozen gameplay remains pending.
 
 Before launch, static review found a copied recovery-verifier service name still
 pointing to the closed reward10 allocation. The original declaration, verifier

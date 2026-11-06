@@ -36,8 +36,10 @@ own-initial gain/min,100k recovery and four24-episode frozen arms. Original864/
 Root `/mnt/data/kindle-breakout-prior-reward-20261106/full`. CPU helper qualification
 and all five actual commands pass. Original main PID1562317, invocation
 `3fbc09cb5f2947459016bc52a123e6f8`, source`dda5bf6f`; startup review passes.
-The main, collector and recovery observer are active. A stale recovery-unit
-literal was corrected and archived before launch; no GPU stage repeats.
+The main and collector are active. Independent100k/6,227-update recovery checks
+pass in1.700s:357 finite tensors, sealed weights/moments and854 unchanged pins;
+the observer completes successfully while the original learner continues.
+A stale recovery-unit literal was corrected and archived before launch; no GPU stage repeats.
 The bounded and native qualification stages are closed. No extension, sweep,
 second learner or automatic successor. Retain the existing recipe until outcome.
 
