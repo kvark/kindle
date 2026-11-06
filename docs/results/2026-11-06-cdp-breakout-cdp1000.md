@@ -129,11 +129,29 @@ Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`, execution source
 main PID1532223/invocation`d6760fb8ef014cd194dd90a70cb5c0e5`.
 Collector PID1532226/invocation`1cb0ccb509dc447ab99ba05768e358b8` and
 recovery observer PID1532229/invocation`4915905c186149cb8881badc97bb90a7`
-are independently active.
+were launched independently. The recovery observer has now completed; main
+and collector remain active under their original identities.
 
 Startup passes18:25:07.766 UTC: all357 initial tensors match bounded and
 retained, all47 pre-update events match, first update376 and exact declared
 header/config change. The startup observer takes.335182s, included in training
-wall time. Training,100k recovery, complete replay and frozen outcomes remain
-pending. Observe these original identities; a timeout is not a stopped job.
+wall time. Training, complete replay and frozen outcomes remain pending.
+Observe these original identities; a timeout is not a stopped job.
 No extension, second learner or automatic successor is selected.
+
+## Verified100k recovery during the original run
+
+The saved100k/6,227-update checkpoint passes independent CPU verification at
+18:36:01.673 UTC November6. All357 tensors,51,502,659 parameter/optimizer
+elements, checkpoint config/counters/checksums and137 declared pins pass.
+The original main PID1532223/invocation`d6760fb8ef014cd194dd90a70cb5c0e5`
+remains active before and after the check. The recovery directory is0555 and
+its four files0444. These files omit replay, live games/beliefs and full RNG;
+they do not constitute an uninterrupted-learning resume.
+
+The verifier takes.355836s, with zero model forwards or learner updates.
+Its observer exits0 after.414311s; the main checkpoint observer takes.337602s.
+Co-host CPU time remains in measured training wall time. The recovery service
+is now inactive/success, with the original main and terminal collector still
+active. Training passes109,544 actions/6,824 updates at18:36:44 UTC; this is
+progress, not a frozen gameplay result. No stage is restarted or repeated.

@@ -8,24 +8,24 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [fresh200k CDP prediction-scale1000 comparison](results/2026-11-06-cdp-breakout-cdp1000.md#fresh200k-comparison-selected) is running.
-Only prediction loss500→1000 changes; retain native447fe50, original encoder,
-teacher and learning recipe. All357 initial tensors and47 pre-update events
-match bounded/retained; first update376. Exact five-command preflight passes
-with137 pins and zero native/emulator construction. No gameplay result yet.
+The [fresh200k CDP prediction-scale1000 comparison](results/2026-11-06-cdp-breakout-cdp1000.md#verified100k-recovery-during-the-original-run) is running;
+its100k/6,227-update recovery passes independent CPU verification18:36:01.673
+UTC November6. All357 tensors/51,502,659 parameter and optimizer elements,
+config/counters/checksums and137 pins pass. Read-only checkpoint retained;
+recovery observer exits0. Main and terminal collector remain active.
 
+Only prediction loss500→1000 changes, with retained native447fe50 and original
+encoder/teacher/recipe. Startup357 tensors/47 events match; first update376.
 Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`, source5b8d21a1. Main service
 `kindle-breakout-cdp1000-200k-20261106`, PID1532223,
-invocation`d6760fb8ef014cd194dd90a70cb5c0e5`, starts18:25:01.109 UTC November6.
-Recovery observer1532229 and terminal collector1532226 are active. Monitor the
-original identities; do not restart after an observer timeout. Training,100k
-recovery and four frozen24-natural-episode arms remain pending. See the
-[fixed protocol](experiments/2026-11-06-cdp-breakout-cdp1000-200k.md); greedy raw return and own-initial gain/min are
-primary, with a positive lower paired gain/min interval required for retention.
+invocation`d6760fb8ef014cd194dd90a70cb5c0e5`; collector1532226. Observe original
+identities; never restart after an observer timeout. Training, complete replay
+and four frozen24-natural-episode arms remain pending. Follow the
+[fixed protocol](experiments/2026-11-06-cdp-breakout-cdp1000-200k.md); no gameplay result yet.
 
-Original canonical import failure and full CPU plot-fixture failure remain
-preserved with separate repairs. No completed GPU stage repeats; no native
-build, experience transfer, extension, second learner or automatic successor.
+Original canonical import and full CPU plot-fixture failures remain preserved
+with separate repairs. No completed GPU stage repeats; no native build,
+experience transfer, extension, second learner or automatic successor.
 Retain143.667 greedy/70.750 sampled. Original864/90% two-wall and the five-game
 goal remain unfinished. The completed stride-two option stays off.
 
