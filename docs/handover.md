@@ -8,24 +8,20 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [frozen residual serving ablation](results/2026-11-06-cdp-residual-actor-serving-ablation.md) is complete. Zeroing only the
-learned correction raises greedy117.625→131.750 and sampled49.333→60.000, but
-both paired intervals span zero and both means remain below143.667/70.750.
-All0/24 two-wall. This does not establish that the correction caused the full
-learner's regression, or that a fresh base-only learner would reproduce it.
+The [fixed-width latent regrouping development](experiments/2026-11-06-cdp-latent-shape.md) selects an optional
+64×8 categorical state in place of32×16 at12M. Flattened state, CNN, parameter
+shapes/counts and actor/critic widths stay fixed; sampling, KL and one-hot
+activity change together. This is a representation hypothesis, not evidence
+that capacity caused earlier failures. Default remains the retained32×16.
 
-All361 untouched tensors/moments and source files remain exact; both new frozen
-arms preserve363 tensors with zero updates/truncations and24 natural episodes.
-Replays/videos, guards,369 pins and70 sealed files pass. Original controller/
-wrapper finish10:31:27.438 UTC November6 in86.268s; independent CPU recount and
-closure pass at10:33:13.169 in.519s. Source80f4559c. No experiment stage fails
-or repeats; original native qualification failures remain preserved separately.
-
-Root `/x/Temp/kindle-residual-serving-ablation-20261106` is closed. No GPU work,
-new learner or successor is selected. Keep residual actor off, preset256 base,
-coordinates and actor dynamics off. Retain143.667 greedy/70.750 sampled; original
-864/90%-two-wall and five-game gates remain unfinished. No unchanged extension,
-sweep or old-stage repeat; separately justify the next experiment.
+Implementation,202 Kindle/5 adapter CPU tests,36 focused Python checks and
+strict workspace/binding Clippy pass. Release packaging is next. Root
+`/x/Temp/kindle-latent-shape-20261106`; no GPU allocation, bounded check or full
+learner is selected. Native values/derivatives and synthetic learning/restore
+require the separate declaration described in the protocol. Keep actor dynamics,
+residual actor and coordinates off, and retain143.667 greedy/70.750 sampled.
+Original864/90%-two-wall and five-game gates remain unfinished. Completed stages
+stay closed; no unchanged extension, sweep or old-stage repeat.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

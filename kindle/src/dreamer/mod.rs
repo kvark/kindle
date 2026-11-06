@@ -31,7 +31,7 @@ pub use agent::{
 };
 pub use config::{
     ColorCentroidSupervision, DreamerConfig, ExpertImitation, ExpertImitationDecay,
-    FeatureStandardization, LossScales, ModelSize, NetworkSize, ObservationKind,
+    FeatureStandardization, LatentShape, LossScales, ModelSize, NetworkSize, ObservationKind,
     OpenLoopSupervision, ReplayValueBootstrap, TrainingPrecision, VideoEncoder,
 };
 pub use replay::{FrameFlags, ReplaySamplingReport, Reward};

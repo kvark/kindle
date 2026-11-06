@@ -108,6 +108,12 @@ pub struct NetworkSize {
     pub vision_depth: usize,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct LatentShape {
+    pub variables: usize,
+    pub classes: usize,
+}
+
 impl ModelSize {
     pub const fn network(self) -> NetworkSize {
         match self {
@@ -301,6 +307,9 @@ pub struct OpenLoopSupervision {
 pub struct DreamerConfig {
     pub action_count: usize,
     pub model_size: ModelSize,
+    /// Regroup categorical state without changing the preset's flattened width.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub latent_shape: Option<LatentShape>,
     #[serde(default)]
     pub training_precision: TrainingPrecision,
     #[serde(default)]
@@ -461,6 +470,7 @@ impl DreamerConfig {
         let config = Self {
             action_count,
             model_size: ModelSize::Size12M,
+            latent_shape: None,
             training_precision: TrainingPrecision::Auto,
             observation_kind: ObservationKind::Features,
             rgb_frame_pair: false,
@@ -546,7 +556,12 @@ impl DreamerConfig {
     }
 
     pub fn network(&self) -> NetworkSize {
-        self.model_size.network()
+        let mut size = self.model_size.network();
+        if let Some(shape) = self.latent_shape {
+            size.stoch = shape.variables;
+            size.classes = shape.classes;
+        }
+        size
     }
 
     pub fn uses_disagreement(&self) -> bool {
@@ -686,6 +701,19 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if let Some(shape) = self.latent_shape {
+            let preset = self.model_size.network();
+            if shape.variables == 0
+                || shape.classes < 2
+                || shape.variables.checked_mul(shape.classes)
+                    != Some(preset.stoch * preset.classes)
+            {
+                return Err("latent_shape requires positive variables, classes > 1 and the preset's flattened width".into());
+            }
+            if !self.is_cdp() || !self.cdp_centered {
+                return Err("latent_shape requires centered RGB CDP".into());
+            }
+        }
         if self.actor_residual
             && (!self.is_cdp()
                 || !self.cdp_centered

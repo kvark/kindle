@@ -5,6 +5,8 @@ mod vector;
 #[cfg(test)]
 mod actor_width_tests;
 #[cfg(test)]
+mod latent_shape_tests;
+#[cfg(test)]
 mod residual_actor_tests;
 #[cfg(test)]
 mod dynamics_gradients;

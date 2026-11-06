@@ -1,5 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [fixed-width latent regrouping development](../experiments/2026-11-06-cdp-latent-shape.md) selects an optional
+64×8 categorical state in place of32×16 at12M. Flattened state, CNN, parameter
+shapes/counts and actor/critic widths stay fixed; sampling, KL and one-hot
+activity change together. This is a representation hypothesis, not evidence
+that capacity caused earlier failures. Default remains the retained32×16.
+
+Implementation,202 Kindle/5 adapter CPU tests,36 focused Python checks and
+strict workspace/binding Clippy pass. Release packaging is next. Root
+`/x/Temp/kindle-latent-shape-20261106`; no GPU allocation, bounded check or full
+learner is selected. Native values/derivatives and synthetic learning/restore
+require the separate declaration described in the protocol. Keep actor dynamics,
+residual actor and coordinates off, and retain143.667 greedy/70.750 sampled.
+Original864/90%-two-wall and five-game gates remain unfinished. Completed stages
+stay closed; no unchanged extension, sweep or old-stage repeat.
+
 The [frozen residual serving ablation](2026-11-06-cdp-residual-actor-serving-ablation.md) is complete and inconclusive.
 Zeroing two correction parameters raises greedy117.625→131.750 and sampled
 49.333→60.000, but both paired intervals span zero; both remain below retained

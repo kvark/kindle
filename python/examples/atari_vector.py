@@ -167,6 +167,8 @@ def main():
                         help="fresh CDP dynamics/posterior/prediction/exploration rate; omitted: 4e-4 scaled with the base rate")
     parser.add_argument("--latent-unimix", type=float,
                         help="fresh training only: categorical posterior/prior uniform mixing; omitted: native default")
+    parser.add_argument("--latent-shape", type=int, nargs=2, metavar=("VARIABLES", "CLASSES"),
+                        help="fresh centered CDP: regroup categorical state at the preset's flattened width")
     parser.add_argument("--actor-unimix", type=float, default=0.0,
                         help="native policy uniform mixture in [0,1); fresh default0, restore keeps checkpoint policy")
     parser.add_argument("--report-every", type=int, default=1000)
@@ -315,6 +317,14 @@ def main():
             parser.error("actor-hidden-units must be a positive unsigned 64-bit integer")
         if args.restore or args.evaluate:
             parser.error("actor-hidden-units requires fresh training")
+    if args.latent_shape is not None:
+        variables, classes = args.latent_shape
+        if not (0 < variables < 2**64 and 1 < classes < 2**64):
+            parser.error("latent-shape requires unsigned 64-bit variables > 0 and classes > 1")
+        if args.restore or args.evaluate:
+            parser.error("latent-shape requires fresh training")
+        if not args.cdp or not args.cdp_centered:
+            parser.error("latent-shape requires centered CDP")
     if args.actor_residual:
         if args.restore or args.evaluate:
             parser.error("actor-residual requires fresh training")
@@ -487,6 +497,7 @@ def main():
     training_options.add("--image-crop")
     training_options.add("--actor-unimix")
     training_options.add("--latent-unimix")
+    training_options.add("--latent-shape")
     training_options.add("--imagination-length")
     training_options.update(("--open-loop-length", "--open-loop-scale"))
     training_options.add("--replay-context")
@@ -550,6 +561,8 @@ def main():
         parser.error("actor-hidden-units requires native actor width support")
     if args.actor_residual and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RESIDUAL", False):
         parser.error("actor-residual requires native residual actor support")
+    if args.latent_shape is not None and not getattr(kindle.VectorAgent, "SUPPORTS_LATENT_SHAPE", False):
+        parser.error("latent-shape requires native latent shape support")
     if args.replay_actor_observed_lower_bound and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False):
         parser.error("observed lower-bound mode requires native conservative-return actor support")
     if args.breakout_return_life_boundaries and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RETURN_BOUNDARIES", False):
@@ -570,6 +583,9 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     if args.restore and (args.restore / "metadata.json").is_file():
         metadata = json.loads((args.restore / "metadata.json").read_text())
+        if (metadata.get("config", {}).get("latent_shape") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_LATENT_SHAPE", False)):
+            parser.error("checkpoint requires native latent shape support")
         if (metadata.get("config", {}).get("actor_residual", False)
                 and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RESIDUAL", False)):
             parser.error("residual actor checkpoint requires native residual actor support")
@@ -727,6 +743,8 @@ def main():
                       learning_rate_warmup=1000, agc=0.3)
         if args.latent_unimix is not None:
             config["unimix"] = args.latent_unimix
+        if args.latent_shape is not None:
+            config["latent_shape"] = dict(variables=args.latent_shape[0], classes=args.latent_shape[1])
         if args.imagination_length is not None:
             config["imagination_length"] = args.imagination_length
         if args.discount_horizon is not None:
