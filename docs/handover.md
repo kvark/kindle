@@ -17,10 +17,12 @@ speed and gameplay benefit are unmeasured. Existing RGB64 resizing stays fixed.
 CPU checks pass216 Kindle +5 adapter tests,1,246 Python cases with zero native
 construction attempts, and strict workspace/binding Clippy. An initial fixture
 compile failure and original bytes remain preserved; the repaired tests pass.
-Two new native value/derivative/update/restore fixtures compile but are unexecuted.
-Root `/x/Temp/kindle-rgb-stride2-20261106`; CPU closure17:14:01.561 UTC November6.
-Next build/package, separately qualify native/default-off behavior, then declare
-the8,192-action cost check. No GPU allocation or full learner is selected yet.
+Release package native `cde123e1` and test executable `da5dcc99` are retained;
+installed-package checks also pass1,246 cases with zero native construction.
+Two new native value/derivative/update/restore fixtures are selected once under
+the linked report/protocol. Root `/x/Temp/kindle-rgb-stride2-20261106`; no Atari
+learner is selected. Default-off compatibility and the8,192-action cost check
+require their separate declarations after successful qualification.
 Keep the retained teacher/recipe and143.667 greedy/70.750 sampled; original864/90%
 two-wall and the five-game goal remain unfinished.
 
