@@ -138,3 +138,10 @@ off. Its primary paired interval spans zero; this single recipe neither isolates
 a gradient-conflict cause nor rejects every independent reward head. Keep it off.
 This is not a SuperMimic reproduction or evidence that its ratios transfer to
 Atari. No successor allocation follows automatically.
+
+A subsequent [serving ablation](2026-11-06-cdp-residual-actor-serving-ablation.md)
+raises both point scores when the correction is zeroed, but both paired intervals
+span zero and neither mean reaches retained. Holding the learned world/base and
+training history fixed makes this a narrower serving test; it does not establish
+that a pure-imitation learner would be better. Useful action values and their
+measured policy effect remain unresolved. No new actor objective is selected.

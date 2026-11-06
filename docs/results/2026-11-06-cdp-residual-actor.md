@@ -220,3 +220,9 @@ Native/runner bytes differ from the historical control; scoped checks and equal
 initial traces do not isolate every runtime effect. This single recipe does not
 prove imitation interference absent, nor that all independent reward heads fail.
 The five-game goal remains active and unfinished.
+
+The separate [frozen serving ablation](2026-11-06-cdp-residual-actor-serving-ablation.md)
+is also complete: zeroing only the correction raises greedy117.625→131.750 and
+sampled49.333→60.000, but both paired intervals span zero and both means remain
+below retained. All361 other tensors/moments stay exact; no learner or old arm
+repeats. This does not isolate the full training regression or select a new recipe.

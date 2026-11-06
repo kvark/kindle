@@ -1,13 +1,21 @@
 # Kindle: CDP learning roadmap
 
-The [frozen residual serving ablation](experiments/2026-11-06-cdp-residual-actor-serving-ablation.md) is selected after passing
-CPU preparation (.915s,351 unchanged original pins). Exactly two residual
-parameters are zeroed in a separately identified final-checkpoint copy; the other
-361 tensors and all moments remain unchanged. Two new frozen sampled/greedy arms
-will test whether that correction helps its own base policy. The completed
-combined-policy assessments are reused; no training, rebuild or old stage repeats.
-This tests a serving effect, not a fresh base-only learner or a cause of the full
-regression. Root `/x/Temp/kindle-residual-serving-ablation-20261106`.
+The [frozen residual serving ablation](results/2026-11-06-cdp-residual-actor-serving-ablation.md) is complete and inconclusive.
+Zeroing two correction parameters raises greedy117.625→131.750 and sampled
+49.333→60.000, but both paired intervals span zero; both remain below retained
+143.667/70.750, all0/24 two-wall. Greedy difference+14.125 has95% interval
+[−27.252083,56.626042] with6/8 improved lanes; sampled+10.666667 has interval
+[−12.291667,43.083333] with4/8 improved. This serving intervention is not a
+separately trained base-only control or a cause of the original regression.
+
+All361 other tensors/moments and source files remain exact. Both new24-natural-
+episode arms have zero updates/truncations and363 invariant tensors; full replays,
+videos,guards,369 pins and70 sealed files pass. Aggregate evaluation74,048 actions/
+296,118 frames; no learning. Original controller/wrapper complete **10:31:27.438
+UTC November6** in86.268s, source80f4559c. Independent CPU recount closes
+**10:33:13.169** in.519s. No experiment failure/repeat or successor; root
+`/x/Temp/kindle-residual-serving-ablation-20261106` is closed. Keep residual off
+and retained143.667/70.750; original864/90%-two-wall/five-game gates remain.
 
 The [full residual actor comparison](results/2026-11-06-cdp-residual-actor.md#full-200k-comparison)
 is complete and fails retention. Fresh200k actions/799,615 frames/12,477 updates

@@ -20,24 +20,24 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [frozen residual serving ablation](docs/experiments/2026-11-06-cdp-residual-actor-serving-ablation.md) is selected to resolve
-whether the learned correction helps its own base policy. The completed full
-learner scores117.625 greedy/49.333 sampled below retained143.667/70.750; this
-intervention does not restart training or repeat those completed assessments.
+The [frozen residual serving ablation](docs/results/2026-11-06-cdp-residual-actor-serving-ablation.md) is complete. Zeroing only the
+learned correction raises greedy117.625→131.750 and sampled49.333→60.000, but
+both paired intervals span zero and both means remain below143.667/70.750.
+All0/24 two-wall. This does not establish that the correction caused the full
+learner's regression, or that a fresh base-only learner would reproduce it.
 
-A separately identified final-checkpoint copy zeros only residual weight/bias;
-all361 other tensors, optimizer moments and source files remain unchanged.
-CPU preparation passes in.915s, with351 original pins and both exact commands
-checked. Metadata differs only in the behavior tensor-file hash. No native
-construction or emulator occurs in preparation; no rebuild or learning is selected.
+All361 untouched tensors/moments and source files remain exact; both new frozen
+arms preserve363 tensors with zero updates/truncations and24 natural episodes.
+Replays/videos, guards,369 pins and70 sealed files pass. Original controller/
+wrapper finish10:31:27.438 UTC November6 in86.268s; independent CPU recount and
+closure pass at10:33:13.169 in.519s. Source80f4559c. No experiment stage fails
+or repeats; original native qualification failures remain preserved separately.
 
-Run two serial frozen sampled/greedy arms,24 natural episodes each on the same
-eight lanes, with guidance and updates off. Greedy paired return difference
-against the original combined policy is primary. This is a serving intervention,
-not a trained base-only control or seed-reliability test. Root
-`/x/Temp/kindle-residual-serving-ablation-20261106`; consult its protocol before
-execution. Keep residual actor off for retained learning; original864/90%-two-wall
-and five-game gates remain unfinished. No automatic successor or old-stage repeat.
+Root `/x/Temp/kindle-residual-serving-ablation-20261106` is closed. No GPU work,
+new learner or successor is selected. Keep residual actor off, preset256 base,
+coordinates and actor dynamics off. Retain143.667 greedy/70.750 sampled; original
+864/90%-two-wall and five-game gates remain unfinished. No unchanged extension,
+sweep or old-stage repeat; separately justify the next experiment.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
