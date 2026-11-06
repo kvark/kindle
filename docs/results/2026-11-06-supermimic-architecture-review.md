@@ -169,3 +169,14 @@ Atari. That limits the available gain from accelerating environment simulation
 alone. The practical architectural objective remains better frozen policy
 improvement per model update and training minute, with direct actor gradients
 kept as an optional native capability. No successor allocation is selected.
+
+The subsequent [fresh-seed confirmation](2026-11-06-cdp-breakout-seed22003.md)
+also qualifies how strongly the selected control should be interpreted. On a
+new shared cohort, retained1009 scores94.625 greedy/70.500 sampled, while fresh
+22003 scores75.250/44.708 in21m30.822s. Both improve over their actual-initial
+controls; all0/24 two-wall. The retained greedy historical point143.667 does
+not reproduce on this new cohort. Fresh primary gain/min is21.091% lower than
+the matched control, but its paired interval narrowly includes zero. These
+results show material seed/cohort variation and preserve useful fresh learning;
+they do not change the closed architectural comparisons or justify extrapolating
+their effect sizes across seeds. No new actor objective or successor is selected.

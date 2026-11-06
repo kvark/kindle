@@ -20,27 +20,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [one-seed Breakout confirmation](docs/experiments/2026-11-06-cdp-breakout-seed22003.md) is selected. Train one fresh learner
-at seed 22003 for 200k actions with the exact retained recipe, native447fe50 /
-SHA35ad0db, runnercf4ea238 and original teacher. No hyperparameter, architecture,
-loss, runtime build or experience transfer changes. Evaluate both new and retained
-1009 final/actual-initial checkpoints on new cohort4000022003, sampled and greedy,
-24 natural episodes per arm. This tests the selected baseline beyond reused1009;
-positive learning alone does not satisfy the original864/90% two-wall gate.
+The [fresh-seed Breakout confirmation](docs/results/2026-11-06-cdp-breakout-seed22003.md) is complete. Seed22003 learns
+75.250 greedy/44.708 sampled in21m30.822s, versus its2.292/1.875 actual-initial
+controls. Retained1009 on the same new cohort scores94.625/70.500; its historical
+old-cohort point remains143.667/70.750. Fresh own-initial gains are positive on
+all eight lanes in both modes. Greedy gain/min is21.091% lower than the matched
+control, with its paired95% interval narrowly including zero; sampled is38.323%
+lower. Both training-seed and evaluation-cohort variation matter. All0/24 two-wall;
+the original864/90% gate and five-game goal remain unfinished.
 
-Root `/x/Temp/kindle-breakout-seed22003-20261106/full`; service
-`kindle-breakout-seed22003-200k-20261106`. The learner launches20:36:28.653 UTC November6 fromdcc4dd5d, controller1546932 /
-invocation316ee06c85004cb68a061364822fdc3b. All nine mocked commands and90 input
-pins pass. Startup verifies357 finite tensors, changed encoder/actor random
-weights,47 pre-update events and first update376. Training and independent
-recovery/terminal observers are active. A stale archived replay-helper path caused a preparation copy failure;
-its source/error are preserved, and the continuation uses the verified exact
-retained copy. No native/emulator stage was attempted or repeated.
+All90 active/338 retained pins,69 completion artifacts,52 checkpoint files and
+288 recounted episodes pass. Training executes200k actions/799,616 frames and
+12,477 updates; recovery, all eight frozen arms, replays and original services
+pass. Independent closure completes21:04:53.361 UTC November6. Native447fe50 /
+SHA35ad0db, runnercf4ea238 and teacher are unchanged; execution sourcedcc4dd5d.
+The initial archived-helper copy failure remains preserved with its separate
+preparation repair. No GPU stage or learner update repeats.
 
-The [completed replay-value comparison](docs/results/2026-11-06-cdp-completed-value.md#full200k-comparison) stays closed and off:
-89.958 greedy/50.500 sampled versus primary143.667/70.750, with21.906% lower
-primary gain/min. Do not repeat completed stages. No extension, second learner,
-seed search or automatic successor is selected. The five-game goal is unfinished.
+Root `/x/Temp/kindle-breakout-seed22003-20261106/full` is closed; main/recovery/
+terminal services are inactive, with no render holder or learner. Keep the
+retained recipe with the measured variation disclosed. No new seed is promoted;
+no extension, second learner, seed search or automatic successor is selected.
+Consult the [fixed protocol](docs/experiments/2026-11-06-cdp-breakout-seed22003.md) before any separately justified work.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
@@ -77,7 +78,7 @@ The **five-game goal is unfinished**:
 | [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
 | [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
-| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s | All0/24 two-wall; the higher-budget point has lower gain/min. Reused1009/cohort; original864/90% gate unfinished |
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall; original864/90% gate unfinished |
 | [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
 
 Published long-run scores are aspirations,not matched-budget comparisons.
