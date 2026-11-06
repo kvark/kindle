@@ -26,12 +26,14 @@ shapes/counts and actor/critic widths stay fixed; sampling, KL and one-hot
 activity change together. This is a representation hypothesis, not evidence
 that capacity caused earlier failures. Default remains the retained32×16.
 
-CPU and packaging pass:202 Kindle/5 adapter tests,36 focused Python checks,
-strict Clippy and1,139 installed-package checks/10 deselected, zero construction
-attempts. Source536012d5/native2c9c6e6f pins246 files. The separate native protocol
-selects two serial guarded fixtures for categorical values/derivatives and
-synthetic learning/restore,120s each/controller300s. Root
-`/x/Temp/kindle-latent-shape-20261106`; no Atari learner or bounded check is selected. Keep actor dynamics,
+CPU/package qualification passes202 Kindle/5 adapter,36 focused Python and
+1,139 installed-package tests. Original native qualification fails on a fixture
+readback API mismatch before derivative checks or learner updates. Preserve its
+failed guard/log/binary. A separate test-only indexed-read repair passes five CPU
+checks and strict Clippy; release compilation and guarded qualification are next.
+Original production native2c9c6e6f stays unchanged. Root
+`/x/Temp/kindle-latent-shape-20261106/readback-repair`; no Atari learner or bounded
+check is selected. Keep actor dynamics,
 residual actor and coordinates off, and retain143.667 greedy/70.750 sampled.
 Original864/90%-two-wall and five-game gates remain unfinished. Completed stages
 stay closed; no unchanged extension, sweep or old-stage repeat.

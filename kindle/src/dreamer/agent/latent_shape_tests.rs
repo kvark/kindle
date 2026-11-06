@@ -283,8 +283,18 @@ fn latent_shape_native_categorical_values_derivatives_and_samples() {
             session.zero_grad();
             session.step();
             session.wait();
-            assert!((f64::from(session.read_loss()) - loss).abs() < 2e-4);
-            assert!((f64::from(session.read_output(1)[0]) - raw).abs() < 2e-4);
+            let actual_loss = f64::from(session.read_loss());
+            assert!(
+                (actual_loss - loss).abs() < 2e-4,
+                "loss: {actual_loss} vs {loss}"
+            );
+            let mut actual_raw = [0.0];
+            session.read_output_by_index(1, &mut actual_raw);
+            assert!(
+                (f64::from(actual_raw[0]) - raw).abs() < 2e-4,
+                "raw KL: {} vs {raw}",
+                actual_raw[0]
+            );
             for (name, expected, stopped) in [("posterior", &dq, stop_q), ("prior", &dp, stop_p)] {
                 let mut actual = vec![0.0; 1024];
                 if session.has_param_grad(name) {
@@ -298,7 +308,8 @@ fn latent_shape_native_categorical_values_derivatives_and_samples() {
                     );
                 }
             }
-            let sample = session.read_output(2);
+            let mut sample = vec![0.0; 1024];
+            session.read_output_by_index(2, &mut sample);
             assert_eq!(sample.len(), 1024);
             for (row, onehot) in sample.chunks(classes).enumerate() {
                 let range = row * classes..(row + 1) * classes;

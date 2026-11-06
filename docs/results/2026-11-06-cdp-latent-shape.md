@@ -45,3 +45,19 @@ and the wheel are retained. The [separate native protocol](../experiments/2026-1
 now selects two guarded fixtures,120s each/controller300s: independent F64
 categorical values/derivatives/sampling, then two synthetic vector updates and
 exact restore. No Atari learner or bounded cost check is selected.
+
+## Original native failure and separate readback repair
+
+The original native qualification fails at11:00:22.953 UTC November6, source
+befcbf0c, in2.169s wrapper. The first scalar-loss check passes, then the raw-KL
+check reads the first output because `read_output` takes a length, not an index.
+Derivative checks and the second learning fixture are not reached; zero learner
+updates or Atari actions. The guard records child1462683 exit101 and no recovery
+or unfinished children. Preserve the original failed qualification and binary.
+
+The [separate readback repair](../experiments/2026-11-06-cdp-latent-shape-readback-repair.md)
+changes only the new test fixture's raw-KL/sample reads to indexed reads. Graphs,
+F64 oracle, thresholds, production math and original packaged native remain
+unchanged. Five affected CPU tests and strict Clippy pass. A separate release
+executable and new output/checkpoint paths will qualify the repaired derivative
+fixture and previously unexecuted learning/restore fixture. No Atari learner.
