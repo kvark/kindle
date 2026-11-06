@@ -1,10 +1,21 @@
 # Kindle: CDP learning roadmap
 
-The [sparse-wall brick-aiming teacher experiment](experiments/2026-11-06-cdp-breakout-brick-aim.md) is selected for one bounded CPU comparison. The retained teacher predicts catches without inspecting remaining bricks. This candidate adds a fixed RGB occupancy grid and a three-pixel target bias toward the occupied-cell centroid only on sparse walls and projected interior landings. It preserves the original tracking, unbiased landing cache and mean-response planner. Earlier fixed-edge aiming and outer-entry failures remain retained.
+The [sparse-wall brick-aiming teacher comparison](results/2026-11-06-cdp-breakout-brick-aim.md) is complete and
+fails retention: 208.458 versus 225.083 (−7.386%), only 1/8 improved lanes and
+0/24 two-wall for both. Keep the original teacher. The fixed RGB-cell rule is
+eligible on 445 selected decisions and changes 191 of 39,749 first commands.
+This does not calibrate outgoing angles or isolate the cause of the regression.
 
-Six CPU fixture groups and the import/command preflight pass in 0.246s with 47 pins, unchanged mean recurrence/cost and tracking bytes, zero emulator construction and no native import. The single eight-environment collection selects three natural episodes per lane, reuses the development cohort and fully replays its decisions. The fixed gate requires at least 10% higher mean than 225.083 and five improved lane means. Consult the protocol before execution.
+Six CPU fixture groups, 48 declared pins and 31 completion artifacts pass.
+One candidate completes 43,176 actions / 172,667 frames in 33.187557s; full
+38.043074s replay matches every decision/pixel/reward/frame/reset/outcome.
+Controller 71.688512s, closed 19:16:42.795 UTC November 6, source e52a6844;
+independent recount passes at 19:16:50.885. No failed or repeated stage.
 
-Root `/x/Temp/kindle-breakout-brick-aim-20261106`; no GPU or native learner is selected. A pass permits only a separately declared fresh-cohort comparison. No integration, sweep or automatic successor is selected. Keep retained CDP prediction scale 500 and Breakout 143.667 greedy / 70.750 sampled; original 864/90% two-wall and the five-game goal remain unfinished.
+Root `/x/Temp/kindle-breakout-brick-aim-20261106` is closed. No control rerun,
+native learner or GPU work. No fresh cohort, integration, sweep or automatic
+successor is selected. Retain CDP scale 500 and Breakout 143.667 greedy / 70.750
+sampled; original 864/90% two-wall and the five-game goal remain unfinished.
 
 The [completed CDP prediction-scale1000 comparison](results/2026-11-06-cdp-breakout-cdp1000.md#full200k-comparison) regresses to 77.167 greedy / 42.750 sampled in 21m30.371s, with 47.111% lower primary gain/min. Keep scale 500. All learning, frozen evaluation, recovery and independent closure checks pass; original CPU import and plot-fixture failures remain preserved with separate repairs. Root `/x/Temp/kindle-breakout-cdp1000-20261106/full` is closed. Do not repeat or extend its stages.
 
