@@ -145,6 +145,8 @@ def main():
                         help="fresh CDP only: posterior continuation loss multiplier for true game-over rows")
     parser.add_argument("--prior-continuation-scale", type=float,
                         help="fresh CDP only: auxiliary continuation loss on sampled one-step priors")
+    parser.add_argument("--actor-dynamics-scale", type=float,
+                        help="add normalized return gradients through frozen imagined dynamics; default off")
     parser.add_argument("--replay-actor-scale", type=float,
                         help="fresh training: positive-advantage imitation of completed observed returns")
     parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
@@ -297,6 +299,13 @@ def main():
             parser.error("replay-actor-scale requires disagreement-scale0 or explicit observed lower-bound mode")
         if "KINDLE_DEVICE_TARGETS" in os.environ:
             parser.error("replay-actor-scale requires CPU target construction")
+    if args.actor_dynamics_scale is not None:
+        if not positive_f32(args.actor_dynamics_scale):
+            parser.error("actor-dynamics-scale must be finite and positive in F32")
+        if args.restore or args.evaluate:
+            parser.error("actor-dynamics-scale requires fresh training")
+        if "KINDLE_DEVICE_TARGETS" in os.environ:
+            parser.error("actor-dynamics-scale requires CPU target construction")
     if args.behavior_learning_rate is not None:
         if not positive_f32(args.behavior_learning_rate):
             parser.error("behavior-learning-rate must be finite and positive in F32")
@@ -473,6 +482,7 @@ def main():
     training_options.add("--terminal-continuation-weight")
     training_options.add("--prior-continuation-scale")
     training_options.add("--replay-actor-scale")
+    training_options.add("--actor-dynamics-scale")
     training_options.add("--return-lambda")
     training_options.add("--replay-value-bootstrap")
     training_options.add("--encoder-learning-rate")
@@ -513,6 +523,8 @@ def main():
         parser.error("replay-value-bootstrap requires native bootstrap support")
     if args.replay_actor_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False):
         parser.error("replay-actor-scale requires native completed-return actor support")
+    if args.actor_dynamics_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_DYNAMICS", False):
+        parser.error("actor-dynamics-scale requires native actor dynamics support")
     if args.replay_actor_observed_lower_bound and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False):
         parser.error("observed lower-bound mode requires native conservative-return actor support")
     if args.breakout_return_life_boundaries and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RETURN_BOUNDARIES", False):
@@ -533,6 +545,11 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     if args.restore and (args.restore / "metadata.json").is_file():
         metadata = json.loads((args.restore / "metadata.json").read_text())
+        if metadata.get("config", {}).get("actor_dynamics_scale") is not None:
+            if not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_DYNAMICS", False):
+                parser.error("actor dynamics checkpoint requires native actor dynamics support")
+            if "KINDLE_DEVICE_TARGETS" in os.environ:
+                parser.error("actor dynamics checkpoint requires CPU target construction")
         if (metadata.get("config", {}).get("prior_continuation_scale") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_CONTINUATION", False)):
             parser.error("prior-continuation checkpoint requires native prior-continuation support")
@@ -706,6 +723,8 @@ def main():
             config["prior_continuation_scale"] = args.prior_continuation_scale
         if args.replay_actor_scale is not None:
             config["replay_actor_scale"] = args.replay_actor_scale
+        if args.actor_dynamics_scale is not None:
+            config["actor_dynamics_scale"] = args.actor_dynamics_scale
         if args.replay_actor_observed_lower_bound:
             config["replay_actor_observed_lower_bound"] = True
         if args.breakout_return_life_boundaries:

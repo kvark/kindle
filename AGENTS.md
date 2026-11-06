@@ -20,26 +20,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [completed coordinate-channel comparison](docs/results/2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison)
-finishes 200k actions / 799,523 frames / 12,477 updates in **20m58.414s**.
-Greedy **66.333** and sampled **35.917** regress retained **143.667 / 70.750**;
-all 0/24 two-wall. Primary own-initial gain/min falls 53.36%, despite 2.29%
-shorter training time. Retain `rgb_coordinates=false`. The paired eight-lane
-95% gain/min interval [−4.914387, −1.999408] describes the reused cohort,
-not seed reliability or an isolated perceptual cause.
+The [optional dynamics-gradient actor](docs/experiments/2026-11-06-cdp-actor-dynamics.md) is selected for native
+qualification. Implementation adds a default-off normalized return loss through
+frozen world/critic inputs, with straight-through categorical derivatives and
+one actor optimizer. World snapshots are private GPU inputs; existing rollout
+states, draws and detached disagreement values are reused. No new trainable
+weights or checkpoint tensors are added. See the [implementation record](docs/results/2026-11-06-cdp-actor-dynamics.md).
 
-All 124 current / 338 retained pins, 100k recovery, full replays, frozen controls,
-357 invariant tensors, guards and curves pass. Original main/collector finish
-04:55:15.624 / 04:56:00.819 UTC November6; all three services succeed. Earlier
-bounded import, packaging and fixture failures and the pause timing remain in
-the result. No completed GPU stage repeats. Root
-`/x/Temp/kindle-rgb-coordinates-20261104/full` is closed; no allocation is active
-at closure. Check live state before work. No extension, sweep, confirmation or
-automatic successor is selected.
+CPU validation passes 188 Kindle + 5 gym tests, 16 CLI/report tests and strict
+workspace and binding Clippy. Initial compile, row-scaling, frozen-scalar optimizer-slot and
+restore-guard failures are preserved. Packaging and guarded
+F64/production-loss/snapshot/restore tests remain pending. No GPU allocation or
+Atari learner is active or selected. Root
+`/x/Temp/kindle-actor-dynamics-20261106`; consult the protocol before execution.
 
-The [SuperMimic source review](docs/results/2026-11-06-supermimic-architecture-review.md) identifies direct
-actor gradients through imagined dynamics as a separate architectural proposal
-within the same goal. It is not implemented or allocated by this comparison.
+The [coordinate comparison](docs/results/2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison) is closed and
+negative: 66.333 greedy / 35.917 sampled in20m58.414s. Retain coordinates off and
+143.667 / 70.750. No extension or automatic successor to that run is selected.
 The original 864/90%-two-wall gate and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)

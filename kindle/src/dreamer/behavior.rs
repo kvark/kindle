@@ -5,6 +5,8 @@ use meganeura::{Graph, graph::NodeId};
 use super::config::{DreamerConfig, ExpertImitation};
 use super::networks::{MlpHead, mixed_log_probabilities, scale, sum, weighted_cross_entropy};
 
+mod dynamics;
+
 pub const LOSS_TOTAL: usize = 0;
 pub const LOSS_POLICY: usize = 1;
 pub const LOSS_EXPERT: usize = 6;
@@ -15,6 +17,10 @@ pub const WEIGHTED_POLICY_ENTROPY: usize = 5;
 
 pub fn replay_actor_output(config: &DreamerConfig) -> usize {
     LOSS_EXPERT + usize::from(config.expert_imitation.is_some())
+}
+
+pub(crate) fn dynamics_actor_output(config: &DreamerConfig) -> usize {
+    replay_actor_output(config) + usize::from(config.replay_actor_scale.is_some())
 }
 
 struct BehaviorModel {
@@ -200,6 +206,17 @@ pub fn build_training_graph(
         losses.push(scale(&mut graph, loss, coefficient));
         loss
     });
+    let dynamics_loss = config.actor_dynamics_scale.map(|coefficient| {
+        let loss = dynamics::loss(
+            &mut graph,
+            config,
+            &model.actor,
+            &model.value,
+            imagined_weight,
+        );
+        losses.push(scale(&mut graph, loss, coefficient * scales.policy));
+        loss
+    });
     let total = sum(&mut graph, &losses);
     let mut outputs = vec![
         total,
@@ -214,6 +231,10 @@ pub fn build_training_graph(
     }
     if let Some(loss) = replay_actor_loss {
         assert_eq!(outputs.len(), replay_actor_output(config));
+        outputs.push(loss);
+    }
+    if let Some(loss) = dynamics_loss {
+        assert_eq!(outputs.len(), dynamics_actor_output(config));
         outputs.push(loss);
     }
     graph.set_outputs(outputs);

@@ -139,6 +139,10 @@ def audit(path):
         require_numbers(config["train_ratio"])
         check(config["train_ratio"] >= 0, "invalid train ratio")
         replay_actor_scale = config.get("replay_actor_scale")
+        actor_dynamics_scale = config.get("actor_dynamics_scale")
+        if actor_dynamics_scale is not None:
+            require_numbers(actor_dynamics_scale)
+            check(actor_dynamics_scale > 0, "invalid actor dynamics scale")
         lower_bound = config.get("replay_actor_observed_lower_bound", False)
         check(type(lower_bound) is bool, "invalid observed lower-bound mode")
         disagreement = config.get("disagreement_bonus", False) and config.get("intrinsic_reward_scale", 0) > 0
@@ -407,6 +411,11 @@ def audit(path):
                 report = event["report"]
                 require_numbers(report)
                 audit_terminal_replay(config, report)
+                dynamics_loss = report.get("behavior", {}).get("dynamics_actor_loss")
+                check((dynamics_loss is not None) == (actor_dynamics_scale is not None),
+                      "actor dynamics report/config mismatch")
+                if dynamics_loss is not None:
+                    check(type(dynamics_loss) in (int, float), "invalid actor dynamics loss")
                 replay_actor = report.get("behavior", {}).get("replay_actor")
                 check((replay_actor is not None) == (replay_actor_scale is not None),
                       "completed-return actor report/config mismatch")

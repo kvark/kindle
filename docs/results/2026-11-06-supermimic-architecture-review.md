@@ -3,8 +3,9 @@
 Source review at2d651cb0 confirms that Kindle learns a world model and trains
 its actor on imagined trajectories, but does not differentiate the imagined
 return through the dynamics into the actor. SuperMimic's corresponding path is
-a meaningful architectural proposal within the five-game goal. It is not
-implemented or selected for a GPU allocation by this review. The independent
+a meaningful architectural proposal within the five-game goal. The [optional implementation](2026-11-06-cdp-actor-dynamics.md) now proceeds
+through native qualification under a separate protocol; no Atari learner is
+selected. The independent
 [coordinate-channel comparison](2026-11-06-cdp-rgb-coordinates.md) is now closed
 and regresses both frozen modes; it does not test this actor-gradient proposal.
 

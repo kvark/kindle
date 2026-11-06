@@ -203,6 +203,12 @@ struct LinearNorm {
 }
 
 impl LinearNorm {
+    fn freeze(&mut self, graph: &mut Graph) {
+        self.linear.weight = graph.stop_gradient(self.linear.weight);
+        self.linear.bias = self.linear.bias.map(|bias| graph.stop_gradient(bias));
+        self.norm.weight = graph.stop_gradient(self.norm.weight);
+    }
+
     fn new(graph: &mut Graph, name: &str, input: usize, output: usize) -> Self {
         Self {
             linear: nn::Linear::new(graph, name, input, output),
@@ -251,6 +257,11 @@ struct BlockLinear {
 }
 
 impl BlockLinear {
+    fn freeze(&mut self, graph: &mut Graph) {
+        self.weight = graph.stop_gradient(self.weight);
+        self.bias = graph.stop_gradient(self.bias);
+    }
+
     fn new(
         graph: &mut Graph,
         name: &str,
@@ -343,6 +354,17 @@ pub(crate) struct RssmCore {
 }
 
 impl RssmCore {
+    pub(crate) fn new_frozen(graph: &mut Graph, config: &DreamerConfig) -> Self {
+        let mut core = Self::new(graph, config);
+        core.deter_input.freeze(graph);
+        core.stoch_input.freeze(graph);
+        core.action_input.freeze(graph);
+        core.hidden.freeze(graph);
+        core.hidden_norm.weight = graph.stop_gradient(core.hidden_norm.weight);
+        core.gru.freeze(graph);
+        core
+    }
+
     pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let size = config.network();
         let block_deter = size.deter / size.blocks;
@@ -444,6 +466,15 @@ pub(crate) struct Prior {
 }
 
 impl Prior {
+    pub(crate) fn new_frozen(graph: &mut Graph, config: &DreamerConfig) -> Self {
+        let mut prior = Self::new(graph, config);
+        prior.layer0.freeze(graph);
+        prior.layer1.freeze(graph);
+        prior.output.weight = graph.stop_gradient(prior.output.weight);
+        prior.output.bias = prior.output.bias.map(|bias| graph.stop_gradient(bias));
+        prior
+    }
+
     pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let size = config.network();
         Self {

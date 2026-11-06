@@ -3,6 +3,8 @@
 mod vector;
 
 #[cfg(test)]
+mod dynamics_tests;
+#[cfg(test)]
 mod exploration;
 #[cfg(test)]
 mod gradient_contributions;
@@ -220,6 +222,9 @@ pub struct BehaviorMetrics {
     pub expert_imitation: Option<ExpertImitationMetrics>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub replay_actor: Option<ReplayActorMetrics>,
+    /// Unscaled normalized return loss; its coefficient is actor_dynamics_scale * policy.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dynamics_actor_loss: Option<f32>,
     pub value_loss: f32,
     pub replay_value_loss: f32,
     /// Mean categorical entropy before trajectory weighting.
@@ -250,6 +255,8 @@ pub struct LearnReport {
 /// Wall time includes the GPU waits and host transfers performed by each stage.
 #[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct LearnTiming {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dynamics_snapshot_seconds: Option<f64>,
     pub replay_seconds: f64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub replay_context_seconds: Option<f64>,
@@ -522,6 +529,11 @@ impl DreamerCore {
             config.replay_actor_scale.is_none()
                 || std::env::var_os("KINDLE_DEVICE_TARGETS").is_none(),
             "completed-return actor requires CPU target construction"
+        );
+        assert!(
+            config.actor_dynamics_scale.is_none()
+                || std::env::var_os("KINDLE_DEVICE_TARGETS").is_none(),
+            "actor dynamics requires CPU target construction"
         );
         let starts = config.batch_size * config.batch_length;
         let imagined_rows = starts * config.imagination_length;
@@ -1304,6 +1316,30 @@ impl DreamerCore {
             timing.replay_context_seconds = Some(stage.elapsed().as_secs_f64());
         }
         let stage = Instant::now();
+        if self.config.actor_dynamics_scale.is_some() {
+            let names = self
+                .behavior_train
+                .plan()
+                .input_buffers
+                .iter()
+                .filter_map(|(name, _)| {
+                    name.strip_prefix("dynamics_parameter_")
+                        .map(|parameter| (parameter.to_owned(), name.clone()))
+                })
+                .collect::<Vec<_>>();
+            assert!(!names.is_empty());
+            let copies = names
+                .iter()
+                .map(|(parameter, input)| DeviceCopy {
+                    source: (&self.world_train, ExternalSlot::Parameter(parameter)),
+                    target: (&self.behavior_train, input),
+                    target_offset_bytes: 0,
+                })
+                .collect::<Vec<_>>();
+            self.device_copies.copy(&copies);
+            timing.dynamics_snapshot_seconds = Some(stage.elapsed().as_secs_f64());
+        }
+        let stage = Instant::now();
         let posterior = self.sample_posterior_batch(&batch);
         timing.posterior_seconds = stage.elapsed().as_secs_f64();
         // D3 forms all targets from the same pre-update parameters. Keeping
@@ -2035,6 +2071,37 @@ impl DreamerCore {
             },
         ]);
         self.imagination.step();
+        if self.config.actor_dynamics_scale.is_some() {
+            let mut names = vec!["deter".to_owned(), "stoch".to_owned()];
+            for time in 0..horizon {
+                names.push(format!("action_uniforms_{time}"));
+                names.push(format!("latent_uniforms_{time}"));
+            }
+            let targets = names
+                .iter()
+                .map(|name| format!("dynamics_{name}"))
+                .collect::<Vec<_>>();
+            let mut copies = names
+                .iter()
+                .zip(&targets)
+                .map(|(name, target)| DeviceCopy {
+                    source: (&self.imagination, ExternalSlot::Input(name)),
+                    target: (&self.behavior_train, target),
+                    target_offset_bytes: 0,
+                })
+                .collect::<Vec<_>>();
+            if self.config.uses_disagreement() {
+                copies.push(DeviceCopy {
+                    source: (
+                        &self.imagination,
+                        ExternalSlot::Output(world::IMAGINATION_BONUS),
+                    ),
+                    target: (&self.behavior_train, "dynamics_bonus"),
+                    target_offset_bytes: 0,
+                });
+            }
+            self.device_copies.copy(&copies);
+        }
         #[cfg(test)]
         meganeura::profiler::record_instant("phase:imagination_submitted");
         self.device_copies.copy(&[
@@ -2435,6 +2502,11 @@ impl DreamerCore {
     }
 
     fn train_behavior(&mut self, batch: &BehaviorTrainingBatch) -> BehaviorMetrics {
+        if self.config.actor_dynamics_scale.is_some() {
+            assert!(batch.return_scale.is_finite() && batch.return_scale >= 1.0);
+            self.behavior_train
+                .set_input("dynamics_return_scale", &[batch.return_scale]);
+        }
         let actor_update_scale = self.config.actor_update_scale(self.learner_step);
         let expert_scale = self.config.expert_imitation.as_ref().and_then(|expert| {
             expert
@@ -2508,6 +2580,14 @@ impl DreamerCore {
         });
         let metrics = BehaviorMetrics {
             expert_imitation,
+            dynamics_actor_loss: self.config.actor_dynamics_scale.map(|_| {
+                let loss = read_scalar(
+                    &self.behavior_train,
+                    behavior::dynamics_actor_output(&self.config),
+                );
+                assert!(loss.is_finite(), "nonfinite dynamics actor loss");
+                loss
+            }),
             replay_actor: self.config.replay_actor_scale.map(|_| {
                 let loss = read_scalar(
                     &self.behavior_train,
