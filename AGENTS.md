@@ -28,11 +28,15 @@ The existing latent straight-through surrogate remains explicit; this is not the
 full actor objective. The independent F64 recurrent fixture checks18 derivatives;
 a separate existing-inference path checks forward values before production.
 
-All190 Kindle/5 gym CPU tests,4 analysis tests,strict Clippy and the release test
-build pass. An initial missing historical-receipt lookup and two missing closure
-index annotations are preserved as preparation failures; neither allocated GPU.
-Root `/x/Temp/kindle-breakout-action-path-20261106`. Qualification cap180s; no
-production allocation or new learner is selected until qualification passes.
+All190 Kindle/5 gym CPU tests,4 analysis tests and strict Clippy pass. Original
+native qualification then fails during toy graph construction: scalar/vector
+multiplication shapes differ, before any forward/backward pass. The [fixture
+repair](docs/experiments/2026-11-06-cdp-action-path-fixture-repair.md) uses matrix
+multiplication and adds CPU graph construction; both affected CPU checks and
+strict Clippy pass. Earlier missing-receipt/type failures remain preserved.
+Root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair` is the separately
+declared repair, with the unchanged180s qualification cap. Do not rerun the
+original failed stage. No production allocation or learner is selected.
 
 The [completed contexts](docs/results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
 provide120 origins per model. Reuse them and the saved92 short rescues/18 differing

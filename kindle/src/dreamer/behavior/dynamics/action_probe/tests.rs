@@ -34,7 +34,7 @@ fn toy_graph() -> Graph {
         let previous = graph.add(previous, contribution);
         h = graph.tanh(previous);
         let weight = vector(&mut graph, &LOGIT_WEIGHT);
-        let logits = graph.mul(h, weight);
+        let logits = graph.matmul(h, weight);
         let bias = vector(&mut graph, &BIAS);
         let logits = graph.add(logits, bias);
         let uniforms = graph.input(&format!("uniforms_{time}"), &[1, 3]);
@@ -112,6 +112,9 @@ fn reference(actions: &[f64; 9], anchors: Option<&[Anchor]>) -> ([f64; 2], Vec<A
 
 #[test]
 fn action_probe_reference_tracks_survival_and_terminal_value() {
+    let graph = toy_graph();
+    let (plan, _) = meganeura::compile_training_graph(&graph);
+    assert_eq!(plan.param_grad_pairs.len(), 3);
     let actions = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0];
     let (base, anchors) = reference(&actions, None);
     assert_eq!(base, reference(&actions, Some(&anchors)).0);
