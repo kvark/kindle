@@ -1,13 +1,17 @@
 # Kindle: CDP learning roadmap
 
-The [one-step prior reward experiment](results/2026-11-06-cdp-breakout-prior-reward.md) passes corrected CPU/native qualification and default-off frozen compatibility.
-All33 distinct Rust CPU tests,47 CLI cases per runtime, strict Clippy and two
-guarded native fixtures pass. A retained seed22003 frozen prefix matches128
-events and357 tensors at1,024 actions/4,096 frames with zero updates. Original
-CPU assertion/reporting failures remain preserved with separate repairs; no
-GPU stage repeats. Runtimea89b0b8e/SHA19b6f46 is packaged and its build cache
-released. The fixed8,192-action cost check is selected but has not started.
-No full learner or gameplay benefit is established; existing negatives stay closed.
+The [prior-reward bounded check](results/2026-11-06-cdp-breakout-prior-reward.md) passes:8,192 actions/32,725 frames/489 updates in46.736739s,
+with a fixed padded200k projection of21m25.260s. All783 allocation pins, initial/
+frozen tensors,47 initial events, full replay, weighted losses and mask bounds
+pass. Both original services succeed; independent closure recounts489 reports
+and seals86 artifacts at22:39:54.108 UTC November6. No bounded-stage failure or
+repeat; earlier qualification CPU failures remain preserved with separate repairs.
+
+The [fresh200k comparison](experiments/2026-11-06-cdp-breakout-prior-reward-200k.md) is separately selected on seed22003 against its retained control,
+with unchanged teacher/recipe except prior reward CE scale1 and the qualified
+native/runner. Primary greedy own-initial gain/min,100k recovery and four24-episode
+frozen arms remain fixed. Helpers pass CPU qualification; actual-command pinning/
+preflight and launch remain. No gameplay benefit or five-game completion claim.
 
 The [completed reward-supervision comparison](results/2026-11-06-cdp-breakout-reward10.md#full200k-comparison) fails retention. Only
 reward loss1→10 changes against retained22003:greedy52.167/sample42.625 versus

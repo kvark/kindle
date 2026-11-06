@@ -20,25 +20,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [one-step prior reward experiment](docs/results/2026-11-06-cdp-breakout-prior-reward.md) passes corrected native
-qualification and default-off frozen compatibility. Add optional reward CE on
-sampled one-step prior states at every valid replay row, using the existing reward
-head/targets and masking episode starts. No new parameters or inference inputs.
+The [prior-reward bounded check](docs/results/2026-11-06-cdp-breakout-prior-reward.md) passes:8,192 actions/32,725 frames/489
+updates in46.736739s, padded200k estimate21m25.260s. Initial357 tensors/47 events
+match retained22003; frozen restore retains357 tensors with zero updates. Full
+replay, weighted losses, mask bounds,783 pins and original services pass. Native
+qualification's original CPU failures remain preserved; no bounded stage repeats.
 
-All33 distinct CPU Rust tests,47 CLI cases on each runtime, strict Clippy and two
-guarded GPU fixtures pass after a separate scalar-gradient assertion repair.
-Default-off restore matches128 events and all357 tensors at1,024 actions/4,096
-frames, with zero updates. Its original CPU reporting key error is preserved;
-a separate reader completes the report without repeating the GPU run. All277
-native/502 legacy pins pass. The wheel/runtime/test executable are retained;
-the disposable build cache is released. No gameplay benefit is established.
+The [fresh200k comparison](docs/experiments/2026-11-06-cdp-breakout-prior-reward-200k.md) is separately selected against matched22003.
+Add only prior reward CE scale1; posterior reward stays1. Nativea89b0b8e/SHA19b6f46
+and the exact bounded runner/runtime retain the original teacher/adapters. Keep
+all other settings fixed, seed22003, frozen cohort4000022003, primary greedy
+own-initial gain/min,100k recovery and four24-episode frozen arms. Original864/
+90%-two-wall and the full five-game goal remain unfinished.
 
-The [fixed8,192-action cost check](docs/experiments/2026-11-06-cdp-breakout-prior-reward.md) is selected and remains to be prepared
-and executed. No GPU allocation or learner is active. Root
-`/mnt/data/kindle-breakout-prior-reward-20261106`; nativea89b0b8e/SHA19b6f46.
-A full learner requires the cost gate and a separate declaration. Retain reward1
-and the original teacher; posterior reward10 and joint H3 remain closed negatives.
-Original864/90% two-wall and the full five-game goal remain unfinished.
+Root `/mnt/data/kindle-breakout-prior-reward-20261106/full`. CPU helper qualification
+passes; prepare/pin actual commands before launch. No full learner is active yet.
+The bounded and native qualification stages are closed. No extension, sweep,
+second learner or automatic successor. Retain the existing recipe until outcome.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

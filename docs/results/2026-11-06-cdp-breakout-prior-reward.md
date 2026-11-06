@@ -1,11 +1,12 @@
-# One-step prior reward supervision qualifies; learning remains untested
+# Prior-reward supervision passes the bounded cost gate
 
 The [optional prior-reward loss](../experiments/2026-11-06-cdp-breakout-prior-reward.md)
 passes corrected CPU qualification, packaging, two guarded native fixtures and
 a default-off frozen restore. The original CPU graph assertion failure and
 subsequent CPU reporting failure remain preserved with separate repairs. No GPU
-stage repeats. The fixed8,192-action cost check is selected but has not started;
-no full learner or gameplay benefit is established.
+stage repeats. The fixed8,192-action cost check is complete and passes. A separately declared
+[full200k comparison](../experiments/2026-11-06-cdp-breakout-prior-reward-200k.md)
+is selected. No gameplay benefit is established.
 
 The new loss applies the existing reward head to sampled one-step prior states
 before the arrival image enters the posterior. It uses the same real reward
@@ -75,8 +76,40 @@ The wheel, runtime and validation executable remain retained. The disposable
 build cache is released with a separate receipt; the original build receipt stays
 unchanged. `qualification-review.json` seals the evidence and both failures.
 
-Next prepare and execute the protocol's fixed8,192-action cost check, including
-actual-initial controls, complete training replay, weighted-loss/mask audit and
-frozen restore. A full200k comparison requires the below30-minute projection and
-a separate declaration. Retain the existing recipe, reward1 and original teacher.
+## Bounded learning closure
+
+The fresh seed22003 check completes8,192 actions/32,725 frames/489 updates in
+46.736739s, with first update376 and residual credit.5. Frozen restore executes
+1,024 actions/4,096 frames in.897090s with zero updates and357 invariant tensors.
+All357 initial tensors and47 pre-update events match retained22003. CNN, reward,
+continuation, actor and critic parameters change. All finite reports, full
+pixel/action/label replay, weighted world/behavior losses and host guards pass.
+
+The auxiliary CE mean is4.378472; valid fraction mean.997835 and minimum.98828125,
+with271 masked replay rows. Fractions pass the256-row lattice and bounds derived
+from independently reported labeled rows. Sampled row identities are not logged;
+these checks do not establish exact per-row masking independently of the native
+fixtures. Actual guidance overrides4,412/8,192 actions (53.8574%); the20% setting
+selects episodes. Guided returns and these short frozen actions are not competence.
+
+The fixed conservative200k estimate is46.736739*25*1.10=1,285.260324s
+(21m25.260s), below30 minutes. All783 allocation pins,338 original/90 matched-seed
+pins and69 matched completion artifacts pass. The CPU actual-command preflight
+passes in2.435385s without native/emulator construction. The separate runtime
+receipt pins the qualified native plus exact retained Python adapters/teacher;
+only the prior-reward option is added to the retained runner. The previous
+native/compatibility checks are reused, not repeated.
+
+MainPID1561744/invocation2cba4f3fdf6442ba8431da140ef7959a and collectorPID1561747/
+invocationb2315f7db1b44fe58ca15286d2d4de9c both finish successfully. Main/collector
+complete22:38:55.266/22:39:06.552 UTC November6; independent closure completes
+22:39:54.108 in6.152240s, source5453b914. It recounts489 reports, both exact tensor
+comparisons, initial events, loss arithmetic and cost;86 artifacts are sealed.
+Maximum weighted world-total error is.00011715 within the fixed relative tolerance.
+No bounded preparation/run failure, repeated GPU stage, learner or collector.
+Earlier qualification CPU failures remain preserved above.
+
+The bounded allocation is closed. The [fixed200k comparison](../experiments/2026-11-06-cdp-breakout-prior-reward-200k.md)
+is separately selected against matched22003 with actual-initial controls and
+four24-episode frozen arms. Retain the current recipe pending its outcome.
 Original864/90%-two-wall and the full five-game goal remain unfinished.
