@@ -8,29 +8,23 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [optional RGB96 geometry](results/2026-11-06-cdp-rgb96.md) is implemented and
-CPU-qualified. Default64, native pooled RGB and one GPU resize remain. At12M the
-embedding grows1024→2304; posterior/CDP projections, memory and compute change,
-while CNN weights and control graphs retain their shapes. A perceptual cause or
-learning benefit is not established.
+The [optional RGB96 geometry](results/2026-11-06-cdp-rgb96.md) is packaged and
+native-qualified after two test-fixture repairs. Resize/scalar encoder values
+and derivatives/two Tiny updates with exact restore pass. Reuse the passed resize;
+original inactive-stream/reference-layout failures and Python fixture failure
+remain preserved. Production native7704d25c is unchanged by those repairs.
 
-All210 Kindle/five adapter CPU tests and strict workspace/binding Clippy pass.
-Python initially passes1,207 cases withone new restore-fixture failure; the
-corrected14-case file passes withzero native construction. Original failure is
-preserved. Three native fixtures compile but remain unexecuted. All256 current
-source pins pass; closure14:08:46.132 UTC November6 confirms no Kindle service or
-render holder. Root `/x/Temp/kindle-rgb96-20261106`.
+The [bounded protocol](experiments/2026-11-06-cdp-rgb96-bounded.md) now selects
+one fresh8,192-action/489-update learner and1,024 frozen greedy actions. All prior
+children are terminal; no full learner is selected. Actual commands and schema
+pass CPU preflight. RGB96 expands the12M preset to24,862,993 trainable parameters
+and full replay to12,083,200,000 bytes; keep the35-minute padded200k and2GiB
+conservative headroom gates. Root `/x/Temp/kindle-rgb96-20261106/bounded`.
 
-Package1279a415/native7704d25c passes1,208 installed-package CPU cases.
-Corrected resize passes all six small-object positions and resident layouts.
-The next fixture fails because its scalar encoder reference still assumes4×4
-instead of6×6 output. Both original native failures and Python failure remain.
-Reference-only repair passes four CPU checks/Clippy; the [remaining-check protocol](experiments/2026-11-06-cdp-rgb96-reference-repair.md)
-selects repaired encoder and unstarted restore with binary0bb0d62a. Reuse passed
-resize; production native remains unchanged. No bounded/full learner selected. The closed [enumerated actor comparison](results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
-failed retention; keep it and direct dynamics gradients off. Retain RGB64,
-32×16 and143.667 greedy/70.750 sampled. Original864/90%-two-wall and the five-game
-goal remain unfinished.
+A perception or gameplay benefit is unestablished. The [enumerated actor comparison](results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
+remains closed negative. Retain RGB64,32×16 and143.667 greedy/70.750 sampled;
+keep optional actor paths off. Original864/90%-two-wall and five-game goal remain
+unfinished. No full learner, extension or automatic successor follows.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
