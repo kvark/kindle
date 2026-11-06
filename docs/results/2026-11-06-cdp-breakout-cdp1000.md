@@ -1,12 +1,20 @@
 # CDP prediction scale1000: bounded check and fresh learning comparison
 
+The fresh200k comparison is complete and negative:77.167 greedy/42.750 sampled
+versus retained143.667/70.750, at21m30.371s versus21m27.910s. Primary own-initial
+gain/min falls47.111%; both paired gain/min intervals are below zero. Retain
+prediction scale500. All full-run audits and original services pass; the two
+earlier CPU failures and their separate repairs remain preserved. No successor
+allocation is selected; original864/90% two-wall and the five-game goal remain
+unfinished. [Full results](#full200k-comparison).
+
 The [fixed protocol](../experiments/2026-11-06-cdp-breakout-cdp1000.md) selects
 one fresh8,192-action/489-update check of prediction scale500→1000. Only
 `loss_scales.future_prediction` changes. The retained native447fe50, original
 convolution/max-pool encoder, teacher, geometry and learning schedule remain
 fixed. No native build is needed. After the completed bounded check, a separate
 [fresh200k comparison](../experiments/2026-11-06-cdp-breakout-cdp1000-200k.md)
-is now running; its startup checks pass. Frozen gameplay results remain pending.
+was selected and has now completed.
 
 Earlier gradient attribution found imitation already a major representation
 objective, partly aligned with CDP. This does not establish that stronger CDP
@@ -129,14 +137,13 @@ Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`, execution source
 main PID1532223/invocation`d6760fb8ef014cd194dd90a70cb5c0e5`.
 Collector PID1532226/invocation`1cb0ccb509dc447ab99ba05768e358b8` and
 recovery observer PID1532229/invocation`4915905c186149cb8881badc97bb90a7`
-were launched independently. The recovery observer has now completed; main
-and collector remain active under their original identities.
+were launched independently. All three original services have now completed
+successfully; their identities and terminal outputs are retained.
 
 Startup passes18:25:07.766 UTC: all357 initial tensors match bounded and
 retained, all47 pre-update events match, first update376 and exact declared
 header/config change. The startup observer takes.335182s, included in training
-wall time. Training, complete replay and frozen outcomes remain pending.
-Observe these original identities; a timeout is not a stopped job.
+wall time. Training, complete replay and frozen outcomes have since completed.
 No extension, second learner or automatic successor is selected.
 
 ## Verified100k recovery during the original run
@@ -153,5 +160,80 @@ The verifier takes.355836s, with zero model forwards or learner updates.
 Its observer exits0 after.414311s; the main checkpoint observer takes.337602s.
 Co-host CPU time remains in measured training wall time. The recovery service
 is now inactive/success, with the original main and terminal collector still
-active. Training passes109,544 actions/6,824 updates at18:36:44 UTC; this is
-progress, not a frozen gameplay result. No stage is restarted or repeated.
+active at that checkpoint observation. Training passed109,544 actions/6,824
+updates at18:36:44 UTC; that observation was progress, not a frozen gameplay
+result. No stage was restarted or repeated.
+
+## Full200k comparison
+
+Only prediction scale500→1000 changes. The same retained native/runtime,
+teacher, model geometry, initial weights and scheduled updates are used.
+The fresh candidate completes200,000 actions/799,557 emulator frames and
+12,477 updates in1290.370570s, versus1287.910495s retained:0.191% more time.
+Construction takes2.397449s separately. This development point fails retention.
+
+| Frozen measure | Scale1000 | Retained500 |
+|---|---:|---:|
+| Greedy return |77.167|143.667|
+| Sampled return |42.750|70.750|
+| Actual-initial greedy |2.208|2.208|
+| Actual-initial sampled |1.417|1.417|
+| Greedy own-initial gain/min |3.485433|6.590132|
+| Sampled own-initial gain/min |1.921929|3.230038|
+| Final two-wall successes, each mode |0/24|0/24|
+| Training time |21m30.371s|21m27.910s|
+
+Greedy raw difference is−66.500, paired95% interval[−109.208,−30.458]. Primary
+gain/min difference is−3.104699[−5.093525,−1.425874], a47.111% reduction.
+Sampled raw difference is−28.000[−41.583,−14.167]; gain/min difference is
+−1.308110[−1.940473,−.664421], a40.498% reduction. Only one of eight lanes
+improves in each mode. These are10,000-resample intervals over the reused
+eight-lane cohort, not independent training-seed reliability estimates.
+
+Each arm uses the first three natural episodes per lane:24 episodes, zero
+truncations, guidance or learning, and357 invariant tensors. Initial frozen
+semantic traces match retained exactly after documented time fields are
+ignored:799 sampled events and794 greedy events. All357 actual-initial tensors
+and47 pre-update training events also match. No episode is substituted.
+
+| Frozen arm | Aggregate actions | Emulator frames | Seconds |
+|---|---:|---:|---:|
+| Trained sampled |28,016|112,031|17.850785|
+| Initial sampled |5,944|23,719|3.943718|
+| Trained greedy |39,856|159,385|25.043617|
+| Initial greedy |5,936|23,706|3.910018|
+
+All12,477 finite reports,1000-weight world loss totals, behavior loss totals,
+actor sharing, parameter-change checks and checkpoint/config checks pass.
+The complete110.373914s CPU training audit/replay verifies every action, pixel,
+frame, reward, boundary, corrective label and override. Actual overrides cover
+46.1105% of actions;20% denotes episode selection. The265 completed training
+episodes reach at most426 points including tails. There are190,478 actions
+below216 pre-action points and9,522 at216–431, with none at432 or above.
+Guided returns and these coverage counts are not frozen competence.
+
+Training stage times are learning1146.552453s, acting62.822535s, environment
+62.311666s, observe12.404550s, reset1.132791s and checkpoint.564717s. Reported
+learner timing totals1133.173740s, including posterior181.635957, world training
+357.372711, imagination452.467629 and behavior training66.504749s. These are
+wrapper/session measurements, not isolated GPU-kernel costs.
+
+Training completes18:46:36.222 UTC, main18:50:32.434 and terminal collector
+18:51:18.640 UTC November6. All five GPU children exit0 with passing host
+guards; main, recovery and collector are terminal/success. Independent
+1.744101s CPU publication closure at18:52:01.151 verifies137 active/338 retained
+pins,56 completion artifacts,28 checkpoint files,192 candidate/control selected
+episodes and both paired gain/min calculations. No native module is imported
+by that closure, and no service or render holder remains active.
+
+`full/comparison.json`, `report-result.json`, `terminal-summary.json` and
+`publication-closure.json` retain exact results and identities. Checkpoints,
+logs, replay receipts, videos, curves, declarations and the two original CPU
+failures remain outside Git. No full GPU phase failed or repeated; the earlier
+CPU invocations remain failed with their repairs recorded separately.
+
+Retain scale500. This result rejects1000 for this recipe/development comparison;
+it does not establish a representation, gradient-conflict or forecasting cause,
+or reject every use of CDP prediction training. No extension, coefficient sweep,
+second learner or automatic successor follows. The original864/90% two-wall
+gate and unfinished five-game goal are unchanged.

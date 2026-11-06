@@ -8,26 +8,26 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [fresh200k CDP prediction-scale1000 comparison](results/2026-11-06-cdp-breakout-cdp1000.md#verified100k-recovery-during-the-original-run) is running;
-its100k/6,227-update recovery passes independent CPU verification18:36:01.673
-UTC November6. All357 tensors/51,502,659 parameter and optimizer elements,
-config/counters/checksums and137 pins pass. Read-only checkpoint retained;
-recovery observer exits0. Main and terminal collector remain active.
+The [CDP prediction-scale1000 comparison](results/2026-11-06-cdp-breakout-cdp1000.md#full200k-comparison) is complete and negative.
+Fresh200k scores77.167 greedy/42.750 sampled versus retained143.667/70.750,
+in21m30.371s versus21m27.910s (0.191% more time). Primary own-initial gain/min
+falls47.111%; sampled falls40.498%. Both paired gain/min intervals are below
+zero; only1/8 lanes improves in each mode. Retain prediction scale500.
 
-Only prediction loss500→1000 changes, with retained native447fe50 and original
-encoder/teacher/recipe. Startup357 tensors/47 events match; first update376.
-Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`, source5b8d21a1. Main service
-`kindle-breakout-cdp1000-200k-20261106`, PID1532223,
-invocation`d6760fb8ef014cd194dd90a70cb5c0e5`; collector1532226. Observe original
-identities; never restart after an observer timeout. Training, complete replay
-and four frozen24-natural-episode arms remain pending. Follow the
-[fixed protocol](experiments/2026-11-06-cdp-breakout-cdp1000-200k.md); no gameplay result yet.
+All12,477 updates,357 initial/frozen tensors,47 pre-update events, exact initial
+frozen traces, complete training/frozen replays and100k recovery pass. Independent
+CPU closure checks137 active/338 retained pins,56 completion artifacts,
+28 checkpoint files and192 selected candidate/control episodes. Original
+canonical import and full CPU plot-fixture failures remain preserved with
+separate repairs; no GPU stage fails or repeats.
 
-Original canonical import and full CPU plot-fixture failures remain preserved
-with separate repairs. No completed GPU stage repeats; no native build,
-experience transfer, extension, second learner or automatic successor.
-Retain143.667 greedy/70.750 sampled. Original864/90% two-wall and the five-game
-goal remain unfinished. The completed stride-two option stays off.
+Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`, source5b8d21a1,
+native447fe50/SHA35ad0db. Main, recovery and collector are terminal/success;
+publication closure18:52:01.151 UTC November6. No learner or render holder is
+active. No extension, sweep, second learner or automatic successor is selected.
+Do not repeat completed stages. This reused seed/cohort does not establish a
+mechanism or broad reliability. Retain143.667/70.750; original864/90% two-wall
+and the five-game goal remain unfinished. Stride-two stays off.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
