@@ -9,8 +9,11 @@ loss, runtime build or experience transfer changes. Evaluate both new and retain
 positive learning alone does not satisfy the original864/90% two-wall gate.
 
 Root `/x/Temp/kindle-breakout-seed22003-20261106/full`; service
-`kindle-breakout-seed22003-200k-20261106`. Preparation is CPU-only; no learner
-is active. A stale archived replay-helper path caused a preparation copy failure;
+`kindle-breakout-seed22003-200k-20261106`. The learner launches20:36:28.653 UTC November6 fromdcc4dd5d, controller1546932 /
+invocation316ee06c85004cb68a061364822fdc3b. All nine mocked commands and90 input
+pins pass. Startup verifies357 finite tensors, changed encoder/actor random
+weights,47 pre-update events and first update376. Training and independent
+recovery/terminal observers are active. A stale archived replay-helper path caused a preparation copy failure;
 its source/error are preserved, and the continuation uses the verified exact
 retained copy. No native/emulator stage was attempted or repeated.
 
