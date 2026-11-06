@@ -8,20 +8,20 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [contact-horizon risk teacher comparison](experiments/2026-11-06-cdp-breakout-contact-risk.md) is selected for one
-bounded CPU arm:24 natural episodes across eight lanes, development4000001009,
-compared with the retained225.083 teacher. It propagates the existing nine
-command-error second moments to contact within five actions, keeping the mean
-planner fixed and falling back whenever any candidate leaves the interior
-calibration region. The earlier one-step risk failure remains closed.
+The [contact-horizon risk teacher comparison](results/2026-11-06-cdp-breakout-contact-risk.md) is complete and fails
+retention:206.250 versus225.083 (−8.367%), only3/8 improved lanes and0/24 two-wall
+for both. Keep the original teacher. The penalty changes159 first commands in
+40,195 selected decisions, including110 at horizons above one action. The region
+gate leaves no eligible3–5-action cases; this is not a calibrated uncertainty
+model or an empirical five-action test.
 
-Six new CPU fixture groups pass, including independent signed-shock arithmetic,
-one-step equivalence and zero-penalty legacy behavior. All44 preflight pins and
-11 historical artifacts pass; ROM/ALE/adapter match the retained control exactly.
-No emulator is constructed in preflight. Collection/replay caps300s each,
-600k aggregate actions,660s controller; no control rerun or native learner.
-Root `/x/Temp/kindle-breakout-contact-risk-20261106`. No GPU allocation, native
-integration or fresh cohort is selected. Retain original teacher/guidance and
+One CPU candidate completes46,200 actions/184,763 frames in32.161830s; complete
+35.692589s replay matches every decision/pixel/reward/frame/reset/outcome. Six
+new fixture groups,45 declared pins and23 completion artifacts pass. Controller
+68.250249s, closed16:53:43.976 UTC November6, source2ce19be9; independent recount
+passes16:55:32.367. Root `/x/Temp/kindle-breakout-contact-risk-20261106` is closed.
+No control rerun, failure, native learner or GPU work. No fresh cohort, retry,
+integration or automatic successor is selected. Retain original guidance and
 143.667 greedy/70.750 sampled; original864/90% and five-game gates remain open.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
