@@ -1,13 +1,13 @@
 # Kindle: CDP learning roadmap
 
-The [one-step prior reward experiment](experiments/2026-11-06-cdp-breakout-prior-reward.md) is selected for native qualification and a bounded cost check.
-The new default-off loss supervises rewards before the arrival image is seen,
-at every valid replay row; no feature/continuation auxiliary or new parameter.
-The closed posterior reward10 and joint H3 failures remain relevant. All47
-targeted CPU CLI cases pass without native/emulator construction. Rust/native
-qualification and packaging remain. The first Rust graph fixture failed on its
-scalar-zero shape assertion; a separate test-only repair checks zero constants.
-The original failure is preserved. No GPU allocation or full learner is active.
+The [one-step prior reward experiment](results/2026-11-06-cdp-breakout-prior-reward.md) passes corrected CPU/native qualification and default-off frozen compatibility.
+All33 distinct Rust CPU tests,47 CLI cases per runtime, strict Clippy and two
+guarded native fixtures pass. A retained seed22003 frozen prefix matches128
+events and357 tensors at1,024 actions/4,096 frames with zero updates. Original
+CPU assertion/reporting failures remain preserved with separate repairs; no
+GPU stage repeats. Runtimea89b0b8e/SHA19b6f46 is packaged and its build cache
+released. The fixed8,192-action cost check is selected but has not started.
+No full learner or gameplay benefit is established; existing negatives stay closed.
 
 The [completed reward-supervision comparison](results/2026-11-06-cdp-breakout-reward10.md#full200k-comparison) fails retention. Only
 reward loss1→10 changes against retained22003:greedy52.167/sample42.625 versus

@@ -20,25 +20,25 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [one-step prior reward experiment](docs/experiments/2026-11-06-cdp-breakout-prior-reward.md) is selected for native qualification
-and a bounded cost check. Add default-off reward CE on sampled one-step prior
-states at every valid replay row, using the shared reward head and existing
-reward targets. Episode starts are masked; no parameters or inference inputs
-are added. This differs from the closed posterior reward10 and joint H3 tests.
+The [one-step prior reward experiment](docs/results/2026-11-06-cdp-breakout-prior-reward.md) passes corrected native
+qualification and default-off frozen compatibility. Add optional reward CE on
+sampled one-step prior states at every valid replay row, using the existing reward
+head/targets and masking episode starts. No new parameters or inference inputs.
 
-Implementation and47 targeted CPU CLI cases pass with zero native/emulator
-construction. The first Rust CPU graph fixture failed because it treated scalar
-zero-gradient shape as evidence of connectivity. A separate repair checks the
-zero constant directly; production code is unchanged and the failure is retained.
-Rust/native qualification and packaging are next. No GPU allocation
-or full learner is active. Root `/mnt/data/kindle-breakout-prior-reward-20261106`;
-consult the fixed protocol before execution. A full comparison requires the
-bounded check's measured cost and a separate declaration.
+All33 distinct CPU Rust tests,47 CLI cases on each runtime, strict Clippy and two
+guarded GPU fixtures pass after a separate scalar-gradient assertion repair.
+Default-off restore matches128 events and all357 tensors at1,024 actions/4,096
+frames, with zero updates. Its original CPU reporting key error is preserved;
+a separate reader completes the report without repeating the GPU run. All277
+native/502 legacy pins pass. The wheel/runtime/test executable are retained;
+the disposable build cache is released. No gameplay benefit is established.
 
-The [reward10 comparison](docs/results/2026-11-06-cdp-breakout-reward10.md) stays closed and negative:52.167 greedy/42.625
-sampled versus matched22003's75.250/44.708; primary gain/min falls31.086%.
-Retain reward1 and the original teacher. All prior completed failures remain
-retained. Original864/90% two-wall and the full five-game goal remain unfinished.
+The [fixed8,192-action cost check](docs/experiments/2026-11-06-cdp-breakout-prior-reward.md) is selected and remains to be prepared
+and executed. No GPU allocation or learner is active. Root
+`/mnt/data/kindle-breakout-prior-reward-20261106`; nativea89b0b8e/SHA19b6f46.
+A full learner requires the cost gate and a separate declaration. Retain reward1
+and the original teacher; posterior reward10 and joint H3 remain closed negatives.
+Original864/90% two-wall and the full five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
