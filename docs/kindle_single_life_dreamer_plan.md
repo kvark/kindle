@@ -14,14 +14,17 @@ remain; no learned parameters or image changes. Horizon and start distribution
 change with the estimator. CPU helper/comparison/plot and all five exact queued
 command checks pass,365 pins. The guarded learner is active; startup matches all
 357 initial tensors and47 pre-update events to bounded/retained. First update376
-passes. Matching initial frozen traces,100k recovery, full replays, final gameplay
-comparison and original terminal collection remain pending.
+passes. The100k/6,227-update recovery and independent CPU verification pass:
+all357 finite tensors, exact hashes/config, read-only files and365 unchanged pins.
+Matching initial frozen traces, full replays, final gameplay comparison and
+original terminal collection remain pending.
 
 Root `/x/Temp/kindle-actor-expected-value-20261106/full`; service
 `kindle-breakout-actor-expected-value-200k-20261106`, mainPID1491004/invocation
 `9cf81a2d7f52454a9bec3ef5685633b8`, source2de5bd0f, launched13:14:33 UTC.
-Collector1491007 and recovery observer1491010 are active. Inspect these original
-identities; an observer timeout does not authorize a restart.
+Collector1491007 remains active; recovery observer1491010 completes successfully
+at13:28:34 UTC. Inspect the original identities; an observer timeout does not
+authorize a restart.
 Original CPU compile failure stays preserved; corrected CPU/native/bounded stages
 pass, with no repeated GPU stage. No extension, sweep or automatic successor.
 Keep the default off and retain ordinary inference,32×16 and143.667 greedy/70.750

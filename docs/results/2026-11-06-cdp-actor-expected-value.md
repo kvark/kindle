@@ -2,7 +2,7 @@
 
 The bounded check passes execution and cost gates, with **31.350% more training
 time** than retained. Gameplay benefit remains unmeasured; a separately declared
-fresh200k comparison is now running. Startup passes; final gameplay is pending. [Bounded results](#bounded-learning-cost-check-complete).
+fresh200k comparison is now running. Startup and100k recovery pass; final gameplay is pending. [Bounded results](#bounded-learning-cost-check-complete).
 
 The [development protocol](../experiments/2026-11-06-cdp-actor-expected-value.md)
 implements `actor_expected_value`, default false. It replaces the sampled-action
@@ -179,3 +179,20 @@ score or gain/min result exists yet. The100k recovery check, all four frozen
 arms, full action replays, curves, exposure and terminal collection remain pending.
 An observation timeout is not a stopped learner; inspect the original service and
 process before any action. No successor or extension is selected.
+
+## 100k recovery verified; learner continues
+
+The original learner saves100,000 actions/6,227 updates. Its checkpoint review
+passes at **13:28:30.873 UTC November6**; the independent CPU verification passes
+at **13:28:34.052**, taking.328s (.414s including its wrapper). All357 tensors
+(world280/behavior66/slow11) are finite, with exact metadata/config, tensor/file
+hashes and expected shapes. Directory0555/files0444 retain the recovery read-only.
+All365 pinned inputs remain unchanged. The observer performs zero model forwards
+or learner updates and confirms the same live mainPID1491004/invocation before
+and after verification. Its service exits successfully.
+
+The learner and collector remain active under their original identities. This
+checkpoint retains weights/optimizer moments; it does not restore replay, live
+beliefs, game state or complete RNG. CPU observer time remains in measured training
+wall time. Final200k training, four frozen arms, full audits and terminal collection
+remain pending; no gameplay or efficiency conclusion is available.
