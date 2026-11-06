@@ -27,7 +27,10 @@ reward targets. Episode starts are masked; no parameters or inference inputs
 are added. This differs from the closed posterior reward10 and joint H3 tests.
 
 Implementation and47 targeted CPU CLI cases pass with zero native/emulator
-construction. Rust/native qualification and packaging are next. No GPU allocation
+construction. The first Rust CPU graph fixture failed because it treated scalar
+zero-gradient shape as evidence of connectivity. A separate repair checks the
+zero constant directly; production code is unchanged and the failure is retained.
+Rust/native qualification and packaging are next. No GPU allocation
 or full learner is active. Root `/mnt/data/kindle-breakout-prior-reward-20261106`;
 consult the fixed protocol before execution. A full comparison requires the
 bounded check's measured cost and a separate declaration.

@@ -5,7 +5,9 @@ The new default-off loss supervises rewards before the arrival image is seen,
 at every valid replay row; no feature/continuation auxiliary or new parameter.
 The closed posterior reward10 and joint H3 failures remain relevant. All47
 targeted CPU CLI cases pass without native/emulator construction. Rust/native
-qualification and packaging remain; no GPU allocation or full learner is active.
+qualification and packaging remain. The first Rust graph fixture failed on its
+scalar-zero shape assertion; a separate test-only repair checks zero constants.
+The original failure is preserved. No GPU allocation or full learner is active.
 
 The [completed reward-supervision comparison](2026-11-06-cdp-breakout-reward10.md#full200k-comparison) fails retention. Only
 reward loss1→10 changes against retained22003:greedy52.167/sample42.625 versus
