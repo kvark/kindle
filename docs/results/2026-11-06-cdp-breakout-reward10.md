@@ -41,3 +41,20 @@ This qualifies cost and execution, not natural-episode competence. A separate
 selects development22003 with its matching retained final/actual-initial controls
 on cohort4000022003. No experience from the bounded check is transferred. The
 original864/90%-two-wall and full five-game goals remain unfinished.
+
+## Full200k comparison running
+
+Execution source3be21d90 launches21:37:11.656 UTC November6, original PID1552095 /
+invocationf6402af01ae946019805b26479f206de. All263 allocation pins verify. Initial
+357 tensors and47 pre-update actions exactly match retained22003; first update376.
+The100k recovery observer and terminal collector monitor this original service.
+No frozen gameplay result exists yet.
+
+Full-helper checks pass in4.343s. The first actual-command preflight fails before
+native/emulator construction because its forbidden-API test double lacks the
+`act` signature inspected by the runner. The separate repaired fixture adds only
+that signature, still forbids execution and is AST-identical when this method is
+removed. All five commands and four wrong-command checks pass in1.110s with zero
+native/emulator construction and no GPU descriptor. Original source/failure/logs
+remain pinned. The separate launch qualification verifies repair provenance,
+then calls the unchanged declared launcher; no training code, queue or cap changes.

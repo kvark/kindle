@@ -34,8 +34,11 @@ a closure stdout hash sealed before its final line; separate semantic resolution
 and corrected helper checks pass, preserving the failure. No GPU stage repeats.
 
 Root `/mnt/data/kindle-breakout-reward10-20261106/full`, service
-`kindle-breakout-reward10-200k-20261106`; next qualify the exact five queued
-commands and launch once. No GPU job is active at declaration. Retain100k recovery
+`kindle-breakout-reward10-200k-20261106` is running from source3be21d90,
+original PID1552095/invocationf6402af01ae946019805b26479f206de. All357 initial
+tensors and47 pre-update events match22003. Exact five-command CPU qualification
+passes after a separate missing-test-double-signature repair; the original
+failure remains. Training code/queues/limits are unchanged. Retain100k recovery
 and four24-episode frozen arms. No extension, sweep or automatic successor.
 Promising changes require fresh-seed confirmation. The bounded check is closed.
 

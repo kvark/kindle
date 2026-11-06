@@ -9,8 +9,12 @@ stdout pin rejection remains preserved with separate semantic resolution and
 corrected full-helper checks; no GPU repeat. Native447fe50/SHA35ad0db unchanged.
 No extension, sweep or automatic successor; assess frozen gain/min and preserve
 the original864/90% and full five-game gates. Root
-`/mnt/data/kindle-breakout-reward10-20261106/full`; exact queue qualification and
-single launch are next. A reward-loss bottleneck or benefit is not established.
+`/mnt/data/kindle-breakout-reward10-20261106/full` is running from source3be21d90,
+original PID1552095/invocationf6402af01ae946019805b26479f206de. All357 initial
+tensors and47 pre-update events match22003. Five-command CPU qualification
+passes after a separate test-double signature repair; its original failure is
+preserved and execution code/queues/limits are unchanged. A reward-loss bottleneck
+or benefit is not established; await frozen evaluation.
 
 The [pre-contact shot predictor](results/2026-11-06-cdp-breakout-causal-shot.md) is complete and fails its fixed
 screen. Adding planned contact offset lowers holdout slope MAE.691547→.601837
