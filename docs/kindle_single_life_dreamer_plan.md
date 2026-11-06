@@ -1,25 +1,21 @@
 # Kindle: CDP learning roadmap
 
-The [optional fixed-width latent grouping](results/2026-11-06-cdp-latent-shape.md) completes CPU/native
-qualification with a separate test readback repair. At12M,64×8 replaces32×16
-with unchanged512-entry width and parameter shapes/counts. Sampling, KL and
-one-hot activity change together; no gameplay benefit is established.
+The [fixed8,192-action64×8 latent check](experiments/2026-11-06-cdp-latent-shape-bounded.md) is selected after
+native qualification with the separate readback repair. All357 parameter shapes/
+initial tensors must match retained; sampled initial action traces may differ.
+Keep the retained12M64/B16/T16/H15/R16 recipe, changing only categorical grouping.
+Sampling, KL and active one-hot entries change together; no benefit is established.
 
-CPU/package checks pass202 Kindle/5 adapter,36 focused Python and1,139 installed
-Python tests. Original native qualification fails on a fixture API mismatch;
-keep that failure. Test-only indexed reads then pass all F64 categorical values/
-derivatives/samples and two Tiny vector updates, sharing and exact restore.
-Both repaired guards and255 pins pass at11:04:01.865 UTC November6,3.672s wrapper.
-Sourceacc24213 changes only the fixture; original native536012d5/2c9c6e6f remains.
+CPU preflight passes both exact queued CLI commands, missing-shape rejection,
+five changed/shape/extra/missing tensor cases and weighted-loss checks, with zero
+native/emulator construction. Native536012d5/2c9c6e6f and matched runner/teacher
+are pinned; the original native qualification failure remains preserved.
 
-Root `/x/Temp/kindle-latent-shape-20261106`; original and repaired stages are
-closed. CPU closure verifies terminal children/no GPU holders;6.411GB logical
-build cache released with all four package artifacts retained. No GPU allocation,
-Atari learner or bounded check is selected. Next requires a separately declared
-8,192-action cost/replay check; do not repeat qualification or old stages.
-Retain143.667 greedy/70.750 sampled, latent grouping absent/preset32×16,
-actor dynamics/residual/coordinates off. Original864/90%-two-wall and five-game
-gates remain unfinished; no unchanged extension or sweep.
+Root `/x/Temp/kindle-latent-shape-20261106/bounded`; one fresh8,192-action learner
+and1,024-action frozen restore, guards/caps per protocol. No full learner is
+selected. Require finite updates, complete replays,357 frozen invariants and
+measured cost/headroom gates. Do not repeat completed qualification or old jobs.
+Retain143.667 greedy/70.750 sampled, original864/90%-two-wall and five-game gates.
 
 The [frozen residual serving ablation](results/2026-11-06-cdp-residual-actor-serving-ablation.md) is complete and inconclusive.
 Zeroing two correction parameters raises greedy117.625→131.750 and sampled

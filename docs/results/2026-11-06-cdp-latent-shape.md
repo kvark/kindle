@@ -103,3 +103,19 @@ not12M Atari learning, initialized-tensor equivalence or improved efficiency.
 A separate fixed8,192-action cost/replay protocol is the next substantive check;
 no such allocation or full learner is selected here. Keep retained143.667/70.750
 and all original gates unchanged. Do not repeat the closed qualification stages.
+
+## Selected bounded cost/replay check
+
+The [fixed8,192-action protocol](../experiments/2026-11-06-cdp-latent-shape-bounded.md)
+now selects one fresh12M64/64×8 Breakout learner and1,024 frozen greedy actions.
+All other retained settings stay fixed. Require357 equal retained initial
+weights/moments,489 finite updates, full training/frozen replays and357 invariant
+frozen tensors. Initial action traces may differ under changed grouping.
+
+CPU preflight passes in.167s wrapper with zero native/emulator construction:
+both exact queued commands, missing-shape rejection, all357 equality and five
+actor/world/shape/extra/missing negative cases. Same16,334,353 parameters and
+5,939,200,000-byte full replay footprint. Guard/cost/headroom caps follow the
+separate protocol; no full learner or gameplay benefit is established. Root
+`/x/Temp/kindle-latent-shape-20261106/bounded`; original qualification failure
+and successful test-only repair stay retained without repeating either stage.
