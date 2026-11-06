@@ -51,10 +51,51 @@ wall-clock timestamps) and preserve all357 checkpoint tensors. All39 pins and
 both guards pass. Neither native fixture nor frozen arm was repeated; no GPU
 fault or nonfinite result occurred.
 
-A separate [bounded protocol](../experiments/2026-11-06-cdp-actor-dynamics-bounded.md)
-selects one fresh8,192-action/489-update cost and numerics check at coefficient.5,
-followed by1,024 frozen actions. It preserves the retained recipe and tests
-initial tensor/trajectory equality, full action/label replay, weighted loss
-accounting, memory and a30-minute padded200k projection. No full learner is
-selected. Keep coordinates off and Breakout143.667 greedy/70.750 sampled;
-original864/90%-two-wall and five-game gates remain unfinished.
+## Completed bounded cost and numerics check
+
+The separate [bounded protocol](../experiments/2026-11-06-cdp-actor-dynamics-bounded.md)
+passes on documentation source7609cd4a and native744dd793/876ed0c. One fresh
+seed1009 learner with coefficient.5 and the retained recipe completes
+**8,192 actions /32,725 emulator frames /489 updates in58.368809s**.
+Construction takes3.510119s. A subsequent1,024-action/4,096-frame greedy restore
+takes.863110s with zero updates and357 invariant tensors. Both guards pass;
+no fault, nonfinite value, failed stage or stage repeat occurs.
+
+Training takes **22.393% longer** than the retained bounded47.689684s. The
+padded200k projection is **1,567.522s (26m07.522s)**, below the declared30-minute
+cap. Minimum observed native headroom is17,399,513,088 bytes; after subtracting
+the entire5,939,200,000-byte full replay footprint,11,460,313,088 bytes (10.67GiB)
+remain. These are short-run projections, not measured full-learner cost.
+
+Summed learner timings locate the added cost in behavior training:
+**2.502150→13.941962s** across489 updates. Original imagination remains
+16.647413→16.637848s and world training13.612795→13.546420s. Snapshot submission
+adds.142025s; this measures wrapper/submission time and is not an isolated GPU
+copy benchmark. Total reported learner time rises40.438189→51.877643s. The
+new backward pass is affordable here, but must improve learning enough to
+compensate for its cost. Historical timing and changed experience limit causal
+performance attribution; no paired timing repetition was allocated.
+
+All357 actual-initial tensors and47 pre-update transitions match the retained
+control exactly. Both weighted-loss checks pass on all489 reports: maximum
+absolute errors9.825e-5 world and3.714e-5 behavior. Auxiliary loss ranges
+−.371540 to−.012000 (mean−.140876), with finite snapshot timings. Encoder,
+reward, continuation, actor and critic parameters change. Full CPU replay
+reconstructs every training action, reward, frame, boundary and pixel label;
+3,746 overrides are45.728% of actions. Guided training returns are not frozen
+competence.
+
+The actual queued command/configuration paths pass CPU preflight in.167s with
+zero native/emulator construction. All45 allocation pins and237 original source
+pins remain unchanged. Controller and audit finish **05:40:12.457 UTC November6**
+in76.369s; the outer execution receipt succeeds in76.404s. Root
+`/x/Temp/kindle-actor-dynamics-20261106/bounded` is closed. No Atari cost check,
+synthetic fixture, frozen arm or collector should repeat.
+
+No full learner, extension, sweep or automatic successor is selected. This
+establishes native execution and cost feasibility, not useful policy derivatives,
+gameplay improvement or a SuperMimic-like efficiency gain. The next substantive
+learning comparison would need a separately declared fresh budget and frozen
+actual-initial controls, judged by return gained per training minute. Keep
+coordinates off and Breakout143.667 greedy/70.750 sampled; original864/90%-two-wall
+and five-game gates remain unfinished.

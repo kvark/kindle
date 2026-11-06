@@ -5,16 +5,23 @@ initial states/draws as imagination; actor gradients traverse dynamics and froze
 reward/continuation/critic heads. Categorical straight-through derivatives are
 biased; disagreement values, trajectory weights and normalization stay detached.
 The existing actor losses remain, with one optimizer and no added trainable
-weights or checkpoint tensors. Default off; a separate bounded cost check is selected.
+weights or checkpoint tensors. Default off; its bounded cost check is now complete.
 
 [Qualification](results/2026-11-06-cdp-actor-dynamics.md) passes188 Kindle+5 gym tests,1,108 packaged Python tests, strict
 workspace/binding Clippy and guarded F64/production/snapshot/restore checks.
 Default-off final/initial policies reproduce2,048 frozen actions and preserve357
 tensors each. Original preparation failures remain; no GPU stage repeats.
-A separate [8,192-action check](experiments/2026-11-06-cdp-actor-dynamics-bounded.md) fixes coefficient.5 with the retained recipe and tests cost,
-numerics and memory before any full allocation. Source744dd793/native876ed0c;
-root `/x/Temp/kindle-actor-dynamics-20261106`. Build cache released; no full
-learner selected. Original Breakout864/90% and five-game gates remain unfinished.
+The [bounded result](results/2026-11-06-cdp-actor-dynamics.md#completed-bounded-cost-and-numerics-check) completes8,192 actions/32,725 frames/489 updates in58.369s,
+22.39% longer than retained47.690s. Behavior training rises2.502→13.942s;
+imagination/world time is essentially unchanged. The26m07.522s padded200k
+projection and10.67GiB conservative replay headroom pass. All357 initial tensors,
+47 pre-update events,weighted losses,full pixel/action replay,357 frozen tensors,
+45 allocation/237 source pins and guards pass. No failed or repeated stage.
+Controller closes05:40:12.457 UTC November6/source7609cd4a/native744dd793.
+Root `/x/Temp/kindle-actor-dynamics-20261106/bounded` is closed; no full learner,
+extension or automatic successor is selected. Numerical correctness and cost
+feasibility do not establish gameplay improvement or useful model derivatives.
+Original Breakout864/90% and five-game gates remain unfinished.
 
 The [completed coordinate-channel comparison](results/2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison)
 finishes 200k actions / 799,523 frames / 12,477 updates in **20m58.414s**.

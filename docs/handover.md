@@ -21,10 +21,17 @@ fixtures. Default-off final/initial policies reproduce2,048 frozen actions and
 preserve357 tensors per arm. All preparation failures remain recorded; no GPU
 stage repeats. Build cache is released after verified packaging.
 
-One fresh [8,192-action cost/numerics check](experiments/2026-11-06-cdp-actor-dynamics-bounded.md)
-is selected at coefficient.5 with the retained12M64/Auto/N8/B16/T16/H15/R16
-recipe, then1,024 frozen actions. No full learner is selected. Root
-`/x/Temp/kindle-actor-dynamics-20261106`; consult the protocol before execution.
+The [bounded cost check](results/2026-11-06-cdp-actor-dynamics.md#completed-bounded-cost-and-numerics-check)
+is complete:8,192 actions/32,725 frames/489 updates in58.369s,22.39% longer than
+retained47.690s. Padded200k projection26m07.522s and10.67GiB conservative replay
+headroom pass. All357 initial tensors/47 pre-update events,weighted losses,
+full pixel/action replay and357 frozen tensors pass. Main completes05:40:12.457
+UTC November6 with no failed/repeated stage. Behavior training accounts for the
+added cost; no gameplay benefit is established.
+
+Root `/x/Temp/kindle-actor-dynamics-20261106/bounded` is closed. No full learner,
+extension, sweep or automatic successor is selected; no GPU allocation remains
+active at closure. A learning-benefit comparison needs a separate declaration.
 
 The [coordinate comparison](results/2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison) is closed and
 negative: 66.333 greedy / 35.917 sampled in20m58.414s. Retain coordinates off and
