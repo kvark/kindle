@@ -9,9 +9,11 @@ UTC November6. This short historical timing does not establish a speedup.
 
 The candidate keeps the retained12M64/B16/T16/H15/R16 recipe and changes only
 32×16→64×8 categorical grouping. Parameter shapes/counts stay fixed; sampling,
-KL and active one-hot entries change together. CPU full-comparison helpers pass
-in3.554s with no native/emulator construction. Exact queues must pass before
-launch. Keep native536012d5/2c9c6e6f; original qualification failure remains failed.
+KL and active one-hot entries change together. CPU helpers pass in3.554s and five-command preflight in.437s with zero native/
+emulator construction and356 pins. The original main/recovery/collector are
+active from11:16:40.300 UTC November6/sourceeda94b80. Startup passes all357 bounded/
+retained initial tensors and47 bounded pre-update events. Keep native536012d5/
+2c9c6e6f; original qualification failure remains failed.
 
 Root `/x/Temp/kindle-latent-shape-20261106/full`, service
 `kindle-breakout-latent-shape-200k-20261106`. One fresh200k learner,100k recovery,

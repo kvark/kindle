@@ -161,3 +161,21 @@ Four frozen24-natural-episode arms measure actual-initial and final policies.
 No bounded experience is transferred; no full result or gameplay benefit exists
 yet. Exact five-command preflight must pass before launch. Original864/90% and
 five-game gates remain unchanged.
+
+## Full comparison launched
+
+At11:16:40.300 UTC November6, sourceeda94b80 launches the fixed comparison under
+`kindle-breakout-latent-shape-200k-20261106`. Main PID1464984/invocation
+`eb874d2d6b8f4abd9ca4e97148e4f0de`, collector1464987/
+`031409b24d4f4f4791cc97f2e44947ad`, recovery observer1464990/
+`9e6a4019ce22401c9668689b3817c261` are independently recorded in launch receipts.
+Exact five-command preflight passes in.437s with356 pins, three rejected training
+changes, both replay argv paths and zero native/emulator construction.
+
+Startup passes all357 bounded initial tensors and all357 retained initial tensors,
+plus47 bounded pre-update semantic events. The descriptive retained comparison
+also observes47 matching events; equality was not required for changed grouping.
+No frozen initial or final score has been measured yet. The original service is
+active; no new source/runtime edit, repeat, extension or successor is selected.
+Follow its original identity and observers through completion rather than
+restarting after an observation timeout. The fixed protocol remains unchanged.
