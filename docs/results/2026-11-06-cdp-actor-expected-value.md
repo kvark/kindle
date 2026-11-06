@@ -131,7 +131,7 @@ labels and frozen outcomes/frames/boundaries. All253 source/51 execution pins,
 host guards and queue/audit receipts pass. Source `ad5fa2934cdc9820795031359e567d2b6a19757e`,
 controller1489646 completes **13:06:26.569 UTC November6**,81.268s including
 checks (outer wrapper81.309s). The read-only publication closure completes
-**13:07:03.835 UTC** in.085s, confirming original controller/children gone,
+**13:07:03.835 UTC** in.072s, confirming original controller/children gone,
 no Kindle service/render holder, initial/trace/frozen identities and cost math.
 No GPU stage or audit fails/repeats. Original compile failure remains preserved.
 
