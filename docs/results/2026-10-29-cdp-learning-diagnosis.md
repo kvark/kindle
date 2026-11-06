@@ -1,5 +1,13 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [new actor-update diagnostic](../experiments/2026-11-06-cdp-dynamics-actor-update.md) is implemented and CPU-qualified
+(192 Kindle/5 adapter tests, strict Clippy). It reuses the two archived November3
+behavior batches to measure the added dynamics.5 gradient and its interaction
+with clipping, preconditioning and saved momentum. Exact rollout/target checks
+gate the new backward passes. Release packaging and the separately guarded job
+are next; zero learner updates or new training allocation. Earlier completed
+probes and negative learners remain closed.
+
 The [frozen action-path probe](2026-11-06-cdp-breakout-action-path-derivatives.md)
 is closed. Recorded-plan return gradients favor81/92 known short rescues for
 control and80/92 for candidate; full-plan predictions favor71/92 and73/92.

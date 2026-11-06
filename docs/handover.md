@@ -8,29 +8,21 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [frozen action-path probe](results/2026-11-06-cdp-breakout-action-path-derivatives.md)
-is closed. At92 short rescues, recorded-plan return gradients favor teacher81/92
-control and80/92 candidate; full-plan predictions favor71/92 and73/92. At18
-differing game-over origins, survival gradients favor12/18 and8/18, agreeing
-with finite plan differences10/18 and7/18. Recorded terminal plans still receive
-.970267/.967395 discounted survival despite actual zero. This does not show
-generally reversed return gradients or isolate the full learner regression.
+The [dynamics actor-update diagnostic](experiments/2026-11-06-cdp-dynamics-actor-update.md)
+is implemented for the two archived November3 behavior batches. All192 Kindle
+and5 adapter CPU tests and strict Clippy pass; release packaging is next.
+The native probe must reconstruct the original actions, latent rollout and
+normalized targets before measuring the new dynamics.5 and combined gradients.
+It then compares conditional AGC/LaProp updates from the same saved moments.
+Zero Atari actions, learner updates or optimizer steps; no new learner selected.
+Root `/x/Temp/kindle-dynamics-actor-update-20261106`.
 
-All775 production pins,43 frozen GPU input tensors per model,checkpoint hashes,
-19 identical-plan zero checks and guards pass. Native1.676s/.949s; controller6.029s
-complete07:06:43.521 UTC November6, CPU analysis.417s and closure07:11:32.503.
-Zero Atari actions, learner or optimizer updates; no failed/repeated production
-stage. Root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair`, source
-b7d45c32/SHAf564ec90, selection65f1a9ac. No active allocation or successor selected.
-
-Original toy-shape qualification failure and separate repair remain preserved.
-Repaired18 F64 derivatives and Tiny forward checks pass; earlier CPU/Clippy and
-preparation failures remain linked. Both packaged binaries are retained; the
-5,610,733,853-logical-byte disposable build cache is released. Never rerun the
-probe, old captures or collectors. Fixed plans omit actor feedback and optimizer
-interactions; those remain unresolved. Retain `actor_dynamics_scale=None`,
-coordinates off and143.667/70.750 control. Original864/90%-two-wall and five-game
-gates remain unfinished.
+The [completed fixed-plan probe](results/2026-11-06-cdp-breakout-action-path-derivatives.md)
+does not show generally reversed return directions, while survival remains
+poorly calibrated. The full dynamics.5 learner is closed and negative. Preserve
+those results, failures and original collectors; do not rerun completed stages.
+Keep actor dynamics off, coordinates off and retained143.667/70.750 control.
+Original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
