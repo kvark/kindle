@@ -8,28 +8,23 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) has a separately declared
-fresh200k-action Breakout comparison running. Bounded cost falls47.690→41.940s
-(12.06%); native values/derivatives, restore, default-off compatibility, exact
-initial/frozen tensors and replay checks pass. Original CPU fixture compile
-failure remains preserved; no completed stage repeats.
+The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) comparison is complete and negative.
+Fresh200k scores16.458 greedy/13.000 sampled versus143.667/70.750 retained.
+Training takes19m22.697s versus21m27.910s (9.722% less), but primary own-initial
+gain/min falls88.580%; all eight lanes regress in both modes. Keep stride-two
+off and retain the original convolution/max-pool encoder. Sampling/nonlinearity
+change together; the result does not isolate a perceptual cause.
 
-Use native `cde123e1`, the matching runner and retained12M/RGB64/B16/T16/R16/Auto
-recipe/teacher; only `rgb_stride2` is enabled. No check experience transfers.
-Fixed200k actions/12,477 updates,25min training cap,100k recovery; four frozen
-24-natural-episode arms compare final and own actual-initial sampled/greedy.
-Greedy raw return and own-initial gain/min, with a positive paired lane interval,
-are the retention criteria. Initial tensors match; encoder outputs may differ.
-Root `/x/Temp/kindle-rgb-stride2-20261106/full`; source `8d4ab88d`.
-CPU helpers and all five queued commands pass with zero model/emulator
-construction. Main PID1528001/invocation `6304e163ba8d4aa5a831bfa602f2eb77`
-started17:32:44 UTC November6; terminal collector remains attached. Startup
-passes357 initial tensors/47 same-stride events, first update376. The100k/6,227
-recovery passes an independent CPU check at17:42:45 UTC:357 finite tensors,
-372 pins and read-only files; original learner identity unchanged. Recovery
-observer is complete. Inspect live service identity; no restart on timeout.
-No extension, second learner or automatic successor. Keep retained143.667
-greedy/70.750 sampled; original864/90% two-wall and five-game goal unfinished.
+All12,477 updates,357 initial/frozen tensors, full action/label replays,100k
+recovery,372 active/338 retained pins and original services pass. Independent
+CPU closure recounts192 candidate/control episodes,55 completion artifacts and
+28 checkpoint files. Original CPU fixture compile failure remains preserved;
+no GPU stage repeats. Root `/x/Temp/kindle-rgb-stride2-20261106/full`, source
+`8d4ab88d`, native `cde123e1`; closure17:57:14.858 UTC November6.
+Main, recovery and terminal services are complete; no render holder or learner
+is active. No successor is selected. Do not repeat completed stages. Keep
+retained143.667 greedy/70.750 sampled; original864/90% two-wall and five-game
+goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

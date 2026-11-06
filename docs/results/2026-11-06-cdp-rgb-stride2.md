@@ -1,4 +1,4 @@
-# Optional stride-two RGB encoder: qualification
+# Optional stride-two RGB encoder: completed negative learning comparison
 
 The [default-off experiment](../experiments/2026-11-06-cdp-rgb-stride2.md)
 implements `rgb_stride2` and fresh CLI `--rgb-stride2`. Four stride-two5×5
@@ -9,8 +9,9 @@ latent/control dimensions remain unchanged. Decoder graphs remain exact.
 The encoder convolutions compute one quarter of their former output positions;
 no encoder max-pool follows them. This changes sampling and nonlinear reduction,
 so behavior can change. The operation count alone does not establish speedup.
-Learning quality remains unmeasured; the bounded training-cost result below is
-a historical comparison, not a paired timing benchmark. Native max-pooled
+The fresh200k comparison below regresses both frozen modes despite9.722% less
+training time. Keep the option off. This is one reused development seed and a
+historical timing comparison, not a broad reliability or isolated-cause result. Native max-pooled
 RGB and the existing single GPU resize remain; no labels or emulator state enter
 the model. The earlier pixel diagnostic already recovers precise ball positions
 fromRGB64, so resizing alone is not a sufficient explanation of feature errors.
@@ -143,7 +144,7 @@ RGB64 teacher/recipe and143.667 greedy/70.750 sampled until useful learning is
 measured. Original864/90% two-wall and five-game gates remain unfinished.
 
 
-## Fresh200k comparison running
+## Completed fresh200k comparison
 
 The [separate fixed-budget protocol](../experiments/2026-11-06-cdp-breakout-rgb-stride2-200k.md)
 selects one fresh200k-action/12,477-update learner. The measured12.056% bounded
@@ -184,6 +185,87 @@ This preserves weights and moments, not replay, live games/beliefs or complete
 RNG state. At the following live observation, training has passed105,832 actions/
 6,591 updates; the terminal collector remains attached.
 
-Training completion and frozen outcomes remain pending. Inspect live service/child
-identity before any action; observer timeout is not a stopped learner. No automatic
-extension, second learner or successor is selected; retained default unchanged.
+Training completes at17:52:11.444 UTC, the main pipeline at17:55:06.192 UTC
+and original terminal collection at17:55:17.128 UTC November6. The original
+main, recovery and terminal services exit successfully; all GPU children are
+terminal and gone. No render holder or running Kindle service remains.
+
+
+### Fixed-budget outcome
+
+| Measure | Retained convolution/max-pool | Stride-two |
+|---|---:|---:|
+| Training actions /updates |200,000 /12,477|200,000 /12,477|
+| Actual emulator frames |799,595|799,452|
+| Training wall time |21m27.910s|19m22.697s|
+| Final greedy mean |143.667|16.458|
+| Actual-initial greedy mean |2.208|1.875|
+| Greedy own-initial gain/min |6.590132|.752561|
+| Final sampled mean |70.750|13.000|
+| Actual-initial sampled mean |1.417|1.667|
+| Sampled own-initial gain/min |3.230038|.584847|
+| Final two-wall successes |0/24 in both modes|0/24 in both modes|
+
+The candidate uses9.722% less training time but loses88.580% primary greedy
+own-initial gain/min and81.893% sampled gain/min. All eight lanes regress in both
+raw return and gain/min for both modes. The paired eight-lane95% intervals are:
+
+- Greedy raw return difference:−127.208, interval[−164.500,−93.000].
+- Greedy gain/min difference:−5.837571, interval[−7.573528,−4.251078].
+- Sampled raw return difference:−57.750, interval[−67.708,−47.833].
+- Sampled gain/min difference:−2.645191, interval[−3.106194,−2.193570].
+
+These are10,000-resample lane intervals on reused seed1009/cohort4000001009,
+not training-seed reliability intervals. The fixed retention criterion fails.
+Candidate final greedy range9–26 and sampled6–31 remain far below the original
+mean864/90% two-wall gate. Own actual-initial controls are required because the
+changed encoder produces different initial behavior despite identical weights.
+
+| Frozen arm | Aggregate actions | Emulator frames | Wall time | Selected mean |
+|---|---:|---:|---:|---:|
+| Final sampled |15,528|62,080|8.336s|13.000|
+| Actual-initial sampled |6,664|26,589|3.952s|1.667|
+| Final greedy |16,304|65,180|9.055s|16.458|
+| Actual-initial greedy |5,536|22,109|3.267s|1.875|
+
+Each arm selects the first3 natural episodes per lane,24 total, with no
+truncation, guidance, labels or learning. All357 tensors/moments remain exact.
+Action/reward/frame/outcome replay and videos pass for all four arms. Frozen
+logs lack live image hashes; replay does not prove unrecorded image equality.
+
+### Execution and limits
+
+All12,477 learner reports are finite; independent world/behavior loss sums,
+parameter changes, actor sharing, cadence, config and initial identity pass.
+Full training replay verifies all200,000 actions, native pixel policy decisions,
+corrective labels, overrides, rewards, frames and boundaries in98.206s including
+CPU audit. Actual overridden fraction is58.0985%;20% applies to episode selection.
+Guided online data are not frozen competence. There are357 completed training
+episodes, maximum score419 including tails, and no exposure at pre-action score432
+or above. The50k-window reported imitation loss declines1.272→.862→.752→.628;
+that decline does not establish independent control competence.
+
+Training stage times: learning1,018.866s, acting62.572s, environment62.211s,
+observation12.386s, reset1.536s and checkpoint.524s. Agent construction2.465s
+is separate. Reported learner components total1,006.157s, including posterior
+133.918s, world training270.686s, imagination459.783s and behavior training66.992s.
+These elapsed times include synchronization/host work; CPU observer time remains
+in training wall time. The full-run saving is smaller than the12.056% bounded
+saving, and neither establishes useful learning efficiency.
+
+Publication closure at **17:57:14.858 UTC November6** independently recounts all
+192 candidate/control natural episodes and both paired gain/min intervals,
+verifies372 active and338 retained pins,55 completion artifacts and28 checkpoint
+files, original service identities and five terminal GPU children. It takes1.742s
+on CPU with no native import. Root retains `publication-closure.json`,
+`comparison.json`, `completion.json`, `terminal-summary.json`,
+`recovery-verification.json`, all checkpoints/logs/replays/videos and curves.
+Source `8d4ab88d`, native `cde123e1`; original CPU fixture compile failure and
+repair remain preserved. No full-run stage failed or repeated.
+
+Keep `rgb_stride2` off and the retained convolution/max-pool encoder. This recipe
+changes sampling and nonlinear reduction together; numerical qualification and
+parameter identity do not isolate why learning regresses. It does not reject all
+cheaper encoders or prove a general max-pooling advantage. No extension, second
+learner, diagnosis or successor is automatically selected. Retain143.667 greedy/
+70.750 sampled; original864/90% two-wall and the five-game goal remain unfinished.
