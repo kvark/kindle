@@ -13,6 +13,8 @@ use super::networks::{
 };
 use crate::vision::levjepa::joint;
 mod prior_continuation;
+#[cfg(test)]
+mod prior_reward;
 mod terminal_continuation;
 #[cfg(test)]
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
@@ -40,6 +42,8 @@ pub const LOSS_COLOR_CENTROID: usize = 19;
 pub const COLOR_CENTROID_VALID_FRACTION: usize = 20;
 pub const LOSS_PRIOR_CONTINUATION: usize = 21;
 pub const PRIOR_CONTINUATION_VALID_FRACTION: usize = 22;
+pub const LOSS_PRIOR_REWARD: usize = 23;
+pub const PRIOR_REWARD_VALID_FRACTION: usize = 24;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 mod cdp;
@@ -362,6 +366,8 @@ fn training_graph(
     let mut prior_states = Vec::new();
     let mut prior_continuation_losses = Vec::new();
     let mut prior_continuation_valid = Vec::new();
+    let mut prior_reward_losses = Vec::new();
+    let mut prior_reward_valid = Vec::new();
     let mut actions = Vec::new();
 
     for time in 0..length {
@@ -402,13 +408,18 @@ fn training_graph(
             batch,
         );
         let prior_logits = model.dynamics.prior.forward(&mut graph, deter, batch);
-        if config.prior_continuation_scale.is_some() {
+        if config.prior_continuation_scale.is_some() || config.prior_reward_scale.is_some() {
             prior_states.push(prior_continuation::state(
                 &mut graph,
                 config,
                 deter,
                 prior_logits,
                 time,
+                if config.prior_reward_scale.is_some() {
+                    "prior_reward"
+                } else {
+                    "prior_continuation"
+                },
             ));
         }
         let posterior_logits =
@@ -642,7 +653,7 @@ fn training_graph(
             ),
             None => mean_binary_cross_entropy(&mut graph, continuation, continuation_target, rows),
         });
-        if config.prior_continuation_scale.is_some() {
+        if config.prior_continuation_scale.is_some() || config.prior_reward_scale.is_some() {
             let start = group * time_batch_length;
             let prior = stack_time(
                 &mut graph,
@@ -650,16 +661,27 @@ fn training_graph(
                 batch,
                 config.feature_dim(),
             );
-            let logits = model.heads.continuation.forward(&mut graph, prior);
             let keep = graph.sum_inner(keep_action);
             let keep = graph.scale(keep, 1.0 / config.action_count as f32);
-            prior_continuation_losses.push(prior_continuation::loss(
-                &mut graph,
-                logits,
-                continuation_target,
-                keep,
-            ));
-            prior_continuation_valid.push(graph.mean_all(keep));
+            if config.prior_reward_scale.is_some() {
+                let logits = model.heads.reward.forward(&mut graph, prior);
+                prior_reward_losses.push(weighted_cross_entropy(
+                    &mut graph,
+                    logits,
+                    reward_target,
+                    keep,
+                ));
+                prior_reward_valid.push(graph.mean_all(keep));
+            } else {
+                let logits = model.heads.continuation.forward(&mut graph, prior);
+                prior_continuation_losses.push(prior_continuation::loss(
+                    &mut graph,
+                    logits,
+                    continuation_target,
+                    keep,
+                ));
+                prior_continuation_valid.push(graph.mean_all(keep));
+            }
         }
         let replay_value_state = if config.replay_value_gradient {
             state
@@ -827,6 +849,18 @@ fn training_graph(
     } else {
         total
     };
+    let prior_reward = config.prior_reward_scale.map(|scale| {
+        let loss = sum(&mut graph, &prior_reward_losses);
+        let loss = graph.scale(loss, head_average);
+        let valid = sum(&mut graph, &prior_reward_valid);
+        let valid = graph.scale(valid, head_average);
+        (graph.scale(loss, scale), loss, valid)
+    });
+    let total = if let Some((scaled, _, _)) = prior_reward {
+        graph.add(total, scaled)
+    } else {
+        total
+    };
     let mut outputs = vec![
         total,
         reconstruction,
@@ -870,6 +904,12 @@ fn training_graph(
     }
     if let Some((_, loss, valid)) = prior_continuation {
         while outputs.len() < LOSS_PRIOR_CONTINUATION {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([loss, valid]);
+    }
+    if let Some((_, loss, valid)) = prior_reward {
+        while outputs.len() < LOSS_PRIOR_REWARD {
             outputs.push(graph.scalar(0.0));
         }
         outputs.extend([loss, valid]);

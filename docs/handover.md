@@ -8,27 +8,22 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [reward-supervision comparison](results/2026-11-06-cdp-breakout-reward10.md#full200k-comparison) is complete and negative. Reward
-loss1→10 scores52.167 greedy/42.625 sampled versus matched22003's75.250/44.708,
-in21m20.465s versus21m30.822s. Primary own-initial gain/min falls31.086%; its
-paired95% interval is entirely negative. Sampled falls4.094% with an interval
-crossing zero. All0/24 two-wall. Retain reward scale1; no general causal claim.
+The [one-step prior reward experiment](experiments/2026-11-06-cdp-breakout-prior-reward.md) is selected for native qualification
+and a bounded cost check. Add default-off reward CE on sampled one-step prior
+states at every valid replay row, using the shared reward head and existing
+reward targets. Episode starts are masked; no parameters or inference inputs
+are added. This differs from the closed posterior reward10 and joint H3 tests.
 
-The run completes200k actions/799,583 frames/12,477 updates. All263 allocation/
-338 original retained pins,55 completion artifacts,28 checkpoint files,100k
-recovery, initial/frozen tensor checks, full replays and original services pass.
-Independent CPU closure recounts192 evaluation episodes and all learner totals;
-complete22:03:43.920 UTC November6, execution source3be21d90. Original CPU
-preparation/import failures remain preserved with separate repairs. No GPU repeat.
+Implementation and47 targeted CPU CLI cases pass with zero native/emulator
+construction. Rust/native qualification and packaging are next. No GPU allocation
+or full learner is active. Root `/mnt/data/kindle-breakout-prior-reward-20261106`;
+consult the fixed protocol before execution. A full comparison requires the
+bounded check's measured cost and a separate declaration.
 
-Root `/mnt/data/kindle-breakout-reward10-20261106/full` is closed. No active
-learner, collector or render holder. No extension, coefficient sweep, second
-learner or automatic successor is selected. Original864/90% two-wall and the
-full five-game goal remain unfinished. Do not repeat completed stages.
-
-The pre-contact shot predictor stays closed and failed; keep the original
-teacher. Retained22003's75.250/44.708 and1009's94.625/70.500 on the shared cohort
-show material seed variation. Keep the retained recipe; do not promote a seed.
+The [reward10 comparison](results/2026-11-06-cdp-breakout-reward10.md) stays closed and negative:52.167 greedy/42.625
+sampled versus matched22003's75.250/44.708; primary gain/min falls31.086%.
+Retain reward1 and the original teacher. All prior completed failures remain
+retained. Original864/90% two-wall and the full five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

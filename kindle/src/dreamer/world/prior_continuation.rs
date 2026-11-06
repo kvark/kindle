@@ -6,13 +6,11 @@ pub(super) fn state(
     deter: NodeId,
     logits: NodeId,
     time: usize,
+    name: &str,
 ) -> NodeId {
     let size = config.network();
     let rows = config.batch_size * size.stoch;
-    let uniforms = graph.input(
-        &format!("prior_continuation_uniforms_{time}"),
-        &[rows, size.classes],
-    );
+    let uniforms = graph.input(&format!("{name}_uniforms_{time}"), &[rows, size.classes]);
     let sample = gumbel_sample(graph, logits, uniforms, rows, size.classes, config.unimix);
     let sample = graph.stop_gradient(sample);
     let probabilities = mixed_probabilities(graph, logits, rows, size.classes, config.unimix);

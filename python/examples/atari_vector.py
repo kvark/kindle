@@ -153,6 +153,8 @@ def main():
                         help="fresh CDP only: posterior continuation loss multiplier for true game-over rows")
     parser.add_argument("--prior-continuation-scale", type=float,
                         help="fresh CDP only: auxiliary continuation loss on sampled one-step priors")
+    parser.add_argument("--prior-reward-scale", type=float,
+                        help="fresh CDP only: auxiliary reward loss on sampled one-step priors")
     parser.add_argument("--actor-dynamics-scale", type=float,
                         help="add normalized return gradients through frozen imagined dynamics; default off")
     parser.add_argument("--actor-expected-value", action="store_true",
@@ -313,6 +315,13 @@ def main():
                 or args.open_loop_length is not None or args.open_loop_scale is not None
                 or args.terminal_continuation_weight is not None):
             parser.error("prior-continuation-scale requires fresh CDP without open-loop or terminal weighting")
+    if args.prior_reward_scale is not None:
+        if not positive_f32(args.prior_reward_scale):
+            parser.error("prior-reward-scale must be finite and positive in F32")
+        if (args.restore or args.evaluate or not args.cdp or args.encoder_training
+                or args.open_loop_length is not None or args.open_loop_scale is not None
+                or args.prior_continuation_scale is not None):
+            parser.error("prior-reward-scale requires fresh CDP without open-loop or prior continuation")
     if args.replay_value_bootstrap is not None and args.evaluate:
         parser.error("replay-value-bootstrap requires fresh training")
     if args.replay_value_completed:
@@ -572,6 +581,7 @@ def main():
     training_options.add("--discount-horizon")
     training_options.add("--terminal-continuation-weight")
     training_options.add("--prior-continuation-scale")
+    training_options.add("--prior-reward-scale")
     training_options.add("--replay-value-completed")
     training_options.add("--replay-actor-scale")
     training_options.add("--actor-dynamics-scale")
@@ -638,6 +648,8 @@ def main():
         parser.error("return life boundaries require native actor-return boundary support")
     if args.replay_context is not None and args.replay_context > 1 and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_CONTEXT", False):
         parser.error("replay-context requires native prefix support")
+    if args.prior_reward_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_REWARD", False):
+        parser.error("prior-reward scale requires native prior-reward support")
     if args.prior_continuation_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_CONTINUATION", False):
         parser.error("prior-continuation scale requires native prior-continuation support")
     if args.terminal_continuation_weight is not None and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_CONTINUATION_WEIGHT", False):
@@ -674,6 +686,9 @@ def main():
         if (metadata.get("config", {}).get("actor_hidden_units") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_HIDDEN_UNITS", False)):
             parser.error("actor width checkpoint requires native actor width support")
+        if (metadata.get("config", {}).get("prior_reward_scale") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_REWARD", False)):
+            parser.error("prior-reward checkpoint requires native prior-reward support")
         if (metadata.get("config", {}).get("prior_continuation_scale") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_CONTINUATION", False)):
             parser.error("prior-continuation checkpoint requires native prior-continuation support")
@@ -864,6 +879,8 @@ def main():
             config["terminal_continuation_weight"] = args.terminal_continuation_weight
         if args.prior_continuation_scale is not None:
             config["prior_continuation_scale"] = args.prior_continuation_scale
+        if args.prior_reward_scale is not None:
+            config["prior_reward_scale"] = args.prior_reward_scale
         if args.replay_value_completed:
             config["replay_value_completed"] = True
         if args.replay_actor_scale is not None:

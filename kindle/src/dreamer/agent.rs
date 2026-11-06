@@ -174,6 +174,10 @@ pub struct WorldMetrics {
     pub prior_continuation_loss: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prior_continuation_valid_fraction: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prior_reward_loss: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prior_reward_valid_fraction: Option<f32>,
     pub replay_reward_prediction_mean: f32,
     pub replay_reward_target_mean: f32,
     pub replay_reward_mae: f32,
@@ -1812,12 +1816,19 @@ impl DreamerCore {
                     }
                 }
 
-                if self.config.prior_continuation_scale.is_some() {
+                if self.config.prior_continuation_scale.is_some()
+                    || self.config.prior_reward_scale.is_some()
+                {
+                    let name = if self.config.prior_reward_scale.is_some() {
+                        "prior_reward"
+                    } else {
+                        "prior_continuation"
+                    };
                     let uniforms = (0..chunk_length)
                         .map(|time| {
                             (
                                 self.world_train
-                                    .input_buffer(&format!("prior_continuation_uniforms_{time}"))
+                                    .input_buffer(&format!("{name}_uniforms_{time}"))
                                     .unwrap(),
                                 microbatch_rows * stochastic_width,
                             )
@@ -1900,6 +1911,12 @@ impl DreamerCore {
                 #[cfg(test)]
                 meganeura::profiler::record_instant("phase:world_wait_done");
                 metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
+                if self.config.prior_reward_scale.is_some() {
+                    *metrics.prior_reward_loss.get_or_insert(0.0) +=
+                        read_scalar(&self.world_train, world::LOSS_PRIOR_REWARD);
+                    *metrics.prior_reward_valid_fraction.get_or_insert(0.0) +=
+                        read_scalar(&self.world_train, world::PRIOR_REWARD_VALID_FRACTION);
+                }
                 if self.config.prior_continuation_scale.is_some() {
                     *metrics.prior_continuation_loss.get_or_insert(0.0) +=
                         read_scalar(&self.world_train, world::LOSS_PRIOR_CONTINUATION);
@@ -1967,6 +1984,8 @@ impl DreamerCore {
         for value in [
             &mut metrics.prior_continuation_loss,
             &mut metrics.prior_continuation_valid_fraction,
+            &mut metrics.prior_reward_loss,
+            &mut metrics.prior_reward_valid_fraction,
         ]
         .into_iter()
         .flatten()

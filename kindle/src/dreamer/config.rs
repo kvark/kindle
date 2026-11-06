@@ -377,6 +377,9 @@ pub struct DreamerConfig {
     /// Auxiliary continuation BCE on sampled one-step priors; reset rows are masked.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prior_continuation_scale: Option<f32>,
+    /// Auxiliary reward CE on sampled one-step priors; reset rows are masked.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prior_reward_scale: Option<f32>,
     /// Replay samples per action. Zero disables scheduled updates; explicit
     /// `DreamerCore::learn` remains available for isolated diagnostics.
     pub train_ratio: f32,
@@ -507,6 +510,7 @@ impl DreamerConfig {
             terminal_replay_fraction: None,
             terminal_continuation_weight: None,
             prior_continuation_scale: None,
+            prior_reward_scale: None,
             train_ratio: 32.0,
             imagination_length: 15,
             horizon: 333,
@@ -995,6 +999,15 @@ impl DreamerConfig {
         {
             return Err("prior continuation requires CDP without open-loop or terminal weighting, horizon > 1, and positive finite scale".into());
         }
+        if let Some(scale) = self.prior_reward_scale
+            && (!self.is_cdp()
+                || self.open_loop_supervision.is_some()
+                || self.prior_continuation_scale.is_some()
+                || !scale.is_finite()
+                || scale <= 0.0)
+        {
+            return Err("prior reward requires CDP without open-loop or prior continuation, and positive finite scale".into());
+        }
         if self.batch_size == 0 || self.batch_length <= 1 {
             return Err("batch_size must be positive and batch_length must exceed one".into());
         }
@@ -1207,6 +1220,41 @@ mod tests {
         assert!(config.check().is_err());
         config.open_loop_supervision = None;
         config.horizon = 1;
+        assert!(config.check().is_err());
+    }
+
+    #[test]
+    fn prior_reward_is_optional_and_validated() {
+        let mut config = DreamerConfig::tiny(3);
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert!(legacy.get("prior_reward_scale").is_none());
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(legacy).unwrap(),
+            config
+        );
+        config.prior_reward_scale = Some(1.0);
+        assert!(config.check().is_err());
+        config.observation_kind = ObservationKind::Rgb32;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.check().unwrap();
+        let saved = serde_json::to_value(&config).unwrap();
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(saved).unwrap(),
+            config
+        );
+        for scale in [0.0, -1.0, f32::NAN, f32::INFINITY] {
+            config.prior_reward_scale = Some(scale);
+            assert!(config.check().is_err());
+        }
+        config.prior_reward_scale = Some(1.0);
+        config.prior_continuation_scale = Some(1.0);
+        assert!(config.check().is_err());
+        config.prior_continuation_scale = None;
+        config.open_loop_supervision = Some(OpenLoopSupervision {
+            horizon: 3,
+            scale: 1.0,
+        });
         assert!(config.check().is_err());
     }
 

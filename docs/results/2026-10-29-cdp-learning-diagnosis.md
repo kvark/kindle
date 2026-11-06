@@ -1,5 +1,12 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [one-step prior reward experiment](../experiments/2026-11-06-cdp-breakout-prior-reward.md) is selected for native qualification and a bounded cost check.
+The new default-off loss supervises rewards before the arrival image is seen,
+at every valid replay row; no feature/continuation auxiliary or new parameter.
+The closed posterior reward10 and joint H3 failures remain relevant. All47
+targeted CPU CLI cases pass without native/emulator construction. Rust/native
+qualification and packaging remain; no GPU allocation or full learner is active.
+
 The [completed reward-supervision comparison](2026-11-06-cdp-breakout-reward10.md#full200k-comparison) fails retention. Only
 reward loss1→10 changes against retained22003:greedy52.167/sample42.625 versus
 75.250/44.708,21m20.465s versus21m30.822s. Primary own-initial gain/min falls
