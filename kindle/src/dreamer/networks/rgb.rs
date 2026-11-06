@@ -8,10 +8,22 @@ const DECODER_BLOCKS: usize = 8;
 struct Convolution {
     layer: nn::Conv2d,
     bias: NodeId,
+    output_side: u32,
 }
 
 impl Convolution {
     fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
+        Self::with_stride(graph, name, input, output, side, 1)
+    }
+
+    fn with_stride(
+        graph: &mut Graph,
+        name: &str,
+        input: usize,
+        output: usize,
+        side: usize,
+        stride: usize,
+    ) -> Self {
         Self {
             layer: nn::Conv2d::new(
                 graph,
@@ -21,10 +33,11 @@ impl Convolution {
                 5,
                 side as u32,
                 side as u32,
-                1,
+                stride as u32,
                 2,
             ),
             bias: graph.parameter(&format!("{name}.bias"), &[output]),
+            output_side: side.div_ceil(stride) as u32,
         }
     }
 
@@ -34,7 +47,7 @@ impl Convolution {
             value,
             self.bias,
             self.layer.out_channels,
-            self.layer.in_h * self.layer.in_w,
+            self.output_side * self.output_side,
         )
     }
 }
@@ -73,8 +86,19 @@ struct ConvNorm {
 
 impl ConvNorm {
     fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
+        Self::with_stride(graph, name, input, output, side, 1)
+    }
+
+    fn with_stride(
+        graph: &mut Graph,
+        name: &str,
+        input: usize,
+        output: usize,
+        side: usize,
+        stride: usize,
+    ) -> Self {
         Self {
-            convolution: Convolution::new(graph, name, input, output, side),
+            convolution: Convolution::with_stride(graph, name, input, output, side, stride),
             norm: nn::RmsNorm::new(
                 graph,
                 &format!("{name}.norm.weight"),
@@ -87,7 +111,7 @@ impl ConvNorm {
     fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize, pool: bool) -> NodeId {
         let layer = &self.convolution.layer;
         let mut value = self.convolution.forward(graph, input, batch);
-        let mut side = layer.in_h;
+        let mut side = self.convolution.output_side;
         if pool {
             value = graph.max_pool_2d(
                 value,
@@ -117,6 +141,7 @@ pub(crate) struct Encoder {
     layers: Vec<ConvNorm>,
     input_channels: usize,
     coordinates: bool,
+    stride2: bool,
     channels: usize,
     side: usize,
 }
@@ -132,12 +157,13 @@ impl Encoder {
             .enumerate()
             .map(|(i, mult)| {
                 let output = depth * mult;
-                let layer = ConvNorm::new(
+                let layer = ConvNorm::with_stride(
                     graph,
                     &format!("world.representation.encoder.cnn{i}"),
                     channels,
                     output,
                     side >> i,
+                    if config.rgb_stride2 { 2 } else { 1 },
                 );
                 channels = output;
                 layer
@@ -147,6 +173,7 @@ impl Encoder {
             layers,
             input_channels,
             coordinates: config.rgb_coordinates,
+            stride2: config.rgb_stride2,
             channels,
             side,
         }
@@ -178,7 +205,7 @@ impl Encoder {
             value = graph.reshape(value, &[batch * (self.input_channels + 2) * width]);
         }
         for layer in &self.layers {
-            value = layer.forward(graph, value, batch, true);
+            value = layer.forward(graph, value, batch, !self.stride2);
         }
         let value = transpose_spatial(
             graph,
@@ -361,3 +388,5 @@ impl Decoder {
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod stride_tests;

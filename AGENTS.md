@@ -20,21 +20,21 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [contact-horizon risk teacher comparison](docs/results/2026-11-06-cdp-breakout-contact-risk.md) is complete and fails
-retention:206.250 versus225.083 (−8.367%), only3/8 improved lanes and0/24 two-wall
-for both. Keep the original teacher. The penalty changes159 first commands in
-40,195 selected decisions, including110 at horizons above one action. The region
-gate leaves no eligible3–5-action cases; this is not a calibrated uncertainty
-model or an empirical five-action test.
+The [optional stride-two RGB encoder](docs/results/2026-11-06-cdp-rgb-stride2.md) is implemented and CPU-qualified.
+Default-off `rgb_stride2` replaces encoder stride-one convolution/max-pool with
+stride-two5×5 convolutions. Parameter/replay/latent dimensions and decoder/control
+graphs stay unchanged; convolution output positions are quartered. Total training
+speed and gameplay benefit are unmeasured. Existing RGB64 resizing stays fixed.
 
-One CPU candidate completes46,200 actions/184,763 frames in32.161830s; complete
-35.692589s replay matches every decision/pixel/reward/frame/reset/outcome. Six
-new fixture groups,45 declared pins and23 completion artifacts pass. Controller
-68.250249s, closed16:53:43.976 UTC November6, source2ce19be9; independent recount
-passes16:55:32.367. Root `/x/Temp/kindle-breakout-contact-risk-20261106` is closed.
-No control rerun, failure, native learner or GPU work. No fresh cohort, retry,
-integration or automatic successor is selected. Retain original guidance and
-143.667 greedy/70.750 sampled; original864/90% and five-game gates remain open.
+CPU checks pass216 Kindle +5 adapter tests,1,246 Python cases with zero native
+construction attempts, and strict workspace/binding Clippy. An initial fixture
+compile failure and original bytes remain preserved; the repaired tests pass.
+Two new native value/derivative/update/restore fixtures compile but are unexecuted.
+Root `/x/Temp/kindle-rgb-stride2-20261106`; CPU closure17:14:01.561 UTC November6.
+Next build/package, separately qualify native/default-off behavior, then declare
+the8,192-action cost check. No GPU allocation or full learner is selected yet.
+Keep the retained teacher/recipe and143.667 greedy/70.750 sampled; original864/90%
+two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

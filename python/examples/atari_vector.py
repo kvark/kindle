@@ -71,6 +71,8 @@ def rgb_preprocessing(config):
         description += '; previous/current RGB pair on GPU, repeat first image on reset'
     if config.get('rgb_coordinates', False):
         description += '; encoder appends fixed x/y pixel-center coordinates in [-0.5,0.5]'
+    if config.get('rgb_stride2', False):
+        description += '; encoder uses stride-two convolutions without max-pooling'
     return description
 
 
@@ -91,6 +93,8 @@ def main():
                         help="fresh CDP: encode previous/current resized RGB images as six channels")
     parser.add_argument("--rgb-coordinates", action="store_true",
                         help="fresh learned RGB: append fixed x/y coordinate channels inside the CNN")
+    parser.add_argument("--rgb-stride2", action="store_true",
+                        help="fresh learned RGB: downsample with stride-two convolutions without max-pooling")
     parser.add_argument("--image-crop", type=int, nargs=4, metavar=("X", "Y", "WIDTH", "HEIGHT"),
                         help="fresh learned RGB/CDP: native-pixel crop before the single GPU resize; restore uses checkpoint crop")
     parser.add_argument("--cdp-centered", action="store_true",
@@ -556,6 +560,7 @@ def main():
     training_options.add("--disagreement-scale")
     training_options.add("--training-precision")
     training_options.add("--rgb-coordinates")
+    training_options.add("--rgb-stride2")
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
@@ -666,8 +671,16 @@ def main():
         if (metadata.get("config", {}).get("rgb_coordinates", False)
                 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_COORDINATES", False)):
             parser.error("coordinate checkpoint requires native RGB coordinate support")
+        if (metadata.get("config", {}).get("rgb_stride2", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_STRIDE2", False)):
+            parser.error("stride-two checkpoint requires native RGB stride-two support")
     args.observation_size = args.observation_size or "native"
     learned_rgb = args.encoder_checkpoint is None
+    if args.rgb_stride2:
+        if not learned_rgb or args.evaluate:
+            parser.error("rgb-stride2 requires fresh training with the learned CNN")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_RGB_STRIDE2", False):
+            parser.error("rgb-stride2 requires native RGB stride-two support")
     if args.rgb_coordinates:
         if not learned_rgb or args.evaluate:
             parser.error("rgb-coordinates requires fresh training with the learned CNN")
@@ -855,6 +868,8 @@ def main():
                 config["rgb_frame_pair"] = True
             if args.rgb_coordinates:
                 config["rgb_coordinates"] = True
+            if args.rgb_stride2:
+                config["rgb_stride2"] = True
             if args.image_crop is not None:
                 config["observation_crop"] = dict(zip(("x", "y", "width", "height"), args.image_crop))
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)

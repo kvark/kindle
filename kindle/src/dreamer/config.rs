@@ -322,6 +322,9 @@ pub struct DreamerConfig {
     /// Append fixed x/y pixel-center coordinates inside the learned RGB encoder.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_coordinates: bool,
+    /// Downsample the learned RGB encoder with stride-two convolutions, without max-pooling.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_stride2: bool,
     /// Optional native-frame rectangle for the learned-RGB GPU preprocessor.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub observation_crop: Option<crate::vision::preprocess_gpu::FrameCrop>,
@@ -481,6 +484,7 @@ impl DreamerConfig {
             observation_kind: ObservationKind::Features,
             rgb_frame_pair: false,
             rgb_coordinates: false,
+            rgb_stride2: false,
             observation_crop: None,
             video_encoder: None,
             future_target_standardization: None,
@@ -797,6 +801,9 @@ impl DreamerConfig {
             return Err("auxiliary actor boundaries require observed lower-bound mode and nonnegative reward scales".into());
         }
         let size = self.network();
+        if self.rgb_stride2 && (!self.observation_kind.is_rgb() || self.video_encoder.is_some()) {
+            return Err("RGB stride-two convolutions require the learned RGB encoder".into());
+        }
         if self.rgb_coordinates && (!self.observation_kind.is_rgb() || self.video_encoder.is_some())
         {
             return Err("RGB coordinates require the learned RGB encoder".into());

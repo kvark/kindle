@@ -83,6 +83,9 @@ impl PyVectorAgent {
     const SUPPORTS_RGB_COORDINATES: bool = true;
 
     #[classattr]
+    const SUPPORTS_RGB_STRIDE2: bool = true;
+
+    #[classattr]
     const SUPPORTS_RGB96: bool = true;
 
     #[classmethod]

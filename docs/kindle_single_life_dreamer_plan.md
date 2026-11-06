@@ -1,5 +1,21 @@
 # Kindle: CDP learning roadmap
 
+The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) is implemented and CPU-qualified.
+Default-off `rgb_stride2` replaces encoder stride-one convolution/max-pool with
+stride-two5×5 convolutions. Parameter/replay/latent dimensions and decoder/control
+graphs stay unchanged; convolution output positions are quartered. Total training
+speed and gameplay benefit are unmeasured. Existing RGB64 resizing stays fixed.
+
+CPU checks pass216 Kindle +5 adapter tests,1,246 Python cases with zero native
+construction attempts, and strict workspace/binding Clippy. An initial fixture
+compile failure and original bytes remain preserved; the repaired tests pass.
+Two new native value/derivative/update/restore fixtures compile but are unexecuted.
+Root `/x/Temp/kindle-rgb-stride2-20261106`; CPU closure17:14:01.561 UTC November6.
+Next build/package, separately qualify native/default-off behavior, then declare
+the8,192-action cost check. No GPU allocation or full learner is selected yet.
+Keep the retained teacher/recipe and143.667 greedy/70.750 sampled; original864/90%
+two-wall and the five-game goal remain unfinished.
+
 The [contact-horizon risk teacher comparison](results/2026-11-06-cdp-breakout-contact-risk.md) is complete and fails
 retention:206.250 versus225.083 (−8.367%), only3/8 improved lanes and0/24 two-wall
 for both. Keep the original teacher. The penalty changes159 first commands in
