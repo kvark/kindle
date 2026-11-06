@@ -8,18 +8,20 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [shot-outcome diagnostic](experiments/2026-11-06-cdp-breakout-shot-outcomes.md) is selected for one CPU-only analysis
-of retained teacher trajectories. It joins 776 saved outgoing contact fits to
-post-catch rewards, bounded by the next catch, life loss, episode end or 256
-frames. Fixed outer-versus-middle projected-entry comparisons separate score
-bands and lanes. This is observational evidence, not a new controller or learner.
+The [offline shot-outcome diagnostic](results/2026-11-06-cdp-breakout-shot-outcomes.md) is complete and fails its fixed
+outer-region design screen. Post-catch reward/frame ratios are 1.173490 below
+score216 and 1.271007 at216–431; only3/8 lanes favor projected outer entry.
+All minimum counts pass. This does not justify a general edge-aiming rule or
+reject every policy using remaining brick geometry.
 
-Four CPU fixture groups and all 30 historical sealed files pass; 45 inputs are
-pinned. Root `/x/Temp/kindle-breakout-shot-outcomes-20261106`. No emulator,
-trajectory collection, GPU allocation or native rebuild is selected. The earlier
-three-pixel aiming policy and initial-episode guidance learner remain closed and
-negative. Retain original guidance and 143.667 greedy / 70.750 sampled. Original
-864/90% two-wall and the five-game goal remain unfinished.
+All776 contact windows,18,749 distinct actions,33 output groups,30 historical
+sealed artifacts and46 current pins pass. CPU controller.769346s, complete
+16:39:37.438 UTC November6, source687788a0. Root
+`/x/Temp/kindle-breakout-shot-outcomes-20261106` is closed; zero new actions,
+emulator/native imports, updates or GPU work. Earlier three-pixel aiming and
+initial-episode guidance failures remain retained. No successor is selected.
+Keep original teacher/guidance and143.667 greedy/70.750 sampled; original864/90%
+two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
