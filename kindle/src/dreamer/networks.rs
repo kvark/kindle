@@ -508,9 +508,10 @@ impl ObservationEncoder {
     pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         match config.observation_kind {
             ObservationKind::Features => Self::Features(FeatureEncoder::new(graph, config)),
-            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
-                Self::Rgb(rgb::Encoder::new(graph, config))
-            }
+            ObservationKind::Rgb64
+            | ObservationKind::Rgb48
+            | ObservationKind::Rgb32
+            | ObservationKind::Rgb96 => Self::Rgb(rgb::Encoder::new(graph, config)),
         }
     }
 
@@ -907,7 +908,10 @@ impl ObservationDecoder {
             ObservationKind::Features => {
                 Self::Features(FeatureDecoder::new(graph, config, name, input_dim))
             }
-            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+            ObservationKind::Rgb64
+            | ObservationKind::Rgb48
+            | ObservationKind::Rgb32
+            | ObservationKind::Rgb96 => {
                 Self::Rgb(rgb::Decoder::new(graph, config, name, input_dim))
             }
         }

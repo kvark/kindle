@@ -8,28 +8,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [full enumerated one-step actor comparison](results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
-is complete and fails retention. Fresh200k actions/12,477 updates take27m58.682s
-versus retained21m27.910s, **30.341% more**. Greedy138.417 and sampled58.083 trail
-143.667/70.750; all0/24 two-wall. Primary own-initial gain/min falls **26.126%**,
-6.590132→4.868404. Its paired95% difference interval[-4.253377,.800655] spans zero;
-this reused development cohort does not establish training-seed reliability.
+The [optional RGB96 geometry](results/2026-11-06-cdp-rgb96.md) is implemented and
+CPU-qualified. Default64, native pooled RGB and one GPU resize remain. At12M the
+embedding grows1024→2304; posterior/CDP projections, memory and compute change,
+while CNN weights and control graphs retain their shapes. A perceptual cause or
+learning benefit is not established.
 
-All357 initial tensors and47 pre-update events match bounded/retained; actual-
-initial sampled1.416667/greedy2.208333 and799/794 semantic events match retained.
-All four frozen arms select24 natural episodes with zero updates/truncations and
-357 invariant tensors. Weighted losses, required expected-value metrics/snapshot
-timing,100k recovery, full replays/videos, curves, exposure,365 current/338 retained
-pins and original terminal services pass. Main/collector complete13:46:32.617 /
-13:46:51.144 UTC November6; publication reader and idle closure pass. Original
-CPU compile failure remains preserved; no full GPU/audit stage fails or repeats.
+All210 Kindle/five adapter CPU tests and strict workspace/binding Clippy pass.
+Python initially passes1,207 cases withone new restore-fixture failure; the
+corrected14-case file passes withzero native construction. Original failure is
+preserved. Three native fixtures compile but remain unexecuted. All256 current
+source pins pass; closure14:08:46.132 UTC November6 confirms no Kindle service or
+render holder. Root `/x/Temp/kindle-rgb96-20261106`.
 
-Root `/x/Temp/kindle-actor-expected-value-20261106/full` is closed. No GPU
-allocation, extension, sweep or successor is selected. Keep the option off and
-retain ordinary inference,32×16 and143.667 greedy/70.750 sampled. Enumerating
-one-step actions changes horizon/start distribution with the estimator; this
-result does not isolate gradient bias or reject every differentiable-control
-method. Original864/90%-two-wall and the five-game goal remain unfinished.
+Next build/package, then separately declare native qualification and any bounded
+cost check under the [protocol](experiments/2026-11-06-cdp-rgb96.md). No GPU
+allocation or learner is selected. The closed [enumerated actor comparison](results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
+failed retention; keep it and direct dynamics gradients off. Retain RGB64,
+32×16 and143.667 greedy/70.750 sampled. Original864/90%-two-wall and the five-game
+goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

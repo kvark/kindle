@@ -82,6 +82,9 @@ impl PyVectorAgent {
     #[classattr]
     const SUPPORTS_RGB_COORDINATES: bool = true;
 
+    #[classattr]
+    const SUPPORTS_RGB96: bool = true;
+
     #[classmethod]
     fn learned_rgb(
         _class: &Bound<'_, PyType>,

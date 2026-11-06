@@ -86,10 +86,14 @@ fn smaller_rgb_graphs_keep_shapes_and_cdp_gradients() {
 }
 
 // Independent scalar cross-correlation, max-pool, per-pixel channel RMS and SiLU.
-fn reference(input: &[f32], parameters: &HashMap<String, Vec<f32>>) -> Vec<f64> {
+fn reference_at_side(
+    input: &[f32],
+    parameters: &HashMap<String, Vec<f32>>,
+    mut side: usize,
+) -> Vec<f64> {
     let mut values = input.iter().map(|&x| f64::from(x)).collect::<Vec<_>>();
     let input_channels = parameters["world.representation.encoder.cnn0.weight"].len() / (8 * 25);
-    let (mut side, mut channels) = (64, input_channels);
+    let mut channels = input_channels;
     for (layer, output) in [8, 12, 16, 16].into_iter().enumerate() {
         let name = format!("world.representation.encoder.cnn{layer}");
         let weights = &parameters[&format!("{name}.weight")];
@@ -190,8 +194,24 @@ fn tiny_rgb_coordinate_encoder_matches_independent_reference() {
 }
 
 fn check_encoder_reference(frame_pair: bool, coordinates: bool, capture: bool) {
+    check_encoder_at_side(frame_pair, coordinates, capture, ObservationKind::Rgb64);
+}
+
+#[test]
+#[ignore = "requires separately guarded RGB96 scalar CNN and derivative qualification"]
+fn tiny_rgb96_encoder_matches_independent_reference() {
+    check_encoder_at_side(false, false, false, ObservationKind::Rgb96);
+}
+
+fn check_encoder_at_side(
+    frame_pair: bool,
+    coordinates: bool,
+    capture: bool,
+    kind: ObservationKind,
+) {
     let mut config = DreamerConfig::tiny(3);
-    config.observation_kind = ObservationKind::Rgb64;
+    config.observation_kind = kind;
+    let side = config.observation_grid();
     config.rgb_frame_pair = frame_pair;
     config.rgb_coordinates = coordinates;
     let mut graph = Graph::new();
@@ -227,10 +247,11 @@ fn check_encoder_reference(frame_pair: bool, coordinates: bool, capture: bool) {
         for frame in pixels.chunks_exact(config.observation_dim()) {
             augmented.extend_from_slice(frame);
             for axis in 0..2 {
-                for y in 0..64 {
-                    for x in 0..64 {
+                for y in 0..side {
+                    for x in 0..side {
                         let position = if axis == 0 { x } else { y };
-                        augmented.push(((2 * position + 1) as f64 / 128.0 - 0.5) as f32);
+                        augmented
+                            .push(((2 * position + 1) as f64 / (2 * side) as f64 - 0.5) as f32);
                     }
                 }
             }
@@ -239,14 +260,14 @@ fn check_encoder_reference(frame_pair: bool, coordinates: bool, capture: bool) {
     } else {
         pixels.clone()
     };
-    let expected = reference(&reference_pixels, &parameters);
+    let expected = reference_at_side(&reference_pixels, &parameters, side);
     let mut actual = vec![0.0; expected.len()];
     session.read_output_by_index(1, &mut actual);
     for (&a, &b) in actual.iter().zip(&expected) {
         assert!((f64::from(a) - b).abs() < 3e-4, "{a} != {b}");
     }
     let scalar_loss = |p: &HashMap<String, Vec<f32>>| {
-        let values = reference(&reference_pixels, p);
+        let values = reference_at_side(&reference_pixels, p, side);
         values.iter().map(|x| x * x).sum::<f64>() / values.len() as f64
     };
     assert!((f64::from(session.read_loss()) - scalar_loss(&parameters)).abs() < 3e-4);
@@ -266,7 +287,7 @@ fn check_encoder_reference(frame_pair: bool, coordinates: bool, capture: bool) {
             .open(path)
             .unwrap();
         serde_json::to_writer(file, &serde_json::json!({
-            "seed": 103, "input_channels": 6, "batch": 2, "side": 64,
+            "seed": 103, "input_channels": config.observation_channels(), "batch": 2, "side": side,
             "normalization_epsilon": DREAMER_NORM_EPSILON, "precision": config.training_precision,
             "pixels": pixels, "parameters": parameters, "gradients": gradients,
             "gpu_outputs": actual, "scalar_outputs": expected, "gpu_loss": session.read_loss(),
@@ -312,7 +333,7 @@ fn check_encoder_reference(frame_pair: bool, coordinates: bool, capture: bool) {
         let original = parameters[&name][lane];
         // The paired fixture crosses max-pool boundaries at 1e-4; 1e-5 and
         // 1e-6 converge without changing winners in the independent reference.
-        let step = if frame_pair || coordinates {
+        let step = if frame_pair || coordinates || side == 96 {
             1e-5
         } else {
             1e-4

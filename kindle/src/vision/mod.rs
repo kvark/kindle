@@ -151,14 +151,14 @@ impl Observation {
     }
 
     pub fn rgb(values: Vec<f32>, side: usize) -> Self {
-        assert!(matches!(side, 32 | 48 | 64));
+        assert!(matches!(side, 32 | 48 | 64 | 96));
         assert_eq!(values.len(), 3 * side * side);
         Self::checked(values)
     }
 
     /// Previous/current centered CHW images for the optional CDP pair input.
     pub fn rgb_pair(values: Vec<f32>, side: usize) -> Self {
-        assert!(matches!(side, 32 | 48 | 64));
+        assert!(matches!(side, 32 | 48 | 64 | 96));
         assert_eq!(values.len(), 6 * side * side);
         Self::checked(values)
     }

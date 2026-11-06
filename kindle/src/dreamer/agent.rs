@@ -15,6 +15,8 @@ mod dynamics_tests;
 #[cfg(test)]
 mod expected_value_tests;
 #[cfg(test)]
+mod rgb96_tests;
+#[cfg(test)]
 mod exploration;
 #[cfg(test)]
 mod gradient_contributions;

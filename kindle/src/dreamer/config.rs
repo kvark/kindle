@@ -12,6 +12,8 @@ pub enum ObservationKind {
     Rgb48,
     /// One GPU resize to 32x32, channel-major RGB in [-0.5, 0.5].
     Rgb32,
+    /// One GPU resize to 96x96, channel-major RGB in [-0.5, 0.5].
+    Rgb96,
 }
 
 impl ObservationKind {
@@ -588,14 +590,22 @@ impl DreamerConfig {
             ObservationKind::Rgb64 => 64,
             ObservationKind::Rgb48 => 48,
             ObservationKind::Rgb32 => 32,
+            ObservationKind::Rgb96 => 96,
         }
     }
 
     pub const fn observation_channels(&self) -> usize {
         match self.observation_kind {
             ObservationKind::Features => OBSERVATION_CHANNELS,
-            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
-                if self.rgb_frame_pair { 6 } else { 3 }
+            ObservationKind::Rgb64
+            | ObservationKind::Rgb48
+            | ObservationKind::Rgb32
+            | ObservationKind::Rgb96 => {
+                if self.rgb_frame_pair {
+                    6
+                } else {
+                    3
+                }
             }
         }
     }
@@ -606,9 +616,10 @@ impl DreamerConfig {
                 batch * OBSERVATION_GRID * OBSERVATION_GRID,
                 OBSERVATION_CHANNELS,
             ],
-            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
-                [batch, self.observation_dim()]
-            }
+            ObservationKind::Rgb64
+            | ObservationKind::Rgb48
+            | ObservationKind::Rgb32
+            | ObservationKind::Rgb96 => [batch, self.observation_dim()],
         }
     }
 
@@ -617,7 +628,10 @@ impl DreamerConfig {
             ObservationKind::Features => {
                 OBSERVATION_GRID * OBSERVATION_GRID * self.network().vision_depth
             }
-            ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+            ObservationKind::Rgb64
+            | ObservationKind::Rgb48
+            | ObservationKind::Rgb32
+            | ObservationKind::Rgb96 => {
                 let side = self.observation_grid() / 16;
                 side * side * self.network().vision_depth * 4
             }

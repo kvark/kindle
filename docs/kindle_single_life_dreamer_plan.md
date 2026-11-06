@@ -1,5 +1,25 @@
 # Kindle: CDP learning roadmap
 
+The [optional RGB96 geometry](results/2026-11-06-cdp-rgb96.md) is implemented and
+CPU-qualified. Default64, native pooled RGB and one GPU resize remain. At12M the
+embedding grows1024→2304; posterior/CDP projections, memory and compute change,
+while CNN weights and control graphs retain their shapes. A perceptual cause or
+learning benefit is not established.
+
+All210 Kindle/five adapter CPU tests and strict workspace/binding Clippy pass.
+Python initially passes1,207 cases withone new restore-fixture failure; the
+corrected14-case file passes withzero native construction. Original failure is
+preserved. Three native fixtures compile but remain unexecuted. All256 current
+source pins pass; closure14:08:46.132 UTC November6 confirms no Kindle service or
+render holder. Root `/x/Temp/kindle-rgb96-20261106`.
+
+Next build/package, then separately declare native qualification and any bounded
+cost check under the [protocol](experiments/2026-11-06-cdp-rgb96.md). No GPU
+allocation or learner is selected. The closed [enumerated actor comparison](results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
+failed retention; keep it and direct dynamics gradients off. Retain RGB64,
+32×16 and143.667 greedy/70.750 sampled. Original864/90%-two-wall and the five-game
+goal remain unfinished.
+
 The [full enumerated one-step actor comparison](results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
 is complete and fails retention. Fresh200k actions/12,477 updates take27m58.682s
 versus retained21m27.910s, **30.341% more**. Greedy138.417 and sampled58.083 trail

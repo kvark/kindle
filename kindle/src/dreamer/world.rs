@@ -249,7 +249,10 @@ fn future_predictor(graph: &mut Graph, config: &DreamerConfig) -> FuturePredicto
         ObservationKind::Features => {
             FuturePredictor::Features(FeatureDecoder::new(graph, config, name, input))
         }
-        ObservationKind::Rgb64 | ObservationKind::Rgb48 | ObservationKind::Rgb32 => {
+        ObservationKind::Rgb64
+        | ObservationKind::Rgb48
+        | ObservationKind::Rgb32
+        | ObservationKind::Rgb96 => {
             let width = config.encoded_observation_dim();
             FuturePredictor::Cdp(MlpHead::new(graph, name, input, width, 1, width))
         }

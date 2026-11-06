@@ -92,6 +92,8 @@ def audit(path):
         check(header["event"] == "run_start" and header["protocol"] in (
             "kindle-vector-v1", VECTOR_PROTOCOL, EXPLORATION_PROTOCOL, *EPISODE_EVALUATION_PROTOCOLS), "unknown vector protocol")
         count, config = header["num_envs"], header["config"]
+        check(config.get("observation_kind", "features") in ("features", "rgb32", "rgb48", "rgb64", "rgb96"),
+              "unknown observation geometry")
         check(type(count) is int and count > 0, "invalid stream count")
         check(type(header["steps"]) is int and header["steps"] > 0 and header["steps"] % count == 0, "invalid action budget")
         check(len(header["environment_seeds"]) == count and len(set(header["environment_seeds"])) == count, "environment seed identifiers must be distinct")
@@ -189,7 +191,7 @@ def audit(path):
                   and 2 <= open_loop["horizon"] < min(config["batch_length"], config.get("world_backprop_length", 0)),
                   "invalid open-loop horizon")
             require_numbers(open_loop["scale"])
-            check(open_loop["scale"] > 0 and config.get("observation_kind") in ("rgb32", "rgb48", "rgb64")
+            check(open_loop["scale"] > 0 and config.get("observation_kind") in ("rgb32", "rgb48", "rgb64", "rgb96")
                   and config.get("loss_scales", {}).get("future_prediction", 0) > 0,
                   "open-loop supervision requires positive scale and CDP")
         centroid = config.get("color_centroid_supervision")
@@ -201,7 +203,7 @@ def audit(path):
                   and centroid["scale"] > 0 and centroid["background_scale"] > 0,
                   "invalid centroid channel/scales")
             geometry = config.get("observation_kind")
-            check(geometry in ("rgb32", "rgb48", "rgb64"), "centroid requires RGB")
+            check(geometry in ("rgb32", "rgb48", "rgb64", "rgb96"), "centroid requires RGB")
             region = centroid["region"]
             check(isinstance(region, list) and len(region) == 4
                   and all(0 <= value <= 1 for value in region), "invalid centroid region")

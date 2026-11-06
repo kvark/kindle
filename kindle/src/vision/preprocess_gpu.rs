@@ -9,6 +9,8 @@ use std::{collections::HashMap, sync::Arc};
 use blade_graphics::{self as gpu, ShaderBindable as _, ShaderData as _};
 use meganeura::{Session, runtime::ExternalSlot};
 
+#[cfg(test)]
+mod rgb96_tests;
 mod rgb_filter;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -233,7 +235,7 @@ impl GpuPreprocessor {
         side: usize,
         crop: Option<FrameCrop>,
     ) -> Self {
-        assert!(matches!(side, 32 | 48 | 64));
+        assert!(matches!(side, 32 | 48 | 64 | 96));
         if let Some(crop) = crop {
             crop.check().expect("invalid image crop");
         }
@@ -759,7 +761,7 @@ mod tests {
         patches_from_pixels_chw(&chw, size, patch)
     }
 
-    fn check_patches(session: &mut Session, expected: &[f32], label: &str) -> Vec<f32> {
+    pub(super) fn check_patches(session: &mut Session, expected: &[f32], label: &str) -> Vec<f32> {
         session.step();
         session.wait();
         let actual = session.read_output(expected.len());
