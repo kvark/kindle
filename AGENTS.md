@@ -20,28 +20,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [pre-contact shot predictor](docs/results/2026-11-06-cdp-breakout-causal-shot.md) is complete and fails its fixed
-screen. Adding planned contact offset lowers holdout slope MAE.691547→.601837
-(12.972%) versus incoming direction alone, below the required20%; direction
-accuracy76.761% misses80%. All eight lanes improve MAE, but this does not qualify
-a steering controller. Inputs precede the incoming-fit window; reconstructed
-actual contact offset and future geometry are excluded as features. Keep the
-original teacher. This is observational prediction, not a causal action test.
+The [reward-supervision check](docs/experiments/2026-11-06-cdp-breakout-reward10.md) is selected for bounded native qualification.
+Only existing reward-prediction loss weight1→10 changes; rewards, teacher,
+architecture and other losses stay fixed. The hypothesis is improved task-relevant
+shared representation; a reward-loss bottleneck or gameplay benefit is unproven.
+Native447fe50/SHA35ad0db needs no rebuild. Both canonical and private runners
+pass34 targeted CPU cases, with zero native/emulator construction. Actual queued
+commands, loss/configuration rejection fixtures and terminal collector checks
+pass in1.476s; no failure or repeated stage.
 
-All776 contacts qualify:492 fitting/284 reused holdout rows. Six CPU fixture
-groups,64 pins,47 historical sealed files,18 completion artifacts and an
-independent source-join/augmented-least-squares recount of54 metric groups pass.
-The controller completes21:17:03.571 UTC November6 in1.058103s, source569d34bf;
-separate terminal closure passes21:18:12.524. No failed or repeated stage.
+Next run one fresh8,192-action/489-update check and a1,024-action frozen restore.
+The fixed cost screen is a padded200k projection under30 minutes. Root
+`/mnt/data/kindle-breakout-reward10-20261106`, service
+`kindle-breakout-reward10-check-20261106`; no GPU job is active at declaration.
+No full learner or automatic successor is selected. A separately justified full
+comparison would use development22003 and its retained matching controls.
+Original864/90% two-wall and the five-game goal remain unfinished.
 
-Root `/mnt/data/kindle-breakout-causal-shot-20261106` is closed. No collector,
-emulator/native construction, new game action, learner update or GPU work.
-No controller, fit retry, integration or automatic successor is selected.
-Original864/90% two-wall and the full five-game goal remain unfinished.
-
-The [fresh-seed confirmation](docs/results/2026-11-06-cdp-breakout-seed22003.md) remains closed:75.250/44.708 versus retained94.625/70.500 on the same new cohort.
-Useful learning is confirmed; seed/cohort variation and all0/24 two-wall remain.
-Do not repeat its completed stages or promote a new best seed.
+The [pre-contact shot predictor](docs/results/2026-11-06-cdp-breakout-causal-shot.md) remains closed and fails its fixed screen;
+keep the original teacher. The fresh-seed confirmation remains closed, with
+useful learning, material seed/cohort variation and all0/24 two-wall. Do not
+repeat completed stages or promote a new best seed.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

@@ -1,5 +1,15 @@
 # Kindle: CDP learning roadmap
 
+The [bounded reward-supervision check](experiments/2026-11-06-cdp-breakout-reward10.md) selects only reward loss1→10
+with the retained native/runtime and recipe. Both runners pass34 targeted CPU
+cases; actual commands and audit rejection fixtures pass without native/emulator
+construction. One8,192-action learner and1,024-action frozen restore are selected
+for numerics/cost, not gameplay qualification. No full learner is selected.
+Root `/mnt/data/kindle-breakout-reward10-20261106`; consult the fixed protocol.
+Stronger supervision is a hypothesis, not an established bottleneck. A later
+full comparison would use development22003 and its matching retained controls;
+original864/90% and the five-game goal remain unfinished.
+
 The [pre-contact shot predictor](results/2026-11-06-cdp-breakout-causal-shot.md) is complete and fails its fixed
 screen. Adding planned contact offset lowers holdout slope MAE.691547→.601837
 (12.972%) versus incoming direction alone, below the required20%; direction

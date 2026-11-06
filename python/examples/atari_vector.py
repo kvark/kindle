@@ -143,6 +143,8 @@ def main():
                         help="fresh training only: real-replay value loss scale; omitted: native default")
     parser.add_argument("--continuation-scale", type=float,
                         help="fresh training only: world continuation loss scale; omitted: native default")
+    parser.add_argument("--reward-scale", type=float,
+                        help="fresh training only: world reward prediction loss scale; omitted: native default")
     parser.add_argument("--representation-scale", type=float,
                         help="fresh training only: posterior representation KL loss scale; omitted: native default")
     parser.add_argument("--dynamics-scale", type=float,
@@ -281,6 +283,11 @@ def main():
             parser.error("continuation-scale must be finite and positive in F32")
         if args.evaluate:
             parser.error("continuation-scale requires fresh training")
+    if args.reward_scale is not None:
+        if not positive_f32(args.reward_scale):
+            parser.error("reward-scale must be finite and positive in F32")
+        if args.evaluate:
+            parser.error("reward-scale requires fresh training")
     if args.representation_scale is not None:
         if not positive_f32(args.representation_scale):
             parser.error("representation-scale must be finite and positive in F32")
@@ -559,6 +566,7 @@ def main():
     training_options.add("--behavior-learning-rate")
     training_options.add("--replay-value-scale")
     training_options.add("--continuation-scale")
+    training_options.add("--reward-scale")
     training_options.add("--representation-scale")
     training_options.add("--dynamics-scale")
     training_options.add("--discount-horizon")
@@ -846,6 +854,8 @@ def main():
             config["loss_scales"]["replay_value"] = args.replay_value_scale
         if args.continuation_scale is not None:
             config["loss_scales"]["continuation"] = args.continuation_scale
+        if args.reward_scale is not None:
+            config["loss_scales"]["reward"] = args.reward_scale
         if args.representation_scale is not None:
             config["loss_scales"]["representation"] = args.representation_scale
         if args.dynamics_scale is not None:
