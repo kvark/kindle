@@ -10,11 +10,11 @@ no gameplay or efficiency gain is established.
 
 [CPU checks](results/2026-11-06-cdp-actor-expected-value.md) pass207 Kindle/5 adapter tests,
 192 focused Python tests plus20 guard checks (15 overlap), and strict workspace/
-binding Clippy. The original native-fixture compile failure is preserved; its
-explicit index-type repair passes. Two ignored native fixtures compile but have
-not executed. Next package and separately qualify native values, actor derivatives,
-branch routing, snapshots and restore before a bounded learning-cost check.
-No GPU allocation or learner is active or selected.
+binding Clippy. The packaged runtime passes1194 Python checks,10 deselected,
+with zero native construction. The original fixture compile failure is preserved.
+Two separately declared guarded Tiny native checks are selected: values, actor
+derivatives, branch routing, snapshots and restore, with two synthetic learner
+updates and zero Atari actions. No bounded cost check or full learner is selected.
 
 Root `/x/Temp/kindle-actor-expected-value-20261106`; default off. Retain ordinary
 inference,32×16 and143.667 greedy/70.750 sampled. The [closed averaging comparison](results/2026-11-06-cdp-actor-posterior-average.md#fixed-trained-policy-comparison-complete)

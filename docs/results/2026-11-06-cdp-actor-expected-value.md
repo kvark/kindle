@@ -53,3 +53,19 @@ native path before selecting a bounded cost check. No GPU allocation, learner,
 sweep or automatic successor is selected. Retain143.667 greedy/70.750 sampled,
 ordinary inference and32×16; original864/90%-two-wall and five-game gates remain
 unfinished.
+
+## Packaging and native declaration
+
+Release test binary and wheel package source `f2b80fe596ae553bbea3cc7a3c638ea55529dc22`,
+with253 source pins unchanged during both builds. Native SHA256 is
+`961f79583c1e2384f5dd2daba56fc2357c1a8dc280abd6bb8aef4d35fbf8b069`;
+test executable SHA256 is
+`e582bbce455f6e05b033ddf6a322c14ba513cfd756299e01b7708a96a93d1783`.
+Packaged Python passes1194 tests with10 constructor checks deselected and zero
+native construction attempts, in4.322s including the wrapper. This verifies the
+actual package capability flag and legacy defaults without GPU allocation.
+
+The [separate native protocol](../experiments/2026-11-06-cdp-actor-expected-value-native.md)
+selects the two prepared fixtures once, with the existing AMD host guard. Two
+synthetic optimizer steps and two Tiny learner updates, zero Atari actions.
+A bounded cost check and full learner remain unselected.
