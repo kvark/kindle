@@ -1,5 +1,14 @@
 # Kindle: CDP learning roadmap
 
+The [frozen residual serving ablation](experiments/2026-11-06-cdp-residual-actor-serving-ablation.md) is selected after passing
+CPU preparation (.915s,351 unchanged original pins). Exactly two residual
+parameters are zeroed in a separately identified final-checkpoint copy; the other
+361 tensors and all moments remain unchanged. Two new frozen sampled/greedy arms
+will test whether that correction helps its own base policy. The completed
+combined-policy assessments are reused; no training, rebuild or old stage repeats.
+This tests a serving effect, not a fresh base-only learner or a cause of the full
+regression. Root `/x/Temp/kindle-residual-serving-ablation-20261106`.
+
 The [full residual actor comparison](results/2026-11-06-cdp-residual-actor.md#full-200k-comparison)
 is complete and fails retention. Fresh200k actions/799,615 frames/12,477 updates
 take **21m18.238s**,0.751% less observed time than retained21m27.910s. Greedy
