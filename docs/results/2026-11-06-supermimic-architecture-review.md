@@ -128,3 +128,11 @@ measurement in that task. Sharing one robot's dynamics across goals also does
 not establish that unrelated Atari games should share a single dynamics model.
 These are architectural directions within the existing goal, not permission
 to repeat closed experiments or a claim of a SuperMimic-sized efficiency gain.
+
+A distinct [residual actor experiment](2026-11-06-cdp-residual-actor.md) now tests
+whether separating imagined policy/entropy parameters and moments from imitation
+helps at the fixed200k budget. The zero-initialized correction preserves the
+initial policy and adds46,098 parameters; its bounded run passes at46.535s versus
+47.690s. A fresh learner is running, with dynamics gradients still off. This
+follows the measured update-interference hypothesis; it is not a SuperMimic
+reproduction or evidence that its efficiency ratios transfer to Atari.

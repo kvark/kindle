@@ -126,3 +126,12 @@ replay SHA256 `9f35eb4ffc25c133333a633896666a830cfa12208d346dd15839d2c86133a195`
 New full helpers/declaration live under the separate `full` directory. Original
 native failure remains failed; the separate repair and closed bounded stages
 are not repeated. No extension or automatic successor is selected.
+
+The full candidate launches at09:51:14.567 UTC November6 from sourcee22b94df,
+main PID1448396/invocation`de33e7330d9f474199d2512d308cd558`, with separate original
+recovery and terminal observers. Exact five-command preflight passes in.381s
+wrapper with351 unchanged pins, zero native/emulator construction, three
+training-option rejections and both replay argv paths checked. Startup passes
+at09:51:20.255: all363 bounded tensors,357 retained tensors plus six zeros,
+and both47-event pre-update traces match. Training is active; no final gameplay
+result exists yet. The fixed protocol and declaration stay unchanged.

@@ -7,11 +7,13 @@ invariant, both full replays/guards and finite weighted losses pass. Padded200k
 projection20m49.712s and conservative12.049GB headroom pass. No natural frozen
 episode completes in the1,024-action check; no gameplay benefit is established.
 
-The [separate fresh200k residual comparison](experiments/2026-11-06-cdp-breakout-residual-actor-200k.md) is selected after
-passing CPU helper checks. Imagined policy/entropy train a46,098-parameter
+The [separate fresh200k residual comparison](experiments/2026-11-06-cdp-breakout-residual-actor-200k.md) is running from sourcee22b94df after
+passing CPU helpers and all five exact queued commands (351 pins, no native or
+emulator construction). Startup matches363 bounded/357 retained initial tensors,
+six zero additions and47 initial events. Imagined policy/entropy train a46,098-parameter
 correction; imitation trains the unchanged base actor with separate moments.
 Greedy own-initial gain/min is primary; use the same200k budget, recipe and
-24-natural-episode frozen cohorts. Exact queued-command preflight precedes launch.
+24-natural-episode frozen cohorts. Original main service PID1448396/invocationde33e733 remains the owner.
 Original native fixture failure and separate passing repair remain preserved.
 Root `/x/Temp/kindle-residual-actor-20261106/full`; default off, no repeated stage
 or automatic successor. Retain143.667/70.750 and original864/90%/five-game gates.

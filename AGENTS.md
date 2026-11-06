@@ -27,11 +27,12 @@ invariant. Full replays, finite weighted losses and both guards pass. Projected
 200k cost20m49.712s and conservative memory headroom12.049GB pass the screens;
 this short historical comparison does not establish gameplay or speed gains.
 
-A [separate fresh200k comparison](docs/experiments/2026-11-06-cdp-breakout-residual-actor-200k.md) is selected. The zero-initialized
+A [separate fresh200k comparison](docs/experiments/2026-11-06-cdp-breakout-residual-actor-200k.md) is running from sourcee22b94df. The zero-initialized
 linear correction receives imagined policy/entropy gradients; imitation trains
 the base actor, with separate parameter moments. It adds46,098 parameters at12M,
-with unchanged CNN/RSSM/critic. CPU comparison helpers pass; exact command
-preflight must pass before launch. Original native fixture failure and separate
+with unchanged CNN/RSSM/critic. CPU helpers and all five exact queued commands pass,
+with351 pins and zero native/emulator construction. Startup passes363 matching
+bounded tensors,357 matching retained tensors, six zero additions and47 events. Original native fixture failure and separate
 passing test-only repair remain preserved. No completed stage repeats.
 
 Root `/x/Temp/kindle-residual-actor-20261106/full`; fixed200k actions, then24
