@@ -14,14 +14,20 @@ losses/rates and all-state labels remain; timing, amount and state distribution
 change together. Require independent phase/cap recount and four24-natural-episode
 frozen arms against actual-initial controls. Greedy gain/min is primary.
 
-Full helpers, comparison/plot entry checks and negative cases pass in3.872s,
-without native/emulator construction. Root
-/x/Temp/kindle-breakout-initial-guidance-20261106/full is prepared; exact queue
-preflight and guarded launch follow. The bounded controller/children are terminal,
-302 pins pass and GPU is idle. Two incomplete CLI mocks and prior native fixture
-failures remain preserved. No bounded experience transfers, completed stage
-repeats, extension, second learner or automatic successor. Retain143.667 greedy/
-70.750 sampled pending evidence; original864/90% and five-game gates unfinished.
+Full helpers/comparison/plot checks pass in3.872s and all five queued commands
+pass in.381s, with zero native/emulator construction. The original learner starts
+15:55:04.816 UTC November6, sourcef797ad78, PID1512125/invocation
+cfe8a3d86199424d954c680e213badb9. Collector1512128 and recovery observer1512131
+are active. At15:56:19.964,12,104 actions/733 updates are independently recounted;
+all357 initial tensors match retained/own bounded,47 own pre-update events match,
+and374 pins pass. No phase exit or cap release yet; these are measured per lane.
+
+Root /x/Temp/kindle-breakout-initial-guidance-20261106/full is running under the
+existing guard. Keep observing original identities; do not restart on timeout.
+Two incomplete CLI mocks and prior native fixture failures remain preserved.
+No bounded experience transfers, completed stage repeats, extension, second
+learner or automatic successor. Retain143.667 greedy/70.750 sampled pending
+frozen evaluation; original864/90% and five-game gates remain unfinished.
 
 The [RGB96 full comparison](results/2026-11-06-cdp-rgb96.md#full-200k-comparison) is complete and
 fails retention:74.708 greedy/60.417 sampled versus143.667/70.750. Fresh200k

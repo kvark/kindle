@@ -57,3 +57,16 @@ Full comparison helpers, independent schedule recount, complete comparison entry
 plotting and negative loss/header fixtures pass in3.872s with no native/emulator
 construction. Exact queued-command qualification and launch follow the separate
 full protocol; no GPU allocation has started at this declaration.
+
+## Full200k comparison running
+
+All five queued commands pass before native construction in.381s. Execution
+sourcef797ad78 starts15:55:04.816 UTC November6; original main PID1512125,
+invocationcfe8a3d86199424d954c680e213badb9, collector1512128 and recovery
+observer1512131. First live recount at15:56:19.964 verifies12,104 actions/733
+updates,374 unchanged pins and all original live service identities. Startup
+confirms357 initial tensors equal retained/own bounded and47 pre-update events
+equal the own bounded trace. The first lane is in episode2; all others are in
+episode1, with no cap release or phase exit yet. Full phase coverage,100k recovery
+and frozen learning results remain pending; online guided returns are not
+competence. Original services continue without any restart or stage repeat.
