@@ -16,7 +16,12 @@ and80/92 for candidate. Survival directions favor12/18 and8/18 differing game-ov
 rescues, while actual-terminal plans still receive about.97 discounted survival.
 This does not show generally reversed return gradients or isolate the full learner
 regression; actor feedback, other losses and optimizer interactions are omitted.
-No successor allocation is selected. The independent
+The [completed actor-update diagnostic](2026-11-06-cdp-dynamics-actor-update.md)
+adds a limited late-checkpoint result: the full estimated actor update changes
+only.01136%/.01702% on two archived batches, with exact critic invariance.
+Imitation and saved momentum still dominate. This neither explains early
+training nor justifies increasing the coefficient. No successor allocation is
+selected. The independent
 [coordinate-channel comparison](2026-11-06-cdp-rgb-coordinates.md) is now closed
 and regresses both frozen modes; it does not test this actor-gradient proposal.
 

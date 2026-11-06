@@ -1,12 +1,18 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [new actor-update diagnostic](../experiments/2026-11-06-cdp-dynamics-actor-update.md) is implemented and CPU-qualified
-(192 Kindle/5 adapter tests, strict Clippy). It reuses the two archived November3
-behavior batches to measure the added dynamics.5 gradient and its interaction
-with clipping, preconditioning and saved momentum. Exact rollout/target checks
-gate the new backward passes. Release packaging and the separately guarded job
-are next; zero learner updates or new training allocation. Earlier completed
-probes and negative learners remain closed.
+The [completed actor-update diagnostic](2026-11-06-cdp-dynamics-actor-update.md) finds dynamics.5 changes
+the full estimated update by.01136%/.01702% at two retained200k batches;
+cosines exceed.99999998. Conditional imitation exceeds the auxiliary term
+4782×/3282×. Critic gradients and estimated updates are exactly unchanged.
+All actions, features and targets reconstruct exactly;419 native pins,22
+unchanged behavior parameters,32 world inputs and guards pass. Native.369s,
+controller3.986s, complete07:38:44.292 UTC November6, sourcec041afea/SHA51c5332c.
+Zero Atari actions or updates. Original CPU launcher collision remains failed;
+separate unchanged-arithmetic repair completes in.698s with454 pins. Closure
+07:43:01.701 seals92 files. Packaged executable retained,4.688GB logical build
+cache released. No active allocation or successor selected. These late fixed
+batches do not explain the candidate's early trajectory or justify a coefficient
+sweep. Keep actor dynamics off and the retained control; five-game goal unfinished.
 
 The [frozen action-path probe](2026-11-06-cdp-breakout-action-path-derivatives.md)
 is closed. Recorded-plan return gradients favor81/92 known short rescues for

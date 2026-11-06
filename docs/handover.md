@@ -8,20 +8,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [dynamics actor-update diagnostic](experiments/2026-11-06-cdp-dynamics-actor-update.md)
-is implemented for the two archived November3 behavior batches. All192 Kindle
-and5 adapter CPU tests and strict Clippy pass; release packaging is next.
-The native probe must reconstruct the original actions, latent rollout and
-normalized targets before measuring the new dynamics.5 and combined gradients.
-It then compares conditional AGC/LaProp updates from the same saved moments.
-Zero Atari actions, learner updates or optimizer steps; no new learner selected.
-Root `/x/Temp/kindle-dynamics-actor-update-20261106`.
+The [actor-update diagnostic](results/2026-11-06-cdp-dynamics-actor-update.md)
+is closed. On two archived retained200k batches, dynamics.5 changes the full
+estimated actor update by only.01136%/.01702%; update cosines exceed.99999998.
+Conditional imitation is4782×/3282× the new term. Critic gradients and estimated
+updates remain exactly unchanged. This does not explain the failed learner's
+early trajectory or justify a coefficient sweep. Keep actor dynamics off,
+coordinates off and retained143.667/70.750 control.
 
-The [completed fixed-plan probe](results/2026-11-06-cdp-breakout-action-path-derivatives.md)
-does not show generally reversed return directions, while survival remains
-poorly calibrated. The full dynamics.5 learner is closed and negative. Preserve
-those results, failures and original collectors; do not rerun completed stages.
-Keep actor dynamics off, coordinates off and retained143.667/70.750 control.
+All archived actions, features and normalized targets reconstruct exactly.
+All419 native pins,22 behavior parameters,32 frozen world inputs and guards pass;
+zero Atari actions, learner updates or optimizer steps. Native.369s/controller
+3.986s complete07:38:44.292 UTC November6, sourcec041afea/SHA51c5332c. Original
+CPU analysis launcher collision remains failed; separate unchanged-arithmetic
+repair completes in.698s with454 pins. Closure07:43:01.701 seals92 files; no live
+allocation. Root `/x/Temp/kindle-dynamics-actor-update-20261106`.
+
+The packaged executable is retained and4,688,112,504logical bytes of disposable
+build cache released. Do not rerun this diagnostic, old captures or collectors.
+Full dynamics.5 and fixed-plan probes remain closed; no successor selected.
 Original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
