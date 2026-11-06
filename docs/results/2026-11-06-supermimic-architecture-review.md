@@ -7,7 +7,9 @@ a meaningful architectural proposal within the five-game goal. The [optional imp
 native qualification and the separately declared8,192-action cost check. The
 new path adds22.39% bounded wall time. A separately declared
 [fresh200k comparison](../experiments/2026-11-06-cdp-breakout-actor-dynamics-200k.md)
-is selected; no gameplay benefit is established. The independent
+is now complete and negative:85.708 greedy/51.625 sampled in26m38.517s,
+below retained143.667/70.750 in21m27.910s. Keep the option off; this coefficient
+and seed do not establish useful extra learning or rule out all such recipes. The independent
 [coordinate-channel comparison](2026-11-06-cdp-rgb-coordinates.md) is now closed
 and regresses both frozen modes; it does not test this actor-gradient proposal.
 

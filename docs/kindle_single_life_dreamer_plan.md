@@ -1,20 +1,28 @@
 # Kindle: CDP learning roadmap
 
-A separately declared [fresh200k dynamics-gradient comparison](experiments/2026-11-06-cdp-breakout-actor-dynamics-200k.md)
-is selected after the bounded cost/numerics check passes. Fix coefficient.5 and
-the retained12M64/Auto/N8/B16/T16/H15/R16 recipe, seed1009/evaluation4000001009;
-coordinates off. The added actor gradients must improve frozen own-initial gain
-per training minute over retained143.667/6.590132, with a positive paired95% lane
-interval. One learner,1,800s training cap,100k recovery and four frozen24-episode
-arms; no experience transfer or automatic successor. CPU helper and exact-queue checks pass;
-the original learner is active since05:49:07.298 UTC/sourcef3be4bd4, PID1397920/
-invocation96e0f92ec2784b0f84cc8c37c45ae0d7. All345 pins,357 matching initial
-tensors and47 pre-update events pass. Independent100k/6,227 recovery verification
-passes06:02:37.883 UTC in.357s:357 finite tensors/moments,345 unchanged pins and
-read-only files. Recovery observer succeeds; original learner/collector remain
-active. Root
-`/x/Temp/kindle-actor-dynamics-20261106/full`. Original864/90% and five-game gates
-remain unfinished; no gameplay benefit is established.
+The [full dynamics-gradient actor comparison](results/2026-11-06-cdp-actor-dynamics.md#full-200k-comparison) is complete and negative:
+200k actions/799,565 frames/12,477 updates in **26m38.517s**, with **85.708 greedy /
+51.625 sampled** versus143.667/70.750. Training costs24.117% more; primary
+own-initial gain/min falls52.44%,6.590132→3.134155. Its paired eight-lane95%
+interval[−5.380121,−1.816569] describes the reused cohort, not seed reliability.
+All0/24 two-wall. Retain `actor_dynamics_scale=None` and coordinates off.
+
+All345 current/338 retained pins,100k recovery,357 matching initial/invariant
+frozen tensors,47 pre-update events,weighted losses,full replays/videos,guards,
+curves,exposure and terminal collection pass. Actual-initial1.416667/2.208333 and
+all799/794 initial semantic events match retained. Original main/collector finish
+06:19:43.764/06:19:55.079 UTC November6/sourcef3be4bd4; all three services succeed.
+The.024s publication reader passes. No failed/repeated production stage; original
+implementation preparation failures remain. Root
+`/x/Temp/kindle-actor-dynamics-20261106/full` is closed, with no allocation active
+at closure. No extension,sweep,confirmation or automatic successor is selected.
+
+Learning-stage time rises1,133.927→1,452.328s. Late own-replay imitation CE improves
+.560514→.545267 despite worse gameplay. Correct derivatives and finite losses
+have not produced useful extra learning at coefficient.5 in this development
+seed. This does not isolate a categorical-gradient bias mechanism or rule out
+all dynamics-gradient recipes. Original864/90% and five-game gates remain
+unfinished; further derivative-quality work needs a separate justified protocol.
 
 The [optional dynamics-gradient actor](experiments/2026-11-06-cdp-actor-dynamics.md) is implemented and natively qualified. A private pre-update world snapshot receives the same
 initial states/draws as imagination; actor gradients traverse dynamics and frozen
@@ -35,7 +43,7 @@ projection and10.67GiB conservative replay headroom pass. All357 initial tensors
 45 allocation/237 source pins and guards pass. No failed or repeated stage.
 Controller closes05:40:12.457 UTC November6/source7609cd4a/native744dd793.
 Root `/x/Temp/kindle-actor-dynamics-20261106/bounded` is closed; no successor was
-selected by that check. The separate full comparison above is now declared. Numerical correctness and cost
+selected by that check. The separate full comparison above is now closed. Numerical correctness and cost
 feasibility do not establish gameplay improvement or useful model derivatives.
 Original Breakout864/90% and five-game gates remain unfinished.
 

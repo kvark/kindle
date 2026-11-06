@@ -8,36 +8,26 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-One [fresh200k Breakout dynamics-gradient comparison](experiments/2026-11-06-cdp-breakout-actor-dynamics-200k.md)
-is selected at `actor_dynamics_scale=.5`, retaining12M64/Auto/N8/B16/T16/H15/R16,
-encoder4e-5, dynamics4e-4, behavior8e-5, critic1/1 and expert100/all-state labels/
-20%-episode guidance. Coordinates stay off. The hypothesis is more useful actor
-learning per update; added backward cost must be repaid in frozen gain/min.
-Greedy is primary against retained143.667/6.590132gain/min, with own-initial
-controls and a positive paired eight-lane95% lower bound. Original864/90%-two-wall
-and five-game gates remain unfinished.
+The [full dynamics-gradient comparison](results/2026-11-06-cdp-actor-dynamics.md#full-200k-comparison)
+is closed and negative:200k actions/799,565 frames/12,477 updates in26m38.517s,
+with85.708 greedy/51.625 sampled versus retained143.667/70.750. Training costs
+24.117% more; primary own-initial gain/min falls52.44% (6.590132→3.134155).
+Paired95% lane interval[−5.380121,−1.816569]; all0/24 two-wall. Retain
+`actor_dynamics_scale=None`, coordinates off and the existing control.
 
-The [bounded check](results/2026-11-06-cdp-actor-dynamics.md#completed-bounded-cost-and-numerics-check)
-passes8,192 actions/489 updates in58.369s,22.39% above retained47.690s; padded
-200k projection26m07.522s and10.67GiB conservative replay headroom pass. Native
-source744dd793/SHA876ed0c, derivative/snapshot/restore qualification and357
-matching initial tensors/47 pre-update events are retained. Earlier preparation
-failures remain recorded. No completed qualification or bounded stage repeats.
+All345 current/338 retained pins,100k recovery,357 matching initial/invariant
+frozen tensors,47 pre-update events,weighted reports,full replays/videos,guards,
+curves and terminal collection pass. Original main/collector finish
+06:19:43.764/06:19:55.079 UTC November6; all three services succeed. No failed or
+repeated production stage. Earlier implementation preparation failures remain.
+Root `/x/Temp/kindle-actor-dynamics-20261106/full` is closed; no GPU allocation is
+active at closure. No extension,sweep,confirmation or automatic successor is
+selected. Check live state before new work; never restart this comparison.
 
-Root `/x/Temp/kindle-actor-dynamics-20261106/full`; service
-`kindle-breakout-actor-dynamics-200k-20261106`. The original learner is active since05:49:07.298 UTC, sourcef3be4bd4,
-PID1397920/invocation96e0f92ec2784b0f84cc8c37c45ae0d7. All345 pins,357 initial
-tensors and47 pre-update events pass. The100k/6,227 recovery verifies at
-06:02:37.883 UTC:357 finite tensors/moments,345 unchanged pins and read-only
-files; the recovery observer succeeds. Original learner and terminal observer
-remain active. CPU helper and exact-queue checks pass with no native/emulator construction. One learner,200k actions/12,477 updates,1,800s cap; retain100k
-recovery and four frozen24-episode arms. Consult the protocol before execution.
-No extension, sweep, second learner or automatic successor is selected. Check
-original process/invocation before interpreting an observer timeout.
-
-The [coordinate comparison](results/2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison)
-remains closed and negative66.333/35.917. Retain coordinates off and the
-143.667 greedy/70.750 sampled control until a qualified improvement is measured.
+The native implementation and bounded derivative/cost checks pass, but this
+coefficient/seed does not establish useful policy gradients or a general cause
+for the regression. Any new derivative-quality assessment needs its own justified
+protocol. Original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
