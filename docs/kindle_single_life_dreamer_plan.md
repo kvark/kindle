@@ -1,21 +1,24 @@
 # Kindle: CDP learning roadmap
 
-The [fixed8,192-action64×8 latent check](experiments/2026-11-06-cdp-latent-shape-bounded.md) is selected after
-native qualification with the separate readback repair. All357 parameter shapes/
-initial tensors must match retained; sampled initial action traces may differ.
-Keep the retained12M64/B16/T16/H15/R16 recipe, changing only categorical grouping.
-Sampling, KL and active one-hot entries change together; no benefit is established.
+The [fresh200k64×8 latent comparison](experiments/2026-11-06-cdp-breakout-latent-shape-200k.md) is selected after the bounded
+check passes:8,192 actions/32,734 frames/489 updates in46.655s versus47.690s;
+padded200k projection1,252.951s and conservative headroom12,049,403,904 bytes.
+All357 initial tensors match retained;357 frozen tensors, replays, guards,
+51 allocation/246 source pins pass. Original bounded jobs are closed at11:11:18.958
+UTC November6. This short historical timing does not establish a speedup.
 
-CPU preflight passes both exact queued CLI commands, missing-shape rejection,
-five changed/shape/extra/missing tensor cases and weighted-loss checks, with zero
-native/emulator construction. Native536012d5/2c9c6e6f and matched runner/teacher
-are pinned; the original native qualification failure remains preserved.
+The candidate keeps the retained12M64/B16/T16/H15/R16 recipe and changes only
+32×16→64×8 categorical grouping. Parameter shapes/counts stay fixed; sampling,
+KL and active one-hot entries change together. CPU full-comparison helpers pass
+in3.554s with no native/emulator construction. Exact queues must pass before
+launch. Keep native536012d5/2c9c6e6f; original qualification failure remains failed.
 
-Root `/x/Temp/kindle-latent-shape-20261106/bounded`; one fresh8,192-action learner
-and1,024-action frozen restore, guards/caps per protocol. No full learner is
-selected. Require finite updates, complete replays,357 frozen invariants and
-measured cost/headroom gates. Do not repeat completed qualification or old jobs.
-Retain143.667 greedy/70.750 sampled, original864/90%-two-wall and five-game gates.
+Root `/x/Temp/kindle-latent-shape-20261106/full`, service
+`kindle-breakout-latent-shape-200k-20261106`. One fresh200k learner,100k recovery,
+then four24-natural-episode final/actual-initial frozen arms. Greedy own-initial
+gain/min is primary; no experience transfer, sweep, extension or successor.
+Retain143.667 greedy/70.750 sampled until evidence qualifies a change. Original
+864/90%-two-wall and five-game gates remain unfinished.
 
 The [frozen residual serving ablation](results/2026-11-06-cdp-residual-actor-serving-ablation.md) is complete and inconclusive.
 Zeroing two correction parameters raises greedy117.625→131.750 and sampled

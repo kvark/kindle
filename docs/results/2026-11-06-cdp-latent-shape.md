@@ -1,5 +1,9 @@
 # Fixed-width categorical regrouping development
 
+The bounded cost/replay check passes. A separately declared fresh200k comparison
+is selected to measure gameplay per minute; no full result exists yet. Native
+qualification's original failure and separate passing repair remain below.
+
 Native qualification is complete with a separate test readback repair. The
 original qualification remains failed. The repaired categorical fixture and
 previously unexecuted Tiny learning/restore fixture both pass; details and
@@ -119,3 +123,41 @@ actor/world/shape/extra/missing negative cases. Same16,334,353 parameters and
 separate protocol; no full learner or gameplay benefit is established. Root
 `/x/Temp/kindle-latent-shape-20261106/bounded`; original qualification failure
 and successful test-only repair stay retained without repeating either stage.
+
+## Completed bounded check and selected fresh comparison
+
+Sourcec65b68fb completes the bounded controller at11:11:18.958 UTC November6
+in64.712s (64.745s wrapper). Training covers8,192 actions/32,734 emulator frames/
+489 updates in46.655331s, versus retained47.689684s,2.169% less observed time.
+Construction takes2.771416s. Historical timing and changed experience do not
+establish an isolated speed improvement. Padded200k projection1,252.950787s
+passes the1,800s gate; minimum observed headroom17,988,603,904 bytes across3,096
+snapshots leaves12,049,403,904 after subtracting the entire5,939,200,000-byte full
+replay footprint. The conservative2GiB gate passes.
+
+All357 actual-initial tensors match retained and all schemas stay unchanged.
+The1,024-action/4,096-frame frozen restore takes.907656s, preserves357 tensors
+and performs zero updates. It completes zero natural episodes and provides no
+competence evidence. Encoder/reward/continuation/actor/critic parameters change;
+all489 finite reports and both weighted loss identities pass. Complete training
+pixel/action/label/override replay and frozen action/outcome/frame/boundary replay
+pass, as do both guards and51 allocation/246 source pins. Overrides cover47.046%
+of actions;20% selects episodes. Learner time40.274s includes component sums
+16.566s imagination,13.558s world training,6.145s posterior and2.501s behavior.
+
+Independent CPU closure confirms original controller1464564 and both children
+are terminal with51 unchanged allocation pins. No bounded stage fails or repeats.
+Review SHA256 `8952e2ea167fdfc94f5537806d74deb7590edc16b787a7923f9b1f9226eaac67`;
+training replay `ed4265a8690cc64e8d276e54530b828df5834bd5f6d8692adb840d650bd79598`.
+Root `/x/Temp/kindle-latent-shape-20261106/bounded` is closed.
+
+The [separate fresh200k protocol](../experiments/2026-11-06-cdp-breakout-latent-shape-200k.md)
+selects one candidate with the same package/recipe, initialized afresh. CPU
+helpers pass in3.554s with no native/emulator construction: full comparison
+entry, own-initial lane estimates, corrupted losses/headers, exposure and plotting.
+All357 bounded/retained initial tensors must match;47 pre-update events must
+match the bounded candidate. Retained action traces may differ under grouping.
+Four frozen24-natural-episode arms measure actual-initial and final policies.
+No bounded experience is transferred; no full result or gameplay benefit exists
+yet. Exact five-command preflight must pass before launch. Original864/90% and
+five-game gates remain unchanged.
