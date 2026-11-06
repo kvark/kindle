@@ -20,20 +20,24 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [causal shot-prediction analysis](docs/experiments/2026-11-06-cdp-breakout-causal-shot.md) is selected. Use only saved
-teacher decisions at or before the first incoming-fit frame to predict the later
-outgoing slope. Compare one fixed ridge model using predicted paddle offset and
-incoming direction with incoming-only and constant baselines. Fit episodes0–1;
-use episode2 as a reused development holdout. Actual reconstructed contact offset
-uses outgoing geometry and is excluded from features. This tests whether planned
-contact placement adds predictive value; it does not establish useful steering.
+The [pre-contact shot predictor](docs/results/2026-11-06-cdp-breakout-causal-shot.md) is complete and fails its fixed
+screen. Adding planned contact offset lowers holdout slope MAE.691547→.601837
+(12.972%) versus incoming direction alone, below the required20%; direction
+accuracy76.761% misses80%. All eight lanes improve MAE, but this does not qualify
+a steering controller. Inputs precede the incoming-fit window; reconstructed
+actual contact offset and future geometry are excluded as features. Keep the
+original teacher. This is observational prediction, not a causal action test.
 
-Root `/mnt/data/kindle-breakout-causal-shot-20261106`. CPU-only, one low-priority
-core,30s analysis/90s controller caps. No collector, emulator, native agent, GPU
-allocation or learner. Six CPU fixture groups and63 pins, including47 historical
-sealed files, pass. The independent reader will recount source joins and solve
-the ridge models through augmented least squares. No threshold search or automatic controller successor.
-The original864/90% two-wall gate and five-game goal remain unfinished.
+All776 contacts qualify:492 fitting/284 reused holdout rows. Six CPU fixture
+groups,64 pins,47 historical sealed files,18 completion artifacts and an
+independent source-join/augmented-least-squares recount of54 metric groups pass.
+The controller completes21:17:03.571 UTC November6 in1.058103s, source569d34bf;
+separate terminal closure passes21:18:12.524. No failed or repeated stage.
+
+Root `/mnt/data/kindle-breakout-causal-shot-20261106` is closed. No collector,
+emulator/native construction, new game action, learner update or GPU work.
+No controller, fit retry, integration or automatic successor is selected.
+Original864/90% two-wall and the full five-game goal remain unfinished.
 
 The [fresh-seed confirmation](docs/results/2026-11-06-cdp-breakout-seed22003.md) remains closed:75.250/44.708 versus retained94.625/70.500 on the same new cohort.
 Useful learning is confirmed; seed/cohort variation and all0/24 two-wall remain.
