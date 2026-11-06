@@ -8,23 +8,22 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) passes native correctness and bounded cost checks.
-It remains default off.
-The fixed8,192-action/489-update check takes41.940s versus saved47.690s
-(12.06% less wall time); this historical comparison does not establish gameplay
-benefit. Encoder sampling/nonlinear reduction change despite identical parameters.
-Retain native RGB max-pool, one GPU resize, RGB64, latent/control dimensions.
+The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) now has a separately declared
+fresh200k-action Breakout comparison selected. Bounded cost falls47.690→41.940s
+(12.06%); native values/derivatives, restore, default-off compatibility, exact
+initial/frozen tensors and replay checks pass. Original CPU fixture compile
+failure remains preserved; no completed stage repeats.
 
-CPU/package checks, independent native values/derivatives, synthetic updates/
-restore and default-off traces pass; original CPU fixture failure stays retained.
-Bounded checks pass all357 initial/frozen tensors, finite losses, full action/label
-replays and guards. Conservative full-replay headroom11.667GiB; padded200k
-projection18m46s. Imagination remains47.26% of measured learner time.
-Root `/x/Temp/kindle-rgb-stride2-20261106`; closure17:26:13.324 UTC November6.
-No GPU allocation or full learner is active/selected. A learning comparison
-requires a separate declaration and own actual-initial frozen controls. Do not
-repeat completed qualification stages. Keep retained143.667 greedy/70.750 sampled;
-original864/90% two-wall and the five-game goal remain unfinished.
+Use native `cde123e1`, the matching runner and retained12M/RGB64/B16/T16/R16/Auto
+recipe/teacher; only `rgb_stride2` is enabled. No check experience transfers.
+Fixed200k actions/12,477 updates,25min training cap,100k recovery; four frozen
+24-natural-episode arms compare final and own actual-initial sampled/greedy.
+Greedy raw return and own-initial gain/min, with a positive paired lane interval,
+are the retention criteria. Initial tensors match; encoder outputs may differ.
+Root `/x/Temp/kindle-rgb-stride2-20261106/full`; CPU helpers pass4.142s,
+model/emulator construction blocked. Queued-command preflight precedes launch.
+No extension, second learner or automatic successor. Keep retained143.667
+greedy/70.750 sampled; original864/90% two-wall and five-game goal unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

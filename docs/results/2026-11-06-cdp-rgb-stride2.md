@@ -79,7 +79,8 @@ passes in.167s, exercises both actual queue commands with zero native/emulator
 construction, and retains exact357-tensor initial/frozen checks. Only the
 encoder stride option changes the retained learning config. The declared gates are25min padded200k and2GiB conservative replay headroom.
 All packaged artifacts and the exact original native-pinned build receipt remain
-retained after disposable build-cache release. No full learner is selected.
+retained after disposable build-cache release. These checks do not by themselves
+select a full learner; the separate learning declaration follows below.
 
 
 ## Completed bounded cost check
@@ -140,3 +141,26 @@ training minute against its own actual-initial control and report both modes;
 it cannot reuse check experience or claim an independent seed. Retain the current
 RGB64 teacher/recipe and143.667 greedy/70.750 sampled until useful learning is
 measured. Original864/90% two-wall and five-game gates remain unfinished.
+
+
+## Fresh200k comparison selected
+
+The [separate fixed-budget protocol](../experiments/2026-11-06-cdp-breakout-rgb-stride2-200k.md)
+selects one fresh200k-action/12,477-update learner. The measured12.056% bounded
+cost reduction warrants testing frozen learning efficiency; no gameplay benefit
+is inferred from speed alone. Only `rgb_stride2` changes the retained recipe.
+Reuse seed1009/cohort4000001009, with no weights or experience transferred. Keep
+25min training cap,100k recovery and four24-natural-episode frozen arms, including
+own actual-initial sampled/greedy controls. All357 initial tensors must match
+bounded and retained; pre-update traces must match the same-stride bounded run,
+while retained initial actions may differ. Greedy is primary under the declared
+raw-score and own-initial gain/min criterion with paired lane bootstrap.
+
+Existing controllers are copied and adapted to the flag/preprocessing change,
+25min cap and declared initial-behavior differences. CPU helper qualification
+passes in4.142s: retained/bounded audit inputs, loss sums, configuration rejection,
+full comparison entry, actual curve input and recovery/collector conditions.
+Native model construction is absent. Exact queued parser/configuration checks
+must pass before launch. Root `/x/Temp/kindle-rgb-stride2-20261106/full`;
+service `kindle-breakout-rgb-stride2-200k-20261106`. No automatic extension,
+second learner or successor is selected; the retained default stays unchanged.
