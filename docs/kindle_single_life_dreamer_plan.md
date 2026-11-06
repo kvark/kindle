@@ -1,15 +1,24 @@
 # Kindle: CDP learning roadmap
 
-The [actor-only width experiment](experiments/2026-11-06-cdp-actor-width.md) adds a default-absent actor width
-override, selecting512 versus256 at12M with1,054,720 extra actor parameters.
-All194 Kindle/5 adapter tests,1,116 packaged Python checks and strict
-workspace/binding Clippy pass. The original native Tiny qualification passes
-in2.820s: two updates, exact actor sharing/restore,243 unchanged pins and zero
-Atari actions. The [separately declared8,192-action/489-update cost check](experiments/2026-11-06-cdp-actor-width-bounded.md) and
-1,024-action frozen restore are selected. Actual CLI and non-actor audit
-fixtures pass CPU preflight in.167s with zero native/emulator constructions.
-No full learner is selected. Prior larger-world and shorter-imagination
-failures do not test this actor-only hypothesis; no capacity cause is claimed.
+The [actor-only width512 bounded check](results/2026-11-06-cdp-actor-width.md) is complete and passes execution/cost gates.
+The original8,192-action/32,715-frame/489-update run takes53.270s,11.702% longer
+than retained47.690s; padded200k projection23m50.597s and conservative full-replay
+headroom11.214GiB pass. Frozen1,024 actions/4,096 frames take.892s with zero
+updates and357 invariant tensors; no natural episode completes, so gameplay
+quality is unmeasured. All313 non-actor initial tensors match;40 actor shapes
+widen, adding1,054,720 trainable parameters. Both weighted-loss checks, full
+training/frozen CPU replays,49 allocation/239 source pins and guards pass.
+
+Implementation80085208/nativeeeaf699a passes194 Kindle/5 adapter tests,1,116
+packaged Python checks and strict Clippy. Native Tiny2-update qualification
+passes in2.820s with243 pins; actual-command/non-actor fixtures pass in.167s
+without native/emulator construction. Bounded sourceeeebd450/controller completes
+08:14:02.459 UTC November6 in70.966s, with no failed/repeated stage. Root
+`/x/Temp/kindle-actor-width-20261106/bounded` is closed;4.807GB logical build
+cache released, packaged runtime/binary retained. No allocation or full learner
+is selected. A separately declared comparison must use own-initial controls
+and judge return gained per minute. Capacity causality and gameplay benefit
+remain unproven; retained143.667/70.750 and the five-game goal are unchanged.
 
 The [completed actor-update diagnostic](results/2026-11-06-cdp-dynamics-actor-update.md) finds dynamics.5 changes
 the full estimated update by.01136%/.01702% at two retained200k batches;

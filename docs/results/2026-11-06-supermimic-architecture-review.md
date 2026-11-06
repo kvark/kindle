@@ -98,3 +98,33 @@ it has separate compute andmodel-bias tradeoffs.
 The retained Breakout70.750sampled/143.667greedy control andoriginal864/90% gate
 remain unchanged. No speedup, completed five-game goal or successor allocation follows from the
 paper alone; the implemented comparison and diagnostic results are linked above.
+
+## Architectural implications after the measured comparison
+
+Keep learned imagination and the optional connected actor path. The failed
+coefficient.5 recipe is evidence against adopting that recipe, not a reproduction
+of SuperMimic or a rejection of every differentiable-control method. A derivative
+can be computed correctly for the declared surrogate while remaining poor
+guidance for real action choices. The completed outcome and optimizer probes
+provide narrower evidence than a full explanation of the regression.
+
+For future Atari development, prioritize the model's usefulness for choosing
+actions: accurate alternative-action rankings, survival and reward predictions
+over the control horizon, followed by a measured effect on policy updates and
+frozen gameplay per minute. Reuse the completed probes when defining a new
+hypothesis. More multi-step supervision alone is not a fresh proposal: the
+[three-step comparison](2026-11-03-cdp-breakout-open-loop.md) already regressed.
+
+One distinct future estimator would score each discrete action with a fixed
+world model and critic, then train the actor against the probability-weighted
+action values. This avoids differentiating through a relaxed button choice,
+but retains model/critic bias and adds branch computation. It is not equivalent
+to multi-step dynamics backpropagation, and no such experiment is selected here.
+Continuous latent states alone would not remove the discrete-action issue.
+
+For a future continuous-control task, direct actor gradients would be a more
+natural candidate. The native capability now exists; its value would still need
+measurement in that task. Sharing one robot's dynamics across goals also does
+not establish that unrelated Atari games should share a single dynamics model.
+These are architectural directions within the existing goal, not permission
+to repeat closed experiments or a claim of a SuperMimic-sized efficiency gain.

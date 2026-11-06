@@ -8,22 +8,22 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [actor-only width experiment](experiments/2026-11-06-cdp-actor-width.md)
-is selected for native qualification and a bounded cost check. Add optional
-`actor_hidden_units`; test512 versus the12M preset's256, with1,054,720 extra
-trainable actor parameters. CNN, RSSM, critic widths, losses and optimizer
-ownership stay fixed. Default absent; restore preserves the width. Larger
-whole-model capacity failed, so actor-only capacity remains an unproven narrower
-hypothesis, not an established bottleneck.
+The [actor-only width check](results/2026-11-06-cdp-actor-width.md)
+is complete. Optional `actor_hidden_units=512` versus256 adds1,054,720
+trainable actor parameters, with unchanged CNN/RSSM/critic widths and losses.
+Default absent; restore preserves the width. CPU/CLI/native qualification and
+both original bounded GPU jobs pass. Fresh8,192 actions/489 updates take53.270s,
+11.702% longer than retained; padded200k projection23m50.597s and11.214GiB
+conservative replay headroom pass. All313 non-actor initial tensors and357
+frozen invariant tensors, weighted losses, full CPU replays and guards pass.
 
-Implementation,194 Kindle/5 adapter CPU tests,1,116 packaged Python checks
-and strict workspace/binding Clippy pass. The original guarded two-update Tiny
-restore/synchronization check passes in2.820s with243 unchanged pins and zero
-Atari actions. The [separately declared8,192-action cost check](experiments/2026-11-06-cdp-actor-width-bounded.md) is selected, with
-1,024 frozen actions; actual command paths and non-actor invariance audit pass
-CPU preflight with zero native/emulator construction. Root
-`/x/Temp/kindle-actor-width-20261106`. No full learner, coefficient sweep or
-old-stage repeat is selected; consult the bounded protocol before execution.
+Root `/x/Temp/kindle-actor-width-20261106/bounded` is closed. No GPU allocation,
+full learner or automatic successor is selected. Packaged runtime/binary remain;
+4.807GB logical build cache is released. Do not repeat qualification, learners,
+replays or audits. The [bounded protocol](experiments/2026-11-06-cdp-actor-width-bounded.md)
+checks cost and execution only; better learning and an actor-capacity cause
+remain unmeasured. Any full comparison requires a separate declaration with
+own-initial frozen controls and return gained per minute.
 
 The [closed actor-update diagnostic](results/2026-11-06-cdp-dynamics-actor-update.md)
 finds only.01136%/.01702% changes in estimated retained-checkpoint updates.
