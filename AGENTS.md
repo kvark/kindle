@@ -34,9 +34,12 @@ Require exact own-bounded initial tensors/pre-update events and four24-episode
 frozen arms with own actual-initial controls. Greedy gain/min is primary.
 
 Changed CPU helpers and complete comparison/plot entry checks pass in3.991s,
-with no native/emulator construction. Root
-/x/Temp/kindle-rgb96-20261106/full is prepared; no GPU allocation has started.
-Next prepare/check the exact queues and launch the single guarded learner.
+with no native/emulator construction; all five exact queues pass in.503s.
+Root /x/Temp/kindle-rgb96-20261106/full is active from14:44:55 UTC November6,
+sourcecf007696. Startup passes all357 own-bounded initial tensors and47 pre-update
+events; first update376. All367 pins and original main/collector/recovery service
+identities pass at14:45:48. No frozen gameplay result yet; observe the original
+allocation through recovery, fixed assessments and terminal collection.
 Original Python/two native fixture failures remain preserved with separate repairs.
 No bounded experience transfers and no completed stage repeats or extends.
 Retain RGB64,32×16,143.667 greedy/70.750 sampled pending evidence.
