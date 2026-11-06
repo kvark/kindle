@@ -12,7 +12,12 @@ is separately selected with100k recovery andfour24-episode frozen arms. Fixed
 coordinates add1,600 first-layer weights andchange initialization; no baseline
 initial equality orisolated mechanism is claimed. Nativeb9136467/runnera0ffbe46.
 The SuperMimic actor-gradient direction is a separate proposal, not this change.
-The original864/90% gate andfive-game goal remain unfinished. Check live state.
+The fresh learner launches04:30:28.229 UTC November6/sourcecb9a0499 with124pins,
+mainPID1386077/invocationc11b782f30804e6f951712401a64d0d8. Startup passes357initial
+tensors and47events; recovery/terminal observers are active. Full frozen benefit
+is pending. The [SuperMimic source review](results/2026-11-06-supermimic-architecture-review.md)
+records the separate connected-actor-graph proposal. The original864/90% gate
+andfive-game goal remain unfinished. Check live state; no concurrent GPU job.
 
 The [completed categorical-mixing comparison](results/2026-11-04-cdp-breakout-latent-unimix001.md#full-200k-comparison) finishes 200k actions /
 799,612 frames /12,477 updates in **21m19.046s**. Lower latent mixing.001 scores

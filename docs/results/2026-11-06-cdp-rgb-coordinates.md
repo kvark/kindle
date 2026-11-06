@@ -60,3 +60,25 @@ Do not repeat completed stages. A separately declared
 [fresh200k comparison](../experiments/2026-11-06-cdp-breakout-rgb-coordinates-200k.md)
 will measure whether explicit image position improves frozen gameplay per minute.
 The original864/90%-two-wall gate and five-game goal remain unfinished.
+
+## Fresh comparison startup
+
+The separately declared200k learner launches **04:30:28.229 UTC November6**
+on sourcecb9a0499, with124 fixed pins. MainPID1386077, invocation
+`c11b782f30804e6f951712401a64d0d8`; service
+`kindle-breakout-rgb-coordinates-200k-20261106`. All357 initial tensors match the
+bounded architecture and47 pre-update events match. The first update occurs
+at376 actions. Recovery andterminal observers are active; no frozen full result
+is available. Check live process identity before any further GPU work.
+
+Full CPU preparation first fails only in its plot fixture, which retained the
+previous experiment's path andlatent-mixing expectation. Both are corrected in
+that fixture; a separate1.111s CPU continuation completes the remaining checks,
+without repeating prior successful helper stages. The complete comparison entry,
+config/schema,allfive mocked queued commands andreplay paths pass. Original
+failure,fixture source andrepair receipts are pinned. The1.009GB disposable
+build cache is released; wheel,native runtime andvalidation executable remain.
+
+The [SuperMimic review](2026-11-06-supermimic-architecture-review.md) records a
+separate connected-actor-graph proposal. It is not part of this comparison and
+has no selected GPU allocation.

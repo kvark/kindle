@@ -34,12 +34,16 @@ sampled/greedy24-episode assessments. Coordinates add1,600 first-layer weights;
 RGB replay,one GPU resize andother retained settings stay fixed. No gameplay
 benefit or isolated perceptual cause is established. Source2d651cb0/nativeb9136467
 andrunnera0ffbe46 differ fromretained447fe50; baseline initial equality is not
-required. Root`/x/Temp/kindle-rgb-coordinates-20261104/full`. Check live state
-before work; no learner has launched at this update.
+required. Root`/x/Temp/kindle-rgb-coordinates-20261104/full`. The fresh learner
+launches04:30:28.229 UTC November6/sourcecb9a0499, with124 pins; mainPID1386077/invocationc11b782f30804e6f951712401a64d0d8. Startup passes357
+bounded-matching initial tensors and47 pre-update events. Recovery/terminal
+observers are active. Check live identity; do not restart or launch another GPU
+job while this learner is active.
 
-The SuperMimic review identifies direct dynamics-gradient actor training as a
-separate architectural lead within the same goal. It remains a proposal; this
-coordinate comparison does not change actor training. Retain143.667greedy/
+The [SuperMimic source review](docs/results/2026-11-06-supermimic-architecture-review.md) identifies
+direct dynamics-gradient actor training as a separate architectural lead within
+the same goal. It remains a proposal; this coordinate comparison does not change
+actor training. Retain143.667greedy/
 70.750sampled andthe original864/90%-two-wall gate. The five-game goal is unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
