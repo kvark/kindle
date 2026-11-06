@@ -1,5 +1,21 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [contact-horizon risk teacher comparison](../experiments/2026-11-06-cdp-breakout-contact-risk.md) is selected for one
+bounded CPU arm:24 natural episodes across eight lanes, development4000001009,
+compared with the retained225.083 teacher. It propagates the existing nine
+command-error second moments to contact within five actions, keeping the mean
+planner fixed and falling back whenever any candidate leaves the interior
+calibration region. The earlier one-step risk failure remains closed.
+
+Six new CPU fixture groups pass, including independent signed-shock arithmetic,
+one-step equivalence and zero-penalty legacy behavior. All44 preflight pins and
+11 historical artifacts pass; ROM/ALE/adapter match the retained control exactly.
+No emulator is constructed in preflight. Collection/replay caps300s each,
+600k aggregate actions,660s controller; no control rerun or native learner.
+Root `/x/Temp/kindle-breakout-contact-risk-20261106`. No GPU allocation, native
+integration or fresh cohort is selected. Retain original teacher/guidance and
+143.667 greedy/70.750 sampled; original864/90% and five-game gates remain open.
+
 The [offline shot-outcome diagnostic](2026-11-06-cdp-breakout-shot-outcomes.md) is complete and fails its fixed
 outer-region design screen. Post-catch reward/frame ratios are 1.173490 below
 score216 and 1.271007 at216–431; only3/8 lanes favor projected outer entry.
