@@ -1,23 +1,22 @@
 # Kindle: CDP learning roadmap
 
-The [completed-return replay-value experiment](experiments/2026-11-06-cdp-completed-value.md) is selected for
-CPU implementation and packaging. Default-off `replay_value_completed` uses
-completed observed game returns where available and preserves the existing
-lambda target elsewhere. It adds no graph operations or parameters. Active
-model-derived disagreement and auxiliary life boundaries are incompatible.
-This differs from the closed completed-return actor experiments; they stay closed.
+The [completed replay-value implementation](results/2026-11-06-cdp-completed-value.md) is packaged and selected
+for [bounded native qualification](experiments/2026-11-06-cdp-completed-value-native.md). Default-off targets use completed
+observed game returns where available, preserving the existing lambda target
+elsewhere. No new graph operations or parameters; model-derived disagreement
+and auxiliary life boundaries are incompatible.
 
-Implementation and new CPU/native fixture sources are ready for checks. The
-native fixture remains ignored pending a separate GPU declaration. No emulator,
-GPU allocation or learner is selected. Root
-`/x/Temp/kindle-completed-value-20261106`; 261 pre-edit source files are retained.
-Next verify configuration, return alignment, fallback, reporting and restore
-validation, then package the exact runtime. Do not infer gameplay benefit.
+Rust passes 220 Kindle / five gym tests and both strict Clippy checks. Original
+packaged Python records 1,158 passes / 12 fixture failures / ten deselections;
+the separate fixture-only repair passes all 12 affected cases with zero native
+construction. Preserve the original failure. Native d0e7bb79/SHA3146e0dc and the
+wheel/test binary are retained after verified disposable-cache release.
 
-The [brick-aiming teacher check](results/2026-11-06-cdp-breakout-brick-aim.md) is closed and negative (208.458 versus
-225.083); keep the original teacher. Retain CDP scale 500 and learned Breakout
-143.667 greedy / 70.750 sampled. Original 864/90% two-wall and the five-game
-goal remain unfinished. No full learner or automatic successor is selected.
+Root `/x/Temp/kindle-completed-value-20261106`. Next execute the single guarded
+Tiny target/restore fixture, then two default-off frozen compatibility prefixes.
+No cost-check learner or full training is selected. Keep the original teacher,
+CDP scale 500 and learned Breakout 143.667 greedy / 70.750 sampled. Original
+864/90% two-wall and the five-game goal remain unfinished.
 
 The [sparse-wall brick-aiming teacher comparison](results/2026-11-06-cdp-breakout-brick-aim.md) is complete and
 fails retention: 208.458 versus 225.083 (−7.386%), only 1/8 improved lanes and

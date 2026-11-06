@@ -13,8 +13,8 @@ from test_breakout_corrections import corrective_events
 from test_vector import write_log
 
 
-def command(tmp_path, args):
-    return ['atari_vector.py', '--output', str(tmp_path/'never.jsonl'), *args]
+def command(tmp_path, args, name='never'):
+    return ['atari_vector.py', '--output', str(tmp_path/f'{name}.jsonl'), *args]
 
 
 @pytest.mark.parametrize('args,message', [
@@ -67,7 +67,7 @@ def test_completed_values_only_add_selected_config(monkeypatch, tmp_path):
         learned_rgb=construct, SUPPORTS_COMPLETED_REPLAY_VALUE=True))
     for enabled in (False, True):
         monkeypatch.setattr(sys, 'argv', command(tmp_path, ['--cdp', '--cdp-centered',
-            '--disagreement-scale', '0', *(['--replay-value-completed'] if enabled else [])]))
+            '--disagreement-scale', '0', *(['--replay-value-completed'] if enabled else [])], name=str(enabled)))
         with pytest.raises(RuntimeError, match='checked native boundary'):
             atari_vector.main()
     plain, candidate = configs
@@ -108,7 +108,7 @@ def test_completed_value_reports_match_config(tmp_path, mutation):
     rows = corrective_events()
     config = rows[0]['config']
     config.update(replay_value_completed=True, disagreement_bonus=False)
-    config['loss_scales']['replay_value'] = 1.
+    config.setdefault('loss_scales', {})['replay_value'] = 1.
     reports = [event['report'] for event in rows if event['event'] == 'learner']
     for report in reports:
         report['behavior'] = dict(completed_value_rows=1)
