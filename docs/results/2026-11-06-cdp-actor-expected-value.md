@@ -1,4 +1,8 @@
-# Enumerated one-step actor: implementation and CPU qualification
+# Enumerated one-step actor: qualification and bounded cost
+
+The bounded check passes execution and cost gates, with **31.350% more training
+time** than retained. Gameplay benefit remains unmeasured; no full learner is
+selected. [Bounded results](#bounded-learning-cost-check-complete).
 
 The [development protocol](../experiments/2026-11-06-cdp-actor-expected-value.md)
 implements `actor_expected_value`, default false. It replaces the sampled-action
@@ -91,3 +95,50 @@ now selects8,192 fresh learning actions and1,024 frozen actions with this packag
 The one-step expectation removes the sampled-action term but preserves entropy,
 imitation, critic and ordinary imagination; its extra branch cost is unmeasured.
 No full learner is selected. Keep the retained recipe pending measured outcomes.
+
+## Bounded learning-cost check complete
+
+The fresh8,192-action learner completes489 updates in **62.640236s**, versus
+retained47.689684s: **31.3497% more** observed wall time. Training executes32,725
+emulator frames; construction adds2.568818s. First update is at376 actions and
+final debt.5. Its20%-episode schedule actually overrides3,788/8,192 actions;
+guided online returns are not frozen competence. Native pooled RGB, one GPU
+resize,12M64/B16/T16/H15/R16,32×16 and the retained teacher/settings remain.
+
+A separate1,024-action/4,096-frame frozen greedy restore takes.848175s plus
+2.320214s construction, with zero updates and no completed natural episode.
+All357 tensors remain invariant and the expected-value flag survives restore.
+This arm checks execution/restore; it supplies no natural-episode score.
+All357 actual-initial tensors/moments and47 pre-update transition events match
+retained exactly. Encoder, reward, continuation, actor and critic change during
+learning; frozen world actor copies match their source actor. All489 finite
+reports and both weighted totals pass. The expected-value metric is already
+inside policy_loss and is not added a second time.
+
+The padded200k projection `62.640236*200000/8192*1.1` is **1682.232912s**
+(**28m02.233s**), below the declared1800s cap. All3098 memory snapshots are valid.
+Minimum observed headroom is16,356,782,080 bytes; subtracting the entire full
+5,939,200,000-byte replay leaves10,417,582,080 bytes (**9.702GiB**), above2GiB.
+Both gates pass. This is a bounded projection, not measured full-training cost.
+
+Learning occupies56.242s of the62.640s loop. Summed wrapper timings include
+imagination16.635s, world training13.593s and behavior training18.187s; the new
+snapshot wrapper sums.145s. These timers do not isolate GPU kernels, and neither
+this cost change nor derivative correctness establishes a better policy.
+
+Both independent full action replays pass, including training pixels/corrective
+labels and frozen outcomes/frames/boundaries. All253 source/51 execution pins,
+host guards and queue/audit receipts pass. Source `ad5fa2934cdc9820795031359e567d2b6a19757e`,
+controller1489646 completes **13:06:26.569 UTC November6**,81.268s including
+checks (outer wrapper81.309s). The read-only publication closure completes
+**13:07:03.835 UTC** in.085s, confirming original controller/children gone,
+no Kindle service/render holder, initial/trace/frozen identities and cost math.
+No GPU stage or audit fails/repeats. Original compile failure remains preserved.
+
+The3,449,779,219-byte disposable build cache is released after verifying all
+three retained package artifacts. Root `/x/Temp/kindle-actor-expected-value-20261106/bounded`
+is closed. No full learner, sweep, extension or automatic successor is selected.
+A separately declared fresh fixed comparison is now feasible; it must judge
+frozen own-initial gameplay gain per training minute against143.667/70.750,
+not loss magnitude or bounded guided returns. Retain the existing recipe and
+keep the new option off. Original864/90%-two-wall and five-game gates remain.
