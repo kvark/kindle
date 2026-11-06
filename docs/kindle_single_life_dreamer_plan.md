@@ -20,9 +20,14 @@ starts08:27:14.431 UTC November6/source91647453/PID1432519/invocation
 Startup passes08:27:20.152:357 bounded initial tensors/47 events and313 retained
 non-actor tensors match;11 retained initial events differ as allowed. Root
 `/x/Temp/kindle-actor-width-20261106/full`, service
-`kindle-breakout-actor-width-200k-20261106`, is active. Recovery and frozen scores
-remain pending. Check original live identity; no extension, sweep, second
-learner or automatic successor. Original864/90%-two-wall and five-game gates remain.
+`kindle-breakout-actor-width-200k-20261106`, is active. The100k/6,227 checkpoint
+passes its original audit08:39:19.911 UTC and independent CPU verification
+08:39:45.022 in.372s:357 finite tensors,347 unchanged pins and read-only files.
+The verifier performs no model forward/update; original learner identity stays
+unchanged and the recovery observer succeeds. Recovery omits replay, games,
+live beliefs and full RNG. Frozen scores remain pending. Check original live
+identity; no extension, sweep, second learner or automatic successor. Original
+864/90%-two-wall and five-game gates remain.
 
 The completed bounded run takes53.270s for8,192 actions/32,715 frames/489 updates,
 11.702% longer than retained; padded200k projection23m50.597s and11.214GiB
