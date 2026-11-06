@@ -44,12 +44,15 @@ is mocked where required and all native constructors are forbidden. This is not
 qualification of a newly built package. Existing CPU adapter tests may exercise
 emulators; no native learning or GPU work occurs.
 
-## Prepared native qualification
+## Completed native qualification
 
 Two new ignored fixtures compile: TinyRGB64 encoder values/loss and four selected
 parameter derivatives against an independent F64 strided reference; two synthetic
-CDP updates with exact parameter/optimizer/config restore. Neither has executed; both are now selected once by the
-[guarded native protocol](../experiments/2026-11-06-cdp-rgb-stride2-native.md).
+CDP updates with exact parameter/optimizer/config restore. Both pass once under the
+[guarded native protocol](../experiments/2026-11-06-cdp-rgb-stride2-native.md):
+encoder.77s, synthetic learner/restore.58s; complete guarded controller3.568s.
+All266 pins remain unchanged. Both children exit0 and are gone, guards pass,
+and no render holder or Kindle service remains. Zero Atari actions.
 Existing native resize, CNN and learner fixtures are not selected for repetition.
 
 Release test compilation passes in63.677s and wheel build in6.935s. Installed
@@ -61,8 +64,12 @@ test executable SHA256
 The receipt pins260 source files and all packaged artifacts.
 
 Root `/x/Temp/kindle-rgb-stride2-20261106` retains source pins, exact commands,
-logs and the original failed fixture. Native qualification is selected;
-default-off compatibility and the fixed8,192-action cost check remain conditional
-and require separate declarations. No full learner or gameplay benefit is selected or established. Retain the
+logs and the original failed fixture. Native qualification is complete.
+The [default-off compatibility protocol](../experiments/2026-11-06-cdp-rgb-stride2-legacy.md)
+now selects two frozen1,024-action traces of retained/actual-initial checkpoints.
+No learning updates. The fixed8,192-action cost check remains conditional and
+requires a separate declaration. The3.9GiB build cache is released after
+packaging/native validation; all packaged artifacts and the exact original
+native-pinned build receipt remain retained. No full learner or gameplay benefit is selected or established. Retain the
 current teacher, RGB64 recipe and143.667 greedy/70.750 sampled; original864/90%
 two-wall and the five-game goal remain unfinished.
