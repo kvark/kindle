@@ -20,25 +20,24 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [completed replay-value comparison](docs/results/2026-11-06-cdp-completed-value.md#full200k-comparison) finishes200k actions /799,584
-frames /12,477 updates in17m03.021s. Frozen greedy89.958/sample50.500 improve
-point scores over bonus-off65.208/46.458, but both paired gain/min intervals
-span zero. Against primary143.667/70.750, greedy gain/min falls21.906% despite
-20.567% less training time. Keep the option off and retain primary; all0/24
-two-wall and original864/90% gate unfinished.
+The [one-seed Breakout confirmation](docs/experiments/2026-11-06-cdp-breakout-seed22003.md) is selected. Train one fresh learner
+at seed 22003 for 200k actions with the exact retained recipe, native447fe50 /
+SHA35ad0db, runnercf4ea238 and original teacher. No hyperparameter, architecture,
+loss, runtime build or experience transfer changes. Evaluate both new and retained
+1009 final/actual-initial checkpoints on new cohort4000022003, sampled and greedy,
+24 natural episodes per arm. This tests the selected baseline beyond reused1009;
+positive learning alone does not satisfy the original864/90% two-wall gate.
 
-All261 initial/frozen tensors,47 pre-update events, complete replays, weighted
-losses,100k recovery and original services pass. Completed labels supply2,531,238
-row exposures on12,422 updates, first at action1,224. Independent CPU closure
-20:19:20.913 UTC November6 verifies425 active/338 retained pins,55 completion
-artifacts,28 checkpoint files and384 candidate/reference episodes. Prior packaged
-fixture and full helper log-order failures remain preserved with separate repairs.
+Root `/x/Temp/kindle-breakout-seed22003-20261106/full`; service
+`kindle-breakout-seed22003-200k-20261106`. Preparation is CPU-only; no learner
+is active. A stale archived replay-helper path caused a preparation copy failure;
+its source/error are preserved, and the continuation uses the verified exact
+retained copy. No native/emulator stage was attempted or repeated.
 
-Root `/x/Temp/kindle-completed-value-20261106/full` is closed; execution39324619,
-native d0e7bb79/SHA3146e0dc. All five GPU children and main/recovery/collector
-services are terminal; no render holder remains. No extension, second learner,
-sweep or automatic successor is selected. Do not repeat completed stages.
-The five-game goal remains unfinished.
+The [completed replay-value comparison](docs/results/2026-11-06-cdp-completed-value.md#full200k-comparison) stays closed and off:
+89.958 greedy/50.500 sampled versus primary143.667/70.750, with21.906% lower
+primary gain/min. Do not repeat completed stages. No extension, second learner,
+seed search or automatic successor is selected. The five-game goal is unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
