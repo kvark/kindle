@@ -1,13 +1,14 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [frozen action-path probe](../experiments/2026-11-06-cdp-breakout-action-path-derivatives.md)
-passes190 Kindle/5 gym CPU tests,4 analysis tests and strict Clippy. Its original
-native fixture fails on scalar/vector graph construction before forward/backward
-execution. A [separate shape repair](../experiments/2026-11-06-cdp-action-path-fixture-repair.md)
-uses matrix multiplication and adds CPU construction coverage; both changed CPU
-checks and Clippy pass. Original failure/binary/source remain under the parent
-root. New root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair`, same180s
-qualification cap. No production allocation or learner is selected.
+The [frozen action-path probe](2026-11-06-cdp-breakout-action-path-derivatives.md)
+passes its separately declared fixture repair:18 F64 derivatives,both objectives,
+frozen inputs and Tiny forward parity (relative error1.180303e-6),774 pins and
+host guard pass. Native.81s/controller3.193s, complete07:04:52.759 UTC November6.
+Original scalar/vector construction failure and earlier preparation failures
+remain preserved. Sourceb7d45c32/SHAf564ec90; two serial production jobs are now
+selected,120 origins/eight paired draws per model,180s each,zero learner updates
+or Atari actions. Root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair`.
+Qualification establishes numerical behavior, not useful model derivatives.
 
 The [matched action-derivative context capture](2026-11-06-cdp-breakout-action-derivative-contexts.md)
 is complete:120 latent origins per model,43,424 actions/173,660 frames each,

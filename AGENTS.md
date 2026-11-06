@@ -20,31 +20,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [frozen action-path derivative probe](docs/experiments/2026-11-06-cdp-breakout-action-path-derivatives.md)
-is implemented as test-only native code and selected for numerical qualification.
-It differentiates survival and endpoint critic-bootstrapped return with respect
-to fixed action plans, with frozen world/critic inputs and no optimizer updates.
-The existing latent straight-through surrogate remains explicit; this is not the
-full actor objective. The independent F64 recurrent fixture checks18 derivatives;
-a separate existing-inference path checks forward values before production.
+The [frozen action-path derivative probe](docs/results/2026-11-06-cdp-breakout-action-path-derivatives.md)
+passes its separate fixture repair and is selected for two serial frozen
+production jobs. Each uses120 saved origins/eight paired latent draws, two fixed
+plans and explicit survival/endpoint-return objectives. No actor feedback,
+optimizer updates, learner or Atari actions. Native sourceb7d45c32/SHAf564ec90,
+root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair`;180s per model.
+Consult the protocol and current process identity before execution.
 
-All190 Kindle/5 gym CPU tests,4 analysis tests and strict Clippy pass. Original
-native qualification then fails during toy graph construction: scalar/vector
-multiplication shapes differ, before any forward/backward pass. The [fixture
-repair](docs/experiments/2026-11-06-cdp-action-path-fixture-repair.md) uses matrix
-multiplication and adds CPU graph construction; both affected CPU checks and
-strict Clippy pass. Earlier missing-receipt/type failures remain preserved.
-Root `/x/Temp/kindle-breakout-action-path-20261106/shape-repair` is the separately
-declared repair, with the unchanged180s qualification cap. Do not rerun the
-original failed stage. No production allocation or learner is selected.
+Qualification passes18 F64 derivatives,both objectives,frozen inputs and Tiny
+forward parity (maximum relative error1.180303e-6), with774 pins and host guard
+passing. Native test.81s/controller3.193s, complete07:04:52.759 UTC November6.
+The original scalar/vector fixture construction fails before forward/backward;
+its guard,binary,source and earlier preparation failures remain preserved.
+The repair adds CPU construction coverage; both changed CPU checks and Clippy
+pass, with190 Kindle/5 gym and4 analysis tests passing before the repair.
 
-The [completed contexts](docs/results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
-provide120 origins per model. Reuse them and the saved92 short rescues/18 differing
-game-over outcomes; never repeat the capture or old collectors. Retain the
-original control and `actor_dynamics_scale=None`, coordinates off. The [full
-dynamics-gradient learner](docs/results/2026-11-06-cdp-actor-dynamics.md#full-200k-comparison)
-remains closed and negative85.708/51.625 versus143.667/70.750, at24.117% more
-training cost. Original864/90%-two-wall and five-game gates remain unfinished.
+Reuse the [captured contexts](docs/results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
+and saved92 short rescues/18 differing game-over outcomes. No capture or old
+collector repeats. This diagnostic cannot alone isolate the learner regression.
+Retain `actor_dynamics_scale=None`, coordinates off and143.667/70.750 control;
+original864/90%-two-wall and five-game gates remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
