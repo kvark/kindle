@@ -8,18 +8,22 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [optional dynamics-gradient actor](experiments/2026-11-06-cdp-actor-dynamics.md) is selected for native
+The [optional dynamics-gradient actor](experiments/2026-11-06-cdp-actor-dynamics.md) has passed native
 qualification. Implementation adds a default-off normalized return loss through
 frozen world/critic inputs, with straight-through categorical derivatives and
 one actor optimizer. World snapshots are private GPU inputs; existing rollout
 states, draws and detached disagreement values are reused. No new trainable
 weights or checkpoint tensors are added. See the [implementation record](results/2026-11-06-cdp-actor-dynamics.md).
 
-CPU validation passes 188 Kindle + 5 gym tests, 16 CLI/report tests and strict
-workspace and binding Clippy. Initial compile, row-scaling, frozen-scalar optimizer-slot and
-restore-guard failures are preserved. Packaging and guarded
-F64/production-loss/snapshot/restore tests remain pending. No GPU allocation or
-Atari learner is active or selected. Root
+Qualification passes188 Kindle+5 gym tests,1,108 packaged Python tests, strict
+workspace/binding Clippy and both guarded F64/production/snapshot/restore
+fixtures. Default-off final/initial policies reproduce2,048 frozen actions and
+preserve357 tensors per arm. All preparation failures remain recorded; no GPU
+stage repeats. Build cache is released after verified packaging.
+
+One fresh [8,192-action cost/numerics check](experiments/2026-11-06-cdp-actor-dynamics-bounded.md)
+is selected at coefficient.5 with the retained12M64/Auto/N8/B16/T16/H15/R16
+recipe, then1,024 frozen actions. No full learner is selected. Root
 `/x/Temp/kindle-actor-dynamics-20261106`; consult the protocol before execution.
 
 The [coordinate comparison](results/2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison) is closed and

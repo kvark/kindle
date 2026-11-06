@@ -1,18 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [optional dynamics-gradient actor](../experiments/2026-11-06-cdp-actor-dynamics.md) is implemented and selected
-for native qualification. A private pre-update world snapshot receives the same
+The [optional dynamics-gradient actor](../experiments/2026-11-06-cdp-actor-dynamics.md) is implemented and natively qualified. A private pre-update world snapshot receives the same
 initial states/draws as imagination; actor gradients traverse dynamics and frozen
 reward/continuation/critic heads. Categorical straight-through derivatives are
 biased; disagreement values, trajectory weights and normalization stay detached.
 The existing actor losses remain, with one optimizer and no added trainable
-weights or checkpoint tensors. Default off; no Atari allocation is selected.
+weights or checkpoint tensors. Default off; a separate bounded cost check is selected.
 
-[CPU validation](2026-11-06-cdp-actor-dynamics.md) passes188 Kindle+5 gym tests,16 CLI/report tests and
-strict workspace and binding Clippy. Compile/shape/ownership/restore failures remain recorded.
-Packaging and guarded F64/production-loss/snapshot/restore tests
-are pending at `/x/Temp/kindle-actor-dynamics-20261106`. No GPU stage has run.
-The five-game goal and original Breakout864/90% gate remain unfinished.
+[Qualification](2026-11-06-cdp-actor-dynamics.md) passes188 Kindle+5 gym tests,1,108 packaged Python tests, strict
+workspace/binding Clippy and guarded F64/production/snapshot/restore checks.
+Default-off final/initial policies reproduce2,048 frozen actions and preserve357
+tensors each. Original preparation failures remain; no GPU stage repeats.
+A separate [8,192-action check](../experiments/2026-11-06-cdp-actor-dynamics-bounded.md) fixes coefficient.5 with the retained recipe and tests cost,
+numerics and memory before any full allocation. Source744dd793/native876ed0c;
+root `/x/Temp/kindle-actor-dynamics-20261106`. Build cache released; no full
+learner selected. Original Breakout864/90% and five-game gates remain unfinished.
 
 The [completed coordinate-channel comparison](2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison)
 finishes 200k actions / 799,523 frames / 12,477 updates in **20m58.414s**.
