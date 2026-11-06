@@ -1,14 +1,16 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [bounded reward-supervision check](../experiments/2026-11-06-cdp-breakout-reward10.md) selects only reward loss1→10
-with the retained native/runtime and recipe. Both runners pass34 targeted CPU
-cases; actual commands and audit rejection fixtures pass without native/emulator
-construction. One8,192-action learner and1,024-action frozen restore are selected
-for numerics/cost, not gameplay qualification. No full learner is selected.
-Root `/mnt/data/kindle-breakout-reward10-20261106`; consult the fixed protocol.
-Stronger supervision is a hypothesis, not an established bottleneck. A later
-full comparison would use development22003 and its matching retained controls;
-original864/90% and the five-game goal remain unfinished.
+The [full reward-supervision comparison](../experiments/2026-11-06-cdp-breakout-reward10-200k.md) selects one fresh200k
+seed22003 learner against the matching retained22003/cohort4000022003 control.
+Only existing reward loss1→10 changes. The [bounded check](2026-11-06-cdp-breakout-reward10.md) completes
+8,192 actions/32,730 frames/489 updates in46.723s, passing the20m54.778s padded
+projection. Tensor/trace/weighted-loss/replay/guard checks pass. Original closure
+stdout pin rejection remains preserved with separate semantic resolution and
+corrected full-helper checks; no GPU repeat. Native447fe50/SHA35ad0db unchanged.
+No extension, sweep or automatic successor; assess frozen gain/min and preserve
+the original864/90% and full five-game gates. Root
+`/mnt/data/kindle-breakout-reward10-20261106/full`; exact queue qualification and
+single launch are next. A reward-loss bottleneck or benefit is not established.
 
 The [pre-contact shot predictor](2026-11-06-cdp-breakout-causal-shot.md) is complete and fails its fixed
 screen. Adding planned contact offset lowers holdout slope MAE.691547→.601837

@@ -8,27 +8,28 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [reward-supervision check](experiments/2026-11-06-cdp-breakout-reward10.md) is selected for bounded native qualification.
-Only existing reward-prediction loss weight1→10 changes; rewards, teacher,
-architecture and other losses stay fixed. The hypothesis is improved task-relevant
-shared representation; a reward-loss bottleneck or gameplay benefit is unproven.
-Native447fe50/SHA35ad0db needs no rebuild. Both canonical and private runners
-pass34 targeted CPU cases, with zero native/emulator construction. Actual queued
-commands, loss/configuration rejection fixtures and terminal collector checks
-pass in1.476s; no failure or repeated stage.
+The [full reward-supervision comparison](experiments/2026-11-06-cdp-breakout-reward10-200k.md) selects one fresh200k-action
+seed22003 learner against its retained matching control/cohort4000022003. Only
+reward-prediction loss1→10 changes; rewards, teacher, architecture and other
+losses stay fixed. Native447fe50/SHA35ad0db needs no rebuild. Primary is greedy
+own-initial gain per training minute; original864/90% and five-game gates remain.
 
-Next run one fresh8,192-action/489-update check and a1,024-action frozen restore.
-The fixed cost screen is a padded200k projection under30 minutes. Root
-`/mnt/data/kindle-breakout-reward10-20261106`, service
-`kindle-breakout-reward10-check-20261106`; no GPU job is active at declaration.
-No full learner or automatic successor is selected. A separately justified full
-comparison would use development22003 and its retained matching controls.
-Original864/90% two-wall and the five-game goal remain unfinished.
+The [bounded check](results/2026-11-06-cdp-breakout-reward10.md) completes8,192 actions/32,730 frames/489 updates
+in46.723s; padded200k projection20m54.778s passes30 minutes. Initial/frozen357
+tensors,47 pre-update events, weighted losses, replay and both guards pass.
+Both runners pass34 targeted CPU cases. Initial full-helper qualification rejects
+a closure stdout hash sealed before its final line; separate semantic resolution
+and corrected helper checks pass, preserving the failure. No GPU stage repeats.
 
-The [pre-contact shot predictor](results/2026-11-06-cdp-breakout-causal-shot.md) remains closed and fails its fixed screen;
-keep the original teacher. The fresh-seed confirmation remains closed, with
-useful learning, material seed/cohort variation and all0/24 two-wall. Do not
-repeat completed stages or promote a new best seed.
+Root `/mnt/data/kindle-breakout-reward10-20261106/full`, service
+`kindle-breakout-reward10-200k-20261106`; next qualify the exact five queued
+commands and launch once. No GPU job is active at declaration. Retain100k recovery
+and four24-episode frozen arms. No extension, sweep or automatic successor.
+Promising changes require fresh-seed confirmation. The bounded check is closed.
+
+The pre-contact shot predictor stays closed and failed; keep the original
+teacher. Fresh22003's retained75.250/44.708 and1009's94.625/70.500 on the same
+cohort show material seed variation; all0/24 two-wall. Do not repeat old stages.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
