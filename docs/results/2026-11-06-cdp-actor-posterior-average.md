@@ -3,7 +3,8 @@
 The [development protocol](../experiments/2026-11-06-cdp-actor-posterior-average.md)
 selects eight additional categorical draws for the actor's current decision.
 The option is implemented and CPU checks pass. Native numerical qualification,
-cost and gameplay are not yet measured; no GPU allocation is selected.
+cost and gameplay are not yet measured. Native qualification is now separately
+selected below; no Atari allocation is selected.
 
 Each native decision repeats the current deterministic state, samples eight
 categorical states from the same posterior, evaluates the shared actor in one
@@ -44,3 +45,16 @@ commands, logs and hashes. Next package the exact source and separately declare
 guarded native qualification; no unchanged closed experiment is restarted.
 Retain Breakout 143.667 greedy/70.750 sampled and preset 32×16. The original
 864/90%-two-wall and five-game gates remain unfinished.
+
+## Packaged native fixture selected
+
+The release test executable and wheel build pass on source fddf48ba, with 249
+pinned source files. Native SHA256 is
+`960667d10fb031ec82963f5cd644802bd650c273c64db914ec6c46f6a6265680`;
+test executable is `77ab9956ba5545f1e4f770127d93d9a5447da565d334571dc4e55e3ee0ea7322`.
+The extracted package passes **1,174 Python tests /10 deselected** with zero native
+construction attempts, including availability of the new API. Original CPU
+receipts and source pins remain unchanged. The
+[separate native protocol](../experiments/2026-11-06-cdp-actor-posterior-average-native.md)
+selects one guarded Tiny fixture, 120s child/300s controller. No native result,
+Atari comparison, learner or speedup is established at declaration.

@@ -7,11 +7,12 @@ default off; no training loss, parameters, encoder geometry or checkpoint change
 The earlier modal result motivates this test but does not establish a noise cause.
 
 CPU checks pass 204 Kindle/5 adapter tests, 161 Python tests and strict workspace/binding
-Clippy. A nonuniform native fixture is prepared but has not run. Next package and
-separately qualify native values, shared parameters, recurrent-state/RNG equality
-under forced actions, frozen moments and learning guards. No GPU allocation or
-learner is active or selected. Root `/x/Temp/kindle-actor-posterior-average-20261106`;
-consult the protocol before execution.
+Clippy. Packaging fddf48ba/native960667d1 passes 1,174 installed Python tests
+with zero construction attempts. One separately declared guarded Tiny fixture is
+selected for native values, shared parameters, recurrent-state/RNG equality under
+forced actions, frozen moments and learning guards. No Atari learner is selected.
+Root `/x/Temp/kindle-actor-posterior-average-20261106`; consult the protocol before
+execution. No native result exists yet.
 
 The [64×8 latent comparison](2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
 is complete and fails the primary retention criterion. Fresh 200k actions/
