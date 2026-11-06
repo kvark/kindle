@@ -25,12 +25,13 @@ frozen arms against actual-initial controls. Greedy gain/min is primary.
 Full helpers/comparison/plot checks pass in3.872s and all five queued commands
 pass in.381s, with zero native/emulator construction. The original learner starts
 15:55:04.816 UTC November6, sourcef797ad78, PID1512125/invocation
-cfe8a3d86199424d954c680e213badb9. Collector1512128 and recovery observer1512131
-are active. At15:58:45.001,35,240 actions/2,179 updates are independently recounted.
+cfe8a3d86199424d954c680e213badb9. Main and collector1512128 remain active.
+Recovery observer1512131 completes successfully: the100k/6,227 checkpoint passes
+at16:06:05.370 with357 finite tensors/51,502,659 elements, read-only files and
+374 unchanged pins; verification takes.351s and performs no model forward/update.
 All eight lanes have left the initial phase, at aggregate actions22,232–30,344;
-initial-phase actions total26,884, with257 actions after selected-episode caps.
-All357 initial tensors match retained/own bounded,47 own pre-update events match,
-and374 pins pass. Phase exits are measured from actual per-lane resets.
+initial-phase actions total26,884. All357 initial tensors match retained/own
+bounded and47 own pre-update events match. Phase exits are measured per lane.
 
 Root /x/Temp/kindle-breakout-initial-guidance-20261106/full is running under the
 existing guard. Keep observing original identities; do not restart on timeout.

@@ -77,3 +77,11 @@ all eight phase exits at aggregate actions[22,232,28,376,28,496,26,816,23,664,
 8,356;257 actions have occurred after selected-episode caps. All374 pins and
 original learner/collector/recovery identities pass. This confirms live schedule
 coverage, not learning quality; frozen evaluation remains pending.
+
+The100k/6,227 checkpoint passes the learner's observer at16:05:44.146 UTC and
+the independent CPU verifier at16:06:05.370. The latter takes.351s, checks357
+finite tensors/51,502,659 elements, exact schemas/config/counters and0555/0444
+directory/file modes, and verifies374 pins with the original active main identity.
+It executes zero model forwards or updates. Recovery observer1512131 terminates
+successfully; the original learner and collector continue. Recovery retains
+weights and moments, not replay, games, live beliefs or complete RNG state.
