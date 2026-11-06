@@ -8,37 +8,30 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [fresh initial-episode guidance comparison](experiments/2026-11-06-cdp-breakout-initial-guidance-200k.md) is selected after the
-[bounded check](results/2026-11-06-cdp-breakout-initial-guidance.md) passes:8,192 actions/489 updates in46.584s versus47.690s,
-with all357 initial tensors equal retained and all357 frozen tensors invariant.
-All eight lanes stayed in their first episode; all actions were guided. The
-20m51s padded projection and11.22GiB conservative headroom pass feasibility gates.
-No learning benefit or live phase-exit coverage follows from the short check.
+The [initial-episode guidance comparison](results/2026-11-06-cdp-breakout-initial-guidance.md#full-200k-comparison) is complete
+and fails retention: greedy 114.000 / sampled 49.125 versus 143.667 / 70.750.
+Fresh 200k actions / 799,655 frames / 12,477 updates take 21m28.245s, just 0.026%
+more training time. Primary own-initial gain/min falls 20.993%, 6.590132→5.206697.
+Its paired 95% difference interval [-4.096855, 1.194018] spans zero; this reused
+development seed/cohort does not establish a reliable population regression.
+Both final modes remain 0/24 two-wall.
 
-One fresh200k-action/12,477-update learner uses exact bounded native7704d25c and
-runner/teacher, seed1009. Force each lane's first two episodes, retain cap1,920,
-then resume20% selection with one random draw per episode. RGB64/12M/T16/R16,
-losses/rates and all-state labels remain; timing, amount and state distribution
-change together. Require independent phase/cap recount and four24-natural-episode
-frozen arms against actual-initial controls. Greedy gain/min is primary.
+All 357 initial tensors match retained/own bounded, 47 own pre-update events and
+both retained frozen-initial traces match. Finite/weighted reports, 100k recovery,
+four 24-natural-episode frozen arms with 357 invariant tensors, full replays/videos,
+curves and 374 current / 338 retained pins pass. All eight lanes leave the initial
+phase at 22,232–30,344 aggregate actions. Initial-phase actions total 26,884;
+overrides total 103,444/200,000 (51.722%). Timing, amount and state distribution
+change together. Maximum training score is 422; no episode/tail reaches 432.
 
-Full helpers/comparison/plot checks pass in3.872s and all five queued commands
-pass in.381s, with zero native/emulator construction. The original learner starts
-15:55:04.816 UTC November6, sourcef797ad78, PID1512125/invocation
-cfe8a3d86199424d954c680e213badb9. Main and collector1512128 remain active.
-Recovery observer1512131 completes successfully: the100k/6,227 checkpoint passes
-at16:06:05.370 with357 finite tensors/51,502,659 elements, read-only files and
-374 unchanged pins; verification takes.351s and performs no model forward/update.
-All eight lanes have left the initial phase, at aggregate actions22,232–30,344;
-initial-phase actions total26,884. All357 initial tensors match retained/own
-bounded and47 own pre-update events match. Phase exits are measured per lane.
-
-Root /x/Temp/kindle-breakout-initial-guidance-20261106/full is running under the
-existing guard. Keep observing original identities; do not restart on timeout.
-Two incomplete CLI mocks and prior native fixture failures remain preserved.
-No bounded experience transfers, completed stage repeats, extension, second
-learner or automatic successor. Retain143.667 greedy/70.750 sampled pending
-frozen evaluation; original864/90% and five-game gates remain unfinished.
+Original main/collector finish 16:20:30.454 / 16:20:37.393 UTC November 6.
+Closure at 16:21:18.893 verifies terminal identities and no Kindle service/render
+holder. Root /x/Temp/kindle-breakout-initial-guidance-20261106/full is closed,
+execution source f797ad78, native 7704d25c. Two incomplete CLI mocks and prior
+native fixture failures remain preserved; no full-stage failure or repeat.
+Retain the original 20% schedule and 143.667 greedy / 70.750 sampled. No GPU
+allocation, extension or automatic successor is selected. Original 864/90%
+two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
