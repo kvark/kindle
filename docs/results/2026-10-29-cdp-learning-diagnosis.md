@@ -1,27 +1,33 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [fresh200k64×8 latent comparison](../experiments/2026-11-06-cdp-breakout-latent-shape-200k.md) is selected after the bounded
-check passes:8,192 actions/32,734 frames/489 updates in46.655s versus47.690s;
-padded200k projection1,252.951s and conservative headroom12,049,403,904 bytes.
-All357 initial tensors match retained;357 frozen tensors, replays, guards,
-51 allocation/246 source pins pass. Original bounded jobs are closed at11:11:18.958
-UTC November6. This short historical timing does not establish a speedup.
+The [64×8 latent comparison](2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
+is complete and fails the primary retention criterion. Fresh 200k actions/
+799,594 frames/12,477 updates take **21m25.849s**, 0.160% less observed time than
+retained 21m27.910s. Greedy **136.958** trails 143.667; sampled **77.875** exceeds
+70.750. All 0/24 two-wall. Primary own-initial gain/min falls **4.295%**,
+6.590132→6.307119; paired difference −.283013 has 95% interval
+[−2.896655, 2.688719]. Sampled gain/min rises 10.393%, but its paired interval
+also spans zero. This reused cohort does not establish training-seed reliability.
+Keep preset 32×16, actor width 256, coordinates/residual/dynamics gradients off.
 
-The candidate keeps the retained12M64/B16/T16/H15/R16 recipe and changes only
-32×16→64×8 categorical grouping. Parameter shapes/counts stay fixed; sampling,
-KL and active one-hot entries change together. CPU helpers pass in3.554s and five-command preflight in.437s with zero native/
-emulator construction and356 pins. Original services launched11:16:40.300 UTC November6/sourceeda94b80. Main and
-collector remain active; the100k/6,227 recovery check passes at11:27:40.863 in.357s
-with357 finite tensors and356 unchanged pins. Startup passes all357 bounded/
-retained initial tensors and47 bounded pre-update events. Keep native536012d5/
-2c9c6e6f; original qualification failure remains failed.
+All 357 initial tensors match bounded and retained, with 47 matching bounded
+pre-update events. Actual-initial sampled 1.458333/greedy 1.791667 and subsequent
+initial traces differ from retained; comparison uses own-initial scores.
+Four frozen arms select 24 natural episodes each with zero updates/truncations
+and 357 invariant tensors. All 356 current/338 retained pins, 100k recovery,
+weighted losses, full replays/videos, guards, curves, exposure and original
+services pass. Main/collector complete **11:42:01.706/11:42:12.947 UTC November 6**,
+source eda94b80. Publication reader passes in .047s. No full preparation or
+production stage fails or repeats; original native qualification failure and
+separate successful test repair remain preserved.
 
-Root `/x/Temp/kindle-latent-shape-20261106/full`, service
-`kindle-breakout-latent-shape-200k-20261106`. One fresh200k learner,100k recovery,
-then four24-natural-episode final/actual-initial frozen arms. Greedy own-initial
-gain/min is primary; no experience transfer, sweep, extension or successor.
-Retain143.667 greedy/70.750 sampled until evidence qualifies a change. Original
-864/90%-two-wall and five-game gates remain unfinished.
+Late own-replay labeled imitation CE improves .560514→.546367 while greedy
+quality falls; experience differs. Training spends 96.182% of actions below
+216 points and none at 432 or above. Sampling, KL and active one-hot counts
+change together, so these results do not isolate a representation cause.
+Root `/x/Temp/kindle-latent-shape-20261106/full` is closed; no GPU allocation,
+extension or successor is selected. Retain 143.667/70.750; original 864/90%-two-wall
+and five-game gates remain unfinished.
 
 The [frozen residual serving ablation](2026-11-06-cdp-residual-actor-serving-ablation.md) is complete and inconclusive.
 Zeroing two correction parameters raises greedy117.625→131.750 and sampled

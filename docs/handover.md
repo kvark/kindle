@@ -8,28 +8,21 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [fresh200k64×8 latent comparison](experiments/2026-11-06-cdp-breakout-latent-shape-200k.md) is selected after the bounded
-check passes:8,192 actions/32,734 frames/489 updates in46.655s versus47.690s;
-padded200k projection1,252.951s and conservative headroom12,049,403,904 bytes.
-All357 initial tensors match retained;357 frozen tensors, replays, guards,
-51 allocation/246 source pins pass. Original bounded jobs are closed at11:11:18.958
-UTC November6. This short historical timing does not establish a speedup.
+The [64×8 latent comparison](results/2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
+is complete and fails the primary retention criterion. Fresh 200k actions/
+799,594 frames/12,477 updates take 21m25.849s versus retained 21m27.910s.
+Greedy 136.958 trails 143.667; sampled 77.875 exceeds 70.750. Primary own-initial
+gain/min falls 4.295%; both paired intervals span zero. All frozen modes have
+0/24 two-wall successes. Keep preset 32×16 and retained 143.667/70.750.
 
-The candidate keeps the retained12M64/B16/T16/H15/R16 recipe and changes only
-32×16→64×8 categorical grouping. Parameter shapes/counts stay fixed; sampling,
-KL and active one-hot entries change together. CPU helpers pass in3.554s and five-command preflight in.437s with zero native/
-emulator construction and356 pins. Original services launched11:16:40.300 UTC November6/sourceeda94b80. Main and
-collector remain active; the100k/6,227 recovery check passes at11:27:40.863 in.357s
-with357 finite tensors and356 unchanged pins. Startup passes all357 bounded/
-retained initial tensors and47 bounded pre-update events. Keep native536012d5/
-2c9c6e6f; original qualification failure remains failed.
-
-Root `/x/Temp/kindle-latent-shape-20261106/full`, service
-`kindle-breakout-latent-shape-200k-20261106`. One fresh200k learner,100k recovery,
-then four24-natural-episode final/actual-initial frozen arms. Greedy own-initial
-gain/min is primary; no experience transfer, sweep, extension or successor.
-Retain143.667 greedy/70.750 sampled until evidence qualifies a change. Original
-864/90%-two-wall and five-game gates remain unfinished.
+All four frozen arms select 24 natural episodes with zero updates/truncations
+and 357 invariant tensors. Initial equality, 100k recovery, complete replays,
+guards, curves, exposure and 356 current/338 retained pins pass. Original services
+close at 11:42:01.706/11:42:12.947 UTC November 6, source eda94b80. The original
+native qualification failure and separate successful test repair remain preserved.
+Root `/x/Temp/kindle-latent-shape-20261106/full` is closed; no GPU allocation,
+extension, stage repeat or successor is selected. Original 864/90%-two-wall and
+five-game gates remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

@@ -1,13 +1,16 @@
 # Fixed-width categorical regrouping development
 
-The bounded cost/replay check passes. A separately declared fresh200k comparison
-is selected to measure gameplay per minute; no full result exists yet. Native
-qualification's original failure and separate passing repair remain below.
+The completed fresh 200k comparison fails the primary retention criterion:
+greedy **136.958** versus retained **143.667**, sampled **77.875** versus **70.750**,
+in **21m25.849s** versus **21m27.910s**. Primary own-initial gain/min falls 4.295%;
+both paired intervals span zero. Keep preset 32×16 and the retained recipe.
+The full result is below. Original native qualification remains failed alongside
+its separate successful test repair; no stage was repeated to obtain this result.
 
 Native qualification is complete with a separate test readback repair. The
 original qualification remains failed. The repaired categorical fixture and
 previously unexecuted Tiny learning/restore fixture both pass; details and
-limits follow below. No Atari learner or gameplay benefit is established.
+limits follow below. These fixtures alone establish no gameplay benefit.
 
 The [development protocol](../experiments/2026-11-06-cdp-latent-shape.md) selects
 an optional64×8 latent grouping at12M instead of32×16, with the same512 flattened
@@ -158,9 +161,9 @@ entry, own-initial lane estimates, corrupted losses/headers, exposure and plotti
 All357 bounded/retained initial tensors must match;47 pre-update events must
 match the bounded candidate. Retained action traces may differ under grouping.
 Four frozen24-natural-episode arms measure actual-initial and final policies.
-No bounded experience is transferred; no full result or gameplay benefit exists
-yet. Exact five-command preflight must pass before launch. Original864/90% and
-five-game gates remain unchanged.
+No bounded experience is transferred; no full result or gameplay benefit existed
+at declaration. Exact five-command preflight was required before launch.
+Original864/90% and five-game gates remain unchanged.
 
 ## Full comparison launched
 
@@ -175,15 +178,91 @@ changes, both replay argv paths and zero native/emulator construction.
 Startup passes all357 bounded initial tensors and all357 retained initial tensors,
 plus47 bounded pre-update semantic events. The descriptive retained comparison
 also observes47 matching events; equality was not required for changed grouping.
-No frozen initial or final score has been measured yet. The original service is
-active; no new source/runtime edit, repeat, extension or successor is selected.
+At launch no frozen initial or final score had been measured. The original service
+was active; no source/runtime edit, repeat, extension or successor was selected.
 Follow its original identity and observers through completion rather than
 restarting after an observation timeout. The fixed protocol remains unchanged.
 
 The original recovery observer completes successfully at11:27:40.863 UTC in.357s:
 100k actions/6,227 updates,357 finite tensors and356 unchanged pins, with original
 main identity preserved throughout. Files/directories are read-only; verification
-performs zero forwards or updates. Main training and terminal collection continue.
+performs zero forwards or updates. Main training and terminal collection continued.
 A manual status poll initially assumes the completed observer still exposes its
 active invocation ID; systemd clears it on completion. Direct service/journal
 inspection confirms success and the unchanged live learner. No job is restarted.
+
+## Completed full 200k comparison
+
+The [fixed protocol](../experiments/2026-11-06-cdp-breakout-latent-shape-200k.md)
+completes on source eda94b80 with native 536012d5/SHA256 prefix 2c9c6e6f.
+One fresh seed 1009 learner finishes **200,000 aggregate actions /799,594 emulator
+frames /12,477 updates** at **11:38:10.380 UTC November 6**, in **1,285.848676s**.
+Construction takes 2.477081s. The observed training-time difference is only
+−.160%; historical timing and changed experience do not establish a speedup.
+
+| Measure | Retained 32×16 | Candidate 64×8 |
+|---|---:|---:|
+| Training wall time |21m27.910s|21m25.849s|
+| Greedy return |143.666667|136.958333|
+| Sampled return |70.750000|77.875000|
+| Actual-initial greedy return |2.208333|1.791667|
+| Actual-initial sampled return |1.416667|1.458333|
+| Greedy own-initial gain/min |6.590132|6.307119|
+| Sampled own-initial gain/min |3.230038|3.565738|
+| Greedy/sample two-wall successes |0/24 each|0/24 each|
+
+Greedy is the declared primary. Its raw difference is −6.708333 with paired
+95% interval [−63.000000,56.796875]; own-initial gain/min falls **4.295%**, with
+difference −.283013 and interval [−2.896655,2.688719]. Four of eight lanes improve.
+Sampled raw difference is +7.125000 with interval [−8.833333,26.458333]; gain/min
+rises **10.393%**, difference +.335700 with interval [−.406812,1.235388]. Five lanes
+improve. Intervals resample the eight reused lanes 10,000 times at seed 0; they
+are not training-seed reliability intervals. The candidate fails retention,
+while neither mode establishes a reliable difference. Keep preset 32×16.
+
+All 357 actual-initial tensors equal both bounded and retained, and all 47
+bounded pre-update events match. Changed grouping nevertheless changes initial
+behavior: sampled traces have 245 matching/538 differing paired events plus
+52 candidate-only/16 retained-only events; greedy has 0 matching/743 differing
+paired events plus 94/51 unpaired events. This is allowed by the fixed protocol,
+and both comparisons subtract their own measured initial scores.
+
+All four frozen arms select the first three natural episodes per eight lanes,
+24 each, with zero updates or selected truncations and 357 unchanged tensors.
+The four executions total **82,448 actions /329,636 frames /52.883s**; extra
+completed episodes and partial tails outside the selected cohort are excluded.
+Every action/outcome/frame/boundary replay, guard and video check passes. Frozen
+logs lack live image hashes, so replay cannot prove unrecorded image equality.
+The complete training pixel/action/label/override replay, finite reports, both
+weighted losses, initial equality and 100k recovery all pass. Actor sharing
+retains the earlier native fixture qualification; this full audit does not
+independently remeasure internal graph ownership.
+
+Guidance overrides 42.549% of training actions; the 20% setting selects episodes,
+not actions. Training spends **96.182%** of actions below 216 points, with none
+at 432 or above and maximum observed score 417 including partial tails. These
+are cumulative-score bands, not wall events or frozen competence. Late labeled
+imitation CE is .546367 versus retained .560514 on different own replay; lower
+fitting loss does not establish better control. Learner stage time is 1,141.649s,
+versus 63.117s acting, 62.570s environment and 12.393s observing. No representation
+cause follows: categorical sampling, KL sums and active one-hot counts changed
+together despite unchanged 16,334,353 parameters and flattened latent width.
+
+Original main and collector finish **11:42:01.706 /11:42:12.947 UTC November 6**;
+all three original services are inactive/success with their original PIDs gone.
+All **356 current /338 retained pins** and sealed completion artifacts pass.
+The existing read-only publication reader completes in **.047s**, with no helper
+source change. No full preparation or production stage fails or repeats; the
+manual read-only status-poll correction above is preserved separately. Original
+native readback failure remains failed alongside its successful test repair.
+No additional learner, extension, sweep or successor is selected.
+
+Artifacts remain at `/x/Temp/kindle-latent-shape-20261106/full`:
+
+- `comparison.json`: SHA256 `6e4839947bac060c145943285e63fce66dad0e01f219142df8d3653764b0b0f0`.
+- `completion.json`: SHA256 `c090e2d70905266cdca004ddcb372e9c4d3d2ce958eeabc3b6c7f18376809176`.
+- `terminal-summary.json`: SHA256 `be7b8e639230666b6139fe7a9fcc4a5579aa670c0122d6430984dd451f196b58`.
+- `result-read-execution.json`: SHA256 `f3884c5ce13155a77ef36969ec3eae7a17df30884e625c5d8f2ad369df5e0f37`.
+
+Retain Breakout **143.667 greedy /70.750 sampled**. The original mean-864 and
+90%-two-wall gate, and the five-game goal, remain unfinished.
