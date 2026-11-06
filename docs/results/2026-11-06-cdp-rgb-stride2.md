@@ -66,9 +66,18 @@ The receipt pins260 source files and all packaged artifacts.
 Root `/x/Temp/kindle-rgb-stride2-20261106` retains source pins, exact commands,
 logs and the original failed fixture. Native qualification is complete.
 The [default-off compatibility protocol](../experiments/2026-11-06-cdp-rgb-stride2-legacy.md)
-now selects two frozen1,024-action traces of retained/actual-initial checkpoints.
-No learning updates. The fixed8,192-action cost check remains conditional and
-requires a separate declaration. The3.9GiB build cache is released after
+passes both frozen1,024-action traces: retained.860575s and actual-initial
+.880874s,4,096 emulator frames each, zero learner updates. All128 transition
+rows per arm match saved controls except wall timestamps; all357 tensors match
+exactly. All40 pins and both guards pass, children are gone. Queue11.700s and
+CPU review.947s; no stage repeated.
+
+The [bounded cost protocol](../experiments/2026-11-06-cdp-rgb-stride2-bounded.md)
+now selects8,192 fresh actions/489 updates plus1,024 frozen actions. CPU preflight
+passes in.167s, exercises both actual queue commands with zero native/emulator
+construction, and retains exact357-tensor initial/frozen checks. Only the
+encoder stride option changes the retained learning config. The declared cost
+and memory gates remain25min padded200k and2GiB conservative replay headroom. The3.9GiB build cache is released after
 packaging/native validation; all packaged artifacts and the exact original
 native-pinned build receipt remain retained. No full learner or gameplay benefit is selected or established. Retain the
 current teacher, RGB64 recipe and143.667 greedy/70.750 sampled; original864/90%

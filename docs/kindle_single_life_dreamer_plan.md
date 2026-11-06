@@ -11,12 +11,14 @@ construction attempts, and strict workspace/binding Clippy. An initial fixture
 compile failure and original bytes remain preserved; the repaired tests pass.
 Release package native `cde123e1` and test executable `da5dcc99` are retained;
 installed-package checks also pass1,246 cases with zero native construction.
-Both new native value/derivative/update/restore fixtures pass once:266 pins,
-two synthetic CDP updates, zero Atari actions,3.568s controller. Default-off
-compatibility now selects two frozen1,024-action traces under the linked report
-and protocol. Root `/x/Temp/kindle-rgb-stride2-20261106`; build cache released,
-packaged artifacts retained. No Atari learner selected; the8,192-action cost
-check requires its own declaration after compatibility passes.
+Both native fixtures pass once; default-off retained/initial frozen traces match
+all128 transition rows and357 tensors per arm. Root
+`/x/Temp/kindle-rgb-stride2-20261106`; build cache released, packages retained.
+The separately declared8,192-action/489-update cost check is now selected,
+followed by1,024 frozen actions. Retained12M/RGB64/B16/T16/R16/Auto recipe and
+teacher stay fixed; only stride-two is enabled. Require finite learning, exact
+initial/frozen tensors, independent replay,2GiB conservative full-replay headroom
+and padded200k time≤25min. No full learner is selected.
 Keep the retained teacher/recipe and143.667 greedy/70.750 sampled; original864/90%
 two-wall and the five-game goal remain unfinished.
 
