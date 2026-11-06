@@ -9,7 +9,8 @@ latent/control dimensions remain unchanged. Decoder graphs remain exact.
 The encoder convolutions compute one quarter of their former output positions;
 no encoder max-pool follows them. This changes sampling and nonlinear reduction,
 so it is neither a behavior-preserving optimization nor a measured speedup.
-Learning quality and total training cost remain unmeasured. Native max-pooled
+Learning quality remains unmeasured; the bounded training-cost result below is
+a historical comparison, not a paired timing benchmark. Native max-pooled
 RGB and the existing single GPU resize remain; no labels or emulator state enter
 the model. The earlier pixel diagnostic already recovers precise ball positions
 fromRGB64, so resizing alone is not a sufficient explanation of feature errors.
@@ -67,18 +68,75 @@ Root `/x/Temp/kindle-rgb-stride2-20261106` retains source pins, exact commands,
 logs and the original failed fixture. Native qualification is complete.
 The [default-off compatibility protocol](../experiments/2026-11-06-cdp-rgb-stride2-legacy.md)
 passes both frozen1,024-action traces: retained.860575s and actual-initial
-.880874s,4,096 emulator frames each, zero learner updates. All128 transition
+.880874s,4,096/4,094 emulator frames respectively, zero learner updates. All128 transition
 rows per arm match saved controls except wall timestamps; all357 tensors match
 exactly. All40 pins and both guards pass, children are gone. Queue11.700s and
 CPU review.947s; no stage repeated.
 
 The [bounded cost protocol](../experiments/2026-11-06-cdp-rgb-stride2-bounded.md)
-now selects8,192 fresh actions/489 updates plus1,024 frozen actions. CPU preflight
+completes8,192 fresh actions/489 updates plus1,024 frozen actions once. CPU preflight
 passes in.167s, exercises both actual queue commands with zero native/emulator
 construction, and retains exact357-tensor initial/frozen checks. Only the
-encoder stride option changes the retained learning config. The declared cost
-and memory gates remain25min padded200k and2GiB conservative replay headroom. The3.9GiB build cache is released after
-packaging/native validation; all packaged artifacts and the exact original
-native-pinned build receipt remain retained. No full learner or gameplay benefit is selected or established. Retain the
-current teacher, RGB64 recipe and143.667 greedy/70.750 sampled; original864/90%
-two-wall and the five-game goal remain unfinished.
+encoder stride option changes the retained learning config. The declared gates are25min padded200k and2GiB conservative replay headroom.
+All packaged artifacts and the exact original native-pinned build receipt remain
+retained after disposable build-cache release. No full learner is selected.
+
+
+## Completed bounded cost check
+
+Execution source `edb702087ac3aaa2899db8c75aac3444f9d88559`, same packaged
+native `cde123e1`, current matching runner, original teacher and retained config
+with only `rgb_stride2=true`. All357 initial tensors exactly equal the retained
+actual-initial checkpoint. Changed encoder operations can change initial actions;
+no pre-update trajectory identity is required or claimed.
+
+| Measure | Result |
+|---|---:|
+| Fresh training |8,192 aggregate actions /32,719 emulator frames /489 updates|
+| Training wall time |41.940327s versus historical47.689684s;12.056% less|
+| Throughput change |13.708% more actions/s; single historical comparison|
+| Agent construction |2.573873s, separate from training elapsed|
+| Padded200k projection |1,126.327s =18m46.327s; passes25min cap|
+| Conservative full-replay headroom |12,527,583,232 bytes =11.667GiB; passes2GiB cap|
+| Frozen execution |1,024 actions /4,096 frames /.827412s;zero updates|
+| Complete controller |61.002771s, including construction, guards and CPU audits|
+
+All489 learner reports are finite and pass independent loss-sum checks. Encoder,
+reward, continuation, actor and value weights change. All357 final/frozen tensors,
+moments and optimizer counts match exactly. Independent replay verifies every
+training action/reward/frame/terminal, all8,192 teacher recommendations and3,836
+actual overrides; frozen action/reward/frame replay also passes. All51 bounded
+pins and260 source pins match. Both guards pass; all six native/legacy/bounded
+children are terminal and gone, with no render holders or running Kindle services.
+No GPU stage repeats. Original CPU fixture failure and exact original bytes remain.
+
+### Remaining measured cost
+
+| Learner stage | Saved control | Stride-two |
+|---|---:|---:|
+| Posterior inference |6.209s|4.469s|
+| World training |13.613s|10.293s|
+| Imagined rollouts |16.647s|16.754s|
+| Behavior training |2.502s|2.519s|
+| Total reported learner time |40.438s|35.455s|
+
+Most saved learner time is in posterior inference and world training, which use
+the encoder. Imagination is unchanged by this encoder option and now accounts
+for47.256% of measured learner time. These are instrumented stage elapsed times,
+including synchronization/host work, not isolated GPU kernel durations. Different
+sampling/trajectories and historical execution limit causal timing claims. Computing one quarter as many convolution output positions does not
+imply four times faster training, and shorter training does not establish better frozen competence.
+
+Qualification closes at **17:26:13.324 UTC November6**. Root retains
+`qualification-closure.json`, native/legacy/bounded declarations and reviews,
+all logs/checkpoints/replays, `bounded/timing-comparison.json`, packaged binaries
+and original failures. Closure verifies266 native,40 legacy,51 bounded and260
+source pins; the native-pinned pre-cache-release build receipt is resolved to its
+exact archived copy. The3.9GiB disposable build cache is gone.
+
+The cost/memory gates pass. No full learner is selected by these stages. Any
+separately justified fresh fixed-budget comparison must judge frozen gain per
+training minute against its own actual-initial control and report both modes;
+it cannot reuse check experience or claim an independent seed. Retain the current
+RGB64 teacher/recipe and143.667 greedy/70.750 sampled until useful learning is
+measured. Original864/90% two-wall and five-game gates remain unfinished.

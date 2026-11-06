@@ -8,27 +8,23 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) is implemented and CPU-qualified.
-Default-off `rgb_stride2` replaces encoder stride-one convolution/max-pool with
-stride-two5×5 convolutions. Parameter/replay/latent dimensions and decoder/control
-graphs stay unchanged; convolution output positions are quartered. Total training
-speed and gameplay benefit are unmeasured. Existing RGB64 resizing stays fixed.
+The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) passes native correctness and bounded cost checks.
+It remains default off.
+The fixed8,192-action/489-update check takes41.940s versus saved47.690s
+(12.06% less wall time); this historical comparison does not establish gameplay
+benefit. Encoder sampling/nonlinear reduction change despite identical parameters.
+Retain native RGB max-pool, one GPU resize, RGB64, latent/control dimensions.
 
-CPU checks pass216 Kindle +5 adapter tests,1,246 Python cases with zero native
-construction attempts, and strict workspace/binding Clippy. An initial fixture
-compile failure and original bytes remain preserved; the repaired tests pass.
-Release package native `cde123e1` and test executable `da5dcc99` are retained;
-installed-package checks also pass1,246 cases with zero native construction.
-Both native fixtures pass once; default-off retained/initial frozen traces match
-all128 transition rows and357 tensors per arm. Root
-`/x/Temp/kindle-rgb-stride2-20261106`; build cache released, packages retained.
-The separately declared8,192-action/489-update cost check is now selected,
-followed by1,024 frozen actions. Retained12M/RGB64/B16/T16/R16/Auto recipe and
-teacher stay fixed; only stride-two is enabled. Require finite learning, exact
-initial/frozen tensors, independent replay,2GiB conservative full-replay headroom
-and padded200k time≤25min. No full learner is selected.
-Keep the retained teacher/recipe and143.667 greedy/70.750 sampled; original864/90%
-two-wall and the five-game goal remain unfinished.
+CPU/package checks, independent native values/derivatives, synthetic updates/
+restore and default-off traces pass; original CPU fixture failure stays retained.
+Bounded checks pass all357 initial/frozen tensors, finite losses, full action/label
+replays and guards. Conservative full-replay headroom11.667GiB; padded200k
+projection18m46s. Imagination remains47.26% of measured learner time.
+Root `/x/Temp/kindle-rgb-stride2-20261106`; closure17:26:13.324 UTC November6.
+No GPU allocation or full learner is active/selected. A learning comparison
+requires a separate declaration and own actual-initial frozen controls. Do not
+repeat completed qualification stages. Keep retained143.667 greedy/70.750 sampled;
+original864/90% two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
