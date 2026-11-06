@@ -20,28 +20,24 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [fresh-seed Breakout confirmation](docs/results/2026-11-06-cdp-breakout-seed22003.md) is complete. Seed22003 learns
-75.250 greedy/44.708 sampled in21m30.822s, versus its2.292/1.875 actual-initial
-controls. Retained1009 on the same new cohort scores94.625/70.500; its historical
-old-cohort point remains143.667/70.750. Fresh own-initial gains are positive on
-all eight lanes in both modes. Greedy gain/min is21.091% lower than the matched
-control, with its paired95% interval narrowly including zero; sampled is38.323%
-lower. Both training-seed and evaluation-cohort variation matter. All0/24 two-wall;
-the original864/90% gate and five-game goal remain unfinished.
+The [causal shot-prediction analysis](docs/experiments/2026-11-06-cdp-breakout-causal-shot.md) is selected. Use only saved
+teacher decisions at or before the first incoming-fit frame to predict the later
+outgoing slope. Compare one fixed ridge model using predicted paddle offset and
+incoming direction with incoming-only and constant baselines. Fit episodes0–1;
+use episode2 as a reused development holdout. Actual reconstructed contact offset
+uses outgoing geometry and is excluded from features. This tests whether planned
+contact placement adds predictive value; it does not establish useful steering.
 
-All90 active/338 retained pins,69 completion artifacts,52 checkpoint files and
-288 recounted episodes pass. Training executes200k actions/799,616 frames and
-12,477 updates; recovery, all eight frozen arms, replays and original services
-pass. Independent closure completes21:04:53.361 UTC November6. Native447fe50 /
-SHA35ad0db, runnercf4ea238 and teacher are unchanged; execution sourcedcc4dd5d.
-The initial archived-helper copy failure remains preserved with its separate
-preparation repair. No GPU stage or learner update repeats.
+Root `/mnt/data/kindle-breakout-causal-shot-20261106`. CPU-only, one low-priority
+core,30s analysis/90s controller caps. No collector, emulator, native agent, GPU
+allocation or learner. Six CPU fixture groups and63 pins, including47 historical
+sealed files, pass. The independent reader will recount source joins and solve
+the ridge models through augmented least squares. No threshold search or automatic controller successor.
+The original864/90% two-wall gate and five-game goal remain unfinished.
 
-Root `/x/Temp/kindle-breakout-seed22003-20261106/full` is closed; main/recovery/
-terminal services are inactive, with no render holder or learner. Keep the
-retained recipe with the measured variation disclosed. No new seed is promoted;
-no extension, second learner, seed search or automatic successor is selected.
-Consult the [fixed protocol](docs/experiments/2026-11-06-cdp-breakout-seed22003.md) before any separately justified work.
+The [fresh-seed confirmation](docs/results/2026-11-06-cdp-breakout-seed22003.md) remains closed:75.250/44.708 versus retained94.625/70.500 on the same new cohort.
+Useful learning is confirmed; seed/cohort variation and all0/24 two-wall remain.
+Do not repeat its completed stages or promote a new best seed.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

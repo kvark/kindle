@@ -1,5 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [causal shot-prediction analysis](../experiments/2026-11-06-cdp-breakout-causal-shot.md) is selected. Use only saved
+teacher decisions at or before the first incoming-fit frame to predict the later
+outgoing slope. Compare one fixed ridge model using predicted paddle offset and
+incoming direction with incoming-only and constant baselines. Fit episodes0–1;
+use episode2 as a reused development holdout. Actual reconstructed contact offset
+uses outgoing geometry and is excluded from features. This tests whether planned
+contact placement adds predictive value; it does not establish useful steering.
+
+Root `/mnt/data/kindle-breakout-causal-shot-20261106`. CPU-only, one low-priority
+core,30s analysis/90s controller caps. No collector, emulator, native agent, GPU
+allocation or learner. Six CPU fixture groups and63 pins, including47 historical
+sealed files, pass. The independent reader will recount source joins and solve
+the ridge models through augmented least squares. No threshold search or automatic controller successor.
+The original864/90% two-wall gate and five-game goal remain unfinished.
+
 The [fresh-seed Breakout confirmation](2026-11-06-cdp-breakout-seed22003.md) is complete. Seed22003 learns
 75.250 greedy/44.708 sampled in21m30.822s, versus its2.292/1.875 actual-initial
 controls. Retained1009 on the same new cohort scores94.625/70.500; its historical
