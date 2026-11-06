@@ -38,8 +38,10 @@ with no native/emulator construction; all five exact queues pass in.503s.
 Root /x/Temp/kindle-rgb96-20261106/full is active from14:44:55 UTC November6,
 sourcecf007696. Startup passes all357 own-bounded initial tensors and47 pre-update
 events; first update376. All367 pins and original main/collector/recovery service
-identities pass at14:45:48. No frozen gameplay result yet; observe the original
-allocation through recovery, fixed assessments and terminal collection.
+identities pass at14:45:48. The100k/6,227 recovery independently passes15:00:25
+with all357 finite tensors/read-only files and367 unchanged pins; its observer
+exits successfully. Original main/collector remain active. No frozen gameplay
+result yet; observe the same allocation through fixed assessments and collection.
 Original Python/two native fixture failures remain preserved with separate repairs.
 No bounded experience transfers and no completed stage repeats or extends.
 Retain RGB64,32×16,143.667 greedy/70.750 sampled pending evidence.
