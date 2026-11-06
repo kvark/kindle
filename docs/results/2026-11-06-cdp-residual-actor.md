@@ -83,3 +83,46 @@ rejection and changed/extra/missing initial-tensor cases. It requires357 matchin
 legacy initial tensors, six zero residual additions,47 matching initial events,
 363 frozen invariant tensors, complete replays and finite weighted losses.
 Native3003151f/package7e0bb827 remain unchanged. No full learner is selected.
+
+## Completed bounded check and selected full comparison
+
+At09:40:58.358 UTC November6, source542bea7f completes the bounded controller
+in66.755s (66.792s external wrapper). Training covers8,192 aggregate actions,
+32,734 emulator frames and489 updates in46.534734s; retained cost is47.689684s,
+a2.422% observed reduction. Construction takes2.594s. This is a short historical
+comparison with different experience, not an isolated speed improvement.
+
+All357 legacy initial tensors and47 pre-update semantic events match retained;
+exactly six residual parameter/moment tensors start at zero. Initial/final/frozen
+schemas contain363 tensors (world280,behavior72,slow critic11). Encoder, reward,
+continuation, base/residual actor and critic parameters change. All489 reports
+are finite, both weighted loss identities pass, and full training pixel/action/
+label/override replay passes. The1,024-action frozen restore performs zero updates
+and preserves all363 tensors; it completes zero natural episodes and supplies no
+competence evidence. Both host guards and all49 allocation/243 source pins pass.
+No bounded stage fails or repeats.
+
+The padded200k projection is1,249.712s (20m49.712s), below1,800s. Minimum observed
+headroom across3,097 snapshots is17,988,620,288 bytes. Subtracting the entire
+5,939,200,000-byte full replay footprint leaves12,049,420,288 bytes, above2GiB;
+this conservatively counts already allocated pages twice. Reported update sums
+are16.587s imagination,13.628s world training,6.207s posterior,2.196s behavior
+and1.232s replay; aggregate learner time is40.146s. There are3,727 overrides
+(45.496%) and117,053 repeated expert-label rows, not unique experience.
+
+The [fresh200k protocol](../experiments/2026-11-06-cdp-breakout-residual-actor-200k.md)
+selects one candidate with the same package and recipe, initialized afresh.
+CPU helpers qualify the complete comparison, configuration rejection, weighted
+losses, exposure, plotting and terminal-message handling in3.533s wrapper with
+zero native/emulator construction. Exact queued commands are checked separately
+before launch. This tests whether independent reward-update parameters improve
+frozen gameplay per minute; it does not establish an imitation mechanism or
+repair inaccurate model/critic forecasts. Retain143.667/70.750 meanwhile.
+
+Artifacts: `/x/Temp/kindle-residual-actor-20261106/bounded/check/completion.json`,
+`review.json`, `guidance-replay.json` and guarded train/frozen evidence. Review
+SHA256 `532199ca7286596878ffa7f1fdad5cdec3af07c5375bd6c5c133b7947cff6eaf`;
+replay SHA256 `9f35eb4ffc25c133333a633896666a830cfa12208d346dd15839d2c86133a195`.
+New full helpers/declaration live under the separate `full` directory. Original
+native failure remains failed; the separate repair and closed bounded stages
+are not repeated. No extension or automatic successor is selected.

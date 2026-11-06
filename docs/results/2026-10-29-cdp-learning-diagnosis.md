@@ -1,14 +1,20 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [residual actor qualification](2026-11-06-cdp-residual-actor.md)
-completes with a preserved native fixture failure: original derivative checks
-pass, original learning fixture fails before its first transition on an RGB
-constructor mismatch, and a separate test-only repair passes two updates,
-sharing and exact restore in2.970s with248 pins. Production/package bytes remain
-unchanged. The fixed8,192-action cost check and1,024 frozen restore are selected
-following passing CPU command/configuration preflight. No full learner is selected.
-Root `/x/Temp/kindle-residual-actor-20261106/bounded`; default off. Retain143.667
-greedy/70.750 sampled and the original864/90%-two-wall/five-game gates.
+The [residual actor bounded check](2026-11-06-cdp-residual-actor.md) is complete:8,192 actions/32,734
+frames/489 updates in46.535s versus retained47.690s. All357 retained initial
+tensors/47 events match; six residual additions are zero,363 frozen tensors are
+invariant, both full replays/guards and finite weighted losses pass. Padded200k
+projection20m49.712s and conservative12.049GB headroom pass. No natural frozen
+episode completes in the1,024-action check; no gameplay benefit is established.
+
+The [separate fresh200k residual comparison](../experiments/2026-11-06-cdp-breakout-residual-actor-200k.md) is selected after
+passing CPU helper checks. Imagined policy/entropy train a46,098-parameter
+correction; imitation trains the unchanged base actor with separate moments.
+Greedy own-initial gain/min is primary; use the same200k budget, recipe and
+24-natural-episode frozen cohorts. Exact queued-command preflight precedes launch.
+Original native fixture failure and separate passing repair remain preserved.
+Root `/x/Temp/kindle-residual-actor-20261106/full`; default off, no repeated stage
+or automatic successor. Retain143.667/70.750 and original864/90%/five-game gates.
 
 The [full actor-width512 comparison](2026-11-06-cdp-actor-width.md#full-200k-comparison)
 is complete and negative. Fresh200k actions/799,552 frames/12,477 updates take

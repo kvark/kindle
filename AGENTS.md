@@ -20,25 +20,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [residual actor experiment](docs/results/2026-11-06-cdp-residual-actor.md)
-is qualified through native execution, with the original fixture failure retained.
-A zero-initialized linear correction receives imagined policy/entropy gradients;
-the base actor receives imitation. It adds46,098 trainable parameters at12M/full18,
-with separate moments and unchanged CNN/RSSM/critic. Default off.
+The [residual actor bounded check](docs/results/2026-11-06-cdp-residual-actor.md) passes:8,192 actions/489 updates
+in46.535s, versus retained47.690s. All357 legacy initial tensors and47 initial
+events match, six residual tensors start at zero, and363 frozen tensors remain
+invariant. Full replays, finite weighted losses and both guards pass. Projected
+200k cost20m49.712s and conservative memory headroom12.049GB pass the screens;
+this short historical comparison does not establish gameplay or speed gains.
 
-The original derivative fixture passes; the learning fixture fails before its
-first transition on an RGB constructor mismatch. The separate test-only repair
-passes two synthetic updates, sharing and exact restore in2.970s with248 pins.
-Production/native bytes stay unchanged; completed derivative work is not repeated.
-CPU/package checks and the bounded command preflight pass. The
-[fixed8,192-action cost check](docs/experiments/2026-11-06-cdp-residual-actor-bounded.md)
-and1,024-action frozen restore are now selected. No full learner is selected.
+A [separate fresh200k comparison](docs/experiments/2026-11-06-cdp-breakout-residual-actor-200k.md) is selected. The zero-initialized
+linear correction receives imagined policy/entropy gradients; imitation trains
+the base actor, with separate parameter moments. It adds46,098 parameters at12M,
+with unchanged CNN/RSSM/critic. CPU comparison helpers pass; exact command
+preflight must pass before launch. Original native fixture failure and separate
+passing test-only repair remain preserved. No completed stage repeats.
 
-Root `/x/Temp/kindle-residual-actor-20261106/bounded`; consult the protocol before
-execution. Both test binaries/package remain after disposable cache release.
-Keep the preset256 base, coordinates and actor dynamics off. Retain143.667
-greedy/70.750 sampled; original864/90%-two-wall and five-game gates remain
-unfinished. No old-stage repeat, sweep or automatic successor learner.
+Root `/x/Temp/kindle-residual-actor-20261106/full`; fixed200k actions, then24
+natural episodes per final/actual-initial sampled/greedy arm. Greedy gain per
+training minute is primary. Keep preset256 base, coordinates and actor dynamics
+off. Retain143.667 greedy/70.750 sampled until comparison completes. Original
+864/90%-two-wall and five-game gates remain unfinished. No extension, sweep or
+automatic successor learner.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
