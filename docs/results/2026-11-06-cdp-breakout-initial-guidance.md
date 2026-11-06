@@ -70,3 +70,10 @@ equal the own bounded trace. The first lane is in episode2; all others are in
 episode1, with no cap release or phase exit yet. Full phase coverage,100k recovery
 and frozen learning results remain pending; online guided returns are not
 competence. Original services continue without any restart or stage repeat.
+
+The independent15:58:45.001 recount verifies35,240 actions/2,179 updates and
+all eight phase exits at aggregate actions[22,232,28,376,28,496,26,816,23,664,
+30,344,25,232,29,912]. Initial-phase actions total26,884 and later-phase actions
+8,356;257 actions have occurred after selected-episode caps. All374 pins and
+original learner/collector/recovery identities pass. This confirms live schedule
+coverage, not learning quality; frozen evaluation remains pending.

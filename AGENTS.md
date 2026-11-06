@@ -38,9 +38,11 @@ Full helpers/comparison/plot checks pass in3.872s and all five queued commands
 pass in.381s, with zero native/emulator construction. The original learner starts
 15:55:04.816 UTC November6, sourcef797ad78, PID1512125/invocation
 cfe8a3d86199424d954c680e213badb9. Collector1512128 and recovery observer1512131
-are active. At15:56:19.964,12,104 actions/733 updates are independently recounted;
-all357 initial tensors match retained/own bounded,47 own pre-update events match,
-and374 pins pass. No phase exit or cap release yet; these are measured per lane.
+are active. At15:58:45.001,35,240 actions/2,179 updates are independently recounted.
+All eight lanes have left the initial phase, at aggregate actions22,232–30,344;
+initial-phase actions total26,884, with257 actions after selected-episode caps.
+All357 initial tensors match retained/own bounded,47 own pre-update events match,
+and374 pins pass. Phase exits are measured from actual per-lane resets.
 
 Root /x/Temp/kindle-breakout-initial-guidance-20261106/full is running under the
 existing guard. Keep observing original identities; do not restart on timeout.
