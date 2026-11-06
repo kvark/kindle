@@ -8,26 +8,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [full dynamics-gradient comparison](results/2026-11-06-cdp-actor-dynamics.md#full-200k-comparison)
-is closed and negative:200k actions/799,565 frames/12,477 updates in26m38.517s,
-with85.708 greedy/51.625 sampled versus retained143.667/70.750. Training costs
-24.117% more; primary own-initial gain/min falls52.44% (6.590132→3.134155).
-Paired95% lane interval[−5.380121,−1.816569]; all0/24 two-wall. Retain
-`actor_dynamics_scale=None`, coordinates off and the existing control.
+The [matched action-derivative contexts](experiments/2026-11-06-cdp-breakout-action-derivative-contexts.md)
+are selected for two serial frozen captures. Re-observe the retained control's
+43,424 actions/173,660 frames for each model, saving latent states at the same120
+previously branched rescue origins. Use qualified native744dd793/SHA876ed0c for
+both retained and dynamics.5 checkpoints. Reuse the saved92 short rescues and18
+differing game-over outcomes; do not repeat the old emulator oracle or forecasts.
 
-All345 current/338 retained pins,100k recovery,357 matching initial/invariant
-frozen tensors,47 pre-update events,weighted reports,full replays/videos,guards,
-curves and terminal collection pass. Original main/collector finish
-06:19:43.764/06:19:55.079 UTC November6; all three services succeed. No failed or
-repeated production stage. Earlier implementation preparation failures remain.
-Root `/x/Temp/kindle-actor-dynamics-20261106/full` is closed; no GPU allocation is
-active at closure. No extension,sweep,confirmation or automatic successor is
-selected. Check live state before new work; never restart this comparison.
+All16 CPU checks and preparation pass; entrypoint tests intercept native/emulator
+construction. Root `/x/Temp/kindle-breakout-action-derivatives-20261106` contains
+the exact queue, scripts and pins. Each capture is capped at180s, controller480s,
+with zero updates and357 invariant checkpoint tensors required. Consult the
+protocol and check live process identity before execution. No native derivative
+stage or new learner is selected by this capture.
 
-The native implementation and bounded derivative/cost checks pass, but this
-coefficient/seed does not establish useful policy gradients or a general cause
-for the regression. Any new derivative-quality assessment needs its own justified
-protocol. Original864/90%-two-wall and the five-game goal remain unfinished.
+The [full dynamics-gradient learner](results/2026-11-06-cdp-actor-dynamics.md#full-200k-comparison)
+remains closed and negative:85.708 greedy/51.625 sampled in26m38.517s versus
+retained143.667/70.750 in21m27.910s. Retain `actor_dynamics_scale=None` and
+coordinates off. Correct numerical derivatives have not established useful
+model gradients. Original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
