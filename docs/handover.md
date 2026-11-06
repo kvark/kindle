@@ -8,19 +8,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [actor posterior averaging experiment](experiments/2026-11-06-cdp-actor-posterior-average.md) is selected for implementation
-and CPU qualification. It averages eight conditional actor distributions while
+The [actor posterior averaging experiment](experiments/2026-11-06-cdp-actor-posterior-average.md) passes implementation, CPU
+and separately guarded Tiny native qualification. It averages eight conditional actor distributions while
 preserving the original sampled recurrent state and RNG streams. Frozen-only,
 default off; no training loss, parameters, encoder geometry or checkpoint change.
 The earlier modal result motivates this test but does not establish a noise cause.
 
 CPU checks pass 204 Kindle/5 adapter tests, 161 Python tests and strict workspace/binding
-Clippy. Packaging fddf48ba/native960667d1 passes 1,174 installed Python tests
-with zero construction attempts. One separately declared guarded Tiny fixture is
-selected for native values, shared parameters, recurrent-state/RNG equality under
-forced actions, frozen moments and learning guards. No Atari learner is selected.
-Root `/x/Temp/kindle-actor-posterior-average-20261106`; consult the protocol before
-execution. No native result exists yet.
+Clippy; packaged fddf48ba/native960667d1 passes 1,174 installed tests with zero
+construction attempts. The separately guarded Tiny fixture passes in 1.19s:
+independent probability means/actions, shared parameters, identical original RNGs
+and recurrent states under forced actions, frozen moments and learning guards.
+All 254 pins pass; zero learner updates or Atari actions. Native qualification
+closes at 12:06:09.504 UTC November 6; no failed or repeated declared stage.
+
+Root `/x/Temp/kindle-actor-posterior-average-20261106` retains wheel, runtime and
+test executable after verified release of 5.136GB logical build cache. No GPU
+allocation or learner is active or selected. Next separately declare bounded
+12M frozen compatibility/cost before any gameplay comparison; Tiny qualification
+does not establish Atari benefit or speed. Retain the current recipe.
 
 The [completed 64×8 grouping comparison](results/2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
 remains closed: greedy 136.958/sample 77.875 versus retained 143.667/70.750,

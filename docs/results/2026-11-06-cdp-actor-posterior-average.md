@@ -2,16 +2,17 @@
 
 The [development protocol](../experiments/2026-11-06-cdp-actor-posterior-average.md)
 selects eight additional categorical draws for the actor's current decision.
-The option is implemented and CPU checks pass. Native numerical qualification,
-cost and gameplay are not yet measured. Native qualification is now separately
-selected below; no Atari allocation is selected.
+The option passes CPU checks and the separately guarded Tiny native fixture.
+Atari compatibility, inference cost and gameplay remain unmeasured. No Atari
+allocation or learner is selected; the current recipe remains retained.
 
 Each native decision repeats the current deterministic state, samples eight
 categorical states from the same posterior, evaluates the shared actor in one
 batch and averages softmax probabilities. It returns log mean probabilities
 (floor 1e-30) to the existing action selector. Existing action masking and uniform
 mixing apply there once. The original one-sample recurrent state and its RNG
-remain separate; the native fixture must still verify this on the device.
+remain separate; the native fixture below verifies this on bounded synthetic
+inputs under identical forced actions.
 This is a conditional Monte Carlo actor average, not averaging logits or latent
 vectors, planning, or a full posterior over recurrent histories.
 
@@ -38,11 +39,12 @@ four synthetic decisions, a deliberately nonuniform actor, an ordinary actor
 reference, independent F64 sampling/averages, masks and sampled/greedy selection.
 It checks parameter sharing, frozen parameters/moments/learning counters, and
 identical live features and original RNG streams under the same forced actions.
-The fixture has compiled but has **not executed**. GPU success is unproven.
+At CPU closure the fixture had compiled but had not executed. The separate
+native result below supplies the later device evidence.
 
 Root `/x/Temp/kindle-actor-posterior-average-20261106` retains CPU sources,
-commands, logs and hashes. Next package the exact source and separately declare
-guarded native qualification; no unchanged closed experiment is restarted.
+commands, logs and hashes. Packaging and the separately declared native qualification now complete below;
+no unchanged closed experiment was restarted.
 Retain Breakout 143.667 greedy/70.750 sampled and preset 32×16. The original
 864/90%-two-wall and five-game gates remain unfinished.
 
@@ -58,3 +60,45 @@ receipts and source pins remain unchanged. The
 [separate native protocol](../experiments/2026-11-06-cdp-actor-posterior-average-native.md)
 selects one guarded Tiny fixture, 120s child/300s controller. No native result,
 Atari comparison, learner or speedup is established at declaration.
+
+## Native qualification complete
+
+The single declared fixture passes on the AMD RX7900XT/RADV with Auto, source
+**de97b762**, production package **fddf48ba/960667d1**. It finishes at
+**12:06:09.504 UTC November 6**: **1.19s native test**, **2.866620s controller**,
+**3.020570s wrapper**. All **254 pinned files** remain unchanged. The host guard
+passes, original child PID1477457 exits successfully, and no child remains.
+No host recovery, GPU telemetry campaign or Atari execution occurs.
+
+Across four synthetic decisions per two streams and eight additional draws,
+the new probability means satisfy the declared absolute 2e-4 bound against
+independent F64 categorical reconstruction plus ordinary native actor evaluations.
+Sample-dependent probabilities are nonuniform. Fixed sampled/greedy selections
+and masks match exactly. All 11 actor parameters are shared, and both native
+learning entry points reject the evaluation-only option. Expected caught guard
+panics remain in stderr; the fixture exits successfully.
+
+Under identical forced commands and RGB inputs, original recurrent features,
+posterior RNG and policy RNG match the ordinary agent at every decision.
+Parameters, optimizer moments and learning counters stay unchanged; environment
+counters advance equally. This is a bounded inference routing/value result,
+not a derivative, full-history marginalization or gameplay result. No Atari
+steps or learner updates occur, and no declared check fails or repeats.
+
+The separate read-only closure takes .039580s, confirms the original child is
+terminal, no Kindle service/render holder remains, and rechecks all 254 pins plus
+packaged artifacts. Wheel, native runtime and test executable remain retained.
+A separate release receipt removes **5,136,346,520 logical bytes** of disposable
+build cache and verifies all three retained artifact hashes unchanged. The
+original build receipt is not rewritten.
+
+| Artifact | SHA256 |
+|---|---|
+|`native-review.json`|`b49dbe63ca1d2c08477cf5b4b6abedaaaa3f4c53d692c98425afd50148eccf50`|
+|`qualification-closure.json`|`30c9c9bef02119967af497863dfd6bcd592ab8497f8527c398ac4ce4f7d464f1`|
+|`cache-release.json`|`3ada88786a34ae84754e665b15129a6d5d9c10ebaba02ef940e3da1e958130b6`|
+
+Next, separately declare a bounded 12M frozen compatibility/cost check before
+selecting a gameplay comparison. No new GPU allocation, learner, sample-count
+sweep or automatic successor is selected. Retain the original five-game goal
+and Breakout 143.667/70.750; neither speedup nor improved competence is established.
