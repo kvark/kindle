@@ -1,8 +1,8 @@
 # Enumerated one-step actor: qualification and bounded cost
 
 The bounded check passes execution and cost gates, with **31.350% more training
-time** than retained. Gameplay benefit remains unmeasured; no full learner is
-selected. [Bounded results](#bounded-learning-cost-check-complete).
+time** than retained. Gameplay benefit remains unmeasured; a separately declared
+fresh200k comparison is now selected. [Bounded results](#bounded-learning-cost-check-complete).
 
 The [development protocol](../experiments/2026-11-06-cdp-actor-expected-value.md)
 implements `actor_expected_value`, default false. It replaces the sampled-action
@@ -142,3 +142,21 @@ A separately declared fresh fixed comparison is now feasible; it must judge
 frozen own-initial gameplay gain per training minute against143.667/70.750,
 not loss magnitude or bounded guided returns. Retain the existing recipe and
 keep the new option off. Original864/90%-two-wall and five-game gates remain.
+
+## Fresh200k comparison selected
+
+The [separate full protocol](../experiments/2026-11-06-cdp-breakout-actor-expected-value-200k.md)
+selects one fresh200k-action learner, with no checkpoint/bounded-experience
+transfer, plus actual-initial/final sampled and greedy24-natural-episode arms.
+Greedy raw return and own-initial gain/min must improve, with a positive lower
+bound on the paired eight-lane95% gain/min interval. Retained143.667/70.750 and
+original864/90%-two-wall gates remain. This is a reused development seed/cohort.
+
+Current CPU helper checks pass in3.477s including wrapper. They exercise exact
+configuration comparisons, weighted totals, required expected-value metric and
+positive snapshot timing, retained/bounded exposure accounting, complete paired
+comparison entry, malformed headers, plotting and null journal messages. No
+native module or emulator is constructed. Exact five-command qualification and
+launch remain next; no learner is active at this declaration. Root
+`/x/Temp/kindle-actor-expected-value-20261106/full` retains its source copies and
+historical source resolution. No old stage or failed queue is repeated.

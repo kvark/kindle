@@ -1,24 +1,27 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [enumerated one-step actor](../experiments/2026-11-06-cdp-actor-expected-value.md) passes CPU/native qualification and
-its [bounded learning-cost check](2026-11-06-cdp-actor-expected-value.md#bounded-learning-cost-check-complete).
-Fresh8,192 actions/489 updates take62.640s versus retained47.690s, **31.350% more**.
-The padded200k projection is28m02.233s, below30min; conservative full-replay
-headroom is9.702GiB. These are execution/cost results, not frozen competence.
+The [fresh200k enumerated-actor comparison](../experiments/2026-11-06-cdp-breakout-actor-expected-value-200k.md) is selected after the
+[bounded check](2026-11-06-cdp-actor-expected-value.md#bounded-learning-cost-check-complete) passes. Test whether
+frozen gameplay gain offsets31.350% extra bounded time; the padded projection is
+28m02.233s, with9.702GiB conservative replay headroom. Fresh seed1009,200k actions/
+12,477 updates; actual-initial/final sampled and greedy24-natural-episode arms.
+Greedy own-initial gain per training minute is primary, with the existing paired
+interval criterion. These reused development choices do not establish reliability.
 
-All357 initial tensors and47 pre-update events match retained;1,024 frozen
-actions make zero updates and preserve all357 tensors. Both full action replays,
-weighted losses, snapshot timing, guards,253 source/51 execution pins and terminal
-controller/children checks pass. Packaged1194 Python checks and both Tiny native
-fixtures pass. The original CPU compile failure remains preserved; no GPU stage
-fails or repeats. Disposable build cache released; packaged artifacts retained.
+The option replaces sampled-action policy loss with a detached expectation over
+all18 one-step action values. Entropy, imitation, critic and original imagination
+remain; no learned parameters or image changes. Horizon and start distribution
+change with the estimator. CPU helper/comparison/plot checks pass; next declare
+and qualify the exact five queued commands before launching one guarded learner.
+Require357 initial tensor and47 pre-update event matches to bounded/retained,
+matching initial frozen traces,100k recovery, full replays and terminal collection.
 
-Root `/x/Temp/kindle-actor-expected-value-20261106/bounded` is closed. No GPU
-allocation or full learner is active or selected. A separately declared fresh
-comparison can now test whether gameplay gain offsets the extra cost; no unchanged
-extension, sweep or automatic successor. Keep the option off and retain ordinary
-inference,32×16 and143.667 greedy/70.750 sampled. Original864/90%-two-wall and
-the five-game goal remain unfinished.
+Root `/x/Temp/kindle-actor-expected-value-20261106/full`; service
+`kindle-breakout-actor-expected-value-200k-20261106`. No learner is active yet.
+Original CPU compile failure stays preserved; corrected CPU/native/bounded stages
+pass, with no repeated GPU stage. No extension, sweep or automatic successor.
+Keep the default off and retain ordinary inference,32×16 and143.667 greedy/70.750
+sampled. Original864/90%-two-wall and the five-game goal remain unfinished.
 
 The [actor posterior averaging comparison](2026-11-06-cdp-actor-posterior-average.md#fixed-trained-policy-comparison-complete)
 is complete and fails the declared retention criterion. Eight-sample greedy

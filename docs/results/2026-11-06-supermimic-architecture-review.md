@@ -119,7 +119,7 @@ One distinct future estimator would score each discrete action with a fixed
 world model and critic, then train the actor against the probability-weighted
 action values. This avoids differentiating through a relaxed button choice,
 but retains model/critic bias and adds branch computation. It is not equivalent
-to multi-step dynamics backpropagation, and is now selected as the distinct [enumerated one-step actor experiment](2026-11-06-cdp-actor-expected-value.md), with CPU/native qualification and bounded cost gates passed. It adds31.35% bounded wall time; gameplay benefit remains unmeasured and no full learner is selected.
+to multi-step dynamics backpropagation, and is now selected as the distinct [enumerated one-step actor experiment](2026-11-06-cdp-actor-expected-value.md), with CPU/native qualification and bounded cost gates passed. It adds31.35% bounded wall time; gameplay benefit remains unmeasured. A separately declared fresh200k comparison is now selected to test gain per training minute.
 Continuous latent states alone would not remove the discrete-action issue.
 
 For a future continuous-control task, direct actor gradients would be a more
