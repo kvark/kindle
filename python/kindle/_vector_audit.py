@@ -161,6 +161,12 @@ def audit(path):
         lower_bound = config.get("replay_actor_observed_lower_bound", False)
         check(type(lower_bound) is bool, "invalid observed lower-bound mode")
         disagreement = config.get("disagreement_bonus", False) and config.get("intrinsic_reward_scale", 0) > 0
+        completed_values = config.get("replay_value_completed", False)
+        check(type(completed_values) is bool, "invalid completed replay-value option")
+        check(not completed_values or (not disagreement
+              and not config.get("replay_actor_auxiliary_boundaries", False)
+              and config.get("loss_scales", {}).get("replay_value", 0) > 0),
+              "completed replay values require observed game returns and positive replay-value scale")
         check(not lower_bound or (replay_actor_scale is not None and disagreement),
               "observed lower-bound mode requires actor learning and active disagreement")
         if replay_actor_scale is not None:
@@ -439,6 +445,13 @@ def audit(path):
                       "actor dynamics report/config mismatch")
                 if dynamics_loss is not None:
                     check(type(dynamics_loss) in (int, float), "invalid actor dynamics loss")
+                completed_rows = report.get("behavior", {}).get("completed_value_rows")
+                check((completed_rows is not None) == completed_values,
+                      "completed replay-value report/config mismatch")
+                if completed_rows is not None:
+                    check(type(completed_rows) is int
+                          and 0 <= completed_rows <= config["batch_size"] * (config["batch_length"] - 1),
+                          "invalid completed replay-value row count")
                 replay_actor = report.get("behavior", {}).get("replay_actor")
                 check((replay_actor is not None) == (replay_actor_scale is not None),
                       "completed-return actor report/config mismatch")

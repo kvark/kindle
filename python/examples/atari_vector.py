@@ -159,6 +159,8 @@ def main():
                         help="fresh training only: actor MLP width; world and critic keep the model preset")
     parser.add_argument("--actor-residual", action="store_true",
                         help="fresh centered CDP: separate imagined-policy correction to a supervised actor")
+    parser.add_argument("--replay-value-completed", action="store_true",
+                        help="use completed observed game returns for available replay-value targets; requires disagreement-scale0")
     parser.add_argument("--replay-actor-scale", type=float,
                         help="fresh training: positive-advantage imitation of completed observed returns")
     parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
@@ -306,6 +308,15 @@ def main():
             parser.error("prior-continuation-scale requires fresh CDP without open-loop or terminal weighting")
     if args.replay_value_bootstrap is not None and args.evaluate:
         parser.error("replay-value-bootstrap requires fresh training")
+    if args.replay_value_completed:
+        if args.restore or args.evaluate:
+            parser.error("replay-value-completed requires fresh training")
+        if args.disagreement_scale != 0 or args.breakout_return_life_boundaries:
+            parser.error("replay-value-completed requires disagreement-scale0 and game-level returns")
+        if args.replay_value_scale is not None and not positive_f32(args.replay_value_scale):
+            parser.error("replay-value-completed requires a positive replay-value-scale")
+        if "KINDLE_DEVICE_TARGETS" in os.environ:
+            parser.error("replay-value-completed requires CPU target construction")
     if args.replay_actor_observed_lower_bound and (
             args.replay_actor_scale is None or not positive_f32(args.disagreement_scale)):
         parser.error("observed lower-bound mode requires replay-actor-scale and positive disagreement-scale")
@@ -553,6 +564,7 @@ def main():
     training_options.add("--discount-horizon")
     training_options.add("--terminal-continuation-weight")
     training_options.add("--prior-continuation-scale")
+    training_options.add("--replay-value-completed")
     training_options.add("--replay-actor-scale")
     training_options.add("--actor-dynamics-scale")
     training_options.add("--actor-expected-value")
@@ -598,6 +610,8 @@ def main():
         parser.error("centroid supervision requires native color-centroid support")
     if args.replay_value_bootstrap is not None and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_VALUE_BOOTSTRAP", False):
         parser.error("replay-value-bootstrap requires native bootstrap support")
+    if args.replay_value_completed and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_REPLAY_VALUE", False):
+        parser.error("replay-value-completed requires native completed replay-value support")
     if args.replay_actor_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False):
         parser.error("replay-actor-scale requires native completed-return actor support")
     if args.actor_dynamics_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_DYNAMICS", False):
@@ -661,6 +675,11 @@ def main():
         if (metadata.get("config", {}).get("terminal_continuation_weight") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_CONTINUATION_WEIGHT", False)):
             parser.error("terminal-continuation checkpoint requires native terminal-weight support")
+        if metadata.get("config", {}).get("replay_value_completed", False):
+            if not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_REPLAY_VALUE", False):
+                parser.error("completed replay-value checkpoint requires native support")
+            if "KINDLE_DEVICE_TARGETS" in os.environ:
+                parser.error("completed replay-value checkpoint requires CPU target construction")
         if (metadata.get("config", {}).get("replay_actor_scale") is not None
                 and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False)):
             parser.error("completed-return actor checkpoint requires native support")
@@ -835,6 +854,8 @@ def main():
             config["terminal_continuation_weight"] = args.terminal_continuation_weight
         if args.prior_continuation_scale is not None:
             config["prior_continuation_scale"] = args.prior_continuation_scale
+        if args.replay_value_completed:
+            config["replay_value_completed"] = True
         if args.replay_actor_scale is not None:
             config["replay_actor_scale"] = args.replay_actor_scale
         if args.actor_dynamics_scale is not None:

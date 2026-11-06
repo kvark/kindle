@@ -118,7 +118,7 @@ impl ReplayStream {
         self.total_frames - self.frames.len() as u64
     }
 
-    fn complete_actor_returns(&mut self, config: &DreamerConfig) {
+    fn complete_returns(&mut self, config: &DreamerConfig) {
         let mut next = 0.0_f64;
         for (offset, frame) in self.frames.iter_mut().rev().enumerate() {
             if offset > 0 && frame.flags.is_last {
@@ -225,7 +225,7 @@ impl SequenceReplay {
         // Real terminals have already completed their segment; timeouts remain
         // ineligible even if a life loss coincides with the cutoff.
         if !arrival.flags.is_last {
-            history.complete_actor_returns(config);
+            history.complete_returns(config);
         }
     }
 
@@ -322,7 +322,8 @@ impl SequenceReplay {
         if frame.flags.is_terminal {
             history.terminal_frames.push_back(history.total_frames);
         }
-        let complete = config.replay_actor_scale.is_some() && frame.flags.is_terminal;
+        let complete = (config.replay_actor_scale.is_some() || config.replay_value_completed)
+            && frame.flags.is_terminal;
         if frame.flags.is_first {
             history.next_encoder_phase = 0;
         }
@@ -330,7 +331,7 @@ impl SequenceReplay {
         history.next_encoder_phase = (phase + 1) % crate::vision::levjepa::FRAMES;
         history.frames.push_back(frame);
         if complete {
-            history.complete_actor_returns(config);
+            history.complete_returns(config);
         }
 
         history.total_frames = history
@@ -738,6 +739,23 @@ pub struct ReplayPrefix {
 }
 
 impl SequenceBatch {
+    pub fn completed_value_target(
+        &self,
+        config: &DreamerConfig,
+        time: usize,
+        lane: usize,
+    ) -> Option<f32> {
+        if !config.replay_value_completed
+            || self.flags[time][lane].is_last
+            || self.flags[time + 1][lane].is_first
+        {
+            return None;
+        }
+        let value = self.completed_returns[time][lane]?;
+        assert!(value.is_finite(), "nonfinite completed replay value");
+        Some(value)
+    }
+
     pub fn replay_actor_targets(
         &self,
         config: &DreamerConfig,
@@ -835,6 +853,10 @@ impl SequenceBatch {
 #[cfg(test)]
 #[path = "replay/terminal_tests.rs"]
 mod terminal_tests;
+
+#[cfg(test)]
+#[path = "replay/completed_value_tests.rs"]
+mod completed_value_tests;
 
 #[cfg(test)]
 mod tests {

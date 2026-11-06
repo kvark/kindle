@@ -1,5 +1,24 @@
 # Kindle: CDP learning roadmap
 
+The [completed-return replay-value experiment](experiments/2026-11-06-cdp-completed-value.md) is selected for
+CPU implementation and packaging. Default-off `replay_value_completed` uses
+completed observed game returns where available and preserves the existing
+lambda target elsewhere. It adds no graph operations or parameters. Active
+model-derived disagreement and auxiliary life boundaries are incompatible.
+This differs from the closed completed-return actor experiments; they stay closed.
+
+Implementation and new CPU/native fixture sources are ready for checks. The
+native fixture remains ignored pending a separate GPU declaration. No emulator,
+GPU allocation or learner is selected. Root
+`/x/Temp/kindle-completed-value-20261106`; 261 pre-edit source files are retained.
+Next verify configuration, return alignment, fallback, reporting and restore
+validation, then package the exact runtime. Do not infer gameplay benefit.
+
+The [brick-aiming teacher check](results/2026-11-06-cdp-breakout-brick-aim.md) is closed and negative (208.458 versus
+225.083); keep the original teacher. Retain CDP scale 500 and learned Breakout
+143.667 greedy / 70.750 sampled. Original 864/90% two-wall and the five-game
+goal remain unfinished. No full learner or automatic successor is selected.
+
 The [sparse-wall brick-aiming teacher comparison](results/2026-11-06-cdp-breakout-brick-aim.md) is complete and
 fails retention: 208.458 versus 225.083 (−7.386%), only 1/8 improved lanes and
 0/24 two-wall for both. Keep the original teacher. The fixed RGB-cell rule is

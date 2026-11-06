@@ -15,6 +15,8 @@ mod dynamics_tests;
 #[cfg(test)]
 mod expected_value_tests;
 #[cfg(test)]
+mod completed_value_tests;
+#[cfg(test)]
 mod rgb96_tests;
 #[cfg(test)]
 mod rgb_stride_tests;
@@ -236,6 +238,9 @@ pub struct BehaviorMetrics {
     pub expert_imitation: Option<ExpertImitationMetrics>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub replay_actor: Option<ReplayActorMetrics>,
+    /// Valid replay rows whose value targets use completed observed returns.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub completed_value_rows: Option<usize>,
     /// Unscaled normalized return loss; its coefficient is actor_dynamics_scale * policy.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dynamics_actor_loss: Option<f32>,
@@ -299,6 +304,7 @@ struct BehaviorTrainingBatch {
     replay_actor_target: Vec<f32>,
     replay_actor_completed_rows: usize,
     replay_actor_positive_rows: usize,
+    completed_value_rows: usize,
     expert_action_target: Vec<f32>,
     expert_labeled_rows: usize,
     action_target: Vec<f32>,
@@ -544,6 +550,10 @@ impl DreamerCore {
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
         config.validate();
+        assert!(
+            !config.replay_value_completed || std::env::var_os("KINDLE_DEVICE_TARGETS").is_none(),
+            "completed replay values require CPU target construction"
+        );
         assert!(
             config.replay_actor_scale.is_none()
                 || std::env::var_os("KINDLE_DEVICE_TARGETS").is_none(),
@@ -2416,6 +2426,7 @@ impl DreamerCore {
         let mut replay_weight = vec![0.0; replay_rows];
         let mut replay_value_target = vec![0.0; replay_rows * self.config.value_bins];
         let mut replay_slow_target = vec![0.0; replay_rows * self.config.value_bins];
+        let mut completed_value_rows = 0;
         let bootstrap_values = self
             .config
             .replay_value_bootstrap
@@ -2462,8 +2473,10 @@ impl DreamerCore {
                             ..(start + 1) * self.config.feature_dim()],
                     );
                 replay_weight[row] = 1.0 - last[time];
+                let completed = batch.completed_value_target(&self.config, time, batch_row);
+                completed_value_rows += usize::from(completed.is_some());
                 self.bins.encode(
-                    replay_return[time],
+                    completed.unwrap_or(replay_return[time]),
                     &mut replay_value_target
                         [row * self.config.value_bins..(row + 1) * self.config.value_bins],
                 );
@@ -2481,6 +2494,7 @@ impl DreamerCore {
             replay_actor_target,
             replay_actor_completed_rows,
             replay_actor_positive_rows,
+            completed_value_rows,
             expert_action_target: Vec::new(),
             expert_labeled_rows: 0,
             action_target,
@@ -2637,6 +2651,10 @@ impl DreamerCore {
         });
         let metrics = BehaviorMetrics {
             expert_imitation,
+            completed_value_rows: self
+                .config
+                .replay_value_completed
+                .then_some(batch.completed_value_rows),
             expected_value_actor_loss: self.config.actor_expected_value.then(|| {
                 let loss = read_scalar(
                     &self.behavior_train,

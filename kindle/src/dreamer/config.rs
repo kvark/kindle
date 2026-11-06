@@ -435,6 +435,9 @@ pub struct DreamerConfig {
     /// Positive-advantage actor imitation of completed observed episode returns.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub replay_actor_scale: Option<f32>,
+    /// Prefer completed observed game returns to bootstrapped replay-value targets.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub replay_value_completed: bool,
     /// Use observed completed returns as a conservative lower bound when the
     /// critic also includes nonnegative model-derived disagreement rewards.
     #[serde(default, skip_serializing_if = "is_false")]
@@ -530,6 +533,7 @@ impl DreamerConfig {
             actor_learning_starts: 0,
             expert_imitation: None,
             replay_actor_scale: None,
+            replay_value_completed: false,
             replay_actor_observed_lower_bound: false,
             replay_actor_auxiliary_boundaries: false,
             learning_rate_warmup: 1_000,
@@ -728,8 +732,7 @@ impl DreamerConfig {
             let preset = self.model_size.network();
             if shape.variables == 0
                 || shape.classes < 2
-                || shape.variables.checked_mul(shape.classes)
-                    != Some(preset.stoch * preset.classes)
+                || shape.variables.checked_mul(shape.classes) != Some(preset.stoch * preset.classes)
             {
                 return Err("latent_shape requires positive variables, classes > 1 and the preset's flattened width".into());
             }
@@ -776,6 +779,14 @@ impl DreamerConfig {
             return Err(
                 "actor dynamics requires a positive finite scale and finite weighted scale".into(),
             );
+        }
+        if self.replay_value_completed
+            && (self.uses_disagreement()
+                || self.replay_actor_auxiliary_boundaries
+                || !self.loss_scales.replay_value.is_finite()
+                || self.loss_scales.replay_value <= 0.0)
+        {
+            return Err("completed replay values require observed rewards, game-level returns and a positive replay-value scale".into());
         }
         if let Some(scale) = self.replay_actor_scale
             && (!scale.is_finite() || scale <= 0.0)
@@ -1282,6 +1293,40 @@ mod tests {
                 .unwrap_err()
                 .contains("without color-centroid")
         );
+    }
+
+    #[test]
+    fn completed_replay_values_preserve_defaults_and_require_observed_game_returns() {
+        let mut config = DreamerConfig::tiny(3);
+        let legacy = serde_json::to_value(&config).unwrap();
+        assert!(legacy.get("replay_value_completed").is_none());
+        assert!(
+            !serde_json::from_value::<DreamerConfig>(legacy)
+                .unwrap()
+                .replay_value_completed
+        );
+        config.replay_value_completed = true;
+        config.check().unwrap();
+        assert!(config.replay_actor_scale.is_none());
+        let restored: DreamerConfig =
+            serde_json::from_value(serde_json::to_value(&config).unwrap()).unwrap();
+        assert_eq!(restored, config);
+        for scale in [0.0, -1.0, f32::NAN, f32::INFINITY] {
+            let mut invalid = config.clone();
+            invalid.loss_scales.replay_value = scale;
+            assert!(invalid.check().is_err());
+        }
+        config.disagreement_bonus = true;
+        config.intrinsic_reward_scale = 1.0;
+        assert!(config.check().is_err());
+        config.intrinsic_reward_scale = 0.0;
+        config.check().unwrap();
+        config.disagreement_bonus = false;
+        config.visitation_bonus = true;
+        config.intrinsic_reward_scale = 1.0;
+        config.check().unwrap();
+        config.replay_actor_auxiliary_boundaries = true;
+        assert!(config.check().is_err());
     }
 
     #[test]

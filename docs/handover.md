@@ -8,22 +8,24 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [sparse-wall brick-aiming teacher comparison](results/2026-11-06-cdp-breakout-brick-aim.md) is complete and
-fails retention: 208.458 versus 225.083 (−7.386%), only 1/8 improved lanes and
-0/24 two-wall for both. Keep the original teacher. The fixed RGB-cell rule is
-eligible on 445 selected decisions and changes 191 of 39,749 first commands.
-This does not calibrate outgoing angles or isolate the cause of the regression.
+The [completed-return replay-value experiment](experiments/2026-11-06-cdp-completed-value.md) is selected for
+CPU implementation and packaging. Default-off `replay_value_completed` uses
+completed observed game returns where available and preserves the existing
+lambda target elsewhere. It adds no graph operations or parameters. Active
+model-derived disagreement and auxiliary life boundaries are incompatible.
+This differs from the closed completed-return actor experiments; they stay closed.
 
-Six CPU fixture groups, 48 declared pins and 31 completion artifacts pass.
-One candidate completes 43,176 actions / 172,667 frames in 33.187557s; full
-38.043074s replay matches every decision/pixel/reward/frame/reset/outcome.
-Controller 71.688512s, closed 19:16:42.795 UTC November 6, source e52a6844;
-independent recount passes at 19:16:50.885. No failed or repeated stage.
+Implementation and new CPU/native fixture sources are ready for checks. The
+native fixture remains ignored pending a separate GPU declaration. No emulator,
+GPU allocation or learner is selected. Root
+`/x/Temp/kindle-completed-value-20261106`; 261 pre-edit source files are retained.
+Next verify configuration, return alignment, fallback, reporting and restore
+validation, then package the exact runtime. Do not infer gameplay benefit.
 
-Root `/x/Temp/kindle-breakout-brick-aim-20261106` is closed. No control rerun,
-native learner or GPU work. No fresh cohort, integration, sweep or automatic
-successor is selected. Retain CDP scale 500 and Breakout 143.667 greedy / 70.750
-sampled; original 864/90% two-wall and the five-game goal remain unfinished.
+The [brick-aiming teacher check](results/2026-11-06-cdp-breakout-brick-aim.md) is closed and negative (208.458 versus
+225.083); keep the original teacher. Retain CDP scale 500 and learned Breakout
+143.667 greedy / 70.750 sampled. Original 864/90% two-wall and the five-game
+goal remain unfinished. No full learner or automatic successor is selected.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
