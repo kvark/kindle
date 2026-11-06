@@ -20,26 +20,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [fixed actor-averaging evaluation](docs/experiments/2026-11-06-cdp-actor-posterior-average-candidate-evaluation.md)
-selects one24-natural-episode frozen greedy comparison against retained143.667.
-Eight posterior samples, unchanged live sampled state, no training. Require≥10%
-higher mean, positive paired eight-lane95% interval, no fewer two-wall successes
-and≤2× saved ordinary per-action cost. Cohort4000001009 is reused development
-experience; this serving comparison does not establish training-seed reliability
-or initial-subtracted learning efficiency. Child cap300s/600k actions; no sweep
-or automatic successor.
+The [actor posterior averaging comparison](docs/results/2026-11-06-cdp-actor-posterior-average.md#fixed-trained-policy-comparison-complete)
+is complete and fails the declared retention criterion. Eight-sample greedy
+return175.500 exceeds ordinary143.667 by22.158%, but the paired eight-lane95%
+interval is[-15.417,83.792], only4/8 lanes improve and both have0/24 two-wall.
+Keep ordinary inference; averaging stays frozen-only and default off. This
+fixed-checkpoint serving result does not establish a training-efficiency gain,
+a posterior-noise cause or training-seed reliability.
 
-The [new bounded candidate](docs/results/2026-11-06-cdp-actor-posterior-average.md#separate-candidate-compatibility-check-complete)
-passes at12:30:43.268 UTC:4,096 actions/16,384 frames in2.785s,1.018472× saved
-ordinary cost,2.797s construction,357 unchanged finite tensors, full replay and
-all653 pins. Child1479179 is terminal. The original two-arm and CPU-repair
-failures remain failed; no completed stage is repeated. Full-command CPU preflight
-passes with zero native import/construction. No learner is selected.
+The fixed24-natural-episode cohort is selected from25 completed episodes, with
+zero updates/truncations.45,128 actions/180,472 frames take29.068s, construction
+2.936s. All357 tensors remain finite/invariant; full replay/video,681 pins and
+the guard pass. Comparison completes12:33:57.992 UTC November6,
+publication recount12:35:07.674; original child1479392 is terminal.
+No Kindle service/render holder remains. The separate bounded candidate passed
+at1.018472× observed ordinary per-action cost. Original pipeline/CPU-repair
+failures remain failed; no completed stage was repeated.
 
-Root `/x/Temp/kindle-actor-posterior-average-20261106/candidate-evaluation`,
-packagefddf48ba/native960667d1. Averaging stays frozen-only/default-off pending
-results. Retain32×16 and143.667 greedy/70.750 sampled; original864/90%-two-wall
-and five-game gates remain unfinished.
+Root `/x/Temp/kindle-actor-posterior-average-20261106/candidate-evaluation` is
+closed; no GPU allocation, learner, count/seed sweep or successor is selected.
+Retain32×16 and143.667 greedy/70.750 sampled; original864/90%-two-wall and
+five-game gates remain unfinished. Consult a separately justified new protocol
+before further GPU work; do not restart this comparison or its failed queue.
 
 The [completed 64×8 grouping comparison](docs/results/2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
 remains closed: greedy 136.958/sample 77.875 versus retained 143.667/70.750,

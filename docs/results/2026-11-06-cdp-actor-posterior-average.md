@@ -1,4 +1,4 @@
-# Frozen actor posterior averaging: qualification and bounded audit failure
+# Frozen actor posterior averaging: higher mean, inconclusive comparison
 
 The [development protocol](../experiments/2026-11-06-cdp-actor-posterior-average.md)
 selects eight additional categorical draws for the actor's current decision.
@@ -203,3 +203,59 @@ Favor averaging only at≥10% higher mean with positive paired eight-lane95%
 interval, no fewer two-wall successes and≤2× saved ordinary per-action cost.
 Original864/90%-two-wall and five-game gates remain unchanged. Gameplay benefit
 is still unmeasured at this declaration; no automatic successor is selected.
+
+
+## Fixed trained-policy comparison complete
+
+The [fixed declaration](../experiments/2026-11-06-cdp-actor-posterior-average-candidate-evaluation.md)
+completes on sourced2da3904 and **fails the retention criterion**. Keep ordinary
+sampled-state inference and retained143.667 greedy/70.750 sampled. The optional
+eight-sample path remains frozen-only/default-off; no new learner or sampled-
+action assessment was performed.
+
+| Measure | Ordinary retained | Eight-sample averaging |
+|---|---:|---:|
+| Selected natural episodes |24|24|
+| Greedy return |143.666667|175.500000|
+| Two-wall successes |0/24|0/24|
+
+Mean return rises **31.833333 (+22.158%)**, exceeding the declared10% threshold,
+but the **paired eight-lane95% interval[-15.416667,83.791667] crosses zero**.
+Only4/8 lanes improve. The interval uses the declared10,000 resamples/seed0.
+The cohort4000001009 and learner1009 were used in development; this does not
+establish training-seed reliability or a posterior-noise cause. The original
+864/90%-two-wall gate remains unpassed. Both the old modal result and this
+conditional actor averaging result remain inconclusive under their fixed rules.
+
+The candidate completes **45,128 actions /180,472 emulator frames in29.068463s**,
+with2.935687s construction. There are25 natural episodes, zero truncations and
+zero learner updates; the fixed first three per lane select24 and exclude one
+extra episode. Full recorded-action/reward/frame/boundary replay and video pass.
+All357 tensors, including moments, remain finite and unchanged. Its observed
+full-run per-action cost is.964768× the short saved ordinary control; different
+trajectories, fixed export overhead and possible warmup effects limit interpreting
+that as a general speedup. Construction is reported separately and excluded from
+the declared per-action ratio. The separate bounded check's1.018472× ratio also
+satisfies the2× cost cap; neither timing proves improved learning per GPU-hour.
+
+All681 allocation pins and the host guard pass. Original child1479392 exits0;
+controller completes **12:33:57.992 UTC November6** in53.301478s,
+wrapper53.429039s. The independent CPU publication reader selects episodes from
+raw logs, joins the replay outcomes and reproduces lane means, the interval and
+the failed decision. It verifies653 bounded/681 full pins,68 publication inputs,
+all saved output hashes and terminal controller/child identities. Reader completes
+**12:35:07.674 UTC** in3.051733s (3.119865s wrapper), with no GPU or
+emulator work. No Kindle service/render holder remains.
+
+The new candidate bounded/evaluation stages and publication reader pass on their
+first executions. The original two-arm pipeline and its CPU-repair execution
+remain failed and unchanged; their completed ordinary control was reused without
+GPU, replay or completed-audit repetition. No learner, extension, count/seed sweep
+or successor is selected. Keep the original five-game goal unfinished and the
+retained recipe unchanged.
+
+| Artifact | SHA256 |
+|---|---|
+|`candidate-bounded/completion.json`|`2c943a977d3c2c5d14b7c6f603641bc44f95f45d1c5d003533650686c0cda874`|
+|`candidate-evaluation/completion.json`|`60a9fdaa0146d789dd47fab3b11edfb5c498b5dc642687978aec77de12f5193e`|
+|`candidate-publication/completion.json`|`ce621571705fd5e52fb53b94a9be07e7a919a803a6003e43caba7319b7ea0099`|
