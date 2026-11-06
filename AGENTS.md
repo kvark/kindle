@@ -26,7 +26,7 @@ logit correction receives imagined policy/entropy gradients; the existing base
 actor receives expert imitation. The separate parameters have separate optimizer
 moments. At12M/full18 it adds46,098 trainable parameters; CNN/RSSM/critic remain
 unchanged. Default off. Routing, native execution, cost and gameplay benefit are
-not yet established. No GPU allocation or full learner is selected.
+not yet established. The separate native qualification is selected; no Atari learner is selected.
 
 Root `/x/Temp/kindle-residual-actor-20261106`; consult the protocol before execution.
 The first CLI test run fails because its new fixture incorrectly spells the
@@ -34,7 +34,8 @@ positional environment as `--environment`; original sources/logs are preserved.
 The repaired checks pass196 Kindle/5 adapter tests, strict workspace Clippy and
 17 focused CLI cases. Rust fixture type/borrow errors and later CLI cap/action-name
 failures remain preserved in the [report](docs/results/2026-11-06-cdp-residual-actor.md).
-Packaging is next; no native/emulator construction occurred in CPU checks.
+Packaging and1,125 installed Python checks pass with zero native construction.
+Two guarded Tiny fixtures are selected under the [native protocol](docs/experiments/2026-11-06-cdp-residual-actor-native.md).
 
 The [width512 comparison](docs/results/2026-11-06-cdp-actor-width.md#full-200k-comparison)
 remains closed and negative:87.125/39.958 versus143.667/70.750, with46.293% lower

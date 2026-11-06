@@ -7,7 +7,8 @@ base actor logits, with imagined policy/entropy gradients only in the correction
 and expert gradients only in the base. It adds46,098 parameters at12M/full18;
 CNN/RSSM/critic and world expert supervision remain unchanged. Default off.
 Implementation/CPU qualification pass196 Kindle/5 adapter tests, strict Clippy
-and17 focused CLI cases. Packaging is next; no GPU allocation or learner is selected. First CLI fixture failure (positional environment incorrectly passed
+and17 focused CLI cases. Packaging/1,125 installed Python checks pass with zero native construction.
+Two separately declared guarded Tiny fixtures are selected; no Atari learner. First CLI fixture failure (positional environment incorrectly passed
 as `--environment`) is preserved. Root `/x/Temp/kindle-residual-actor-20261106`.
 Separate native and bounded declarations follow only passing qualification.
 Retain143.667 greedy/70.750 sampled; original864/90% and five-game goal unfinished.

@@ -19,8 +19,12 @@ and17 focused CLI checks including the existing width controls. Graph traversal
 checks that policy/entropy gradients reach only the correction, expert gradients
 reach only the base, and world-training graphs remain identical. The actual
 native derivatives, zero-logit initialization, synthetic learning, sharing and
-restore fixtures are compiled but have not executed. Packaging is next; no GPU
-allocation, cost check or full learner is selected.
+restore fixtures are compiled but have not executed. Packaging passes on source7e0bb827: native SHA256 prefix3003151f and test
+executablea0b707a9, with243 unchanged source pins. The installed package passes
+1,125 Python tests/10 deselected with zero native construction attempts. Strict
+binding Clippy also passes. The [separate native declaration](../experiments/2026-11-06-cdp-residual-actor-native.md)
+now selects two serial guarded fixtures,120s each/controller300s. No Atari cost
+check or full learner is selected.
 
 Original preparation failures are retained at
 `/x/Temp/kindle-residual-actor-20261106`: the Rust test build catches an old dynamics
