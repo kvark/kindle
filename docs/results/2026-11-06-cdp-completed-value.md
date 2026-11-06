@@ -129,7 +129,7 @@ control and the stronger retained bonus-on primary, with four frozen24-natural-
 episode arms, exact initial controls,100k recovery, replay and independent
 collection. Relative to bonus-off, only the new boolean differs in effective
 learning config; native/runner/guidance-wrapper identities differ as disclosed.
-No gameplay result exists yet; preparation remains CPU-only. No extension,
+No gameplay result exists yet. No extension,
 second learner or automatic successor is selected.
 
 The initial full CPU helper preflight fails before GPU launch: it assumes an
@@ -139,3 +139,10 @@ A separate action-counter audit repair finishes only the unreached checks in
 1.759393s (wrapper1.850254s), including four corrupted-activity cases and the
 complete comparison entry. Passed helper stages are not repeated. This changes
 no learner, target or native code. The original failure is not relabeled passed.
+
+The full learner launches19:57:02.775 UTC November6 from39324619, original
+controller1543615/invocationf0806cb2c90e47aaa5aa60c4541fb751. All425 pins and
+five actual mocked command paths pass (0.994570s; zero native/emulator
+construction). Actual startup matches all261 bounded/bonus-off arrays and47
+pre-update events, first update376. Independent recovery and terminal observers
+are active; the fixed budget and adoption criterion are unchanged.

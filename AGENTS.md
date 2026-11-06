@@ -33,7 +33,11 @@ Root `/x/Temp/kindle-completed-value-20261106/full`; service
 Compare both bonus-off65.208/46.458 and retained143.667/70.750; the weaker control
 alone cannot justify adoption. Native/runner/wrapper versions differ from the
 historical control; core teacher ASTs and initial tensors/traces are qualified.
-Preparation is CPU-only; no full learner has launched yet.
+Launched19:57:02.775 UTC November6 from39324619, controller1543615/
+invocationf0806cb2c90e47aaa5aa60c4541fb751. All425 pins and five mocked
+command paths pass;261 actual-initial arrays and47 pre-update events match.
+The original CPU log-order failure and separate missing-check repair remain
+preserved. Training and independent recovery/terminal observers are active.
 
 The bounded root is closed:36.403s,56,061 target-row exposures,977.620s projected
 full cost and11.920GiB conservative replay headroom. Do not repeat it. Prior
