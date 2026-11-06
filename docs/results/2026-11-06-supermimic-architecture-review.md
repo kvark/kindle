@@ -5,7 +5,8 @@ its actor on imagined trajectories, but does not differentiate the imagined
 return through the dynamics into the actor. SuperMimic's corresponding path is
 a meaningful architectural proposal within the five-game goal. It is not
 implemented or selected for a GPU allocation by this review. The independent
-coordinate-channel comparison is the active learner.
+[coordinate-channel comparison](2026-11-06-cdp-rgb-coordinates.md) is now closed
+and regresses both frozen modes; it does not test this actor-gradient proposal.
 
 [SuperMimic §3](https://arxiv.org/pdf/2610.28480) fits short autoregressive world
 predictions and improves a policy by backpropagating critic-bootstrapped return

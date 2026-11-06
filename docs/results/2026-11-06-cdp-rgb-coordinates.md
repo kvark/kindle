@@ -1,9 +1,67 @@
-# RGB coordinate channels pass bounded execution and cost checks
+# RGB coordinate channels regress frozen Breakout learning
+
+The [fixed 200k comparison](../experiments/2026-11-06-cdp-breakout-rgb-coordinates-200k.md)
+completes 200,000 actions / 799,523 emulator frames / 12,477 updates in
+**20m58.414s**. Frozen greedy return falls **143.667 → 66.333** and sampled
+return falls **70.750 → 35.917**. All assessments have 0/24 two-wall successes.
+The 2.29% shorter training time does not offset the regression: primary
+own-initial gain/min falls **53.36%**. Retain `rgb_coordinates=false` and the
+143.667 greedy / 70.750 sampled control. No extension, confirmation, sweep or
+automatic successor is selected. The original 864/90% gate remains unfinished.
+
+## Full 200k comparison
+
+Training starts fresh under reused development seed1009 and evaluation seed
+4000001009; this is not an independent confirmation learner.
+
+| Measure | Retained | Coordinates |
+|---|---:|---:|
+| Training time | 21m27.910s | 20m58.414s |
+| Greedy final / actual initial | 143.667 / 2.208 | 66.333 / 1.875 |
+| Sampled final / actual initial | 70.750 / 1.417 | 35.917 / 1.583 |
+| Greedy own-initial gain/min | 6.590132 | 3.073312 |
+| Sampled own-initial gain/min | 3.230038 | 1.636981 |
+| Actual overridden actions | 43.0585% | 52.2320% |
+
+Each frozen arm scores the first three natural episodes from each of eight
+lanes, with no guidance, updates or truncation. Candidate greedy return differs
+by −77.333, with paired lane-bootstrap 95% interval [−107.584, −44.416]. Its
+own-initial gain/min difference is −3.516819 [−4.914387, −1.999408]. Sampled
+differences are −34.833 [−41.667, −28.250] and −1.593057
+[−1.905099, −1.284412]. These 10,000-resample, seed0 intervals describe the
+reused eight-lane evaluation cohort, not training-seed reliability.
+
+Learning-stage time is 1,113.764s (88.51% of training wall time), versus retained
+1,133.927s. These wrapper timers do not isolate GPU kernels or an architectural
+speedup. Late own-replay imitation CE is .562130 versus .560514; raw KL is
+12.411776 versus 11.815355. Similar imitation fitting accompanies substantially
+worse frozen control. Coordinates change the first convolution, initialization
+and subsequent experience; native/runner versions also differ. This comparison
+does not isolate a perceptual mechanism or establish that position is useless.
+
+All 124 current / 338 retained pins, 100k recovery, finite weighted reports,
+full training and frozen replays, videos, guards, curves and exposure checks
+pass. Every frozen arm preserves all 357 tensors. Candidate initial tensors
+match the same-architecture bounded check; baseline initial tensors and traces
+differ as allowed, so the comparison uses each learner's actual initial scores.
+
+The original main service completes **04:55:15.624 UTC November6**; its independent
+collector completes **04:56:00.819 UTC**. Main, recovery and collector all exit
+successfully, with no repeated GPU stage or learner update. The separate
+publication reader passes in .042s. Full-run results require no repair; the
+earlier bounded/preparation failures below remain preserved. Root
+`/x/Temp/kindle-rgb-coordinates-20261104/full` is closed. Comparison SHA256
+`a8645fa20d5ea767f8526aba2feee44052967edc3b5e586cc7d3ec7759a32bb7`;
+terminal-summary SHA256
+`d2cf03493a2ae803496c059736ccd6e1db7813d2e2141e6b979c49f13e6cca4c`.
+No Kindle allocation is active at closure; check live state before further work.
+
+## Bounded execution and cost check
 
 The fresh check completes **8,192 actions /32,713 emulator frames /489 updates
 in47.565s**. A1,024-action frozen restore takes.882s with zero updates and no
 completed natural episodes. The padded200k projection is **21m17.383s**, below
-the fixed30-minute cap. Gameplay benefit remains unmeasured.
+the fixed30-minute cap. This bounded stage does not measure gameplay benefit.
 
 The [protocol](../experiments/2026-11-04-cdp-rgb-coordinates.md) adds fixed x/y
 pixel-center channels inside the native learned RGB CNN. First-layer weights
@@ -56,9 +114,9 @@ This is a projection, not proof of sustained full-run memory or speed. The
 Evidence remains at `/x/Temp/kindle-rgb-coordinates-20261104`; the repaired
 completion is `bounded/check/completion-repaired.json`, reviewSHA
 `ee7900519838e606a451f1051fae6be362e164fd7e0d2f5ba22ab815230c67a3`.
-Do not repeat completed stages. A separately declared
+Do not repeat completed stages. The separately declared
 [fresh200k comparison](../experiments/2026-11-06-cdp-breakout-rgb-coordinates-200k.md)
-will measure whether explicit image position improves frozen gameplay per minute.
+measures frozen gameplay per minute above.
 The original864/90%-two-wall gate and five-game goal remain unfinished.
 
 ## Fresh comparison startup
@@ -72,8 +130,8 @@ at376 actions. The100k/6,227-update recovery passes **04:40:58.783 UTC**:
 357 finite tensors/51,507,459 elements,124 unchanged pins,read-only directory
 andfiles. Independent verification takes.349s (.414s observer wrapper), with
 zero model forwards/updates; CPU co-host time remains uncorrected. The recovery
-service succeeds. Original learner andterminal observer remain active; no full
-frozen result is available. Check live process identity before further GPU work.
+service succeeds. The original learner andterminal observer subsequently finish
+successfully, as recorded above.
 
 Full CPU preparation first fails only in its plot fixture, which retained the
 previous experiment's path andlatent-mixing expectation. Both are corrected in

@@ -1,24 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [coordinate-channel check](2026-11-06-cdp-rgb-coordinates.md) completes
-8,192 actions/32,713 frames/489 updates in47.565s; frozen1,024/.882s haszero
-updates/no natural episodes. Native F64 derivatives,legacy compatibility,357
-invariant tensors,47 original/24 repair pins andfull replay pass. After explicit
-resume,a6.995s CPU import-path repair closes04:25:53.730 UTC November6, preserving
-the original failed audit andpause receipts; no GPU stage repeats. Conservative
-200k projection21m17.383s passes30min. Gameplay benefit remains unmeasured.
-A [fresh200k comparison](../experiments/2026-11-06-cdp-breakout-rgb-coordinates-200k.md)
-is separately selected with100k recovery andfour24-episode frozen arms. Fixed
-coordinates add1,600 first-layer weights andchange initialization; no baseline
-initial equality orisolated mechanism is claimed. Nativeb9136467/runnera0ffbe46.
-The SuperMimic actor-gradient direction is a separate proposal, not this change.
-The fresh learner launches04:30:28.229 UTC November6/sourcecb9a0499 with124pins,
-mainPID1386077/invocationc11b782f30804e6f951712401a64d0d8. Startup passes357initial
-tensors and47events. The100k/6,227 recovery passes04:40:58.783 UTC, with357finite
-tensors and124unchanged pins; original learner andterminal observer remain
-active. Full frozen benefit is pending. The [SuperMimic source review](2026-11-06-supermimic-architecture-review.md)
-records the separate connected-actor-graph proposal. The original864/90% gate
-andfive-game goal remain unfinished. Check live state; no concurrent GPU job.
+The [completed coordinate-channel comparison](2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison)
+finishes 200k actions / 799,523 frames / 12,477 updates in **20m58.414s**.
+Greedy **66.333** and sampled **35.917** regress retained **143.667 / 70.750**;
+all 0/24 two-wall. Primary own-initial gain/min falls 53.36%, despite 2.29%
+shorter training time. Retain `rgb_coordinates=false`. The paired eight-lane
+95% gain/min interval [−4.914387, −1.999408] describes the reused cohort,
+not seed reliability or an isolated perceptual cause.
+
+All 124 current / 338 retained pins, 100k recovery, full replays, frozen controls,
+357 invariant tensors, guards and curves pass. Original main/collector finish
+04:55:15.624 / 04:56:00.819 UTC November6; all three services succeed. Earlier
+bounded import, packaging and fixture failures and the pause timing remain in
+the result. No completed GPU stage repeats. Root
+`/x/Temp/kindle-rgb-coordinates-20261104/full` is closed; no allocation is active
+at closure. Check live state before work. No extension, sweep, confirmation or
+automatic successor is selected.
+
+The [SuperMimic source review](2026-11-06-supermimic-architecture-review.md) identifies direct
+actor gradients through imagined dynamics as a separate architectural proposal
+within the same goal. It is not implemented or allocated by this comparison.
+The original 864/90%-two-wall gate and five-game goal remain unfinished.
 
 The [completed categorical-mixing comparison](2026-11-04-cdp-breakout-latent-unimix001.md#full-200k-comparison) finishes 200k actions /
 799,612 frames /12,477 updates in **21m19.046s**. Lower latent mixing.001 scores

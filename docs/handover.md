@@ -8,32 +8,27 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [RGB coordinate-channel bounded check](results/2026-11-06-cdp-rgb-coordinates.md)
-passes8,192 actions/32,713 frames/489 updates in47.565s; frozen1,024 takes.882s
-withzero updates/no completed episodes. Native derivatives,legacy compatibility,
-357 invariant tensors,47 original/24 repair pins andfull replay pass. The original
-CPU import failure remains; a6.995s CPU repair closes04:25:53.730 UTC November6
-following explicit resume. No GPU stage repeats. The pause timing and all earlier
-qualification failures are recorded in the result.
+The [completed coordinate-channel comparison](results/2026-11-06-cdp-rgb-coordinates.md#full-200k-comparison)
+finishes 200k actions / 799,523 frames / 12,477 updates in **20m58.414s**.
+Greedy **66.333** and sampled **35.917** regress retained **143.667 / 70.750**;
+all 0/24 two-wall. Primary own-initial gain/min falls 53.36%, despite 2.29%
+shorter training time. Retain `rgb_coordinates=false`. The paired eight-lane
+95% gain/min interval [−4.914387, −1.999408] describes the reused cohort,
+not seed reliability or an isolated perceptual cause.
 
-One [fresh200k comparison](experiments/2026-11-06-cdp-breakout-rgb-coordinates-200k.md)
-is selected, with30-minute training cap,100k recovery and final/actual-initial
-sampled/greedy24-episode assessments. Coordinates add1,600 first-layer weights;
-RGB replay,one GPU resize andother retained settings stay fixed. No gameplay
-benefit or isolated perceptual cause is established. Source2d651cb0/nativeb9136467
-andrunnera0ffbe46 differ fromretained447fe50; baseline initial equality is not
-required. Root`/x/Temp/kindle-rgb-coordinates-20261104/full`. The fresh learner
-launches04:30:28.229 UTC November6/sourcecb9a0499, with124 pins; mainPID1386077/invocationc11b782f30804e6f951712401a64d0d8. Startup passes357
-bounded-matching initial tensors and47 pre-update events. The100k/6,227 recovery
-passes independent verification04:40:58.783 UTC:357 finite tensors,124 unchanged
-pins andread-only files. Original learner andterminal observer remain active. Check live identity; do not restart or launch another GPU
-job while this learner is active.
+All 124 current / 338 retained pins, 100k recovery, full replays, frozen controls,
+357 invariant tensors, guards and curves pass. Original main/collector finish
+04:55:15.624 / 04:56:00.819 UTC November6; all three services succeed. Earlier
+bounded import, packaging and fixture failures and the pause timing remain in
+the result. No completed GPU stage repeats. Root
+`/x/Temp/kindle-rgb-coordinates-20261104/full` is closed; no allocation is active
+at closure. Check live state before work. No extension, sweep, confirmation or
+automatic successor is selected.
 
-The [SuperMimic source review](results/2026-11-06-supermimic-architecture-review.md) identifies
-direct dynamics-gradient actor training as a separate architectural lead within
-the same goal. It remains a proposal; this coordinate comparison does not change
-actor training. Retain143.667greedy/
-70.750sampled andthe original864/90%-two-wall gate. The five-game goal is unfinished.
+The [SuperMimic source review](results/2026-11-06-supermimic-architecture-review.md) identifies direct
+actor gradients through imagined dynamics as a separate architectural proposal
+within the same goal. It is not implemented or allocated by this comparison.
+The original 864/90%-two-wall gate and five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
