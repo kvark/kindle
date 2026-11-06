@@ -1,24 +1,26 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [RGB96 bounded check](2026-11-06-cdp-rgb96.md#bounded-check-complete)
-completes8,192 actions/32,713 frames/489 updates in66.690s versus47.690s retained,
-**39.842% more training time**. Its padded200k projection29m51s passes the35-minute
-cap; conservative projected headroom3.757GiB passes2GiB. Native header confirms
-24,862,993 trainable parameters. All357 frozen tensors, full replays, finite/
-weighted reports,256 source/51 execution/14 qualification pins and guards pass.
+The [fresh RGB96 comparison](../experiments/2026-11-06-cdp-breakout-rgb96-200k.md) is selected to test whether increased
+visual spatial capacity improves frozen learning enough to offset its cost.
+The closed bounded check takes66.690s versus47.690s (+39.842%); its29m51s padded
+projection and3.757GiB conservative headroom pass the35-minute/2GiB gates.
 
-Source8558353c; controller/children terminal, no Kindle service/render holder.
-Completion14:30:34.959 UTC November6; publication closure14:32:04.248. Root
-`/x/Temp/kindle-rgb96-20261106/bounded` is closed. Original Python/two native
-fixture failures and separate test-only repairs remain preserved. Native7704d25c
-is unchanged. Useful package/test artifacts remain; disposable build cache released.
+One fresh200k-action/12,477-update learner, seed1009, uses the qualified native
+7704d25c and matching runner/teacher. RGB96 increases trainable parameters
+16,334,353→24,862,993 through visual embedding, posterior, CDP predictor and
+disagreement capacity. Other effective settings remain retained; optional actor
+paths stay off. This is a joint geometry/capacity test, not a perceptual finding.
+Require exact own-bounded initial tensors/pre-update events and four24-episode
+frozen arms with own actual-initial controls. Greedy gain/min is primary.
 
-No full learner or automatic successor is selected. The [protocol](../experiments/2026-11-06-cdp-rgb96-bounded.md)
-permits considering a separately justified fresh comparison; bounded experience
-must not transfer. The short frozen action budget completes no natural episode,
-so no gameplay or learning-efficiency gain is established. Retain RGB64,32×16,
-143.667 greedy/70.750 sampled and optional actor paths off. Original864/90%-two-wall
-and five-game goal remain unfinished. Do not repeat completed stages.
+Changed CPU helpers and complete comparison/plot entry checks pass in3.991s,
+with no native/emulator construction. Root
+/x/Temp/kindle-rgb96-20261106/full is prepared; no GPU allocation has started.
+Next prepare/check the exact queues and launch the single guarded learner.
+Original Python/two native fixture failures remain preserved with separate repairs.
+No bounded experience transfers and no completed stage repeats or extends.
+Retain RGB64,32×16,143.667 greedy/70.750 sampled pending evidence.
+Original864/90%-two-wall and the five-game goal remain unfinished.
 
 The [full enumerated one-step actor comparison](2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
 is complete and fails retention. Fresh200k actions/12,477 updates take27m58.682s
