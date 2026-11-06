@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 #[ignore = "requires separately guarded RGB96 resize and small-object qualification"]
-fn gpu_rgb96_resize_matches_scalar_and_preserves_small_objects() {
+fn gpu_rgb96_resize_matches_scalar_and_clears_inactive_streams() {
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     let side = 96;
     let elements = 3 * side * side;
@@ -31,7 +31,7 @@ fn gpu_rgb96_resize_matches_scalar_and_preserves_small_objects() {
             }
         }
         let resized = rgb_filter::reference(&rgb, width, height, side);
-        let mut expected = vec![0.125; 2 * elements];
+        let mut expected = vec![0.0; 2 * elements];
         for index in 0..side * side {
             for channel in 0..3 {
                 expected[elements + channel * side * side + index] =
@@ -41,7 +41,7 @@ fn gpu_rgb96_resize_matches_scalar_and_preserves_small_objects() {
         assert!(resized.iter().any(|&value| value > 0));
         pixels.cpu_frames(&mut session, &[(1, &rgb, width, height)]);
         let uploaded = tests::check_patches(&mut session, &expected, "RGB96 CPU small object");
-        assert!(uploaded[..elements].iter().all(|&value| value == -0.125));
+        assert!(uploaded[..elements].iter().all(|&value| value == 0.0));
         let peak = uploaded[elements..elements + side * side]
             .iter()
             .map(|&value| 0.5 - value)

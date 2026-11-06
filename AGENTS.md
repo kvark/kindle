@@ -33,10 +33,13 @@ preserved. Three native fixtures compile but remain unexecuted. All256 current
 source pins pass; closure14:08:46.132 UTC November6 confirms no Kindle service or
 render holder. Root `/x/Temp/kindle-rgb96-20261106`.
 
-Package source1279a415/native7704d25c passes1,208 installed-package CPU cases
-withzero native construction. The [native protocol](docs/experiments/2026-11-06-cdp-rgb96-native.md)
-now selects three guarded fixtures: resize, encoder values/derivatives and two Tiny
-updates with exact restore. No bounded/full learner is selected. The closed [enumerated actor comparison](docs/results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
+Package source1279a415/native7704d25c passes1,208 installed-package CPU cases.
+The original resize fixture fails because it expects inactive lanes to retain a
+sentinel; production explicitly clears them. Child1504247 exits101, no host fault
+reported, encoder/restore unstarted. Original failure and bytes are retained.
+Test-only repair passes CPU/Clippy; the [separate native repair protocol](docs/experiments/2026-11-06-cdp-rgb96-native-repair.md)
+selects corrected resize and the two unstarted checks with binaryc2225f09. Native
+library is unchanged. No bounded/full learner is selected. The closed [enumerated actor comparison](docs/results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
 failed retention; keep it and direct dynamics gradients off. Retain RGB64,
 32×16 and143.667 greedy/70.750 sampled. Original864/90%-two-wall and the five-game
 goal remain unfinished.
