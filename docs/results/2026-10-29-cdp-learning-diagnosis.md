@@ -1,22 +1,24 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [completed replay-value option](../results/2026-11-06-cdp-completed-value.md) passes native qualification and
-is selected for one [8,192-action activity/cost check](../experiments/2026-11-06-cdp-completed-value-bounded.md). The Tiny
-fixture passes in2.767s with277 pins; default-off frozen prefixes reproduce all
-128 transitions per arm and357 invariant tensors. Both guards and40 pins pass.
-Original packaged Python fixture failures remain preserved with their repair.
+The [completed replay-value option](../results/2026-11-06-cdp-completed-value.md#completed-bounded-activity-and-cost-check)
+passes its bounded check: 8,192 actions / 32,729 frames / 489 updates in36.403s,
+versus saved bonus-off36.677s. Completed targets replace56,061 rows on434 updates,
+first at action1,224. All261 initial/frozen tensors,47 pre-update transitions,
+weighted losses, complete replays and guards pass. This establishes activity
+and early cost, not gameplay benefit.
 
-The new check enables completed observed replay-value targets with the model
-bonus off, preserving original targets where returns are unavailable. Its CPU
-preflight passes both command paths with zero native/emulator construction and
-unchanged core teacher ASTs. Compare with the saved bonus-off36.677s cost point;
-verify261 initial/frozen tensors and47 pre-update transitions. Consult the fixed
-protocol before execution. Native d0e7bb79/SHA3146e0dc, root
-`/x/Temp/kindle-completed-value-20261106/bounded`.
+Padded200k projection16m17.620s and conservative11.920GiB full-replay headroom
+clear the declared gates. Controller closes19:42:33.689 UTC November6; independent
+CPU recount at19:42:54.153 verifies57 pins,46 artifacts andnine tensor files.
+Both GPU children are terminal; no learner or render holder remains. Native
+d0e7bb79/SHA3146e0dc, execution20dc4d43; root
+`/x/Temp/kindle-completed-value-20261106/bounded` is closed. Original packaged
+Python fixture failures remain preserved with their separate repair.
 
-No full learner, coefficient sweep or automatic successor is selected. Keep
-original guidance, CDP500 and primary Breakout143.667 greedy/70.750 sampled.
-Original864/90% two-wall and the five-game goal remain unfinished.
+No full learner, coefficient sweep, extension or automatic successor is selected.
+Do not repeat completed stages or reuse this check's experience. Retain original
+guidance, CDP500 and primary Breakout143.667 greedy/70.750 sampled; original
+864/90% two-wall and the five-game goal remain unfinished.
 
 The [sparse-wall brick-aiming teacher comparison](2026-11-06-cdp-breakout-brick-aim.md) is complete and
 fails retention: 208.458 versus 225.083 (−7.386%), only 1/8 improved lanes and
