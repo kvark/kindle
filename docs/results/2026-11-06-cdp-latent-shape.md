@@ -35,3 +35,13 @@ installed-package CPU checks. A separate guarded native declaration must precede
 the two ignored fixtures; a separate bounded protocol must precede Atari learning.
 Keep retained143.667 greedy/70.750 sampled, actor dynamics/residual/coordinates
 off. Original864/90%-two-wall and five-game gates remain unfinished.
+
+## Packaged native qualification selected
+
+Release packaging passes on source536012d5, native SHA256 prefix2c9c6e6f and
+executable73a18277, with246 source pins. The installed package passes1,139 Python
+tests/10 deselected with zero native construction attempts. Both release artifacts
+and the wheel are retained. The [separate native protocol](../experiments/2026-11-06-cdp-latent-shape-native.md)
+now selects two guarded fixtures,120s each/controller300s: independent F64
+categorical values/derivatives/sampling, then two synthetic vector updates and
+exact restore. No Atari learner or bounded cost check is selected.
