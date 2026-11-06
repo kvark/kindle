@@ -20,30 +20,18 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [initial-episode guidance comparison](docs/results/2026-11-06-cdp-breakout-initial-guidance.md#full-200k-comparison) is complete
-and fails retention: greedy 114.000 / sampled 49.125 versus 143.667 / 70.750.
-Fresh 200k actions / 799,655 frames / 12,477 updates take 21m28.245s, just 0.026%
-more training time. Primary own-initial gain/min falls 20.993%, 6.590132→5.206697.
-Its paired 95% difference interval [-4.096855, 1.194018] spans zero; this reused
-development seed/cohort does not establish a reliable population regression.
-Both final modes remain 0/24 two-wall.
+The [shot-outcome diagnostic](docs/experiments/2026-11-06-cdp-breakout-shot-outcomes.md) is selected for one CPU-only analysis
+of retained teacher trajectories. It joins 776 saved outgoing contact fits to
+post-catch rewards, bounded by the next catch, life loss, episode end or 256
+frames. Fixed outer-versus-middle projected-entry comparisons separate score
+bands and lanes. This is observational evidence, not a new controller or learner.
 
-All 357 initial tensors match retained/own bounded, 47 own pre-update events and
-both retained frozen-initial traces match. Finite/weighted reports, 100k recovery,
-four 24-natural-episode frozen arms with 357 invariant tensors, full replays/videos,
-curves and 374 current / 338 retained pins pass. All eight lanes leave the initial
-phase at 22,232–30,344 aggregate actions. Initial-phase actions total 26,884;
-overrides total 103,444/200,000 (51.722%). Timing, amount and state distribution
-change together. Maximum training score is 422; no episode/tail reaches 432.
-
-Original main/collector finish 16:20:30.454 / 16:20:37.393 UTC November 6.
-Closure at 16:21:18.893 verifies terminal identities and no Kindle service/render
-holder. Root /x/Temp/kindle-breakout-initial-guidance-20261106/full is closed,
-execution source f797ad78, native 7704d25c. Two incomplete CLI mocks and prior
-native fixture failures remain preserved; no full-stage failure or repeat.
-Retain the original 20% schedule and 143.667 greedy / 70.750 sampled. No GPU
-allocation, extension or automatic successor is selected. Original 864/90%
-two-wall and the five-game goal remain unfinished.
+Four CPU fixture groups and all 30 historical sealed files pass; 45 inputs are
+pinned. Root `/x/Temp/kindle-breakout-shot-outcomes-20261106`. No emulator,
+trajectory collection, GPU allocation or native rebuild is selected. The earlier
+three-pixel aiming policy and initial-episode guidance learner remain closed and
+negative. Retain original guidance and 143.667 greedy / 70.750 sampled. Original
+864/90% two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

@@ -1,5 +1,18 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
+The [shot-outcome diagnostic](../experiments/2026-11-06-cdp-breakout-shot-outcomes.md) is selected for one CPU-only analysis
+of retained teacher trajectories. It joins 776 saved outgoing contact fits to
+post-catch rewards, bounded by the next catch, life loss, episode end or 256
+frames. Fixed outer-versus-middle projected-entry comparisons separate score
+bands and lanes. This is observational evidence, not a new controller or learner.
+
+Four CPU fixture groups and all 30 historical sealed files pass; 45 inputs are
+pinned. Root `/x/Temp/kindle-breakout-shot-outcomes-20261106`. No emulator,
+trajectory collection, GPU allocation or native rebuild is selected. The earlier
+three-pixel aiming policy and initial-episode guidance learner remain closed and
+negative. Retain original guidance and 143.667 greedy / 70.750 sampled. Original
+864/90% two-wall and the five-game goal remain unfinished.
+
 The [initial-episode guidance comparison](2026-11-06-cdp-breakout-initial-guidance.md#full-200k-comparison) is complete
 and fails retention: greedy 114.000 / sampled 49.125 versus 143.667 / 70.750.
 Fresh 200k actions / 799,655 frames / 12,477 updates take 21m28.245s, just 0.026%
