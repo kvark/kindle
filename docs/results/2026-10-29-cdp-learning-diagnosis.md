@@ -1,24 +1,29 @@
 # Learning diagnosis: useful forecasts and better replay fitting do not guarantee control
 
-The [actor-only width512 bounded check](2026-11-06-cdp-actor-width.md) is complete and passes execution/cost gates.
-The original8,192-action/32,715-frame/489-update run takes53.270s,11.702% longer
-than retained47.690s; padded200k projection23m50.597s and conservative full-replay
-headroom11.214GiB pass. Frozen1,024 actions/4,096 frames take.892s with zero
-updates and357 invariant tensors; no natural episode completes, so gameplay
-quality is unmeasured. All313 non-actor initial tensors match;40 actor shapes
-widen, adding1,054,720 trainable parameters. Both weighted-loss checks, full
-training/frozen CPU replays,49 allocation/239 source pins and guards pass.
+The [fresh200k actor-width512 comparison](../experiments/2026-11-06-cdp-breakout-actor-width-200k.md)
+is selected after [bounded qualification](2026-11-06-cdp-actor-width.md). Actor-only capacity is untested;
+whole25M changed the world/critic too. Keep12M64/Auto/N8/B16/T16/H15/R16,
+encoder4e-5/dynamics4e-4/behavior8e-5,critic1/1,expert100/world gradients and
+20% guided episodes. Width512 adds1,054,720 trainable actor parameters; other
+widths/losses stay fixed. Coordinates and actor dynamics stay off.
 
-Implementation80085208/nativeeeaf699a passes194 Kindle/5 adapter tests,1,116
-packaged Python checks and strict Clippy. Native Tiny2-update qualification
-passes in2.820s with243 pins; actual-command/non-actor fixtures pass in.167s
-without native/emulator construction. Bounded sourceeeebd450/controller completes
-08:14:02.459 UTC November6 in70.966s, with no failed/repeated stage. Root
-`/x/Temp/kindle-actor-width-20261106/bounded` is closed;4.807GB logical build
-cache released, packaged runtime/binary retained. No allocation or full learner
-is selected. A separately declared comparison must use own-initial controls
-and judge return gained per minute. Capacity causality and gameplay benefit
-remain unproven; retained143.667/70.750 and the five-game goal are unchanged.
+One fresh seed1009 learner receives200k actions/12,477 updates and100k recovery,
+with no bounded experience/weight transfer. Four frozen final/actual-initial
+sampled/greedy arms select24 natural episodes each. Judge raw greedy return
+and own-initial gain/min against143.667/6.590132, with the predeclared paired
+lane interval. Initial actor values/actions differ from retained; require313
+non-actor initial matches and exact357 tensors/47 events against the bounded
+run. CPU helper/comparison/plot checks pass in3.541s with no native construction;
+exact queue declaration/qualification precedes launch. Root
+`/x/Temp/kindle-actor-width-20261106/full`, service
+`kindle-breakout-actor-width-200k-20261106`. No extension, sweep, second learner
+or automatic successor. Original864/90%-two-wall and five-game gates remain.
+
+The completed bounded run takes53.270s for8,192 actions/32,715 frames/489 updates,
+11.702% longer than retained; padded200k projection23m50.597s and11.214GiB
+conservative replay headroom pass. Native/CPU/restore/replay/guard checks pass
+without repeated or failed stages. Packaged runtime remains after4.807GB logical
+cache release. No bounded stage or old collector should repeat.
 
 The [completed actor-update diagnostic](2026-11-06-cdp-dynamics-actor-update.md) finds dynamics.5 changes
 the full estimated update by.01136%/.01702% at two retained200k batches;

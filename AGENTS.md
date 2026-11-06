@@ -20,22 +20,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [actor-only width check](docs/results/2026-11-06-cdp-actor-width.md)
-is complete. Optional `actor_hidden_units=512` versus256 adds1,054,720
-trainable actor parameters, with unchanged CNN/RSSM/critic widths and losses.
-Default absent; restore preserves the width. CPU/CLI/native qualification and
-both original bounded GPU jobs pass. Fresh8,192 actions/489 updates take53.270s,
-11.702% longer than retained; padded200k projection23m50.597s and11.214GiB
-conservative replay headroom pass. All313 non-actor initial tensors and357
-frozen invariant tensors, weighted losses, full CPU replays and guards pass.
+The [fresh200k actor-width comparison](docs/experiments/2026-11-06-cdp-breakout-actor-width-200k.md)
+is selected after the [bounded cost check](docs/results/2026-11-06-cdp-actor-width.md) passes.
+Test actor512 versus256 with unchanged CNN/RSSM/critic widths and losses;
+add1,054,720 trainable parameters. Retain the12M64/Auto/N8/B16/T16/H15/R16
+recipe, expert100/all-state labels/20% guided episodes, coordinates and actor
+dynamics off. Fresh seed1009,200k actions/12,477 updates,100k recovery; no
+weights or experience transfer. Root `/x/Temp/kindle-actor-width-20261106/full`.
 
-Root `/x/Temp/kindle-actor-width-20261106/bounded` is closed. No GPU allocation,
-full learner or automatic successor is selected. Packaged runtime/binary remain;
-4.807GB logical build cache is released. Do not repeat qualification, learners,
-replays or audits. The [bounded protocol](docs/experiments/2026-11-06-cdp-actor-width-bounded.md)
-checks cost and execution only; better learning and an actor-capacity cause
-remain unmeasured. Any full comparison requires a separate declaration with
-own-initial frozen controls and return gained per minute.
+Greedy frozen return and own-initial gain/min are primary, against143.667 and
+6.590132. Evaluate final and actual-initial sampled/greedy policies on24 natural
+episodes each. Initial actor values differ from retained; require313 matching
+non-actor tensors and exact357-tensor/47-event matches to the bounded run.
+The CPU helpers/comparison/plot checks pass in3.541s without native construction.
+Next declare and qualify the exact queues, then launch the single learner under
+host guards. Service `kindle-breakout-actor-width-200k-20261106`.
+
+No capacity cause is established. No sweep, unchanged extension, second learner
+or automatic successor is selected. Completed bounded/native stages remain
+closed; no rebuild is needed. Original864/90%-two-wall and the five-game goal
+remain unfinished.
 
 The [closed actor-update diagnostic](docs/results/2026-11-06-cdp-dynamics-actor-update.md)
 finds only.01136%/.01702% changes in estimated retained-checkpoint updates.
