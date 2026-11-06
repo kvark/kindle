@@ -115,12 +115,17 @@ frozen gameplay per minute. Reuse the completed probes when defining a new
 hypothesis. More multi-step supervision alone is not a fresh proposal: the
 [three-step comparison](2026-11-03-cdp-breakout-open-loop.md) already regressed.
 
-One distinct future estimator would score each discrete action with a fixed
-world model and critic, then train the actor against the probability-weighted
-action values. This avoids differentiating through a relaxed button choice,
-but retains model/critic bias and adds branch computation. It is not equivalent
-to multi-step dynamics backpropagation, and is now selected as the distinct [enumerated one-step actor experiment](2026-11-06-cdp-actor-expected-value.md), with CPU/native qualification and bounded cost gates passed. It adds31.35% bounded wall time; gameplay benefit remains unmeasured. The separately declared fresh200k comparison is now running to test gain per training minute; startup passes and final gameplay remains pending.
-Continuous latent states alone would not remove the discrete-action issue.
+The subsequent [enumerated one-step actor comparison](2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
+scores every discrete action with a fixed world snapshot and critic, then trains
+the actor on their probability-weighted values. It avoids differentiating through
+a relaxed button choice, while retaining model/critic bias and adding branch
+computation. Correctness/native/cost checks pass, but the fresh200k comparison
+fails retention: greedy138.417/sample58.083 versus143.667/70.750,30.341% more
+training time and26.126% lower primary gain/min. The primary paired interval
+spans zero; all0/24 two-wall. Keep it off. Horizon and start-state distribution
+change alongside the estimator, so this neither isolates categorical-gradient
+bias nor rejects every action-value approach. Continuous latent states alone
+would not remove the discrete-action issue.
 
 For a future continuous-control task, direct actor gradients would be a more
 natural candidate. The native capability now exists; its value would still need
@@ -145,4 +150,5 @@ span zero and neither mean reaches retained. Holding the learned world/base and
 training history fixed makes this a narrower serving test; it does not establish
 that a pure-imitation learner would be better. Useful action values and their
 measured policy effect remain unresolved. The later enumerated one-step actor
-experiment tests a different estimator; it does not repeat these closed learners.
+comparison also fails its fixed learning-efficiency criterion. Its distinct
+objective is recorded above; no closed learner is repeated or extended.

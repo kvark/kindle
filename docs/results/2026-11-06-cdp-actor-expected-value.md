@@ -1,8 +1,10 @@
-# Enumerated one-step actor: qualification and bounded cost
+# Enumerated one-step actor: qualification and full learning result
 
-The bounded check passes execution and cost gates, with **31.350% more training
-time** than retained. Gameplay benefit remains unmeasured; a separately declared
-fresh200k comparison is now running. Startup and100k recovery pass; final gameplay is pending. [Bounded results](#bounded-learning-cost-check-complete).
+The completed fresh200k comparison **fails retention**: greedy138.417/sample58.083
+versus143.667/70.750, with30.341% more training time and26.126% lower primary
+own-initial gain/min. All0/24 two-wall. Keep the default off; this one recipe does
+not isolate a categorical-gradient cause or reject every related method.
+[Full results](#full-200k-comparison). No GPU allocation or successor is selected.
 
 The [development protocol](../experiments/2026-11-06-cdp-actor-expected-value.md)
 implements `actor_expected_value`, default false. It replaces the sampled-action
@@ -196,3 +198,70 @@ checkpoint retains weights/optimizer moments; it does not restore replay, live
 beliefs, game state or complete RNG. CPU observer time remains in measured training
 wall time. Final200k training, four frozen arms, full audits and terminal collection
 remain pending; no gameplay or efficiency conclusion is available.
+
+## Full 200k comparison
+
+The [declared fresh comparison](../experiments/2026-11-06-cdp-breakout-actor-expected-value-200k.md)
+completes **200,000 actions/799,571 emulator frames/12,477 updates** in
+**1678.681539s (27m58.682s)**, plus2.630956s construction. Retained training takes
+1287.910495s (21m27.910s), so observed training cost rises **30.3415%**. The run
+stays within its1800s cap but fails the primary learning-efficiency criterion.
+
+| Frozen result | Retained | Enumerated actor |
+|---|---:|---:|
+| Greedy final mean |143.666667|138.416667|
+| Sampled final mean |70.750000|58.083333|
+| Greedy actual-initial mean |2.208333|2.208333|
+| Sampled actual-initial mean |1.416667|1.416667|
+| Greedy own-initial gain/min |6.590132|4.868404|
+| Sampled own-initial gain/min |3.230038|2.025399|
+| Final two-wall successes, either mode |0/24|0/24|
+
+Primary greedy gain/min falls **26.1258%**. Its paired eight-lane difference is
+−1.721728,95% interval **[−4.253377,.800655]**. Raw greedy difference−5.250 has
+interval[−66.418750,55.879167]. Sampled gain/min falls37.2949%; difference−1.204639
+has interval[−1.746170,−.629304], while raw score difference−12.666667 has interval
+[−25.584375,.792708]. Bootstrap10,000 resamples/seed0. These describe the reused
+cohort, not training-seed reliability. The primary point estimates regress and
+its gain/min interval lacks a positive lower bound; keep the option off.
+
+All357 initial tensors/moments match both bounded and retained, as do47 pre-update
+semantic events. The actual-initial sampled/greedy799/794 events match retained
+exactly apart from permitted time fields. Each frozen arm selects24 natural
+episodes with zero updates/truncations and357 invariant tensors. Together the
+four arms execute84,840 actions/339,194 frames, with all replay/video checks
+passing. Fixed cohort selection is unchanged; no episode or stage is substituted.
+
+All12,477 finite reports, both weighted losses, expected-value metrics and
+positive snapshot timings pass. Expected-value loss remains inside policy_loss,
+not a second auxiliary addition. Encoder, reward, continuation, actor and critic
+parameters change, and world actor copies stay synchronized. The100k recovery
+and its independent verification pass with exact365 pins. All full training
+pixels/actions/labels/overrides and frozen action/outcome/frame/boundary replays
+pass, together with curves, exposure and original host guards. No full
+preparation, GPU, audit or publication stage fails/repeats; the original CPU
+fixture compile failure stays preserved.
+
+Late own-replay label cross-entropy is.554410 versus retained.560514 on different
+experience. This does not measure frozen skill or explain the regression.
+Training spends96.4445% of actions below216 points and none at432 or above;
+1,528 native actions occur in216–431. The20%-episode guidance schedule overrides
+44.511% of all actions. These cumulative-score/experience statistics are not
+wall-success events, and guided online returns remain separate from evaluation.
+Learning occupies1533.983s of1678.682s; component wrappers do not isolate kernels.
+
+Source `2de5bd0f41f2eb00dc6524dfa25d4e2986aa8777`; training completes
+**13:42:36.615 UTC November6**. Original main/collector complete **13:46:32.617 /
+13:46:51.144 UTC**, with365 current/338 retained pins verified. Read-only publication
+passes **13:47:40.250 UTC** in.024s. All original services exit successfully;
+original main/collector/recovery PIDs and all five guarded children are gone,
+with no Kindle service or render-device holder. Exact receipts/logs/checkpoints/
+replays/videos/curves remain under `/x/Temp/kindle-actor-expected-value-20261106/full`.
+
+The new objective changes horizon and replay-start distribution with its policy
+estimator. Its correct native derivative and all-action expectation do not prove
+accurate action values or useful gameplay guidance. This is neither an isolated
+gradient-bias explanation nor a SuperMimic reproduction. No coefficient sweep,
+longer extension or automatic successor follows. Retain32×16, ordinary inference
+and143.667 greedy/70.750 sampled; original864/90%-two-wall and five-game gates
+remain unfinished.

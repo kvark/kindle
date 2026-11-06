@@ -20,35 +20,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [fresh200k enumerated-actor comparison](docs/experiments/2026-11-06-cdp-breakout-actor-expected-value-200k.md) is selected after the
-[bounded check](docs/results/2026-11-06-cdp-actor-expected-value.md#bounded-learning-cost-check-complete) passes. Test whether
-frozen gameplay gain offsets31.350% extra bounded time; the padded projection is
-28m02.233s, with9.702GiB conservative replay headroom. Fresh seed1009,200k actions/
-12,477 updates; actual-initial/final sampled and greedy24-natural-episode arms.
-Greedy own-initial gain per training minute is primary, with the existing paired
-interval criterion. These reused development choices do not establish reliability.
+The [full enumerated one-step actor comparison](docs/results/2026-11-06-cdp-actor-expected-value.md#full-200k-comparison)
+is complete and fails retention. Fresh200k actions/12,477 updates take27m58.682s
+versus retained21m27.910s, **30.341% more**. Greedy138.417 and sampled58.083 trail
+143.667/70.750; all0/24 two-wall. Primary own-initial gain/min falls **26.126%**,
+6.590132→4.868404. Its paired95% difference interval[-4.253377,.800655] spans zero;
+this reused development cohort does not establish training-seed reliability.
 
-The option replaces sampled-action policy loss with a detached expectation over
-all18 one-step action values. Entropy, imitation, critic and original imagination
-remain; no learned parameters or image changes. Horizon and start distribution
-change with the estimator. CPU helper/comparison/plot and all five exact queued
-command checks pass,365 pins. The guarded learner is active; startup matches all
-357 initial tensors and47 pre-update events to bounded/retained. First update376
-passes. The100k/6,227-update recovery and independent CPU verification pass:
-all357 finite tensors, exact hashes/config, read-only files and365 unchanged pins.
-Matching initial frozen traces, full replays, final gameplay comparison and
-original terminal collection remain pending.
+All357 initial tensors and47 pre-update events match bounded/retained; actual-
+initial sampled1.416667/greedy2.208333 and799/794 semantic events match retained.
+All four frozen arms select24 natural episodes with zero updates/truncations and
+357 invariant tensors. Weighted losses, required expected-value metrics/snapshot
+timing,100k recovery, full replays/videos, curves, exposure,365 current/338 retained
+pins and original terminal services pass. Main/collector complete13:46:32.617 /
+13:46:51.144 UTC November6; publication reader and idle closure pass. Original
+CPU compile failure remains preserved; no full GPU/audit stage fails or repeats.
 
-Root `/x/Temp/kindle-actor-expected-value-20261106/full`; service
-`kindle-breakout-actor-expected-value-200k-20261106`, mainPID1491004/invocation
-`9cf81a2d7f52454a9bec3ef5685633b8`, source2de5bd0f, launched13:14:33 UTC.
-Collector1491007 remains active; recovery observer1491010 completes successfully
-at13:28:34 UTC. Inspect the original identities; an observer timeout does not
-authorize a restart.
-Original CPU compile failure stays preserved; corrected CPU/native/bounded stages
-pass, with no repeated GPU stage. No extension, sweep or automatic successor.
-Keep the default off and retain ordinary inference,32×16 and143.667 greedy/70.750
-sampled. Original864/90%-two-wall and the five-game goal remain unfinished.
+Root `/x/Temp/kindle-actor-expected-value-20261106/full` is closed. No GPU
+allocation, extension, sweep or successor is selected. Keep the option off and
+retain ordinary inference,32×16 and143.667 greedy/70.750 sampled. Enumerating
+one-step actions changes horizon/start distribution with the estimator; this
+result does not isolate gradient bias or reject every differentiable-control
+method. Original864/90%-two-wall and the five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
