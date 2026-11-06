@@ -1,22 +1,24 @@
 # Kindle: CDP learning roadmap
 
-The [prior-reward bounded check](results/2026-11-06-cdp-breakout-prior-reward.md) passes:8,192 actions/32,725 frames/489 updates in46.736739s,
-with a fixed padded200k projection of21m25.260s. All783 allocation pins, initial/
-frozen tensors,47 initial events, full replay, weighted losses and mask bounds
-pass. Both original services succeed; independent closure recounts489 reports
-and seals86 artifacts at22:39:54.108 UTC November6. No bounded-stage failure or
-repeat; earlier qualification CPU failures remain preserved with separate repairs.
+The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) is complete and fails its fixed retention rule.
+Fresh22003 scores79.167 greedy/47.000 sampled versus matched75.250/44.708,
+in21m33.955s versus21m30.822s. Greedy own-initial gain/min rises5.113%
+(3.391251→3.564653), but the paired95% difference[−1.322212,1.717042] spans zero.
+Sampled gain/min rises5.095% with its interval also crossing zero. All0/24 two-wall.
+Keep prior reward off and posterior reward1. Small point gains on one reused
+seed/cohort establish neither a useful improvement nor a reward-model mechanism.
 
-The [fresh200k comparison](experiments/2026-11-06-cdp-breakout-prior-reward-200k.md) is running on seed22003 against its retained control,
-with unchanged teacher/recipe except prior reward CE scale1 and the qualified
-native/runner. Primary greedy own-initial gain/min,100k recovery and four24-episode
-frozen arms remain fixed. Helpers and all five actual commands pass CPU checks;
-startup review passes. Original main PID1562317/invocation
-`3fbc09cb5f2947459016bc52a123e6f8` and collector are active, execution source
-`dda5bf6f`. The independent100k/6,227-update recovery passes in1.700s with357
-finite tensors and854 unchanged pins; its original observer succeeds while
-the learner continues. The archived prelaunch recovery-unit correction
-requires no GPU repeat. No gameplay benefit or five-game completion claim.
+All200k actions/799,622 frames/12,477 updates,100k recovery,357 matched initial/
+invariant frozen tensors,47 initial events, full replays,854 allocation/338 original
+retained pins and original services pass. Independent closure recounts192 frozen
+episodes, paired intervals, all learner reports,53 completion artifacts and28
+checkpoint files in5.507s, complete23:13:49.902 UTC November6, source`dda5bf6f`.
+The bounded check remains closed and passed. Earlier qualification failures,
+prelaunch recovery-unit correction and the later publication reader's non-text
+journal-entry failure remain preserved with separate CPU repairs; no GPU stage
+repeats. Root `/mnt/data/kindle-breakout-prior-reward-20261106/full` is closed,
+with no active allocation or selected successor. Original864/90%-two-wall and
+full five-game goals remain unfinished.
 
 The [completed reward-supervision comparison](results/2026-11-06-cdp-breakout-reward10.md#full200k-comparison) fails retention. Only
 reward loss1→10 changes against retained22003:greedy52.167/sample42.625 versus

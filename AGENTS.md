@@ -20,28 +20,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [prior-reward bounded check](docs/results/2026-11-06-cdp-breakout-prior-reward.md) passes:8,192 actions/32,725 frames/489
-updates in46.736739s, padded200k estimate21m25.260s. Initial357 tensors/47 events
-match retained22003; frozen restore retains357 tensors with zero updates. Full
-replay, weighted losses, mask bounds,783 pins and original services pass. Native
-qualification's original CPU failures remain preserved; no bounded stage repeats.
+The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) is complete and fails its fixed retention rule.
+Fresh22003 scores79.167 greedy/47.000 sampled versus matched75.250/44.708,
+in21m33.955s versus21m30.822s. Primary own-initial gain/min rises5.113%, but
+its paired95% difference interval[−1.322212,1.717042] spans zero; sampled also
+remains inconclusive. All0/24 two-wall. Keep prior reward off and posterior
+reward1. One reused development seed/cohort does not establish reliability.
 
-The [fresh200k comparison](docs/experiments/2026-11-06-cdp-breakout-prior-reward-200k.md) is running against matched22003.
-Add only prior reward CE scale1; posterior reward stays1. Nativea89b0b8e/SHA19b6f46
-and the exact bounded runner/runtime retain the original teacher/adapters. Keep
-all other settings fixed, seed22003, frozen cohort4000022003, primary greedy
-own-initial gain/min,100k recovery and four24-episode frozen arms. Original864/
-90%-two-wall and the full five-game goal remain unfinished.
+All200k actions/799,622 frames/12,477 updates,100k recovery, initial/frozen tensors,
+full replays,854 allocation pins and original services pass. Independent closure
+recounts192 evaluation episodes and all learner reports, complete23:13:49.902 UTC
+November6, source`dda5bf6f`. Prelaunch recovery-unit correction and earlier CPU
+qualification failures remain preserved. A later publication reader's non-text
+journal-entry failure has a separate CPU-only repair; no GPU stage repeats.
 
-Root `/mnt/data/kindle-breakout-prior-reward-20261106/full`. CPU helper qualification
-and all five actual commands pass. Original main PID1562317, invocation
-`3fbc09cb5f2947459016bc52a123e6f8`, source`dda5bf6f`; startup review passes.
-The main and collector are active. Independent100k/6,227-update recovery checks
-pass in1.700s:357 finite tensors, sealed weights/moments and854 unchanged pins;
-the observer completes successfully while the original learner continues.
-A stale recovery-unit literal was corrected and archived before launch; no GPU stage repeats.
-The bounded and native qualification stages are closed. No extension, sweep,
-second learner or automatic successor. Retain the existing recipe until outcome.
+Root `/mnt/data/kindle-breakout-prior-reward-20261106/full` is closed. No learner
+or GPU allocation is active; no extension, sweep, confirmation or successor is
+selected. Original864/90%-two-wall and the full five-game goal remain unfinished.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
