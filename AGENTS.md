@@ -20,24 +20,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [CDP prediction-scale1000 bounded check](docs/results/2026-11-06-cdp-breakout-cdp1000.md) is complete and passes
-execution/cost gates:8,192 actions/32,728 frames/489 updates in46.680678s versus
-saved47.689684s. The2.116% lower observed time is not a paired speed result.
-Only prediction loss500→1000 changes; retain native447fe50 and the original
-encoder/teacher/recipe. No native build or full learner is selected.
+One [fresh200k CDP prediction-scale1000 comparison](docs/experiments/2026-11-06-cdp-breakout-cdp1000-200k.md) is selected
+after the completed bounded check passes execution/cost gates. Change only
+prediction loss500→1000, with retained native447fe50, original encoder, teacher
+and learning recipe. Fresh seed1009;100k recovery and four frozen24-natural-
+episode arms. Greedy raw return and own-initial gain/min are primary, including
+a positive lower paired gain/min interval. No native build or experience transfer.
 
-All357 initial/frozen tensors,47 pre-update events, weighted loss sums and full
-action/label replay pass. Frozen restore1,024 actions/4,096 frames takes.922426s,
-with no completed natural episodes; no competence claim. Projection1253.631s
-and conservative11.222GiB headroom pass. All49 pins/four experiment source files,
-53 completion artifacts and terminal identities pass; no learner/render holder
-is active. Original CPU import failure and separate repair remain preserved.
-Root `/x/Temp/kindle-breakout-cdp1000-20261106`; closure18:15:32.218 UTC November6,
-source957bed96. Consult the [fixed protocol](docs/experiments/2026-11-06-cdp-breakout-cdp1000.md); do not repeat stages.
+The first full CPU helper preflight fails at a stale plot-fixture path. Preserve
+its failure and source bytes; a separate1.187419s CPU repair completes the
+missing plot/source checks without native import or GPU work. Earlier bounded
+canonical import failure and repair also remain retained. [Evidence](docs/results/2026-11-06-cdp-breakout-cdp1000.md#fresh200k-comparison-selected).
+Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`; actual queue preflight and
+launch preparation are next. No GPU allocation is active yet. Do not repeat
+completed stages; no extension, second learner or automatic successor.
 
-The [completed stride-two comparison](docs/results/2026-11-06-cdp-rgb-stride2.md) remains closed and negative;
-keep it off. Retain143.667 greedy/70.750 sampled. Original864/90% two-wall
-and the five-game goal remain unfinished. No automatic successor.
+Retain143.667 greedy/70.750 sampled. Original864/90% two-wall and the five-game
+goal remain unfinished. The completed stride-two option stays off.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

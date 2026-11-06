@@ -1,10 +1,12 @@
-# CDP prediction scale1000: bounded execution and cost check
+# CDP prediction scale1000: bounded check and fresh learning comparison
 
 The [fixed protocol](../experiments/2026-11-06-cdp-breakout-cdp1000.md) selects
 one fresh8,192-action/489-update check of prediction scale500→1000. Only
 `loss_scales.future_prediction` changes. The retained native447fe50, original
 convolution/max-pool encoder, teacher, geometry and learning schedule remain
-fixed. No native build or full learner is selected.
+fixed. No native build is needed. After the completed bounded check, a separate
+[fresh200k comparison](../experiments/2026-11-06-cdp-breakout-cdp1000-200k.md)
+is selected below; it has not started yet.
 
 Earlier gradient attribution found imitation already a major representation
 objective, partly aligned with CDP. This does not establish that stronger CDP
@@ -88,6 +90,34 @@ remains. The completed GPU stages, audits and replays are not repeated.
 Evidence is in `bounded/check/completion.json`, `review.json`, guidance/frozen
 replays and guards, with `bounded/publication-closure.json` sealing source,
 artifact and terminal checks. The original CPU import failure remains preserved.
-No full learner is selected. A separately declared learning comparison would
-still be needed to assess benefit. Retain143.667 greedy/70.750 sampled; original
-864/90% two-wall and the five-game goal remain unfinished. No automatic successor.
+No full learner was selected by that bounded declaration. Retain143.667
+greedy/70.750 sampled; original864/90% two-wall and the five-game goal remain
+unfinished. No automatic successor follows from the bounded result.
+
+## Fresh200k comparison selected
+
+The separate fixed-budget declaration selects one fresh200k/12,477-update
+learner, seed1009, with100k recovery and actual-initial/final sampled/greedy
+24-natural-episode assessments. Only prediction loss500→1000 changes. Favor
+the candidate only if greedy raw score and own-initial gain/min improve, with
+a positive lower paired eight-lane95% gain/min interval. This is a reused
+development seed/cohort; even a passing result would need fresh confirmation.
+
+The first full CPU helper preflight fails after2.567353s at the plotting fixture:
+its copied path points to `check/train.jsonl` instead of `bounded/check/train.jsonl`.
+The original failed invocation, plot receipt and source bytes remain retained.
+Earlier helper assertions reached this plot assertion, including exact bounded/
+retained expert accounting, header/config rejection,1000-weight loss arithmetic
+and rejection of a500-weight total. The comparison entry fixture had already
+passed11 negative-header cases.
+
+A separate1.187419s CPU repair fixes that path and the fixture's expected
+coefficient, completes only the missing plot/source checks and imports no
+native module. It does not rerun the original failed helper invocation or any
+completed GPU stage. `helpers-review.json` explicitly records
+`passed_with_plot_fixture_repair`, linked to the preserved failure and separate
+repair. The original canonical-package import failure also remains preserved.
+
+Root `/x/Temp/kindle-breakout-cdp1000-20261106/full`; the five actual queue
+commands and launch declaration are being prepared. No new GPU allocation is
+active yet. No extension, second learner or automatic successor is selected.
