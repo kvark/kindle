@@ -160,13 +160,44 @@ fn reference_at_side(
     }
     let mut result = Vec::new();
     for b in 0..2 {
-        for p in 0..16 {
-            for c in 0..16 {
-                result.push(values[(b * 16 + c) * 16 + p]);
+        for p in 0..side * side {
+            for c in 0..channels {
+                result.push(values[(b * channels + c) * side * side + p]);
             }
         }
     }
     result
+}
+
+#[test]
+fn rgb96_scalar_reference_keeps_all_spatial_tokens() {
+    let mut parameters = HashMap::new();
+    let mut input_channels = 3;
+    for (layer, output_channels) in [8, 12, 16, 16].into_iter().enumerate() {
+        let name = format!("world.representation.encoder.cnn{layer}");
+        parameters.insert(
+            format!("{name}.weight"),
+            vec![0.0; output_channels * input_channels * 25],
+        );
+        parameters.insert(
+            format!("{name}.bias"),
+            (1..=output_channels).map(|i| i as f32 / 16.0).collect(),
+        );
+        parameters.insert(format!("{name}.norm.weight"), vec![1.0; output_channels]);
+        input_channels = output_channels;
+    }
+    let expected_rms = ((1..=16).map(|i| (i as f64 / 16.0).powi(2)).sum::<f64>() / 16.0
+        + f64::from(DREAMER_NORM_EPSILON))
+    .sqrt();
+    let actual = reference_at_side(&vec![0.0; 2 * 3 * 96 * 96], &parameters, 96);
+    assert_eq!(actual.len(), 2 * 36 * 16);
+    for token in actual.chunks_exact(16) {
+        for (channel, value) in token.iter().enumerate() {
+            let normalized = (channel + 1) as f64 / 16.0 / expected_rms;
+            let expected = normalized / (1.0 + (-normalized).exp());
+            assert!((value - expected).abs() < 1e-12);
+        }
+    }
 }
 
 #[test]
@@ -199,7 +230,7 @@ fn check_encoder_reference(frame_pair: bool, coordinates: bool, capture: bool) {
 
 #[test]
 #[ignore = "requires separately guarded RGB96 scalar CNN and derivative qualification"]
-fn tiny_rgb96_encoder_matches_independent_reference() {
+fn tiny_rgb96_encoder_matches_spatial_reference() {
     check_encoder_at_side(false, false, false, ObservationKind::Rgb96);
 }
 
@@ -261,6 +292,7 @@ fn check_encoder_at_side(
         pixels.clone()
     };
     let expected = reference_at_side(&reference_pixels, &parameters, side);
+    assert_eq!(expected.len(), 2 * config.encoded_observation_dim());
     let mut actual = vec![0.0; expected.len()];
     session.read_output_by_index(1, &mut actual);
     for (&a, &b) in actual.iter().zip(&expected) {
