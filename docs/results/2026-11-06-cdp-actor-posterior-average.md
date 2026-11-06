@@ -102,3 +102,17 @@ Next, separately declare a bounded 12M frozen compatibility/cost check before
 selecting a gameplay comparison. No new GPU allocation, learner, sample-count
 sweep or automatic successor is selected. Retain the original five-game goal
 and Breakout 143.667/70.750; neither speedup nor improved competence is established.
+
+
+## Bounded 12M check selected
+
+The [separate protocol](../experiments/2026-11-06-cdp-actor-posterior-average-bounded.md)
+selects two frozen 4,096-action runs from the retained 200k checkpoint: ordinary
+greedy and eight-sample averaging with greedy actions. CPU preflight passes in
+3.466s (3.621s execution receipt), with two actual CLI paths, four invalid
+commands, 14 invalid headers, five invalid ends, two invalid cohorts and six
+decision fixtures. All 338 retained pins and 357 finite tensors pass; zero native
+imports or native/emulator construction. The saved ordinary prefix contains
+512 semantic events. Runtime/source/checkpoint identity, frozen tensors, full
+replays and ≤2× observed per-action cost must pass before any separately declared
+gameplay comparison. No learner, count sweep or automatic successor is selected.

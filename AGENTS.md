@@ -34,11 +34,15 @@ and recurrent states under forced actions, frozen moments and learning guards.
 All 254 pins pass; zero learner updates or Atari actions. Native qualification
 closes at 12:06:09.504 UTC November 6; no failed or repeated declared stage.
 
-Root `/x/Temp/kindle-actor-posterior-average-20261106` retains wheel, runtime and
-test executable after verified release of 5.136GB logical build cache. No GPU
-allocation or learner is active or selected. Next separately declare bounded
-12M frozen compatibility/cost before any gameplay comparison; Tiny qualification
-does not establish Atari benefit or speed. Retain the current recipe.
+The separately declared [bounded 12M check](docs/experiments/2026-11-06-cdp-actor-posterior-average-bounded.md)
+selects two frozen 4,096-action runs, ordinary then eight-sample averaging.
+CPU preflight passes both actual CLI paths, rejection fixtures, all 338 retained
+pins and 357 finite checkpoint tensors, with zero native/emulator construction.
+Require exact ordinary-prefix events, frozen tensors, full replays and ≤2×
+per-action cost; 120s per child. No learner or full gameplay comparison is selected.
+Root `/x/Temp/kindle-actor-posterior-average-20261106/bounded` retains exclusive
+receipts. Packaged artifacts remain after 5.136GB verified cache release.
+Tiny qualification does not establish Atari benefit or speed; retain the recipe.
 
 The [completed 64×8 grouping comparison](docs/results/2026-11-06-cdp-latent-shape.md#completed-full-200k-comparison)
 remains closed: greedy 136.958/sample 77.875 versus retained 143.667/70.750,
