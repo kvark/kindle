@@ -113,8 +113,18 @@ actual-initial controls and the retained143.667/6.590132gain/min control.
 CPU helper qualification passes in3.674s with no native-module import, emulator
 construction or GPU work. It checks the real comparison entry, gain/min decision,
 new weighted actor loss and snapshot timing, corruptions, retained exposure and
-plot inputs. Root `/x/Temp/kindle-actor-dynamics-20261106/full`; exact queues and
-command qualification precede launch. One200k/12,477 learner with1,800s cap,
+plot inputs. Exact five-queue command qualification passes in.380s with zero
+native/emulator construction, including coefficient corruption and restore
+configuration paths. Root `/x/Temp/kindle-actor-dynamics-20261106/full`. One200k/12,477 learner with1,800s cap,
 100k recovery and four frozen24-episode arms is selected. No extension, sweep,
 second learner or automatic successor is selected. Previous failures remain
 preserved; no completed old stage is repeated.
+
+The original learner launches **05:49:07.298 UTC November6**, sourcef3be4bd4,
+PID1397920/invocation96e0f92ec2784b0f84cc8c37c45ae0d7. All345 allocation pins,
+357 initial tensors versus both bounded/retained controls,47 pre-update semantic
+events and first update at action376 pass. Startup observer takes.314s.
+At05:49:50.823, original main, recovery and terminal observer process identities
+are verified live; no stage failed or repeated. No frozen learning score is
+available yet. These process identities, not stale logs or observer timeouts,
+identify the running allocation.

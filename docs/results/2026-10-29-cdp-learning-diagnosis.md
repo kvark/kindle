@@ -6,8 +6,10 @@ the retained12M64/Auto/N8/B16/T16/H15/R16 recipe, seed1009/evaluation4000001009;
 coordinates off. The added actor gradients must improve frozen own-initial gain
 per training minute over retained143.667/6.590132, with a positive paired95% lane
 interval. One learner,1,800s training cap,100k recovery and four frozen24-episode
-arms; no experience transfer or automatic successor. CPU helper checks pass;
-exact queue declaration and command qualification precede launch. Root
+arms; no experience transfer or automatic successor. CPU helper and exact-queue checks pass;
+the original learner is active since05:49:07.298 UTC/sourcef3be4bd4, PID1397920/
+invocation96e0f92ec2784b0f84cc8c37c45ae0d7. All345 pins,357 matching initial
+tensors and47 pre-update events pass; recovery and terminal observers are live. Root
 `/x/Temp/kindle-actor-dynamics-20261106/full`. Original864/90% and five-game gates
 remain unfinished; no gameplay benefit is established.
 
