@@ -385,6 +385,10 @@ pub struct DreamerConfig {
     /// Override only the actor MLP hidden width; world and critic keep the preset.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub actor_hidden_units: Option<usize>,
+    /// Learn an independent linear logit correction from imagined policy losses;
+    /// the base actor learns only from expert imitation.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub actor_residual: bool,
     /// Auxiliary normalized lambda-return gradient through frozen imagined dynamics.
     /// Categorical draws use straight-through derivatives; disagreement and
     /// trajectory weights remain detached. Added to the existing actor objective.
@@ -495,6 +499,7 @@ impl DreamerConfig {
             actor_entropy: 3e-4,
             actor_dynamics_scale: None,
             actor_hidden_units: None,
+            actor_residual: false,
             slow_value_rate: 0.02,
             return_norm_rate: 0.01,
             learning_rate: 4e-5,
@@ -681,6 +686,24 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if self.actor_residual
+            && (!self.is_cdp()
+                || !self.cdp_centered
+                || !self.loss_scales.policy.is_finite()
+                || self.loss_scales.policy <= 0.0
+                || !self.expert_imitation.as_ref().is_some_and(|expert| {
+                    expert.world_gradient
+                        && expert.scale.is_finite()
+                        && expert.scale > 0.0
+                        && expert.decay.is_none()
+                })
+                || self.actor_critic_gradient
+                || self.actor_dynamics_scale.is_some()
+                || self.replay_actor_scale.is_some()
+                || self.actor_learning_starts != 0)
+        {
+            return Err("residual actor requires centered RGB CDP, positive policy and constant world expert imitation, without other actor losses or delayed actor updates".into());
+        }
         if self.actor_hidden_units == Some(0) {
             return Err("actor_hidden_units must be positive".into());
         }

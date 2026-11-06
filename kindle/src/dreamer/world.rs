@@ -1104,14 +1104,7 @@ pub fn build_imagination_graph(config: &DreamerConfig) -> Graph {
     let mut graph = Graph::new();
     let dynamics = Dynamics::new(&mut graph, config);
     let heads = WorldHeads::new(&mut graph, config);
-    let actor = MlpHead::new(
-        &mut graph,
-        "behavior.actor",
-        config.feature_dim(),
-        config.actor_hidden_units(),
-        3,
-        config.action_count,
-    );
+    let actor = behavior::Actor::new(&mut graph, config);
     let value = MlpHead::new(
         &mut graph,
         "behavior.value",

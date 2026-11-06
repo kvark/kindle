@@ -175,8 +175,11 @@ pub(crate) fn initialize_d3(session: &mut Session, graph: &Graph, seed: u64) {
             vec![1.0; size]
         } else if name.ends_with(".bias") {
             vec![0.0; size]
-        } else if name == "world.reward.out.weight" || name == "behavior.value.out.weight" {
-            // D3 initializes reward and value predictions to exactly zero.
+        } else if name == "world.reward.out.weight"
+            || name == "behavior.value.out.weight"
+            || name == "behavior.actor.residual.weight"
+        {
+            // Reward/value predictions and optional policy corrections start at zero.
             vec![0.0; size]
         } else {
             let output_scale = if name == "behavior.actor.out.weight" {

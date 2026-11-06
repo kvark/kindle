@@ -41,7 +41,7 @@ fn dynamics_graph_only_differentiates_actor_parameters() {
     let mut graph = Graph::new();
     let model = super::super::BehaviorModel::new(&mut graph, &config);
     let weights = graph.input("weights", &[6, 1]);
-    let loss = loss(&mut graph, &config, &model.actor, &model.value, weights);
+    let loss = loss(&mut graph, &config, &model.actor.base, &model.value, weights);
     graph.set_outputs(vec![loss]);
     let (plan, _) = meganeura::compile_training_graph(&graph);
     let mut actor_count = 0;

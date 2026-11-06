@@ -2,6 +2,8 @@
 
 use super::super::acting_gpu::ActingGpu;
 use super::*;
+#[cfg(test)]
+mod residual_tests;
 use crate::dreamer::ObservationKind;
 use crate::vision::{
     levjepa::LeVJepaPerception,

@@ -20,26 +20,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 6
 
-The [actor-width512 comparison](docs/results/2026-11-06-cdp-actor-width.md#full-200k-comparison)
-is complete and negative. Greedy87.125/sample39.958 regress143.667/70.750;
-200k actions take24m14.355s versus21m27.910s,12.924% longer. Primary own-initial
-gain/min falls46.293%. All0/24 two-wall. Retain the preset256 actor with optional
-width absent, coordinates off and actor dynamics off. One reused development
-seed does not establish a general capacity cause or reliability.
+The [residual actor experiment](docs/experiments/2026-11-06-cdp-residual-actor.md)
+is selected for implementation and CPU qualification. A zero-initialized linear
+logit correction receives imagined policy/entropy gradients; the existing base
+actor receives expert imitation. The separate parameters have separate optimizer
+moments. At12M/full18 it adds46,098 trainable parameters; CNN/RSSM/critic remain
+unchanged. Default off. Routing, native execution, cost and gameplay benefit are
+not yet established. No GPU allocation or full learner is selected.
 
-All347 current/338 retained pins,100k recovery,357 matching bounded initial/
-invariant frozen tensors,313 retained non-actor initial tensors,weighted losses,
-full replays/videos,guards,curves and original services pass. Main/collector
-finish08:55:25.209/08:55:47.274 UTC November6, source91647453. No stage fails
-or repeats. Initial actor values/actions differ, and own-initial controls are
-used. Root `/x/Temp/kindle-actor-width-20261106/full` is closed; no GPU allocation
-or successor is selected. Packaged runtime remains; build cache was released
-after bounded qualification. Do not repeat its stages or collectors.
+Root `/x/Temp/kindle-residual-actor-20261106`; consult the protocol before execution.
+The first CLI test run fails because its new fixture incorrectly spells the
+positional environment as `--environment`; original sources/logs are preserved.
+The repaired checks pass196 Kindle/5 adapter tests, strict workspace Clippy and
+17 focused CLI cases. Rust fixture type/borrow errors and later CLI cap/action-name
+failures remain preserved in the [report](docs/results/2026-11-06-cdp-residual-actor.md).
+Packaging is next; no native/emulator construction occurred in CPU checks.
 
-The [protocol](docs/experiments/2026-11-06-cdp-breakout-actor-width-200k.md)
-retains exact budgets and comparisons. No extension, width sweep, confirmation
-or automatic successor. Original864/90%-two-wall and the five-game goal remain
-unfinished. A new experiment needs a separately justified hypothesis.
+The [width512 comparison](docs/results/2026-11-06-cdp-actor-width.md#full-200k-comparison)
+remains closed and negative:87.125/39.958 versus143.667/70.750, with46.293% lower
+primary gain/min. Keep the preset256 base, coordinates and actor dynamics off.
+Do not repeat closed stages. Original864/90%-two-wall and five-game gates remain
+unfinished. No coefficient/width sweep or automatic successor learner.
 
 Completed experiment details and their failures remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
 and [diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.

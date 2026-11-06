@@ -149,6 +149,8 @@ def main():
                         help="add normalized return gradients through frozen imagined dynamics; default off")
     parser.add_argument("--actor-hidden-units", type=int,
                         help="fresh training only: actor MLP width; world and critic keep the model preset")
+    parser.add_argument("--actor-residual", action="store_true",
+                        help="fresh centered CDP: separate imagined-policy correction to a supervised actor")
     parser.add_argument("--replay-actor-scale", type=float,
                         help="fresh training: positive-advantage imitation of completed observed returns")
     parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
@@ -313,6 +315,16 @@ def main():
             parser.error("actor-hidden-units must be a positive unsigned 64-bit integer")
         if args.restore or args.evaluate:
             parser.error("actor-hidden-units requires fresh training")
+    if args.actor_residual:
+        if args.restore or args.evaluate:
+            parser.error("actor-residual requires fresh training")
+        if (not args.cdp or not args.cdp_centered or not args.guidance_world_gradient
+                or args.guidance_imitation_scale is None
+                or not positive_f32(args.guidance_imitation_scale)
+                or args.guidance_imitation_decay is not None
+                or args.actor_critic_gradient or args.actor_dynamics_scale is not None
+                or args.replay_actor_scale is not None):
+            parser.error("actor-residual requires centered CDP and constant world expert imitation without other actor losses")
     if args.behavior_learning_rate is not None:
         if not positive_f32(args.behavior_learning_rate):
             parser.error("behavior-learning-rate must be finite and positive in F32")
@@ -491,6 +503,7 @@ def main():
     training_options.add("--replay-actor-scale")
     training_options.add("--actor-dynamics-scale")
     training_options.add("--actor-hidden-units")
+    training_options.add("--actor-residual")
     training_options.add("--return-lambda")
     training_options.add("--replay-value-bootstrap")
     training_options.add("--encoder-learning-rate")
@@ -535,6 +548,8 @@ def main():
         parser.error("actor-dynamics-scale requires native actor dynamics support")
     if args.actor_hidden_units is not None and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_HIDDEN_UNITS", False):
         parser.error("actor-hidden-units requires native actor width support")
+    if args.actor_residual and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RESIDUAL", False):
+        parser.error("actor-residual requires native residual actor support")
     if args.replay_actor_observed_lower_bound and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False):
         parser.error("observed lower-bound mode requires native conservative-return actor support")
     if args.breakout_return_life_boundaries and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RETURN_BOUNDARIES", False):
@@ -555,6 +570,9 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     if args.restore and (args.restore / "metadata.json").is_file():
         metadata = json.loads((args.restore / "metadata.json").read_text())
+        if (metadata.get("config", {}).get("actor_residual", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RESIDUAL", False)):
+            parser.error("residual actor checkpoint requires native residual actor support")
         if metadata.get("config", {}).get("actor_dynamics_scale") is not None:
             if not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_DYNAMICS", False):
                 parser.error("actor dynamics checkpoint requires native actor dynamics support")
@@ -740,6 +758,8 @@ def main():
             config["actor_dynamics_scale"] = args.actor_dynamics_scale
         if args.actor_hidden_units is not None:
             config["actor_hidden_units"] = args.actor_hidden_units
+        if args.actor_residual:
+            config["actor_residual"] = True
         if args.replay_actor_observed_lower_bound:
             config["replay_actor_observed_lower_bound"] = True
         if args.breakout_return_life_boundaries:

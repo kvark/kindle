@@ -6,6 +6,8 @@ use super::config::{DreamerConfig, ExpertImitation};
 use super::networks::{MlpHead, mixed_log_probabilities, scale, sum, weighted_cross_entropy};
 
 mod dynamics;
+mod residual;
+pub(crate) use residual::Actor;
 
 pub const LOSS_TOTAL: usize = 0;
 pub const LOSS_POLICY: usize = 1;
@@ -24,7 +26,7 @@ pub(crate) fn dynamics_actor_output(config: &DreamerConfig) -> usize {
 }
 
 struct BehaviorModel {
-    actor: MlpHead,
+    actor: Actor,
     value: MlpHead,
 }
 
@@ -32,14 +34,7 @@ impl BehaviorModel {
     fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let units = config.network().units;
         Self {
-            actor: MlpHead::new(
-                graph,
-                "behavior.actor",
-                config.feature_dim(),
-                config.actor_hidden_units(),
-                3,
-                config.action_count,
-            ),
+            actor: Actor::new(graph, config),
             value: MlpHead::new(
                 graph,
                 "behavior.value",
@@ -140,7 +135,7 @@ pub fn build_training_graph(
     let imagined_slow_target =
         graph.input("imagined_slow_target", &[imagined_rows, config.value_bins]);
 
-    let actor_logits = model.actor.forward(&mut graph, imagined_feature);
+    let actor_logits = model.actor.forward_policy(&mut graph, imagined_feature);
     let value_logits = model.value.forward(&mut graph, imagined_feature);
     let (policy, mean_entropy, weighted_entropy) = policy_loss(
         &mut graph,
@@ -178,7 +173,7 @@ pub fn build_training_graph(
     let mut losses = vec![weighted_policy, weighted_value, weighted_replay];
     let expert_loss = config.expert_imitation.as_ref().map(|expert| {
         let target = graph.input("expert_action_target", &[replay_rows, config.action_count]);
-        let logits = model.actor.forward(&mut graph, replay_feature);
+        let logits = model.actor.base.forward(&mut graph, replay_feature);
         let log_probabilities = mixed_log_probabilities(
             &mut graph,
             logits,
@@ -210,7 +205,7 @@ pub fn build_training_graph(
         let loss = dynamics::loss(
             &mut graph,
             config,
-            &model.actor,
+            &model.actor.base,
             &model.value,
             imagined_weight,
         );
@@ -260,14 +255,7 @@ pub fn build_actor_inference_graph(config: &DreamerConfig, batch: usize) -> Grap
     config.validate();
     assert!(batch > 0);
     let mut graph = Graph::new();
-    let actor = MlpHead::new(
-        &mut graph,
-        "behavior.actor",
-        config.feature_dim(),
-        config.actor_hidden_units(),
-        3,
-        config.action_count,
-    );
+    let actor = Actor::new(&mut graph, config);
     let state = graph.input("feature", &[batch, config.feature_dim()]);
     let logits = actor.forward(&mut graph, state);
     graph.set_outputs(vec![logits]);

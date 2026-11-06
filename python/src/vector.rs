@@ -28,6 +28,8 @@ impl PyVectorAgent {
     const SUPPORTS_ACTOR_DYNAMICS: bool = true;
     #[classattr]
     const SUPPORTS_ACTOR_HIDDEN_UNITS: bool = true;
+    #[classattr]
+    const SUPPORTS_ACTOR_RESIDUAL: bool = true;
 
     #[classattr]
     const SUPPORTS_COMPLETED_RETURN_ACTOR: bool = true;
