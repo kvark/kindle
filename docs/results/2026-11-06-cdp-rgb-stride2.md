@@ -143,7 +143,7 @@ RGB64 teacher/recipe and143.667 greedy/70.750 sampled until useful learning is
 measured. Original864/90% two-wall and five-game gates remain unfinished.
 
 
-## Fresh200k comparison selected
+## Fresh200k comparison running
 
 The [separate fixed-budget protocol](../experiments/2026-11-06-cdp-breakout-rgb-stride2-200k.md)
 selects one fresh200k-action/12,477-update learner. The measured12.056% bounded
@@ -160,7 +160,20 @@ Existing controllers are copied and adapted to the flag/preprocessing change,
 25min cap and declared initial-behavior differences. CPU helper qualification
 passes in4.142s: retained/bounded audit inputs, loss sums, configuration rejection,
 full comparison entry, actual curve input and recovery/collector conditions.
-Native model construction is absent. Exact queued parser/configuration checks
-must pass before launch. Root `/x/Temp/kindle-rgb-stride2-20261106/full`;
-service `kindle-breakout-rgb-stride2-200k-20261106`. No automatic extension,
-second learner or successor is selected; the retained default stays unchanged.
+Native model construction is absent. All five exact queued parser/configuration
+checks pass in.386s with zero native/emulator construction; preparation takes
+1.228s. Declaration pins372 files, with338 retained pins verified using the
+existing exact historical replay-helper resolution.
+
+Launched17:32:44.497 UTC November6 from `8d4ab88daae667158accca8ee05c4b1941486588`.
+Root `/x/Temp/kindle-rgb-stride2-20261106/full`, main service
+`kindle-breakout-rgb-stride2-200k-20261106`, PID1528001, invocation
+`6304e163ba8d4aa5a831bfa602f2eb77`. Recovery PID1528007 and terminal collector
+PID1528004 are attached. Startup passes all357 bounded/retained initial tensors,
+47 same-stride pre-update events and first update at action376; observer.339s.
+Compared to retained pre-update behavior,15/47 events match and32 differ, as
+allowed by the changed encoder computation. No causal performance claim follows.
+
+Training and frozen outcomes remain pending. Inspect live service/child identity
+before any action; observer timeout is not a stopped learner. No automatic
+extension, second learner or successor is selected; retained default unchanged.

@@ -1,7 +1,7 @@
 # Kindle: CDP learning roadmap
 
-The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) now has a separately declared
-fresh200k-action Breakout comparison selected. Bounded cost falls47.690→41.940s
+The [optional stride-two RGB encoder](results/2026-11-06-cdp-rgb-stride2.md) has a separately declared
+fresh200k-action Breakout comparison running. Bounded cost falls47.690→41.940s
 (12.06%); native values/derivatives, restore, default-off compatibility, exact
 initial/frozen tensors and replay checks pass. Original CPU fixture compile
 failure remains preserved; no completed stage repeats.
@@ -12,8 +12,12 @@ Fixed200k actions/12,477 updates,25min training cap,100k recovery; four frozen
 24-natural-episode arms compare final and own actual-initial sampled/greedy.
 Greedy raw return and own-initial gain/min, with a positive paired lane interval,
 are the retention criteria. Initial tensors match; encoder outputs may differ.
-Root `/x/Temp/kindle-rgb-stride2-20261106/full`; CPU helpers pass4.142s,
-model/emulator construction blocked. Queued-command preflight precedes launch.
+Root `/x/Temp/kindle-rgb-stride2-20261106/full`; source `8d4ab88d`.
+CPU helpers and all five queued commands pass with zero model/emulator
+construction. Main PID1528001/invocation `6304e163ba8d4aa5a831bfa602f2eb77`
+started17:32:44 UTC November6; recovery and terminal observers are attached.
+Startup passes357 initial tensors and47 same-stride pre-update events; first
+update at376. Inspect live service identity before acting; no restart on timeout.
 No extension, second learner or automatic successor. Keep retained143.667
 greedy/70.750 sampled; original864/90% two-wall and five-game goal unfinished.
 
