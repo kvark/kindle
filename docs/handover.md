@@ -8,19 +8,20 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [matched action-derivative contexts](experiments/2026-11-06-cdp-breakout-action-derivative-contexts.md)
-are selected for two serial frozen captures. Re-observe the retained control's
-43,424 actions/173,660 frames for each model, saving latent states at the same120
-previously branched rescue origins. Use qualified native744dd793/SHA876ed0c for
-both retained and dynamics.5 checkpoints. Reuse the saved92 short rescues and18
-differing game-over outcomes; do not repeat the old emulator oracle or forecasts.
+The [matched action-derivative contexts](results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
+are captured and closed:120 latent states per model,43,424 actions/173,660 frames
+each,50.591s control/50.498s candidate. Both use qualified native744dd793/SHA876ed0c
+and the same retained-control history. All16 CPU checks,537 pins,exact source
+transitions,357 invariant tensors per model and host guards pass. Zero updates,
+zero multi-step forecasts; no failed or repeated stage. Controller completes
+06:42:29.897 UTC November6, CPU closure06:43:18.395; no active GPU allocation.
 
-All16 CPU checks and preparation pass; entrypoint tests intercept native/emulator
-construction. Root `/x/Temp/kindle-breakout-action-derivatives-20261106` contains
-the exact queue, scripts and pins. Each capture is capped at180s, controller480s,
-with zero updates and357 invariant checkpoint tensors required. Consult the
-protocol and check live process identity before execution. No native derivative
-stage or new learner is selected by this capture.
+Root `/x/Temp/kindle-breakout-action-derivatives-20261106` retains both result files
+and the closure manifest. Reuse these states and the existing92 short rescues/18
+differing game-over outcomes. Do not repeat the capture or old branch/forecast
+collectors. A native fixed-plan derivative probe still needs its separately
+declared objective,surrogate,paired draws and numerical qualification; no derivative
+GPU stage or new learner is selected by this completed capture.
 
 The [full dynamics-gradient learner](results/2026-11-06-cdp-actor-dynamics.md#full-200k-comparison)
 remains closed and negative:85.708 greedy/51.625 sampled in26m38.517s versus

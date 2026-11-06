@@ -1,12 +1,15 @@
 # Kindle: CDP learning roadmap
 
-The [matched action-derivative context capture](experiments/2026-11-06-cdp-breakout-action-derivative-contexts.md)
-is selected after16 passing CPU checks. Two serial frozen checkpoints re-observe
-the same43,424 actions/173,660 frames each and save120 latent origins per model.
-The existing92 short rescues/18 differing game-over outcomes supply later outcome
-comparisons. Zero updates; no repeated branch oracle or old forecasts. This
-supplies inputs for a separately qualified native derivative probe, which is not
-selected here. Root `/x/Temp/kindle-breakout-action-derivatives-20261106`.
+The [matched action-derivative context capture](results/2026-11-06-cdp-breakout-action-derivative-contexts.md)
+is complete:120 latent origins per model,43,424 actions/173,660 frames each,
+50.591s control/50.498s candidate. All16 CPU tests,537 pins,357 invariant tensors
+per model,exact transitions and guards pass. Zero updates or multi-step forecasts;
+no failed/repeated stage. Controller completes06:42:29.897 UTC November6, with
+no active GPU allocation at closure. Root
+`/x/Temp/kindle-breakout-action-derivatives-20261106` retains the states alongside
+references to92 known short rescues/18 differing game-over outcomes. This supplies
+inputs for a separately qualified native derivative probe; derivative quality
+remains unmeasured, and no derivative GPU stage or learner is selected here.
 
 The [full dynamics-gradient actor comparison](results/2026-11-06-cdp-actor-dynamics.md#full-200k-comparison) is complete and negative:
 200k actions/799,565 frames/12,477 updates in **26m38.517s**, with **85.708 greedy /
