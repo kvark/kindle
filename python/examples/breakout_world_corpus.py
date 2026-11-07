@@ -53,6 +53,30 @@ def choose_evaluation(streams, seed):
     return dict(natural=natural, contacts=contacts, endings=endings)
 
 
+def sampler_plan(streams, config, steps):
+    rng = np.random.default_rng(config['seed'] ^ 0x636f72707573)
+    locations = np.asarray([sample_locations(streams, config['batch_length'], config['batch_size'], rng)
+                            for _ in range(steps)], np.int32)
+    seen = [np.zeros(len(stream['action']), bool) for stream in streams]
+    total_terminal = prior_terminal = positive = context_resets = source_resets = 0
+    for row in locations:
+        actions = np.stack([streams[lane]['action'][start:start+32] for lane, start in row], axis=1).copy()
+        terminals = np.stack([streams[lane]['terminal'][start:start+32] for lane, start in row], axis=1)
+        rewards = np.stack([streams[lane]['reward'][start:start+32] for lane, start in row], axis=1)
+        source_resets += int((actions == -1).sum())
+        actions[0] = -1
+        keep = np.cumprod(actions[-16:] != -1, axis=0).astype(bool)
+        total_terminal += int(terminals.sum())
+        prior_terminal += int((terminals[-16:] & keep).sum())
+        positive += int((rewards > 0).sum())
+        context_resets += int((actions == -1).sum())
+        for lane, start in row: seen[lane][start:start+32] = True
+    counts = dict(terminal_rows=total_terminal, prior_terminal_rows=prior_terminal, positive_reward_rows=positive,
+                  context_reset_rows=context_resets, source_reset_rows=source_resets,
+                  unique_source_arrivals=sum(int(row.sum()) for row in seen))
+    return locations, counts
+
+
 def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
     if not locations:
         result = dict(count=0, unsupported=True)
@@ -136,13 +160,15 @@ def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
 def train(args, config, fitting, development):
     import kindle
     from safetensors.numpy import load_file
+    plan, expected_counts = sampler_plan(fitting, config, args.steps)
+    np.savez_compressed(args.output/'sampler-plan.npz', locations=plan)
+    write(args.output/'sampler-plan.json', expected_counts)
     learner = kindle.WorldModelLearner(config, prediction_length=args.prediction_length)
     require_device(learner)
     write(args.output/'actual-config.json', learner.config)
     selections = dict(fitting=choose_evaluation(fitting, 112003), development=choose_evaluation(development, 112019))
     write(args.output/'selections.json', selections)
     learner.save(str(args.output/'initial'))
-    rng = np.random.default_rng(config['seed'] ^ 0x636f72707573)
     seen = [np.zeros(len(stream['action']), bool) for stream in fitting]
     total_terminal, prior_terminal, positive_rows, context_reset_rows, source_reset_rows = 0, 0, 0, 0, 0
     native_seconds = 0.
@@ -158,7 +184,7 @@ def train(args, config, fitting, development):
     evaluate(0)
     with (args.output/'learning.jsonl').open('x') as log:
         for step in range(1, args.steps+1):
-            locations = sample_locations(fitting, config['batch_length'], config['batch_size'], rng)
+            locations = plan[step-1].tolist()
             streams = [fitting[lane] for lane, _ in locations]
             batch = training_windows(streams, [start for _, start in locations], config['batch_length'],
                                      allow_resets=True, retain_initial_targets=True)
@@ -198,6 +224,10 @@ def train(args, config, fitting, development):
     before, after = (load_file(args.output/phase/'world.safetensors') for phase in ('final', 'final-frozen'))
     assert before.keys() == after.keys() and all(np.array_equal(before[k], after[k]) for k in before)
     assert all(np.isfinite(v).all() for v in after.values()) and learner.updates == args.steps
+    observed_counts = dict(terminal_rows=total_terminal, prior_terminal_rows=prior_terminal,
+        positive_reward_rows=positive_rows, context_reset_rows=context_reset_rows, source_reset_rows=source_reset_rows,
+        unique_source_arrivals=sum(int(row.sum()) for row in seen))
+    assert observed_counts == expected_counts
     write(args.output/'result.json', dict(status='complete', updates=args.steps, prediction_length=args.prediction_length,
         training_seconds=native_seconds, total_seconds=time.monotonic()-started, no_behavior=True,
         unique_source_arrivals=sum(int(row.sum()) for row in seen), source_arrivals=sum(len(row) for row in seen),
@@ -227,10 +257,10 @@ def restore_check(args, config, development):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('train', 'restore-check'))
+    parser.add_argument('mode', choices=('collect', 'train', 'restore-check'))
     parser.add_argument('--config', type=Path, required=True)
-    parser.add_argument('--dataset', type=Path, required=True)
-    parser.add_argument('--development', type=Path, required=True)
+    parser.add_argument('--dataset', type=Path)
+    parser.add_argument('--development', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--steps', type=int, default=8192)
     parser.add_argument('--prediction-length', type=int, default=16)
@@ -246,8 +276,18 @@ def main():
     config = json.loads(args.config.read_text())
     if config['batch_size'] != 8 or config['batch_length'] != 32:
         parser.error('this protocol requires B8/T32')
+    if args.mode == 'collect':
+        from breakout_world_model import collect
+        groups = [('standard-fit', .25, 151001, 2048), ('standard-development', .25, 191001, 1024)]
+        write(args.output/'declaration.json', dict(mode='collect', config=config, groups=groups,
+            action_pool=list(range(18)), source_sha256=sha(__file__), started_unix=time.time()))
+        collect(config, args.output, action_pool=tuple(range(18)), groups=groups)
+        return
+    if args.dataset is None or args.development is None: parser.error('dataset and development required')
     fitting, fit_manifest = load_dataset(args.dataset)
     development, dev_manifest = load_dataset(args.development)
+    if min(fit_manifest.get('action_counts', [0]*18)) <= 0 or min(dev_manifest.get('action_counts', [0]*18)) <= 0:
+        raise ValueError('all eighteen commands must be represented in fitting and development corpora')
     fit_seeds = {row['seed'] for row in fit_manifest['files']}
     assert not fit_seeds.intersection(row['seed'] for row in dev_manifest['files'])
     write(args.output/'declaration.json', dict(mode=args.mode, config=config, loss_names=LOSS_NAMES,

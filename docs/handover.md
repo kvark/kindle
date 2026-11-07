@@ -38,18 +38,24 @@ imagined state.32 CPU world tests (18 GPU tests ignored),60 Python tests and
 strict Clippy pass after a preserved loop-style repair. Paddle validation found
 and corrected ball contamination; both original and corrected reviews remain.
 
-Next qualify partial/all-zero masks and feature/restore readbacks, then run one
-fixed8,192-update full-corpus world-only learner and a separate frozen restore
-check. Keep RGB64/12M-preset/B8/T32/Auto/reconstruction100/prior16. Sample the
-retained8,205 fitting arrivals (8,192 original game actions); development uses
-separate retained seeds. The sampler dry-run covers every fitting arrival and
-retains1,269 terminal-row exposures,604 within valid prior segments. Evaluate
-natural, contact and ending slices separately at0/1k/.../8k updates, including
-32-step forecasts. Export latent features for diagnosis. No new collector or
-policy/critic training is selected. Root `/mnt/data/kindle-breakout-world-corpus-20261107`.
-No full-corpus GPU phase is launched at this publication. This is development
-work; untouched test, broader coverage and fresh confirmation remain unfinished.
-Keep the world-model goal active and unproven. Do not restart completed stages.
+An action audit finds the old corpora contain only commands0/1/3/4, leaving14
+of the model's18 inputs uncovered. Select a new, separately justified all18
+corpus:16,384 fitting actions on seeds151001+1009/lane and8,192 development
+actions on191001+1009/lane, eight environments, sticky.25 and the same pixel
+controller with all18 random command blocks. This does not restart a completed
+collector. The earlier four-command sampler preflight remains preserved and is
+superseded for the broad run.
+
+Next qualify partial/all-zero masks and feature/restore readbacks, collect that
+corpus, then run one fixed8,192-update world-only learner and a frozen restore
+check. Keep RGB64/12M-preset/B8/T32/Auto/reconstruction100/prior16 and4e-4 rates.
+A precomputed uniform sampler includes reset crossings and retains genuine
+terminal labels at clipped context starts. Natural/contact/ending curves at
+0/1k/.../8k updates include32-step forecasts; optional latent exports support
+diagnosis. No actor/critic learns. Root `/mnt/data/kindle-breakout-world-corpus-20261107`.
+No GPU phase is launched at this publication. Untouched test, broader late-game
+coverage and fresh confirmation remain unfinished. Keep the goal active and
+unproven. Do not restart completed stages.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

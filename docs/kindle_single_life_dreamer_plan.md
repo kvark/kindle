@@ -23,12 +23,20 @@ qualification failure is retained separately from its repair. Evaluation adds
 paddle/brick measurements, reward-event probabilities and optional latent-state
 exports; native-image label validation and its paddle correction are retained.
 
+The input audit finds only commands0/1/3/4 in the old fitting/development
+corpora. Fourteen full18 inputs have no examples. Before the broader learner,
+collect a separately declared all18 corpus with16,384 fitting actions on fresh
+151001+1009/lane seeds and8,192 development actions on191001+1009/lane seeds.
+Keep eight environments/sticky.25 and the pixel controller, but sample command
+blocks from all18 IDs. This is new coverage data, not a repeat of a closed
+collector. The four-command sampler dry-run remains preserved as superseded.
+
 Next qualify the mask composition, then run a fixed8,192-update world-only
-learner on the retained8,205 fitting arrivals, with separate development seeds,
+learner on that all18 fitting corpus, with separate development seeds,
 actual-initial controls, natural/contact/ending slices and1/4/8/16/32-step curves.
 Keep RGB64/12M-preset/B8/T32/Auto/reconstruction100/prior16 and4e-4 rates. The
-sampler dry-run covers every fitting arrival and retains1,269 terminal-row
-exposures (604 in valid prior segments), rather than filtering reset crossings.
+precomputed uniform sampler retains reset crossings and known terminal targets;
+expected exposures are recounted from the new data before GPU construction.
 No collection, coupled learner or completed stage repeats. A full-model frozen
 restore check is declared as a separate final phase. Root
 `/mnt/data/kindle-breakout-world-corpus-20261107`; no GPU phase has launched at

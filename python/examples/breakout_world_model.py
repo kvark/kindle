@@ -134,7 +134,7 @@ def mask_fixture(config, output, prediction_length):
           target_changes_do_not_affect_prior_loss=True))
 
 
-def collect(config, output):
+def collect(config, output, *, action_pool=(0, 1, 3, 4), groups=None):
     import ale_py
     import gymnasium as gym
     import kindle
@@ -145,8 +145,11 @@ def collect(config, output):
     learner = kindle.WorldModelLearner(config)
     require_device(learner)
     assert config['batch_size'] == 8
-    groups = [('standard-fit', .25, 51001, 1024), ('debug-fit', 0., 71001, 512),
-              ('standard-development', .25, 91001, 512)]
+    if groups is None:
+        groups = [('standard-fit', .25, 51001, 1024), ('debug-fit', 0., 71001, 512),
+                  ('standard-development', .25, 91001, 512)]
+    if not action_pool or any(type(value) is not int or not 0 <= value < 18 for value in action_pool):
+        raise ValueError('nonempty full18 action pool required')
     summaries = []
     for name, sticky, base_seed, ticks in groups:
         root = output/name
@@ -188,7 +191,7 @@ def collect(config, output):
             for lane, (teacher, rng) in enumerate(zip(teachers, rngs)):
                 proposed = teacher.propose(frames[lane])
                 if blocks[lane] == 0 and rng.random() < .025:
-                    blocks[lane], command[lane] = int(rng.integers(4, 13)), int(rng.choice([0, 1, 3, 4]))
+                    blocks[lane], command[lane] = int(rng.integers(4, 13)), int(rng.choice(action_pool))
                 action = int(command[lane]) if blocks[lane] else int(proposed)
                 if blocks[lane]: blocks[lane] -= 1
                 teacher.feedback(action)
@@ -204,8 +207,10 @@ def collect(config, output):
                 require_device(learner)
                 print(json.dumps(dict(event='collection', group=name, ticks=tick+1, actions=8*(tick+1))), flush=True)
         files = []
+        action_counts = np.zeros(18, int)
         for lane, stream in enumerate(streams):
             data = {key: np.asarray(value) for key, value in stream.items()}
+            action_counts += np.bincount(data['action'][data['action'] >= 0], minlength=18)
             path = root/f'lane{lane}.npz'
             np.savez_compressed(path, **data)
             files.append(dict(path=str(path), sha256=sha(path), seed=base_seed+lane*1009,
@@ -214,7 +219,8 @@ def collect(config, output):
             total_frames += environments[lane].executed_action_frames
         for environment in environments: environment.close()
         summary = dict(name=name, sticky=sticky, actions=8*ticks, emulator_frames=total_frames, files=files,
-                       selection='fixed controller with random command blocks; labels evaluation-only')
+                       selection='fixed controller with random command blocks; labels evaluation-only',
+                       action_pool=list(action_pool), action_counts=action_counts.tolist())
         write(root/'manifest.json', summary)
         summaries.append(summary)
     assert learner.updates == 0
