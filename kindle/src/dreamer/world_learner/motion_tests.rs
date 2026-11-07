@@ -159,6 +159,10 @@ fn predictive_objective_is_explicit_and_legacy_objective_readers_reject_it() {
     }
     for (objective, name) in [
         (
+            PixelLoss::MotionLatentOvershooting,
+            "motion_latent_overshooting",
+        ),
+        (
             PixelLoss::PredictiveMotionEnergy,
             "predictive_motion_energy",
         ),

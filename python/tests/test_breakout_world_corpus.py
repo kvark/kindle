@@ -24,6 +24,16 @@ def test_predictive_reports_keep_observed_indices_and_add_energy_diagnostics(obj
     with pytest.raises(ValueError):corpus.report_names(objective,16)
 
 
+def test_latent_rollout_uses_dynamics_scale_and_distinct_report_names():
+    names=corpus.report_names(corpus.LATENT_OBJECTIVE,16)
+    assert names[:9]==corpus.LOSS_NAMES[:9]
+    assert names[9:]==('latent_overshooting_kl','latent_rollout_valid_fraction')
+    with pytest.raises(ValueError):corpus.report_names(corpus.LATENT_OBJECTIVE,0)
+    scales=dict(reconstruction=100.,dynamics=2.,representation=.1,reward=3.,continuation=4.)
+    values=[0.,1.,2.,3.,4.,5.,0.,0.,0.,6.,.5]
+    assert corpus.reported_total(dict(loss_scales=scales),values,corpus.LATENT_OBJECTIVE,16)==100+2*(2+6)+.1*3+3*4+4*5
+
+
 class PersistenceLearner:
     config = dict(batch_size=2, horizon=333)
     updates = 7

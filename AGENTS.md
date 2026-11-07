@@ -70,6 +70,15 @@ Test-only measurement; retained packages/production graphs are unchanged.
 `closure-review.json` verifies closure. No Kindle worker,learner,collector or
 successor is active/selected. Do not repeat completed stages or old-model runs.
 
+The [latent-overshooting experiment](docs/experiments/2026-11-07-breakout-world-overshooting.md)
+is selected for qualification: retain pixel/motion reconstruction and add16-step
+causal prior-to-detached-posterior KL,without sampled outcome energy or extra
+image decoding. No new parameters,inference inputs or actor/critic.54 CPU world
+and53 affected Python checks pass; native values/derivatives,initial identity
+and restore precede a separately pinned fresh8,192-update learner. Root
+`/mnt/data/kindle-breakout-world-overshooting-20261107`. No GPU job is active yet.
+Preserve initial syntax,F32-reference and scalar-zero-gradient fixture failures.
+
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
 uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
 untouched tests and fresh confirmation. The retained oracle has no above-top-

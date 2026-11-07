@@ -26,6 +26,7 @@ pub enum PixelLoss {
     SquaredError,
     CrossEntropy,
     MotionCrossEntropy,
+    MotionLatentOvershooting,
     PredictiveMotionEnergy,
     PredictiveMotionEnergyScoreFunction,
 }
@@ -35,6 +36,7 @@ impl PixelLoss {
         matches!(
             self,
             Self::MotionCrossEntropy
+                | Self::MotionLatentOvershooting
                 | Self::PredictiveMotionEnergy
                 | Self::PredictiveMotionEnergyScoreFunction
         )
@@ -49,6 +51,10 @@ impl PixelLoss {
 
     pub(crate) fn score_function(self) -> bool {
         self == Self::PredictiveMotionEnergyScoreFunction
+    }
+
+    pub(crate) fn latent_overshooting(self) -> bool {
+        self == Self::MotionLatentOvershooting
     }
 }
 
@@ -250,7 +256,13 @@ impl WorldModelLearner {
         if prediction_length >= config.batch_length {
             return Err("prediction length must leave an observed prefix".into());
         }
-        if pixel_loss.motion_attention() && prediction_length != 0 {
+        if pixel_loss.latent_overshooting() && prediction_length == 0 {
+            return Err("latent overshooting requires a positive prediction length".into());
+        }
+        if pixel_loss.motion_attention()
+            && !pixel_loss.latent_overshooting()
+            && prediction_length != 0
+        {
             return Err("motion pixel attention requires no prior-image objective".into());
         }
         let gpu = Arc::new(crate::init_gpu_context()?);
@@ -262,6 +274,7 @@ impl WorldModelLearner {
             (
                 PixelLoss::CrossEntropy
                 | PixelLoss::MotionCrossEntropy
+                | PixelLoss::MotionLatentOvershooting
                 | PixelLoss::PredictiveMotionEnergy
                 | PixelLoss::PredictiveMotionEnergyScoreFunction,
                 length,
@@ -463,11 +476,18 @@ impl WorldModelLearner {
             }
         }
         for (time, weight) in weights.iter().enumerate() {
-            let uniforms = (0..batch * size.stoch * size.classes)
-                .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
-                .collect::<Vec<_>>();
-            self.train
-                .set_input(&format!("pixel_rollout_uniforms_{time}"), &uniforms);
+            if !self.pixel_loss.latent_overshooting() || time + 1 < weights.len() {
+                let uniforms = (0..batch * size.stoch * size.classes)
+                    .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
+                    .collect::<Vec<_>>();
+                let prefix = if self.pixel_loss.latent_overshooting() {
+                    "latent_rollout"
+                } else {
+                    "pixel_rollout"
+                };
+                self.train
+                    .set_input(&format!("{prefix}_uniforms_{time}"), &uniforms);
+            }
             self.train
                 .set_input(&format!("pixel_rollout_weight_{time}"), weight);
         }
@@ -487,7 +507,7 @@ impl WorldModelLearner {
         if self.prediction_length > 0 {
             let mut loss = [0.0];
             self.train
-                .read_output_by_index(world::LOSS_PIXEL_ROLLOUT, &mut loss);
+                .read_output_by_index(world::LOSS_WORLD_ROLLOUT, &mut loss);
             losses.push(loss[0]);
             losses.push(
                 weights.iter().flatten().sum::<f32>() / (batch * self.prediction_length) as f32,

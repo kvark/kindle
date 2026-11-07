@@ -70,3 +70,18 @@ def test_sampling_rejects_missing_fitting_pools_and_wrong_native_geometry():
     with pytest.raises(ValueError):coverage.coverage_plan(data,{**config,'batch_length':16},2)
     for stream in data:stream['terminal'][:]=False
     with pytest.raises(ValueError):coverage.coverage_plan(data,config,2)
+
+
+def test_latent_suffix_preserves_locations_and_includes_terminal_until_reset():
+    data=streams();config=dict(seed=41001,batch_size=8,batch_length=32)
+    plan,original=coverage.coverage_plan(data,config,64,0)
+    suffix,counts=coverage.coverage_plan(data,config,64,16)
+    np.testing.assert_array_equal(plan,suffix)
+    assert counts['prior_terminal_rows']>0
+    assert {k:v for k,v in counts.items() if k!='prior_terminal_rows'}=={
+        k:v for k,v in original.items() if k!='prior_terminal_rows'}
+    actions=np.zeros((32,2),np.int32);actions[23,1]=-1
+    keep=coverage.corpus.rollout_validity(actions,16)
+    assert keep[:,0].all() and keep[:7,1].all() and not keep[7:,1].any()
+    terminal=np.zeros((32,2),bool);terminal[22,1]=True
+    assert int((terminal[-16:]&keep).sum())==1

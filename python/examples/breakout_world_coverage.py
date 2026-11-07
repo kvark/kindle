@@ -155,8 +155,8 @@ def sampling_pools(streams, length=32):
 
 
 def coverage_plan(streams, config, steps, prediction_length=0):
-    if config['batch_size'] != 8 or config['batch_length'] != 32 or prediction_length != 0:
-        raise ValueError('coverage sampler requires B8/T32/H0')
+    if config['batch_size'] != 8 or config['batch_length'] != 32 or prediction_length not in (0,16):
+        raise ValueError('coverage sampler requires B8/T32/H0 or H16')
     waits,endings = sampling_pools(streams)
     rng = np.random.default_rng(config['seed'] ^ 0x636f766572616765)
     plan = []
@@ -165,7 +165,7 @@ def coverage_plan(streams, config, steps, prediction_length=0):
         new = [(lane+8,start) for lane,start in corpus.sample_locations(streams[8:],32,2,rng)]
         plan.append(old+new+[tuple(waits[rng.integers(len(waits))]),tuple(endings[rng.integers(len(endings))])])
     plan = np.asarray(plan,np.int32)
-    return plan,corpus.plan_counts(streams,config,plan,0)
+    return plan,corpus.plan_counts(streams,config,plan,prediction_length)
 
 
 def main():
@@ -179,7 +179,8 @@ def main():
     parser.add_argument('--development',type=Path)
     parser.add_argument('--initial-reference',type=Path)
     parser.add_argument('--sampling-plan',type=Path)
-    parser.add_argument('--pixel-loss',choices=['motion_cross_entropy',*corpus.PREDICTIVE_OBJECTIVES],default='motion_cross_entropy')
+    parser.add_argument('--pixel-loss',choices=['motion_cross_entropy',corpus.LATENT_OBJECTIVE,*corpus.PREDICTIVE_OBJECTIVES],default='motion_cross_entropy')
+    parser.add_argument('--prediction-length',type=int,choices=(0,16),default=0)
     parser.add_argument('--reference',type=Path)
     parser.add_argument('--ticks',type=int,default=2048)
     parser.add_argument('--steps',type=int,default=8192)
@@ -187,7 +188,7 @@ def main():
     parser.add_argument('--dense-fitting',type=int,default=256)
     parser.add_argument('--dense-development',type=int,default=128)
     args=parser.parse_args()
-    args.prediction_length=0
+    if (args.pixel_loss==corpus.LATENT_OBJECTIVE) != (args.prediction_length==16):parser.error('latent overshooting requires H16; other coverage objectives require H0')
     if min(args.ticks,args.steps,args.eval_every,args.dense_fitting,args.dense_development)<=0:parser.error('positive budgets required')
     if args.mode=='collect' and args.checkpoint is None:parser.error('collection requires actual-initial checkpoint')
     if args.mode=='collect' and args.pixel_loss!='motion_cross_entropy':parser.error('resize-only collection uses the retained actual-initial objective')
@@ -197,8 +198,8 @@ def main():
     args.output.mkdir(parents=True,exist_ok=False)
     config=json.loads(args.config.read_text())
     write(args.output/'declaration.json',dict(mode=args.mode,config=config,source_sha256=sha(__file__),
-        started_unix=time.time(),prediction_length=0,pixel_loss=args.pixel_loss,steps=args.steps,
-        loss_names=corpus.report_names(args.pixel_loss,0),
+        started_unix=time.time(),prediction_length=args.prediction_length,pixel_loss=args.pixel_loss,steps=args.steps,
+        loss_names=corpus.report_names(args.pixel_loss,args.prediction_length),
         data_recipe='4 retained uniform + 2 supplement uniform + 1 supplement waiting + 1 terminal window'))
     if args.mode=='collect':collect(args);return
     development,_=corpus.load_dataset(args.development)
@@ -210,7 +211,7 @@ def main():
     assert not {r['seed'] for r in old_manifest['files']}.intersection(r['seed'] for r in new_manifest['files'])
     dev_manifest=json.loads((args.development/'manifest.json').read_text())
     assert not {r['seed'] for r in old_manifest['files']+new_manifest['files']}.intersection(r['seed'] for r in dev_manifest['files'])
-    plan,counts=coverage_plan(fitting+new,config,args.steps)
+    plan,counts=coverage_plan(fitting+new,config,args.steps,args.prediction_length)
     with np.load(args.sampling_plan,allow_pickle=False) as expected:
         assert np.array_equal(plan,expected['locations']), 'source plan differs from declaration'
     corpus.train(args,config,fitting+new,development,sampler=lambda *_:(plan,counts),initial_reference=args.initial_reference)
