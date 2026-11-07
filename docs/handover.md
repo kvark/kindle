@@ -42,8 +42,7 @@ is not calibrated likelihood. Default MSE/plain BCE remain available.
 
 Implementation and37 CPU world tests (20 GPU tests ignored),61 Python checks and
 strict workspace/bindings Clippy pass. New v2 checkpoints explicitly preserve
-objective; old v1 MSE/BCE restores remain supported. Next package and qualify
-two new workers: native F64 motion-weight/loss/derivatives and full-size
+objective; old v1 MSE/BCE restores remain supported. The two new workers qualify: native F64 motion-weight/loss/derivatives and full-size
 motion-H0 matched-init/update/frozen/v1+v2 restore. Both now pass, with306 pins,
 204 initial/frozen tensors and18 exact restored arrays. Native/source3fa37b6d,
 SHA prefixeafe8359, matching runtime at
