@@ -85,7 +85,7 @@ one bounded training/data change. No successor learner is preselected.
 
 ## Preparation evidence and preserved failure
 
-Eight CPU tests pass: score spread/location, terminal reward/absorption, native
+Nine CPU tests pass: score spread/location, terminal reward/absorption, native
 brick axes/ambiguity, eight-frame resize contract, fixed command plans, origin
 boundaries, snapshot file roundtrip, and absorbing endpoint scoring. The original
 CPU clone fixture reproduces two complete traces exactly and exposes5 unique
@@ -98,6 +98,15 @@ trace pairs exactly; source replay also verified full original ALE state. This
 does not empirically demonstrate a raw-clone defect or relabel the fixture as
 passed. No GPU/emulator construction occurs in the repair review; no fixture is
 rerun. Replay reconstruction is retained as the source-supported correction.
+
+The first CPU collection stops before completing any oracle branch: the forced
+initial NOOP calls teacher feedback without a pending proposal. Preserve its
+original `oracle/` declaration and `collect.log`; no GPU was constructed. The
+corrected source always requests a proposal before overriding/feeding back the
+executed command. The ninth CPU test checks manual commands with the real teacher.
+Declare the bounded corrected collection under `root/repair/oracle`, with separate
+copied sources and pins. No completed source stage is repeated. Source-emulator
+state was not serialized before the original exception; retain this evidence gap.
 
 Later-game/tunnel/second-wall states remain outside this challenge. Passing early
 reconstruction or outperforming controls here does not prove the full world,

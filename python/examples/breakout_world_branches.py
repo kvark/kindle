@@ -231,6 +231,13 @@ def eligible(category, history):
     raise ValueError(category)
 
 
+def source_action(category, history, teacher):
+    proposal = teacher.propose(history[-1]['native_rgb'])
+    if len(history) < HISTORY: return 0
+    if category in ['life_loss', 'ending']: return 12
+    return int(proposal)
+
+
 def collect(output, repeats, source_ticks):
     from kindle._breakout_guidance import FeedbackPixelPolicy
     import ale_py
@@ -256,7 +263,7 @@ def collect(output, repeats, source_ticks):
                     if eligible(category, history):
                         snaps[lane] = Snapshot.capture(env)
                         continue
-                    command = 0 if len(history) < HISTORY else (12 if category in ['life_loss', 'ending'] else teachers[lane].propose(history[-1]['native_rgb']))
+                    command = source_action(category, history, teachers[lane])
                     before = env.executed_action_frames
                     frame, reward, terminal, truncated, _ = env.step(int(command))
                     source_actions += 1; source_frames += env.executed_action_frames-before

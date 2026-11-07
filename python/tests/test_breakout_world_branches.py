@@ -72,6 +72,17 @@ def test_origin_selection_rejects_short_history_life_boundary_and_terminal():
     assert not branches.eligible('contact', history)
 
 
+def test_manual_source_commands_still_have_real_teacher_proposal_feedback():
+    from kindle._breakout_guidance import FeedbackPixelPolicy
+    teacher = FeedbackPixelPolicy()
+    history = [dict(native_rgb=np.zeros((210, 160, 3), np.uint8))]
+    for category, length, expected in [('serve', 1, 0), ('life_loss', 32, 12), ('ending', 32, 12)]:
+        command = branches.source_action(category, history*length, teacher)
+        assert command == expected
+        teacher.feedback(command)
+        assert teacher.pending is None
+
+
 def test_snapshot_disk_roundtrip_keeps_bytes_frames_ram_and_counters(tmp_path):
     snap = branches.Snapshot(b'full', b'game', [np.zeros((2, 3, 3), np.uint8)]*2,
                              [dict(type='fixture', fields={'_elapsed_steps': 7})], np.arange(128, dtype=np.uint8))
