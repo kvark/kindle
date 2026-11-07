@@ -47,9 +47,9 @@ phase repeats; future runners explicitly compare18 arrays. The preceding broad
 run compared16, and that documentation count is corrected.
 
 The fixed8,192-update same-data/init/sampler comparison and frozen restore are
-selected after review, not launched at this publication. Root
+active after review, with final frozen restore declared in the same queue. Root
 `/mnt/data/kindle-breakout-world-bce-20261107`, native build535de479/SHA adfc2f9e.
-Declare a separate queue and pin execution-runner changes independently. The
+Execution878f66be retains unchanged native build535de479; training-protocol pins306 inputs. Initial tensors/sampler/origins match, and first128 updates are finite. The
 analytical weak-gradient candidate motivates this test, not a cause/BCE-benefit
 claim; objective units and relative KL weights change. No extension, new corpus,
 capacity increase or actor/critic resume. Untouched test, prospective branches,

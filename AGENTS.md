@@ -69,10 +69,12 @@ tensors and the finite full-size update. No GPU phase repeats. Future runners
 explicitly compare all18 arrays. The earlier broad-run restore compared16;
 its documentation count is corrected, with original evidence unchanged.
 
-The fixed8,192-update same-data/init/sampler comparison and final frozen restore
-are selected after this review; no GPU job is active at publication. Declare
-its separate two-stage queue, pin current execution source/runner versus native
-build535de479, retain exact initial/sampling checks and stop at the fixed budget.
+The fixed8,192-update same-data/init/sampler comparison is now active, with its
+final frozen restore declared in the same two-stage queue. Execution source
+878f66be uses unchanged native build535de479. Root training-protocol.json pins306
+inputs. Initial204 tensors, sampler and evaluation origins match the control;
+first128 updates are finite. Session74984 owns the queue; learner PID1597257
+was confirmed live. Stop after the fixed budget; no automatic successor.
 At true ball pixels, sigmoid-MSE output gradients are about2,500× weaker; this
 motivates the experiment without proving the cause or BCE benefit. No new data,
 capacity increase, completed-stage repeat or actor/critic resume. Untouched

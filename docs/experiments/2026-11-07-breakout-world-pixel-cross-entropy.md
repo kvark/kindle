@@ -109,6 +109,8 @@ The runner now explicitly checks/reports all18 arrays for future restores.
 The fixed8,192-update comparison is selected after that CPU review. Pin the
 current execution runner/source separately from native build535de479, whose
 Rust/Python-library code is unchanged. Reuse the original data/config. No
-learner is launched at this publication. Declare the two-stage learner/restore
-queue externally before execution, retain actual-initial and sampling assertions,
-and stop after its fixed budget. A qualification failure is not a learning win.
+automatic successor is selected. The two-stage learner/restore queue is now
+active under execution878f66be, with306 pinned inputs and unchanged native
+build535de479. Initial tensors, sampler and origins match the control; first128
+updates are finite. Retain actual-initial/sampling assertions and stop after the
+fixed budget. A qualification failure is not a learning win.
