@@ -17,7 +17,10 @@ def metadata():
 @pytest.mark.parametrize('version',[f'kindle-world-only-v{i}' for i in range(1,6)])
 def test_fixed_teacher_cannot_hide_in_older_format(tmp_path,version):
     m=metadata();m['format']=version;(tmp_path/'metadata.json').write_text(json.dumps(m))
-    with pytest.raises(RuntimeError,match='requires world-only checkpoint format v6'):
+    message = {'kindle-world-only-v4':'invalid latent-only RGB checkpoint architecture',
+               'kindle-world-only-v5':'invalid previous-frame RGB checkpoint architecture'}.get(version,
+                   'requires world-only checkpoint format v6')
+    with pytest.raises(RuntimeError,match=message):
         kindle.WorldModelLearner.restore(str(tmp_path))
 
 
