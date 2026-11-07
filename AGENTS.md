@@ -138,20 +138,25 @@ Deduplicated all-detected28/31 images have59.29%/57.76% empirical mean-error sha
 component meets2/3 dominance: triage mixed. Missing/deduplicated/outcome-selected
 support remains explicit; no isolated encoder/sampling cause or world competence.
 
-The [strided/lower-mixing recipe](docs/experiments/2026-11-07-breakout-world-code-stride.md)
-is composition-qualified; its separately declared fresh8192 learner/restore are
-active in `kindle-world-code-stride-learning-20261107`. Observation-only code,
-existing `rgb_stride2=true`,unimix.001; two changes combined,no isolated cause or
-benefit established. Earlier whole-agent failures stay closed/negative.
+The [strided/lower-mixing recipe](docs/results/2026-11-07-breakout-world-code-stride.md)
+is closed and fails retention. Fresh8192 updates improve observed76/112,
+one-step28/109,eight-step15/107 over previous code65/112,25/109,9/107,but all
+three gates fail. Primary energy.223651 is8.64% worse than previous code and
+31.95% worse than retained H0. Freeflight detections29/41/46/45 of64 each fail;
+ending16/32 Brier.037389/.114732 and RIGHT16.136519 fail. Non-ending category-mean
+gate passes,but50/304 individual cases exceed5%,max13.99%. Keep coverage.
 
-Root `/mnt/data/kindle-breakout-world-code-stride-20261107`; unchanged native780f00a8/
-SHAe6ca7ca4,runner68e9bbb7,no rebuild. Encoder prefix exactly matches qualified
-22c262ea. First composition qualification137 pins/18.789s passes198 prior-matched
-actual initial tensors,18 initial/trained restored arrays,finite update,inference
-invariance and34-parameter h separation. Old primitive/legacy checks are reused,
-not rerun. Learning175 pins retains original data/full plan/loss/seed/counts,
-matched256/128 dense initial/final and all world gates. Final-only branches remain
-unallocated until learning review; no collector,actor/critic or automatic successor.
+Root `/mnt/data/kindle-breakout-world-code-stride-20261107`; reused native780f00a8/
+SHAe6ca7ca4,runner68e9bbb7,no rebuild. Existing stride2/unimix.001 change together;
+observation-only/H16 loss/data/seed/counts remain. Earlier whole-agent failures
+stay negative/closed. Composition137/learning175/branches1130 pins,8192 finite
+reports,all66 changed parameters,198 prior-matched initial/frozen tensors,
+18 restored arrays,384 dense-initial origins and four guards pass. Native calls
+489.334s (12.25% less than previous code),loop622.496s,observed guard span640.489s
+includes constructor/dense-initial/pins/polling; frozen branches128.003s outside.
+No native stage failure/retry; existing primitive/legacy tests reused. All services
+terminal; no GPU allocation,extension,sweep or automatic successor selected.
+Full world-model competence remains unproven; no actor/critic or collector.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched

@@ -77,5 +77,9 @@ tensors matching the prior observation-code initial checkpoint,18 initial/traine
 restore arrays,finite11-report update,63 changed parameters across expected
 families,198 frozen tensors and34 invariant visual parameters/exact h separation.
 Legacy qualification and existing primitive evidence are reused without repetition.
-A separately declared175-pin fresh8192 learner/restore is active. Original source
-plan/exposures and all gates remain; final-only branches await learning review.
+The separately declared175-pin fresh8192 learner/restore and1130-pin84-group
+new-final assessment are complete. All execution checks pass; quality fails
+retention. Native calls489.334s,loop622.496s,observed worker guard span640.489s;
+branches128.003s. See the [closed result](../results/2026-11-07-breakout-world-code-stride.md)
+for every unchanged gate and timing scope. Keep coverage; no extension,repeat,
+sweep or automatic successor. No GPU allocation remains active.
