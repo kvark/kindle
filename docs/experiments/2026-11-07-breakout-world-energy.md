@@ -154,3 +154,28 @@ energy/total/mask identities. No numerical/GPU fault or host recovery.
 only,89 input pins,source/native as above. All exact budgets/settings/counts in
 the preceding section apply. Training is active; frozen oracle evaluation has
 not yet been declared. No collector,old-model rerun or automatic successor.
+
+
+## Learner reviewed; frozen evaluation declared
+
+All8,192 finite13-report rows,89 learning pins,exact original204 initial tensors/
+18 development arrays,68 changed parameters,204 invariant final tensors and18
+restore arrays pass; both guards/sealed audits pass. Native987.968s,loop1,338.229s.
+Dense observed ball109/112 versus108/112,one-step81/109 versus94/109,eight-step
+4/107 versus14/107. Brick balanced error.207707 versus.223954. No blanket promotion.
+
+A separate exact CPU three-bin audit finds a coordinate-ST gradient limitation:
+for reward support[-1,0,1],probabilities[.25,.5,.25],target0,expected ST gradient
+is zero while the true score gradient is[.0624063,-.1248126,.0624063]. Finite
+differences verify it. This is a conditional-head counterexample,not a causal
+explanation of the full learner's regression. An unimplemented score-function
+estimator matches the exact conditional gradient in two CPU fixtures; no new
+native path or learner is selected.
+
+`branch-protocol.json` separately declares only this final checkpoint's frozen
+history16/32,eight-draw,84-group comparison,648 pins. No recollection,old-model
+rerun or learning. The original25% energy-reduction gate is unchanged; a CPU
+oracle feasibility check gives baseline.169502219,threshold.127126664 and exact
+finite-oracle minimum.004211016. This is not a population calibration bound.
+A separate RAM-reference detector audit confirms no above-top-brick endpoints
+and some finite-coordinate balls outside detector support. Preserve these limits.

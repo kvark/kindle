@@ -84,13 +84,20 @@ pass,77 input pins,two clean guards/sealed audits,204 initial/frozen tensors,
 18 initial/restore arrays and65 expected first-update changes. Old observed
 components match; no GPU fault/recovery. No completed qualification repeats.
 
-Qualification reviewed; one fresh matched-init8,192-update comparison on the
-exact coverage data/plan is active under the host guard,followed only by its
-restore check.89 learning input pins; seed41001 reused,not fresh confirmation.
-No collector or actor/critic. Do not start another job or mistake an observer
-timeout for a stopped worker. Review learning before separately declaring this
-checkpoint's frozen oracle comparison. Full goal,untouched tests,late-game/
-second-wall coverage,brick memory and fresh confirmation stay unfinished.
+The fixed fresh matched-init8,192-update learner and restore are closed.
+89 learning pins,all68 parameters changed,8,192 finite13-report rows,204 initial/
+frozen tensors,18 exact initial-development/restore arrays and both sealed guards
+pass. Native987.968s/loop1,338.229s,versus529.515/796.900s coverage. Dense observed
+ball109/112 versus108/112;one-step81/109 versus94/109,eight-step4/107 versus14/107.
+Brick balanced error.207707 improves.223954. No blanket promotion.
+
+Learning reviewed; only this final checkpoint's frozen oracle evaluation is
+active: history16/32,eight draws,84 groups,648 input pins. No learning,collector
+or old-model rerun. Do not start another GPU job or mistake an observer timeout
+for a stopped worker. A CPU three-bin counterexample verifies that sampled
+head-coordinate ST gradients can miss variance correction; it does not attribute
+this full learner's regression. Full goal,untouched tests,late-game/second-wall
+coverage,brick memory and fresh confirmation stay unfinished.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
