@@ -29,16 +29,18 @@ def config_f32(value):
     return value
 
 
-def assert_phase(learner, metadata):
+def assert_phase(learner, metadata, pixel_loss=corpus.FIXED_TEACHER_OBJECTIVE):
     # Getters serialize F32 directly; checkpoint JSON first stores it as F64.
     assert config_f32(learner.config) == config_f32(metadata['config'])
     assert learner.phase_start_updates == metadata['updates']
     assert learner.updates >= learner.phase_start_updates
     assert learner.training_scope == 'fixed_teacher'
-    assert learner.prediction_length == 16 and learner.pixel_loss == corpus.FIXED_TEACHER_OBJECTIVE
+    assert learner.prediction_length == 16 and learner.pixel_loss == pixel_loss
 
 
-def main():
+def main(*, pixel_loss=corpus.FIXED_TEACHER_OBJECTIVE):
+    factory = {corpus.FIXED_TEACHER_OBJECTIVE: 'start_fixed_teacher_phase',
+               corpus.FIXED_IMAGE_OBJECTIVE: 'start_fixed_teacher_image_phase'}[pixel_loss]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['train', 'restore-check'])
     for name in ['output', 'development', 'source-checkpoint']:
@@ -60,7 +62,7 @@ def main():
     if source['updates'] != 8192 or source['prediction_length'] != 0 or source['pixel_loss'] != 'motion_cross_entropy':
         parser.error('this experiment inherits the retained experienced H0 motion world')
     config = source['config']
-    args.prediction_length, args.pixel_loss = 16, corpus.FIXED_TEACHER_OBJECTIVE
+    args.prediction_length, args.pixel_loss = 16, pixel_loss
     args.dense_initial = True
     development, dev_manifest = corpus.load_dataset(args.development)
     args.output.mkdir(parents=True, exist_ok=False)
@@ -71,7 +73,7 @@ def main():
     import kindle
     if args.mode == 'restore-check':
         learner = kindle.WorldModelLearner.restore(str(args.checkpoint))
-        assert_phase(learner, source)
+        assert_phase(learner, source, pixel_loss)
         corpus.restore_check(args, config, development, learner=learner)
         return
     fitting, original, extra = load_fitting(args.dataset, args.supplement)
@@ -83,8 +85,8 @@ def main():
     plan, counts = coverage.coverage_plan(fitting, config, args.steps, 16)
     with np.load(args.sampling_plan, allow_pickle=False) as declared:
         np.testing.assert_array_equal(plan, declared['locations'])
-    learner = kindle.WorldModelLearner.start_fixed_teacher_phase(str(args.source_checkpoint))
-    assert_phase(learner, source)
+    learner = getattr(kindle.WorldModelLearner, factory)(str(args.source_checkpoint))
+    assert_phase(learner, source, pixel_loss)
     assert learner.updates == source['updates']
     corpus.train(args, config, fitting, development, sampler=lambda *_: (plan, counts), learner=learner,
                  initial_checkpoint=args.source_checkpoint)

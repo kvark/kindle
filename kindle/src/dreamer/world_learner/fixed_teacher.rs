@@ -63,6 +63,19 @@ pub(super) fn sampling_seeds(seed: u64, age: u64, batch: usize) -> Vec<u64> {
 
 impl WorldModelLearner {
     pub fn start_fixed_teacher_phase(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::start_fixed_teacher_with_loss(path, PixelLoss::MotionFixedTeacher)
+    }
+
+    pub fn start_fixed_teacher_image_phase(
+        path: &Path,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::start_fixed_teacher_with_loss(path, PixelLoss::MotionFixedTeacherImage)
+    }
+
+    fn start_fixed_teacher_with_loss(
+        path: &Path,
+        objective: PixelLoss,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
         let metadata: serde_json::Value =
             serde_json::from_slice(&std::fs::read(path.join("metadata.json"))?)?;
         let loss = checkpoint_pixel_loss(&metadata)?;
@@ -88,8 +101,7 @@ impl WorldModelLearner {
         }
         let config = serde_json::from_value(metadata["config"].clone())?;
         let anchor = TeacherAnchor::new(path.join("world.safetensors"))?;
-        let mut learner =
-            Self::with_pixel_loss_inner(config, 16, PixelLoss::MotionFixedTeacher, Some(anchor))?;
+        let mut learner = Self::with_pixel_loss_inner(config, 16, objective, Some(anchor))?;
         learner.load_training_checkpoint(path, age)?;
         learner.training_scope = TrainingScope::FixedTeacher { start_updates: age };
         Ok(learner)
@@ -352,5 +364,84 @@ mod phase_tests {
                 .iter()
                 .any(|n| n.starts_with("world.dynamics.prior"))
         );
+    }
+    #[test]
+    fn image_phase_requires_v7_and_an_explicit_source_before_gpu() {
+        let mut m = metadata();
+        m["format"] = json!("kindle-world-only-v7");
+        m["pixel_loss"] = json!("motion_fixed_teacher_image");
+        assert_eq!(
+            checkpoint_pixel_loss(&m).unwrap(),
+            PixelLoss::MotionFixedTeacherImage
+        );
+        assert_eq!(
+            TrainingScope::from_metadata(&m, PixelLoss::MotionFixedTeacherImage, 16, 12288)
+                .unwrap(),
+            TrainingScope::FixedTeacher {
+                start_updates: 8192
+            }
+        );
+        for version in 1..=6 {
+            let mut bad = m.clone();
+            bad["format"] = json!(format!("kindle-world-only-v{version}"));
+            assert!(checkpoint_pixel_loss(&bad).is_err());
+        }
+        m["pixel_loss"] = json!("motion_fixed_teacher");
+        assert!(checkpoint_pixel_loss(&m).is_err());
+        assert!(
+            matches!(WorldModelLearner::with_pixel_loss(config(),16,PixelLoss::MotionFixedTeacherImage),
+            Err(e) if e.to_string().contains("explicit source phase"))
+        );
+    }
+
+    #[test]
+    fn image_phase_inputs_are_unique_and_only_use_pixel_rollout_samples() {
+        let c = config();
+        let g = world::build_world_only_pixel_training_graph(
+            &c,
+            16,
+            PixelLoss::MotionFixedTeacherImage,
+        );
+        let old =
+            world::build_world_only_pixel_training_graph(&c, 16, PixelLoss::MotionCrossEntropy);
+        let inputs = g
+            .nodes()
+            .iter()
+            .filter_map(|n| match &n.op {
+                Op::Input { name } => Some(name.as_str()),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        let unique = inputs
+            .iter()
+            .copied()
+            .collect::<std::collections::HashSet<_>>();
+        assert_eq!(inputs.len(), unique.len());
+        for t in 0..32 {
+            assert!(unique.contains(format!("fixed_teacher_deter_{t}").as_str()));
+            assert!(unique.contains(format!("fixed_teacher_stoch_{t}").as_str()));
+            assert!(!unique.contains(format!("uniforms_{t}").as_str()));
+        }
+        for t in 0..16 {
+            assert!(unique.contains(format!("pixel_rollout_weight_{t}").as_str()));
+            assert!(unique.contains(format!("pixel_rollout_uniforms_{t}").as_str()));
+        }
+        assert!(inputs.iter().all(|n| !n.starts_with("recurrent_")
+            && !n.starts_with("latent_rollout_")
+            && !n.starts_with("fixed_teacher_recurrent_")));
+        let (plan, _) = meganeura::compile_training_graph(&g);
+        let (reference, _) = meganeura::compile_training_graph(&old);
+        let geometry = |p: &meganeura::compile::ExecutionPlan| {
+            p.param_buffers
+                .iter()
+                .map(|(n, b)| (n.clone(), p.param_types[b].clone()))
+                .collect::<std::collections::BTreeMap<_, _>>()
+        };
+        assert_eq!(geometry(&plan), geometry(&reference));
+        assert_eq!(plan.param_buffers.len(), 68);
+        assert_eq!(g.outputs().len(), world::LOSS_WORLD_ROLLOUT + 3);
+        assert!(PixelLoss::MotionFixedTeacherImage.motion_attention());
+        assert!(!PixelLoss::MotionFixedTeacherImage.latent_overshooting());
+        assert!(!PixelLoss::MotionFixedTeacherImage.recurrent_energy());
     }
 }

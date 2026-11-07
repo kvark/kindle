@@ -26,28 +26,22 @@ CNN/categorical RSSM/RGB decoder as the inspectable reference; CDP is a later
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-The [fixed observation-filter phase](docs/results/2026-11-07-breakout-world-fixed-teacher.md)
-is closed and fails retention. Frozen independent H0 filter plus separately
-learned forecast dynamics improve recorded dev one/eight94/109→98/109 and
-14/107→17/107; observed108/112 stays exact. Primary16/32 ball energy improves
-16.58%(.169502→.141405),misses25% threshold. RIGHT freeflight8 presence48/64
-and ending32 Brier.334714 fail; early ending16 improves. Keep coverage.
-No repeat,extension,sweep or automatic successor; full goal remains unproven.
+Select the [fixed-filter direct RGB phase](docs/experiments/2026-11-07-breakout-world-fixed-image.md)
+for native qualification,then a separately declared4096-update warm check.
+Keep the complete H0 observation filter and36 visual weights fixed; learn32
+forecast/head weights with existing H16 motion RGB loss through the fixed decoder.
+This replaces latent KL/h-energy suffix supervision; it is a new objective,
+not an extension of a completed phase. Root
+`/mnt/data/kindle-breakout-world-fixed-image-20261107`. v7 objective explicit,
+old defaults/architectures unchanged. No new data,labels,actor/critic or backend
+primitive.85 affected world CPU checks and strict Clippy pass; packaging/native
+qualification remain pending. No GPU allocation or full learner is declared yet.
 
-Root `/mnt/data/kindle-breakout-world-fixed-targets-20261107`; native/source/runner
-8c6fbae2,SHA b40c9d2b. New4096 warm updates8192→12288,original first4096 plan rows,
-384 dense-initial origins;36 visual weights and full filter fixed,32 active weights
-changed.112 CPU/88 Python checks,strict Clippy,484 qualification/491 learning/
-920 branch pins,18 restore arrays,four successful guards/36 sealed files and
-2465-pin closure pass. Original two failed qualifiers and separate CPU/report
-corrections stay preserved. No native worker remains active.
-
-New native388.861s/loop459.954s plus inherited529.515s/796.900s;482.530s observed
-worker span includes construction/dense-initial/pinning/polling; frozen84 groups
-135.799s outside learning timers. Extra filter6,203,136 scalar copies/session
-35,799,168 bytes(not peak or exact total-system increment),plus106,261,452-byte
-anchor. The834,940,974-byte cache is released; wheels/runtimes/checkpoints retained.
-Detailed gates,per-action regressions,cost limits and causal clips are linked.
+The [preceding fixed-target phase](docs/results/2026-11-07-breakout-world-fixed-teacher.md)
+remains closed/failed:one98/109,eight17/107,energy.141405(16.58% gain),RIGHT
+presence48/64,ending32 Brier.334714. The earlier fixed-visual RGB phase reaches
+24/107 at eight but allows changing recurrent observation conditioning. Neither
+is repeated. All original failures/repairs and checkpoints remain preserved.
 
 Retain the [coverage H0 control](docs/results/2026-11-07-breakout-world-coverage.md):
 observed108/112,one94/109,eight14/107. Source/native3fa37b6d,SHAeafe8359,

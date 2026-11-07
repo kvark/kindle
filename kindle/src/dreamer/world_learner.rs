@@ -42,6 +42,7 @@ pub enum PixelLoss {
     MotionLatentOvershooting,
     MotionRecurrentEnergy,
     MotionFixedTeacher,
+    MotionFixedTeacherImage,
     PredictiveMotionEnergy,
     PredictiveMotionEnergyScoreFunction,
 }
@@ -54,6 +55,7 @@ impl PixelLoss {
                 | Self::MotionLatentOvershooting
                 | Self::MotionRecurrentEnergy
                 | Self::MotionFixedTeacher
+                | Self::MotionFixedTeacherImage
                 | Self::PredictiveMotionEnergy
                 | Self::PredictiveMotionEnergyScoreFunction
         )
@@ -82,7 +84,10 @@ impl PixelLoss {
     }
 
     pub(crate) fn fixed_teacher(self) -> bool {
-        self == Self::MotionFixedTeacher
+        matches!(
+            self,
+            Self::MotionFixedTeacher | Self::MotionFixedTeacherImage
+        )
     }
 }
 
@@ -108,6 +113,10 @@ fn checkpoint_pixel_loss(
         return Err("invalid latent-only RGB checkpoint architecture".into());
     }
     let fixed_teacher = metadata["pixel_loss"] == "motion_fixed_teacher";
+    let fixed_image = metadata["pixel_loss"] == "motion_fixed_teacher_image";
+    if fixed_image && metadata["format"] != "kindle-world-only-v7" {
+        return Err("fixed teacher image requires world-only checkpoint format v7".into());
+    }
     if fixed_teacher && metadata["format"] != "kindle-world-only-v6" {
         return Err("fixed teacher requires world-only checkpoint format v6".into());
     }
@@ -115,6 +124,11 @@ fn checkpoint_pixel_loss(
         && (!fixed_teacher || latent_only || previous_frame)
     {
         return Err("invalid fixed-teacher checkpoint architecture".into());
+    }
+    if metadata["format"] == "kindle-world-only-v7"
+        && (!fixed_image || latent_only || previous_frame)
+    {
+        return Err("invalid fixed-teacher image checkpoint architecture".into());
     }
     match metadata["format"].as_str() {
         Some("kindle-world-only-v1") => Ok(metadata
@@ -127,7 +141,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v3"
             | "kindle-world-only-v4"
             | "kindle-world-only-v5"
-            | "kindle-world-only-v6",
+            | "kindle-world-only-v6"
+            | "kindle-world-only-v7",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -376,6 +391,7 @@ impl WorldModelLearner {
                 | PixelLoss::MotionLatentOvershooting
                 | PixelLoss::MotionRecurrentEnergy
                 | PixelLoss::MotionFixedTeacher
+                | PixelLoss::MotionFixedTeacherImage
                 | PixelLoss::PredictiveMotionEnergy
                 | PixelLoss::PredictiveMotionEnergyScoreFunction,
                 length,
@@ -658,7 +674,7 @@ impl WorldModelLearner {
             }
             self.train
                 .set_input(&format!("pixel_rollout_weight_{time}"), weight);
-            if self.pixel_loss.fixed_teacher() {
+            if self.pixel_loss == PixelLoss::MotionFixedTeacher {
                 self.train
                     .set_input(&format!("fixed_teacher_recurrent_weight_{time}"), weight);
             }
@@ -677,7 +693,7 @@ impl WorldModelLearner {
             self.train
                 .read_output_by_index(index, std::slice::from_mut(loss));
         }
-        if self.pixel_loss.fixed_teacher() {
+        if self.pixel_loss == PixelLoss::MotionFixedTeacher {
             let mut value = [0.0];
             self.train
                 .read_output_by_index(world::LOSS_WORLD_ROLLOUT, &mut value);
@@ -910,7 +926,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.rgb_previous_frame {
+        let format = if self.pixel_loss == PixelLoss::MotionFixedTeacherImage {
+            "kindle-world-only-v7"
+        } else if self.config.rgb_previous_frame {
             assert_eq!(self.training_scope, TrainingScope::All);
             "kindle-world-only-v5"
         } else if self.config.rgb_latent_only {

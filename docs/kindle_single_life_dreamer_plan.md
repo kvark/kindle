@@ -2,6 +2,16 @@
 
 ## Selected direction: Breakout world model in isolation
 
+The [fixed-filter direct RGB phase](experiments/2026-11-07-breakout-world-fixed-image.md)
+is selected for native qualification before a separately declared4096-update
+warm check. It combines the qualified immutable full H0 filter with existing
+H16 motion RGB supervision through the fixed decoder,instead of latent KL/h
+energy. This combination has not been tested by either closed phase. Same data,
+H0 source8192,32 active/36 fixed weights,plan and unchanged gates; explicit v7.
+85 world CPU checks/Clippy pass; package/native qualification pending. No GPU
+allocation/full learner declared. Root
+`/mnt/data/kindle-breakout-world-fixed-image-20261107`; full goal unproven.
+
 The [fixed observation-filter phase](results/2026-11-07-breakout-world-fixed-teacher.md)
 is closed and fails retention. Warm4096 updates8192→12288 with an independent
 fixed H0 filter,36 fixed visual weights and32 learned forecast/head weights

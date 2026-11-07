@@ -117,6 +117,7 @@ mod tests {
             PixelLoss::SquaredError,
             PixelLoss::CrossEntropy,
             PixelLoss::MotionCrossEntropy,
+            PixelLoss::MotionFixedTeacherImage,
         ] {
             let mut config = DreamerConfig::tiny(3);
             config.observation_kind = ObservationKind::Rgb64;

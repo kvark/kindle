@@ -101,13 +101,13 @@ impl TrainingScope {
                     start_updates: start,
                 })
             }
-            Some("kindle-world-only-v6") => {
+            Some("kindle-world-only-v6" | "kindle-world-only-v7") => {
                 let start = metadata["phase_start_updates"]
                     .as_u64()
                     .filter(|&value| value > 0 && value <= updates)
                     .ok_or("invalid fixed-teacher phase start")?;
                 if metadata["training_scope"] != "fixed_teacher"
-                    || pixel_loss != PixelLoss::MotionFixedTeacher
+                    || !pixel_loss.fixed_teacher()
                     || prediction_length != 16
                     || metadata["teacher_sha256"]
                         .as_str()
