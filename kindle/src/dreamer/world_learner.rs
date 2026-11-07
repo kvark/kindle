@@ -15,6 +15,8 @@ use super::{
 use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 
 #[cfg(test)]
+mod gradient_diagnostic;
+#[cfg(test)]
 mod motion_tests;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

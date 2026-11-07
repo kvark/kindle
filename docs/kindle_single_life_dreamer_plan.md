@@ -68,10 +68,12 @@ head. Their generalization failure does not prove information absent. Eight
 feature-input and30 action/source pins,63 fixed ridge coefficient/prediction
 files remain in root/readout-diagnosis. No readout enters model training.
 
-No Kindle GPU job or successor is active/selected. The next focused question is
-actual gradient noise/loss/optimizer interference at a common frozen checkpoint,
-before another recipe,larger architecture or longer budget. Separately declare
-that diagnostic; no automatic learner,collector,old-model rerun or actor/critic.
+The [fixed-weight gradient diagnostic](experiments/2026-11-07-breakout-world-gradient-noise.md)
+is selected: three fixed fitting batches at the coverage checkpoint,observed
+control plus16 paired predictive draws,108 raw forward/backward steps with no
+optimizer or model update. Compare noise,loss alignment and CPU AGC/LaProp
+sensitivity before another learner. Root `/mnt/data/kindle-breakout-world-gradient-noise-20261107`.
+CPU checks precede one900s guarded worker; no learner,collector or actor/critic.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
 uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
