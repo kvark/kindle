@@ -146,19 +146,25 @@ No native stage failure/retry; existing primitive/legacy tests reused. All servi
 terminal; no GPU allocation,extension,sweep or automatic successor selected.
 Full world-model competence remains unproven; no actor/critic or collector.
 
-The [four-step image-rollout experiment](experiments/2026-11-07-breakout-world-short-rollout.md)
-is composition-qualified; its separately declared147-pin fresh8192 learner and
-restore are active in `kindle-world-short-rollout-learning-20261107`. Retain the
-recurrent-conditioned architecture,RGB64/12M/B8/T32/Auto,mixing.01,seed/data/full
-plan; shorten direct motion image supervision H16→4. Native85dbe150/SHA5b112866
-is reused without rebuild. CPU preparation matches all8192 locations/non-suffix
-exposures; four-step suffix256,201 valid rows/2,382 terminals. All36 Python checks
-pass. First qualification139 pins/15.354s passes204 exact initial tensors,18
-initial predictions,18 initial/trained restore arrays,65 changed parameters,
-finite11-report/mask/total and204 frozen tensors. Existing primitive/legacy
-qualification is reused. Root `/mnt/data/kindle-breakout-world-short-rollout-20261107`;
-all world gates remain; final-only branches await learning review. Previous
-negative experiments stay closed; no collector or automatic successor.
+The [four-step image-rollout experiment](results/2026-11-07-breakout-world-short-rollout.md)
+is closed and fails retention. Fresh8192 updates give observed91/112,one73/109,
+eight5/107 versus H0 108/112,94/109,14/107 and H16 99/112,84/109,25/107.
+All three dense gates fail. Primary16/32 energy0.646172; unchanged threshold.127127.
+Ending16/32 Brier0.000002/0.494911;
+RIGHT160.002054. Full unchanged gates/actions and
+regressions remain in the linked result. Keep coverage; no extension or repeat.
+
+Root `/mnt/data/kindle-breakout-world-short-rollout-20261107`; reused native85dbe150/
+SHA5b112866,runner606720ca,no rebuild. Same recurrent-conditioned architecture,
+RGB64/12M/B8/T32/Auto,mixing.01,data/seed/full plan; direct image H16→4 also changes
+prefix/suffix/exposures/RNG. No isolated cause. CPU36 pass; composition139 pins/
+15.354s,learning147/branches918 pins,8192 finite reports,all68 changed parameters,
+204 exact initial/frozen tensors,384 matched dense-initial origins,18 restored
+arrays and four guards pass. Native calls579.490s,loop
+728.258s excludes dense-initial; observed guard span742.800s
+includes constructor/dense-initial/pins/polling. Frozen branches166.754s outside.
+All services terminal; no GPU allocation,collector or automatic successor selected.
+World-model goal remains unproven; previous negative experiments remain closed.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched

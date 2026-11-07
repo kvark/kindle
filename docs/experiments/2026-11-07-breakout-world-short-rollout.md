@@ -89,4 +89,7 @@ First139-pin composition preflight completes in15.354s:204 exact initial
 weights/moments,18 original initial arrays,18 initial/trained restore arrays,
 65 changed parameters,finite11-report/mask/total and204 frozen tensors pass.
 No primitive/legacy fixture repeats or stage failure. A separately declared147-pin
-fresh8192 learner/restore is active; final-only branches await reviewed completion.
+fresh8192 learner/restore and separately declared918-pin84-group final assessment
+are complete. All execution checks pass; learned quality fails retention. See the
+[closed result](../results/2026-11-07-breakout-world-short-rollout.md). Keep coverage;
+no extension,repeat or automatic successor. No GPU allocation remains active.
