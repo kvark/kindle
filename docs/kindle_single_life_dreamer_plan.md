@@ -8,8 +8,12 @@ warm check. It combines the qualified immutable full H0 filter with existing
 H16 motion RGB supervision through the fixed decoder,instead of latent KL/h
 energy. This combination has not been tested by either closed phase. Same data,
 H0 source8192,32 active/36 fixed weights,plan and unchanged gates; explicit v7.
-85 world CPU checks/Clippy pass; package/native qualification pending. No GPU
-allocation/full learner declared. Root
+85 world CPU/97 packaged Python/Clippy checks pass. First native qualifier462
+pins/19.872s passes204 inherited tensors,18 initial/trained restored arrays,two
+finite11-report updates,32 active changed/36 visual fixed weights,exact filter/
+targets and v7 rejection; unchanged primitive/prefix/lane receipts are reused.
+Native/source/runner b4d4f8f2,SHA9402c44d. Separately declared4096 warm updates
+8192→12288 and final restore are active under the AMD host guard. Root
 `/mnt/data/kindle-breakout-world-fixed-image-20261107`; full goal unproven.
 
 The [fixed observation-filter phase](results/2026-11-07-breakout-world-fixed-teacher.md)

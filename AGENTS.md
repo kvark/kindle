@@ -34,8 +34,13 @@ This replaces latent KL/h-energy suffix supervision; it is a new objective,
 not an extension of a completed phase. Root
 `/mnt/data/kindle-breakout-world-fixed-image-20261107`. v7 objective explicit,
 old defaults/architectures unchanged. No new data,labels,actor/critic or backend
-primitive.85 affected world CPU checks and strict Clippy pass; packaging/native
-qualification remain pending. No GPU allocation or full learner is declared yet.
+primitive.85 world CPU/97 packaged Python checks and strict core/binding Clippy pass.
+First native qualification462 pins/19.872s passes204 inherited tensors,18 initial/
+trained restore arrays,two finite11-report updates,32 active changed/36 visual
+fixed weights,exact filter/targets across updates/restore and v7 legacy rejection.
+Unchanged prefix/lane/primitive receipts are reused with source identity checks.
+Source/native/runner b4d4f8f2,SHA9402c44d. The separately declared4096 warm updates
+8192→12288 and final restore are active under the AMD host guard.
 
 The [preceding fixed-target phase](docs/results/2026-11-07-breakout-world-fixed-teacher.md)
 remains closed/failed:one98/109,eight17/107,energy.141405(16.58% gain),RIGHT
