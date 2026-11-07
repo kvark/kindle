@@ -26,10 +26,12 @@ LOSS_NAMES = ('total', 'reconstruction', 'dynamics_kl', 'representation_kl', 're
               'continuation', 'replay_value', 'raw_kl', 'future_prediction',
               'pixel_rollout', 'pixel_rollout_valid_fraction')
 PREDICTIVE_OBJECTIVE = 'predictive_motion_energy'
+SCORE_FUNCTION_OBJECTIVE = 'predictive_motion_energy_score_function'
+PREDICTIVE_OBJECTIVES = (PREDICTIVE_OBJECTIVE, SCORE_FUNCTION_OBJECTIVE)
 
 
 def report_names(pixel_loss, prediction_length):
-    if pixel_loss == PREDICTIVE_OBJECTIVE:
+    if pixel_loss in PREDICTIVE_OBJECTIVES:
         if prediction_length: raise ValueError('predictive motion uses one-step targets, not suffix rollouts')
         return LOSS_NAMES[:9]+('predictive_joint_energy', 'predictive_target_distance', 'predictive_sample_distance', 'predictive_valid_fraction')
     return LOSS_NAMES if prediction_length else LOSS_NAMES[:9]
@@ -40,7 +42,7 @@ def reported_total(config, values, pixel_loss, prediction_length):
     result = (scales['reconstruction']*(values[1]+(values[9] if prediction_length else 0))
         +scales['dynamics']*values[2]+scales['representation']*values[3]
         +scales['reward']*values[4]+scales['continuation']*values[5])
-    if pixel_loss == PREDICTIVE_OBJECTIVE:
+    if pixel_loss in PREDICTIVE_OBJECTIVES:
         result += scales['reconstruction']*values[9]
     return result
 
@@ -235,7 +237,7 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             keep = rollout_validity(batch['action'], args.prediction_length)
             assert len(values) == len(report_names(args.pixel_loss, args.prediction_length))
             if args.prediction_length: assert values[10] == float(keep.mean())
-            if args.pixel_loss == PREDICTIVE_OBJECTIVE:
+            if args.pixel_loss in PREDICTIVE_OBJECTIVES:
                 valid = batch['action'] >= 0
                 assert values[12] == float(valid.mean())
                 predictive_valid_rows += int(valid.sum())
@@ -282,7 +284,7 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
         positive_reward_rows=positive_rows, context_reset_rows=context_reset_rows,
         source_reset_rows=source_reset_rows, frozen_tensors=len(before),
         world_model_proven=False, untouched_test_scored=False)
-    if args.pixel_loss == PREDICTIVE_OBJECTIVE: result['predictive_valid_rows'] = predictive_valid_rows
+    if args.pixel_loss in PREDICTIVE_OBJECTIVES: result['predictive_valid_rows'] = predictive_valid_rows
     write(args.output/'result.json', result)
 
 
@@ -342,7 +344,7 @@ def initial_check(args, config, fitting, development, *, locations=None):
     values = learner.learn(pixels(batch['rgb'].astype(np.float32)/255-.5),
         *[batch[key].ravel().tolist() for key in ('action', 'reward', 'terminal')])
     assert len(values) == len(report_names(args.pixel_loss, args.prediction_length)) and np.isfinite(values).all() and learner.updates == 1
-    if args.pixel_loss == PREDICTIVE_OBJECTIVE:
+    if args.pixel_loss in PREDICTIVE_OBJECTIVES:
         assert values[12] == float((batch['action'] >= 0).mean())
         np.testing.assert_allclose(values[9], values[10]-.5*values[11], rtol=1e-5, atol=1e-5)
     expected_loss = reported_total(config, values, args.pixel_loss, args.prediction_length)
@@ -380,7 +382,7 @@ def main():
     parser.add_argument('--dense-development', type=int, default=128)
     parser.add_argument('--checkpoint', type=Path)
     parser.add_argument('--reference', type=Path)
-    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy", "motion_cross_entropy", PREDICTIVE_OBJECTIVE), default="squared_error")
+    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy", "motion_cross_entropy", *PREDICTIVE_OBJECTIVES), default="squared_error")
     args = parser.parse_args()
     if args.steps < 1 or args.eval_every < 1 or args.prediction_length not in (0, 16) or min(args.dense_fitting, args.dense_development) < 1:
         parser.error('positive training/evaluation budgets and prediction-length0/16 required')

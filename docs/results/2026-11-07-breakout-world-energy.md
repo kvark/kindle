@@ -137,7 +137,7 @@ remain open. No CDP-superiority,reliability or gameplay result follows.
 
 ## Evidence and failures
 
-43 CPU world tests(21 GPU tests ignored),41 affected and41 packaged Python checks,
+43 CPU world tests(21 GPU tests ignored),27 affected and27 packaged Python checks,
 strict workspace/bindings Clippy pass; final-source workspace Clippy also passes.
 New513-row native F64 energy values/derivatives and one-update preflight pass.
 77 qualification/89 learning/648 frozen input pins verify. Five native guards
@@ -160,3 +160,16 @@ CPU derivations and hashes remain in the external root; `closure-review.json`
 links them. Retain both checkpoints as different development capabilities.
 No new GPU job or automatic successor is selected. The active world goal remains
 open; actor/critic and five-game campaign stay parked.
+
+
+## Python verification-count correction
+
+The initial publication/build receipt claimed41 affected and41 packaged Python
+checks. Retained `python-cpu-repair2.log` and `packaged-cpu.log` show**27 each**.
+The original41-count claim was not met. The original pinned receipt/protocol and
+publication atf5d594be remain preserved; no old tests/GPU stages were repeated.
+A separate CPU-only count audit is retained at
+`/mnt/data/kindle-breakout-world-score-function-20261107/prior-energy-python-count-review.json`.
+This corrects a reporting defect; it does not complete missing old checks or
+change the native/learning/frozen numeric evidence. Subsequent validation must
+record the actual test selection/count rather than copy a prior recipe's count.

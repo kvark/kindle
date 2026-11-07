@@ -34,7 +34,7 @@ group means pass5%,but65/304 origin-plan cases assign>5% ending probability,
 maximum25.990%,versus0/304 and1.907% control. Precise tracking/reward remain weak.
 
 Root `/mnt/data/kindle-breakout-world-energy-20261107`,native/source161839d9,
-SHA8d5552e5,matching root/runtime.43 CPU world/41 affected/41 packaged Python checks,
+SHA8d5552e5,matching root/runtime.43 CPU world/27 affected/27 packaged Python checks,
 strict Clippy,77/89/648 phase input pins,five guards/sealed audits,204 initial/
 frozen tensors,18 initial/restore arrays and8,192 finite13-report rows pass.
 Preserve initial CPU fixture/path failures. `closure-review.json` verifies closure.
@@ -42,19 +42,31 @@ The coverage trajectory control remains at its exact native/source3fa37b6d,
 SHAeafe8359,runtime `/mnt/data/kindle-breakout-world-motion-20261107/runtime`.
 Do not mix runtime overlays or objectives.
 
-An exact CPU three-bin counterexample shows the energy head-coordinate ST
-surrogate can miss variance correction. It does not attribute full-model
-regressions. A conditional score-function correction has only a CPU derivation;
-no new native path/learner is selected. The [earlier pointwise prototype](experiments/2026-11-07-breakout-world-predictive.md#closed-prototype-before-full-learning)
-remains parked without full training,with its failed68-change assertion and
-separate CPU repair preserved.
+The energy result's original41/41 Python-count claim was incorrect: retained logs
+show27/27. Its pinned receipt/protocol/publication remain preserved,with a separate
+CPU-only count correction linked in the result. No old check or GPU phase reruns.
 
-No Kindle GPU allocation or successor is active/selected. Use the findings before
-separately declaring another bounded experiment; no unchanged extension or broad
-seed campaign. Remaining requirements include precise causal1/4/8/16/32 forecasts,
-reward/uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall
-coverage,untouched tests and fresh confirmation. The retained oracle has no
-above-top-brick endpoints; detector-support limits and duplicate contexts remain.
+The selected [conditional score-function experiment](experiments/2026-11-07-breakout-world-score-function.md)
+keeps sampled futures/energy values/data fixed and replaces current prior/head
+coordinate-ST derivatives with their conditional likelihood-ratio estimator.
+Past posterior ST/observed losses remain; full BPTT is not globally unbiased.
+No new parameter,input,geometry or inference path. Explicit new objective; old
+energy and production objectives remain compatible. Actor/critic stays parked.
+
+Root `/mnt/data/kindle-breakout-world-score-function-20261107`. Implementation48
+CPU world tests(22 GPU tests ignored),51 Python checks and strict workspace/
+bindings Clippy pass. Exact finite enumeration/finite differences cover prior,
+conditional heads and RGB gradients,including the symmetric variance failure.
+Preserve initial fixture shape and Clippy array/Vec failures with repairs.
+Next build/package,pin all identities,then only the new native gradient fixture
+and full-size one-update/frozen/restore preflight. No GPU allocation or full
+learner is active/selected; review qualification before separately declaring one.
+No collector,old-model rerun,unchanged extension or broad seed campaign.
+
+Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
+uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
+untouched tests and fresh confirmation. The retained oracle has no above-top-
+brick endpoints; detector-support limits and duplicate contexts remain.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

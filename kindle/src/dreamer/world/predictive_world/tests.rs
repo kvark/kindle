@@ -79,6 +79,7 @@ fn fixture(rows: usize, width: usize, zero_mask: bool) -> Fixture {
         w,
         k,
         [2., 0.5],
+        None,
     );
     graph.set_outputs(vec![
         losses.energy,
@@ -173,7 +174,7 @@ fn categorical_samples_have_hard_support_and_softmax_surrogate_derivatives() {
     let mut graph = Graph::new();
     let logits = graph.parameter("logits", &[2, 3]);
     let uniforms = graph.input("uniforms", &[2, 3]);
-    let sample = sample_coordinate(&mut graph, logits, uniforms, &[-2., 0., 3.], 2);
+    let sample = sample_coordinate(&mut graph, logits, uniforms, &[-2., 0., 3.], 2, false).0;
     let loss = graph.sum_all(sample);
     graph.set_outputs(vec![loss, sample]);
     let backward = meganeura::autodiff::differentiate(&graph);
@@ -277,6 +278,7 @@ fn sampled_prior_excludes_targets_and_joint_loss_reaches_shared_world_parameters
         &config,
         &model,
         states,
+        None,
         target,
         previous,
         before_previous,
@@ -319,8 +321,7 @@ fn complete_energy_world_preserves_parameter_shapes_and_compiles() {
     config.loss_scales.value = 0.;
     config.loss_scales.replay_value = 0.;
     let control = build_world_only_pixel_training_graph(&config, 0, PixelLoss::MotionCrossEntropy);
-    let energy =
-        build_world_only_pixel_training_graph(&config, 0, PixelLoss::PredictiveMotionEnergy);
+
     let params = |g: &Graph| {
         g.nodes()
             .iter()
@@ -330,15 +331,21 @@ fn complete_energy_world_preserves_parameter_shapes_and_compiles() {
             })
             .collect::<Vec<_>>()
     };
-    assert_eq!(params(&control), params(&energy));
-    assert!(
-        params(&energy)
-            .iter()
-            .all(|(name, _)| name.starts_with("world."))
-    );
-    assert_eq!(energy.outputs().len(), LOSS_PREDICTIVE_WORLD + 6);
-    let (plan, _) = meganeura::compile_training_graph(&energy);
-    assert!(!plan.dispatches.is_empty());
+    for objective in [
+        PixelLoss::PredictiveMotionEnergy,
+        PixelLoss::PredictiveMotionEnergyScoreFunction,
+    ] {
+        let energy = build_world_only_pixel_training_graph(&config, 0, objective);
+        assert_eq!(params(&control), params(&energy));
+        assert!(
+            params(&energy)
+                .iter()
+                .all(|(name, _)| name.starts_with("world."))
+        );
+        assert_eq!(energy.outputs().len(), LOSS_PREDICTIVE_WORLD + 6);
+        let (plan, _) = meganeura::compile_training_graph(&energy);
+        assert!(!plan.dispatches.is_empty());
+    }
 }
 
 #[test]

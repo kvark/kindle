@@ -442,6 +442,7 @@ fn training_graph(
     let mut predictive_states = Vec::new();
     let mut predictive_second_states = Vec::new();
     let mut predictive_keeps = Vec::new();
+    let mut predictive_log_probabilities = Vec::new();
     let mut predictive_losses = Vec::new();
     let mut actions = Vec::new();
 
@@ -484,22 +485,29 @@ fn training_graph(
         );
         let prior_logits = model.dynamics.prior.forward(&mut graph, deter, batch);
         if pixel_loss.predictive() {
-            predictive_states.push(prior_continuation::state(
+            let (first, first_log_probability) = predictive_world::state(
                 &mut graph,
                 config,
                 deter,
                 prior_logits,
                 time,
                 "predictive",
-            ));
-            predictive_second_states.push(prior_continuation::state(
+                pixel_loss.score_function(),
+            );
+            let (second, second_log_probability) = predictive_world::state(
                 &mut graph,
                 config,
                 deter,
                 prior_logits,
                 time,
                 "predictive_second",
-            ));
+                pixel_loss.score_function(),
+            );
+            predictive_states.push(first);
+            predictive_second_states.push(second);
+            if let Some(first) = first_log_probability {
+                predictive_log_probabilities.push([first, second_log_probability.unwrap()]);
+            }
             predictive_keeps.push(keep_action);
         }
         if config.prior_continuation_scale.is_some() || config.prior_reward_scale.is_some() {
@@ -817,11 +825,21 @@ fn training_graph(
                 batch,
                 config.feature_dim(),
             );
+            let log_probabilities = pixel_loss.score_function().then(|| {
+                [0, 1].map(|sample| {
+                    let nodes = predictive_log_probabilities[start..start + chunk.len()]
+                        .iter()
+                        .map(|pair| pair[sample])
+                        .collect::<Vec<_>>();
+                    stack_time(&mut graph, &nodes, batch, 1)
+                })
+            });
             predictive_losses.push(predictive_world::losses(
                 &mut graph,
                 config,
                 &model,
                 [prior, second],
+                log_probabilities,
                 observation,
                 previous,
                 before_previous,

@@ -193,3 +193,12 @@ All77/89/648 phase pins,five guards/sealed audits,204 frozen tensors and18 resto
 arrays pass. Initial CPU failures and original prototype failures remain intact.
 No new native correction,learner,collector or GPU successor is selected. The full
 world goal remains active/unproven; actor/critic stays parked.
+
+
+## Qualification reporting correction
+
+The original publication/build receipt's41 affected/41 packaged Python checks
+were incorrectly copied from the pointwise prototype. The retained energy logs
+contain27/27. Original pinned receipt/protocol/source remain unchanged; the
+separate CPU count audit and [result correction](../results/2026-11-07-breakout-world-energy.md#python-verification-count-correction)
+preserve the unmet41-count claim. No old stage was rerun or retroactively passed.

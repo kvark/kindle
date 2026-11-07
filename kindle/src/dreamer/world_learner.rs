@@ -25,18 +25,28 @@ pub enum PixelLoss {
     CrossEntropy,
     MotionCrossEntropy,
     PredictiveMotionEnergy,
+    PredictiveMotionEnergyScoreFunction,
 }
 
 impl PixelLoss {
     pub(crate) fn motion_attention(self) -> bool {
         matches!(
             self,
-            Self::MotionCrossEntropy | Self::PredictiveMotionEnergy
+            Self::MotionCrossEntropy
+                | Self::PredictiveMotionEnergy
+                | Self::PredictiveMotionEnergyScoreFunction
         )
     }
 
     pub(crate) fn predictive(self) -> bool {
-        self == Self::PredictiveMotionEnergy
+        matches!(
+            self,
+            Self::PredictiveMotionEnergy | Self::PredictiveMotionEnergyScoreFunction
+        )
+    }
+
+    pub(crate) fn score_function(self) -> bool {
+        self == Self::PredictiveMotionEnergyScoreFunction
     }
 }
 
@@ -250,7 +260,8 @@ impl WorldModelLearner {
             (
                 PixelLoss::CrossEntropy
                 | PixelLoss::MotionCrossEntropy
-                | PixelLoss::PredictiveMotionEnergy,
+                | PixelLoss::PredictiveMotionEnergy
+                | PixelLoss::PredictiveMotionEnergyScoreFunction,
                 length,
             ) => world::build_world_only_pixel_training_graph(&config, length, pixel_loss),
         };
