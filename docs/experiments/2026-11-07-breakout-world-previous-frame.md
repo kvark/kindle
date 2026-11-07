@@ -87,3 +87,17 @@ action/horizon/reward/paddle/brick regressions. These repeatedly used families a
 development,not fresh confirmation. Full causal physics,event calibration,brick
 memory,late/tunnel/second-wall coverage,untouched families and fresh confirmation
 remain required; passing intermediate gates does not complete the goal.
+
+## Actual qualification and allocation
+
+All60 affected Rust/89 packaged Python checks and core/binding Clippy pass.
+Preserve first float-syntax/import compilation and flat-weight-shape fixture
+failures separately; repairs change no learning result. Native source/runner
+70da4788,SHA96adefd2. First456-pin composition check completes in17.391s with
+204 own-initial restored tensors,18 initial/trained restore arrays,18 exact legacy
+arrays,65 expected changed parameters,204 frozen tensors,previous-frame influence,
+lane independence,reset isolation and old-native v5 rejection. Build cache release
+retains exact wheel/runtime/CPU executable and releases834,734,615 counted bytes.
+A separately declared466-pin fresh8192 H0 learner/restore is active. Source members
+are copied byte-exactly from the pinned Git archive; original declarations remain
+unchanged. Final-only branches await reviewed learning/restore completion.

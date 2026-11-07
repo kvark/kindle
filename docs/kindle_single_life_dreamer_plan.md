@@ -150,19 +150,25 @@ All execution/restore/guard checks pass; keep coverage. Full details and origina
 failures remain in its report/root; no repeat or extension.
 
 The [previous-frame encoder experiment](experiments/2026-11-07-breakout-world-previous-frame.md)
-is implemented for source/package qualification. Optional `rgb_previous_frame`
-keeps RGB3 replay/targets and one GPU resize; native same-lane previous/current
-images enter a widened first convolution. Starts/resets duplicate current RGB;
+is native-qualified; a separately declared466-pin fresh8192 H0 learner and restore
+are active in `kindle-world-previous-frame-learning-20261107`. Optional
+`rgb_previous_frame` keeps RGB3 replay/targets/one GPU resize; same-lane previous/
+current images feed the first convolution. Starts/resets duplicate current RGB;
 no future image enters a prior. Adds2,400 weights:68 logical/8,855,075 scalars/
-204 tensors,with unchanged latent/decoder geometry. Default off,v5 persists mode.
+204 tensors,latent/decoder geometry unchanged. Default off,v5 persists mode.
 No information is added to the whole RSSM; this tests a shorter motion path.
 Earlier whole-agent CDP frame-pair results remain negative and closed.
 
-Root `/mnt/data/kindle-breakout-world-previous-frame-20261107`;31 world/29 config
-Rust CPU checks pass after preserved formatter/import and flattened-shape fixture
-failures. Core/binding strict Clippy passes; packaged Python checks and native composition
-qualification remain. No GPU allocation or learner is active or declared. Use the
-protocol before execution; all original world gates remain. No automatic successor.
+Root `/mnt/data/kindle-breakout-world-previous-frame-20261107`; source/runner
+70da4788,native SHA96adefd2. All60 Rust/89 packaged Python checks and strict
+core/binding Clippy pass. Preserve formatter/import and flattened-shape fixture
+failures. First native456-pin check17.391s passes204 own-initial restored tensors,
+18 initial/trained restore arrays,18 legacy arrays,65 changed parameters,204
+frozen tensors,previous-frame encoder influence,lane independence,reset isolation
+and old-native v5 rejection. Exact source members are archived;834,734,615-byte
+build cache released after qualification,with wheel/runtime/CPU executable kept.
+Original H0 data/full plan/seed/settings and all world gates remain; final-only
+branches await learning review. No collector,concurrent learner or automatic successor.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
