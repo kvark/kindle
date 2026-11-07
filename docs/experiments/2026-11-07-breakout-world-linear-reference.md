@@ -54,3 +54,24 @@ repair. Retain compact findings in docs/results and update PR31. Full-world
 forecasting, events, brick memory, late/tunnel/second-wall coverage, untouched
 families and fresh confirmation remain required. Select no new GPU experiment
 from this protocol alone.
+
+## Fixed implementation details
+
+Last-two control support requires both observed RGB centers, no reset/terminal
+between them, and unchanged lives. The history-line control additionally requires
+at least four observed centers (including the current center), no reset/terminal
+or life change in the sixteen-image observed history. Fit ordinary least squares
+at the actual observation indices -15..0; extrapolate its intercept and slope.
+Do not clamp an out-of-field extrapolation into the ROI. Missing support stays
+missing and counts as a tracking failure in the full-eligible denominator.
+
+The future-linear eligibility check requires a stable last observed transition,
+but does not require an entirely linear past. The separate past-and-future slice
+also requires finite exact linear references and stability over all sixteen
+observations. Preserve overlapping flag counts and a fixed exclusion cascade:
+availability, no terminal, last-transition stability, same future lives, finite
+references, nonzero velocity, current RGB support, target RGB support, exact line.
+Report full-eligible and common-two-control-supported tables. Reproduce all seven
+exports' unfiltered published observed/five-horizon counts before interpreting
+subsets. Recover all source positions/lives/masks and cached RGB contexts/targets
+exactly. No native package, emulator or learner is imported by the analysis.

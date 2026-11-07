@@ -70,12 +70,29 @@ and three current guards/27 sealed pins pass. Original evaluation cohorts and
 all 989,057 suffix targets/10,562 terminal rows match. All 448 paired fitting
 origins and three full causal APNGs remain retained. No GPU worker is active.
 
-Next selected work is the [CPU linear-reference diagnosis](experiments/2026-11-07-breakout-world-linear-reference.md),
-root `/mnt/data/kindle-breakout-world-linear-reference-20261107`. Pin retained
-exports/source histories and inspect exact linear reference slices against
-past-RGB point controls, keeping future-outcome selection/visibility/duplicate
-limits explicit. No new query, collector, learner, GPU allocation, acceptance
-criterion or automatic successor is selected. The full world goal remains open.
+The [CPU linear-reference diagnosis](results/2026-11-07-breakout-world-linear-reference.md)
+is closed: at8 on32 common-control development origins, coverage/motion/paired
+track3/9/1, versus last-two/history-line2/0. None has a fully linear observed
+sixteen-frame history. Strict4-step fit/dev have only6/2 origins; line fit gets
+6/6 and2/2, but support is too small for broad claims. No32-step eligible case.
+Five unique cached histories underlie40 paired fitting8-step origins. All500
+pins,21 source joins,56 export matches,42 instrument controls and an independent
+505-input/260-cell/448-parent review pass. CPU4.418s +.255s, no native/emulator
+imports or queries; no acceptance-gate change. Preserve the first closure
+self-stdout hash failure and separate CPU-only seal repair; analysis/recount
+remain unchanged and are not rerun.
+
+Next implement the [frozen visual training phase](experiments/2026-11-07-breakout-world-frozen-visual.md),
+root `/mnt/data/kindle-breakout-world-frozen-visual-20261107`. Warm-start the
+coverage H0 final world, preserve204 tensors/age, freeze encoder/posterior/decoder
+weights and train dynamics/heads with existing H16 RGB supervision. This combines
+warm initialization, H16 and a frozen subset; no isolated causal claim. Preserve
+legacy/default restore and persist a distinguishable frozen-phase schema. No
+implementation, native rebuild or GPU allocation is active yet. Qualify changed
+phase/scope/restore behavior before separately declaring4096 warm updates and
+new-final-only assessments; no new loss, data, actor/critic or automatic successor.
+The previous coordinate-channel comparison stays negative/closed; do not repeat
+its native qualification or learner. The full world goal remains open.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
