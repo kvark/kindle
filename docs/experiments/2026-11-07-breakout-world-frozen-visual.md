@@ -2,7 +2,7 @@
 
 Select a separately bounded training-phase experiment after the
 [linear-reference diagnosis](../results/2026-11-07-breakout-world-linear-reference.md).
-No GPU allocation or implementation exists yet. This protocol does not restart
+The implementation is packaged; native qualification remains unfinished. This protocol does not restart
 any closed learner, collector or assessment. Root:
 `/mnt/data/kindle-breakout-world-frozen-visual-20261107`.
 
@@ -100,5 +100,14 @@ The first CPU graph fixture accidentally retained the whole-agent replay-value
 scale. Preserve its19-pass/one-failure log and source; the corrected standalone
 fixture completes20 CPU checks (four GPU checks ignored), and Rust Clippy passes.
 The27 corpus/coverage/sampler CPU checks include fresh/warm global-update paths
-and reuse of a supplied restored learner. New binding-header tests remain to run
-against the rebuilt package before any native qualification allocation.
+and reuse of a supplied restored learner. The rebuilt package passes87 CPU checks.
+
+The first native qualification constructed and loaded the phase, then stopped
+at Python configuration equality before any prediction, save or training update.
+Native getters serialize F32 values directly; checkpoint metadata serializes
+their F64 equivalents. Preserve that failed qualification and its immutable
+declaration. A Python-only correction compares exact canonical F32 values,
+rejecting even a one-ULP change; all92 CPU checks pass. No native rebuild or
+learning-setting change is needed. Separately declare the unstarted native
+prediction/update checks with the corrected runner, also requiring exact equality
+between saved phase metadata and the original checkpoint configuration.

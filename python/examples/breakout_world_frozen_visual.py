@@ -20,8 +20,18 @@ def load_fitting(dataset, supplement):
     return original+extra, original_manifest, extra_manifest
 
 
+def config_f32(value):
+    if isinstance(value, dict): return {key: config_f32(item) for key, item in value.items()}
+    if isinstance(value, list): return [config_f32(item) for item in value]
+    if isinstance(value, float):
+        assert np.isfinite(value) and np.isfinite(np.float32(value))
+        return float(np.float32(value))
+    return value
+
+
 def assert_phase(learner, metadata):
-    assert learner.config == metadata['config']
+    # Getters serialize F32 directly; checkpoint JSON first stores it as F64.
+    assert config_f32(learner.config) == config_f32(metadata['config'])
     assert learner.phase_start_updates == metadata['updates']
     assert learner.updates >= learner.phase_start_updates
     assert learner.training_scope == 'frozen_visual'
