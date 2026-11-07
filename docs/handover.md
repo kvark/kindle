@@ -8,104 +8,81 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 7
 
-The active goal is **prove Breakout world-model training in isolation**. Actor/
+The active goal is **prove the world model training on Breakout**. Actor/
 critic and the five-game campaign are parked. Use the native pixel-supervised
 CNN/categorical RSSM/RGB decoder as the inspectable reference; CDP is a later
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
-model inputs/objectives. Full competence remains unproven.
+training. Full competence remains unproven.
 
 The [motion learner](results/2026-11-07-breakout-world-motion-attention.md)
-solves most observed ball reconstruction. The [coverage comparison](results/2026-11-07-breakout-world-coverage.md)
-retains observed108/112,one-step94/109,eight-step14/107; waiting/contacts improve,
-but long forecasts remain weak. Its final8,192 checkpoint is the common anchor
-for the new diagnosis. Exact native/source3fa37b6d,SHAeafe8359,matching runtime
-`/mnt/data/kindle-breakout-world-motion-20261107/runtime`.
+solves most observed ball reconstruction. Retain the [coverage trajectory
+control](results/2026-11-07-breakout-world-coverage.md): observed108/112,
+one-step94/109,eight-step14/107. Source/native3fa37b6d,SHAeafe8359,matching runtime
+`/mnt/data/kindle-breakout-world-motion-20261107/runtime`. Accurate long futures,
+reward/event timing and brick memory remain weak; do not promote on reconstruction.
 
-The [ST energy comparison](results/2026-11-07-breakout-world-energy.md)
-learns ending(last-life RIGHT97.182%,Brier.006129 versus50.211%/.144566),but
-regresses one/eight-step tracking81/109,4/107. The [conditional score-function
-comparison](results/2026-11-07-breakout-world-score-function.md)
-passes exact/native derivatives yet fails learning: one/eight-step71/109,4/107;
-NOOP8 false balls29/64; ending RIGHT8.591%,Brier.433024. Primary16/32 ball energy
-.393950 versus.151784 ST/.169502 coverage. Both learners are closed; retain their
-distinct capabilities without replacement,extension or seed-reliability claims.
-Their roots/exact runtimes,all original failures and repaired evidence remain
-linked in the reports. Earlier ST Python-count claim41/41 was wrong(actual27/27);
-preserve its pinned records and separate correction. No old checks rerun.
+The [ST energy](results/2026-11-07-breakout-world-energy.md) and
+[score-function](results/2026-11-07-breakout-world-score-function.md) learners
+are closed. ST learns ending endpoints but harms tracking and has65/304 non-ending
+cases>5% ending probability at32. Corrected conditional derivatives pass yet
+learning regresses severely. The [fixed-gradient audit](results/2026-11-07-breakout-world-gradient-noise.md)
+finds prior variance550–893× ST; LaProp moments were not raw-gradient/AGC-saturation
+proof. Preserve all original errors/repairs,including ST's wrong41/41 Python-count
+claim(actual27/27) and the invalid FIRE90% pair-match criterion. No old stages rerun.
+The [CPU readout diagnosis](results/2026-11-07-breakout-world-readout-diagnosis.md)
+finds short-term motion but no simple position-head rescue; failure does not prove
+information absent.
 
-The [CPU frozen-feature diagnosis](results/2026-11-07-breakout-world-readout-diagnosis.md)
-finds useful short-term motion but no simple position-head rescue. Failed linear
-probes do not prove information absent. Its eight feature and30 source/action
-pins,63 coefficient/prediction files and interpretation limits remain retained.
+The [latent-overshooting learner](results/2026-11-07-breakout-world-overshooting.md)
+is closed and fails retention: fresh8,192 updates improve four-step33→43/109,
+but eight-step14→7/107 and primary energy improves4.34%,not25%. Ending32 Brier
+.003192 and low false alarms improve,but RIGHT16 predicts73.352% ending versus
+oracle0%; event timing/reward remain wrong. Sourcee311b216/native965f2bd2,matching
+root/runtime `/mnt/data/kindle-breakout-world-overshooting-20261107`. All execution
+checks pass; do not replace the trajectory control or extend this recipe.
 
-The [fixed-weight gradient diagnostic](results/2026-11-07-breakout-world-gradient-noise.md)
-is **closed**:108 raw forward/backward steps at the coverage anchor,three fixed
-fitting batches,16 paired predictive draws,zero optimizer/model updates. Corrected
-sampling variance is550–893× ST in the prior,1,250–11,699× reward,57–207×
-continuation. Repeated-input gradients are bitwise exact; paired decoder relative
-differences<6.15e-7. Prior noise394–460 versus observed-gradient norm7.12–8.01;
-even16 samples poorly resolve corrected means. CPU AGC/LaProp sensitivity shows
-strong nonlinear effects. This is a concrete estimator-noise finding,not a full
-cause of fresh-run regression or a successful variance-reduction method. Earlier
-`adam_m` norms included LaProp RMS normalization and did not prove AGC saturation.
+The [state-substitution diagnosis](results/2026-11-07-breakout-world-state-swap.md)
+is now closed,with the original construction failure preserved separately.
+On the newer model,natural-origin eight-step ball counts are prior8/108,
+corrected h90/108,corrected z12/108,full teacher104/108; at32:0/87/0/107 of108.
+These pool four draws of supported origins,not independent episodes. Hybrids use
+real future information and never feed back; they identify a readout repair,not
+a learned improvement or causal error fraction. Past categorical mistakes can
+cause h drift; z is not exonerated. Investigate recurrent rollout supervision.
 
-Root `/mnt/data/kindle-breakout-world-gradient-noise-20261107`,source7c66bf12,
-diagnostic executable SHA636bf7e5. Native43.282s/CPU analysis77.774s;50 CPU world
-checks,strict Clippy,five CPU optimizer checks,28 data/21 execution/123 analysis
-pins,one host guard/nine sealed pins and408 exact snapshot tensors pass. Initial
-compile/tiny-fixture failures and pre-GPU output-index correction remain recorded.
-Test-only measurement; retained packages/production graphs are unchanged.
-`closure-review.json` verifies closure. At that diagnostic closure,no Kindle worker or successor was active/selected.
-Do not repeat completed stages or old-model runs.
+Posterior-conditioned timing still mismatches terminal-aligned examples: full
+teacher ending probability44.65% by16 versus target0,73.47% by17 versus target1.
+Outcome-selected windows do not establish population calibration or exclude
+observational ambiguity. Keep event timing as a separate question alongside h
+forecast drift; no new objective or learner is selected by these measurements.
 
-The [latent-overshooting comparison](results/2026-11-07-breakout-world-overshooting.md)
-is **closed and fails its learning gates**. Fresh8,192 updates retain observed
-109/112 and one-step93/109; four-step improves33→43/109,but eight-step falls
-14→7/107(fails28/107). Primary16/32 ball energy.162147 improves only4.34% versus
-.169502 coverage,failing25%. Native580.173s/loop825.609s versus529.515/796.900s.
-Ending32 Brier.003192 and RIGHT93.344%(oracle100%) improve,with0/304 non-ending
-cases>5%,maximum1.367%. But RIGHT16 predicts73.352% ending versus oracle0%;
-ending16 Brier regresses.003345→.156492. Eventual outcomes do not establish
-correct timing. Ending32 reward Brier.403468 versus.000173 also regresses.
+Root `/mnt/data/kindle-breakout-world-state-swap-20261107`. Original sourcece0dc547
+fails raw-JSON double comparison before any query; its failed guard/27 sealed
+files remain failed. Native-F32 configuration repair passes56 CPU world tests
+and strict Clippy. Corrected source6f0ae309/test executable SHAe14de97b completes
+48 queries in42.977s; CPU scoring4.723s.38 data/14 original execution/20 corrected
+execution/60 analysis/five clip pins,eight exact baseline references,816 unchanged
+snapshot tensors and corrected guard/nine sealed pins pass. Separate analysis-
+helper source audit binds qualified code. Preserve moved-value,config/audit and
+empty-support CPU failures; repairs do not rerun completed queries.
 
-Root `/mnt/data/kindle-breakout-world-overshooting-20261107`,sourcee311b216/
-native SHA965f2bd2,matching root/runtime.54 CPU world,53 affected/53 packaged
-Python checks,strict Clippy,native derivatives,87/96/856 phase input pins,five
-guards/45 sealed pins,204 initial/frozen tensors,18 initial/restore arrays,exact
-plan/exposures and all8,192 finite11-report rows pass. Preserve syntax,F32-
-reference,scalar-zero fixture and missing plotting-dependency failures; the plot
-repair is CPU-only. `closure-review.json` verifies closure; separate cache-release
-receipt preserves the original pinned build receipt. At that comparison closure,
-no worker,learner,collector or successor remained active/selected. Retain distinct capabilities without replacement,
-extension,confirmation campaign or a variance-reduction/world-completion claim.
-The [frozen state-substitution diagnostic](experiments/2026-11-07-breakout-world-state-swap.md)
-is selected:32 original dense origins plus10 terminal-centered development
-windows,four fixed draws,two checkpoints,readout-only h/z replacements. Future
-information is explicitly diagnostic and never feeds a prior rollout.55 CPU world
-tests initially pass; preserve the moved-value compilation failure and original
-pre-query JSON-double comparison failure. Native F32 configuration comparison
-and rejection checks now pass56 CPU tests/strict Clippy. CPU-only review preserves
-the failed guard's27 sealed files and zero queries; a separately pinned root/repair
-worker selects only48 unstarted measurements,900s,no production-graph/package change. Root `/mnt/data/kindle-breakout-world-state-swap-20261107`. No learner or
-collector is selected; no cause or new training objective is established yet.
+Lossless32/17-decision true/predicted diagnostic clips cover128/68 original
+emulator frames,with explicit future-information warnings. No model update,new
+action/emulator frame,package/production-graph change or overlay mixing.
+`closure-review.json` distinguishes original failure from corrected completion;
+`analysis-source-review.json` supplements provenance. No worker,learner,collector
+or successor is active/selected. Do not repeat completed stages or old queues.
 
-Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
-uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
-untouched tests and fresh confirmation. The retained oracle has no above-top-
-brick endpoints; detector-support limits and duplicate contexts remain. Investigate
-variance/objective coupling before more capacity or longer training; separately
-justify a new experiment rather than selecting a scalar from this audit alone.
+Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
+calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
+families and fresh confirmation. The retained oracle has no above-top-brick
+endpoints. A privileged state substitution is not world-model competence.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison)
-remains closed and inconclusive:79.167/47.000 greedy/sampled versus matched
-75.250/44.708,intervals crossing0,all0/24 two-wall. Retain prior reward off and
-posterior reward1 for the retained agent,with original failures/repairs intact.
-
-Completed details remain in the [roadmap](kindle_single_life_dreamer_plan.md)
-and linked reports. Expanded November3 guide/handover remain in Git at
-`0cf70be8d8cc9d4e6cab32bf1b8e97195fd1d0ab`. This condensation changes status prose,
-not checkpoints,logs,runtimes,protocols or experiment sources. Keep current work
-focused on the active allocation; link completed results rather than a job ledger.
+remains closed/inconclusive; keep prior reward off and posterior reward1 for the
+retained whole agent,with original failures/repairs intact. Expanded November3
+working guide/handover remain in Git at0cf70be8d8cc9d4e6cab32bf1b8e97195fd1d0ab.
+Keep current work focused on the active allocation; link completed details.
 
 ## Current AMD runtime and retained position
 

@@ -121,3 +121,15 @@ distinct; no original result,guard or declaration is overwritten or relabeled.
 This is a corrected construction check followed by missing measurements,not a
 retry of a completed measurement or a response to a GPU fault. No learner or
 collector is selected.
+
+## Closed measurements
+
+The [completed result](../results/2026-11-07-breakout-world-state-swap.md) retains
+the original failed attempt and separately completes48 corrected frozen queries.
+Teacher-h substitutions repair much more tracking than teacher-z substitutions;
+future information and off-manifold states prevent causal/competence claims.
+Event-aligned timing remains imperfect even in full teacher states. All816
+snapshot tensors and eight baseline references match. CPU scoring's initial
+empty-support dtype failure and its repair remain retained; no native query
+repeats. Clips,raw traces,source audits and exact identities remain in the result.
+No learner,collector or successor is selected; the full world goal stays open.
