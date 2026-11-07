@@ -128,3 +128,17 @@ motion/energy restores pass. No GPU/numerical fault or host recovery.
 declare only the fresh fixed8,192-update learner and restore,95 input pins,
 all previously specified settings/data/counts unchanged. Training is active;
 frozen oracle evaluation is not selected yet. No collector or old-model rerun.
+
+
+## Closed negative comparison
+
+The [complete result](../results/2026-11-07-breakout-world-score-function.md)
+records all stages closed. Native990.401s,loop1,240.170s; observed109/112 stays
+accurate but one-step71/109 regresses81 ST/94 coverage. Primary ball energy.393950,
+NOOP8 false balls45.31%,ending RIGHT8.591% and ending Brier.433024 fail important
+world gates. No extension,confirmation campaign or replacement is selected.
+All83/95/858 phase pins,five guards/sealed audits,204 frozen tensors and18 restore
+arrays pass. Mathematical/native verification is distinct from useful learning.
+The separate [frozen-readout diagnosis](../results/2026-11-07-breakout-world-readout-diagnosis.md)
+finds accessible short-term motion but no simple linear forecast-head rescue.
+No new GPU job/learner is active. Full world goal remains open; actor/critic parked.

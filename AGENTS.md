@@ -58,28 +58,35 @@ The energy result's original41/41 Python-count claim was incorrect: retained log
 show27/27. Its pinned receipt/protocol/publication remain preserved,with a separate
 CPU-only count correction linked in the result. No old check or GPU phase reruns.
 
-The selected [conditional score-function experiment](docs/experiments/2026-11-07-breakout-world-score-function.md)
-keeps sampled futures/energy values/data fixed and replaces current prior/head
-coordinate-ST derivatives with their conditional likelihood-ratio estimator.
-Past posterior ST/observed losses remain; full BPTT is not globally unbiased.
-No new parameter,input,geometry or inference path. Explicit new objective; old
-energy and production objectives remain compatible. Actor/critic stays parked.
+The [conditional score-function comparison](docs/results/2026-11-07-breakout-world-score-function.md)
+is **closed and fails its learning comparison**. Its exact conditional gradient
+passes CPU/native references and all13 first-update values match ST energy,but
+fixed8,192 updates regress one-step71/109 versus81 ST/94 coverage; eight-step
+4/107 versus4/14. Observed109/112 remains good. Frozen history16/32,eight draws,
+84 groups regress primary ball energy.393950 versus.151784 ST/.169502 coverage;
+NOOP8 false balls29/64 (45.31%) versus0; last-life RIGHT ending8.591% versus
+97.182% ST/50.211% coverage (oracle100%); ending Brier.433024 versus.006129/.144566.
+No extension,confirmation campaign or replacement. Retain both earlier capabilities.
 
 Root `/mnt/data/kindle-breakout-world-score-function-20261107`,native/source0ab7fea7,
-SHA0ebed9cd,matching root/runtime.48 CPU world tests(22 GPU tests ignored),51
-explicitly selected and51 packaged Python checks,strict Clippy pass. Preserve
-initial fixture shape and Clippy Vec/array failures with repairs. New native
-exact-enumeration gradient fixture/full-size preflight pass,83 input pins,two
-guards/sealed audits,204 initial/frozen tensors,18 initial/restore arrays,65
-expected first-update changes and legacy motion/energy restores. All13 forward
-reports exactly match the old energy preflight. No completed qualification repeats.
+SHA0ebed9cd,matching root/runtime. Native990.401s/loop1,240.170s; source seed41001
+and exact coverage data/plan reused,not confirmation.48 CPU world tests(22 GPU
+ignored),51 selected/51 packaged Python checks,strict Clippy,83/95/858 phase pins,
+five guards/sealed audits,204 initial/frozen tensors,18 initial/restore arrays
+and8,192 finite13-report rows pass. Preserve fixture shape/Clippy failures and
+previous energy Python-count correction. Execution passes; learning gates fail.
 
-Qualification reviewed; one fresh matched-init8,192-update learner on the exact
-coverage data/plan is active under the host guard,followed only by its restore.
-95 learning input pins,seed41001 reused,not confirmation. No actor/critic or
-collector. Do not start another GPU job or mistake an observer timeout for a
-stopped worker. Review learning before separately declaring its frozen oracle
-comparison. No unchanged extension,broad seed campaign or automatic successor.
+The [CPU frozen-feature diagnosis](docs/results/2026-11-07-breakout-world-readout-diagnosis.md)
+is closed,with no GPU/emulator,new forecast or model update. Short-term motion is
+linearly readable; current/future position readouts do not provide a useful new
+head. Their generalization failure does not prove information absent. Eight
+feature-input and30 action/source pins,63 fixed ridge coefficient/prediction
+files remain in root/readout-diagnosis. No readout enters model training.
+
+No Kindle GPU job or successor is active/selected. The next focused question is
+actual gradient noise/loss/optimizer interference at a common frozen checkpoint,
+before another recipe,larger architecture or longer budget. Separately declare
+that diagnostic; no automatic learner,collector,old-model rerun or actor/critic.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
 uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
