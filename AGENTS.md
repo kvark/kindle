@@ -43,12 +43,24 @@ new guarded phases finish successfully; each2,048-update rollout learner costs
 about187s of training. The preceding collector and reconstruction comparisons
 remain closed at `/mnt/data/kindle-breakout-world-model-20261107`.
 
-Next implement reset-safe prior-loss masks, then full-corpus world-only training
-and development/held-out evaluation. Include terminal arrivals and mask later
-future resets without feeding their observations/boundaries into imagined state.
-The current fitting path rejects reset crossings; filtering them out in broader
-training would underrepresent endings. Reuse the fixed corpora. No full-corpus
-learner is yet qualified or launched; no GPU job is active at this publication.
+Reset-safe prior-loss masks, uniform full-corpus sampling and expanded physical
+readouts are implemented. Clipped contexts retain genuine reward/terminal
+targets; later natural resets are masked from prior-image loss without entering
+imagined state.32 CPU world tests (18 GPU tests ignored),60 Python tests and
+strict Clippy pass after a preserved loop-style repair. Paddle validation found
+and corrected ball contamination; both original and corrected reviews remain.
+
+Next qualify partial/all-zero masks and feature/restore readbacks, then run one
+fixed8,192-update full-corpus world-only learner and a separate frozen restore
+check. Keep RGB64/12M-preset/B8/T32/Auto/reconstruction100/prior16. Sample the
+retained8,205 fitting arrivals (8,192 original game actions); development uses
+separate retained seeds. The sampler dry-run covers every fitting arrival and
+retains1,269 terminal-row exposures,604 within valid prior segments. Evaluate
+natural, contact and ending slices separately at0/1k/.../8k updates, including
+32-step forecasts. Export latent features for diagnosis. No new collector or
+policy/critic training is selected. Root `/mnt/data/kindle-breakout-world-corpus-20261107`.
+No full-corpus GPU phase is launched at this publication. This is development
+work; untouched test, broader coverage and fresh confirmation remain unfinished.
 Keep the world-model goal active and unproven. Do not restart completed stages.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:

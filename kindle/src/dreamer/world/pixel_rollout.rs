@@ -61,7 +61,11 @@ pub(super) fn build(
         let target = graph.stop_gradient(observation);
         let residual = graph.sub(prediction, target);
         let squared = graph.mul(residual, residual);
-        losses.push(graph.sum_all(squared));
+        let per_row = graph.sum_inner(squared);
+        let weight = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
+        let weight = graph.stop_gradient(weight);
+        let weighted = graph.mul(per_row, weight);
+        losses.push(graph.sum_all(weighted));
     }
     let loss = sum(graph, &losses);
     let loss = graph.scale(loss, 1.0 / (batch * actions.len()) as f32);
@@ -117,6 +121,10 @@ mod tests {
                 }
             }
             assert!(images.iter().all(|image| !seen.contains(image)));
+            assert!(
+                seen.iter().all(|&id| !matches!(&graph.node(id).op,
+                meganeura::graph::Op::Input { name } if name.starts_with("pixel_rollout_weight_")))
+            );
             assert!(seen.contains(&deter) && seen.contains(&stoch));
         }
         graph.set_outputs(vec![rollout.loss]);

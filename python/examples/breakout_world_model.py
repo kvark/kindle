@@ -60,24 +60,21 @@ def fixture(config, output, prediction_length=0):
     reports = [learner.learn(pixels(observations), actions.ravel().tolist(), reward.ravel().tolist(), terminal.ravel().tolist())
                for _ in range(8)]
     if prediction_length:
-        invalid = actions.copy()
-        invalid[length-prediction_length] = -1
-        try:
-            learner.learn(pixels(observations), invalid.ravel().tolist(), reward.ravel().tolist(), terminal.ravel().tolist())
-        except ValueError:
-            pass
-        else:
-            raise AssertionError('future reset accepted')
-        assert learner.updates == 8
         for values in reports:
+            assert len(values) == 11 and values[10] == 1
             expected = (config['loss_scales']['reconstruction']*(values[1]+values[9])
                         +config['loss_scales']['dynamics']*values[2]
                         +config['loss_scales']['representation']*values[3]
                         +config['loss_scales']['reward']*values[4]
                         +config['loss_scales']['continuation']*values[5])
             np.testing.assert_allclose(values[0], expected, rtol=1e-5, atol=1e-4)
-    prediction = learner.predict(pixels(observations[:2]), actions[:2].ravel().tolist(), [0]*(batch*4), seed=73001)
+    prediction = learner.predict(pixels(observations[:2]), actions[:2].ravel().tolist(), [0]*(batch*4), seed=73001, include_features=True)
     assert np.frombuffer(prediction['prior_rgb'], '<f4').size == 4*batch*3*64*64
+    assert len(prediction['prior_features']) == 4*len(prediction['posterior_features'])
+    for name in ('encoder_features', 'posterior_features', 'prior_features'):
+        assert np.isfinite(np.frombuffer(prediction[name], '<f4')).all()
+    probability = np.asarray(prediction['reward_positive_probability'])
+    assert probability.shape == (4, batch) and np.all((probability >= 0) & (probability <= 1))
     learner.save(str(output/'trained'))
     final = load_file(output/'trained/world.safetensors')
     changes = {}
@@ -87,17 +84,54 @@ def fixture(config, output, prediction_length=0):
         assert names and all(np.isfinite(final[name]).all() for name in names)
         changes[prefix] = max(float(np.abs(final[name]-initial[name]).max()) for name in names)
         assert changes[prefix] > 0
-    frozen = learner.predict(pixels(observations[:2]), actions[:2].ravel().tolist(), [0]*(batch*4), seed=73001)
+    frozen = learner.predict(pixels(observations[:2]), actions[:2].ravel().tolist(), [0]*(batch*4), seed=73001, include_features=True)
     assert prediction == frozen and learner.updates == 8
     learner.save(str(output/'frozen'))
     after = load_file(output/'frozen/world.safetensors')
     assert initial.keys() == final.keys() == after.keys()
     assert all(np.array_equal(final[name], after[name]) for name in final)
     restored = kindle.WorldModelLearner.restore(str(output/'trained'))
-    repeat = restored.predict(pixels(observations[:2]), actions[:2].ravel().tolist(), [0]*(batch*4), seed=73001)
+    repeat = restored.predict(pixels(observations[:2]), actions[:2].ravel().tolist(), [0]*(batch*4), seed=73001, include_features=True)
     assert repeat == prediction and restored.updates == 8 and restored.prediction_length == prediction_length
     write(output/'result.json', dict(status='complete', updates=8, no_behavior=True, changes=changes,
                                    reports=reports, prediction_restore_equal=True, frozen_tensors=len(final), prediction_length=prediction_length))
+
+
+def mask_fixture(config, output, prediction_length):
+    import kindle
+    assert config['batch_length'] == 4 and prediction_length == 2
+    (output/'unmasked').mkdir()
+    fixture(config, output/'unmasked', prediction_length)
+    batch = config['batch_size']
+    observations = np.full((4, batch, 3, 64, 64), -.25, np.float32)
+    actions = np.zeros((4, batch), np.int32)
+    actions[0] = actions[3] = -1
+    terminals = np.zeros((4, batch), bool)
+    terminals[2] = True
+    rewards = np.zeros((4, batch), np.float32)
+    reports = []
+    for replacement in (0., .4):
+        learner = kindle.WorldModelLearner(config, prediction_length=prediction_length)
+        require_device(learner)
+        changed = observations.copy()
+        changed[3] = replacement
+        reports.append(learner.learn(pixels(changed), actions.ravel().tolist(), rewards.ravel().tolist(), terminals.ravel().tolist()))
+    np.testing.assert_allclose(reports[0][9], reports[1][9], rtol=1e-6, atol=1e-5)
+    assert abs(reports[0][1]-reports[1][1]) > 1e-3
+    assert reports[0][10] == reports[1][10] == .5
+    learner = kindle.WorldModelLearner(config, prediction_length=prediction_length)
+    actions[2], actions[3] = -1, 0
+    terminals[2], terminals[1] = False, True
+    all_masked = learner.learn(pixels(observations), actions.ravel().tolist(), rewards.ravel().tolist(), terminals.ravel().tolist())
+    assert all_masked[9] == all_masked[10] == 0
+    actions[1], actions[2:] = -1, 0
+    terminals[:] = False
+    terminals[0], rewards[0] = True, 7
+    clipped_terminal = learner.learn(pixels(observations), actions.ravel().tolist(), rewards.ravel().tolist(), terminals.ravel().tolist())
+    assert clipped_terminal[10] == 1
+    write(output/'result.json', dict(status='complete', prediction_length=prediction_length, synthetic_updates=12,
+          masked_target_reports=reports, all_masked_report=all_masked, clipped_terminal_report=clipped_terminal,
+          target_changes_do_not_affect_prior_loss=True))
 
 
 def collect(config, output):
@@ -300,7 +334,7 @@ def overfit(config, output, dataset, steps, prediction_length=0):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('fixture', 'collect', 'baseline', 'overfit'))
+    parser.add_argument('mode', choices=('fixture', 'mask-fixture', 'collect', 'baseline', 'overfit'))
     parser.add_argument('--config', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--dataset', type=Path)
@@ -313,6 +347,7 @@ def main():
     write(args.output/'declaration.json', dict(mode=args.mode, config=config, steps=args.steps,
         source_sha256=sha(__file__), dataset=str(args.dataset), prediction_length=args.prediction_length, started_unix=time.time()))
     if args.mode == 'fixture': fixture(config, args.output, args.prediction_length)
+    elif args.mode == 'mask-fixture': mask_fixture(config, args.output, args.prediction_length)
     elif args.mode == 'collect': collect(config, args.output)
     elif args.mode == 'baseline':
         if args.dataset is None or args.checkpoint is None: parser.error('baseline requires dataset and checkpoint')

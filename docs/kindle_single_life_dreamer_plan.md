@@ -14,17 +14,27 @@ result. Standard eight-step ball fitting improves1/8→4–5/8, while16-step rem
 16-step7–8/8 across four fixed draws. Observed-state image reconstruction remains
 inconsistent. No actor/critic learns, and world-model competence is not proven.
 
-Next implement reset-safe prior-image loss masks, preserving terminal arrivals
-and stopping loss after future resets without conditioning imagined state on
-future boundaries/images. Then train on the full retained fitting corpus and
-measure development/held-out generalization. The current capacity path rejects
-reset crossings; carrying that restriction into broader sampling would bias
-ending coverage. Reuse the fixed corpora, with no collector or completed learner
-repeats. No full-corpus allocation is launched or qualified yet. Current world
-runtime source25b3328b/native547f065f is retained under
-`/mnt/data/kindle-breakout-world-rollout-20261107`. Keep the goal active. Event/
-brick competence, action branches,32-step forecasts, later-game coverage and
-fresh-initialization confirmation remain unfinished.
+Reset-safe prior-loss masks and uniform full-corpus sampling are implemented.
+Clipped context starts keep known incoming rewards/terminals; actual later
+resets clear observed history, while prior-image losses stop at the first
+future reset without feeding boundary labels into imagined state.32 CPU world
+tests (18 GPU tests ignored),60 Python tests and strict Clippy pass. A loop-style
+qualification failure is retained separately from its repair. Evaluation adds
+paddle/brick measurements, reward-event probabilities and optional latent-state
+exports; native-image label validation and its paddle correction are retained.
+
+Next qualify the mask composition, then run a fixed8,192-update world-only
+learner on the retained8,205 fitting arrivals, with separate development seeds,
+actual-initial controls, natural/contact/ending slices and1/4/8/16/32-step curves.
+Keep RGB64/12M-preset/B8/T32/Auto/reconstruction100/prior16 and4e-4 rates. The
+sampler dry-run covers every fitting arrival and retains1,269 terminal-row
+exposures (604 in valid prior segments), rather than filtering reset crossings.
+No collection, coupled learner or completed stage repeats. A full-model frozen
+restore check is declared as a separate final phase. Root
+`/mnt/data/kindle-breakout-world-corpus-20261107`; no GPU phase has launched at
+this publication. Keep the goal active. Untouched test, event/brick competence,
+prospective action branches, later-game coverage and fresh confirmation remain
+unfinished.
 
 ### Representation and training scope
 

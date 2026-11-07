@@ -3123,7 +3123,7 @@ pub(super) fn sample_latents(
     output
 }
 
-fn join_features(deter: &[f32], stoch: &[f32], batch: usize, config: &DreamerConfig) -> Vec<f32> {
+pub(super) fn join_features(deter: &[f32], stoch: &[f32], batch: usize, config: &DreamerConfig) -> Vec<f32> {
     let size = config.network();
     assert_eq!(deter.len(), batch * size.deter);
     let stoch_width = size.stoch * size.classes;

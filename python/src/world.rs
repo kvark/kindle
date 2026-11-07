@@ -96,7 +96,8 @@ impl PyWorldModelLearner {
     }
 
     /// Centered CHW images and arrival-aligned actions are time-major then batch.
-    /// -1 denotes a context reset; reset arrivals have zero reward and are nonterminal.
+    /// -1 clears history. Mid-window episode resets have zero reward and are nonterminal;
+    /// a clipped first arrival may retain its known incoming reward/terminal target.
     fn learn(
         &mut self,
         observations: &[u8],
@@ -115,7 +116,7 @@ impl PyWorldModelLearner {
     }
 
     /// Returns posterior RGB bytes, future RGB bytes, rewards and discounted continuation.
-    #[pyo3(signature = (observations, previous_actions, future_actions, *, seed))]
+    #[pyo3(signature = (observations, previous_actions, future_actions, *, seed, include_features=false))]
     fn predict<'py>(
         &mut self,
         py: Python<'py>,
@@ -123,21 +124,35 @@ impl PyWorldModelLearner {
         previous_actions: Vec<i32>,
         future_actions: Vec<usize>,
         seed: u64,
+        include_features: bool,
     ) -> PyResult<Bound<'py, PyAny>> {
         let result = self
             .inner
-            .predict(
+            .predict_with_features(
                 &floats(observations)?,
                 &previous_actions,
                 &future_actions,
                 seed,
+                include_features,
             )
             .map_err(PyValueError::new_err)?;
         let output = pyo3::types::PyDict::new(py);
         output.set_item("posterior_rgb", float_bytes(py, &result.posterior)?)?;
         output.set_item("prior_rgb", float_bytes(py, &result.observations)?)?;
         output.set_item("reward", result.rewards)?;
+        output.set_item(
+            "reward_positive_probability",
+            result.reward_positive_probability,
+        )?;
         output.set_item("continuation", result.continuations)?;
+        if include_features {
+            output.set_item("encoder_features", float_bytes(py, &result.encoded)?)?;
+            output.set_item(
+                "posterior_features",
+                float_bytes(py, &result.posterior_features)?,
+            )?;
+            output.set_item("prior_features", float_bytes(py, &result.prior_features)?)?;
+        }
         Ok(output.into_any())
     }
 

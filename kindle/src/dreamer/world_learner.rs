@@ -6,7 +6,11 @@ use meganeura::{Graph, Mode, Session};
 use rand::{Rng, SeedableRng, rngs::StdRng};
 
 use super::{
-    DreamerConfig, agent::sample_latents, checkpoint, distributions::TwoHotBins, runtime, world,
+    DreamerConfig,
+    agent::{join_features, sample_latents},
+    checkpoint,
+    distributions::TwoHotBins,
+    runtime, world,
 };
 use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 
@@ -16,8 +20,13 @@ pub struct WorldPrediction {
     /// Centered CHW RGB, future-time then batch order.
     pub observations: Vec<f32>,
     pub rewards: Vec<Vec<f32>>,
+    pub reward_positive_probability: Vec<Vec<f32>>,
     /// Includes the configured continuation discount, as in the online learner.
     pub continuations: Vec<Vec<f32>>,
+    /// Optional diagnostic readbacks, never inputs or learning targets.
+    pub encoded: Vec<f32>,
+    pub posterior_features: Vec<f32>,
+    pub prior_features: Vec<f32>,
 }
 
 pub struct WorldModelLearner {
@@ -121,6 +130,39 @@ fn action_inputs(
         mask(size.stoch * size.classes),
         mask(config.action_count),
     )
+}
+
+fn rollout_weights(actions: &[i32], batch: usize, horizon: usize) -> Vec<Vec<f32>> {
+    let mut keep = vec![1.0; batch];
+    actions[actions.len() - horizon * batch..]
+        .chunks_exact(batch)
+        .map(|row| {
+            for (keep, &action) in keep.iter_mut().zip(row) {
+                if action == -1 {
+                    *keep = 0.0;
+                }
+            }
+            keep.clone()
+        })
+        .collect()
+}
+
+fn validate_targets(
+    actions: &[i32],
+    rewards: &[f32],
+    terminals: &[bool],
+    batch: usize,
+) -> Result<(), &'static str> {
+    for (i, &terminal) in terminals.iter().enumerate() {
+        // A clipped context clears history but can start at a real terminal or reward.
+        // Later -1 arrivals are actual episode resets, which carry neither.
+        if (i >= batch && actions[i] == -1 && (terminal || rewards[i] != 0.0))
+            || (terminal && i + batch < actions.len() && actions[i + batch] != -1)
+        {
+            return Err("terminal/reset alignment mismatch");
+        }
+    }
+    Ok(())
 }
 
 impl WorldModelLearner {
@@ -247,18 +289,8 @@ impl WorldModelLearner {
         {
             return Err("training batch shape or reward mismatch");
         }
-        for (i, &terminal) in terminals.iter().enumerate() {
-            if (actions[i] == -1 && (terminal || rewards[i] != 0.0))
-                || (terminal && i + batch < actions.len() && actions[i + batch] != -1)
-            {
-                return Err("terminal/reset alignment mismatch");
-            }
-        }
-        if self.prediction_length > 0
-            && actions[(length - self.prediction_length) * batch..].contains(&-1)
-        {
-            return Err("prior rollout cannot cross a reset");
-        }
+        validate_targets(actions, rewards, terminals, batch)?;
+        let weights = rollout_weights(actions, batch, self.prediction_length);
         let size = self.config.network();
         self.train
             .set_input("initial_deter", &vec![0.0; batch * size.deter]);
@@ -309,12 +341,14 @@ impl WorldModelLearner {
             self.train
                 .set_input(&format!("continuation_target_{time}"), &target);
         }
-        for time in 0..self.prediction_length {
+        for (time, weight) in weights.iter().enumerate() {
             let uniforms = (0..batch * size.stoch * size.classes)
                 .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
                 .collect::<Vec<_>>();
             self.train
                 .set_input(&format!("pixel_rollout_uniforms_{time}"), &uniforms);
+            self.train
+                .set_input(&format!("pixel_rollout_weight_{time}"), weight);
         }
         runtime::configure_d3_optimizer(
             &mut self.train,
@@ -334,6 +368,9 @@ impl WorldModelLearner {
             self.train
                 .read_output_by_index(world::LOSS_PIXEL_ROLLOUT, &mut loss);
             losses.push(loss[0]);
+            losses.push(
+                weights.iter().flatten().sum::<f32>() / (batch * self.prediction_length) as f32,
+            );
         }
         if losses.iter().any(|x| !x.is_finite()) {
             return Err("nonfinite standalone world loss");
@@ -350,6 +387,17 @@ impl WorldModelLearner {
         actions: &[i32],
         future: &[usize],
         seed: u64,
+    ) -> Result<WorldPrediction, &'static str> {
+        self.predict_with_features(observations, actions, future, seed, false)
+    }
+
+    pub fn predict_with_features(
+        &mut self,
+        observations: &[f32],
+        actions: &[i32],
+        future: &[usize],
+        seed: u64,
+        include_features: bool,
     ) -> Result<WorldPrediction, &'static str> {
         let length = validate_history(&self.config, observations, actions)?;
         let batch = self.config.batch_size;
@@ -377,6 +425,11 @@ impl WorldModelLearner {
         let mut stoch = vec![0.0; batch * size.stoch * size.classes];
         let mut logits = vec![0.0; stoch.len()];
         let width = self.config.observation_dim();
+        let mut encoded = if include_features {
+            vec![0.0; batch * self.config.encoded_observation_dim()]
+        } else {
+            Vec::new()
+        };
         for time in 0..length {
             let (action, keep_deter, keep_stoch, keep_action) =
                 action_inputs(&self.config, &actions[time * batch..(time + 1) * batch]);
@@ -398,6 +451,9 @@ impl WorldModelLearner {
             self.observe.wait();
             self.observe.read_output_by_index(0, &mut deter);
             self.observe.read_output_by_index(1, &mut logits);
+            if include_features && time + 1 == length {
+                self.observe.read_output_by_index(3, &mut encoded);
+            }
             stoch = sample_latents(
                 &logits,
                 batch,
@@ -421,7 +477,15 @@ impl WorldModelLearner {
             posterior,
             observations: Vec::new(),
             rewards: Vec::new(),
+            reward_positive_probability: Vec::new(),
             continuations: Vec::new(),
+            encoded,
+            posterior_features: if include_features {
+                join_features(&deter, &stoch, batch, &self.config)
+            } else {
+                Vec::new()
+            },
+            prior_features: Vec::new(),
         };
         let bins = TwoHotBins::new(self.config.value_bins);
         for actions in future.chunks_exact(batch) {
@@ -445,6 +509,11 @@ impl WorldModelLearner {
             result
                 .observations
                 .extend(decode(&mut self.decoder, &deter, &stoch));
+            if include_features {
+                result
+                    .prior_features
+                    .extend(join_features(&deter, &stoch, batch, &self.config));
+            }
             self.heads.set_input("deter", &deter);
             self.heads.set_input("stoch", &stoch);
             self.heads.step();
@@ -454,12 +523,17 @@ impl WorldModelLearner {
             self.heads.read_output_by_index(0, &mut reward_logits);
             self.heads.read_output_by_index(1, &mut continuation);
             let mut scratch = vec![0.0; bins.len()];
-            result.rewards.push(
-                reward_logits
-                    .chunks_exact(bins.len())
-                    .map(|row| bins.decode_logits_with_scratch(row, &mut scratch))
-                    .collect(),
-            );
+            let mut rewards = Vec::new();
+            let mut positive = Vec::new();
+            for row in reward_logits.chunks_exact(bins.len()) {
+                rewards.push(bins.decode_logits_with_scratch(row, &mut scratch));
+                positive.push(
+                    (scratch[bins.len() / 2 + 1..].iter().sum::<f64>()
+                        / scratch.iter().sum::<f64>()) as f32,
+                );
+            }
+            result.rewards.push(rewards);
+            result.reward_positive_probability.push(positive);
             result.continuations.push(continuation);
         }
         if result
@@ -468,6 +542,10 @@ impl WorldModelLearner {
             .chain(&result.observations)
             .chain(result.rewards.iter().flatten())
             .chain(result.continuations.iter().flatten())
+            .chain(result.reward_positive_probability.iter().flatten())
+            .chain(&result.encoded)
+            .chain(&result.posterior_features)
+            .chain(&result.prior_features)
             .any(|x| !x.is_finite())
         {
             return Err("nonfinite standalone forecast");
@@ -522,6 +600,32 @@ mod tests {
     use super::*;
     use crate::dreamer::ObservationKind;
     use meganeura::graph::Op;
+
+    #[test]
+    fn rollout_masks_keep_terminal_arrivals_and_ignore_all_later_episode_rows() {
+        let actions = [-1, -1, 1, 2, 1, 2, -1, 2, 1, -1, 1, 2];
+        assert_eq!(
+            rollout_weights(&actions, 2, 4),
+            vec![
+                vec![1.0, 1.0],
+                vec![0.0, 1.0],
+                vec![0.0, 0.0],
+                vec![0.0, 0.0]
+            ]
+        );
+        assert!(rollout_weights(&actions, 2, 0).is_empty());
+        assert_eq!(
+            rollout_weights(&[-1, -1, 0, 2], 2, 2),
+            vec![vec![0.0, 0.0], vec![0.0, 0.0]]
+        );
+    }
+
+    #[test]
+    fn clipped_context_can_begin_with_a_real_terminal_or_reward() {
+        assert!(validate_targets(&[-1, -1, 2], &[7.0, 0.0, 0.0], &[true, false, false], 1).is_ok());
+        assert!(validate_targets(&[-1, 2, 2], &[0.0; 3], &[false, true, false], 1).is_err());
+        assert!(validate_targets(&[-1, -1, 2], &[0.0, 1.0, 0.0], &[false; 3], 1).is_err());
+    }
 
     fn config() -> DreamerConfig {
         let mut config = DreamerConfig::tiny(3);
