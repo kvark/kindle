@@ -319,6 +319,9 @@ pub struct DreamerConfig {
     /// CDP input is the previous and current resized RGB image, oldest first.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_frame_pair: bool,
+    /// Standalone RGB world: encode previous/current images; replay and targets stay RGB.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_previous_frame: bool,
     /// Append fixed x/y pixel-center coordinates inside the learned RGB encoder.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_coordinates: bool,
@@ -492,6 +495,7 @@ impl DreamerConfig {
             training_precision: TrainingPrecision::Auto,
             observation_kind: ObservationKind::Features,
             rgb_frame_pair: false,
+            rgb_previous_frame: false,
             rgb_coordinates: false,
             rgb_latent_only: false,
             rgb_stride2: false,
@@ -820,6 +824,23 @@ impl DreamerConfig {
             return Err("auxiliary actor boundaries require observed lower-bound mode and nonnegative reward scales".into());
         }
         let size = self.network();
+        if self.rgb_previous_frame
+            && (!self.observation_kind.is_rgb()
+                || self.video_encoder.is_some()
+                || self.rgb_frame_pair
+                || self.rgb_latent_only
+                || self.observation_crop.is_some()
+                || self.is_cdp()
+                || self.loss_scales.policy != 0.0
+                || self.loss_scales.value != 0.0
+                || self.loss_scales.replay_value != 0.0
+                || self.actor_critic_gradient)
+        {
+            return Err(
+                "previous-frame RGB requires a plain recurrent RGB world without behavior learning"
+                    .into(),
+            );
+        }
         if self.rgb_latent_only
             && (!self.observation_kind.is_rgb()
                 || self.video_encoder.is_some()

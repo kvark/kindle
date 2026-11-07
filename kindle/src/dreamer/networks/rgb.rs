@@ -150,7 +150,8 @@ impl Encoder {
     pub(super) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let depth = config.network().vision_depth;
         let side = config.observation_grid();
-        let input_channels = config.observation_channels();
+        let input_channels =
+            config.observation_channels() * if config.rgb_previous_frame { 2 } else { 1 };
         let mut channels = input_channels + if config.rgb_coordinates { 2 } else { 0 };
         let layers = [2, 3, 4, 4]
             .into_iter()

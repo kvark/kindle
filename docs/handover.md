@@ -146,25 +146,26 @@ No native stage failure/retry; existing primitive/legacy tests reused. All servi
 terminal; no GPU allocation,extension,sweep or automatic successor selected.
 Full world-model competence remains unproven; no actor/critic or collector.
 
-The [four-step image-rollout experiment](results/2026-11-07-breakout-world-short-rollout.md)
-is closed and fails retention. Fresh8192 updates give observed91/112,one73/109,
-eight5/107 versus H0 108/112,94/109,14/107 and H16 99/112,84/109,25/107.
-All three dense gates fail. Primary16/32 energy0.646172; unchanged threshold.127127.
-Ending16/32 Brier0.000002/0.494911;
-RIGHT160.002054. Full unchanged gates/actions and
-regressions remain in the linked result. Keep coverage; no extension or repeat.
+The [four-step image learner](results/2026-11-07-breakout-world-short-rollout.md)
+remains closed and fails retention: dev91/112 observed,73/109 one-step,5/107 eight;
+fit9/176 at eight,0/171 at sixteen. Primary energy.646172 versus H0.169502.
+All execution/restore/guard checks pass; keep coverage. Full details and original
+failures remain in its report/root; no repeat or extension.
 
-Root `/mnt/data/kindle-breakout-world-short-rollout-20261107`; reused native85dbe150/
-SHA5b112866,runner606720ca,no rebuild. Same recurrent-conditioned architecture,
-RGB64/12M/B8/T32/Auto,mixing.01,data/seed/full plan; direct image H16→4 also changes
-prefix/suffix/exposures/RNG. No isolated cause. CPU36 pass; composition139 pins/
-15.354s,learning147/branches918 pins,8192 finite reports,all68 changed parameters,
-204 exact initial/frozen tensors,384 matched dense-initial origins,18 restored
-arrays and four guards pass. Native calls579.490s,loop
-728.258s excludes dense-initial; observed guard span742.800s
-includes constructor/dense-initial/pins/polling. Frozen branches166.754s outside.
-All services terminal; no GPU allocation,collector or automatic successor selected.
-World-model goal remains unproven; previous negative experiments remain closed.
+The [previous-frame encoder experiment](experiments/2026-11-07-breakout-world-previous-frame.md)
+is implemented for source/package qualification. Optional `rgb_previous_frame`
+keeps RGB3 replay/targets and one GPU resize; native same-lane previous/current
+images enter a widened first convolution. Starts/resets duplicate current RGB;
+no future image enters a prior. Adds2,400 weights:68 logical/8,855,075 scalars/
+204 tensors,with unchanged latent/decoder geometry. Default off,v5 persists mode.
+No information is added to the whole RSSM; this tests a shorter motion path.
+Earlier whole-agent CDP frame-pair results remain negative and closed.
+
+Root `/mnt/data/kindle-breakout-world-previous-frame-20261107`;31 world/29 config
+Rust CPU checks pass after preserved formatter/import and flattened-shape fixture
+failures. Core/binding strict Clippy passes; packaged Python checks and native composition
+qualification remain. No GPU allocation or learner is active or declared. Use the
+protocol before execution; all original world gates remain. No automatic successor.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched

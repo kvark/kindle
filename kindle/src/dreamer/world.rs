@@ -8,8 +8,8 @@ use super::config::{DreamerConfig, FeatureStandardization, ObservationKind};
 use super::exploration::Disagreement;
 use super::networks::{
     FeatureDecoder, MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl,
-    feature, gumbel_sample, mixed_log_probabilities, mixed_probabilities, scale, slice_columns,
-    straight_through_sample, sum, weighted_cross_entropy,
+    concat_columns, feature, gumbel_sample, mixed_log_probabilities, mixed_probabilities, scale,
+    slice_columns, straight_through_sample, sum, weighted_cross_entropy,
 };
 use super::world_learner::PixelLoss;
 use crate::vision::levjepa::joint;
@@ -139,6 +139,21 @@ fn replay_observations(graph: &mut Graph, config: &DreamerConfig, length: usize)
             })
             .collect()
     }
+}
+
+pub(super) fn encoder_observation(
+    graph: &mut Graph,
+    config: &DreamerConfig,
+    current: NodeId,
+    previous_name: &str,
+    batch: usize,
+) -> NodeId {
+    if !config.rgb_previous_frame {
+        return current;
+    }
+    let width = config.observation_dim();
+    let previous = graph.input(previous_name, &[batch, width]);
+    concat_columns(graph, previous, current, batch, width, width)
 }
 
 struct Dynamics {
@@ -372,6 +387,10 @@ fn training_graph(
     pixel_loss: PixelLoss,
 ) -> Graph {
     config.validate();
+    assert!(
+        !behavior || !config.rgb_previous_frame,
+        "previous-frame RGB is world-only"
+    );
     assert!(length > 0 && length <= config.batch_length);
     assert!(time_batch_length > 0 && length.is_multiple_of(time_batch_length));
     let batch = config.batch_size;
@@ -397,9 +416,23 @@ fn training_graph(
     } else {
         (graph.scalar(0.0), graph.scalar(0.0))
     };
+    let encoder_observations = observations
+        .iter()
+        .enumerate()
+        .map(|(time, &current)| {
+            encoder_observation(
+                &mut graph,
+                config,
+                current,
+                &format!("previous_observation_{time}"),
+                batch,
+            )
+        })
+        .collect::<Vec<_>>();
+    let encoder_width = config.observation_dim() * if config.rgb_previous_frame { 2 } else { 1 };
     let mut encodings = Vec::with_capacity(length);
-    for chunk in observations.chunks(time_batch_length) {
-        let observation = stack_time(&mut graph, chunk, batch, config.observation_dim());
+    for chunk in encoder_observations.chunks(time_batch_length) {
+        let observation = stack_time(&mut graph, chunk, batch, encoder_width);
         let encoded =
             model
                 .representation
@@ -1554,6 +1587,13 @@ pub fn build_observe_graph(config: &DreamerConfig, batch: usize) -> Graph {
         batch,
     );
     let prior = dynamics.prior.forward(&mut graph, deter, batch);
+    let observation = encoder_observation(
+        &mut graph,
+        config,
+        observation,
+        "previous_observation",
+        batch,
+    );
     let encoded = representation
         .encoder
         .forward(&mut graph, observation, batch);

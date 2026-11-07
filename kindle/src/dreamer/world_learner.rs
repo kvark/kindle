@@ -26,6 +26,8 @@ mod observation_code_tests;
 #[cfg(test)]
 mod posterior_correction_diagnostic;
 #[cfg(test)]
+mod previous_frame_tests;
+#[cfg(test)]
 mod state_diagnostic;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -79,6 +81,15 @@ fn checkpoint_pixel_loss(
     let latent_only = metadata["config"]["rgb_latent_only"]
         .as_bool()
         .unwrap_or(false);
+    let previous_frame = metadata["config"]["rgb_previous_frame"]
+        .as_bool()
+        .unwrap_or(false);
+    if previous_frame && metadata["format"] != "kindle-world-only-v5" {
+        return Err("previous-frame RGB requires world-only checkpoint format v5".into());
+    }
+    if metadata["format"] == "kindle-world-only-v5" && (!previous_frame || latent_only) {
+        return Err("invalid previous-frame RGB checkpoint architecture".into());
+    }
     if latent_only && metadata["format"] != "kindle-world-only-v4" {
         return Err("latent-only RGB requires world-only checkpoint format v4".into());
     }
@@ -91,14 +102,17 @@ fn checkpoint_pixel_loss(
             .map(|v| serde_json::from_value(v.clone()))
             .transpose()?
             .unwrap_or_default()),
-        Some("kindle-world-only-v2" | "kindle-world-only-v3" | "kindle-world-only-v4") => {
-            Ok(serde_json::from_value(
-                metadata
-                    .get("pixel_loss")
-                    .ok_or("missing pixel objective")?
-                    .clone(),
-            )?)
-        }
+        Some(
+            "kindle-world-only-v2"
+            | "kindle-world-only-v3"
+            | "kindle-world-only-v4"
+            | "kindle-world-only-v5",
+        ) => Ok(serde_json::from_value(
+            metadata
+                .get("pixel_loss")
+                .ok_or("missing pixel objective")?
+                .clone(),
+        )?),
         _ => Err(io::Error::other("not a supported world-only checkpoint").into()),
     }
 }
@@ -221,6 +235,25 @@ fn action_inputs(
         mask(size.stoch * size.classes),
         mask(config.action_count),
     )
+}
+
+/// Select the preceding resized image in the same lane, duplicating the current
+/// image at a clipped start or episode reset. No future image is read.
+fn previous_images(observations: &[f32], actions: &[i32], time: usize, width: usize) -> Vec<f32> {
+    let batch = actions.len();
+    let start = time * batch * width;
+    let current = &observations[start..start + batch * width];
+    if time == 0 {
+        return current.to_vec();
+    }
+    let mut previous = observations[start - batch * width..start].to_vec();
+    for (row, &action) in actions.iter().enumerate() {
+        if action == -1 {
+            previous[row * width..(row + 1) * width]
+                .copy_from_slice(&current[row * width..(row + 1) * width]);
+        }
+    }
+    previous
 }
 
 fn rollout_weights(actions: &[i32], batch: usize, horizon: usize) -> Vec<Vec<f32>> {
@@ -448,6 +481,12 @@ impl WorldModelLearner {
                 &format!("observation_{time}"),
                 &observations[time * batch * width..(time + 1) * batch * width],
             );
+            if self.config.rgb_previous_frame {
+                self.train.set_input(
+                    &format!("previous_observation_{time}"),
+                    &previous_images(observations, &actions[range.clone()], time, width),
+                );
+            }
             let uniforms = (0..batch * size.stoch * size.classes)
                 .map(|_| self.rng.random_range(1e-6..1.0 - 1e-6))
                 .collect::<Vec<_>>();
@@ -647,6 +686,17 @@ impl WorldModelLearner {
                 "observation",
                 &observations[time * batch * width..(time + 1) * batch * width],
             );
+            if self.config.rgb_previous_frame {
+                self.observe.set_input(
+                    "previous_observation",
+                    &previous_images(
+                        observations,
+                        &actions[time * batch..(time + 1) * batch],
+                        time,
+                        width,
+                    ),
+                );
+            }
             self.observe.step();
             self.observe.wait();
             self.observe.read_output_by_index(0, &mut deter);
@@ -764,7 +814,10 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.rgb_latent_only {
+        let format = if self.config.rgb_previous_frame {
+            assert_eq!(self.training_scope, TrainingScope::All);
+            "kindle-world-only-v5"
+        } else if self.config.rgb_latent_only {
             assert_eq!(self.training_scope, TrainingScope::All);
             "kindle-world-only-v4"
         } else {
@@ -808,6 +861,9 @@ impl WorldModelLearner {
         let metadata: serde_json::Value =
             serde_json::from_slice(&std::fs::read(path.join("metadata.json"))?)?;
         let pixel_loss = checkpoint_pixel_loss(&metadata)?;
+        if metadata["config"]["rgb_previous_frame"].as_bool() == Some(true) {
+            return Err("frozen visual phase requires single-frame RGB".into());
+        }
         if metadata["config"]["rgb_latent_only"].as_bool() == Some(true) {
             return Err("frozen visual phase requires recurrent-conditioned RGB".into());
         }
