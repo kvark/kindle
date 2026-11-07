@@ -45,10 +45,12 @@ The selected [prospective fixed-plan challenge](docs/experiments/2026-11-07-brea
 evaluates that frozen model against its actual-initial control, with no training.
 Root `/mnt/data/kindle-breakout-world-branches-20261107`. Seven origin categories,
 eight seed streams each, fixed32-command plans, eight oracle/model repetitions;
-history16 primary,32 secondary. Eight CPU checks pass. Preserve the separate
+history16 primary,32 secondary. Nine CPU checks pass. The first collector fails before any oracle branch on
+manual-command teacher feedback; its log/declaration remain. Corrected CPU
+collection is active under `root/repair/oracle`. Preserve the separate
 sticky-fixture exposure failure and CPU-only review; replay the full source
 transcript before each branch because ALE clones omit private previous action.
-Next pin sources and collect the bounded CPU oracle, then guarded frozen GPU
+Sources are pinned; finish the bounded CPU oracle, then guarded frozen GPU
 evaluation. No new learner, capacity change, actor/critic resume or automatic
 successor. Untouched tests, later-game/second-wall coverage and fresh confirmation
 remain unfinished. Keep the full goal active and unproven.

@@ -17,9 +17,11 @@ critic learns. Earlier H16/H0 failures and CPU repairs stay in linked reports.
 Next is the [fixed-plan prospective challenge](experiments/2026-11-07-breakout-world-branches.md),
 with no training: seven groups of eight source seed streams,42 fixed plan batches,
 eight oracle/model repetitions, history16 primary/32 secondary. Root
-`/mnt/data/kindle-breakout-world-branches-20261107`. Eight CPU checks pass; the
+`/mnt/data/kindle-breakout-world-branches-20261107`. Nine CPU checks pass; the initial collector fails before any oracle branch
+on manual-command teacher feedback. Corrected collection is active under
+`root/repair/oracle`; preserve the original log/declaration. The
 sticky-fixture exposure assertion fails and is preserved. A separate CPU review
-verifies16 exact replay-corrected trace pairs. Pin and collect the bounded oracle,
+verifies16 exact replay-corrected trace pairs. Sources are pinned; finish the bounded oracle,
 then guarded initial/final frozen evaluation. No completed collector/learner
 repeats, unchanged extension, automatic successor or actor/critic resume. Existing
 training data omit later-game states (max score56/34, no ball above top row).
