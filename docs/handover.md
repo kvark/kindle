@@ -101,25 +101,31 @@ Source32b182a1/executable40e79a33,root
 pre-native guard-copy failure is preserved; no prior/teacher transition,optimizer
 or collector executes. Future images/readouts remain privileged diagnostics.
 
-The [observation-only visual code experiment](experiments/2026-11-07-breakout-world-observation-code.md)
-is implemented and natively qualified. Default-off `rgb_latent_only` makes the
-posterior CNN-only and RGB decoder z-only; core/prior/actions/heads retain their
-temporal interfaces. New architecture has66 logical/8,065,219 scalar weights and
-198 checkpoint tensors (legacy68/8,852,675/204). Changes are combined; no isolated
-cause or benefit is established. Version4 persists the option and old natives
-reject it before construction; legacy/default formats retain their behavior.
+The [observation-only visual code experiment](results/2026-11-07-breakout-world-observation-code.md)
+is closed and fails retention. New code learns from actual initial0/112 observed,
+but final65/112 observed,25/109 one-step,9/107 eight-step regress coverage108/112,
+94/109,14/107. It detects105/112 observed balls; position precision is weak.
+Primary energy.205862 versus.169502; RIGHT16 falsely ends96.21%,non-ending59/304
+above5%. Keep coverage; no unchanged extension, repeat or automatic successor.
 
 Root `/mnt/data/kindle-breakout-world-observation-code-20261107`; native780f00a8/
-SHAe6ca7ca4,runner68e9bbb7. All54 Rust CPU/99 packaged Python checks and strict
-core/binding Clippy pass. First native qualification passes268 pins in32.457s,
-198 exact initial restore tensors,18 initial/trained/legacy arrays,finite update,
-34 invariant visual parameters and exact h perturbation separation. The separately
-declared fresh8192-update run and restore are active in
-`kindle-world-observation-code-learning-20261107`,309 pins. Existing H16 latent
-overshooting,RGB64/12M/B8/T32/Auto,original data/full4/2/1/1 plan and all gates remain.
-Matched256/128 dense initial controls are added; final-only branch assessment is
-not allocated until reviewed learning. No old stage repeat,new loss/data/actor/
-critic,concurrent learner or automatic successor; full world goal stays open.
+SHAe6ca7ca4,runner68e9bbb7. Optional architecture66 logical/8,065,219 scalar weights,
+198 checkpoint tensors; default off,legacy unchanged,v4 persisted. First native
+qualification268 pins/32.457s,54 CPU/99 Python checks and strict Clippy pass.
+Learning309/branches1130 pins,8192 finite reports,all66 changed parameters,198 exact
+initial/frozen tensors,18 restored arrays,384 matched dense-initial origins and
+four guards pass. Native calls557.635s/loop830.191s (dense-initial outside timer);
+observed guard span856.209s,separate84 branches159.293s. Exact artifacts/failures
+and timing scopes remain in the report; no GPU worker remains active.
+
+Select the [CPU code-precision decomposition](experiments/2026-11-07-breakout-world-code-precision.md)
+from retained four-draw current-image reconstructions. Separate shared position
+bias from centered variation on all-detected images,while retaining full detection/
+accuracy denominators,source joins,deduplicated inputs and outcome-selection limits.
+Root `/mnt/data/kindle-breakout-world-code-precision-20261107`; no new model/emulator
+query,readout fit,update or GPU allocation. This checks a new observation-only code,
+not a repeat of old recurrent-h drift diagnostics. No cause or next learner is
+established; all world gates/full-goal requirements remain unchanged.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched

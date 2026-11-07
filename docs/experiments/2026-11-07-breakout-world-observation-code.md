@@ -7,8 +7,8 @@ conditioned on a drifted h. Test a visual code whose image information and
 reconstruction do not depend on recurrent history. This is a concrete hypothesis,
 not an isolated cause established by that diagnostic.
 
-Root `/mnt/data/kindle-breakout-world-observation-code-20261107`. Implementation
-and native qualification pass; the separately declared bounded learner is active.
+Root `/mnt/data/kindle-breakout-world-observation-code-20261107`. The experiment is
+[closed and fails retention](../results/2026-11-07-breakout-world-observation-code.md).
 
 ## Native intervention
 
@@ -90,4 +90,16 @@ The first guarded qualification passes268 pins in32.457s:198 exact initial tenso
 rejection. A separate309-pin learner/restore declaration selects fresh8192 updates
 with the original full plan. Matched256/128 dense initial exports use the final
 dense locations/draw; all198 post-query initial tensors must match the qualified
-actual initial checkpoint. The final-only branch allocation remains unstarted.
+actual initial checkpoint. Final-only branches are declared after learning review;
+their completed result is recorded below.
+
+## Completed learning and final assessment
+
+The declared fresh8192-update learner,restore and new-final-only84-group frozen
+assessment complete first attempt. All309 learning/1130 branch pins,finite losses,
+198 actual-initial/frozen tensors,18 restore arrays and unchanged source exposures
+pass. Actual initial dense256/128 cohorts match final source tables. All quality
+gates remain unchanged; observed/one/eight-step,primary energy,early ending and
+per-plan presence fail. Retain coverage and the complete negative result; no
+extension or automatic successor. The separate CPU precision diagnostic uses
+existing arrays only and allocates no learning/GPU work.
