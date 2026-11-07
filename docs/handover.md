@@ -55,21 +55,22 @@ checks,strict Clippy,five CPU optimizer checks,28 data/21 execution/123 analysis
 pins,one host guard/nine sealed pins and408 exact snapshot tensors pass. Initial
 compile/tiny-fixture failures and pre-GPU output-index correction remain recorded.
 Test-only measurement; retained packages/production graphs are unchanged.
-`closure-review.json` verifies closure. No Kindle worker,learner,collector or
-successor is active/selected. Do not repeat completed stages or old-model runs.
+`closure-review.json` verifies closure. At that diagnostic closure,no Kindle worker or successor was active/selected.
+Do not repeat completed stages or old-model runs.
 
 The [latent-overshooting experiment](experiments/2026-11-07-breakout-world-overshooting.md)
-is qualified and its separately declared fresh8,192-update learner is active.
-Retain observed pixel/motion reconstruction; add16-step causal prior-to-detached-
-posterior KL,without sampled outcome energy or extra image decoding. Same68
-parameters,RGB64/12M/B8/T32/Auto,seed41001 and exact coverage4/2/1/1 plan.54 CPU
-world,53 affected/53 packaged Python checks,strict Clippy,native derivatives,
-204 initial tensors,18 initial/restore arrays and two guards/sealed audits pass.
-87 qualification/96 learning input pins; H16 retains9,570 terminals/975,941 valid
-suffix rows. Sourcee311b216/native SHA965f2bd2,matching root/runtime at
-`/mnt/data/kindle-breakout-world-overshooting-20261107`. Fixed external gates
-precede any retention decision. Preserve initial syntax,F32-reference and
-scalar-zero-gradient fixture failures. No collector or actor/critic is selected.
+has completed its fresh8,192-update learner and restore; only its new-checkpoint
+frozen branch assessment is active. Native580.173s/loop825.609s; observed109/112,
+one-step93/109,four-step43/109 versus coverage33/109,but eight-step7/107 versus
+14/107 fails the fixed28/107 gate. Brick balanced error.200453 versus.223954.
+Do not promote from perception or the latent loss. All96 learning pins,204
+initial/frozen tensors,18 initial/restore arrays,exact plan/975,941 valid suffix
+rows and both learning guards/sealed audits pass. Sourcee311b216/native965f2bd2,
+matching root/runtime at `/mnt/data/kindle-breakout-world-overshooting-20261107`.
+The separately declared856-pin assessment reuses the oracle,history16/32,eight
+fixed draws,84 groups,1800s. No old model rerun,collector or actor/critic.54 CPU
+world,53 affected/53 packaged Python checks and native derivatives pass; preserve
+syntax,F32-reference,scalar-zero fixture and missing plotting-dependency failures.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
 uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
