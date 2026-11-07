@@ -14,24 +14,22 @@ pins,204 frozen tensors and18 exact restored arrays pass. Source/native3fa37b6d,
 SHA eafe8359; root `/mnt/data/kindle-breakout-world-motion-20261107`. No actor/
 critic learns. Earlier H16/H0 failures and CPU repairs stay in linked reports.
 
-The [fixed-plan challenge](results/2026-11-07-breakout-world-branches.md) is
-closed: seven groups/eight seed streams,42 plans,eight oracle/model draws,
-history16 primary/32 secondary. Short paddle responses work,but8-step supported
-ball draw-match is59.0% free flight/31.9% paddle approach versus100%/97.5% oracle
-leave-one-out. RIGHT ends all selected last-life branches by32 decisions; model
-ending probability averages.581%. History32 is no consistent rescue. Serving
-also exposes absent behavior coverage: no fitting16-action non-FIRE ball-absent
-run versus31 initial NOOPs here. These are diagnoses,not isolated causes.
+The [closed fixed-plan challenge](results/2026-11-07-breakout-world-branches.md)
+finds short paddle response but drifting ball forecasts,wrong serving and severe
+last-life ending underprediction(.581% versus100% on RIGHT). All431 input pins,
+guards and204 invariant tensors pass. Preserve its three original failures and
+separate repairs. No completed collector/learner/evaluator repeats.
 
-Root `/mnt/data/kindle-breakout-world-branches-20261107`, corrected work under
-`root/repair`. Nine CPU tests,393 manifest pins,431 evaluation inputs,both guards
-and204 invariant tensors per model pass;131.115/252.232s initial/final,
-298.770s CPU collection. Preserve original sticky-exposure,teacher-feedback and
-CPU-audit failures plus separate repairs. No completed phase repeats; no active
-GPU allocation,new learner or actor/critic resume. Next separately justify
-coverage/forecast supervision work. Current corpus max score56/34,no ball above
-top row; untouched tests,late-game/second-wall coverage and fresh confirmation
-remain unfinished. Keep the full goal active and unproven.
+The selected [behavior-coverage experiment](experiments/2026-11-07-breakout-world-coverage.md)
+adds one16,384-action fitting supplement: long waits,sustained controls and paths
+to game-over. Root `/mnt/data/kindle-breakout-world-coverage-20261107`. Eight CPU
+checks pass and all8,192 old uniform plans/counts stay exact. Native3fa37b6d/
+eafe8359 unchanged; pin/run resize-only collection(age0,204 invariant tensors),
+then audit before separately declaring one fresh matched-init8,192-update learner.
+Per-update recipe:4 old uniform +2 new uniform +1 waiting +1 terminal window.
+No model/loss change or label inputs. No learner/actor/critic is active; no automatic
+successor/extension. Max original corpus score56/34,no ball above top row;
+untouched tests,late-game/second-wall coverage and fresh confirmation remain open.
 
 ### Representation and training scope
 

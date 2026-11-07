@@ -41,24 +41,24 @@ matching runtime `/mnt/data/kindle-breakout-world-motion-20261107/runtime`.
 This learner/restore is closed; do not repeat or extend it. Earlier negative
 results and separate CPU repairs remain in linked reports.
 
-The [fixed-plan challenge](docs/results/2026-11-07-breakout-world-branches.md)
-is closed: seven groups/eight seed streams,42 plan batches,eight oracle/model
-draws,history16 primary/32 secondary. Useful short paddle responses are learned,
-but8-step ball draw-match within1 pixel is59.0% free flight/31.9% paddle approach,
-versus100%/97.5% oracle leave-one-out. RIGHT ends all selected last-life branches
-by32 decisions; predicted mean ending probability is.581%. History32 does not
-consistently rescue forecasts. Waiting-to-serve failure also exposes missing
-coverage: no fitting ball-absent16-action non-FIRE run versus31 initial NOOPs here.
+The [closed fixed-plan challenge](docs/results/2026-11-07-breakout-world-branches.md)
+finds short paddle responses but drifting ball forecasts,wrong serving and severe
+last-life ending underprediction(.581% versus100% for RIGHT). Its431 input pins,
+both guards and204 invariant tensors pass; preserve its three original failures
+and separate repairs. No completed phase repeats. Full world competence is unproven.
 
-Root `/mnt/data/kindle-breakout-world-branches-20261107`, corrected work under
-`root/repair`. Nine CPU tests,393 manifest pins,431 evaluation inputs,both guarded
-frozen jobs and all204 invariant tensors pass. Initial/final131.115/252.232s;
-CPU collection298.770s. Preserve original sticky-exposure,teacher-feedback and
-CPU-audit failures; separate repairs/limits are in the report. No GPU allocation
-or new learner is active/selected. Do not repeat completed phases or resume
-actor/critic. Next separately justify coverage/forecast supervision work; untouched
-tests,later-game/second-wall coverage and fresh confirmation remain unfinished.
-Keep the full goal active and unproven.
+The selected [coverage experiment](docs/experiments/2026-11-07-breakout-world-coverage.md)
+adds one16,384-action fitting supplement: long non-FIRE waits,sustained random
+controls and deliberate paths to game-over. Native/source3fa37b6d/eafe8359 stays
+unchanged. Eight CPU checks pass; original8,192 uniform sampling plans/counts
+remain exact. Root `/mnt/data/kindle-breakout-world-coverage-20261107`.
+Next pin and run the bounded resize-only collector under the host guard(age0,
+204 frozen tensors),then audit coverage before separately declaring one fresh
+matched-init8,192-update learner. Recipe per update:4 retained uniform windows,
+2 supplement uniform,1 waiting,1 terminal-focused. Architecture/losses unchanged;
+no RAM/phase labels enter model inputs/objectives. No learner or actor/critic is
+active. No automatic extension/successor. Untouched tests,later-game/second-wall
+coverage and fresh confirmation remain unfinished; keep the full goal active.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
