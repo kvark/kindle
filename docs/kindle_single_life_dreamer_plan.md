@@ -68,12 +68,25 @@ head. Their generalization failure does not prove information absent. Eight
 feature-input and30 action/source pins,63 fixed ridge coefficient/prediction
 files remain in root/readout-diagnosis. No readout enters model training.
 
-The [fixed-weight gradient diagnostic](experiments/2026-11-07-breakout-world-gradient-noise.md)
-is selected: three fixed fitting batches at the coverage checkpoint,observed
-control plus16 paired predictive draws,108 raw forward/backward steps with no
-optimizer or model update. Compare noise,loss alignment and CPU AGC/LaProp
-sensitivity before another learner. Root `/mnt/data/kindle-breakout-world-gradient-noise-20261107`.
-CPU checks precede one900s guarded worker; no learner,collector or actor/critic.
+The [fixed-weight gradient diagnostic](results/2026-11-07-breakout-world-gradient-noise.md)
+is **closed**:108 raw forward/backward steps at the coverage anchor,three fixed
+fitting batches,16 paired predictive draws,zero model/optimizer updates. Corrected
+variance increases550–893× in the prior,1,250–11,699× reward and57–207× continuation.
+Identical-input repeats are bitwise exact; paired decoder differences<6.15e-7.
+Prior noise394–460 versus observed gradient7.12–8.01;16-sample means remain poorly
+resolved. CPU AGC/LaProp references expose strong nonlinear sensitivity. Earlier
+`adam_m` comparisons include LaProp RMS normalization,not raw gradients or proof
+of AGC saturation. This narrows the estimator-noise question,not all causes of a
+fresh learner's failure. No scalar,learner,collector or successor is selected.
+
+Root `/mnt/data/kindle-breakout-world-gradient-noise-20261107`,source7c66bf12,
+diagnostic executable SHA636bf7e5. Native43.282s/CPU analysis77.774s;50 CPU world
+checks,strict Clippy,five optimizer reference checks,28/21/123 phase pins,one
+host guard/nine sealed pins and408 invariant snapshot tensors pass. Preserve
+compile/tiny-fixture failures and the pre-GPU output-index correction. Test-only
+measurement leaves production graphs/packages unchanged. `closure-review.json`
+verifies closure; no Kindle worker is active. Investigate variance/objective
+coupling before larger models or longer budgets; separately justify new work.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
 uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
