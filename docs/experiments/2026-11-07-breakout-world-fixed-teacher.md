@@ -105,3 +105,21 @@ Use AMD/Auto/host guard,stop real faults/nonfinite state,no reset/recovery/NVML.
 No unchanged extension,sweep,concurrent learner or automatic successor. Full
 physical forecasts,event calibration,brick memory,late/tunnel/second-wall data,
 untouched families and fresh confirmation remain required before goal completion.
+
+## Construction failure and separate loader repair
+
+The initial f19e3fec/nativea74334ab qualification stopped in construction before
+updates or evaluations: the complete checkpoint's logical parameter map does
+not equal the subset observation plan. Preserve its failed guard and all bytes
+under the original root. No world learning result exists for that package.
+
+The separate repair first loads/validates the full anchor against the complete
+training plan, then copies matching weights through existing native transfer
+into an independently allocated inference session and verifies it bitwise against
+the anchor. No shared parameter allocation or backend change. Ordinary restore
+subsequently loads current student state. Extra constructor loading/copying is
+included in worker time. Root
+`/mnt/data/kindle-breakout-world-fixed-teacher-loader-20261107`; reuse the exact
+prepared data/plan, requalify the changed constructor with new pinned bytes,
+and only then separately declare the original4096-update budget. This does not
+repeat a learner. Original failed qualification remains failed.

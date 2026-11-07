@@ -383,6 +383,11 @@ impl WorldModelLearner {
         };
         let mut train = runtime::build_training_session(&graph, &gpu, &config);
         runtime::initialize_d3(&mut train, &graph, config.seed);
+        if let Some(anchor) = &fixed_teacher {
+            // Validate the complete logical checkpoint before copying its
+            // matching weights into an independently allocated filter.
+            checkpoint::load_session(&mut train, &anchor.path)?;
+        }
         let batch = config.batch_size;
         let mut inference = |graph: Graph| {
             let mut session = runtime::build_session(&graph, &gpu, Mode::Inference, false);
@@ -396,7 +401,8 @@ impl WorldModelLearner {
                 Mode::Inference,
                 false,
             );
-            checkpoint::load_session(&mut session, &anchor.path)?;
+            runtime::sync_matching(&train, &mut session, "world.");
+            anchor.verify(&session)?;
             session
         } else {
             inference(world::build_observe_graph(&config, batch))

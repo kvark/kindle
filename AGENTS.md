@@ -35,10 +35,13 @@ forecast/head weights learn. This combines several changes and adds filter
 inference/memory; it does not isolate target drift. Root
 `/mnt/data/kindle-breakout-world-fixed-teacher-20261107`.
 
-Implementation and affected CPU graph/phase tests are ready. Preserve the original
-zero-sentinel gradient fixture failure and corrected check, nested-condition
-Clippy repair and CPU preparation import failure. No native qualification,
-GPU allocation or full learner is declared yet. Consult the protocol before work.
+Initial native qualification failed at construction before any update: a full
+training checkpoint cannot load directly into a subset inference plan. Preserve
+`/mnt/data/kindle-breakout-world-fixed-teacher-20261107`. The separate loader repair
+validates the complete training plan, then copies matching weights into an
+independently allocated filter and verifies GPU values. Repaired package/check
+root `/mnt/data/kindle-breakout-world-fixed-teacher-loader-20261107`; no learner
+is declared. Original CPU fixture/style/import failures remain retained.
 
 Retain the [coverage H0 control](docs/results/2026-11-07-breakout-world-coverage.md):
 observed108/112,one94/109,eight14/107. Source/native3fa37b6d,SHAeafe8359,
