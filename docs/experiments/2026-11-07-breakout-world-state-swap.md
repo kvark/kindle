@@ -97,3 +97,27 @@ identity. One900s worker under the existing AMD host guard;Auto precision,no NVM
 reset/reload/reboot or retry. Stop on numerical/real GPU faults. Verify all204
 checkpoint tensors before/after and original input hashes on CPU. Preserve any
 failure and separate repair. Production packages/defaults remain unchanged.
+
+## Construction failure and separately declared unstarted work
+
+The original sourcece0dc547 worker fails before any query or checkpoint snapshot:
+its raw JSON Value comparison sees one-F64-ULP parsing differences in beta2 and
+epsilon,although both pairs are identical native F32 values. Original guard exit101,
+empty query log,source,binary and inputs remain preserved; this protocol attempt
+does not pass. Its failed guard has27 sealed diagnostic files,not the nine files
+of a successful guard; preserve the first CPU audit's incorrect nine-pin assertion.
+
+The corrected test compares complete configurations after deserializing to the
+actual DreamerConfig types,without changing numeric tolerances or model settings.
+A CPU regression accepts only the equivalent F32 values and rejects actual beta2,
+epsilon and geometry changes. CPU review rehashes38 data/14 execution pins,checks
+all native configuration leaves and verifies zero original queries/snapshots.
+56 CPU world tests and strict Clippy pass. The changed configuration precheck is
+also performed before GPU construction. No forward graph or input changes.
+
+Separately select only the48 unstarted queries in root/repair,under a new source/
+executable/input declaration and one900s guard. Keep the original failed attempt
+distinct; no original result,guard or declaration is overwritten or relabeled.
+This is a corrected construction check followed by missing measurements,not a
+retry of a completed measurement or a response to a GPU fault. No learner or
+collector is selected.

@@ -82,9 +82,11 @@ The [frozen state-substitution diagnostic](experiments/2026-11-07-breakout-world
 is selected:32 original dense origins plus10 terminal-centered development
 windows,four fixed draws,two checkpoints,readout-only h/z replacements. Future
 information is explicitly diagnostic and never feeds a prior rollout.55 CPU world
-tests pass; preserve the initial moved-value compilation failure. One900s guarded
-test worker follows source/data/executable pins,no package or production-graph
-change. Root `/mnt/data/kindle-breakout-world-state-swap-20261107`. No learner or
+tests initially pass; preserve the moved-value compilation failure and original
+pre-query JSON-double comparison failure. Native F32 configuration comparison
+and rejection checks now pass56 CPU tests/strict Clippy. CPU-only review preserves
+the failed guard's27 sealed files and zero queries; a separately pinned root/repair
+worker selects only48 unstarted measurements,900s,no production-graph/package change. Root `/mnt/data/kindle-breakout-world-state-swap-20261107`. No learner or
 collector is selected; no cause or new training objective is established yet.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/

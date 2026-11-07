@@ -13,6 +13,29 @@ use std::{
 const HORIZONS: [usize; 5] = [1, 4, 8, 16, 32];
 const MODES: [(bool, bool); 4] = [(false, false), (true, false), (false, true), (true, true)];
 
+fn native_config_matches(config: &DreamerConfig, declared: &Value) -> bool {
+    let expected: DreamerConfig = serde_json::from_value(declared.clone()).unwrap();
+    serde_json::to_value(config).unwrap() == serde_json::to_value(expected).unwrap()
+}
+
+#[test]
+fn state_configuration_compares_f32_values_and_rejects_actual_changes() {
+    let config = DreamerConfig::tiny(18);
+    let mut declared = serde_json::to_value(&config).unwrap();
+    declared["optimizer_beta2"] = json!(0.9990000128746032);
+    declared["optimizer_epsilon"] = json!(9.999999682655224e-21);
+    assert!(native_config_matches(&config, &declared));
+    for (field, value) in [
+        ("optimizer_beta2", json!(0.998)),
+        ("optimizer_epsilon", json!(2e-20)),
+        ("batch_size", json!(config.batch_size + 1)),
+    ] {
+        let mut changed = declared.clone();
+        changed[field] = value;
+        assert!(!native_config_matches(&config, &changed), "{field}");
+    }
+}
+
 fn blocks(
     prior: &[f32],
     teacher: &[f32],
@@ -368,6 +391,13 @@ fn frozen_state_substitutions() {
     let mut movies = 0;
     for model in settings["models"].as_array().unwrap() {
         let name = model["name"].as_str().unwrap();
+        let metadata: Value = serde_json::from_slice(
+            &fs::read(Path::new(model["checkpoint"].as_str().unwrap()).join("metadata.json"))
+                .unwrap(),
+        )
+        .unwrap();
+        let declared: DreamerConfig = serde_json::from_value(metadata["config"].clone()).unwrap();
+        assert!(native_config_matches(&declared, &model["config"]));
         let mut learner =
             WorldModelLearner::restore(Path::new(model["checkpoint"].as_str().unwrap())).unwrap();
         assert_eq!(
@@ -377,10 +407,7 @@ fn frozen_state_substitutions() {
         assert_eq!(learner.updates, 8192);
         assert_eq!(learner.train.adam_step_count(), 8192);
         assert_eq!(learner.parameter_names().len(), 68);
-        assert_eq!(
-            serde_json::to_value(learner.config()).unwrap(),
-            model["config"]
-        );
+        assert!(native_config_matches(learner.config(), &model["config"]));
         learner.save(&out.join(format!("before-{name}"))).unwrap();
         let size = learner.config.network();
         let b = learner.config.batch_size;
