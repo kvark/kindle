@@ -2,19 +2,35 @@
 
 ## Selected direction: Breakout world model in isolation
 
-The [fixed-filter direct RGB phase](experiments/2026-11-07-breakout-world-fixed-image.md)
-is selected for native qualification before a separately declared4096-update
-warm check. It combines the qualified immutable full H0 filter with existing
-H16 motion RGB supervision through the fixed decoder,instead of latent KL/h
-energy. This combination has not been tested by either closed phase. Same data,
-H0 source8192,32 active/36 fixed weights,plan and unchanged gates; explicit v7.
-85 world CPU/97 packaged Python/Clippy checks pass. First native qualifier462
-pins/19.872s passes204 inherited tensors,18 initial/trained restored arrays,two
-finite11-report updates,32 active changed/36 visual fixed weights,exact filter/
-targets and v7 rejection; unchanged primitive/prefix/lane receipts are reused.
-Native/source/runner b4d4f8f2,SHA9402c44d. Separately declared4096 warm updates
-8192→12288 and final restore are active under the AMD host guard. Root
-`/mnt/data/kindle-breakout-world-fixed-image-20261107`; full goal unproven.
+The [fixed-filter direct RGB phase](results/2026-11-07-breakout-world-fixed-image.md)
+is closed and fails retention. Warm4096 updates8192→12288 from original H0 with
+fixed full filter/36 visual weights/32 learned forecast-head weights and existing
+H16 motion RGB objective yields dev108/112,94/109,47/109,17/107,3/114,0/95
+at observed/1/4/8/16/32. Primary energy.303067 is78.80% worse than H0.169502 and
+worse than prior fixed-target.141405. LEFT freeflight8 presence52/64 fails90%;
+ending32 Brier.451774 fails.18/304 individual non-ending cases>5%,max10.994%,
+remain explicit while category means pass. Full per-action/reward/paddle/brick
+regressions versus H0/fixed-target/frozen-visual controls and causal clips retained.
+Keep coverage;no repeat,extension,sweep or automatic successor;full goal unproven.
+
+Source/native/runnerb4d4f8f2,SHA9402c44d;root
+`/mnt/data/kindle-breakout-world-fixed-image-20261107`.85 affected world CPU/97
+packaged Python/strict Clippy checks pass. First qualifier462 pins/19.872s,
+learning469 pins/123 CPU inputs,branches1133 pins,four guards/36 sealed
+files and2653-pin closure pass;no native stage failure/retry.204 initial/
+frozen tensors,4096 finite11-report rows,32 active changed/36 visual exact weights,
+72 allowed visual moment changes,384 dense-initial origins,108 cached initial/
+24 fixed visual arrays,18 restored arrays,full488,356 suffix exposures and teacher
+GPU/file identity pass. v7 persists objective/scope;legacy/default semantics stay.
+Unchanged filter/primitive receipts reused with source identity checks.
+
+Native455.465s/loop532.665s plus inherited529.515s/796.900s,total984.980s/1329.565s;
+worker550.646s includes construction/dense-initial/pins/polling;restore9.212s,
+new frozen84 groups150.138s and CPU comparison47.351s separate. Extra teacher
+6,203,136 scalar copies/session35,799,168 bytes(not peak or exact system increment),
+106,261,452-byte anchor and warm/development limits remain explicit.834,978,639-byte
+cache released;wheels/runtime/CPU executable/checkpoints/source retained. All
+current services terminal. No new data/labels/model size/actor/critic/backend loss.
 
 The [fixed observation-filter phase](results/2026-11-07-breakout-world-fixed-teacher.md)
 is closed and fails retention. Warm4096 updates8192→12288 with an independent

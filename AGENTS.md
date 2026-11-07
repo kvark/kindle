@@ -26,21 +26,26 @@ CNN/categorical RSSM/RGB decoder as the inspectable reference; CDP is a later
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-Select the [fixed-filter direct RGB phase](docs/experiments/2026-11-07-breakout-world-fixed-image.md)
-for native qualification,then a separately declared4096-update warm check.
-Keep the complete H0 observation filter and36 visual weights fixed; learn32
-forecast/head weights with existing H16 motion RGB loss through the fixed decoder.
-This replaces latent KL/h-energy suffix supervision; it is a new objective,
-not an extension of a completed phase. Root
-`/mnt/data/kindle-breakout-world-fixed-image-20261107`. v7 objective explicit,
-old defaults/architectures unchanged. No new data,labels,actor/critic or backend
-primitive.85 world CPU/97 packaged Python checks and strict core/binding Clippy pass.
-First native qualification462 pins/19.872s passes204 inherited tensors,18 initial/
-trained restore arrays,two finite11-report updates,32 active changed/36 visual
-fixed weights,exact filter/targets across updates/restore and v7 legacy rejection.
-Unchanged prefix/lane/primitive receipts are reused with source identity checks.
-Source/native/runner b4d4f8f2,SHA9402c44d. The separately declared4096 warm updates
-8192→12288 and final restore are active under the AMD host guard.
+The [fixed-filter direct RGB phase](docs/results/2026-11-07-breakout-world-fixed-image.md)
+is closed and fails retention. Same fixed full H0 filter/36 visual weights,
+32 learned forecast/head weights; existing H16 motion RGB replaces latent/h
+suffix objectives. Recorded dev108/112 observed,94/109 one,17/107 eight;16/32
+return3/114 and0/95. Primary energy.303067 is78.80% worse than H0.169502;
+LEFT presence52/64 and ending32 Brier.451774 fail.18/304 non-ending cases>5%,
+max10.994%,remain reported despite passing category-mean gate. Keep coverage.
+No extension,repeat,sweep or automatic successor; full goal remains unproven.
+
+Root `/mnt/data/kindle-breakout-world-fixed-image-20261107`;native/source/runner
+b4d4f8f2,SHA9402c44d.85 world CPU/97 packaged Python/Clippy checks pass. First
+qualifier462 pins/19.872s,learning469 pins/123 CPU inputs,
+84 branches1133 pins,2653-pin closure,four guards/36 sealed files pass.
+All4096 finite11-report updates,204 inherited/frozen tensors,32 active changed/
+36 fixed visual weights,384 dense-initial origins,24 fixed visual arrays,18
+restored arrays and teacher GPU/file identity pass. No native stage failure/retry.
+New native455.465s/loop532.665s plus inherited529.515s/796.900s;observed worker
+550.646s includes construction/dense-initial/pins/polling;frozen branches150.138s
+separate. Extra filter and warm/development limits remain disclosed.834,978,639-byte
+build cache released;useful checkpoints/runtime/source retained. All services terminal.
 
 The [preceding fixed-target phase](docs/results/2026-11-07-breakout-world-fixed-teacher.md)
 remains closed/failed:one98/109,eight17/107,energy.141405(16.58% gain),RIGHT
