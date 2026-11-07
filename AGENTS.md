@@ -77,13 +77,19 @@ the parent JSON/112-file repair and first base-interpreter NumPy launch failure;
 the separately declared invocation repair ran only the still-unstarted collection.
 No completed collector or learner repeats; no GPU worker is active.
 
-Next implement/pin the fixed paired/original/wait/terminal sampler and qualify
-one full-shape native update, then separately declare the bounded fresh H16
-learner/restore/new-checkpoint assessment from the
+The fixed paired/original/wait/terminal sampler is implemented. Four related
+plan lanes share a real common cut; half target the intervention, half use valid
+uniform cuts. The seeded terminal-pool cycle includes all paired terminal ends.
+Original sixteen-stream fitting/development evaluations remain unchanged, with
+paired fitting diagnostics separate. Ten new sampler checks and fourteen existing
+corpus/coverage checks pass. Next pin the plan/data/runner and qualify one full-
+shape native update, then separately declare the bounded fresh H16 learner/
+restore/new-checkpoint assessment from the
 [protocol](docs/experiments/2026-11-07-breakout-world-paired-actions.md).
-No model improvement is established by collecting data. Keep all original quality
-gates plus per-plan freeflight ball presence at 8 >=90%; position/calibration,
-late coverage and fresh confirmation remain necessary. No automatic successor.
+No model improvement is established by collecting data or passing CPU checks.
+Keep original quality gates plus per-plan freeflight ball presence at 8 >=90%;
+position/calibration, late coverage and fresh confirmation remain necessary.
+No automatic successor or native primitive/backend rerun.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched

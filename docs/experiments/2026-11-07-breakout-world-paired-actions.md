@@ -108,3 +108,35 @@ an emulator/world. A new declaration pins those original failures and the
 unchanged collector/native sources; `unstarted-collection-queue.json` allocates
 only the still-unstarted first collection. Do not relabel the original launch
 as passed or repeat any collected stage.
+
+## Fixed sampler and runner implementation
+
+Each update selects one of 112 parent/repeat groups uniformly. Its first four
+lanes use the four plan streams at a common start in `[0, min(future lengths)]`.
+Exactly half the 8,192 updates target start `min(16, limit)`; the other half use
+uniform valid starts. Original-data lanes sample the original eight streams.
+Waiting windows use the existing supplement pool. The terminal pool combines
+existing original/supplement windows and each paired terminal's final complete
+32-arrival window; cycle a fixed seeded permutation of that pool. This keeps
+longer-plan terminal labels available when a short member limits the paired cut.
+Declare actual terminal exposure; pool membership alone is not a learning result.
+
+The Python runner adds an optional `evaluation_fitting` argument to the corpus
+trainer. Its default retains previous behavior; this experiment explicitly uses
+the original sixteen streams for periodic and dense fitting evaluation. Assert
+both original fitting/development selections against the retained control before
+training. A separate post-training diagnostic evaluates all 448 paired origins,
+one fixed model draw, conditioning on the last sixteen source-prefix images.
+Unavailable tails stay unscored under the qualified existing evaluator. Save and
+verify 204 frozen tensors after that diagnostic. It is fitting evidence, not a
+new held-out success gate or gameplay evaluation. Its time is reported separately
+from the established training/evaluation loop timer.
+
+The implementation changes Python data loading/sampling and evaluation routing
+only. Native source `85dbe150` / SHA256 `5b112866` is reused unchanged. New CPU
+sampler tests cover short branches, exact first-prefix actions, common cuts,
+terminal availability, actual exposure counts and invalid groups/reset/terminal/
+geometry inputs. Existing corpus/coverage tests also pass. Qualify one mixed
+full-shape update with 204 matched initial tensors, eighteen initial/restore
+arrays, eleven finite losses and exact suffix-mask/total identities before a
+separately declared fresh learner. Do not rerun native primitive suites.

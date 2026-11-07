@@ -201,11 +201,13 @@ def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
     return result
 
 
-def train(args, config, fitting, development, *, sampler=sampler_plan, initial_reference=None):
+def train(args, config, fitting, development, *, sampler=sampler_plan, initial_reference=None,
+          evaluation_fitting=None):
     import kindle
     from safetensors.numpy import load_file
     plan, expected_counts = sampler(fitting, config, args.steps, args.prediction_length)
-    selections = dict(fitting=choose_evaluation(fitting, 112003), development=choose_evaluation(development, 112019))
+    evaluation_fitting = fitting if evaluation_fitting is None else evaluation_fitting
+    selections = dict(fitting=choose_evaluation(evaluation_fitting, 112003), development=choose_evaluation(development, 112019))
     if args.reference is not None:
         assert config == json.loads((args.reference/'declaration.json').read_text())['config']
         assert np.array_equal(plan, np.load(args.reference/'sampler-plan.npz', allow_pickle=False)['locations'])
@@ -232,7 +234,7 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
     def evaluate(step):
         output = args.output/'evaluations'/str(step)
         output.mkdir(parents=True)
-        for split, streams in [('fitting', fitting), ('development', development)]:
+        for split, streams in [('fitting', evaluation_fitting), ('development', development)]:
             for kind, locations in selections[split].items():
                 evaluate_group(learner, streams, locations, output, f'{split}-{kind}')
 
@@ -281,7 +283,7 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             if step % args.eval_every == 0 or step == args.steps: evaluate(step)
     final_extra = args.output/'dense-final'
     final_extra.mkdir()
-    for label, streams, count, seed in [('fitting', fitting, args.dense_fitting, 182003),
+    for label, streams, count, seed in [('fitting', evaluation_fitting, args.dense_fitting, 182003),
                                         ('development', development, args.dense_development, 182009)]:
         locations = sample_locations(streams, HISTORY+1, count, np.random.default_rng(seed))
         evaluate_group(learner, streams, locations, final_extra, label, draws=DRAWS[:1])
