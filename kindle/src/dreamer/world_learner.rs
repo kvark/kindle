@@ -269,12 +269,8 @@ impl WorldModelLearner {
         {
             return Err("state rollout objective requires a positive prediction length".into());
         }
-        if pixel_loss.motion_attention()
-            && !pixel_loss.latent_overshooting()
-            && !pixel_loss.recurrent_energy()
-            && prediction_length != 0
-        {
-            return Err("motion pixel attention requires no prior-image objective".into());
+        if pixel_loss.predictive() && prediction_length != 0 {
+            return Err("predictive motion requires no suffix image objective".into());
         }
         let gpu = Arc::new(crate::init_gpu_context()?);
         let graph = match (pixel_loss, prediction_length) {

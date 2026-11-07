@@ -127,6 +127,10 @@ fn motion_objective_preserves_parameters_and_checkpoint_objectives_are_versioned
     };
     assert_eq!(names(&normal), names(&motion));
     meganeura::compile_training_graph(&motion);
+    let rollout =
+        world::build_world_only_pixel_training_graph(&config, 2, PixelLoss::MotionCrossEntropy);
+    assert_eq!(names(&normal), names(&rollout));
+    meganeura::compile_training_graph(&rollout);
     let read = |v| checkpoint_pixel_loss(&v);
     assert_eq!(
         read(serde_json::json!({"format":"kindle-world-only-v1"})).unwrap(),

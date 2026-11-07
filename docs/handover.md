@@ -41,32 +41,32 @@ oracle0%; event timing/reward remain wrong. Sourcee311b216/native965f2bd2,matchi
 root/runtime `/mnt/data/kindle-breakout-world-overshooting-20261107`. All execution
 checks pass; do not replace the trajectory control or extend this recipe.
 
-The [state-substitution diagnosis](results/2026-11-07-breakout-world-state-swap.md)
-finds a useful readout repair: newer-model eight-step ball counts are prior 8/108,
-corrected h90/108, corrected z12/108, full teacher 104/108. Future-informed hybrids
-never feed rollouts; this is not a learned improvement or causal error fraction.
-Past categorical errors can cause h drift. Observed-state timing also remains
-imperfect; the report retains original construction/analysis failures and repairs.
+The [state substitutions](results/2026-11-07-breakout-world-state-swap.md)
+repair newer-model eight-step readouts 8→90/108 with future-informed h, versus
+12/108 with future-informed z. These hybrids never feed rollouts and do not prove
+learned improvement or causal attribution. Past categorical errors can cause drift.
+The [recurrent-energy learner](results/2026-11-07-breakout-world-recurrent-energy.md)
+is closed: one-step 88/109, eight-step 13/107, primary energy gain 22.11% below 25%,
+and false early endings. Retain the coverage control; do not extend that recipe.
 
-The [recurrent-state energy learner](results/2026-11-07-breakout-world-recurrent-energy.md)
-is closed and fails retention. Two causal H16 futures toward stopped observed h,
-RMS energy at scale 100, no added parameters or inference inputs. Fresh 8,192 updates
-retain observed 108/112, but one-step 94→88/109 and eight-step 14→13/107 regress;
-16-step 3→6/114 rises,32-step stays 0/95. Primary ball energy improves 22.11%, below 25%.
-Ending 32 Brier .052126 improves, but ending 16 Brier .229969 and RIGHT 16 ending 55.43%
-versus oracle 0% fail timing. Ending 32 reward Brier .419860 also regresses.
-Native calls 604.731s/loop 837.601s versus 529.515s/796.900s. Retain coverage control;
-no unchanged extension or successor. Internal state dispersion is not competence.
+The [CPU drift decomposition](results/2026-11-07-breakout-world-drift-components.md)
+is closed: 82–86% empirical mean-delta share at 8/16 in two older checkpoints,
+75–82% after finite-draw correction. Shared learned drift warrants investigation
+before suppressing sampling, without a causal/physical-error fraction claim.
+106 input/four output pins,6,144 algebra identities pass; no new native query.
+Preserve its first mutable-source-pin declaration failure and archive-based repair.
 
-Root `/mnt/data/kindle-breakout-world-recurrent-energy-20261107`, source `ab68b0f7`,
-native SHA `2d02f981`, matching root/runtime .60 CPU world/54 affected/54 packaged
-Python checks and strict Clippy pass; 90 qualification/99 learning/1,068 branch
-pins, five guards/45 sealed pins,204 initial/frozen tensors and 18 restore arrays
-pass. Preserve the initial CPU declaration and missing-script controller failure
-before native construction, plus the old-prose-path review repair; original
-attempts are not passed retroactively. Separate cache release retains package/
-runtime. All stages closed; no Kindle GPU worker, collector or actor/critic active.
-Do not repeat completed stages or old queues. Full goal remains active/unproven.
+The [motion-weighted future-image experiment](experiments/2026-11-07-breakout-world-motion-rollout.md)
+is selected. Keep observed motion RGB losses; add causal H16 direct RGB
+cross-entropy with the same generic motion weights, at reconstruction scale 100.
+No object labels, capacity change or privileged inference input. Earlier uniform
+future-image losses failed; pointwise pressure may still blur uncertain futures.
+62 CPU world tests,55 affected/55 packaged Python checks, release packaging and
+strict workspace/binding Clippy pass. New native loss/preflight precede a separately
+pinned fresh 8,192-update learner. Root
+`/mnt/data/kindle-breakout-world-motion-rollout-20261107`. No GPU job yet.
+No collector, actor/critic, unchanged extension or automatic successor. All old
+stages stay closed; preserve original failures and separate repairs.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched

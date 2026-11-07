@@ -250,7 +250,7 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             keep = rollout_validity(batch['action'], args.prediction_length)
             assert len(values) == len(report_names(args.pixel_loss, args.prediction_length))
             if args.prediction_length and args.pixel_loss != RECURRENT_OBJECTIVE: assert values[10] == float(keep.mean())
-            if args.pixel_loss == LATENT_OBJECTIVE:
+            if args.pixel_loss == LATENT_OBJECTIVE or args.pixel_loss == 'motion_cross_entropy':
                 np.testing.assert_allclose(values[0], reported_total(config, values, args.pixel_loss, args.prediction_length), rtol=1e-5)
             if args.pixel_loss in PREDICTIVE_OBJECTIVES or args.pixel_loss == RECURRENT_OBJECTIVE:
                 valid = keep if args.pixel_loss == RECURRENT_OBJECTIVE else batch['action'] >= 0

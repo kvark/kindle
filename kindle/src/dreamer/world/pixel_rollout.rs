@@ -8,6 +8,21 @@ pub(super) struct PixelRollout {
     pub states: Vec<NodeId>,
 }
 
+fn motion_loss(
+    graph: &mut Graph,
+    errors: NodeId,
+    current: NodeId,
+    previous: NodeId,
+    keep: NodeId,
+) -> NodeId {
+    let weights = super::super::networks::pixel_motion_weights(graph, current, previous, keep);
+    let weighted = graph.mul(errors, weights);
+    let per_row = graph.sum_inner(weighted);
+    let keep = graph.stop_gradient(keep);
+    let weighted = graph.mul(per_row, keep);
+    graph.sum_all(weighted)
+}
+
 pub(super) fn build(
     graph: &mut Graph,
     config: &DreamerConfig,
@@ -18,7 +33,7 @@ pub(super) fn build(
     pixel_loss: PixelLoss,
 ) -> PixelRollout {
     let (mut deter, mut stoch) = initial;
-    assert!(!actions.is_empty() && actions.len() == observations.len());
+    assert!(!actions.is_empty() && actions.len() + 1 == observations.len());
     let size = config.network();
     let batch = config.batch_size;
     let decoder = model
@@ -28,7 +43,8 @@ pub(super) fn build(
     let mut losses = Vec::new();
     #[cfg(test)]
     let mut states = Vec::new();
-    for (time, (&action, &observation)) in actions.iter().zip(observations).enumerate() {
+    for (time, (&action, pair)) in actions.iter().zip(observations.windows(2)).enumerate() {
+        let (previous, observation) = (pair[0], pair[1]);
         deter = model
             .dynamics
             .core
@@ -58,7 +74,7 @@ pub(super) fn build(
         let state = feature(graph, deter, stoch, batch, config);
         #[cfg(test)]
         states.push(state);
-        let squared = if pixel_loss == PixelLoss::CrossEntropy {
+        let squared = if pixel_loss != PixelLoss::SquaredError {
             decoder.cross_entropy(graph, state, observation, batch)
         } else {
             let prediction = decoder.forward(graph, state, batch);
@@ -66,11 +82,17 @@ pub(super) fn build(
             let residual = graph.sub(prediction, target);
             graph.mul(residual, residual)
         };
-        let per_row = graph.sum_inner(squared);
-        let weight = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
-        let weight = graph.stop_gradient(weight);
-        let weighted = graph.mul(per_row, weight);
-        losses.push(graph.sum_all(weighted));
+        let loss = if pixel_loss.motion_attention() {
+            let keep = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
+            motion_loss(graph, squared, observation, previous, keep)
+        } else {
+            let per_row = graph.sum_inner(squared);
+            let weight = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
+            let weight = graph.stop_gradient(weight);
+            let weighted = graph.mul(per_row, weight);
+            graph.sum_all(weighted)
+        };
+        losses.push(loss);
     }
     let loss = sum(graph, &losses);
     let loss = graph.scale(loss, 1.0 / (batch * actions.len()) as f32);
@@ -82,13 +104,20 @@ pub(super) fn build(
 }
 
 #[cfg(test)]
+mod motion_tests;
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::collections::HashSet;
 
     #[test]
     fn future_images_are_targets_only_and_prior_parameters_receive_gradients() {
-        for pixel_loss in [PixelLoss::SquaredError, PixelLoss::CrossEntropy] {
+        for pixel_loss in [
+            PixelLoss::SquaredError,
+            PixelLoss::CrossEntropy,
+            PixelLoss::MotionCrossEntropy,
+        ] {
             let mut config = DreamerConfig::tiny(3);
             config.observation_kind = ObservationKind::Rgb64;
             config.actor_critic_gradient = false;
@@ -109,7 +138,7 @@ mod tests {
                     )
                 })
                 .collect::<Vec<_>>();
-            let images = (0..3)
+            let images = (0..4)
                 .map(|i| {
                     graph.input(
                         &format!("target{i}"),

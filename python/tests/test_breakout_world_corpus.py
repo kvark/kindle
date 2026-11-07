@@ -44,6 +44,13 @@ def test_recurrent_energy_reports_and_total_keep_suffix_and_pixel_scales_distinc
     assert corpus.reported_total(dict(loss_scales=scales),values,corpus.RECURRENT_OBJECTIVE,16)==100*(1+.25)+2*2+.1*3+3*4+4*5
 
 
+def test_motion_suffix_reports_preserve_pixel_scale_and_full_suffix_mask():
+    assert corpus.report_names('motion_cross_entropy',16)==corpus.LOSS_NAMES
+    values=[0.,1.,2.,3.,4.,5.,0.,0.,0.,6.,.5]
+    scales=dict(reconstruction=100.,dynamics=2.,representation=.1,reward=3.,continuation=4.)
+    assert corpus.reported_total(dict(loss_scales=scales),values,'motion_cross_entropy',16)==700+2*2+.1*3+3*4+4*5
+
+
 class PersistenceLearner:
     config = dict(batch_size=2, horizon=333)
     updates = 7

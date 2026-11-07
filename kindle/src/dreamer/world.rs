@@ -345,7 +345,7 @@ pub(crate) fn build_world_only_pixel_training_graph(
     }
     if pixel_loss.latent_overshooting() || pixel_loss.recurrent_energy() {
         assert!(prediction_length > 0);
-    } else if pixel_loss.motion_attention() {
+    } else if pixel_loss.predictive() {
         assert_eq!(prediction_length, 0);
     }
     assert!(!config.actor_critic_gradient && !config.expert_world_gradient());
@@ -1088,7 +1088,7 @@ fn training_graph(
             &model,
             (deters[start - 1], stochs[start - 1]),
             &actions[start..],
-            &observations[start..],
+            &observations[start - 1..],
             pixel_loss,
         )
     });
