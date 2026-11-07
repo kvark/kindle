@@ -43,44 +43,39 @@ previous recorded-control/fixed-action framing without changing any failed gate.
 877 input pins, 210 endpoint identities, 336 cached-feature checks and 140 energy
 cells pass. Three full causal APNGs use retained arrays, with no new queries.
 
-The [paired fitting-action collection](results/2026-11-07-breakout-world-paired-actions-data.md)
-is complete: 56 fitting-only parents, 448 branches, 13,068 new actions / 52,122
-emulator frames in 228.179s. Source/restore replay adds 503,280 actions / 2,012,229
-frames, counted separately. All 14,336 shared prefix arrivals and valid future
-commands/terminals/counts pass independent CPU review; 84 terminal branches are
-retained without fake futures. All eight fitting freeflight parents have identical
-finite reference ball paths across four repeat0 plans through 16 decisions.
-Repeat0 shares parent RNG; repeat1 evolves per plan and is not common RNG or
-independent. No development/oracle source selected parents; cross-split identical-
-history exclusion was not separately tested. These are reused fitting families.
-
-Root `/mnt/data/kindle-breakout-world-paired-actions-20261107`; reuse motion-rollout
-native `5b112866` and matching runtime. Zero predictions/updates, 204 unchanged
-camera tensors, 1,792 exact native-resize prefix images, 167 input/677 output pins,
-nine CPU collector checks and host guard pass. CPU review takes 96.815s. Preserve
-the parent JSON/112-file repair and first base-interpreter NumPy launch failure;
-the separately declared invocation repair ran only the still-unstarted collection.
-No completed collector or learner repeats; no GPU worker is active.
-
 The [paired-data learner](results/2026-11-07-breakout-world-paired-actions-learning.md)
-is active under `kindle-world-paired-actions-learning-20261107`. One fresh
-8,192-update H16 RGB64/12M/B8/T32/Auto world uses the existing motion loss/rates/
-seed41001; native `5b112866` is unchanged. Python runner source `e751a883` pins
-sampling/evaluation routing. No actor/critic or emulator collection runs. The
-4-paired/2-original/1-wait/1-terminal plan has 989,057 valid suffix targets and
-10,562 suffix terminals; stored prefix duplicates are not new experience.
-Original fitting/development evaluation origins match the control; all 448 paired
-origins get separate fitting diagnostics. Data and sampling change together.
+is closed and fails retention. Fresh 8,192 updates regress recorded observed
+99→76/112, one-step 84→46/109, eight-step 25→5/107 versus motion rollout. New
+paired fitting also underfits: 76/251 at eight, 0/102 at 32; freeflight-origin
+subset 4/64 at eight. Fixed-plan primary energy .349371 is 106.12% worse than
+control; freeflight detections NOOP/LEFT/RIGHT/REVERSE are 8/32/32/43 of 64, all
+below 90%. Ending32 Brier .378178 and 134/304 non-ending cases >5% (max 96.24%) fail.
+Some fixed-plan one-step accuracy improves; no broad/per-action competence claim.
+Keep coverage; no unchanged extension, repeat or sweep.
 
-Ten new sampler/fourteen existing CPU checks pass. The single full-shape
-preflight completes in 27.956s: 517 pins, 204 matched initial/frozen tensors,
-eighteen initial/restore arrays, eleven finite losses, exact mask/total and guard
-checks pass. The learner/restore declaration pins 524 inputs and caps stages at
-3600/600s. Audit completion and restore before separately declaring a new-final-
-checkpoint-only branch assessment (1800s); do not restart on an observer timeout.
-Keep original quality gates plus each freeflight plan's ball presence at 8 >=90%.
-Full competence, late coverage and fresh confirmation remain unproven. No
-unchanged extension, sweep, collector repeat or automatic successor.
+Data and sampling changed together; do not infer paired data is generally useless
+or isolate an architecture/optimizer cause. The
+[collection](results/2026-11-07-breakout-world-paired-actions-data.md)
+remains qualified: 56 fitting-only parents/448 branches, 13,068 new actions /
+52,122 frames in 228.179s, source/restore replay 503,280 actions /2,012,229 frames separately.
+Preserve parent NaN/112-file CPU repair and base-interpreter NumPy launch failure.
+No completed stage repeats; all native learning/assessment stages pass first try.
+
+Root `/mnt/data/kindle-breakout-world-paired-actions-20261107`; Python runner
+`e751a883`, unchanged native `85dbe150` / SHA `5b112866`, matching motion runtime.
+Native calls 769.167s / loop 1,128.611s; separate frozen 84 groups 299.786s. All 24 CPU
+checks, 517 qualification/524 learning/857 branch/1,078 CPU comparison pins,
+204 initial/frozen tensors, 108 initial evaluation arrays, eighteen restore arrays
+and three current guards/27 sealed pins pass. Original evaluation cohorts and
+all 989,057 suffix targets/10,562 terminal rows match. All 448 paired fitting
+origins and three full causal APNGs remain retained. No GPU worker is active.
+
+Next selected work is the [CPU linear-reference diagnosis](experiments/2026-11-07-breakout-world-linear-reference.md),
+root `/mnt/data/kindle-breakout-world-linear-reference-20261107`. Pin retained
+exports/source histories and inspect exact linear reference slices against
+past-RGB point controls, keeping future-outcome selection/visibility/duplicate
+limits explicit. No new query, collector, learner, GPU allocation, acceptance
+criterion or automatic successor is selected. The full world goal remains open.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
@@ -1066,7 +1061,7 @@ control. No calibration fit or threshold search occurs. The outcome-conditioned
 control-policy cohort cannot establish population calibration or a causal gameplay
 bottleneck; transforming saved outputs does not change the learned actor.
 
-All24 CPU tests and1,125 pins pass. One2.060s single-core CPU analysis completes
+All 24 CPU tests and1,125 pins pass. One2.060s single-core CPU analysis completes
 07:27:01 UTC November4/source db4840bd/PID1144889. Independent4.073s closure
 completes07:27:22, verifying16 artifacts,13,824 pair orders,240 transformed outputs
 and all arithmetic. No failure, repair, repeat, model/emulator execution or GPU
