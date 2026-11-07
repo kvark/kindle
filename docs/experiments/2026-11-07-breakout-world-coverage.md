@@ -123,3 +123,23 @@ and final restore(600s),under a new pinned declaration. CPU plan has exactly
 the training CLI must reproduce the declared source plan exactly. Preserve its
 new output directories and compare actual counts after training. No successor
 or unchanged extension is selected after this pair.
+
+The learner completes8,192 finite updates:529.515s native,796.900s total. All204
+initial tensors and18 initial-development arrays equal the retained control;
+204 tensors remain frozen and the separately run restore reproduces18 arrays.
+The **original queue fails** its expected total-arrival check:32,849 was the
+sampled unique count,while32,850 arrivals exist. Supplement lane3 arrival2053
+(combined lane11) is not sampled. Preserve original queue/log/declaration. A
+separate CPU review verifies the actual source plan/counts,then only the unstarted
+restore is executed. No learner repeats. The first CPU comparison script has a
+SyntaxError; its separate corrected CPU-only script passes without a GPU repeat.
+
+Matched dense development reconstructs108/112 balls within1 pixel versus107/112;
+one-step94/109 versus93/109,eight-step14/107 versus8/107,32-step0/95 versus1/95.
+Brick balanced error worsens.206631→.223954. Do not promote on reconstruction.
+Now separately select one **new-checkpoint-only frozen** action-branch evaluation:
+root/branches,history16 primary/32 secondary,84 groups,eight fixed draws,1,800s
+host-guarded budget. Reuse the exact retained oracle from the closed challenge;
+do not recollect it,rerun old models or alter the previously declared gates.
+Require all204 tensors and age8,192 unchanged. This is reused development;
+fresh confirmation and the full world goal remain unfinished.

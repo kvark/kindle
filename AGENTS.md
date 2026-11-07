@@ -55,15 +55,20 @@ remain exact. Root `/mnt/data/kindle-breakout-world-coverage-20261107`.
 Collector complete:16,384 actions/65,492 emulator frames,44 natural endings,
 2,979 waiting windows across eight lanes,max absent non-FIRE run96;19.248s,
 age0/all204 tensors unchanged. Data/guard audit passes; no above-wall states.
-The separately declared matched-init8,192-update learner/final restore is active
-under80 input pins. Queue session25328,learner PID1618756 confirmed live;
-first640 updates finite and all204 initial tensors exact.
-Recipe:4 retained uniform +2 supplement uniform +1 waiting +1 terminal window;
-10,909 terminal targets versus2,649 previously,all32,849 fitting arrivals covered
-by the declared plan. Architecture/losses unchanged; no RAM/phase labels enter
-model inputs/objectives. No actor/critic is active. No automatic
-extension/successor. Untouched tests,later-game/second-wall coverage and fresh
-confirmation remain unfinished; keep the full goal active.
+The learner completes8,192 finite updates:529.515s native,796.900s total;
+204 initial tensors/18 initial-development arrays exact,204 frozen tensors and
+18 final-restore arrays pass. Original queue fails a total-arrivals expectation:
+32,849 unique sampled versus32,850 available,one unsampled new arrival. Preserve
+its failure; separate CPU review and only the unstarted restore complete evidence.
+Also preserve the first CPU comparison SyntaxError and separate CPU repair.
+
+Dense development observed balls108/112 versus107/112;8-step14/107 versus8/107,
+32-step0/95 versus1/95,brick balanced error.223954 versus.206631. World competence
+remains unproven. Next separately pin/run this new checkpoint's frozen comparison
+on the retained oracle(history16/32,eight draws,84 groups),without recollection
+or old-model reruns. No learner/actor/critic is active. No automatic extension/
+successor; untouched tests,late-game/second-wall coverage and fresh confirmation
+remain unfinished. Keep the full goal active.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

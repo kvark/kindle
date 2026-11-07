@@ -26,14 +26,19 @@ to game-over. Root `/mnt/data/kindle-breakout-world-coverage-20261107`. Eight CP
 checks pass and all8,192 old uniform plans/counts stay exact. Native3fa37b6d/
 eafe8359 unchanged. Collector complete:16,384 actions/65,492 frames,44 endings,
 2,979 waiting windows,max absent non-FIRE run96;19.248s,age0/204 tensors unchanged.
-Data/guard audit passes; no above-wall states. The separately declared fresh
-matched-init8,192-update learner/restore is active under80 pins(session25328,
-PID1618756;first640 updates finite,204 initial tensors exact). Plan covers32,849 arrivals and
-10,909 terminal targets versus2,649 previously.
-Per-update recipe:4 old uniform +2 new uniform +1 waiting +1 terminal window.
-No model/loss change or label inputs. No actor/critic is active; no automatic
-successor/extension. Max original corpus score56/34,no ball above top row;
-untouched tests,late-game/second-wall coverage and fresh confirmation remain open.
+Data/guard audit passes; no above-wall states. The learner completes8,192 finite
+updates,529.515s native/796.900s total. All204 initial/frozen tensors and18
+initial-development/final-restore arrays pass. Original queue fails a total-
+arrival expectation(32,849 unique sampled versus32,850 available); preserve it.
+A separate CPU review and only the unstarted restore complete evidence. Preserve
+the CPU comparison SyntaxError/separate repair too. No learner repeats.
+
+Dense development observed balls108/112 versus107/112;8-step14/107 versus8/107,
+32-step0/95 versus1/95;brick balanced error.223954 versus.206631. Next separately
+pin/run only the new checkpoint's frozen action-branch comparison(history16/32,
+eight draws,84 groups),reusing the oracle without recollection/old-model reruns.
+No active learner/actor/critic or automatic extension/successor. The full world
+goal,untouched tests,late-game/second-wall coverage and confirmation remain open.
 
 ### Representation and training scope
 
