@@ -77,19 +77,25 @@ the parent JSON/112-file repair and first base-interpreter NumPy launch failure;
 the separately declared invocation repair ran only the still-unstarted collection.
 No completed collector or learner repeats; no GPU worker is active.
 
-The fixed paired/original/wait/terminal sampler is implemented. Four related
-plan lanes share a real common cut; half target the intervention, half use valid
-uniform cuts. The seeded terminal-pool cycle includes all paired terminal ends.
-Original sixteen-stream fitting/development evaluations remain unchanged, with
-paired fitting diagnostics separate. Ten new sampler checks and fourteen existing
-corpus/coverage checks pass. Next pin the plan/data/runner and qualify one full-
-shape native update, then separately declare the bounded fresh H16 learner/
-restore/new-checkpoint assessment from the
-[protocol](docs/experiments/2026-11-07-breakout-world-paired-actions.md).
-No model improvement is established by collecting data or passing CPU checks.
-Keep original quality gates plus per-plan freeflight ball presence at 8 >=90%;
-position/calibration, late coverage and fresh confirmation remain necessary.
-No automatic successor or native primitive/backend rerun.
+The [paired-data learner](docs/results/2026-11-07-breakout-world-paired-actions-learning.md)
+is active under `kindle-world-paired-actions-learning-20261107`. One fresh
+8,192-update H16 RGB64/12M/B8/T32/Auto world uses the existing motion loss/rates/
+seed41001; native `5b112866` is unchanged. Python runner source `e751a883` pins
+sampling/evaluation routing. No actor/critic or emulator collection runs. The
+4-paired/2-original/1-wait/1-terminal plan has 989,057 valid suffix targets and
+10,562 suffix terminals; stored prefix duplicates are not new experience.
+Original fitting/development evaluation origins match the control; all 448 paired
+origins get separate fitting diagnostics. Data and sampling change together.
+
+Ten new sampler/fourteen existing CPU checks pass. The single full-shape
+preflight completes in 27.956s: 517 pins, 204 matched initial/frozen tensors,
+eighteen initial/restore arrays, eleven finite losses, exact mask/total and guard
+checks pass. The learner/restore declaration pins 524 inputs and caps stages at
+3600/600s. Audit completion and restore before separately declaring a new-final-
+checkpoint-only branch assessment (1800s); do not restart on an observer timeout.
+Keep original quality gates plus each freeflight plan's ball presence at 8 >=90%.
+Full competence, late coverage and fresh confirmation remain unproven. No
+unchanged extension, sweep, collector repeat or automatic successor.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
