@@ -2,7 +2,7 @@
 
 Select a separately bounded training-phase experiment after the
 [linear-reference diagnosis](../results/2026-11-07-breakout-world-linear-reference.md).
-The implementation is packaged; native qualification remains unfinished. This protocol does not restart
+The experiment is [closed and fails retention](../results/2026-11-07-breakout-world-frozen-visual.md). This protocol does not restart
 any closed learner, collector or assessment. Root:
 `/mnt/data/kindle-breakout-world-frozen-visual-20261107`.
 
@@ -111,3 +111,14 @@ rejecting even a one-ULP change; all92 CPU checks pass. No native rebuild or
 learning-setting change is needed. Separately declare the unstarted native
 prediction/update checks with the corrected runner, also requiring exact equality
 between saved phase metadata and the original checkpoint configuration.
+
+## Completed allocation
+
+Corrected native qualification passes353 pins in21.571s with no frozen visual
+weight changes,32 trainable weight changes and72 frozen-weight moment changes.
+The original serialization failure remains failed; corrected scope/prediction/
+update checks pass. The separately declared4096-update warm phase and restore
+complete with375 pins,108 inherited initial arrays,18 exact restored arrays and
+all36 fixed visual weights at intermediate/final checkpoints. Final-only84-group
+branches complete under1129 pins. No extension, collector or automatic successor.
+See the linked result and external closure receipt for all unchanged gates/costs.

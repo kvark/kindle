@@ -85,25 +85,25 @@ imports or queries; no acceptance-gate change. Preserve the first closure
 self-stdout hash failure and separate CPU-only seal repair; analysis/recount
 remain unchanged and are not rerun.
 
-The [frozen visual training phase](experiments/2026-11-07-breakout-world-frozen-visual.md)
-is implemented and natively qualified. Root
-`/mnt/data/kindle-breakout-world-frozen-visual-20261107`; native7ed07b2b/SHA3032c0a6,
-runner442a2b45. The guarded4096-update warm phase is active in
-`kindle-world-frozen-visual-learning-20261107`: original coverage H0 global8192
-→12288, same data/geometry/rates, existing H16 RGB loss, fixed encoder/posterior/
-decoder weights. Restore follows; final-only branch assessment remains unallocated.
-This combines warm initialization, H16 and freezing; no isolated causal claim.
-No new loss, data, actor/critic, collector or automatic successor.
+The [frozen-visual staged world experiment](results/2026-11-07-breakout-world-frozen-visual.md)
+is closed and fails retention. Warm-start8192+4096 updates preserves development
+observed108/112 and one-step94/109, improves four-step33→51/109 and eight-step
+14→24/107, but misses28/107; sixteen4/114 and thirty-two0/95 remain weak.
+Primary16/32 energy0.204741 versus.169502 H0;
+all existing event/per-plan gates remain in the linked result. Keep coverage;
+no unchanged extension, repeat, collector, sweep or automatic successor.
 
-The first CPU graph fixture failure and native configuration-serialization failure
-remain preserved. The native failure reached no prediction/save/update. The
-Python-only exact-F32 comparison repair passes92 CPU checks; corrected native
-qualification passes353 pins,204 exact inherited tensors,18 initial/restore
-arrays,all36 fixed visual weights,two updates including restored scope and the
-host guard. All32 trainable weights and72 frozen-weight moments change; only
-visual weights are frozen during learning. Native formulas/inference are unchanged.
-The earlier coordinate comparison remains negative/closed; do not repeat it.
-The full world goal remains open.
+Root `/mnt/data/kindle-breakout-world-frozen-visual-20261107`, native7ed07b2b/
+SHA3032c0a6,runner442a2b45. Native phase calls383.411s/loop535.628s plus inherited
+529.515/796.900s; final-only84 branch groups and CPU diagnostics are complete.
+The experiment combines warm initialization,H16 and freezing; no isolated causal
+claim. All36 visual weights stay exact,all32 trainable weights/72 frozen-weight
+moments change. All375 learning/1129 branch pins,4096 finite loss rows,204 inherited/
+frozen tensors,108 initial arrays,18 restore arrays and four successful guards pass.
+Preserve first CPU fixture/native-config failures and separately qualified exact-F32
+repair (92 CPU checks,353 pins,two native verification updates); failures remain
+failures. No old stage repeats. No GPU worker or new allocation is selected.
+Actor/critic,CDP comparisons and five-game work remain parked; full world goal open.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
