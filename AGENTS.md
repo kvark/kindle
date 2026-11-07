@@ -54,48 +54,31 @@ root/runtime `/mnt/data/kindle-breakout-world-overshooting-20261107`. All execut
 checks pass; do not replace the trajectory control or extend this recipe.
 
 The [state-substitution diagnosis](docs/results/2026-11-07-breakout-world-state-swap.md)
-is now closed,with the original construction failure preserved separately.
-On the newer model,natural-origin eight-step ball counts are prior8/108,
-corrected h90/108,corrected z12/108,full teacher104/108; at32:0/87/0/107 of108.
-These pool four draws of supported origins,not independent episodes. Hybrids use
-real future information and never feed back; they identify a readout repair,not
-a learned improvement or causal error fraction. Past categorical mistakes can
-cause h drift; z is not exonerated. Investigate recurrent rollout supervision.
+finds a useful readout repair: newer-model eight-step ball counts are prior 8/108,
+corrected h90/108, corrected z12/108, full teacher 104/108. Future-informed hybrids
+never feed rollouts; this is not a learned improvement or causal error fraction.
+Past categorical errors can cause h drift. Observed-state timing also remains
+imperfect; the report retains original construction/analysis failures and repairs.
 
-Posterior-conditioned timing still mismatches terminal-aligned examples: full
-teacher ending probability44.65% by16 versus target0,73.47% by17 versus target1.
-Outcome-selected windows do not establish population calibration or exclude
-observational ambiguity. Keep event timing as a separate question alongside h
-forecast drift; no new objective or learner is selected by these measurements.
+The [recurrent-state energy learner](docs/results/2026-11-07-breakout-world-recurrent-energy.md)
+is closed and fails retention. Two causal H16 futures toward stopped observed h,
+RMS energy at scale 100, no added parameters or inference inputs. Fresh 8,192 updates
+retain observed 108/112, but one-step 94→88/109 and eight-step 14→13/107 regress;
+16-step 3→6/114 rises,32-step stays 0/95. Primary ball energy improves 22.11%, below 25%.
+Ending 32 Brier .052126 improves, but ending 16 Brier .229969 and RIGHT 16 ending 55.43%
+versus oracle 0% fail timing. Ending 32 reward Brier .419860 also regresses.
+Native calls 604.731s/loop 837.601s versus 529.515s/796.900s. Retain coverage control;
+no unchanged extension or successor. Internal state dispersion is not competence.
 
-Root `/mnt/data/kindle-breakout-world-state-swap-20261107`. Original sourcece0dc547
-fails raw-JSON double comparison before any query; its failed guard/27 sealed
-files remain failed. Native-F32 configuration repair passes56 CPU world tests
-and strict Clippy. Corrected source6f0ae309/test executable SHAe14de97b completes
-48 queries in42.977s; CPU scoring4.723s.38 data/14 original execution/20 corrected
-execution/60 analysis/five clip pins,eight exact baseline references,816 unchanged
-snapshot tensors and corrected guard/nine sealed pins pass. Separate analysis-
-helper source audit binds qualified code. Preserve moved-value,config/audit and
-empty-support CPU failures; repairs do not rerun completed queries.
-
-Lossless32/17-decision true/predicted diagnostic clips cover128/68 original
-emulator frames,with explicit future-information warnings. No model update,new
-action/emulator frame,package/production-graph change or overlay mixing.
-`closure-review.json` distinguishes original failure from corrected completion;
-`analysis-source-review.json` supplements provenance. No worker,learner,collector
-or successor is active/selected. Do not repeat completed stages or old queues.
-
-The [recurrent-state energy experiment](docs/experiments/2026-11-07-breakout-world-recurrent-energy.md)
-is selected for qualification. Retain observed pixel/motion losses and train two
-causal H16 recurrent futures toward stopped observed h,using smoothed RMS energy
-at reconstruction scale100. Independent future samples,shared detached prefix;
-no sampled outcome scores,extra decoder,parameters or privileged inference input.
-Intermediate ST remains biased and targets are learned; physical gates decide.
-60 CPU world tests,54 affected Python checks and strict Clippy pass. Root
-`/mnt/data/kindle-breakout-world-recurrent-energy-20261107`. Package/native
-qualification precedes separately declared fixed8,192 learning. No GPU job yet;
-no collector or actor/critic. Add ending16 timing gates to the existing forecast
-checks; no latent-loss-only retention or unchanged extension.
+Root `/mnt/data/kindle-breakout-world-recurrent-energy-20261107`, source `ab68b0f7`,
+native SHA `2d02f981`, matching root/runtime .60 CPU world/54 affected/54 packaged
+Python checks and strict Clippy pass; 90 qualification/99 learning/1,068 branch
+pins, five guards/45 sealed pins,204 initial/frozen tensors and 18 restore arrays
+pass. Preserve the initial CPU declaration and missing-script controller failure
+before native construction, plus the old-prose-path review repair; original
+attempts are not passed retroactively. Separate cache release retains package/
+runtime. All stages closed; no Kindle GPU worker, collector or actor/critic active.
+Do not repeat completed stages or old queues. Full goal remains active/unproven.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
