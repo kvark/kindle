@@ -14,19 +14,24 @@ pins,204 frozen tensors and18 exact restored arrays pass. Source/native3fa37b6d,
 SHA eafe8359; root `/mnt/data/kindle-breakout-world-motion-20261107`. No actor/
 critic learns. Earlier H16/H0 failures and CPU repairs stay in linked reports.
 
-Next is the [fixed-plan prospective challenge](experiments/2026-11-07-breakout-world-branches.md),
-with no training: seven groups of eight source seed streams,42 fixed plan batches,
-eight oracle/model repetitions, history16 primary/32 secondary. Root
-`/mnt/data/kindle-breakout-world-branches-20261107`. Nine CPU checks pass; the initial collector fails before any oracle branch
-on manual-command teacher feedback. Corrected collection is active under
-`root/repair/oracle`; preserve the original log/declaration. The
-sticky-fixture exposure assertion fails and is preserved. A separate CPU review
-verifies16 exact replay-corrected trace pairs. Sources are pinned; finish the bounded oracle,
-then guarded initial/final frozen evaluation. No completed collector/learner
-repeats, unchanged extension, automatic successor or actor/critic resume. Existing
-training data omit later-game states (max score56/34, no ball above top row).
-Untouched tests, prospective physics, stochastic calibration, late-game/second-wall
-coverage and fresh confirmation remain unfinished. Keep the goal active.
+The [fixed-plan challenge](results/2026-11-07-breakout-world-branches.md) is
+closed: seven groups/eight seed streams,42 plans,eight oracle/model draws,
+history16 primary/32 secondary. Short paddle responses work,but8-step supported
+ball draw-match is59.0% free flight/31.9% paddle approach versus100%/97.5% oracle
+leave-one-out. RIGHT ends all selected last-life branches by32 decisions; model
+ending probability averages.581%. History32 is no consistent rescue. Serving
+also exposes absent behavior coverage: no fitting16-action non-FIRE ball-absent
+run versus31 initial NOOPs here. These are diagnoses,not isolated causes.
+
+Root `/mnt/data/kindle-breakout-world-branches-20261107`, corrected work under
+`root/repair`. Nine CPU tests,393 manifest pins,431 evaluation inputs,both guards
+and204 invariant tensors per model pass;131.115/252.232s initial/final,
+298.770s CPU collection. Preserve original sticky-exposure,teacher-feedback and
+CPU-audit failures plus separate repairs. No completed phase repeats; no active
+GPU allocation,new learner or actor/critic resume. Next separately justify
+coverage/forecast supervision work. Current corpus max score56/34,no ball above
+top row; untouched tests,late-game/second-wall coverage and fresh confirmation
+remain unfinished. Keep the full goal active and unproven.
 
 ### Representation and training scope
 

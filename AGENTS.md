@@ -41,19 +41,24 @@ matching runtime `/mnt/data/kindle-breakout-world-motion-20261107/runtime`.
 This learner/restore is closed; do not repeat or extend it. Earlier negative
 results and separate CPU repairs remain in linked reports.
 
-The selected [prospective fixed-plan challenge](docs/experiments/2026-11-07-breakout-world-branches.md)
-evaluates that frozen model against its actual-initial control, with no training.
-Root `/mnt/data/kindle-breakout-world-branches-20261107`. Seven origin categories,
-eight seed streams each, fixed32-command plans, eight oracle/model repetitions;
-history16 primary,32 secondary. Nine CPU checks pass. The first collector fails before any oracle branch on
-manual-command teacher feedback; its log/declaration remain. Corrected CPU
-collection is active under `root/repair/oracle`. Preserve the separate
-sticky-fixture exposure failure and CPU-only review; replay the full source
-transcript before each branch because ALE clones omit private previous action.
-Sources are pinned; finish the bounded CPU oracle, then guarded frozen GPU
-evaluation. No new learner, capacity change, actor/critic resume or automatic
-successor. Untouched tests, later-game/second-wall coverage and fresh confirmation
-remain unfinished. Keep the full goal active and unproven.
+The [fixed-plan challenge](docs/results/2026-11-07-breakout-world-branches.md)
+is closed: seven groups/eight seed streams,42 plan batches,eight oracle/model
+draws,history16 primary/32 secondary. Useful short paddle responses are learned,
+but8-step ball draw-match within1 pixel is59.0% free flight/31.9% paddle approach,
+versus100%/97.5% oracle leave-one-out. RIGHT ends all selected last-life branches
+by32 decisions; predicted mean ending probability is.581%. History32 does not
+consistently rescue forecasts. Waiting-to-serve failure also exposes missing
+coverage: no fitting ball-absent16-action non-FIRE run versus31 initial NOOPs here.
+
+Root `/mnt/data/kindle-breakout-world-branches-20261107`, corrected work under
+`root/repair`. Nine CPU tests,393 manifest pins,431 evaluation inputs,both guarded
+frozen jobs and all204 invariant tensors pass. Initial/final131.115/252.232s;
+CPU collection298.770s. Preserve original sticky-exposure,teacher-feedback and
+CPU-audit failures; separate repairs/limits are in the report. No GPU allocation
+or new learner is active/selected. Do not repeat completed phases or resume
+actor/critic. Next separately justify coverage/forecast supervision work; untouched
+tests,later-game/second-wall coverage and fresh confirmation remain unfinished.
+Keep the full goal active and unproven.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
