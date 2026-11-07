@@ -18,6 +18,8 @@ use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 mod gradient_diagnostic;
 #[cfg(test)]
 mod motion_tests;
+#[cfg(test)]
+mod state_diagnostic;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]

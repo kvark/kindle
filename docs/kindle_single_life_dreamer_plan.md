@@ -105,11 +105,17 @@ guards/45 sealed pins,204 initial/frozen tensors,18 initial/restore arrays,exact
 plan/exposures and all8,192 finite11-report rows pass. Preserve syntax,F32-
 reference,scalar-zero fixture and missing plotting-dependency failures; the plot
 repair is CPU-only. `closure-review.json` verifies closure; separate cache-release
-receipt preserves the original pinned build receipt. No worker,learner,collector
-or successor is active/selected. Retain distinct capabilities without replacement,
+receipt preserves the original pinned build receipt. At that comparison closure,
+no worker,learner,collector or successor remained active/selected. Retain distinct capabilities without replacement,
 extension,confirmation campaign or a variance-reduction/world-completion claim.
-A focused next question is deterministic-state drift versus categorical latent
-agreement; no cause or new objective is established by this comparison.
+The [frozen state-substitution diagnostic](experiments/2026-11-07-breakout-world-state-swap.md)
+is selected:32 original dense origins plus10 terminal-centered development
+windows,four fixed draws,two checkpoints,readout-only h/z replacements. Future
+information is explicitly diagnostic and never feeds a prior rollout.55 CPU world
+tests pass; preserve the initial moved-value compilation failure. One900s guarded
+test worker follows source/data/executable pins,no package or production-graph
+change. Root `/mnt/data/kindle-breakout-world-state-swap-20261107`. No learner or
+collector is selected; no cause or new training objective is established yet.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
 uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
