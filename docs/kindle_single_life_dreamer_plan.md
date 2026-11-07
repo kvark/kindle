@@ -68,7 +68,7 @@ checks, 517 qualification/524 learning/857 branch/1,078 CPU comparison pins,
 204 initial/frozen tensors, 108 initial evaluation arrays, eighteen restore arrays
 and three current guards/27 sealed pins pass. Original evaluation cohorts and
 all 989,057 suffix targets/10,562 terminal rows match. All 448 paired fitting
-origins and three full causal APNGs remain retained. No GPU worker is active.
+origins and three full causal APNGs remain retained. That allocation is closed.
 
 The [CPU linear-reference diagnosis](results/2026-11-07-breakout-world-linear-reference.md)
 is closed: at8 on32 common-control development origins, coverage/motion/paired
@@ -82,17 +82,25 @@ imports or queries; no acceptance-gate change. Preserve the first closure
 self-stdout hash failure and separate CPU-only seal repair; analysis/recount
 remain unchanged and are not rerun.
 
-Next implement the [frozen visual training phase](experiments/2026-11-07-breakout-world-frozen-visual.md),
-root `/mnt/data/kindle-breakout-world-frozen-visual-20261107`. Warm-start the
-coverage H0 final world, preserve204 tensors/age, freeze encoder/posterior/decoder
-weights and train dynamics/heads with existing H16 RGB supervision. This combines
-warm initialization, H16 and a frozen subset; no isolated causal claim. Preserve
-legacy/default restore and persist a distinguishable frozen-phase schema. No
-implementation, native rebuild or GPU allocation is active yet. Qualify changed
-phase/scope/restore behavior before separately declaring4096 warm updates and
-new-final-only assessments; no new loss, data, actor/critic or automatic successor.
-The previous coordinate-channel comparison stays negative/closed; do not repeat
-its native qualification or learner. The full world goal remains open.
+The [frozen visual training phase](experiments/2026-11-07-breakout-world-frozen-visual.md)
+is implemented and natively qualified. Root
+`/mnt/data/kindle-breakout-world-frozen-visual-20261107`; native7ed07b2b/SHA3032c0a6,
+runner442a2b45. The guarded4096-update warm phase is active in
+`kindle-world-frozen-visual-learning-20261107`: original coverage H0 global8192
+→12288, same data/geometry/rates, existing H16 RGB loss, fixed encoder/posterior/
+decoder weights. Restore follows; final-only branch assessment remains unallocated.
+This combines warm initialization, H16 and freezing; no isolated causal claim.
+No new loss, data, actor/critic, collector or automatic successor.
+
+The first CPU graph fixture failure and native configuration-serialization failure
+remain preserved. The native failure reached no prediction/save/update. The
+Python-only exact-F32 comparison repair passes92 CPU checks; corrected native
+qualification passes353 pins,204 exact inherited tensors,18 initial/restore
+arrays,all36 fixed visual weights,two updates including restored scope and the
+host guard. All32 trainable weights and72 frozen-weight moments change; only
+visual weights are frozen during learning. Native formulas/inference are unchanged.
+The earlier coordinate comparison remains negative/closed; do not repeat it.
+The full world goal remains open.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
