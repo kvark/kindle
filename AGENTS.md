@@ -138,15 +138,20 @@ Deduplicated all-detected28/31 images have59.29%/57.76% empirical mean-error sha
 component meets2/3 dominance: triage mixed. Missing/deduplicated/outcome-selected
 support remains explicit; no isolated encoder/sampling cause or world competence.
 
-Select the [strided/lower-mixing recipe](docs/experiments/2026-11-07-breakout-world-code-stride.md)
-for composition qualification,then separately declared fresh8192 learning if it
-passes. Keep observation-only code,enable existing `rgb_stride2`,set unimix.001;
-shapes/counts/data/loss/seed remain. Two changes are combined; no isolated benefit
-is established. Earlier whole-agent stride/mixing failures stay closed/negative.
-Reuse native780f00a8/SHAe6ca7ca4 and runner68e9bbb7; encoder prefix matches qualified
-22c262ea exactly. No rebuild or unchanged primitive/legacy qualification repeat.
-Root `/mnt/data/kindle-breakout-world-code-stride-20261107`; no GPU allocation yet.
-Original world gates and full-goal requirements remain; no automatic successor.
+The [strided/lower-mixing recipe](docs/experiments/2026-11-07-breakout-world-code-stride.md)
+is composition-qualified; its separately declared fresh8192 learner/restore are
+active in `kindle-world-code-stride-learning-20261107`. Observation-only code,
+existing `rgb_stride2=true`,unimix.001; two changes combined,no isolated cause or
+benefit established. Earlier whole-agent failures stay closed/negative.
+
+Root `/mnt/data/kindle-breakout-world-code-stride-20261107`; unchanged native780f00a8/
+SHAe6ca7ca4,runner68e9bbb7,no rebuild. Encoder prefix exactly matches qualified
+22c262ea. First composition qualification137 pins/18.789s passes198 prior-matched
+actual initial tensors,18 initial/trained restored arrays,finite update,inference
+invariance and34-parameter h separation. Old primitive/legacy checks are reused,
+not rerun. Learning175 pins retains original data/full plan/loss/seed/counts,
+matched256/128 dense initial/final and all world gates. Final-only branches remain
+unallocated until learning review; no collector,actor/critic or automatic successor.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched

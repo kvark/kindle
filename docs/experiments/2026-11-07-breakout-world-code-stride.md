@@ -69,3 +69,13 @@ Intermediate success does not complete the goal. Precise causal physics, event
 calibration, persistent brick memory, late/tunnel/second-wall coverage, untouched
 families and fresh confirmation remain necessary. Actor/critic and CDP efficiency
 comparisons stay parked.
+
+## Actual qualification and allocation
+
+First composition qualification passes137 pins in18.789s,with198 exact initial
+tensors matching the prior observation-code initial checkpoint,18 initial/trained
+restore arrays,finite11-report update,63 changed parameters across expected
+families,198 frozen tensors and34 invariant visual parameters/exact h separation.
+Legacy qualification and existing primitive evidence are reused without repetition.
+A separately declared175-pin fresh8192 learner/restore is active. Original source
+plan/exposures and all gates remain; final-only branches await learning review.
