@@ -24,6 +24,20 @@ pub enum PixelLoss {
     SquaredError,
     CrossEntropy,
     MotionCrossEntropy,
+    PredictiveMotionCrossEntropy,
+}
+
+impl PixelLoss {
+    pub(crate) fn motion_attention(self) -> bool {
+        matches!(
+            self,
+            Self::MotionCrossEntropy | Self::PredictiveMotionCrossEntropy
+        )
+    }
+
+    pub(crate) fn predictive(self) -> bool {
+        self == Self::PredictiveMotionCrossEntropy
+    }
 }
 
 fn checkpoint_pixel_loss(
@@ -224,7 +238,7 @@ impl WorldModelLearner {
         if prediction_length >= config.batch_length {
             return Err("prediction length must leave an observed prefix".into());
         }
-        if pixel_loss == PixelLoss::MotionCrossEntropy && prediction_length != 0 {
+        if pixel_loss.motion_attention() && prediction_length != 0 {
             return Err("motion pixel attention requires no prior-image objective".into());
         }
         let gpu = Arc::new(crate::init_gpu_context()?);
@@ -233,9 +247,12 @@ impl WorldModelLearner {
             (PixelLoss::SquaredError, length) => {
                 world::build_world_only_rollout_training_graph(&config, length)
             }
-            (PixelLoss::CrossEntropy | PixelLoss::MotionCrossEntropy, length) => {
-                world::build_world_only_pixel_training_graph(&config, length, pixel_loss)
-            }
+            (
+                PixelLoss::CrossEntropy
+                | PixelLoss::MotionCrossEntropy
+                | PixelLoss::PredictiveMotionCrossEntropy,
+                length,
+            ) => world::build_world_only_pixel_training_graph(&config, length, pixel_loss),
         };
         let mut train = runtime::build_training_session(&graph, &gpu, &config);
         runtime::initialize_d3(&mut train, &graph, config.seed);
@@ -375,6 +392,13 @@ impl WorldModelLearner {
                 .map(|_| self.rng.random_range(1e-6..1.0 - 1e-6))
                 .collect::<Vec<_>>();
             self.train.set_input(&format!("uniforms_{time}"), &uniforms);
+            if self.pixel_loss.predictive() {
+                let uniforms = (0..batch * size.stoch * size.classes)
+                    .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
+                    .collect::<Vec<_>>();
+                self.train
+                    .set_input(&format!("predictive_uniforms_{time}"), &uniforms);
+            }
             let mut target = vec![0.0; batch * bins.len()];
             for (row, &reward) in rewards[range.clone()].iter().enumerate() {
                 bins.encode(
@@ -427,6 +451,13 @@ impl WorldModelLearner {
             losses.push(
                 weights.iter().flatten().sum::<f32>() / (batch * self.prediction_length) as f32,
             );
+        }
+        if self.pixel_loss.predictive() {
+            for index in world::LOSS_PREDICTIVE_WORLD..world::LOSS_PREDICTIVE_WORLD + 4 {
+                let mut loss = [0.0];
+                self.train.read_output_by_index(index, &mut loss);
+                losses.push(loss[0]);
+            }
         }
         if losses.iter().any(|x| !x.is_finite()) {
             return Err("nonfinite standalone world loss");

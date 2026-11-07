@@ -179,6 +179,7 @@ def main():
     parser.add_argument('--development',type=Path)
     parser.add_argument('--initial-reference',type=Path)
     parser.add_argument('--sampling-plan',type=Path)
+    parser.add_argument('--pixel-loss',choices=['motion_cross_entropy',corpus.PREDICTIVE_OBJECTIVE],default='motion_cross_entropy')
     parser.add_argument('--reference',type=Path)
     parser.add_argument('--ticks',type=int,default=2048)
     parser.add_argument('--steps',type=int,default=8192)
@@ -186,9 +187,10 @@ def main():
     parser.add_argument('--dense-fitting',type=int,default=256)
     parser.add_argument('--dense-development',type=int,default=128)
     args=parser.parse_args()
-    args.prediction_length,args.pixel_loss=0,'motion_cross_entropy'
+    args.prediction_length=0
     if min(args.ticks,args.steps,args.eval_every,args.dense_fitting,args.dense_development)<=0:parser.error('positive budgets required')
     if args.mode=='collect' and args.checkpoint is None:parser.error('collection requires actual-initial checkpoint')
+    if args.mode=='collect' and args.pixel_loss!='motion_cross_entropy':parser.error('resize-only collection uses the retained actual-initial objective')
     if args.mode!='collect' and args.development is None:parser.error('development required')
     if args.mode=='train' and any(x is None for x in [args.dataset,args.supplement,args.initial_reference,args.sampling_plan]):parser.error('training requires both fitting corpora, actual-initial reference and declared sampling plan')
     if args.mode=='restore-check' and any(x is None for x in [args.checkpoint,args.reference]):parser.error('restore requires checkpoint and new training reference')
@@ -196,6 +198,7 @@ def main():
     config=json.loads(args.config.read_text())
     write(args.output/'declaration.json',dict(mode=args.mode,config=config,source_sha256=sha(__file__),
         started_unix=time.time(),prediction_length=0,pixel_loss=args.pixel_loss,steps=args.steps,
+        loss_names=corpus.report_names(args.pixel_loss,0),
         data_recipe='4 retained uniform + 2 supplement uniform + 1 supplement waiting + 1 terminal window'))
     if args.mode=='collect':collect(args);return
     development,_=corpus.load_dataset(args.development)

@@ -51,8 +51,10 @@ mod cdp;
 mod color_centroid;
 mod open_loop;
 mod pixel_rollout;
+mod predictive_world;
 
 pub(crate) const LOSS_PIXEL_ROLLOUT: usize = 25;
+pub(crate) const LOSS_PREDICTIVE_WORLD: usize = 26;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
     (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_centered {
@@ -338,7 +340,7 @@ pub(crate) fn build_world_only_pixel_training_graph(
         assert!(config.observation_kind.is_rgb());
         assert!(config.reconstruction_target_standardization.is_none());
     }
-    if pixel_loss == PixelLoss::MotionCrossEntropy {
+    if pixel_loss.motion_attention() {
         assert_eq!(prediction_length, 0);
     }
     assert!(!config.actor_critic_gradient && !config.expert_world_gradient());
@@ -437,6 +439,8 @@ fn training_graph(
     let mut prior_continuation_valid = Vec::new();
     let mut prior_reward_losses = Vec::new();
     let mut prior_reward_valid = Vec::new();
+    let mut predictive_states = Vec::new();
+    let mut predictive_losses = Vec::new();
     let mut actions = Vec::new();
 
     for time in 0..length {
@@ -477,6 +481,16 @@ fn training_graph(
             batch,
         );
         let prior_logits = model.dynamics.prior.forward(&mut graph, deter, batch);
+        if pixel_loss.predictive() {
+            predictive_states.push(prior_continuation::state(
+                &mut graph,
+                config,
+                deter,
+                prior_logits,
+                time,
+                "predictive",
+            ));
+        }
         if config.prior_continuation_scale.is_some() || config.prior_reward_scale.is_some() {
             prior_states.push(prior_continuation::state(
                 &mut graph,
@@ -682,7 +696,7 @@ fn training_graph(
         if let Some(decoder) = &model.decoder {
             let squared = if pixel_loss != PixelLoss::SquaredError {
                 let loss = decoder.cross_entropy(&mut graph, state, observation, rows);
-                if pixel_loss == PixelLoss::MotionCrossEntropy {
+                if pixel_loss.motion_attention() {
                     let start = group * time_batch_length;
                     let previous = (start..start + chunk.len())
                         .map(|t| observations[t.saturating_sub(1)])
@@ -749,6 +763,30 @@ fn training_graph(
             ),
             None => mean_binary_cross_entropy(&mut graph, continuation, continuation_target, rows),
         });
+        if pixel_loss.predictive() {
+            let start = group * time_batch_length;
+            let prior = stack_time(
+                &mut graph,
+                &predictive_states[start..start + chunk.len()],
+                batch,
+                config.feature_dim(),
+            );
+            let previous = (start..start + chunk.len())
+                .map(|time| observations[time.saturating_sub(1)])
+                .collect::<Vec<_>>();
+            let previous = stack_time(&mut graph, &previous, batch, config.observation_dim());
+            predictive_losses.push(predictive_world::losses(
+                &mut graph,
+                &model,
+                prior,
+                observation,
+                previous,
+                keep_action,
+                reward_target,
+                continuation_target,
+                rows,
+            ));
+        }
         if config.prior_continuation_scale.is_some() || config.prior_reward_scale.is_some() {
             let start = group * time_batch_length;
             let prior = stack_time(
@@ -986,6 +1024,15 @@ fn training_graph(
     } else {
         total
     };
+    let predictive = pixel_loss
+        .predictive()
+        .then(|| predictive_world::average(&mut graph, &predictive_losses));
+    let total = if let Some(losses) = &predictive {
+        let scaled = losses.scaled(&mut graph, config);
+        graph.add(total, scaled)
+    } else {
+        total
+    };
     let mut outputs = vec![
         total,
         reconstruction,
@@ -1044,6 +1091,17 @@ fn training_graph(
             outputs.push(graph.scalar(0.0));
         }
         outputs.push(rollout.loss);
+    }
+    if let Some(losses) = predictive {
+        while outputs.len() < LOSS_PREDICTIVE_WORLD {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([
+            losses.image,
+            losses.reward,
+            losses.continuation,
+            losses.valid,
+        ]);
     }
     if sample_posterior {
         outputs.push(stack_time(&mut graph, &deters, batch, size.deter));

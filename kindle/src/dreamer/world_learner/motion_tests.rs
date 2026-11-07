@@ -149,6 +149,25 @@ fn motion_objective_preserves_parameters_and_checkpoint_objectives_are_versioned
 }
 
 #[test]
+fn predictive_objective_is_explicit_and_legacy_objective_readers_reject_it() {
+    #[derive(serde::Deserialize)]
+    #[serde(rename_all = "snake_case")]
+    enum LegacyPixelLoss {
+        SquaredError,
+        CrossEntropy,
+        MotionCrossEntropy,
+    }
+    let encoded = serde_json::to_value(PixelLoss::PredictiveMotionCrossEntropy).unwrap();
+    assert_eq!(encoded, "predictive_motion_cross_entropy");
+    assert!(serde_json::from_value::<LegacyPixelLoss>(encoded.clone()).is_err());
+    let metadata = serde_json::json!({"format":"kindle-world-only-v2","pixel_loss":encoded});
+    assert_eq!(
+        checkpoint_pixel_loss(&metadata).unwrap(),
+        PixelLoss::PredictiveMotionCrossEntropy
+    );
+}
+
+#[test]
 #[ignore = "requires guarded GPU; image-wise motion normalization and derivatives"]
 fn motion_attention_native_matches_f64() {
     let (graph, feeds, values, weights, gradient, loss) = fixture(1024);

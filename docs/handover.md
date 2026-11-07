@@ -51,11 +51,21 @@ the CPU comparison SyntaxError/repair,and the invalid FIRE gate:90% pair matchin
 is unattainable on its finite oracle(max78.125%); do not relabel it passed.
 Use proper forecast scores/oracle uncertainty in future protocols.
 
-All stages are closed; no Kindle GPU allocation,learner or actor/critic is active/selected.
-Retain both models and new fitting data as development evidence. Next separately
-justify direct forecast supervision; no unchanged extension or automatic successor.
-Untouched tests,late-game/second-wall coverage,removed-brick memory and fresh
-confirmation remain unfinished. Keep the full goal active and unproven.
+The selected [predictive-world experiment](experiments/2026-11-07-breakout-world-predictive.md)
+adds one-step prior RGB/reward/continuation targets before the arrival image is
+seen,alongside unchanged observed losses. Optional explicit objective
+`predictive_motion_cross_entropy`;no new parameters or inference inputs. Mask
+clipped starts/resets,keep valid terminal arrivals,no life penalty.13 reports.
+Root `/mnt/data/kindle-breakout-world-predictive-20261107`.
+
+Implementation42 CPU world tests(20 GPU tests ignored),41 affected Python tests
+and strict workspace/bindings Clippy pass. Preserve three initial CPU fixture/
+compile failures and repairs in root logs. Next build/package,pin all identities,
+then run only the declared full-size one-update/frozen/restore preflight. No GPU
+allocation or full learner is active/selected yet. After qualification review,
+separately declare fixed8,192-update learning on the exact coverage data/plan;
+no collector or old learner repeats. Full world goal stays active/unproven;
+untouched tests,late-game/second-wall coverage,brick memory and confirmation open.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

@@ -36,10 +36,17 @@ complete evidence. Preserve CPU comparison SyntaxError/repair and invalid FIRE
 pair-match gate90% versus empirical maximum78.125%; do not relabel it passed.
 Future protocols need proper scores/oracle uncertainty. No completed stage repeats.
 
-All stages closed; no Kindle GPU allocation,new learner or actor/critic active/selected.
-Next separately justify direct forecast supervision,without an unchanged extension
-or automatic successor. Untouched tests,late-game/second-wall coverage,removed-
-brick memory and fresh confirmation remain open. Keep the full world goal active.
+The selected [predictive-world objective](experiments/2026-11-07-breakout-world-predictive.md)
+adds one-step prior RGB/reward/continuation supervision,without current-image input,
+alongside unchanged observed losses. No new parameters; explicit new objective,
+13 reports,reset/start masking and valid terminal targets.42 CPU world/41 Python
+checks and strict workspace/bindings Clippy pass; preserve initial CPU failures
+and repairs. Root `/mnt/data/kindle-breakout-world-predictive-20261107`.
+Next build/package,pin,and run only the full-size one-update/frozen/restore
+preflight. No GPU allocation/full learner active or selected yet. After review,
+separately declare fixed8,192 updates on exact coverage data/plan; no recollection
+or old-model reruns. Full goal,untouched tests,late-game/second-wall coverage,
+brick memory and fresh confirmation remain unfinished.
 
 ### Representation and training scope
 

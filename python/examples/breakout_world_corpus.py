@@ -25,6 +25,24 @@ FIELDS = ('rgb', 'action', 'reward', 'terminal', 'position', 'lives', 'frames', 
 LOSS_NAMES = ('total', 'reconstruction', 'dynamics_kl', 'representation_kl', 'reward',
               'continuation', 'replay_value', 'raw_kl', 'future_prediction',
               'pixel_rollout', 'pixel_rollout_valid_fraction')
+PREDICTIVE_OBJECTIVE = 'predictive_motion_cross_entropy'
+
+
+def report_names(pixel_loss, prediction_length):
+    if pixel_loss == PREDICTIVE_OBJECTIVE:
+        if prediction_length: raise ValueError('predictive motion uses one-step targets, not suffix rollouts')
+        return LOSS_NAMES[:9]+('predictive_rgb', 'predictive_reward', 'predictive_continuation', 'predictive_valid_fraction')
+    return LOSS_NAMES if prediction_length else LOSS_NAMES[:9]
+
+
+def reported_total(config, values, pixel_loss, prediction_length):
+    scales = config['loss_scales']
+    result = (scales['reconstruction']*(values[1]+(values[9] if prediction_length else 0))
+        +scales['dynamics']*values[2]+scales['representation']*values[3]
+        +scales['reward']*values[4]+scales['continuation']*values[5])
+    if pixel_loss == PREDICTIVE_OBJECTIVE:
+        result += scales['reconstruction']*values[9]+scales['reward']*values[10]+scales['continuation']*values[11]
+    return result
 
 
 def load_dataset(root):
@@ -193,6 +211,7 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
     seen = [np.zeros(len(stream['action']), bool) for stream in fitting]
     total_terminal, prior_terminal, positive_rows, context_reset_rows, source_reset_rows = 0, 0, 0, 0, 0
     native_seconds = 0.
+    predictive_valid_rows = 0
     started = time.monotonic()
 
     def evaluate(step):
@@ -214,8 +233,13 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             values = learner.learn(observed, *[batch[key].ravel().tolist() for key in ('action', 'reward', 'terminal')])
             native_seconds += time.monotonic()-tick
             keep = rollout_validity(batch['action'], args.prediction_length)
-            assert len(values) == (len(LOSS_NAMES) if args.prediction_length else 9)
+            assert len(values) == len(report_names(args.pixel_loss, args.prediction_length))
             if args.prediction_length: assert values[10] == float(keep.mean())
+            if args.pixel_loss == PREDICTIVE_OBJECTIVE:
+                valid = batch['action'] >= 0
+                assert values[12] == float(valid.mean())
+                predictive_valid_rows += int(valid.sum())
+                np.testing.assert_allclose(values[0], reported_total(config, values, args.pixel_loss, 0), rtol=1e-5)
             terminals = int(batch['terminal'].sum())
             kept_terminals = int((batch['terminal'][len(batch['action'])-args.prediction_length:] & keep).sum())
             total_terminal += terminals
@@ -250,13 +274,15 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
         positive_reward_rows=positive_rows, context_reset_rows=context_reset_rows, source_reset_rows=source_reset_rows,
         unique_source_arrivals=sum(int(row.sum()) for row in seen))
     assert observed_counts == expected_counts
-    write(args.output/'result.json', dict(status='complete', updates=args.steps, prediction_length=args.prediction_length,
+    result = dict(status='complete', updates=args.steps, prediction_length=args.prediction_length,
         training_seconds=native_seconds, total_seconds=time.monotonic()-started, no_behavior=True, pixel_loss=learner.pixel_loss,
         unique_source_arrivals=sum(int(row.sum()) for row in seen), source_arrivals=sum(len(row) for row in seen),
         replayed_terminal_rows=total_terminal, prior_terminal_rows=prior_terminal,
         positive_reward_rows=positive_rows, context_reset_rows=context_reset_rows,
         source_reset_rows=source_reset_rows, frozen_tensors=len(before),
-        world_model_proven=False, untouched_test_scored=False))
+        world_model_proven=False, untouched_test_scored=False)
+    if args.pixel_loss == PREDICTIVE_OBJECTIVE: result['predictive_valid_rows'] = predictive_valid_rows
+    write(args.output/'result.json', result)
 
 
 def restore_check(args, config, development):
@@ -279,7 +305,7 @@ def restore_check(args, config, development):
         exact_prediction_restore=True, checked_arrays=len(axes)+1, source_origins=len(selection), pixel_loss=learner.pixel_loss))
 
 
-def initial_check(args, config, fitting, development):
+def initial_check(args, config, fitting, development, *, locations=None):
     """Verify matched initial tensors/traces and one full-shape finite update."""
     import kindle
     from safetensors.numpy import load_file
@@ -309,14 +335,14 @@ def initial_check(args, config, fitting, development):
     evaluate_group(legacy, development, selection, args.output, 'legacy')
     with np.load(args.output/'legacy.npz', allow_pickle=False) as trace:
         assert all(np.array_equal(trace[k], actual_trace[k], equal_nan=True) for k in (*axes, "horizons"))
-    batch = training_windows(fitting[:config['batch_size']], [0]*config['batch_size'], config['batch_length'],
+    locations = [(i,0) for i in range(config['batch_size'])] if locations is None else locations
+    batch = training_windows([fitting[lane] for lane,_ in locations], [start for _,start in locations], config['batch_length'],
                              allow_resets=True, retain_initial_targets=True)
     values = learner.learn(pixels(batch['rgb'].astype(np.float32)/255-.5),
         *[batch[key].ravel().tolist() for key in ('action', 'reward', 'terminal')])
-    assert len(values) == (11 if args.prediction_length else 9) and np.isfinite(values).all() and learner.updates == 1
-    expected_loss = (config['loss_scales']['reconstruction']*(values[1]+(values[9] if args.prediction_length else 0))
-        +config['loss_scales']['dynamics']*values[2]+config['loss_scales']['representation']*values[3]
-        +config['loss_scales']['reward']*values[4]+config['loss_scales']['continuation']*values[5])
+    assert len(values) == len(report_names(args.pixel_loss, args.prediction_length)) and np.isfinite(values).all() and learner.updates == 1
+    if args.pixel_loss == PREDICTIVE_OBJECTIVE: assert values[12] == float((batch['action'] >= 0).mean())
+    expected_loss = reported_total(config, values, args.pixel_loss, args.prediction_length)
     np.testing.assert_allclose(values[0], expected_loss, rtol=1e-5)
     learner.save(str(args.output/'trained'))
     evaluate_group(learner, development, selection, args.output, 'trained')
@@ -351,7 +377,7 @@ def main():
     parser.add_argument('--dense-development', type=int, default=128)
     parser.add_argument('--checkpoint', type=Path)
     parser.add_argument('--reference', type=Path)
-    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy", "motion_cross_entropy"), default="squared_error")
+    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy", "motion_cross_entropy", PREDICTIVE_OBJECTIVE), default="squared_error")
     args = parser.parse_args()
     if args.steps < 1 or args.eval_every < 1 or args.prediction_length not in (0, 16) or min(args.dense_fitting, args.dense_development) < 1:
         parser.error('positive training/evaluation budgets and prediction-length0/16 required')
@@ -373,7 +399,7 @@ def main():
         raise ValueError('all eighteen commands must be represented in fitting and development corpora')
     fit_seeds = {row['seed'] for row in fit_manifest['files']}
     assert not fit_seeds.intersection(row['seed'] for row in dev_manifest['files'])
-    write(args.output/'declaration.json', dict(mode=args.mode, config=config, loss_names=LOSS_NAMES if args.prediction_length else LOSS_NAMES[:9],
+    write(args.output/'declaration.json', dict(mode=args.mode, config=config, loss_names=report_names(args.pixel_loss, args.prediction_length),
         prediction_length=args.prediction_length, pixel_loss=args.pixel_loss, steps=args.steps, eval_every=args.eval_every,
         source_sha256=sha(__file__), fitting_manifest_sha256=sha(args.dataset/'manifest.json'),
         development_manifest_sha256=sha(args.development/'manifest.json'), started_unix=time.time()))
