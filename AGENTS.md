@@ -68,17 +68,27 @@ before suppressing sampling, without a causal/physical-error fraction claim.
 106 input/four output pins,6,144 algebra identities pass; no new native query.
 Preserve its first mutable-source-pin declaration failure and archive-based repair.
 
-The [motion-weighted future-image experiment](docs/experiments/2026-11-07-breakout-world-motion-rollout.md)
-is selected. Keep observed motion RGB losses; add causal H16 direct RGB
-cross-entropy with the same generic motion weights, at reconstruction scale 100.
-No object labels, capacity change or privileged inference input. Earlier uniform
-future-image losses failed; pointwise pressure may still blur uncertain futures.
-62 CPU world tests,55 affected/55 packaged Python checks, release packaging and
-strict workspace/binding Clippy pass. New native loss/preflight precede a separately
-pinned fresh 8,192-update learner. Root
-`/mnt/data/kindle-breakout-world-motion-rollout-20261107`. No GPU job yet.
-No collector, actor/critic, unchanged extension or automatic successor. All old
-stages stay closed; preserve original failures and separate repairs.
+The [motion-weighted future-image learner](docs/results/2026-11-07-breakout-world-motion-rollout.md)
+is closed and fails retention. Direct causal H16 motion-weighted RGB supervision
+improves recorded development eight-step 14→25/107, 16-step 3→10/114, 32-step 0→4/95,
+but observed 108→99/112, one-step 94→84/109 and bricks regress. Fixed-action primary
+ball energy worsens 84.05% to .311977; 23/304 non-ending cases exceed 5% ending
+probability, max 43.84%. Ending 16 timing passes, ending 32 Brier .189225 fails.
+Native 765.720s/loop 1,105.997s cost 44.61%/38.79% more. Retain coverage control;
+no extension or replacement. Recorded-control gains do not establish causal
+forecasting; coverage, uncertainty and feedback-control information remain questions.
+A post-hoc threshold-free peak only raises 8-step 25→27/107 and 32-step 4→7/95;
+no brightness-only rescue or new scoring gate.
+
+Root `/mnt/data/kindle-breakout-world-motion-rollout-20261107`, source `85dbe150`,
+native SHA `5b112866`, matching root/runtime. 62 CPU world/55 selected/55 packaged
+Python checks and strict Clippy pass; 86 qualification/95 learning/1,280 branch
+pins, five guards/45 sealed pins, 204 initial/frozen tensors and 18 restore arrays
+pass. Preserve the first Python source-package fixture error(54 pass/one error)
+and corrected 55/packaged 55 completion; no native stage repeats. Separate 1.276GB
+cache release preserves the original build receipt. All stages closed; no Kindle
+GPU worker, collector, actor/critic, unchanged extension or successor active/selected.
+Investigate the recorded-control/fixed-action gap before another learner.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
