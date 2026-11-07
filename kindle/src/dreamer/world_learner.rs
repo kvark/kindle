@@ -14,6 +14,9 @@ use super::{
 };
 use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 
+mod frozen_visual;
+use frozen_visual::TrainingScope;
+
 #[cfg(test)]
 mod gradient_diagnostic;
 #[cfg(test)]
@@ -75,7 +78,7 @@ fn checkpoint_pixel_loss(
             .map(|v| serde_json::from_value(v.clone()))
             .transpose()?
             .unwrap_or_default()),
-        Some("kindle-world-only-v2") => Ok(serde_json::from_value(
+        Some("kindle-world-only-v2" | "kindle-world-only-v3") => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
                 .ok_or("missing pixel objective")?
@@ -113,6 +116,7 @@ pub struct WorldModelLearner {
     rollout_rng: StdRng,
     prediction_length: usize,
     pixel_loss: PixelLoss,
+    training_scope: TrainingScope,
     updates: u64,
     dirty: bool,
 }
@@ -320,6 +324,7 @@ impl WorldModelLearner {
             rollout_rng,
             prediction_length,
             pixel_loss,
+            training_scope: TrainingScope::All,
             updates: 0,
             dirty: false,
         })
@@ -330,6 +335,12 @@ impl WorldModelLearner {
     }
     pub fn updates(&self) -> u64 {
         self.updates
+    }
+    pub fn training_scope(&self) -> &'static str {
+        self.training_scope.name()
+    }
+    pub fn phase_start_updates(&self) -> Option<u64> {
+        self.training_scope.start_updates()
     }
     pub fn prediction_length(&self) -> usize {
         self.prediction_length
@@ -515,6 +526,7 @@ impl WorldModelLearner {
             self.updates + 1,
             self.config.learning_rate,
         );
+        self.training_scope.apply(&mut self.train);
         self.train.step();
         self.train.wait();
         let mut losses = vec![0.0; 9];
@@ -737,7 +749,11 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let metadata = serde_json::json!({"format": "kindle-world-only-v2", "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length, "pixel_loss": self.pixel_loss});
+        let mut metadata = serde_json::json!({"format": self.training_scope.format(), "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length, "pixel_loss": self.pixel_loss});
+        if let Some(start) = self.training_scope.start_updates() {
+            metadata["training_scope"] = serde_json::json!(self.training_scope.name());
+            metadata["phase_start_updates"] = serde_json::json!(start);
+        }
         std::fs::write(
             path.join("metadata.json"),
             serde_json::to_vec_pretty(&metadata)?,
@@ -755,14 +771,51 @@ impl WorldModelLearner {
             Some(value) => value.as_u64().ok_or("invalid world prediction length")?,
         };
         let prediction_length = usize::try_from(prediction_length)?;
+        let updates = metadata["updates"].as_u64().ok_or("missing update count")?;
+        let scope =
+            TrainingScope::from_metadata(&metadata, pixel_loss, prediction_length, updates)?;
         let mut learner = Self::with_pixel_loss(config, prediction_length, pixel_loss)?;
-        checkpoint::load_session(&mut learner.train, &path.join("world.safetensors"))?;
-        learner.updates = metadata["updates"].as_u64().ok_or("missing update count")?;
-        if u64::from(learner.train.adam_step_count()) != learner.updates {
+        learner.load_training_checkpoint(path, updates)?;
+        learner.training_scope = scope;
+        Ok(learner)
+    }
+
+    /// Start a distinct H16 phase from an experienced H0 motion world. Rebuild
+    /// the training graph while preserving all weights, moments and optimizer age.
+    /// Ordinary restore never changes objectives or training scope.
+    pub fn start_frozen_visual_phase(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
+        let metadata: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(path.join("metadata.json"))?)?;
+        let pixel_loss = checkpoint_pixel_loss(&metadata)?;
+        let prediction_length = metadata
+            .get("prediction_length")
+            .map(|value| value.as_u64().ok_or("invalid world prediction length"))
+            .transpose()?
+            .unwrap_or(0);
+        let prediction_length = usize::try_from(prediction_length)?;
+        let updates = metadata["updates"].as_u64().ok_or("missing update count")?;
+        let scope =
+            TrainingScope::from_metadata(&metadata, pixel_loss, prediction_length, updates)?;
+        let phase = scope.start_frozen_visual(pixel_loss, prediction_length, updates)?;
+        let config = serde_json::from_value(metadata["config"].clone())?;
+        let mut learner = Self::with_pixel_loss(config, 16, pixel_loss)?;
+        learner.load_training_checkpoint(path, updates)?;
+        learner.training_scope = phase;
+        Ok(learner)
+    }
+
+    fn load_training_checkpoint(
+        &mut self,
+        path: &Path,
+        updates: u64,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        checkpoint::load_session(&mut self.train, &path.join("world.safetensors"))?;
+        if u64::from(self.train.adam_step_count()) != updates {
             return Err(io::Error::other("world checkpoint optimizer age mismatch").into());
         }
-        learner.dirty = true;
-        Ok(learner)
+        self.updates = updates;
+        self.dirty = true;
+        Ok(())
     }
 }
 

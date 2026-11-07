@@ -99,7 +99,8 @@ def test_evaluation_counts_only_real_roots_keeps_endings_and_handles_empty_horiz
     assert data['prior_features'].shape == (5, 3, 5)
 
 
-def test_restore_comparison_axes_match_a_prefix_of_the_original_batch(tmp_path, monkeypatch):
+@pytest.mark.parametrize('supplied', [False, True])
+def test_restore_comparison_axes_match_a_prefix_of_the_original_batch(tmp_path, monkeypatch, supplied):
     import kindle
     reference = tmp_path/'reference'
     output = reference/'evaluations/7'
@@ -109,12 +110,59 @@ def test_restore_comparison_axes_match_a_prefix_of_the_original_batch(tmp_path, 
     (reference/'selections.json').write_text(json.dumps(dict(development=dict(natural=locations))))
     restored = tmp_path/'restore'
     restored.mkdir()
-    monkeypatch.setitem(kindle.__dict__, 'WorldModelLearner', SimpleNamespace(restore=lambda _: PersistenceLearner()))
+    loads = []
+    def load(path):
+        assert not supplied
+        loads.append(path)
+        return PersistenceLearner()
+    monkeypatch.setitem(kindle.__dict__, 'WorldModelLearner', SimpleNamespace(restore=load))
     monkeypatch.setattr(corpus, 'require_device', lambda _: None)
     args = SimpleNamespace(reference=reference, checkpoint=tmp_path/'unused-checkpoint', output=restored)
-    corpus.restore_check(args, PersistenceLearner.config, [stream()])
+    corpus.restore_check(args, PersistenceLearner.config, [stream()], learner=PersistenceLearner() if supplied else None)
     result = json.loads((restored/'result.json').read_text())
     assert result['exact_prediction_restore'] and result['source_origins'] == 2
+    assert len(loads) == (0 if supplied else 1)
+
+
+@pytest.mark.parametrize('inherited', [0, 8192])
+def test_training_counts_incremental_updates_and_uses_global_evaluation_paths(tmp_path, monkeypatch, inherited):
+    import kindle
+    from safetensors.numpy import save_file
+    config = dict(seed=41001, batch_size=2, batch_length=32, loss_scales=dict(
+        reconstruction=100., dynamics=1., representation=.1, reward=1., continuation=1.))
+
+    class Learner:
+        def __init__(self): self.updates = inherited; self.config = config; self.pixel_loss = 'motion_cross_entropy'
+        def save(self, path):
+            path = Path(path); path.mkdir()
+            save_file({'world.parameter': np.array([self.updates], np.float32)}, path/'world.safetensors')
+        def learn(self, observed, action, reward, terminal):
+            assert len(observed) == 32*2*3*64*64*4
+            self.updates += 1
+            keep = corpus.rollout_validity(np.asarray(action).reshape(32,2),16)
+            values = [0.,1.,2.,3.,4.,5.,0.,2.,0.,6.,float(keep.mean())]
+            values[0] = corpus.reported_total(config, values, self.pixel_loss, 16)
+            return values
+
+    learner = Learner()
+    source = tmp_path/'inherited'
+    learner.save(str(source))
+    output = tmp_path/'new'; output.mkdir()
+    args = SimpleNamespace(output=output, reference=None, steps=2, prediction_length=16,
+        pixel_loss='motion_cross_entropy', eval_every=1, dense_fitting=1, dense_development=1)
+    evaluated = []
+    monkeypatch.setattr(corpus, 'require_device', lambda _: None)
+    monkeypatch.setattr(corpus, 'evaluate_group', lambda model, data, locations, output, name, **kwargs:
+        evaluated.append((model.updates, output, name)))
+    monkeypatch.setitem(kindle.__dict__, 'WorldModelLearner', lambda *a, **kw: learner)
+    corpus.train(args, config, [stream(),stream()], [stream(),stream()],
+                 learner=learner if inherited else None, initial_checkpoint=source)
+    result = json.loads((output/'result.json').read_text())
+    assert result['updates'] == inherited+2 and result['start_updates'] == inherited and result['new_updates'] == 2
+    assert {int(path.name) for _,path,_ in evaluated if path.parent.name == 'evaluations'} == {inherited,inherited+1,inherited+2}
+    rows = [json.loads(line) for line in (output/'learning.jsonl').read_text().splitlines()]
+    assert [row['step'] for row in rows] == [1,2]
+    assert [row['global_update'] for row in rows] == [inherited+1,inherited+2]
 
 
 def test_zero_prior_horizon_keeps_sampling_and_counts_without_negative_zero_slices():

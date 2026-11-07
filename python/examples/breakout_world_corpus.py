@@ -202,7 +202,7 @@ def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
 
 
 def train(args, config, fitting, development, *, sampler=sampler_plan, initial_reference=None,
-          evaluation_fitting=None):
+          evaluation_fitting=None, learner=None, initial_checkpoint=None):
     import kindle
     from safetensors.numpy import load_file
     plan, expected_counts = sampler(fitting, config, args.steps, args.prediction_length)
@@ -215,14 +215,19 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
                               for split,values in json.loads((args.reference/'selections.json').read_text()).items()}
     np.savez_compressed(args.output/'sampler-plan.npz', locations=plan)
     write(args.output/'sampler-plan.json', expected_counts)
-    learner = kindle.WorldModelLearner(config, prediction_length=args.prediction_length, pixel_loss=args.pixel_loss)
+    if learner is None:
+        learner = kindle.WorldModelLearner(config, prediction_length=args.prediction_length, pixel_loss=args.pixel_loss)
     require_device(learner)
+    start_updates = learner.updates
     write(args.output/'actual-config.json', learner.config)
     write(args.output/'selections.json', selections)
     learner.save(str(args.output/'initial'))
     initial_reference = args.reference if args.reference is not None else initial_reference
-    if initial_reference is not None:
-        initial, control = (load_file(path/'initial/world.safetensors') for path in (args.output, initial_reference))
+    if initial_checkpoint is not None or initial_reference is not None:
+        reference_file = (initial_checkpoint/'world.safetensors' if initial_checkpoint is not None
+                          else initial_reference/'initial/world.safetensors')
+        initial = load_file(args.output/'initial/world.safetensors')
+        control = load_file(reference_file)
         assert initial.keys() == control.keys() and all(np.array_equal(initial[k], control[k]) for k in initial)
     seen = [np.zeros(len(stream['action']), bool) for stream in fitting]
     total_terminal, prior_terminal, positive_rows, context_reset_rows, source_reset_rows = 0, 0, 0, 0, 0
@@ -238,7 +243,7 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             for kind, locations in selections[split].items():
                 evaluate_group(learner, streams, locations, output, f'{split}-{kind}')
 
-    evaluate(0)
+    evaluate(start_updates)
     with (args.output/'learning.jsonl').open('x') as log:
         for step in range(1, args.steps+1):
             locations = plan[step-1].tolist()
@@ -270,7 +275,7 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             source_reset_rows += sum(int((stream['action'][start:start+config['batch_length']] == -1).sum())
                                      for stream, (_, start) in zip(streams, locations))
             for lane, start in locations: seen[lane][start:start+config['batch_length']] = True
-            log.write(json.dumps(dict(step=step, locations=locations, losses=values,
+            log.write(json.dumps(dict(step=step, global_update=learner.updates, locations=locations, losses=values,
                 terminal_rows=terminals, prior_terminal_rows=kept_terminals, training_seconds=native_seconds))+'\n')
             if step % 128 == 0:
                 log.flush()
@@ -278,9 +283,9 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
                     unique_source_arrivals=sum(int(row.sum()) for row in seen))), flush=True)
                 require_device(learner)
             if step in (2048, 4096) and step != args.steps:
-                learner.save(str(args.output/f'checkpoint-{step}'))
+                learner.save(str(args.output/f'checkpoint-{learner.updates}'))
             if step == args.steps: learner.save(str(args.output/'final'))
-            if step % args.eval_every == 0 or step == args.steps: evaluate(step)
+            if step % args.eval_every == 0 or step == args.steps: evaluate(learner.updates)
     final_extra = args.output/'dense-final'
     final_extra.mkdir()
     for label, streams, count, seed in [('fitting', evaluation_fitting, args.dense_fitting, 182003),
@@ -290,12 +295,13 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
     learner.save(str(args.output/'final-frozen'))
     before, after = (load_file(args.output/phase/'world.safetensors') for phase in ('final', 'final-frozen'))
     assert before.keys() == after.keys() and all(np.array_equal(before[k], after[k]) for k in before)
-    assert all(np.isfinite(v).all() for v in after.values()) and learner.updates == args.steps
+    assert all(np.isfinite(v).all() for v in after.values()) and learner.updates == start_updates+args.steps
     observed_counts = dict(terminal_rows=total_terminal, prior_terminal_rows=prior_terminal,
         positive_reward_rows=positive_rows, context_reset_rows=context_reset_rows, source_reset_rows=source_reset_rows,
         unique_source_arrivals=sum(int(row.sum()) for row in seen))
     assert observed_counts == expected_counts
-    result = dict(status='complete', updates=args.steps, prediction_length=args.prediction_length,
+    result = dict(status='complete', updates=learner.updates, start_updates=start_updates, new_updates=args.steps,
+        prediction_length=args.prediction_length,
         training_seconds=native_seconds, total_seconds=time.monotonic()-started, no_behavior=True, pixel_loss=learner.pixel_loss,
         unique_source_arrivals=sum(int(row.sum()) for row in seen), source_arrivals=sum(len(row) for row in seen),
         replayed_terminal_rows=total_terminal, prior_terminal_rows=prior_terminal,
@@ -307,9 +313,10 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
     write(args.output/'result.json', result)
 
 
-def restore_check(args, config, development):
+def restore_check(args, config, development, *, learner=None):
     import kindle
-    learner = kindle.WorldModelLearner.restore(str(args.checkpoint))
+    if learner is None:
+        learner = kindle.WorldModelLearner.restore(str(args.checkpoint))
     require_device(learner)
     assert learner.pixel_loss == getattr(args, 'pixel_loss', 'squared_error')
     selection = json.loads((args.reference/'selections.json').read_text())['development']['natural'][:config['batch_size']]

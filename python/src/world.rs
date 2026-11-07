@@ -56,6 +56,14 @@ impl PyWorldModelLearner {
         })
     }
 
+    #[classmethod]
+    fn start_frozen_visual_phase(_class: &Bound<'_, PyType>, checkpoint: &str) -> PyResult<Self> {
+        Ok(Self {
+            inner: WorldModelLearner::start_frozen_visual_phase(Path::new(checkpoint))
+                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?,
+        })
+    }
+
     #[getter]
     fn config<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         json_to_python(py, self.inner.config())
@@ -64,6 +72,16 @@ impl PyWorldModelLearner {
     #[getter]
     fn updates(&self) -> u64 {
         self.inner.updates()
+    }
+
+    #[getter]
+    fn training_scope(&self) -> &'static str {
+        self.inner.training_scope()
+    }
+
+    #[getter]
+    fn phase_start_updates(&self) -> Option<u64> {
+        self.inner.phase_start_updates()
     }
 
     #[getter]

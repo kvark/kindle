@@ -76,3 +76,29 @@ automatic successor. Stop actual faults/nonfinite state; use the AMD host guard
 and Auto, without reset/reload/reboot. Full causal physics, calibrated events,
 brick memory, late/tunnel/second-wall coverage, untouched families and fresh
 confirmation remain necessary before proving the goal or resuming actor/critic.
+
+## Implemented API and fixture accounting
+
+`WorldModelLearner.start_frozen_visual_phase(checkpoint)` accepts only an
+experienced all-weight H0 motion checkpoint. It rebuilds the H16 training graph,
+strictly loads all optimizer tensors/age and sets `training_scope=frozen_visual`.
+Getters expose that scope and `phase_start_updates`. Ordinary `restore` uses the
+saved mode without fresh overrides. All-weight saves retain v2; frozen-phase
+saves use v3 with explicit scope/start age, so older natives reject them before
+GPU construction. Scope is reapplied after normal LR setup on every update.
+
+The retained world has68 logical parameters:36 frozen visual weights and32
+trainable dynamics/head weights. All204 initial weight/moment tensors must match.
+During learning require only the36 frozen weights invariant; optimizer moments
+can change. Inference/frozen restore still requires all204 tensors invariant.
+The single full-shape qualification performs one phase update, then one update
+after restoring that fixture to prove scope persistence (global8192→8193→8194).
+Those two verification updates never seed the actual4096-update phase, which
+warm-starts independently from the original8192 checkpoint.
+
+The first CPU graph fixture accidentally retained the whole-agent replay-value
+scale. Preserve its19-pass/one-failure log and source; the corrected standalone
+fixture completes20 CPU checks (four GPU checks ignored), and Rust Clippy passes.
+The27 corpus/coverage/sampler CPU checks include fresh/warm global-update paths
+and reuse of a supplied restored learner. New binding-header tests remain to run
+against the rebuilt package before any native qualification allocation.
