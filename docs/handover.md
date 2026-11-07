@@ -53,15 +53,21 @@ Past posterior ST/observed losses remain; full BPTT is not globally unbiased.
 No new parameter,input,geometry or inference path. Explicit new objective; old
 energy and production objectives remain compatible. Actor/critic stays parked.
 
-Root `/mnt/data/kindle-breakout-world-score-function-20261107`. Implementation48
-CPU world tests(22 GPU tests ignored),51 Python checks and strict workspace/
-bindings Clippy pass. Exact finite enumeration/finite differences cover prior,
-conditional heads and RGB gradients,including the symmetric variance failure.
-Preserve initial fixture shape and Clippy array/Vec failures with repairs.
-Next build/package,pin all identities,then only the new native gradient fixture
-and full-size one-update/frozen/restore preflight. No GPU allocation or full
-learner is active/selected; review qualification before separately declaring one.
-No collector,old-model rerun,unchanged extension or broad seed campaign.
+Root `/mnt/data/kindle-breakout-world-score-function-20261107`,native/source0ab7fea7,
+SHA0ebed9cd,matching root/runtime.48 CPU world tests(22 GPU tests ignored),51
+explicitly selected and51 packaged Python checks,strict Clippy pass. Preserve
+initial fixture shape and Clippy Vec/array failures with repairs. New native
+exact-enumeration gradient fixture/full-size preflight pass,83 input pins,two
+guards/sealed audits,204 initial/frozen tensors,18 initial/restore arrays,65
+expected first-update changes and legacy motion/energy restores. All13 forward
+reports exactly match the old energy preflight. No completed qualification repeats.
+
+Qualification reviewed; one fresh matched-init8,192-update learner on the exact
+coverage data/plan is active under the host guard,followed only by its restore.
+95 learning input pins,seed41001 reused,not confirmation. No actor/critic or
+collector. Do not start another GPU job or mistake an observer timeout for a
+stopped worker. Review learning before separately declaring its frozen oracle
+comparison. No unchanged extension,broad seed campaign or automatic successor.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
 uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,

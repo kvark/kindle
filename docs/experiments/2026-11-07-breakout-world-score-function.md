@@ -112,3 +112,19 @@ The previous energy run's published41/41 Python counts were wrong: logs show
 this run's51 checks do not retroactively complete that claim. See the prior
 [result correction](../results/2026-11-07-breakout-world-energy.md#python-verification-count-correction).
 Next package/pin/qualify only; no full learner selected.
+
+
+## Qualification reviewed; fixed learner declared
+
+Native/source0ab7fea7,SHA0ebed9cd,matching root/runtime.48 CPU world and51 affected/
+51 packaged Python checks,strict workspace/bindings Clippy pass. Both new guarded
+jobs pass,sealed audits pass,83 input pins verify. Native exact-enumeration
+conditional derivatives match the independent F64 reference. Full-size first
+update matches all13 old energy forward reports exactly;204 initial/frozen
+tensors,18 initial/restore arrays,65 expected changed parameters and legacy
+motion/energy restores pass. No GPU/numerical fault or host recovery.
+
+`qualification-review.json` reviewed. `learning-protocol.json`/queue separately
+declare only the fresh fixed8,192-update learner and restore,95 input pins,
+all previously specified settings/data/counts unchanged. Training is active;
+frozen oracle evaluation is not selected yet. No collector or old-model rerun.
