@@ -8,7 +8,7 @@ reconstruction do not depend on recurrent history. This is a concrete hypothesis
 not an isolated cause established by that diagnostic.
 
 Root `/mnt/data/kindle-breakout-world-observation-code-20261107`. Implementation
-and native qualification remain unfinished; no GPU allocation is declared.
+and native qualification pass; the separately declared bounded learner is active.
 
 ## Native intervention
 
@@ -74,3 +74,20 @@ Passing intermediate gates is not full-goal completion. Precise causal forecasts
 event/reward calibration,brick memory,late/tunnel/second-wall coverage,untouched
 families and fresh confirmation remain required. Actor/critic and CDP efficiency
 comparisons stay parked until the world-model requirements are established.
+
+## Qualification and actual allocation
+
+Native source780f00a8/SHAe6ca7ca4 and runner68e9bbb7 are separately pinned. The
+new architecture has66 logical parameters,8,065,219 scalar weights and198 checkpoint
+tensors; the old68/8,852,675/204 geometry remains separately qualified. Removing
+the RGB deterministic branch removes two parameters and narrows the posterior
+input. Full-shape CPU compilation/gradient-family checks pass; all54 affected Rust
+CPU and99 packaged Python checks and strict core/binding Clippy pass.
+
+The first guarded qualification passes268 pins in32.457s:198 exact initial tensors,
+18 initial/trained restore arrays,18 exact legacy arrays,finite11-loss update,
+34 invariant visual parameters,exact h-perturbation separation and legacy-v4
+rejection. A separate309-pin learner/restore declaration selects fresh8192 updates
+with the original full plan. Matched256/128 dense initial exports use the final
+dense locations/draw; all198 post-query initial tensors must match the qualified
+actual initial checkpoint. The final-only branch allocation remains unstarted.

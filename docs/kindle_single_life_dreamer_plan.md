@@ -98,16 +98,25 @@ Source32b182a1/executable40e79a33,root
 pre-native guard-copy failure is preserved; no prior/teacher transition,optimizer
 or collector executes. Future images/readouts remain privileged diagnostics.
 
-Select the [observation-only visual code experiment](experiments/2026-11-07-breakout-world-observation-code.md)
-for implementation: default-off `rgb_latent_only`,posterior from CNN alone and
-RGB decoder from z alone; h/core/prior/actions/heads retain temporal interfaces.
-Use existing H16 latent overshooting,plain RGB64/12M/B8/T32/Auto and original data.
-This changes architecture/shapes/gradient routes together; no isolated cause or
-benefit is established. Root `/mnt/data/kindle-breakout-world-observation-code-20261107`.
-Implement/version/package and qualify separation/restore before separately
-declaring fresh8192 updates and final-only branches. No GPU allocation is active
-or declared. No new loss,data,actor/critic,closed-stage repeat or automatic successor.
-Original full-world requirements and all retention gates remain unchanged.
+The [observation-only visual code experiment](experiments/2026-11-07-breakout-world-observation-code.md)
+is implemented and natively qualified. Default-off `rgb_latent_only` makes the
+posterior CNN-only and RGB decoder z-only; core/prior/actions/heads retain their
+temporal interfaces. New architecture has66 logical/8,065,219 scalar weights and
+198 checkpoint tensors (legacy68/8,852,675/204). Changes are combined; no isolated
+cause or benefit is established. Version4 persists the option and old natives
+reject it before construction; legacy/default formats retain their behavior.
+
+Root `/mnt/data/kindle-breakout-world-observation-code-20261107`; native780f00a8/
+SHAe6ca7ca4,runner68e9bbb7. All54 Rust CPU/99 packaged Python checks and strict
+core/binding Clippy pass. First native qualification passes268 pins in32.457s,
+198 exact initial restore tensors,18 initial/trained/legacy arrays,finite update,
+34 invariant visual parameters and exact h perturbation separation. The separately
+declared fresh8192-update run and restore are active in
+`kindle-world-observation-code-learning-20261107`,309 pins. Existing H16 latent
+overshooting,RGB64/12M/B8/T32/Auto,original data/full4/2/1/1 plan and all gates remain.
+Matched256/128 dense initial controls are added; final-only branch assessment is
+not allocated until reviewed learning. No old stage repeat,new loss/data/actor/
+critic,concurrent learner or automatic successor; full world goal stays open.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
