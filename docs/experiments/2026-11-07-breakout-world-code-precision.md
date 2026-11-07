@@ -15,8 +15,10 @@ prediction arrays are already retained. Native qualification and source establis
 that this new posterior/decoder do not use h; with current RGB fixed, these model
 outputs vary with the sampled code. Pixel-detector response can also be nonlinear;
 do not call its measured variance an isolated physical latent-noise quantity.
-File order is fitting-natural, fitting-contacts, fitting-ending,
-development-natural, development-contacts, development-ending; preserve row order.
+File order is fitting-natural, fitting-contacts, fitting-endings,
+development-natural, development-contacts, development-endings; preserve row order.
+Load the pinned pure NumPy instrument file directly, without importing the Kindle
+package or native extension.
 
 Use the existing conservative ball instrument. Report all visible-target/draw
 detection and within-one-pixel counts, including missing predictions. For origins
