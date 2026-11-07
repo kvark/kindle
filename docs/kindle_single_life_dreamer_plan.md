@@ -6,39 +6,25 @@ The user selected this direction after pausing the five-game campaign. Treat
 world-model competence as the immediate objective. Gameplay score is a later
 integration measure. Do not restart any closed learner, collector or comparison.
 The active goal is **prove the world model training on Breakout**. The
-[completed no-prior-image ablation](results/2026-11-07-breakout-world-no-prior-image.md)
-improves observed development ball accuracy0/112 to5/112, paddle accuracy88.28%
-to99.22%, and native training time765.084 to527.850s for8,192 updates. Forecasts
-also improve modestly. Retain H0 for isolated investigation; the90% reconstruction
-diagnostic and full world competence remain far away. Coarse/faint/spatial
-probes still fail most precise ball states. No actor/critic learns.
+[closed motion-weighted pixel learner](results/2026-11-07-breakout-world-motion-attention.md)
+passes observed development ball reconstruction107/112 (95.54%) versus5/112 for
+plain H0. Forecast accuracy is85.32%/32.11%/7.48% at1/4/8 decisions; unseen
+brick layouts remain weak. Native530.143s/8,192 updates,734.272s total. All307
+pins,204 frozen tensors and18 exact restored arrays pass. Source/native3fa37b6d,
+SHA eafe8359; root `/mnt/data/kindle-breakout-world-motion-20261107`. No actor/
+critic learns. Earlier H16/H0 failures and CPU repairs stay in linked reports.
 
-All H0 phases close with305 pins,8,192 finite rows,68 changed logical parameters,
-204 invariant frozen tensors,18 exact restored arrays and correct exposures.
-Source36a5d3e0 is archived. No completed phase repeats. Existing data still omit
-later-game states (maximum score56/34, no ball above top brick row). These gaps
-do not explain visible-ball reconstruction errors on existing early states.
-
-The [selected motion-attention experiment](experiments/2026-11-07-breakout-world-motion-attention.md)
-weights observed cross-entropy by `1+100*abs(current-previous RGB)`, normalized
-per image to mean1; clip starts/resets uniform. No object/RAM labels, new
-parameters or inference inputs. Preserve H0 dynamics/heads, native resize,
-data/init/source plan and evaluations. Fitting-only output arithmetic moves
-ball-core gradient share2.78% to31.18%, motivating a focus test without proving
-an upstream cause/benefit. Target-dependent attention is not calibrated likelihood.
-Default MSE/plain BCE remain available.
-
-37 CPU world tests,61 Python checks and strict workspace/bindings Clippy pass.
-New v2 writes explicitly preserve objective; old v1 MSE/BCE restores remain.
-Root `/mnt/data/kindle-breakout-world-motion-20261107`. Native/source3fa37b6d,
-SHA eafe8359. Both new qualification workers pass306 pins: F64 values/derivatives
-and full-size matched-init/update/frozen/v1+v2 restore. The fresh8,192-update
-learner/final restore is separately declared and active under307 pins. Session
-71177, learner PID1609131 confirmed live; first736 updates finite. Initial
-weights/source samples/origins match H0; matched one-step encoder moments differ,
-confirming motion reweighting is active. No automatic successor/extension,
-new data, capacity change or actor/critic resume. Untouched tests, prospective
-branches, calibration, later-game coverage and fresh confirmation remain unfinished.
+Next is the [fixed-plan prospective challenge](experiments/2026-11-07-breakout-world-branches.md),
+with no training: seven groups of eight source seed streams,42 fixed plan batches,
+eight oracle/model repetitions, history16 primary/32 secondary. Root
+`/mnt/data/kindle-breakout-world-branches-20261107`. Eight CPU checks pass; the
+sticky-fixture exposure assertion fails and is preserved. A separate CPU review
+verifies16 exact replay-corrected trace pairs. Pin and collect the bounded oracle,
+then guarded initial/final frozen evaluation. No completed collector/learner
+repeats, unchanged extension, automatic successor or actor/critic resume. Existing
+training data omit later-game states (max score56/34, no ball above top row).
+Untouched tests, prospective physics, stochastic calibration, late-game/second-wall
+coverage and fresh confirmation remain unfinished. Keep the goal active.
 
 ### Representation and training scope
 

@@ -30,42 +30,28 @@ gameplay score is a later integration test. CDP remains a subsequent efficiency
 comparison after the pixel baseline establishes competence.
 
 The active goal is to prove Breakout world-model training; the five-game
-campaign remains parked. The [completed H0 ablation](docs/results/2026-11-07-breakout-world-no-prior-image.md)
-removes extra prior-image loss, improving observed development ball accuracy
-0/112 to5/112 and paddle accuracy88.28% to99.22%, with31.01% less native training
-time (527.850s/8,192 updates). This is useful progress, far below the90%
-reconstruction diagnostic. Coarse/faint/spatial readouts still fail most precise
-ball states. World competence remains unproven; no actor/critic learns.
+campaign remains parked. The [closed motion-weighted pixel learner](docs/results/2026-11-07-breakout-world-motion-attention.md)
+passes observed development ball reconstruction:107/112 within1 resized pixel
+(95.54%), versus5/112 for plain H0. One-step forecasts reach85.32%, falling to
+32.11%/7.48% at4/8 decisions. Unseen bricks remain weak. No actor/critic learns.
 
-All H0 phases complete:305 pins,8,192 finite rows,68 changed logical parameters,
-204 invariant frozen tensors and18 restored arrays pass. Source36a5d3e0 is
-archived at `/mnt/data/kindle-breakout-world-no-prior-image-20261107`. Earlier
-MSE/BCE H16 failures and separate CPU repairs stay in linked reports. No completed
-phase repeats. The corpus remains early-game only (max score56/34, no ball above
-top brick row); these gaps do not explain early visible-ball reconstruction errors.
+All8,192 updates,307 pins,204 frozen tensors and18 restore arrays pass. Native
+training530.143s; total734.272s. Source/native3fa37b6d, SHA prefixeafe8359,
+matching runtime `/mnt/data/kindle-breakout-world-motion-20261107/runtime`.
+This learner/restore is closed; do not repeat or extend it. Earlier negative
+results and separate CPU repairs remain in linked reports.
 
-The selected [motion-attention experiment](docs/experiments/2026-11-07-breakout-world-motion-attention.md)
-adds normalized loss weights `1+100*abs(current-previous RGB)` to observed
-cross-entropy. Clip starts/resets use uniform weights; no RAM/object masks enter
-training. Keep H0's latent dynamics, architecture, data/init/sampling/evaluations.
-Fitting-only output allocation shifts ball-core gradient share2.78% to31.18%;
-this motivates the test, not a cause or benefit claim. Target-dependent attention
-is not calibrated likelihood. Default MSE/plain BCE remain available.
-
-Implementation and37 CPU world tests (20 GPU tests ignored),61 Python checks and
-strict workspace/bindings Clippy pass. New v2 checkpoints explicitly preserve
-objective; old v1 MSE/BCE restores remain supported. The two new workers qualify: native F64 motion-weight/loss/derivatives and full-size
-motion-H0 matched-init/update/frozen/v1+v2 restore. Both now pass, with306 pins,
-204 initial/frozen tensors and18 exact restored arrays. Native/source3fa37b6d,
-SHA prefixeafe8359, matching runtime at
-`/mnt/data/kindle-breakout-world-motion-20261107/runtime`. The separately declared
-fresh8,192-update learner/final restore is active under307 pins. Queue session
-71177; learner PID1609131 confirmed live, first736 updates finite. Initial
-weights/source samples/origins match H0. One matched preflight update changes99
-optimizer moments, including encoder moments, confirming reweighting is active.
-No capacity increase, recollection, unchanged extension, automatic successor or
-actor/critic resume. Untouched tests, prospective branches, later-game coverage
-and fresh confirmation remain unfinished. Keep the full goal active and unproven.
+The selected [prospective fixed-plan challenge](docs/experiments/2026-11-07-breakout-world-branches.md)
+evaluates that frozen model against its actual-initial control, with no training.
+Root `/mnt/data/kindle-breakout-world-branches-20261107`. Seven origin categories,
+eight seed streams each, fixed32-command plans, eight oracle/model repetitions;
+history16 primary,32 secondary. Eight CPU checks pass. Preserve the separate
+sticky-fixture exposure failure and CPU-only review; replay the full source
+transcript before each branch because ALE clones omit private previous action.
+Next pin sources and collect the bounded CPU oracle, then guarded frozen GPU
+evaluation. No new learner, capacity change, actor/critic resume or automatic
+successor. Untouched tests, later-game/second-wall coverage and fresh confirmation
+remain unfinished. Keep the full goal active and unproven.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
