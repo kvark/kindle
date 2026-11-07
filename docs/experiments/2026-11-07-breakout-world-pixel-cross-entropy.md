@@ -48,7 +48,7 @@ The first GPU queue has only three selected qualification phases:
 2. Cross-entropy tinyB2/T4/H2 mask fixture:12 synthetic updates, finite weighted
    loss, all parameter families change, frozen invariance and exact restore;
    altered masked targets leave prior loss unchanged, all-zero masks give0.
-3. RGB64/12M/B8/T32/H16 initial check: all204 initial tensors and17 forecast/
+3. RGB64/12M/B8/T32/H16 initial check: all204 initial tensors and18 forecast/
    feature arrays match the retained squared-error control exactly; old metadata
    restores as squared error with matching forecasts. One full-shape update must
    be finite with correct loss arithmetic. This checkpoint is discarded as a
@@ -77,7 +77,7 @@ against the control before the first update.
 Keep0/1024/.../8192 frozen natural/contact/ending exports, four fixed draws,
 1/4/8/16/32 decisions and final256 fitting/128 development origins. Retain all
 204 final parameter/moment tensors unchanged through frozen evaluation and
-17-array exact restore. Audit all finite updates, exposure counters and pins.
+18-array exact restore. Audit all finite updates, exposure counters and pins.
 Report native training and total loop wall-time separately; replayed arrivals
 are not new actions or emulator frames.
 
@@ -95,7 +95,20 @@ prospective action effects, calibrated stochastic outcomes, untouched tests,
 late-game/tunnel/second-wall dynamics or fresh confirmation. Keep actor/critic
 parked until world competence is established.
 
-Root `/mnt/data/kindle-breakout-world-bce-20261107`. Implementation/CPU checks are
-in progress at initial publication. No GPU queue has launched at publication;
-the exact native/source/config/runner/host identities must be pinned externally
-before execution. Update current status in AGENTS/handover/PR31 in place.
+Root `/mnt/data/kindle-breakout-world-bce-20261107`. Native build source535de479,
+SHA256 `adfc2f9ec8e9174b56628ab8c390516ee6acee31dc4151418208bcfdf7f59c54`.
+All three native workers exit0: loss/derivatives, mask fixture and matched-init
+preflight. The qualification queue **fails its declaration**, expecting17
+compared arrays when the runner reports16. Preserve that original failure;
+no GPU phase repeats. A separate CPU review verifies all304 pins and all18
+saved arrays, including horizons/locations, against both the original control
+and legacy restore. Initial204 tensors are exact; the full-size update is finite.
+This completes missing comparison evidence without relabeling the failed queue.
+The runner now explicitly checks/reports all18 arrays for future restores.
+
+The fixed8,192-update comparison is selected after that CPU review. Pin the
+current execution runner/source separately from native build535de479, whose
+Rust/Python-library code is unchanged. Reuse the original data/config. No
+learner is launched at this publication. Declare the two-stage learner/restore
+queue externally before execution, retain actual-initial and sampling assertions,
+and stop after its fixed budget. A qualification failure is not a learning win.

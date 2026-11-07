@@ -180,7 +180,7 @@ world-model stages remain in their original roots.
 All four guarded stages complete: reset-mask fixture, all18 collector, learner
 and frozen restore. The fixture tests partial/all-zero masks, unchanged prior
 loss under altered masked future images, feature readback and clipped-start
-terminal targets. Restore reproduces17 saved arrays exactly on eight development
+terminal targets. Restore reproduces16 saved arrays exactly on eight development
 origins. Final frozen evaluation leaves all204 parameter/moment tensors exact;
 all68 logical parameters change from initialization. The CPU closure review
 verifies278 pins, all8,192 finite update rows, exact source sampling plan,

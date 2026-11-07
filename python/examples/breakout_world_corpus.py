@@ -254,14 +254,15 @@ def restore_check(args, config, development):
     evaluate_group(learner, development, selection, args.output, 'restored')
     expected = np.load(args.reference/'evaluations'/str(learner.updates)/'development-natural.npz', allow_pickle=False)
     actual = np.load(args.output/'restored.npz', allow_pickle=False)
-    axes = dict(truth=1, context=0, previous_context=0, valid=1, target_reward=1, target_terminal=1,
+    assert np.array_equal(expected["horizons"], actual["horizons"])
+    axes = dict(locations=0, truth=1, context=0, previous_context=0, valid=1, target_reward=1, target_terminal=1,
         position=1, lives=1, prediction=2, posterior=1, reward=2, reward_positive_probability=2,
         continuation=2, encoder_features=0, posterior_features=0, prior_features=1)
     for key, axis in axes.items():
         reference = np.take(expected[key], np.arange(len(selection)), axis=axis)
         assert np.array_equal(reference, actual[key], equal_nan=True), key
     write(args.output/'result.json', dict(status='complete', updates=learner.updates,
-        exact_prediction_restore=True, checked_arrays=len(axes), source_origins=len(selection), pixel_loss=learner.pixel_loss))
+        exact_prediction_restore=True, checked_arrays=len(axes)+1, source_origins=len(selection), pixel_loss=learner.pixel_loss))
 
 
 def initial_check(args, config, fitting, development):
@@ -280,7 +281,8 @@ def initial_check(args, config, fitting, development):
     evaluate_group(learner, development, selection, args.output, 'candidate')
     expected_trace = np.load(args.reference/'evaluations/0/development-natural.npz', allow_pickle=False)
     actual_trace = np.load(args.output/'candidate.npz', allow_pickle=False)
-    axes = dict(truth=1, context=0, previous_context=0, valid=1, target_reward=1, target_terminal=1,
+    assert np.array_equal(expected_trace["horizons"], actual_trace["horizons"])
+    axes = dict(locations=0, truth=1, context=0, previous_context=0, valid=1, target_reward=1, target_terminal=1,
         position=1, lives=1, prediction=2, posterior=1, reward=2, reward_positive_probability=2,
         continuation=2, encoder_features=0, posterior_features=0, prior_features=1)
     for key, axis in axes.items():
@@ -290,7 +292,7 @@ def initial_check(args, config, fitting, development):
     assert legacy.pixel_loss == 'squared_error'
     evaluate_group(legacy, development, selection, args.output, 'legacy')
     with np.load(args.output/'legacy.npz', allow_pickle=False) as trace:
-        assert all(np.array_equal(trace[k], actual_trace[k], equal_nan=True) for k in axes)
+        assert all(np.array_equal(trace[k], actual_trace[k], equal_nan=True) for k in (*axes, "horizons"))
     batch = training_windows(fitting[:config['batch_size']], [0]*config['batch_size'], config['batch_length'],
                              allow_resets=True, retain_initial_targets=True)
     values = learner.learn(pixels(batch['rgb'].astype(np.float32)/255-.5),
@@ -301,7 +303,7 @@ def initial_check(args, config, fitting, development):
         +config['loss_scales']['reward']*values[4]+config['loss_scales']['continuation']*values[5])
     np.testing.assert_allclose(values[0], expected_loss, rtol=1e-5)
     write(args.output/'result.json', dict(status='complete', updates=1, pixel_loss=learner.pixel_loss,
-        exact_initial_tensors=len(actual), exact_initial_arrays=len(axes), exact_legacy_restore=True,
+        exact_initial_tensors=len(actual), exact_initial_arrays=len(axes)+1, exact_legacy_restore=True,
         first_full_shape_report=values, world_model_proven=False))
 
 

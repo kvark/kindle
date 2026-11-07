@@ -29,23 +29,31 @@ curves cover1/4/8/16/32 steps, four draws; final dense exports support frozen
 readouts. These are retrospective recorded-control forecasts, not prospective
 planning.32 CPU world tests,60 Python tests and strict Clippy pass. All four
 guarded stages complete;278 pins,8,192 finite update rows, exact sampling plan,
-204 frozen tensors and17 restored arrays pass. Preserve label-reference and
+204 frozen tensors and16 restored arrays pass. Preserve label-reference and
 CPU readout-support corrections and the preceding original failures.
 
 Root `/mnt/data/kindle-breakout-world-corpus-20261107`; execution2774e4f2, native
 build49c99fb1/SHA prefix1b9d0dc6. The exact source is archived. No GPU job is
 active; do not repeat or extend completed stages.
 
-Next implement optional logits-based pixel cross-entropy for standalone training,
-keeping default MSE and old restores. The sigmoid decoder predicts nearly black
-at true ball pixels; analytical output-logit MSE gradients are about2,500× weaker
-than cross-entropy there. This is a mechanism candidate, not measured upstream
-parameter gradients or proof of a better recipe. Qualify native values,
-derivatives and restore, then declare a bounded comparison on the same data,
-initialization, sampling plan and frozen evaluations. Loss units/relative KL
-weight change, so a gain will not isolate saturation alone. No next GPU
-allocation is declared. Actor/critic stays parked. Untouched test, prospective
-branches, late-game coverage and fresh confirmation remain unfinished.
+Optional [logits-based pixel cross-entropy](experiments/2026-11-07-breakout-world-pixel-cross-entropy.md)
+is implemented, preserving default MSE/old restores.34 CPU world tests,60
+packaged Python tests and strict workspace/bindings Clippy pass. All three
+native qualification workers exit0, including F64 loss/derivatives, mask/restore
+fixture and matched-init/legacy-restore/one-update preflight. The queue fails its
+count declaration (17 expected,16 reported); preserve it. A separate CPU repair
+verifies304 pins and all18 saved arrays including horizons/locations. No GPU
+phase repeats; future runners explicitly compare18 arrays. The preceding broad
+run compared16, and that documentation count is corrected.
+
+The fixed8,192-update same-data/init/sampler comparison and frozen restore are
+selected after review, not launched at this publication. Root
+`/mnt/data/kindle-breakout-world-bce-20261107`, native build535de479/SHA adfc2f9e.
+Declare a separate queue and pin execution-runner changes independently. The
+analytical weak-gradient candidate motivates this test, not a cause/BCE-benefit
+claim; objective units and relative KL weights change. No extension, new corpus,
+capacity increase or actor/critic resume. Untouched test, prospective branches,
+late-game coverage and fresh confirmation remain unfinished.
 
 ### Representation and training scope
 

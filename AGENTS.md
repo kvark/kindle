@@ -43,7 +43,7 @@ The new data cover all18 commands:16,384 fitting actions/65,503 emulator frames/
 22 game-overs and8,192 development actions/32,755 frames/10 game-overs. Training
 reuses fitting data only; no actor/critic learns. Reset-safe masks, known
 clipped-start terminal targets, uniform sampling and1/4/8/16/32-step exports are
-qualified. All four guarded phases complete,17 restored arrays and204 frozen
+qualified. All four guarded phases complete,16 restored arrays and204 frozen
 parameter/moment tensors are exact,278 pins and all8,192 finite update rows
 pass.32 CPU world tests,60 Python tests and strict Clippy pass. Label-reference
 and CPU readout-support corrections remain separately preserved.
@@ -54,21 +54,30 @@ is archived before further code changes. No GPU job is active; completed stages
 must not repeat or extend.
 
 Optional [logits-based pixel cross-entropy](docs/experiments/2026-11-07-breakout-world-pixel-cross-entropy.md)
-is implemented in the standalone world path; default MSE and old restores are
-retained. At true ball-core pixels, sigmoid-MSE output-logit gradients are about
-2,500× weaker; this motivates the test without proving the cause or BCE benefit.
-34 CPU world tests (19 GPU tests ignored) and strict workspace/bindings Clippy
-pass. Initial bias-shape and F32-reciprocal tolerance failures are preserved;
-the first installed-package Python import check awaits the packaged runtime.
+is implemented in the standalone world path; default MSE and old restores remain.
+34 CPU world tests,60 packaged Python tests and strict workspace/bindings Clippy
+pass. Native build535de479/SHA prefixadfc2f9e is packaged at
+`/mnt/data/kindle-breakout-world-bce-20261107/runtime`. Preparation failures and
+repairs remain preserved. All three guarded native workers exit0: F64 loss/
+derivative check,12-update mask/restore fixture and full-shape matched-init/
+legacy-restore/one-update preflight.
 
-Next package and run only the declared three-phase qualification: native loss/
-derivatives, tiny mask/update/restore fixture, and full-shape matched-init/legacy
-restore/one-update preflight. Root `/mnt/data/kindle-breakout-world-bce-20261107`.
-No GPU allocation is active at this publication. Review qualification before
-separately declaring the fixed8,192-update same-data/init/sampler comparison.
-No recollection, capacity increase, completed-stage repeat or actor/critic
-resume. Untouched test, prospective branches, late-game coverage and fresh
-confirmation remain unfinished. Keep the goal active and unproven.
+The qualification queue fails its declared count (17 expected,16 reported).
+Do not relabel it passed. A separate CPU repair verifies304 pins and all18 saved
+arrays, including locations/horizons, against both controls, plus204 initial
+tensors and the finite full-size update. No GPU phase repeats. Future runners
+explicitly compare all18 arrays. The earlier broad-run restore compared16;
+its documentation count is corrected, with original evidence unchanged.
+
+The fixed8,192-update same-data/init/sampler comparison and final frozen restore
+are selected after this review; no GPU job is active at publication. Declare
+its separate two-stage queue, pin current execution source/runner versus native
+build535de479, retain exact initial/sampling checks and stop at the fixed budget.
+At true ball pixels, sigmoid-MSE output gradients are about2,500× weaker; this
+motivates the experiment without proving the cause or BCE benefit. No new data,
+capacity increase, completed-stage repeat or actor/critic resume. Untouched
+test, prospective branches, late-game coverage and fresh confirmation remain
+unfinished. Keep the goal active and unproven.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
