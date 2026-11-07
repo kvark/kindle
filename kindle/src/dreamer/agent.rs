@@ -3084,7 +3084,7 @@ fn world_training_config(config: &DreamerConfig) -> DreamerConfig {
     world
 }
 
-fn sample_latents(
+pub(super) fn sample_latents(
     logits: &[f32],
     batch: usize,
     stoch: usize,

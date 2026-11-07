@@ -190,13 +190,18 @@ struct WorldModel {
     heads: WorldHeads,
     /// The behavior optimizer owns these parameters. They are frozen in this
     /// graph so replay-value gradients only shape the posterior/RSSM path.
-    replay_value: MlpHead,
+    replay_value: Option<MlpHead>,
     actor: Option<MlpHead>,
     exploration: Option<Disagreement>,
 }
 
 impl WorldModel {
+    #[cfg(test)]
     fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
+        Self::with_behavior(graph, config, true)
+    }
+
+    fn with_behavior(graph: &mut Graph, config: &DreamerConfig, behavior: bool) -> Self {
         let units = config.network().units;
         Self {
             dynamics: Dynamics::new(graph, config),
@@ -210,14 +215,16 @@ impl WorldModel {
             exploration: config
                 .uses_disagreement()
                 .then(|| Disagreement::new(graph, config)),
-            replay_value: MlpHead::new(
-                graph,
-                "behavior.value",
-                config.feature_dim(),
-                units,
-                3,
-                config.value_bins,
-            ),
+            replay_value: behavior.then(|| {
+                MlpHead::new(
+                    graph,
+                    "behavior.value",
+                    config.feature_dim(),
+                    units,
+                    3,
+                    config.value_bins,
+                )
+            }),
             actor: (config.actor_critic_gradient || config.expert_world_gradient()).then(|| {
                 MlpHead::new(
                     graph,
@@ -281,12 +288,27 @@ fn build_training_graph_grouped(
     length: usize,
     time_batch_length: usize,
 ) -> Graph {
-    training_graph(config, length, time_batch_length, false)
+    training_graph(config, length, time_batch_length, false, true)
 }
 
 /// Sample and export the posterior before consuming late behavior targets.
 pub(crate) fn build_staged_training_graph(config: &DreamerConfig) -> Graph {
-    training_graph(config, config.batch_length, config.batch_length, true)
+    training_graph(config, config.batch_length, config.batch_length, true, true)
+}
+
+/// Standalone world learning, with posterior sampling inside the loss graph.
+/// No policy/value parameters, targets or imitation gradients are constructed.
+pub(crate) fn build_world_only_training_graph(config: &DreamerConfig) -> Graph {
+    assert!(!config.actor_critic_gradient && !config.expert_world_gradient());
+    assert!(!config.uses_disagreement() && !config.visitation_bonus);
+    assert_eq!(config.loss_scales.replay_value, 0.0);
+    training_graph(
+        config,
+        config.batch_length,
+        config.batch_length,
+        true,
+        false,
+    )
 }
 
 fn training_graph(
@@ -294,6 +316,7 @@ fn training_graph(
     length: usize,
     time_batch_length: usize,
     sample_posterior: bool,
+    behavior: bool,
 ) -> Graph {
     config.validate();
     assert!(length > 0 && length <= config.batch_length);
@@ -301,7 +324,7 @@ fn training_graph(
     let batch = config.batch_size;
     let size = config.network();
     let mut graph = Graph::new();
-    let model = WorldModel::new(&mut graph, config);
+    let model = WorldModel::with_behavior(&mut graph, config, behavior);
     let centroid_head = config.color_centroid_supervision.as_ref().map(|_| {
         MlpHead::new(
             &mut graph,
@@ -533,9 +556,13 @@ fn training_graph(
         };
         let reward_target = target("reward_target", config.value_bins);
         let continuation_target = target("continuation_target", 1);
-        let replay_value_target = target("replay_value_target", config.value_bins);
-        let replay_slow_target = target("replay_slow_target", config.value_bins);
-        let replay_value_weight = target("replay_value_weight", 1);
+        let replay_targets = behavior.then(|| {
+            (
+                target("replay_value_target", config.value_bins),
+                target("replay_slow_target", config.value_bins),
+                target("replay_value_weight", 1),
+            )
+        });
         let initial_targets = config.actor_critic_gradient.then(|| {
             (
                 target("initial_action_target", config.action_count),
@@ -688,14 +715,19 @@ fn training_graph(
         } else {
             graph.stop_gradient(state)
         };
-        let value = model
-            .replay_value
-            .forward_frozen(&mut graph, replay_value_state);
-        let value_target =
-            weighted_cross_entropy(&mut graph, value, replay_value_target, replay_value_weight);
-        let slow_target =
-            weighted_cross_entropy(&mut graph, value, replay_slow_target, replay_value_weight);
-        replay_value_losses.push(graph.add(value_target, slow_target));
+        if let Some((replay_value_target, replay_slow_target, replay_value_weight)) = replay_targets
+        {
+            let value = model
+                .replay_value
+                .as_ref()
+                .unwrap()
+                .forward_frozen(&mut graph, replay_value_state);
+            let value_target =
+                weighted_cross_entropy(&mut graph, value, replay_value_target, replay_value_weight);
+            let slow_target =
+                weighted_cross_entropy(&mut graph, value, replay_slow_target, replay_value_weight);
+            replay_value_losses.push(graph.add(value_target, slow_target));
+        }
         if let (Some(actor), Some((action_target, weight, value_target, slow_target))) =
             (&model.actor, initial_targets)
         {
@@ -704,7 +736,11 @@ fn training_graph(
             let logits = actor.forward_frozen(&mut graph, state);
             let (policy, _, _) =
                 behavior::policy_loss(&mut graph, config, logits, action_target, weight, rows);
-            let value = model.replay_value.forward_frozen(&mut graph, state);
+            let value = model
+                .replay_value
+                .as_ref()
+                .unwrap()
+                .forward_frozen(&mut graph, state);
             initial_policy_losses.push(policy);
             initial_value_losses.push(behavior::value_loss(
                 &mut graph,
@@ -751,7 +787,7 @@ fn training_graph(
     let reward = scale(&mut graph, reward, head_average);
     let continuation = sum(&mut graph, &continuation_losses);
     let continuation = scale(&mut graph, continuation, head_average);
-    let replay_value = sum(&mut graph, &replay_value_losses);
+    let replay_value = sum_or_zero(&mut graph, &replay_value_losses);
     let replay_value = scale(&mut graph, replay_value, head_average);
 
     let scales = config.loss_scales;

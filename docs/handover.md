@@ -6,7 +6,7 @@ and [PR31](https://github.com/kvark/kindle/pull/31) for the live dashboard.
 The five-game goal remains unfinished. Detailed experiment history belongs in
 those reports; historical “next” paragraphs do not authorize restarting jobs.
 
-## Current work — November 6
+## Current work — November 7
 
 The user selected [Breakout world-model learning in isolation](kindle_single_life_dreamer_plan.md#selected-direction-breakout-world-model-in-isolation) after
 pausing the five-game campaign. Start with a pixel-supervised latent RSSM
@@ -17,11 +17,22 @@ trajectory data, episode-family splits and explicit open-loop physical tests;
 gameplay score is a later integration test. CDP remains a subsequent efficiency
 comparison after the pixel baseline establishes competence.
 
-First prepare the forecast evaluation/corpus path and a small training-clip
-overfit check. No new native path, numeric acceptance thresholds, training
-allocation or model result is yet qualified. No learner or GPU allocation is
-active. The five-game goal remains paused and unfinished; this new focus does
-not restart a closed learner, collector or assessment.
+The active goal is to prove Breakout world-model training; the five-game
+campaign remains parked and unfinished. A standalone native world learner and
+fixed-data runner are implemented. CPU checks pass:29 world/regression tests
+(18 GPU tests ignored),53 Python analysis/regression tests and strict workspace
+and binding Clippy. The initial CPU build failure from a missing test-only
+constructor is preserved, with its separate repaired test log.
+
+Next qualify the native composition with eight tiny synthetic updates and exact
+frozen/restore checks. Then collect fixed fitting/development clips with eight
+independent environments, inspect retained RGB weights, and run one bounded
+2,048-update capacity check on eight paddle-contact fitting clips. RGB64,
+12M RSSM preset,B8/T32,Auto,flat4e-4 learning rates; no behavior/auxiliary losses.
+The declared data includes standard sticky.25 and a separate sticky-off debug
+set. No untouched test set or full physics qualification is claimed by this
+capacity stage. Root `/mnt/data/kindle-breakout-world-model-20261107`.
+No new GPU phase has launched at this publication. Do not restart closed stages.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

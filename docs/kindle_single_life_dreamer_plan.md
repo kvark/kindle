@@ -5,7 +5,28 @@
 The user selected this direction after pausing the five-game campaign. Treat
 world-model competence as the immediate objective. Gameplay score is a later
 integration measure. Do not restart any closed learner, collector or comparison.
-No new training allocation has been launched for this direction.
+The active goal is now **prove the world model training on Breakout**. The
+standalone native learner, fixed-data runner and physical scoring helpers are
+implemented.29 CPU world/regression tests (18 GPU tests ignored),53 Python tests
+and strict workspace/binding Clippy pass. The first CPU test build's missing
+compatibility constructor is preserved separately from the repaired passing log.
+
+The first declared execution is a tiny native update/restore fixture, fixed
+8,192-action standard fitting /4,096-action sticky-off debug /4,096-action fresh
+standard development corpora, a frozen earlier-RGB inspection, and one bounded
+2,048-update fitting-clip capacity test. Use RGB64,12M RSSM preset,B8/T32,Auto,
+flat4e-4 base/encoder/dynamics rates, default reconstruction/reward/continuation
+and KL scales, and no behavior/auxiliary losses. Each fitting batch contains
+eight32-arrival contact clips, with16 observed arrivals followed by16 predicted
+arrivals. Four fixed model draws are reported individually. The detector covers
+the below-brick ball region; missing/unsupported ball detections remain explicit.
+These are capacity measurements, not held-out world-model qualification.
+
+Execution root `/mnt/data/kindle-breakout-world-model-20261107`; exact config,
+source/native identities and stage limits are recorded before launch. No new GPU
+phase has launched at this publication. Generalization,32-decision forecasts,
+full event/brick tests, counterfactual branches and fresh-seed confirmation remain
+required beyond this initial stage.
 
 ### Representation and training scope
 

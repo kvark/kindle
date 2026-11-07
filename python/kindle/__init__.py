@@ -22,6 +22,7 @@ __all__ = [
     "LEVJEPA_MODEL_ID",
     "LEVJEPA_CHECKPOINT_REVISION",
     "default_config",
+    "WorldModelLearner",
 ]
 
 

@@ -1,0 +1,143 @@
+use super::*;
+use kindle::dreamer::WorldModelLearner;
+
+#[pyclass(name = "WorldModelLearner", module = "kindle._native", unsendable)]
+pub(crate) struct PyWorldModelLearner {
+    inner: WorldModelLearner,
+}
+
+fn floats(bytes: &[u8]) -> PyResult<Vec<f32>> {
+    let (words, remainder) = bytes.as_chunks::<4>();
+    if !remainder.is_empty() {
+        return Err(PyValueError::new_err("expected little-endian F32 bytes"));
+    }
+    Ok(words.iter().map(|&word| f32::from_le_bytes(word)).collect())
+}
+
+fn float_bytes<'py>(py: Python<'py>, values: &[f32]) -> PyResult<Bound<'py, PyBytes>> {
+    PyBytes::new_with(py, values.len() * 4, |output| {
+        for (word, value) in output.as_chunks_mut::<4>().0.iter_mut().zip(values) {
+            word.copy_from_slice(&value.to_le_bytes());
+        }
+        Ok(())
+    })
+}
+
+#[pymethods]
+impl PyWorldModelLearner {
+    #[new]
+    fn new(config: &Bound<'_, PyAny>) -> PyResult<Self> {
+        let encoded: String = config
+            .py()
+            .import("json")?
+            .call_method1("dumps", (config,))?
+            .extract()?;
+        let config: DreamerConfig =
+            serde_json::from_str(&encoded).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok(Self {
+            inner: WorldModelLearner::new(config)
+                .map_err(|e| PyValueError::new_err(e.to_string()))?,
+        })
+    }
+
+    #[classmethod]
+    fn restore(_class: &Bound<'_, PyType>, checkpoint: &str) -> PyResult<Self> {
+        Ok(Self {
+            inner: WorldModelLearner::restore(Path::new(checkpoint))
+                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?,
+        })
+    }
+
+    #[getter]
+    fn config<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, self.inner.config())
+    }
+
+    #[getter]
+    fn updates(&self) -> u64 {
+        self.inner.updates()
+    }
+
+    #[getter]
+    fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.gpu_device())
+    }
+
+    #[getter]
+    fn gpu_memory_budget<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.gpu_memory_budget())
+    }
+
+    #[getter]
+    fn parameter_names(&self) -> Vec<String> {
+        self.inner.parameter_names()
+    }
+
+    fn preprocess<'py>(
+        &mut self,
+        py: Python<'py>,
+        frames: Vec<Bound<'py, PyAny>>,
+    ) -> PyResult<Bound<'py, PyBytes>> {
+        let frames = frames
+            .iter()
+            .map(parse_rgb_frame)
+            .collect::<PyResult<Vec<_>>>()?;
+        let pixels = self
+            .inner
+            .preprocess(&frames)
+            .map_err(PyValueError::new_err)?;
+        float_bytes(py, &pixels)
+    }
+
+    /// Centered CHW images and arrival-aligned actions are time-major then batch.
+    /// -1 denotes a context reset; reset arrivals have zero reward and are nonterminal.
+    fn learn(
+        &mut self,
+        observations: &[u8],
+        previous_actions: Vec<i32>,
+        rewards: Vec<f32>,
+        terminals: Vec<bool>,
+    ) -> PyResult<Vec<f32>> {
+        self.inner
+            .learn(
+                &floats(observations)?,
+                &previous_actions,
+                &rewards,
+                &terminals,
+            )
+            .map_err(PyValueError::new_err)
+    }
+
+    /// Returns posterior RGB bytes, future RGB bytes, rewards and discounted continuation.
+    #[pyo3(signature = (observations, previous_actions, future_actions, *, seed))]
+    fn predict<'py>(
+        &mut self,
+        py: Python<'py>,
+        observations: &[u8],
+        previous_actions: Vec<i32>,
+        future_actions: Vec<usize>,
+        seed: u64,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let result = self
+            .inner
+            .predict(
+                &floats(observations)?,
+                &previous_actions,
+                &future_actions,
+                seed,
+            )
+            .map_err(PyValueError::new_err)?;
+        let output = pyo3::types::PyDict::new(py);
+        output.set_item("posterior_rgb", float_bytes(py, &result.posterior)?)?;
+        output.set_item("prior_rgb", float_bytes(py, &result.observations)?)?;
+        output.set_item("reward", result.rewards)?;
+        output.set_item("continuation", result.continuations)?;
+        Ok(output.into_any())
+    }
+
+    fn save(&mut self, checkpoint: &str) -> PyResult<()> {
+        self.inner
+            .save(Path::new(checkpoint))
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+    }
+}
