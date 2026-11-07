@@ -278,8 +278,8 @@ def initial_check(args, config, fitting, development):
     """Verify matched initial tensors/traces and one full-shape finite update."""
     import kindle
     from safetensors.numpy import load_file
-    if args.reference is None or args.pixel_loss != 'cross_entropy':
-        raise ValueError('initial-check requires squared-error reference and cross_entropy candidate')
+    if args.reference is None:
+        raise ValueError('initial-check requires a reference')
     learner = kindle.WorldModelLearner(config, prediction_length=args.prediction_length, pixel_loss=args.pixel_loss)
     require_device(learner)
     learner.save(str(args.output/'initial'))
@@ -346,7 +346,7 @@ def main():
     parser.add_argument('--dense-development', type=int, default=128)
     parser.add_argument('--checkpoint', type=Path)
     parser.add_argument('--reference', type=Path)
-    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy"), default="squared_error")
+    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy", "motion_cross_entropy"), default="squared_error")
     args = parser.parse_args()
     if args.steps < 1 or args.eval_every < 1 or args.prediction_length not in (0, 16) or min(args.dense_fitting, args.dense_development) < 1:
         parser.error('positive training/evaluation budgets and prediction-length0/16 required')

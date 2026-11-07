@@ -956,6 +956,32 @@ pub(crate) fn pixel_cross_entropy(
     graph.sub(positive, product)
 }
 
+/// Loss-only attention to RGB changes, normalized to mean1 in every image.
+pub(crate) fn pixel_motion_weights(
+    graph: &mut Graph,
+    current: NodeId,
+    previous: NodeId,
+    keep: NodeId,
+) -> NodeId {
+    let shape = graph.node(current).ty.shape.clone();
+    let width = shape[1];
+    let current = graph.stop_gradient(current);
+    let previous = graph.stop_gradient(previous);
+    let difference = graph.sub(current, previous);
+    let difference = graph.abs(difference);
+    let keep = graph.broadcast_inner(keep, width);
+    let difference = graph.mul(difference, keep);
+    let attention = graph.scale(difference, 100.0);
+    let attention = graph.reshape(attention, &[shape.iter().product(), 1]);
+    let one = graph.scalar(1.0);
+    let attention = graph.bias_add(attention, one);
+    let attention = graph.reshape(attention, &shape);
+    let mean = graph.mean_inner(attention);
+    let mean = graph.broadcast_inner(mean, width);
+    let weight = graph.div(attention, mean);
+    graph.stop_gradient(weight)
+}
+
 pub(crate) struct FeatureDecoder {
     trunk: LinearNorm,
     spatial: nn::Linear,

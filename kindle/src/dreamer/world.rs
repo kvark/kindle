@@ -334,9 +334,12 @@ pub(crate) fn build_world_only_pixel_training_graph(
     prediction_length: usize,
     pixel_loss: PixelLoss,
 ) -> Graph {
-    if pixel_loss == PixelLoss::CrossEntropy {
+    if pixel_loss != PixelLoss::SquaredError {
         assert!(config.observation_kind.is_rgb());
         assert!(config.reconstruction_target_standardization.is_none());
+    }
+    if pixel_loss == PixelLoss::MotionCrossEntropy {
+        assert_eq!(prediction_length, 0);
     }
     assert!(!config.actor_critic_gradient && !config.expert_world_gradient());
     assert!(!config.uses_disagreement() && !config.visitation_bonus);
@@ -677,8 +680,26 @@ fn training_graph(
             future_prediction_losses.push(graph.mean_all(per_row));
         }
         if let Some(decoder) = &model.decoder {
-            let squared = if pixel_loss == PixelLoss::CrossEntropy {
-                decoder.cross_entropy(&mut graph, state, observation, rows)
+            let squared = if pixel_loss != PixelLoss::SquaredError {
+                let loss = decoder.cross_entropy(&mut graph, state, observation, rows);
+                if pixel_loss == PixelLoss::MotionCrossEntropy {
+                    let start = group * time_batch_length;
+                    let previous = (start..start + chunk.len())
+                        .map(|t| observations[t.saturating_sub(1)])
+                        .collect::<Vec<_>>();
+                    let previous =
+                        stack_time(&mut graph, &previous, batch, config.observation_dim());
+                    let keep = graph.mean_inner(keep_action);
+                    let weights = super::networks::pixel_motion_weights(
+                        &mut graph,
+                        observation,
+                        previous,
+                        keep,
+                    );
+                    graph.mul(loss, weights)
+                } else {
+                    loss
+                }
             } else {
                 let reconstruction = decoder.forward(&mut graph, state, rows);
                 let reconstruction =

@@ -347,7 +347,7 @@ def main():
     parser.add_argument('--checkpoint', type=Path)
     parser.add_argument('--steps', type=int, default=2048)
     parser.add_argument('--prediction-length', type=int, default=0)
-    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy"), default="squared_error")
+    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy", "motion_cross_entropy"), default="squared_error")
     args = parser.parse_args()
     if args.mode in ("collect", "baseline") and args.pixel_loss != "squared_error":
         parser.error("pixel-loss applies to training/fixtures only")

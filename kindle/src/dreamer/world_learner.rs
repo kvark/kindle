@@ -14,12 +14,35 @@ use super::{
 };
 use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 
+#[cfg(test)]
+mod motion_tests;
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum PixelLoss {
     #[default]
     SquaredError,
     CrossEntropy,
+    MotionCrossEntropy,
+}
+
+fn checkpoint_pixel_loss(
+    metadata: &serde_json::Value,
+) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    match metadata["format"].as_str() {
+        Some("kindle-world-only-v1") => Ok(metadata
+            .get("pixel_loss")
+            .map(|v| serde_json::from_value(v.clone()))
+            .transpose()?
+            .unwrap_or_default()),
+        Some("kindle-world-only-v2") => Ok(serde_json::from_value(
+            metadata
+                .get("pixel_loss")
+                .ok_or("missing pixel objective")?
+                .clone(),
+        )?),
+        _ => Err(io::Error::other("not a supported world-only checkpoint").into()),
+    }
 }
 
 pub struct WorldPrediction {
@@ -193,7 +216,7 @@ impl WorldModelLearner {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         validate_config(&config)?;
         config.validate();
-        if pixel_loss == PixelLoss::CrossEntropy
+        if pixel_loss != PixelLoss::SquaredError
             && config.reconstruction_target_standardization.is_some()
         {
             return Err("pixel cross-entropy requires unstandardized RGB targets".into());
@@ -201,13 +224,16 @@ impl WorldModelLearner {
         if prediction_length >= config.batch_length {
             return Err("prediction length must leave an observed prefix".into());
         }
+        if pixel_loss == PixelLoss::MotionCrossEntropy && prediction_length != 0 {
+            return Err("motion pixel attention requires no prior-image objective".into());
+        }
         let gpu = Arc::new(crate::init_gpu_context()?);
         let graph = match (pixel_loss, prediction_length) {
             (PixelLoss::SquaredError, 0) => world::build_world_only_training_graph(&config),
             (PixelLoss::SquaredError, length) => {
                 world::build_world_only_rollout_training_graph(&config, length)
             }
-            (PixelLoss::CrossEntropy, length) => {
+            (PixelLoss::CrossEntropy | PixelLoss::MotionCrossEntropy, length) => {
                 world::build_world_only_pixel_training_graph(&config, length, pixel_loss)
             }
         };
@@ -594,7 +620,7 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let metadata = serde_json::json!({"format": "kindle-world-only-v1", "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length, "pixel_loss": self.pixel_loss});
+        let metadata = serde_json::json!({"format": "kindle-world-only-v2", "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length, "pixel_loss": self.pixel_loss});
         std::fs::write(
             path.join("metadata.json"),
             serde_json::to_vec_pretty(&metadata)?,
@@ -605,20 +631,13 @@ impl WorldModelLearner {
     pub fn restore(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
         let metadata: serde_json::Value =
             serde_json::from_slice(&std::fs::read(path.join("metadata.json"))?)?;
-        if metadata["format"] != "kindle-world-only-v1" {
-            return Err(io::Error::other("not a world-only checkpoint").into());
-        }
+        let pixel_loss = checkpoint_pixel_loss(&metadata)?;
         let config = serde_json::from_value(metadata["config"].clone())?;
         let prediction_length = match metadata.get("prediction_length") {
             None => 0,
             Some(value) => value.as_u64().ok_or("invalid world prediction length")?,
         };
         let prediction_length = usize::try_from(prediction_length)?;
-        let pixel_loss = metadata
-            .get("pixel_loss")
-            .map(|v| serde_json::from_value(v.clone()))
-            .transpose()?
-            .unwrap_or_default();
         let mut learner = Self::with_pixel_loss(config, prediction_length, pixel_loss)?;
         checkpoint::load_session(&mut learner.train, &path.join("world.safetensors"))?;
         learner.updates = metadata["updates"].as_u64().ok_or("missing update count")?;

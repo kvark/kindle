@@ -18,41 +18,38 @@ gameplay score is a later integration test. CDP remains a subsequent efficiency
 comparison after the pixel baseline establishes competence.
 
 The active goal is to prove Breakout world-model training; the five-game
-campaign remains parked. Both broader pixel-world recipes fail observed ball
-reconstruction: [MSE](results/2026-11-07-breakout-world-model-corpus.md) has0/220 fitting/0/112 development detections;
-[cross-entropy](results/2026-11-07-breakout-world-pixel-cross-entropy.md) has2/220 (one accurate)/0/112 after8,192 updates in765.084s native training.
-Coarse readouts improve modestly but do not rescue a precise state. Goal remains
-active and unproven; no actor/critic learns. Closed roots remain retained under
-`/mnt/data/kindle-breakout-world-{corpus,bce}-20261107`; no stage repeats.
+campaign remains parked. The [completed H0 ablation](results/2026-11-07-breakout-world-no-prior-image.md)
+removes extra prior-image loss, improving observed development ball accuracy
+0/112 to5/112 and paddle accuracy88.28% to99.22%, with31.01% less native training
+time (527.850s/8,192 updates). This is useful progress, far below the90%
+reconstruction diagnostic. Coarse/faint/spatial readouts still fail most precise
+ball states. World competence remains unproven; no actor/critic learns.
 
-Cross-entropy's learner/restore queue completes:204 frozen tensors,18 restored
-arrays,306 pins and8,192 finite rows pass. Its qualification count failure and
-separate CPU repair, and closure-audit corpus-path failure/CPU repair, remain
-preserved in the report. Source878f66be is archived; all H16 phases are closed.
-The corpus covers all18 commands globally, but only early states: maximum
-fitting/development score56/34, no ball above the top brick row. Some commands
-lack ball-absent contexts. Native image-cell audit explains27 transient resized
-brick-label errors; scored comparison metrics stay unchanged. None of these
-coverage limits explains away the visible-ball reconstruction failure.
+All H0 phases complete:305 pins,8,192 finite rows,68 changed logical parameters,
+204 invariant frozen tensors and18 restored arrays pass. Source36a5d3e0 is
+archived at `/mnt/data/kindle-breakout-world-no-prior-image-20261107`. Earlier
+MSE/BCE H16 failures and separate CPU repairs stay in linked reports. No completed
+phase repeats. The corpus remains early-game only (max score56/34, no ball above
+top brick row); these gaps do not explain early visible-ball reconstruction errors.
 
-The selected [next ablation](experiments/2026-11-07-breakout-world-no-prior-image.md)
-removes only the extra16-step prior-image loss (`prediction_length=0`), retaining
-observed cross-entropy, RSSM KL/dynamics, reward/continuation and all data/config/
-init/sampling/evaluations. Independently sampled image losses can favor mean
-futures under uncertainty; interference is a candidate, not an established cause.
-Open-loop forecast tests remain1/4/8/16/32 steps. No capacity increase or new data.
+The selected [motion-attention experiment](experiments/2026-11-07-breakout-world-motion-attention.md)
+adds normalized loss weights `1+100*abs(current-previous RGB)` to observed
+cross-entropy. Clip starts/resets use uniform weights; no RAM/object masks enter
+training. Keep H0's latent dynamics, architecture, data/init/sampling/evaluations.
+Fitting-only output allocation shifts ball-core gradient share2.78% to31.18%;
+this motivates the test, not a cause or benefit claim. Target-dependent attention
+is not calibrated likelihood. Default MSE/plain BCE remain available.
 
-Runner implementation and61 CPU checks pass. Reuse exact native535de479/SHA
-adfc2f9e at `/mnt/data/kindle-breakout-world-bce-20261107/runtime`; no native rebuild
-is needed. Root `/mnt/data/kindle-breakout-world-no-prior-image-20261107`.
-The new full-size H0 preflight passes:304 pins, matched204 initial tensors/18
-arrays, finite nine-loss update,204 frozen tensors and18 exact restored arrays.
-The separately declared fresh8,192-update learner/final-restore queue is now
-active under execution36a5d3e0, with305 pinned inputs. Initial weights/sampler/
-origins match H16. Queue session12503; learner PID1606165 confirmed live. Stop at
-the fixed budget; preserve failures, no automatic retry/extension/successor.
-Untouched tests, prospective branches, later-game coverage and fresh confirmation
-remain unfinished. Keep the full world-model goal active and unproven.
+Implementation and37 CPU world tests (20 GPU tests ignored),61 Python checks and
+strict workspace/bindings Clippy pass. New v2 checkpoints explicitly preserve
+objective; old v1 MSE/BCE restores remain supported. Next package and qualify
+only two new workers: native F64 motion-weight/loss/derivatives, then full-size
+motion-H0 matched-init/one-update/frozen/v1+v2 restore preflight. Root
+`/mnt/data/kindle-breakout-world-motion-20261107`. No GPU allocation is active.
+Review qualification before declaring the fixed8,192-update learner/restore.
+No capacity increase, recollection, unchanged extension, automatic successor or
+actor/critic resume. Untouched tests, prospective branches, later-game coverage
+and fresh confirmation remain unfinished. Keep the full goal active and unproven.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
