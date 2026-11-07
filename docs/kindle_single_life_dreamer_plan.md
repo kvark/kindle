@@ -24,8 +24,11 @@ The selected [behavior-coverage experiment](experiments/2026-11-07-breakout-worl
 adds one16,384-action fitting supplement: long waits,sustained controls and paths
 to game-over. Root `/mnt/data/kindle-breakout-world-coverage-20261107`. Eight CPU
 checks pass and all8,192 old uniform plans/counts stay exact. Native3fa37b6d/
-eafe8359 unchanged; pin/run resize-only collection(age0,204 invariant tensors),
-then audit before separately declaring one fresh matched-init8,192-update learner.
+eafe8359 unchanged. Collector complete:16,384 actions/65,492 frames,44 endings,
+2,979 waiting windows,max absent non-FIRE run96;19.248s,age0/204 tensors unchanged.
+Data/guard audit passes; no above-wall states. Separately declare one fresh
+matched-init8,192-update learner and restore; plan covers32,849 arrivals and
+10,909 terminal targets versus2,649 previously.
 Per-update recipe:4 old uniform +2 new uniform +1 waiting +1 terminal window.
 No model/loss change or label inputs. No learner/actor/critic is active; no automatic
 successor/extension. Max original corpus score56/34,no ball above top row;

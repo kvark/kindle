@@ -40,13 +40,16 @@ adds one16,384-action fitting supplement: long non-FIRE waits,sustained random
 controls and deliberate paths to game-over. Native/source3fa37b6d/eafe8359 stays
 unchanged. Eight CPU checks pass; original8,192 uniform sampling plans/counts
 remain exact. Root `/mnt/data/kindle-breakout-world-coverage-20261107`.
-Next pin and run the bounded resize-only collector under the host guard(age0,
-204 frozen tensors),then audit coverage before separately declaring one fresh
-matched-init8,192-update learner. Recipe per update:4 retained uniform windows,
-2 supplement uniform,1 waiting,1 terminal-focused. Architecture/losses unchanged;
-no RAM/phase labels enter model inputs/objectives. No learner or actor/critic is
-active. No automatic extension/successor. Untouched tests,later-game/second-wall
-coverage and fresh confirmation remain unfinished; keep the full goal active.
+Collector complete:16,384 actions/65,492 emulator frames,44 natural endings,
+2,979 waiting windows across eight lanes,max absent non-FIRE run96;19.248s,
+age0/all204 tensors unchanged. Data/guard audit passes; no above-wall states.
+Separately declare one fresh matched-init8,192-update learner plus final restore.
+Recipe:4 retained uniform +2 supplement uniform +1 waiting +1 terminal window;
+10,909 terminal targets versus2,649 previously,all32,849 fitting arrivals covered
+by the declared plan. Architecture/losses unchanged; no RAM/phase labels enter
+model inputs/objectives. No learner/actor/critic is active yet. No automatic
+extension/successor. Untouched tests,later-game/second-wall coverage and fresh
+confirmation remain unfinished; keep the full goal active.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

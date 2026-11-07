@@ -178,6 +178,7 @@ def main():
     parser.add_argument('--supplement',type=Path)
     parser.add_argument('--development',type=Path)
     parser.add_argument('--initial-reference',type=Path)
+    parser.add_argument('--sampling-plan',type=Path)
     parser.add_argument('--reference',type=Path)
     parser.add_argument('--ticks',type=int,default=2048)
     parser.add_argument('--steps',type=int,default=8192)
@@ -189,7 +190,7 @@ def main():
     if min(args.ticks,args.steps,args.eval_every,args.dense_fitting,args.dense_development)<=0:parser.error('positive budgets required')
     if args.mode=='collect' and args.checkpoint is None:parser.error('collection requires actual-initial checkpoint')
     if args.mode!='collect' and args.development is None:parser.error('development required')
-    if args.mode=='train' and any(x is None for x in [args.dataset,args.supplement,args.initial_reference]):parser.error('training requires both fitting corpora and actual-initial reference')
+    if args.mode=='train' and any(x is None for x in [args.dataset,args.supplement,args.initial_reference,args.sampling_plan]):parser.error('training requires both fitting corpora, actual-initial reference and declared sampling plan')
     if args.mode=='restore-check' and any(x is None for x in [args.checkpoint,args.reference]):parser.error('restore requires checkpoint and new training reference')
     args.output.mkdir(parents=True,exist_ok=False)
     config=json.loads(args.config.read_text())
@@ -206,7 +207,10 @@ def main():
     assert not {r['seed'] for r in old_manifest['files']}.intersection(r['seed'] for r in new_manifest['files'])
     dev_manifest=json.loads((args.development/'manifest.json').read_text())
     assert not {r['seed'] for r in old_manifest['files']+new_manifest['files']}.intersection(r['seed'] for r in dev_manifest['files'])
-    corpus.train(args,config,fitting+new,development,sampler=coverage_plan,initial_reference=args.initial_reference)
+    plan,counts=coverage_plan(fitting+new,config,args.steps)
+    with np.load(args.sampling_plan,allow_pickle=False) as expected:
+        assert np.array_equal(plan,expected['locations']), 'source plan differs from declaration'
+    corpus.train(args,config,fitting+new,development,sampler=lambda *_:(plan,counts),initial_reference=args.initial_reference)
 
 
 if __name__=='__main__':main()

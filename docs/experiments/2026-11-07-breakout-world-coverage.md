@@ -108,3 +108,18 @@ checkpoints, executable, package versions, commands and budgets are pinned befor
 GPU work. Use the existing AMD host guard/current boot/module identity; no NVML,
 reset/reload/reboot or backend qualification project. Collection timeout900s;
 learning/restore budgets are separately declared after data review.
+
+The first collector completes:16,384 actions/65,492 emulator frames,44 natural
+endings,19.248s. All204 tensors/age0 are unchanged; the guard and sealed audit
+pass. CPU data review verifies eight files/native hashes/frame/reset alignment,
+2,979 waiting windows across all eight lanes,1,040 terminal windows,and max
+absent non-FIRE run96. No above-top-row states; later-game coverage stays open.
+
+The data gate passes. Separately select fresh8,192-update learning(3,600s timeout)
+and final restore(600s),under a new pinned declaration. CPU plan has exactly
+10,909 terminal targets versus2,649 previously,34,440 positive-reward rows,
+10,488 natural-reset rows,and all32,849 fitting arrivals exposed. It replays
+2,097,152 arrivals rather than collecting more actions. Before GPU construction,
+the training CLI must reproduce the declared source plan exactly. Preserve its
+new output directories and compare actual counts after training. No successor
+or unchanged extension is selected after this pair.
