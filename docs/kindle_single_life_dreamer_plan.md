@@ -6,26 +6,25 @@ The user selected this direction after pausing the five-game campaign. Treat
 world-model competence as the immediate objective. Gameplay score is a later
 integration measure. Do not restart any closed learner, collector or comparison.
 The active goal is now **prove the world model training on Breakout**. The
-[first isolated-world results](results/2026-11-07-breakout-world-model-capacity.md)
-establish native training/frozen invariance/exact prediction restore, but do not
-prove physical competence. On eight fitting contact clips, reconstruction1→100
-improves observed/one-step ball accuracy1/8→6/8 and4-step0/6→3/6;8/16-step accuracy
-remains weak. Each2,048-update learner costs about130s of training. The earlier
-RGB checkpoint omits a detectable ball on these same clips. All five guarded
-phases complete; no actor/critic learns. Source9c1dcf89 and all original artifacts
-remain preserved at `/mnt/data/kindle-breakout-world-model-20261107`.
+[isolated reconstruction comparison](results/2026-11-07-breakout-world-model-capacity.md)
+and [direct prior-image results](results/2026-11-07-breakout-world-model-rollout.md)
+establish native world-only training and a useful short-trajectory capacity
+result. Standard eight-step ball fitting improves1/8→4–5/8, while16-step remains
+2/8. Separate sticky-off fitting reaches4-step8/8,8-step4/4 supported targets and
+16-step7–8/8 across four fixed draws. Observed-state image reconstruction remains
+inconsistent. No actor/critic learns, and world-model competence is not proven.
 
-The next focused change is direct RGB supervision after the observed prefix
-ends, through a bounded prior rollout. The native implementation passes30 CPU
-world/regression tests (18 GPU tests ignored), including explicit future-target
-exclusion and prior/RSSM/decoder gradient connectivity. Next qualify a2-step
-tiny rollout and run a fresh2,048-update fitting test with16 observed/16 prior
-steps, reconstruction100 and the same eight clips. No collector or completed
-baseline repeats. Root `/mnt/data/kindle-breakout-world-rollout-20261107`; no
-rollout GPU phase has launched at this publication. Keep the goal active. Fitting
-success, physical events, action branches,32-step forecasts, later-game coverage,
-held-out generalization and one fresh confirmation remain required. The existing
-fixed development/debug corpora are retained, not repeatedly recollected.
+Next implement reset-safe prior-image loss masks, preserving terminal arrivals
+and stopping loss after future resets without conditioning imagined state on
+future boundaries/images. Then train on the full retained fitting corpus and
+measure development/held-out generalization. The current capacity path rejects
+reset crossings; carrying that restriction into broader sampling would bias
+ending coverage. Reuse the fixed corpora, with no collector or completed learner
+repeats. No full-corpus allocation is launched or qualified yet. Current world
+runtime source25b3328b/native547f065f is retained under
+`/mnt/data/kindle-breakout-world-rollout-20261107`. Keep the goal active. Event/
+brick competence, action branches,32-step forecasts, later-game coverage and
+fresh-initialization confirmation remain unfinished.
 
 ### Representation and training scope
 

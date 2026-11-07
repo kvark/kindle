@@ -1,5 +1,8 @@
 # Breakout world-only learning exposes a visual-detail and forecasting gap
 
+Subsequent [direct prior-image training](2026-11-07-breakout-world-model-rollout.md)
+improves longer fitting forecasts; neither stage proves generalization.
+
 The standalone native training path works, but **world-model competence is not
 proven**. A small fitting test learns the court while largely omitting the ball.
 Increasing reconstruction pressure improves observed-state and one-step ball

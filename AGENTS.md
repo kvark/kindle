@@ -30,25 +30,26 @@ gameplay score is a later integration test. CDP remains a subsequent efficiency
 comparison after the pixel baseline establishes competence.
 
 The active goal is to prove Breakout world-model training; the five-game
-campaign remains parked and unfinished. The [first isolated-world results](docs/results/2026-11-07-breakout-world-model-capacity.md) establish native updates,
-frozen invariance and exact prediction restore, but fail physical competence.
-On eight fitting contact clips, reconstruction1→100 improves observed/one-step
-ball accuracy1/8→6/8;4-step improves0/6→3/6, then8/16-step forecasts remain weak.
-Both2,048-update learners take about130s of native training. No actor/critic,
-imitation or intrinsic training occurs. The earlier RGB checkpoint also omits
-an accepted ball on these clips. This is fitting evidence, not generalization.
+campaign remains parked and unfinished. [Direct prior-image training](docs/results/2026-11-07-breakout-world-model-rollout.md) improves eight-step standard fitting ball
+accuracy1/8→4–5/8;16-step remains2/8. On separate sticky-off fitting clips,
+4-step is8/8,8-step4/4 supported targets and16-step7–8/8 across four draws.
+Observed-state reconstruction still fails several clips. These are capacity
+results, not a qualified world model or held-out generalization.
 
-Five guarded phases and their collector/capacity stages are complete at
-`/mnt/data/kindle-breakout-world-model-20261107`. Preserve them. The next focused
-change is direct RGB supervision through a prior rollout after an observed
-prefix. The implementation passes30 CPU world/regression tests (18 GPU tests
-ignored), including future-target exclusion and prior-gradient connectivity.
-Next qualify a2-step tiny rollout, then run a fresh2,048-update fitting test
-with16 observed/16 prior steps, reconstruction100 and the exact retained clips.
-No new data collection or baseline repeat is selected. Execution root
-`/mnt/data/kindle-breakout-world-rollout-20261107`; retain RGB64/12M/B8/T32/Auto.
-No rollout GPU phase has launched at this publication. The goal remains active
-and unproven.
+Standalone native training has no actor/critic, imitation, replay-value or
+intrinsic objectives. Current world runtime/source25b3328b (native547f065f) is
+retained at `/mnt/data/kindle-breakout-world-rollout-20261107/runtime`. All three
+new guarded phases finish successfully; each2,048-update rollout learner costs
+about187s of training. The preceding collector and reconstruction comparisons
+remain closed at `/mnt/data/kindle-breakout-world-model-20261107`.
+
+Next implement reset-safe prior-loss masks, then full-corpus world-only training
+and development/held-out evaluation. Include terminal arrivals and mask later
+future resets without feeding their observations/boundaries into imagined state.
+The current fitting path rejects reset crossings; filtering them out in broader
+training would underrepresent endings. Reuse the fixed corpora. No full-corpus
+learner is yet qualified or launched; no GPU job is active at this publication.
+Keep the world-model goal active and unproven. Do not restart completed stages.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
