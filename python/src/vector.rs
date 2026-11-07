@@ -24,6 +24,104 @@ pub(super) fn validate_streams(streams: &[usize], count: usize, items: usize) ->
 
 #[pymethods]
 impl PyVectorAgent {
+    #[classattr]
+    const SUPPORTS_ACTOR_DYNAMICS: bool = true;
+    #[classattr]
+    const SUPPORTS_ACTOR_EXPECTED_VALUE: bool = true;
+    #[classattr]
+    const SUPPORTS_ACTOR_HIDDEN_UNITS: bool = true;
+    #[classattr]
+    const SUPPORTS_ACTOR_RESIDUAL: bool = true;
+    #[classattr]
+    const SUPPORTS_LATENT_SHAPE: bool = true;
+
+    #[classattr]
+    const SUPPORTS_COMPLETED_RETURN_ACTOR: bool = true;
+
+    #[classattr]
+    const SUPPORTS_COMPLETED_REPLAY_VALUE: bool = true;
+
+    #[classattr]
+    const SUPPORTS_CONSERVATIVE_RETURN_ACTOR: bool = true;
+
+    #[classattr]
+    const SUPPORTS_ACTOR_RETURN_BOUNDARIES: bool = true;
+
+    #[classattr]
+    const SUPPORTS_EXPERT_WORLD_GRADIENT: bool = true;
+
+    #[classattr]
+    const SUPPORTS_EXPERT_IMITATION_DECAY: bool = true;
+
+    #[classattr]
+    const SUPPORTS_ACTOR_ONLY_IMITATION_DECAY: bool = true;
+
+    #[classattr]
+    const SUPPORTS_OPEN_LOOP_SUPERVISION: bool = true;
+
+    #[classattr]
+    const SUPPORTS_COLOR_CENTROID_SUPERVISION: bool = true;
+
+    #[classattr]
+    const SUPPORTS_REPLAY_VALUE_BOOTSTRAP: bool = true;
+
+    #[classattr]
+    const SUPPORTS_REPLAY_CONTEXT: bool = true;
+
+    #[classattr]
+    const SUPPORTS_TERMINAL_REPLAY: bool = true;
+
+    #[classattr]
+    const SUPPORTS_TERMINAL_CONTINUATION_WEIGHT: bool = true;
+    #[classattr]
+    const SUPPORTS_PRIOR_CONTINUATION: bool = true;
+    #[classattr]
+    const SUPPORTS_PRIOR_REWARD: bool = true;
+
+    #[classattr]
+    const SUPPORTS_RGB_CROP: bool = true;
+
+    #[classattr]
+    const SUPPORTS_RGB_FRAME_PAIR: bool = true;
+
+    #[classattr]
+    const SUPPORTS_RGB_COORDINATES: bool = true;
+
+    #[classattr]
+    const SUPPORTS_RGB_STRIDE2: bool = true;
+
+    #[classattr]
+    const SUPPORTS_RGB96: bool = true;
+
+    #[classmethod]
+    fn learned_rgb(
+        _class: &Bound<'_, PyType>,
+        num_envs: usize,
+        config: &Bound<'_, PyAny>,
+    ) -> PyResult<Self> {
+        let encoded: String = config
+            .py()
+            .import("json")?
+            .call_method1("dumps", (config,))?
+            .extract()?;
+        let config: DreamerConfig =
+            serde_json::from_str(&encoded).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        let inner = VectorDreamerAgent::learned_rgb(config, num_envs)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        Ok(Self { inner })
+    }
+
+    #[classmethod]
+    fn restore_rgb(
+        _class: &Bound<'_, PyType>,
+        dreamer_checkpoint: &str,
+        num_envs: usize,
+    ) -> PyResult<Self> {
+        let inner = VectorDreamerAgent::restore_rgb(dreamer_checkpoint, num_envs)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        Ok(Self { inner })
+    }
+
     /// The config is the complete dictionary returned by kindle.default_config.
     #[new]
     #[pyo3(signature = (encoder_checkpoint, num_envs, config, *, encoder = "levjepa-tiny"))]
@@ -65,6 +163,24 @@ impl PyVectorAgent {
         Ok(Self { inner })
     }
 
+    fn use_greedy_posterior_for_evaluation(&mut self) -> PyResult<()> {
+        self.inner
+            .use_greedy_posterior_for_evaluation()
+            .map_err(PyValueError::new_err)
+    }
+
+    fn set_action_temperature_for_evaluation(&mut self, temperature: f32) -> PyResult<()> {
+        self.inner
+            .set_action_temperature_for_evaluation(temperature)
+            .map_err(PyValueError::new_err)
+    }
+
+    fn set_actor_posterior_samples_for_evaluation(&mut self, samples: usize) -> PyResult<()> {
+        self.inner
+            .set_actor_posterior_samples_for_evaluation(samples)
+            .map_err(PyValueError::new_err)
+    }
+
     fn begin_episodes(
         &mut self,
         streams: Vec<usize>,
@@ -80,17 +196,36 @@ impl PyVectorAgent {
         Ok(())
     }
 
-    #[pyo3(signature = (greedy = false, action_overrides = None))]
+    #[pyo3(signature = (greedy = false, action_overrides = None, *, expert_actions = None, expert_labels = None))]
     fn act(
         &mut self,
         greedy: bool,
         action_overrides: Option<Vec<Option<usize>>>,
+        expert_actions: Option<Vec<Option<usize>>>,
+        expert_labels: Option<Vec<Option<usize>>>,
     ) -> PyResult<Vec<usize>> {
         let mode = if greedy {
             ActionMode::Greedy
         } else {
             ActionMode::Sample
         };
+        if let Some(actions) = expert_actions {
+            if action_overrides.is_some() || expert_labels.is_some() {
+                return Err(PyValueError::new_err(
+                    "expert actions are mutually exclusive with ordinary overrides and passive labels",
+                ));
+            }
+            return self
+                .inner
+                .act_with_expert_actions(mode, &actions)
+                .map_err(PyValueError::new_err);
+        }
+        if let Some(labels) = expert_labels {
+            return self
+                .inner
+                .act_with_expert_labels(mode, &labels, action_overrides.as_deref())
+                .map_err(PyValueError::new_err);
+        }
         match action_overrides {
             Some(actions) => self
                 .inner
@@ -100,6 +235,22 @@ impl PyVectorAgent {
         }
     }
 
+    /// Read-only values and scaled bonuses, after act and before observe.
+    fn behavior_predictions(&mut self) -> PyResult<(Vec<f32>, Vec<f32>)> {
+        self.inner
+            .behavior_predictions()
+            .map_err(PyValueError::new_err)
+    }
+
+    /// Exact row-major actor inputs and raw logits, after act and before observe.
+    /// Logits precede temperature and unimix; this only copies existing buffers.
+    fn policy_inputs_and_logits(&mut self) -> PyResult<(Vec<f32>, Vec<f32>)> {
+        self.inner
+            .policy_inputs_and_logits()
+            .map_err(PyValueError::new_err)
+    }
+
+    #[pyo3(signature = (streams, frames, rewards, terminated, truncated, *, actor_boundaries = None))]
     fn observe(
         &mut self,
         streams: Vec<usize>,
@@ -107,6 +258,7 @@ impl PyVectorAgent {
         rewards: Vec<f32>,
         terminated: Vec<bool>,
         truncated: Vec<bool>,
+        actor_boundaries: Option<Vec<bool>>,
     ) -> PyResult<Vec<(f32, f32)>> {
         validate_streams(&streams, self.inner.stream_count(), frames.len())?;
         let count = frames.len();
@@ -117,6 +269,18 @@ impl PyVectorAgent {
         }
         if !rewards.iter().all(|r| r.is_finite()) {
             return Err(PyValueError::new_err("rewards must be finite"));
+        }
+        if let Some(boundaries) = &actor_boundaries {
+            if !self.inner.config().replay_actor_auxiliary_boundaries {
+                return Err(PyValueError::new_err(
+                    "auxiliary actor boundaries are not enabled",
+                ));
+            }
+            if boundaries.len() != count || rewards.iter().any(|&reward| reward < 0.0) {
+                return Err(PyValueError::new_err(
+                    "actor boundaries require one boolean per arrival and nonnegative rewards",
+                ));
+            }
         }
         let transitions = streams
             .into_iter()
@@ -137,9 +301,14 @@ impl PyVectorAgent {
                 ))
             })
             .collect::<PyResult<Vec<_>>>()?;
-        Ok(self
-            .inner
-            .observe(&transitions)
+        let stored = match actor_boundaries {
+            Some(boundaries) => self
+                .inner
+                .observe_with_actor_boundaries(&transitions, &boundaries)
+                .map_err(PyValueError::new_err)?,
+            None => self.inner.observe(&transitions),
+        };
+        Ok(stored
             .into_iter()
             .map(|r| (r.extrinsic, r.intrinsic))
             .collect())
@@ -152,6 +321,19 @@ impl PyVectorAgent {
         py: Python<'py>,
         maximum_updates: usize,
     ) -> PyResult<Bound<'py, PyAny>> {
+        if self.inner.posterior_mode() == ActionMode::Greedy {
+            return Err(PyValueError::new_err("greedy posterior is evaluation only"));
+        }
+        if self.inner.action_temperature().is_some() {
+            return Err(PyValueError::new_err(
+                "action temperature is evaluation only",
+            ));
+        }
+        if self.inner.actor_posterior_samples().is_some() {
+            return Err(PyValueError::new_err(
+                "actor posterior averaging is evaluation only",
+            ));
+        }
         reports_to_python(py, &self.inner.learn_scheduled(maximum_updates))
     }
 

@@ -36,8 +36,7 @@ impl TwoHotBins {
         self.values.len()
     }
 
-    #[cfg(test)]
-    fn values(&self) -> &[f32] {
+    pub(super) fn values(&self) -> &[f32] {
         &self.values
     }
 
@@ -311,6 +310,42 @@ mod tests {
             1.0,
         );
         assert_eq!(result, vec![2.8, 2.0]);
+    }
+
+    #[test]
+    fn replay_bootstrap_modes_preserve_reward_and_boundary_alignment() {
+        use super::super::config::ReplayValueBootstrap;
+        let posterior = [10.0, 2.0, 4.0, 8.0];
+        let imagined = [100.0, 20.0, 40.0, 80.0];
+        let reward = [999.0, 1.0, 2.0, 3.0];
+        // Exactly representable values give independently expanded F64 targets.
+        for (mode, continuing, terminal, timeout) in [
+            (
+                ReplayValueBootstrap::Imagined,
+                [11.6875, 22.75, 43.0],
+                [9.1875, 12.75, 3.0],
+                [11.5, 22.0, 43.0],
+            ),
+            (
+                ReplayValueBootstrap::Posterior,
+                [2.6875, 4.75, 7.0],
+                [2.4375, 3.75, 3.0],
+                [2.5, 4.0, 7.0],
+            ),
+        ] {
+            let bootstrap = mode.values(&posterior, &imagined);
+            for (last, end, expected) in [
+                ([0.0; 4], [0.0; 4], continuing),
+                ([0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], terminal),
+                ([0.0, 0.0, 1.0, 0.0], [0.0; 4], timeout),
+            ] {
+                let result = lambda_returns(&last, &end, &reward, &posterior, bootstrap, 0.5, 0.5);
+                assert_eq!(
+                    result.iter().map(|&v| f64::from(v)).collect::<Vec<_>>(),
+                    expected
+                );
+            }
+        }
     }
 
     #[test]

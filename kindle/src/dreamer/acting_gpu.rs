@@ -108,11 +108,13 @@ impl ActingGpu {
             naga_module: None,
         });
         let sample = gpu.create_compute_pipeline(gpu::ComputePipelineDesc {
+            full_subgroup_size: None,
             name: "kindle_categorical",
             data_layouts: &[&SamplingBindings::layout()],
             compute: sample_shader.at("main"),
         });
         let commit = gpu.create_compute_pipeline(gpu::ComputePipelineDesc {
+            full_subgroup_size: None,
             name: "kindle_live_state",
             data_layouts: &[&StateBindings::layout()],
             compute: state_shader.at("main"),
@@ -159,6 +161,7 @@ impl ActingGpu {
         policy: &Session,
         active: &[u32],
         draws: &[f32],
+        mode: ActionMode,
     ) {
         assert_eq!(active.len(), self.streams);
         assert_eq!(draws.len(), self.streams * self.stoch);
@@ -174,8 +177,9 @@ impl ActingGpu {
             draws.len(),
             self.classes,
             self.unimix,
-            ActionMode::Sample,
+            mode,
             false,
+            1.0,
         );
         let data = StateBindings {
             next_deter: observe.output_buffer(0).unwrap(),
@@ -210,6 +214,7 @@ impl ActingGpu {
         draws: &[f32],
         mode: ActionMode,
         mask: Option<&[bool]>,
+        temperature: f32,
     ) -> gpu::BufferPiece {
         assert_eq!(draws.len(), self.streams);
         self.wait();
@@ -232,11 +237,13 @@ impl ActingGpu {
             self.actor_unimix,
             mode,
             mask.is_some(),
+            temperature,
         );
         self.completion = Some(self.gpu.submit(&mut self.encoder));
         self.selected.into()
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn encode_sample(
         &mut self,
         logits: gpu::BufferPiece,
@@ -245,6 +252,7 @@ impl ActingGpu {
         unimix: f32,
         mode: ActionMode,
         masked: bool,
+        temperature: f32,
     ) {
         let data = SamplingBindings {
             logits,
@@ -258,7 +266,7 @@ impl ActingGpu {
                 unimix.to_bits(),
                 u32::from(mode == ActionMode::Greedy),
                 u32::from(masked),
-                0,
+                temperature.to_bits(),
                 0,
                 0,
             ],

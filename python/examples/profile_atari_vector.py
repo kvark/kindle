@@ -57,7 +57,7 @@ def summarize(log, gpu_trace=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("encoder_checkpoint")
+    parser.add_argument("--encoder-checkpoint", help="opt into frozen causal JEPA instead of learned RGB")
     parser.add_argument("directory", type=Path)
     parser.add_argument("--num-envs", nargs="+", type=int, default=[1, 2, 4])
     parser.add_argument("--batch-size", type=int, default=16)
@@ -79,9 +79,11 @@ def main():
     for count in args.num_envs:
         path = args.directory / f"n{count}"
         log = path.with_suffix(".jsonl")
-        command = [sys.executable, str(runner), args.encoder_checkpoint,
+        command = [sys.executable, str(runner),
                    "--num-envs", str(count), "--steps", str(args.steps),
                    "--batch-size", str(args.batch_size), "--output", str(log), "--report-every", "512"]
+        if args.encoder_checkpoint:
+            command += ["--encoder-checkpoint", args.encoder_checkpoint]
         if args.evaluate:
             command += ["--evaluate", "--train-ratio", "0"]
         print("Starting", " ".join(command), flush=True)

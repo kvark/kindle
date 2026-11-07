@@ -1,0 +1,128 @@
+# Fresh400k Breakout comparison at replay ratio8
+
+The [bounded R8 check](../results/2026-11-01-cdp-breakout-r8.md) passes execution,
+initial/frozen tensors,full guided replay,host guards and a conservative26m01s
+cost projection. Its original terminal collector succeeds13:03:34 UTC November1;
+completionSHA256`9cf15b6df62474915a1e2f694820c3d6348ca45861090da72c12a5673dc95bef`.
+No Kindle job remains running at selection review. Deliberately select one fresh
+400k-action learner after that evidence;the full harness must pass CPU
+qualification before a declaration,queue or GPU allocation is created.
+
+The retained200k/R16 control scores56.292 sampled and104.667 greedy in21m28s,
+allzero of24 two-wall successes. More fitting work under H5/R24 lowered imitation
+loss without improving play. This comparison asks whether twice the experience
+at roughly the same update count improves useful frozen learning. The earlier
+Qbert400k/R8 failure remains relevant;there is no prior evidence of a benefit
+in this Breakout regime.
+
+Keep centeredCDP/12M64/Auto/N8/B16/T16/H15,encoder/base/actor4e-5,dynamics4e-4,
+warmup1000,actor-unimix.01,action-effects coefficient1,full18/sticky.25/repeat4,
+native max-pooled pixels and one GPU resize. Keep expert100/unit action weights/
+world gradients,all-state corrective labels,20% episode guidance/cap1920,
+native447fe50,exact runner6c1b69fb and teacher. Change train ratio16→8 and
+experience200k→400k together. Cadence,sampling,warmup duration and exposure also
+change;this does not isolate data coverage. Learner1009/evaluation4000001009
+are reused development seeds,not independent confirmation. No prior weights,
+replay,belief,games,RNG or bounded-check experience are reused.
+
+Train400,000 aggregate actions with a **35-minute cap**,12,489 updates,first
+update376 and residual credit.25. Require recovery at100k/3,114,200k/6,239 and
+300k/9,364 updates. Audit and preserve all four checkpoint files at each recovery
+before the next overwrite,with matching metadata/hashes;do not restore or repeat
+training to obtain them. Checkpoints omit replay,belief,games and RNG,so they
+are not uninterrupted-training recovery. Require357 finite initial tensors
+matching control/check,47 matching pre-update events,finite supervised reports,
+changed CNN/reward/actor/value,exact config/cadence,expert row/weight accounting
+and aligned raw world/actor losses. Require full training pixel/action/label
+replay and host guards.
+
+Assess final and actual-initial checkpoints with sampled and greedy actions.
+Each arm has300s/600k-action caps and selects the first three natural episodes
+per eight lanes=24. Guidance/labels are off;requirezero updates and selected
+truncations,357 invariant tensors,paired initial semantic traces and complete
+recorded-action/outcome/frame/reset replays/videos. Ordinary frozen logs lack
+live pixel hashes;do not claim comparison against unavailable live images.
+Preserve the90%-two-wall task gate. Sampled remains primary;report greedy
+separately,absolute means and own-initial-subtracted return per training minute.
+Do not switch primary mode or choose checkpoints after observing outcomes.
+
+Main service cap5400s includes training,four frozen arms and CPU audit1800s;
+full guided replay cap1200s. Postprocessing/collection limits6000s/6300s.
+Observers monitor only the original process and never start or restart GPU
+work. Collect curves,coverage,exposure,paired comparison and original terminal
+states. Retain co-host timing without wall-time correction. Stop on real GPU
+faults or nonfinite reports;no driver reset/recovery. Preserve original failures
+if a separate CPU repair is needed;never repeat a completed GPU stage.
+
+CPU qualification must exercise all five actual CLI paths,the intended config
+and schedule changes,357 shapes,recovery audit/retention cases,observer parsing,
+source paths and exact native/runner/teacher identity without constructing a
+native agent or emulator. Reuse passed bounded qualification;do not rebuild.
+No extension,cap increase,ratio retry,confirmation or automatic successor is
+selected. Full frozen benefit remains unmeasured.
+
+Prospective root `/x/Temp/kindle-breakout-r8-20261101/full`,trial
+`breakout-12m-64-b16-r8-encoder4e5-expert100-400k-seed1009`,service
+`kindle-breakout-r8-400k-20261101`. No full trial,queue or allocation exists at
+this protocol's selection. Check current live state before declaration/launch.
+
+## Full CPU harness qualification
+
+The full harness passes **13:12:29 UTC November1**,1.415s test body/1.531s
+wrapper. It exercises all five actual CLI paths,24 config rejection cases,
+10 startup-header cases,four observer-parser cases,five recovery-body cases,
+six checkpoint-retention fixtures,44 resolved paths,17 compiled controllers,
+259 bounded/227 control pins and357 checkpoint shapes. Recovery schedules
+100k/3,114,200k/6,239,300k/9,364 and final400k/12,489 pass;all three observer
+milestones and declared service caps are checked. No native agent or emulator
+is constructed. Plot-environment import passes.107s without native/ALE loading.
+The actual bounded metadata hash agrees with the retention contract.
+
+The initial generated-command review and first CPU preflight fail because a
+service-name substitution rebases the retained control path into the new root.
+The.745s preflight failure,exact original generator/controllers and separate
+command-review failure record remain under`full-preflight-attempt1`. Correcting
+only those paths,retaining the failure and pinning both attempt snapshots yields
+the passing second qualification. No full declaration or GPU allocation existed
+for either attempt. The qualified native runner remains byte-identical. Do not
+repeat the passing full or bounded qualifications.
+
+## Launch and startup
+
+The fresh400k learner launches **13:14:30 UTC November1**,source
+`566a2a564bd9ea620b5562bbd1d8f5596305bd59`,with315 pinned inputs. Original
+mainPID798240/invocation`cc7e1c87ac4b478ab8d9f23644a5fa65`,service
+`kindle-breakout-r8-400k-20261101`. Progress,recovery,postprocessing and collection
+observers run under their first invocations. Recovery watches100k/3,114,
+200k/6,239 and300k/9,364 and will retain four audited files at each milestone.
+
+Startup passes **13:15:03**,1.116s CPU wrapper:all315 inputs,357 control/bounded-
+matching initial tensors,47 identical pre-update transitions,exact update cadence
+376/408/440/472/504/536 and251 finite supervised reports through8,408 actions.
+No full frozen result is available. Retain startup CPU co-host time without
+wall-time correction. Inspect this original process;do not restart it,repeat
+passed checks or allocate concurrent GPU work. Require the three recoveries and
+all four fixed assessments. No extension,ratio retry or automatic successor.
+
+DeclarationSHA256`f40018a4b6ae48a09cb718435de5637d452336af1006e6cf331b1c60a2e1d542`.
+
+## First recovery retained
+
+The original recovery observer passes **13:20:35 UTC November1** at100,000
+actions/3,114 updates with357 finite tensors. Its complete log prefix verifies
+3,215 finite reports through103,256 actions. The same observer preserves all
+four files/206,067,153 bytes under`recovery-100k` in.305s copying time,with matching
+metadata/tensor hashes and unchanged source bytes/stat timestamps. No restore,
+learner update or GPU stage is repeated. The observer remains active for200k
+and300k;do not repeat the completed audit or retention.
+
+MetadataSHA256`0d52ea3d3553a2c3d23615fc2df7cae4a903c47a06d813730fc89e39ceb15811`,
+audit`fa67c1bba313d82f58e54031ca127fa2cabf46c545ce6162a588f45e736e5388`,
+retention`1cbde50cb59349c8c0f3f964b3c6fec27fce8de50d658dc0e8f6e2db531d3f1e`.
+Weights/metadata omit replay,belief,games and RNG;this is not uninterrupted
+training recovery. Retain CPU co-host time without wall-time correction.
+
+## Completion
+
+The fixed assessment is complete. See the [result and retained limitations](../results/2026-11-01-cdp-breakout-r8.md).
+Do not repeat completed stages;no automatic successor is selected.

@@ -1,0 +1,189 @@
+use super::*;
+
+const WORLD_PARAMETERS: [&str; 2] = [
+    "world.representation.encoder.cnn0.weight",
+    "world.reward.out.weight",
+];
+
+fn observation(config: &DreamerConfig, stream: usize, time: usize) -> Observation {
+    Observation::rgb(
+        (0..config.observation_dim())
+            .map(|i| ((i + stream * 11 + time * 7) % 31) as f32 / 31.0)
+            .collect(),
+        config.observation_grid(),
+    )
+}
+
+#[test]
+fn latent_shape_synthetic_observations_use_rgb_geometry() {
+    let mut config = super::super::latent_shape_tests::config();
+    config.latent_shape = Some(crate::dreamer::LatentShape {
+        variables: 8,
+        classes: 2,
+    });
+    let graph = world::build_training_graph(&config, config.world_backprop_length);
+    for name in WORLD_PARAMETERS {
+        assert!(graph.nodes().iter().any(|node| matches!(&node.op,
+            meganeura::graph::Op::Parameter { name: actual } if actual == name)));
+    }
+    for stream in 0..2 {
+        for time in 0..=16 {
+            let frame = observation(&config, stream, time);
+            assert_eq!(frame.as_slice().len(), 3 * 32 * 32);
+            assert!(frame.as_slice().iter().all(|&x| (0.0..1.0).contains(&x)));
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires separately declared guarded latent shape qualification"]
+fn latent_shape_native_learning_sharing_and_restore() {
+    let mut config = super::super::latent_shape_tests::config();
+    config.latent_shape = Some(crate::dreamer::LatentShape {
+        variables: 8,
+        classes: 2,
+    });
+    let core = DreamerCore::new(config.clone()).unwrap();
+    assert_eq!(
+        core.gpu_device().device_name,
+        std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+    );
+    assert!(!core.gpu_device().is_software_emulated);
+    let mut vector = VectorCore::new(core, 2);
+    let names = ["behavior.actor.out.weight", "behavior.value.out.weight"];
+    let initial = vector.learner.behavior_train.read_params(&names);
+    let world_names = WORLD_PARAMETERS;
+    let world_initial = vector.learner.world_train.read_params(&world_names);
+    vector.ingest(
+        (0..2)
+            .map(|stream| {
+                (
+                    stream,
+                    observation(&config, stream, 0),
+                    FrameFlags {
+                        is_first: true,
+                        ..Default::default()
+                    },
+                    Reward::default(),
+                )
+            })
+            .collect(),
+    );
+    for time in 1..=16 {
+        vector
+            .act_with_expert_labels(
+                ActionMode::Sample,
+                &[Some(time % 3), Some((time + 1) % 3)],
+                None,
+            )
+            .unwrap();
+        vector.ingest(
+            (0..2)
+                .map(|stream| {
+                    (
+                        stream,
+                        observation(&config, stream, time),
+                        FrameFlags::default(),
+                        Reward {
+                            extrinsic: if time % 3 == 0 { 1.0 } else { 0.0 },
+                            intrinsic: 0.0,
+                        },
+                    )
+                })
+                .collect(),
+        );
+    }
+    for update in 1..=2 {
+        let report = vector.learn().expect("synthetic labeled replay ready");
+        assert_eq!(report.learner_step, update);
+        assert!(report.behavior.policy_loss.is_finite());
+        assert!(
+            report
+                .behavior
+                .expert_imitation
+                .as_ref()
+                .unwrap()
+                .loss
+                .is_finite()
+        );
+        let core = &vector.learner;
+        let actor_names = core
+            .behavior_train
+            .param_names()
+            .into_iter()
+            .filter(|name| name.starts_with("behavior.actor."))
+            .collect::<Vec<_>>();
+        assert_eq!(actor_names.len(), 11);
+        let source = core.behavior_train.read_params(&actor_names);
+        for target in [&core.policy_live, &core.imagination, &vector.policy] {
+            assert_eq!(
+                target.read_params(&actor_names),
+                source,
+                "shared actor parameters"
+            );
+        }
+        assert_eq!(
+            core.world_train.read_params(&[names[0]]),
+            core.behavior_train.read_params(&[names[0]])
+        );
+        assert_eq!(u64::from(core.behavior_train.adam_step_count()), update);
+    }
+    for stream in 0..2 {
+        let feature = vector.feature(stream);
+        let size = config.network();
+        assert_eq!(feature.len(), config.feature_dim());
+        for onehot in feature[size.deter..].chunks(size.classes) {
+            assert_eq!(onehot.iter().sum::<f32>(), 1.0);
+            assert!(onehot.iter().all(|&x| x == 0.0 || x == 1.0));
+        }
+    }
+    let core = &mut vector.learner;
+    for (before, after) in world_initial
+        .iter()
+        .zip(core.world_train.read_params(&world_names))
+    {
+        assert_ne!(before, &after);
+        assert!(after.iter().all(|x| x.is_finite()));
+    }
+    for (name, (before, after)) in names
+        .iter()
+        .zip(initial.iter().zip(core.behavior_train.read_params(&names)))
+    {
+        assert_ne!(before, &after, "parameter changed: {name}");
+        assert!(after.iter().all(|x| x.is_finite()));
+    }
+    let checkpoint =
+        Path::new(&std::env::var_os("KINDLE_LATENT_SHAPE_CHECKPOINT").unwrap()).to_owned();
+    assert!(!checkpoint.exists());
+    core.save_checkpoint(&checkpoint).unwrap();
+    let restored = DreamerCore::restore_with_gpu(
+        &checkpoint,
+        Arc::clone(&core.gpu),
+        read_checkpoint_metadata(&checkpoint).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(restored.config.latent_shape, config.latent_shape);
+    assert_eq!(restored.replay_len(), 0);
+    for (source, target) in [
+        (&core.world_train, &restored.world_train),
+        (&core.behavior_train, &restored.behavior_train),
+        (&core.behavior_slow, &restored.behavior_slow),
+    ] {
+        assert_eq!(source.adam_step_count(), target.adam_step_count());
+        let names = source.param_names();
+        assert_eq!(source.read_params(&names), target.read_params(&names));
+        for name in names.into_iter().filter(|name| source.has_param_grad(name)) {
+            let mut a = vec![0.0; source.param_size(name).unwrap()];
+            let mut b = vec![0.0; a.len()];
+            source.read_adam_m(name, &mut a);
+            target.read_adam_m(name, &mut b);
+            assert_eq!(a, b, "first moment {name}");
+            source.read_adam_v(name, &mut a);
+            target.read_adam_v(name, &mut b);
+            assert_eq!(a, b, "second moment {name}");
+        }
+    }
+    eprintln!(
+        "Latent8x2: two finite labeled synthetic updates, world/actor/critic changes, shared acting/imagination weights, one-hot states and exact restore; zero Atari actions"
+    );
+}

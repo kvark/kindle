@@ -3,156 +3,250 @@
 Kindle learns while acting. Games are the first testbed; sparse explicit rewards
 and human guidance are allowed. Favor minimalism, expressiveness, safety and
 speed. Keep learning/inference native on Meganeura + Blade. Python is for game
-adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
+adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md` when
+available. Only the user merges PRs; commits and pushes are allowed.
 
-## Current priority
+## Start here
 
-- The September 27 user direction adopts `docs/strategy_reset_plan.md`:
-  iteration speed -> test LeVJEPA's value -> exploration/reward -> video priors
-  for dynamics/behavior -> later asynchronous real-time deployment. Stop
-  unchanged five-game/mastery confirmations and Atari-only gate tuning.
-  The current roadmap/evidence stays in `docs/kindle_single_life_dreamer_plan.md`.
-  GPU acting/capture is integrated. Phase 1 is complete: fused learner/grouped
-  RSSM pass, and the three-seed MinAtar screen completes in 8m18s. The 3x update
-  target is unmet; the user explicitly accepts it as a stretch target, not a
-  Phase 1 exit gate. Phase 2 is next.
-  Do not mix speed and learning changes.
-- The first shared-parameter step passes exact 241-tensor/146-moment and report
-  parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.
-  Mean 12M update falls 227.03 -> 212.78 ms (6.28% less time), not yet game
-  throughput or the 3x target. See `docs/results/2026-09-27-shared-parameters.md`.
-  Fused T64/H15 recurrence now uses GPU Gumbel sampling with CPU-owned draws;
-  outputs/gradients have independent references. Grouped RSSM layout improves
-  the shared-control synthetic update 212.70 -> 184.43 ms and short native N6
-  Pong R256 throughput 17.36 -> 20.16 actions/s. The 3x target is not met.
-  See `docs/results/2026-09-27-fused-learner.md`. CPU targets/slow-critic EMA
-  remain; shared mutable weights require serialized actor/learner access.
-- `docs/screening.md` defines the separate Size1M/B8/T16/H15/R32 MinAtar recipe,
-  eight streams and seeds 1009/2017/3019. Public 10x10 observations are packed
-  losslessly into 7x7x64 and use a jointly learned encoder; no frozen frontend,
-  pretraining or reward/action aid. CPU environment/upload is the allowed
-  temporary fallback, not GPU-resident simulation or a CPU learner. Never
-  compare its R32 speed with the R256 Atari control as an optimization gain.
-  All three 32,768-action / 8,135-update runs pass. Final online scores are
-  .44/.40/.68; mean .507 with seed-bootstrap 95% CI [.400,.680]. This does not
-  establish reliable improvement or frozen competence. See
-  `docs/results/2026-09-27-minatar-screen.md`. Keep the unresolved 3x target
-  distinct from completed implementation; no unchanged mastery queue resumes.
-  Next: Phase 2 representation probes and matched learning controls; a frozen
-  JEPA frontend must demonstrate its value. No asynchronous learner or swarms.
-- The user's September 26 direction supersedes historical checkpoint/pinning
-  requirements: finish the new GPU encoding/acting path and remove obsolete
-  implementations freely. Do not build migration layers for old checkpoints or
-  recursively pin old experiment histories. Historical measurements remain
-  historical; do not relabel them as results of changed code.
-- `TASK.md` is the user's high-level intent. The acting path is GPU capture ->
-  preprocessing -> causal LeVJEPA -> belief/policy -> action readback. Rewards,
-  checkpoints and requested diagnostics may cross the host boundary. A buffer
-  entry point alone is not capture integration. Validate ownership, producer
-  completion and GPU memory visibility, including ring-buffer reuse.
-- The current reference uses the independently pretrained ~5.5M causal Tiny frontend,
-  not DINO or the 303M Large default. Keep Dreamer12M and the 7x7x64 observation
-  contract for speed comparisons. Small learners/learned encoders are allowed in
-  explicitly separate screening/representation experiments. JEPA must earn its
-  place on probes and learning curves; it is not an obligation for 2D games.
-  Preserve native image detail; no downscale-then-upscale adapter pipeline.
-- Prioritize one reliable actor before swarms: Atari, accelerated playing plus
-  learning, video/world pretraining, mind-games vkQuake2/TMNF, GOG/Wine, then
-  held-out cross-game adaptation and retention. No concurrent learner service
-  now; the strategy's later deployment phase may introduce one after measuring
-  effective single-actor learning, actor latency and learner debt.
-- Six environments share batched perception/policy and one learner, not causal
-  histories. Preserve per-stream recurrent state, RNG, replay and resets. The
-  encoder's 16-arrival chunk reset is not an environment/RSSM reset.
+- [Machine handover](docs/handover.md): source branches, build instructions,
+  shared checkpoint/evidence package and unfinished work.
+- [Roadmap](docs/kindle_single_life_dreamer_plan.md): results, priorities and gates.
+- [PR31](https://github.com/kvark/kindle/pull/31): live status dashboard. Update its
+  description when status changes; do not create a separate STATUS.md.
+- [Learning diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md):
+  representation, forecasting, actor/critic and training-coverage evidence.
+- [GPU incident](docs/results/2026-10-23-cdp-context64-gpu-fault.md):
+  initialization failures on the original machine and their limits.
 
-## Research and status
+## Current work — November 7
 
-- One authoritative plan: `docs/kindle_single_life_dreamer_plan.md`. Keep it
-  decision-focused with one game-status table and direct rollout/world-report
-  links. Detailed results belong in experiment reports and `runs/`.
-- Use [PR29](https://github.com/kvark/kindle/pull/29) as the status dashboard:
-  dated done/running/next items, results and limitations. No STATUS.md. Update
-  at meaningful boundaries, not each poll.
-- The JEPA bet is cheaper useful latent world prediction than pixel
-  reconstruction. Measure whole-agent and world-model time/memory/learning
-  against Dreamer12M at matched actual interactions. Backend parity alone can
-  share bugs: retain independent value/gradient references.
-- Historical non-sticky fixed-protocol reliability is 3/5 (Boxing, Pong,
-  assisted-training Freeway). Qbert and Breakout fail their gates. Pong's one-root
-  sticky .25 evaluation fails: 2/24 wins, mean -7.1667. Do not call the historical
-  non-sticky wins robust mastery. Tiny same-title video pretraining is additional
-  experience (45k train + 5k validation frames/game), not online-only learning.
-- Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
-  truncate Large weights or silently substitute an untrained product encoder.
-- Current backend: Meganeura `367e53d4` carries only the Blade dependency update
-  over latest upstream `ee3aea42`; Blade `7cca6377` adds checked external Vulkan
-  imports/ownership over `fbb4f28c`. Both branches are pushed. Check upstream
-  before diagnosing already-fixed issues. Keep dependencies reproducible, but
-  do not delay implementation to preserve obsolete runtime/checkpoint identities.
-- GPU pixel v2 and its N6 train/frozen/sticky plumbing tests pass. The stock
-  upstream Dreamer/JAX sanity also passes (5,990 actions, 1,149 updates); this is
-  not a matched learning comparison. Reset/update accounting, replay capacity
-  and artificial-cutoff semantics still need alignment for that claim. See
-  `docs/experiments/2026-09-26-gpu-pixels-and-pong-robustness.md` and
-  `docs/experiments/2026-09-26-upstream-control-protocol.md`.
-- Single and vector pixel actors now share resident encoder/pooling/belief/
-  categorical sampling and paged GPU replay collection. Only selected actions
-  leave the acting path. Explicit probes/checkpoints and sampled learner batches
-  may read back. Imagined recurrence is resident; scalar target construction
-  still uses the host.
-  Dullahan GPU_SYNC supplies a fenced EXTERNAL ownership lease, not a SHM flag.
-  vkQuake capture-to-keyboard plumbing passes at native 640x480: 12M frozen
-  256 actions/2.758s; a separate tiny learner completes 105 finite updates.
-  These are short plumbing tests, not 12M training speed or competence. Keep its
-  sparse reward/terminal adapter and full mind-games GameSession integration distinct
-  from transport success. See `docs/experiments/2026-09-26-gpu-resident-acting.md`.
-- Screen small, confirm big. Use one changed factor, >=3 learner seeds and
-  score-vs-actions/time curves for development learning comparisons, with
-  bootstrap uncertainty or suite IQM; no development mastery gates. Numerical
-  smoke tests are not multi-seed learning experiments. One matched timing plus
-  numerical/learning parity check suffices for a speed change; no micro-campaign.
-  Commit each new result as compact JSON + Markdown in `docs/results/`, including
-  config, seeds, aids, curves and limits. PR29 remains the status dashboard.
-  Keep original competence gates for final confirmed claims. Retain failures
-  and all completed episodes/unfinished tails.
-  Plumbing tests and online wins are not frozen competence. Report aggregate
-  and per-stream real time. A lower replay ratio is a learning tradeoff.
-- Frozen evaluation never updates weights. Restore without replay/RNG/live
-  belief is not equivalent to uninterrupted training. Separately evaluate prior
-  forecasts with persistence/unrelated-action/reward controls and event counts;
-  posterior estimates are not forecasts, features are not imagined RGB, and
-  privileged game observers never enter the policy.
+The active goal is **prove Breakout world-model training in isolation**. Actor/
+critic and the five-game campaign are parked. Use the native pixel-supervised
+CNN/categorical RSSM/RGB decoder as the inspectable reference; CDP is a later
+efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
+model inputs/objectives. Full competence remains unproven.
+
+The [motion learner](docs/results/2026-11-07-breakout-world-motion-attention.md)
+solves most observed ball reconstruction. The [coverage comparison](docs/results/2026-11-07-breakout-world-coverage.md)
+retains observed108/112,one-step94/109,eight-step14/107; waiting/contacts improve,
+but long forecasts remain weak. Its final8,192 checkpoint is the common anchor
+for the new diagnosis. Exact native/source3fa37b6d,SHAeafe8359,matching runtime
+`/mnt/data/kindle-breakout-world-motion-20261107/runtime`.
+
+The [ST energy comparison](docs/results/2026-11-07-breakout-world-energy.md)
+learns ending(last-life RIGHT97.182%,Brier.006129 versus50.211%/.144566),but
+regresses one/eight-step tracking81/109,4/107. The [conditional score-function
+comparison](docs/results/2026-11-07-breakout-world-score-function.md)
+passes exact/native derivatives yet fails learning: one/eight-step71/109,4/107;
+NOOP8 false balls29/64; ending RIGHT8.591%,Brier.433024. Primary16/32 ball energy
+.393950 versus.151784 ST/.169502 coverage. Both learners are closed; retain their
+distinct capabilities without replacement,extension or seed-reliability claims.
+Their roots/exact runtimes,all original failures and repaired evidence remain
+linked in the reports. Earlier ST Python-count claim41/41 was wrong(actual27/27);
+preserve its pinned records and separate correction. No old checks rerun.
+
+The [CPU frozen-feature diagnosis](docs/results/2026-11-07-breakout-world-readout-diagnosis.md)
+finds useful short-term motion but no simple position-head rescue. Failed linear
+probes do not prove information absent. Its eight feature and30 source/action
+pins,63 coefficient/prediction files and interpretation limits remain retained.
+
+The [fixed-weight gradient diagnostic](docs/results/2026-11-07-breakout-world-gradient-noise.md)
+is **closed**:108 raw forward/backward steps at the coverage anchor,three fixed
+fitting batches,16 paired predictive draws,zero optimizer/model updates. Corrected
+sampling variance is550–893× ST in the prior,1,250–11,699× reward,57–207×
+continuation. Repeated-input gradients are bitwise exact; paired decoder relative
+differences<6.15e-7. Prior noise394–460 versus observed-gradient norm7.12–8.01;
+even16 samples poorly resolve corrected means. CPU AGC/LaProp sensitivity shows
+strong nonlinear effects. This is a concrete estimator-noise finding,not a full
+cause of fresh-run regression or a successful variance-reduction method. Earlier
+`adam_m` norms included LaProp RMS normalization and did not prove AGC saturation.
+
+Root `/mnt/data/kindle-breakout-world-gradient-noise-20261107`,source7c66bf12,
+diagnostic executable SHA636bf7e5. Native43.282s/CPU analysis77.774s;50 CPU world
+checks,strict Clippy,five CPU optimizer checks,28 data/21 execution/123 analysis
+pins,one host guard/nine sealed pins and408 exact snapshot tensors pass. Initial
+compile/tiny-fixture failures and pre-GPU output-index correction remain recorded.
+Test-only measurement; retained packages/production graphs are unchanged.
+`closure-review.json` verifies closure. At that diagnostic closure,no Kindle worker or successor was active/selected.
+Do not repeat completed stages or old-model runs.
+
+The [latent-overshooting comparison](docs/results/2026-11-07-breakout-world-overshooting.md)
+is **closed and fails its learning gates**. Fresh8,192 updates retain observed
+109/112 and one-step93/109; four-step improves33→43/109,but eight-step falls
+14→7/107(fails28/107). Primary16/32 ball energy.162147 improves only4.34% versus
+.169502 coverage,failing25%. Native580.173s/loop825.609s versus529.515/796.900s.
+Ending32 Brier.003192 and RIGHT93.344%(oracle100%) improve,with0/304 non-ending
+cases>5%,maximum1.367%. But RIGHT16 predicts73.352% ending versus oracle0%;
+ending16 Brier regresses.003345→.156492. Eventual outcomes do not establish
+correct timing. Ending32 reward Brier.403468 versus.000173 also regresses.
+
+Root `/mnt/data/kindle-breakout-world-overshooting-20261107`,sourcee311b216/
+native SHA965f2bd2,matching root/runtime.54 CPU world,53 affected/53 packaged
+Python checks,strict Clippy,native derivatives,87/96/856 phase input pins,five
+guards/45 sealed pins,204 initial/frozen tensors,18 initial/restore arrays,exact
+plan/exposures and all8,192 finite11-report rows pass. Preserve syntax,F32-
+reference,scalar-zero fixture and missing plotting-dependency failures; the plot
+repair is CPU-only. `closure-review.json` verifies closure; separate cache-release
+receipt preserves the original pinned build receipt. No worker,learner,collector
+or successor is active/selected. Retain distinct capabilities without replacement,
+extension,confirmation campaign or a variance-reduction/world-completion claim.
+A focused next question is deterministic-state drift versus categorical latent
+agreement; no cause or new objective is established by this comparison.
+
+Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
+uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
+untouched tests and fresh confirmation. The retained oracle has no above-top-
+brick endpoints; detector-support limits and duplicate contexts remain. Investigate
+variance/objective coupling before more capacity or longer training; separately
+justify a new experiment rather than selecting a scalar from this audit alone.
+
+The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison)
+remains closed and inconclusive:79.167/47.000 greedy/sampled versus matched
+75.250/44.708,intervals crossing0,all0/24 two-wall. Retain prior reward off and
+posterior reward1 for the retained agent,with original failures/repairs intact.
+
+Completed details remain in the [roadmap](docs/kindle_single_life_dreamer_plan.md)
+and linked reports. Expanded November3 guide/handover remain in Git at
+`0cf70be8d8cc9d4e6cab32bf1b8e97195fd1d0ab`. This condensation changes status prose,
+not checkpoints,logs,runtimes,protocols or experiment sources. Keep current work
+focused on the active allocation; link completed results rather than a job ledger.
+
+## Direction and retained results
+
+Training is the priority. Backend optimization,upstream porting and JAX parity
+are parked. The retained agent uses **centered CDP** with a jointly learned CNN,
+categorical RSSM and imagined actor/critic. The newly selected isolated-world
+baseline uses pixel supervision as specified above. No pretrained DINO or Tiny
+JEPA encoder is required. Explicitly select the intended objective; learned RGB
+remains the CLI default.
+
+The priority is compute-constrained success on this game set. Game-specific
+model sizes,resolutions and learning settings are allowed; one universal recipe
+is not required. Prefer useful frozen learning per GPU-hour. Start fromT16;
+T64 is an experiment,not the default. Native32/48/64 geometry is supported.
+Size1M works well for Boxing/Freeway but was much weaker for Breakout/Qbert.
+Changing several settings to find a cheap useful recipe is allowed; disclose
+them without claiming isolated causes or broad reliability.
+
+Work on `phase2-levjepa-evaluation` and PR31. The branch includes the qualified
+c8aeba28 implementation with portable dependencies. Do not switch to a separate
+takeover branch or modify neighboring worktrees. Keep `runs/`,large data and
+archived experiment ledgers out of Git.
+
+The **five-game goal is unfinished**:
+
+| Game | Retained evidence | Remaining limitation |
+|---|---|---|
+| [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
+| [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
+| [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall; original864/90% gate unfinished |
+| [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
+
+Published long-run scores are aspirations,not matched-budget comparisons.
+Finite losses,short runs and backend speed do not establish mastery or CDP
+superiority. Guided online returns and replay imitation losses are not frozen
+competence. Keep detailed results in the roadmap and linked reports,not a
+growing history in this file.
+
+Useful Breakout diagnostic references:
+- [Value consistency](docs/results/2026-11-02-cdp-breakout-value-consistency.md):
+  sampled one-step RMSE.732/.941 versus complete-return6.682/6.691. Short targets
+  use the same critic's bootstrap; terminal slices are outcome-conditioned.
+  All32 diagnostic/73 source/912 active pins pass;6.366s CPU-only,original Qbert
+  identity preserved. Import failure/repair retained; no new loss orlearner.
+- [Encoder4e-5](docs/results/2026-11-01-cdp-breakout-encoder4e5.md):
+  sampled/greedy56.292/104.667 versus25.292/42.625 at2e-5;21m28s versus22m27s.
+  All227 pins,recovery,initial/frozen tensors,replays,guards and original
+  services pass. Retain4e-5; earlier4M/expert10 rate failure remains relevant.
+- [Representation and own-policy replay](docs/results/2026-11-01-cdp-encoder4e5-representation.md):
+  ball/motion readouts improve but remain less precise than pixel diagnostics.
+  All replacement action readouts trail the learned actor. Own episodes last
+  25.36% longer and earn95.88% more reward/action; state distributions differ.
+- [Teacher takeovers](docs/results/2026-11-01-cdp-breakout-recoverability.md):
+  earlier control avoids108/120 recorded losses versus26/120 at the last
+  near-descending state. This supports earlier-control investigation,not exact
+  causal error attribution or optimal irrecoverability. CPU-only,293 pins pass.
+- [Delayed-takeover states](docs/results/2026-11-01-cdp-breakout-takeover-states.md):
+  onlytwo of21 earlier-only rescues project contact withinfive actions at delay16;
+  14 already match the teacher command. Timing estimates/imperfect teacher do not
+  isolate the cause. All480 joins/478 saved-branch recounts,nine inputs and524
+  active Qbert pins pass;CPU-only2.766s,complete15:23:52 UTC November1. Do not rerun.
+
+Completed negative results and protocol failures remain retained. Do not restart
+completed learners,old queues,failed assessments or collectors; no unchanged
+long extensions,broad seed campaigns or automatic successors. Consult the linked
+protocol before a separately justified new experiment. Preserve original failures
+when a separate CPU-only repair completes missing evidence; never relabel a
+protocol-failed comparison as passed. Single-actor learning precedes swarms or
+concurrent learners.
+
+## Runtime and precision
+
+Use **Auto** on the current AMD RX7900XT/RADV. BF16 and
+`KINDLE_DEVICE_TARGETS` remain unavailable. Three paired early updates leave the
+first reward projection unchanged underF16 while Auto changes it; derivatives
+and mechanism remain unmeasured. Completed F16/Auto B2/T64 lives do not justify
+extensions. [Precision evidence](docs/results/2026-10-25-cdp-amd-precision.md).
+
+Current retained learning uses native447fe50/SHA256 prefix35ad0db and the exact
+matching runner. Breakout retains `/x/Temp/kindle-breakout-corrective-20261028/runtime`;
+current Qbert uses `/x/Temp/kindle-qbert-color-masks-20261101/runtime` with the
+qualified faster,decision-equivalent teacher.
+Each declaration pins exact native,runner,teacher and source bytes. Optional
+posterior,temperature,centroid,open-loop and imitation-decay runtimes have
+separate receipts; do not mix overlays. Preserve source-specific validation
+failures and limits. No rebuild is needed for an exposed learning-rate change.
+
+## Experiment practice
+
+- Use small development runs and meaningful checks; avoid turning preparation
+  into another backend qualification project. Automate monitoring and audits.
+- Keep batched inference with eight independent Atari environments. Report
+  aggregate actions and emulator frames separately,plus wall-clock time.
+- Retain config,seeds,source/native identity,curves and frozen natural-episode
+  evaluations against actual-initial controls. Record aids,budgets,cutoffs and
+  failures. Confirm promising changes across seeds before reliability claims;
+  selected/reused development seeds are not held-out tests.
+- Checkpoints omit replay,live belief,games and RNG. A restored extension is a
+  warm start,not uninterrupted learning or an independent seed. Restore preserves
+  architecture/geometry and rejects fresh-training overrides.
+- Preserve native max-pooled frames and one GPU resize; verify small-object
+  visibility. Do not reintroduce CPU downscale followed by upscale.
+- Put compact results in docs/results and update PR31. Logs,weights,videos,
+  build caches and profiling dumps belong outside Git. Keep useful checkpoint
+  milestones; release disposable build caches after packaging.
 
 ## GPU operation
 
-- Ordinary bounded GPU work is authorized on driver 580.178.04. Normal JAX/CUDA
-  initialization (including its internal NVML use) is permitted. Separate NVML
-  polling/legacy health loggers remain off. Do not build an NVML-free backend or
-  a CPU learner workaround. Unavailable utilization is unmeasured, not zero.
-- Serialize heavy GPU jobs. Use `python/examples/gpu_host_guard.py` around the
-  native-bearing process with a persistent systemd user service (`Restart=no`,
-  `KillMode=control-group`, bounded deadline). A game integration needs explicit
-  ownership/cleanup of its game process too. Review failures before any follow-up.
-- Require the expected native device and >=2GiB sampled Vulkan estimated
-  budget headroom. Budget-minus-usage is not physical free or peak VRAM.
-  Last observed boot: `4f5152d1-e5fd-46cf-a0c4-06534c430d26`.
-- Stop on kernel faults/native failures. No reset, driver reload/change, reboot
-  or power-cycle without new user approval. Historical Xid62/154 incidents remain
-  unexplained; successful no-NVML runs prove neither causality nor safety. Never
-  retry quarantined 75dfe, 0a98775/02b600a1 or 070f4b51/7db0d05c bundles. Follow
-  `docs/gpu_incident_response.md`; do not restart historical queues/followers.
+GPU work is authorized unless the device is genuinely faulted. Known allocation
+warnings alone are not an approval gate. Use the existing host guard and stop on
+real faults or numerical failures. No automatic driver reset/reload/reboot.
+Separate NVML polling is unnecessary for the current experiment. Check live
+process/service identity before work; an observer timeout is not a stopped job.
 
-## Implementation discipline
+The current AMD host is separate from the original NVIDIA PMU incident. Older
+595/615 drivers repeatedly halted during first-world initialization,before
+checkpoint loading. An ASLR-disabled debugger success was not a fix; localization
+does not establish a buffer,firmware or hardware cause. On that host,use the
+prepared pre-submission capture after recovery,not another blind restore. The
+ABI-specific GDB collector applies only to its original binary. On a new healthy
+GPU,qualify bounded initialization/restore and record device/driver identity
+without inheriting old boot assertions.
 
-Keep exercised production code small. Delete obsolete encoding/compatibility
-code instead of extending it. Use proportionate correctness/integration tests,
-formatting and Clippy. Do not rebuild unchanged source for documentation edits.
-One concise run configuration/result is enough; no new artifact-pin framework.
+## Historical material
 
-Automate routine validation. Check long training about every 30 minutes or on
-completion; report meaningful results, not counters. Never compile during
-matched timing. Use one CPU, 2GiB and zero swap for heavy preparation. Meganeura
-has an unignored GPU test, so review CPU test filters.
+The shared transfer `/mnt/data/kindle-handover-20261025` contains the4096-action
+context smoke and2M Breakout originals,matching all346 tensors. Other historical
+game weights were not transferred. New AMD checkpoints remain locally retained.
+Original archives moved to `/x/Artifacts/shared-drive-cleanup-20261025` on the
+original machine; exact counters and paths are in the handover.
 
-Preserve unrelated user changes, especially in Meganeura/Blade/mind-games.
-Only the user merges PRs; commits and pushes are allowed. Keep history linear.
+Old incident/optimization ledgers and detailed data remain on
+`archive/phase2-before-cleanup-20261025`; current reports stay here.
+Earlier expanded instructions remain in Git at34b1e74; the earlier experiment
+ledger is preserved at52c2174 (and earlier113ecde/8b1ba49) and in the roadmap/reports. Historical “next”
+paragraphs are not active instructions. Preserve user-authored TASK.md and
+docs/cdp-claude-feedback.md as context; subsequent CDP decisions and measured
+results supersede their older architecture/performance assumptions. Do not
+merge this or upstream PRs on the user's behalf.

@@ -16,6 +16,232 @@ import audit_pong
 import profile_atari_vector
 
 
+@pytest.mark.parametrize("args,message", [
+    (["--action-temperature", ".5"], "requires sampled frozen restore"),
+    (["--evaluate", "--action-temperature", ".5"], "requires sampled frozen restore"),
+    (["--restore", "unused", "--action-temperature", ".5"], "requires sampled frozen restore"),
+    (["--evaluate", "--restore", "unused", "--greedy", "--action-temperature", ".5"], "requires sampled frozen restore"),
+    *[(["--action-temperature", value], "positive normal finite F32")
+      for value in ("0", "-1", "nan", "inf", "1e-40", "1e40")],
+    (["--greedy-posterior"], "greedy posterior requires frozen restore"),
+    (["--evaluate", "--greedy-posterior"], "greedy posterior requires frozen restore"),
+    (["--restore", "unused", "--greedy-posterior"], "greedy posterior requires frozen restore"),
+    (["--open-loop-length", "3"], "requires learned CDP"),
+    (["--cdp", "--open-loop-length", "1"], "requires learned CDP"),
+    (["--cdp", "--open-loop-length", "16", "--batch-length", "16"], "requires learned CDP"),
+    (["--cdp", "--open-loop-length", "3", "--encoder-checkpoint", "unused"], "requires learned CDP"),
+    (["--open-loop-scale", "1"], "requires open-loop-length"),
+    (["--cdp", "--open-loop-length", "3", "--open-loop-scale", "nan"], "positive finite"),
+    (["--cdp", "--open-loop-length", "3", "--open-loop-scale", "0"], "positive finite"),
+    (["--cdp", "--open-loop-length", "3", "--open-loop-scale", "1e38"], "positive finite"),
+    (["--restore", "unused", "--cdp", "--open-loop-length=3"], "training overrides"),
+    (["--guidance-imitation-scale", "0"], "scale must be positive"),
+    (["--guidance-imitation-scale", "nan"], "scale must be positive"),
+    (["--guidance-imitation-scale", "inf"], "scale must be positive"),
+    (["--guidance-imitation-scale", "1e300"], "scale must be positive"),
+    (["--guidance-imitation-scale", "1e-300"], "scale must be positive"),
+    (["--guidance-imitation-scale", "1"], "requires fresh guided training"),
+    (["--guidance-noop-weight", ".05"], "requires imitation"),
+    (["--guidance-world-gradient"], "world gradient requires imitation"),
+    (["ALE/Qbert-v5", "--restore", "unused", "--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-world-gradient"], "training overrides"),
+    (["--evaluate", "--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-world-gradient"], "requires fresh guided training"),
+    (["--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-noop-weight", "0"], "NOOP weight must"),
+    (["--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-noop-weight", "nan"], "NOOP weight must"),
+    (["--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1", "--guidance-noop-weight", "2"], "NOOP weight must"),
+    (["--encoder-training", "joint"], "encoder-training requires a Tiny"),
+    (["--encoder-training", "frozen", "--encoder-checkpoint", "unused"], "batch-length16"),
+    (["--encoder-training", "joint", "--encoder-checkpoint", "unused", "--batch-length", "16"], "explicit replay-capacity"),
+    (["--encoder-training", "joint", "--encoder-checkpoint", "unused", "--batch-length", "16",
+      "--encoder", "levjepa"], "requires a Tiny"),
+    (["--encoder-training", "joint", "--encoder-checkpoint", "unused", "--batch-length", "16",
+      "--observation-size", "64"], "native frames"),
+    (["--replay-capacity", "0"], "replay-capacity must be positive"),
+    (["--replay-context", "0"], "replay-context must be positive"),
+    (["--replay-context", "-1"], "replay-context must be positive"),
+    (["--replay-context", "100000"], "smaller than replay-capacity"),
+    (["--replay-context", "1.5"], "invalid int value"),
+    (["--replay-context", "9", "--encoder-training", "joint"], "causal encoder training requires replay-context1"),
+    (["--restore", "unused", "--replay-context", "9"], "training overrides"),
+    (["--restore", "unused", "--replay-context=1"], "training overrides"),
+    (["--restore", "unused", "--encoder-training", "joint"], "training overrides"),
+    (["--restore", "unused", "--replay-capacity", "512"], "training overrides"),
+    (["--restore", "unused", "--actor-critic-gradient"], "training overrides"),
+    (["--restore", "unused", "--cdp"], "training overrides"),
+    (["--restore", "unused", "--cdp-centered"], "training overrides"),
+    (["--restore", "unused", "--training-precision", "f16"], "training overrides"),
+    (["--training-precision", "fp8"], "invalid choice"),
+    (["--imagination-length", "0"], "imagination-length must be positive"),
+    (["--imagination-length", "-1"], "imagination-length must be positive"),
+    (["--imagination-length", "1.5"], "invalid int value"),
+    (["--restore", "unused", "--imagination-length", "5"], "training overrides"),
+    (["--restore", "unused", "--imagination-length=15"], "training overrides"),
+    (["--replay-value-bootstrap", "unknown"], "invalid choice"),
+    (["--restore", "unused", "--replay-value-bootstrap", "posterior"], "training overrides"),
+    (["--restore", "unused", "--replay-value-bootstrap=imagined"], "training overrides"),
+    (["--evaluate", "--replay-value-bootstrap", "posterior"], "requires fresh training"),
+    (["--actor-unimix", "-0.1"], "actor-unimix must be finite and in [0, 1)"),
+    (["--actor-unimix", "1"], "actor-unimix must be finite and in [0, 1)"),
+    (["--actor-unimix", "nan"], "actor-unimix must be finite and in [0, 1)"),
+    (["--actor-unimix", "inf"], "actor-unimix must be finite and in [0, 1)"),
+    (["--restore", "unused", "--actor-unimix", ".01"], "training overrides"),
+    (["--restore", "unused", "--actor-unimix=0"], "training overrides"),
+    (["--image-size", "33"], "invalid choice"),
+    (["--rgb-frame-pair"], "rgb-frame-pair requires fresh CDP"),
+    (["--rgb-frame-pair", "--cdp", "--encoder-checkpoint", "unused"], "rgb-frame-pair requires fresh CDP"),
+    (["--restore", "unused", "--rgb-frame-pair"], "training overrides"),
+    (["--restore", "unused", "--image-size", "32"], "training overrides"),
+    (["--encoder-checkpoint", "unused", "--image-size", "48"], "image-size requires"),
+    (["--restore", "unused", "--image-crop", "0", "32", "160", "168"], "training overrides"),
+    (["--encoder-checkpoint", "unused", "--image-crop", "0", "32", "160", "168"], "image-crop requires the learned"),
+    *[(["--image-crop", *values], "nonempty rectangle") for values in (
+        ["0", "0", "0", "10"], ["0", "0", "10", "0"], ["-1", "0", "10", "10"],
+        ["0", "-1", "10", "10"], ["1", "0", "160", "210"], ["0", "33", "160", "178"],
+    )],
+    (["--restore", "unused", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
+    (["--evaluate", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
+    (["--checkpoint", "fresh", "--initial-checkpoint", "fresh"], "separate fresh path"),
+    (["--cdp-centered"], "centered CDP requires"),
+    (["--cdp", "--cdp-centered", "--world-microbatch-size", "1"], "full-batch world training"),
+    (["--cdp", "--encoder-checkpoint", "unused"], "CDP requires"),
+    (["--learning-rate", "0"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "-0.1"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "nan"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "inf"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "1e300"], "learning-rate must be finite and positive in F32"),
+    (["--learning-rate", "1e-300"], "learning-rate must be finite and positive in F32"),
+    (["--cdp", "--learning-rate", "1e38"], "CDP learning rates must be finite and positive in F32"),
+    (["--cdp", "--learning-rate", "1e-45"], "CDP learning rates must be finite and positive in F32"),
+    (["--restore", "unused", "--learning-rate", "0.00008"], "training overrides"),
+    (["--restore", "unused", "--learning-rate=0.00004"], "training overrides"),
+    (["--behavior-learning-rate", "0"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "-0.1"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "nan"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "inf"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "1e300"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "1e-300"], "behavior-learning-rate must be finite and positive in F32"),
+    (["--behavior-learning-rate", "1e38"], "behavior-learning-rate ratio must be finite and positive in F32"),
+    (["--learning-rate", "1e38", "--behavior-learning-rate", "1e-38"], "behavior-learning-rate ratio must be finite and positive in F32"),
+    (["--restore", "unused", "--behavior-learning-rate", "0.00008"], "training overrides"),
+    (["--restore", "unused", "--behavior-learning-rate=0.00004"], "training overrides"),
+    (["--encoder-learning-rate", "0"], "encoder-learning-rate must be finite and positive in F32"),
+    (["--encoder-learning-rate", "-0.1"], "encoder-learning-rate must be finite and positive in F32"),
+    (["--encoder-learning-rate", "nan"], "encoder-learning-rate must be finite and positive in F32"),
+    (["--encoder-learning-rate", "inf"], "encoder-learning-rate must be finite and positive in F32"),
+    (["--encoder-learning-rate", "1e300"], "encoder-learning-rate must be finite and positive in F32"),
+    (["--encoder-learning-rate", "1e-300"], "encoder-learning-rate must be finite and positive in F32"),
+    (["--encoder-learning-rate", "1e38"], "encoder-learning-rate ratio must be finite and positive in F32"),
+    (["--learning-rate", "1e38", "--encoder-learning-rate", "1e-38"], "encoder-learning-rate ratio must be finite and positive in F32"),
+    (["--encoder-learning-rate", "4e-5"], "encoder-learning-rate requires fresh CDP"),
+    (["--restore", "unused", "--encoder-learning-rate", "4e-5"], "training overrides"),
+    (["--restore", "unused", "--encoder-learning-rate=4e-5"], "training overrides"),
+    *[(["--dynamics-learning-rate", value], "dynamics-learning-rate must be finite and positive in F32")
+      for value in ("0", "-1", "nan", "inf", "1e300", "1e-300")],
+    (["--dynamics-learning-rate", "1e38"], "dynamics-learning-rate ratio must be finite and positive in F32"),
+    (["--learning-rate", "1e38", "--dynamics-learning-rate", "1e-38"], "dynamics-learning-rate ratio must be finite and positive in F32"),
+    (["--dynamics-learning-rate", "1e-4"], "dynamics-learning-rate requires fresh CDP"),
+    (["--restore", "unused", "--dynamics-learning-rate", "1e-4"], "training overrides"),
+    (["--restore", "unused", "--dynamics-learning-rate=1e-4"], "training overrides"),
+    *[(["--return-lambda", value], "return-lambda must be finite and in [0, 1]")
+      for value in ("-0.1", "1.1", "nan", "inf", "1e300")],
+    (["--evaluate", "--return-lambda", "1"], "return-lambda requires fresh training"),
+    (["--restore", "unused", "--return-lambda", "1"], "training overrides"),
+    (["--restore", "unused", "--return-lambda=0.95"], "training overrides"),
+    (["--restore", "unused", "--disagreement-scale", "1"], "training overrides"),
+    (["--disagreement-scale", "-1"], "finite and non-negative"),
+    (["--disagreement-scale", "nan"], "finite and non-negative"),
+    (["--disagreement-scale", "inf"], "finite and non-negative"),
+    (["--disagreement-scale", "1"], "requires fresh CDP"),
+])
+def test_joint_encoder_recipe_refusals_precede_outputs(monkeypatch, tmp_path, capsys, args, message):
+    output = tmp_path / "never.jsonl"
+    def unexpected_environment(*_args, **_kwargs):
+        pytest.fail("invalid CLI must not construct an environment")
+    monkeypatch.setattr(atari_vector.gym, "make", unexpected_environment)
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert message in capsys.readouterr().err
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("return_lambda", [None, 0., .95, 1.])
+def test_return_lambda_reaches_native_without_default_changes(monkeypatch, tmp_path, return_lambda):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    expected = kindle.default_config(18, "12m")["lambda"] if return_lambda is None else return_lambda
+    def construct(streams, config):
+        assert config["lambda"] == expected
+        assert config["loss_scales"]["replay_value"] == kindle.default_config(18, "12m")["loss_scales"]["replay_value"]
+        raise RuntimeError("configuration reached native boundary")
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    args = ["atari_vector.py", "--output", str(tmp_path / "run.jsonl")]
+    if return_lambda is not None:
+        args.extend(["--return-lambda", str(return_lambda)])
+    monkeypatch.setattr(sys, "argv", args)
+    with pytest.raises(RuntimeError, match="configuration reached native boundary"):
+        atari_vector.main()
+
+
+@pytest.mark.parametrize("context", [None, 1, 2, 9])
+def test_replay_context_reaches_native_without_changing_training_rows(monkeypatch, tmp_path, context):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    def construct(streams, config):
+        assert config["replay_context"] == (1 if context is None else context)
+        assert config["batch_size"] == config["batch_length"] == config["world_backprop_length"] == 16
+        assert config["world_microbatch_size"] == 16
+        raise RuntimeError("checked before GPU")
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct, SUPPORTS_REPLAY_CONTEXT=True))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"), "--batch-length", "16",
+                                    *(["--replay-context", str(context)] if context is not None else [])])
+    with pytest.raises(RuntimeError, match="checked before GPU"):
+        atari_vector.main()
+
+
+def test_replay_context_rejects_old_native_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("environment constructed"))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "never.jsonl"), "--replay-context", "9"])
+    with pytest.raises(SystemExit):
+        atari_vector.main()
+    assert "requires native prefix support" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("length,scale", [(None, None), (3, None), (3, .25)])
+def test_open_loop_config_reaches_native_without_default_changes(monkeypatch, tmp_path, length, scale):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    def construct(streams, config):
+        if length is None:
+            assert "open_loop_supervision" not in config
+        else:
+            assert config["open_loop_supervision"] == dict(horizon=length, scale=1.0 if scale is None else scale)
+        raise RuntimeError("checked before GPU")
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct, SUPPORTS_OPEN_LOOP_SUPERVISION=True))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"), "--cdp",
+                                    *(["--open-loop-length", str(length)] if length is not None else []),
+                                    *(["--open-loop-scale", str(scale)] if scale is not None else [])])
+    with pytest.raises(RuntimeError, match="checked before GPU"):
+        atari_vector.main()
+
+
+def test_open_loop_rejects_old_native_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("environment created"))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "never.jsonl"), "--cdp", "--open-loop-length", "3"])
+    with pytest.raises(SystemExit):
+        atari_vector.main()
+    assert "requires native open-loop support" in capsys.readouterr().err
+    assert not (tmp_path / "never.jsonl").exists()
+
+
 def test_vector_api_rejects_invalid_config_before_loading_weights():
     with pytest.raises(ValueError, match="positive"):
         kindle.VectorAgent("unused", 0, {})
@@ -27,6 +253,489 @@ def test_vector_api_rejects_invalid_config_before_loading_weights():
         kindle.VectorAgent("unused", 4, config, encoder="levjepa-tiny")
 
 
+@pytest.mark.parametrize('option, message', [
+    (['--greedy-posterior'], 'greedy posterior'),
+    (['--action-temperature', '.5'], 'action temperature'),
+])
+def test_evaluation_controls_reject_old_native_before_output(monkeypatch, tmp_path, capsys, option, message):
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("unexpected environment"))
+    output = tmp_path / "absent" / "run.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output),
+                                    "--evaluate", "--restore", "unused", *option])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert "native runtime does not support " + message in capsys.readouterr().err
+    assert not output.parent.exists()
+
+
+@pytest.mark.parametrize("unimix", [None, .01])
+@pytest.mark.parametrize("enabled", [False, True])
+@pytest.mark.parametrize("precision", ["auto", "f32", "f16", "bf16", "mixed"])
+def test_runner_forwards_actor_controls_before_gpu(monkeypatch, tmp_path, enabled, precision, unimix):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config["actor_critic_gradient"] is enabled
+        assert config["actor_unimix"] == (0 if unimix is None else unimix)
+        assert config["training_precision"] == precision
+        raise RuntimeError("checked before GPU initialization")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"),
+                                    "--training-precision", precision,
+                                    *(["--actor-unimix", str(unimix)] if unimix is not None else []),
+                                    *(["--actor-critic-gradient"] if enabled else [])])
+    with pytest.raises(RuntimeError, match="checked before GPU"):
+        atari_vector.main()
+
+
+@pytest.mark.parametrize("length", [None, 1, 5])
+def test_runner_forwards_imagination_length_before_gpu(monkeypatch, tmp_path, length):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        expected = kindle.default_config(18, "4m")["imagination_length"] if length is None else length
+        assert config["imagination_length"] == expected
+        raise RuntimeError("rollout length checked before GPU initialization")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"),
+                                    "--model-size", "4m",
+                                    *(["--imagination-length", str(length)] if length is not None else [])])
+    with pytest.raises(RuntimeError, match="rollout length checked before GPU"):
+        atari_vector.main()
+
+
+@pytest.mark.parametrize("world_gradient", [False, True])
+def test_runner_expert_world_gradient_is_explicit_before_gpu(monkeypatch, tmp_path, world_gradient):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  action_meanings=["NOOP"] + [f"action{i}" for i in range(1, 18)],
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        expected = dict(scale=1.0, action_weights=[.05] + [1.0] * 17)
+        if world_gradient:
+            expected["world_gradient"] = True
+        assert config["expert_imitation"] == expected
+        raise RuntimeError("expert world gradient checked before GPU")
+
+    def act(self, action_overrides=None, expert_actions=None):
+        raise AssertionError("no native action should run")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct, act=act,
+                                                            SUPPORTS_EXPERT_WORLD_GRADIENT=True))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "ALE/Qbert-v5", "--output", str(tmp_path / "expert.jsonl"),
+                                    "--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1",
+                                    "--guidance-noop-weight", ".05",
+                                    *(["--guidance-world-gradient"] if world_gradient else [])])
+    with pytest.raises(RuntimeError, match="expert world gradient checked before GPU"):
+        atari_vector.main()
+
+
+def test_runner_rejects_old_native_for_expert_world_gradient(monkeypatch, tmp_path, capsys):
+    def act(self, action_overrides=None, expert_actions=None):
+        raise AssertionError("no native action should run")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(act=act))
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("must reject before environment"))
+    output = tmp_path / "never.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "ALE/Qbert-v5", "--output", str(output),
+                                    "--qbert-guidance-probability", ".05", "--guidance-imitation-scale", "1",
+                                    "--guidance-world-gradient"])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert "requires native world-gradient support" in capsys.readouterr().err
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("actor_critic_gradient", [False, True])
+@pytest.mark.parametrize("scale", [0, 1])
+@pytest.mark.parametrize("centered", [False, True])
+@pytest.mark.parametrize("batch_shape", [None, (8, 16), (2, 64)])
+@pytest.mark.parametrize("image_size", [None, 32, 48])
+def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, batch_shape, image_size, actor_critic_gradient):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config['observation_kind'] == f'rgb{image_size or 64}'
+        assert config['loss_scales']['reconstruction'] == 0
+        assert config['loss_scales']['future_prediction'] == 500
+        assert config['encoder_learning_rate'] == 6e-6
+        assert config['dynamics_learning_rate'] == 4e-4
+        assert config['learning_rate'] == 4e-5
+        assert config['actor_critic_gradient'] is actor_critic_gradient
+        assert config['actor_unimix'] == 0
+        assert config['disagreement_bonus'] is (scale > 0)
+        assert config['intrinsic_reward_scale'] == scale
+        assert config['cdp_centered'] is centered
+        if batch_shape is not None:
+            batch, length = batch_shape
+            assert config['batch_size'] == config['world_microbatch_size'] == batch
+            assert config['batch_length'] == config['world_backprop_length'] == length
+            assert batch * length == 128
+        raise RuntimeError('CDP recipe checked before GPU')
+
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct))
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path / 'cdp.jsonl'),
+                                    '--cdp', '--disagreement-scale', str(scale),
+                                    *(['--image-size', str(image_size)] if image_size else []),
+                                    *(['--batch-size', str(batch_shape[0]), '--batch-length', str(batch_shape[1]),
+                                       '--world-microbatch-size', str(batch_shape[0])] if batch_shape else []),
+                                    *(['--cdp-centered'] if centered else []),
+                                    *(['--actor-critic-gradient'] if actor_critic_gradient else [])])
+    with pytest.raises(RuntimeError, match='CDP recipe checked'):
+        atari_vector.main()
+
+
+def test_runner_crop_requires_native_support_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: pytest.fail('must reject before environment'))
+    output = tmp_path / 'never.jsonl'
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(output), '--image-crop', '0', '32', '160', '168'])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert 'requires native RGB crop support' in capsys.readouterr().err
+    assert not output.exists()
+
+
+def test_cropped_restore_rejects_old_native_before_environment(monkeypatch, tmp_path, capsys):
+    checkpoint = tmp_path/'checkpoint'
+    checkpoint.mkdir()
+    (checkpoint/'metadata.json').write_text(json.dumps(dict(config=dict(
+        observation_crop=dict(x=0, y=32, width=160, height=168)))))
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: pytest.fail('must reject before environment'))
+    output = tmp_path/'never.jsonl'
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(output), '--evaluate',
+        '--restore', str(checkpoint), '--observation-size', 'native'])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert 'cropped checkpoint requires native RGB crop support' in capsys.readouterr().err
+    assert not output.exists()
+
+
+@pytest.mark.parametrize('side', [32, 48, 64])
+def test_runner_crop_recipe_and_description_before_gpu(monkeypatch, tmp_path, side):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18), reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, 'DreamerAtariPreprocessing', lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config['observation_crop'] == dict(x=0, y=32, width=160, height=168)
+        assert config['observation_kind'] == f'rgb{side}'
+        description = atari_vector.rgb_preprocessing(config)
+        assert description.startswith('native crop x=0,y=32,width=160,height=168; ')
+        assert description.endswith(atari_vector.rgb_preprocessing(dict(observation_kind=f'rgb{side}')))
+        raise RuntimeError('crop recipe checked before GPU')
+
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct, SUPPORTS_RGB_CROP=True))
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path/'crop.jsonl'),
+        '--cdp', '--image-size', str(side), '--image-crop', '0', '32', '160', '168'])
+    with pytest.raises(RuntimeError, match='crop recipe checked'):
+        atari_vector.main()
+
+
+def test_full_frame_preprocessing_description_stays_unchanged():
+    assert atari_vector.rgb_preprocessing(dict(observation_kind='rgb64')) == (
+        'single GPU Pillow-equivalent antialiased bilinear resize to 64x64, '
+        'per-axis RGB8 rounding; CHW /255-0.5')
+
+
+@pytest.mark.parametrize('restore', [False, True])
+def test_frame_pairs_reject_old_native_before_environment(monkeypatch, tmp_path, capsys, restore):
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: pytest.fail('must reject before environment'))
+    output = tmp_path/'never.jsonl'
+    args = ['--cdp', '--rgb-frame-pair']
+    if restore:
+        checkpoint = tmp_path/'checkpoint'
+        checkpoint.mkdir()
+        (checkpoint/'metadata.json').write_text(json.dumps(dict(config=dict(rgb_frame_pair=True))))
+        args = ['--evaluate', '--restore', str(checkpoint), '--observation-size', 'native']
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert 'requires native RGB frame-pair support' in capsys.readouterr().err
+    assert not output.exists()
+
+
+@pytest.mark.parametrize('side', [32, 48, 64])
+def test_frame_pair_recipe_and_description_before_gpu(monkeypatch, tmp_path, side):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18), reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, 'DreamerAtariPreprocessing', lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config['rgb_frame_pair'] is True
+        assert config['observation_kind'] == f'rgb{side}'
+        assert config['loss_scales']['reconstruction'] == 0
+        assert config['loss_scales']['future_prediction'] > 0
+        assert atari_vector.rgb_preprocessing(config).endswith(
+            '; previous/current RGB pair on GPU, repeat first image on reset')
+        raise RuntimeError('frame-pair recipe checked before GPU')
+
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct, SUPPORTS_RGB_FRAME_PAIR=True))
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path/'pair.jsonl'),
+        '--cdp', '--image-size', str(side), '--rgb-frame-pair'])
+    with pytest.raises(RuntimeError, match='frame-pair recipe checked'):
+        atari_vector.main()
+
+
+def test_frame_pairs_reject_centroid_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(SUPPORTS_COLOR_CENTROID_SUPERVISION=True,
+                                                            SUPPORTS_RGB_FRAME_PAIR=True))
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *_, **__: pytest.fail('must reject before environment'))
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', 'ALE/Breakout-v5', '--output', str(tmp_path/'never.jsonl'),
+        '--cdp', '--rgb-frame-pair', '--breakout-centroid-scale', '1'])
+    with pytest.raises(SystemExit):
+        atari_vector.main()
+    assert 'cannot combine with color-centroid' in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("rate,encoder,dynamics", [
+    (2e-5, 3e-6, 2e-4), (4e-5, 6e-6, 4e-4), (8e-5, 1.2e-5, 8e-4),
+])
+@pytest.mark.parametrize("cdp", [False, True])
+@pytest.mark.parametrize("behavior", [None, 8e-5])
+def test_runner_learning_rate_recipe_before_gpu(monkeypatch, tmp_path, rate, encoder, dynamics, cdp, behavior):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config["learning_rate"] == rate
+        assert config["encoder_learning_rate"] == (encoder if cdp else None)
+        assert config["dynamics_learning_rate"] == (dynamics if cdp else None)
+        assert config["behavior_learning_rate"] == behavior
+        assert config["learning_rate_warmup"] == 1000
+        assert config["optimizer_beta1"] == .9 and config["optimizer_beta2"] == .999
+        assert config["batch_size"] == config["world_microbatch_size"] == 16
+        assert config["batch_length"] == config["world_backprop_length"] == 16
+        assert config["observation_kind"] == "rgb48" and config["train_ratio"] == 32
+        assert config["loss_scales"]["future_prediction"] == (500 if cdp else 0)
+        assert config["loss_scales"]["reconstruction"] == (0 if cdp else 1)
+        assert config["cdp_centered"] is cdp
+        raise RuntimeError("learning rates checked before GPU")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "rate.jsonl"),
+        "--model-size", "4m", "--image-size", "48", "--batch-size", "16", "--batch-length", "16",
+        "--world-microbatch-size", "16", "--train-ratio", "32", "--learning-rate", str(rate),
+        *(["--behavior-learning-rate", str(behavior)] if behavior is not None else []),
+        *(["--cdp", "--cdp-centered"] if cdp else [])])
+    with pytest.raises(RuntimeError, match="learning rates checked before GPU"):
+        atari_vector.main()
+
+
+@pytest.mark.parametrize("rate,dynamics", [(4e-5, 4e-4), (8e-5, 8e-4)])
+@pytest.mark.parametrize("dynamics_override", [None, 1e-4])
+def test_encoder_rate_override_preserves_other_cdp_rates(monkeypatch, tmp_path, rate, dynamics, dynamics_override):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config["encoder_learning_rate"] == 4e-5
+        assert config["dynamics_learning_rate"] == (dynamics if dynamics_override is None else dynamics_override)
+        assert config["learning_rate"] == rate
+        assert config["behavior_learning_rate"] == 2e-5
+        assert config["learning_rate_warmup"] == 1000
+        raise RuntimeError("encoder override checked before GPU")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "encoder.jsonl"),
+        "--cdp", "--cdp-centered", "--encoder-learning-rate", "4e-5",
+        "--learning-rate", str(rate), "--behavior-learning-rate", "2e-5",
+        *(["--dynamics-learning-rate", str(dynamics_override)] if dynamics_override is not None else [])])
+    with pytest.raises(RuntimeError, match="encoder override checked before GPU"):
+        atari_vector.main()
+
+
+@pytest.mark.parametrize("args,message", [
+    *[(["--replay-value-scale", value], "finite and positive in F32")
+      for value in ("0", "-1", "nan", "inf", "1e300", "1e-300")],
+    (["--restore", "unused", "--replay-value-scale", "1"], "training overrides"),
+    (["--restore", "unused", "--replay-value-scale=1"], "training overrides"),
+    (["--evaluate", "--replay-value-scale", "1"], "requires fresh training"),
+])
+def test_replay_value_override_rejects_invalid_runs(monkeypatch, tmp_path, capsys, args, message):
+    output = tmp_path / "never.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2 and not output.exists()
+    assert message in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("cdp", [False, True])
+def test_replay_value_override_changes_only_requested_loss(monkeypatch, tmp_path, cdp):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    configs = []
+
+    def construct(streams, config):
+        configs.append(copy.deepcopy(config))
+        raise RuntimeError("config checked before GPU")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    for scale in (None, 1.0):
+        monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / f"loss-{scale}.jsonl"),
+            *(["--cdp", "--cdp-centered"] if cdp else []),
+            *(["--replay-value-scale", str(scale)] if scale is not None else [])])
+        with pytest.raises(RuntimeError, match="config checked before GPU"):
+            atari_vector.main()
+    default, overridden = configs
+    assert default["loss_scales"]["replay_value"] == kindle.default_config(18)["loss_scales"]["replay_value"]
+    assert overridden["loss_scales"]["replay_value"] == 1.0
+    overridden["loss_scales"]["replay_value"] = default["loss_scales"]["replay_value"]
+    assert overridden == default
+
+
+@pytest.mark.parametrize("args,message", [
+    *[(["--continuation-scale", value], "finite and positive in F32")
+      for value in ("0", "-1", "nan", "inf", "1e300", "1e-300")],
+    (["--restore", "unused", "--continuation-scale", "10"], "training overrides"),
+    (["--restore", "unused", "--continuation-scale=10"], "training overrides"),
+    (["--evaluate", "--continuation-scale", "10"], "requires fresh training"),
+])
+def test_continuation_override_rejects_invalid_runs(monkeypatch, tmp_path, capsys, args, message):
+    output = tmp_path / "never.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2 and not output.exists()
+    assert message in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("cdp", [False, True])
+def test_continuation_override_changes_only_requested_loss(monkeypatch, tmp_path, cdp):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    configs = []
+
+    def construct(streams, config):
+        configs.append(copy.deepcopy(config))
+        raise RuntimeError("config checked before GPU")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    for scale in (None, 1.0, 10.0):
+        monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / f"continuation-{scale}.jsonl"),
+            *(["--cdp", "--cdp-centered"] if cdp else []),
+            *(["--continuation-scale", str(scale)] if scale is not None else [])])
+        with pytest.raises(RuntimeError, match="config checked before GPU"):
+            atari_vector.main()
+    default, explicit_default, stronger = configs
+    assert default["loss_scales"]["continuation"] == kindle.default_config(18)["loss_scales"]["continuation"] == 1.0
+    assert explicit_default == default
+    assert stronger["loss_scales"]["continuation"] == 10.0
+    stronger["loss_scales"]["continuation"] = 1.0
+    assert stronger == default
+
+
+@pytest.mark.parametrize("args,message", [
+    *[(["--reward-scale", value], "finite and positive in F32")
+      for value in ("0", "-1", "nan", "inf", "1e300", "1e-300")],
+    (["--restore", "unused", "--reward-scale", "10"], "training overrides"),
+    (["--restore", "unused", "--reward-scale=10"], "training overrides"),
+    (["--evaluate", "--reward-scale", "10"], "requires fresh training"),
+])
+def test_reward_override_rejects_invalid_runs(monkeypatch, tmp_path, capsys, args, message):
+    output = tmp_path / "never.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2 and not output.exists()
+    assert message in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("cdp", [False, True])
+def test_reward_override_changes_only_requested_loss(monkeypatch, tmp_path, cdp):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    configs = []
+
+    def construct(streams, config):
+        configs.append(copy.deepcopy(config))
+        raise RuntimeError("config checked before GPU")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    for scale in (None, 1.0, 10.0):
+        monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / f"reward-{scale}.jsonl"),
+            *(["--cdp", "--cdp-centered"] if cdp else []),
+            *(["--reward-scale", str(scale)] if scale is not None else [])])
+        with pytest.raises(RuntimeError, match="config checked before GPU"):
+            atari_vector.main()
+    default, explicit_default, stronger = configs
+    assert default["loss_scales"]["reward"] == kindle.default_config(18)["loss_scales"]["reward"] == 1.0
+    assert explicit_default == default
+    assert stronger["loss_scales"]["reward"] == 10.0
+    stronger["loss_scales"]["reward"] = 1.0
+    assert stronger == default
+
+
+@pytest.mark.parametrize("cdp", [False, True])
+def test_replay_bootstrap_override_changes_only_requested_target(monkeypatch, tmp_path, cdp):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    configs = []
+
+    def construct(streams, config):
+        configs.append(copy.deepcopy(config))
+        raise RuntimeError("config checked before GPU")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct,
+                       SUPPORTS_REPLAY_VALUE_BOOTSTRAP=True))
+    for mode in (None, "imagined", "posterior"):
+        monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / f"bootstrap-{mode}.jsonl"),
+            *(["--cdp", "--cdp-centered"] if cdp else []),
+            *(["--replay-value-bootstrap", mode] if mode is not None else [])])
+        with pytest.raises(RuntimeError, match="config checked before GPU"):
+            atari_vector.main()
+    default, imagined, posterior = configs
+    assert default["replay_value_bootstrap"] == "imagined" and imagined == default
+    assert posterior["replay_value_bootstrap"] == "posterior"
+    posterior["replay_value_bootstrap"] = "imagined"
+    assert posterior == default
+
+
+def test_replay_bootstrap_rejects_older_runtime_before_environment(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace())
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: pytest.fail("environment constructed"))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "unsupported.jsonl"),
+                                    "--replay-value-bootstrap", "posterior"])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert "requires native bootstrap support" in capsys.readouterr().err
+
+
 def test_feature_vector_rejects_invalid_config_before_gpu():
     config = kindle.default_config(6, "tiny")
     with pytest.raises(ValueError, match="at least one"):
@@ -34,6 +743,32 @@ def test_feature_vector_rejects_invalid_config_before_gpu():
     config["batch_size"] = 0
     with pytest.raises(ValueError, match="batch_size"):
         kindle.FeatureVectorAgent(4, config)
+
+
+@pytest.mark.parametrize("precision", ["auto", "f32", "f16", "bf16", "mixed"])
+def test_learned_rgb_api_checks_kind_and_capacity_before_gpu(precision):
+    config = kindle.default_config(6, "tiny")
+    config["training_precision"] = precision
+    with pytest.raises(RuntimeError, match="observation_kind"):
+        kindle.VectorAgent.learned_rgb(2, config)
+    config["observation_kind"] = "rgb64"
+    with pytest.raises(RuntimeError, match="at least one"):
+        kindle.VectorAgent.learned_rgb(0, config)
+    with pytest.raises(ValueError, match="FeatureVectorAgent"):
+        kindle.FeatureVectorAgent(2, config)
+    config["loss_scales"]["future_prediction"] = .25
+    with pytest.raises(RuntimeError, match="RGB learning"):
+        kindle.VectorAgent.learned_rgb(2, config)
+
+
+@pytest.mark.parametrize("args", [["--observation-size", "64"], ["--encoder", "levjepa-tiny"]])
+def test_learned_rgb_rejects_double_resize_or_frozen_encoder(monkeypatch, tmp_path, capsys, args):
+    output = tmp_path / "never.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2 and not output.exists()
+    assert "one GPU resize" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("encoder", ["levjepa-tiny-ish", "dinov3"])
@@ -62,7 +797,7 @@ def test_restore_rejects_changed_encoder_before_outputs(monkeypatch, tmp_path, c
     checkpoint.mkdir()
     (checkpoint / "metadata.json").write_text(json.dumps({"perception": {"kind": recorded}}))
     output = tmp_path / "unused.jsonl"
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(output),
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--encoder-checkpoint", "unused", "--output", str(output),
                                     "--restore", str(checkpoint), "--encoder", requested])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
@@ -74,11 +809,12 @@ def test_restore_rejects_changed_encoder_before_outputs(monkeypatch, tmp_path, c
     (["--steps", "7", "--num-envs", "2"], "multiple"),
     (["--num-envs", "0"], "multiple"),
     (["--greedy"], "frozen evaluation"),
+    (["--probe-behavior"], "frozen evaluation"),
     (["--world-microbatch-size", "0"], "must be positive"),
     (["--restore", "unused", "--batch-size", "32"], "overrides require a fresh run"),
 ])
 def test_runner_rejects_ambiguous_budgets_before_gpu(monkeypatch, capsys, tmp_path, args, message):
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(tmp_path / "log.jsonl"), *args])
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "log.jsonl"), *args])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
     assert error.value.code == 2
@@ -92,7 +828,7 @@ def test_runner_rejects_ambiguous_budgets_before_gpu(monkeypatch, capsys, tmp_pa
 ])
 def test_profiler_rejects_unusable_windows_before_starting_jobs(monkeypatch, capsys, tmp_path, args, message):
     directory = tmp_path / "matrix"
-    monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", "unused", str(directory), *args])
+    monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", str(directory), *args])
     with pytest.raises(SystemExit) as error:
         profile_atari_vector.main()
     assert error.value.code == 2
@@ -100,9 +836,11 @@ def test_profiler_rejects_unusable_windows_before_starting_jobs(monkeypatch, cap
     assert not directory.exists()
 
 
-def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkeypatch, tmp_path):
+@pytest.mark.parametrize("weights", [None, "unused"])
+def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkeypatch, tmp_path, weights):
     directory = tmp_path / "matrix"
-    monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", "unused", str(directory), "--num-envs", "2"])
+    monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", str(directory), "--num-envs", "2",
+                                    *(["--encoder-checkpoint", weights] if weights else [])])
     def no_monitor(*_args, **_kwargs):
         pytest.fail("profiler must not spawn an NVML monitor")
     monkeypatch.setattr(profile_atari_vector.subprocess, "Popen", no_monitor)
@@ -113,6 +851,9 @@ def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkey
     results = json.loads((directory / "summary.json").read_text())
     assert results[0]["status"] == "failed"
     assert results[0]["num_envs"] == 2 and results[0]["exit_code"] == 1
+    assert ("--encoder-checkpoint" in results[0]["command"]) == (weights is not None)
+    if weights:
+        assert results[0]["command"][-2:] == ["--encoder-checkpoint", weights]
     assert "actions_per_second" not in results[0]
     assert not list(directory.glob("*.gpu.csv"))
 
@@ -166,6 +907,52 @@ def test_vector_accounting_keeps_reset_records_out_of_action_credit(tmp_path):
     assert result["updates"] == 3
     assert result["positive_return_natural_episodes"] == 1
     assert "natural_wins" not in result
+
+
+@pytest.mark.parametrize("mode", ["frozen", "joint"])
+@pytest.mark.parametrize("capacity,reset,ready_ticks", [
+    (160, False, set(range(31, 65))),
+    (160, True, set(range(25, 65))),
+    (48, False, set(range(31, 39)) | set(range(47, 55)) | {63, 64}),
+])
+def test_video_audit_uses_complete_chunks_context_resets_and_eviction(tmp_path, mode, capacity, reset, ready_ticks):
+    rows = fixture_events()[:1]
+    rows[0]["steps"] = 128
+    rows[0]["config"].update(video_encoder=mode, batch_length=16, train_ratio=4., replay_capacity=capacity)
+    updates, credit, started = 0, 0., False
+    for tick in range(1, 65):
+        done = reset and tick == 10
+        rows.append(dict(event="transition", run_step=2*tick, vector_tick=tick,
+                         actions=[0, 0], rewards=[0., 0.], stored_rewards=[[0., 0.], [0., 0.]],
+                         terminated=[done, False], truncated=[False, False], executed_action_frames=[4*tick]*2))
+        length = min(capacity, 2+2*tick+int(reset and tick > 10))
+        if started:
+            credit += .5
+        if tick in ready_ticks:
+            if not started:
+                started, credit = True, 1.
+            while credit >= 1:
+                updates += 1
+                credit -= 1
+                rows.append(dict(event="learner", run_step=2*tick,
+                                 report=dict(learner_step=updates, replay_len=length)))
+        if done:
+            rows.extend([dict(event="episode", run_step=20, stream_step=10, stream=0, episode=0,
+                              episode_return=0., episode_length=10, terminated=True, truncated=False),
+                         dict(event="reset", run_step=20, streams=[0])])
+    rows.append(dict(event="run_end", run_step=128, vector_ticks=64, environment_step=128,
+                     learner_step=updates, learner_updates=updates, replay_len=min(capacity, 130+int(reset)),
+                     training_debt=credit, executed_action_frames=[256]*2, total_rewards=[0., 0.],
+                     episode_counts=[int(reset), 0], partial_returns=[0., 0.], partial_lengths=[54 if reset else 64, 64],
+                     stage_seconds={}, elapsed_seconds=128., actions_per_second=1.,
+                     aggregate_simulated_wall_ratio=512/60/128, per_stream_simulated_wall_ratio=[256/60/128]*2,
+                     reason="budget_complete", completed_games=int(reset), natural_wins=0,
+                     mean_completed_return=0. if reset else None))
+    assert audit(write_log(tmp_path, rows))["updates"] == (20 if reset else 17)
+    # A false overlapping-window interpretation must not accept this ledger.
+    rows[0]["config"]["video_encoder"] = None
+    with pytest.raises(ValueError, match="incomplete vector round|unexpected learner"):
+        audit(write_log(tmp_path, rows))
 
 
 def version_two_events():
@@ -233,12 +1020,16 @@ def test_episode_summary_requires_actual_boolean_boundaries(terminal, truncated)
 
 
 @pytest.mark.parametrize("behavior", ["default", "exploration", "ignored_override"])
+@pytest.mark.parametrize("training_action_mode", [None, "greedy"])
 @pytest.mark.parametrize("memory_enabled", [False, True])
-@pytest.mark.parametrize("encoder_kind", [None, "levjepa-tiny"])
-@pytest.mark.parametrize("observation_size", [None, "64"])
+@pytest.mark.parametrize("encoder_kind,observation_size", [
+    (None, None), (None, "64"), ("levjepa-tiny", None), ("levjepa-tiny", "64"),
+    ("learned-cnn", None), ("cdp-disagreement", None)])
 @pytest.mark.parametrize("sticky_actions", [0.0, 0.25])
-def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled, encoder_kind, observation_size, sticky_actions):
+def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled, encoder_kind, observation_size, sticky_actions, training_action_mode):
     created = []
+    learned = encoder_kind in ("learned-cnn", "cdp-disagreement")
+    disagreement = encoder_kind == "cdp-disagreement"
 
     class Environment:
         action_space = SimpleNamespace(n=2)
@@ -278,10 +1069,21 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
             assert encoder == (encoder_kind or "levjepa")
             self.streams, self.config = streams, config
 
+        @classmethod
+        def learned_rgb(cls, streams, config):
+            assert learned
+            assert config["observation_kind"] == "rgb64"
+            assert config["loss_scales"]["reconstruction"] == (0 if disagreement else 1)
+            assert config["loss_scales"]["future_prediction"] == (500 if disagreement else 0)
+            assert config["disagreement_bonus"] is disagreement
+            assert config["intrinsic_reward_scale"] == int(disagreement)
+            return cls(None, streams, config, encoder=encoder_kind)
+
         def begin_episodes(self, ids, frames):
             self.replay_len += len(ids)
 
         def act(self, *, greedy, action_overrides=None):
+            assert greedy == (training_action_mode == "greedy")
             if behavior == "default":
                 assert action_overrides is None
                 self.selected = [0] * self.streams
@@ -311,14 +1113,20 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
         return env
 
     output = tmp_path / "vector.jsonl"
+    loaded_wrapper = tmp_path / "loaded_atari.py"
+    loaded_wrapper.write_text("independently loaded wrapper fixture")
+    monkeypatch.setattr(atari_vector.atari, "__file__", str(loaded_wrapper))
     monkeypatch.setattr(atari_vector.gym, "make", make)
     monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", wrap)
     monkeypatch.setattr(kindle, "VectorAgent", Agent)
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "ALE/Seaquest-v5",
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "ALE/Seaquest-v5",
+        *([] if learned else ["--encoder-checkpoint", "unused"]),
+        *(["--cdp", "--cdp-centered", "--disagreement-scale", "1"] if disagreement else []),
         "--output", str(output), "--steps", "6", "--num-envs", "2", "--train-ratio", "0",
         "--sticky-actions", str(sticky_actions),
+        *(["--training-action-mode", training_action_mode] if training_action_mode else []),
         *(["--observation-size", observation_size] if observation_size else []),
-        *(["--encoder", encoder_kind] if encoder_kind else []),
+        *(["--encoder", encoder_kind] if encoder_kind and not learned else []),
         *(["--min-gpu-budget-headroom-mib", "2048"] if memory_enabled else []),
         *([] if behavior == "default" else ["--exploration-probability", "1", "--exploration-hold", "4"])])
     if behavior == "ignored_override":
@@ -341,6 +1149,9 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     rows = [json.loads(line) for line in output.read_text().splitlines()]
     assert rows[0]["observation_size"] == (observation_size or "native")
     assert rows[0]["sticky_actions"] == sticky_actions
+    assert rows[0].get("training_action_mode") == training_action_mode
+    assert rows[0]["wrapper_sha256"] == atari_vector.sha256_file(loaded_wrapper)
+    assert ("learned_rgb_preprocessing" in rows[0]) == learned
     assert rows[0]["protocol"] == (VECTOR_PROTOCOL if behavior == "default" else EXPLORATION_PROTOCOL)
     assert "natural_wins" not in rows[-1] and "completed_games" not in rows[-1]
     result = audit(output)
@@ -350,12 +1161,14 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     assert result["completed_episodes"] == result["positive_return_natural_episodes"] == 2
     assert result["mean_completed_return"] == 40
     assert rows[-1]["partial_returns"] == [20, 20] and rows[-1]["partial_lengths"] == [1, 1]
+    assert all(0 < row["elapsed_seconds"] <= rows[-1]["elapsed_seconds"]
+               for row in rows if row["event"] == "episode")
     assert len(created) == 2 and all(env.closed for env in created)
 
 
 def test_restore_requires_explicit_pixel_protocol_before_outputs(monkeypatch, tmp_path, capsys):
     output = tmp_path / "log.jsonl"
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(output),
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output),
                                     "--restore", "unused"])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
