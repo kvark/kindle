@@ -1,4 +1,4 @@
-# Motion-weighted future images improve recorded tracking but fail fixed action branches
+# Motion-weighted forecasts improve short tracking but fail long-horizon retention
 
 The [motion-weighted rollout experiment](../experiments/2026-11-07-breakout-world-motion-rollout.md)
 is **closed and fails retention**. Recorded development eight-step ball accuracy
@@ -7,11 +7,18 @@ one-step forecasts and bricks regress. On the retained fixed-action oracle,
 primary long-horizon ball-feature error worsens **84.05%**, with new false endings.
 Keep the coverage control; no extension or replacement is selected.
 
-This establishes a useful distinction: direct future-image training can improve
-recorded trajectories without producing better prospective action-conditioned
-futures. It does not establish whether feedback-control information, coverage,
-uncertainty, decoder averaging or other optimization effects cause that gap.
-The full world-model goal remains active and unproven. Actor/critic stays parked.
+Direct future-image training improves some short tracking measurements while
+long-horizon distributions, object presence and event calibration remain weak.
+Whether feedback-control information, coverage, uncertainty, decoder averaging
+or other optimization effects cause the remaining errors is unresolved. The full
+world-model goal remains active and unproven. Actor/critic stays parked.
+
+The later [matched-metric action audit](2026-11-07-breakout-world-action-gap.md)
+clarifies that some fixed-action point tracking also improves at8/16. The failed
+primary energy mixes different horizons,missing detections and event weights;
+it did not establish that all short-term gains failed to transfer. Thirty-two-step
+tracking and unwanted action sensitivity remain clear failures. Original scores,
+gates and failed retention status are unchanged.
 
 ## Fixed intervention and identity
 

@@ -21,62 +21,57 @@ one-step94/109,eight-step14/107. Source/native3fa37b6d,SHAeafe8359,matching runt
 `/mnt/data/kindle-breakout-world-motion-20261107/runtime`. Accurate long futures,
 reward/event timing and brick memory remain weak; do not promote on reconstruction.
 
-The [ST energy](results/2026-11-07-breakout-world-energy.md) and
-[score-function](results/2026-11-07-breakout-world-score-function.md) learners
-are closed. ST learns ending endpoints but harms tracking and has65/304 non-ending
-cases>5% ending probability at32. Corrected conditional derivatives pass yet
-learning regresses severely. The [fixed-gradient audit](results/2026-11-07-breakout-world-gradient-noise.md)
-finds prior variance550–893× ST; LaProp moments were not raw-gradient/AGC-saturation
-proof. Preserve all original errors/repairs,including ST's wrong41/41 Python-count
-claim(actual27/27) and the invalid FIRE90% pair-match criterion. No old stages rerun.
-The [CPU readout diagnosis](results/2026-11-07-breakout-world-readout-diagnosis.md)
-finds short-term motion but no simple position-head rescue; failure does not prove
-information absent.
+The completed [loss experiments](results/2026-11-07-breakout-world-motion-rollout.md)
+remain closed and failed retention. Motion-weighted H16 RGB targets improve
+recorded eight-step tracking 14→25/107 but regress observed/one-step tracking,
+bricks, ending calibration and primary 16/32 energy. Retain the coverage control;
+do not repeat or extend completed learners. Linked reports preserve all earlier
+ST/score-function, latent/recurrent-energy, readout and state-substitution results,
+including original failures and separate repairs.
+The [gradient-noise audit](results/2026-11-07-breakout-world-gradient-noise.md),
+[future-informed state substitutions](results/2026-11-07-breakout-world-state-swap.md)
+and [CPU drift decomposition](results/2026-11-07-breakout-world-drift-components.md)
+remain diagnostics, not learned competence or grounds for a repeat.
 
-The [latent-overshooting learner](results/2026-11-07-breakout-world-overshooting.md)
-is closed and fails retention: fresh8,192 updates improve four-step33→43/109,
-but eight-step14→7/107 and primary energy improves4.34%,not25%. Ending32 Brier
-.003192 and low false alarms improve,but RIGHT16 predicts73.352% ending versus
-oracle0%; event timing/reward remain wrong. Sourcee311b216/native965f2bd2,matching
-root/runtime `/mnt/data/kindle-breakout-world-overshooting-20261107`. All execution
-checks pass; do not replace the trajectory control or extend this recipe.
+The [CPU action-gap audit](results/2026-11-07-breakout-world-action-gap.md)
+is closed. Matching metrics/horizons shows some short gains also transfer to fixed
+plans: supported visible-ball pair accuracy at 8/16 improves 22.45→27.51% /
+20.22→39.63%; at 32 it falls 5.90→0.29%. These are related model/oracle pairs,
+not independent episodes or calibrated distribution scores. In eight verified
+freeflight histories, all four oracle plans have identical ball paths through 8,
+but the new model renders a ball in 64/64 NOOP versus 41/64 RIGHT images. Fixed
+commands have nonzero but uneven fitting support. No checked source/data layout
+bug is identified; native argument buffers were not retained. This narrows the
+previous recorded-control/fixed-action framing without changing any failed gate.
+877 input pins, 210 endpoint identities, 336 cached-feature checks and 140 energy
+cells pass. Three full causal APNGs use retained arrays, with no new queries.
 
-The [state substitutions](results/2026-11-07-breakout-world-state-swap.md)
-repair newer-model eight-step readouts 8→90/108 with future-informed h, versus
-12/108 with future-informed z. These hybrids never feed rollouts and do not prove
-learned improvement or causal attribution. Past categorical errors can cause drift.
-The [recurrent-energy learner](results/2026-11-07-breakout-world-recurrent-energy.md)
-is closed: one-step 88/109, eight-step 13/107, primary energy gain 22.11% below 25%,
-and false early endings. Retain the coverage control; do not extend that recipe.
+The [paired fitting-action collection](results/2026-11-07-breakout-world-paired-actions-data.md)
+is complete: 56 fitting-only parents, 448 branches, 13,068 new actions / 52,122
+emulator frames in 228.179s. Source/restore replay adds 503,280 actions / 2,012,229
+frames, counted separately. All 14,336 shared prefix arrivals and valid future
+commands/terminals/counts pass independent CPU review; 84 terminal branches are
+retained without fake futures. All eight fitting freeflight parents have identical
+finite reference ball paths across four repeat0 plans through 16 decisions.
+Repeat0 shares parent RNG; repeat1 evolves per plan and is not common RNG or
+independent. No development/oracle source selected parents; cross-split identical-
+history exclusion was not separately tested. These are reused fitting families.
 
-The [CPU drift decomposition](results/2026-11-07-breakout-world-drift-components.md)
-is closed: 82–86% empirical mean-delta share at 8/16 in two older checkpoints,
-75–82% after finite-draw correction. Shared learned drift warrants investigation
-before suppressing sampling, without a causal/physical-error fraction claim.
-106 input/four output pins,6,144 algebra identities pass; no new native query.
-Preserve its first mutable-source-pin declaration failure and archive-based repair.
+Root `/mnt/data/kindle-breakout-world-paired-actions-20261107`; reuse motion-rollout
+native `5b112866` and matching runtime. Zero predictions/updates, 204 unchanged
+camera tensors, 1,792 exact native-resize prefix images, 167 input/677 output pins,
+nine CPU collector checks and host guard pass. CPU review takes 96.815s. Preserve
+the parent JSON/112-file repair and first base-interpreter NumPy launch failure;
+the separately declared invocation repair ran only the still-unstarted collection.
+No completed collector or learner repeats; no GPU worker is active.
 
-The [motion-weighted future-image learner](results/2026-11-07-breakout-world-motion-rollout.md)
-is closed and fails retention. Direct causal H16 motion-weighted RGB supervision
-improves recorded development eight-step 14→25/107, 16-step 3→10/114, 32-step 0→4/95,
-but observed 108→99/112, one-step 94→84/109 and bricks regress. Fixed-action primary
-ball energy worsens 84.05% to .311977; 23/304 non-ending cases exceed 5% ending
-probability, max 43.84%. Ending 16 timing passes, ending 32 Brier .189225 fails.
-Native 765.720s/loop 1,105.997s cost 44.61%/38.79% more. Retain coverage control;
-no extension or replacement. Recorded-control gains do not establish causal
-forecasting; coverage, uncertainty and feedback-control information remain questions.
-A post-hoc threshold-free peak only raises 8-step 25→27/107 and 32-step 4→7/95;
-no brightness-only rescue or new scoring gate.
-
-Root `/mnt/data/kindle-breakout-world-motion-rollout-20261107`, source `85dbe150`,
-native SHA `5b112866`, matching root/runtime. 62 CPU world/55 selected/55 packaged
-Python checks and strict Clippy pass; 86 qualification/95 learning/1,280 branch
-pins, five guards/45 sealed pins, 204 initial/frozen tensors and 18 restore arrays
-pass. Preserve the first Python source-package fixture error(54 pass/one error)
-and corrected 55/packaged 55 completion; no native stage repeats. Separate 1.276GB
-cache release preserves the original build receipt. All stages closed; no Kindle
-GPU worker, collector, actor/critic, unchanged extension or successor active/selected.
-Investigate the recorded-control/fixed-action gap before another learner.
+Next implement/pin the fixed paired/original/wait/terminal sampler and qualify
+one full-shape native update, then separately declare the bounded fresh H16
+learner/restore/new-checkpoint assessment from the
+[protocol](experiments/2026-11-07-breakout-world-paired-actions.md).
+No model improvement is established by collecting data. Keep all original quality
+gates plus per-plan freeflight ball presence at 8 >=90%; position/calibration,
+late coverage and fresh confirmation remain necessary. No automatic successor.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
