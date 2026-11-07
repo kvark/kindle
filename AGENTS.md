@@ -26,30 +26,28 @@ CNN/categorical RSSM/RGB decoder as the inspectable reference; CDP is a later
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-Select the [fixed observation-filter phase](docs/experiments/2026-11-07-breakout-world-fixed-teacher.md)
-for native qualification, then a separately declared bounded learning check.
-Freeze an independent copy of the retained H0 filter, including recurrence;
-train separate forecast dynamics in those coordinates with existing categorical
-overshooting KL and recurrent-state energy. Keep36 visual weights fixed;32
-forecast/head weights learn. This combines several changes and adds filter
-inference/memory; it does not isolate target drift. Root
-`/mnt/data/kindle-breakout-world-fixed-teacher-20261107`.
+The [fixed observation-filter phase](docs/results/2026-11-07-breakout-world-fixed-teacher.md)
+is closed and fails retention. Frozen independent H0 filter plus separately
+learned forecast dynamics improve recorded dev one/eight94/109→98/109 and
+14/107→17/107; observed108/112 stays exact. Primary16/32 ball energy improves
+16.58%(.169502→.141405),misses25% threshold. RIGHT freeflight8 presence48/64
+and ending32 Brier.334714 fail; early ending16 improves. Keep coverage.
+No repeat,extension,sweep or automatic successor; full goal remains unproven.
 
-Native qualification is complete on source8c6fbae2/SHA b40c9d2b:484 input pins,
-204 inherited tensors,18 initial/restored arrays,two finite14-report updates,
-all32 active weights changed and36 visual weights exact. Prefix/lane checks,
-fixed GPU filter/targets after updates and restore,observed visual arrays and
-old-native v6 rejection pass. Preserve the failed construction and mask qualifiers
-and separate CPU corrections at the two earlier roots; neither is relabeled.
+Root `/mnt/data/kindle-breakout-world-fixed-targets-20261107`; native/source/runner
+8c6fbae2,SHA b40c9d2b. New4096 warm updates8192→12288,original first4096 plan rows,
+384 dense-initial origins;36 visual weights and full filter fixed,32 active weights
+changed.112 CPU/88 Python checks,strict Clippy,484 qualification/491 learning/
+920 branch pins,18 restore arrays,four successful guards/36 sealed files and
+2465-pin closure pass. Original two failed qualifiers and separate CPU/report
+corrections stay preserved. No native worker remains active.
 
-The separately declared4096-update warm phase(global8192→12288) and final restore
-are active under the host guard. Root
-`/mnt/data/kindle-breakout-world-fixed-targets-20261107`; exact original first4096
-plan rows,384 matched dense-initial/final origins,RGB64/B8/T32/Auto. Teacher adds
-39 logical/6,203,136 scalar parameter copies and35,799,168 session allocation bytes
-(excluding driver/staging; not peak or exact total-system increment). The original
-106,261,452-byte anchor includes optimizer state. Include inherited H0 training
-cost. No new emulator actions/data/actor/critic; physical competence is pending.
+New native388.861s/loop459.954s plus inherited529.515s/796.900s;482.530s observed
+worker span includes construction/dense-initial/pinning/polling; frozen84 groups
+135.799s outside learning timers. Extra filter6,203,136 scalar copies/session
+35,799,168 bytes(not peak or exact total-system increment),plus106,261,452-byte
+anchor. The834,940,974-byte cache is released; wheels/runtimes/checkpoints retained.
+Detailed gates,per-action regressions,cost limits and causal clips are linked.
 
 Retain the [coverage H0 control](docs/results/2026-11-07-breakout-world-coverage.md):
 observed108/112,one94/109,eight14/107. Source/native3fa37b6d,SHAeafe8359,

@@ -2,22 +2,32 @@
 
 ## Selected direction: Breakout world model in isolation
 
-The [fixed observation-filter phase](experiments/2026-11-07-breakout-world-fixed-teacher.md)
-is natively qualified on8c6fbae2/SHA b40c9d2b after separately preserved failed
-construction/mask qualifiers. Complete anchor validation/independent copy and
-distinct rollout masks repair composition; original failures remain failed.
-484 pins,204 inherited tensors,18 initial/restore arrays,two finite14-report
-updates,32 active changed/36 fixed visual weights,causality/lane/fixed-filter and
-legacy v6 rejection pass.112 affected Rust CPU/88 packaged Python checks and
-strict Clippy pass,with original CPU fixture/import/style/borrow failures retained.
+The [fixed observation-filter phase](results/2026-11-07-breakout-world-fixed-teacher.md)
+is closed and fails retention. Warm4096 updates8192→12288 with an independent
+fixed H0 filter,36 fixed visual weights and32 learned forecast/head weights
+improve recorded dev observed/one/eight108/112,98/109,17/107 versus108/112,94/109,
+14/107. Primary16/32 ball energy.141405 is16.58% better than.169502 H0,but misses
+25%; RIGHT freeflight8 presence48/64 and ending32 Brier.334714 fail. Early ending16
+Brier.000253/RIGHT16 mean.024970 improve;0/304 non-ending cases>5%,max3.265%.
+All per-action/horizon reward/paddle/brick regressions stay retained. Keep coverage;
+no unchanged extension,repeat,sweep or automatic successor. Full goal unproven.
 
-The separately declared4096-update warm phase(global8192→12288) is active,then
-restore and separately reviewed new-final-only84 groups. No new data or behavior.
-Extra fixed filter39 logical/6,203,136 scalar copies/35,799,168 session allocation
-bytes(excluding driver/staging/not peak),106,261,452-byte anchor,plus inherited H0
-cost. Root `/mnt/data/kindle-breakout-world-fixed-targets-20261107`. Fixed filter
-weights/coordinates do not mean unchanged random realizations; per-lane target
-seeds depend solely on seed/age. Full physical competence remains unproven.
+Native/source/runner8c6fbae2,SHA b40c9d2b,root
+`/mnt/data/kindle-breakout-world-fixed-targets-20261107`.112 affected CPU/88 packaged
+Python/strict Clippy,484 qualification/491 learning/920 frozen branch pins,
+204 inherited/frozen tensors,384 dense-initial origins,108 cached initial arrays,
+24 fixed visual arrays,18 final restore arrays and four guards/36 sealed files
+pass.2465-pin closure plus separate one-cell report correction preserve original
+failed construction/mask qualifiers and CPU fixture/style/import/borrow failures.
+No full learner/collector or old-model assessment repeats. Source archives and
+useful checkpoints retained;834,940,974-byte build cache released.
+
+Incremental native388.861s/loop459.954s plus inherited529.515s/796.900s;
+observed worker482.530s includes construction/dense-initial/pins/polling; frozen
+84 groups135.799s separate. Extra teacher39 logical/6,203,136 scalar copies and
+35,799,168 session allocation bytes(excludes driver/staging/not peak/exact system
+increment),106,261,452-byte anchor. Warm/development and coupled-loss/filter limits
+remain explicit; no learning-per-hour or reliability claim. All services terminal.
 
 The user selected this direction after pausing the five-game campaign. Treat
 world-model competence as the immediate objective. Gameplay score is a later
