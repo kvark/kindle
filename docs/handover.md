@@ -23,15 +23,21 @@ forecast/head weights learn. This combines several changes and adds filter
 inference/memory; it does not isolate target drift. Root
 `/mnt/data/kindle-breakout-world-fixed-teacher-20261107`.
 
-Initial native qualification failed at construction before any update: a full
-training checkpoint cannot load directly into a subset inference plan. Preserve
-`/mnt/data/kindle-breakout-world-fixed-teacher-20261107`. The separate loader repair
-validates the complete training plan, then copies matching weights into an
-independently allocated filter and verifies GPU values. The separate loader check reached the first update, then failed its mask report;
-the combined losses had16 duplicate input names. Preserve that failed guard.
-Distinct masks and a unique-input CPU assertion are in preparation at
-`/mnt/data/kindle-breakout-world-fixed-targets-20261107`. No full learner has run.
-Original CPU fixture/style/import and Rust borrow-check failures remain retained.
+Native qualification is complete on source8c6fbae2/SHA b40c9d2b:484 input pins,
+204 inherited tensors,18 initial/restored arrays,two finite14-report updates,
+all32 active weights changed and36 visual weights exact. Prefix/lane checks,
+fixed GPU filter/targets after updates and restore,observed visual arrays and
+old-native v6 rejection pass. Preserve the failed construction and mask qualifiers
+and separate CPU corrections at the two earlier roots; neither is relabeled.
+
+The separately declared4096-update warm phase(global8192→12288) and final restore
+are active under the host guard. Root
+`/mnt/data/kindle-breakout-world-fixed-targets-20261107`; exact original first4096
+plan rows,384 matched dense-initial/final origins,RGB64/B8/T32/Auto. Teacher adds
+39 logical/6,203,136 scalar parameter copies and35,799,168 session allocation bytes
+(excluding driver/staging; not peak or exact total-system increment). The original
+106,261,452-byte anchor includes optimizer state. Include inherited H0 training
+cost. No new emulator actions/data/actor/critic; physical competence is pending.
 
 Retain the [coverage H0 control](results/2026-11-07-breakout-world-coverage.md):
 observed108/112,one94/109,eight14/107. Source/native3fa37b6d,SHAeafe8359,

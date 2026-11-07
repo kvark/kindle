@@ -3,14 +3,21 @@
 ## Selected direction: Breakout world model in isolation
 
 The [fixed observation-filter phase](experiments/2026-11-07-breakout-world-fixed-teacher.md)
-is selected for native qualification before a separately declared4096-update
-warm learning check. An immutable H0 filter supplies observation states/targets;
-separate forecast dynamics learn in that coordinate system. Existing H16 latent
-KL and recurrent energy are combined,visual36 weights fixed,32 dynamics/head
-weights trainable. Extra filter compute/memory and inherited H0 cost are explicit.
-No native allocation is declared yet; CPU checks/packaging precede qualification.
-Original fixture/style/import failures remain preserved. Full competence unproven;
-previous-frame and all completed learners remain closed,coverage remains retained.
+is natively qualified on8c6fbae2/SHA b40c9d2b after separately preserved failed
+construction/mask qualifiers. Complete anchor validation/independent copy and
+distinct rollout masks repair composition; original failures remain failed.
+484 pins,204 inherited tensors,18 initial/restore arrays,two finite14-report
+updates,32 active changed/36 fixed visual weights,causality/lane/fixed-filter and
+legacy v6 rejection pass.112 affected Rust CPU/88 packaged Python checks and
+strict Clippy pass,with original CPU fixture/import/style/borrow failures retained.
+
+The separately declared4096-update warm phase(global8192→12288) is active,then
+restore and separately reviewed new-final-only84 groups. No new data or behavior.
+Extra fixed filter39 logical/6,203,136 scalar copies/35,799,168 session allocation
+bytes(excluding driver/staging/not peak),106,261,452-byte anchor,plus inherited H0
+cost. Root `/mnt/data/kindle-breakout-world-fixed-targets-20261107`. Fixed filter
+weights/coordinates do not mean unchanged random realizations; per-lane target
+seeds depend solely on seed/age. Full physical competence remains unproven.
 
 The user selected this direction after pausing the five-game campaign. Treat
 world-model competence as the immediate objective. Gameplay score is a later
