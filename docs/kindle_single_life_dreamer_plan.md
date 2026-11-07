@@ -49,14 +49,21 @@ weights use real past frames only; reward/continuation are sampled from their
 existing heads/encoded targets. Native categorical gradients remain straight-through
 surrogates. No new parameters/inputs; unchanged posterior losses. Explicit
 `predictive_motion_energy`,13 reports; no actor/critic or collector.
-Root `/mnt/data/kindle-breakout-world-energy-20261107`. 43 CPU world tests(21 GPU tests ignored),41 affected Python checks and strict
-workspace/bindings Clippy pass. Preserve initial derivative-fixture rounding,
-missing-test-path and package-path failures with their repairs. Next build/package,
-pin identities and run only the declared
-new native F64 fixture and one-update/frozen/restore preflight. No GPU allocation
-or full learner is active/selected. After qualification review separately declare
-fixed8,192 updates on the exact coverage data/plan. Full goal,untouched tests,
-late-game/second-wall coverage,brick memory and fresh confirmation stay unfinished.
+Root `/mnt/data/kindle-breakout-world-energy-20261107`. Native/source161839d9,
+SHA8d5552e5,matching root/runtime.43 CPU world tests,41 affected and packaged
+Python checks,strict workspace/bindings Clippy pass. Preserve initial CPU fixture/
+path failures and repairs. New native F64 energy fixture and full-size preflight
+pass,77 input pins,two clean guards/sealed audits,204 initial/frozen tensors,
+18 initial/restore arrays and65 expected first-update changes. Old observed
+components match; no GPU fault/recovery. No completed qualification repeats.
+
+Qualification reviewed; one fresh matched-init8,192-update comparison on the
+exact coverage data/plan is active under the host guard,followed only by its
+restore check.89 learning input pins; seed41001 reused,not fresh confirmation.
+No collector or actor/critic. Do not start another job or mistake an observer
+timeout for a stopped worker. Review learning before separately declaring this
+checkpoint's frozen oracle comparison. Full goal,untouched tests,late-game/
+second-wall coverage,brick memory and fresh confirmation stay unfinished.
 ### Representation and training scope
 
 Start with a **pixel-supervised latent RSSM baseline**, using Kindle's existing

@@ -137,3 +137,20 @@ below coverage. Report every category and regression, not favorable clips. FIRE
 90% pair matching remains an invalid criterion; use scores/oracle spread.
 Untouched tests, late-game/second-wall states, removed-brick memory, stochastic
 calibration and fresh learner confirmation remain required by the larger goal.
+
+
+## Qualification reviewed; fixed learner declared
+
+Native/source161839d9,SHA8d5552e5 with matching root/runtime. Both guarded jobs
+pass with sealed audits: new513-row F64 native energy values/derivatives, then
+full-size preflight.77 input pins;204 exact initial/frozen tensors,18 initial/
+restore arrays,old objective restore and original observed components match.
+Exactly65 first-update parameters change,with the independently verified three
+hidden reward tensors unchanged; new output weights move.13 reports satisfy
+energy/total/mask identities. No numerical/GPU fault or host recovery.
+
+`qualification-review.json` reviewed. `learning-protocol.json` and
+`learning-queue.json` separately declare the fixed fresh8,192 updates and restore
+only,89 input pins,source/native as above. All exact budgets/settings/counts in
+the preceding section apply. Training is active; frozen oracle evaluation has
+not yet been declared. No collector,old-model rerun or automatic successor.
