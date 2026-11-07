@@ -20,25 +20,26 @@ last-life ending underprediction(.581% versus100% on RIGHT). All431 input pins,
 guards and204 invariant tensors pass. Preserve its three original failures and
 separate repairs. No completed collector/learner/evaluator repeats.
 
-The selected [behavior-coverage experiment](experiments/2026-11-07-breakout-world-coverage.md)
-adds one16,384-action fitting supplement: long waits,sustained controls and paths
-to game-over. Root `/mnt/data/kindle-breakout-world-coverage-20261107`. Eight CPU
-checks pass and all8,192 old uniform plans/counts stay exact. Native3fa37b6d/
-eafe8359 unchanged. Collector complete:16,384 actions/65,492 frames,44 endings,
-2,979 waiting windows,max absent non-FIRE run96;19.248s,age0/204 tensors unchanged.
-Data/guard audit passes; no above-wall states. The learner completes8,192 finite
-updates,529.515s native/796.900s total. All204 initial/frozen tensors and18
-initial-development/final-restore arrays pass. Original queue fails a total-
-arrival expectation(32,849 unique sampled versus32,850 available); preserve it.
-A separate CPU review and only the unstarted restore complete evidence. Preserve
-the CPU comparison SyntaxError/separate repair too. No learner repeats.
+The [closed coverage experiment](results/2026-11-07-breakout-world-coverage.md)
+adds16,384 fitting actions/65,492 frames and4/2/1/1 retained/new/waiting/terminal
+sampling,with model/loss/native unchanged. Fresh matched-init8,192 updates cost
+529.515s native/796.900s loop; observed balls108/112,NOOP8 false balls95.3%→0%,
+paddle-approach32 ball energy.8510→.2563,last-life RIGHT ending probability
+.581%→50.211%(oracle100%). Ending Brier.144566 fails.10; long forecasts,reward
+and bricks remain mixed. Retain both models/new fitting data as development.
 
-Dense development observed balls108/112 versus107/112;8-step14/107 versus8/107,
-32-step0/95 versus1/95;brick balanced error.223954 versus.206631. Next separately
-pin/run only the new checkpoint's frozen action-branch comparison(history16/32,
-eight draws,84 groups),reusing the oracle without recollection/old-model reruns.
-No active learner/actor/critic or automatic extension/successor. The full world
-goal,untouched tests,late-game/second-wall coverage and confirmation remain open.
+Root `/mnt/data/kindle-breakout-world-coverage-20261107`. All35/80/482 phase
+pins,204 initial/frozen tensors,18 initial-development/final-restore arrays and
+four native guards pass. Original queue remains protocol-failed:32,849 sampled
+versus32,850 total arrivals; separate CPU review and only the unstarted restore
+complete evidence. Preserve CPU comparison SyntaxError/repair and invalid FIRE
+pair-match gate90% versus empirical maximum78.125%; do not relabel it passed.
+Future protocols need proper scores/oracle uncertainty. No completed stage repeats.
+
+All stages closed; no Kindle GPU allocation,new learner or actor/critic active/selected.
+Next separately justify direct forecast supervision,without an unchanged extension
+or automatic successor. Untouched tests,late-game/second-wall coverage,removed-
+brick memory and fresh confirmation remain open. Keep the full world goal active.
 
 ### Representation and training scope
 
