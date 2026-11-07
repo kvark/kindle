@@ -9,7 +9,7 @@ use super::{
     DreamerConfig,
     agent::{join_features, sample_latents},
     checkpoint,
-    distributions::TwoHotBins,
+    distributions::{TwoHotBins, sample_probabilities},
     runtime, world,
 };
 use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
@@ -24,19 +24,19 @@ pub enum PixelLoss {
     SquaredError,
     CrossEntropy,
     MotionCrossEntropy,
-    PredictiveMotionCrossEntropy,
+    PredictiveMotionEnergy,
 }
 
 impl PixelLoss {
     pub(crate) fn motion_attention(self) -> bool {
         matches!(
             self,
-            Self::MotionCrossEntropy | Self::PredictiveMotionCrossEntropy
+            Self::MotionCrossEntropy | Self::PredictiveMotionEnergy
         )
     }
 
     pub(crate) fn predictive(self) -> bool {
-        self == Self::PredictiveMotionCrossEntropy
+        self == Self::PredictiveMotionEnergy
     }
 }
 
@@ -250,7 +250,7 @@ impl WorldModelLearner {
             (
                 PixelLoss::CrossEntropy
                 | PixelLoss::MotionCrossEntropy
-                | PixelLoss::PredictiveMotionCrossEntropy,
+                | PixelLoss::PredictiveMotionEnergy,
                 length,
             ) => world::build_world_only_pixel_training_graph(&config, length, pixel_loss),
         };
@@ -393,11 +393,19 @@ impl WorldModelLearner {
                 .collect::<Vec<_>>();
             self.train.set_input(&format!("uniforms_{time}"), &uniforms);
             if self.pixel_loss.predictive() {
-                let uniforms = (0..batch * size.stoch * size.classes)
-                    .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
-                    .collect::<Vec<_>>();
-                self.train
-                    .set_input(&format!("predictive_uniforms_{time}"), &uniforms);
+                for (name, width) in [
+                    ("predictive_uniforms", size.stoch * size.classes),
+                    ("predictive_second_uniforms", size.stoch * size.classes),
+                    ("predictive_reward_uniforms0", bins.len()),
+                    ("predictive_reward_uniforms1", bins.len()),
+                    ("predictive_continuation_uniforms0", 2),
+                    ("predictive_continuation_uniforms1", 2),
+                ] {
+                    let uniforms = (0..batch * width)
+                        .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
+                        .collect::<Vec<_>>();
+                    self.train.set_input(&format!("{name}_{time}"), &uniforms);
+                }
             }
             let mut target = vec![0.0; batch * bins.len()];
             for (row, &reward) in rewards[range.clone()].iter().enumerate() {
@@ -408,6 +416,18 @@ impl WorldModelLearner {
             }
             self.train
                 .set_input(&format!("reward_target_{time}"), &target);
+            if self.pixel_loss.predictive() {
+                let sampled = target
+                    .chunks_exact(bins.len())
+                    .map(|row| {
+                        let index = sample_probabilities(row, &mut self.rollout_rng);
+                        let value = bins.values()[index];
+                        value.signum() * value.abs().ln_1p()
+                    })
+                    .collect::<Vec<_>>();
+                self.train
+                    .set_input(&format!("predictive_reward_sample_{time}"), &sampled);
+            }
             let target = terminals[range]
                 .iter()
                 .map(|&terminal| {
@@ -420,6 +440,14 @@ impl WorldModelLearner {
                 .collect::<Vec<_>>();
             self.train
                 .set_input(&format!("continuation_target_{time}"), &target);
+            if self.pixel_loss.predictive() {
+                let sampled = target
+                    .iter()
+                    .map(|&p| f32::from(self.rollout_rng.random::<f32>() < p))
+                    .collect::<Vec<_>>();
+                self.train
+                    .set_input(&format!("predictive_continuation_sample_{time}"), &sampled);
+            }
         }
         for (time, weight) in weights.iter().enumerate() {
             let uniforms = (0..batch * size.stoch * size.classes)

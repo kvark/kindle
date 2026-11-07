@@ -440,6 +440,8 @@ fn training_graph(
     let mut prior_reward_losses = Vec::new();
     let mut prior_reward_valid = Vec::new();
     let mut predictive_states = Vec::new();
+    let mut predictive_second_states = Vec::new();
+    let mut predictive_keeps = Vec::new();
     let mut predictive_losses = Vec::new();
     let mut actions = Vec::new();
 
@@ -490,6 +492,15 @@ fn training_graph(
                 time,
                 "predictive",
             ));
+            predictive_second_states.push(prior_continuation::state(
+                &mut graph,
+                config,
+                deter,
+                prior_logits,
+                time,
+                "predictive_second",
+            ));
+            predictive_keeps.push(keep_action);
         }
         if config.prior_continuation_scale.is_some() || config.prior_reward_scale.is_some() {
             prior_states.push(prior_continuation::state(
@@ -634,6 +645,18 @@ fn training_graph(
         let expert_target = config
             .expert_world_gradient()
             .then(|| target("expert_action_target", config.action_count));
+        let predictive_targets = pixel_loss.predictive().then(|| predictive_world::Uniforms {
+            reward: [
+                target("predictive_reward_uniforms0", config.value_bins),
+                target("predictive_reward_uniforms1", config.value_bins),
+            ],
+            continuation: [
+                target("predictive_continuation_uniforms0", 2),
+                target("predictive_continuation_uniforms1", 2),
+            ],
+            reward_target: target("predictive_reward_sample", 1),
+            continuation_target: target("predictive_continuation_sample", 1),
+        });
         let reward_weight = graph.constant(vec![1.0; rows], &[rows, 1]);
 
         if let (Some(head), Some(settings)) = (&centroid_head, &config.color_centroid_supervision) {
@@ -775,15 +798,36 @@ fn training_graph(
                 .map(|time| observations[time.saturating_sub(1)])
                 .collect::<Vec<_>>();
             let previous = stack_time(&mut graph, &previous, batch, config.observation_dim());
+            let before_previous = (start..start + chunk.len())
+                .map(|time| observations[time.saturating_sub(2)])
+                .collect::<Vec<_>>();
+            let before_previous = stack_time(
+                &mut graph,
+                &before_previous,
+                batch,
+                config.observation_dim(),
+            );
+            let past_keep = (start..start + chunk.len())
+                .map(|time| predictive_keeps[time.saturating_sub(1)])
+                .collect::<Vec<_>>();
+            let past_keep = stack_time(&mut graph, &past_keep, batch, config.action_count);
+            let second = stack_time(
+                &mut graph,
+                &predictive_second_states[start..start + chunk.len()],
+                batch,
+                config.feature_dim(),
+            );
             predictive_losses.push(predictive_world::losses(
                 &mut graph,
+                config,
                 &model,
-                prior,
+                [prior, second],
                 observation,
                 previous,
+                before_previous,
+                past_keep,
                 keep_action,
-                reward_target,
-                continuation_target,
+                predictive_targets.unwrap(),
                 rows,
             ));
         }
@@ -1097,9 +1141,9 @@ fn training_graph(
             outputs.push(graph.scalar(0.0));
         }
         outputs.extend([
-            losses.image,
-            losses.reward,
-            losses.continuation,
+            losses.energy,
+            losses.target_distance,
+            losses.sample_distance,
             losses.valid,
         ]);
     }

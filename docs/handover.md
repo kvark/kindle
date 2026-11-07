@@ -51,21 +51,27 @@ the CPU comparison SyntaxError/repair,and the invalid FIRE gate:90% pair matchin
 is unattainable on its finite oracle(max78.125%); do not relabel it passed.
 Use proper forecast scores/oracle uncertainty in future protocols.
 
-The selected [predictive-world experiment](experiments/2026-11-07-breakout-world-predictive.md)
-adds one-step prior RGB/reward/continuation targets before the arrival image is
-seen,alongside unchanged observed losses. Optional explicit objective
-`predictive_motion_cross_entropy`;no new parameters or inference inputs. Mask
-clipped starts/resets,keep valid terminal arrivals,no life penalty.13 reports.
-Root `/mnt/data/kindle-breakout-world-predictive-20261107`.
+The [pointwise predictive prototype](experiments/2026-11-07-breakout-world-predictive.md#closed-prototype-before-full-learning)
+is parked without a full learner: per-sample target error can average uncertain
+futures. Its one-update core completed; original final68-change assertion failed
+(actual65, three reward-hidden tensors receive no gradient with a zero output
+weight). Separate CPU-only70-pin repair verifies evidence, preserves failure,
+and does not rerun GPU. Root `/mnt/data/kindle-breakout-world-predictive-20261107`.
 
-Implementation42 CPU world tests(20 GPU tests ignored),41 affected Python tests
-and strict workspace/bindings Clippy pass. Preserve three initial CPU fixture/
-compile failures and repairs in root logs. Next build/package,pin all identities,
-then run only the declared full-size one-update/frozen/restore preflight. No GPU
-allocation or full learner is active/selected yet. After qualification review,
-separately declare fixed8,192-update learning on the exact coverage data/plan;
-no collector or old learner repeats. Full world goal stays active/unproven;
-untouched tests,late-game/second-wall coverage,brick memory and confirmation open.
+The selected [joint energy experiment](experiments/2026-11-07-breakout-world-energy.md)
+compares two sampled prior worlds to the arrival and to each other. RGB metric
+weights use real past frames only; reward/continuation are sampled from their
+existing heads/encoded targets. Native categorical gradients remain straight-through
+surrogates. No new parameters/inputs; unchanged posterior losses. Explicit
+`predictive_motion_energy`,13 reports; no actor/critic or collector.
+Root `/mnt/data/kindle-breakout-world-energy-20261107`. 43 CPU world tests(21 GPU tests ignored),41 affected Python checks and strict
+workspace/bindings Clippy pass. Preserve initial derivative-fixture rounding,
+missing-test-path and package-path failures with their repairs. Next build/package,
+pin identities and run only the declared
+new native F64 fixture and one-update/frozen/restore preflight. No GPU allocation
+or full learner is active/selected. After qualification review separately declare
+fixed8,192 updates on the exact coverage data/plan. Full goal,untouched tests,
+late-game/second-wall coverage,brick memory and fresh confirmation stay unfinished.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

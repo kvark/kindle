@@ -10,16 +10,16 @@ sys.path.insert(0, str(Path(__file__).parents[1]/'examples'))
 import breakout_world_corpus as corpus
 
 
-def test_predictive_reports_keep_observed_indices_and_add_three_losses_plus_mask():
+def test_predictive_reports_keep_observed_indices_and_add_energy_diagnostics():
     assert corpus.report_names('motion_cross_entropy',0)==corpus.LOSS_NAMES[:9]
     assert corpus.report_names('cross_entropy',16)==corpus.LOSS_NAMES
     names=corpus.report_names(corpus.PREDICTIVE_OBJECTIVE,0)
     assert names[:9]==corpus.LOSS_NAMES[:9] and names[9:]==(
-        'predictive_rgb','predictive_reward','predictive_continuation','predictive_valid_fraction')
+        'predictive_joint_energy','predictive_target_distance','predictive_sample_distance','predictive_valid_fraction')
     scales=dict(reconstruction=100.,dynamics=1.,representation=.1,reward=2.,continuation=3.)
     values=[0.,1.,2.,3.,4.,5.,0.,0.,0.,6.,7.,8.,.5]
     actual=corpus.reported_total(dict(loss_scales=scales),values,corpus.PREDICTIVE_OBJECTIVE,0)
-    assert actual==100*(1+6)+2+.1*3+2*(4+7)+3*(5+8)
+    assert actual==100*(1+6)+2+.1*3+2*4+3*5
     with pytest.raises(ValueError):corpus.report_names(corpus.PREDICTIVE_OBJECTIVE,16)
 
 

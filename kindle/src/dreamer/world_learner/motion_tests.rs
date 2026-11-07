@@ -157,13 +157,13 @@ fn predictive_objective_is_explicit_and_legacy_objective_readers_reject_it() {
         CrossEntropy,
         MotionCrossEntropy,
     }
-    let encoded = serde_json::to_value(PixelLoss::PredictiveMotionCrossEntropy).unwrap();
-    assert_eq!(encoded, "predictive_motion_cross_entropy");
+    let encoded = serde_json::to_value(PixelLoss::PredictiveMotionEnergy).unwrap();
+    assert_eq!(encoded, "predictive_motion_energy");
     assert!(serde_json::from_value::<LegacyPixelLoss>(encoded.clone()).is_err());
     let metadata = serde_json::json!({"format":"kindle-world-only-v2","pixel_loss":encoded});
     assert_eq!(
         checkpoint_pixel_loss(&metadata).unwrap(),
-        PixelLoss::PredictiveMotionCrossEntropy
+        PixelLoss::PredictiveMotionEnergy
     );
 }
 

@@ -119,3 +119,19 @@ decisions versus coverage,while reporting every category/regression separately.
 These are development diagnostics,not a full-world completion criterion.
 Untouched tests,calibrated stochastic forecasts,late-game/second-wall coverage,
 removed-brick memory and fresh learner confirmation remain unfinished.
+
+## Closed prototype before full learning
+
+Native source498b94e5/SHA5fabcd51 completed the preflight's204 initial/frozen
+checks,18 initial/restore arrays and one13-report update. The original worker
+still **failed** its final `changed==68` assertion:65 changed, with exactly the
+three hidden reward tensors unchanged because the reward output weight starts
+at zero. A separate CPU-only70-pin review verifies this against the earlier
+motion preflight and preserves the failed guard, broad kernel snapshot limit,
+and all original logs. No GPU rerun or full learner occurred.
+
+The pointwise objective is parked because expected per-sample error against one
+observed future can favor averaging stochastic futures. The selected replacement
+is the separately declared [joint energy experiment](2026-11-07-breakout-world-energy.md).
+Archived matching source/runtime and `prototype-closure.json` remain in this
+root; do not relabel the failed protocol as passed.
