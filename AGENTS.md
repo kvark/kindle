@@ -130,14 +130,23 @@ four guards pass. Native calls557.635s/loop830.191s (dense-initial outside timer
 observed guard span856.209s,separate84 branches159.293s. Exact artifacts/failures
 and timing scopes remain in the report; no GPU worker remains active.
 
-Select the [CPU code-precision decomposition](docs/experiments/2026-11-07-breakout-world-code-precision.md)
-from retained four-draw current-image reconstructions. Separate shared position
-bias from centered variation on all-detected images,while retaining full detection/
-accuracy denominators,source joins,deduplicated inputs and outcome-selection limits.
-Root `/mnt/data/kindle-breakout-world-code-precision-20261107`; no new model/emulator
-query,readout fit,update or GPU allocation. This checks a new observation-only code,
-not a repeat of old recurrent-h drift diagnostics. No cause or next learner is
-established; all world gates/full-goal requirements remain unchanged.
+The [CPU code-precision decomposition](docs/results/2026-11-07-breakout-world-code-precision.md)
+is closed:164 exact source joins,96 published metric checks,49 input pins and
+analytic/algebra checks pass in.617s with no model/emulator import or query.
+Deduplicated all-detected28/31 images have59.29%/57.76% empirical mean-error shares,
+45.72%/43.68% after finite-draw correction. Both exceed16 support but neither
+component meets2/3 dominance: triage mixed. Missing/deduplicated/outcome-selected
+support remains explicit; no isolated encoder/sampling cause or world competence.
+
+Select the [strided/lower-mixing recipe](docs/experiments/2026-11-07-breakout-world-code-stride.md)
+for composition qualification,then separately declared fresh8192 learning if it
+passes. Keep observation-only code,enable existing `rgb_stride2`,set unimix.001;
+shapes/counts/data/loss/seed remain. Two changes are combined; no isolated benefit
+is established. Earlier whole-agent stride/mixing failures stay closed/negative.
+Reuse native780f00a8/SHAe6ca7ca4 and runner68e9bbb7; encoder prefix matches qualified
+22c262ea exactly. No rebuild or unchanged primitive/legacy qualification repeat.
+Root `/mnt/data/kindle-breakout-world-code-stride-20261107`; no GPU allocation yet.
+Original world gates and full-goal requirements remain; no automatic successor.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
