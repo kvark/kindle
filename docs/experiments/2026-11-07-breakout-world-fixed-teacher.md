@@ -123,3 +123,21 @@ included in worker time. Root
 prepared data/plan, requalify the changed constructor with new pinned bytes,
 and only then separately declare the original4096-update budget. This does not
 repeat a learner. Original failed qualification remains failed.
+
+## Combined-input failure and separate mask repair
+
+The loader-repaired e651e95e qualifier matched204 inherited tensors and18 cached
+initial arrays, and passed target repeat/prefix/lane checks. It then failed its
+first-update report assertion before saving advanced state or launching a full
+learner. The individual report was not saved; do not invent its values. Preserve
+that failed guard and the earlier CPU borrow-check compilation failure under the
+loader root. A new CPU uniqueness check reproduces16 duplicate named graph inputs:
+latent and recurrent losses each declared `pixel_rollout_weight_t`, while the
+native setter writes only the first match. Each loss alone remains unaffected.
+
+Use distinct `fixed_teacher_recurrent_weight_t` names and supply both masks;
+legacy paths keep their names. Require unique named inputs in the combined CPU
+graph, rerun affected world tests/strict Clippy and package tests, then separately
+qualify new bytes at `/mnt/data/kindle-breakout-world-fixed-targets-20261107`.
+Persist update reports before assertions. This repairs composition, with no loss,
+data, budget or gate change; previous failed qualifications remain failed.

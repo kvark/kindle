@@ -178,7 +178,15 @@ fn recurrent_prior_states_exclude_future_targets_masks_and_actions() {
     let targets = (0..3)
         .map(|i| graph.input(&format!("target{i}"), &[batch, size.deter]))
         .collect::<Vec<_>>();
-    let losses = build(&mut graph, &config, &model, (h, z), &actions, &targets);
+    let losses = build(
+        &mut graph,
+        &config,
+        &model,
+        (h, z),
+        &actions,
+        &targets,
+        "pixel_rollout_weight",
+    );
     for (i, &state) in losses.states.iter().enumerate() {
         let time = i / 2;
         let mut seen = HashSet::new();

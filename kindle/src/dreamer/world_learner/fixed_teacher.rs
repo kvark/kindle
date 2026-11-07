@@ -304,6 +304,16 @@ mod phase_tests {
             assert!(inputs.contains(format!("fixed_teacher_stoch_{t}").as_str()));
             assert!(!inputs.contains(format!("uniforms_{t}").as_str()));
         }
+        let input_count = g
+            .nodes()
+            .iter()
+            .filter(|n| matches!(n.op, Op::Input { .. }))
+            .count();
+        assert_eq!(
+            inputs.len(),
+            input_count,
+            "named training inputs must be unique"
+        );
         let kl = g.outputs()[world::LOSS_WORLD_ROLLOUT];
         let energy = g.outputs()[world::LOSS_RECURRENT_WORLD];
         let energy = g.scale(energy, 100.0);

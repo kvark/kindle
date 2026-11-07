@@ -27,9 +27,11 @@ Initial native qualification failed at construction before any update: a full
 training checkpoint cannot load directly into a subset inference plan. Preserve
 `/mnt/data/kindle-breakout-world-fixed-teacher-20261107`. The separate loader repair
 validates the complete training plan, then copies matching weights into an
-independently allocated filter and verifies GPU values. Repaired package/check
-root `/mnt/data/kindle-breakout-world-fixed-teacher-loader-20261107`; no learner
-is declared. Original CPU fixture/style/import failures remain retained.
+independently allocated filter and verifies GPU values. The separate loader check reached the first update, then failed its mask report;
+the combined losses had16 duplicate input names. Preserve that failed guard.
+Distinct masks and a unique-input CPU assertion are in preparation at
+`/mnt/data/kindle-breakout-world-fixed-targets-20261107`. No full learner has run.
+Original CPU fixture/style/import and Rust borrow-check failures remain retained.
 
 Retain the [coverage H0 control](results/2026-11-07-breakout-world-coverage.md):
 observed108/112,one94/109,eight14/107. Source/native3fa37b6d,SHAeafe8359,

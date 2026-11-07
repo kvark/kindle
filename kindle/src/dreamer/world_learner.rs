@@ -658,6 +658,10 @@ impl WorldModelLearner {
             }
             self.train
                 .set_input(&format!("pixel_rollout_weight_{time}"), weight);
+            if self.pixel_loss.fixed_teacher() {
+                self.train
+                    .set_input(&format!("fixed_teacher_recurrent_weight_{time}"), weight);
+            }
         }
         runtime::configure_d3_optimizer(
             &mut self.train,

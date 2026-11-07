@@ -64,6 +64,7 @@ pub(super) fn build(
     initial: (NodeId, NodeId),
     actions: &[NodeId],
     targets: &[NodeId],
+    weight_prefix: &str,
 ) -> Losses {
     assert!(!actions.is_empty() && actions.len() == targets.len());
     let size = config.network();
@@ -113,7 +114,7 @@ pub(super) fn build(
                 z[i] = straight_through_sample(graph, sample, probabilities);
             }
         }
-        let keep = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
+        let keep = graph.input(&format!("{weight_prefix}_{time}"), &[batch, 1]);
         losses.push(score(graph, h[0], h[1], target, keep, size.deter));
     }
     let mut average = |field: fn(&Losses) -> NodeId| {

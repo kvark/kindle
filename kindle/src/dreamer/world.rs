@@ -1169,6 +1169,11 @@ fn training_graph(
             (deters[start - 1], stochs[start - 1]),
             &actions[start..],
             &deters[start..],
+            if pixel_loss.fixed_teacher() {
+                "fixed_teacher_recurrent_weight"
+            } else {
+                "pixel_rollout_weight"
+            },
         )
     });
     let total = if let Some(losses) = &recurrent_rollout {
