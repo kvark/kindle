@@ -98,6 +98,9 @@ failures separately; repairs change no learning result. Native source/runner
 arrays,65 expected changed parameters,204 frozen tensors,previous-frame influence,
 lane independence,reset isolation and old-native v5 rejection. Build cache release
 retains exact wheel/runtime/CPU executable and releases834,734,615 counted bytes.
-A separately declared466-pin fresh8192 H0 learner/restore is active. Source members
+The separately declared466-pin fresh8192 H0 learner/restore and918-pin new-final
+84-group assessment are complete. The [closed result](../results/2026-11-07-breakout-world-previous-frame.md)
+records all unchanged gates; full competence remains unproven. No GPU allocation,
+unchanged extension,repeat or automatic successor remains selected. Source members
 are copied byte-exactly from the pinned Git archive; original declarations remain
-unchanged. Final-only branches await reviewed learning/restore completion.
+unchanged. Final-only branches execute after reviewed learning/restore completion and remain frozen.

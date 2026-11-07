@@ -149,26 +149,30 @@ fit9/176 at eight,0/171 at sixteen. Primary energy.646172 versus H0.169502.
 All execution/restore/guard checks pass; keep coverage. Full details and original
 failures remain in its report/root; no repeat or extension.
 
-The [previous-frame encoder experiment](experiments/2026-11-07-breakout-world-previous-frame.md)
-is native-qualified; a separately declared466-pin fresh8192 H0 learner and restore
-are active in `kindle-world-previous-frame-learning-20261107`. Optional
-`rgb_previous_frame` keeps RGB3 replay/targets/one GPU resize; same-lane previous/
-current images feed the first convolution. Starts/resets duplicate current RGB;
-no future image enters a prior. Adds2,400 weights:68 logical/8,855,075 scalars/
-204 tensors,latent/decoder geometry unchanged. Default off,v5 persists mode.
-No information is added to the whole RSSM; this tests a shorter motion path.
-Earlier whole-agent CDP frame-pair results remain negative and closed.
+The [previous-frame encoder experiment](results/2026-11-07-breakout-world-previous-frame.md)
+is closed and fails retention:observed108/112,
+one90/109,eight10/107
+versus H0 108/112,94/109,14/107. Primary16/32 energy0.189612,versus.169502 H0;
+unchanged threshold.127127. Ending16/32 Brier0.017841/
+0.073287,RIGHT160.223745.
+Full gates/actions/reward/brick regressions remain linked. Keep coverage.
+No extension,repeat,sweep or automatic successor selected; full goal remains unproven.
 
-Root `/mnt/data/kindle-breakout-world-previous-frame-20261107`; source/runner
-70da4788,native SHA96adefd2. All60 Rust/89 packaged Python checks and strict
-core/binding Clippy pass. Preserve formatter/import and flattened-shape fixture
-failures. First native456-pin check17.391s passes204 own-initial restored tensors,
-18 initial/trained restore arrays,18 legacy arrays,65 changed parameters,204
-frozen tensors,previous-frame encoder influence,lane independence,reset isolation
-and old-native v5 rejection. Exact source members are archived;834,734,615-byte
-build cache released after qualification,with wheel/runtime/CPU executable kept.
-Original H0 data/full plan/seed/settings and all world gates remain; final-only
-branches await learning review. No collector,concurrent learner or automatic successor.
+Root `/mnt/data/kindle-breakout-world-previous-frame-20261107`;native/source/runner
+70da4788,SHA96adefd2. Optional previous/current input changes only the first CNN:
+RGB3 replay/targets/one resize,68 logical/8,855,075 scalars/204 tensors,latent
+geometry unchanged,starts/resets duplicate current image. Default off,v5 persisted.
+No information added to the whole RSSM; no isolated mechanism or whole-agent benefit.
+Earlier CDP pair result remains negative/closed. CPU60/Python89/Clippy pass after
+preserved formatter/import and flattened-shape fixture failures. First native456
+pins/17.391s,learning466/branches918 pins,8192 finite reports,all68 changed
+parameters,204 initial/frozen tensors,384 matched dense-initial origins,18 restore
+arrays and four guards pass. Source archive/immutable member copies retained;
+834,734,615-byte cache released with wheel/runtime/CPU executable preserved.
+Native calls538.013s,loop674.426s excludes dense-initial;
+worker span688.647s includes construction/dense-initial/pins/polling.
+Frozen branches126.066s outside learning timers. All services terminal;
+no GPU allocation,collector or automatic successor. See report for full timing limits.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
