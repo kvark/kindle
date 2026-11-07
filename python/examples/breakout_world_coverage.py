@@ -155,8 +155,8 @@ def sampling_pools(streams, length=32):
 
 
 def coverage_plan(streams, config, steps, prediction_length=0):
-    if config['batch_size'] != 8 or config['batch_length'] != 32 or prediction_length not in (0,16):
-        raise ValueError('coverage sampler requires B8/T32/H0 or H16')
+    if config['batch_size'] != 8 or config['batch_length'] != 32 or prediction_length not in (0,4,16):
+        raise ValueError('coverage sampler requires B8/T32/H0, H4 or H16')
     waits,endings = sampling_pools(streams)
     rng = np.random.default_rng(config['seed'] ^ 0x636f766572616765)
     plan = []
@@ -180,7 +180,8 @@ def main():
     parser.add_argument('--initial-reference',type=Path)
     parser.add_argument('--sampling-plan',type=Path)
     parser.add_argument('--pixel-loss',choices=['motion_cross_entropy',corpus.LATENT_OBJECTIVE,corpus.RECURRENT_OBJECTIVE,*corpus.PREDICTIVE_OBJECTIVES],default='motion_cross_entropy')
-    parser.add_argument('--prediction-length',type=int,choices=(0,16),default=0)
+    parser.add_argument('--prediction-length',type=int,choices=(0,4,16),default=0)
+    parser.add_argument('--dense-initial',action='store_true')
     parser.add_argument('--reference',type=Path)
     parser.add_argument('--ticks',type=int,default=2048)
     parser.add_argument('--steps',type=int,default=8192)

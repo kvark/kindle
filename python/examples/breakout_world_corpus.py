@@ -229,6 +229,18 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
         initial = load_file(args.output/'initial/world.safetensors')
         control = load_file(reference_file)
         assert initial.keys() == control.keys() and all(np.array_equal(initial[k], control[k]) for k in initial)
+    if getattr(args, 'dense_initial', False):
+        initial_output = args.output/'dense-initial'
+        initial_output.mkdir()
+        for label, streams, count, seed in [('fitting', evaluation_fitting, args.dense_fitting, 182003),
+                                           ('development', development, args.dense_development, 182009)]:
+            locations = sample_locations(streams, HISTORY+1, count, np.random.default_rng(seed))
+            evaluate_group(learner, streams, locations, initial_output, label, draws=DRAWS[:1])
+        learner.save(str(args.output/'initial-dense-frozen'))
+        before = load_file(args.output/'initial/world.safetensors')
+        after = load_file(args.output/'initial-dense-frozen/world.safetensors')
+        assert before.keys() == after.keys() and all(np.array_equal(before[k], after[k]) for k in before)
+        assert learner.updates == start_updates
     seen = [np.zeros(len(stream['action']), bool) for stream in fitting]
     total_terminal, prior_terminal, positive_rows, context_reset_rows, source_reset_rows = 0, 0, 0, 0, 0
     native_seconds = 0.

@@ -85,3 +85,17 @@ def test_latent_suffix_preserves_locations_and_includes_terminal_until_reset():
     assert keep[:,0].all() and keep[:7,1].all() and not keep[7:,1].any()
     terminal=np.zeros((32,2),bool);terminal[22,1]=True
     assert int((terminal[-16:]&keep).sum())==1
+
+
+def test_short_image_suffix_keeps_plan_and_masks_reset_after_terminal():
+    data=streams();config=dict(seed=41001,batch_size=8,batch_length=32)
+    plan,original=coverage.coverage_plan(data,config,64,0)
+    short,counts=coverage.coverage_plan(data,config,64,4)
+    np.testing.assert_array_equal(plan,short)
+    assert {k:v for k,v in counts.items() if k!='prior_terminal_rows'}=={
+        k:v for k,v in original.items() if k!='prior_terminal_rows'}
+    actions=np.zeros((32,2),np.int32);actions[30,1]=-1
+    keep=coverage.corpus.rollout_validity(actions,4)
+    np.testing.assert_array_equal(keep,[[True,True],[True,True],[True,False],[True,False]])
+    terminal=np.zeros((32,2),bool);terminal[29,1]=True
+    assert int((terminal[-4:]&keep).sum())==1
