@@ -22,6 +22,8 @@ mod gradient_diagnostic;
 #[cfg(test)]
 mod motion_tests;
 #[cfg(test)]
+mod observation_code_tests;
+#[cfg(test)]
 mod posterior_correction_diagnostic;
 #[cfg(test)]
 mod state_diagnostic;
@@ -74,18 +76,29 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let latent_only = metadata["config"]["rgb_latent_only"]
+        .as_bool()
+        .unwrap_or(false);
+    if latent_only && metadata["format"] != "kindle-world-only-v4" {
+        return Err("latent-only RGB requires world-only checkpoint format v4".into());
+    }
+    if metadata["format"] == "kindle-world-only-v4" && !latent_only {
+        return Err("invalid latent-only RGB checkpoint architecture".into());
+    }
     match metadata["format"].as_str() {
         Some("kindle-world-only-v1") => Ok(metadata
             .get("pixel_loss")
             .map(|v| serde_json::from_value(v.clone()))
             .transpose()?
             .unwrap_or_default()),
-        Some("kindle-world-only-v2" | "kindle-world-only-v3") => Ok(serde_json::from_value(
-            metadata
-                .get("pixel_loss")
-                .ok_or("missing pixel objective")?
-                .clone(),
-        )?),
+        Some("kindle-world-only-v2" | "kindle-world-only-v3" | "kindle-world-only-v4") => {
+            Ok(serde_json::from_value(
+                metadata
+                    .get("pixel_loss")
+                    .ok_or("missing pixel objective")?
+                    .clone(),
+            )?)
+        }
         _ => Err(io::Error::other("not a supported world-only checkpoint").into()),
     }
 }
@@ -261,7 +274,7 @@ impl WorldModelLearner {
         pixel_loss: PixelLoss,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         validate_config(&config)?;
-        config.validate();
+        config.check().map_err(io::Error::other)?;
         if pixel_loss != PixelLoss::SquaredError
             && config.reconstruction_target_standardization.is_some()
         {
@@ -751,7 +764,13 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let mut metadata = serde_json::json!({"format": self.training_scope.format(), "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length, "pixel_loss": self.pixel_loss});
+        let format = if self.config.rgb_latent_only {
+            assert_eq!(self.training_scope, TrainingScope::All);
+            "kindle-world-only-v4"
+        } else {
+            self.training_scope.format()
+        };
+        let mut metadata = serde_json::json!({"format": format, "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length, "pixel_loss": self.pixel_loss});
         if let Some(start) = self.training_scope.start_updates() {
             metadata["training_scope"] = serde_json::json!(self.training_scope.name());
             metadata["phase_start_updates"] = serde_json::json!(start);
@@ -789,6 +808,9 @@ impl WorldModelLearner {
         let metadata: serde_json::Value =
             serde_json::from_slice(&std::fs::read(path.join("metadata.json"))?)?;
         let pixel_loss = checkpoint_pixel_loss(&metadata)?;
+        if metadata["config"]["rgb_latent_only"].as_bool() == Some(true) {
+            return Err("frozen visual phase requires recurrent-conditioned RGB".into());
+        }
         let prediction_length = metadata
             .get("prediction_length")
             .map(|value| value.as_u64().ok_or("invalid world prediction length"))

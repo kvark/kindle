@@ -576,11 +576,16 @@ pub(crate) struct Posterior {
 impl Posterior {
     pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig, encoded_dim: usize) -> Self {
         let size = config.network();
+        let deter = if config.rgb_latent_only {
+            0
+        } else {
+            size.deter
+        };
         Self {
             hidden: LinearNorm::new(
                 graph,
                 "world.representation.posterior.obs0",
-                size.deter + encoded_dim,
+                deter + encoded_dim,
                 size.hidden,
             ),
             output: nn::Linear::new(
@@ -590,7 +595,7 @@ impl Posterior {
                 size.stoch * size.classes,
             ),
             encoded_dim,
-            deter: size.deter,
+            deter,
             stoch: size.stoch,
             classes: size.classes,
         }
@@ -603,7 +608,11 @@ impl Posterior {
         encoded: NodeId,
         batch: usize,
     ) -> NodeId {
-        let value = concat_columns(graph, deter, encoded, batch, self.deter, self.encoded_dim);
+        let value = if self.deter == 0 {
+            encoded
+        } else {
+            concat_columns(graph, deter, encoded, batch, self.deter, self.encoded_dim)
+        };
         let value = self.hidden.forward(graph, value);
         let logits = self.output.forward(graph, value);
         graph.reshape(logits, &[batch * self.stoch, self.classes])

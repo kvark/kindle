@@ -68,7 +68,7 @@ impl TrainingScope {
         updates: u64,
     ) -> Result<Self, &'static str> {
         match metadata["format"].as_str() {
-            Some("kindle-world-only-v1" | "kindle-world-only-v2") => {
+            Some("kindle-world-only-v1" | "kindle-world-only-v2" | "kindle-world-only-v4") => {
                 if metadata.get("training_scope").is_some()
                     || metadata.get("phase_start_updates").is_some()
                 {

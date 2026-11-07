@@ -322,6 +322,9 @@ pub struct DreamerConfig {
     /// Append fixed x/y pixel-center coordinates inside the learned RGB encoder.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_coordinates: bool,
+    /// Standalone RGB world: image-only posterior and stochastic-only decoder.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_latent_only: bool,
     /// Downsample the learned RGB encoder with stride-two convolutions, without max-pooling.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_stride2: bool,
@@ -490,6 +493,7 @@ impl DreamerConfig {
             observation_kind: ObservationKind::Features,
             rgb_frame_pair: false,
             rgb_coordinates: false,
+            rgb_latent_only: false,
             rgb_stride2: false,
             observation_crop: None,
             video_encoder: None,
@@ -816,6 +820,22 @@ impl DreamerConfig {
             return Err("auxiliary actor boundaries require observed lower-bound mode and nonnegative reward scales".into());
         }
         let size = self.network();
+        if self.rgb_latent_only
+            && (!self.observation_kind.is_rgb()
+                || self.video_encoder.is_some()
+                || self.rgb_frame_pair
+                || self.observation_crop.is_some()
+                || self.is_cdp()
+                || self.loss_scales.policy != 0.0
+                || self.loss_scales.value != 0.0
+                || self.loss_scales.replay_value != 0.0
+                || self.actor_critic_gradient)
+        {
+            return Err(
+                "latent-only RGB requires a plain learned RGB world without behavior learning"
+                    .into(),
+            );
+        }
         if self.rgb_stride2 && (!self.observation_kind.is_rgb() || self.video_encoder.is_some()) {
             return Err("RGB stride-two convolutions require the learned RGB encoder".into());
         }

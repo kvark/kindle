@@ -232,7 +232,7 @@ fn coordinate_planes(side: usize) -> Vec<f32> {
 }
 
 pub(crate) struct Decoder {
-    deterministic: BlockLinear,
+    deterministic: Option<BlockLinear>,
     stochastic_hidden: LinearNorm,
     stochastic_output: nn::Linear,
     spatial_norm: nn::RmsNorm,
@@ -253,13 +253,15 @@ impl Decoder {
         let spatial = (side / 16) * (side / 16) * channels;
         let mut input_channels = channels;
         Self {
-            deterministic: BlockLinear::new(
-                graph,
-                &format!("{name}.sp0"),
-                DECODER_BLOCKS,
-                size.deter / DECODER_BLOCKS,
-                spatial / DECODER_BLOCKS,
-            ),
+            deterministic: (!config.rgb_latent_only).then(|| {
+                BlockLinear::new(
+                    graph,
+                    &format!("{name}.sp0"),
+                    DECODER_BLOCKS,
+                    size.deter / DECODER_BLOCKS,
+                    spatial / DECODER_BLOCKS,
+                )
+            }),
             stochastic_hidden: LinearNorm::new(
                 graph,
                 &format!("{name}.sp1"),
@@ -310,7 +312,6 @@ impl Decoder {
     }
 
     pub(super) fn forward_logits(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        let deter = slice_columns(graph, input, batch, self.deter + self.stoch, 0, self.deter);
         let stoch = slice_columns(
             graph,
             input,
@@ -319,19 +320,22 @@ impl Decoder {
             self.deter,
             self.stoch,
         );
-        let deter = self.deterministic.forward(graph, deter, batch);
-        // Upstream's (group, h, w, channel) output becomes NCHW directly.
-        let deter = transpose_spatial(
-            graph,
-            deter,
-            batch * DECODER_BLOCKS,
-            (self.side / 16) * (self.side / 16),
-            self.channels / DECODER_BLOCKS,
-        );
-        let deter = graph.reshape(
-            deter,
-            &[batch * self.channels * (self.side / 16) * (self.side / 16)],
-        );
+        let deter = self.deterministic.as_ref().map(|layer| {
+            let deter = slice_columns(graph, input, batch, self.deter + self.stoch, 0, self.deter);
+            let deter = layer.forward(graph, deter, batch);
+            // Upstream's (group, h, w, channel) output becomes NCHW directly.
+            let deter = transpose_spatial(
+                graph,
+                deter,
+                batch * DECODER_BLOCKS,
+                (self.side / 16) * (self.side / 16),
+                self.channels / DECODER_BLOCKS,
+            );
+            graph.reshape(
+                deter,
+                &[batch * self.channels * (self.side / 16) * (self.side / 16)],
+            )
+        });
         let stoch = self.stochastic_hidden.forward(graph, stoch);
         let stoch = self.stochastic_output.forward(graph, stoch);
         let stoch = transpose_spatial(
@@ -345,7 +349,11 @@ impl Decoder {
             stoch,
             &[batch * self.channels * (self.side / 16) * (self.side / 16)],
         );
-        let value = graph.add(deter, stoch);
+        let value = if let Some(deter) = deter {
+            graph.add(deter, stoch)
+        } else {
+            stoch
+        };
         let mut value = normalize_image(
             graph,
             value,
