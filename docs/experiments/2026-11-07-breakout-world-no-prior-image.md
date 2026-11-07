@@ -66,7 +66,11 @@ calibrated stochastic outcomes, late-game/tunnel/second-wall coverage and fresh
 confirmation remain unfinished. Actor/critic stays parked.
 
 Root `/mnt/data/kindle-breakout-world-no-prior-image-20261107`.
-Implementation and61 CPU tests are ready at publication. No GPU phase has
-launched at publication. Do not extend the closed H16 learner or repeat its
+Implementation and61 CPU tests pass. The full-size preflight passes304 pins,
+204 exact initial/frozen tensors,18 exact initial/restored arrays and one finite
+nine-loss update. After review, a fresh8,192-update learner and final frozen
+restore are separately declared and active: execution36a5d3e0,305 pinned inputs,
+unchanged native535de479. Initial weights, source sampling and origins match
+H16. Queue session12503; learner PID1606165 confirmed live. Do not extend the closed H16 learner or repeat its
 qualification, collector, evaluations or audits. No unchanged extension, broad
 seed campaign, capacity increase or automatic successor is selected.

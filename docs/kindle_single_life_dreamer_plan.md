@@ -31,11 +31,12 @@ proving a cause. Forecasts still cover1/4/8/16/32 decisions. Data/init/sampling/
 geometry/rates stay fixed; no recollection or capacity change. Implementation
 and61 CPU tests pass. Reuse native535de479/SHA adfc2f9e; no rebuild is needed.
 
-No GPU job is active. Root
-`/mnt/data/kindle-breakout-world-no-prior-image-20261107`. Next declare one new
-H0 full-shape matched-init/one-update/frozen/restore preflight, then review before
-separately selecting the fixed8,192-update learner/restore. Nine-loss accounting
-and empty prior masks are checked. No completed H16 phase repeats; no automatic
+Root `/mnt/data/kindle-breakout-world-no-prior-image-20261107`. The new H0
+preflight passes304 pins,204 initial/frozen tensors,18 initial/restored arrays
+and one finite nine-loss full-size update. The fresh8,192-update learner/final
+restore queue is now active, execution36a5d3e0/native535de479,305 pinned inputs.
+Initial weights/sampler/origins match H16. Session12503, learner PID1606165 is
+confirmed live. Nine-loss accounting and empty prior masks are checked. No completed H16 phase repeats; no automatic
 extension/successor. Goal remains active and unproven; untouched tests,
 prospective branches, late-game coverage and fresh confirmation remain unfinished.
 

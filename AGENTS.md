@@ -40,7 +40,7 @@ active and unproven; no actor/critic learns. Closed roots remain retained under
 Cross-entropy's learner/restore queue completes:204 frozen tensors,18 restored
 arrays,306 pins and8,192 finite rows pass. Its qualification count failure and
 separate CPU repair, and closure-audit corpus-path failure/CPU repair, remain
-preserved in the report. Source878f66be is archived. No GPU job is active.
+preserved in the report. Source878f66be is archived; all H16 phases are closed.
 The corpus covers all18 commands globally, but only early states: maximum
 fitting/development score56/34, no ball above the top brick row. Some commands
 lack ball-absent contexts. Native image-cell audit explains27 transient resized
@@ -57,11 +57,14 @@ Open-loop forecast tests remain1/4/8/16/32 steps. No capacity increase or new da
 Runner implementation and61 CPU checks pass. Reuse exact native535de479/SHA
 adfc2f9e at `/mnt/data/kindle-breakout-world-bce-20261107/runtime`; no native rebuild
 is needed. Root `/mnt/data/kindle-breakout-world-no-prior-image-20261107`.
-Next declare one full-size H0 initial/one-update/frozen/restore preflight (nine
-losses,204 tensors,18 arrays), review it, then separately declare the fixed8,192-
-update comparison and final restore. No GPU allocation has launched at publication.
-Preserve failures; no automatic retry, extension or successor. Untouched tests,
-prospective branches, later-game coverage and fresh confirmation remain unfinished.
+The new full-size H0 preflight passes:304 pins, matched204 initial tensors/18
+arrays, finite nine-loss update,204 frozen tensors and18 exact restored arrays.
+The separately declared fresh8,192-update learner/final-restore queue is now
+active under execution36a5d3e0, with305 pinned inputs. Initial weights/sampler/
+origins match H16. Queue session12503; learner PID1606165 confirmed live. Stop at
+the fixed budget; preserve failures, no automatic retry/extension/successor.
+Untouched tests, prospective branches, later-game coverage and fresh confirmation
+remain unfinished. Keep the full world-model goal active and unproven.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
