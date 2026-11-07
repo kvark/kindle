@@ -523,6 +523,11 @@ fn training_graph(
             batch,
         );
         let prior_logits = model.dynamics.prior.forward(&mut graph, deter, batch);
+        if pixel_loss.fixed_teacher() {
+            // The predictive core above conditions on the preceding frozen-filter
+            // state. Current observations/readouts use the fixed current state.
+            deter = graph.input(&format!("fixed_teacher_deter_{time}"), &[batch, size.deter]);
+        }
         if pixel_loss.predictive() {
             let (first, first_log_probability) = predictive_world::state(
                 &mut graph,
@@ -571,7 +576,12 @@ fn training_graph(
         if pixel_loss.latent_overshooting() {
             posterior_targets.push(posterior_logits);
         }
-        let hard_sample = if sample_posterior {
+        let hard_sample = if pixel_loss.fixed_teacher() {
+            graph.input(
+                &format!("fixed_teacher_stoch_{time}"),
+                &[batch * size.stoch, size.classes],
+            )
+        } else if sample_posterior {
             let uniforms = graph.input(
                 &format!("uniforms_{time}"),
                 &[batch * size.stoch, size.classes],

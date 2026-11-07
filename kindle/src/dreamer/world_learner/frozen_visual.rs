@@ -11,6 +11,7 @@ const FROZEN_PREFIXES: [&str; 3] = [
 pub(super) enum TrainingScope {
     All,
     FrozenVisual { start_updates: u64 },
+    FixedTeacher { start_updates: u64 },
 }
 
 impl TrainingScope {
@@ -18,6 +19,7 @@ impl TrainingScope {
         match self {
             Self::All => "all",
             Self::FrozenVisual { .. } => "frozen_visual",
+            Self::FixedTeacher { .. } => "fixed_teacher",
         }
     }
 
@@ -25,18 +27,21 @@ impl TrainingScope {
         match self {
             Self::All => "kindle-world-only-v2",
             Self::FrozenVisual { .. } => "kindle-world-only-v3",
+            Self::FixedTeacher { .. } => "kindle-world-only-v6",
         }
     }
 
     pub fn start_updates(self) -> Option<u64> {
         match self {
             Self::All => None,
-            Self::FrozenVisual { start_updates } => Some(start_updates),
+            Self::FrozenVisual { start_updates } | Self::FixedTeacher { start_updates } => {
+                Some(start_updates)
+            }
         }
     }
 
     pub fn apply(self, session: &mut Session) {
-        if matches!(self, Self::FrozenVisual { .. }) {
+        if matches!(self, Self::FrozenVisual { .. } | Self::FixedTeacher { .. }) {
             for prefix in FROZEN_PREFIXES {
                 session.set_lr_multiplier(prefix, 0.0);
             }
@@ -93,6 +98,24 @@ impl TrainingScope {
                     return Err("invalid frozen visual checkpoint scope or objective");
                 }
                 Ok(Self::FrozenVisual {
+                    start_updates: start,
+                })
+            }
+            Some("kindle-world-only-v6") => {
+                let start = metadata["phase_start_updates"]
+                    .as_u64()
+                    .filter(|&value| value > 0 && value <= updates)
+                    .ok_or("invalid fixed-teacher phase start")?;
+                if metadata["training_scope"] != "fixed_teacher"
+                    || pixel_loss != PixelLoss::MotionFixedTeacher
+                    || prediction_length != 16
+                    || metadata["teacher_sha256"]
+                        .as_str()
+                        .is_none_or(|s| s.len() != 64 || !s.bytes().all(|b| b.is_ascii_hexdigit()))
+                {
+                    return Err("invalid fixed-teacher checkpoint scope or objective");
+                }
+                Ok(Self::FixedTeacher {
                     start_updates: start,
                 })
             }

@@ -16,6 +16,8 @@ use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 
 mod frozen_visual;
 use frozen_visual::TrainingScope;
+mod fixed_teacher;
+use fixed_teacher::TeacherAnchor;
 
 #[cfg(test)]
 mod gradient_diagnostic;
@@ -39,6 +41,7 @@ pub enum PixelLoss {
     MotionCrossEntropy,
     MotionLatentOvershooting,
     MotionRecurrentEnergy,
+    MotionFixedTeacher,
     PredictiveMotionEnergy,
     PredictiveMotionEnergyScoreFunction,
 }
@@ -50,6 +53,7 @@ impl PixelLoss {
             Self::MotionCrossEntropy
                 | Self::MotionLatentOvershooting
                 | Self::MotionRecurrentEnergy
+                | Self::MotionFixedTeacher
                 | Self::PredictiveMotionEnergy
                 | Self::PredictiveMotionEnergyScoreFunction
         )
@@ -67,11 +71,18 @@ impl PixelLoss {
     }
 
     pub(crate) fn latent_overshooting(self) -> bool {
-        self == Self::MotionLatentOvershooting
+        matches!(
+            self,
+            Self::MotionLatentOvershooting | Self::MotionFixedTeacher
+        )
     }
 
     pub(crate) fn recurrent_energy(self) -> bool {
-        self == Self::MotionRecurrentEnergy
+        matches!(self, Self::MotionRecurrentEnergy | Self::MotionFixedTeacher)
+    }
+
+    pub(crate) fn fixed_teacher(self) -> bool {
+        self == Self::MotionFixedTeacher
     }
 }
 
@@ -96,6 +107,15 @@ fn checkpoint_pixel_loss(
     if metadata["format"] == "kindle-world-only-v4" && !latent_only {
         return Err("invalid latent-only RGB checkpoint architecture".into());
     }
+    let fixed_teacher = metadata["pixel_loss"] == "motion_fixed_teacher";
+    if fixed_teacher && metadata["format"] != "kindle-world-only-v6" {
+        return Err("fixed teacher requires world-only checkpoint format v6".into());
+    }
+    if metadata["format"] == "kindle-world-only-v6"
+        && (!fixed_teacher || latent_only || previous_frame)
+    {
+        return Err("invalid fixed-teacher checkpoint architecture".into());
+    }
     match metadata["format"].as_str() {
         Some("kindle-world-only-v1") => Ok(metadata
             .get("pixel_loss")
@@ -106,7 +126,8 @@ fn checkpoint_pixel_loss(
             "kindle-world-only-v2"
             | "kindle-world-only-v3"
             | "kindle-world-only-v4"
-            | "kindle-world-only-v5",
+            | "kindle-world-only-v5"
+            | "kindle-world-only-v6",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -148,6 +169,7 @@ pub struct WorldModelLearner {
     training_scope: TrainingScope,
     updates: u64,
     dirty: bool,
+    fixed_teacher: Option<TeacherAnchor>,
 }
 
 fn validate_config(config: &DreamerConfig) -> Result<(), &'static str> {
@@ -306,6 +328,24 @@ impl WorldModelLearner {
         prediction_length: usize,
         pixel_loss: PixelLoss,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        if pixel_loss.fixed_teacher() {
+            return Err("fixed teacher requires an explicit source phase".into());
+        }
+        Self::with_pixel_loss_inner(config, prediction_length, pixel_loss, None)
+    }
+
+    fn with_pixel_loss_inner(
+        config: DreamerConfig,
+        prediction_length: usize,
+        pixel_loss: PixelLoss,
+        fixed_teacher: Option<TeacherAnchor>,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        if pixel_loss.fixed_teacher() != fixed_teacher.is_some()
+            || (pixel_loss.fixed_teacher()
+                && (prediction_length != 16 || config.rgb_previous_frame || config.rgb_latent_only))
+        {
+            return Err("invalid fixed teacher objective, source or geometry".into());
+        }
         validate_config(&config)?;
         config.check().map_err(io::Error::other)?;
         if pixel_loss != PixelLoss::SquaredError
@@ -335,6 +375,7 @@ impl WorldModelLearner {
                 | PixelLoss::MotionCrossEntropy
                 | PixelLoss::MotionLatentOvershooting
                 | PixelLoss::MotionRecurrentEnergy
+                | PixelLoss::MotionFixedTeacher
                 | PixelLoss::PredictiveMotionEnergy
                 | PixelLoss::PredictiveMotionEnergyScoreFunction,
                 length,
@@ -348,7 +389,18 @@ impl WorldModelLearner {
             runtime::share_matching(&mut train, &mut session, "world.");
             session
         };
-        let observe = inference(world::build_observe_graph(&config, batch));
+        let observe = if let Some(anchor) = &fixed_teacher {
+            let mut session = runtime::build_session(
+                &world::build_observe_graph(&config, batch),
+                &gpu,
+                Mode::Inference,
+                false,
+            );
+            checkpoint::load_session(&mut session, &anchor.path)?;
+            session
+        } else {
+            inference(world::build_observe_graph(&config, batch))
+        };
         let transition = inference(world::build_transition_graph(&config, batch));
         let decoder = inference(world::build_observation_prediction_graph(&config, batch));
         let heads = inference(world::build_head_graph(&config, batch));
@@ -375,6 +427,7 @@ impl WorldModelLearner {
             training_scope: TrainingScope::All,
             updates: 0,
             dirty: false,
+            fixed_teacher,
         })
     }
 
@@ -458,6 +511,15 @@ impl WorldModelLearner {
         validate_targets(actions, rewards, terminals, batch)?;
         let weights = rollout_weights(actions, batch, self.prediction_length);
         let size = self.config.network();
+        let teacher = if self.pixel_loss.fixed_teacher() {
+            Some(self.fixed_teacher_targets(
+                observations,
+                actions,
+                &fixed_teacher::sampling_seeds(self.config.seed, self.updates, batch),
+            )?)
+        } else {
+            None
+        };
         self.train
             .set_input("initial_deter", &vec![0.0; batch * size.deter]);
         self.train.set_input(
@@ -487,10 +549,23 @@ impl WorldModelLearner {
                     &previous_images(observations, &actions[range.clone()], time, width),
                 );
             }
-            let uniforms = (0..batch * size.stoch * size.classes)
-                .map(|_| self.rng.random_range(1e-6..1.0 - 1e-6))
-                .collect::<Vec<_>>();
-            self.train.set_input(&format!("uniforms_{time}"), &uniforms);
+            if let Some((deter, stoch)) = &teacher {
+                let dw = batch * size.deter;
+                let sw = batch * size.stoch * size.classes;
+                self.train.set_input(
+                    &format!("fixed_teacher_deter_{time}"),
+                    &deter[time * dw..(time + 1) * dw],
+                );
+                self.train.set_input(
+                    &format!("fixed_teacher_stoch_{time}"),
+                    &stoch[time * sw..(time + 1) * sw],
+                );
+            } else {
+                let uniforms = (0..batch * size.stoch * size.classes)
+                    .map(|_| self.rng.random_range(1e-6..1.0 - 1e-6))
+                    .collect::<Vec<_>>();
+                self.train.set_input(&format!("uniforms_{time}"), &uniforms);
+            }
             if self.pixel_loss.predictive() {
                 for (name, width) in [
                     ("predictive_uniforms", size.stoch * size.classes),
@@ -549,17 +624,18 @@ impl WorldModelLearner {
             }
         }
         for (time, weight) in weights.iter().enumerate() {
-            if self.pixel_loss.recurrent_energy() {
-                if time + 1 < weights.len() {
-                    for name in ["recurrent_first", "recurrent_second"] {
-                        let uniforms = (0..batch * size.stoch * size.classes)
-                            .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
-                            .collect::<Vec<_>>();
-                        self.train
-                            .set_input(&format!("{name}_uniforms_{time}"), &uniforms);
-                    }
+            if self.pixel_loss.recurrent_energy() && time + 1 < weights.len() {
+                for name in ["recurrent_first", "recurrent_second"] {
+                    let uniforms = (0..batch * size.stoch * size.classes)
+                        .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
+                        .collect::<Vec<_>>();
+                    self.train
+                        .set_input(&format!("{name}_uniforms_{time}"), &uniforms);
                 }
-            } else if !self.pixel_loss.latent_overshooting() || time + 1 < weights.len() {
+            }
+            if (self.pixel_loss.fixed_teacher() || !self.pixel_loss.recurrent_energy())
+                && (!self.pixel_loss.latent_overshooting() || time + 1 < weights.len())
+            {
                 let uniforms = (0..batch * size.stoch * size.classes)
                     .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
                     .collect::<Vec<_>>();
@@ -588,7 +664,16 @@ impl WorldModelLearner {
             self.train
                 .read_output_by_index(index, std::slice::from_mut(loss));
         }
-        if self.prediction_length > 0 && !self.pixel_loss.recurrent_energy() {
+        if self.pixel_loss.fixed_teacher() {
+            let mut value = [0.0];
+            self.train
+                .read_output_by_index(world::LOSS_WORLD_ROLLOUT, &mut value);
+            losses.push(value[0]);
+            for index in world::LOSS_RECURRENT_WORLD..world::LOSS_RECURRENT_WORLD + 4 {
+                self.train.read_output_by_index(index, &mut value);
+                losses.push(value[0]);
+            }
+        } else if self.prediction_length > 0 && !self.pixel_loss.recurrent_energy() {
             let mut loss = [0.0];
             self.train
                 .read_output_by_index(world::LOSS_WORLD_ROLLOUT, &mut loss);
@@ -604,7 +689,7 @@ impl WorldModelLearner {
                 losses.push(loss[0]);
             }
         }
-        if self.pixel_loss.recurrent_energy() {
+        if self.pixel_loss.recurrent_energy() && !self.pixel_loss.fixed_teacher() {
             for index in world::LOSS_RECURRENT_WORLD..world::LOSS_RECURRENT_WORLD + 4 {
                 let mut loss = [0.0];
                 self.train.read_output_by_index(index, &mut loss);
@@ -648,12 +733,10 @@ impl WorldModelLearner {
             return Err("expected 1..64 complete future action batches");
         }
         if self.dirty {
-            for session in [
-                &mut self.observe,
-                &mut self.transition,
-                &mut self.decoder,
-                &mut self.heads,
-            ] {
+            if self.fixed_teacher.is_none() {
+                runtime::sync_matching(&self.train, &mut self.observe, "world.");
+            }
+            for session in [&mut self.transition, &mut self.decoder, &mut self.heads] {
                 runtime::sync_matching(&self.train, session, "world.");
             }
             self.dirty = false;
@@ -824,6 +907,15 @@ impl WorldModelLearner {
             self.training_scope.format()
         };
         let mut metadata = serde_json::json!({"format": format, "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length, "pixel_loss": self.pixel_loss});
+        if let Some(anchor) = &self.fixed_teacher {
+            let (parameters, scalars) = anchor.verify(&self.observe)?;
+            std::fs::copy(&anchor.path, path.join("teacher.safetensors"))?;
+            metadata["teacher_sha256"] = serde_json::json!(anchor.sha256);
+            metadata["teacher_parameters"] = serde_json::json!(parameters);
+            metadata["teacher_scalars"] = serde_json::json!(scalars);
+            metadata["teacher_session_allocation_bytes"] =
+                serde_json::json!(self.observe.memory_summary().total_allocated_bytes());
+        }
         if let Some(start) = self.training_scope.start_updates() {
             metadata["training_scope"] = serde_json::json!(self.training_scope.name());
             metadata["phase_start_updates"] = serde_json::json!(start);
@@ -848,7 +940,13 @@ impl WorldModelLearner {
         let updates = metadata["updates"].as_u64().ok_or("missing update count")?;
         let scope =
             TrainingScope::from_metadata(&metadata, pixel_loss, prediction_length, updates)?;
-        let mut learner = Self::with_pixel_loss(config, prediction_length, pixel_loss)?;
+        let teacher = if pixel_loss.fixed_teacher() {
+            Some(TeacherAnchor::restore(path, &metadata)?)
+        } else {
+            None
+        };
+        let mut learner =
+            Self::with_pixel_loss_inner(config, prediction_length, pixel_loss, teacher)?;
         learner.load_training_checkpoint(path, updates)?;
         learner.training_scope = scope;
         Ok(learner)

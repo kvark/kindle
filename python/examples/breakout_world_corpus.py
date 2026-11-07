@@ -29,10 +29,15 @@ PREDICTIVE_OBJECTIVE = 'predictive_motion_energy'
 SCORE_FUNCTION_OBJECTIVE = 'predictive_motion_energy_score_function'
 LATENT_OBJECTIVE = 'motion_latent_overshooting'
 RECURRENT_OBJECTIVE = 'motion_recurrent_energy'
+FIXED_TEACHER_OBJECTIVE = 'motion_fixed_teacher'
 PREDICTIVE_OBJECTIVES = (PREDICTIVE_OBJECTIVE, SCORE_FUNCTION_OBJECTIVE)
 
 
 def report_names(pixel_loss, prediction_length):
+    if pixel_loss == FIXED_TEACHER_OBJECTIVE:
+        if prediction_length != 16: raise ValueError('fixed teacher requires H16')
+        return LOSS_NAMES[:9]+('fixed_teacher_latent_kl','fixed_teacher_h_energy',
+            'fixed_teacher_target_distance','fixed_teacher_sample_distance','fixed_teacher_valid_fraction')
     if pixel_loss == RECURRENT_OBJECTIVE:
         if not prediction_length: raise ValueError('recurrent energy requires a positive suffix length')
         return LOSS_NAMES[:9]+('recurrent_energy','recurrent_target_distance','recurrent_sample_distance','recurrent_valid_fraction')
@@ -47,6 +52,10 @@ def report_names(pixel_loss, prediction_length):
 
 def reported_total(config, values, pixel_loss, prediction_length):
     scales = config['loss_scales']
+    if pixel_loss == FIXED_TEACHER_OBJECTIVE:
+        return (scales['reconstruction']*(values[1]+values[10])
+            +scales['dynamics']*(values[2]+values[9])+scales['representation']*values[3]
+            +scales['reward']*values[4]+scales['continuation']*values[5])
     latent = pixel_loss == LATENT_OBJECTIVE
     recurrent = pixel_loss == RECURRENT_OBJECTIVE
     result = (scales['reconstruction']*(values[1]+(values[9] if prediction_length and not latent and not recurrent else 0))
@@ -268,7 +277,11 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             native_seconds += time.monotonic()-tick
             keep = rollout_validity(batch['action'], args.prediction_length)
             assert len(values) == len(report_names(args.pixel_loss, args.prediction_length))
-            if args.prediction_length and args.pixel_loss != RECURRENT_OBJECTIVE: assert values[10] == float(keep.mean())
+            if args.prediction_length and args.pixel_loss not in (RECURRENT_OBJECTIVE,FIXED_TEACHER_OBJECTIVE): assert values[10] == float(keep.mean())
+            if args.pixel_loss == FIXED_TEACHER_OBJECTIVE:
+                assert values[13] == float(keep.mean())
+                np.testing.assert_allclose(values[10],values[11]-.5*values[12],rtol=1e-5,atol=1e-5)
+                np.testing.assert_allclose(values[0],reported_total(config,values,args.pixel_loss,args.prediction_length),rtol=1e-5)
             if args.pixel_loss == LATENT_OBJECTIVE or args.pixel_loss == 'motion_cross_entropy':
                 np.testing.assert_allclose(values[0], reported_total(config, values, args.pixel_loss, args.prediction_length), rtol=1e-5)
             if args.pixel_loss in PREDICTIVE_OBJECTIVES or args.pixel_loss == RECURRENT_OBJECTIVE:

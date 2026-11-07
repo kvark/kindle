@@ -2,6 +2,16 @@
 
 ## Selected direction: Breakout world model in isolation
 
+The [fixed observation-filter phase](experiments/2026-11-07-breakout-world-fixed-teacher.md)
+is selected for native qualification before a separately declared4096-update
+warm learning check. An immutable H0 filter supplies observation states/targets;
+separate forecast dynamics learn in that coordinate system. Existing H16 latent
+KL and recurrent energy are combined,visual36 weights fixed,32 dynamics/head
+weights trainable. Extra filter compute/memory and inherited H0 cost are explicit.
+No native allocation is declared yet; CPU checks/packaging precede qualification.
+Original fixture/style/import failures remain preserved. Full competence unproven;
+previous-frame and all completed learners remain closed,coverage remains retained.
+
 The user selected this direction after pausing the five-game campaign. Treat
 world-model competence as the immediate objective. Gameplay score is a later
 integration measure. Do not restart any closed learner, collector or comparison.

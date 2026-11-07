@@ -64,6 +64,32 @@ impl PyWorldModelLearner {
         })
     }
 
+    #[classmethod]
+    fn start_fixed_teacher_phase(_class: &Bound<'_, PyType>, checkpoint: &str) -> PyResult<Self> {
+        Ok(Self {
+            inner: WorldModelLearner::start_fixed_teacher_phase(Path::new(checkpoint))
+                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?,
+        })
+    }
+
+    fn fixed_teacher_targets<'py>(
+        &mut self,
+        py: Python<'py>,
+        observations: &[u8],
+        previous_actions: Vec<i32>,
+        sampling_seeds: Vec<u64>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let (h, z) = self
+            .inner
+            .fixed_teacher_targets(&floats(observations)?, &previous_actions, &sampling_seeds)
+            .map_err(PyValueError::new_err)?;
+        let output = pyo3::types::PyDict::new(py);
+        output.set_item("deter", float_bytes(py, &h)?)?;
+        output.set_item("stoch", float_bytes(py, &z)?)?;
+        output.set_item("privileged_training_targets", true)?;
+        Ok(output.into_any())
+    }
+
     #[getter]
     fn config<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         json_to_python(py, self.inner.config())
