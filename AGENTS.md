@@ -30,44 +30,39 @@ gameplay score is a later integration test. CDP remains a subsequent efficiency
 comparison after the pixel baseline establishes competence.
 
 The active goal is to prove Breakout world-model training; the five-game
-campaign remains parked and unfinished. [Direct prior-image training](docs/results/2026-11-07-breakout-world-model-rollout.md) improves eight-step standard fitting ball
-accuracy1/8→4–5/8;16-step remains2/8. On separate sticky-off fitting clips,
-4-step is8/8,8-step4/4 supported targets and16-step7–8/8 across four draws.
-Observed-state reconstruction still fails several clips. These are capacity
-results, not a qualified world model or held-out generalization.
+campaign remains parked and unfinished. The [broader pixel-world run](docs/results/2026-11-07-breakout-world-model-corpus.md)
+completes8,192 updates in759.246s native training/1,032.918s total loop, but
+fails world-model qualification. Dense observed reconstruction finds0/220
+fitting and0/112 development balls, despite94.53%/92.97% paddle accuracy.
+Brick balanced error is.00101/.19935. Frozen linear readouts remain coarse;
+their failure does not prove absent information. Reward/endings also remain weak.
+The earlier [short-clip gains](docs/results/2026-11-07-breakout-world-model-rollout.md)
+remain capacity evidence, not broader competence.
 
-Standalone native training has no actor/critic, imitation, replay-value or
-intrinsic objectives. Current world runtime/source25b3328b (native547f065f) is
-retained at `/mnt/data/kindle-breakout-world-rollout-20261107/runtime`. All three
-new guarded phases finish successfully; each2,048-update rollout learner costs
-about187s of training. The preceding collector and reconstruction comparisons
-remain closed at `/mnt/data/kindle-breakout-world-model-20261107`.
+The new data cover all18 commands:16,384 fitting actions/65,503 emulator frames/
+22 game-overs and8,192 development actions/32,755 frames/10 game-overs. Training
+reuses fitting data only; no actor/critic learns. Reset-safe masks, known
+clipped-start terminal targets, uniform sampling and1/4/8/16/32-step exports are
+qualified. All four guarded phases complete,17 restored arrays and204 frozen
+parameter/moment tensors are exact,278 pins and all8,192 finite update rows
+pass.32 CPU world tests,60 Python tests and strict Clippy pass. Label-reference
+and CPU readout-support corrections remain separately preserved.
 
-Reset-safe prior-loss masks, uniform full-corpus sampling and expanded physical
-readouts are implemented. Clipped contexts retain genuine reward/terminal
-targets; later natural resets are masked from prior-image loss without entering
-imagined state.32 CPU world tests (18 GPU tests ignored),60 Python tests and
-strict Clippy pass after a preserved loop-style repair. Paddle validation found
-and corrected ball contamination; both original and corrected reviews remain.
+Root `/mnt/data/kindle-breakout-world-corpus-20261107`; execution source2774e4f2,
+native build49c99fb1/SHA prefix1b9d0dc6, matching runtime under that root. Source
+is archived before further code changes. No GPU job is active; completed stages
+must not repeat or extend.
 
-An action audit finds the old corpora contain only commands0/1/3/4, leaving14
-of the model's18 inputs uncovered. Select a new, separately justified all18
-corpus:16,384 fitting actions on seeds151001+1009/lane and8,192 development
-actions on191001+1009/lane, eight environments, sticky.25 and the same pixel
-controller with all18 random command blocks. This does not restart a completed
-collector. The earlier four-command sampler preflight remains preserved and is
-superseded for the broad run.
-
-Next qualify partial/all-zero masks and feature/restore readbacks, collect that
-corpus, then run one fixed8,192-update world-only learner and a frozen restore
-check. Keep RGB64/12M-preset/B8/T32/Auto/reconstruction100/prior16 and4e-4 rates.
-A precomputed uniform sampler includes reset crossings and retains genuine
-terminal labels at clipped context starts. Natural/contact/ending curves at
-0/1k/.../8k updates include32-step forecasts; optional latent exports support
-diagnosis. No actor/critic learns. Root `/mnt/data/kindle-breakout-world-corpus-20261107`.
-No GPU phase is launched at this publication. Untouched test, broader late-game
-coverage and fresh confirmation remain unfinished. Keep the goal active and
-unproven. Do not restart completed stages.
+Next implement optional **logits-based pixel cross-entropy** in the standalone
+world path, retaining default MSE/old restores. At true ball-core pixels the
+current sigmoid decoder paints nearly black, giving about2,500× smaller
+analytical output-logit gradients under MSE than cross-entropy. This motivates
+a bounded matched-data/init/sampler comparison after CPU/native loss,
+derivative and restore checks; it does not prove the cause or a BCE benefit.
+No next GPU allocation has been declared. Do not grow capacity or resume
+actor/critic as a substitute for fixing observed reconstruction. Untouched test,
+prospective action branches, late-game coverage and fresh confirmation remain
+unfinished. Keep the world-model goal active and unproven.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

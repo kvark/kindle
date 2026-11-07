@@ -5,44 +5,47 @@
 The user selected this direction after pausing the five-game campaign. Treat
 world-model competence as the immediate objective. Gameplay score is a later
 integration measure. Do not restart any closed learner, collector or comparison.
-The active goal is now **prove the world model training on Breakout**. The
-[isolated reconstruction comparison](results/2026-11-07-breakout-world-model-capacity.md)
-and [direct prior-image results](results/2026-11-07-breakout-world-model-rollout.md)
-establish native world-only training and a useful short-trajectory capacity
-result. Standard eight-step ball fitting improves1/8→4–5/8, while16-step remains
-2/8. Separate sticky-off fitting reaches4-step8/8,8-step4/4 supported targets and
-16-step7–8/8 across four fixed draws. Observed-state image reconstruction remains
-inconsistent. No actor/critic learns, and world-model competence is not proven.
+The active goal is **prove the world model training on Breakout**. The
+[broader all18 corpus experiment](results/2026-11-07-breakout-world-model-corpus.md)
+completes8,192 world-only updates in759.246s native training/1,032.918s total loop,
+but fails qualification. Dense observed reconstruction has0/220 fitting and
+0/112 development balls,94.53%/92.97% paddle accuracy and.00101/.19935 brick
+balanced error. Linear readouts of CNN/posterior features remain coarse; readout
+failure is not proof of absent information. Reward/endings remain weak. The
+[earlier isolated fitting](results/2026-11-07-breakout-world-model-capacity.md)
+and [direct prior-image gains](results/2026-11-07-breakout-world-model-rollout.md)
+remain short-trajectory capacity evidence.
 
-Reset-safe prior-loss masks and uniform full-corpus sampling are implemented.
-Clipped context starts keep known incoming rewards/terminals; actual later
-resets clear observed history, while prior-image losses stop at the first
-future reset without feeding boundary labels into imagined state.32 CPU world
-tests (18 GPU tests ignored),60 Python tests and strict Clippy pass. A loop-style
-qualification failure is retained separately from its repair. Evaluation adds
-paddle/brick measurements, reward-event probabilities and optional latent-state
-exports; native-image label validation and its paddle correction are retained.
+All18 commands now appear in16,384 fitting actions/65,503 emulator frames/
+22 game-overs and8,192 development actions/32,755 frames/10 game-overs, on separate
+seed families. This separately selected collector fixes the earlier four-command
+coverage gap without restarting a completed collector. Command counts alone do
+not prove state/action coverage. Training samples all16,414 fitting arrivals;
+2,097,152 replayed arrivals are not new environment actions.
 
-The input audit finds only commands0/1/3/4 in the old fitting/development
-corpora. Fourteen full18 inputs have no examples. Before the broader learner,
-collect a separately declared all18 corpus with16,384 fitting actions on fresh
-151001+1009/lane seeds and8,192 development actions on191001+1009/lane seeds.
-Keep eight environments/sticky.25 and the pixel controller, but sample command
-blocks from all18 IDs. This is new coverage data, not a repeat of a closed
-collector. The four-command sampler dry-run remains preserved as superseded.
+Reset-safe prior-loss masks retain terminal arrivals/known clipped-start targets
+without leaking future boundaries into imagined states. Natural/contact/ending
+curves cover1/4/8/16/32 steps, four draws; final dense exports support frozen
+readouts. These are retrospective recorded-control forecasts, not prospective
+planning.32 CPU world tests,60 Python tests and strict Clippy pass. All four
+guarded stages complete;278 pins,8,192 finite update rows, exact sampling plan,
+204 frozen tensors and17 restored arrays pass. Preserve label-reference and
+CPU readout-support corrections and the preceding original failures.
 
-Next qualify the mask composition, then run a fixed8,192-update world-only
-learner on that all18 fitting corpus, with separate development seeds,
-actual-initial controls, natural/contact/ending slices and1/4/8/16/32-step curves.
-Keep RGB64/12M-preset/B8/T32/Auto/reconstruction100/prior16 and4e-4 rates. The
-precomputed uniform sampler retains reset crossings and known terminal targets;
-expected exposures are recounted from the new data before GPU construction.
-No collection, coupled learner or completed stage repeats. A full-model frozen
-restore check is declared as a separate final phase. Root
-`/mnt/data/kindle-breakout-world-corpus-20261107`; no GPU phase has launched at
-this publication. Keep the goal active. Untouched test, event/brick competence,
-prospective action branches, later-game coverage and fresh confirmation remain
-unfinished.
+Root `/mnt/data/kindle-breakout-world-corpus-20261107`; execution2774e4f2, native
+build49c99fb1/SHA prefix1b9d0dc6. The exact source is archived. No GPU job is
+active; do not repeat or extend completed stages.
+
+Next implement optional logits-based pixel cross-entropy for standalone training,
+keeping default MSE and old restores. The sigmoid decoder predicts nearly black
+at true ball pixels; analytical output-logit MSE gradients are about2,500× weaker
+than cross-entropy there. This is a mechanism candidate, not measured upstream
+parameter gradients or proof of a better recipe. Qualify native values,
+derivatives and restore, then declare a bounded comparison on the same data,
+initialization, sampling plan and frozen evaluations. Loss units/relative KL
+weight change, so a gain will not isolate saturation alone. No next GPU
+allocation is declared. Actor/critic stays parked. Untouched test, prospective
+branches, late-game coverage and fresh confirmation remain unfinished.
 
 ### Representation and training scope
 
