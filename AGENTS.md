@@ -55,11 +55,13 @@ remain exact. Root `/mnt/data/kindle-breakout-world-coverage-20261107`.
 Collector complete:16,384 actions/65,492 emulator frames,44 natural endings,
 2,979 waiting windows across eight lanes,max absent non-FIRE run96;19.248s,
 age0/all204 tensors unchanged. Data/guard audit passes; no above-wall states.
-Separately declare one fresh matched-init8,192-update learner plus final restore.
+The separately declared matched-init8,192-update learner/final restore is active
+under80 input pins. Queue session25328,learner PID1618756 confirmed live;
+first640 updates finite and all204 initial tensors exact.
 Recipe:4 retained uniform +2 supplement uniform +1 waiting +1 terminal window;
 10,909 terminal targets versus2,649 previously,all32,849 fitting arrivals covered
 by the declared plan. Architecture/losses unchanged; no RAM/phase labels enter
-model inputs/objectives. No learner/actor/critic is active yet. No automatic
+model inputs/objectives. No actor/critic is active. No automatic
 extension/successor. Untouched tests,later-game/second-wall coverage and fresh
 confirmation remain unfinished; keep the full goal active.
 

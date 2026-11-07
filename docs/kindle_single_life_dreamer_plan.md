@@ -26,11 +26,12 @@ to game-over. Root `/mnt/data/kindle-breakout-world-coverage-20261107`. Eight CP
 checks pass and all8,192 old uniform plans/counts stay exact. Native3fa37b6d/
 eafe8359 unchanged. Collector complete:16,384 actions/65,492 frames,44 endings,
 2,979 waiting windows,max absent non-FIRE run96;19.248s,age0/204 tensors unchanged.
-Data/guard audit passes; no above-wall states. Separately declare one fresh
-matched-init8,192-update learner and restore; plan covers32,849 arrivals and
+Data/guard audit passes; no above-wall states. The separately declared fresh
+matched-init8,192-update learner/restore is active under80 pins(session25328,
+PID1618756;first640 updates finite,204 initial tensors exact). Plan covers32,849 arrivals and
 10,909 terminal targets versus2,649 previously.
 Per-update recipe:4 old uniform +2 new uniform +1 waiting +1 terminal window.
-No model/loss change or label inputs. No learner/actor/critic is active; no automatic
+No model/loss change or label inputs. No actor/critic is active; no automatic
 successor/extension. Max original corpus score56/34,no ball above top row;
 untouched tests,late-game/second-wall coverage and fresh confirmation remain open.
 
