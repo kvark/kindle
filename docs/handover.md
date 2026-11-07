@@ -18,21 +18,20 @@ gameplay score is a later integration test. CDP remains a subsequent efficiency
 comparison after the pixel baseline establishes competence.
 
 The active goal is to prove Breakout world-model training; the five-game
-campaign remains parked and unfinished. A standalone native world learner and
-fixed-data runner are implemented. CPU checks pass:29 world/regression tests
-(18 GPU tests ignored),53 Python analysis/regression tests and strict workspace
-and binding Clippy. The initial CPU build failure from a missing test-only
-constructor is preserved, with its separate repaired test log.
+campaign remains parked and unfinished. The [first isolated-world results](results/2026-11-07-breakout-world-model-capacity.md) establish native updates,
+frozen invariance and exact prediction restore, but fail physical competence.
+On eight fitting contact clips, reconstruction1→100 improves observed/one-step
+ball accuracy1/8→6/8;4-step improves0/6→3/6, then8/16-step forecasts remain weak.
+Both2,048-update learners take about130s of native training. No actor/critic,
+imitation or intrinsic training occurs. The earlier RGB checkpoint also omits
+an accepted ball on these clips. This is fitting evidence, not generalization.
 
-Next qualify the native composition with eight tiny synthetic updates and exact
-frozen/restore checks. Then collect fixed fitting/development clips with eight
-independent environments, inspect retained RGB weights, and run one bounded
-2,048-update capacity check on eight paddle-contact fitting clips. RGB64,
-12M RSSM preset,B8/T32,Auto,flat4e-4 learning rates; no behavior/auxiliary losses.
-The declared data includes standard sticky.25 and a separate sticky-off debug
-set. No untouched test set or full physics qualification is claimed by this
-capacity stage. Root `/mnt/data/kindle-breakout-world-model-20261107`.
-No new GPU phase has launched at this publication. Do not restart closed stages.
+Five guarded phases and their collector/capacity stages are complete at
+`/mnt/data/kindle-breakout-world-model-20261107`. Preserve them. The next focused
+change is direct RGB supervision through a prior rollout after an observed
+prefix. It is selected for implementation; no rollout learner is launched or
+qualified yet. Retain RGB64/12M/B8/T32/Auto for this investigation. No GPU job
+is active at this publication. The world-model goal remains active and unproven.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
