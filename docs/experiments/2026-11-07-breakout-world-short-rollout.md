@@ -80,3 +80,13 @@ Use current AMD host guard/Auto, verify live identity, stop real faults/nonfinit
 state, no reset/recovery/NVML. No unchanged extension, sweep or automatic successor.
 Completed negative learners and their original failures remain closed. Passing
 execution or intermediate gates does not complete the world-model goal.
+
+## Actual qualification and allocation
+
+All36 affected CPU tests pass. Preparation matches8192 source locations and
+non-suffix counts; H4 has256,201 valid suffix rows and2,382 terminal targets.
+First139-pin composition preflight completes in15.354s:204 exact initial
+weights/moments,18 original initial arrays,18 initial/trained restore arrays,
+65 changed parameters,finite11-report/mask/total and204 frozen tensors pass.
+No primitive/legacy fixture repeats or stage failure. A separately declared147-pin
+fresh8192 learner/restore is active; final-only branches await reviewed completion.

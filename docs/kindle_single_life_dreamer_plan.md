@@ -144,15 +144,18 @@ terminal; no GPU allocation,extension,sweep or automatic successor selected.
 Full world-model competence remains unproven; no actor/critic or collector.
 
 The [four-step image-rollout experiment](experiments/2026-11-07-breakout-world-short-rollout.md)
-is selected for a bounded composition check, then a separately declared fresh
-8192 learner if qualified. Keep the retained recurrent-conditioned architecture,
-RGB64/12M/B8/T32/Auto,mixing.01,seed/data/full source plan; shorten direct motion
-image supervision H16→4. Native85dbe150/SHA5b112866 is reused without rebuild.
-CPU preparation matches all8192 locations and non-suffix exposures; four-step
-suffix256,201 valid rows/2,382 terminals. All36 affected Python checks pass.
-No GPU allocation or learner is active yet; use the protocol before declaration.
-Root `/mnt/data/kindle-breakout-world-short-rollout-20261107`. All world gates
-remain unchanged; previous negative experiments stay closed. No automatic successor.
+is composition-qualified; its separately declared147-pin fresh8192 learner and
+restore are active in `kindle-world-short-rollout-learning-20261107`. Retain the
+recurrent-conditioned architecture,RGB64/12M/B8/T32/Auto,mixing.01,seed/data/full
+plan; shorten direct motion image supervision H16→4. Native85dbe150/SHA5b112866
+is reused without rebuild. CPU preparation matches all8192 locations/non-suffix
+exposures; four-step suffix256,201 valid rows/2,382 terminals. All36 Python checks
+pass. First qualification139 pins/15.354s passes204 exact initial tensors,18
+initial predictions,18 initial/trained restore arrays,65 changed parameters,
+finite11-report/mask/total and204 frozen tensors. Existing primitive/legacy
+qualification is reused. Root `/mnt/data/kindle-breakout-world-short-rollout-20261107`;
+all world gates remain; final-only branches await learning review. Previous
+negative experiments stay closed; no collector or automatic successor.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
