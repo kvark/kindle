@@ -431,6 +431,13 @@ impl WorldModelLearner {
     }
 
     pub fn save(&mut self, path: &Path) -> Result<(), Box<dyn std::error::Error>> {
+        if self.train.memory_summary().adam_state_bytes == 0 {
+            if self.train.adam_step_count() != 0 {
+                return Err(io::Error::other("stepped world optimizer has no moments").into());
+            }
+            runtime::configure_d3_optimizer(&mut self.train, &self.config, 0, 0.0);
+            self.train.clear_optimizer();
+        }
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
@@ -452,6 +459,9 @@ impl WorldModelLearner {
         let mut learner = Self::new(config)?;
         checkpoint::load_session(&mut learner.train, &path.join("world.safetensors"))?;
         learner.updates = metadata["updates"].as_u64().ok_or("missing update count")?;
+        if u64::from(learner.train.adam_step_count()) != learner.updates {
+            return Err(io::Error::other("world checkpoint optimizer age mismatch").into());
+        }
         learner.dirty = true;
         Ok(learner)
     }
