@@ -34,6 +34,16 @@ def test_latent_rollout_uses_dynamics_scale_and_distinct_report_names():
     assert corpus.reported_total(dict(loss_scales=scales),values,corpus.LATENT_OBJECTIVE,16)==100+2*(2+6)+.1*3+3*4+4*5
 
 
+def test_recurrent_energy_reports_and_total_keep_suffix_and_pixel_scales_distinct():
+    names=corpus.report_names(corpus.RECURRENT_OBJECTIVE,16)
+    assert names[:9]==corpus.LOSS_NAMES[:9]
+    assert names[9:]==('recurrent_energy','recurrent_target_distance','recurrent_sample_distance','recurrent_valid_fraction')
+    with pytest.raises(ValueError):corpus.report_names(corpus.RECURRENT_OBJECTIVE,0)
+    values=[0.,1.,2.,3.,4.,5.,0.,0.,0.,.25,.5,.5,.75]
+    scales=dict(reconstruction=100.,dynamics=2.,representation=.1,reward=3.,continuation=4.)
+    assert corpus.reported_total(dict(loss_scales=scales),values,corpus.RECURRENT_OBJECTIVE,16)==100*(1+.25)+2*2+.1*3+3*4+4*5
+
+
 class PersistenceLearner:
     config = dict(batch_size=2, horizon=333)
     updates = 7

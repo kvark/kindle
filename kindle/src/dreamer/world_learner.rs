@@ -29,6 +29,7 @@ pub enum PixelLoss {
     CrossEntropy,
     MotionCrossEntropy,
     MotionLatentOvershooting,
+    MotionRecurrentEnergy,
     PredictiveMotionEnergy,
     PredictiveMotionEnergyScoreFunction,
 }
@@ -39,6 +40,7 @@ impl PixelLoss {
             self,
             Self::MotionCrossEntropy
                 | Self::MotionLatentOvershooting
+                | Self::MotionRecurrentEnergy
                 | Self::PredictiveMotionEnergy
                 | Self::PredictiveMotionEnergyScoreFunction
         )
@@ -57,6 +59,10 @@ impl PixelLoss {
 
     pub(crate) fn latent_overshooting(self) -> bool {
         self == Self::MotionLatentOvershooting
+    }
+
+    pub(crate) fn recurrent_energy(self) -> bool {
+        self == Self::MotionRecurrentEnergy
     }
 }
 
@@ -258,11 +264,14 @@ impl WorldModelLearner {
         if prediction_length >= config.batch_length {
             return Err("prediction length must leave an observed prefix".into());
         }
-        if pixel_loss.latent_overshooting() && prediction_length == 0 {
-            return Err("latent overshooting requires a positive prediction length".into());
+        if (pixel_loss.latent_overshooting() || pixel_loss.recurrent_energy())
+            && prediction_length == 0
+        {
+            return Err("state rollout objective requires a positive prediction length".into());
         }
         if pixel_loss.motion_attention()
             && !pixel_loss.latent_overshooting()
+            && !pixel_loss.recurrent_energy()
             && prediction_length != 0
         {
             return Err("motion pixel attention requires no prior-image objective".into());
@@ -277,6 +286,7 @@ impl WorldModelLearner {
                 PixelLoss::CrossEntropy
                 | PixelLoss::MotionCrossEntropy
                 | PixelLoss::MotionLatentOvershooting
+                | PixelLoss::MotionRecurrentEnergy
                 | PixelLoss::PredictiveMotionEnergy
                 | PixelLoss::PredictiveMotionEnergyScoreFunction,
                 length,
@@ -478,7 +488,17 @@ impl WorldModelLearner {
             }
         }
         for (time, weight) in weights.iter().enumerate() {
-            if !self.pixel_loss.latent_overshooting() || time + 1 < weights.len() {
+            if self.pixel_loss.recurrent_energy() {
+                if time + 1 < weights.len() {
+                    for name in ["recurrent_first", "recurrent_second"] {
+                        let uniforms = (0..batch * size.stoch * size.classes)
+                            .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
+                            .collect::<Vec<_>>();
+                        self.train
+                            .set_input(&format!("{name}_uniforms_{time}"), &uniforms);
+                    }
+                }
+            } else if !self.pixel_loss.latent_overshooting() || time + 1 < weights.len() {
                 let uniforms = (0..batch * size.stoch * size.classes)
                     .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
                     .collect::<Vec<_>>();
@@ -506,7 +526,7 @@ impl WorldModelLearner {
             self.train
                 .read_output_by_index(index, std::slice::from_mut(loss));
         }
-        if self.prediction_length > 0 {
+        if self.prediction_length > 0 && !self.pixel_loss.recurrent_energy() {
             let mut loss = [0.0];
             self.train
                 .read_output_by_index(world::LOSS_WORLD_ROLLOUT, &mut loss);
@@ -517,6 +537,13 @@ impl WorldModelLearner {
         }
         if self.pixel_loss.predictive() {
             for index in world::LOSS_PREDICTIVE_WORLD..world::LOSS_PREDICTIVE_WORLD + 4 {
+                let mut loss = [0.0];
+                self.train.read_output_by_index(index, &mut loss);
+                losses.push(loss[0]);
+            }
+        }
+        if self.pixel_loss.recurrent_energy() {
+            for index in world::LOSS_RECURRENT_WORLD..world::LOSS_RECURRENT_WORLD + 4 {
                 let mut loss = [0.0];
                 self.train.read_output_by_index(index, &mut loss);
                 losses.push(loss[0]);

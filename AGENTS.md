@@ -85,6 +85,18 @@ action/emulator frame,package/production-graph change or overlay mixing.
 `analysis-source-review.json` supplements provenance. No worker,learner,collector
 or successor is active/selected. Do not repeat completed stages or old queues.
 
+The [recurrent-state energy experiment](docs/experiments/2026-11-07-breakout-world-recurrent-energy.md)
+is selected for qualification. Retain observed pixel/motion losses and train two
+causal H16 recurrent futures toward stopped observed h,using smoothed RMS energy
+at reconstruction scale100. Independent future samples,shared detached prefix;
+no sampled outcome scores,extra decoder,parameters or privileged inference input.
+Intermediate ST remains biased and targets are learned; physical gates decide.
+60 CPU world tests,54 affected Python checks and strict Clippy pass. Root
+`/mnt/data/kindle-breakout-world-recurrent-energy-20261107`. Package/native
+qualification precedes separately declared fixed8,192 learning. No GPU job yet;
+no collector or actor/critic. Add ending16 timing gates to the existing forecast
+checks; no latent-loss-only retention or unchanged extension.
+
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
 families and fresh confirmation. The retained oracle has no above-top-brick

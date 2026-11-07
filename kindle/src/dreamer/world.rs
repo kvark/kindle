@@ -53,9 +53,11 @@ mod latent_rollout;
 mod open_loop;
 mod pixel_rollout;
 mod predictive_world;
+mod recurrent_rollout;
 
 pub(crate) const LOSS_WORLD_ROLLOUT: usize = 25;
 pub(crate) const LOSS_PREDICTIVE_WORLD: usize = 26;
+pub(crate) const LOSS_RECURRENT_WORLD: usize = 30;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
     (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_centered {
@@ -341,7 +343,7 @@ pub(crate) fn build_world_only_pixel_training_graph(
         assert!(config.observation_kind.is_rgb());
         assert!(config.reconstruction_target_standardization.is_none());
     }
-    if pixel_loss.latent_overshooting() {
+    if pixel_loss.latent_overshooting() || pixel_loss.recurrent_energy() {
         assert!(prediction_length > 0);
     } else if pixel_loss.motion_attention() {
         assert_eq!(prediction_length, 0);
@@ -1073,7 +1075,10 @@ fn training_graph(
     } else {
         total
     };
-    let pixel_rollout = (prediction_length > 0 && !pixel_loss.latent_overshooting()).then(|| {
+    let pixel_rollout = (prediction_length > 0
+        && !pixel_loss.latent_overshooting()
+        && !pixel_loss.recurrent_energy())
+    .then(|| {
         assert!(!behavior && config.loss_scales.reconstruction > 0.0);
         assert!(prediction_length < length);
         let start = length - prediction_length;
@@ -1107,6 +1112,24 @@ fn training_graph(
     });
     let total = if let Some(rollout) = &latent_rollout {
         let weighted = graph.scale(rollout.loss, config.loss_scales.dynamics);
+        graph.add(total, weighted)
+    } else {
+        total
+    };
+    let recurrent_rollout = pixel_loss.recurrent_energy().then(|| {
+        assert!(prediction_length < length);
+        let start = length - prediction_length;
+        recurrent_rollout::build(
+            &mut graph,
+            config,
+            &model,
+            (deters[start - 1], stochs[start - 1]),
+            &actions[start..],
+            &deters[start..],
+        )
+    });
+    let total = if let Some(losses) = &recurrent_rollout {
+        let weighted = graph.scale(losses.energy, config.loss_scales.reconstruction);
         graph.add(total, weighted)
     } else {
         total
@@ -1187,6 +1210,17 @@ fn training_graph(
     }
     if let Some(losses) = predictive {
         while outputs.len() < LOSS_PREDICTIVE_WORLD {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([
+            losses.energy,
+            losses.target_distance,
+            losses.sample_distance,
+            losses.valid,
+        ]);
+    }
+    if let Some(losses) = recurrent_rollout {
+        while outputs.len() < LOSS_RECURRENT_WORLD {
             outputs.push(graph.scalar(0.0));
         }
         outputs.extend([
