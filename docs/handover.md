@@ -59,13 +59,17 @@ Test-only measurement; retained packages/production graphs are unchanged.
 successor is active/selected. Do not repeat completed stages or old-model runs.
 
 The [latent-overshooting experiment](experiments/2026-11-07-breakout-world-overshooting.md)
-is selected for qualification: retain pixel/motion reconstruction and add16-step
-causal prior-to-detached-posterior KL,without sampled outcome energy or extra
-image decoding. No new parameters,inference inputs or actor/critic.54 CPU world
-and53 affected Python checks pass; native values/derivatives,initial identity
-and restore precede a separately pinned fresh8,192-update learner. Root
-`/mnt/data/kindle-breakout-world-overshooting-20261107`. No GPU job is active yet.
-Preserve initial syntax,F32-reference and scalar-zero-gradient fixture failures.
+is qualified and its separately declared fresh8,192-update learner is active.
+Retain observed pixel/motion reconstruction; add16-step causal prior-to-detached-
+posterior KL,without sampled outcome energy or extra image decoding. Same68
+parameters,RGB64/12M/B8/T32/Auto,seed41001 and exact coverage4/2/1/1 plan.54 CPU
+world,53 affected/53 packaged Python checks,strict Clippy,native derivatives,
+204 initial tensors,18 initial/restore arrays and two guards/sealed audits pass.
+87 qualification/96 learning input pins; H16 retains9,570 terminals/975,941 valid
+suffix rows. Sourcee311b216/native SHA965f2bd2,matching root/runtime at
+`/mnt/data/kindle-breakout-world-overshooting-20261107`. Fixed external gates
+precede any retention decision. Preserve initial syntax,F32-reference and
+scalar-zero-gradient fixture failures. No collector or actor/critic is selected.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
 uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,

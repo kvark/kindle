@@ -85,3 +85,27 @@ physics. Preserve regressions even if a gate passes. No unchanged extension,
 scalar sweep,automatic fresh seed or actor/critic successor. Untouched trajectory
 families,fresh confirmation,late-game/tunnel/second wall and brick memory remain
 required before declaring the full world goal proved.
+
+## Qualified allocation
+
+Implementation/sourcee311b216,native SHA256
+`965f2bd2c4b619efe24e841fb0cb325cc85d208743ccbe1aec4fc32728a3f1a0`,
+matching root/runtime.54 CPU world tests,53 affected/53 packaged Python checks,
+strict workspace/bindings Clippy pass. Preserve initial Rust literal syntax,
+F32-mixture/mean-reference and scalar-zero-sentinel fixture failures; corrected
+references match exact graph constants and scalar dead gradients are verified0.
+
+One native derivative fixture and full-shape preflight pass under two guards
+and nine sealed pins each. All204 initial tensors,18 initial arrays and18 trained
+restore arrays match;204 tensors stay frozen in exports. First11-report update
+matches shared observed components and total/validity identities;65 parameters
+change,three reward-hidden tensors correctly remain fixed behind zero output
+weights. Legacy coverage restores.87 qualification input pins pass.
+
+CPU review reproduces all8,192 coverage locations exactly; H16 has9,570 valid
+terminal arrivals and975,941 valid suffix rows. All other source counts match
+H0:10,909 observed terminals,34,440 positive rewards,10,488 natural resets,
+75,808 context resets,32,849 sampled unique arrivals of32,850 available.
+Separately pinned96-input learning declaration selects only this fresh8,192-
+update learner(3600s) and final restore(600s). No new actions/emulator frames
+are collected. Qualification does not establish learning or full competence.
