@@ -179,3 +179,17 @@ oracle feasibility check gives baseline.169502219,threshold.127126664 and exact
 finite-oracle minimum.004211016. This is not a population calibration bound.
 A separate RAM-reference detector audit confirms no above-top-brick endpoints
 and some finite-coordinate balls outside detector support. Preserve these limits.
+
+
+## Closed comparison
+
+All declared stages are closed; see the [complete result](../results/2026-11-07-breakout-world-energy.md).
+The final frozen comparison improves ending Brier.144566→.006129 and last-life
+RIGHT ending probability50.211%→97.182%,but precise tracking regresses and primary
+ball energy improves10.45%,failing25%. Non-ending group means pass5% while
+individual assigned probabilities worsen. Native training costs86.58% more.
+Retain both models as different development capabilities,not a replacement.
+All77/89/648 phase pins,five guards/sealed audits,204 frozen tensors and18 restore
+arrays pass. Initial CPU failures and original prototype failures remain intact.
+No new native correction,learner,collector or GPU successor is selected. The full
+world goal remains active/unproven; actor/critic stays parked.

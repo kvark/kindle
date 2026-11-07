@@ -5,72 +5,54 @@
 The user selected this direction after pausing the five-game campaign. Treat
 world-model competence as the immediate objective. Gameplay score is a later
 integration measure. Do not restart any closed learner, collector or comparison.
-The active goal is **prove the world model training on Breakout**. The
-[closed motion-weighted pixel learner](results/2026-11-07-breakout-world-motion-attention.md)
-passes observed development ball reconstruction107/112 (95.54%) versus5/112 for
-plain H0. Forecast accuracy is85.32%/32.11%/7.48% at1/4/8 decisions; unseen
-brick layouts remain weak. Native530.143s/8,192 updates,734.272s total. All307
-pins,204 frozen tensors and18 exact restored arrays pass. Source/native3fa37b6d,
-SHA eafe8359; root `/mnt/data/kindle-breakout-world-motion-20261107`. No actor/
-critic learns. Earlier H16/H0 failures and CPU repairs stay in linked reports.
+The active goal is **prove the world model training on Breakout**. Actor/
+critic and the five-game campaign are parked. Use the native pixel-supervised
+CNN/categorical RSSM/RGB decoder as the inspectable reference; CDP is a later
+efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
+model inputs/objectives. Full competence remains unproven.
 
-The [closed fixed-plan challenge](results/2026-11-07-breakout-world-branches.md)
-finds short paddle response but drifting ball forecasts,wrong serving and severe
-last-life ending underprediction(.581% versus100% on RIGHT). All431 input pins,
-guards and204 invariant tensors pass. Preserve its three original failures and
-separate repairs. No completed collector/learner/evaluator repeats.
+The [motion learner](results/2026-11-07-breakout-world-motion-attention.md)
+solves most observed ball reconstruction; the [coverage comparison](results/2026-11-07-breakout-world-coverage.md)
+fixes waiting and improves contacts/ending. Retain both closed results, including
+original count/comparison failures and the invalid FIRE90% pair-match gate with
+separate repairs/reviews. Do not repeat any completed worker or collector.
 
-The [closed coverage experiment](results/2026-11-07-breakout-world-coverage.md)
-adds16,384 fitting actions/65,492 frames and4/2/1/1 retained/new/waiting/terminal
-sampling,with model/loss/native unchanged. Fresh matched-init8,192 updates cost
-529.515s native/796.900s loop; observed balls108/112,NOOP8 false balls95.3%→0%,
-paddle-approach32 ball energy.8510→.2563,last-life RIGHT ending probability
-.581%→50.211%(oracle100%). Ending Brier.144566 fails.10; long forecasts,reward
-and bricks remain mixed. Retain both models/new fitting data as development.
+The [joint predictive energy comparison](results/2026-11-07-breakout-world-energy.md)
+is now **closed**. At matched fresh8,192 updates,observed balls109/112 versus
+108/112 and brick balanced error.207707 versus.223954 improve,but one-step
+81/109 versus94/109 and eight-step4/107 versus14/107 regress. Native987.968s/
+loop1,338.229s versus529.515/796.900s. Retain both models as different development
+capabilities; no replacement or gameplay/seed-reliability claim.
 
-Root `/mnt/data/kindle-breakout-world-coverage-20261107`. All35/80/482 phase
-pins,204 initial/frozen tensors,18 initial-development/final-restore arrays and
-four native guards pass. Original queue remains protocol-failed:32,849 sampled
-versus32,850 total arrivals; separate CPU review and only the unstarted restore
-complete evidence. Preserve CPU comparison SyntaxError/repair and invalid FIRE
-pair-match gate90% versus empirical maximum78.125%; do not relabel it passed.
-Future protocols need proper scores/oracle uncertainty. No completed stage repeats.
+Frozen history16/32,eight draws,84 groups finds useful ending learning: last-life
+RIGHT97.182% versus50.211% (oracle100%); ending Brier.006129 versus.144566,passing.10.
+Aggregate16/32 ball energy improves10.45%,failing the declared25% gate. Non-ending
+group means pass5%,but65/304 origin-plan cases assign>5% ending probability,
+maximum25.990%,versus0/304 and1.907% control. Precise tracking/reward remain weak.
 
-The [pointwise predictive prototype](experiments/2026-11-07-breakout-world-predictive.md#closed-prototype-before-full-learning)
-is parked without a full learner: per-sample target error can average uncertain
-futures. Its one-update core completed; original final68-change assertion failed
-(actual65, three reward-hidden tensors receive no gradient with a zero output
-weight). Separate CPU-only70-pin repair verifies evidence, preserves failure,
-and does not rerun GPU. Root `/mnt/data/kindle-breakout-world-predictive-20261107`.
+Root `/mnt/data/kindle-breakout-world-energy-20261107`,native/source161839d9,
+SHA8d5552e5,matching root/runtime.43 CPU world/41 affected/41 packaged Python checks,
+strict Clippy,77/89/648 phase input pins,five guards/sealed audits,204 initial/
+frozen tensors,18 initial/restore arrays and8,192 finite13-report rows pass.
+Preserve initial CPU fixture/path failures. `closure-review.json` verifies closure.
+The coverage trajectory control remains at its exact native/source3fa37b6d,
+SHAeafe8359,runtime `/mnt/data/kindle-breakout-world-motion-20261107/runtime`.
+Do not mix runtime overlays or objectives.
 
-The selected [joint energy experiment](experiments/2026-11-07-breakout-world-energy.md)
-compares two sampled prior worlds to the arrival and to each other. RGB metric
-weights use real past frames only; reward/continuation are sampled from their
-existing heads/encoded targets. Native categorical gradients remain straight-through
-surrogates. No new parameters/inputs; unchanged posterior losses. Explicit
-`predictive_motion_energy`,13 reports; no actor/critic or collector.
-Root `/mnt/data/kindle-breakout-world-energy-20261107`. Native/source161839d9,
-SHA8d5552e5,matching root/runtime.43 CPU world tests,41 affected and packaged
-Python checks,strict workspace/bindings Clippy pass. Preserve initial CPU fixture/
-path failures and repairs. New native F64 energy fixture and full-size preflight
-pass,77 input pins,two clean guards/sealed audits,204 initial/frozen tensors,
-18 initial/restore arrays and65 expected first-update changes. Old observed
-components match; no GPU fault/recovery. No completed qualification repeats.
+An exact CPU three-bin counterexample shows the energy head-coordinate ST
+surrogate can miss variance correction. It does not attribute full-model
+regressions. A conditional score-function correction has only a CPU derivation;
+no new native path/learner is selected. The [earlier pointwise prototype](experiments/2026-11-07-breakout-world-predictive.md#closed-prototype-before-full-learning)
+remains parked without full training,with its failed68-change assertion and
+separate CPU repair preserved.
 
-The fixed fresh matched-init8,192-update learner and restore are closed.
-89 learning pins,all68 parameters changed,8,192 finite13-report rows,204 initial/
-frozen tensors,18 exact initial-development/restore arrays and both sealed guards
-pass. Native987.968s/loop1,338.229s,versus529.515/796.900s coverage. Dense observed
-ball109/112 versus108/112;one-step81/109 versus94/109,eight-step4/107 versus14/107.
-Brick balanced error.207707 improves.223954. No blanket promotion.
+No Kindle GPU allocation or successor is active/selected. Use the findings before
+separately declaring another bounded experiment; no unchanged extension or broad
+seed campaign. Remaining requirements include precise causal1/4/8/16/32 forecasts,
+reward/uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall
+coverage,untouched tests and fresh confirmation. The retained oracle has no
+above-top-brick endpoints; detector-support limits and duplicate contexts remain.
 
-Learning reviewed; only this final checkpoint's frozen oracle evaluation is
-active: history16/32,eight draws,84 groups,648 input pins. No learning,collector
-or old-model rerun. Do not start another GPU job or mistake an observer timeout
-for a stopped worker. A CPU three-bin counterexample verifies that sampled
-head-coordinate ST gradients can miss variance correction; it does not attribute
-this full learner's regression. Full goal,untouched tests,late-game/second-wall
-coverage,brick memory and fresh confirmation stay unfinished.
 ### Representation and training scope
 
 Start with a **pixel-supervised latent RSSM baseline**, using Kindle's existing
