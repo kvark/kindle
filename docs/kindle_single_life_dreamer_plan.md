@@ -30,10 +30,13 @@ Default MSE/plain BCE remain available.
 
 37 CPU world tests,61 Python checks and strict workspace/bindings Clippy pass.
 New v2 writes explicitly preserve objective; old v1 MSE/BCE restores remain.
-No GPU allocation is active. Root `/mnt/data/kindle-breakout-world-motion-20261107`.
-Next package, pin and qualify native motion values/derivatives plus one full-size
-matched-init/update/frozen/restore preflight. Review before separately declaring
-one fixed8,192-update learner/final restore. No automatic successor/extension,
+Root `/mnt/data/kindle-breakout-world-motion-20261107`. Native/source3fa37b6d,
+SHA eafe8359. Both new qualification workers pass306 pins: F64 values/derivatives
+and full-size matched-init/update/frozen/v1+v2 restore. The fresh8,192-update
+learner/final restore is separately declared and active under307 pins. Session
+71177, learner PID1609131 confirmed live; first736 updates finite. Initial
+weights/source samples/origins match H0; matched one-step encoder moments differ,
+confirming motion reweighting is active. No automatic successor/extension,
 new data, capacity change or actor/critic resume. Untouched tests, prospective
 branches, calibration, later-game coverage and fresh confirmation remain unfinished.
 

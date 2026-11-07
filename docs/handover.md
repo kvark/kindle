@@ -43,10 +43,15 @@ is not calibrated likelihood. Default MSE/plain BCE remain available.
 Implementation and37 CPU world tests (20 GPU tests ignored),61 Python checks and
 strict workspace/bindings Clippy pass. New v2 checkpoints explicitly preserve
 objective; old v1 MSE/BCE restores remain supported. Next package and qualify
-only two new workers: native F64 motion-weight/loss/derivatives, then full-size
-motion-H0 matched-init/one-update/frozen/v1+v2 restore preflight. Root
-`/mnt/data/kindle-breakout-world-motion-20261107`. No GPU allocation is active.
-Review qualification before declaring the fixed8,192-update learner/restore.
+two new workers: native F64 motion-weight/loss/derivatives and full-size
+motion-H0 matched-init/update/frozen/v1+v2 restore. Both now pass, with306 pins,
+204 initial/frozen tensors and18 exact restored arrays. Native/source3fa37b6d,
+SHA prefixeafe8359, matching runtime at
+`/mnt/data/kindle-breakout-world-motion-20261107/runtime`. The separately declared
+fresh8,192-update learner/final restore is active under307 pins. Queue session
+71177; learner PID1609131 confirmed live, first736 updates finite. Initial
+weights/source samples/origins match H0. One matched preflight update changes99
+optimizer moments, including encoder moments, confirming reweighting is active.
 No capacity increase, recollection, unchanged extension, automatic successor or
 actor/critic resume. Untouched tests, prospective branches, later-game coverage
 and fresh confirmation remain unfinished. Keep the full goal active and unproven.

@@ -83,7 +83,18 @@ calibrated stochastic outcomes, late-game/tunnel/second-wall coverage and fresh
 confirmation remain unfinished. No capacity increase, broad seed campaign,
 unchanged extension, actor/critic resume or automatic successor is selected.
 
-Root `/mnt/data/kindle-breakout-world-motion-20261107`. Implementation and initial
-CPU checks are ready; package/native qualification is next. No GPU allocation
-has launched at publication. The completed H0 source36a5d3e0 is archived before
-these code changes; its weights, logs, evaluations and original receipts remain.
+Root `/mnt/data/kindle-breakout-world-motion-20261107`. Implementation,37 CPU
+world tests,61 packaged Python checks and strict workspace/bindings Clippy pass.
+Native/source3fa37b6d, SHA256
+`eafe8359ae5019ea0a5a7517b7acfe75aacaf64b4e84a3bcd9ec4548cf939dc5`.
+Both new GPU workers pass306 pins: native F64 weights/loss/derivatives and
+full-size matched-init/one-update/frozen/v1+v2 restore. Initial204 tensors/18
+arrays, trained18 arrays and204 frozen tensors are exact; v2 objective retained.
+One matched preflight update changes99 optimizer moments (including encoder)
+versus plain H0, verifying integration without a competence claim.
+
+After review, the fresh8,192-update learner/final restore is separately declared
+and active under307 pins. Queue session71177; learner PID1609131 confirmed live,
+first736 updates finite. Initial weights/source plan/origins match H0. Stop at
+the fixed budget; no automatic successor. The completed H0 source36a5d3e0 is
+archived before these changes; original artifacts/receipts remain unchanged.
