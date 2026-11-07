@@ -97,25 +97,25 @@ imports or queries; no acceptance-gate change. Preserve the first closure
 self-stdout hash failure and separate CPU-only seal repair; analysis/recount
 remain unchanged and are not rerun.
 
-The [frozen-visual staged world experiment](docs/results/2026-11-07-breakout-world-frozen-visual.md)
-is closed and fails retention. Warm-start8192+4096 updates preserves development
-observed108/112 and one-step94/109, improves four-step33→51/109 and eight-step
-14→24/107, but misses28/107; sixteen4/114 and thirty-two0/95 remain weak.
-Primary16/32 energy0.204741 versus.169502 H0;
-all existing event/per-plan gates remain in the linked result. Keep coverage;
-no unchanged extension, repeat, collector, sweep or automatic successor.
+The [frozen-visual phase](docs/results/2026-11-07-breakout-world-frozen-visual.md)
+is closed and fails retention: observed108/112 and one-step94/109 preserved,
+four/eight-step51/109 and24/107 improve, but primary energy.204741 versus.169502
+and ending/presence gates fail. Keep coverage; no unchanged extension or repeat.
 
-Root `/mnt/data/kindle-breakout-world-frozen-visual-20261107`, native7ed07b2b/
-SHA3032c0a6,runner442a2b45. Native phase calls383.411s/loop535.628s plus inherited
-529.515/796.900s; final-only84 branch groups and CPU diagnostics are complete.
-The experiment combines warm initialization,H16 and freezing; no isolated causal
-claim. All36 visual weights stay exact,all32 trainable weights/72 frozen-weight
-moments change. All375 learning/1129 branch pins,4096 finite loss rows,204 inherited/
-frozen tensors,108 initial arrays,18 restore arrays and four successful guards pass.
-Preserve first CPU fixture/native-config failures and separately qualified exact-F32
-repair (92 CPU checks,353 pins,two native verification updates); failures remain
-failures. No old stage repeats. No GPU worker or new allocation is selected.
-Actor/critic,CDP comparisons and five-game work remain parked; full world goal open.
+The [posterior-correction readout diagnostic](docs/experiments/2026-11-07-breakout-world-posterior-correction.md)
+is selected. Root `/mnt/data/kindle-breakout-world-posterior-correction-20261107`.
+Use cached coverage forecast h and true current future images to recompute
+q(z|h_prior,image), then decode at that same h without feeding corrections back.
+Earlier teacher-z swaps used teacher-history h; this checks a missing condition
+before selecting any new future-latent loss. Privileged images/readouts are not
+forecast competence. No learner, optimizer, ordinary forecast or collector.
+
+Two focused CPU tests and strict Kindle lib/tests Clippy pass. Declare one900s
+AMD/Auto guarded inference-only fixture:24 traces,768 correction steps,all36
+visual weights invariant,regenerated cached prior draws exact,step1 teacher
+identities and source204-tensor checkpoint bytes unchanged. No production graph/
+API/package change or old stage repeat. Native correction remains unfinished;
+no automatic training successor. Original world gates and full goal stay open.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched

@@ -22,6 +22,8 @@ mod gradient_diagnostic;
 #[cfg(test)]
 mod motion_tests;
 #[cfg(test)]
+mod posterior_correction_diagnostic;
+#[cfg(test)]
 mod state_diagnostic;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
