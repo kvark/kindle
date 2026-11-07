@@ -38,10 +38,10 @@ def require_device(learner):
         assert all(name.startswith('world.') for name in learner.parameter_names)
 
 
-def fixture(config, output, prediction_length=0):
+def fixture(config, output, prediction_length=0, pixel_loss="squared_error"):
     import kindle
     from safetensors.numpy import load_file
-    learner = kindle.WorldModelLearner(config, prediction_length=prediction_length)
+    learner = kindle.WorldModelLearner(config, prediction_length=prediction_length, pixel_loss=pixel_loss)
     require_device(learner)
     batch, length = config['batch_size'], config['batch_length']
     frames = [np.full((210, 160, 3), [64, 128, 192], np.uint8) for _ in range(batch)]
@@ -92,16 +92,16 @@ def fixture(config, output, prediction_length=0):
     assert all(np.array_equal(final[name], after[name]) for name in final)
     restored = kindle.WorldModelLearner.restore(str(output/'trained'))
     repeat = restored.predict(pixels(observations[:2]), actions[:2].ravel().tolist(), [0]*(batch*4), seed=73001, include_features=True)
-    assert repeat == prediction and restored.updates == 8 and restored.prediction_length == prediction_length
+    assert repeat == prediction and restored.updates == 8 and restored.prediction_length == prediction_length and restored.pixel_loss == pixel_loss
     write(output/'result.json', dict(status='complete', updates=8, no_behavior=True, changes=changes,
-                                   reports=reports, prediction_restore_equal=True, frozen_tensors=len(final), prediction_length=prediction_length))
+                                   reports=reports, prediction_restore_equal=True, frozen_tensors=len(final), prediction_length=prediction_length, pixel_loss=learner.pixel_loss))
 
 
-def mask_fixture(config, output, prediction_length):
+def mask_fixture(config, output, prediction_length, pixel_loss="squared_error"):
     import kindle
     assert config['batch_length'] == 4 and prediction_length == 2
     (output/'unmasked').mkdir()
-    fixture(config, output/'unmasked', prediction_length)
+    fixture(config, output/'unmasked', prediction_length, pixel_loss)
     batch = config['batch_size']
     observations = np.full((4, batch, 3, 64, 64), -.25, np.float32)
     actions = np.zeros((4, batch), np.int32)
@@ -111,7 +111,7 @@ def mask_fixture(config, output, prediction_length):
     rewards = np.zeros((4, batch), np.float32)
     reports = []
     for replacement in (0., .4):
-        learner = kindle.WorldModelLearner(config, prediction_length=prediction_length)
+        learner = kindle.WorldModelLearner(config, prediction_length=prediction_length, pixel_loss=pixel_loss)
         require_device(learner)
         changed = observations.copy()
         changed[3] = replacement
@@ -119,7 +119,7 @@ def mask_fixture(config, output, prediction_length):
     np.testing.assert_allclose(reports[0][9], reports[1][9], rtol=1e-6, atol=1e-5)
     assert abs(reports[0][1]-reports[1][1]) > 1e-3
     assert reports[0][10] == reports[1][10] == .5
-    learner = kindle.WorldModelLearner(config, prediction_length=prediction_length)
+    learner = kindle.WorldModelLearner(config, prediction_length=prediction_length, pixel_loss=pixel_loss)
     actions[2], actions[3] = -1, 0
     terminals[2], terminals[1] = False, True
     all_masked = learner.learn(pixels(observations), actions.ravel().tolist(), rewards.ravel().tolist(), terminals.ravel().tolist())
@@ -131,7 +131,7 @@ def mask_fixture(config, output, prediction_length):
     assert clipped_terminal[10] == 1
     write(output/'result.json', dict(status='complete', prediction_length=prediction_length, synthetic_updates=12,
           masked_target_reports=reports, all_masked_report=all_masked, clipped_terminal_report=clipped_terminal,
-          target_changes_do_not_affect_prior_loss=True))
+          target_changes_do_not_affect_prior_loss=True, pixel_loss=learner.pixel_loss))
 
 
 def collect(config, output, *, action_pool=(0, 1, 3, 4), groups=None):
@@ -297,7 +297,7 @@ def evaluate(learner, batch, output, step):
     return result
 
 
-def overfit(config, output, dataset, steps, prediction_length=0):
+def overfit(config, output, dataset, steps, prediction_length=0, pixel_loss="squared_error"):
     import kindle
     from safetensors.numpy import load_file
     streams = [dict(np.load(dataset/f'lane{i}.npz', allow_pickle=False)) for i in range(8)]
@@ -305,7 +305,7 @@ def overfit(config, output, dataset, steps, prediction_length=0):
     batch = training_windows(streams, starts, config['batch_length'])
     write(output/'selection.json', dict(starts=starts, source_manifest=sha(dataset/'manifest.json'),
         training_only=True, labels_used_only_to_select_contact_candidates=True))
-    learner = kindle.WorldModelLearner(config, prediction_length=prediction_length)
+    learner = kindle.WorldModelLearner(config, prediction_length=prediction_length, pixel_loss=pixel_loss)
     require_device(learner)
     learner.save(str(output/'initial'))
     evaluate(learner, batch, output, 0)
@@ -347,20 +347,23 @@ def main():
     parser.add_argument('--checkpoint', type=Path)
     parser.add_argument('--steps', type=int, default=2048)
     parser.add_argument('--prediction-length', type=int, default=0)
+    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy"), default="squared_error")
     args = parser.parse_args()
+    if args.mode in ("collect", "baseline") and args.pixel_loss != "squared_error":
+        parser.error("pixel-loss applies to training/fixtures only")
     args.output.mkdir(parents=True, exist_ok=False)
     config = json.loads(args.config.read_text())
     write(args.output/'declaration.json', dict(mode=args.mode, config=config, steps=args.steps,
-        source_sha256=sha(__file__), dataset=str(args.dataset), prediction_length=args.prediction_length, started_unix=time.time()))
-    if args.mode == 'fixture': fixture(config, args.output, args.prediction_length)
-    elif args.mode == 'mask-fixture': mask_fixture(config, args.output, args.prediction_length)
+        source_sha256=sha(__file__), dataset=str(args.dataset), prediction_length=args.prediction_length, pixel_loss=args.pixel_loss, started_unix=time.time()))
+    if args.mode == 'fixture': fixture(config, args.output, args.prediction_length, args.pixel_loss)
+    elif args.mode == 'mask-fixture': mask_fixture(config, args.output, args.prediction_length, args.pixel_loss)
     elif args.mode == 'collect': collect(config, args.output)
     elif args.mode == 'baseline':
         if args.dataset is None or args.checkpoint is None: parser.error('baseline requires dataset and checkpoint')
         baseline(args.output, args.dataset, args.checkpoint)
     else:
         if args.dataset is None or args.steps <= 0: parser.error('overfit requires dataset and positive steps')
-        overfit(config, args.output, args.dataset, args.steps, args.prediction_length)
+        overfit(config, args.output, args.dataset, args.steps, args.prediction_length, args.pixel_loss)
 
 
 if __name__ == '__main__':

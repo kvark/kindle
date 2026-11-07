@@ -898,6 +898,20 @@ pub(crate) enum ObservationDecoder {
 }
 
 impl ObservationDecoder {
+    pub(crate) fn cross_entropy(
+        &self,
+        graph: &mut Graph,
+        input: NodeId,
+        target: NodeId,
+        batch: usize,
+    ) -> NodeId {
+        let Self::Rgb(decoder) = self else {
+            panic!("pixel cross-entropy requires RGB decoder")
+        };
+        let logits = decoder.forward_logits(graph, input, batch);
+        pixel_cross_entropy(graph, logits, target)
+    }
+
     pub(crate) fn new(
         graph: &mut Graph,
         config: &DreamerConfig,
@@ -923,6 +937,23 @@ impl ObservationDecoder {
             Self::Rgb(decoder) => decoder.forward(graph, input, batch),
         }
     }
+}
+
+/// Elementwise soft-RGB cross-entropy, evaluated directly from logits.
+pub(crate) fn pixel_cross_entropy(
+    graph: &mut Graph,
+    logits: NodeId,
+    centered_target: NodeId,
+) -> NodeId {
+    let target = graph.stop_gradient(centered_target);
+    let shape = graph.node(target).ty.shape.clone();
+    let target = graph.reshape(target, &[shape.iter().product(), 1]);
+    let offset = graph.scalar(0.5);
+    let target = graph.bias_add(target, offset);
+    let target = graph.reshape(target, &shape);
+    let positive = graph.softplus(logits, 1.0);
+    let product = graph.mul(logits, target);
+    graph.sub(positive, product)
 }
 
 pub(crate) struct FeatureDecoder {

@@ -12,6 +12,7 @@ import breakout_world_corpus as corpus
 class PersistenceLearner:
     config = dict(batch_size=2, horizon=333)
     updates = 7
+    pixel_loss = 'squared_error'
 
     def predict(self, observations, actions, future, *, seed, include_features):
         batch = self.config['batch_size']

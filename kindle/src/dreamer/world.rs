@@ -11,6 +11,7 @@ use super::networks::{
     feature, gumbel_sample, mixed_log_probabilities, mixed_probabilities, scale, slice_columns,
     straight_through_sample, sum, weighted_cross_entropy,
 };
+use super::world_learner::PixelLoss;
 use crate::vision::levjepa::joint;
 mod prior_continuation;
 #[cfg(test)]
@@ -291,7 +292,15 @@ fn build_training_graph_grouped(
     length: usize,
     time_batch_length: usize,
 ) -> Graph {
-    training_graph(config, length, time_batch_length, false, true, 0)
+    training_graph(
+        config,
+        length,
+        time_batch_length,
+        false,
+        true,
+        0,
+        PixelLoss::SquaredError,
+    )
 }
 
 /// Sample and export the posterior before consuming late behavior targets.
@@ -303,6 +312,7 @@ pub(crate) fn build_staged_training_graph(config: &DreamerConfig) -> Graph {
         true,
         true,
         0,
+        PixelLoss::SquaredError,
     )
 }
 
@@ -316,6 +326,18 @@ pub(crate) fn build_world_only_rollout_training_graph(
     config: &DreamerConfig,
     prediction_length: usize,
 ) -> Graph {
+    build_world_only_pixel_training_graph(config, prediction_length, PixelLoss::SquaredError)
+}
+
+pub(crate) fn build_world_only_pixel_training_graph(
+    config: &DreamerConfig,
+    prediction_length: usize,
+    pixel_loss: PixelLoss,
+) -> Graph {
+    if pixel_loss == PixelLoss::CrossEntropy {
+        assert!(config.observation_kind.is_rgb());
+        assert!(config.reconstruction_target_standardization.is_none());
+    }
     assert!(!config.actor_critic_gradient && !config.expert_world_gradient());
     assert!(!config.uses_disagreement() && !config.visitation_bonus);
     assert_eq!(config.loss_scales.replay_value, 0.0);
@@ -326,6 +348,7 @@ pub(crate) fn build_world_only_rollout_training_graph(
         true,
         false,
         prediction_length,
+        pixel_loss,
     )
 }
 
@@ -336,6 +359,7 @@ fn training_graph(
     sample_posterior: bool,
     behavior: bool,
     prediction_length: usize,
+    pixel_loss: PixelLoss,
 ) -> Graph {
     config.validate();
     assert!(length > 0 && length <= config.batch_length);
@@ -653,17 +677,22 @@ fn training_graph(
             future_prediction_losses.push(graph.mean_all(per_row));
         }
         if let Some(decoder) = &model.decoder {
-            let reconstruction = decoder.forward(&mut graph, state, rows);
-            let reconstruction = graph.reshape(reconstruction, &[rows, config.observation_dim()]);
-            let target = graph.stop_gradient(observation);
-            let target = standardized_target(
-                &mut graph,
-                target,
-                config.reconstruction_target_standardization.as_ref(),
-            );
-            let negative_target = graph.neg(target);
-            let residual = graph.add(reconstruction, negative_target);
-            let squared = graph.mul(residual, residual);
+            let squared = if pixel_loss == PixelLoss::CrossEntropy {
+                decoder.cross_entropy(&mut graph, state, observation, rows)
+            } else {
+                let reconstruction = decoder.forward(&mut graph, state, rows);
+                let reconstruction =
+                    graph.reshape(reconstruction, &[rows, config.observation_dim()]);
+                let target = graph.stop_gradient(observation);
+                let target = standardized_target(
+                    &mut graph,
+                    target,
+                    config.reconstruction_target_standardization.as_ref(),
+                );
+                let negative_target = graph.neg(target);
+                let residual = graph.add(reconstruction, negative_target);
+                graph.mul(residual, residual)
+            };
             let reconstruction_loss = graph.sum_all(squared);
             // Sum event dimensions and average B*T, as in the D3 control.
             reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / rows as f32));
@@ -924,10 +953,10 @@ fn training_graph(
             &mut graph,
             config,
             &model,
-            deters[start - 1],
-            stochs[start - 1],
+            (deters[start - 1], stochs[start - 1]),
             &actions[start..],
             &observations[start..],
+            pixel_loss,
         )
     });
     let total = if let Some(rollout) = &pixel_rollout {

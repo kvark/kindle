@@ -14,6 +14,14 @@ use super::{
 };
 use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PixelLoss {
+    #[default]
+    SquaredError,
+    CrossEntropy,
+}
+
 pub struct WorldPrediction {
     /// Centered CHW RGB, batch-major.
     pub posterior: Vec<f32>,
@@ -41,6 +49,7 @@ pub struct WorldModelLearner {
     rng: StdRng,
     rollout_rng: StdRng,
     prediction_length: usize,
+    pixel_loss: PixelLoss,
     updates: u64,
     dirty: bool,
 }
@@ -174,16 +183,33 @@ impl WorldModelLearner {
         config: DreamerConfig,
         prediction_length: usize,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::with_pixel_loss(config, prediction_length, PixelLoss::SquaredError)
+    }
+
+    pub fn with_pixel_loss(
+        config: DreamerConfig,
+        prediction_length: usize,
+        pixel_loss: PixelLoss,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
         validate_config(&config)?;
         config.validate();
+        if pixel_loss == PixelLoss::CrossEntropy
+            && config.reconstruction_target_standardization.is_some()
+        {
+            return Err("pixel cross-entropy requires unstandardized RGB targets".into());
+        }
         if prediction_length >= config.batch_length {
             return Err("prediction length must leave an observed prefix".into());
         }
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let graph = if prediction_length == 0 {
-            world::build_world_only_training_graph(&config)
-        } else {
-            world::build_world_only_rollout_training_graph(&config, prediction_length)
+        let graph = match (pixel_loss, prediction_length) {
+            (PixelLoss::SquaredError, 0) => world::build_world_only_training_graph(&config),
+            (PixelLoss::SquaredError, length) => {
+                world::build_world_only_rollout_training_graph(&config, length)
+            }
+            (PixelLoss::CrossEntropy, length) => {
+                world::build_world_only_pixel_training_graph(&config, length, pixel_loss)
+            }
         };
         let mut train = runtime::build_training_session(&graph, &gpu, &config);
         runtime::initialize_d3(&mut train, &graph, config.seed);
@@ -216,6 +242,7 @@ impl WorldModelLearner {
             rng,
             rollout_rng,
             prediction_length,
+            pixel_loss,
             updates: 0,
             dirty: false,
         })
@@ -229,6 +256,9 @@ impl WorldModelLearner {
     }
     pub fn prediction_length(&self) -> usize {
         self.prediction_length
+    }
+    pub fn pixel_loss(&self) -> PixelLoss {
+        self.pixel_loss
     }
     pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
         crate::gpu_device_info(self.train.device_information())
@@ -564,7 +594,7 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let metadata = serde_json::json!({"format": "kindle-world-only-v1", "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length});
+        let metadata = serde_json::json!({"format": "kindle-world-only-v1", "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length, "pixel_loss": self.pixel_loss});
         std::fs::write(
             path.join("metadata.json"),
             serde_json::to_vec_pretty(&metadata)?,
@@ -584,7 +614,12 @@ impl WorldModelLearner {
             Some(value) => value.as_u64().ok_or("invalid world prediction length")?,
         };
         let prediction_length = usize::try_from(prediction_length)?;
-        let mut learner = Self::with_prediction_length(config, prediction_length)?;
+        let pixel_loss = metadata
+            .get("pixel_loss")
+            .map(|v| serde_json::from_value(v.clone()))
+            .transpose()?
+            .unwrap_or_default();
+        let mut learner = Self::with_pixel_loss(config, prediction_length, pixel_loss)?;
         checkpoint::load_session(&mut learner.train, &path.join("world.safetensors"))?;
         learner.updates = metadata["updates"].as_u64().ok_or("missing update count")?;
         if u64::from(learner.train.adam_step_count()) != learner.updates {
@@ -600,6 +635,114 @@ mod tests {
     use super::*;
     use crate::dreamer::ObservationKind;
     use meganeura::graph::Op;
+
+    fn pixel_loss_fixture() -> (Graph, Vec<f32>, Vec<f32>, Vec<f32>) {
+        let logits = vec![-80., -10., -1., 0., 1., 10., 80., -8., 8., -4., 4., 0.];
+        let targets = vec![
+            0.5, -0.5, 0.2, 0., -0.2, 0.5, -0.5, 0.5, -0.5, 0.25, -0.25, 0.5,
+        ];
+        let weights = vec![1., 0., 1.];
+        let mut graph = Graph::new();
+        let x = graph.parameter("logits", &[3, 4]);
+        let y = graph.input("target", &[3, 4]);
+        let elements = super::super::networks::pixel_cross_entropy(&mut graph, x, y);
+        let rows = graph.sum_inner(elements);
+        let mask = graph.constant(weights.clone(), &[3, 1]);
+        let masked = graph.mul(rows, mask);
+        let loss = graph.mean_all(masked);
+        graph.set_outputs(vec![loss]);
+        (graph, logits, targets, weights)
+    }
+
+    fn expected_pixel_loss(logits: &[f32], targets: &[f32], weights: &[f32]) -> (f64, Vec<f64>) {
+        let mut loss = 0.;
+        let mut gradient = Vec::new();
+        for (i, (&x, &y)) in logits.iter().zip(targets).enumerate() {
+            let x = f64::from(x);
+            let y = f64::from(y) + 0.5;
+            let weight = f64::from(weights[i / 4]) / 3.;
+            loss += (x.max(0.) + (-x.abs()).exp().ln_1p() - x * y) * weight;
+            gradient.push((1. / (1. + (-x).exp()) - y) * weight);
+        }
+        (loss, gradient)
+    }
+
+    #[test]
+    fn pixel_cross_entropy_matches_f64_values_and_derivatives() {
+        use meganeura::reference::{Feeds, evaluate};
+        let (graph, logits, targets, weights) = pixel_loss_fixture();
+        let backward = meganeura::autodiff::differentiate(&graph);
+        let mut feeds = Feeds::new();
+        feeds.set("logits", &logits).set("target", &targets);
+        let values = evaluate(&backward, &feeds).unwrap();
+        let (loss, gradient) = expected_pixel_loss(&logits, &targets, &weights);
+        assert!((values[backward.outputs()[0] as usize].data[0] - loss).abs() < 1e-10);
+        for (actual, expected) in values[backward.outputs()[1] as usize]
+            .data
+            .iter()
+            .zip(gradient)
+        {
+            // Autodiff stores the mean's reciprocal as an F32 scale constant.
+            assert!((actual - expected).abs() < 2e-8, "{actual} vs {expected}");
+        }
+    }
+
+    #[test]
+    #[ignore = "requires guarded GPU; pixel cross-entropy values and derivatives"]
+    fn pixel_cross_entropy_native_matches_f64() {
+        let (graph, logits, targets, weights) = pixel_loss_fixture();
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let mut session = runtime::build_session(&graph, &gpu, Mode::Training, false);
+        session.set_parameter("logits", &logits);
+        session.set_input("target", &targets);
+        session.step();
+        session.wait();
+        let mut actual = [0.];
+        let mut gradients = vec![0.; logits.len()];
+        session.read_output_by_index(0, &mut actual);
+        session.read_param_grad("logits", &mut gradients);
+        let (loss, gradient) = expected_pixel_loss(&logits, &targets, &weights);
+        assert!((f64::from(actual[0]) - loss).abs() < 2e-5);
+        for (actual, expected) in gradients.iter().zip(gradient) {
+            assert!(
+                (f64::from(*actual) - expected).abs() < 2e-6,
+                "{actual} vs {expected}"
+            );
+        }
+    }
+
+    #[test]
+    fn cross_entropy_keeps_parameter_shapes_and_has_no_behavior_dependencies() {
+        let config = config();
+        let graphs = [PixelLoss::SquaredError, PixelLoss::CrossEntropy]
+            .map(|loss| world::build_world_only_pixel_training_graph(&config, 2, loss));
+        let names = graphs.each_ref().map(|graph| {
+            graph
+                .nodes()
+                .iter()
+                .filter_map(|node| match &node.op {
+                    Op::Parameter { name } => Some((name.clone(), node.ty.shape.clone())),
+                    Op::Input { name } => {
+                        assert!(!name.contains("value") && !name.contains("expert"));
+                        None
+                    }
+                    _ => None,
+                })
+                .collect::<Vec<_>>()
+        });
+        assert_eq!(names[0], names[1]);
+        assert!(names[0].iter().all(|(name, _)| name.starts_with("world.")));
+        meganeura::compile_training_graph(&graphs[1]);
+        assert_eq!(
+            serde_json::from_str::<PixelLoss>("\"cross_entropy\"").unwrap(),
+            PixelLoss::CrossEntropy
+        );
+        assert!(serde_json::from_str::<PixelLoss>("\"unknown\"").is_err());
+    }
 
     #[test]
     fn rollout_masks_keep_terminal_arrivals_and_ignore_all_later_episode_rows() {

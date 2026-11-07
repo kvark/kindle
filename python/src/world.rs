@@ -1,5 +1,5 @@
 use super::*;
-use kindle::dreamer::WorldModelLearner;
+use kindle::dreamer::{PixelLoss, WorldModelLearner};
 
 #[pyclass(name = "WorldModelLearner", module = "kindle._native", unsendable)]
 pub(crate) struct PyWorldModelLearner {
@@ -26,8 +26,15 @@ fn float_bytes<'py>(py: Python<'py>, values: &[f32]) -> PyResult<Bound<'py, PyBy
 #[pymethods]
 impl PyWorldModelLearner {
     #[new]
-    #[pyo3(signature = (config, *, prediction_length=0))]
-    fn new(config: &Bound<'_, PyAny>, prediction_length: usize) -> PyResult<Self> {
+    #[pyo3(signature = (config, *, prediction_length=0, pixel_loss="squared_error"))]
+    fn new(
+        config: &Bound<'_, PyAny>,
+        prediction_length: usize,
+        pixel_loss: &str,
+    ) -> PyResult<Self> {
+        let pixel_loss: PixelLoss =
+            serde_json::from_value(serde_json::Value::String(pixel_loss.into()))
+                .map_err(|e| PyValueError::new_err(e.to_string()))?;
         let encoded: String = config
             .py()
             .import("json")?
@@ -36,7 +43,7 @@ impl PyWorldModelLearner {
         let config: DreamerConfig =
             serde_json::from_str(&encoded).map_err(|e| PyValueError::new_err(e.to_string()))?;
         Ok(Self {
-            inner: WorldModelLearner::with_prediction_length(config, prediction_length)
+            inner: WorldModelLearner::with_pixel_loss(config, prediction_length, pixel_loss)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
         })
     }
@@ -62,6 +69,11 @@ impl PyWorldModelLearner {
     #[getter]
     fn prediction_length(&self) -> usize {
         self.inner.prediction_length()
+    }
+
+    #[getter]
+    fn pixel_loss<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.pixel_loss())
     }
 
     #[getter]

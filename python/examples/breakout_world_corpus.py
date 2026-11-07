@@ -161,14 +161,22 @@ def train(args, config, fitting, development):
     import kindle
     from safetensors.numpy import load_file
     plan, expected_counts = sampler_plan(fitting, config, args.steps)
+    selections = dict(fitting=choose_evaluation(fitting, 112003), development=choose_evaluation(development, 112019))
+    if args.reference is not None:
+        assert config == json.loads((args.reference/'declaration.json').read_text())['config']
+        assert np.array_equal(plan, np.load(args.reference/'sampler-plan.npz', allow_pickle=False)['locations'])
+        assert selections == {split:{kind:[tuple(x) for x in locations] for kind,locations in values.items()}
+                              for split,values in json.loads((args.reference/'selections.json').read_text()).items()}
     np.savez_compressed(args.output/'sampler-plan.npz', locations=plan)
     write(args.output/'sampler-plan.json', expected_counts)
-    learner = kindle.WorldModelLearner(config, prediction_length=args.prediction_length)
+    learner = kindle.WorldModelLearner(config, prediction_length=args.prediction_length, pixel_loss=args.pixel_loss)
     require_device(learner)
     write(args.output/'actual-config.json', learner.config)
-    selections = dict(fitting=choose_evaluation(fitting, 112003), development=choose_evaluation(development, 112019))
     write(args.output/'selections.json', selections)
     learner.save(str(args.output/'initial'))
+    if args.reference is not None:
+        initial, control = (load_file(path/'initial/world.safetensors') for path in (args.output, args.reference))
+        assert initial.keys() == control.keys() and all(np.array_equal(initial[k], control[k]) for k in initial)
     seen = [np.zeros(len(stream['action']), bool) for stream in fitting]
     total_terminal, prior_terminal, positive_rows, context_reset_rows, source_reset_rows = 0, 0, 0, 0, 0
     native_seconds = 0.
@@ -229,7 +237,7 @@ def train(args, config, fitting, development):
         unique_source_arrivals=sum(int(row.sum()) for row in seen))
     assert observed_counts == expected_counts
     write(args.output/'result.json', dict(status='complete', updates=args.steps, prediction_length=args.prediction_length,
-        training_seconds=native_seconds, total_seconds=time.monotonic()-started, no_behavior=True,
+        training_seconds=native_seconds, total_seconds=time.monotonic()-started, no_behavior=True, pixel_loss=learner.pixel_loss,
         unique_source_arrivals=sum(int(row.sum()) for row in seen), source_arrivals=sum(len(row) for row in seen),
         replayed_terminal_rows=total_terminal, prior_terminal_rows=prior_terminal,
         positive_reward_rows=positive_rows, context_reset_rows=context_reset_rows,
@@ -241,6 +249,7 @@ def restore_check(args, config, development):
     import kindle
     learner = kindle.WorldModelLearner.restore(str(args.checkpoint))
     require_device(learner)
+    assert learner.pixel_loss == getattr(args, 'pixel_loss', 'squared_error')
     selection = json.loads((args.reference/'selections.json').read_text())['development']['natural'][:config['batch_size']]
     evaluate_group(learner, development, selection, args.output, 'restored')
     expected = np.load(args.reference/'evaluations'/str(learner.updates)/'development-natural.npz', allow_pickle=False)
@@ -252,12 +261,53 @@ def restore_check(args, config, development):
         reference = np.take(expected[key], np.arange(len(selection)), axis=axis)
         assert np.array_equal(reference, actual[key], equal_nan=True), key
     write(args.output/'result.json', dict(status='complete', updates=learner.updates,
-        exact_prediction_restore=True, checked_arrays=len(axes), source_origins=len(selection)))
+        exact_prediction_restore=True, checked_arrays=len(axes), source_origins=len(selection), pixel_loss=learner.pixel_loss))
+
+
+def initial_check(args, config, fitting, development):
+    """Verify matched initial tensors/traces and one full-shape finite update."""
+    import kindle
+    from safetensors.numpy import load_file
+    if args.reference is None or args.pixel_loss != 'cross_entropy':
+        raise ValueError('initial-check requires squared-error reference and cross_entropy candidate')
+    learner = kindle.WorldModelLearner(config, prediction_length=args.prediction_length, pixel_loss=args.pixel_loss)
+    require_device(learner)
+    learner.save(str(args.output/'initial'))
+    actual = load_file(args.output/'initial/world.safetensors')
+    expected = load_file(args.reference/'initial/world.safetensors')
+    assert actual.keys() == expected.keys() and all(np.array_equal(actual[k], expected[k]) for k in actual)
+    selection = json.loads((args.reference/'selections.json').read_text())['development']['natural'][:config['batch_size']]
+    evaluate_group(learner, development, selection, args.output, 'candidate')
+    expected_trace = np.load(args.reference/'evaluations/0/development-natural.npz', allow_pickle=False)
+    actual_trace = np.load(args.output/'candidate.npz', allow_pickle=False)
+    axes = dict(truth=1, context=0, previous_context=0, valid=1, target_reward=1, target_terminal=1,
+        position=1, lives=1, prediction=2, posterior=1, reward=2, reward_positive_probability=2,
+        continuation=2, encoder_features=0, posterior_features=0, prior_features=1)
+    for key, axis in axes.items():
+        assert np.array_equal(np.take(expected_trace[key], np.arange(len(selection)), axis=axis), actual_trace[key], equal_nan=True), key
+    legacy = kindle.WorldModelLearner.restore(str(args.reference/'initial'))
+    require_device(legacy)
+    assert legacy.pixel_loss == 'squared_error'
+    evaluate_group(legacy, development, selection, args.output, 'legacy')
+    with np.load(args.output/'legacy.npz', allow_pickle=False) as trace:
+        assert all(np.array_equal(trace[k], actual_trace[k], equal_nan=True) for k in axes)
+    batch = training_windows(fitting[:config['batch_size']], [0]*config['batch_size'], config['batch_length'],
+                             allow_resets=True, retain_initial_targets=True)
+    values = learner.learn(pixels(batch['rgb'].astype(np.float32)/255-.5),
+        *[batch[key].ravel().tolist() for key in ('action', 'reward', 'terminal')])
+    assert len(values) == 11 and np.isfinite(values).all() and learner.updates == 1
+    expected_loss = (config['loss_scales']['reconstruction']*(values[1]+values[9])
+        +config['loss_scales']['dynamics']*values[2]+config['loss_scales']['representation']*values[3]
+        +config['loss_scales']['reward']*values[4]+config['loss_scales']['continuation']*values[5])
+    np.testing.assert_allclose(values[0], expected_loss, rtol=1e-5)
+    write(args.output/'result.json', dict(status='complete', updates=1, pixel_loss=learner.pixel_loss,
+        exact_initial_tensors=len(actual), exact_initial_arrays=len(axes), exact_legacy_restore=True,
+        first_full_shape_report=values, world_model_proven=False))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('collect', 'train', 'restore-check'))
+    parser.add_argument('mode', choices=('collect', 'train', 'restore-check', 'initial-check'))
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--dataset', type=Path)
     parser.add_argument('--development', type=Path)
@@ -269,6 +319,7 @@ def main():
     parser.add_argument('--dense-development', type=int, default=128)
     parser.add_argument('--checkpoint', type=Path)
     parser.add_argument('--reference', type=Path)
+    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy"), default="squared_error")
     args = parser.parse_args()
     if args.steps < 1 or args.eval_every < 1 or args.prediction_length != 16 or min(args.dense_fitting, args.dense_development) < 1:
         parser.error('positive training/evaluation budgets and prediction-length16 required')
@@ -291,10 +342,11 @@ def main():
     fit_seeds = {row['seed'] for row in fit_manifest['files']}
     assert not fit_seeds.intersection(row['seed'] for row in dev_manifest['files'])
     write(args.output/'declaration.json', dict(mode=args.mode, config=config, loss_names=LOSS_NAMES,
-        prediction_length=args.prediction_length, steps=args.steps, eval_every=args.eval_every,
+        prediction_length=args.prediction_length, pixel_loss=args.pixel_loss, steps=args.steps, eval_every=args.eval_every,
         source_sha256=sha(__file__), fitting_manifest_sha256=sha(args.dataset/'manifest.json'),
         development_manifest_sha256=sha(args.development/'manifest.json'), started_unix=time.time()))
-    if args.mode == 'train': train(args, config, fitting, development)
+    if args.mode == 'initial-check': initial_check(args, config, fitting, development)
+    elif args.mode == 'train': train(args, config, fitting, development)
     else:
         if args.checkpoint is None or args.reference is None: parser.error('restore-check needs checkpoint/reference')
         restore_check(args, config, development)

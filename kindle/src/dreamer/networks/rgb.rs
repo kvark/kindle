@@ -309,7 +309,7 @@ impl Decoder {
         }
     }
 
-    pub(super) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
+    pub(super) fn forward_logits(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
         let deter = slice_columns(graph, input, batch, self.deter + self.stoch, 0, self.deter);
         let stoch = slice_columns(
             graph,
@@ -376,6 +376,11 @@ impl Decoder {
             side as u32,
         );
         value = self.output.forward(graph, value, batch);
+        graph.reshape(value, &[batch, 3 * self.side * self.side])
+    }
+
+    pub(super) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
+        let mut value = self.forward_logits(graph, input, batch);
         value = graph.sigmoid(value);
         // Both replay and diagnostic outputs are centered. This is the same
         // summed pixel MSE as sigmoid prediction versus upstream's RGB / 255.
@@ -387,6 +392,6 @@ impl Decoder {
 }
 
 #[cfg(test)]
-mod tests;
-#[cfg(test)]
 mod stride_tests;
+#[cfg(test)]
+mod tests;

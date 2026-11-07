@@ -26,7 +26,7 @@ mod uniform_gpu;
 mod world;
 mod world_learner;
 
-pub use world_learner::{WorldModelLearner, WorldPrediction};
+pub use world_learner::{PixelLoss, WorldModelLearner, WorldPrediction};
 
 pub use agent::{
     ActionMode, BehaviorMetrics, DreamerAgent, DreamerCore, FeatureVectorAgent, LearnReport,

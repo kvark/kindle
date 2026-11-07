@@ -41,16 +41,22 @@ native build49c99fb1/SHA prefix1b9d0dc6, matching runtime under that root. Sourc
 is archived before further code changes. No GPU job is active; completed stages
 must not repeat or extend.
 
-Next implement optional **logits-based pixel cross-entropy** in the standalone
-world path, retaining default MSE/old restores. At true ball-core pixels the
-current sigmoid decoder paints nearly black, giving about2,500× smaller
-analytical output-logit gradients under MSE than cross-entropy. This motivates
-a bounded matched-data/init/sampler comparison after CPU/native loss,
-derivative and restore checks; it does not prove the cause or a BCE benefit.
-No next GPU allocation has been declared. Do not grow capacity or resume
-actor/critic as a substitute for fixing observed reconstruction. Untouched test,
-prospective action branches, late-game coverage and fresh confirmation remain
-unfinished. Keep the world-model goal active and unproven.
+Optional [logits-based pixel cross-entropy](experiments/2026-11-07-breakout-world-pixel-cross-entropy.md)
+is implemented in the standalone world path; default MSE and old restores are
+retained. At true ball-core pixels, sigmoid-MSE output-logit gradients are about
+2,500× weaker; this motivates the test without proving the cause or BCE benefit.
+34 CPU world tests (19 GPU tests ignored) and strict workspace/bindings Clippy
+pass. Initial bias-shape and F32-reciprocal tolerance failures are preserved;
+the first installed-package Python import check awaits the packaged runtime.
+
+Next package and run only the declared three-phase qualification: native loss/
+derivatives, tiny mask/update/restore fixture, and full-shape matched-init/legacy
+restore/one-update preflight. Root `/mnt/data/kindle-breakout-world-bce-20261107`.
+No GPU allocation is active at this publication. Review qualification before
+separately declaring the fixed8,192-update same-data/init/sampler comparison.
+No recollection, capacity increase, completed-stage repeat or actor/critic
+resume. Untouched test, prospective branches, late-game coverage and fresh
+confirmation remain unfinished. Keep the goal active and unproven.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

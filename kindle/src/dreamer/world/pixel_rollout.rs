@@ -12,11 +12,12 @@ pub(super) fn build(
     graph: &mut Graph,
     config: &DreamerConfig,
     model: &WorldModel,
-    mut deter: NodeId,
-    mut stoch: NodeId,
+    initial: (NodeId, NodeId),
     actions: &[NodeId],
     observations: &[NodeId],
+    pixel_loss: PixelLoss,
 ) -> PixelRollout {
+    let (mut deter, mut stoch) = initial;
     assert!(!actions.is_empty() && actions.len() == observations.len());
     let size = config.network();
     let batch = config.batch_size;
@@ -57,10 +58,14 @@ pub(super) fn build(
         let state = feature(graph, deter, stoch, batch, config);
         #[cfg(test)]
         states.push(state);
-        let prediction = decoder.forward(graph, state, batch);
-        let target = graph.stop_gradient(observation);
-        let residual = graph.sub(prediction, target);
-        let squared = graph.mul(residual, residual);
+        let squared = if pixel_loss == PixelLoss::CrossEntropy {
+            decoder.cross_entropy(graph, state, observation, batch)
+        } else {
+            let prediction = decoder.forward(graph, state, batch);
+            let target = graph.stop_gradient(observation);
+            let residual = graph.sub(prediction, target);
+            graph.mul(residual, residual)
+        };
         let per_row = graph.sum_inner(squared);
         let weight = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
         let weight = graph.stop_gradient(weight);
@@ -83,67 +88,77 @@ mod tests {
 
     #[test]
     fn future_images_are_targets_only_and_prior_parameters_receive_gradients() {
-        let mut config = DreamerConfig::tiny(3);
-        config.observation_kind = ObservationKind::Rgb64;
-        config.actor_critic_gradient = false;
-        config.loss_scales.replay_value = 0.0;
-        let mut graph = Graph::new();
-        let model = WorldModel::with_behavior(&mut graph, &config, false);
-        let size = config.network();
-        let deter = graph.input("prefix_deter", &[config.batch_size, size.deter]);
-        let stoch = graph.input(
-            "prefix_stoch",
-            &[config.batch_size * size.stoch, size.classes],
-        );
-        let actions = (0..3)
-            .map(|i| {
-                graph.input(
-                    &format!("action{i}"),
-                    &[config.batch_size, config.action_count],
-                )
-            })
-            .collect::<Vec<_>>();
-        let images = (0..3)
-            .map(|i| {
-                graph.input(
-                    &format!("target{i}"),
-                    &config.observation_shape(config.batch_size),
-                )
-            })
-            .collect::<Vec<_>>();
-        let rollout = build(&mut graph, &config, &model, deter, stoch, &actions, &images);
-        for state in rollout.states {
-            let mut seen = HashSet::new();
-            let mut pending = vec![state];
-            while let Some(node) = pending.pop() {
-                if seen.insert(node) {
-                    pending.extend(graph.node(node).inputs.iter().copied());
+        for pixel_loss in [PixelLoss::SquaredError, PixelLoss::CrossEntropy] {
+            let mut config = DreamerConfig::tiny(3);
+            config.observation_kind = ObservationKind::Rgb64;
+            config.actor_critic_gradient = false;
+            config.loss_scales.replay_value = 0.0;
+            let mut graph = Graph::new();
+            let model = WorldModel::with_behavior(&mut graph, &config, false);
+            let size = config.network();
+            let deter = graph.input("prefix_deter", &[config.batch_size, size.deter]);
+            let stoch = graph.input(
+                "prefix_stoch",
+                &[config.batch_size * size.stoch, size.classes],
+            );
+            let actions = (0..3)
+                .map(|i| {
+                    graph.input(
+                        &format!("action{i}"),
+                        &[config.batch_size, config.action_count],
+                    )
+                })
+                .collect::<Vec<_>>();
+            let images = (0..3)
+                .map(|i| {
+                    graph.input(
+                        &format!("target{i}"),
+                        &config.observation_shape(config.batch_size),
+                    )
+                })
+                .collect::<Vec<_>>();
+            let rollout = build(
+                &mut graph,
+                &config,
+                &model,
+                (deter, stoch),
+                &actions,
+                &images,
+                pixel_loss,
+            );
+            for state in rollout.states {
+                let mut seen = HashSet::new();
+                let mut pending = vec![state];
+                while let Some(node) = pending.pop() {
+                    if seen.insert(node) {
+                        pending.extend(graph.node(node).inputs.iter().copied());
+                    }
                 }
-            }
-            assert!(images.iter().all(|image| !seen.contains(image)));
-            assert!(
-                seen.iter().all(|&id| !matches!(&graph.node(id).op,
+                assert!(images.iter().all(|image| !seen.contains(image)));
+                assert!(
+                    seen.iter().all(|&id| !matches!(&graph.node(id).op,
                 meganeura::graph::Op::Input { name } if name.starts_with("pixel_rollout_weight_")))
-            );
-            assert!(seen.contains(&deter) && seen.contains(&stoch));
-        }
-        graph.set_outputs(vec![rollout.loss]);
-        let (plan, _) = meganeura::compile_training_graph(&graph);
-        for prefix in [
-            "world.dynamics.core.",
-            "world.dynamics.prior",
-            "world.decoder.",
-        ] {
-            assert!(
-                plan.param_buffers
-                    .iter()
-                    .any(|(name, buffer)| name.starts_with(prefix)
-                        && plan
-                            .param_grad_pairs
-                            .iter()
-                            .any(|(parameter, _)| parameter == buffer)),
-                "{prefix}"
-            );
+                );
+                assert!(seen.contains(&deter) && seen.contains(&stoch));
+            }
+            graph.set_outputs(vec![rollout.loss]);
+            let (plan, _) = meganeura::compile_training_graph(&graph);
+            for prefix in [
+                "world.dynamics.core.",
+                "world.dynamics.prior",
+                "world.decoder.",
+            ] {
+                assert!(
+                    plan.param_buffers
+                        .iter()
+                        .any(|(name, buffer)| name.starts_with(prefix)
+                            && plan
+                                .param_grad_pairs
+                                .iter()
+                                .any(|(parameter, _)| parameter == buffer)),
+                    "{prefix}"
+                );
+            }
         }
     }
 }
