@@ -109,3 +109,13 @@ H0:10,909 observed terminals,34,440 positive rewards,10,488 natural resets,
 Separately pinned96-input learning declaration selects only this fresh8,192-
 update learner(3600s) and final restore(600s). No new actions/emulator frames
 are collected. Qualification does not establish learning or full competence.
+
+## Closed comparison
+
+The [completed result](../results/2026-11-07-breakout-world-overshooting.md) fails
+its eight-step and25% primary-energy gates. It learns useful ending endpoints,
+with much earlier false termination and wrong intermediate ball trajectories.
+All qualification,learning,restore,frozen identity and guard checks pass. Preserve
+original CPU/plot failures and separate repairs. No extension or successor is
+selected; the full world-model goal remains open. Detailed counts,physical
+metrics,timing,protocol identities and artifacts remain in the linked report.

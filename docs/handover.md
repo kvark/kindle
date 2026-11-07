@@ -58,19 +58,28 @@ Test-only measurement; retained packages/production graphs are unchanged.
 `closure-review.json` verifies closure. At that diagnostic closure,no Kindle worker or successor was active/selected.
 Do not repeat completed stages or old-model runs.
 
-The [latent-overshooting experiment](experiments/2026-11-07-breakout-world-overshooting.md)
-has completed its fresh8,192-update learner and restore; only its new-checkpoint
-frozen branch assessment is active. Native580.173s/loop825.609s; observed109/112,
-one-step93/109,four-step43/109 versus coverage33/109,but eight-step7/107 versus
-14/107 fails the fixed28/107 gate. Brick balanced error.200453 versus.223954.
-Do not promote from perception or the latent loss. All96 learning pins,204
-initial/frozen tensors,18 initial/restore arrays,exact plan/975,941 valid suffix
-rows and both learning guards/sealed audits pass. Sourcee311b216/native965f2bd2,
-matching root/runtime at `/mnt/data/kindle-breakout-world-overshooting-20261107`.
-The separately declared856-pin assessment reuses the oracle,history16/32,eight
-fixed draws,84 groups,1800s. No old model rerun,collector or actor/critic.54 CPU
-world,53 affected/53 packaged Python checks and native derivatives pass; preserve
-syntax,F32-reference,scalar-zero fixture and missing plotting-dependency failures.
+The [latent-overshooting comparison](results/2026-11-07-breakout-world-overshooting.md)
+is **closed and fails its learning gates**. Fresh8,192 updates retain observed
+109/112 and one-step93/109; four-step improves33→43/109,but eight-step falls
+14→7/107(fails28/107). Primary16/32 ball energy.162147 improves only4.34% versus
+.169502 coverage,failing25%. Native580.173s/loop825.609s versus529.515/796.900s.
+Ending32 Brier.003192 and RIGHT93.344%(oracle100%) improve,with0/304 non-ending
+cases>5%,maximum1.367%. But RIGHT16 predicts73.352% ending versus oracle0%;
+ending16 Brier regresses.003345→.156492. Eventual outcomes do not establish
+correct timing. Ending32 reward Brier.403468 versus.000173 also regresses.
+
+Root `/mnt/data/kindle-breakout-world-overshooting-20261107`,sourcee311b216/
+native SHA965f2bd2,matching root/runtime.54 CPU world,53 affected/53 packaged
+Python checks,strict Clippy,native derivatives,87/96/856 phase input pins,five
+guards/45 sealed pins,204 initial/frozen tensors,18 initial/restore arrays,exact
+plan/exposures and all8,192 finite11-report rows pass. Preserve syntax,F32-
+reference,scalar-zero fixture and missing plotting-dependency failures; the plot
+repair is CPU-only. `closure-review.json` verifies closure; separate cache-release
+receipt preserves the original pinned build receipt. No worker,learner,collector
+or successor is active/selected. Retain distinct capabilities without replacement,
+extension,confirmation campaign or a variance-reduction/world-completion claim.
+A focused next question is deterministic-state drift versus categorical latent
+agreement; no cause or new objective is established by this comparison.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/
 uncertainty calibration,removed-brick memory,late-game/tunnel/second-wall coverage,
