@@ -1,5 +1,145 @@
 # Kindle: CDP learning roadmap
 
+## Selected direction: Breakout world model in isolation
+
+The user selected this direction after pausing the five-game campaign. Treat
+world-model competence as the immediate objective. Gameplay score is a later
+integration measure. Do not restart any closed learner, collector or comparison.
+No new training allocation has been launched for this direction.
+
+### Representation and training scope
+
+Start with a **pixel-supervised latent RSSM baseline**, using Kindle's existing
+jointly learned RGB CNN, categorical RSSM, RGB decoder, reward and continuation
+heads on Meganeura + Blade. Both CDP and this baseline consume pixels; the choice
+is what supervises the representation. Use RGB reconstruction rather than CDP
+as the initial reference because predictions can be checked against an external,
+fixed target. This is a deliberate change from the preceding CDP-only campaign,
+not evidence that pixels outperform CDP. Keep the recurrent latent interface so
+the world model can later serve Kindle's imagined actor/critic.
+
+Remove actor/critic updates and their representation gradients, replay-value
+supervision, trusted-action imitation and intrinsic/disagreement objectives.
+Merely setting behavior learning rates to zero is insufficient: the current
+world graph can still receive gradients through frozen behavior heads. The
+world-only path must not form actor/critic targets or execute imagination for
+behavior training. Verify that its executable loss has no behavior dependency.
+Keep observed external reward and natural game termination as world targets;
+a lost life and a game-over are distinct events. Do not add a life-loss penalty.
+
+Begin from the existing 64-pixel geometry and retained RSSM size, Auto precision,
+and eight collection environments. Measure the decoder's added cost rather than
+assuming the old model-size label or update speed still applies. Preserve native
+max-pooled frames and one GPU resize. Python remains an adapter/analysis layer.
+Model size and resolution become speed experiments only after a baseline works.
+
+The [earlier RGB control](results/2026-10-29-cdp-breakout-rgb-control.md) already
+trained a pixel-reconstruction model with the complete agent. Its gameplay was
+weaker and training cost23.63% more than the then-current CDP control. Preserve
+that negative result. Reuse its frozen checkpoint as an initial diagnostic
+reference, where compatible, before training another pixel model. That result
+measures complete-agent learning on changing experience, not an isolated test
+of pixel-model physics on fixed data; it neither qualifies this approach nor
+rules it out.
+
+### Fixed data and coverage
+
+Reuse retained trajectories first. Reconstruct frames only where required by the
+new corpus; this is dataset preparation, not a repeat of a closed assessment.
+Record observation/action/next-observation alignment, actual executed frame
+counts, reward, life changes, termination and truncation. The model receives
+RGB, submitted actions and episode resets, without RAM, object labels, emulator
+state, future observations or task-outcome labels as inputs.
+
+Split by original episode/trajectory family and collection seed **before**
+extracting overlapping windows. Counterfactual branches and their common source
+must stay in one split. Keep fitting, development and untouched test data apart;
+existing repeatedly examined evaluation cohorts are development data. Evaluate
+both natural-frequency data and a separately reported event-focused challenge
+set. The challenge set must not be presented as population calibration.
+
+Cover free flight in both directions, paddle movement/reversal/edges, hits and
+misses, wall/brick contacts, different contact offsets and speeds, serving,
+intermediate life loss and game-over. Audit brick configurations and late-game
+coverage explicitly. Existing retained training did not reach a 432-point wall;
+it cannot establish competence on a second wall or tunnel/above-wall states.
+Collect missing situations deliberately with fixed controllers/action
+interventions when needed; do not resume whole-agent learning to obtain them.
+Emulator snapshots may generate paired branches and evaluation labels, but never
+enter model input. Validate any RAM/pixel label mapping against actual images.
+
+### Evaluation contract
+
+At an origin, condition on an observed history, then supply only a fixed future
+action sequence. Forecast **1, 4, 8, 16 and 32 decisions**, reporting emulator
+frames separately. Do not feed future true images, encodings or inferred
+posteriors back into an open-loop forecast. Include the terminal arrival and
+exclude reset crossings and incomplete horizons without silently shortening them.
+Also measure observed-state reconstruction and one-step prediction separately:
+this distinguishes a perception/readout failure from accumulating dynamics error.
+
+| Capability | Measurements |
+| --- | --- |
+| Visible state | Ball presence, ball/paddle position and velocity; position errors and missed detections, including near-contact slices |
+| Free-flight dynamics | Position error versus horizon, direction and speed; comparisons with persistence and constant-velocity controls |
+| Contacts and action effects | Hit/miss, time to contact, outgoing direction/angle, paddle response; same-origin alternative-action outcome predictions |
+| Persistent game state | Brick occupancy, removal/addition mistakes, changes after collisions, wall/tunnel and speed-change slices |
+| Reward and boundaries | Reward event/value/timing, lost-life versus game-over, calibrated termination probabilities and false alarms |
+| Visual rollouts | True/predicted clips and difference images, full-frame and foreground/change errors; missing-ball failures cannot pass on background accuracy |
+
+Game-specific geometry is an **evaluation instrument**, not training supervision
+in this baseline. For CDP, a separately fitted frozen readout can expose its
+latent forecasts to the same physical tests; readout error is not proof that
+information is absent. A CDP feature-space loss is never compared numerically
+with RGB reconstruction loss as a shared measure of competence.
+
+Retain the standard sticky-action .25, repeat4 task as the primary setting.
+It contains genuine uncertainty from action execution and incomplete visual
+history. Score multiple model futures using event probabilities and proper
+sample-distribution scores, rather than choosing the sample closest to the
+answer or treating a blurred mean image as a correct physical trajectory.
+Use a separately labeled sticky-off debug fixture only to localize errors in
+otherwise predictable dynamics. It cannot qualify the standard stochastic task.
+
+Report class-conditional event errors, detection coverage, quantiles and all
+challenge slices, alongside natural-frequency aggregates. An empty/unsupported
+slice is untested. Compare with fixed simple controls and an empirical frequency
+predictor. Establish absolute tolerances from sprite/contact geometry and label
+precision on development data, then fix them before scoring the untouched test.
+Do not reduce acceptance to an improvement in a single aggregate loss.
+
+### Bounded progression
+
+1. Build the shared evaluation/corpus path and record the existing CDP model's
+   competence on development data. Reuse relevant completed observations; fill
+   actual measurement gaps rather than rerunning old diagnostics.
+2. Verify the world-only executable and overfit a small, fixed collection of
+   training clips. Require correct short deterministic debug forecasts through
+   contacts, including visible ball/brick/reward transitions. If this fails,
+   investigate alignment, gradients, representation or capacity before scaling.
+3. Train the pixel RSSM on the fixed fitting corpus, with development curves for
+   reconstruction, one-step priors and open-loop physics. Start with a bounded
+   timing/capacity check and declare its training budget before the run. Diagnose
+   a failed component before choosing another loss or configuration. Standard
+   posterior reconstruction plus KL does not by itself establish a good prior;
+   a targeted multi-step pixel objective is an option if measured drift requires
+   it, not a pre-authorized loss sweep.
+4. Qualify generalization on untouched episode families and paired action
+   branches. Confirm the successful recipe on one fresh initialization. Only
+   then compare CDP at matched data and measured compute, pursuing its speed
+   advantage if it preserves the same physical competence.
+5. Freeze the qualified world model before returning to policy/value learning.
+   Check short action selection against real emulator branches as an integration
+   test; use a native rollout/planner if needed. Training a strong critic or
+   policy is a subsequent objective and is not presumed solved by model accuracy.
+
+The first deliverable is a component-level forecast report and true/predicted
+clips, with a small pixel-model overfit result. This direction is selected;
+implementation, dataset coverage, numeric acceptance tolerances and a training
+allocation are not yet qualified. There is no new world-model result to report.
+
+## Retained campaign evidence
+
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) is complete and fails its fixed retention rule.
 Fresh22003 scores79.167 greedy/47.000 sampled versus matched75.250/44.708,
 in21m33.955s versus21m30.822s. Greedy own-initial gain/min rises5.113%

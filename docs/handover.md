@@ -8,23 +8,25 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 6
 
-The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) is complete and fails its fixed retention rule.
-Fresh22003 scores79.167 greedy/47.000 sampled versus matched75.250/44.708,
-in21m33.955s versus21m30.822s. Primary own-initial gain/min rises5.113%, but
-its paired95% difference interval[−1.322212,1.717042] spans zero; sampled also
-remains inconclusive. All0/24 two-wall. Keep prior reward off and posterior
-reward1. One reused development seed/cohort does not establish reliability.
+The user selected [Breakout world-model learning in isolation](kindle_single_life_dreamer_plan.md#selected-direction-breakout-world-model-in-isolation) after
+pausing the five-game campaign. Start with a pixel-supervised latent RSSM
+baseline using Kindle's native CNN/RSSM/RGB decoder. This deliberately supersedes
+the preceding CDP-only direction for this experiment. Remove actor/critic,
+replay-value, imitation and intrinsic-reward training dependencies. Use fixed
+trajectory data, episode-family splits and explicit open-loop physical tests;
+gameplay score is a later integration test. CDP remains a subsequent efficiency
+comparison after the pixel baseline establishes competence.
 
-All200k actions/799,622 frames/12,477 updates,100k recovery, initial/frozen tensors,
-full replays,854 allocation pins and original services pass. Independent closure
-recounts192 evaluation episodes and all learner reports, complete23:13:49.902 UTC
-November6, source`dda5bf6f`. Prelaunch recovery-unit correction and earlier CPU
-qualification failures remain preserved. A later publication reader's non-text
-journal-entry failure has a separate CPU-only repair; no GPU stage repeats.
+First prepare the forecast evaluation/corpus path and a small training-clip
+overfit check. No new native path, numeric acceptance thresholds, training
+allocation or model result is yet qualified. No learner or GPU allocation is
+active. The five-game goal remains paused and unfinished; this new focus does
+not restart a closed learner, collector or assessment.
 
-Root `/mnt/data/kindle-breakout-prior-reward-20261106/full` is closed. No learner
-or GPU allocation is active; no extension, sweep, confirmation or successor is
-selected. Original864/90%-two-wall and the full five-game goal remain unfinished.
+The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
+79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals
+crossing zero, all0/24 two-wall. Retain prior reward off and posterior reward1
+for the retained agent. Its original failures, repairs and closure remain intact.
 
 Completed experiment details and their failures remain in the [roadmap](kindle_single_life_dreamer_plan.md)
 and [diagnosis](results/2026-10-29-cdp-learning-diagnosis.md), with links to exact protocols and artifacts.
@@ -40,8 +42,9 @@ Use Auto precision on RX7900XT/RADV. BF16 and `KINDLE_DEVICE_TARGETS` are
 unavailable; see the [paired precision evidence](results/2026-10-25-cdp-amd-precision.md).
 The completed F16/Auto context experiments do not justify extensions.
 Native learning remains on Meganeura + Blade; backend porting, optimization
-and JAX parity are parked. Explicitly select centered CDP; the CLI default is
-learned RGB. Keep native pooled frames and one GPU resize.
+and JAX parity are parked. Retained agents explicitly select centered CDP; the
+new isolated-world baseline selects pixel supervision. The CLI default is learned
+RGB. Keep native pooled frames and one GPU resize.
 
 Current learning uses native447fe5013b6442c477fc7bfef7eab4122082bc54,
 SHA256 `35ad0db42fc7ed5dbaf6dacddff613fdc04d83ae6e0f38548532f6ab2c7812a2`.
