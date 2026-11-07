@@ -102,20 +102,27 @@ is closed and fails retention: observed108/112 and one-step94/109 preserved,
 four/eight-step51/109 and24/107 improve, but primary energy.204741 versus.169502
 and ending/presence gates fail. Keep coverage; no unchanged extension or repeat.
 
-The [posterior-correction readout diagnostic](docs/experiments/2026-11-07-breakout-world-posterior-correction.md)
-is selected. Root `/mnt/data/kindle-breakout-world-posterior-correction-20261107`.
-Use cached coverage forecast h and true current future images to recompute
-q(z|h_prior,image), then decode at that same h without feeding corrections back.
-Earlier teacher-z swaps used teacher-history h; this checks a missing condition
-before selecting any new future-latent loss. Privileged images/readouts are not
-forecast competence. No learner, optimizer, ordinary forecast or collector.
+The [posterior-correction diagnostic](docs/results/2026-11-07-breakout-world-posterior-correction.md)
+is closed. New q(z|h_prior,true future image) improves natural8 from15→45/108,
+but32 only1→4/108,versus104/108 and101/108 full teacher. It fails80%/70% target
+triage; do not launch a frozen future-posterior loss on this justification.
+Source32b182a1/executable40e79a33,root
+`/mnt/data/kindle-breakout-world-posterior-correction-20261107`. All24 traces/
+768 steps,36 invariant visual weights,cached prior sample/step1 identities,
+55 native pins,host guard and CPU review pass in22.751s +2.267s. Original
+pre-native guard-copy failure is preserved; no prior/teacher transition,optimizer
+or collector executes. Future images/readouts remain privileged diagnostics.
 
-Two focused CPU tests and strict Kindle lib/tests Clippy pass. Declare one900s
-AMD/Auto guarded inference-only fixture:24 traces,768 correction steps,all36
-visual weights invariant,regenerated cached prior draws exact,step1 teacher
-identities and source204-tensor checkpoint bytes unchanged. No production graph/
-API/package change or old stage repeat. Native correction remains unfinished;
-no automatic training successor. Original world gates and full goal stay open.
+Select the [observation-only visual code experiment](docs/experiments/2026-11-07-breakout-world-observation-code.md)
+for implementation: default-off `rgb_latent_only`,posterior from CNN alone and
+RGB decoder from z alone; h/core/prior/actions/heads retain temporal interfaces.
+Use existing H16 latent overshooting,plain RGB64/12M/B8/T32/Auto and original data.
+This changes architecture/shapes/gradient routes together; no isolated cause or
+benefit is established. Root `/mnt/data/kindle-breakout-world-observation-code-20261107`.
+Implement/version/package and qualify separation/restore before separately
+declaring fresh8192 updates and final-only branches. No GPU allocation is active
+or declared. No new loss,data,actor/critic,closed-stage repeat or automatic successor.
+Original full-world requirements and all retention gates remain unchanged.
 
 Remaining requirements include precise causal1/4/8/16/32 forecasts,reward/event
 calibration,removed-brick memory,late-game/tunnel/second-wall coverage,untouched
