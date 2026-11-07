@@ -26,7 +26,8 @@ fn float_bytes<'py>(py: Python<'py>, values: &[f32]) -> PyResult<Bound<'py, PyBy
 #[pymethods]
 impl PyWorldModelLearner {
     #[new]
-    fn new(config: &Bound<'_, PyAny>) -> PyResult<Self> {
+    #[pyo3(signature = (config, *, prediction_length=0))]
+    fn new(config: &Bound<'_, PyAny>, prediction_length: usize) -> PyResult<Self> {
         let encoded: String = config
             .py()
             .import("json")?
@@ -35,7 +36,7 @@ impl PyWorldModelLearner {
         let config: DreamerConfig =
             serde_json::from_str(&encoded).map_err(|e| PyValueError::new_err(e.to_string()))?;
         Ok(Self {
-            inner: WorldModelLearner::new(config)
+            inner: WorldModelLearner::with_prediction_length(config, prediction_length)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?,
         })
     }
@@ -56,6 +57,11 @@ impl PyWorldModelLearner {
     #[getter]
     fn updates(&self) -> u64 {
         self.inner.updates()
+    }
+
+    #[getter]
+    fn prediction_length(&self) -> usize {
+        self.inner.prediction_length()
     }
 
     #[getter]

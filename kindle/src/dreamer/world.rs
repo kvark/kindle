@@ -49,6 +49,9 @@ pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 mod cdp;
 mod color_centroid;
 mod open_loop;
+mod pixel_rollout;
+
+pub(crate) const LOSS_PIXEL_ROLLOUT: usize = 25;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
     (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_centered {
@@ -288,17 +291,31 @@ fn build_training_graph_grouped(
     length: usize,
     time_batch_length: usize,
 ) -> Graph {
-    training_graph(config, length, time_batch_length, false, true)
+    training_graph(config, length, time_batch_length, false, true, 0)
 }
 
 /// Sample and export the posterior before consuming late behavior targets.
 pub(crate) fn build_staged_training_graph(config: &DreamerConfig) -> Graph {
-    training_graph(config, config.batch_length, config.batch_length, true, true)
+    training_graph(
+        config,
+        config.batch_length,
+        config.batch_length,
+        true,
+        true,
+        0,
+    )
 }
 
 /// Standalone world learning, with posterior sampling inside the loss graph.
 /// No policy/value parameters, targets or imitation gradients are constructed.
 pub(crate) fn build_world_only_training_graph(config: &DreamerConfig) -> Graph {
+    build_world_only_rollout_training_graph(config, 0)
+}
+
+pub(crate) fn build_world_only_rollout_training_graph(
+    config: &DreamerConfig,
+    prediction_length: usize,
+) -> Graph {
     assert!(!config.actor_critic_gradient && !config.expert_world_gradient());
     assert!(!config.uses_disagreement() && !config.visitation_bonus);
     assert_eq!(config.loss_scales.replay_value, 0.0);
@@ -308,6 +325,7 @@ pub(crate) fn build_world_only_training_graph(config: &DreamerConfig) -> Graph {
         config.batch_length,
         true,
         false,
+        prediction_length,
     )
 }
 
@@ -317,6 +335,7 @@ fn training_graph(
     time_batch_length: usize,
     sample_posterior: bool,
     behavior: bool,
+    prediction_length: usize,
 ) -> Graph {
     config.validate();
     assert!(length > 0 && length <= config.batch_length);
@@ -897,6 +916,26 @@ fn training_graph(
     } else {
         total
     };
+    let pixel_rollout = (prediction_length > 0).then(|| {
+        assert!(!behavior && config.loss_scales.reconstruction > 0.0);
+        assert!(prediction_length < length);
+        let start = length - prediction_length;
+        pixel_rollout::build(
+            &mut graph,
+            config,
+            &model,
+            deters[start - 1],
+            stochs[start - 1],
+            &actions[start..],
+            &observations[start..],
+        )
+    });
+    let total = if let Some(rollout) = &pixel_rollout {
+        let weighted = graph.scale(rollout.loss, config.loss_scales.reconstruction);
+        graph.add(total, weighted)
+    } else {
+        total
+    };
     let mut outputs = vec![
         total,
         reconstruction,
@@ -949,6 +988,12 @@ fn training_graph(
             outputs.push(graph.scalar(0.0));
         }
         outputs.extend([loss, valid]);
+    }
+    if let Some(rollout) = pixel_rollout {
+        while outputs.len() < LOSS_PIXEL_ROLLOUT {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.push(rollout.loss);
     }
     if sample_posterior {
         outputs.push(stack_time(&mut graph, &deters, batch, size.deter));

@@ -16,8 +16,13 @@ phases complete; no actor/critic learns. Source9c1dcf89 and all original artifac
 remain preserved at `/mnt/data/kindle-breakout-world-model-20261107`.
 
 The next focused change is direct RGB supervision after the observed prefix
-ends, through a bounded prior rollout. It is selected for implementation; no
-rollout learner is yet qualified or launched. Keep the goal active. Fitting
+ends, through a bounded prior rollout. The native implementation passes30 CPU
+world/regression tests (18 GPU tests ignored), including explicit future-target
+exclusion and prior/RSSM/decoder gradient connectivity. Next qualify a2-step
+tiny rollout and run a fresh2,048-update fitting test with16 observed/16 prior
+steps, reconstruction100 and the same eight clips. No collector or completed
+baseline repeats. Root `/mnt/data/kindle-breakout-world-rollout-20261107`; no
+rollout GPU phase has launched at this publication. Keep the goal active. Fitting
 success, physical events, action branches,32-step forecasts, later-game coverage,
 held-out generalization and one fresh confirmation remain required. The existing
 fixed development/debug corpora are retained, not repeatedly recollected.

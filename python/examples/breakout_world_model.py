@@ -38,10 +38,10 @@ def require_device(learner):
         assert all(name.startswith('world.') for name in learner.parameter_names)
 
 
-def fixture(config, output):
+def fixture(config, output, prediction_length=0):
     import kindle
     from safetensors.numpy import load_file
-    learner = kindle.WorldModelLearner(config)
+    learner = kindle.WorldModelLearner(config, prediction_length=prediction_length)
     require_device(learner)
     batch, length = config['batch_size'], config['batch_length']
     frames = [np.full((210, 160, 3), [64, 128, 192], np.uint8) for _ in range(batch)]
@@ -59,6 +59,23 @@ def fixture(config, output):
     initial = load_file(output/'initial/world.safetensors')
     reports = [learner.learn(pixels(observations), actions.ravel().tolist(), reward.ravel().tolist(), terminal.ravel().tolist())
                for _ in range(8)]
+    if prediction_length:
+        invalid = actions.copy()
+        invalid[length-prediction_length] = -1
+        try:
+            learner.learn(pixels(observations), invalid.ravel().tolist(), reward.ravel().tolist(), terminal.ravel().tolist())
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('future reset accepted')
+        assert learner.updates == 8
+        for values in reports:
+            expected = (config['loss_scales']['reconstruction']*(values[1]+values[9])
+                        +config['loss_scales']['dynamics']*values[2]
+                        +config['loss_scales']['representation']*values[3]
+                        +config['loss_scales']['reward']*values[4]
+                        +config['loss_scales']['continuation']*values[5])
+            np.testing.assert_allclose(values[0], expected, rtol=1e-5, atol=1e-4)
     prediction = learner.predict(pixels(observations[:2]), actions[:2].ravel().tolist(), [0]*(batch*4), seed=73001)
     assert np.frombuffer(prediction['prior_rgb'], '<f4').size == 4*batch*3*64*64
     learner.save(str(output/'trained'))
@@ -78,9 +95,9 @@ def fixture(config, output):
     assert all(np.array_equal(final[name], after[name]) for name in final)
     restored = kindle.WorldModelLearner.restore(str(output/'trained'))
     repeat = restored.predict(pixels(observations[:2]), actions[:2].ravel().tolist(), [0]*(batch*4), seed=73001)
-    assert repeat == prediction and restored.updates == 8
+    assert repeat == prediction and restored.updates == 8 and restored.prediction_length == prediction_length
     write(output/'result.json', dict(status='complete', updates=8, no_behavior=True, changes=changes,
-                                   reports=reports, prediction_restore_equal=True, frozen_tensors=len(final)))
+                                   reports=reports, prediction_restore_equal=True, frozen_tensors=len(final), prediction_length=prediction_length))
 
 
 def collect(config, output):
@@ -240,7 +257,7 @@ def evaluate(learner, batch, output, step):
     return result
 
 
-def overfit(config, output, dataset, steps):
+def overfit(config, output, dataset, steps, prediction_length=0):
     import kindle
     from safetensors.numpy import load_file
     streams = [dict(np.load(dataset/f'lane{i}.npz', allow_pickle=False)) for i in range(8)]
@@ -248,7 +265,7 @@ def overfit(config, output, dataset, steps):
     batch = training_windows(streams, starts, config['batch_length'])
     write(output/'selection.json', dict(starts=starts, source_manifest=sha(dataset/'manifest.json'),
         training_only=True, labels_used_only_to_select_contact_candidates=True))
-    learner = kindle.WorldModelLearner(config)
+    learner = kindle.WorldModelLearner(config, prediction_length=prediction_length)
     require_device(learner)
     learner.save(str(output/'initial'))
     evaluate(learner, batch, output, 0)
@@ -276,9 +293,9 @@ def overfit(config, output, dataset, steps):
     changed = sum(not np.array_equal(initial[name], final[name]) for name in names)
     assert learner.updates == steps and changed > 0
     write(output/'result.json', dict(status='complete', scope='capacity test on fitting contact clips', updates=steps,
-        unique_arrivals=int(np.prod(batch['action'].shape)), elapsed_seconds=time.monotonic()-started,
+        source_arrivals=int(np.prod(batch['action'].shape)), elapsed_seconds=time.monotonic()-started,
         training_seconds=training_seconds, changed_parameters=changed, no_behavior=True,
-        held_out_competence_proven=False))
+        held_out_competence_proven=False, prediction_length=prediction_length))
 
 
 def main():
@@ -289,19 +306,20 @@ def main():
     parser.add_argument('--dataset', type=Path)
     parser.add_argument('--checkpoint', type=Path)
     parser.add_argument('--steps', type=int, default=2048)
+    parser.add_argument('--prediction-length', type=int, default=0)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     config = json.loads(args.config.read_text())
     write(args.output/'declaration.json', dict(mode=args.mode, config=config, steps=args.steps,
-        source_sha256=sha(__file__), dataset=str(args.dataset), started_unix=time.time()))
-    if args.mode == 'fixture': fixture(config, args.output)
+        source_sha256=sha(__file__), dataset=str(args.dataset), prediction_length=args.prediction_length, started_unix=time.time()))
+    if args.mode == 'fixture': fixture(config, args.output, args.prediction_length)
     elif args.mode == 'collect': collect(config, args.output)
     elif args.mode == 'baseline':
         if args.dataset is None or args.checkpoint is None: parser.error('baseline requires dataset and checkpoint')
         baseline(args.output, args.dataset, args.checkpoint)
     else:
         if args.dataset is None or args.steps <= 0: parser.error('overfit requires dataset and positive steps')
-        overfit(config, args.output, args.dataset, args.steps)
+        overfit(config, args.output, args.dataset, args.steps, args.prediction_length)
 
 
 if __name__ == '__main__':

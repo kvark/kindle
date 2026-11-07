@@ -41,9 +41,14 @@ an accepted ball on these clips. This is fitting evidence, not generalization.
 Five guarded phases and their collector/capacity stages are complete at
 `/mnt/data/kindle-breakout-world-model-20261107`. Preserve them. The next focused
 change is direct RGB supervision through a prior rollout after an observed
-prefix. It is selected for implementation; no rollout learner is launched or
-qualified yet. Retain RGB64/12M/B8/T32/Auto for this investigation. No GPU job
-is active at this publication. The world-model goal remains active and unproven.
+prefix. The implementation passes30 CPU world/regression tests (18 GPU tests
+ignored), including future-target exclusion and prior-gradient connectivity.
+Next qualify a2-step tiny rollout, then run a fresh2,048-update fitting test
+with16 observed/16 prior steps, reconstruction100 and the exact retained clips.
+No new data collection or baseline repeat is selected. Execution root
+`/mnt/data/kindle-breakout-world-rollout-20261107`; retain RGB64/12M/B8/T32/Auto.
+No rollout GPU phase has launched at this publication. The goal remains active
+and unproven.
 
 The [prior-reward comparison](docs/results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

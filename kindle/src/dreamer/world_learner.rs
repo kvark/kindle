@@ -30,11 +30,18 @@ pub struct WorldModelLearner {
     resize: Session,
     preprocessor: GpuPreprocessor,
     rng: StdRng,
+    rollout_rng: StdRng,
+    prediction_length: usize,
     updates: u64,
     dirty: bool,
 }
 
 fn validate_config(config: &DreamerConfig) -> Result<(), &'static str> {
+    if config.world_backprop_length != config.batch_length
+        || config.world_microbatch_size() != config.batch_size
+    {
+        return Err("standalone world learner requires full-sequence BPTT and a complete batch");
+    }
     if !config.observation_kind.is_rgb()
         || config.video_encoder.is_some()
         || config.rgb_frame_pair
@@ -118,10 +125,24 @@ fn action_inputs(
 
 impl WorldModelLearner {
     pub fn new(config: DreamerConfig) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::with_prediction_length(config, 0)
+    }
+
+    pub fn with_prediction_length(
+        config: DreamerConfig,
+        prediction_length: usize,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
         validate_config(&config)?;
         config.validate();
+        if prediction_length >= config.batch_length {
+            return Err("prediction length must leave an observed prefix".into());
+        }
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let graph = world::build_world_only_training_graph(&config);
+        let graph = if prediction_length == 0 {
+            world::build_world_only_training_graph(&config)
+        } else {
+            world::build_world_only_rollout_training_graph(&config, prediction_length)
+        };
         let mut train = runtime::build_training_session(&graph, &gpu, &config);
         runtime::initialize_d3(&mut train, &graph, config.seed);
         let batch = config.batch_size;
@@ -140,6 +161,7 @@ impl WorldModelLearner {
         let resize = runtime::build_session(&graph, &gpu, Mode::Inference, false);
         let preprocessor = GpuPreprocessor::rgb(gpu, batch, config.observation_grid(), None);
         let rng = StdRng::seed_from_u64(config.seed ^ 0x776f_726c_646f_6e6c);
+        let rollout_rng = StdRng::seed_from_u64(config.seed ^ 0x7069_7865_6c72_6f6c);
         Ok(Self {
             config,
             train,
@@ -150,6 +172,8 @@ impl WorldModelLearner {
             resize,
             preprocessor,
             rng,
+            rollout_rng,
+            prediction_length,
             updates: 0,
             dirty: false,
         })
@@ -160,6 +184,9 @@ impl WorldModelLearner {
     }
     pub fn updates(&self) -> u64 {
         self.updates
+    }
+    pub fn prediction_length(&self) -> usize {
+        self.prediction_length
     }
     pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
         crate::gpu_device_info(self.train.device_information())
@@ -227,6 +254,11 @@ impl WorldModelLearner {
                 return Err("terminal/reset alignment mismatch");
             }
         }
+        if self.prediction_length > 0
+            && actions[(length - self.prediction_length) * batch..].contains(&-1)
+        {
+            return Err("prior rollout cannot cross a reset");
+        }
         let size = self.config.network();
         self.train
             .set_input("initial_deter", &vec![0.0; batch * size.deter]);
@@ -277,6 +309,13 @@ impl WorldModelLearner {
             self.train
                 .set_input(&format!("continuation_target_{time}"), &target);
         }
+        for time in 0..self.prediction_length {
+            let uniforms = (0..batch * size.stoch * size.classes)
+                .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
+                .collect::<Vec<_>>();
+            self.train
+                .set_input(&format!("pixel_rollout_uniforms_{time}"), &uniforms);
+        }
         runtime::configure_d3_optimizer(
             &mut self.train,
             &self.config,
@@ -289,6 +328,12 @@ impl WorldModelLearner {
         for (index, loss) in losses.iter_mut().enumerate() {
             self.train
                 .read_output_by_index(index, std::slice::from_mut(loss));
+        }
+        if self.prediction_length > 0 {
+            let mut loss = [0.0];
+            self.train
+                .read_output_by_index(world::LOSS_PIXEL_ROLLOUT, &mut loss);
+            losses.push(loss[0]);
         }
         if losses.iter().any(|x| !x.is_finite()) {
             return Err("nonfinite standalone world loss");
@@ -441,7 +486,7 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let metadata = serde_json::json!({"format": "kindle-world-only-v1", "config": self.config, "updates": self.updates});
+        let metadata = serde_json::json!({"format": "kindle-world-only-v1", "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length});
         std::fs::write(
             path.join("metadata.json"),
             serde_json::to_vec_pretty(&metadata)?,
@@ -456,7 +501,12 @@ impl WorldModelLearner {
             return Err(io::Error::other("not a world-only checkpoint").into());
         }
         let config = serde_json::from_value(metadata["config"].clone())?;
-        let mut learner = Self::new(config)?;
+        let prediction_length = match metadata.get("prediction_length") {
+            None => 0,
+            Some(value) => value.as_u64().ok_or("invalid world prediction length")?,
+        };
+        let prediction_length = usize::try_from(prediction_length)?;
+        let mut learner = Self::with_prediction_length(config, prediction_length)?;
         checkpoint::load_session(&mut learner.train, &path.join("world.safetensors"))?;
         learner.updates = metadata["updates"].as_u64().ok_or("missing update count")?;
         if u64::from(learner.train.adam_step_count()) != learner.updates {
