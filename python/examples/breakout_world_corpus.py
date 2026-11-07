@@ -65,6 +65,10 @@ def sampler_plan(streams, config, steps, prediction_length=16):
     rng = np.random.default_rng(config['seed'] ^ 0x636f72707573)
     locations = np.asarray([sample_locations(streams, config['batch_length'], config['batch_size'], rng)
                             for _ in range(steps)], np.int32)
+    return locations, plan_counts(streams, config, locations, prediction_length)
+
+
+def plan_counts(streams, config, locations, prediction_length):
     seen = [np.zeros(len(stream['action']), bool) for stream in streams]
     total_terminal = prior_terminal = positive = context_resets = source_resets = 0
     for row in locations:
@@ -82,7 +86,7 @@ def sampler_plan(streams, config, steps, prediction_length=16):
     counts = dict(terminal_rows=total_terminal, prior_terminal_rows=prior_terminal, positive_reward_rows=positive,
                   context_reset_rows=context_resets, source_reset_rows=source_resets,
                   unique_source_arrivals=sum(int(row.sum()) for row in seen))
-    return locations, counts
+    return counts
 
 
 def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
@@ -165,10 +169,10 @@ def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
     return result
 
 
-def train(args, config, fitting, development):
+def train(args, config, fitting, development, *, sampler=sampler_plan, initial_reference=None):
     import kindle
     from safetensors.numpy import load_file
-    plan, expected_counts = sampler_plan(fitting, config, args.steps, args.prediction_length)
+    plan, expected_counts = sampler(fitting, config, args.steps, args.prediction_length)
     selections = dict(fitting=choose_evaluation(fitting, 112003), development=choose_evaluation(development, 112019))
     if args.reference is not None:
         assert config == json.loads((args.reference/'declaration.json').read_text())['config']
@@ -182,8 +186,9 @@ def train(args, config, fitting, development):
     write(args.output/'actual-config.json', learner.config)
     write(args.output/'selections.json', selections)
     learner.save(str(args.output/'initial'))
-    if args.reference is not None:
-        initial, control = (load_file(path/'initial/world.safetensors') for path in (args.output, args.reference))
+    initial_reference = args.reference if args.reference is not None else initial_reference
+    if initial_reference is not None:
+        initial, control = (load_file(path/'initial/world.safetensors') for path in (args.output, initial_reference))
         assert initial.keys() == control.keys() and all(np.array_equal(initial[k], control[k]) for k in initial)
     seen = [np.zeros(len(stream['action']), bool) for stream in fitting]
     total_terminal, prior_terminal, positive_rows, context_reset_rows, source_reset_rows = 0, 0, 0, 0, 0
