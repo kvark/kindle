@@ -73,3 +73,17 @@ def test_restore_comparison_axes_match_a_prefix_of_the_original_batch(tmp_path, 
     corpus.restore_check(args, PersistenceLearner.config, [stream()])
     result = json.loads((restored/'result.json').read_text())
     assert result['exact_prediction_restore'] and result['source_origins'] == 2
+
+
+def test_zero_prior_horizon_keeps_sampling_and_counts_without_negative_zero_slices():
+    streams = [stream(), stream()]
+    config = dict(seed=41001, batch_size=2, batch_length=32)
+    default_plan, default_counts = corpus.sampler_plan(streams, config, 32)
+    zero_plan, zero_counts = corpus.sampler_plan(streams, config, 32, 0)
+    assert np.array_equal(default_plan, zero_plan)
+    assert default_counts['prior_terminal_rows'] > 0 and zero_counts['prior_terminal_rows'] == 0
+    assert {k:v for k,v in default_counts.items() if k != 'prior_terminal_rows'} == {
+        k:v for k,v in zero_counts.items() if k != 'prior_terminal_rows'}
+    actions = np.array([[-1, -1], [0, 1], [1, -1], [2, 2]])
+    assert corpus.rollout_validity(actions, 0).shape == (0, 2)
+    assert np.array_equal(corpus.rollout_validity(actions, 2), [[True, False], [True, False]])

@@ -18,56 +18,38 @@ gameplay score is a later integration test. CDP remains a subsequent efficiency
 comparison after the pixel baseline establishes competence.
 
 The active goal is to prove Breakout world-model training; the five-game
-campaign remains parked and unfinished. The [broader pixel-world run](results/2026-11-07-breakout-world-model-corpus.md)
-completes8,192 updates in759.246s native training/1,032.918s total loop, but
-fails world-model qualification. Dense observed reconstruction finds0/220
-fitting and0/112 development balls, despite94.53%/92.97% paddle accuracy.
-Brick balanced error is.00101/.19935. Frozen linear readouts remain coarse;
-their failure does not prove absent information. Reward/endings also remain weak.
-The earlier [short-clip gains](results/2026-11-07-breakout-world-model-rollout.md)
-remain capacity evidence, not broader competence.
+campaign remains parked. Both broader pixel-world recipes fail observed ball
+reconstruction: [MSE](results/2026-11-07-breakout-world-model-corpus.md) has0/220 fitting/0/112 development detections;
+[cross-entropy](results/2026-11-07-breakout-world-pixel-cross-entropy.md) has2/220 (one accurate)/0/112 after8,192 updates in765.084s native training.
+Coarse readouts improve modestly but do not rescue a precise state. Goal remains
+active and unproven; no actor/critic learns. Closed roots remain retained under
+`/mnt/data/kindle-breakout-world-{corpus,bce}-20261107`; no stage repeats.
 
-The new data cover all18 commands:16,384 fitting actions/65,503 emulator frames/
-22 game-overs and8,192 development actions/32,755 frames/10 game-overs. Training
-reuses fitting data only; no actor/critic learns. Reset-safe masks, known
-clipped-start terminal targets, uniform sampling and1/4/8/16/32-step exports are
-qualified. All four guarded phases complete,16 restored arrays and204 frozen
-parameter/moment tensors are exact,278 pins and all8,192 finite update rows
-pass.32 CPU world tests,60 Python tests and strict Clippy pass. Label-reference
-and CPU readout-support corrections remain separately preserved.
+Cross-entropy's learner/restore queue completes:204 frozen tensors,18 restored
+arrays,306 pins and8,192 finite rows pass. Its qualification count failure and
+separate CPU repair, and closure-audit corpus-path failure/CPU repair, remain
+preserved in the report. Source878f66be is archived. No GPU job is active.
+The corpus covers all18 commands globally, but only early states: maximum
+fitting/development score56/34, no ball above the top brick row. Some commands
+lack ball-absent contexts. Native image-cell audit explains27 transient resized
+brick-label errors; scored comparison metrics stay unchanged. None of these
+coverage limits explains away the visible-ball reconstruction failure.
 
-Root `/mnt/data/kindle-breakout-world-corpus-20261107`; execution source2774e4f2,
-native build49c99fb1/SHA prefix1b9d0dc6, matching runtime under that root. Source
-is archived before further code changes. No GPU job is active; completed stages
-must not repeat or extend.
+The selected [next ablation](experiments/2026-11-07-breakout-world-no-prior-image.md)
+removes only the extra16-step prior-image loss (`prediction_length=0`), retaining
+observed cross-entropy, RSSM KL/dynamics, reward/continuation and all data/config/
+init/sampling/evaluations. Independently sampled image losses can favor mean
+futures under uncertainty; interference is a candidate, not an established cause.
+Open-loop forecast tests remain1/4/8/16/32 steps. No capacity increase or new data.
 
-Optional [logits-based pixel cross-entropy](experiments/2026-11-07-breakout-world-pixel-cross-entropy.md)
-is implemented in the standalone world path; default MSE and old restores remain.
-34 CPU world tests,60 packaged Python tests and strict workspace/bindings Clippy
-pass. Native build535de479/SHA prefixadfc2f9e is packaged at
-`/mnt/data/kindle-breakout-world-bce-20261107/runtime`. Preparation failures and
-repairs remain preserved. All three guarded native workers exit0: F64 loss/
-derivative check,12-update mask/restore fixture and full-shape matched-init/
-legacy-restore/one-update preflight.
-
-The qualification queue fails its declared count (17 expected,16 reported).
-Do not relabel it passed. A separate CPU repair verifies304 pins and all18 saved
-arrays, including locations/horizons, against both controls, plus204 initial
-tensors and the finite full-size update. No GPU phase repeats. Future runners
-explicitly compare all18 arrays. The earlier broad-run restore compared16;
-its documentation count is corrected, with original evidence unchanged.
-
-The fixed8,192-update same-data/init/sampler comparison is now active, with its
-final frozen restore declared in the same two-stage queue. Execution source
-878f66be uses unchanged native build535de479. Root training-protocol.json pins306
-inputs. Initial204 tensors, sampler and evaluation origins match the control;
-first128 updates are finite. Session74984 owns the queue; learner PID1597257
-was confirmed live. Stop after the fixed budget; no automatic successor.
-At true ball pixels, sigmoid-MSE output gradients are about2,500× weaker; this
-motivates the experiment without proving the cause or BCE benefit. No new data,
-capacity increase, completed-stage repeat or actor/critic resume. Untouched
-test, prospective branches, late-game coverage and fresh confirmation remain
-unfinished. Keep the goal active and unproven.
+Runner implementation and61 CPU checks pass. Reuse exact native535de479/SHA
+adfc2f9e at `/mnt/data/kindle-breakout-world-bce-20261107/runtime`; no native rebuild
+is needed. Root `/mnt/data/kindle-breakout-world-no-prior-image-20261107`.
+Next declare one full-size H0 initial/one-update/frozen/restore preflight (nine
+losses,204 tensors,18 arrays), review it, then separately declare the fixed8,192-
+update comparison and final restore. No GPU allocation has launched at publication.
+Preserve failures; no automatic retry, extension or successor. Untouched tests,
+prospective branches, later-game coverage and fresh confirmation remain unfinished.
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) remains closed and inconclusive:
 79.167/47.000 greedy/sampled versus matched75.250/44.708, with paired intervals

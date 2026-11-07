@@ -6,54 +6,38 @@ The user selected this direction after pausing the five-game campaign. Treat
 world-model competence as the immediate objective. Gameplay score is a later
 integration measure. Do not restart any closed learner, collector or comparison.
 The active goal is **prove the world model training on Breakout**. The
-[broader all18 corpus experiment](results/2026-11-07-breakout-world-model-corpus.md)
-completes8,192 world-only updates in759.246s native training/1,032.918s total loop,
-but fails qualification. Dense observed reconstruction has0/220 fitting and
-0/112 development balls,94.53%/92.97% paddle accuracy and.00101/.19935 brick
-balanced error. Linear readouts of CNN/posterior features remain coarse; readout
-failure is not proof of absent information. Reward/endings remain weak. The
-[earlier isolated fitting](results/2026-11-07-breakout-world-model-capacity.md)
-and [direct prior-image gains](results/2026-11-07-breakout-world-model-rollout.md)
-remain short-trajectory capacity evidence.
+[broader MSE run](results/2026-11-07-breakout-world-model-corpus.md) and
+[cross-entropy comparison](results/2026-11-07-breakout-world-pixel-cross-entropy.md)
+remain unqualified: observed development ball detections are0/112 in both.
+Cross-entropy gets2/220 fitting detections (one within1 pixel), slightly better
+coarse readouts and some brightness, but fails the90% reconstruction diagnostic.
+Its8,192 updates cost765.084s native training/1,003.581s total loop. No actor/
+critic learns. Both runs remain closed; their original failures and independent
+CPU repairs stay retained. Cross-entropy frozen204 tensors/18 restored arrays,
+306 pins, all8,192 rows and source samples pass. Source878f66be is archived.
 
-All18 commands now appear in16,384 fitting actions/65,503 emulator frames/
-22 game-overs and8,192 development actions/32,755 frames/10 game-overs, on separate
-seed families. This separately selected collector fixes the earlier four-command
-coverage gap without restarting a completed collector. Command counts alone do
-not prove state/action coverage. Training samples all16,414 fitting arrivals;
-2,097,152 replayed arrivals are not new environment actions.
+Corpus audit finds maximum fitting/development episode scores56/34, no ball
+above the top brick row, and incomplete action coverage after ball-absent states,
+despite all18 global action counts. Native image-cell review explains27 transient
+resized brick-label errors across2.66M cells. Scored metrics remain unchanged;
+these small instrument errors do not explain the model's large brick errors.
+Early visible-ball states already suffice for the failed reconstruction test.
 
-Reset-safe prior-loss masks retain terminal arrivals/known clipped-start targets
-without leaking future boundaries into imagined states. Natural/contact/ending
-curves cover1/4/8/16/32 steps, four draws; final dense exports support frozen
-readouts. These are retrospective recorded-control forecasts, not prospective
-planning.32 CPU world tests,60 Python tests and strict Clippy pass. All four
-guarded stages complete;278 pins,8,192 finite update rows, exact sampling plan,
-204 frozen tensors and16 restored arrays pass. Preserve label-reference and
-CPU readout-support corrections and the preceding original failures.
+The [selected next ablation](experiments/2026-11-07-breakout-world-no-prior-image.md)
+sets the extra prior-image horizon16→0 with observed cross-entropy and RSSM KL/
+dynamics/reward/continuation unchanged. Independent future-image errors can
+favor mean predictions under uncertainty, motivating an interference test without
+proving a cause. Forecasts still cover1/4/8/16/32 decisions. Data/init/sampling/
+geometry/rates stay fixed; no recollection or capacity change. Implementation
+and61 CPU tests pass. Reuse native535de479/SHA adfc2f9e; no rebuild is needed.
 
-Root `/mnt/data/kindle-breakout-world-corpus-20261107`; execution2774e4f2, native
-build49c99fb1/SHA prefix1b9d0dc6. The exact source is archived. No GPU job is
-active; do not repeat or extend completed stages.
-
-Optional [logits-based pixel cross-entropy](experiments/2026-11-07-breakout-world-pixel-cross-entropy.md)
-is implemented, preserving default MSE/old restores.34 CPU world tests,60
-packaged Python tests and strict workspace/bindings Clippy pass. All three
-native qualification workers exit0, including F64 loss/derivatives, mask/restore
-fixture and matched-init/legacy-restore/one-update preflight. The queue fails its
-count declaration (17 expected,16 reported); preserve it. A separate CPU repair
-verifies304 pins and all18 saved arrays including horizons/locations. No GPU
-phase repeats; future runners explicitly compare18 arrays. The preceding broad
-run compared16, and that documentation count is corrected.
-
-The fixed8,192-update same-data/init/sampler comparison and frozen restore are
-active after review, with final frozen restore declared in the same queue. Root
-`/mnt/data/kindle-breakout-world-bce-20261107`, native build535de479/SHA adfc2f9e.
-Execution878f66be retains unchanged native build535de479; training-protocol pins306 inputs. Initial tensors/sampler/origins match, and first128 updates are finite. The
-analytical weak-gradient candidate motivates this test, not a cause/BCE-benefit
-claim; objective units and relative KL weights change. No extension, new corpus,
-capacity increase or actor/critic resume. Untouched test, prospective branches,
-late-game coverage and fresh confirmation remain unfinished.
+No GPU job is active. Root
+`/mnt/data/kindle-breakout-world-no-prior-image-20261107`. Next declare one new
+H0 full-shape matched-init/one-update/frozen/restore preflight, then review before
+separately selecting the fixed8,192-update learner/restore. Nine-loss accounting
+and empty prior masks are checked. No completed H16 phase repeats; no automatic
+extension/successor. Goal remains active and unproven; untouched tests,
+prospective branches, late-game coverage and fresh confirmation remain unfinished.
 
 ### Representation and training scope
 

@@ -53,7 +53,15 @@ def choose_evaluation(streams, seed):
     return dict(natural=natural, contacts=contacts, endings=endings)
 
 
-def sampler_plan(streams, config, steps):
+def rollout_validity(actions, prediction_length):
+    if not 0 <= prediction_length < len(actions):
+        raise ValueError('prediction length must leave an observed prefix')
+    if prediction_length == 0:
+        return np.zeros((0, actions.shape[1]), bool)
+    return np.cumprod(actions[-prediction_length:] != -1, axis=0).astype(bool)
+
+
+def sampler_plan(streams, config, steps, prediction_length=16):
     rng = np.random.default_rng(config['seed'] ^ 0x636f72707573)
     locations = np.asarray([sample_locations(streams, config['batch_length'], config['batch_size'], rng)
                             for _ in range(steps)], np.int32)
@@ -65,9 +73,9 @@ def sampler_plan(streams, config, steps):
         rewards = np.stack([streams[lane]['reward'][start:start+32] for lane, start in row], axis=1)
         source_resets += int((actions == -1).sum())
         actions[0] = -1
-        keep = np.cumprod(actions[-16:] != -1, axis=0).astype(bool)
+        keep = rollout_validity(actions, prediction_length)
         total_terminal += int(terminals.sum())
-        prior_terminal += int((terminals[-16:] & keep).sum())
+        prior_terminal += int((terminals[len(actions)-prediction_length:] & keep).sum())
         positive += int((rewards > 0).sum())
         context_resets += int((actions == -1).sum())
         for lane, start in row: seen[lane][start:start+32] = True
@@ -160,7 +168,7 @@ def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
 def train(args, config, fitting, development):
     import kindle
     from safetensors.numpy import load_file
-    plan, expected_counts = sampler_plan(fitting, config, args.steps)
+    plan, expected_counts = sampler_plan(fitting, config, args.steps, args.prediction_length)
     selections = dict(fitting=choose_evaluation(fitting, 112003), development=choose_evaluation(development, 112019))
     if args.reference is not None:
         assert config == json.loads((args.reference/'declaration.json').read_text())['config']
@@ -200,10 +208,11 @@ def train(args, config, fitting, development):
             tick = time.monotonic()
             values = learner.learn(observed, *[batch[key].ravel().tolist() for key in ('action', 'reward', 'terminal')])
             native_seconds += time.monotonic()-tick
-            keep = np.cumprod(batch['action'][-args.prediction_length:] != -1, axis=0).astype(bool)
-            assert len(values) == len(LOSS_NAMES) and values[10] == float(keep.mean())
+            keep = rollout_validity(batch['action'], args.prediction_length)
+            assert len(values) == (len(LOSS_NAMES) if args.prediction_length else 9)
+            if args.prediction_length: assert values[10] == float(keep.mean())
             terminals = int(batch['terminal'].sum())
-            kept_terminals = int((batch['terminal'][-args.prediction_length:] & keep).sum())
+            kept_terminals = int((batch['terminal'][len(batch['action'])-args.prediction_length:] & keep).sum())
             total_terminal += terminals
             prior_terminal += kept_terminals
             positive_rows += int((batch['reward'] > 0).sum())
@@ -289,7 +298,9 @@ def initial_check(args, config, fitting, development):
         assert np.array_equal(np.take(expected_trace[key], np.arange(len(selection)), axis=axis), actual_trace[key], equal_nan=True), key
     legacy = kindle.WorldModelLearner.restore(str(args.reference/'initial'))
     require_device(legacy)
-    assert legacy.pixel_loss == 'squared_error'
+    metadata = json.loads((args.reference/'initial/metadata.json').read_text())
+    assert legacy.pixel_loss == metadata.get('pixel_loss', 'squared_error')
+    assert legacy.prediction_length == metadata.get('prediction_length', 0)
     evaluate_group(legacy, development, selection, args.output, 'legacy')
     with np.load(args.output/'legacy.npz', allow_pickle=False) as trace:
         assert all(np.array_equal(trace[k], actual_trace[k], equal_nan=True) for k in (*axes, "horizons"))
@@ -297,14 +308,28 @@ def initial_check(args, config, fitting, development):
                              allow_resets=True, retain_initial_targets=True)
     values = learner.learn(pixels(batch['rgb'].astype(np.float32)/255-.5),
         *[batch[key].ravel().tolist() for key in ('action', 'reward', 'terminal')])
-    assert len(values) == 11 and np.isfinite(values).all() and learner.updates == 1
-    expected_loss = (config['loss_scales']['reconstruction']*(values[1]+values[9])
+    assert len(values) == (11 if args.prediction_length else 9) and np.isfinite(values).all() and learner.updates == 1
+    expected_loss = (config['loss_scales']['reconstruction']*(values[1]+(values[9] if args.prediction_length else 0))
         +config['loss_scales']['dynamics']*values[2]+config['loss_scales']['representation']*values[3]
         +config['loss_scales']['reward']*values[4]+config['loss_scales']['continuation']*values[5])
     np.testing.assert_allclose(values[0], expected_loss, rtol=1e-5)
+    learner.save(str(args.output/'trained'))
+    evaluate_group(learner, development, selection, args.output, 'trained')
+    learner.save(str(args.output/'trained-frozen'))
+    before, after = (load_file(args.output/phase/'world.safetensors') for phase in ('trained', 'trained-frozen'))
+    assert all(np.array_equal(before[k], after[k]) for k in before)
+    del legacy
+    restored = kindle.WorldModelLearner.restore(str(args.output/'trained'))
+    require_device(restored)
+    assert restored.pixel_loss == learner.pixel_loss and restored.prediction_length == learner.prediction_length
+    assert restored.updates == learner.updates == 1
+    evaluate_group(restored, development, selection, args.output, 'trained-restored')
+    with np.load(args.output/'trained.npz', allow_pickle=False) as first, np.load(args.output/'trained-restored.npz', allow_pickle=False) as second:
+        assert all(np.array_equal(first[k], second[k], equal_nan=True) for k in first.files)
     write(args.output/'result.json', dict(status='complete', updates=1, pixel_loss=learner.pixel_loss,
         exact_initial_tensors=len(actual), exact_initial_arrays=len(axes)+1, exact_legacy_restore=True,
-        first_full_shape_report=values, world_model_proven=False))
+        first_full_shape_report=values, prediction_length=learner.prediction_length, loss_count=len(values),
+        exact_trained_restore_arrays=len(axes)+1, frozen_tensors=len(before), world_model_proven=False))
 
 
 def main():
@@ -323,8 +348,8 @@ def main():
     parser.add_argument('--reference', type=Path)
     parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy"), default="squared_error")
     args = parser.parse_args()
-    if args.steps < 1 or args.eval_every < 1 or args.prediction_length != 16 or min(args.dense_fitting, args.dense_development) < 1:
-        parser.error('positive training/evaluation budgets and prediction-length16 required')
+    if args.steps < 1 or args.eval_every < 1 or args.prediction_length not in (0, 16) or min(args.dense_fitting, args.dense_development) < 1:
+        parser.error('positive training/evaluation budgets and prediction-length0/16 required')
     args.output.mkdir(parents=True, exist_ok=False)
     config = json.loads(args.config.read_text())
     if config['batch_size'] != 8 or config['batch_length'] != 32:
@@ -343,7 +368,7 @@ def main():
         raise ValueError('all eighteen commands must be represented in fitting and development corpora')
     fit_seeds = {row['seed'] for row in fit_manifest['files']}
     assert not fit_seeds.intersection(row['seed'] for row in dev_manifest['files'])
-    write(args.output/'declaration.json', dict(mode=args.mode, config=config, loss_names=LOSS_NAMES,
+    write(args.output/'declaration.json', dict(mode=args.mode, config=config, loss_names=LOSS_NAMES if args.prediction_length else LOSS_NAMES[:9],
         prediction_length=args.prediction_length, pixel_loss=args.pixel_loss, steps=args.steps, eval_every=args.eval_every,
         source_sha256=sha(__file__), fitting_manifest_sha256=sha(args.dataset/'manifest.json'),
         development_manifest_sha256=sha(args.development/'manifest.json'), started_unix=time.time()))
