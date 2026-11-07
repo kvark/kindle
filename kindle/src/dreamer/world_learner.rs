@@ -389,9 +389,9 @@ impl WorldModelLearner {
             checkpoint::load_session(&mut train, &anchor.path)?;
         }
         let batch = config.batch_size;
-        let mut inference = |graph: Graph| {
+        let inference = |graph: Graph, train: &mut Session| {
             let mut session = runtime::build_session(&graph, &gpu, Mode::Inference, false);
-            runtime::share_matching(&mut train, &mut session, "world.");
+            runtime::share_matching(train, &mut session, "world.");
             session
         };
         let observe = if let Some(anchor) = &fixed_teacher {
@@ -405,11 +405,14 @@ impl WorldModelLearner {
             anchor.verify(&session)?;
             session
         } else {
-            inference(world::build_observe_graph(&config, batch))
+            inference(world::build_observe_graph(&config, batch), &mut train)
         };
-        let transition = inference(world::build_transition_graph(&config, batch));
-        let decoder = inference(world::build_observation_prediction_graph(&config, batch));
-        let heads = inference(world::build_head_graph(&config, batch));
+        let transition = inference(world::build_transition_graph(&config, batch), &mut train);
+        let decoder = inference(
+            world::build_observation_prediction_graph(&config, batch),
+            &mut train,
+        );
+        let heads = inference(world::build_head_graph(&config, batch), &mut train);
         let mut graph = Graph::new();
         let pixels = graph.input("observation", &[batch, config.observation_dim()]);
         graph.set_outputs(vec![pixels]);
