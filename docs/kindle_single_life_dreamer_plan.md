@@ -6,20 +6,21 @@ The goal **prove the world model training on Breakout** remains active and unpro
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
 object/RAM training labels. The [local-action protocol](experiments/2026-11-08-breakout-world-local-action.md)
-has passed native qualification and started one fresh8,192-update learning check.
-Direct incoming action planes and a16-channel image-history branch test local
-control alongside the RSSM. Source/runner7f797a2b,native SHA38680c73;140 CPU/273
-isolated packaged Python checks and strict core/test/binding Clippy pass. Geometry
-80 logical/8,893,203 scalars/240 tensors. Qualification passes1,250 pins/31.256s:
-F64/native values/derivatives,lane/causal target controls,one finite13-report
-update,210 common initial tensors/16 nonimage arrays and18 initial/trained
-restores. Host guard passes nine sealed files. Cache836,613,824 bytes released.
-Learning pins1,257 inputs:original4/2/1/1 plan,RGB64/12M/B8/T32/H16/full BPTT/Auto,
-seed41001,rates4e-4,mixing.01,RGB100/events1. Retain actual initial/2048/4096/final,
-384 dense origins and exact final restore. Unit
-`kindle-world-local-action-learning-20261108`;observer audits completion without
-restart. After reviewed learning,declare only its84 final frozen groups. Root
-`/mnt/data/kindle-breakout-world-local-action-20261108`;consult the protocol.
+has completed fresh8,192-update learning and exact restore;its final-only frozen
+assessment is active. Direct incoming action planes plus a16-channel history
+branch test local control alongside the RSSM. Source/runner7f797a2b,native
+SHA38680c73;140 CPU/273 packaged Python and strict core/test/binding Clippy pass.
+Qualification1,250 pins/31.256s passes F64/native values/derivatives,lane/reset/
+causal controls,210 common initial tensors/16 nonimage arrays and exact restores.
+Learning1,257 input/170 CPU pins passes all8192 finite13-component rows,80 changed
+weights,240 own initial/frozen tensors,384 dense origins and18 final restore
+arrays. Dense dev observed/one/eight/16/32:98/112,101/109,43/107,29/114,11/95;
+observed gate fails,one/eight pass. Native1389.476s/loop1568.062s. Final retention
+awaits the separately declared84 frozen groups/1,557 pins,history16 primary/32
+secondary,eight draws;cached oracle/controls reused. Unit
+`kindle-world-local-action-branches-20261108`;no extension or extra learner.
+Root `/mnt/data/kindle-breakout-world-local-action-20261108`. Cache836,613,824
+counted bytes released;source,runtime,weights and arrays retained.
 All original gates stay;the change does not establish a global-state cause.
 
 The [pixel-transport experiment](results/2026-11-08-breakout-world-transport.md)
