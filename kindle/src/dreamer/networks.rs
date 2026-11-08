@@ -914,10 +914,21 @@ impl ObservationDecoder {
         history: NodeId,
         batch: usize,
     ) -> NodeId {
+        self.logits_with_action_history(graph, input, history, None, batch)
+    }
+
+    pub(crate) fn logits_with_action_history(
+        &self,
+        graph: &mut Graph,
+        input: NodeId,
+        history: NodeId,
+        action: Option<NodeId>,
+        batch: usize,
+    ) -> NodeId {
         let Self::Rgb(decoder) = self else {
             panic!("spatial history requires RGB")
         };
-        decoder.forward_logits_with_history(graph, input, Some(history), batch)
+        decoder.forward_logits_with_action_history(graph, input, Some(history), action, batch)
     }
 
     pub(crate) fn forward_with_history(

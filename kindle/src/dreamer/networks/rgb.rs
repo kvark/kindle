@@ -84,6 +84,21 @@ struct ConvNorm {
     norm: nn::RmsNorm,
 }
 
+fn action_history(
+    graph: &mut Graph,
+    history: NodeId,
+    action: NodeId,
+    batch: usize,
+    actions: usize,
+    side: usize,
+) -> NodeId {
+    let area = side * side;
+    let action = graph.reshape(action, &[batch * actions, 1]);
+    let planes = repeat_columns(graph, action, batch * actions, 1, area);
+    let planes = graph.reshape(planes, &[batch, actions * area]);
+    concat_columns(graph, history, planes, batch, 6 * area, actions * area)
+}
+
 impl ConvNorm {
     fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
         Self::with_stride(graph, name, input, output, side, 1)
@@ -240,6 +255,8 @@ pub(crate) struct Decoder {
     layers: Vec<ConvNorm>,
     output: Convolution,
     motion: Vec<ConvNorm>,
+    motion_channels: usize,
+    action_count: Option<usize>,
     fusion: Option<Box<ConvNorm>>,
     transport: Option<Box<transport::Transport>>,
     residual: bool,
@@ -257,6 +274,8 @@ impl Decoder {
         let channels = 4 * size.vision_depth;
         let spatial = (side / 16) * (side / 16) * channels;
         let mut input_channels = channels;
+        let motion_channels = if config.rgb_spatial_action { 16 } else { 8 };
+        let action_count = config.rgb_spatial_action.then_some(config.action_count);
         Self {
             deterministic: (!config.rgb_latent_only).then(|| {
                 BlockLinear::new(
@@ -319,8 +338,12 @@ impl Decoder {
                         ConvNorm::new(
                             graph,
                             &format!("{name}.motion{i}"),
-                            if i == 0 { 6 } else { 8 },
-                            8,
+                            if i == 0 {
+                                6 + action_count.unwrap_or(0)
+                            } else {
+                                motion_channels
+                            },
+                            motion_channels,
                             side,
                         )
                     })
@@ -332,7 +355,7 @@ impl Decoder {
                 Box::new(ConvNorm::new(
                     graph,
                     &format!("{name}.fusion"),
-                    2 * size.vision_depth + 8,
+                    2 * size.vision_depth + motion_channels,
                     16,
                     side,
                 ))
@@ -345,6 +368,8 @@ impl Decoder {
                 ))
             }),
             residual: config.rgb_spatial_residual,
+            motion_channels,
+            action_count,
             deter: size.deter,
             stoch: size.stoch * size.classes,
             channels,
@@ -363,7 +388,19 @@ impl Decoder {
         history: Option<NodeId>,
         batch: usize,
     ) -> NodeId {
+        self.forward_logits_with_action_history(graph, input, history, None, batch)
+    }
+
+    pub(super) fn forward_logits_with_action_history(
+        &self,
+        graph: &mut Graph,
+        input: NodeId,
+        history: Option<NodeId>,
+        action: Option<NodeId>,
+        batch: usize,
+    ) -> NodeId {
         assert_eq!(history.is_none(), self.motion.is_empty());
+        assert_eq!(action.is_some(), self.action_count.is_some());
         let stoch = slice_columns(
             graph,
             input,
@@ -436,7 +473,13 @@ impl Decoder {
             side as u32,
         );
         if let Some(history) = history {
-            let mut motion = graph.reshape(history, &[batch * 6 * self.side * self.side]);
+            let history = if let Some(actions) = self.action_count {
+                action_history(graph, history, action.unwrap(), batch, actions, self.side)
+            } else {
+                history
+            };
+            let inputs = 6 + self.action_count.unwrap_or(0);
+            let mut motion = graph.reshape(history, &[batch * inputs * self.side * self.side]);
             for layer in &self.motion {
                 motion = layer.forward(graph, motion, batch, false);
             }
@@ -446,9 +489,12 @@ impl Decoder {
                 motion,
                 batch,
                 channels * self.side * self.side,
-                8 * self.side * self.side,
+                self.motion_channels * self.side * self.side,
             );
-            value = graph.reshape(value, &[batch * (channels + 8) * self.side * self.side]);
+            value = graph.reshape(
+                value,
+                &[batch * (channels + self.motion_channels) * self.side * self.side],
+            );
             if let Some(fusion) = &self.fusion {
                 value = fusion.forward(graph, value, batch, false);
             }
@@ -510,3 +556,6 @@ mod stride_tests;
 #[cfg(test)]
 mod tests;
 mod transport;
+
+#[cfg(test)]
+mod action_tests;

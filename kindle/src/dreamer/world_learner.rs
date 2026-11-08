@@ -30,6 +30,8 @@ mod gradient_diagnostic;
 #[cfg(test)]
 mod image_feedback_tests;
 #[cfg(test)]
+mod local_action_tests;
+#[cfg(test)]
 mod loss_gradient_diagnostic;
 #[cfg(test)]
 mod motion_tests;
@@ -144,6 +146,19 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let local_action = metadata["config"]["rgb_spatial_action"] == true;
+    if local_action != (metadata["format"] == "kindle-world-only-v18") {
+        return Err("spatial action requires checkpoint format v18 and its decoder flag".into());
+    }
+    if local_action
+        && (metadata["config"]["rgb_spatial_fusion"] != true
+            || metadata["config"]["rgb_spatial_transport"] == true
+            || metadata["config"]["rgb_spatial_residual"] == true
+            || metadata["pixel_loss"] != "motion_event_rollout"
+            || metadata["prediction_length"].as_u64().unwrap_or(0) == 0)
+    {
+        return Err("invalid spatial action checkpoint objective or geometry".into());
+    }
     let transport = metadata["config"]["rgb_spatial_transport"] == true;
     if transport != (metadata["format"] == "kindle-world-only-v17") {
         return Err("spatial transport requires checkpoint format v17 and its decoder flag".into());
@@ -182,7 +197,12 @@ fn checkpoint_pixel_loss(
     let fusion = metadata["config"]["rgb_spatial_fusion"]
         .as_bool()
         .unwrap_or(false);
-    if event_rollout && metadata["format"] != "kindle-world-only-v13" && !residual && !transport {
+    if event_rollout
+        && metadata["format"] != "kindle-world-only-v13"
+        && !residual
+        && !transport
+        && !local_action
+    {
         return Err("suffix event objective requires checkpoint format v13".into());
     }
     if metadata["format"] == "kindle-world-only-v13"
@@ -199,6 +219,7 @@ fn checkpoint_pixel_loss(
                     | "kindle-world-only-v14"
                     | "kindle-world-only-v15"
                     | "kindle-world-only-v17"
+                    | "kindle-world-only-v18"
             )
         )
     {
@@ -212,6 +233,7 @@ fn checkpoint_pixel_loss(
                 | "kindle-world-only-v14"
                 | "kindle-world-only-v15"
                 | "kindle-world-only-v17"
+                | "kindle-world-only-v18"
         )
     ) && (!fusion
         || metadata["config"]["rgb_spatial_decoder"] != true
@@ -249,6 +271,7 @@ fn checkpoint_pixel_loss(
                 | "kindle-world-only-v14"
                 | "kindle-world-only-v15"
                 | "kindle-world-only-v17"
+                | "kindle-world-only-v18"
         )
     ) && (!spatial
         || (!event_rollout && !clean_prior && metadata["pixel_loss"] != "motion_cross_entropy")
@@ -356,7 +379,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v14"
             | "kindle-world-only-v15"
             | "kindle-world-only-v16"
-            | "kindle-world-only-v17",
+            | "kindle-world-only-v17"
+            | "kindle-world-only-v18",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -579,6 +603,14 @@ impl WorldModelLearner {
         }
         if config.world_gaussian && pixel_loss != PixelLoss::MotionCrossEntropy {
             return Err("Gaussian world requires the motion RGB objective without a phase".into());
+        }
+        if config.rgb_spatial_action
+            && (pixel_loss != PixelLoss::MotionEventRollout || prediction_length == 0)
+        {
+            return Err(
+                "spatial action requires the suffix event objective and positive prediction length"
+                    .into(),
+            );
         }
         if config.rgb_spatial_transport
             && (pixel_loss != PixelLoss::MotionEventRollout
@@ -1114,11 +1146,18 @@ impl WorldModelLearner {
             }
             stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
         }
-        let decode = |session: &mut Session, deter: &[f32], stoch: &[f32], history: &[f32]| {
+        let decode = |session: &mut Session,
+                      deter: &[f32],
+                      stoch: &[f32],
+                      history: &[f32],
+                      action: &[f32]| {
             session.set_input("deter", deter);
             session.set_input("stoch", stoch);
             if self.config.rgb_spatial_decoder {
                 session.set_input("decoder_history", history);
+            }
+            if self.config.rgb_spatial_action {
+                session.set_input("decoder_action", action);
             }
             session.step();
             session.wait();
@@ -1131,7 +1170,18 @@ impl WorldModelLearner {
         } else {
             Vec::new()
         };
-        let posterior = decode(&mut self.decoder, &deter, &stoch, &posterior_history);
+        let posterior_action = if self.config.rgb_spatial_action {
+            action_inputs(&self.config, &actions[(length - 1) * batch..length * batch]).0
+        } else {
+            Vec::new()
+        };
+        let posterior = decode(
+            &mut self.decoder,
+            &deter,
+            &stoch,
+            &posterior_history,
+            &posterior_action,
+        );
         let mut history = if self.config.rgb_spatial_decoder {
             super::spatial_history::after_cpu(observations, actions, length - 1, batch, width)
         } else {
@@ -1163,7 +1213,7 @@ impl WorldModelLearner {
             self.transition.read_output_by_index(0, &mut deter);
             self.transition.read_output_by_index(1, &mut logits);
             stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
-            let image = decode(&mut self.decoder, &deter, &stoch, &history);
+            let image = decode(&mut self.decoder, &deter, &stoch, &history, &action);
             if let Some(session) = &mut self.feedback {
                 session.set_input("deter", &deter);
                 session.set_input("generated_image", &image);
@@ -1231,7 +1281,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.rgb_spatial_transport {
+        let format = if self.config.rgb_spatial_action {
+            "kindle-world-only-v18"
+        } else if self.config.rgb_spatial_transport {
             "kindle-world-only-v17"
         } else if self.pixel_loss.fixed_teacher_events() {
             "kindle-world-only-v16"

@@ -170,7 +170,9 @@ pub(super) fn build_with_feedback(
         };
         let state = feature(graph, deter, stoch, batch, config);
         let squared = if let Some(past) = history {
-            let logits = decoder.logits_with_history(graph, state, past, batch);
+            let direct_action = config.rgb_spatial_action.then_some(action);
+            let logits =
+                decoder.logits_with_action_history(graph, state, past, direct_action, batch);
             let next = super::super::networks::centered_pixels(graph, logits);
             #[cfg(test)]
             predictions.push(next);
@@ -455,3 +457,6 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod local_action_tests;

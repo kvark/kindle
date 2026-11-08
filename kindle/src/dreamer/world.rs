@@ -496,6 +496,7 @@ fn training_graph(
     let mut predictive_log_probabilities = Vec::new();
     let mut predictive_losses = Vec::new();
     let mut actions = Vec::new();
+    let mut decoder_actions = Vec::new();
     let mut spatial_keeps = Vec::new();
     let mut rollout_reward_targets = Vec::new();
     let mut rollout_continuation_targets = Vec::new();
@@ -521,6 +522,9 @@ fn training_graph(
         let masked_deter = graph.mul(deter, keep_deter);
         let masked_stoch = graph.mul(stoch, keep_stoch);
         let masked_action = graph.mul(action, keep_action);
+        if config.rgb_spatial_action {
+            decoder_actions.push(masked_action);
+        }
         if model.exploration.is_some() {
             exploration_states.push(feature(
                 &mut graph,
@@ -879,7 +883,16 @@ fn training_graph(
                         .collect::<Vec<_>>();
                     let history =
                         stack_time(&mut graph, &histories, batch, 2 * config.observation_dim());
-                    let logits = decoder.logits_with_history(&mut graph, state, history, rows);
+                    let action = config.rgb_spatial_action.then(|| {
+                        stack_time(
+                            &mut graph,
+                            &decoder_actions[start..start + chunk.len()],
+                            batch,
+                            config.action_count,
+                        )
+                    });
+                    let logits = decoder
+                        .logits_with_action_history(&mut graph, state, history, action, rows);
                     super::networks::pixel_cross_entropy(&mut graph, logits, observation)
                 } else {
                     decoder.cross_entropy(&mut graph, state, observation, rows)
@@ -1911,7 +1924,14 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
     let state = feature(&mut graph, deter, stoch, batch, config);
     let observation = if config.rgb_spatial_decoder {
         let history = graph.input("decoder_history", &[batch, 2 * config.observation_dim()]);
-        decoder.forward_with_history(&mut graph, state, history, batch)
+        if config.rgb_spatial_action {
+            let action = graph.input("decoder_action", &[batch, config.action_count]);
+            let logits =
+                decoder.logits_with_action_history(&mut graph, state, history, Some(action), batch);
+            super::networks::centered_pixels(&mut graph, logits)
+        } else {
+            decoder.forward_with_history(&mut graph, state, history, batch)
+        }
     } else {
         decoder.forward(&mut graph, state, batch)
     };

@@ -334,6 +334,9 @@ pub struct DreamerConfig {
     /// Standalone fused world: mix learned horizontal/vertical RGB transport with generation.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_spatial_transport: bool,
+    /// Standalone fused world: wider local image history with incoming action planes.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_spatial_action: bool,
     /// Standalone spatial world: encode generated images into the imagined belief.
     #[serde(default, skip_serializing_if = "is_false")]
     pub world_image_feedback: bool,
@@ -521,6 +524,7 @@ impl DreamerConfig {
             rgb_spatial_fusion: false,
             rgb_spatial_residual: false,
             rgb_spatial_transport: false,
+            rgb_spatial_action: false,
             world_image_feedback: false,
             rgb_coordinates: false,
             rgb_latent_only: false,
@@ -776,6 +780,11 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if self.rgb_spatial_action
+            && (!self.rgb_spatial_fusion || self.rgb_spatial_transport || self.rgb_spatial_residual)
+        {
+            return Err("spatial action requires fusion without transport or residual".into());
+        }
         if self.rgb_spatial_transport && (!self.rgb_spatial_fusion || self.rgb_spatial_residual) {
             return Err("spatial transport requires fusion without spatial residual".into());
         }
