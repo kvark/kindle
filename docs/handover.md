@@ -11,51 +11,38 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. The [local-action protocol](experiments/2026-11-08-breakout-world-local-action.md)
-has completed fresh8,192-update learning and exact restore;its final-only frozen
-assessment is active. Direct incoming action planes plus a16-channel history
-branch test local control alongside the RSSM. Source/runner7f797a2b,native
-SHA38680c73;140 CPU/273 packaged Python and strict core/test/binding Clippy pass.
-Qualification1,250 pins/31.256s passes F64/native values/derivatives,lane/reset/
-causal controls,210 common initial tensors/16 nonimage arrays and exact restores.
-Learning1,257 input/170 CPU pins passes all8192 finite13-component rows,80 changed
-weights,240 own initial/frozen tensors,384 dense origins and18 final restore
-arrays. Dense dev observed/one/eight/16/32:98/112,101/109,43/107,29/114,11/95;
-observed gate fails,one/eight pass. Native1389.476s/loop1568.062s. Final retention
-awaits the separately declared84 frozen groups/1,557 pins,history16 primary/32
-secondary,eight draws;cached oracle/controls reused. Unit
-`kindle-world-local-action-branches-20261108`;no extension or extra learner.
-Root `/mnt/data/kindle-breakout-world-local-action-20261108`. Cache836,613,824
-counted bytes released;source,runtime,weights and arrays retained.
-All original gates stay;the change does not establish a global-state cause.
+object/RAM training labels. No GPU allocation or next learner is selected.
 
-The [pixel-transport experiment](results/2026-11-08-breakout-world-transport.md)
-is complete and fails retention. Default-off595-weight horizontal/vertical shift
-head plus RGB fallback;RSSM and13-report event objective stay. Fresh8192 updates,
-RGB64/12M/B8/T32/H16/full BPTT/Auto,seed41001,rates4e-4,mixing.01,RGB100/events1,
-original data/4/2/1/1 plan. Source/runner80dc8c76,native SHA013ae7a7;82 logical/
-8,872,550 scalars/246 tensors. Dense dev observed/one/eight94/112,102/109,31/107;
-fitting eight54/176. One/eight gates pass,observed fails. All commands retain64/64
-freeflight balls,but primary16/32 energy.200277 is worse than H0.169502 and misses
-.127127. Ending16/32 Brier.017587/.337100,RIGHT16 risk.068080,183/304 nonending
-alarms>5%. Presence improves;precise physics/events remain inaccurate.
+The [local-action experiment](results/2026-11-08-breakout-world-local-action.md)
+is complete and fails retention. Incoming action planes plus history width16;
+categorical RSSM and RSSM-only event heads stay. Source/runner7f797a2b,native
+SHA38680c73;80 logical/8,893,203 scalars/240 tensors. Fresh8192 updates,RGB64/12M/
+B8/T32/H16/full BPTT/Auto,seed41001,rates4e-4,mixing.01,RGB100/events1 and original
+4/2/1/1 plan. Dense dev observed/one/eight/16/32:98/112,101/109,43/107,29/114,11/95;
+fitting eight79/176. One/eight and all-command presence64/64 pass;observed fails.
+Primary16/32 energy.240566 is worse than H0.169502 and required.127127. Ending16/
+32 Brier.094168/.208852,RIGHT16 false risk.507002,244/304 nonending alarms>5%.
+Ball-position gains coexist with paddle/reward/ending regressions. Image heads
+see local history while event heads see RSSM only;coherence is an investigation
+target,not an established cause. Do not replace the original survival-weighted
+gates with support-conditioned point accuracy.
 
-Qualification1,247 pins/115.674s,learning1,254 input/170 CPU pins and84 final-only
-frozen groups/1,345 pins pass their implementation/audit checks. All8192 finite
-reports,82 changed weights,240 cached common initial tensors/16 nonimage arrays,
-246 own initial/frozen tensors,384 dense origins and18 exact final restore arrays.
-Four successful guards/36 sealed files,no recovery/NVML/unfinished child.122 CPU/
-249 packaged Python checks and strict core/test/binding Clippy pass. Preserve the
-fixture compile failure and separate repair;invalid first uint8-truth display
-preview and separate CPU-only display repair remain. No model query is repeated.
-Native1562.699s/loop1734.273s;assessment220.168s,CPU comparison74.807s. Cache
-836,444,204 counted bytes released;runtime,weights,arrays,figures and full causal
-clips retained. Root `/mnt/data/kindle-breakout-world-transport-20261108`.
+Qualification1,250 pins/31.256s,learning1,257 input/170 CPU pins and84 final-only
+frozen groups/1,557 pins pass implementation/audit checks.140 CPU/273 packaged
+Python and strict core/test/binding Clippy pass.210 common initial tensors/16
+nonimage arrays,all8192 finite13-component rows,80 changed weights,240 own initial/
+frozen tensors,384 dense origins and18 exact final restore arrays. Four guards/
+36 sealed files pass,no native failure/retry,recovery,NVML or unfinished child.
+Closure3,532 input pins pass;all five services are terminal.
+Native1389.476s/loop1568.062s;assessment loop200.553s,CPU comparison165.306s.
+Worker/polling spans and additional build/pinning costs remain in the report.
+Cache836,613,824 counted bytes released;source,runtime,weights,arrays,figures and
+full causal clips retained. Root `/mnt/data/kindle-breakout-world-local-action-20261108`.
 
-The [fixed-filter/future-event phase](results/2026-11-08-breakout-world-fixed-events.md)
-and earlier linked experiments remain closed with their original failures. Keep
-H0 as reference. Do not repeat completed learners,assessments or collectors. No
-unchanged extension,sweep or automatic successor. Precise physics,event timing/
+The [transport experiment](results/2026-11-08-breakout-world-transport.md)
+and earlier linked experiments remain closed with original failures and repairs.
+Keep H0 as reference. Do not repeat completed learners,assessments or collectors.
+No unchanged extension,sweep or automatic successor. Precise physics,event timing/
 calibration,persistent brick memory,late/tunnel/second-wall coverage,untouched
 families and fresh confirmation remain required. Existing oracle has no above-
 top-brick endpoints. Full world-model and five-game goals stay unfinished.
