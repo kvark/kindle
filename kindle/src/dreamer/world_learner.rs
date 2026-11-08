@@ -49,6 +49,8 @@ mod spatial_residual_tests;
 mod state_diagnostic;
 #[cfg(test)]
 mod suffix_event_tests;
+#[cfg(test)]
+mod transport_tests;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -142,6 +144,18 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let transport = metadata["config"]["rgb_spatial_transport"] == true;
+    if transport != (metadata["format"] == "kindle-world-only-v17") {
+        return Err("spatial transport requires checkpoint format v17 and its decoder flag".into());
+    }
+    if transport
+        && (metadata["config"]["rgb_spatial_residual"] == true
+            || metadata["config"]["rgb_spatial_fusion"] != true
+            || metadata["pixel_loss"] != "motion_event_rollout"
+            || metadata["prediction_length"].as_u64().unwrap_or(0) == 0)
+    {
+        return Err("invalid spatial transport checkpoint objective or geometry".into());
+    }
     let residual = metadata["config"]["rgb_spatial_residual"] == true;
     if residual != (metadata["format"] == "kindle-world-only-v15") {
         return Err("spatial residual requires checkpoint format v15 and its decoder flag".into());
@@ -168,7 +182,7 @@ fn checkpoint_pixel_loss(
     let fusion = metadata["config"]["rgb_spatial_fusion"]
         .as_bool()
         .unwrap_or(false);
-    if event_rollout && metadata["format"] != "kindle-world-only-v13" && !residual {
+    if event_rollout && metadata["format"] != "kindle-world-only-v13" && !residual && !transport {
         return Err("suffix event objective requires checkpoint format v13".into());
     }
     if metadata["format"] == "kindle-world-only-v13"
@@ -184,6 +198,7 @@ fn checkpoint_pixel_loss(
                     | "kindle-world-only-v13"
                     | "kindle-world-only-v14"
                     | "kindle-world-only-v15"
+                    | "kindle-world-only-v17"
             )
         )
     {
@@ -196,6 +211,7 @@ fn checkpoint_pixel_loss(
                 | "kindle-world-only-v13"
                 | "kindle-world-only-v14"
                 | "kindle-world-only-v15"
+                | "kindle-world-only-v17"
         )
     ) && (!fusion
         || metadata["config"]["rgb_spatial_decoder"] != true
@@ -232,6 +248,7 @@ fn checkpoint_pixel_loss(
                 | "kindle-world-only-v13"
                 | "kindle-world-only-v14"
                 | "kindle-world-only-v15"
+                | "kindle-world-only-v17"
         )
     ) && (!spatial
         || (!event_rollout && !clean_prior && metadata["pixel_loss"] != "motion_cross_entropy")
@@ -338,7 +355,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v13"
             | "kindle-world-only-v14"
             | "kindle-world-only-v15"
-            | "kindle-world-only-v16",
+            | "kindle-world-only-v16"
+            | "kindle-world-only-v17",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -561,6 +579,14 @@ impl WorldModelLearner {
         }
         if config.world_gaussian && pixel_loss != PixelLoss::MotionCrossEntropy {
             return Err("Gaussian world requires the motion RGB objective without a phase".into());
+        }
+        if config.rgb_spatial_transport
+            && (pixel_loss != PixelLoss::MotionEventRollout
+                || prediction_length == 0
+                || !config.rgb_spatial_fusion
+                || config.rgb_spatial_residual)
+        {
+            return Err("spatial transport requires the suffix event objective, fusion and positive prediction length without residual".into());
         }
         if config.rgb_spatial_residual
             && (pixel_loss != PixelLoss::MotionEventRollout || prediction_length == 0)
@@ -1205,7 +1231,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.pixel_loss.fixed_teacher_events() {
+        let format = if self.config.rgb_spatial_transport {
+            "kindle-world-only-v17"
+        } else if self.pixel_loss.fixed_teacher_events() {
             "kindle-world-only-v16"
         } else if self.config.rgb_spatial_residual {
             "kindle-world-only-v15"

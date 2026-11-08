@@ -331,6 +331,9 @@ pub struct DreamerConfig {
     /// Standalone fused world: add a learned correction to the latest image's log odds.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_spatial_residual: bool,
+    /// Standalone fused world: mix learned horizontal/vertical RGB transport with generation.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_spatial_transport: bool,
     /// Standalone spatial world: encode generated images into the imagined belief.
     #[serde(default, skip_serializing_if = "is_false")]
     pub world_image_feedback: bool,
@@ -517,6 +520,7 @@ impl DreamerConfig {
             rgb_spatial_decoder: false,
             rgb_spatial_fusion: false,
             rgb_spatial_residual: false,
+            rgb_spatial_transport: false,
             world_image_feedback: false,
             rgb_coordinates: false,
             rgb_latent_only: false,
@@ -772,6 +776,9 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if self.rgb_spatial_transport && (!self.rgb_spatial_fusion || self.rgb_spatial_residual) {
+            return Err("spatial transport requires fusion without spatial residual".into());
+        }
         if self.rgb_spatial_residual && !self.rgb_spatial_fusion {
             return Err("spatial residual requires the standalone fused RGB decoder".into());
         }

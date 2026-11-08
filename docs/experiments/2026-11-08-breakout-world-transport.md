@@ -19,9 +19,10 @@ transport, not arbitrary joint289-offset probabilities.
 
 Sigmoid blending chooses transported RGB versus the existing sigmoid RGB head.
 The latter can generate new content or motion beyond the transport window.
-Convert the mixed probabilities to logits after the existing1/255..254/255
-clamp convention. This can clip one intensity level; it is not exact fallback
-identity at the extremes. Use ordinary named D3 initialization and zero biases;
+Convert the mixed probabilities to logits after clipping to1e-6..1−1e-6.
+This keeps uniformly spread small-object mass above the probability floor more
+often than a1/255 clip; finite black/white values and derivatives must be checked
+on Auto. Fallback identity is clipped at the extremes. Use ordinary named D3 initialization and zero biases;
 no flow/alpha bonuses, pretrained weights, object labels or emulator-state input.
 Use existing slice/concat/reshape/softmax/elementwise operations only. No backend
 primitive, dependency, actor/critic or event-head change.

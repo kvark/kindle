@@ -241,6 +241,7 @@ pub(crate) struct Decoder {
     output: Convolution,
     motion: Vec<ConvNorm>,
     fusion: Option<Box<ConvNorm>>,
+    transport: Option<Box<transport::Transport>>,
     residual: bool,
     deter: usize,
     stoch: usize,
@@ -333,6 +334,13 @@ impl Decoder {
                     &format!("{name}.fusion"),
                     2 * size.vision_depth + 8,
                     16,
+                    side,
+                ))
+            }),
+            transport: config.rgb_spatial_transport.then(|| {
+                Box::new(transport::Transport::new(
+                    graph,
+                    &format!("{name}.transport"),
                     side,
                 ))
             }),
@@ -445,10 +453,13 @@ impl Decoder {
                 value = fusion.forward(graph, value, batch, false);
             }
         }
+        let fused = value;
         value = self.output.forward(graph, value, batch);
         let width = 3 * self.side * self.side;
         let logits = graph.reshape(value, &[batch, width]);
-        if self.residual {
+        if let Some(transport) = &self.transport {
+            transport.forward(graph, fused, history.unwrap(), logits, batch, self.side)
+        } else if self.residual {
             residual_logits(graph, logits, history.unwrap(), batch, width)
         } else {
             logits
@@ -493,7 +504,9 @@ fn residual_logits(
 mod fusion_tests;
 #[cfg(test)]
 mod residual_tests;
+
 #[cfg(test)]
 mod stride_tests;
 #[cfg(test)]
 mod tests;
+mod transport;
