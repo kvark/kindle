@@ -4,45 +4,29 @@
 
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic,CDP comparisons and the five-game campaign stay parked. Use native
-pixel supervision and H0 as the broad inspectable reference. No pretrained
-encoder or object/RAM training labels. No GPU allocation or successor is selected.
+pixel supervision and H0 as the broad inspectable reference;no pretrained encoder
+or object/RAM training labels.
 
-The [bounded H32 recipe](results/2026-11-08-breakout-world-h32.md) is closed and **fails retention**;
-[protocol](experiments/2026-11-08-breakout-world-h32.md). Fresh4,096,T48/H32/prefix16,world/dynamics8e-4,encoder4e-4,
-qualified v18 local-action architecture. Dev observed/1/4/8/16/32 are95/112,
-92/109,38/109,25/107,15/114,8/95,versus H16's98/112,101/109,63/109,43/107,
-29/114,11/95. Fitting eight-step48/176 also trails H16's79/176. Primary ball
-energy.329402 versus H0.169502/H16.240566 and required.127127. Reverse freeflight8
-presence47/64 fails. Ending16 Brier.000891/RIGHT risk.033947 improve,but32 Brier
-.398760 regresses;152/304 nonending alarms remain. All oracle outcomes through16
-are alive,so lower16 Brier does not establish recognition of genuine endings.
+The [state/image-history protocol](experiments/2026-11-08-breakout-world-state-history.md) is selected for CPU implementation,
+data and test-executable qualification. Compare frozen local-action H16/H32
+readouts across eight combinations of prior/image-informed h,z and history2.
+Earlier state swaps lacked this image route. No hybrid feeds a forecast;future
+labels are privileged diagnostics,not training or a replacement gate. Production
+forward graphs/math stay unchanged. No GPU allocation or learner is declared.
+Root `/mnt/data/kindle-breakout-world-state-history-20261108`;consult protocol.
 
-Native learning1,515.733s/loop1,691.448s costs9.087%/7.869% more than H16;
-shared-host timings and the coupled rates/context/budget/target/RNG changes do
-not isolate a cause or speed effect. All4,096 finite13-component rows,80 changed
-weights,240 actual-initial/frozen tensors,58 finite exports,384 dense origins,
-18 restore arrays and84 final groups pass integrity checks. Closure3,453 pins,
-four successful guards/36 pins and original failed guard27 pins pass verification;
-allfive services terminal. CPU count/getter-float/declaration/missing-queue/
-unexecuted audit-syntax failures and separate repairs remain;no failed stage is
-relabeled. No native rebuild or primitive requalification.
+The [H32 recipe](results/2026-11-08-breakout-world-h32.md) remains closed and fails retention:dev eight-step25/107
+versus H16's43/107,primary.329402 versus H0.169502/H16.240566 and required.127127;
+fitting48/176 also trails79/176. Ending16 false alarms improve but32 Brier.398760
+regresses. All3,453 closure pins,weights,three lossless clips,regressions and
+original count/getter/declaration/missing-queue/audit-source failures remain.
+Native/source7f797a2b/SHA38680c73,runner96d3a809;do not extend or repeat it.
 
-Root `/mnt/data/kindle-breakout-world-h32-20261108`;native/source7f797a2b,
-SHA38680c73,runner96d3a809. Weights,arrays,curves,three lossless causal clips,
-source/runtime and all per-action/horizon regressions are retained. Consult the
-protocol before a separately justified new experiment. Do not extend or repeat
-this learner,completed assessments,old collectors or unchanged recipes.
-
-The [survival decomposition](results/2026-11-08-breakout-world-survival-decomposition.md) remains a closed CPU diagnostic:
-future-label-assisted reweighting changes local H16 ball energy.240566→.161658,
-not its learned forecasts. It cannot replace any original gate or establish a
-causal fix. [Local-action H16](results/2026-11-08-breakout-world-local-action.md) stays closed and fails retention despite
-stronger short point forecasts. Keep all original negative results and failures.
-
-Precise physics,event timing/natural-frequency calibration,persistent removed-
-brick memory,late/tunnel/second-wall coverage,untouched families and fresh
-confirmation remain required. Existing oracle has no above-top-brick endpoint.
-Intermediate gates cannot finish the world-model or five-game goal.
+Precise physics,event timing/calibration,persistent removed-brick memory,late/
+tunnel/second-wall coverage,untouched families and fresh confirmation remain
+required. Existing oracle has no above-top-brick endpoint. No unchanged extension,
+sweep,completed-stage repeat or automatic successor. Intermediate and privileged
+diagnostic scores cannot complete the world-model or five-game goal.
 
 ### What would establish the world model
 
