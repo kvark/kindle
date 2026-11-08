@@ -13,32 +13,29 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [posterior-trained local-action/H0 implementation](experiments/2026-11-08-breakout-world-local-h0.md) is implemented;74 distinct CPU world checks andstrict core/binding Clippy pass.
-Packaging/306 Python checks pass. The645-pin bounded native qualifier is
-selected:one H0 update plus initial/trained18-array restores,native6930e7b8,
-source/runner5bcaaebd. No full learner is selected. The original graph-test count
-assertion failed (11 rawoutputs versus9 losses);separate correction checksnine
-scalar losses plus two state traces. Originalsource/log are preserved. No full learner is selected;only the guarded qualifier may allocate. Keep the same
-603,915-weight1M RGB64 decoder/RSSM;allow observed-posterior motion CE/KL/events
-withH0 andexplicit v20 metadata. Remove added sampled-prior RGB andimagined-event
-losses,without changing inference/parameters or relaxing oldv18/v19 headers.
-The first preparation byte-identity assertion failed onan existing T48 counter
-generalization;separate CPU repair verifies unchanged other AST bodies,T32 and
-scaled sealed counts without recounting the old plan. Original failure retained.
+The [fixed posterior-only local H0 learner](experiments/2026-11-08-breakout-world-local-h0-learning.md) is selected: fresh16,384 updates,1M/RGB64/v20,
+603,915 weights/80 logical/240 tensors,B8/T32,Auto,seed41001,rates4e-4,RGB1,
+KL1/.1/free-nat1,observed events1,mixing.01. Same local decoder/RSSM/inference;
+remove added sampled-prior RGB andimagined-event losses. RGB1 additionally
+changes loss balance,informed byearlier12M gradients,not a measured1M cause.
+The prepared4,096-row corrective plan repeatsfour times;sealed counts scale,
+no old generic recount. No extension,sweep or automatic successor.
 Root `/mnt/data/kindle-breakout-world-local-h0-20261108`.
 
-The [loss review](results/2026-11-08-breakout-world-prior-pixel-loss-review.md) verifies an averaging incentive inour added H16 term:independently sampled
-prior futures are compared toeach recorded future. A two-outcome pixel example
-prefersaveraging under per-draw BCE butsharp alternatives under joint marginal
-likelihood. Official Dreamer usesposterior reconstruction/prior-posterior KL.
-This diagnoses the extra term's incentive,not every coupled-model error or a
-proved remedy. Existing energy/score-function/overshooting attempts remainclosed.
+[Qualification](experiments/2026-11-08-breakout-world-local-h0.md) passes atRGB100:645 pins/13.878s,77 changed weights/all required families,
+240 finite/frozen tensors,18 exact arrays per initial/trained restore,one9-file
+guard/terminal unit. Initial240 tensors/18 arrays match retained actual-initial
+control. Independent CPUreview36pins/.360s. Native6930e7b8/source/runner5bcaaebd;
+74 distinct Rust checks,306 packaged Python andstrict core/binding Clippy pass.
+Original CPU graph-count failure andrunner-byte stop remain with separate repairs.
+Keep the pinned qualifier/config untouched;RGB1 uses a separate learning config
+andfirst actual update checks inside the budget. No new rebuild/qualification.
 
-The [fitting diagnostic](results/2026-11-08-breakout-world-launch-fitting.md) staysclosed:real futures differwidely fromidentical past/commands,while
-four model draws show nearlyidentical multi-ball ghost images. Native31.309s,
-390pins/240 frozen tensors;original CPU serialization failure preserved and
-separate2.855s CPU repair complete,502-pin closure/one9-file guard. Its easier
-fitting result cannotrepair the [failed corrective trial](results/2026-11-08-breakout-world-launch-corrective.md). All completed stages stayclosed.
+The [loss review](results/2026-11-08-breakout-world-prior-pixel-loss-review.md) identifies an averaging incentive inour added independent-prior pixel term;
+[launch-fitting evidence](results/2026-11-08-breakout-world-launch-fitting.md) shows nearlyidentical sampled ghost images versus different real futures.
+This motivates the recipe,not a guaranteed repair or full causal diagnosis.
+All completed learners/collectors/diagnostics stayclosed;the previous corrective
+trial remains failed. Restore never changes objectives;new H0 needsv20.
 
 All original physics/event gates stand. Precise physics, event timing/calibration,
 persistent brick memory, late/tunnel/second-wall coverage, untouched families and

@@ -1,5 +1,7 @@
 # Breakout: posterior-trained local-action world
 
+**Qualification complete.** The [separately declared learning recipe](2026-11-08-breakout-world-local-h0-learning.md) selects RGB1;the original qualifier below used RGB100.
+
 Select implementation and bounded qualification of the existing local-action
 decoder with H0 observed-posterior training. The [loss review](../results/2026-11-08-breakout-world-prior-pixel-loss-review.md)
 identifies an averaging incentive in the added sampled-prior RGB term; the
