@@ -82,3 +82,14 @@ original failed learners,assessments,collectors and diagnostics remain closed.
 No sweep,extension,automatic successor or completed-stage repeat. Full physics,
 events,brick memory,late/tunnel/second-wall coverage,untouched families and fresh
 confirmation remain required;the world-model and five-game goals stay unfinished.
+
+
+CPU preparation:the first test-executable build failed eight counter-type
+comparisons (expected usize against learner u64/optimizer u32). Its original
+compiler log/failure receipt remain retained. Separate explicit u64 comparison
+repair passes three new CPU checks,with the native diagnostic ignored,and
+strict release core/test Clippy passes. Cached data preparation passes first:
+32 natural/10 terminal origins,six batches/six padding lanes,eight exact source
+reference joins and48 planned queries. No GPU/model/emulator construction.
+Production Rust changes are only a cfg(test) module registration plus the new
+orchestrator;all production graphs and earlier diagnostics are unchanged.

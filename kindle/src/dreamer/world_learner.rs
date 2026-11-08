@@ -48,6 +48,8 @@ mod spatial_fusion_tests;
 #[cfg(test)]
 mod spatial_residual_tests;
 #[cfg(test)]
+mod spatial_state_diagnostic;
+#[cfg(test)]
 mod state_diagnostic;
 #[cfg(test)]
 mod suffix_event_tests;
