@@ -26,25 +26,28 @@ CNN/RSSM/RGB decoder with retained categorical H0 as the inspectable reference; 
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-The [self-generated image-feedback result](docs/results/2026-11-08-breakout-world-image-feedback.md)
-is closed and **fails retention**. Fresh 8,192 H16 updates yield development observed/one/eight
-90/112, 87/109, 26/107; primary ball energy 0.256859
-versus H0 .169502. Ending16/32 Brier 0.038424/0.241261;
-99/304 individual non-ending cases exceed5%. All gates and
-per-action/reward/paddle/brick regressions remain in the report. Keep H0 as reference;
-full competence remains unproven. No next GPU allocation or automatic successor.
+Select the [fixed-contact motion fitting diagnostic](docs/experiments/2026-11-08-breakout-world-contact-fit.md).
+The motion-weighted H16 objective has not been checked on the original eight
+fixed fitting clips. Fresh 2,048 updates, RGB64/12M/B8/T32/Auto, seed41001/rates4e-4,
+unchanged qualified85dbe150/SHA5b112866 runtime. No rebuild, collection, labels,
+actor/critic, spatial decoder or image feedback. CPU review verifies eight source
+hashes, exact old contexts/futures/actions, episode boundaries and all204 common
+initial tensors.256 unique arrivals;262,144 replayed future targets;no future
+positive reward or terminal. This is motion/contact fitting,not event calibration.
 
-Default-off `world_image_feedback`/`motion_image_feedback` couples generated RGB
-back into the same-h posterior and supervises future reward/continuation. No new
-parameters:77 logical/8,857,723 scalars/231 tensors. Feedback and losses change
-together; no isolated mechanism follows. Source/native/runner ea90ee96,SHA9d3d8536.
-99 Rust CPU/135 packaged Python/strict Clippy,1,196-pin native qualification,
-all 8,192 finite13-loss rows,231 frozen tensors,18 restored arrays,84 frozen groups,
-four guards/36 sealed files and 2,894-pin closure pass. Preserve the
-first fixture count failure and separate CPU repair. Native training 1232.062s;
-loop 1412.747s. Root `/mnt/data/kindle-breakout-world-image-feedback-20261108`;
-835,754,676-byte build cache released, checkpoints/source/runtime/curves/clips retained.
-No collection, new labels, actor/critic or old-model query. No completed stage repeats.
+Root `/mnt/data/kindle-breakout-world-contact-fit-20261108`. Declare one guarded
+900s learner and300s exact restore. Save initial/512/1024/2048 and all four fixed
+draws at every1..16 endpoint. Every supported observed/1/4/8/16 ball must be within
+one pixel on each draw,plus>=90% all1..16 support per draw. Original full-corpus
+gates and the full world-model goal stay unchanged; a fitting pass is diagnostic.
+No automatic extension, repeat or successor. No GPU allocation active yet.
+
+The [image-feedback result](docs/results/2026-11-08-breakout-world-image-feedback.md)
+is closed/failed:90/112 observed,87/109 one,26/107 eight;primary energy.256859
+versus H0.169502;99/304 non-ending cases>5%. All source/native checks,restores,
+four guards and2,894-pin closure pass. Keep H0;all checkpoints,failures,curves and
+clips retained. It improves some recorded forecasts but not full physical/event
+quality. No completed stage is repeated.
 
 The [spatial-decoder result](docs/results/2026-11-08-breakout-world-spatial-decoder.md) remains closed/failed:
 87/112,81/109,24/107;energy.478844 versus H0.169502;187/304 nonending false alarms
