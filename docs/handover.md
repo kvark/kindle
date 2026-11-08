@@ -30,12 +30,17 @@ Fresh8,192 H16 budget/original full plan/seeds/objectives and all gates stay;
 no unchanged extension. Full competence remains unproven.
 
 Root `/mnt/data/kindle-breakout-world-spatial-decoder-20261108`.100 affected
-Rust CPU checks pass; strict core Clippy passes. Preserve initial Rust fixture
-literal syntax error and first too-strict analytic-gradient tolerance failure;
-separate repairs retain F32-constant rounding evidence. Native history-value/
-derivative and fixed-latent history-effect fixtures are prepared but unrun.
-Next finish packaged CPU checks, then separately declare native qualification.
-No GPU allocation or full learner is active or selected before qualification.
+Rust CPU/118 packaged Python/strict core-binding Clippy pass. Preserve initial
+fixture literal syntax error and first analytic-gradient tolerance failure;
+separate CPU-only repairs retain the F32-constant rounding evidence.
+Native qualifier1,189 pins/25.687s passes history F64 values/derivatives,
+fixed-latent history effects/lane isolation,201 common initial tensors/67 weights,
+231 own initial/frozen tensors,18 initial/trained restore arrays,74 first-update
+changed weights across required families/spatial layers and old-native v10
+rejection. Source/native/runner0a50d611,SHA0228e625. The separately declared
+fresh8,192-update H16 learner and final restore are active under the AMD guard.
+Disposable build cache released; runtime,CPU executable,source and logs retained.
+No completed learner or collector repeats.
 
 The [compact Gaussian32 result](results/2026-11-08-breakout-world-gaussian32.md) remains closed/failed:
 one68/109,eight13/107,energy.409350 versus H0.169502 and Gaussian512.557271,
