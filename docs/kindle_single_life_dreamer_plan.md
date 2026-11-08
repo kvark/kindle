@@ -24,12 +24,15 @@ failed guard/observer and34.725s worker/polling span; native update time is unkn
 Two actual CPU training-loop cases reproduce it; four fresh/warm legacy/new cases
 pass after the Python-only membership repair. Native qualification remains passed.
 
-A separately declared repaired4096-update warm phase (8192→12288) and final restore
-are active,1377 pins. Same H0 anchor/plan/config; original completed initial/dense
+Repaired4096-update warm learning (8192→12288),final restore and CPU audit pass
+1377/123 pins:16 finite reports,total/energy/plan/exposures,32 changed/36 fixed
+weights,24 exact visual arrays,204 frozen tensors,108 reused initial arrays,384
+dense origins and18 restore arrays. Development observed/one/eight108/112,83/109,
+22/107;only observed gate passes. Native395.123s/loop457.361s. Separately declared
+84 frozen groups are active,1134 pins. Same H0 anchor/plan/config; original completed initial/dense
 arrays are copied/hashed, not queried again. All204 fresh initial tensors match
 H0 and the first16 logged reports match qualification exactly. RNG restarts; this
-is not an uninterrupted continuation or fresh confirmation. Final84 frozen groups
-await reviewed learning/restore. All original gates stay. Native/source249786f1,
+is not an uninterrupted continuation or fresh confirmation. All original gates stay. Native/source249786f1,
 SHAab645a5b; repaired runner84de0f5a. Active root
 `/mnt/data/kindle-breakout-world-fixed-events-20261108/runner-repair`; parent retains
 qualification and original failed launcher. No native rebuild/requalification.
