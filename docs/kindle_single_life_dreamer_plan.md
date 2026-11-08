@@ -12,12 +12,16 @@ v9 persists its dimension and old natives must reject before GPU. Expected
 68 logical/8,008,003 scalars/204 tensors; feature width2080. No new data,labels,
 actor/critic,teacher or backend primitive. Full competence remains unproven.
 
-Root `/mnt/data/kindle-breakout-world-gaussian32-20261108`. Eleven affected
-Gaussian CPU checks pass; width1 F64 math and compact geometry/header tests pass.
-The first dependency build hit system-disk ENOSPC before tests; its log is
-preserved and the new build cache moved to /mnt/data. No GPU allocation yet.
-Next finish affected CPU/package checks, then separately declare native
-qualification and a bounded learner only after reviewed qualification.
+Root `/mnt/data/kindle-breakout-world-gaussian32-20261108`.96 affected Rust CPU/
+100 packaged Python/strict core-binding Clippy checks pass. Preserve first
+system-disk ENOSPC dependency build and separate /mnt/data cache repair.
+Native qualifier1,180 pins/25.514s passes width1 F64 values/derivatives,
+180 common initial tensors/60 weights,204 own initial/frozen tensors,18 initial/
+trained restore arrays,65 first-update changed weights,both mean/scale halves,
+continuous samples and old-native v9 rejection. Source/native/runner40828aef,
+SHA657d0ba4. The separately declared fresh8,192-update H16 learner and final
+restore are active under the AMD host guard; checkpoints0/2048/4096/8192.
+Disposable build caches released; runtime,CPU executable,source and logs retained.
 
 The [Gaussian512 result](results/2026-11-08-breakout-world-gaussian.md) remains closed/failed:
 observed105/112,one76/109,eight16/107,primary energy.557271 versus H0.169502,
