@@ -58,6 +58,7 @@ mod recurrent_rollout;
 pub(crate) const LOSS_WORLD_ROLLOUT: usize = 25;
 pub(crate) const LOSS_PREDICTIVE_WORLD: usize = 26;
 pub(crate) const LOSS_RECURRENT_WORLD: usize = 30;
+pub(crate) const LOSS_IMAGE_FEEDBACK: usize = 34;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
     (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_centered {
@@ -493,6 +494,8 @@ fn training_graph(
     let mut predictive_losses = Vec::new();
     let mut actions = Vec::new();
     let mut spatial_keeps = Vec::new();
+    let mut feedback_reward_targets = Vec::new();
+    let mut feedback_continuation_targets = Vec::new();
 
     for time in 0..length {
         let action = graph.input(
@@ -738,6 +741,14 @@ fn training_graph(
             let inputs = (group * time_batch_length..(group + 1) * time_batch_length)
                 .map(|time| graph.input(&format!("{name}_{time}"), &[batch, width]))
                 .collect::<Vec<_>>();
+            if config.world_image_feedback {
+                if name == "reward_target" {
+                    feedback_reward_targets.extend_from_slice(&inputs);
+                }
+                if name == "continuation_target" {
+                    feedback_continuation_targets.extend_from_slice(&inputs);
+                }
+            }
             stack_time(&mut graph, &inputs, batch, width)
         };
         let reward_target = target("reward_target", config.value_bins);
@@ -1210,7 +1221,7 @@ fn training_graph(
                 config.observation_dim(),
             )
         });
-        pixel_rollout::build_with_history(
+        pixel_rollout::build_with_feedback(
             &mut graph,
             config,
             &model,
@@ -1219,11 +1230,24 @@ fn training_graph(
             &observations[start - 1..],
             pixel_loss,
             history,
+            config
+                .world_image_feedback
+                .then(|| pixel_rollout::EventTargets {
+                    reward: &feedback_reward_targets[start..],
+                    continuation: &feedback_continuation_targets[start..],
+                }),
         )
     });
     let total = if let Some(rollout) = &pixel_rollout {
         let weighted = graph.scale(rollout.loss, config.loss_scales.reconstruction);
-        graph.add(total, weighted)
+        let mut total = graph.add(total, weighted);
+        if let Some([reward, continuation]) = rollout.events {
+            let reward = graph.scale(reward, config.loss_scales.reward);
+            let continuation = graph.scale(continuation, config.loss_scales.continuation);
+            total = graph.add(total, reward);
+            total = graph.add(total, continuation);
+        }
+        total
     } else {
         total
     };
@@ -1335,6 +1359,12 @@ fn training_graph(
             outputs.push(graph.scalar(0.0));
         }
         outputs.push(rollout.loss);
+        if let Some(events) = rollout.events {
+            while outputs.len() < LOSS_IMAGE_FEEDBACK {
+                outputs.push(graph.scalar(0.0));
+            }
+            outputs.extend(events);
+        }
     }
     if let Some(rollout) = latent_rollout {
         while outputs.len() < LOSS_WORLD_ROLLOUT {
@@ -1702,6 +1732,23 @@ pub fn build_observe_graph(config: &DreamerConfig, batch: usize) -> Graph {
         .posterior
         .forward(&mut graph, deter, encoded, batch);
     graph.set_outputs(vec![deter, posterior, prior, encoded]);
+    graph
+}
+
+/// Re-encode only a model-generated image at the already advanced h.
+/// This graph deliberately has no GRU or future outcome/reset inputs.
+pub(crate) fn build_image_feedback_graph(config: &DreamerConfig, batch: usize) -> Graph {
+    config.validate();
+    assert!(config.world_image_feedback && batch > 0);
+    let mut graph = Graph::new();
+    let representation = Representation::new(&mut graph, config);
+    let deter = graph.input("deter", &[batch, config.network().deter]);
+    let image = graph.input("generated_image", &config.observation_shape(batch));
+    let encoded = representation.encoder.forward(&mut graph, image, batch);
+    let logits = representation
+        .posterior
+        .forward(&mut graph, deter, encoded, batch);
+    graph.set_outputs(vec![logits]);
     graph
 }
 

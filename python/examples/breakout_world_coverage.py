@@ -179,7 +179,7 @@ def main():
     parser.add_argument('--development',type=Path)
     parser.add_argument('--initial-reference',type=Path)
     parser.add_argument('--sampling-plan',type=Path)
-    parser.add_argument('--pixel-loss',choices=['motion_cross_entropy',corpus.LATENT_OBJECTIVE,corpus.RECURRENT_OBJECTIVE,*corpus.PREDICTIVE_OBJECTIVES],default='motion_cross_entropy')
+    parser.add_argument('--pixel-loss',choices=['motion_cross_entropy','motion_image_feedback',corpus.LATENT_OBJECTIVE,corpus.RECURRENT_OBJECTIVE,*corpus.PREDICTIVE_OBJECTIVES],default='motion_cross_entropy')
     parser.add_argument('--prediction-length',type=int,choices=(0,4,16),default=0)
     parser.add_argument('--dense-initial',action='store_true')
     parser.add_argument('--reference',type=Path)

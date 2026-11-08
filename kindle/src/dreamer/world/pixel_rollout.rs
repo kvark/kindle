@@ -4,11 +4,19 @@ use super::*;
 
 pub(super) struct PixelRollout {
     pub loss: NodeId,
+    pub events: Option<[NodeId; 2]>,
     #[cfg(test)]
     pub states: Vec<NodeId>,
     #[cfg(test)]
     pub predictions: Vec<NodeId>,
 }
+
+pub(super) struct EventTargets<'a> {
+    pub reward: &'a [NodeId],
+    pub continuation: &'a [NodeId],
+}
+
+mod feedback;
 
 fn motion_loss(
     graph: &mut Graph,
@@ -48,6 +56,7 @@ pub(super) fn build(
 }
 
 #[allow(clippy::too_many_arguments)]
+#[cfg(test)]
 pub(super) fn build_with_history(
     graph: &mut Graph,
     config: &DreamerConfig,
@@ -56,9 +65,39 @@ pub(super) fn build_with_history(
     actions: &[NodeId],
     observations: &[NodeId],
     pixel_loss: PixelLoss,
+    history: Option<NodeId>,
+) -> PixelRollout {
+    build_with_feedback(
+        graph,
+        config,
+        model,
+        initial,
+        actions,
+        observations,
+        pixel_loss,
+        history,
+        None,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn build_with_feedback(
+    graph: &mut Graph,
+    config: &DreamerConfig,
+    model: &WorldModel,
+    initial: (NodeId, NodeId),
+    actions: &[NodeId],
+    observations: &[NodeId],
+    pixel_loss: PixelLoss,
     mut history: Option<NodeId>,
+    targets: Option<EventTargets<'_>>,
 ) -> PixelRollout {
     assert_eq!(config.rgb_spatial_decoder, history.is_some());
+    assert_eq!(config.world_image_feedback, targets.is_some());
+    if let Some(targets) = &targets {
+        assert_eq!(targets.reward.len(), actions.len());
+        assert_eq!(targets.continuation.len(), actions.len());
+    }
     let (mut deter, mut stoch) = initial;
     assert!(!actions.is_empty() && actions.len() + 1 == observations.len());
     let size = config.network();
@@ -68,6 +107,7 @@ pub(super) fn build_with_history(
         .as_ref()
         .expect("RGB rollout requires decoder");
     let mut losses = Vec::new();
+    let mut event_losses = Vec::new();
     #[cfg(test)]
     let mut states = Vec::new();
     #[cfg(test)]
@@ -111,8 +151,6 @@ pub(super) fn build_with_history(
             straight_through_sample(graph, sampled, probabilities)
         };
         let state = feature(graph, deter, stoch, batch, config);
-        #[cfg(test)]
-        states.push(state);
         let squared = if let Some(past) = history {
             let logits = decoder.logits_with_history(graph, state, past, batch);
             let next = super::super::networks::centered_pixels(graph, logits);
@@ -125,6 +163,34 @@ pub(super) fn build_with_history(
                 batch,
                 config.observation_dim(),
             ));
+            if config.world_image_feedback {
+                let encoded = model.representation.encoder.forward(graph, next, batch);
+                let logits = model
+                    .representation
+                    .posterior
+                    .forward(graph, deter, encoded, batch);
+                let noise = graph.input(
+                    &format!("pixel_feedback_uniforms_{time}"),
+                    &[batch * size.stoch, size.classes],
+                );
+                let sampled = gumbel_sample(
+                    graph,
+                    logits,
+                    noise,
+                    batch * size.stoch,
+                    size.classes,
+                    config.unimix,
+                );
+                let sampled = graph.stop_gradient(sampled);
+                let probabilities = mixed_probabilities(
+                    graph,
+                    logits,
+                    batch * size.stoch,
+                    size.classes,
+                    config.unimix,
+                );
+                stoch = straight_through_sample(graph, sampled, probabilities);
+            }
             super::super::networks::pixel_cross_entropy(graph, logits, observation)
         } else if pixel_loss != PixelLoss::SquaredError {
             decoder.cross_entropy(graph, state, observation, batch)
@@ -134,9 +200,34 @@ pub(super) fn build_with_history(
             let residual = graph.sub(prediction, target);
             graph.mul(residual, residual)
         };
+        let belief = if config.world_image_feedback {
+            feature(graph, deter, stoch, batch, config)
+        } else {
+            state
+        };
+        #[cfg(test)]
+        states.push(belief);
+        // Read targets only after the complete causal state and image exist.
+        let mut event_weight = None;
+        if let Some(targets) = &targets {
+            let weight = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
+            event_weight = Some(weight);
+            let reward = model.heads.reward.forward(graph, belief);
+            let continuation = model.heads.continuation.forward(graph, belief);
+            event_losses.push(feedback::event_losses(
+                graph,
+                reward,
+                continuation,
+                targets.reward[time],
+                targets.continuation[time],
+                weight,
+            ));
+        }
         let loss = if pixel_loss.motion_attention() {
-            let keep = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
-            motion_loss(graph, squared, observation, previous, keep)
+            let weight = event_weight.unwrap_or_else(|| {
+                graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1])
+            });
+            motion_loss(graph, squared, observation, previous, weight)
         } else {
             let per_row = graph.sum_inner(squared);
             let weight = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
@@ -148,8 +239,16 @@ pub(super) fn build_with_history(
     }
     let loss = sum(graph, &losses);
     let loss = graph.scale(loss, 1.0 / (batch * actions.len()) as f32);
+    let events = targets.map(|_| {
+        [0, 1].map(|i| {
+            let values = event_losses.iter().map(|row| row[i]).collect::<Vec<_>>();
+            let loss = sum(graph, &values);
+            graph.scale(loss, 1.0 / actions.len() as f32)
+        })
+    });
     PixelRollout {
         loss,
+        events,
         #[cfg(test)]
         states,
         #[cfg(test)]
@@ -159,6 +258,8 @@ pub(super) fn build_with_history(
 
 #[cfg(test)]
 mod motion_tests;
+#[cfg(test)]
+mod image_feedback_tests;
 
 #[cfg(test)]
 mod tests {

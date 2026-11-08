@@ -497,6 +497,7 @@ pub struct DreamerCore {
 
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
+        assert!(!config.world_image_feedback,"image feedback is standalone world only");
         assert!(
             !config.rgb_spatial_decoder,
             "spatial decoder is standalone world only"
@@ -561,6 +562,7 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
+        assert!(!config.world_image_feedback,"image feedback is standalone world only");
         assert!(
             !config.rgb_spatial_decoder,
             "spatial decoder is standalone world only"
@@ -2914,6 +2916,9 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.config.world_image_feedback {
+        return Err(io::Error::new(io::ErrorKind::InvalidData,"image feedback is standalone world only"));
+    }
     if metadata.config.rgb_spatial_decoder {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,

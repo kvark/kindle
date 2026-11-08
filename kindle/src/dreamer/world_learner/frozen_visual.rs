@@ -80,7 +80,8 @@ impl TrainingScope {
                 | "kindle-world-only-v5"
                 | "kindle-world-only-v8"
                 | "kindle-world-only-v9"
-                | "kindle-world-only-v10",
+                | "kindle-world-only-v10"
+                | "kindle-world-only-v11",
             ) => {
                 if metadata.get("training_scope").is_some()
                     || metadata.get("phase_start_updates").is_some()

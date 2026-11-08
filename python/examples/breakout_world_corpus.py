@@ -35,6 +35,9 @@ PREDICTIVE_OBJECTIVES = (PREDICTIVE_OBJECTIVE, SCORE_FUNCTION_OBJECTIVE)
 
 
 def report_names(pixel_loss, prediction_length):
+    if pixel_loss == 'motion_image_feedback':
+        if not prediction_length: raise ValueError('image feedback requires a positive suffix length')
+        return LOSS_NAMES+('feedback_future_reward','feedback_future_continuation')
     if pixel_loss == FIXED_IMAGE_OBJECTIVE:
         if prediction_length != 16: raise ValueError('fixed teacher image requires H16')
         return LOSS_NAMES[:9]+('fixed_teacher_rgb_rollout', 'fixed_teacher_valid_fraction')
@@ -69,6 +72,8 @@ def reported_total(config, values, pixel_loss, prediction_length):
         result += scales['reconstruction']*values[9]
     if latent:
         result += scales['dynamics']*values[9]
+    if pixel_loss == 'motion_image_feedback':
+        result += scales['reward']*values[11]+scales['continuation']*values[12]
     return result
 
 
@@ -286,7 +291,7 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
                 assert values[13] == float(keep.mean())
                 np.testing.assert_allclose(values[10],values[11]-.5*values[12],rtol=1e-5,atol=1e-5)
                 np.testing.assert_allclose(values[0],reported_total(config,values,args.pixel_loss,args.prediction_length),rtol=1e-5)
-            if args.pixel_loss == LATENT_OBJECTIVE or args.pixel_loss in ('motion_cross_entropy', FIXED_IMAGE_OBJECTIVE):
+            if args.pixel_loss == LATENT_OBJECTIVE or args.pixel_loss in ('motion_cross_entropy', 'motion_image_feedback', FIXED_IMAGE_OBJECTIVE):
                 np.testing.assert_allclose(values[0], reported_total(config, values, args.pixel_loss, args.prediction_length), rtol=1e-5)
             if args.pixel_loss in PREDICTIVE_OBJECTIVES or args.pixel_loss == RECURRENT_OBJECTIVE:
                 valid = keep if args.pixel_loss == RECURRENT_OBJECTIVE else batch['action'] >= 0
@@ -438,7 +443,7 @@ def main():
     parser.add_argument('--dense-development', type=int, default=128)
     parser.add_argument('--checkpoint', type=Path)
     parser.add_argument('--reference', type=Path)
-    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy", "motion_cross_entropy", LATENT_OBJECTIVE, RECURRENT_OBJECTIVE, *PREDICTIVE_OBJECTIVES), default="squared_error")
+    parser.add_argument("--pixel-loss", choices=("squared_error", "cross_entropy", "motion_cross_entropy", "motion_image_feedback", LATENT_OBJECTIVE, RECURRENT_OBJECTIVE, *PREDICTIVE_OBJECTIVES), default="squared_error")
     args = parser.parse_args()
     if args.steps < 1 or args.eval_every < 1 or args.prediction_length not in (0, 16) or min(args.dense_fitting, args.dense_development) < 1:
         parser.error('positive training/evaluation budgets and prediction-length0/16 required')

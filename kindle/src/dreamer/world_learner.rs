@@ -24,6 +24,8 @@ mod gaussian_tests;
 #[cfg(test)]
 mod gradient_diagnostic;
 #[cfg(test)]
+mod image_feedback_tests;
+#[cfg(test)]
 mod motion_tests;
 #[cfg(test)]
 mod observation_code_tests;
@@ -43,6 +45,7 @@ pub enum PixelLoss {
     SquaredError,
     CrossEntropy,
     MotionCrossEntropy,
+    MotionImageFeedback,
     MotionLatentOvershooting,
     MotionRecurrentEnergy,
     MotionFixedTeacher,
@@ -56,6 +59,7 @@ impl PixelLoss {
         matches!(
             self,
             Self::MotionCrossEntropy
+                | Self::MotionImageFeedback
                 | Self::MotionLatentOvershooting
                 | Self::MotionRecurrentEnergy
                 | Self::MotionFixedTeacher
@@ -98,10 +102,24 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let feedback = metadata["config"]["world_image_feedback"]
+        .as_bool()
+        .unwrap_or(false);
+    if feedback && metadata["format"] != "kindle-world-only-v11" {
+        return Err("image feedback requires checkpoint format v11".into());
+    }
+    if (metadata["format"] == "kindle-world-only-v11"
+        && (!feedback
+            || metadata["config"]["rgb_spatial_decoder"] != true
+            || metadata["pixel_loss"] != "motion_image_feedback"))
+        || (metadata["pixel_loss"] == "motion_image_feedback" && !feedback)
+    {
+        return Err("invalid image feedback checkpoint architecture or objective".into());
+    }
     let spatial = metadata["config"]["rgb_spatial_decoder"]
         .as_bool()
         .unwrap_or(false);
-    if spatial && metadata["format"] != "kindle-world-only-v10" {
+    if spatial && !feedback && metadata["format"] != "kindle-world-only-v10" {
         return Err("spatial decoder requires checkpoint format v10".into());
     }
     if metadata["format"] == "kindle-world-only-v10"
@@ -197,7 +215,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v7"
             | "kindle-world-only-v8"
             | "kindle-world-only-v9"
-            | "kindle-world-only-v10",
+            | "kindle-world-only-v10"
+            | "kindle-world-only-v11",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -220,6 +239,7 @@ pub struct WorldPrediction {
     /// Optional diagnostic readbacks, never inputs or learning targets.
     pub encoded: Vec<f32>,
     pub posterior_features: Vec<f32>,
+    /// Self-observed imagined belief when image feedback is active; otherwise prior state.
     pub prior_features: Vec<f32>,
 }
 
@@ -230,6 +250,7 @@ pub struct WorldModelLearner {
     transition: Session,
     decoder: Session,
     heads: Session,
+    feedback: Option<Session>,
     resize: Session,
     preprocessor: GpuPreprocessor,
     rng: StdRng,
@@ -419,7 +440,20 @@ impl WorldModelLearner {
         if config.world_gaussian && pixel_loss != PixelLoss::MotionCrossEntropy {
             return Err("Gaussian world requires the motion RGB objective without a phase".into());
         }
-        if config.rgb_spatial_decoder && pixel_loss != PixelLoss::MotionCrossEntropy {
+        if config.world_image_feedback != (pixel_loss == PixelLoss::MotionImageFeedback)
+            || (config.world_image_feedback && prediction_length == 0)
+        {
+            return Err(
+                "image feedback requires its explicit objective and positive prediction length"
+                    .into(),
+            );
+        }
+        if config.rgb_spatial_decoder
+            && !matches!(
+                pixel_loss,
+                PixelLoss::MotionCrossEntropy | PixelLoss::MotionImageFeedback
+            )
+        {
             return Err("spatial decoder requires the motion RGB objective without a phase".into());
         }
         validate_config(&config)?;
@@ -449,6 +483,7 @@ impl WorldModelLearner {
             (
                 PixelLoss::CrossEntropy
                 | PixelLoss::MotionCrossEntropy
+                | PixelLoss::MotionImageFeedback
                 | PixelLoss::MotionLatentOvershooting
                 | PixelLoss::MotionRecurrentEnergy
                 | PixelLoss::MotionFixedTeacher
@@ -490,6 +525,12 @@ impl WorldModelLearner {
             &mut train,
         );
         let heads = inference(world::build_head_graph(&config, batch), &mut train);
+        let feedback = config.world_image_feedback.then(|| {
+            inference(
+                world::build_image_feedback_graph(&config, batch),
+                &mut train,
+            )
+        });
         let mut graph = Graph::new();
         let pixels = graph.input("observation", &[batch, config.observation_dim()]);
         graph.set_outputs(vec![pixels]);
@@ -504,6 +545,7 @@ impl WorldModelLearner {
             transition,
             decoder,
             heads,
+            feedback,
             resize,
             preprocessor,
             rng,
@@ -728,6 +770,11 @@ impl WorldModelLearner {
                 };
                 self.train
                     .set_input(&format!("{prefix}_uniforms_{time}"), &uniforms);
+                if self.config.world_image_feedback {
+                    let noise = super::gaussian::noise(&self.config, &mut self.rollout_rng);
+                    self.train
+                        .set_input(&format!("pixel_feedback_uniforms_{time}"), &noise);
+                }
             }
             self.train
                 .set_input(&format!("pixel_rollout_weight_{time}"), weight);
@@ -775,6 +822,13 @@ impl WorldModelLearner {
                 losses.push(loss[0]);
             }
         }
+        if self.config.world_image_feedback {
+            for index in world::LOSS_IMAGE_FEEDBACK..world::LOSS_IMAGE_FEEDBACK + 2 {
+                let mut loss = [0.0];
+                self.train.read_output_by_index(index, &mut loss);
+                losses.push(loss[0]);
+            }
+        }
         if self.pixel_loss.recurrent_energy() && !self.pixel_loss.fixed_teacher() {
             for index in world::LOSS_RECURRENT_WORLD..world::LOSS_RECURRENT_WORLD + 4 {
                 let mut loss = [0.0];
@@ -790,7 +844,7 @@ impl WorldModelLearner {
         Ok(losses)
     }
 
-    /// No future image argument exists. All future states come from prior transitions.
+    /// No true future image argument exists. Feedback consumes only generated images.
     pub fn predict(
         &mut self,
         observations: &[f32],
@@ -823,6 +877,9 @@ impl WorldModelLearner {
                 runtime::sync_matching(&self.train, &mut self.observe, "world.");
             }
             for session in [&mut self.transition, &mut self.decoder, &mut self.heads] {
+                runtime::sync_matching(&self.train, session, "world.");
+            }
+            if let Some(session) = &mut self.feedback {
                 runtime::sync_matching(&self.train, session, "world.");
             }
             self.dirty = false;
@@ -925,6 +982,14 @@ impl WorldModelLearner {
             self.transition.read_output_by_index(1, &mut logits);
             stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
             let image = decode(&mut self.decoder, &deter, &stoch, &history);
+            if let Some(session) = &mut self.feedback {
+                session.set_input("deter", &deter);
+                session.set_input("generated_image", &image);
+                session.step();
+                session.wait();
+                session.read_output_by_index(0, &mut logits);
+                stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
+            }
             if self.config.rgb_spatial_decoder {
                 history = super::spatial_history::shift_cpu(&history, &image, width);
             }
@@ -984,7 +1049,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.rgb_spatial_decoder {
+        let format = if self.config.world_image_feedback {
+            "kindle-world-only-v11"
+        } else if self.config.rgb_spatial_decoder {
             "kindle-world-only-v10"
         } else if self.config.world_gaussian_dim.is_some() {
             "kindle-world-only-v9"

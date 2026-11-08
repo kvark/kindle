@@ -14,34 +14,34 @@ CNN/RSSM/RGB decoder with retained categorical H0 as the inspectable reference; 
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-The [causal spatial-decoder experiment](results/2026-11-08-breakout-world-spatial-decoder.md) is closed and fails retention.
-Fresh8,192 H16 updates give development observed/one/eight87/112,81/109,24/107
-versus H0 108/112,94/109,14/107 and categorical H16 99/112,84/109,25/107. All
-three gates fail. Primary16/32 energy.478844 is182.50% worse than H0.169502.
-Freeflight8 presence64/63/57/61 of64 fails RIGHT's90% gate; event ending16/32
-Brier.012795/.230475 fail,though RIGHT16 mean.033346 passes.187/304 individual
-non-ending cases exceed5%,maximum.968467; category means also fail. All action/
-horizon/reward/paddle/brick regressions and full causal clips remain retained.
+Select the [self-generated image-feedback experiment](experiments/2026-11-08-breakout-world-image-feedback.md) for native
+qualification. The closed spatial decoder changes RGB readout but never feeds
+that image memory into recurrent belief or event heads. New default-off
+`world_image_feedback`/`motion_image_feedback` advances GRU once,samples prior,
+decodes RGB,encodes only that generated image and samples posterior at the same
+h. Use this self-observed belief for heads/next GRU. Add future reward CE1 and
+continuation BCE1 with stopped targets/masks/full BxH denominator. No true future
+image/outcome/reset input to belief. Full BPTT. Feedback and event objectives
+change together; no isolated cause or established benefit is claimed.
 
-This recipe adds two-image memory to the decoder,not the RSSM transition or
-event heads. Full belief includes24,576 image scalars beyond RSSM feature2560;
-legacy feature readbacks omit image memory. No isolated cause or general spatial
-memory failure is established. Keep H0. Full competence remains unproven;
-no successor or GPU allocation is selected. No completed stages repeat.
+No new parameters:77 logical/8,857,723 scalars/231 tensors; same spatial decoder,
+RGB64/12M/RSSM2560 plus24,576 image scalars. Legacy `prior_features` now means
+self-observed imagined state and still omits image memory. v11 binds both flags/
+objective; default paths unchanged. Fresh8,192 H16 original plan/rates/seed and
+all physical/event gates stay. Report13 values including future heads. No new
+data,labels,teacher,pretraining,actor/critic or backend primitive.
 
-Root `/mnt/data/kindle-breakout-world-spatial-decoder-20261108`,source/native/
-runner0a50d611,SHA0228e625.100 affected Rust CPU/118 packaged Python/strict
-Clippy pass. Preserve initial fixture syntax/tolerance failures and separate
-CPU repairs. Qualifier1,189/learning1,196/branch920 pins and2,646-pin closure
-pass; four successful guards/36 sealed files.77 changed weights/8,857,723
-scalars,231 own initial/frozen tensors,201 common initial tensors/67 weights,
-384 dense origins,18 exact restored arrays,full exposures and finite reports
-pass. Native1,021.332s/loop1,186.625s,worker1,204.658s,restore9.212s,frozen
-assessment192.280s;CPU learning audit7.795s/comparison38.940s separate. Extra
-image state/activation work matters despite5,048 added weights; single-run costs
-do not show useful learning efficiency.835,554,056-byte build cache released;
-source,runtime,CPU executable,checkpoints,curves,clips and failure logs retained.
-All allocation services terminal; no native stage failure or host recovery.
+Root `/mnt/data/kindle-breakout-world-image-feedback-20261108`.99 affected Rust
+CPU checks/strict core Clippy pass,including future CE/BCE F64 derivatives,
+stopped labels,generated-only ancestry,shared target names and total inclusion.
+Preserve first fixture output-count failure (36 metrics plus two existing debug
+outputs means38); separate CPU correction changes no production math. Packaged
+CPU checks and native qualification remain. No GPU allocation yet.
+
+The [spatial-decoder result](results/2026-11-08-breakout-world-spatial-decoder.md) remains closed/failed:
+87/112,81/109,24/107;energy.478844 versus H0.169502;187/304 nonending false alarms
+above5%. All prior stages/collectors remain closed; keep H0. Full competence,
+untouched families,late-state coverage and fresh confirmation remain unproven.
 
 The [compact Gaussian32 result](results/2026-11-08-breakout-world-gaussian32.md) remains closed/failed:
 one68/109,eight13/107,energy.409350 versus H0.169502 and Gaussian512.557271,

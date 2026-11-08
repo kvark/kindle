@@ -325,6 +325,9 @@ pub struct DreamerConfig {
     /// Standalone RGB world: decode from RSSM state and two causal RGB images.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_spatial_decoder: bool,
+    /// Standalone spatial world: encode generated images into the imagined belief.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub world_image_feedback: bool,
     /// Append fixed x/y pixel-center coordinates inside the learned RGB encoder.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_coordinates: bool,
@@ -506,6 +509,7 @@ impl DreamerConfig {
             rgb_frame_pair: false,
             rgb_previous_frame: false,
             rgb_spatial_decoder: false,
+            world_image_feedback: false,
             rgb_coordinates: false,
             rgb_latent_only: false,
             world_gaussian: false,
@@ -760,6 +764,9 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if self.world_image_feedback && !self.rgb_spatial_decoder {
+            return Err("image feedback requires the standalone spatial RGB decoder".into());
+        }
         if let Some(dim) = self.world_gaussian_dim {
             let preset = self.model_size.network();
             if !self.world_gaussian
