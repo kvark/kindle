@@ -133,12 +133,13 @@ def sampler_plan(streams, config, steps, prediction_length=16):
 
 
 def plan_counts(streams, config, locations, prediction_length):
+    length = config['batch_length']
     seen = [np.zeros(len(stream['action']), bool) for stream in streams]
     total_terminal = prior_terminal = positive = context_resets = source_resets = 0
     for row in locations:
-        actions = np.stack([streams[lane]['action'][start:start+32] for lane, start in row], axis=1).copy()
-        terminals = np.stack([streams[lane]['terminal'][start:start+32] for lane, start in row], axis=1)
-        rewards = np.stack([streams[lane]['reward'][start:start+32] for lane, start in row], axis=1)
+        actions = np.stack([streams[lane]['action'][start:start+length] for lane, start in row], axis=1).copy()
+        terminals = np.stack([streams[lane]['terminal'][start:start+length] for lane, start in row], axis=1)
+        rewards = np.stack([streams[lane]['reward'][start:start+length] for lane, start in row], axis=1)
         source_resets += int((actions == -1).sum())
         actions[0] = -1
         keep = rollout_validity(actions, prediction_length)
@@ -146,7 +147,7 @@ def plan_counts(streams, config, locations, prediction_length):
         prior_terminal += int((terminals[len(actions)-prediction_length:] & keep).sum())
         positive += int((rewards > 0).sum())
         context_resets += int((actions == -1).sum())
-        for lane, start in row: seen[lane][start:start+32] = True
+        for lane, start in row: seen[lane][start:start+length] = True
     counts = dict(terminal_rows=total_terminal, prior_terminal_rows=prior_terminal, positive_reward_rows=positive,
                   context_reset_rows=context_resets, source_reset_rows=source_resets,
                   unique_source_arrivals=sum(int(row.sum()) for row in seen))

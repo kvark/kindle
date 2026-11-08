@@ -75,3 +75,10 @@ completed learner/collector repeat or automatic successor. Root
 `/mnt/data/kindle-breakout-world-h32-20261108`. Check live identity/use existing
 host guard,stop real faults/nonfinite state,no reset,recovery,NVML. No GPU
 allocation or full learner is declared at selection.
+
+CPU preparation: the first selected adapter check failed two tests (28 passed):
+the shared exposure counter still sliced32 arrivals,so H32 left no observed
+prefix. Its source and first log remain retained at the experiment root. A
+separate repair uses config batch length for all three target slices and unique
+arrival coverage;the selected/new and legacy CPU checks then pass30/30 without
+GPU or emulator construction. This does not establish native shape qualification.

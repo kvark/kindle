@@ -140,7 +140,7 @@ def sampling_pools(streams, length=32):
     for lane,stream in enumerate(streams):
         action = stream['action']
         for terminal in np.flatnonzero(stream['terminal']):
-            for offset in range(16,32):
+            for offset in range(16,length):
                 start = int(terminal)-offset
                 if start >= 0 and start+length <= len(action) and not (action[start+1:terminal+1] == -1).any():
                     endings.append((lane,start))
@@ -154,15 +154,23 @@ def sampling_pools(streams, length=32):
     return np.array(waits,np.int32),np.array(endings,np.int32)
 
 
+def coverage_length(config, prediction_length):
+    length = config['batch_length']
+    legacy = length == 32 and prediction_length in (0,4,16)
+    long_suffix = length == 48 and prediction_length == 32 and config.get('rgb_spatial_action',False)
+    if config['batch_size'] != 8 or not (legacy or long_suffix):
+        raise ValueError('coverage sampler requires B8/T32/H0, H4 or H16, or local-action B8/T48/H32')
+    return length
+
+
 def coverage_plan(streams, config, steps, prediction_length=0):
-    if config['batch_size'] != 8 or config['batch_length'] != 32 or prediction_length not in (0,4,16):
-        raise ValueError('coverage sampler requires B8/T32/H0, H4 or H16')
-    waits,endings = sampling_pools(streams)
+    length = coverage_length(config, prediction_length)
+    waits,endings = sampling_pools(streams,length)
     rng = np.random.default_rng(config['seed'] ^ 0x636f766572616765)
     plan = []
     for _ in range(steps):
-        old = corpus.sample_locations(streams[:8],32,4,rng)
-        new = [(lane+8,start) for lane,start in corpus.sample_locations(streams[8:],32,2,rng)]
+        old = corpus.sample_locations(streams[:8],length,4,rng)
+        new = [(lane+8,start) for lane,start in corpus.sample_locations(streams[8:],length,2,rng)]
         plan.append(old+new+[tuple(waits[rng.integers(len(waits))]),tuple(endings[rng.integers(len(endings))])])
     plan = np.asarray(plan,np.int32)
     return plan,corpus.plan_counts(streams,config,plan,prediction_length)
@@ -180,7 +188,7 @@ def main():
     parser.add_argument('--initial-reference',type=Path)
     parser.add_argument('--sampling-plan',type=Path)
     parser.add_argument('--pixel-loss',choices=['motion_cross_entropy','motion_image_feedback','motion_event_rollout','motion_clean_prior',corpus.LATENT_OBJECTIVE,corpus.RECURRENT_OBJECTIVE,*corpus.PREDICTIVE_OBJECTIVES],default='motion_cross_entropy')
-    parser.add_argument('--prediction-length',type=int,choices=(0,4,16),default=0)
+    parser.add_argument('--prediction-length',type=int,choices=(0,4,16,32),default=0)
     parser.add_argument('--dense-initial',action='store_true')
     parser.add_argument('--reference',type=Path)
     parser.add_argument('--ticks',type=int,default=2048)
@@ -197,8 +205,14 @@ def main():
     if args.mode!='collect' and args.development is None:parser.error('development required')
     if args.mode=='train' and any(x is None for x in [args.dataset,args.supplement,args.initial_reference,args.sampling_plan]):parser.error('training requires both fitting corpora, actual-initial reference and declared sampling plan')
     if args.mode=='restore-check' and any(x is None for x in [args.checkpoint,args.reference]):parser.error('restore requires checkpoint and new training reference')
-    args.output.mkdir(parents=True,exist_ok=False)
     config=json.loads(args.config.read_text())
+    try:
+        length=coverage_length(config,args.prediction_length)
+    except ValueError as error:
+        parser.error(str(error))
+    if length==48 and (args.mode=='collect' or args.pixel_loss!='motion_event_rollout'):
+        parser.error('T48/H32 is qualified only for local-action suffix-event training and restore')
+    args.output.mkdir(parents=True,exist_ok=False)
     write(args.output/'declaration.json',dict(mode=args.mode,config=config,source_sha256=sha(__file__),
         started_unix=time.time(),prediction_length=args.prediction_length,pixel_loss=args.pixel_loss,steps=args.steps,
         loss_names=corpus.report_names(args.pixel_loss,args.prediction_length),
