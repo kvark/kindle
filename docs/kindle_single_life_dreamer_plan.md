@@ -2,15 +2,23 @@
 
 ## Selected direction: Breakout world model in isolation
 
-The goal **prove the world model training on Breakout** is paused by the user. Actor/critic
+The goal **prove the world model training on Breakout** is active after user resumption. Actor/critic
 and the five-game campaign are parked. Use native pixel supervision and retained
 categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
 Full competence remains unproven. No pretrained encoder or object/RAM training labels.
 
 The [causal-prior objective](experiments/2026-11-08-breakout-world-clean-prior.md)
-is qualified; its declared learner is stopped at the user's pause request.
-It reports2,998 updates; latest retained weights are checkpoint2,048. No final
-checkpoint, restore or frozen assessment completed. Do not restart automatically. Explicit `motion_clean_prior` trains main RGB/reward/continuation readouts
+is qualified and its bounded continuation is active after user resumption.
+The original interrupted run reports2,998 updates; retained checkpoint2,048
+starts6,144 new updates toward8,192,using exact original plan rows2,048:8,192.
+This is a warm start with optimizer state retained and RNG restarted;950 unsaved
+updates remain counted as spent compute. Original interrupted guard stays unsealed.
+A first restore assertion compared differing decimal representations and failed;
+the separate repair proves bit-exact float32 config identity,then matches all18
+cached arrays and240 unchanged tensors.1,431-pin resumed learning uses runner61bf7acb,
+unchanged native35c090d0/SHA d60f2888,AMD/Auto/host guard. No completed query repeats.
+Resume root `/mnt/data/kindle-breakout-world-clean-prior-20261108/resume`.
+Only after reviewed final learning/restore may its84 frozen groups run. Explicit `motion_clean_prior` trains main RGB/reward/continuation readouts
 from causal priors at every valid observed transition;the posterior teacher/KL
 and H16 free-rollout losses remain. Mask reset/first arrivals;no extra decoder
 pass,weights,heads,labels,collector or image feedback. Same fusion geometry/

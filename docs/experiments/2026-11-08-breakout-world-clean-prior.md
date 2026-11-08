@@ -98,3 +98,13 @@ the discarded950 updates. No new collection or easier gate.
 After reviewed continuation, separately declare only the new final's original
 84 frozen groups. All original competence requirements remain. User resumption
 authorizes this bounded continuation; no automatic successor or extension.
+
+
+The first resumed restore check stopped before forecasting on an over-strict
+Python config equality: the native getter emits short decimal float32 values,
+while checkpoint metadata contains their expanded float64 JSON representations.
+A separate CPU repair proves exact float32 identity for every numeric config
+field, compares the getter against the cached original getter output, and keeps
+the original failed guard/script. The repaired native check matches all18 cached
+arrays and all240 unchanged weights/moments in13.049s. No learning occurred in
+these checks. The1,431-pin continuation is separately declared under `resume`.
