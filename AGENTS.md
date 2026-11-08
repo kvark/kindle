@@ -21,32 +21,25 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 8
 
 The goal **prove the world model training on Breakout** remains active and unproven.
-Actor/critic, CDP comparisons and the five-game campaign remain parked. Use native
-pixel supervision and categorical H0 as the inspectable reference. No pretrained
-encoder or object/RAM training labels. One guarded pixel-residual world learner is active.
+Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
+pixel supervision and H0 as the inspectable reference. No pretrained encoder or
+object/RAM training labels. No GPU allocation or successor is selected.
 
-The [optional copy-plus-correction decoder](docs/experiments/2026-11-08-breakout-world-pixel-residual.md)
-has passed native qualification; its separately declared fresh8,192-update learner is active.
-The current decoder rebuilds every pixel. New `rgb_spatial_residual` adds the latest
-causal image's clamped log odds to its existing logits; zero correction copies to
-within 1/255. Keep gradients through generated history. No new weights, heads,
-labels, collector or backend primitive. Default off, v15, explicit v13 suffix-event
-objective; posterior main readouts remain. This changes initialization and gradient
-routes together; a persistence cause or gameplay benefit is not established.
-Seven new CPU/ten legacy-header/250 packaged Python checks and strict core/test/
-binding Clippy pass. First packaged run249 passes/one message-fixture failure;
-only that failed case is repaired and rerun. Initial Rust fixture compilation,
-source-identity declaration and premature launcher failures remain preserved;
-no GPU guard existed for the premature launcher. Whole suffix source matches the
-qualified v14 parent; removing its forwarding wrapper matches v13 exactly.
-New native qualification182 pins/32.006s passes copy values/derivatives, production
-zero-correction copying/lane isolation,240 parent initial tensors,16 cached non-image
-arrays,77 required changed weights,13 finite reports/total/fraction,240 frozen tensors,
-18 initial/trained restored arrays and old-native v15 rejection. Native/source/runner
-36c2b6c8,SHA e18a94ef. Learning190 pins,AMD/Auto/host guard; no old native fixture repeats.
-Released2,939,816,086 counted build-cache bytes;wheel/runtime/native executable/source retained.
-Root `/mnt/data/kindle-breakout-world-pixel-residual-20261108`; all original gates stay.
-Only after reviewed learning/restore separately declare the new final's84 frozen groups.
+The [pixel-residual world learner](docs/results/2026-11-08-breakout-world-pixel-residual.md)
+is closed and failed retention. Observed/one/eight ball precision:
+92/112, 83/109, 22/107; primary energy 0.519582 versus H0 .169502;
+213/304 non-ending cases exceed 5% ending risk. Optional v15 copy-plus-correction
+adds no weights and changes outputs/gradient routes; no isolated cause is established.
+Fresh8,192 updates; all13 reports/exposures,80 changed weights,240 own initial/frozen
+tensors,384 dense origins and18 final restore arrays pass. Four guards/36 sealed
+files/3067 closure pins pass. Seven new Rust/ten legacy-header/250 packaged Python
+checks and strict core/test/binding Clippy pass. Preserve original fixture compile,
+Python expected-message, source-declaration and pre-GPU launcher failures/repairs.
+First actual native qualification182 pins/32.006s passes; no old native fixture repeats.
+Native/source/runner36c2b6c8,SHA e18a94ef. Native training1157.190s /
+loop1335.676s. Source/runtime/arrays/useful checkpoints/failure clips remain at
+`/mnt/data/kindle-breakout-world-pixel-residual-20261108`; released2,939,816,086 counted
+build-cache bytes stay released. No unchanged extension, sweep or automatic successor.
 
 The [causal-prior learner](docs/results/2026-11-08-breakout-world-clean-prior.md)
 remains closed/failed: observed/one/eight93/112,90/109,27/107; primary.452156
