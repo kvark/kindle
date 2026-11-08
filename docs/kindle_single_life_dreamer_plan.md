@@ -8,12 +8,17 @@ pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
 The [posterior-trained local-action/H0 implementation](experiments/2026-11-08-breakout-world-local-h0.md) is implemented;74 distinct CPU world checks andstrict core/binding Clippy pass.
-Packaging andbounded native qualification remain. The original graph-test count
+Packaging/306 Python checks pass. The645-pin bounded native qualifier is
+selected:one H0 update plus initial/trained18-array restores,native6930e7b8,
+source/runner5bcaaebd. No full learner is selected. The original graph-test count
 assertion failed (11 rawoutputs versus9 losses);separate correction checksnine
-scalar losses plus two state traces. Originalsource/log are preserved. No full learner/GPU allocation is selected. Keep the same
+scalar losses plus two state traces. Originalsource/log are preserved. No full learner is selected;only the guarded qualifier may allocate. Keep the same
 603,915-weight1M RGB64 decoder/RSSM;allow observed-posterior motion CE/KL/events
 withH0 andexplicit v20 metadata. Remove added sampled-prior RGB andimagined-event
 losses,without changing inference/parameters or relaxing oldv18/v19 headers.
+The first preparation byte-identity assertion failed onan existing T48 counter
+generalization;separate CPU repair verifies unchanged other AST bodies,T32 and
+scaled sealed counts without recounting the old plan. Original failure retained.
 Root `/mnt/data/kindle-breakout-world-local-h0-20261108`.
 
 The [loss review](results/2026-11-08-breakout-world-prior-pixel-loss-review.md) verifies an averaging incentive inour added H16 term:independently sampled
