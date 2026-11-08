@@ -53,12 +53,13 @@ struct Fixture {
     feeds: Feeds,
     parameters: Vec<(String, Vec<f32>)>,
 }
-fn fixture() -> Fixture {
+fn fixture_with_transport(transport: bool) -> Fixture {
     let mut c = DreamerConfig::tiny(3);
     c.observation_kind = ObservationKind::Rgb32;
     c.rgb_spatial_decoder = true;
     c.rgb_spatial_fusion = true;
     c.rgb_spatial_action = true;
+    c.rgb_spatial_transport = transport;
     let mut g = Graph::new();
     let decoder = Decoder::new(&mut g, &c, "world.decoder", c.feature_dim());
     let state = g.parameter("fixture.state", &[2, c.feature_dim()]);
@@ -103,7 +104,16 @@ fn fixture() -> Fixture {
 
 #[test]
 fn local_decoder_responds_to_actions_at_fixed_state_and_history() {
-    let mut f = fixture();
+    reference_actions_and_history(false);
+}
+
+#[test]
+fn action_transport_decoder_has_causal_action_history_derivatives_and_lane_isolation() {
+    reference_actions_and_history(true);
+}
+
+fn reference_actions_and_history(transport: bool) {
+    let mut f = fixture_with_transport(transport);
     let backward = meganeura::autodiff::differentiate(&f.graph);
     let original = evaluate(&backward, &f.feeds).unwrap();
     assert!(original.iter().flat_map(|v| &v.data).all(|x| x.is_finite()));
@@ -116,6 +126,38 @@ fn local_decoder_responds_to_actions_at_fixed_state_and_history() {
                 .any(|x| x.abs() > 1e-10),
             "{name}"
         );
+    }
+    if transport {
+        for name in ["fixture.action", "fixture.history"] {
+            let index = f.parameters.iter().position(|(n, _)| n == name).unwrap();
+            let values = f.parameters[index].1.clone();
+            let direction = (0..values.len())
+                .map(|i| if i % 2 == 0 { 1.0 } else { -1.0 })
+                .collect::<Vec<f64>>();
+            let norm = (values.len() as f64).sqrt();
+            let expected = original[backward.outputs()[2 + index] as usize]
+                .data
+                .iter()
+                .zip(&direction)
+                .map(|(g, d)| g * d / norm)
+                .sum::<f64>();
+            let losses = [-1.0, 1.0].map(|sign| {
+                let changed = values
+                    .iter()
+                    .zip(&direction)
+                    .map(|(&v, d)| (f64::from(v) + sign * 0.01 * d / norm) as f32)
+                    .collect::<Vec<_>>();
+                f.feeds.set(name, &changed);
+                let reference = evaluate(&f.graph, &f.feeds).unwrap();
+                reference[f.graph.outputs()[0] as usize].data[0]
+            });
+            f.feeds.set(name, &values);
+            let observed = (losses[1] - losses[0]) / 0.02;
+            assert!(
+                (observed - expected).abs() <= 3e-6 + 3e-3 * expected.abs(),
+                "{name}: {observed} vs {expected}"
+            );
+        }
     }
     let pixels = f.graph.outputs()[1];
     f.feeds.set("fixture.action", &[0., 1., 0., 1., 0., 0.]);
@@ -136,7 +178,17 @@ fn local_decoder_responds_to_actions_at_fixed_state_and_history() {
 #[test]
 #[ignore = "requires separately declared guarded local-action composition qualification"]
 fn local_action_native_values_gradients_and_lane_controls_match_f64() {
-    let mut f = fixture();
+    native_values_gradients_and_lane_controls(false);
+}
+
+#[test]
+#[ignore = "requires separately declared guarded action-transport composition qualification"]
+fn action_transport_native_values_gradients_and_lane_controls_match_f64() {
+    native_values_gradients_and_lane_controls(true);
+}
+
+fn native_values_gradients_and_lane_controls(transport: bool) {
+    let mut f = fixture_with_transport(transport);
     let backward = meganeura::autodiff::differentiate(&f.graph);
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     let mut session = runtime::build_session(&f.graph, &gpu, Mode::Training, false);

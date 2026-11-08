@@ -35,10 +35,11 @@ def test_local_action_requires_its_qualified_objective(objective):
         kindle.WorldModelLearner(metadata()['config'],prediction_length=16,pixel_loss=objective)
 
 
-def test_local_action_default_off_and_incompatible_residual_or_zero_suffix():
+def test_local_action_default_off_and_incompatible_residual_or_zero_suffix(tmp_path):
     assert 'rgb_spatial_action' not in kindle.default_config(18,'tiny')
     m=metadata();m['config']['rgb_spatial_residual']=True
     with pytest.raises(ValueError):kindle.WorldModelLearner(m['config'],prediction_length=16,pixel_loss='motion_event_rollout')
     with pytest.raises(ValueError):kindle.WorldModelLearner(metadata()['config'],prediction_length=0,pixel_loss='motion_event_rollout')
     m=metadata();m['config']['rgb_spatial_transport']=True
-    with pytest.raises(ValueError):kindle.WorldModelLearner(m['config'],prediction_length=16,pixel_loss='motion_event_rollout')
+    (tmp_path/'metadata.json').write_text(json.dumps(m))
+    with pytest.raises(RuntimeError):kindle.WorldModelLearner.restore(str(tmp_path))

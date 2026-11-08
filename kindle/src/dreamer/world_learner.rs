@@ -20,6 +20,8 @@ mod fixed_teacher;
 use fixed_teacher::TeacherAnchor;
 
 #[cfg(test)]
+mod action_transport_tests;
+#[cfg(test)]
 mod clean_prior_tests;
 #[cfg(test)]
 mod fixed_event_tests;
@@ -149,20 +151,35 @@ fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
     let local_action = metadata["config"]["rgb_spatial_action"] == true;
-    if local_action != (metadata["format"] == "kindle-world-only-v18") {
+    let transport = metadata["config"]["rgb_spatial_transport"] == true;
+    if (local_action && transport) != (metadata["format"] == "kindle-world-only-v19") {
+        return Err(
+            "combined action transport requires checkpoint format v19 and both decoder flags"
+                .into(),
+        );
+    }
+    if local_action
+        != matches!(
+            metadata["format"].as_str(),
+            Some("kindle-world-only-v18" | "kindle-world-only-v19")
+        )
+    {
         return Err("spatial action requires checkpoint format v18 and its decoder flag".into());
     }
     if local_action
         && (metadata["config"]["rgb_spatial_fusion"] != true
-            || metadata["config"]["rgb_spatial_transport"] == true
             || metadata["config"]["rgb_spatial_residual"] == true
             || metadata["pixel_loss"] != "motion_event_rollout"
             || metadata["prediction_length"].as_u64().unwrap_or(0) == 0)
     {
         return Err("invalid spatial action checkpoint objective or geometry".into());
     }
-    let transport = metadata["config"]["rgb_spatial_transport"] == true;
-    if transport != (metadata["format"] == "kindle-world-only-v17") {
+    if transport
+        != matches!(
+            metadata["format"].as_str(),
+            Some("kindle-world-only-v17" | "kindle-world-only-v19")
+        )
+    {
         return Err("spatial transport requires checkpoint format v17 and its decoder flag".into());
     }
     if transport
@@ -222,6 +239,7 @@ fn checkpoint_pixel_loss(
                     | "kindle-world-only-v15"
                     | "kindle-world-only-v17"
                     | "kindle-world-only-v18"
+                    | "kindle-world-only-v19"
             )
         )
     {
@@ -236,6 +254,7 @@ fn checkpoint_pixel_loss(
                 | "kindle-world-only-v15"
                 | "kindle-world-only-v17"
                 | "kindle-world-only-v18"
+                | "kindle-world-only-v19"
         )
     ) && (!fusion
         || metadata["config"]["rgb_spatial_decoder"] != true
@@ -274,6 +293,7 @@ fn checkpoint_pixel_loss(
                 | "kindle-world-only-v15"
                 | "kindle-world-only-v17"
                 | "kindle-world-only-v18"
+                | "kindle-world-only-v19"
         )
     ) && (!spatial
         || (!event_rollout && !clean_prior && metadata["pixel_loss"] != "motion_cross_entropy")
@@ -382,7 +402,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v15"
             | "kindle-world-only-v16"
             | "kindle-world-only-v17"
-            | "kindle-world-only-v18",
+            | "kindle-world-only-v18"
+            | "kindle-world-only-v19",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -1283,7 +1304,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.rgb_spatial_action {
+        let format = if self.config.rgb_spatial_action && self.config.rgb_spatial_transport {
+            "kindle-world-only-v19"
+        } else if self.config.rgb_spatial_action {
             "kindle-world-only-v18"
         } else if self.config.rgb_spatial_transport {
             "kindle-world-only-v17"

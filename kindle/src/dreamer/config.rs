@@ -780,10 +780,8 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
-        if self.rgb_spatial_action
-            && (!self.rgb_spatial_fusion || self.rgb_spatial_transport || self.rgb_spatial_residual)
-        {
-            return Err("spatial action requires fusion without transport or residual".into());
+        if self.rgb_spatial_action && (!self.rgb_spatial_fusion || self.rgb_spatial_residual) {
+            return Err("spatial action requires fusion without residual".into());
         }
         if self.rgb_spatial_transport && (!self.rgb_spatial_fusion || self.rgb_spatial_residual) {
             return Err("spatial transport requires fusion without spatial residual".into());

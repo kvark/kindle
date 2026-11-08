@@ -74,3 +74,14 @@ No sweep,unchanged extension,completed-stage repeat or automatic successor.
 Precise physics,events,persistent brick memory,late/tunnel/second-wall coverage,
 untouched families and fresh confirmation remain required. Existing oracle has
 no above-top-brick endpoint. Full world-model/five-game goals stay unfinished.
+
+
+CPU implementation checks:first world-learner run passes71/fails1/ignores10.
+The new positive v19 header reaches the old restore-scope whitelist and fails
+there before GPU. Original header/scope/test sources and first log remain at
+root. Separate whitelist addition yields127 world CPU passes/38 ignored;
+19 RGB CPU passes/14 ignored,including combined action/history finite differences,
+nonzero derivatives and lane isolation.146 distinct affected CPU checks pass;
+do not add the overlapping first71. Strict release core/all-target Clippy passes.
+Cached data preparation verifies54 pins and reuses the complete plan/counts;
+no new recount,collection or model query. Package/native qualification pending.
