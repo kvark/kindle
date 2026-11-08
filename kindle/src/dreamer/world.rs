@@ -494,8 +494,8 @@ fn training_graph(
     let mut predictive_losses = Vec::new();
     let mut actions = Vec::new();
     let mut spatial_keeps = Vec::new();
-    let mut feedback_reward_targets = Vec::new();
-    let mut feedback_continuation_targets = Vec::new();
+    let mut rollout_reward_targets = Vec::new();
+    let mut rollout_continuation_targets = Vec::new();
 
     for time in 0..length {
         let action = graph.input(
@@ -741,12 +741,12 @@ fn training_graph(
             let inputs = (group * time_batch_length..(group + 1) * time_batch_length)
                 .map(|time| graph.input(&format!("{name}_{time}"), &[batch, width]))
                 .collect::<Vec<_>>();
-            if config.world_image_feedback {
+            if pixel_loss.rollout_events() {
                 if name == "reward_target" {
-                    feedback_reward_targets.extend_from_slice(&inputs);
+                    rollout_reward_targets.extend_from_slice(&inputs);
                 }
                 if name == "continuation_target" {
-                    feedback_continuation_targets.extend_from_slice(&inputs);
+                    rollout_continuation_targets.extend_from_slice(&inputs);
                 }
             }
             stack_time(&mut graph, &inputs, batch, width)
@@ -1230,11 +1230,11 @@ fn training_graph(
             &observations[start - 1..],
             pixel_loss,
             history,
-            config
-                .world_image_feedback
+            pixel_loss
+                .rollout_events()
                 .then(|| pixel_rollout::EventTargets {
-                    reward: &feedback_reward_targets[start..],
-                    continuation: &feedback_continuation_targets[start..],
+                    reward: &rollout_reward_targets[start..],
+                    continuation: &rollout_continuation_targets[start..],
                 }),
         )
     });

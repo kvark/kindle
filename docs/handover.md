@@ -13,6 +13,16 @@ and the five-game campaign are parked. Use native pixel supervision and retained
 categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
 Full competence remains unproven. No pretrained encoder or object/RAM training labels.
 
+Select the [suffix-event objective](experiments/2026-11-08-breakout-world-suffix-events.md)
+for native qualification and a separately declared fresh learning check. Explicit
+`motion_event_rollout` adds stopped-target imagined reward CE/continuation BCE
+without image feedback,at ordinary scales1;unchanged fusion architecture,80
+weights/8,871,955 scalars/240 tensors,v13.105 world CPU checks/strict core Clippy
+pass;preserve first optional-microbatch fixture compilation failure and separate
+repair. Native qualification,packaged CPU tests and learning have not run.
+Root `/mnt/data/kindle-breakout-world-suffix-events-20261108`;no GPU allocation.
+Keep original recipe,budget,all physical/event gates;no old stage repeats.
+
 The [CPU event diagnosis](results/2026-11-08-breakout-world-event-diagnosis.md)
 is closed. Fusion non-ending branch risk rises .750%→5.860%→34.180% at8/16/32,
 versus H0 .256% at32. Its observed terminal probability on four fitting contexts

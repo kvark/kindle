@@ -93,7 +93,7 @@ pub(super) fn build_with_feedback(
     targets: Option<EventTargets<'_>>,
 ) -> PixelRollout {
     assert_eq!(config.rgb_spatial_decoder, history.is_some());
-    assert_eq!(config.world_image_feedback, targets.is_some());
+    assert_eq!(pixel_loss.rollout_events(), targets.is_some());
     if let Some(targets) = &targets {
         assert_eq!(targets.reward.len(), actions.len());
         assert_eq!(targets.continuation.len(), actions.len());
@@ -257,9 +257,11 @@ pub(super) fn build_with_feedback(
 }
 
 #[cfg(test)]
+mod image_feedback_tests;
+#[cfg(test)]
 mod motion_tests;
 #[cfg(test)]
-mod image_feedback_tests;
+mod suffix_event_tests;
 
 #[cfg(test)]
 mod tests {

@@ -1,4 +1,4 @@
-//! Proper reward and continuation losses on self-observed imagined states.
+//! Proper reward and continuation losses on causal imagined states.
 use super::*;
 
 pub(super) fn event_losses(
