@@ -3,27 +3,33 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and unproven.
-Actor/critic,CDP comparisons and the five-game campaign remain parked. Use native
+Actor/critic, CDP comparisons and the five-game campaign remain parked. Use native
 pixel supervision and categorical H0 as the inspectable reference. No pretrained
-encoder or object/RAM training labels. No GPU allocation or successor is selected.
+encoder or object/RAM training labels. No GPU job is allocated at this stage.
 
-The [causal-prior world learner](results/2026-11-08-breakout-world-clean-prior.md)
-is closed and failed retention. Observed/one/eight ball precision is
-93/112, 90/109 and 27/107; primary energy is .452156 versus H0 .169502.
-235/304 non-ending cases exceed 5% predicted ending risk.
-The interrupted original 2,998 reports retain checkpoint 2,048;
-6,144 resumed updates reach 8,192.
-Warm start retains optimizer,restarts RNG,and preserves950 discarded reports.
-All8192 retained-lineage14-report rows,80 changed weights,240 exact paused/frozen
-tensors,384 dense origins and18 final restore arrays pass. Five successful guards,
-45 sealed files and 3,058 closure pins pass. Preserve first resumed restore config
-assertion failure/float32 repair and CPU metric-field summary failure/repair;original interrupted guard
-stays unsealed. Native/source35c090d0/SHA d60f2888,runner61bf7acb unchanged.
-Native retained lineage1166.406s;actual logged spent
-1301.933s;new loop999.845s. Last interrupted in-flight cost unmeasured.
-Root `/mnt/data/kindle-breakout-world-clean-prior-20261108/resume`;all sources,
-arrays,checkpoints,failures and runtime retained;original865,662,743-byte build
-cache remains released. No completed learner,query,collector or qualification repeats.
+The [optional copy-plus-correction decoder](experiments/2026-11-08-breakout-world-pixel-residual.md)
+is selected for implementation and native qualification before bounded learning.
+The current decoder rebuilds every pixel. New `rgb_spatial_residual` adds the latest
+causal image's clamped log odds to its existing logits; zero correction copies to
+within 1/255. Keep gradients through generated history. No new weights, heads,
+labels, collector or backend primitive. Default off, v15, explicit v13 suffix-event
+objective; posterior main readouts remain. This changes initialization and gradient
+routes together; a persistence cause or gameplay benefit is not established.
+Seven new CPU checks, ten affected legacy header checks and strict core/test
+Clippy pass. Preserve the initial test-fixture compile failure and typing repair.
+Next build/package, then separately declare native qualification. No old native stage repeats.
+Root `/mnt/data/kindle-breakout-world-pixel-residual-20261108`; consult the protocol
+before each separately declared GPU allocation. All original full-world gates stay.
+
+The [causal-prior learner](results/2026-11-08-breakout-world-clean-prior.md)
+remains closed/failed: observed/one/eight93/112,90/109,27/107; primary.452156
+versus H0.169502;235/304 non-ending alarms>5%. The warm continuation retains
+2048+6144 updates;950 unsaved updates remain spent cost. Five successful guards,
+45 sealed files and3058 closure pins pass. Preserve restore JSON assertion/repair,
+CPU metric-field summary failure/repair and the original interrupted unsealed guard.
+Native35c090d0/SHA d60f2888, runner61bf7acb; native lineage1166.406s/spent1301.933s.
+All source/runtime/arrays/checkpoints/failures and clips remain retained at
+`/mnt/data/kindle-breakout-world-clean-prior-20261108/resume`; old build cache stays released.
 
 The [suffix-event learner](results/2026-11-08-breakout-world-suffix-events.md)
 remains closed/failed:observed98/112,one97/109,eight31/107;primary.283365 versus

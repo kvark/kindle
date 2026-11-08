@@ -40,6 +40,8 @@ mod spatial_decoder_tests;
 #[cfg(test)]
 mod spatial_fusion_tests;
 #[cfg(test)]
+mod spatial_residual_tests;
+#[cfg(test)]
 mod state_diagnostic;
 #[cfg(test)]
 mod suffix_event_tests;
@@ -123,6 +125,17 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let residual = metadata["config"]["rgb_spatial_residual"] == true;
+    if residual != (metadata["format"] == "kindle-world-only-v15") {
+        return Err("spatial residual requires checkpoint format v15 and its decoder flag".into());
+    }
+    if residual
+        && (metadata["config"]["rgb_spatial_fusion"] != true
+            || metadata["pixel_loss"] != "motion_event_rollout"
+            || metadata["prediction_length"].as_u64().unwrap_or(0) == 0)
+    {
+        return Err("invalid spatial residual checkpoint objective or geometry".into());
+    }
     let clean_prior = metadata["pixel_loss"] == "motion_clean_prior";
     if clean_prior && metadata["format"] != "kindle-world-only-v14" {
         return Err("clean prior objective requires checkpoint format v14".into());
@@ -138,7 +151,7 @@ fn checkpoint_pixel_loss(
     let fusion = metadata["config"]["rgb_spatial_fusion"]
         .as_bool()
         .unwrap_or(false);
-    if event_rollout && metadata["format"] != "kindle-world-only-v13" {
+    if event_rollout && metadata["format"] != "kindle-world-only-v13" && !residual {
         return Err("suffix event objective requires checkpoint format v13".into());
     }
     if metadata["format"] == "kindle-world-only-v13"
@@ -149,14 +162,24 @@ fn checkpoint_pixel_loss(
     if fusion
         && !matches!(
             metadata["format"].as_str(),
-            Some("kindle-world-only-v12" | "kindle-world-only-v13" | "kindle-world-only-v14")
+            Some(
+                "kindle-world-only-v12"
+                    | "kindle-world-only-v13"
+                    | "kindle-world-only-v14"
+                    | "kindle-world-only-v15"
+            )
         )
     {
         return Err("spatial fusion requires checkpoint format v12".into());
     }
     if matches!(
         metadata["format"].as_str(),
-        Some("kindle-world-only-v12" | "kindle-world-only-v13" | "kindle-world-only-v14")
+        Some(
+            "kindle-world-only-v12"
+                | "kindle-world-only-v13"
+                | "kindle-world-only-v14"
+                | "kindle-world-only-v15"
+        )
     ) && (!fusion
         || metadata["config"]["rgb_spatial_decoder"] != true
         || metadata["config"]["world_image_feedback"] == true
@@ -191,6 +214,7 @@ fn checkpoint_pixel_loss(
                 | "kindle-world-only-v12"
                 | "kindle-world-only-v13"
                 | "kindle-world-only-v14"
+                | "kindle-world-only-v15"
         )
     ) && (!spatial
         || (!event_rollout && !clean_prior && metadata["pixel_loss"] != "motion_cross_entropy")
@@ -288,7 +312,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v11"
             | "kindle-world-only-v12"
             | "kindle-world-only-v13"
-            | "kindle-world-only-v14",
+            | "kindle-world-only-v14"
+            | "kindle-world-only-v15",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -511,6 +536,11 @@ impl WorldModelLearner {
         }
         if config.world_gaussian && pixel_loss != PixelLoss::MotionCrossEntropy {
             return Err("Gaussian world requires the motion RGB objective without a phase".into());
+        }
+        if config.rgb_spatial_residual
+            && (pixel_loss != PixelLoss::MotionEventRollout || prediction_length == 0)
+        {
+            return Err("spatial residual requires the suffix event objective and positive prediction length".into());
         }
         if config.world_image_feedback != (pixel_loss == PixelLoss::MotionImageFeedback)
             || (config.world_image_feedback && prediction_length == 0)
@@ -1147,7 +1177,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.pixel_loss.clean_prior() {
+        let format = if self.config.rgb_spatial_residual {
+            "kindle-world-only-v15"
+        } else if self.pixel_loss.clean_prior() {
             "kindle-world-only-v14"
         } else if self.pixel_loss == PixelLoss::MotionEventRollout {
             "kindle-world-only-v13"

@@ -241,6 +241,7 @@ pub(crate) struct Decoder {
     output: Convolution,
     motion: Vec<ConvNorm>,
     fusion: Option<Box<ConvNorm>>,
+    residual: bool,
     deter: usize,
     stoch: usize,
     channels: usize,
@@ -335,6 +336,7 @@ impl Decoder {
                     side,
                 ))
             }),
+            residual: config.rgb_spatial_residual,
             deter: size.deter,
             stoch: size.stoch * size.classes,
             channels,
@@ -444,7 +446,13 @@ impl Decoder {
             }
         }
         value = self.output.forward(graph, value, batch);
-        graph.reshape(value, &[batch, 3 * self.side * self.side])
+        let width = 3 * self.side * self.side;
+        let logits = graph.reshape(value, &[batch, width]);
+        if self.residual {
+            residual_logits(graph, logits, history.unwrap(), batch, width)
+        } else {
+            logits
+        }
     }
 
     pub(super) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
@@ -459,8 +467,32 @@ impl Decoder {
     }
 }
 
+fn residual_logits(
+    graph: &mut Graph,
+    correction: NodeId,
+    history: NodeId,
+    batch: usize,
+    width: usize,
+) -> NodeId {
+    let latest = slice_columns(graph, history, batch, 2 * width, width, width);
+    let latest = graph.reshape(latest, &[batch * width, 1]);
+    let half = graph.scalar(0.5);
+    let probability = graph.bias_add(latest, half);
+    let probability = graph.clamp(probability, 1.0 / 255.0, 254.0 / 255.0);
+    let positive = graph.log(probability);
+    let negative = graph.neg(probability);
+    let one = graph.scalar(1.0);
+    let negative = graph.bias_add(negative, one);
+    let negative = graph.log(negative);
+    let logits = graph.sub(positive, negative);
+    let logits = graph.reshape(logits, &[batch, width]);
+    graph.add(correction, logits)
+}
+
 #[cfg(test)]
 mod fusion_tests;
+#[cfg(test)]
+mod residual_tests;
 #[cfg(test)]
 mod stride_tests;
 #[cfg(test)]
