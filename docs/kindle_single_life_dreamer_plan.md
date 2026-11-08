@@ -7,49 +7,44 @@ and the five-game campaign are parked. Use native pixel supervision and retained
 categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
 Full competence remains unproven. No pretrained encoder or object/RAM training labels.
 
-Select the [CPU event-forecast diagnosis](experiments/2026-11-08-breakout-world-event-diagnosis.md)
-to distinguish observed-state head errors from imagined-state drift using five
-retained worlds. Verify an F64 continuation head against saved native outputs,
-then inspect conditional hazards, accumulated ending risk and the energy score's
-sensitivity to survival weights. No new model query,update,collector or GPU
-allocation. Original competence gates and all closed failures remain authoritative.
-Root `/mnt/data/kindle-breakout-world-event-diagnosis-20261108`.
+The [CPU event diagnosis](results/2026-11-08-breakout-world-event-diagnosis.md)
+is closed. Fusion non-ending branch risk rises .750%→5.860%→34.180% at8/16/32,
+versus H0 .256% at32. Its observed terminal probability on four fitting contexts
+is23.278% versus82.824%; selected ten terminal-arrival dev priors give11.615%
+versus68.166%. These limited cohorts do not establish population calibration.
+Both observed fitting and rollout errors need attention. Forcing survival to one
+still leaves fusion ball energy .271092 versus H0 .197336;this is diagnostic only,
+not a replacement gate or learned correction. No gradient interference or causal
+loss mechanism was measured. Keep all failed retention results authoritative.
 
-The [nonlinear spatial fusion result](results/2026-11-08-breakout-world-spatial-fusion.md) is closed:failed retention.
-Recorded development observed/1/4/8/16/32 is 93/112, 95/109, 62/109, 34/107, 15/114, 4/95;
-primary16/32 survival-weighted ball energy 0.345425 versus H0.169502.
-Keep H0 as the broad reference. The extra joint decoder interaction does not by
-itself establish improved physics. Geometry,capacity,output width,initialization
-and gradients change together. All individual alarms and per-action regressions,
-curves and causal clips remain in the report/artifact root.
+Root `/mnt/data/kindle-breakout-world-event-diagnosis-20261108`,sourcea3e90e19.
+First declared CPU analysis passes1,136 input pins/2,300 exact context RGB joins
+in19.360s.11,500 F64 head values match saved native within9.48e-7 (gate1e-4);
+860,160 survival values/16,800 event means/16,800 original energy scores match
+within1e-12. Retain9,665 head rows/16,800 branch rows/all1,180 individual alarms
+across five models and both histories. 1,156-pin closure passes. Preserve the
+separate console system-Python/NumPy failure and project-interpreter correction,
+and the original report wording plus its narrower survival-one clarification.
+Zero new model queries,updates,environment actions,emulator frames or GPU work.
+All old native stages remain closed;no collector,scalar fit or threshold search.
 
-Root `/mnt/data/kindle-breakout-world-spatial-fusion-20261108`.
-Source/native/runner7e1408c9,SHA0a6e1bd2. Default-off fusion adds ConvNorm5→16
-between40-channel concatenation and RGB Conv5;net+14,232,80 logical/
-8,871,955 scalars/240 checkpoint tensors. RSSM2560+24,576 image history stays;
-no image feedback or future event loss. v12 persists architecture;defaults/v1-v11 stay.
-104 Rust/208 packaged Python CPU and strict core/binding Clippy pass. Preserve
-original count/layout/Python fixtures and separate repairs. Qualification1,212
-pins/27.200s passes native F64 values/derivatives,joint interaction/lane isolation,
-228 spatial/201 H0 common initial tensors,240 own initial/frozen tensors and18
-initial/trained restore arrays. Fresh8,192 updates,1,219 learning pins,
-all80 weights change,11 finite reports,384 dense origins and18 final restore
-arrays pass. Four guards/36 sealed files,2,781-pin closure andthree terminal
-services pass. Native1142.861s/loop1317.429s; frozen and CPU costs
-separate. Released865,550,538 counted build-cache bytes;useful checkpoints,
-wheel,runtime,source and failures retained.
+The [nonlinear fusion learner](results/2026-11-08-breakout-world-spatial-fusion.md)
+remains closed/failed:observed93/112,one95/109,eight34/107;primary energy.345425
+versus H0.169502;276/304 non-ending cases exceed5%. Native/source7e1408c9,
+SHA0a6e1bd2,80 weights/8,871,955 scalars/240 tensors,v12;104 Rust/208 packaged
+Python/strict Clippy,native derivatives/interaction/restore checks,four guards
+and2,781-pin closure pass. Native1142.861s/loop1317.429s. Keep H0;useful checkpoints,
+source/runtime and all original failures remain in the linked report/root.
 
-The original H16/full data plan,RGB64/12M/B8/T32/Auto,seed41001 and all gates stayed.
-Reused development is not fresh confirmation or untouched generalization.
-Earlier [contact fitting](results/2026-11-08-breakout-world-contact-fit.md) reaches110/110 supported positions on four
-draws only on eight fitted clips; the [curriculum](results/2026-11-08-breakout-world-contact-curriculum.md) loses that fit
-and fails broad gates. All completed learners,assessments and collectors stay
-closed. No unchanged extension,sweep or automatic successor is selected.
-
+A separately justified suffix-event objective without generated-image re-encoding
+is an available next hypothesis,not a selected learner or proved fix. The earlier
+[image-feedback result](results/2026-11-08-breakout-world-image-feedback.md)
+changes both conditioning and future event losses. Do not repeat it or any closed
+learner/collector/assessment. No unchanged extension,sweep or automatic successor.
 Precise causal physics,event timing/calibration,persistent brick memory,
 late/tunnel/second-wall coverage,untouched families and fresh confirmation remain
-required. The retained oracle has no above-top-brick endpoints. Full world-model
-and five-game goals remain unfinished; no GPU allocation is active or selected.
+required. The oracle has no above-top-brick endpoints. World-model and five-game
+goals stay unfinished;no GPU allocation is active or selected.
 
 The [curriculum result](results/2026-11-08-breakout-world-contact-curriculum.md)
 stays closed/failed:86/112 observed,66/109 one,12/107 eight;energy.322807 versus
