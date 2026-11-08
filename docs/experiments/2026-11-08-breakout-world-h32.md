@@ -82,3 +82,23 @@ prefix. Its source and first log remain retained at the experiment root. A
 separate repair uses config batch length for all three target slices and unique
 arrival coverage;the selected/new and legacy CPU checks then pass30/30 without
 GPU or emulator construction. This does not establish native shape qualification.
+
+
+Native preparation: original qualification is protocol-failed at its metadata/
+getter equality assertion,after saving the zero-update initial and confirming
+all240 tensors. Saved metadata is exact;the direct F32 getter emits shorter JSON
+floats. No update or prediction export completed there. Separate repair restores
+that saved initial,normalizes getter values to F32,and completes the missing
+shape/update/restore evidence;no initial construction or old-model query repeats.
+The repair declaration first wrongly expected nine guard pins;the failed guard
+actually sealed27. That CPU assertion and a mistakenly launched controller with
+no queue file are retained;neither spawned a native worker. Corrected declaration
+and distinct repair2 service complete1,261 input pins,all240 initial tensors,
+18 cached initial arrays,18 own initial/trained restores,13 finite components,
+B*32 mask/total and77 first-step changed parameters in94.066s. Original failures
+are not relabeled. No native rebuild or primitive tests.
+
+Reviewed repair guard sealsnine pins;the fresh4,096-update learner and final
+restore are separately declared under3600s/600s. Save initial/2048/final,evaluate
+every512 with384 dense initial/final origins. Native7f797a2b/SHA38680c73 and
+runner96d3a809 remain pinned. Full frozen branch assessment is not allocated yet.
