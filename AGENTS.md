@@ -21,38 +21,38 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 8
 
 The goal **prove the world model training on Breakout** remains active and unproven.
-Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
+Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [action-conditioned transport protocol](docs/experiments/2026-11-08-breakout-world-action-transport.md) has completed its fresh
-8,192-update learner and exact final restore. CPU review passes 1,282 original
-pins and 219 audit inputs: all 13 reports finite, all 82 weights changed, exact
-plan/counts, 246 initial/frozen tensors, 384 dense origins, 58 finite exports and
-18 restore arrays. Development observed/1/4/8/16/32 ball counts are
-103/112, 100/109, 65/109, 43/107, 22/114, 8/95. The three short gates pass;
-long physical/event accuracy remains unproven. Native learning 1,794.491s,
-measured training/evaluation loop 1,973.503s, with other host GPU work present.
+The [action-conditioned transport experiment](docs/results/2026-11-08-breakout-world-action-transport.md) is closed and fails
+retention. Fresh8,192 B8/T32/H16 updates produce development observed/1/4/8/16/32
+ball counts103/112,100/109,65/109,43/107,22/114,8/95. All three short gates pass,
+but primary long ball energy.387593 trails H0.169502 and required.127127.
+Ending16/32 Brier.093754/.249306,RIGHT16 false risk.488927,and197/304 nonending
+alarms fail event gates. Freeflight presence64/64 for every command does not
+establish correct locations. No extension or successor is selected; no Kindle
+GPU allocation is active. Consult the [protocol](docs/experiments/2026-11-08-breakout-world-action-transport.md) before new work.
 
-After review, only the final frozen 84-group assessment is separately declared
-under 1,800s, with 1,981 pins, histories16/32 and eight draws. It is active;
-no learner is active. All oracle/control queries are cached. Root
-`/mnt/data/kindle-breakout-world-action-transport-20261108`.
-Native/source/runner5fe4545c, SHA15bd4a8d; explicit v19 composes existing action
-planes/width16 and pixel transport, adding595 weights to v18. Qualification,
-146 affected CPU/392 packaged Python checks, original CPU failures and released
-837,729,332-byte build cache remain retained. No extension or successor selected.
+Native learning1,794.491s,training/evaluation loop1,973.503s,final84-group frozen
+assessment236.293s;other host GPU work was present. Same original plan/data,
+no new emulator actions/frames or old-model queries. All8,192 finite reports,
+82 changed weights,246 own initial/frozen tensors,384 dense origins,58 finite
+exports and18 restore arrays pass. Closure seals3,700 pins/four guards/36 files;
+original CPU failures remain. Source/runner5fe4545c,native SHA15bd4a8d. Released
+837,729,332-byte build cache;all useful weights/runtime/raw arrays/figures/clips
+remain under `/mnt/data/kindle-breakout-world-action-transport-20261108`.
 
-The [closed state/history diagnostic](docs/results/2026-11-08-breakout-world-state-history.md) motivates visual-transition
-stability: H16 eight-step prior46/108, h-only44/108, true-history96/108,
-history+h100/108. These privileged readouts are not learned gains or causal
-fractions. Event heads remain invariant under history swaps and weak on selected
-true-image terminal states. H32 and all earlier completed stages stay closed.
+The [closed state/history diagnostic](docs/results/2026-11-08-breakout-world-state-history.md) remains a lead for visual
+stability: H16 eight-step prior46/108,h-only44/108,true-history96/108,
+history+h100/108. These privileged readouts are not learned improvements or
+causal error fractions. Heads stay invariant under history swaps and weak on
+selected true-image terminal states. H32 and earlier completed stages stay closed.
 
 All original physics/event gates stand. Precise physics, event timing/calibration,
 persistent brick memory, late/tunnel/second-wall coverage, untouched families and
 fresh confirmation remain required. Existing oracle has no above-top-brick
-endpoint. No intermediate score completes the world-model or five-game goal.
+endpoint. Intermediate scores cannot complete the world-model or five-game goal.
 No unchanged extension, sweep, completed-stage repeat or automatic successor.
 
 ## Direction and retained results

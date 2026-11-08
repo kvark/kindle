@@ -1,5 +1,7 @@
 # Breakout: action-conditioned pixel transport
 
+**Closed; fails retention.** [Final result](../results/2026-11-08-breakout-world-action-transport.md). No active allocation or selected successor.
+
 The [state/history diagnostic](../results/2026-11-08-breakout-world-state-history.md)
 repairs many local-H16 visual readouts with true image history,but not with h
 alone. This is privileged sensitivity,not a causal training percentage or a fix.
@@ -125,3 +127,12 @@ After reviewed learner/restore, final-only84 groups are separately declared
 under1,800s with1,981 pins,histories16 primary/32 secondary,eight draws. That
 assessment is active;no learner is active. Old models/oracle remain cached,
 no best checkpoint/draw or gate change. No extension or successor selected.
+
+
+All final84 groups and CPU review complete. Primary energy.387593263465,
+ending16/32 Brier.093754356874/.249306093393,RIGHT16 risk.488926931827;
+197/304 nonending alarms. Short/presence/serve gates pass;long physical/event
+retention fails. Native assessment236.292693s,CPU comparison182.078238s.
+All per-action/horizon regressions and individual alarms retained. Closure
+seals3,700 pins/four guards/36 files/three terminal allocation identities.
+No extension or successor selected;full world-model goal stays unproven.
