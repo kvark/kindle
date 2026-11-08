@@ -7,12 +7,15 @@ Actor/critic,CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad inspectable reference;no pretrained encoder
 or object/RAM training labels.
 
-The [state/image-history protocol](experiments/2026-11-08-breakout-world-state-history.md) is selected for CPU implementation,
-data and test-executable qualification. Compare frozen local-action H16/H32
+The [state/image-history protocol](experiments/2026-11-08-breakout-world-state-history.md) has a separately selected API-contract repair after an original failed native
+attempt. Cached data,three CPU checks and strict Clippy pass. Compare frozen local-action H16/H32
 readouts across eight combinations of prior/image-informed h,z and history2.
 Earlier state swaps lacked this image route. No hybrid feeds a forecast;future
 labels are privileged diagnostics,not training or a replacement gate. Production
-forward graphs/math stay unchanged. No GPU allocation or learner is declared.
+forward graphs/math stay unchanged. Original empty-future control failure,
+compile/packaging failures and27 sealed failed-guard pins remain. The repair uses
+one unused NOOP batch for a posterior control;no hybrid consumes it. No repair
+GPU allocation or learner is declared.
 Root `/mnt/data/kindle-breakout-world-state-history-20261108`;consult protocol.
 
 The [H32 recipe](results/2026-11-08-breakout-world-h32.md) remains closed and fails retention:dev eight-step25/107

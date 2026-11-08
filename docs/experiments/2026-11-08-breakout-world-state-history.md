@@ -93,3 +93,19 @@ strict release core/test Clippy passes. Cached data preparation passes first:
 reference joins and48 planned queries. No GPU/model/emulator construction.
 Production Rust changes are only a cfg(test) module registration plus the new
 orchestrator;all production graphs and earlier diagnostics are unchanged.
+
+
+The original GPU diagnostic is protocol-failed:its first trace/common-cache/
+prefix/history/head controls complete,but the final canonical teacher call
+rejects an empty future list (API requires1..64 full batches). No per-query export
+or result is completed;the unsaved trace and9.72s native-test cost remain spent.
+The guard stops on process exit101,no device fault/recovery,and seals27 pins.
+A separate repair is selected only for the still-missing diagnostic outputs.
+Preserve original source/executable/guard/empty query log unchanged. Supply one
+unused complete NOOP future batch to the canonical48-observation predictor;
+its posterior is computed before that extra prediction. The dummy future never
+feeds a hybrid or a score. No production graph/API validation is changed,and no
+completed assessment or collector repeats. Rebuild only the test executable,
+review CPU/source/data pins,and separately declare a new900s repair unit/root.
+The first packaging CPU assertion also falsely matched the dependency name
+`thiserror`;its failure/repair remain and completed Clippy was reused.

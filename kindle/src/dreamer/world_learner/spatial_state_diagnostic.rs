@@ -549,8 +549,9 @@ fn frozen_state_and_history_readouts() {
                     movie,
                 );
                 movies += usize::from(movie);
+                // The API requires a future batch; only its earlier posterior is checked.
                 let full_teacher = learner
-                    .predict_with_features(&observations, &actions, &[], seed, true)
+                    .predict_with_features(&observations, &actions, &vec![0; b], seed, true)
                     .unwrap();
                 let last = &t.rgb[(7 * 5 + 4) * b * width..(7 * 5 + 5) * b * width];
                 let same_features =
