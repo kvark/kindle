@@ -8,12 +8,12 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 8
 
-The goal **prove the world model training on Breakout** is paused by the user and remains unproven.
+The goal **prove the world model training on Breakout** is active and remains unproven.
 Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [fixed posterior-only local H0 learner](experiments/2026-11-08-breakout-world-local-h0-learning.md) is frozen by user pause after7,852 logged updates of16,384,1M/RGB64/v20,
+The [fixed posterior-only local H0 learner](experiments/2026-11-08-breakout-world-local-h0-learning.md) resumed the same live learner after a user pause at7,852 logged updates of16,384,1M/RGB64/v20,
 603,915 weights/80 logical/240 tensors,B8/T32,Auto,seed41001,rates4e-4,RGB1,
 KL1/.1/free-nat1,observed events1,mixing.01. Same local decoder/RSSM/inference;
 remove added sampled-prior RGB andimagined-event losses. RGB1 additionally
@@ -22,10 +22,14 @@ The prepared4,096-row corrective plan repeatsfour times;sealed counts scale,
 no old generic recount. No extension,sweep or automatic successor.
 697 input pins frozen;first RGB1 update passes9 finite reports,total/unweighted
 forward checks,240 finite tensors/age1,and77 changed weights/all required families.
-Live servicePID1929595/invocationd69b4c399521422087535f14af4797ac. The service
-cgroup isfrozen,not stopped;live state/GPU memory remain. Observer stopped.
-Before anythaw,review the guardwall-clock timeout androotpause.json. No further
-goal work whilepaused. Disposable
+Original nativePID1929598/start113967517 remains live,with unchanged weights/RNG.
+The expired raw wall-clock guard is stopped until that worker exits;an unchanged
+host guard now supervises an identity-checking CPU relay with a conservative
+2,400s cap. CPU identity/stop/exit checks and kernel-gap review pass;all697 inputs
+reverified. Original controller remains stopped until the train guard seals,then
+performs its unstarted restore. Root `resume-20261108-2343/declaration.json` pins
+the supervision amendment. Raw timers include the pause;no original raw-wall-cap
+or clean speed claim. No restart,extra update or recipe change. Disposable
 3,360,843,323-byte build cache released;runtime,wheels,source/CPU executable remain.
 Root `/mnt/data/kindle-breakout-world-local-h0-20261108`.
 

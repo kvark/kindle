@@ -65,3 +65,30 @@ full-game physics,event timing/calibration,persistent removed-brick memory,
 late/tunnel/second-wall/above-top coverage,untouched families and fresh learner
 confirmation required. No actor/critic restart or world-goal completion follows
 from lower loss,sharper samples or this one development learner.
+
+## Resume after the user pause
+
+The user resumed the active goal after the service was frozen at7,852 logged
+updates. NativePID1929598/start ticks113967517,original invocation
+`d69b4c399521422087535f14af4797ac`,remains the same live process;no checkpoint
+restore,RNG reset or new learner. All697 input pins reverify. The CPU-only
+identity/stop/zombie-exit checks pass,and unchanged host checks cover the kernel
+log gap from the last original cursor. No model query was needed for preparation.
+
+The original3,600s guard deadline expired during the freeze. Before thaw,the
+original controller and guard receive SIGSTOP. A new unchanged host guard owns
+an identity-checking CPU relay,which copies the original native stdout/stderr
+for validation checks and forwards failure/termination to its exact process
+group. This external-worker supervision differs from the normal direct-native
+child boundary and is explicit in the pinned resume declaration. The new cap is
+2,400s;pre-pause active wall is under600s,so combined active wall stays under
+3,000s. The original guard resumes only after native exit0 and expected result,
+then the original controller runs its unstarted restore. Three guard audits and
+terminal service evidence are required before CPU learning review.
+
+Root `resume-20261108-2343` retains declarations,CPU/gap receipts,process identity,
+freeze/thaw evidence and bounded lifecycle automation. Thaw begins at unix
+1794181874.3737993. Raw native/learning clocks include the pause;retain them and
+make no clean throughput comparison or original raw-wall-cap pass claim. The
+16,384-update budget,recipe,data,seed and inference remain fixed. No successor
+is selected.
