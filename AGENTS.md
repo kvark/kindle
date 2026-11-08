@@ -26,13 +26,15 @@ pixel supervision and categorical H0 as the inspectable reference. No pretrained
 encoder or object/RAM training labels. No GPU allocation or successor is selected.
 
 The [causal-prior world learner](docs/results/2026-11-08-breakout-world-clean-prior.md)
-is closed/fails retention:observed/one/eight precision93/112/90/109/27/107;primary energy
-0.452156 versus H0.169502;235/304 non-ending alarms>5%.
-The user-interrupted original2998 reports retains2048;resumed6144 reaches8192.
+is closed and failed retention. Observed/one/eight ball precision is
+93/112, 90/109 and 27/107; primary energy is .452156 versus H0 .169502.
+235/304 non-ending cases exceed 5% predicted ending risk.
+The interrupted original 2,998 reports retain checkpoint 2,048;
+6,144 resumed updates reach 8,192.
 Warm start retains optimizer,restarts RNG,and preserves950 discarded reports.
 All8192 retained-lineage14-report rows,80 changed weights,240 exact paused/frozen
-tensors,384 dense origins and18 final restore arrays pass. Five successful guards/
-45 sealed files/3058 closure pins pass. Preserve first resumed restore config
+tensors,384 dense origins and18 final restore arrays pass. Five successful guards,
+45 sealed files and 3,058 closure pins pass. Preserve first resumed restore config
 assertion failure/float32 repair and CPU metric-field summary failure/repair;original interrupted guard
 stays unsealed. Native/source35c090d0/SHA d60f2888,runner61bf7acb unchanged.
 Native retained lineage1166.406s;actual logged spent
