@@ -13,13 +13,14 @@ Actor/critic,CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference;no pretrained encoder or
 object/RAM training labels.
 
-The [action-conditioned transport protocol](experiments/2026-11-08-breakout-world-action-transport.md) is selected for CPU/native
-implementation and qualification. Combine the existing default-off action planes/
+The [action-conditioned transport protocol](experiments/2026-11-08-breakout-world-action-transport.md) has passed146 affected CPU/392 packaged Python checks and strict core/binding
+Clippy;bounded900s AMD Auto native qualification is active. Combine the existing default-off action planes/
 width16 with learned pixel transport;explicit v19 binding preserves v17/v18 and
 older defaults. Adds595 weights to v18,82 logical/8,893,798 scalars/246 tensors.
 Select fresh8,192 B8/T32/H16,original rates4e-4/plan/event losses;no new collector,
 labels,pretrained encoder,backend primitive or actor/critic. Consult protocol.
-No GPU allocation or full learner is declared. Root
+No full learner is declared. Source/runner5fe4545c,native SHA15bd4a8d.
+Original scope-whitelist and test-helper collection failures remain retained. Root
 `/mnt/data/kindle-breakout-world-action-transport-20261108`.
 
 The [closed state/history diagnostic](results/2026-11-08-breakout-world-state-history.md) motivates visual-transition

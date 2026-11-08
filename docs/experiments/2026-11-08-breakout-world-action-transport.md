@@ -85,3 +85,14 @@ nonzero derivatives and lane isolation.146 distinct affected CPU checks pass;
 do not add the overlapping first71. Strict release core/all-target Clippy passes.
 Cached data preparation verifies54 pins and reuses the complete plan/counts;
 no new recount,collection or model query. Package/native qualification pending.
+
+
+Package imports from its isolated CPython3.13 runtime. First packaged pytest
+collection fails because RGB96's test helper directory is absent from import-mode
+paths;no test/model runs. Separate search-path repair passes392 packaged checks,
+with the original log preserved. Core/all-target and binding release Clippy pass.
+Native/source/runner5fe4545c,SHA15bd4a8db077b1d8aaddfcb97ea0898ca51829b26f5c758a5f7d69ea116688f9;
+test executable SHAe4e1ef9a. Reused data/camera/causal/transport source receipts
+and old v18 initial values are pinned. Qualification is separately declared900s
+under host guard with1,274 input pins;no full learner is declared. Build cache is
+retained until native review for a concrete repair if needed.
