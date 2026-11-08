@@ -14,10 +14,12 @@ labels or data. Reuse qualified source/native a8efffc6/SHAf40555b5 and exact run
 Preflight passes143 pins/29.604s:240 exact v13 initial tensors,18 cached initial
 arrays,raw reports,new total,77 changed weights and18 exact arrays for each initial/
 trained restore. One guard/nine sealed files pass; original native math receipts
-reused. The separately declared fresh8192-update learner/restore is active,153 pins,
-unchanged RGB64/12M/B8/T32/H16/full plan. Final84 frozen groups await learning
-review; all gates stay. Root `/mnt/data/kindle-breakout-world-rgb1-20261108`.
-No automatic successor or unchanged extension.
+reused. Fresh8192-update learning/final restore and CPU review pass153/170 pins,all13
+finite reports,total/plan/exposures,80 changed weights,240 own initial/frozen tensors,
+384 dense origins and18 restore arrays. Development observed/one/eight91/112,
+85/109,25/107 versus RGB10098/112,97/109,31/107;all three gates fail. Native1155.480s/
+loop1329.204s. Separately declared84 frozen groups are active,1344 pins;all gates
+stay. Root `/mnt/data/kindle-breakout-world-rgb1-20261108`. No extension or successor.
 
 The [loss-gradient diagnostic](results/2026-11-08-breakout-world-loss-gradients.md)
 is closed/complete. At the reused v13 checkpoint and12 fitting/noise conditions,
