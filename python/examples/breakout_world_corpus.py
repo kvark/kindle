@@ -30,6 +30,7 @@ SCORE_FUNCTION_OBJECTIVE = 'predictive_motion_energy_score_function'
 LATENT_OBJECTIVE = 'motion_latent_overshooting'
 RECURRENT_OBJECTIVE = 'motion_recurrent_energy'
 FIXED_TEACHER_OBJECTIVE = 'motion_fixed_teacher'
+FIXED_EVENTS_OBJECTIVE = 'motion_fixed_teacher_events'
 FIXED_IMAGE_OBJECTIVE = 'motion_fixed_teacher_image'
 PREDICTIVE_OBJECTIVES = (PREDICTIVE_OBJECTIVE, SCORE_FUNCTION_OBJECTIVE)
 
@@ -46,6 +47,8 @@ def report_names(pixel_loss, prediction_length):
     if pixel_loss == 'motion_image_feedback':
         if not prediction_length: raise ValueError('image feedback requires a positive suffix length')
         return LOSS_NAMES+('feedback_future_reward','feedback_future_continuation')
+    if pixel_loss == FIXED_EVENTS_OBJECTIVE:
+        return report_names(FIXED_TEACHER_OBJECTIVE, prediction_length)+('fixed_teacher_future_reward','fixed_teacher_future_continuation')
     if pixel_loss == FIXED_IMAGE_OBJECTIVE:
         if prediction_length != 16: raise ValueError('fixed teacher image requires H16')
         return LOSS_NAMES[:9]+('fixed_teacher_rgb_rollout', 'fixed_teacher_valid_fraction')
@@ -67,10 +70,13 @@ def report_names(pixel_loss, prediction_length):
 
 def reported_total(config, values, pixel_loss, prediction_length):
     scales = config['loss_scales']
-    if pixel_loss == FIXED_TEACHER_OBJECTIVE:
-        return (scales['reconstruction']*(values[1]+values[10])
+    if pixel_loss in (FIXED_TEACHER_OBJECTIVE, FIXED_EVENTS_OBJECTIVE):
+        total = (scales['reconstruction']*(values[1]+values[10])
             +scales['dynamics']*(values[2]+values[9])+scales['representation']*values[3]
             +scales['reward']*values[4]+scales['continuation']*values[5])
+        if pixel_loss == FIXED_EVENTS_OBJECTIVE:
+            total += scales['reward']*values[14]+scales['continuation']*values[15]
+        return total
     latent = pixel_loss == LATENT_OBJECTIVE
     recurrent = pixel_loss == RECURRENT_OBJECTIVE
     result = (scales['reconstruction']*(values[1]+(values[9] if prediction_length and not latent and not recurrent else 0))

@@ -66,6 +66,12 @@ impl WorldModelLearner {
         Self::start_fixed_teacher_with_loss(path, PixelLoss::MotionFixedTeacher)
     }
 
+    pub fn start_fixed_teacher_events_phase(
+        path: &Path,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::start_fixed_teacher_with_loss(path, PixelLoss::MotionFixedTeacherEvents)
+    }
+
     pub fn start_fixed_teacher_image_phase(
         path: &Path,
     ) -> Result<Self, Box<dyn std::error::Error>> {

@@ -73,6 +73,17 @@ impl PyWorldModelLearner {
     }
 
     #[classmethod]
+    fn start_fixed_teacher_events_phase(
+        _class: &Bound<'_, PyType>,
+        checkpoint: &str,
+    ) -> PyResult<Self> {
+        Ok(Self {
+            inner: WorldModelLearner::start_fixed_teacher_events_phase(Path::new(checkpoint))
+                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?,
+        })
+    }
+
+    #[classmethod]
     fn start_fixed_teacher_image_phase(
         _class: &Bound<'_, PyType>,
         checkpoint: &str,

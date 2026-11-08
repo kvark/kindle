@@ -40,6 +40,7 @@ def assert_phase(learner, metadata, pixel_loss=corpus.FIXED_TEACHER_OBJECTIVE):
 
 def main(*, pixel_loss=corpus.FIXED_TEACHER_OBJECTIVE):
     factory = {corpus.FIXED_TEACHER_OBJECTIVE: 'start_fixed_teacher_phase',
+               corpus.FIXED_EVENTS_OBJECTIVE: 'start_fixed_teacher_events_phase',
                corpus.FIXED_IMAGE_OBJECTIVE: 'start_fixed_teacher_image_phase'}[pixel_loss]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['train', 'restore-check'])

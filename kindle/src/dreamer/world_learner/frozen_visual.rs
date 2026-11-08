@@ -109,7 +109,7 @@ impl TrainingScope {
                     start_updates: start,
                 })
             }
-            Some("kindle-world-only-v6" | "kindle-world-only-v7") => {
+            Some("kindle-world-only-v6" | "kindle-world-only-v7" | "kindle-world-only-v16") => {
                 let start = metadata["phase_start_updates"]
                     .as_u64()
                     .filter(|&value| value > 0 && value <= updates)

@@ -22,6 +22,8 @@ use fixed_teacher::TeacherAnchor;
 #[cfg(test)]
 mod clean_prior_tests;
 #[cfg(test)]
+mod fixed_event_tests;
+#[cfg(test)]
 mod gaussian_tests;
 #[cfg(test)]
 mod gradient_diagnostic;
@@ -62,6 +64,7 @@ pub enum PixelLoss {
     MotionRecurrentEnergy,
     MotionFixedTeacher,
     MotionFixedTeacherImage,
+    MotionFixedTeacherEvents,
     PredictiveMotionEnergy,
     PredictiveMotionEnergyScoreFunction,
 }
@@ -78,6 +81,7 @@ impl PixelLoss {
                 | Self::MotionRecurrentEnergy
                 | Self::MotionFixedTeacher
                 | Self::MotionFixedTeacherImage
+                | Self::MotionFixedTeacherEvents
                 | Self::PredictiveMotionEnergy
                 | Self::PredictiveMotionEnergyScoreFunction
         )
@@ -108,18 +112,29 @@ impl PixelLoss {
     pub(crate) fn latent_overshooting(self) -> bool {
         matches!(
             self,
-            Self::MotionLatentOvershooting | Self::MotionFixedTeacher
+            Self::MotionLatentOvershooting
+                | Self::MotionFixedTeacher
+                | Self::MotionFixedTeacherEvents
         )
     }
 
     pub(crate) fn recurrent_energy(self) -> bool {
-        matches!(self, Self::MotionRecurrentEnergy | Self::MotionFixedTeacher)
+        matches!(
+            self,
+            Self::MotionRecurrentEnergy | Self::MotionFixedTeacher | Self::MotionFixedTeacherEvents
+        )
+    }
+
+    pub(crate) fn fixed_teacher_events(self) -> bool {
+        self == Self::MotionFixedTeacherEvents
     }
 
     pub(crate) fn fixed_teacher(self) -> bool {
         matches!(
             self,
-            Self::MotionFixedTeacher | Self::MotionFixedTeacherImage
+            Self::MotionFixedTeacher
+                | Self::MotionFixedTeacherImage
+                | Self::MotionFixedTeacherEvents
         )
     }
 }
@@ -277,6 +292,13 @@ fn checkpoint_pixel_loss(
     if metadata["format"] == "kindle-world-only-v4" && !latent_only {
         return Err("invalid latent-only RGB checkpoint architecture".into());
     }
+    let fixed_events = metadata["pixel_loss"] == "motion_fixed_teacher_events";
+    if fixed_events != (metadata["format"] == "kindle-world-only-v16") {
+        return Err("fixed teacher events require world-only checkpoint format v16".into());
+    }
+    if fixed_events && (latent_only || previous_frame) {
+        return Err("invalid fixed-teacher event checkpoint architecture".into());
+    }
     let fixed_teacher = metadata["pixel_loss"] == "motion_fixed_teacher";
     let fixed_image = metadata["pixel_loss"] == "motion_fixed_teacher_image";
     if fixed_image && metadata["format"] != "kindle-world-only-v7" {
@@ -315,7 +337,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v12"
             | "kindle-world-only-v13"
             | "kindle-world-only-v14"
-            | "kindle-world-only-v15",
+            | "kindle-world-only-v15"
+            | "kindle-world-only-v16",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -607,6 +630,7 @@ impl WorldModelLearner {
                 | PixelLoss::MotionRecurrentEnergy
                 | PixelLoss::MotionFixedTeacher
                 | PixelLoss::MotionFixedTeacherImage
+                | PixelLoss::MotionFixedTeacherEvents
                 | PixelLoss::PredictiveMotionEnergy
                 | PixelLoss::PredictiveMotionEnergyScoreFunction,
                 length,
@@ -874,7 +898,9 @@ impl WorldModelLearner {
             }
         }
         for (time, weight) in weights.iter().enumerate() {
-            if self.pixel_loss.recurrent_energy() && time + 1 < weights.len() {
+            if self.pixel_loss.recurrent_energy()
+                && (time + 1 < weights.len() || self.pixel_loss.fixed_teacher_events())
+            {
                 for name in ["recurrent_first", "recurrent_second"] {
                     let uniforms = (0..batch * size.stoch * size.classes)
                         .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
@@ -902,7 +928,7 @@ impl WorldModelLearner {
             }
             self.train
                 .set_input(&format!("pixel_rollout_weight_{time}"), weight);
-            if self.pixel_loss == PixelLoss::MotionFixedTeacher {
+            if self.pixel_loss.fixed_teacher() && self.pixel_loss.recurrent_energy() {
                 self.train
                     .set_input(&format!("fixed_teacher_recurrent_weight_{time}"), weight);
             }
@@ -921,7 +947,7 @@ impl WorldModelLearner {
             self.train
                 .read_output_by_index(index, std::slice::from_mut(loss));
         }
-        if self.pixel_loss == PixelLoss::MotionFixedTeacher {
+        if self.pixel_loss.fixed_teacher() && self.pixel_loss.recurrent_energy() {
             let mut value = [0.0];
             self.train
                 .read_output_by_index(world::LOSS_WORLD_ROLLOUT, &mut value);
@@ -946,7 +972,7 @@ impl WorldModelLearner {
                 losses.push(loss[0]);
             }
         }
-        if self.pixel_loss.rollout_events() {
+        if self.pixel_loss.rollout_events() || self.pixel_loss.fixed_teacher_events() {
             for index in world::LOSS_IMAGE_FEEDBACK..world::LOSS_IMAGE_FEEDBACK + 2 {
                 let mut loss = [0.0];
                 self.train.read_output_by_index(index, &mut loss);
@@ -1179,7 +1205,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.rgb_spatial_residual {
+        let format = if self.pixel_loss.fixed_teacher_events() {
+            "kindle-world-only-v16"
+        } else if self.config.rgb_spatial_residual {
             "kindle-world-only-v15"
         } else if self.pixel_loss.clean_prior() {
             "kindle-world-only-v14"

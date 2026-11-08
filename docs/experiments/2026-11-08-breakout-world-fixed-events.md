@@ -72,3 +72,12 @@ cannot complete the goal. No unchanged extension,sweep or automatic successor.
 AMD Auto/host guard,check live identities,stop real faults/nonfinite values;
 no recovery/reset/NVML. Root `/mnt/data/kindle-breakout-world-fixed-events-20261108`.
 No GPU allocation or full learner at selection.
+
+The first new fixture is preserved after Rust formatting rejects leading-dot
+float literals; correct them before compilation. The first CPU run has116 passes
+and one new composition failure: future reward/continuation target vectors are
+empty because their collection gate omitted the new objective. Preserve that
+source/log and add the new objective to collection of the existing target nodes.
+A separate rerun of only the failed test passes, giving117 distinct passing world
+checks,36 ignored. Strict core/test Clippy passes. The116 completed checks are
+not repeated; no GPU model was constructed by these CPU failures/repairs.

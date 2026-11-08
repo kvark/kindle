@@ -760,7 +760,7 @@ fn training_graph(
             let inputs = (group * time_batch_length..(group + 1) * time_batch_length)
                 .map(|time| graph.input(&format!("{name}_{time}"), &[batch, width]))
                 .collect::<Vec<_>>();
-            if pixel_loss.rollout_events() {
+            if pixel_loss.rollout_events() || pixel_loss.fixed_teacher_events() {
                 if name == "reward_target" {
                     rollout_reward_targets.extend_from_slice(&inputs);
                 }
@@ -1315,11 +1315,27 @@ fn training_graph(
     let recurrent_rollout = pixel_loss.recurrent_energy().then(|| {
         assert!(prediction_length < length);
         let start = length - prediction_length;
+        let initial = (deters[start - 1], stochs[start - 1]);
+        if pixel_loss.fixed_teacher_events() {
+            return recurrent_rollout::build_with_events(
+                &mut graph,
+                config,
+                &model,
+                initial,
+                &actions[start..],
+                &deters[start..],
+                "fixed_teacher_recurrent_weight",
+                Some(pixel_rollout::EventTargets {
+                    reward: &rollout_reward_targets[start..],
+                    continuation: &rollout_continuation_targets[start..],
+                }),
+            );
+        }
         recurrent_rollout::build(
             &mut graph,
             config,
             &model,
-            (deters[start - 1], stochs[start - 1]),
+            initial,
             &actions[start..],
             &deters[start..],
             if pixel_loss.fixed_teacher() {
@@ -1331,7 +1347,14 @@ fn training_graph(
     });
     let total = if let Some(losses) = &recurrent_rollout {
         let weighted = graph.scale(losses.energy, config.loss_scales.reconstruction);
-        graph.add(total, weighted)
+        let mut total = graph.add(total, weighted);
+        if let Some([reward, continuation]) = losses.events {
+            let reward = graph.scale(reward, config.loss_scales.reward);
+            let continuation = graph.scale(continuation, config.loss_scales.continuation);
+            total = graph.add(total, reward);
+            total = graph.add(total, continuation);
+        }
+        total
     } else {
         total
     };
@@ -1436,6 +1459,10 @@ fn training_graph(
             losses.sample_distance,
             losses.valid,
         ]);
+        if let Some(events) = losses.events {
+            assert_eq!(outputs.len(), LOSS_IMAGE_FEEDBACK);
+            outputs.extend(events);
+        }
     }
     if pixel_loss.clean_prior() {
         while outputs.len() < CLEAN_PRIOR_VALID_FRACTION {

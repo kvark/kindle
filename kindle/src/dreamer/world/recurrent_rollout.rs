@@ -7,6 +7,7 @@ pub(super) struct Losses {
     pub target_distance: NodeId,
     pub sample_distance: NodeId,
     pub valid: NodeId,
+    pub events: Option<[NodeId; 2]>,
     #[cfg(test)]
     states: Vec<NodeId>,
 }
@@ -52,6 +53,7 @@ fn score(
         target_distance,
         sample_distance,
         valid,
+        events: None,
         #[cfg(test)]
         states: Vec::new(),
     }
@@ -66,7 +68,34 @@ pub(super) fn build(
     targets: &[NodeId],
     weight_prefix: &str,
 ) -> Losses {
+    build_with_events(
+        graph,
+        config,
+        model,
+        initial,
+        actions,
+        targets,
+        weight_prefix,
+        None,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn build_with_events(
+    graph: &mut Graph,
+    config: &DreamerConfig,
+    model: &WorldModel,
+    initial: (NodeId, NodeId),
+    actions: &[NodeId],
+    targets: &[NodeId],
+    weight_prefix: &str,
+    event_targets: Option<super::pixel_rollout::EventTargets<'_>>,
+) -> Losses {
     assert!(!actions.is_empty() && actions.len() == targets.len());
+    if let Some(events) = &event_targets {
+        assert_eq!(events.reward.len(), actions.len());
+        assert_eq!(events.continuation.len(), actions.len());
+    }
     let size = config.network();
     let batch = config.batch_size;
     let seed_h = graph.stop_gradient(initial.0);
@@ -74,9 +103,11 @@ pub(super) fn build(
     let mut h = [seed_h; 2];
     let mut z = [seed_z; 2];
     let mut losses = Vec::new();
+    let mut event_losses = Vec::new();
     #[cfg(test)]
     let mut states = Vec::new();
     for (time, (&action, &target)) in actions.iter().zip(targets).enumerate() {
+        let mut event_states = Vec::new();
         for i in 0..2 {
             h[i] = model
                 .dynamics
@@ -84,7 +115,7 @@ pub(super) fn build(
                 .forward(graph, h[i], z[i], action, batch);
             #[cfg(test)]
             states.push(h[i]);
-            if time + 1 < actions.len() {
+            if time + 1 < actions.len() || event_targets.is_some() {
                 let logits = model.dynamics.prior.forward(graph, h[i], batch);
                 let name = if i == 0 {
                     "recurrent_first"
@@ -113,9 +144,26 @@ pub(super) fn build(
                 );
                 z[i] = straight_through_sample(graph, sample, probabilities);
             }
+            if event_targets.is_some() {
+                event_states.push(feature(graph, h[i], z[i], batch, config));
+            }
         }
         let keep = graph.input(&format!("{weight_prefix}_{time}"), &[batch, 1]);
         losses.push(score(graph, h[0], h[1], target, keep, size.deter));
+        if let Some(events) = &event_targets {
+            for state in event_states {
+                let reward = model.heads.reward.forward(graph, state);
+                let continuation = model.heads.continuation.forward(graph, state);
+                event_losses.push(super::pixel_rollout::event_losses(
+                    graph,
+                    reward,
+                    continuation,
+                    events.reward[time],
+                    events.continuation[time],
+                    keep,
+                ));
+            }
+        }
     }
     let mut average = |field: fn(&Losses) -> NodeId| {
         let values = losses.iter().map(field).collect::<Vec<_>>();
@@ -126,11 +174,19 @@ pub(super) fn build(
     let target_distance = average(|x| x.target_distance);
     let sample_distance = average(|x| x.sample_distance);
     let valid = average(|x| x.valid);
+    let events = event_targets.map(|_| {
+        [0, 1].map(|i| {
+            let values = event_losses.iter().map(|row| row[i]).collect::<Vec<_>>();
+            let loss = sum(graph, &values);
+            graph.scale(loss, 1.0 / (2 * actions.len()) as f32)
+        })
+    });
     Losses {
         energy,
         target_distance,
         sample_distance,
         valid,
+        events,
         #[cfg(test)]
         states,
     }
@@ -138,3 +194,6 @@ pub(super) fn build(
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod event_tests;
