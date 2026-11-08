@@ -11,7 +11,12 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. No GPU allocation or next learner is selected.
+object/RAM training labels. A [CPU-only survival decomposition](experiments/2026-11-08-breakout-world-survival-decomposition.md)
+is selected using cached H0/local-action forecasts. Hold images fixed;compare
+original,mean,oracle-mean and all-alive survival weights. Original failed gates
+stay;oracle-assisted scores cannot qualify a model. No GPU allocation or full
+learner is selected. Root
+`/mnt/data/kindle-breakout-world-survival-decomposition-20261108`;consult protocol.
 
 The [local-action experiment](results/2026-11-08-breakout-world-local-action.md)
 is complete and fails retention. Incoming action planes plus history width16;
