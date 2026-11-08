@@ -1,5 +1,7 @@
 # Breakout: survival sensitivity of the new small RGB64 world
 
+**Closed.** [Measured diagnostic](../results/2026-11-08-breakout-world-small64-survival.md). Original retention remains failed; no learner selected.
+
 The [closed small-world trial](../results/2026-11-08-breakout-world-small64.md)
 scores .172366 versus H0 .169502, with265/304 nonending alarms. Select one
 CPU-only diagnostic of this **new model's** retained forecasts before choosing

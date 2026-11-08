@@ -13,33 +13,28 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [smaller RGB64 trial](results/2026-11-08-breakout-world-small64.md) is closed and fails retention. The1M
-configuration has603,915 world weights and completes16,384 fresh updates on the
-original plan twice,with no collector or native build. Development observed/
-1/4/8/16/32 counts103/112,102/109,69/109,53/107,22/114,8/95 pass the three short gates.
-Primary joint ball energy.172366 is near H0.169502 but misses required.127127.
-Ending16/32 Brier.026988/.279207,RIGHT16 false risk.252476 and265/304 nonending
-alarms fail event gates. Chosen-action point accuracy at32 is2.64%,versus17.77%
-for12M local action; the gain in recorded eight-step accuracy is not uniform
-physical improvement. No learner, assessment or successor is active or selected.
-Consult the [protocol](experiments/2026-11-08-breakout-world-small64.md) before separately justified work.
+The [small64 survival diagnostic](results/2026-11-08-breakout-world-small64-survival.md) is closed. Holding its image
+paths fixed,oracle ending marginals change ball energy.172366→.130336 and paddle
+.104890→.026661. Same-mean draw reassociation changes ball score only.000006746.
+Serve/contact/ending categories retain most altered ball error. This is privileged
+sensitivity,not a learned fix or causal error fraction. All6,720 cases/840 groups
+reconstruct ordinary scores within1e-12;4.804s CPU,325 closure pins. No model query,
+GPU allocation,old model assessment or old scalar-fixture repeat. Root
+`/mnt/data/kindle-breakout-world-small64-survival-20261108`.
 
-Native learning2,203.088s,measured loop2,369.265s:individual updates are faster
-but doubled optimizer work costs more than12M local action. Final frozen84
-assessment176.104s,CPU comparison16.544s. All16,384 finite reports,80 changed
-weights,240 own initial/frozen tensors,continuous plan/counts,384 dense origins,
-58 finite exports and18 restore arrays pass. Closure seals1,358 pins/four guards/
-36 files. Native/source/runner7f797a2b,SHA38680c73. Root
-`/mnt/data/kindle-breakout-world-small64-20261108`;weights/runtime/arrays/plots/
-three lossless new-model/oracle clips and the original CPU plot-schema failure
-remain. Cached aggregation passes1,680 fields/480 point rows without old forecast
-RGB reads. No new build cache exists. Other host GPU work was present.
+The next decision should inspect conditional training support for serve/contact
+transitions,not infer coverage from category names or global action counts.
+Existing paired fitting data already includes FIRE/LEFTFIRE/RIGHTFIRE;missing all
+launch data is not established. No learner,collector or successor is selected.
+Consult the [diagnostic protocol](experiments/2026-11-08-breakout-world-small64-survival.md) before new work.
 
-The [pixel-generator review](results/2026-11-08-breakout-world-pixel-generators-review.md) contains hypotheses about joint image
-sampling and event readouts conditioned on generated transitions;it selects no
-successor. Earlier state/history swaps remain privileged sensitivity,not learned
-repairs or causal fractions. All completed learners/collectors/diagnostics stay
-closed;do not repeat them.
+The [small RGB64 trial](results/2026-11-08-breakout-world-small64.md) remains closed and failed:603,915 weights,
+16,384 fresh updates,natural eight-step53/107 but32-step8/95,primary.172366 versus
+required.127127,RIGHT16 false risk.252476,and265/304 nonending alarms. Its39m29s
+loop costs more than12M local action despite faster individual updates. All1,358
+pins/four guards/36 files,weights/runtime/arrays/plots/clips and original CPU
+plot-schema failure remain. No new build cache exists. Earlier completed work
+stays closed;the pixel-generator review is hypothesis guidance only.
 
 All original physics/event gates stand. Precise physics, event timing/calibration,
 persistent brick memory, late/tunnel/second-wall coverage, untouched families and
