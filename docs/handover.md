@@ -14,7 +14,8 @@ pixel supervision and H0 as the inspectable reference. No pretrained encoder or
 object/RAM training labels.
 
 The [pixel-transport protocol](experiments/2026-11-08-breakout-world-transport.md)
-is in one separately declared fresh8,192-update learning check. Default-off
+has completed fresh8,192-update learning/restore;its frozen assessment is active.
+Default-off
 595-weight head learns horizontal/vertical pixel shifts and blends with existing
 RGB generation; RSSM, causal two-image history and13-report objective stay.
 Source/runner80dc8c76,native SHA013ae7a7;122 CPU/249 packaged Python checks and
@@ -23,11 +24,16 @@ and separate explicit-type repair. Cache836,444,204 counted bytes released.
 Qualification passes1,247 pins/115.674s:independent F64/native math,one finite
 13-report update,240 cached initial tensors/16 nonimage arrays,246 frozen tensors,
 18 initial/trained restore arrays and nine sealed guard files. No GPU fault.
-Root `/mnt/data/kindle-breakout-world-transport-20261108`. Learning pins1,254 inputs,RGB64/12M/B8/T32/H16/full BPTT/Auto,seed41001,
-rates4e-4,mixing.01,RGB100/events1,original4/2/1/1 replay plan. Retain actual
-initial/2048/4096/final,dense controls and exact final restore. Unit
-`kindle-world-transport-learning-20261108`;observer audits completion,never restarts.
-After reviewed learning,declare only its84 final frozen groups. Original gates stay.
+Root `/mnt/data/kindle-breakout-world-transport-20261108`. Learning1,254 input/170 CPU pins passes all8,192 finite13-report rows,82 changed
+weights,246 initial/frozen tensors,384 dense origins and18 exact restore arrays.
+Native1562.699s/loop1734.273s. Dense dev observed/one/eight94/112,102/109,31/107;
+observed gate fails,one/eight pass. Long forecasting and full competence stay
+unproven. Only the new final84 frozen groups are separately declared,1,345 pins,
+history16 primary/32 secondary,eight draws;cached controls/oracle reused.
+Unit `kindle-world-transport-branches-20261108`;observer audits retained arrays.
+No extension selected. Preserve the invalid first uint8-truth display preview
+and separate CPU-only repair;training/source metrics stay unchanged. Original
+gates stay.
 
 The [fixed-filter/future-event phase](results/2026-11-08-breakout-world-fixed-events.md)
 is closed and fails retention:observed/one/eight108/112,83/109,22/107;primary
