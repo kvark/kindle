@@ -5,10 +5,10 @@
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. No GPU allocation or new learner is declared yet.
+object/RAM training labels. One guarded fixed-weight gradient measurement is active; no learner is selected.
 
 The [fixed-weight loss-gradient diagnostic](experiments/2026-11-08-breakout-world-loss-gradients.md)
-is selected to measure observed RGB, KL, observed events, future RGB and future
+is active to measure observed RGB, KL, observed events, future RGB and future
 events versus their joint gradient. Reuse v13 final8,192 weights and three retained
 fitting batches; four fixed noise draws each plus joint repeats,75 forward/backward
 steps, no optimizer. Analyze per family and a predeclared F64 RGB100-versus1 local
@@ -16,7 +16,8 @@ sensitivity using the anchor moments. This cannot select a useful learning recip
 prove a causal physics-error fraction or complete the goal. No Python runtime,
 production training graph/API or checkpoint-format changes; Rust test-only module.
 Three new CPU checks and strict core/test Clippy pass after a preserved helper-API
-compilation repair. Build-source review precedes a separately declared guarded run.
+compilation repair. Sourcec46fa6e3/test SHA10345287;16 execution/37 data pins,900s cap.
+This is the first new measurement; no old native fixture or gradient stage repeats.
 Root `/mnt/data/kindle-breakout-world-loss-gradients-20261108`. No old native fixture,
 collector, learner, frozen assessment or completed gradient analysis repeats.
 
