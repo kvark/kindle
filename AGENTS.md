@@ -25,41 +25,33 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [smaller RGB64 world protocol](docs/experiments/2026-11-08-breakout-world-small64.md) is selected. Keep the existing
-v18 local-action architecture and qualified7f797a2b native/runner (SHA38680c73),
-but use size1M at unchanged RGB64 and16,384 fresh updates. The exact original
-8,192-row plan repeats twice in one learner, with sealed counts scaled rather
-than recounted. No new collector, camera path, backend primitive, build or
-actor/critic. Capacity and optimizer budget change together; no isolated cause
-or speed benefit is established. Root
-`/mnt/data/kindle-breakout-world-small64-20261108`.
+The [smaller RGB64 trial](docs/results/2026-11-08-breakout-world-small64.md) is closed and fails retention. The1M
+configuration has603,915 world weights and completes16,384 fresh updates on the
+original plan twice,with no collector or native build. Development observed/
+1/4/8/16/32 counts103/112,102/109,69/109,53/107,22/114,8/95 pass the three short gates.
+Primary joint ball energy.172366 is near H0.169502 but misses required.127127.
+Ending16/32 Brier.026988/.279207,RIGHT16 false risk.252476 and265/304 nonending
+alarms fail event gates. Chosen-action point accuracy at32 is2.64%,versus17.77%
+for12M local action; the gain in recorded eight-step accuracy is not uniform
+physical improvement. No learner, assessment or successor is active or selected.
+Consult the [protocol](docs/experiments/2026-11-08-breakout-world-small64.md) before separately justified work.
 
-CPU driver controls pass: real plan is two exact cycles; a four-step stand-in
-uses one continuous learner and preserves reports/masks/counts without GPU or
-emulator construction. Native preflight passes137 pins in29.152s:80 logical /
-603,915 scalars /240 tensors,77 changed first-update weights,required families,
-13 finite reports/mask/total and18 exact initial/trained restore arrays. Guard
-seals9 files. No build or primitive qualification repeats.
+Native learning2,203.088s,measured loop2,369.265s:individual updates are faster
+but doubled optimizer work costs more than12M local action. Final frozen84
+assessment176.104s,CPU comparison16.544s. All16,384 finite reports,80 changed
+weights,240 own initial/frozen tensors,continuous plan/counts,384 dense origins,
+58 finite exports and18 restore arrays pass. Closure seals1,358 pins/four guards/
+36 files. Native/source/runner7f797a2b,SHA38680c73. Root
+`/mnt/data/kindle-breakout-world-small64-20261108`;weights/runtime/arrays/plots/
+three lossless new-model/oracle clips and the original CPU plot-schema failure
+remain. Cached aggregation passes1,680 fields/480 point rows without old forecast
+RGB reads. No new build cache exists. Other host GPU work was present.
 
-The fresh16,384 learner and exact final restore are complete. CPU review passes
-159 input/198 audit pins:all finite13-report rows,first exact qualified report,
-80 changed weights,240 own initial/frozen tensors,continuous two-cycle plan/counts,
-384 dense origins,58 finite exports and18 restore arrays. Development observed/
-1/4/8/16/32 counts103/112,102/109,69/109,53/107,22/114,8/95 pass the three short gates;
-long physical/event retention is unproven. Native learning2,203.088s,measured
-training/evaluation loop2,369.265s;separate shared-host runs,not a kernel benchmark.
-
-Only after that review,final-only84 groups are separately declared under1,800s
-with863 pins,histories16 primary/32 secondary and eight draws. Assessment is active;
-no learner is active. Cached control aggregation matches1,680 scalar fields/480
-point rows without old forecast RGB reads. Original timer-schema CPU precheck
-failure and its separate `step` fallback repair remain. No successor is selected.
-
-The [closed action/transport trial](docs/results/2026-11-08-breakout-world-action-transport.md) remains failed: short gates pass,
-but primary energy.387593 versus H0.169502,RIGHT16 false risk.488927 and197/304
-nonending alarms. All3,700 pins/failures/checkpoints/clips remain retained.
-The state/history diagnostic is a privileged sensitivity result, not a learned
-fix. H32 and all earlier completed stages stay closed; do not repeat them.
+The [pixel-generator review](docs/results/2026-11-08-breakout-world-pixel-generators-review.md) contains hypotheses about joint image
+sampling and event readouts conditioned on generated transitions;it selects no
+successor. Earlier state/history swaps remain privileged sensitivity,not learned
+repairs or causal fractions. All completed learners/collectors/diagnostics stay
+closed;do not repeat them.
 
 All original physics/event gates stand. Precise physics, event timing/calibration,
 persistent brick memory, late/tunnel/second-wall coverage, untouched families and

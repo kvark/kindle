@@ -1,5 +1,7 @@
 # Breakout: smaller RGB64 world under a fixed learning budget
 
+**Closed; fails retention.** [Final result](../results/2026-11-08-breakout-world-small64.md). No active allocation or selected successor.
+
 The closed [action/transport trial](../results/2026-11-08-breakout-world-action-transport.md)
 does not solve rollout drift or events. Earlier local-action H16 improves short
 forecasts but still fails retention. Select a distinct capacity/budget recipe:
@@ -109,3 +111,13 @@ After review, final-only84 groups are separately declared under1,800s with863
 pins,histories16 primary/32 secondary and eight draws. That assessment is active;
 no learner is active. Old forecasts stay cached;fixed gates and final selection
 stand. No extension or successor is selected.
+
+
+Final assessment and CPU review complete. Primary energy.172365704612 misses
+.127126664317;ending16/32 Brier.026988374280/.279206664698,RIGHT16 risk.252475605456
+and265/304 individual nonending alarms fail event gates. Serve/freeflight presence
+and the three short gates pass. Native assessment176.103903s,CPU comparison
+16.543625s. Both-history regressions and individual alarms remain. Closure verifies
+1,358 pins/four successful guards/36 files/three terminal allocation services.
+The fixed failed trial stays closed,with no extension or successor selected.
+Full world-model competence remains unproven.
