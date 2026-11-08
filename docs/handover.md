@@ -12,9 +12,14 @@ The goal **prove the world model training on Breakout** remains active and unpro
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
 object/RAM training labels. The [local-action protocol](experiments/2026-11-08-breakout-world-local-action.md)
-is selected for CPU/native qualification. Direct incoming action planes and a
-16-channel image-history branch test local control alongside the RSSM. No GPU
-allocation or full learner is declared. Root
+is in bounded AMD Auto native qualification. Direct incoming action planes and a
+16-channel image-history branch test local control alongside the RSSM. Source/
+runner7f797a2b,native SHA38680c73;140 CPU/273 isolated packaged Python checks and
+strict core/test/binding Clippy pass. Geometry80 logical/8,893,203 scalars/240
+tensors. Qualification pins1,250 inputs and permits two new composed fixtures,
+one full-shape update and exact restores under the900s host guard. No full learner
+is declared. Cache836,613,824 counted bytes released;wheel/runtime/source and CPU
+executable retained. Root
 `/mnt/data/kindle-breakout-world-local-action-20261108`;consult the protocol.
 All original gates stay;the change does not establish a global-state cause.
 
