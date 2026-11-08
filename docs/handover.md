@@ -12,12 +12,13 @@ The goal **prove the world model training on Breakout** remains active and unpro
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
 object/RAM training labels. The [bounded H32 protocol](experiments/2026-11-08-breakout-world-h32.md)
-has passed separate repaired shape qualification and its fresh learner is active.
+has completed its repaired qualification,fresh learner and exact restore.
 Reuse v18 native38680c73/runner96d3a809;T48/H32 keeps
 prefix16 and tests a fresh4,096-update budget,world/dynamics8e-4,encoder4e-4.
 Same raw future slots as old8,192/H16,fewer observed slots;no matched-compute or
-isolated-horizon claim. Bound4,096 updates(3600s),then exact restore(600s);
-no frozen branch allocation yet. CPU30 checks and repaired shape1,261 pins/
+isolated-horizon claim. All4,096 updates/18 restore arrays pass;dense dev observed/one/eight/32 are
+95/112,92/109,25/107,8/95 and observed/eight gates fail. Final84-group assessment
+is active under1,800s after reviewed learning;no successor is selected. CPU30 checks and repaired shape1,261 pins/
 240 initial tensors/18 cached+restore arrays pass. Original getter-float assertion
 and separate CPU declaration/missing-queue failures remain retained. Root
 `/mnt/data/kindle-breakout-world-h32-20261108`;consult protocol.

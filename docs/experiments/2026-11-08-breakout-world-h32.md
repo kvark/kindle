@@ -102,3 +102,17 @@ Reviewed repair guard sealsnine pins;the fresh4,096-update learner and final
 restore are separately declared under3600s/600s. Save initial/2048/final,evaluate
 every512 with384 dense initial/final origins. Native7f797a2b/SHA38680c73 and
 runner96d3a809 remain pinned. Full frozen branch assessment is not allocated yet.
+
+
+Learning/final restore complete:4,096 finite13-component rows,80 changed logical
+parameters,240 actual-initial/frozen tensors,58 finite exports,full plan/counts,
+384 dense initial/final origins,18 final restore arrays and exact first qualified
+report pass1,268 declared/186 CPU audit pins. Native1,515.732651s;measured loop
+1,691.448028s. Dense development observed/1/4/8/16/32 are95/112,92/109,38/109,
+25/107,15/114,8/95;observed/eight gates fail. A CPU parse caught accidental
+replacement syntax in the unexecuted audit;original source/error and corrected
+parse remain. No learner or query repeats.
+
+After reviewed learning,the fixed final84 groups are separately declared under
+1,800s with1,769 pins,both histories andeight draws. Cached controls/oracle are
+reused;no new collection,no successor or extension. All original gates stand.
