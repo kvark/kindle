@@ -2,32 +2,46 @@
 
 ## Selected direction: Breakout world model in isolation
 
-Select the [nonlinear spatial fusion experiment](experiments/2026-11-08-breakout-world-spatial-fusion.md)
-for the qualified fresh learning check. Add default-off `rgb_spatial_fusion` after joining
-history/global fields:ConvNorm5→16 channels then RGB Conv5. It requires standalone
-categorical spatial RGB without image feedback. Net+14,232 weights:80 logical/
-8,871,955 scalars/240 tensors. RSSM2560 and image history24,576 stay. Geometry,
-capacity,output width,receptive field and gradients change together; no cause or
-benefit is established. v12 binds the architecture; defaults/v1-v11 stay.
+The active goal is **prove the world model training on Breakout**. Actor/critic
+and the five-game campaign are parked. Use native pixel supervision and retained
+categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
+Full competence remains unproven. No pretrained encoder or object/RAM training labels.
 
-Root `/mnt/data/kindle-breakout-world-spatial-fusion-20261108`.102 world CPU checks
-plus two RGB fusion CPU checks and strict core Clippy pass. F64 finite differences
-cover40 fusion input/16 output channels. Preserve first count-fixture failure and
-count-only correction,plus initial Clippy enum-size warning/fix:box the new CPU
-descriptor,unchanged GPU graph.208 packaged Python checks and strict binding
-Clippy pass. Preserve first CLI fixture error and its standalone/full-BPTT repair;
-no native/package change. Native/source7e1408c9,SHA0a6e1bd2. One guarded new native
-qualification passes:1,212 pins/27.200s,F64/native values/derivatives,joint logit
-interaction/lane isolation,228 spatial/201 H0 common initial tensors,240 own
-initial/frozen tensors,18 initial/trained restore arrays,77 changed weights and
-all fusion parameters,eleven finite reports/total/mask and old-native v12 rejection.
-Sixteen cached non-image initial arrays match spatial v10 exactly;RGB changes.
-The separately declared fresh8,192 learner/final restore are active,1,219 pins,
-AMD/Auto/host guard. Source/native/runner7e1408c9,SHA0a6e1bd2;CLI fixture correction
-is Python-test-only. Released865,550,538 counted build-cache bytes;runtime/wheel/
-CPU executable/source/failures retained. Do not repeat qualification or old stages.
-Use original H16/full plan/rates/seed and all physical/event gates;feedback and
-future event losses stay off. No labels,collection,actor/critic or backend op.
+The [nonlinear spatial fusion result](results/2026-11-08-breakout-world-spatial-fusion.md) is closed:failed retention.
+Recorded development observed/1/4/8/16/32 is 93/112, 95/109, 62/109, 34/107, 15/114, 4/95;
+primary16/32 survival-weighted ball energy 0.345425 versus H0.169502.
+Keep H0 as the broad reference. The extra joint decoder interaction does not by
+itself establish improved physics. Geometry,capacity,output width,initialization
+and gradients change together. All individual alarms and per-action regressions,
+curves and causal clips remain in the report/artifact root.
+
+Root `/mnt/data/kindle-breakout-world-spatial-fusion-20261108`.
+Source/native/runner7e1408c9,SHA0a6e1bd2. Default-off fusion adds ConvNorm5→16
+between40-channel concatenation and RGB Conv5;net+14,232,80 logical/
+8,871,955 scalars/240 checkpoint tensors. RSSM2560+24,576 image history stays;
+no image feedback or future event loss. v12 persists architecture;defaults/v1-v11 stay.
+104 Rust/208 packaged Python CPU and strict core/binding Clippy pass. Preserve
+original count/layout/Python fixtures and separate repairs. Qualification1,212
+pins/27.200s passes native F64 values/derivatives,joint interaction/lane isolation,
+228 spatial/201 H0 common initial tensors,240 own initial/frozen tensors and18
+initial/trained restore arrays. Fresh8,192 updates,1,219 learning pins,
+all80 weights change,11 finite reports,384 dense origins and18 final restore
+arrays pass. Four guards/36 sealed files,2,781-pin closure andthree terminal
+services pass. Native1142.861s/loop1317.429s; frozen and CPU costs
+separate. Released865,550,538 counted build-cache bytes;useful checkpoints,
+wheel,runtime,source and failures retained.
+
+The original H16/full data plan,RGB64/12M/B8/T32/Auto,seed41001 and all gates stayed.
+Reused development is not fresh confirmation or untouched generalization.
+Earlier [contact fitting](results/2026-11-08-breakout-world-contact-fit.md) reaches110/110 supported positions on four
+draws only on eight fitted clips; the [curriculum](results/2026-11-08-breakout-world-contact-curriculum.md) loses that fit
+and fails broad gates. All completed learners,assessments and collectors stay
+closed. No unchanged extension,sweep or automatic successor is selected.
+
+Precise causal physics,event timing/calibration,persistent brick memory,
+late/tunnel/second-wall coverage,untouched families and fresh confirmation remain
+required. The retained oracle has no above-top-brick endpoints. Full world-model
+and five-game goals remain unfinished; no GPU allocation is active or selected.
 
 The [curriculum result](results/2026-11-08-breakout-world-contact-curriculum.md)
 stays closed/failed:86/112 observed,66/109 one,12/107 eight;energy.322807 versus
