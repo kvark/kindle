@@ -25,17 +25,22 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [conditional transition-support audit](docs/results/2026-11-08-breakout-world-transition-support.md) is closed. After16 stable absent-reference
-arrivals,the first imagined command has274 FIRE1 exposures/93 unique targets
-but zero for FIRE aliases10–17. Onlytwo ofeight existing paired serve parents
-satisfy stable16/32;the paired dataset was not used by small64. Contact has
-nonzero support for all18 commands;exact collision adequacy is not established.
-All171 input/176 closure pins pass;1.377s CPU,no model/native/emulator/GPU work.
-Root `/mnt/data/kindle-breakout-world-transition-support-20261108`. No learner or
-collector is selected by this [protocol](docs/experiments/2026-11-08-breakout-world-transition-support.md).
-Missing launch aliases support a separately declared focused data change,not a
-claim that coverage explains all failures or that an event-head refit suffices.
-The [survival sensitivity](docs/results/2026-11-08-breakout-world-small64-survival.md) remains privileged score substitution only.
+The [clean-wait fitting collection](docs/experiments/2026-11-08-breakout-world-clean-launch.md) is selected;no learner is selected.
+Eight fresh fitting seeds,32-arrival absent-ball prefixes at varied paddle
+positions,all18 constant32-command branches/two sticky repetitions:at most9,216
+new actions/36,864 frames (18,392/73,568 including source/private-state replay).
+Exact native16/32 development-history matches abort. Use the unchanged small64
+final16,384 as a frozen240-tensor native camera and existing host guard;no
+prediction/gradient/optimizer call or new backend qualification. Root
+`/mnt/data/kindle-breakout-world-clean-launch-20261108`.
+
+The [conditional support audit](docs/results/2026-11-08-breakout-world-transition-support.md) is closed:after16 stable absent-reference
+arrivals,first imagined FIRE1 has274 exposures/93 unique targets but aliases10–17
+have zero. Onlytwo ofeight older paired serve parents satisfy stable16/32;those
+branches were not small64 fitting data. Contact has nonzero support for all18
+commands;collision adequacy and a causal coverage explanation are not established.
+171 input/176 closure pins,1.377s CPU,no model/native/emulator/GPU work. The
+[survival sensitivity](docs/results/2026-11-08-breakout-world-small64-survival.md) remains privileged score substitution only.
 
 The [small RGB64 trial](docs/results/2026-11-08-breakout-world-small64.md) remains closed and failed:603,915 weights,
 16,384 fresh updates,natural eight-step53/107 but32-step8/95,primary.172366 versus
