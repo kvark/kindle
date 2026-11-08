@@ -25,15 +25,22 @@ and the five-game campaign are parked. Use native pixel supervision and retained
 categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
 Full competence remains unproven. No pretrained encoder or object/RAM training labels.
 
-Select the [suffix-event objective](docs/experiments/2026-11-08-breakout-world-suffix-events.md)
-for native qualification and a separately declared fresh learning check. Explicit
-`motion_event_rollout` adds stopped-target imagined reward CE/continuation BCE
-without image feedback,at ordinary scales1;unchanged fusion architecture,80
-weights/8,871,955 scalars/240 tensors,v13.105 world CPU checks/strict core Clippy
-pass;preserve first optional-microbatch fixture compilation failure and separate
-repair. Native qualification,packaged CPU tests and learning have not run.
-Root `/mnt/data/kindle-breakout-world-suffix-events-20261108`;no GPU allocation.
-Keep original recipe,budget,all physical/event gates;no old stage repeats.
+The [suffix-event objective](docs/experiments/2026-11-08-breakout-world-suffix-events.md)
+is qualified and its separately declared fresh8,192 learner/final restore are
+active. Explicit `motion_event_rollout` adds stopped-target imagined reward CE/
+continuation BCE at scales1 without image feedback. Fusion geometry,80 weights/
+8,871,955 scalars/240 tensors and full original H16 recipe/gates stay;v13 binds
+the objective. Native/source/runnera8efffc6,SHAf40555b5.105 world CPU/224 packaged
+Python CPU/strict core-binding Clippy pass. Preserve first optional-microbatch
+fixture compilation failure and correction,and first incomplete receipt count
+assertion:169 world-prefix plus55 disjoint corpus tests pass with no repeats.
+Qualification1,217 pins/33.925s passes causal target/mask controls,lane isolation,
+all240 exact fusion initial tensors,18 cached initial arrays,18 initial/trained
+restores,77 changed weights,13 reports/total/mask and old-native v13 rejection.
+Unchanged event-loss math receipt is reused,not rerun. Learning1,225 pins,
+AMD/Auto/host guard. Root `/mnt/data/kindle-breakout-world-suffix-events-20261108`.
+Released865,583,382 counted build-cache bytes;runtime,wheel,CPU executable,source,
+useful checkpoints and original failures retained. No old stage repeats.
 
 The [CPU event diagnosis](docs/results/2026-11-08-breakout-world-event-diagnosis.md)
 is closed. Fusion non-ending branch risk rises .750%→5.860%→34.180% at8/16/32,
@@ -72,7 +79,7 @@ learner/collector/assessment. No unchanged extension,sweep or automatic successo
 Precise causal physics,event timing/calibration,persistent brick memory,
 late/tunnel/second-wall coverage,untouched families and fresh confirmation remain
 required. The oracle has no above-top-brick endpoints. World-model and five-game
-goals stay unfinished;no GPU allocation is active or selected.
+goals stay unfinished;follow the separately declared allocation above.
 
 ## Direction and retained results
 
