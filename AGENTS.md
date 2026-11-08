@@ -25,11 +25,13 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [bounded launch-corrective phase](docs/experiments/2026-11-08-breakout-world-launch-corrective.md) is selected:4,096 new updates fromsmall64
+The [bounded launch-corrective phase](docs/experiments/2026-11-08-breakout-world-launch-corrective.md) is running:4,096 new updates fromsmall64
 16,384→20,480,unchanged1M/RGB64/v18,B8/T32/H16,Auto,rates4e-4,RGB100,KL1/.1,
 event1,mixing.01. New sampler:two original natural,one supplement,one wait,one
 terminal,two clean-launch windows andone retained paired contact/life-loss/ending
-branch. Freeze the full plan/inputs before allocation. No old model/qualification
+branch. The full plan/620 input pins are frozen;first actual update has13 finite reports
+and240 finite saved tensors. Native learner service is1916430/invocation
+57480516ad4e434eac50ae926dad9e88. No old model/qualification
 repeat;reuse sealed inherited actual-initial evaluations. Warm start resets live
 belief/RNG;not uninterrupted training,an independent seed or isolated data cause.
 Root `/mnt/data/kindle-breakout-world-launch-corrective-20261108`.
