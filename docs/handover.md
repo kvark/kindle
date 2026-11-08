@@ -11,7 +11,16 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. No GPU allocation or next learner is selected.
+object/RAM training labels. The pixel-transport experiment is selected for
+CPU/native qualification; no GPU allocation or full learner is declared.
+
+The [transport protocol](experiments/2026-11-08-breakout-world-transport.md)
+adds a default-off595-weight head:per-pixel horizontal/vertical offset mixtures
+then blending with existing RGB generation. Existing two-image history,RSSM and
+13-report event objective stay; no new labels,backend primitive or event heads.
+Validate values/derivatives/causality/geometry and package before separately
+declaring native qualification. Root `/mnt/data/kindle-breakout-world-transport-20261108`.
+All original gates stay; no automatic successor.
 
 The [fixed-filter/future-event phase](results/2026-11-08-breakout-world-fixed-events.md)
 is closed and fails retention. Observed/one/eight108/112,83/109,22/107;fitting eight
