@@ -14,28 +14,28 @@ CNN/RSSM/RGB decoder with retained categorical H0 as the inspectable reference; 
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-The [fixed-contact motion fitting result](results/2026-11-08-breakout-world-contact-fit.md)
-is closed and passes all 24 fitting gates. Fresh 2,048 updates fit all 110 supported
-future ball positions across actions 1..16 within one resized pixel on each of
-four fixed draws, plus 8/8 observed reconstructions. Eighteen positions per draw
-are unsupported. This proves fitting on eight trajectories, not general physics.
-Zero future reward/terminal positives; no event-calibration claim. Original full-
-corpus gates, untouched families, late-state coverage and fresh confirmation stay.
+Select the [contact-first curriculum](experiments/2026-11-08-breakout-world-contact-curriculum.md).
+Warm-start the precise contact-fit checkpoint at age2,048 and train6,144 broad
+updates to8,192 total. Same qualified85dbe150/SHA5b112866 native, H16 motion RGB,
+RGB64/12M/B8/T32/Auto, all weights and rates. No rebuild, new loss, frozen subset,
+labels, collection, actor/critic, spatial decoder or image feedback. This is a
+warm start with preserved moments/age, not uninterrupted learning or a fresh seed.
 
-Reuse unchanged native85dbe150/SHA5b112866, RGB64/12M/B8/T32/H16/Auto and motion
-RGB objective. All 204 initial tensors match early/broad controls; 68 weights
-change; all 2,048 eleven-loss rows, 204 frozen tensors and 32 exact restored draw
-arrays pass. Native training 186.289s; loop 191.500s. No rebuild, collection,
-labels, actor/critic, spatial decoder or image feedback. Root
-`/mnt/data/kindle-breakout-world-contact-fit-20261108`; checkpoints/curves/clip retained.
+Root `/mnt/data/kindle-breakout-world-contact-curriculum-20261108`. CPU import closure
+passes with GPU loader disabled. Independent recount verifies first6,144 original
+4/2/1/1 rows,32,845/32,850 sampled arrivals,732,326 valid suffix targets,7,151
+future terminals and12,034 future positive rewards. Pretraining/broad fitting
+families are disjoint from reused development. All original dense/frozen physical
+and event gates stay;contact retention is descriptive. Declare2,400s learner and
+600s exact restore,then only after review84 frozen groups. No GPU active yet.
 
-Preserve first launcher failure: missing guard helper, before any native worker
-or update. Separate CPU import repair and 57-pin unstarted-stage declaration
-complete the original learner/restore without repeating a native stage. Two
-successful guards/18 sealed files and 132-pin closure pass; original failed
-service remains failed. Full goal remains unproven; keep H0 as broad reference.
-The next question is retaining this precision across diverse histories/actions;
-no next GPU allocation, extension or automatic successor is selected.
+The [fixed-contact result](results/2026-11-08-breakout-world-contact-fit.md)
+remains closed/passed for fitting only:110/110 supported future positions on each
+of four draws,18 unsupported,all24 gates,32 restored arrays. Native186.289s/loop
+191.500s are inherited costs. Preserve its original failed launcher, separate
+CPU import repair,two native guards and132-pin closure. It does not prove broad
+physics,event calibration or generalization. Keep H0 as broad reference. No
+completed stage repeats,unchanged extension or automatic successor.
 
 The [image-feedback result](results/2026-11-08-breakout-world-image-feedback.md)
 is closed/failed:90/112 observed,87/109 one,26/107 eight;primary energy.256859
