@@ -1,5 +1,7 @@
 # Breakout: bounded corrective replay with clean launches
 
+**Closed; retention fails.** [Measured results](../results/2026-11-08-breakout-world-launch-corrective.md).
+
 Select one4,096-update corrective phase after the [clean-wait collection](../results/2026-11-08-breakout-world-clean-launch.md)
 and conditional support review. Start from the closed small64 final16,384 and
 finish at20,480. New data and sampler change deliberately; this is a warm start,
