@@ -11,21 +11,30 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign remain parked. Use native
 pixel supervision and categorical H0 as the inspectable reference. No pretrained
-encoder or object/RAM training labels. No GPU job is allocated at this stage.
+encoder or object/RAM training labels. One guarded pixel-residual world learner is active.
 
 The [optional copy-plus-correction decoder](experiments/2026-11-08-breakout-world-pixel-residual.md)
-is selected for implementation and native qualification before bounded learning.
+has passed native qualification; its separately declared fresh8,192-update learner is active.
 The current decoder rebuilds every pixel. New `rgb_spatial_residual` adds the latest
 causal image's clamped log odds to its existing logits; zero correction copies to
 within 1/255. Keep gradients through generated history. No new weights, heads,
 labels, collector or backend primitive. Default off, v15, explicit v13 suffix-event
 objective; posterior main readouts remain. This changes initialization and gradient
 routes together; a persistence cause or gameplay benefit is not established.
-Seven new CPU checks, ten affected legacy header checks and strict core/test
-Clippy pass. Preserve the initial test-fixture compile failure and typing repair.
-Next build/package, then separately declare native qualification. No old native stage repeats.
-Root `/mnt/data/kindle-breakout-world-pixel-residual-20261108`; consult the protocol
-before each separately declared GPU allocation. All original full-world gates stay.
+Seven new CPU/ten legacy-header/250 packaged Python checks and strict core/test/
+binding Clippy pass. First packaged run249 passes/one message-fixture failure;
+only that failed case is repaired and rerun. Initial Rust fixture compilation,
+source-identity declaration and premature launcher failures remain preserved;
+no GPU guard existed for the premature launcher. Whole suffix source matches the
+qualified v14 parent; removing its forwarding wrapper matches v13 exactly.
+New native qualification182 pins/32.006s passes copy values/derivatives, production
+zero-correction copying/lane isolation,240 parent initial tensors,16 cached non-image
+arrays,77 required changed weights,13 finite reports/total/fraction,240 frozen tensors,
+18 initial/trained restored arrays and old-native v15 rejection. Native/source/runner
+36c2b6c8,SHA e18a94ef. Learning190 pins,AMD/Auto/host guard; no old native fixture repeats.
+Released2,939,816,086 counted build-cache bytes;wheel/runtime/native executable/source retained.
+Root `/mnt/data/kindle-breakout-world-pixel-residual-20261108`; all original gates stay.
+Only after reviewed learning/restore separately declare the new final's84 frozen groups.
 
 The [causal-prior learner](results/2026-11-08-breakout-world-clean-prior.md)
 remains closed/failed: observed/one/eight93/112,90/109,27/107; primary.452156
