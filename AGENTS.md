@@ -23,54 +23,34 @@ available. Only the user merges PRs; commits and pushes are allowed.
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. The pixel-transport experiment is selected for
-CPU/native qualification; no GPU allocation or full learner is declared.
+object/RAM training labels.
 
-The [transport protocol](docs/experiments/2026-11-08-breakout-world-transport.md)
-adds a default-off595-weight head:per-pixel horizontal/vertical offset mixtures
-then blending with existing RGB generation. Existing two-image history,RSSM and
-13-report event objective stay; no new labels,backend primitive or event heads.
-Validate values/derivatives/causality/geometry and package before separately
-declaring native qualification. Root `/mnt/data/kindle-breakout-world-transport-20261108`.
-All original gates stay; no automatic successor.
+The [pixel-transport protocol](docs/experiments/2026-11-08-breakout-world-transport.md)
+is in one separately declared fresh8,192-update learning check. Default-off
+595-weight head learns horizontal/vertical pixel shifts and blends with existing
+RGB generation; RSSM, causal two-image history and13-report objective stay.
+Source/runner80dc8c76,native SHA013ae7a7;122 CPU/249 packaged Python checks and
+strict core/test/binding Clippy pass. Preserve the fixture compilation failure
+and separate explicit-type repair. Cache836,444,204 counted bytes released.
+Qualification passes1,247 pins/115.674s:independent F64/native math,one finite
+13-report update,240 cached initial tensors/16 nonimage arrays,246 frozen tensors,
+18 initial/trained restore arrays and nine sealed guard files. No GPU fault.
+Root `/mnt/data/kindle-breakout-world-transport-20261108`. Learning pins1,254 inputs,RGB64/12M/B8/T32/H16/full BPTT/Auto,seed41001,
+rates4e-4,mixing.01,RGB100/events1,original4/2/1/1 replay plan. Retain actual
+initial/2048/4096/final,dense controls and exact final restore. Unit
+`kindle-world-transport-learning-20261108`;observer audits completion,never restarts.
+After reviewed learning,declare only its84 final frozen groups. Original gates stay.
 
 The [fixed-filter/future-event phase](docs/results/2026-11-08-breakout-world-fixed-events.md)
-is closed and fails retention. Observed/one/eight108/112,83/109,22/107;fitting eight
-44/176. Primary energy.166164 versus original fixed-filter.141405 and H0.169502,
-missing the unchanged.127127 gate. Freeflight8 presence61/62/60/62 of64 passes
-all commands, and nonending alarms remain0/304. Ending32 Brier improves.334714→
-.120330 but ending16 worsens.000253→.094185;RIGHT16 false risk.024970→.438322.
-This is a timing/forecast tradeoff,not accurate physics or a proven error cause.
-Keep H0 as the inspectable reference; all original gates and failures stay.
-
-Warm4096 updates8192→12288 from the same H0 anchor;immutable observation filter,
-36 fixed visual weights and32 changed dynamics/head weights. New16 reports and
-v16,source/native249786f1/SHAab645a5b;Python runner repair84de0f5a. Native395.123s/
-loop457.361s,plus inherited H0529.515s/796.900s. Original failed launcher remains
-failed:one unlogged/unsaved update,unknown native duration,34.725s worker/polling.
-Four CPU loop checks repair its Python report-layout assertion; initial/dense
-queries are reused rather than repeated. Source formatting/first CPU graph failure
-and separate repairs remain preserved.117 distinct CPU/224 packaged Python and
-strict core/test/binding Clippy pass;repair checks overlap older cases.
-
-All16 finite reports/total/energy/plan/exposures,32 changed/36 fixed weights,
-24 exact visual arrays,204 frozen tensors,108 initial arrays,384 dense origins and
-18 final restore arrays pass.84 frozen groups,history16 primary/32 secondary,
-eight draws,all horizons;no old-model/collector repeat. Four successful guards/
-36 sealed files plus original failed guard/27 sealed files,1572 bitwise tensor
-comparisons and3196 closure pins pass. No recovery/reset/NVML/unfinished child.
-Root `/mnt/data/kindle-breakout-world-fixed-events-20261108/runner-repair`;parent
-retains qualification/failed launcher. Source,runtime,weights,arrays,figures and
-fixed causal clips remain;836,276,083 counted build-cache bytes stay released.
-
-The [RGB-weight1 experiment](docs/results/2026-11-08-breakout-world-rgb1.md),
-[original fixed filter](docs/results/2026-11-07-breakout-world-fixed-teacher.md) and
-[joint suffix events](docs/results/2026-11-08-breakout-world-suffix-events.md) remain
-closed/failed. Do not repeat completed learners,assessments or collectors. No
-unchanged extension,sweep or automatic successor. Precise physics,event timing/
-calibration,persistent removed-brick memory,late/tunnel/second-wall coverage,
-untouched families and fresh confirmation remain required. The oracle has no
-above-top-brick endpoints. Full world-model and five-game goals stay unfinished.
+is closed and fails retention:observed/one/eight108/112,83/109,22/107;primary
+energy.166164 versus H0.169502 and required.127127. Freeflight presence passes
+all commands but ending timing fails. Original failed launcher and separate
+runner repair,discarded update,all audits and artifacts remain in the report.
+Do not repeat completed learners,assessments or collectors. No unchanged
+extension,sweep or automatic successor. Precise physics,event timing/calibration,
+persistent brick memory,late/tunnel/second-wall coverage,untouched families and
+fresh confirmation remain required. The oracle has no above-top-brick endpoints.
+Full world-model and five-game goals stay unfinished.
 
 ## Direction and retained results
 
