@@ -26,20 +26,28 @@ CNN/RSSM/RGB decoder with retained categorical H0 as the inspectable reference; 
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-Select the [contact-first curriculum](docs/experiments/2026-11-08-breakout-world-contact-curriculum.md).
-Warm-start the precise contact-fit checkpoint at age2,048 and train6,144 broad
-updates to8,192 total. Same qualified85dbe150/SHA5b112866 native, H16 motion RGB,
-RGB64/12M/B8/T32/Auto, all weights and rates. No rebuild, new loss, frozen subset,
-labels, collection, actor/critic, spatial decoder or image feedback. This is a
-warm start with preserved moments/age, not uninterrupted learning or a fresh seed.
+The [contact-first curriculum result](docs/results/2026-11-08-breakout-world-contact-curriculum.md)
+is closed and fails retention. Warm age2,048 plus6,144 broad updates ends8,192:
+development observed/one/eight86/112,66/109,12/107;primary ball energy.322807
+versus H0.169502 (90.44% worse). Contact precision falls110/110 to26/17/20/20
+of110 across four draws. Only serve-NOOP/nonending category-mean gates pass;
+15 individual nonending cases exceed5%. Keep H0 as broad reference. This simple
+contact-first/data-switch recipe is not retained; no unchanged extension.
 
-Root `/mnt/data/kindle-breakout-world-contact-curriculum-20261108`. CPU import closure
-passes with GPU loader disabled. Independent recount verifies first6,144 original
-4/2/1/1 rows,32,845/32,850 sampled arrivals,732,326 valid suffix targets,7,151
-future terminals and12,034 future positive rewards. Pretraining/broad fitting
-families are disjoint from reused development. All original dense/frozen physical
-and event gates stay;contact retention is descriptive. Declare2,400s learner and
-600s exact restore,then only after review84 frozen groups. No GPU active yet.
+Unchanged85dbe150/SHA5b112866 native,H16 motion RGB,RGB64/12M/B8/T32/Auto.
+All243 learning pins/156 CPU inputs,6,144 finite11-loss rows,68 changed weights,
+204 inherited/frozen tensors,384 dense origins,18 restored development arrays
+plus32 contact draw-arrays,84 frozen groups,three guards/27 sealed files and
+1,524-pin closure pass. New native565.070s/loop683.255s plus inherited
+186.289s/191.500s totals751.359s/874.755s. Frozen assessment166.236s separate.
+No new failure/rebuild/collection/labels/actor/critic. Inherited launcher failure
+and CPU repair remain preserved. Root
+`/mnt/data/kindle-breakout-world-contact-curriculum-20261108`;source/weights/curves/clips retained.
+
+Source-only `spatial-fusion-source-review.json` records an unselected architecture
+hypothesis:the optional history/global decoder fuses only before a linear output,
+with no joint nonlinear hidden layer. No cause or benefit is established. Full
+world competence remains unproven;no next GPU allocation or automatic successor.
 
 The [fixed-contact result](docs/results/2026-11-08-breakout-world-contact-fit.md)
 remains closed/passed for fitting only:110/110 supported future positions on each
