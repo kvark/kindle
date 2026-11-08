@@ -25,6 +25,14 @@ and the five-game campaign are parked. Use native pixel supervision and retained
 categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
 Full competence remains unproven. No pretrained encoder or object/RAM training labels.
 
+Select the [CPU event-forecast diagnosis](docs/experiments/2026-11-08-breakout-world-event-diagnosis.md)
+to distinguish observed-state head errors from imagined-state drift using five
+retained worlds. Verify an F64 continuation head against saved native outputs,
+then inspect conditional hazards, accumulated ending risk and the energy score's
+sensitivity to survival weights. No new model query,update,collector or GPU
+allocation. Original competence gates and all closed failures remain authoritative.
+Root `/mnt/data/kindle-breakout-world-event-diagnosis-20261108`.
+
 The [nonlinear spatial fusion result](docs/results/2026-11-08-breakout-world-spatial-fusion.md) is closed:failed retention.
 Recorded development observed/1/4/8/16/32 is 93/112, 95/109, 62/109, 34/107, 15/114, 4/95;
 primary16/32 survival-weighted ball energy 0.345425 versus H0.169502.
