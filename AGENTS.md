@@ -25,29 +25,27 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [action-conditioned transport experiment](docs/results/2026-11-08-breakout-world-action-transport.md) is closed and fails
-retention. Fresh8,192 B8/T32/H16 updates produce development observed/1/4/8/16/32
-ball counts103/112,100/109,65/109,43/107,22/114,8/95. All three short gates pass,
-but primary long ball energy.387593 trails H0.169502 and required.127127.
-Ending16/32 Brier.093754/.249306,RIGHT16 false risk.488927,and197/304 nonending
-alarms fail event gates. Freeflight presence64/64 for every command does not
-establish correct locations. No extension or successor is selected; no Kindle
-GPU allocation is active. Consult the [protocol](docs/experiments/2026-11-08-breakout-world-action-transport.md) before new work.
+The [smaller RGB64 world protocol](docs/experiments/2026-11-08-breakout-world-small64.md) is selected. Keep the existing
+v18 local-action architecture and qualified7f797a2b native/runner (SHA38680c73),
+but use size1M at unchanged RGB64 and16,384 fresh updates. The exact original
+8,192-row plan repeats twice in one learner, with sealed counts scaled rather
+than recounted. No new collector, camera path, backend primitive, build or
+actor/critic. Capacity and optimizer budget change together; no isolated cause
+or speed benefit is established. Root
+`/mnt/data/kindle-breakout-world-small64-20261108`.
 
-Native learning1,794.491s,training/evaluation loop1,973.503s,final84-group frozen
-assessment236.293s;other host GPU work was present. Same original plan/data,
-no new emulator actions/frames or old-model queries. All8,192 finite reports,
-82 changed weights,246 own initial/frozen tensors,384 dense origins,58 finite
-exports and18 restore arrays pass. Closure seals3,700 pins/four guards/36 files;
-original CPU failures remain. Source/runner5fe4545c,native SHA15bd4a8d. Released
-837,729,332-byte build cache;all useful weights/runtime/raw arrays/figures/clips
-remain under `/mnt/data/kindle-breakout-world-action-transport-20261108`.
+CPU driver controls pass: real plan is two exact cycles; a four-step stand-in
+uses one continuous learner and preserves reports/masks/counts. No GPU/emulator
+construction occurred. Next separately declare a bounded600s smaller-shape
+native preflight, recording all shapes/scalars,13 finite reports and18 exact
+initial/trained restore arrays. No full learner or GPU allocation is declared.
+Only after review may the fixed16,384 learner/final restore be separately declared.
 
-The [closed state/history diagnostic](docs/results/2026-11-08-breakout-world-state-history.md) remains a lead for visual
-stability: H16 eight-step prior46/108,h-only44/108,true-history96/108,
-history+h100/108. These privileged readouts are not learned improvements or
-causal error fractions. Heads stay invariant under history swaps and weak on
-selected true-image terminal states. H32 and earlier completed stages stay closed.
+The [closed action/transport trial](docs/results/2026-11-08-breakout-world-action-transport.md) remains failed: short gates pass,
+but primary energy.387593 versus H0.169502,RIGHT16 false risk.488927 and197/304
+nonending alarms. All3,700 pins/failures/checkpoints/clips remain retained.
+The state/history diagnostic is a privileged sensitivity result, not a learned
+fix. H32 and all earlier completed stages stay closed; do not repeat them.
 
 All original physics/event gates stand. Precise physics, event timing/calibration,
 persistent brick memory, late/tunnel/second-wall coverage, untouched families and
