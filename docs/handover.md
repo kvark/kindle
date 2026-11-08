@@ -15,7 +15,7 @@ efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
 Select the [nonlinear spatial fusion experiment](experiments/2026-11-08-breakout-world-spatial-fusion.md)
-for native qualification. Add default-off `rgb_spatial_fusion` after joining
+for the qualified fresh learning check. Add default-off `rgb_spatial_fusion` after joining
 history/global fields:ConvNorm5→16 channels then RGB Conv5. It requires standalone
 categorical spatial RGB without image feedback. Net+14,232 weights:80 logical/
 8,871,955 scalars/240 tensors. RSSM2560 and image history24,576 stay. Geometry,
@@ -29,7 +29,15 @@ count-only correction,plus initial Clippy enum-size warning/fix:box the new CPU
 descriptor,unchanged GPU graph.208 packaged Python checks and strict binding
 Clippy pass. Preserve first CLI fixture error and its standalone/full-BPTT repair;
 no native/package change. Native/source7e1408c9,SHA0a6e1bd2. One guarded new native
-qualification precedes separately declared fresh8,192 learning. No GPU active yet.
+qualification passes:1,212 pins/27.200s,F64/native values/derivatives,joint logit
+interaction/lane isolation,228 spatial/201 H0 common initial tensors,240 own
+initial/frozen tensors,18 initial/trained restore arrays,77 changed weights and
+all fusion parameters,eleven finite reports/total/mask and old-native v12 rejection.
+Sixteen cached non-image initial arrays match spatial v10 exactly;RGB changes.
+The separately declared fresh8,192 learner/final restore are active,1,219 pins,
+AMD/Auto/host guard. Source/native/runner7e1408c9,SHA0a6e1bd2;CLI fixture correction
+is Python-test-only. Released865,550,538 counted build-cache bytes;runtime/wheel/
+CPU executable/source/failures retained. Do not repeat qualification or old stages.
 Use original H16/full plan/rates/seed and all physical/event gates;feedback and
 future event losses stay off. No labels,collection,actor/critic or backend op.
 
