@@ -76,3 +76,22 @@ the earlier141-pin declaration remains preserved. This is declaration finalizati
 not a failed/repeated learner. Learning is active. Its first report matches the
 qualified update exactly;512 early updates take56.603892s native. Other host GPU
 work may exist;no exclusive benchmark. No frozen final assessment is allocated.
+
+
+Final assessment and CPU review scripts are prepared,not allocated. The new
+cached-report aggregator reproduces1,680 sealed control scalar fields within
+absolute1e-13 and checks480 cached point-summary rows in.524s,without old
+forecast RGB reads. H0 truth arrays remain the cached oracle target reference;
+new-model RGB features are still independently checked. All per-action/horizon
+regressions and individual alarms will be retained for both histories.
+
+The first preexecution learning-curve schema assertion fails because old H0 logs
+lack `global_update`;its source/failure record remain. Separate plot-reader
+fallback uses `step` for that fresh8192 source. Both completed control clocks
+validate all8192 step indices and exact final native totals. No figure,model,
+learner or assessment is repeated by this CPU-only repair. New-model/oracle-only
+clips avoid rereading old forecast RGB for display too.
+
+The [pixel-generator architecture review](../results/2026-11-08-breakout-world-pixel-generators-review.md)
+records research hypotheses while this fixed learner continues. It does not
+select a successor or alter the current model,budget,losses or gates.

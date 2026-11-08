@@ -34,6 +34,9 @@ under3600s/600s with159 pins, including own initial references. Learning is acti
 first report matches qualification exactly. Initial512 updates take56.604s native
 (~.111s/update), an early shared-host observation rather than an exclusive speed
 benchmark. No frozen final assessment is allocated yet; fixed gates stay unchanged.
+Final analysis is prepared: cached-report aggregation reproduces1,680 scalar
+fields/480 point rows without old forecast RGB reads; the protocol retains a
+separate CPU-only repair for the older H0 timer schema.
 
 The [closed action/transport trial](results/2026-11-08-breakout-world-action-transport.md) remains failed: short gates pass,
 but primary energy.387593 versus H0.169502,RIGHT16 false risk.488927 and197/304
