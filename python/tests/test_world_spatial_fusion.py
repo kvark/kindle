@@ -7,7 +7,11 @@ import pytest
 
 def metadata():
     config = kindle.default_config(18, 'tiny')
-    config.update(rgb_spatial_decoder=True, rgb_spatial_fusion=True)
+    config.update(rgb_spatial_decoder=True, rgb_spatial_fusion=True, observation_kind='rgb32',
+                  world_backprop_length=config['batch_length'],
+                  world_microbatch_size=config['batch_size'], disagreement_bonus=False)
+    for key in ('policy', 'value', 'replay_value'):
+        config['loss_scales'][key] = 0.
     return dict(format='kindle-world-only-v12', config=config,
                 pixel_loss='motion_cross_entropy', prediction_length=16, updates=0)
 

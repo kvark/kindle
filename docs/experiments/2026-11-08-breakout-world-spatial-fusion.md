@@ -79,3 +79,8 @@ the goal. No unchanged extension, repeated stage, sweep or automatic successor.
 Root `/mnt/data/kindle-breakout-world-spatial-fusion-20261108`; AMD/Auto/existing
 host guard, stop real faults/nonfinite state, no reset/recovery/NVML. No GPU work
 has run at protocol declaration time.
+
+The first packaged CLI run passes207 tests and fails one fixture: the tiny default
+configuration hits full-BPTT validation before the intended incompatible-flag
+check. A separate complete-standalone fixture repair passes208 CPU tests with GPU
+loader disabled. Native/package bytes are unchanged; preserve both logs/sources.

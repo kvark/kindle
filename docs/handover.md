@@ -26,8 +26,10 @@ Root `/mnt/data/kindle-breakout-world-spatial-fusion-20261108`.102 world CPU che
 plus two RGB fusion CPU checks and strict core Clippy pass. F64 finite differences
 cover40 fusion input/16 output channels. Preserve first count-fixture failure and
 count-only correction,plus initial Clippy enum-size warning/fix:box the new CPU
-descriptor,unchanged GPU graph. Package/CPU CLI checks and one guarded new native
-qualification precede separately declared fresh8,192 learning. No GPU active yet.
+descriptor,unchanged GPU graph.208 packaged Python checks and strict binding
+Clippy pass. Preserve first CLI fixture error and its standalone/full-BPTT repair;
+no native/package change. Native/source7e1408c9,SHA0a6e1bd2. One guarded new native
+qualification precedes separately declared fresh8,192 learning. No GPU active yet.
 Use original H16/full plan/rates/seed and all physical/event gates;feedback and
 future event losses stay off. No labels,collection,actor/critic or backend op.
 
