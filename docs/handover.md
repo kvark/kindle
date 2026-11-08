@@ -13,23 +13,25 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [launch-fitting diagnostic](results/2026-11-08-breakout-world-launch-fitting.md) is closed. Final20,480 onall288 fitting branches,36 groups,
-four draws: FIRE visible/within1px counts532/370 of576 at1,496/173 at8,156/0 at32;
-non-FIRE haszero false balls. At16 no below-brick truth support exists.
-Two valid real source futures fromidentical past/command often differ widely:
-mean1-step separation6.949px,while median maximum model-draw separation.0326px
-among63 fully detected conditions. Fixed preview shows faint multiple balls
-within each nearly identical sampled image. Point agreement alone is not a
-stochastic fitting criterion. This supports reviewing the added prior-image loss,
-not a proved cause or guaranteed remedy. No learner/GPU allocation is selected.
+The [posterior-trained local-action/H0 implementation](experiments/2026-11-08-breakout-world-local-h0.md) is selected for CPU checks,packaging andbounded native
+qualification. No full learner/GPU allocation is selected. Keep the same
+603,915-weight1M RGB64 decoder/RSSM;allow observed-posterior motion CE/KL/events
+withH0 andexplicit v20 metadata. Remove added sampled-prior RGB andimagined-event
+losses,without changing inference/parameters or relaxing oldv18/v19 headers.
+Root `/mnt/data/kindle-breakout-world-local-h0-20261108`.
 
-Native31.309s/390 pins/240 frozen tensors andages;zero training/actions/frames.
-Original CPU coordinate serialization fails andstays preserved;separate CPU-only
-repair completes2,016 joins/5,760 cases in2.855s without inference repeat.
-Post-hoc conditional-spread support.118s;502-pin closure.340s andone9-file guard.
-Root `/mnt/data/kindle-breakout-world-launch-fitting-20261108`. The [corrective trial](results/2026-11-08-breakout-world-launch-corrective.md) staysfailed:
-energy.172366→.229385,natural8-step53/107→46/107,234/304 alarms. Retain earlier
-small64. All completed learners/collectors/diagnostics remain closed.
+The [loss review](results/2026-11-08-breakout-world-prior-pixel-loss-review.md) verifies an averaging incentive inour added H16 term:independently sampled
+prior futures are compared toeach recorded future. A two-outcome pixel example
+prefersaveraging under per-draw BCE butsharp alternatives under joint marginal
+likelihood. Official Dreamer usesposterior reconstruction/prior-posterior KL.
+This diagnoses the extra term's incentive,not every coupled-model error or a
+proved remedy. Existing energy/score-function/overshooting attempts remainclosed.
+
+The [fitting diagnostic](results/2026-11-08-breakout-world-launch-fitting.md) staysclosed:real futures differwidely fromidentical past/commands,while
+four model draws show nearlyidentical multi-ball ghost images. Native31.309s,
+390pins/240 frozen tensors;original CPU serialization failure preserved and
+separate2.855s CPU repair complete,502-pin closure/one9-file guard. Its easier
+fitting result cannotrepair the [failed corrective trial](results/2026-11-08-breakout-world-launch-corrective.md). All completed stages stayclosed.
 
 All original physics/event gates stand. Precise physics, event timing/calibration,
 persistent brick memory, late/tunnel/second-wall coverage, untouched families and
