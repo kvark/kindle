@@ -7,8 +7,10 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [posterior-trained local-action/H0 implementation](experiments/2026-11-08-breakout-world-local-h0.md) is selected for CPU checks,packaging andbounded native
-qualification. No full learner/GPU allocation is selected. Keep the same
+The [posterior-trained local-action/H0 implementation](experiments/2026-11-08-breakout-world-local-h0.md) is implemented;74 distinct CPU world checks andstrict core/binding Clippy pass.
+Packaging andbounded native qualification remain. The original graph-test count
+assertion failed (11 rawoutputs versus9 losses);separate correction checksnine
+scalar losses plus two state traces. Originalsource/log are preserved. No full learner/GPU allocation is selected. Keep the same
 603,915-weight1M RGB64 decoder/RSSM;allow observed-posterior motion CE/KL/events
 withH0 andexplicit v20 metadata. Remove added sampled-prior RGB andimagined-event
 losses,without changing inference/parameters or relaxing oldv18/v19 headers.
