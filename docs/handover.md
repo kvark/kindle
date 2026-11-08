@@ -32,11 +32,17 @@ all physical/event gates stay. Report13 values including future heads. No new
 data,labels,teacher,pretraining,actor/critic or backend primitive.
 
 Root `/mnt/data/kindle-breakout-world-image-feedback-20261108`.99 affected Rust
-CPU checks/strict core Clippy pass,including future CE/BCE F64 derivatives,
-stopped labels,generated-only ancestry,shared target names and total inclusion.
-Preserve first fixture output-count failure (36 metrics plus two existing debug
-outputs means38); separate CPU correction changes no production math. Packaged
-CPU checks and native qualification remain. No GPU allocation yet.
+CPU/135 packaged Python/strict core-binding Clippy pass. Preserve first fixture
+output-count failure and separate correction (36 metrics plus two debug outputs).
+First native qualifier1,196 pins/36.543s passes future CE/BCE F64 values/derivatives,
+stopped targets/zero masks,fixed-h generated-image effects/lane isolation,231
+spatial actual-initial tensors/201 H0 common tensors,231 own initial/frozen
+tensors,18 initial/trained restore arrays,74 changed weights,13 finite reports/
+total/masks,cached spatial prefix/first RGB and old-native v11 rejection.
+Source/native/runnerea90ee96,SHA9d3d8536. Recount975,941 valid future rows,9,570
+terminals and16,008 positive rewards. The separately declared fresh8,192 H16
+learner/final restore are active under the AMD host guard. Build cache released;
+source,runtime,CPU executable and original logs retained. Do not repeat stages.
 
 The [spatial-decoder result](results/2026-11-08-breakout-world-spatial-decoder.md) remains closed/failed:
 87/112,81/109,24/107;energy.478844 versus H0.169502;187/304 nonending false alarms
