@@ -25,20 +25,17 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [small64 survival diagnostic](docs/results/2026-11-08-breakout-world-small64-survival.md) is closed. Holding its image
-paths fixed,oracle ending marginals change ball energy.172366→.130336 and paddle
-.104890→.026661. Same-mean draw reassociation changes ball score only.000006746.
-Serve/contact/ending categories retain most altered ball error. This is privileged
-sensitivity,not a learned fix or causal error fraction. All6,720 cases/840 groups
-reconstruct ordinary scores within1e-12;4.804s CPU,325 closure pins. No model query,
-GPU allocation,old model assessment or old scalar-fixture repeat. Root
-`/mnt/data/kindle-breakout-world-small64-survival-20261108`.
-
-The next decision should inspect conditional training support for serve/contact
-transitions,not infer coverage from category names or global action counts.
-Existing paired fitting data already includes FIRE/LEFTFIRE/RIGHTFIRE;missing all
-launch data is not established. No learner,collector or successor is selected.
-Consult the [diagnostic protocol](docs/experiments/2026-11-08-breakout-world-small64-survival.md) before new work.
+The [conditional transition-support audit](docs/results/2026-11-08-breakout-world-transition-support.md) is closed. After16 stable absent-reference
+arrivals,the first imagined command has274 FIRE1 exposures/93 unique targets
+but zero for FIRE aliases10–17. Onlytwo ofeight existing paired serve parents
+satisfy stable16/32;the paired dataset was not used by small64. Contact has
+nonzero support for all18 commands;exact collision adequacy is not established.
+All171 input/176 closure pins pass;1.377s CPU,no model/native/emulator/GPU work.
+Root `/mnt/data/kindle-breakout-world-transition-support-20261108`. No learner or
+collector is selected by this [protocol](docs/experiments/2026-11-08-breakout-world-transition-support.md).
+Missing launch aliases support a separately declared focused data change,not a
+claim that coverage explains all failures or that an event-head refit suffices.
+The [survival sensitivity](docs/results/2026-11-08-breakout-world-small64-survival.md) remains privileged score substitution only.
 
 The [small RGB64 trial](docs/results/2026-11-08-breakout-world-small64.md) remains closed and failed:603,915 weights,
 16,384 fresh updates,natural eight-step53/107 but32-step8/95,primary.172366 versus
