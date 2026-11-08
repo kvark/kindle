@@ -228,7 +228,7 @@ def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
 
 
 def train(args, config, fitting, development, *, sampler=sampler_plan, initial_reference=None,
-          evaluation_fitting=None, learner=None, initial_checkpoint=None):
+          evaluation_fitting=None, learner=None, initial_checkpoint=None, initial_evaluation=True):
     import kindle
     from safetensors.numpy import load_file
     plan, expected_counts = sampler(fitting, config, args.steps, args.prediction_length)
@@ -281,7 +281,8 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             for kind, locations in selections[split].items():
                 evaluate_group(learner, streams, locations, output, f'{split}-{kind}')
 
-    evaluate(start_updates)
+    if initial_evaluation:
+        evaluate(start_updates)
     with (args.output/'learning.jsonl').open('x') as log:
         for step in range(1, args.steps+1):
             locations = plan[step-1].tolist()

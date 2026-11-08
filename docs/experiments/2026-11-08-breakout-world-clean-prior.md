@@ -69,3 +69,32 @@ The oracle has no above-top-brick endpoints. Intermediate gates do not complete
 the goal. AMD/Auto/host guard;stop real faults/nonfinite state,no recovery/NVML.
 Root `/mnt/data/kindle-breakout-world-clean-prior-20261108`;no GPU allocation at
 this declaration. Original failed learners and collectors remain closed.
+
+## User-authorized resume after pause
+
+The user paused the run at2,998 reported updates, then resumed the goal. The
+latest saved checkpoint is2,048;950 later updates have no saved weights. Preserve
+the original interrupted queue,unsealed guard,logs and pause receipt. Do not
+relabel them complete or restart that queue. Qualification remains separately
+passed; no build or completed native fixture repeats.
+
+Use the unchanged native/runtime35c090d0/SHA d60f2888. Separately declare one
+600s guarded restore check of checkpoint2,048 against its cached18 forecast
+arrays,and verify all240 weights/moments are unchanged by inference. Only after
+review declare6,144 additional updates using exactly original plan rows2,048:8,192,
+then final restore. This is a warm start: optimizer state is retained but RNG
+restarts. It is not uninterrupted learning or an independent confirmation.
+
+Use separate resume outputs and service identities. The Python runner may skip
+the completed initial evaluation; default fresh-run behavior stays. Keep the
+original0/1,024/2,048 evaluations and actual-initial dense baseline, rather than
+querying them again. New periodic evaluations begin at3,072. Checkpoint4,096 and
+an extra6,144 milestone follow the existing relative-step save schedule; only
+final8,192 is assessed. Validate the suffix plan and counts before execution,
+all14 finite reports/totals/fractions afterward,240 frozen tensors and18 final
+restored arrays. Include both retained-lineage cost and actual spent cost with
+the discarded950 updates. No new collection or easier gate.
+
+After reviewed continuation, separately declare only the new final's original
+84 frozen groups. All original competence requirements remain. User resumption
+authorizes this bounded continuation; no automatic successor or extension.
