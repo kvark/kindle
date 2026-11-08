@@ -13,16 +13,21 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [bounded launch-corrective phase](experiments/2026-11-08-breakout-world-launch-corrective.md) is running:4,096 new updates fromsmall64
-16,384→20,480,unchanged1M/RGB64/v18,B8/T32/H16,Auto,rates4e-4,RGB100,KL1/.1,
-event1,mixing.01. New sampler:two original natural,one supplement,one wait,one
-terminal,two clean-launch windows andone retained paired contact/life-loss/ending
-branch. The full plan/620 input pins are frozen;first actual update has13 finite reports
-and240 finite saved tensors. Native learner service is1916430/invocation
-57480516ad4e434eac50ae926dad9e88. No old model/qualification
-repeat;reuse sealed inherited actual-initial evaluations. Warm start resets live
-belief/RNG;not uninterrupted training,an independent seed or isolated data cause.
-Root `/mnt/data/kindle-breakout-world-launch-corrective-20261108`.
+The [launch-corrective learning phase](experiments/2026-11-08-breakout-world-launch-corrective.md) completes16,384→20,480 updates. Native455.523s,
+loop527.794s;all4,096 finite13-component reports,new plan/exposures,80 changed
+parameters,240 inherited/frozen tensors,continuous phase ages and18 restore arrays
+pass620 input/115 CPU-audit pins in3.330s. Natural eight-step ball regresses53/107
+→46/107;one-step104/109,16-step21/114,32-step5/95. No broad tracking gain.
+The separately pinned final-only assessment is selected:1,409 pins,84 groups,
+42 chosen plans,histories16/32,eight draws;reuse cached four controls and original
+oracle outcomes,no old forecasts or scalar/point validation repeats. No learner,
+extension or successor is active/selected. Root
+`/mnt/data/kindle-breakout-world-launch-corrective-20261108`.
+
+Unchanged1M/RGB64/v18,B8/T32/H16,Auto,rates4e-4,RGB100,KL1/.1,event1,mixing.01;
+new replay interleaves clean launches/retained contact/life-loss/ending/natural
+windows. Warm start resets belief/RNG;not an independent seed,uninterrupted
+learning or isolated data cause. Keep the original failed small64 result.
 
 The [new clean-wait collection](results/2026-11-08-breakout-world-clean-launch.md) is closed:288 full branches,all18 commands/two repetitions,
 9,216 new actions/36,864 frames;18,392 actions/73,568 frames and296 explicit resets
