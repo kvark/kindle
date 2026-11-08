@@ -26,35 +26,25 @@ CNN/RSSM/RGB decoder with retained categorical H0 as the inspectable reference; 
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-Select the [self-generated image-feedback experiment](docs/experiments/2026-11-08-breakout-world-image-feedback.md) for native
-qualification. The closed spatial decoder changes RGB readout but never feeds
-that image memory into recurrent belief or event heads. New default-off
-`world_image_feedback`/`motion_image_feedback` advances GRU once,samples prior,
-decodes RGB,encodes only that generated image and samples posterior at the same
-h. Use this self-observed belief for heads/next GRU. Add future reward CE1 and
-continuation BCE1 with stopped targets/masks/full BxH denominator. No true future
-image/outcome/reset input to belief. Full BPTT. Feedback and event objectives
-change together; no isolated cause or established benefit is claimed.
+The [self-generated image-feedback result](docs/results/2026-11-08-breakout-world-image-feedback.md)
+is closed and **fails retention**. Fresh 8,192 H16 updates yield development observed/one/eight
+90/112, 87/109, 26/107; primary ball energy 0.256859
+versus H0 .169502. Ending16/32 Brier 0.038424/0.241261;
+99/304 individual non-ending cases exceed5%. All gates and
+per-action/reward/paddle/brick regressions remain in the report. Keep H0 as reference;
+full competence remains unproven. No next GPU allocation or automatic successor.
 
-No new parameters:77 logical/8,857,723 scalars/231 tensors; same spatial decoder,
-RGB64/12M/RSSM2560 plus24,576 image scalars. Legacy `prior_features` now means
-self-observed imagined state and still omits image memory. v11 binds both flags/
-objective; default paths unchanged. Fresh8,192 H16 original plan/rates/seed and
-all physical/event gates stay. Report13 values including future heads. No new
-data,labels,teacher,pretraining,actor/critic or backend primitive.
-
-Root `/mnt/data/kindle-breakout-world-image-feedback-20261108`.99 affected Rust
-CPU/135 packaged Python/strict core-binding Clippy pass. Preserve first fixture
-output-count failure and separate correction (36 metrics plus two debug outputs).
-First native qualifier1,196 pins/36.543s passes future CE/BCE F64 values/derivatives,
-stopped targets/zero masks,fixed-h generated-image effects/lane isolation,231
-spatial actual-initial tensors/201 H0 common tensors,231 own initial/frozen
-tensors,18 initial/trained restore arrays,74 changed weights,13 finite reports/
-total/masks,cached spatial prefix/first RGB and old-native v11 rejection.
-Source/native/runnerea90ee96,SHA9d3d8536. Recount975,941 valid future rows,9,570
-terminals and16,008 positive rewards. The separately declared fresh8,192 H16
-learner/final restore are active under the AMD host guard. Build cache released;
-source,runtime,CPU executable and original logs retained. Do not repeat stages.
+Default-off `world_image_feedback`/`motion_image_feedback` couples generated RGB
+back into the same-h posterior and supervises future reward/continuation. No new
+parameters:77 logical/8,857,723 scalars/231 tensors. Feedback and losses change
+together; no isolated mechanism follows. Source/native/runner ea90ee96,SHA9d3d8536.
+99 Rust CPU/135 packaged Python/strict Clippy,1,196-pin native qualification,
+all 8,192 finite13-loss rows,231 frozen tensors,18 restored arrays,84 frozen groups,
+four guards/36 sealed files and 2,894-pin closure pass. Preserve the
+first fixture count failure and separate CPU repair. Native training 1232.062s;
+loop 1412.747s. Root `/mnt/data/kindle-breakout-world-image-feedback-20261108`;
+835,754,676-byte build cache released, checkpoints/source/runtime/curves/clips retained.
+No collection, new labels, actor/critic or old-model query. No completed stage repeats.
 
 The [spatial-decoder result](docs/results/2026-11-08-breakout-world-spatial-decoder.md) remains closed/failed:
 87/112,81/109,24/107;energy.478844 versus H0.169502;187/304 nonending false alarms
