@@ -7,13 +7,17 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [fixed posterior-only local H0 learner](experiments/2026-11-08-breakout-world-local-h0-learning.md) is selected: fresh16,384 updates,1M/RGB64/v20,
+The [fixed posterior-only local H0 learner](experiments/2026-11-08-breakout-world-local-h0-learning.md) is running: fresh16,384 updates,1M/RGB64/v20,
 603,915 weights/80 logical/240 tensors,B8/T32,Auto,seed41001,rates4e-4,RGB1,
 KL1/.1/free-nat1,observed events1,mixing.01. Same local decoder/RSSM/inference;
 remove added sampled-prior RGB andimagined-event losses. RGB1 additionally
 changes loss balance,informed byearlier12M gradients,not a measured1M cause.
 The prepared4,096-row corrective plan repeatsfour times;sealed counts scale,
 no old generic recount. No extension,sweep or automatic successor.
+697 input pins frozen;first RGB1 update passes9 finite reports,total/unweighted
+forward checks,240 finite tensors/age1,and77 changed weights/all required families.
+Live servicePID1929595/invocationd69b4c399521422087535f14af4797ac. Disposable
+3,360,843,323-byte build cache released;runtime,wheels,source/CPU executable remain.
 Root `/mnt/data/kindle-breakout-world-local-h0-20261108`.
 
 [Qualification](experiments/2026-11-08-breakout-world-local-h0.md) passes atRGB100:645 pins/13.878s,77 changed weights/all required families,
