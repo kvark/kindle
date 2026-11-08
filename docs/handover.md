@@ -11,7 +11,20 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. No GPU allocation or successor is selected.
+object/RAM training labels. No GPU allocation or new learner is declared yet.
+
+The [fixed-weight loss-gradient diagnostic](experiments/2026-11-08-breakout-world-loss-gradients.md)
+is selected to measure observed RGB, KL, observed events, future RGB and future
+events versus their joint gradient. Reuse v13 final8,192 weights and three retained
+fitting batches; four fixed noise draws each plus joint repeats,75 forward/backward
+steps, no optimizer. Analyze per family and a predeclared F64 RGB100-versus1 local
+sensitivity using the anchor moments. This cannot select a useful learning recipe,
+prove a causal physics-error fraction or complete the goal. No Python runtime,
+production training graph/API or checkpoint-format changes; Rust test-only module.
+Three new CPU checks and strict core/test Clippy pass after a preserved helper-API
+compilation repair. Build-source review precedes a separately declared guarded run.
+Root `/mnt/data/kindle-breakout-world-loss-gradients-20261108`. No old native fixture,
+collector, learner, frozen assessment or completed gradient analysis repeats.
 
 The [pixel-residual world learner](results/2026-11-08-breakout-world-pixel-residual.md)
 is closed and failed retention. Observed/one/eight ball precision:

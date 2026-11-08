@@ -28,6 +28,8 @@ mod gradient_diagnostic;
 #[cfg(test)]
 mod image_feedback_tests;
 #[cfg(test)]
+mod loss_gradient_diagnostic;
+#[cfg(test)]
 mod motion_tests;
 #[cfg(test)]
 mod observation_code_tests;
