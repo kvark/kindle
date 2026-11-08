@@ -5,7 +5,17 @@
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. No GPU allocation or learner is currently selected.
+object/RAM training labels. The RGB-weight1 experiment is selected for bounded
+qualification, then a separately declared fresh learner and assessment.
+
+The [RGB-weight1 protocol](experiments/2026-11-08-breakout-world-rgb1.md)
+changes only observed/future RGB scale100→1 from v13. No new native build, model,
+labels or data. Reuse qualified source/native a8efffc6/SHAf40555b5 and exact runner.
+First check common actual-initial weights/arrays, raw reports, new total and exact
+restore with one full-shape update. Only after review, declare fresh8192 updates
+with unchanged RGB64/12M/B8/T32/H16/full plan, then final84 frozen groups. All gates
+stay unchanged. Root `/mnt/data/kindle-breakout-world-rgb1-20261108`. No GPU
+allocation at selection; no automatic successor or unchanged extension.
 
 The [loss-gradient diagnostic](results/2026-11-08-breakout-world-loss-gradients.md)
 is closed/complete. At the reused v13 checkpoint and12 fitting/noise conditions,
