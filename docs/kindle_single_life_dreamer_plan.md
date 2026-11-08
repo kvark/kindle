@@ -2,33 +2,34 @@
 
 ## Selected direction: Breakout world model in isolation
 
-Select the [causal spatial-decoder experiment](experiments/2026-11-08-breakout-world-spatial-decoder.md) for native qualification.
-Keep the categorical RSSM; add a width8/three5x5 ConvNorm branch from the two
-preceding RGB images to the decoder's final RGB projection. During imagination,
-shift in its own decoded images with full BPTT. Past image history is new world
-state,not privileged future targets. Clear history across observed resets;
-future outcome/reset labels never correct or clear imagined history. No labels,
-teacher,pretraining or new backend primitive. Default off/standalone only,v10.
+The [causal spatial-decoder experiment](results/2026-11-08-breakout-world-spatial-decoder.md) is closed and fails retention.
+Fresh8,192 H16 updates give development observed/one/eight87/112,81/109,24/107
+versus H0 108/112,94/109,14/107 and categorical H16 99/112,84/109,25/107. All
+three gates fail. Primary16/32 energy.478844 is182.50% worse than H0.169502.
+Freeflight8 presence64/63/57/61 of64 fails RIGHT's90% gate; event ending16/32
+Brier.012795/.230475 fail,though RIGHT16 mean.033346 passes.187/304 individual
+non-ending cases exceed5%,maximum.968467; category means also fail. All action/
+horizon/reward/paddle/brick regressions and full causal clips remain retained.
 
-RGB64/12M RSSM width2560 stays; full belief also carries24,576 RGB scalars.
-Legacy feature readbacks exclude that image history. Add5,048 weights:77 logical/
-8,857,723 scalars/231 tensors;201 common initial tensors/67 weights expected.
-Event heads still read RSSM; image accuracy cannot replace event/physical gates.
-Fresh8,192 H16 budget/original full plan/seeds/objectives and all gates stay;
-no unchanged extension. Full competence remains unproven.
+This recipe adds two-image memory to the decoder,not the RSSM transition or
+event heads. Full belief includes24,576 image scalars beyond RSSM feature2560;
+legacy feature readbacks omit image memory. No isolated cause or general spatial
+memory failure is established. Keep H0. Full competence remains unproven;
+no successor or GPU allocation is selected. No completed stages repeat.
 
-Root `/mnt/data/kindle-breakout-world-spatial-decoder-20261108`.100 affected
-Rust CPU/118 packaged Python/strict core-binding Clippy pass. Preserve initial
-fixture literal syntax error and first analytic-gradient tolerance failure;
-separate CPU-only repairs retain the F32-constant rounding evidence.
-Native qualifier1,189 pins/25.687s passes history F64 values/derivatives,
-fixed-latent history effects/lane isolation,201 common initial tensors/67 weights,
-231 own initial/frozen tensors,18 initial/trained restore arrays,74 first-update
-changed weights across required families/spatial layers and old-native v10
-rejection. Source/native/runner0a50d611,SHA0228e625. The separately declared
-fresh8,192-update H16 learner and final restore are active under the AMD guard.
-Disposable build cache released; runtime,CPU executable,source and logs retained.
-No completed learner or collector repeats.
+Root `/mnt/data/kindle-breakout-world-spatial-decoder-20261108`,source/native/
+runner0a50d611,SHA0228e625.100 affected Rust CPU/118 packaged Python/strict
+Clippy pass. Preserve initial fixture syntax/tolerance failures and separate
+CPU repairs. Qualifier1,189/learning1,196/branch920 pins and2,646-pin closure
+pass; four successful guards/36 sealed files.77 changed weights/8,857,723
+scalars,231 own initial/frozen tensors,201 common initial tensors/67 weights,
+384 dense origins,18 exact restored arrays,full exposures and finite reports
+pass. Native1,021.332s/loop1,186.625s,worker1,204.658s,restore9.212s,frozen
+assessment192.280s;CPU learning audit7.795s/comparison38.940s separate. Extra
+image state/activation work matters despite5,048 added weights; single-run costs
+do not show useful learning efficiency.835,554,056-byte build cache released;
+source,runtime,CPU executable,checkpoints,curves,clips and failure logs retained.
+All allocation services terminal; no native stage failure or host recovery.
 
 The [compact Gaussian32 result](results/2026-11-08-breakout-world-gaussian32.md) remains closed/failed:
 one68/109,eight13/107,energy.409350 versus H0.169502 and Gaussian512.557271,
