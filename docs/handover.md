@@ -11,80 +11,39 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. The RGB-weight1 experiment is selected for bounded
-qualification, then a separately declared fresh learner and assessment.
+object/RAM training labels. No GPU allocation or new learner is selected.
 
-The [RGB-weight1 protocol](experiments/2026-11-08-breakout-world-rgb1.md)
-changes only observed/future RGB scale100→1 from v13. No new native build, model,
-labels or data. Reuse qualified source/native a8efffc6/SHAf40555b5 and exact runner.
-Preflight passes143 pins/29.604s:240 exact v13 initial tensors,18 cached initial
-arrays,raw reports,new total,77 changed weights and18 exact arrays for each initial/
-trained restore. One guard/nine sealed files pass; original native math receipts
-reused. Fresh8192-update learning/final restore and CPU review pass153/170 pins,all13
-finite reports,total/plan/exposures,80 changed weights,240 own initial/frozen tensors,
-384 dense origins and18 restore arrays. Development observed/one/eight91/112,
-85/109,25/107 versus RGB10098/112,97/109,31/107;all three gates fail. Native1155.480s/
-loop1329.204s. Separately declared84 frozen groups are active,1344 pins;all gates
-stay. Root `/mnt/data/kindle-breakout-world-rgb1-20261108`. No extension or successor.
+The [RGB-weight1 experiment](results/2026-11-08-breakout-world-rgb1.md)
+is closed and fails retention. Change only observed/future RGB scale100→1 from
+v13; fresh8192 updates, RGB64/12M/B8/T32/H16/Auto, same full plan/runtime/seed.
+Development observed/one/eight91/112,85/109,25/107 regresses98/112,97/109,31/107;
+fitting eight71/176→40/176. Primary ball energy.477757 versus RGB100.283365 and
+H0.169502; RIGHT freeflight8 presence24/64;175/304 nonending alarms>5%. Keep H0.
+Over the fixed final1024 updates, raw KL25.759→1.477 while aggregate RGB losses
+change<1%; this does not prove information loss or a causal physical mechanism.
+The [gradient diagnostic](results/2026-11-08-breakout-world-loss-gradients.md)
+measured local dominance/opposition, not a useful coefficient; its completed75
+fixed-weight backward calls and original failures/repairs remain preserved.
 
-The [loss-gradient diagnostic](results/2026-11-08-breakout-world-loss-gradients.md)
-is closed/complete. At the reused v13 checkpoint and12 fitting/noise conditions,
-weighted future-RGB/KL norms are22.199–87.212x in the prior and336.248–883.791x
-in the core; median observed/future RGB encoder cosine is-.7161. F64 RGB100→1
-fresh prior-gradient cosine.1893–.6122 (momentum update.8567–.9146). Local dominance/
-conflict and hypothetical updates do not prove a useful coefficient or physics cause.
-All75 fixed-weight forward/backward steps,12 bitwise80-weight snapshots/960 tensor
-comparisons,three exact joint repeats,408 zero-gradient checks and native component
-linearity max1.825e-6 pass. One guard/nine sealed files/436 closure pins pass;
-original240-tensor checkpoint untouched,zero optimizer steps. Three new CPU checks/
-strict core-test Clippy pass. Preserve helper-API compilation and CPU plot failures/
-separate repairs; no production graph/API/runtime changes or old native stage repeats.
-Sourcec46fa6e3/test SHA10345287. Native440.689s includes graph/session construction
-and buffer exports;CPU21.279s. Root `/mnt/data/kindle-breakout-world-loss-gradients-20261108`.
-All raw buffers/source/results remain;2,182,611,160 counted build-cache bytes released.
-All original physical/event gates and full-world requirements remain unproven.
-
-The [pixel-residual world learner](results/2026-11-08-breakout-world-pixel-residual.md)
-is closed and failed retention. Observed/one/eight ball precision:
-92/112, 83/109, 22/107; primary energy 0.519582 versus H0 .169502;
-213/304 non-ending cases exceed 5% ending risk. Optional v15 copy-plus-correction
-adds no weights and changes outputs/gradient routes; no isolated cause is established.
-Fresh8,192 updates; all13 reports/exposures,80 changed weights,240 own initial/frozen
+All new preflight143 pins,learning153/170 CPU pins,84 assessment groups/1344 pins,
+13 reports/weighted totals/plan/exposures,80 changed weights,240 own initial/frozen
 tensors,384 dense origins and18 final restore arrays pass. Four guards/36 sealed
-files/3067 closure pins pass. Seven new Rust/ten legacy-header/250 packaged Python
-checks and strict core/test/binding Clippy pass. Preserve original fixture compile,
-Python expected-message, source-declaration and pre-GPU launcher failures/repairs.
-First actual native qualification182 pins/32.006s passes; no old native fixture repeats.
-Native/source/runner36c2b6c8,SHA e18a94ef. Native training1157.190s /
-loop1335.676s. Source/runtime/arrays/useful checkpoints/failure clips remain at
-`/mnt/data/kindle-breakout-world-pixel-residual-20261108`; released2,939,816,086 counted
-build-cache bytes stay released. No unchanged extension, sweep or automatic successor.
+files,1440 bitwise tensor comparisons and1911 closure pins pass; no new native
+stage failure or build. Reuse source/native/runner a8efffc6,SHAf40555b5; original
+causal/derivative/package receipts remain unchanged. Native1155.480s/loop1329.204s,
+assessment200.933s,CPU learning8.354s/branch68.814s. Root
+`/mnt/data/kindle-breakout-world-rgb1-20261108`; useful weights,arrays,loss reports,
+figures and fixed causal clips retained. No unchanged extension,sweep or successor.
 
-The [causal-prior learner](results/2026-11-08-breakout-world-clean-prior.md)
-remains closed/failed: observed/one/eight93/112,90/109,27/107; primary.452156
-versus H0.169502;235/304 non-ending alarms>5%. The warm continuation retains
-2048+6144 updates;950 unsaved updates remain spent cost. Five successful guards,
-45 sealed files and3058 closure pins pass. Preserve restore JSON assertion/repair,
-CPU metric-field summary failure/repair and the original interrupted unsealed guard.
-Native35c090d0/SHA d60f2888, runner61bf7acb; native lineage1166.406s/spent1301.933s.
-All source/runtime/arrays/checkpoints/failures and clips remain retained at
-`/mnt/data/kindle-breakout-world-clean-prior-20261108/resume`; old build cache stays released.
-
-The [suffix-event learner](results/2026-11-08-breakout-world-suffix-events.md)
-remains closed/failed:observed98/112,one97/109,eight31/107;primary.283365 versus
-H0.169502/fusion.345425;239/304 non-ending alarms>5%. Source/nativea8efffc6,
-SHAf40555b5,105 Rust/224 packaged Python,native causal/restore checks,four guards/
-36 sealed files and2,789-pin closure pass. Native1166.306s/loop1352.208s. Keep H0.
-Its [CPU event diagnosis](results/2026-11-08-breakout-world-event-diagnosis.md)
-and [fusion predecessor](results/2026-11-08-breakout-world-spatial-fusion.md)
-stay closed;all failures/checkpoints/source/runtime remain retained.
-
-Do not repeat closed learners,assessments or collectors. No unchanged extension,
-sweep or automatic successor. All original physical/event gates stay. Precise
-causal physics,event timing/calibration,persistent brick memory,late/tunnel/second-
-wall coverage,untouched families and fresh confirmation remain required. The
-oracle has no above-top-brick endpoints. World-model and five-game goals remain
-unfinished;no causal failure mechanism is established.
+Earlier [pixel residual](results/2026-11-08-breakout-world-pixel-residual.md),
+[causal prior](results/2026-11-08-breakout-world-clean-prior.md),
+[suffix events](results/2026-11-08-breakout-world-suffix-events.md) and
+[fusion](results/2026-11-08-breakout-world-spatial-fusion.md) remain closed
+and failed; all failures/checkpoints/source/runtime remain retained. Do not repeat
+closed learners,assessments or collectors. All original gates stay. Precise physics,
+event timing/calibration,persistent removed-brick memory,late/tunnel/second-wall
+coverage,untouched families and fresh confirmation remain required. The oracle
+has no above-top-brick endpoints. Full world-model and five-game goals stay unfinished.
 
 ## Current AMD runtime and retained position
 
