@@ -11,7 +11,12 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. No GPU allocation or next learner is selected.
+object/RAM training labels. The [local-action protocol](experiments/2026-11-08-breakout-world-local-action.md)
+is selected for CPU/native qualification. Direct incoming action planes and a
+16-channel image-history branch test local control alongside the RSSM. No GPU
+allocation or full learner is declared. Root
+`/mnt/data/kindle-breakout-world-local-action-20261108`;consult the protocol.
+All original gates stay;the change does not establish a global-state cause.
 
 The [pixel-transport experiment](results/2026-11-08-breakout-world-transport.md)
 is complete and fails retention. Default-off595-weight horizontal/vertical shift
