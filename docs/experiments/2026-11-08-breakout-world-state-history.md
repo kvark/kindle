@@ -1,5 +1,9 @@
 # Breakout: privileged state and image-history readouts
 
+Outcome:the original native attempt remains protocol-failed;the separate API
+repair completes the frozen diagnostic. [Results](../results/2026-11-08-breakout-world-state-history.md).
+No GPU allocation or successor is selected. The world-model goal stays unproven.
+
 The [closed H32 recipe](../results/2026-11-08-breakout-world-h32.md) worsens
 fitting and development forecasts despite explicit32-action supervision. Earlier
 [state substitutions](../results/2026-11-07-breakout-world-state-swap.md) repaired
@@ -109,3 +113,21 @@ completed assessment or collector repeats. Rebuild only the test executable,
 review CPU/source/data pins,and separately declare a new900s repair unit/root.
 The first packaging CPU assertion also falsely matched the dependency name
 `thiserror`;its failure/repair remain and completed Clippy was reused.
+
+
+The separate repair passes48 query bundles/eight modes,64 cached reference
+arrays,all prefix/prior transition/RGB/head/history-pair controls and48 final
+teacher controls. Four before/after snapshots reproduce960 tensors;the failed
+original snapshot separately matches240. Ages8192/4096 unchanged,zero new model
+updates/emulator actions. H16 eight-step prior46/108,h44/108,true history96/108,
+h+history100/108;H3228/108,28/108,58/108,92/108. These are privileged readouts,
+not forecasts,a trained repair or a replacement retention gate. Event heads stay
+invariant under history swaps and weak on selected true-image terminal states.
+
+Repair source22cf176a/executable091c0661,2,370 execution pins,66.212892s native
+function/66.70s test,25.826287s CPU analysis. Closure2,518 pins,successful guard9/
+failed guard27,both services terminal,four full first-origin/draw lossless clips
+with98 decoded frames checked. Source/executables/weights/all modes/arrays and
+original failures remain;736,178,565-byte disposable cache released after review.
+Full physics,events,memory,coverage,untouched families and fresh confirmation
+remain required. No new learner,unchanged extension or automatic successor.
