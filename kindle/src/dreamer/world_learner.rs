@@ -20,6 +20,8 @@ mod fixed_teacher;
 use fixed_teacher::TeacherAnchor;
 
 #[cfg(test)]
+mod gaussian_tests;
+#[cfg(test)]
 mod gradient_diagnostic;
 #[cfg(test)]
 mod motion_tests;
@@ -94,6 +96,20 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let gaussian = metadata["config"]["world_gaussian"]
+        .as_bool()
+        .unwrap_or(false);
+    if gaussian && metadata["format"] != "kindle-world-only-v8" {
+        return Err("Gaussian world requires checkpoint format v8".into());
+    }
+    if metadata["format"] == "kindle-world-only-v8"
+        && (!gaussian
+            || metadata["pixel_loss"] != "motion_cross_entropy"
+            || metadata["config"]["rgb_previous_frame"] == true
+            || metadata["config"]["rgb_latent_only"] == true)
+    {
+        return Err("invalid Gaussian checkpoint architecture or objective".into());
+    }
     let latent_only = metadata["config"]["rgb_latent_only"]
         .as_bool()
         .unwrap_or(false);
@@ -142,7 +158,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v4"
             | "kindle-world-only-v5"
             | "kindle-world-only-v6"
-            | "kindle-world-only-v7",
+            | "kindle-world-only-v7"
+            | "kindle-world-only-v8",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -360,6 +377,9 @@ impl WorldModelLearner {
                 && (prediction_length != 16 || config.rgb_previous_frame || config.rgb_latent_only))
         {
             return Err("invalid fixed teacher objective, source or geometry".into());
+        }
+        if config.world_gaussian && pixel_loss != PixelLoss::MotionCrossEntropy {
+            return Err("Gaussian world requires the motion RGB objective without a phase".into());
         }
         validate_config(&config)?;
         config.check().map_err(io::Error::other)?;
@@ -586,9 +606,7 @@ impl WorldModelLearner {
                     &stoch[time * sw..(time + 1) * sw],
                 );
             } else {
-                let uniforms = (0..batch * size.stoch * size.classes)
-                    .map(|_| self.rng.random_range(1e-6..1.0 - 1e-6))
-                    .collect::<Vec<_>>();
+                let uniforms = super::gaussian::noise(&self.config, &mut self.rng);
                 self.train.set_input(&format!("uniforms_{time}"), &uniforms);
             }
             if self.pixel_loss.predictive() {
@@ -661,9 +679,7 @@ impl WorldModelLearner {
             if (self.pixel_loss.fixed_teacher() || !self.pixel_loss.recurrent_energy())
                 && (!self.pixel_loss.latent_overshooting() || time + 1 < weights.len())
             {
-                let uniforms = (0..batch * size.stoch * size.classes)
-                    .map(|_| self.rollout_rng.random_range(1e-6..1.0 - 1e-6))
-                    .collect::<Vec<_>>();
+                let uniforms = super::gaussian::noise(&self.config, &mut self.rollout_rng);
                 let prefix = if self.pixel_loss.latent_overshooting() {
                     "latent_rollout"
                 } else {
@@ -774,7 +790,7 @@ impl WorldModelLearner {
         let size = self.config.network();
         let mut deter = vec![0.0; batch * size.deter];
         let mut stoch = vec![0.0; batch * size.stoch * size.classes];
-        let mut logits = vec![0.0; stoch.len()];
+        let mut logits = vec![0.0; batch * size.stoch * self.config.latent_parameter_classes()];
         let width = self.config.observation_dim();
         let mut encoded = if include_features {
             vec![0.0; batch * self.config.encoded_observation_dim()]
@@ -816,14 +832,7 @@ impl WorldModelLearner {
             if include_features && time + 1 == length {
                 self.observe.read_output_by_index(3, &mut encoded);
             }
-            stoch = sample_latents(
-                &logits,
-                batch,
-                size.stoch,
-                size.classes,
-                self.config.unimix,
-                &mut rng,
-            );
+            stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
         }
         let decode = |session: &mut Session, deter: &[f32], stoch: &[f32]| {
             session.set_input("deter", deter);
@@ -860,14 +869,7 @@ impl WorldModelLearner {
             self.transition.wait();
             self.transition.read_output_by_index(0, &mut deter);
             self.transition.read_output_by_index(1, &mut logits);
-            stoch = sample_latents(
-                &logits,
-                batch,
-                size.stoch,
-                size.classes,
-                self.config.unimix,
-                &mut rng,
-            );
+            stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
             result
                 .observations
                 .extend(decode(&mut self.decoder, &deter, &stoch));
@@ -926,7 +928,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.pixel_loss == PixelLoss::MotionFixedTeacherImage {
+        let format = if self.config.world_gaussian {
+            "kindle-world-only-v8"
+        } else if self.pixel_loss == PixelLoss::MotionFixedTeacherImage {
             "kindle-world-only-v7"
         } else if self.config.rgb_previous_frame {
             assert_eq!(self.training_scope, TrainingScope::All);
@@ -990,6 +994,9 @@ impl WorldModelLearner {
         let metadata: serde_json::Value =
             serde_json::from_slice(&std::fs::read(path.join("metadata.json"))?)?;
         let pixel_loss = checkpoint_pixel_loss(&metadata)?;
+        if metadata["config"]["world_gaussian"].as_bool() == Some(true) {
+            return Err("frozen visual phase requires categorical latents".into());
+        }
         if metadata["config"]["rgb_previous_frame"].as_bool() == Some(true) {
             return Err("frozen visual phase requires single-frame RGB".into());
         }

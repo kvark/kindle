@@ -484,10 +484,10 @@ impl Prior {
                 graph,
                 "world.dynamics.priorlogit",
                 size.hidden,
-                size.stoch * size.classes,
+                size.stoch * config.latent_parameter_classes(),
             ),
             stoch: size.stoch,
-            classes: size.classes,
+            classes: config.latent_parameter_classes(),
         }
     }
 
@@ -592,12 +592,12 @@ impl Posterior {
                 graph,
                 "world.representation.posterior.obslogit",
                 size.hidden,
-                size.stoch * size.classes,
+                size.stoch * config.latent_parameter_classes(),
             ),
             encoded_dim,
             deter,
             stoch: size.stoch,
-            classes: size.classes,
+            classes: config.latent_parameter_classes(),
         }
     }
 
@@ -694,7 +694,7 @@ pub(crate) fn straight_through_sample(
     graph.add(hard_sample, correction)
 }
 
-pub(crate) struct CategoricalKl {
+pub(crate) struct KlLoss {
     pub(crate) loss: NodeId,
     pub(crate) raw: NodeId,
 }
@@ -711,7 +711,7 @@ pub(crate) fn categorical_kl(
     stop_posterior: bool,
     stop_prior: bool,
     free_nats: f32,
-) -> CategoricalKl {
+) -> KlLoss {
     let posterior_logits = if stop_posterior {
         graph.stop_gradient(posterior_logits)
     } else {
@@ -744,7 +744,7 @@ pub(crate) fn categorical_kl(
         let clamped = graph.add(excess, floor);
         graph.mean_all(clamped)
     };
-    CategoricalKl { loss, raw }
+    KlLoss { loss, raw }
 }
 
 pub(crate) fn feature(

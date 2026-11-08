@@ -15,6 +15,7 @@ mod cpu;
 mod device_copy;
 mod distributions;
 mod exploration;
+mod gaussian;
 mod intrinsic;
 mod networks;
 mod readback;

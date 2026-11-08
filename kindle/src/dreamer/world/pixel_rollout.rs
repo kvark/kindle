@@ -54,23 +54,33 @@ pub(super) fn build(
             &format!("pixel_rollout_uniforms_{time}"),
             &[batch * size.stoch, size.classes],
         );
-        let sampled = gumbel_sample(
-            graph,
-            logits,
-            uniforms,
-            batch * size.stoch,
-            size.classes,
-            config.unimix,
-        );
-        let sampled = graph.stop_gradient(sampled);
-        let probabilities = mixed_probabilities(
-            graph,
-            logits,
-            batch * size.stoch,
-            size.classes,
-            config.unimix,
-        );
-        stoch = straight_through_sample(graph, sampled, probabilities);
+        stoch = if config.world_gaussian {
+            super::super::gaussian::sample(
+                graph,
+                logits,
+                uniforms,
+                batch * size.stoch,
+                size.classes,
+            )
+        } else {
+            let sampled = gumbel_sample(
+                graph,
+                logits,
+                uniforms,
+                batch * size.stoch,
+                size.classes,
+                config.unimix,
+            );
+            let sampled = graph.stop_gradient(sampled);
+            let probabilities = mixed_probabilities(
+                graph,
+                logits,
+                batch * size.stoch,
+                size.classes,
+                config.unimix,
+            );
+            straight_through_sample(graph, sampled, probabilities)
+        };
         let state = feature(graph, deter, stoch, batch, config);
         #[cfg(test)]
         states.push(state);
@@ -113,15 +123,19 @@ mod tests {
 
     #[test]
     fn future_images_are_targets_only_and_prior_parameters_receive_gradients() {
-        for pixel_loss in [
-            PixelLoss::SquaredError,
-            PixelLoss::CrossEntropy,
-            PixelLoss::MotionCrossEntropy,
-            PixelLoss::MotionFixedTeacherImage,
+        for (pixel_loss, gaussian) in [
+            (PixelLoss::SquaredError, false),
+            (PixelLoss::CrossEntropy, false),
+            (PixelLoss::MotionCrossEntropy, false),
+            (PixelLoss::MotionFixedTeacherImage, false),
+            (PixelLoss::MotionCrossEntropy, true),
         ] {
             let mut config = DreamerConfig::tiny(3);
             config.observation_kind = ObservationKind::Rgb64;
             config.actor_critic_gradient = false;
+            config.world_gaussian = gaussian;
+            config.loss_scales.policy = 0.0;
+            config.loss_scales.value = 0.0;
             config.loss_scales.replay_value = 0.0;
             let mut graph = Graph::new();
             let model = WorldModel::with_behavior(&mut graph, &config, false);

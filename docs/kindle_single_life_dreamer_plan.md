@@ -2,6 +2,18 @@
 
 ## Selected direction: Breakout world model in isolation
 
+The [Gaussian latent reference](experiments/2026-11-07-breakout-world-gaussian.md)
+is selected for native qualification on November8 before a fresh8192-update H16
+motion-RGB learner. Default-off/standalone512 Gaussian scalars replace categorical
+state;prior/posterior mean+scale projections double,adding263,168 weights,total
+9,115,843/68 logical/204 tensors. Same CNN/GRU/decoder/state widths,data and gates.
+No teacher/labels/actor/critic/new backend primitive. Family/capacity/KL/sampling/
+gradients change together;no isolated bias cause. CPU math/graph/header/config/
+ancestry/Clippy pass;preserve tiny reward-bin full-geometry fixture failure and
+separate correction. Packaging/native qualification pending,no GPU allocation.
+Root `/mnt/data/kindle-breakout-world-gaussian-20261107` keeps its selection tag;
+full goal remains unproven. No completed learner or collector repeats.
+
 The [fixed-filter direct RGB phase](results/2026-11-07-breakout-world-fixed-image.md)
 is closed and fails retention. Warm4096 updates8192→12288 from original H0 with
 fixed full filter/36 visual weights/32 learned forecast-head weights and existing

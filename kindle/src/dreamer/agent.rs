@@ -497,6 +497,10 @@ pub struct DreamerCore {
 
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
+        assert!(
+            !config.world_gaussian,
+            "Gaussian state is standalone world only"
+        );
         let gpu = Arc::new(crate::init_gpu_context()?);
         Ok(Self::with_gpu(config, gpu))
     }
@@ -553,6 +557,10 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
+        assert!(
+            !config.world_gaussian,
+            "Gaussian state is standalone world only"
+        );
         config.validate();
         assert!(
             !config.replay_value_completed || std::env::var_os("KINDLE_DEVICE_TARGETS").is_none(),
@@ -2898,6 +2906,12 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.config.world_gaussian {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "Gaussian state is standalone world only",
+        ));
+    }
     if metadata.collection_streams == 0 {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,

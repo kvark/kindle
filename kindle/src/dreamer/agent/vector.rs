@@ -967,6 +967,9 @@ impl VectorDreamerAgent {
         streams: usize,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         config.check()?;
+        if config.world_gaussian {
+            return Err("Gaussian state is standalone world only".into());
+        }
         check_capacity(&config, streams)?;
         if !config.observation_kind.is_rgb() {
             return Err(

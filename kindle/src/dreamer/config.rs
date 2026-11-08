@@ -328,6 +328,9 @@ pub struct DreamerConfig {
     /// Standalone RGB world: image-only posterior and stochastic-only decoder.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_latent_only: bool,
+    /// Standalone RGB world: diagonal Gaussian state with reparameterized samples.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub world_gaussian: bool,
     /// Downsample the learned RGB encoder with stride-two convolutions, without max-pooling.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_stride2: bool,
@@ -498,6 +501,7 @@ impl DreamerConfig {
             rgb_previous_frame: false,
             rgb_coordinates: false,
             rgb_latent_only: false,
+            world_gaussian: false,
             rgb_stride2: false,
             observation_crop: None,
             video_encoder: None,
@@ -598,6 +602,10 @@ impl DreamerConfig {
     pub fn feature_dim(&self) -> usize {
         let size = self.network();
         size.deter + size.stoch * size.classes
+    }
+
+    pub(crate) fn latent_parameter_classes(&self) -> usize {
+        self.network().classes * if self.world_gaussian { 2 } else { 1 }
     }
 
     pub const fn observation_dim(&self) -> usize {
@@ -824,6 +832,21 @@ impl DreamerConfig {
             return Err("auxiliary actor boundaries require observed lower-bound mode and nonnegative reward scales".into());
         }
         let size = self.network();
+        if self.world_gaussian
+            && (!self.observation_kind.is_rgb()
+                || self.video_encoder.is_some()
+                || self.rgb_frame_pair
+                || self.rgb_previous_frame
+                || self.rgb_latent_only
+                || self.observation_crop.is_some()
+                || self.is_cdp()
+                || self.loss_scales.policy != 0.0
+                || self.loss_scales.value != 0.0
+                || self.loss_scales.replay_value != 0.0
+                || self.actor_critic_gradient)
+        {
+            return Err("Gaussian latents require a standalone plain RGB world".into());
+        }
         if self.rgb_previous_frame
             && (!self.observation_kind.is_rgb()
                 || self.video_encoder.is_some()

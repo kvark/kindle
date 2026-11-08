@@ -6,7 +6,7 @@ and [PR31](https://github.com/kvark/kindle/pull/31) for the live dashboard.
 The five-game goal remains unfinished. Detailed experiment history belongs in
 those reports; historical “next” paragraphs do not authorize restarting jobs.
 
-## Current work — November 7
+## Current work — November 8
 
 The active goal is **prove the world model training on Breakout**. Actor/critic
 and the five-game campaign are parked. Use the native pixel-supervised
@@ -14,26 +14,24 @@ CNN/categorical RSSM/RGB decoder as the inspectable reference; CDP is a later
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-The [fixed-filter direct RGB phase](results/2026-11-07-breakout-world-fixed-image.md)
-is closed and fails retention. Same fixed full H0 filter/36 visual weights,
-32 learned forecast/head weights; existing H16 motion RGB replaces latent/h
-suffix objectives. Recorded dev108/112 observed,94/109 one,17/107 eight;16/32
-return3/114 and0/95. Primary energy.303067 is78.80% worse than H0.169502;
-LEFT presence52/64 and ending32 Brier.451774 fail.18/304 non-ending cases>5%,
-max10.994%,remain reported despite passing category-mean gate. Keep coverage.
-No extension,repeat,sweep or automatic successor; full goal remains unproven.
+Select the [Gaussian latent world reference](experiments/2026-11-07-breakout-world-gaussian.md)
+for native qualification before a separately declared fresh8192-update H16 learner.
+Optional `world_gaussian`,default off,standalone only:512 continuous Gaussian
+scalars with learned mean/scale and reparameterized draws;existing categorical
+H0 remains retained. CNN/GRU/decoder/state widths stay;four output projections
+double,adding263,168 weights(total9,115,843;68 logical/204 tensors). No teacher,
+new data/object labels,actor/critic or backend primitive. This changes family,
+capacity,KL geometry and gradients;sampling bias is a hypothesis,not isolated.
 
-Root `/mnt/data/kindle-breakout-world-fixed-image-20261107`;native/source/runner
-b4d4f8f2,SHA9402c44d.85 world CPU/97 packaged Python/Clippy checks pass. First
-qualifier462 pins/19.872s,learning469 pins/123 CPU inputs,
-84 branches1133 pins,2653-pin closure,four guards/36 sealed files pass.
-All4096 finite11-report updates,204 inherited/frozen tensors,32 active changed/
-36 fixed visual weights,384 dense-initial origins,24 fixed visual arrays,18
-restored arrays and teacher GPU/file identity pass. No native stage failure/retry.
-New native455.465s/loop532.665s plus inherited529.515s/796.900s;observed worker
-550.646s includes construction/dense-initial/pins/polling;frozen branches150.138s
-separate. Extra filter and warm/development limits remain disclosed.834,978,639-byte
-build cache released;useful checkpoints/runtime/source retained. All services terminal.
+Root `/mnt/data/kindle-breakout-world-gaussian-20261107` retains its selection tag;
+qualification/learning work is current November8. CPU math/graph/header/config/
+ancestry checks and strict Clippy pass. First full-geometry fixture retained tiny
+reward bins15 instead of255;preserve original failure and corrected CPU check.
+Native packaging/qualification pending;no GPU allocation or full learner declared.
+
+The [direct RGB fixed-filter phase](results/2026-11-07-breakout-world-fixed-image.md)
+remains closed/failed:eight17/107,energy.303067(78.8% worse than H0),ending32
+Brier.451774,LEFT presence52/64. No prior learner or collector repeats.
 
 The [preceding fixed-target phase](results/2026-11-07-breakout-world-fixed-teacher.md)
 remains closed/failed:one98/109,eight17/107,energy.141405(16.58% gain),RIGHT

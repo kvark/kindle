@@ -388,6 +388,10 @@ fn training_graph(
 ) -> Graph {
     config.validate();
     assert!(
+        !behavior || !config.world_gaussian,
+        "Gaussian state is standalone world only"
+    );
+    assert!(
         !behavior || !config.rgb_previous_frame,
         "previous-frame RGB is world-only"
     );
@@ -576,39 +580,54 @@ fn training_graph(
         if pixel_loss.latent_overshooting() {
             posterior_targets.push(posterior_logits);
         }
-        let hard_sample = if pixel_loss.fixed_teacher() {
-            graph.input(
-                &format!("fixed_teacher_stoch_{time}"),
-                &[batch * size.stoch, size.classes],
-            )
-        } else if sample_posterior {
-            let uniforms = graph.input(
+        stoch = if config.world_gaussian {
+            assert!(sample_posterior);
+            let noise = graph.input(
                 &format!("uniforms_{time}"),
                 &[batch * size.stoch, size.classes],
             );
-            let sampled = gumbel_sample(
+            super::gaussian::sample(
                 &mut graph,
                 posterior_logits,
-                uniforms,
+                noise,
+                batch * size.stoch,
+                size.classes,
+            )
+        } else {
+            let hard_sample = if pixel_loss.fixed_teacher() {
+                graph.input(
+                    &format!("fixed_teacher_stoch_{time}"),
+                    &[batch * size.stoch, size.classes],
+                )
+            } else if sample_posterior {
+                let uniforms = graph.input(
+                    &format!("uniforms_{time}"),
+                    &[batch * size.stoch, size.classes],
+                );
+                let sampled = gumbel_sample(
+                    &mut graph,
+                    posterior_logits,
+                    uniforms,
+                    batch * size.stoch,
+                    size.classes,
+                    config.unimix,
+                );
+                graph.stop_gradient(sampled)
+            } else {
+                graph.input(
+                    &format!("posterior_sample_{time}"),
+                    &[batch * size.stoch, size.classes],
+                )
+            };
+            let probabilities = mixed_probabilities(
+                &mut graph,
+                posterior_logits,
                 batch * size.stoch,
                 size.classes,
                 config.unimix,
             );
-            graph.stop_gradient(sampled)
-        } else {
-            graph.input(
-                &format!("posterior_sample_{time}"),
-                &[batch * size.stoch, size.classes],
-            )
+            straight_through_sample(&mut graph, hard_sample, probabilities)
         };
-        let probabilities = mixed_probabilities(
-            &mut graph,
-            posterior_logits,
-            batch * size.stoch,
-            size.classes,
-            config.unimix,
-        );
-        stoch = straight_through_sample(&mut graph, hard_sample, probabilities);
         deters.push(deter);
         stochs.push(stoch);
         if model.exploration.is_some() {
@@ -627,32 +646,60 @@ fn training_graph(
             keep_action,
         });
 
-        let dynamics_kl = categorical_kl(
-            &mut graph,
-            posterior_logits,
-            prior_logits,
-            batch,
-            size.stoch,
-            size.classes,
-            config.unimix,
-            true,
-            false,
-            config.dynamics_free_nats(),
-        );
+        let dynamics_kl = if config.world_gaussian {
+            super::gaussian::kl(
+                &mut graph,
+                posterior_logits,
+                prior_logits,
+                batch,
+                size.stoch,
+                size.classes,
+                true,
+                false,
+                config.dynamics_free_nats(),
+            )
+        } else {
+            categorical_kl(
+                &mut graph,
+                posterior_logits,
+                prior_logits,
+                batch,
+                size.stoch,
+                size.classes,
+                config.unimix,
+                true,
+                false,
+                config.dynamics_free_nats(),
+            )
+        };
         dynamics_losses.push(dynamics_kl.loss);
         raw_kl_metrics.push(dynamics_kl.raw);
-        let representation_kl = categorical_kl(
-            &mut graph,
-            posterior_logits,
-            prior_logits,
-            batch,
-            size.stoch,
-            size.classes,
-            config.unimix,
-            false,
-            true,
-            config.free_nats,
-        );
+        let representation_kl = if config.world_gaussian {
+            super::gaussian::kl(
+                &mut graph,
+                posterior_logits,
+                prior_logits,
+                batch,
+                size.stoch,
+                size.classes,
+                false,
+                true,
+                config.free_nats,
+            )
+        } else {
+            categorical_kl(
+                &mut graph,
+                posterior_logits,
+                prior_logits,
+                batch,
+                size.stoch,
+                size.classes,
+                config.unimix,
+                false,
+                true,
+                config.free_nats,
+            )
+        };
         representation_losses.push(representation_kl.loss);
     }
 
