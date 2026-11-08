@@ -60,3 +60,19 @@ timeout is not a stopped job. No extension, sweep or automatic successor.
 Precise physics, event calibration, persistent brick memory, late/tunnel/second-
 wall coverage, untouched families and fresh confirmation remain required.
 Current oracle has no above-top-brick endpoint. The full goal remains unproven.
+
+
+CPU preparation verifies the real two-cycle plan and scaled sealed counts without
+recounting. A four-step actual-loop stand-in uses one learner across its cycle
+boundary, with reports/masks/exposures correct and no GPU/emulator construction.
+Native preflight then passes137 pins in29.151661s:80 logical parameters,
+603,915 scalars,240 tensors,77 first-update changes/required families,13 finite
+reports/mask/total,own finite/frozen tensors and18 initial/trained restores. Guard
+seals9 files. No native rebuild, primitive rerun or old-model query.
+
+After review, fresh16,384(3600s) and final restore(600s) are separately declared.
+Final declaration159 pins adds18 own preflight-reference files before allocation;
+the earlier141-pin declaration remains preserved. This is declaration finalization,
+not a failed/repeated learner. Learning is active. Its first report matches the
+qualified update exactly;512 early updates take56.603892s native. Other host GPU
+work may exist;no exclusive benchmark. No frozen final assessment is allocated.

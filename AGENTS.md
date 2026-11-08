@@ -35,11 +35,17 @@ or speed benefit is established. Root
 `/mnt/data/kindle-breakout-world-small64-20261108`.
 
 CPU driver controls pass: real plan is two exact cycles; a four-step stand-in
-uses one continuous learner and preserves reports/masks/counts. No GPU/emulator
-construction occurred. Next separately declare a bounded600s smaller-shape
-native preflight, recording all shapes/scalars,13 finite reports and18 exact
-initial/trained restore arrays. No full learner or GPU allocation is declared.
-Only after review may the fixed16,384 learner/final restore be separately declared.
+uses one continuous learner and preserves reports/masks/counts without GPU or
+emulator construction. Native preflight passes137 pins in29.152s:80 logical /
+603,915 scalars /240 tensors,77 changed first-update weights,required families,
+13 finite reports/mask/total and18 exact initial/trained restore arrays. Guard
+seals9 files. No build or primitive qualification repeats.
+
+After reviewed preflight, fresh16,384 and final restore are separately declared
+under3600s/600s with159 pins, including own initial references. Learning is active;
+first report matches qualification exactly. Initial512 updates take56.604s native
+(~.111s/update), an early shared-host observation rather than an exclusive speed
+benchmark. No frozen final assessment is allocated yet; fixed gates stay unchanged.
 
 The [closed action/transport trial](docs/results/2026-11-08-breakout-world-action-transport.md) remains failed: short gates pass,
 but primary energy.387593 versus H0.169502,RIGHT16 false risk.488927 and197/304
