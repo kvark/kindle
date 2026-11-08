@@ -1,5 +1,9 @@
 # Breakout: explicit32-action world supervision under a bounded budget
 
+Outcome:closed and fails retention. See the [completed result](../results/2026-11-08-breakout-world-h32.md).
+All selected native stages are terminal;no GPU allocation or successor is selected.
+The full world-model goal remains active and unproven.
+
 The [survival diagnostic](../results/2026-11-08-breakout-world-survival-decomposition.md)
 shows large ending-mass penalties but substantial ball error even with oracle
 survival. The [local-action world](../results/2026-11-08-breakout-world-local-action.md)
@@ -116,3 +120,21 @@ parse remain. No learner or query repeats.
 After reviewed learning,the fixed final84 groups are separately declared under
 1,800s with1,769 pins,both histories andeight draws. Cached controls/oracle are
 reused;no new collection,no successor or extension. All original gates stand.
+
+
+Final assessment completes84 groups/both histories/eight draws with240 frozen
+tensors and no learning. Primary energy.329402470601 fails.127126664317 and
+trails H0.169502219090/local H16.240565683475. Ending16 Brier.000890787467 and
+RIGHT16 risk.033947321688 pass,false alarms152/304 improve,but32 Brier
+.398760383680 and REVERSE freeflight47/64 fail. All oracle outcomes through16
+are alive;false-alarm suppression is not demonstrated terminal recognition.
+All original gates and per-action/horizon regressions remain authoritative.
+
+Closure verifies3,453 pins,four successful guards/36 sealed pins,original failed
+27-pin guard and allfive terminal services. Native assessment220.130800s,
+CPU comparison96.506064s,closure15.893948s;preparation/guard spans/figures and
+failures are additional costs. All arrays,weights,source/runtime,curves,three
+fixed full causal clips and their lossless decode checks are retained. No build
+cache was created. No extension,collection,sweep,completed-stage repeat or
+automatic successor is selected. Full physics,events,memory,coverage and fresh
+confirmation remain unproven.
