@@ -8,14 +8,15 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 ## Current work — November 8
 
-The active goal is **prove the world model training on Breakout**. Actor/critic
+The goal **prove the world model training on Breakout** is paused by the user. Actor/critic
 and the five-game campaign are parked. Use native pixel supervision and retained
 categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
 Full competence remains unproven. No pretrained encoder or object/RAM training labels.
 
 The [causal-prior objective](experiments/2026-11-08-breakout-world-clean-prior.md)
-is qualified and its separately declared fresh8,192 learner/final restore are
-active. Explicit `motion_clean_prior` trains main RGB/reward/continuation readouts
+is qualified; its declared learner is stopped at the user's pause request.
+It reports2,998 updates; latest retained weights are checkpoint2,048. No final
+checkpoint, restore or frozen assessment completed. Do not restart automatically. Explicit `motion_clean_prior` trains main RGB/reward/continuation readouts
 from causal priors at every valid observed transition;the posterior teacher/KL
 and H16 free-rollout losses remain. Mask reset/first arrivals;no extra decoder
 pass,weights,heads,labels,collector or image feedback. Same fusion geometry/
