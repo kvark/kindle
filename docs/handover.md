@@ -11,58 +11,45 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels.
+object/RAM training labels. No GPU allocation or next learner is selected.
 
-The [fixed-event protocol](experiments/2026-11-08-breakout-world-fixed-events.md)
-is the active allocation. Add future reward/continuation supervision to the two
-existing recurrent draws of the fixed-filter phase; no new parameters or RGB
-suffix loss. Keep the immutable H0 observation filter and36 fixed visual weights;
-32 dynamics/head weights learn. Native qualification passes1241 pins/33.158s:
-204 exact inherited tensors,18 cached v6 initial arrays,original13 raw components,
-16 finite reports/new total,32 changed active/36 fixed visual weights,18 restore
-arrays,filter/anchor/observed-output invariance and new target/mask/lane controls.
-Old native rejects v16 before GPU. One guard/nine sealed files pass.
+The [fixed-filter/future-event phase](results/2026-11-08-breakout-world-fixed-events.md)
+is closed and fails retention. Observed/one/eight108/112,83/109,22/107;fitting eight
+44/176. Primary energy.166164 versus original fixed-filter.141405 and H0.169502,
+missing the unchanged.127127 gate. Freeflight8 presence61/62/60/62 of64 passes
+all commands, and nonending alarms remain0/304. Ending32 Brier improves.334714→
+.120330 but ending16 worsens.000253→.094185;RIGHT16 false risk.024970→.438322.
+This is a timing/forecast tradeoff,not accurate physics or a proven error cause.
+Keep H0 as the inspectable reference; all original gates and failures stay.
 
-The first1250-pin full launcher fails in Python report validation after one native
-update returns: validity-at10 incorrectly handles the new validity-at13 layout.
-No report/advanced state is saved; one unsaved update is discarded. Preserve its
-failed guard/observer and34.725s worker/polling span; native update time is unknown.
-Two actual CPU training-loop cases reproduce it; four fresh/warm legacy/new cases
-pass after the Python-only membership repair. Native qualification remains passed.
+Warm4096 updates8192→12288 from the same H0 anchor;immutable observation filter,
+36 fixed visual weights and32 changed dynamics/head weights. New16 reports and
+v16,source/native249786f1/SHAab645a5b;Python runner repair84de0f5a. Native395.123s/
+loop457.361s,plus inherited H0529.515s/796.900s. Original failed launcher remains
+failed:one unlogged/unsaved update,unknown native duration,34.725s worker/polling.
+Four CPU loop checks repair its Python report-layout assertion; initial/dense
+queries are reused rather than repeated. Source formatting/first CPU graph failure
+and separate repairs remain preserved.117 distinct CPU/224 packaged Python and
+strict core/test/binding Clippy pass;repair checks overlap older cases.
 
-Repaired4096-update warm learning (8192→12288),final restore and CPU audit pass
-1377/123 pins:16 finite reports,total/energy/plan/exposures,32 changed/36 fixed
-weights,24 exact visual arrays,204 frozen tensors,108 reused initial arrays,384
-dense origins and18 restore arrays. Development observed/one/eight108/112,83/109,
-22/107;only observed gate passes. Native395.123s/loop457.361s. Separately declared
-84 frozen groups are active,1134 pins. Same H0 anchor/plan/config; original completed initial/dense
-arrays are copied/hashed, not queried again. All204 fresh initial tensors match
-H0 and the first16 logged reports match qualification exactly. RNG restarts; this
-is not an uninterrupted continuation or fresh confirmation. All original gates stay. Native/source249786f1,
-SHAab645a5b; repaired runner84de0f5a. Active root
-`/mnt/data/kindle-breakout-world-fixed-events-20261108/runner-repair`; parent retains
-qualification and original failed launcher. No native rebuild/requalification.
+All16 finite reports/total/energy/plan/exposures,32 changed/36 fixed weights,
+24 exact visual arrays,204 frozen tensors,108 initial arrays,384 dense origins and
+18 final restore arrays pass.84 frozen groups,history16 primary/32 secondary,
+eight draws,all horizons;no old-model/collector repeat. Four successful guards/
+36 sealed files plus original failed guard/27 sealed files,1572 bitwise tensor
+comparisons and3196 closure pins pass. No recovery/reset/NVML/unfinished child.
+Root `/mnt/data/kindle-breakout-world-fixed-events-20261108/runner-repair`;parent
+retains qualification/failed launcher. Source,runtime,weights,arrays,figures and
+fixed causal clips remain;836,276,083 counted build-cache bytes stay released.
 
-117 distinct CPU/224 original packaged Python checks and strict core/test/binding
-Clippy pass; the four repair checks overlap older cases and are not added as an
-independent test count. Preserve fixture formatting failure and first CPU116-pass/
-one-failure target-collection omission with its separate gate repair. No116-test
-rerun. Released836,276,083 counted build-cache bytes; source,wheel,runtime/test
-executable retained. Native learning stays on Meganeura+Blade.
-
-The [RGB-weight1 result](results/2026-11-08-breakout-world-rgb1.md) stays
-closed/failed:91/112 observed,85/109 one,25/107 eight;primary.477757 versus RGB100
-.283365/H0.169502;175/304 nonending alarms. All four guards/36 files/1911 closure
-pins pass; no extension. Its low training KL does not establish useful physics.
-The [original fixed-filter phase](results/2026-11-07-breakout-world-fixed-teacher.md)
-stays closed/failed despite16.58% primary improvement; new work adds event losses
-from the same H0 anchor rather than extending that final. All other completed
-learners,assessments,collectors and failures stay retained; do not repeat them.
-
-No unchanged extension,sweep or automatic successor. Precise physics,event timing/
+The [RGB-weight1 experiment](results/2026-11-08-breakout-world-rgb1.md),
+[original fixed filter](results/2026-11-07-breakout-world-fixed-teacher.md) and
+[joint suffix events](results/2026-11-08-breakout-world-suffix-events.md) remain
+closed/failed. Do not repeat completed learners,assessments or collectors. No
+unchanged extension,sweep or automatic successor. Precise physics,event timing/
 calibration,persistent removed-brick memory,late/tunnel/second-wall coverage,
 untouched families and fresh confirmation remain required. The oracle has no
-above-top-brick endpoints. Full world-model and five-game goals remain unfinished.
+above-top-brick endpoints. Full world-model and five-game goals stay unfinished.
 
 ## Current AMD runtime and retained position
 
