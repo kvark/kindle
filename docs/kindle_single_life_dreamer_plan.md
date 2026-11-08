@@ -2,22 +2,27 @@
 
 ## Selected direction: Breakout world model in isolation
 
-The [Gaussian latent reference](experiments/2026-11-07-breakout-world-gaussian.md)
-is selected for native qualification on November8 before a fresh8192-update H16
-motion-RGB learner. Default-off/standalone512 Gaussian scalars replace categorical
-state;prior/posterior mean+scale projections double,adding263,168 weights,total
-9,115,843/68 logical/204 tensors. Same CNN/GRU/decoder/state widths,data and gates.
-No teacher/labels/actor/critic/new backend primitive. Family/capacity/KL/sampling/
-gradients change together;no isolated bias cause. CPU math/graph/header/config/
-ancestry/Clippy pass;preserve tiny reward-bin full-geometry fixture failure and
-separate correction. Native qualifier461 pins/25.317s passes Gaussian values/derivatives,192 common
-initial/204 own tensors,18 initial/trained restored arrays,65 first-update changed
-weights,both distribution halves/continuous samples,204 frozen tensors and v8
-legacy rejection.263 affected Rust CPU/112 Python/Clippy pass after preserved
-fixture repair. Source/native/runner bc007ca2,SHA b79a1a74;separately declared
-fresh8192 H16 learner/final restore active under the AMD host guard.
-Root `/mnt/data/kindle-breakout-world-gaussian-20261107` keeps its selection tag;
-full goal remains unproven. No completed learner or collector repeats.
+The [Gaussian latent reference](results/2026-11-08-breakout-world-gaussian.md)
+is closed and fails retention after fresh 8,192-update H16 pixel-supervised learning.
+Observed/one/eight-step ball precision is 105/112,76/109,16/107; retained H0 is
+108/112,94/109,14/107. Primary long-horizon ball energy is .557271 versus .169502
+for H0 and .311977 for categorical H16. Free-flight ball presence is 40/40/40/47
+of64 across commands; RIGHT falsely predicts an ending at16 with probability
+.659267. Eight of304 individual non-ending cases exceed5% (maximum .055299),
+while their category means pass. This 512-dimensional bounded-scale Gaussian
+recipe does not solve forecasting; it does not rule out other continuous models.
+Keep categorical H0. No successor or GPU allocation is selected.
+
+Source/native/runner bc007ca2,SHA b79a1a74; root
+`/mnt/data/kindle-breakout-world-gaussian-20261107` retains its selection tag.
+Gaussian math/derivatives, common initialization, own initial/final restores,
+all68 changed parameters, finite reports, causal ancestry and frozen tensors pass.
+263 affected Rust CPU/112 packaged Python/strict Clippy checks pass after the
+preserved reward-bin fixture correction. Qualification461/learning468 pins,
+2,487-pin closure and four successful guards/36 sealed files pass; all services
+are terminal. Native learning810.106s/loop959.732s; frozen assessment156.697s
+separate. Released835,160,540-byte build cache; checkpoints/runtime/source and
+original failures remain retained. No completed learner or collector repeats.
 
 The [fixed-filter direct RGB phase](results/2026-11-07-breakout-world-fixed-image.md)
 is closed and fails retention. Warm4096 updates8192→12288 from original H0 with
