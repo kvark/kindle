@@ -2,21 +2,28 @@
 
 ## Selected direction: Breakout world model in isolation
 
-Select the [fixed-contact motion fitting diagnostic](experiments/2026-11-08-breakout-world-contact-fit.md).
-The motion-weighted H16 objective has not been checked on the original eight
-fixed fitting clips. Fresh 2,048 updates, RGB64/12M/B8/T32/Auto, seed41001/rates4e-4,
-unchanged qualified85dbe150/SHA5b112866 runtime. No rebuild, collection, labels,
-actor/critic, spatial decoder or image feedback. CPU review verifies eight source
-hashes, exact old contexts/futures/actions, episode boundaries and all204 common
-initial tensors.256 unique arrivals;262,144 replayed future targets;no future
-positive reward or terminal. This is motion/contact fitting,not event calibration.
+The [fixed-contact motion fitting result](results/2026-11-08-breakout-world-contact-fit.md)
+is closed and passes all 24 fitting gates. Fresh 2,048 updates fit all 110 supported
+future ball positions across actions 1..16 within one resized pixel on each of
+four fixed draws, plus 8/8 observed reconstructions. Eighteen positions per draw
+are unsupported. This proves fitting on eight trajectories, not general physics.
+Zero future reward/terminal positives; no event-calibration claim. Original full-
+corpus gates, untouched families, late-state coverage and fresh confirmation stay.
 
-Root `/mnt/data/kindle-breakout-world-contact-fit-20261108`. Declare one guarded
-900s learner and300s exact restore. Save initial/512/1024/2048 and all four fixed
-draws at every1..16 endpoint. Every supported observed/1/4/8/16 ball must be within
-one pixel on each draw,plus>=90% all1..16 support per draw. Original full-corpus
-gates and the full world-model goal stay unchanged; a fitting pass is diagnostic.
-No automatic extension, repeat or successor. No GPU allocation active yet.
+Reuse unchanged native85dbe150/SHA5b112866, RGB64/12M/B8/T32/H16/Auto and motion
+RGB objective. All 204 initial tensors match early/broad controls; 68 weights
+change; all 2,048 eleven-loss rows, 204 frozen tensors and 32 exact restored draw
+arrays pass. Native training 186.289s; loop 191.500s. No rebuild, collection,
+labels, actor/critic, spatial decoder or image feedback. Root
+`/mnt/data/kindle-breakout-world-contact-fit-20261108`; checkpoints/curves/clip retained.
+
+Preserve first launcher failure: missing guard helper, before any native worker
+or update. Separate CPU import repair and 57-pin unstarted-stage declaration
+complete the original learner/restore without repeating a native stage. Two
+successful guards/18 sealed files and 132-pin closure pass; original failed
+service remains failed. Full goal remains unproven; keep H0 as broad reference.
+The next question is retaining this precision across diverse histories/actions;
+no next GPU allocation, extension or automatic successor is selected.
 
 The [image-feedback result](results/2026-11-08-breakout-world-image-feedback.md)
 is closed/failed:90/112 observed,87/109 one,26/107 eight;primary energy.256859
