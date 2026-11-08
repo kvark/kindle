@@ -1,5 +1,8 @@
 # Breakout: can the corrective model fit its clean launches?
 
+**Closed.** Original CPU serialization failed; separate CPU-only repair completes
+missing evidence. [Fitting and conditional-spread result](../results/2026-11-08-breakout-world-launch-fitting.md).
+
 Select one new frozen fitting diagnostic after the [failed corrective phase](../results/2026-11-08-breakout-world-launch-corrective.md).
 Its natural fitting exports cover the original16 streams, not the new launch
 branches. The new question is whether the model produces the learned launch

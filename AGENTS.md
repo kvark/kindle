@@ -25,22 +25,23 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [clean-launch fitting diagnostic](docs/experiments/2026-11-08-breakout-world-launch-fitting.md) is selected. The corrective model's new fitting branches
-were not included in its original16-stream fitting exports. Query only its final
-20,480 state onall288 retained launch branches:36 eight-lane groups,four fixed
-latent draws,history16/endpoints1/4/8/16/32. No training,gradient,new gameplay,
-other model query or old assessment repeat. Check source joins,finite arrays,
-all240 frozen tensors/ages andthe existing host guard. Root
-`/mnt/data/kindle-breakout-world-launch-fitting-20261108`. No learner is selected.
-The question is fitting versus different-context failure,not a new world gate;
-all draws/missing objects remain andfitting success cannot repair the failed trial.
+The [launch-fitting diagnostic](docs/results/2026-11-08-breakout-world-launch-fitting.md) is closed. Final20,480 onall288 fitting branches,36 groups,
+four draws: FIRE visible/within1px counts532/370 of576 at1,496/173 at8,156/0 at32;
+non-FIRE haszero false balls. At16 no below-brick truth support exists.
+Two valid real source futures fromidentical past/command often differ widely:
+mean1-step separation6.949px,while median maximum model-draw separation.0326px
+among63 fully detected conditions. Fixed preview shows faint multiple balls
+within each nearly identical sampled image. Point agreement alone is not a
+stochastic fitting criterion. This supports reviewing the added prior-image loss,
+not a proved cause or guaranteed remedy. No learner/GPU allocation is selected.
 
-The [corrective trial](docs/results/2026-11-08-breakout-world-launch-corrective.md) stays closed and failed:ball energy.172366→.229385;
-natural eight-step53/107→46/107;234/304 false alarms. Retain earlier small64.
-Native455.523s/loop527.794s;new final84 groups170.763s,closure1,785 pins/three
-guards/27 files/two terminal services. Report-only generator correction preserved,
-sealed original restored;no measured files changed. The [new collection](docs/results/2026-11-08-breakout-world-clean-launch.md),
-[conditional audit](docs/results/2026-11-08-breakout-world-transition-support.md),[survival sensitivity](docs/results/2026-11-08-breakout-world-small64-survival.md) and[small64 trial](docs/results/2026-11-08-breakout-world-small64.md) remain closed. Do not repeat them.
+Native31.309s/390 pins/240 frozen tensors andages;zero training/actions/frames.
+Original CPU coordinate serialization fails andstays preserved;separate CPU-only
+repair completes2,016 joins/5,760 cases in2.855s without inference repeat.
+Post-hoc conditional-spread support.118s;502-pin closure.340s andone9-file guard.
+Root `/mnt/data/kindle-breakout-world-launch-fitting-20261108`. The [corrective trial](docs/results/2026-11-08-breakout-world-launch-corrective.md) staysfailed:
+energy.172366→.229385,natural8-step53/107→46/107,234/304 alarms. Retain earlier
+small64. All completed learners/collectors/diagnostics remain closed.
 
 All original physics/event gates stand. Precise physics, event timing/calibration,
 persistent brick memory, late/tunnel/second-wall coverage, untouched families and
