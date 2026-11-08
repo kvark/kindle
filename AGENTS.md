@@ -35,18 +35,29 @@ suffix loss. Keep the immutable H0 observation filter and36 fixed visual weights
 arrays,filter/anchor/observed-output invariance and new target/mask/lane controls.
 Old native rejects v16 before GPU. One guard/nine sealed files pass.
 
-The separately declared4096-update warm phase (8192→12288) and final restore are
-active,1250 pins. Same H0 anchor,first4096 plan rows,16 fitting/eight development
-streams,RGB64/12M/B8/T32/H16/Auto,rates4e-4,mixing.01,base RGB100,KL1/.1,latent KL1,
-recurrent energy100,all event scales1. This is not uninterrupted training or fresh
-confirmation. Final84 frozen groups await reviewed learning/restore; all gates stay.
-Source/native/runner249786f1,native SHAab645a5b. Root
-`/mnt/data/kindle-breakout-world-fixed-events-20261108`. Native training stays on
-Meganeura+Blade.117 distinct CPU/224 packaged Python checks and strict core/test/
-binding Clippy pass. Preserve initial fixture formatting failure and first CPU
-116-pass/one-failure target-collection omission; separate production-gate repair
-and targeted test pass. No116-test rerun or new native-stage failure. Released
-836,276,083 counted build-cache bytes; source,wheel,runtime/test executable retained.
+The first1250-pin full launcher fails in Python report validation after one native
+update returns: validity-at10 incorrectly handles the new validity-at13 layout.
+No report/advanced state is saved; one unsaved update is discarded. Preserve its
+failed guard/observer and34.725s worker/polling span; native update time is unknown.
+Two actual CPU training-loop cases reproduce it; four fresh/warm legacy/new cases
+pass after the Python-only membership repair. Native qualification remains passed.
+
+A separately declared repaired4096-update warm phase (8192→12288) and final restore
+are active,1377 pins. Same H0 anchor/plan/config; original completed initial/dense
+arrays are copied/hashed, not queried again. All204 fresh initial tensors match
+H0 and the first16 logged reports match qualification exactly. RNG restarts; this
+is not an uninterrupted continuation or fresh confirmation. Final84 frozen groups
+await reviewed learning/restore. All original gates stay. Native/source249786f1,
+SHAab645a5b; repaired runner84de0f5a. Active root
+`/mnt/data/kindle-breakout-world-fixed-events-20261108/runner-repair`; parent retains
+qualification and original failed launcher. No native rebuild/requalification.
+
+117 distinct CPU/224 original packaged Python checks and strict core/test/binding
+Clippy pass; the four repair checks overlap older cases and are not added as an
+independent test count. Preserve fixture formatting failure and first CPU116-pass/
+one-failure target-collection omission with its separate gate repair. No116-test
+rerun. Released836,276,083 counted build-cache bytes; source,wheel,runtime/test
+executable retained. Native learning stays on Meganeura+Blade.
 
 The [RGB-weight1 result](docs/results/2026-11-08-breakout-world-rgb1.md) stays
 closed/failed:91/112 observed,85/109 one,25/107 eight;primary.477757 versus RGB100
