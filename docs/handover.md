@@ -10,7 +10,7 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 
 The active goal is **prove the world model training on Breakout**. Actor/critic
 and the five-game campaign are parked. Use the native pixel-supervised
-CNN/categorical RSSM/RGB decoder as the inspectable reference; CDP is a later
+CNN/RSSM/RGB decoder with retained categorical H0 as the inspectable reference; CDP is a later
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
@@ -27,7 +27,13 @@ Root `/mnt/data/kindle-breakout-world-gaussian-20261107` retains its selection t
 qualification/learning work is current November8. CPU math/graph/header/config/
 ancestry checks and strict Clippy pass. First full-geometry fixture retained tiny
 reward bins15 instead of255;preserve original failure and corrected CPU check.
-Native packaging/qualification pending;no GPU allocation or full learner declared.
+First native qualifier461 pins/25.317s passes Gaussian F64 values/derivatives,
+192 common initial tensors/64 weights,204 own-initial tensors,18 initial/trained
+restore arrays,continuous samples,both mean/scale projection changes,65 first-update
+changed parameters,204 frozen tensors and old-native v8 rejection.263 affected
+Rust CPU/112 packaged Python/strict Clippy checks pass after the preserved fixture
+correction. Source/native/runner bc007ca2,SHA b79a1a74. The separately declared
+fresh8192-update H16 learner and final restore are active under the AMD host guard.
 
 The [direct RGB fixed-filter phase](results/2026-11-07-breakout-world-fixed-image.md)
 remains closed/failed:eight17/107,energy.303067(78.8% worse than H0),ending32

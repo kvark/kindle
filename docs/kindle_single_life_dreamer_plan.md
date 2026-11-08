@@ -10,7 +10,12 @@ state;prior/posterior mean+scale projections double,adding263,168 weights,total
 No teacher/labels/actor/critic/new backend primitive. Family/capacity/KL/sampling/
 gradients change together;no isolated bias cause. CPU math/graph/header/config/
 ancestry/Clippy pass;preserve tiny reward-bin full-geometry fixture failure and
-separate correction. Packaging/native qualification pending,no GPU allocation.
+separate correction. Native qualifier461 pins/25.317s passes Gaussian values/derivatives,192 common
+initial/204 own tensors,18 initial/trained restored arrays,65 first-update changed
+weights,both distribution halves/continuous samples,204 frozen tensors and v8
+legacy rejection.263 affected Rust CPU/112 Python/Clippy pass after preserved
+fixture repair. Source/native/runner bc007ca2,SHA b79a1a74;separately declared
+fresh8192 H16 learner/final restore active under the AMD host guard.
 Root `/mnt/data/kindle-breakout-world-gaussian-20261107` keeps its selection tag;
 full goal remains unproven. No completed learner or collector repeats.
 
@@ -76,7 +81,7 @@ world-model competence as the immediate objective. Gameplay score is a later
 integration measure. Do not restart any closed learner, collector or comparison.
 The active goal is **prove the world model training on Breakout**. Actor/
 critic and the five-game campaign are parked. Use the native pixel-supervised
-CNN/categorical RSSM/RGB decoder as the inspectable reference; CDP is a later
+CNN/RSSM/RGB decoder with retained categorical H0 as the inspectable reference; CDP is a later
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
