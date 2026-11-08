@@ -36,6 +36,8 @@ mod previous_frame_tests;
 #[cfg(test)]
 mod spatial_decoder_tests;
 #[cfg(test)]
+mod spatial_fusion_tests;
+#[cfg(test)]
 mod state_diagnostic;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -102,6 +104,20 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let fusion = metadata["config"]["rgb_spatial_fusion"]
+        .as_bool()
+        .unwrap_or(false);
+    if fusion && metadata["format"] != "kindle-world-only-v12" {
+        return Err("spatial fusion requires checkpoint format v12".into());
+    }
+    if metadata["format"] == "kindle-world-only-v12"
+        && (!fusion
+            || metadata["config"]["rgb_spatial_decoder"] != true
+            || metadata["config"]["world_image_feedback"] == true
+            || metadata["pixel_loss"] != "motion_cross_entropy")
+    {
+        return Err("invalid spatial fusion checkpoint architecture or objective".into());
+    }
     let feedback = metadata["config"]["world_image_feedback"]
         .as_bool()
         .unwrap_or(false);
@@ -119,15 +135,17 @@ fn checkpoint_pixel_loss(
     let spatial = metadata["config"]["rgb_spatial_decoder"]
         .as_bool()
         .unwrap_or(false);
-    if spatial && !feedback && metadata["format"] != "kindle-world-only-v10" {
+    if spatial && !feedback && !fusion && metadata["format"] != "kindle-world-only-v10" {
         return Err("spatial decoder requires checkpoint format v10".into());
     }
-    if metadata["format"] == "kindle-world-only-v10"
-        && (!spatial
-            || metadata["pixel_loss"] != "motion_cross_entropy"
-            || metadata["config"]["world_gaussian"] == true
-            || metadata["config"]["rgb_previous_frame"] == true
-            || metadata["config"]["rgb_latent_only"] == true)
+    if matches!(
+        metadata["format"].as_str(),
+        Some("kindle-world-only-v10" | "kindle-world-only-v12")
+    ) && (!spatial
+        || metadata["pixel_loss"] != "motion_cross_entropy"
+        || metadata["config"]["world_gaussian"] == true
+        || metadata["config"]["rgb_previous_frame"] == true
+        || metadata["config"]["rgb_latent_only"] == true)
     {
         return Err("invalid spatial decoder checkpoint architecture or objective".into());
     }
@@ -216,7 +234,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v8"
             | "kindle-world-only-v9"
             | "kindle-world-only-v10"
-            | "kindle-world-only-v11",
+            | "kindle-world-only-v11"
+            | "kindle-world-only-v12",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -1049,7 +1068,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.world_image_feedback {
+        let format = if self.config.rgb_spatial_fusion {
+            "kindle-world-only-v12"
+        } else if self.config.world_image_feedback {
             "kindle-world-only-v11"
         } else if self.config.rgb_spatial_decoder {
             "kindle-world-only-v10"

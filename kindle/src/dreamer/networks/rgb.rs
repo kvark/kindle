@@ -240,6 +240,7 @@ pub(crate) struct Decoder {
     layers: Vec<ConvNorm>,
     output: Convolution,
     motion: Vec<ConvNorm>,
+    fusion: Option<Box<ConvNorm>>,
     deter: usize,
     stoch: usize,
     channels: usize,
@@ -302,7 +303,11 @@ impl Decoder {
             output: Convolution::new(
                 graph,
                 &format!("{name}.imgout"),
-                2 * size.vision_depth + if config.rgb_spatial_decoder { 8 } else { 0 },
+                if config.rgb_spatial_fusion {
+                    16
+                } else {
+                    2 * size.vision_depth + if config.rgb_spatial_decoder { 8 } else { 0 }
+                },
                 3,
                 side,
             ),
@@ -321,6 +326,15 @@ impl Decoder {
             } else {
                 Vec::new()
             },
+            fusion: config.rgb_spatial_fusion.then(|| {
+                Box::new(ConvNorm::new(
+                    graph,
+                    &format!("{name}.fusion"),
+                    2 * size.vision_depth + 8,
+                    16,
+                    side,
+                ))
+            }),
             deter: size.deter,
             stoch: size.stoch * size.classes,
             channels,
@@ -425,6 +439,9 @@ impl Decoder {
                 8 * self.side * self.side,
             );
             value = graph.reshape(value, &[batch * (channels + 8) * self.side * self.side]);
+            if let Some(fusion) = &self.fusion {
+                value = fusion.forward(graph, value, batch, false);
+            }
         }
         value = self.output.forward(graph, value, batch);
         graph.reshape(value, &[batch, 3 * self.side * self.side])
@@ -442,6 +459,8 @@ impl Decoder {
     }
 }
 
+#[cfg(test)]
+mod fusion_tests;
 #[cfg(test)]
 mod stride_tests;
 #[cfg(test)]

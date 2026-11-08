@@ -26,28 +26,29 @@ CNN/RSSM/RGB decoder with retained categorical H0 as the inspectable reference; 
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-The [contact-first curriculum result](docs/results/2026-11-08-breakout-world-contact-curriculum.md)
-is closed and fails retention. Warm age2,048 plus6,144 broad updates ends8,192:
-development observed/one/eight86/112,66/109,12/107;primary ball energy.322807
-versus H0.169502 (90.44% worse). Contact precision falls110/110 to26/17/20/20
-of110 across four draws. Only serve-NOOP/nonending category-mean gates pass;
-15 individual nonending cases exceed5%. Keep H0 as broad reference. This simple
-contact-first/data-switch recipe is not retained; no unchanged extension.
+Select the [nonlinear spatial fusion experiment](docs/experiments/2026-11-08-breakout-world-spatial-fusion.md)
+for native qualification. Add default-off `rgb_spatial_fusion` after joining
+history/global fields:ConvNorm5→16 channels then RGB Conv5. It requires standalone
+categorical spatial RGB without image feedback. Net+14,232 weights:80 logical/
+8,871,955 scalars/240 tensors. RSSM2560 and image history24,576 stay. Geometry,
+capacity,output width,receptive field and gradients change together; no cause or
+benefit is established. v12 binds the architecture; defaults/v1-v11 stay.
 
-Unchanged85dbe150/SHA5b112866 native,H16 motion RGB,RGB64/12M/B8/T32/Auto.
-All243 learning pins/156 CPU inputs,6,144 finite11-loss rows,68 changed weights,
-204 inherited/frozen tensors,384 dense origins,18 restored development arrays
-plus32 contact draw-arrays,84 frozen groups,three guards/27 sealed files and
-1,524-pin closure pass. New native565.070s/loop683.255s plus inherited
-186.289s/191.500s totals751.359s/874.755s. Frozen assessment166.236s separate.
-No new failure/rebuild/collection/labels/actor/critic. Inherited launcher failure
-and CPU repair remain preserved. Root
-`/mnt/data/kindle-breakout-world-contact-curriculum-20261108`;source/weights/curves/clips retained.
+Root `/mnt/data/kindle-breakout-world-spatial-fusion-20261108`.102 world CPU checks
+plus two RGB fusion CPU checks and strict core Clippy pass. F64 finite differences
+cover40 fusion input/16 output channels. Preserve first count-fixture failure and
+count-only correction,plus initial Clippy enum-size warning/fix:box the new CPU
+descriptor,unchanged GPU graph. Package/CPU CLI checks and one guarded new native
+qualification precede separately declared fresh8,192 learning. No GPU active yet.
+Use original H16/full plan/rates/seed and all physical/event gates;feedback and
+future event losses stay off. No labels,collection,actor/critic or backend op.
 
-Source-only `spatial-fusion-source-review.json` records an unselected architecture
-hypothesis:the optional history/global decoder fuses only before a linear output,
-with no joint nonlinear hidden layer. No cause or benefit is established. Full
-world competence remains unproven;no next GPU allocation or automatic successor.
+The [curriculum result](docs/results/2026-11-08-breakout-world-contact-curriculum.md)
+stays closed/failed:86/112 observed,66/109 one,12/107 eight;energy.322807 versus
+H0.169502;contact110/110→26/17/20/20. Three guards/1,524-pin closure pass. Keep H0
+as broad reference. No completed stage repeats,unchanged extension or automatic
+successor. Full physics,event calibration,late coverage and fresh confirmation
+remain unproven.
 
 The [fixed-contact result](docs/results/2026-11-08-breakout-world-contact-fit.md)
 remains closed/passed for fitting only:110/110 supported future positions on each
