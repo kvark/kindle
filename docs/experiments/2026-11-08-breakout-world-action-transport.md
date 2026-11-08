@@ -96,3 +96,18 @@ test executable SHAe4e1ef9a. Reused data/camera/causal/transport source receipts
 and old v18 initial values are pinned. Qualification is separately declared900s
 under host guard with1,274 input pins;no full learner is declared. Build cache is
 retained until native review for a concrete repair if needed.
+
+
+Native qualification passes first execution:1,274 pins,combined F64/native
+values/derivatives/action/lane/reset controls with zero fixture optimizer age,
+240 common initial tensors/16 nonimage arrays/10 initial non-RGB reports exact,
+246 own finite/frozen tensors,79 changed parameters including both new projection
+weights,13 finite reports/correct mask/total,18 initial/trained restore arrays and
+legacy pre-GPU rejection.118.533593s. Guard audit sealsnine pins with no unfinished
+children/recovery. After review,837,729,332-byte cache is released;wheel/runtime/
+source/test executable remain. No primitive qualification or old query repeats.
+
+Fresh8,192 from zero and final restore are separately declared under3600s/600s
+with1,282 pins. Same original full plan/counts,initial/2048/4096/final,periodic1024
+and384 dense actual-initial/final origins. No frozen final branch allocation yet,
+no automatic extension. Full world-model/five-game goals remain unfinished.

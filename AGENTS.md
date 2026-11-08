@@ -26,12 +26,13 @@ pixel supervision and H0 as the broad reference;no pretrained encoder or
 object/RAM training labels.
 
 The [action-conditioned transport protocol](docs/experiments/2026-11-08-breakout-world-action-transport.md) has passed146 affected CPU/392 packaged Python checks and strict core/binding
-Clippy;bounded900s AMD Auto native qualification is active. Combine the existing default-off action planes/
+Clippy. Native qualification passes1,274 pins in118.534s;the fresh8,192 learner
+and final restore are separately declared under3600s/600s,and learning is active. Combine the existing default-off action planes/
 width16 with learned pixel transport;explicit v19 binding preserves v17/v18 and
 older defaults. Adds595 weights to v18,82 logical/8,893,798 scalars/246 tensors.
 Select fresh8,192 B8/T32/H16,original rates4e-4/plan/event losses;no new collector,
 labels,pretrained encoder,backend primitive or actor/critic. Consult protocol.
-No full learner is declared. Source/runner5fe4545c,native SHA15bd4a8d.
+No final frozen assessment is allocated yet. Source/runner5fe4545c,native SHA15bd4a8d.
 Original scope-whitelist and test-helper collection failures remain retained. Root
 `/mnt/data/kindle-breakout-world-action-transport-20261108`.
 
