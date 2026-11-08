@@ -3,33 +3,39 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and unproven.
-Actor/critic,CDP comparisons and the five-game campaign stay parked. Use native
-pixel supervision and H0 as the broad reference;no pretrained encoder or
+Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
+pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [action-conditioned transport protocol](experiments/2026-11-08-breakout-world-action-transport.md) has passed146 affected CPU/392 packaged Python checks and strict core/binding
-Clippy. Native qualification passes1,274 pins in118.534s;the fresh8,192 learner
-and final restore are separately declared under3600s/600s,and learning is active. Combine the existing default-off action planes/
-width16 with learned pixel transport;explicit v19 binding preserves v17/v18 and
-older defaults. Adds595 weights to v18,82 logical/8,893,798 scalars/246 tensors.
-Select fresh8,192 B8/T32/H16,original rates4e-4/plan/event losses;no new collector,
-labels,pretrained encoder,backend primitive or actor/critic. Consult protocol.
-No final frozen assessment is allocated yet. Source/runner5fe4545c,native SHA15bd4a8d.
-Original scope-whitelist and test-helper collection failures remain retained. Root
+The [action-conditioned transport protocol](experiments/2026-11-08-breakout-world-action-transport.md) has completed its fresh
+8,192-update learner and exact final restore. CPU review passes 1,282 original
+pins and 219 audit inputs: all 13 reports finite, all 82 weights changed, exact
+plan/counts, 246 initial/frozen tensors, 384 dense origins, 58 finite exports and
+18 restore arrays. Development observed/1/4/8/16/32 ball counts are
+103/112, 100/109, 65/109, 43/107, 22/114, 8/95. The three short gates pass;
+long physical/event accuracy remains unproven. Native learning 1,794.491s,
+measured training/evaluation loop 1,973.503s, with other host GPU work present.
+
+After review, only the final frozen 84-group assessment is separately declared
+under 1,800s, with 1,981 pins, histories16/32 and eight draws. It is active;
+no learner is active. All oracle/control queries are cached. Root
 `/mnt/data/kindle-breakout-world-action-transport-20261108`.
+Native/source/runner5fe4545c, SHA15bd4a8d; explicit v19 composes existing action
+planes/width16 and pixel transport, adding595 weights to v18. Qualification,
+146 affected CPU/392 packaged Python checks, original CPU failures and released
+837,729,332-byte build cache remain retained. No extension or successor selected.
 
 The [closed state/history diagnostic](results/2026-11-08-breakout-world-state-history.md) motivates visual-transition
-stability:H16 eight-step prior46/108,h-only44/108,true-history96/108,history+h
-100/108. These are privileged readouts,not learned repairs or causal fractions.
-Event heads stay invariant under history swaps and weak on selected true-image
-terminal states. Original failure/repair,2,518 pins and all raw modes/clips stay.
-The [H32 recipe](results/2026-11-08-breakout-world-h32.md) remains closed and fails retention;do not extend it.
+stability: H16 eight-step prior46/108, h-only44/108, true-history96/108,
+history+h100/108. These privileged readouts are not learned gains or causal
+fractions. Event heads remain invariant under history swaps and weak on selected
+true-image terminal states. H32 and all earlier completed stages stay closed.
 
-All original physics/event gates stand. No unchanged recipe,sweep,completed-stage
-repeat or automatic successor. Precise physics,events,persistent brick memory,
-late/tunnel/second-wall coverage,untouched families and fresh confirmation remain
-required. Existing oracle has no above-top-brick endpoint. Intermediate and
-privileged diagnostic scores cannot complete the world-model or five-game goal.
+All original physics/event gates stand. Precise physics, event timing/calibration,
+persistent brick memory, late/tunnel/second-wall coverage, untouched families and
+fresh confirmation remain required. Existing oracle has no above-top-brick
+endpoint. No intermediate score completes the world-model or five-game goal.
+No unchanged extension, sweep, completed-stage repeat or automatic successor.
 
 ### What would establish the world model
 

@@ -111,3 +111,17 @@ Fresh8,192 from zero and final restore are separately declared under3600s/600s
 with1,282 pins. Same original full plan/counts,initial/2048/4096/final,periodic1024
 and384 dense actual-initial/final origins. No frozen final branch allocation yet,
 no automatic extension. Full world-model/five-game goals remain unfinished.
+
+
+Learning and final restore complete: 8,192 finite13-report updates, all82 weights
+changed, exact plan/counts and all four v19 configs,246 own initial/frozen tensors,
+384 dense actual-initial/final origins,58 finite exports and18 restore arrays.
+CPU review verifies1,282 original/219 audit pins in8.208s. Development observed/
+1/4/8/16/32 counts103/112,100/109,65/109,43/107,22/114,8/95;all three short gates
+pass. Native learning1,794.491362s,measured loop1,973.503401s. Other host GPU work
+was present;not an exclusive benchmark. No new emulator actions/frames.
+
+After reviewed learner/restore, final-only84 groups are separately declared
+under1,800s with1,981 pins,histories16 primary/32 secondary,eight draws. That
+assessment is active;no learner is active. Old models/oracle remain cached,
+no best checkpoint/draw or gate change. No extension or successor selected.
