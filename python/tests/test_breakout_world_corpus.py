@@ -125,14 +125,15 @@ def test_restore_comparison_axes_match_a_prefix_of_the_original_batch(tmp_path, 
 
 
 @pytest.mark.parametrize('inherited', [0, 8192])
-def test_training_counts_incremental_updates_and_uses_global_evaluation_paths(tmp_path, monkeypatch, inherited):
+@pytest.mark.parametrize('pixel_loss', ['motion_cross_entropy', corpus.FIXED_EVENTS_OBJECTIVE])
+def test_training_counts_incremental_updates_and_uses_global_evaluation_paths(tmp_path, monkeypatch, inherited, pixel_loss):
     import kindle
     from safetensors.numpy import save_file
     config = dict(seed=41001, batch_size=2, batch_length=32, loss_scales=dict(
         reconstruction=100., dynamics=1., representation=.1, reward=1., continuation=1.))
 
     class Learner:
-        def __init__(self): self.updates = inherited; self.config = config; self.pixel_loss = 'motion_cross_entropy'
+        def __init__(self): self.updates = inherited; self.config = config; self.pixel_loss = pixel_loss
         def save(self, path):
             path = Path(path); path.mkdir()
             save_file({'world.parameter': np.array([self.updates], np.float32)}, path/'world.safetensors')
@@ -141,6 +142,8 @@ def test_training_counts_incremental_updates_and_uses_global_evaluation_paths(tm
             self.updates += 1
             keep = corpus.rollout_validity(np.asarray(action).reshape(32,2),16)
             values = [0.,1.,2.,3.,4.,5.,0.,2.,0.,6.,float(keep.mean())]
+            if self.pixel_loss == corpus.FIXED_EVENTS_OBJECTIVE:
+                values = [0.,1.,2.,3.,4.,5.,0.,2.,0.,6.,.25,.5,.5,float(keep.mean()),.2,.3]
             values[0] = corpus.reported_total(config, values, self.pixel_loss, 16)
             return values
 
@@ -149,7 +152,7 @@ def test_training_counts_incremental_updates_and_uses_global_evaluation_paths(tm
     learner.save(str(source))
     output = tmp_path/'new'; output.mkdir()
     args = SimpleNamespace(output=output, reference=None, steps=2, prediction_length=16,
-        pixel_loss='motion_cross_entropy', eval_every=1, dense_fitting=1, dense_development=1)
+        pixel_loss=pixel_loss, eval_every=1, dense_fitting=1, dense_development=1)
     evaluated = []
     monkeypatch.setattr(corpus, 'require_device', lambda _: None)
     monkeypatch.setattr(corpus, 'evaluate_group', lambda model, data, locations, output, name, **kwargs:

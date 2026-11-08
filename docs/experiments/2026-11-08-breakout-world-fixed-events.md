@@ -81,3 +81,25 @@ source/log and add the new objective to collection of the existing target nodes.
 A separate rerun of only the failed test passes, giving117 distinct passing world
 checks,36 ignored. Strict core/test Clippy passes. The116 completed checks are
 not repeated; no GPU model was constructed by these CPU failures/repairs.
+
+## Python report-layout repair after the first launcher
+
+Native composition qualification passes1241 pins/33.158s, but the first full
+launcher fails at Python's post-update report check. The new objective was not
+excluded from the ordinary validity-at10 rule or included in the fixed-filter
+validity-at13/energy/total rules. One native update returned before this assertion;
+no update report or advanced checkpoint was saved. Preserve its failed guard,
+observer, initial snapshots/predictions and spent worker time; the one discarded
+update's native duration/report is unmeasured. No GPU fault/recovery is indicated.
+
+Two new CPU cases reproduce the actual training-loop failure. Include the new
+objective in the existing fixed-filter report rules; four fresh/warm legacy/new
+training-loop cases then pass. Native/source249786f1/SHAab645a5b is unchanged;
+no rebuild or native requalification. Use a separately declared repair allocation
+under `runner-repair`: new4096-update phase from the same H0 anchor, with the
+original completed initial/dense arrays and initial-dense-frozen snapshot copied
+and hash-verified. Skip those initial queries, check all204 fresh initial tensors
+against the anchor, keep the same plan, all new intermediate/final evidence and
+all gates. RNG restarts; this is not an uninterrupted continuation. Count the
+failed/discarded update and worker cost separately. Original failure stays failed;
+no old collector, qualifier or completed initial assessment repeats.

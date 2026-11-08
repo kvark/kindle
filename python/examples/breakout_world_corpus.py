@@ -301,9 +301,9 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             native_seconds += time.monotonic()-tick
             keep = rollout_validity(batch['action'], args.prediction_length)
             assert len(values) == len(report_names(args.pixel_loss, args.prediction_length))
-            if args.prediction_length and args.pixel_loss not in (RECURRENT_OBJECTIVE,FIXED_TEACHER_OBJECTIVE): assert values[10] == float(keep.mean())
+            if args.prediction_length and args.pixel_loss not in (RECURRENT_OBJECTIVE,FIXED_TEACHER_OBJECTIVE,FIXED_EVENTS_OBJECTIVE): assert values[10] == float(keep.mean())
             if args.pixel_loss == 'motion_clean_prior': assert values[13] == float((batch['action'] >= 0).mean())
-            if args.pixel_loss == FIXED_TEACHER_OBJECTIVE:
+            if args.pixel_loss in (FIXED_TEACHER_OBJECTIVE,FIXED_EVENTS_OBJECTIVE):
                 assert values[13] == float(keep.mean())
                 np.testing.assert_allclose(values[10],values[11]-.5*values[12],rtol=1e-5,atol=1e-5)
                 np.testing.assert_allclose(values[0],reported_total(config,values,args.pixel_loss,args.prediction_length),rtol=1e-5)
