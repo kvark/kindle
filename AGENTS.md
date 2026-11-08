@@ -25,22 +25,27 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [clean-wait fitting collection](docs/experiments/2026-11-08-breakout-world-clean-launch.md) is selected;no learner is selected.
-Eight fresh fitting seeds,32-arrival absent-ball prefixes at varied paddle
-positions,all18 constant32-command branches/two sticky repetitions:at most9,216
-new actions/36,864 frames (18,392/73,568 including source/private-state replay).
-Exact native16/32 development-history matches abort. Use the unchanged small64
-final16,384 as a frozen240-tensor native camera and existing host guard;no
-prediction/gradient/optimizer call or new backend qualification. Root
-`/mnt/data/kindle-breakout-world-clean-launch-20261108`.
+The [bounded launch-corrective phase](docs/experiments/2026-11-08-breakout-world-launch-corrective.md) is selected:4,096 new updates fromsmall64
+16,384→20,480,unchanged1M/RGB64/v18,B8/T32/H16,Auto,rates4e-4,RGB100,KL1/.1,
+event1,mixing.01. New sampler:two original natural,one supplement,one wait,one
+terminal,two clean-launch windows andone retained paired contact/life-loss/ending
+branch. Freeze the full plan/inputs before allocation. No old model/qualification
+repeat;reuse sealed inherited actual-initial evaluations. Warm start resets live
+belief/RNG;not uninterrupted training,an independent seed or isolated data cause.
+Root `/mnt/data/kindle-breakout-world-launch-corrective-20261108`.
 
-The [conditional support audit](docs/results/2026-11-08-breakout-world-transition-support.md) is closed:after16 stable absent-reference
-arrivals,first imagined FIRE1 has274 exposures/93 unique targets but aliases10–17
-have zero. Onlytwo ofeight older paired serve parents satisfy stable16/32;those
-branches were not small64 fitting data. Contact has nonzero support for all18
-commands;collision adequacy and a causal coverage explanation are not established.
-171 input/176 closure pins,1.377s CPU,no model/native/emulator/GPU work. The
-[survival sensitivity](docs/results/2026-11-08-breakout-world-small64-survival.md) remains privileged score substitution only.
+The [new clean-wait collection](docs/results/2026-11-08-breakout-world-clean-launch.md) is closed:288 full branches,all18 commands/two repetitions,
+9,216 new actions/36,864 frames;18,392 actions/73,568 frames and296 explicit resets
+including source/private-state replay. Allnine FIRE commands enter finite ball
+reference atdecision1;non-FIRE remain absent. Eight seeds givefour recent16-frame
+histories/five at32,not eight distinct physical states;no exact development16/32
+match. All240 camera tensors/ages unchanged;397 input/764 closure pins,35.002s
+collection/4.701s CPU review,one successful9-file guard. Do not repeat it.
+
+The [conditional support audit](docs/results/2026-11-08-breakout-world-transition-support.md) is closed:oldsmall64 first imagined FIRE1 had274 exposures/93
+unique targets afterstable16,butaliases10–17 hadzero. Existing paired data was
+not its fitting corpus. Contact already hasnonzero command support;adequacy and
+a causal coverage explanation remain unproven. The [survival sensitivity](docs/results/2026-11-08-breakout-world-small64-survival.md) remains privileged score substitution only.
 
 The [small RGB64 trial](docs/results/2026-11-08-breakout-world-small64.md) remains closed and failed:603,915 weights,
 16,384 fresh updates,natural eight-step53/107 but32-step8/95,primary.172366 versus

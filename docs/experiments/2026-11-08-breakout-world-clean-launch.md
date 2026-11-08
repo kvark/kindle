@@ -1,5 +1,7 @@
 # Breakout: clean waiting-to-launch fitting branches
 
+**Closed.** [Collection and verification](../results/2026-11-08-breakout-world-clean-launch.md).
+
 Select one new fitting-data collection, motivated by the [measured conditional
 launch gap](../results/2026-11-08-breakout-world-transition-support.md). The
 small64 model has no first-imagined FIRE-alias examples after a stable wait.
