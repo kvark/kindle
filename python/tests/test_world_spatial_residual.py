@@ -45,5 +45,5 @@ def test_spatial_residual_is_default_off_and_requires_fusion():
     assert 'rgb_spatial_residual' not in kindle.default_config(18, 'tiny')
     c = metadata()['config']
     c['rgb_spatial_fusion'] = False
-    with pytest.raises(ValueError, match='spatial residual requires the standalone fused RGB decoder'):
+    with pytest.raises(ValueError, match='suffix event objective requires spatial fusion and a positive prediction length'):
         kindle.WorldModelLearner(c, prediction_length=16, pixel_loss='motion_event_rollout')
