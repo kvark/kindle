@@ -2,41 +2,26 @@
 
 ## Selected direction: Breakout world model in isolation
 
-The goal **prove the world model training on Breakout** is active after user resumption. Actor/critic
-and the five-game campaign are parked. Use native pixel supervision and retained
-categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
-Full competence remains unproven. No pretrained encoder or object/RAM training labels.
+The goal **prove the world model training on Breakout** remains active and unproven.
+Actor/critic,CDP comparisons and the five-game campaign remain parked. Use native
+pixel supervision and categorical H0 as the inspectable reference. No pretrained
+encoder or object/RAM training labels. No GPU allocation or successor is selected.
 
-The [causal-prior objective](experiments/2026-11-08-breakout-world-clean-prior.md)
-is qualified and its bounded continuation is active after user resumption.
-The original interrupted run reports2,998 updates; retained checkpoint2,048
-starts6,144 new updates toward8,192,using exact original plan rows2,048:8,192.
-This is a warm start with optimizer state retained and RNG restarted;950 unsaved
-updates remain counted as spent compute. Original interrupted guard stays unsealed.
-A first restore assertion compared differing decimal representations and failed;
-the separate repair proves bit-exact float32 config identity,then matches all18
-cached arrays and240 unchanged tensors.1,431-pin resumed learning uses runner61bf7acb,
-unchanged native35c090d0/SHA d60f2888,AMD/Auto/host guard. No completed query repeats.
-Resume root `/mnt/data/kindle-breakout-world-clean-prior-20261108/resume`.
-Only after reviewed final learning/restore may its84 frozen groups run. Explicit `motion_clean_prior` trains main RGB/reward/continuation readouts
-from causal priors at every valid observed transition;the posterior teacher/KL
-and H16 free-rollout losses remain. Mask reset/first arrivals;no extra decoder
-pass,weights,heads,labels,collector or image feedback. Same fusion geometry/
-inference/data;80 weights/8,871,955 scalars/240 tensors,v14,14 API reports.
-Conditioning,gradients,reset weighting and RNG sampling change together.
-
-Root `/mnt/data/kindle-breakout-world-clean-prior-20261108`. Support count finds
-65,454 real-history first-suffix forecasts/623 terminals versus2,021,344 potential
-valid causal transitions/10,826 terminals. Counts are exposures,not independent
-data or proof of a bottleneck.108 world CPU/241 packaged Python/strict core-
-binding Clippy pass. New batched native controls pass without repeating old math
-fixtures. Qualification1,222 pins/35.760s passes target/image/mask independence,
-lane isolation,zero losses under zero masks,all240 parent initial tensors/18
-cached initial arrays,18 initial/trained restores,77 changed weights and14
-finite reports/totals/fractions,plus old-native v14 rejection. Source/native/runner
-35c090d0,SHA d60f2888. Learning1,230 pins,AMD/Auto/host guard.
-Released865,662,743 counted build-cache bytes;runtime,wheel,CPU executable,
-source,support audit and useful checkpoints retained. No qualification repeats.
+The [causal-prior world learner](results/2026-11-08-breakout-world-clean-prior.md)
+is closed/fails retention:observed/one/eight precision93/112/90/109/27/107;primary energy
+0.452156 versus H0.169502;235/304 non-ending alarms>5%.
+The user-interrupted original2998 reports retains2048;resumed6144 reaches8192.
+Warm start retains optimizer,restarts RNG,and preserves950 discarded reports.
+All8192 retained-lineage14-report rows,80 changed weights,240 exact paused/frozen
+tensors,384 dense origins and18 final restore arrays pass. Five successful guards/
+45 sealed files/3058 closure pins pass. Preserve first resumed restore config
+assertion failure/float32 repair and CPU metric-field summary failure/repair;original interrupted guard
+stays unsealed. Native/source35c090d0/SHA d60f2888,runner61bf7acb unchanged.
+Native retained lineage1166.406s;actual logged spent
+1301.933s;new loop999.845s. Last interrupted in-flight cost unmeasured.
+Root `/mnt/data/kindle-breakout-world-clean-prior-20261108/resume`;all sources,
+arrays,checkpoints,failures and runtime retained;original865,662,743-byte build
+cache remains released. No completed learner,query,collector or qualification repeats.
 
 The [suffix-event learner](results/2026-11-08-breakout-world-suffix-events.md)
 remains closed/failed:observed98/112,one97/109,eight31/107;primary.283365 versus
