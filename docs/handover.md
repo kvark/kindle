@@ -29,14 +29,19 @@ emulator construction. Native preflight passes137 pins in29.152s:80 logical /
 13 finite reports/mask/total and18 exact initial/trained restore arrays. Guard
 seals9 files. No build or primitive qualification repeats.
 
-After reviewed preflight, fresh16,384 and final restore are separately declared
-under3600s/600s with159 pins, including own initial references. Learning is active;
-first report matches qualification exactly. Initial512 updates take56.604s native
-(~.111s/update), an early shared-host observation rather than an exclusive speed
-benchmark. No frozen final assessment is allocated yet; fixed gates stay unchanged.
-Final analysis is prepared: cached-report aggregation reproduces1,680 scalar
-fields/480 point rows without old forecast RGB reads; the protocol retains a
-separate CPU-only repair for the older H0 timer schema.
+The fresh16,384 learner and exact final restore are complete. CPU review passes
+159 input/198 audit pins:all finite13-report rows,first exact qualified report,
+80 changed weights,240 own initial/frozen tensors,continuous two-cycle plan/counts,
+384 dense origins,58 finite exports and18 restore arrays. Development observed/
+1/4/8/16/32 counts103/112,102/109,69/109,53/107,22/114,8/95 pass the three short gates;
+long physical/event retention is unproven. Native learning2,203.088s,measured
+training/evaluation loop2,369.265s;separate shared-host runs,not a kernel benchmark.
+
+Only after that review,final-only84 groups are separately declared under1,800s
+with863 pins,histories16 primary/32 secondary and eight draws. Assessment is active;
+no learner is active. Cached control aggregation matches1,680 scalar fields/480
+point rows without old forecast RGB reads. Original timer-schema CPU precheck
+failure and its separate `step` fallback repair remain. No successor is selected.
 
 The [closed action/transport trial](results/2026-11-08-breakout-world-action-transport.md) remains failed: short gates pass,
 but primary energy.387593 versus H0.169502,RIGHT16 false risk.488927 and197/304

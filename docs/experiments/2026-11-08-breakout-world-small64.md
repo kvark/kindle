@@ -95,3 +95,17 @@ clips avoid rereading old forecast RGB for display too.
 The [pixel-generator architecture review](../results/2026-11-08-breakout-world-pixel-generators-review.md)
 records research hypotheses while this fixed learner continues. It does not
 select a successor or alter the current model,budget,losses or gates.
+
+
+Learner and exact final restore complete. CPU review verifies159 input/198 audit
+pins in7.655099s:16,384 finite13-report rows,first qualified report exact,all80
+weights changed,240 own initial/frozen tensors,continuous global ages/two-cycle
+plan/exposures,four exact v18 configurations,384 dense actual-initial/final
+origins,58 finite exports and18 restore arrays. Development counts observed/
+1/4/8/16/32:103/112,102/109,69/109,53/107,22/114,8/95. All three short gates pass.
+Native learning2,203.087522s,measured loop2,369.265223s;not an exclusive benchmark.
+
+After review, final-only84 groups are separately declared under1,800s with863
+pins,histories16 primary/32 secondary and eight draws. That assessment is active;
+no learner is active. Old forecasts stay cached;fixed gates and final selection
+stand. No extension or successor is selected.
