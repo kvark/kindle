@@ -392,6 +392,10 @@ fn training_graph(
         "Gaussian state is standalone world only"
     );
     assert!(
+        !behavior || !config.rgb_spatial_decoder,
+        "spatial decoder is standalone world only"
+    );
+    assert!(
         !behavior || !config.rgb_previous_frame,
         "previous-frame RGB is world-only"
     );
@@ -488,6 +492,7 @@ fn training_graph(
     let mut predictive_log_probabilities = Vec::new();
     let mut predictive_losses = Vec::new();
     let mut actions = Vec::new();
+    let mut spatial_keeps = Vec::new();
 
     for time in 0..length {
         let action = graph.input(
@@ -504,6 +509,9 @@ fn training_graph(
             &format!("keep_action_{time}"),
             &[batch, config.action_count],
         );
+        if config.rgb_spatial_decoder {
+            spatial_keeps.push(graph.mean_inner(keep_action));
+        }
         let masked_deter = graph.mul(deter, keep_deter);
         let masked_stoch = graph.mul(stoch, keep_stoch);
         let masked_action = graph.mul(action, keep_action);
@@ -825,7 +833,27 @@ fn training_graph(
         }
         if let Some(decoder) = &model.decoder {
             let squared = if pixel_loss != PixelLoss::SquaredError {
-                let loss = decoder.cross_entropy(&mut graph, state, observation, rows);
+                let loss = if config.rgb_spatial_decoder {
+                    let start = group * time_batch_length;
+                    let histories = (start..start + chunk.len())
+                        .map(|t| {
+                            super::spatial_history::before(
+                                &mut graph,
+                                &observations,
+                                &spatial_keeps,
+                                t,
+                                batch,
+                                config.observation_dim(),
+                            )
+                        })
+                        .collect::<Vec<_>>();
+                    let history =
+                        stack_time(&mut graph, &histories, batch, 2 * config.observation_dim());
+                    let logits = decoder.logits_with_history(&mut graph, state, history, rows);
+                    super::networks::pixel_cross_entropy(&mut graph, logits, observation)
+                } else {
+                    decoder.cross_entropy(&mut graph, state, observation, rows)
+                };
                 if pixel_loss.motion_attention() {
                     let start = group * time_batch_length;
                     let previous = (start..start + chunk.len())
@@ -1172,7 +1200,17 @@ fn training_graph(
         assert!(!behavior && config.loss_scales.reconstruction > 0.0);
         assert!(prediction_length < length);
         let start = length - prediction_length;
-        pixel_rollout::build(
+        let history = config.rgb_spatial_decoder.then(|| {
+            super::spatial_history::after(
+                &mut graph,
+                &observations,
+                &spatial_keeps,
+                start - 1,
+                batch,
+                config.observation_dim(),
+            )
+        });
+        pixel_rollout::build_with_history(
             &mut graph,
             config,
             &model,
@@ -1180,6 +1218,7 @@ fn training_graph(
             &actions[start..],
             &observations[start - 1..],
             pixel_loss,
+            history,
         )
     });
     let total = if let Some(rollout) = &pixel_rollout {
@@ -1746,7 +1785,12 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
     let deter = graph.input("deter", &[batch, size.deter]);
     let stoch = graph.input("stoch", &[batch * size.stoch, size.classes]);
     let state = feature(&mut graph, deter, stoch, batch, config);
-    let observation = decoder.forward(&mut graph, state, batch);
+    let observation = if config.rgb_spatial_decoder {
+        let history = graph.input("decoder_history", &[batch, 2 * config.observation_dim()]);
+        decoder.forward_with_history(&mut graph, state, history, batch)
+    } else {
+        decoder.forward(&mut graph, state, batch)
+    };
     let observation = raw_prediction(
         &mut graph,
         observation,

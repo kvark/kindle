@@ -498,6 +498,10 @@ pub struct DreamerCore {
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
         assert!(
+            !config.rgb_spatial_decoder,
+            "spatial decoder is standalone world only"
+        );
+        assert!(
             !config.world_gaussian,
             "Gaussian state is standalone world only"
         );
@@ -557,6 +561,10 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
+        assert!(
+            !config.rgb_spatial_decoder,
+            "spatial decoder is standalone world only"
+        );
         assert!(
             !config.world_gaussian,
             "Gaussian state is standalone world only"
@@ -2906,6 +2914,12 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.config.rgb_spatial_decoder {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "spatial decoder is standalone world only",
+        ));
+    }
     if metadata.config.world_gaussian {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,

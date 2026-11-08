@@ -32,6 +32,8 @@ mod posterior_correction_diagnostic;
 #[cfg(test)]
 mod previous_frame_tests;
 #[cfg(test)]
+mod spatial_decoder_tests;
+#[cfg(test)]
 mod state_diagnostic;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -96,6 +98,21 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let spatial = metadata["config"]["rgb_spatial_decoder"]
+        .as_bool()
+        .unwrap_or(false);
+    if spatial && metadata["format"] != "kindle-world-only-v10" {
+        return Err("spatial decoder requires checkpoint format v10".into());
+    }
+    if metadata["format"] == "kindle-world-only-v10"
+        && (!spatial
+            || metadata["pixel_loss"] != "motion_cross_entropy"
+            || metadata["config"]["world_gaussian"] == true
+            || metadata["config"]["rgb_previous_frame"] == true
+            || metadata["config"]["rgb_latent_only"] == true)
+    {
+        return Err("invalid spatial decoder checkpoint architecture or objective".into());
+    }
     let gaussian = metadata["config"]["world_gaussian"]
         .as_bool()
         .unwrap_or(false);
@@ -179,7 +196,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v6"
             | "kindle-world-only-v7"
             | "kindle-world-only-v8"
-            | "kindle-world-only-v9",
+            | "kindle-world-only-v9"
+            | "kindle-world-only-v10",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -400,6 +418,9 @@ impl WorldModelLearner {
         }
         if config.world_gaussian && pixel_loss != PixelLoss::MotionCrossEntropy {
             return Err("Gaussian world requires the motion RGB objective without a phase".into());
+        }
+        if config.rgb_spatial_decoder && pixel_loss != PixelLoss::MotionCrossEntropy {
+            return Err("spatial decoder requires the motion RGB objective without a phase".into());
         }
         validate_config(&config)?;
         config.check().map_err(io::Error::other)?;
@@ -854,16 +875,29 @@ impl WorldModelLearner {
             }
             stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
         }
-        let decode = |session: &mut Session, deter: &[f32], stoch: &[f32]| {
+        let decode = |session: &mut Session, deter: &[f32], stoch: &[f32], history: &[f32]| {
             session.set_input("deter", deter);
             session.set_input("stoch", stoch);
+            if self.config.rgb_spatial_decoder {
+                session.set_input("decoder_history", history);
+            }
             session.step();
             session.wait();
             let mut pixels = vec![0.0; batch * width];
             session.read_output_by_index(0, &mut pixels);
             pixels
         };
-        let posterior = decode(&mut self.decoder, &deter, &stoch);
+        let posterior_history = if self.config.rgb_spatial_decoder {
+            super::spatial_history::before_cpu(observations, actions, length - 1, batch, width)
+        } else {
+            Vec::new()
+        };
+        let posterior = decode(&mut self.decoder, &deter, &stoch, &posterior_history);
+        let mut history = if self.config.rgb_spatial_decoder {
+            super::spatial_history::after_cpu(observations, actions, length - 1, batch, width)
+        } else {
+            Vec::new()
+        };
         let mut result = WorldPrediction {
             posterior,
             observations: Vec::new(),
@@ -890,9 +924,11 @@ impl WorldModelLearner {
             self.transition.read_output_by_index(0, &mut deter);
             self.transition.read_output_by_index(1, &mut logits);
             stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
-            result
-                .observations
-                .extend(decode(&mut self.decoder, &deter, &stoch));
+            let image = decode(&mut self.decoder, &deter, &stoch, &history);
+            if self.config.rgb_spatial_decoder {
+                history = super::spatial_history::shift_cpu(&history, &image, width);
+            }
+            result.observations.extend(image);
             if include_features {
                 result
                     .prior_features
@@ -948,7 +984,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.world_gaussian_dim.is_some() {
+        let format = if self.config.rgb_spatial_decoder {
+            "kindle-world-only-v10"
+        } else if self.config.world_gaussian_dim.is_some() {
             "kindle-world-only-v9"
         } else if self.config.world_gaussian {
             "kindle-world-only-v8"
@@ -1016,6 +1054,9 @@ impl WorldModelLearner {
         let metadata: serde_json::Value =
             serde_json::from_slice(&std::fs::read(path.join("metadata.json"))?)?;
         let pixel_loss = checkpoint_pixel_loss(&metadata)?;
+        if metadata["config"]["rgb_spatial_decoder"].as_bool() == Some(true) {
+            return Err("frozen visual phase requires the original RGB decoder".into());
+        }
         if metadata["config"]["world_gaussian"].as_bool() == Some(true) {
             return Err("frozen visual phase requires categorical latents".into());
         }

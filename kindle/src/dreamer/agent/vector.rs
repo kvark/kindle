@@ -967,6 +967,9 @@ impl VectorDreamerAgent {
         streams: usize,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         config.check()?;
+        if config.rgb_spatial_decoder {
+            return Err("spatial decoder is standalone world only".into());
+        }
         if config.world_gaussian {
             return Err("Gaussian state is standalone world only".into());
         }

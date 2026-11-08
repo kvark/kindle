@@ -95,6 +95,7 @@ impl WorldModelLearner {
             || length != 0
             || age == 0
             || metadata["config"]["world_gaussian"].as_bool() == Some(true)
+            || metadata["config"]["rgb_spatial_decoder"].as_bool() == Some(true)
             || metadata["config"]["rgb_previous_frame"].as_bool() == Some(true)
             || metadata["config"]["rgb_latent_only"].as_bool() == Some(true)
         {

@@ -6,6 +6,8 @@ pub(super) struct PixelRollout {
     pub loss: NodeId,
     #[cfg(test)]
     pub states: Vec<NodeId>,
+    #[cfg(test)]
+    pub predictions: Vec<NodeId>,
 }
 
 fn motion_loss(
@@ -23,6 +25,7 @@ fn motion_loss(
     graph.sum_all(weighted)
 }
 
+#[cfg(test)]
 pub(super) fn build(
     graph: &mut Graph,
     config: &DreamerConfig,
@@ -32,6 +35,30 @@ pub(super) fn build(
     observations: &[NodeId],
     pixel_loss: PixelLoss,
 ) -> PixelRollout {
+    build_with_history(
+        graph,
+        config,
+        model,
+        initial,
+        actions,
+        observations,
+        pixel_loss,
+        None,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn build_with_history(
+    graph: &mut Graph,
+    config: &DreamerConfig,
+    model: &WorldModel,
+    initial: (NodeId, NodeId),
+    actions: &[NodeId],
+    observations: &[NodeId],
+    pixel_loss: PixelLoss,
+    mut history: Option<NodeId>,
+) -> PixelRollout {
+    assert_eq!(config.rgb_spatial_decoder, history.is_some());
     let (mut deter, mut stoch) = initial;
     assert!(!actions.is_empty() && actions.len() + 1 == observations.len());
     let size = config.network();
@@ -43,6 +70,8 @@ pub(super) fn build(
     let mut losses = Vec::new();
     #[cfg(test)]
     let mut states = Vec::new();
+    #[cfg(test)]
+    let mut predictions = Vec::new();
     for (time, (&action, pair)) in actions.iter().zip(observations.windows(2)).enumerate() {
         let (previous, observation) = (pair[0], pair[1]);
         deter = model
@@ -84,7 +113,20 @@ pub(super) fn build(
         let state = feature(graph, deter, stoch, batch, config);
         #[cfg(test)]
         states.push(state);
-        let squared = if pixel_loss != PixelLoss::SquaredError {
+        let squared = if let Some(past) = history {
+            let logits = decoder.logits_with_history(graph, state, past, batch);
+            let next = super::super::networks::centered_pixels(graph, logits);
+            #[cfg(test)]
+            predictions.push(next);
+            history = Some(super::super::spatial_history::shift(
+                graph,
+                past,
+                next,
+                batch,
+                config.observation_dim(),
+            ));
+            super::super::networks::pixel_cross_entropy(graph, logits, observation)
+        } else if pixel_loss != PixelLoss::SquaredError {
             decoder.cross_entropy(graph, state, observation, batch)
         } else {
             let prediction = decoder.forward(graph, state, batch);
@@ -110,6 +152,8 @@ pub(super) fn build(
         loss,
         #[cfg(test)]
         states,
+        #[cfg(test)]
+        predictions,
     }
 }
 
@@ -120,6 +164,88 @@ mod motion_tests;
 mod tests {
     use super::*;
     use std::collections::HashSet;
+
+    #[test]
+    fn spatial_forecasts_use_own_images_without_future_targets_or_reset_masks() {
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_kind = ObservationKind::Rgb32;
+        config.rgb_spatial_decoder = true;
+        config.loss_scales.policy = 0.0;
+        config.loss_scales.value = 0.0;
+        config.loss_scales.replay_value = 0.0;
+        let mut graph = Graph::new();
+        let model = WorldModel::with_behavior(&mut graph, &config, false);
+        let size = config.network();
+        let deter = graph.input("seed_deter", &[config.batch_size, size.deter]);
+        let stoch = graph.input(
+            "seed_stoch",
+            &[config.batch_size * size.stoch, size.classes],
+        );
+        let history = graph.input(
+            "seed_history",
+            &[config.batch_size, 2 * config.observation_dim()],
+        );
+        let images = (0..4)
+            .map(|i| {
+                graph.input(
+                    &format!("target{i}"),
+                    &[config.batch_size, config.observation_dim()],
+                )
+            })
+            .collect::<Vec<_>>();
+        let actions = (0..3)
+            .map(|i| {
+                graph.input(
+                    &format!("action{i}"),
+                    &[config.batch_size, config.action_count],
+                )
+            })
+            .collect::<Vec<_>>();
+        let rollout = build_with_history(
+            &mut graph,
+            &config,
+            &model,
+            (deter, stoch),
+            &actions,
+            &images,
+            PixelLoss::MotionCrossEntropy,
+            Some(history),
+        );
+        assert_eq!(rollout.predictions.len(), 3);
+        for (i, &prediction) in rollout.predictions.iter().enumerate() {
+            let mut seen = HashSet::new();
+            let mut pending = vec![prediction];
+            while let Some(node) = pending.pop() {
+                if seen.insert(node) {
+                    pending.extend(graph.node(node).inputs.iter().copied());
+                }
+            }
+            assert!(images.iter().all(|n| !seen.contains(n)));
+            assert!(seen.contains(&history) && seen.contains(&deter) && seen.contains(&stoch));
+            assert!(seen.iter().all(|&n| !matches!(&graph.node(n).op,meganeura::graph::Op::Input{name} if name.starts_with("pixel_rollout_weight_"))));
+            if i > 0 {
+                assert!(seen.contains(&rollout.predictions[i - 1]));
+            }
+        }
+        graph.set_outputs(vec![rollout.loss]);
+        let (plan, _) = meganeura::compile_training_graph(&graph);
+        for prefix in [
+            "world.dynamics.core.",
+            "world.dynamics.prior",
+            "world.decoder.motion0.",
+            "world.decoder.motion1.",
+            "world.decoder.motion2.",
+            "world.decoder.imgout.",
+        ] {
+            assert!(
+                plan.param_buffers
+                    .iter()
+                    .any(|(name, buffer)| name.starts_with(prefix)
+                        && plan.param_grad_pairs.iter().any(|(p, _)| p == buffer)),
+                "{prefix}"
+            );
+        }
+    }
 
     #[test]
     fn future_images_are_targets_only_and_prior_parameters_receive_gradients() {

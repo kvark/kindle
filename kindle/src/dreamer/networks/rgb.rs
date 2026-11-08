@@ -239,6 +239,7 @@ pub(crate) struct Decoder {
     spatial_norm: nn::RmsNorm,
     layers: Vec<ConvNorm>,
     output: Convolution,
+    motion: Vec<ConvNorm>,
     deter: usize,
     stoch: usize,
     channels: usize,
@@ -301,10 +302,25 @@ impl Decoder {
             output: Convolution::new(
                 graph,
                 &format!("{name}.imgout"),
-                2 * size.vision_depth,
+                2 * size.vision_depth + if config.rgb_spatial_decoder { 8 } else { 0 },
                 3,
                 side,
             ),
+            motion: if config.rgb_spatial_decoder {
+                (0..3)
+                    .map(|i| {
+                        ConvNorm::new(
+                            graph,
+                            &format!("{name}.motion{i}"),
+                            if i == 0 { 6 } else { 8 },
+                            8,
+                            side,
+                        )
+                    })
+                    .collect()
+            } else {
+                Vec::new()
+            },
             deter: size.deter,
             stoch: size.stoch * size.classes,
             channels,
@@ -313,6 +329,17 @@ impl Decoder {
     }
 
     pub(super) fn forward_logits(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
+        self.forward_logits_with_history(graph, input, None, batch)
+    }
+
+    pub(super) fn forward_logits_with_history(
+        &self,
+        graph: &mut Graph,
+        input: NodeId,
+        history: Option<NodeId>,
+        batch: usize,
+    ) -> NodeId {
+        assert_eq!(history.is_none(), self.motion.is_empty());
         let stoch = slice_columns(
             graph,
             input,
@@ -384,6 +411,21 @@ impl Decoder {
             side as u32,
             side as u32,
         );
+        if let Some(history) = history {
+            let mut motion = graph.reshape(history, &[batch * 6 * self.side * self.side]);
+            for layer in &self.motion {
+                motion = layer.forward(graph, motion, batch, false);
+            }
+            value = concat_columns(
+                graph,
+                value,
+                motion,
+                batch,
+                channels * self.side * self.side,
+                8 * self.side * self.side,
+            );
+            value = graph.reshape(value, &[batch * (channels + 8) * self.side * self.side]);
+        }
         value = self.output.forward(graph, value, batch);
         graph.reshape(value, &[batch, 3 * self.side * self.side])
     }

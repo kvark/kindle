@@ -907,6 +907,29 @@ pub(crate) enum ObservationDecoder {
 }
 
 impl ObservationDecoder {
+    pub(crate) fn logits_with_history(
+        &self,
+        graph: &mut Graph,
+        input: NodeId,
+        history: NodeId,
+        batch: usize,
+    ) -> NodeId {
+        let Self::Rgb(decoder) = self else {
+            panic!("spatial history requires RGB")
+        };
+        decoder.forward_logits_with_history(graph, input, Some(history), batch)
+    }
+
+    pub(crate) fn forward_with_history(
+        &self,
+        graph: &mut Graph,
+        input: NodeId,
+        history: NodeId,
+        batch: usize,
+    ) -> NodeId {
+        let logits = self.logits_with_history(graph, input, history, batch);
+        centered_pixels(graph, logits)
+    }
     pub(crate) fn cross_entropy(
         &self,
         graph: &mut Graph,
@@ -946,6 +969,15 @@ impl ObservationDecoder {
             Self::Rgb(decoder) => decoder.forward(graph, input, batch),
         }
     }
+}
+
+pub(crate) fn centered_pixels(graph: &mut Graph, logits: NodeId) -> NodeId {
+    let shape = graph.node(logits).ty.shape.clone();
+    let probabilities = graph.sigmoid(logits);
+    let probabilities = graph.reshape(probabilities, &[shape.iter().product(), 1]);
+    let offset = graph.scalar(-0.5);
+    let probabilities = graph.bias_add(probabilities, offset);
+    graph.reshape(probabilities, &shape)
 }
 
 /// Elementwise soft-RGB cross-entropy, evaluated directly from logits.

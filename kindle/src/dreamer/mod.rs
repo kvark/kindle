@@ -22,6 +22,7 @@ mod readback;
 mod replay;
 mod replay_gpu;
 mod runtime;
+mod spatial_history;
 mod targets_gpu;
 mod uniform_gpu;
 mod world;

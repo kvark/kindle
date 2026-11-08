@@ -322,6 +322,9 @@ pub struct DreamerConfig {
     /// Standalone RGB world: encode previous/current images; replay and targets stay RGB.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_previous_frame: bool,
+    /// Standalone RGB world: decode from RSSM state and two causal RGB images.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_spatial_decoder: bool,
     /// Append fixed x/y pixel-center coordinates inside the learned RGB encoder.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_coordinates: bool,
@@ -502,6 +505,7 @@ impl DreamerConfig {
             observation_kind: ObservationKind::Features,
             rgb_frame_pair: false,
             rgb_previous_frame: false,
+            rgb_spatial_decoder: false,
             rgb_coordinates: false,
             rgb_latent_only: false,
             world_gaussian: false,
@@ -850,6 +854,22 @@ impl DreamerConfig {
             return Err("auxiliary actor boundaries require observed lower-bound mode and nonnegative reward scales".into());
         }
         let size = self.network();
+        if self.rgb_spatial_decoder
+            && (!self.observation_kind.is_rgb()
+                || self.video_encoder.is_some()
+                || self.rgb_frame_pair
+                || self.rgb_previous_frame
+                || self.rgb_latent_only
+                || self.world_gaussian
+                || self.observation_crop.is_some()
+                || self.is_cdp()
+                || self.loss_scales.policy != 0.0
+                || self.loss_scales.value != 0.0
+                || self.loss_scales.replay_value != 0.0
+                || self.actor_critic_gradient)
+        {
+            return Err("spatial decoder requires a standalone plain categorical RGB world".into());
+        }
         if self.world_gaussian
             && (!self.observation_kind.is_rgb()
                 || self.video_encoder.is_some()
