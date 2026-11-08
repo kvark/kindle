@@ -11,41 +11,35 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. A [CPU-only survival decomposition](experiments/2026-11-08-breakout-world-survival-decomposition.md)
-is selected using cached H0/local-action forecasts. Hold images fixed;compare
-original,mean,oracle-mean and all-alive survival weights. Original failed gates
-stay;oracle-assisted scores cannot qualify a model. No GPU allocation or full
-learner is selected. Root
-`/mnt/data/kindle-breakout-world-survival-decomposition-20261108`;consult protocol.
+object/RAM training labels. No GPU allocation or next learner is selected.
 
-The [local-action experiment](results/2026-11-08-breakout-world-local-action.md)
-is complete and fails retention. Incoming action planes plus history width16;
-categorical RSSM and RSSM-only event heads stay. Source/runner7f797a2b,native
-SHA38680c73;80 logical/8,893,203 scalars/240 tensors. Fresh8192 updates,RGB64/12M/
-B8/T32/H16/full BPTT/Auto,seed41001,rates4e-4,mixing.01,RGB100/events1 and original
-4/2/1/1 plan. Dense dev observed/one/eight/16/32:98/112,101/109,43/107,29/114,11/95;
-fitting eight79/176. One/eight and all-command presence64/64 pass;observed fails.
-Primary16/32 energy.240566 is worse than H0.169502 and required.127127. Ending16/
-32 Brier.094168/.208852,RIGHT16 false risk.507002,244/304 nonending alarms>5%.
-Ball-position gains coexist with paddle/reward/ending regressions. Image heads
-see local history while event heads see RSSM only;coherence is an investigation
-target,not an established cause. Do not replace the original survival-weighted
-gates with support-conditioned point accuracy.
+The [survival decomposition](results/2026-11-08-breakout-world-survival-decomposition.md)
+is complete,CPU-only. With rendered features fixed,oracle survival changes local-
+action ball energy.240566→.161658;H0.169502→.159390. Same-mean association effects
+are tiny. On predefined nonending cases,local paddle energy.134833→.003380 while
+images stay fixed. This exposes sensitivity to ending mass,not a causal training
+fix. Geometry remains inaccurate:retained ball oracle-entropy reference.004813.
+Oracle-assisted values use future labels and cannot replace any original gate.
 
-Qualification1,250 pins/31.256s,learning1,257 input/170 CPU pins and84 final-only
-frozen groups/1,557 pins pass implementation/audit checks.140 CPU/273 packaged
-Python and strict core/test/binding Clippy pass.210 common initial tensors/16
-nonimage arrays,all8192 finite13-component rows,80 changed weights,240 own initial/
-frozen tensors,384 dense origins and18 exact final restore arrays. Four guards/
-36 sealed files pass,no native failure/retry,recovery,NVML or unfinished child.
-Closure3,532 input pins pass;all five services are terminal.
-Native1389.476s/loop1568.062s;assessment loop200.553s,CPU comparison165.306s.
-Worker/polling spans and additional build/pinning costs remain in the report.
-Cache836,613,824 counted bytes released;source,runtime,weights,arrays,figures and
-full causal clips retained. Root `/mnt/data/kindle-breakout-world-local-action-20261108`.
+All523 input pins/420 closed cached files,24 independent scalar fixtures,13,440
+cases/1,680 groups and210 truth joins pass;maximum ordinary score error4.44e-16.
+Both histories/all endpoints/ball+paddle/four signed terms are retained. Eight
+oracle draws agree on ending status at every endpoint;at32,17 of336 are all-dead
+and319 all-alive. These are related reused development samples,not population
+calibration. Analysis41.259s plus declaration/figure/publication costs,no model
+query,training,emulator or GPU work. Root
+`/mnt/data/kindle-breakout-world-survival-decomposition-20261108`.
 
-The [transport experiment](results/2026-11-08-breakout-world-transport.md)
-and earlier linked experiments remain closed with original failures and repairs.
+The [local-action world](results/2026-11-08-breakout-world-local-action.md)
+remains closed and fails retention:dev observed/one/eight/16/32 are98/112,101/109,
+43/107,29/114,11/95;primary.240566,RIGHT16 false ending risk.507002 and244/304
+nonending alarms>5%. Source/runner7f797a2b,native SHA38680c73,retained runtime at
+`/mnt/data/kindle-breakout-world-local-action-20261108/runtime`;match its runner.
+Original failures,all regressions,weights,figures/clips and3,532 closure pins stay.
+Event heads read RSSM only;images also read local history. Coherence is an
+investigation target,not an established explanation. Both event prediction and
+physical forecasting remain training targets.
+
 Keep H0 as reference. Do not repeat completed learners,assessments or collectors.
 No unchanged extension,sweep or automatic successor. Precise physics,event timing/
 calibration,persistent brick memory,late/tunnel/second-wall coverage,untouched
