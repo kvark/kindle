@@ -23,21 +23,24 @@ available. Only the user merges PRs; commits and pushes are allowed.
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. One guarded fixed-weight gradient measurement is active; no learner is selected.
+object/RAM training labels. No GPU allocation or learner is currently selected.
 
-The [fixed-weight loss-gradient diagnostic](docs/experiments/2026-11-08-breakout-world-loss-gradients.md)
-is active to measure observed RGB, KL, observed events, future RGB and future
-events versus their joint gradient. Reuse v13 final8,192 weights and three retained
-fitting batches; four fixed noise draws each plus joint repeats,75 forward/backward
-steps, no optimizer. Analyze per family and a predeclared F64 RGB100-versus1 local
-sensitivity using the anchor moments. This cannot select a useful learning recipe,
-prove a causal physics-error fraction or complete the goal. No Python runtime,
-production training graph/API or checkpoint-format changes; Rust test-only module.
-Three new CPU checks and strict core/test Clippy pass after a preserved helper-API
-compilation repair. Sourcec46fa6e3/test SHA10345287;16 execution/37 data pins,900s cap.
-This is the first new measurement; no old native fixture or gradient stage repeats.
-Root `/mnt/data/kindle-breakout-world-loss-gradients-20261108`. No old native fixture,
-collector, learner, frozen assessment or completed gradient analysis repeats.
+The [loss-gradient diagnostic](docs/results/2026-11-08-breakout-world-loss-gradients.md)
+is closed/complete. At the reused v13 checkpoint and12 fitting/noise conditions,
+weighted future-RGB/KL norms are22.199–87.212x in the prior and336.248–883.791x
+in the core; median observed/future RGB encoder cosine is-.7161. F64 RGB100→1
+fresh prior-gradient cosine.1893–.6122 (momentum update.8567–.9146). Local dominance/
+conflict and hypothetical updates do not prove a useful coefficient or physics cause.
+All75 fixed-weight forward/backward steps,12 bitwise80-weight snapshots/960 tensor
+comparisons,three exact joint repeats,408 zero-gradient checks and native component
+linearity max1.825e-6 pass. One guard/nine sealed files/436 closure pins pass;
+original240-tensor checkpoint untouched,zero optimizer steps. Three new CPU checks/
+strict core-test Clippy pass. Preserve helper-API compilation and CPU plot failures/
+separate repairs; no production graph/API/runtime changes or old native stage repeats.
+Sourcec46fa6e3/test SHA10345287. Native440.689s includes graph/session construction
+and buffer exports;CPU21.279s. Root `/mnt/data/kindle-breakout-world-loss-gradients-20261108`.
+All raw buffers/source/results remain;2,182,611,160 counted build-cache bytes released.
+All original physical/event gates and full-world requirements remain unproven.
 
 The [pixel-residual world learner](docs/results/2026-11-08-breakout-world-pixel-residual.md)
 is closed and failed retention. Observed/one/eight ball precision:
