@@ -320,6 +320,38 @@ fn gaussian_world_configuration_requires_explicit_supported_architecture() {
 #[test]
 #[ignore = "requires separately declared guarded GPU Gaussian values/derivatives check"]
 fn gaussian_native_values_and_derivatives() {
+    native_values_and_derivatives(16);
+}
+
+#[test]
+#[ignore = "requires separately declared guarded GPU compact Gaussian values/derivatives check"]
+fn compact_gaussian_native_values_and_derivatives() {
+    native_values_and_derivatives(1);
+}
+
+#[test]
+fn compact_gaussian_values_and_derivatives_match_f64() {
+    for (stop_q, stop_p, floor) in [
+        (false, false, 0.0),
+        (true, false, 0.0),
+        (false, true, 0.0),
+        (false, false, 1e6),
+    ] {
+        let f = fixture(2, 3, 1, stop_q, stop_p, floor);
+        let backward = meganeura::autodiff::differentiate(&f.graph);
+        let v = evaluate(&backward, &f.feeds).unwrap();
+        for (i, &x) in f.expected.iter().enumerate() {
+            assert!((v[backward.outputs()[i] as usize].data[0] - x).abs() < 1e-7);
+        }
+        for (i, g) in f.grad.iter().enumerate() {
+            for (a, b) in v[backward.outputs()[4 + i] as usize].data.iter().zip(g) {
+                assert!((a - b).abs() < 2e-5, "{a} vs {b}");
+            }
+        }
+    }
+}
+
+fn native_values_and_derivatives(width: usize) {
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     assert_eq!(
         gpu.device_information().device_name,
@@ -331,7 +363,7 @@ fn gaussian_native_values_and_derivatives() {
         (false, true, 0.0),
         (false, false, 1e6),
     ] {
-        let f = fixture(8, 32, 16, qstop, pstop, floor);
+        let f = fixture(8, 32, width, qstop, pstop, floor);
         let mut s = runtime::build_session(&f.graph, &gpu, Mode::Training, false);
         s.set_parameter("q", &f.q);
         s.set_parameter("p", &f.p);

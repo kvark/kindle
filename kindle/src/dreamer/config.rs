@@ -331,6 +331,9 @@ pub struct DreamerConfig {
     /// Standalone RGB world: diagonal Gaussian state with reparameterized samples.
     #[serde(default, skip_serializing_if = "is_false")]
     pub world_gaussian: bool,
+    /// Optional compact standalone Gaussian state; otherwise retain preset width.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub world_gaussian_dim: Option<usize>,
     /// Downsample the learned RGB encoder with stride-two convolutions, without max-pooling.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_stride2: bool,
@@ -502,6 +505,7 @@ impl DreamerConfig {
             rgb_coordinates: false,
             rgb_latent_only: false,
             world_gaussian: false,
+            world_gaussian_dim: None,
             rgb_stride2: false,
             observation_crop: None,
             video_encoder: None,
@@ -591,6 +595,10 @@ impl DreamerConfig {
         if let Some(shape) = self.latent_shape {
             size.stoch = shape.variables;
             size.classes = shape.classes;
+        }
+        if let Some(dim) = self.world_gaussian_dim {
+            size.stoch = dim;
+            size.classes = 1;
         }
         size
     }
@@ -748,6 +756,16 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if let Some(dim) = self.world_gaussian_dim {
+            let preset = self.model_size.network();
+            if !self.world_gaussian
+                || self.latent_shape.is_some()
+                || dim == 0
+                || dim > preset.stoch * preset.classes
+            {
+                return Err("world_gaussian_dim requires Gaussian latents, no latent_shape and a positive dimension within the preset width".into());
+            }
+        }
         if let Some(shape) = self.latent_shape {
             let preset = self.model_size.network();
             if shape.variables == 0
@@ -1025,7 +1043,11 @@ impl DreamerConfig {
         if size.deter == 0 || !size.deter.is_multiple_of(size.blocks) {
             return Err("deter must be non-zero and divisible by blocks".into());
         }
-        if size.hidden == 0 || size.stoch == 0 || size.classes <= 1 {
+        if size.hidden == 0
+            || size.stoch == 0
+            || size.classes == 0
+            || (size.classes == 1 && !self.world_gaussian)
+        {
             return Err("hidden/stoch/classes network dimensions are invalid".into());
         }
         if size.units == 0 || size.vision_depth == 0 {

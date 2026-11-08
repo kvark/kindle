@@ -99,14 +99,33 @@ fn checkpoint_pixel_loss(
     let gaussian = metadata["config"]["world_gaussian"]
         .as_bool()
         .unwrap_or(false);
-    if gaussian && metadata["format"] != "kindle-world-only-v8" {
+    let compact = metadata["config"]["world_gaussian_dim"].is_number();
+    if !metadata["config"]["world_gaussian_dim"].is_null() && !compact {
+        return Err("invalid Gaussian dimension".into());
+    }
+    if compact && (!gaussian || metadata["format"] != "kindle-world-only-v9") {
+        return Err("compact Gaussian world requires checkpoint format v9".into());
+    }
+    if metadata["format"] == "kindle-world-only-v9"
+        && (!compact
+            || !gaussian
+            || metadata["config"]["world_gaussian_dim"]
+                .as_u64()
+                .unwrap_or(0)
+                == 0)
+    {
+        return Err("invalid compact Gaussian checkpoint architecture".into());
+    }
+    if gaussian && !compact && metadata["format"] != "kindle-world-only-v8" {
         return Err("Gaussian world requires checkpoint format v8".into());
     }
-    if metadata["format"] == "kindle-world-only-v8"
-        && (!gaussian
-            || metadata["pixel_loss"] != "motion_cross_entropy"
-            || metadata["config"]["rgb_previous_frame"] == true
-            || metadata["config"]["rgb_latent_only"] == true)
+    if matches!(
+        metadata["format"].as_str(),
+        Some("kindle-world-only-v8" | "kindle-world-only-v9")
+    ) && (!gaussian
+        || metadata["pixel_loss"] != "motion_cross_entropy"
+        || metadata["config"]["rgb_previous_frame"] == true
+        || metadata["config"]["rgb_latent_only"] == true)
     {
         return Err("invalid Gaussian checkpoint architecture or objective".into());
     }
@@ -159,7 +178,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v5"
             | "kindle-world-only-v6"
             | "kindle-world-only-v7"
-            | "kindle-world-only-v8",
+            | "kindle-world-only-v8"
+            | "kindle-world-only-v9",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -928,7 +948,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.world_gaussian {
+        let format = if self.config.world_gaussian_dim.is_some() {
+            "kindle-world-only-v9"
+        } else if self.config.world_gaussian {
             "kindle-world-only-v8"
         } else if self.pixel_loss == PixelLoss::MotionFixedTeacherImage {
             "kindle-world-only-v7"

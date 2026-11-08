@@ -11,6 +11,32 @@ def metadata():
 
 def test_gaussian_stays_off_in_default_config():
     assert 'world_gaussian' not in kindle.default_config(18,'tiny')
+    assert 'world_gaussian_dim' not in kindle.default_config(18,'tiny')
+
+
+@pytest.mark.parametrize('version',range(1,9))
+def test_compact_gaussian_rejects_old_formats_before_gpu(tmp_path,version):
+    m=metadata();m['config']['world_gaussian_dim']=4;m['format']=f'kindle-world-only-v{version}'
+    (tmp_path/'metadata.json').write_text(json.dumps(m))
+    with pytest.raises(RuntimeError,match='compact Gaussian world requires checkpoint format v9'):
+        kindle.WorldModelLearner.restore(str(tmp_path))
+
+
+@pytest.mark.parametrize('dim',[None,0,-1,1.5,'32'])
+def test_v9_rejects_invalid_dimensions_before_gpu(tmp_path,dim):
+    m=metadata();m['format']='kindle-world-only-v9';m['config']['world_gaussian_dim']=dim
+    (tmp_path/'metadata.json').write_text(json.dumps(m))
+    with pytest.raises(RuntimeError,match='Gaussian dimension|Gaussian checkpoint architecture|format v8'):
+        kindle.WorldModelLearner.restore(str(tmp_path))
+
+
+@pytest.mark.parametrize('dim',[0,17])
+def test_compact_gaussian_rejects_invalid_constructor_dimensions(dim):
+    c=metadata()['config'];c['world_gaussian_dim']=dim
+    c.update(observation_kind='rgb32',disagreement_bonus=False,batch_length=32,world_backprop_length=32)
+    c['loss_scales'].update(policy=0.0,value=0.0,replay_value=0.0)
+    with pytest.raises(ValueError,match='world_gaussian_dim'):
+        kindle.WorldModelLearner(c,prediction_length=16,pixel_loss='motion_cross_entropy')
 
 
 @pytest.mark.parametrize('version',range(1,8))

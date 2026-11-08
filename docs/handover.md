@@ -14,27 +14,27 @@ CNN/RSSM/RGB decoder with retained categorical H0 as the inspectable reference; 
 efficiency comparison. No pretrained encoder or RAM/object/phase labels enter
 training. Full competence remains unproven.
 
-The [Gaussian latent reference](results/2026-11-08-breakout-world-gaussian.md)
-is closed and fails retention after fresh 8,192-update H16 pixel-supervised learning.
-Observed/one/eight-step ball precision is 105/112,76/109,16/107; retained H0 is
-108/112,94/109,14/107. Primary long-horizon ball energy is .557271 versus .169502
-for H0 and .311977 for categorical H16. Free-flight ball presence is 40/40/40/47
-of64 across commands; RIGHT falsely predicts an ending at16 with probability
-.659267. Eight of304 individual non-ending cases exceed5% (maximum .055299),
-while their category means pass. This 512-dimensional bounded-scale Gaussian
-recipe does not solve forecasting; it does not rule out other continuous models.
-Keep categorical H0. No successor or GPU allocation is selected.
+Select the [compact Gaussian32 world test](experiments/2026-11-08-breakout-world-gaussian32.md) for native qualification.
+The closed Gaussian512 recipe retained flattened width but introduced512 noisy
+continuous coordinates. Test32 coordinates with the same2048 recurrent state,
+RGB64/H16 data plan,8,192-update budget and forecasting gates. Capacity,noise
+and projection geometry change together; no isolated cause is claimed.
+Default-off `world_gaussian_dim:32` requires the standalone Gaussian RGB world;
+v9 persists its dimension and old natives must reject before GPU. Expected
+68 logical/8,008,003 scalars/204 tensors; feature width2080. No new data,labels,
+actor/critic,teacher or backend primitive. Full competence remains unproven.
 
-Source/native/runner bc007ca2,SHA b79a1a74; root
-`/mnt/data/kindle-breakout-world-gaussian-20261107` retains its selection tag.
-Gaussian math/derivatives, common initialization, own initial/final restores,
-all68 changed parameters, finite reports, causal ancestry and frozen tensors pass.
-263 affected Rust CPU/112 packaged Python/strict Clippy checks pass after the
-preserved reward-bin fixture correction. Qualification461/learning468 pins,
-2,487-pin closure and four successful guards/36 sealed files pass; all services
-are terminal. Native learning810.106s/loop959.732s; frozen assessment156.697s
-separate. Released835,160,540-byte build cache; checkpoints/runtime/source and
-original failures remain retained. No completed learner or collector repeats.
+Root `/mnt/data/kindle-breakout-world-gaussian32-20261108`. Eleven affected
+Gaussian CPU checks pass; width1 F64 math and compact geometry/header tests pass.
+The first dependency build hit system-disk ENOSPC before tests; its log is
+preserved and the new build cache moved to /mnt/data. No GPU allocation yet.
+Next finish affected CPU/package checks, then separately declare native
+qualification and a bounded learner only after reviewed qualification.
+
+The [Gaussian512 result](results/2026-11-08-breakout-world-gaussian.md) remains closed/failed:
+observed105/112,one76/109,eight16/107,primary energy.557271 versus H0.169502,
+freeflight presence40/40/40/47 of64 and RIGHT16 false ending.659267. Retain H0;
+no old learner or collector repeats. All failures,receipts and checkpoints stay.
 
 The [direct RGB fixed-filter phase](results/2026-11-07-breakout-world-fixed-image.md)
 remains closed/failed:eight17/107,energy.303067(78.8% worse than H0),ending32

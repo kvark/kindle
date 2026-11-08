@@ -126,3 +126,91 @@ fn gaussian_full_shape_geometry_is_explicit() {
     assert_eq!(c.feature_dim(), 2560);
     assert_eq!(c.encoded_observation_dim(), 1024);
 }
+
+#[test]
+fn compact_gaussian_geometry_and_headers_preserve_explicit_dimension() {
+    let mut c = config();
+    c.model_size = crate::dreamer::ModelSize::Size12M;
+    c.value_bins = 255;
+    c.observation_kind = ObservationKind::Rgb64;
+    c.batch_size = 8;
+    c.world_gaussian_dim = Some(32);
+    assert!(c.check().is_ok());
+    assert_eq!((c.network().stoch, c.network().classes), (32, 1));
+    assert_eq!(c.feature_dim(), 2080);
+    let g = world::build_world_only_pixel_training_graph(&c, 16, PixelLoss::MotionCrossEntropy);
+    let weights = g
+        .nodes()
+        .iter()
+        .filter(|n| matches!(n.op, Op::Parameter { .. }))
+        .collect::<Vec<_>>();
+    assert_eq!(weights.len(), 68);
+    // Two 960-output reductions and four 480-input reductions at widths256/512.
+    assert_eq!(
+        weights
+            .iter()
+            .map(|n| n.ty.shape.iter().product::<usize>())
+            .sum::<usize>(),
+        8_008_003
+    );
+    assert!(!g.nodes().iter().any(|n| matches!(n.op, Op::ArgMaxOneHot)));
+    let m = json!({"format":"kindle-world-only-v9","config":c,"pixel_loss":"motion_cross_entropy","prediction_length":16,"updates":0});
+    assert_eq!(
+        checkpoint_pixel_loss(&m).unwrap(),
+        PixelLoss::MotionCrossEntropy
+    );
+    assert_eq!(
+        TrainingScope::from_metadata(&m, PixelLoss::MotionCrossEntropy, 16, 0).unwrap(),
+        TrainingScope::All
+    );
+    for version in 1..9 {
+        let mut bad = m.clone();
+        bad["format"] = json!(format!("kindle-world-only-v{version}"));
+        assert!(checkpoint_pixel_loss(&bad).is_err());
+    }
+    for dim in [
+        serde_json::Value::Null,
+        json!(0),
+        json!(-1),
+        json!(1.5),
+        json!("32"),
+    ] {
+        let mut bad = m.clone();
+        bad["config"]["world_gaussian_dim"] = dim;
+        assert!(checkpoint_pixel_loss(&bad).is_err());
+    }
+    let mut bad = m;
+    bad["training_scope"] = json!("all");
+    assert!(TrainingScope::from_metadata(&bad, PixelLoss::MotionCrossEntropy, 16, 0).is_err());
+}
+
+#[test]
+fn compact_gaussian_dimension_rejects_implicit_or_conflicting_architectures() {
+    let mut c = config();
+    c.world_gaussian_dim = Some(4);
+    let roundtrip: DreamerConfig =
+        serde_json::from_value(serde_json::to_value(&c).unwrap()).unwrap();
+    assert_eq!(roundtrip, c);
+    assert!(c.check().is_ok());
+    for dim in [0, 17, usize::MAX] {
+        let mut bad = c.clone();
+        bad.world_gaussian_dim = Some(dim);
+        assert!(bad.check().is_err());
+    }
+    let mut bad = c.clone();
+    bad.world_gaussian = false;
+    assert!(bad.check().is_err());
+    let mut bad = c;
+    bad.latent_shape = Some(crate::dreamer::LatentShape {
+        variables: 4,
+        classes: 4,
+    });
+    assert!(bad.check().is_err());
+    assert!(
+        !serde_json::to_value(DreamerConfig::tiny(18))
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("world_gaussian_dim")
+    );
+}

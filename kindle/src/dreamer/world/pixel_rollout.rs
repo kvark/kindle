@@ -123,17 +123,19 @@ mod tests {
 
     #[test]
     fn future_images_are_targets_only_and_prior_parameters_receive_gradients() {
-        for (pixel_loss, gaussian) in [
-            (PixelLoss::SquaredError, false),
-            (PixelLoss::CrossEntropy, false),
-            (PixelLoss::MotionCrossEntropy, false),
-            (PixelLoss::MotionFixedTeacherImage, false),
-            (PixelLoss::MotionCrossEntropy, true),
+        for (pixel_loss, gaussian, dim) in [
+            (PixelLoss::SquaredError, false, None),
+            (PixelLoss::CrossEntropy, false, None),
+            (PixelLoss::MotionCrossEntropy, false, None),
+            (PixelLoss::MotionFixedTeacherImage, false, None),
+            (PixelLoss::MotionCrossEntropy, true, None),
+            (PixelLoss::MotionCrossEntropy, true, Some(4)),
         ] {
             let mut config = DreamerConfig::tiny(3);
             config.observation_kind = ObservationKind::Rgb64;
             config.actor_critic_gradient = false;
             config.world_gaussian = gaussian;
+            config.world_gaussian_dim = dim;
             config.loss_scales.policy = 0.0;
             config.loss_scales.value = 0.0;
             config.loss_scales.replay_value = 0.0;
