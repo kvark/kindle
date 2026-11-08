@@ -35,6 +35,26 @@ fresh confirmation remain required. The oracle has no above-top-brick endpoints.
 Full world-model and five-game goals stay unfinished.
 
 
+### What would establish the world model
+
+Finite training losses and backend qualification establish that an experiment
+runs; they do not establish game dynamics. Keep the complete goal distinct from
+the current transport comparison:
+
+| Capability | Retained evidence | What is still missing |
+|---|---|---|
+| Read observed images | [H0 coverage](results/2026-11-07-breakout-world-coverage.md):108/112 balls within one RGB64 pixel | Consistent precision across the full game,including late and occluded states |
+| Forecast under submitted actions | [Fixed-filter phase](results/2026-11-07-breakout-world-fixed-teacher.md):observed108/112 stays exact,but only17/107 eight-step and4/95 thirty-two-step balls match | Accurate free flight and collision trajectories,including fitting data; existing precision/distribution gates |
+| Predict rewards and endings | [Future-event phase](results/2026-11-08-breakout-world-fixed-events.md):ending32 Brier.120330 and RIGHT16 false ending risk.438322 | Correct event timing and natural-frequency calibration; current outcome-selected slices alone cannot establish calibration |
+| Remember changed world state | Existing reports retain brick-cell scores and regressions | Persistent removed-brick memory through absence/occlusion; low image loss or a static wall reconstruction is insufficient |
+| Cover the game and generalize | Current fixed-action challenge has33 distinct contexts across seven reused development groups; repetitions share histories | Late/tunnel/second-wall states,above-top-brick endpoints,untouched families and fresh confirmation |
+
+Pixel supervision makes these errors observable. CDP remains a later comparison,
+not an assumed solution to the forecast gap. A better transport score would be
+intermediate evidence only; it cannot discharge the untested rows above. Preserve
+all per-action/horizon regressions and all protocol failures when deciding the
+next separately justified experiment.
+
 ## Retained campaign evidence
 
 The [prior-reward comparison](results/2026-11-06-cdp-breakout-prior-reward.md#full200k-comparison) is complete and fails its fixed retention rule.
