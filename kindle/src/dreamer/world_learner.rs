@@ -20,6 +20,8 @@ mod fixed_teacher;
 use fixed_teacher::TeacherAnchor;
 
 #[cfg(test)]
+mod clean_prior_tests;
+#[cfg(test)]
 mod gaussian_tests;
 #[cfg(test)]
 mod gradient_diagnostic;
@@ -51,6 +53,7 @@ pub enum PixelLoss {
     MotionCrossEntropy,
     MotionImageFeedback,
     MotionEventRollout,
+    MotionCleanPrior,
     MotionLatentOvershooting,
     MotionRecurrentEnergy,
     MotionFixedTeacher,
@@ -66,6 +69,7 @@ impl PixelLoss {
             Self::MotionCrossEntropy
                 | Self::MotionImageFeedback
                 | Self::MotionEventRollout
+                | Self::MotionCleanPrior
                 | Self::MotionLatentOvershooting
                 | Self::MotionRecurrentEnergy
                 | Self::MotionFixedTeacher
@@ -76,7 +80,14 @@ impl PixelLoss {
     }
 
     pub(crate) fn rollout_events(self) -> bool {
-        matches!(self, Self::MotionImageFeedback | Self::MotionEventRollout)
+        matches!(
+            self,
+            Self::MotionImageFeedback | Self::MotionEventRollout | Self::MotionCleanPrior
+        )
+    }
+
+    pub(crate) fn clean_prior(self) -> bool {
+        self == Self::MotionCleanPrior
     }
 
     pub(crate) fn predictive(self) -> bool {
@@ -112,6 +123,17 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let clean_prior = metadata["pixel_loss"] == "motion_clean_prior";
+    if clean_prior && metadata["format"] != "kindle-world-only-v14" {
+        return Err("clean prior objective requires checkpoint format v14".into());
+    }
+    if metadata["format"] == "kindle-world-only-v14"
+        && (!clean_prior
+            || metadata["config"]["rgb_spatial_fusion"] != true
+            || metadata["prediction_length"].as_u64().unwrap_or(0) == 0)
+    {
+        return Err("invalid clean prior checkpoint objective or geometry".into());
+    }
     let event_rollout = metadata["pixel_loss"] == "motion_event_rollout";
     let fusion = metadata["config"]["rgb_spatial_fusion"]
         .as_bool()
@@ -127,18 +149,18 @@ fn checkpoint_pixel_loss(
     if fusion
         && !matches!(
             metadata["format"].as_str(),
-            Some("kindle-world-only-v12" | "kindle-world-only-v13")
+            Some("kindle-world-only-v12" | "kindle-world-only-v13" | "kindle-world-only-v14")
         )
     {
         return Err("spatial fusion requires checkpoint format v12".into());
     }
     if matches!(
         metadata["format"].as_str(),
-        Some("kindle-world-only-v12" | "kindle-world-only-v13")
+        Some("kindle-world-only-v12" | "kindle-world-only-v13" | "kindle-world-only-v14")
     ) && (!fusion
         || metadata["config"]["rgb_spatial_decoder"] != true
         || metadata["config"]["world_image_feedback"] == true
-        || (!event_rollout && metadata["pixel_loss"] != "motion_cross_entropy"))
+        || (!event_rollout && !clean_prior && metadata["pixel_loss"] != "motion_cross_entropy"))
     {
         return Err("invalid spatial fusion checkpoint architecture or objective".into());
     }
@@ -164,9 +186,14 @@ fn checkpoint_pixel_loss(
     }
     if matches!(
         metadata["format"].as_str(),
-        Some("kindle-world-only-v10" | "kindle-world-only-v12" | "kindle-world-only-v13")
+        Some(
+            "kindle-world-only-v10"
+                | "kindle-world-only-v12"
+                | "kindle-world-only-v13"
+                | "kindle-world-only-v14"
+        )
     ) && (!spatial
-        || (!event_rollout && metadata["pixel_loss"] != "motion_cross_entropy")
+        || (!event_rollout && !clean_prior && metadata["pixel_loss"] != "motion_cross_entropy")
         || metadata["config"]["world_gaussian"] == true
         || metadata["config"]["rgb_previous_frame"] == true
         || metadata["config"]["rgb_latent_only"] == true)
@@ -260,7 +287,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v10"
             | "kindle-world-only-v11"
             | "kindle-world-only-v12"
-            | "kindle-world-only-v13",
+            | "kindle-world-only-v13"
+            | "kindle-world-only-v14",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -492,8 +520,10 @@ impl WorldModelLearner {
                     .into(),
             );
         }
-        if pixel_loss == PixelLoss::MotionEventRollout
-            && (!config.rgb_spatial_fusion || prediction_length == 0)
+        if matches!(
+            pixel_loss,
+            PixelLoss::MotionEventRollout | PixelLoss::MotionCleanPrior
+        ) && (!config.rgb_spatial_fusion || prediction_length == 0)
         {
             return Err(
                 "suffix event objective requires spatial fusion and a positive prediction length"
@@ -506,6 +536,7 @@ impl WorldModelLearner {
                 PixelLoss::MotionCrossEntropy
                     | PixelLoss::MotionImageFeedback
                     | PixelLoss::MotionEventRollout
+                    | PixelLoss::MotionCleanPrior
             )
         {
             return Err("spatial decoder requires the motion RGB objective without a phase".into());
@@ -539,6 +570,7 @@ impl WorldModelLearner {
                 | PixelLoss::MotionCrossEntropy
                 | PixelLoss::MotionImageFeedback
                 | PixelLoss::MotionEventRollout
+                | PixelLoss::MotionCleanPrior
                 | PixelLoss::MotionLatentOvershooting
                 | PixelLoss::MotionRecurrentEnergy
                 | PixelLoss::MotionFixedTeacher
@@ -747,6 +779,11 @@ impl WorldModelLearner {
                 let uniforms = super::gaussian::noise(&self.config, &mut self.rng);
                 self.train.set_input(&format!("uniforms_{time}"), &uniforms);
             }
+            if self.pixel_loss.clean_prior() {
+                let uniforms = super::gaussian::noise(&self.config, &mut self.rollout_rng);
+                self.train
+                    .set_input(&format!("clean_prior_uniforms_{time}"), &uniforms);
+            }
             if self.pixel_loss.predictive() {
                 for (name, width) in [
                     ("predictive_uniforms", size.stoch * size.classes),
@@ -883,6 +920,12 @@ impl WorldModelLearner {
                 self.train.read_output_by_index(index, &mut loss);
                 losses.push(loss[0]);
             }
+        }
+        if self.pixel_loss.clean_prior() {
+            let mut fraction = [0.0];
+            self.train
+                .read_output_by_index(world::CLEAN_PRIOR_VALID_FRACTION, &mut fraction);
+            losses.push(fraction[0]);
         }
         if self.pixel_loss.recurrent_energy() && !self.pixel_loss.fixed_teacher() {
             for index in world::LOSS_RECURRENT_WORLD..world::LOSS_RECURRENT_WORLD + 4 {
@@ -1104,7 +1147,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.pixel_loss == PixelLoss::MotionEventRollout {
+        let format = if self.pixel_loss.clean_prior() {
+            "kindle-world-only-v14"
+        } else if self.pixel_loss == PixelLoss::MotionEventRollout {
             "kindle-world-only-v13"
         } else if self.config.rgb_spatial_fusion {
             "kindle-world-only-v12"

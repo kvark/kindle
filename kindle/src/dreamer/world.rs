@@ -48,6 +48,8 @@ pub const PRIOR_REWARD_VALID_FRACTION: usize = 24;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 mod cdp;
+#[cfg(test)]
+mod clean_prior_tests;
 mod color_centroid;
 mod latent_rollout;
 mod open_loop;
@@ -59,6 +61,7 @@ pub(crate) const LOSS_WORLD_ROLLOUT: usize = 25;
 pub(crate) const LOSS_PREDICTIVE_WORLD: usize = 26;
 pub(crate) const LOSS_RECURRENT_WORLD: usize = 30;
 pub(crate) const LOSS_IMAGE_FEEDBACK: usize = 34;
+pub(crate) const CLEAN_PRIOR_VALID_FRACTION: usize = 36;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
     (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_centered {
@@ -569,14 +572,19 @@ fn training_graph(
             }
             predictive_keeps.push(keep_action);
         }
-        if config.prior_continuation_scale.is_some() || config.prior_reward_scale.is_some() {
+        if config.prior_continuation_scale.is_some()
+            || config.prior_reward_scale.is_some()
+            || pixel_loss.clean_prior()
+        {
             prior_states.push(prior_continuation::state(
                 &mut graph,
                 config,
                 deter,
                 prior_logits,
                 time,
-                if config.prior_reward_scale.is_some() {
+                if pixel_loss.clean_prior() {
+                    "clean_prior"
+                } else if config.prior_reward_scale.is_some() {
                     "prior_reward"
                 } else {
                     "prior_continuation"
@@ -737,6 +745,17 @@ fn training_graph(
             state,
             keep_action,
         } = HeadInputs::stack(&mut graph, chunk, config);
+        let state = if pixel_loss.clean_prior() {
+            let start = group * time_batch_length;
+            stack_time(
+                &mut graph,
+                &prior_states[start..start + chunk.len()],
+                batch,
+                config.feature_dim(),
+            )
+        } else {
+            state
+        };
         let mut target = |name, width| {
             let inputs = (group * time_batch_length..(group + 1) * time_batch_length)
                 .map(|time| graph.input(&format!("{name}_{time}"), &[batch, width]))
@@ -897,6 +916,14 @@ fn training_graph(
                 let residual = graph.add(reconstruction, negative_target);
                 graph.mul(residual, residual)
             };
+            let squared = if pixel_loss.clean_prior() {
+                let keep = graph.mean_inner(keep_action);
+                let keep = graph.stop_gradient(keep);
+                let keep = graph.broadcast_inner(keep, config.observation_dim());
+                graph.mul(squared, keep)
+            } else {
+                squared
+            };
             let reconstruction_loss = graph.sum_all(squared);
             // Sum event dimensions and average B*T, as in the D3 control.
             reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / rows as f32));
@@ -907,7 +934,7 @@ fn training_graph(
         let terminal_weight = config
             .terminal_continuation_weight
             .filter(|&weight| weight != 1.0);
-        let continuation = if terminal_weight.is_some() {
+        let continuation = if terminal_weight.is_some() || pixel_loss.clean_prior() {
             continuation_logits
         } else {
             graph.sigmoid(continuation_logits)
@@ -915,23 +942,39 @@ fn training_graph(
         // Keep the reduction explicit because this value is composed into the
         // joint loss and exported as a metric. The fused backend loss stores
         // per-row partials and is only scalar when used as a terminal output.
-        reward_losses.push(weighted_cross_entropy(
-            &mut graph,
-            reward,
-            reward_target,
-            reward_weight,
-        ));
-        continuation_losses.push(match terminal_weight {
-            Some(weight) => terminal_continuation::loss(
+        if pixel_loss.clean_prior() {
+            let keep = graph.mean_inner(keep_action);
+            let [reward, continuation] = pixel_rollout::event_losses(
                 &mut graph,
+                reward,
                 continuation,
+                reward_target,
                 continuation_target,
-                rows,
-                config.continuation_discount(),
-                weight,
-            ),
-            None => mean_binary_cross_entropy(&mut graph, continuation, continuation_target, rows),
-        });
+                keep,
+            );
+            reward_losses.push(reward);
+            continuation_losses.push(continuation);
+        } else {
+            reward_losses.push(weighted_cross_entropy(
+                &mut graph,
+                reward,
+                reward_target,
+                reward_weight,
+            ));
+            continuation_losses.push(match terminal_weight {
+                Some(weight) => terminal_continuation::loss(
+                    &mut graph,
+                    continuation,
+                    continuation_target,
+                    rows,
+                    config.continuation_discount(),
+                    weight,
+                ),
+                None => {
+                    mean_binary_cross_entropy(&mut graph, continuation, continuation_target, rows)
+                }
+            });
+        }
         if pixel_loss.predictive() {
             let start = group * time_batch_length;
             let prior = stack_time(
@@ -1393,6 +1436,13 @@ fn training_graph(
             losses.sample_distance,
             losses.valid,
         ]);
+    }
+    if pixel_loss.clean_prior() {
+        while outputs.len() < CLEAN_PRIOR_VALID_FRACTION {
+            outputs.push(graph.scalar(0.0));
+        }
+        let keep = stack_time(&mut graph, &spatial_keeps, batch, 1);
+        outputs.push(graph.mean_all(keep));
     }
     if sample_posterior {
         outputs.push(stack_time(&mut graph, &deters, batch, size.deter));

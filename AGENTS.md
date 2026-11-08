@@ -25,41 +25,39 @@ and the five-game campaign are parked. Use native pixel supervision and retained
 categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
 Full competence remains unproven. No pretrained encoder or object/RAM training labels.
 
-The [suffix-event result](docs/results/2026-11-08-breakout-world-suffix-events.md)
-is closed:fails retention. Recorded development observed/1/4/8/16/32 is
-98/112, 97/109, 58/109, 31/107, 13/114, 6/95. Primary16/32 ball energy0.283365
-versus H0.169502/fusion.345425. Non-ending alarms>5% are
-239/304,max0.999482.
-All physical/event gates,individual alarms and per-action/horizon reward/paddle/
-brick regressions stay authoritative. Keep H0 as the broad reference.
+Select the [causal-prior objective](docs/experiments/2026-11-08-breakout-world-clean-prior.md)
+for native qualification and a separately declared bounded learner. Explicit
+`motion_clean_prior` replaces main-pass posterior RGB/reward/continuation readouts
+with causal prior readouts at each observed transition. Keep the posterior teacher
+trajectory/KL and H16 RGB/event suffix losses. Mask unavailable incoming transitions;
+no extra decoder pass,weights,heads,labels,collector or image feedback. Geometry/
+inference/data stay;80 weights/8,871,955 scalars/240 tensors,v14 and14 API reports.
+Conditioning,gradients,reset weighting and RNG sampling change together.
 
-Root `/mnt/data/kindle-breakout-world-suffix-events-20261108`.
-Explicit `motion_event_rollout` adds future reward CE/continuation BCE at scales1
-without generated-image feedback. Architecture/data/budget/seed/rates stay fixed;
-80 weights/8,871,955 scalars/240 tensors,v13. Source/native/runnera8efffc6,
-SHAf40555b5.105 world CPU/224 packaged Python CPU/strict core-binding Clippy pass.
-Preserve optional-microbatch fixture compilation failure/correction and incomplete
-receipt count assertion:169+55 disjoint tests complete224 without repeats.
-Qualification1,217 pins/33.925s passes new causal controls/lane isolation,240 exact
-fusion initial tensors/18 cached initial arrays,18 initial/trained restores and13
-finite reports/total/mask. Unchanged event-loss math receipt reused,not rerun.
-Fresh8,192 updates:1,225 learning pins,all80 weights change,
-13 finite reports,384 dense origins and18 final restore arrays pass. Four guards/
-36 sealed files,2,789-pin closure andthree terminal services
-pass. Native1166.306s/loop1352.208s;assessment/CPU
-costs separate. Released865,583,382 counted build-cache bytes;useful checkpoints,
-source/runtime,wheel,CPU executable and all original failures remain retained.
+Root `/mnt/data/kindle-breakout-world-clean-prior-20261108`. New CPU support count
+finds65,454 real-history first-suffix forecasts/623 terminals versus2,021,344
+potential valid causal transitions/10,826 terminals in the same fixed plan.
+Counts are exposures,not independent data or proof of a bottleneck.108 world CPU
+checks and strict core Clippy pass. The pending native fixture was strengthened
+from serial to time-batched readouts;compile-only and strict Clippy pass without
+repeating CPU cases. Package/binding checks and native qualification have not run.
+No GPU allocation is active or declared. Consult the protocol before execution.
 
-The [CPU event diagnosis](docs/results/2026-11-08-breakout-world-event-diagnosis.md)
-and [fusion learner](docs/results/2026-11-08-breakout-world-spatial-fusion.md) remain
-closed. Their observed/imagined event errors motivated this separately tested
-loss;no gradient interference or isolated failure mechanism was established.
-Do not repeat any closed learner,assessment or collector. No unchanged extension,
-sweep or automatic successor is selected. Precise causal physics,event timing/
-calibration,persistent brick memory,late/tunnel/second-wall coverage,untouched
-families and fresh confirmation remain required. The oracle has no above-top-
-brick endpoints. Full world-model and five-game goals remain unfinished;
-no GPU allocation is active or selected.
+The [suffix-event learner](docs/results/2026-11-08-breakout-world-suffix-events.md)
+remains closed/failed:observed98/112,one97/109,eight31/107;primary.283365 versus
+H0.169502/fusion.345425;239/304 non-ending alarms>5%. Source/nativea8efffc6,
+SHAf40555b5,105 Rust/224 packaged Python,native causal/restore checks,four guards/
+36 sealed files and2,789-pin closure pass. Native1166.306s/loop1352.208s. Keep H0.
+Its [CPU event diagnosis](docs/results/2026-11-08-breakout-world-event-diagnosis.md)
+and [fusion predecessor](docs/results/2026-11-08-breakout-world-spatial-fusion.md)
+stay closed;all failures/checkpoints/source/runtime remain retained.
+
+Do not repeat closed learners,assessments or collectors. No unchanged extension,
+sweep or automatic successor. All original physical/event gates stay. Precise
+causal physics,event timing/calibration,persistent brick memory,late/tunnel/second-
+wall coverage,untouched families and fresh confirmation remain required. The
+oracle has no above-top-brick endpoints. World-model and five-game goals remain
+unfinished;no causal failure mechanism is established.
 
 ## Direction and retained results
 

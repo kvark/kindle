@@ -18,6 +18,24 @@ pub(super) struct EventTargets<'a> {
 
 mod feedback;
 
+pub(super) fn event_losses(
+    graph: &mut Graph,
+    reward: NodeId,
+    continuation: NodeId,
+    reward_target: NodeId,
+    continuation_target: NodeId,
+    weight: NodeId,
+) -> [NodeId; 2] {
+    feedback::event_losses(
+        graph,
+        reward,
+        continuation,
+        reward_target,
+        continuation_target,
+        weight,
+    )
+}
+
 fn motion_loss(
     graph: &mut Graph,
     errors: NodeId,
