@@ -23,7 +23,12 @@ available. Only the user merges PRs; commits and pushes are allowed.
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. No GPU allocation or next learner is selected.
+object/RAM training labels. The [bounded H32 protocol](docs/experiments/2026-11-08-breakout-world-h32.md)
+is selected for CPU/shape qualification. Reuse v18 native38680c73;T48/H32 keeps
+prefix16 and tests a fresh4,096-update budget,world/dynamics8e-4,encoder4e-4.
+Same raw future slots as old8,192/H16,fewer observed slots;no matched-compute or
+isolated-horizon claim. No GPU allocation or full learner is declared. Root
+`/mnt/data/kindle-breakout-world-h32-20261108`;consult protocol.
 
 The [survival decomposition](docs/results/2026-11-08-breakout-world-survival-decomposition.md)
 is complete,CPU-only. With rendered features fixed,oracle survival changes local-
