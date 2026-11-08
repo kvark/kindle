@@ -25,23 +25,27 @@ and the five-game campaign are parked. Use native pixel supervision and retained
 categorical H0 as the inspectable reference; CDP is a later efficiency comparison.
 Full competence remains unproven. No pretrained encoder or object/RAM training labels.
 
-Select the [causal-prior objective](docs/experiments/2026-11-08-breakout-world-clean-prior.md)
-for native qualification and a separately declared bounded learner. Explicit
-`motion_clean_prior` replaces main-pass posterior RGB/reward/continuation readouts
-with causal prior readouts at each observed transition. Keep the posterior teacher
-trajectory/KL and H16 RGB/event suffix losses. Mask unavailable incoming transitions;
-no extra decoder pass,weights,heads,labels,collector or image feedback. Geometry/
-inference/data stay;80 weights/8,871,955 scalars/240 tensors,v14 and14 API reports.
+The [causal-prior objective](docs/experiments/2026-11-08-breakout-world-clean-prior.md)
+is qualified and its separately declared fresh8,192 learner/final restore are
+active. Explicit `motion_clean_prior` trains main RGB/reward/continuation readouts
+from causal priors at every valid observed transition;the posterior teacher/KL
+and H16 free-rollout losses remain. Mask reset/first arrivals;no extra decoder
+pass,weights,heads,labels,collector or image feedback. Same fusion geometry/
+inference/data;80 weights/8,871,955 scalars/240 tensors,v14,14 API reports.
 Conditioning,gradients,reset weighting and RNG sampling change together.
 
-Root `/mnt/data/kindle-breakout-world-clean-prior-20261108`. New CPU support count
-finds65,454 real-history first-suffix forecasts/623 terminals versus2,021,344
-potential valid causal transitions/10,826 terminals in the same fixed plan.
-Counts are exposures,not independent data or proof of a bottleneck.108 world CPU
-checks and strict core Clippy pass. The pending native fixture was strengthened
-from serial to time-batched readouts;compile-only and strict Clippy pass without
-repeating CPU cases. Package/binding checks and native qualification have not run.
-No GPU allocation is active or declared. Consult the protocol before execution.
+Root `/mnt/data/kindle-breakout-world-clean-prior-20261108`. Support count finds
+65,454 real-history first-suffix forecasts/623 terminals versus2,021,344 potential
+valid causal transitions/10,826 terminals. Counts are exposures,not independent
+data or proof of a bottleneck.108 world CPU/241 packaged Python/strict core-
+binding Clippy pass. New batched native controls pass without repeating old math
+fixtures. Qualification1,222 pins/35.760s passes target/image/mask independence,
+lane isolation,zero losses under zero masks,all240 parent initial tensors/18
+cached initial arrays,18 initial/trained restores,77 changed weights and14
+finite reports/totals/fractions,plus old-native v14 rejection. Source/native/runner
+35c090d0,SHA d60f2888. Learning1,230 pins,AMD/Auto/host guard.
+Released865,662,743 counted build-cache bytes;runtime,wheel,CPU executable,
+source,support audit and useful checkpoints retained. No qualification repeats.
 
 The [suffix-event learner](docs/results/2026-11-08-breakout-world-suffix-events.md)
 remains closed/failed:observed98/112,one97/109,eight31/107;primary.283365 versus
