@@ -5,40 +5,29 @@
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic,CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference;no pretrained encoder or
-object/RAM training labels. No GPU allocation or successor is selected.
+object/RAM training labels.
 
-The [state/image-history diagnostic](results/2026-11-08-breakout-world-state-history.md) is separately repaired and closed;
-[protocol](experiments/2026-11-08-breakout-world-state-history.md). H16 natural eight-step readouts:prior46/108,h-only44/108,
-true-image-history96/108,history+h100/108. At32:8/108,8/108,74/108,88/108.
-H32 eight-step:prior28/108,history58/108,history+h92/108. Four related draws per
-origin are not independent trials. No hybrid feeds a forecast;true later images
-and teacher states are privileged information,not learned improvements or gates.
-The new image route changes the old nonspatial state-swap interpretation.
+The [action-conditioned transport protocol](experiments/2026-11-08-breakout-world-action-transport.md) is selected for CPU/native
+implementation and qualification. Combine the existing default-off action planes/
+width16 with learned pixel transport;explicit v19 binding preserves v17/v18 and
+older defaults. Adds595 weights to v18,82 logical/8,893,798 scalars/246 tensors.
+Select fresh8,192 B8/T32/H16,original rates4e-4/plan/event losses;no new collector,
+labels,pretrained encoder,backend primitive or actor/critic. Consult protocol.
+No GPU allocation or full learner is declared. Root
+`/mnt/data/kindle-breakout-world-action-transport-20261108`.
 
-History pairs leave event heads exactly unchanged. Full-teacher terminal17 means
-remain.205339(H16)/.086247(H32) on ten outcome-selected examples. This identifies
-weak readout/timing on that slice,not population calibration or a head/GRU cause.
-The next separately justified learning decision should address stable visual
-transitions and coherent state/event fitting. Do not repeat the closed diagnostic
-or substitute teacher scores for a learned world model.
+The [closed state/history diagnostic](results/2026-11-08-breakout-world-state-history.md) motivates visual-transition
+stability:H16 eight-step prior46/108,h-only44/108,true-history96/108,history+h
+100/108. These are privileged readouts,not learned repairs or causal fractions.
+Event heads stay invariant under history swaps and weak on selected true-image
+terminal states. Original failure/repair,2,518 pins and all raw modes/clips stay.
+The [H32 recipe](results/2026-11-08-breakout-world-h32.md) remains closed and fails retention;do not extend it.
 
-Repair source22cf176a/test executable SHA091c0661;production Rust graphs/math
-and older diagnostics unchanged from7f797a2b. All48 bundles/eight modes,64 cached
-reference arrays,960 unchanged snapshot tensors,zero updates and four lossless
-clips/98 frames pass. Closure2,518 pins,successful guard9/failed guard27,both
-services terminal. Original empty-future native attempt remains protocol-failed;
-its unsaved trace/9.72s,counter-type and packaging-assert failures/repairs stay.
-Repair66.213s native/25.826s CPU,additional preparation/guard/figure/failure costs;
-736,178,565-byte cache released. Root
-`/mnt/data/kindle-breakout-world-state-history-20261108/repair`.
-
-The [H32 recipe](results/2026-11-08-breakout-world-h32.md) remains closed and fails retention:dev eight-step25/107
-versus H16's43/107,primary.329402 versus H0.169502/H16.240566 and required.127127;
-fitting48/176 also trails79/176. All original failures/3,453 closure pins stay.
-No extension,unchanged recipe,sweep,completed-stage repeat or automatic successor.
-Precise physics,events,persistent brick memory,late/tunnel/second-wall coverage,
-untouched families and fresh confirmation remain required. Existing oracle has
-no above-top-brick endpoint. Full world-model and five-game goals stay unfinished.
+All original physics/event gates stand. No unchanged recipe,sweep,completed-stage
+repeat or automatic successor. Precise physics,events,persistent brick memory,
+late/tunnel/second-wall coverage,untouched families and fresh confirmation remain
+required. Existing oracle has no above-top-brick endpoint. Intermediate and
+privileged diagnostic scores cannot complete the world-model or five-game goal.
 
 ### What would establish the world model
 
