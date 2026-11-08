@@ -13,35 +13,22 @@ Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the broad reference; no pretrained encoder or
 object/RAM training labels.
 
-The [launch-corrective trial](results/2026-11-08-breakout-world-launch-corrective.md) is closed and fails retention. Warm16,384→20,480
-updates,unchanged1M/RGB64/v18,T32/H16/rates4e-4,new clean-launch/retained paired
-replay. Serve energy.371741→.329427,but overall.172366→.229385;natural eight-step
-53/107→46/107 and chosen-action8/16/32 accuracy47.7%/62.5%/2.64%→40.5%/53.5%/.90%.
-Ending16 Brier.007332 passes;ending32.324060,RIGHT16.101968 and234/304 false alarms
-fail. Retain earlier small64;the data gap did not resolve broader rollout errors
-at this budget. No learner,GPU allocation,extension or successor is selected.
+The [clean-launch fitting diagnostic](experiments/2026-11-08-breakout-world-launch-fitting.md) is selected. The corrective model's new fitting branches
+were not included in its original16-stream fitting exports. Query only its final
+20,480 state onall288 retained launch branches:36 eight-lane groups,four fixed
+latent draws,history16/endpoints1/4/8/16/32. No training,gradient,new gameplay,
+other model query or old assessment repeat. Check source joins,finite arrays,
+all240 frozen tensors/ages andthe existing host guard. Root
+`/mnt/data/kindle-breakout-world-launch-fitting-20261108`. No learner is selected.
+The question is fitting versus different-context failure,not a new world gate;
+all draws/missing objects remain andfitting success cannot repair the failed trial.
 
-All4,096 finite13-component rows,80 changed weights,240 inherited/frozen tensors,
-plan/counts/ages and18 restore arrays pass620 input/115 CPU-audit pins. Native
-455.523s/loop527.794s;new final84 groups170.763s/CPU16.087s. Closure1,785 pins,
-three guards/27 files/two terminal units. All84 causal exports finite;96 clip
-frames exact. Report-only post-closure generator correction retained separately,
-original script restored byte-exact;no learning/evaluation data changed. Root
-`/mnt/data/kindle-breakout-world-launch-corrective-20261108`. Do not repeat it.
-
-The [clean-wait collection](results/2026-11-08-breakout-world-clean-launch.md) stays closed:288 full18-command branches,9,216 new actions/
-36,864 frames (18,392/73,568 including source/private-state replay),35.002s.
-Eight fitting seeds givefour recent16-arrival/five32-arrival histories;no exact
-match to56 development prefixes. All240 camera tensors/ages unchanged;764 closure
-pins. The [conditional support](results/2026-11-08-breakout-world-transition-support.md) and [survival sensitivity](results/2026-11-08-breakout-world-small64-survival.md) remain diagnostics,not complete causal explanations.
-
-The [small RGB64 trial](results/2026-11-08-breakout-world-small64.md) remains closed and failed:603,915 weights,
-16,384 fresh updates,natural eight-step53/107 but32-step8/95,primary.172366 versus
-required.127127,RIGHT16 false risk.252476,and265/304 nonending alarms. Its39m29s
-loop costs more than12M local action despite faster individual updates. All1,358
-pins/four guards/36 files,weights/runtime/arrays/plots/clips and original CPU
-plot-schema failure remain. No new build cache exists. Earlier completed work
-stays closed;the pixel-generator review is hypothesis guidance only.
+The [corrective trial](results/2026-11-08-breakout-world-launch-corrective.md) stays closed and failed:ball energy.172366→.229385;
+natural eight-step53/107→46/107;234/304 false alarms. Retain earlier small64.
+Native455.523s/loop527.794s;new final84 groups170.763s,closure1,785 pins/three
+guards/27 files/two terminal services. Report-only generator correction preserved,
+sealed original restored;no measured files changed. The [new collection](results/2026-11-08-breakout-world-clean-launch.md),
+[conditional audit](results/2026-11-08-breakout-world-transition-support.md),[survival sensitivity](results/2026-11-08-breakout-world-small64-survival.md) and[small64 trial](results/2026-11-08-breakout-world-small64.md) remain closed. Do not repeat them.
 
 All original physics/event gates stand. Precise physics, event timing/calibration,
 persistent brick memory, late/tunnel/second-wall coverage, untouched families and
