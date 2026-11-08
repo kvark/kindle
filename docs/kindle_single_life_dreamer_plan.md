@@ -5,7 +5,16 @@
 The goal **prove the world model training on Breakout** remains active and unproven.
 Actor/critic, CDP comparisons and the five-game campaign stay parked. Use native
 pixel supervision and H0 as the inspectable reference. No pretrained encoder or
-object/RAM training labels. No GPU allocation or new learner is selected.
+object/RAM training labels. The fixed-filter/future-event composition is selected
+for CPU/native qualification; no GPU allocation or full learner is declared.
+
+The [fixed-event protocol](experiments/2026-11-08-breakout-world-fixed-events.md)
+adds future reward/continuation supervision to the two existing recurrent draws
+of the fixed-filter phase. Keep immutable H0 observation filter and36 fixed visual
+weights;32 dynamics/head weights learn. New explicit objective/API/v16 and16 reports;
+no new parameters or RGB suffix loss. CPU checks and a separately declared native
+composition qualifier precede any4096-update phase. Root
+`/mnt/data/kindle-breakout-world-fixed-events-20261108`. All original gates stay.
 
 The [RGB-weight1 experiment](results/2026-11-08-breakout-world-rgb1.md)
 is closed and fails retention. Change only observed/future RGB scale100→1 from
