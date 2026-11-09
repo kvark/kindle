@@ -76,3 +76,10 @@ A fit pass cannot prove the full goal. Original physics/event precision,natural
 calibration,persistent removed-brick memory,late/tunnel/second-wall/above-top
 coverage,untouched families andfresh confirmation remain required. Full oracle
 still lacks above-top endpoints. All completed trials/failures stay retained.
+
+The [completed result](../results/2026-11-09-breakout-denoising-frame-residual.md)
+fails0/110 ordinary and0/198 privileged one-step per draw. More one-step balls
+remain visible,butall detected supported balls match their previous positions,
+withmedian movement projection0 andnext-position error about2.6 pixels. Legacy
+qualification,first event tensors,frozen/restore andthree guards pass. The trial
+isclosed;no extension,broad learner or successor isselected. Full goal unproven.
