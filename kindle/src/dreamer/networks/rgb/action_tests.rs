@@ -54,6 +54,10 @@ struct Fixture {
     parameters: Vec<(String, Vec<f32>)>,
 }
 fn fixture_with_options(transport: bool, late: bool) -> Fixture {
+    fixture_with_architecture(transport, late, false)
+}
+
+fn fixture_with_architecture(transport: bool, late: bool, wide: bool) -> Fixture {
     let mut c = DreamerConfig::tiny(3);
     c.observation_kind = ObservationKind::Rgb32;
     c.rgb_spatial_decoder = true;
@@ -61,6 +65,7 @@ fn fixture_with_options(transport: bool, late: bool) -> Fixture {
     c.rgb_spatial_action = true;
     c.rgb_spatial_transport = transport;
     c.rgb_late_action = late;
+    c.rgb_wide_motion = wide;
     let mut g = Graph::new();
     let decoder = Decoder::new(&mut g, &c, "world.decoder", c.feature_dim());
     let state = g.parameter("fixture.state", &[2, c.feature_dim()]);
@@ -118,7 +123,11 @@ fn reference_actions_and_history(transport: bool) {
 }
 
 fn reference_options(transport: bool, late: bool) {
-    let mut f = fixture_with_options(transport, late);
+    reference_architecture(transport, late, false);
+}
+
+fn reference_architecture(transport: bool, late: bool, wide: bool) {
+    let mut f = if wide { fixture_with_architecture(transport, late, true) } else { fixture_with_options(transport, late) };
     let backward = meganeura::autodiff::differentiate(&f.graph);
     let original = evaluate(&backward, &f.feeds).unwrap();
     assert!(original.iter().flat_map(|v| &v.data).all(|x| x.is_finite()));
@@ -132,7 +141,7 @@ fn reference_options(transport: bool, late: bool) {
             "{name}"
         );
     }
-    if transport || late {
+    if transport || late || wide {
         for name in ["fixture.action", "fixture.history"] {
             let index = f.parameters.iter().position(|(n, _)| n == name).unwrap();
             let values = f.parameters[index].1.clone();
@@ -197,7 +206,11 @@ fn native_values_gradients_and_lane_controls(transport: bool) {
 }
 
 fn native_options(transport: bool, late: bool) {
-    let mut f = fixture_with_options(transport, late);
+    native_architecture(transport, late, false);
+}
+
+fn native_architecture(transport: bool, late: bool, wide: bool) {
+    let mut f = if wide { fixture_with_architecture(transport, late, true) } else { fixture_with_options(transport, late) };
     let backward = meganeura::autodiff::differentiate(&f.graph);
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     let mut session = runtime::build_session(&f.graph, &gpu, Mode::Training, false);
@@ -226,7 +239,7 @@ fn native_options(transport: bool, late: bool) {
         let expected = evaluate(&backward, &f.feeds).unwrap();
         session.step();
         session.wait();
-        if late {
+        if late || wide {
             let mut pixels = vec![0.; 2 * 3 * 32 * 32];
             session.read_output_by_index(1, &mut pixels);
             let lane = pixels[..3 * 32 * 32].to_vec();
@@ -310,4 +323,41 @@ fn late_action_motion_ancestors_exclude_commands_until_fusion() {
         assert_eq!(seen.contains(&action), index == 3);
         assert_eq!(seen.contains(&state), index == 3);
     }
+}
+
+#[test]
+fn wide_motion_cpu_derivatives_and_lane_isolation() {
+    reference_architecture(false, false, true);
+}
+
+#[test]
+#[ignore = "requires separately declared guarded wide-motion qualification"]
+fn wide_motion_native_values_gradients_and_lane_controls_match_f64() {
+    native_architecture(false, false, true);
+}
+
+#[test]
+fn wide_motion_keeps_causal_inputs_and_widens_only_the_local_path() {
+    let mut c = DreamerConfig::tiny(18);
+    c.observation_kind = ObservationKind::Rgb32;
+    c.rgb_spatial_decoder = true;
+    c.rgb_spatial_fusion = true;
+    c.rgb_spatial_action = true;
+    c.rgb_wide_motion = true;
+    let mut graph = Graph::new();
+    let decoder = Decoder::new(&mut graph, &c, "world.decoder", c.feature_dim());
+    let state = graph.input("state", &[2, c.feature_dim()]);
+    let history = graph.input("history", &[2, 2 * c.observation_dim()]);
+    let action = graph.input("action", &[2, 18]);
+    let output=decoder.forward_logits_with_action_history(&mut graph, state, Some(history), Some(action), 2);
+    for (index, layer) in decoder.motion.iter().chain(decoder.fusion.as_deref()).enumerate() {
+        assert_eq!(layer.convolution.layer.out_channels,32);
+        let weight=layer.convolution.layer.weight;
+        let conv=graph.nodes().iter().find(|n| matches!(n.op,Op::Conv2d{..}) && n.inputs.contains(&weight)).unwrap();
+        let seen=super::fusion_tests::ancestors(&graph,conv.id);
+        assert!(seen.contains(&history) && seen.contains(&action));
+        assert_eq!(seen.contains(&state),index==3);
+    }
+    assert_eq!(decoder.output.layer.in_channels,32);
+    assert_eq!(graph.node(output).ty.shape,[2,c.observation_dim()]);
 }

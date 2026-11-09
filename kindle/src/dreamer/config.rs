@@ -343,6 +343,9 @@ pub struct DreamerConfig {
     /// Standalone local-action world: append commands after image motion extraction.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_late_action: bool,
+    /// Standalone local-action world: widen the motion and fusion path to32 channels.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_wide_motion: bool,
     /// Standalone spatial world: encode generated images into the imagined belief.
     #[serde(default, skip_serializing_if = "is_false")]
     pub world_image_feedback: bool,
@@ -540,6 +543,7 @@ impl DreamerConfig {
             rgb_spatial_transport: false,
             rgb_spatial_action: false,
             rgb_late_action: false,
+            rgb_wide_motion: false,
             world_image_feedback: false,
             rgb_coordinates: false,
             rgb_latent_only: false,
@@ -797,6 +801,23 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if self.rgb_wide_motion
+            && (!self.rgb_spatial_action
+                || !self.rgb_spatial_fusion
+                || !self.rgb_spatial_decoder
+                || self.rgb_late_action
+                || self.rgb_spatial_transport
+                || self.rgb_spatial_residual
+                || self.world_image_feedback
+                || self.world_gaussian
+                || self.world_mean_latents
+                || self.rgb_previous_frame
+                || self.rgb_latent_only
+                || self.rgb_color_attention.is_some()
+                || self.color_centroid_supervision.is_some())
+        {
+            return Err("wide motion requires a plain local-action categorical fused decoder".into());
+        }
         if self.rgb_late_action
             && (!self.rgb_spatial_action
                 || self.rgb_spatial_transport

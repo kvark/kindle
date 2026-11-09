@@ -16,6 +16,7 @@ use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 
 mod action_features;
 mod late_action;
+mod wide_motion;
 mod frozen_visual;
 use frozen_visual::TrainingScope;
 mod fixed_teacher;
@@ -164,6 +165,9 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    if let Some(base) = wide_motion::base_metadata(metadata)? {
+        return checkpoint_pixel_loss(&base);
+    }
     if let Some(base) = late_action::base_metadata(metadata)? {
         return checkpoint_pixel_loss(&base);
     }
@@ -742,6 +746,7 @@ impl WorldModelLearner {
         pixel_loss: PixelLoss,
         fixed_teacher: Option<TeacherAnchor>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        wide_motion::validate(&config, prediction_length, pixel_loss)?;
         late_action::validate(&config, prediction_length, pixel_loss)?;
         action_features::validate(&config, prediction_length, pixel_loss)?;
         if config.world_mean_latents
@@ -1549,6 +1554,10 @@ impl WorldModelLearner {
         if self.config.rgb_late_action {
             assert_eq!(self.training_scope, TrainingScope::All);
             late_action::wrap_metadata(&mut metadata)?;
+        }
+        if self.config.rgb_wide_motion {
+            assert_eq!(self.training_scope, TrainingScope::All);
+            wide_motion::wrap_metadata(&mut metadata)?;
         }
         if let Some(anchor) = &self.fixed_teacher {
             let (parameters, scalars) = anchor.verify(&self.observe)?;

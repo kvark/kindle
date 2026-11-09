@@ -497,6 +497,7 @@ pub struct DreamerCore {
 
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
+        assert!(!config.rgb_wide_motion, "wide motion is standalone world only");
         assert!(!config.rgb_late_action, "late action is standalone world only");
         assert!(
             config.world_action_features.is_none(),
@@ -576,6 +577,7 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
+        assert!(!config.rgb_wide_motion, "wide motion is standalone world only");
         assert!(!config.rgb_late_action, "late action is standalone world only");
         assert!(
             config.world_action_features.is_none(),
@@ -2944,6 +2946,9 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.config.rgb_wide_motion {
+        return Err(io::Error::new(io::ErrorKind::InvalidData, "wide motion is standalone world only"));
+    }
     if metadata.config.rgb_late_action {
         return Err(io::Error::new(io::ErrorKind::InvalidData, "late action is standalone world only"));
     }
@@ -3619,6 +3624,15 @@ mod tests {
             perception: Some(PerceptionKind::LeVJepaTiny.identity("1".repeat(64))),
             tensor_sha256: None,
         }
+    }
+
+    #[test]
+    fn checkpoint_rejects_standalone_wide_motion_before_loading_tensors() {
+        let mut metadata = valid_checkpoint_metadata();
+        metadata.config.rgb_wide_motion = true;
+        let error = validate_checkpoint_metadata(&metadata).unwrap_err();
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert!(error.to_string().contains("wide motion"));
     }
 
     #[test]

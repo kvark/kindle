@@ -294,7 +294,14 @@ impl Decoder {
         let channels = 4 * size.vision_depth;
         let spatial = (side / 16) * (side / 16) * channels;
         let mut input_channels = channels;
-        let motion_channels = if config.rgb_spatial_action { 16 } else { 8 };
+        let motion_channels = if config.rgb_wide_motion {
+            32
+        } else if config.rgb_spatial_action {
+            16
+        } else {
+            8
+        };
+        let fusion_channels = if config.rgb_wide_motion { 32 } else { 16 };
         let action_count = config.rgb_spatial_action.then_some(config.action_count);
         Self {
             deterministic: (!config.rgb_latent_only).then(|| {
@@ -345,7 +352,7 @@ impl Decoder {
                 graph,
                 &format!("{name}.imgout"),
                 if config.rgb_spatial_fusion {
-                    16
+                    fusion_channels
                 } else {
                     2 * size.vision_depth + if config.rgb_spatial_decoder { 8 } else { 0 }
                 },
@@ -386,7 +393,7 @@ impl Decoder {
                         } else {
                             0
                         },
-                    16,
+                    fusion_channels,
                     side,
                 ))
             }),

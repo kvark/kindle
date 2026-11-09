@@ -14,19 +14,30 @@ immutable. The latest pass leaves about273 GiB available on the root filesystem.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [frozen-state readout diagnostic](results/2026-11-09-breakout-world-state-readouts.md)
-is closed:30 immutable inputs,42 fitting-only affine/RBF fits,144 metric rows,
-36 exact original RGB counts and27,648 per-origin rows;three synthetic tests pass.
-1.918s CPU,zero model/GPU/emulator queries,no source/checkpoint orscore changes.
-Prior-suffix current h/z RBF1/112 versus RGB103/112;posterior-history encoder55/112,
-h/z24/112 versus RGB108/112. New horizon-specific RBF8 is4/107 with9.36px RMSE,
-while fitting resubstitution is176/176. No precise transferable readout rescue.
-Weak probes do not prove information absent: h/z omits24,576 image-history values
-that the local decoder reads directly. The full world state is larger thanh/z;
-readout generalization anddecoder/history use are not an isolated failure cause.
-Root `/x/Temp/kindle-world-state-readouts-20261109`;plot reviewed,all families/
-horizons retained. No GPU job,native intervention,new learner,collector,assessment,
-extension orautomatic successor is selected.
+unproven. Select [wide local motion native qualification](experiments/2026-11-09-breakout-world-wide-motion.md)
+for the default-off32-channel motion/fusion variant. Existing local widths stay16
+across model presets;this widens that path without changing encoder/RSSM/event
+geometry.1M:80 parameters/675,643 scalars/240 saved arrays,13 changed local shapes,
++71,728 scalars. Explicitv27 wraps v18/v25;no late/transport/residual/auxiliary
+composition orwhole-agent use. Hypothesis only;not a diagnosed capacity cause.
+
+Six unique new/affected CPU checks include derivatives/lane isolation,shape/counts,
+headers andwhole-agent rejection;29 config/five scope/four feature/three late
+checks andstrict core/test/binding Clippy pass.51 isolated packaged Python CPU
+checks pass. Optimized candidate native SHA02feea6e/test SHA7ed42e9e at
+`/x/Temp/kindle-world-wide-motion-20261109`. Initial dev-profile wheel/log remain
+retained;separate release wheel is selected before any native declaration.
+No GPU job ormain learner active yet. Pin source/config/data,then run one bounded
+qualification;no retry orautomatic successor. A learning comparison requires
+separate review/declaration afterward. Existing runtimes/scripts stay immutable.
+
+The [frozen-state diagnostic](results/2026-11-09-breakout-world-state-readouts.md)
+stays closed:30 inputs,42 fits,144 metric rows,1.918s CPU,zero model queries.
+Partial h/z probes omit24,576 image-history values;they provide no precise
+transferable forecast rescue andcannot prove information absence. All original
+image scores,plots,folds and27,648 per-origin rows remain retained. Wider denoiser
+failure andall earlier architecture failures stay closed;this is a distinct
+local-decoder branch,not a repeat orassumed fix.
 
 The [posterior-history RGB100 learner](results/2026-11-09-breakout-world-posterior-natural100.md)
 stays closed/failed at2/3 dense gates: observed108/112,one99/109,eight19/107,
