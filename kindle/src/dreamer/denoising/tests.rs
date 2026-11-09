@@ -605,6 +605,7 @@ fn half_max_requires_v4_preserves_legacy_defaults_and_all_graphs() {
     }
 }
 
+mod event_logits;
 mod sampler_steps;
 mod sampler_trace;
 

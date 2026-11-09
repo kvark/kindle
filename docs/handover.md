@@ -39,7 +39,13 @@ Original unpublished report's0/24 prose is preserved with a CPU correction to
 3/24; no score/gate/model query is changed or repeated. Root
 `/mnt/data/kindle-breakout-denoising-low-noise-20261109`.
 
-All jobs stopped. No learner, extension, collector or successor selected. Keep
+The [frozen reward-logit diagnosis](experiments/2026-11-09-breakout-denoising-event-logits.md) is selected. Compare actual/forecast/ordinary
+head inputs, retain255 logits per row, and require12 cached event arrays exact.
+200 head batches/1,600 rows; no learning or new RGB generation.22 CPU checks and
+strict release test-target Clippy pass; production bytes matchfecc251b. Pin before
+one300s guarded allocation,135 frozen tensors/nine sealed files required. Root
+`/mnt/data/kindle-breakout-denoising-event-logits-20261109`.
+No learner, extension or collection selected. Keep
 native/checkpoint/runner identities separate. The [six-step sampler](results/2026-11-09-breakout-denoising-six-steps.md) and
 [grouped-history trial](results/2026-11-09-breakout-denoising-generated-history.md) stay rejected; all prior trials/failures/repairs remain
 closed. Full physics/events/natural calibration, changed-brick memory, late/
