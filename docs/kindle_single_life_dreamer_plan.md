@@ -3,29 +3,31 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [recurrent contact rehearsal with broad replay](experiments/2026-11-09-breakout-world-contact-rehearsal.md).
-Warm-start original accurately fitting contact2048,then6,144 newupdates to8192:
-3,072 broad updates alternate3,072 contact updates. Same8.85M recurrent world,
-H16 motion CE/native85dbe150/SHA5b112866,no build/config override. This changes
-replay composition fromthe closed pure-broad curriculum,which failed;no old
-stage repeats. Checkpoints omit full RNG/replay/belief;not fresh confirmation.
+unproven. [Contact rehearsal](results/2026-11-09-breakout-world-contact-rehearsal.md) preserves110/110 onallfour original
+contact draws/all24 gates,butbroader development scores62/112 observed,9/109
+one-step,3/107 eight-step;allthree broad gates fail. Broad fitting also staysweak:
+108/163 observed,33/177 one-step,13/176 eight-step. Preserving these fitted
+trajectories doesnot establish broader dynamics orisolate the failure cause.
+Keep H0 as broad recurrent reference;the original contactfit remains fitting-only.
 
-CPU plan/data/config/source checks pass:32,820 broad+256 contact unique arrivals,
-759,269 valid suffix targets,3,570 terminals,6,078 positive suffix rewards.
-Original384 dense final origins/selections stay. Reuse cached warm-initial dense
-controls;require204 initial/frozen tensors,32 initial contact arrays,18 development/
-32 contact restore arrays exact. Keep allcontact/broad physics/event/brick gates;
-only afterboth contact/dense gates pass mayfinal oracle assessment be separately
-declared. One service,two guards,2400s/600s caps. Root
-`/mnt/data/kindle-breakout-world-contact-rehearsal-20261109`.
+Warm-start contact2048,then6,144 newupdates to8192:3,072 broad and3,072 contact.
+759,269 valid suffix targets,3,570 terminals,6,078 positives;32,820 broad+256
+contact unique arrivals. Source/order/exposure differs frompure-broad curriculum,
+not a matched-experience orfresh-seed comparison. Calls566.641s,loop700.916s,
+plusinherited186.289s/191.500s.204 initial/frozen tensors,32 initial contact
+arrays,18 development/32 contact restore arrays exact;6,144 finite loss rows/
+68 weights changed.160 declaration/346 closure pins,two guards/18 files,one
+terminal successful service. CPU plotting import failure stayswithseparate
+offline-cache repair;no native stage/audit repeats. Native85dbe150/SHA5b112866,
+no build. Root `/mnt/data/kindle-breakout-world-contact-rehearsal-20261109`.
 
-[Four generated pixel-history frames](results/2026-11-09-breakout-full-causal-prefix.md) staysnegative:ordinary
-27/29/19/31 of110,one-step139/139/140/146 of198,2/24 gates. Retain B32/reward32
-as pixel ordinary reference andclean B8 as fitting evidence. Allprevious jobs
-stayclosed;fullres staysprotocol-failed. No automatic successor. Full physics/
-events,natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
-untouched families andfresh confirmation remain required. No fitting score
-completes thegoal. Actor/critic,CDP comparison andfive-game work stayparked.
+Conditional oracle assessment isnot allocated becausebroad gates fail. Alljobs
+stopped,no learner/extension/collector/automatic successor selected. Pixel B32/
+reward32 ordinary andclean B8 fitting evidence remain separate;allprior jobs
+stayclosed,fullres staysprotocol-failed. Full physics/events,natural calibration,
+changed-brick memory,late/tunnel/second-wall/above-top,untouched families and
+fresh confirmation remain required. No fitting score completes thegoal.
+Actor/critic,CDP comparison andfive-game work stayparked.
 [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
 
 ### What would establish the world model

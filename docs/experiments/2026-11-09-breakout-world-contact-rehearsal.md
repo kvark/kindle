@@ -66,3 +66,5 @@ Precise all-horizon physics,correct/calibrated rewards andlife/game-over timing,
 persistent removed-brick memory,late/tunnel/second-wall/above-top,untouched
 families andfresh confirmation remain required. The full world-model goal stays
 active andunproven;no fitting orintermediate pass completes it.
+
+Completed: [retention succeeds,expansion fails](../results/2026-11-09-breakout-world-contact-rehearsal.md). Contact110/110 onfour draws/24 gates pass;dense broad0/3.346 closure pins,two guards/18 sealed files pass. Conditional oracle assessment isnot allocated;no successor selected.
