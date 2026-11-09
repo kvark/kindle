@@ -3,27 +3,35 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. [Mean-latent world mode](experiments/2026-11-09-breakout-world-mean-latents.md) is selected for native qualification.
-Feed categorical probability vectors inposterior/prior training andinference,
-without latent samples orstraight-through gradients. Same68 parameters/204
-tensors/11 reports;defaultoff,v24. Four requested forecasts areidentical,not
-independent uncertainty samples;f(mean-state) isnot mean(sampled forecasts).
-This changes representation/gradient estimator anddoesnot establish a sampling
-cause. Previous drift,Gaussian andlower-mixing results stayclosed.
+unproven. A separately declared [fresh mean-latent learner](experiments/2026-11-09-breakout-world-mean-latents-learning.md) is selected:
+8,192 fresh updates,RGB64/12M/B8/T32/H16/Auto,41001,rates4e-4,RGB100,original
+4/2/1/1 plan. Only the state computation changes versus original H16:posterior/
+prior probability vectors inboth training andinference,no latent samples or
+straight-through gradients. Same68 weights/204 tensors/11 reports,v24,defaultoff.
+Requested draws areidentical,not independent uncertainty samples. Original RGB/
+branch/event/brick andfull-game requirements stay. Root
+`/x/Temp/kindle-world-mean-latents-learning-20261109`.
 
-149 world CPU/29 config/strict core+binding Clippy/31 packaged Python checks pass.
-First Clippy fixture range-loop failure remains withseparate corrected source/
-checks. Next allocation isone guarded primitive plusdefault-off compatibility,
-mean-mode initial/update/frozen/restore checks;no learner yet. Root
-`/x/Temp/kindle-world-mean-latents-20261109`.
+[Qualification](results/2026-11-09-breakout-world-mean-latents.md) passes/closed:149 world CPU/29 config/strict core+binding
+Clippy/31 packaged Python checks,native F64 probabilities/true derivatives/CPU
+parity,no RNG advancement,noargmax/noise/causality/header guards.204 common
+initial/own frozen tensors,32 default-off initial/32 trained restore arrays,
+24 initial/24 trained draw-equality comparisons exact. Mean-mode predictions
+change asintended.65/68 weights change firstupdate;11 finite reports.119 declaration/
+157 closure pins,nine sealed files,one terminal successful service;25.791s.
+Sourceaffedefa/native SHA cc6022e3 retained withmatching runner at
+`/x/Temp/kindle-world-mean-latents-20261109`;own811,446,272-byte buildcache released.
+First fixture Clippy style failure andseparate corrected checks remain. The
+qualifier age1 checkpoint isnot resumed;new actual-initial predictions arekept.
 
-[Direct RGB color attention](results/2026-11-09-breakout-world-color-attention-learning.md) remains closed/negative:0/112 observed,
-0/109 one-step,0/107 eight-step;allfour contacts0/110. RetainH0 broad reference;
-optional modes stayoff. No oldstage repeats. Prior jobs stayclosed/fullres stays
-protocol-failed. Full physics,natural event calibration,removed-brick memory,
-late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
-required. Actor/critic,CDP comparison andfive-game work stayparked. No automatic
-learner,extension,collector orsuccessor;consult theprotocol beforeexecution.
+[Direct color weighting](results/2026-11-09-breakout-world-color-attention-learning.md) remains closed/negative:0/112 observed,0/109
+one-step,0/107 eight-step andallfour contacts0/110. RetainH0 broad reference;
+no oldstage repeats. Prior drift/Gaussian/lower-mixing results stayclosed;the
+new mode doesnot isolate a samplingcause orprove calibrated stochastic futures.
+No extension,collector orautomatic successor. Full precise physics,natural
+calibration,removed-brick memory,late/tunnel/second-wall/above-top,untouched
+families andfresh confirmation remain required. Actor/critic,CDP comparison and
+five-game work stayparked;fullres staysprotocol-failed.
 
 ### What would establish the world model
 
