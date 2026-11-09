@@ -19,6 +19,7 @@ use super::*;
 
 mod centroid_contract;
 mod forward_contract;
+mod local_forward_contract;
 
 type Inputs = BTreeMap<String, Vec<f32>>;
 

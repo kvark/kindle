@@ -22,7 +22,7 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 The goal **prove the world model training on Breakout** remains active and
 unproven. The [late-command learner](docs/results/2026-11-09-breakout-world-late-action-learning.md)
-is closed and fails the2/3 dense screen: observed99/112, one99/109, four73/109,
+is closed and fails the dense screen (2/3 gates pass): observed99/112, one99/109, four73/109,
 eight56/107, sixteen28/114, thirty-two5/95 versus early106/112,101/109,66/109,
 53/107,25/114,11/95.1852.773s native/2010.351s loop;205 execution/169 audit/
 177 closure pins,240 tensors/80 changed weights/18 restore arrays and two

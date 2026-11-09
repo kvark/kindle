@@ -124,4 +124,3 @@ original receipts and failed audits remain. Separately declared CPUv3 uses a
 fixed immutable input list and verifies all18 pins after process exit, preserving
 the valid28-input metric/image checks. No metric calculation, forecast or learner
 is repeated, and the original receipts are not relabeled as passed.
-
