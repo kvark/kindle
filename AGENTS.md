@@ -21,25 +21,30 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. [Direct RGB color attention](docs/experiments/2026-11-09-breakout-world-color-attention.md) is selected for native qualification.
-Default-off replay-derived red/region weights multiply motion attention and
-renormalize to mean1 per image,for observed and imagined RGB cross-entropy.
-No new head/parameters/inference path:68 weights/204 tensors/11 reports,v23.
-144 world CPU/29 config/strict core+binding Clippy/25 packaged Python checks pass.
-Initial fixture string inference andF32-reciprocal reference failures remain
-withseparate corrected tests. The next allocation isone guarded primitive plus
-one full-shape update/initial/frozen/restore check;no learner isyet selected.
-Root `/x/Temp/kindle-world-color-attention-20261109`.
+unproven. A separately declared [fresh direct RGB color-attention learner](docs/experiments/2026-11-09-breakout-world-color-attention-learning.md)
+is selected:8,192 fresh updates,RGB64/12M/B8/T32/H16/Auto,seed41001,RGB100 and
+original4/2/1/1 plan. Add only detached color×motion attention,mean-one per image;
+no position head/new parameter/inference change. Original RGB gates andall
+physics/event/brick requirements stay. Root
+`/x/Temp/kindle-world-color-attention-learning-20261109`.
 
-[Position10,000](docs/results/2026-11-09-breakout-world-centroid10000-learning.md) remains closed/negative:development77/112 observed,
-70/109 one-step,14/107 eight-step;0/3 broad gates. The coordinate readout improves
-RMSE2.437→1.648px butdoesnot improve RGB. Original summary typo andseparate CPU
-clarification remain;all8,192 loss identities confirm10,000. Retain H0 broad
-reference;optional modes staydefaultoff. Prior jobs stayclosed andfullres stays
-protocol-failed. Full physics,natural event calibration,removed-brick memory,
-late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
-required. Actor/critic,CDP comparison andfive-game work stayparked. No automatic
-learner,extension,collector orsuccessor;read the protocol before execution.
+[Native qualification](docs/results/2026-11-09-breakout-world-color-attention.md) passes/closed:144 world CPU/29 config/strict
+core+binding Clippy/25 packaged Python checks,native F64 values/derivatives/
+detached targets/reset zeros,204 common initial/own frozen tensors,32 initial/
+trained restore arrays,11 finite reports.65/68 weights change atfirstupdate.
+123 declaration/158 closure pins,nine sealed guard files,one terminal successful
+service;19.477s,one qualifier update,no main learner update/actions/frames.
+Sourcec672292c/native SHAef45f798;matching runtime/runner retained at
+`/x/Temp/kindle-world-color-attention-20261109`. Own811,401,216-byte buildcache
+released. Original CPU fixture string-inference/F32-reciprocal failures remain
+with separate corrected checks. The qualifier checkpoint isnot resumed.
+
+[Position10,000](docs/results/2026-11-09-breakout-world-centroid10000-learning.md) remains closed/negative:77/112 observed,70/109 one-step,
+14/107 eight-step;0/3 gates despite better coordinate RMSE. No oldstage repeats.
+Allprior jobs stayclosed/fullres staysprotocol-failed. No extension,collector or
+automatic successor. Full precise physics,natural event calibration,removed-brick
+memory,late/tunnel/second-wall/above-top,untouched families andfresh confirmation
+remain required. Actor/critic,CDP comparison andfive-game work stayparked.
 
 ## Direction and retained results
 

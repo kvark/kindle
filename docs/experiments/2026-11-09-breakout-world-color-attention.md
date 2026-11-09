@@ -64,3 +64,5 @@ Full precise physics,natural event calibration,persistent removed-brick memory,
 late/tunnel/second-wall/above-top coverage,untouched families andfresh confirmation
 remain required. No implementation or fitting result completes the goal.
 Actor/critic,CDP comparison andfive-game work remain parked;prior jobs stay closed.
+
+Qualification passes: [native result](../results/2026-11-09-breakout-world-color-attention.md),158 closure pins/nine sealed files. Fresh [learning declaration](2026-11-09-breakout-world-color-attention-learning.md) is separate; the qualifier update is not resumed.
