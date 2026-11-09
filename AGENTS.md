@@ -21,28 +21,33 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [frozen position contract diagnosis](docs/experiments/2026-11-09-breakout-world-centroid-contract.md)
-is selected: native/CPU head parity, same-time observed-target accounting and
-five weighted gradient components at the final centroid checkpoint. Two recorded
-B8/T32 batches/two fresh diagnostic noise pairs,20 backwards,zero optimizer
-steps. CPU component derivatives and strict Clippy pass; initial empty test
-filter is preserved separately. Root `/x/Temp/kindle-world-centroid-contract-20261109`.
-No learner, collector, extension or automatic successor is selected.
+unproven. The [frozen position contract diagnosis](docs/results/2026-11-09-breakout-world-centroid-contract.md)
+closespassed: native/CPU saved-feature affine error<=0.00004522px,same-time
+observed centroid values/masks match;weighted gradients sum tojoint with
+relative L2 error<=2.49e-7 globally. The coarse readout isnot astorage-order
+artifact. Onone mixed batch/two draws,position/RGB gradient norm ratio is
+4.61–6.79% inthe encoder and4.60–5.71% inthe prior;encoder cosines-.146/-.247.
+Contact clips have stronger relative position gradients. This supports testing
+loss balance,not acausal explanation orprediction ofAdam/AGC updates.
+
+Twenty frozen backwards,zero optimizer steps/actions/frames;all70 weights exact
+after each component,source checkpoint unchanged. One CPU derivative test/strict
+Clippy pass;initial empty test filter remains uncounted. CPU reportingv1's
+zero-RGB ratios remain withseparatev2 null repair;no native stage repeats.
+24 declaration/71 CPUv2/94 closure pins,nine sealed guard files,one terminal
+successful service. Test-only sourceedbe1d0c/SHA4043b8af;learner runtime unchanged.
+Native384.029s/debug harness392.70s isnot training speed. Own2.23GB buildcache
+released;root `/x/Temp/kindle-world-centroid-contract-20261109`.
 
 [RGB1/centroid1000 learning](docs/results/2026-11-09-breakout-world-centroid-learning.md)
-remains closed/negative: development85/112 observed,73/109 one-step,15/107
-eight-step;allthree broad gates fail. Fitting134/163,119/177,34/176. CPU affine
-observed development RMSE2.437px,15/112 within1px;native parity was unmeasured.
-Do not replace RGB gates with coordinates or claim information absence. Joint
-head/loss/RGB-scale changes andone reused seed do not isolate causes.
-
-[Qualification](docs/results/2026-11-09-breakout-world-centroid.md) stayspassed/closed;
-initial fixture failures and separate repairs remain. Prior jobs stayclosed,
-fullres staysprotocol-failed;no old stages repeat. Full physics/events,natural
-calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
-families andfresh confirmation remain required. Actor/critic,CDP comparison and
-five-game work stayparked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
-recovered115GB;hardlinked evidence staysimmutable.
+remains closed/negative:development85/112 observed,73/109 one-step,15/107
+eight-step;allthree broad gates fail. Fitting134/163,119/177,34/176. Retain H0
+broad reference;optional auxiliary mode staysdefaultoff. Coordinate accuracy
+cannot replace RGB gates orprove information absence. Allprior jobs stayclosed,
+fullres staysprotocol-failed;no learner/collector/extension/automatic successor
+selected. Full physics/events,natural calibration,removed-brick memory,
+late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
+required. Actor/critic,CDP comparison andfive-game work stayparked.
 
 ## Direction and retained results
 
