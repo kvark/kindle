@@ -21,43 +21,37 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [late-command learner](docs/results/2026-11-09-breakout-world-late-action-learning.md)
-is closed and fails the dense screen (2/3 gates pass): observed99/112, one99/109, four73/109,
-eight56/107, sixteen28/114, thirty-two5/95 versus early106/112,101/109,66/109,
-53/107,25/114,11/95.1852.773s native/2010.351s loop;205 execution/169 audit/
-177 closure pins,240 tensors/80 changed weights/18 restore arrays and two
-successful guards/18 sealed files pass. No broad assessment or extension.
-Native/observer/CPU services are inactive/successful. Keep late conditioning off.
+unproven. Select one fresh [posterior-history RGB100 natural learner](docs/experiments/2026-11-09-breakout-world-posterior-natural100.md):
+16,384 updates,1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,one-hot actions,RGB100,
+rates4e-4,KL1/.1/freeNat1,mixing.01,observed events1. Existing posterior-history
+objective/v21 and qualified64f5489f/native SHAaa12d050 runtime/runner;no rebuild,
+physical feature table,late conditioning,actor/critic or collection. Root
+`/x/Temp/kindle-world-posterior-natural100-20261109`. CPU driver passes with
+model construction trapped. No GPU job active yet;declare before execution.
 
-The [local forward-contract measurement](docs/results/2026-11-09-breakout-world-local-forward-contract.md)
-is closed: strict contract fails on295 observed RGB values andfour/98,304
-categorical blocks. All forced-sample recurrent states and actual native generated
-suffix pixels agree exactly;24 F64 loss checks pass. One full-graph loss value
-has1.907e-6 difference; all continuous full-graph comparisons pass. CPU-only
-consequence on3,072 image pairs changeszero ball detections/within1px decisions,
-maximum observed coordinate difference.00330px. These conditional checks do not
-prove free-running physics or categorical harmlessness.268.267s native,zero
-optimizer steps;107 execution/70 analysis/73 closure pins andone guard/nine sealed
-files pass, source checkpoints unchanged. Native/observer are inactive/successful.
-No new learner, collector, physical assessment or automatic successor is selected.
-Root `/x/Temp/kindle-world-local-forward-contract-20261109`; retained test source
-5bbeaccf/SHAe6995c54, production runtime unchanged, packaged compiler cache released.
+Same retained natural two-cycle plan/config as small64. Own initial240 tensors/
+18 arrays and first actual update are checked inside the budget before update2.
+Keep curves/initial+final dense forecasts,all11 reports,exact final restore and
+unchanged intermediate gates;no automatic assessment,extension or successor.
+The [earlier posterior-history run](docs/results/2026-11-09-breakout-world-posterior-history.md)
+remains failed atRGB1/2,048/broad-corrective. New data/loss balance/budget changes
+are bundled;not an isolated effect or an unchanged extension. Inference still
+uses priors andgenerated history without future actual images. Old qualified
+runtime bytes remain immutable;do not mix overlays.
 
-The [late native qualification](docs/results/2026-11-09-breakout-world-late-action-native.md)
-stays closed at52.356s with128 execution/69 closure pins; source81a5e4e3/
-SHA4b0eb0b0 and exact runtime/runner remain at
-`/x/Temp/kindle-world-late-action-20261109`. Its2.9GiB build cache is released.
-The original provisional closure failures and separate CPUv3 repair remain;
-the main learner/final audit have no failure or retry. All five final figures
-are reviewed. No score/tolerance/visibility change or better-checkpoint selection.
-
-The [real-history probe](docs/results/2026-11-09-breakout-world-oracle-history.md) and
-[edge audit](docs/results/2026-11-09-breakout-world-edge-rebound.md) retain their limits.
+The [local forward comparison](docs/results/2026-11-09-breakout-world-local-forward-contract.md)
+is closed: strict contract fails on295 observed RGB values/four categorical blocks,
+but forced-sample recurrent states and actual generated suffix pixels are exact.
+CPU-only3,072 paired images changezero detector/within1px decisions;no free-running
+physics or categorical harmlessness proof.268.267s/zero optimizer steps,107/70/73
+pins andone guard/nine sealed files pass. Both services inactive/successful.
+The [late learner](docs/results/2026-11-09-breakout-world-late-action-learning.md)
+stays closed at2/3 dense gates;keep late conditioning off. Its native qualification,
+original provisional failures/separate CPUv3 repair andfinal audits remain linked.
 The [early feature assessment](docs/results/2026-11-09-breakout-world-action-features-branches.md)
-stays failed at .224881 versus one-hot .172366,296/304 nonending alarms.
-Full physics/events, brick memory, late/above-top coverage, untouched families
-and fresh confirmation remain required. Actor/critic, CDP and five-game work
-stay parked.
+stays failed at.224881 versus one-hot.172366,296/304 nonending alarms. Full
+physics/events,brick memory,late/above-top coverage,untouched families andfresh
+confirmation remain required. Actor/critic,CDP andfive-game work stay parked.
 
 ## Direction and retained results
 
