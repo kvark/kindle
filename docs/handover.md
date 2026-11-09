@@ -22,8 +22,15 @@ event geometry stays. This is a capacity hypothesis,not a diagnosed cause.
 Same original two-cycle plan/data/RGB100/event losses/rates4e-4/Auto/41001;
 new initialization/native andfirst-update checks differ. Fixed final decision,
 unchanged dense gates,6,600s training/600s restore caps,no automatic successor.
-No broader assessment ormain GPU job is active yet;declare/check the driver
-before launch. Original full-world requirements remain.
+The main learner is active under one host guard;215 execution/41 CPU-plan pins,
+CPU model-construction trap andexact first-batch/plan checks pass. The first actual
+update matches13 reports/240 qualifiedage1 tensors exactly;77 required-family
+parameters change,finite240 tensors andtotal/support pass before update2.
+Source56611db4,
+main invocationc993d779a66f46d6a58daee8078ecfb1/controller2231604,observer2231609,
+CPU finisher2231611;root `/x/Temp/kindle-world-wide-motion-learning-20261109`.
+Restore/CPU final audits are attached;no broader assessment is allocated.
+Original full-world requirements remain.
 
 The [native qualification](results/2026-11-09-breakout-world-wide-motion-native.md)
 passes in81.157s:small-fixture native values/derivatives/lane isolation,
