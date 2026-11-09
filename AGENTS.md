@@ -23,8 +23,16 @@ available. Only the user merges PRs; commits and pushes are allowed.
 The goal **prove the world model training on Breakout** is active and unproven.
 Actor/critic,CDP comparison and the five-game campaign remain parked. Use native
 pixel supervision and retained global H0 as the inspectable reference;no
-pretrained encoder or object/RAM training targets. No GPU allocation or next
-learner is active or selected.
+pretrained encoder or object/RAM training targets. The [one-time refresh
+diagnostic](docs/experiments/2026-11-09-breakout-world-refresh.md) is selected
+for bounded native execution after CPU/data/package review. Frozen final H0/RGB1
+only;first16 fitting/16 development origins,four draws,four causal branches,one
+image-history/latent/both refresh before action4 using true arrivals only through3.
+Then run to32 without further correction. Distinct from old readout-only swaps;
+no old model,learner or new gameplay. Two CPU checks/strict Clippy pass;original
+metadata-key andfixture-allocation failures remain with separate finishes.
+Root `/mnt/data/kindle-breakout-world-refresh-20261109`. No GPU allocation or
+next learner is active;do not run before the declared guard/inputs are ready.
 
 The [local H0/RGB1 trial](docs/results/2026-11-09-breakout-world-local-h0.md) is closed and fails retention after16,384 fresh updates. Dense development
 observed/1/8/16/32 ball precision is109/112,107/109,15/107,3/114,0/95;fitting8
