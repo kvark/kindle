@@ -497,6 +497,7 @@ pub struct DreamerCore {
 
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
+        assert!(!config.rgb_late_action, "late action is standalone world only");
         assert!(
             config.world_action_features.is_none(),
             "action features are standalone world only"
@@ -575,6 +576,7 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
+        assert!(!config.rgb_late_action, "late action is standalone world only");
         assert!(
             config.world_action_features.is_none(),
             "action features are standalone world only"
@@ -2942,6 +2944,9 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.config.rgb_late_action {
+        return Err(io::Error::new(io::ErrorKind::InvalidData, "late action is standalone world only"));
+    }
     if metadata.config.world_action_features.is_some() {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,

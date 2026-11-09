@@ -21,37 +21,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [completed real-history probe](docs/results/2026-11-09-breakout-world-oracle-history.md)
-restores LEFT/reversal ball accuracy to64/64 at16/32 under both histories;
-ordinary reversal is0/64. Some collision-adjacent assisted predictions still
-fail. Assistance changes posterior state and image history together, so their
-individual causes remain unresolved. Native1,152 calls/64.215s,133 pins,64
-exact controls/20 truth joins/240 frozen tensors pass. Original observer fails
-on a cleared terminal invocation ID; separate29-pin CPU completion verifies
-the exact journal and guard without rerunning GPU work. Preserve that failure.
+unproven. The [late command path](docs/experiments/2026-11-09-breakout-world-late-action.md)
+is implemented with default-off `rgb_late_action` and explicit standalonev26.
+Move18 action planes from motion0 to fusion after three image-only motion layers;
+80 weights/603,915 scalars remain, with7,200 weights moved between two shapes.
+This is a robustness hypothesis, not a proven normalization cause or repair.
 
-The [edge-rebound audit](docs/results/2026-11-09-breakout-world-edge-rebound.md) corrects
-the respawn attribution: NOOP/LEFT/reversal survive this life_loss slice, and
-NOOP/LEFT saved outcomes are equal. One distinct initial history limits scope.
-Fitting contains179 complete-context left-edge targets and51 upward reversals;
-simple absence of examples is not the explanation established by this audit.
+CPU checks pass:96 world,29 configuration,14 checkpoint-filter and5 decoder
+checks, including new causal ancestry/derivatives/lane/header/size tests; strict
+core and binding Clippy pass. Native tests stay ignored until declared. Next
+package the separate runtime/runner and execute the bounded1,200s qualification.
+Root `/x/Temp/kindle-world-late-action-20261109`. No GPU job is active yet;
+no fixed learner or collector is selected. Keep all old runtimes immutable.
 
-Select [late command conditioning](docs/experiments/2026-11-09-breakout-world-late-action.md)
-for implementation and bounded native qualification. Move18 action planes from
-motion0 to fusion, after the three image-only motion layers. Intended total
-80 weights/603,915 scalars stays fixed, with7,200 weights moved between two
-convolutions. This is a hypothesis about generated-history robustness, not a
-proven normalization cause or repair. Default-off, explicit new formatv26;
-read the full protocol before editing or executing. Root
-`/x/Temp/kindle-world-late-action-20261109`. No new GPU allocation, learner or
-collector is active; no fixed learner is selected yet.
+The [closed real-history probe](docs/results/2026-11-09-breakout-world-oracle-history.md)
+restores later LEFT/reversal predictions but some collision-adjacent frames fail;
+posterior and image history change together. Its native pass and original
+observer failure/separate CPU completion remain retained. The [edge audit](docs/results/2026-11-09-breakout-world-edge-rebound.md)
+corrects the respawn attribution and establishes fitting examples, not a cause.
 
-The [completed action-feature assessment](docs/results/2026-11-09-breakout-world-action-features-branches.md)
+The [early action-feature assessment](docs/results/2026-11-09-breakout-world-action-features-branches.md)
 remains failed at primary .224881 versus one-hot .172366 and296/304 nonending
-alarms. Keep its feature option default-off and preserve native1331b702/SHA15ea18b5
-with exact runtime-v2/runner. All original failures remain. Full physics/events,
-brick memory, late/above-top coverage, untouched families and fresh confirmation
-remain required. Actor/critic, CDP and five-game work stay parked.
+alarms. Keep that feature option default-off and preserve native1331b702/SHA15ea18b5
+with exact runtime-v2/runner. Full physics/events, brick memory, late/above-top
+coverage, untouched families and fresh confirmation remain required. Actor/critic,
+CDP and five-game work stay parked.
 
 ## Direction and retained results
 

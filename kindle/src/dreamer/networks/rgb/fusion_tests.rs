@@ -7,7 +7,7 @@ use meganeura::{
 };
 use std::{collections::HashSet, sync::Arc};
 
-fn ancestors(graph: &Graph, node: NodeId) -> HashSet<NodeId> {
+pub(super) fn ancestors(graph: &Graph, node: NodeId) -> HashSet<NodeId> {
     let mut seen = HashSet::new();
     let mut todo = vec![node];
     while let Some(n) = todo.pop() {

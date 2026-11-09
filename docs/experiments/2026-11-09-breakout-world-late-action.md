@@ -38,7 +38,7 @@ way. Do not hard-code paddle geometry, ball dynamics or conditional action alias
 
 ## Scope and persistence
 
-Add a default-off serialized configuration option for late action conditioning.
+Use default-off serialized `rgb_late_action` for late action conditioning.
 Require local-action categorical RGB, fusion, positive motion-event suffix and
 ordinary full-world training. Reject transport, residual, feedback, Gaussian,
 auxiliary/teacher/phased objectives and whole-agent construction before GPU.

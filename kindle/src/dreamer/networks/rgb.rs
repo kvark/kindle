@@ -92,11 +92,30 @@ fn action_history(
     actions: usize,
     side: usize,
 ) -> NodeId {
+    append_action(graph, history, action, batch, 6, actions, side)
+}
+
+fn append_action(
+    graph: &mut Graph,
+    features: NodeId,
+    action: NodeId,
+    batch: usize,
+    channels: usize,
+    actions: usize,
+    side: usize,
+) -> NodeId {
     let area = side * side;
     let action = graph.reshape(action, &[batch * actions, 1]);
     let planes = repeat_columns(graph, action, batch * actions, 1, area);
     let planes = graph.reshape(planes, &[batch, actions * area]);
-    concat_columns(graph, history, planes, batch, 6 * area, actions * area)
+    concat_columns(
+        graph,
+        features,
+        planes,
+        batch,
+        channels * area,
+        actions * area,
+    )
 }
 
 impl ConvNorm {
@@ -257,6 +276,7 @@ pub(crate) struct Decoder {
     motion: Vec<ConvNorm>,
     motion_channels: usize,
     action_count: Option<usize>,
+    late_action: bool,
     fusion: Option<Box<ConvNorm>>,
     transport: Option<Box<transport::Transport>>,
     residual: bool,
@@ -339,7 +359,11 @@ impl Decoder {
                             graph,
                             &format!("{name}.motion{i}"),
                             if i == 0 {
-                                6 + action_count.unwrap_or(0)
+                                6 + if config.rgb_late_action {
+                                    0
+                                } else {
+                                    action_count.unwrap_or(0)
+                                }
                             } else {
                                 motion_channels
                             },
@@ -355,7 +379,13 @@ impl Decoder {
                 Box::new(ConvNorm::new(
                     graph,
                     &format!("{name}.fusion"),
-                    2 * size.vision_depth + motion_channels,
+                    2 * size.vision_depth
+                        + motion_channels
+                        + if config.rgb_late_action {
+                            action_count.unwrap_or(0)
+                        } else {
+                            0
+                        },
                     16,
                     side,
                 ))
@@ -370,6 +400,7 @@ impl Decoder {
             residual: config.rgb_spatial_residual,
             motion_channels,
             action_count,
+            late_action: config.rgb_late_action,
             deter: size.deter,
             stoch: size.stoch * size.classes,
             channels,
@@ -473,12 +504,13 @@ impl Decoder {
             side as u32,
         );
         if let Some(history) = history {
-            let history = if let Some(actions) = self.action_count {
+            let early_actions = self.action_count.filter(|_| !self.late_action);
+            let history = if let Some(actions) = early_actions {
                 action_history(graph, history, action.unwrap(), batch, actions, self.side)
             } else {
                 history
             };
-            let inputs = 6 + self.action_count.unwrap_or(0);
+            let inputs = 6 + early_actions.unwrap_or(0);
             let mut motion = graph.reshape(history, &[batch * inputs * self.side * self.side]);
             for layer in &self.motion {
                 motion = layer.forward(graph, motion, batch, false);
@@ -491,9 +523,24 @@ impl Decoder {
                 channels * self.side * self.side,
                 self.motion_channels * self.side * self.side,
             );
+            let late_actions = self.action_count.filter(|_| self.late_action);
+            if let Some(actions) = late_actions {
+                value = append_action(
+                    graph,
+                    value,
+                    action.unwrap(),
+                    batch,
+                    channels + self.motion_channels,
+                    actions,
+                    self.side,
+                );
+            }
             value = graph.reshape(
                 value,
-                &[batch * (channels + self.motion_channels) * self.side * self.side],
+                &[batch
+                    * (channels + self.motion_channels + late_actions.unwrap_or(0))
+                    * self.side
+                    * self.side],
             );
             if let Some(fusion) = &self.fusion {
                 value = fusion.forward(graph, value, batch, false);
