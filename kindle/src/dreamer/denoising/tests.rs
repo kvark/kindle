@@ -696,3 +696,153 @@ fn sigma_data_requires_v5_and_changes_no_graph_or_default_header() {
     bad["config"]["sigma_data"] = 0.5.into();
     assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
 }
+
+#[test]
+fn log_noise_mean_matches_f64_and_preserves_default_sigma_math() {
+    let normals = (0..32).map(|i| (i % 8) as f32 - 4.).collect::<Vec<_>>();
+    for half in [false, true] {
+        for update in [0, 1] {
+            let default = DenoisingConfig {
+                half_max_noise: half,
+                ..DenoisingConfig::default()
+            };
+            assert_eq!(
+                default.training_sigmas(normals.clone(), update),
+                training_sigmas(normals.clone(), update, half)
+            );
+            for mean in [-6., -3., -1.2, 1.] {
+                let c = DenoisingConfig {
+                    log_noise_mean: mean,
+                    ..default.clone()
+                };
+                let actual = c.training_sigmas(normals.clone(), update);
+                for (lane, (&value, &normal)) in actual.iter().zip(&normals).enumerate() {
+                    let forced = half && (lane < 16) == update.is_multiple_of(2);
+                    let expected = if forced {
+                        5.
+                    } else {
+                        (f64::from(mean) + 1.2 * f64::from(normal))
+                            .exp()
+                            .clamp(0.002, 5.)
+                    };
+                    assert!((f64::from(value) - expected).abs() <= 3e-6 * expected);
+                    if forced {
+                        assert_eq!(value, SIGMA_MAX);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn log_noise_mean_keeps_rng_forced_half_and_all_graphs_unchanged() {
+    let control = DenoisingConfig {
+        sigma_data: 0.05,
+        half_max_noise: true,
+        context_motion_scale: 100.,
+        residual_frame: true,
+        ..DenoisingConfig::default()
+    };
+    let changed = DenoisingConfig {
+        log_noise_mean: -3.,
+        ..control.clone()
+    };
+    for update in [0, 1] {
+        let mut a = StdRng::seed_from_u64(41001);
+        let mut b = StdRng::seed_from_u64(41001);
+        let old = control.training_sigmas(gaussian::normals(&mut a, 32), update);
+        let new = changed.training_sigmas(gaussian::normals(&mut b, 32), update);
+        for lane in 0..32 {
+            if (lane < 16) == update.is_multiple_of(2) {
+                assert_eq!((old[lane], new[lane]), (5., 5.));
+            }
+        }
+        assert_eq!(gaussian::normals(&mut a, 96), gaussian::normals(&mut b, 96));
+    }
+    for build in [
+        network::training,
+        network::sampling,
+        network::event_sampling,
+    ] {
+        assert_eq!(
+            format!("{:?}", build(&control).nodes()),
+            format!("{:?}", build(&changed).nodes())
+        );
+    }
+    assert_eq!(
+        params(&network::training(&control)),
+        params(&network::training(&changed))
+    );
+}
+
+#[test]
+fn log_noise_mean_requires_v6_and_preserves_legacy_headers() {
+    for (scale, residual, half, data, version) in [
+        (0., false, false, 0.5, "v1"),
+        (100., false, false, 0.5, "v2"),
+        (100., true, false, 0.5, "v3"),
+        (100., true, true, 0.5, "v4"),
+        (100., true, true, 0.05, "v5"),
+    ] {
+        let c = DenoisingConfig {
+            context_motion_scale: scale,
+            residual_frame: residual,
+            half_max_noise: half,
+            sigma_data: data,
+            ..DenoisingConfig::default()
+        };
+        assert!(
+            !serde_json::to_value(&c)
+                .unwrap()
+                .as_object()
+                .unwrap()
+                .contains_key("log_noise_mean")
+        );
+        assert_eq!(
+            c.checkpoint_format(),
+            format!("kindle-denoising-world-{version}")
+        );
+        let changed = DenoisingConfig {
+            log_noise_mean: -3.,
+            ..c.clone()
+        };
+        let header = |config: &DenoisingConfig, format: &str| serde_json::json!({"format":format,"config":config,"updates":0,"architecture":"conditional-unet16-32-64-history4","sampler":config.sampler_name(),"observed_reconstruction":"single-denoise-sigma0.5-not-rssm-posterior"});
+        let bytes = |v: serde_json::Value| serde_json::to_vec(&v).unwrap();
+        assert_eq!(
+            read_header(&bytes(header(&c, c.checkpoint_format())))
+                .unwrap()
+                .0,
+            c
+        );
+        assert_eq!(changed.checkpoint_format(), "kindle-denoising-world-v6");
+        assert_eq!(
+            read_header(&bytes(header(&changed, changed.checkpoint_format())))
+                .unwrap()
+                .0,
+            changed
+        );
+        assert!(read_header(&bytes(header(&changed, c.checkpoint_format()))).is_err());
+        assert!(read_header(&bytes(header(&c, "kindle-denoising-world-v6"))).is_err());
+    }
+    for mean in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY, -6.01, 1.01] {
+        assert!(
+            DenoisingConfig {
+                log_noise_mean: mean,
+                ..DenoisingConfig::default()
+            }
+            .validate()
+            .is_err()
+        );
+    }
+    for mean in [-6., 1.] {
+        assert!(
+            DenoisingConfig {
+                log_noise_mean: mean,
+                ..DenoisingConfig::default()
+            }
+            .validate()
+            .is_ok()
+        );
+    }
+}

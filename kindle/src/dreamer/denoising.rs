@@ -34,6 +34,11 @@ pub struct DenoisingConfig {
         skip_serializing_if = "is_default_sigma_data"
     )]
     pub sigma_data: f32,
+    #[serde(
+        default = "default_log_noise_mean",
+        skip_serializing_if = "is_default_log_noise_mean"
+    )]
+    pub log_noise_mean: f32,
 }
 impl Default for DenoisingConfig {
     fn default() -> Self {
@@ -50,6 +55,7 @@ impl Default for DenoisingConfig {
             residual_frame: false,
             half_max_noise: false,
             sigma_data: SIGMA_DATA,
+            log_noise_mean: default_log_noise_mean(),
         }
     }
 }
@@ -71,13 +77,17 @@ impl DenoisingConfig {
             || !(0.0..=1000.0).contains(&self.context_motion_scale)
             || !self.sigma_data.is_finite()
             || !(0.01..=2.0).contains(&self.sigma_data)
+            || !self.log_noise_mean.is_finite()
+            || !(-6.0..=1.0).contains(&self.log_noise_mean)
         {
             return Err("invalid denoising world geometry or learning configuration");
         }
         Ok(())
     }
     fn checkpoint_format(&self) -> &'static str {
-        if !is_default_sigma_data(&self.sigma_data) {
+        if !is_default_log_noise_mean(&self.log_noise_mean) {
+            "kindle-denoising-world-v6"
+        } else if !is_default_sigma_data(&self.sigma_data) {
             "kindle-denoising-world-v5"
         } else if self.half_max_noise {
             "kindle-denoising-world-v4"
@@ -103,6 +113,13 @@ impl DenoisingConfig {
             conditioners_with_scale(sigma, self.sigma_data)
         }
     }
+    fn training_sigmas(&self, normals: Vec<f32>, update: u64) -> Vec<f32> {
+        if is_default_log_noise_mean(&self.log_noise_mean) {
+            training_sigmas(normals, update, self.half_max_noise)
+        } else {
+            training_sigmas_with_mean(normals, update, self.half_max_noise, self.log_noise_mean)
+        }
+    }
     fn optimizer(&self) -> DreamerConfig {
         let mut c = DreamerConfig::tiny(self.action_count);
         c.training_precision = TrainingPrecision::Auto;
@@ -117,6 +134,12 @@ impl DenoisingConfig {
 const SIGMA_DATA: f32 = 0.5;
 const SIGMA_MIN: f32 = 0.002;
 const SIGMA_MAX: f32 = 5.;
+fn default_log_noise_mean() -> f32 {
+    -1.2
+}
+fn is_default_log_noise_mean(value: &f32) -> bool {
+    *value == default_log_noise_mean()
+}
 fn default_sigma_data() -> f32 {
     SIGMA_DATA
 }
@@ -162,6 +185,25 @@ fn training_sigmas(normals: Vec<f32>, update: u64, half_max: bool) -> Vec<f32> {
                 SIGMA_MAX
             } else {
                 (-1.2 + 1.2 * n).exp().clamp(SIGMA_MIN, SIGMA_MAX)
+            }
+        })
+        .collect()
+}
+fn training_sigmas_with_mean(
+    normals: Vec<f32>,
+    update: u64,
+    half_max: bool,
+    mean: f32,
+) -> Vec<f32> {
+    let split = normals.len() / 2;
+    normals
+        .into_iter()
+        .enumerate()
+        .map(|(lane, n)| {
+            if half_max && (lane < split) == update.is_multiple_of(2) {
+                SIGMA_MAX
+            } else {
+                (mean + 1.2 * n).exp().clamp(SIGMA_MIN, SIGMA_MAX)
             }
         })
         .collect()
@@ -458,11 +500,7 @@ impl DenoisingWorldLearner {
                 history.push(&actual, incoming);
                 continue;
             }
-            let sigma = training_sigmas(
-                gaussian::normals(&mut self.rng, b),
-                self.updates,
-                c.half_max_noise,
-            );
+            let sigma = c.training_sigmas(gaussian::normals(&mut self.rng, b), self.updates);
             let noise = gaussian::normals(&mut self.rng, b * w);
             let base = history.base(incoming, c.residual_frame);
             let mut inputs = Vec::new();

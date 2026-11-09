@@ -3,39 +3,33 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Retain the [sigma_data0.05 control](results/2026-11-09-breakout-denoising-sigma-data0p05.md): one-step140/149/140/140 of198,
-ordinary35/38/34/33 of110. Detected balls move about98% of the true step, but
-missing balls and long rollouts still fail every strict fitting gate. Reused
-development data/seed; no mastery or reliability claim.
+unproven. The [lower-noise training test](experiments/2026-11-09-breakout-denoising-low-noise.md) is selected: keep half the targets at
+sigma5, shift the unforced lognormal mean−1.2→−3, std1.2 unchanged. Expected
+fraction below sigma.05 rises3.363%→25.071%; this is an optimization hypothesis,
+not a measured exposure count or established cause. Same model/data/target and
+pixel-normal order, fresh2,048 updates/65,536 targets, sigma_data.05/history.5,
+actual histories, Auto, rate.001 and three-step sampler. No new loss/graph/weights.
 
-The [frozen six-step sampler test](results/2026-11-09-breakout-denoising-six-steps.md) is closed. Same weights/noise improve
-one-step matches to156/165/163/161 of198; ordinary30/42/40/38 of110 is mixed.
-All0/24 fitting gates. Pixel MSE worsens3.332× one-step/4.087× ordinary, with
-more false balls. Retain three production steps; no default/API/header change.
-Source1e66499e adds a test-only native collector. All108 teacher/64 ordinary
-baseline batches and20 full production arrays are bit-exact before intervention;
-135 frozen tensors stay exact.19 CPU checks/strict release test-target Clippy,
-51 declared/29 CPU/103 closure pins andone sealed guard/nine files pass. Native
-query/export9.616s, CPU1.257s; source/executables retained, own719,946,264-byte
-apparent build cache released. Original shell/CPU schedule/Clippy failures remain
-preserved with separate CPU corrections; physical thresholds never change.
-Root `/mnt/data/kindle-breakout-denoising-six-steps-20261109`.
+Optional log_noise_mean defaults−1.2/omitted; default path retains original
+sigma math andv1/v2/v3/v4/v5. Non-default mean requiresv6.22 Rust CPU/40 packaged
+CPU/four runner checks and strict release test-target Clippy pass. New native
+SHA prefix831461633936; pin source/native/matching runner before GPU. Guarded default
+v5 qualification must match135 initial/frozen tensors,20 full initial arrays,
+and135 first-update tensors/six losses before one fresh learner/restore; wrapper
+enforces reviewed qualification first. The single qualification update is
+separate from the main budget. No GPU job launched yet. Root
+`/mnt/data/kindle-breakout-denoising-low-noise-20261109`.
 
-The [matched-noise diagnosis](results/2026-11-09-breakout-denoising-paired-history.md) confirms history-error accumulation:
-real-history77/86/77/77 versus recursive40/41/35/33 of110. The subsequent
-[grouped-history learner](results/2026-11-09-breakout-denoising-generated-history.md) regresses to13/9/10/10 of110 and59/60/55/59
-of198; reject that recipe. This does not rule out all robust-history training.
-These completed jobs, all older trials/failures/repairs andthe
-[stage trace](results/2026-11-09-breakout-denoising-stage-trace.md) stay closed; do not repeat them.
-
-All jobs are stopped. No learner, extension, collector or successor selected.
-Production native7871f08b/SHAaf13a03e stays unchanged. Default sigma_data.5/
-history scale.5 andv1/v2/v3/v4 remain; optional.05 usesv5. Retain.05 as development
-evidence, not a global default. Full physics/events/natural calibration,
-changed-brick memory, late/tunnel/second-wall/above-top, untouched families and
-fresh confirmation remain required. No fitting score completes the goal.
-Actor/critic, CDP comparison andfive-game work stay parked. [Cleanup](results/2026-11-09-temp-cleanup.md)
-recovered115GB; hardlinked evidence stays immutable.
+Retain the [sigma_data.05 control](results/2026-11-09-breakout-denoising-sigma-data0p05.md): one-step140/149/140/140 of198,
+ordinary35/38/34/33 of110, still failing strict fitting gates. The
+[six-step sampler](results/2026-11-09-breakout-denoising-six-steps.md) raises one-step counts but worsens pixel MSE3–4×/false balls;
+keep three steps. The [grouped-history learner](results/2026-11-09-breakout-denoising-generated-history.md) also regresses. All earlier trials,
+failures and repairs stay closed; no old learner/assessment/collector repeats.
+No extension, broad learner, collection or automatic successor. Full physics/
+events/natural calibration, changed-brick memory, late/tunnel/second-wall/above-
+top, untouched families and fresh confirmation remain required. No fitting
+score completes the goal. Actor/critic, CDP comparison andfive-game work stay
+parked. [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB; hardlinked evidence stays immutable.
 
 ### What would establish the world model
 
