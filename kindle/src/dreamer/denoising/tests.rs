@@ -1179,3 +1179,117 @@ fn target_motion_requires_v9_nonzero_weight_and_preserves_graphs() {
     old["format"] = "kindle-denoising-world-v9".into();
     assert!(read_header(&serde_json::to_vec(&old).unwrap()).is_err());
 }
+
+#[test]
+fn wider_denoiser_expands_only_pixel_parameters_and_keeps_shared_interfaces() {
+    let control = DenoisingConfig {
+        context_motion_scale: 100.,
+        ..DenoisingConfig::default()
+    };
+    let wide = DenoisingConfig {
+        denoiser_width: 32,
+        ..control.clone()
+    };
+    let narrow_params = params(&network::training(&control));
+    let wide_params = params(&network::training(&wide));
+    assert_eq!(
+        narrow_params.keys().collect::<Vec<_>>(),
+        wide_params.keys().collect::<Vec<_>>()
+    );
+    assert_eq!(wide_params.len(), 45);
+    let event_params = |p: &BTreeMap<String, Vec<usize>>| {
+        p.iter()
+            .filter(|(k, _)| k.starts_with("pixel.events."))
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect::<BTreeMap<_, _>>()
+    };
+    assert_eq!(event_params(&narrow_params), event_params(&wide_params));
+    assert_eq!(event_params(&wide_params).len(), 19);
+    assert_eq!(
+        format!("{:?}", network::event_sampling(&control).nodes()),
+        format!("{:?}", network::event_sampling(&wide).nodes())
+    );
+    let mut infer = params(&network::sampling(&wide));
+    infer.extend(params(&network::event_sampling(&wide)));
+    assert_eq!(wide_params, infer);
+    for build in [network::training, network::sampling] {
+        let a = build(&control);
+        let b = build(&wide);
+        assert_eq!(a.nodes().len(), b.nodes().len());
+        let inputs = |g: &Graph| {
+            g.nodes()
+                .iter()
+                .filter(|n| matches!(n.op, Op::Input { .. }))
+                .map(|n| format!("{:?}:{:?}", n.op, n.ty))
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(inputs(&a), inputs(&b));
+        for (x, y) in a.outputs().iter().zip(b.outputs()) {
+            assert_eq!(a.node(*x).ty, b.node(*y).ty);
+        }
+    }
+    let size = |p: &BTreeMap<String, Vec<usize>>, prefix: &str| {
+        p.iter()
+            .filter(|(k, _)| k.starts_with(prefix))
+            .map(|(_, v)| v.iter().product::<usize>())
+            .sum::<usize>()
+    };
+    assert_eq!(size(&narrow_params, ""), 1787843);
+    assert_eq!(size(&narrow_params, "pixel.denoiser."), 606707);
+    assert!(size(&wide_params, "pixel.denoiser.") > 3 * 606707);
+    println!(
+        "width32_scalars={} width32_denoiser_scalars={} event_scalars={}",
+        size(&wide_params, ""),
+        size(&wide_params, "pixel.denoiser."),
+        size(&wide_params, "pixel.events.")
+    );
+}
+
+#[test]
+fn denoiser_width_requires_v10_and_matching_architecture_before_gpu() {
+    let control = DenoisingConfig {
+        context_motion_scale: 100.,
+        residual_frame: true,
+        half_max_noise: true,
+        sigma_data: 0.05,
+        reward_limit: Some(32.),
+        ..DenoisingConfig::default()
+    };
+    assert!(
+        !serde_json::to_value(&control)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("denoiser_width")
+    );
+    for width in [0, 17, 64] {
+        assert!(
+            DenoisingWorldLearner::new(DenoisingConfig {
+                denoiser_width: width,
+                ..control.clone()
+            })
+            .is_err()
+        );
+    }
+    let wide = DenoisingConfig {
+        denoiser_width: 32,
+        ..control.clone()
+    };
+    assert!(wide.validate().is_ok());
+    assert_eq!(wide.checkpoint_format(), "kindle-denoising-world-v10");
+    let header = |c: &DenoisingConfig| serde_json::json!({"format":c.checkpoint_format(),"config":c,"updates":0,"architecture":c.architecture_name(),"sampler":c.sampler_name(),"observed_reconstruction":c.observed_task()});
+    assert_eq!(
+        read_header(&serde_json::to_vec(&header(&wide)).unwrap())
+            .unwrap()
+            .0,
+        wide
+    );
+    for field in ["format", "architecture"] {
+        let mut h = header(&wide);
+        h[field] = header(&control)[field].clone();
+        assert!(read_header(&serde_json::to_vec(&h).unwrap()).is_err());
+    }
+    let mut h = header(&control);
+    h["format"] = "kindle-denoising-world-v10".into();
+    assert!(read_header(&serde_json::to_vec(&h).unwrap()).is_err());
+}

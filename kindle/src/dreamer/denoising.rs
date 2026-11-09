@@ -45,6 +45,11 @@ pub struct DenoisingConfig {
     pub deterministic_frame: bool,
     #[serde(default, skip_serializing_if = "is_false")]
     pub target_motion_loss: bool,
+    #[serde(
+        default = "default_denoiser_width",
+        skip_serializing_if = "is_default_denoiser_width"
+    )]
+    pub denoiser_width: usize,
 }
 impl Default for DenoisingConfig {
     fn default() -> Self {
@@ -65,6 +70,7 @@ impl Default for DenoisingConfig {
             reward_limit: None,
             deterministic_frame: false,
             target_motion_loss: false,
+            denoiser_width: default_denoiser_width(),
         }
     }
 }
@@ -77,6 +83,7 @@ impl DenoisingConfig {
             || self.train_batch_size == 0
             || self.train_batch_size > 64
             || !matches!(self.side, 32 | 64)
+            || !matches!(self.denoiser_width, 16 | 32)
             || self.value_bins < 3
             || self.value_bins.is_multiple_of(2)
             || !self.learning_rate.is_finite()
@@ -98,7 +105,9 @@ impl DenoisingConfig {
         Ok(())
     }
     fn checkpoint_format(&self) -> &'static str {
-        if self.target_motion_loss {
+        if !is_default_denoiser_width(&self.denoiser_width) {
+            "kindle-denoising-world-v10"
+        } else if self.target_motion_loss {
             "kindle-denoising-world-v9"
         } else if self.deterministic_frame {
             "kindle-denoising-world-v8"
@@ -116,6 +125,13 @@ impl DenoisingConfig {
             "kindle-denoising-world-v1"
         } else {
             "kindle-denoising-world-v2"
+        }
+    }
+    fn architecture_name(&self) -> &'static str {
+        if self.denoiser_width == 32 {
+            "conditional-unet32-64-128-history4"
+        } else {
+            "conditional-unet16-32-64-history4"
         }
     }
     fn sampler_name(&self) -> &'static str {
@@ -183,6 +199,12 @@ impl DenoisingConfig {
 const SIGMA_DATA: f32 = 0.5;
 const SIGMA_MIN: f32 = 0.002;
 const SIGMA_MAX: f32 = 5.;
+fn default_denoiser_width() -> usize {
+    16
+}
+fn is_default_denoiser_width(value: &usize) -> bool {
+    *value == default_denoiser_width()
+}
 fn default_log_noise_mean() -> f32 {
     -1.2
 }
@@ -876,7 +898,7 @@ impl DenoisingWorldLearner {
         std::fs::write(
             path.join("metadata.json"),
             serde_json::to_vec_pretty(
-                &serde_json::json!({"format":self.config.checkpoint_format(),"config":self.config,"updates":self.updates,"architecture":"conditional-unet16-32-64-history4","sampler":self.config.sampler_name(),"observed_reconstruction":self.config.observed_task()}),
+                &serde_json::json!({"format":self.config.checkpoint_format(),"config":self.config,"updates":self.updates,"architecture":self.config.architecture_name(),"sampler":self.config.sampler_name(),"observed_reconstruction":self.config.observed_task()}),
             )?,
         )?;
         Ok(())
@@ -907,7 +929,7 @@ fn read_header(bytes: &[u8]) -> Result<(DenoisingConfig, u64), Box<dyn std::erro
     }
     let h: Header = serde_json::from_slice(bytes)?;
     if h.format != h.config.checkpoint_format()
-        || h.architecture != "conditional-unet16-32-64-history4"
+        || h.architecture != h.config.architecture_name()
         || h.sampler != h.config.sampler_name()
         || h.observed_reconstruction != h.config.observed_task()
         || h.updates > u64::from(u32::MAX)

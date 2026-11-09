@@ -17,28 +17,41 @@ fn up(g: &mut Graph, x: NodeId, batch: usize, channels: usize, side: usize) -> N
     g.upsample_2x(x, batch as u32, channels as u32, side as u32, side as u32)
 }
 
-fn denoiser(g: &mut Graph, input: NodeId, batch: usize, actions: usize, side: usize) -> NodeId {
+fn denoiser(
+    g: &mut Graph,
+    input: NodeId,
+    batch: usize,
+    actions: usize,
+    side: usize,
+    width: usize,
+) -> NodeId {
     let channels = 16 + 4 * actions;
+    let double = 2 * width;
+    let deep = 4 * width;
     let input = g.reshape(input, &[batch * channels * side * side]);
-    let e0 =
-        ConvNorm::new(g, "pixel.denoiser.enc0", channels, 16, side).forward(g, input, batch, false);
-    let e1 = ConvNorm::with_stride(g, "pixel.denoiser.enc1", 16, 32, side, 2)
+    let e0 = ConvNorm::new(g, "pixel.denoiser.enc0", channels, width, side)
+        .forward(g, input, batch, false);
+    let e1 = ConvNorm::with_stride(g, "pixel.denoiser.enc1", width, double, side, 2)
         .forward(g, e0, batch, false);
-    let e2 = ConvNorm::with_stride(g, "pixel.denoiser.enc2", 32, 64, side / 2, 2)
+    let e2 = ConvNorm::with_stride(g, "pixel.denoiser.enc2", double, deep, side / 2, 2)
         .forward(g, e1, batch, false);
-    let e3 = ConvNorm::with_stride(g, "pixel.denoiser.enc3", 64, 64, side / 4, 2)
+    let e3 = ConvNorm::with_stride(g, "pixel.denoiser.enc3", deep, deep, side / 4, 2)
         .forward(g, e2, batch, false);
-    let mid = ConvNorm::new(g, "pixel.denoiser.mid", 64, 64, side / 8).forward(g, e3, batch, false);
-    let x = up(g, mid, batch, 64, side / 8);
-    let x = join(g, x, e2, batch, 64, 64, side / 4);
-    let x = ConvNorm::new(g, "pixel.denoiser.up2", 128, 64, side / 4).forward(g, x, batch, false);
-    let x = up(g, x, batch, 64, side / 4);
-    let x = join(g, x, e1, batch, 64, 32, side / 2);
-    let x = ConvNorm::new(g, "pixel.denoiser.up1", 96, 32, side / 2).forward(g, x, batch, false);
-    let x = up(g, x, batch, 32, side / 2);
-    let x = join(g, x, e0, batch, 32, 16, side);
-    let x = ConvNorm::new(g, "pixel.denoiser.up0", 48, 16, side).forward(g, x, batch, false);
-    Convolution::new(g, "pixel.denoiser.out", 16, 3, side).forward(g, x, batch)
+    let mid =
+        ConvNorm::new(g, "pixel.denoiser.mid", deep, deep, side / 8).forward(g, e3, batch, false);
+    let x = up(g, mid, batch, deep, side / 8);
+    let x = join(g, x, e2, batch, deep, deep, side / 4);
+    let x = ConvNorm::new(g, "pixel.denoiser.up2", 2 * deep, deep, side / 4)
+        .forward(g, x, batch, false);
+    let x = up(g, x, batch, deep, side / 4);
+    let x = join(g, x, e1, batch, deep, double, side / 2);
+    let x = ConvNorm::new(g, "pixel.denoiser.up1", deep + double, double, side / 2)
+        .forward(g, x, batch, false);
+    let x = up(g, x, batch, double, side / 2);
+    let x = join(g, x, e0, batch, double, width, side);
+    let x = ConvNorm::new(g, "pixel.denoiser.up0", double + width, width, side)
+        .forward(g, x, batch, false);
+    Convolution::new(g, "pixel.denoiser.out", width, 3, side).forward(g, x, batch)
 }
 
 fn events(
@@ -89,7 +102,7 @@ pub(super) fn training(c: &DenoisingConfig) -> Graph {
     );
     let target = g.input("denoiser_target", &[b * w]);
     let weight = g.input("row_weight", &[b, 1]);
-    let output = denoiser(&mut g, input, b, c.action_count, c.side);
+    let output = denoiser(&mut g, input, b, c.action_count, c.side, c.denoiser_width);
     let image_loss = if c.context_motion_scale == 0. {
         masked_mse(&mut g, output, target, weight, b, w)
     } else {
@@ -129,7 +142,7 @@ pub(super) fn sampling(c: &DenoisingConfig) -> Graph {
         "denoiser_input",
         &[b, (16 + 4 * c.action_count) * c.side * c.side],
     );
-    let output = denoiser(&mut g, input, b, c.action_count, c.side);
+    let output = denoiser(&mut g, input, b, c.action_count, c.side, c.denoiser_width);
     g.set_outputs(vec![output]);
     g
 }
