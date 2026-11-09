@@ -2,57 +2,48 @@
 
 ## Selected direction: Breakout world model in isolation
 
-The goal **prove the world model training on Breakout** is active and remains unproven.
-Actor/critic, CDP comparison and the five-game campaign stay parked. Use native
-pixel supervision and H0 as the broad reference; no pretrained encoder or
-object/RAM training labels.
+The goal **prove the world model training on Breakout** is active and unproven.
+Actor/critic,CDP comparison and the five-game campaign remain parked. Use native
+pixel supervision and retained global H0 as the inspectable reference;no
+pretrained encoder or object/RAM training targets. No GPU allocation or next
+learner is active or selected.
 
-The [fixed posterior-only local H0 learner](experiments/2026-11-08-breakout-world-local-h0-learning.md) resumed the same live learner after a user pause at7,852 logged updates of16,384,1M/RGB64/v20,
-603,915 weights/80 logical/240 tensors,B8/T32,Auto,seed41001,rates4e-4,RGB1,
-KL1/.1/free-nat1,observed events1,mixing.01. Same local decoder/RSSM/inference;
-remove added sampled-prior RGB andimagined-event losses. RGB1 additionally
-changes loss balance,informed byearlier12M gradients,not a measured1M cause.
-The prepared4,096-row corrective plan repeatsfour times;sealed counts scale,
-no old generic recount. No extension,sweep or automatic successor.
-697 input pins frozen;first RGB1 update passes9 finite reports,total/unweighted
-forward checks,240 finite tensors/age1,and77 changed weights/all required families.
-Original nativePID1929598/start113967517 remains live,with unchanged weights/RNG.
-The expired raw wall-clock guard is stopped until that worker exits;an unchanged
-host guard now supervises an identity-checking CPU relay with a conservative
-2,400s cap. CPU identity/stop/exit checks and kernel-gap review pass;all697 inputs
-reverified. Original controller remains stopped until the train guard seals,then
-performs its unstarted restore. Root `resume-20261108-2343/declaration.json` pins
-the supervision amendment. Raw timers include the pause;no original raw-wall-cap
-or clean speed claim. No restart,extra update or recipe change. Disposable
-3,360,843,323-byte build cache released;runtime,wheels,source/CPU executable remain.
+The [local H0/RGB1 trial](results/2026-11-09-breakout-world-local-h0.md) is closed and fails retention after16,384 fresh updates. Dense development
+observed/1/8/16/32 ball precision is109/112,107/109,15/107,3/114,0/95;fitting8
+is36/176. Chosen-action balanced ball energy.429470 trails H0.169502 andthe
+unchanged.127127 gate. Freeflight NOOP8 presence8/64;ending32 Brier.268326;
+68/304 nonending alarms. Five of ten intermediate gates pass. Strong observed/
+one-step reading doesnot establish sustained dynamics. Objectives,loss balance
+anddata/sampler change together;no isolated cause orgeneral H0/CDP conclusion.
+
+All697 learner/216 CPU and1,574 assessment/236 CPU pins,16,384 finite9-component
+rows,80 changed weights,240 frozen tensors/ages,18 restore arrays,51 natural/
+84 full causal exports and96 exact clip frames pass. Closure2,044 pins/8.699s,
+four guarded jobs/36 sealed files,three terminal services. Native6930e7b8/source/
+runner5bcaaebd,1M/RGB64/v20/603,915 weights,Auto. Same live worker resumed across
+the user pause;no restart/RNG reset. Raw clocks retain12,767.850s ofpause;
+subtracting it gives18m03s calls/20m09s loop,not a clean speed comparison or
+original raw-wall-cap pass. Frozen assessment122.866s/CPU14.250s. Disposable
+3,360,843,323-byte build cache released;runtime,wheels,CPU executable remain.
 Root `/mnt/data/kindle-breakout-world-local-h0-20261108`.
 
-[Qualification](experiments/2026-11-08-breakout-world-local-h0.md) passes atRGB100:645 pins/13.878s,77 changed weights/all required families,
-240 finite/frozen tensors,18 exact arrays per initial/trained restore,one9-file
-guard/terminal unit. Initial240 tensors/18 arrays match retained actual-initial
-control. Independent CPUreview36pins/.360s. Native6930e7b8/source/runner5bcaaebd;
-74 distinct Rust checks,306 packaged Python andstrict core/binding Clippy pass.
-Original CPU graph-count failure andrunner-byte stop remain with separate repairs.
-Keep the pinned qualifier/config untouched;RGB1 uses a separate learning config
-andfirst actual update checks inside the budget. No new rebuild/qualification.
+Read the [learning protocol](experiments/2026-11-08-breakout-world-local-h0-learning.md) and[assessment](experiments/2026-11-08-breakout-world-local-h0-assessment.md) before new work. Qualification and original CPU graph-count/unused-counter byte
+failures with separate repairs remain retained. Do not repeat these completed
+learners,collectors,assessments or diagnostics;no unchanged extension,sweep or
+automatic successor. Before another full learner,justify a distinct test of
+latent versus generated-history error,using prior state/history andcontact-fit
+evidence without repeating it unchanged.
 
-The [loss review](results/2026-11-08-breakout-world-prior-pixel-loss-review.md) identifies an averaging incentive inour added independent-prior pixel term;
-[launch-fitting evidence](results/2026-11-08-breakout-world-launch-fitting.md) shows nearlyidentical sampled ghost images versus different real futures.
-This motivates the recipe,not a guaranteed repair or full causal diagnosis.
-All completed learners/collectors/diagnostics stayclosed;the previous corrective
-trial remains failed. Restore never changes objectives;new H0 needsv20.
-
-All original physics/event gates stand. Precise physics, event timing/calibration,
-persistent brick memory, late/tunnel/second-wall coverage, untouched families and
-fresh confirmation remain required. Existing oracle has no above-top-brick
-endpoint. Intermediate scores cannot complete the world-model or five-game goal.
-No unchanged extension, sweep, completed-stage repeat or automatic successor.
+All original physics/event gates stand. Precise physics,event timing/calibration,
+persistent removed-brick memory,late/tunnel/second-wall/above-top coverage,
+untouched families andfresh confirmation remain required. Existing oracle has
+no above-top-brick endpoint. Intermediate scores cannot complete either goal.
 
 ### What would establish the world model
 
 Finite training losses and backend qualification establish that an experiment
 runs; they do not establish game dynamics. Keep the complete goal distinct from
-the completed H32 comparison:
+completed short development comparisons:
 
 | Capability | Retained evidence | What is still missing |
 |---|---|---|
