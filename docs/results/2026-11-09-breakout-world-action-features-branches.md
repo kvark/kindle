@@ -91,5 +91,7 @@ confirmation remain required. The full goal isactive andunproven.
 
 The subsequent [CPU diagnostic](2026-11-09-breakout-world-action-features-survival.md)
 is complete. Ordinary ball energy .224881 becomes .185873 under oracle-assisted
-survival,with life-loss/respawn the largest residual category. It does not alter
+survival, with `life_loss` the largest residual category. The subsequent
+[edge-rebound audit](2026-11-09-breakout-world-edge-rebound.md) finds surviving
+NOOP/LEFT/reversal paths there, correcting the earlier respawn attribution. It does not alter
 any original score,gate orretention result.

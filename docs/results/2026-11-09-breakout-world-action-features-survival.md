@@ -43,8 +43,11 @@ raw forecasts and fixtures are not rerun.
 |life_loss|0.454335113|0.426554020|0.025405091|
 |ending|0.426913866|0.241271195|0.267341903|
 
-Life-loss/respawn is the largest remaining category,with wall and brick
-interactions also worse than the one-hot diagnostic. Contact improves strongly.
+The category named `life_loss` has the largest residual, with wall and brick
+interactions also worse than the one-hot diagnostic. The subsequent
+[edge-rebound audit](2026-11-09-breakout-world-edge-rebound.md) establishes that
+NOOP, LEFT and reversal actually survive this slice; only RIGHT loses a life.
+The earlier life-loss/respawn attribution is therefore unsupported. Contact improves strongly.
 These are functional error locations,not proof of a data-coverage,representation
 or optimizer cause. Supported-position counts condition on visible balls;they
 can improve while disappearance/respawn or other image-distribution errors worsen.

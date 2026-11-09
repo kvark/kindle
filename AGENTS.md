@@ -21,31 +21,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select the [CPU edge-rebound/support audit](docs/experiments/2026-11-09-breakout-world-edge-rebound.md) after the closed
-action-feature failure andsurvival decomposition. Preliminary inspection finds
-that the life_loss challenge loses a life only under RIGHT;NOOP,LEFT andreversal
-rebound without a decrement. The new model oftenloses the rendered ball after
-those surviving rebounds. Do not assume the category name diagnoses respawn.
-Root `/x/Temp/kindle-world-edge-rebound-20261109`.
+unproven. The [closed edge-rebound audit](docs/results/2026-11-09-breakout-world-edge-rebound.md)
+corrects the earlier respawn attribution: NOOP, LEFT and reversal survive the
+life_loss slice. Saved NOOP/LEFT outcomes are identical, but model LEFT ball
+presence at16 is14.1% versus100% for NOOP. One distinct initial history limits
+scope. The fitting plan contains179 complete-context left-edge targets and51
+observed upward reversals; a missing-example cause is not established.
 
-Use saved forecasts/oracles andactual fitting metadata/plan only. New masks are
-descending y150–160 approaches,reference-paddle8 subset,last-life approaches,
-actual nonterminal decrements andfixed post-decrement age bins. Separate source,
-observed,imagined,first-imagined andcomplete-context exposure;keep unique targets
-andnative-history fingerprints distinct from repetitions. Test NOOP/LEFT saved
-outcomes andall four plans,both histories anddraws. No model/emulator/GPU query,
-collector,learner oracceptance change. Do not repeat old generic support audits.
+Select the [frozen real-history probe](docs/experiments/2026-11-09-breakout-world-oracle-history.md):
+all four saved plans, histories16/32, eight draws and18 fixed target arrivals.
+Supply real recent frames/actions before one-step prediction; exclude target
+and future images. This changes posterior state and local image history together.
+Root `/x/Temp/kindle-world-oracle-history-20261109`. One guarded job capped1,200s,
+1,152 calls, unchanged16,384 updates and240 frozen tensors. No native rebuild,
+training, emulator, collector, acceptance change or automatic successor.
 
-The [completed action-feature work](docs/results/2026-11-09-breakout-world-action-features-branches.md) retains primary .224881 versus
-one-hot .172366,296/304 nonending alarms,3/3 intermediate dense gates andall
-original failures. Oracle-survival substitutions leave substantial spatial
-errors but do not identify a causal training defect. Keep the option default-off.
-
-No GPU allocation orautomatic successor is active orselected. Preserve source
-native1331b702/SHA15ea18b5 andits exact runtime-v2/runner for separately declared
-future work. Fullphysics,events,brickmemory,late/tunnel/second-wall/above-top,
-untouched families andfresh confirmation remain required. Actor/critic,CDP and
-five-game work stay parked.
+The [completed action-feature work](docs/results/2026-11-09-breakout-world-action-features-branches.md)
+retains failed primary .224881 versus one-hot .172366 and296/304 nonending alarms.
+Keep the option default-off. Preserve native1331b702/SHA15ea18b5 and its exact
+runtime-v2/runner. All original failures remain. Full physics/events, brick
+memory, late/above-top coverage, untouched families and fresh confirmation
+remain required. Actor/critic, CDP and five-game work stay parked.
 
 ## Direction and retained results
 
