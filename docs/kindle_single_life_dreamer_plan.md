@@ -3,39 +3,24 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [past-motion importance fitting trial](results/2026-11-09-breakout-denoising-context.md) is closed and failed:
-2,048 updates/65,536 targets still yield0/110 ordinary and0/198 actual-history
-one-step matches on each draw;observed denoising0/8. All supported forecasts have
-zero ball candidates. Forty-five of46 checked real-history first-target ball
-centers receive importance>1 (median11.77),without a ball-gradient attribution.
-No unchanged extension,broad learner or successor is selected;no GPU job active.
+The [actual-history denoiser fitting check](experiments/2026-11-09-breakout-denoising-real-history.md) is selected:
+feed four actual past frames on every update through the existing five-arrival
+API. Same qualified native9657af72/source879ab527,config,target order,noise
+stream and2,048-update/65,536-target budget;no rebuild or collector. Four CPU
+checks pass. Declare/pin before guarded train/restore;no GPU job launched yet.
+Root `/mnt/data/kindle-breakout-denoising-real-history-20261109`.
 
-Source879ab527/native9657af72,scale100/radius4/mean1 from past RGB only.
-Default0/v1 andinference remain unchanged;positive scale requires v2. Ten CPU/
-351 packaged/three runner checks,strict Clippy andguarded native weighted-loss
-values/derivatives pass. All154 declared/70 CPU inputs,135 exact initial/frozen
-tensors,20 initial/restore per-draw arrays andunchanged first event losses pass.
-Call/loop137.973s/146.389s versus uniform call133.854s;not useful speed gain.
-Closure276 pins/three guards/27 files/two terminal services;16 exact frames/
-1,376 endpoints retained. Own3,227,107,516-byte build caches released.
-Root `/mnt/data/kindle-breakout-denoising-context-20261109`. [Protocol](experiments/2026-11-09-breakout-denoising-context.md).
+The [past-motion importance trial](results/2026-11-09-breakout-denoising-context.md) remains closed and failed:
+ordinary0/110,privileged one-step0/198 andobserved denoising0/8 on each draw.
+It weighted45/46 checked first-target ball centers above1 without fixing fitting.
+Its failures/CPU-only repairs and complete evidence remain retained. No old
+learner,query,collector or unchanged extension will repeat.
 
-Original F32 mean-test,pixel JSON serialization andearly closure failures remain
-with separate CPU-only corrections;no learner/query repeats. Initial parity
-reads only the required cached actual-initial RGB;no old final forecast or
-old learner is queried. The [uniform fitting control](results/2026-11-09-breakout-denoising-fit.md) stays closed.
-The trainer's mixed real/generated conditioning remains an unisolated factor;
-the five-arrival API can test actual-history training without a rebuild.
-
-The user's [temporary cleanup](results/2026-11-09-temp-cleanup.md) recovers115 GB from/x/Temp through
-compiler-cache removal andbyte-identical artifact hardlinks. All4,392 large
-artifact paths remain;two retained runtimes still match35ad0db. Detailed receipt
-root `/mnt/data/kindle-temp-cleanup-20261109`. Retained evidence stays immutable.
-
-Actor/critic,CDP comparison and the game campaign remain parked. Full physics/
-events/calibration,brick memory,late/tunnel/second-wall/above-top,untouched
-families andfresh confirmation remain required. No fitting/privileged score
-completes either goal;the full oracle lacks above-top endpoints.
+The user's [temporary cleanup](results/2026-11-09-temp-cleanup.md) recovered115 GB;all4,392 large artifact
+paths remain. Deduplicated evidence stays immutable. Actor/critic,CDP comparison
+andthe game campaign stay parked. Full physics/events/calibration,brick memory,
+late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
+required. No fitting/privileged score completes the goal.
 
 ### What would establish the world model
 
