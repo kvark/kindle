@@ -82,7 +82,7 @@ impl PyDenoisingWorldLearner {
             )
             .map_err(PyValueError::new_err)
     }
-    /// Observed reconstruction is noisy-frame denoising at sigma .5, not an RSSM posterior.
+    /// The output task is identified by observed_reconstruction; it is never an RSSM posterior.
     #[pyo3(signature=(observations,previous_actions,future_actions,*,seed,include_features=false))]
     fn predict<'py>(
         &mut self,
@@ -111,7 +111,7 @@ impl PyDenoisingWorldLearner {
         out.set_item("posterior_rgb", float_bytes(py, &r.posterior)?)?;
         out.set_item(
             "observed_reconstruction",
-            "single-denoise-sigma0.5-not-rssm-posterior",
+            self.inner.config().observed_task(),
         )?;
         out.set_item("prior_rgb", float_bytes(py, &r.observations)?)?;
         out.set_item("reward", r.rewards)?;

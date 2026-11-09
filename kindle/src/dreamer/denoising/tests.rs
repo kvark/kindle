@@ -980,3 +980,93 @@ fn bounded_reward_header_requires_v7_and_preserves_all_defaults() {
         assert!(read_header(&header(&c, "kindle-denoising-world-v7")).is_err());
     }
 }
+
+#[test]
+fn direct_frame_has_target_independent_inputs_and_recovers_scaled_residual() {
+    for residual in [false, true] {
+        let c = DenoisingConfig {
+            deterministic_frame: true,
+            residual_frame: residual,
+            sigma_data: 0.05,
+            ..DenoisingConfig::default()
+        };
+        for sigma in [0.002, 0.05, 0.5, 5.] {
+            let (cin, cout, skip, cnoise) = c.coefficients(sigma);
+            assert_eq!((cin, cout, skip), (0., 0.05, 0.));
+            assert!((f64::from(cnoise) - 5f64.ln() / 4.).abs() < 1e-7);
+            for value in [-1., -0.3, 0., 0.8, 1.] {
+                for normal in [-100., 0., 100.] {
+                    let noisy = c.noisy_pixel(value, 0.2, sigma, normal);
+                    assert_eq!(noisy, 0.);
+                    let target = (coordinate(value, 0.2, residual) - skip * noisy) / cout;
+                    assert!(
+                        (f64::from(target)
+                            - (f64::from(value) - if residual { 0.2f32 as f64 } else { 0. })
+                                / 0.05f32 as f64)
+                            .abs()
+                            < 2e-6
+                    );
+                    assert!(
+                        (absolute(skip * noisy + cout * target, 0.2, residual) - quantize(value))
+                            .abs()
+                            < 1e-6
+                    );
+                }
+            }
+        }
+    }
+    let legacy = DenoisingConfig::default();
+    assert_eq!(legacy.noisy_pixel(0.3, 0.2, 0.5, 0.7), 0.3 + 0.5 * 0.7);
+}
+
+#[test]
+fn direct_frame_preserves_graph_and_requires_its_v8_task_metadata() {
+    let c = DenoisingConfig {
+        context_motion_scale: 100.,
+        residual_frame: true,
+        half_max_noise: true,
+        sigma_data: 0.05,
+        reward_limit: Some(32.),
+        ..DenoisingConfig::default()
+    };
+    let direct = DenoisingConfig {
+        deterministic_frame: true,
+        ..c.clone()
+    };
+    for build in [
+        network::training,
+        network::sampling,
+        network::event_sampling,
+    ] {
+        assert_eq!(
+            format!("{:?}", build(&c).nodes()),
+            format!("{:?}", build(&direct).nodes())
+        );
+    }
+    let header = |config: &DenoisingConfig| serde_json::json!({"format":config.checkpoint_format(),"config":config,"updates":0,"architecture":"conditional-unet16-32-64-history4","sampler":config.sampler_name(),"observed_reconstruction":config.observed_task()});
+    assert!(
+        !serde_json::to_value(&c)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("deterministic_frame")
+    );
+    assert_eq!(c.checkpoint_format(), "kindle-denoising-world-v7");
+    assert_eq!(direct.checkpoint_format(), "kindle-denoising-world-v8");
+    for config in [&c, &direct] {
+        assert_eq!(
+            read_header(&serde_json::to_vec(&header(config)).unwrap())
+                .unwrap()
+                .0,
+            *config
+        );
+    }
+    for field in ["format", "sampler", "observed_reconstruction"] {
+        let mut value = header(&direct);
+        value[field] = header(&c)[field].clone();
+        assert!(read_header(&serde_json::to_vec(&value).unwrap()).is_err());
+    }
+    let mut value = header(&c);
+    value["config"]["deterministic_frame"] = true.into();
+    assert!(read_header(&serde_json::to_vec(&value).unwrap()).is_err());
+}

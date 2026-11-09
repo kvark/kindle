@@ -113,3 +113,20 @@ def test_reward_limit_requires_matching_header_without_gpu(tmp_path,version,limi
     (tmp_path/'metadata.json').write_text(json.dumps(header))
     with pytest.raises(RuntimeError,match='checkpoint header'):
         kindle.DenoisingWorldLearner.restore(str(tmp_path))
+
+@pytest.mark.parametrize('field,value', [('format','kindle-denoising-world-v7'),
+    ('sampler','edm-euler3-sigma5-last-frame-residual-quantized'),
+    ('observed_reconstruction','single-denoise-sigma0.5-not-rssm-posterior'),
+    ('deterministic_frame',False)])
+def test_direct_frame_rejects_stale_metadata_without_gpu(tmp_path,field,value):
+    header=dict(format='kindle-denoising-world-v8',
+        config=CONFIG | {'context_motion_scale':100.,'residual_frame':True,
+                       'half_max_noise':True,'sigma_data':.05,'reward_limit':32.,
+                       'deterministic_frame':True},updates=0,
+        architecture='conditional-unet16-32-64-history4',sampler='direct-history4-quantized',
+        observed_reconstruction='causal-single-pass-not-observed-denoising')
+    if field=='deterministic_frame':header['config'][field]=value
+    else:header[field]=value
+    (tmp_path/'metadata.json').write_text(json.dumps(header))
+    with pytest.raises(RuntimeError,match='checkpoint header'):
+        kindle.DenoisingWorldLearner.restore(str(tmp_path))

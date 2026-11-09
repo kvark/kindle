@@ -21,36 +21,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Reject the completed [history-noise trial](docs/results/2026-11-09-breakout-denoising-history-noise.md): ordinary25/24/22/24 of110 versus35/38/34/33;
-actual-history one-step132/129/126/129 of198 versus140/149/140/140. Only1/24
-individual gates passes; the overall fitting gate fails. Shared spatial std.02
-on half the prefixes after a clean first update does not fix rollout drift.
-This does not refute all generated-history training methods. Targets/model/
-config/native remain matched; residual anchors,importance andevent inputs change
-together. Retain the clean-history reward32 model.
+unproven. Select [direct next-frame prediction](docs/experiments/2026-11-09-breakout-direct-frame.md): optional deterministic_frame,default off,keeps graph/weights and
+regresses the next-frame residual from four past images/actions without noisy
+current target inputs orEuler steps. Explicit v8/task metadata distinguishes its
+causal observed-output forecast fromdenoising. Rust CPU27/package54/strict Clippy pass. Initial packaging stopped because
+pip is absent;original failure retained,isolated wheel extraction succeeds.
+Next default fixture135/20/six exact before a fresh
+2,048-update/65,536-target learner. Require57 event tensors exact,own initial,
+frozen/restore andoriginal physics/event gates. No actor/critic/CDP,collection,
+extension orautomatic successor. Root
+`/mnt/data/kindle-breakout-direct-frame-20261109`.
 
-All135 initial/first-update tensors,six first losses,20 initial arrays,135 frozen
-tensors and20 restored arrays match.2,048 updates/65,536 targets take164.772s
-learn-call/172.042s loop; no isolated kernel-speed claim. All135 declaration/
-232 closure pins,two sealed guards/18 files andone terminal service pass.
-Mutable declaration guide/protocol bytes archived before final status updates;
-original pins/mapping remain retained. No build ordisposable cache. Root
-`/mnt/data/kindle-breakout-denoising-history-noise-20261109`.
-
-Retain [reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):
-ordinary zero-reward RMSE.417886→.0000317932, causal reward1 about.33→.990714.
-Physics remains35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
-One privileged positive still missed; no natural calibration orfresh confirmation.
-[Frozen logits](docs/results/2026-11-09-breakout-denoising-event-logits.md)
-confirm tiny support-tail mass dominates old scalar error; arithmetic is correct.
-Native source8dbf9ab5/SHA60b9b67244d7,25 CPU/50 packaged/four runner checks andstrict
-Clippy qualified. Full physics/events,natural calibration,changed-brick memory,
-late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
-required. No fitting result completes the goal. All jobs stopped; no extension,
-collector,old-model repeat orsuccessor selected. Actor/critic,CDP comparison and
-five-game work stay parked. All prior failures/repairs remain closed.
-[Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB; hardlinked
-evidence stays immutable.
+Retain [clean-history reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):
+ordinary zero-reward RMSE.417886→.0000317932,causal reward1 about.33→.990714;
+physics35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
+[History noise](docs/results/2026-11-09-breakout-denoising-history-noise.md)
+regresses both tasks andstays rejected;all prior trials/failures/repairs remain
+closed. Existing native60b9b67244d7 remains the control,not the new package.
+Full physics/events,natural calibration,changed-brick memory,late/tunnel/second-
+wall/above-top,untouched families andfresh confirmation remain required.
+No fitting score completes the full world-model orfive-game goal.
+[Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked
+retained evidence stays immutable.
 
 ## Direction and retained results
 

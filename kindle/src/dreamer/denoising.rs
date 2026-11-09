@@ -41,6 +41,8 @@ pub struct DenoisingConfig {
     pub log_noise_mean: f32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reward_limit: Option<f32>,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub deterministic_frame: bool,
 }
 impl Default for DenoisingConfig {
     fn default() -> Self {
@@ -59,6 +61,7 @@ impl Default for DenoisingConfig {
             sigma_data: SIGMA_DATA,
             log_noise_mean: default_log_noise_mean(),
             reward_limit: None,
+            deterministic_frame: false,
         }
     }
 }
@@ -91,7 +94,9 @@ impl DenoisingConfig {
         Ok(())
     }
     fn checkpoint_format(&self) -> &'static str {
-        if self.reward_limit.is_some() {
+        if self.deterministic_frame {
+            "kindle-denoising-world-v8"
+        } else if self.reward_limit.is_some() {
             "kindle-denoising-world-v7"
         } else if !is_default_log_noise_mean(&self.log_noise_mean) {
             "kindle-denoising-world-v6"
@@ -108,17 +113,36 @@ impl DenoisingConfig {
         }
     }
     fn sampler_name(&self) -> &'static str {
-        if self.residual_frame {
+        if self.deterministic_frame {
+            "direct-history4-quantized"
+        } else if self.residual_frame {
             "edm-euler3-sigma5-last-frame-residual-quantized"
         } else {
             "edm-euler3-sigma5-quantized"
         }
     }
     fn coefficients(&self, sigma: f32) -> (f32, f32, f32, f32) {
-        if is_default_sigma_data(&self.sigma_data) {
+        if self.deterministic_frame {
+            (0., self.sigma_data, 0., SIGMA_MAX.ln() / 4.)
+        } else if is_default_sigma_data(&self.sigma_data) {
             conditioners(sigma)
         } else {
             conditioners_with_scale(sigma, self.sigma_data)
+        }
+    }
+    /// The observed-image output is a causal forecast in direct mode.
+    pub fn observed_task(&self) -> &'static str {
+        if self.deterministic_frame {
+            "causal-single-pass-not-observed-denoising"
+        } else {
+            "single-denoise-sigma0.5-not-rssm-posterior"
+        }
+    }
+    fn noisy_pixel(&self, value: f32, base: f32, sigma: f32, normal: f32) -> f32 {
+        if self.deterministic_frame {
+            0.
+        } else {
+            coordinate(value, base, self.residual_frame) + sigma * normal
         }
     }
     fn training_sigmas(&self, normals: Vec<f32>, update: u64) -> Vec<f32> {
@@ -535,10 +559,7 @@ impl DenoisingWorldLearner {
                     .iter()
                     .zip(&noise[lane * w..(lane + 1) * w])
                     .enumerate()
-                    .map(|(i, (&y, &n))| {
-                        let y = coordinate(y, base[lane * w + i], c.residual_frame);
-                        y + sigma[lane] * n
-                    })
+                    .map(|(i, (&y, &n))| c.noisy_pixel(y, base[lane * w + i], sigma[lane], n))
                     .collect::<Vec<_>>();
                 let cond = history.condition(lane, incoming[lane], c.action_count, true);
                 inputs.extend_from_slice(&cond);
@@ -716,7 +737,7 @@ impl DenoisingWorldLearner {
             .iter()
             .zip(noise)
             .enumerate()
-            .map(|(i, (&v, n))| coordinate(v, base[i], c.residual_frame) + 0.5 * n)
+            .map(|(i, (&v, n))| c.noisy_pixel(v, base[i], 0.5, n))
             .collect::<Vec<_>>();
         let posterior = self
             .denoise(&history, &actions[(length - 1) * b..], &x, 0.5)?
@@ -740,20 +761,25 @@ impl DenoisingWorldLearner {
         for a in future.chunks_exact(b) {
             let incoming = a.iter().map(|&a| a as i32).collect::<Vec<_>>();
             let base = history.base(&incoming, c.residual_frame);
-            let mut x = gaussian::normals(&mut rng, b * w)
-                .iter()
-                .map(|v| v * SIGMA_MAX)
-                .collect::<Vec<_>>();
-            for pair in sigmas.windows(2) {
-                let d = self.denoise(&history, &incoming, &x, pair[0])?;
-                for (i, (v, pred)) in x.iter_mut().zip(d).enumerate() {
-                    let pred = coordinate(pred, base[i], c.residual_frame);
-                    *v += (*v - pred) / pair[0] * (pair[1] - pair[0]);
+            let x = if c.deterministic_frame {
+                self.denoise(&history, &incoming, &vec![0.; b * w], SIGMA_MAX)?
+            } else {
+                let mut x = gaussian::normals(&mut rng, b * w)
+                    .iter()
+                    .map(|v| v * SIGMA_MAX)
+                    .collect::<Vec<_>>();
+                for pair in sigmas.windows(2) {
+                    let d = self.denoise(&history, &incoming, &x, pair[0])?;
+                    for (i, (v, pred)) in x.iter_mut().zip(d).enumerate() {
+                        let pred = coordinate(pred, base[i], c.residual_frame);
+                        *v += (*v - pred) / pair[0] * (pair[1] - pair[0]);
+                    }
                 }
-            }
-            for (i, v) in x.iter_mut().enumerate() {
-                *v = absolute(*v, base[i], c.residual_frame);
-            }
+                for (i, v) in x.iter_mut().enumerate() {
+                    *v = absolute(*v, base[i], c.residual_frame);
+                }
+                x
+            };
             let mut event_input = Vec::new();
             for (lane, &action) in incoming.iter().enumerate() {
                 event_input.extend(history.condition(lane, action, c.action_count, false));
@@ -811,7 +837,7 @@ impl DenoisingWorldLearner {
         std::fs::write(
             path.join("metadata.json"),
             serde_json::to_vec_pretty(
-                &serde_json::json!({"format":self.config.checkpoint_format(),"config":self.config,"updates":self.updates,"architecture":"conditional-unet16-32-64-history4","sampler":self.config.sampler_name(),"observed_reconstruction":"single-denoise-sigma0.5-not-rssm-posterior"}),
+                &serde_json::json!({"format":self.config.checkpoint_format(),"config":self.config,"updates":self.updates,"architecture":"conditional-unet16-32-64-history4","sampler":self.config.sampler_name(),"observed_reconstruction":self.config.observed_task()}),
             )?,
         )?;
         Ok(())
@@ -844,7 +870,7 @@ fn read_header(bytes: &[u8]) -> Result<(DenoisingConfig, u64), Box<dyn std::erro
     if h.format != h.config.checkpoint_format()
         || h.architecture != "conditional-unet16-32-64-history4"
         || h.sampler != h.config.sampler_name()
-        || h.observed_reconstruction != "single-denoise-sigma0.5-not-rssm-posterior"
+        || h.observed_reconstruction != h.config.observed_task()
         || h.updates > u64::from(u32::MAX)
     {
         return Err("invalid denoising checkpoint header".into());
