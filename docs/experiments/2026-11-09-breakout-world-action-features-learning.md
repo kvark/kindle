@@ -67,3 +67,11 @@ before declaring an assessment of a new trained checkpoint. Full distributional
 physics/action responses, natural event calibration, removed-brick memory,
 late/tunnel/second-wall/above-top coverage, untouched families and fresh
 confirmation remain required even if the three intermediate gates pass.
+
+## Declaration repair before GPU execution
+
+The first declaration script stops on an undefined JSON writer after archiving
+source and copying the protocol. No learning declaration, queue, CPU plan, model
+or emulator is created. Preserve declare_v1.py and its traceback. Separately
+select declare_v2.py with an exclusive JSON writer and new source/protocol copy
+names. Training settings, bounds, data and acceptance gates do not change.
