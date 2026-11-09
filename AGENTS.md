@@ -21,44 +21,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Retain [reward_limit32](docs/results/2026-11-09-breakout-denoising-reward32.md) as a Breakout development setting. Ordinary zero-
-reward RMSE improves from own initial.417886 to.0000317932, versus old trained
-65.604. Causal one-step overall.408339→.0314885; the exported reward1 case
-improves about.33→.990714, positive probability.503→.99294. The other privileged
-positive still predicts.267701 for1. No natural calibration or fresh confirmation.
-All78 denoiser weights/moments and final RGB stay bit-exact to the control:
-physics remains35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
-This improves one component, not the full world model or retained CDP agent.
+unproven. Select the [history-noise trial](docs/experiments/2026-11-09-breakout-denoising-history-noise.md): one fresh2,048-update/65,536-target
+learner, four-frame shared spatial noise std.02 on half the prefixes after a
+clean first update. Targets, model, config and qualified reward32 native/runner
+stay unchanged. CPU preparation passes; require135 first-update tensors/six
+losses and135 initial tensors/20 arrays exact before altered training. Then
+check original physics gates, event/pixel regressions and exact frozen/restore.
+No actor/critic/CDP work, collection, extension or automatic successor.
+Root `/mnt/data/kindle-breakout-denoising-history-noise-20261109`.
 
-The [frozen logit diagnosis](docs/results/2026-11-09-breakout-denoising-event-logits.md) confirms tiny mass outside±32 dominates the old
-scalar errors even on actual images. Native arithmetic reconstructs correctly;
-no decoder implementation bug. Diagnostic central contributions/modal values
-are not learned replacements. Source has only two fitting positives and no
-terminals; causal teacher exports cover one positive, privileged head inputs
-both. Exact input keys are distinct, which does not rule out feature aliasing.
-
-Latest source8dbf9ab5/native60b9b67244d7. Optional reward_limit=None preserves
-original support/decoder/v1–v6; explicit32 usesv7 and rejects out-of-range target
-rewards before updates. Any future dataset must pass that guard.25 Rust CPU/
-50 packaged config-restore/four runner checks and strict release Clippy pass.
-DefaultNone fixture135 initial/frozen/first-update tensors,20 initial arrays and
-six losses exact before main launch; one qualification update is separate.
-Main135 initial tensors/16 non-reward arrays,78 first/final denoiser tensors,
-135 own frozen tensors/20 restored arrays and12 head replay arrays are exact.
-All140 declaration/125 physical CPU/306 closure pins, four sealed guards/36 files
-andtwo terminal services pass.2,048 updates/65,536 targets take161.420s learn-
-call/169.299s loop on the shared host. Own792,664,189-byte apparent cache released.
-Original terminal guard-count metadata2 remains with a clarification tothree
-main guards plus one fixture; no native or audit repeat. Root
-`/mnt/data/kindle-breakout-denoising-reward32-20261109`.
-
-All jobs stopped. No learner, extension, collector or successor selected.
-Keep source/native/checkpoint/runner identities separate. The earlier
-[lower-noise](docs/results/2026-11-09-breakout-denoising-low-noise.md),[six-step](docs/results/2026-11-09-breakout-denoising-six-steps.md) and[grouped-history](docs/results/2026-11-09-breakout-denoising-generated-history.md) changes stay rejected; all
-prior trials/failures/repairs remain closed. Full physics/events/natural
-calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
-families andfresh confirmation remain required. No fitting score completes the
-goal. Actor/critic,CDP comparison andfive-game work stay parked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
+Retain [reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):
+ordinary zero-reward RMSE.417886→.0000317932, causal reward1 about.33→.990714.
+Physics remains35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
+One privileged positive still missed; no natural calibration or fresh confirmation.
+[Frozen logits](docs/results/2026-11-09-breakout-denoising-event-logits.md)
+confirm tiny support-tail mass dominates old scalar error; arithmetic is correct.
+Native source8dbf9ab5/SHA60b9b67244d7,25 CPU/50 packaged/four runner checks andstrict
+Clippy qualified. All prior failures/repairs remain closed. Full physics/events,
+natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. The full world model
+and five-game goals are unproven. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
 recovered115GB; hardlinked evidence stays immutable.
 
 ## Direction and retained results
