@@ -39,7 +39,12 @@ caches released. Optional CPU console failure/repair andseparate closure-field
 metadata correction remain preserved;no native job/query isrepeated.
 Root `/mnt/data/kindle-breakout-denoising-sigma-data0p05-20261109`.
 
-No GPU job,extension orsuccessor isselected. Retain.05 as development evidence,
+The [frozen paired-history diagnostic](docs/experiments/2026-11-09-breakout-denoising-paired-history.md) is selected:compare a new recursive
+branch to cached actual-history predictions with identical per-step sampling
+noise. Reuse current native/checkpoint;no build ortraining. Declare before one
+300s guarded allocation. Root
+`/mnt/data/kindle-breakout-denoising-paired-history-20261109`.
+No learner,extension orcollector isselected. Retain.05 as development evidence,
 not a global default. The [stage trace](docs/results/2026-11-09-breakout-denoising-stage-trace.md) andall older trials/failures/repairs stay
 closed. No old learner/query queue orcollector repeats. Full physics/events/
 natural calibration,brick memory,late/tunnel/second-wall/above-top,untouched
