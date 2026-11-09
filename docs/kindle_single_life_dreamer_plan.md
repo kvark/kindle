@@ -3,30 +3,30 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. A separately declared [plain sampled H16/RGB1 learner](experiments/2026-11-09-breakout-world-plain-rgb1.md) is
-selected:only reconstruction coefficient100→1 changes versus original H16,
-withnormal categorical samples/ST gradients. No mean mode,spatial decoder,
-extra head orcolor attention. Fresh8,192/RGB64/12M/B8/T32/H16/Auto/41001/rates4e-4,
-original4/2/1/1 plan,68 weights/204 tensors/11 reports,legacyv2. Earlier RGB1
-fusion/suffix-event andlocal H0/transport failures remain closed;this is a distinct
-plain-model balance test,not a diagnosed cause. No rebuild;use qualified default-
-off nativeaffedefa/SHA cc6022e3 andmatching runner. Root
-`/x/Temp/kindle-world-plain-rgb1-20261109`.
+unproven. The [plain sampled H16/RGB1 comparison](results/2026-11-09-breakout-world-plain-rgb1.md) is closed and negative:
+85/112 observed, 69/109 one-step and 11/107 eight-step balls match; **0/3 gates**.
+Original H16 scores 99/112, 84/109 and 25/107. Fitting scores are 126/163,
+121/177 and 49/176; four contact draws match 25/18/20/14 of 110. Lowering only
+reconstruction 100→1 reduces raw dynamics KL 42.261→14.474 without improving
+physics. This does not identify a causal failure. Retain the H0 broad reference.
+No branch assessment, extension or successor is selected.
 
-[Mean-latent learning](results/2026-11-09-breakout-world-mean-latents-learning.md) remains closed/negative:106/112 observed,61/109
-one-step,18/107 eight-step,1/3 gates;fit155/163,102/177,42/176;contacts20/110.
-All498 requested-draw equalities pass,not independent stochastic evidence.
-204 initial/frozen tensors and18 development/32 contact restore arrays pass;
-149 declaration/158 CPU/324 original closure/331 publication pins,two guards/
-18 files;native749.533s,loop852.913s. Original CPU report-link/wording defect and
-separatev2 correction remain withunchanged metrics;no native/analysis rerun.
-Retain H0 broad reference. Mean andcolor options stayoff;no oldlearner repeats.
+All 204 original initial/own frozen tensors, 36 actual-initial arrays, 18
+development/32 contact restore arrays, eight one-hot state arrays and 8,192
+finite eleven-report rows pass. There are 150 declaration/163 CPU analysis/330
+closure pins, two successful terminal jobs and two guards/18 sealed files.
+Native calls take 759.598s; the loop takes 867.901s. No new build, retry, repair,
+emulator actions or frames. Root: `/x/Temp/kindle-world-plain-rgb1-20261109`.
+The report retains the full recipe and all per-horizon regressions.
 
-No extension,collector orautomatic successor. Full precise physics,natural event
-calibration,removed-brick memory,late/tunnel/second-wall/above-top,untouched
-families andfresh confirmation remain required. Actor/critic,CDP comparison and
-five-game work stayparked;earlier jobs closed/fullres protocol-failed. Only the
-new bounded learner above isselected;consult its protocol beforeexecution.
+[Mean-latent learning](results/2026-11-09-breakout-world-mean-latents-learning.md) and all earlier comparisons stay closed; mean/color
+options stay off. No GPU allocation or full learner is active or selected.
+Full precise physics, natural event calibration, removed-brick memory,
+late/tunnel/second-wall/above-top coverage, untouched families and fresh
+confirmation remain required. Actor/critic, CDP comparison and five-game work
+stay parked; earlier jobs remain closed/fullres protocol-failed. Consult a
+separately justified protocol before any new experiment; do not repeat completed
+stages or collectors.
 
 ### What would establish the world model
 

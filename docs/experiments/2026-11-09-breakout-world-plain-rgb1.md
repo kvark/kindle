@@ -60,3 +60,7 @@ Full precise physics,natural reward/life/game-over calibration,removed-brick
 memory,late/tunnel/second-wall/above-top,untouched families andfresh confirmation
 remain required. No implementation/fitting/intermediate score completes thegoal.
 Actor/critic,CDP comparison andfive-game work stayparked. Earlier jobs stayclosed.
+
+## Closed result
+
+[Fixed final result](../results/2026-11-09-breakout-world-plain-rgb1.md):85/112 observed,69/109 one-step,11/107 eight-step;0/3 gates. No conditional branch assessment,extension orsuccessor. All330 closure pins andtwo terminal guarded stages pass;the full goal remains unproven.
