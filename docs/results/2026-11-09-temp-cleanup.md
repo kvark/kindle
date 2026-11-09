@@ -106,3 +106,35 @@ No unique checkpoints, replay, logs, videos or experiment evidence are deleted.
 The remaining large directories predominantly hold retained experiment artifacts.
 Inventory, removed-cache list, duplicate map and verification receipts remain at
 `/x/Artifacts/kindle-temp-cleanup-2120-20261109`. Earlier receipts are unchanged.
+
+## Remaining compiler helpers and newer duplicates
+
+The next requested pass recovers **683,999,232 allocated bytes (684 MB)**.
+`/x/Temp` falls191,314,010,112→190,630,010,880 bytes (about177.5 GiB).
+The root filesystem has291,468,087,296 bytes (271.5 GiB) available afterward.
+Most remaining temporary storage holds retained checkpoints and logs.
+
+- Remove781 unused compiler-helper paths from old Cargo caches, reclaiming
+  477,462,528 bytes across365 inodes. These are652 Cargo build-script executables
+  and129 procedural-macro libraries, identified by their Rust macro symbols.
+  Earlier cleanup conservatively retained executable files; these helpers are
+  compiler inputs rather than validation tools or production native libraries.
+  Preserve validation executables, runtimes, compiler diagnostics and source.
+- Share storage for ten newer byte-identical artifact paths, reclaiming
+  206,217,216 bytes. All nine canonical full-content hashes pass a final recheck;
+  original paths, content, permissions, owners and extended attributes remain.
+- Recover319,488 zero-filled allocated bytes from six newer checkpoint inodes.
+  Full SHA256 matches before and after; sizes, inodes, permissions, owners,
+  link counts and modification times are preserved.
+- Verify all7,917 remaining inventoried large artifact paths. The original
+  8,104-path inventory includes187 removed compiler helpers; none of those is
+  a checkpoint, runtime or experiment result. Both retained agent-runtime hashes
+  above and173 distinct current wide-motion execution/closure pins still match.
+
+The current wide-motion directory is excluded from cleanup. No process has an
+open temporary artifact at the start; no GPU work or learner is launched.
+No unique checkpoint, replay, log, video, source or experiment evidence is deleted.
+Receipts, compiler-tool classification and hashes, duplicate map and verification
+remain at `/x/Artifacts/kindle-temp-cleanup-2251-20261109`. Earlier receipts
+remain unchanged. The separate wide-motion packaged build-cache release is not
+included in this pass's684 MB total.
