@@ -9,7 +9,7 @@ Original H16 scores 99/112, 84/109 and 25/107. Fitting scores are 126/163,
 121/177 and 49/176; four contact draws match 25/18/20/14 of 110. Lowering only
 reconstruction 100→1 reduces raw dynamics KL 42.261→14.474 without improving
 physics. This does not identify a causal failure. Retain the H0 broad reference.
-No branch assessment, extension or successor is selected.
+No branch assessment or extension is selected.
 
 All 204 original initial/own frozen tensors, 36 actual-initial arrays, 18
 development/32 contact restore arrays, eight one-hot state arrays and 8,192
@@ -20,7 +20,14 @@ emulator actions or frames. Root: `/x/Temp/kindle-world-plain-rgb1-20261109`.
 The report retains the full recipe and all per-horizon regressions.
 
 [Mean-latent learning](results/2026-11-09-breakout-world-mean-latents-learning.md) and all earlier comparisons stay closed; mean/color
-options stay off. No GPU allocation or full learner is active or selected.
+options stay off. A separately declared [frozen forward-contract study](experiments/2026-11-09-breakout-world-forward-contract.md)
+is selected: eight cases at the original H16/RGB100 and plain RGB1 final weights,
+two retained mixed/contact batches and two diagnostic noise pairs. Compare the
+actual training graph, identical unrolled inference graph and streaming native
+observe/transition/decoder path at matched categorical samples. Zero optimizer
+steps, no production/runtime change or full learner. CPU extraction check and
+strict Clippy pass; own build cache released after packaging. Root:
+`/x/Temp/kindle-world-forward-contract-20261109`.
 Full precise physics, natural event calibration, removed-brick memory,
 late/tunnel/second-wall/above-top coverage, untouched families and fresh
 confirmation remain required. Actor/critic, CDP comparison and five-game work
