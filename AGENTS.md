@@ -21,29 +21,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [same-target B8 learner](docs/results/2026-11-09-breakout-denoising-batch8.md) completes: one-step ball
-matches178/174/176/173 of198 improve140/149/140/140, butordinary rollouts
-33/31/29/28 of110 trail35/38/34/33. Both0/24 gates. All detected one-step balls
-are accurate;20–25 are missing. Generated histories remain weak despite better
-fitting. Retain B32/reward32 as ordinary control;keep B8 as distinct fitting
-evidence. No isolated mechanism or seed/generalization claim.
+unproven. Select [four generated training-history frames](docs/experiments/2026-11-09-breakout-full-causal-prefix.md): fresh B8
+8,192-update learner,unchanged65,536 targets/config/native Gaussian order.
+First4,096 updates clean;then13,424 exposures replace allfour prefix frames with
+causal four-step forecasts,half ofeligible source repetitions.16 frozen caches/
+368 queries/11,776 imagined frames,refresh256,no new emulator experience.
+Seven CPU check groups pass. Require135 initial/first/2036/4084 tensors,six
+first losses,20 initial/2036/4084 arrays andown frozen/restore exact. One service,
+two guards,existing native60b9b672/source8dbf9ab5,no build. Root
+`/mnt/data/kindle-breakout-full-causal-prefix-20261109`.
 
-B8 uses8,192 updates/65,536 targets versus2,048 atB32;per-source exposures,
-588 positives and32,768 forced-max-noise targets match. Noise interleaving,
-averaging andAdam age differ. Learning calls218.921s,loop228.929s versus
-161.420s/169.299s:35.22% more loop time.135 initial/frozen tensors and20
-initial/restored arrays exact;all8,192 loss rows finite/all45 parameters change.
-215 closure pins,two guards/18 sealed files,one terminal successful service.
-Native60b9b672/source8dbf9ab5 reused,no build. Root
-`/mnt/data/kindle-breakout-denoising-batch8-20261109`.
+The [B8 control](docs/results/2026-11-09-breakout-denoising-batch8.md) improves one-step matches to178/174/176/173 of198,
+butordinary33/31/29/28 of110 trails B32's35/38/34/33;both0/24 gates. B8 costs
+35.22% more loop time. Keep B32/reward32 as ordinary reference andB8 as distinct
+fitting evidence. Prior latest-only generated histories failed;the new test
+uses allfour generated frames after longer warmup,not a repeat. No isolated
+mechanism,seed/generalization orfull16-step training-history claim.
 
-[Frozen noisy-input attenuation](docs/results/2026-11-09-breakout-noisy-channels0p1.md) staysnegative;original gain retained.
-All jobs stopped,prior trials stayclosed,fullres staysprotocol-failed. No learner,
-extension,collector orautomatic successor selected. Full physics/events,natural
-calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
-families andfresh confirmation remain required. No fitting score completes the
-goal. Actor/critic,CDP comparison andfive-game work stayparked.
-[Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
+Allprevious jobs stayclosed;fullres staysprotocol-failed. No automatic successor.
+Full physics/events,natural calibration,changed-brick memory,late/tunnel/second-
+wall/above-top,untouched families andfresh confirmation remain required. No
+fitting score completes thegoal. Actor/critic,CDP comparison andfive-game work
+stayparked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
 
 ## Direction and retained results
 
