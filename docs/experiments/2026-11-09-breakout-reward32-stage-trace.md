@@ -50,3 +50,10 @@ calibration,natural-game competence orworld-model proof. Full physics/events,
 changed-brick memory,late/tunnel/second-wall/above-top,untouched families andfresh
 confirmation remain required. Fullres protocol failure remains failed;all prior
 learners/assessments stayclosed. No extension,collector orautomatic successor.
+
+Completed: [result](../results/2026-11-09-breakout-reward32-stage-trace.md).
+Later stages improve ball matches114/114/107/111→140/149/140/140;stage2→3 loses
+no correct cases. Weak creation ispresent alreadyathigh noise. Native parity/
+frozen checks,105 declaration/147 closure pins,nine guardfiles pass;service
+terminal,no learning/build. No sampler intervention orsuccessor selected;
+full goal remains unproven,andfullres protocol failure staysfailed.

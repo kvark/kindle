@@ -9,39 +9,33 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [fullres16 run](results/2026-11-09-breakout-fullres16.md) is
-**protocol-failed**,not aqualified comparison. I edited hash-pinned analyse.py
-while learning;all2,048 updates/final forecasts completed,then the final pincheck
-failed andrestore never launched. Original failed process/guard/observer,declared
-andmodified scripts preserved. Separate CPU analysis scores saved arrays only;
-it doesnot relabel the comparison aspassed. No learner/native/audit repeat.
+unproven. The [retained-model stage trace](results/2026-11-09-breakout-reward32-stage-trace.md) completeswithout learning: stage1 ball matches114/114/107/111 of198,
+stage2 139/149/139/138,stage3 140/149/140/140. Stage1→2 gains131 correct/losses12;
+stage2→3 gainsfour/losseszero. Later steps improve these actual-history cases;
+this doesnot support selecting one-step sampling. Median new-ball pixel change
+projection.653–.670→.730–.778,old-pixel erasure.967–.973→.999–1.000. Motion is
+nearideal where detected;foreground creation remains weaker than erasure.
+No causal loss/architecture diagnosis orordinary one-stage rollout isproved.
 
-Descriptive scores:ordinary27/25/25/27 of110 versus35/38/34/33;one-step149/152/152/151
-of198 versus140/149/140/140.0/24 gates. Retain qualified U-Net reward32;fullres
-stays off.33 Rust CPU/67 packaged/four runner/strict Clippy passedbefore GPU.
-Default U-Net fixture135 initial/frozen/first tensors,20 arrays/six losses exact;
-main57 initial/first/final event+15 shared-edge initial tensors exact. CPU confirms
-135 own frozen tensors;restore/20 restored outputs unmeasured. All144 declaration
-bytes verified viaarchived declared analysis,withlive mismatch explicitlyretained.
-277 CPU closure pins verified;legacy guard passes9 sealed files,main guard fails
-childexit1 with27 sealed files (36 total). Main servicefailed/legacy successful,
-both stopped. Initial preservation CPU audit-exit assumption failure andseparate
-repair retained;the auditor wasnot repeated. Own792,853,659-byte apparent build
-cache released. Native1eb5d74265a9/sourcec4f3279b;root
-`/mnt/data/kindle-breakout-fullres16-20261109`.
+Unweighted RGB MSE riseswhile ball recovery improves;it isnot the native weighted/
+preconditioned loss anddoesnot establish an objective cause. Allstage paddle/
+brick/pixel/false-detection/motion regressions,2,592 rows and27 fixed lossless
+panels retained.108 traces/324 denoiser calls/four normal origin queries take
+3.631s,shared host/restore/readback included,no kernel-speed claim. All108 cached
+finalbatch arrays/864 images,20 origin model arrays and135 frozen tensors exact.
+105 declaration/147 closure pins,nine sealed guard files/one terminal successful
+service pass. Reuse native test786ab275/source8dbf9ab5,no build/newlearner.
+Root `/mnt/data/kindle-breakout-reward32-stage-trace-20261109`.
 
-Pixel predictor keepsnine5×5 convolutions at64×64,16 hidden channels,seven.1
-residual adds;81,459 pixel parameters,total1,262,595. It changes spatial/skip/
-parameter allocation together,no isolated resampling claim. Defaultfalse preserves
-U-Net/v1–v10;true usesv11. Learning counters165.784s/173.606s loop werewritten
-beforeintegrityfailure,not asuccessful job receipt. Retain
-[reward32](results/2026-11-09-breakout-denoising-reward32.md):35/38/34/33
-of110 ordinary,140/149/140/140 of198 one-step,0/24 gates. Earlierfailed recipes
-stayclosed. No extension,collector,old-model repeat,restore retry orautomatic
-successor. Full physics/events,natural calibration,changed-brick memory,late/
+Retain [reward32](results/2026-11-09-breakout-denoising-reward32.md):
+35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates. Old sigma_data.5
+trace andallprevious trials stayclosed. [Fullres](results/2026-11-09-breakout-fullres16.md)
+remains protocol-failed,restore unrun;CPU recovery doesnot qualify it. All jobs
+stopped;no sampler intervention,learner,extension,collector orautomatic successor
+selected. Full physics/events,natural calibration,changed-brick memory,late/
 tunnel/second-wall/above-top,untouched families andfresh confirmation remain
-required. Actor/critic,CDP comparison andfive-game work stayparked. No fitting
-result completes the full goal. [Cleanup](results/2026-11-09-temp-cleanup.md)
+required. Actor/critic,CDP comparison andfive-game work stayparked. No diagnostic
+or fitting score completes the goal. [Cleanup](results/2026-11-09-temp-cleanup.md)
 recovered115GB;hardlinked retained evidence staysimmutable.
 
 ## Preserved source and fresh-machine setup
