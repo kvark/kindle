@@ -8,6 +8,7 @@ use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
 const DREAMER_NORM_EPSILON: f32 = 1e-4;
 
 mod rgb;
+pub(crate) use rgb::{ConvNorm, Convolution};
 
 pub(crate) fn concat_columns(
     graph: &mut Graph,

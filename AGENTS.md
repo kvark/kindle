@@ -21,44 +21,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-Actor/critic,CDP comparison and the five-game campaign remain parked. Native pixel
-supervision/global H0 stay the inspectable reference. No GPU allocation or next
-learner is active or selected;no pretrained encoder or object/RAM training labels.
+The [conditional pixel denoising experiment](docs/experiments/2026-11-09-breakout-denoising-world.md) is selected for focused
+CPU/native qualification and a bounded fresh learning check. It replaces the
+RSSM image generator with a four-frame/action U-Net and separate transition
+reward/ending reader; no actor/critic, CDP comparison or pretrained encoder.
+Existing world learners/defaults remain unchanged. Root
+`/mnt/data/kindle-breakout-denoising-world-20261109`.
 
-The [posterior-conditioned generated-history trial](docs/results/2026-11-09-breakout-world-posterior-history.md) is closed andfails its fresh2,048-update check. v21 adds suffix reconstruction
-using real posterior states andself-generated past images,with unchanged ordinary
-losses/inference. Matched2k natural development one-step18/27 trails H0's23/27;
-both eight-step scores arezero. Dense observed/1/8:78/112,57/109,2/107.
-Primary ball energy.534384 versus H0.169502/gate.127127;only serve NOOP passes
-of ten gates. Ending16/32 Brier.021188/.276176,RIGHT16 risk.102788,278/304
-nonending alarms. This isnegative early-budget evidence,not a claim about every
-later budget or all posterior-conditioned methods. No extension is justified.
+CPU preparation caught struct-pattern, NCHW shape and test-fixture errors;
+original logs and separate corrections remain retained. Six focused CPU checks
+pass;347 packaged checks and strict core Clippy pass. Native qualification
+and the declared learning budget remain.
+No GPU learner is active yet. Observed-frame denoising is a separate task from
+RSSM reconstruction; future forecasts receive no real-image corrections.
 
-All657 learner/129 CPU and1,611 assessment/236 CPU pins,2,048 finite11-component
-rows,80 changed weights,240 initial/frozen tensors/ages,18 restored arrays,
-27 natural/84 full causal exports and96 exact clip frames pass. Source/runner
-64f5489f/nativeaa12d050,1M/RGB64/B8/T32/suffix16,Auto;no new weights/primitive.
-Call/loop225.649s/290.849s;matched H0 call135.039s,with different checkpoint
-instrumentation,not isolated kernel timing. Assessment182.831s/CPU16.049s.
-Closure2,345 pins/10.530s,three guards/27 files,two terminal services. Original
-compile/allowlist/fixture failures remain with separate corrections;first
-unqualified wheel overwritten before retention,source/log preserved. Three new
-CPU/13 affected header/326 packaged checks andstrict core Clippy pass. Disposable
-3,206,658,485-byte caches released;runtime/wheels/source/executable retained.
-Root `/mnt/data/kindle-breakout-world-posterior-history-20261109`.
+The [posterior-history trial](docs/results/2026-11-09-breakout-world-posterior-history.md) stays closed and failed: primary ball
+energy .534384 versus H0 .169502/gate .127127; only one of ten gates passes.
+Do not repeat it or its completed evaluations. Native pixel/global H0 is the
+inspectable reference. The existing pixel-generator review is not being repeated.
 
-The [refresh diagnostic](docs/results/2026-11-09-breakout-world-refresh.md) establishes temporary sensitivity to generated image history,not a trainable
-repair. The [H0/RGB1 learner](docs/results/2026-11-09-breakout-world-local-h0.md) stays closed andfailed. Use the existing
-[pixel-generator review](docs/results/2026-11-08-breakout-world-pixel-generators-review.md) and these results to justify a distinct image-generator/distribution experiment;
-do not repeat that review or assume another recurrence tweak fixes sampling.
-No image-generator successor is selected here. Read the
-[posterior-history protocol](docs/experiments/2026-11-09-breakout-world-posterior-history.md) before new work. Do not repeat completed learners,collectors,assessments or
-diagnostics;no unchanged extension,sweep or automatic successor.
-
-All original physics/event/full-game gates stand:precise dynamics,event timing/
-calibration,persistent removed-brick memory,late/tunnel/second-wall/above-top
-coverage,untouched families andfresh confirmation. Existing oracle hasno
-above-top-brick endpoint. No intermediate/privileged score completes either goal.
+The protocol selects 8,189 native transition updates, trainB32/inferB8,
+RGB64/Auto, with a separately qualified first update inside that budget. No new
+collector, extension, seed sweep or automatic successor. All original physics,
+event/calibration, brick-memory and full-game gates stand; untouched families,
+late/tunnel/second-wall/above-top coverage and fresh confirmation remain open.
+No intermediate or privileged score completes either goal.
 
 ## Direction and retained results
 

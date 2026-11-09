@@ -9,92 +9,31 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-Actor/critic,CDP comparison and the five-game campaign remain parked. Native pixel
-supervision/global H0 stay the inspectable reference. No GPU allocation or next
-learner is active or selected;no pretrained encoder or object/RAM training labels.
+The [conditional pixel denoising experiment](experiments/2026-11-09-breakout-denoising-world.md) is selected for focused
+CPU/native qualification and a bounded fresh learning check. It replaces the
+RSSM image generator with a four-frame/action U-Net and separate transition
+reward/ending reader; no actor/critic, CDP comparison or pretrained encoder.
+Existing world learners/defaults remain unchanged. Root
+`/mnt/data/kindle-breakout-denoising-world-20261109`.
 
-The [posterior-conditioned generated-history trial](results/2026-11-09-breakout-world-posterior-history.md) is closed andfails its fresh2,048-update check. v21 adds suffix reconstruction
-using real posterior states andself-generated past images,with unchanged ordinary
-losses/inference. Matched2k natural development one-step18/27 trails H0's23/27;
-both eight-step scores arezero. Dense observed/1/8:78/112,57/109,2/107.
-Primary ball energy.534384 versus H0.169502/gate.127127;only serve NOOP passes
-of ten gates. Ending16/32 Brier.021188/.276176,RIGHT16 risk.102788,278/304
-nonending alarms. This isnegative early-budget evidence,not a claim about every
-later budget or all posterior-conditioned methods. No extension is justified.
+CPU preparation caught struct-pattern, NCHW shape and test-fixture errors;
+original logs and separate corrections remain retained. Six focused CPU checks
+pass;347 packaged checks and strict core Clippy pass. Native qualification
+and the declared learning budget remain.
+No GPU learner is active yet. Observed-frame denoising is a separate task from
+RSSM reconstruction; future forecasts receive no real-image corrections.
 
-All657 learner/129 CPU and1,611 assessment/236 CPU pins,2,048 finite11-component
-rows,80 changed weights,240 initial/frozen tensors/ages,18 restored arrays,
-27 natural/84 full causal exports and96 exact clip frames pass. Source/runner
-64f5489f/nativeaa12d050,1M/RGB64/B8/T32/suffix16,Auto;no new weights/primitive.
-Call/loop225.649s/290.849s;matched H0 call135.039s,with different checkpoint
-instrumentation,not isolated kernel timing. Assessment182.831s/CPU16.049s.
-Closure2,345 pins/10.530s,three guards/27 files,two terminal services. Original
-compile/allowlist/fixture failures remain with separate corrections;first
-unqualified wheel overwritten before retention,source/log preserved. Three new
-CPU/13 affected header/326 packaged checks andstrict core Clippy pass. Disposable
-3,206,658,485-byte caches released;runtime/wheels/source/executable retained.
-Root `/mnt/data/kindle-breakout-world-posterior-history-20261109`.
+The [posterior-history trial](results/2026-11-09-breakout-world-posterior-history.md) stays closed and failed: primary ball
+energy .534384 versus H0 .169502/gate .127127; only one of ten gates passes.
+Do not repeat it or its completed evaluations. Native pixel/global H0 is the
+inspectable reference. The existing pixel-generator review is not being repeated.
 
-The [refresh diagnostic](results/2026-11-09-breakout-world-refresh.md) establishes temporary sensitivity to generated image history,not a trainable
-repair. The [H0/RGB1 learner](results/2026-11-09-breakout-world-local-h0.md) stays closed andfailed. Use the existing
-[pixel-generator review](results/2026-11-08-breakout-world-pixel-generators-review.md) and these results to justify a distinct image-generator/distribution experiment;
-do not repeat that review or assume another recurrence tweak fixes sampling.
-No image-generator successor is selected here. Read the
-[posterior-history protocol](experiments/2026-11-09-breakout-world-posterior-history.md) before new work. Do not repeat completed learners,collectors,assessments or
-diagnostics;no unchanged extension,sweep or automatic successor.
-
-All original physics/event/full-game gates stand:precise dynamics,event timing/
-calibration,persistent removed-brick memory,late/tunnel/second-wall/above-top
-coverage,untouched families andfresh confirmation. Existing oracle hasno
-above-top-brick endpoint. No intermediate/privileged score completes either goal.
-
-## Current AMD runtime and retained position
-
-Use Auto precision on RX7900XT/RADV. BF16 and `KINDLE_DEVICE_TARGETS` are
-unavailable; see the [paired precision evidence](results/2026-10-25-cdp-amd-precision.md).
-The completed F16/Auto context experiments do not justify extensions.
-Native learning remains on Meganeura + Blade; backend porting, optimization
-and JAX parity are parked. Retained agents explicitly select centered CDP; the
-new isolated-world baseline selects pixel supervision. The CLI default is learned
-RGB. Keep native pooled frames and one GPU resize.
-
-Current learning uses native447fe5013b6442c477fc7bfef7eab4122082bc54,
-SHA256 `35ad0db42fc7ed5dbaf6dacddff613fdc04d83ae6e0f38548532f6ab2c7812a2`.
-Breakout uses `/x/Temp/kindle-breakout-corrective-20261028/runtime` with its
-exact qualified runner. Qbert uses
-`/x/Temp/kindle-qbert-color-masks-20261101/runtime` and its qualified faster,
-decision-equivalent teacher. Python is `/x/Code/kindle/python/.venv/bin/python`
-(CPython3.13). Declarations pin exact sources, binaries, runners, teachers,
-configuration and environment. Do not mix optional runtime overlays.
-
-The latest completed guard records boot `a8648671-8577-4f42-9b46-a4345d3ac297` and kernel
-`7.0.0-38-generic`, with no host recovery performed. Check live state before
-GPU work; preserve guard stops on actual faults or nonfinite values. An observer
-timeout does not prove the learner stopped. Do not reset/reload/reboot the GPU.
-
-Boxing and aided Freeway pass on two compact learners; Pong passes on both
-retained learners with greedy evaluation. Qbert's fixed240k/R20 recipe passes
-its15k/90% gate on the development learner and
-[one fresh greedy confirmation](results/2026-11-02-cdp-qbert-r20-seed18013.md),
-in about26 minutes each. Its sampled means still miss15k. Breakout retains
-[70.750 sampled/143.667 greedy](results/2026-11-02-cdp-breakout-replay-value1.md)
-from sampled collection, and a distinct
-[78.542 sampled/90.042 greedy](results/2026-11-02-cdp-breakout-greedy-training.md)
-point from greedy collection. The [fresh-seed/common-cohort check](results/2026-11-06-cdp-breakout-seed22003.md)
-scores94.625/75.250 greedy and70.500/44.708 sampled on1009/22003; the historical
-greedy point varies materially with cohort. All remain zero of24 two-wall successes.
-The [lower-dynamics/value1 comparison](results/2026-11-02-cdp-breakout-value1-dynamics1e4.md)
-regresses both modes and is closed. No completed stage should repeat.
-
-The full 3,188-line handover and 376-line working guide before the November2 condensation
-remain in Git at `52c2174e2bc6e3cd9ff6ae5ae9b598308e9a8f51`; the roadmap and
-linked results preserve experiment details. PR31's earlier expanded dashboard
-is retained at `/x/Temp/kindle-pr31-dashboard-20261102/pr-before-condensation.json`.
-The November3 dashboard before condensation is separately saved at
-`/x/Temp/kindle-pr31-dashboard-20261103/pr-before-condensation.json`.
-No artifact, checkpoint or experiment source is removed by this documentation
-change. The retained original transfer/build instructions below are historical;
-current active declarations take precedence.
+The protocol selects 8,189 native transition updates, trainB32/inferB8,
+RGB64/Auto, with a separately qualified first update inside that budget. No new
+collector, extension, seed sweep or automatic successor. All original physics,
+event/calibration, brick-memory and full-game gates stand; untouched families,
+late/tunnel/second-wall/above-top coverage and fresh confirmation remain open.
+No intermediate or privileged score completes either goal.
 
 ## Preserved source and fresh-machine setup
 

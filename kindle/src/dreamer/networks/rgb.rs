@@ -5,18 +5,18 @@ use super::*;
 
 const DECODER_BLOCKS: usize = 8;
 
-struct Convolution {
+pub(crate) struct Convolution {
     layer: nn::Conv2d,
     bias: NodeId,
     output_side: u32,
 }
 
 impl Convolution {
-    fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
+    pub(crate) fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
         Self::with_stride(graph, name, input, output, side, 1)
     }
 
-    fn with_stride(
+    pub(crate) fn with_stride(
         graph: &mut Graph,
         name: &str,
         input: usize,
@@ -41,7 +41,7 @@ impl Convolution {
         }
     }
 
-    fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
+    pub(crate) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
         let value = self.layer.forward(graph, input, batch as u32);
         graph.add_per_channel(
             value,
@@ -79,7 +79,7 @@ fn normalize_image(
     graph.reshape(value, &[batch * channels * side * side])
 }
 
-struct ConvNorm {
+pub(crate) struct ConvNorm {
     convolution: Convolution,
     norm: nn::RmsNorm,
 }
@@ -100,11 +100,11 @@ fn action_history(
 }
 
 impl ConvNorm {
-    fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
+    pub(crate) fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
         Self::with_stride(graph, name, input, output, side, 1)
     }
 
-    fn with_stride(
+    pub(crate) fn with_stride(
         graph: &mut Graph,
         name: &str,
         input: usize,
@@ -123,7 +123,7 @@ impl ConvNorm {
         }
     }
 
-    fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize, pool: bool) -> NodeId {
+    pub(crate) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize, pool: bool) -> NodeId {
         let layer = &self.convolution.layer;
         let mut value = self.convolution.forward(graph, input, batch);
         let mut side = self.convolution.output_side;

@@ -30,12 +30,12 @@ def pixels(values):
     return np.asarray(values, dtype='<f4').tobytes()
 
 
-def require_device(learner):
+def require_device(learner, *, parameter_prefix="world."):
     from atari_vector import require_gpu_budget, require_gpu_device
     require_gpu_device(learner.gpu_device, 'AMD Radeon RX 7900 XT (RADV NAVI31)')
     require_gpu_budget(learner.gpu_memory_budget, 2 << 30)
     if hasattr(learner, 'parameter_names'):
-        assert all(name.startswith('world.') for name in learner.parameter_names)
+        assert all(name.startswith(parameter_prefix) for name in learner.parameter_names)
 
 
 def fixture(config, output, prediction_length=0, pixel_loss="squared_error"):

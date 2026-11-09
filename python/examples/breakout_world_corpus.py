@@ -157,7 +157,7 @@ def plan_counts(streams, config, locations, prediction_length):
     return counts
 
 
-def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
+def evaluate_group(learner, streams, locations, output, name, draws=DRAWS, *, include_features=True):
     if not locations:
         result = dict(count=0, unsupported=True)
         write(output/f'{name}.json', result)
@@ -185,14 +185,14 @@ def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
         lives.append(data['lives'][:, :count])
         for draw, seed in enumerate(draws):
             prediction = learner.predict(pixels(observed), data['action'][:HISTORY].ravel().tolist(),
-                data['action'][HISTORY:].ravel().tolist(), seed=seed, include_features=draw == 0)
+                data['action'][HISTORY:].ravel().tolist(), seed=seed, include_features=draw == 0 and include_features)
             rgb = np.frombuffer(prediction['prior_rgb'], '<f4').reshape(max(HORIZONS), batch_size, 3, 64, 64)
             rgb_parts[draw].append(rgb[selected, :count])
             posterior_parts[draw].append(np.frombuffer(prediction['posterior_rgb'], '<f4').reshape(batch_size, 3, 64, 64)[:count])
             reward_parts[draw].append(np.asarray(prediction['reward'], np.float32)[:, :count])
             positive_parts[draw].append(np.asarray(prediction['reward_positive_probability'], np.float32)[:, :count])
             continuation_parts[draw].append(np.asarray(prediction['continuation'], np.float32)[:, :count])
-            if draw == 0:
+            if draw == 0 and include_features:
                 encoded.append(np.frombuffer(prediction['encoder_features'], '<f4').reshape(batch_size, -1)[:count])
                 posterior_features.append(np.frombuffer(prediction['posterior_features'], '<f4').reshape(batch_size, -1)[:count])
                 prior_features.append(np.frombuffer(prediction['prior_features'], '<f4').reshape(max(HORIZONS), batch_size, -1)[selected, :count])
@@ -205,17 +205,20 @@ def evaluate_group(learner, streams, locations, output, name, draws=DRAWS):
         posterior=np.stack([np.concatenate(v) for v in posterior_parts]),
         reward=np.stack([np.concatenate(v, axis=1) for v in reward_parts]),
         reward_positive_probability=np.stack([np.concatenate(v, axis=1) for v in positive_parts]),
-        continuation=np.stack([np.concatenate(v, axis=1) for v in continuation_parts]),
-        encoder_features=np.concatenate(encoded), posterior_features=np.concatenate(posterior_features),
-        prior_features=np.concatenate(prior_features, axis=1))
+        continuation=np.stack([np.concatenate(v, axis=1) for v in continuation_parts]))
+    if include_features:
+        arrays.update(encoder_features=np.concatenate(encoded), posterior_features=np.concatenate(posterior_features),
+                      prior_features=np.concatenate(prior_features, axis=1))
     for key in ('prediction', 'posterior', 'reward', 'reward_positive_probability', 'continuation',
                 'encoder_features', 'posterior_features', 'prior_features'):
-        assert np.isfinite(arrays[key]).all(), key
+        if key in arrays: assert np.isfinite(arrays[key]).all(), key
     np.savez_compressed(output/f'{name}.npz', **arrays)
     context = arrays['context'].astype(np.float32)/255-.5
     result = dict(count=len(locations), source_streams=sorted({int(lane) for lane, _ in locations}),
         scope='retrospective recorded-control forecasts; four draws are not independent episodes',
         posterior=[image_metrics(context, image, context) for image in arrays['posterior']], horizons={})
+    if 'observed_reconstruction' in prediction:
+        result['observed_reconstruction'] = prediction['observed_reconstruction']
     gamma = float(np.float32(1)-np.float32(1)/np.float32(learner.config['horizon']))
     for index, horizon in enumerate(HORIZONS):
         valid = arrays['valid'][horizon-1]

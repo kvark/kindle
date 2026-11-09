@@ -13,6 +13,7 @@ mod checkpoint;
 mod config;
 mod cpu;
 mod device_copy;
+mod denoising;
 mod distributions;
 mod exploration;
 mod gaussian;
@@ -28,6 +29,7 @@ mod uniform_gpu;
 mod world;
 mod world_learner;
 
+pub use denoising::{DenoisingConfig, DenoisingWorldLearner};
 pub use world_learner::{PixelLoss, WorldModelLearner, WorldPrediction};
 
 pub use agent::{

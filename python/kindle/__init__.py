@@ -23,6 +23,7 @@ __all__ = [
     "LEVJEPA_CHECKPOINT_REVISION",
     "default_config",
     "WorldModelLearner",
+    "DenoisingWorldLearner",
 ]
 
 

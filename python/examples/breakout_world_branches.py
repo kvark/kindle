@@ -484,8 +484,10 @@ def evaluate(args):
     manifest = json.loads((args.dataset/'result.json').read_text())
     assert manifest['status'] == 'complete'
     for path, expected in manifest['files'].items(): assert digest((args.dataset/path).read_bytes()) == expected
-    learner = kindle.WorldModelLearner.restore(str(args.checkpoint))
-    require_device(learner)
+    model_kind = getattr(args, "model_kind", "rssm")
+    factory = kindle.DenoisingWorldLearner if model_kind == "denoising" else kindle.WorldModelLearner
+    learner = factory.restore(str(args.checkpoint))
+    require_device(learner, parameter_prefix="pixel." if model_kind == "denoising" else "world.")
     before = learner.updates
     learner.save(str(args.output/'before'))
     gamma = float(np.float32(1)-np.float32(1)/np.float32(learner.config['horizon']))
@@ -519,7 +521,9 @@ def evaluate(args):
     write(args.output/'result.json', dict(status='complete', updates_before=before, updates_after=learner.updates,
         frozen_tensors=len(a), groups=len(summaries), draws=draws, histories=args.histories,
         wall_seconds=time.monotonic()-started,
-        no_learning=True, model_proven=False, split='fresh development challenge; not untouched test'))
+        no_learning=True, model_proven=False, model_kind=model_kind,
+        observed_reconstruction='single-denoise-sigma0.5-not-rssm-posterior' if model_kind == 'denoising' else 'rssm-posterior',
+        split='fresh development challenge; not untouched test'))
 
 
 def main():
@@ -531,6 +535,7 @@ def main():
     parser.add_argument('--checkpoint', type=Path)
     parser.add_argument('--dataset', type=Path)
     parser.add_argument('--draws', type=int, default=8)
+    parser.add_argument('--model-kind', choices=['rssm', 'denoising'], default='rssm')
     parser.add_argument('--histories', type=int, nargs='+', default=[16, 32])
     args = parser.parse_args()
     if args.repeats < 2 or args.source_ticks < HISTORY: parser.error('invalid bounded collection budgets')

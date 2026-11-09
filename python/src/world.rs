@@ -6,7 +6,7 @@ pub(crate) struct PyWorldModelLearner {
     inner: WorldModelLearner,
 }
 
-fn floats(bytes: &[u8]) -> PyResult<Vec<f32>> {
+pub(super) fn floats(bytes: &[u8]) -> PyResult<Vec<f32>> {
     let (words, remainder) = bytes.as_chunks::<4>();
     if !remainder.is_empty() {
         return Err(PyValueError::new_err("expected little-endian F32 bytes"));
@@ -14,7 +14,7 @@ fn floats(bytes: &[u8]) -> PyResult<Vec<f32>> {
     Ok(words.iter().map(|&word| f32::from_le_bytes(word)).collect())
 }
 
-fn float_bytes<'py>(py: Python<'py>, values: &[f32]) -> PyResult<Bound<'py, PyBytes>> {
+pub(super) fn float_bytes<'py>(py: Python<'py>, values: &[f32]) -> PyResult<Bound<'py, PyBytes>> {
     PyBytes::new_with(py, values.len() * 4, |output| {
         for (word, value) in output.as_chunks_mut::<4>().0.iter_mut().zip(values) {
             word.copy_from_slice(&value.to_le_bytes());
