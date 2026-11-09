@@ -21,7 +21,7 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select the [fresh action-feature learner](docs/experiments/2026-11-09-breakout-world-action-features-learning.md): 16,384 updates,
+unproven. The [fresh action-feature learner](docs/experiments/2026-11-09-breakout-world-action-features-learning.md) is running: 16,384 updates,
 1M/RGB64/B8/T32/H16/full BPTT/Auto/41001, RGB100, rates4e-4 and the exact retained
 two-cycle plan. Only the intended recipe change is the fixed LEFT/RIGHT/FIRE
 command table. No new experience, warm start, extension, actor or critic.
@@ -45,8 +45,10 @@ Qualification is not learned dynamics. Require the fixed dense gates and all
 physics, event, brick-memory, late/tunnel/second-wall/above-top, untouched-family
 and fresh-confirmation evidence. Earlier learners remain closed; no physical
 branch assessment or automatic successor is selected. Actor/critic, CDP and
-five-game work stay parked. Training/restore, observer and pinned CPU finisher
-will have separate live process receipts; inspect them before acting.
+five-game work stay parked. Training/restore service invocation
+`2a0f0114f88a4163b9f5fc9d8e46fc4c` is active with its observer and pinned CPU
+finisher. Exact receipts are in the learning root; inspect live handles before
+acting. Do not restart because an observation times out.
 
 ## Direction and retained results
 
