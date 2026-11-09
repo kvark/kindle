@@ -71,3 +71,12 @@ A fitting pass cannot prove the full goal. Original physics/events/natural
 calibration,brick memory,late/tunnel/second-wall/above-top,untouched families and
 fresh confirmation remain required. The full oracle lacks above-top endpoints.
 Actor/critic,CDP comparison andfive-game work remain parked.
+
+Completed: the [result](../results/2026-11-09-breakout-denoising-sigma-data0p05.md)
+shows much stronger one-step motion but fails every declared strict fitting
+criterion. Correct one-step140/149/140/140 of198;ordinary35/38/34/33 of110.
+All jobs are terminal;no extension orsuccessor selected. Optional console-summary
+failure andseparate CPU-only repair remain retained. A substring replacement
+misnames one closure metadata field;`closure-metadata-correction.json` preserves
+andcorrects it separately. Legacy initial20 output arrays remain exact,as the
+original `legacy-review.json` proves. No evaluation orlearner isrepeated.
