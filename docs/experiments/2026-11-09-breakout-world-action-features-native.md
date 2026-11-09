@@ -63,3 +63,12 @@ Passing this qualification establishes composition andinput semantics,not learne
 dynamics. Onlyafter review may a separate bounded learning comparison be selected,
 withunchanged fullworld gates. Fullphysics,events,brickmemory,lategame,untouched
 families andfresh confirmation remain unproven. All earlier jobs stayclosed.
+
+## Pre-GPU source correction
+
+The initial strict core Clippy run rejects a nested conditional in table
+validation. Preserve that failure and the first packaged wheel/runtime, which
+has not been used for GPU qualification. Collapse the conditional without
+changing its predicate. The focused feature/config tests and strict core Clippy
+pass on the corrected source. Package the corrected source separately under
+wheels-v2/runtime-v2 with new receipts; retain the initial package unchanged.

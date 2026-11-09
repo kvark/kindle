@@ -1115,15 +1115,14 @@ impl DreamerConfig {
         if self.action_count <= 1 {
             return Err("action_count must be greater than one".into());
         }
-        if let Some(table) = &self.world_action_features {
-            if table.len() != self.action_count
+        if let Some(table) = &self.world_action_features
+            && (table.len() != self.action_count
                 || table.iter().any(|row| {
                     row.len() != self.action_count
                         || row.iter().any(|x| !x.is_finite() || x.abs() > 1.0)
-                })
-            {
-                return Err("world action features require an action_count square finite table in [-1, 1]".into());
-            }
+                }))
+        {
+            return Err("world action features require an action_count square finite table in [-1, 1]".into());
         }
         if size.deter == 0 || !size.deter.is_multiple_of(size.blocks) {
             return Err("deter must be non-zero and divisible by blocks".into());
