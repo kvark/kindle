@@ -9,58 +9,44 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-Actor/critic,CDP comparison and the five-game campaign remain parked. Native
-pixel supervision and global H0 remain the inspectable reference;no pretrained
-encoder or object/RAM training labels. The [posterior-conditioned generated-history
-objective](experiments/2026-11-09-breakout-world-posterior-history.md) is
-implemented for a bounded fresh2,048-update check,not an extension. v21/local
-action,size1M/RGB64/B8/T32,suffix16,Auto,rates4e-4,RGB1,KL1/.1/free-nat1,
-observed events1,mixing.01. Add suffix reconstruction with actual posterior
-states andself-generated past images;no independent prior future/image loss.
-Same80/603,915 parameters andinference,no new primitive/actor/critic.
-Three repaired new CPU checks,13 affected header checks,strict core Clippy and
-326 installed-package CPU checks pass. Original compile/allowlist/fixture
-failures andintermediate wheels remain as recorded;the first unqualified wheel
-was overwritten before retention,with source/log preserved. New2,048-row prefix
-counted once across496 streams;56,189 unique arrivals. First actual update must
-pass finite/total/initial240+18/changed-family checks before another update.
-Root `/mnt/data/kindle-breakout-world-posterior-history-20261109`;no GPU allocation
-yet. No extension,sweep or automatic successor.
+Actor/critic,CDP comparison and the five-game campaign remain parked. Native pixel
+supervision/global H0 stay the inspectable reference. No GPU allocation or next
+learner is active or selected;no pretrained encoder or object/RAM training labels.
 
-The [one-time refresh diagnostic](results/2026-11-09-breakout-world-refresh.md) is closed. Only frozen local H0/RGB1 final16,384,first16 fitting/16 development
-origins,four draws. One history/latent/both correction before action4 uses true
-arrivals only through3;each branch then feeds forward without further correction.
-Unlike old readout-only swaps,this tests persistence. History correction raises
-fitting4:22/52→52/52 and8:4/44→14/44;development4:28/56→56/56 and8:8/48→24/48.
-Latent-only doesnot repair those counts;both adds little. Development16/32 stays
-zero inall modes. History-only state/heads remain exact. Privileged corrections
-andrelated draws are diagnostic,not a trained repair,causal fraction or proof
-that latents are generally correct. Investigate robustness to generated image
-history andoutcome-conditioned reconstruction before another full learner.
+The [posterior-conditioned generated-history trial](results/2026-11-09-breakout-world-posterior-history.md) is closed andfails its fresh2,048-update check. v21 adds suffix reconstruction
+using real posterior states andself-generated past images,with unchanged ordinary
+losses/inference. Matched2k natural development one-step18/27 trails H0's23/27;
+both eight-step scores arezero. Dense observed/1/8:78/112,57/109,2/107.
+Primary ball energy.534384 versus H0.169502/gate.127127;only serve NOOP passes
+of ten gates. Ending16/32 Brier.021188/.276176,RIGHT16 risk.102788,278/304
+nonending alarms. This isnegative early-budget evidence,not a claim about every
+later budget or all posterior-conditioned methods. No extension is justified.
 
-All134 execution/59 CPU pins,16 query bundles/four modes,four cached8-array
-controls,64 full finite trajectories,480 before/after tensor comparisons,
-model/optimizer age16,384 and64 exact clip frames pass. Native timed section
-31.018s/full test79.55s;CPU7.018s. Source520b2fab/executablee80a2c98,production
-inference unchanged. Original metadata-key andfixture-allocation failures remain
-with separate finishes. Original kernel-baseline timeout spawned no native child
-andremains failed25 pins;independent.682s host review passes,then a separately
-declared unchanged guard completes the still-unstarted diagnostic with9 pins.
-Closure256 pins/1.385s,two terminal services,no host recovery. Disposable
-2,558,574,676-byte cache released;executable/sources/outputs retained.
-Root `/mnt/data/kindle-breakout-world-refresh-20261109`.
+All657 learner/129 CPU and1,611 assessment/236 CPU pins,2,048 finite11-component
+rows,80 changed weights,240 initial/frozen tensors/ages,18 restored arrays,
+27 natural/84 full causal exports and96 exact clip frames pass. Source/runner
+64f5489f/nativeaa12d050,1M/RGB64/B8/T32/suffix16,Auto;no new weights/primitive.
+Call/loop225.649s/290.849s;matched H0 call135.039s,with different checkpoint
+instrumentation,not isolated kernel timing. Assessment182.831s/CPU16.049s.
+Closure2,345 pins/10.530s,three guards/27 files,two terminal services. Original
+compile/allowlist/fixture failures remain with separate corrections;first
+unqualified wheel overwritten before retention,source/log preserved. Three new
+CPU/13 affected header/326 packaged checks andstrict core Clippy pass. Disposable
+3,206,658,485-byte caches released;runtime/wheels/source/executable retained.
+Root `/mnt/data/kindle-breakout-world-posterior-history-20261109`.
 
-The [prior local H0/RGB1 learner](results/2026-11-09-breakout-world-local-h0.md) remains closed andfailed:development8:15/107,primary ball energy.429470 versus
-H0.169502/gate.127127. Its original gates are unchanged. Read the
-[refresh protocol](experiments/2026-11-09-breakout-world-refresh.md) andlinked prior state/history/contact-fitting evidence before a separately justified
-new experiment. Do not repeat completed stages,old diagnostics or collectors;
-no unchanged extension,sweep or automatic successor.
+The [refresh diagnostic](results/2026-11-09-breakout-world-refresh.md) establishes temporary sensitivity to generated image history,not a trainable
+repair. The [H0/RGB1 learner](results/2026-11-09-breakout-world-local-h0.md) stays closed andfailed. Use the existing
+[pixel-generator review](results/2026-11-08-breakout-world-pixel-generators-review.md) and these results to justify a distinct image-generator/distribution experiment;
+do not repeat that review or assume another recurrence tweak fixes sampling.
+No image-generator successor is selected here. Read the
+[posterior-history protocol](experiments/2026-11-09-breakout-world-posterior-history.md) before new work. Do not repeat completed learners,collectors,assessments or
+diagnostics;no unchanged extension,sweep or automatic successor.
 
-All original physics/event gates stand. Precise full-game physics,event timing/
+All original physics/event/full-game gates stand:precise dynamics,event timing/
 calibration,persistent removed-brick memory,late/tunnel/second-wall/above-top
-coverage,untouched families andfresh confirmation remain required. Existing
-oracle hasno above-top-brick endpoint. No intermediate orprivileged score can
-complete either goal.
+coverage,untouched families andfresh confirmation. Existing oracle hasno
+above-top-brick endpoint. No intermediate/privileged score completes either goal.
 
 ## Current AMD runtime and retained position
 
