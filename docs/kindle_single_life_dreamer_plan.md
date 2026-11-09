@@ -3,16 +3,19 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select one [CPU-only frozen-state readout diagnostic](experiments/2026-11-09-breakout-world-state-readouts.md)
-before another learner: shared actual initial,small64 prior-suffix final16k and
-posterior-history RGB100 final16k;only existing dense fitting/development arrays.
-Two fixed affine/RBF families,stream-grouped fitting-only ridge selection,
-observed-to-prior transfer andhorizon-specific readouts. Targets use the unchanged
-RGB detector for analysis only;no native training label ormodel input. Conditional
-visible-ball readouts cannot replace presence/RGB/physics gates,andweak probes
-cannot prove information absent. Three synthetic CPU checks pass. Root
-`/x/Temp/kindle-world-state-readouts-20261109`;declare before analysis,120s cap,
-no automatic retry. No GPU job,learner,collector orassessment is selected.
+unproven. The [frozen-state readout diagnostic](results/2026-11-09-breakout-world-state-readouts.md)
+is closed:30 immutable inputs,42 fitting-only affine/RBF fits,144 metric rows,
+36 exact original RGB counts and27,648 per-origin rows;three synthetic tests pass.
+1.918s CPU,zero model/GPU/emulator queries,no source/checkpoint orscore changes.
+Prior-suffix current h/z RBF1/112 versus RGB103/112;posterior-history encoder55/112,
+h/z24/112 versus RGB108/112. New horizon-specific RBF8 is4/107 with9.36px RMSE,
+while fitting resubstitution is176/176. No precise transferable readout rescue.
+Weak probes do not prove information absent: h/z omits24,576 image-history values
+that the local decoder reads directly. The full world state is larger thanh/z;
+readout generalization anddecoder/history use are not an isolated failure cause.
+Root `/x/Temp/kindle-world-state-readouts-20261109`;plot reviewed,all families/
+horizons retained. No GPU job,native intervention,new learner,collector,assessment,
+extension orautomatic successor is selected.
 
 The [posterior-history RGB100 learner](results/2026-11-09-breakout-world-posterior-natural100.md)
 stays closed/failed at2/3 dense gates: observed108/112,one99/109,eight19/107,
