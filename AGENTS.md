@@ -21,32 +21,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [action-feature assessment](docs/results/2026-11-09-breakout-world-action-features-branches.md) is closed and fails broader
-gates:primary .224881281067 versus retained1M .172365704612 andrequired
-<=.127126664317;296/304 nonending alarms above5%. Its [learner](docs/results/2026-11-09-breakout-world-action-features-learning.md) passes
-3/3 dense gates with106/112 observed,101/109 one-step and53/107 eight-step.
-Both allocations are terminal;keep the option default-off andno extension.
+unproven. Select the [CPU edge-rebound/support audit](docs/experiments/2026-11-09-breakout-world-edge-rebound.md) after the closed
+action-feature failure andsurvival decomposition. Preliminary inspection finds
+that the life_loss challenge loses a life only under RIGHT;NOOP,LEFT andreversal
+rebound without a decrement. The new model oftenloses the rendered ball after
+those surviving rebounds. Do not assume the category name diagnoses respawn.
+Root `/x/Temp/kindle-world-edge-rebound-20261109`.
 
-The [CPU survival decomposition](docs/results/2026-11-09-breakout-world-action-features-survival.md) is also closed:ordinary .224881→
-oracle-assisted .185873 withunchanged images. Life-loss/respawn remains the
-largest residual category (.426554 oracle-assisted versus cached one-hot
-.025405);wall/brick interactions also regress,whilecontact improves. This
-locates functional failures,not their training cause. Oracle score substitutions
-are not learned repairs ornew gate passes. All312 inputs,6,720 cases/840 groups,
-420 ending checks and1e-12 reconstruction pass;4.760s CPU,zero new model queries,
-training or emulator work. The complete raw score failures remain unchanged.
+Use saved forecasts/oracles andactual fitting metadata/plan only. New masks are
+descending y150–160 approaches,reference-paddle8 subset,last-life approaches,
+actual nonterminal decrements andfixed post-decrement age bins. Separate source,
+observed,imagined,first-imagined andcomplete-context exposure;keep unique targets
+andnative-history fingerprints distinct from repetitions. Test NOOP/LEFT saved
+outcomes andall four plans,both histories anddraws. No model/emulator/GPU query,
+collector,learner oracceptance change. Do not repeat old generic support audits.
 
-Next inspect existing fitting support andsaved forecasts around life-loss/
-respawn before selecting another learning change. No GPU allocation,learner,
-collector orautomatic successor is active orselected. Do not repeat completed
-jobs. Preserve every original failure andseparately named repair inlinked reports.
+The [completed action-feature work](docs/results/2026-11-09-breakout-world-action-features-branches.md) retains primary .224881 versus
+one-hot .172366,296/304 nonending alarms,3/3 intermediate dense gates andall
+original failures. Oracle-survival substitutions leave substantial spatial
+errors but do not identify a causal training defect. Keep the option default-off.
 
-Retain exact native1331b702/SHA15ea18b5 andmatching runtime-v2/runner under
-`/x/Temp/kindle-world-action-features-20261109/native`. New AMD checkpoints and
-all evidence remain outside Git. Fulldistributional physics/action responses,
-natural event calibration,persistent brick memory,late/tunnel/second-wall/
-above-top,untouched families andfresh confirmation remain required. Actor/critic,
-CDP andfive-game work stay parked.
+No GPU allocation orautomatic successor is active orselected. Preserve source
+native1331b702/SHA15ea18b5 andits exact runtime-v2/runner for separately declared
+future work. Fullphysics,events,brickmemory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. Actor/critic,CDP and
+five-game work stay parked.
 
 ## Direction and retained results
 
