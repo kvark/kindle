@@ -58,3 +58,9 @@ all failures separately; no automatic successor or extension. Keep reward32
 unless this trial supports advancement. Full physics/events/natural calibration,
 changed-brick memory,late/tunnel/second-wall/above-top,untouched families andfresh
 confirmation remain required; a tiny fitting pass cannot complete the goal.
+
+Completed: [result](../results/2026-11-09-breakout-denoising-history-noise.md)
+rejects this setting. Ordinary25/24/22/24 andone-step132/129/126/129 both regress;
+1/24 individual gates passes butoverall fitting fails. Initial/first update,
+frozen/restore,135 declaration/232 closure pins,two guards/18 files pass;service
+terminal. Retain reward32 clean histories. No successor selected;full goal open.
