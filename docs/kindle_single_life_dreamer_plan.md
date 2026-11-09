@@ -3,34 +3,32 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [fresh action-feature learner](experiments/2026-11-09-breakout-world-action-features-learning.md) is running: 16,384 updates,
-1M/RGB64/B8/T32/H16/full BPTT/Auto/41001, RGB100, rates4e-4 and the exact retained
-two-cycle plan. Only the intended recipe change is the fixed LEFT/RIGHT/FIRE
-command table. No new experience, warm start, extension, actor or critic.
-Root `/x/Temp/kindle-world-action-features-learning-20261109`.
+unproven. The [fresh action-feature learner](results/2026-11-09-breakout-world-action-features-learning.md) is closed: 106/112 observed,
+101/109 one-step,53/107 eight-step,25/114 sixteen-step and11/95 thirty-two-step.
+All3/3 intermediate dense gates pass; eight-step matches retained one-hot53/107.
+Native calls1841.013s;training/evaluation loop1998.783s versus2203.088/2369.265s.
+This pair is faster without an isolated or reliable speedup claim. All16,384
+finite13-report rows,240 initial/frozen tensors,80 changed parameters,18 restore
+arrays,plan/counts,223 execution/167 audit/175 closure pins pass. Training,
+restore,observer andCPU finisher are inactive/successful. No extension.
 
-The [native feature qualification](results/2026-11-09-breakout-world-action-features-native.md) is closed and passes: 240 default-off
-initial tensors / 18 cached forecasts, two equivalent-command one-update
-instances with all 240 trained arrays / 13 reports exact, fixed-noise alias
-forecasts and restore. It retains 80 parameters / 603,915 scalars. 182 execution
-and 41 closure pins, one successful host guard / nine sealed files, 41.435s;
-3GB disposable cache released. Original Clippy failure and corrected package
-remain. Native source1331b702/SHA15ea18b5; exact runtime-v2 and runner under
-`/x/Temp/kindle-world-action-features-20261109/native`.
+After reviewing the complete result, select the separate [frozen action-feature
+assessment](experiments/2026-11-09-breakout-world-action-features-branches.md): only the new final,84 logical groups,history16 primary/
+32 secondary,eight draws,original cached oracle andunchanged acceptance.33 reused
+contexts do not establish untouched generalization orlate/above-top coverage.
+No training,new collection,old-model query,rebuild orautomatic successor.
+Root `/x/Temp/kindle-world-action-features-branches-20261109`.
 
-The [CPU/emulator semantics check](results/2026-11-09-breakout-world-action-semantics.md) retains 608 exact nonidentity
-comparisons across 832 rollouts. All 15 canonical pairs differ somewhere; no
-game-over arrivals and only 28 distinct retained histories. Its original
-pre-emulator failure remains; the separately pinned repair passes.
+Use exact native source1331b702/SHA15ea18b5 andmatching runtime-v2/runner under
+`/x/Temp/kindle-world-action-features-20261109/native`. Keep all source-specific
+failures andrepairs in the linked reports. The default-off table encodes only
+submitted-command LEFT/RIGHT/FIRE;raw replay IDs andmodel geometry stay intact.
 
-Qualification is not learned dynamics. Require the fixed dense gates and all
-physics, event, brick-memory, late/tunnel/second-wall/above-top, untouched-family
-and fresh-confirmation evidence. Earlier learners remain closed; no physical
-branch assessment or automatic successor is selected. Actor/critic, CDP and
-five-game work stay parked. Training/restore service invocation
-`2a0f0114f88a4163b9f5fc9d8e46fc4c` is active with its observer and pinned CPU
-finisher. Exact receipts are in the learning root; inspect live handles before
-acting. Do not restart because an observation times out.
+Full distributional physics/action responses,natural event calibration,persistent
+removed-brick memory,late/tunnel/second-wall/above-top coverage,untouched families
+andfresh learner confirmation remain required. Actor/critic,CDP andfive-game work
+stay parked. Inspect live process receipts before acting; an observation timeout
+never justifies restarting a completed orstill-live job.
 
 ### What would establish the world model
 
