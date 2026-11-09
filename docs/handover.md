@@ -9,28 +9,30 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [pixel-derived centroid supervision](experiments/2026-11-09-breakout-world-centroid.md) fornative
-qualification:shared linear state→xy head,observed andcausal future losses.
-Existing RGB-derived color/region targets encode game-specific supervision,
-not emulator inputs orunguided representation learning. Default off,plain
-categorical motion RGB suffix only,checkpointv22. Add5,122 weights:70 logical/
-8,857,797 scalars/210 checkpoint tensors at12M. RGB inference shapes stay.
+unproven. Select fresh [RGB1/centroid1000 broad learning](experiments/2026-11-09-breakout-world-centroid-learning.md) afterpassed
+[native qualification](results/2026-11-09-breakout-world-centroid.md).8,192 updates,original16 fitting/eight development
+streams/4-2-1-1 plan,975,941 valid suffix targets/9,570 terminals/16,008 positives.
+SameRGB64/12M/B8/T32/H16/Auto/rates4e-4/mixing.01. Position targets use fixed
+RGB color/region knowledge;this isextra game-specific supervision,no emulator
+state input orunguided-representation claim. No actor/critic/CDP ornewbackend.
 
-CPU target audit matcheswithin1px on14,114/14,125 fitting,8,511/8,518 supplement,
-7,014/7,020 development supported arrivals;allunsupported mass-valid labels stay
-explicit. CPU world tests pass139 with40 GPU tests ignored;initial fixture
-compile/prefix-name failures remain withrepaired logs/source. Strict core/binding Clippy and19 packaged Python checks pass. Pin bounded native
-masked values/derivatives/full-shape update/restore qualification next. No native
-allocation orlearner selected yet.
-Root `/mnt/data/kindle-breakout-world-centroid-20261109`.
+Qualified source449361ae/nativeee44ec16,70 weights/8,857,797 scalars/210 tensors.
+139 Rust world CPU/strict core+binding Clippy/19 packaged Python checks pass.
+Native masked F64 derivatives/zeros,204 common initial/210 own tensors,32 initial/
+trained restore arrays and15 finite reports pass;one qualification update,not a
+main warm start.190 closure pins/nine sealed files;own1.25GB buildcache released.
+Initial fixture API/prefix/style failures remain withseparate corrected checks.
+Fresh learner mustmatch210 qualified initial tensors/age0 andretain384 actual-
+initial/final dense origins,allcurves/losses,210 own frozen/18 development/32
+contact restore arrays. Two guards,2400s/600s caps. Root
+`/mnt/data/kindle-breakout-world-centroid-learning-20261109`.
 
-[Contact rehearsal](results/2026-11-09-breakout-world-contact-rehearsal.md) remains24/24 contacts/110 perdraw,butbroad
-0/3 gates;fitting13/176 anddevelopment3/107 eight-step matches. H0 remains broad
-recurrent reference. Allprior jobs stayclosed,fullres staysprotocol-failed.
-Potential fresh RGB1/centroid1000 learning requires reviewed qualification and
-separate declaration;no automatic successor. Full physics/events,natural
+Qualification root `/mnt/data/kindle-breakout-world-centroid-20261109` staysclosed;
+allprior jobs stayclosed,fullres staysprotocol-failed. H0 remains broad recurrent
+reference. Onlyafterallthree broad gates pass mayoriginal final oracle groups be
+separately declared. No automatic successor. Full physics/events,natural
 calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
-families andfresh confirmation remain required. No diagnostic/fitting score
+families andfresh confirmation remain required. No implementation/fitting score
 completes thegoal. Actor/critic,CDP comparison andfive-game work stayparked.
 [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
 

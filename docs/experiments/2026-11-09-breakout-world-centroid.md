@@ -73,3 +73,5 @@ Full precise all-horizon physics,event timing/natural calibration,changed-brick
 memory,late/tunnel/second-wall/above-top,untouched families andfresh confirmation
 remain required. A low coordinate loss orpassed implementation doesnot establish
 a good world model. Actor/critic,CDP comparison andfive-game work stayparked.
+
+Qualification completes: [native result](../results/2026-11-09-breakout-world-centroid.md),190 closure pins/nine sealed files. Build cache1,249,533,952 bytes released. Fresh [learning declaration](2026-11-09-breakout-world-centroid-learning.md) isseparate;qualifier checkpoint isnot resumed.
