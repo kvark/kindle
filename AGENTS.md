@@ -21,27 +21,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [frozen noisy-input attenuation](docs/experiments/2026-11-09-breakout-noisy-channels0p1.md): clone the qualified reward32 checkpoint,scale only1,200 first-
-conv coefficients forcurrent noisy residual channels84..86 by.1.134 other tensor
-arrays/event heads/metadata remain exact. This affects neural current-residual
-conditioning atallthree stages,not justnoise. No training/build ornew native API.
-CPU layout/mask/metadata/float64 equivalence checks pass. Assess full rollouts,
-one-step events andcandidate stages;require135 own frozen tensors and108 final/
-20 origin trace arrays exact. One service,two guards,300s capeachstage.
-Root `/mnt/data/kindle-breakout-noisy-channels0p1-20261109`.
+unproven. Select [B8 at a fixed target budget](docs/experiments/2026-11-09-breakout-denoising-batch8.md): fresh8,192 updates
+instead ofB32/2,048,with exactly65,536 exposures ofthe same224 source arrivals,
+588 positive and32,768 forced-max-noise targets. Only training batch geometry
+changes;noise interleaving/averaging/Adam age also differ. CPU exposure/config
+checks pass. Reuse native60b9b672/source8dbf9ab5,no build. Require135 initial/
+frozen tensors and20 initial/restored arrays exact;one service,two guards.
+Root `/mnt/data/kindle-breakout-denoising-batch8-20261109`.
 
-[Retained stage trace](docs/results/2026-11-09-breakout-reward32-stage-trace.md)
-shows later denoising improves ball recovery;weak creation starts at highnoise.
-The new test measures sensitivity,not a trained-recipe orcausal error proof.
-Retain [reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):
-35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates. Fullres
-remains protocol-failed;allprevious jobs stayclosed. No learner,extension,
-collector orautomatic successor. Full physics/events,natural calibration,
-changed-brick memory,late/tunnel/second-wall/above-top,untouched families and
-fresh confirmation remain required. Actor/critic,CDP comparison andfive-game
-work stayparked. No diagnostic completes the goal.
-[Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked
-retained evidence staysimmutable.
+[Frozen noisy-input attenuation](docs/results/2026-11-09-breakout-noisy-channels0p1.md) closes negatively:
+ordinary15/13/12/17 of110 andone-step90/91/90/87 of198,versus retained
+35/38/34/33 and140/149/140/140. First-stage matches115 each,butlater stages
+regress to87–91;retain original gain.218 closure pins,18 sealed guard files,
+135 own frozen tensors and108 final/20 origin trace arrays exact. Observer import
+andCPU path failures remain with separate successful repairs;no native repeat.
+
+Retain reward32;allprior trials stayclosed,fullres staysprotocol-failed. Full
+physics/events,natural calibration,changed-brick memory,late/tunnel/second-wall/
+above-top,untouched families andfresh confirmation remain required. No fitting
+score completes thegoal. No automatic successor;actor/critic,CDP comparison and
+five-game work stayparked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence
+staysimmutable.
 
 ## Direction and retained results
 

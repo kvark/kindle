@@ -56,3 +56,5 @@ Fullres protocol failure staysfailed;allold jobs stayclosed. No learner,extensio
 collector orautomatic successor. Full physics/events,natural calibration,changed-
 brick memory,late/tunnel/second-wall/above-top,untouched families andfresh
 confirmation remain required;the full world-model goal remains unproven.
+
+Completed: [negative frozen result](../results/2026-11-09-breakout-noisy-channels0p1.md). Original gain retained;218 closure pins andtwo guards pass.

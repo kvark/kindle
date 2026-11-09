@@ -9,34 +9,27 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [retained-model stage trace](results/2026-11-09-breakout-reward32-stage-trace.md) completeswithout learning: stage1 ball matches114/114/107/111 of198,
-stage2 139/149/139/138,stage3 140/149/140/140. Stage1→2 gains131 correct/losses12;
-stage2→3 gainsfour/losseszero. Later steps improve these actual-history cases;
-this doesnot support selecting one-step sampling. Median new-ball pixel change
-projection.653–.670→.730–.778,old-pixel erasure.967–.973→.999–1.000. Motion is
-nearideal where detected;foreground creation remains weaker than erasure.
-No causal loss/architecture diagnosis orordinary one-stage rollout isproved.
+unproven. Select [B8 at a fixed target budget](experiments/2026-11-09-breakout-denoising-batch8.md): fresh8,192 updates
+instead ofB32/2,048,with exactly65,536 exposures ofthe same224 source arrivals,
+588 positive and32,768 forced-max-noise targets. Only training batch geometry
+changes;noise interleaving/averaging/Adam age also differ. CPU exposure/config
+checks pass. Reuse native60b9b672/source8dbf9ab5,no build. Require135 initial/
+frozen tensors and20 initial/restored arrays exact;one service,two guards.
+Root `/mnt/data/kindle-breakout-denoising-batch8-20261109`.
 
-Unweighted RGB MSE riseswhile ball recovery improves;it isnot the native weighted/
-preconditioned loss anddoesnot establish an objective cause. Allstage paddle/
-brick/pixel/false-detection/motion regressions,2,592 rows and27 fixed lossless
-panels retained.108 traces/324 denoiser calls/four normal origin queries take
-3.631s,shared host/restore/readback included,no kernel-speed claim. All108 cached
-finalbatch arrays/864 images,20 origin model arrays and135 frozen tensors exact.
-105 declaration/147 closure pins,nine sealed guard files/one terminal successful
-service pass. Reuse native test786ab275/source8dbf9ab5,no build/newlearner.
-Root `/mnt/data/kindle-breakout-reward32-stage-trace-20261109`.
+[Frozen noisy-input attenuation](results/2026-11-09-breakout-noisy-channels0p1.md) closes negatively:
+ordinary15/13/12/17 of110 andone-step90/91/90/87 of198,versus retained
+35/38/34/33 and140/149/140/140. First-stage matches115 each,butlater stages
+regress to87–91;retain original gain.218 closure pins,18 sealed guard files,
+135 own frozen tensors and108 final/20 origin trace arrays exact. Observer import
+andCPU path failures remain with separate successful repairs;no native repeat.
 
-Retain [reward32](results/2026-11-09-breakout-denoising-reward32.md):
-35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates. Old sigma_data.5
-trace andallprevious trials stayclosed. [Fullres](results/2026-11-09-breakout-fullres16.md)
-remains protocol-failed,restore unrun;CPU recovery doesnot qualify it. All jobs
-stopped;no sampler intervention,learner,extension,collector orautomatic successor
-selected. Full physics/events,natural calibration,changed-brick memory,late/
-tunnel/second-wall/above-top,untouched families andfresh confirmation remain
-required. Actor/critic,CDP comparison andfive-game work stayparked. No diagnostic
-or fitting score completes the goal. [Cleanup](results/2026-11-09-temp-cleanup.md)
-recovered115GB;hardlinked retained evidence staysimmutable.
+Retain reward32;allprior trials stayclosed,fullres staysprotocol-failed. Full
+physics/events,natural calibration,changed-brick memory,late/tunnel/second-wall/
+above-top,untouched families andfresh confirmation remain required. No fitting
+score completes thegoal. No automatic successor;actor/critic,CDP comparison and
+five-game work stayparked. [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence
+staysimmutable.
 
 ## Preserved source and fresh-machine setup
 
