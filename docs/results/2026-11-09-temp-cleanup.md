@@ -54,3 +54,30 @@ allocation changes, original failure and completion receipts are retained at
 `/x/Artifacts/kindle-temp-cleanup-followup-20261109`. Existing cleanup and
 experiment receipts are unchanged. Hardlinked retained artifacts remain
 immutable; filesystem holes read back as the original zero bytes.
+
+## Additional artifact pass
+
+The subsequent user-requested cleanup recovers **2,353,840,128 allocated bytes
+(2.35 GB)** from newer and previously ungrouped artifacts. Across all three
+passes, measured recovery is about **134 GB**. At completion the root filesystem
+has about **296 GB (275 GiB)** available; capacity can change as other work runs.
+
+- Share storage for 77 additional byte-identical artifact paths, reclaiming
+  2,266,734,592 allocated bytes. This includes 42 replay exports, 11 validation
+  executables, eight checkpoints, eight binary files, six videos, a native
+  library and a tar archive. Full SHA256, permissions, owners and extended
+  attributes agree before replacement; all 55 canonical hashes pass a final
+  recheck.
+- Reclaim another 87,105,536 allocated zero bytes from nine checkpoint inodes.
+  Full SHA256 matches before and after; sizes, inodes, permissions, owners,
+  link counts and modification times are preserved. Skip 102 read-only
+  checkpoint inodes without changing permissions.
+- Verify all 7,863 inventoried large artifact paths and both retained native
+  runtime hashes. No unique checkpoint, replay, log, video or source is deleted.
+  The current edge-rebound audit is excluded; no process has an open temporary
+  artifact at the start, and no learner or GPU work is launched.
+
+No disposable compiler intermediates remain in the inspected caches. Scripts,
+original inventory, duplicate map, per-file zero-block receipts and final
+verification are in `/x/Artifacts/kindle-temp-cleanup-final-20261109`.
+The earlier passes and their original failure receipts remain intact.
