@@ -55,3 +55,11 @@ Even a fitting pass leaves original full physics/events/natural calibration,
 changed-brick memory, late/tunnel/second-wall/above-top, untouched families and
 fresh confirmation required. Actor/critic, CDP comparison and five-game work
 remain parked.
+
+Completed: the [result](../results/2026-11-09-breakout-denoising-generated-history.md)
+regresses to13/9/10/10 ordinary matches of110 and59/60/55/59 one-step matches of198;
+all0/24 fitting gates. Retain the actual-history-training sigma_data.05 control.
+All native stages/restore/frozen checks pass and the service is terminal.
+Original CPU plan-schema and observer audit-path failures are preserved, with
+separately declared CPU repairs. All149 closure pins pass; no model work repeats.
+No extension, collector or successor selected. The full goal remains unproven.
