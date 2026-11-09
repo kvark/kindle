@@ -3,30 +3,37 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. A separately declared [fresh direct RGB color-attention learner](experiments/2026-11-09-breakout-world-color-attention-learning.md)
-is selected:8,192 fresh updates,RGB64/12M/B8/T32/H16/Auto,seed41001,RGB100 and
-original4/2/1/1 plan. Add only detached color×motion attention,mean-one per image;
-no position head/new parameter/inference change. Original RGB gates andall
-physics/event/brick requirements stay. Root
-`/x/Temp/kindle-world-color-attention-learning-20261109`.
+unproven. [Direct RGB color-attention learning](results/2026-11-09-breakout-world-color-attention-learning.md) closes negative:
+development0/112 observed,0/109 one-step,0/107 eight-step;0/3 original gates.
+Fitting0/163,1/177,1/176;all four reused contact draws0/110. Fixed visual evidence
+shows diffuse red fragments,not a localized ball. Retain H0 broad reference;
+new optional attention stays default off. Do not allocate its conditional oracle
+assessment,extend this learner or automatically reduce its coefficient.
 
-[Native qualification](results/2026-11-09-breakout-world-color-attention.md) passes/closed:144 world CPU/29 config/strict
-core+binding Clippy/25 packaged Python checks,native F64 values/derivatives/
-detached targets/reset zeros,204 common initial/own frozen tensors,32 initial/
-trained restore arrays,11 finite reports.65/68 weights change atfirstupdate.
-123 declaration/158 closure pins,nine sealed guard files,one terminal successful
-service;19.477s,one qualifier update,no main learner update/actions/frames.
-Sourcec672292c/native SHAef45f798;matching runtime/runner retained at
-`/x/Temp/kindle-world-color-attention-20261109`. Own811,401,216-byte buildcache
-released. Original CPU fixture string-inference/F32-reciprocal failures remain
-with separate corrected checks. The qualifier checkpoint isnot resumed.
+All8,192 eleven-report rows,RGB100 totals/source/reset identities,68 changed
+weights,204 qualified initial/own frozen tensors,18 development/32 contact
+restore arrays,34 finite exports,original384 dense origins and36 initial dense
+arrays pass. Only the color-attention setting changes versus original H16.
+149 declaration/154 CPU analysis/320 closure pins,two guards/18 sealed files,
+terminal successful native queue and observer. Native758.781s,loop857.664s;
+export cadence differs from old H16,not an isolated speed comparison. Source
+28bcf374 reuses nativec672292c/SHAef45f798;matching runtime/runner preserved.
+Root `/x/Temp/kindle-world-color-attention-learning-20261109`.
 
-[Position10,000](results/2026-11-09-breakout-world-centroid10000-learning.md) remains closed/negative:77/112 observed,70/109 one-step,
-14/107 eight-step;0/3 gates despite better coordinate RMSE. No oldstage repeats.
-Allprior jobs stayclosed/fullres staysprotocol-failed. No extension,collector or
-automatic successor. Full precise physics,natural event calibration,removed-brick
-memory,late/tunnel/second-wall/above-top,untouched families andfresh confirmation
-remain required. Actor/critic,CDP comparison andfive-game work stayparked.
+[Qualification](results/2026-11-09-breakout-world-color-attention.md) remains passed/closed:144 world CPU/29 config/strict
+core+binding Clippy/25 Python checks,native F64 values/derivatives/reset zeros,
+204 initial/own frozen tensors and32 initial/trained restore arrays.123 declaration/
+158 closure pins,nine sealed files,19.477s. Its original fixture failures and
+separate corrected checks remain;own811,401,216-byte build cache is released.
+Implementation correctness did not establish useful learning. No native stage
+is repeated to repair or reinterpret the negative result.
+
+All jobs are stopped;no learner,extension,collector orautomatic successor is
+selected. Prior jobs stayclosed/fullres staysprotocol-failed. Full precise
+physics,natural event calibration,persistent removed-brick memory,late/tunnel/
+second-wall/above-top,untouched families andfresh confirmation remain required.
+Actor/critic,CDP comparison andfive-game work stayparked. Keep historical
+hardlinked evidence immutable;no new build cache was created for this learner.
 
 ### What would establish the world model
 
