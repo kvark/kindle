@@ -14,35 +14,25 @@ immutable. The follow-up leaves about281 GiB available on the root filesystem.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [half-rate16k comparison](results/2026-11-09-breakout-world-rate2em4-16k.md) is closed and negative:
-94/112 observed, 71/109 one-step, 23/107 eight-step; **0/3 fixed development
-gates**, versus original H16's 99/112, 84/109, 25/107. Fitting forecasts improve at
-some horizons (eight-step 71/176 versus 61/176, sixteen-step 43/171 versus 21/171), without a
-matching development gain. Contacts match 26/25/27/24 of 110. Changing rates and budget
-together does not isolate either effect or diagnose a causal failure. Keep H0
-as the broad reference; no branch assessment or extension is selected.
+unproven. Select only the [action-feature semantics check](experiments/2026-11-09-breakout-world-action-features.md):
+32 retained fitting/waiting parents,26 plans each,at most13,312 new actions and
+76,934 source-replay actions. Test whether18 raw Atari command names form six
+physical classes, preserving simultaneous movement+FIRE. Exact native RGB/RAM,
+events,lives and frame counts must match; canonical-control differences are
+also retained. This is CPU/emulator evidence,not a world-model pass or learning
+benefit. No GPU allocation, learner or native feature implementation is selected.
+Root `/x/Temp/kindle-world-action-features-20261109/semantics`.
 
-Fresh16,384/RGB64/12M/B8/T32/H16/full BPTT/Auto/41001/RGB100, all rates2e-4;
-original8,192-row4/2/1/1 plan repeated twice.4,194,304 replayed arrivals are not
-new experience. All16,384 finite11-report rows,204 original initial/own frozen
-tensors,36 initial arrays,18 development/32 contact restores,58 finite exports
-and8 one-hot state arrays pass.178 execution/199 CPU analysis/400 closure pins,
-two successful terminal native jobs,two guards/18 sealed files. Native calls1508.740s;
-loop1671.213s. No build or native retry/repair. Original preparation import-path
-failure remains. The pinned automatic CPU finisher completes successfully.
-Root: `/x/Temp/kindle-world-rate2em4-16k-20261109`.
+The [half-rate16k learner](results/2026-11-09-breakout-world-rate2em4-16k.md) remains closed and negative:94/112 observed,
+71/109 one-step,23/107 eight-step,0/3 fixed development gates. The
+[forward-contract study](results/2026-11-09-breakout-world-forward-contract.md) retains its strict numerical failure.
+All earlier learners/collectors remain closed; no repeats or automatic successors.
 
-The [forward-contract study](results/2026-11-09-breakout-world-forward-contract.md) retains its strict numerical failure and
-separate repairs; conditional recurrent paths are exact but unconstrained sampled
-parity and learned dynamics are unproven. Earlier RGB1/mean/color and all other
-learners stay closed; options stay off. No GPU allocation, learner, collector or
-automatic successor is active or selected. Do not repeat completed jobs.
-
-Full precise physics/action responses, natural event calibration, removed-brick
-memory, late/tunnel/second-wall/above-top coverage, untouched families and fresh
-confirmation remain required. Actor/critic, CDP comparison and five-game work
-stay parked; earlier jobs remain closed/fullres protocol-failed. Consult a
-separately justified protocol before any new experiment.
+Full precise physics/action responses,natural event calibration,removed-brick
+memory,late/tunnel/second-wall/above-top coverage,untouched families and fresh
+confirmation remain required. Actor/critic,CDP comparison and five-game work
+stay parked. Review the semantics evidence before selecting any separate native
+implementation,qualification or bounded learning protocol.
 
 ## Preserved source and fresh-machine setup
 
