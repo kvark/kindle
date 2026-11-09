@@ -50,6 +50,8 @@ pub struct DenoisingConfig {
         skip_serializing_if = "is_default_denoiser_width"
     )]
     pub denoiser_width: usize,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub full_resolution: bool,
 }
 impl Default for DenoisingConfig {
     fn default() -> Self {
@@ -71,6 +73,7 @@ impl Default for DenoisingConfig {
             deterministic_frame: false,
             target_motion_loss: false,
             denoiser_width: default_denoiser_width(),
+            full_resolution: false,
         }
     }
 }
@@ -105,7 +108,9 @@ impl DenoisingConfig {
         Ok(())
     }
     fn checkpoint_format(&self) -> &'static str {
-        if !is_default_denoiser_width(&self.denoiser_width) {
+        if self.full_resolution {
+            "kindle-denoising-world-v11"
+        } else if !is_default_denoiser_width(&self.denoiser_width) {
             "kindle-denoising-world-v10"
         } else if self.target_motion_loss {
             "kindle-denoising-world-v9"
@@ -128,7 +133,11 @@ impl DenoisingConfig {
         }
     }
     fn architecture_name(&self) -> &'static str {
-        if self.denoiser_width == 32 {
+        if self.full_resolution && self.denoiser_width == 32 {
+            "conditional-fullres32-residual0p1-history4"
+        } else if self.full_resolution {
+            "conditional-fullres16-residual0p1-history4"
+        } else if self.denoiser_width == 32 {
             "conditional-unet32-64-128-history4"
         } else {
             "conditional-unet16-32-64-history4"

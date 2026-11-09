@@ -24,6 +24,7 @@ fn denoiser(
     actions: usize,
     side: usize,
     width: usize,
+    full_resolution: bool,
 ) -> NodeId {
     let channels = 16 + 4 * actions;
     let double = 2 * width;
@@ -31,6 +32,16 @@ fn denoiser(
     let input = g.reshape(input, &[batch * channels * side * side]);
     let e0 = ConvNorm::new(g, "pixel.denoiser.enc0", channels, width, side)
         .forward(g, input, batch, false);
+    if full_resolution {
+        let mut x = e0;
+        for name in ["enc1", "enc2", "enc3", "mid", "up2", "up1", "up0"] {
+            let delta = ConvNorm::new(g, &format!("pixel.denoiser.{name}"), width, width, side)
+                .forward(g, x, batch, false);
+            let delta = g.scale(delta, 0.1);
+            x = g.add(x, delta);
+        }
+        return Convolution::new(g, "pixel.denoiser.out", width, 3, side).forward(g, x, batch);
+    }
     let e1 = ConvNorm::with_stride(g, "pixel.denoiser.enc1", width, double, side, 2)
         .forward(g, e0, batch, false);
     let e2 = ConvNorm::with_stride(g, "pixel.denoiser.enc2", double, deep, side / 2, 2)
@@ -102,7 +113,15 @@ pub(super) fn training(c: &DenoisingConfig) -> Graph {
     );
     let target = g.input("denoiser_target", &[b * w]);
     let weight = g.input("row_weight", &[b, 1]);
-    let output = denoiser(&mut g, input, b, c.action_count, c.side, c.denoiser_width);
+    let output = denoiser(
+        &mut g,
+        input,
+        b,
+        c.action_count,
+        c.side,
+        c.denoiser_width,
+        c.full_resolution,
+    );
     let image_loss = if c.context_motion_scale == 0. {
         masked_mse(&mut g, output, target, weight, b, w)
     } else {
@@ -142,7 +161,15 @@ pub(super) fn sampling(c: &DenoisingConfig) -> Graph {
         "denoiser_input",
         &[b, (16 + 4 * c.action_count) * c.side * c.side],
     );
-    let output = denoiser(&mut g, input, b, c.action_count, c.side, c.denoiser_width);
+    let output = denoiser(
+        &mut g,
+        input,
+        b,
+        c.action_count,
+        c.side,
+        c.denoiser_width,
+        c.full_resolution,
+    );
     g.set_outputs(vec![output]);
     g
 }

@@ -168,3 +168,19 @@ def test_wide_denoiser_requires_matching_header_without_gpu(tmp_path,field,value
     (tmp_path/'metadata.json').write_text(json.dumps(header))
     with pytest.raises(RuntimeError,match='checkpoint header'):
         kindle.DenoisingWorldLearner.restore(str(tmp_path))
+
+@pytest.mark.parametrize('field,value',[('format','kindle-denoising-world-v7'),
+    ('architecture','conditional-unet16-32-64-history4'),('full_resolution',False)])
+def test_full_resolution_requires_matching_header_without_gpu(tmp_path,field,value):
+    header=dict(format='kindle-denoising-world-v11',
+        config=CONFIG | {'context_motion_scale':100.,'residual_frame':True,
+                       'half_max_noise':True,'sigma_data':.05,'reward_limit':32.,
+                       'full_resolution':True},updates=0,
+        architecture='conditional-fullres16-residual0p1-history4',
+        sampler='edm-euler3-sigma5-last-frame-residual-quantized',
+        observed_reconstruction='single-denoise-sigma0.5-not-rssm-posterior')
+    if field=='full_resolution':header['config'][field]=value
+    else:header[field]=value
+    (tmp_path/'metadata.json').write_text(json.dumps(header))
+    with pytest.raises(RuntimeError,match='checkpoint header'):
+        kindle.DenoisingWorldLearner.restore(str(tmp_path))

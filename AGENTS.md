@@ -21,36 +21,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Reject [width32 pixel predictor](docs/results/2026-11-09-breakout-denoiser-width32.md):13/12/10/14 of110 ordinary versus35/38/34/33;one-step106/104/100/105
-of198 versus140/149/140/140.0/24 gates. Loop203.215s versus169.299s (+20.03%).
-Own initial2/110 and0/198 improve withlearning buttrail the retained model.
-This matched-target comparison does not rule out other wider-model optimization.
-Retain width16 clean-history reward32;keep width32 experimental/off bydefault.
+unproven. Select [full-resolution residual predictor](docs/experiments/2026-11-09-breakout-fullres16.md): nine5×5 pixel convolutions stay64×64,16 hidden channels,
+seven residual adds at.1.81,459 pixel parameters,total1,262,595;event heads
+unchanged. No internal pixel feature resampling;normal native RGB resize remains.
+Optional defaultfalse preserves U-Net/v1–v10;true requiresv11/matching architecture.
+33 Rust CPU/67 packaged/four runner/strict Clippy required before defaultfixture
+andfresh2,048-update/65,536-target learner. Require57 event+15 shared-edge initial
+tensors exact,57 first/final event tensors,own frozen/restore andoriginal gates.
+Root `/mnt/data/kindle-breakout-fullres16-20261109`.
 
-Pixel widths32/64/128:2,352,611 pixel parameters,total3,533,747;event heads unchanged.
-Default16 preservesv1–v9;32 requiresv10/matching architecture.31 Rust CPU/64
-packaged/four runner/strict Clippy pass. Default16 fixture135 initial/frozen/
-first-update tensors,20 arrays/six losses exact before main. Main57 initial/first/
-final event tensors/two first event losses exact;135 own frozen tensors/20
-restored arrays exact.143 declaration/276 closure pins,three guards/27 files,
-two terminal services pass. Source273818cd/nativee354ce919b4d;own792,783,105-byte
-apparent build cache released. Inherited graph_unchanged flag preserved with
-prelaunch clarification ofchanged pixel shapes;original CPU report None-at-zero-
-support failure andseparate report_v2 repair retained,no native/audit repeat.
-Root `/mnt/data/kindle-breakout-denoiser-width32-20261109`.
-
-New exact predictive-input audit usesfour past RGB frames/four actions,target
-excluded:224 unique prefixes,no duplicates/conflicts. This does not prove full
-observability,learned feature separation orabsence ofnear-aliasing. Retain
-[reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):35/38/34/33
-of110 ordinary,140/149/140/140 of198 one-step,0/24 gates;stable reward scalars,
-one privileged positive missed,no terminals/natural calibration. All previous
-negative trials stayclosed. All jobs stopped;no extension,collector,old-model
-repeat orautomatic successor. Full physics/events,natural calibration,changed-
-brick memory,late/tunnel/second-wall/above-top,untouched families andfresh
-confirmation remain required. Actor/critic,CDP comparison andfive-game work stay
-parked. No fitting result completes the goal. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
-recovered115GB;hardlinked retained evidence staysimmutable.
+Retain [clean-history reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
+[Wider U-Net](docs/results/2026-11-09-breakout-denoiser-width32.md) regresses both
+prediction tasks at+20.03% loop time;earlier failed recipes stayclosed. Exact
+four-frame/action keys are224 unique,whichdoes not establish observability or
+learned feature separation. This new test changes spatial architecture/parameter
+budget/skip topology together;no isolated cause claim. No actor/critic/CDP,
+collection,extension orautomatic successor. Full physics/events,natural
+calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
+families andfresh confirmation remain required. No fitting score completes the
+full goal. [Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;
+hardlinked retained evidence staysimmutable.
 
 ## Direction and retained results
 

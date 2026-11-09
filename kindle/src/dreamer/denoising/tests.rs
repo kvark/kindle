@@ -1293,3 +1293,94 @@ fn denoiser_width_requires_v10_and_matching_architecture_before_gpu() {
     h["format"] = "kindle-denoising-world-v10".into();
     assert!(read_header(&serde_json::to_vec(&h).unwrap()).is_err());
 }
+
+#[test]
+fn full_resolution_keeps_pixel_convolutions_at_native_side_and_event_graph_exact() {
+    let control = DenoisingConfig {
+        context_motion_scale: 100.,
+        ..DenoisingConfig::default()
+    };
+    for width in [16, 32] {
+        let full = DenoisingConfig {
+            denoiser_width: width,
+            full_resolution: true,
+            ..control.clone()
+        };
+        let graph = network::sampling(&full);
+        let conv = graph
+            .nodes()
+            .iter()
+            .filter(|n| matches!(n.op, Op::Conv2d { .. }))
+            .collect::<Vec<_>>();
+        assert_eq!(conv.len(), 9);
+        for (i, n) in conv.iter().enumerate() {
+            assert_eq!(
+                n.ty.num_elements(),
+                full.batch_size * full.side * full.side * if i == 8 { 3 } else { width }
+            );
+        }
+        let mut shared = params(&graph);
+        shared.extend(params(&network::event_sampling(&full)));
+        assert_eq!(shared, params(&network::training(&full)));
+        assert_eq!(shared.len(), 45);
+        assert_eq!(
+            format!("{:?}", network::event_sampling(&control).nodes()),
+            format!("{:?}", network::event_sampling(&full).nodes())
+        );
+        let pixel = shared
+            .iter()
+            .filter(|(k, _)| k.starts_with("pixel.denoiser."))
+            .map(|(_, s)| s.iter().product::<usize>())
+            .sum::<usize>();
+        if width == 16 {
+            assert_eq!(pixel, 81459);
+            println!(
+                "fullres16_pixel_scalars={pixel} total_scalars={}",
+                pixel + 1181136
+            );
+        }
+    }
+}
+
+#[test]
+fn full_resolution_requires_v11_architecture_and_preserves_default_headers() {
+    let control = DenoisingConfig {
+        context_motion_scale: 100.,
+        residual_frame: true,
+        half_max_noise: true,
+        sigma_data: 0.05,
+        reward_limit: Some(32.),
+        ..DenoisingConfig::default()
+    };
+    assert!(
+        !serde_json::to_value(&control)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("full_resolution")
+    );
+    let header = |c: &DenoisingConfig| serde_json::json!({"format":c.checkpoint_format(),"config":c,"updates":0,"architecture":c.architecture_name(),"sampler":c.sampler_name(),"observed_reconstruction":c.observed_task()});
+    for width in [16, 32] {
+        let full = DenoisingConfig {
+            denoiser_width: width,
+            full_resolution: true,
+            ..control.clone()
+        };
+        assert!(full.validate().is_ok());
+        assert_eq!(full.checkpoint_format(), "kindle-denoising-world-v11");
+        assert_eq!(
+            read_header(&serde_json::to_vec(&header(&full)).unwrap())
+                .unwrap()
+                .0,
+            full
+        );
+        for field in ["format", "architecture"] {
+            let mut bad = header(&full);
+            bad[field] = header(&control)[field].clone();
+            assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
+        }
+    }
+    let mut bad = header(&control);
+    bad["format"] = "kindle-denoising-world-v11".into();
+    assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
+}
