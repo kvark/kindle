@@ -9,36 +9,38 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Reject the completed [history-noise trial](results/2026-11-09-breakout-denoising-history-noise.md): ordinary25/24/22/24 of110 versus35/38/34/33;
-actual-history one-step132/129/126/129 of198 versus140/149/140/140. Only1/24
-individual gates passes; the overall fitting gate fails. Shared spatial std.02
-on half the prefixes after a clean first update does not fix rollout drift.
-This does not refute all generated-history training methods. Targets/model/
-config/native remain matched; residual anchors,importance andevent inputs change
-together. Retain the clean-history reward32 model.
+unproven. Reject [direct-frame prediction](results/2026-11-09-breakout-direct-frame.md):6/110 ordinary and63/198 one-step matches,identical across seeds,
+versus35/38/34/33 and140/149/140/140 for the stochastic control.0/24 gates.
+The simpler objective/sampler changes together;this does not isolate random
+noise alone. One-step output misses132/198 balls;63 of66 detected balls match
+within1px. Conditional motion precision is much better than detection coverage;
+this supports investigating small-object rendering,not a proven causal diagnosis.
+Keep deterministic_frame off;retain clean-history reward32.
 
-All135 initial/first-update tensors,six first losses,20 initial arrays,135 frozen
-tensors and20 restored arrays match.2,048 updates/65,536 targets take164.772s
-learn-call/172.042s loop; no isolated kernel-speed claim. All135 declaration/
-232 closure pins,two sealed guards/18 files andone terminal service pass.
-Mutable declaration guide/protocol bytes archived before final status updates;
-original pins/mapping remain retained. No build ordisposable cache. Root
-`/mnt/data/kindle-breakout-denoising-history-noise-20261109`.
+Optional defaultfalse preserves original denoising/v1–v7;true usesv8 andcausal
+observed-output task metadata.27 Rust CPU/54 packaged/four runner/strict Clippy
+pass. Initial packaging stopped because pip is absent;original failure remains,
+separate wheel extraction passes. Default fixture135 initial/frozen/first-update
+tensors,20 arrays andsix losses exact before learner. Main135 initial tensors,
+57 first/final event tensors/two first event losses,135 own frozen tensors/20
+restored arrays exact;new direct RGB outputs intentionally differ.142 declaration/
+270 closure pins,three sealed guards/27 files,two terminal services pass.
+2,048 updates/65,536 targets take162.021s learn-call (loop in report),no isolated
+speed claim. Own792,670,537-byte apparent build cache released. Sourcef756f278/
+native105e12079324 are separate fromthe retained control60b9b67244d7. Root
+`/mnt/data/kindle-breakout-direct-frame-20261109`.
 
 Retain [reward32](results/2026-11-09-breakout-denoising-reward32.md):
-ordinary zero-reward RMSE.417886→.0000317932, causal reward1 about.33→.990714.
-Physics remains35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
-One privileged positive still missed; no natural calibration orfresh confirmation.
-[Frozen logits](results/2026-11-09-breakout-denoising-event-logits.md)
-confirm tiny support-tail mass dominates old scalar error; arithmetic is correct.
-Native source8dbf9ab5/SHA60b9b67244d7,25 CPU/50 packaged/four runner checks andstrict
-Clippy qualified. Full physics/events,natural calibration,changed-brick memory,
-late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
-required. No fitting result completes the goal. All jobs stopped; no extension,
-collector,old-model repeat orsuccessor selected. Actor/critic,CDP comparison and
-five-game work stay parked. All prior failures/repairs remain closed.
-[Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB; hardlinked
-evidence stays immutable.
+ordinary zero-reward RMSE.417886→.0000317932,causal reward1 about.33→.990714;
+physics35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
+[History noise](results/2026-11-09-breakout-denoising-history-noise.md)
+regresses both tasks andstays rejected. All prior trials/failures/repairs remain
+closed. Full physics/events,natural calibration,changed-brick memory,late/tunnel/
+second-wall/above-top,untouched families andfresh confirmation remain required.
+All jobs stopped;no extension,collector,old-model repeat orsuccessor selected.
+Actor/critic,CDP comparison andfive-game work stay parked. No fitting result
+completes the full goal. [Cleanup](results/2026-11-09-temp-cleanup.md)
+recovered115GB;hardlinked retained evidence stays immutable.
 
 ## Preserved source and fresh-machine setup
 

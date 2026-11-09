@@ -66,3 +66,10 @@ packaging/assessment. No unchanged extension,collection orautomatic successor.
 Full-world physics/events,natural calibration,changed-brick memory,late/tunnel/
 second-wall/above-top,untouched families andfresh confirmation remain required.
 A small fitting pass cannot establish the whole world model.
+
+Completed: [result](../results/2026-11-09-breakout-direct-frame.md) rejects this
+recipe.6/110 ordinary,63/198 one-step and0/24 gates. Default/initial/event/frozen/
+restore parity,142 declaration/270 closure pins,three guards/27 files pass;
+both services terminal,own cache released. Original missing-pip install failure
+retained;separate wheel extraction/54 packaged checks pass before GPU. Keep off,
+retain clean-history reward32. No successor selected;full objective unproven.
