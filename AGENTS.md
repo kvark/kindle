@@ -21,27 +21,32 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [action-semantics check](docs/results/2026-11-09-breakout-world-action-semantics.md) completes with 608/608 exact
-nonidentity comparisons across 832 rollouts. All 15 pairs of canonical controls
-differ somewhere. The 32 fixed selections share 28 retained histories and have
-no game-over arrivals. New branches use 13,312 actions / 53,248 frames; prefix
-replay uses 76,934 actions / 307,736 frames. CPU/emulator time is 111.163s. The
-original pre-emulator verifier failure remains; the separately pinned repair and
-CPU recount pass. This study constructs no model and uses no GPU or optimizer.
+unproven. Select the [fresh action-feature learner](docs/experiments/2026-11-09-breakout-world-action-features-learning.md): 16,384 updates,
+1M/RGB64/B8/T32/H16/full BPTT/Auto/41001, RGB100, rates4e-4 and the exact retained
+two-cycle plan. Only the intended recipe change is the fixed LEFT/RIGHT/FIRE
+command table. No new experience, warm start, extension, actor or critic.
+Root `/x/Temp/kindle-world-action-features-learning-20261109`.
 
-Select the separate [native action-feature qualification](docs/experiments/2026-11-09-breakout-world-action-features-native.md): default-off
-LEFT/RIGHT/FIRE rows derived from submitted commands, unchanged 18-channel width
-and parameter geometry, shared lookup during learning and prediction, explicit
-v25 table persistence, and whole-agent/phase guards. Implementation and CPU
-checks are in progress; GPU qualification waits for packaging and declaration.
-No learner is selected. Root `/x/Temp/kindle-world-action-features-20261109`.
+The [native feature qualification](docs/results/2026-11-09-breakout-world-action-features-native.md) is closed and passes: 240 default-off
+initial tensors / 18 cached forecasts, two equivalent-command one-update
+instances with all 240 trained arrays / 13 reports exact, fixed-noise alias
+forecasts and restore. It retains 80 parameters / 603,915 scalars. 182 execution
+and 41 closure pins, one successful host guard / nine sealed files, 41.435s;
+3GB disposable cache released. Original Clippy failure and corrected package
+remain. Native source1331b702/SHA15ea18b5; exact runtime-v2 and runner under
+`/x/Temp/kindle-world-action-features-20261109/native`.
 
-The half-rate16k learner remains closed at 0/3 development gates. The strict
-forward-contract numerical failure and earlier negative/protocol-failed results
-remain. Full physics, events, brick memory, late/tunnel/second-wall/above-top
-coverage, untouched families and fresh confirmation are still required.
-Actor/critic, CDP and five-game work stay parked. Do not repeat completed jobs or
-start automatic successors.
+The [CPU/emulator semantics check](docs/results/2026-11-09-breakout-world-action-semantics.md) retains 608 exact nonidentity
+comparisons across 832 rollouts. All 15 canonical pairs differ somewhere; no
+game-over arrivals and only 28 distinct retained histories. Its original
+pre-emulator failure remains; the separately pinned repair passes.
+
+Qualification is not learned dynamics. Require the fixed dense gates and all
+physics, event, brick-memory, late/tunnel/second-wall/above-top, untouched-family
+and fresh-confirmation evidence. Earlier learners remain closed; no physical
+branch assessment or automatic successor is selected. Actor/critic, CDP and
+five-game work stay parked. Training/restore, observer and pinned CPU finisher
+will have separate live process receipts; inspect them before acting.
 
 ## Direction and retained results
 
