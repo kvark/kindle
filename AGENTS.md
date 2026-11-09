@@ -21,34 +21,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [fresh action-feature learner](docs/results/2026-11-09-breakout-world-action-features-learning.md) is closed: 106/112 observed,
-101/109 one-step,53/107 eight-step,25/114 sixteen-step and11/95 thirty-two-step.
-All3/3 intermediate dense gates pass; eight-step matches retained one-hot53/107.
-Native calls1841.013s;training/evaluation loop1998.783s versus2203.088/2369.265s.
-This pair is faster without an isolated or reliable speedup claim. All16,384
-finite13-report rows,240 initial/frozen tensors,80 changed parameters,18 restore
-arrays,plan/counts,223 execution/167 audit/175 closure pins pass. Training,
-restore,observer andCPU finisher are inactive/successful. No extension.
+unproven. The [frozen action-feature assessment](docs/results/2026-11-09-breakout-world-action-features-branches.md) is closed and fails:
+primary energy .224881281067 versus retained1M .172365704612 andrequired
+<=.127126664317. Ending Brier16/32 .022598/.340064;296/304 nonending cases have
+risk above5%. Chosen-action supported position improves at8/16/32,so those point
+metrics andthe failed joint score must stay distinct. All871 execution/235 audit/
+239 closure pins,240 frozen arrays,84 groups andone guard/nine sealed files pass;
+175.330s native,zero training/new emulator actions. Both services are terminal.
 
-After reviewing the complete result, select the separate [frozen action-feature
-assessment](docs/experiments/2026-11-09-breakout-world-action-features-branches.md): only the new final,84 logical groups,history16 primary/
-32 secondary,eight draws,original cached oracle andunchanged acceptance.33 reused
-contexts do not establish untouched generalization orlate/above-top coverage.
-No training,new collection,old-model query,rebuild orautomatic successor.
-Root `/x/Temp/kindle-world-action-features-branches-20261109`.
-The frozen assessment is active under invocation
-`af96f4e020a54a30a2bb63aeb112ba6c`, with its pinned observer/scorer.
+The [learner](docs/results/2026-11-09-breakout-world-action-features-learning.md) stays closed at3/3 intermediate dense gates:106/112
+observed,101/109 one-step,53/107 eight-step,25/114 sixteen-step,11/95 thirty-two.
+Its measured loop1998.783s versus2369.265s is not an isolated speedup claim.
+Keep the feature option default-off;no extension orrepeated learner.
 
-Use exact native source1331b702/SHA15ea18b5 andmatching runtime-v2/runner under
-`/x/Temp/kindle-world-action-features-20261109/native`. Keep all source-specific
-failures andrepairs in the linked reports. The default-off table encodes only
-submitted-command LEFT/RIGHT/FIRE;raw replay IDs andmodel geometry stay intact.
+Select only the [CPU saved-survival decomposition](docs/experiments/2026-11-09-breakout-world-action-features-survival.md),holding new
+rendered forecasts fixed whilechecking original,same-mean,oracle-mean andall-alive
+survival weights. Use sealed math/fixtures and1e-12 reconstruction tolerance.
+Oracle substitutions are evaluation diagnostics,not a deployable model,gate pass
+or causal account of training failure. No GPU/model/emulator work is selected.
+Root `/x/Temp/kindle-world-action-features-survival-20261109`.
 
-Full distributional physics/action responses,natural event calibration,persistent
-removed-brick memory,late/tunnel/second-wall/above-top coverage,untouched families
-andfresh learner confirmation remain required. Actor/critic,CDP andfive-game work
-stay parked. Inspect live process receipts before acting; an observation timeout
-never justifies restarting a completed orstill-live job.
+Retain exact native1331b702/SHA15ea18b5 andmatching runtime-v2/runner forfuture
+separately declared work. Preserve original failures andall regressions inlinked
+reports. Fullphysics/events/brickmemory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. Actor/critic,CDP and
+five-game work stay parked. No automatic successor;do not repeat completed jobs.
 
 ## Direction and retained results
 
