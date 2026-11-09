@@ -11,14 +11,17 @@ eight56/107, sixteen28/114, thirty-two5/95 versus early106/112,101/109,66/109,
 successful guards/18 sealed files pass. No broad assessment or extension.
 Native/observer/CPU services are inactive/successful. Keep late conditioning off.
 
-Select the [local forward-contract measurement](experiments/2026-11-09-breakout-world-local-forward-contract.md)
-for test-only implementation and one bounded guarded measurement. Compare the
-retained early-featurev25 and new latev26 local1M finals on sealed mixed/contact
-batches and two fixed noise pairs. The prior plain12M contract explicitly excludes
-local image decoders. Expose existing nodes only; keep production code/runtime
-unchanged and all strict tolerances. No optimizer step, learner, collector,
-physical assessment or automatic successor. Root
-`/x/Temp/kindle-world-local-forward-contract-20261109`; no GPU job active yet.
+The [local forward-contract measurement](experiments/2026-11-09-breakout-world-local-forward-contract.md)
+is active under one1,800s host guard: eight cases across the early-featurev25 and
+latev26 local1M finals, two sealed batches and two fixed noise pairs. Source
+5bbeaccf/executable SHAe6995c54/107 execution pins; both focused CPU checks and
+strict core/test Clippy pass. Existing158 production files match81a5e4e3 except
+cfg(test) registration. No optimizer step, learner, collector or production
+runtime change. Unit `kindle-world-local-forward-20261109`, invocation
+863e51ce948049e4a02162c28b98d8ef/controller2214535 and observer2214538 are live.
+Root `/x/Temp/kindle-world-local-forward-contract-20261109`; source, executable,
+settings and checks retained, packaged2.14GB compiler cache released. Strict
+contract and CPU audit remain pending. No automatic successor.
 
 The [late native qualification](results/2026-11-09-breakout-world-late-action-native.md)
 stays closed at52.356s with128 execution/69 closure pins; source81a5e4e3/
