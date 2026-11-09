@@ -3,38 +3,32 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [posterior-history RGB100 natural learner](results/2026-11-09-breakout-world-posterior-natural100.md)
-is closed andfails the dense screen (2/3 gates pass). Final development ball
-counts observed/1/4/8/16/32:108/112,99/109,45/109,19/107,5/114,0/95 versus
-prior-suffix103/112,102/109,69/109,53/107,22/114,8/95. Fitting8 falls84/176→41/176;
-observed reconstruction/paddle scores improve,but long ball forecasts regress.
-Do not adopt the recipe orallocate its broader assessment/extension. No GPU job,
-new learner,collector orautomatic successor is active orselected.
+unproven. Select one [CPU-only frozen-state readout diagnostic](experiments/2026-11-09-breakout-world-state-readouts.md)
+before another learner: shared actual initial,small64 prior-suffix final16k and
+posterior-history RGB100 final16k;only existing dense fitting/development arrays.
+Two fixed affine/RBF families,stream-grouped fitting-only ridge selection,
+observed-to-prior transfer andhorizon-specific readouts. Targets use the unchanged
+RGB detector for analysis only;no native training label ormodel input. Conditional
+visible-ball readouts cannot replace presence/RGB/physics gates,andweak probes
+cannot prove information absent. Three synthetic CPU checks pass. Root
+`/x/Temp/kindle-world-state-readouts-20261109`;declare before analysis,120s cap,
+no automatic retry. No GPU job,learner,collector orassessment is selected.
 
-Fresh16,384 updates,1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,one-hot,RGB100,
-rates4e-4,KL1/.1/freeNat1,mixing.01,observed events1,posterior-history/v21. Native
-64f5489f/SHAaa12d050 andmatching original runner are unchanged;no rebuild. Same
-small64 config/two-cycle natural plan;objective,imagined-event loss andsource/
-wrappers differ. Compared with the older failed RGB1/2k/broad run,data/loss/
-budget changes are bundled. No isolated cause orreliability claim. Root
-`/x/Temp/kindle-world-posterior-natural100-20261109`.1,820.531s native/1,951.302s
-loop;17.36%/17.64% less time than cached one-hot with worse ball forecasts,not
-an isolated backend speedup oruseful-learning gain.
-
-All182 execution/174 CPU-audit/38 CPU-stage/182 closure pins,16,384 finite11-report
-rows,240 initial/frozen arrays,80 changed weights,384 initial dense origins and
-18 exact restore arrays pass. Two guards/18 sealed files pass;main/observer/CPU
-finisher inactive/MainPID0/Resultsuccess. No native/CPU failure orretry in this
-allocation. All five final figures are reviewed;34 final-image pins/60 physical
-joins/allsix groups/four draws pass without model queries. Initial/age1/2048/4096/
-final,curves,provisional2k/halfway reviews andall regressions remain retained.
+The [posterior-history RGB100 learner](results/2026-11-09-breakout-world-posterior-natural100.md)
+stays closed/failed at2/3 dense gates: observed108/112,one99/109,eight19/107,
+sixteen5/114,thirty-two0/95 versus prior-suffix103/112,102/109,53/107,22/114,8/95.
+Fitting8 falls84/176→41/176;current reconstruction/paddle scores improve,but
+long ball forecasts regress. Native1,820.531s/loop1,951.302s,182/174/38/182 pins,
+two guards/18 sealed files andexact18-array restore pass. All three services are
+inactive/successful;all five final figures reviewed. No extension orbroader
+assessment. Bundled data/loss/budget/source changes do not isolate a cause.
 
 The [local forward comparison](results/2026-11-09-breakout-world-local-forward-contract.md)
 stays strictly failed on small observed/sampling differences,with exact forced-
 sample recurrent/generated suffix values;it does not prove free-running physics.
 The [late learner](results/2026-11-09-breakout-world-late-action-learning.md)
 and[earlier posterior-history run](results/2026-11-09-breakout-world-posterior-history.md)
-remain closed/failed,including their original source-specific failures/repairs.
+remain closed/failed,including original source-specific failures/repairs.
 The [early feature assessment](results/2026-11-09-breakout-world-action-features-branches.md)
 stays failed at.224881 versus one-hot.172366,296/304 nonending alarms. Full
 physics/events,brick memory,late/above-top coverage,untouched families andfresh
