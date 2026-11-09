@@ -21,40 +21,34 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [conditional pixel denoising trial](docs/results/2026-11-09-breakout-denoising-world.md) is closed and fails its early
-learning check:8,189 updates/260,807 valid targets,call/loop461.835s/467.658s.
-Dense fitting/development forecast ball detections arezero at every horizon;
-raw pixels havezero ball candidates,not merely ambiguous centroids. Primary
-ball energy.648302 versus H0.169502/gate.127127;two of nine comparable forecast
-gates pass. Ending16/32 Brier.024693/.372969,RIGHT16 risk.120679 fail;0/304
-nonending false alarms exceed5%. Observed denoising is a different task from
-RSSM reconstruction and is not counted as that gate. No extension is justified.
+Select the [conditional denoiser fitting diagnostic](docs/experiments/2026-11-09-breakout-denoising-fit.md) to distinguish
+basic one-step fitting from generated-history rollout failure. The same qualified
+1.8M/native0c705e12/db6b433d model will train fresh2,048 updates on eight fixed
+contact clips;65,536 target exposures/224 unique arrivals. No new code, rebuild,
+backend fixture, old-model query, actor/critic or data collection. No GPU learner
+is active yet. Root `/mnt/data/kindle-breakout-denoising-fit-20261109`.
 
-Source0c705e12/nativedb6b433d,1.8M RGB64/trainB32/inferB8,Auto,seed41001.
-The explicit four-frame/action U-Net and separate transition event CNN leave
-existing world learners/defaults unchanged. Six CPU/347 packaged checks,strict
-core Clippy,native scalar values/derivatives,45 changed weight tensors,135
-frozen tensors andfive exact restore arrays pass. All648 learner/92 repaired
-CPU and1,605 assessment/236 CPU inputs pass;84 frozen groups/462 paired
-history arrays/96 clip frames retained. Closure1,981 pins/four guards/36 files/
-three terminal services;3,221,707,567-byte disposable caches released.
-Root `/mnt/data/kindle-breakout-denoising-world-20261109`.
+Three CPU runner checks pass, including no future-image input. All224 exact
+four-frame/action conditions aredistinct. Original preparation wrongly assumes
+all rewards arezero;its CPU-only repair retains two positive prefix rewards,
+588 training exposures,andzero evaluated suffix positives. Failure/source/log
+remain. Declare exact runner/data/runtime identities before allocation and
+check live host/service state. Compare own-initial/final ordinary16-step
+rollouts and separately labeled privileged one-step queries. Read the protocol;
+fitting success cannot complete the full world-model goal. No extension,
+sweep or automatic successor is selected.
 
-Original launch ordering fails: native test/guard already passed,but an import
-error doesnot prevent training starting;648-input review finishes after launch.
-It is preserved,not relabeled passed. Original CPU float-canonicalization and
-preparation/install failures remain with separate repairs;no GPU stage repeats.
-The [protocol](docs/experiments/2026-11-09-breakout-denoising-world.md) and result retain exact settings/limits. This early
-negative doesnot rule out all denoisers or budgets,or establish a unique cause.
+The [broad denoising trial](docs/results/2026-11-09-breakout-denoising-world.md) stays closed and failed:8,189 updates,
+zero detected balls,primary energy.648302 versus H0.169502/gate.127127. Its
+original launch ordering failure remains;do not repeat its completed learners,
+collectors,assessments or reviews. The [earlier pixel RSSM fit](docs/results/2026-11-08-breakout-world-contact-fit.md)
+learned110/110 supported positions on each draw;only its fixed data/cached
+report are reused. No architecture or matched-budget superiority follows.
 
-No GPU allocation or next learner is active or selected. Actor/critic,CDP
-comparison and the five-game campaign remain parked. Pixel/global H0 stays the
-inspectable reference. Do not repeat this trial,the closed posterior-history
-trial,old reviews,collectors or assessments;no unchanged extension or automatic
-successor. Full physics/events,calibration,brick memory,late/tunnel/second-wall/
-above-top coverage,untouched families andfresh confirmation remain required.
-The current oracle hasno above-top endpoint. No intermediate score completes
-either goal.
+Actor/critic,CDP comparison and the five-game campaign remain parked. Full
+physics/events,calibration,brick memory,late/tunnel/second-wall/above-top
+coverage,untouched families andfresh confirmation remain required. No
+intermediate or privileged score completes either goal.
 
 ## Direction and retained results
 
