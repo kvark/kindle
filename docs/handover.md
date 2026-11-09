@@ -9,46 +9,39 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Retain the [sigma_data0.05 control](results/2026-11-09-breakout-denoising-sigma-data0p05.md): correct one-step balls
-140/149/140/140 of198 versus11/17/16/14 at.5, ordinary35/38/34/33 of110.
-Detected balls move about98% of the true step, with.334–.363 pixel median error.
-Missing balls and longer rollouts still fail every strict fitting gate. One
-reused development learner/data/seed, not full-game or reliability evidence.
+unproven. Retain the [sigma_data0.05 control](results/2026-11-09-breakout-denoising-sigma-data0p05.md): one-step140/149/140/140 of198,
+ordinary35/38/34/33 of110. Detected balls move about98% of the true step, but
+missing balls and long rollouts still fail every strict fitting gate. Reused
+development data/seed; no mastery or reliability claim.
+
+The [frozen six-step sampler test](results/2026-11-09-breakout-denoising-six-steps.md) is closed. Same weights/noise improve
+one-step matches to156/165/163/161 of198; ordinary30/42/40/38 of110 is mixed.
+All0/24 fitting gates. Pixel MSE worsens3.332× one-step/4.087× ordinary, with
+more false balls. Retain three production steps; no default/API/header change.
+Source1e66499e adds a test-only native collector. All108 teacher/64 ordinary
+baseline batches and20 full production arrays are bit-exact before intervention;
+135 frozen tensors stay exact.19 CPU checks/strict release test-target Clippy,
+51 declared/29 CPU/103 closure pins andone sealed guard/nine files pass. Native
+query/export9.616s, CPU1.257s; source/executables retained, own719,946,264-byte
+apparent build cache released. Original shell/CPU schedule/Clippy failures remain
+preserved with separate CPU corrections; physical thresholds never change.
+Root `/mnt/data/kindle-breakout-denoising-six-steps-20261109`.
 
 The [matched-noise diagnosis](results/2026-11-09-breakout-denoising-paired-history.md) confirms history-error accumulation:
-real-history77/86/77/77 versus recursive40/41/35/33 of110 with identical per-step
-noise. The subsequent [grouped denoised-history learner](results/2026-11-09-breakout-denoising-generated-history.md) regresses to13/9/10/10 of110
-and59/60/55/59 of198. All0/24 fitting gates; reject this recipe. Earlier denoised
-training estimates still contain noisy target information; this does not rule
-out all ways to learn robust history. History/anchors/importance/events change
-together. Same target/noise order, fresh2,048 updates/65,536 targets in513 calls;
-155.067s native-call/162.249s loop versus control175.803s/184.417s, shared host.
+real-history77/86/77/77 versus recursive40/41/35/33 of110. The subsequent
+[grouped-history learner](results/2026-11-09-breakout-denoising-generated-history.md) regresses to13/9/10/10 of110 and59/60/55/59
+of198; reject that recipe. This does not rule out all robust-history training.
+These completed jobs, all older trials/failures/repairs andthe
+[stage trace](results/2026-11-09-breakout-denoising-stage-trace.md) stay closed; do not repeat them.
 
-Latest declaration source3f1115ae, unchanged native7871f08b/SHAaf13a03e; no build.
-Existing18 Rust CPU/402 packaged/4 runner checks and Clippy receipts reused.
-135 initial/frozen tensors,20 initial/restored arrays and57 first event tensors
-are exact. Final57 event tensors differ as expected from changed conditioning.
-All43 declared/73 CPU/149 closure pins, two sealed guards/18 files and terminal
-service pass. Original CPU plan-schema and observer-path failures remain with
-separate CPU-only repairs; no native or assessment repeat. Root
-`/mnt/data/kindle-breakout-denoising-generated-history-20261109`.
-
-The [frozen six-step sampler test](experiments/2026-11-09-breakout-denoising-six-steps.md) is selected. Test a finer rho7 grid with
-unchanged weights/noise; require exact cached/default production parity before
-any intervention. Test-only collector; no production/API/checkpoint change.
-19 focused CPU checks and strict release test-target Clippy pass; four native
-tests stay ignored until selection. Declaration precedes one300s guarded job. Original CPU schedule
-expectation failure is preserved with a separate check against F64 grid values;
-selected grid and physical gates stay unchanged. Root
-`/mnt/data/kindle-breakout-denoising-six-steps-20261109`.
-No learner, extension or collector selected.
-Default sigma_data.5/history scale.5 and v1/v2/v3/v4 remain; optional.05 usesv5.
-Retain.05 as development evidence, not a global default. All prior trials,
-failures and repairs, including the [stage trace](results/2026-11-09-breakout-denoising-stage-trace.md), stay closed; do not repeat them.
-Full physics/events/natural calibration, changed-brick memory, late/tunnel/
-second-wall/above-top, untouched families and fresh confirmation remain required.
-No fitting score completes the goal. Actor/critic, CDP comparison and five-game
-work stay parked. [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB; hardlinked evidence stays immutable.
+All jobs are stopped. No learner, extension, collector or successor selected.
+Production native7871f08b/SHAaf13a03e stays unchanged. Default sigma_data.5/
+history scale.5 andv1/v2/v3/v4 remain; optional.05 usesv5. Retain.05 as development
+evidence, not a global default. Full physics/events/natural calibration,
+changed-brick memory, late/tunnel/second-wall/above-top, untouched families and
+fresh confirmation remain required. No fitting score completes the goal.
+Actor/critic, CDP comparison andfive-game work stay parked. [Cleanup](results/2026-11-09-temp-cleanup.md)
+recovered115GB; hardlinked evidence stays immutable.
 
 ## Preserved source and fresh-machine setup
 

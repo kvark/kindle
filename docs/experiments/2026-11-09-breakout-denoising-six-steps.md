@@ -63,3 +63,12 @@ fixture initializations. Preserve its failing log/source, then use equivalent
 struct initializers without changing values/assertions. The final collector
 rebuild passes19 CPU checks/four ignored GPU tests and strict release test-target
 Clippy. All production source bytes remain unchanged.
+
+Completed: the [result](../results/2026-11-09-breakout-denoising-six-steps.md)
+gets156/165/163/161 one-step matches of198 and30/42/40/38 ordinary of110, but all
+0/24 fitting gates fail. Mean pixel error grows3.332×/4.087× with more false balls;
+retain three production steps. All exact baseline/frozen/guard checks pass,
+service terminal success,103 closure pins verified, own build cache released.
+Original shell/CPU schedule/Clippy failures stay retained with separate CPU
+corrections. No learner, extension, collector or successor selected. Full goal
+remains unproven; no production API/sampler/header changes.
