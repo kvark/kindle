@@ -21,22 +21,29 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [wide local motion native qualification](docs/experiments/2026-11-09-breakout-world-wide-motion.md)
-for the default-off32-channel motion/fusion variant. Existing local widths stay16
-across model presets;this widens that path without changing encoder/RSSM/event
-geometry.1M:80 parameters/675,643 scalars/240 saved arrays,13 changed local shapes,
-+71,728 scalars. Explicitv27 wraps v18/v25;no late/transport/residual/auxiliary
-composition orwhole-agent use. Hypothesis only;not a diagnosed capacity cause.
+unproven. Select the [fixed wide-motion learning comparison](docs/experiments/2026-11-09-breakout-world-wide-motion-learning.md):
+one fresh16,384-update1M/RGB64/B8/T32/H16 physical-feature learner with
+`rgb_wide_motion=true`. Local motion/fusion widths16→32;80 parameters/675,643
+scalars/240 saved arrays,13 changed local shapes,+71,728 scalars. Encoder/RSSM/
+event geometry stays. This is a capacity hypothesis,not a diagnosed cause.
+Same original two-cycle plan/data/RGB100/event losses/rates4e-4/Auto/41001;
+new initialization/native andfirst-update checks differ. Fixed final decision,
+unchanged dense gates,6,600s training/600s restore caps,no automatic successor.
+No broader assessment ormain GPU job is active yet;declare/check the driver
+before launch. Original full-world requirements remain.
 
-Six unique new/affected CPU checks include derivatives/lane isolation,shape/counts,
-headers andwhole-agent rejection;29 config/five scope/four feature/three late
-checks andstrict core/test/binding Clippy pass.51 isolated packaged Python CPU
-checks pass. Optimized candidate native SHA02feea6e/test SHA7ed42e9e at
-`/x/Temp/kindle-world-wide-motion-20261109`. Initial dev-profile wheel/log remain
-retained;separate release wheel is selected before any native declaration.
-No GPU job ormain learner active yet. Pin source/config/data,then run one bounded
-qualification;no retry orautomatic successor. A learning comparison requires
-separate review/declaration afterward. Existing runtimes/scripts stay immutable.
+The [native qualification](docs/results/2026-11-09-breakout-world-wide-motion-native.md)
+passes in81.157s:small-fixture native values/derivatives/lane isolation,
+32 cached default-off forecasts/240 tensors,two exact equivalent-command
+updates/13 reports/240 tensors and32 exact restored forecasts.77/80 first-update
+parameters change in required families. Explicitv27 wraps v18/v25;unsupported
+scopes/whole-agent use reject.130 execution/71 closure pins andone guard/nine
+sealed files pass;both services inactive/successful. Sourcee3d18841/native
+SHA02feea6e at `/x/Temp/kindle-world-wide-motion-20261109`;reuse exact runtime/
+runner without rebuild. Initial dev-profile wheel/log andseparate optimized
+release selection remain retained. The3,580,907,520-byte compiler cache is
+released;retained artifact hashes pass. This qualifies implementation,not
+learning orphysics. Existing runtimes/scripts stay immutable.
 
 The [frozen-state diagnostic](docs/results/2026-11-09-breakout-world-state-readouts.md)
 stays closed:30 inputs,42 fits,144 metric rows,1.918s CPU,zero model queries.
