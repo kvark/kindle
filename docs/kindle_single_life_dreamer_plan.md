@@ -3,31 +3,40 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [conditional pixel denoising experiment](experiments/2026-11-09-breakout-denoising-world.md) is selected for focused
-CPU/native qualification and a bounded fresh learning check. It replaces the
-RSSM image generator with a four-frame/action U-Net and separate transition
-reward/ending reader; no actor/critic, CDP comparison or pretrained encoder.
-Existing world learners/defaults remain unchanged. Root
-`/mnt/data/kindle-breakout-denoising-world-20261109`.
+The [conditional pixel denoising trial](results/2026-11-09-breakout-denoising-world.md) is closed and fails its early
+learning check:8,189 updates/260,807 valid targets,call/loop461.835s/467.658s.
+Dense fitting/development forecast ball detections arezero at every horizon;
+raw pixels havezero ball candidates,not merely ambiguous centroids. Primary
+ball energy.648302 versus H0.169502/gate.127127;two of nine comparable forecast
+gates pass. Ending16/32 Brier.024693/.372969,RIGHT16 risk.120679 fail;0/304
+nonending false alarms exceed5%. Observed denoising is a different task from
+RSSM reconstruction and is not counted as that gate. No extension is justified.
 
-CPU preparation caught struct-pattern, NCHW shape and test-fixture errors;
-original logs and separate corrections remain retained. Six focused CPU checks
-pass;347 packaged checks and strict core Clippy pass. Native qualification
-and the declared learning budget remain.
-No GPU learner is active yet. Observed-frame denoising is a separate task from
-RSSM reconstruction; future forecasts receive no real-image corrections.
+Source0c705e12/nativedb6b433d,1.8M RGB64/trainB32/inferB8,Auto,seed41001.
+The explicit four-frame/action U-Net and separate transition event CNN leave
+existing world learners/defaults unchanged. Six CPU/347 packaged checks,strict
+core Clippy,native scalar values/derivatives,45 changed weight tensors,135
+frozen tensors andfive exact restore arrays pass. All648 learner/92 repaired
+CPU and1,605 assessment/236 CPU inputs pass;84 frozen groups/462 paired
+history arrays/96 clip frames retained. Closure1,981 pins/four guards/36 files/
+three terminal services;3,221,707,567-byte disposable caches released.
+Root `/mnt/data/kindle-breakout-denoising-world-20261109`.
 
-The [posterior-history trial](results/2026-11-09-breakout-world-posterior-history.md) stays closed and failed: primary ball
-energy .534384 versus H0 .169502/gate .127127; only one of ten gates passes.
-Do not repeat it or its completed evaluations. Native pixel/global H0 is the
-inspectable reference. The existing pixel-generator review is not being repeated.
+Original launch ordering fails: native test/guard already passed,but an import
+error doesnot prevent training starting;648-input review finishes after launch.
+It is preserved,not relabeled passed. Original CPU float-canonicalization and
+preparation/install failures remain with separate repairs;no GPU stage repeats.
+The [protocol](experiments/2026-11-09-breakout-denoising-world.md) and result retain exact settings/limits. This early
+negative doesnot rule out all denoisers or budgets,or establish a unique cause.
 
-The protocol selects 8,189 native transition updates, trainB32/inferB8,
-RGB64/Auto, with a separately qualified first update inside that budget. No new
-collector, extension, seed sweep or automatic successor. All original physics,
-event/calibration, brick-memory and full-game gates stand; untouched families,
-late/tunnel/second-wall/above-top coverage and fresh confirmation remain open.
-No intermediate or privileged score completes either goal.
+No GPU allocation or next learner is active or selected. Actor/critic,CDP
+comparison and the five-game campaign remain parked. Pixel/global H0 stays the
+inspectable reference. Do not repeat this trial,the closed posterior-history
+trial,old reviews,collectors or assessments;no unchanged extension or automatic
+successor. Full physics/events,calibration,brick memory,late/tunnel/second-wall/
+above-top coverage,untouched families andfresh confirmation remain required.
+The current oracle hasno above-top endpoint. No intermediate score completes
+either goal.
 
 ### What would establish the world model
 

@@ -92,3 +92,9 @@ package extraction hits the full host cache; its subsequent collection fails
 because installation did not complete. Corrected extraction uses its own
 /mnt/data cache, and the separately logged packaged checks pass. No GPU or
 emulator ran during those failures.
+
+The [completed result](../results/2026-11-09-breakout-denoising-world.md) fails
+this early check:zero ball detections,primary energy.648302,seven of nine
+comparable forecast gates fail. Original launch ordering fails and stays failed;
+separate CPU repairs complete technical evidence. The trial is closed;no
+extension or successor is selected. Full goal remains unproven.
