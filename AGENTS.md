@@ -21,24 +21,36 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [rate1e-3 denoiser fitting check](docs/experiments/2026-11-09-breakout-denoising-rate1em3.md) learner is complete andfails:
-ordinary0/110 andprivileged one-step0/198 on all draws,despite lower image loss.
-Observed noisy-frame matches3/8,0/8,2/8,1/8. First forward losses and90 optimizer
-moments match the control;image/event update norms are10x. Train/restore and
-both guards pass. All old learners remain closed.
+The [rate1e-3 denoiser fitting check](docs/results/2026-11-09-breakout-denoising-rate1em3.md) is closed andfailed:
+2,048 updates/65,536 targets still yield0/110 ordinary and0/198 privileged
+one-step matches per draw. Image loss.809515→.048756 fallsbelow rate1e-4's
+.124014 without repairing forecasts. Observed noisy-frame matches3/8,0/8,2/8,1/8.
+Native default1e-4 remains;no working denoiser recipe established.
 
-Select a separately declared16-query frozen conditioning check of this current
-checkpoint: compare identical-noise forecasts under actual/all-past/older-past/
-latest-frame lane shifts. Four CPU variant checks pass;no training,rebuild,
-collector or old-model query. This measures input sensitivity,not counterfactual
-physics. Declare successfully before one300s guarded stage;no GPU job active yet.
-Root `/mnt/data/kindle-breakout-denoising-rate1em3-20261109`.
+All130 declared/72 CPU analysis pins,four runner checks,135 initial tensors,
+20 initial/restore arrays,90 first optimizer moments and135 frozen tensors pass.
+First image/event parameter steps are10x;call/loop153.982s/161.896s. Qualified
+source879ab527/native9657af72 reused,without rebuild or native-fixture repeat.
+
+Separately selected16-query frozen conditioning check passes148 declared/10 CPU
+pins,20 exact baseline arrays and135 unchanged tensors. Older-only past RGB
+shifts change forecasts RMSE.01006–.01029;latest-only.00914–.01015. This rulesout
+complete history disconnection,not weak ball-specific conditioning or wrong
+motion. Lane shifts have no emulator branch/counterfactual physics score.
+Same target15:observed matches3/0/2/1 of8 whileforecasts0/8;different input/noise
+tasks do not uniquely identify sigma/sampler causes.
+
+Closure259 pins/three guards/27 files/two terminal services;16 exact frames/
+1,376 endpoints retained. [Protocol](docs/experiments/2026-11-09-breakout-denoising-rate1em3.md). No GPU job,unchanged extension,
+broad learner,collector or successor selected. Root
+`/mnt/data/kindle-breakout-denoising-rate1em3-20261109`. All old trials/failures/
+repairs remain retained;no completed old learner/query/collector repeats.
 
 User-requested [cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115 GB;all4,392 large artifact paths
 remain andhardlinked evidence stays immutable. Actor/critic,CDP comparison and
 five-game work stay parked. Physics/events/calibration,brick memory,late/tunnel/
 second-wall/above-top,untouched families andfresh confirmation remain required.
-No fitting/privileged score completes the goal;no automatic broad successor.
+No fitting/privileged score completes the goal.
 
 ## Direction and retained results
 

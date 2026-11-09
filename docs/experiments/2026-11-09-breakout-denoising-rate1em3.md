@@ -81,3 +81,10 @@ perturbations,no causal attribution of prediction error,andno counterfactual
 physics/calibration score. Summarize output RMSE versus changed past-input RMSE,
 all draw/lane endpoints andbase correctness. Do not infer useful dynamics merely
 from a nonzero response. No new collector,training,rebuild or old-model query.
+
+The [completed result](../results/2026-11-09-breakout-denoising-rate1em3.md)
+fails0/110 ordinary and0/198 privileged one-step on each draw. First optimizer
+moments match andparameter steps are10x;lower pixel loss does not repair fitting.
+The separately declared frozen check proves nonzero image-level responses to
+older/latest past frames,not correct motion. All stages are terminal andclosed;
+no extension,broad learner or successor is selected. The full goal stays unproven.
