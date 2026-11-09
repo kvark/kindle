@@ -66,3 +66,7 @@ persistent removed-brick memory, late/tunnel/second-wall/above-top coverage,
 untouched families and fresh learner confirmation remain required. No small
 fitting score, implementation check or intermediate screen proves the full goal.
 Actor/critic, CDP comparison and five-game work remain parked.
+
+## Closed result
+
+[Fixed final result](../results/2026-11-09-breakout-world-rate2em4-16k.md):94/112 observed,71/109 one-step,23/107 eight-step;0/3 gates. Some fitting horizons improve without a matching development gain.178 execution/199 CPU analysis/400 closure pins, two terminal successful native jobs and18 sealed guard files pass. No conditional branch assessment,extension orsuccessor; the full goal remains unproven.

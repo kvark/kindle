@@ -14,36 +14,35 @@ immutable. The follow-up leaves about281 GiB available on the root filesystem.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. A fresh [half-rate16k plain H16 learner](experiments/2026-11-09-breakout-world-rate2em4-16k.md) is selected:
-base/encoder/dynamics2e-4 and16,384 updates, versus original4e-4/8,192.
-The original periodic eight-step curve still improves in its last quarter;
-this tests rate and budget together, without an isolated-cause or success claim.
-No closed checkpoint is resumed. Keep RGB64/12M/B8/T32/H16/full BPTT/Auto,
-seed41001, RGB100, KL1/.1/free-nat1, mixing.01 and observed event losses1.
-Reuse nativeaffedefa/SHA cc6022e3 and its exact matching runner/runtime; no build
-or new qualification. Root: `/x/Temp/kindle-world-rate2em4-16k-20261109`.
+unproven. The [half-rate16k comparison](results/2026-11-09-breakout-world-rate2em4-16k.md) is closed and negative:
+94/112 observed, 71/109 one-step, 23/107 eight-step; **0/3 fixed development
+gates**, versus original H16's 99/112, 84/109, 25/107. Fitting forecasts improve at
+some horizons (eight-step 71/176 versus 61/176, sixteen-step 43/171 versus 21/171), without a
+matching development gain. Contacts match 26/25/27/24 of 110. Changing rates and budget
+together does not isolate either effect or diagnose a causal failure. Keep H0
+as the broad reference; no branch assessment or extension is selected.
 
-The exact original8,192-row4/2/1/1 plan is repeated twice:4,194,304 replayed
-arrivals,1,951,882 valid suffix targets,19,140 suffix terminals and32,016 positive
-suffix rewards. Unique arrivals stay32,849/32,850; this is not new experience.
-Independent data/mask/family checks pass. The initial preparation import-path
-failure and correct-environment completion remain; no native stage has repeated.
-Keep the fixed final observed≥90%,one≥89/109,eight≥28/107 gates and all other
-horizon/event/brick regressions. A branch assessment remains conditional and
-unallocated. Only this bounded fresh learner and its restore are selected.
+Fresh16,384/RGB64/12M/B8/T32/H16/full BPTT/Auto/41001/RGB100, all rates2e-4;
+original8,192-row4/2/1/1 plan repeated twice.4,194,304 replayed arrivals are not
+new experience. All16,384 finite11-report rows,204 original initial/own frozen
+tensors,36 initial arrays,18 development/32 contact restores,58 finite exports
+and8 one-hot state arrays pass.178 execution/199 CPU analysis/400 closure pins,
+two successful terminal native jobs,two guards/18 sealed files. Native calls1508.740s;
+loop1671.213s. No build or native retry/repair. Original preparation import-path
+failure remains. The pinned automatic CPU finisher completes successfully.
+Root: `/x/Temp/kindle-world-rate2em4-16k-20261109`.
 
-The [forward-contract study](results/2026-11-09-breakout-world-forward-contract.md) remains closed with its strict numerical
-failure and separate CPU repairs. Conditional recurrence and full-graph mode
-outputs are bitwise exact; this does not prove learned dynamics or unrestricted
-sampled parity. The [plain RGB1 learner](results/2026-11-09-breakout-world-plain-rgb1.md) stays closed at0/3 gates. Keep H0
-as the broad reference; mean/color options stay off. No old learner, assessment
-or collector repeats, and no automatic extension or successor is selected.
+The [forward-contract study](results/2026-11-09-breakout-world-forward-contract.md) retains its strict numerical failure and
+separate repairs; conditional recurrent paths are exact but unconstrained sampled
+parity and learned dynamics are unproven. Earlier RGB1/mean/color and all other
+learners stay closed; options stay off. No GPU allocation, learner, collector or
+automatic successor is active or selected. Do not repeat completed jobs.
 
-Full precise physics, natural event calibration, removed-brick memory,
-late/tunnel/second-wall/above-top coverage, untouched families and fresh
+Full precise physics/action responses, natural event calibration, removed-brick
+memory, late/tunnel/second-wall/above-top coverage, untouched families and fresh
 confirmation remain required. Actor/critic, CDP comparison and five-game work
-stay parked; earlier jobs remain closed/fullres protocol-failed. Consult the
-selected protocol before execution.
+stay parked; earlier jobs remain closed/fullres protocol-failed. Consult a
+separately justified protocol before any new experiment.
 
 ## Preserved source and fresh-machine setup
 
