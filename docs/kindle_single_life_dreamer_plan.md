@@ -28,7 +28,13 @@ andonly1–2 gained. This supports history-error accumulation,not a unique cause
 tensors,22 declared/22 CPU pins andone sealed guard/nine files pass. Service
 terminal success. No old assessment/learner repeats. Root
 `/mnt/data/kindle-breakout-denoising-paired-history-20261109`.
-No learner,extension orcollector isselected. Retain.05 as development evidence,
+The [generated-history learning test](experiments/2026-11-09-breakout-denoising-generated-history.md) is selected after reading this diagnosis:
+group identical target/noise order into513 short calls,exposing existing native
+learning to its earlier denoised estimates. Same.05 config/fresh seed/2,048
+updates/65,536 targets;no build. These histories retain noisy target information
+andare not full causal forecasts. Declare/pin before one guarded learner/restore.
+Root `/mnt/data/kindle-breakout-denoising-generated-history-20261109`.
+No extension orcollector selected. Retain.05 as development evidence,
 not a global default. The [stage trace](results/2026-11-09-breakout-denoising-stage-trace.md) andall older trials/failures/repairs stay
 closed. No old learner/query queue orcollector repeats. Full physics/events/
 natural calibration,brick memory,late/tunnel/second-wall/above-top,untouched
