@@ -6,6 +6,11 @@ and [PR31](https://github.com/kvark/kindle/pull/31) for the live dashboard.
 The five-game goal remains unfinished. Detailed experiment history belongs in
 those reports; historical “next” paragraphs do not authorize restarting jobs.
 
+The [November 9 storage cleanup](results/2026-11-09-temp-cleanup.md) recovers
+about132 GB across two passes, preserving checkpoints and evidence. Retained
+artifacts may share hardlinks and contain sparse zero blocks; keep their bytes
+immutable. The follow-up leaves about281 GiB available on the root filesystem.
+
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
