@@ -19,7 +19,12 @@ Source56611db4,
 main invocationc993d779a66f46d6a58daee8078ecfb1/controller2231604,observer2231609,
 CPU finisher2231611;root `/x/Temp/kindle-world-wide-motion-learning-20261109`.
 Restore/CPU final audits are attached;no broader assessment is allocated.
-Original full-world requirements remain.
+The [provisional2,048 review](results/2026-11-09-breakout-world-wide-motion-learning.md)
+shows mixed small-curve development:observed17/26 vs23/26,one17/27 vs21/27,
+four6/26 vs3/26,eight1/27 vs0/27. Native483.300s vs228.781s (2.113x).
+34-input/60-join CPU review passes,all six groups/four draws/four fixed grids
+retained;long drift/ball loss remains. These are not final dense gates orproof
+of useful learning/hour. Continue the fixed endpoint. Original requirements remain.
 
 The [native qualification](results/2026-11-09-breakout-world-wide-motion-native.md)
 passes in81.157s:small-fixture native values/derivatives/lane isolation,
