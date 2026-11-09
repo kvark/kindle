@@ -58,3 +58,5 @@ persistent removed-brick memory,late/tunnel/second-wall/above-top,untouched
 families andfresh confirmation remain required. Neither correct implementation,
 low position loss noran intermediate score completes thefull world-model goal.
 Actor/critic,CDP comparison andfive-game work stayparked;prior jobs stayclosed.
+
+Completed: [negative learning result](../results/2026-11-09-breakout-world-centroid-learning.md). Development85/112 observed,73/109 one-step,15/107 eight-step;0/3 gates.311 closure pins,two guards/18 sealed files andallfrozen/restore checks pass. Conditional oracle assessment isnot allocated;no successor selected.

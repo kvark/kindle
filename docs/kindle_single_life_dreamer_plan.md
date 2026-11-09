@@ -3,32 +3,37 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select fresh [RGB1/centroid1000 broad learning](experiments/2026-11-09-breakout-world-centroid-learning.md) afterpassed
-[native qualification](results/2026-11-09-breakout-world-centroid.md).8,192 updates,original16 fitting/eight development
-streams/4-2-1-1 plan,975,941 valid suffix targets/9,570 terminals/16,008 positives.
-SameRGB64/12M/B8/T32/H16/Auto/rates4e-4/mixing.01. Position targets use fixed
-RGB color/region knowledge;this isextra game-specific supervision,no emulator
-state input orunguided-representation claim. No actor/critic/CDP ornewbackend.
+unproven. [RGB1/centroid1000 world learning](results/2026-11-09-breakout-world-centroid-learning.md) closesnegative:development
+85/112 observed,73/109 one-step,15/107 eight-step;allthree broad gates fail.
+Fitting134/163 observed,119/177 one-step,34/176 eight-step. Original contact-family
+diagnostic17/18/16/19 of110,not fitting data forthis learner. Keep H0 broad reference;
+new optional auxiliary mode staysdefaultoff. Joint head/loss/RGB-scale changes
+andone reused development seed donot isolate a cause orprove reliability.
 
-Qualified source449361ae/nativeee44ec16,70 weights/8,857,797 scalars/210 tensors.
-139 Rust world CPU/strict core+binding Clippy/19 packaged Python checks pass.
-Native masked F64 derivatives/zeros,204 common initial/210 own tensors,32 initial/
-trained restore arrays and15 finite reports pass;one qualification update,not a
-main warm start.190 closure pins/nine sealed files;own1.25GB buildcache released.
-Initial fixture API/prefix/style failures remain withseparate corrected checks.
-Fresh learner mustmatch210 qualified initial tensors/age0 andretain384 actual-
-initial/final dense origins,allcurves/losses,210 own frozen/18 development/32
-contact restore arrays. Two guards,2400s/600s caps. Root
+The CPU affine position readout isalso coarse:observed development2.437px RMSE,
+15/112 within1px;prior1 17/109,prior8 6/107. It isconditioned onvisible truth,
+hasno presence output andno native-head readback parity. It cannot replace RGB
+physics gates orprove information absence. FixedRGB color/region supervision is
+game-specific knowledge,no object/emulator state input orunguided-learning claim.
+
+Fresh8,192 updates/15 finite reports;70 weights change,210 qualified initial/own
+frozen tensors and18 development/32 contact restore arrays exact. Original384
+initial/final dense origins/source plan,975,941 suffix targets/9,570 terminals/
+16,008 positives pass. Calls766.210s,loop879.901s;changed export frequency prevents
+an isolated speed claim.149 declaration/311 closure pins,two guards/18 files,
+one terminal successful service. Native449361ae/SHAee44ec16 reused. Root
 `/mnt/data/kindle-breakout-world-centroid-learning-20261109`.
 
-Qualification root `/mnt/data/kindle-breakout-world-centroid-20261109` staysclosed;
-allprior jobs stayclosed,fullres staysprotocol-failed. H0 remains broad recurrent
-reference. Onlyafterallthree broad gates pass mayoriginal final oracle groups be
-separately declared. No automatic successor. Full physics/events,natural
-calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
-families andfresh confirmation remain required. No implementation/fitting score
-completes thegoal. Actor/critic,CDP comparison andfive-game work stayparked.
-[Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
+[Qualification](results/2026-11-09-breakout-world-centroid.md) stayspassed/closed:masked native F64 derivatives/zeros,
+139 Rust CPU/strict core+binding Clippy/19 Python checks,190 closure pins,nine
+sealed files. Initial fixture API/prefix/style failures remain withseparate
+corrected checks. Own1.25GB buildcache released. Conditional oracle assessment
+isnot allocated;alljobs stopped,no automatic learner/extension/collector/successor.
+Allprior jobs stayclosed,fullres staysprotocol-failed. Full physics/events,
+natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. No implementation/
+fitting score completes thegoal. Actor/critic,CDP comparison andfive-game work
+stayparked. [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
 
 ### What would establish the world model
 
