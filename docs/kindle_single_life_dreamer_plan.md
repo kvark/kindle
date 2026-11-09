@@ -18,6 +18,8 @@ assessment](experiments/2026-11-09-breakout-world-action-features-branches.md): 
 contexts do not establish untouched generalization orlate/above-top coverage.
 No training,new collection,old-model query,rebuild orautomatic successor.
 Root `/x/Temp/kindle-world-action-features-branches-20261109`.
+The frozen assessment is active under invocation
+`af96f4e020a54a30a2bb63aeb112ba6c`, with its pinned observer/scorer.
 
 Use exact native source1331b702/SHA15ea18b5 andmatching runtime-v2/runner under
 `/x/Temp/kindle-world-action-features-20261109/native`. Keep all source-specific
