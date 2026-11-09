@@ -84,3 +84,9 @@ persistent removed-brick memory, late/tunnel/second-wall/above-top coverage,
 untouched families and fresh confirmation. The current full oracle lacks an
 above-top endpoint. Actor/critic, CDP comparison and the five-game campaign stay
 parked; the goal **prove the world model training on Breakout** stays unproven.
+
+The [completed diagnostic](../results/2026-11-09-breakout-denoising-fit.md) fails:
+0/110 ordinary and0/198 actual-history one-step endpoints on every draw;
+observed denoising0/8. All frozen/restore checks pass;original preparation
+failure stays retained. No extension or successor is selected. Full goal stays
+active and unproven.

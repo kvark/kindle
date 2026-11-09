@@ -9,34 +9,36 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-Select the [conditional denoiser fitting diagnostic](experiments/2026-11-09-breakout-denoising-fit.md) to distinguish
-basic one-step fitting from generated-history rollout failure. The same qualified
-1.8M/native0c705e12/db6b433d model will train fresh2,048 updates on eight fixed
-contact clips;65,536 target exposures/224 unique arrivals. No new code, rebuild,
-backend fixture, old-model query, actor/critic or data collection. No GPU learner
-is active yet. Root `/mnt/data/kindle-breakout-denoising-fit-20261109`.
+The [conditional denoiser fitting diagnostic](results/2026-11-09-breakout-denoising-fit.md) is closed and failed:
+fresh2,048 updates/65,536 target exposures on eight clips yield0/110 ordinary
+16-step and0/198 privileged actual-history one-step ball matches on each of
+four draws. Observed noisy-frame denoising detects0/8 balls per draw,with perfect
+static brick-cell accuracy. Failure exists before generated-history drift
+could explain it;no unique capacity/optimizer/noise/sampler cause is established.
+No unchanged extension or successor is selected;no GPU allocation is active.
 
-Three CPU runner checks pass, including no future-image input. All224 exact
-four-frame/action conditions aredistinct. Original preparation wrongly assumes
-all rewards arezero;its CPU-only repair retains two positive prefix rewards,
-588 training exposures,andzero evaluated suffix positives. Failure/source/log
-remain. Declare exact runner/data/runtime identities before allocation and
-check live host/service state. Compare own-initial/final ordinary16-step
-rollouts and separately labeled privileged one-step queries. Read the protocol;
-fitting success cannot complete the full world-model goal. No extension,
-sweep or automatic successor is selected.
+Unchanged qualified native0c705e12/db6b433d,1.8M RGB64/trainB32/inferB8,Auto,
+seed41001;experiment declarationab14c014. Call/loop133.854s/141.289s.
+All142 declared/69 CPU inputs,513 finite reports,45 changed weights,135 initial/
+frozen tensors and20 exact per-draw restore arrays pass. Three CPU runner
+checks include no future-image input. All224 exact conditions aredistinct;
+224 unique targets receive292–296 exposures each. Closure229 pins/two sealed
+guards/18 files,one terminal service;16 exact clip frames/1,376 endpoints retained.
+Root `/mnt/data/kindle-breakout-denoising-fit-20261109`. No rebuild,backend fixture,
+old model query or collection repeats. Two positive prefix rewards/588 training
+targets remain;the evaluation suffix hasno positives. Original CPU preparation
+failure and its separate repair remain. [Protocol](experiments/2026-11-09-breakout-denoising-fit.md).
 
 The [broad denoising trial](results/2026-11-09-breakout-denoising-world.md) stays closed and failed:8,189 updates,
 zero detected balls,primary energy.648302 versus H0.169502/gate.127127. Its
-original launch ordering failure remains;do not repeat its completed learners,
-collectors,assessments or reviews. The [earlier pixel RSSM fit](results/2026-11-08-breakout-world-contact-fit.md)
-learned110/110 supported positions on each draw;only its fixed data/cached
-report are reused. No architecture or matched-budget superiority follows.
+launch ordering failure remains. The earlier pixel RSSM's110/110 fitting result
+is a cached,different-capacity/objective/workload reference,not a matched-budget
+architecture comparison. Do not repeat completed learners,collectors,assessments
+or reviews. Actor/critic,CDP comparison and the five-game campaign remain parked.
 
-Actor/critic,CDP comparison and the five-game campaign remain parked. Full
-physics/events,calibration,brick memory,late/tunnel/second-wall/above-top
-coverage,untouched families andfresh confirmation remain required. No
-intermediate or privileged score completes either goal.
+All full physics/event/calibration,brick-memory,late/tunnel/second-wall/above-top,
+untouched-family andfresh-confirmation requirements remain. No fitting or
+privileged score completes either goal;the current oracle hasno above-top endpoint.
 
 ## Preserved source and fresh-machine setup
 
