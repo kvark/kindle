@@ -60,3 +60,12 @@ assessment. Preserve failures/separate repairs. No extension,collector,old model
 repeat orautomatic successor. Full physics/events,natural calibration,changed-
 brick memory,late/tunnel/second-wall/above-top,untouched families andfresh
 confirmation remain required. A tiny fitting pass cannot complete the goal.
+
+Completed: [result](../results/2026-11-09-breakout-target-motion.md) improves
+actual-history one-step150/157/151/148 butregresses ordinary9/9/10/8;0/24 gates.
+Rollouts accumulate ambiguous red regions;reject this setting andretain control.
+Default/initial/event/frozen/restore parity,144 declaration/270 closure pins,
+three guards/27 files pass;both services terminal,own cache released. Existing
+noisy-target denoising input remains unchanged: target-derived attention is
+loss-only,with no clean future frame added tohistory conditioning. No successor
+selected;full goal remains unproven.

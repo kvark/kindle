@@ -21,28 +21,41 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [target-motion loss attention](docs/experiments/2026-11-09-breakout-target-motion.md): use exact supervised RGB changes instead ofdilated past-only
-weights,scale100. Inputs/graph/parameters/targets/sampler remain unchanged.
-Defaultfalse preserves prior paths;true requiresv9/nonzero strength. 29 Rust CPU/58 packaged/four runner/strict Clippy pass. Next default
-fixture before the fresh bounded
-2,048-update/65,536-target learner. Root
+unproven. Reject [target-motion loss attention](docs/results/2026-11-09-breakout-target-motion.md) forrollouts:9/9/10/8 of110 versus35/38/34/33. One-step improves
+150/157/151/148 of198 versus140/149/140/140,butoverall0/24 gates still fail.
+Detections rise190–194/198;only148–157 matchwithin1px. Ordinary rollout outputs
+have77–80/110 ambiguous red masks (>12 candidate pixels),versus no candidate-
+free cases. Improved local visibility does not establish stable generated
+histories. Keep target_motion_loss off;retain clean-history reward32.
+
+Only loss attention changes: exact supervised RGB differences replace dilated
+past-only weights atscale100. No new object labels ormodel inputs;existing noisy-
+target denoising input is retained,clean next RGB is not added tohistory.
+Optional defaultfalse preservesv1–v8;true requiresv9/nonzero strength.29 Rust CPU/
+58 packaged/four runner/strict Clippy pass;weighted-MSE graph/derivatives reused.
+Default fixture135 initial/frozen/first-update tensors,20 arrays/six losses exact
+before main. Main135 initial tensors/20 arrays,57 first/final event tensors/two
+first event losses,135 own frozen tensors/20 restored arrays exact.144 declaration/
+270 closure pins,three sealed guards/27 files,two terminal services pass.
+2,048 updates/65,536 targets take157.609s learn-call/166.498s loop,shared host,
+no isolated speed claim. Own792,742,242-byte apparent cache released.
+Source75b7e7b0/native59045d5e98aa;root
 `/mnt/data/kindle-breakout-target-motion-20261109`.
 
-[Saved appearance diagnosis](docs/results/2026-11-09-breakout-ball-appearance.md):
-45/55 strict no-candidate stochastic one-step outputs have a red-contrast peak
-within1px,with median.385 true-ball contrast. Diagnostic peak locations never
-replace the strict detector orcount toward gates. Sharper label-derived RGB
-attention raises median true-ball weight14.203→39.484 in CPU analysis only;
-this motivates learning,not a causal claim. No object label enters the model.
-Retain [clean-history reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
-[Direct frame](docs/results/2026-11-09-breakout-direct-frame.md) and[history
-noise](docs/results/2026-11-09-breakout-denoising-history-noise.md) stay rejected;
-all prior trials/failures/repairs remain closed. Full physics/events,natural
-calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
-families andfresh confirmation remain required. Actor/critic,CDP comparison and
-five-game work stay parked. No extension,collector orautomatic successor.
-[Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked
-retained evidence stays immutable.
+[Saved appearance diagnosis](docs/results/2026-11-09-breakout-ball-appearance.md)
+finds45/55 strict no-candidate control outputs with near-target faint peaks.
+Those diagnostic locations never replace the strict detector orcount as passes.
+10 input pins/396 first-draw model/case rows verified;CPU-only,no newmodel query.
+Retain [reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):
+35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates;stable learned
+reward scalars butone privileged positive missed,no terminals/natural calibration.
+Direct-frame/history-noise andall earlier negative recipes stayclosed.
+Full physics/events,natural calibration,changed-brick memory,late/tunnel/second-
+wall/above-top,untouched families andfresh confirmation remain required.
+All jobs stopped;no extension,collector,old-model repeat orautomatic successor.
+Actor/critic,CDP comparison andfive-game work stay parked. No fitting score
+completes the goal. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
+recovered115GB;hardlinked retained evidence stays immutable.
 
 ## Direction and retained results
 
