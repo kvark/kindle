@@ -65,3 +65,12 @@ pending. No broader assessment,extension orautomatic successor is allocated.
 Full action-conditioned distributional physics,natural events,brick memory,
 late/tunnel/second-wall/above-top coverage,untouched families andfresh learner
 confirmation remain required. The complete world-model goal is unproven.
+
+A separate final-image CPU observer is attached after this provisional review.
+It waits for successful final audits before pinning/reading final image exports;
+it adds no model query orupdate. Its immediate launcher identity check fails
+before saving its receipt;the first state/failed predicate is not captured.
+`final-images-v1/launch-observation-failure-v1.json` preserves the original output.
+A separate `service-v2.json` verifies the same original invocation/command and
+controller2234733 without restart. Image analysis remains pending;this is not
+a native-learning failure or a repeated provisional review.

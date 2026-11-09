@@ -58,3 +58,22 @@ Full distributional action-conditioned physics, natural reward/life/ending
 calibration, persistent removed-brick memory, late/tunnel/second-wall/above-top
 coverage, untouched families andfresh confirmation remain required. Actor/critic,
 CDP andfive-game work stay parked. The full goal remains active andunproven.
+
+## Final-image review attachment
+
+After launch, attach one separately declared CPU-only final-image observer under
+`final-images-v1`. It waits for the exact original CPU-audit service to finish
+successfully andverifies its closed result/closure before declaring image inputs.
+It then compares all six groups/four draws against cached16-channel final exports,
+checks ten physical fields/finite arrays andrenders four fixed row0/draw0 grids.
+No model/GPU/emulator query, optimizer update ormain-run modification. Script,
+controller andsource receipts are pinned before waiting;closed image inputs are
+pinned before analysis. Plotting log is closed before output sealing. No retry.
+
+The immediate launcher identity observation fails before a service receipt is
+written;its exact failed predicate is unisolated because state/command assertions
+share a line andthe first state is not captured. Preserve that failure separately.
+A fresh observation verifies the original invocation5ff779bc66d541c684ab54ad763b7cf7,
+controller2234733 andexpected command without restart. The image analysis has not
+executed at this point. This observation recovery neither repairs norrestarts
+the native learner orany completed assessment. Original pinned scripts stay.

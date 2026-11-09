@@ -37,6 +37,10 @@ Source56611db4,
 main invocationc993d779a66f46d6a58daee8078ecfb1/controller2231604,observer2231609,
 CPU finisher2231611;root `/x/Temp/kindle-world-wide-motion-learning-20261109`.
 Restore/CPU final audits are attached;no broader assessment is allocated.
+Final-image CPU observer2234733/invocation5ff779bc66d541c684ab54ad763b7cf7 waits
+for the original final-audit service,then reviews cached exports only. Its initial
+immediate launcher observation fails;the separate same-invocation identity check
+passes without restart. Original failure remains;image analysis has not run.
 The [provisional2,048 review](docs/results/2026-11-09-breakout-world-wide-motion-learning.md)
 shows mixed small-curve development:observed17/26 vs23/26,one17/27 vs21/27,
 four6/26 vs3/26,eight1/27 vs0/27. Native483.300s vs228.781s (2.1125x).
