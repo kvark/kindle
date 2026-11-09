@@ -62,3 +62,12 @@ No extension,collector,old-model repeat orautomatic successor. Full physics/
 events,natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
 untouched families andfresh confirmation remain required. No fitting score can
 complete the full world-model orfive-game goal.
+
+Completed: [result](../results/2026-11-09-breakout-denoiser-width32.md) regresses
+ordinary13/12/10/14 andone-step106/104/100/105;0/24 gates,20.03% more loop time.
+Reject width32 atthis recipe/budget. Default/event/frozen/restore checks,143
+input/276 closure pins,three guards/27 files pass;both services terminal,own
+cache released. Original graph-metadata flag/prelaunch clarification andCPU
+report failure/separate repair retained,no native/audit repeat. New exact four-
+frame/action prefix audit finds224 unique inputs;no observability claim.
+Retain width16 reward32;no successor selected,full objective unproven.

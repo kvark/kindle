@@ -9,35 +9,35 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Reject [causal generated-latest training](results/2026-11-09-breakout-causal-prefix.md): ordinary22/25/19/24 of110 versus35/38/34/33;one-step97/107/101/105
-of198 versus140/149/140/140.0/24 gates. First512 updates stayclean,then half the
-histories getone causal predicted latestframe;earlier three frames stayactual.
-This tested one-frame recipe regresses both tasks;it does not rule out other
-schedules orfull generated-history training. Retain clean-history reward32.
+unproven. Reject [width32 pixel predictor](results/2026-11-09-breakout-denoiser-width32.md):13/12/10/14 of110 ordinary versus35/38/34/33;one-step106/104/100/105
+of198 versus140/149/140/140.0/24 gates. Loop203.215s versus169.299s (+20.03%).
+Own initial2/110 and0/198 improve withlearning buttrail the retained model.
+This matched-target comparison does not rule out other wider-model optimization.
+Retain width16 clean-history reward32;keep width32 experimental/off bydefault.
 
-Seven CPU runner checks pass. Reuse native60b9b67244d7/source8dbf9ab5 andexact
-runner;no rebuild/new qualification. Initial/first/509 tensors135,initial/509
-arrays20,six first losses andfirst-cache frozen135 tensors exact. Final135 own
-frozen tensors/20 restore arrays exact. All24 refresh ages/seeds,624 causal
-queries/4,992 imagined frames and22,816 augmented-exposure joins pass. These add
-inference,not emulator experience. Arrivals4/5 andboth source positives remain
-clean due to the API minimum. Native RNG/target order/config unchanged;residual
-anchors,importance andevent conditioning change together.134 declaration/260
-closure pins,two sealed guards/18 files andone terminal service pass.
-2,048 updates/65,536 targets take144.855s learn-call/20.152s cache phase/174.757s
-loop onshared host,no isolated speed claim. No build cache created;generated
-caches are retained evidence. Root
-`/mnt/data/kindle-breakout-causal-prefix-20261109`.
+Pixel widths32/64/128:2,352,611 pixel parameters,total3,533,747;event heads unchanged.
+Default16 preservesv1–v9;32 requiresv10/matching architecture.31 Rust CPU/64
+packaged/four runner/strict Clippy pass. Default16 fixture135 initial/frozen/
+first-update tensors,20 arrays/six losses exact before main. Main57 initial/first/
+final event tensors/two first event losses exact;135 own frozen tensors/20
+restored arrays exact.143 declaration/276 closure pins,three guards/27 files,
+two terminal services pass. Source273818cd/nativee354ce919b4d;own792,783,105-byte
+apparent build cache released. Inherited graph_unchanged flag preserved with
+prelaunch clarification ofchanged pixel shapes;original CPU report None-at-zero-
+support failure andseparate report_v2 repair retained,no native/audit repeat.
+Root `/mnt/data/kindle-breakout-denoiser-width32-20261109`.
 
-Retain [reward32](results/2026-11-09-breakout-denoising-reward32.md):
-35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates;stable learned
-reward scalars butone privileged positive missed,no terminals/natural calibration.
-Target-motion/direct-frame/history-noise andall earlier failed recipes stayclosed.
-All jobs stopped;no extension,collector,old-model repeat orautomatic successor.
-Full physics/events,natural calibration,changed-brick memory,late/tunnel/second-
-wall/above-top,untouched families andfresh confirmation remain required.
-Actor/critic,CDP comparison andfive-game work stayparked. No fitting result
-completes the goal. [Cleanup](results/2026-11-09-temp-cleanup.md)
+New exact predictive-input audit usesfour past RGB frames/four actions,target
+excluded:224 unique prefixes,no duplicates/conflicts. This does not prove full
+observability,learned feature separation orabsence ofnear-aliasing. Retain
+[reward32](results/2026-11-09-breakout-denoising-reward32.md):35/38/34/33
+of110 ordinary,140/149/140/140 of198 one-step,0/24 gates;stable reward scalars,
+one privileged positive missed,no terminals/natural calibration. All previous
+negative trials stayclosed. All jobs stopped;no extension,collector,old-model
+repeat orautomatic successor. Full physics/events,natural calibration,changed-
+brick memory,late/tunnel/second-wall/above-top,untouched families andfresh
+confirmation remain required. Actor/critic,CDP comparison andfive-game work stay
+parked. No fitting result completes the goal. [Cleanup](results/2026-11-09-temp-cleanup.md)
 recovered115GB;hardlinked retained evidence staysimmutable.
 
 ## Preserved source and fresh-machine setup
