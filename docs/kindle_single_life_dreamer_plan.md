@@ -3,20 +3,18 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [rate1e-3 denoiser fitting check](experiments/2026-11-09-breakout-denoising-rate1em3.md) is selected:
-one fresh2,048-update/65,536-target actual-history learner changes only learning
-rate1e-4→1e-3,for image/event heads. Same target/noise order,config otherwise,
-qualified native9657af72/source879ab527 andstrict fitting/full-goal gates. Four
-CPU checks andprepared data/helper checks pass;no rebuild or collector. Declare
-successfully before guarded train/restore. No GPU job launched yet.
-Root `/mnt/data/kindle-breakout-denoising-rate1em3-20261109`.
+The [rate1e-3 denoiser fitting check](experiments/2026-11-09-breakout-denoising-rate1em3.md) learner is complete andfails:
+ordinary0/110 andprivileged one-step0/198 on all draws,despite lower image loss.
+Observed noisy-frame matches3/8,0/8,2/8,1/8. First forward losses and90 optimizer
+moments match the control;image/event update norms are10x. Train/restore and
+both guards pass. All old learners remain closed.
 
-The [actual-history control](results/2026-11-09-breakout-denoising-real-history.md) stays closed and failed:0/110 ordinary,
-0/198 privileged one-step and0/8 observed balls per draw. All135 first trained
-tensors match its mixed-history control;initial/frozen/restore andguards pass.
-Actual histories alone do not repair the failure. Mean image loss.848643→.124014
-does not establish adequate optimization;the new rate test addresses that limit.
-Prior denoiser trials/failures/repairs stay retained;no old job/query repeats.
+Select a separately declared16-query frozen conditioning check of this current
+checkpoint: compare identical-noise forecasts under actual/all-past/older-past/
+latest-frame lane shifts. Four CPU variant checks pass;no training,rebuild,
+collector or old-model query. This measures input sensitivity,not counterfactual
+physics. Declare successfully before one300s guarded stage;no GPU job active yet.
+Root `/mnt/data/kindle-breakout-denoising-rate1em3-20261109`.
 
 User-requested [cleanup](results/2026-11-09-temp-cleanup.md) recovered115 GB;all4,392 large artifact paths
 remain andhardlinked evidence stays immutable. Actor/critic,CDP comparison and

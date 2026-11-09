@@ -52,3 +52,32 @@ physics/event precision andnatural calibration, persistent removed-brick memory,
 late/tunnel/second-wall/above-top coverage,untouched families andfresh confirmation.
 The full oracle still hasno above-top endpoint. Actor/critic,CDP comparison and
 game campaign remain parked. Read this result before selecting further work.
+
+## Separately selected frozen conditioning check
+
+After the completed rate learner fails0/110 ordinary and0/198 actual-history
+one-step on every draw,but observed denoising recovers3/8,0/8,2/8,1/8 balls,
+select16 frozen queries only. This selection follows the actual result; it is
+not a learner extension or automatic broad successor. Use this current final
+checkpoint and unchanged native/config,not an old model. Reproduce the saved
+baseline first forecast/observed/event arrays exactly on each of four draws.
+Then cyclically shift past RGB across lanes in three modes: all observed frames
+0..15;older0..14 keeping latest15;latest15 only keeping older frames. Keep all
+historical/future commands,rewards/terminals andfuture RGB bytes unchanged.
+The existing query helper sends only the declared prefix andone future command.
+
+Same seed per paired variant holds inference noise fixed; export every output.
+Four CPU variant checks precede a separate source/input declaration andone
+300s guarded job. Pin current final tensors,baseline cache,data,helper/runtime,
+receipts andsource. Require no updates,135 frozen tensors exact and20 exact
+baseline per-draw arrays. Audit terminal guard before CPU sensitivity analysis.
+The same source-arrival15 has both stored observed sigma.5 denoising andstored
+one-step forecasts from its preceding actual history; compare these distinct
+tasks without attributing their gap uniquely to sigma or sampling.
+
+Lane-shifted histories can be inconsistent with commands. They test finite
+input sensitivity only: there is no emulator branch/ground truth for these
+perturbations,no causal attribution of prediction error,andno counterfactual
+physics/calibration score. Summarize output RMSE versus changed past-input RMSE,
+all draw/lane endpoints andbase correctness. Do not infer useful dynamics merely
+from a nonzero response. No new collector,training,rebuild or old-model query.
