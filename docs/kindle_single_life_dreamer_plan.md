@@ -3,31 +3,35 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [late command path](experiments/2026-11-09-breakout-world-late-action.md)
-is implemented with default-off `rgb_late_action` and explicit standalonev26.
-Move18 action planes from motion0 to fusion after three image-only motion layers;
-80 weights/603,915 scalars remain, with7,200 weights moved between two shapes.
-This is a robustness hypothesis, not a proven normalization cause or repair.
+unproven. The [late-command native qualification](results/2026-11-09-breakout-world-late-action-native.md)
+passes: default-off32 cached controls, native values/derivatives/lane isolation,
+two equivalent-command one-update instances,240 exact common/trained/frozen
+tensors,13 exact reports and32 restored forecasts.52.356s;128 execution/69
+closure pins and one guard/nine sealed files pass. No failure/retry; the2.9GiB
+compiler cache is released. Native source81a5e4e3/SHA4b0eb0b0 and exact runtime/
+runner are retained at `/x/Temp/kindle-world-late-action-20261109`.
 
-CPU checks pass:96 world,29 configuration,14 checkpoint-filter and5 decoder
-checks, including new causal ancestry/derivatives/lane/header/size tests; strict
-core and binding Clippy pass. Native tests stay ignored until declared. Next
-package the separate runtime/runner and execute the bounded1,200s qualification.
-Root `/x/Temp/kindle-world-late-action-20261109`. No GPU job is active yet;
-no fixed learner or collector is selected. Keep all old runtimes immutable.
+Select the [fresh late-command learner](experiments/2026-11-09-breakout-world-late-action-learning.md):
+16,384 updates, same1M/RGB64/B8/T32/H16/Auto/41001, data and repeated plan as
+early physical features. Only intended recipe flag `rgb_late_action` changes;
+two shapes/initialization and native revision differ. Parameter total stays
+80/603,915. First qualified batch, plan callback and initial-reference binding
+pass CPU checks without a model. Root
+`/x/Temp/kindle-world-late-action-learning-20261109`. Next declare/start the
+single guarded training/restore queue and its CPU finisher. No collector,
+extension, branch query or automatic successor is selected. Keep all original
+dense and broader physics/event gates; checkpoint/draw selection is forbidden.
 
 The [closed real-history probe](results/2026-11-09-breakout-world-oracle-history.md)
-restores later LEFT/reversal predictions but some collision-adjacent frames fail;
-posterior and image history change together. Its native pass and original
-observer failure/separate CPU completion remain retained. The [edge audit](results/2026-11-09-breakout-world-edge-rebound.md)
-corrects the respawn attribution and establishes fitting examples, not a cause.
+restores later LEFT/reversal forecasts but misses some collision-adjacent frames;
+posterior and image history change together. The [edge audit](results/2026-11-09-breakout-world-edge-rebound.md)
+corrects the earlier respawn attribution. Their limits and original observer
+failure/separate CPU completion remain retained. The [early feature assessment](results/2026-11-09-breakout-world-action-features-branches.md)
+stays failed at .224881 versus one-hot .172366,296/304 nonending alarms.
 
-The [early action-feature assessment](results/2026-11-09-breakout-world-action-features-branches.md)
-remains failed at primary .224881 versus one-hot .172366 and296/304 nonending
-alarms. Keep that feature option default-off and preserve native1331b702/SHA15ea18b5
-with exact runtime-v2/runner. Full physics/events, brick memory, late/above-top
-coverage, untouched families and fresh confirmation remain required. Actor/critic,
-CDP and five-game work stay parked.
+The new flag and physical feature option stay default-off. Full physics/events,
+brick memory, late/above-top coverage, untouched families and fresh confirmation
+remain required. Actor/critic, CDP and five-game work stay parked.
 
 ### What would establish the world model
 
