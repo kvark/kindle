@@ -76,3 +76,11 @@ precision,natural calibration,persistent removed-brick memory,late/tunnel/
 second-wall/above-top coverage,untouched families andfresh confirmation. The
 full oracle lacks above-top endpoints. All prior trials/failures stay closed.
 Actor/critic,CDP comparison andthe five-game campaign remain parked.
+
+The [completed result](../results/2026-11-09-breakout-denoising-half-max-noise.md)
+fails its gates:ordinary1/1/0/2 of110,privileged one-step11/17/16/14 of198.
+The control haszero correct one-step balls,butnew ball detections fall to48/49/
+48/51 andmedian movement remains0. All57 final event weights/moments remain
+exact;qualification,first update,frozen/restore andthree guards pass. The trial
+isclosed withall evidence retained;no extension,broad learner or successor is
+selected. The limited gain cannot complete the full goal.

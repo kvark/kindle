@@ -21,27 +21,35 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [half-maximum-noise check](docs/experiments/2026-11-09-breakout-denoising-half-max-noise.md) is selected. Force half ofB32 to
-sigma5,withtwo forced-high/two original-law copies ofevery clip each update.
-This tests high-noise training coverage after the residual model copied previous
-ball positions. Same model/loss/sampler,rate1e-3,actual histories,target/pixel-noise
-order and2,048-update/65,536-target budget. Aggregate MSE isnot matched across
-mixtures;physical fitting gates remain unchanged. No rebuild ofgraph primitives.
+The [half-maximum-noise check](docs/results/2026-11-09-breakout-denoising-half-max-noise.md) is closed andfails:
+ordinary1/1/0/2 of110;privileged one-step11/17/16/14 of198 versus control0/198.
+New detections48/49/48/51 are fewer than control135/135/135/128;30–34 still match
+previous positions andmedian movement remains0. Onlyone source endpoint matches
+onall four diffusion draws (union36);these areone learner/reused data,not fresh
+seeds. Observed matches5/3/5/4 of8. Limited next-position gain isnot useful fitting.
 
-Optional half_max_noise defaultfalse preserves v1/v2/v3;true requiresv4.16 Rust
-CPU/394 packaged/four runner checks andstrict Clippy pass. Graph/loss source
-unchanged;new native needs guarded fresh pre-mixture initial parity before
-learning. Declare successfully before allocation;no GPU job launched yet. Root
-`/mnt/data/kindle-breakout-denoising-half-max-noise-20261109`.
+Optional half_max_noise defaultfalse preserves v1/v2/v3;true requiresv4. Force
+two ofeach clip'sfour noisy copies to sigma5,32,768 exposures,leavingtwo onthe
+original law. Pixel-noise draws/target order,model/loss/sampler unchanged;MSE
+averages across mixtures are not matched. Sourceccf09d7f/natived3b46c07.
+16 Rust CPU/394 packaged/4 runner checks andstrict Clippy pass. Fresh pre-mixture
+initial parity135 tensors/20 first-step arrays completes before learning;learner
+initial135/20 arrays exact. Firstandfinal57 event weights/moments match control.
+All134 declared/93 CPU analysis pins,135 frozen tensors and20 v4 restored arrays
+pass. Call/loop160.819s/185.468s;shared host/filesystem limits speed attribution.
 
-The [residual-frame control](docs/results/2026-11-09-breakout-denoising-frame-residual.md) stays closed andfailed:0/110 ordinary,
-0/198 one-step;detected balls135/135/135/128 all within1px ofprevious positions,
-median movement0,next-position error2.6px. All prior failures/repairs retained.
-Full physics/events/calibration,brick memory,late/tunnel/second-wall/above-top,
-untouched families andfresh confirmation remain required. No fitting score
-completes the goal. Actor/critic,CDP comparison andfive-game work stay parked.
-No extension,broad learner,collector or automatic successor. User-requested
-[cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115 GB;retained hardlinked evidence stays immutable.
+Closure261 pins/three guards/27 files/two terminal services;16 exact frames/
+1,376 endpoints and864 motion rows retained. Own2,814,996,842-byte build caches
+released. [Protocol](docs/experiments/2026-11-09-breakout-denoising-half-max-noise.md). Root
+`/mnt/data/kindle-breakout-denoising-half-max-noise-20261109`. No GPU job,
+unchanged extension,broad learner,collector or automatic successor selected.
+
+The [residual control](docs/results/2026-11-09-breakout-denoising-frame-residual.md) andall prior failures/repairs stay retained and
+closed. Full physics/events/calibration,brick memory,late/tunnel/second-wall/
+above-top,untouched families andfresh confirmation remain required. No fitting
+score completes the goal. Actor/critic,CDP comparison andfive-game work stay
+parked. User-requested [cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115 GB;retained hardlinked
+evidence stays immutable.
 
 ## Direction and retained results
 
