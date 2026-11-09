@@ -67,3 +67,8 @@ separate [frozen chosen-action assessment](../experiments/2026-11-09-breakout-wo
 It queries only the new final checkpoint, with no training, new emulator data,
 old-model query, budget extension or acceptance change. The complete Breakout
 world-model goal remains active and unproven.
+
+The subsequent frozen assessment is now closed and fails the broader gates:
+primary .224881281067 versus one-hot .172365704612. See its linked report and
+the [saved-survival diagnostic](2026-11-09-breakout-world-action-features-survival.md).
+The three dense passes above remain intermediate evidence only.

@@ -21,31 +21,32 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [frozen action-feature assessment](docs/results/2026-11-09-breakout-world-action-features-branches.md) is closed and fails:
-primary energy .224881281067 versus retained1M .172365704612 andrequired
-<=.127126664317. Ending Brier16/32 .022598/.340064;296/304 nonending cases have
-risk above5%. Chosen-action supported position improves at8/16/32,so those point
-metrics andthe failed joint score must stay distinct. All871 execution/235 audit/
-239 closure pins,240 frozen arrays,84 groups andone guard/nine sealed files pass;
-175.330s native,zero training/new emulator actions. Both services are terminal.
+unproven. The [action-feature assessment](docs/results/2026-11-09-breakout-world-action-features-branches.md) is closed and fails broader
+gates:primary .224881281067 versus retained1M .172365704612 andrequired
+<=.127126664317;296/304 nonending alarms above5%. Its [learner](docs/results/2026-11-09-breakout-world-action-features-learning.md) passes
+3/3 dense gates with106/112 observed,101/109 one-step and53/107 eight-step.
+Both allocations are terminal;keep the option default-off andno extension.
 
-The [learner](docs/results/2026-11-09-breakout-world-action-features-learning.md) stays closed at3/3 intermediate dense gates:106/112
-observed,101/109 one-step,53/107 eight-step,25/114 sixteen-step,11/95 thirty-two.
-Its measured loop1998.783s versus2369.265s is not an isolated speedup claim.
-Keep the feature option default-off;no extension orrepeated learner.
+The [CPU survival decomposition](docs/results/2026-11-09-breakout-world-action-features-survival.md) is also closed:ordinary .224881→
+oracle-assisted .185873 withunchanged images. Life-loss/respawn remains the
+largest residual category (.426554 oracle-assisted versus cached one-hot
+.025405);wall/brick interactions also regress,whilecontact improves. This
+locates functional failures,not their training cause. Oracle score substitutions
+are not learned repairs ornew gate passes. All312 inputs,6,720 cases/840 groups,
+420 ending checks and1e-12 reconstruction pass;4.760s CPU,zero new model queries,
+training or emulator work. The complete raw score failures remain unchanged.
 
-Select only the [CPU saved-survival decomposition](docs/experiments/2026-11-09-breakout-world-action-features-survival.md),holding new
-rendered forecasts fixed whilechecking original,same-mean,oracle-mean andall-alive
-survival weights. Use sealed math/fixtures and1e-12 reconstruction tolerance.
-Oracle substitutions are evaluation diagnostics,not a deployable model,gate pass
-or causal account of training failure. No GPU/model/emulator work is selected.
-Root `/x/Temp/kindle-world-action-features-survival-20261109`.
+Next inspect existing fitting support andsaved forecasts around life-loss/
+respawn before selecting another learning change. No GPU allocation,learner,
+collector orautomatic successor is active orselected. Do not repeat completed
+jobs. Preserve every original failure andseparately named repair inlinked reports.
 
-Retain exact native1331b702/SHA15ea18b5 andmatching runtime-v2/runner forfuture
-separately declared work. Preserve original failures andall regressions inlinked
-reports. Fullphysics/events/brickmemory,late/tunnel/second-wall/above-top,
-untouched families andfresh confirmation remain required. Actor/critic,CDP and
-five-game work stay parked. No automatic successor;do not repeat completed jobs.
+Retain exact native1331b702/SHA15ea18b5 andmatching runtime-v2/runner under
+`/x/Temp/kindle-world-action-features-20261109/native`. New AMD checkpoints and
+all evidence remain outside Git. Fulldistributional physics/action responses,
+natural event calibration,persistent brick memory,late/tunnel/second-wall/
+above-top,untouched families andfresh confirmation remain required. Actor/critic,
+CDP andfive-game work stay parked.
 
 ## Direction and retained results
 

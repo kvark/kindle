@@ -88,3 +88,8 @@ It substitutes evaluation weights whileholding images fixed;it does not repair
 a learned head orisolate a causal training defect. No learner isselected.
 Fullphysics,events,brickmemory,late-game/above-top,untouched families andfresh
 confirmation remain required. The full goal isactive andunproven.
+
+The subsequent [CPU diagnostic](2026-11-09-breakout-world-action-features-survival.md)
+is complete. Ordinary ball energy .224881 becomes .185873 under oracle-assisted
+survival,with life-loss/respawn the largest residual category. It does not alter
+any original score,gate orretention result.
