@@ -44,6 +44,8 @@ mod observation_code_tests;
 #[cfg(test)]
 mod posterior_correction_diagnostic;
 #[cfg(test)]
+mod posterior_history_tests;
+#[cfg(test)]
 mod previous_frame_tests;
 #[cfg(test)]
 mod spatial_decoder_tests;
@@ -67,6 +69,7 @@ pub enum PixelLoss {
     SquaredError,
     CrossEntropy,
     MotionCrossEntropy,
+    MotionPosteriorHistory,
     MotionImageFeedback,
     MotionEventRollout,
     MotionCleanPrior,
@@ -84,6 +87,7 @@ impl PixelLoss {
         matches!(
             self,
             Self::MotionCrossEntropy
+                | Self::MotionPosteriorHistory
                 | Self::MotionImageFeedback
                 | Self::MotionEventRollout
                 | Self::MotionCleanPrior
@@ -152,6 +156,10 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let posterior_history = metadata["pixel_loss"] == "motion_posterior_history";
+    if posterior_history != (metadata["format"] == "kindle-world-only-v21") {
+        return Err("posterior history requires checkpoint format v21".into());
+    }
     let local_action = metadata["config"]["rgb_spatial_action"] == true;
     let transport = metadata["config"]["rgb_spatial_transport"] == true;
     if (local_action && transport) != (metadata["format"] == "kindle-world-only-v19") {
@@ -163,15 +171,24 @@ fn checkpoint_pixel_loss(
     if local_action
         != matches!(
             metadata["format"].as_str(),
-            Some("kindle-world-only-v18" | "kindle-world-only-v19" | "kindle-world-only-v20")
+            Some(
+                "kindle-world-only-v18"
+                    | "kindle-world-only-v19"
+                    | "kindle-world-only-v20"
+                    | "kindle-world-only-v21"
+            )
         )
     {
         return Err(
-            "spatial action requires checkpoint format v18/v19/v20 and its decoder flag".into(),
+            "spatial action requires checkpoint format v18/v19/v20/v21 and its decoder flag".into(),
         );
     }
     let local_observation = metadata["format"] == "kindle-world-only-v20";
-    let local_objective = if local_observation {
+    let local_objective = if posterior_history {
+        metadata["prediction_length"]
+            .as_u64()
+            .is_some_and(|v| v > 0)
+    } else if local_observation {
         metadata["pixel_loss"] == "motion_cross_entropy"
             && metadata["prediction_length"].as_u64() == Some(0)
     } else {
@@ -252,6 +269,7 @@ fn checkpoint_pixel_loss(
                     | "kindle-world-only-v18"
                     | "kindle-world-only-v19"
                     | "kindle-world-only-v20"
+                    | "kindle-world-only-v21"
             )
         )
     {
@@ -268,11 +286,15 @@ fn checkpoint_pixel_loss(
                 | "kindle-world-only-v18"
                 | "kindle-world-only-v19"
                 | "kindle-world-only-v20"
+                | "kindle-world-only-v21"
         )
     ) && (!fusion
         || metadata["config"]["rgb_spatial_decoder"] != true
         || metadata["config"]["world_image_feedback"] == true
-        || (!event_rollout && !clean_prior && metadata["pixel_loss"] != "motion_cross_entropy"))
+        || (!event_rollout
+            && !clean_prior
+            && !posterior_history
+            && metadata["pixel_loss"] != "motion_cross_entropy"))
     {
         return Err("invalid spatial fusion checkpoint architecture or objective".into());
     }
@@ -308,9 +330,13 @@ fn checkpoint_pixel_loss(
                 | "kindle-world-only-v18"
                 | "kindle-world-only-v19"
                 | "kindle-world-only-v20"
+                | "kindle-world-only-v21"
         )
     ) && (!spatial
-        || (!event_rollout && !clean_prior && metadata["pixel_loss"] != "motion_cross_entropy")
+        || (!event_rollout
+            && !clean_prior
+            && !posterior_history
+            && metadata["pixel_loss"] != "motion_cross_entropy")
         || metadata["config"]["world_gaussian"] == true
         || metadata["config"]["rgb_previous_frame"] == true
         || metadata["config"]["rgb_latent_only"] == true)
@@ -418,7 +444,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v17"
             | "kindle-world-only-v18"
             | "kindle-world-only-v19"
-            | "kindle-world-only-v20",
+            | "kindle-world-only-v20"
+            | "kindle-world-only-v21",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -639,12 +666,20 @@ impl WorldModelLearner {
         {
             return Err("invalid fixed teacher objective, source or geometry".into());
         }
+        if pixel_loss == PixelLoss::MotionPosteriorHistory
+            && (!config.rgb_spatial_action || prediction_length == 0)
+        {
+            return Err(
+                "posterior history requires local action and a positive suffix length".into(),
+            );
+        }
         if config.world_gaussian && pixel_loss != PixelLoss::MotionCrossEntropy {
             return Err("Gaussian world requires the motion RGB objective without a phase".into());
         }
         if config.rgb_spatial_action
             && !((pixel_loss == PixelLoss::MotionEventRollout && prediction_length > 0)
-                || (pixel_loss == PixelLoss::MotionCrossEntropy && prediction_length == 0))
+                || (pixel_loss == PixelLoss::MotionCrossEntropy && prediction_length == 0)
+                || (pixel_loss == PixelLoss::MotionPosteriorHistory && prediction_length > 0))
         {
             return Err(
                 "spatial action requires H0 motion cross-entropy or a positive suffix event objective"
@@ -686,6 +721,7 @@ impl WorldModelLearner {
             && !matches!(
                 pixel_loss,
                 PixelLoss::MotionCrossEntropy
+                    | PixelLoss::MotionPosteriorHistory
                     | PixelLoss::MotionImageFeedback
                     | PixelLoss::MotionEventRollout
                     | PixelLoss::MotionCleanPrior
@@ -720,6 +756,7 @@ impl WorldModelLearner {
             (
                 PixelLoss::CrossEntropy
                 | PixelLoss::MotionCrossEntropy
+                | PixelLoss::MotionPosteriorHistory
                 | PixelLoss::MotionImageFeedback
                 | PixelLoss::MotionEventRollout
                 | PixelLoss::MotionCleanPrior
@@ -1006,7 +1043,8 @@ impl WorldModelLearner {
                         .set_input(&format!("{name}_uniforms_{time}"), &uniforms);
                 }
             }
-            if (self.pixel_loss.fixed_teacher() || !self.pixel_loss.recurrent_energy())
+            if self.pixel_loss != PixelLoss::MotionPosteriorHistory
+                && (self.pixel_loss.fixed_teacher() || !self.pixel_loss.recurrent_energy())
                 && (!self.pixel_loss.latent_overshooting() || time + 1 < weights.len())
             {
                 let uniforms = super::gaussian::noise(&self.config, &mut self.rollout_rng);
@@ -1320,7 +1358,9 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.rgb_spatial_action && self.config.rgb_spatial_transport {
+        let format = if self.pixel_loss == PixelLoss::MotionPosteriorHistory {
+            "kindle-world-only-v21"
+        } else if self.config.rgb_spatial_action && self.config.rgb_spatial_transport {
             "kindle-world-only-v19"
         } else if self.config.rgb_spatial_action {
             if self.prediction_length == 0 {

@@ -11,8 +11,21 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 The goal **prove the world model training on Breakout** is active and unproven.
 Actor/critic,CDP comparison and the five-game campaign remain parked. Native
 pixel supervision and global H0 remain the inspectable reference;no pretrained
-encoder or object/RAM training labels. No GPU allocation or next learner is
-active or selected.
+encoder or object/RAM training labels. The [posterior-conditioned generated-history
+objective](experiments/2026-11-09-breakout-world-posterior-history.md) is
+implemented for a bounded fresh2,048-update check,not an extension. v21/local
+action,size1M/RGB64/B8/T32,suffix16,Auto,rates4e-4,RGB1,KL1/.1/free-nat1,
+observed events1,mixing.01. Add suffix reconstruction with actual posterior
+states andself-generated past images;no independent prior future/image loss.
+Same80/603,915 parameters andinference,no new primitive/actor/critic.
+Three repaired new CPU checks,13 affected header checks,strict core Clippy and
+326 installed-package CPU checks pass. Original compile/allowlist/fixture
+failures andintermediate wheels remain as recorded;the first unqualified wheel
+was overwritten before retention,with source/log preserved. New2,048-row prefix
+counted once across496 streams;56,189 unique arrivals. First actual update must
+pass finite/total/initial240+18/changed-family checks before another update.
+Root `/mnt/data/kindle-breakout-world-posterior-history-20261109`;no GPU allocation
+yet. No extension,sweep or automatic successor.
 
 The [one-time refresh diagnostic](results/2026-11-09-breakout-world-refresh.md) is closed. Only frozen local H0/RGB1 final16,384,first16 fitting/16 development
 origins,four draws. One history/latent/both correction before action4 uses true

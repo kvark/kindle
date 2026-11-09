@@ -13,6 +13,7 @@ use super::networks::{
 };
 use super::world_learner::PixelLoss;
 use crate::vision::levjepa::joint;
+mod posterior_history;
 mod prior_continuation;
 #[cfg(test)]
 mod prior_reward;
@@ -1277,6 +1278,23 @@ fn training_graph(
                 config.observation_dim(),
             )
         });
+        if pixel_loss == PixelLoss::MotionPosteriorHistory {
+            let states = (start..length)
+                .map(|t| feature(&mut graph, deters[t], stochs[t], batch, config))
+                .collect::<Vec<_>>();
+            return posterior_history::build(
+                &mut graph,
+                config,
+                &model,
+                posterior_history::Sequence {
+                    posterior: &states,
+                    actions: &actions[start..],
+                    observations: &observations[start - 1..],
+                    keeps: &spatial_keeps[start..],
+                    history: history.unwrap(),
+                },
+            );
+        }
         pixel_rollout::build_with_feedback(
             &mut graph,
             config,
