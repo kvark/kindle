@@ -21,29 +21,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. [Four generated training-history frames](docs/results/2026-11-09-breakout-full-causal-prefix.md) closes negatively:
-ordinary27/29/19/31 of110 versusclean B8's33/31/29/28;one-step139/139/140/146
-of198 versus178/174/176/173.2/24 gates pass,both ordinary horizon1;all16-step
-endpoints fail. Retain B32/reward32 as ordinary reference andclean B8 as distinct
-fitting evidence. Generated-prefix training didnot repair rollouts inthis recipe.
+unproven. Select [recurrent contact rehearsal with broad replay](docs/experiments/2026-11-09-breakout-world-contact-rehearsal.md).
+Warm-start original accurately fitting contact2048,then6,144 newupdates to8192:
+3,072 broad updates alternate3,072 contact updates. Same8.85M recurrent world,
+H16 motion CE/native85dbe150/SHA5b112866,no build/config override. This changes
+replay composition fromthe closed pure-broad curriculum,which failed;no old
+stage repeats. Checkpoints omit full RNG/replay/belief;not fresh confirmation.
 
-Fresh8,192 updates/65,536 targets;after4,096 clean updates,13,424 exposures use
-four causal generated prefix frames.16 caches/368 queries/11,776 imagined frames,
-no emulator experience.9,042/12,122 supported augmented targets have no detectable
-ball inthe last generated frame;not proof ofcomplete information loss orcause.
-Every cache/source/action/seed/age and1,678 training join verifies.135 initial/
-first/2036/4084 tensors,six first losses,20 initial/2036/4084 model arrays,135 own
-frozen/20 restore arrays exact;8,192 finite loss rows/all45 parameters change.
-128 declaration/247 closure pins,two guards/18 files,one terminal successful
-service. Calls218.693s,cache40.020s,loop270.376s versus228.929s clean B8.
-Native60b9b672/source8dbf9ab5 reused,no build. Root
-`/mnt/data/kindle-breakout-full-causal-prefix-20261109`.
+CPU plan/data/config/source checks pass:32,820 broad+256 contact unique arrivals,
+759,269 valid suffix targets,3,570 terminals,6,078 positive suffix rewards.
+Original384 dense final origins/selections stay. Reuse cached warm-initial dense
+controls;require204 initial/frozen tensors,32 initial contact arrays,18 development/
+32 contact restore arrays exact. Keep allcontact/broad physics/event/brick gates;
+only afterboth contact/dense gates pass mayfinal oracle assessment be separately
+declared. One service,two guards,2400s/600s caps. Root
+`/mnt/data/kindle-breakout-world-contact-rehearsal-20261109`.
 
-The separate [recurrent contact fit](docs/results/2026-11-08-breakout-world-contact-fit.md) remains110/110 across four draws;
-its architecture/loss/target budget differs andit isnot generalization proof.
-All jobs stopped;allprior trials stayclosed,fullres staysprotocol-failed. No
-learner,extension,collector orautomatic successor selected. Full physics/events,
-natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
+[Four generated pixel-history frames](docs/results/2026-11-09-breakout-full-causal-prefix.md) staysnegative:ordinary
+27/29/19/31 of110,one-step139/139/140/146 of198,2/24 gates. Retain B32/reward32
+as pixel ordinary reference andclean B8 as fitting evidence. Allprevious jobs
+stayclosed;fullres staysprotocol-failed. No automatic successor. Full physics/
+events,natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
 untouched families andfresh confirmation remain required. No fitting score
 completes thegoal. Actor/critic,CDP comparison andfive-game work stayparked.
 [Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
