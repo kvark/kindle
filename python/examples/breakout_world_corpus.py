@@ -35,7 +35,12 @@ FIXED_IMAGE_OBJECTIVE = 'motion_fixed_teacher_image'
 PREDICTIVE_OBJECTIVES = (PREDICTIVE_OBJECTIVE, SCORE_FUNCTION_OBJECTIVE)
 
 
-def report_names(pixel_loss, prediction_length):
+def report_names(pixel_loss, prediction_length, *, color_centroid=False):
+    if color_centroid:
+        if pixel_loss != 'motion_cross_entropy' or prediction_length <= 0:
+            raise ValueError('world centroid requires a positive motion RGB suffix')
+        return LOSS_NAMES + ('observed_centroid', 'observed_centroid_valid_fraction',
+                             'future_centroid', 'future_centroid_valid_fraction')
     if pixel_loss == 'motion_posterior_history':
         if not prediction_length: raise ValueError('posterior history requires a positive suffix length')
         return LOSS_NAMES[:9]+('posterior_history_reconstruction','posterior_history_valid_fraction')
@@ -73,6 +78,13 @@ def report_names(pixel_loss, prediction_length):
 
 def reported_total(config, values, pixel_loss, prediction_length):
     scales = config['loss_scales']
+    centroid = config.get('color_centroid_supervision')
+    if centroid is not None:
+        assert len(values) == len(report_names(pixel_loss, prediction_length, color_centroid=True))
+        return (scales['reconstruction']*(values[1]+values[9])
+                +scales['dynamics']*values[2]+scales['representation']*values[3]
+                +scales['reward']*values[4]+scales['continuation']*values[5]
+                +centroid['scale']*(values[11]+values[13]))
     if pixel_loss in (FIXED_TEACHER_OBJECTIVE, FIXED_EVENTS_OBJECTIVE):
         total = (scales['reconstruction']*(values[1]+values[10])
             +scales['dynamics']*(values[2]+values[9])+scales['representation']*values[3]
@@ -307,7 +319,8 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             values = learner.learn(observed, *[batch[key].ravel().tolist() for key in ('action', 'reward', 'terminal')])
             native_seconds += time.monotonic()-tick
             keep = rollout_validity(batch['action'], args.prediction_length)
-            assert len(values) == len(report_names(args.pixel_loss, args.prediction_length))
+            assert len(values) == len(report_names(args.pixel_loss, args.prediction_length,
+                color_centroid=config.get('color_centroid_supervision') is not None))
             if args.prediction_length and args.pixel_loss not in (RECURRENT_OBJECTIVE,FIXED_TEACHER_OBJECTIVE,FIXED_EVENTS_OBJECTIVE): assert values[10] == float(keep.mean())
             if args.pixel_loss == 'motion_clean_prior': assert values[13] == float((batch['action'] >= 0).mean())
             if args.pixel_loss in (FIXED_TEACHER_OBJECTIVE,FIXED_EVENTS_OBJECTIVE):
@@ -426,7 +439,8 @@ def initial_check(args, config, fitting, development, *, locations=None):
                              allow_resets=True, retain_initial_targets=True)
     values = learner.learn(pixels(batch['rgb'].astype(np.float32)/255-.5),
         *[batch[key].ravel().tolist() for key in ('action', 'reward', 'terminal')])
-    assert len(values) == len(report_names(args.pixel_loss, args.prediction_length)) and np.isfinite(values).all() and learner.updates == 1
+    assert len(values) == len(report_names(args.pixel_loss, args.prediction_length,
+        color_centroid=config.get('color_centroid_supervision') is not None)) and np.isfinite(values).all() and learner.updates == 1
     if args.pixel_loss in PREDICTIVE_OBJECTIVES or args.pixel_loss == RECURRENT_OBJECTIVE:
         valid = rollout_validity(batch['action'],args.prediction_length) if args.pixel_loss == RECURRENT_OBJECTIVE else batch['action'] >= 0
         assert values[12] == float(valid.mean())
@@ -488,7 +502,8 @@ def main():
         raise ValueError('all eighteen commands must be represented in fitting and development corpora')
     fit_seeds = {row['seed'] for row in fit_manifest['files']}
     assert not fit_seeds.intersection(row['seed'] for row in dev_manifest['files'])
-    write(args.output/'declaration.json', dict(mode=args.mode, config=config, loss_names=report_names(args.pixel_loss, args.prediction_length),
+    write(args.output/'declaration.json', dict(mode=args.mode, config=config, loss_names=report_names(args.pixel_loss, args.prediction_length,
+        color_centroid=config.get('color_centroid_supervision') is not None),
         prediction_length=args.prediction_length, pixel_loss=args.pixel_loss, steps=args.steps, eval_every=args.eval_every,
         source_sha256=sha(__file__), fitting_manifest_sha256=sha(args.dataset/'manifest.json'),
         development_manifest_sha256=sha(args.development/'manifest.json'), started_unix=time.time()))

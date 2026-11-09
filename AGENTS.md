@@ -21,31 +21,29 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. [Contact rehearsal](docs/results/2026-11-09-breakout-world-contact-rehearsal.md) preserves110/110 onallfour original
-contact draws/all24 gates,butbroader development scores62/112 observed,9/109
-one-step,3/107 eight-step;allthree broad gates fail. Broad fitting also staysweak:
-108/163 observed,33/177 one-step,13/176 eight-step. Preserving these fitted
-trajectories doesnot establish broader dynamics orisolate the failure cause.
-Keep H0 as broad recurrent reference;the original contactfit remains fitting-only.
+unproven. Select [pixel-derived centroid supervision](docs/experiments/2026-11-09-breakout-world-centroid.md) fornative
+qualification:shared linear state→xy head,observed andcausal future losses.
+Existing RGB-derived color/region targets encode game-specific supervision,
+not emulator inputs orunguided representation learning. Default off,plain
+categorical motion RGB suffix only,checkpointv22. Add5,122 weights:70 logical/
+8,857,797 scalars/210 checkpoint tensors at12M. RGB inference shapes stay.
 
-Warm-start contact2048,then6,144 newupdates to8192:3,072 broad and3,072 contact.
-759,269 valid suffix targets,3,570 terminals,6,078 positives;32,820 broad+256
-contact unique arrivals. Source/order/exposure differs frompure-broad curriculum,
-not a matched-experience orfresh-seed comparison. Calls566.641s,loop700.916s,
-plusinherited186.289s/191.500s.204 initial/frozen tensors,32 initial contact
-arrays,18 development/32 contact restore arrays exact;6,144 finite loss rows/
-68 weights changed.160 declaration/346 closure pins,two guards/18 files,one
-terminal successful service. CPU plotting import failure stayswithseparate
-offline-cache repair;no native stage/audit repeats. Native85dbe150/SHA5b112866,
-no build. Root `/mnt/data/kindle-breakout-world-contact-rehearsal-20261109`.
+CPU target audit matcheswithin1px on14,114/14,125 fitting,8,511/8,518 supplement,
+7,014/7,020 development supported arrivals;allunsupported mass-valid labels stay
+explicit. CPU world tests pass139 with40 GPU tests ignored;initial fixture
+compile/prefix-name failures remain withrepaired logs/source. Strict core/binding Clippy and19 packaged Python checks pass. Pin bounded native
+masked values/derivatives/full-shape update/restore qualification next. No native
+allocation orlearner selected yet.
+Root `/mnt/data/kindle-breakout-world-centroid-20261109`.
 
-Conditional oracle assessment isnot allocated becausebroad gates fail. Alljobs
-stopped,no learner/extension/collector/automatic successor selected. Pixel B32/
-reward32 ordinary andclean B8 fitting evidence remain separate;allprior jobs
-stayclosed,fullres staysprotocol-failed. Full physics/events,natural calibration,
-changed-brick memory,late/tunnel/second-wall/above-top,untouched families and
-fresh confirmation remain required. No fitting score completes thegoal.
-Actor/critic,CDP comparison andfive-game work stayparked.
+[Contact rehearsal](docs/results/2026-11-09-breakout-world-contact-rehearsal.md) remains24/24 contacts/110 perdraw,butbroad
+0/3 gates;fitting13/176 anddevelopment3/107 eight-step matches. H0 remains broad
+recurrent reference. Allprior jobs stayclosed,fullres staysprotocol-failed.
+Potential fresh RGB1/centroid1000 learning requires reviewed qualification and
+separate declaration;no automatic successor. Full physics/events,natural
+calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
+families andfresh confirmation remain required. No diagnostic/fitting score
+completes thegoal. Actor/critic,CDP comparison andfive-game work stayparked.
 [Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
 
 ## Direction and retained results

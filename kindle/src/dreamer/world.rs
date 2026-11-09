@@ -62,6 +62,7 @@ pub(crate) const LOSS_WORLD_ROLLOUT: usize = 25;
 pub(crate) const LOSS_PREDICTIVE_WORLD: usize = 26;
 pub(crate) const LOSS_RECURRENT_WORLD: usize = 30;
 pub(crate) const LOSS_IMAGE_FEEDBACK: usize = 34;
+pub(crate) const LOSS_WORLD_CENTROID: usize = 37;
 pub(crate) const CLEAN_PRIOR_VALID_FRACTION: usize = 36;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
@@ -416,7 +417,7 @@ fn training_graph(
             "world.color_centroid",
             config.feature_dim(),
             size.units,
-            1,
+            usize::from(behavior),
             2,
         )
     });
@@ -1295,7 +1296,7 @@ fn training_graph(
                 },
             );
         }
-        pixel_rollout::build_with_feedback(
+        pixel_rollout::build_with_centroid(
             &mut graph,
             config,
             &model,
@@ -1310,6 +1311,7 @@ fn training_graph(
                     reward: &rollout_reward_targets[start..],
                     continuation: &rollout_continuation_targets[start..],
                 }),
+            centroid_head.as_ref(),
         )
     });
     let total = if let Some(rollout) = &pixel_rollout {
@@ -1320,6 +1322,13 @@ fn training_graph(
             let continuation = graph.scale(continuation, config.loss_scales.continuation);
             total = graph.add(total, reward);
             total = graph.add(total, continuation);
+        }
+        if let Some([centroid, _]) = rollout.centroid {
+            let scaled = graph.scale(
+                centroid,
+                config.color_centroid_supervision.as_ref().unwrap().scale,
+            );
+            total = graph.add(total, scaled);
         }
         total
     } else {
@@ -1461,6 +1470,12 @@ fn training_graph(
                 outputs.push(graph.scalar(0.0));
             }
             outputs.extend(events);
+        }
+        if let Some(centroid) = rollout.centroid {
+            while outputs.len() < LOSS_WORLD_CENTROID {
+                outputs.push(graph.scalar(0.0));
+            }
+            outputs.extend(centroid);
         }
     }
     if let Some(rollout) = latent_rollout {

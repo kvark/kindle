@@ -81,7 +81,26 @@ pub(super) fn loss(
     rows: usize,
     side: usize,
 ) -> (NodeId, NodeId) {
+    loss_with_weight(graph, settings, pixels, prediction, rows, side, None)
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn loss_with_weight(
+    graph: &mut Graph,
+    settings: &ColorCentroidSupervision,
+    pixels: NodeId,
+    prediction: NodeId,
+    rows: usize,
+    side: usize,
+    weight: Option<NodeId>,
+) -> (NodeId, NodeId) {
     let (target, valid) = targets(graph, settings, pixels, rows, side);
+    let valid = if let Some(weight) = weight {
+        let weight = graph.stop_gradient(weight);
+        graph.mul(valid, weight)
+    } else {
+        valid
+    };
     let error = graph.sub(prediction, target);
     let squared = graph.mul(error, error);
     let per_row = graph.sum_inner(squared);
@@ -378,5 +397,122 @@ mod tests {
         assert!((valid_fraction[0] - 0.5).abs() <= f32::EPSILON);
         assert_eq!(session.read_params(&["prediction"])[0], predictions);
         eprintln!("F64 color centroid targets/loss/gradients and exact absent-row zeros pass");
+    }
+}
+
+#[cfg(test)]
+mod masked_tests {
+    use super::*;
+    use meganeura::reference::{Feeds, evaluate};
+    #[test]
+    fn suffix_weights_mask_loss_validity_and_gradients_with_f64_reference() {
+        let mut g = Graph::new();
+        let pixels = g.parameter("pixels", &[2, 3 * 16]);
+        let prediction = g.parameter("prediction", &[2, 2]);
+        let keep = g.parameter("keep", &[2, 1]);
+        let settings = ColorCentroidSupervision {
+            scale: 1.,
+            channel: 0,
+            background_scale: 1.5,
+            region: [0., 0., 1., 1.],
+        };
+        let (loss, valid) =
+            loss_with_weight(&mut g, &settings, pixels, prediction, 2, 4, Some(keep));
+        g.set_outputs(vec![loss, valid]);
+        let mut images = vec![-0.5; 2 * 3 * 16];
+        images[6] = 0.5;
+        images[3 * 16 + 2 * 4 + 1] = 0.5;
+        let mut f = Feeds::new();
+        f.set("pixels", &images)
+            .set("prediction", &[0., 0., 0.4, -0.4])
+            .set("keep", &[1., 0.]);
+        let out = evaluate(&g, &f).unwrap();
+        assert!(
+            (out[loss as usize].data[0] - (0.125_f64.powi(2) + (-0.125_f64).powi(2)) / 2.).abs()
+                < 1e-8
+        );
+        assert_eq!(out[valid as usize].data, [0.5]);
+        g.set_outputs(vec![loss]);
+        let b = meganeura::autodiff::differentiate(&g);
+        let v = evaluate(&b, &f).unwrap();
+        assert!(v[b.outputs()[1] as usize].data.iter().all(|&x| x == 0.));
+        assert_eq!(v[b.outputs()[2] as usize].data, [-0.125, 0.125, 0., 0.]);
+        assert!(v[b.outputs()[3] as usize].data.iter().all(|&x| x == 0.));
+    }
+}
+
+#[cfg(test)]
+mod native_masked_tests {
+    use super::*;
+    #[test]
+    #[ignore = "requires separately guarded GPU; masked centroid values and gradients"]
+    fn native_suffix_centroid_mask_and_gradient() {
+        let mut graph = Graph::new();
+        let pixels = graph.parameter("pixels", &[2, 3 * 32 * 32]);
+        let prediction = graph.parameter("prediction", &[2, 2]);
+        let weight = graph.parameter("keep", &[2, 1]);
+        let settings = ColorCentroidSupervision {
+            scale: 7.,
+            channel: 0,
+            background_scale: 1.5,
+            region: [0., 0., 1., 1.],
+        };
+        let (loss, valid) = loss_with_weight(
+            &mut graph,
+            &settings,
+            pixels,
+            prediction,
+            2,
+            32,
+            Some(weight),
+        );
+        let total = graph.scale(loss, settings.scale);
+        graph.set_outputs(vec![total, loss, valid]);
+        let gpu = std::sync::Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!gpu.device_information().is_software_emulated);
+        let mut session = super::super::super::runtime::build_session(
+            &graph,
+            &gpu,
+            meganeura::Mode::Training,
+            false,
+        );
+        let mut images = vec![-0.5; 2 * 3 * 32 * 32];
+        images[20 * 32 + 10] = 0.5;
+        images[3 * 32 * 32 + 10 * 32 + 20] = 0.5;
+        let predictions = [0.05_f32, -0.12, 0.15, 0.2];
+        session.set_parameter("pixels", &images);
+        session.set_parameter("prediction", &predictions);
+        session.set_parameter("keep", &[1., 0.]);
+        session.step();
+        session.wait();
+        assert!(!session.has_param_grad("pixels") && !session.has_param_grad("keep"));
+        let target = [10.5 / 32. - 0.5, 20.5 / 32. - 0.5];
+        let expected = (0..2)
+            .map(|i| (f64::from(predictions[i]) - target[i]).powi(2) / 2.)
+            .sum::<f64>();
+        assert!((f64::from(session.read_loss()) - 7. * expected).abs() < 1e-5);
+        let mut raw = [0.];
+        let mut fraction = [0.];
+        session.read_output_by_index(1, &mut raw);
+        session.read_output_by_index(2, &mut fraction);
+        assert!((f64::from(raw[0]) - expected).abs() < 3e-6);
+        assert_eq!(fraction, [0.5]);
+        let mut gradient = [0.; 4];
+        session.read_param_grad("prediction", &mut gradient);
+        for i in 0..2 {
+            assert!(
+                (f64::from(gradient[i]) - 7. * (f64::from(predictions[i]) - target[i])).abs()
+                    < 1e-5
+            );
+        }
+        assert_eq!(&gradient[2..], &[0., 0.]);
+        assert_eq!(session.read_params(&["prediction"])[0], predictions);
+        eprintln!(
+            "Masked F64 centroid values/gradients,detached targets/weights andexact masked zeros pass"
+        );
     }
 }

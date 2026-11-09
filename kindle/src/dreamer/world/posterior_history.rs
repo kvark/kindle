@@ -62,6 +62,7 @@ pub(super) fn build(
     pixel_rollout::PixelRollout {
         loss,
         events: None,
+        centroid: None,
         #[cfg(test)]
         states: posterior.to_vec(),
         #[cfg(test)]

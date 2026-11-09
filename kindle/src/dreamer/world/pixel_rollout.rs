@@ -5,6 +5,7 @@ use super::*;
 pub(super) struct PixelRollout {
     pub loss: NodeId,
     pub events: Option<[NodeId; 2]>,
+    pub centroid: Option<[NodeId; 2]>,
     #[cfg(test)]
     pub states: Vec<NodeId>,
     #[cfg(test)]
@@ -99,7 +100,34 @@ pub(super) fn build_with_history(
 }
 
 #[allow(clippy::too_many_arguments)]
+#[cfg(test)]
 pub(super) fn build_with_feedback(
+    graph: &mut Graph,
+    config: &DreamerConfig,
+    model: &WorldModel,
+    initial: (NodeId, NodeId),
+    actions: &[NodeId],
+    observations: &[NodeId],
+    pixel_loss: PixelLoss,
+    history: Option<NodeId>,
+    targets: Option<EventTargets<'_>>,
+) -> PixelRollout {
+    build_with_centroid(
+        graph,
+        config,
+        model,
+        initial,
+        actions,
+        observations,
+        pixel_loss,
+        history,
+        targets,
+        None,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn build_with_centroid(
     graph: &mut Graph,
     config: &DreamerConfig,
     model: &WorldModel,
@@ -109,6 +137,7 @@ pub(super) fn build_with_feedback(
     pixel_loss: PixelLoss,
     mut history: Option<NodeId>,
     targets: Option<EventTargets<'_>>,
+    centroid_head: Option<&MlpHead>,
 ) -> PixelRollout {
     assert_eq!(config.rgb_spatial_decoder, history.is_some());
     assert_eq!(pixel_loss.rollout_events(), targets.is_some());
@@ -126,6 +155,7 @@ pub(super) fn build_with_feedback(
         .expect("RGB rollout requires decoder");
     let mut losses = Vec::new();
     let mut event_losses = Vec::new();
+    let mut centroid_losses = Vec::new();
     #[cfg(test)]
     let mut states = Vec::new();
     #[cfg(test)]
@@ -243,14 +273,31 @@ pub(super) fn build_with_feedback(
                 weight,
             ));
         }
-        let loss = if pixel_loss.motion_attention() {
-            let weight = event_weight.unwrap_or_else(|| {
+        let weight = (pixel_loss.motion_attention() || centroid_head.is_some()).then(|| {
+            event_weight.unwrap_or_else(|| {
                 graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1])
-            });
-            motion_loss(graph, squared, observation, previous, weight)
+            })
+        });
+        if let Some(head) = centroid_head {
+            let prediction = head.forward(graph, belief);
+            let (loss, valid) = color_centroid::loss_with_weight(
+                graph,
+                config.color_centroid_supervision.as_ref().unwrap(),
+                observation,
+                prediction,
+                batch,
+                config.observation_grid(),
+                weight,
+            );
+            centroid_losses.push([loss, valid]);
+        }
+        let loss = if pixel_loss.motion_attention() {
+            motion_loss(graph, squared, observation, previous, weight.unwrap())
         } else {
             let per_row = graph.sum_inner(squared);
-            let weight = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
+            let weight = weight.unwrap_or_else(|| {
+                graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1])
+            });
             let weight = graph.stop_gradient(weight);
             let weighted = graph.mul(per_row, weight);
             graph.sum_all(weighted)
@@ -269,6 +316,16 @@ pub(super) fn build_with_feedback(
     PixelRollout {
         loss,
         events,
+        centroid: centroid_head.map(|_| {
+            [0, 1].map(|index| {
+                let values = centroid_losses
+                    .iter()
+                    .map(|row| row[index])
+                    .collect::<Vec<_>>();
+                let value = sum(graph, &values);
+                graph.scale(value, 1.0 / actions.len() as f32)
+            })
+        }),
         #[cfg(test)]
         states,
         #[cfg(test)]
@@ -282,6 +339,73 @@ mod image_feedback_tests;
 mod motion_tests;
 #[cfg(test)]
 mod suffix_event_tests;
+
+#[cfg(test)]
+mod centroid_tests {
+    use super::*;
+    use std::collections::HashSet;
+
+    #[test]
+    fn future_centroid_targets_and_masks_never_enter_prior_states() {
+        let mut c = DreamerConfig::tiny(3);
+        c.observation_kind = ObservationKind::Rgb32;
+        c.batch_size = 2;
+        c.color_centroid_supervision =
+            Some(super::super::super::config::ColorCentroidSupervision {
+                scale: 1000.,
+                channel: 0,
+                background_scale: 1.5,
+                region: [0., 0., 1., 1.],
+            });
+        let mut g = Graph::new();
+        let size = c.network();
+        let model = WorldModel::with_behavior(&mut g, &c, false);
+        let head = MlpHead::new(
+            &mut g,
+            "world.color_centroid",
+            c.feature_dim(),
+            size.units,
+            0,
+            2,
+        );
+        let h = g.input("initial_h", &[2, size.deter]);
+        let z = g.input("initial_z", &[2, size.stoch * size.classes]);
+        let actions = (0..2)
+            .map(|i| g.input(&format!("action_{i}"), &[2, 3]))
+            .collect::<Vec<_>>();
+        let images = (0..3)
+            .map(|i| g.input(&format!("image_{i}"), &[2, c.observation_dim()]))
+            .collect::<Vec<_>>();
+        let result = build_with_centroid(
+            &mut g,
+            &c,
+            &model,
+            (h, z),
+            &actions,
+            &images,
+            PixelLoss::MotionCrossEntropy,
+            None,
+            None,
+            Some(&head),
+        );
+        for (i, &state) in result.states.iter().enumerate() {
+            let mut seen = HashSet::new();
+            let mut todo = vec![state];
+            while let Some(n) = todo.pop() {
+                if seen.insert(n) {
+                    todo.extend(g.node(n).inputs.iter().copied());
+                }
+            }
+            assert!(seen.contains(&actions[i]));
+            assert!(images.iter().all(|image| !seen.contains(image)));
+            if i == 0 {
+                assert!(!seen.contains(&actions[1]));
+            }
+            assert!(g.nodes().iter().enumerate().filter(|(_,n)|matches!(&n.op,meganeura::graph::Op::Input{name} if name.starts_with("pixel_rollout_weight_"))).all(|(id,_)|!seen.contains(&(id as NodeId))));
+        }
+        assert!(result.centroid.is_some());
+    }
+}
 
 #[cfg(test)]
 mod tests {

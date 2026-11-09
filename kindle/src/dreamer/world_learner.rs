@@ -22,6 +22,8 @@ use fixed_teacher::TeacherAnchor;
 #[cfg(test)]
 mod action_transport_tests;
 #[cfg(test)]
+mod centroid_tests;
+#[cfg(test)]
 mod clean_prior_tests;
 #[cfg(test)]
 mod fixed_event_tests;
@@ -156,6 +158,24 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let centroid = !metadata["config"]["color_centroid_supervision"].is_null();
+    if centroid != (metadata["format"] == "kindle-world-only-v22") {
+        return Err("world centroid supervision requires checkpoint format v22".into());
+    }
+    if centroid
+        && (metadata["pixel_loss"] != "motion_cross_entropy"
+            || metadata["prediction_length"].as_u64().unwrap_or(0) == 0
+            || [
+                "world_gaussian",
+                "rgb_spatial_decoder",
+                "rgb_previous_frame",
+                "rgb_latent_only",
+            ]
+            .iter()
+            .any(|key| metadata["config"][key] == true))
+    {
+        return Err("world centroid requires a plain categorical motion RGB suffix".into());
+    }
     let posterior_history = metadata["pixel_loss"] == "motion_posterior_history";
     if posterior_history != (metadata["format"] == "kindle-world-only-v21") {
         return Err("posterior history requires checkpoint format v21".into());
@@ -445,7 +465,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v18"
             | "kindle-world-only-v19"
             | "kindle-world-only-v20"
-            | "kindle-world-only-v21",
+            | "kindle-world-only-v21"
+            | "kindle-world-only-v22",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -516,7 +537,6 @@ fn validate_config(config: &DreamerConfig) -> Result<(), &'static str> {
         || config.loss_scales.policy != 0.0
         || config.loss_scales.value != 0.0
         || config.open_loop_supervision.is_some()
-        || config.color_centroid_supervision.is_some()
         || config.prior_reward_scale.is_some()
         || config.prior_continuation_scale.is_some()
     {
@@ -660,6 +680,16 @@ impl WorldModelLearner {
         pixel_loss: PixelLoss,
         fixed_teacher: Option<TeacherAnchor>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        if config.color_centroid_supervision.is_some()
+            && (pixel_loss != PixelLoss::MotionCrossEntropy
+                || prediction_length == 0
+                || config.world_gaussian
+                || config.rgb_spatial_decoder
+                || config.rgb_previous_frame
+                || config.rgb_latent_only)
+        {
+            return Err("world centroid requires a plain categorical motion RGB suffix".into());
+        }
         if pixel_loss.fixed_teacher() != fixed_teacher.is_some()
             || (pixel_loss.fixed_teacher()
                 && (prediction_length != 16 || config.rgb_previous_frame || config.rgb_latent_only))
@@ -1127,6 +1157,18 @@ impl WorldModelLearner {
                 losses.push(loss[0]);
             }
         }
+        if self.config.color_centroid_supervision.is_some() {
+            for index in [
+                world::LOSS_COLOR_CENTROID,
+                world::LOSS_COLOR_CENTROID + 1,
+                world::LOSS_WORLD_CENTROID,
+                world::LOSS_WORLD_CENTROID + 1,
+            ] {
+                let mut value = [0.0];
+                self.train.read_output_by_index(index, &mut value);
+                losses.push(value[0]);
+            }
+        }
         if losses.iter().any(|x| !x.is_finite()) {
             return Err("nonfinite standalone world loss");
         }
@@ -1358,7 +1400,10 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.pixel_loss == PixelLoss::MotionPosteriorHistory {
+        let format = if self.config.color_centroid_supervision.is_some() {
+            assert_eq!(self.training_scope, TrainingScope::All);
+            "kindle-world-only-v22"
+        } else if self.pixel_loss == PixelLoss::MotionPosteriorHistory {
             "kindle-world-only-v21"
         } else if self.config.rgb_spatial_action && self.config.rgb_spatial_transport {
             "kindle-world-only-v19"
