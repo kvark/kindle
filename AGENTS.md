@@ -21,33 +21,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [native sampler-stage diagnostic](docs/results/2026-11-09-breakout-denoising-stage-trace.md) is closed. Exact108 final batch
-arrays/864 images,20 origin16 arrays and135 frozen tensors pass;no learning.
-Source35018f7d changes tests only;production/model/loss/sampler sourceccf09d7f
-remains unchanged.16 CPU checks pass. Native3.029s/CPU.671s;37 declared/25 CPU
-pins. One sealed guard/nine files andone terminal successful service pass.
+The [sigma_data0.05 test](docs/experiments/2026-11-09-breakout-denoising-sigma-data0p05.md) is selected:adapt EDM data scale from.5
+to.05 for frame differences,keeping history normalization.5. The prior trace
+measures residual std/RMS.03537 versus whole-image std.47237 andweak new-ball
+creation. This is an optimization hypothesis,not a demonstrated cause or repair.
+Same model/loss graph,noise distribution/grid,rate1e-3,data,target/pixel-noise
+order and2,048-update/65,536-target budget. Compare physical gates,not loss levels.
 
-Stage1 sigma5 already matchesonly17/17/13/15 of198 next-ball positions;stage2
-.283 gives11/17/16/14 andstage3 .002 changesnone ofthose matches. Stage2 loses
-10/6/2/6 earlier correct positions andcreates4/6/5/5;no simple final-step cause.
-Final new-location RGB-change projection medians.101–.110 versus old-location
-erasure.547–.559. These aredescriptive clean-estimate/pixel measurements,not
-replacement forecasts,causal error shares orfractions ofphysical movement.
+Optional sigma_data defaults.5 andpreserves v1/v2/v3/v4 viaoriginal coefficient
+path;non-default requiresv5.18 Rust CPU/402 packaged/4 runner checks andstrict
+Clippy pass. History scale is unchanged. Declare/pin before guarded default-
+scale initial parity,then one fresh learner/restore;no GPU job launched yet.
+Root `/mnt/data/kindle-breakout-denoising-sigma-data0p05-20261109`.
 
-Additional all224 unique-arrival statistics:internal whole-image std.47237,
-frame-difference std/RMS.03537;EDM sigma_data remains.5. This suggests a separate
-preconditioning-scale hypothesis,not a proven cause. History conditioning.5 is
-a separate operation;do not silently rescale it. No nextlearner selected.
-
-Root `/mnt/data/kindle-breakout-denoising-stage-trace-20261109` retains108 traces,
-2,592 endpoint rows and27 exact fixed-lane panels (separate one-step forecasts,
-not a continuous rollout). Own580,736,006-byte build cache released. [Protocol](docs/experiments/2026-11-09-breakout-denoising-stage-trace.md).
-No GPU job,extension,broad learner,collector or automatic successor selected.
-The [half-noise learner](docs/results/2026-11-09-breakout-denoising-half-max-noise.md) andall prior failures/repairs stay closed/retained.
-Full physics/events/calibration,brick memory,late/tunnel/second-wall/above-top,
-untouched families andfresh confirmation remain required. No diagnostic score
-completes the goal. Actor/critic,CDP comparison andfive-game work stay parked.
-User-requested [cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115 GB;hardlinked evidence stays immutable.
+The [frozen stage diagnostic](docs/results/2026-11-09-breakout-denoising-stage-trace.md) andall older trials/failures/repairs stay
+closed/retained. No old learner/query queue orcollector repeats. Full physics/
+events/calibration,brick memory,late/tunnel/second-wall/above-top,untouched
+families andfresh confirmation remain required. No fitting score completes the
+goal. Actor/critic,CDP comparison andfive-game work stay parked. No automatic
+extension orsuccessor. User-requested [cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115 GB;retained
+hardlinked evidence stays immutable.
 
 ## Direction and retained results
 

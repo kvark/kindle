@@ -29,6 +29,11 @@ pub struct DenoisingConfig {
     pub residual_frame: bool,
     #[serde(default, skip_serializing_if = "is_false")]
     pub half_max_noise: bool,
+    #[serde(
+        default = "default_sigma_data",
+        skip_serializing_if = "is_default_sigma_data"
+    )]
+    pub sigma_data: f32,
 }
 impl Default for DenoisingConfig {
     fn default() -> Self {
@@ -44,6 +49,7 @@ impl Default for DenoisingConfig {
             context_motion_scale: 0.,
             residual_frame: false,
             half_max_noise: false,
+            sigma_data: SIGMA_DATA,
         }
     }
 }
@@ -63,13 +69,17 @@ impl DenoisingConfig {
             || self.horizon < 2
             || !self.context_motion_scale.is_finite()
             || !(0.0..=1000.0).contains(&self.context_motion_scale)
+            || !self.sigma_data.is_finite()
+            || !(0.01..=2.0).contains(&self.sigma_data)
         {
             return Err("invalid denoising world geometry or learning configuration");
         }
         Ok(())
     }
     fn checkpoint_format(&self) -> &'static str {
-        if self.half_max_noise {
+        if !is_default_sigma_data(&self.sigma_data) {
+            "kindle-denoising-world-v5"
+        } else if self.half_max_noise {
             "kindle-denoising-world-v4"
         } else if self.residual_frame {
             "kindle-denoising-world-v3"
@@ -86,6 +96,13 @@ impl DenoisingConfig {
             "edm-euler3-sigma5-quantized"
         }
     }
+    fn coefficients(&self, sigma: f32) -> (f32, f32, f32, f32) {
+        if is_default_sigma_data(&self.sigma_data) {
+            conditioners(sigma)
+        } else {
+            conditioners_with_scale(sigma, self.sigma_data)
+        }
+    }
     fn optimizer(&self) -> DreamerConfig {
         let mut c = DreamerConfig::tiny(self.action_count);
         c.training_precision = TrainingPrecision::Auto;
@@ -100,6 +117,12 @@ impl DenoisingConfig {
 const SIGMA_DATA: f32 = 0.5;
 const SIGMA_MIN: f32 = 0.002;
 const SIGMA_MAX: f32 = 5.;
+fn default_sigma_data() -> f32 {
+    SIGMA_DATA
+}
+fn is_default_sigma_data(value: &f32) -> bool {
+    *value == SIGMA_DATA
+}
 fn is_false(value: &bool) -> bool {
     !value
 }
@@ -112,6 +135,15 @@ fn conditioners(sigma: f32) -> (f32, f32, f32, f32) {
         variance.sqrt().recip(),
         sigma * SIGMA_DATA / variance.sqrt(),
         SIGMA_DATA * SIGMA_DATA / variance,
+        sigma.ln() / 4.,
+    )
+}
+fn conditioners_with_scale(sigma: f32, data_scale: f32) -> (f32, f32, f32, f32) {
+    let variance = sigma * sigma + data_scale * data_scale;
+    (
+        variance.sqrt().recip(),
+        sigma * data_scale / variance.sqrt(),
+        data_scale * data_scale / variance,
         sigma.ln() / 4.,
     )
 }
@@ -441,7 +473,7 @@ impl DenoisingWorldLearner {
             let mut weights = Vec::new();
             let mut noisy = Vec::new();
             for lane in 0..b {
-                let (cin, cout, cskip, cnoise) = conditioners(sigma[lane]);
+                let (cin, cout, cskip, cnoise) = c.coefficients(sigma[lane]);
                 let x = actual[lane * w..(lane + 1) * w]
                     .iter()
                     .zip(&noise[lane * w..(lane + 1) * w])
@@ -520,7 +552,7 @@ impl DenoisingWorldLearner {
             }
             let mut next = Vec::with_capacity(b * w);
             for lane in 0..b {
-                let (_, cout, cskip, _) = conditioners(sigma[lane]);
+                let (_, cout, cskip, _) = c.coefficients(sigma[lane]);
                 for i in 0..w {
                     let j = lane * w + i;
                     next.push(if incoming[lane] < 0 {
@@ -558,7 +590,7 @@ impl DenoisingWorldLearner {
         let c = &self.config;
         let b = c.batch_size;
         let w = 3 * c.side * c.side;
-        let (cin, cout, cskip, cnoise) = conditioners(sigma);
+        let (cin, cout, cskip, cnoise) = c.coefficients(sigma);
         let mut input = Vec::new();
         for lane in 0..b {
             input.extend(history.condition(lane, actions[lane], c.action_count, true));

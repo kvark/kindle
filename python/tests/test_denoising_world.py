@@ -64,3 +64,18 @@ def test_half_max_noise_requires_matching_version_without_gpu(tmp_path,version,h
     (tmp_path/'metadata.json').write_text(json.dumps(header))
     with pytest.raises(RuntimeError,match='checkpoint header'):
         kindle.DenoisingWorldLearner.restore(str(tmp_path))
+
+@pytest.mark.parametrize('scale', [0., .009, 2.01])
+def test_invalid_sigma_data_without_gpu(scale):
+    with pytest.raises(ValueError,match='invalid denoising'):
+        kindle.DenoisingWorldLearner(CONFIG | {'sigma_data':scale})
+
+@pytest.mark.parametrize('version,scale', [('v1',.05),('v2',.05),('v3',.05),('v4',.05),('v5',.5)])
+def test_sigma_data_requires_matching_header_without_gpu(tmp_path,version,scale):
+    header=dict(format='kindle-denoising-world-'+version,
+        config=CONFIG | {'context_motion_scale':100.,'residual_frame':True,'half_max_noise':True,'sigma_data':scale},updates=0,
+        architecture='conditional-unet16-32-64-history4',sampler='edm-euler3-sigma5-last-frame-residual-quantized',
+        observed_reconstruction='single-denoise-sigma0.5-not-rssm-posterior')
+    (tmp_path/'metadata.json').write_text(json.dumps(header))
+    with pytest.raises(RuntimeError,match='checkpoint header'):
+        kindle.DenoisingWorldLearner.restore(str(tmp_path))

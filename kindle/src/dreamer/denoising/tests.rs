@@ -604,3 +604,90 @@ fn half_max_requires_v4_preserves_legacy_defaults_and_all_graphs() {
 }
 
 mod sampler_trace;
+
+#[test]
+fn configurable_sigma_data_matches_f64_and_recovers_rgb_without_rescaling_history() {
+    for scale in [0.01, 0.05, 0.1, 0.5, 2.] {
+        let mut c = DenoisingConfig::default();
+        c.sigma_data = scale;
+        assert!(c.validate().is_ok());
+        for sigma in [0.002, 0.05, 0.28308183, 0.5, 5.] {
+            let (cin, cout, skip, noise) = c.coefficients(sigma);
+            let sf = f64::from(sigma);
+            let df = f64::from(scale);
+            let variance = sf * sf + df * df;
+            for (actual, expected) in [
+                (cin, 1. / variance.sqrt()),
+                (cout, sf * df / variance.sqrt()),
+                (skip, df * df / variance),
+                (noise, sf.ln() / 4.),
+            ] {
+                assert!((f64::from(actual) - expected).abs() <= 2e-6 * expected.abs().max(1.));
+            }
+            for base in [-1., 0., 1.] {
+                for byte in [0, 19, 128, 221, 255] {
+                    let y = byte as f32 / 127.5 - 1.;
+                    let delta = y - base;
+                    let x = delta + sigma * 0.37;
+                    let target = (delta - skip * x) / cout;
+                    assert!((absolute(skip * x + cout * target, base, true) - y).abs() < 2e-6);
+                }
+            }
+        }
+    }
+    let c = DenoisingConfig::default();
+    for sigma in [0.002, 0.05, 0.5, 1., 5.] {
+        assert_eq!(c.coefficients(sigma), conditioners(sigma));
+    }
+    let mut h = History::empty(1, 3);
+    for _ in 0..4 {
+        h.push(&[0.25, -0.5, 1.], &[0]);
+    }
+    // Conditioning stays at the original .5 scale, independent of noise-data scale.
+    assert_eq!(&h.condition(0, 0, 1, true)[..3], &[0.5, -1., 2.]);
+}
+
+#[test]
+fn sigma_data_requires_v5_and_changes_no_graph_or_default_header() {
+    let mut c = DenoisingConfig::default();
+    assert!(
+        !serde_json::to_value(&c)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("sigma_data")
+    );
+    for bad in [0., 0.009, 2.01, f32::NAN, f32::INFINITY] {
+        c.sigma_data = bad;
+        assert!(c.validate().is_err());
+    }
+    c = DenoisingConfig::default();
+    c.context_motion_scale = 100.;
+    c.residual_frame = true;
+    c.half_max_noise = true;
+    let mut small = c.clone();
+    small.sigma_data = 0.05;
+    for build in [
+        network::training,
+        network::sampling,
+        network::event_sampling,
+    ] {
+        assert_eq!(
+            format!("{:?}", build(&c).nodes()),
+            format!("{:?}", build(&small).nodes())
+        );
+    }
+    let v = serde_json::json!({"format":"kindle-denoising-world-v5","config":small,"updates":0,"architecture":"conditional-unet16-32-64-history4","sampler":small.sampler_name(),"observed_reconstruction":"single-denoise-sigma0.5-not-rssm-posterior"});
+    assert_eq!(
+        read_header(&serde_json::to_vec(&v).unwrap()).unwrap().0,
+        small
+    );
+    for version in ["v1", "v2", "v3", "v4"] {
+        let mut bad = v.clone();
+        bad["format"] = format!("kindle-denoising-world-{version}").into();
+        assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
+    }
+    let mut bad = v;
+    bad["config"]["sigma_data"] = 0.5.into();
+    assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
+}
