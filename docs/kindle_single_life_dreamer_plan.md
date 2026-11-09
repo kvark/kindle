@@ -3,40 +3,30 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. [Mean-latent learning](results/2026-11-09-breakout-world-mean-latents-learning.md) closes negative:development106/112
-observed,61/109 one-step,18/107 eight-step;only reconstruction passes,1/3 original
-gates. Fitting155/163,102/177,42/176;all four contact requests20/110. Removing
-latent samples doesnot solve forecast drift. Keep H0 broad reference;optional
-mean mode staysoff. No conditional branch assessment orunchanged extension.
+unproven. A separately declared [plain sampled H16/RGB1 learner](experiments/2026-11-09-breakout-world-plain-rgb1.md) is
+selected:only reconstruction coefficient100→1 changes versus original H16,
+withnormal categorical samples/ST gradients. No mean mode,spatial decoder,
+extra head orcolor attention. Fresh8,192/RGB64/12M/B8/T32/H16/Auto/41001/rates4e-4,
+original4/2/1/1 plan,68 weights/204 tensors/11 reports,legacyv2. Earlier RGB1
+fusion/suffix-event andlocal H0/transport failures remain closed;this is a distinct
+plain-model balance test,not a diagnosed cause. No rebuild;use qualified default-
+off nativeaffedefa/SHA cc6022e3 andmatching runner. Root
+`/x/Temp/kindle-world-plain-rgb1-20261109`.
 
-All8,192 eleven-report rows/RGB100 total/source/reset identities,68 changed
-weights,204 qualified initial/own frozen tensors,18 development/32 contact restore
-arrays and34 finite exports pass.384 original dense origins and20 initial source
-arrays match;actual initial model arrays differ from sampled controls asintended.
-Only the mean-state setting changes versus original H16.450 curve/48 contact
-requested-draw comparisons areexact,not independent stochastic evidence.
-149 declaration/158 CPU analysis/324 original closure pins,331 publication pins
-including separate CPU reporting correction,two guards/18 sealed files,terminal
-successful queue/observer. Native749.533s,loop852.913s;export cadence differs from
-old H16,no isolated speed claim. Root
-`/x/Temp/kindle-world-mean-latents-learning-20261109`.
+[Mean-latent learning](results/2026-11-09-breakout-world-mean-latents-learning.md) remains closed/negative:106/112 observed,61/109
+one-step,18/107 eight-step,1/3 gates;fit155/163,102/177,42/176;contacts20/110.
+All498 requested-draw equalities pass,not independent stochastic evidence.
+204 initial/frozen tensors and18 development/32 contact restore arrays pass;
+149 declaration/158 CPU/324 original closure/331 publication pins,two guards/
+18 files;native749.533s,loop852.913s. Original CPU report-link/wording defect and
+separatev2 correction remain withunchanged metrics;no native/analysis rerun.
+Retain H0 broad reference. Mean andcolor options stayoff;no oldlearner repeats.
 
-The original report template linked the color-attention protocol andoverstated
-inference-path identity. Its pinned script/report remain;new CPUv2 corrects only
-that link andclarifies unchanged graphs versus changed CPU latent feeding. All
-metrics/negative decisions remain;no native stage oranalysis repeats. [Native
-qualification](results/2026-11-09-breakout-world-mean-latents.md) stayspassed/closed:149 world/29 config CPU,strict Clippy,
-31 Python checks,F64 true derivatives/CPU probability parity,204 tensors,
-32 default-off initial/32 trained restore arrays,24 initial/24 trained draw checks.
-119 declaration/157 closure pins,nine sealed files,25.791s;sourceaffedefa/native
-SHA cc6022e3,own811,446,272-byte buildcache released. Original fixture Clippy
-failure andseparate correction remain.
-
-Alljobs stopped;no learner,extension,collector orautomatic successor selected.
-Full precise physics,natural event calibration,removed-brick memory,late/tunnel/
-second-wall/above-top,untouched families andfresh confirmation remain required.
-Actor/critic,CDP comparison andfive-game work stayparked;prior jobs stayclosed
-andfullres staysprotocol-failed. No new buildcache for this learner.
+No extension,collector orautomatic successor. Full precise physics,natural event
+calibration,removed-brick memory,late/tunnel/second-wall/above-top,untouched
+families andfresh confirmation remain required. Actor/critic,CDP comparison and
+five-game work stayparked;earlier jobs closed/fullres protocol-failed. Only the
+new bounded learner above isselected;consult its protocol beforeexecution.
 
 ### What would establish the world model
 
