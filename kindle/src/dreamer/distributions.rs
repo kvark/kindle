@@ -36,6 +36,26 @@ impl TwoHotBins {
         self.values.len()
     }
 
+    pub(super) fn bounded(count: usize, limit: f32) -> Self {
+        assert!(count >= 3 && count % 2 == 1);
+        assert!(limit.is_finite() && limit > 0.);
+        let half = (count - 1) / 2;
+        let radius = limit.ln_1p();
+        let mut values = (0..=half)
+            .map(|index| symexp(-radius + radius * index as f32 / half as f32))
+            .collect::<Vec<_>>();
+        values[0] = -limit;
+        values[half] = 0.;
+        let positive = (0..half)
+            .rev()
+            .map(|index| -values[index])
+            .collect::<Vec<_>>();
+        values.extend(positive);
+        Self {
+            values: values.into_boxed_slice(),
+        }
+    }
+
     pub(super) fn values(&self) -> &[f32] {
         &self.values
     }

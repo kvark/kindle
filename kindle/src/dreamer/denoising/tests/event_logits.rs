@@ -53,7 +53,7 @@ fn head(
     let mut cont = vec![0.; b];
     model.events.read_output_by_index(0, &mut logits);
     model.events.read_output_by_index(1, &mut cont);
-    let bins = TwoHotBins::new(c.value_bins);
+    let bins = c.reward_bins();
     let mut scratch = vec![0.; c.value_bins];
     let mut reward = Vec::new();
     let mut positive = Vec::new();
@@ -195,7 +195,7 @@ fn frozen_event_logits() {
     outputs.sync_all().unwrap();
     write_floats(
         &mut fs::File::create(case.output.join("support.f32")).unwrap(),
-        TwoHotBins::new(255).values(),
+        c.reward_bins().values(),
     );
     fs::write(
         case.output.join("rows.json"),

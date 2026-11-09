@@ -21,49 +21,44 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [lower-noise learner](docs/results/2026-11-09-breakout-denoising-low-noise.md) is closed and rejected: one-step matches rise
-140/149/140/140→161/161/158/155 of198, but ordinary35/38/34/33→18/20/23/23 of110.
-Only3/24 individual fitting gates pass (first-step checks); all aggregate/longer
-criteria fail. Pixel MSE/false balls worsen. Retain the [sigma_data.05 control](docs/results/2026-11-09-breakout-denoising-sigma-data0p05.md)
-and log-noise mean−1.2. Reused development learner/data/seed, not reliability.
+unproven. The [bounded reward-support learner](docs/experiments/2026-11-09-breakout-denoising-reward32.md) is selected after the completed
+[logit diagnosis](docs/results/2026-11-09-breakout-denoising-event-logits.md). On512 zero-reward ordinary rows, mean mass outside±32
+is.0000213354 yet dominates65.604 scalar RMSE; central contribution error is
+.000208. The arithmetic reconstructs every native mean/positive probability.
+Errors also occur with actual images; two positive examples remain insufficient
+for calibration, and one is poorly recognized. This is not a decoder-bug claim.
+The diagnostic's200 head batches/1,600 rows,12 exact cached arrays,135 frozen
+tensors,22 CPU checks/Clippy,39 declared/75 closure pins andnine sealed guard
+files pass; terminal success. Its719,963,816-byte apparent cache is released.
 
-An added CPU event audit finds scalar reward RMSE65.604 control/59.913 new on
-512 zero-reward ordinary predictions, despite0 positive/ending alarms at.5.
-The wide scalar support is a possible contributor; logits are not retained, so
-no exact attribution or decoder-bug claim. Event-head57 tensors remain exact;
-changed generated images alter its inputs. Source rewards at arrival4/lane4
-and5/lane1 are positive. Teacher RGB exports include the latter but discard
-head outputs; ordinary event windows16..31 are zero-only. The separate coverage
-clarification scopes the original evaluated_positive_rewards=0 field; original
-review is unchanged. Natural/positive-event calibration remains unproved.
+New optional reward_limit=None preserves original support/decoder andv1–v6;
+finite positive bound32 requiresv7, uses the same bounded support for labels and
+means, and rejects out-of-range targets. No new graph/parameters/loss expression.
+Same.05 data scale/−1.2 noise mean, actual histories,Auto,rate.001,three Euler
+steps,fresh2,048 updates/65,536 targets. Require78 first/final denoiser tensors
+and all final RGB exact tocontrol; this cannot improve its failed physics gates.
+Retain own initial reward outputs so the structural bound alone is not called
+learning. Teacher exports retain already computed event outputs/labels without
+extra queries. A fixed post-restore head diagnostic captures both privileged
+positive cases, with12 own cached arrays/135 frozen tensors exact.
 
-Latest sourcefecc251b/native831461633936. Optional log_noise_mean defaults−1.2/
-omitted with original sigma function/v1–v5; non-default−3 usesv6.22 Rust CPU/
-40 packaged config-restore/four runner checks and strict release test-target
-Clippy pass. Default-mean fixture135 initial/frozen/first-update tensors,20 full
-initial arrays andsix losses are exact before main launch; one qualification
-update is separate. Main135 initial/frozen tensors,20 initial/restored arrays
-and57 first/final event tensors are exact; restored mean−3 persists. All140
-configuration/97 CPU/285 closure pins, three sealed guards/27 files andtwo
-terminal services pass.2,048 updates/65,536 targets in161.227s learn-call/
-169.159s loop; shared host. Own792,536,079-byte apparent build cache released.
-Original unpublished report's0/24 prose is preserved with a CPU correction to
-3/24; no score/gate/model query is changed or repeated. Root
-`/mnt/data/kindle-breakout-denoising-low-noise-20261109`.
+25 Rust CPU/50 packaged config-restore/four runner checks and strict release
+Clippy pass; native prefix60b9b67244d7. Declare/pin before one defaultNone v5 fixture,
+requiring135 initial/frozen/first-update tensors,20 full initial arrays andsix
+losses exact before main launch. Main initial135 tensors/16 non-reward arrays
+must match; final135 tensors/20 restored arrays must be exact. Four guarded
+stages/36 sealed files across two services; no GPU job launched yet. Root
+`/mnt/data/kindle-breakout-denoising-reward32-20261109`.
 
-The [frozen reward-logit diagnosis](docs/experiments/2026-11-09-breakout-denoising-event-logits.md) is selected. Compare actual/forecast/ordinary
-head inputs, retain255 logits per row, and require12 cached event arrays exact.
-200 head batches/1,600 rows; no learning or new RGB generation.22 CPU checks and
-strict release test-target Clippy pass; production bytes matchfecc251b. Pin before
-one300s guarded allocation,135 frozen tensors/nine sealed files required. Root
-`/mnt/data/kindle-breakout-denoising-event-logits-20261109`.
-No learner, extension or collection selected. Keep
-native/checkpoint/runner identities separate. The [six-step sampler](docs/results/2026-11-09-breakout-denoising-six-steps.md) and
-[grouped-history trial](docs/results/2026-11-09-breakout-denoising-generated-history.md) stay rejected; all prior trials/failures/repairs remain
-closed. Full physics/events/natural calibration, changed-brick memory, late/
-tunnel/second-wall/above-top, untouched families and fresh confirmation remain
-required. No fitting score completes the goal. Actor/critic, CDP comparison and
-five-game work stay parked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB; hardlinked evidence is immutable.
+The [lower-noise learner](docs/results/2026-11-09-breakout-denoising-low-noise.md),[six-step sampler](docs/results/2026-11-09-breakout-denoising-six-steps.md) and
+[grouped-history trial](docs/results/2026-11-09-breakout-denoising-generated-history.md) remain rejected/closed. Retain the original
+[sigma_data.05 control](docs/results/2026-11-09-breakout-denoising-sigma-data0p05.md) checkpoint/runtime for existing physics evidence.
+No old learner/assessment/collector repeats; no extension,broad learner,data
+collection or automatic successor. Full physics/events/natural calibration,
+changed-brick memory,late/tunnel/second-wall/above-top,untouched families and
+fresh confirmation remain required. No fitting score completes the goal.
+Actor/critic,CDP comparison andfive-game work stay parked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
+recovered115GB; hardlinked evidence stays immutable.
 
 ## Direction and retained results
 

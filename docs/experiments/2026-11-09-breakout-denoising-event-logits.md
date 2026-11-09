@@ -45,3 +45,10 @@ No learner, extension, collection or automatic successor. All earlier jobs,
 failures and repairs remain closed. Full physics/events/calibration, changed-
 brick memory, late/tunnel/second-wall/above-top, untouched families and fresh
 confirmation remain required; the full goal is unproven.
+
+Completed: the [result](../results/2026-11-09-breakout-denoising-event-logits.md)
+reconstructs all native means/probabilities. Mass outside±32 dominates scalar
+error even with real-image inputs. Actual-image recognition still misses one
+of two positive examples.12 cached arrays/135 frozen tensors exact;75 closure
+pins andnine sealed files verified, service terminal, own cache released. This
+is diagnostic attribution, not a learned replacement decoder or full-goal pass.

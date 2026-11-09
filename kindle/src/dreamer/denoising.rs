@@ -39,6 +39,8 @@ pub struct DenoisingConfig {
         skip_serializing_if = "is_default_log_noise_mean"
     )]
     pub log_noise_mean: f32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reward_limit: Option<f32>,
 }
 impl Default for DenoisingConfig {
     fn default() -> Self {
@@ -56,6 +58,7 @@ impl Default for DenoisingConfig {
             half_max_noise: false,
             sigma_data: SIGMA_DATA,
             log_noise_mean: default_log_noise_mean(),
+            reward_limit: None,
         }
     }
 }
@@ -79,13 +82,18 @@ impl DenoisingConfig {
             || !(0.01..=2.0).contains(&self.sigma_data)
             || !self.log_noise_mean.is_finite()
             || !(-6.0..=1.0).contains(&self.log_noise_mean)
+            || self
+                .reward_limit
+                .is_some_and(|v| !v.is_finite() || !(0.01..=1e6).contains(&v))
         {
             return Err("invalid denoising world geometry or learning configuration");
         }
         Ok(())
     }
     fn checkpoint_format(&self) -> &'static str {
-        if !is_default_log_noise_mean(&self.log_noise_mean) {
+        if self.reward_limit.is_some() {
+            "kindle-denoising-world-v7"
+        } else if !is_default_log_noise_mean(&self.log_noise_mean) {
             "kindle-denoising-world-v6"
         } else if !is_default_sigma_data(&self.sigma_data) {
             "kindle-denoising-world-v5"
@@ -128,6 +136,17 @@ impl DenoisingConfig {
         c.optimizer_beta2 = 0.999;
         c.agc = 0.3;
         c
+    }
+    fn reward_bins(&self) -> TwoHotBins {
+        match self.reward_limit {
+            Some(limit) => TwoHotBins::bounded(self.value_bins, limit),
+            None => TwoHotBins::new(self.value_bins),
+        }
+    }
+    fn valid_rewards(&self, rewards: &[f32]) -> bool {
+        rewards
+            .iter()
+            .all(|r| r.is_finite() && self.reward_limit.is_none_or(|limit| r.abs() <= limit))
     }
 }
 
@@ -469,7 +488,7 @@ impl DenoisingWorldLearner {
             || actions
                 .iter()
                 .any(|&a| a < -1 || a >= c.action_count as i32)
-            || rewards.iter().any(|x| !x.is_finite())
+            || !c.valid_rewards(rewards)
         {
             return Err("invalid denoising training sequence");
         }
@@ -488,7 +507,7 @@ impl DenoisingWorldLearner {
             history.push(&frame, &actions[t * b..(t + 1) * b]);
         }
         let mut report = vec![0.; 6];
-        let bins = TwoHotBins::new(c.value_bins);
+        let bins = c.reward_bins();
         for t in 4..length {
             let incoming = &actions[t * b..(t + 1) * b];
             let valid = incoming.iter().filter(|&&a| a >= 0).count();
@@ -717,7 +736,7 @@ impl DenoisingWorldLearner {
         };
         let mut rng = StdRng::seed_from_u64(seed);
         let sigmas = schedule();
-        let bins = TwoHotBins::new(c.value_bins);
+        let bins = c.reward_bins();
         for a in future.chunks_exact(b) {
             let incoming = a.iter().map(|&a| a as i32).collect::<Vec<_>>();
             let base = history.base(&incoming, c.residual_frame);

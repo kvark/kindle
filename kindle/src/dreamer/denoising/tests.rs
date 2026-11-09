@@ -847,3 +847,136 @@ fn log_noise_mean_requires_v6_and_preserves_legacy_headers() {
         );
     }
 }
+
+#[test]
+fn bounded_reward_support_matches_f64_and_roundtrips_targets() {
+    let c = DenoisingConfig {
+        reward_limit: Some(32.),
+        ..DenoisingConfig::default()
+    };
+    let bins = c.reward_bins();
+    let values = bins.values();
+    assert_eq!((values[0], values[127], values[254]), (-32., 0., 32.));
+    assert!(values.windows(2).all(|v| v[0] < v[1]));
+    for i in 0..255 {
+        assert_eq!(values[i], -values[254 - i]);
+        let coordinate = -33f64.ln() + 33f64.ln() * i as f64 / 127.;
+        let expected = coordinate.signum() * coordinate.abs().exp_m1();
+        assert!((f64::from(values[i]) - expected).abs() <= 3e-6 * expected.abs().max(1.));
+    }
+    for target in [-32., -7., -1., 0., 0.5, 1., 4., 7., 28., 32.] {
+        let mut encoded = vec![0.; 255];
+        bins.encode(target, &mut encoded);
+        let mean = encoded
+            .iter()
+            .zip(values)
+            .map(|(&p, &v)| f64::from(p) * f64::from(v))
+            .sum::<f64>();
+        assert!((mean - f64::from(target)).abs() <= 3e-6 * f64::from(target).abs().max(1.));
+        let logits = encoded
+            .iter()
+            .map(|&p| if p == 0. { -1000. } else { p.ln() })
+            .collect::<Vec<_>>();
+        let decoded = bins.decode_logits_with_scratch(&logits, &mut vec![0.; 255]);
+        assert!((decoded - target).abs() <= 3e-6 * target.abs().max(1.));
+    }
+    assert_eq!(
+        DenoisingConfig::default().reward_bins().values(),
+        TwoHotBins::new(255).values()
+    );
+}
+
+#[test]
+fn reward_limit_rejects_invalid_targets_and_changes_no_graph() {
+    let control = DenoisingConfig {
+        sigma_data: 0.05,
+        context_motion_scale: 100.,
+        residual_frame: true,
+        half_max_noise: true,
+        ..DenoisingConfig::default()
+    };
+    let changed = DenoisingConfig {
+        reward_limit: Some(32.),
+        ..control.clone()
+    };
+    assert!(changed.valid_rewards(&[-32., 0., 1., 32.]));
+    assert!(!changed.valid_rewards(&[32.001]));
+    assert!(!changed.valid_rewards(&[-32.001]));
+    assert!(!changed.valid_rewards(&[f32::NAN]));
+    for limit in [0., -1., 0.009, 1000001., f32::NAN, f32::INFINITY] {
+        assert!(
+            DenoisingConfig {
+                reward_limit: Some(limit),
+                ..control.clone()
+            }
+            .validate()
+            .is_err()
+        );
+    }
+    for build in [
+        network::training,
+        network::sampling,
+        network::event_sampling,
+    ] {
+        assert_eq!(
+            format!("{:?}", build(&control).nodes()),
+            format!("{:?}", build(&changed).nodes())
+        );
+    }
+    assert_eq!(
+        params(&network::training(&control)),
+        params(&network::training(&changed))
+    );
+}
+
+#[test]
+fn bounded_reward_header_requires_v7_and_preserves_all_defaults() {
+    for (scale, residual, half, data, mean, version) in [
+        (0., false, false, 0.5, -1.2, "v1"),
+        (100., false, false, 0.5, -1.2, "v2"),
+        (100., true, false, 0.5, -1.2, "v3"),
+        (100., true, true, 0.5, -1.2, "v4"),
+        (100., true, true, 0.05, -1.2, "v5"),
+        (100., true, true, 0.05, -3., "v6"),
+    ] {
+        let c = DenoisingConfig {
+            context_motion_scale: scale,
+            residual_frame: residual,
+            half_max_noise: half,
+            sigma_data: data,
+            log_noise_mean: mean,
+            ..DenoisingConfig::default()
+        };
+        assert!(
+            !serde_json::to_value(&c)
+                .unwrap()
+                .as_object()
+                .unwrap()
+                .contains_key("reward_limit")
+        );
+        assert_eq!(
+            c.checkpoint_format(),
+            format!("kindle-denoising-world-{version}")
+        );
+        let changed = DenoisingConfig {
+            reward_limit: Some(32.),
+            ..c.clone()
+        };
+        let header = |config: &DenoisingConfig, format: &str| {
+            serde_json::to_vec(&serde_json::json!({"format":format,"config":config,"updates":0,"architecture":"conditional-unet16-32-64-history4","sampler":config.sampler_name(),"observed_reconstruction":"single-denoise-sigma0.5-not-rssm-posterior"})).unwrap()
+        };
+        assert_eq!(changed.checkpoint_format(), "kindle-denoising-world-v7");
+        assert_eq!(
+            read_header(&header(&c, c.checkpoint_format())).unwrap().0,
+            c
+        );
+        assert_eq!(
+            read_header(&header(&changed, changed.checkpoint_format()))
+                .unwrap()
+                .0,
+            changed
+        );
+        assert!(read_header(&header(&changed, c.checkpoint_format())).is_err());
+        assert!(read_header(&header(&c, "kindle-denoising-world-v7")).is_err());
+    }
+}
