@@ -17,9 +17,12 @@ early physical features. Only intended recipe flag `rgb_late_action` changes;
 two shapes/initialization and native revision differ. Parameter total stays
 80/603,915. First qualified batch, plan callback and initial-reference binding
 pass CPU checks without a model. Root
-`/x/Temp/kindle-world-late-action-learning-20261109`. Next declare/start the
-single guarded training/restore queue and its CPU finisher. No collector,
-extension, branch query or automatic successor is selected. Keep all original
+`/x/Temp/kindle-world-late-action-learning-20261109`. The declared205-pin
+training/restore queue is running under `kindle-world-late-action-learning-20261109.service`,
+invocation6904542f6a9f48b8a71dcd21b17471eb, controllerPID2204349. Initial exports
+are underway. Its matching observer and CPU finisher are active; source/shape/
+config and fixed final checks remain pending. No collector, extension, branch
+query or automatic successor is selected. Keep all original
 dense and broader physics/event gates; checkpoint/draw selection is forbidden.
 
 The [closed real-history probe](results/2026-11-09-breakout-world-oracle-history.md)
