@@ -21,40 +21,38 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. A separately declared [fresh position10000 learner](docs/experiments/2026-11-09-breakout-world-centroid10000-learning.md)
-is selected:only auxiliary weight1000→10000 changes versusclosed RGB1/position1000,
-same8,192 fresh updates/seed41001/plan/RGB64/B8/T32/H16/Auto/nativeee44ec16.
-Gradient measurements justify testing thebalance,not predictingsuccess.
-Root `/x/Temp/kindle-world-centroid10000-learning-20261109`;no extension/collector/
-automatic successor. Original RGB gates andfull world-model requirements stay.
+unproven. The [fresh position10,000 learner](docs/results/2026-11-09-breakout-world-centroid10000-learning.md) closes negative:
+development77/112 observed,70/109 one-step,14/107 eight-step; all three original
+RGB gates fail. Fitting118/163,107/177,28/176. Increasing only the auxiliary
+coefficient from1,000 to10,000 improves the CPU coordinate readout (observed
+development RMSE2.437→1.648px,15→40/112 within1px), but weakens RGB reconstruction
+and does not improve the eight-step RGB result15→14/107. Do not adopt it or
+allocate its conditional oracle assessment. Retain the H0 broad reference;
+optional auxiliary mode stays default off. Reused41001 is not fresh confirmation.
 
-The completed frozen measurement follows. The [frozen position contract diagnosis](docs/results/2026-11-09-breakout-world-centroid-contract.md)
-closespassed: native/CPU saved-feature affine error<=0.00004522px,same-time
-observed centroid values/masks match;weighted gradients sum tojoint with
-relative L2 error<=2.49e-7 globally. The coarse readout isnot astorage-order
-artifact. Onone mixed batch/two draws,position/RGB gradient norm ratio is
-4.61–6.79% inthe encoder and4.60–5.71% inthe prior;encoder cosines-.146/-.247.
-Contact clips have stronger relative position gradients. This supports testing
-loss balance,not acausal explanation orprediction ofAdam/AGC updates.
+All8,192 fifteen-report rows,weight10,000 total/source/mask identities,70 changed
+weights,210 actual-initial/own frozen tensors and18 development/32 contact
+restore arrays pass. The only config change and all initial arrays versus the
+weight1,000 control pass; original384 dense origins match.149 declaration/149
+CPU analysis/326 closure pins,two guards/18 sealed files,terminal successful
+native queue and observer. Calls768.912s,loop874.419s. Sourcef14282d6 reuses native
+449361ae/SHAee44ec16 andmatching runner;no rebuild. Root
+`/x/Temp/kindle-world-centroid10000-learning-20261109`.
 
-Twenty frozen backwards,zero optimizer steps/actions/frames;all70 weights exact
-after each component,source checkpoint unchanged. One CPU derivative test/strict
-Clippy pass;initial empty test filter remains uncounted. CPU reportingv1's
-zero-RGB ratios remain withseparatev2 null repair;no native stage repeats.
-24 declaration/71 CPUv2/94 closure pins,nine sealed guard files,one terminal
-successful service. Test-only sourceedbe1d0c/SHA4043b8af;learner runtime unchanged.
-Native384.029s/debug harness392.70s isnot training speed. Own2.23GB buildcache
-released;root `/x/Temp/kindle-world-centroid-contract-20261109`.
+The copied launcher's top-level summary field still says1,000; preserve it and
+its pinned source. Protocol/config/native getters/checkpoints and all8,192 loss
+identities confirm execution with10,000. A separate CPU clarification records
+the bookkeeping defect; no native stage repeats. [Frozen contract checks](docs/results/2026-11-09-breakout-world-centroid-contract.md)
+stay passed: native affine layout/observed time alignment agree, and measured
+raw position gradients were weaker than RGB. That did not predict the outcome
+of this coefficient experiment or prove an optimization cause.
 
-[RGB1/centroid1000 learning](docs/results/2026-11-09-breakout-world-centroid-learning.md)
-remains closed/negative:development85/112 observed,73/109 one-step,15/107
-eight-step;allthree broad gates fail. Fitting134/163,119/177,34/176. Retain H0
-broad reference;optional auxiliary mode staysdefaultoff. Coordinate accuracy
-cannot replace RGB gates orprove information absence. Allprior jobs stayclosed,
-fullres staysprotocol-failed. Prior jobs areclosed;only the new learner above
-is selected. Full physics/events,natural calibration,removed-brick memory,
-late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
-required. Actor/critic,CDP comparison andfive-game work stayparked.
+All jobs are stopped; no learner,extension,collector orautomatic successor is
+selected. Prior jobs stay closed and fullres stays protocol-failed. Full precise
+physics,natural event calibration,removed-brick memory,late/tunnel/second-wall/
+above-top coverage,untouched families andfresh confirmation remain required.
+Actor/critic,CDP comparison andfive-game work stay parked. Keep hardlinked
+historical evidence immutable; no new build cache was created for this run.
 
 ## Direction and retained results
 

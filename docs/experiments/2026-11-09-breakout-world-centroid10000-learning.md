@@ -54,3 +54,5 @@ Precise all-horizon physics,natural event calibration,removed-brick memory,
 late/tunnel/second-wall/above-top,untouched families andfresh learner confirmation
 remain required. Even passing allthree intermediate gates wouldnot prove the
 full world-model goal. Actor/critic,CDP comparison andfive-game work stayparked.
+
+Completed negative: [result](../results/2026-11-09-breakout-world-centroid10000-learning.md),0/3 broad gates. Original summary typo and separate CPU clarification remain preserved; no native retry.

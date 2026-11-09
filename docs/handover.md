@@ -9,37 +9,38 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. [RGB1/centroid1000 world learning](results/2026-11-09-breakout-world-centroid-learning.md) closesnegative:development
-85/112 observed,73/109 one-step,15/107 eight-step;allthree broad gates fail.
-Fitting134/163 observed,119/177 one-step,34/176 eight-step. Original contact-family
-diagnostic17/18/16/19 of110,not fitting data forthis learner. Keep H0 broad reference;
-new optional auxiliary mode staysdefaultoff. Joint head/loss/RGB-scale changes
-andone reused development seed donot isolate a cause orprove reliability.
+unproven. The [fresh position10,000 learner](results/2026-11-09-breakout-world-centroid10000-learning.md) closes negative:
+development77/112 observed,70/109 one-step,14/107 eight-step; all three original
+RGB gates fail. Fitting118/163,107/177,28/176. Increasing only the auxiliary
+coefficient from1,000 to10,000 improves the CPU coordinate readout (observed
+development RMSE2.437→1.648px,15→40/112 within1px), but weakens RGB reconstruction
+and does not improve the eight-step RGB result15→14/107. Do not adopt it or
+allocate its conditional oracle assessment. Retain the H0 broad reference;
+optional auxiliary mode stays default off. Reused41001 is not fresh confirmation.
 
-The CPU affine position readout isalso coarse:observed development2.437px RMSE,
-15/112 within1px;prior1 17/109,prior8 6/107. It isconditioned onvisible truth,
-hasno presence output andno native-head readback parity. It cannot replace RGB
-physics gates orprove information absence. FixedRGB color/region supervision is
-game-specific knowledge,no object/emulator state input orunguided-learning claim.
+All8,192 fifteen-report rows,weight10,000 total/source/mask identities,70 changed
+weights,210 actual-initial/own frozen tensors and18 development/32 contact
+restore arrays pass. The only config change and all initial arrays versus the
+weight1,000 control pass; original384 dense origins match.149 declaration/149
+CPU analysis/326 closure pins,two guards/18 sealed files,terminal successful
+native queue and observer. Calls768.912s,loop874.419s. Sourcef14282d6 reuses native
+449361ae/SHAee44ec16 andmatching runner;no rebuild. Root
+`/x/Temp/kindle-world-centroid10000-learning-20261109`.
 
-Fresh8,192 updates/15 finite reports;70 weights change,210 qualified initial/own
-frozen tensors and18 development/32 contact restore arrays exact. Original384
-initial/final dense origins/source plan,975,941 suffix targets/9,570 terminals/
-16,008 positives pass. Calls766.210s,loop879.901s;changed export frequency prevents
-an isolated speed claim.149 declaration/311 closure pins,two guards/18 files,
-one terminal successful service. Native449361ae/SHAee44ec16 reused. Root
-`/mnt/data/kindle-breakout-world-centroid-learning-20261109`.
+The copied launcher's top-level summary field still says1,000; preserve it and
+its pinned source. Protocol/config/native getters/checkpoints and all8,192 loss
+identities confirm execution with10,000. A separate CPU clarification records
+the bookkeeping defect; no native stage repeats. [Frozen contract checks](results/2026-11-09-breakout-world-centroid-contract.md)
+stay passed: native affine layout/observed time alignment agree, and measured
+raw position gradients were weaker than RGB. That did not predict the outcome
+of this coefficient experiment or prove an optimization cause.
 
-[Qualification](results/2026-11-09-breakout-world-centroid.md) stayspassed/closed:masked native F64 derivatives/zeros,
-139 Rust CPU/strict core+binding Clippy/19 Python checks,190 closure pins,nine
-sealed files. Initial fixture API/prefix/style failures remain withseparate
-corrected checks. Own1.25GB buildcache released. Conditional oracle assessment
-isnot allocated;alljobs stopped,no automatic learner/extension/collector/successor.
-Allprior jobs stayclosed,fullres staysprotocol-failed. Full physics/events,
-natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
-untouched families andfresh confirmation remain required. No implementation/
-fitting score completes thegoal. Actor/critic,CDP comparison andfive-game work
-stayparked. [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
+All jobs are stopped; no learner,extension,collector orautomatic successor is
+selected. Prior jobs stay closed and fullres stays protocol-failed. Full precise
+physics,natural event calibration,removed-brick memory,late/tunnel/second-wall/
+above-top coverage,untouched families andfresh confirmation remain required.
+Actor/critic,CDP comparison andfive-game work stay parked. Keep hardlinked
+historical evidence immutable; no new build cache was created for this run.
 
 ## Preserved source and fresh-machine setup
 
