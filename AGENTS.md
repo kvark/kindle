@@ -21,25 +21,36 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [causal generated-latest prefixes](docs/experiments/2026-11-09-breakout-causal-prefix.md): one fresh2,048-update/65,536-target learner,first512
-clean,then half the histories getone detached causal predicted latestframe.
-Earlier three frames stay real.24 caches/624 queries add4,992 imagined frames;
-22,816 target exposures getgenerated latest history. Seven CPU runner checks pass.
-Reuse exact reward32 native60b9b67244d7 andrunner;no build ornew backend work.
-Require initial/first/509 tensors andarrays exact before augmentation,first-cache
-135 frozen tensors,final own135 tensors/20 restore arrays andoriginal gates.
-Root `/mnt/data/kindle-breakout-causal-prefix-20261109`.
+unproven. Reject [causal generated-latest training](docs/results/2026-11-09-breakout-causal-prefix.md): ordinary22/25/19/24 of110 versus35/38/34/33;one-step97/107/101/105
+of198 versus140/149/140/140.0/24 gates. First512 updates stayclean,then half the
+histories getone causal predicted latestframe;earlier three frames stayactual.
+This tested one-frame recipe regresses both tasks;it does not rule out other
+schedules orfull generated-history training. Retain clean-history reward32.
 
-Retain [clean-history reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
-[Target-motion attention](docs/results/2026-11-09-breakout-target-motion.md)
-improves one-step butregresses ordinary to8–10/110 with77–80 ambiguous red masks;
-keep off. Direct-frame/history-noise andall earlier negative recipes stayclosed.
-This new trial tests onlyone generated frame,not full generated-history training.
-No actor/critic/CDP,collection,extension orautomatic successor. Full physics/
-events,natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
-untouched families andfresh confirmation remain required. No fitting result
+Seven CPU runner checks pass. Reuse native60b9b67244d7/source8dbf9ab5 andexact
+runner;no rebuild/new qualification. Initial/first/509 tensors135,initial/509
+arrays20,six first losses andfirst-cache frozen135 tensors exact. Final135 own
+frozen tensors/20 restore arrays exact. All24 refresh ages/seeds,624 causal
+queries/4,992 imagined frames and22,816 augmented-exposure joins pass. These add
+inference,not emulator experience. Arrivals4/5 andboth source positives remain
+clean due to the API minimum. Native RNG/target order/config unchanged;residual
+anchors,importance andevent conditioning change together.134 declaration/260
+closure pins,two sealed guards/18 files andone terminal service pass.
+2,048 updates/65,536 targets take144.855s learn-call/20.152s cache phase/174.757s
+loop onshared host,no isolated speed claim. No build cache created;generated
+caches are retained evidence. Root
+`/mnt/data/kindle-breakout-causal-prefix-20261109`.
+
+Retain [reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):
+35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates;stable learned
+reward scalars butone privileged positive missed,no terminals/natural calibration.
+Target-motion/direct-frame/history-noise andall earlier failed recipes stayclosed.
+All jobs stopped;no extension,collector,old-model repeat orautomatic successor.
+Full physics/events,natural calibration,changed-brick memory,late/tunnel/second-
+wall/above-top,untouched families andfresh confirmation remain required.
+Actor/critic,CDP comparison andfive-game work stayparked. No fitting result
 completes the goal. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
-recovered115GB;hardlinked retained evidence stays immutable.
+recovered115GB;hardlinked retained evidence staysimmutable.
 
 ## Direction and retained results
 

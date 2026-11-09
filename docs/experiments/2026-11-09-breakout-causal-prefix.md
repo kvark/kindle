@@ -71,3 +71,9 @@ collector,old-model repeat orautomatic successor. Full physics/events,natural
 calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
 families andfresh confirmation remain required. A fitting pass cannot finish
 the full world-model orfive-game goal.
+
+Completed: [result](../results/2026-11-09-breakout-causal-prefix.md) regresses
+ordinary22/25/19/24 andone-step97/107/101/105;0/24 gates. Reject this recipe.
+Initial/first/509 andfirst-cache/frozen/restore checks,134 declaration/260 closure
+pins,all24 cache/624 query/22,816 exposure joins,two guards/18 files pass;service
+terminal. Retain clean-history reward32;no successor selected. Full goal unproven.
