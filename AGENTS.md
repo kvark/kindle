@@ -21,27 +21,26 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [actual-history denoiser fitting check](docs/results/2026-11-09-breakout-denoising-real-history.md) is closed and failed:
-2,048 updates/65,536 targets still yield0/110 ordinary,0/198 privileged one-step
-and0/8 observed balls per draw. All supported raw forecasts havezero ball
-candidates. Actual training histories alone do not repair the fixed-budget
-recipe;failure exists before accumulated ordinary-rollout drift.
+The [rate1e-3 denoiser fitting check](docs/experiments/2026-11-09-breakout-denoising-rate1em3.md) is selected:
+one fresh2,048-update/65,536-target actual-history learner changes only learning
+rate1e-4→1e-3,for image/event heads. Same target/noise order,config otherwise,
+qualified native9657af72/source879ab527 andstrict fitting/full-goal gates. Four
+CPU checks andprepared data/helper checks pass;no rebuild or collector. Declare
+successfully before guarded train/restore. No GPU job launched yet.
+Root `/mnt/data/kindle-breakout-denoising-rate1em3-20261109`.
 
-All129 declared/70 CPU analysis pins,four CPU checks,135 actual-initial andfirst
-trained tensors,20 initial/restore arrays and135 frozen tensors pass. Native
-9657af72/source879ab527 qualification reused;no rebuild. Call/loop157.905s/
-166.498s;timing is affected by extra calls/shared host. Closure221 pins/two
-guards/18 files/one terminal service;16 exact frames/1,376 endpoints retained.
-Root `/mnt/data/kindle-breakout-denoising-real-history-20261109`.
-[Protocol](docs/experiments/2026-11-09-breakout-denoising-real-history.md). No GPU job or unchanged extension active.
+The [actual-history control](docs/results/2026-11-09-breakout-denoising-real-history.md) stays closed and failed:0/110 ordinary,
+0/198 privileged one-step and0/8 observed balls per draw. All135 first trained
+tensors match its mixed-history control;initial/frozen/restore andguards pass.
+Actual histories alone do not repair the failure. Mean image loss.848643→.124014
+does not establish adequate optimization;the new rate test addresses that limit.
+Prior denoiser trials/failures/repairs stay retained;no old job/query repeats.
 
-The [past-motion importance trial](docs/results/2026-11-09-breakout-denoising-context.md) remains closed and failed. All prior
-failures/repairs remain retained. User-requested [cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered
-115 GB withall4,392 large artifact paths preserved;hardlinked evidence remains
-immutable. Actor/critic,CDP comparison andthe game campaign stay parked. Full
-physics/events/calibration,brick memory,late/tunnel/second-wall/above-top,
-untouched families andfresh confirmation remain required. No fitting score
-completes the goal.
+User-requested [cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115 GB;all4,392 large artifact paths
+remain andhardlinked evidence stays immutable. Actor/critic,CDP comparison and
+five-game work stay parked. Physics/events/calibration,brick memory,late/tunnel/
+second-wall/above-top,untouched families andfresh confirmation remain required.
+No fitting/privileged score completes the goal;no automatic broad successor.
 
 ## Direction and retained results
 
