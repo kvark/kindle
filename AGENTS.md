@@ -21,27 +21,29 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [B8 at a fixed target budget](docs/experiments/2026-11-09-breakout-denoising-batch8.md): fresh8,192 updates
-instead ofB32/2,048,with exactly65,536 exposures ofthe same224 source arrivals,
-588 positive and32,768 forced-max-noise targets. Only training batch geometry
-changes;noise interleaving/averaging/Adam age also differ. CPU exposure/config
-checks pass. Reuse native60b9b672/source8dbf9ab5,no build. Require135 initial/
-frozen tensors and20 initial/restored arrays exact;one service,two guards.
-Root `/mnt/data/kindle-breakout-denoising-batch8-20261109`.
+unproven. The [same-target B8 learner](docs/results/2026-11-09-breakout-denoising-batch8.md) completes: one-step ball
+matches178/174/176/173 of198 improve140/149/140/140, butordinary rollouts
+33/31/29/28 of110 trail35/38/34/33. Both0/24 gates. All detected one-step balls
+are accurate;20–25 are missing. Generated histories remain weak despite better
+fitting. Retain B32/reward32 as ordinary control;keep B8 as distinct fitting
+evidence. No isolated mechanism or seed/generalization claim.
 
-[Frozen noisy-input attenuation](docs/results/2026-11-09-breakout-noisy-channels0p1.md) closes negatively:
-ordinary15/13/12/17 of110 andone-step90/91/90/87 of198,versus retained
-35/38/34/33 and140/149/140/140. First-stage matches115 each,butlater stages
-regress to87–91;retain original gain.218 closure pins,18 sealed guard files,
-135 own frozen tensors and108 final/20 origin trace arrays exact. Observer import
-andCPU path failures remain with separate successful repairs;no native repeat.
+B8 uses8,192 updates/65,536 targets versus2,048 atB32;per-source exposures,
+588 positives and32,768 forced-max-noise targets match. Noise interleaving,
+averaging andAdam age differ. Learning calls218.921s,loop228.929s versus
+161.420s/169.299s:35.22% more loop time.135 initial/frozen tensors and20
+initial/restored arrays exact;all8,192 loss rows finite/all45 parameters change.
+215 closure pins,two guards/18 sealed files,one terminal successful service.
+Native60b9b672/source8dbf9ab5 reused,no build. Root
+`/mnt/data/kindle-breakout-denoising-batch8-20261109`.
 
-Retain reward32;allprior trials stayclosed,fullres staysprotocol-failed. Full
-physics/events,natural calibration,changed-brick memory,late/tunnel/second-wall/
-above-top,untouched families andfresh confirmation remain required. No fitting
-score completes thegoal. No automatic successor;actor/critic,CDP comparison and
-five-game work stayparked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence
-staysimmutable.
+[Frozen noisy-input attenuation](docs/results/2026-11-09-breakout-noisy-channels0p1.md) staysnegative;original gain retained.
+All jobs stopped,prior trials stayclosed,fullres staysprotocol-failed. No learner,
+extension,collector orautomatic successor selected. Full physics/events,natural
+calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
+families andfresh confirmation remain required. No fitting score completes the
+goal. Actor/critic,CDP comparison andfive-game work stayparked.
+[Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
 
 ## Direction and retained results
 

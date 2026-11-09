@@ -45,3 +45,5 @@ no NVML or reset. Stop numerical/real host faults. No automatic learner,extensio
 collector or successor. Full physics/events,natural calibration,changed-brick
 memory,late/tunnel/second-wall/above-top,untouched families andfresh confirmation
 remain required. Actor/critic,CDP comparison andfive-game work stayparked.
+
+Completed: [mixed fitting/rollout result](../results/2026-11-09-breakout-denoising-batch8.md). Both guarded stages pass;215 closure pins. Retain B32 for ordinary rollouts;B8 retained as fitting evidence. No successor selected.
