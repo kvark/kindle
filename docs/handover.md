@@ -14,26 +14,36 @@ immutable. The latest pass leaves about275 GiB available on the root filesystem.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [closed edge-rebound audit](results/2026-11-09-breakout-world-edge-rebound.md)
-corrects the earlier respawn attribution: NOOP, LEFT and reversal survive the
-life_loss slice. Saved NOOP/LEFT outcomes are identical, but model LEFT ball
-presence at16 is14.1% versus100% for NOOP. One distinct initial history limits
-scope. The fitting plan contains179 complete-context left-edge targets and51
-observed upward reversals; a missing-example cause is not established.
+unproven. The [completed real-history probe](results/2026-11-09-breakout-world-oracle-history.md)
+restores LEFT/reversal ball accuracy to64/64 at16/32 under both histories;
+ordinary reversal is0/64. Some collision-adjacent assisted predictions still
+fail. Assistance changes posterior state and image history together, so their
+individual causes remain unresolved. Native1,152 calls/64.215s,133 pins,64
+exact controls/20 truth joins/240 frozen tensors pass. Original observer fails
+on a cleared terminal invocation ID; separate29-pin CPU completion verifies
+the exact journal and guard without rerunning GPU work. Preserve that failure.
 
-Select the [frozen real-history probe](experiments/2026-11-09-breakout-world-oracle-history.md):
-all four saved plans, histories16/32, eight draws and18 fixed target arrivals.
-Supply real recent frames/actions before one-step prediction; exclude target
-and future images. This changes posterior state and local image history together.
-Root `/x/Temp/kindle-world-oracle-history-20261109`. One guarded job capped1,200s,
-1,152 calls, unchanged16,384 updates and240 frozen tensors. No native rebuild,
-training, emulator, collector, acceptance change or automatic successor.
+The [edge-rebound audit](results/2026-11-09-breakout-world-edge-rebound.md) corrects
+the respawn attribution: NOOP/LEFT/reversal survive this life_loss slice, and
+NOOP/LEFT saved outcomes are equal. One distinct initial history limits scope.
+Fitting contains179 complete-context left-edge targets and51 upward reversals;
+simple absence of examples is not the explanation established by this audit.
 
-The [completed action-feature work](results/2026-11-09-breakout-world-action-features-branches.md)
-retains failed primary .224881 versus one-hot .172366 and296/304 nonending alarms.
-Keep the option default-off. Preserve native1331b702/SHA15ea18b5 and its exact
-runtime-v2/runner. All original failures remain. Full physics/events, brick
-memory, late/above-top coverage, untouched families and fresh confirmation
+Select [late command conditioning](experiments/2026-11-09-breakout-world-late-action.md)
+for implementation and bounded native qualification. Move18 action planes from
+motion0 to fusion, after the three image-only motion layers. Intended total
+80 weights/603,915 scalars stays fixed, with7,200 weights moved between two
+convolutions. This is a hypothesis about generated-history robustness, not a
+proven normalization cause or repair. Default-off, explicit new formatv26;
+read the full protocol before editing or executing. Root
+`/x/Temp/kindle-world-late-action-20261109`. No new GPU allocation, learner or
+collector is active; no fixed learner is selected yet.
+
+The [completed action-feature assessment](results/2026-11-09-breakout-world-action-features-branches.md)
+remains failed at primary .224881 versus one-hot .172366 and296/304 nonending
+alarms. Keep its feature option default-off and preserve native1331b702/SHA15ea18b5
+with exact runtime-v2/runner. All original failures remain. Full physics/events,
+brick memory, late/above-top coverage, untouched families and fresh confirmation
 remain required. Actor/critic, CDP and five-game work stay parked.
 
 ## Preserved source and fresh-machine setup

@@ -52,3 +52,18 @@ GPU/numerical failures; no reset, retry, extension or automatic successor.
 Full physical transitions, events, brick memory, late/above-top coverage,
 untouched families and fresh confirmation remain required. No learner,
 collector, actor/critic or CDP experiment is selected by this diagnostic.
+
+## CPU completion repair
+
+The native job completes all1,152 calls in64.215s with a successful host guard.
+The original observer then fails its invocation assertion: systemd has unloaded
+the successful transient unit and cleared its InvocationID. Preserve watch_v1.py,
+its traceback and failed service. Do not repeat the native stage.
+
+Select finish_v2.py as a separately pinned CPU-only completion. Require the saved
+native invocation's journal to contain the controller's `Completed probe` message
+and its successful guard exit, with no other invocation for that unit. Check the
+unit is inactive/MainPID0/Resultsuccess, queue completion, all original execution
+pins, source/before/after240 tensors and finite saved arrays. Audit the sealed
+guard. Declare the existing plot script against those finished inputs. This
+repairs missing completion evidence, not the original observer's failed status.
