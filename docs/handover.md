@@ -9,35 +9,39 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Reject [width32 pixel predictor](results/2026-11-09-breakout-denoiser-width32.md):13/12/10/14 of110 ordinary versus35/38/34/33;one-step106/104/100/105
-of198 versus140/149/140/140.0/24 gates. Loop203.215s versus169.299s (+20.03%).
-Own initial2/110 and0/198 improve withlearning buttrail the retained model.
-This matched-target comparison does not rule out other wider-model optimization.
-Retain width16 clean-history reward32;keep width32 experimental/off bydefault.
+unproven. The [fullres16 run](results/2026-11-09-breakout-fullres16.md) is
+**protocol-failed**,not aqualified comparison. I edited hash-pinned analyse.py
+while learning;all2,048 updates/final forecasts completed,then the final pincheck
+failed andrestore never launched. Original failed process/guard/observer,declared
+andmodified scripts preserved. Separate CPU analysis scores saved arrays only;
+it doesnot relabel the comparison aspassed. No learner/native/audit repeat.
 
-Pixel widths32/64/128:2,352,611 pixel parameters,total3,533,747;event heads unchanged.
-Default16 preservesv1–v9;32 requiresv10/matching architecture.31 Rust CPU/64
-packaged/four runner/strict Clippy pass. Default16 fixture135 initial/frozen/
-first-update tensors,20 arrays/six losses exact before main. Main57 initial/first/
-final event tensors/two first event losses exact;135 own frozen tensors/20
-restored arrays exact.143 declaration/276 closure pins,three guards/27 files,
-two terminal services pass. Source273818cd/nativee354ce919b4d;own792,783,105-byte
-apparent build cache released. Inherited graph_unchanged flag preserved with
-prelaunch clarification ofchanged pixel shapes;original CPU report None-at-zero-
-support failure andseparate report_v2 repair retained,no native/audit repeat.
-Root `/mnt/data/kindle-breakout-denoiser-width32-20261109`.
+Descriptive scores:ordinary27/25/25/27 of110 versus35/38/34/33;one-step149/152/152/151
+of198 versus140/149/140/140.0/24 gates. Retain qualified U-Net reward32;fullres
+stays off.33 Rust CPU/67 packaged/four runner/strict Clippy passedbefore GPU.
+Default U-Net fixture135 initial/frozen/first tensors,20 arrays/six losses exact;
+main57 initial/first/final event+15 shared-edge initial tensors exact. CPU confirms
+135 own frozen tensors;restore/20 restored outputs unmeasured. All144 declaration
+bytes verified viaarchived declared analysis,withlive mismatch explicitlyretained.
+277 CPU closure pins verified;legacy guard passes9 sealed files,main guard fails
+childexit1 with27 sealed files (36 total). Main servicefailed/legacy successful,
+both stopped. Initial preservation CPU audit-exit assumption failure andseparate
+repair retained;the auditor wasnot repeated. Own792,853,659-byte apparent build
+cache released. Native1eb5d74265a9/sourcec4f3279b;root
+`/mnt/data/kindle-breakout-fullres16-20261109`.
 
-New exact predictive-input audit usesfour past RGB frames/four actions,target
-excluded:224 unique prefixes,no duplicates/conflicts. This does not prove full
-observability,learned feature separation orabsence ofnear-aliasing. Retain
+Pixel predictor keepsnine5×5 convolutions at64×64,16 hidden channels,seven.1
+residual adds;81,459 pixel parameters,total1,262,595. It changes spatial/skip/
+parameter allocation together,no isolated resampling claim. Defaultfalse preserves
+U-Net/v1–v10;true usesv11. Learning counters165.784s/173.606s loop werewritten
+beforeintegrityfailure,not asuccessful job receipt. Retain
 [reward32](results/2026-11-09-breakout-denoising-reward32.md):35/38/34/33
-of110 ordinary,140/149/140/140 of198 one-step,0/24 gates;stable reward scalars,
-one privileged positive missed,no terminals/natural calibration. All previous
-negative trials stayclosed. All jobs stopped;no extension,collector,old-model
-repeat orautomatic successor. Full physics/events,natural calibration,changed-
-brick memory,late/tunnel/second-wall/above-top,untouched families andfresh
-confirmation remain required. Actor/critic,CDP comparison andfive-game work stay
-parked. No fitting result completes the goal. [Cleanup](results/2026-11-09-temp-cleanup.md)
+of110 ordinary,140/149/140/140 of198 one-step,0/24 gates. Earlierfailed recipes
+stayclosed. No extension,collector,old-model repeat,restore retry orautomatic
+successor. Full physics/events,natural calibration,changed-brick memory,late/
+tunnel/second-wall/above-top,untouched families andfresh confirmation remain
+required. Actor/critic,CDP comparison andfive-game work stayparked. No fitting
+result completes the full goal. [Cleanup](results/2026-11-09-temp-cleanup.md)
 recovered115GB;hardlinked retained evidence staysimmutable.
 
 ## Preserved source and fresh-machine setup

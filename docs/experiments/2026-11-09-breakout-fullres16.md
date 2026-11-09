@@ -65,3 +65,12 @@ No extension,collector,old-model repeat orautomatic successor. Full physics/
 events,natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
 untouched families andfresh confirmation remain required. No fitting score can
 complete the full world-model orfive-game goal.
+
+Closed as **protocol-failed**: [report](../results/2026-11-09-breakout-fullres16.md).
+All2,048 updates completed before final integrity failure caused byediting the
+pinned analysis script;restore never launched. Original failure/declared archive/
+modified source retained. Separate CPU-only review describes ordinary27/25/25/27,
+one-step149/152/152/151,0/24 gates;doesnot qualify the comparison.277 evidence
+pins verified;legacy guardpassed/main guardfailed,36 sealed files. No native/
+audit rerun. Original CPU preservation-exit assumption failure andseparate repair
+retained. Own build cache released;retain qualified control,no successor selected.
