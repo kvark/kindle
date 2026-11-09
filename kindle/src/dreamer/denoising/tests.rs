@@ -250,3 +250,167 @@ fn denoising_native_loss_matches_f64() {
         std::fs::write(path,serde_json::to_vec_pretty(&serde_json::json!({"status":"complete","loss":actual[0],"gradients":got,"values_and_derivatives":true,"no_optimizer_update":true})).unwrap()).unwrap();
     }
 }
+
+#[test]
+fn context_importance_is_local_positive_mean_one_and_lane_safe() {
+    let side = 16;
+    let area = side * side;
+    let width = 3 * area;
+    let mut h = History::empty(2, width);
+    for t in 0..4 {
+        let mut rgb = vec![-1.; 2 * width];
+        if t >= 2 {
+            rgb[8 * side + if t == 2 { 4 } else { 6 }] = 1.;
+        }
+        h.push(&rgb, &[if t == 0 { -1 } else { 0 }; 2]);
+    }
+    let weights = h.motion_importance(0, side, 100.);
+    let mean = (99. * 101. + 157.) / 256.;
+    assert_eq!(weights.len(), width);
+    assert!(weights.iter().all(|v| v.is_finite() && *v > 0.));
+    assert!((weights.iter().copied().map(f64::from).sum::<f64>() / width as f64 - 1.).abs() < 2e-6);
+    for c in 0..3 {
+        assert!((weights[c * area + 8 * side + 10] - 101. / mean).abs() < 1e-6);
+        assert!((weights[c * area + 8 * side + 11] - 1. / mean).abs() < 1e-6);
+        assert_eq!(&weights[..area], &weights[c * area..(c + 1) * area]);
+    }
+    assert_eq!(h.motion_importance(1, side, 100.), vec![1.; width]);
+    h.rgb[..2 * 2 * width].fill(0.9);
+    assert_eq!(h.motion_importance(0, side, 100.), weights);
+    assert_eq!(h.motion_importance(0, side, 0.), vec![1.; width]);
+    h.push(&vec![0.7; 2 * width], &[-1, 0]);
+    assert_eq!(h.motion_importance(0, side, 100.), vec![1.; width]);
+}
+
+#[test]
+fn context_motion_headers_preserve_v1_and_require_v2_for_weighting() {
+    let mut c = DenoisingConfig::default();
+    assert!(
+        !serde_json::to_value(&c)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("context_motion_scale")
+    );
+    let mut v = serde_json::json!({"format":"kindle-denoising-world-v1","config":c,"updates":0,"architecture":"conditional-unet16-32-64-history4","sampler":"edm-euler3-sigma5-quantized","observed_reconstruction":"single-denoise-sigma0.5-not-rssm-posterior"});
+    assert!(read_header(&serde_json::to_vec(&v).unwrap()).is_ok());
+    c.context_motion_scale = 100.;
+    assert!(c.validate().is_ok());
+    v["config"] = serde_json::to_value(&c).unwrap();
+    assert!(read_header(&serde_json::to_vec(&v).unwrap()).is_err());
+    v["format"] = "kindle-denoising-world-v2".into();
+    assert_eq!(read_header(&serde_json::to_vec(&v).unwrap()).unwrap().0, c);
+    v["config"]
+        .as_object_mut()
+        .unwrap()
+        .remove("context_motion_scale");
+    assert!(read_header(&serde_json::to_vec(&v).unwrap()).is_err());
+    for scale in [-1., f32::NAN, f32::INFINITY, 1001.] {
+        c.context_motion_scale = scale;
+        assert!(c.validate().is_err());
+    }
+}
+
+#[test]
+fn motion_importance_changes_only_image_loss_and_keeps_inference_and_weights() {
+    let c = DenoisingConfig::default();
+    let mut weighted = c.clone();
+    weighted.context_motion_scale = 100.;
+    assert_eq!(
+        params(&network::training(&c)),
+        params(&network::training(&weighted))
+    );
+    for build in [network::sampling, network::event_sampling] {
+        assert_eq!(
+            format!("{:?}", build(&c).nodes()),
+            format!("{:?}", build(&weighted).nodes())
+        );
+    }
+    let g = network::training(&weighted);
+    let id = g
+        .nodes()
+        .iter()
+        .find(|n| matches!(&n.op,Op::Input{name} if name=="pixel_importance"))
+        .unwrap()
+        .id;
+    assert!(ancestors(&g, g.outputs()[1]).contains(&id));
+    assert!(!ancestors(&g, g.outputs()[2]).contains(&id));
+    assert!(!ancestors(&g, g.outputs()[3]).contains(&id));
+}
+
+fn weighted_fixture() -> (Graph, meganeura::reference::Feeds, Vec<f32>, Vec<f64>, f64) {
+    let (mut g, mut feeds, x, mut grad, _) = mse_fixture();
+    let target = g
+        .nodes()
+        .iter()
+        .find(|n| matches!(&n.op,Op::Input{name} if name=="target"))
+        .unwrap()
+        .id;
+    let row = g
+        .nodes()
+        .iter()
+        .find(|n| matches!(&n.op,Op::Input{name} if name=="mask"))
+        .unwrap()
+        .id;
+    let prediction = g
+        .nodes()
+        .iter()
+        .find(|n| matches!(&n.op,Op::Parameter{name} if name=="prediction"))
+        .unwrap()
+        .id;
+    let importance = g.input("importance", &[16]);
+    let loss = network::weighted_mse(&mut g, prediction, target, row, importance, 2, 8);
+    g.set_outputs(vec![loss]);
+    let weights = (0..16)
+        .map(|i| if i % 2 == 0 { 0.5 } else { 1.5 })
+        .collect::<Vec<_>>();
+    feeds.set("importance", &weights);
+    for (v, &w) in grad.iter_mut().zip(&weights) {
+        *v *= f64::from(w);
+    }
+    let y = feeds.f32("target").unwrap();
+    let loss = x[..8]
+        .iter()
+        .zip(&y)
+        .zip(&weights)
+        .map(|((&a, &b), &w)| (f64::from(a) - f64::from(b)).powi(2) * f64::from(w) / 8.)
+        .sum();
+    (g, feeds, x, grad, loss)
+}
+#[test]
+fn context_weighted_loss_and_derivatives_match_independent_f64() {
+    let (g, feeds, _, grad, loss) = weighted_fixture();
+    let g = meganeura::autodiff::differentiate(&g);
+    let values = meganeura::reference::evaluate(&g, &feeds).unwrap();
+    assert!((values[g.outputs()[0] as usize].data[0] - loss).abs() < 1e-10);
+    for (&a, &b) in values[g.outputs()[1] as usize].data.iter().zip(&grad) {
+        assert!((a - b).abs() < 1e-10);
+    }
+}
+#[test]
+#[ignore = "requires guarded GPU: positive pixel importance and masked derivatives"]
+fn context_weighted_native_loss_matches_f64() {
+    let (g, feeds, x, grad, loss) = weighted_fixture();
+    let gpu = Arc::new(crate::init_gpu_context().unwrap());
+    assert_eq!(
+        gpu.device_information().device_name,
+        std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+    );
+    let mut session = runtime::build_session(&g, &gpu, Mode::Training, false);
+    session.set_parameter("prediction", &x);
+    for name in ["target", "mask", "importance"] {
+        session.set_input(name, &feeds.f32(name).unwrap());
+    }
+    session.step();
+    session.wait();
+    let mut actual = [0.];
+    session.read_output_by_index(0, &mut actual);
+    assert!((f64::from(actual[0]) - loss).abs() < 1e-6);
+    let mut got = [0.; 16];
+    session.read_param_grad("prediction", &mut got);
+    for (&a, &b) in got.iter().zip(&grad) {
+        assert!((f64::from(a) - b).abs() < 1e-6);
+    }
+    let p = std::env::var("KINDLE_CONTEXT_NATIVE_RECEIPT").unwrap();
+    std::fs::write(p,serde_json::to_vec_pretty(&serde_json::json!({"status":"complete","loss":actual[0],"gradient":got,"values_and_derivatives":true,"no_optimizer_update":true})).unwrap()).unwrap();
+}

@@ -90,7 +90,12 @@ pub(super) fn training(c: &DenoisingConfig) -> Graph {
     let target = g.input("denoiser_target", &[b * w]);
     let weight = g.input("row_weight", &[b, 1]);
     let output = denoiser(&mut g, input, b, c.action_count, c.side);
-    let image_loss = masked_mse(&mut g, output, target, weight, b, w);
+    let image_loss = if c.context_motion_scale == 0. {
+        masked_mse(&mut g, output, target, weight, b, w)
+    } else {
+        let importance = g.input("pixel_importance", &[b * w]);
+        weighted_mse(&mut g, output, target, weight, importance, b, w)
+    };
     let event_input = g.input(
         "event_input",
         &[b, (15 + 4 * c.action_count) * c.side * c.side],
@@ -150,6 +155,31 @@ pub(super) fn masked_mse(
 ) -> NodeId {
     let error = g.sub(output, target);
     let error = g.mul(error, error);
+    masked_pixel_mean(g, error, weight, batch, width)
+}
+
+pub(super) fn weighted_mse(
+    g: &mut Graph,
+    output: NodeId,
+    target: NodeId,
+    weight: NodeId,
+    importance: NodeId,
+    batch: usize,
+    width: usize,
+) -> NodeId {
+    let error = g.sub(output, target);
+    let error = g.mul(error, error);
+    let error = g.mul(error, importance);
+    masked_pixel_mean(g, error, weight, batch, width)
+}
+
+fn masked_pixel_mean(
+    g: &mut Graph,
+    error: NodeId,
+    weight: NodeId,
+    batch: usize,
+    width: usize,
+) -> NodeId {
     let error = g.reshape(error, &[batch, width]);
     let error = g.mean_inner(error);
     let error = g.mul(error, weight);

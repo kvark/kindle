@@ -23,6 +23,8 @@ pub struct DenoisingConfig {
     pub learning_rate: f32,
     pub seed: u64,
     pub horizon: usize,
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub context_motion_scale: f32,
 }
 impl Default for DenoisingConfig {
     fn default() -> Self {
@@ -35,6 +37,7 @@ impl Default for DenoisingConfig {
             learning_rate: 1e-4,
             seed: 41001,
             horizon: 333,
+            context_motion_scale: 0.,
         }
     }
 }
@@ -52,10 +55,19 @@ impl DenoisingConfig {
             || !self.learning_rate.is_finite()
             || self.learning_rate <= 0.
             || self.horizon < 2
+            || !self.context_motion_scale.is_finite()
+            || !(0.0..=1000.0).contains(&self.context_motion_scale)
         {
             return Err("invalid denoising world geometry or learning configuration");
         }
         Ok(())
+    }
+    fn checkpoint_format(&self) -> &'static str {
+        if self.context_motion_scale == 0. {
+            "kindle-denoising-world-v1"
+        } else {
+            "kindle-denoising-world-v2"
+        }
     }
     fn optimizer(&self) -> DreamerConfig {
         let mut c = DreamerConfig::tiny(self.action_count);
@@ -71,6 +83,9 @@ impl DenoisingConfig {
 const SIGMA_DATA: f32 = 0.5;
 const SIGMA_MIN: f32 = 0.002;
 const SIGMA_MAX: f32 = 5.;
+fn is_zero(value: &f32) -> bool {
+    *value == 0.
+}
 fn conditioners(sigma: f32) -> (f32, f32, f32, f32) {
     let variance = sigma * sigma + SIGMA_DATA * SIGMA_DATA;
     (
@@ -162,6 +177,48 @@ impl History {
             }
         }
         result
+    }
+    /// Positive, mean-one importance derived only from the conditioning history.
+    fn motion_importance(&self, lane: usize, side: usize, scale: f32) -> Vec<f32> {
+        let area = side * side;
+        if scale == 0. || self.actions[3 * self.batch + lane] < 0 {
+            return vec![1.; 3 * area];
+        }
+        let previous = (2 * self.batch + lane) * self.width;
+        let current = (3 * self.batch + lane) * self.width;
+        let motion = (0..area)
+            .map(|i| {
+                (0..3)
+                    .map(|c| {
+                        (self.rgb[current + c * area + i] - self.rgb[previous + c * area + i]).abs()
+                            * 0.5
+                    })
+                    .fold(0., f32::max)
+            })
+            .collect::<Vec<_>>();
+        // Separable radius-four max filter keeps nearby future motion in scope.
+        let mut horizontal = vec![0.; area];
+        let mut importance = vec![1.; area];
+        for y in 0..side {
+            for x in 0..side {
+                horizontal[y * side + x] = (x.saturating_sub(4)..=(x + 4).min(side - 1))
+                    .map(|xx| motion[y * side + xx])
+                    .fold(0., f32::max);
+            }
+        }
+        for y in 0..side {
+            for x in 0..side {
+                let change = (y.saturating_sub(4)..=(y + 4).min(side - 1))
+                    .map(|yy| horizontal[yy * side + x])
+                    .fold(0., f32::max);
+                importance[y * side + x] += scale * change;
+            }
+        }
+        let mean = importance.iter().sum::<f32>() / area as f32;
+        for value in &mut importance {
+            *value /= mean;
+        }
+        importance.repeat(3)
     }
 }
 
@@ -368,6 +425,14 @@ impl DenoisingWorldLearner {
                 ("row_weight", &weights),
             ] {
                 self.train.set_input(name, values);
+            }
+            if c.context_motion_scale > 0. {
+                let importance = (0..b)
+                    .flat_map(|lane| {
+                        history.motion_importance(lane, c.side, c.context_motion_scale)
+                    })
+                    .collect::<Vec<_>>();
+                self.train.set_input("pixel_importance", &importance);
             }
             runtime::configure_d3_optimizer(
                 &mut self.train,
@@ -584,7 +649,7 @@ impl DenoisingWorldLearner {
         std::fs::write(
             path.join("metadata.json"),
             serde_json::to_vec_pretty(
-                &serde_json::json!({"format":"kindle-denoising-world-v1","config":self.config,"updates":self.updates,"architecture":"conditional-unet16-32-64-history4","sampler":"edm-euler3-sigma5-quantized","observed_reconstruction":"single-denoise-sigma0.5-not-rssm-posterior"}),
+                &serde_json::json!({"format":self.config.checkpoint_format(),"config":self.config,"updates":self.updates,"architecture":"conditional-unet16-32-64-history4","sampler":"edm-euler3-sigma5-quantized","observed_reconstruction":"single-denoise-sigma0.5-not-rssm-posterior"}),
             )?,
         )?;
         Ok(())
@@ -614,7 +679,7 @@ fn read_header(bytes: &[u8]) -> Result<(DenoisingConfig, u64), Box<dyn std::erro
         observed_reconstruction: String,
     }
     let h: Header = serde_json::from_slice(bytes)?;
-    if h.format != "kindle-denoising-world-v1"
+    if h.format != h.config.checkpoint_format()
         || h.architecture != "conditional-unet16-32-64-history4"
         || h.sampler != "edm-euler3-sigma5-quantized"
         || h.observed_reconstruction != "single-denoise-sigma0.5-not-rssm-posterior"

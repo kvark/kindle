@@ -9,36 +9,32 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [conditional denoiser fitting diagnostic](results/2026-11-09-breakout-denoising-fit.md) is closed and failed:
-fresh2,048 updates/65,536 target exposures on eight clips yield0/110 ordinary
-16-step and0/198 privileged actual-history one-step ball matches on each of
-four draws. Observed noisy-frame denoising detects0/8 balls per draw,with perfect
-static brick-cell accuracy. Failure exists before generated-history drift
-could explain it;no unique capacity/optimizer/noise/sampler cause is established.
-No unchanged extension or successor is selected;no GPU allocation is active.
+Select [conditioning-motion importance](experiments/2026-11-09-breakout-denoising-context.md) for a bounded fresh denoiser
+fit:positive image-loss weights from past RGB changes only,scale100/radius4/
+mean1. No target/object/RAM weighting or extra inference feature. This changes
+optimization emphasis;the unconstrained conditional residual mean is unchanged,
+without a finite-capacity or calibration guarantee. Default0/v1 remain;positive
+scale requires v2. Same45 parameters/1.8M scalars/135 tensors and sampling.
+Root `/mnt/data/kindle-breakout-denoising-context-20261109`.
 
-Unchanged qualified native0c705e12/db6b433d,1.8M RGB64/trainB32/inferB8,Auto,
-seed41001;experiment declarationab14c014. Call/loop133.854s/141.289s.
-All142 declared/69 CPU inputs,513 finite reports,45 changed weights,135 initial/
-frozen tensors and20 exact per-draw restore arrays pass. Three CPU runner
-checks include no future-image input. All224 exact conditions aredistinct;
-224 unique targets receive292–296 exposures each. Closure229 pins/two sealed
-guards/18 files,one terminal service;16 exact clip frames/1,376 endpoints retained.
-Root `/mnt/data/kindle-breakout-denoising-fit-20261109`. No rebuild,backend fixture,
-old model query or collection repeats. Two positive prefix rewards/588 training
-targets remain;the evaluation suffix hasno positives. Original CPU preparation
-failure and its separate repair remain. [Protocol](experiments/2026-11-09-breakout-denoising-fit.md).
+Ten CPU/351 packaged/three runner checks andstrict core Clippy pass. Original
+F32 mean-test failure andF64 accumulation correction remain. Only disposable
+workspace pytest/bytecode caches were archived/released to relieve full root;
+new build/runtime/cache files stay on/mnt/data. No GPU allocation active yet.
+Next pin matching native/source/runner,qualify weighted loss values/derivatives,
+then review the separately selected2,048-update fitting learner. Same closed
+513-call/65,536-target plan,224 arrivals,eight clips andseed41001;reuse counts,
+no old model query or collector. Read the protocol before execution. No broad
+learner,extension,sweep or automatic successor is selected.
 
-The [broad denoising trial](results/2026-11-09-breakout-denoising-world.md) stays closed and failed:8,189 updates,
-zero detected balls,primary energy.648302 versus H0.169502/gate.127127. Its
-launch ordering failure remains. The earlier pixel RSSM's110/110 fitting result
-is a cached,different-capacity/objective/workload reference,not a matched-budget
-architecture comparison. Do not repeat completed learners,collectors,assessments
-or reviews. Actor/critic,CDP comparison and the five-game campaign remain parked.
-
-All full physics/event/calibration,brick-memory,late/tunnel/second-wall/above-top,
-untouched-family andfresh-confirmation requirements remain. No fitting or
-privileged score completes either goal;the current oracle hasno above-top endpoint.
+The [uniform denoiser fit](results/2026-11-09-breakout-denoising-fit.md) remains closed and failed:0/110 ordinary
+and0/198 actual-history one-step matches per draw;observed denoising0/8 despite
+perfect static brick cells. All completed learners,assessments andreviews stay
+closed. The new weighting is a hypothesis,not an established explanation orfix.
+Actor/critic,CDP comparison and the five-game campaign remain parked. Full
+physics/events,calibration,brick memory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. No fitting or
+privileged score completes either goal;the full oracle lacks above-top endpoints.
 
 ## Preserved source and fresh-machine setup
 

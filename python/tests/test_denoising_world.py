@@ -25,3 +25,18 @@ def test_incompatible_header_without_gpu(tmp_path,field):
 def test_unknown_setting_is_rejected_without_gpu():
     with pytest.raises(ValueError,match='unknown field'):
         kindle.DenoisingWorldLearner(CONFIG | {'target_conditioning':True})
+
+@pytest.mark.parametrize('scale', [-1., 1001.])
+def test_invalid_context_scale_without_gpu(scale):
+    with pytest.raises(ValueError, match='invalid denoising'):
+        kindle.DenoisingWorldLearner(CONFIG | {'context_motion_scale':scale})
+
+@pytest.mark.parametrize('version,scale', [('v1',100.),('v2',0.)])
+def test_context_objective_requires_matching_header_without_gpu(tmp_path,version,scale):
+    header=dict(format='kindle-denoising-world-'+version,
+        config=CONFIG | {'context_motion_scale':scale},updates=0,
+        architecture='conditional-unet16-32-64-history4',sampler='edm-euler3-sigma5-quantized',
+        observed_reconstruction='single-denoise-sigma0.5-not-rssm-posterior')
+    (tmp_path/'metadata.json').write_text(json.dumps(header))
+    with pytest.raises(RuntimeError,match='checkpoint header'):
+        kindle.DenoisingWorldLearner.restore(str(tmp_path))
