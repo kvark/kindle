@@ -76,3 +76,26 @@ No new learner, physical-branch assessment or collector is selected here.
 Full physics/action responses, natural event calibration, changed-brick memory,
 late/above-top coverage, untouched families and fresh confirmation remain
 required. The full goal stays active and unproven.
+
+## Selected terminal CPU consequence check
+
+The single native job has completed all eight cases in268.267s. Its strict
+analysis fails on observed RGB and four categorical blocks, while every forced-
+sample recurrent state and actual generated suffix pixel agrees exactly.
+Before interpreting these small image differences, select one CPU-only derived
+check of the saved paired images. No model or emulator query is allowed.
+
+Reuse the unchanged conservative ball detector from the prior plain-world
+consequence check. Include both local models, both batches, both draws and every
+observed/suffix frame; do not rerun the prior plain-world cases. Compare observed
+F64 sigmoid-of-training-logits with the saved streaming image, and actual native
+training-generated suffix means with the saved streaming suffix. Report detection
+availability, coordinate differences and within1px decisions, with truth-supported
+and reset-valid denominators separate. Retain missing/diffuse cases. This is a
+descriptive instrument consequence, not a new physics assessment or a replacement
+for any original tolerance/gate. Keep the original strict contract failed.
+
+Also recount exact full-graph values from the saved arrays so within-tolerance
+equality is not mislabeled as bitwise equality. Declare immutable inputs before
+calculation, preserve the original analysis/closure and exclude the new outputs
+and open logs from their own manifests. No automatic native successor is selected.

@@ -11,17 +11,19 @@ eight56/107, sixteen28/114, thirty-two5/95 versus early106/112,101/109,66/109,
 successful guards/18 sealed files pass. No broad assessment or extension.
 Native/observer/CPU services are inactive/successful. Keep late conditioning off.
 
-The [local forward-contract measurement](experiments/2026-11-09-breakout-world-local-forward-contract.md)
-is active under one1,800s host guard: eight cases across the early-featurev25 and
-latev26 local1M finals, two sealed batches and two fixed noise pairs. Source
-5bbeaccf/executable SHAe6995c54/107 execution pins; both focused CPU checks and
-strict core/test Clippy pass. Existing158 production files match81a5e4e3 except
-cfg(test) registration. No optimizer step, learner, collector or production
-runtime change. Unit `kindle-world-local-forward-20261109`, invocation
-863e51ce948049e4a02162c28b98d8ef/controller2214535 and observer2214538 are live.
-Root `/x/Temp/kindle-world-local-forward-contract-20261109`; source, executable,
-settings and checks retained, packaged2.14GB compiler cache released. Strict
-contract and CPU audit remain pending. No automatic successor.
+The [local forward-contract measurement](results/2026-11-09-breakout-world-local-forward-contract.md)
+is closed: strict contract fails on295 observed RGB values andfour/98,304
+categorical blocks. All forced-sample recurrent states and actual native generated
+suffix pixels agree exactly;24 F64 loss checks pass. One full-graph loss value
+has1.907e-6 difference; all continuous full-graph comparisons pass. CPU-only
+consequence on3,072 image pairs changeszero ball detections/within1px decisions,
+maximum observed coordinate difference.00330px. These conditional checks do not
+prove free-running physics or categorical harmlessness.268.267s native,zero
+optimizer steps;107 execution/70 analysis/73 closure pins andone guard/nine sealed
+files pass, source checkpoints unchanged. Native/observer are inactive/successful.
+No new learner, collector, physical assessment or automatic successor is selected.
+Root `/x/Temp/kindle-world-local-forward-contract-20261109`; retained test source
+5bbeaccf/SHAe6995c54, production runtime unchanged, packaged compiler cache released.
 
 The [late native qualification](results/2026-11-09-breakout-world-late-action-native.md)
 stays closed at52.356s with128 execution/69 closure pins; source81a5e4e3/
