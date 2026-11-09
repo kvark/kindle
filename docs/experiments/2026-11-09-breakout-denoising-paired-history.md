@@ -38,3 +38,8 @@ No new training, emulator actions/frames, collection, extension or automatic
 successor. Full physics/events/natural calibration, changed-brick memory,
 late/tunnel/second-wall/above-top, untouched families and fresh confirmation still
 remain required to prove the goal.
+
+Completed: the [result](../results/2026-11-09-breakout-denoising-paired-history.md)
+confirms real-history77/86/77/77 versus recursive40/41/35/33 of110 under matched
+noise. All first-step/frozen/guard checks pass, service terminal success. No
+learner or extension selected by this diagnostic; full goal remains unproven.

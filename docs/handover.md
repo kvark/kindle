@@ -27,10 +27,12 @@ caches released. Optional CPU console failure/repair andseparate closure-field
 metadata correction remain preserved;no native job/query isrepeated.
 Root `/mnt/data/kindle-breakout-denoising-sigma-data0p05-20261109`.
 
-The [frozen paired-history diagnostic](experiments/2026-11-09-breakout-denoising-paired-history.md) is selected:compare a new recursive
-branch to cached actual-history predictions with identical per-step sampling
-noise. Reuse current native/checkpoint;no build ortraining. Declare before one
-300s guarded allocation. Root
+The [frozen paired-history diagnostic](results/2026-11-09-breakout-denoising-paired-history.md) is closed. Matched per-step noise gives
+real-history77/86/77/77 versus recursive40/41/35/33 of110;38–46 successes lost
+andonly1–2 gained. This supports history-error accumulation,not a unique cause.
+64 native queries/4.934s,no build/training;20 exact first-step arrays/135 frozen
+tensors,22 declared/22 CPU pins andone sealed guard/nine files pass. Service
+terminal success. No old assessment/learner repeats. Root
 `/mnt/data/kindle-breakout-denoising-paired-history-20261109`.
 No learner,extension orcollector isselected. Retain.05 as development evidence,
 not a global default. The [stage trace](results/2026-11-09-breakout-denoising-stage-trace.md) andall older trials/failures/repairs stay
