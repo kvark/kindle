@@ -57,3 +57,5 @@ Passing this fitting task would not prove the world model. Preserve full
 physics/event/calibration/brick-memory gates, late/tunnel/second-wall/above-top
 coverage, untouched families and fresh confirmation. Current oracle has no
 above-top endpoint. Read the result before selecting any further allocation.
+
+The [completed result](../results/2026-11-09-breakout-denoising-real-history.md) fails:0/110 ordinary and0/198 privileged one-step on each draw. All135 first trained tensors match the control exactly. The allocation is closed;no unchanged extension is selected.

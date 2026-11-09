@@ -9,24 +9,27 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [actual-history denoiser fitting check](experiments/2026-11-09-breakout-denoising-real-history.md) is selected:
-feed four actual past frames on every update through the existing five-arrival
-API. Same qualified native9657af72/source879ab527,config,target order,noise
-stream and2,048-update/65,536-target budget;no rebuild or collector. Four CPU
-checks pass. Declare/pin before guarded train/restore;no GPU job launched yet.
+The [actual-history denoiser fitting check](results/2026-11-09-breakout-denoising-real-history.md) is closed and failed:
+2,048 updates/65,536 targets still yield0/110 ordinary,0/198 privileged one-step
+and0/8 observed balls per draw. All supported raw forecasts havezero ball
+candidates. Actual training histories alone do not repair the fixed-budget
+recipe;failure exists before accumulated ordinary-rollout drift.
+
+All129 declared/70 CPU analysis pins,four CPU checks,135 actual-initial andfirst
+trained tensors,20 initial/restore arrays and135 frozen tensors pass. Native
+9657af72/source879ab527 qualification reused;no rebuild. Call/loop157.905s/
+166.498s;timing is affected by extra calls/shared host. Closure221 pins/two
+guards/18 files/one terminal service;16 exact frames/1,376 endpoints retained.
 Root `/mnt/data/kindle-breakout-denoising-real-history-20261109`.
+[Protocol](experiments/2026-11-09-breakout-denoising-real-history.md). No GPU job or unchanged extension active.
 
-The [past-motion importance trial](results/2026-11-09-breakout-denoising-context.md) remains closed and failed:
-ordinary0/110,privileged one-step0/198 andobserved denoising0/8 on each draw.
-It weighted45/46 checked first-target ball centers above1 without fixing fitting.
-Its failures/CPU-only repairs and complete evidence remain retained. No old
-learner,query,collector or unchanged extension will repeat.
-
-The user's [temporary cleanup](results/2026-11-09-temp-cleanup.md) recovered115 GB;all4,392 large artifact
-paths remain. Deduplicated evidence stays immutable. Actor/critic,CDP comparison
-andthe game campaign stay parked. Full physics/events/calibration,brick memory,
-late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
-required. No fitting/privileged score completes the goal.
+The [past-motion importance trial](results/2026-11-09-breakout-denoising-context.md) remains closed and failed. All prior
+failures/repairs remain retained. User-requested [cleanup](results/2026-11-09-temp-cleanup.md) recovered
+115 GB withall4,392 large artifact paths preserved;hardlinked evidence remains
+immutable. Actor/critic,CDP comparison andthe game campaign stay parked. Full
+physics/events/calibration,brick memory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. No fitting score
+completes the goal.
 
 ## Preserved source and fresh-machine setup
 
