@@ -21,40 +21,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [fullres16 run](docs/results/2026-11-09-breakout-fullres16.md) is
-**protocol-failed**,not aqualified comparison. I edited hash-pinned analyse.py
-while learning;all2,048 updates/final forecasts completed,then the final pincheck
-failed andrestore never launched. Original failed process/guard/observer,declared
-andmodified scripts preserved. Separate CPU analysis scores saved arrays only;
-it doesnot relabel the comparison aspassed. No learner/native/audit repeat.
+unproven. Select [retained reward32 stage trace](docs/experiments/2026-11-09-breakout-reward32-stage-trace.md): frozen sigma_data.05 model,108 actual-history traces,
+324 denoiser calls,allthree intermediate RGB estimates. Reuse exact qualified
+native-cpu-test/source8dbf9ab5;no rebuild/new learner. Require108 finalbatch
+arrays/20 normal origin arrays and135 frozen tensors exact before CPU scoring.
+One guarded300s job. Root
+`/mnt/data/kindle-breakout-reward32-stage-trace-20261109`.
 
-Descriptive scores:ordinary27/25/25/27 of110 versus35/38/34/33;one-step149/152/152/151
-of198 versus140/149/140/140.0/24 gates. Retain qualified U-Net reward32;fullres
-stays off.33 Rust CPU/67 packaged/four runner/strict Clippy passedbefore GPU.
-Default U-Net fixture135 initial/frozen/first tensors,20 arrays/six losses exact;
-main57 initial/first/final event+15 shared-edge initial tensors exact. CPU confirms
-135 own frozen tensors;restore/20 restored outputs unmeasured. All144 declaration
-bytes verified viaarchived declared analysis,withlive mismatch explicitlyretained.
-277 CPU closure pins verified;legacy guard passes9 sealed files,main guard fails
-childexit1 with27 sealed files (36 total). Main servicefailed/legacy successful,
-both stopped. Initial preservation CPU audit-exit assumption failure andseparate
-repair retained;the auditor wasnot repeated. Own792,853,659-byte apparent build
-cache released. Native1eb5d74265a9/sourcec4f3279b;root
-`/mnt/data/kindle-breakout-fullres16-20261109`.
-
-Pixel predictor keepsnine5×5 convolutions at64×64,16 hidden channels,seven.1
-residual adds;81,459 pixel parameters,total1,262,595. It changes spatial/skip/
-parameter allocation together,no isolated resampling claim. Defaultfalse preserves
-U-Net/v1–v10;true usesv11. Learning counters165.784s/173.606s loop werewritten
-beforeintegrityfailure,not asuccessful job receipt. Retain
+The old stage trace usedsigma_data.5,not this checkpoint;it staysclosed. This
+trace doesnot test one-stage autoregressive sampling ornew event calibration.
+Keep allstage ball/paddle/brick/pixel/contrast/motion regressions,no detector
+change orbest-stage selection. New analysis filenames/declarations only;no
+editing pinned scripts. Retain qualified
 [reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):35/38/34/33
-of110 ordinary,140/149/140/140 of198 one-step,0/24 gates. Earlierfailed recipes
-stayclosed. No extension,collector,old-model repeat,restore retry orautomatic
-successor. Full physics/events,natural calibration,changed-brick memory,late/
-tunnel/second-wall/above-top,untouched families andfresh confirmation remain
-required. Actor/critic,CDP comparison andfive-game work stayparked. No fitting
-result completes the full goal. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
-recovered115GB;hardlinked retained evidence staysimmutable.
+of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
+[Fullres run](docs/results/2026-11-09-breakout-fullres16.md) remains protocol-
+failed;its CPU-only recovery doesnot qualify it andrestore never ran. All earlier
+negative trials stayclosed. No extension,collector orautomatic successor. Full
+physics/events,natural calibration,changed-brick memory,late/tunnel/second-wall/
+above-top,untouched families andfresh confirmation remain required. Actor/critic,
+CDP comparison andfive-game work stayparked. No fitting score completes the goal.
+[Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked
+retained evidence staysimmutable.
 
 ## Direction and retained results
 
