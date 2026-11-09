@@ -86,3 +86,21 @@ inputs, excluding itself andopen logs. No new model/GPU/emulator query or
 optimizer update is made. Artifacts are under `milestone-2048-v1`; original
 execution/CPU scripts andthe running learner remain unchanged. Final forecasts,
 frozen restore andthe final-only decision remain pending.
+
+## Halfway scheduled curve
+
+At the fixed8,192-update checkpoint, natural development reconstruction improves
+while forecasts trail the cached prior-suffix recipe:
+
+|Natural development, first draw|Observed|1|4|8|16|32|
+|---|---:|---:|---:|---:|---:|---:|
+|Cached prior-suffix small64|23/26|24/27|11/26|8/27|3/27|0/25|
+|Posterior-history RGB100|25/26|18/27|3/26|1/27|0/27|0/25|
+
+The CPU-only summary pins all12 completed JSON exports across both recipes and
+all six groups, retaining all four draws. This reads existing scheduled scores;
+it makes no model query, new physical-field join or final gate decision. Source
+artifacts remain in `halfway-inputs-v1.json` and `halfway-review-v1.json`.
+The original learner/controller/observer/CPU-finisher identities remain live.
+No budget, objective, checkpoint selection or allocation changes. The fixed final
+comparison, exact restore andfull CPU audit remain pending.
