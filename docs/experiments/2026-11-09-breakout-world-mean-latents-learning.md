@@ -65,3 +65,5 @@ removed-brick memory,late/tunnel/second-wall/above-top,untouched families andfre
 confirmation remain required. No implementation/fitting/intermediate result
 completes thegoal. No extension,collector orautomatic successor. Actor/critic,
 CDP comparison andfive-game work stayparked;earlier jobs remain closed.
+
+Completed negative: [result](../results/2026-11-09-breakout-world-mean-latents-learning.md),1/3 original gates.324 original closure/331 publication pins. A separate CPU-only report-link/wording correction preserves original source/report andallmetrics. No native rerun orconditional assessment.
