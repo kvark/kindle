@@ -59,3 +59,5 @@ existing AMD host guard,no NVML/reset/reload. No new game action/frame,actor,
 critic,CDP,build orautomatic successor. Full physics/events,natural calibration,
 changed-brick memory,late/tunnel/second-wall/above-top,untouched families and
 fresh confirmation remain required;no fitting score completes thefull goal.
+
+Completed: [negative training result](../results/2026-11-09-breakout-full-causal-prefix.md). Ordinary27/29/19/31,one-step139/139/140/146;2/24 gates.247 closure pins,two guards/18 files andall cache joins pass. Retain existing controls;no successor selected.

@@ -3,28 +3,32 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [four generated training-history frames](experiments/2026-11-09-breakout-full-causal-prefix.md): fresh B8
-8,192-update learner,unchanged65,536 targets/config/native Gaussian order.
-First4,096 updates clean;then13,424 exposures replace allfour prefix frames with
-causal four-step forecasts,half ofeligible source repetitions.16 frozen caches/
-368 queries/11,776 imagined frames,refresh256,no new emulator experience.
-Seven CPU check groups pass. Require135 initial/first/2036/4084 tensors,six
-first losses,20 initial/2036/4084 arrays andown frozen/restore exact. One service,
-two guards,existing native60b9b672/source8dbf9ab5,no build. Root
+unproven. [Four generated training-history frames](results/2026-11-09-breakout-full-causal-prefix.md) closes negatively:
+ordinary27/29/19/31 of110 versusclean B8's33/31/29/28;one-step139/139/140/146
+of198 versus178/174/176/173.2/24 gates pass,both ordinary horizon1;all16-step
+endpoints fail. Retain B32/reward32 as ordinary reference andclean B8 as distinct
+fitting evidence. Generated-prefix training didnot repair rollouts inthis recipe.
+
+Fresh8,192 updates/65,536 targets;after4,096 clean updates,13,424 exposures use
+four causal generated prefix frames.16 caches/368 queries/11,776 imagined frames,
+no emulator experience.9,042/12,122 supported augmented targets have no detectable
+ball inthe last generated frame;not proof ofcomplete information loss orcause.
+Every cache/source/action/seed/age and1,678 training join verifies.135 initial/
+first/2036/4084 tensors,six first losses,20 initial/2036/4084 model arrays,135 own
+frozen/20 restore arrays exact;8,192 finite loss rows/all45 parameters change.
+128 declaration/247 closure pins,two guards/18 files,one terminal successful
+service. Calls218.693s,cache40.020s,loop270.376s versus228.929s clean B8.
+Native60b9b672/source8dbf9ab5 reused,no build. Root
 `/mnt/data/kindle-breakout-full-causal-prefix-20261109`.
 
-The [B8 control](results/2026-11-09-breakout-denoising-batch8.md) improves one-step matches to178/174/176/173 of198,
-butordinary33/31/29/28 of110 trails B32's35/38/34/33;both0/24 gates. B8 costs
-35.22% more loop time. Keep B32/reward32 as ordinary reference andB8 as distinct
-fitting evidence. Prior latest-only generated histories failed;the new test
-uses allfour generated frames after longer warmup,not a repeat. No isolated
-mechanism,seed/generalization orfull16-step training-history claim.
-
-Allprevious jobs stayclosed;fullres staysprotocol-failed. No automatic successor.
-Full physics/events,natural calibration,changed-brick memory,late/tunnel/second-
-wall/above-top,untouched families andfresh confirmation remain required. No
-fitting score completes thegoal. Actor/critic,CDP comparison andfive-game work
-stayparked. [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
+The separate [recurrent contact fit](results/2026-11-08-breakout-world-contact-fit.md) remains110/110 across four draws;
+its architecture/loss/target budget differs andit isnot generalization proof.
+All jobs stopped;allprior trials stayclosed,fullres staysprotocol-failed. No
+learner,extension,collector orautomatic successor selected. Full physics/events,
+natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. No fitting score
+completes thegoal. Actor/critic,CDP comparison andfive-game work stayparked.
+[Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
 
 ### What would establish the world model
 
