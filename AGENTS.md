@@ -21,39 +21,23 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Reject [target-motion loss attention](docs/results/2026-11-09-breakout-target-motion.md) forrollouts:9/9/10/8 of110 versus35/38/34/33. One-step improves
-150/157/151/148 of198 versus140/149/140/140,butoverall0/24 gates still fail.
-Detections rise190–194/198;only148–157 matchwithin1px. Ordinary rollout outputs
-have77–80/110 ambiguous red masks (>12 candidate pixels),versus no candidate-
-free cases. Improved local visibility does not establish stable generated
-histories. Keep target_motion_loss off;retain clean-history reward32.
+unproven. Select [causal generated-latest prefixes](docs/experiments/2026-11-09-breakout-causal-prefix.md): one fresh2,048-update/65,536-target learner,first512
+clean,then half the histories getone detached causal predicted latestframe.
+Earlier three frames stay real.24 caches/624 queries add4,992 imagined frames;
+22,816 target exposures getgenerated latest history. Seven CPU runner checks pass.
+Reuse exact reward32 native60b9b67244d7 andrunner;no build ornew backend work.
+Require initial/first/509 tensors andarrays exact before augmentation,first-cache
+135 frozen tensors,final own135 tensors/20 restore arrays andoriginal gates.
+Root `/mnt/data/kindle-breakout-causal-prefix-20261109`.
 
-Only loss attention changes: exact supervised RGB differences replace dilated
-past-only weights atscale100. No new object labels ormodel inputs;existing noisy-
-target denoising input is retained,clean next RGB is not added tohistory.
-Optional defaultfalse preservesv1–v8;true requiresv9/nonzero strength.29 Rust CPU/
-58 packaged/four runner/strict Clippy pass;weighted-MSE graph/derivatives reused.
-Default fixture135 initial/frozen/first-update tensors,20 arrays/six losses exact
-before main. Main135 initial tensors/20 arrays,57 first/final event tensors/two
-first event losses,135 own frozen tensors/20 restored arrays exact.144 declaration/
-270 closure pins,three sealed guards/27 files,two terminal services pass.
-2,048 updates/65,536 targets take157.609s learn-call/166.498s loop,shared host,
-no isolated speed claim. Own792,742,242-byte apparent cache released.
-Source75b7e7b0/native59045d5e98aa;root
-`/mnt/data/kindle-breakout-target-motion-20261109`.
-
-[Saved appearance diagnosis](docs/results/2026-11-09-breakout-ball-appearance.md)
-finds45/55 strict no-candidate control outputs with near-target faint peaks.
-Those diagnostic locations never replace the strict detector orcount as passes.
-10 input pins/396 first-draw model/case rows verified;CPU-only,no newmodel query.
-Retain [reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):
-35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates;stable learned
-reward scalars butone privileged positive missed,no terminals/natural calibration.
-Direct-frame/history-noise andall earlier negative recipes stayclosed.
-Full physics/events,natural calibration,changed-brick memory,late/tunnel/second-
-wall/above-top,untouched families andfresh confirmation remain required.
-All jobs stopped;no extension,collector,old-model repeat orautomatic successor.
-Actor/critic,CDP comparison andfive-game work stay parked. No fitting score
+Retain [clean-history reward32](docs/results/2026-11-09-breakout-denoising-reward32.md):35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
+[Target-motion attention](docs/results/2026-11-09-breakout-target-motion.md)
+improves one-step butregresses ordinary to8–10/110 with77–80 ambiguous red masks;
+keep off. Direct-frame/history-noise andall earlier negative recipes stayclosed.
+This new trial tests onlyone generated frame,not full generated-history training.
+No actor/critic/CDP,collection,extension orautomatic successor. Full physics/
+events,natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. No fitting result
 completes the goal. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
 recovered115GB;hardlinked retained evidence stays immutable.
 
