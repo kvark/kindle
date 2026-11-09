@@ -9,49 +9,45 @@ those reports; historical “next” paragraphs do not authorize restarting jobs
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-Actor/critic,CDP comparison and the five-game campaign remain parked. Use native
-pixel supervision and retained global H0 as the inspectable reference;no
-pretrained encoder or object/RAM training targets. The [one-time refresh
-diagnostic](experiments/2026-11-09-breakout-world-refresh.md) is selected
-for bounded native execution after CPU/data/package review. Frozen final H0/RGB1
-only;first16 fitting/16 development origins,four draws,four causal branches,one
-image-history/latent/both refresh before action4 using true arrivals only through3.
-Then run to32 without further correction. Distinct from old readout-only swaps;
-no old model,learner or new gameplay. Two CPU checks/strict Clippy pass;original
-metadata-key andfixture-allocation failures remain with separate finishes.
-Root `/mnt/data/kindle-breakout-world-refresh-20261109`. No GPU allocation or
-next learner is active;do not run before the declared guard/inputs are ready.
+Actor/critic,CDP comparison and the five-game campaign remain parked. Native
+pixel supervision and global H0 remain the inspectable reference;no pretrained
+encoder or object/RAM training labels. No GPU allocation or next learner is
+active or selected.
 
-The [local H0/RGB1 trial](results/2026-11-09-breakout-world-local-h0.md) is closed and fails retention after16,384 fresh updates. Dense development
-observed/1/8/16/32 ball precision is109/112,107/109,15/107,3/114,0/95;fitting8
-is36/176. Chosen-action balanced ball energy.429470 trails H0.169502 andthe
-unchanged.127127 gate. Freeflight NOOP8 presence8/64;ending32 Brier.268326;
-68/304 nonending alarms. Five of ten intermediate gates pass. Strong observed/
-one-step reading doesnot establish sustained dynamics. Objectives,loss balance
-anddata/sampler change together;no isolated cause orgeneral H0/CDP conclusion.
+The [one-time refresh diagnostic](results/2026-11-09-breakout-world-refresh.md) is closed. Only frozen local H0/RGB1 final16,384,first16 fitting/16 development
+origins,four draws. One history/latent/both correction before action4 uses true
+arrivals only through3;each branch then feeds forward without further correction.
+Unlike old readout-only swaps,this tests persistence. History correction raises
+fitting4:22/52→52/52 and8:4/44→14/44;development4:28/56→56/56 and8:8/48→24/48.
+Latent-only doesnot repair those counts;both adds little. Development16/32 stays
+zero inall modes. History-only state/heads remain exact. Privileged corrections
+andrelated draws are diagnostic,not a trained repair,causal fraction or proof
+that latents are generally correct. Investigate robustness to generated image
+history andoutcome-conditioned reconstruction before another full learner.
 
-All697 learner/216 CPU and1,574 assessment/236 CPU pins,16,384 finite9-component
-rows,80 changed weights,240 frozen tensors/ages,18 restore arrays,51 natural/
-84 full causal exports and96 exact clip frames pass. Closure2,044 pins/8.699s,
-four guarded jobs/36 sealed files,three terminal services. Native6930e7b8/source/
-runner5bcaaebd,1M/RGB64/v20/603,915 weights,Auto. Same live worker resumed across
-the user pause;no restart/RNG reset. Raw clocks retain12,767.850s ofpause;
-subtracting it gives18m03s calls/20m09s loop,not a clean speed comparison or
-original raw-wall-cap pass. Frozen assessment122.866s/CPU14.250s. Disposable
-3,360,843,323-byte build cache released;runtime,wheels,CPU executable remain.
-Root `/mnt/data/kindle-breakout-world-local-h0-20261108`.
+All134 execution/59 CPU pins,16 query bundles/four modes,four cached8-array
+controls,64 full finite trajectories,480 before/after tensor comparisons,
+model/optimizer age16,384 and64 exact clip frames pass. Native timed section
+31.018s/full test79.55s;CPU7.018s. Source520b2fab/executablee80a2c98,production
+inference unchanged. Original metadata-key andfixture-allocation failures remain
+with separate finishes. Original kernel-baseline timeout spawned no native child
+andremains failed25 pins;independent.682s host review passes,then a separately
+declared unchanged guard completes the still-unstarted diagnostic with9 pins.
+Closure256 pins/1.385s,two terminal services,no host recovery. Disposable
+2,558,574,676-byte cache released;executable/sources/outputs retained.
+Root `/mnt/data/kindle-breakout-world-refresh-20261109`.
 
-Read the [learning protocol](experiments/2026-11-08-breakout-world-local-h0-learning.md) and[assessment](experiments/2026-11-08-breakout-world-local-h0-assessment.md) before new work. Qualification and original CPU graph-count/unused-counter byte
-failures with separate repairs remain retained. Do not repeat these completed
-learners,collectors,assessments or diagnostics;no unchanged extension,sweep or
-automatic successor. Before another full learner,justify a distinct test of
-latent versus generated-history error,using prior state/history andcontact-fit
-evidence without repeating it unchanged.
+The [prior local H0/RGB1 learner](results/2026-11-09-breakout-world-local-h0.md) remains closed andfailed:development8:15/107,primary ball energy.429470 versus
+H0.169502/gate.127127. Its original gates are unchanged. Read the
+[refresh protocol](experiments/2026-11-09-breakout-world-refresh.md) andlinked prior state/history/contact-fitting evidence before a separately justified
+new experiment. Do not repeat completed stages,old diagnostics or collectors;
+no unchanged extension,sweep or automatic successor.
 
-All original physics/event gates stand. Precise physics,event timing/calibration,
-persistent removed-brick memory,late/tunnel/second-wall/above-top coverage,
-untouched families andfresh confirmation remain required. Existing oracle has
-no above-top-brick endpoint. Intermediate scores cannot complete either goal.
+All original physics/event gates stand. Precise full-game physics,event timing/
+calibration,persistent removed-brick memory,late/tunnel/second-wall/above-top
+coverage,untouched families andfresh confirmation remain required. Existing
+oracle hasno above-top-brick endpoint. No intermediate orprivileged score can
+complete either goal.
 
 ## Current AMD runtime and retained position
 
