@@ -178,36 +178,46 @@ pub(super) fn build_with_centroid(
             .core
             .forward(graph, deter, stoch, action, batch);
         let logits = model.dynamics.prior.forward(graph, deter, batch);
-        let uniforms = graph.input(
-            &format!("pixel_rollout_uniforms_{time}"),
-            &[batch * size.stoch, size.classes],
-        );
-        stoch = if config.world_gaussian {
-            super::super::gaussian::sample(
+        stoch = if config.world_mean_latents {
+            mixed_probabilities(
                 graph,
                 logits,
-                uniforms,
                 batch * size.stoch,
                 size.classes,
+                config.unimix,
             )
         } else {
-            let sampled = gumbel_sample(
-                graph,
-                logits,
-                uniforms,
-                batch * size.stoch,
-                size.classes,
-                config.unimix,
+            let uniforms = graph.input(
+                &format!("pixel_rollout_uniforms_{time}"),
+                &[batch * size.stoch, size.classes],
             );
-            let sampled = graph.stop_gradient(sampled);
-            let probabilities = mixed_probabilities(
-                graph,
-                logits,
-                batch * size.stoch,
-                size.classes,
-                config.unimix,
-            );
-            straight_through_sample(graph, sampled, probabilities)
+            if config.world_gaussian {
+                super::super::gaussian::sample(
+                    graph,
+                    logits,
+                    uniforms,
+                    batch * size.stoch,
+                    size.classes,
+                )
+            } else {
+                let sampled = gumbel_sample(
+                    graph,
+                    logits,
+                    uniforms,
+                    batch * size.stoch,
+                    size.classes,
+                    config.unimix,
+                );
+                let sampled = graph.stop_gradient(sampled);
+                let probabilities = mixed_probabilities(
+                    graph,
+                    logits,
+                    batch * size.stoch,
+                    size.classes,
+                    config.unimix,
+                );
+                straight_through_sample(graph, sampled, probabilities)
+            }
         };
         let state = feature(graph, deter, stoch, batch, config);
         let squared = if let Some(past) = history {
@@ -362,6 +372,59 @@ mod suffix_event_tests;
 mod centroid_tests {
     use super::*;
     use std::collections::HashSet;
+
+    #[test]
+    fn mean_latent_prior_beliefs_never_read_future_images_or_reset_weights() {
+        let mut c = DreamerConfig::tiny(3);
+        c.observation_kind = ObservationKind::Rgb32;
+        c.batch_size = 2;
+        c.world_mean_latents = true;
+        let mut g = Graph::new();
+        let size = c.network();
+        let model = WorldModel::with_behavior(&mut g, &c, false);
+        let h = g.input("initial_h", &[2, size.deter]);
+        let z = g.input("initial_z", &[2, size.stoch * size.classes]);
+        let actions = (0..2)
+            .map(|i| g.input(&format!("action_{i}"), &[2, 3]))
+            .collect::<Vec<_>>();
+        let images = (0..3)
+            .map(|i| g.input(&format!("image_{i}"), &[2, c.observation_dim()]))
+            .collect::<Vec<_>>();
+        let result = build_with_centroid(
+            &mut g,
+            &c,
+            &model,
+            (h, z),
+            &actions,
+            &images,
+            PixelLoss::MotionCrossEntropy,
+            None,
+            None,
+            None,
+        );
+        for (i, &state) in result.states.iter().enumerate() {
+            let mut seen = HashSet::new();
+            let mut todo = vec![state];
+            while let Some(n) = todo.pop() {
+                if seen.insert(n) {
+                    todo.extend(g.node(n).inputs.iter().copied());
+                }
+            }
+            assert!(seen.contains(&actions[i]));
+            for image in &images {
+                assert!(!seen.contains(image));
+            }
+            for action in &actions[i + 1..] {
+                assert!(!seen.contains(action));
+            }
+            for node in g.nodes() {
+                if matches!(&node.op,meganeura::graph::Op::Input{name} if name.starts_with("pixel_rollout_weight_"))
+                {
+                    assert!(!seen.contains(&node.id));
+                }
+            }
+        }
+    }
 
     #[test]
     fn future_color_attention_never_enters_prior_beliefs() {

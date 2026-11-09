@@ -605,7 +605,16 @@ fn training_graph(
         if pixel_loss.latent_overshooting() {
             posterior_targets.push(posterior_logits);
         }
-        stoch = if config.world_gaussian {
+        stoch = if config.world_mean_latents {
+            assert!(sample_posterior && !behavior);
+            mixed_probabilities(
+                &mut graph,
+                posterior_logits,
+                batch * size.stoch,
+                size.classes,
+                config.unimix,
+            )
+        } else if config.world_gaussian {
             assert!(sample_posterior);
             let noise = graph.input(
                 &format!("uniforms_{time}"),

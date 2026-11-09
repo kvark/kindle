@@ -42,6 +42,8 @@ mod local_observation_tests;
 #[cfg(test)]
 mod loss_gradient_diagnostic;
 #[cfg(test)]
+mod mean_latent_tests;
+#[cfg(test)]
 mod motion_tests;
 #[cfg(test)]
 mod observation_code_tests;
@@ -160,6 +162,30 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let mean_latents = metadata["config"]["world_mean_latents"]
+        .as_bool()
+        .unwrap_or(false);
+    if mean_latents != (metadata["format"] == "kindle-world-only-v24") {
+        return Err("mean-latent world requires checkpoint format v24".into());
+    }
+    if mean_latents
+        && (metadata["pixel_loss"] != "motion_cross_entropy"
+            || metadata["prediction_length"].as_u64().unwrap_or(0) == 0
+            || !metadata["config"]["color_centroid_supervision"].is_null()
+            || !metadata["config"]["rgb_color_attention"].is_null()
+            || [
+                "world_gaussian",
+                "rgb_spatial_decoder",
+                "rgb_previous_frame",
+                "rgb_latent_only",
+            ]
+            .iter()
+            .any(|key| metadata["config"][key] == true))
+    {
+        return Err(
+            "mean-latent world requires a plain motion RGB suffix without auxiliary heads".into(),
+        );
+    }
     let color_attention = !metadata["config"]["rgb_color_attention"].is_null();
     if color_attention != (metadata["format"] == "kindle-world-only-v23") {
         return Err("world color attention requires checkpoint format v23".into());
@@ -488,7 +514,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v20"
             | "kindle-world-only-v21"
             | "kindle-world-only-v22"
-            | "kindle-world-only-v23",
+            | "kindle-world-only-v23"
+            | "kindle-world-only-v24",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -702,6 +729,21 @@ impl WorldModelLearner {
         pixel_loss: PixelLoss,
         fixed_teacher: Option<TeacherAnchor>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        if config.world_mean_latents
+            && (pixel_loss != PixelLoss::MotionCrossEntropy
+                || prediction_length == 0
+                || config.world_gaussian
+                || config.rgb_spatial_decoder
+                || config.rgb_previous_frame
+                || config.rgb_latent_only
+                || config.color_centroid_supervision.is_some()
+                || config.rgb_color_attention.is_some())
+        {
+            return Err(
+                "mean-latent world requires a plain motion RGB suffix without auxiliary heads"
+                    .into(),
+            );
+        }
         if config.rgb_color_attention.is_some()
             && (pixel_loss != PixelLoss::MotionCrossEntropy
                 || prediction_length == 0
@@ -1028,7 +1070,7 @@ impl WorldModelLearner {
                     &format!("fixed_teacher_stoch_{time}"),
                     &stoch[time * sw..(time + 1) * sw],
                 );
-            } else {
+            } else if !self.config.world_mean_latents {
                 let uniforms = super::gaussian::noise(&self.config, &mut self.rng);
                 self.train.set_input(&format!("uniforms_{time}"), &uniforms);
             }
@@ -1106,7 +1148,8 @@ impl WorldModelLearner {
                         .set_input(&format!("{name}_uniforms_{time}"), &uniforms);
                 }
             }
-            if self.pixel_loss != PixelLoss::MotionPosteriorHistory
+            if !self.config.world_mean_latents
+                && self.pixel_loss != PixelLoss::MotionPosteriorHistory
                 && (self.pixel_loss.fixed_teacher() || !self.pixel_loss.recurrent_energy())
                 && (!self.pixel_loss.latent_overshooting() || time + 1 < weights.len())
             {
@@ -1433,7 +1476,10 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.rgb_color_attention.is_some() {
+        let format = if self.config.world_mean_latents {
+            assert_eq!(self.training_scope, TrainingScope::All);
+            "kindle-world-only-v24"
+        } else if self.config.rgb_color_attention.is_some() {
             assert_eq!(self.training_scope, TrainingScope::All);
             "kindle-world-only-v23"
         } else if self.config.color_centroid_supervision.is_some() {

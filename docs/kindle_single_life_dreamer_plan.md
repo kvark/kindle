@@ -3,37 +3,27 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. [Direct RGB color-attention learning](results/2026-11-09-breakout-world-color-attention-learning.md) closes negative:
-development0/112 observed,0/109 one-step,0/107 eight-step;0/3 original gates.
-Fitting0/163,1/177,1/176;all four reused contact draws0/110. Fixed visual evidence
-shows diffuse red fragments,not a localized ball. Retain H0 broad reference;
-new optional attention stays default off. Do not allocate its conditional oracle
-assessment,extend this learner or automatically reduce its coefficient.
+unproven. [Mean-latent world mode](experiments/2026-11-09-breakout-world-mean-latents.md) is selected for native qualification.
+Feed categorical probability vectors inposterior/prior training andinference,
+without latent samples orstraight-through gradients. Same68 parameters/204
+tensors/11 reports;defaultoff,v24. Four requested forecasts areidentical,not
+independent uncertainty samples;f(mean-state) isnot mean(sampled forecasts).
+This changes representation/gradient estimator anddoesnot establish a sampling
+cause. Previous drift,Gaussian andlower-mixing results stayclosed.
 
-All8,192 eleven-report rows,RGB100 totals/source/reset identities,68 changed
-weights,204 qualified initial/own frozen tensors,18 development/32 contact
-restore arrays,34 finite exports,original384 dense origins and36 initial dense
-arrays pass. Only the color-attention setting changes versus original H16.
-149 declaration/154 CPU analysis/320 closure pins,two guards/18 sealed files,
-terminal successful native queue and observer. Native758.781s,loop857.664s;
-export cadence differs from old H16,not an isolated speed comparison. Source
-28bcf374 reuses nativec672292c/SHAef45f798;matching runtime/runner preserved.
-Root `/x/Temp/kindle-world-color-attention-learning-20261109`.
+149 world CPU/29 config/strict core+binding Clippy/31 packaged Python checks pass.
+First Clippy fixture range-loop failure remains withseparate corrected source/
+checks. Next allocation isone guarded primitive plusdefault-off compatibility,
+mean-mode initial/update/frozen/restore checks;no learner yet. Root
+`/x/Temp/kindle-world-mean-latents-20261109`.
 
-[Qualification](results/2026-11-09-breakout-world-color-attention.md) remains passed/closed:144 world CPU/29 config/strict
-core+binding Clippy/25 Python checks,native F64 values/derivatives/reset zeros,
-204 initial/own frozen tensors and32 initial/trained restore arrays.123 declaration/
-158 closure pins,nine sealed files,19.477s. Its original fixture failures and
-separate corrected checks remain;own811,401,216-byte build cache is released.
-Implementation correctness did not establish useful learning. No native stage
-is repeated to repair or reinterpret the negative result.
-
-All jobs are stopped;no learner,extension,collector orautomatic successor is
-selected. Prior jobs stayclosed/fullres staysprotocol-failed. Full precise
-physics,natural event calibration,persistent removed-brick memory,late/tunnel/
-second-wall/above-top,untouched families andfresh confirmation remain required.
-Actor/critic,CDP comparison andfive-game work stayparked. Keep historical
-hardlinked evidence immutable;no new build cache was created for this learner.
+[Direct RGB color attention](results/2026-11-09-breakout-world-color-attention-learning.md) remains closed/negative:0/112 observed,
+0/109 one-step,0/107 eight-step;allfour contacts0/110. RetainH0 broad reference;
+optional modes stayoff. No oldstage repeats. Prior jobs stayclosed/fullres stays
+protocol-failed. Full physics,natural event calibration,removed-brick memory,
+late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
+required. Actor/critic,CDP comparison andfive-game work stayparked. No automatic
+learner,extension,collector orsuccessor;consult theprotocol beforeexecution.
 
 ### What would establish the world model
 

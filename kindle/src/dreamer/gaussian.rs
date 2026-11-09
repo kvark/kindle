@@ -102,6 +102,18 @@ pub(crate) fn noise(config: &DreamerConfig, rng: &mut StdRng) -> Vec<f32> {
 
 pub(crate) fn sample_cpu(config: &DreamerConfig, stats: &[f32], rng: &mut StdRng) -> Vec<f32> {
     let size = config.network();
+    if config.world_mean_latents {
+        assert!(!config.world_gaussian);
+        assert_eq!(stats.len(), config.batch_size * size.stoch * size.classes);
+        let mut result = vec![0.; stats.len()];
+        for (logits, out) in stats
+            .chunks_exact(size.classes)
+            .zip(result.chunks_exact_mut(size.classes))
+        {
+            super::distributions::softmax_unimix(logits, config.unimix, out);
+        }
+        return result;
+    }
     if !config.world_gaussian {
         return sample_latents(
             stats,

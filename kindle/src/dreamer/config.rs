@@ -349,6 +349,9 @@ pub struct DreamerConfig {
     /// Standalone RGB world: diagonal Gaussian state with reparameterized samples.
     #[serde(default, skip_serializing_if = "is_false")]
     pub world_gaussian: bool,
+    /// Standalone world: feed categorical probabilities directly as latent state.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub world_mean_latents: bool,
     /// Optional compact standalone Gaussian state; otherwise retain preset width.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub world_gaussian_dim: Option<usize>,
@@ -533,6 +536,7 @@ impl DreamerConfig {
             rgb_coordinates: false,
             rgb_latent_only: false,
             world_gaussian: false,
+            world_mean_latents: false,
             world_gaussian_dim: None,
             rgb_stride2: false,
             observation_crop: None,
