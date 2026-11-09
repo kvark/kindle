@@ -67,3 +67,15 @@ implementation/qualification and bounded learning protocol be selected. It must
 default off, persist its action representation, preserve ordinary raw action
 traces, apply consistently during learning/observed inference/prior inference,
 and retain original full-game gates. No benefit is established yet.
+
+## Separate pre-execution repair
+
+The declared v1 invocation fails in its initial pin verifier: a JSON string path
+is passed to a helper expecting a Path. It stops before imports, emulator/model
+construction and creation of any rollout log. Preserve run_v1.py,execution-pins.json
+and run-v1.log unchanged. Separately select run_v2.py with Path conversion in the
+hash helper and direct traps for the actual Kindle constructor export names;
+use new execution-pins-v2.json,run-v2.log,rollouts-v2.jsonl and result-v2.json.
+All source states,commands,bounds and acceptance requirements remain unchanged.
+This is a repaired CPU/emulator invocation,not a successful original invocation.
+No automatic retry is authorized after emulator execution starts.
