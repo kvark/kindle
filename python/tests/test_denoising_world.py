@@ -40,3 +40,17 @@ def test_context_objective_requires_matching_header_without_gpu(tmp_path,version
     (tmp_path/'metadata.json').write_text(json.dumps(header))
     with pytest.raises(RuntimeError,match='checkpoint header'):
         kindle.DenoisingWorldLearner.restore(str(tmp_path))
+
+@pytest.mark.parametrize('version,residual,sampler', [
+    ('v1',True,'edm-euler3-sigma5-quantized'),
+    ('v2',True,'edm-euler3-sigma5-quantized'),
+    ('v3',False,'edm-euler3-sigma5-last-frame-residual-quantized'),
+    ('v3',True,'edm-euler3-sigma5-quantized')])
+def test_residual_mode_requires_matching_version_and_sampler_without_gpu(tmp_path,version,residual,sampler):
+    header=dict(format='kindle-denoising-world-'+version,
+        config=CONFIG | {'context_motion_scale':100.,'residual_frame':residual},updates=0,
+        architecture='conditional-unet16-32-64-history4',sampler=sampler,
+        observed_reconstruction='single-denoise-sigma0.5-not-rssm-posterior')
+    (tmp_path/'metadata.json').write_text(json.dumps(header))
+    with pytest.raises(RuntimeError,match='checkpoint header'):
+        kindle.DenoisingWorldLearner.restore(str(tmp_path))

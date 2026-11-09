@@ -414,3 +414,102 @@ fn context_weighted_native_loss_matches_f64() {
     let p = std::env::var("KINDLE_CONTEXT_NATIVE_RECEIPT").unwrap();
     std::fs::write(p,serde_json::to_vec_pretty(&serde_json::json!({"status":"complete","loss":actual[0],"gradient":got,"values_and_derivatives":true,"no_optimizer_update":true})).unwrap()).unwrap();
 }
+
+#[test]
+fn residual_coordinates_recover_full_range_rgb_and_preserve_legacy_math() {
+    for sigma in [0.002, 0.05, 0.5, 1., 5.] {
+        let (_, cout, skip, _) = conditioners(sigma);
+        for base in [-1., -0.6, 0., 0.8, 1.] {
+            for byte in [0, 17, 64, 128, 211, 255] {
+                let y = byte as f32 / 127.5 - 1.;
+                let delta = coordinate(y, base, true);
+                assert!((f64::from(delta) - (f64::from(y) - f64::from(base))).abs() < 2e-7);
+                let x = delta + sigma * 0.37;
+                let target = (delta - skip * x) / cout;
+                assert!((absolute(skip * x + cout * target, base, true) - y).abs() < 2e-6);
+                assert_eq!(coordinate(y, base, false).to_bits(), y.to_bits());
+                assert_eq!(absolute(y, base, false), quantize(y));
+            }
+        }
+    }
+    // A full bright-to-dark transition needs residuals outside [-1,1].
+    let base = 1.;
+    let target = -1.;
+    let mut x = 3.7;
+    for pair in schedule().windows(2) {
+        let prediction = coordinate(target, base, true);
+        x += (x - prediction) / pair[0] * (pair[1] - pair[0]);
+    }
+    assert!(x < -1.9);
+    assert_eq!(absolute(x, base, true), target);
+    assert_eq!(absolute(100., base, true), 1.);
+    assert_eq!(absolute(-100., base, true), -1.);
+}
+
+#[test]
+fn residual_base_uses_only_latest_past_frame_and_respects_reset_lanes() {
+    let mut history = History::empty(2, 3);
+    for t in 0..4 {
+        history.push(&[t as f32, 0., 1., 10. + t as f32, 2., 3.], &[0, 1]);
+    }
+    assert_eq!(history.base(&[2, 3], true), [3., 0., 1., 13., 2., 3.]);
+    assert_eq!(history.base(&[-1, 3], true), [0., 0., 0., 13., 2., 3.]);
+    assert_eq!(history.base(&[2, 3], false), [0.; 6]);
+    history.rgb[..18].fill(-99.);
+    assert_eq!(history.base(&[2, 3], true), [3., 0., 1., 13., 2., 3.]);
+}
+
+#[test]
+fn residual_mode_changes_no_differentiated_or_inference_graph() {
+    let mut c = DenoisingConfig::default();
+    c.context_motion_scale = 100.;
+    let mut residual = c.clone();
+    residual.residual_frame = true;
+    for build in [
+        network::training,
+        network::sampling,
+        network::event_sampling,
+    ] {
+        assert_eq!(
+            format!("{:?}", build(&c).nodes()),
+            format!("{:?}", build(&residual).nodes())
+        );
+    }
+    let p = params(&network::training(&residual));
+    assert_eq!(p.len(), 45);
+    assert_eq!(
+        p.values()
+            .map(|shape| shape.iter().product::<usize>())
+            .sum::<usize>(),
+        1_787_843
+    );
+}
+
+#[test]
+fn residual_header_requires_v3_and_its_sampler_and_preserves_old_defaults() {
+    let mut c = DenoisingConfig::default();
+    assert!(
+        !serde_json::to_value(&c)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("residual_frame")
+    );
+    c.residual_frame = true;
+    for scale in [0., 100.] {
+        c.context_motion_scale = scale;
+        let v = serde_json::json!({"format":c.checkpoint_format(),"config":c,"updates":0,"architecture":"conditional-unet16-32-64-history4","sampler":c.sampler_name(),"observed_reconstruction":"single-denoise-sigma0.5-not-rssm-posterior"});
+        assert_eq!(read_header(&serde_json::to_vec(&v).unwrap()).unwrap().0, c);
+        for version in ["kindle-denoising-world-v1", "kindle-denoising-world-v2"] {
+            let mut bad = v.clone();
+            bad["format"] = version.into();
+            assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
+        }
+        let mut bad = v.clone();
+        bad["sampler"] = "edm-euler3-sigma5-quantized".into();
+        assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
+        let mut bad = v;
+        bad["config"]["residual_frame"] = false.into();
+        assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
+    }
+}
