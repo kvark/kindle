@@ -28,7 +28,7 @@ metrics, false detections andraw reward/continuation outputs remain retained.
 These curve groups differ from the fixed final dense128 development origins.
 
 Native learn-call time through2,048 is483.300479s versus228.781371s for the
-earlier16-channel physical-feature learner:2.113x. The earlier4,096-update point
+earlier16-channel physical-feature learner:2.1125x. The earlier4,096-update point
 costs458.756136s;that timing alone is not a forecast comparison. New timing
 includes the first-update checks andage1 save. Initialization, preparation,
 scheduled evaluation andseparate restore are excluded. No isolated backend
