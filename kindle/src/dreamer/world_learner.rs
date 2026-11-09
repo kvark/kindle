@@ -14,6 +14,7 @@ use super::{
 };
 use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 
+mod action_features;
 mod frozen_visual;
 use frozen_visual::TrainingScope;
 mod fixed_teacher;
@@ -162,6 +163,9 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    if let Some(base) = action_features::base_metadata(metadata)? {
+        return checkpoint_pixel_loss(&base);
+    }
     let mean_latents = metadata["config"]["world_mean_latents"]
         .as_bool()
         .unwrap_or(false);
@@ -628,10 +632,15 @@ fn action_inputs(
     actions: &[i32],
 ) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<f32>) {
     let size = config.network();
-    let mut one_hot = vec![0.0; actions.len() * config.action_count];
+    let mut features = vec![0.0; actions.len() * config.action_count];
     for (row, &action) in actions.iter().enumerate() {
         if action >= 0 {
-            one_hot[row * config.action_count + action as usize] = 1.0;
+            if let Some(table) = &config.world_action_features {
+                features[row * config.action_count..(row + 1) * config.action_count]
+                    .copy_from_slice(&table[action as usize]);
+            } else {
+                features[row * config.action_count + action as usize] = 1.0;
+            }
         }
     }
     let mask = |width| {
@@ -641,7 +650,7 @@ fn action_inputs(
             .collect()
     };
     (
-        one_hot,
+        features,
         mask(size.deter),
         mask(size.stoch * size.classes),
         mask(config.action_count),
@@ -729,6 +738,7 @@ impl WorldModelLearner {
         pixel_loss: PixelLoss,
         fixed_teacher: Option<TeacherAnchor>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        action_features::validate(&config, prediction_length, pixel_loss)?;
         if config.world_mean_latents
             && (pixel_loss != PixelLoss::MotionCrossEntropy
                 || prediction_length == 0
@@ -1527,6 +1537,10 @@ impl WorldModelLearner {
             self.training_scope.format()
         };
         let mut metadata = serde_json::json!({"format": format, "config": self.config, "updates": self.updates, "prediction_length": self.prediction_length, "pixel_loss": self.pixel_loss});
+        if self.config.world_action_features.is_some() {
+            assert_eq!(self.training_scope, TrainingScope::All);
+            action_features::wrap_metadata(&mut metadata)?;
+        }
         if let Some(anchor) = &self.fixed_teacher {
             let (parameters, scalars) = anchor.verify(&self.observe)?;
             std::fs::copy(&anchor.path, path.join("teacher.safetensors"))?;

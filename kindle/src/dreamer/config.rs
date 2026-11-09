@@ -308,6 +308,9 @@ pub struct OpenLoopSupervision {
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DreamerConfig {
     pub action_count: usize,
+    /// Standalone world: fixed submitted-action features, with unchanged input width.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub world_action_features: Option<Vec<Vec<f32>>>,
     pub model_size: ModelSize,
     /// Regroup categorical state without changing the preset's flattened width.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -521,6 +524,7 @@ impl DreamerConfig {
     pub fn new(action_count: usize) -> Self {
         let config = Self {
             action_count,
+            world_action_features: None,
             model_size: ModelSize::Size12M,
             latent_shape: None,
             training_precision: TrainingPrecision::Auto,
@@ -1110,6 +1114,16 @@ impl DreamerConfig {
         }
         if self.action_count <= 1 {
             return Err("action_count must be greater than one".into());
+        }
+        if let Some(table) = &self.world_action_features {
+            if table.len() != self.action_count
+                || table.iter().any(|row| {
+                    row.len() != self.action_count
+                        || row.iter().any(|x| !x.is_finite() || x.abs() > 1.0)
+                })
+            {
+                return Err("world action features require an action_count square finite table in [-1, 1]".into());
+            }
         }
         if size.deter == 0 || !size.deter.is_multiple_of(size.blocks) {
             return Err("deter must be non-zero and divisible by blocks".into());

@@ -14,25 +14,27 @@ immutable. The follow-up leaves about281 GiB available on the root filesystem.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select only the [action-feature semantics check](experiments/2026-11-09-breakout-world-action-features.md):
-32 retained fitting/waiting parents,26 plans each,at most13,312 new actions and
-76,934 source-replay actions. Test whether18 raw Atari command names form six
-physical classes, preserving simultaneous movement+FIRE. Exact native RGB/RAM,
-events,lives and frame counts must match; canonical-control differences are
-also retained. This is CPU/emulator evidence,not a world-model pass or learning
-benefit. No GPU allocation, learner or native feature implementation is selected.
-Root `/x/Temp/kindle-world-action-features-20261109/semantics`.
+unproven. The [action-semantics check](results/2026-11-09-breakout-world-action-semantics.md) completes with 608/608 exact
+nonidentity comparisons across 832 rollouts. All 15 pairs of canonical controls
+differ somewhere. The 32 fixed selections share 28 retained histories and have
+no game-over arrivals. New branches use 13,312 actions / 53,248 frames; prefix
+replay uses 76,934 actions / 307,736 frames. CPU/emulator time is 111.163s. The
+original pre-emulator verifier failure remains; the separately pinned repair and
+CPU recount pass. This study constructs no model and uses no GPU or optimizer.
 
-The [half-rate16k learner](results/2026-11-09-breakout-world-rate2em4-16k.md) remains closed and negative:94/112 observed,
-71/109 one-step,23/107 eight-step,0/3 fixed development gates. The
-[forward-contract study](results/2026-11-09-breakout-world-forward-contract.md) retains its strict numerical failure.
-All earlier learners/collectors remain closed; no repeats or automatic successors.
+Select the separate [native action-feature qualification](experiments/2026-11-09-breakout-world-action-features-native.md): default-off
+LEFT/RIGHT/FIRE rows derived from submitted commands, unchanged 18-channel width
+and parameter geometry, shared lookup during learning and prediction, explicit
+v25 table persistence, and whole-agent/phase guards. Implementation and CPU
+checks are in progress; GPU qualification waits for packaging and declaration.
+No learner is selected. Root `/x/Temp/kindle-world-action-features-20261109`.
 
-Full precise physics/action responses,natural event calibration,removed-brick
-memory,late/tunnel/second-wall/above-top coverage,untouched families and fresh
-confirmation remain required. Actor/critic,CDP comparison and five-game work
-stay parked. Review the semantics evidence before selecting any separate native
-implementation,qualification or bounded learning protocol.
+The half-rate16k learner remains closed at 0/3 development gates. The strict
+forward-contract numerical failure and earlier negative/protocol-failed results
+remain. Full physics, events, brick memory, late/tunnel/second-wall/above-top
+coverage, untouched families and fresh confirmation are still required.
+Actor/critic, CDP and five-game work stay parked. Do not repeat completed jobs or
+start automatic successors.
 
 ## Preserved source and fresh-machine setup
 

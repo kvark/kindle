@@ -498,6 +498,10 @@ pub struct DreamerCore {
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
         assert!(
+            config.world_action_features.is_none(),
+            "action features are standalone world only"
+        );
+        assert!(
             !config.world_mean_latents,
             "mean latent state is standalone world only"
         );
@@ -571,6 +575,10 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
+        assert!(
+            config.world_action_features.is_none(),
+            "action features are standalone world only"
+        );
         assert!(
             !config.world_mean_latents,
             "mean latent state is standalone world only"
@@ -2934,6 +2942,12 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.config.world_action_features.is_some() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "action features are standalone world only",
+        ));
+    }
     if metadata.config.world_mean_latents {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,
@@ -3600,6 +3614,15 @@ mod tests {
             perception: Some(PerceptionKind::LeVJepaTiny.identity("1".repeat(64))),
             tensor_sha256: None,
         }
+    }
+
+    #[test]
+    fn checkpoint_rejects_standalone_action_features_before_loading_tensors() {
+        let mut metadata = valid_checkpoint_metadata();
+        metadata.config.world_action_features = Some(vec![vec![0.; 3]; 3]);
+        let error = validate_checkpoint_metadata(&metadata).unwrap_err();
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert!(error.to_string().contains("action features"));
     }
 
     #[test]
