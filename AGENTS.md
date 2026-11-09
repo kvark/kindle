@@ -21,37 +21,28 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. [RGB1/centroid1000 world learning](docs/results/2026-11-09-breakout-world-centroid-learning.md) closesnegative:development
-85/112 observed,73/109 one-step,15/107 eight-step;allthree broad gates fail.
-Fitting134/163 observed,119/177 one-step,34/176 eight-step. Original contact-family
-diagnostic17/18/16/19 of110,not fitting data forthis learner. Keep H0 broad reference;
-new optional auxiliary mode staysdefaultoff. Joint head/loss/RGB-scale changes
-andone reused development seed donot isolate a cause orprove reliability.
+unproven. The [frozen position contract diagnosis](docs/experiments/2026-11-09-breakout-world-centroid-contract.md)
+is selected: native/CPU head parity, same-time observed-target accounting and
+five weighted gradient components at the final centroid checkpoint. Two recorded
+B8/T32 batches/two fresh diagnostic noise pairs,20 backwards,zero optimizer
+steps. CPU component derivatives and strict Clippy pass; initial empty test
+filter is preserved separately. Root `/x/Temp/kindle-world-centroid-contract-20261109`.
+No learner, collector, extension or automatic successor is selected.
 
-The CPU affine position readout isalso coarse:observed development2.437px RMSE,
-15/112 within1px;prior1 17/109,prior8 6/107. It isconditioned onvisible truth,
-hasno presence output andno native-head readback parity. It cannot replace RGB
-physics gates orprove information absence. FixedRGB color/region supervision is
-game-specific knowledge,no object/emulator state input orunguided-learning claim.
+[RGB1/centroid1000 learning](docs/results/2026-11-09-breakout-world-centroid-learning.md)
+remains closed/negative: development85/112 observed,73/109 one-step,15/107
+eight-step;allthree broad gates fail. Fitting134/163,119/177,34/176. CPU affine
+observed development RMSE2.437px,15/112 within1px;native parity was unmeasured.
+Do not replace RGB gates with coordinates or claim information absence. Joint
+head/loss/RGB-scale changes andone reused seed do not isolate causes.
 
-Fresh8,192 updates/15 finite reports;70 weights change,210 qualified initial/own
-frozen tensors and18 development/32 contact restore arrays exact. Original384
-initial/final dense origins/source plan,975,941 suffix targets/9,570 terminals/
-16,008 positives pass. Calls766.210s,loop879.901s;changed export frequency prevents
-an isolated speed claim.149 declaration/311 closure pins,two guards/18 files,
-one terminal successful service. Native449361ae/SHAee44ec16 reused. Root
-`/mnt/data/kindle-breakout-world-centroid-learning-20261109`.
-
-[Qualification](docs/results/2026-11-09-breakout-world-centroid.md) stayspassed/closed:masked native F64 derivatives/zeros,
-139 Rust CPU/strict core+binding Clippy/19 Python checks,190 closure pins,nine
-sealed files. Initial fixture API/prefix/style failures remain withseparate
-corrected checks. Own1.25GB buildcache released. Conditional oracle assessment
-isnot allocated;alljobs stopped,no automatic learner/extension/collector/successor.
-Allprior jobs stayclosed,fullres staysprotocol-failed. Full physics/events,
-natural calibration,changed-brick memory,late/tunnel/second-wall/above-top,
-untouched families andfresh confirmation remain required. No implementation/
-fitting score completes thegoal. Actor/critic,CDP comparison andfive-game work
-stayparked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115GB;hardlinked evidence staysimmutable.
+[Qualification](docs/results/2026-11-09-breakout-world-centroid.md) stayspassed/closed;
+initial fixture failures and separate repairs remain. Prior jobs stayclosed,
+fullres staysprotocol-failed;no old stages repeat. Full physics/events,natural
+calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
+families andfresh confirmation remain required. Actor/critic,CDP comparison and
+five-game work stayparked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
+recovered115GB;hardlinked evidence staysimmutable.
 
 ## Direction and retained results
 

@@ -17,6 +17,8 @@ use sha2::{Digest, Sha256};
 
 use super::*;
 
+mod centroid_contract;
+
 type Inputs = BTreeMap<String, Vec<f32>>;
 
 #[derive(Clone, Copy, Debug)]
