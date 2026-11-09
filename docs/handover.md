@@ -14,31 +14,29 @@ immutable. The follow-up leaves about281 GiB available on the root filesystem.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [plain sampled H16/RGB1 comparison](results/2026-11-09-breakout-world-plain-rgb1.md) is closed and negative:
-85/112 observed, 69/109 one-step and 11/107 eight-step balls match; **0/3 gates**.
-Original H16 scores 99/112, 84/109 and 25/107. Fitting scores are 126/163,
-121/177 and 49/176; four contact draws match 25/18/20/14 of 110. Lowering only
-reconstruction 100→1 reduces raw dynamics KL 42.261→14.474 without improving
-physics. This does not identify a causal failure. Retain the H0 broad reference.
-No branch assessment or extension is selected.
+unproven. The [frozen forward-contract study](results/2026-11-09-breakout-world-forward-contract.md) is closed: its strict
+contract fails, with eight observed-image arrays exceeding tolerance and two of
+98,304 sampled categorical blocks disagreeing. At matched samples, all 736 full
+training/inference arrays and 384 streaming recurrent-state arrays are bitwise
+exact. All 128 suffix-image arrays and 24 F64 loss checks pass. Eight frozen
+cases do not establish accurate learned dynamics or unconstrained RNG parity.
 
-All 204 original initial/own frozen tensors, 36 actual-initial arrays, 18
-development/32 contact restore arrays, eight one-hot state arrays and 8,192
-finite eleven-report rows pass. There are 150 declaration/163 CPU analysis/330
-closure pins, two successful terminal jobs and two guards/18 sealed files.
-Native calls take 759.598s; the loop takes 867.901s. No new build, retry, repair,
-emulator actions or frames. Root: `/x/Temp/kindle-world-plain-rgb1-20261109`.
-The report retains the full recipe and all per-horizon regressions.
+The separate CPU consequence check finds no ball-presence changes over 3,072
+paired images, but six within-one-pixel decisions change at the cutoff; observed
+coordinate shifts reach .46813px. Preserve every original threshold and failed
+gate. Native execution succeeds in 219.305s, with zero optimizer steps, unchanged
+source checkpoints, one guard/nine sealed files and both services inactive.
+There are 30 execution/72 CPU analysis/54 consequence/124 closure pins. Original
+prelaunch self-log pin failure, startup observation race and CPU counting failure
+remain with separate repairs; no native restart or rerun. Own 2.24GB build cache
+released. Root: `/x/Temp/kindle-world-forward-contract-20261109/prelaunch-v2`.
 
-[Mean-latent learning](results/2026-11-09-breakout-world-mean-latents-learning.md) and all earlier comparisons stay closed; mean/color
-options stay off. A separately declared [frozen forward-contract study](experiments/2026-11-09-breakout-world-forward-contract.md)
-is selected: eight cases at the original H16/RGB100 and plain RGB1 final weights,
-two retained mixed/contact batches and two diagnostic noise pairs. Compare the
-actual training graph, identical unrolled inference graph and streaming native
-observe/transition/decoder path at matched categorical samples. Zero optimizer
-steps, no production/runtime change or full learner. CPU extraction check and
-strict Clippy pass; own build cache released after packaging. Root:
-`/x/Temp/kindle-world-forward-contract-20261109`.
+The [plain H16/RGB1 learner](results/2026-11-09-breakout-world-plain-rgb1.md) stays closed and negative: 85/112 observed,
+69/109 one-step and 11/107 eight-step balls; 0/3 gates. Earlier mean-latent/color
+and other learners stay closed. Keep the H0 broad reference and mean/color
+options off. No GPU allocation, learner, extension, collector or successor is
+active or selected.
+
 Full precise physics, natural event calibration, removed-brick memory,
 late/tunnel/second-wall/above-top coverage, untouched families and fresh
 confirmation remain required. Actor/critic, CDP comparison and five-game work

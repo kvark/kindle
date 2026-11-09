@@ -56,3 +56,7 @@ A contract pass only rules out a material mismatch on these measured cases.
 It cannot prove learning, physical accuracy, natural event calibration, persistent
 brick memory, late/tunnel/second-wall/above-top coverage, untouched families or
 fresh learner confirmation. Those full-world requirements remain unchanged.
+
+## Closed result
+
+[Result](../results/2026-11-09-breakout-world-forward-contract.md): the strict contract fails. Conditional recurrent states and full-graph mode outputs are bitwise exact; eight observed RGB arrays and two categorical blocks differ. The CPU consequence check changes six cutoff decisions over3,072 images. All124 closure pins and the single guarded native stage pass; no native retry or successor. Prelaunch and CPU reporting failures remain preserved with separate repairs. The full world-model goal remains unproven.
