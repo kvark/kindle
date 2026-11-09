@@ -14,13 +14,18 @@ immutable. The latest pass leaves about273 GiB available on the root filesystem.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select one fresh [posterior-history RGB100 natural learner](experiments/2026-11-09-breakout-world-posterior-natural100.md):
+unproven. The fresh [posterior-history RGB100 natural learner](results/2026-11-09-breakout-world-posterior-natural100.md) is active:
 16,384 updates,1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,one-hot actions,RGB100,
 rates4e-4,KL1/.1/freeNat1,mixing.01,observed events1. Existing posterior-history
 objective/v21 and qualified64f5489f/native SHAaa12d050 runtime/runner;no rebuild,
 physical feature table,late conditioning,actor/critic or collection. Root
 `/x/Temp/kindle-world-posterior-natural100-20261109`. CPU driver passes with
-model construction trapped. No GPU job active yet;declare before execution.
+model construction trapped.182 execution pins/source5cbe4b62;unit
+`kindle-world-posterior-natural100-20261109`,invocation1f99119922f04609a8f3ff620880967f,
+controller2215458/observer2215461/CPU finisher2215464 are active. Own initial240
+tensors/18 arrays and first actual update pass;77/80 first-update weights change
+in required families. Sealed256-row live prefix/12 CPU inputs pass. No final
+forecast/gate result yet;automated final restore andCPU analysis remain pending.
 
 Same retained natural two-cycle plan/config as small64. Own initial240 tensors/
 18 arrays and first actual update are checked inside the budget before update2.
