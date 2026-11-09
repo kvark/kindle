@@ -21,35 +21,36 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [frozen forward-contract study](docs/results/2026-11-09-breakout-world-forward-contract.md) is closed: its strict
-contract fails, with eight observed-image arrays exceeding tolerance and two of
-98,304 sampled categorical blocks disagreeing. At matched samples, all 736 full
-training/inference arrays and 384 streaming recurrent-state arrays are bitwise
-exact. All 128 suffix-image arrays and 24 F64 loss checks pass. Eight frozen
-cases do not establish accurate learned dynamics or unconstrained RNG parity.
+unproven. A fresh [half-rate16k plain H16 learner](docs/experiments/2026-11-09-breakout-world-rate2em4-16k.md) is selected:
+base/encoder/dynamics2e-4 and16,384 updates, versus original4e-4/8,192.
+The original periodic eight-step curve still improves in its last quarter;
+this tests rate and budget together, without an isolated-cause or success claim.
+No closed checkpoint is resumed. Keep RGB64/12M/B8/T32/H16/full BPTT/Auto,
+seed41001, RGB100, KL1/.1/free-nat1, mixing.01 and observed event losses1.
+Reuse nativeaffedefa/SHA cc6022e3 and its exact matching runner/runtime; no build
+or new qualification. Root: `/x/Temp/kindle-world-rate2em4-16k-20261109`.
 
-The separate CPU consequence check finds no ball-presence changes over 3,072
-paired images, but six within-one-pixel decisions change at the cutoff; observed
-coordinate shifts reach .46813px. Preserve every original threshold and failed
-gate. Native execution succeeds in 219.305s, with zero optimizer steps, unchanged
-source checkpoints, one guard/nine sealed files and both services inactive.
-There are 30 execution/72 CPU analysis/54 consequence/124 closure pins. Original
-prelaunch self-log pin failure, startup observation race and CPU counting failure
-remain with separate repairs; no native restart or rerun. Own 2.24GB build cache
-released. Root: `/x/Temp/kindle-world-forward-contract-20261109/prelaunch-v2`.
+The exact original8,192-row4/2/1/1 plan is repeated twice:4,194,304 replayed
+arrivals,1,951,882 valid suffix targets,19,140 suffix terminals and32,016 positive
+suffix rewards. Unique arrivals stay32,849/32,850; this is not new experience.
+Independent data/mask/family checks pass. The initial preparation import-path
+failure and correct-environment completion remain; no native stage has repeated.
+Keep the fixed final observed≥90%,one≥89/109,eight≥28/107 gates and all other
+horizon/event/brick regressions. A branch assessment remains conditional and
+unallocated. Only this bounded fresh learner and its restore are selected.
 
-The [plain H16/RGB1 learner](docs/results/2026-11-09-breakout-world-plain-rgb1.md) stays closed and negative: 85/112 observed,
-69/109 one-step and 11/107 eight-step balls; 0/3 gates. Earlier mean-latent/color
-and other learners stay closed. Keep the H0 broad reference and mean/color
-options off. No GPU allocation, learner, extension, collector or successor is
-active or selected.
+The [forward-contract study](docs/results/2026-11-09-breakout-world-forward-contract.md) remains closed with its strict numerical
+failure and separate CPU repairs. Conditional recurrence and full-graph mode
+outputs are bitwise exact; this does not prove learned dynamics or unrestricted
+sampled parity. The [plain RGB1 learner](docs/results/2026-11-09-breakout-world-plain-rgb1.md) stays closed at0/3 gates. Keep H0
+as the broad reference; mean/color options stay off. No old learner, assessment
+or collector repeats, and no automatic extension or successor is selected.
 
 Full precise physics, natural event calibration, removed-brick memory,
 late/tunnel/second-wall/above-top coverage, untouched families and fresh
 confirmation remain required. Actor/critic, CDP comparison and five-game work
-stay parked; earlier jobs remain closed/fullres protocol-failed. Consult a
-separately justified protocol before any new experiment; do not repeat completed
-stages or collectors.
+stay parked; earlier jobs remain closed/fullres protocol-failed. Consult the
+selected protocol before execution.
 
 ## Direction and retained results
 
