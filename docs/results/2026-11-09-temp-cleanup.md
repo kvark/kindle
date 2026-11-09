@@ -81,3 +81,28 @@ No disposable compiler intermediates remain in the inspected caches. Scripts,
 original inventory, duplicate map, per-file zero-block receipts and final
 verification are in `/x/Artifacts/kindle-temp-cleanup-final-20261109`.
 The earlier passes and their original failure receipts remain intact.
+
+## Packaged compiler-cache pass
+
+A further requested pass recovers **2,192,723,968 bytes (2.19 GB)**. Combined
+measured recovery across the four passes is about **136 GB**. The root filesystem
+now has **293,087,674,368 bytes (273 GiB)** available; `/x/Temp` occupies about
+177 GiB after subsequent experiment work.
+
+- Remove the local forward-contract experiment's packaged Cargo cache:
+  2,604 files, reclaiming 2,138,845,184 bytes. Before removal, verify the retained
+  stripped validation executable against its packaging SHA256 and list its tests
+  with Vulkan disabled. Its source, executable, settings and CPU/Clippy evidence
+  remain; no production runtime or experiment input is removed.
+- Merge five additional byte-identical artifact paths using hardlinks,
+  reclaiming 53,878,784 measured bytes. Full content hashes, permissions, owners
+  and extended attributes agree before replacement; all five canonical hashes
+  pass a final recheck. Every original path remains.
+- Verify all 8,004 inventoried large artifact paths and both retained native
+  runtime hashes. No process has an open temporary artifact at the start.
+  Exclude the current local forward-contract directory from deduplication.
+
+No unique checkpoints, replay, logs, videos or experiment evidence are deleted.
+The remaining large directories predominantly hold retained experiment artifacts.
+Inventory, removed-cache list, duplicate map and verification receipts remain at
+`/x/Artifacts/kindle-temp-cleanup-2120-20261109`. Earlier receipts are unchanged.
