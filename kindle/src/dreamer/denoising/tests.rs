@@ -461,8 +461,10 @@ fn residual_base_uses_only_latest_past_frame_and_respects_reset_lanes() {
 
 #[test]
 fn residual_mode_changes_no_differentiated_or_inference_graph() {
-    let mut c = DenoisingConfig::default();
-    c.context_motion_scale = 100.;
+    let c = DenoisingConfig {
+        context_motion_scale: 100.,
+        ..DenoisingConfig::default()
+    };
     let mut residual = c.clone();
     residual.residual_frame = true;
     for build in [
@@ -603,13 +605,16 @@ fn half_max_requires_v4_preserves_legacy_defaults_and_all_graphs() {
     }
 }
 
+mod sampler_steps;
 mod sampler_trace;
 
 #[test]
 fn configurable_sigma_data_matches_f64_and_recovers_rgb_without_rescaling_history() {
     for scale in [0.01, 0.05, 0.1, 0.5, 2.] {
-        let mut c = DenoisingConfig::default();
-        c.sigma_data = scale;
+        let c = DenoisingConfig {
+            sigma_data: scale,
+            ..DenoisingConfig::default()
+        };
         assert!(c.validate().is_ok());
         for sigma in [0.002, 0.05, 0.28308183, 0.5, 5.] {
             let (cin, cout, skip, noise) = c.coefficients(sigma);

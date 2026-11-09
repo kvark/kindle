@@ -27,7 +27,15 @@ service pass. Original CPU plan-schema and observer-path failures remain with
 separate CPU-only repairs; no native or assessment repeat. Root
 `/mnt/data/kindle-breakout-denoising-generated-history-20261109`.
 
-All jobs are stopped. No learner, extension, collector or successor is selected.
+The [frozen six-step sampler test](experiments/2026-11-09-breakout-denoising-six-steps.md) is selected. Test a finer rho7 grid with
+unchanged weights/noise; require exact cached/default production parity before
+any intervention. Test-only collector; no production/API/checkpoint change.
+19 focused CPU checks and strict release test-target Clippy pass; four native
+tests stay ignored until selection. Declaration precedes one300s guarded job. Original CPU schedule
+expectation failure is preserved with a separate check against F64 grid values;
+selected grid and physical gates stay unchanged. Root
+`/mnt/data/kindle-breakout-denoising-six-steps-20261109`.
+No learner, extension or collector selected.
 Default sigma_data.5/history scale.5 and v1/v2/v3/v4 remain; optional.05 usesv5.
 Retain.05 as development evidence, not a global default. All prior trials,
 failures and repairs, including the [stage trace](results/2026-11-09-breakout-denoising-stage-trace.md), stay closed; do not repeat them.
