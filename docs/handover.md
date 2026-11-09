@@ -30,9 +30,10 @@ two shapes/initialization and native revision differ. Parameter total stays
 pass CPU checks without a model. Root
 `/x/Temp/kindle-world-late-action-learning-20261109`. The declared205-pin
 training/restore queue is running under `kindle-world-late-action-learning-20261109.service`,
-invocation6904542f6a9f48b8a71dcd21b17471eb, controllerPID2204349. Initial exports
-are underway. Its matching observer and CPU finisher are active; source/shape/
-config and fixed final checks remain pending. No collector, extension, branch
+invocation6904542f6a9f48b8a71dcd21b17471eb, controllerPID2204349. Initial240
+qualified/frozen tensors and the first qualified report match exactly. A saved
+1,138-row live prefix has finite13 reports and correct total identities. Its
+observer and CPU finisher are active; all fixed final checks remain pending. No collector, extension, branch
 query or automatic successor is selected. Keep all original
 dense and broader physics/event gates; checkpoint/draw selection is forbidden.
 
