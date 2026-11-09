@@ -68,3 +68,15 @@ event precision, natural calibration, changed-brick memory, late/tunnel/second-
 wall/above-top, untouched families and fresh confirmation remain required.
 Actor/critic, CDP comparison and five-game work stay parked. No fitting score
 completes the full goal; all earlier trials/failures/repairs remain closed.
+
+Completed: [result](../results/2026-11-09-breakout-denoising-low-noise.md).
+One-step161/161/158/155 of198 improves, ordinary18/20/23/23 of110 regresses;
+3/24 individual gates pass, overall fitting test fails. Retain mean−1.2.
+The40 packaged checks cover native config/restore parsing, not a new CLI flag.
+All default first-update/initial/frozen/restore/event-state checks pass; both
+services terminal, three guards/27 files and285 closure pins verified, cache
+released. Original unpublished0/24 report prose remains with a separate CPU
+correction to3/24. No score or native assessment is repeated. Additional event
+metrics show scalar reward RMSE65.604/59.913 on zero-only ordinary windows;
+coverage clarification preserves the original review. No successor selected.
+Full goal remains unproven.

@@ -3,33 +3,43 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [lower-noise training test](experiments/2026-11-09-breakout-denoising-low-noise.md) is selected: keep half the targets at
-sigma5, shift the unforced lognormal mean−1.2→−3, std1.2 unchanged. Expected
-fraction below sigma.05 rises3.363%→25.071%; this is an optimization hypothesis,
-not a measured exposure count or established cause. Same model/data/target and
-pixel-normal order, fresh2,048 updates/65,536 targets, sigma_data.05/history.5,
-actual histories, Auto, rate.001 and three-step sampler. No new loss/graph/weights.
+unproven. The [lower-noise learner](results/2026-11-09-breakout-denoising-low-noise.md) is closed and rejected: one-step matches rise
+140/149/140/140→161/161/158/155 of198, but ordinary35/38/34/33→18/20/23/23 of110.
+Only3/24 individual fitting gates pass (first-step checks); all aggregate/longer
+criteria fail. Pixel MSE/false balls worsen. Retain the [sigma_data.05 control](results/2026-11-09-breakout-denoising-sigma-data0p05.md)
+and log-noise mean−1.2. Reused development learner/data/seed, not reliability.
 
-Optional log_noise_mean defaults−1.2/omitted; default path retains original
-sigma math andv1/v2/v3/v4/v5. Non-default mean requiresv6.22 Rust CPU/40 packaged
-CPU/four runner checks and strict release test-target Clippy pass. New native
-SHA prefix831461633936; pin source/native/matching runner before GPU. Guarded default
-v5 qualification must match135 initial/frozen tensors,20 full initial arrays,
-and135 first-update tensors/six losses before one fresh learner/restore; wrapper
-enforces reviewed qualification first. The single qualification update is
-separate from the main budget. No GPU job launched yet. Root
+An added CPU event audit finds scalar reward RMSE65.604 control/59.913 new on
+512 zero-reward ordinary predictions, despite0 positive/ending alarms at.5.
+The wide scalar support is a possible contributor; logits are not retained, so
+no exact attribution or decoder-bug claim. Event-head57 tensors remain exact;
+changed generated images alter its inputs. Source rewards at arrival4/lane4
+and5/lane1 are positive. Teacher RGB exports include the latter but discard
+head outputs; ordinary event windows16..31 are zero-only. The separate coverage
+clarification scopes the original evaluated_positive_rewards=0 field; original
+review is unchanged. Natural/positive-event calibration remains unproved.
+
+Latest sourcefecc251b/native831461633936. Optional log_noise_mean defaults−1.2/
+omitted with original sigma function/v1–v5; non-default−3 usesv6.22 Rust CPU/
+40 packaged config-restore/four runner checks and strict release test-target
+Clippy pass. Default-mean fixture135 initial/frozen/first-update tensors,20 full
+initial arrays andsix losses are exact before main launch; one qualification
+update is separate. Main135 initial/frozen tensors,20 initial/restored arrays
+and57 first/final event tensors are exact; restored mean−3 persists. All140
+configuration/97 CPU/285 closure pins, three sealed guards/27 files andtwo
+terminal services pass.2,048 updates/65,536 targets in161.227s learn-call/
+169.159s loop; shared host. Own792,536,079-byte apparent build cache released.
+Original unpublished report's0/24 prose is preserved with a CPU correction to
+3/24; no score/gate/model query is changed or repeated. Root
 `/mnt/data/kindle-breakout-denoising-low-noise-20261109`.
 
-Retain the [sigma_data.05 control](results/2026-11-09-breakout-denoising-sigma-data0p05.md): one-step140/149/140/140 of198,
-ordinary35/38/34/33 of110, still failing strict fitting gates. The
-[six-step sampler](results/2026-11-09-breakout-denoising-six-steps.md) raises one-step counts but worsens pixel MSE3–4×/false balls;
-keep three steps. The [grouped-history learner](results/2026-11-09-breakout-denoising-generated-history.md) also regresses. All earlier trials,
-failures and repairs stay closed; no old learner/assessment/collector repeats.
-No extension, broad learner, collection or automatic successor. Full physics/
-events/natural calibration, changed-brick memory, late/tunnel/second-wall/above-
-top, untouched families and fresh confirmation remain required. No fitting
-score completes the goal. Actor/critic, CDP comparison andfive-game work stay
-parked. [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB; hardlinked evidence stays immutable.
+All jobs stopped. No learner, extension, collector or successor selected. Keep
+native/checkpoint/runner identities separate. The [six-step sampler](results/2026-11-09-breakout-denoising-six-steps.md) and
+[grouped-history trial](results/2026-11-09-breakout-denoising-generated-history.md) stay rejected; all prior trials/failures/repairs remain
+closed. Full physics/events/natural calibration, changed-brick memory, late/
+tunnel/second-wall/above-top, untouched families and fresh confirmation remain
+required. No fitting score completes the goal. Actor/critic, CDP comparison and
+five-game work stay parked. [Cleanup](results/2026-11-09-temp-cleanup.md) recovered115GB; hardlinked evidence is immutable.
 
 ### What would establish the world model
 
@@ -41,7 +51,7 @@ completed short development comparisons:
 |---|---|---|
 | Read observed images | [H0 coverage](results/2026-11-07-breakout-world-coverage.md):108/112 balls within one RGB64 pixel | Consistent precision across the full game,including late and occluded states |
 | Forecast under submitted actions | [Local-action world](results/2026-11-08-breakout-world-local-action.md):43/107 eight-step and11/95 thirty-two-step balls match;ordinary primary.240566 trails H0.169502 | Accurate free flight and collision trajectories,including fitting data; existing precision/distribution gates |
-| Predict rewards and endings | [Local-action world](results/2026-11-08-breakout-world-local-action.md):RIGHT16 false ending risk.507002 and244/304 nonending alarms;[survival diagnostic](results/2026-11-08-breakout-world-survival-decomposition.md) changes scores with oracle labels only | Correct event timing and natural-frequency calibration; current outcome-selected slices alone cannot establish calibration |
+| Predict rewards and endings | [Denoiser event audit](results/2026-11-09-breakout-denoising-low-noise.md):scalar reward RMSE65.604/59.913 on512 zero-reward ordinary outputs;positive teacher event outputs not exported. [Local-action world](results/2026-11-08-breakout-world-local-action.md):RIGHT16 false ending risk.507002 and244/304 nonending alarms;[survival diagnostic](results/2026-11-08-breakout-world-survival-decomposition.md) changes scores with oracle labels only | Correct event timing and natural-frequency calibration; current outcome-selected slices alone cannot establish calibration |
 | Remember changed world state | Existing reports retain brick-cell scores and regressions | Persistent removed-brick memory through absence/occlusion; low image loss or a static wall reconstruction is insufficient |
 | Cover the game and generalize | Current fixed-action challenge has33 distinct contexts across seven reused development groups; repetitions share histories | Late/tunnel/second-wall states,above-top-brick endpoints,untouched families and fresh confirmation |
 
