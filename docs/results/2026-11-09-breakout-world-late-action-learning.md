@@ -38,6 +38,13 @@ six groups, preserving all four draws. It creates four reviewed figures in
 `/x/Temp/kindle-world-late-action-learning-20261109/milestone-2048-v1`.
 This does not change learning settings, select a checkpoint or score final gates.
 
+Two subsequent verification receipts fail independently of the metric review:
+v1 includes its own empty-file hash; v2 includes its still-open output log. Both
+original receipts and failed audits remain. Separately declared CPUv3 uses a
+fixed immutable input list and verifies all18 pins after process exit, preserving
+the valid28-input metric/image checks. No metric calculation, forecast or learner
+is repeated, and the original receipts are not relabeled as passed.
+
 ## Active run and verification still required
 
 Root `/x/Temp/kindle-world-late-action-learning-20261109`. Main service
