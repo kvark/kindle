@@ -1070,3 +1070,112 @@ fn direct_frame_preserves_graph_and_requires_its_v8_task_metadata() {
     value["config"]["deterministic_frame"] = true.into();
     assert!(read_header(&serde_json::to_vec(&value).unwrap()).is_err());
 }
+
+#[test]
+fn target_motion_weights_match_f64_without_changing_history_or_inputs() {
+    let side = 4;
+    let area = side * side;
+    let width = 3 * area;
+    let mut history = History::empty(2, width);
+    for t in 0..4 {
+        let frame = (0..2 * width)
+            .map(|i| ((i + 3 * t) % 19) as f32 / 9. - 1.)
+            .collect::<Vec<_>>();
+        history.push(&frame, &[1, 2]);
+    }
+    let before = history.condition(0, 3, 18, true);
+    let target = (0..width)
+        .map(|i| ((i * 7) % 17) as f32 / 8. - 1.)
+        .collect::<Vec<_>>();
+    for lane in 0..2 {
+        assert_eq!(
+            history.target_motion_importance(lane, side, 0., &target),
+            vec![1.; width]
+        );
+        let actual = history.target_motion_importance(lane, side, 100., &target);
+        let latest = (3 * 2 + lane) * width;
+        let mut expected = (0..area)
+            .map(|i| {
+                1. + 100.
+                    * (0..3)
+                        .map(|c| {
+                            (f64::from(target[c * area + i])
+                                - f64::from(history.rgb[latest + c * area + i]))
+                            .abs()
+                                * 0.5
+                        })
+                        .fold(0., f64::max)
+            })
+            .collect::<Vec<_>>();
+        let mean = expected.iter().sum::<f64>() / area as f64;
+        for v in &mut expected {
+            *v /= mean;
+        }
+        for (a, b) in actual.iter().zip(expected.repeat(3)) {
+            assert!((f64::from(*a) - b).abs() < 2e-6);
+            assert!(*a > 0.);
+        }
+        assert!((actual.iter().sum::<f32>() / width as f32 - 1.).abs() < 1e-6);
+    }
+    let different = history.target_motion_importance(0, side, 100., &vec![0.; width]);
+    assert_ne!(
+        different,
+        history.target_motion_importance(0, side, 100., &target)
+    );
+    assert_eq!(before, history.condition(0, 3, 18, true));
+}
+
+#[test]
+fn target_motion_requires_v9_nonzero_weight_and_preserves_graphs() {
+    let control = DenoisingConfig {
+        context_motion_scale: 100.,
+        residual_frame: true,
+        half_max_noise: true,
+        sigma_data: 0.05,
+        reward_limit: Some(32.),
+        ..DenoisingConfig::default()
+    };
+    let changed = DenoisingConfig {
+        target_motion_loss: true,
+        ..control.clone()
+    };
+    assert!(changed.validate().is_ok());
+    assert!(
+        DenoisingWorldLearner::new(DenoisingConfig {
+            target_motion_loss: true,
+            ..DenoisingConfig::default()
+        })
+        .is_err()
+    );
+    assert!(
+        !serde_json::to_value(&control)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("target_motion_loss")
+    );
+    for build in [
+        network::training,
+        network::sampling,
+        network::event_sampling,
+    ] {
+        assert_eq!(
+            format!("{:?}", build(&control).nodes()),
+            format!("{:?}", build(&changed).nodes())
+        );
+    }
+    let header = |c: &DenoisingConfig| serde_json::json!({"format":c.checkpoint_format(),"config":c,"updates":0,"architecture":"conditional-unet16-32-64-history4","sampler":c.sampler_name(),"observed_reconstruction":c.observed_task()});
+    assert_eq!(changed.checkpoint_format(), "kindle-denoising-world-v9");
+    assert_eq!(
+        read_header(&serde_json::to_vec(&header(&changed)).unwrap())
+            .unwrap()
+            .0,
+        changed
+    );
+    let mut old = header(&changed);
+    old["format"] = "kindle-denoising-world-v7".into();
+    assert!(read_header(&serde_json::to_vec(&old).unwrap()).is_err());
+    let mut old = header(&control);
+    old["format"] = "kindle-denoising-world-v9".into();
+    assert!(read_header(&serde_json::to_vec(&old).unwrap()).is_err());
+}

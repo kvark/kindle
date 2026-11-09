@@ -43,6 +43,8 @@ pub struct DenoisingConfig {
     pub reward_limit: Option<f32>,
     #[serde(default, skip_serializing_if = "is_false")]
     pub deterministic_frame: bool,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub target_motion_loss: bool,
 }
 impl Default for DenoisingConfig {
     fn default() -> Self {
@@ -62,6 +64,7 @@ impl Default for DenoisingConfig {
             log_noise_mean: default_log_noise_mean(),
             reward_limit: None,
             deterministic_frame: false,
+            target_motion_loss: false,
         }
     }
 }
@@ -81,6 +84,7 @@ impl DenoisingConfig {
             || self.horizon < 2
             || !self.context_motion_scale.is_finite()
             || !(0.0..=1000.0).contains(&self.context_motion_scale)
+            || (self.target_motion_loss && self.context_motion_scale == 0.)
             || !self.sigma_data.is_finite()
             || !(0.01..=2.0).contains(&self.sigma_data)
             || !self.log_noise_mean.is_finite()
@@ -94,7 +98,9 @@ impl DenoisingConfig {
         Ok(())
     }
     fn checkpoint_format(&self) -> &'static str {
-        if self.deterministic_frame {
+        if self.target_motion_loss {
+            "kindle-denoising-world-v9"
+        } else if self.deterministic_frame {
             "kindle-denoising-world-v8"
         } else if self.reward_limit.is_some() {
             "kindle-denoising-world-v7"
@@ -390,6 +396,30 @@ impl History {
         }
         importance.repeat(3)
     }
+    /// Loss labels may emphasize changed pixels without entering conditioning.
+    fn target_motion_importance(
+        &self,
+        lane: usize,
+        side: usize,
+        scale: f32,
+        target: &[f32],
+    ) -> Vec<f32> {
+        let area = side * side;
+        let latest = (3 * self.batch + lane) * self.width;
+        let mut importance = (0..area)
+            .map(|i| {
+                let change = (0..3)
+                    .map(|c| (target[c * area + i] - self.rgb[latest + c * area + i]).abs() * 0.5)
+                    .fold(0., f32::max);
+                1. + scale * change
+            })
+            .collect::<Vec<_>>();
+        let mean = importance.iter().sum::<f32>() / area as f32;
+        for value in &mut importance {
+            *value /= mean;
+        }
+        importance.repeat(3)
+    }
 }
 
 pub struct DenoisingWorldLearner {
@@ -602,7 +632,16 @@ impl DenoisingWorldLearner {
             if c.context_motion_scale > 0. {
                 let importance = (0..b)
                     .flat_map(|lane| {
-                        history.motion_importance(lane, c.side, c.context_motion_scale)
+                        if c.target_motion_loss {
+                            history.target_motion_importance(
+                                lane,
+                                c.side,
+                                c.context_motion_scale,
+                                &actual[lane * w..(lane + 1) * w],
+                            )
+                        } else {
+                            history.motion_importance(lane, c.side, c.context_motion_scale)
+                        }
                     })
                     .collect::<Vec<_>>();
                 self.train.set_input("pixel_importance", &importance);

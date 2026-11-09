@@ -130,3 +130,20 @@ def test_direct_frame_rejects_stale_metadata_without_gpu(tmp_path,field,value):
     (tmp_path/'metadata.json').write_text(json.dumps(header))
     with pytest.raises(RuntimeError,match='checkpoint header'):
         kindle.DenoisingWorldLearner.restore(str(tmp_path))
+
+def test_target_motion_requires_nonzero_scale_without_gpu():
+    with pytest.raises(ValueError,match='invalid denoising'):
+        kindle.DenoisingWorldLearner(CONFIG | {'target_motion_loss':True})
+
+@pytest.mark.parametrize('version,enabled',[('v7',True),('v8',True),('v9',False)])
+def test_target_motion_requires_matching_header_without_gpu(tmp_path,version,enabled):
+    header=dict(format='kindle-denoising-world-'+version,
+        config=CONFIG | {'context_motion_scale':100.,'residual_frame':True,
+                       'half_max_noise':True,'sigma_data':.05,'reward_limit':32.,
+                       'target_motion_loss':enabled},updates=0,
+        architecture='conditional-unet16-32-64-history4',
+        sampler='edm-euler3-sigma5-last-frame-residual-quantized',
+        observed_reconstruction='single-denoise-sigma0.5-not-rssm-posterior')
+    (tmp_path/'metadata.json').write_text(json.dumps(header))
+    with pytest.raises(RuntimeError,match='checkpoint header'):
+        kindle.DenoisingWorldLearner.restore(str(tmp_path))
