@@ -27,6 +27,8 @@ pub struct DenoisingConfig {
     pub context_motion_scale: f32,
     #[serde(default, skip_serializing_if = "is_false")]
     pub residual_frame: bool,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub half_max_noise: bool,
 }
 impl Default for DenoisingConfig {
     fn default() -> Self {
@@ -41,6 +43,7 @@ impl Default for DenoisingConfig {
             horizon: 333,
             context_motion_scale: 0.,
             residual_frame: false,
+            half_max_noise: false,
         }
     }
 }
@@ -66,7 +69,9 @@ impl DenoisingConfig {
         Ok(())
     }
     fn checkpoint_format(&self) -> &'static str {
-        if self.residual_frame {
+        if self.half_max_noise {
+            "kindle-denoising-world-v4"
+        } else if self.residual_frame {
             "kindle-denoising-world-v3"
         } else if self.context_motion_scale == 0. {
             "kindle-denoising-world-v1"
@@ -114,6 +119,20 @@ fn schedule() -> [f32; 4] {
     let lo = SIGMA_MIN.powf(1. / 7.);
     let hi = SIGMA_MAX.powf(1. / 7.);
     [SIGMA_MAX, (hi + 0.5 * (lo - hi)).powi(7), SIGMA_MIN, 0.]
+}
+fn training_sigmas(normals: Vec<f32>, update: u64, half_max: bool) -> Vec<f32> {
+    let split = normals.len() / 2;
+    normals
+        .into_iter()
+        .enumerate()
+        .map(|(lane, n)| {
+            if half_max && (lane < split) == update.is_multiple_of(2) {
+                SIGMA_MAX
+            } else {
+                (-1.2 + 1.2 * n).exp().clamp(SIGMA_MIN, SIGMA_MAX)
+            }
+        })
+        .collect()
 }
 fn quantize(x: f32) -> f32 {
     ((x.clamp(-1., 1.) + 1.) * 127.5).round() / 127.5 - 1.
@@ -407,10 +426,11 @@ impl DenoisingWorldLearner {
                 history.push(&actual, incoming);
                 continue;
             }
-            let sigma = gaussian::normals(&mut self.rng, b)
-                .into_iter()
-                .map(|n| (-1.2 + 1.2 * n).exp().clamp(SIGMA_MIN, SIGMA_MAX))
-                .collect::<Vec<_>>();
+            let sigma = training_sigmas(
+                gaussian::normals(&mut self.rng, b),
+                self.updates,
+                c.half_max_noise,
+            );
             let noise = gaussian::normals(&mut self.rng, b * w);
             let base = history.base(incoming, c.residual_frame);
             let mut inputs = Vec::new();

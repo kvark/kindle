@@ -513,3 +513,92 @@ fn residual_header_requires_v3_and_its_sampler_and_preserves_old_defaults() {
         assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
     }
 }
+
+#[test]
+fn half_max_sigmas_preserve_legacy_values_and_balance_every_repeated_clip() {
+    let normals = (0..32).map(|i| (i % 4) as f32 - 2.).collect::<Vec<_>>();
+    let expected = normals
+        .iter()
+        .map(|&n| (-1.2 + 1.2 * n).exp().clamp(SIGMA_MIN, SIGMA_MAX))
+        .collect::<Vec<_>>();
+    for update in [0, 1, 19, u64::MAX] {
+        let plain = training_sigmas(normals.clone(), update, false);
+        for (a, b) in plain.iter().zip(&expected) {
+            assert_eq!(a.to_bits(), b.to_bits());
+        }
+        let high = training_sigmas(normals.clone(), update, true);
+        assert_eq!(high.iter().filter(|&&v| v == SIGMA_MAX).count(), 16);
+        for lane in 0..8 {
+            let copies = (0..4).map(|copy| lane + copy * 8).collect::<Vec<_>>();
+            assert_eq!(copies.iter().filter(|&&i| high[i] == SIGMA_MAX).count(), 2);
+            for i in copies {
+                assert_eq!(
+                    high[i],
+                    if (i < 16) == update.is_multiple_of(2) {
+                        SIGMA_MAX
+                    } else {
+                        expected[i]
+                    }
+                );
+            }
+        }
+    }
+    // Alternating halves balance odd batches over two updates too.
+    let first = training_sigmas(vec![0.; 5], 0, true);
+    let second = training_sigmas(vec![0.; 5], 1, true);
+    for i in 0..5 {
+        assert_ne!(first[i] == SIGMA_MAX, second[i] == SIGMA_MAX);
+    }
+    let mut a = StdRng::seed_from_u64(41001);
+    let mut b = a.clone();
+    let _ = training_sigmas(gaussian::normals(&mut a, 32), 0, true);
+    let _ = training_sigmas(gaussian::normals(&mut b, 32), 0, false);
+    assert_eq!(
+        gaussian::normals(&mut a, 512),
+        gaussian::normals(&mut b, 512)
+    );
+}
+
+#[test]
+fn half_max_requires_v4_preserves_legacy_defaults_and_all_graphs() {
+    let mut c = DenoisingConfig::default();
+    assert!(
+        !serde_json::to_value(&c)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("half_max_noise")
+    );
+    for residual in [false, true] {
+        c.residual_frame = residual;
+        c.context_motion_scale = 100.;
+        let mut half = c.clone();
+        half.half_max_noise = true;
+        for build in [
+            network::training,
+            network::sampling,
+            network::event_sampling,
+        ] {
+            assert_eq!(
+                format!("{:?}", build(&c).nodes()),
+                format!("{:?}", build(&half).nodes())
+            );
+        }
+        let mut v = serde_json::json!({"format":"kindle-denoising-world-v4","config":half,"updates":0,"architecture":"conditional-unet16-32-64-history4","sampler":half.sampler_name(),"observed_reconstruction":"single-denoise-sigma0.5-not-rssm-posterior"});
+        assert_eq!(
+            read_header(&serde_json::to_vec(&v).unwrap()).unwrap().0,
+            half
+        );
+        for version in [
+            "kindle-denoising-world-v1",
+            "kindle-denoising-world-v2",
+            "kindle-denoising-world-v3",
+        ] {
+            let mut bad = v.clone();
+            bad["format"] = version.into();
+            assert!(read_header(&serde_json::to_vec(&bad).unwrap()).is_err());
+        }
+        v["config"]["half_max_noise"] = false.into();
+        assert!(read_header(&serde_json::to_vec(&v).unwrap()).is_err());
+    }
+}

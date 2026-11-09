@@ -21,34 +21,27 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [last-frame residual denoiser](docs/results/2026-11-09-breakout-denoising-frame-residual.md) is closed andfailed:
-2,048 updates/65,536 targets yield0/110 ordinary and0/198 privileged one-step
-matches per draw. Detected one-step balls135/135/135/128 of198 all remainwithin
-one pixel oftheir previous positions;median movement projection0,next-position
-error2.60–2.62 pixels. This model copies ball state without correct motion.
-Observed noisy-frame matches4/2/3/2 of8;copy-last baseline2/110 ordinary,0/198
-one-step. No physical fitting improvement or unique error cause established.
+The [half-maximum-noise check](docs/experiments/2026-11-09-breakout-denoising-half-max-noise.md) is selected. Force half ofB32 to
+sigma5,withtwo forced-high/two original-law copies ofevery clip each update.
+This tests high-noise training coverage after the residual model copied previous
+ball positions. Same model/loss/sampler,rate1e-3,actual histories,target/pixel-noise
+order and2,048-update/65,536-target budget. Aggregate MSE isnot matched across
+mixtures;physical fitting gates remain unchanged. No rebuild ofgraph primitives.
 
-Optional residual_frame defaultfalse preserves v1/v2;true requiresv3/matching
-sampler. Sourcec4354982/native1416da70 addsno weights/backend primitive;graphs/
-loss source unchanged.14 Rust CPU/390 packaged/4 runner checks andstrict Clippy
-pass. Fresh legacy-initial qualification135 tensors/20 first-step arrays exact
-completes before learning;first57 event weights/moments exact. All133 declared/
-93 CPU inputs,135 own-initial/frozen tensors and20 restored arrays pass.
-Call/loop158.881s/167.465s. Closure258 pins/three guards/27 files/two terminal
-services;16 exact frames/1,376 endpoints plus864 motion rows retained. Own
-2,815,151,412-byte build caches released;all packaged evidence remains.
-[Protocol](docs/experiments/2026-11-09-breakout-denoising-frame-residual.md). Root
-`/mnt/data/kindle-breakout-denoising-frame-residual-20261109`. No GPU job,
-unchanged extension,broad learner,collector or successor selected.
+Optional half_max_noise defaultfalse preserves v1/v2/v3;true requiresv4.16 Rust
+CPU/394 packaged/four runner checks andstrict Clippy pass. Graph/loss source
+unchanged;new native needs guarded fresh pre-mixture initial parity before
+learning. Declare successfully before allocation;no GPU job launched yet. Root
+`/mnt/data/kindle-breakout-denoising-half-max-noise-20261109`.
 
-Prior [rate1e-3 result](docs/results/2026-11-09-breakout-denoising-rate1em3.md) andall completed trials/failures/repairs remain
-retained. Actor/critic,CDP comparison andfive-game work stay parked. Full physics/
-events/calibration,brick memory,late/tunnel/second-wall/above-top,untouched
-families andfresh confirmation remain required. No fitting score completes the
-goal. User-requested [cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115 GB;hardlinked evidence stays
-immutable. One live workspace graph-source pin is archived byte-exact from its
-committed tar so future source edits preserve the original declared bytes.
+The [residual-frame control](docs/results/2026-11-09-breakout-denoising-frame-residual.md) stays closed andfailed:0/110 ordinary,
+0/198 one-step;detected balls135/135/135/128 all within1px ofprevious positions,
+median movement0,next-position error2.6px. All prior failures/repairs retained.
+Full physics/events/calibration,brick memory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. No fitting score
+completes the goal. Actor/critic,CDP comparison andfive-game work stay parked.
+No extension,broad learner,collector or automatic successor. User-requested
+[cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115 GB;retained hardlinked evidence stays immutable.
 
 ## Direction and retained results
 
