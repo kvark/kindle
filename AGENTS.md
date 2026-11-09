@@ -21,43 +21,44 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [bounded reward-support learner](docs/experiments/2026-11-09-breakout-denoising-reward32.md) is selected after the completed
-[logit diagnosis](docs/results/2026-11-09-breakout-denoising-event-logits.md). On512 zero-reward ordinary rows, mean mass outside±32
-is.0000213354 yet dominates65.604 scalar RMSE; central contribution error is
-.000208. The arithmetic reconstructs every native mean/positive probability.
-Errors also occur with actual images; two positive examples remain insufficient
-for calibration, and one is poorly recognized. This is not a decoder-bug claim.
-The diagnostic's200 head batches/1,600 rows,12 exact cached arrays,135 frozen
-tensors,22 CPU checks/Clippy,39 declared/75 closure pins andnine sealed guard
-files pass; terminal success. Its719,963,816-byte apparent cache is released.
+unproven. Retain [reward_limit32](docs/results/2026-11-09-breakout-denoising-reward32.md) as a Breakout development setting. Ordinary zero-
+reward RMSE improves from own initial.417886 to.0000317932, versus old trained
+65.604. Causal one-step overall.408339→.0314885; the exported reward1 case
+improves about.33→.990714, positive probability.503→.99294. The other privileged
+positive still predicts.267701 for1. No natural calibration or fresh confirmation.
+All78 denoiser weights/moments and final RGB stay bit-exact to the control:
+physics remains35/38/34/33 of110 ordinary,140/149/140/140 of198 one-step,0/24 gates.
+This improves one component, not the full world model or retained CDP agent.
 
-New optional reward_limit=None preserves original support/decoder andv1–v6;
-finite positive bound32 requiresv7, uses the same bounded support for labels and
-means, and rejects out-of-range targets. No new graph/parameters/loss expression.
-Same.05 data scale/−1.2 noise mean, actual histories,Auto,rate.001,three Euler
-steps,fresh2,048 updates/65,536 targets. Require78 first/final denoiser tensors
-and all final RGB exact tocontrol; this cannot improve its failed physics gates.
-Retain own initial reward outputs so the structural bound alone is not called
-learning. Teacher exports retain already computed event outputs/labels without
-extra queries. A fixed post-restore head diagnostic captures both privileged
-positive cases, with12 own cached arrays/135 frozen tensors exact.
+The [frozen logit diagnosis](docs/results/2026-11-09-breakout-denoising-event-logits.md) confirms tiny mass outside±32 dominates the old
+scalar errors even on actual images. Native arithmetic reconstructs correctly;
+no decoder implementation bug. Diagnostic central contributions/modal values
+are not learned replacements. Source has only two fitting positives and no
+terminals; causal teacher exports cover one positive, privileged head inputs
+both. Exact input keys are distinct, which does not rule out feature aliasing.
 
-25 Rust CPU/50 packaged config-restore/four runner checks and strict release
-Clippy pass; native prefix60b9b67244d7. Declare/pin before one defaultNone v5 fixture,
-requiring135 initial/frozen/first-update tensors,20 full initial arrays andsix
-losses exact before main launch. Main initial135 tensors/16 non-reward arrays
-must match; final135 tensors/20 restored arrays must be exact. Four guarded
-stages/36 sealed files across two services; no GPU job launched yet. Root
+Latest source8dbf9ab5/native60b9b67244d7. Optional reward_limit=None preserves
+original support/decoder/v1–v6; explicit32 usesv7 and rejects out-of-range target
+rewards before updates. Any future dataset must pass that guard.25 Rust CPU/
+50 packaged config-restore/four runner checks and strict release Clippy pass.
+DefaultNone fixture135 initial/frozen/first-update tensors,20 initial arrays and
+six losses exact before main launch; one qualification update is separate.
+Main135 initial tensors/16 non-reward arrays,78 first/final denoiser tensors,
+135 own frozen tensors/20 restored arrays and12 head replay arrays are exact.
+All140 declaration/125 physical CPU/306 closure pins, four sealed guards/36 files
+andtwo terminal services pass.2,048 updates/65,536 targets take161.420s learn-
+call/169.299s loop on the shared host. Own792,664,189-byte apparent cache released.
+Original terminal guard-count metadata2 remains with a clarification tothree
+main guards plus one fixture; no native or audit repeat. Root
 `/mnt/data/kindle-breakout-denoising-reward32-20261109`.
 
-The [lower-noise learner](docs/results/2026-11-09-breakout-denoising-low-noise.md),[six-step sampler](docs/results/2026-11-09-breakout-denoising-six-steps.md) and
-[grouped-history trial](docs/results/2026-11-09-breakout-denoising-generated-history.md) remain rejected/closed. Retain the original
-[sigma_data.05 control](docs/results/2026-11-09-breakout-denoising-sigma-data0p05.md) checkpoint/runtime for existing physics evidence.
-No old learner/assessment/collector repeats; no extension,broad learner,data
-collection or automatic successor. Full physics/events/natural calibration,
-changed-brick memory,late/tunnel/second-wall/above-top,untouched families and
-fresh confirmation remain required. No fitting score completes the goal.
-Actor/critic,CDP comparison andfive-game work stay parked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
+All jobs stopped. No learner, extension, collector or successor selected.
+Keep source/native/checkpoint/runner identities separate. The earlier
+[lower-noise](docs/results/2026-11-09-breakout-denoising-low-noise.md),[six-step](docs/results/2026-11-09-breakout-denoising-six-steps.md) and[grouped-history](docs/results/2026-11-09-breakout-denoising-generated-history.md) changes stay rejected; all
+prior trials/failures/repairs remain closed. Full physics/events/natural
+calibration,changed-brick memory,late/tunnel/second-wall/above-top,untouched
+families andfresh confirmation remain required. No fitting score completes the
+goal. Actor/critic,CDP comparison andfive-game work stay parked. [Cleanup](docs/results/2026-11-09-temp-cleanup.md)
 recovered115GB; hardlinked evidence stays immutable.
 
 ## Direction and retained results
@@ -65,7 +66,8 @@ recovered115GB; hardlinked evidence stays immutable.
 Training is the priority. Backend optimization,upstream porting and JAX parity
 are parked. The retained agent uses **centered CDP** with a jointly learned CNN,
 categorical RSSM and imagined actor/critic. The isolated-world track
-uses explicit pixel supervision; the denoiser is a failed development trial. No pretrained DINO or Tiny
+uses explicit pixel supervision; the denoiser still fails physics gates, with
+bounded reward support retained as a development improvement. No pretrained DINO or Tiny
 JEPA encoder is required. Explicitly select the intended objective; learned RGB
 remains the CLI default.
 

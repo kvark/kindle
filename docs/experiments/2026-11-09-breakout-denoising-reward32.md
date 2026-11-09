@@ -74,3 +74,13 @@ packaging. No extension,broad learner,collection or automatic successor. Preserv
 failures and separately declared repairs. Full physics/events/natural calibration,
 changed-brick memory,late/tunnel/second-wall/above-top,untouched families and fresh
 confirmation remain required. The full objective remains unproven.
+
+Completed: the [result](../results/2026-11-09-breakout-denoising-reward32.md)
+reduces ordinary zero-reward RMSE.417886 initial→.0000317932 trained, and the
+causal positive prediction about.33→.990714. Retain32 for development, not as a
+global default or reliability claim. One privileged positive remains missed;
+physics is bit-identical and0/24 gates still fail. All default/isolation/frozen/
+restore/head checks pass, four guards/36 files and306 closure pins verified,
+both services terminal, own cache released. Original observer terminal count2
+is preserved with a CPU metadata clarification tothree actual main guards plus
+one fixture. No native/audit repeat or successor selected. Full goal unproven.
