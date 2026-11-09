@@ -52,3 +52,10 @@ All original fitting/physical/event/calibration/brick-memory andlate/tunnel/
 second-wall/above-top/untouched-family/fresh-confirmation requirements remain.
 Full oracle lacks above-top endpoints;this frozen diagnostic cannot prove the
 world model. The full goal remains active andunproven.
+
+The [completed result](../results/2026-11-09-breakout-denoising-stage-trace.md)
+passes exact parity/freeze andfinds weak motion already atstage1,creation/loss
+ofcorrect positions atstage2,andno match changes atstage3. New-ball RGB-change
+projection isabout10–11%,versus55% old-location erasure. A CPU residual-scale
+statistic suggests a separate preconditioning hypothesis,not a proven cause.
+The diagnostic isclosed;no learner orsampler successor isselected.

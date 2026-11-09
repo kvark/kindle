@@ -21,27 +21,33 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** is active and unproven.
-The [frozen sampler-stage diagnostic](docs/experiments/2026-11-09-breakout-denoising-stage-trace.md) is selected for the retained
-half-max-noise checkpoint. Inspect all27 one-step origins/eight lanes/four draws
-atallthree denoising stages. Test-only native collector;production source/API/
-model/loss/sampler unchanged. Release executable compiles;16 CPU checks pass,
-three GPU checks remain ignored. Source bytes match retained production code.
-Declare successfully before one300s guarded job;no GPU allocation launched yet.
-Root `/mnt/data/kindle-breakout-denoising-stage-trace-20261109`.
+The [native sampler-stage diagnostic](docs/results/2026-11-09-breakout-denoising-stage-trace.md) is closed. Exact108 final batch
+arrays/864 images,20 origin16 arrays and135 frozen tensors pass;no learning.
+Source35018f7d changes tests only;production/model/loss/sampler sourceccf09d7f
+remains unchanged.16 CPU checks pass. Native3.029s/CPU.671s;37 declared/25 CPU
+pins. One sealed guard/nine files andone terminal successful service pass.
 
-Require108 exact cached final batch arrays,20 origin16 model arrays and135
-unchanged tensors before interpreting traces. Decode only this selected current
-checkpoint's cached final outputs for required parity;no other historical model.
-No training,emulator action/frame,collector or completed assessment restart.
-Intermediate denoised means are diagnostics,not replacement forecasts orgates.
+Stage1 sigma5 already matchesonly17/17/13/15 of198 next-ball positions;stage2
+.283 gives11/17/16/14 andstage3 .002 changesnone ofthose matches. Stage2 loses
+10/6/2/6 earlier correct positions andcreates4/6/5/5;no simple final-step cause.
+Final new-location RGB-change projection medians.101–.110 versus old-location
+erasure.547–.559. These aredescriptive clean-estimate/pixel measurements,not
+replacement forecasts,causal error shares orfractions ofphysical movement.
 
-The [half-noise learner](docs/results/2026-11-09-breakout-denoising-half-max-noise.md) stays closed andfailed:ordinary1/1/0/2 of110,
-one-step11/17/16/14 of198. Detections fall to48/49/48/51;copying/absence dominate.
-All prior failures/repairs remain retained. Full physics/events/calibration,brick
-memory,late/tunnel/second-wall/above-top,untouched families andfresh confirmation
-remain required. No fitting/diagnostic score completes the goal. Actor/critic,
-CDP comparison andfive-game work stay parked. No automatic successor. Retained
-hardlinked evidence fromthe user's [cleanup](docs/results/2026-11-09-temp-cleanup.md) stays immutable.
+Additional all224 unique-arrival statistics:internal whole-image std.47237,
+frame-difference std/RMS.03537;EDM sigma_data remains.5. This suggests a separate
+preconditioning-scale hypothesis,not a proven cause. History conditioning.5 is
+a separate operation;do not silently rescale it. No nextlearner selected.
+
+Root `/mnt/data/kindle-breakout-denoising-stage-trace-20261109` retains108 traces,
+2,592 endpoint rows and27 exact fixed-lane panels (separate one-step forecasts,
+not a continuous rollout). Own580,736,006-byte build cache released. [Protocol](docs/experiments/2026-11-09-breakout-denoising-stage-trace.md).
+No GPU job,extension,broad learner,collector or automatic successor selected.
+The [half-noise learner](docs/results/2026-11-09-breakout-denoising-half-max-noise.md) andall prior failures/repairs stay closed/retained.
+Full physics/events/calibration,brick memory,late/tunnel/second-wall/above-top,
+untouched families andfresh confirmation remain required. No diagnostic score
+completes the goal. Actor/critic,CDP comparison andfive-game work stay parked.
+User-requested [cleanup](docs/results/2026-11-09-temp-cleanup.md) recovered115 GB;hardlinked evidence stays immutable.
 
 ## Direction and retained results
 
