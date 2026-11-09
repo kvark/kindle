@@ -3,7 +3,14 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [frozen position contract diagnosis](results/2026-11-09-breakout-world-centroid-contract.md)
+unproven. A separately declared [fresh position10000 learner](experiments/2026-11-09-breakout-world-centroid10000-learning.md)
+is selected:only auxiliary weight1000→10000 changes versusclosed RGB1/position1000,
+same8,192 fresh updates/seed41001/plan/RGB64/B8/T32/H16/Auto/nativeee44ec16.
+Gradient measurements justify testing thebalance,not predictingsuccess.
+Root `/x/Temp/kindle-world-centroid10000-learning-20261109`;no extension/collector/
+automatic successor. Original RGB gates andfull world-model requirements stay.
+
+The completed frozen measurement follows. The [frozen position contract diagnosis](results/2026-11-09-breakout-world-centroid-contract.md)
 closespassed: native/CPU saved-feature affine error<=0.00004522px,same-time
 observed centroid values/masks match;weighted gradients sum tojoint with
 relative L2 error<=2.49e-7 globally. The coarse readout isnot astorage-order
@@ -26,8 +33,8 @@ remains closed/negative:development85/112 observed,73/109 one-step,15/107
 eight-step;allthree broad gates fail. Fitting134/163,119/177,34/176. Retain H0
 broad reference;optional auxiliary mode staysdefaultoff. Coordinate accuracy
 cannot replace RGB gates orprove information absence. Allprior jobs stayclosed,
-fullres staysprotocol-failed;no learner/collector/extension/automatic successor
-selected. Full physics/events,natural calibration,removed-brick memory,
+fullres staysprotocol-failed. Prior jobs areclosed;only the new learner above
+is selected. Full physics/events,natural calibration,removed-brick memory,
 late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
 required. Actor/critic,CDP comparison andfive-game work stayparked.
 
