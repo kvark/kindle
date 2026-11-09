@@ -78,3 +78,9 @@ All original full-corpus physics/event/calibration/brick-memory gates, late/
 tunnel/second-wall/above-top coverage, untouched families and fresh confirmation
 remain. The full oracle hasno above-top endpoint. Read the result before any
 new allocation; actor/critic,CDP comparison and the game campaign stay parked.
+
+The [completed result](../results/2026-11-09-breakout-denoising-context.md) fails:
+0/110 ordinary,0/198 actual-history one-step and0/8 observed matches per draw.
+Initial parity/first-head-loss checks,frozen tensors andrestore pass. Original
+CPU/closure failures remain separately retained. The trial is closed;no
+extension,broad learner or successor is selected. The full goal stays unproven.
