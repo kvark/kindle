@@ -3,38 +3,25 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [fresh position10,000 learner](results/2026-11-09-breakout-world-centroid10000-learning.md) closes negative:
-development77/112 observed,70/109 one-step,14/107 eight-step; all three original
-RGB gates fail. Fitting118/163,107/177,28/176. Increasing only the auxiliary
-coefficient from1,000 to10,000 improves the CPU coordinate readout (observed
-development RMSE2.437→1.648px,15→40/112 within1px), but weakens RGB reconstruction
-and does not improve the eight-step RGB result15→14/107. Do not adopt it or
-allocate its conditional oracle assessment. Retain the H0 broad reference;
-optional auxiliary mode stays default off. Reused41001 is not fresh confirmation.
+unproven. [Direct RGB color attention](experiments/2026-11-09-breakout-world-color-attention.md) is selected for native qualification.
+Default-off replay-derived red/region weights multiply motion attention and
+renormalize to mean1 per image,for observed and imagined RGB cross-entropy.
+No new head/parameters/inference path:68 weights/204 tensors/11 reports,v23.
+144 world CPU/29 config/strict core+binding Clippy/25 packaged Python checks pass.
+Initial fixture string inference andF32-reciprocal reference failures remain
+withseparate corrected tests. The next allocation isone guarded primitive plus
+one full-shape update/initial/frozen/restore check;no learner isyet selected.
+Root `/x/Temp/kindle-world-color-attention-20261109`.
 
-All8,192 fifteen-report rows,weight10,000 total/source/mask identities,70 changed
-weights,210 actual-initial/own frozen tensors and18 development/32 contact
-restore arrays pass. The only config change and all initial arrays versus the
-weight1,000 control pass; original384 dense origins match.149 declaration/149
-CPU analysis/326 closure pins,two guards/18 sealed files,terminal successful
-native queue and observer. Calls768.912s,loop874.419s. Sourcef14282d6 reuses native
-449361ae/SHAee44ec16 andmatching runner;no rebuild. Root
-`/x/Temp/kindle-world-centroid10000-learning-20261109`.
-
-The copied launcher's top-level summary field still says1,000; preserve it and
-its pinned source. Protocol/config/native getters/checkpoints and all8,192 loss
-identities confirm execution with10,000. A separate CPU clarification records
-the bookkeeping defect; no native stage repeats. [Frozen contract checks](results/2026-11-09-breakout-world-centroid-contract.md)
-stay passed: native affine layout/observed time alignment agree, and measured
-raw position gradients were weaker than RGB. That did not predict the outcome
-of this coefficient experiment or prove an optimization cause.
-
-All jobs are stopped; no learner,extension,collector orautomatic successor is
-selected. Prior jobs stay closed and fullres stays protocol-failed. Full precise
-physics,natural event calibration,removed-brick memory,late/tunnel/second-wall/
-above-top coverage,untouched families andfresh confirmation remain required.
-Actor/critic,CDP comparison andfive-game work stay parked. Keep hardlinked
-historical evidence immutable; no new build cache was created for this run.
+[Position10,000](results/2026-11-09-breakout-world-centroid10000-learning.md) remains closed/negative:development77/112 observed,
+70/109 one-step,14/107 eight-step;0/3 broad gates. The coordinate readout improves
+RMSE2.437→1.648px butdoesnot improve RGB. Original summary typo andseparate CPU
+clarification remain;all8,192 loss identities confirm10,000. Retain H0 broad
+reference;optional modes staydefaultoff. Prior jobs stayclosed andfullres stays
+protocol-failed. Full physics,natural event calibration,removed-brick memory,
+late/tunnel/second-wall/above-top,untouched families andfresh confirmation remain
+required. Actor/critic,CDP comparison andfive-game work stayparked. No automatic
+learner,extension,collector orsuccessor;read the protocol before execution.
 
 ### What would establish the world model
 

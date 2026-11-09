@@ -497,6 +497,10 @@ pub struct DreamerCore {
 
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
+        assert!(
+            config.rgb_color_attention.is_none(),
+            "color attention is standalone world only"
+        );
         assert!(!config.rgb_spatial_fusion, "spatial fusion is standalone world only");
         assert!(!config.world_image_feedback,"image feedback is standalone world only");
         assert!(
@@ -563,6 +567,10 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
+        assert!(
+            config.rgb_color_attention.is_none(),
+            "color attention is standalone world only"
+        );
         assert!(!config.rgb_spatial_fusion, "spatial fusion is standalone world only");
         assert!(!config.world_image_feedback,"image feedback is standalone world only");
         assert!(
@@ -2918,6 +2926,12 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.config.rgb_color_attention.is_some() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "color attention is standalone world only",
+        ));
+    }
     if metadata.config.rgb_spatial_fusion {
         return Err(io::Error::new(io::ErrorKind::InvalidData, "spatial fusion is standalone world only"));
     }

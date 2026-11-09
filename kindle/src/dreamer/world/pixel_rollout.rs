@@ -39,12 +39,23 @@ pub(super) fn event_losses(
 
 fn motion_loss(
     graph: &mut Graph,
+    config: &DreamerConfig,
     errors: NodeId,
     current: NodeId,
     previous: NodeId,
     keep: NodeId,
 ) -> NodeId {
-    let weights = super::super::networks::pixel_motion_weights(graph, current, previous, keep);
+    let mut weights = super::super::networks::pixel_motion_weights(graph, current, previous, keep);
+    if let Some(settings) = &config.rgb_color_attention {
+        weights = color_centroid::attention(
+            graph,
+            settings,
+            current,
+            weights,
+            config.batch_size,
+            config.observation_grid(),
+        );
+    }
     let weighted = graph.mul(errors, weights);
     let per_row = graph.sum_inner(weighted);
     let keep = graph.stop_gradient(keep);
@@ -292,7 +303,14 @@ pub(super) fn build_with_centroid(
             centroid_losses.push([loss, valid]);
         }
         let loss = if pixel_loss.motion_attention() {
-            motion_loss(graph, squared, observation, previous, weight.unwrap())
+            motion_loss(
+                graph,
+                config,
+                squared,
+                observation,
+                previous,
+                weight.unwrap(),
+            )
         } else {
             let per_row = graph.sum_inner(squared);
             let weight = weight.unwrap_or_else(|| {
@@ -344,6 +362,65 @@ mod suffix_event_tests;
 mod centroid_tests {
     use super::*;
     use std::collections::HashSet;
+
+    #[test]
+    fn future_color_attention_never_enters_prior_beliefs() {
+        let mut c = DreamerConfig::tiny(3);
+        c.observation_kind = ObservationKind::Rgb32;
+        c.batch_size = 2;
+        c.rgb_color_attention = Some(super::super::super::config::ColorCentroidSupervision {
+            scale: 1000.,
+            channel: 0,
+            background_scale: 1.5,
+            region: [0., 0., 1., 1.],
+        });
+        let mut g = Graph::new();
+        let size = c.network();
+        let model = WorldModel::with_behavior(&mut g, &c, false);
+        let h = g.input("initial_h", &[2, size.deter]);
+        let z = g.input("initial_z", &[2, size.stoch * size.classes]);
+        let actions = (0..2)
+            .map(|i| g.input(&format!("action_{i}"), &[2, 3]))
+            .collect::<Vec<_>>();
+        let images = (0..3)
+            .map(|i| g.input(&format!("image_{i}"), &[2, c.observation_dim()]))
+            .collect::<Vec<_>>();
+        let result = build_with_centroid(
+            &mut g,
+            &c,
+            &model,
+            (h, z),
+            &actions,
+            &images,
+            PixelLoss::MotionCrossEntropy,
+            None,
+            None,
+            None,
+        );
+        for (i, &state) in result.states.iter().enumerate() {
+            let mut seen = HashSet::new();
+            let mut todo = vec![state];
+            while let Some(n) = todo.pop() {
+                if seen.insert(n) {
+                    todo.extend(g.node(n).inputs.iter().copied());
+                }
+            }
+            assert!(seen.contains(&actions[i]));
+            for image in &images {
+                assert!(!seen.contains(image));
+            }
+            for action in &actions[i + 1..] {
+                assert!(!seen.contains(action));
+            }
+            for node in g.nodes() {
+                if matches!(&node.op,meganeura::graph::Op::Input{name} if name.starts_with("pixel_rollout_weight_"))
+                {
+                    assert!(!seen.contains(&node.id));
+                }
+            }
+        }
+        assert!(result.centroid.is_none());
+    }
 
     #[test]
     fn future_centroid_targets_and_masks_never_enter_prior_states() {

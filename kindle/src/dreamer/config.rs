@@ -392,6 +392,10 @@ pub struct DreamerConfig {
     pub open_loop_supervision: Option<OpenLoopSupervision>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub color_centroid_supervision: Option<ColorCentroidSupervision>,
+    /// Standalone-world loss attention derived from replay RGB. Reuses the
+    /// color/region settings; scale controls attention, without a position head.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rgb_color_attention: Option<ColorCentroidSupervision>,
     /// One cached state plus optional forward-only observations before the
     /// training sequence. The default of 1 performs no state recomputation.
     pub replay_context: usize,
@@ -546,6 +550,7 @@ impl DreamerConfig {
             world_microbatch_size: None,
             open_loop_supervision: None,
             color_centroid_supervision: None,
+            rgb_color_attention: None,
             replay_context: 1,
             terminal_replay_fraction: None,
             terminal_continuation_weight: None,
@@ -1014,7 +1019,11 @@ impl DreamerConfig {
         }) {
             return Err("actor-only expert imitation decay requires world_gradient".into());
         }
-        if let Some(centroid) = &self.color_centroid_supervision {
+        for centroid in self
+            .color_centroid_supervision
+            .iter()
+            .chain(self.rgb_color_attention.iter())
+        {
             let [x0, y0, x1, y1] = centroid.region;
             let side = self.observation_grid();
             let contains_center = |low, high| {

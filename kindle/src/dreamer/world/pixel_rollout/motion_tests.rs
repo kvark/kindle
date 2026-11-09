@@ -47,6 +47,7 @@ fn fixture(width: usize, zero: bool) -> Fixture {
         let errors = pixel_cross_entropy(&mut graph, logits, frames[time + 1]);
         losses.push(motion_loss(
             &mut graph,
+            &DreamerConfig::tiny(3),
             errors,
             frames[time + 1],
             frames[time],
@@ -108,7 +109,14 @@ fn temporal_motion_targets_and_masks_are_stopped() {
     let previous = graph.parameter("previous", &[2, 8]);
     let keep = graph.parameter("keep", &[2, 1]);
     let errors = pixel_cross_entropy(&mut graph, logits, current);
-    let loss = motion_loss(&mut graph, errors, current, previous, keep);
+    let loss = motion_loss(
+        &mut graph,
+        &DreamerConfig::tiny(3),
+        errors,
+        current,
+        previous,
+        keep,
+    );
     graph.set_outputs(vec![loss]);
     let backward = meganeura::autodiff::differentiate(&graph);
     let mut feeds = Feeds::new();

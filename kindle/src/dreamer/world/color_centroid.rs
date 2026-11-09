@@ -5,13 +5,16 @@ use super::*;
 
 const MIN_MASS: f32 = 1e-6;
 
-fn targets(
+#[cfg(test)]
+mod attention_tests;
+
+fn color_mass(
     graph: &mut Graph,
     settings: &ColorCentroidSupervision,
     pixels: NodeId,
     rows: usize,
     side: usize,
-) -> (NodeId, NodeId) {
+) -> NodeId {
     let width = side * side;
     let pixels = graph.stop_gradient(pixels);
     let offset = graph.constant(vec![0.5; width], &[width]);
@@ -47,7 +50,18 @@ fn targets(
         })
         .collect::<Vec<_>>();
     let mask = graph.constant(mask, &[width]);
-    let mass = graph.bias_mul(excess, mask);
+    graph.bias_mul(excess, mask)
+}
+
+fn targets(
+    graph: &mut Graph,
+    settings: &ColorCentroidSupervision,
+    pixels: NodeId,
+    rows: usize,
+    side: usize,
+) -> (NodeId, NodeId) {
+    let width = side * side;
+    let mass = color_mass(graph, settings, pixels, rows, side);
     let total = graph.sum_inner(mass);
     let minimum = graph.constant(vec![MIN_MASS; rows], &[rows, 1]);
     let valid = graph.greater(total, minimum);
@@ -71,6 +85,30 @@ fn targets(
     let coordinates =
         super::super::networks::concat_columns(graph, coordinates[0], coordinates[1], rows, 1, 1);
     (graph.stop_gradient(coordinates), graph.stop_gradient(valid))
+}
+
+/// Replay-only spatial attention, shared across RGB channels. Renormalize the
+/// combined color/motion weights to mean one in each image.
+pub(super) fn attention(
+    graph: &mut Graph,
+    settings: &ColorCentroidSupervision,
+    pixels: NodeId,
+    motion: NodeId,
+    rows: usize,
+    side: usize,
+) -> NodeId {
+    let width = side * side;
+    let mass = color_mass(graph, settings, pixels, rows, side);
+    let color = graph.scale(mass, settings.scale);
+    let one = graph.constant(vec![1.0; width], &[width]);
+    let color = graph.bias_add(color, one);
+    let pair = concat_columns(graph, color, color, rows, width, width);
+    let color = concat_columns(graph, pair, color, rows, 2 * width, width);
+    let combined = graph.mul(motion, color);
+    let mean = graph.mean_inner(combined);
+    let mean = graph.broadcast_inner(mean, 3 * width);
+    let normalized = graph.div(combined, mean);
+    graph.stop_gradient(normalized)
 }
 
 pub(super) fn loss(

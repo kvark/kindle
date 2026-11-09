@@ -26,6 +26,8 @@ mod centroid_tests;
 #[cfg(test)]
 mod clean_prior_tests;
 #[cfg(test)]
+mod color_attention_tests;
+#[cfg(test)]
 mod fixed_event_tests;
 #[cfg(test)]
 mod gaussian_tests;
@@ -158,6 +160,25 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    let color_attention = !metadata["config"]["rgb_color_attention"].is_null();
+    if color_attention != (metadata["format"] == "kindle-world-only-v23") {
+        return Err("world color attention requires checkpoint format v23".into());
+    }
+    if color_attention
+        && (metadata["pixel_loss"] != "motion_cross_entropy"
+            || metadata["prediction_length"].as_u64().unwrap_or(0) == 0
+            || !metadata["config"]["color_centroid_supervision"].is_null()
+            || [
+                "world_gaussian",
+                "rgb_spatial_decoder",
+                "rgb_previous_frame",
+                "rgb_latent_only",
+            ]
+            .iter()
+            .any(|key| metadata["config"][key] == true))
+    {
+        return Err("world color attention requires a plain categorical motion RGB suffix without a position head".into());
+    }
     let centroid = !metadata["config"]["color_centroid_supervision"].is_null();
     if centroid != (metadata["format"] == "kindle-world-only-v22") {
         return Err("world centroid supervision requires checkpoint format v22".into());
@@ -466,7 +487,8 @@ fn checkpoint_pixel_loss(
             | "kindle-world-only-v19"
             | "kindle-world-only-v20"
             | "kindle-world-only-v21"
-            | "kindle-world-only-v22",
+            | "kindle-world-only-v22"
+            | "kindle-world-only-v23",
         ) => Ok(serde_json::from_value(
             metadata
                 .get("pixel_loss")
@@ -680,6 +702,17 @@ impl WorldModelLearner {
         pixel_loss: PixelLoss,
         fixed_teacher: Option<TeacherAnchor>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        if config.rgb_color_attention.is_some()
+            && (pixel_loss != PixelLoss::MotionCrossEntropy
+                || prediction_length == 0
+                || config.color_centroid_supervision.is_some()
+                || config.world_gaussian
+                || config.rgb_spatial_decoder
+                || config.rgb_previous_frame
+                || config.rgb_latent_only)
+        {
+            return Err("world color attention requires a plain categorical motion RGB suffix without a position head".into());
+        }
         if config.color_centroid_supervision.is_some()
             && (pixel_loss != PixelLoss::MotionCrossEntropy
                 || prediction_length == 0
@@ -1400,7 +1433,10 @@ impl WorldModelLearner {
         std::fs::create_dir(path)?;
         self.train
             .save_checkpoint(&path.join("world.safetensors"))?;
-        let format = if self.config.color_centroid_supervision.is_some() {
+        let format = if self.config.rgb_color_attention.is_some() {
+            assert_eq!(self.training_scope, TrainingScope::All);
+            "kindle-world-only-v23"
+        } else if self.config.color_centroid_supervision.is_some() {
             assert_eq!(self.training_scope, TrainingScope::All);
             "kindle-world-only-v22"
         } else if self.pixel_loss == PixelLoss::MotionPosteriorHistory {

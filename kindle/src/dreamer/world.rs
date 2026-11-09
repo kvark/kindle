@@ -907,12 +907,22 @@ fn training_graph(
                     let previous =
                         stack_time(&mut graph, &previous, batch, config.observation_dim());
                     let keep = graph.mean_inner(keep_action);
-                    let weights = super::networks::pixel_motion_weights(
+                    let mut weights = super::networks::pixel_motion_weights(
                         &mut graph,
                         observation,
                         previous,
                         keep,
                     );
+                    if let Some(settings) = &config.rgb_color_attention {
+                        weights = color_centroid::attention(
+                            &mut graph,
+                            settings,
+                            observation,
+                            weights,
+                            rows,
+                            config.observation_grid(),
+                        );
+                    }
                     graph.mul(loss, weights)
                 } else {
                     loss
