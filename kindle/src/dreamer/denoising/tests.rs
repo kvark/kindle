@@ -602,3 +602,5 @@ fn half_max_requires_v4_preserves_legacy_defaults_and_all_graphs() {
         assert!(read_header(&serde_json::to_vec(&v).unwrap()).is_err());
     }
 }
+
+mod sampler_trace;
