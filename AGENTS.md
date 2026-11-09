@@ -21,42 +21,38 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 9
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The fresh [posterior-history RGB100 natural learner](docs/results/2026-11-09-breakout-world-posterior-natural100.md) is active:
-16,384 updates,1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,one-hot actions,RGB100,
-rates4e-4,KL1/.1/freeNat1,mixing.01,observed events1. Existing posterior-history
-objective/v21 and qualified64f5489f/native SHAaa12d050 runtime/runner;no rebuild,
-physical feature table,late conditioning,actor/critic or collection. Root
-`/x/Temp/kindle-world-posterior-natural100-20261109`. CPU driver passes with
-model construction trapped.182 execution pins/source5cbe4b62;unit
-`kindle-world-posterior-natural100-20261109`,invocation1f99119922f04609a8f3ff620880967f,
-controller2215458/observer2215461/CPU finisher2215464 are active. Own initial240
-tensors/18 arrays and first actual update pass;77/80 first-update weights change
-in required families. Sealed256-row live prefix/12 CPU inputs pass. No final
-forecast/gate result yet;automated final restore andCPU analysis remain pending.
-Fixed2,048 natural development first draw21/26,16/27,3/26,0/27,0/27,0/25 versus
-prior-suffix20/26,20/27,1/26,0/27,0/27,0/25. Contacts1 falls8/8→4/8. Allsix groups/
-four draws andfour fixed figures retain weak rollouts;29 CPU pins/60 physical joins
-pass without model queries. Provisional only;no checkpoint selection orrun change.
+unproven. The [posterior-history RGB100 natural learner](docs/results/2026-11-09-breakout-world-posterior-natural100.md)
+is closed andfails the dense screen (2/3 gates pass). Final development ball
+counts observed/1/4/8/16/32:108/112,99/109,45/109,19/107,5/114,0/95 versus
+prior-suffix103/112,102/109,69/109,53/107,22/114,8/95. Fitting8 falls84/176→41/176;
+observed reconstruction/paddle scores improve,but long ball forecasts regress.
+Do not adopt the recipe orallocate its broader assessment/extension. No GPU job,
+new learner,collector orautomatic successor is active orselected.
 
-Same retained natural two-cycle plan/config as small64. Own initial240 tensors/
-18 arrays and first actual update are checked inside the budget before update2.
-Keep curves/initial+final dense forecasts,all11 reports,exact final restore and
-unchanged intermediate gates;no automatic assessment,extension or successor.
-The [earlier posterior-history run](docs/results/2026-11-09-breakout-world-posterior-history.md)
-remains failed atRGB1/2,048/broad-corrective. New data/loss balance/budget changes
-are bundled;not an isolated effect or an unchanged extension. Inference still
-uses priors andgenerated history without future actual images. Old qualified
-runtime bytes remain immutable;do not mix overlays.
+Fresh16,384 updates,1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,one-hot,RGB100,
+rates4e-4,KL1/.1/freeNat1,mixing.01,observed events1,posterior-history/v21. Native
+64f5489f/SHAaa12d050 andmatching original runner are unchanged;no rebuild. Same
+small64 config/two-cycle natural plan;objective,imagined-event loss andsource/
+wrappers differ. Compared with the older failed RGB1/2k/broad run,data/loss/
+budget changes are bundled. No isolated cause orreliability claim. Root
+`/x/Temp/kindle-world-posterior-natural100-20261109`.1,820.531s native/1,951.302s
+loop;17.36%/17.64% less time than cached one-hot with worse ball forecasts,not
+an isolated backend speedup oruseful-learning gain.
+
+All182 execution/174 CPU-audit/38 CPU-stage/182 closure pins,16,384 finite11-report
+rows,240 initial/frozen arrays,80 changed weights,384 initial dense origins and
+18 exact restore arrays pass. Two guards/18 sealed files pass;main/observer/CPU
+finisher inactive/MainPID0/Resultsuccess. No native/CPU failure orretry in this
+allocation. All five final figures are reviewed;34 final-image pins/60 physical
+joins/allsix groups/four draws pass without model queries. Initial/age1/2048/4096/
+final,curves,provisional2k/halfway reviews andall regressions remain retained.
 
 The [local forward comparison](docs/results/2026-11-09-breakout-world-local-forward-contract.md)
-is closed: strict contract fails on295 observed RGB values/four categorical blocks,
-but forced-sample recurrent states and actual generated suffix pixels are exact.
-CPU-only3,072 paired images changezero detector/within1px decisions;no free-running
-physics or categorical harmlessness proof.268.267s/zero optimizer steps,107/70/73
-pins andone guard/nine sealed files pass. Both services inactive/successful.
+stays strictly failed on small observed/sampling differences,with exact forced-
+sample recurrent/generated suffix values;it does not prove free-running physics.
 The [late learner](docs/results/2026-11-09-breakout-world-late-action-learning.md)
-stays closed at2/3 dense gates;keep late conditioning off. Its native qualification,
-original provisional failures/separate CPUv3 repair andfinal audits remain linked.
+and[earlier posterior-history run](docs/results/2026-11-09-breakout-world-posterior-history.md)
+remain closed/failed,including their original source-specific failures/repairs.
 The [early feature assessment](docs/results/2026-11-09-breakout-world-action-features-branches.md)
 stays failed at.224881 versus one-hot.172366,296/304 nonending alarms. Full
 physics/events,brick memory,late/above-top coverage,untouched families andfresh
