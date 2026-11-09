@@ -57,3 +57,32 @@ forecasts andexact restore. The final-only frozen comparison andautomatic CPU
 audit remain pending. No retry, extension, new collection, physical assessment
 or automatic successor is selected. The original intermediate andfull-game
 requirements remain unchanged; actor/critic, CDP andfive-game work stay parked.
+
+## Provisional fixed2,048-update review
+
+The first declared curve checkpoint remains weak. It does not score final gates
+or select a replacement checkpoint; the fixed16,384-update run continues.
+
+|Natural development, first draw|Observed|1|4|8|16|32|
+|---|---:|---:|---:|---:|---:|---:|
+|Cached prior-suffix small64|20/26|20/27|1/26|0/27|0/27|0/25|
+|Posterior-history RGB100|21/26|16/27|3/26|0/27|0/27|0/25|
+
+Development contacts fall8/8→4/8 at one step; four-step stays1/5 andlater first-
+draw matches remain zero. Natural fitting observed/one-step fall16/20→13/20 and
+11/21→10/21. Fitting-contact four-step improves0/15→4/15 while later forecasts
+remain inaccurate. All six fitting/development natural/contact/ending groups and
+all four draws remain retained, including paddle/brick/event metrics and
+missing/diffuse failures. These are reused small diagnostic cohorts.
+
+Four fixed row0/draw0 grids are reviewed. Some posterior-history rows show less
+spreading red detail than the cached prior-suffix rows, but incorrect trajectories,
+missed contact responses and disappearing/blurred balls remain. These selected-
+by-rule illustrations are not aggregate evidence of coherence or physics.
+
+The CPU-only review verifies29 immutable inputs and60 physical-field joins,
+retains four figures andtakes1.411s. Its separate closure verifies nine closed
+inputs, excluding itself andopen logs. No new model/GPU/emulator query or
+optimizer update is made. Artifacts are under `milestone-2048-v1`; original
+execution/CPU scripts andthe running learner remain unchanged. Final forecasts,
+frozen restore andthe final-only decision remain pending.

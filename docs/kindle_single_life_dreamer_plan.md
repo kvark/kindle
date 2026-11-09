@@ -15,6 +15,10 @@ controller2215458/observer2215461/CPU finisher2215464 are active. Own initial240
 tensors/18 arrays and first actual update pass;77/80 first-update weights change
 in required families. Sealed256-row live prefix/12 CPU inputs pass. No final
 forecast/gate result yet;automated final restore andCPU analysis remain pending.
+Fixed2,048 natural development first draw21/26,16/27,3/26,0/27,0/27,0/25 versus
+prior-suffix20/26,20/27,1/26,0/27,0/27,0/25. Contacts1 falls8/8→4/8. Allsix groups/
+four draws andfour fixed figures retain weak rollouts;29 CPU pins/60 physical joins
+pass without model queries. Provisional only;no checkpoint selection orrun change.
 
 Same retained natural two-cycle plan/config as small64. Own initial240 tensors/
 18 arrays and first actual update are checked inside the budget before update2.
