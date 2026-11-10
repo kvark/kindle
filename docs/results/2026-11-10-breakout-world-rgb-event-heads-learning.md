@@ -26,7 +26,7 @@ The CPU driver matches the first qualified batch, fresh actual-initial reference
 checked learner and sealed plan callback with model/emulator construction trapped.
 The new main learner starts atage0 and retains its actual-initial dense forecasts.
 The first actual update matches all13 qualified reports and240age1 arrays before
-update2;77 expected parameter families change. Checks/saving are inside the
+update2;77 of80 logical parameters change. Checks/saving are inside the
 native-call timer. The learner continues past that check; this is not a quality
 gate pass. Final frozen and
 separately restored forecasts, original dense gates, all regressions and costs
@@ -48,3 +48,44 @@ event gates require a separate later decision/declaration; no such assessment
 is allocated here. Full physics, natural event calibration, brick memory,
 late/above-top coverage, untouched families and fresh confirmation remain.
 Actor/critic, CDP and five-game work stay parked.
+
+## Provisional saved-forecast review at2,048
+
+A separate CPU-only review compares the saved milestone with the early physical-
+feature control at the same update. All six curve groups and four draws remain;
+all10 physical fields join exactly in each group. Four preselected row0/draw0
+image grids are reviewed. These are smaller curve subsets, not the final dense
+128-origin development panel, and no final gate is scored or stopping rule changed.
+
+First fixed draw, visible balls within one RGB64 pixel:
+
+| Development natural curve | Observed | 1 action | 4 | 8 | 16 | 32 |
+|---|---:|---:|---:|---:|---:|---:|
+| Early physical-feature control |23/26|21/27|3/26|0/27|0/27|0/25|
+| Decoded-RGB event heads |22/26|17/27|3/26|1/27|0/27|0/25|
+
+Development contact curves remain8/8 observed and one-step for both; neither
+matches a supported ball at4/8/16/32. Fixed images retain coarse scene/brick
+structure while longer ball paths become diffuse, drift or disappear. These
+illustrations do not establish a common causal failure. There is no consistent
+early quality improvement.
+
+One-step pointwise terminal Brier on the selected development ending slice
+changes.923925→.833097 (10/10 positive targets), still poor. Development natural
+one/sixteen/thirty-two Brier changes.00002056/.00059093/.00090124 to
+.00007142/.00066542/.00070818; those supports32/32/31 contain zero positive
+terminals. These are pointwise endpoint errors, not cumulative ending-risk
+scores or proof of natural calibration. All reward/event metrics and regressions
+remain in the saved review.
+
+Cumulative native-call time to2,048 is256.800s versus228.781s:1.122469x,
+about12.25% more in this pair. The new timer includes first-update checks/age1
+saving; these exclude initialization, evaluation and preparation, and do not
+establish final efficiency or an isolated backend effect.
+
+The review verifies34 input pins and17 closed files, with no model/GPU/emulator
+query or new update. Original preparationv1 has an unmatched-parenthesis syntax
+error; its script/plan/failure receipt remain. Separately namedv2 scripts/plan
+pass before analysis and produce the reviewed result in2.543 seconds. No learner or review job is restarted. Artifacts and the four figures:
+`/x/Temp/kindle-world-rgb-event-heads-learning-20261110/milestone-2048-v1`.
+The declared16,384-update run continues; its final comparison remains required.

@@ -45,7 +45,13 @@ seed/origins, not fresh confirmation. The separately declared learner is active;
 see [active learning report](docs/results/2026-11-10-breakout-world-rgb-event-heads-learning.md). Scientific sourceaa8859bd,native45633605/SHAf71e9354,240 pins;
 CPU driver matches batch/plan/fresh initial with construction trapped. The first
 actual update matches13 reports/240 tensors,77 required weights change before
-update2,and learning continues; no quality result yet. Main
+update2,and learning continues. Saved2,048 CPU review (34 pins/17 closed files,
+all6 groups/four draws/four fixed grids) finds no consistent early improvement:
+development natural observed/1/8/32 are22/26,17/27,1/27,0/25 vs23/26,21/27,0/27,0/25.
+Learn calls256.800s vs228.781s (1.122469x); provisional,not final dense gates.
+Pointwise ending Brier.833097 vs.923925 on10 positives remains poor; zero-positive
+natural slices do not prove calibration. Original CPU preparation syntax error
+remains; separately namedv2 analysis passes without model/GPU query orrestart. Main
 invocationc1449b7c333a4f598f9992e266c34431/PID2258744,watcher
 b418b44ffbf84d29b1042d2d2c6466b1/PID2258750 andCPU finisher
 6916431b180c4a99b2a85448e324692d/PID2258755 all live-verified. Train/restore
