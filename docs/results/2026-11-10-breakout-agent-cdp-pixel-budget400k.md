@@ -34,9 +34,37 @@ Seed 1009 across both cohorts (4000001009 / 4000022003), greedy and sampled:
 
 ## 400k life
 
-RUN400K
+Training 19:16 to 20:21 UTC: 400,000 actions (1,599,371 frames), 24,977
+updates, 3,929.2 s wall (65m29s against the retained CDP 400k life's 43m37s),
+101.8 actions/s, learn stage 3,636 s, VRAM 9.6 GiB. The 200k recovery
+checkpoint reproduces the 200k life bit for bit (update 12,477: CDP loss .056,
+reconstruction 2,763.07, prior rollout 2,819.74, as in `s1/`). At 400k the
+CDP loss is .053, reconstruction 2,662, prior rollout 2,737, exploration .03,
+reward .03, KL 18.9; imagined return mean 54.1, return scale 129.3, policy
+entropy .61. 404 online episodes with guided play, mean 75.3 (50k buckets:
+25.0, 56.1, 83.5, 89.7, 150.6, 91.0, 89.0, 132.4).
 
-EVAL400K
+### 400k frozen evaluations
+
+| Learner (seed 1009, 400k) | Cohort | Mode | Episodes | Mean | Natural-24 | Median | Max | At or above 100 | Two-wall |
+|---|---|---|---|---|---|---|---|---|---|
+| CDP + pixel scale 1 | 4000001009 | sampled | 24 | 85.583 | 85.583 | 69.5 | 301 | 7 | 0/24 |
+| CDP + pixel scale 1 | 4000001009 | greedy | 27 | 135.593 | 120.833 | 106 | 341 | 16 | 0/27 |
+| CDP + pixel scale 1 | 4000022003 | sampled | 25 | 102.840 | 104.583 | 84 | 366 | 7 | 0/25 |
+| CDP + pixel scale 1 | 4000022003 | greedy | 27 | 134.519 | 145.417 | 96 | 383 | 13 | 0/27 |
+| Retained CDP (reference) | 4000001009 | sampled | 24 | 92.792 | | | | | 0/24 |
+| Retained CDP (reference) | 4000001009 | greedy | 24 | 173.708 | | | | | 0/24 |
+| Retained CDP (evaluated here) | 4000022003 | sampled | 24 | 120.625 | 120.625 | 90 | 365 | 10 | 0/24 |
+| Retained CDP (evaluated here) | 4000022003 | greedy | 24 | 150.750 | 150.750 | 114 | 384 | 15 | 0/24 |
+| Pixel world 64x64 | both | both | PIXEL400K | | | | | | |
+
+Actual-initial controls of the 400k life on cohort 4000001009: sampled 1.286
+(28 episodes), greedy 2.071 (28); identical weights to the 200k life's
+initial checkpoint. Budget scaling of the combined learner, 200k to 400k:
+cohort 1009 sampled 66.5 to 85.6 and greedy 103.0 to 135.6; cohort 22003
+sampled 61.7 to 102.8 and greedy 104.0 to 134.5. Retained CDP, 200k to 400k:
+cohort 1009 70.8 to 92.8 and 143.7 to 173.7; cohort 22003 70.5 to 120.6 and
+94.6 to 150.8.
 
 ## Reading (200k part)
 
@@ -54,4 +82,16 @@ greedy and 5 sampled) than the CDP learner (49 points greedy between its
 selection cohort and the new one). Which learner is "best" depends on the
 mode and the cohort; none passes the two-wall gate.
 
-READING
+At 400k the retained CDP learner leads the combined learner on both cohorts
+and in both modes (92.8 / 173.7 and 120.6 / 150.8 against 85.6 / 135.6 and
+102.8 / 134.5), and does so in two-thirds of the training time. The
+combined learner's 200k lead on cohort 22003 does not survive the second
+200k: CDP gains more from the extra budget (sampled 70.5 to 120.6 on that
+cohort) than the combined learner (61.7 to 102.8). The pixel auxiliary at
+scale 1 therefore does not improve the retained CDP recipe at either fixed
+budget once both cohorts are counted; it narrows cohort variation and
+raises the 200k greedy score on the new cohort, nothing more.
+
+The question the pure pixel world leaves open, whether its consistent 200k
+greedy edge survives the 400k budget, is answered by the fourth job of the
+amended protocol (PIXEL400K_READING).

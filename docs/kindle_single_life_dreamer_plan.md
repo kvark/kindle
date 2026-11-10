@@ -74,12 +74,17 @@ own [original cohort 4000001009](results/2026-11-10-breakout-agent-cdp-pixel-bud
 the picture differs: retained CDP 143.667 / 70.750, CDP plus pixel 103.040 /
 66.538, pixel world 156.840 / 37.680. Consistent across all three
 seed/cohort pairs: the pixel world wins greedy and loses sampled, and both
-pixel-world learners vary far less between cohorts than CDP. A fresh 400k
-CDP-plus-pixel life (root `/x/Temp/kindle-breakout-cdp-pixel-400k-20261110`,
-unit `kindle-breakout-cdp-pixel-400k-20261110.service`) is running against
-CDP's 400k point (92.792 / 173.708 on cohort 1009). Still development
-seeds on reused cohorts, 0 two-wall episodes, 33 minutes per 200k against
-CDP's 21. First-run root
+pixel-world learners vary far less between cohorts than CDP. At **400k** the
+retained CDP learner leads the CDP-plus-pixel learner on both cohorts and
+both modes (92.792 / 173.708 and 120.625 / 150.750 against 85.583 / 135.593
+and 102.840 / 134.519, greedy second) in two-thirds of the time (43.6 against
+65.5 minutes; root `/x/Temp/kindle-breakout-cdp-pixel-400k-20261110`, unit
+finished), so the auxiliary does not improve the retained recipe at a fixed
+budget. The pure pixel world's 400k life (root
+`/x/Temp/kindle-breakout-pixel64-400k-20261110`, unit
+`kindle-breakout-pixel64-400k-20261110.service`) is running to close the
+comparison. Still development seeds on reused cohorts, 0 two-wall episodes.
+First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
 on any checkpoint). These are development screens on reused seed 41001 and
