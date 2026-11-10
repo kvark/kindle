@@ -59,3 +59,56 @@ Full stochastic physics/serve/collisions,natural events,persistent brick memory,
 late/tunnel/second-wall/above-top coverage,untouched families and fresh learner
 confirmation remain. No automatic assessment, extension, coefficient sweep,
 collector or successor is selected. Actor/critic,CDP and five-game work stay parked.
+
+## Provisional 2,048-update review
+
+The saved-only review finds reduced ending risk on ordinary play but still
+weaker recognition of known endings, without an early ball-tracking gain.
+This does not change the fixed coefficient, final checkpoint or stopping rule.
+No intermediate gate is substituted for the final dense/physics/event criteria.
+
+Development natural first-draw observed/1/4/8/16/32 matches are
+**21/26,18/27,4/26,0/27,0/27,0/25**, versus the previous RGB-event run's
+22/26,17/27,3/26,1/27,0/27,0/25 at the same2,048 updates. These32-origin
+curve subsets are not the128-origin final dense cohort. All four draws,
+six fitting/development groups and164 origins remain retained. The four fixed
+row0/draw0 RGB grids still show later ball spreading/fading/missing detail;
+they are examples, not aggregate evidence.
+
+For cumulative risk, de-discount each continuation using the exact float32
+gamma, then multiply in F64 before averaging the four draws. Retain a known
+event after an observed valid terminal; otherwise require the whole actual
+prefix through the scored horizon. A terminal makes the absorbing event known
+even when later RGB is invalid padding. No predicted event or future label
+corrects a model state. Original per-step event summaries stay separate.
+
+| Development subset/horizon | Positive events /known cases | Previous mean risk | Survival10 mean risk | Previous /new cumulative Brier |
+|---|---:|---:|---:|---:|
+|Natural16|0/32|.074046|.022745|.018946 /.000958|
+|Natural32|1/32|.200973|.064345|.084813 /.031011|
+|Contacts32|0/8|.064700|.030333|.006003 /.001108|
+|Selected endings1|10/10|.089790|.006095|.833097 /.987862|
+|Selected endings32|10/10|.425048|.086761|.410957 /.835882|
+
+All selected ending cases already end at the next actual step; their32-step
+event is therefore known from step1. They do not represent natural event
+prevalence or prove calibrated timing on the separately chosen-action ending
+families. On the one positive development natural32 case, mean risk also falls
+.438326→.105947, while negative-case mean risk falls.193317→.063003.
+The fitting selected-ending66/66 next-step risk falls.061805→.007236.
+Lower scores dominated by alive cases cannot establish useful ending recognition.
+
+The new CPU declaration pins35 closed inputs and seals15 files. Analysis takes
+1.741535s, retains384 group/model/step rows and all32-step per-origin/draw CDFs,
+and checks the per-draw Brier = marginal Brier + draw-variance identity within
+1e-12(max3.02e-16). All five figures are reviewed; a separate visual receipt
+preserves hashes and notes post-terminal padding/forecast-axis limits. Old
+model RGB predictions are not read; cached physical fields, continuation arrays
+and scalar summaries are used. No model/GPU/emulator query, optimizer update,
+failure, retry or old stage rerun occurs.
+
+Learn-call time to2,048 is257.768137s versus256.799990s,1.003770x(+.377%).
+This excludes initial/evaluation work and includes first-update checks/saving;
+it is not a final useful-learning/hour or isolated GPU-throughput result.
+Artifacts are under `milestone-2048-v1`. The original worker and both observers
+continue; final conclusions remain pending.

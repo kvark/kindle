@@ -26,6 +26,11 @@ Final dense/restore/audit checks remain pending. Falling training Brier and
 zero-positive natural point slices do not establish cumulative calibration.
 A separately declared final chosen-action assessment remains necessary.
 
+The saved2,048 review finds lower risk on both surviving and already-ending
+cases,without an early tracking gain;final conclusions remain pending. A
+separate [CPU loss-support audit](experiments/2026-11-10-breakout-world-survival-loss-support.md)
+checks known cumulative labels dropped by reset masks,without changing the run.
+
 [Qualification](results/2026-11-10-breakout-world-survival-loss.md) is closed:
 42.760s,143 execution/77 closure/186 distinct pins,one guard/nine sealed files,
 native analytic derivatives,default-off32 arrays/240 tensors,own initial/frozen/
