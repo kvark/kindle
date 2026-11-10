@@ -87,11 +87,18 @@ and 68.292 / 47.667 at scale .1 (the objectives interfere); root
 (22003, root `/x/Temp/kindle-breakout-pixel-seed22003-20261110`, unit
 finished) holds the pattern against fresh CDP 22003's 75.250 / 44.708: pixel
 world 99.259 / 28.375, CDP plus pixel at scale 1 **101.040 / 68.280**.
-Two-seed means, greedy / sampled: CDP 84.9 / 57.6, pixel world 125.2 / 34.3,
-CDP plus pixel 102.5 / 65.0; the combined learner is the only one above CDP
-in both modes and the most seed-stable. Still two development seeds on one
-reused cohort, 0 two-wall episodes, 33 minutes per 200k against CDP's 21.
-First-run root
+Two-seed means on that cohort, greedy / sampled: CDP 84.9 / 57.6, pixel
+world 125.2 / 34.3, CDP plus pixel 102.5 / 65.0. On the retained learner's
+own [original cohort 4000001009](results/2026-11-10-breakout-agent-cdp-pixel-budget400k.md)
+the picture differs: retained CDP 143.667 / 70.750, CDP plus pixel 103.040 /
+66.538, pixel world 156.840 / 37.680. Consistent across all three
+seed/cohort pairs: the pixel world wins greedy and loses sampled, and both
+pixel-world learners vary far less between cohorts than CDP. A fresh 400k
+CDP-plus-pixel life (root `/x/Temp/kindle-breakout-cdp-pixel-400k-20261110`,
+unit `kindle-breakout-cdp-pixel-400k-20261110.service`) is running against
+CDP's 400k point (92.792 / 173.708 on cohort 1009). Still development
+seeds on reused cohorts, 0 two-wall episodes, 33 minutes per 200k against
+CDP's 21. First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
 on any checkpoint). These are development screens on reused seed 41001 and
