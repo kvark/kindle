@@ -14,7 +14,7 @@ import time
 
 import numpy as np
 
-from kindle._breakout_world import sample_locations, training_windows
+from kindle._breakout_world import evaluation_windows, event_metrics, image_metrics, sample_locations, training_windows
 
 FIELDS = ('rgb', 'action', 'reward', 'terminal', 'position', 'lives', 'frames', 'episode')
 CHECKPOINT_DIVISOR = 4
@@ -38,8 +38,8 @@ def pixels(values):
 class Lane:
     """Preallocated arrival storage for one environment stream."""
 
-    def __init__(self, capacity):
-        self.rgb = np.zeros((capacity, 3, 64, 64), np.uint8)
+    def __init__(self, capacity, side):
+        self.rgb = np.zeros((capacity, 3, side, side), np.uint8)
         self.action = np.zeros(capacity, np.int64)
         self.reward = np.zeros(capacity, np.float64)
         self.terminal = np.zeros(capacity, bool)
@@ -72,7 +72,7 @@ def collect(args):
     from kindle._representation_probe import positions
     gym.register_envs(ale_py)
     config = json.loads(args.config.read_text())
-    lanes = config['batch_size']
+    lanes, side = config['batch_size'], frame_side(config)
     learner = kindle.WorldModelLearner(config, prediction_length=args.prediction_length, pixel_loss=args.pixel_loss)
     require_device(learner)
     environments = [DreamerAtariPreprocessing(gym.make('ALE/Breakout-v5', frameskip=1,
@@ -80,14 +80,14 @@ def collect(args):
         max_episode_frames=108000) for _ in range(lanes)]
     teachers = [FeedbackPixelPolicy() for _ in range(lanes)]
     rngs = [np.random.default_rng(args.seed + lane * 1009 + 0x17a) for lane in range(lanes)]
-    streams = [Lane(args.ticks + 1 + args.ticks // 16) for _ in range(lanes)]
+    streams = [Lane(args.ticks + 1 + args.ticks // 16, side) for _ in range(lanes)]
     episodes = np.zeros(lanes, np.int64)
     blocks, command = np.zeros(lanes, int), np.zeros(lanes, int)
     frames = [environment.reset(seed=args.seed + lane * 1009)[0] for lane, environment in enumerate(environments)]
     started = time.monotonic()
 
     def append(indices, actions, rewards, terminals):
-        rgb = np.frombuffer(learner.preprocess(frames), '<f4').reshape(lanes, 3, 64, 64)
+        rgb = np.frombuffer(learner.preprocess(frames), '<f4').reshape(lanes, 3, side, side)
         rgb8 = np.rint((rgb + .5) * 255).clip(0, 255).astype(np.uint8)
         for lane in indices:
             environment = environments[lane]
@@ -136,10 +136,103 @@ def collect(args):
         files.append(dict(path=str(path), sha256=sha(path), seed=args.seed + lane * 1009, arrivals=int(stream.count),
                           reward=float(data['reward'].sum()), game_overs=int(data['terminal'].sum()),
                           episodes=int(data['episode'].max()) + 1))
-    write(args.output / 'manifest.json', dict(status='complete', name=args.output.name, sticky=args.sticky, actions=lanes * args.ticks,
+    write(args.output / 'manifest.json', dict(status='complete', name=args.output.name, side=side, sticky=args.sticky, actions=lanes * args.ticks,
         emulator_frames=int(sum(environment.executed_action_frames for environment in environments)),
         block_probability=args.block_probability, action_counts=action_counts.tolist(), files=files,
         seconds=time.monotonic() - started))
+
+
+def frame_side(config):
+    return int(config['observation_kind'].removeprefix('rgb'))
+
+
+def evaluate_group(learner, streams, locations, output, name, draws, *, history=16, horizons=(1, 4, 8, 16, 32)):
+    """Side-agnostic copy of breakout_world_corpus.evaluate_group: forecasts from
+    recorded history and future actions, scored with the physical image metrics."""
+    if not locations:
+        write(output / f'{name}.json', dict(count=0, unsupported=True))
+        return dict(count=0, unsupported=True)
+    batch_size, side = learner.config['batch_size'], frame_side(learner.config)
+    horizon = max(horizons)
+    selected = np.asarray(horizons) - 1
+    rgb_parts, posterior_parts, reward_parts, positive_parts, continuation_parts = ([[] for _ in draws] for _ in range(5))
+    truth, context, validity, rewards, terminals = ([] for _ in range(5))
+    before = learner.updates
+    for offset in range(0, len(locations), batch_size):
+        actual = locations[offset:offset + batch_size]
+        count = len(actual)
+        data = evaluation_windows(streams, list(actual) + [actual[0]] * (batch_size - count), history=history, horizon=horizon)
+        observed = data['rgb'][:history].astype(np.float32) / 255 - .5
+        truth.append(data['rgb'][history + selected, :count])
+        context.append(data['rgb'][history - 1, :count])
+        validity.append(data['valid'][:, :count])
+        rewards.append(data['reward'][history:, :count])
+        terminals.append(data['terminal'][history:, :count])
+        for draw, seed in enumerate(draws):
+            prediction = learner.predict(pixels(observed), data['action'][:history].ravel().tolist(),
+                                         data['action'][history:].ravel().tolist(), seed=seed)
+            rgb = np.frombuffer(prediction['prior_rgb'], '<f4').reshape(horizon, batch_size, 3, side, side)
+            rgb_parts[draw].append(rgb[selected, :count])
+            posterior_parts[draw].append(np.frombuffer(prediction['posterior_rgb'], '<f4').reshape(batch_size, 3, side, side)[:count])
+            reward_parts[draw].append(np.asarray(prediction['reward'], np.float32)[:, :count])
+            positive_parts[draw].append(np.asarray(prediction['reward_positive_probability'], np.float32)[:, :count])
+            continuation_parts[draw].append(np.asarray(prediction['continuation'], np.float32)[:, :count])
+    assert learner.updates == before
+    arrays = dict(horizons=np.asarray(horizons), locations=np.asarray(locations), truth=np.concatenate(truth, axis=1),
+                  context=np.concatenate(context), valid=np.concatenate(validity, axis=1),
+                  target_reward=np.concatenate(rewards, axis=1), target_terminal=np.concatenate(terminals, axis=1),
+                  prediction=np.stack([np.concatenate(v, axis=1) for v in rgb_parts]),
+                  posterior=np.stack([np.concatenate(v) for v in posterior_parts]),
+                  reward=np.stack([np.concatenate(v, axis=1) for v in reward_parts]),
+                  reward_positive_probability=np.stack([np.concatenate(v, axis=1) for v in positive_parts]),
+                  continuation=np.stack([np.concatenate(v, axis=1) for v in continuation_parts]))
+    for key in ('prediction', 'posterior', 'reward', 'reward_positive_probability', 'continuation'):
+        assert np.isfinite(arrays[key]).all(), key
+    np.savez_compressed(output / f'{name}.npz', **arrays)
+    context = arrays['context'].astype(np.float32) / 255 - .5
+    gamma = float(np.float32(1) - np.float32(1) / np.float32(learner.config['horizon']))
+    result = dict(count=len(locations), side=side, posterior=[image_metrics(context, image, context) for image in arrays['posterior']], horizons={})
+    for index, h in enumerate(horizons):
+        valid = arrays['valid'][h - 1]
+        target = arrays['truth'][index, valid].astype(np.float32) / 255 - .5
+        actual_reward = arrays['target_reward'][h - 1, valid]
+        probability = arrays['reward_positive_probability'][:, h - 1, valid].mean(axis=0)
+        terminal_probability = 1 - np.clip(arrays['continuation'][:, h - 1, valid].mean(axis=0) / gamma, 0, 1)
+        result['horizons'][str(h)] = dict(count=int(valid.sum()), excluded=int((~valid).sum()),
+            images=[image_metrics(target, image[index, valid], context[valid]) for image in arrays['prediction']],
+            persistence=image_metrics(target, context[valid], context[valid]),
+            positive_reward=event_metrics(actual_reward > 0, probability),
+            terminal=event_metrics(arrays['target_terminal'][h - 1, valid], terminal_probability))
+    write(output / f'{name}.json', result)
+    print(json.dumps(dict(event='evaluation', group=name, count=len(locations),
+                          ball={h: [x['ball_within_1px'] for x in row['images']] for h, row in result['horizons'].items()})), flush=True)
+    return result
+
+
+def rerender(args):
+    """Re-render a corpus that kept native frames at this config's frame side."""
+    import kindle
+    from breakout_world_model import require_device
+    config = json.loads(args.config.read_text())
+    lanes, side = config['batch_size'], frame_side(config)
+    learner = kindle.WorldModelLearner(config, prediction_length=args.prediction_length, pixel_loss=args.pixel_loss)
+    require_device(learner)
+    source = json.loads((args.source / 'manifest.json').read_text())
+    files = []
+    for lane, item in enumerate(source['files']):
+        with np.load(args.source / f'lane{lane}.npz', allow_pickle=False) as data:
+            native = data['native_rgb']
+            fields = {key: data[key] for key in FIELDS if key != 'rgb'}
+        rgb = np.zeros((len(native), 3, side, side), np.uint8)
+        for start in range(0, len(native), lanes):
+            frames = [native[min(index, len(native) - 1)] for index in range(start, start + lanes)]
+            resized = np.frombuffer(learner.preprocess(frames), '<f4').reshape(lanes, 3, side, side)
+            count = min(lanes, len(native) - start)
+            rgb[start:start + count] = np.rint((resized[:count] + .5) * 255).clip(0, 255).astype(np.uint8)
+        path = args.output / f'lane{lane}.npz'
+        np.savez(path, rgb=rgb, **fields)
+        files.append(dict(item, path=str(path), sha256=sha(path), source_sha256=item['sha256']))
+    write(args.output / 'manifest.json', dict(source, status='complete', side=side, rerendered_from=str(args.source), files=files))
 
 
 def load_dataset(root):
@@ -156,7 +249,7 @@ def load_dataset(root):
 
 def train(args):
     import kindle
-    from breakout_world_corpus import DRAWS, HISTORY, choose_evaluation, evaluate_group
+    from breakout_world_corpus import DRAWS, HISTORY, choose_evaluation
     from breakout_world_model import require_device
     config = json.loads(args.config.read_text())
     fitting, fitting_manifest = load_dataset(args.dataset)
@@ -183,7 +276,7 @@ def train(args):
         summary = dict(step=step, training_seconds=native_seconds, groups={})
         for split, selections in groups.items():
             for kind, locations in selections.items():
-                result = evaluate_group(learner, development, locations, output, f'{split}-{kind}')
+                result = evaluate_group(learner, development, locations, output, f'{split}-{kind}', DRAWS)
                 summary['groups'][f'{split}-{kind}'] = ball_summary(result)
         for split, locations in dense.items():
             streams = fitting if split == 'fitting' else development
@@ -226,7 +319,7 @@ def ball_summary(result):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('collect', 'train'))
+    parser.add_argument('mode', choices=('collect', 'train', 'rerender'))
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--ticks', type=int, default=65536, help='collection steps per lane')
@@ -234,6 +327,7 @@ def main():
     parser.add_argument('--sticky', type=float, default=.25)
     parser.add_argument('--block-probability', type=float, default=.025)
     parser.add_argument('--dataset', type=Path)
+    parser.add_argument('--source', type=Path, help='corpus with native frames to re-render')
     parser.add_argument('--development', type=Path)
     parser.add_argument('--steps', type=int, default=16384)
     parser.add_argument('--eval-every', type=int, default=2048)
@@ -244,6 +338,10 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     if args.mode == 'collect':
         collect(args)
+    elif args.mode == 'rerender':
+        if args.source is None:
+            parser.error('rerender requires --source')
+        rerender(args)
     else:
         if args.dataset is None or args.development is None:
             parser.error('train requires --dataset and --development')

@@ -86,6 +86,30 @@ def first_contact_window(stream, length=32, history=16):
     raise ValueError('no complete paddle-contact fitting window')
 
 
+SIDES = (32, 48, 64, 96)
+
+
+def geometry(side):
+    """Detector windows scaled from the original 64x64 calibration."""
+    if side not in SIDES:
+        raise ValueError('expected a supported square RGB side')
+    scale = side / 64
+    return dict(scale=scale, ball_rows=(round(28 * scale), round(56 * scale)),
+                ball_cols=(round(4 * scale), round(60 * scale)), ball_pixels=round(12 * scale * scale),
+                paddle_rows=(round(57.5 * scale), round(58.5 * scale) + 1),
+                paddle_cols=(round(3 * scale), round(61 * scale)),
+                paddle_pixels=(round(2 * scale), round(10 * scale)))
+
+
+def _side(rgb, rank):
+    shape = np.shape(rgb)
+    if len(shape) != rank or shape[-3] != 3 or shape[-1] != shape[-2] or shape[-1] not in SIDES:
+        raise ValueError('expected centered CHW RGB with a supported square side')
+    if not np.isfinite(rgb).all():
+        raise ValueError('expected finite centered RGB')
+    return shape[-1]
+
+
 def ball_center(rgb):
     """Conservative red-sprite measurement below the bricks, in resized pixels.
 
@@ -93,17 +117,16 @@ def ball_center(rgb):
     from a low-contrast prediction. This excludes upper-wall ball positions.
     """
     rgb = np.asarray(rgb, dtype=np.float64)
-    if rgb.shape != (3, 64, 64) or not np.isfinite(rgb).all():
-        raise ValueError('expected finite centered CHW64 RGB')
+    g = geometry(_side(rgb, 3))
     image = rgb + .5
     excess = image[0] - np.maximum(image[1], image[2])
     mask = (excess > .12) & (image[0] > .30)
-    mask[:28] = False
-    mask[56:] = False
-    mask[:, :4] = False
-    mask[:, 60:] = False
+    mask[:g['ball_rows'][0]] = False
+    mask[g['ball_rows'][1]:] = False
+    mask[:, :g['ball_cols'][0]] = False
+    mask[:, g['ball_cols'][1]:] = False
     y, x = np.where(mask)
-    if not 1 <= len(x) <= 12:
+    if not 1 <= len(x) <= g['ball_pixels']:
         return None
     weights = excess[y, x]
     return np.array([np.average(x, weights=weights), np.average(y, weights=weights)])
@@ -113,8 +136,9 @@ def image_metrics(target, prediction, context):
     target, prediction, context = (np.asarray(x, np.float64) for x in (target, prediction, context))
     if target.shape != prediction.shape or target.shape != context.shape or target.ndim != 4:
         raise ValueError('equal NCHW images required')
-    if target.shape[1:] != (3, 64, 64) or not all(np.isfinite(x).all() for x in (target, prediction, context)):
-        raise ValueError('finite CHW64 images required')
+    pixel = geometry(_side(target, 4))['scale']
+    for x in (prediction, context):
+        _side(x, 4)
     squared = np.square(prediction-target)
     changed = np.max(np.abs(target-context), axis=1) > 1/255
     truth = [ball_center(x) for x in target]
@@ -130,28 +154,30 @@ def image_metrics(target, prediction, context):
                 changed_pixels=int(changed.sum()),
                 changed_mse=float(squared.transpose(0, 2, 3, 1)[changed].mean()) if changed.any() else None,
                 ball_visible=len(visible), ball_detected=len(detected),
-                ball_within_1px=sum(error <= 1 for error in errors)/len(visible) if visible else None,
+                ball_within_1px=sum(error <= pixel for error in errors)/len(visible) if visible else None,
                 ball_error_mean_detected=float(np.mean(errors)) if errors else None,
                 ball_error_p95_detected=float(np.percentile(errors, 95)) if errors else None,
                 ball_false_detections=sum(t is None and p is not None for t, p in zip(truth, estimated)),
                 paddle_visible=len(paddle_rows), paddle_detected=len(paddle_errors),
-                paddle_within_1px=sum(x <= 1 for x in paddle_errors)/len(paddle_rows) if paddle_rows else None,
+                paddle_within_1px=sum(x <= pixel for x in paddle_errors)/len(paddle_rows) if paddle_rows else None,
                 paddle_mae_detected=float(np.mean(paddle_errors)) if paddle_errors else None,
                 bricks=brick_metrics(target, prediction, context))
 
 
 def paddle_center(rgb):
-    if np.shape(rgb) != (3, 64, 64) or not np.isfinite(rgb).all():
-        raise ValueError('expected finite centered CHW64 RGB')
+    g = geometry(_side(rgb, 3))
+    (r0, r1), (c0, c1), (shortest, longest) = g['paddle_rows'], g['paddle_cols'], g['paddle_pixels']
     image = np.asarray(rgb, np.float64)+.5
-    excess = image[0, 58, 3:61]-np.maximum(image[1, 58, 3:61], image[2, 58, 3:61])
-    x = np.flatnonzero((excess > .12) & (image[0, 58, 3:61] > .30))
+    band = image[:, r0:r1, c0:c1]
+    excess = np.max(band[0]-np.maximum(band[1], band[2]), axis=0)
+    red = np.max(band[0], axis=0)
+    x = np.flatnonzero((excess > .12) & (red > .30))
     if not len(x): return None
     components = sorted(np.split(x, np.flatnonzero(np.diff(x) > 1)+1), key=len, reverse=True)
-    if not 2 <= len(components[0]) <= 10 or (len(components) > 1 and len(components[0]) == len(components[1])):
+    if not shortest <= len(components[0]) <= longest or (len(components) > 1 and len(components[0]) == len(components[1])):
         return None
     x = components[0]
-    return float(np.average(x+3, weights=excess[x]))
+    return float(np.average(x+c0, weights=excess[x]))
 
 
 BRICK_COLORS = np.array([(200, 72, 72), (198, 108, 58), (180, 122, 48),
@@ -161,10 +187,9 @@ BRICK_COLORS = np.array([(200, 72, 72), (198, 108, 58), (180, 122, 48),
 def brick_strength(rgb):
     """Image-only occupancy at the centers of the 6x18 native brick cells."""
     rgb = np.asarray(rgb, np.float64)
-    if rgb.ndim != 4 or rgb.shape[1:] != (3, 64, 64) or not np.isfinite(rgb).all():
-        raise ValueError('expected finite NCHW64 RGB')
-    y, x = np.meshgrid((60+6*np.arange(6))*64/210-.5,
-                       (12+8*np.arange(18))*64/160-.5, indexing='ij')
+    side = _side(rgb, 4)
+    y, x = np.meshgrid((60+6*np.arange(6))*side/210-.5,
+                       (12+8*np.arange(18))*side/160-.5, indexing='ij')
     y, x = y.ravel(), x.ravel()
     y0, x0 = y.astype(int), x.astype(int)
     dy, dx = (y-y0)[None, :, None], (x-x0)[None, :, None]

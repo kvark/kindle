@@ -580,6 +580,9 @@ pub struct WorldModelLearner {
     updates: u64,
     dirty: bool,
     fixed_teacher: Option<TeacherAnchor>,
+    /// Inference-only logit temperature for frames fed back as decoder history
+    /// during forecasts; 1 feeds the decoded probabilities back unchanged.
+    feedback_sharpness: f32,
 }
 
 fn validate_config(config: &DreamerConfig) -> Result<(), &'static str> {
@@ -690,6 +693,21 @@ fn previous_images(observations: &[f32], actions: &[i32], time: usize, width: us
         }
     }
     previous
+}
+
+/// Divide the Bernoulli logits of centered pixels by a temperature in (0, 1].
+fn sharpen_pixels(centered: &[f32], temperature: f32) -> Vec<f32> {
+    if temperature == 1.0 {
+        return centered.to_vec();
+    }
+    centered
+        .iter()
+        .map(|&value| {
+            let probability = (value + 0.5).clamp(1e-6, 1.0 - 1e-6);
+            let logit = (probability / (1.0 - probability)).ln();
+            1.0 / (1.0 + (-logit / temperature).exp()) - 0.5
+        })
+        .collect()
 }
 
 fn rollout_weights(actions: &[i32], batch: usize, horizon: usize) -> Vec<Vec<f32>> {
@@ -968,6 +986,7 @@ impl WorldModelLearner {
             updates: 0,
             dirty: false,
             fixed_teacher,
+            feedback_sharpness: 1.0,
         })
     }
 
@@ -988,6 +1007,21 @@ impl WorldModelLearner {
     }
     pub fn pixel_loss(&self) -> PixelLoss {
         self.pixel_loss
+    }
+
+    pub fn feedback_sharpness(&self) -> f32 {
+        self.feedback_sharpness
+    }
+
+    /// Forecast-time only: divides the logits of each decoded frame by this
+    /// temperature before the frame enters the decoder's image history. Training,
+    /// checkpoints and the returned forecasts are unchanged.
+    pub fn set_feedback_sharpness(&mut self, temperature: f32) -> Result<(), &'static str> {
+        if !temperature.is_finite() || !(0.0..=1.0).contains(&temperature) || temperature == 0.0 {
+            return Err("feedback sharpness must be a temperature in (0, 1]");
+        }
+        self.feedback_sharpness = temperature;
+        Ok(())
     }
     pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
         crate::gpu_device_info(self.train.device_information())
@@ -1454,7 +1488,8 @@ impl WorldModelLearner {
                 stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
             }
             if self.config.rgb_spatial_decoder {
-                history = super::spatial_history::shift_cpu(&history, &image, width);
+                let fed_back = sharpen_pixels(&image, self.feedback_sharpness);
+                history = super::spatial_history::shift_cpu(&history, &fed_back, width);
             }
             if self.config.rgb_event_heads {
                 self.heads.set_input("decoded_rgb", &image);

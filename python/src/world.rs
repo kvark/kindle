@@ -143,6 +143,18 @@ impl PyWorldModelLearner {
     }
 
     #[getter]
+    fn feedback_sharpness(&self) -> f32 {
+        self.inner.feedback_sharpness()
+    }
+
+    #[setter]
+    fn set_feedback_sharpness(&mut self, temperature: f32) -> PyResult<()> {
+        self.inner
+            .set_feedback_sharpness(temperature)
+            .map_err(PyValueError::new_err)
+    }
+
+    #[getter]
     fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         json_to_python(py, &self.inner.gpu_device())
     }
