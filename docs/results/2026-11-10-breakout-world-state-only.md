@@ -47,6 +47,42 @@ beat the predict-the-mean baseline for the ball at any horizon.
 | 16384 | 15 / 13 | 14 / 8 | 13 / 7 | 15 / 7 | 18 / 9 | 22 / 11 | 30 / 21 | 7 / 14 |
 | predict-the-mean baseline | 40 / 28 | same | same | same | same | same | same | 47 |
 
+## Capacity: the 4M preset
+
+The same recipe with `size4_m` (1,024 deterministic units, 32 eight-way
+categoricals, hidden 128), output `train-96-plain-4m`, 1,602.3 s of native
+calls for 16,384 updates (97.8 ms each, 2.6x cheaper than the spatial 96 run).
+
+| Learner, dense development, updates | Observed | 1 | 4 | 8 | 16 | 32 |
+|---|---:|---:|---:|---:|---:|---:|
+| State-only 4M 96x96, 2048 | 43/113 | 19/112 | 2/112 | 1/112 | 0/115 | 0/102 |
+| State-only 4M 96x96, 4096 | 96/113 | 66/112 | 15/112 | 12/112 | 4/115 | 0/102 |
+| State-only 4M 96x96, 6144 | 97/113 | 78/112 | 38/112 | 16/112 | 8/115 | 1/102 |
+| State-only 4M 96x96, 8192 | 109/113 | 82/112 | 41/112 | 18/112 | 8/115 | 2/102 |
+| State-only 4M 96x96, 10240 | 111/113 | 97/112 | 46/112 | 27/112 | 7/115 | 0/102 |
+| State-only 4M 96x96, 12288 | 113/113 | 108/112 | 67/112 | 35/112 | 8/115 | 3/102 |
+| State-only 4M 96x96, 14336 | 110/113 | 98/112 | 44/112 | 21/112 | 11/115 | 3/102 |
+| State-only 4M 96x96, 16384 | 113/113 | 105/112 | 78/112 | 45/112 | 15/115 | 4/102 |
+| State-only 1M 96x96, 16,384 | 110/113 | 97/112 | 59/112 | 24/112 | 7/115 | 2/102 |
+| Spatial 1M 96x96 (soft feedback), 16,384 | 103/113 | 105/112 | 54/112 | 36/112 | 19/115 | 4/102 |
+| Spatial 1M 64x64 control, 16,384 | 106/112 | 101/109 | 66/109 | 53/107 | 25/114 | 11/95 |
+
+State probe at 16,384 (same columns as above):
+
+| Updates | Encoder ball x / y | Posterior ball x / y | Prior 1 | Prior 4 | Prior 8 | Prior 16 | Prior 32 | Paddle 1 / 32 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 4M, 16384 | 13 / 12 | 18 / 6 | 18 / 5 | 16 / 5 | 19 / 8 | 23 / 11 | 31 / 19 | 7 / 12 |
+
+Four times the state lifts the pixel forecasts at every horizon up to sixteen
+steps: observed reconstruction is perfect on the cohort, four-step tracking
+(78/112) exceeds every spatial recipe including the 64x64 control's 66/109,
+and eight-step (45/112) closes most of the gap to the control's 53/107 while
+the ball is carried by the state rather than by fed-back frames. The linear
+state readout is unchanged from 1M (prior-state ball 16/5 at four steps,
+19/8 at eight, 23/11 at sixteen), so the extra capacity went into rendering
+and the scene, not into a sharper linear ball code; the evaluation-to-evaluation
+oscillation (eight-step 35 → 21 → 45 over the last three points) remains.
+
 ## Reading
 
 Removing the shortcut changes what the state learns. After 2,048 updates the
