@@ -14,22 +14,23 @@ from pathlib import Path
 
 METRICS = {
     "world": set("""
-        total_loss reconstruction_loss future_prediction_loss exploration_loss encoder_regularization encoder_spread raw_kl dynamics_kl
-        representation_kl reward_loss continuation_loss replay_value_loss
-        initial_policy_loss initial_value_loss
-        replay_reward_prediction_mean replay_reward_target_mean replay_reward_mae
-        rewarded_prediction_mean unrewarded_prediction_mean rewarded_count
-        positive_reward_prediction_mean zero_reward_prediction_mean
-        negative_reward_prediction_mean positive_reward_count zero_reward_count
-        negative_reward_count replay_continuation_prediction_mean
-        replay_continuation_target_mean replay_continuation_mae
+        color_centroid_supervision continuation_loss dynamics_kl encoder_regularization encoder_spread
+        expert_imitation_loss expert_imitation_scale exploration_loss future_prediction_loss
+        initial_policy_loss initial_value_loss negative_reward_count negative_reward_prediction_mean
+        open_loop_supervision positive_reward_count positive_reward_prediction_mean prior_continuation_loss
+        prior_continuation_valid_fraction prior_reward_loss prior_reward_valid_fraction raw_kl
+        reconstruction_loss replay_continuation_mae replay_continuation_prediction_mean
+        replay_continuation_target_mean replay_reward_mae replay_reward_prediction_mean
+        replay_reward_target_mean replay_value_loss representation_kl reward_loss rewarded_count
+        rewarded_prediction_mean total_loss unrewarded_prediction_mean zero_reward_count
+        zero_reward_prediction_mean
     """.split()),
     "behavior": set("""
-        total_loss policy_loss actor_update_scale value_loss replay_value_loss
-        policy_entropy weighted_policy_entropy imagined_reward_mean
-        imagined_intrinsic_reward_mean replay_intrinsic_reward_mean
-        imagined_continuation_mean return_mean return_scale advantage_abs_mean
-        weighted_advantage_abs_mean
+        actor_update_scale advantage_abs_mean completed_value_rows dynamics_actor_loss
+        expected_value_actor_loss expert_imitation imagined_continuation_mean imagined_intrinsic_reward_mean
+        imagined_reward_mean policy_entropy policy_loss replay_actor replay_intrinsic_reward_mean
+        replay_value_loss return_mean return_scale total_loss value_loss weighted_advantage_abs_mean
+        weighted_policy_entropy
     """.split()),
 }
 STAGES = """

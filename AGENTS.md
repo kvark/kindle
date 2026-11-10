@@ -20,55 +20,34 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 ## Current work — November 10
 
-The goal **prove the world model training on Breakout** remains paused and
-unproven. The fresh [cumulative-survival learner](docs/results/2026-11-10-breakout-world-survival-loss-learning.md)
-is frozen at the user's request under its [fixed protocol](docs/experiments/2026-11-10-breakout-world-survival-loss-learning.md).
-Root `/x/Temp/kindle-world-survival-loss-learning-20261110`; final16,384 updates,
-no extension/sweep, collector, automatic assessment or successor. Actor/critic,
-CDP and the five-game campaign stay parked.
+Kindle now builds against **upstream Meganeura main** (`a0eff600`, Blade
+`d9112e26`) instead of the October handover fork; see the
+[switch report](docs/results/2026-11-10-meganeura-main-switch.md). The fork's
+`MEGANEURA_COMMAND_CACHE`/`IMAGE_VIEWS`/`CONVOLUTION_*`/`COPY_COMPOSITION` flags
+are inert. A one-method upstream patch (`Session::slot_buffer`) waits for the
+user to push from `/x/Temp/kindle-meganeura-slot-buffer-20261110/`; until then
+the retained-off actor-dynamics/expected-value snapshots cross the host.
+Run every heavy job as a memory-capped `systemd-run --user` unit; a bare
+`cargo test` peaked at 17.6 GB and the OOM killer took the session down.
 
-Paused at04:00:46 UTC November10, last logged9,964/16,384. The original learner
-and both monitors retain their PIDs/invocations, memory and RNG state; exact live
-optimizer age is unmeasured. No thaw or restart is authorized by cleanup. Review
-wall-clock supervision before resuming at the user's request.
+The goal **prove the world model training on Breakout** is active. The first
+experiment on the new stack, [corpus scale](docs/experiments/2026-11-10-breakout-world-scale.md),
+keeps the early physical-feature recipe (1M/RGB64/B8/T32/H16/Auto/41001,
+`motion_event_rollout`) and only replaces the 33k-arrival corpus reused for
+128 passes with a fresh 524,288-action collection (eight lanes, same teacher
+plus random blocks, seed base 251001), scoring the unchanged November 7
+development origins. Root `/x/Temp/kindle-world-scale-20261110`, unit
+`kindle-world-scale-20261110.service`, driver `python/examples/breakout_world_scale.py`.
+Eight-step ball tracking was equally poor on fitting and development data
+(86/176 versus 52/107), so this separates a data limit from a model limit before
+any further one-knob change. Actor/critic, CDP and the five-game campaign stay parked.
 
-Only `world_survival_scale=10` is added to the previous RGB-event effective
-config:1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,RGB100,rates4e-4,KL1/.1/freeNat1,
-mixing.01,event scales1,local width16/two-image history and physical action table.
-The sealed natural two-cycle plan/counts are unchanged;zero new emulator actions/
-frames. Source06971ff6;native64324882/SHA1966cae4,exact runtime/runner at
-`/x/Temp/kindle-world-survival-loss-20261110`. Do not mix overlays.
-
-Startup passes all239 execution pins,240 actual-initial and240 age1 tensors
-byte-exact to the qualifier,andall14 first reports. Original queue/observer/CPU
-audit services are frozen in place; consult the result report and launch receipts for
-exact identity. Continue the existing worker,never restart on observer timeout.
-Final dense/restore/audit checks remain pending. Falling training Brier and
-zero-positive natural point slices do not establish cumulative calibration.
-A separately declared final chosen-action assessment remains necessary.
-
-The saved2,048 review finds lower risk on both surviving and already-ending
-cases,without an early tracking gain;final conclusions remain pending. A
-separate [CPU loss-support audit](docs/experiments/2026-11-10-breakout-world-survival-loss-support.md)
-checks known cumulative labels dropped by reset masks,without changing the run.
-
-[Qualification](docs/results/2026-11-10-breakout-world-survival-loss.md) is closed:
-42.760s,143 execution/77 closure/186 distinct pins,one guard/nine sealed files,
-native analytic derivatives,default-off32 arrays/240 tensors,own initial/frozen/
-restore andfour fixture updates pass. Default absent;v29 wraps v28 andbinds
-positive coefficient/all-world scope. No parameter or inference change.
-3,064,246,272 disposable build-cache bytes released;package/executable/source and
-original preparation failures retained. Do not repeat this qualification.
-
-The [saved timing review](docs/results/2026-11-10-breakout-world-rgb-event-heads-timing.md)
-is closed:226 inputs/23 closed files,six figures reviewed,exact reconstruction.
-Ending RIGHT mean50% risk at12 versusoracle17;FIRE launch loses detections by4.
-Longer history doesnot repair these failures. No missing-clock/data-only cause
-is established. Prior RGB-event learner,broader assessment,decomposition andall
-other completed recipes/collectors stay closed,with failures retained inlinked
-reports. Original joint/event gates andfull physics/serve/collisions,natural
-calibration,persistent brick memory,late/tunnel/second-wall/above-top coverage,
-untouched families andfresh learner confirmation remain.
+The previous [cumulative-survival learner](docs/results/2026-11-10-breakout-world-survival-loss-learning.md)
+remains frozen by systemd at the user's request at update 9,964/16,384
+(`kindle-world-survival-loss-learning-20261110.service`, PID 2287733); it holds
+about 1 GB of host memory and 0.5 GB of VRAM. Do not thaw, restart or stop it
+without the user. Its fixed protocol, qualification and the closed RGB-event
+reviews stay as recorded in their reports; its runtime is the fork's.
 
 ## Direction and retained results
 
