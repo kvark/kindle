@@ -12,8 +12,11 @@ recovers another 671 MB from duplicates and regenerable bytecode, preserving
 all checkpoints and evidence. All 8,054 large artifact paths and 670 current/
 retained-runtime hashes verify; about 268.7 GiB remains available on the root
 filesystem. Retained artifacts may share hardlinks and contain sparse zero
-blocks; keep their bytes immutable. Archiving older logs could save roughly
-29 GB, but the user's archive choice is pending and all original logs remain.
+blocks; keep their bytes immutable. A verified 4.48 GB older-log archive is
+prepared at `/x/Artifacts/kindle-log-archive-20261110`; removing its 2,478
+original logs would recover 29.15 GB net. The user's archive choice is pending,
+all originals remain, and the prepared copy currently uses additional space.
+The cleanup report links its manifest and restoration command.
 
 ## Current work — November 10
 

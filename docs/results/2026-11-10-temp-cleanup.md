@@ -47,3 +47,32 @@ Any archival pass must retain original content hashes, path/metadata mappings
 and a restoration command, and verify decompressed contents before removing an
 original. Existing experiment receipts are not rewritten to pretend archived
 paths remain directly accessible.
+
+## Verified archive prepared
+
+The follow-up prepares and verifies the proposed archive without removing any
+original logs. All **2,478 members**, covering **33,671,117,373 content bytes**
+across 213 older experiment roots, pass full decompressed SHA256 and
+size/permission/owner checks. Preparation and verification take 87.760 seconds.
+The compressed archive is **4,476,480,704 bytes (4.48 GB)**. Five selected paths
+share inodes with other retained paths; allowing for those remaining links and
+the archive's allocation, removing the selected originals would reclaim
+**29,154,574,336 allocated bytes (29.15 GB / 27.15 GiB) net**. No such removal
+has been performed: the prepared copy currently uses additional space.
+
+Archive, per-file content hashes/metadata, verification log and restoration
+script are retained at `/x/Artifacts/kindle-log-archive-20261110`.
+Archive SHA256 is
+`f18850460717ee25ab1cba752e3de5c264309fea683d4f6c28738c60856e2d1d`.
+To restore into a new directory, refusing to overwrite existing files:
+
+```sh
+python3 /x/Artifacts/kindle-log-archive-20261110/restore.py --destination /x/Recovered/kindle-logs
+```
+
+The same command with `--destination /x/Temp` restores the original log paths
+after archival. It verifies the archive and restored content hashes and restores
+recorded permissions, extended attributes and timestamps. Source hardlinks
+restore as independent files. Checkpoints, replay, source, runtime packages and
+all `kindle-world-*` roots remain outside this archive. The archive choice is
+still pending; no additional space recovery is claimed.
