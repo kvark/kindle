@@ -21,11 +21,24 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 10
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [the saved survival decomposition](docs/experiments/2026-11-10-breakout-world-rgb-event-heads-survival.md) for separately declared CPU-only execution. Hold new saved
-images fixed; compare original/model-mean/oracle-mean/all-alive score components
-with sealed unchanged math/fixtures. No GPU/model/emulator query,old forecast
-read or new update. Root `/x/Temp/kindle-world-rgb-event-heads-survival-20261110`.
-Oracle labels are diagnostic weights,not learned repairs or passing scores.
+unproven. Select [the saved serving/ending timing review](docs/experiments/2026-11-10-breakout-world-rgb-event-heads-timing.md) for CPU implementation and a separate declaration. Inspect
+all18 serve/four ending plans,both histories/all draws/origins,all32 risk steps,
+endpoint features,16/32-frame input-prefix metadata andsix fixed images. No
+model/GPU/emulator query,new update,old forecast read or collector. No further
+training/native allocation is selected. Root
+`/x/Temp/kindle-world-rgb-event-heads-timing-20261110`.
+
+The [survival-weight decomposition](docs/results/2026-11-10-breakout-world-rgb-event-heads-survival.md) closes:317 pins/16 closed files,6,720 cases/840 groups/420 checks,
+max4.44e-16,5.062s CPU. Ordinary ball.142943→oracle-assisted.073155;
+nonending.090232→.083957,paddle.087932→.003173. Wall residual.058692 vswide
+.496435 improves;serve.336614 vs.276916 remains poor. Ending.459213→.008345
+is score sensitivity,not a learned repair/causal fraction/passing result. All
+ordinary gates remain failed. Original whole-runner identity assertion and
+missing-declaration analysis attempt remain; separately namedv2 verifies exact
+non-dispatch scorer/constants AST equality plusboth hashes,then reconstructs all
+ordinary scores. Optional dispatch/metadata differ;closed native modeisRSSM.
+No GPU stage,old analysis orfixture isrepeated. Oracle future labels are only
+score substitutions. All source/checkpoints remain unchanged.
 
 The [frozen assessment](docs/results/2026-11-10-breakout-world-rgb-event-heads-branches.md) closes **failed**:primary.142943451628 vsrequired<=.127126664317,
 H0.169502219090,wide.160386921843,early physical.224881281067. The15.67% H0

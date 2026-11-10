@@ -81,3 +81,5 @@ Full action-conditioned physics,serve/collisions,natural event calibration,
 persistent brick memory,late/tunnel/second-wall/above-top coverage,untouched
 families and fresh learner confirmation remain. Actor/critic,CDP and five-game
 work stay parked. The world-model goal remains active and unproven.
+
+The [separate CPU decomposition](2026-11-10-breakout-world-rgb-event-heads-survival.md) is now closed. Its oracle-weighted scores arediagnostics only; all ordinary failures above remain.
