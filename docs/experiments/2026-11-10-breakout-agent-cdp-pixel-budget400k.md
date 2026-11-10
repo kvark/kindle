@@ -34,3 +34,16 @@ cohort against 70.750 / 143.667. The 400k point is read against 92.792 /
 minute, as the retained report did. One seed, fixed budgets, no extension of
 an existing life; the original 864/90% two-wall gate is reported, not
 expected.
+
+## Additions (November 10, after the 400k life)
+
+3. The retained CDP 400k checkpoint
+   (`/x/Temp/kindle-breakout-budget400k-20261103/full/breakout-12m-64-b16-r16-replayvalue1-expert100-400k-seed1009/final`)
+   is evaluated on cohort 4000022003, sampled and greedy, so the 400k
+   comparison exists on both cohorts (`eval200k/cdp400k-c22003*`,
+   `queue-cdp400k.json`).
+4. A fresh 400,000-action life of the matched pixel world 64x64 (no CDP),
+   seed 1009, evaluated at 400k on both cohorts, sampled and greedy: root
+   `/x/Temp/kindle-breakout-pixel64-400k-20261110`, unit
+   `kindle-breakout-pixel64-400k-20261110.service`. Its actual-initial
+   checkpoint is the same seed 1009 initialization already evaluated.
