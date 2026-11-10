@@ -24,16 +24,24 @@ review passes in2.432s. Its original immediate launcher observation failure
 remains;separate same-invocation observation andoriginal image job complete
 without restart. No native/main CPU failure orretry. Provisional2k evidence stays.
 
-Select the separate [frozen chosen-action assessment](experiments/2026-11-10-breakout-world-wide-motion-branches.md),
-not another learner. Same394 cached oracle inputs,84 related groups/33 distinct
-contexts,history16/32,eight draws,unchanged physics/event gates;only new final
-queried,old scores cached.963 execution pins andCPU import/config/control mapping
-trap pass;one1,800s host-guarded job isactive. Source429c13e3,main invocation
-4270bdc82bb146dc972fa5928480f89e/controller2246344,observer2246349;root
-`/x/Temp/kindle-world-wide-motion-branches-20261110`. Exact nativee3d18841/
-SHA02feea6e andrunner are reused. No learning,collector,extension orautomatic
-successor. Original full-world requirements remain;short point gains do not
-prove a full world.
+The [frozen chosen-action assessment](results/2026-11-10-breakout-world-wide-motion-branches.md)
+is closed/failed:energy.160386921843 versus early physical.224881281067,
+one-hot.172365704612,H0.169502219090,required<=.127126664317. Ending Brier16/32
+.0426034/.263400,RIGHT16.302606 and276/304 nonending alarms fail. All four
+freeflight64/64 andserveNOOP0 presence gates pass;point8/16/32 is54.442%/
+64.374%/24.484%,with16 regressing vs early physical71.870%. Native185.711s/CPU
+16.006s,963/238/242 pins,240 exact frozen arrays,210 oracle joins/168 feature
+checks andone guard/nine sealed files pass. Main4270bdc82bb146dc972fa5928480f89e/
+2246344,observer2246349 inactive/successful;source429c13e3/nativee3d18841/SHA02feea6e.
+No failure/retry/repair orold-model query. No GPU job remains active.
+
+Select the separate [CPU saved-survival decomposition](experiments/2026-11-10-breakout-world-wide-motion-survival.md),
+only new frozen outputs. Reuse sealed math/fixtures without rerunning old work;
+6,720 cases/840 groups,both histories,all endpoints,original reconstruction1e-12
+before fixed-image substitutions. Pin inputs before execution. No model/GPU/
+emulator query,loss change,collector,learner,extension orautomatic successor.
+Original gates/full-world requirements remain;oracle-assisted values cannot pass
+orrepair them. Root `/x/Temp/kindle-world-wide-motion-survival-20261110`.
 
 The [native qualification](results/2026-11-09-breakout-world-wide-motion-native.md)
 passes in81.157s:small-fixture native values/derivatives/lane isolation,

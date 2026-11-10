@@ -113,3 +113,8 @@ reward/life/game-over calibration,persistent brick memory,late/tunnel/second-wal
 above-top coverage,untouched families andfresh learner confirmation remain
 required. Actor/critic,CDP andfive-game work remain parked. The full world-model
 goal is active andunproven.
+
+The subsequent [chosen-action assessment](2026-11-10-breakout-world-wide-motion-branches.md)
+is closed/failed:energy.160386921843 versusrequired<=.127126664317,andall
+ending/false-alarm gates fail. Its modest dense/point gains do not repair those
+failures or complete the full goal. No learner extension is selected.
