@@ -84,3 +84,8 @@ Full action-conditioned physics,natural reward/life/game-over calibration,
 persistent removed-brick memory,late/tunnel/second-wall/above-top coverage,
 untouched families andfresh learner confirmation remain required. Actor/critic,
 CDP andfive-game work stay parked. The full goal remains active andunproven.
+
+The subsequent [CPU decomposition](2026-11-10-breakout-world-wide-motion-survival.md)
+closes:ordinary.160387→oracle-assisted.127843,withwall andserve thelargest
+residual categories. It changes no original score orfailure anddoes not identify
+a causal training defect. A separate saved-case review isselected.

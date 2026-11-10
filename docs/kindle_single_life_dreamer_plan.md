@@ -35,13 +35,22 @@ checks andone guard/nine sealed files pass. Main4270bdc82bb146dc972fa5928480f89e
 2246344,observer2246349 inactive/successful;source429c13e3/nativee3d18841/SHA02feea6e.
 No failure/retry/repair orold-model query. No GPU job remains active.
 
-Select the separate [CPU saved-survival decomposition](experiments/2026-11-10-breakout-world-wide-motion-survival.md),
-only new frozen outputs. Reuse sealed math/fixtures without rerunning old work;
-6,720 cases/840 groups,both histories,all endpoints,original reconstruction1e-12
-before fixed-image substitutions. Pin inputs before execution. No model/GPU/
-emulator query,loss change,collector,learner,extension orautomatic successor.
-Original gates/full-world requirements remain;oracle-assisted values cannot pass
-orrepair them. Root `/x/Temp/kindle-world-wide-motion-survival-20261110`.
+The [CPU saved-survival decomposition](results/2026-11-10-breakout-world-wide-motion-survival.md)
+is closed:ordinary ball.160387→oracle-assisted.127843,nonending.157351→.148004;
+paddle.080773→.002296. Wall/serve residuals dominate (.496435/.276916),while
+old edge-rebound residual improves.426554→.023331. These are fixed-image score
+substitutions,not learned repairs,passing scores orcausal fractions.312 pins,
+6,720 cases/840 groups/420 ending checks reconstruct within1e-12,max4.44e-16,
+4.688s CPU,no model/GPU/emulator query orupdate,failure/retry/repair. Sealed math/
+fixtures reused without old-work rerun. Root `/x/Temp/kindle-world-wide-motion-survival-20261110`.
+
+Select the [saved wall/serve case review](experiments/2026-11-10-breakout-world-wide-motion-error-cases.md),
+CPU-only new frozen outputs. All22 plans,both histories,eight draws/origins,five
+endpoints retained;fixed lane0/draw0 wall-four/serve-FIRE grids. Pin scripts and
+closed inputs before execution. No learner,native intervention,collector,
+extension orautomatic successor selected. No GPU job active. Original failed
+gates andall full-world requirements remain. Root
+`/x/Temp/kindle-world-wide-motion-error-cases-20261110`.
 
 The [native qualification](results/2026-11-09-breakout-world-wide-motion-native.md)
 passes in81.157s:small-fixture native values/derivatives/lane isolation,
