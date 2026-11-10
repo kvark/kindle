@@ -21,59 +21,43 @@ The cleanup report links its manifest and restoration command.
 ## Current work — November 10
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [the saved serving/ending timing review](experiments/2026-11-10-breakout-world-rgb-event-heads-timing.md) for CPU implementation and a separate declaration. Inspect
-all18 serve/four ending plans,both histories/all draws/origins,all32 risk steps,
-endpoint features,16/32-frame input-prefix metadata andsix fixed images. No
-model/GPU/emulator query,new update,old forecast read or collector. No further
-training/native allocation is selected. Root
-`/x/Temp/kindle-world-rgb-event-heads-timing-20261110`.
+unproven. Select the [optional cumulative-survival Brier loss](experiments/2026-11-10-breakout-world-survival-loss.md)
+for implementation and bounded CPU/native qualification. Default absent,
+standalone1M/RGB64/H16/RGB-event heads only; add a masked cumulative-product
+objective, no parameters or inference correction. Explicitv29/positive coefficient,
+independent F64 values/derivatives, causality/masking, default-off, first-update/
+frozen/restore checks precede any learner. Candidate scale10, no sweep.
+Root `/x/Temp/kindle-world-survival-loss-20261110`. No learner, collector,
+full assessment, extension or automatic successor is declared.
 
-The [survival-weight decomposition](results/2026-11-10-breakout-world-rgb-event-heads-survival.md) closes:317 pins/16 closed files,6,720 cases/840 groups/420 checks,
-max4.44e-16,5.062s CPU. Ordinary ball.142943→oracle-assisted.073155;
-nonending.090232→.083957,paddle.087932→.003173. Wall residual.058692 vswide
-.496435 improves;serve.336614 vs.276916 remains poor. Ending.459213→.008345
-is score sensitivity,not a learned repair/causal fraction/passing result. All
-ordinary gates remain failed. Original whole-runner identity assertion and
-missing-declaration analysis attempt remain; separately namedv2 verifies exact
-non-dispatch scorer/constants AST equality plusboth hashes,then reconstructs all
-ordinary scores. Optional dispatch/metadata differ;closed native modeisRSSM.
-No GPU stage,old analysis orfixture isrepeated. Oracle future labels are only
-score substitutions. All source/checkpoints remain unchanged.
+The [saved timing review](results/2026-11-10-breakout-world-rgb-event-heads-timing.md)
+closes:226 input pins/23 closed files,22 plans/44 groups,352 curves,1,760 endpoint
+rows,220 endpoint joins,32 prefix rows andsix reviewed figures;5.070s CPU,
+reconstruction errorzero. Ending RIGHT mean50% risk at12 versusoracle17;
+NOOP/LEFT/reversal5% at5/6/8 versus17. Longer history doesnot repair it.
+Serving FIRE1 loses detection at4/8/32 (0/512 each);RIGHTFIRE11 also at1.
+Native serve prefixes arestatic;ending11–13/27–29 distinct16/32 frames,life2→1.
+No missing-clock/data-only cause isestablished. RIGHT32 truth ispost-terminal
+padding,masked fromnumeric point pairs. No model/GPU/emulator query orupdate,
+failure/retry orold stage rerun. Original services areclosed/unloaded;their
+historical success isverified bysealed invocation-specific completion journals.
 
-The [frozen assessment](results/2026-11-10-breakout-world-rgb-event-heads-branches.md) closes **failed**:primary.142943451628 vsrequired<=.127126664317,
-H0.169502219090,wide.160386921843,early physical.224881281067. The15.67% H0
-reduction misses25%. Ending16/32 Brier.329116/.331428,RIGHT16.818743 vsoracle0,
-201/304 nonending>5% andmaximum.961272 fail all four event gates. Onlycontact
-hasnonending32 category mean<=.05. Serve NOOP andfour freeflight64/64 pass.
-Native190.129s/CPU16.694s;all1,059/238/242 pins,1,298 distinct,240 exactsource/
-before/after arrays,210 oracle joins/168 features,one guard/nine sealed files
-and both terminal services/completion journals pass. No failure/retry/repair.
-All old models/collectors stay closed; no new native allocation is selected.
+The [RGB-event learner](results/2026-11-10-breakout-world-rgb-event-heads-learning.md)
+remains closed3/3 dense,12.13% morenative time. Its [broader assessment](results/2026-11-10-breakout-world-rgb-event-heads-branches.md)
+fails:primary.142943 vsrequired<=.127127,ending16/32 Brier.329116/.331428,
+RIGHT16.818743 versuszero,201/304 nonending alarms>5%. Its [saved decomposition](results/2026-11-10-breakout-world-rgb-event-heads-survival.md)
+finds improved wall-feature residuals butpersistent serving errors;oracle weights
+are diagnostic only,not learned repairs orpassing scores. Original failures and
+separate repairs remain inlinked reports. All completed stages stayclosed.
 
-The [RGB event-head learner](results/2026-11-10-breakout-world-rgb-event-heads-learning.md) closes3/3 dense:103/112,99/109,71/109,52/107,30/114,8/95 versusearly
-106/112,101/109,66/109,53/107,25/114,11/95. Native2,064.391s/loop2,233.998s
-versus1,841.013s/1,998.783s (1.121334x/1.117679x). No consistent ball/efficiency
-gain or adoption. All240/172/46/180 pins,485 distinct,bit-exact240 initial/first/
-frozen arrays,18 restore arrays,80 changed weights,16,384 finite13-report rows,
-counts/plan,384 initial origins/58 exports,two guards/18 sealed files andall four
-terminal services/journals pass. Five final figures reviewed;drifting/diffuse/
-missing long ball paths persist. Original2k syntax failure and separatev2 CPU
-completion remain;no learner/restore/observer/final audit/image job fails/repeats.
-
-Reuse qualified native45633605/SHAf71e9354 at
-`/x/Temp/kindle-world-rgb-event-heads-20261110`,exact runtime/runner,Auto.
-Default-off h/z plusshared-CNN own decoded RGB changes twohead matrices640→896,
-+32,768 scalars,80/636,683/240. Local width16,two-image history,RGB3 replay,
-encoder/RSSM andraw prior chronology stay. Explicitv28 binds flag/geometry/v25/v18;
-whole-agent/unqualified compositions reject beforeGPU. [native qualification](results/2026-11-10-breakout-world-rgb-event-heads.md) remains closed;
-retain original build/formatter/F64/late-observer failures andseparate checks.
-Its3,133,976,576-byte build cache isalready released; no rebuild needed.
-
-Earlier wider-motion,posterior-history,position/color,coordinates,image-feedback
-and other failed recipes stay closed. Full physics,serve/collisions,natural
-events,persistent brick memory,late/tunnel/second-wall/above-top coverage,
+Retain native45633605/SHAf71e9354 andmatching runtime/runner at
+`/x/Temp/kindle-world-rgb-event-heads-20261110` as the existing reference.
+Its qualification and3.13GB build-cache release areclosed. New objective needs
+its own matching package;do not mixoverlays. Earlier failed recipes,launch
+coverage/counts andcollectors mustnot repeat. Full physics/serve/collisions,
+natural events,persistent brick memory,late/tunnel/second-wall/above-top coverage,
 untouched families andfresh confirmation remain. Actor/critic,CDP andfive-game
-work stay parked. No unchanged extension,broad seed campaign orautomatic successor.
+work stayparked.
 
 ## Preserved source and fresh-machine setup
 
