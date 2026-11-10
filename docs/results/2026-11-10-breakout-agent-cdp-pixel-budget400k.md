@@ -56,7 +56,21 @@ entropy .61. 404 online episodes with guided play, mean 75.3 (50k buckets:
 | Retained CDP (reference) | 4000001009 | greedy | 24 | 173.708 | | | | | 0/24 |
 | Retained CDP (evaluated here) | 4000022003 | sampled | 24 | 120.625 | 120.625 | 90 | 365 | 10 | 0/24 |
 | Retained CDP (evaluated here) | 4000022003 | greedy | 24 | 150.750 | 150.750 | 114 | 384 | 15 | 0/24 |
-| Pixel world 64x64 | both | both | PIXEL400K | | | | | | |
+| Pixel world 64x64 | 4000001009 | sampled | 26 | 83.615 | 87.667 | 77 | 238 | 6 | 0/26 |
+| Pixel world 64x64 | 4000001009 | greedy | 25 | **185.160** | 189.958 | 160 | 404 | 19 | 0/25 |
+| Pixel world 64x64 | 4000022003 | sampled | 24 | 100.917 | 100.917 | 66 | 359 | 7 | 0/24 |
+| Pixel world 64x64 | 4000022003 | greedy | 24 | **158.625** | 158.625 | 148 | 349 | 19 | 0/24 |
+
+The pixel world's 400k life (root `/x/Temp/kindle-breakout-pixel64-400k-20261110`,
+20:25 to 21:30 UTC) took 3,902.7 s (65m03s), 24,977 updates, 102.5 actions/s,
+VRAM 9.5 GiB; its 200k recovery checkpoint reproduces the matched 64x64 life
+bit for bit (update 12,477: reconstruction 2,735.49, prior rollout 2,827.57).
+At 400k: reconstruction 2,756, prior rollout 2,811, exploration .02, reward
+.04, KL 17.1; imagined return mean 16.1, return scale 23.6, policy entropy
+.77; 467 online episodes, guided mean 67.5 (50k buckets 33.9, 52.9, 93.6,
+65.9, 64.1, 92.0, 96.4, 116.8). Greedy 400k sorted on cohort 1009: 46, 52,
+70, 76, 92, 94, 118, 119, 124, 126, 144, 158, 160, 167, 168, 168, 182, 186,
+246, 298, 321, 346, 370, 394, 404.
 
 Actual-initial controls of the 400k life on cohort 4000001009: sampled 1.286
 (28 episodes), greedy 2.071 (28); identical weights to the 200k life's
@@ -92,6 +106,15 @@ scale 1 therefore does not improve the retained CDP recipe at either fixed
 budget once both cohorts are counted; it narrows cohort variation and
 raises the 200k greedy score on the new cohort, nothing more.
 
-The question the pure pixel world leaves open, whether its consistent 200k
-greedy edge survives the 400k budget, is answered by the fourth job of the
-amended protocol (PIXEL400K_READING).
+The pure pixel world's greedy edge survives the 400k budget on both
+cohorts (185.2 against 173.7 and 158.6 against 150.8), narrower than at 200k
+(7% and 5% against 9% and 60%), and its sampled deficit persists (83.6
+against 92.8 and 100.9 against 120.6). Across every seed, cohort and budget
+tried today, five pairs in all, the pixel objective beats centered CDP in
+greedy play and loses in sampled play, at 1.5 times the training time per
+action. No learner reached a two-wall episode; the pixel world's 404 is the
+closest. The remaining question is the sampled mode: the pixel-world
+learners have the sharper greedy policies and the wider gap between their
+greedy and sampled scores, so their policy distributions are flatter where
+it matters; whether actor unimix, the entropy scale or the imitation weight
+closes that gap is a separate experiment, not a conclusion here.

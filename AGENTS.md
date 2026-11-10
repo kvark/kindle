@@ -97,10 +97,13 @@ and 102.840 / 134.519, greedy second) in two-thirds of the time (43.6 against
 65.5 minutes; root `/x/Temp/kindle-breakout-cdp-pixel-400k-20261110`, unit
 finished), so the auxiliary does not improve the retained recipe at a fixed
 budget. The pure pixel world's 400k life (root
-`/x/Temp/kindle-breakout-pixel64-400k-20261110`, unit
-`kindle-breakout-pixel64-400k-20261110.service`) is running to close the
-comparison. Still development seeds on reused cohorts, 0 two-wall episodes.
-First-run root
+`/x/Temp/kindle-breakout-pixel64-400k-20261110`, unit finished, 65 minutes)
+scores **185.160 greedy / 83.615 sampled** on cohort 1009 and **158.625 /
+100.917** on cohort 22003 against CDP's 173.708 / 92.792 and 150.750 /
+120.625: across all five seed/cohort/budget pairs tried, the pixel objective
+wins greedy and loses sampled, at 1.5 times the training time. Still
+development seeds on reused cohorts; 0 two-wall episodes anywhere (best
+single episode 404). No run is active; the GPU is free. First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
 on any checkpoint). These are development screens on reused seed 41001 and
