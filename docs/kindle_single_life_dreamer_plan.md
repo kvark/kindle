@@ -44,11 +44,13 @@ rollout, retained guidance, no CDP and no exploration bonus; 12,469 updates
 in 31 minutes) is a negative result: frozen sampled 4.760 / greedy 4.785 on
 cohort 4000022003 (initial 1.250 / 2.167) against retained CDP 1009's 94.625
 greedy / 70.500 sampled and fresh CDP 22003's 75.250 / 44.708, with guided
-online returns averaging 34.5 that the frozen policy does not carry. The
-world objective and the missing bonus are confounded; a bonus-decoupled
-matched run and a CDP-plus-pixel-rollout auxiliary run are the cheapest next
-checks, not yet launched. Root `/x/Temp/kindle-breakout-world96-agent-20261110`
-(unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
+online returns averaging 34.5 that the frozen policy does not carry. That
+run was not matched: it also changed model size, resolution, batch geometry,
+guidance labels, actor unimix, the dynamics rate and the replay-value scale
+and dropped the action-effects bonus (protocol correction recorded). The
+matched follow-up keeps the retained 12M/64/B16/T16 recipe and swaps only the
+world objective (runner now allows the bonus with a pixel world). Root
+`/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
 on any checkpoint). These are development screens on reused seed 41001 and
 reused origins, not held-out qualification. CDP and the five-game campaign

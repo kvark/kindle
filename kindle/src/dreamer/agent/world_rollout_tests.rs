@@ -20,6 +20,30 @@ fn with_rollout() -> DreamerConfig {
     c
 }
 
+fn with_rollout_and_bonus() -> DreamerConfig {
+    let mut c = with_rollout();
+    c.disagreement_bonus = true;
+    c.intrinsic_reward_scale = 1.0;
+    c
+}
+
+#[test]
+fn agent_world_rollout_accepts_the_action_effects_bonus_without_cdp() {
+    let c = with_rollout_and_bonus();
+    assert!(c.check().is_ok());
+    assert!(!c.is_cdp() && c.uses_disagreement());
+    let graph = world::build_training_graph(&world_training_config(&c), 4);
+    assert!(graph.outputs().len() > world::LOSS_WORLD_ROLLOUT);
+    let heads = graph
+        .nodes()
+        .iter()
+        .filter(|n| matches!(&n.op, Op::Parameter { name } if name.starts_with("world.exploration.")))
+        .count();
+    assert!(heads > 0);
+    let imagination = world::build_imagination_graph(&c);
+    assert_eq!(imagination.outputs().len(), world::IMAGINATION_BONUS + 1);
+}
+
 #[test]
 fn agent_world_rollout_requires_a_plain_rgb_world_with_full_bptt() {
     let c = with_rollout();
@@ -141,7 +165,16 @@ fn fixture(config: &DreamerConfig, rng: &mut StdRng) -> SequenceBatch {
 #[test]
 #[ignore = "builds and runs all Dreamer GPU sessions"]
 fn tiny_rgb_agent_trains_a_prior_image_rollout() {
-    let config = with_rollout();
+    tiny_rgb_agent_trains(with_rollout());
+}
+
+#[test]
+#[ignore = "builds and runs all Dreamer GPU sessions"]
+fn tiny_rgb_agent_trains_a_prior_image_rollout_with_the_bonus() {
+    tiny_rgb_agent_trains(with_rollout_and_bonus());
+}
+
+fn tiny_rgb_agent_trains(config: DreamerConfig) {
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     let mut core = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
     let mut rng = StdRng::seed_from_u64(701);

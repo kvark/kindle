@@ -783,8 +783,9 @@ def main():
         parser.error("centered CDP requires --cdp and full-batch world training")
     if not math.isfinite(args.disagreement_scale) or args.disagreement_scale < 0:
         parser.error("disagreement-scale must be finite and non-negative")
-    if args.disagreement_scale and not args.cdp:
-        parser.error("disagreement requires fresh CDP")
+    pixel_world = args.world_pixel_loss is not None or args.world_prediction_length is not None
+    if args.disagreement_scale and not args.cdp and not (pixel_world and learned_rgb and not args.restore):
+        parser.error("disagreement requires fresh CDP or a fresh learned-RGB pixel world objective")
     if args.replay_capacity <= 0:
         parser.error("replay-capacity must be positive")
     if args.encoder_training and (learned_rgb or args.encoder == "levjepa"

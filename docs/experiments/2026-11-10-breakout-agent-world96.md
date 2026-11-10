@@ -38,3 +38,16 @@ state-only RGB world; parity or a loss would say the world's forecast quality
 is not the limiting factor for play at this budget, or that 4M at 96x96 costs
 too much imagination throughput. Report aggregate actions, emulator frames,
 updates, wall time and the usual two-wall count.
+
+## Correction (November 10, after the run)
+
+The recipe paragraph above is wrong about what it matched. The retained
+Breakout learner (`/x/Temp/kindle-breakout-replay-value1-20261102/full/
+breakout-12m-64-b16-r16-replayvalue1-expert100-200k-seed1009/queue.json`)
+trains 12M at 64x64 with B16/T16, centered CDP, the action-effects bonus
+(scale 1), corrective guidance labels, actor unimix .01, encoder rate 4e-5,
+dynamics rate 4e-4 (the CDP default), behavior rate 8e-5 and replay-value
+scale 1. This run used 4M at 96x96 with B8/T32, no CDP, no bonus, plain
+guidance labels, actor unimix 0, one 4e-5 rate for every group and replay-value
+scale .3. Its result therefore does not isolate the world objective; the
+[matched protocol](2026-11-10-breakout-agent-world96-matched.md) does.

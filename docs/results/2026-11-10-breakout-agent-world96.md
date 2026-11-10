@@ -54,12 +54,15 @@ cohort, and far below its own guided online returns (34.5 mean), so the
 frozen policy does not carry what the teacher-aided play showed. This is one
 development seed; it says the state-only pixel world, as wired into the
 agent here, is not a drop-in replacement for the CDP objective at the 200k
-budget. Two differences from the retained recipe are confounded and neither
-is isolated: the world objective (pixel cross-entropy plus a 16-step image
-rollout at 96x96 with the 4M preset instead of centered CDP) and the missing
-action-effects exploration bonus. The update count matches (12,469 against
-the retained learner's 12,477 at the same budget); only the wall time differs
-(31 against 21 minutes). The world losses are dominated by pixels
+budget. The protocol claimed to match the retained recipe except for the world
+objective; it did not (see the protocol's correction). Against the retained
+12M/64/B16/T16 learner this run also changed the model size (4M), the
+resolution (96), the batch geometry (B8/T32), the guidance labels (plain
+instead of corrective), actor unimix (0 instead of .01), the dynamics rate
+(4e-5 instead of CDP's 4e-4), and the replay-value scale (.3 instead of 1),
+and dropped the action-effects bonus. None of these is isolated. The update
+count matches (12,469 against the retained learner's 12,477 at the same
+budget); only the wall time differs (31 against 21 minutes). The world losses are dominated by pixels
 (6,200 + 6,450 against reward .11 and continuation .02), and the imagined
 return mean stayed under 7 throughout, so the critic saw little reward
 signal in imagination; whether the latent that renders the ball is also the
@@ -67,8 +70,7 @@ latent the actor needs remains an open question that the standalone forecast
 metrics cannot answer. The greedy stalls (15 truncations) match the earlier
 Breakout greedy behaviour of not firing after a lost life.
 
-Not established: that a better world forecast improves play, that the bonus
-or the update count explains the gap, or anything about other seeds. The
-cheapest next checks are a matched run with the exploration bonus decoupled
-from CDP, and a run that keeps CDP and adds the pixel rollout as an
-auxiliary loss, both on this seed and cohort before any wider claim.
+Not established: that a better world forecast improves play, which of the
+listed differences explains the gap, or anything about other seeds. The
+[matched follow-up](2026-11-10-breakout-agent-world96-matched.md) keeps the
+retained recipe and swaps only the world objective (with the bonus kept).
