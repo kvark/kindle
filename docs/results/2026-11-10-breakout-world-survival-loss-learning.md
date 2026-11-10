@@ -1,8 +1,15 @@
-# Cumulative-survival world learner: active fixed comparison
+# Cumulative-survival world learner: paused fixed comparison
 
-One fresh16,384-update learner is active under the [fixed protocol](../experiments/2026-11-10-breakout-world-survival-loss-learning.md).
+The fresh16,384-update learner is paused under the [fixed protocol](../experiments/2026-11-10-breakout-world-survival-loss-learning.md).
 No final score or event benefit is established. The full Breakout world-model
-goal remains active and unproven.
+goal remains paused and unproven.
+
+At the user's request on November10 at04:00:46 UTC,freeze the original learner
+and both monitors in place. Last logged update9,964;exact live optimizer age is
+not independently measured. Same process/invocation,memory and RNG state remain;
+no checkpoint restore or restart. The subsequent storage cleanup verifies all
+three remain frozen and all280 protected input hashes unchanged. On a requested
+resume,review wall-clock caps before thawing;cleanup does not authorize resume.
 
 Root `/x/Temp/kindle-world-survival-loss-learning-20261110`.
 Scientific source06971ff6c880636d8ef52bd947b7b7d6e6fd5185;

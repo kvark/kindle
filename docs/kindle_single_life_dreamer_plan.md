@@ -1,15 +1,20 @@
 # Kindle: CDP learning roadmap
 
-One fresh fixed16,384-update cumulative-survival world learner is active. Native qualification and startup checks pass; no final learning or calibration result is claimed. The full Breakout world-model goal remains unproven.
+The fixed16,384-update cumulative-survival world learner is paused at the user's request, last logged9,964. Native qualification and startup checks pass; no final learning or calibration result is claimed. The full Breakout world-model goal remains unproven.
 
 ## Selected direction: Breakout world model in isolation
 
-The goal **prove the world model training on Breakout** remains active and
-unproven. One fresh [cumulative-survival learner](results/2026-11-10-breakout-world-survival-loss-learning.md)
-is active under its [fixed protocol](experiments/2026-11-10-breakout-world-survival-loss-learning.md).
+The goal **prove the world model training on Breakout** remains paused and
+unproven. The fresh [cumulative-survival learner](results/2026-11-10-breakout-world-survival-loss-learning.md)
+is frozen at the user's request under its [fixed protocol](experiments/2026-11-10-breakout-world-survival-loss-learning.md).
 Root `/x/Temp/kindle-world-survival-loss-learning-20261110`; final16,384 updates,
 no extension/sweep, collector, automatic assessment or successor. Actor/critic,
 CDP and the five-game campaign stay parked.
+
+Paused at04:00:46 UTC November10, last logged9,964/16,384. The original learner
+and both monitors retain their PIDs/invocations, memory and RNG state; exact live
+optimizer age is unmeasured. No thaw or restart is authorized by cleanup. Review
+wall-clock supervision before resuming at the user's request.
 
 Only `world_survival_scale=10` is added to the previous RGB-event effective
 config:1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,RGB100,rates4e-4,KL1/.1/freeNat1,
@@ -20,7 +25,7 @@ frames. Source06971ff6;native64324882/SHA1966cae4,exact runtime/runner at
 
 Startup passes all239 execution pins,240 actual-initial and240 age1 tensors
 byte-exact to the qualifier,andall14 first reports. Original queue/observer/CPU
-audit services are active; consult the result report and launch receipts for
+audit services are frozen in place; consult the result report and launch receipts for
 exact identity. Continue the existing worker,never restart on observer timeout.
 Final dense/restore/audit checks remain pending. Falling training Brier and
 zero-positive natural point slices do not establish cumulative calibration.

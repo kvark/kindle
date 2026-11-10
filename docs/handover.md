@@ -6,26 +6,34 @@ and [PR31](https://github.com/kvark/kindle/pull/31) for the live dashboard.
 The five-game goal remains unfinished. Detailed experiment history belongs in
 those reports; historical “next” paragraphs do not authorize restarting jobs.
 
-The [November 9 storage cleanup](results/2026-11-09-temp-cleanup.md) recovers
-about 137 GB across five passes. The [November 10 pass](results/2026-11-10-temp-cleanup.md)
-recovers another 671 MB from duplicates and regenerable bytecode, preserving
-all checkpoints and evidence. All 8,054 large artifact paths and 670 current/
-retained-runtime hashes verify; about 268.7 GiB remains available on the root
-filesystem. Retained artifacts may share hardlinks and contain sparse zero
-blocks; keep their bytes immutable. A verified 4.48 GB older-log archive is
-prepared at `/x/Artifacts/kindle-log-archive-20261110`; removing its 2,478
-original logs would recover 29.15 GB net. The user's archive choice is pending,
-all originals remain, and the prepared copy currently uses additional space.
-The cleanup report links its manifest and restoration command.
+The [latest old-run/worktree cleanup](results/2026-11-10-storage-cleanup.md)
+increases available space39.41 GB to316.20 GB(294.48 GiB) at completion.
+Remove Meganeura's6.93 GB Cargo cache,three obsolete source worktrees,two stale
+registrations,the unused plotting environment and393 empty old output directories.
+All dirty/untracked worktree source has verified archives and tested recovery;
+commits/branches remain reachable. Retain the patched Naga dependency.
+
+The2,478 older logs now live in the verified4.48 GB archive at
+`/x/Artifacts/kindle-log-archive-20261110`;restore before checking an old original
+pathname. Models,shared checkpoints,current runtimes/data and280 protected input
+hashes remain intact. The learner and both monitors stay frozen. Cleanup and
+recovery receipts: `/x/Artifacts/kindle-storage-cleanup-20261110`.
+Earlier137 GB and671 MB cleanup passes remain recorded in their linked reports.
+Retained artifacts can share hardlinks/sparse blocks;keep their bytes immutable.
 
 ## Current work — November 10
 
-The goal **prove the world model training on Breakout** remains active and
-unproven. One fresh [cumulative-survival learner](results/2026-11-10-breakout-world-survival-loss-learning.md)
-is active under its [fixed protocol](experiments/2026-11-10-breakout-world-survival-loss-learning.md).
+The goal **prove the world model training on Breakout** remains paused and
+unproven. The fresh [cumulative-survival learner](results/2026-11-10-breakout-world-survival-loss-learning.md)
+is frozen at the user's request under its [fixed protocol](experiments/2026-11-10-breakout-world-survival-loss-learning.md).
 Root `/x/Temp/kindle-world-survival-loss-learning-20261110`; final16,384 updates,
 no extension/sweep, collector, automatic assessment or successor. Actor/critic,
 CDP and the five-game campaign stay parked.
+
+Paused at04:00:46 UTC November10, last logged9,964/16,384. The original learner
+and both monitors retain their PIDs/invocations, memory and RNG state; exact live
+optimizer age is unmeasured. No thaw or restart is authorized by cleanup. Review
+wall-clock supervision before resuming at the user's request.
 
 Only `world_survival_scale=10` is added to the previous RGB-event effective
 config:1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,RGB100,rates4e-4,KL1/.1/freeNat1,
@@ -36,7 +44,7 @@ frames. Source06971ff6;native64324882/SHA1966cae4,exact runtime/runner at
 
 Startup passes all239 execution pins,240 actual-initial and240 age1 tensors
 byte-exact to the qualifier,andall14 first reports. Original queue/observer/CPU
-audit services are active; consult the result report and launch receipts for
+audit services are frozen in place; consult the result report and launch receipts for
 exact identity. Continue the existing worker,never restart on observer timeout.
 Final dense/restore/audit checks remain pending. Falling training Brier and
 zero-positive natural point slices do not establish cumulative calibration.

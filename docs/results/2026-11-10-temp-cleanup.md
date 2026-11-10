@@ -39,9 +39,11 @@ roughly 28.9 GB of potential savings; actual compression is not yet measured for
 the full set. Temporary sample copies are released; their hashes, sizes and
 source paths remain recorded.
 
-The user has been asked whether older evidence may move into verified compressed
-archives, requiring extraction before reuse. **That choice is pending; no original
-log has been removed or archived in place.** The proposed file inventory is
+At this preparation stage, the user was asked whether older evidence could move
+into verified compressed archives, requiring extraction before reuse. No original
+was removed then. The later explicit cleanup request is now completed in the
+[old-run/worktree cleanup](2026-11-10-storage-cleanup.md), using this verified
+archive. The original proposed file inventory remains
 `/x/Artifacts/kindle-temp-cleanup-20261110/log-archive-plan.json`.
 Any archival pass must retain original content hashes, path/metadata mappings
 and a restoration command, and verify decompressed contents before removing an
@@ -58,7 +60,9 @@ The compressed archive is **4,476,480,704 bytes (4.48 GB)**. Five selected paths
 share inodes with other retained paths; allowing for those remaining links and
 the archive's allocation, removing the selected originals would reclaim
 **29,154,574,336 allocated bytes (29.15 GB / 27.15 GiB) net**. No such removal
-has been performed: the prepared copy currently uses additional space.
+was performed at preparation time: the prepared copy then used additional space.
+The subsequent cleanup now removes the selected originals after re-verification;
+see the linked completion report above for actual recovery measurements.
 
 Archive, per-file content hashes/metadata, verification log and restoration
 script are retained at `/x/Artifacts/kindle-log-archive-20261110`.
@@ -74,5 +78,6 @@ The same command with `--destination /x/Temp` restores the original log paths
 after archival. It verifies the archive and restored content hashes and restores
 recorded permissions, extended attributes and timestamps. Source hardlinks
 restore as independent files. Checkpoints, replay, source, runtime packages and
-all `kindle-world-*` roots remain outside this archive. The archive choice is
-still pending; no additional space recovery is claimed.
+all `kindle-world-*` roots remain outside this archive. This preparation receipt
+does not itself claim recovery; the separate completion report records the
+subsequent original-path retirement and recovery.
