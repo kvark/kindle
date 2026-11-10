@@ -82,9 +82,15 @@ held-out qualification, 0 two-wall episodes. Root
 (`world_pixel_scale`, `--world-pixel-scale`) scores greedy 104.036 / sampled
 61.692 at scale 1 (the most balanced learner; CDP loss still falls to .056)
 and 68.292 / 47.667 at scale .1 (the objectives interfere); root
-`/x/Temp/kindle-breakout-cdp-pixel-aux-20261110` (unit finished). Every one
-of these is seed 1009 on cohort 4000022003; a second-seed confirmation
-(seed 22003, against fresh CDP 22003's 75.250 / 44.708) is the next run.
+`/x/Temp/kindle-breakout-cdp-pixel-aux-20261110` (unit finished). The
+[second seed](results/2026-11-10-breakout-agent-pixel-seed22003.md)
+(22003, root `/x/Temp/kindle-breakout-pixel-seed22003-20261110`, unit
+finished) holds the pattern against fresh CDP 22003's 75.250 / 44.708: pixel
+world 99.259 / 28.375, CDP plus pixel at scale 1 **101.040 / 68.280**.
+Two-seed means, greedy / sampled: CDP 84.9 / 57.6, pixel world 125.2 / 34.3,
+CDP plus pixel 102.5 / 65.0; the combined learner is the only one above CDP
+in both modes and the most seed-stable. Still two development seeds on one
+reused cohort, 0 two-wall episodes, 33 minutes per 200k against CDP's 21.
 First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
