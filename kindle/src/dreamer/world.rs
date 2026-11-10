@@ -63,6 +63,7 @@ pub(crate) const LOSS_PREDICTIVE_WORLD: usize = 26;
 pub(crate) const LOSS_RECURRENT_WORLD: usize = 30;
 pub(crate) const LOSS_IMAGE_FEEDBACK: usize = 34;
 pub(crate) const LOSS_WORLD_CENTROID: usize = 37;
+pub(crate) const LOSS_WORLD_SURVIVAL: usize = 39;
 pub(crate) const CLEAN_PRIOR_VALID_FRACTION: usize = 36;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
@@ -1350,6 +1351,10 @@ fn training_graph(
             total = graph.add(total, reward);
             total = graph.add(total, continuation);
         }
+        if let Some(survival) = rollout.survival {
+            let scaled = graph.scale(survival, config.world_survival_scale.unwrap());
+            total = graph.add(total, scaled);
+        }
         if let Some([centroid, _]) = rollout.centroid {
             let scaled = graph.scale(
                 centroid,
@@ -1497,6 +1502,12 @@ fn training_graph(
                 outputs.push(graph.scalar(0.0));
             }
             outputs.extend(events);
+        }
+        if let Some(survival) = rollout.survival {
+            while outputs.len() < LOSS_WORLD_SURVIVAL {
+                outputs.push(graph.scalar(0.0));
+            }
+            outputs.push(survival);
         }
         if let Some(centroid) = rollout.centroid {
             while outputs.len() < LOSS_WORLD_CENTROID {

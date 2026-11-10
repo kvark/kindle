@@ -349,6 +349,9 @@ pub struct DreamerConfig {
     /// Standalone world: read shared-CNN features of decoded RGB in event heads.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_event_heads: bool,
+    /// Standalone RGB-event world: Brier loss on cumulative imagined survival.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub world_survival_scale: Option<f32>,
     /// Standalone spatial world: encode generated images into the imagined belief.
     #[serde(default, skip_serializing_if = "is_false")]
     pub world_image_feedback: bool,
@@ -548,6 +551,7 @@ impl DreamerConfig {
             rgb_late_action: false,
             rgb_wide_motion: false,
             rgb_event_heads: false,
+            world_survival_scale: None,
             world_image_feedback: false,
             rgb_coordinates: false,
             rgb_latent_only: false,
@@ -805,6 +809,13 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if let Some(scale) = self.world_survival_scale
+            && (!scale.is_finite() || scale <= 0.0 || !self.rgb_event_heads)
+        {
+            return Err(
+                "world survival scale requires positive finite scale and RGB event heads".into(),
+            );
+        }
         if self.rgb_event_heads
             && (self.model_size != ModelSize::Size1M
                 || self.observation_kind != ObservationKind::Rgb64

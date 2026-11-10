@@ -10,6 +10,20 @@ sys.path.insert(0, str(Path(__file__).parents[1]/'examples'))
 import breakout_world_corpus as corpus
 
 
+def test_cumulative_survival_report_preserves_components_and_adds_its_own_scale():
+    base = corpus.report_names('motion_event_rollout', 16)
+    assert len(base) == 13
+    assert corpus.report_names('motion_event_rollout', 16, survival=True) == base+('rollout_survival_brier',)
+    scales = dict(reconstruction=100., dynamics=2., representation=.1, reward=3., continuation=4.)
+    values = [0.,1.,2.,3.,4.,5.,0.,0.,0.,6.,.5,7.,8.]
+    config = dict(loss_scales=scales)
+    expected = corpus.reported_total(config, values, 'motion_event_rollout', 16)
+    assert corpus.reported_total(config | dict(world_survival_scale=10.), values+[.125],
+                                 'motion_event_rollout', 16) == expected+1.25
+    for objective, horizon in [('motion_event_rollout', 0), ('motion_event_rollout', 32), ('motion_cross_entropy', 16)]:
+        with pytest.raises(ValueError): corpus.report_names(objective, horizon, survival=True)
+
+
 @pytest.mark.parametrize("objective",corpus.PREDICTIVE_OBJECTIVES)
 def test_predictive_reports_keep_observed_indices_and_add_energy_diagnostics(objective):
     assert corpus.report_names('motion_cross_entropy',0)==corpus.LOSS_NAMES[:9]

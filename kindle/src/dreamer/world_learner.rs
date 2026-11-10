@@ -18,6 +18,7 @@ mod action_features;
 mod frozen_visual;
 mod late_action;
 mod rgb_event_heads;
+mod survival;
 mod wide_motion;
 use frozen_visual::TrainingScope;
 mod fixed_teacher;
@@ -166,6 +167,9 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    if let Some(base) = survival::base_metadata(metadata)? {
+        return checkpoint_pixel_loss(&base);
+    }
     if let Some(base) = rgb_event_heads::base_metadata(metadata)? {
         return checkpoint_pixel_loss(&base);
     }
@@ -750,6 +754,7 @@ impl WorldModelLearner {
         pixel_loss: PixelLoss,
         fixed_teacher: Option<TeacherAnchor>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        survival::validate(&config, prediction_length, pixel_loss)?;
         rgb_event_heads::validate(&config, prediction_length, pixel_loss)?;
         wide_motion::validate(&config, prediction_length, pixel_loss)?;
         late_action::validate(&config, prediction_length, pixel_loss)?;
@@ -1245,6 +1250,12 @@ impl WorldModelLearner {
                 losses.push(loss[0]);
             }
         }
+        if self.config.world_survival_scale.is_some() {
+            let mut loss = [0.0];
+            self.train
+                .read_output_by_index(world::LOSS_WORLD_SURVIVAL, &mut loss);
+            losses.push(loss[0]);
+        }
         if self.pixel_loss.clean_prior() {
             let mut fraction = [0.0];
             self.train
@@ -1570,6 +1581,10 @@ impl WorldModelLearner {
         if self.config.rgb_event_heads {
             assert_eq!(self.training_scope, TrainingScope::All);
             rgb_event_heads::wrap_metadata(&mut metadata)?;
+        }
+        if self.config.world_survival_scale.is_some() {
+            assert_eq!(self.training_scope, TrainingScope::All);
+            survival::wrap_metadata(&mut metadata)?;
         }
         if let Some(anchor) = &self.fixed_teacher {
             let (parameters, scalars) = anchor.verify(&self.observe)?;

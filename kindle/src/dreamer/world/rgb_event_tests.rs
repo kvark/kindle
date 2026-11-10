@@ -15,6 +15,11 @@ fn ancestors(g: &Graph, n: NodeId) -> HashSet<NodeId> {
 
 #[test]
 fn rgb_event_suffix_reads_own_images_but_never_corrects_prior_states() {
+    suffix_causality(None);
+    suffix_causality(Some(10.));
+}
+
+fn suffix_causality(survival_scale: Option<f32>) {
     // A reduced graph fixture exercises the shared readout wiring, not a
     // supported production preset. Public construction is separately restricted.
     let mut c = DreamerConfig::tiny(3);
@@ -23,6 +28,7 @@ fn rgb_event_suffix_reads_own_images_but_never_corrects_prior_states() {
     c.rgb_spatial_fusion = true;
     c.rgb_spatial_action = true;
     c.rgb_event_heads = true;
+    c.world_survival_scale = survival_scale;
     c.value_bins = 5;
     let mut g = Graph::new();
     let b = c.batch_size;
@@ -65,7 +71,14 @@ fn rgb_event_suffix_reads_own_images_but_never_corrects_prior_states() {
         assert!(seen.iter().all(|&n|!matches!(&g.node(n).op,Op::Input{name} if name.starts_with("truth_") || name.starts_with("pixel_rollout_weight_"))));
     }
     let [reward, continuation] = rollout.events.unwrap();
-    let events = g.add(reward, continuation);
+    let mut events = g.add(reward, continuation);
+    if let Some(loss) = rollout.survival {
+        let seen = ancestors(&g, loss);
+        assert!(continuations.iter().all(|n| seen.contains(n)));
+        assert!(images.iter().all(|n| !seen.contains(n)));
+        assert!(rollout.predictions.iter().all(|n| seen.contains(n)));
+        events = g.add(events, loss);
+    }
     for loss in [reward, continuation] {
         let seen = ancestors(&g, loss);
         assert!(rollout.predictions.iter().all(|n| seen.contains(n)));

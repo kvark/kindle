@@ -5,6 +5,7 @@ use super::*;
 pub(super) struct PixelRollout {
     pub loss: NodeId,
     pub events: Option<[NodeId; 2]>,
+    pub survival: Option<NodeId>,
     pub centroid: Option<[NodeId; 2]>,
     #[cfg(test)]
     pub states: Vec<NodeId>,
@@ -18,6 +19,7 @@ pub(super) struct EventTargets<'a> {
 }
 
 mod feedback;
+pub(super) mod survival;
 
 pub(super) fn event_losses(
     graph: &mut Graph,
@@ -166,6 +168,8 @@ pub(super) fn build_with_centroid(
         .expect("RGB rollout requires decoder");
     let mut losses = Vec::new();
     let mut event_losses = Vec::new();
+    let mut survival_predictions = Vec::new();
+    let mut survival_weights = Vec::new();
     let mut centroid_losses = Vec::new();
     #[cfg(test)]
     let mut states = Vec::new();
@@ -298,6 +302,8 @@ pub(super) fn build_with_centroid(
             };
             let reward = model.heads.reward.forward(graph, event_state);
             let continuation = model.heads.continuation.forward(graph, event_state);
+            survival_predictions.push(continuation);
+            survival_weights.push(weight);
             event_losses.push(feedback::event_losses(
                 graph,
                 reward,
@@ -345,6 +351,19 @@ pub(super) fn build_with_centroid(
         };
         losses.push(loss);
     }
+    let survival = config.world_survival_scale.map(|_| {
+        let targets = targets
+            .as_ref()
+            .expect("survival loss requires event targets");
+        survival::build(
+            graph,
+            &survival_predictions,
+            targets.continuation,
+            &survival_weights,
+            config.continuation_discount(),
+            batch,
+        )
+    });
     let loss = sum(graph, &losses);
     let loss = graph.scale(loss, 1.0 / (batch * actions.len()) as f32);
     let events = targets.map(|_| {
@@ -357,6 +376,7 @@ pub(super) fn build_with_centroid(
     PixelRollout {
         loss,
         events,
+        survival,
         centroid: centroid_head.map(|_| {
             [0, 1].map(|index| {
                 let values = centroid_losses

@@ -35,7 +35,11 @@ FIXED_IMAGE_OBJECTIVE = 'motion_fixed_teacher_image'
 PREDICTIVE_OBJECTIVES = (PREDICTIVE_OBJECTIVE, SCORE_FUNCTION_OBJECTIVE)
 
 
-def report_names(pixel_loss, prediction_length, *, color_centroid=False):
+def report_names(pixel_loss, prediction_length, *, color_centroid=False, survival=False):
+    if survival:
+        if pixel_loss != 'motion_event_rollout' or prediction_length != 16 or color_centroid:
+            raise ValueError('cumulative survival requires the H16 RGB-event objective')
+        return report_names(pixel_loss, prediction_length)+('rollout_survival_brier',)
     if color_centroid:
         if pixel_loss != 'motion_cross_entropy' or prediction_length <= 0:
             raise ValueError('world centroid requires a positive motion RGB suffix')
@@ -103,6 +107,9 @@ def reported_total(config, values, pixel_loss, prediction_length):
         result += scales['dynamics']*values[9]
     if pixel_loss in ('motion_image_feedback', 'motion_event_rollout', 'motion_clean_prior'):
         result += scales['reward']*values[11]+scales['continuation']*values[12]
+    if config.get('world_survival_scale') is not None:
+        assert len(values) == len(report_names(pixel_loss, prediction_length, survival=True))
+        result += config['world_survival_scale']*values[13]
     return result
 
 
@@ -320,7 +327,8 @@ def train(args, config, fitting, development, *, sampler=sampler_plan, initial_r
             native_seconds += time.monotonic()-tick
             keep = rollout_validity(batch['action'], args.prediction_length)
             assert len(values) == len(report_names(args.pixel_loss, args.prediction_length,
-                color_centroid=config.get('color_centroid_supervision') is not None))
+                color_centroid=config.get('color_centroid_supervision') is not None,
+                survival=config.get('world_survival_scale') is not None))
             if args.prediction_length and args.pixel_loss not in (RECURRENT_OBJECTIVE,FIXED_TEACHER_OBJECTIVE,FIXED_EVENTS_OBJECTIVE): assert values[10] == float(keep.mean())
             if args.pixel_loss == 'motion_clean_prior': assert values[13] == float((batch['action'] >= 0).mean())
             if args.pixel_loss in (FIXED_TEACHER_OBJECTIVE,FIXED_EVENTS_OBJECTIVE):
@@ -440,7 +448,8 @@ def initial_check(args, config, fitting, development, *, locations=None):
     values = learner.learn(pixels(batch['rgb'].astype(np.float32)/255-.5),
         *[batch[key].ravel().tolist() for key in ('action', 'reward', 'terminal')])
     assert len(values) == len(report_names(args.pixel_loss, args.prediction_length,
-        color_centroid=config.get('color_centroid_supervision') is not None)) and np.isfinite(values).all() and learner.updates == 1
+        color_centroid=config.get('color_centroid_supervision') is not None,
+        survival=config.get('world_survival_scale') is not None)) and np.isfinite(values).all() and learner.updates == 1
     if args.pixel_loss in PREDICTIVE_OBJECTIVES or args.pixel_loss == RECURRENT_OBJECTIVE:
         valid = rollout_validity(batch['action'],args.prediction_length) if args.pixel_loss == RECURRENT_OBJECTIVE else batch['action'] >= 0
         assert values[12] == float(valid.mean())
@@ -503,7 +512,8 @@ def main():
     fit_seeds = {row['seed'] for row in fit_manifest['files']}
     assert not fit_seeds.intersection(row['seed'] for row in dev_manifest['files'])
     write(args.output/'declaration.json', dict(mode=args.mode, config=config, loss_names=report_names(args.pixel_loss, args.prediction_length,
-        color_centroid=config.get('color_centroid_supervision') is not None),
+        color_centroid=config.get('color_centroid_supervision') is not None,
+        survival=config.get('world_survival_scale') is not None),
         prediction_length=args.prediction_length, pixel_loss=args.pixel_loss, steps=args.steps, eval_every=args.eval_every,
         source_sha256=sha(__file__), fitting_manifest_sha256=sha(args.dataset/'manifest.json'),
         development_manifest_sha256=sha(args.development/'manifest.json'), started_unix=time.time()))
