@@ -48,14 +48,23 @@ origins, against the control's 101/66/53/25/11, and predicts near-term brick
 hits where the spatial recipes never did. Its bricks blur (balanced error
 .32); a [fixed observed context frame](docs/results/2026-11-10-breakout-world-context-frame.md)
 (`rgb_context_lag` 8) keeps the scene sharp with the ball still in the state
-(1M, 16,384 updates: four-step 72/112, eight-step 32/112, brick error .011).
-The active run combines them: 4M preset, context frame, 65,536 updates
-(`train-96-context-4m-65k`, `guards-context-4m`, unit
-`kindle-world-scale-20261110.service`). Root `/x/Temp/kindle-world-scale-20261110`;
-driver `python/examples/breakout_world_scale.py` (`probe` mode runs the state
-readout on any checkpoint). These are development screens on reused seed 41001
-and reused development origins, not held-out qualification. Actor/critic, CDP
-and the five-game campaign stay parked.
+(1M, 16,384 updates: four-step 72/112, eight-step 32/112, brick error .011;
+4M at 16,384: four-step 74/112, eight-step 30/112, brick error .010, its 65k
+continuation stopped at that point and reproducible from `queue-96-context-4m.json`).
+Whole agents can now train this objective: `world_pixel_loss` and
+`world_prediction_length` (plain learned-RGB worlds, full BPTT) with runner
+flags `--world-pixel-loss`/`--world-prediction-length`. The active run is the
+[Breakout agent with the state-only 96x96 world objective](docs/experiments/2026-11-10-breakout-agent-world96.md):
+seed 1009, 200k actions, 4M/96/B8/T32/R16, motion cross-entropy, 16-step
+rollout, retained guidance, no CDP and no exploration bonus, frozen
+evaluations on cohort 4000022003 (unit `kindle-breakout-world96-agent-20261110.service`,
+root `/x/Temp/kindle-breakout-world96-agent-20261110`). References on that
+cohort: retained CDP 1009 94.625 greedy / 70.500 sampled, fresh CDP 22003
+75.250 / 44.708. World-model root `/x/Temp/kindle-world-scale-20261110`; driver
+`python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
+on any checkpoint). These are development screens on reused seed 41001 and
+reused origins, not held-out qualification. CDP and the five-game campaign
+stay parked.
 
 The previous [cumulative-survival learner](docs/results/2026-11-10-breakout-world-survival-loss-learning.md)
 remains frozen by systemd at the user's request at update 9,964/16,384
