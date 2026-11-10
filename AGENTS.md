@@ -22,7 +22,11 @@ available. Only the user merges PRs; commits and pushes are allowed.
 
 The goal **prove the world model training on Breakout** remains active and
 unproven. Select [the frozen chosen-action assessment](docs/experiments/2026-11-10-breakout-world-rgb-event-heads-branches.md) for separate preparation/declaration, using only the new
-final16,384 RGB event-head checkpoint; no new training or GPU job is active yet.
+final16,384 RGB event-head checkpoint. The separately declared frozen assessment
+is active; see [active assessment](docs/results/2026-11-10-breakout-world-rgb-event-heads-branches.md). Source79b71fb7,native45633605/SHAf71e9354,1,059 pins/394 oracle inputs,
+six cached controls,84 groups/history16/32/eight draws. Main61986139ea8d46f1a09809430d63e9e0/
+PID2270011 and observerc1e76d204fa646e4a83cee614c01bc87/PID2270018 are live-verified;
+cap1,800s,Auto/host guard,no emulator/learning/old-model query. No new learner is active.
 The3/3 dense result does not settle the intended event-calibration benefit.
 Keep original energy/ending/false-alarm gates and cached controls, including
 wider motion; query no old model or emulator. Root
