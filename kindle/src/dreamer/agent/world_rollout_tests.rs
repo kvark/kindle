@@ -20,6 +20,57 @@ fn with_rollout() -> DreamerConfig {
     c
 }
 
+fn cdp_with_pixels() -> DreamerConfig {
+    let mut c = with_rollout();
+    c.loss_scales.reconstruction = 0.0;
+    c.loss_scales.future_prediction = 1.0;
+    c.cdp_centered = true;
+    c.world_pixel_scale = 1.0;
+    c
+}
+
+#[test]
+fn cdp_world_trains_an_auxiliary_pixel_decoder_and_rollout() {
+    let c = cdp_with_pixels();
+    assert!(c.check().is_ok(), "{:?}", c.check());
+    assert!(c.is_cdp() && c.trains_pixels() && c.pixel_scale() == 1.0);
+    assert_eq!(
+        serde_json::from_value::<DreamerConfig>(serde_json::to_value(&c).unwrap()).unwrap(),
+        c
+    );
+    let names = |g: &Graph| {
+        g.nodes()
+            .iter()
+            .filter_map(|n| match &n.op {
+                Op::Parameter { name } => Some(name.clone()),
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+    };
+    let graph = world::build_training_graph(&world_training_config(&c), 4);
+    let parameters = names(&graph);
+    assert!(parameters.iter().any(|n| n.starts_with("world.decoder.")));
+    assert!(parameters.iter().any(|n| n.starts_with("world.future_predictor.")));
+    assert!(graph.outputs().len() > world::LOSS_WORLD_ROLLOUT);
+
+    let mut without = cdp_with_pixels();
+    without.world_pixel_scale = 0.0;
+    assert!(without.check().is_err());
+    without.world_prediction_length = 0;
+    without.world_pixel_loss = PixelLoss::SquaredError;
+    assert!(without.check().is_ok());
+    assert!(!without.trains_pixels());
+    let graph = world::build_training_graph(&world_training_config(&without), 4);
+    assert!(!names(&graph).iter().any(|n| n.starts_with("world.decoder.")));
+
+    let mut plain = with_rollout();
+    plain.world_pixel_scale = 1.0;
+    assert!(plain.check().is_err());
+    let mut negative = cdp_with_pixels();
+    negative.world_pixel_scale = -1.0;
+    assert!(negative.check().is_err());
+}
+
 fn with_rollout_and_bonus() -> DreamerConfig {
     let mut c = with_rollout();
     c.disagreement_bonus = true;
@@ -174,7 +225,19 @@ fn tiny_rgb_agent_trains_a_prior_image_rollout_with_the_bonus() {
     tiny_rgb_agent_trains(with_rollout_and_bonus());
 }
 
-fn tiny_rgb_agent_trains(config: DreamerConfig) {
+#[test]
+#[ignore = "builds and runs all Dreamer GPU sessions"]
+fn tiny_cdp_agent_trains_the_auxiliary_pixel_rollout() {
+    tiny_cdp_agent_trains(cdp_with_pixels());
+}
+
+fn tiny_cdp_agent_trains(config: DreamerConfig) {
+    let world = tiny_rgb_agent_trains(config);
+    assert!(world.future_prediction_loss > 0.0);
+}
+
+fn tiny_rgb_agent_trains(config: DreamerConfig) -> WorldMetrics {
+    let mut last = None;
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     let mut core = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
     let mut rng = StdRng::seed_from_u64(701);
@@ -186,6 +249,9 @@ fn tiny_rgb_agent_trains(config: DreamerConfig) {
         core.sync_world_inference();
         let rollout = world.prior_rollout_loss.expect("rollout loss reported");
         assert!(world.total_loss.is_finite() && rollout.is_finite() && rollout > 0.0);
+        assert!(world.reconstruction_loss > 0.0);
         core.learner_step += 1;
+        last = Some(world);
     }
+    last.unwrap()
 }

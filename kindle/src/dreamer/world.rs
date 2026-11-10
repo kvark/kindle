@@ -229,7 +229,7 @@ impl WorldModel {
         Self {
             dynamics: Dynamics::new(graph, config),
             representation: Representation::new(graph, config),
-            decoder: (config.loss_scales.reconstruction > 0.0).then(|| {
+            decoder: config.trains_pixels().then(|| {
                 ObservationDecoder::new(graph, config, "world.decoder", config.feature_dim())
             }),
             future_predictor: (config.loss_scales.future_prediction > 0.0)
@@ -875,6 +875,18 @@ fn training_graph(
         }
         let mut decoded_event_image = None;
         if let Some(decoder) = &model.decoder {
+            // CDP heads target embeddings; the auxiliary decoder targets pixels.
+            let observation = if config.is_cdp() {
+                let start = group * time_batch_length;
+                stack_time(
+                    &mut graph,
+                    &observations[start..start + chunk.len()],
+                    batch,
+                    config.observation_dim(),
+                )
+            } else {
+                observation
+            };
             let squared = if pixel_loss != PixelLoss::SquaredError {
                 let loss = if config.rgb_spatial_decoder {
                     let start = group * time_batch_length;
@@ -1198,7 +1210,7 @@ fn training_graph(
 
     let scales = config.loss_scales;
     let weighted = [
-        scale(&mut graph, reconstruction, scales.reconstruction),
+        scale(&mut graph, reconstruction, config.pixel_scale()),
         scale(&mut graph, future_prediction, scales.future_prediction),
         scale(&mut graph, dynamics, scales.dynamics),
         scale(&mut graph, representation, scales.representation),
@@ -1307,7 +1319,7 @@ fn training_graph(
         && !pixel_loss.latent_overshooting()
         && !pixel_loss.recurrent_energy())
     .then(|| {
-        assert!(config.loss_scales.reconstruction > 0.0);
+        assert!(config.trains_pixels());
         assert!(
             !behavior
                 || matches!(
@@ -1373,7 +1385,7 @@ fn training_graph(
         )
     });
     let total = if let Some(rollout) = &pixel_rollout {
-        let weighted = graph.scale(rollout.loss, config.loss_scales.reconstruction);
+        let weighted = graph.scale(rollout.loss, config.pixel_scale());
         let mut total = graph.add(total, weighted);
         if let Some([reward, continuation]) = rollout.events {
             let reward = graph.scale(reward, config.loss_scales.reward);

@@ -157,6 +157,8 @@ def main():
                         help="learned-RGB world pixel objective; motion cross-entropy weights changed pixels")
     parser.add_argument("--world-prediction-length", type=int,
                         help="learned-RGB world: imagined steps after the observed prefix whose images are supervised directly")
+    parser.add_argument("--world-pixel-scale", type=float,
+                        help="fresh CDP only: auxiliary RGB decoder weight; trained with --world-pixel-loss/--world-prediction-length while CDP keeps its own scales")
     parser.add_argument("--prior-reward-scale", type=float,
                         help="fresh CDP only: auxiliary reward loss on sampled one-step priors")
     parser.add_argument("--actor-dynamics-scale", type=float,
@@ -588,6 +590,7 @@ def main():
     training_options.add("--prior-reward-scale")
     training_options.add("--world-pixel-loss")
     training_options.add("--world-prediction-length")
+    training_options.add("--world-pixel-scale")
     training_options.add("--replay-value-completed")
     training_options.add("--replay-actor-scale")
     training_options.add("--actor-dynamics-scale")
@@ -784,6 +787,13 @@ def main():
     if not math.isfinite(args.disagreement_scale) or args.disagreement_scale < 0:
         parser.error("disagreement-scale must be finite and non-negative")
     pixel_world = args.world_pixel_loss is not None or args.world_prediction_length is not None
+    if args.world_pixel_scale is not None:
+        if not positive_f32(args.world_pixel_scale):
+            parser.error("world-pixel-scale must be finite and positive in F32")
+        if not args.cdp or not learned_rgb or args.restore or args.evaluate:
+            parser.error("world-pixel-scale requires fresh CDP with the learned CNN")
+    if pixel_world and args.cdp and args.world_pixel_scale is None:
+        parser.error("world pixel objectives with CDP require --world-pixel-scale")
     if args.disagreement_scale and not args.cdp and not (pixel_world and learned_rgb and not args.restore):
         parser.error("disagreement requires fresh CDP or a fresh learned-RGB pixel world objective")
     if args.replay_capacity <= 0:
@@ -892,6 +902,8 @@ def main():
             config["world_pixel_loss"] = args.world_pixel_loss
         if args.world_prediction_length is not None:
             config["world_prediction_length"] = args.world_prediction_length
+        if args.world_pixel_scale is not None:
+            config["world_pixel_scale"] = args.world_pixel_scale
         if args.replay_value_completed:
             config["replay_value_completed"] = True
         if args.replay_actor_scale is not None:

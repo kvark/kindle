@@ -292,6 +292,10 @@ impl ExpertImitation {
     }
 }
 
+fn is_zero_f32(value: &f32) -> bool {
+    *value == 0.0
+}
+
 fn is_zero(value: &usize) -> bool {
     *value == 0
 }
@@ -436,6 +440,13 @@ pub struct DreamerConfig {
     /// imagination still cover the whole window.
     #[serde(default, skip_serializing_if = "is_zero")]
     pub world_prediction_length: usize,
+    /// CDP worlds only: weight of an auxiliary RGB decoder trained with
+    /// `world_pixel_loss` on posterior states and, with
+    /// `world_prediction_length`, on prior-rollout images. The CDP embedding
+    /// objective and its scales are unchanged; zero disables the decoder.
+    /// Plain learned-RGB worlds weight pixels with `loss_scales.reconstruction`.
+    #[serde(default, skip_serializing_if = "is_zero_f32")]
+    pub world_pixel_scale: f32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub open_loop_supervision: Option<OpenLoopSupervision>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -606,6 +617,7 @@ impl DreamerConfig {
             world_microbatch_size: None,
             world_pixel_loss: super::world_learner::PixelLoss::SquaredError,
             world_prediction_length: 0,
+            world_pixel_scale: 0.0,
             open_loop_supervision: None,
             color_centroid_supervision: None,
             rgb_color_attention: None,
@@ -775,6 +787,20 @@ impl DreamerConfig {
 
     pub fn is_cdp(&self) -> bool {
         self.observation_kind.is_rgb() && self.loss_scales.future_prediction > 0.0
+    }
+
+    /// Pixel loss weight: reconstruction in plain learned-RGB worlds, the
+    /// auxiliary decoder scale in CDP worlds.
+    pub fn pixel_scale(&self) -> f32 {
+        if self.is_cdp() {
+            self.world_pixel_scale
+        } else {
+            self.loss_scales.reconstruction
+        }
+    }
+
+    pub fn trains_pixels(&self) -> bool {
+        self.pixel_scale() > 0.0
     }
 
     /// CDP forecasts CNN embeddings, not RGB images or reconstructed features.
@@ -1322,11 +1348,23 @@ impl DreamerConfig {
         }
         {
             use super::world_learner::PixelLoss;
+            if !self.world_pixel_scale.is_finite() || self.world_pixel_scale < 0.0 {
+                return Err("world_pixel_scale must be finite and non-negative".into());
+            }
+            if self.world_pixel_scale > 0.0
+                && (!self.is_cdp()
+                    || self.video_encoder.is_some()
+                    || self.rgb_frame_pair
+                    || self.observation_crop.is_some()
+                    || self.rgb_spatial_decoder
+                    || self.reconstruction_target_standardization.is_some())
+            {
+                return Err("world_pixel_scale is the CDP auxiliary pixel decoder; plain learned-RGB worlds use reconstruction".into());
+            }
             if (self.world_prediction_length > 0
                 || self.world_pixel_loss != PixelLoss::SquaredError)
                 && (!self.observation_kind.is_rgb()
-                    || self.loss_scales.reconstruction <= 0.0
-                    || self.loss_scales.future_prediction != 0.0
+                    || !self.trains_pixels()
                     || self.video_encoder.is_some()
                     || self.rgb_frame_pair
                     || self.observation_crop.is_some()
@@ -1337,7 +1375,7 @@ impl DreamerConfig {
                         PixelLoss::SquaredError | PixelLoss::MotionCrossEntropy
                     ))
             {
-                return Err("agent world pixel objectives require a plain learned-RGB world with reconstruction only".into());
+                return Err("agent world pixel objectives require a learned-RGB world that trains pixels: reconstruction, or CDP with world_pixel_scale".into());
             }
             if self.world_prediction_length > 0
                 && (self.world_prediction_length >= self.batch_length
