@@ -85,13 +85,23 @@ raw experiment data or checkpoint history is committed.
 
 | Dependency | Revision |
 | --- | --- |
-| [Meganeura](https://github.com/kvark/meganeura/tree/handover/cdp-qualified-20261025) | `423d373634a1b1f04ff623db2b419757f1e8d96d` |
-| [Blade](https://github.com/kvark/blade/tree/handover/cdp-qualified-20261025) | `bbbc93b7d26b8196d9143944fe7d8a61d6da4583` |
-| Naga fork | `13f582ddd2792befb46952498010248bd65818e6` |
+| [Meganeura](https://github.com/kvark/meganeura) | `a0eff600d0aaf877a6a6ba02c2de1eb8804583ed` (main) |
+| [Blade](https://github.com/kvark/blade) | `d9112e26ab1244d9e206e7d27387295a28cb3fa3` (main) |
+| Naga (wgpu trunk, dev-dependency) | `9964733300924e724b6d41ef268e7c2933f3dcdb` |
 
-These preserve the measured implementation, not a fresh upstream port. Only the
-user merges PRs. Cargo fetches the dependency branches without sibling checkouts
-or old absolute paths. The prior handover verified329 library source files
+Since November 10 the source builds against upstream Meganeura main instead of
+the preserved `handover/cdp-qualified-20261025` fork (`423d3736`/Blade `bbbc93b7`).
+The fork's command cache, image views, convolution reuse, pooled tapes and
+diagnostic-group APIs are gone; its `MEGANEURA_COMMAND_CACHE`,
+`MEGANEURA_IMAGE_VIEWS`, `MEGANEURA_CONVOLUTION_WORDS`, `MEGANEURA_COPY_COMPOSITION`
+and `MEGANEURA_CONVOLUTION_REUSE` flags are inert. Main has no device view of
+parameter storage, so the optional actor-dynamics/expected-value parameter
+snapshots cross the host until a `Session::slot_buffer` accessor lands upstream.
+Retained runtimes under
+`/x/Temp/*/runtime` keep their own fork binaries; the checkpoints they wrote
+still load, but new learners are not byte-comparable to the fork's qualifiers.
+Only the user merges PRs. Cargo fetches the dependency revisions without sibling
+checkouts or old absolute paths. The prior handover verified329 library source files
 against the measured implementation and passed CPU workspace/Python compilation.
 `tools/handover/verify_sources.py` and its manifest preserve the source receipt
 and eight explicit cleanup differences: Rust formatting, actual dependency

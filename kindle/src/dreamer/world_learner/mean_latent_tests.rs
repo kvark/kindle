@@ -143,7 +143,7 @@ fn mean_latent_graph_has_no_samples_and_preserves_parameters_and_inference_graph
         !enabled
             .nodes()
             .iter()
-            .any(|n| matches!(n.op, Op::ArgMaxOneHot))
+            .any(|n| matches!(n.op, Op::ArgMaxInner))
     );
     assert!(
         !enabled
@@ -155,7 +155,7 @@ fn mean_latent_graph_has_no_samples_and_preserves_parameters_and_inference_graph
         disabled
             .nodes()
             .iter()
-            .any(|n| matches!(n.op, Op::ArgMaxOneHot))
+            .any(|n| matches!(n.op, Op::ArgMaxInner))
     );
     for build in [
         world::build_observe_graph,

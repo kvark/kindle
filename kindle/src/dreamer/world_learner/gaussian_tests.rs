@@ -65,7 +65,7 @@ fn gaussian_graph_preserves_state_width_and_has_unique_inputs_without_argmax() {
         names.len(),
         names.iter().collect::<std::collections::HashSet<_>>().len()
     );
-    assert!(!g.nodes().iter().any(|n| matches!(n.op, Op::ArgMaxOneHot)));
+    assert!(!g.nodes().iter().any(|n| matches!(n.op, Op::ArgMaxInner)));
     assert_eq!(g.outputs().len(), world::LOSS_WORLD_ROLLOUT + 3);
     let size = c.network();
     let mut graph = Graph::new();
@@ -153,7 +153,7 @@ fn compact_gaussian_geometry_and_headers_preserve_explicit_dimension() {
             .sum::<usize>(),
         8_008_003
     );
-    assert!(!g.nodes().iter().any(|n| matches!(n.op, Op::ArgMaxOneHot)));
+    assert!(!g.nodes().iter().any(|n| matches!(n.op, Op::ArgMaxInner)));
     let m = json!({"format":"kindle-world-only-v9","config":c,"pixel_loss":"motion_cross_entropy","prediction_length":16,"updates":0});
     assert_eq!(
         checkpoint_pixel_loss(&m).unwrap(),

@@ -4,11 +4,8 @@
 use super::*;
 use std::collections::BTreeMap;
 
-mod captured_group;
-mod convolution_cut;
 mod copy_gradients;
 mod first_value;
-mod inline_gap;
 mod resident_targets;
 
 /// Optional test-harness annotations, independent of GPU timestamps/barriers.
@@ -374,16 +371,12 @@ fn restore_profile_core(source: &std::path::Path) -> DreamerCore {
 }
 
 fn profile_bf16_dense(dispatch: &meganeura::compile::Dispatch) -> bool {
-    use meganeura::compile::{Kernel, ShaderEntry};
-    match (&dispatch.shader, &dispatch.kernel) {
-        (ShaderEntry::MatMulTyped { types, .. }, _)
-        | (_, Kernel::CooperativeTyped { types, .. })
-        | (
-            _,
-            Kernel::CooperativeWorkgroup {
-                types: Some(types), ..
-            },
-        ) => types.multiply == meganeura::DType::BF16,
+    use meganeura::compile::Kernel;
+    match &dispatch.kernel {
+        Kernel::CooperativeTyped { types, .. }
+        | Kernel::CooperativeWorkgroup {
+            types: Some(types), ..
+        } => types.multiply == meganeura::DType::BF16,
         _ => false,
     }
 }
@@ -405,16 +398,6 @@ fn profile_bf16_dense_counter_recognizes_kernel_types() {
             };
             assert_eq!(profile_bf16_dense(&dispatch), storage == DType::BF16);
         }
-        let dispatch = Dispatch {
-            shader: ShaderEntry::MatMulTyped {
-                transpose_a: false,
-                transpose_b: false,
-                addend: false,
-                types,
-            },
-            ..Default::default()
-        };
-        assert_eq!(profile_bf16_dense(&dispatch), storage == DType::BF16);
     }
     assert!(!profile_bf16_dense(&Dispatch::default()));
 }
@@ -437,13 +420,6 @@ fn time_fixed_batch_checkpoint() {
     if single_submission {
         core.world_train.set_submission_chunks(1);
     }
-    if std::env::var_os("KINDLE_DIAGNOSTIC_BOUNDARY").is_some() {
-        core.world_train.split_diagnostic_group(3977);
-    }
-    save_json(
-        &root.join("world-groups.json"),
-        &core.world_train.diagnostic_groups(),
-    );
     let config = core.config.clone();
     assert_eq!(config.observation_kind, crate::ObservationKind::Rgb64);
     let check_device = |core: &DreamerCore| {
@@ -475,14 +451,12 @@ fn time_fixed_batch_checkpoint() {
             "logical_buffer_bytes": plan.buffers.iter().sum::<usize>(),
             "shader_counts": shader_counts,
             "bf16_matrices": plan.dispatches.iter().filter(|d| profile_bf16_dense(d)).count(),
-            "bf16_scalar": plan.dispatches.iter().filter(|d| d.scalar_storage.bf16_inputs != 0 || d.scalar_storage.bf16_output).count(),
             "standalone_casts": plan.dispatches.iter().filter(|d| matches!(d.shader, meganeura::compile::ShaderEntry::ToBF16 | meganeura::compile::ShaderEntry::FromBF16)).count(),
         })
     };
     let precision_plans = serde_json::json!({
         "posterior": precision_plan(core.posterior_session()),
         "posterior_is_world_prefix": core.world_posterior.is_none(),
-        "posterior_prefix_dispatches": core.world_train.preparation_dispatch_count(),
         "imagination": precision_plan(&core.imagination),
         "world_gradient": precision_plan(&core.world_train),
         "behavior_gradient": precision_plan(&core.behavior_train),
@@ -550,10 +524,6 @@ fn time_fixed_batch_checkpoint() {
             save_json(
                 &root.join(format!("{name}-pipelines.json")),
                 &session.dispatch_pipeline_keys(),
-            );
-            save_json(
-                &root.join(format!("{name}-convolution-boundaries.json")),
-                &session.diagnostic_convolution_boundaries(),
             );
         }
     }
@@ -667,15 +637,6 @@ fn time_fixed_batch_checkpoint() {
     checkpoint(&mut core, &root.join("final"));
     check_device(&core);
     let final_memory = core.gpu_memory_budget();
-    save_json(
-        &root.join("command-cache.json"),
-        &serde_json::json!({
-            "world": core.world_train.command_cache_counts(),
-            "imagination": core.imagination.command_cache_counts(),
-            "behavior": core.behavior_train.command_cache_counts(),
-            "slow_value": core.behavior_slow.command_cache_counts(),
-        }),
-    );
     let mean_ms = reports[WARMUP..]
         .iter()
         .map(|row| row["elapsed_ms"].as_f64().unwrap())

@@ -10,8 +10,8 @@ license = "MIT"
 
 [dependencies]
 # Keep training correctness fixes and the shared Blade context on one pinned stack.
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "423d373634a1b1f04ff623db2b419757f1e8d96d" }
-blade-graphics = { git = "https://github.com/kvark/blade", rev = "bbbc93b7d26b8196d9143944fe7d8a61d6da4583" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "a0eff600d0aaf877a6a6ba02c2de1eb8804583ed" }
+blade-graphics = { git = "https://github.com/kvark/blade", rev = "d9112e26ab1244d9e206e7d27387295a28cb3fa3" }
 rand = "0.9"
 rand_chacha = "0.9"
 rayon = "1.12"
@@ -25,4 +25,4 @@ nix = { version = "0.27", features = ["socket", "uio"] }
 
 [dev-dependencies]
 libloading = "0.8"
-naga = { git = "https://github.com/kvark/wgpu", rev = "13f582ddd2792befb46952498010248bd65818e6", features = ["wgsl-in", "spv-out"] }
+naga = { git = "https://github.com/kvark/wgpu", rev = "9964733300924e724b6d41ef268e7c2933f3dcdb", default-features = false, features = ["wgsl-in", "spv-out"] }

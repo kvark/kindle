@@ -1191,7 +1191,7 @@ mod block_matmul_tests {
             .filter(|n| matches!(n.op, Op::BlockMatMulAT { .. } | Op::BlockMatMulBT))
             .collect::<Vec<_>>();
         assert_eq!(block_gradients.len(), 2);
-        assert!(block_gradients.iter().all(|n| n.requires_full_precision));
+        assert!(block_gradients.iter().all(|n| n.full_precision()));
         let (plan, _) = meganeura::compile_training_graph(&graph);
         assert_eq!(plan.param_grad_pairs.len(), 3);
     }

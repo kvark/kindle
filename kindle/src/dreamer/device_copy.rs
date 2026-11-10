@@ -50,12 +50,6 @@ impl DeviceCopies {
                 let available = target
                     .slot_size(ExternalSlot::Input(input))
                     .expect("known target input");
-                if matches!(slot, ExternalSlot::Parameter(_)) {
-                    assert_eq!(
-                        bytes, available,
-                        "snapshot parameter/input storage mismatch"
-                    );
-                }
                 let end = copy
                     .target_offset_bytes
                     .checked_add(bytes)
@@ -65,12 +59,9 @@ impl DeviceCopies {
                 let source_buffer = match slot {
                     ExternalSlot::Input(name) => source.input_buffer(name),
                     ExternalSlot::Output(index) => source.output_buffer(index),
-                    // Parameter storage remains live for the entire session;
-                    // unlike intermediate activations, this view cannot expire
-                    // between the same-queue snapshot and world update.
-                    ExternalSlot::Parameter(name) => source
-                        .param_buffer(name)
-                        .map(|buffer| source.diagnostic_buffer_piece(buffer)),
+                    // Meganeura exposes no device view of parameter storage;
+                    // parameter snapshots cross the host in the agent instead.
+                    ExternalSlot::Parameter(_) => None,
                 }
                 .expect("known source buffer");
                 let mut target_buffer = target.input_buffer(input).expect("known target buffer");
