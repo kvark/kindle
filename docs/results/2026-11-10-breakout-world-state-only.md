@@ -83,6 +83,26 @@ state readout is unchanged from 1M (prior-state ball 16/5 at four steps,
 and the scene, not into a sharper linear ball code; the evaluation-to-evaluation
 oscillation (eight-step 35 → 21 → 45 over the last three points) remains.
 
+## Reward events
+
+Brier error on the positive-reward targets of the dense development cohort
+(2 / 4 / 4 / 1 / 2 positives at 1 / 4 / 8 / 16 / 32 steps; 1.0 means the
+model never expects the brick hit):
+
+| Learner | 1 | 4 | 8 | 16 | 32 |
+|---|---:|---:|---:|---:|---:|
+| State-only 4M 96x96 | .036 | .335 | .206 | 1.000 | 1.000 |
+| Context frame 1M 96x96 | .320 | .422 | .253 | .557 | .922 |
+| Spatial 1M 96x96 (soft feedback) | .929 | .909 | .810 | .937 | .936 |
+| Spatial 1M 64x64 control | .936 | .934 | .832 | .947 | .905 |
+
+The spatial recipes never expect a brick hit at any horizon: their reward head
+reads a state that does not know where the ball is. The state-only and
+context-frame models predict the near-term hits, which is the signal an
+imagination-trained policy needs. The counts are tiny and this is not a
+calibration result; the game-over head is still poor for every learner on the
+ten development endings (positive Brier .88–.97 at one step).
+
 ## Reading
 
 Removing the shortcut changes what the state learns. After 2,048 updates the
