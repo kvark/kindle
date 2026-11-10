@@ -21,43 +21,44 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 10
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select the [optional cumulative-survival Brier loss](docs/experiments/2026-11-10-breakout-world-survival-loss.md)
-for implementation and bounded CPU/native qualification. Default absent,
-standalone1M/RGB64/H16/RGB-event heads only; add a masked cumulative-product
-objective, no parameters or inference correction. Explicitv29/positive coefficient,
-independent F64 values/derivatives, causality/masking, default-off, first-update/
-frozen/restore checks precede any learner. Candidate scale10, no sweep.
-Root `/x/Temp/kindle-world-survival-loss-20261110`. No learner, collector,
-full assessment, extension or automatic successor is declared.
+unproven. One fresh [cumulative-survival learner](docs/results/2026-11-10-breakout-world-survival-loss-learning.md)
+is active under its [fixed protocol](docs/experiments/2026-11-10-breakout-world-survival-loss-learning.md).
+Root `/x/Temp/kindle-world-survival-loss-learning-20261110`; final16,384 updates,
+no extension/sweep, collector, automatic assessment or successor. Actor/critic,
+CDP and the five-game campaign stay parked.
+
+Only `world_survival_scale=10` is added to the previous RGB-event effective
+config:1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,RGB100,rates4e-4,KL1/.1/freeNat1,
+mixing.01,event scales1,local width16/two-image history and physical action table.
+The sealed natural two-cycle plan/counts are unchanged;zero new emulator actions/
+frames. Source06971ff6;native64324882/SHA1966cae4,exact runtime/runner at
+`/x/Temp/kindle-world-survival-loss-20261110`. Do not mix overlays.
+
+Startup passes all239 execution pins,240 actual-initial and240 age1 tensors
+byte-exact to the qualifier,andall14 first reports. Original queue/observer/CPU
+audit services are active; consult the result report and launch receipts for
+exact identity. Continue the existing worker,never restart on observer timeout.
+Final dense/restore/audit checks remain pending. Falling training Brier and
+zero-positive natural point slices do not establish cumulative calibration.
+A separately declared final chosen-action assessment remains necessary.
+
+[Qualification](docs/results/2026-11-10-breakout-world-survival-loss.md) is closed:
+42.760s,143 execution/77 closure/186 distinct pins,one guard/nine sealed files,
+native analytic derivatives,default-off32 arrays/240 tensors,own initial/frozen/
+restore andfour fixture updates pass. Default absent;v29 wraps v28 andbinds
+positive coefficient/all-world scope. No parameter or inference change.
+3,064,246,272 disposable build-cache bytes released;package/executable/source and
+original preparation failures retained. Do not repeat this qualification.
 
 The [saved timing review](docs/results/2026-11-10-breakout-world-rgb-event-heads-timing.md)
-closes:226 input pins/23 closed files,22 plans/44 groups,352 curves,1,760 endpoint
-rows,220 endpoint joins,32 prefix rows andsix reviewed figures;5.070s CPU,
-reconstruction errorzero. Ending RIGHT mean50% risk at12 versusoracle17;
-NOOP/LEFT/reversal5% at5/6/8 versus17. Longer history doesnot repair it.
-Serving FIRE1 loses detection at4/8/32 (0/512 each);RIGHTFIRE11 also at1.
-Native serve prefixes arestatic;ending11–13/27–29 distinct16/32 frames,life2→1.
-No missing-clock/data-only cause isestablished. RIGHT32 truth ispost-terminal
-padding,masked fromnumeric point pairs. No model/GPU/emulator query orupdate,
-failure/retry orold stage rerun. Original services areclosed/unloaded;their
-historical success isverified bysealed invocation-specific completion journals.
-
-The [RGB-event learner](docs/results/2026-11-10-breakout-world-rgb-event-heads-learning.md)
-remains closed3/3 dense,12.13% morenative time. Its [broader assessment](docs/results/2026-11-10-breakout-world-rgb-event-heads-branches.md)
-fails:primary.142943 vsrequired<=.127127,ending16/32 Brier.329116/.331428,
-RIGHT16.818743 versuszero,201/304 nonending alarms>5%. Its [saved decomposition](docs/results/2026-11-10-breakout-world-rgb-event-heads-survival.md)
-finds improved wall-feature residuals butpersistent serving errors;oracle weights
-are diagnostic only,not learned repairs orpassing scores. Original failures and
-separate repairs remain inlinked reports. All completed stages stayclosed.
-
-Retain native45633605/SHAf71e9354 andmatching runtime/runner at
-`/x/Temp/kindle-world-rgb-event-heads-20261110` as the existing reference.
-Its qualification and3.13GB build-cache release areclosed. New objective needs
-its own matching package;do not mixoverlays. Earlier failed recipes,launch
-coverage/counts andcollectors mustnot repeat. Full physics/serve/collisions,
-natural events,persistent brick memory,late/tunnel/second-wall/above-top coverage,
-untouched families andfresh confirmation remain. Actor/critic,CDP andfive-game
-work stayparked.
+is closed:226 inputs/23 closed files,six figures reviewed,exact reconstruction.
+Ending RIGHT mean50% risk at12 versusoracle17;FIRE launch loses detections by4.
+Longer history doesnot repair these failures. No missing-clock/data-only cause
+is established. Prior RGB-event learner,broader assessment,decomposition andall
+other completed recipes/collectors stay closed,with failures retained inlinked
+reports. Original joint/event gates andfull physics/serve/collisions,natural
+calibration,persistent brick memory,late/tunnel/second-wall/above-top coverage,
+untouched families andfresh learner confirmation remain.
 
 ## Direction and retained results
 
