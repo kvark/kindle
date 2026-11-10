@@ -189,6 +189,8 @@ def main():
                         help="fresh training only: categorical posterior/prior uniform mixing; omitted: native default")
     parser.add_argument("--latent-shape", type=int, nargs=2, metavar=("VARIABLES", "CLASSES"),
                         help="fresh centered CDP: regroup categorical state at the preset's flattened width")
+    parser.add_argument("--actor-entropy", type=float,
+                        help="fresh training only: actor entropy regularizer scale; omitted: native default 3e-4")
     parser.add_argument("--actor-unimix", type=float, default=0.0,
                         help="native policy uniform mixture in [0,1); fresh default0, restore keeps checkpoint policy")
     parser.add_argument("--report-every", type=int, default=1000)
@@ -553,6 +555,11 @@ def main():
             parser.error("latent-unimix must be representable in F32 and in [0, 1)")
         if args.evaluate:
             parser.error("latent-unimix requires fresh training")
+    if args.actor_entropy is not None:
+        if not math.isfinite(args.actor_entropy) or args.actor_entropy < 0:
+            parser.error("actor-entropy must be finite and non-negative")
+        if args.restore or args.evaluate:
+            parser.error("actor-entropy requires fresh training")
     if not math.isfinite(args.actor_unimix) or not 0 <= args.actor_unimix < 1:
         parser.error("actor-unimix must be finite and in [0, 1)")
     if args.evaluate and args.exploration_probability:
@@ -571,6 +578,7 @@ def main():
     training_options.add("--rgb-frame-pair")
     training_options.add("--image-crop")
     training_options.add("--actor-unimix")
+    training_options.add("--actor-entropy")
     training_options.add("--latent-unimix")
     training_options.add("--latent-shape")
     training_options.add("--imagination-length")
@@ -904,6 +912,8 @@ def main():
             config["world_prediction_length"] = args.world_prediction_length
         if args.world_pixel_scale is not None:
             config["world_pixel_scale"] = args.world_pixel_scale
+        if args.actor_entropy is not None:
+            config["actor_entropy"] = args.actor_entropy
         if args.replay_value_completed:
             config["replay_value_completed"] = True
         if args.replay_actor_scale is not None:
