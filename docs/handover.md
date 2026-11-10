@@ -43,16 +43,15 @@ eight-step development ball tracking at 38/107, 36/112 and 23/112 against the
 showed why: the spatial-history recipes never encode the ball in the recurrent
 state, only in fed-back frames that fade. [Removing the image history](results/2026-11-10-breakout-world-state-only.md)
 makes the state learn the ball (prior-state readout 13/7 native pixels at one
-step, 22/11 at sixteen, baselines 40/28) and, at the 4M preset, gives the best
-forecasts so far on the shared origins: observed 113/113, one-step 105/112,
-four-step 78/112 (control 66/109), eight-step 45/112 (control 53/107),
-sixteen-step 15/115, at 97.8 ms per update on 96x96 frames. The 1M state-only
-run blurs the brick rows, so the active run gives the spatial decoder a
-[fixed observed context frame](experiments/2026-11-10-breakout-world-context-frame.md)
-(`rgb_context_lag` 8: scenery from a real frame, ball and paddle from the
-state, nothing fed back), followed by the 65,536-update state-only run
-(`kindle-world-scale-20261110.service`, `guards-after-4m`, outputs
-`train-96-context`, `train-96-plain-65k-v2`). Root
+step, 22/11 at sixteen, baselines 40/28); at 4M it gives the best eight-step
+forecasts so far (observed 113/113, one-step 105/112, four-step 78/112,
+eight-step 45/112, sixteen-step 15/115, 97.8 ms per update) but blurs the
+bricks. Giving the spatial decoder a [fixed observed context frame](results/2026-11-10-breakout-world-context-frame.md)
+(`rgb_context_lag` 8, nothing fed back) keeps the ball in the state and the
+scene sharp at 1M: four-step 72/112, eight-step 32/112, brick balanced error
+0.011. The active queue runs the 65,536-update state-only 1M job
+(`train-96-plain-65k-v2`, `guards-after-4m`), then the 4M context-frame job
+(`queue-96-context-4m.json`) launches automatically. Root
 `/x/Temp/kindle-world-scale-20261110`; driver `python/examples/breakout_world_scale.py`
 (`probe` mode runs the state readout on any checkpoint). Actor/critic, CDP and
 the five-game campaign stay parked.
