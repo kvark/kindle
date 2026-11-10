@@ -27,6 +27,12 @@ decoder/fusion/action and the LEFT/RIGHT/FIRE table as the
 frame selection on the graph and on the host, reset masking, unchanged
 parameters and the absence of the rollout shift.
 
+After the 1M result, the 4M preset with the same context frame runs for
+65,536 updates with evaluation every 8,192 (`context-config-96-4m.json`,
+output `train-96-context-4m-65k`, launched automatically after the 65k
+state-only run). Training is deterministic for a fixed seed and plan, so its
+16,384-update point equals a separate 16k run.
+
 ## Reading
 
 Against the state-only run: brick balanced error and observed reconstruction
