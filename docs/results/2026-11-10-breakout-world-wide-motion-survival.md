@@ -75,3 +75,8 @@ It is CPU-only onnew frozen outputs,not a repeated model assessment. No native
 intervention,learner,collector,extension orautomatic successor isselected.
 Full physics,natural events,brick memory,late/above-top coverage,untouched
 families andfresh confirmation remain required. The full goal stays unproven.
+
+The [saved-case review](2026-11-10-breakout-world-wide-motion-error-cases.md)
+iscomplete:serve FIRE loses scored balls,wall trajectories drift andlater
+feature-presence errors remain. It doesnot localize a causal boundary defect.
+No original failure ischanged. A separate direct RGB event-head prototype isselected.

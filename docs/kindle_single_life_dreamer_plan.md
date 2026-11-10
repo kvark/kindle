@@ -3,67 +3,49 @@
 ## Selected direction: Breakout world model in isolation
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The [fixed wider-motion learner](results/2026-11-09-breakout-world-wide-motion-learning.md)
-closes with3/3 dense gates:development observed/1/4/8/16/32
-107/112,105/109,77/109,58/107,31/114,11/95 versus early physical
-106/112,101/109,66/109,53/107,25/114,11/95. Fitting32 regresses24/179→22/179.
-Native3,888.344s/loop4,065.276s versus1,841.013s/1,998.783s;no efficiency gain
-established. Same data/plan/1M/RGB64/B8/T32/H16/Auto/41001/RGB100,rates4e-4;
-local motion/fusion16→32 is the intended change,withnew shapes/init/native.
-80 weights/675,643 scalars/240 arrays,+71,728 scalars;default stays off.
+unproven. Select the [decoded-RGB event-head prototype](experiments/2026-11-10-breakout-world-rgb-event-heads.md)
+for implementation/CPU checks,then separately declared native qualification.
+Default-off standalone heads readh/z plusshared-CNN features oftheir own decoded
+image. No posterior correction/extra transition orfuture actual image inbelief;
+keep local width16,two-image history,RGB3 replay andencoder/RSSM geometry. At1M64,
+expectedtwo head matrices640→896,+32,768 scalars,80/636,683/240;derive before
+allocation. Explicitv28 wraps v25/v18;reject whole-agent/unqualified compositions.
+No implementation orGPU allocation yet,no main learner selected. Root
+`/x/Temp/kindle-world-rgb-event-heads-20261110`. Hypothesis only;h/z information
+absence andcause ofcalibration/physics failures are not established.
 
-All215 execution/172 CPU-audit/41 CPU-plan/180 closure pins pass,426 unique
-closed pins verified.16,384 finite13-report rows,240 actual-initial/frozen,
-80 changed weights,384 dense initial origins,58 exports and18 exact restore
-arrays pass;first actual update matches13 reports/240 qualifiedage1 tensors.
-Two guards/18 sealed files andall four services inactive/successful. Main
-source56611db4/invocationc993d779a66f46d6a58daee8078ecfb1;root
-`/x/Temp/kindle-world-wide-motion-learning-20261109`. All five final figures
-reviewed;long drift,blur andball loss persist. Final-image34-input/60-join CPU
-review passes in2.432s. Its original immediate launcher observation failure
-remains;separate same-invocation observation andoriginal image job complete
-without restart. No native/main CPU failure orretry. Provisional2k evidence stays.
+The [wider-motion learner](results/2026-11-09-breakout-world-wide-motion-learning.md)
+closes3/3 dense:107/112,105/109,77/109,58/107,31/114,11/95. Native3,888.344s/
+loop4,065.276s versusearly physical1,841.013s/1,998.783s;no efficiency gain.
+215/172/41/180 pins,426 distinct closed inputs,240 frozen/18 restore,all80 weights
+changed,two guards/18 sealed files andall four terminal services pass. All five
+final figures reviewed;original image-launcher observation failure remains with
+separate same-invocation recovery,no restart. Earlier packaging errors remain.
+Its [broader assessment](results/2026-11-10-breakout-world-wide-motion-branches.md)
+fails:energy.160386921843 vsrequired<=.127126664317,ending Brier16/32.0426034/
+.263400,RIGHT16.302606,276/304 false alarms. Native185.711s/CPU16.006s,
+963/238/242 pins,240 exact arrays,210 oracle joins/168 feature checks,one guard/
+nine sealed files andboth terminal services pass. No modelquery repeated.
 
-The [frozen chosen-action assessment](results/2026-11-10-breakout-world-wide-motion-branches.md)
-is closed/failed:energy.160386921843 versus early physical.224881281067,
-one-hot.172365704612,H0.169502219090,required<=.127126664317. Ending Brier16/32
-.0426034/.263400,RIGHT16.302606 and276/304 nonending alarms fail. All four
-freeflight64/64 andserveNOOP0 presence gates pass;point8/16/32 is54.442%/
-64.374%/24.484%,with16 regressing vs early physical71.870%. Native185.711s/CPU
-16.006s,963/238/242 pins,240 exact frozen arrays,210 oracle joins/168 feature
-checks andone guard/nine sealed files pass. Main4270bdc82bb146dc972fa5928480f89e/
-2246344,observer2246349 inactive/successful;source429c13e3/nativee3d18841/SHA02feea6e.
-No failure/retry/repair orold-model query. No GPU job remains active.
+The [survival decomposition](results/2026-11-10-breakout-world-wide-motion-survival.md)
+closes:ordinary.160387→oracle-assisted.127843,wall/serve residuals.496435/.276916;
+old edge-rebound residue improves.426554→.023331.312 pins/6,720 cases/840 groups/
+420 checks,max4.44e-16,4.688s CPU. These are score substitutions,not passing
+scores,learned repairs orcausal fractions. All original gates remain failed.
+The [saved-case review](results/2026-11-10-breakout-world-wide-motion-error-cases.md)
+checks209 inputs,22 plans/44 history groups/1,760 rows/ending joins,4.041s CPU,
+five fixed grids reviewed. Serve FIRE8 has0/512 detected pairs;wall NOOP16
+0/512 within1px,LEFT16 RMSE9.859px. Unsupported detector regions are not physical
+ball absence,andstarting wall labels do not locate later error. System-Python/
+NumPy ABI preparation failure remains;project-Python inspection/declared analysis
+passes. No model/GPU/emulator query orupdate in these CPU stages;all sealed.
 
-The [CPU saved-survival decomposition](results/2026-11-10-breakout-world-wide-motion-survival.md)
-is closed:ordinary ball.160387→oracle-assisted.127843,nonending.157351→.148004;
-paddle.080773→.002296. Wall/serve residuals dominate (.496435/.276916),while
-old edge-rebound residual improves.426554→.023331. These are fixed-image score
-substitutions,not learned repairs,passing scores orcausal fractions.312 pins,
-6,720 cases/840 groups/420 ending checks reconstruct within1e-12,max4.44e-16,
-4.688s CPU,no model/GPU/emulator query orupdate,failure/retry/repair. Sealed math/
-fixtures reused without old-work rerun. Root `/x/Temp/kindle-world-wide-motion-survival-20261110`.
-
-Select the [saved wall/serve case review](experiments/2026-11-10-breakout-world-wide-motion-error-cases.md),
-CPU-only new frozen outputs. All22 plans,both histories,eight draws/origins,five
-endpoints retained;fixed lane0/draw0 wall-four/serve-FIRE grids. Pin scripts and
-closed inputs before execution. No learner,native intervention,collector,
-extension orautomatic successor selected. No GPU job active. Original failed
-gates andall full-world requirements remain. Root
-`/x/Temp/kindle-world-wide-motion-error-cases-20261110`.
-
-The [native qualification](results/2026-11-09-breakout-world-wide-motion-native.md)
-passes in81.157s:small-fixture native values/derivatives/lane isolation,
-32 cached default-off forecasts/240 tensors,two exact equivalent-command
-updates/13 reports/240 tensors and32 exact restored forecasts.77/80 first-update
-parameters change in required families. Explicitv27 wraps v18/v25;unsupported
-scopes/whole-agent use reject.130 execution/71 closure pins andone guard/nine
-sealed files pass;both services inactive/successful. Sourcee3d18841/native
-SHA02feea6e at `/x/Temp/kindle-world-wide-motion-20261109`;reuse exact runtime/
-runner without rebuild. Initial dev-profile wheel/log andseparate optimized
-release selection remain retained. The3,580,907,520-byte compiler cache is
-released;retained artifact hashes pass. This qualifies implementation,not
-learning orphysics. Existing runtimes/scripts stay immutable.
+Earlier image-feedback/posterior-history,position/color,encoder coordinates,
+wider-denoiser andother negatives stay closed. This prototype changes onlyhead
+visual readout,not prior recurrence orlosses;no old failed comparison isrepaired.
+Full physics,serve/collisions,natural events,brick memory,late/above-top coverage,
+untouched families andfresh confirmation remain. Actor/critic,CDP andfive-game
+work stay parked;no learner,collector,extension orautomatic successor isselected.
 
 The [frozen-state diagnostic](results/2026-11-09-breakout-world-state-readouts.md)
 stays closed:30 inputs,42 fits,144 metric rows,1.918s CPU,zero model queries.
