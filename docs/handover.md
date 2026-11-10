@@ -70,15 +70,17 @@ and dropped the action-effects bonus (protocol correction recorded). The
 [matched follow-up](results/2026-11-10-breakout-agent-world96-matched.md)
 keeps the retained 12M/B16/T16 recipe (bonus, corrective labels, unimix,
 rates) and swaps only the world objective (motion cross-entropy, 8-step prior
-image rollout; runner now allows the bonus with a pixel world). At 96x96 it
-scores frozen **greedy 114.625 / sampled 38.231** on cohort 4000022003
-(initial 1.875 / 1.179; 12,477 updates in 53.6 minutes, 242 ms per update,
-VRAM 17.6 GiB): above the retained CDP greedy on this cohort, below its
-sampled 70.5; one seed, no held-out qualification. The 64x64 twin runs next
-in the same queue (root `/x/Temp/kindle-breakout-world96-matched-20261110`,
-unit `kindle-breakout-world96-matched-20261110.service`). A CDP world can now
-also train an auxiliary pixel decoder and rollout (`world_pixel_scale`,
-`--world-pixel-scale`), the natural next run. First-run root
+image rollout; runner now allows the bonus with a pixel world). Frozen on
+cohort 4000022003: **64x64 greedy 151.080 / sampled 40.286** (12,477 updates
+in 33 minutes, 143 ms per update, VRAM 9.5 GiB) and 96x96 greedy 114.625 /
+sampled 38.231 (54 minutes, 17.6 GiB), against the retained CDP learner's
+94.625 / 70.500 on the same cohort and initial controls near 2. The pixel
+objective wins greedy by a wide margin and loses sampled; one seed, no
+held-out qualification, 0 two-wall episodes. Root
+`/x/Temp/kindle-breakout-world96-matched-20261110` (unit finished). The next
+run, [retained CDP plus the pixel objective as an auxiliary](experiments/2026-11-10-breakout-agent-cdp-pixel-aux.md)
+(`world_pixel_scale`, `--world-pixel-scale`), asks whether the two compose;
+root `/x/Temp/kindle-breakout-cdp-pixel-aux-20261110`. First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
 on any checkpoint). These are development screens on reused seed 41001 and
