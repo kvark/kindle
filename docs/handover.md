@@ -34,27 +34,31 @@ Run every heavy job as a memory-capped `systemd-run --user` unit; a bare
 `cargo test` peaked at 17.6 GB and the OOM killer took the session down.
 
 The goal **prove the world model training on Breakout** is active and has
-its first positive mechanism. Three feedback-side screens
-([16x more play](results/2026-11-10-breakout-world-scale.md), [96x96
-frames](results/2026-11-10-breakout-world-rgb96.md), [palette-committed
-feedback](results/2026-11-10-breakout-world-palette-feedback.md)) left
-eight-step development ball tracking at 38/107, 36/112 and 23/112 against the
-64x64 control's 53/107, and a [linear state probe](results/2026-11-10-breakout-world-state-probe.md)
+its first learner that beats the previous best at every horizon. Three
+feedback-side screens ([16x more play](results/2026-11-10-breakout-world-scale.md),
+[96x96 frames](results/2026-11-10-breakout-world-rgb96.md),
+[palette-committed feedback](results/2026-11-10-breakout-world-palette-feedback.md))
+left eight-step development ball tracking at 38/107, 36/112 and 23/112 against
+the 64x64 control's 53/107, and a [linear state probe](results/2026-11-10-breakout-world-state-probe.md)
 showed why: the spatial-history recipes never encode the ball in the recurrent
 state, only in fed-back frames that fade. [Removing the image history](results/2026-11-10-breakout-world-state-only.md)
-makes the state learn the ball (prior-state readout 13/7 native pixels at one
-step, 22/11 at sixteen, baselines 40/28); at 4M it gives the best eight-step
-forecasts so far (observed 113/113, one-step 105/112, four-step 78/112,
-eight-step 45/112, sixteen-step 15/115, 97.8 ms per update) but blurs the
-bricks. Giving the spatial decoder a [fixed observed context frame](results/2026-11-10-breakout-world-context-frame.md)
-(`rgb_context_lag` 8, nothing fed back) keeps the ball in the state and the
-scene sharp at 1M: four-step 72/112, eight-step 32/112, brick balanced error
-0.011. The active queue runs the 65,536-update state-only 1M job
-(`train-96-plain-65k-v2`, `guards-after-4m`), then the 4M context-frame job
-(`queue-96-context-4m.json`) launches automatically. Root
-`/x/Temp/kindle-world-scale-20261110`; driver `python/examples/breakout_world_scale.py`
-(`probe` mode runs the state readout on any checkpoint). Actor/critic, CDP and
-the five-game campaign stay parked.
+makes the state learn the ball (prior-state readout 14/7 native pixels at one
+step, 20/11 at sixteen, baselines 40/28); the 1M state-only recipe at 96x96
+for 65,536 updates (74 minutes of native calls, 68 ms per update) reaches
+observed 113/113, one-step 109/112, four-step 93/112, eight-step 70/112,
+sixteen-step 46/115 and thirty-two-step 15/102 on the shared development
+origins, against the control's 101/66/53/25/11, and predicts near-term brick
+hits where the spatial recipes never did. Its bricks blur (balanced error
+.32); a [fixed observed context frame](results/2026-11-10-breakout-world-context-frame.md)
+(`rgb_context_lag` 8) keeps the scene sharp with the ball still in the state
+(1M, 16,384 updates: four-step 72/112, eight-step 32/112, brick error .011).
+The active run combines them: 4M preset, context frame, 65,536 updates
+(`train-96-context-4m-65k`, `guards-context-4m`, unit
+`kindle-world-scale-20261110.service`). Root `/x/Temp/kindle-world-scale-20261110`;
+driver `python/examples/breakout_world_scale.py` (`probe` mode runs the state
+readout on any checkpoint). These are development screens on reused seed 41001
+and reused development origins, not held-out qualification. Actor/critic, CDP
+and the five-game campaign stay parked.
 
 The previous [cumulative-survival learner](results/2026-11-10-breakout-world-survival-loss-learning.md)
 remains frozen by systemd at the user's request at update 9,964/16,384

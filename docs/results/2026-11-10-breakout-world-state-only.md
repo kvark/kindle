@@ -1,4 +1,4 @@
-# Without the image shortcut, the Breakout world state learns the ball
+# Without the image shortcut, the Breakout world state learns the ball and beats the control
 
 [Protocol](../experiments/2026-11-10-breakout-world-state-only.md). Root
 `/x/Temp/kindle-world-scale-20261110`; output `train-96-plain-v2`, guard
@@ -82,6 +82,56 @@ state readout is unchanged from 1M (prior-state ball 16/5 at four steps,
 19/8 at eight, 23/11 at sixteen), so the extra capacity went into rendering
 and the scene, not into a sharper linear ball code; the evaluation-to-evaluation
 oscillation (eight-step 35 → 21 → 45 over the last three points) remains.
+
+## Budget: 65,536 updates
+
+The 1M state-only recipe for four times the budget (`train-96-plain-65k-v2`,
+evaluation every 8,192; its 8,192 and 16,384 points reproduce the 16k run
+exactly). Native calls 4,457.0 s (68.0 ms per update), loop 4,985.0 s.
+
+| Learner, dense development, updates | Observed | 1 | 4 | 8 | 16 | 32 |
+|---|---:|---:|---:|---:|---:|---:|
+| State-only 1M 96x96, long, 8192 | 90/113 | 68/112 | 23/112 | 7/112 | 7/115 | 1/102 |
+| State-only 1M 96x96, long, 16384 | 110/113 | 97/112 | 59/112 | 24/112 | 7/115 | 2/102 |
+| State-only 1M 96x96, long, 24576 | 111/113 | 103/112 | 67/112 | 28/112 | 12/115 | 3/102 |
+| State-only 1M 96x96, long, 32768 | 112/113 | 107/112 | 82/112 | 52/112 | 23/115 | 9/102 |
+| State-only 1M 96x96, long, 40960 | 112/113 | 109/112 | 88/112 | 52/112 | 24/115 | 9/102 |
+| State-only 1M 96x96, long, 49152 | 112/113 | 107/112 | 91/112 | 65/112 | 36/115 | 10/102 |
+| State-only 1M 96x96, long, 57344 | 111/113 | 110/112 | 93/112 | 65/112 | 39/115 | 15/102 |
+| State-only 1M 96x96, long, 65536 | 113/113 | 109/112 | 93/112 | 70/112 | 46/115 | 15/102 |
+| State-only 4M 96x96, 16,384 | 113/113 | 105/112 | 78/112 | 45/112 | 15/115 | 4/102 |
+| Spatial 1M 96x96 (soft feedback), 16,384 | 103/113 | 105/112 | 54/112 | 36/112 | 19/115 | 4/102 |
+| Spatial 1M 64x64 control, 16,384 | 106/112 | 101/109 | 66/109 | 53/107 | 25/114 | 11/95 |
+
+State probe along the run (same columns as above):
+
+| Updates | Encoder ball x / y | Posterior ball x / y | Prior 1 | Prior 4 | Prior 8 | Prior 16 | Prior 32 | Paddle 1 / 32 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 8192 | 16 / 13 | 15 / 9 | 14 / 8 | 15 / 7 | 18 / 10 | 21 / 12 | 31 / 20 | 7 / 14 |
+| 16384 | 15 / 13 | 14 / 8 | 13 / 7 | 15 / 7 | 18 / 9 | 22 / 11 | 30 / 21 | 7 / 14 |
+| 24576 | 15 / 13 | 15 / 8 | 14 / 6 | 15 / 7 | 19 / 8 | 22 / 11 | 30 / 21 | 7 / 13 |
+| 32768 | 15 / 13 | 16 / 8 | 15 / 6 | 16 / 7 | 19 / 8 | 20 / 10 | 32 / 19 | 8 / 14 |
+| 40960 | 15 / 13 | 17 / 9 | 15 / 7 | 16 / 7 | 18 / 9 | 22 / 11 | 31 / 17 | 8 / 13 |
+| 49152 | 15 / 13 | 15 / 8 | 14 / 6 | 16 / 7 | 19 / 9 | 20 / 10 | 31 / 16 | 8 / 13 |
+| 57344 | 15 / 13 | 16 / 9 | 14 / 7 | 16 / 7 | 18 / 8 | 22 / 10 | 26 / 18 | 8 / 15 |
+| 65536 | 15 / 14 | 16 / 9 | 14 / 7 | 16 / 8 | 19 / 8 | 20 / 11 | 30 / 14 | 8 / 13 |
+| predict-the-mean baseline | 40 / 28 | same | same | same | same | same | same | 47 |
+
+The budget was the missing ingredient. Past 16,384 updates the pixel forecasts
+keep climbing at every horizon and at 65,536 the 1M state-only model beats the
+64x64 control everywhere on the shared development origins: four-step 93/112
+against 66/109, eight-step 70/112 against 53/107, sixteen-step 46/115 against
+25/114, thirty-two-step 15/102 against 11/95, with observed reconstruction
+113/113 and one-step 109/112, in 74 minutes of native calls on 96x96 frames.
+The curve had not flattened at the end (eight-step 65 → 70, sixteen-step
+39 → 46 over the last 8,192 updates). The linear state readout stays on its
+plateau throughout (prior-state ball 14 / 7 at one step, 20 / 11 at sixteen)
+while the thirty-two-step readout tightens (30 / 21 → 30 / 14), so the gains
+come from the renderer and the nonlinear part of the state code. The forecast
+tiles at 65,536 show a sharp ball through four steps, a blob at eight and
+smears at sixteen and thirty-two, with the brick rows still blurred (balanced
+error .32): the scene is the remaining weakness of the state-only decoder,
+which the running 4M context-frame job addresses.
 
 ## Reward events
 
