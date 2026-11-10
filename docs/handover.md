@@ -11,35 +11,37 @@ about137 GB across five passes, preserving checkpoints and evidence. Retained
 artifacts may share hardlinks and contain sparse zero blocks; keep their bytes
 immutable. The latest pass leaves about271.5 GiB available on the root filesystem.
 
-## Current work — November 9
+## Current work — November 10
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select the [fixed wide-motion learning comparison](experiments/2026-11-09-breakout-world-wide-motion-learning.md):
-one fresh16,384-update1M/RGB64/B8/T32/H16 physical-feature learner with
-`rgb_wide_motion=true`. Local motion/fusion widths16→32;80 parameters/675,643
-scalars/240 saved arrays,13 changed local shapes,+71,728 scalars. Encoder/RSSM/
-event geometry stays. This is a capacity hypothesis,not a diagnosed cause.
-Same original two-cycle plan/data/RGB100/event losses/rates4e-4/Auto/41001;
-new initialization/native andfirst-update checks differ. Fixed final decision,
-unchanged dense gates,6,600s training/600s restore caps,no automatic successor.
-The main learner is active under one host guard;215 execution/41 CPU-plan pins,
-CPU model-construction trap andexact first-batch/plan checks pass. The first actual
-update matches13 reports/240 qualifiedage1 tensors exactly;77 required-family
-parameters change,finite240 tensors andtotal/support pass before update2.
-Source56611db4,
-main invocationc993d779a66f46d6a58daee8078ecfb1/controller2231604,observer2231609,
-CPU finisher2231611;root `/x/Temp/kindle-world-wide-motion-learning-20261109`.
-Restore/CPU final audits are attached;no broader assessment is allocated.
-Final-image CPU observer2234733/invocation5ff779bc66d541c684ab54ad763b7cf7 waits
-for the original final-audit service,then reviews cached exports only. Its initial
-immediate launcher observation fails;the separate same-invocation identity check
-passes without restart. Original failure remains;image analysis has not run.
-The [provisional2,048 review](results/2026-11-09-breakout-world-wide-motion-learning.md)
-shows mixed small-curve development:observed17/26 vs23/26,one17/27 vs21/27,
-four6/26 vs3/26,eight1/27 vs0/27. Native483.300s vs228.781s (2.1125x).
-34-input/60-join CPU review passes,all six groups/four draws/four fixed grids
-retained;long drift/ball loss remains. These are not final dense gates orproof
-of useful learning/hour. Continue the fixed endpoint. Original requirements remain.
+unproven. The [fixed wider-motion learner](results/2026-11-09-breakout-world-wide-motion-learning.md)
+closes with3/3 dense gates:development observed/1/4/8/16/32
+107/112,105/109,77/109,58/107,31/114,11/95 versus early physical
+106/112,101/109,66/109,53/107,25/114,11/95. Fitting32 regresses24/179→22/179.
+Native3,888.344s/loop4,065.276s versus1,841.013s/1,998.783s;no efficiency gain
+established. Same data/plan/1M/RGB64/B8/T32/H16/Auto/41001/RGB100,rates4e-4;
+local motion/fusion16→32 is the intended change,withnew shapes/init/native.
+80 weights/675,643 scalars/240 arrays,+71,728 scalars;default stays off.
+
+All215 execution/172 CPU-audit/41 CPU-plan/180 closure pins pass,426 unique
+closed pins verified.16,384 finite13-report rows,240 actual-initial/frozen,
+80 changed weights,384 dense initial origins,58 exports and18 exact restore
+arrays pass;first actual update matches13 reports/240 qualifiedage1 tensors.
+Two guards/18 sealed files andall four services inactive/successful. Main
+source56611db4/invocationc993d779a66f46d6a58daee8078ecfb1;root
+`/x/Temp/kindle-world-wide-motion-learning-20261109`. All five final figures
+reviewed;long drift,blur andball loss persist. Final-image34-input/60-join CPU
+review passes in2.432s. Its original immediate launcher observation failure
+remains;separate same-invocation observation andoriginal image job complete
+without restart. No native/main CPU failure orretry. Provisional2k evidence stays.
+
+Select the separate [frozen chosen-action assessment](experiments/2026-11-10-breakout-world-wide-motion-branches.md),
+not another learner. Same394 cached oracle inputs,84 related groups/33 distinct
+contexts,history16/32,eight draws,unchanged physics/event gates;only new final
+queried,old scores cached. Pin source/config/native/runner/closed inputs before
+one1,800s guarded allocation at `/x/Temp/kindle-world-wide-motion-branches-20261110`.
+No GPU job isactive yet,no collector/extension/automatic successor. All original
+full-world requirements remain;short point gains do not prove a full world.
 
 The [native qualification](results/2026-11-09-breakout-world-wide-motion-native.md)
 passes in81.157s:small-fixture native values/derivatives/lane isolation,

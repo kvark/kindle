@@ -1,76 +1,115 @@
-# Wider local motion: provisional2,048-update review
+# Wider local motion: modest point gains at twice the training cost
 
-The fixed fresh16,384-update learner remains active. This is a scheduled curve
-review, not the final dense screen or a world-model success claim.
-[Protocol](../experiments/2026-11-09-breakout-world-wide-motion-learning.md),
+The fixed fresh16,384-update learner closes on November10 andpasses **3/3
+intermediate dense gates**. Several point forecasts improve, but long forecasts
+remain weak andlearning calls cost2.1121x the earlier physical-feature learner.
+This is not a useful-learning/hour gain or a full-world success. After reviewing
+all closed audits/images, select the separately declared
+[chosen-action assessment](../experiments/2026-11-10-breakout-world-wide-motion-branches.md).
+No learning extension orautomatic successor follows.
+
+[Learning protocol](../experiments/2026-11-09-breakout-world-wide-motion-learning.md),
 [native qualification](2026-11-09-breakout-world-wide-motion-native.md).
 Root `/x/Temp/kindle-world-wide-motion-learning-20261109`.
 
-At the same2,048 updates, first-draw visible balls within one RGB64 pixel are:
+## Fixed final recorded-action forecasts
 
-| Group/model | Observed | 1 action | 4 actions | 8 actions | 16 actions | 32 actions |
+First fixed draw, visible truth balls within one RGB64 pixel. Missing/diffuse
+balls fail. Related reused origins andvarying supports are not independent trials.
+No checkpoint, draw or tolerance selection replaces the fixed final.
+
+|Development model|Observed|1|4|8|16|32|
 |---|---:|---:|---:|---:|---:|---:|
-| Development natural,16 channels |23/26|21/27|3/26|0/27|0/27|0/25|
-| Development natural,32 channels |17/26|17/27|6/26|1/27|0/27|0/25|
-| Development contacts,16 channels |8/8|8/8|0/5|0/6|0/8|0/8|
-| Development contacts,32 channels |8/8|8/8|2/5|0/6|0/8|0/8|
-| Fitting natural,16 channels |15/20|13/21|2/23|0/21|1/23|0/21|
-| Fitting natural,32 channels |14/20|15/21|4/23|1/21|0/23|0/21|
-| Fitting contacts,16 channels |16/16|16/16|4/15|0/9|0/16|0/16|
-| Fitting contacts,32 channels |16/16|16/16|3/15|0/9|0/16|0/16|
+|Own actual initial|0/112|0/109|1/109|0/107|1/114|0/95|
+|Retained one-hot|103/112|102/109|69/109|53/107|22/114|8/95|
+|Early physical features|106/112|101/109|66/109|53/107|25/114|11/95|
+|Late commands|99/112|99/109|73/109|56/107|28/114|5/95|
+|Posterior history|108/112|99/109|45/109|19/107|5/114|0/95|
+|Wide motion|107/112|105/109|77/109|58/107|31/114|11/95|
 
-Four-step development improves on these small reused groups; natural observed
-andone-step regress. All four draws andsix groups remain in the CPU review.
-Development-natural observed32-channel counts are17,16,16,16/26;one-step
-17,17,18,16/27;four-step6/26 each;eight1,2,1,1/27. Ending groups have zero
-supported ball coordinates, not perfect coordinate forecasts. Paddle/brick
-metrics, false detections andraw reward/continuation outputs remain retained.
-These curve groups differ from the fixed final dense128 development origins.
+Observed>=.90,one>=89/109,eight>=28/107 all pass. This intermediate screen does
+not establish accurate long rollouts, calibrated events orchosen-action physics.
 
-Native learn-call time through2,048 is483.300479s versus228.781371s for the
-earlier16-channel physical-feature learner:2.1125x. The earlier4,096-update point
-costs458.756136s;that timing alone is not a forecast comparison. New timing
-includes the first-update checks andage1 save. Initialization, preparation,
-scheduled evaluation andseparate restore are excluded. No isolated backend
-speedup, useful-learning/hour gain orfinal efficiency conclusion follows.
+|Fitting model|Observed|1|4|8|16|32|
+|---|---:|---:|---:|---:|---:|---:|
+|Own actual initial|0/163|0/177|0/180|0/176|0/171|0/179|
+|Retained one-hot|146/163|154/177|107/180|84/176|37/171|20/179|
+|Early physical features|147/163|159/177|114/180|90/176|43/171|24/179|
+|Wide motion|151/163|160/177|135/180|96/176|49/171|22/179|
 
-Four fixed row0/draw0 grids compare recorded truth,16-channel and32-channel
-forecasts on natural/contact fitting/development groups. All four are reviewed.
-The32-channel fitting-natural example shows an upward red streak near the
-recorded trajectory at intermediate horizons;development-natural still smears,
-loses the ball andmisses the later bounce. Contact forecasts still drift orlose
-the ball after near-term agreement. A streak is not a precise ball forecast;
-these rows do not replace aggregate metrics or establish a mechanism.
+Fitting32 falls24/179→22/179 against early physical features despite nearer
+improvements. Development paddle observed falls118/128→111/128,one rises71/128→
+74/128,eight45/126→49/126,and32 rises30/118→32/118. Ball false detections at
+one/eight/32 rise0/9/9→3/10/12. Brick balanced error at32 improves.060017→.034836;
+this does not establish persistent removed-brick memory. All fitting/development,
+draw/horizon, reward/continuation andattribute regressions remain in raw exports.
 
-One2.516s CPU review verifies34 closed input pins,60 physical-field joins and
-finite forecasts for all six groups/four draws.12 closed files are sealed after
-the plotting subprocess exits, including its closed log. No model/GPU/emulator
-query, optimizer update, retry orrepair is used. Script/analysis plan are declared
-before inputs;inputs are pinned only after evaluation finishes andlearning resumes.
-Receipts, all metrics andfour PNGs remain under `milestone-2048-v1`;original
-scripts/results stay immutable. The main learner andits final decision are unchanged.
+## Recipe, cost and limits
 
-Main source56611db4,nativee3d18841/SHA02feea6e,215 execution/41 CPU-plan pins.
-Fresh1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,RGB100/rates4e-4,physical features,
-observed/imagined event losses1,same exact two-cycle plan/data. Intended change
-is local motion/fusion16→32;13 shapes,initialization,native source andwrapper work
-also differ. First actual update matches13 qualified reports/240 tensors;
-77 required-family weights change and240 tensors remain finite before update2.
-Main invocationc993d779a66f46d6a58daee8078ecfb1/controller2231604;observer2231609
-andCPU finisher2231611 stay attached. No fault orstderr is reported at this review.
+Fresh1M/RGB64/B8/T32/H16/full BPTT/Auto/41001,RGB100,rates4e-4,KL1/.1/freeNat1,
+mixing.01,observed/imagined event losses1,fixed LEFT/RIGHT/FIRE table. Same exact
+original natural two-cycle plan/data. Intended config change `rgb_wide_motion`:
+motion0/1/2/fusion outputs16→32,final RGB input16→32.80 logical weights/675,643
+scalars/240 arrays;13 shapes change,+71,728 scalars. Encoder/RSSM/event geometry,
+early commands,two-image history andRGB3 targets remain. Initialization,native
+source andfirst-update wrapper work also differ. Capacity as an isolated cause
+is not established. Default stays off; no rebuild/overlay ornew primitive.
 
-Continue the declared endpoint without early quality stopping orcheckpoint
-selection. Final dense gates, frozen tensors/restore andclosed audits remain
-pending. No broader assessment,extension orautomatic successor is allocated.
-Full action-conditioned distributional physics,natural events,brick memory,
-late/tunnel/second-wall/above-top coverage,untouched families andfresh learner
-confirmation remain required. The complete world-model goal is unproven.
+Native calls **3,888.344207s (64m48.344s)**; training/evaluation/checkpoint loop
+**4,065.275627s (67m45.276s)**. Early physical-feature control:1,841.013208s/
+1,998.782574s;ratios2.1120675/2.0338759. One-hot:2,203.088s/2,369.265s.
+New call timing includes first-update checks/age1 saving. Initialization,initial
+dense export,separate restore andCPU review are outside the loop. Shared-host
+wrapper intervals do not isolate kernel speed orpaired reliability. The short
+point gains do not justify a training-efficiency claim.
 
-A separate final-image CPU observer is attached after this provisional review.
-It waits for successful final audits before pinning/reading final image exports;
-it adds no model query orupdate. Its immediate launcher identity check fails
-before saving its receipt;the first state/failed predicate is not captured.
-`final-images-v1/launch-observation-failure-v1.json` preserves the original output.
-A separate `service-v2.json` verifies the same original invocation/command and
-controller2234733 without restart. Image analysis remains pending;this is not
-a native-learning failure or a repeated provisional review.
+Source32,850/unique32,849 arrivals,4,194,304 replay rows,1,951,882 valid suffix
+rows,19,140 suffix terminals,32,016 future positives,68,880 observed positives,
+21,818 observed terminals,151,616 context resets and20,976 source resets. No new
+emulator actions/frames,collection,actor,critic orCDP. Learner seed/development
+origins are reused. Full-game coverage andfresh confirmation remain open.
+
+## Closed execution and images
+
+All215 execution/172 CPU-audit/41 CPU-plan/180 closure pins verify after exit.
+A combined terminal review verifies426 distinct pinned files. All16,384 finite
+13-report rows,loss/support identities,exact plan/counts,240 qualified actual-
+initial/final frozen arrays,80 changed weights,384 dense initial origins,58
+finite exports and18 exact restored arrays pass. The first actual update is
+inside the budget andmatches13 qualified reports/240age1 arrays exactly;
+77 required-family weights change before update2. Explicitv27 wraps v25/v18.
+Two host guards/18 sealed files pass,none unsealed.
+
+All four services areinactive/MainPID0/Resultsuccess. Main invocation
+c993d779a66f46d6a58daee8078ecfb1/controller2231604,observer2231609,
+CPU finisher2231611 andimage observer2234733;terminal completion journal matches.
+Nativee3d18841/SHA02feea6e,matching runtime/runner are reused unchanged.
+Main declaration source56611db4. No native ormain CPU failure,retry orrepair.
+
+All five final figures areviewed. Four fixed row0/draw0 grids compare truth,
+16-channel and32-channel natural/contact fitting/development forecasts. Long
+red streaks,blur,incorrect trajectories anddisappearing/multiple ball-like
+features remain. These rows do not replace aggregate metrics orprove a cause.
+The2.432s CPU image review checks34 closed inputs/60 physical joins/finite arrays
+onall six groups/four draws;15 closed files seal after its log closes. Zero
+model/GPU/emulator queries orupdates.
+
+The image observer's immediate launcher identity observation fails before its
+receipt iswritten;the initial failed predicate/state isunisolated. Original
+output remains in `final-images-v1/launch-observation-failure-v1.json`. A separate
+same-invocation/command observation passes without restart,then the original
+observer completes its declared image analysis successfully. No failed original
+observation is relabeled. Original dev-profile wheel/log andseparate release
+packaging correction remain in the native qualification.
+
+The2,048-update provisional report,all four-draw curves,its34-input CPU review,
+figures andoriginal rounding correction snapshots remain under
+`milestone-2048-v1` andin Git history. No provisional result replaces the final.
+No build cache iscreated by this learner;qualified cache release stays separate.
+
+The selected frozen assessment requires its own source/data/runtime declaration;
+it is not an automatic learner extension. Full distributional physics,natural
+reward/life/game-over calibration,persistent brick memory,late/tunnel/second-wall/
+above-top coverage,untouched families andfresh learner confirmation remain
+required. Actor/critic,CDP andfive-game work remain parked. The full world-model
+goal is active andunproven.
