@@ -12,7 +12,13 @@ pub(crate) struct Convolution {
 }
 
 impl Convolution {
-    pub(crate) fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
+    pub(crate) fn new(
+        graph: &mut Graph,
+        name: &str,
+        input: usize,
+        output: usize,
+        side: usize,
+    ) -> Self {
         Self::with_stride(graph, name, input, output, side, 1)
     }
 
@@ -119,7 +125,13 @@ fn append_action(
 }
 
 impl ConvNorm {
-    pub(crate) fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
+    pub(crate) fn new(
+        graph: &mut Graph,
+        name: &str,
+        input: usize,
+        output: usize,
+        side: usize,
+    ) -> Self {
         Self::with_stride(graph, name, input, output, side, 1)
     }
 
@@ -142,7 +154,13 @@ impl ConvNorm {
         }
     }
 
-    pub(crate) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize, pool: bool) -> NodeId {
+    pub(crate) fn forward(
+        &self,
+        graph: &mut Graph,
+        input: NodeId,
+        batch: usize,
+        pool: bool,
+    ) -> NodeId {
         let layer = &self.convolution.layer;
         let mut value = self.convolution.forward(graph, input, batch);
         let mut side = self.convolution.output_side;

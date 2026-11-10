@@ -178,9 +178,5 @@ fn centroid_future_loss_reaches_encoder_prior_core_and_head_without_future_state
     );
     // The only learned head reads causal prior features; future targets and
     // reset weights enter detached target/mask branches after state creation.
-    assert!(
-        g.nodes()
-            .iter()
-            .any(|n| matches!(n.op, Op::StopGradient))
-    );
+    assert!(g.nodes().iter().any(|n| matches!(n.op, Op::StopGradient)));
 }

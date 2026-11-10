@@ -230,7 +230,8 @@ impl Reference {
                 );
                 let selected = (0..size.classes)
                     .max_by(|&a, &b| {
-                        let score = |i: usize| probabilities[i].ln() - (-inputs[2][offset + i].ln()).ln();
+                        let score =
+                            |i: usize| probabilities[i].ln() - (-inputs[2][offset + i].ln()).ln();
                         score(a).total_cmp(&score(b))
                     })
                     .unwrap();

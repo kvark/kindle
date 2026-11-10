@@ -5,9 +5,7 @@ mod vector;
 #[cfg(test)]
 mod actor_width_tests;
 #[cfg(test)]
-mod latent_shape_tests;
-#[cfg(test)]
-mod residual_actor_tests;
+mod completed_value_tests;
 #[cfg(test)]
 mod dynamics_gradients;
 #[cfg(test)]
@@ -15,17 +13,19 @@ mod dynamics_tests;
 #[cfg(test)]
 mod expected_value_tests;
 #[cfg(test)]
-mod completed_value_tests;
-#[cfg(test)]
-mod rgb96_tests;
-#[cfg(test)]
-mod rgb_stride_tests;
-#[cfg(test)]
 mod exploration;
 #[cfg(test)]
 mod gradient_contributions;
 #[cfg(test)]
+mod latent_shape_tests;
+#[cfg(test)]
 mod optimizer_replay;
+#[cfg(test)]
+mod residual_actor_tests;
+#[cfg(test)]
+mod rgb96_tests;
+#[cfg(test)]
+mod rgb_stride_tests;
 #[cfg(test)]
 mod upstream_reference;
 pub use vector::{FeatureVectorAgent, VectorDreamerAgent};
@@ -497,10 +497,22 @@ pub struct DreamerCore {
 
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
-        assert!(config.world_survival_scale.is_none(), "cumulative survival is standalone world only");
-        assert!(!config.rgb_event_heads, "RGB event heads are standalone world only");
-        assert!(!config.rgb_wide_motion, "wide motion is standalone world only");
-        assert!(!config.rgb_late_action, "late action is standalone world only");
+        assert!(
+            config.world_survival_scale.is_none(),
+            "cumulative survival is standalone world only"
+        );
+        assert!(
+            !config.rgb_event_heads,
+            "RGB event heads are standalone world only"
+        );
+        assert!(
+            !config.rgb_wide_motion,
+            "wide motion is standalone world only"
+        );
+        assert!(
+            !config.rgb_late_action,
+            "late action is standalone world only"
+        );
         assert!(
             config.world_action_features.is_none(),
             "action features are standalone world only"
@@ -513,8 +525,14 @@ impl DreamerCore {
             config.rgb_color_attention.is_none(),
             "color attention is standalone world only"
         );
-        assert!(!config.rgb_spatial_fusion, "spatial fusion is standalone world only");
-        assert!(!config.world_image_feedback,"image feedback is standalone world only");
+        assert!(
+            !config.rgb_spatial_fusion,
+            "spatial fusion is standalone world only"
+        );
+        assert!(
+            !config.world_image_feedback,
+            "image feedback is standalone world only"
+        );
         assert!(
             !config.rgb_spatial_decoder,
             "spatial decoder is standalone world only"
@@ -579,10 +597,22 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
-        assert!(config.world_survival_scale.is_none(), "cumulative survival is standalone world only");
-        assert!(!config.rgb_event_heads, "RGB event heads are standalone world only");
-        assert!(!config.rgb_wide_motion, "wide motion is standalone world only");
-        assert!(!config.rgb_late_action, "late action is standalone world only");
+        assert!(
+            config.world_survival_scale.is_none(),
+            "cumulative survival is standalone world only"
+        );
+        assert!(
+            !config.rgb_event_heads,
+            "RGB event heads are standalone world only"
+        );
+        assert!(
+            !config.rgb_wide_motion,
+            "wide motion is standalone world only"
+        );
+        assert!(
+            !config.rgb_late_action,
+            "late action is standalone world only"
+        );
         assert!(
             config.world_action_features.is_none(),
             "action features are standalone world only"
@@ -595,8 +625,14 @@ impl DreamerCore {
             config.rgb_color_attention.is_none(),
             "color attention is standalone world only"
         );
-        assert!(!config.rgb_spatial_fusion, "spatial fusion is standalone world only");
-        assert!(!config.world_image_feedback,"image feedback is standalone world only");
+        assert!(
+            !config.rgb_spatial_fusion,
+            "spatial fusion is standalone world only"
+        );
+        assert!(
+            !config.world_image_feedback,
+            "image feedback is standalone world only"
+        );
         assert!(
             !config.rgb_spatial_decoder,
             "spatial decoder is standalone world only"
@@ -2951,16 +2987,26 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
     if metadata.config.world_survival_scale.is_some() {
-        return Err(std::io::Error::other("cumulative survival is standalone world only"));
+        return Err(std::io::Error::other(
+            "cumulative survival is standalone world only",
+        ));
     }
     if metadata.config.rgb_event_heads {
-        return Err(std::io::Error::other("RGB event heads are standalone world only"));
+        return Err(std::io::Error::other(
+            "RGB event heads are standalone world only",
+        ));
     }
     if metadata.config.rgb_wide_motion {
-        return Err(io::Error::new(io::ErrorKind::InvalidData, "wide motion is standalone world only"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "wide motion is standalone world only",
+        ));
     }
     if metadata.config.rgb_late_action {
-        return Err(io::Error::new(io::ErrorKind::InvalidData, "late action is standalone world only"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "late action is standalone world only",
+        ));
     }
     if metadata.config.world_action_features.is_some() {
         return Err(io::Error::new(
@@ -2981,10 +3027,16 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
         ));
     }
     if metadata.config.rgb_spatial_fusion {
-        return Err(io::Error::new(io::ErrorKind::InvalidData, "spatial fusion is standalone world only"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "spatial fusion is standalone world only",
+        ));
     }
     if metadata.config.world_image_feedback {
-        return Err(io::Error::new(io::ErrorKind::InvalidData,"image feedback is standalone world only"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "image feedback is standalone world only",
+        ));
     }
     if metadata.config.rgb_spatial_decoder {
         return Err(io::Error::new(
@@ -3223,7 +3275,12 @@ pub(super) fn sample_latents(
     output
 }
 
-pub(super) fn join_features(deter: &[f32], stoch: &[f32], batch: usize, config: &DreamerConfig) -> Vec<f32> {
+pub(super) fn join_features(
+    deter: &[f32],
+    stoch: &[f32],
+    batch: usize,
+    config: &DreamerConfig,
+) -> Vec<f32> {
     let size = config.network();
     assert_eq!(deter.len(), batch * size.deter);
     let stoch_width = size.stoch * size.classes;

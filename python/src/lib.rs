@@ -1,10 +1,10 @@
 //! Python bindings for the pixel-first Dreamer baseline.
 
+mod denoising;
 mod features;
 mod probes;
 mod vector;
 mod world;
-mod denoising;
 
 use std::path::Path;
 

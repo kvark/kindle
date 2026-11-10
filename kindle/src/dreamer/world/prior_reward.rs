@@ -58,9 +58,11 @@ fn prior_reward_excludes_arrival_but_reaches_dynamics_and_reward() {
                 "connected {name}"
             );
         } else {
-            assert!(matches!(&backward.node(gradient).op,
+            assert!(
+                matches!(&backward.node(gradient).op,
                 Op::Constant { data } if data.iter().all(|&value| value == 0.0)),
-                "detached {name}");
+                "detached {name}"
+            );
         }
     }
 }

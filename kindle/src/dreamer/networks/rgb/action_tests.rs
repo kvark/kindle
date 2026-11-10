@@ -127,7 +127,11 @@ fn reference_options(transport: bool, late: bool) {
 }
 
 fn reference_architecture(transport: bool, late: bool, wide: bool) {
-    let mut f = if wide { fixture_with_architecture(transport, late, true) } else { fixture_with_options(transport, late) };
+    let mut f = if wide {
+        fixture_with_architecture(transport, late, true)
+    } else {
+        fixture_with_options(transport, late)
+    };
     let backward = meganeura::autodiff::differentiate(&f.graph);
     let original = evaluate(&backward, &f.feeds).unwrap();
     assert!(original.iter().flat_map(|v| &v.data).all(|x| x.is_finite()));
@@ -210,7 +214,11 @@ fn native_options(transport: bool, late: bool) {
 }
 
 fn native_architecture(transport: bool, late: bool, wide: bool) {
-    let mut f = if wide { fixture_with_architecture(transport, late, true) } else { fixture_with_options(transport, late) };
+    let mut f = if wide {
+        fixture_with_architecture(transport, late, true)
+    } else {
+        fixture_with_options(transport, late)
+    };
     let backward = meganeura::autodiff::differentiate(&f.graph);
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     let mut session = runtime::build_session(&f.graph, &gpu, Mode::Training, false);
@@ -349,15 +357,30 @@ fn wide_motion_keeps_causal_inputs_and_widens_only_the_local_path() {
     let state = graph.input("state", &[2, c.feature_dim()]);
     let history = graph.input("history", &[2, 2 * c.observation_dim()]);
     let action = graph.input("action", &[2, 18]);
-    let output=decoder.forward_logits_with_action_history(&mut graph, state, Some(history), Some(action), 2);
-    for (index, layer) in decoder.motion.iter().chain(decoder.fusion.as_deref()).enumerate() {
-        assert_eq!(layer.convolution.layer.out_channels,32);
-        let weight=layer.convolution.layer.weight;
-        let conv=graph.nodes().iter().find(|n| matches!(n.op,Op::Conv2d{..}) && n.inputs.contains(&weight)).unwrap();
-        let seen=super::fusion_tests::ancestors(&graph,conv.id);
+    let output = decoder.forward_logits_with_action_history(
+        &mut graph,
+        state,
+        Some(history),
+        Some(action),
+        2,
+    );
+    for (index, layer) in decoder
+        .motion
+        .iter()
+        .chain(decoder.fusion.as_deref())
+        .enumerate()
+    {
+        assert_eq!(layer.convolution.layer.out_channels, 32);
+        let weight = layer.convolution.layer.weight;
+        let conv = graph
+            .nodes()
+            .iter()
+            .find(|n| matches!(n.op, Op::Conv2d { .. }) && n.inputs.contains(&weight))
+            .unwrap();
+        let seen = super::fusion_tests::ancestors(&graph, conv.id);
         assert!(seen.contains(&history) && seen.contains(&action));
-        assert_eq!(seen.contains(&state),index==3);
+        assert_eq!(seen.contains(&state), index == 3);
     }
-    assert_eq!(decoder.output.layer.in_channels,32);
-    assert_eq!(graph.node(output).ty.shape,[2,c.observation_dim()]);
+    assert_eq!(decoder.output.layer.in_channels, 32);
+    assert_eq!(graph.node(output).ty.shape, [2, c.observation_dim()]);
 }
