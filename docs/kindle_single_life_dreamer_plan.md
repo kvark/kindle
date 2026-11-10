@@ -14,21 +14,24 @@ the retained-off actor-dynamics/expected-value snapshots cross the host.
 Run every heavy job as a memory-capped `systemd-run --user` unit; a bare
 `cargo test` peaked at 17.6 GB and the OOM killer took the session down.
 
-The goal **prove the world model training on Breakout** is active. The first
-experiment on the new stack, [corpus scale](experiments/2026-11-10-breakout-world-scale.md),
-is complete: the unchanged early physical-feature recipe (1M/RGB64/B8/T32/H16/
-Auto/41001, `motion_event_rollout`) trained on a fresh 524,288-action corpus
-instead of 128 passes over 33k arrivals scores observed 101/112, one-step
-104/109, four-step 59/109, eight-step 38/107, sixteen-step 18/114 and
-thirty-two-step 0/95 on the November 7 development origins, against the
-control's 106/101/66/53/25/11; fitting equals development in both runs. More
-data does not lift the long horizons, so the limit is the model, objective or
-optimization, not the corpus ([result](results/2026-11-10-breakout-world-scale.md)).
-Two follow-ups run serially in `kindle-world-scale-followup-20261110.service`
-on the same corpus: the 1M recipe for 65,536 updates, then the 4M preset for
-16,384 updates. Root `/x/Temp/kindle-world-scale-20261110`; driver
-`python/examples/breakout_world_scale.py`. Actor/critic, CDP and the five-game
-campaign stay parked.
+The goal **prove the world model training on Breakout** is active. The
+[corpus-scale screen](results/2026-11-10-breakout-world-scale.md) is
+complete: 16x more distinct play with the unchanged 1M recipe leaves
+development ball tracking at the control's level or below past four steps
+(8-step 38/107 versus 53/107, 16-step 18/114 versus 25/114), fitting equals
+development in both runs, and training reproduces bit-exactly for a fixed seed
+and plan. Forecast-time sharpening of fed-back frames collapses the forecasts.
+The cause is representational: in 64x64 frames the ball is sub-pixel (brightest
+red 77/255 on average, 0 at the 10th percentile), while at 96x96 it is a
+consistent multi-pixel object (181/255, 10th percentile 162). The active
+experiment is the [same recipe at 96x96](experiments/2026-11-10-breakout-world-rgb96.md)
+on a fresh 524,288-action 96x96 corpus, scored on the November 7 development
+origins re-rendered at 96 (unit `kindle-world-scale-20261110.service`, output
+`train-96`, about 347 ms per update). The 65,536-update budget run was
+interrupted at about 9,500 updates in its favour (`train-1m-65k/`, partial
+curve retained and reproducible); it and the 4M run follow afterwards. Root
+`/x/Temp/kindle-world-scale-20261110`; driver `python/examples/breakout_world_scale.py`.
+Actor/critic, CDP and the five-game campaign stay parked.
 
 The previous [cumulative-survival learner](results/2026-11-10-breakout-world-survival-loss-learning.md)
 remains frozen by systemd at the user's request at update 9,964/16,384

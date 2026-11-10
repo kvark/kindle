@@ -11,7 +11,13 @@ development tracking 59/109 → 3/109 at temperature .5, 0 below). Corpus scale
 did not change this ([result](../results/2026-11-10-breakout-world-scale.md)).
 
 This experiment changes only the frame side. `ObservationKind::Rgb96` already
-exists in the encoder, decoder, preprocessing and config.
+exists in the encoder, decoder, preprocessing and config. On 1,026 re-rendered
+development frames the ball is detected in 895 (the same 87% as at 64), its
+brightest red pixel averages 181/255 (10th percentile 162, 90th 196) and about
+four pixels exceed 100/255: a consistent multi-pixel object instead of a
+phase-dependent blob. The 1M learner costs 347 ms per update at 96 against
+129 ms at 64 (both measured with light concurrent GPU use), so 16,384 updates
+take about 1h50m.
 
 ## Data
 
