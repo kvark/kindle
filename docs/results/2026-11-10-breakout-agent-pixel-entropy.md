@@ -17,7 +17,10 @@ wall; 313 online episodes with guided play, mean 48.6. Final policy entropy
 
 ## Entropy 3e-5
 
-RUN_E3E5
+Training 22:15 to 22:48 UTC: 200,000 actions, 12,477 updates, 1,969.2 s
+wall; 307 online episodes with guided play, mean 48.7. Final policy entropy
+.88 (weighted .85), return scale 20.9, imagined return mean 10.7; world losses
+unchanged (reconstruction 2,823, prior rollout 2,920).
 
 ## Frozen evaluations (200k, three natural episodes per environment, zero updates)
 
@@ -31,8 +34,25 @@ RUN_E3E5
 | 1e-4 | 4000001009 | greedy | 27 | 93.926 | 97.333 | 82 | 292 | 8 | 0/27 |
 | 1e-4 | 4000022003 | sampled | 25 | 33.720 | 34.583 | 29 | 74 | 0 | 0/25 |
 | 1e-4 | 4000022003 | greedy | 25 | 85.800 | 86.083 | 79 | 264 | 7 | 0/25 |
-EVAL_E3E5
+| 3e-5 | 4000001009 | sampled | 24 | 31.375 | 31.375 | 28 | 55 | 0 | 0/24 |
+| 3e-5 | 4000001009 | greedy | 24 | 129.125 | 129.125 | 83 | 342 | 9 | 0/24 |
+| 3e-5 | 4000022003 | sampled | 26 | 29.462 | 29.958 | 26.5 | 90 | 0 | 0/26 |
+| 3e-5 | 4000022003 | greedy | 24 | 110.917 | 110.917 | 92 | 400 | 11 | 0/24 |
 
 ## Reading
 
-READING
+Negative. Cutting the entropy scale three- or tenfold leaves the actor's
+final policy entropy where it was (.87, .89, .88 nats across 3e-4, 1e-4 and
+3e-5) and the sampled scores unchanged or slightly lower (31 to 34 against 38
+to 40), while the greedy scores fall (94 to 129 against 151 to 157). The
+entropy bonus is therefore not what keeps the pixel-world actor's
+distribution flat; something else pins its entropy near .88 nats for four
+actions, and the temperature result (198.8 at .25) says the ranking under
+that flat distribution is good. Candidates not tested here: actor unimix
+(.01 mixes 1% uniform but does not explain .88 nats), the return
+normalization (return scale 18 to 38 against the CDP learner's values,
+which shrink the advantages that sharpen the policy), and the imitation
+term (scale 100 on guided rows, which pulls the actor toward the teacher's
+distribution). One seed per point; the greedy drops are within the seed
+variation seen elsewhere today (CDP 143.7 against 94.6 between cohorts, 94.6
+against 75.3 between seeds) and are not read as an entropy effect.
