@@ -30,22 +30,21 @@ the retained-off actor-dynamics/expected-value snapshots cross the host.
 Run every heavy job as a memory-capped `systemd-run --user` unit; a bare
 `cargo test` peaked at 17.6 GB and the OOM killer took the session down.
 
-The goal **prove the world model training on Breakout** is active. The
-[corpus-scale screen](docs/results/2026-11-10-breakout-world-scale.md) is
-complete: 16x more distinct play with the unchanged 1M recipe leaves
-development ball tracking at the control's level or below past four steps
-(8-step 38/107 versus 53/107, 16-step 18/114 versus 25/114), fitting equals
-development in both runs, and training reproduces bit-exactly for a fixed seed
-and plan. Forecast-time sharpening of fed-back frames collapses the forecasts.
-The cause is representational: in 64x64 frames the ball is sub-pixel (brightest
-red 77/255 on average, 0 at the 10th percentile), while at 96x96 it is a
-consistent multi-pixel object (181/255, 10th percentile 162). The active
-experiment is the [same recipe at 96x96](docs/experiments/2026-11-10-breakout-world-rgb96.md)
-on a fresh 524,288-action 96x96 corpus, scored on the November 7 development
-origins re-rendered at 96 (unit `kindle-world-scale-20261110.service`, output
-`train-96`, about 347 ms per update). The 65,536-update budget run was
-interrupted at about 9,500 updates in its favour (`train-1m-65k/`, partial
-curve retained and reproducible); it and the 4M run follow afterwards. Root
+The goal **prove the world model training on Breakout** is active. Two
+screens on the new stack are closed: [16x more play](docs/results/2026-11-10-breakout-world-scale.md)
+and [96x96 frames](docs/results/2026-11-10-breakout-world-rgb96.md) both leave
+development ball tracking where the 64x64 control had it or below past four
+steps (eight-step 38/107 and 36/112 versus 53/107), with fitting equal to
+development, bit-exact reproduction for a fixed seed, and the sub-pixel 64x64
+ball (brightest red 77/255 on average) replaced by a bright multi-pixel ball at
+96 without effect. Forecast-time sharpening of fed-back frames collapses the
+forecasts. The remaining explanation is the autoregressive image feedback
+itself: hedged soft frames re-enter as dimmer blobs. The active experiment is
+[palette-committed feedback](docs/experiments/2026-11-10-breakout-world-palette-feedback.md):
+the same 96x96 recipe with `rgb_history_palette` snapping every fed-back frame
+to the nearest of 32 corpus colours with a straight-through gradient (output
+`train-96-palette`, unit `kindle-world-scale-20261110.service`). The 65,536-update
+budget run (partial at `train-1m-65k/`) and the 4M run follow. Root
 `/x/Temp/kindle-world-scale-20261110`; driver `python/examples/breakout_world_scale.py`.
 Actor/critic, CDP and the five-game campaign stay parked.
 
