@@ -144,7 +144,14 @@ performance on other GPUs still need checking.
 
 ## Transfer package
 
-Shared destination: **`/mnt/data/kindle-handover-20261025`**.
+Historical shared destination: **`/mnt/data/kindle-handover-20261025`**.
+That pathname is absent at the November10 cleanup check. The retained local
+extraction is `/x/Temp/kindle-amd-20261025/handover`; all eight files of its
+two original checkpoint sets still match the October25 availability receipt.
+This cleanup does not modify `/mnt/data`. The archive/bundle details below
+describe the original transfer package, rather than a new verification that
+the historical shared directory is present.
+
 `manifest.json` identifies every included artifact by original path, size and
 SHA256. `archive-review.json` records independent verification of all304 members.
 The artifact archive is392,172,204 bytes (about374MiB); it contains no build caches.

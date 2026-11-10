@@ -100,6 +100,16 @@ live optimizer age is not independently measured. No thaw, restore, RNG reset,
 new GPU allocation or goal work occurs during cleanup. Shared checkpoints,
 retained agent/world runtimes, models and unique datasets remain accessible.
 
+The final documentation check finds the historical
+`/mnt/data/kindle-handover-20261025` directory absent. The cleanup only removes
+the listed `/x` paths; it does not operate on `/mnt/data`. Both original
+checkpoint sets remain at `/x/Temp/kindle-amd-20261025/handover`, with all eight
+files matching their original October25 size/SHA256 receipt. Record the actual
+retained location instead of claiming that the historical directory was
+verified present. The initial post-cleanup assumption failure and separately
+named local-checkpoint verification remain in the cleanup artifacts; no cleanup
+or model stage is repeated.
+
 The first normal status query on an old Mind-Games worktree fails because a
 submodule path is a symlink. The separate `--ignore-submodules=all` inventory
 and full filesystem/symlink backup preserve its state; no source deletion follows

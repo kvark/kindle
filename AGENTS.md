@@ -198,6 +198,10 @@ without inheriting old boot assertions.
 
 ## Historical material
 
+On this host, the original checkpoints remain in the verified local extraction
+`/x/Temp/kindle-amd-20261025/handover`. The historical shared-transfer pathname
+below is absent at the November10 cleanup check; see the cleanup report.
+
 The shared transfer `/mnt/data/kindle-handover-20261025` contains the4096-action
 context smoke and2M Breakout originals,matching all346 tensors. Other historical
 game weights were not transferred. New AMD checkpoints remain locally retained.
