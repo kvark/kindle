@@ -292,6 +292,14 @@ impl ExpertImitation {
     }
 }
 
+fn is_zero(value: &usize) -> bool {
+    *value == 0
+}
+
+fn is_squared_error(value: &super::world_learner::PixelLoss) -> bool {
+    *value == super::world_learner::PixelLoss::SquaredError
+}
+
 fn is_false(value: &bool) -> bool {
     !value
 }
@@ -417,6 +425,17 @@ pub struct DreamerConfig {
     /// changes peak activation memory without changing the effective D3 batch.
     #[serde(default)]
     pub world_microbatch_size: Option<usize>,
+    /// Whole-agent learned-RGB world: per-pixel objective for reconstructions
+    /// and, with `world_prediction_length`, for prior-rollout images. Squared
+    /// error is upstream's; motion cross-entropy weights changed pixels as in
+    /// the standalone learner.
+    #[serde(default, skip_serializing_if = "is_squared_error")]
+    pub world_pixel_loss: super::world_learner::PixelLoss,
+    /// Whole-agent learned-RGB world: imagined steps after the observed prefix
+    /// whose decoded images are supervised directly. The posterior, heads and
+    /// imagination still cover the whole window.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub world_prediction_length: usize,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub open_loop_supervision: Option<OpenLoopSupervision>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -585,6 +604,8 @@ impl DreamerConfig {
             batch_length: 64,
             world_backprop_length: 8,
             world_microbatch_size: None,
+            world_pixel_loss: super::world_learner::PixelLoss::SquaredError,
+            world_prediction_length: 0,
             open_loop_supervision: None,
             color_centroid_supervision: None,
             rgb_color_attention: None,
@@ -1298,6 +1319,33 @@ impl DreamerConfig {
         }
         if self.batch_size == 0 || self.batch_length <= 1 {
             return Err("batch_size must be positive and batch_length must exceed one".into());
+        }
+        {
+            use super::world_learner::PixelLoss;
+            if (self.world_prediction_length > 0
+                || self.world_pixel_loss != PixelLoss::SquaredError)
+                && (!self.observation_kind.is_rgb()
+                    || self.loss_scales.reconstruction <= 0.0
+                    || self.loss_scales.future_prediction != 0.0
+                    || self.video_encoder.is_some()
+                    || self.rgb_frame_pair
+                    || self.observation_crop.is_some()
+                    || self.rgb_spatial_decoder
+                    || self.reconstruction_target_standardization.is_some()
+                    || !matches!(
+                        self.world_pixel_loss,
+                        PixelLoss::SquaredError | PixelLoss::MotionCrossEntropy
+                    ))
+            {
+                return Err("agent world pixel objectives require a plain learned-RGB world with reconstruction only".into());
+            }
+            if self.world_prediction_length > 0
+                && (self.world_prediction_length >= self.batch_length
+                    || self.world_backprop_length != self.batch_length
+                    || self.world_microbatch_size() != self.batch_size)
+            {
+                return Err("world_prediction_length requires full-sequence BPTT, a complete batch and a rollout shorter than the window".into());
+            }
         }
         if self.world_backprop_length == 0
             || self.world_backprop_length > self.batch_length

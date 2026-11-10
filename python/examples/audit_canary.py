@@ -18,8 +18,8 @@ METRICS = {
         expert_imitation_loss expert_imitation_scale exploration_loss future_prediction_loss
         initial_policy_loss initial_value_loss negative_reward_count negative_reward_prediction_mean
         open_loop_supervision positive_reward_count positive_reward_prediction_mean prior_continuation_loss
-        prior_continuation_valid_fraction prior_reward_loss prior_reward_valid_fraction raw_kl
-        reconstruction_loss replay_continuation_mae replay_continuation_prediction_mean
+        prior_continuation_valid_fraction prior_reward_loss prior_reward_valid_fraction prior_rollout_loss
+        raw_kl reconstruction_loss replay_continuation_mae replay_continuation_prediction_mean
         replay_continuation_target_mean replay_reward_mae replay_reward_prediction_mean
         replay_reward_target_mean replay_value_loss representation_kl reward_loss rewarded_count
         rewarded_prediction_mean total_loss unrewarded_prediction_mean zero_reward_count

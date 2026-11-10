@@ -317,13 +317,17 @@ fn build_training_graph_grouped(
         time_batch_length,
         false,
         true,
-        0,
-        PixelLoss::SquaredError,
+        config.world_prediction_length,
+        config.world_pixel_loss,
     )
 }
 
 /// Sample and export the posterior before consuming late behavior targets.
 pub(crate) fn build_staged_training_graph(config: &DreamerConfig) -> Graph {
+    assert!(
+        config.world_prediction_length == 0 && config.world_pixel_loss == PixelLoss::SquaredError,
+        "staged world training keeps upstream's pixel objective"
+    );
     training_graph(
         config,
         config.batch_length,
@@ -1303,7 +1307,15 @@ fn training_graph(
         && !pixel_loss.latent_overshooting()
         && !pixel_loss.recurrent_energy())
     .then(|| {
-        assert!(!behavior && config.loss_scales.reconstruction > 0.0);
+        assert!(config.loss_scales.reconstruction > 0.0);
+        assert!(
+            !behavior
+                || matches!(
+                    pixel_loss,
+                    PixelLoss::SquaredError | PixelLoss::MotionCrossEntropy
+                ),
+            "whole agents supervise prior images with plain pixel objectives only"
+        );
         assert!(prediction_length < length);
         let start = length - prediction_length;
         let history = config.rgb_spatial_decoder.then(|| {

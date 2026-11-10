@@ -28,6 +28,8 @@ mod rgb96_tests;
 mod rgb_stride_tests;
 #[cfg(test)]
 mod upstream_reference;
+#[cfg(test)]
+mod world_rollout_tests;
 pub use vector::{FeatureVectorAgent, VectorDreamerAgent};
 
 use std::fs;
@@ -79,6 +81,7 @@ const RNG_TRAIN_POSTERIOR: u64 = 0x7472_6169_6e70_6f73;
 const RNG_IMAGINATION: u64 = 0x696d_6167_696e_6501;
 const RNG_OPEN_LOOP: u64 = 0x6f70_656e_6c6f_6f70;
 const RNG_DIAGNOSTIC: u64 = 0x6469_6167_6e6f_7374;
+const RNG_WORLD_ROLLOUT: u64 = 0x776f_726c_6472_6f6c;
 const RNG_RESUME: u64 = 0x7265_7375_6d65_0001;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -178,6 +181,9 @@ pub struct WorldMetrics {
     pub prior_reward_loss: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prior_reward_valid_fraction: Option<f32>,
+    /// Direct pixel loss of the prior rollout after the observed prefix.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prior_rollout_loss: Option<f32>,
     pub replay_reward_prediction_mean: f32,
     pub replay_reward_target_mean: f32,
     pub replay_reward_mae: f32,
@@ -398,6 +404,7 @@ struct DreamerRngs {
     train_posterior: ChaCha12Rng,
     imagination: ChaCha12Rng,
     open_loop: ChaCha12Rng,
+    world_rollout: ChaCha12Rng,
 }
 
 impl DreamerRngs {
@@ -410,6 +417,7 @@ impl DreamerRngs {
             train_posterior: ChaCha12Rng::seed_from_u64(seed ^ RNG_TRAIN_POSTERIOR),
             imagination: ChaCha12Rng::seed_from_u64(seed ^ RNG_IMAGINATION),
             open_loop: ChaCha12Rng::seed_from_u64(seed ^ RNG_OPEN_LOOP),
+            world_rollout: ChaCha12Rng::seed_from_u64(seed ^ RNG_WORLD_ROLLOUT),
         }
     }
 
@@ -684,7 +692,9 @@ impl DreamerCore {
         let staged_world = config.world_backprop_length == config.batch_length
             && config.world_microbatch_size() == config.batch_size
             && config.training_precision == super::config::TrainingPrecision::Bf16
-            && config.video_encoder.is_none();
+            && config.video_encoder.is_none()
+            && config.world_prediction_length == 0
+            && config.world_pixel_loss == super::world_learner::PixelLoss::SquaredError;
         let world_train_graph = if staged_world {
             world::build_staged_training_graph(&world_train_config)
         } else {
@@ -1922,6 +1932,30 @@ impl DreamerCore {
                     }
                 }
 
+                if self.config.world_prediction_length > 0 && !staged {
+                    // Prior-rollout images: fresh categorical draws per step and
+                    // per-row weights that drop rows once a reset enters the rollout.
+                    let horizon = self.config.world_prediction_length;
+                    let start = self.config.batch_length - horizon;
+                    let mut keep = vec![1.0f32; microbatch_rows];
+                    for step in 0..horizon {
+                        for (local_row, keep) in keep.iter_mut().enumerate() {
+                            if batch.flags[start + step][first_row + local_row].is_first {
+                                *keep = 0.0;
+                            }
+                        }
+                        let uniforms = (0..microbatch_rows * stochastic_width)
+                            .map(|_| self.rngs.world_rollout.random_range(1e-6..1.0 - 1e-6))
+                            .collect::<Vec<f32>>();
+                        self.world_train
+                            .set_input(&format!("pixel_rollout_uniforms_{step}"), &uniforms);
+                        if self.config.world_pixel_loss.motion_attention() {
+                            self.world_train
+                                .set_input(&format!("pixel_rollout_weight_{step}"), &keep);
+                        }
+                    }
+                }
+
                 if self.config.prior_continuation_scale.is_some()
                     || self.config.prior_reward_scale.is_some()
                 {
@@ -2051,6 +2085,10 @@ impl DreamerCore {
                 }
                 metrics.reconstruction_loss +=
                     read_scalar(&self.world_train, world::LOSS_RECONSTRUCTION);
+                if self.config.world_prediction_length > 0 {
+                    *metrics.prior_rollout_loss.get_or_insert(0.0) +=
+                        read_scalar(&self.world_train, world::LOSS_WORLD_ROLLOUT);
+                }
                 metrics.future_prediction_loss +=
                     read_scalar(&self.world_train, world::LOSS_FUTURE_PREDICTION);
                 if self.config.uses_disagreement() {
@@ -2092,6 +2130,7 @@ impl DreamerCore {
             &mut metrics.prior_continuation_valid_fraction,
             &mut metrics.prior_reward_loss,
             &mut metrics.prior_reward_valid_fraction,
+            &mut metrics.prior_rollout_loss,
         ]
         .into_iter()
         .flatten()

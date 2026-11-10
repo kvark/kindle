@@ -153,6 +153,10 @@ def main():
                         help="fresh CDP only: posterior continuation loss multiplier for true game-over rows")
     parser.add_argument("--prior-continuation-scale", type=float,
                         help="fresh CDP only: auxiliary continuation loss on sampled one-step priors")
+    parser.add_argument("--world-pixel-loss", choices=("squared_error", "motion_cross_entropy"),
+                        help="learned-RGB world pixel objective; motion cross-entropy weights changed pixels")
+    parser.add_argument("--world-prediction-length", type=int,
+                        help="learned-RGB world: imagined steps after the observed prefix whose images are supervised directly")
     parser.add_argument("--prior-reward-scale", type=float,
                         help="fresh CDP only: auxiliary reward loss on sampled one-step priors")
     parser.add_argument("--actor-dynamics-scale", type=float,
@@ -582,6 +586,8 @@ def main():
     training_options.add("--terminal-continuation-weight")
     training_options.add("--prior-continuation-scale")
     training_options.add("--prior-reward-scale")
+    training_options.add("--world-pixel-loss")
+    training_options.add("--world-prediction-length")
     training_options.add("--replay-value-completed")
     training_options.add("--replay-actor-scale")
     training_options.add("--actor-dynamics-scale")
@@ -881,6 +887,10 @@ def main():
             config["prior_continuation_scale"] = args.prior_continuation_scale
         if args.prior_reward_scale is not None:
             config["prior_reward_scale"] = args.prior_reward_scale
+        if args.world_pixel_loss is not None:
+            config["world_pixel_loss"] = args.world_pixel_loss
+        if args.world_prediction_length is not None:
+            config["world_prediction_length"] = args.world_prediction_length
         if args.replay_value_completed:
             config["replay_value_completed"] = True
         if args.replay_actor_scale is not None:
