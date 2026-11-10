@@ -7,9 +7,13 @@ The five-game goal remains unfinished. Detailed experiment history belongs in
 those reports; historical “next” paragraphs do not authorize restarting jobs.
 
 The [November 9 storage cleanup](results/2026-11-09-temp-cleanup.md) recovers
-about137 GB across five passes, preserving checkpoints and evidence. Retained
-artifacts may share hardlinks and contain sparse zero blocks; keep their bytes
-immutable. The latest pass leaves about271.5 GiB available on the root filesystem.
+about 137 GB across five passes. The [November 10 pass](results/2026-11-10-temp-cleanup.md)
+recovers another 671 MB from duplicates and regenerable bytecode, preserving
+all checkpoints and evidence. All 8,054 large artifact paths and 670 current/
+retained-runtime hashes verify; about 268.7 GiB remains available on the root
+filesystem. Retained artifacts may share hardlinks and contain sparse zero
+blocks; keep their bytes immutable. Archiving older logs could save roughly
+29 GB, but the user's archive choice is pending and all original logs remain.
 
 ## Current work — November 10
 
