@@ -101,9 +101,15 @@ budget. The pure pixel world's 400k life (root
 scores **185.160 greedy / 83.615 sampled** on cohort 1009 and **158.625 /
 100.917** on cohort 22003 against CDP's 173.708 / 92.792 and 150.750 /
 120.625: across all five seed/cohort/budget pairs tried, the pixel objective
-wins greedy and loses sampled, at 1.5 times the training time. Still
-development seeds on reused cohorts; 0 two-wall episodes anywhere (best
-single episode 404). No run is active; the GPU is free. First-run root
+wins greedy and loses sampled, at 1.5 times the training time. An
+[action-temperature diagnostic](docs/results/2026-11-10-breakout-action-temperature.md)
+on the 400k checkpoints (cohort 1009) shows the sampled deficit is
+distribution sharpness, not ranking: at temperature .5 / .25 the pixel world
+scores 162.5 / 198.8 against CDP's 106.4 / 113.9 (temperature 1: 83.6 against
+92.8). Still development seeds on reused cohorts; 0 two-wall episodes
+anywhere (best single episode 404). The 4M context-frame world's full 65k
+run (`train-96-context-4m-65k-v2`, unit `kindle-world-context-4m-65k-20261110.service`)
+and a lower-entropy pixel-world agent are the active follow-ups. First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
 on any checkpoint). These are development screens on reused seed 41001 and
