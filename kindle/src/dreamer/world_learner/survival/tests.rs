@@ -81,6 +81,9 @@ fn cumulative_survival_header_binds_coefficient_base_scope_and_legacy_compatibil
 
 #[test]
 fn cumulative_survival_invalid_public_construction_rejects_before_gpu() {
+    let mut whole_agent = DreamerConfig::tiny(18);
+    whole_agent.world_survival_scale = Some(10.);
+    assert!(std::panic::catch_unwind(|| crate::dreamer::agent::DreamerCore::new(whole_agent)).is_err());
     for scale in [0., -1., f32::NAN, f32::INFINITY] {
         let mut c = config();
         c.world_survival_scale = Some(scale);

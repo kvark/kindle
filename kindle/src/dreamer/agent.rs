@@ -497,6 +497,7 @@ pub struct DreamerCore {
 
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
+        assert!(config.world_survival_scale.is_none(), "cumulative survival is standalone world only");
         assert!(!config.rgb_event_heads, "RGB event heads are standalone world only");
         assert!(!config.rgb_wide_motion, "wide motion is standalone world only");
         assert!(!config.rgb_late_action, "late action is standalone world only");
@@ -578,6 +579,7 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
+        assert!(config.world_survival_scale.is_none(), "cumulative survival is standalone world only");
         assert!(!config.rgb_event_heads, "RGB event heads are standalone world only");
         assert!(!config.rgb_wide_motion, "wide motion is standalone world only");
         assert!(!config.rgb_late_action, "late action is standalone world only");
@@ -2948,6 +2950,9 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.config.world_survival_scale.is_some() {
+        return Err(std::io::Error::other("cumulative survival is standalone world only"));
+    }
     if metadata.config.rgb_event_heads {
         return Err(std::io::Error::other("RGB event heads are standalone world only"));
     }
