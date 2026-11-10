@@ -45,10 +45,13 @@ without restart. No native/main CPU failure orretry. Provisional2k evidence stay
 Select the separate [frozen chosen-action assessment](docs/experiments/2026-11-10-breakout-world-wide-motion-branches.md),
 not another learner. Same394 cached oracle inputs,84 related groups/33 distinct
 contexts,history16/32,eight draws,unchanged physics/event gates;only new final
-queried,old scores cached. Pin source/config/native/runner/closed inputs before
-one1,800s guarded allocation at `/x/Temp/kindle-world-wide-motion-branches-20261110`.
-No GPU job isactive yet,no collector/extension/automatic successor. All original
-full-world requirements remain;short point gains do not prove a full world.
+queried,old scores cached.963 execution pins andCPU import/config/control mapping
+trap pass;one1,800s host-guarded job isactive. Source429c13e3,main invocation
+4270bdc82bb146dc972fa5928480f89e/controller2246344,observer2246349;root
+`/x/Temp/kindle-world-wide-motion-branches-20261110`. Exact nativee3d18841/
+SHA02feea6e andrunner are reused. No learning,collector,extension orautomatic
+successor. Original full-world requirements remain;short point gains do not
+prove a full world.
 
 The [native qualification](docs/results/2026-11-09-breakout-world-wide-motion-native.md)
 passes in81.157s:small-fixture native values/derivatives/lane isolation,
