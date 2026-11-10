@@ -346,6 +346,9 @@ pub struct DreamerConfig {
     /// Standalone local-action world: widen the motion and fusion path to32 channels.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_wide_motion: bool,
+    /// Standalone world: read shared-CNN features of decoded RGB in event heads.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_event_heads: bool,
     /// Standalone spatial world: encode generated images into the imagined belief.
     #[serde(default, skip_serializing_if = "is_false")]
     pub world_image_feedback: bool,
@@ -544,6 +547,7 @@ impl DreamerConfig {
             rgb_spatial_action: false,
             rgb_late_action: false,
             rgb_wide_motion: false,
+            rgb_event_heads: false,
             world_image_feedback: false,
             rgb_coordinates: false,
             rgb_latent_only: false,
@@ -801,6 +805,32 @@ impl DreamerConfig {
     }
 
     pub fn check(&self) -> Result<(), String> {
+        if self.rgb_event_heads
+            && (self.model_size != ModelSize::Size1M
+                || self.observation_kind != ObservationKind::Rgb64
+                || !self.rgb_spatial_action
+                || !self.rgb_spatial_fusion
+                || !self.rgb_spatial_decoder
+                || self.rgb_wide_motion
+                || self.rgb_late_action
+                || self.rgb_spatial_transport
+                || self.rgb_spatial_residual
+                || self.world_image_feedback
+                || self.world_gaussian
+                || self.world_mean_latents
+                || self.rgb_previous_frame
+                || self.rgb_frame_pair
+                || self.rgb_latent_only
+                || self.rgb_coordinates
+                || self.rgb_stride2
+                || self.rgb_color_attention.is_some()
+                || self.color_centroid_supervision.is_some())
+        {
+            return Err(
+                "RGB event heads require the plain 1M RGB64 local-action categorical fused world"
+                    .into(),
+            );
+        }
         if self.rgb_wide_motion
             && (!self.rgb_spatial_action
                 || !self.rgb_spatial_fusion
@@ -816,7 +846,9 @@ impl DreamerConfig {
                 || self.rgb_color_attention.is_some()
                 || self.color_centroid_supervision.is_some())
         {
-            return Err("wide motion requires a plain local-action categorical fused decoder".into());
+            return Err(
+                "wide motion requires a plain local-action categorical fused decoder".into(),
+            );
         }
         if self.rgb_late_action
             && (!self.rgb_spatial_action
@@ -830,7 +862,9 @@ impl DreamerConfig {
                 || self.rgb_color_attention.is_some()
                 || self.color_centroid_supervision.is_some())
         {
-            return Err("late action requires a plain local-action categorical fused decoder".into());
+            return Err(
+                "late action requires a plain local-action categorical fused decoder".into(),
+            );
         }
         if self.rgb_spatial_action && (!self.rgb_spatial_fusion || self.rgb_spatial_residual) {
             return Err("spatial action requires fusion without residual".into());
@@ -1161,7 +1195,10 @@ impl DreamerConfig {
                         || row.iter().any(|x| !x.is_finite() || x.abs() > 1.0)
                 }))
         {
-            return Err("world action features require an action_count square finite table in [-1, 1]".into());
+            return Err(
+                "world action features require an action_count square finite table in [-1, 1]"
+                    .into(),
+            );
         }
         if size.deter == 0 || !size.deter.is_multiple_of(size.blocks) {
             return Err("deter must be non-zero and divisible by blocks".into());

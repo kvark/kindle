@@ -75,3 +75,5 @@ Full action-conditioned physics,serve/collision behavior,natural event calibrati
 persistent brick memory,late/tunnel/second-wall/above-top coverage,untouched
 families andfresh confirmation remain required. The world-model goal stays
 active andunproven;this hypothesis doesnot narrow orreplace it.
+
+Implementation and focused CPU checks are recorded in the [implementation report](../results/2026-11-10-breakout-world-rgb-event-heads.md). Native qualification remains separately declared; no main learner is selected.

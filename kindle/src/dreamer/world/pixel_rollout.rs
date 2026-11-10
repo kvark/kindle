@@ -220,11 +220,13 @@ pub(super) fn build_with_centroid(
             }
         };
         let state = feature(graph, deter, stoch, batch, config);
+        let mut decoded_event_image = None;
         let squared = if let Some(past) = history {
             let direct_action = config.rgb_spatial_action.then_some(action);
             let logits =
                 decoder.logits_with_action_history(graph, state, past, direct_action, batch);
             let next = super::super::networks::centered_pixels(graph, logits);
+            decoded_event_image = Some(next);
             #[cfg(test)]
             predictions.push(next);
             history = Some(super::super::spatial_history::shift(
@@ -283,8 +285,19 @@ pub(super) fn build_with_centroid(
         if let Some(targets) = &targets {
             let weight = graph.input(&format!("pixel_rollout_weight_{time}"), &[batch, 1]);
             event_weight = Some(weight);
-            let reward = model.heads.reward.forward(graph, belief);
-            let continuation = model.heads.continuation.forward(graph, belief);
+            let event_state = if config.rgb_event_heads {
+                rgb_event_features(
+                    graph,
+                    &model.representation.encoder,
+                    belief,
+                    decoded_event_image.expect("RGB event heads require decoded prior RGB"),
+                    batch,
+                )
+            } else {
+                belief
+            };
+            let reward = model.heads.reward.forward(graph, event_state);
+            let continuation = model.heads.continuation.forward(graph, event_state);
             event_losses.push(feedback::event_losses(
                 graph,
                 reward,

@@ -497,6 +497,7 @@ pub struct DreamerCore {
 
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
+        assert!(!config.rgb_event_heads, "RGB event heads are standalone world only");
         assert!(!config.rgb_wide_motion, "wide motion is standalone world only");
         assert!(!config.rgb_late_action, "late action is standalone world only");
         assert!(
@@ -577,6 +578,7 @@ impl DreamerCore {
     }
 
     pub fn with_gpu(config: DreamerConfig, gpu: Arc<blade_graphics::Context>) -> Self {
+        assert!(!config.rgb_event_heads, "RGB event heads are standalone world only");
         assert!(!config.rgb_wide_motion, "wide motion is standalone world only");
         assert!(!config.rgb_late_action, "late action is standalone world only");
         assert!(
@@ -2946,6 +2948,9 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.config.rgb_event_heads {
+        return Err(std::io::Error::other("RGB event heads are standalone world only"));
+    }
     if metadata.config.rgb_wide_motion {
         return Err(io::Error::new(io::ErrorKind::InvalidData, "wide motion is standalone world only"));
     }

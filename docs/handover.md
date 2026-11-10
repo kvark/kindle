@@ -25,7 +25,13 @@ image. No posterior correction/extra transition orfuture actual image inbelief;
 keep local width16,two-image history,RGB3 replay andencoder/RSSM geometry. At1M64,
 expectedtwo head matrices640→896,+32,768 scalars,80/636,683/240;derive before
 allocation. Explicitv28 wraps v25/v18;reject whole-agent/unqualified compositions.
-No implementation orGPU allocation yet,no main learner selected. Root
+Implementation and focused CPU checks now pass; see the [implementation report](results/2026-11-10-breakout-world-rgb-event-heads.md).
+Six new CPU checks,29 configuration,5 scope,3/3/4 wide/late/features,3 history
+and1 suffix pass; strict core/binding Clippy pass. Original build/formatter and
+two finite-difference fixture failures remain; stable pooling-region checks pass
+without production/backend repair. Release packaging and isolated Python API
+checks precede a separately declared native stage. No GPU allocation yet;
+no main learner selected. Root
 `/x/Temp/kindle-world-rgb-event-heads-20261110`. Hypothesis only;h/z information
 absence andcause ofcalibration/physics failures are not established.
 

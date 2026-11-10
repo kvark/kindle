@@ -15,9 +15,10 @@ use super::{
 use crate::{env::RgbFrame, vision::preprocess_gpu::GpuPreprocessor};
 
 mod action_features;
-mod late_action;
-mod wide_motion;
 mod frozen_visual;
+mod late_action;
+mod rgb_event_heads;
+mod wide_motion;
 use frozen_visual::TrainingScope;
 mod fixed_teacher;
 use fixed_teacher::TeacherAnchor;
@@ -165,6 +166,9 @@ impl PixelLoss {
 fn checkpoint_pixel_loss(
     metadata: &serde_json::Value,
 ) -> Result<PixelLoss, Box<dyn std::error::Error>> {
+    if let Some(base) = rgb_event_heads::base_metadata(metadata)? {
+        return checkpoint_pixel_loss(&base);
+    }
     if let Some(base) = wide_motion::base_metadata(metadata)? {
         return checkpoint_pixel_loss(&base);
     }
@@ -746,6 +750,7 @@ impl WorldModelLearner {
         pixel_loss: PixelLoss,
         fixed_teacher: Option<TeacherAnchor>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        rgb_event_heads::validate(&config, prediction_length, pixel_loss)?;
         wide_motion::validate(&config, prediction_length, pixel_loss)?;
         late_action::validate(&config, prediction_length, pixel_loss)?;
         action_features::validate(&config, prediction_length, pixel_loss)?;
@@ -1440,6 +1445,9 @@ impl WorldModelLearner {
             if self.config.rgb_spatial_decoder {
                 history = super::spatial_history::shift_cpu(&history, &image, width);
             }
+            if self.config.rgb_event_heads {
+                self.heads.set_input("decoded_rgb", &image);
+            }
             result.observations.extend(image);
             if include_features {
                 result
@@ -1558,6 +1566,10 @@ impl WorldModelLearner {
         if self.config.rgb_wide_motion {
             assert_eq!(self.training_scope, TrainingScope::All);
             wide_motion::wrap_metadata(&mut metadata)?;
+        }
+        if self.config.rgb_event_heads {
+            assert_eq!(self.training_scope, TrainingScope::All);
+            rgb_event_heads::wrap_metadata(&mut metadata)?;
         }
         if let Some(anchor) = &self.fixed_teacher {
             let (parameters, scalars) = anchor.verify(&self.observe)?;

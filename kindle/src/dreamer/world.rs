@@ -184,23 +184,15 @@ struct WorldHeads {
 impl WorldHeads {
     fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let units = config.network().units;
+        let inputs = config.feature_dim()
+            + if config.rgb_event_heads {
+                config.encoded_observation_dim()
+            } else {
+                0
+            };
         Self {
-            reward: MlpHead::new(
-                graph,
-                "world.reward",
-                config.feature_dim(),
-                units,
-                1,
-                config.value_bins,
-            ),
-            continuation: MlpHead::new(
-                graph,
-                "world.continuation",
-                config.feature_dim(),
-                units,
-                1,
-                1,
-            ),
+            reward: MlpHead::new(graph, "world.reward", inputs, units, 1, config.value_bins),
+            continuation: MlpHead::new(graph, "world.continuation", inputs, units, 1, 1),
         }
     }
 
@@ -876,6 +868,7 @@ fn training_graph(
             };
             future_prediction_losses.push(graph.mean_all(per_row));
         }
+        let mut decoded_event_image = None;
         if let Some(decoder) = &model.decoder {
             let squared = if pixel_loss != PixelLoss::SquaredError {
                 let loss = if config.rgb_spatial_decoder {
@@ -904,6 +897,10 @@ fn training_graph(
                     });
                     let logits = decoder
                         .logits_with_action_history(&mut graph, state, history, action, rows);
+                    if config.rgb_event_heads {
+                        decoded_event_image =
+                            Some(super::networks::centered_pixels(&mut graph, logits));
+                    }
                     super::networks::pixel_cross_entropy(&mut graph, logits, observation)
                 } else {
                     decoder.cross_entropy(&mut graph, state, observation, rows)
@@ -963,8 +960,19 @@ fn training_graph(
             reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / rows as f32));
         }
 
-        let reward = model.heads.reward.forward(&mut graph, state);
-        let continuation_logits = model.heads.continuation.forward(&mut graph, state);
+        let event_state = if config.rgb_event_heads {
+            rgb_event_features(
+                &mut graph,
+                &model.representation.encoder,
+                state,
+                decoded_event_image.expect("RGB event heads require decoded posterior RGB"),
+                rows,
+            )
+        } else {
+            state
+        };
+        let reward = model.heads.reward.forward(&mut graph, event_state);
+        let continuation_logits = model.heads.continuation.forward(&mut graph, event_state);
         let terminal_weight = config
             .terminal_continuation_weight
             .filter(|&weight| weight != 1.0);
@@ -1915,6 +1923,25 @@ pub fn build_transition_graph(config: &DreamerConfig, batch: usize) -> Graph {
     graph
 }
 
+fn rgb_event_features(
+    graph: &mut Graph,
+    encoder: &super::networks::ObservationEncoder,
+    state: NodeId,
+    image: NodeId,
+    batch: usize,
+) -> NodeId {
+    let encoded = encoder.forward(graph, image, batch);
+    let latent_width = graph.node(state).ty.shape.iter().product::<usize>() / batch;
+    concat_columns(
+        graph,
+        state,
+        encoded,
+        batch,
+        latent_width,
+        encoder.output_dim(),
+    )
+}
+
 /// Reward and continuation predictions for posterior or imagined states.
 pub fn build_head_graph(config: &DreamerConfig, batch: usize) -> Graph {
     head_graph(config, batch, false)
@@ -1935,7 +1962,14 @@ fn head_graph(config: &DreamerConfig, batch: usize, expose_state: bool) -> Graph
     let deter = graph.input("deter", &[batch, size.deter]);
     let stoch = graph.input("stoch", &[batch * size.stoch, size.classes]);
     let state = feature(&mut graph, deter, stoch, batch, config);
-    let (reward, continuation) = heads.forward(&mut graph, state);
+    let event_state = if config.rgb_event_heads {
+        let encoder = super::networks::ObservationEncoder::new(&mut graph, config);
+        let image = graph.input("decoded_rgb", &config.observation_shape(batch));
+        rgb_event_features(&mut graph, &encoder, state, image, batch)
+    } else {
+        state
+    };
+    let (reward, continuation) = heads.forward(&mut graph, event_state);
     let mut outputs = vec![reward, continuation];
     if expose_state {
         outputs.push(state);
@@ -3078,3 +3112,6 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod rgb_event_tests;
