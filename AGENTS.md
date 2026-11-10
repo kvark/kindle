@@ -35,16 +35,20 @@ screens on the new stack are closed on the same development origins:
 [16x more play](docs/results/2026-11-10-breakout-world-scale.md) (eight-step
 38/107), [96x96 frames](docs/results/2026-11-10-breakout-world-rgb96.md)
 (36/112) and [palette-committed feedback](docs/results/2026-11-10-breakout-world-palette-feedback.md)
-(23/112), against the 64x64 control's 53/107; fitting equals development in
-all of them and training reproduces bit-exactly for a fixed seed. The ball is
-lost in the one-step hedging of the autoregressive image feedback, which the
-recurrent state does not resolve. A serial queue now runs in
-`kindle-world-scale-20261110.service` (`guards-next`): the 96x96 recipe
-without image history (`train-96-plain`, state must carry the ball), the 1M
-recipe for 65,536 updates (`train-1m-65k-v2`) and the 4M preset (`train-4m`),
-all on the 524,288-action corpora. The latent-prediction formulation from
-TASK.md (multi-step embedding prediction with a detached pixel probe) is the
-next candidate. Root `/x/Temp/kindle-world-scale-20261110`; driver
+(23/112), against the 64x64 control's 53/107. A [linear state probe](docs/results/2026-11-10-breakout-world-state-probe.md)
+on the saved forecasts explains them: the paddle is read from the recurrent
+state to within 4–14 native pixels at every horizon, the ball at none, and not
+even from the current frame's encoder features. The encoder ignores the ball;
+only the decoder's two-frame image history carries it, and that autoregressive
+path fades under hedging. A serial queue runs in
+`kindle-world-scale-20261110.service` (`guards-next-v2`): the 96x96 recipe
+without image history (`train-96-plain-v2`, the state must carry the ball),
+the 1M recipe for 65,536 updates (`train-1m-65k-v2`) and the 4M preset
+(`train-4m`). Its first launch was killed by the host OOM killer when a probe
+loaded a second copy of the corpus; `breakout_world_scale.py probe` now loads
+only the origins it needs, and every evaluation saves encoder, posterior and
+prior features. Any latent-prediction objective must first make the encoder
+see the ball. Root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py`. Actor/critic, CDP and the five-game
 campaign stay parked.
 

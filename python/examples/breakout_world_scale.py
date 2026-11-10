@@ -156,7 +156,8 @@ def evaluate_group(learner, streams, locations, output, name, draws, *, history=
     horizon = max(horizons)
     selected = np.asarray(horizons) - 1
     rgb_parts, posterior_parts, reward_parts, positive_parts, continuation_parts = ([[] for _ in draws] for _ in range(5))
-    truth, context, validity, rewards, terminals = ([] for _ in range(5))
+    truth, context, validity, rewards, terminals, positions = ([] for _ in range(6))
+    encoded, posterior_features, prior_features = [], [], []
     before = learner.updates
     for offset in range(0, len(locations), batch_size):
         actual = locations[offset:offset + batch_size]
@@ -168,9 +169,14 @@ def evaluate_group(learner, streams, locations, output, name, draws, *, history=
         validity.append(data['valid'][:, :count])
         rewards.append(data['reward'][history:, :count])
         terminals.append(data['terminal'][history:, :count])
+        positions.append(data['position'][:, :count])
         for draw, seed in enumerate(draws):
             prediction = learner.predict(pixels(observed), data['action'][:history].ravel().tolist(),
-                                         data['action'][history:].ravel().tolist(), seed=seed)
+                                         data['action'][history:].ravel().tolist(), seed=seed, include_features=draw == 0)
+            if draw == 0:
+                encoded.append(np.frombuffer(prediction['encoder_features'], '<f4').reshape(batch_size, -1)[:count])
+                posterior_features.append(np.frombuffer(prediction['posterior_features'], '<f4').reshape(batch_size, -1)[:count])
+                prior_features.append(np.frombuffer(prediction['prior_features'], '<f4').reshape(horizon, batch_size, -1)[selected, :count])
             rgb = np.frombuffer(prediction['prior_rgb'], '<f4').reshape(horizon, batch_size, 3, side, side)
             rgb_parts[draw].append(rgb[selected, :count])
             posterior_parts[draw].append(np.frombuffer(prediction['posterior_rgb'], '<f4').reshape(batch_size, 3, side, side)[:count])
@@ -181,6 +187,8 @@ def evaluate_group(learner, streams, locations, output, name, draws, *, history=
     arrays = dict(horizons=np.asarray(horizons), locations=np.asarray(locations), truth=np.concatenate(truth, axis=1),
                   context=np.concatenate(context), valid=np.concatenate(validity, axis=1),
                   target_reward=np.concatenate(rewards, axis=1), target_terminal=np.concatenate(terminals, axis=1),
+                  position=np.concatenate(positions, axis=1), encoder_features=np.concatenate(encoded),
+                  posterior_features=np.concatenate(posterior_features), prior_features=np.concatenate(prior_features, axis=1),
                   prediction=np.stack([np.concatenate(v, axis=1) for v in rgb_parts]),
                   posterior=np.stack([np.concatenate(v) for v in posterior_parts]),
                   reward=np.stack([np.concatenate(v, axis=1) for v in reward_parts]),
@@ -257,6 +265,82 @@ def palette(args):
         config['rgb_history_palette'] = centered
         write(args.output / 'config.json', config)
     print(json.dumps(dict(event='palette', colours=len(centered), coverage=result['coverage'])), flush=True)
+
+
+def ridge(features, targets, lam):
+    mean, deviation = features.mean(0), features.std(0) + 1e-6
+    standardized = (features - mean) / deviation
+    weights = np.linalg.solve(standardized.T @ standardized + lam * np.eye(features.shape[1]), standardized.T @ (targets - targets.mean(0)))
+    return lambda x: ((x - mean) / deviation) @ weights + targets.mean(0)
+
+
+def state_probe(fitting, development, horizons, history=16, lam=300.):
+    """Linear readouts of RAM ball/paddle positions from saved features, fitting -> development."""
+    report = {}
+    sources = {'current': [('encoder_features', None), ('posterior_features', None)]}
+    sources.update({str(h): [('prior_features', index)] for index, h in enumerate(horizons)})
+    for label, items in sources.items():
+        for key, index in items:
+            for column, name in ((0, 'ball_x'), (1, 'ball_y'), (2, 'paddle_x')):
+                row = history - 1 if index is None else history + int(label) - 1
+                xf = fitting[key] if index is None else fitting[key][index]
+                xd = development[key] if index is None else development[key][index]
+                yf, yd = fitting['position'][row][:, column], development['position'][row][:, column]
+                vf, vd = np.isfinite(yf), np.isfinite(yd)
+                if index is not None:
+                    vf &= fitting['valid'][int(label) - 1]
+                    vd &= development['valid'][int(label) - 1]
+                model = ridge(xf[vf], yf[vf][:, None], lam)
+                error = float(np.sqrt(((model(xd[vd])[:, 0] - yd[vd]) ** 2).mean()))
+                baseline = float(np.sqrt(((yf[vf].mean() - yd[vd]) ** 2).mean()))
+                report[f'{label}:{key}:{name}'] = dict(rmse=error, baseline=baseline, fitting=int(vf.sum()), development=int(vd.sum()))
+    return report
+
+
+def window_streams(root, seed, count, history, horizon):
+    """The dense origins of a corpus as one short stream each, loading one lane's frames at a time.
+
+    Avoids holding a whole corpus in memory next to a running learner; the
+    returned locations index the short streams, the originals are returned too.
+    """
+    manifest = json.loads((root / 'manifest.json').read_text())
+    lanes = len(manifest['files'])
+    lengths = []
+    for lane in range(lanes):
+        with np.load(root / f'lane{lane}.npz', allow_pickle=False) as data:
+            lengths.append(len(data['action']))
+    skeleton = [dict(action=np.zeros(length, np.int64)) for length in lengths]
+    originals = sample_locations(skeleton, history + 1, count, np.random.default_rng(seed))
+    streams = [None] * len(originals)
+    for lane in range(lanes):
+        wanted = [(index, start) for index, (origin_lane, start) in enumerate(originals) if origin_lane == lane]
+        if not wanted:
+            continue
+        with np.load(root / f'lane{lane}.npz', allow_pickle=False) as data:
+            fields = {key: data[key] for key in FIELDS}
+        for index, start in wanted:
+            stop = min(start + history + horizon, lengths[lane])
+            streams[index] = {key: np.array(value[start:stop], copy=True) for key, value in fields.items()}
+        del fields
+    return streams, [(index, 0) for index in range(len(originals))], originals
+
+
+def probe(args):
+    """Restore a checkpoint, forecast the dense origins with features, and probe the state."""
+    import kindle
+    from breakout_world_corpus import DRAWS, HISTORY
+    from breakout_world_model import require_device
+    learner = kindle.WorldModelLearner.restore(str(args.checkpoint))
+    require_device(learner)
+    groups, origins = {}, {}
+    for split, root, seed in (('fitting', args.dataset, 182003), ('development', args.development, 182009)):
+        streams, locations, origins[split] = window_streams(root, seed, args.dense, HISTORY, 32)
+        evaluate_group(learner, streams, locations, args.output, f'dense-{split}', DRAWS[:1])
+        groups[split] = np.load(args.output / f'dense-{split}.npz')
+    report = state_probe(groups['fitting'], groups['development'], (1, 4, 8, 16, 32), lam=args.ridge)
+    write(args.output / 'probe.json', dict(checkpoint=str(args.checkpoint), updates=learner.updates, ridge=args.ridge, origins=origins, readouts=report))
+    for key, value in report.items():
+        print(f"{key:40s} dev RMSE {value['rmse']:6.1f}  baseline {value['baseline']:6.1f}  (n {value['fitting']}/{value['development']})", flush=True)
 
 
 def load_dataset(root):
@@ -343,7 +427,7 @@ def ball_summary(result):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('collect', 'train', 'rerender', 'palette'))
+    parser.add_argument('mode', choices=('collect', 'train', 'rerender', 'palette', 'probe'))
     parser.add_argument('--config', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--ticks', type=int, default=65536, help='collection steps per lane')
@@ -359,6 +443,8 @@ def main():
     parser.add_argument('--prediction-length', type=int, default=16)
     parser.add_argument('--pixel-loss', default='motion_event_rollout')
     parser.add_argument('--colours', type=int, default=32)
+    parser.add_argument('--checkpoint', type=Path)
+    parser.add_argument('--ridge', type=float, default=300.)
     parser.add_argument('--palette-stride', type=int, default=50)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
@@ -366,6 +452,11 @@ def main():
         if args.dataset is None:
             parser.error('palette requires --dataset')
         palette(args)
+        return
+    if args.mode == 'probe':
+        if args.checkpoint is None or args.dataset is None or args.development is None:
+            parser.error('probe requires --checkpoint, --dataset and --development')
+        probe(args)
         return
     if args.config is None:
         parser.error('--config is required')
