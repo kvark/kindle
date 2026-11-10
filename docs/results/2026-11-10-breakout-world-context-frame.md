@@ -19,6 +19,20 @@ PIXEL_TABLE
 
 PROBE_TABLE
 
+## 4M preset with the context frame
+
+`train-96-context-4m-65k` (4M, context lag 8, 346 ms per update) was stopped
+after its 16,384-update point to hand the GPU to the Breakout agent run; its
+8,192 and 16,384 points are retained and the run is reproducible from the
+queue file. At 16,384: observed 113/113, one-step 107/112, four-step 74/112,
+eight-step 30/112, sixteen-step 14/115, thirty-two-step 2/102, brick balanced
+error .010 at eight steps; state probe prior-ball 18 / 5 at one step, 20 / 8 at
+eight, 23 / 11 at sixteen. Against the 4M state-only run at the same point
+(105 / 78 / 45 / 15 / 4, bricks .35) the context frame keeps the scene exact
+but trails at eight steps, so at this budget the two designs trade scene
+fidelity against ball tracking; whether the gap closes with budget, as it did
+for the state-only 1M run, is the open question for the 65k continuation.
+
 ## Reading
 
 The decoder reads the scene from a real frame and the ball from the state,
