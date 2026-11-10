@@ -33,6 +33,8 @@ mod clean_prior_tests;
 #[cfg(test)]
 mod color_attention_tests;
 #[cfg(test)]
+mod context_tests;
+#[cfg(test)]
 mod fixed_event_tests;
 #[cfg(test)]
 mod gaussian_tests;
@@ -1432,10 +1434,20 @@ impl WorldModelLearner {
             session.read_output_by_index(0, &mut pixels);
             pixels
         };
-        let posterior_history = if self.config.rgb_spatial_decoder {
-            super::spatial_history::before_cpu(observations, actions, length - 1, batch, width)
-        } else {
-            Vec::new()
+        let posterior_history = match (self.config.rgb_spatial_decoder, self.config.rgb_context_lag)
+        {
+            (true, Some(lag)) => super::spatial_history::context_cpu(
+                observations,
+                actions,
+                length - 1,
+                lag,
+                batch,
+                width,
+            ),
+            (true, None) => {
+                super::spatial_history::before_cpu(observations, actions, length - 1, batch, width)
+            }
+            (false, _) => Vec::new(),
         };
         let posterior_action = if self.config.rgb_spatial_action {
             action_inputs(&self.config, &actions[(length - 1) * batch..length * batch]).0
@@ -1449,10 +1461,14 @@ impl WorldModelLearner {
             &posterior_history,
             &posterior_action,
         );
-        let mut history = if self.config.rgb_spatial_decoder {
-            super::spatial_history::after_cpu(observations, actions, length - 1, batch, width)
-        } else {
-            Vec::new()
+        let mut history = match (self.config.rgb_spatial_decoder, self.config.rgb_context_lag) {
+            (true, Some(_)) => {
+                super::spatial_history::fixed_cpu(observations, length - 1, batch, width)
+            }
+            (true, None) => {
+                super::spatial_history::after_cpu(observations, actions, length - 1, batch, width)
+            }
+            (false, _) => Vec::new(),
         };
         let mut result = WorldPrediction {
             posterior,
@@ -1489,7 +1505,7 @@ impl WorldModelLearner {
                 session.read_output_by_index(0, &mut logits);
                 stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
             }
-            if self.config.rgb_spatial_decoder {
+            if self.config.rgb_spatial_decoder && self.config.rgb_context_lag.is_none() {
                 let mut fed_back = sharpen_pixels(&image, self.feedback_sharpness);
                 if let Some(palette) = &self.config.rgb_history_palette {
                     fed_back = super::networks::snap_to_palette_cpu(&fed_back, palette, width);

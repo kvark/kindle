@@ -360,6 +360,12 @@ pub struct DreamerConfig {
     /// value is discrete, the gradient passes straight through.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rgb_history_palette: Option<Vec<[f32; 3]>>,
+    /// Standalone spatial world: the decoder's image history is one observed
+    /// frame from this many arrivals back (clamped to the window start) instead
+    /// of the two previous frames, and stays fixed through forecasts, so static
+    /// scenery comes from a real frame while motion must come from the state.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rgb_context_lag: Option<usize>,
     /// Append fixed x/y pixel-center coordinates inside the learned RGB encoder.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_coordinates: bool,
@@ -559,6 +565,7 @@ impl DreamerConfig {
             world_survival_scale: None,
             world_image_feedback: false,
             rgb_history_palette: None,
+            rgb_context_lag: None,
             rgb_coordinates: false,
             rgb_latent_only: false,
             world_gaussian: false,
@@ -900,6 +907,14 @@ impl DreamerConfig {
         }
         if self.world_image_feedback && !self.rgb_spatial_decoder {
             return Err("image feedback requires the standalone spatial RGB decoder".into());
+        }
+        if let Some(lag) = self.rgb_context_lag
+            && (!self.rgb_spatial_decoder
+                || !(1..=32).contains(&lag)
+                || self.rgb_history_palette.is_some()
+                || self.world_image_feedback)
+        {
+            return Err("context lag requires the standalone spatial RGB decoder, 1..=32 arrivals, no history palette and no image feedback".into());
         }
         if let Some(palette) = &self.rgb_history_palette
             && (!self.rgb_spatial_decoder

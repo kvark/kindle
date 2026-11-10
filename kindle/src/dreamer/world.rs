@@ -875,15 +875,24 @@ fn training_graph(
                 let loss = if config.rgb_spatial_decoder {
                     let start = group * time_batch_length;
                     let histories = (start..start + chunk.len())
-                        .map(|t| {
-                            super::spatial_history::before(
+                        .map(|t| match config.rgb_context_lag {
+                            Some(lag) => super::spatial_history::context(
+                                &mut graph,
+                                &observations,
+                                &spatial_keeps,
+                                t,
+                                lag,
+                                batch,
+                                config.observation_dim(),
+                            ),
+                            None => super::spatial_history::before(
                                 &mut graph,
                                 &observations,
                                 &spatial_keeps,
                                 t,
                                 batch,
                                 config.observation_dim(),
-                            )
+                            ),
                         })
                         .collect::<Vec<_>>();
                     let history =
@@ -1298,14 +1307,23 @@ fn training_graph(
         assert!(prediction_length < length);
         let start = length - prediction_length;
         let history = config.rgb_spatial_decoder.then(|| {
-            super::spatial_history::after(
-                &mut graph,
-                &observations,
-                &spatial_keeps,
-                start - 1,
-                batch,
-                config.observation_dim(),
-            )
+            if config.rgb_context_lag.is_some() {
+                super::spatial_history::fixed(
+                    &mut graph,
+                    observations[start - 1],
+                    batch,
+                    config.observation_dim(),
+                )
+            } else {
+                super::spatial_history::after(
+                    &mut graph,
+                    &observations,
+                    &spatial_keeps,
+                    start - 1,
+                    batch,
+                    config.observation_dim(),
+                )
+            }
         });
         if pixel_loss == PixelLoss::MotionPosteriorHistory {
             let states = (start..length)

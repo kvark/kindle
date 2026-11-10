@@ -534,6 +534,10 @@ impl DreamerCore {
             "history palette is standalone world only"
         );
         assert!(
+            config.rgb_context_lag.is_none(),
+            "context lag is standalone world only"
+        );
+        assert!(
             !config.world_image_feedback,
             "image feedback is standalone world only"
         );
@@ -636,6 +640,10 @@ impl DreamerCore {
         assert!(
             config.rgb_history_palette.is_none(),
             "history palette is standalone world only"
+        );
+        assert!(
+            config.rgb_context_lag.is_none(),
+            "context lag is standalone world only"
         );
         assert!(
             !config.world_image_feedback,
@@ -3046,6 +3054,12 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,
             "history palette is standalone world only",
+        ));
+    }
+    if metadata.config.rgb_context_lag.is_some() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "context lag is standalone world only",
         ));
     }
     if metadata.config.world_image_feedback {

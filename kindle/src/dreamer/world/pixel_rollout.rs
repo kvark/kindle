@@ -243,13 +243,17 @@ pub(super) fn build_with_centroid(
                 ),
                 None => next,
             };
-            history = Some(super::super::spatial_history::shift(
-                graph,
-                past,
-                fed_back,
-                batch,
-                config.observation_dim(),
-            ));
+            history = Some(if config.rgb_context_lag.is_some() {
+                past
+            } else {
+                super::super::spatial_history::shift(
+                    graph,
+                    past,
+                    fed_back,
+                    batch,
+                    config.observation_dim(),
+                )
+            });
             if config.world_image_feedback {
                 let encoded = model.representation.encoder.forward(graph, next, batch);
                 let logits = model

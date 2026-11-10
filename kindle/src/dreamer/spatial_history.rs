@@ -47,6 +47,36 @@ pub(crate) fn after(
     concat_columns(graph, older, images[time], batch, width, width)
 }
 
+/// One observed frame from `lag` arrivals back, clamped to the window start and
+/// repeated into both history slots; zero at the first arrival and across any
+/// reset within the lag.
+pub(crate) fn context(
+    graph: &mut Graph,
+    images: &[NodeId],
+    keeps: &[NodeId],
+    time: usize,
+    lag: usize,
+    batch: usize,
+    width: usize,
+) -> NodeId {
+    let frame = if time == 0 {
+        graph.constant(vec![0.0; batch * width], &[batch, width])
+    } else {
+        let lag = lag.min(time);
+        let mut keep = keeps[time];
+        for step in 1..lag {
+            keep = graph.mul(keep, keeps[time - step]);
+        }
+        masked(graph, images[time - lag], keep, width)
+    };
+    concat_columns(graph, frame, frame, batch, width, width)
+}
+
+/// The last observed frame in both history slots, held fixed through a forecast.
+pub(crate) fn fixed(graph: &mut Graph, image: NodeId, batch: usize, width: usize) -> NodeId {
+    concat_columns(graph, image, image, batch, width, width)
+}
+
 pub(crate) fn shift(
     graph: &mut Graph,
     history: NodeId,
@@ -97,6 +127,44 @@ pub(crate) fn after_cpu(
         if time > 0 && actions[time * batch + row] != -1 {
             result[target..target + width]
                 .copy_from_slice(&images[source - batch * width..source - batch * width + width]);
+        }
+    }
+    result
+}
+
+pub(crate) fn context_cpu(
+    images: &[f32],
+    actions: &[i32],
+    time: usize,
+    lag: usize,
+    batch: usize,
+    width: usize,
+) -> Vec<f32> {
+    let mut result = vec![0.0; batch * 2 * width];
+    if time == 0 {
+        return result;
+    }
+    let lag = lag.min(time);
+    for row in 0..batch {
+        if (0..lag).any(|step| actions[(time - step) * batch + row] == -1) {
+            continue;
+        }
+        let source = ((time - lag) * batch + row) * width;
+        for half in 0..2 {
+            let target = row * 2 * width + half * width;
+            result[target..target + width].copy_from_slice(&images[source..source + width]);
+        }
+    }
+    result
+}
+
+pub(crate) fn fixed_cpu(images: &[f32], time: usize, batch: usize, width: usize) -> Vec<f32> {
+    let mut result = vec![0.0; batch * 2 * width];
+    for row in 0..batch {
+        let source = (time * batch + row) * width;
+        for half in 0..2 {
+            let target = row * 2 * width + half * width;
+            result[target..target + width].copy_from_slice(&images[source..source + width]);
         }
     }
     result
