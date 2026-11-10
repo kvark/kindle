@@ -18,107 +18,41 @@ blocks; keep their bytes immutable. Archiving older logs could save roughly
 ## Current work — November 10
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. The decoded-RGB event-head prototype is implemented and native-qualified;
-see [implementation/native qualification](results/2026-11-10-breakout-world-rgb-event-heads.md). Six new CPU checks, affected compatibility checks, strict core/binding
-Clippy and77 isolated Python API checks pass. At1M/RGB64 onlytwo head matrices
-640→896 change,+32,768 scalars,80 logical/636,683 scalars/240 arrays. Shared
-encoder, local width16,two-image history,RGB3 replay and raw prior chronology stay.
-Explicitv28 binds flag/geometry/v25/v18; unqualified/whole-agent use is rejected.
+unproven. Select [the frozen chosen-action assessment](experiments/2026-11-10-breakout-world-rgb-event-heads-branches.md) for separate preparation/declaration, using only the new
+final16,384 RGB event-head checkpoint; no new training or GPU job is active yet.
+The3/3 dense result does not settle the intended event-calibration benefit.
+Keep original energy/ending/false-alarm gates and cached controls, including
+wider motion; query no old model or emulator. Root
+`/x/Temp/kindle-world-rgb-event-heads-branches-20261110`.
 
-Native qualification closes in45.880s:150/85 pins,192 distinct, exact240
-initial/frozen/trained arrays,32 cached default-off/restore forecasts,13 alias
-reports and77/80 first-update weights changed. Small native/F64 derivatives and
-lane/image controls pass; one guard/nine sealed files and both services are
-inactive/successful. Original build/formatter/two finite-difference fixture failures
-and late observer-active assertion remain, with separate successful checks;
-no worker restart or production/backend repair. Release3,133,976,576 build-cache
-bytes after retained package/source/native/executable hashes pass.
+The [RGB event-head learner](results/2026-11-10-breakout-world-rgb-event-heads-learning.md) is closed: development observed/1/4/8/16/32 is103/112,99/109,71/109,
+52/107,30/114,8/95 versus early106/112,101/109,66/109,53/107,25/114,11/95.
+Native2,064.391s/loop2,233.998s versus1,841.013s/1,998.783s (1.121334x/
+1.117679x). No consistent ball/efficiency gain or adoption. All240/172/46/180
+pins,485 distinct closed files,240 bit-exact initial/first/frozen arrays,18
+byte-exact restore arrays,all80 weights changed,16,384 finite13-report rows,
+plan/counts,384 initial origins and58 exports pass. Two guards/18 sealed files
+and all four terminal services/completion journals pass. Five final figures
+reviewed; long drifting/diffuse/missing ball paths remain. Final-image review:
+34 inputs/15 closed files/60 joins/six groups/four draws,2.724s CPU. Original
+provisional CPU syntax failure and separatev2 completion remain; no learner,
+restore,observer,final-audit or final-image job fails/repeats.
 
-Select [the fixed learning comparison](experiments/2026-11-10-breakout-world-rgb-event-heads-learning.md) for preparation and a separately declared fixed fresh16,384-update
-comparison: same early physical1M/RGB64/B8/T32/H16/Auto/41001/RGB100 recipe/data,
-only intended flag`rgb_event_heads=true`, with own actual-initial, first-update,
-frozen/restore evidence and all original dense/broader gates. Reused development
-seed/origins, not fresh confirmation. The separately declared learner is active;
-see [active learning report](results/2026-11-10-breakout-world-rgb-event-heads-learning.md). Scientific sourceaa8859bd,native45633605/SHAf71e9354,240 pins;
-CPU driver matches batch/plan/fresh initial with construction trapped. The first
-actual update matches13 reports/240 tensors,77 required weights change before
-update2,and learning continues. Saved2,048 CPU review (34 pins/17 closed files,
-all6 groups/four draws/four fixed grids) finds no consistent early improvement:
-development natural observed/1/8/32 are22/26,17/27,1/27,0/25 vs23/26,21/27,0/27,0/25.
-Learn calls256.800s vs228.781s (1.122469x); provisional,not final dense gates.
-Pointwise ending Brier.833097 vs.923925 on10 positives remains poor; zero-positive
-natural slices do not prove calibration. Original CPU preparation syntax error
-remains; separately namedv2 analysis passes without model/GPU query orrestart. Main
-invocationc1449b7c333a4f598f9992e266c34431/PID2258744,watcher
-b418b44ffbf84d29b1042d2d2c6466b1/PID2258750 andCPU finisher
-6916431b180c4a99b2a85448e324692d/PID2258755 all live-verified. Train/restore
-caps6,600/600s,Auto/host guard,no emulator. Final result and improvement unproven;
-no broader assessment,extension orautomatic successor selected.
-Roots `/x/Temp/kindle-world-rgb-event-heads-20261110` and
-`/x/Temp/kindle-world-rgb-event-heads-learning-20261110`. Full physics/calibration,
-brick memory,late/above-top coverage,untouched families and fresh confirmation
-remain. Actor/critic,CDP and five-game work stay parked.
+Reuse qualified native45633605/SHAf71e9354 at
+`/x/Temp/kindle-world-rgb-event-heads-20261110`, exact runtime/runner,Auto.
+Default-off heads readh/z plus shared-CNN own decoded RGB; two matrices640→896,
++32,768 scalars,80/636,683/240. Local width16,two-image history,RGB3 replay,
+encoder/RSSM and raw prior chronology stay. Explicitv28 binds flag/geometry/v25/v18;
+whole-agent/unqualified compositions reject beforeGPU. [native qualification](results/2026-11-10-breakout-world-rgb-event-heads.md) remains closed;
+retain its original build/formatter/F64/late-observer failures and separate checks.
+Its disposable3,133,976,576-byte build cache is already released; no rebuild needed.
 
-The [wider-motion learner](results/2026-11-09-breakout-world-wide-motion-learning.md)
-closes3/3 dense:107/112,105/109,77/109,58/107,31/114,11/95. Native3,888.344s/
-loop4,065.276s versusearly physical1,841.013s/1,998.783s;no efficiency gain.
-215/172/41/180 pins,426 distinct closed inputs,240 frozen/18 restore,all80 weights
-changed,two guards/18 sealed files andall four terminal services pass. All five
-final figures reviewed;original image-launcher observation failure remains with
-separate same-invocation recovery,no restart. Earlier packaging errors remain.
-Its [broader assessment](results/2026-11-10-breakout-world-wide-motion-branches.md)
-fails:energy.160386921843 vsrequired<=.127126664317,ending Brier16/32.0426034/
-.263400,RIGHT16.302606,276/304 false alarms. Native185.711s/CPU16.006s,
-963/238/242 pins,240 exact arrays,210 oracle joins/168 feature checks,one guard/
-nine sealed files andboth terminal services pass. No modelquery repeated.
-
-The [survival decomposition](results/2026-11-10-breakout-world-wide-motion-survival.md)
-closes:ordinary.160387→oracle-assisted.127843,wall/serve residuals.496435/.276916;
-old edge-rebound residue improves.426554→.023331.312 pins/6,720 cases/840 groups/
-420 checks,max4.44e-16,4.688s CPU. These are score substitutions,not passing
-scores,learned repairs orcausal fractions. All original gates remain failed.
-The [saved-case review](results/2026-11-10-breakout-world-wide-motion-error-cases.md)
-checks209 inputs,22 plans/44 history groups/1,760 rows/ending joins,4.041s CPU,
-five fixed grids reviewed. Serve FIRE8 has0/512 detected pairs;wall NOOP16
-0/512 within1px,LEFT16 RMSE9.859px. Unsupported detector regions are not physical
-ball absence,andstarting wall labels do not locate later error. System-Python/
-NumPy ABI preparation failure remains;project-Python inspection/declared analysis
-passes. No model/GPU/emulator query orupdate in these CPU stages;all sealed.
-
-Earlier image-feedback/posterior-history,position/color,encoder coordinates,
-wider-denoiser andother negatives stay closed. This prototype changes onlyhead
-visual readout,not prior recurrence orlosses;no old failed comparison isrepaired.
-Full physics,serve/collisions,natural events,brick memory,late/above-top coverage,
-untouched families andfresh confirmation remain. Actor/critic,CDP andfive-game
-work stay parked;no learner,collector,extension orautomatic successor isselected.
-
-The [frozen-state diagnostic](results/2026-11-09-breakout-world-state-readouts.md)
-stays closed:30 inputs,42 fits,144 metric rows,1.918s CPU,zero model queries.
-Partial h/z probes omit24,576 image-history values;they provide no precise
-transferable forecast rescue andcannot prove information absence. All original
-image scores,plots,folds and27,648 per-origin rows remain retained. Wider denoiser
-failure andall earlier architecture failures stay closed;this is a distinct
-local-decoder branch,not a repeat orassumed fix.
-
-The [posterior-history RGB100 learner](results/2026-11-09-breakout-world-posterior-natural100.md)
-stays closed/failed at2/3 dense gates: observed108/112,one99/109,eight19/107,
-sixteen5/114,thirty-two0/95 versus prior-suffix103/112,102/109,53/107,22/114,8/95.
-Fitting8 falls84/176→41/176;current reconstruction/paddle scores improve,but
-long ball forecasts regress. Native1,820.531s/loop1,951.302s,182/174/38/182 pins,
-two guards/18 sealed files andexact18-array restore pass. All three services are
-inactive/successful;all five final figures reviewed. No extension orbroader
-assessment. Bundled data/loss/budget/source changes do not isolate a cause.
-
-The [local forward comparison](results/2026-11-09-breakout-world-local-forward-contract.md)
-stays strictly failed on small observed/sampling differences,with exact forced-
-sample recurrent/generated suffix values;it does not prove free-running physics.
-The [late learner](results/2026-11-09-breakout-world-late-action-learning.md)
-and[earlier posterior-history run](results/2026-11-09-breakout-world-posterior-history.md)
-remain closed/failed,including original source-specific failures/repairs.
-The [early feature assessment](results/2026-11-09-breakout-world-action-features-branches.md)
-stays failed at.224881 versus one-hot.172366,296/304 nonending alarms. Full
-physics/events,brick memory,late/above-top coverage,untouched families andfresh
-confirmation remain required. Actor/critic,CDP andfive-game work stay parked.
+Earlier wider-motion,posterior-history,position/color,encoder-coordinate,image-
+feedback and other failed recipes stay closed in linked results/roadmap; do not
+restart collectors,old models or completed stages. Full action-conditioned
+physics,serve/collisions,natural events,persistent brick memory,late/tunnel/second-
+wall/above-top coverage,untouched families and fresh confirmation remain.
+Actor/critic,CDP and five-game work stay parked. No automatic successor.
 
 ## Preserved source and fresh-machine setup
 

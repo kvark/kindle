@@ -1,6 +1,6 @@
 # Kindle: CDP learning roadmap
 
-The November10 decoded-RGB event-head prototype passes [implementation/native qualification](results/2026-11-10-breakout-world-rgb-event-heads.md). Select the [fixed fresh learning comparison](experiments/2026-11-10-breakout-world-rgb-event-heads-learning.md) now active under a separate 240-pin declaration; see the [active report](results/2026-11-10-breakout-world-rgb-event-heads-learning.md). The world-model goal remains unproven.
+The November10 decoded-RGB event-head learner closes [3/3 dense gates with mixed point results and12.13% more native learning cost](results/2026-11-10-breakout-world-rgb-event-heads-learning.md). All closed artifacts/restore/services and five figures pass review; no adoption. Select the [bounded frozen chosen-action assessment](experiments/2026-11-10-breakout-world-rgb-event-heads-branches.md) for preparation/declaration. The full world-model goal remains unproven.
 
 ## Selected direction: Breakout world model in isolation
 
