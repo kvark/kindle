@@ -89,3 +89,13 @@ error; its script/plan/failure receipt remain. Separately namedv2 scripts/plan
 pass before analysis and produce the reviewed result in2.543 seconds. No learner or review job is restarted. Artifacts and the four figures:
 `/x/Temp/kindle-world-rgb-event-heads-learning-20261110/milestone-2048-v1`.
 The declared16,384-update run continues; its final comparison remains required.
+
+A separate final-image CPU plan is now declared under`final-images-v1`. Its
+five script/source/service pins verify. The observer waits for this exact main
+queue and CPU audit service to complete successfully and seal their outputs,
+then pins the final six curve groups and renders the same four fixed row0/draw0
+grids, retaining all four draws and event summaries. It makes no model/GPU/
+emulator query and changes no stopping rule. Service
+`kindle-world-rgb-event-heads-learning-images-20261110.service`, invocation
+`3360692f09af4e8cba1114b49413cf04`/PID2261360, is live-verified while waiting.
+No final-image result or successful main completion is claimed yet.
