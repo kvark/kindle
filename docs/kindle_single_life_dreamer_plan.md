@@ -1,6 +1,6 @@
 # Kindle: CDP learning roadmap
 
-The November10 decoded-RGB event-head prototype now passes [implementation and CPU checks](results/2026-11-10-breakout-world-rgb-event-heads.md); release packaging/native qualification remain. No main learner is allocated; the world-model goal remains unproven.
+The November10 decoded-RGB event-head prototype passes [implementation/native qualification](results/2026-11-10-breakout-world-rgb-event-heads.md). Select the [fixed fresh learning comparison](experiments/2026-11-10-breakout-world-rgb-event-heads-learning.md) for preparation/declaration; no main allocation yet. The world-model goal remains unproven.
 
 ## Selected direction: Breakout world model in isolation
 

@@ -21,22 +21,31 @@ available. Only the user merges PRs; commits and pushes are allowed.
 ## Current work — November 10
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select the [decoded-RGB event-head prototype](docs/experiments/2026-11-10-breakout-world-rgb-event-heads.md)
-for implementation/CPU checks,then separately declared native qualification.
-Default-off standalone heads readh/z plusshared-CNN features oftheir own decoded
-image. No posterior correction/extra transition orfuture actual image inbelief;
-keep local width16,two-image history,RGB3 replay andencoder/RSSM geometry. At1M64,
-expectedtwo head matrices640→896,+32,768 scalars,80/636,683/240;derive before
-allocation. Explicitv28 wraps v25/v18;reject whole-agent/unqualified compositions.
-Implementation and focused CPU checks now pass; see the [implementation report](docs/results/2026-11-10-breakout-world-rgb-event-heads.md).
-Six new CPU checks,29 configuration,5 scope,3/3/4 wide/late/features,3 history
-and1 suffix pass; strict core/binding Clippy pass. Original build/formatter and
-two finite-difference fixture failures remain; stable pooling-region checks pass
-without production/backend repair. Release packaging and isolated Python API
-checks precede a separately declared native stage. No GPU allocation yet;
-no main learner selected. Root
-`/x/Temp/kindle-world-rgb-event-heads-20261110`. Hypothesis only;h/z information
-absence andcause ofcalibration/physics failures are not established.
+unproven. The decoded-RGB event-head prototype is implemented and native-qualified;
+see [implementation/native qualification](docs/results/2026-11-10-breakout-world-rgb-event-heads.md). Six new CPU checks, affected compatibility checks, strict core/binding
+Clippy and77 isolated Python API checks pass. At1M/RGB64 onlytwo head matrices
+640→896 change,+32,768 scalars,80 logical/636,683 scalars/240 arrays. Shared
+encoder, local width16,two-image history,RGB3 replay and raw prior chronology stay.
+Explicitv28 binds flag/geometry/v25/v18; unqualified/whole-agent use is rejected.
+
+Native qualification closes in45.880s:150/85 pins,192 distinct, exact240
+initial/frozen/trained arrays,32 cached default-off/restore forecasts,13 alias
+reports and77/80 first-update weights changed. Small native/F64 derivatives and
+lane/image controls pass; one guard/nine sealed files and both services are
+inactive/successful. Original build/formatter/two finite-difference fixture failures
+and late observer-active assertion remain, with separate successful checks;
+no worker restart or production/backend repair. Release3,133,976,576 build-cache
+bytes after retained package/source/native/executable hashes pass.
+
+Select [the fixed learning comparison](docs/experiments/2026-11-10-breakout-world-rgb-event-heads-learning.md) for preparation and a separately declared fixed fresh16,384-update
+comparison: same early physical1M/RGB64/B8/T32/H16/Auto/41001/RGB100 recipe/data,
+only intended flag`rgb_event_heads=true`, with own actual-initial, first-update,
+frozen/restore evidence and all original dense/broader gates. Reused development
+seed/origins, not fresh confirmation. No main allocation or GPU job active yet.
+Roots `/x/Temp/kindle-world-rgb-event-heads-20261110` and
+`/x/Temp/kindle-world-rgb-event-heads-learning-20261110`. Full physics/calibration,
+brick memory,late/above-top coverage,untouched families and fresh confirmation
+remain. Actor/critic,CDP and five-game work stay parked.
 
 The [wider-motion learner](docs/results/2026-11-09-breakout-world-wide-motion-learning.md)
 closes3/3 dense:107/112,105/109,77/109,58/107,31/114,11/95. Native3,888.344s/
