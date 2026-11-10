@@ -41,7 +41,16 @@ Select [the fixed learning comparison](docs/experiments/2026-11-10-breakout-worl
 comparison: same early physical1M/RGB64/B8/T32/H16/Auto/41001/RGB100 recipe/data,
 only intended flag`rgb_event_heads=true`, with own actual-initial, first-update,
 frozen/restore evidence and all original dense/broader gates. Reused development
-seed/origins, not fresh confirmation. No main allocation or GPU job active yet.
+seed/origins, not fresh confirmation. The separately declared learner is active;
+see [active learning report](docs/results/2026-11-10-breakout-world-rgb-event-heads-learning.md). Scientific sourceaa8859bd,native45633605/SHAf71e9354,240 pins;
+CPU driver matches batch/plan/fresh initial with construction trapped. The first
+actual update matches13 reports/240 tensors,77 required weights change before
+update2,and learning continues; no quality result yet. Main
+invocationc1449b7c333a4f598f9992e266c34431/PID2258744,watcher
+b418b44ffbf84d29b1042d2d2c6466b1/PID2258750 andCPU finisher
+6916431b180c4a99b2a85448e324692d/PID2258755 all live-verified. Train/restore
+caps6,600/600s,Auto/host guard,no emulator. Final result and improvement unproven;
+no broader assessment,extension orautomatic successor selected.
 Roots `/x/Temp/kindle-world-rgb-event-heads-20261110` and
 `/x/Temp/kindle-world-rgb-event-heads-learning-20261110`. Full physics/calibration,
 brick memory,late/above-top coverage,untouched families and fresh confirmation
