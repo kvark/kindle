@@ -14,23 +14,23 @@ the retained-off actor-dynamics/expected-value snapshots cross the host.
 Run every heavy job as a memory-capped `systemd-run --user` unit; a bare
 `cargo test` peaked at 17.6 GB and the OOM killer took the session down.
 
-The goal **prove the world model training on Breakout** is active. Two
-screens on the new stack are closed: [16x more play](results/2026-11-10-breakout-world-scale.md)
-and [96x96 frames](results/2026-11-10-breakout-world-rgb96.md) both leave
-development ball tracking where the 64x64 control had it or below past four
-steps (eight-step 38/107 and 36/112 versus 53/107), with fitting equal to
-development, bit-exact reproduction for a fixed seed, and the sub-pixel 64x64
-ball (brightest red 77/255 on average) replaced by a bright multi-pixel ball at
-96 without effect. Forecast-time sharpening of fed-back frames collapses the
-forecasts. The remaining explanation is the autoregressive image feedback
-itself: hedged soft frames re-enter as dimmer blobs. The active experiment is
-[palette-committed feedback](experiments/2026-11-10-breakout-world-palette-feedback.md):
-the same 96x96 recipe with `rgb_history_palette` snapping every fed-back frame
-to the nearest of 32 corpus colours with a straight-through gradient (output
-`train-96-palette`, unit `kindle-world-scale-20261110.service`). The 65,536-update
-budget run (partial at `train-1m-65k/`) and the 4M run follow. Root
-`/x/Temp/kindle-world-scale-20261110`; driver `python/examples/breakout_world_scale.py`.
-Actor/critic, CDP and the five-game campaign stay parked.
+The goal **prove the world model training on Breakout** is active. Three
+screens on the new stack are closed on the same development origins:
+[16x more play](results/2026-11-10-breakout-world-scale.md) (eight-step
+38/107), [96x96 frames](results/2026-11-10-breakout-world-rgb96.md)
+(36/112) and [palette-committed feedback](results/2026-11-10-breakout-world-palette-feedback.md)
+(23/112), against the 64x64 control's 53/107; fitting equals development in
+all of them and training reproduces bit-exactly for a fixed seed. The ball is
+lost in the one-step hedging of the autoregressive image feedback, which the
+recurrent state does not resolve. A serial queue now runs in
+`kindle-world-scale-20261110.service` (`guards-next`): the 96x96 recipe
+without image history (`train-96-plain`, state must carry the ball), the 1M
+recipe for 65,536 updates (`train-1m-65k-v2`) and the 4M preset (`train-4m`),
+all on the 524,288-action corpora. The latent-prediction formulation from
+TASK.md (multi-step embedding prediction with a detached pixel probe) is the
+next candidate. Root `/x/Temp/kindle-world-scale-20261110`; driver
+`python/examples/breakout_world_scale.py`. Actor/critic, CDP and the five-game
+campaign stay parked.
 
 The previous [cumulative-survival learner](results/2026-11-10-breakout-world-survival-loss-learning.md)
 remains frozen by systemd at the user's request at update 9,964/16,384
