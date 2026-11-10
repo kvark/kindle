@@ -17,6 +17,13 @@ positions and lives. Fitting: 65,536 ticks per lane (524,288 aggregate actions),
 seed base 251001. Development: 4,096 ticks per lane (32,768 actions), seed base
 291001. Seeds do not overlap each other or the November 7 corpora.
 
+Collection runs as a plain memory-capped `systemd-run --user` unit rather than
+under `gpu_host_guard.py`: the guard's 3 s `journalctl` kernel probe times out
+during the 6.4 GB lane-file write burst and killed a complete first collection
+(retained under `guards-v2/`; an earlier attempt failed on the learner
+constructor, retained under `guards-failed-v1/`). The GPU only resizes frames
+during collection; the training job keeps the guard.
+
 ## Learner
 
 Unchanged early physical-feature recipe: 1M/RGB64/B8/T32/full BPTT/Auto/seed

@@ -35,15 +35,19 @@ Run every heavy job as a memory-capped `systemd-run --user` unit; a bare
 
 The goal **prove the world model training on Breakout** is active. The first
 experiment on the new stack, [corpus scale](experiments/2026-11-10-breakout-world-scale.md),
-keeps the early physical-feature recipe (1M/RGB64/B8/T32/H16/Auto/41001,
-`motion_event_rollout`) and only replaces the 33k-arrival corpus reused for
-128 passes with a fresh 524,288-action collection (eight lanes, same teacher
-plus random blocks, seed base 251001), scoring the unchanged November 7
-development origins. Root `/x/Temp/kindle-world-scale-20261110`, unit
-`kindle-world-scale-20261110.service`, driver `python/examples/breakout_world_scale.py`.
-Eight-step ball tracking was equally poor on fitting and development data
-(86/176 versus 52/107), so this separates a data limit from a model limit before
-any further one-knob change. Actor/critic, CDP and the five-game campaign stay parked.
+is complete: the unchanged early physical-feature recipe (1M/RGB64/B8/T32/H16/
+Auto/41001, `motion_event_rollout`) trained on a fresh 524,288-action corpus
+instead of 128 passes over 33k arrivals scores observed 101/112, one-step
+104/109, four-step 59/109, eight-step 38/107, sixteen-step 18/114 and
+thirty-two-step 0/95 on the November 7 development origins, against the
+control's 106/101/66/53/25/11; fitting equals development in both runs. More
+data does not lift the long horizons, so the limit is the model, objective or
+optimization, not the corpus ([result](results/2026-11-10-breakout-world-scale.md)).
+Two follow-ups run serially in `kindle-world-scale-followup-20261110.service`
+on the same corpus: the 1M recipe for 65,536 updates, then the 4M preset for
+16,384 updates. Root `/x/Temp/kindle-world-scale-20261110`; driver
+`python/examples/breakout_world_scale.py`. Actor/critic, CDP and the five-game
+campaign stay parked.
 
 The previous [cumulative-survival learner](results/2026-11-10-breakout-world-survival-loss-learning.md)
 remains frozen by systemd at the user's request at update 9,964/16,384
