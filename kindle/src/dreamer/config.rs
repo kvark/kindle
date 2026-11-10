@@ -355,6 +355,11 @@ pub struct DreamerConfig {
     /// Standalone spatial world: encode generated images into the imagined belief.
     #[serde(default, skip_serializing_if = "is_false")]
     pub world_image_feedback: bool,
+    /// Standalone spatial world: snap generated frames to the nearest of these
+    /// centered RGB colours before they re-enter the image history; the forward
+    /// value is discrete, the gradient passes straight through.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rgb_history_palette: Option<Vec<[f32; 3]>>,
     /// Append fixed x/y pixel-center coordinates inside the learned RGB encoder.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_coordinates: bool,
@@ -553,6 +558,7 @@ impl DreamerConfig {
             rgb_event_heads: false,
             world_survival_scale: None,
             world_image_feedback: false,
+            rgb_history_palette: None,
             rgb_coordinates: false,
             rgb_latent_only: false,
             world_gaussian: false,
@@ -894,6 +900,16 @@ impl DreamerConfig {
         }
         if self.world_image_feedback && !self.rgb_spatial_decoder {
             return Err("image feedback requires the standalone spatial RGB decoder".into());
+        }
+        if let Some(palette) = &self.rgb_history_palette
+            && (!self.rgb_spatial_decoder
+                || !(2..=32).contains(&palette.len())
+                || palette
+                    .iter()
+                    .flatten()
+                    .any(|value| !value.is_finite() || !(-0.5..=0.5).contains(value)))
+        {
+            return Err("history palette requires the standalone spatial RGB decoder and 2..=32 finite centered colours".into());
         }
         if let Some(dim) = self.world_gaussian_dim {
             let preset = self.model_size.network();

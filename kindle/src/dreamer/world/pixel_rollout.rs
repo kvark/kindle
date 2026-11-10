@@ -233,10 +233,20 @@ pub(super) fn build_with_centroid(
             decoded_event_image = Some(next);
             #[cfg(test)]
             predictions.push(next);
+            let fed_back = match &config.rgb_history_palette {
+                Some(palette) => super::super::networks::snap_to_palette(
+                    graph,
+                    next,
+                    palette,
+                    batch,
+                    config.observation_grid(),
+                ),
+                None => next,
+            };
             history = Some(super::super::spatial_history::shift(
                 graph,
                 past,
-                next,
+                fed_back,
                 batch,
                 config.observation_dim(),
             ));

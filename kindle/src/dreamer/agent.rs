@@ -530,6 +530,10 @@ impl DreamerCore {
             "spatial fusion is standalone world only"
         );
         assert!(
+            config.rgb_history_palette.is_none(),
+            "history palette is standalone world only"
+        );
+        assert!(
             !config.world_image_feedback,
             "image feedback is standalone world only"
         );
@@ -628,6 +632,10 @@ impl DreamerCore {
         assert!(
             !config.rgb_spatial_fusion,
             "spatial fusion is standalone world only"
+        );
+        assert!(
+            config.rgb_history_palette.is_none(),
+            "history palette is standalone world only"
         );
         assert!(
             !config.world_image_feedback,
@@ -3032,6 +3040,12 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,
             "spatial fusion is standalone world only",
+        ));
+    }
+    if metadata.config.rgb_history_palette.is_some() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "history palette is standalone world only",
         ));
     }
     if metadata.config.world_image_feedback {

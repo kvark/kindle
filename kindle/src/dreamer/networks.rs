@@ -992,6 +992,81 @@ pub(crate) fn centered_pixels(graph: &mut Graph, logits: NodeId) -> NodeId {
     graph.reshape(probabilities, &shape)
 }
 
+/// Nearest-palette snap of centered CHW frames `[batch, 3 * side * side]`.
+/// The forward value is the closest palette colour at every pixel; the
+/// gradient passes straight through to the soft frame.
+pub(crate) fn snap_to_palette(
+    graph: &mut Graph,
+    centered: NodeId,
+    palette: &[[f32; 3]],
+    batch: usize,
+    side: usize,
+) -> NodeId {
+    let area = side * side;
+    let channel_major = graph.reshape(centered, &[batch, 3, area]);
+    let pixel_major = graph.transpose(channel_major);
+    let pixels = graph.reshape(pixel_major, &[batch * area, 3]);
+    let table = graph.constant(
+        palette.iter().flatten().copied().collect(),
+        &[palette.len(), 3],
+    );
+    // argmin_k |p - c_k|^2 == argmax_k (p . c_k - |c_k|^2 / 2)
+    let half_norms = graph.constant(
+        palette
+            .iter()
+            .map(|colour| -0.5 * colour.iter().map(|v| v * v).sum::<f32>())
+            .collect(),
+        &[palette.len()],
+    );
+    let scores = graph.matmul_bt(pixels, table);
+    let scores = graph.bias_add(scores, half_norms);
+    let nearest = graph.argmax_one_hot(scores);
+    let snapped = graph.matmul(nearest, table);
+    let snapped = graph.reshape(snapped, &[batch, area, 3]);
+    let snapped = graph.transpose(snapped);
+    let snapped = graph.reshape(snapped, &[batch, 3 * area]);
+    let correction = graph.sub(snapped, centered);
+    let correction = graph.stop_gradient(correction);
+    graph.add(centered, correction)
+}
+
+/// CPU twin of [`snap_to_palette`] for host-side forecast feedback.
+pub(crate) fn snap_to_palette_cpu(
+    centered: &[f32],
+    palette: &[[f32; 3]],
+    width: usize,
+) -> Vec<f32> {
+    let area = width / 3;
+    let mut snapped = centered.to_vec();
+    for row in snapped.chunks_exact_mut(width) {
+        for pixel in 0..area {
+            let value = [row[pixel], row[area + pixel], row[2 * area + pixel]];
+            let nearest = palette
+                .iter()
+                .map(|colour| {
+                    colour
+                        .iter()
+                        .zip(&value)
+                        .map(|(c, v)| (c - v) * (c - v))
+                        .sum::<f32>()
+                })
+                .enumerate()
+                .fold((0, f32::INFINITY), |best, (index, distance)| {
+                    if distance < best.1 {
+                        (index, distance)
+                    } else {
+                        best
+                    }
+                })
+                .0;
+            for (channel, &component) in palette[nearest].iter().enumerate() {
+                row[channel * area + pixel] = component;
+            }
+        }
+    }
+    snapped
+}
+
 /// Elementwise soft-RGB cross-entropy, evaluated directly from logits.
 pub(crate) fn pixel_cross_entropy(
     graph: &mut Graph,

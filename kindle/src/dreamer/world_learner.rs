@@ -53,6 +53,8 @@ mod motion_tests;
 #[cfg(test)]
 mod observation_code_tests;
 #[cfg(test)]
+mod palette_tests;
+#[cfg(test)]
 mod posterior_correction_diagnostic;
 #[cfg(test)]
 mod posterior_history_tests;
@@ -1488,7 +1490,10 @@ impl WorldModelLearner {
                 stoch = super::gaussian::sample_cpu(&self.config, &logits, &mut rng);
             }
             if self.config.rgb_spatial_decoder {
-                let fed_back = sharpen_pixels(&image, self.feedback_sharpness);
+                let mut fed_back = sharpen_pixels(&image, self.feedback_sharpness);
+                if let Some(palette) = &self.config.rgb_history_palette {
+                    fed_back = super::networks::snap_to_palette_cpu(&fed_back, palette, width);
+                }
                 history = super::spatial_history::shift_cpu(&history, &fed_back, width);
             }
             if self.config.rgb_event_heads {

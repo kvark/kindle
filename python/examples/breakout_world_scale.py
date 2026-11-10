@@ -235,6 +235,30 @@ def rerender(args):
     write(args.output / 'manifest.json', dict(source, status='complete', side=side, rerendered_from=str(args.source), files=files))
 
 
+def palette(args):
+    """Most frequent frame colours of a corpus, as centered RGB for `rgb_history_palette`."""
+    counts = {}
+    manifest = json.loads((args.dataset / 'manifest.json').read_text())
+    for lane in range(len(manifest['files'])):
+        with np.load(args.dataset / f'lane{lane}.npz', allow_pickle=False) as data:
+            frames = data['rgb'][::args.palette_stride]
+        flat = frames.transpose(0, 2, 3, 1).reshape(-1, 3)
+        colours, number = np.unique(flat, axis=0, return_counts=True)
+        for colour, n in zip(map(tuple, colours.tolist()), number.tolist()):
+            counts[colour] = counts.get(colour, 0) + n
+    total = sum(counts.values())
+    ranked = sorted(counts.items(), key=lambda item: -item[1])[:args.colours]
+    centered = [[round(channel / 255 - .5, 6) for channel in colour] for colour, _ in ranked]
+    result = dict(dataset=str(args.dataset), colours=args.colours, stride=args.palette_stride, sampled_pixels=total,
+                  coverage=sum(n for _, n in ranked) / total, rgb=[list(colour) for colour, _ in ranked], centered=centered)
+    write(args.output / 'palette.json', result)
+    if args.config is not None:
+        config = json.loads(args.config.read_text())
+        config['rgb_history_palette'] = centered
+        write(args.output / 'config.json', config)
+    print(json.dumps(dict(event='palette', colours=len(centered), coverage=result['coverage'])), flush=True)
+
+
 def load_dataset(root):
     manifest = json.loads((root / 'manifest.json').read_text())
     streams = []
@@ -319,8 +343,8 @@ def ball_summary(result):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('collect', 'train', 'rerender'))
-    parser.add_argument('--config', type=Path, required=True)
+    parser.add_argument('mode', choices=('collect', 'train', 'rerender', 'palette'))
+    parser.add_argument('--config', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--ticks', type=int, default=65536, help='collection steps per lane')
     parser.add_argument('--seed', type=int, default=251001)
@@ -334,8 +358,17 @@ def main():
     parser.add_argument('--dense', type=int, default=128)
     parser.add_argument('--prediction-length', type=int, default=16)
     parser.add_argument('--pixel-loss', default='motion_event_rollout')
+    parser.add_argument('--colours', type=int, default=32)
+    parser.add_argument('--palette-stride', type=int, default=50)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
+    if args.mode == 'palette':
+        if args.dataset is None:
+            parser.error('palette requires --dataset')
+        palette(args)
+        return
+    if args.config is None:
+        parser.error('--config is required')
     if args.mode == 'collect':
         collect(args)
     elif args.mode == 'rerender':
