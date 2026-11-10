@@ -56,14 +56,18 @@ hits where the spatial recipes never did. Its bricks blur (balanced error
 continuation stopped at that point and reproducible from `queue-96-context-4m.json`).
 Whole agents can now train this objective: `world_pixel_loss` and
 `world_prediction_length` (plain learned-RGB worlds, full BPTT) with runner
-flags `--world-pixel-loss`/`--world-prediction-length`. The active run is the
-[Breakout agent with the state-only 96x96 world objective](experiments/2026-11-10-breakout-agent-world96.md):
-seed 1009, 200k actions, 4M/96/B8/T32/R16, motion cross-entropy, 16-step
-rollout, retained guidance, no CDP and no exploration bonus, frozen
-evaluations on cohort 4000022003 (unit `kindle-breakout-world96-agent-20261110.service`,
-root `/x/Temp/kindle-breakout-world96-agent-20261110`). References on that
-cohort: retained CDP 1009 94.625 greedy / 70.500 sampled, fresh CDP 22003
-75.250 / 44.708. World-model root `/x/Temp/kindle-world-scale-20261110`; driver
+flags `--world-pixel-loss`/`--world-prediction-length`. The first
+[Breakout agent with the state-only 96x96 world objective](results/2026-11-10-breakout-agent-world96.md)
+(seed 1009, 200k actions, 4M/96/B8/T32/R16, motion cross-entropy, 16-step
+rollout, retained guidance, no CDP and no exploration bonus; 12,469 updates
+in 31 minutes) is a negative result: frozen sampled 4.760 / greedy 4.785 on
+cohort 4000022003 (initial 1.250 / 2.167) against retained CDP 1009's 94.625
+greedy / 70.500 sampled and fresh CDP 22003's 75.250 / 44.708, with guided
+online returns averaging 34.5 that the frozen policy does not carry. The
+world objective and the missing bonus are confounded; a bonus-decoupled
+matched run and a CDP-plus-pixel-rollout auxiliary run are the cheapest next
+checks, not yet launched. Root `/x/Temp/kindle-breakout-world96-agent-20261110`
+(unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
 on any checkpoint). These are development screens on reused seed 41001 and
 reused origins, not held-out qualification. CDP and the five-game campaign
