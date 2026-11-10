@@ -18,7 +18,8 @@ corrective labels, imitation scale 100 and the world gradient, actor unimix
 checkpoint at 100k) with these changes only:
 
 - `--cdp --cdp-centered --encoder-learning-rate 4e-5` removed; the world is
-  the plain learned-RGB decoder with reconstruction 100 and
+  the plain learned-RGB decoder with reconstruction scale 1 (runner default
+  for learned RGB; an earlier draft said 100) and
   `--world-pixel-loss motion_cross_entropy --world-prediction-length 8` (the
   rollout must be shorter than the 16-step window; the standalone recipe used
   16 of 32). Without CDP every parameter group trains at the base 4e-5, so the

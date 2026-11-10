@@ -16,13 +16,17 @@ CDP scale 500, action-effects bonus 1, corrective labels, actor unimix .01,
 encoder rate 4e-5, dynamics rate 4e-4, behavior rate 8e-5, replay-value scale
 1, 200k actions, seed 1009) plus
 `--world-pixel-scale S --world-pixel-loss motion_cross_entropy --world-prediction-length 8`.
-`S` is chosen once from a 768-action smoke so that the weighted pixel term
-(S times the summed per-pixel cross-entropy, about 6,000 to 17,000 at 64x64)
-is of the same order as the weighted CDP term (500 times the embedding loss),
-not larger; the value and the smoke's loss readings are recorded in the
-queue and the result. Resolution stays at the retained 64x64 so the only
-change from the retained learner is the auxiliary; the 96x96 variant is a
-separate decision after the matched 64x64 twin reports.
+The 768-action smoke (`smoke/`, scale 1, 139 ms per update, VRAM 3.6 GiB)
+read the centered CDP loss at .998 (weighted 500) against a pixel
+reconstruction of 8,600 plus a prior-rollout loss of 8,500 (weighted 17,000
+at scale 1; the matched 64x64 pixel world ended near 2,800 plus 2,800). Two
+scales run in one queue, 200k actions each: **S = 0.1** (`s01/`: weighted
+pixel term about 1,700 early and 560 late, the same order as the CDP term)
+and **S = 1** (`s1/`: pixel-dominated as in the matched pixel world, with CDP
+retained underneath). Resolution stays at the retained 64x64, which the
+matched twin also showed to be the better and cheaper agent setting. Root
+`/x/Temp/kindle-breakout-cdp-pixel-aux-20261110`, `queue.json`, unit
+`kindle-breakout-cdp-pixel-aux-20261110.service` (launched 16:51 UTC).
 
 Implementation: `world_pixel_scale` (commit 4201056e) builds `world.decoder`
 in a CDP world, targets raw replay pixels (the CDP heads still target

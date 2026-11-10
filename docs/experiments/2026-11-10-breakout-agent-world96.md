@@ -18,8 +18,8 @@ in the retained CDP learner. The retained learner's action-effects exploration
 bonus (scale 1) is absent: the runner ties it to CDP, so this run differs from
 the retained recipe in the world objective and in the missing bonus. `--world-pixel-loss
 motion_cross_entropy --world-prediction-length 16` select the new objective;
-CDP is off (plain learned RGB with reconstruction 100 from the default
-config). Root `/x/Temp/kindle-breakout-world96-agent-20261110`, output
+CDP is off (plain learned RGB; the runner sets reconstruction scale 1, not
+the 100 this paragraph first claimed; corrected November 10). Root `/x/Temp/kindle-breakout-world96-agent-20261110`, output
 `candidate/`, `queue.json`.
 
 ## Evaluation
