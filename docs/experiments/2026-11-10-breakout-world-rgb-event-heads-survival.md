@@ -36,3 +36,12 @@ share and no substituted result as learned improvement. All original ordinary
 failures stand. Full physics,event calibration,brick memory,late/above-top
 coverage,untouched families and fresh confirmation remain. No learner,collector,
 new native job,extension or automatic successor is selected.
+
+Preparationv1 fails an inherited whole-runner byte-identity assertion; its later
+analysis attempt stops at the missing declaration before scoring any case. Both
+logs/scripts remain. The only runner diff is optional model-kind dispatch,
+CLI/default and descriptive metadata; the closed native job explicitly used RSSM.
+Separately namedv2 preparation verifies exact AST equality of every non-dispatch
+module node, including all scoring/feature functions and constants, and pins both
+runner hashes plus its equivalence receipt. The unchanged F64 math and fixture
+receipt stay required. No native job, old analysis or fixture is repeated.
