@@ -74,10 +74,15 @@ sampled 38.231 (54 minutes, 17.6 GiB), against the retained CDP learner's
 94.625 / 70.500 on the same cohort and initial controls near 2. The pixel
 objective wins greedy by a wide margin and loses sampled; one seed, no
 held-out qualification, 0 two-wall episodes. Root
-`/x/Temp/kindle-breakout-world96-matched-20261110` (unit finished). The next
-run, [retained CDP plus the pixel objective as an auxiliary](docs/experiments/2026-11-10-breakout-agent-cdp-pixel-aux.md)
-(`world_pixel_scale`, `--world-pixel-scale`), asks whether the two compose;
-root `/x/Temp/kindle-breakout-cdp-pixel-aux-20261110`. First-run root
+`/x/Temp/kindle-breakout-world96-matched-20261110` (unit finished).
+[Retained CDP plus the pixel objective as an auxiliary](docs/results/2026-11-10-breakout-agent-cdp-pixel-aux.md)
+(`world_pixel_scale`, `--world-pixel-scale`) scores greedy 104.036 / sampled
+61.692 at scale 1 (the most balanced learner; CDP loss still falls to .056)
+and 68.292 / 47.667 at scale .1 (the objectives interfere); root
+`/x/Temp/kindle-breakout-cdp-pixel-aux-20261110` (unit finished). Every one
+of these is seed 1009 on cohort 4000022003; a second-seed confirmation
+(seed 22003, against fresh CDP 22003's 75.250 / 44.708) is the next run.
+First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
 on any checkpoint). These are development screens on reused seed 41001 and
