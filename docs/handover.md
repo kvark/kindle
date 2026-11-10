@@ -18,45 +18,46 @@ blocks; keep their bytes immutable. Archiving older logs could save roughly
 ## Current work — November 10
 
 The goal **prove the world model training on Breakout** remains active and
-unproven. Select [the frozen chosen-action assessment](experiments/2026-11-10-breakout-world-rgb-event-heads-branches.md) for separate preparation/declaration, using only the new
-final16,384 RGB event-head checkpoint. The separately declared frozen assessment
-is active; see [active assessment](results/2026-11-10-breakout-world-rgb-event-heads-branches.md). Source79b71fb7,native45633605/SHAf71e9354,1,059 pins/394 oracle inputs,
-six cached controls,84 groups/history16/32/eight draws. Main61986139ea8d46f1a09809430d63e9e0/
-PID2270011 and observerc1e76d204fa646e4a83cee614c01bc87/PID2270018 are live-verified;
-cap1,800s,Auto/host guard,no emulator/learning/old-model query. No new learner is active.
-The3/3 dense result does not settle the intended event-calibration benefit.
-Keep original energy/ending/false-alarm gates and cached controls, including
-wider motion; query no old model or emulator. Root
-`/x/Temp/kindle-world-rgb-event-heads-branches-20261110`.
+unproven. Select [the saved survival decomposition](experiments/2026-11-10-breakout-world-rgb-event-heads-survival.md) for separately declared CPU-only execution. Hold new saved
+images fixed; compare original/model-mean/oracle-mean/all-alive score components
+with sealed unchanged math/fixtures. No GPU/model/emulator query,old forecast
+read or new update. Root `/x/Temp/kindle-world-rgb-event-heads-survival-20261110`.
+Oracle labels are diagnostic weights,not learned repairs or passing scores.
 
-The [RGB event-head learner](results/2026-11-10-breakout-world-rgb-event-heads-learning.md) is closed: development observed/1/4/8/16/32 is103/112,99/109,71/109,
-52/107,30/114,8/95 versus early106/112,101/109,66/109,53/107,25/114,11/95.
-Native2,064.391s/loop2,233.998s versus1,841.013s/1,998.783s (1.121334x/
-1.117679x). No consistent ball/efficiency gain or adoption. All240/172/46/180
-pins,485 distinct closed files,240 bit-exact initial/first/frozen arrays,18
-byte-exact restore arrays,all80 weights changed,16,384 finite13-report rows,
-plan/counts,384 initial origins and58 exports pass. Two guards/18 sealed files
-and all four terminal services/completion journals pass. Five final figures
-reviewed; long drifting/diffuse/missing ball paths remain. Final-image review:
-34 inputs/15 closed files/60 joins/six groups/four draws,2.724s CPU. Original
-provisional CPU syntax failure and separatev2 completion remain; no learner,
-restore,observer,final-audit or final-image job fails/repeats.
+The [frozen assessment](results/2026-11-10-breakout-world-rgb-event-heads-branches.md) closes **failed**:primary.142943451628 vsrequired<=.127126664317,
+H0.169502219090,wide.160386921843,early physical.224881281067. The15.67% H0
+reduction misses25%. Ending16/32 Brier.329116/.331428,RIGHT16.818743 vsoracle0,
+201/304 nonending>5% andmaximum.961272 fail all four event gates. Onlycontact
+hasnonending32 category mean<=.05. Serve NOOP andfour freeflight64/64 pass.
+Native190.129s/CPU16.694s;all1,059/238/242 pins,1,298 distinct,240 exactsource/
+before/after arrays,210 oracle joins/168 features,one guard/nine sealed files
+and both terminal services/completion journals pass. No failure/retry/repair.
+All old models/collectors stay closed; no new native allocation is selected.
+
+The [RGB event-head learner](results/2026-11-10-breakout-world-rgb-event-heads-learning.md) closes3/3 dense:103/112,99/109,71/109,52/107,30/114,8/95 versusearly
+106/112,101/109,66/109,53/107,25/114,11/95. Native2,064.391s/loop2,233.998s
+versus1,841.013s/1,998.783s (1.121334x/1.117679x). No consistent ball/efficiency
+gain or adoption. All240/172/46/180 pins,485 distinct,bit-exact240 initial/first/
+frozen arrays,18 restore arrays,80 changed weights,16,384 finite13-report rows,
+counts/plan,384 initial origins/58 exports,two guards/18 sealed files andall four
+terminal services/journals pass. Five final figures reviewed;drifting/diffuse/
+missing long ball paths persist. Original2k syntax failure and separatev2 CPU
+completion remain;no learner/restore/observer/final audit/image job fails/repeats.
 
 Reuse qualified native45633605/SHAf71e9354 at
-`/x/Temp/kindle-world-rgb-event-heads-20261110`, exact runtime/runner,Auto.
-Default-off heads readh/z plus shared-CNN own decoded RGB; two matrices640→896,
+`/x/Temp/kindle-world-rgb-event-heads-20261110`,exact runtime/runner,Auto.
+Default-off h/z plusshared-CNN own decoded RGB changes twohead matrices640→896,
 +32,768 scalars,80/636,683/240. Local width16,two-image history,RGB3 replay,
-encoder/RSSM and raw prior chronology stay. Explicitv28 binds flag/geometry/v25/v18;
+encoder/RSSM andraw prior chronology stay. Explicitv28 binds flag/geometry/v25/v18;
 whole-agent/unqualified compositions reject beforeGPU. [native qualification](results/2026-11-10-breakout-world-rgb-event-heads.md) remains closed;
-retain its original build/formatter/F64/late-observer failures and separate checks.
-Its disposable3,133,976,576-byte build cache is already released; no rebuild needed.
+retain original build/formatter/F64/late-observer failures andseparate checks.
+Its3,133,976,576-byte build cache isalready released; no rebuild needed.
 
-Earlier wider-motion,posterior-history,position/color,encoder-coordinate,image-
-feedback and other failed recipes stay closed in linked results/roadmap; do not
-restart collectors,old models or completed stages. Full action-conditioned
-physics,serve/collisions,natural events,persistent brick memory,late/tunnel/second-
-wall/above-top coverage,untouched families and fresh confirmation remain.
-Actor/critic,CDP and five-game work stay parked. No automatic successor.
+Earlier wider-motion,posterior-history,position/color,coordinates,image-feedback
+and other failed recipes stay closed. Full physics,serve/collisions,natural
+events,persistent brick memory,late/tunnel/second-wall/above-top coverage,
+untouched families andfresh confirmation remain. Actor/critic,CDP andfive-game
+work stay parked. No unchanged extension,broad seed campaign orautomatic successor.
 
 ## Preserved source and fresh-machine setup
 

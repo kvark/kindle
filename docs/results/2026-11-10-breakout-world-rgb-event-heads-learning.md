@@ -107,3 +107,5 @@ The original primary energy/ending/false-alarm gates stay unchanged. No further
 training, adoption, extension, collector or automatic successor is selected.
 Full physics/events,brick memory,late/above-top coverage,untouched families and
 fresh confirmation remain. Actor/critic,CDP and five-game work stay parked.
+
+The separately declared [broader assessment](2026-11-10-breakout-world-rgb-event-heads-branches.md) is now closed and failed atprimary.142943 andall four ending/false-alarm gates. The dense3/3 screen doesnot establish the full goal.
