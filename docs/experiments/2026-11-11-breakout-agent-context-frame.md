@@ -26,8 +26,12 @@ The [matched pixel world 64x64](2026-11-10-breakout-agent-world96-matched.md)
 produced the world-model result: 12M at 64x64 and B16/T16 (the retained
 agent geometry), motion cross-entropy instead of `motion_event_rollout`, and
 an 8-step rollout. Root `/x/Temp/kindle-breakout-pixel-context-20261111`,
-`queue.json`, unit `kindle-breakout-pixel-context-20261111.service`; a
-768-action smoke precedes the launch and must report the prior-rollout loss.
+`queue.json`, unit `kindle-breakout-pixel-context-20261111.service`. The
+768-action smoke (`smoke2/`; `smoke/` is an earlier attempt stopped by a
+vector-agent guard that still forbade the spatial decoder, relaxed in the
+same commit) reports the prior-rollout loss with `rgb_spatial_decoder` and
+lag 8 in the recorded config, 170 ms per update against 143 without the
+context frame, VRAM 4.1 GiB in the smoke. Launched 07:50 UTC.
 
 ## Evaluation
 
