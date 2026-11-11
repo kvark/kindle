@@ -31,7 +31,7 @@ an 8-step rollout. Root `/x/Temp/kindle-breakout-pixel-context-20261111`,
 vector-agent guard that still forbade the spatial decoder, relaxed in the
 same commit) reports the prior-rollout loss with `rgb_spatial_decoder` and
 lag 8 in the recorded config, 170 ms per update against 143 without the
-context frame, VRAM 4.1 GiB in the smoke. Launched 07:50 UTC.
+context frame, VRAM 4.1 GiB in the smoke. Launched 07:41 UTC.
 
 ## Evaluation
 
