@@ -111,9 +111,10 @@ distribution sharpness, not ranking: at temperature .5 / .25 the pixel world
 scores 162.5 / 198.8 against CDP's 106.4 / 113.9 (temperature 1: 83.6 against
 92.8). Still development seeds on reused cohorts; 0 two-wall episodes
 anywhere (best single episode 404). [Lowering the actor entropy scale](results/2026-11-10-breakout-agent-pixel-entropy.md)
-(1e-4, 3e-5) does not sharpen the pixel-world actor: policy entropy stays
-near .88 nats, sampled scores stay at 29 to 34 and greedy scores drop, so
-the entropy bonus is not the lever; unimix, return normalization and the
+(1e-4, 3e-5) or removing the 1% actor unimix does not sharpen the
+pixel-world actor: policy entropy stays at .80 to .89 nats, sampled scores
+stay at 29 to 38 and greedy scores drop to 87 to 129 (all one seed), so
+neither explicit policy knob is the lever; return normalization and the
 imitation term remain untested. The [4M context-frame world at 65,536 updates](results/2026-11-10-breakout-world-context-frame.md)
 (`train-96-context-4m-65k-v4`, 349 ms per update, 6h31m, run without the
 host guard after a 14G OOM and a guard probe timeout killed two attempts) is
