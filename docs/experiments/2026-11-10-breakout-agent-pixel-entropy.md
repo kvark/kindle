@@ -38,3 +38,14 @@ retained sampled protocol; a sampled gain with a greedy loss would say the
 entropy bonus was doing useful exploration work; no sampled change would
 point at unimix or at the critic instead. Policy entropy and online returns
 are reported alongside.
+
+## Addition (November 11): actor unimix 0
+
+The entropy scale did not move the actor's distribution. The other explicit
+policy knob is actor unimix (.01 in the retained recipe: 1% uniform mixed
+into the policy at training and sampling time). One run: the matched pixel
+world 64x64 200k command (seed 1009, entropy 3e-4) with `--actor-unimix 0`,
+frozen evaluations on cohorts 4000001009 and 4000022003, sampled and greedy.
+Root `/x/Temp/kindle-breakout-pixel-unimix0-20261111`, `queue.json`, unit
+`kindle-breakout-pixel-unimix0-20261111.service`. Read against the unimix
+.01 run's 37.680 / 156.840 and 40.286 / 151.080 (sampled / greedy).
