@@ -138,8 +138,14 @@ held-out corpus](docs/results/2026-11-11-breakout-world-heldout.md) (seed
 brick error .009, against the state-only world's 109, 87, 65, 38, 19 and
 .223: the development screens hold at one to eight steps and were optimistic
 at sixteen and thirty-two, the fitting corpus is not memorized, and the
-ordering of the two worlds holds. Thirty-two-step tracking at 16% to 19% is
-the standing world-model limitation. No job is active; the GPU is free.
+ordering of the two worlds holds. Training the same world with a [32-step
+rollout in a 48-step window](docs/results/2026-11-11-breakout-world-context-h32.md)
+(32,768 updates, 870 ms each, 8 hours) raises thirty-two-step tracking to
+31/102 on the development origins and 28/116 held-out (from 22 and 19) with
+sharp bricks, at a cost of 3 to 9 counts at one to eight steps held-out and
+2.5 times the time per update; the long-horizon limit was partly an
+objective-horizon limit, and 24% to 30% at thirty-two steps is the new
+standing number. No job is active; the GPU is free.
 First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
