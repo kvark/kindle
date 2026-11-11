@@ -99,11 +99,17 @@ neither explicit policy knob is the lever; return normalization and the
 imitation term remain untested. Porting the [context-frame decoder to the
 agent](results/2026-11-11-breakout-agent-context-frame.md) (`--world-context-lag`,
 runner and native support committed) is also negative at 64x64/12M: sampled
-27 / 35, greedy 77 / 73, pixel losses unchanged, 20% slower. Five seed-1009
-variants of the pixel recipe now span 77 to 157 greedy on cohort 1009, so the
-baseline's 157 / 151 may be a high draw; a two-fresh-seed screen of the
-unchanged baseline (root `/x/Temp/kindle-breakout-pixel-seeds-20261111`,
-unit `kindle-breakout-pixel-seeds-20261111.service`) runs next to settle it. The [4M context-frame world at 65,536 updates](results/2026-11-10-breakout-world-context-frame.md)
+27 / 35, greedy 77 / 73, pixel losses unchanged, 20% slower. The [fresh-seed
+screen](results/2026-11-11-breakout-agent-pixel-seeds.md) settles the
+variance question against the pixel recipe's favour: seeds 3005 and 4007
+score greedy 108.5 / 160.9 and 50.5 / 43.7 on the two cohorts (sampled 46 /
+35 and 23 / 23), so the recipe's greedy score spans 44 to 161 across four
+seeds while its world losses do not move. **The claim that the pixel
+objective beats CDP in greedy play on every pair is withdrawn**; what holds is
+a higher greedy ceiling (four runs above 150 against CDP's best 150.8 at
+400k), a four-seed greedy mean above CDP's two-seed mean on the new cohort
+(113.7 against 84.9), a worse sampled mode on every seed, and a less
+predictable learner. No job is active; the GPU is free. The [4M context-frame world at 65,536 updates](results/2026-11-10-breakout-world-context-frame.md)
 (`train-96-context-4m-65k-v4`, 349 ms per update, 6h31m, run without the
 host guard after a 14G OOM and a guard probe timeout killed two attempts) is
 the **best Breakout world model so far at every horizon with sharp bricks**:
