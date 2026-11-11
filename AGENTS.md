@@ -132,9 +132,14 @@ the **best Breakout world model so far at every horizon with sharp bricks**:
 observed 113/113, one-step 111/112, four-step 97/112, eight-step 72/112,
 sixteen-step 53/115, thirty-two-step 22/102, brick balanced error .007 /
 .022 / .053 at 8 / 16 / 32, against the control's 101/66/53/25/11 and the
-state-only world's 109/93/70/46/15 with .32 brick error. Still a development
-screen on reused seed 41001 and reused origins. No job is active; the GPU is
-free.
+state-only world's 109/93/70/46/15 with .32 brick error. On a [fresh
+held-out corpus](docs/results/2026-11-11-breakout-world-heldout.md) (seed
+777001, 16 episodes) it scores 112/115, 93/117, 72/113, 41/111, 19/116 with
+brick error .009, against the state-only world's 109, 87, 65, 38, 19 and
+.223: the development screens hold at one to eight steps and were optimistic
+at sixteen and thirty-two, the fitting corpus is not memorized, and the
+ordering of the two worlds holds. Thirty-two-step tracking at 16% to 19% is
+the standing world-model limitation. No job is active; the GPU is free.
 First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
