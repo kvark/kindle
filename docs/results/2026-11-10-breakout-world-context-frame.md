@@ -61,3 +61,48 @@ Nothing generated is fed back, so the long-horizon weakness here is the prior
 drifting (prior-state ball RMSE 34 / 20 at thirty-two steps) and the renderer's
 precision from a coarse latent, not fading. Development screen on reused seed
 41001; nothing here qualifies the world model.
+
+## 4M context frame at 65,536 updates (November 11)
+
+`train-96-context-4m-65k-v4` (same config and seed as the stopped run; the
+run is deterministic and its 8,192 and 16,384 points reproduce the earlier
+ones bit for bit) completed 65,536 updates in 22,855 s of native calls (349
+ms per update; 6h31m wall, 00:26 to 06:57 UTC, unit
+`kindle-world-context-4m-65k-v4-20261110.service`, MemoryMax 24G). Two
+earlier relaunches failed before producing new data: `-v2` was OOM-killed at
+a 14G memory cap while loading the corpus, and `-v3` was killed at update
+14,848 by the host guard's kernel-probe timeout (a known false positive of
+the 3 s `journalctl` probe, child exit -15, no GPU fault); the completed run
+therefore ran without the host guard. Dense development ball tracking
+(within 1.5 px at 96, side-agnostic) and brick balanced error per point:
+
+| Updates | Observed | 1 | 4 | 8 | 16 | 32 | Brick error 8 / 16 / 32 |
+|---|---|---|---|---|---|---|---|
+| 8,192 | 112/113 | 103/112 | 44/112 | 14/112 | 6/115 | 2/102 | .011 / .024 / .058 |
+| 16,384 | 113/113 | 107/112 | 74/112 | 30/112 | 14/115 | 2/102 | .010 / .024 / .058 |
+| 24,576 | 113/113 | 110/112 | 84/112 | 56/112 | 25/115 | 6/102 | .010 / .023 / .059 |
+| 32,768 | 113/113 | 111/112 | 92/112 | 66/112 | 46/115 | 15/102 | .007 / .023 / .058 |
+| 40,960 | 113/113 | 111/112 | 95/112 | 70/112 | 48/115 | 19/102 | .008 / .024 / .053 |
+| 49,152 | 113/113 | 111/112 | 95/112 | 71/112 | 52/115 | 21/102 | .007 / .022 / .054 |
+| 57,344 | 113/113 | 111/112 | 93/112 | 67/112 | 37/115 | 17/102 | .007 / .023 / .054 |
+| **65,536** | **113/113** | **111/112** | **97/112** | **72/112** | **53/115** | **22/102** | **.007 / .022 / .053** |
+| 64x64 control (final) | 106/112 | 101/109 | 66/109 | 53/107 | 25/114 | 11/95 | |
+| State-only 1M, 65,536 | 113/113 | 109/112 | 93/112 | 70/112 | 46/115 | 15/102 | .32 at 8 |
+
+This is the best Breakout world model so far at every horizon on the shared
+development origins, and the first that keeps the bricks sharp while doing
+it (balanced error .007 at eight steps against the state-only world's .32).
+Natural development episodes at 65,536: observed 28/28, one-step 26/27,
+four-step 23/26, eight-step 16/27, sixteen-step 9/27, thirty-two-step 1/25;
+contact origins 8/8, 8/8, 7/7, 1/6, 5/8, 1/8. The 57,344 point dips at
+sixteen and thirty-two steps and recovers at 65,536; single-checkpoint
+points move by ten or more counts between evaluations, so the curve, not one
+point, is the evidence. The linear state probe (development RMSE in native
+pixels, baselines ball 40 / 28, paddle 47) plateaus from 16,384 updates
+while pixel tracking keeps improving: at 65,536, encoder ball 10.4 / 10.4,
+posterior 20.1 / 6.6, prior at one step 18.8 / 5.4, eight 20.3 / 7.0,
+sixteen 21.2 / 10.4, thirty-two 30.8 / 17.9; paddle 8 to 14 at every
+horizon. The driver's `world_model_proven` field in `result.json` is a
+constant `False`: the driver never claims proof, and this remains a
+development screen on reused seed 41001 and reused origins rather than a
+held-out qualification.

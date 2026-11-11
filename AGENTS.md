@@ -111,11 +111,16 @@ anywhere (best single episode 404). [Lowering the actor entropy scale](docs/resu
 (1e-4, 3e-5) does not sharpen the pixel-world actor: policy entropy stays
 near .88 nats, sampled scores stay at 29 to 34 and greedy scores drop, so
 the entropy bonus is not the lever; unimix, return normalization and the
-imitation term remain untested. The 4M context-frame world's full 65k run
-(`train-96-context-4m-65k-v4`, unit `kindle-world-context-4m-65k-v4-20261110.service`,
-MemoryMax 24G, run without the host guard after a 14G OOM and a guard
-kernel-probe timeout killed two earlier attempts; about 365 ms per update,
-6.7 hours) started 00:26 UTC on November 11 and is the only active job.
+imitation term remain untested. The [4M context-frame world at 65,536 updates](docs/results/2026-11-10-breakout-world-context-frame.md)
+(`train-96-context-4m-65k-v4`, 349 ms per update, 6h31m, run without the
+host guard after a 14G OOM and a guard probe timeout killed two attempts) is
+the **best Breakout world model so far at every horizon with sharp bricks**:
+observed 113/113, one-step 111/112, four-step 97/112, eight-step 72/112,
+sixteen-step 53/115, thirty-two-step 22/102, brick balanced error .007 /
+.022 / .053 at 8 / 16 / 32, against the control's 101/66/53/25/11 and the
+state-only world's 109/93/70/46/15 with .32 brick error. Still a development
+screen on reused seed 41001 and reused origins. No job is active; the GPU is
+free.
 First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
