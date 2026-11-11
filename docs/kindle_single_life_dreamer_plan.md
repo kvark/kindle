@@ -96,8 +96,10 @@ anywhere (best single episode 404). [Lowering the actor entropy scale](results/2
 near .88 nats, sampled scores stay at 29 to 34 and greedy scores drop, so
 the entropy bonus is not the lever; unimix, return normalization and the
 imitation term remain untested. The 4M context-frame world's full 65k run
-(`train-96-context-4m-65k-v3`, unit `kindle-world-context-4m-65k-v3-20261110.service`,
-MemoryMax 24G after a 14G OOM) started 22:50 UTC and is the only active job.
+(`train-96-context-4m-65k-v4`, unit `kindle-world-context-4m-65k-v4-20261110.service`,
+MemoryMax 24G, run without the host guard after a 14G OOM and a guard
+kernel-probe timeout killed two earlier attempts; about 365 ms per update,
+6.7 hours) started 00:26 UTC on November 11 and is the only active job.
 First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
