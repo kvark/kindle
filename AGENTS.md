@@ -112,7 +112,14 @@ anywhere (best single episode 404). [Lowering the actor entropy scale](docs/resu
 pixel-world actor: policy entropy stays at .80 to .89 nats, sampled scores
 stay at 29 to 38 and greedy scores drop to 87 to 129 (all one seed), so
 neither explicit policy knob is the lever; return normalization and the
-imitation term remain untested. The [4M context-frame world at 65,536 updates](docs/results/2026-11-10-breakout-world-context-frame.md)
+imitation term remain untested. Porting the [context-frame decoder to the
+agent](docs/results/2026-11-11-breakout-agent-context-frame.md) (`--world-context-lag`,
+runner and native support committed) is also negative at 64x64/12M: sampled
+27 / 35, greedy 77 / 73, pixel losses unchanged, 20% slower. Five seed-1009
+variants of the pixel recipe now span 77 to 157 greedy on cohort 1009, so the
+baseline's 157 / 151 may be a high draw; a two-fresh-seed screen of the
+unchanged baseline (root `/x/Temp/kindle-breakout-pixel-seeds-20261111`,
+unit `kindle-breakout-pixel-seeds-20261111.service`) runs next to settle it. The [4M context-frame world at 65,536 updates](docs/results/2026-11-10-breakout-world-context-frame.md)
 (`train-96-context-4m-65k-v4`, 349 ms per update, 6h31m, run without the
 host guard after a 14G OOM and a guard probe timeout killed two attempts) is
 the **best Breakout world model so far at every horizon with sharp bricks**:
