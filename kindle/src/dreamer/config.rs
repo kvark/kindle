@@ -961,7 +961,7 @@ impl DreamerConfig {
                 || self.rgb_history_palette.is_some()
                 || self.world_image_feedback)
         {
-            return Err("context lag requires the standalone spatial RGB decoder, 1..=32 arrivals, no history palette and no image feedback".into());
+            return Err("context lag requires the spatial RGB decoder, 1..=32 arrivals, no history palette and no image feedback".into());
         }
         if let Some(palette) = &self.rgb_history_palette
             && (!self.rgb_spatial_decoder
@@ -1075,13 +1075,20 @@ impl DreamerConfig {
                 || self.rgb_latent_only
                 || self.world_gaussian
                 || self.observation_crop.is_some()
-                || self.is_cdp()
-                || self.loss_scales.policy != 0.0
+                || self.is_cdp())
+        {
+            return Err("spatial decoder requires a plain categorical RGB world".into());
+        }
+        // Whole agents may use the spatial decoder only with a fixed context
+        // frame; the autoregressive image history is standalone world only.
+        if self.rgb_spatial_decoder
+            && self.rgb_context_lag.is_none()
+            && (self.loss_scales.policy != 0.0
                 || self.loss_scales.value != 0.0
                 || self.loss_scales.replay_value != 0.0
                 || self.actor_critic_gradient)
         {
-            return Err("spatial decoder requires a standalone plain categorical RGB world".into());
+            return Err("autoregressive spatial history requires a standalone world; agents need rgb_context_lag".into());
         }
         if self.world_gaussian
             && (!self.observation_kind.is_rgb()
@@ -1368,7 +1375,7 @@ impl DreamerConfig {
                     || self.video_encoder.is_some()
                     || self.rgb_frame_pair
                     || self.observation_crop.is_some()
-                    || self.rgb_spatial_decoder
+                    || (self.rgb_spatial_decoder && self.rgb_context_lag.is_none())
                     || self.reconstruction_target_standardization.is_some()
                     || !matches!(
                         self.world_pixel_loss,

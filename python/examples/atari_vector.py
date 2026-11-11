@@ -157,6 +157,8 @@ def main():
                         help="learned-RGB world pixel objective; motion cross-entropy weights changed pixels")
     parser.add_argument("--world-prediction-length", type=int,
                         help="learned-RGB world: imagined steps after the observed prefix whose images are supervised directly")
+    parser.add_argument("--world-context-lag", type=int,
+                        help="learned-RGB pixel world: decoder also sees one observed frame from this many arrivals back, held fixed through the prior rollout (standalone rgb_context_lag)")
     parser.add_argument("--world-pixel-scale", type=float,
                         help="fresh CDP only: auxiliary RGB decoder weight; trained with --world-pixel-loss/--world-prediction-length while CDP keeps its own scales")
     parser.add_argument("--prior-reward-scale", type=float,
@@ -599,6 +601,7 @@ def main():
     training_options.add("--world-pixel-loss")
     training_options.add("--world-prediction-length")
     training_options.add("--world-pixel-scale")
+    training_options.add("--world-context-lag")
     training_options.add("--replay-value-completed")
     training_options.add("--replay-actor-scale")
     training_options.add("--actor-dynamics-scale")
@@ -802,6 +805,11 @@ def main():
             parser.error("world-pixel-scale requires fresh CDP with the learned CNN")
     if pixel_world and args.cdp and args.world_pixel_scale is None:
         parser.error("world pixel objectives with CDP require --world-pixel-scale")
+    if args.world_context_lag is not None:
+        if not 1 <= args.world_context_lag <= 32:
+            parser.error("world-context-lag must be in 1..=32")
+        if not pixel_world or args.cdp or not learned_rgb or args.restore or args.evaluate:
+            parser.error("world-context-lag requires a fresh learned-RGB pixel world objective without CDP")
     if args.disagreement_scale and not args.cdp and not (pixel_world and learned_rgb and not args.restore):
         parser.error("disagreement requires fresh CDP or a fresh learned-RGB pixel world objective")
     if args.replay_capacity <= 0:
@@ -912,6 +920,9 @@ def main():
             config["world_prediction_length"] = args.world_prediction_length
         if args.world_pixel_scale is not None:
             config["world_pixel_scale"] = args.world_pixel_scale
+        if args.world_context_lag is not None:
+            config["rgb_spatial_decoder"] = True
+            config["rgb_context_lag"] = args.world_context_lag
         if args.actor_entropy is not None:
             config["actor_entropy"] = args.actor_entropy
         if args.replay_value_completed:

@@ -542,16 +542,12 @@ impl DreamerCore {
             "history palette is standalone world only"
         );
         assert!(
-            config.rgb_context_lag.is_none(),
-            "context lag is standalone world only"
-        );
-        assert!(
             !config.world_image_feedback,
             "image feedback is standalone world only"
         );
         assert!(
-            !config.rgb_spatial_decoder,
-            "spatial decoder is standalone world only"
+            !config.rgb_spatial_decoder || config.rgb_context_lag.is_some(),
+            "autoregressive spatial history is standalone world only"
         );
         assert!(
             !config.world_gaussian,
@@ -650,16 +646,12 @@ impl DreamerCore {
             "history palette is standalone world only"
         );
         assert!(
-            config.rgb_context_lag.is_none(),
-            "context lag is standalone world only"
-        );
-        assert!(
             !config.world_image_feedback,
             "image feedback is standalone world only"
         );
         assert!(
-            !config.rgb_spatial_decoder,
-            "spatial decoder is standalone world only"
+            !config.rgb_spatial_decoder || config.rgb_context_lag.is_some(),
+            "autoregressive spatial history is standalone world only"
         );
         assert!(
             !config.world_gaussian,
@@ -694,7 +686,8 @@ impl DreamerCore {
             && config.training_precision == super::config::TrainingPrecision::Bf16
             && config.video_encoder.is_none()
             && config.world_prediction_length == 0
-            && config.world_pixel_loss == super::world_learner::PixelLoss::SquaredError;
+            && config.world_pixel_loss == super::world_learner::PixelLoss::SquaredError
+            && !config.rgb_spatial_decoder;
         let world_train_graph = if staged_world {
             world::build_staged_training_graph(&world_train_config)
         } else {
@@ -1002,6 +995,13 @@ impl DreamerCore {
             .expect("diagnostic decoder initialized");
         decoder.set_input("deter", &self.deter);
         decoder.set_input("stoch", &self.stoch);
+        if self.config.rgb_spatial_decoder {
+            // Diagnostic render without a context frame; training supplies one.
+            decoder.set_input(
+                "decoder_history",
+                &vec![0.0; 2 * self.config.observation_dim()],
+            );
+        }
         decoder.step();
         decoder.wait();
         let mut observation = vec![0.0; self.config.prediction_dim()];
@@ -3095,22 +3095,16 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
             "history palette is standalone world only",
         ));
     }
-    if metadata.config.rgb_context_lag.is_some() {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "context lag is standalone world only",
-        ));
-    }
     if metadata.config.world_image_feedback {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,
             "image feedback is standalone world only",
         ));
     }
-    if metadata.config.rgb_spatial_decoder {
+    if metadata.config.rgb_spatial_decoder && metadata.config.rgb_context_lag.is_none() {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,
-            "spatial decoder is standalone world only",
+            "autoregressive spatial history is standalone world only",
         ));
     }
     if metadata.config.world_gaussian {

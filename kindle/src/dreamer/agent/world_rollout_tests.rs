@@ -20,6 +20,48 @@ fn with_rollout() -> DreamerConfig {
     c
 }
 
+fn with_context_frame() -> DreamerConfig {
+    let mut c = with_rollout();
+    c.rgb_spatial_decoder = true;
+    c.rgb_context_lag = Some(2);
+    c
+}
+
+#[test]
+fn agent_world_accepts_the_context_frame_decoder_but_not_image_history() {
+    let c = with_context_frame();
+    assert!(c.check().is_ok(), "{:?}", c.check());
+    assert_eq!(
+        serde_json::from_value::<DreamerConfig>(serde_json::to_value(&c).unwrap()).unwrap(),
+        c
+    );
+    let graph = world::build_training_graph(&world_training_config(&c), 4);
+    assert!(graph.outputs().len() > world::LOSS_WORLD_ROLLOUT);
+    let inputs = graph
+        .nodes()
+        .iter()
+        .filter_map(|n| match &n.op {
+            Op::Input { name } => Some(name.clone()),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    assert!(!inputs.iter().any(|n| n.starts_with("decoder_history")));
+    assert!(inputs.iter().any(|n| n == "keep_action_0"));
+    let mut history_only = with_context_frame();
+    history_only.rgb_context_lag = None;
+    assert!(history_only.check().is_err());
+    // The autoregressive history stays available to standalone worlds, which
+    // use the learner's own pixel objective rather than the agent fields.
+    let mut standalone = history_only.clone();
+    standalone.loss_scales.policy = 0.0;
+    standalone.loss_scales.value = 0.0;
+    standalone.loss_scales.replay_value = 0.0;
+    standalone.actor_critic_gradient = false;
+    standalone.world_prediction_length = 0;
+    standalone.world_pixel_loss = PixelLoss::SquaredError;
+    assert!(standalone.check().is_ok(), "{:?}", standalone.check());
+}
+
 fn cdp_with_pixels() -> DreamerConfig {
     let mut c = with_rollout();
     c.loss_scales.reconstruction = 0.0;
@@ -223,6 +265,12 @@ fn tiny_rgb_agent_trains_a_prior_image_rollout() {
 #[ignore = "builds and runs all Dreamer GPU sessions"]
 fn tiny_rgb_agent_trains_a_prior_image_rollout_with_the_bonus() {
     tiny_rgb_agent_trains(with_rollout_and_bonus());
+}
+
+#[test]
+#[ignore = "builds and runs all Dreamer GPU sessions"]
+fn tiny_rgb_agent_trains_with_the_context_frame_decoder() {
+    tiny_rgb_agent_trains(with_context_frame());
 }
 
 #[test]

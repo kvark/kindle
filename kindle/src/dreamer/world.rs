@@ -395,8 +395,8 @@ fn training_graph(
         "Gaussian state is standalone world only"
     );
     assert!(
-        !behavior || !config.rgb_spatial_decoder,
-        "spatial decoder is standalone world only"
+        !behavior || !config.rgb_spatial_decoder || config.rgb_context_lag.is_some(),
+        "autoregressive spatial history is standalone world only"
     );
     assert!(
         !behavior || !config.rgb_previous_frame,
