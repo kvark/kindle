@@ -134,9 +134,13 @@ updates](results/2026-11-11-breakout-world-context-1m-h32.md) (682 ms per
 update, 12.4 hours) reaches 24/102 development and 18/116 held-out at
 thirty-two steps with the best held-out sixteen-step count (45/111): capacity
 limits the long horizon under the longer objective, so the 4M model with the
-32-step rollout is the better use of compute; its 65k budget point
-(`train-96-context-4m-h32-65k`, unit `kindle-world-context-h32-65k-20261112.service`,
-about sixteen hours from 06:45 UTC November 12) is the active job. On a
+32-step rollout is the better use of compute. Its [65k budget
+point](results/2026-11-12-breakout-world-context-h32-65k.md) (sixteen hours,
+867 ms per update) is the **best Breakout world on record at every horizon**:
+development 112/99/75/61/32 at one to thirty-two steps, held-out
+110/90/72/51/37 with brick error .007 / .045, against the 16-step world's
+held-out 112/93/72/41/19; thirty-two-step tracking is 32% held-out, and the
+curve was still rising. No job is active; the GPU is free. On a
 [fresh agent cohort](results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
