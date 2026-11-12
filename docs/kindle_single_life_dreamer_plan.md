@@ -134,8 +134,14 @@ updates](results/2026-11-11-breakout-world-context-1m-h32.md) (682 ms per
 update, 12.4 hours) reaches 24/102 development and 18/116 held-out at
 thirty-two steps with the best held-out sixteen-step count (45/111): capacity
 limits the long horizon under the longer objective, so the 4M model with the
-32-step rollout is the better use of compute. No job is active; the GPU is
-free.
+32-step rollout is the better use of compute; its 65k budget point
+(`train-96-context-4m-h32-65k`, unit `kindle-world-context-h32-65k-20261112.service`,
+about sixteen hours from 06:45 UTC November 12) is the active job. On a
+[fresh agent cohort](results/2026-11-12-breakout-agent-heldout.md)
+(4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
+greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
+loses sampled at 200k (48.0 / 75.2) and ties it at 400k (89.8 / 90.6); 0
+two-wall episodes in 54 evaluations, best single episode 414.
 First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
