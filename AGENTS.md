@@ -160,8 +160,15 @@ curve was still rising. No job is active; the GPU is free. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
-loses sampled at 200k (48.0 / 75.2) and ties it at 400k (89.8 / 90.6); 0
-two-wall episodes in 54 evaluations, best single episode 414.
+loses sampled at 200k (48.0 / 75.2) and ties it at 400k (89.8 / 90.6). The
+[paired CDP seed screen](docs/results/2026-11-12-breakout-agent-cdp-seeds.md)
+(CDP on seeds 3005 and 4007: greedy 93.0 / 112.0 and 82.3 / 100.4, sampled
+39.4 / 41.1 and 49.6 / 43.7) settles the variance question: with four seeds
+each, greedy means are close (CDP 95.6 against pixel 113.7 on cohort 22003)
+but the pixel recipe's range is two to three times wider (44 to 161 against
+75 to 112), and CDP's sampled mode is about 18 points higher on average while
+also varying widely (39 to 71). 0 two-wall episodes in 70 evaluations, best
+single episode 414. No job is active; the GPU is free.
 First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
