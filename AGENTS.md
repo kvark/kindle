@@ -145,7 +145,13 @@ rollout in a 48-step window](docs/results/2026-11-11-breakout-world-context-h32.
 sharp bricks, at a cost of 3 to 9 counts at one to eight steps held-out and
 2.5 times the time per update; the long-horizon limit was partly an
 objective-horizon limit, and 24% to 30% at thirty-two steps is the new
-standing number. No job is active; the GPU is free.
+standing number. The [1M model with the same 32-step rollout for 65,536
+updates](docs/results/2026-11-11-breakout-world-context-1m-h32.md) (682 ms per
+update, 12.4 hours) reaches 24/102 development and 18/116 held-out at
+thirty-two steps with the best held-out sixteen-step count (45/111): capacity
+limits the long horizon under the longer objective, so the 4M model with the
+32-step rollout is the better use of compute. No job is active; the GPU is
+free.
 First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
