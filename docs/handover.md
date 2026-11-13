@@ -159,7 +159,11 @@ point](results/2026-11-12-breakout-world-context-h32-65k.md) (sixteen hours,
 development 112/99/75/61/32 at one to thirty-two steps, held-out
 110/90/72/51/37 with brick error .007 / .045, against the 16-step world's
 held-out 112/93/72/41/19; thirty-two-step tracking is 32% held-out, and the
-curve was still rising. No job is active; the GPU is free. On a
+curve was still rising. The [12M model under the same objective](results/2026-11-12-breakout-world-context-12m-h32.md)
+(32,768 updates, 1,241 ms each, 11.4 hours) gains 3 to 4 held-out counts at
+eight to thirty-two steps over the 4M model at equal updates and trails its
+65k point by 5 to 6: budget buys more than capacity in this range. No job is
+active; the GPU is free. On a
 [fresh agent cohort](results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
