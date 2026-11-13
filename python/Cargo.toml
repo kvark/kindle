@@ -9,6 +9,8 @@ description = "Python bindings for Kindle's DreamerV3 agent."
 license = "MIT"
 publish = false
 
+[workspace]
+
 [lib]
 # Named `_native` to avoid a symbol collision with the `kindle` crate dep.
 # The Python-side import path (`kindle._native`) is set in pyproject.toml.

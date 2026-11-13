@@ -1,12 +1,17 @@
 //! GPU letterboxing, RGB normalization and channel-major patch packing.
 //! CPU images upload their original bytes; resident images use the same kernel.
-//! Interpolation stays in F32, without an intermediate RGB8 quantization.
+//! JEPA interpolation stays in F32. The RGB64 control matches Pillow's
+//! antialiased bilinear filter and per-axis RGB8 rounding on the GPU.
 //! Padding is exactly zero in normalized space.
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use blade_graphics::{self as gpu, ShaderBindable as _, ShaderData as _};
 use meganeura::{Session, runtime::ExternalSlot};
+
+#[cfg(test)]
+mod rgb96_tests;
+mod rgb_filter;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PixelFormat {
@@ -21,6 +26,28 @@ impl PixelFormat {
             Self::Rgb8 => 3,
             Self::Rgba8 | Self::Bgra8 => 4,
         }
+    }
+}
+
+/// Native-pixel rectangle, applied before the single learned-RGB GPU resize.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct FrameCrop {
+    pub x: u32,
+    pub y: u32,
+    pub width: u32,
+    pub height: u32,
+}
+
+impl FrameCrop {
+    pub fn check(self) -> Result<(), &'static str> {
+        if self.width == 0
+            || self.height == 0
+            || self.x.checked_add(self.width).is_none()
+            || self.y.checked_add(self.height).is_none()
+        {
+            return Err("image crop must be nonempty and fit within u32 coordinates");
+        }
+        Ok(())
     }
 }
 
@@ -55,6 +82,22 @@ impl FrameLayout {
             .checked_mul(self.row_stride)
             .and_then(|bytes| bytes.checked_add(self.width * self.format.channels()))
             .expect("frame exceeds GPU address range")
+    }
+
+    fn cropped(self, crop: FrameCrop) -> (u32, Self) {
+        crop.check().expect("invalid image crop");
+        assert!(
+            crop.x + crop.width <= self.width && crop.y + crop.height <= self.height,
+            "image crop exceeds source frame"
+        );
+        let offset = crop
+            .y
+            .checked_mul(self.row_stride)
+            .and_then(|bytes| bytes.checked_add(crop.x * self.format.channels()))
+            .expect("image crop offset overflow");
+        let layout = Self::new(crop.width, crop.height, self.row_stride, self.format);
+        assert!(offset + layout.byte_len() <= self.byte_len());
+        (offset, layout)
     }
 }
 
@@ -104,6 +147,7 @@ impl<'a> GpuFrame<'a> {
 struct Bindings {
     pixels: gpu::BufferPiece,
     patches: gpu::BufferPiece,
+    filter: gpu::BufferPiece,
     params: [u32; 16],
 }
 
@@ -113,6 +157,7 @@ impl gpu::ShaderData for Bindings {
             bindings: vec![
                 ("pixels", gpu::ShaderBinding::Buffer),
                 ("patches", gpu::ShaderBinding::Buffer),
+                ("rgb_coefficients", gpu::ShaderBinding::Buffer),
                 ("params", gpu::ShaderBinding::Plain { size: 64 }),
             ],
         }
@@ -121,8 +166,14 @@ impl gpu::ShaderData for Bindings {
     fn fill(&self, mut context: gpu::PipelineContext) {
         self.pixels.bind_to(&mut context, 0);
         self.patches.bind_to(&mut context, 1);
-        self.params.bind_to(&mut context, 2);
+        self.filter.bind_to(&mut context, 2);
+        self.params.bind_to(&mut context, 3);
     }
+}
+
+struct RgbPair {
+    previous: gpu::Buffer,
+    valid: Vec<bool>,
 }
 
 pub(crate) struct GpuPreprocessor {
@@ -131,9 +182,14 @@ pub(crate) struct GpuPreprocessor {
     encoder: gpu::CommandEncoder,
     completion: Option<gpu::SyncPoint>,
     upload: Option<gpu::Buffer>,
+    rgb_filters: HashMap<(u32, u32), gpu::Buffer>,
     streams: usize,
     size: u32,
     patch: u32,
+    input: &'static str,
+    centered_rgb: bool,
+    crop: Option<FrameCrop>,
+    rgb_pair: Option<RgbPair>,
 }
 
 impl GpuPreprocessor {
@@ -144,6 +200,7 @@ impl GpuPreprocessor {
             naga_module: None,
         });
         let pipeline = gpu.create_compute_pipeline(gpu::ComputePipelineDesc {
+            full_subgroup_size: None,
             name: "kindle_pixels_to_patches",
             data_layouts: &[&Bindings::layout()],
             compute: shader.at("main"),
@@ -159,9 +216,56 @@ impl GpuPreprocessor {
             encoder,
             completion: None,
             upload: None,
+            rgb_filters: HashMap::new(),
             streams,
             size: size.try_into().expect("image size overflow"),
             patch: patch.try_into().expect("patch size overflow"),
+            input: "patches",
+            centered_rgb: false,
+            crop: None,
+            rgb_pair: None,
+        }
+    }
+
+    /// Learned RGB: one antialiased resize, channel-major values in
+    /// [-0.5, 0.5]. No letterbox, ImageNet statistics or second upscale.
+    pub fn rgb(
+        gpu: Arc<gpu::Context>,
+        streams: usize,
+        side: usize,
+        crop: Option<FrameCrop>,
+    ) -> Self {
+        assert!(matches!(side, 32 | 48 | 64 | 96));
+        if let Some(crop) = crop {
+            crop.check().expect("invalid image crop");
+        }
+        let mut pixels = Self::new(gpu, streams, side, side);
+        pixels.input = "observation";
+        pixels.centered_rgb = true;
+        pixels.crop = crop;
+        pixels
+    }
+
+    pub fn with_frame_pair(mut self) -> Self {
+        assert!(self.centered_rgb && self.rgb_pair.is_none());
+        let bytes = self.streams as u64 * u64::from(self.elements()) * 4;
+        assert!(bytes * 2 <= u64::from(u32::MAX));
+        self.rgb_pair = Some(RgbPair {
+            previous: self.gpu.create_buffer(gpu::BufferDesc {
+                name: "kindle_previous_rgb",
+                size: bytes,
+                memory: gpu::Memory::Device,
+            }),
+            valid: vec![false; self.streams],
+        });
+        self
+    }
+
+    pub fn reset_rgb_history(&mut self, streams: impl Iterator<Item = usize>) {
+        if let Some(pair) = &mut self.rgb_pair {
+            for stream in streams {
+                pair.valid[stream] = false;
+            }
         }
     }
 
@@ -179,6 +283,9 @@ impl GpuPreprocessor {
                     PixelFormat::Rgb8,
                 );
                 assert_eq!(pixels.len(), layout.byte_len() as usize);
+                if let Some(crop) = self.crop {
+                    layout.cropped(crop);
+                }
                 let offset = bytes;
                 bytes = bytes
                     .checked_add(padded_size(layout.byte_len()))
@@ -231,6 +338,9 @@ impl GpuPreprocessor {
         validate_streams(frames.iter().map(|row| row.0), self.streams);
         for (_, frame) in frames {
             assert!(Arc::ptr_eq(&self.gpu, frame.gpu), "different GPU context");
+            if let Some(crop) = self.crop {
+                frame.layout.cropped(crop);
+            }
         }
         if frames.is_empty() {
             return;
@@ -261,31 +371,77 @@ impl GpuPreprocessor {
             "different GPU context"
         );
         assert_eq!(
-            session.slot_size(ExternalSlot::Input("patches")),
-            Some(self.streams * self.elements() as usize * size_of::<f32>())
+            session.slot_size(ExternalSlot::Input(self.input)),
+            Some(
+                self.streams
+                    * self.elements() as usize
+                    * size_of::<f32>()
+                    * if self.rgb_pair.is_some() { 2 } else { 1 }
+            )
         );
         session.wait();
         session
-            .input_buffer("patches")
+            .input_buffer(self.input)
             .expect("encoder patches input")
     }
 
     fn bindings(
-        &self,
+        &mut self,
         pixels: gpu::BufferPiece,
         patches: gpu::BufferPiece,
         stream: usize,
         offset: u32,
         layout: FrameLayout,
     ) -> Bindings {
-        let [width, height, x, y] = super::preprocess::letterbox_geometry(
-            layout.width as usize,
-            layout.height as usize,
-            self.size as usize,
-        );
+        let (offset, layout) = match self.crop {
+            Some(crop) => {
+                let (relative, cropped) = layout.cropped(crop);
+                (
+                    offset.checked_add(relative).expect("crop offset overflow"),
+                    cropped,
+                )
+            }
+            None => (offset, layout),
+        };
+        let [width, height, x, y] = if self.centered_rgb {
+            [self.size as usize, self.size as usize, 0, 0]
+        } else {
+            super::preprocess::letterbox_geometry(
+                layout.width as usize,
+                layout.height as usize,
+                self.size as usize,
+            )
+        };
+        // Geometry coefficients only; image data never crosses the host boundary.
+        let filter = if self.centered_rgb {
+            (*self
+                .rgb_filters
+                .entry((layout.width, layout.height))
+                .or_insert_with(|| {
+                    let coefficients =
+                        rgb_filter::coefficients(layout.width, layout.height, self.size as usize);
+                    let buffer = self.gpu.create_buffer(gpu::BufferDesc {
+                        name: "rgb_filter",
+                        size: (coefficients.len() * size_of::<u32>()) as u64,
+                        memory: gpu::Memory::Shared,
+                    });
+                    unsafe {
+                        std::ptr::copy_nonoverlapping(
+                            coefficients.as_ptr().cast::<u8>(),
+                            buffer.data(),
+                            coefficients.len() * size_of::<u32>(),
+                        );
+                    }
+                    buffer
+                }))
+            .into()
+        } else {
+            pixels
+        };
         Bindings {
             pixels,
             patches,
+            filter,
             params: [
                 layout.width,
                 layout.height,
@@ -299,11 +455,15 @@ impl GpuPreprocessor {
                 height as u32,
                 x as u32,
                 y as u32,
-                u32::try_from(stream)
-                    .unwrap()
-                    .checked_mul(self.elements())
-                    .expect("patch offset overflow"),
-                0,
+                u32::try_from(if self.rgb_pair.is_some() {
+                    stream * 2 + 1
+                } else {
+                    stream
+                })
+                .unwrap()
+                .checked_mul(self.elements())
+                .expect("patch offset overflow"),
+                u32::from(self.centered_rgb),
                 0,
                 0,
             ],
@@ -313,11 +473,29 @@ impl GpuPreprocessor {
     fn submit(&mut self, target: gpu::BufferPiece, bindings: &[Bindings]) {
         self.wait();
         self.encoder.start();
+        let frame_bytes = u64::from(self.elements()) * 4;
         if bindings.len() != self.streams {
-            let bytes = self.streams as u64 * u64::from(self.elements()) * 4;
+            let bytes =
+                self.streams as u64 * frame_bytes * if self.rgb_pair.is_some() { 2 } else { 1 };
             self.encoder
                 .transfer("clear_inactive_patches")
                 .fill_buffer(target, bytes, 0);
+        }
+        if let Some(pair) = &self.rgb_pair {
+            let mut transfer = self.encoder.transfer("previous_rgb_to_pair");
+            for binding in bindings {
+                let current_offset = u64::from(binding.params[12]) * 4;
+                let stream = (current_offset / (2 * frame_bytes)) as usize;
+                if pair.valid[stream] {
+                    let mut previous = target;
+                    previous.offset += current_offset - frame_bytes;
+                    transfer.copy_buffer_to_buffer(
+                        pair.previous.at(stream as u64 * frame_bytes),
+                        previous,
+                        frame_bytes,
+                    );
+                }
+            }
         }
         {
             let mut pass = self.encoder.compute("pixels_to_patches");
@@ -325,6 +503,26 @@ impl GpuPreprocessor {
             for binding in bindings {
                 dispatch.bind(0, binding);
                 dispatch.dispatch([(self.size * self.size).div_ceil(64), 1, 1]);
+            }
+        }
+        if let Some(pair) = &mut self.rgb_pair {
+            let mut transfer = self.encoder.transfer("retain_current_rgb");
+            for binding in bindings {
+                let current_offset = u64::from(binding.params[12]) * 4;
+                let stream = (current_offset / (2 * frame_bytes)) as usize;
+                let mut current = target;
+                current.offset += current_offset;
+                if !pair.valid[stream] {
+                    let mut previous = current;
+                    previous.offset -= frame_bytes;
+                    transfer.copy_buffer_to_buffer(current, previous, frame_bytes);
+                }
+                transfer.copy_buffer_to_buffer(
+                    current,
+                    pair.previous.at(stream as u64 * frame_bytes),
+                    frame_bytes,
+                );
+                pair.valid[stream] = true;
             }
         }
         self.completion = Some(self.gpu.submit(&mut self.encoder));
@@ -346,7 +544,13 @@ impl GpuPreprocessor {
 impl Drop for GpuPreprocessor {
     fn drop(&mut self) {
         self.wait();
+        if let Some(pair) = self.rgb_pair.take() {
+            self.gpu.destroy_buffer(pair.previous);
+        }
         if let Some(buffer) = self.upload.take() {
+            self.gpu.destroy_buffer(buffer);
+        }
+        for (_, buffer) in self.rgb_filters.drain() {
             self.gpu.destroy_buffer(buffer);
         }
         self.gpu.destroy_compute_pipeline(&mut self.pipeline);
@@ -387,6 +591,80 @@ fn validate_shape(streams: usize, size: usize, patch: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn crop_preserves_native_stride_and_pixel_addresses() {
+        for format in [PixelFormat::Rgb8, PixelFormat::Rgba8, PixelFormat::Bgra8] {
+            let stride = 160 * format.channels() + 16;
+            let source = FrameLayout::new(160, 210, stride, format);
+            let (offset, crop) = source.cropped(FrameCrop {
+                x: 7,
+                y: 32,
+                width: 151,
+                height: 168,
+            });
+            assert_eq!(
+                (crop.width, crop.height, crop.row_stride, crop.format),
+                (151, 168, stride, format)
+            );
+            for y in 0..168 {
+                for x in 0..151 {
+                    assert_eq!(
+                        offset + y * stride + x * format.channels(),
+                        (y + 32) * stride + (x + 7) * format.channels()
+                    );
+                }
+            }
+            let (offset, full) = source.cropped(FrameCrop {
+                x: 0,
+                y: 0,
+                width: 160,
+                height: 210,
+            });
+            assert_eq!(offset, 0);
+            assert_eq!(full.byte_len(), source.byte_len());
+            for invalid in [
+                FrameCrop {
+                    x: 0,
+                    y: 0,
+                    width: 0,
+                    height: 1,
+                },
+                FrameCrop {
+                    x: 0,
+                    y: 0,
+                    width: 1,
+                    height: 0,
+                },
+                FrameCrop {
+                    x: 159,
+                    y: 0,
+                    width: 2,
+                    height: 1,
+                },
+                FrameCrop {
+                    x: 0,
+                    y: 209,
+                    width: 1,
+                    height: 2,
+                },
+                FrameCrop {
+                    x: u32::MAX,
+                    y: 0,
+                    width: 1,
+                    height: 1,
+                },
+                FrameCrop {
+                    x: 0,
+                    y: u32::MAX,
+                    width: 1,
+                    height: 1,
+                },
+            ] {
+                assert!(std::panic::catch_unwind(|| source.cropped(invalid)).is_err());
+            }
+        }
+    }
 
     #[test]
     fn layout_checks_stride_and_address_range() {
@@ -483,7 +761,7 @@ mod tests {
         patches_from_pixels_chw(&chw, size, patch)
     }
 
-    fn check_patches(session: &mut Session, expected: &[f32], label: &str) -> Vec<f32> {
+    pub(super) fn check_patches(session: &mut Session, expected: &[f32], label: &str) -> Vec<f32> {
         session.step();
         session.wait();
         let actual = session.read_output(expected.len());
@@ -503,6 +781,326 @@ mod tests {
         );
         check_device(session);
         actual
+    }
+
+    #[test]
+    #[ignore = "requires GPU; also exercised on lavapipe in CI"]
+    fn gpu_rgb64_resize_matches_scalar_reference() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        for side in [32, 48, 64] {
+            let elements = 3 * side * side;
+            let mut graph = meganeura::Graph::new();
+            let input = graph.input("observation", &[2, elements]);
+            let output = graph.neg(input);
+            graph.set_outputs(vec![output]);
+            let mut session = meganeura::build(
+                &graph,
+                meganeura::SessionConfig {
+                    mode: meganeura::Mode::Inference,
+                    gpu: Some(Arc::clone(&gpu)),
+                    ..Default::default()
+                },
+            )
+            .0;
+            let mut pixels = GpuPreprocessor::rgb(Arc::clone(&gpu), 2, side, None);
+            for (width, height) in [
+                (160, 210),
+                (64, 64),
+                (13, 7),
+                (1, 19),
+                (640, 480),
+                (641, 479),
+                (1, 1),
+            ] {
+                let rgb = (0..width * height * 3)
+                    .map(|i| ((i * 37 + i / 43) % 256) as u8)
+                    .collect::<Vec<_>>();
+                let mut expected = vec![0.0; 2 * elements];
+                let resized = rgb_filter::reference(&rgb, width, height, side);
+                for y in 0..side {
+                    for x in 0..side {
+                        for c in 0..3 {
+                            expected[elements + c * side * side + y * side + x] =
+                                f32::from(resized[(y * side + x) * 3 + c]) / 255.0 - 0.5;
+                        }
+                    }
+                }
+                pixels.cpu_frames(&mut session, &[(1, &rgb, width, height)]);
+                let uploaded = check_patches(&mut session, &expected, "RGB CPU source");
+                let buffer = gpu.create_buffer(gpu::BufferDesc {
+                    name: "rgb64_test_source",
+                    size: rgb.len().next_multiple_of(4) as u64,
+                    memory: gpu::Memory::Shared,
+                });
+                unsafe {
+                    std::ptr::write_bytes(buffer.data(), 0, buffer.size() as usize);
+                    std::ptr::copy_nonoverlapping(rgb.as_ptr(), buffer.data(), rgb.len());
+                }
+                let frame = unsafe {
+                    GpuFrame::from_buffer(
+                        &gpu,
+                        &buffer,
+                        0,
+                        FrameLayout::new(
+                            width as u32,
+                            height as u32,
+                            (width * 3) as u32,
+                            PixelFormat::Rgb8,
+                        ),
+                    )
+                };
+                pixels.gpu_frames(&mut session, &[(1, frame)]);
+                let resident = check_patches(&mut session, &expected, "RGB GPU source");
+                assert_eq!(resident, uploaded);
+                pixels.wait();
+                gpu.destroy_buffer(buffer);
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded RGB crop geometry check"]
+    fn gpu_rgb_crop_matches_scalar_reference_and_strided_resident_frames() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        for side in [32, 48, 64] {
+            let elements = 3 * side * side;
+            let mut graph = meganeura::Graph::new();
+            let input = graph.input("observation", &[2, elements]);
+            let output = graph.neg(input);
+            graph.set_outputs(vec![output]);
+            let mut session = meganeura::build(
+                &graph,
+                meganeura::SessionConfig {
+                    mode: meganeura::Mode::Inference,
+                    gpu: Some(Arc::clone(&gpu)),
+                    ..Default::default()
+                },
+            )
+            .0;
+            for (width, height, crop) in [
+                (
+                    160,
+                    210,
+                    FrameCrop {
+                        x: 0,
+                        y: 32,
+                        width: 160,
+                        height: 168,
+                    },
+                ),
+                (
+                    19,
+                    13,
+                    FrameCrop {
+                        x: 3,
+                        y: 2,
+                        width: 13,
+                        height: 9,
+                    },
+                ),
+                (
+                    19,
+                    13,
+                    FrameCrop {
+                        x: 0,
+                        y: 0,
+                        width: 19,
+                        height: 13,
+                    },
+                ),
+                (
+                    19,
+                    13,
+                    FrameCrop {
+                        x: 18,
+                        y: 12,
+                        width: 1,
+                        height: 1,
+                    },
+                ),
+            ] {
+                let rgb: Vec<u8> = (0..width * height * 3)
+                    .map(|i| ((i * 37 + i / 43) % 256) as u8)
+                    .collect();
+                let mut cropped = Vec::new();
+                for y in crop.y..crop.y + crop.height {
+                    let start = (y as usize * width + crop.x as usize) * 3;
+                    cropped.extend_from_slice(&rgb[start..start + crop.width as usize * 3]);
+                }
+                let resized = rgb_filter::reference(
+                    &cropped,
+                    crop.width as usize,
+                    crop.height as usize,
+                    side,
+                );
+                let mut expected = vec![0.0; elements * 2];
+                for index in 0..side * side {
+                    for channel in 0..3 {
+                        expected[elements + channel * side * side + index] =
+                            f32::from(resized[index * 3 + channel]) / 255.0 - 0.5;
+                    }
+                }
+                let mut pixels = GpuPreprocessor::rgb(Arc::clone(&gpu), 2, side, Some(crop));
+                pixels.cpu_frames(&mut session, &[(1, &rgb, width, height)]);
+                let uploaded = check_patches(&mut session, &expected, "cropped CPU source");
+                for format in [PixelFormat::Rgb8, PixelFormat::Rgba8, PixelFormat::Bgra8] {
+                    let channels = format.channels() as usize;
+                    let stride = width * channels + 7;
+                    let base = 5;
+                    let mut packed = vec![0xE1; (base + stride * height).next_multiple_of(4)];
+                    for y in 0..height {
+                        for x in 0..width {
+                            for channel in 0..3 {
+                                let component = if format == PixelFormat::Bgra8 {
+                                    2 - channel
+                                } else {
+                                    channel
+                                };
+                                packed[base + y * stride + x * channels + component] =
+                                    rgb[(y * width + x) * 3 + channel];
+                            }
+                        }
+                    }
+                    let buffer = gpu.create_buffer(gpu::BufferDesc {
+                        name: "cropped_rgb_test_source",
+                        size: packed.len() as u64,
+                        memory: gpu::Memory::Shared,
+                    });
+                    unsafe {
+                        std::ptr::copy_nonoverlapping(packed.as_ptr(), buffer.data(), packed.len());
+                    }
+                    let frame = unsafe {
+                        GpuFrame::from_buffer(
+                            &gpu,
+                            &buffer,
+                            base as u64,
+                            FrameLayout::new(width as u32, height as u32, stride as u32, format),
+                        )
+                    };
+                    pixels.gpu_frames(&mut session, &[(1, frame)]);
+                    assert_eq!(
+                        check_patches(&mut session, &expected, "cropped resident source"),
+                        uploaded
+                    );
+                    pixels.wait();
+                    gpu.destroy_buffer(buffer);
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "requires guarded GPU; RGB pairs across subset arrivals and resets"]
+    fn gpu_rgb_pairs_preserve_stream_history_and_repeat_episode_first_frames() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        for side in [32, 48, 64] {
+            let elements = 3 * side * side;
+            let mut graph = meganeura::Graph::new();
+            let input = graph.input("observation", &[3, 2 * elements]);
+            let output = graph.neg(input);
+            graph.set_outputs(vec![output]);
+            let mut session = meganeura::build(
+                &graph,
+                meganeura::SessionConfig {
+                    mode: meganeura::Mode::Inference,
+                    gpu: Some(Arc::clone(&gpu)),
+                    ..Default::default()
+                },
+            )
+            .0;
+            let mut pixels =
+                GpuPreprocessor::rgb(Arc::clone(&gpu), 3, side, None).with_frame_pair();
+            let mut previous: Vec<Option<Vec<f32>>> = vec![None; 3];
+            for (step, (arrivals, resets)) in [
+                (vec![(0, 0), (1, 0)], vec![]),
+                (vec![(1, 1), (2, 0)], vec![]),
+                (vec![(0, 1)], vec![]),
+                (vec![(1, 7), (2, 1)], vec![1]),
+                (vec![(1, 8)], vec![]),
+            ]
+            .into_iter()
+            .enumerate()
+            {
+                pixels.reset_rgb_history(resets.iter().copied());
+                for stream in resets {
+                    previous[stream] = None;
+                }
+                let frames = arrivals
+                    .iter()
+                    .map(|&(stream, time)| {
+                        (
+                            stream,
+                            (0..19 * 13 * 3)
+                                .map(|i| ((i * 37 + i / 43 + stream * 53 + time * 17) % 256) as u8)
+                                .collect::<Vec<_>>(),
+                        )
+                    })
+                    .collect::<Vec<_>>();
+                let mut expected = vec![0.0; 3 * 2 * elements];
+                for (stream, frame) in &frames {
+                    let resized = rgb_filter::reference(frame, 19, 13, side);
+                    let mut current = vec![0.0; elements];
+                    for channel in 0..3 {
+                        for pixel in 0..side * side {
+                            current[channel * side * side + pixel] =
+                                f32::from(resized[3 * pixel + channel]) / 255.0 - 0.5;
+                        }
+                    }
+                    let offset = stream * 2 * elements;
+                    expected[offset..offset + elements]
+                        .copy_from_slice(previous[*stream].as_ref().unwrap_or(&current));
+                    expected[offset + elements..offset + 2 * elements].copy_from_slice(&current);
+                    previous[*stream] = Some(current);
+                }
+                let mut buffers = Vec::new();
+                if step % 2 == 0 {
+                    pixels.cpu_frames(
+                        &mut session,
+                        &frames
+                            .iter()
+                            .map(|(stream, frame)| (*stream, frame.as_slice(), 19, 13))
+                            .collect::<Vec<_>>(),
+                    );
+                } else {
+                    for (_, bytes) in &frames {
+                        let buffer = gpu.create_buffer(gpu::BufferDesc {
+                            name: "rgb_pair_test_source",
+                            size: bytes.len().next_multiple_of(4) as u64,
+                            memory: gpu::Memory::Shared,
+                        });
+                        unsafe {
+                            std::ptr::write_bytes(buffer.data(), 0, buffer.size() as usize);
+                            std::ptr::copy_nonoverlapping(
+                                bytes.as_ptr(),
+                                buffer.data(),
+                                bytes.len(),
+                            );
+                        }
+                        buffers.push(buffer);
+                    }
+                    let resident = frames
+                        .iter()
+                        .zip(&buffers)
+                        .map(|((stream, _), buffer)| {
+                            (*stream, unsafe {
+                                GpuFrame::from_buffer(
+                                    &gpu,
+                                    buffer,
+                                    0,
+                                    FrameLayout::new(19, 13, 57, PixelFormat::Rgb8),
+                                )
+                            })
+                        })
+                        .collect::<Vec<_>>();
+                    pixels.gpu_frames(&mut session, &resident);
+                }
+                check_patches(&mut session, &expected, "RGB pair history");
+                pixels.wait();
+                for buffer in buffers {
+                    gpu.destroy_buffer(buffer);
+                }
+            }
+        }
     }
 
     #[test]

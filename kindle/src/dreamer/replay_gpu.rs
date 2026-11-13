@@ -19,6 +19,8 @@ pub(super) struct DeviceReplay {
     width: usize,
     observation: usize,
     deter: usize,
+    state: usize,
+    pixels: usize,
 }
 
 impl DeviceReplay {
@@ -29,17 +31,25 @@ impl DeviceReplay {
             gpu,
             pages: Vec::new(),
             capacity: config.replay_capacity,
-            width: config.observation_dim() + config.feature_dim(),
+            width: config.observation_dim()
+                + config.feature_dim()
+                + if config.video_encoder.is_some() {
+                    crate::vision::levjepa::joint::PIXELS
+                } else {
+                    0
+                },
             observation: config.observation_dim(),
             deter: config.network().deter,
+            state: config.feature_dim(),
+            pixels: if config.video_encoder.is_some() {
+                crate::vision::levjepa::joint::PIXELS
+            } else {
+                0
+            },
         }
     }
 
-    pub fn store(&mut self, session: &Session, slots: &[(usize, usize)]) {
-        if slots.is_empty() {
-            return;
-        }
-        let last = slots.iter().map(|&(_, slot)| slot).max().unwrap();
+    fn allocate_through(&mut self, last: usize) {
         assert!(last < self.capacity);
         while self.pages.len() <= last / PAGE_FRAMES {
             let rows = PAGE_FRAMES.min(self.capacity - self.pages.len() * PAGE_FRAMES);
@@ -49,6 +59,34 @@ impl DeviceReplay {
                 memory: gpu::Memory::Device,
             }));
         }
+    }
+
+    pub fn store_pixels(&mut self, session: &Session, slots: &[(usize, usize)]) {
+        if slots.is_empty() {
+            return;
+        }
+        assert!(self.pixels > 0);
+        self.allocate_through(slots.iter().map(|&(_, slot)| slot).max().unwrap());
+        let copies = slots
+            .iter()
+            .map(|&(stream, slot)| {
+                let mut source = session.input_buffer("patches").unwrap();
+                source.offset += (stream * self.pixels * 4) as u64;
+                (
+                    source,
+                    self.region(slot, self.observation + self.state),
+                    self.pixels * 4,
+                )
+            })
+            .collect::<Vec<_>>();
+        self.copies.copy_regions(&copies);
+    }
+
+    pub fn store(&mut self, session: &Session, slots: &[(usize, usize)]) {
+        if slots.is_empty() {
+            return;
+        }
+        self.allocate_through(slots.iter().map(|&(_, slot)| slot).max().unwrap());
         let mut copies = Vec::with_capacity(slots.len() * 3);
         for &(stream, slot) in slots {
             for (name, offset, width) in [
@@ -57,7 +95,7 @@ impl DeviceReplay {
                 (
                     "previous_stoch",
                     self.observation + self.deter,
-                    self.width - self.observation - self.deter,
+                    self.state - self.deter,
                 ),
             ] {
                 let mut source = session.input_buffer(name).unwrap();

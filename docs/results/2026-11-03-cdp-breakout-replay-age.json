@@ -1,0 +1,228 @@
+{
+  "actions": 200000,
+  "all": {
+    "all_contexts": {
+      "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+        16,
+        28293,
+        32827,
+        67093,
+        63630,
+        7773
+      ],
+      "count": 199632,
+      "from_collection": 12193,
+      "from_refresh": 187439,
+      "max_updates": 6006,
+      "mean_updates": 269.2087190430392,
+      "median_updates": 154,
+      "p90_updates": 681,
+      "p99_updates": 1523,
+      "potentially_dependent_labeled_actor_rows": 2949392
+    },
+    "ignored_first_reset": 310,
+    "unmasked_contexts": {
+      "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+        16,
+        28236,
+        32763,
+        66998,
+        63548,
+        7761
+      ],
+      "count": 199322,
+      "from_collection": 12173,
+      "from_refresh": 187149,
+      "max_updates": 6006,
+      "mean_updates": 269.2331353287645,
+      "median_updates": 154,
+      "p90_updates": 681,
+      "p99_updates": 1523,
+      "potentially_dependent_labeled_actor_rows": 2949392
+    }
+  },
+  "emulator_constructed": false,
+  "events": 38051,
+  "gpu_work": false,
+  "labeled_replay_rows": 2989405,
+  "learner_constructed": false,
+  "limits": "Reconstruction of producer-update age with exact historical replay/scheduler and scalar markers; not GPU latent values, parameter drift, inherited history age or a gameplay cause.",
+  "reset_arrivals": 263,
+  "status": "complete",
+  "total_arrivals": 200271,
+  "updates": 12477,
+  "windows": {
+    "100000": {
+      "all_contexts": {
+        "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+          0,
+          5367,
+          7153,
+          18802,
+          17598,
+          1080
+        ],
+        "count": 50000,
+        "from_collection": 3062,
+        "from_refresh": 46938,
+        "max_updates": 6006,
+        "mean_updates": 259.25722,
+        "median_updates": 176,
+        "p90_updates": 613,
+        "p99_updates": 1207,
+        "potentially_dependent_labeled_actor_rows": 737578
+      },
+      "ignored_first_reset": 78,
+      "unmasked_contexts": {
+        "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+          0,
+          5357,
+          7141,
+          18775,
+          17572,
+          1077
+        ],
+        "count": 49922,
+        "from_collection": 3058,
+        "from_refresh": 46864,
+        "max_updates": 6006,
+        "mean_updates": 259.20522014342373,
+        "median_updates": 176,
+        "p90_updates": 613,
+        "p99_updates": 1206,
+        "potentially_dependent_labeled_actor_rows": 737578
+      }
+    },
+    "150000": {
+      "all_contexts": {
+        "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+          0,
+          4767,
+          5113,
+          15869,
+          20955,
+          3296
+        ],
+        "count": 50000,
+        "from_collection": 3088,
+        "from_refresh": 46912,
+        "max_updates": 3952,
+        "mean_updates": 361.73176,
+        "median_updates": 244,
+        "p90_updates": 861,
+        "p99_updates": 1726,
+        "potentially_dependent_labeled_actor_rows": 740614
+      },
+      "ignored_first_reset": 64,
+      "unmasked_contexts": {
+        "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+          0,
+          4761,
+          5105,
+          15848,
+          20928,
+          3294
+        ],
+        "count": 49936,
+        "from_collection": 3085,
+        "from_refresh": 46851,
+        "max_updates": 3952,
+        "mean_updates": 361.79639939122075,
+        "median_updates": 244,
+        "p90_updates": 862,
+        "p99_updates": 1726,
+        "potentially_dependent_labeled_actor_rows": 740614
+      }
+    },
+    "200000": {
+      "all_contexts": {
+        "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+          0,
+          4770,
+          5192,
+          15658,
+          21003,
+          3377
+        ],
+        "count": 50000,
+        "from_collection": 3118,
+        "from_refresh": 46882,
+        "max_updates": 3745,
+        "mean_updates": 365.25656,
+        "median_updates": 246,
+        "p90_updates": 863,
+        "p99_updates": 1778,
+        "potentially_dependent_labeled_actor_rows": 743208
+      },
+      "ignored_first_reset": 48,
+      "unmasked_contexts": {
+        "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+          0,
+          4765,
+          5187,
+          15648,
+          20982,
+          3370
+        ],
+        "count": 49952,
+        "from_collection": 3114,
+        "from_refresh": 46838,
+        "max_updates": 3745,
+        "mean_updates": 365.09873478539396,
+        "median_updates": 246,
+        "p90_updates": 862,
+        "p99_updates": 1776,
+        "potentially_dependent_labeled_actor_rows": 743208
+      }
+    },
+    "50000": {
+      "all_contexts": {
+        "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+          16,
+          13389,
+          15369,
+          16764,
+          4074,
+          20
+        ],
+        "count": 49632,
+        "from_collection": 2925,
+        "from_refresh": 46707,
+        "max_updates": 3052,
+        "mean_updates": 89.26495003223727,
+        "median_updates": 47,
+        "p90_updates": 230,
+        "p99_updates": 532,
+        "potentially_dependent_labeled_actor_rows": 727992
+      },
+      "ignored_first_reset": 120,
+      "unmasked_contexts": {
+        "bins_0_1to15_16to63_64to255_256to1023_1024plus": [
+          16,
+          13353,
+          15330,
+          16727,
+          4066,
+          20
+        ],
+        "count": 49512,
+        "from_collection": 2916,
+        "from_refresh": 46596,
+        "max_updates": 3052,
+        "mean_updates": 89.27062126353208,
+        "median_updates": 47,
+        "p90_updates": 230,
+        "p99_updates": 531,
+        "potentially_dependent_labeled_actor_rows": 727992
+      }
+    }
+  },
+  "checked_unix": 1793709319.8003318,
+  "source": "b729ab2396e4b3f9229a5c0c4868b7b86a716c6f",
+  "pins_unchanged": 27,
+  "control_pins_unchanged": 338,
+  "declaration_sha256": "7ed8d16c73d9128bed766f7b3efa942e228c95b8ae088d246f55c155f978109d",
+  "execution_sha256": "d9460814b27d878132cd651e314d1a594ab65e357bc036edd762ced5e89d9cb2",
+  "contexts_sha256": "7af9c65d1b65903139679ad74844ca591aa221dc69ef6e9a81a0c8c81e1870d9",
+  "seconds": 0.38717922498472035
+}

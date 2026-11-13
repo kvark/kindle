@@ -11,6 +11,7 @@ import argparse
 from contextlib import ExitStack
 import hashlib
 import json
+import os
 from pathlib import Path
 import random
 
@@ -22,6 +23,7 @@ import kindle
 from kindle._reward_probe import RewardProbe
 import atari
 from atari import ATARI_PROTOCOLS, DreamerAtariPreprocessing, sha256_file
+from atari_vector import require_gpu_budget, require_gpu_device
 
 
 ACTION_SEED_XOR = 0xA7A2_1000
@@ -52,7 +54,7 @@ def recorded_first_game(path):
                 header = row
                 require(header.get("event") == "run_start", "missing run header")
                 require(
-                    header.get("protocol") == "kindle-vector-v1"
+                    header.get("protocol") in ("kindle-vector-v1", "kindle-vector-v2")
                     and header.get("num_envs") == 1
                     and header.get("mode") == "evaluate_sample",
                     "requires frozen N=1 evaluation",
@@ -168,6 +170,31 @@ def horizon_reward_summary(probe):
     return result
 
 
+class FeatureSpread:
+    """Held-out per-coordinate temporal variation, not a control-sufficiency gate."""
+
+    def __init__(self):
+        self.count, self.mean, self.m2 = 0, None, None
+
+    def record(self, values):
+        values = np.asarray(values, dtype=np.float64)
+        require(values.ndim == 1 and values.size > 0 and np.isfinite(values).all(), "invalid latent sample")
+        if self.mean is None:
+            self.mean, self.m2 = np.zeros_like(values), np.zeros_like(values)
+        require(values.shape == self.mean.shape, "latent sample shape changed")
+        self.count += 1
+        delta = values - self.mean
+        self.mean += delta / self.count
+        self.m2 += delta * (values - self.mean)
+
+    def summary(self):
+        if self.count < 2:
+            return dict(count=self.count, mean_coordinate_std=None, rms_coordinate_std=None)
+        variance = np.maximum(0., self.m2 / (self.count - 1))
+        return dict(count=self.count, mean_coordinate_std=float(np.sqrt(variance).mean()),
+                    rms_coordinate_std=float(np.sqrt(variance.mean())))
+
+
 def main() -> None:
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
@@ -179,6 +206,9 @@ def main() -> None:
     parser.add_argument("--horizon", type=int, default=15)
     parser.add_argument("--stride", type=int, default=50)
     parser.add_argument("--atari-protocol", choices=tuple(ATARI_PROTOCOLS))
+    parser.add_argument("--observation-size", choices=("native", "64"))
+    parser.add_argument("--sticky-actions", type=float, choices=(0., .25))
+    parser.add_argument("--min-gpu-budget-headroom-mib", type=int)
     parser.add_argument("--output")
     parser.add_argument(
         "--trace", help="Fresh JSONL path for per-target prediction errors"
@@ -194,6 +224,8 @@ def main() -> None:
             or args.seed is not None
             or args.environment
             or args.atari_protocol
+            or args.observation_size is not None
+            or args.sticky_actions is not None
         ):
             parser.error(
                 "--recorded-run supplies the budget, seed, environment and protocol"
@@ -206,6 +238,8 @@ def main() -> None:
             source_header["environment"],
             source_header["atari_protocol"],
         )
+        args.observation_size = source_header.get("observation_size", "64")
+        args.sticky_actions = source_header["sticky_actions"]
         require(
             source_header["ale_py_version"] == ale_py.__version__, "ALE version differs"
         )
@@ -218,6 +252,10 @@ def main() -> None:
         args.seed = 100 if args.seed is None else args.seed
         args.environment = args.environment or "ALE/Pong-v5"
         args.atari_protocol = args.atari_protocol or "published"
+        args.observation_size = args.observation_size or "native"
+        args.sticky_actions = .25 if args.sticky_actions is None else args.sticky_actions
+    if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
+        parser.error("GPU budget headroom must be positive")
     if args.steps <= 0:
         parser.error("--steps must be positive")
     if args.horizon <= 0 or args.horizon > args.steps:
@@ -232,7 +270,7 @@ def main() -> None:
             noop_max=protocol.noop_max,
             max_episode_frames=protocol.max_episode_frames,
             full_action_space=protocol.full_action_space,
-            sticky_actions=0.0,
+            sticky_actions=args.sticky_actions,
         )
         require(
             all(source_header.get(key) == value for key, value in expected.items()),
@@ -252,17 +290,33 @@ def main() -> None:
     environment = gym.make(
         args.environment,
         frameskip=1,
-        repeat_action_probability=0.0,
+        repeat_action_probability=args.sticky_actions,
         full_action_space=protocol.full_action_space,
     )
     environment = DreamerAtariPreprocessing(
         environment,
         noop_max=protocol.noop_max,
         max_episode_frames=protocol.max_episode_frames,
+        screen_size=None if args.observation_size == "native" else 64,
     )
     frame, _ = environment.reset(seed=args.seed)
     action_count = int(environment.action_space.n)
     agent = kindle.Agent.restore(args.checkpoint, args.encoder_checkpoint)
+    if expected := os.environ.get("KINDLE_EXPECT_DEVICE_NAME"):
+        require_gpu_device(agent.gpu_device, expected)
+    memory = dict(samples=0, minimum_headroom_bytes=None, maximum_usage_bytes=0)
+
+    def check_memory():
+        if args.min_gpu_budget_headroom_mib is None:
+            return
+        snapshot = agent.gpu_memory_budget
+        require_gpu_budget(snapshot, args.min_gpu_budget_headroom_mib * 1024**2)
+        headroom = snapshot["budget_bytes"] - snapshot["usage_bytes"]
+        memory["minimum_headroom_bytes"] = min(headroom, memory["minimum_headroom_bytes"] or headroom)
+        memory["maximum_usage_bytes"] = max(memory["maximum_usage_bytes"], snapshot["usage_bytes"])
+        memory["samples"] += 1
+
+    check_memory()
     if (
         agent.config["intrinsic_reward_scale"] != 0
         or agent.config["extrinsic_reward_scale"] != 1
@@ -273,6 +327,7 @@ def main() -> None:
     if int(agent.config["action_count"]) != action_count:
         raise ValueError("checkpoint and environment action counts differ")
     agent.begin_episode(frame)
+    check_memory()
     starting_environment_step = agent.environment_step
     starting_learner_step = agent.learner_step
     import kindle._native as native
@@ -334,6 +389,7 @@ def main() -> None:
     control_reward_mae_sum = [0.0] * horizon
     sample_count = [0] * horizon
     reward_probes = [RewardProbe() for _ in range(horizon)]
+    feature_spread = FeatureSpread()
     continuation_mse_sum = [0.0] * horizon
     continue_baseline_mse_sum = [0.0] * horizon
     terminal_count = [0] * horizon
@@ -431,6 +487,7 @@ def main() -> None:
                         )
                     )
                 rollout_starts += 1
+                check_memory()
 
             frame, reward, terminated, truncated, _ = environment.step(action)
             reward = float(reward)
@@ -451,7 +508,9 @@ def main() -> None:
                 terminated=terminated,
                 truncated=truncated,
             )
+            check_memory()
             target_observation = np.asarray(agent.visual_observation, dtype=np.float64)
+            feature_spread.record(target_observation)
             posterior_reward = float(agent.posterior_reward_prediction())
             continuation_target = 0.0 if terminated else discount
             for (
@@ -517,6 +576,7 @@ def main() -> None:
                 if step + 1 < args.steps:
                     frame, _ = environment.reset()
                     agent.begin_episode(frame)
+                    check_memory()
             is_first = terminated or truncated
     require(
         agent.learner_step == starting_learner_step, "diagnostic performed learning"
@@ -539,13 +599,15 @@ def main() -> None:
         for total, count in zip(persistence_mse_sum, sample_count)
     ]
     result = {
-        "protocol": "kindle-world-probe-v2",
+        "protocol": "kindle-world-probe-v3",
         "source": "recorded_frozen_policy" if source_rows else "forced_random_coverage",
         "recorded_game": source_record,
         "sampled_actions_match_source": True if source_rows else None,
         "native_extension_sha256": native_sha256,
         "checkpoint_sha256": checkpoint_hashes,
         "encoder_sha256": sha256_file(args.encoder_checkpoint),
+        "encoder_weights_source": ("restored world checkpoint" if agent.config.get("video_encoder")
+                                   else "supplied encoder checkpoint"),
         "script_sha256": sha256_file(__file__),
         "reward_probe_sha256": sha256_file(
             Path(kindle.__file__).with_name("_reward_probe.py")
@@ -558,6 +620,8 @@ def main() -> None:
         "trace_sha256": sha256_file(args.trace) if args.trace else None,
         "environment": args.environment,
         "atari_protocol": args.atari_protocol,
+        "observation_size": args.observation_size,
+        "sticky_actions": args.sticky_actions,
         "checkpoint": args.checkpoint,
         "starting_environment_step": starting_environment_step,
         "steps": args.steps,
@@ -567,6 +631,9 @@ def main() -> None:
         "rollout_starts": rollout_starts,
         "completed_episodes": episodes,
         "gpu_device": agent.gpu_device,
+        "sampled_gpu_budget": memory if memory["samples"] else None,
+        "gpu_budget_scope": "sampled Vulkan estimated budget minus usage, not physical free or peak VRAM",
+        "target_feature_spread": feature_spread.summary(),
         "observation_prediction_source": (
             "deterministic_forecast" if forecasts else "posterior_reconstruction"
         ),

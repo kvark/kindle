@@ -7,6 +7,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
 import atari_vector
 
 
+def test_native_device_assertion_rejects_a_software_or_wrong_adapter():
+    actual = dict(device_name="expected", is_software_emulated=False)
+    atari_vector.require_gpu_device(actual, "expected")
+    for wrong in ({}, dict(actual, device_name="other"), dict(actual, is_software_emulated=True)):
+        with pytest.raises(ValueError, match="expected native device"):
+            atari_vector.require_gpu_device(wrong, "expected")
+
+
 def test_exact_budget_boundary():
     atari_vector.require_gpu_budget(dict(usage_bytes=1024**3, budget_bytes=3*1024**3), 2*1024**3)
 
@@ -25,7 +33,7 @@ def test_invalid_unsupported_or_insufficient_budget(snapshot):
 @pytest.mark.parametrize("value", ["0", "-1"])
 def test_invalid_minimum_refuses_before_output(monkeypatch, tmp_path, value):
     output = tmp_path / "run.jsonl"
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(output),
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output),
                                     "--min-gpu-budget-headroom-mib", value])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
@@ -36,7 +44,7 @@ def test_existing_memory_report_is_preserved(monkeypatch, tmp_path):
     output = tmp_path / "run.jsonl"
     memory = output.with_suffix(".gpu-memory.jsonl")
     memory.write_text("existing evidence")
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(output),
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output),
                                     "--min-gpu-budget-headroom-mib", "2048"])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()

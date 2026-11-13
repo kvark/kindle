@@ -1,8 +1,9 @@
-"""Independent Atari streams, one native batched LeVJEPA/Dreamer learner.
+"""Independent Atari streams, one native batched Dreamer learner.
 
 --steps counts aggregate executed actions, not vector ticks or per-env actions.
 CPU environment stepping is synchronous; GPU inference is batched. Terminal
 observations are consumed before individually resetting completed environments.
+Learned RGB is the 2D default; --encoder-checkpoint selects frozen causal JEPA.
 """
 
 import argparse
@@ -11,6 +12,7 @@ import json
 import math
 import os
 import signal
+import struct
 import sys
 import time
 from pathlib import Path
@@ -19,8 +21,16 @@ import ale_py
 import gymnasium as gym
 
 import kindle
-from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, episode_summary
+import atari
+from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, episode_summary, require_numbers
+import kindle._pixel_guidance as guidance_schedule_module
+import kindle._qbert_guidance as guidance_module
+import kindle._breakout_guidance as breakout_guidance_module
+from kindle._breakout_guidance import BreakoutGuidance
+from kindle._qbert_guidance import BOUNDED_GUIDANCE_KIND, GUIDANCE_KIND, QbertGuidance
 import kindle._exploration as exploration_module
+import kindle._return_boundaries as return_boundaries_module
+from kindle._return_boundaries import LIFE_BOUNDARY_KIND, LifeBoundaryMonitor
 from kindle._exploration import EXPLORATION_KIND, EXPLORATION_PROTOCOL, PersistentExploration
 from atari import (
     ATARI_ACTION_REPEAT, ATARI_PROTOCOLS, DreamerAtariPreprocessing,
@@ -38,11 +48,64 @@ def require_gpu_budget(snapshot, minimum_bytes):
         raise ValueError("native GPU memory budget headroom below declared minimum")
 
 
+def positive_f32(value):
+    try:
+        value, = struct.unpack("=f", struct.pack("=f", value))
+    except OverflowError:
+        return False
+    return math.isfinite(value) and value > 0
+
+
+def require_gpu_device(snapshot, expected):
+    if snapshot.get("device_name") != expected or snapshot.get("is_software_emulated") is not False:
+        raise ValueError(f"expected native device {expected}, got {snapshot}")
+
+
+def rgb_preprocessing(config):
+    side = config['observation_kind'][3:]
+    description = f"single GPU Pillow-equivalent antialiased bilinear resize to {side}x{side}, per-axis RGB8 rounding; CHW /255-0.5"
+    crop = config.get('observation_crop')
+    if crop is not None:
+        description = 'native crop ' + ','.join(f'{name}={crop[name]}' for name in ('x', 'y', 'width', 'height')) + '; ' + description
+    if config.get('rgb_frame_pair', False):
+        description += '; previous/current RGB pair on GPU, repeat first image on reset'
+    if config.get('rgb_coordinates', False):
+        description += '; encoder appends fixed x/y pixel-center coordinates in [-0.5,0.5]'
+    if config.get('rgb_stride2', False):
+        description += '; encoder uses stride-two convolutions without max-pooling'
+    return description
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("encoder_checkpoint")
+    parser.add_argument("--encoder-checkpoint", help="opt into causal JEPA (frozen unless encoder-training=joint); omitted: jointly learned RGB")
     parser.add_argument("--encoder", choices=("levjepa", "levjepa-tiny"),
                         help="fresh default: levjepa-tiny; restore default: recorded checkpoint kind")
+    parser.add_argument("--encoder-training", choices=("frozen", "joint"),
+                        help="Tiny-only experiment: native pixel replay with phase-aligned causal re-encoding")
+    parser.add_argument("--actor-critic-gradient", action="store_true",
+                        help="train posterior representations from initial imagined actor/value losses (upstream ac_grads)")
+    parser.add_argument("--cdp", action="store_true",
+                        help="learned CNN with cosine feature prediction instead of RGB reconstruction; CDP split learning rates")
+    parser.add_argument("--image-size", type=int, choices=(32, 48, 64, 96),
+                        help="learned RGB/CDP GPU resize side; fresh default64, restore uses checkpoint geometry")
+    parser.add_argument("--rgb-frame-pair", action="store_true",
+                        help="fresh CDP: encode previous/current resized RGB images as six channels")
+    parser.add_argument("--rgb-coordinates", action="store_true",
+                        help="fresh learned RGB: append fixed x/y coordinate channels inside the CNN")
+    parser.add_argument("--rgb-stride2", action="store_true",
+                        help="fresh learned RGB: downsample with stride-two convolutions without max-pooling")
+    parser.add_argument("--image-crop", type=int, nargs=4, metavar=("X", "Y", "WIDTH", "HEIGHT"),
+                        help="fresh learned RGB/CDP: native-pixel crop before the single GPU resize; restore uses checkpoint crop")
+    parser.add_argument("--cdp-scale", type=float,
+                        help="fresh CDP: cosine prediction loss scale; omitted: 500")
+    parser.add_argument("--cdp-centered", action="store_true",
+                        help="CDP ablation: center cosine predictions/targets over the full replay batch")
+    parser.add_argument("--disagreement-scale", type=float, default=0.0,
+                        help="CDP exploration: current latent disagreement in imagined and replay returns; zero disables the ensemble")
+    parser.add_argument("--replay-capacity", type=int, default=100000)
+    parser.add_argument("--terminal-replay-fraction", type=float,
+                        help="fresh non-video training: terminal-containing fraction of non-fresh replay sequences")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--num-envs", type=int, default=4)
@@ -54,72 +117,715 @@ def main():
     parser.add_argument("--sticky-actions", type=float, choices=(0.0, 0.25), default=0.0,
                         help="ALE action repeat probability; declare .25 separately for robustness evaluation")
     parser.add_argument("--model-size", default="12m")
+    parser.add_argument("--training-precision", choices=("auto", "f32", "f16", "bf16", "mixed"), default="auto",
+                        help="bf16 uses native reduced dense/convolution storage; mixed uses F16-input/F32-storage world gradients with BF16 elsewhere; masters and optimizer stay F32")
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--batch-length", type=int, default=64)
+    parser.add_argument("--replay-context", type=int,
+                        help="fresh training: one cached state plus forward-only prefix frames; default1")
     parser.add_argument("--world-microbatch-size", type=int)
+    parser.add_argument("--imagination-length", type=int,
+                        help="fresh imagined rollout steps; omitted: native default, restore keeps checkpoint length")
+    parser.add_argument("--discount-horizon", type=int,
+                        help="fresh training: return discount is 1-1/horizon; distinct from imagination length")
+    parser.add_argument("--open-loop-length", type=int,
+                        help="optional CDP world supervision from one replay start, without future observations")
+    parser.add_argument("--open-loop-scale", type=float,
+                        help="scale for open-loop supervision; requires open-loop-length, omitted: 1")
+    parser.add_argument("--breakout-centroid-scale", type=float,
+                        help="fresh Breakout CDP only: native training loss for a pixel-derived ball position")
     parser.add_argument("--train-ratio", type=float, default=256)
-    parser.add_argument("--learning-rate", type=float, default=0.00004)
+    parser.add_argument("--learning-rate", type=float, default=0.00004,
+                        help="fresh base rate; CDP encoder/dynamics rates scale proportionally from default4e-5")
+    parser.add_argument("--behavior-learning-rate", type=float,
+                        help="fresh actor/critic rate; omitted: native default follows the base rate")
+    parser.add_argument("--replay-value-scale", type=float,
+                        help="fresh training only: real-replay value loss scale; omitted: native default")
+    parser.add_argument("--continuation-scale", type=float,
+                        help="fresh training only: world continuation loss scale; omitted: native default")
+    parser.add_argument("--reward-scale", type=float,
+                        help="fresh training only: world reward prediction loss scale; omitted: native default")
+    parser.add_argument("--representation-scale", type=float,
+                        help="fresh training only: posterior representation KL loss scale; omitted: native default")
+    parser.add_argument("--dynamics-scale", type=float,
+                        help="fresh training only: prior dynamics KL loss scale; omitted: native default")
+    parser.add_argument("--terminal-continuation-weight", type=float,
+                        help="fresh CDP only: posterior continuation loss multiplier for true game-over rows")
+    parser.add_argument("--prior-continuation-scale", type=float,
+                        help="fresh CDP only: auxiliary continuation loss on sampled one-step priors")
+    parser.add_argument("--world-pixel-loss", choices=("squared_error", "motion_cross_entropy"),
+                        help="learned-RGB world pixel objective; motion cross-entropy weights changed pixels")
+    parser.add_argument("--world-prediction-length", type=int,
+                        help="learned-RGB world: imagined steps after the observed prefix whose images are supervised directly")
+    parser.add_argument("--world-context-lag", type=int,
+                        help="learned-RGB pixel world: decoder also sees one observed frame from this many arrivals back, held fixed through the prior rollout (standalone rgb_context_lag)")
+    parser.add_argument("--world-pixel-scale", type=float,
+                        help="fresh CDP only: auxiliary RGB decoder weight; trained with --world-pixel-loss/--world-prediction-length while CDP keeps its own scales")
+    parser.add_argument("--prior-reward-scale", type=float,
+                        help="fresh CDP only: auxiliary reward loss on sampled one-step priors")
+    parser.add_argument("--actor-dynamics-scale", type=float,
+                        help="add normalized return gradients through frozen imagined dynamics; default off")
+    parser.add_argument("--actor-expected-value", action="store_true",
+                        help="fresh training: replace sampled policy loss with an enumerated one-step value expectation")
+    parser.add_argument("--actor-hidden-units", type=int,
+                        help="fresh training only: actor MLP width; world and critic keep the model preset")
+    parser.add_argument("--actor-residual", action="store_true",
+                        help="fresh centered CDP: separate imagined-policy correction to a supervised actor")
+    parser.add_argument("--replay-value-completed", action="store_true",
+                        help="use completed observed game returns for available replay-value targets; requires disagreement-scale0")
+    parser.add_argument("--replay-actor-scale", type=float,
+                        help="fresh training: positive-advantage imitation of completed observed returns")
+    parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
+                        help="with replay-actor-scale and active disagreement: conservatively compare observed returns with the combined critic")
+    parser.add_argument("--breakout-return-life-boundaries", action="store_true",
+                        help="fresh Breakout training: stop auxiliary observed actor returns at raw-frame life losses")
+    parser.add_argument("--return-lambda", type=float,
+                        help="fresh training only: imagined and replay return trace mixture in [0,1]; omitted: native default")
+    parser.add_argument("--replay-value-bootstrap", choices=("imagined", "posterior"),
+                        help="fresh training only: bootstrap replay targets with imagined returns or observed-state values")
+    parser.add_argument("--encoder-learning-rate", type=float,
+                        help="fresh CDP encoder rate; omitted: 6e-6 scaled with the base rate")
+    parser.add_argument("--dynamics-learning-rate", type=float,
+                        help="fresh CDP dynamics/posterior/prediction/exploration rate; omitted: 4e-4 scaled with the base rate")
+    parser.add_argument("--latent-unimix", type=float,
+                        help="fresh training only: categorical posterior/prior uniform mixing; omitted: native default")
+    parser.add_argument("--latent-shape", type=int, nargs=2, metavar=("VARIABLES", "CLASSES"),
+                        help="fresh centered CDP: regroup categorical state at the preset's flattened width")
+    parser.add_argument("--actor-entropy", type=float,
+                        help="fresh training only: actor entropy regularizer scale; omitted: native default 3e-4")
+    parser.add_argument("--actor-unimix", type=float, default=0.0,
+                        help="native policy uniform mixture in [0,1); fresh default0, restore keeps checkpoint policy")
     parser.add_argument("--report-every", type=int, default=1000)
     parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--initial-checkpoint", type=Path,
+                        help="fresh training only: save the actual zero-experience weights for frozen controls")
     parser.add_argument("--checkpoint-every", type=int, default=20000)
     parser.add_argument("--checkpoint-history", action="store_true",
                         help="preserve each save in CHECKPOINT/<run-actions> instead of replacing the last save")
     parser.add_argument("--restore", type=Path)
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--greedy", action="store_true")
+    parser.add_argument("--training-action-mode", choices=("sample", "greedy"),
+                        help="fresh training only: action selection for experience collection; default sample")
+    parser.add_argument("--action-temperature", type=float,
+                        help="sampled frozen restore only: positive native action softmax temperature")
+    parser.add_argument("--greedy-posterior", action="store_true",
+                        help="frozen restore only: use categorical posterior modes independently of action sampling")
+    parser.add_argument("--actor-posterior-samples", type=int,
+                        help="frozen restore only: average native actor probabilities over 2–16 extra posterior draws")
+    parser.add_argument("--probe-behavior", action="store_true",
+                        help="frozen diagnostic: log live critic values and scaled action-effects bonuses")
     parser.add_argument("--episodes-per-env", type=int,
-                        help="frozen restore only: stop when every stream completes this many episodes; steps is a hard action cap")
+                        help="frozen restore only: stop after this many natural episodes per stream; timeouts do not count, steps is a hard cap")
     parser.add_argument("--min-gpu-budget-headroom-mib", type=int,
                         help="check native budget after each GPU stage; write OUTPUT.gpu-memory.jsonl")
     parser.add_argument("--exploration-probability", type=float, default=0.0)
     parser.add_argument("--exploration-hold", type=int, default=16)
+    parser.add_argument("--qbert-guidance-probability", type=float, default=0.0,
+                        help="fresh Qbert only: probability of selecting an episode for pixel guidance")
+    parser.add_argument("--qbert-guidance-policy", choices=("first-pyramid", "continuation"),
+                        help="fresh guided Qbert only; continuation requires an explicit action cap")
+    parser.add_argument("--qbert-guidance-max-actions", type=int,
+                        help="release each selected episode to the learner after this many actions")
+    parser.add_argument("--qbert-corrective-labels", action="store_true",
+                        help="fresh continuation imitation: label all learner states and give the teacher action feedback")
+    parser.add_argument("--breakout-guidance-probability", type=float, default=0.0,
+                        help="fresh Breakout/full18 only: probability of pixel-guided episodes")
+    parser.add_argument("--breakout-guidance-max-actions", type=int,
+                        help="required action cap for each selected Breakout episode")
+    parser.add_argument("--breakout-guidance-block-length", type=int,
+                        help="fresh corrective Breakout only: redraw guidance for blocks of this many actions")
+    parser.add_argument("--breakout-guidance-initial-episodes", type=int,
+                        help="fresh corrective Breakout only: force selection for each lane's first episodes, retaining the action cap")
+    parser.add_argument("--breakout-corrective-labels", action="store_true",
+                        help="fresh Breakout imitation: edge-corrected teacher labels all states with actual-action feedback")
+    parser.add_argument("--guidance-imitation-scale", type=float,
+                        help="fresh guided training only: native supervised actor loss on expert actions")
+    parser.add_argument("--guidance-imitation-decay", type=int, nargs=2, metavar=("START_UPDATE", "END_UPDATE"),
+                        help="hold imitation scale through START_UPDATE, then linearly fade to zero at END_UPDATE")
+    parser.add_argument("--guidance-actor-only-decay", action="store_true",
+                        help="fade only actor imitation; retain the base world-imitation scale")
+    parser.add_argument("--guidance-noop-weight", type=float,
+                        help="relative NOOP target weight for expert imitation; default1")
+    parser.add_argument("--guidance-fire-weight", type=float,
+                        help="relative FIRE target weight for expert imitation; default1")
+    parser.add_argument("--guidance-world-gradient", action="store_true",
+                        help="fresh imitation only: route expert loss through the frozen actor into world state")
     args = parser.parse_args()
+    corrective_labels = args.qbert_corrective_labels or args.breakout_corrective_labels
     if args.num_envs <= 0 or args.steps <= 0 or args.steps % args.num_envs:
         parser.error("steps must be a positive multiple of num-envs")
     if args.report_every <= 0 or args.checkpoint_every <= 0:
         parser.error("report/checkpoint intervals must be positive")
     if args.checkpoint_history and args.checkpoint is None:
         parser.error("checkpoint-history requires --checkpoint")
+    if args.initial_checkpoint and (args.restore or args.evaluate):
+        parser.error("initial-checkpoint requires fresh training")
     if args.world_microbatch_size is not None and args.world_microbatch_size <= 0:
         parser.error("world-microbatch-size must be positive")
+    if args.replay_context is not None:
+        if not 0 < args.replay_context < args.replay_capacity:
+            parser.error("replay-context must be positive and smaller than replay-capacity")
+        if args.encoder_training and args.replay_context != 1:
+            parser.error("causal encoder training requires replay-context1")
+    if args.terminal_replay_fraction is not None:
+        if not math.isfinite(args.terminal_replay_fraction) or not 0 <= args.terminal_replay_fraction <= 1:
+            parser.error("terminal-replay-fraction must be finite and in [0, 1]")
+        if args.restore or args.evaluate or args.encoder_training:
+            parser.error("terminal-replay-fraction requires fresh non-video training")
+    if args.cdp_scale is not None:
+        if not positive_f32(args.cdp_scale):
+            parser.error("cdp-scale must be finite and positive in F32")
+        if args.evaluate or args.encoder_checkpoint or (not args.cdp and not args.restore):
+            parser.error("cdp-scale requires fresh CDP with the learned CNN")
+    if not positive_f32(args.learning_rate):
+        parser.error("learning-rate must be finite and positive in F32")
+    if args.discount_horizon is not None:
+        if not 1 < args.discount_horizon < 2**25 - 1:
+            parser.error("discount-horizon must be between 2 and 33554430 for a nondegenerate F32 discount")
+        if args.evaluate:
+            parser.error("discount-horizon requires fresh training")
+    if args.replay_value_scale is not None:
+        if not positive_f32(args.replay_value_scale):
+            parser.error("replay-value-scale must be finite and positive in F32")
+        if args.evaluate:
+            parser.error("replay-value-scale requires fresh training")
+    if args.continuation_scale is not None:
+        if not positive_f32(args.continuation_scale):
+            parser.error("continuation-scale must be finite and positive in F32")
+        if args.evaluate:
+            parser.error("continuation-scale requires fresh training")
+    if args.reward_scale is not None:
+        if not positive_f32(args.reward_scale):
+            parser.error("reward-scale must be finite and positive in F32")
+        if args.evaluate:
+            parser.error("reward-scale requires fresh training")
+    if args.representation_scale is not None:
+        if not positive_f32(args.representation_scale):
+            parser.error("representation-scale must be finite and positive in F32")
+        if args.evaluate:
+            parser.error("representation-scale requires fresh training")
+    if args.dynamics_scale is not None:
+        if not positive_f32(args.dynamics_scale):
+            parser.error("dynamics-scale must be finite and positive in F32")
+        if args.evaluate:
+            parser.error("dynamics-scale requires fresh training")
+    if args.terminal_continuation_weight is not None:
+        if not positive_f32(args.terminal_continuation_weight):
+            parser.error("terminal-continuation-weight must be finite and positive in F32")
+        if (args.restore or args.evaluate or not args.cdp or args.encoder_training
+                or args.open_loop_length is not None or args.open_loop_scale is not None):
+            parser.error("terminal-continuation-weight requires fresh CDP without open-loop supervision")
+        if args.continuation_scale is not None and not positive_f32(args.terminal_continuation_weight * args.continuation_scale):
+            parser.error("effective terminal-continuation weight must be finite and positive in F32")
+    if args.prior_continuation_scale is not None:
+        if not positive_f32(args.prior_continuation_scale):
+            parser.error("prior-continuation-scale must be finite and positive in F32")
+        if (args.restore or args.evaluate or not args.cdp or args.encoder_training
+                or args.open_loop_length is not None or args.open_loop_scale is not None
+                or args.terminal_continuation_weight is not None):
+            parser.error("prior-continuation-scale requires fresh CDP without open-loop or terminal weighting")
+    if args.prior_reward_scale is not None:
+        if not positive_f32(args.prior_reward_scale):
+            parser.error("prior-reward-scale must be finite and positive in F32")
+        if (args.restore or args.evaluate or not args.cdp or args.encoder_training
+                or args.open_loop_length is not None or args.open_loop_scale is not None
+                or args.prior_continuation_scale is not None):
+            parser.error("prior-reward-scale requires fresh CDP without open-loop or prior continuation")
+    if args.replay_value_bootstrap is not None and args.evaluate:
+        parser.error("replay-value-bootstrap requires fresh training")
+    if args.replay_value_completed:
+        if args.restore or args.evaluate:
+            parser.error("replay-value-completed requires fresh training")
+        if args.disagreement_scale != 0 or args.breakout_return_life_boundaries:
+            parser.error("replay-value-completed requires disagreement-scale0 and game-level returns")
+        if args.replay_value_scale is not None and not positive_f32(args.replay_value_scale):
+            parser.error("replay-value-completed requires a positive replay-value-scale")
+        if "KINDLE_DEVICE_TARGETS" in os.environ:
+            parser.error("replay-value-completed requires CPU target construction")
+    if args.replay_actor_observed_lower_bound and (
+            args.replay_actor_scale is None or not positive_f32(args.disagreement_scale)):
+        parser.error("observed lower-bound mode requires replay-actor-scale and positive disagreement-scale")
+    if args.breakout_return_life_boundaries and (
+            args.environment != "ALE/Breakout-v5" or args.restore or args.evaluate
+            or not args.replay_actor_observed_lower_bound):
+        parser.error("return life boundaries require fresh Breakout training with observed lower-bound mode")
+    if args.replay_actor_scale is not None:
+        if not positive_f32(args.replay_actor_scale):
+            parser.error("replay-actor-scale must be finite and positive in F32")
+        if args.restore or args.evaluate:
+            parser.error("replay-actor-scale requires fresh training")
+        if args.disagreement_scale != 0 and not args.replay_actor_observed_lower_bound:
+            parser.error("replay-actor-scale requires disagreement-scale0 or explicit observed lower-bound mode")
+        if "KINDLE_DEVICE_TARGETS" in os.environ:
+            parser.error("replay-actor-scale requires CPU target construction")
+    if args.actor_dynamics_scale is not None:
+        if not positive_f32(args.actor_dynamics_scale):
+            parser.error("actor-dynamics-scale must be finite and positive in F32")
+        if args.restore or args.evaluate:
+            parser.error("actor-dynamics-scale requires fresh training")
+        if "KINDLE_DEVICE_TARGETS" in os.environ:
+            parser.error("actor-dynamics-scale requires CPU target construction")
+    if args.actor_expected_value:
+        if args.restore or args.evaluate:
+            parser.error("actor-expected-value requires fresh training")
+        if (args.actor_residual or args.actor_dynamics_scale is not None
+                or args.replay_actor_scale is not None or args.actor_critic_gradient):
+            parser.error("actor-expected-value cannot combine with other actor experiments")
+        if "KINDLE_DEVICE_TARGETS" in os.environ:
+            parser.error("actor-expected-value requires CPU target construction")
+    if args.actor_hidden_units is not None:
+        if not 0 < args.actor_hidden_units < 2**64:
+            parser.error("actor-hidden-units must be a positive unsigned 64-bit integer")
+        if args.restore or args.evaluate:
+            parser.error("actor-hidden-units requires fresh training")
+    if args.latent_shape is not None:
+        variables, classes = args.latent_shape
+        if not (0 < variables < 2**64 and 1 < classes < 2**64):
+            parser.error("latent-shape requires unsigned 64-bit variables > 0 and classes > 1")
+        if args.restore or args.evaluate:
+            parser.error("latent-shape requires fresh training")
+        if not args.cdp or not args.cdp_centered:
+            parser.error("latent-shape requires centered CDP")
+    if args.actor_residual:
+        if args.restore or args.evaluate:
+            parser.error("actor-residual requires fresh training")
+        if (not args.cdp or not args.cdp_centered or not args.guidance_world_gradient
+                or args.guidance_imitation_scale is None
+                or not positive_f32(args.guidance_imitation_scale)
+                or args.guidance_imitation_decay is not None
+                or args.actor_critic_gradient or args.actor_dynamics_scale is not None
+                or args.replay_actor_scale is not None):
+            parser.error("actor-residual requires centered CDP and constant world expert imitation without other actor losses")
+    if args.behavior_learning_rate is not None:
+        if not positive_f32(args.behavior_learning_rate):
+            parser.error("behavior-learning-rate must be finite and positive in F32")
+        if not positive_f32(args.behavior_learning_rate / args.learning_rate):
+            parser.error("behavior-learning-rate ratio must be finite and positive in F32")
+    if args.encoder_learning_rate is not None:
+        if not positive_f32(args.encoder_learning_rate):
+            parser.error("encoder-learning-rate must be finite and positive in F32")
+        if not positive_f32(args.encoder_learning_rate / args.learning_rate):
+            parser.error("encoder-learning-rate ratio must be finite and positive in F32")
+    if args.dynamics_learning_rate is not None:
+        if not positive_f32(args.dynamics_learning_rate):
+            parser.error("dynamics-learning-rate must be finite and positive in F32")
+        if not positive_f32(args.dynamics_learning_rate / args.learning_rate):
+            parser.error("dynamics-learning-rate ratio must be finite and positive in F32")
+    if args.return_lambda is not None:
+        if not math.isfinite(args.return_lambda) or not 0 <= args.return_lambda <= 1:
+            parser.error("return-lambda must be finite and in [0, 1]")
+        if args.evaluate:
+            parser.error("return-lambda requires fresh training")
+    if args.imagination_length is not None and args.imagination_length <= 0:
+        parser.error("imagination-length must be positive")
+    if args.open_loop_scale is not None and (args.open_loop_length is None or not positive_f32(args.open_loop_scale)
+                                            or not positive_f32((args.cdp_scale if args.cdp_scale is not None else 500) * args.open_loop_scale)):
+        parser.error("open-loop-scale requires open-loop-length and a positive finite scaled F32 loss")
+    if args.open_loop_length is not None and (not args.cdp or args.encoder_checkpoint
+                                             or not 2 <= args.open_loop_length < args.batch_length):
+        parser.error("open-loop-length requires learned CDP and 2 <= length < batch-length")
+    if args.breakout_centroid_scale is not None:
+        if not positive_f32(args.breakout_centroid_scale):
+            parser.error("breakout-centroid-scale must be positive finite F32")
+        if (args.environment != "ALE/Breakout-v5" or not args.cdp or args.encoder_checkpoint
+                or args.evaluate or args.observation_size not in (None, "native")):
+            parser.error("breakout-centroid-scale requires fresh Breakout CDP training with native frames")
     if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
         parser.error("GPU budget headroom must be positive")
     if args.greedy and not args.evaluate:
         parser.error("greedy actions are only supported for frozen evaluation")
+    if args.training_action_mode is not None and (args.evaluate or args.restore):
+        parser.error("training-action-mode requires fresh training")
+    greedy_actions = args.greedy or args.training_action_mode == "greedy"
+    if args.actor_posterior_samples is not None:
+        if not 2 <= args.actor_posterior_samples <= 16:
+            parser.error("actor posterior samples must be between 2 and 16")
+        if not args.evaluate or not args.restore:
+            parser.error("actor posterior averaging requires frozen restore")
+        if args.greedy_posterior or args.action_temperature is not None:
+            parser.error("actor posterior averaging requires sampled live posteriors and no action temperature")
+        if not hasattr(kindle.VectorAgent, "set_actor_posterior_samples_for_evaluation"):
+            parser.error("native runtime does not support actor posterior averaging")
+    if args.action_temperature is not None:
+        if not math.isfinite(args.action_temperature) or not 2**-126 <= args.action_temperature <= float.fromhex('0x1.fffffep+127'):
+            parser.error("action temperature must be a positive normal finite F32 value")
+        if not args.evaluate or not args.restore or args.greedy:
+            parser.error("action temperature requires sampled frozen restore")
+        if not hasattr(kindle.VectorAgent, "set_action_temperature_for_evaluation"):
+            parser.error("native runtime does not support action temperature evaluation")
+    if args.greedy_posterior:
+        if not args.evaluate or not args.restore:
+            parser.error("greedy posterior requires frozen restore")
+        if not hasattr(kindle.VectorAgent, "use_greedy_posterior_for_evaluation"):
+            parser.error("native runtime does not support greedy posterior evaluation")
+    if args.probe_behavior and not args.evaluate:
+        parser.error("behavior probing requires frozen evaluation")
     if args.episodes_per_env is not None:
         if args.episodes_per_env <= 0:
             parser.error("episodes-per-env must be positive")
-        if not args.evaluate or not args.restore or args.checkpoint:
-            parser.error("episodes-per-env requires frozen restore without checkpoint writes")
+        if not args.evaluate or not args.restore:
+            parser.error("episodes-per-env requires frozen restore")
     if not math.isfinite(args.exploration_probability) or not 0 <= args.exploration_probability <= 1:
         parser.error("exploration probability must be in [0, 1]")
+    if not math.isfinite(args.qbert_guidance_probability) or not 0 <= args.qbert_guidance_probability <= 1:
+        parser.error("Qbert guidance probability must be in [0, 1]")
+    if not math.isfinite(args.breakout_guidance_probability) or not 0 <= args.breakout_guidance_probability <= 1:
+        parser.error("Breakout guidance probability must be in [0, 1]")
+    if args.breakout_guidance_max_actions is not None:
+        if not 0 < args.breakout_guidance_max_actions < 2**32:
+            parser.error("Breakout guidance max-actions must be a positive u32")
+        if not args.breakout_guidance_probability:
+            parser.error("Breakout guidance max-actions requires positive guidance probability")
+    if args.breakout_guidance_probability:
+        if args.breakout_guidance_max_actions is None:
+            parser.error("Breakout guidance requires an explicit max-actions cap")
+        if args.evaluate:
+            parser.error("frozen evaluation must not use Breakout guidance")
+        if args.exploration_probability or args.qbert_guidance_probability:
+            parser.error("Breakout guidance cannot combine with another action aid")
+        if (args.environment != "ALE/Breakout-v5" or args.atari_protocol not in ("published", "published-minimal")
+                or args.observation_size not in (None, "native") or args.encoder_checkpoint is not None):
+            parser.error("Breakout guidance requires Breakout/published action protocol/native pixels/learned RGB")
+    if args.guidance_imitation_scale is not None:
+        if not positive_f32(args.guidance_imitation_scale):
+            parser.error("guidance imitation scale must be positive finite F32")
+        if not (args.qbert_guidance_probability or args.breakout_guidance_probability) or args.evaluate:
+            parser.error("guidance imitation requires fresh guided training")
+    if args.guidance_noop_weight is not None:
+        if args.guidance_imitation_scale is None:
+            parser.error("guidance NOOP weight requires imitation")
+        if not positive_f32(args.guidance_noop_weight) or args.guidance_noop_weight > 1:
+            parser.error("guidance NOOP weight must be positive F32 and at most1")
+    if args.guidance_imitation_decay is not None:
+        if args.guidance_imitation_scale is None:
+            parser.error("guidance imitation decay requires imitation")
+        start, end = args.guidance_imitation_decay
+        if not 0 <= start < end < 2**64:
+            parser.error("guidance imitation decay requires 0 <= start < end within u64")
+    if args.guidance_actor_only_decay and (args.guidance_imitation_decay is None or not args.guidance_world_gradient):
+        parser.error("actor-only imitation decay requires a decay interval and world gradient")
+    if args.guidance_fire_weight is not None:
+        if args.guidance_imitation_scale is None:
+            parser.error("guidance FIRE weight requires imitation")
+        if (not positive_f32(args.guidance_fire_weight)
+                or not positive_f32(args.guidance_fire_weight * args.guidance_imitation_scale)):
+            parser.error("guidance FIRE weight and scaled weight must be positive finite F32")
+    if args.guidance_world_gradient and args.guidance_imitation_scale is None:
+        parser.error("guidance world gradient requires imitation")
+    if args.breakout_corrective_labels and (not args.breakout_guidance_probability
+                                            or args.guidance_imitation_scale is None):
+        parser.error("Breakout corrective labels require Breakout guidance and imitation")
+    if args.breakout_guidance_block_length is not None:
+        if not 0 < args.breakout_guidance_block_length < 2**32:
+            parser.error("Breakout guidance block-length must be a positive u32")
+        if not args.breakout_corrective_labels:
+            parser.error("Breakout guidance blocks require corrective labels")
+    if args.breakout_guidance_initial_episodes is not None:
+        if not 0 < args.breakout_guidance_initial_episodes < 2**32:
+            parser.error("Breakout guidance initial-episodes must be a positive u32")
+        if not args.breakout_corrective_labels:
+            parser.error("Breakout initial guidance requires corrective labels")
+        if args.breakout_guidance_block_length is not None:
+            parser.error("Breakout initial guidance cannot combine with block guidance")
+    if args.qbert_corrective_labels and (args.qbert_guidance_policy != "continuation"
+                                         or args.guidance_imitation_scale is None):
+        parser.error("Qbert corrective labels require continuation guidance and imitation")
+    if args.qbert_guidance_policy is not None and not args.qbert_guidance_probability:
+        parser.error("Qbert guidance policy requires positive guidance probability")
+    if args.qbert_guidance_policy == "continuation" and args.qbert_guidance_max_actions is None:
+        parser.error("Qbert continuation guidance requires an explicit max-actions cap")
+    if args.qbert_guidance_max_actions is not None:
+        if not 0 < args.qbert_guidance_max_actions < 2**32:
+            parser.error("Qbert guidance max-actions must be a positive u32")
+        if not args.qbert_guidance_probability:
+            parser.error("Qbert guidance max-actions requires positive guidance probability")
+    if args.qbert_guidance_probability:
+        if args.evaluate:
+            parser.error("frozen evaluation must not use Qbert guidance")
+        if args.exploration_probability:
+            parser.error("Qbert guidance cannot combine with persistent exploration")
+        if (args.environment != "ALE/Qbert-v5" or args.atari_protocol != "published"
+                or args.observation_size not in (None, "native") or args.encoder_checkpoint is not None):
+            parser.error("Qbert guidance requires Qbert/full18/native pixels/learned RGB")
     if args.exploration_hold <= 0:
         parser.error("exploration hold must be positive")
+    if args.latent_unimix is not None:
+        if (not math.isfinite(args.latent_unimix) or not 0 <= args.latent_unimix < 1
+                or (args.latent_unimix > 0 and not positive_f32(args.latent_unimix))
+                or struct.unpack("=f", struct.pack("=f", args.latent_unimix))[0] >= 1):
+            parser.error("latent-unimix must be representable in F32 and in [0, 1)")
+        if args.evaluate:
+            parser.error("latent-unimix requires fresh training")
+    if args.actor_entropy is not None:
+        if not math.isfinite(args.actor_entropy) or args.actor_entropy < 0:
+            parser.error("actor-entropy must be finite and non-negative")
+        if args.restore or args.evaluate:
+            parser.error("actor-entropy requires fresh training")
+    if not math.isfinite(args.actor_unimix) or not 0 <= args.actor_unimix < 1:
+        parser.error("actor-unimix must be finite and in [0, 1)")
     if args.evaluate and args.exploration_probability:
         parser.error("frozen evaluation must not use exploration overrides")
-    training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold"}
+    training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
+    training_options.add("--qbert-guidance-probability")
+    training_options.add("--qbert-guidance-max-actions")
+    training_options.add("--qbert-guidance-policy")
+    training_options.add("--qbert-corrective-labels")
+    training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions", "--breakout-corrective-labels", "--breakout-guidance-block-length"))
+    training_options.add("--breakout-guidance-initial-episodes")
+    training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-fire-weight", "--guidance-world-gradient"))
+    training_options.add("--guidance-imitation-decay")
+    training_options.add("--guidance-actor-only-decay")
+    training_options.add("--image-size")
+    training_options.add("--rgb-frame-pair")
+    training_options.add("--image-crop")
+    training_options.add("--actor-unimix")
+    training_options.add("--actor-entropy")
+    training_options.add("--latent-unimix")
+    training_options.add("--latent-shape")
+    training_options.add("--imagination-length")
+    training_options.update(("--open-loop-length", "--open-loop-scale"))
+    training_options.add("--replay-context")
+    training_options.add("--terminal-replay-fraction")
+    training_options.add("--breakout-centroid-scale")
+    training_options.add("--behavior-learning-rate")
+    training_options.add("--replay-value-scale")
+    training_options.add("--continuation-scale")
+    training_options.add("--reward-scale")
+    training_options.add("--representation-scale")
+    training_options.add("--dynamics-scale")
+    training_options.add("--discount-horizon")
+    training_options.add("--terminal-continuation-weight")
+    training_options.add("--prior-continuation-scale")
+    training_options.add("--prior-reward-scale")
+    training_options.add("--world-pixel-loss")
+    training_options.add("--world-prediction-length")
+    training_options.add("--world-pixel-scale")
+    training_options.add("--world-context-lag")
+    training_options.add("--replay-value-completed")
+    training_options.add("--replay-actor-scale")
+    training_options.add("--actor-dynamics-scale")
+    training_options.add("--actor-expected-value")
+    training_options.add("--actor-hidden-units")
+    training_options.add("--actor-residual")
+    training_options.add("--return-lambda")
+    training_options.add("--replay-value-bootstrap")
+    training_options.add("--encoder-learning-rate")
+    training_options.add("--dynamics-learning-rate")
+    training_options.add("--cdp")
+    training_options.add("--cdp-centered")
+    training_options.add("--cdp-scale")
+    training_options.add("--disagreement-scale")
+    training_options.add("--training-precision")
+    training_options.add("--rgb-coordinates")
+    training_options.add("--rgb-stride2")
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
         parser.error("seed must fit an unsigned 32-bit integer")
     if args.output.exists() or (args.checkpoint and args.checkpoint.exists()):
         parser.error("output and checkpoint must be fresh paths")
+    if args.initial_checkpoint and (args.initial_checkpoint.exists() or args.initial_checkpoint == args.checkpoint):
+        parser.error("initial-checkpoint must be a separate fresh path")
     memory_path = args.output.with_suffix(".gpu-memory.jsonl")
     if args.min_gpu_budget_headroom_mib is not None and memory_path.exists():
         parser.error("GPU memory output must be a fresh path")
-    if args.exploration_probability and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
+    if (args.exploration_probability or args.qbert_guidance_probability or args.breakout_guidance_probability) and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("persistent exploration requires native vector action overrides")
+    if args.guidance_imitation_scale is not None and "expert_actions" not in inspect.signature(kindle.VectorAgent.act).parameters:
+        parser.error("guidance imitation requires native expert-action support")
+    if corrective_labels and "expert_labels" not in inspect.signature(kindle.VectorAgent.act).parameters:
+        parser.error("corrective labels require native passive-label support")
+    if args.guidance_world_gradient and not getattr(kindle.VectorAgent, "SUPPORTS_EXPERT_WORLD_GRADIENT", False):
+        parser.error("guidance world gradient requires native world-gradient support")
+    if args.guidance_imitation_decay is not None and not getattr(kindle.VectorAgent, "SUPPORTS_EXPERT_IMITATION_DECAY", False):
+        parser.error("guidance imitation decay requires native decay support")
+    if args.guidance_actor_only_decay and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_ONLY_IMITATION_DECAY", False):
+        parser.error("actor-only imitation decay requires native actor-only decay support")
+    if args.open_loop_length is not None and not getattr(kindle.VectorAgent, "SUPPORTS_OPEN_LOOP_SUPERVISION", False):
+        parser.error("open-loop supervision requires native open-loop support")
+    if args.breakout_centroid_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COLOR_CENTROID_SUPERVISION", False):
+        parser.error("centroid supervision requires native color-centroid support")
+    if args.replay_value_bootstrap is not None and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_VALUE_BOOTSTRAP", False):
+        parser.error("replay-value-bootstrap requires native bootstrap support")
+    if args.replay_value_completed and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_REPLAY_VALUE", False):
+        parser.error("replay-value-completed requires native completed replay-value support")
+    if args.replay_actor_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False):
+        parser.error("replay-actor-scale requires native completed-return actor support")
+    if args.actor_dynamics_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_DYNAMICS", False):
+        parser.error("actor-dynamics-scale requires native actor dynamics support")
+    if args.actor_expected_value and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_EXPECTED_VALUE", False):
+        parser.error("actor-expected-value requires native expected-value actor support")
+    if args.actor_hidden_units is not None and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_HIDDEN_UNITS", False):
+        parser.error("actor-hidden-units requires native actor width support")
+    if args.actor_residual and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RESIDUAL", False):
+        parser.error("actor-residual requires native residual actor support")
+    if args.latent_shape is not None and not getattr(kindle.VectorAgent, "SUPPORTS_LATENT_SHAPE", False):
+        parser.error("latent-shape requires native latent shape support")
+    if args.replay_actor_observed_lower_bound and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False):
+        parser.error("observed lower-bound mode requires native conservative-return actor support")
+    if args.breakout_return_life_boundaries and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RETURN_BOUNDARIES", False):
+        parser.error("return life boundaries require native actor-return boundary support")
+    if args.replay_context is not None and args.replay_context > 1 and not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_CONTEXT", False):
+        parser.error("replay-context requires native prefix support")
+    if args.prior_reward_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_REWARD", False):
+        parser.error("prior-reward scale requires native prior-reward support")
+    if args.prior_continuation_scale is not None and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_CONTINUATION", False):
+        parser.error("prior-continuation scale requires native prior-continuation support")
+    if args.terminal_continuation_weight is not None and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_CONTINUATION_WEIGHT", False):
+        parser.error("terminal-continuation weight requires native terminal-weight support")
+    if args.terminal_replay_fraction is not None and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_REPLAY", False):
+        parser.error("terminal-replay-fraction requires native terminal-replay support")
     if args.restore and args.encoder:
         metadata = json.loads((args.restore / "metadata.json").read_text())
         if (metadata.get("perception") or {}).get("kind") != args.encoder:
             parser.error("encoder selection differs from restored checkpoint")
     if args.restore and args.observation_size is None:
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
+    if args.restore and (args.restore / "metadata.json").is_file():
+        metadata = json.loads((args.restore / "metadata.json").read_text())
+        if (metadata.get("config", {}).get("observation_kind") == "rgb96"
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB96", False)):
+            parser.error("RGB96 checkpoint requires native RGB96 support")
+        if metadata.get("config", {}).get("actor_expected_value", False):
+            if not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_EXPECTED_VALUE", False):
+                parser.error("checkpoint requires native expected-value actor support")
+            if "KINDLE_DEVICE_TARGETS" in os.environ:
+                parser.error("expected-value actor checkpoint requires CPU target construction")
+        if (metadata.get("config", {}).get("latent_shape") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_LATENT_SHAPE", False)):
+            parser.error("checkpoint requires native latent shape support")
+        if (metadata.get("config", {}).get("actor_residual", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RESIDUAL", False)):
+            parser.error("residual actor checkpoint requires native residual actor support")
+        if metadata.get("config", {}).get("actor_dynamics_scale") is not None:
+            if not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_DYNAMICS", False):
+                parser.error("actor dynamics checkpoint requires native actor dynamics support")
+            if "KINDLE_DEVICE_TARGETS" in os.environ:
+                parser.error("actor dynamics checkpoint requires CPU target construction")
+        if (metadata.get("config", {}).get("actor_hidden_units") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_HIDDEN_UNITS", False)):
+            parser.error("actor width checkpoint requires native actor width support")
+        if (metadata.get("config", {}).get("prior_reward_scale") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_REWARD", False)):
+            parser.error("prior-reward checkpoint requires native prior-reward support")
+        if (metadata.get("config", {}).get("prior_continuation_scale") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_PRIOR_CONTINUATION", False)):
+            parser.error("prior-continuation checkpoint requires native prior-continuation support")
+        if (metadata.get("config", {}).get("terminal_replay_fraction") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_REPLAY", False)):
+            parser.error("terminal replay checkpoint requires native terminal-replay support")
+        if (metadata.get("config", {}).get("terminal_continuation_weight") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_TERMINAL_CONTINUATION_WEIGHT", False)):
+            parser.error("terminal-continuation checkpoint requires native terminal-weight support")
+        if metadata.get("config", {}).get("replay_value_completed", False):
+            if not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_REPLAY_VALUE", False):
+                parser.error("completed replay-value checkpoint requires native support")
+            if "KINDLE_DEVICE_TARGETS" in os.environ:
+                parser.error("completed replay-value checkpoint requires CPU target construction")
+        if (metadata.get("config", {}).get("replay_actor_scale") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_COMPLETED_RETURN_ACTOR", False)):
+            parser.error("completed-return actor checkpoint requires native support")
+        if (metadata.get("config", {}).get("replay_actor_observed_lower_bound", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_CONSERVATIVE_RETURN_ACTOR", False)):
+            parser.error("observed lower-bound checkpoint requires native conservative-return actor support")
+        if (metadata.get("config", {}).get("replay_actor_auxiliary_boundaries", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_RETURN_BOUNDARIES", False)):
+            parser.error("auxiliary-boundary checkpoint requires native actor-return boundary support")
+        if (metadata.get("config", {}).get("observation_crop") is not None
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_CROP", False)):
+            parser.error("cropped checkpoint requires native RGB crop support")
+        if (metadata.get("config", {}).get("rgb_frame_pair", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_FRAME_PAIR", False)):
+            parser.error("frame-pair checkpoint requires native RGB frame-pair support")
+        if (metadata.get("config", {}).get("rgb_coordinates", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_COORDINATES", False)):
+            parser.error("coordinate checkpoint requires native RGB coordinate support")
+        if (metadata.get("config", {}).get("rgb_stride2", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_STRIDE2", False)):
+            parser.error("stride-two checkpoint requires native RGB stride-two support")
     args.observation_size = args.observation_size or "native"
+    learned_rgb = args.encoder_checkpoint is None
+    if args.rgb_stride2:
+        if not learned_rgb or args.evaluate:
+            parser.error("rgb-stride2 requires fresh training with the learned CNN")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_RGB_STRIDE2", False):
+            parser.error("rgb-stride2 requires native RGB stride-two support")
+    if args.rgb_coordinates:
+        if not learned_rgb or args.evaluate:
+            parser.error("rgb-coordinates requires fresh training with the learned CNN")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_RGB_COORDINATES", False):
+            parser.error("rgb-coordinates requires native RGB coordinate support")
+    if args.rgb_frame_pair:
+        if not learned_rgb or not args.cdp:
+            parser.error("rgb-frame-pair requires fresh CDP with the learned CNN")
+        if args.breakout_centroid_scale is not None:
+            parser.error("rgb-frame-pair cannot combine with color-centroid supervision")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_RGB_FRAME_PAIR", False):
+            parser.error("rgb-frame-pair requires native RGB frame-pair support")
+    if args.image_size is not None and not learned_rgb:
+        parser.error("image-size requires the learned RGB/CNN frontend")
+    if args.image_size == 96 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB96", False):
+        parser.error("image-size96 requires native RGB96 support")
+    if args.image_crop is not None:
+        if not learned_rgb:
+            parser.error("image-crop requires the learned RGB/CNN frontend")
+        x, y, width, height = args.image_crop
+        if not (0 <= x < x + width <= 160 and 0 <= y < y + height <= 210):
+            parser.error("image-crop must be a nonempty rectangle within native160x210 Atari frames")
+        if args.breakout_centroid_scale is not None:
+            parser.error("image-crop cannot combine with color-centroid supervision")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_RGB_CROP", False):
+            parser.error("image-crop requires native RGB crop support")
+    if args.cdp and not learned_rgb:
+        parser.error("CDP requires the learned CNN")
+    if args.encoder_learning_rate is not None and not args.cdp:
+        parser.error("encoder-learning-rate requires fresh CDP")
+    if args.dynamics_learning_rate is not None and not args.cdp:
+        parser.error("dynamics-learning-rate requires fresh CDP")
+    if args.cdp:
+        rate_scale = args.learning_rate / 4e-5
+        cdp_rates = dict(encoder_learning_rate=6e-6 * rate_scale,
+                         dynamics_learning_rate=4e-4 * rate_scale)
+        if args.encoder_learning_rate is not None:
+            cdp_rates["encoder_learning_rate"] = args.encoder_learning_rate
+        if args.dynamics_learning_rate is not None:
+            cdp_rates["dynamics_learning_rate"] = args.dynamics_learning_rate
+        if not all(positive_f32(rate) for rate in cdp_rates.values()):
+            parser.error("CDP learning rates must be finite and positive in F32")
+    if args.cdp_centered and (not args.cdp or args.world_microbatch_size not in (None, args.batch_size)):
+        parser.error("centered CDP requires --cdp and full-batch world training")
+    if not math.isfinite(args.disagreement_scale) or args.disagreement_scale < 0:
+        parser.error("disagreement-scale must be finite and non-negative")
+    pixel_world = args.world_pixel_loss is not None or args.world_prediction_length is not None
+    if args.world_pixel_scale is not None:
+        if not positive_f32(args.world_pixel_scale):
+            parser.error("world-pixel-scale must be finite and positive in F32")
+        if not args.cdp or not learned_rgb or args.restore or args.evaluate:
+            parser.error("world-pixel-scale requires fresh CDP with the learned CNN")
+    if pixel_world and args.cdp and args.world_pixel_scale is None:
+        parser.error("world pixel objectives with CDP require --world-pixel-scale")
+    if args.world_context_lag is not None:
+        if not 1 <= args.world_context_lag <= 32:
+            parser.error("world-context-lag must be in 1..=32")
+        if not pixel_world or args.cdp or not learned_rgb or args.restore or args.evaluate:
+            parser.error("world-context-lag requires a fresh learned-RGB pixel world objective without CDP")
+    if args.disagreement_scale and not args.cdp and not (pixel_world and learned_rgb and not args.restore):
+        parser.error("disagreement requires fresh CDP or a fresh learned-RGB pixel world objective")
+    if args.replay_capacity <= 0:
+        parser.error("replay-capacity must be positive")
+    if args.encoder_training and (learned_rgb or args.encoder == "levjepa"
+                                 or args.observation_size != "native" or args.batch_length != 16):
+        parser.error("encoder-training requires a Tiny checkpoint, native frames and batch-length16")
+    if args.encoder_training and not any(arg.split("=", 1)[0] == "--replay-capacity" for arg in sys.argv[1:]):
+        parser.error("encoder-training requires explicit replay-capacity; native pixel replay is large")
+    if learned_rgb and (args.encoder is not None or args.observation_size != "native"):
+        parser.error("learned RGB consumes native frames for one GPU resize; frozen --encoder requires --encoder-checkpoint")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     gym.register_envs(ale_py)
     environments = []
+    life_monitors = []
     output = args.output.open("x")
     memory_output = None
 
@@ -150,60 +856,222 @@ def main():
         env_seeds = [(args.seed + stream * 1_000_003) % 2**32 for stream in range(args.num_envs)]
         initial = []
         for seed in env_seeds:
-            env = DreamerAtariPreprocessing(gym.make(
+            env = gym.make(
                 args.environment, frameskip=1, repeat_action_probability=args.sticky_actions,
                 full_action_space=protocol.full_action_space,
-            ), noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
+            )
+            if args.breakout_return_life_boundaries:
+                env = LifeBoundaryMonitor(env)
+                life_monitors.append(env)
+            env = DreamerAtariPreprocessing(env, noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
                 screen_size=None if args.observation_size == "native" else 64)
             environments.append(env)
             initial.append(env.reset(seed=seed)[0])
+            if args.breakout_return_life_boundaries:
+                life_monitors[-1].take_changes()
         actions = int(environments[0].action_space.n)
         config = kindle.default_config(actions, args.model_size)
         config.update(seed=args.seed, batch_size=args.batch_size, batch_length=args.batch_length,
+                      training_precision=args.training_precision,
+                      video_encoder=args.encoder_training, replay_capacity=args.replay_capacity,
+                      actor_critic_gradient=args.actor_critic_gradient, actor_unimix=args.actor_unimix,
                       world_backprop_length=args.batch_length,
                       world_microbatch_size=(args.batch_size if args.world_microbatch_size is None else args.world_microbatch_size),
                       train_ratio=args.train_ratio, learning_rate=args.learning_rate,
+                      disagreement_bonus=args.disagreement_scale > 0,
+                      intrinsic_reward_scale=args.disagreement_scale,
                       learning_rate_warmup=1000, agc=0.3)
-        config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)
+        if args.latent_unimix is not None:
+            config["unimix"] = args.latent_unimix
+        if args.latent_shape is not None:
+            config["latent_shape"] = dict(variables=args.latent_shape[0], classes=args.latent_shape[1])
+        if args.imagination_length is not None:
+            config["imagination_length"] = args.imagination_length
+        if args.discount_horizon is not None:
+            config["horizon"] = args.discount_horizon
+        if args.replay_context is not None:
+            config["replay_context"] = args.replay_context
+        if args.terminal_replay_fraction is not None:
+            config["terminal_replay_fraction"] = args.terminal_replay_fraction
+        if args.open_loop_length is not None:
+            config["open_loop_supervision"] = dict(horizon=args.open_loop_length,
+                scale=1.0 if args.open_loop_scale is None else args.open_loop_scale)
+        if args.behavior_learning_rate is not None:
+            config["behavior_learning_rate"] = args.behavior_learning_rate
+        if args.replay_value_scale is not None:
+            config["loss_scales"]["replay_value"] = args.replay_value_scale
+        if args.continuation_scale is not None:
+            config["loss_scales"]["continuation"] = args.continuation_scale
+        if args.reward_scale is not None:
+            config["loss_scales"]["reward"] = args.reward_scale
+        if args.representation_scale is not None:
+            config["loss_scales"]["representation"] = args.representation_scale
+        if args.dynamics_scale is not None:
+            config["loss_scales"]["dynamics"] = args.dynamics_scale
+        if args.terminal_continuation_weight is not None:
+            config["terminal_continuation_weight"] = args.terminal_continuation_weight
+        if args.prior_continuation_scale is not None:
+            config["prior_continuation_scale"] = args.prior_continuation_scale
+        if args.prior_reward_scale is not None:
+            config["prior_reward_scale"] = args.prior_reward_scale
+        if args.world_pixel_loss is not None:
+            config["world_pixel_loss"] = args.world_pixel_loss
+        if args.world_prediction_length is not None:
+            config["world_prediction_length"] = args.world_prediction_length
+        if args.world_pixel_scale is not None:
+            config["world_pixel_scale"] = args.world_pixel_scale
+        if args.world_context_lag is not None:
+            config["rgb_spatial_decoder"] = True
+            config["rgb_context_lag"] = args.world_context_lag
+        if args.actor_entropy is not None:
+            config["actor_entropy"] = args.actor_entropy
+        if args.replay_value_completed:
+            config["replay_value_completed"] = True
+        if args.replay_actor_scale is not None:
+            config["replay_actor_scale"] = args.replay_actor_scale
+        if args.actor_dynamics_scale is not None:
+            config["actor_dynamics_scale"] = args.actor_dynamics_scale
+        if args.actor_expected_value:
+            config["actor_expected_value"] = True
+        if args.actor_hidden_units is not None:
+            config["actor_hidden_units"] = args.actor_hidden_units
+        if args.actor_residual:
+            config["actor_residual"] = True
+        if args.replay_actor_observed_lower_bound:
+            config["replay_actor_observed_lower_bound"] = True
+        if args.breakout_return_life_boundaries:
+            config["replay_actor_auxiliary_boundaries"] = True
+        if args.return_lambda is not None:
+            config["lambda"] = args.return_lambda
+        if args.replay_value_bootstrap is not None:
+            config["replay_value_bootstrap"] = args.replay_value_bootstrap
+        if args.breakout_centroid_scale is not None:
+            config["color_centroid_supervision"] = dict(scale=args.breakout_centroid_scale,
+                channel=0, background_scale=1.5, region=[8/160, 90/210, 152/160, 185/210])
+        if args.guidance_imitation_scale is not None:
+            weights = [1.0] * actions
+            noop = environments[0].action_meanings.index("NOOP")
+            weights[noop] = args.guidance_noop_weight if args.guidance_noop_weight is not None else 1.0
+            if args.guidance_fire_weight is not None:
+                weights[environments[0].action_meanings.index("FIRE")] = args.guidance_fire_weight
+            config["expert_imitation"] = dict(scale=args.guidance_imitation_scale, action_weights=weights)
+            if args.guidance_world_gradient:
+                config["expert_imitation"]["world_gradient"] = True
+            if args.guidance_imitation_decay is not None:
+                start, end = args.guidance_imitation_decay
+                config["expert_imitation"]["decay"] = dict(start_update=start, end_update=end)
+                if args.guidance_actor_only_decay:
+                    config["expert_imitation"]["decay"]["actor_only"] = True
+        if learned_rgb:
+            config["observation_kind"] = f"rgb{args.image_size or 64}"
+            if args.rgb_frame_pair:
+                config["rgb_frame_pair"] = True
+            if args.rgb_coordinates:
+                config["rgb_coordinates"] = True
+            if args.rgb_stride2:
+                config["rgb_stride2"] = True
+            if args.image_crop is not None:
+                config["observation_crop"] = dict(zip(("x", "y", "width", "height"), args.image_crop))
+            config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
+            if args.cdp:
+                config["loss_scales"].update(reconstruction=0.0, future_prediction=args.cdp_scale if args.cdp_scale is not None else 500.0)
+                config.update(**cdp_rates, cdp_centered=args.cdp_centered)
+        else:
+            config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)
         exploration = (PersistentExploration(dict(kind=EXPLORATION_KIND,
             probability=args.exploration_probability, hold_actions=args.exploration_hold,
             seed=args.seed), args.num_envs, actions) if args.exploration_probability else None)
+        if args.qbert_guidance_probability:
+            guidance_config = dict(kind=GUIDANCE_KIND,
+                probability=args.qbert_guidance_probability, seed=args.seed)
+            if args.qbert_guidance_max_actions is not None:
+                guidance_config.update(kind=BOUNDED_GUIDANCE_KIND, max_actions=args.qbert_guidance_max_actions)
+            if args.qbert_guidance_policy == "continuation":
+                guidance_config["kind"] = guidance_module.CONTINUATION_GUIDANCE_KIND
+            if args.qbert_corrective_labels:
+                guidance_config["kind"] = guidance_module.CORRECTIVE_GUIDANCE_KIND
+            exploration = QbertGuidance(guidance_config, args.num_envs, actions)
+        if args.breakout_guidance_probability:
+            guidance_config = dict(kind=(breakout_guidance_module.CORRECTIVE_GUIDANCE_KIND
+                if args.breakout_corrective_labels else breakout_guidance_module.GUIDANCE_KIND),
+                probability=args.breakout_guidance_probability, seed=args.seed,
+                max_actions=args.breakout_guidance_max_actions)
+            if args.breakout_guidance_block_length is not None:
+                guidance_config.update(kind=breakout_guidance_module.BLOCK_CORRECTIVE_GUIDANCE_KIND,
+                                       block_length=args.breakout_guidance_block_length)
+            if args.breakout_guidance_initial_episodes is not None:
+                guidance_config.update(kind=breakout_guidance_module.INITIAL_CORRECTIVE_GUIDANCE_KIND,
+                                       initial_episodes=args.breakout_guidance_initial_episodes)
+            exploration = BreakoutGuidance(guidance_config, args.num_envs, actions,
+                **(dict(action_meanings=environments[0].action_meanings)
+                   if args.atari_protocol == "published-minimal" else {}))
+        guidance = isinstance(exploration, (QbertGuidance, BreakoutGuidance))
+        selected_guidance_module = breakout_guidance_module if isinstance(exploration, BreakoutGuidance) else guidance_module
+        current_frames = initial
         construction = time.perf_counter()
         restored = checkpoint_identity(args.restore) if args.restore else None
-        agent = (kindle.VectorAgent.restore(str(args.restore), args.encoder_checkpoint, args.num_envs)
-                 if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config,
-                     **(dict(encoder=args.encoder) if args.encoder else {})))
+        if learned_rgb:
+            agent = (kindle.VectorAgent.restore_rgb(str(args.restore), args.num_envs) if args.restore
+                     else kindle.VectorAgent.learned_rgb(args.num_envs, config))
+        else:
+            agent = (kindle.VectorAgent.restore(str(args.restore), args.encoder_checkpoint, args.num_envs)
+                     if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config,
+                         **(dict(encoder=args.encoder) if args.encoder else {})))
+        if expected := os.environ.get("KINDLE_EXPECT_DEVICE_NAME"):
+            require_gpu_device(agent.gpu_device, expected)
         if agent.config["action_count"] != actions:
             raise ValueError("checkpoint action vocabulary differs from environment")
         construction = time.perf_counter() - construction
         check_memory("constructed", 0)
         ids = list(range(args.num_envs))
         starting_actions, starting_updates = agent.environment_step, agent.learner_step
+        if args.greedy_posterior:
+            agent.use_greedy_posterior_for_evaluation()
+        if args.action_temperature is not None:
+            agent.set_action_temperature_for_evaluation(args.action_temperature)
+        if args.actor_posterior_samples is not None:
+            agent.set_actor_posterior_samples_for_evaluation(args.actor_posterior_samples)
         started = time.perf_counter()
         agent.begin_episodes(ids, initial)
         check_memory("initialized", 0)
+        initial_checkpoint = None
+        if args.initial_checkpoint:
+            agent.save_checkpoint(str(args.initial_checkpoint))
+            initial_checkpoint = checkpoint_identity(args.initial_checkpoint)
         exploration_header = (dict(exploration=exploration.config,
-            exploration_sha256=sha256_file(exploration_module.__file__)) if exploration else {})
+            **(dict(guidance_schedule_sha256=sha256_file(guidance_schedule_module.__file__)) if guidance else {}),
+            exploration_sha256=sha256_file(selected_guidance_module.__file__ if guidance else exploration_module.__file__)) if exploration else {})
         vector_protocol = (EPISODE_EVALUATION_PROTOCOL if args.episodes_per_env else
                            EXPLORATION_PROTOCOL if exploration else VECTOR_PROTOCOL)
         emit(dict(event="run_start", protocol=vector_protocol, environment=args.environment,
+                  **(dict(initial_checkpoint=initial_checkpoint) if initial_checkpoint else {}),
                   num_envs=args.num_envs, steps=args.steps, seed=args.seed, environment_seeds=env_seeds,
                   **(dict(checkpoint_history=True) if args.checkpoint_history else {}),
                   **(dict(evaluation_episodes_per_stream=args.episodes_per_env) if args.episodes_per_env else {}),
+                  **(dict(frozen_checkpoint_export=True) if args.evaluate and args.checkpoint else {}),
                   policy_seed_rule="config.seed + stream (wrapping u64)",
                   atari_protocol=args.atari_protocol, action_repeat=ATARI_ACTION_REPEAT,
                   noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
                   full_action_space=protocol.full_action_space, sticky_actions=args.sticky_actions,
                   observation_size=args.observation_size, observation_shape=list(initial[0].shape),
+                  **(dict(learned_rgb_preprocessing=rgb_preprocessing(agent.config)) if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
+                  **(dict(training_action_mode=args.training_action_mode) if args.training_action_mode is not None else {}),
+                  **(dict(action_temperature=args.action_temperature) if args.action_temperature is not None else {}),
+                  **(dict(posterior_mode="greedy") if args.greedy_posterior else {}),
+                  **(dict(actor_posterior_samples=args.actor_posterior_samples) if args.actor_posterior_samples is not None else {}),
+                  **(dict(behavior_probe="live-posterior-v1") if args.probe_behavior else {}),
+                  **(dict(actor_return_boundary_kind=LIFE_BOUNDARY_KIND,
+                          actor_return_boundary_sha256=sha256_file(return_boundaries_module.__file__))
+                     if args.breakout_return_life_boundaries else {}),
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,
                   cpu_worker_threads=agent.cpu_worker_threads,
                   trainable_parameter_counts=agent.trainable_parameter_counts,
                   restored_checkpoint=restored, starting_environment_step=starting_actions,
                   starting_learner_step=starting_updates, agent_construction_seconds=construction,
                   native_extension_sha256=sha256_file(kindle._native.__file__),
-                  runner_sha256=sha256_file(__file__), wrapper_sha256=sha256_file(Path(__file__).with_name("atari.py")),
+                  runner_sha256=sha256_file(__file__), wrapper_sha256=sha256_file(atari.__file__),
                   **exploration_header))
         stop = False
 
@@ -215,6 +1083,7 @@ def main():
         episode_returns = [0.0] * args.num_envs
         episode_lengths = [0] * args.num_envs
         episode_counts = [0] * args.num_envs
+        natural_episode_counts = [0] * args.num_envs
         total_rewards = [0.0] * args.num_envs
         completed = []
         timing = dict(act=0.0, environment=0.0, observe=0.0, learn=0.0, reset=0.0, checkpoint=0.0)
@@ -238,6 +1107,8 @@ def main():
             frames = [env.executed_action_frames for env in environments]
             exploration_counts = (dict(overridden_actions=exploration.overridden_actions)
                                   if exploration else {})
+            if guidance:
+                exploration_counts.update(guidance_episodes=exploration.episode_counts)
             return dict(event=event, run_step=run_actions, vector_ticks=run_actions // args.num_envs,
                         environment_step=agent.environment_step, learner_step=agent.learner_step,
                         elapsed_seconds=elapsed, actions_per_second=run_actions / elapsed,
@@ -247,6 +1118,7 @@ def main():
                         aggregate_simulated_wall_ratio=sum(frames) / 60 / elapsed,
                         per_stream_simulated_wall_ratio=[n / 60 / elapsed for n in frames],
                         total_rewards=total_rewards, episode_counts=episode_counts,
+                        **(dict(natural_episode_counts=natural_episode_counts) if args.episodes_per_env else {}),
                         partial_returns=episode_returns, partial_lengths=episode_lengths,
                         replay_len=agent.replay_len, training_debt=agent.training_debt,
                         stage_seconds=timing, **exploration_counts)
@@ -256,20 +1128,46 @@ def main():
                 if stop:
                     break
                 before = time.perf_counter()
-                overrides = exploration.actions() if exploration else None
-                selected = (agent.act(greedy=args.greedy, action_overrides=overrides)
-                            if exploration else agent.act(greedy=args.greedy))
+                overrides = (exploration.actions(current_frames) if guidance else
+                             exploration.actions() if exploration else None)
+                override_argument = "expert_actions" if args.guidance_imitation_scale is not None else "action_overrides"
+                if corrective_labels:
+                    selected = agent.act(greedy=greedy_actions, action_overrides=overrides,
+                                         expert_labels=exploration.expert_labels)
+                else:
+                    selected = (agent.act(greedy=greedy_actions, **{override_argument: overrides})
+                                if exploration else agent.act(greedy=greedy_actions))
                 if overrides is not None and any(forced is not None and selected[stream] != forced
                                                 for stream, forced in enumerate(overrides)):
                     raise ValueError("native action override was not honored")
+                if corrective_labels:
+                    exploration.feedback(selected)
                 timing["act"] += time.perf_counter() - before
                 check_memory("act", run_actions)
+                behavior = {}
+                if args.probe_behavior:
+                    before = time.perf_counter()
+                    values, bonuses = agent.behavior_predictions()
+                    behavior = dict(behavior_values=values, behavior_intrinsic=bonuses)
+                    timing["diagnostics"] = timing.get("diagnostics", 0.0) + time.perf_counter() - before
+                    check_memory("behavior_probe", run_actions)
                 before = time.perf_counter()
                 results = [env.step(action) for env, action in zip(environments, selected)]
                 timing["environment"] += time.perf_counter() - before
                 frames, rewards, terminated, truncated, _ = map(list, zip(*results))
+                current_frames = frames
                 before = time.perf_counter()
-                stored_rewards = agent.observe(ids, frames, rewards, terminated, truncated)
+                boundary_fields = {}
+                if life_monitors:
+                    changes = [monitor.take_changes() for monitor in life_monitors]
+                    boundaries = [losses > 0 for losses, _ in changes]
+                    boundary_fields = dict(actor_return_boundaries=boundaries,
+                        actor_return_losses=[losses for losses, _ in changes],
+                        actor_return_gains=[gains for _, gains in changes])
+                    stored_rewards = agent.observe(ids, frames, rewards, terminated, truncated,
+                                                   actor_boundaries=boundaries)
+                else:
+                    stored_rewards = agent.observe(ids, frames, rewards, terminated, truncated)
                 timing["observe"] += time.perf_counter() - before
                 check_memory("observe", run_actions + args.num_envs)
                 run_actions += args.num_envs
@@ -277,12 +1175,20 @@ def main():
                           actions=selected, rewards=rewards, stored_rewards=stored_rewards,
                           terminated=terminated, truncated=truncated,
                           executed_action_frames=[env.executed_action_frames for env in environments],
-                          **(dict(action_overrides=overrides) if exploration else {})))
+                          **boundary_fields,
+                          **behavior,
+                          **(dict(guidance_frame_sha256=exploration.frame_sha256) if guidance else {}),
+                          **(dict(action_overrides=overrides) if exploration else {}),
+                          **(dict(expert_labels=exploration.expert_labels) if corrective_labels else {}),
+                          **(dict(expert_action_mask=[action is not None for action in
+                                 (exploration.expert_labels if corrective_labels else overrides)])
+                             if args.guidance_imitation_scale is not None else {})))
                 before = time.perf_counter()
                 reports = [] if args.evaluate else agent.learn_scheduled()
                 timing["learn"] += time.perf_counter() - before
                 check_memory("learn", run_actions)
                 for report in reports:
+                    require_numbers(report)
                     emit(dict(event="learner", run_step=run_actions, report=report))
                 resets = []
                 for stream in ids:
@@ -293,10 +1199,12 @@ def main():
                         result = dict(event="episode", stream=stream, run_step=run_actions,
                                       stream_step=tick, episode=episode_counts[stream],
                                       episode_return=episode_returns[stream], episode_length=episode_lengths[stream],
+                                      elapsed_seconds=time.perf_counter() - started,
                                       terminated=bool(terminated[stream]), truncated=bool(truncated[stream]))
                         emit(result)
                         completed.append(result)
                         episode_counts[stream] += 1
+                        natural_episode_counts[stream] += bool(terminated[stream] and not truncated[stream])
                         episode_returns[stream] = 0.0
                         episode_lengths[stream] = 0
                         resets.append(stream)
@@ -304,6 +1212,10 @@ def main():
                 if resets:
                     reset_frames = [environments[stream].reset()[0] for stream in resets]
                     agent.begin_episodes(resets, reset_frames)
+                    for stream, frame in zip(resets, reset_frames):
+                        current_frames[stream] = frame
+                        if life_monitors:
+                            life_monitors[stream].take_changes()
                     check_memory("reset", run_actions)
                     if exploration:
                         exploration.reset(resets)
@@ -318,7 +1230,7 @@ def main():
                     print(f"{run_actions}/{args.steps} actions; {event['actions_per_second']:.2f} actions/s; "
                           f"{agent.learner_step - starting_updates} updates; debt={agent.training_debt:.3f}", flush=True)
                     last_report = run_actions
-                if args.episodes_per_env and min(episode_counts) >= args.episodes_per_env:
+                if args.episodes_per_env and min(natural_episode_counts) >= args.episodes_per_env:
                     break
             if args.checkpoint and run_actions != last_checkpoint:
                 save()
@@ -326,7 +1238,7 @@ def main():
             check_memory("finished", run_actions)
             reason = "budget_complete"
             if args.episodes_per_env:
-                reason = "episode_budget_complete" if min(episode_counts) >= args.episodes_per_env else "action_cap_reached"
+                reason = "episode_budget_complete" if min(natural_episode_counts) >= args.episodes_per_env else "action_cap_reached"
             event.update(reason="interrupted" if stop else reason,
                          **episode_summary(completed),
                          learner_updates=agent.learner_step - starting_updates)

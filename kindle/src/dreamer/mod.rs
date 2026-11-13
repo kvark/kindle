@@ -8,32 +8,47 @@
 mod acting_gpu;
 mod agent;
 mod behavior;
+mod categorical_gpu;
 mod checkpoint;
 mod config;
 mod cpu;
+mod denoising;
 mod device_copy;
 mod distributions;
+mod exploration;
+mod gaussian;
 mod intrinsic;
 mod networks;
 mod readback;
 mod replay;
 mod replay_gpu;
 mod runtime;
+mod spatial_history;
+mod targets_gpu;
+mod uniform_gpu;
 mod world;
+mod world_learner;
+
+pub use denoising::{DenoisingConfig, DenoisingWorldLearner};
+pub use world_learner::{PixelLoss, WorldModelLearner, WorldPrediction};
 
 pub use agent::{
     ActionMode, BehaviorMetrics, DreamerAgent, DreamerCore, FeatureVectorAgent, LearnReport,
     LearnTiming, ModelProvenance, VectorDreamerAgent, WorldMetrics,
 };
-pub use config::{DreamerConfig, LossScales, ModelSize, NetworkSize};
-pub use replay::{FrameFlags, Reward};
+pub use config::{
+    ColorCentroidSupervision, DreamerConfig, ExpertImitation, ExpertImitationDecay,
+    FeatureStandardization, LatentShape, LossScales, ModelSize, NetworkSize, ObservationKind,
+    OpenLoopSupervision, ReplayValueBootstrap, TrainingPrecision, VideoEncoder,
+};
+pub use replay::{FrameFlags, ReplaySamplingReport, Reward};
 
 /// Upstream DreamerV3 revision used as the behavioral contract.
 pub const DREAMERV3_UPSTREAM_REV: &str = "e3f02248693a79dc8b0ebd62c93683888ddaccfe";
 /// Meganeura revision used to compile and optimize the baseline graphs.
-pub const MEGANEURA_REV: &str = "367e53d4de73aea6432afd40aa6fd69b5fcd4e8e";
+pub const MEGANEURA_REV: &str = "a0eff600d0aaf877a6a6ba02c2de1eb8804583ed";
 /// Exact Blade revision providing the shared graphics runtime.
-pub const BLADE_REV: &str = "7cca637791a57d9cacf4e99c10a87211f3c11b6a";
+pub const BLADE_REV: &str = "d9112e26ab1244d9e206e7d27387295a28cb3fa3";
 
 #[cfg(test)]
 mod tests {

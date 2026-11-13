@@ -2,12 +2,23 @@
 
 use meganeura::{Graph, graph::NodeId};
 
-use super::config::DreamerConfig;
+use super::behavior;
+use super::config::VideoEncoder;
+use super::config::{DreamerConfig, FeatureStandardization, ObservationKind};
+use super::exploration::Disagreement;
 use super::networks::{
-    MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl, feature,
-    gumbel_sample, mixed_probabilities, scale, slice_columns, straight_through_sample, sum,
-    weighted_cross_entropy,
+    FeatureDecoder, MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl,
+    concat_columns, feature, gumbel_sample, mixed_log_probabilities, mixed_probabilities, scale,
+    slice_columns, straight_through_sample, sum, weighted_cross_entropy,
 };
+use super::world_learner::PixelLoss;
+use crate::vision::levjepa::joint;
+mod posterior_history;
+mod prior_continuation;
+#[cfg(test)]
+mod prior_reward;
+mod terminal_continuation;
+#[cfg(test)]
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
 
 pub const LOSS_TOTAL: usize = 0;
@@ -19,7 +30,51 @@ pub const LOSS_CONTINUATION: usize = 5;
 pub const LOSS_REPLAY_VALUE: usize = 6;
 pub const RAW_KL: usize = 7;
 pub const LOSS_FUTURE_PREDICTION: usize = 8;
+pub const LOSS_ENCODER_REGULARIZATION: usize = 9;
+pub const ENCODER_SPREAD: usize = 10;
+pub const LOSS_INITIAL_POLICY: usize = 11;
+pub const LOSS_INITIAL_VALUE: usize = 12;
+pub const LOSS_EXPLORATION: usize = 13;
+pub const LOSS_EXPERT: usize = 14;
+pub const LOSS_OPEN_LOOP: usize = 15;
+pub const LOSS_OPEN_LOOP_PREDICTION: usize = 16;
+pub const LOSS_OPEN_LOOP_REWARD: usize = 17;
+pub const LOSS_OPEN_LOOP_CONTINUATION: usize = 18;
+pub const LOSS_COLOR_CENTROID: usize = 19;
+pub const COLOR_CENTROID_VALID_FRACTION: usize = 20;
+pub const LOSS_PRIOR_CONTINUATION: usize = 21;
+pub const PRIOR_CONTINUATION_VALID_FRACTION: usize = 22;
+pub const LOSS_PRIOR_REWARD: usize = 23;
+pub const PRIOR_REWARD_VALID_FRACTION: usize = 24;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
+
+mod cdp;
+#[cfg(test)]
+mod clean_prior_tests;
+mod color_centroid;
+mod latent_rollout;
+mod open_loop;
+mod pixel_rollout;
+mod predictive_world;
+mod recurrent_rollout;
+
+pub(crate) const LOSS_WORLD_ROLLOUT: usize = 25;
+pub(crate) const LOSS_PREDICTIVE_WORLD: usize = 26;
+pub(crate) const LOSS_RECURRENT_WORLD: usize = 30;
+pub(crate) const LOSS_IMAGE_FEEDBACK: usize = 34;
+pub(crate) const LOSS_WORLD_CENTROID: usize = 37;
+pub(crate) const LOSS_WORLD_SURVIVAL: usize = 39;
+pub(crate) const CLEAN_PRIOR_VALID_FRACTION: usize = 36;
+
+pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
+    (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_centered {
+        "continuous-centered-cosine-v1"
+    } else if config.is_cdp() {
+        "continuous-cosine-v1"
+    } else {
+        FUTURE_HEAD_REVISION
+    })
+}
 
 pub const IMAGINATION_FEATURE: usize = 0;
 pub const IMAGINATION_ALL_FEATURES: usize = 1;
@@ -27,6 +82,86 @@ pub const IMAGINATION_ACTION: usize = 2;
 pub const IMAGINATION_REWARD: usize = 3;
 pub const IMAGINATION_CONTINUATION: usize = 4;
 pub const IMAGINATION_VALUE: usize = 5;
+pub const IMAGINATION_BONUS: usize = 6;
+pub const POSTERIOR_BONUS: usize = 2;
+
+fn standardized_target(
+    graph: &mut Graph,
+    target: NodeId,
+    statistics: Option<&FeatureStandardization>,
+) -> NodeId {
+    let Some(stats) = statistics else {
+        return target;
+    };
+    let width = stats.mean.len();
+    let rows = graph.node(target).ty.shape.iter().product::<usize>() / width;
+    let target = graph.reshape(target, &[rows, width]);
+    let negative_mean = graph.constant(stats.mean.iter().map(|x| -x).collect(), &[width]);
+    let inverse_scale = graph.constant(stats.scale.iter().map(|x| x.recip()).collect(), &[width]);
+    let centered = graph.bias_add(target, negative_mean);
+    graph.bias_mul(centered, inverse_scale)
+}
+
+fn raw_prediction(
+    graph: &mut Graph,
+    prediction: NodeId,
+    statistics: Option<&FeatureStandardization>,
+) -> NodeId {
+    let Some(stats) = statistics else {
+        return prediction;
+    };
+    let shape = graph.node(prediction).ty.shape.clone();
+    let width = stats.mean.len();
+    let rows = shape.iter().product::<usize>() / width;
+    let prediction = graph.reshape(prediction, &[rows, width]);
+    let scale = graph.constant(stats.scale.clone(), &[width]);
+    let mean = graph.constant(stats.mean.clone(), &[width]);
+    let scaled = graph.bias_mul(prediction, scale);
+    let raw = graph.bias_add(scaled, mean);
+    graph.reshape(raw, &shape)
+}
+
+fn replay_observations(graph: &mut Graph, config: &DreamerConfig, length: usize) -> Vec<NodeId> {
+    let batch = config.batch_size;
+    if let Some(mode) = config.video_encoder {
+        let pixels = (0..length)
+            .map(|time| graph.input(&format!("pixels_{time}"), &[batch, joint::PIXELS]))
+            .collect::<Vec<_>>();
+        let features = joint::encode(graph, &pixels, batch);
+        if mode == VideoEncoder::Frozen {
+            features
+                .into_iter()
+                .map(|x| graph.stop_gradient(x))
+                .collect()
+        } else {
+            features
+        }
+    } else {
+        (0..length)
+            .map(|time| {
+                graph.input(
+                    &format!("observation_{time}"),
+                    &config.observation_shape(batch),
+                )
+            })
+            .collect()
+    }
+}
+
+pub(super) fn encoder_observation(
+    graph: &mut Graph,
+    config: &DreamerConfig,
+    current: NodeId,
+    previous_name: &str,
+    batch: usize,
+) -> NodeId {
+    if !config.rgb_previous_frame {
+        return current;
+    }
+    let width = config.observation_dim();
+    let previous = graph.input(previous_name, &[batch, width]);
+    concat_columns(graph, previous, current, batch, width, width)
+}
 
 struct Dynamics {
     core: RssmCore,
@@ -50,23 +185,15 @@ struct WorldHeads {
 impl WorldHeads {
     fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let units = config.network().units;
+        let inputs = config.feature_dim()
+            + if config.rgb_event_heads {
+                config.encoded_observation_dim()
+            } else {
+                0
+            };
         Self {
-            reward: MlpHead::new(
-                graph,
-                "world.reward",
-                config.feature_dim(),
-                units,
-                1,
-                config.value_bins,
-            ),
-            continuation: MlpHead::new(
-                graph,
-                "world.continuation",
-                config.feature_dim(),
-                units,
-                1,
-                1,
-            ),
+            reward: MlpHead::new(graph, "world.reward", inputs, units, 1, config.value_bins),
+            continuation: MlpHead::new(graph, "world.continuation", inputs, units, 1, 1),
         }
     }
 
@@ -82,44 +209,88 @@ struct WorldModel {
     dynamics: Dynamics,
     representation: Representation,
     decoder: Option<ObservationDecoder>,
-    future_predictor: Option<ObservationDecoder>,
+    future_predictor: Option<FuturePredictor>,
     heads: WorldHeads,
     /// The behavior optimizer owns these parameters. They are frozen in this
     /// graph so replay-value gradients only shape the posterior/RSSM path.
-    replay_value: MlpHead,
+    replay_value: Option<MlpHead>,
+    actor: Option<MlpHead>,
+    exploration: Option<Disagreement>,
 }
 
 impl WorldModel {
+    #[cfg(test)]
     fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
+        Self::with_behavior(graph, config, true)
+    }
+
+    fn with_behavior(graph: &mut Graph, config: &DreamerConfig, behavior: bool) -> Self {
         let units = config.network().units;
         Self {
             dynamics: Dynamics::new(graph, config),
             representation: Representation::new(graph, config),
-            decoder: (config.loss_scales.reconstruction > 0.0).then(|| {
+            decoder: config.trains_pixels().then(|| {
                 ObservationDecoder::new(graph, config, "world.decoder", config.feature_dim())
             }),
             future_predictor: (config.loss_scales.future_prediction > 0.0)
                 .then(|| future_predictor(graph, config)),
             heads: WorldHeads::new(graph, config),
-            replay_value: MlpHead::new(
-                graph,
-                "behavior.value",
-                config.feature_dim(),
-                units,
-                3,
-                config.value_bins,
-            ),
+            exploration: config
+                .uses_disagreement()
+                .then(|| Disagreement::new(graph, config)),
+            replay_value: behavior.then(|| {
+                MlpHead::new(
+                    graph,
+                    "behavior.value",
+                    config.feature_dim(),
+                    units,
+                    3,
+                    config.value_bins,
+                )
+            }),
+            actor: (config.actor_critic_gradient || config.expert_world_gradient()).then(|| {
+                MlpHead::new(
+                    graph,
+                    "behavior.actor",
+                    config.feature_dim(),
+                    config.actor_hidden_units(),
+                    3,
+                    config.action_count,
+                )
+            }),
         }
     }
 }
 
-fn future_predictor(graph: &mut Graph, config: &DreamerConfig) -> ObservationDecoder {
-    ObservationDecoder::new(
-        graph,
-        config,
-        "world.future_predictor",
-        config.network().deter,
-    )
+enum FuturePredictor {
+    Features(FeatureDecoder),
+    Cdp(MlpHead),
+}
+
+impl FuturePredictor {
+    fn forward(&self, graph: &mut Graph, deter: NodeId, batch: usize) -> NodeId {
+        match self {
+            Self::Features(head) => head.forward(graph, deter, batch),
+            Self::Cdp(head) => head.forward(graph, deter),
+        }
+    }
+}
+
+fn future_predictor(graph: &mut Graph, config: &DreamerConfig) -> FuturePredictor {
+    let name = "world.future_predictor";
+    let input = config.network().deter;
+    match config.observation_kind {
+        ObservationKind::Features => {
+            FuturePredictor::Features(FeatureDecoder::new(graph, config, name, input))
+        }
+        ObservationKind::Rgb64
+        | ObservationKind::Rgb48
+        | ObservationKind::Rgb32
+        | ObservationKind::Rgb96 => {
+            let width = config.encoded_observation_dim();
+            FuturePredictor::Cdp(MlpHead::new(graph, name, input, width, 1, width))
+        }
+    }
 }
 
 /// Full sequence loss with externally sampled hard posterior states.
@@ -140,29 +311,139 @@ fn build_training_graph_grouped(
     length: usize,
     time_batch_length: usize,
 ) -> Graph {
+    training_graph(
+        config,
+        length,
+        time_batch_length,
+        false,
+        true,
+        config.world_prediction_length,
+        config.world_pixel_loss,
+    )
+}
+
+/// Sample and export the posterior before consuming late behavior targets.
+pub(crate) fn build_staged_training_graph(config: &DreamerConfig) -> Graph {
+    assert!(
+        config.world_prediction_length == 0 && config.world_pixel_loss == PixelLoss::SquaredError,
+        "staged world training keeps upstream's pixel objective"
+    );
+    training_graph(
+        config,
+        config.batch_length,
+        config.batch_length,
+        true,
+        true,
+        0,
+        PixelLoss::SquaredError,
+    )
+}
+
+/// Standalone world learning, with posterior sampling inside the loss graph.
+/// No policy/value parameters, targets or imitation gradients are constructed.
+pub(crate) fn build_world_only_training_graph(config: &DreamerConfig) -> Graph {
+    build_world_only_rollout_training_graph(config, 0)
+}
+
+pub(crate) fn build_world_only_rollout_training_graph(
+    config: &DreamerConfig,
+    prediction_length: usize,
+) -> Graph {
+    build_world_only_pixel_training_graph(config, prediction_length, PixelLoss::SquaredError)
+}
+
+pub(crate) fn build_world_only_pixel_training_graph(
+    config: &DreamerConfig,
+    prediction_length: usize,
+    pixel_loss: PixelLoss,
+) -> Graph {
+    if pixel_loss != PixelLoss::SquaredError {
+        assert!(config.observation_kind.is_rgb());
+        assert!(config.reconstruction_target_standardization.is_none());
+    }
+    if pixel_loss.latent_overshooting() || pixel_loss.recurrent_energy() {
+        assert!(prediction_length > 0);
+    } else if pixel_loss.predictive() {
+        assert_eq!(prediction_length, 0);
+    }
+    assert!(!config.actor_critic_gradient && !config.expert_world_gradient());
+    assert!(!config.uses_disagreement() && !config.visitation_bonus);
+    assert_eq!(config.loss_scales.replay_value, 0.0);
+    training_graph(
+        config,
+        config.batch_length,
+        config.batch_length,
+        true,
+        false,
+        prediction_length,
+        pixel_loss,
+    )
+}
+
+fn training_graph(
+    config: &DreamerConfig,
+    length: usize,
+    time_batch_length: usize,
+    sample_posterior: bool,
+    behavior: bool,
+    prediction_length: usize,
+    pixel_loss: PixelLoss,
+) -> Graph {
     config.validate();
+    assert!(
+        !behavior || !config.world_gaussian,
+        "Gaussian state is standalone world only"
+    );
+    assert!(
+        !behavior || !config.rgb_spatial_decoder || config.rgb_context_lag.is_some(),
+        "autoregressive spatial history is standalone world only"
+    );
+    assert!(
+        !behavior || !config.rgb_previous_frame,
+        "previous-frame RGB is world-only"
+    );
     assert!(length > 0 && length <= config.batch_length);
     assert!(time_batch_length > 0 && length.is_multiple_of(time_batch_length));
     let batch = config.batch_size;
     let size = config.network();
-    let patches = OBSERVATION_GRID * OBSERVATION_GRID;
-
     let mut graph = Graph::new();
-    let model = WorldModel::new(&mut graph, config);
+    let model = WorldModel::with_behavior(&mut graph, config, behavior);
+    let centroid_head = config.color_centroid_supervision.as_ref().map(|_| {
+        MlpHead::new(
+            &mut graph,
+            "world.color_centroid",
+            config.feature_dim(),
+            size.units,
+            usize::from(behavior),
+            2,
+        )
+    });
     let mut deter = graph.input("initial_deter", &[batch, size.deter]);
     let mut stoch = graph.input("initial_stoch", &[batch * size.stoch, size.classes]);
 
-    let observations = (0..length)
-        .map(|time| {
-            graph.input(
-                &format!("observation_{time}"),
-                &[batch * patches, OBSERVATION_CHANNELS],
+    let observations = replay_observations(&mut graph, config, length);
+    let (encoder_regularization, encoder_spread) = if config.video_encoder.is_some() {
+        joint::regularization(&mut graph, &observations, batch)
+    } else {
+        (graph.scalar(0.0), graph.scalar(0.0))
+    };
+    let encoder_observations = observations
+        .iter()
+        .enumerate()
+        .map(|(time, &current)| {
+            encoder_observation(
+                &mut graph,
+                config,
+                current,
+                &format!("previous_observation_{time}"),
+                batch,
             )
         })
         .collect::<Vec<_>>();
+    let encoder_width = config.observation_dim() * if config.rgb_previous_frame { 2 } else { 1 };
     let mut encodings = Vec::with_capacity(length);
-    for chunk in observations.chunks(time_batch_length) {
-        let observation = stack_time(&mut graph, chunk, batch, config.observation_dim());
+    for chunk in encoder_observations.chunks(time_batch_length) {
+        let observation = stack_time(&mut graph, chunk, batch, encoder_width);
         let encoded =
             model
                 .representation
@@ -177,7 +458,15 @@ fn build_training_graph_grouped(
             &mut encodings,
         );
     }
+    let cdp_center = config.cdp_centered.then(|| {
+        let targets = stack_time(&mut graph, &encodings, batch, config.prediction_dim());
+        cdp::negative_target_mean(&mut graph, targets)
+    });
     let mut head_inputs = Vec::with_capacity(length);
+    let mut exploration_states = Vec::new();
+    let mut exploration_actions = Vec::new();
+    let mut exploration_targets = Vec::new();
+    let mut exploration_weights = Vec::new();
 
     let mut reconstruction_losses = Vec::with_capacity(length);
     let mut future_prediction_losses = Vec::with_capacity(length);
@@ -187,12 +476,36 @@ fn build_training_graph_grouped(
     let mut reward_losses = Vec::with_capacity(length);
     let mut continuation_losses = Vec::with_capacity(length);
     let mut replay_value_losses = Vec::with_capacity(length);
+    let mut initial_policy_losses = Vec::new();
+    let mut initial_value_losses = Vec::new();
+    let mut expert_losses = Vec::new();
+    let mut centroid_losses = Vec::new();
+    let mut centroid_valid = Vec::new();
+    let mut deters = Vec::new();
+    let mut stochs = Vec::new();
+    let mut posterior_targets = Vec::new();
+    let mut prior_states = Vec::new();
+    let mut prior_continuation_losses = Vec::new();
+    let mut prior_continuation_valid = Vec::new();
+    let mut prior_reward_losses = Vec::new();
+    let mut prior_reward_valid = Vec::new();
+    let mut predictive_states = Vec::new();
+    let mut predictive_second_states = Vec::new();
+    let mut predictive_keeps = Vec::new();
+    let mut predictive_log_probabilities = Vec::new();
+    let mut predictive_losses = Vec::new();
+    let mut actions = Vec::new();
+    let mut decoder_actions = Vec::new();
+    let mut spatial_keeps = Vec::new();
+    let mut rollout_reward_targets = Vec::new();
+    let mut rollout_continuation_targets = Vec::new();
 
     for time in 0..length {
         let action = graph.input(
             &format!("previous_action_{time}"),
             &[batch, config.action_count],
         );
+        actions.push(action);
         let keep_deter = graph.input(&format!("keep_deter_{time}"), &[batch, size.deter]);
         let keep_stoch = graph.input(
             &format!("keep_stoch_{time}"),
@@ -202,13 +515,27 @@ fn build_training_graph_grouped(
             &format!("keep_action_{time}"),
             &[batch, config.action_count],
         );
-        let hard_sample = graph.input(
-            &format!("posterior_sample_{time}"),
-            &[batch * size.stoch, size.classes],
-        );
+        if config.rgb_spatial_decoder {
+            spatial_keeps.push(graph.mean_inner(keep_action));
+        }
         let masked_deter = graph.mul(deter, keep_deter);
         let masked_stoch = graph.mul(stoch, keep_stoch);
         let masked_action = graph.mul(action, keep_action);
+        if config.rgb_spatial_action {
+            decoder_actions.push(masked_action);
+        }
+        if model.exploration.is_some() {
+            exploration_states.push(feature(
+                &mut graph,
+                masked_deter,
+                masked_stoch,
+                batch,
+                config,
+            ));
+            exploration_actions.push(masked_action);
+            let keep = graph.sum_inner(keep_action);
+            exploration_weights.push(graph.scale(keep, 1.0 / config.action_count as f32));
+        }
         deter = model.dynamics.core.forward(
             &mut graph,
             masked_deter,
@@ -217,56 +544,210 @@ fn build_training_graph_grouped(
             batch,
         );
         let prior_logits = model.dynamics.prior.forward(&mut graph, deter, batch);
+        if pixel_loss.fixed_teacher() {
+            // The predictive core above conditions on the preceding frozen-filter
+            // state. Current observations/readouts use the fixed current state.
+            deter = graph.input(&format!("fixed_teacher_deter_{time}"), &[batch, size.deter]);
+        }
+        if pixel_loss.predictive() {
+            let (first, first_log_probability) = predictive_world::state(
+                &mut graph,
+                config,
+                deter,
+                prior_logits,
+                time,
+                "predictive",
+                pixel_loss.score_function(),
+            );
+            let (second, second_log_probability) = predictive_world::state(
+                &mut graph,
+                config,
+                deter,
+                prior_logits,
+                time,
+                "predictive_second",
+                pixel_loss.score_function(),
+            );
+            predictive_states.push(first);
+            predictive_second_states.push(second);
+            if let Some(first) = first_log_probability {
+                predictive_log_probabilities.push([first, second_log_probability.unwrap()]);
+            }
+            predictive_keeps.push(keep_action);
+        }
+        if config.prior_continuation_scale.is_some()
+            || config.prior_reward_scale.is_some()
+            || pixel_loss.clean_prior()
+        {
+            prior_states.push(prior_continuation::state(
+                &mut graph,
+                config,
+                deter,
+                prior_logits,
+                time,
+                if pixel_loss.clean_prior() {
+                    "clean_prior"
+                } else if config.prior_reward_scale.is_some() {
+                    "prior_reward"
+                } else {
+                    "prior_continuation"
+                },
+            ));
+        }
         let posterior_logits =
             model
                 .representation
                 .posterior
                 .forward(&mut graph, deter, encodings[time], batch);
-        let probabilities = mixed_probabilities(
-            &mut graph,
-            posterior_logits,
-            batch * size.stoch,
-            size.classes,
-            config.unimix,
-        );
-        stoch = straight_through_sample(&mut graph, hard_sample, probabilities);
+        if pixel_loss.latent_overshooting() {
+            posterior_targets.push(posterior_logits);
+        }
+        stoch = if config.world_mean_latents {
+            assert!(sample_posterior && !behavior);
+            mixed_probabilities(
+                &mut graph,
+                posterior_logits,
+                batch * size.stoch,
+                size.classes,
+                config.unimix,
+            )
+        } else if config.world_gaussian {
+            assert!(sample_posterior);
+            let noise = graph.input(
+                &format!("uniforms_{time}"),
+                &[batch * size.stoch, size.classes],
+            );
+            super::gaussian::sample(
+                &mut graph,
+                posterior_logits,
+                noise,
+                batch * size.stoch,
+                size.classes,
+            )
+        } else {
+            let hard_sample = if pixel_loss.fixed_teacher() {
+                graph.input(
+                    &format!("fixed_teacher_stoch_{time}"),
+                    &[batch * size.stoch, size.classes],
+                )
+            } else if sample_posterior {
+                let uniforms = graph.input(
+                    &format!("uniforms_{time}"),
+                    &[batch * size.stoch, size.classes],
+                );
+                let sampled = gumbel_sample(
+                    &mut graph,
+                    posterior_logits,
+                    uniforms,
+                    batch * size.stoch,
+                    size.classes,
+                    config.unimix,
+                );
+                graph.stop_gradient(sampled)
+            } else {
+                graph.input(
+                    &format!("posterior_sample_{time}"),
+                    &[batch * size.stoch, size.classes],
+                )
+            };
+            let probabilities = mixed_probabilities(
+                &mut graph,
+                posterior_logits,
+                batch * size.stoch,
+                size.classes,
+                config.unimix,
+            );
+            straight_through_sample(&mut graph, hard_sample, probabilities)
+        };
+        deters.push(deter);
+        stochs.push(stoch);
+        if model.exploration.is_some() {
+            exploration_targets.push(encodings[time]);
+        }
 
         let state = feature(&mut graph, deter, stoch, batch, config);
         head_inputs.push(HeadInputs {
-            observation: observations[time],
+            observation: if config.is_cdp() {
+                encodings[time]
+            } else {
+                observations[time]
+            },
             deter,
             state,
             keep_action,
         });
 
-        let dynamics_kl = categorical_kl(
-            &mut graph,
-            posterior_logits,
-            prior_logits,
-            batch,
-            size.stoch,
-            size.classes,
-            config.unimix,
-            true,
-            false,
-            config.dynamics_free_nats(),
-        );
+        let dynamics_kl = if config.world_gaussian {
+            super::gaussian::kl(
+                &mut graph,
+                posterior_logits,
+                prior_logits,
+                batch,
+                size.stoch,
+                size.classes,
+                true,
+                false,
+                config.dynamics_free_nats(),
+            )
+        } else {
+            categorical_kl(
+                &mut graph,
+                posterior_logits,
+                prior_logits,
+                batch,
+                size.stoch,
+                size.classes,
+                config.unimix,
+                true,
+                false,
+                config.dynamics_free_nats(),
+            )
+        };
         dynamics_losses.push(dynamics_kl.loss);
         raw_kl_metrics.push(dynamics_kl.raw);
-        let representation_kl = categorical_kl(
-            &mut graph,
-            posterior_logits,
-            prior_logits,
-            batch,
-            size.stoch,
-            size.classes,
-            config.unimix,
-            false,
-            true,
-            config.free_nats,
-        );
+        let representation_kl = if config.world_gaussian {
+            super::gaussian::kl(
+                &mut graph,
+                posterior_logits,
+                prior_logits,
+                batch,
+                size.stoch,
+                size.classes,
+                false,
+                true,
+                config.free_nats,
+            )
+        } else {
+            categorical_kl(
+                &mut graph,
+                posterior_logits,
+                prior_logits,
+                batch,
+                size.stoch,
+                size.classes,
+                config.unimix,
+                false,
+                true,
+                config.free_nats,
+            )
+        };
         representation_losses.push(representation_kl.loss);
     }
+
+    let exploration_loss = if let Some(ensemble) = &model.exploration {
+        let state = stack_time(&mut graph, &exploration_states, batch, config.feature_dim());
+        let action = stack_time(&mut graph, &exploration_actions, batch, config.action_count);
+        let target = stack_time(
+            &mut graph,
+            &exploration_targets,
+            batch,
+            config.encoded_observation_dim(),
+        );
+        let weight = stack_time(&mut graph, &exploration_weights, batch, 1);
+        ensemble.loss(&mut graph, state, action, target, weight)
+    } else {
+        graph.scalar(0.0)
+    };
 
     for (group, chunk) in head_inputs.chunks(time_batch_length).enumerate() {
         let rows = batch * chunk.len();
@@ -276,77 +757,436 @@ fn build_training_graph_grouped(
             state,
             keep_action,
         } = HeadInputs::stack(&mut graph, chunk, config);
+        let state = if pixel_loss.clean_prior() {
+            let start = group * time_batch_length;
+            stack_time(
+                &mut graph,
+                &prior_states[start..start + chunk.len()],
+                batch,
+                config.feature_dim(),
+            )
+        } else {
+            state
+        };
         let mut target = |name, width| {
             let inputs = (group * time_batch_length..(group + 1) * time_batch_length)
                 .map(|time| graph.input(&format!("{name}_{time}"), &[batch, width]))
                 .collect::<Vec<_>>();
+            if pixel_loss.rollout_events() || pixel_loss.fixed_teacher_events() {
+                if name == "reward_target" {
+                    rollout_reward_targets.extend_from_slice(&inputs);
+                }
+                if name == "continuation_target" {
+                    rollout_continuation_targets.extend_from_slice(&inputs);
+                }
+            }
             stack_time(&mut graph, &inputs, batch, width)
         };
         let reward_target = target("reward_target", config.value_bins);
         let continuation_target = target("continuation_target", 1);
-        let replay_value_target = target("replay_value_target", config.value_bins);
-        let replay_slow_target = target("replay_slow_target", config.value_bins);
-        let replay_value_weight = target("replay_value_weight", 1);
+        let replay_targets = behavior.then(|| {
+            (
+                target("replay_value_target", config.value_bins),
+                target("replay_slow_target", config.value_bins),
+                target("replay_value_weight", 1),
+            )
+        });
+        let initial_targets = config.actor_critic_gradient.then(|| {
+            (
+                target("initial_action_target", config.action_count),
+                target("initial_weight", 1),
+                target("initial_value_target", config.value_bins),
+                target("initial_slow_target", config.value_bins),
+            )
+        });
+        let expert_target = config
+            .expert_world_gradient()
+            .then(|| target("expert_action_target", config.action_count));
+        let predictive_targets = pixel_loss.predictive().then(|| predictive_world::Uniforms {
+            reward: [
+                target("predictive_reward_uniforms0", config.value_bins),
+                target("predictive_reward_uniforms1", config.value_bins),
+            ],
+            continuation: [
+                target("predictive_continuation_uniforms0", 2),
+                target("predictive_continuation_uniforms1", 2),
+            ],
+            reward_target: target("predictive_reward_sample", 1),
+            continuation_target: target("predictive_continuation_sample", 1),
+        });
         let reward_weight = graph.constant(vec![1.0; rows], &[rows, 1]);
+
+        if let (Some(head), Some(settings)) = (&centroid_head, &config.color_centroid_supervision) {
+            let start = group * time_batch_length;
+            let pixels = stack_time(
+                &mut graph,
+                &observations[start..start + chunk.len()],
+                batch,
+                config.observation_dim(),
+            );
+            let prediction = head.forward(&mut graph, state);
+            let (loss, valid) = color_centroid::loss(
+                &mut graph,
+                settings,
+                pixels,
+                prediction,
+                rows,
+                config.observation_grid(),
+            );
+            centroid_losses.push(loss);
+            centroid_valid.push(valid);
+        }
 
         if let Some(predictor) = &model.future_predictor {
             // Each row uses deter_t, before posterior_t consumes observation_t.
             let prediction = predictor.forward(&mut graph, deter, rows);
-            let prediction = graph.reshape(prediction, &[rows, config.observation_dim()]);
+            let prediction = graph.reshape(prediction, &[rows, config.prediction_dim()]);
             let target = graph.stop_gradient(observation);
-            let negative_target = graph.neg(target);
-            let residual = graph.add(prediction, negative_target);
-            let squared = graph.mul(residual, residual);
-            let per_row = graph.sum_inner(squared);
-            // Reset observations have no preceding action-conditioned state.
-            // Keep valid sequence/microbatch boundaries and normalize over B*T.
-            let keep = graph.sum_inner(keep_action);
-            let normalization =
-                graph.constant(vec![1.0 / config.action_count as f32; rows], &[rows, 1]);
-            let keep = graph.mul(keep, normalization);
-            let masked = graph.mul(per_row, keep);
-            future_prediction_losses.push(graph.mean_all(masked));
+            let per_row = if config.is_cdp() {
+                // Upstream CDP includes episode starts, predicting their
+                // embeddings from the reset recurrent state (without pixels).
+                let (prediction, target) = if let Some(center) = cdp_center {
+                    (
+                        graph.bias_add(prediction, center),
+                        graph.bias_add(target, center),
+                    )
+                } else {
+                    (prediction, target)
+                };
+                cdp::cosine_distance(&mut graph, prediction, target)
+            } else {
+                let target = standardized_target(
+                    &mut graph,
+                    target,
+                    config.future_target_standardization.as_ref(),
+                );
+                let negative_target = graph.neg(target);
+                let residual = graph.add(prediction, negative_target);
+                let squared = graph.mul(residual, residual);
+                let per_row = graph.sum_inner(squared);
+                // Reset observations have no preceding action-conditioned state.
+                let keep = graph.sum_inner(keep_action);
+                let normalization =
+                    graph.constant(vec![1.0 / config.action_count as f32; rows], &[rows, 1]);
+                let keep = graph.mul(keep, normalization);
+                graph.mul(per_row, keep)
+            };
+            future_prediction_losses.push(graph.mean_all(per_row));
         }
+        let mut decoded_event_image = None;
         if let Some(decoder) = &model.decoder {
-            let reconstruction = decoder.forward(&mut graph, state, rows);
-            let reconstruction = graph.reshape(reconstruction, &[rows, config.observation_dim()]);
-            let negative_target = graph.neg(observation);
-            let residual = graph.add(reconstruction, negative_target);
-            let squared = graph.mul(residual, residual);
+            // CDP heads target embeddings; the auxiliary decoder targets pixels.
+            let observation = if config.is_cdp() {
+                let start = group * time_batch_length;
+                stack_time(
+                    &mut graph,
+                    &observations[start..start + chunk.len()],
+                    batch,
+                    config.observation_dim(),
+                )
+            } else {
+                observation
+            };
+            let squared = if pixel_loss != PixelLoss::SquaredError {
+                let loss = if config.rgb_spatial_decoder {
+                    let start = group * time_batch_length;
+                    let histories = (start..start + chunk.len())
+                        .map(|t| match config.rgb_context_lag {
+                            Some(lag) => super::spatial_history::context(
+                                &mut graph,
+                                &observations,
+                                &spatial_keeps,
+                                t,
+                                lag,
+                                batch,
+                                config.observation_dim(),
+                            ),
+                            None => super::spatial_history::before(
+                                &mut graph,
+                                &observations,
+                                &spatial_keeps,
+                                t,
+                                batch,
+                                config.observation_dim(),
+                            ),
+                        })
+                        .collect::<Vec<_>>();
+                    let history =
+                        stack_time(&mut graph, &histories, batch, 2 * config.observation_dim());
+                    let action = config.rgb_spatial_action.then(|| {
+                        stack_time(
+                            &mut graph,
+                            &decoder_actions[start..start + chunk.len()],
+                            batch,
+                            config.action_count,
+                        )
+                    });
+                    let logits = decoder
+                        .logits_with_action_history(&mut graph, state, history, action, rows);
+                    if config.rgb_event_heads {
+                        decoded_event_image =
+                            Some(super::networks::centered_pixels(&mut graph, logits));
+                    }
+                    super::networks::pixel_cross_entropy(&mut graph, logits, observation)
+                } else {
+                    decoder.cross_entropy(&mut graph, state, observation, rows)
+                };
+                if pixel_loss.motion_attention() {
+                    let start = group * time_batch_length;
+                    let previous = (start..start + chunk.len())
+                        .map(|t| observations[t.saturating_sub(1)])
+                        .collect::<Vec<_>>();
+                    let previous =
+                        stack_time(&mut graph, &previous, batch, config.observation_dim());
+                    let keep = graph.mean_inner(keep_action);
+                    let mut weights = super::networks::pixel_motion_weights(
+                        &mut graph,
+                        observation,
+                        previous,
+                        keep,
+                    );
+                    if let Some(settings) = &config.rgb_color_attention {
+                        weights = color_centroid::attention(
+                            &mut graph,
+                            settings,
+                            observation,
+                            weights,
+                            rows,
+                            config.observation_grid(),
+                        );
+                    }
+                    graph.mul(loss, weights)
+                } else {
+                    loss
+                }
+            } else {
+                let reconstruction = decoder.forward(&mut graph, state, rows);
+                let reconstruction =
+                    graph.reshape(reconstruction, &[rows, config.observation_dim()]);
+                let target = graph.stop_gradient(observation);
+                let target = standardized_target(
+                    &mut graph,
+                    target,
+                    config.reconstruction_target_standardization.as_ref(),
+                );
+                let negative_target = graph.neg(target);
+                let residual = graph.add(reconstruction, negative_target);
+                graph.mul(residual, residual)
+            };
+            let squared = if pixel_loss.clean_prior() {
+                let keep = graph.mean_inner(keep_action);
+                let keep = graph.stop_gradient(keep);
+                let keep = graph.broadcast_inner(keep, config.observation_dim());
+                graph.mul(squared, keep)
+            } else {
+                squared
+            };
             let reconstruction_loss = graph.sum_all(squared);
             // Sum event dimensions and average B*T, as in the D3 control.
             reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / rows as f32));
         }
 
-        let (reward, continuation) = model.heads.forward(&mut graph, state);
+        let event_state = if config.rgb_event_heads {
+            rgb_event_features(
+                &mut graph,
+                &model.representation.encoder,
+                state,
+                decoded_event_image.expect("RGB event heads require decoded posterior RGB"),
+                rows,
+            )
+        } else {
+            state
+        };
+        let reward = model.heads.reward.forward(&mut graph, event_state);
+        let continuation_logits = model.heads.continuation.forward(&mut graph, event_state);
+        let terminal_weight = config
+            .terminal_continuation_weight
+            .filter(|&weight| weight != 1.0);
+        let continuation = if terminal_weight.is_some() || pixel_loss.clean_prior() {
+            continuation_logits
+        } else {
+            graph.sigmoid(continuation_logits)
+        };
         // Keep the reduction explicit because this value is composed into the
         // joint loss and exported as a metric. The fused backend loss stores
         // per-row partials and is only scalar when used as a terminal output.
-        reward_losses.push(weighted_cross_entropy(
-            &mut graph,
-            reward,
-            reward_target,
-            reward_weight,
-        ));
-        continuation_losses.push(mean_binary_cross_entropy(
-            &mut graph,
-            continuation,
-            continuation_target,
-            rows,
-        ));
+        if pixel_loss.clean_prior() {
+            let keep = graph.mean_inner(keep_action);
+            let [reward, continuation] = pixel_rollout::event_losses(
+                &mut graph,
+                reward,
+                continuation,
+                reward_target,
+                continuation_target,
+                keep,
+            );
+            reward_losses.push(reward);
+            continuation_losses.push(continuation);
+        } else {
+            reward_losses.push(weighted_cross_entropy(
+                &mut graph,
+                reward,
+                reward_target,
+                reward_weight,
+            ));
+            continuation_losses.push(match terminal_weight {
+                Some(weight) => terminal_continuation::loss(
+                    &mut graph,
+                    continuation,
+                    continuation_target,
+                    rows,
+                    config.continuation_discount(),
+                    weight,
+                ),
+                None => {
+                    mean_binary_cross_entropy(&mut graph, continuation, continuation_target, rows)
+                }
+            });
+        }
+        if pixel_loss.predictive() {
+            let start = group * time_batch_length;
+            let prior = stack_time(
+                &mut graph,
+                &predictive_states[start..start + chunk.len()],
+                batch,
+                config.feature_dim(),
+            );
+            let previous = (start..start + chunk.len())
+                .map(|time| observations[time.saturating_sub(1)])
+                .collect::<Vec<_>>();
+            let previous = stack_time(&mut graph, &previous, batch, config.observation_dim());
+            let before_previous = (start..start + chunk.len())
+                .map(|time| observations[time.saturating_sub(2)])
+                .collect::<Vec<_>>();
+            let before_previous = stack_time(
+                &mut graph,
+                &before_previous,
+                batch,
+                config.observation_dim(),
+            );
+            let past_keep = (start..start + chunk.len())
+                .map(|time| predictive_keeps[time.saturating_sub(1)])
+                .collect::<Vec<_>>();
+            let past_keep = stack_time(&mut graph, &past_keep, batch, config.action_count);
+            let second = stack_time(
+                &mut graph,
+                &predictive_second_states[start..start + chunk.len()],
+                batch,
+                config.feature_dim(),
+            );
+            let log_probabilities = pixel_loss.score_function().then(|| {
+                [0, 1].map(|sample| {
+                    let nodes = predictive_log_probabilities[start..start + chunk.len()]
+                        .iter()
+                        .map(|pair| pair[sample])
+                        .collect::<Vec<_>>();
+                    stack_time(&mut graph, &nodes, batch, 1)
+                })
+            });
+            predictive_losses.push(predictive_world::losses(
+                &mut graph,
+                config,
+                &model,
+                [prior, second],
+                log_probabilities,
+                observation,
+                previous,
+                before_previous,
+                past_keep,
+                keep_action,
+                predictive_targets.unwrap(),
+                rows,
+            ));
+        }
+        if config.prior_continuation_scale.is_some() || config.prior_reward_scale.is_some() {
+            let start = group * time_batch_length;
+            let prior = stack_time(
+                &mut graph,
+                &prior_states[start..start + chunk.len()],
+                batch,
+                config.feature_dim(),
+            );
+            let keep = graph.sum_inner(keep_action);
+            let keep = graph.scale(keep, 1.0 / config.action_count as f32);
+            if config.prior_reward_scale.is_some() {
+                let logits = model.heads.reward.forward(&mut graph, prior);
+                prior_reward_losses.push(weighted_cross_entropy(
+                    &mut graph,
+                    logits,
+                    reward_target,
+                    keep,
+                ));
+                prior_reward_valid.push(graph.mean_all(keep));
+            } else {
+                let logits = model.heads.continuation.forward(&mut graph, prior);
+                prior_continuation_losses.push(prior_continuation::loss(
+                    &mut graph,
+                    logits,
+                    continuation_target,
+                    keep,
+                ));
+                prior_continuation_valid.push(graph.mean_all(keep));
+            }
+        }
         let replay_value_state = if config.replay_value_gradient {
             state
         } else {
             graph.stop_gradient(state)
         };
-        let value = model
-            .replay_value
-            .forward_frozen(&mut graph, replay_value_state);
-        let value_target =
-            weighted_cross_entropy(&mut graph, value, replay_value_target, replay_value_weight);
-        let slow_target =
-            weighted_cross_entropy(&mut graph, value, replay_slow_target, replay_value_weight);
-        replay_value_losses.push(graph.add(value_target, slow_target));
+        if let Some((replay_value_target, replay_slow_target, replay_value_weight)) = replay_targets
+        {
+            let value = model
+                .replay_value
+                .as_ref()
+                .unwrap()
+                .forward_frozen(&mut graph, replay_value_state);
+            let value_target =
+                weighted_cross_entropy(&mut graph, value, replay_value_target, replay_value_weight);
+            let slow_target =
+                weighted_cross_entropy(&mut graph, value, replay_slow_target, replay_value_weight);
+            replay_value_losses.push(graph.add(value_target, slow_target));
+        }
+        if let (Some(actor), Some((action_target, weight, value_target, slow_target))) =
+            (&model.actor, initial_targets)
+        {
+            // Same stopped targets and frozen heads as behavior training. Only
+            // imagination t=0 is a posterior state; later states are detached.
+            let logits = actor.forward_frozen(&mut graph, state);
+            let (policy, _, _) =
+                behavior::policy_loss(&mut graph, config, logits, action_target, weight, rows);
+            let value = model
+                .replay_value
+                .as_ref()
+                .unwrap()
+                .forward_frozen(&mut graph, state);
+            initial_policy_losses.push(policy);
+            initial_value_losses.push(behavior::value_loss(
+                &mut graph,
+                value,
+                value_target,
+                slow_target,
+                weight,
+            ));
+        }
+        if let Some(target) = expert_target {
+            let logits = model
+                .actor
+                .as_ref()
+                .unwrap()
+                .forward_frozen(&mut graph, state);
+            let log_probabilities = mixed_log_probabilities(
+                &mut graph,
+                logits,
+                rows,
+                config.action_count,
+                config.actor_unimix,
+            );
+            expert_losses.push(behavior::action_cross_entropy(
+                &mut graph,
+                log_probabilities,
+                target,
+            ));
+        }
     }
 
     let average = 1.0 / length as f32;
@@ -365,12 +1205,12 @@ fn build_training_graph_grouped(
     let reward = scale(&mut graph, reward, head_average);
     let continuation = sum(&mut graph, &continuation_losses);
     let continuation = scale(&mut graph, continuation, head_average);
-    let replay_value = sum(&mut graph, &replay_value_losses);
+    let replay_value = sum_or_zero(&mut graph, &replay_value_losses);
     let replay_value = scale(&mut graph, replay_value, head_average);
 
     let scales = config.loss_scales;
     let weighted = [
-        scale(&mut graph, reconstruction, scales.reconstruction),
+        scale(&mut graph, reconstruction, config.pixel_scale()),
         scale(&mut graph, future_prediction, scales.future_prediction),
         scale(&mut graph, dynamics, scales.dynamics),
         scale(&mut graph, representation, scales.representation),
@@ -379,7 +1219,269 @@ fn build_training_graph_grouped(
         scale(&mut graph, replay_value, scales.replay_value),
     ];
     let total = sum(&mut graph, &weighted);
-    graph.set_outputs(vec![
+    let total = if model.exploration.is_some() {
+        graph.add(total, exploration_loss)
+    } else {
+        total
+    };
+    let mut initial_losses = None;
+    let actor_scale = (config.actor_critic_gradient || config.expert_world_gradient())
+        .then(|| graph.input("actor_update_scale", &[1]));
+    let total = if config.actor_critic_gradient {
+        // Upstream averages over H imagined losses. The other H-1 states
+        // contribute behavior gradients but no world/encoder gradients.
+        let average = head_average / config.imagination_length as f32;
+        let policy = sum(&mut graph, &initial_policy_losses);
+        let policy = scale(&mut graph, policy, average);
+        let value = sum(&mut graph, &initial_value_losses);
+        let value = scale(&mut graph, value, average);
+        initial_losses = Some((policy, value));
+        let policy = scale(&mut graph, policy, scales.policy);
+        let policy = graph.mul(policy, actor_scale.unwrap());
+        let value = scale(&mut graph, value, scales.value);
+        sum(&mut graph, &[total, policy, value])
+    } else {
+        total
+    };
+    let total = if config.video_encoder.is_some() {
+        let regularizer = scale(
+            &mut graph,
+            encoder_regularization,
+            joint::REGULARIZATION_WEIGHT,
+        );
+        graph.add(total, regularizer)
+    } else {
+        total
+    };
+    let expert_loss = config.expert_world_gradient().then(|| {
+        let loss = sum(&mut graph, &expert_losses);
+        scale(&mut graph, loss, head_average)
+    });
+    let total = if let Some(loss) = expert_loss {
+        let scaled = behavior::scale_expert_loss(
+            &mut graph,
+            loss,
+            config.expert_imitation.as_ref().unwrap(),
+        );
+        let scaled = graph.mul(scaled, actor_scale.unwrap());
+        graph.add(total, scaled)
+    } else {
+        total
+    };
+    let open_loop = config.open_loop_supervision.as_ref().map(|rollout| {
+        assert!(rollout.horizon < length);
+        open_loop::build(
+            &mut graph, config, &model, deters[0], stochs[0], &actions, &encodings, cdp_center,
+        )
+    });
+    let total = if let Some(losses) = &open_loop {
+        graph.add(total, losses.outputs[0])
+    } else {
+        total
+    };
+    let centroid = config.color_centroid_supervision.as_ref().map(|settings| {
+        let loss = sum(&mut graph, &centroid_losses);
+        let loss = graph.scale(loss, head_average);
+        let valid = sum(&mut graph, &centroid_valid);
+        let valid = graph.scale(valid, head_average);
+        (graph.scale(loss, settings.scale), loss, valid)
+    });
+    let total = if let Some((scaled, _, _)) = centroid {
+        graph.add(total, scaled)
+    } else {
+        total
+    };
+    let prior_continuation = config.prior_continuation_scale.map(|scale| {
+        let loss = sum(&mut graph, &prior_continuation_losses);
+        let loss = graph.scale(loss, head_average);
+        let valid = sum(&mut graph, &prior_continuation_valid);
+        let valid = graph.scale(valid, head_average);
+        (graph.scale(loss, scale), loss, valid)
+    });
+    let total = if let Some((scaled, _, _)) = prior_continuation {
+        graph.add(total, scaled)
+    } else {
+        total
+    };
+    let prior_reward = config.prior_reward_scale.map(|scale| {
+        let loss = sum(&mut graph, &prior_reward_losses);
+        let loss = graph.scale(loss, head_average);
+        let valid = sum(&mut graph, &prior_reward_valid);
+        let valid = graph.scale(valid, head_average);
+        (graph.scale(loss, scale), loss, valid)
+    });
+    let total = if let Some((scaled, _, _)) = prior_reward {
+        graph.add(total, scaled)
+    } else {
+        total
+    };
+    let pixel_rollout = (prediction_length > 0
+        && !pixel_loss.latent_overshooting()
+        && !pixel_loss.recurrent_energy())
+    .then(|| {
+        assert!(config.trains_pixels());
+        assert!(
+            !behavior
+                || matches!(
+                    pixel_loss,
+                    PixelLoss::SquaredError | PixelLoss::MotionCrossEntropy
+                ),
+            "whole agents supervise prior images with plain pixel objectives only"
+        );
+        assert!(prediction_length < length);
+        let start = length - prediction_length;
+        let history = config.rgb_spatial_decoder.then(|| {
+            if config.rgb_context_lag.is_some() {
+                super::spatial_history::fixed(
+                    &mut graph,
+                    observations[start - 1],
+                    batch,
+                    config.observation_dim(),
+                )
+            } else {
+                super::spatial_history::after(
+                    &mut graph,
+                    &observations,
+                    &spatial_keeps,
+                    start - 1,
+                    batch,
+                    config.observation_dim(),
+                )
+            }
+        });
+        if pixel_loss == PixelLoss::MotionPosteriorHistory {
+            let states = (start..length)
+                .map(|t| feature(&mut graph, deters[t], stochs[t], batch, config))
+                .collect::<Vec<_>>();
+            return posterior_history::build(
+                &mut graph,
+                config,
+                &model,
+                posterior_history::Sequence {
+                    posterior: &states,
+                    actions: &actions[start..],
+                    observations: &observations[start - 1..],
+                    keeps: &spatial_keeps[start..],
+                    history: history.unwrap(),
+                },
+            );
+        }
+        pixel_rollout::build_with_centroid(
+            &mut graph,
+            config,
+            &model,
+            (deters[start - 1], stochs[start - 1]),
+            &actions[start..],
+            &observations[start - 1..],
+            pixel_loss,
+            history,
+            pixel_loss
+                .rollout_events()
+                .then(|| pixel_rollout::EventTargets {
+                    reward: &rollout_reward_targets[start..],
+                    continuation: &rollout_continuation_targets[start..],
+                }),
+            centroid_head.as_ref(),
+        )
+    });
+    let total = if let Some(rollout) = &pixel_rollout {
+        let weighted = graph.scale(rollout.loss, config.pixel_scale());
+        let mut total = graph.add(total, weighted);
+        if let Some([reward, continuation]) = rollout.events {
+            let reward = graph.scale(reward, config.loss_scales.reward);
+            let continuation = graph.scale(continuation, config.loss_scales.continuation);
+            total = graph.add(total, reward);
+            total = graph.add(total, continuation);
+        }
+        if let Some(survival) = rollout.survival {
+            let scaled = graph.scale(survival, config.world_survival_scale.unwrap());
+            total = graph.add(total, scaled);
+        }
+        if let Some([centroid, _]) = rollout.centroid {
+            let scaled = graph.scale(
+                centroid,
+                config.color_centroid_supervision.as_ref().unwrap().scale,
+            );
+            total = graph.add(total, scaled);
+        }
+        total
+    } else {
+        total
+    };
+    let latent_rollout = pixel_loss.latent_overshooting().then(|| {
+        assert!(prediction_length < length);
+        let start = length - prediction_length;
+        latent_rollout::build(
+            &mut graph,
+            config,
+            &model,
+            (deters[start - 1], stochs[start - 1]),
+            &actions[start..],
+            &posterior_targets[start..],
+        )
+    });
+    let total = if let Some(rollout) = &latent_rollout {
+        let weighted = graph.scale(rollout.loss, config.loss_scales.dynamics);
+        graph.add(total, weighted)
+    } else {
+        total
+    };
+    let recurrent_rollout = pixel_loss.recurrent_energy().then(|| {
+        assert!(prediction_length < length);
+        let start = length - prediction_length;
+        let initial = (deters[start - 1], stochs[start - 1]);
+        if pixel_loss.fixed_teacher_events() {
+            return recurrent_rollout::build_with_events(
+                &mut graph,
+                config,
+                &model,
+                initial,
+                &actions[start..],
+                &deters[start..],
+                "fixed_teacher_recurrent_weight",
+                Some(pixel_rollout::EventTargets {
+                    reward: &rollout_reward_targets[start..],
+                    continuation: &rollout_continuation_targets[start..],
+                }),
+            );
+        }
+        recurrent_rollout::build(
+            &mut graph,
+            config,
+            &model,
+            initial,
+            &actions[start..],
+            &deters[start..],
+            if pixel_loss.fixed_teacher() {
+                "fixed_teacher_recurrent_weight"
+            } else {
+                "pixel_rollout_weight"
+            },
+        )
+    });
+    let total = if let Some(losses) = &recurrent_rollout {
+        let weighted = graph.scale(losses.energy, config.loss_scales.reconstruction);
+        let mut total = graph.add(total, weighted);
+        if let Some([reward, continuation]) = losses.events {
+            let reward = graph.scale(reward, config.loss_scales.reward);
+            let continuation = graph.scale(continuation, config.loss_scales.continuation);
+            total = graph.add(total, reward);
+            total = graph.add(total, continuation);
+        }
+        total
+    } else {
+        total
+    };
+    let predictive = pixel_loss
+        .predictive()
+        .then(|| predictive_world::average(&mut graph, &predictive_losses));
+    let total = if let Some(losses) = &predictive {
+        let scaled = losses.scaled(&mut graph, config);
+        graph.add(total, scaled)
+    } else {
+        total
+    };
+    let mut outputs = vec![
         total,
         reconstruction,
         dynamics,
@@ -389,7 +1491,129 @@ fn build_training_graph_grouped(
         replay_value,
         raw_kl,
         future_prediction,
-    ]);
+    ];
+    if config.video_encoder.is_some() || config.actor_critic_gradient || config.uses_disagreement()
+    {
+        outputs.extend([encoder_regularization, encoder_spread]);
+    }
+    if let Some((policy, value)) = initial_losses {
+        outputs.extend([policy, value]);
+    } else if config.uses_disagreement() {
+        outputs.extend([graph.scalar(0.0), graph.scalar(0.0)]);
+    }
+    if config.uses_disagreement() {
+        outputs.push(exploration_loss);
+    }
+    if let Some(loss) = expert_loss {
+        while outputs.len() < LOSS_EXPERT {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.push(loss);
+    }
+    if let Some(losses) = open_loop {
+        while outputs.len() < LOSS_OPEN_LOOP {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend(losses.outputs);
+    }
+    if let Some((_, loss, valid)) = centroid {
+        while outputs.len() < LOSS_COLOR_CENTROID {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([loss, valid]);
+    }
+    if let Some((_, loss, valid)) = prior_continuation {
+        while outputs.len() < LOSS_PRIOR_CONTINUATION {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([loss, valid]);
+    }
+    if let Some((_, loss, valid)) = prior_reward {
+        while outputs.len() < LOSS_PRIOR_REWARD {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([loss, valid]);
+    }
+    if let Some(rollout) = pixel_rollout {
+        while outputs.len() < LOSS_WORLD_ROLLOUT {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.push(rollout.loss);
+        if let Some(events) = rollout.events {
+            while outputs.len() < LOSS_IMAGE_FEEDBACK {
+                outputs.push(graph.scalar(0.0));
+            }
+            outputs.extend(events);
+        }
+        if let Some(survival) = rollout.survival {
+            while outputs.len() < LOSS_WORLD_SURVIVAL {
+                outputs.push(graph.scalar(0.0));
+            }
+            outputs.push(survival);
+        }
+        if let Some(centroid) = rollout.centroid {
+            while outputs.len() < LOSS_WORLD_CENTROID {
+                outputs.push(graph.scalar(0.0));
+            }
+            outputs.extend(centroid);
+        }
+    }
+    if let Some(rollout) = latent_rollout {
+        while outputs.len() < LOSS_WORLD_ROLLOUT {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.push(rollout.loss);
+    }
+    if let Some(losses) = predictive {
+        while outputs.len() < LOSS_PREDICTIVE_WORLD {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([
+            losses.energy,
+            losses.target_distance,
+            losses.sample_distance,
+            losses.valid,
+        ]);
+    }
+    if let Some(losses) = recurrent_rollout {
+        while outputs.len() < LOSS_RECURRENT_WORLD {
+            outputs.push(graph.scalar(0.0));
+        }
+        outputs.extend([
+            losses.energy,
+            losses.target_distance,
+            losses.sample_distance,
+            losses.valid,
+        ]);
+        if let Some(events) = losses.events {
+            assert_eq!(outputs.len(), LOSS_IMAGE_FEEDBACK);
+            outputs.extend(events);
+        }
+    }
+    if pixel_loss.clean_prior() {
+        while outputs.len() < CLEAN_PRIOR_VALID_FRACTION {
+            outputs.push(graph.scalar(0.0));
+        }
+        let keep = stack_time(&mut graph, &spatial_keeps, batch, 1);
+        outputs.push(graph.mean_all(keep));
+    }
+    if sample_posterior {
+        outputs.push(stack_time(&mut graph, &deters, batch, size.deter));
+        outputs.push(stack_time(
+            &mut graph,
+            &stochs,
+            batch,
+            size.stoch * size.classes,
+        ));
+        if let Some(ensemble) = &model.exploration {
+            let state = stack_time(&mut graph, &exploration_states, batch, config.feature_dim());
+            let action = stack_time(&mut graph, &exploration_actions, batch, config.action_count);
+            let weight = stack_time(&mut graph, &exploration_weights, batch, 1);
+            let bonus = ensemble.bonus(&mut graph, state, action);
+            outputs.push(graph.mul(bonus, weight));
+        }
+    }
+    graph.set_outputs(outputs);
     graph
 }
 
@@ -426,7 +1650,7 @@ impl HeadInputs {
             stack_time(graph, &values, config.batch_size, width)
         };
         Self {
-            observation: stack(|step| step.observation, config.observation_dim()),
+            observation: stack(|step| step.observation, config.prediction_dim()),
             deter: stack(|step| step.deter, config.network().deter),
             state: stack(|step| step.state, config.feature_dim()),
             keep_action: stack(|step| step.keep_action, config.action_count),
@@ -493,26 +1717,27 @@ fn sum_or_zero(graph: &mut Graph, values: &[NodeId]) -> NodeId {
 /// Unrolled posterior sampling. CPU draws and sequence inputs are installed
 /// before submission; recurrence and categorical sampling never visit the host.
 pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
+    posterior_graph(config, config.batch_length, false)
+}
+
+/// Recompute the context without targets or gradients, returning its last state.
+pub fn build_replay_prefix_graph(config: &DreamerConfig) -> Graph {
+    assert!(config.replay_context > 1);
+    posterior_graph(config, config.replay_context - 1, true)
+}
+
+fn posterior_graph(config: &DreamerConfig, length: usize, last_only: bool) -> Graph {
     config.validate();
     let batch = config.batch_size;
-    let length = config.batch_length;
     let size = config.network();
     let mut graph = Graph::new();
     let core = RssmCore::new(&mut graph, config);
     let representation = Representation::new(&mut graph, config);
+    let exploration =
+        (!last_only && config.uses_disagreement()).then(|| Disagreement::new(&mut graph, config));
     let mut deter = graph.input("initial_deter", &[batch, size.deter]);
     let mut stoch = graph.input("initial_stoch", &[batch * size.stoch, size.classes]);
-    let observations = (0..length)
-        .map(|time| {
-            graph.input(
-                &format!("observation_{time}"),
-                &[
-                    batch * OBSERVATION_GRID * OBSERVATION_GRID,
-                    OBSERVATION_CHANNELS,
-                ],
-            )
-        })
-        .collect::<Vec<_>>();
+    let observations = replay_observations(&mut graph, config, length);
     let observations = stack_time(&mut graph, &observations, batch, config.observation_dim());
     let encoded = representation
         .encoder
@@ -528,6 +1753,9 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
     );
     let mut deters = Vec::with_capacity(length);
     let mut stochs = Vec::with_capacity(length);
+    let mut exploration_states = Vec::new();
+    let mut exploration_actions = Vec::new();
+    let mut exploration_weights = Vec::new();
     for (time, encoded) in encodings.into_iter().enumerate() {
         let action = graph.input(
             &format!("previous_action_{time}"),
@@ -549,6 +1777,18 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
         let previous_deter = graph.mul(deter, keep_deter);
         let previous_stoch = graph.mul(stoch, keep_stoch);
         let action = graph.mul(action, keep_action);
+        if exploration.is_some() {
+            exploration_states.push(feature(
+                &mut graph,
+                previous_deter,
+                previous_stoch,
+                batch,
+                config,
+            ));
+            exploration_actions.push(action);
+            let keep = graph.sum_inner(keep_action);
+            exploration_weights.push(graph.scale(keep, 1.0 / config.action_count as f32));
+        }
         deter = core.forward(&mut graph, previous_deter, previous_stoch, action, batch);
         let logits = representation
             .posterior
@@ -564,9 +1804,19 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
         deters.push(deter);
         stochs.push(stoch);
     }
-    let deter = stack_time(&mut graph, &deters, batch, size.deter);
-    let stoch = stack_time(&mut graph, &stochs, batch, size.stoch * size.classes);
-    graph.set_outputs(vec![deter, stoch]);
+    if !last_only {
+        deter = stack_time(&mut graph, &deters, batch, size.deter);
+        stoch = stack_time(&mut graph, &stochs, batch, size.stoch * size.classes);
+    }
+    let mut outputs = vec![deter, stoch];
+    if let Some(ensemble) = exploration {
+        let state = stack_time(&mut graph, &exploration_states, batch, config.feature_dim());
+        let action = stack_time(&mut graph, &exploration_actions, batch, config.action_count);
+        let weight = stack_time(&mut graph, &exploration_weights, batch, 1);
+        let bonus = ensemble.bonus(&mut graph, state, action);
+        outputs.push(graph.mul(bonus, weight));
+    }
+    graph.set_outputs(outputs);
     graph
 }
 
@@ -580,14 +1830,7 @@ pub fn build_imagination_graph(config: &DreamerConfig) -> Graph {
     let mut graph = Graph::new();
     let dynamics = Dynamics::new(&mut graph, config);
     let heads = WorldHeads::new(&mut graph, config);
-    let actor = MlpHead::new(
-        &mut graph,
-        "behavior.actor",
-        config.feature_dim(),
-        size.units,
-        3,
-        config.action_count,
-    );
+    let actor = behavior::Actor::new(&mut graph, config);
     let value = MlpHead::new(
         &mut graph,
         "behavior.value",
@@ -640,7 +1883,12 @@ pub fn build_imagination_graph(config: &DreamerConfig) -> Graph {
     let actions = stack_time(&mut graph, &actions, rows, config.action_count);
     let (reward, continuation) = heads.forward(&mut graph, all);
     let values = value.forward(&mut graph, all);
-    graph.set_outputs(vec![imagined, all, actions, reward, continuation, values]);
+    let mut outputs = vec![imagined, all, actions, reward, continuation, values];
+    if config.uses_disagreement() {
+        let ensemble = Disagreement::new(&mut graph, config);
+        outputs.push(ensemble.bonus(&mut graph, imagined, actions));
+    }
+    graph.set_outputs(outputs);
     graph
 }
 
@@ -652,14 +1900,13 @@ pub fn build_observe_graph(config: &DreamerConfig, batch: usize) -> Graph {
     config.validate();
     assert!(batch > 0);
     let size = config.network();
-    let patches = OBSERVATION_GRID * OBSERVATION_GRID;
     let mut graph = Graph::new();
     let dynamics = Dynamics::new(&mut graph, config);
     let representation = Representation::new(&mut graph, config);
     let previous_deter = graph.input("previous_deter", &[batch, size.deter]);
     let previous_stoch = graph.input("previous_stoch", &[batch * size.stoch, size.classes]);
     let previous_action = graph.input("previous_action", &[batch, config.action_count]);
-    let observation = graph.input("observation", &[batch * patches, OBSERVATION_CHANNELS]);
+    let observation = graph.input("observation", &config.observation_shape(batch));
     let keep_deter = graph.input("keep_deter", &[batch, size.deter]);
     let keep_stoch = graph.input("keep_stoch", &[batch * size.stoch, size.classes]);
     let keep_action = graph.input("keep_action", &[batch, config.action_count]);
@@ -674,6 +1921,13 @@ pub fn build_observe_graph(config: &DreamerConfig, batch: usize) -> Graph {
         batch,
     );
     let prior = dynamics.prior.forward(&mut graph, deter, batch);
+    let observation = encoder_observation(
+        &mut graph,
+        config,
+        observation,
+        "previous_observation",
+        batch,
+    );
     let encoded = representation
         .encoder
         .forward(&mut graph, observation, batch);
@@ -681,6 +1935,23 @@ pub fn build_observe_graph(config: &DreamerConfig, batch: usize) -> Graph {
         .posterior
         .forward(&mut graph, deter, encoded, batch);
     graph.set_outputs(vec![deter, posterior, prior, encoded]);
+    graph
+}
+
+/// Re-encode only a model-generated image at the already advanced h.
+/// This graph deliberately has no GRU or future outcome/reset inputs.
+pub(crate) fn build_image_feedback_graph(config: &DreamerConfig, batch: usize) -> Graph {
+    config.validate();
+    assert!(config.world_image_feedback && batch > 0);
+    let mut graph = Graph::new();
+    let representation = Representation::new(&mut graph, config);
+    let deter = graph.input("deter", &[batch, config.network().deter]);
+    let image = graph.input("generated_image", &config.observation_shape(batch));
+    let encoded = representation.encoder.forward(&mut graph, image, batch);
+    let logits = representation
+        .posterior
+        .forward(&mut graph, deter, encoded, batch);
+    graph.set_outputs(vec![logits]);
     graph
 }
 
@@ -705,6 +1976,25 @@ pub fn build_transition_graph(config: &DreamerConfig, batch: usize) -> Graph {
     graph
 }
 
+fn rgb_event_features(
+    graph: &mut Graph,
+    encoder: &super::networks::ObservationEncoder,
+    state: NodeId,
+    image: NodeId,
+    batch: usize,
+) -> NodeId {
+    let encoded = encoder.forward(graph, image, batch);
+    let latent_width = graph.node(state).ty.shape.iter().product::<usize>() / batch;
+    concat_columns(
+        graph,
+        state,
+        encoded,
+        batch,
+        latent_width,
+        encoder.output_dim(),
+    )
+}
+
 /// Reward and continuation predictions for posterior or imagined states.
 pub fn build_head_graph(config: &DreamerConfig, batch: usize) -> Graph {
     head_graph(config, batch, false)
@@ -725,7 +2015,14 @@ fn head_graph(config: &DreamerConfig, batch: usize, expose_state: bool) -> Graph
     let deter = graph.input("deter", &[batch, size.deter]);
     let stoch = graph.input("stoch", &[batch * size.stoch, size.classes]);
     let state = feature(&mut graph, deter, stoch, batch, config);
-    let (reward, continuation) = heads.forward(&mut graph, state);
+    let event_state = if config.rgb_event_heads {
+        let encoder = super::networks::ObservationEncoder::new(&mut graph, config);
+        let image = graph.input("decoded_rgb", &config.observation_shape(batch));
+        rgb_event_features(&mut graph, &encoder, state, image, batch)
+    } else {
+        state
+    };
+    let (reward, continuation) = heads.forward(&mut graph, event_state);
     let mut outputs = vec![reward, continuation];
     if expose_state {
         outputs.push(state);
@@ -747,6 +2044,11 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
         let deter = graph.input("deter", &[batch, size.deter]);
         graph.input("stoch", &[batch * size.stoch, size.classes]);
         let observation = predictor.forward(&mut graph, deter, batch);
+        let observation = raw_prediction(
+            &mut graph,
+            observation,
+            config.future_target_standardization.as_ref(),
+        );
         graph.set_outputs(vec![observation]);
         return graph;
     }
@@ -759,7 +2061,24 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
     let deter = graph.input("deter", &[batch, size.deter]);
     let stoch = graph.input("stoch", &[batch * size.stoch, size.classes]);
     let state = feature(&mut graph, deter, stoch, batch, config);
-    let observation = decoder.forward(&mut graph, state, batch);
+    let observation = if config.rgb_spatial_decoder {
+        let history = graph.input("decoder_history", &[batch, 2 * config.observation_dim()]);
+        if config.rgb_spatial_action {
+            let action = graph.input("decoder_action", &[batch, config.action_count]);
+            let logits =
+                decoder.logits_with_action_history(&mut graph, state, history, Some(action), batch);
+            super::networks::centered_pixels(&mut graph, logits)
+        } else {
+            decoder.forward_with_history(&mut graph, state, history, batch)
+        }
+    } else {
+        decoder.forward(&mut graph, state, batch)
+    };
+    let observation = raw_prediction(
+        &mut graph,
+        observation,
+        config.reconstruction_target_standardization.as_ref(),
+    );
     graph.set_outputs(vec![observation]);
     graph
 }
@@ -772,11 +2091,600 @@ mod tests {
     use super::*;
 
     #[test]
+    fn staged_graph_preserves_parameters_and_exposes_posterior() {
+        for cdp in [false, true] {
+            let mut config = DreamerConfig::tiny(3);
+            config.observation_kind = super::super::config::ObservationKind::Rgb64;
+            if cdp {
+                config.loss_scales.reconstruction = 0.0;
+                config.loss_scales.future_prediction = 1.0;
+                config.cdp_centered = true;
+                config.disagreement_bonus = true;
+                config.intrinsic_reward_scale = 0.1;
+            }
+            let ordinary = build_training_graph(&config, config.batch_length);
+            let staged = build_staged_training_graph(&config);
+            let parameters = |graph: &Graph| {
+                graph
+                    .nodes()
+                    .iter()
+                    .filter_map(|node| {
+                        if let meganeura::graph::Op::Parameter { ref name } = node.op {
+                            Some((name.clone(), node.ty.clone()))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>()
+            };
+            assert_eq!(parameters(&ordinary), parameters(&staged));
+            let count = 2 + usize::from(config.uses_disagreement());
+            assert_eq!(staged.outputs().len(), ordinary.outputs().len() + count);
+            let inputs = staged
+                .nodes()
+                .iter()
+                .filter_map(|node| {
+                    if let meganeura::graph::Op::Input { ref name } = node.op {
+                        Some(name.as_str())
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(
+                inputs
+                    .iter()
+                    .filter(|name| name.starts_with("uniforms_"))
+                    .count(),
+                config.batch_length
+            );
+            assert!(
+                !inputs
+                    .iter()
+                    .any(|name| name.starts_with("posterior_sample_"))
+            );
+            let differentiated = meganeura::autodiff::differentiate(&staged);
+            assert!(differentiated.nodes().len() > staged.nodes().len());
+        }
+    }
+
+    #[test]
+    fn absent_standardization_preserves_graph_nodes() {
+        let config = DreamerConfig::tiny(3);
+        let mut graph = Graph::new();
+        let x = graph.input("x", &[2, config.observation_dim()]);
+        assert_eq!(standardized_target(&mut graph, x, None), x);
+        assert_eq!(raw_prediction(&mut graph, x, None), x);
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; independent full-width target standardization"]
+    fn standardized_targets_match_f64_values_and_gradients() {
+        use super::super::{config::FeatureStandardization, runtime::build_session};
+        let mut config = DreamerConfig::tiny(3);
+        config.loss_scales.future_prediction = 0.25;
+        let width = config.observation_dim();
+        let stats = FeatureStandardization {
+            mean: (0..width).map(|i| 1.0 + (i % 17) as f32 * 0.1).collect(),
+            scale: (0..width).map(|i| 0.03 + (i % 11) as f32 * 0.01).collect(),
+        };
+        config.future_target_standardization = Some(stats.clone());
+        let mut graph = Graph::new();
+        let p = graph.parameter("prediction", &[2, width]);
+        let target = graph.input("target", &[2, width]);
+        let target = graph.stop_gradient(target);
+        let normalized = standardized_target(
+            &mut graph,
+            target,
+            config.future_target_standardization.as_ref(),
+        );
+        let neg = graph.neg(normalized);
+        let delta = graph.add(p, neg);
+        let square = graph.mul(delta, delta);
+        let loss = graph.sum_all(square);
+        let loss = graph.scale(loss, 0.5);
+        let raw = raw_prediction(&mut graph, p, config.future_target_standardization.as_ref());
+        graph.set_outputs(vec![loss, normalized, raw]);
+        let gpu = std::sync::Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let mut session = build_session(&graph, &gpu, meganeura::Mode::Training, false);
+        let memory = session.device_memory_stats().unwrap();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        let predictions = (0..2 * width)
+            .map(|i| (i % 29) as f32 * 0.02 - 0.3)
+            .collect::<Vec<_>>();
+        let targets = (0..2 * width)
+            .map(|i| 1.9 + (i % 37) as f32 / 23.0)
+            .collect::<Vec<_>>();
+        session.set_parameter("prediction", &predictions);
+        session.set_input("target", &targets);
+        session.step();
+        session.wait();
+        let mut normalized = vec![0.0; 2 * width];
+        let mut raw = normalized.clone();
+        let mut gradients = normalized.clone();
+        session.read_output_by_index(1, &mut normalized);
+        session.read_output_by_index(2, &mut raw);
+        session.read_param_grad("prediction", &mut gradients);
+        let mut loss = 0.0_f64;
+        let mut gradient_error = 0.0_f64;
+        let mut gradient_norm = 0.0_f64;
+        for i in 0..2 * width {
+            let mean = f64::from(stats.mean[i % width]);
+            let scale = f64::from(stats.scale[i % width]);
+            let target = (f64::from(targets[i]) - mean) / scale;
+            let p = f64::from(predictions[i]);
+            assert!((f64::from(normalized[i]) - target).abs() < 2e-5);
+            assert!((f64::from(raw[i]) - (p * scale + mean)).abs() < 1e-6);
+            loss += 0.5 * (p - target).powi(2);
+            gradient_error += (f64::from(gradients[i]) - (p - target)).powi(2);
+            gradient_norm += (p - target).powi(2);
+        }
+        assert!((f64::from(session.read_loss()) / loss - 1.0).abs() < 1e-5);
+        assert!((gradient_error / gradient_norm).sqrt() < 3e-6);
+        assert_eq!(session.read_params(&["prediction"])[0], predictions);
+        let memory = session.device_memory_stats().unwrap();
+        assert!(memory.budget_bytes - memory.usage_bytes >= 2 << 30);
+        eprintln!(
+            "standardized full-width F64 values/gradients pass; relative-gradient-L2={}; memory={memory:?}",
+            (gradient_error / gradient_norm).sqrt()
+        );
+    }
+
+    #[test]
+    fn task_losses_reach_every_joint_tiny_parameter_but_not_frozen_tiny() {
+        for mode in [VideoEncoder::Frozen, VideoEncoder::Joint] {
+            let mut config = DreamerConfig::tiny(3);
+            config.batch_size = 1;
+            config.batch_length = 16;
+            config.world_backprop_length = 16;
+            config.video_encoder = Some(mode);
+            config.actor_critic_gradient = true;
+            config.loss_scales.reconstruction = 0.0;
+            config.loss_scales.future_prediction = 0.25;
+            let mut graph = build_training_graph(&config, 16);
+            let losses = graph.outputs().to_vec();
+            // Test task supervision alone, not a regularizer disguising a
+            // detached world/task path. This checks graph connectivity only.
+            for loss in [
+                LOSS_REWARD,
+                LOSS_CONTINUATION,
+                LOSS_REPLAY_VALUE,
+                LOSS_FUTURE_PREDICTION,
+                LOSS_ENCODER_REGULARIZATION,
+                LOSS_INITIAL_POLICY,
+                LOSS_INITIAL_VALUE,
+            ] {
+                graph.set_outputs(vec![losses[loss]]);
+                let backward = meganeura::autodiff::differentiate(&graph);
+                let mut checked = 0;
+                for (parameter, &gradient) in graph
+                    .nodes()
+                    .iter()
+                    .filter(|n| matches!(n.op, meganeura::graph::Op::Parameter { .. }))
+                    .zip(&backward.outputs()[1..])
+                {
+                    if let meganeura::graph::Op::Parameter { ref name } = parameter.op {
+                        let connected = backward.node(gradient).ty == parameter.ty;
+                        if name.starts_with("encoder.") {
+                            assert_eq!(
+                                connected,
+                                mode == VideoEncoder::Joint,
+                                "{mode:?} loss{loss} {name}"
+                            );
+                            checked += 1;
+                        } else if name.starts_with("behavior.") {
+                            assert!(!connected, "world loss trained frozen behavior head {name}");
+                        }
+                    }
+                }
+                assert_eq!(checked, 148);
+            }
+        }
+    }
+
+    fn expert_gradient_config() -> DreamerConfig {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 2;
+        config.batch_length = 2;
+        config.world_backprop_length = 2;
+        config.observation_kind = ObservationKind::Rgb32;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 1.0;
+        config.cdp_centered = true;
+        config.disagreement_bonus = false;
+        config.expert_imitation = Some(super::super::ExpertImitation {
+            scale: 1.0,
+            action_weights: vec![0.05, 1.0, 1.0],
+            world_gradient: true,
+            decay: None,
+        });
+        config
+    }
+
+    #[test]
+    fn expert_world_loss_connects_cnn_and_posterior_but_freezes_actor() {
+        use meganeura::graph::Op;
+        let mut config = expert_gradient_config();
+        for staged in [false, true] {
+            for actor_gradient in [false, true] {
+                config.actor_critic_gradient = actor_gradient;
+                let mut graph = if staged {
+                    build_staged_training_graph(&config)
+                } else {
+                    build_training_graph(&config, 2)
+                };
+                let names = graph
+                    .nodes()
+                    .iter()
+                    .filter_map(|node| match &node.op {
+                        Op::Input { name } => Some(name),
+                        _ => None,
+                    })
+                    .collect::<Vec<_>>();
+                assert_eq!(
+                    names
+                        .iter()
+                        .filter(|name| name.as_str() == "actor_update_scale")
+                        .count(),
+                    1
+                );
+                assert_eq!(
+                    names
+                        .iter()
+                        .filter(|name| name.starts_with("expert_action_target_"))
+                        .count(),
+                    2
+                );
+                graph.set_outputs(vec![graph.outputs()[LOSS_EXPERT]]);
+                let backward = meganeura::autodiff::differentiate(&graph);
+                let mut cnn = 0;
+                let mut posterior = 0;
+                let mut actor = 0;
+                for (parameter, &gradient) in graph
+                    .nodes()
+                    .iter()
+                    .filter(|node| matches!(node.op, Op::Parameter { .. }))
+                    .zip(&backward.outputs()[1..])
+                {
+                    let Op::Parameter { name } = &parameter.op else {
+                        unreachable!()
+                    };
+                    let connected = backward.node(gradient).ty == parameter.ty;
+                    if name.starts_with("world.representation.encoder.") {
+                        assert!(connected, "{name}");
+                        cnn += 1;
+                    } else if name.starts_with("world.representation.posterior.") {
+                        assert!(connected, "{name}");
+                        posterior += 1;
+                    } else if name.starts_with("behavior.") {
+                        assert!(!connected, "expert world loss trained {name}");
+                        actor += usize::from(name.starts_with("behavior.actor."));
+                    }
+                }
+                assert!(cnn > 0 && posterior > 0 && actor > 0);
+            }
+        }
+        config.actor_critic_gradient = false;
+        config.expert_imitation.as_mut().unwrap().decay =
+            Some(super::super::ExpertImitationDecay {
+                actor_only: false,
+                start_update: 10,
+                end_update: 20,
+            });
+        let scheduled = build_training_graph(&config, 2);
+        assert_eq!(scheduled.nodes().iter().filter(|node|
+            matches!(&node.op, Op::Input { name } if name == "expert_imitation_scale")).count(),1);
+        config
+            .expert_imitation
+            .as_mut()
+            .unwrap()
+            .decay
+            .as_mut()
+            .unwrap()
+            .actor_only = true;
+        let actor_only = build_training_graph(&config, 2);
+        assert_eq!(scheduled.outputs(), actor_only.outputs());
+        assert_eq!(
+            format!("{:?}", scheduled.nodes()),
+            format!("{:?}", actor_only.nodes())
+        );
+        config
+            .expert_imitation
+            .as_mut()
+            .unwrap()
+            .decay
+            .as_mut()
+            .unwrap()
+            .actor_only = false;
+        config.expert_imitation.as_mut().unwrap().world_gradient = false;
+        config.check().unwrap();
+        let disabled = build_training_graph(&config, 2);
+        config.expert_imitation = None;
+        let baseline = build_training_graph(&config, 2);
+        assert_eq!(disabled.outputs(), baseline.outputs());
+        assert_eq!(
+            format!("{:?}", disabled.nodes()),
+            format!("{:?}", baseline.nodes())
+        );
+    }
+
+    #[test]
+    #[ignore = "requires a separately guarded GPU"]
+    fn isolated_expert_world_loss_has_masked_cnn_gradients_and_frozen_actor() {
+        use super::super::runtime::{
+            build_training_session, configure_d3_optimizer, initialize_d3,
+        };
+        use meganeura::graph::Op;
+        use std::sync::Arc;
+        let mut config = expert_gradient_config();
+        config.learning_rate_warmup = 0;
+        let mut graph = build_training_graph(&config, 2);
+        graph.set_outputs(vec![graph.outputs()[LOSS_EXPERT]]);
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!gpu.device_information().is_software_emulated);
+        let mut session = build_training_session(&graph, &gpu, &config);
+        initialize_d3(&mut session, &graph, 103);
+        for node in graph.nodes() {
+            let Op::Input { name } = &node.op else {
+                continue;
+            };
+            if session.input_buffer(name).is_none() {
+                continue;
+            }
+            let width = *node.ty.shape.last().unwrap();
+            let time = name
+                .rsplit('_')
+                .next()
+                .unwrap()
+                .parse::<usize>()
+                .unwrap_or(0);
+            let values = (0..node.ty.num_elements())
+                .map(|i| {
+                    if name.starts_with("observation_") {
+                        (i as f32 * 0.013 + time as f32).sin() * 0.4
+                    } else if name.starts_with("keep_") {
+                        1.0
+                    } else if name.starts_with("expert_action_target_") {
+                        // Only the outgoing action of the first state is labeled.
+                        if time == 0 && i % width == (i / width + 1) % width {
+                            2.0
+                        } else {
+                            0.0
+                        }
+                    } else if name == "initial_deter" {
+                        (i as f32 * 0.17).sin() * 0.2
+                    } else {
+                        f32::from(i % width == (i / width + time) % width)
+                    }
+                })
+                .collect::<Vec<_>>();
+            session.set_input(name, &values);
+        }
+        let names = session
+            .param_names()
+            .iter()
+            .map(|name| name.to_string())
+            .collect::<Vec<_>>();
+        let refs = names.iter().map(String::as_str).collect::<Vec<_>>();
+        let before = session.read_params(&refs);
+        session.clear_optimizer();
+        session.step();
+        session.wait();
+        let loss = session.read_loss();
+        assert!(loss.is_finite() && loss > 0.0);
+        let mut cnn_gradient = 0.0f64;
+        let mut posterior_gradient = 0.0f64;
+        for name in &names {
+            if name.starts_with("world.representation.") {
+                let mut gradient = vec![0.0; session.param_size(name).unwrap()];
+                session.read_param_grad(name, &mut gradient);
+                assert!(gradient.iter().all(|g| g.is_finite()), "{name}");
+                let norm = gradient.iter().map(|&g| f64::from(g).powi(2)).sum::<f64>();
+                if name.starts_with("world.representation.encoder.") {
+                    cnn_gradient += norm;
+                } else {
+                    posterior_gradient += norm;
+                }
+            }
+        }
+        assert!(cnn_gradient > 0.0 && posterior_gradient > 0.0);
+        configure_d3_optimizer(&mut session, &config, 0, config.learning_rate);
+        session.step();
+        session.wait();
+        let after = session.read_params(&refs);
+        let mut cnn_changed = false;
+        for ((name, a), b) in names.iter().zip(&before).zip(&after) {
+            assert!(b.iter().all(|value| value.is_finite()), "{name}");
+            if name.starts_with("behavior.") {
+                assert_eq!(a, b, "{name}");
+            }
+            if name.starts_with("world.representation.encoder.") {
+                cnn_changed |= a != b;
+            }
+        }
+        assert!(cnn_changed);
+        session.clear_optimizer();
+        for time in 0..2 {
+            session.set_input(&format!("expert_action_target_{time}"), &[0.0; 6]);
+        }
+        session.step();
+        session.wait();
+        assert_eq!(session.read_loss(), 0.0);
+        for name in &names {
+            if name.starts_with("world.representation.") {
+                let mut gradient = vec![0.0; session.param_size(name).unwrap()];
+                session.read_param_grad(name, &mut gradient);
+                assert!(gradient.iter().all(|&value| value == 0.0), "{name}");
+            }
+        }
+        eprintln!(
+            "isolated expert loss={loss}, CNN gradient squared norm={cnn_gradient}, posterior gradient squared norm={posterior_gradient}; masked loss/gradients zero, actor parameters unchanged"
+        );
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded GPU and KINDLE_JOINT_TINY_REFERENCE"]
+    fn isolated_policy_loss_updates_encoder_without_training_behavior_heads() {
+        use super::super::runtime::{build_session, configure_d3_optimizer, initialize_d3};
+        use meganeura::{Mode, data::safetensors::SafeTensorsModel, graph::Op};
+        use std::{path::PathBuf, sync::Arc};
+
+        let root = PathBuf::from(std::env::var_os("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let checkpoint = PathBuf::from(manifest["checkpoint"].as_str().unwrap());
+        assert_eq!(
+            crate::vision::checkpoint_sha256(&checkpoint).unwrap(),
+            manifest["checkpoint_sha256"]
+        );
+        let weights = SafeTensorsModel::load(checkpoint).unwrap();
+        let reference = SafeTensorsModel::load(root.join("reference.safetensors")).unwrap();
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 1;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.video_encoder = Some(VideoEncoder::Joint);
+        config.actor_critic_gradient = true;
+        config.learning_rate_warmup = 0;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        let mut graph = build_training_graph(&config, 16);
+        // No reward, value, KL, latent prediction or variance objective can
+        // supply an encoder gradient in this test.
+        graph.set_outputs(vec![graph.outputs()[LOSS_INITIAL_POLICY]]);
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let check_device = || {
+            let info = gpu.device_information();
+            assert_eq!(
+                info.device_name,
+                std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+            );
+            assert!(!info.is_software_emulated);
+            let memory = gpu.memory_stats();
+            assert!(memory.budget.saturating_sub(memory.usage) >= 2 << 30);
+        };
+        check_device();
+        let mut session = build_session(&graph, &gpu, Mode::Training, false);
+        initialize_d3(&mut session, &graph, 103);
+        crate::vision::levjepa::load_weights(
+            &mut session,
+            &weights,
+            0,
+            crate::vision::levjepa::Architecture::Tiny,
+        )
+        .unwrap();
+        for node in graph.nodes() {
+            let Op::Input { name } = &node.op else {
+                continue;
+            };
+            if session.input_buffer(name).is_none() {
+                continue;
+            }
+            let count = node.ty.num_elements();
+            let time = name
+                .rsplit('_')
+                .next()
+                .unwrap()
+                .parse::<usize>()
+                .unwrap_or(0);
+            let values = if name.starts_with("pixels_") {
+                reference
+                    .tensor_f32_auto(&format!("pixels_{}", time % 2))
+                    .unwrap()[..count]
+                    .to_vec()
+            } else if name.starts_with("keep_")
+                || name.starts_with("initial_weight_")
+                || name == "actor_update_scale"
+                || name.starts_with("continuation_target_")
+            {
+                vec![1.0; count]
+            } else if name == "initial_deter" {
+                (0..count).map(|i| (i as f32 * 0.13).sin() * 0.2).collect()
+            } else {
+                let width = *node.ty.shape.last().unwrap();
+                let signed = if name.starts_with("initial_action_target_") && time % 2 == 1 {
+                    -0.8
+                } else {
+                    1.0
+                };
+                (0..count)
+                    .map(|i| {
+                        if i % width == (i / width + time) % width {
+                            signed
+                        } else {
+                            0.0
+                        }
+                    })
+                    .collect()
+            };
+            session.set_input(name, &values);
+        }
+        let names = session
+            .param_names()
+            .iter()
+            .filter(|n| n.starts_with("encoder.") || n.starts_with("behavior."))
+            .map(|n| n.to_string())
+            .collect::<Vec<_>>();
+        let refs = names.iter().map(String::as_str).collect::<Vec<_>>();
+        let before = session.read_params(&refs);
+        session.clear_optimizer();
+        session.step();
+        session.wait();
+        check_device();
+        let mut nonzero = 0;
+        for name in &names {
+            if !name.starts_with("encoder.") {
+                assert!(!session.has_param_grad(name), "unfrozen behavior {name}");
+                continue;
+            }
+            let mut gradient = vec![0.0; session.param_size(name).unwrap()];
+            session.read_param_grad(name, &mut gradient);
+            assert!(gradient.iter().all(|x| x.is_finite()), "{name}");
+            assert!(
+                gradient.iter().any(|&x| x != 0.0),
+                "zero policy gradient {name}"
+            );
+            nonzero += 1;
+        }
+        assert_eq!(nonzero, 148);
+        configure_d3_optimizer(&mut session, &config, 0, config.learning_rate);
+        session.step();
+        session.wait();
+        check_device();
+        let after = session.read_params(&refs);
+        let mut changed = 0;
+        for ((name, before), after) in names.iter().zip(before).zip(after) {
+            assert!(after.iter().all(|x| x.is_finite()), "{name}");
+            if name.starts_with("encoder.") {
+                changed += usize::from(before != after);
+            } else {
+                assert_eq!(before, after, "behavior head was updated {name}");
+            }
+        }
+        assert!(changed > 0);
+        eprintln!(
+            "isolated_policy_tiny: {}",
+            serde_json::json!({"encoder_nonzero_gradients": nonzero, "encoder_changed_tensors": changed, "behavior_heads_unchanged": true})
+        );
+    }
+
+    #[test]
     fn tiny_graphs_expose_d3_shapes() {
         let config = DreamerConfig::tiny(3);
         let size = config.network();
         let training = build_training_graph(&config, config.world_backprop_length);
         assert_eq!(training.outputs().len(), 9);
+        assert!(!training.nodes().iter().any(|n| matches!(
+            &n.op, meganeura::graph::Op::Parameter { name } if name.starts_with("behavior.actor.")
+        )));
         let grouped_weight = training
             .nodes()
             .iter()
@@ -1257,3 +3165,6 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod rgb_event_tests;

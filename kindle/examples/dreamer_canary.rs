@@ -12,8 +12,9 @@ use kindle::{ActionMode, DreamerConfig, DreamerCore, FrameFlags, ModelSize, Rewa
 fn parse_model_size(value: &str) -> ModelSize {
     match value {
         "1m" => ModelSize::Size1M,
+        "4m" => ModelSize::Size4M,
         "12m" => ModelSize::Size12M,
-        other => panic!("unsupported model size {other:?}; use 1m or 12m"),
+        other => panic!("unsupported model size {other:?}; use 1m, 4m, or 12m"),
     }
 }
 
