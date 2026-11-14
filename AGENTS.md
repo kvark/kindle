@@ -172,8 +172,16 @@ one-draw tracking of the recorded continuation at 90% / 70% / 41% at eight /
 sixteen / thirty-two steps (best point forecast 94% / 77% / 50%); the best
 world reaches 70% / 72% / 81% of that, and its misses sit in ball contacts:
 brick bounces, which are deterministic, are tracked 50% to 71% at four to
-sixteen steps, paddle bounces 13% to 25% against a 41% to 68% ceiling. No job
-is active; the GPU is free. On a
+sixteen steps, paddle bounces 13% to 25% against a 41% to 68% ceiling. The
+world is a near-deterministic hedger: its four prior draws agree (any of four
+75 against 71 to 74 single at eight steps; oracle .955 against .903) and most
+paddle-bounce forecasts show a smeared ball, because the image suffix scores
+decoded prior samples against one recorded outcome. A [32-step latent-overshooting
+variant](docs/experiments/2026-11-14-breakout-world-context-latent-h32.md)
+(priors matched to detached posteriors by KL, no prior decoding, 392 ms per
+update) is training: unit `kindle-world-context-latent-h32-20261114.service`,
+output `train-96-context-4m-latent-h32`, about 7 hours from 21:13 UTC
+November 14; a waiter unit runs the held-out probe and four-draw diagnostic. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),

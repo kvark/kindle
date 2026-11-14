@@ -59,6 +59,30 @@ again inside the horizon (the oracle drops them): 0/1, 0/6, 2/8, 4/10 and
 4M world scores paddle 3/23 and 10/47, bricks 11/20 and 22/42 at eight and
 sixteen steps, and the 1M state-only world 5/23 and 8/47, 14/20 and 22/42.
 
+## The best world hedges instead of sampling
+
+Four prior draws of the 131k checkpoint on the held-out origins
+(`python/examples/breakout_world_draws.py`, `heldout/context-4m-h32-131k-draws`)
+against the oracle's draws (a draw of the oracle is one sticky replay):
+
+| Horizon | 1 | 4 | 8 | 16 | 32 |
+|---|---|---|---|---|---|
+| World hits per draw | 110, 109, 110, 110 /115 | 91, 93, 94, 93 /117 | 71, 74, 74, 73 /113 | 56, 56, 57, 54 /111 | 38, 37, 39, 39 /116 |
+| World any of four / all four | 110 / 109 | 95 / 91 | 75 / 71 | 58 / 52 | 44 / 32 |
+| Oracle one draw / any of four / all four | .996 / .998 / .994 | .966 / .988 / .940 | .903 / .955 / .849 | .700 / .829 / .593 | .406 / .612 / .259 |
+
+The world's draws nearly agree where the oracle's spread, so its stochastic
+state carries little of the outcome variety. Where the future is uncertain
+it draws an average instead: in 15 of 23 eight-step paddle-bounce forecasts
+no ball is detected, and those frames hold 30 to 90 strong red pixels in the
+detector window against 2 to 7 for a real ball (the same holds at four and
+sixteen steps). Brick-bounce and straight-flight misses are mostly placement
+errors of a detected ball. This is the averaging incentive identified in the
+[prior pixel loss review](2026-11-08-breakout-world-prior-pixel-loss-review.md):
+the image suffix scores decoded prior samples against one recorded outcome.
+The predicted paddle matches the true paddle best at the scored step, not one
+step earlier, so the paddle misses are not an action-alignment error.
+
 ## Reading
 
 Sticky actions cap thirty-two-step tracking of the recorded continuation at
