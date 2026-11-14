@@ -92,7 +92,11 @@ fn cdp_world_trains_an_auxiliary_pixel_decoder_and_rollout() {
     let graph = world::build_training_graph(&world_training_config(&c), 4);
     let parameters = names(&graph);
     assert!(parameters.iter().any(|n| n.starts_with("world.decoder.")));
-    assert!(parameters.iter().any(|n| n.starts_with("world.future_predictor.")));
+    assert!(
+        parameters
+            .iter()
+            .any(|n| n.starts_with("world.future_predictor."))
+    );
     assert!(graph.outputs().len() > world::LOSS_WORLD_ROLLOUT);
 
     let mut without = cdp_with_pixels();
@@ -103,7 +107,11 @@ fn cdp_world_trains_an_auxiliary_pixel_decoder_and_rollout() {
     assert!(without.check().is_ok());
     assert!(!without.trains_pixels());
     let graph = world::build_training_graph(&world_training_config(&without), 4);
-    assert!(!names(&graph).iter().any(|n| n.starts_with("world.decoder.")));
+    assert!(
+        !names(&graph)
+            .iter()
+            .any(|n| n.starts_with("world.decoder."))
+    );
 
     let mut plain = with_rollout();
     plain.world_pixel_scale = 1.0;
@@ -130,7 +138,9 @@ fn agent_world_rollout_accepts_the_action_effects_bonus_without_cdp() {
     let heads = graph
         .nodes()
         .iter()
-        .filter(|n| matches!(&n.op, Op::Parameter { name } if name.starts_with("world.exploration.")))
+        .filter(
+            |n| matches!(&n.op, Op::Parameter { name } if name.starts_with("world.exploration.")),
+        )
         .count();
     assert!(heads > 0);
     let imagination = world::build_imagination_graph(&c);

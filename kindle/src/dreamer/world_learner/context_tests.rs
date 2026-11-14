@@ -156,3 +156,36 @@ fn context_graphs_keep_the_spatial_parameters_and_drop_the_rollout_shift() {
         );
     }
 }
+
+fn parameter_names(g: &Graph) -> Vec<String> {
+    let mut names = g
+        .nodes()
+        .iter()
+        .filter_map(|n| match &n.op {
+            Op::Parameter { name } => Some(name.clone()),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    names.sort();
+    names
+}
+
+#[test]
+fn context_world_trains_latent_overshooting_without_decoding_priors() {
+    let mut c = with_context(2);
+    c.rgb_spatial_action = true;
+    assert!(c.check().is_ok() && validate_config(&c).is_ok());
+    let images = world::build_world_only_pixel_training_graph(&c, 2, PixelLoss::MotionEventRollout);
+    let latent =
+        world::build_world_only_pixel_training_graph(&c, 2, PixelLoss::MotionLatentOvershooting);
+    // Same weights; the latent suffix matches priors to detached posteriors
+    // instead of decoding sampled priors, so the graph is smaller.
+    assert_eq!(parameter_names(&images), parameter_names(&latent));
+    assert!(latent.nodes().len() < images.nodes().len());
+    assert!(latent.nodes().iter().any(
+        |n| matches!(&n.op, Op::Input { name } if name.starts_with("latent_rollout_uniforms"))
+    ));
+    assert!(!latent.nodes().iter().any(
+        |n| matches!(&n.op, Op::Input { name } if name.starts_with("pixel_rollout_uniforms"))
+    ));
+}

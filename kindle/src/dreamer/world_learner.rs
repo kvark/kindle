@@ -836,7 +836,10 @@ impl WorldModelLearner {
         if config.rgb_spatial_action
             && !((pixel_loss == PixelLoss::MotionEventRollout && prediction_length > 0)
                 || (pixel_loss == PixelLoss::MotionCrossEntropy && prediction_length == 0)
-                || (pixel_loss == PixelLoss::MotionPosteriorHistory && prediction_length > 0))
+                || (pixel_loss == PixelLoss::MotionPosteriorHistory && prediction_length > 0)
+                || (pixel_loss == PixelLoss::MotionLatentOvershooting
+                    && prediction_length > 0
+                    && config.rgb_context_lag.is_some()))
         {
             return Err(
                 "spatial action requires H0 motion cross-entropy or a positive suffix event objective"
@@ -883,6 +886,8 @@ impl WorldModelLearner {
                     | PixelLoss::MotionEventRollout
                     | PixelLoss::MotionCleanPrior
             )
+            && !(pixel_loss == PixelLoss::MotionLatentOvershooting
+                && config.rgb_context_lag.is_some())
         {
             return Err("spatial decoder requires the motion RGB objective without a phase".into());
         }

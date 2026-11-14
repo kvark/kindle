@@ -17,7 +17,10 @@ pub(super) fn validate(
         && !config.rgb_spatial_decoder
         && !config.rgb_spatial_fusion
         && !config.rgb_spatial_action;
-    let local = pixel_loss == PixelLoss::MotionEventRollout
+    // The context-frame world may replace the image suffix with latent
+    // overshooting: priors match detached posteriors and no decoder runs on them.
+    let local = (pixel_loss == PixelLoss::MotionEventRollout
+        || (pixel_loss == PixelLoss::MotionLatentOvershooting && config.rgb_context_lag.is_some()))
         && config.rgb_spatial_decoder
         && config.rgb_spatial_fusion
         && config.rgb_spatial_action;
