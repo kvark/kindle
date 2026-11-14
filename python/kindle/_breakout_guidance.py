@@ -307,3 +307,47 @@ class BreakoutGuidance(EpisodePixelGuidance):
             raise ValueError('Invalid Breakout action feedback batch')
         for policy, action in zip(self._policies, actions):
             policy.feedback(action)
+
+
+DEMONSTRATION_KIND = "initial-demonstration-episodes-breakout-pixels-v1"
+
+
+class BreakoutDemonstrations(EpisodePixelGuidance):
+    """The pixel teacher plays each lane's first episodes in full, then never acts again.
+
+    A demonstration phase, not guidance: no takeovers or labels on the learner's
+    own episodes. Uses the edge-correcting teacher, which equals the feedback
+    teacher when every proposal is executed. With an imitation scale the runner
+    labels exactly the demonstrated rows.
+    """
+
+    def __init__(self, config, streams, action_count):
+        if (not isinstance(config, dict) or set(config) != {"kind", "episodes", "seed"}
+                or config.get("kind") != DEMONSTRATION_KIND):
+            raise ValueError("invalid Breakout demonstration configuration fields")
+        episodes = config["episodes"]
+        if type(episodes) is not int or not 0 < episodes < 2**32:
+            raise ValueError("Breakout demonstration episodes must be a positive u32")
+        self._demonstration_episodes = episodes
+        super().__init__(dict(kind=DEMONSTRATION_KIND, probability=1.0, seed=config["seed"]),
+                         streams, action_count, game="Breakout", kinds=(DEMONSTRATION_KIND,),
+                         bounded_kind=None, seed_xor=GUIDANCE_SEED_XOR,
+                         policy_factory=lambda: PixelPolicy(edge_reset=True),
+                         valid_actions=(0, 1, 3, 4))
+        self._demonstration_config = dict(config)
+
+    @property
+    def config(self):
+        return dict(self._demonstration_config)
+
+    @property
+    def finished(self):
+        return not any(self._selected)
+
+    def reset(self, streams):
+        super().reset(streams)
+        for lane in streams:
+            if self._episodes[lane] > self._demonstration_episodes:
+                self._guided_episodes[lane] -= self._selected[lane]
+                self._selected[lane] = False
+                self._policies[lane] = None

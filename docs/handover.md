@@ -128,7 +128,7 @@ objective beats CDP in greedy play on every pair is withdrawn**; what holds is
 a higher greedy ceiling (four runs above 150 against CDP's best 150.8 at
 400k), a four-seed greedy mean above CDP's two-seed mean on the new cohort
 (113.7 against 84.9), a worse sampled mode on every seed, and a less
-predictable learner. No job is active; the GPU is free. The [4M context-frame world at 65,536 updates](results/2026-11-10-breakout-world-context-frame.md)
+predictable learner. The [4M context-frame world at 65,536 updates](results/2026-11-10-breakout-world-context-frame.md)
 (`train-96-context-4m-65k-v4`, 349 ms per update, 6h31m, run without the
 host guard after a 14G OOM and a guard probe timeout killed two attempts) is
 the **best Breakout world model so far at every horizon with sharp bricks**:
@@ -182,9 +182,15 @@ paddle-bounce forecasts show a smeared ball, because the image suffix scores
 decoded prior samples against one recorded outcome. A [32-step latent-overshooting
 variant](experiments/2026-11-14-breakout-world-context-latent-h32.md)
 (priors matched to detached posteriors by KL, no prior decoding, 392 ms per
-update) is training: unit `kindle-world-context-latent-h32-20261114.service`,
-output `train-96-context-4m-latent-h32`, about 7 hours from 21:13 UTC
-November 14; a waiter unit runs the held-out probe and four-draw diagnostic. On a
+update) was killed by the kernel OOM killer at update 7,680, before its
+first evaluation, while frozen to lend the GPU to a smoke (host RAM ran out;
+frozen units remain OOM targets); it has not been rerun. The user then
+redirected the work to [Breakout agents without hand-made relevance
+priors](experiments/2026-11-15-breakout-clean-representation.md): no motion
+weighting, hand action features, context frames or teacher guidance;
+scripted-teacher demonstrations only as an initial phase; value gradients
+into the representation tested; five arms queued under
+`kindle-breakout-clean-20261115.service` (root `/x/Temp/kindle-breakout-clean-20261115`). On a
 [fresh agent cohort](results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
@@ -196,7 +202,7 @@ each, greedy means are close (CDP 95.6 against pixel 113.7 on cohort 22003)
 but the pixel recipe's range is two to three times wider (44 to 161 against
 75 to 112), and CDP's sampled mode is about 18 points higher on average while
 also varying widely (39 to 71). 0 two-wall episodes in 70 evaluations, best
-single episode 414. No job is active; the GPU is free.
+single episode 414.
 First-run root
 `/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
 `python/examples/breakout_world_scale.py` (`probe` mode runs the state readout

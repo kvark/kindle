@@ -26,7 +26,7 @@ from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, e
 import kindle._pixel_guidance as guidance_schedule_module
 import kindle._qbert_guidance as guidance_module
 import kindle._breakout_guidance as breakout_guidance_module
-from kindle._breakout_guidance import BreakoutGuidance
+from kindle._breakout_guidance import BreakoutDemonstrations, BreakoutGuidance
 from kindle._qbert_guidance import BOUNDED_GUIDANCE_KIND, GUIDANCE_KIND, QbertGuidance
 import kindle._exploration as exploration_module
 import kindle._return_boundaries as return_boundaries_module
@@ -237,6 +237,10 @@ def main():
                         help="fresh corrective Breakout only: redraw guidance for blocks of this many actions")
     parser.add_argument("--breakout-guidance-initial-episodes", type=int,
                         help="fresh corrective Breakout only: force selection for each lane's first episodes, retaining the action cap")
+    parser.add_argument("--breakout-demonstration-episodes", type=int,
+                        help="fresh Breakout only: the pixel teacher plays each lane's first N episodes in full, then never acts or labels again")
+    parser.add_argument("--no-replay-value-gradient", action="store_true",
+                        help="keep D3's replay-value critic loss out of the world representation")
     parser.add_argument("--breakout-corrective-labels", action="store_true",
                         help="fresh Breakout imitation: edge-corrected teacher labels all states with actual-action feedback")
     parser.add_argument("--guidance-imitation-scale", type=float,
@@ -487,10 +491,21 @@ def main():
         if (args.environment != "ALE/Breakout-v5" or args.atari_protocol not in ("published", "published-minimal")
                 or args.observation_size not in (None, "native") or args.encoder_checkpoint is not None):
             parser.error("Breakout guidance requires Breakout/published action protocol/native pixels/learned RGB")
+    if args.breakout_demonstration_episodes is not None:
+        if not 0 < args.breakout_demonstration_episodes < 2**32:
+            parser.error("Breakout demonstration episodes must be a positive u32")
+        if args.evaluate or args.restore:
+            parser.error("Breakout demonstrations require fresh training")
+        if args.exploration_probability or args.qbert_guidance_probability or args.breakout_guidance_probability:
+            parser.error("Breakout demonstrations cannot combine with guidance or another action aid")
+        if (args.environment != "ALE/Breakout-v5" or args.atari_protocol != "published"
+                or args.observation_size not in (None, "native") or args.encoder_checkpoint is not None):
+            parser.error("Breakout demonstrations require Breakout/published action protocol/native pixels/learned RGB")
     if args.guidance_imitation_scale is not None:
         if not positive_f32(args.guidance_imitation_scale):
             parser.error("guidance imitation scale must be positive finite F32")
-        if not (args.qbert_guidance_probability or args.breakout_guidance_probability) or args.evaluate:
+        if not (args.qbert_guidance_probability or args.breakout_guidance_probability
+                or args.breakout_demonstration_episodes) or args.evaluate:
             parser.error("guidance imitation requires fresh guided training")
     if args.guidance_noop_weight is not None:
         if args.guidance_imitation_scale is None:
@@ -573,6 +588,7 @@ def main():
     training_options.add("--qbert-corrective-labels")
     training_options.update(("--breakout-guidance-probability", "--breakout-guidance-max-actions", "--breakout-corrective-labels", "--breakout-guidance-block-length"))
     training_options.add("--breakout-guidance-initial-episodes")
+    training_options.update(("--breakout-demonstration-episodes", "--no-replay-value-gradient"))
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-fire-weight", "--guidance-world-gradient"))
     training_options.add("--guidance-imitation-decay")
     training_options.add("--guidance-actor-only-decay")
@@ -630,7 +646,8 @@ def main():
     memory_path = args.output.with_suffix(".gpu-memory.jsonl")
     if args.min_gpu_budget_headroom_mib is not None and memory_path.exists():
         parser.error("GPU memory output must be a fresh path")
-    if (args.exploration_probability or args.qbert_guidance_probability or args.breakout_guidance_probability) and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
+    if (args.exploration_probability or args.qbert_guidance_probability or args.breakout_guidance_probability
+            or args.breakout_demonstration_episodes) and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("persistent exploration requires native vector action overrides")
     if args.guidance_imitation_scale is not None and "expert_actions" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("guidance imitation requires native expert-action support")
@@ -900,6 +917,8 @@ def main():
             config["behavior_learning_rate"] = args.behavior_learning_rate
         if args.replay_value_scale is not None:
             config["loss_scales"]["replay_value"] = args.replay_value_scale
+        if args.no_replay_value_gradient:
+            config["replay_value_gradient"] = False
         if args.continuation_scale is not None:
             config["loss_scales"]["continuation"] = args.continuation_scale
         if args.reward_scale is not None:
@@ -1005,8 +1024,12 @@ def main():
             exploration = BreakoutGuidance(guidance_config, args.num_envs, actions,
                 **(dict(action_meanings=environments[0].action_meanings)
                    if args.atari_protocol == "published-minimal" else {}))
-        guidance = isinstance(exploration, (QbertGuidance, BreakoutGuidance))
-        selected_guidance_module = breakout_guidance_module if isinstance(exploration, BreakoutGuidance) else guidance_module
+        if args.breakout_demonstration_episodes:
+            exploration = BreakoutDemonstrations(dict(kind=breakout_guidance_module.DEMONSTRATION_KIND,
+                episodes=args.breakout_demonstration_episodes, seed=args.seed), args.num_envs, actions)
+        guidance = isinstance(exploration, (QbertGuidance, BreakoutGuidance, BreakoutDemonstrations))
+        selected_guidance_module = (breakout_guidance_module if isinstance(exploration, (BreakoutGuidance, BreakoutDemonstrations))
+                                    else guidance_module)
         current_frames = initial
         construction = time.perf_counter()
         restored = checkpoint_identity(args.restore) if args.restore else None
