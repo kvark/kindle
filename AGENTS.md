@@ -159,8 +159,21 @@ held-out 112/93/72/41/19; thirty-two-step tracking is 32% held-out, and the
 curve was still rising. The [12M model under the same objective](docs/results/2026-11-12-breakout-world-context-12m-h32.md)
 (32,768 updates, 1,241 ms each, 11.4 hours) gains 3 to 4 held-out counts at
 eight to thirty-two steps over the 4M model at equal updates and trails its
-65k point by 5 to 6: budget buys more than capacity in this range. No job is
-active; the GPU is free. On a
+65k point by 5 to 6: budget buys more than capacity in this range. Its [131k budget
+point](docs/results/2026-11-13-breakout-world-context-h32-131k.md) (33 hours,
+894 ms per update) scores held-out 110/91/71/56/38 with sharper bricks (.006 /
+.040), within checkpoint noise of the 65k point: a post hoc held-out probe of
+every checkpoint shows neighbouring points 18 counts apart at thirty-two
+steps, and past 65k updates the gain goes mostly to the fitting corpus
+(thirty-two-step window means 34 to 45 against held-out 32 to 36), so more
+updates no longer pay. A [sticky-action oracle](docs/results/2026-11-14-breakout-sticky-oracle.md)
+(CPU emulator replays of the recorded actions with fresh sticky draws) caps
+one-draw tracking of the recorded continuation at 90% / 70% / 41% at eight /
+sixteen / thirty-two steps (best point forecast 94% / 77% / 50%); the best
+world reaches 70% / 72% / 81% of that, and its misses sit in ball contacts:
+brick bounces, which are deterministic, are tracked 50% to 71% at four to
+sixteen steps, paddle bounces 13% to 25% against a 41% to 68% ceiling. No job
+is active; the GPU is free. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
@@ -298,7 +311,9 @@ failures and limits. No rebuild is needed for an exposed learning-rate change.
 
 ## GPU operation
 
-GPU work is authorized unless the device is genuinely faulted. Known allocation
+GPU work is authorized unless the device is genuinely faulted. Set
+`MEGANEURA_DEVICE_ID=0x744c` (RX 7900 XT) for every GPU job: on November 14
+Blade's default adapter switched to the integrated GPU without a kernel message. Known allocation
 warnings alone are not an approval gate. Use the existing host guard and stop on
 real faults or numerical failures. No automatic driver reset/reload/reboot.
 Separate NVML polling is unnecessary for the current experiment. Check live
