@@ -180,9 +180,13 @@ that moved play (7.2 / 7.4, sharpest paddle); demonstrations sharpen the
 paddle but shock the return scale (1 to 48) and leave greedy policies
 that never press FIRE; removing the replay-value gradient changes
 nothing. The clean arms replay each action 16 times against DreamerV3's
-32 (Atari) and 256 (Atari100k), so the [ratio-64 run of arm
-B](experiments/2026-11-15-breakout-clean-ratio64.md) tests whether
-the clean recipe is only undertrained. On a
+32 (Atari) and 256 (Atari100k). [Arm B at train ratio
+64](results/2026-11-15-breakout-clean-ratio64.md) (99,907 updates, 165
+minutes) plays 9.8 to 11.1 frozen with no FIRE stalls and moves the ball
+probe only to 19.3 / 16.1 px (within 8 px .081), still improving at the
+end; its 100k checkpoint, with B's update count, plays worse than B. The
+[96x96 run at the same ratio](experiments/2026-11-15-breakout-clean-ratio64-96.md)
+tests whether resolution limits the clean ball. On a
 [fresh agent cohort](results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
