@@ -185,8 +185,12 @@ nothing. The clean arms replay each action 16 times against DreamerV3's
 minutes) plays 9.8 to 11.1 frozen with no FIRE stalls and moves the ball
 probe only to 19.3 / 16.1 px (within 8 px .081), still improving at the
 end; its 100k checkpoint, with B's update count, plays worse than B. The
-[96x96 run at the same ratio](experiments/2026-11-15-breakout-clean-ratio64-96.md)
-tests whether resolution limits the clean ball. On a
+[96x96 run at the same ratio](results/2026-11-15-breakout-clean-ratio64-96.md)
+(293 minutes, 16.3 GiB) is the **best clean Breakout learner**: frozen
+20.3 to 25.3 in all four cells, vertical ball probe error 11.1 px (R² .74)
+against 16.1 at 64x64, horizontal still 18.3; 96x96 is the clean default.
+A [second seed](experiments/2026-11-15-breakout-clean-ratio64-96-seed22003.md)
+(22003) checks it before further changes. On a
 [fresh agent cohort](results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
