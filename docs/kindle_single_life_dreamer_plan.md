@@ -186,7 +186,7 @@ minutes) plays 9.8 to 11.1 frozen with no FIRE stalls and moves the ball
 probe only to 19.3 / 16.1 px (within 8 px .081), still improving at the
 end; its 100k checkpoint, with B's update count, plays worse than B. The
 [96x96 run at the same ratio](results/2026-11-15-breakout-clean-ratio64-96.md)
-(293 minutes, 16.3 GiB) is the **best clean Breakout learner**: frozen
+(293 minutes, 16.3 GiB) is the best clean pixel-objective learner: frozen
 20.3 to 25.3 in all four cells, vertical ball probe error 11.1 px (R² .74)
 against 16.1 at 64x64, horizontal still 18.3; 96x96 is the clean default.
 A [second seed](results/2026-11-15-breakout-clean-ratio64-96-seed22003.md)
@@ -194,8 +194,18 @@ A [second seed](results/2026-11-15-breakout-clean-ratio64-96-seed22003.md)
 mean about 21 on both cohorts in 4.9 hours. The same probe reads the
 retained guided CDP learner's ball at 8.4 / 8.8 px (within 8 px .39), so
 guidance or the latent objective holds the horizontal position no clean
-learner holds; a [clean centered-CDP arm](experiments/2026-11-15-breakout-clean-cdp-96.md)
-at 96x96 / ratio 64 separates the two. On a
+pixel learner holds. The [clean centered-CDP arm](results/2026-11-15-breakout-clean-cdp-96.md)
+(same recipe, world objective swapped to centered CDP with encoder rate
+4e-5; 187 minutes, 15.4 GiB) separates them and is the **best clean
+Breakout learner**: the latent objective learns the ball without labels
+(probe 7.4 / 7.7 px at 100k, 6.0 / 6.3 at 300k, within 8 px .53 to .67,
+better than the guided learner at every kept checkpoint) and frozen play
+at 400k is 71.1 to 91.4 (medians 28 to 38, best 410) against the pixel
+recipe's 21 and the guided learner's 91 to 192. Online returns peak at
+124 near 200k actions, then fall as the return scale jumps (20 to 93) and
+policy entropy rises (.5 to 1.3 nats). One seed; a [second
+seed](experiments/2026-11-15-breakout-clean-cdp-96-seed22003.md) (22003)
+is running. On a
 [fresh agent cohort](results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
