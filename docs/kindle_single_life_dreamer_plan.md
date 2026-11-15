@@ -8,10 +8,9 @@ Kindle now builds against **upstream Meganeura main** (`a0eff600`, Blade
 `d9112e26`) instead of the October handover fork; see the
 [switch report](results/2026-11-10-meganeura-main-switch.md). The fork's
 `MEGANEURA_COMMAND_CACHE`/`IMAGE_VIEWS`/`CONVOLUTION_*`/`COPY_COMPOSITION` flags
-are inert. A one-method upstream patch (`Session::slot_buffer`) is pushed as
-Meganeura branch `session-slot-buffer` (`0a5560b6` on main `e383efc0`, fmt and
-clippy clean) and waits for the user to merge; until Kindle repins on it the
-retained-off actor-dynamics/expected-value snapshots cross the host.
+are inert. Since November 15 the pin is main `e3215fa2`, which adds
+`Session::slot_buffer`; the retained-off actor-dynamics/expected-value
+parameter snapshots are same-queue device copies again.
 Run every heavy job as a memory-capped `systemd-run --user` unit; a bare
 `cargo test` peaked at 17.6 GB and the OOM killer took the session down.
 

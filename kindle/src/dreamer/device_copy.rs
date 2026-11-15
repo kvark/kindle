@@ -50,20 +50,19 @@ impl DeviceCopies {
                 let available = target
                     .slot_size(ExternalSlot::Input(input))
                     .expect("known target input");
+                if matches!(slot, ExternalSlot::Parameter(_)) {
+                    assert_eq!(
+                        bytes, available,
+                        "snapshot parameter/input storage mismatch"
+                    );
+                }
                 let end = copy
                     .target_offset_bytes
                     .checked_add(bytes)
                     .expect("device copy size overflow");
                 assert!(end <= available, "device copy exceeds target input");
                 assert_eq!(copy.target_offset_bytes % size_of::<f32>(), 0);
-                let source_buffer = match slot {
-                    ExternalSlot::Input(name) => source.input_buffer(name),
-                    ExternalSlot::Output(index) => source.output_buffer(index),
-                    // Meganeura exposes no device view of parameter storage;
-                    // parameter snapshots cross the host in the agent instead.
-                    ExternalSlot::Parameter(_) => None,
-                }
-                .expect("known source buffer");
+                let source_buffer = source.slot_buffer(slot).expect("known source buffer");
                 let mut target_buffer = target.input_buffer(input).expect("known target buffer");
                 target_buffer.offset = target_buffer
                     .offset

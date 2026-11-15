@@ -56,3 +56,14 @@ Running the CPU test suite bare in the session shell peaked at 17.6 GB and the
 kernel OOM killer took the session down. Heavy jobs now run as
 `systemd-run --user` units with `MemoryMax`; the suite itself needs about 13 GB
 with four test threads because the 12M world-learner graph tests are large.
+
+## November 15 update
+
+The accessor landed upstream as `Session::slot_buffer` (Meganeura main
+`e3215fa2`; the only source change since `a0eff600` is that 10-line method).
+Kindle is repinned on it and `device_copy.rs` copies parameter slots on the
+device again. Checked on the RX 7900 XT: clippy on all targets and fmt
+clean, the Python crate checks, the device-copy test and the four
+actor-dynamics/expected-value GPU tests pass (the two agent tests compare
+the snapshot inputs with their sources). The CPU suite result is in the
+commit that made the change.

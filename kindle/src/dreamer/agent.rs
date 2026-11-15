@@ -1488,17 +1488,15 @@ impl DreamerCore {
                 })
                 .collect::<Vec<_>>();
             assert!(!names.is_empty());
-            // Meganeura exposes no device view of parameter storage, so this
-            // optional snapshot crosses the host; the retained recipes leave
-            // both options off.
-            let parameters = names
+            let copies = names
                 .iter()
-                .map(|(parameter, _)| parameter.as_str())
+                .map(|(parameter, input)| DeviceCopy {
+                    source: (&self.world_train, ExternalSlot::Parameter(parameter)),
+                    target: (&self.behavior_train, input),
+                    target_offset_bytes: 0,
+                })
                 .collect::<Vec<_>>();
-            let values = self.world_train.read_params(&parameters);
-            for ((_, input), values) in names.iter().zip(&values) {
-                self.behavior_train.set_input(input, values);
-            }
+            self.device_copies.copy(&copies);
             let seconds = Some(stage.elapsed().as_secs_f64());
             if self.config.actor_expected_value {
                 timing.expected_value_snapshot_seconds = seconds;

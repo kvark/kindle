@@ -27,10 +27,9 @@ Kindle now builds against **upstream Meganeura main** (`a0eff600`, Blade
 `d9112e26`) instead of the October handover fork; see the
 [switch report](results/2026-11-10-meganeura-main-switch.md). The fork's
 `MEGANEURA_COMMAND_CACHE`/`IMAGE_VIEWS`/`CONVOLUTION_*`/`COPY_COMPOSITION` flags
-are inert. A one-method upstream patch (`Session::slot_buffer`) is pushed as
-Meganeura branch `session-slot-buffer` (`0a5560b6` on main `e383efc0`, fmt and
-clippy clean) and waits for the user to merge; until Kindle repins on it the
-retained-off actor-dynamics/expected-value snapshots cross the host.
+are inert. Since November 15 the pin is main `e3215fa2`, which adds
+`Session::slot_buffer`; the retained-off actor-dynamics/expected-value
+parameter snapshots are same-queue device copies again.
 Run every heavy job as a memory-capped `systemd-run --user` unit; a bare
 `cargo test` peaked at 17.6 GB and the OOM killer took the session down.
 
@@ -278,7 +277,7 @@ raw experiment data or checkpoint history is committed.
 
 | Dependency | Revision |
 | --- | --- |
-| [Meganeura](https://github.com/kvark/meganeura) | `a0eff600d0aaf877a6a6ba02c2de1eb8804583ed` (main) |
+| [Meganeura](https://github.com/kvark/meganeura) | `e3215fa2393427db29282a2326b3a61c1cedeba1` (main) |
 | [Blade](https://github.com/kvark/blade) | `d9112e26ab1244d9e206e7d27387295a28cb3fa3` (main) |
 | Naga (wgpu trunk, dev-dependency) | `9964733300924e724b6d41ef268e7c2933f3dcdb` |
 
@@ -287,9 +286,10 @@ the preserved `handover/cdp-qualified-20261025` fork (`423d3736`/Blade `bbbc93b7
 The fork's command cache, image views, convolution reuse, pooled tapes and
 diagnostic-group APIs are gone; its `MEGANEURA_COMMAND_CACHE`,
 `MEGANEURA_IMAGE_VIEWS`, `MEGANEURA_CONVOLUTION_WORDS`, `MEGANEURA_COPY_COMPOSITION`
-and `MEGANEURA_CONVOLUTION_REUSE` flags are inert. Main has no device view of
-parameter storage, so the optional actor-dynamics/expected-value parameter
-snapshots cross the host until a `Session::slot_buffer` accessor lands upstream.
+and `MEGANEURA_CONVOLUTION_REUSE` flags are inert. The optional
+actor-dynamics/expected-value parameter snapshots crossed the host from
+November 10 until the November 15 repin on `e3215fa2`, whose
+`Session::slot_buffer` accessor restores the same-queue device copy.
 Retained runtimes under
 `/x/Temp/*/runtime` keep their own fork binaries; the checkpoints they wrote
 still load, but new learners are not byte-comparable to the fork's qualifiers.
