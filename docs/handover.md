@@ -210,7 +210,11 @@ end; its 100k checkpoint, with B's update count, plays worse than B. The
 against 16.1 at 64x64, horizontal still 18.3; 96x96 is the clean default.
 A [second seed](results/2026-11-15-breakout-clean-ratio64-96-seed22003.md)
 (22003) repeats it: frozen 19.1 to 22.1, ball 18.6 / 13.9 px; two-seed
-mean about 21 on both cohorts in 4.9 hours. On a
+mean about 21 on both cohorts in 4.9 hours. The same probe reads the
+retained guided CDP learner's ball at 8.4 / 8.8 px (within 8 px .39), so
+guidance or the latent objective holds the horizontal position no clean
+learner holds; a [clean centered-CDP arm](experiments/2026-11-15-breakout-clean-cdp-96.md)
+at 96x96 / ratio 64 separates the two. On a
 [fresh agent cohort](results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
