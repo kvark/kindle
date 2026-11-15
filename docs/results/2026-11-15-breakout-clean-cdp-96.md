@@ -131,3 +131,8 @@ repeated. Changes that need a decision first stay open: the game's four
 needed actions, demonstrations kept out of the return normalizer or used as
 separate pretraining, and a return-normalization or entropy change on the
 policy side.
+
+**Update.** The [second seed](2026-11-15-breakout-clean-cdp-96-seed22003.md)
+does not repeat the ball result (probe within 8 px .08 to .12, frozen play
+34 to 59): the statements above about the latent objective learning the
+ball hold for seed 1009 only.

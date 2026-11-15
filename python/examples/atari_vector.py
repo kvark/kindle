@@ -37,6 +37,9 @@ from atari import (
     checkpoint_identity, sha256_file,
 )
 
+# A lost life ends the stored training episode; the next one begins on the same frame.
+LIFE_TERMINAL_KIND = "raw-frame-life-loss-episode-end-v1"
+
 
 def require_gpu_budget(snapshot, minimum_bytes):
     if (not isinstance(snapshot, dict) or set(snapshot) != {"usage_bytes", "budget_bytes"}
@@ -179,6 +182,9 @@ def main():
                         help="with replay-actor-scale and active disagreement: conservatively compare observed returns with the combined critic")
     parser.add_argument("--breakout-return-life-boundaries", action="store_true",
                         help="fresh Breakout training: stop auxiliary observed actor returns at raw-frame life losses")
+    parser.add_argument("--life-loss-terminal", action="store_true",
+                        help="fresh training only: store a lost life as a terminal and begin a new stored episode "
+                             "from the same frame; the emulator, logged episodes and evaluations keep whole games")
     parser.add_argument("--return-lambda", type=float,
                         help="fresh training only: imagined and replay return trace mixture in [0,1]; omitted: native default")
     parser.add_argument("--replay-value-bootstrap", choices=("imagined", "posterior"),
@@ -354,6 +360,9 @@ def main():
             args.environment != "ALE/Breakout-v5" or args.restore or args.evaluate
             or not args.replay_actor_observed_lower_bound):
         parser.error("return life boundaries require fresh Breakout training with observed lower-bound mode")
+    if args.life_loss_terminal and (args.restore or args.evaluate or args.breakout_return_life_boundaries
+                                    or args.replay_value_completed):
+        parser.error("life-loss-terminal requires fresh training without auxiliary life boundaries or completed returns")
     if args.replay_actor_scale is not None:
         if not positive_f32(args.replay_actor_scale):
             parser.error("replay-actor-scale must be finite and positive in F32")
@@ -592,6 +601,7 @@ def main():
     training_options.update(("--guidance-imitation-scale", "--guidance-noop-weight", "--guidance-fire-weight", "--guidance-world-gradient"))
     training_options.add("--guidance-imitation-decay")
     training_options.add("--guidance-actor-only-decay")
+    training_options.add("--life-loss-terminal")
     training_options.add("--image-size")
     training_options.add("--rgb-frame-pair")
     training_options.add("--image-crop")
@@ -877,14 +887,14 @@ def main():
                 args.environment, frameskip=1, repeat_action_probability=args.sticky_actions,
                 full_action_space=protocol.full_action_space,
             )
-            if args.breakout_return_life_boundaries:
+            if args.breakout_return_life_boundaries or args.life_loss_terminal:
                 env = LifeBoundaryMonitor(env)
                 life_monitors.append(env)
             env = DreamerAtariPreprocessing(env, noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
                 screen_size=None if args.observation_size == "native" else 64)
             environments.append(env)
             initial.append(env.reset(seed=seed)[0])
-            if args.breakout_return_life_boundaries:
+            if life_monitors:
                 life_monitors[-1].take_changes()
         actions = int(environments[0].action_space.n)
         config = kindle.default_config(actions, args.model_size)
@@ -1088,6 +1098,7 @@ def main():
                   **(dict(actor_return_boundary_kind=LIFE_BOUNDARY_KIND,
                           actor_return_boundary_sha256=sha256_file(return_boundaries_module.__file__))
                      if args.breakout_return_life_boundaries else {}),
+                  **(dict(life_loss_terminal_kind=LIFE_TERMINAL_KIND) if args.life_loss_terminal else {}),
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,
                   cpu_worker_threads=agent.cpu_worker_threads,
                   trainable_parameter_counts=agent.trainable_parameter_counts,
@@ -1181,7 +1192,17 @@ def main():
                 current_frames = frames
                 before = time.perf_counter()
                 boundary_fields = {}
-                if life_monitors:
+                life_resets = []
+                if args.life_loss_terminal:
+                    # Training-only episode boundary: the stored stream ends at the lost life and
+                    # restarts from the same frame; rewards and the emulator's game are unchanged.
+                    lost = [losses > 0 for losses, _ in (monitor.take_changes() for monitor in life_monitors)]
+                    life_resets = [stream for stream in ids
+                                   if lost[stream] and not (terminated[stream] or truncated[stream])]
+                    boundary_fields = dict(life_terminals=[stream in life_resets for stream in ids])
+                    stored_rewards = agent.observe(ids, frames, rewards,
+                        [bool(terminated[stream]) or stream in life_resets for stream in ids], truncated)
+                elif life_monitors:
                     changes = [monitor.take_changes() for monitor in life_monitors]
                     boundaries = [losses > 0 for losses, _ in changes]
                     boundary_fields = dict(actor_return_boundaries=boundaries,
@@ -1232,6 +1253,8 @@ def main():
                         episode_lengths[stream] = 0
                         resets.append(stream)
                 before = time.perf_counter()
+                if life_resets:
+                    agent.begin_episodes(life_resets, [frames[stream] for stream in life_resets])
                 if resets:
                     reset_frames = [environments[stream].reset()[0] for stream in resets]
                     agent.begin_episodes(resets, reset_frames)

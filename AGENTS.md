@@ -220,9 +220,23 @@ better than the guided learner at every kept checkpoint) and frozen play
 at 400k is 71.1 to 91.4 (medians 28 to 38, best 410) against the pixel
 recipe's 21 and the guided learner's 91 to 192. Online returns peak at
 124 near 200k actions, then fall as the return scale jumps (20 to 93) and
-policy entropy rises (.5 to 1.3 nats). One seed; a [second
-seed](docs/experiments/2026-11-15-breakout-clean-cdp-96-seed22003.md) (22003)
-is running. On a
+policy entropy rises (.5 to 1.3 nats). The [second
+seed](docs/results/2026-11-15-breakout-clean-cdp-96-seed22003.md) (22003)
+does not repeat the ball result: its probe stays at 14 / 19 to 22 px
+(within 8 px .08 to .12) at every checkpoint, online returns sit at 19 to
+23 through 250k actions, and frozen play is 34.4 to 58.8 (medians 21.5 to
+33). Two-seed frozen means are 53 to 75 against the pixel recipe's 20 to
+22; whether the latent objective picks up the ball depends on the seed.
+The user's goal since November 15 is **make Kindle learn Breakout well**.
+Published agents that play Breakout well at 100k actions (IRIS 84,
+DIAMOND 133, BBF 371, EfficientZero 414 against DreamerV3's 31) all end
+the training episode on a lost life; the clean recipe did not. The
+[life-loss terminal experiment](docs/experiments/2026-11-15-breakout-life-loss-terminal.md)
+(`--life-loss-terminal`, training only, whole-game evaluation) runs the
+clean CDP recipe with that boundary on both seeds, then a ratio-16 pair:
+root `/x/Temp/kindle-breakout-life-20261115`, unit
+`kindle-breakout-life-20261115`, about 8.7 hours from 22:09 UTC November
+15. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),

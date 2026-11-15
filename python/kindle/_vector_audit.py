@@ -189,6 +189,10 @@ def audit(path):
         else:
             check("actor_return_boundary_sha256" not in header, "undeclared life-boundary source")
             check(not auxiliary_boundaries or header["mode"] != "train", "undeclared life boundaries")
+        life_terminals = header.get("life_loss_terminal_kind")
+        check(life_terminals is None or (life_terminals == "raw-frame-life-loss-episode-end-v1"
+              and life_boundaries is None and header["mode"] == "train"
+              and header.get("restored_checkpoint") is None), "invalid life-terminal protocol")
         open_loop = config.get("open_loop_supervision")
         if open_loop is not None:
             check(isinstance(open_loop, dict) and set(open_loop) == {"horizon", "scale"},
@@ -306,6 +310,7 @@ def audit(path):
         last_flags = None
         final = None
         completed = []
+        pending_life = []
 
         def push(stream, *, reset=False):
             if len(replay) == config["replay_capacity"]:
@@ -327,6 +332,11 @@ def audit(path):
             event = json.loads(line)
             check(final is None, "events after run_end")
             kind = event["event"]
+            if pending_life and kind != "learner":
+                # The stored episode restarts on the same frame after that tick's updates.
+                for stream in pending_life:
+                    push(stream, reset=True)
+                pending_life.clear()
             if kind == "transition":
                 settled()
                 check(episode_target is None or min(budget_counts) < episode_target,
@@ -348,6 +358,15 @@ def audit(path):
                               for value in event[field]), "invalid life-change count")
                     check(event["actor_return_boundaries"] == [value > 0 for value in event["actor_return_losses"]],
                           "actor-return boundaries differ from life losses")
+                if life_terminals:
+                    flags = event.get("life_terminals")
+                    check(isinstance(flags, list) and len(flags) == count and all(type(value) is bool for value in flags),
+                          "invalid life-terminal flags")
+                    check(not any(life and (terminal or truncated) for life, terminal, truncated
+                                  in zip(flags, event["terminated"], event["truncated"])),
+                          "life terminal on a game boundary")
+                else:
+                    check("life_terminals" not in event, "undeclared life terminals")
                 for field in ("behavior_values", "behavior_intrinsic"):
                     if behavior_probe:
                         check(isinstance(event.get(field), list) and len(event[field]) == count,
@@ -413,6 +432,8 @@ def audit(path):
                     episode_returns[stream] += reward
                     total_rewards[stream] += reward
                     push(stream)
+                    if life_terminals and event["life_terminals"][stream]:
+                        pending_life.append(stream)
                     if started:
                         credit = f32(credit + credit_per_action)
                     if terminal or truncated:
