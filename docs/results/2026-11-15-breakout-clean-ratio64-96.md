@@ -81,3 +81,5 @@ noise at this sample size.
 [A second seed of this recipe](../experiments/2026-11-15-breakout-clean-ratio64-96-seed22003.md)
 before it is built on: earlier Breakout recipes varied by a factor of three
 between seeds.
+Its [result](2026-11-15-breakout-clean-ratio64-96-seed22003.md) repeats the
+recipe: frozen 19.1 to 22.1, ball 18.6 / 13.9 px.
