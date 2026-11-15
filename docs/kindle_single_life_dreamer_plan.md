@@ -170,8 +170,19 @@ redirected the work to [Breakout agents without hand-made relevance
 priors](experiments/2026-11-15-breakout-clean-representation.md): no motion
 weighting, hand action features, context frames or teacher guidance;
 scripted-teacher demonstrations only as an initial phase; value gradients
-into the representation tested; five arms queued under
-`kindle-breakout-clean-20261115.service` (root `/x/Temp/kindle-breakout-clean-20261115`). On a
+into the representation tested. [Its five arms](results/2026-11-15-breakout-clean-representation.md)
+(12M, 64x64, train ratio 16, 400k actions, seed 1009; root
+`/x/Temp/kindle-breakout-clean-20261115`) leave the ball out of the model
+state in every arm (linear probe 19.5 to 24.8 source pixels against 27.3
+untrained; paddle 2.4 to 7.7 px). Clean D3 plays 4.3 / 4.0 sampled /
+greedy on cohort 4000777001; `--actor-critic-gradient` is the one lever
+that moved play (7.2 / 7.4, sharpest paddle); demonstrations sharpen the
+paddle but shock the return scale (1 to 48) and leave greedy policies
+that never press FIRE; removing the replay-value gradient changes
+nothing. The clean arms replay each action 16 times against DreamerV3's
+32 (Atari) and 256 (Atari100k), so the [ratio-64 run of arm
+B](experiments/2026-11-15-breakout-clean-ratio64.md) tests whether
+the clean recipe is only undertrained. On a
 [fresh agent cohort](results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
