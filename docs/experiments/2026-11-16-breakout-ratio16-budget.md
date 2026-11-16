@@ -66,7 +66,7 @@ run and twelve evaluations, then six probes), guards `guards-12`, unit
 `kindle-breakout-budget-20261116`, 15 GiB memory cap, about 5.5 hours.
 Launched by hand; nothing is chained. Kindle on Meganeura main `e3215fa2`.
 
-## Amendment, November 16 12:40 UTC: the open seed-22003 cells on a software device
+## Amendment, November 16 12:34 UTC: the open seed-22003 cells on a software device
 
 A [GPU kernel fault](../results/2026-11-16-breakout-ratio16-budget.md)
 stopped the queue after `B22`'s training and one 1.2M cell, and the host
