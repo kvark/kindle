@@ -99,6 +99,13 @@ does not rescue the declared verdict; it is a second measurement.
 
 ## Part B: the Atari-100k protocol
 
+**Withdrawn before launch on November 16.** Part A showed the ratio-16
+life arm playing at least as well as the ratio-64 one on this seed, so the
+protocol arms run at ratio 16 instead:
+[ratio-16 protocol declaration](2026-11-16-breakout-ratio16-protocol.md).
+`queue-10-train.json` was never started. The text below is kept as
+declared.
+
 Both arms are M22's recipe and seed (22003, the seed that does not pick up
 the ball by itself) with the life terminal: 12M, 96x96 RGB, B16/T16,
 replay 100k, train ratio 64, actor unimix .01, behavior rate 8e-5, replay
