@@ -95,3 +95,34 @@ as software-device cells; `K`'s GPU cells stand for 400k because `B22`'s
 in `queue-12b.json` still run when the device is cleared and supersede
 them. Seed 1009 needs the GPU and stays open, so the both-seed tests
 stay open too.
+
+## Amendment, November 16 23:35 UTC: the user reviewed the fault; the queue continues on this boot
+
+Asked how to clear the fault, the user chose "Reviewed, use this boot"
+(no reboot). The existing host guard has no way to record that: it
+refuses any boot whose kernel journal holds a GPU fault record. It is
+left unchanged; two new files wrap it:
+
+- `python/examples/gpu_host_guard_reviewed.py` runs the same guard after
+  removing from its journal reads the records listed in a review file
+  (same boot, exact journal cursor and message) and retains each as a
+  `reviewed_kernel_fault` event. Any other fault record, including every
+  later one, still stops the guard.
+- `python/examples/run_gpu_queue_reviewed.py` is `run_gpu_queue.run`
+  with that guard.
+
+The review file is `gpu-fault-20261116/reviewed-kernel-faults.json`
+under the root (SHA-256 `1ebc9e22…cfc5c`): the nine records of the
+12:27:50 to 12:27:55 UTC ring timeout and mode-1 reset, and nothing
+else. A no-op job passes the wrapped guard with nine reviewed events
+(`guards-guard-smoke`) and is still refused by the unchanged guard
+(`guards-guard-smoke-control`).
+
+Launched by hand: `queue-12b.json` (the 30 remaining jobs, unchanged)
+with guards directory `guards-12b`, unit
+`kindle-breakout-budget-b-20261116`. Its first eleven jobs are `B22`
+evaluations of a few minutes each, which also serve as the device check
+before the seed-1009 training run. The three `B22` 1.2M GPU cells
+supersede the software-device cells in the declared reading; both are
+reported. A second fault stops the queue as before, and is not covered
+by this review.
