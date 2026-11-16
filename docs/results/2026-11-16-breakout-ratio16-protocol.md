@@ -132,11 +132,17 @@ arm's and `K`'s matched logs, not retained as a script): fast-ball misses
 are near misses. The paddle ends a median 12 to 13 px from a missed fast
 ball against a hit window of about 9 px, it had covered a median 87% to
 96% of the needed distance, and the fast-ball return rate does not depend
-on the travel needed (.64 to .77 from under 16 px to over 80 px). One
-four-frame action moves the paddle up to about 24 px. That reads as a
-final-position precision limit, not a reaction or reach limit. Sticky
-noise was one candidate cause; `S16` and `P16` return fast balls no better
-without it, so it is not the main one.
+on the travel needed (.64 to .77 from under 16 px to over 80 px). That
+reads as a final-position precision limit, not a reaction or reach limit.
+Two candidate causes are ruled out. Sticky noise: `S16` and `P16` return
+fast balls no better without it. The control grid: stepping the emulator
+without sticky actions, a four-frame action moves the paddle 12 px from
+rest and 22 to 24 px at full speed, the paddle coasts about 5 px over
+three frames after release, and the positions reachable with two to five
+actions lie at most 10 to 13 px apart, inside the 18 px window that
+returns the ball. What remains is the agent's own estimate of where a
+fast ball lands and of the paddle's momentum (reset probe: ball x error
+7.7 to 8.6 px, horizontal velocity R² .60 to .73 at 400k).
 
 One run per arm on development cohorts and reused seeds. Sticky .25 with
 18 actions stays the protocol for retained results; nothing here argues
