@@ -65,3 +65,33 @@ from the protocol root and pinned in `sources.sha256`, unchanged),
 run and twelve evaluations, then six probes), guards `guards-12`, unit
 `kindle-breakout-budget-20261116`, 15 GiB memory cap, about 5.5 hours.
 Launched by hand; nothing is chained. Kindle on Meganeura main `e3215fa2`.
+
+## Amendment, November 16 12:40 UTC: the open seed-22003 cells on a software device
+
+A [GPU kernel fault](../results/2026-11-16-breakout-ratio16-budget.md)
+stopped the queue after `B22`'s training and one 1.2M cell, and the host
+guard blocks the device for this boot. Frozen evaluation also runs on
+Mesa's software Vulkan device (llvmpipe, CPU only, the faulted card not
+opened): a 100-tick smoke of the completed cell ran at about two ticks
+per second and chose the same action as the GPU log in 718 of 800
+lane-ticks, diverging first at tick 14. It is the same checkpoint and
+runner on different floating-point code, so its games are another draw
+of the same policy, not a replay of the GPU's.
+
+Added, run by hand as memory-capped units outside the GPU queue, with
+`VK_DRIVER_FILES` set to the llvmpipe ICD only, no device id and no
+device-name expectation, otherwise the queue's command:
+
+- `B22` at 1.2M, matched play, the three open cells (777001 greedy,
+  022003 sampled, 022003 greedy), written as `…-reset-llvmpipe.jsonl`,
+  about 50 to 90 minutes each.
+- The completed cell (777001 sampled) once more on llvmpipe, as the
+  check that the software device reproduces the GPU cell's distribution
+  (GPU: mean 278.8, median 277).
+
+Reading: the declared seed-22003 tests are read from these cells, marked
+as software-device cells; `K`'s GPU cells stand for 400k because `B22`'s
+400k world and policy weights are bit-identical to `K`'s. The GPU cells
+in `queue-12b.json` still run when the device is cleared and supersede
+them. Seed 1009 needs the GPU and stays open, so the both-seed tests
+stay open too.
