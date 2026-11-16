@@ -276,10 +276,18 @@ arm plays 11 to 12 against DreamerV3's 31. The same recipe differs 1.6 to
 (.49 to .76), and every curve was still rising at 400k. Sticky .25 with
 18 actions stays the retained protocol. The
 [1.2M-action budget run](docs/experiments/2026-11-16-breakout-ratio16-budget.md)
-of K's recipe on both seeds runs as unit `kindle-breakout-budget-20261116`
-from November 16, about 5.5 hours: root
-`/x/Temp/kindle-breakout-budget-20261116`, `queue-12.json`, guards
-`guards-12`. Nothing is chained; later queues are launched by hand. On a
+of K's recipe on both seeds is [partly done](docs/results/2026-11-16-breakout-ratio16-budget.md):
+seed 22003 trained to 1.2M actions in 149 minutes, online returns rise
+throughout to about 300 per game, and the one matched cell evaluated
+plays **278.8 (median 277, best 421)** with fast balls returned 88%. Its
+first 400k actions reproduce K bit for bit, so seed spread is the seed.
+**A GPU kernel fault (ring timeout, mode-1 reset, VRAM lost) at 12:28
+UTC November 16 stopped the queue after 2 of 32 jobs; the host guard
+requires a recovery review for this boot, so no GPU job may start until
+the user clears it.** The 30 remaining jobs are prepared, unlaunched, as
+`queue-12b.json` in root `/x/Temp/kindle-breakout-budget-20261116`
+(evidence in `gpu-fault-20261116/`). Nothing is chained; queues are
+launched by hand. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
@@ -303,7 +311,8 @@ The previous [cumulative-survival learner](docs/results/2026-11-10-breakout-worl
 remains frozen by systemd at the user's request at update 9,964/16,384
 (`kindle-world-survival-loss-learning-20261110.service`, PID 2287733); it holds
 about 1 GB of host memory and 0.5 GB of VRAM. Do not thaw, restart or stop it
-without the user. Its fixed protocol, qualification and the closed RGB-event
+without the user. The November 16 GPU reset reported VRAM lost, so its
+device state is presumably gone; that does not change the instruction. Its fixed protocol, qualification and the closed RGB-event
 reviews stay as recorded in their reports; its runtime is the fork's.
 
 ## Direction and retained results
