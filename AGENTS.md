@@ -265,13 +265,21 @@ without the boundary get worse under the reset. Even whole-game, K beats
 its no-boundary twin L (53 to 85 against 24 to 31). The fast ball is the
 remaining limit (descents faster than 13 px per action are returned 65%
 to 76%), and at 100k actions the life arms play 22 to 29. The ratio-64
-protocol arms were withdrawn unlaunched; the
-[ratio-16 protocol arms](docs/experiments/2026-11-16-breakout-ratio16-protocol.md)
-(Atari-100k wrapper, non-sticky only, and K's recipe on seed 1009) run as
-unit `kindle-breakout-ratio16-20261116` from 06:51 UTC November 16, about
-3.3 hours: root `/x/Temp/kindle-breakout-protocol-20261116`,
-`queue-11.json`, guards `guards-11`. Nothing is chained; later queues are
-launched by hand. On a
+protocol arms were withdrawn unlaunched. The
+[ratio-16 protocol arms](docs/results/2026-11-16-breakout-ratio16-protocol.md)
+all fail their declared tests: K's recipe on seed 1009 plays 52.8 to 60.9
+(median 54), the Atari-100k wrapper 71.2 to 130.2 with a lower median (51)
+and 16 of 96 games above 300, non-sticky alone 45; non-sticky learners
+keep 13 and 26 under sticky actions, and at 100k actions the Atari-100k
+arm plays 11 to 12 against DreamerV3's 31. The same recipe differs 1.6 to
+2.5 times between its two seeds, the arms differ in fast balls returned
+(.49 to .76), and every curve was still rising at 400k. Sticky .25 with
+18 actions stays the retained protocol. The
+[1.2M-action budget run](docs/experiments/2026-11-16-breakout-ratio16-budget.md)
+of K's recipe on both seeds runs as unit `kindle-breakout-budget-20261116`
+from November 16, about 5.5 hours: root
+`/x/Temp/kindle-breakout-budget-20261116`, `queue-12.json`, guards
+`guards-12`. Nothing is chained; later queues are launched by hand. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
