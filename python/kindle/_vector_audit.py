@@ -192,7 +192,10 @@ def audit(path):
         life_terminals = header.get("life_loss_terminal_kind")
         check(life_terminals is None or (life_terminals == "raw-frame-life-loss-episode-end-v1"
               and life_boundaries is None and header["mode"] == "train"
-              and header.get("restored_checkpoint") is None), "invalid life-terminal protocol")
+              and header.get("restored_checkpoint") is None)
+              or (life_terminals == "raw-frame-life-loss-belief-reset-v1" and life_boundaries is None
+                  and header["mode"] != "train" and header.get("restored_checkpoint") is not None),
+              "invalid life-terminal protocol")
         open_loop = config.get("open_loop_supervision")
         if open_loop is not None:
             check(isinstance(open_loop, dict) and set(open_loop) == {"horizon", "scale"},

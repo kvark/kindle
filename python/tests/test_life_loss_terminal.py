@@ -1,4 +1,4 @@
-"""Training-only life-loss terminals keep whole games in the emulator and the log; no GPU."""
+"""Life-loss terminals (training) and belief resets (frozen evaluation) keep whole games in the emulator and the log; no GPU."""
 import json
 from pathlib import Path
 import sys
@@ -21,6 +21,14 @@ def test_invalid_life_terminal_options_fail_before_environment(monkeypatch, tmp_
     monkeypatch.setattr(sys, 'argv', command(tmp_path, ['--life-loss-terminal', *extra]))
     with pytest.raises(SystemExit): atari_vector.main()
     assert 'life-loss-terminal requires fresh training' in capsys.readouterr().err
+
+
+@pytest.mark.parametrize('extra', [[], ['--evaluate'], ['--restore', 'unused']])
+def test_life_reset_is_frozen_evaluation_only(monkeypatch, tmp_path, capsys, extra):
+    monkeypatch.setattr(atari_vector.gym, 'make', lambda *a, **kw: pytest.fail('environment constructed'))
+    monkeypatch.setattr(sys, 'argv', command(tmp_path, ['--life-loss-reset', *extra]))
+    with pytest.raises(SystemExit): atari_vector.main()
+    assert 'life-loss-reset requires frozen restore' in capsys.readouterr().err
 
 
 @pytest.mark.parametrize('enabled', [False, True])
@@ -84,11 +92,12 @@ def test_life_terminals_reach_only_the_stored_stream(monkeypatch, tmp_path, enab
     assert all(not any(stored[1]) for stored in observed)
     assert audit(tmp_path/'run.jsonl')['updates'] == 0
     if enabled:
-        for mutation in ('undeclared', 'flag', 'boundary'):
+        for mutation in ('undeclared', 'flag', 'boundary', 'evaluation-kind'):
             changed = json.loads(json.dumps(rows))
             target = next(row for row in changed if row['event'] == 'transition')
             if mutation == 'undeclared': del changed[0]['life_loss_terminal_kind']
             elif mutation == 'flag': target['life_terminals'] = [1, 1]
+            elif mutation == 'evaluation-kind': changed[0]['life_loss_terminal_kind'] = atari_vector.LIFE_RESET_KIND
             else: target['life_terminals'], target['terminated'] = [True, True], [True, True]
             (tmp_path/'changed.jsonl').write_text(''.join(json.dumps(row) + '\n' for row in changed))
             with pytest.raises(ValueError): audit(tmp_path/'changed.jsonl')

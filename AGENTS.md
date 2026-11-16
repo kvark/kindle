@@ -235,7 +235,22 @@ the training episode on a lost life; the clean recipe did not. The
 clean CDP recipe with that boundary on both seeds, then a ratio-16 pair:
 root `/x/Temp/kindle-breakout-life-20261115`, unit
 `kindle-breakout-life-20261115`, about 8.7 hours from 22:09 UTC November
-15. On a
+15. Its first arm (seed 22003) misses the declared criteria as evaluated
+(frozen 26.5 to 43.1, pooled median 28 against the control's 27; ball
+within 8 px .25 to .29), but a CPU replay of the frozen logs
+(`breakout_life_replay.py`) shows the evaluation left its training
+distribution: it returns 94% of balls in the first life (97% to 99% until
+the ball speeds up, 81% after twelve hits) and 72% to 89% after its belief
+carries through a lost life, while both controls lose the first life of
+every game with the paddle standing still. All runs so far used sticky
+actions and 18 actions; the published Atari-100k scores did not. The
+[follow-up](docs/experiments/2026-11-16-breakout-life-reset-and-protocol.md)
+adds `--life-loss-reset` (frozen evaluation restarts the belief at a lost
+life, as training did) and two arms on seed 22003 under the Atari-100k
+protocol (non-sticky; then also four actions and no-op starts): root
+`/x/Temp/kindle-breakout-protocol-20261116`, queues `queue-10-eval.json`
+and `queue-10-train.json`, to be launched by hand after the life-loss
+queue ends (nothing is chained). On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),

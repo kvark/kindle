@@ -39,6 +39,8 @@ from atari import (
 
 # A lost life ends the stored training episode; the next one begins on the same frame.
 LIFE_TERMINAL_KIND = "raw-frame-life-loss-episode-end-v1"
+# Frozen evaluation with the same boundary: the belief restarts at a lost life, whole games are scored.
+LIFE_RESET_KIND = "raw-frame-life-loss-belief-reset-v1"
 
 
 def require_gpu_budget(snapshot, minimum_bytes):
@@ -185,6 +187,9 @@ def main():
     parser.add_argument("--life-loss-terminal", action="store_true",
                         help="fresh training only: store a lost life as a terminal and begin a new stored episode "
                              "from the same frame; the emulator, logged episodes and evaluations keep whole games")
+    parser.add_argument("--life-loss-reset", action="store_true",
+                        help="frozen evaluation only: restart the agent's belief from the same frame at a lost life, "
+                             "as life-loss-terminal training does; logged episodes keep whole games")
     parser.add_argument("--return-lambda", type=float,
                         help="fresh training only: imagined and replay return trace mixture in [0,1]; omitted: native default")
     parser.add_argument("--replay-value-bootstrap", choices=("imagined", "posterior"),
@@ -363,6 +368,9 @@ def main():
     if args.life_loss_terminal and (args.restore or args.evaluate or args.breakout_return_life_boundaries
                                     or args.replay_value_completed):
         parser.error("life-loss-terminal requires fresh training without auxiliary life boundaries or completed returns")
+    if args.life_loss_reset and not (args.restore and args.evaluate):
+        parser.error("life-loss-reset requires frozen restore")
+    life_boundary = args.life_loss_terminal or args.life_loss_reset
     if args.replay_actor_scale is not None:
         if not positive_f32(args.replay_actor_scale):
             parser.error("replay-actor-scale must be finite and positive in F32")
@@ -887,7 +895,7 @@ def main():
                 args.environment, frameskip=1, repeat_action_probability=args.sticky_actions,
                 full_action_space=protocol.full_action_space,
             )
-            if args.breakout_return_life_boundaries or args.life_loss_terminal:
+            if args.breakout_return_life_boundaries or life_boundary:
                 env = LifeBoundaryMonitor(env)
                 life_monitors.append(env)
             env = DreamerAtariPreprocessing(env, noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
@@ -1098,7 +1106,8 @@ def main():
                   **(dict(actor_return_boundary_kind=LIFE_BOUNDARY_KIND,
                           actor_return_boundary_sha256=sha256_file(return_boundaries_module.__file__))
                      if args.breakout_return_life_boundaries else {}),
-                  **(dict(life_loss_terminal_kind=LIFE_TERMINAL_KIND) if args.life_loss_terminal else {}),
+                  **(dict(life_loss_terminal_kind=LIFE_TERMINAL_KIND if args.life_loss_terminal else LIFE_RESET_KIND)
+                     if life_boundary else {}),
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,
                   cpu_worker_threads=agent.cpu_worker_threads,
                   trainable_parameter_counts=agent.trainable_parameter_counts,
@@ -1193,8 +1202,8 @@ def main():
                 before = time.perf_counter()
                 boundary_fields = {}
                 life_resets = []
-                if args.life_loss_terminal:
-                    # Training-only episode boundary: the stored stream ends at the lost life and
+                if life_boundary:
+                    # Agent-side episode boundary: the stored stream ends at the lost life and
                     # restarts from the same frame; rewards and the emulator's game are unchanged.
                     lost = [losses > 0 for losses, _ in (monitor.take_changes() for monitor in life_monitors)]
                     life_resets = [stream for stream in ids
