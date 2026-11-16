@@ -253,12 +253,25 @@ arms' probe readings (.18 to .29 within 8 px) are mismatched too;
 actions and 18 actions; the published Atari-100k scores did not. The
 [follow-up](docs/experiments/2026-11-16-breakout-life-reset-and-protocol.md)
 adds `--life-loss-reset` (frozen evaluation restarts the belief at a lost
-life, as training did) and two arms on seed 22003 under the Atari-100k
-protocol (non-sticky; then also four actions and no-op starts): root
-`/x/Temp/kindle-breakout-protocol-20261116`, queues `queue-10-eval.json`
-(32 matched evaluations, then 12 reset probes) and `queue-10-train.json`,
-to be launched by hand after the life-loss queue ends (nothing is
-chained). On a
+life, as training did) and the matching probe. **A life-terminal agent
+must be evaluated and probed with that reset.** Under it the
+[matched results](docs/results/2026-11-16-breakout-life-reset.md) are the
+best clean Breakout play on record: seed 1009 at ratio 64 plays 115.9 to
+154.9 per cell (pooled median 98, 47 of 96 games at 100 or more; reset
+probe .53 within 8 px), the ratio-16 arm K on seed 22003 plays 80.7 to
+101.7 (median 73, probe .51) after 52 minutes of training, and the
+ratio-64 arm on seed 22003 49.3 to 63.7 (median 47). Agents trained
+without the boundary get worse under the reset. Even whole-game, K beats
+its no-boundary twin L (53 to 85 against 24 to 31). The fast ball is the
+remaining limit (descents faster than 13 px per action are returned 65%
+to 76%), and at 100k actions the life arms play 22 to 29. The ratio-64
+protocol arms were withdrawn unlaunched; the
+[ratio-16 protocol arms](docs/experiments/2026-11-16-breakout-ratio16-protocol.md)
+(Atari-100k wrapper, non-sticky only, and K's recipe on seed 1009) run as
+unit `kindle-breakout-ratio16-20261116` from 06:51 UTC November 16, about
+3.3 hours: root `/x/Temp/kindle-breakout-protocol-20261116`,
+`queue-11.json`, guards `guards-11`. Nothing is chained; later queues are
+launched by hand. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),

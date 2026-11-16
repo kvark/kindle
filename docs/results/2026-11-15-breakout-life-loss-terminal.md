@@ -1,4 +1,4 @@
-# Life loss as a training terminal: both ratio-64 arms fail as evaluated, and the evaluation was mismatched
+# Life loss as a training terminal: the ratio-64 arms fail as evaluated, the ratio-16 arm passes, and the evaluation was mismatched
 
 Declared in [the life-loss terminal protocol](../experiments/2026-11-15-breakout-life-loss-terminal.md):
 the clean centered-CDP recipe (published protocol with sticky .25 and 18
@@ -7,8 +7,9 @@ actions, 12M, 96x96 RGB, B16/T16, replay 100k, train ratio 64,
 4e-5`, 400k actions, no guidance, labels, demonstrations or bonus) with
 `--life-loss-terminal` added, on the two control seeds. Root
 `/x/Temp/kindle-breakout-life-20261115`, queue `queue-9.json`, guards
-`guards-9`, unit `kindle-breakout-life-20261115`. Each arm: 99,907 updates
-in 191 minutes, device memory peak 15.4 GiB.
+`guards-9`, unit `kindle-breakout-life-20261115` (status complete). Each
+ratio-64 arm: 99,907 updates in 191 minutes; the ratio-16 pair 24,977
+updates in 52 and 49 minutes; device memory peak 15.4 GiB throughout.
 
 **By the declared reading the boundary does not help play on either seed.**
 Whole-game frozen play at 400k has pooled medians of 28 (seed 22003,
@@ -28,10 +29,13 @@ Online, with the boundary active, both arms beat their controls' late
 returns and seed 1009's arm was still rising at 94 per game. The
 [follow-up](../experiments/2026-11-16-breakout-life-reset-and-protocol.md)
 evaluates and probes the same checkpoints with the belief restarted at a
-lost life.
+lost life; [its result](2026-11-16-breakout-life-reset.md) reverses the
+seed-1009 verdict (116 to 155 per cell, median 98).
 
-The ratio-16 pair (K with the boundary, L without) is still running; its
-section is added when the queue ends.
+**At ratio 16 the boundary passes even as declared.** K (with the
+boundary) plays 53 to 85 whole-game with a pooled median of 61 against L's
+24 to 31 and 26, in 52 minutes, and beats the ratio-64 arm on the same
+seed.
 
 ## Frozen whole-game play, as declared
 
@@ -53,6 +57,35 @@ Of the 96 games at 400k, 85 (M22) and 82 (M10) score 50 or less and one
 each reaches 100; the controls had 13 and 21 games of 100 or more. The life
 arms lose the controls' long tunnelling games, which is where the controls'
 means come from.
+
+## The ratio-16 pair
+
+Seed 22003, 400k actions, 24,977 updates; whole-game evaluation with the
+belief carried, as declared.
+
+| Arm | 777001 sampled | 777001 greedy | 022003 sampled | 022003 greedy | Pooled median | Ball within 8 px |
+|---|---:|---:|---:|---:|---:|---:|
+| K, life terminal | 58.5 (194) | 53.3 (136) | 84.8 (263) | 66.2 (239) | 61 | .395 |
+| K median | 51.5 | 49.5 | 72.5 | 65.0 | | |
+| L, no life terminal | 26.8 (56) | 23.9 (74) | 26.3 (75) | 31.2 (73) | 26 | .326 |
+| L median | 26.0 | 20.5 | 25.0 | 30.0 | | |
+
+K's median exceeds L's in four of four cells and its pooled median is 2.3
+times L's, so by the declared K-against-L criterion the boundary helps at
+ratio 16. Eleven of K's 96 games reach 100; none of L's do. Online, K
+earned 39, 61 and 70 per game over its last three 50k bins and was still
+rising; L sat at 17 to 21 from 100k on.
+
+K's replayed games degrade far less after a lost life than the ratio-64
+arms' do: 97% of balls returned in the first life, then 91%, 93%, 87% and
+77%, with 14 to 20 empty lives of 96 where M10 had 61 to 82. L repeats
+the whole-game controls' pattern (first life lost in 84 actions with the
+paddle standing still at 66 of 96 misses).
+
+The declared screen test ("ratio 16 is a usable screen if that verdict
+agrees with M22's") fails by its letter: K passes and M22 does not. The
+disagreement is that ratio 16 did better, on this seed, under the declared
+evaluation and under the matched one.
 
 ## State probe, as declared
 
@@ -130,11 +163,13 @@ games at 400k; "returned" is the share of ball descents sent back.
 
 ## Reading
 
-- Declared play criterion: fails on both seeds. Declared consequence ("life
+- Declared play criterion at ratio 64: fails on both seeds. Declared consequence ("life
   handling is not what separates Dreamer-style agents") is **not drawn**,
   because the evaluation carried the belief through a boundary the agents
   were trained never to cross; this is a protocol defect of the declaration,
   recorded here, not a pass.
+- Declared K-against-L criterion: passes. Ratio 16 as a screen: fails as
+  worded, because the cheap arm outplays the expensive one.
 - Declared probe readings: seed 22003 not repaired (.25 to .29 against .4);
   seed 1009 reads worse than its control, which the declaration says to
   report as a representation cost. The probe has the same mismatch, so that
