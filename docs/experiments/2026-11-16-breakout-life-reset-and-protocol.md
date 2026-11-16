@@ -192,7 +192,10 @@ ball may be that and not a cost of the boundary.
 `breakout_agent_probe_actions.py` with `--life-loss-reset`: when the teacher
 loses a life, the agent's belief restarts from the same frame (`observe`
 with the terminal, then `begin_episodes`). Trajectories, labels, splits and
-the regression are unchanged; lives lost per lane are recorded.
+the regression are unchanged; lives lost per lane are recorded. Checked on
+CPU with a stub agent: with and without the flag, and through the
+four-action vocabulary, the teacher's returns and the 29 lost lives are
+identical, and every ended lane is restarted before the next action.
 
 **Added jobs** (`make_probe_additions.py` in the root; 44 and 50 jobs):
 
@@ -200,7 +203,7 @@ the regression are unchanged; lives lost per lane are recorded.
   M10 at 100k to 400k, of K and L at 400k, and of the two ratio-64
   controls at 400k (agents never trained with the reset), into
   `reset-probe/`.
-- `queue-10-train.json`, after each arm's declared probes: the same four
+- `queue-10-train.json`, after all 42 declared jobs: each arm's four
   checkpoints probed with the reset (`--minimal-actions` for P22).
 
 **Reading.** Post hoc like Part A: it does not change the declared probe
