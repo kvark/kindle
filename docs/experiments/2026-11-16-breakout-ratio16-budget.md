@@ -96,7 +96,7 @@ in `queue-12b.json` still run when the device is cleared and supersede
 them. Seed 1009 needs the GPU and stays open, so the both-seed tests
 stay open too.
 
-## Amendment, November 16 23:35 UTC: the user reviewed the fault; the queue continues on this boot
+## Amendment, November 16 23:30 UTC: the user reviewed the fault; the queue continues on this boot
 
 Asked how to clear the fault, the user chose "Reviewed, use this boot"
 (no reboot). The existing host guard has no way to record that: it
