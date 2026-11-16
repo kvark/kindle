@@ -66,6 +66,28 @@ degrades after twelve hits. The agent now meets three times as many fast
 descents per game as at 400k, and the fifth life is still the weakest
 (.86).
 
+**Post hoc, where the games end** (same four cells replayed, by the
+game's score at the time; not a declared reading):
+
+| Score so far | Ball descents | Returned | Points per descent | Lives lost per 100 points |
+|---|---:|---:|---:|---:|
+| 0 to 100 | 3,919 | .94 | 2.4 | 2.5 |
+| 100 to 200 | 716 | .91 | 10.5 | .9 |
+| 200 to 300 | 377 | .86 | 15.9 | .9 |
+| 300 to 350 | 269 | .86 | 8.6 | 1.7 |
+| 350 to 400 | 354 | .85 | 3.9 | 4.0 |
+| 400 to 432 | 186 | .83 | 1.4 | 12.3 |
+| Above 432 | 39 | .92 | 1.6 | 4.8 |
+
+Games reaching 300 / 350 / 400 / 420 / 432: 54 / 40 / 19 / 7 / 1 of 96.
+Once the ball is behind the wall a return is worth 10 to 16 points; with
+few bricks left it is worth 1.4, while one return in six is still lost,
+so the last 32 points cost about four lives on average. Sixteen of the
+19 games that reach 400 arrive with one or two lives left. The first wall is
+out of reach by returning alone at this return rate: it needs either
+the late-game return rate near the early-game one or returns aimed at
+the remaining bricks.
+
 ## Software-device cells
 
 The amendment's cells ran on Mesa's llvmpipe (CPU only; the faulted card
