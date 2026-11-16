@@ -162,3 +162,52 @@ launched as a 15 GiB memory-capped unit and read, then
 One run per arm on one seed and reused development cohorts: a screen. A
 passing arm needs a second seed before any reliability claim, and the
 original 864 / 90% two-wall gate is not addressed by any of this.
+
+## Amendment before launch: the state probe carries the belief through lost lives too
+
+Added on November 16 after the second life-loss arm (`M10`, seed 1009)
+finished and before either queue above was started. No declared job
+changes; jobs are appended.
+
+M10 misses its declared criteria the same way M22 did: frozen whole-game
+play 28.5 / 29.7 / 30.9 / 33.8 at 400k (pooled median 25.5 against the
+criterion's 60; its control plays 71 to 91), ball within 8 px .26 and .18
+at 300k and 400k against its control's .67 and .51. Its replayed frozen
+games repeat M22's pattern more sharply: the first life returns 95% of
+balls and scores 17.8 in 449 actions, the second life scores nothing in
+82 of 96 games, and in later lives the serve is returned 48% of the time
+against 100% in the first life. Online, with the boundary active, it
+earned 67 and 94 per game over its last two 50k bins and never fell back
+(its control peaked at 124 near 150k and fell to 59).
+
+The pinned state probe (`breakout_agent_probe.py`) has the same mismatch as
+the whole-game evaluation. Its teacher loses three or four lives per lane
+in 1,536 actions (counted on CPU on the probe's own seeds), so 71% of the
+probe's rows come after a lost life with the belief carried through it. The
+probe criterion of the life-loss declaration was therefore read mostly
+outside the M arms' training distribution, and M10's apparent loss of the
+ball may be that and not a cost of the boundary.
+
+**Change.** `breakout_agent_probe_life.py`, a copy of
+`breakout_agent_probe_actions.py` with `--life-loss-reset`: when the teacher
+loses a life, the agent's belief restarts from the same frame (`observe`
+with the terminal, then `begin_episodes`). Trajectories, labels, splits and
+the regression are unchanged; lives lost per lane are recorded.
+
+**Added jobs** (`make_probe_additions.py` in the root; 44 and 50 jobs):
+
+- `queue-10-eval.json`, after its 32 evaluations: reset probes of M22 and
+  M10 at 100k to 400k, of K and L at 400k, and of the two ratio-64
+  controls at 400k (agents never trained with the reset), into
+  `reset-probe/`.
+- `queue-10-train.json`, after each arm's declared probes: the same four
+  checkpoints probed with the reset (`--minimal-actions` for P22).
+
+**Reading.** Post hoc like Part A: it does not change the declared probe
+verdicts. The boundary costs representation on seed 1009 only if M10's
+reset probe stays under .4 within 8 px at 300k and 400k; it repairs seed
+22003 if M22's reset probe passes .4 there. Predicted before running: M10's
+vertical ball error falls under 10 px (from 16.5 and 17.8) and both M arms
+read within 8 px above their carried-belief probes; the controls change
+little or get worse. For M10's matched play, predicted from its first life:
+cell means 70 to 100 and a pooled median above 60.

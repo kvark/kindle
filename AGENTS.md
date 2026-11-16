@@ -242,15 +242,23 @@ within 8 px .25 to .29), but a CPU replay of the frozen logs
 distribution: it returns 94% of balls in the first life (97% to 99% until
 the ball speeds up, 81% after twelve hits) and 72% to 89% after its belief
 carries through a lost life, while both controls lose the first life of
-every game with the paddle standing still. All runs so far used sticky
+every game with the paddle standing still. The [second arm](docs/results/2026-11-15-breakout-life-loss-terminal.md)
+(seed 1009) fails the same way and more sharply: frozen 28.5 to 33.8
+against its control's 71 to 91, first life 17.8 points with 95% of balls
+returned, second life empty in 82 of 96 games, online returns (belief
+restarted at each loss) rising to 94 per game. The pinned state probe
+carries the belief through lost lives on 71% of its rows, so the life
+arms' probe readings (.18 to .29 within 8 px) are mismatched too;
+`breakout_agent_probe_life.py --life-loss-reset` is the matched probe. All runs so far used sticky
 actions and 18 actions; the published Atari-100k scores did not. The
 [follow-up](docs/experiments/2026-11-16-breakout-life-reset-and-protocol.md)
 adds `--life-loss-reset` (frozen evaluation restarts the belief at a lost
 life, as training did) and two arms on seed 22003 under the Atari-100k
 protocol (non-sticky; then also four actions and no-op starts): root
 `/x/Temp/kindle-breakout-protocol-20261116`, queues `queue-10-eval.json`
-and `queue-10-train.json`, to be launched by hand after the life-loss
-queue ends (nothing is chained). On a
+(32 matched evaluations, then 12 reset probes) and `queue-10-train.json`,
+to be launched by hand after the life-loss queue ends (nothing is
+chained). On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
