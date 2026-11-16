@@ -278,8 +278,16 @@ arm plays 11 to 12 against DreamerV3's 31. The same recipe differs 1.6 to
 [1.2M-action budget run](docs/experiments/2026-11-16-breakout-ratio16-budget.md)
 of K's recipe on both seeds is [partly done](docs/results/2026-11-16-breakout-ratio16-budget.md):
 seed 22003 trained to 1.2M actions in 149 minutes, online returns rise
-throughout to about 300 per game, and the one matched cell evaluated
-plays **278.8 (median 277, best 421)** with fast balls returned 88%. Its
+throughout to about 300 per game, and matched play at 1.2M is **233.8 to
+304.1 per cell (pooled median 324.5, 82 of 96 games at 100 or more, 19
+at 400 or more, one at 495 past the first wall)** against 80.7 to 101.7
+(median 73) at 400k, with fast balls returned 89%. One of those cells
+ran on the GPU; the other three ran on Mesa's software Vulkan device
+(llvmpipe, `VK_DRIVER_FILES` set to its ICD, about 75 to 100 minutes and
+10 GB of host memory per cell, one at a time), which a repeat of the GPU
+cell does not distinguish from the GPU (249.1 against 278.8, standard
+error 35). The seed-22003 budget test passes; the both-seed tests wait
+for seed 1009, which needs the GPU. Its
 first 400k actions reproduce K bit for bit, so seed spread is the seed.
 **A GPU kernel fault (ring timeout, mode-1 reset, VRAM lost) at 12:28
 UTC November 16 stopped the queue after 2 of 32 jobs; the host guard

@@ -1,4 +1,4 @@
-# Interim: the 1.2M-action budget run reaches 300 per game online on seed 22003; a GPU fault stopped the queue after its first evaluation
+# Interim: K's recipe at 1.2M actions plays about 280 per game on seed 22003; a GPU fault leaves seed 1009 open
 
 Partial result of [the ratio-16 budget declaration](../experiments/2026-11-16-breakout-ratio16-budget.md).
 Root `/x/Temp/kindle-breakout-budget-20261116`, `queue-12.json`, guards
@@ -6,9 +6,11 @@ Root `/x/Temp/kindle-breakout-budget-20261116`, `queue-12.json`, guards
 November 16. **2 of 32 jobs completed**: the seed-22003 training run
 (`B22`, 74,977 updates in 148.8 minutes) and one matched evaluation at
 1.2M. The second evaluation faulted the GPU as it started and the host
-guard stopped the queue at 12:28 UTC. The declared reading needs all
-four cells at 400k and 1.2M on both seeds and is **not yet evaluable**;
-seed 1009 has not run.
+guard stopped the queue at 12:28 UTC. The three open 1.2M cells of seed
+22003 were then evaluated on a software Vulkan device under the
+[declaration's amendment](../experiments/2026-11-16-breakout-ratio16-budget.md),
+so **the seed-22003 tests are read below and pass**. The both-seed tests
+need the seed-1009 run, which needs the GPU and **has not run**.
 
 ## What is in hand
 
@@ -34,33 +36,84 @@ matches `K`'s to the printed digit in every bin, and its 400k
 spread between seeds is the seed, not the run, and `K`'s matched 400k
 cells (82.9 / 101.7 / 80.7 / 92.8, median 73) are `B22`'s.
 
-**Matched frozen play at 1.2M, one cell of four** (cohort 4000777001,
-sampled, 24 games, `--life-loss-reset`): **mean 278.8, median 277, best
-421**; 21 of 24 games at 100 or more, 10 above 300, none above 432. The
-same cell at 400k: mean 82.9, median 74.5, best 148.
+**Matched frozen play at 1.2M** (24 games per cell, `--life-loss-reset`;
+mean, median in brackets, best after the semicolon). The first cell ran
+on the GPU, the other three on the software device (see below):
 
-**Replay of that cell by life** (`breakout_life_replay.py`, CPU), with `K`
-at 400k pooled over its four cells:
+| Point | 777001 sampled | 777001 greedy | 022003 sampled | 022003 greedy | Pooled median | 100 or more / above 300 / above 432 of 96 |
+|---|---:|---:|---:|---:|---:|---|
+| 400k (`K`, GPU) | 82.9 (74.5; 148) | 101.7 (72; 324) | 80.7 (76.5; 143) | 92.8 (74.5; 359) | 73 | 27 / 4 / 0 |
+| 1.2M (`B22`) | **278.8** (277; 421) | **302.5** (350; 495) | **233.8** (189; 412) | **304.1** (362; 428) | **324.5** | 82 / 54 / 1 |
+
+Two of the 96 games at 1.2M score 50 or less. One game (495, greedy,
+cohort 777001) passes 432 and so clears the first wall, the first on
+record for any Kindle learner. Eighteen more end between 400 and 431:
+a fifth of the games stop just short of the wall's 432 points, with a
+few bricks left.
+
+**Replay of those cells by life** (`breakout_life_replay.py`, CPU), four
+cells pooled on each row:
 
 | | Returned, lives 1 to 5 | Paddle hits per life | Under 6 px | 6 to 9 | 9 to 13 | 13 or more | First life from 12 hits |
 |---|---|---|---:|---:|---:|---:|---:|
-| `B22` 1.2M, one cell | .99 / .97 / .93 / .95 / .84 | 20.3 / 13.7 / 8.0 / 8.1 / 5.3 | .98 (332) | .97 (431) | .97 (299) | .88 (331) | .97 (240) |
+| `B22` 1.2M | .98 / .97 / .95 / .96 / .86 | 19.0 / 13.8 / 8.3 / 8.7 / 6.2 | .98 (1322) | .97 (1796) | .97 (1146) | .89 (1380) | .97 (884) |
 | `K` 400k | .96 / .95 / .95 / .93 / .81 | 11.6 / 7.5 / 6.7 / 5.7 / 4.4 | .98 (1427) | .94 (1515) | .91 (322) | .76 (439) | .92 (270) |
 
 More of the same training does buy fast-ball precision on this seed:
-descents at 13 px per action or more are returned 88% against 76%, and
-the first life no longer degrades after twelve hits.
+descents at 13 px per action or more are returned 89% against 76% (.88,
+.89, .88 and .91 in the four cells), and the first life no longer
+degrades after twelve hits. The agent now meets three times as many fast
+descents per game as at 400k, and the fifth life is still the weakest
+(.86).
 
-## Against the declaration, so far
+## Software-device cells
 
-- Budget pays on seed 22003 (median at least 1.5 times its 400k median,
-  every cell above its 400k cell): the one cell in hand has 3.7 times the
-  median and 3.4 times the mean of its 400k cell. Three cells open.
-- Learned-well marker (pooled median at least 150 on both seeds): the
-  one cell's median is 277. Seed 1009 open.
-- Predictions: cell means 120 to 250 (the cell is above the range at
-  278.8), fast balls returned .75 to .85 (above at .88), at least one
-  game above 432 (not in this cell; best 421).
+The amendment's cells ran on Mesa's llvmpipe (CPU only; the faulted card
+was not opened), one at a time as memory-capped units, 73 to 100 minutes
+each for 5,900 to 7,300 decisions. It is the same checkpoint and runner
+on different floating-point code, so each cell is another draw of the
+same policy rather than the game the GPU would have played.
+
+The declared check, the GPU's cell repeated on llvmpipe (777001
+sampled):
+
+| Device | Mean | Median | Best | 100 or more / above 300 of 24 | Balls returned | Fast balls returned |
+|---|---:|---:|---:|---|---:|---:|
+| GPU | 278.8 | 277 | 421 | 21 / 10 | .954 | .88 (331) |
+| llvmpipe | 249.1 | 292.5 | 428 | 19 / 11 | .946 | .86 (315) |
+
+The means differ by 29.7 with a standard error of 35.3 (24 games each,
+game standard deviations 108 and 135), the medians go the other way, and
+the replay rates agree, so the two devices are not distinguishable at
+this sample size. A cell mean carries about 25 points of sampling error,
+and the largest gap between two of the four cells above (70) is twice
+the standard error of such a difference.
+The table of declared cells uses the GPU log for this cell; with the
+llvmpipe repeat instead, the pooled median is 326 and the pooled mean
+272.4 against 279.8.
+
+One protocol failure is retained: the first attempt at the 022003 greedy
+cell ran beside another cell under a 6 GB cap and was killed by its own
+cgroup at 2,949 decisions (llvmpipe's shared memory grows by about 1 MB
+per decision, to roughly 10 GB for a cell). Its partial log is kept in
+`cpu-oom-20261116/` and not used; the cell was rerun alone from the
+start under a 13 GB cap.
+
+## Against the declaration
+
+- **Budget pays on seed 22003: passes.** The pooled median at 1.2M is
+  324.5 against 73 at 400k (4.4 times; the test asks for 1.5), and every
+  cell mean is above its 400k cell (2.9 to 3.4 times).
+- **Learned-well marker** (pooled median at least 150 on both seeds):
+  seed 22003 reaches 324.5. **Seed 1009 is open**, so the marker is not
+  yet read. At 400k that seed played 52.8 to 60.9 (median 54) and
+  returned 54% of fast balls, so it starts from further back.
+- Predictions: cell means 120 to 250 (one cell inside at 233.8, three
+  above), medians 100 to 180 (all four above, 189 to 362), fast balls
+  returned .75 to .85 (above, .88 to .91), at least one game above 432
+  (one, 495). The run did better than predicted on every count.
+- The intermediate points (400k as `B22`'s own cells, 800k) and the
+  reset probes were not run; they are GPU jobs in `queue-12b.json`.
 
 ## GPU fault
 
@@ -95,4 +148,7 @@ is presumably gone.
 `queue-12b.json` in the root holds the 30 remaining jobs (`B22`'s eleven
 evaluations, the seed-1009 run and its twelve evaluations, six probes).
 It is not launched; the guard will keep refusing this boot until the
-fault is reviewed, and that review is the user's.
+fault is reviewed, and that review is the user's. Its three `B22` 1.2M
+cells supersede the software-device cells when they run. The seed-1009
+training run (about 150 minutes on the GPU) cannot be moved to the
+software device.
