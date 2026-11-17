@@ -1,6 +1,6 @@
 # Declaration: the clean life-terminal recipe with a two-frame encoder input
 
-November 17, 15:00 UTC. Follows [the own-play state-dump result](../results/2026-11-17-breakout-own-play-state-dump.md).
+November 17, 14:55 UTC. Follows [the own-play state-dump result](../results/2026-11-17-breakout-own-play-state-dump.md).
 
 ## Why
 
