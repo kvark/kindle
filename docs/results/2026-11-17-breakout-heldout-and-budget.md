@@ -1,12 +1,19 @@
-# The 1.2M-action marker holds on a fresh cohort and a held-out seed; the wall is lost on the shrunken paddle
+# The 1.2M-action marker holds on a fresh cohort and a held-out seed; the 3.6M-action run peaks at 1.6M and collapses
 
-Interim result of [the held-out and longer-budget declaration](../experiments/2026-11-17-breakout-heldout-and-budget.md):
-parts 1 and 2 are complete, part 3 (the 3.6M-action run `L22`) is
-training. Root `/x/Temp/kindle-breakout-heldout-20261117`, `queue-13.json`,
-guards `guards-13`, started 02:25 UTC November 17 on the reviewed boot;
-24 of 59 jobs were complete at 05:08 UTC with no kernel GPU message.
-All cells are GPU cells, matched (`--life-loss-reset`), 24 games each;
-mean, median in brackets, best after the semicolon.
+Result of [the held-out and longer-budget declaration](../experiments/2026-11-17-breakout-heldout-and-budget.md).
+Root `/x/Temp/kindle-breakout-heldout-20261117`, `queue-13.json`, guards
+`guards-13`, unit `kindle-breakout-heldout-20261117`: 59 of 59 jobs
+complete, 02:25 to 13:04 UTC November 17 on the reviewed boot, no kernel
+GPU message. All cells are GPU cells, matched (`--life-loss-reset`), 24
+games each; mean, median in brackets, best after the semicolon.
+
+- **Fresh cohort and held-out seed: both declared tests pass.**
+- **Longer budget: the declared test fails.** Seed 22003 peaks at 1.6M
+  actions (median 380.5, 8 of 96 games past the first wall, best 531),
+  falls back by 2.0M and collapses between 2.2M and 2.6M; at 3.6M the
+  median is 141 and no game passes 432.
+- **The project gate (864 in 90% of games) is unmet**: no game at any
+  checkpoint reaches 864.
 
 | Learner at 1.2M | Games | Mean | Median | 100 or more | 400 or more | Past 432 | At 864 |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -102,8 +109,89 @@ rises with budget on every seed (reused cohorts, all scores):
 | 5011 | .692 (130) | .775 (570) | .64 (81) | .72 (351) | 21 / 60 |
 
 The narrow paddle is a state the learner meets only after it breaks
-through the wall, so it is the thinnest part of its experience. `L22`'s
-checkpoints will be read with the same split.
+through the wall, so it is the thinnest part of its experience. On
+`L22` the rise stops at 1.2M, before the collapse:
+
+| `L22` checkpoint | Narrow, all balls | Narrow, fastest balls | Games reaching the narrow paddle of 96 |
+|---|---:|---:|---:|
+| 1.2M | .806 (942) | .76 (564) | 73 |
+| 1.6M | .830 (1,285) | .77 (728) | 83 |
+| 2.0M | .834 (1,106) | .78 (649) | 75 |
+| 2.4M | .680 (25) | .65 (17) | 5 |
+| 3.6M | .676 (222) | .61 (153) | 39 |
+
+**It is not policy noise.** Over the four learners' best points (three
+seeds at 1.2M, `L22` at 1.6M; 264 games per mode) the fastest balls on
+the narrow paddle are returned .76 when actions are sampled and .76
+when they are greedy; on the wide paddle .86 and .88.
+
+**It is not reach.** Over the 432 games at 1.2M, every lost ball in
+every paddle and speed class could have been reached at the paddle's
+full speed from where the paddle stood when the descent began (0
+unreachable of 2,160 lost descents). On the lost fastest balls the
+paddle moved toward the landing point in 91% to 92% of cases, travelled
+a median 37 to 38 px of the 37 to 38 px needed, and ended a median 10
+to 11 px from the ball; on returned balls it ends 4 px away. The paddle
+moves about 11 px in the first action of a move and about 22 px in each
+further one, against a narrow paddle of 12 px.
+
+
+## Longer budget: `L22`, seed 22003 for 3.6M actions
+
+224,977 updates in 436.8 minutes. Its 1.2M checkpoint has the same
+tensors as `B22`'s (all 261 compared; the file hashes of two of the
+three files differ, the contents do not) and its four 1.2M cells repeat
+`B22`'s to the digit.
+
+| Point | 777001 sampled | 777001 greedy | 022003 sampled | 022003 greedy | Median of 96 | 100 or more / 400 or more / past 432 | Fastest balls returned |
+|---|---:|---:|---:|---:|---:|---|---:|
+| 1.2M | 278.8 (277; 421) | 322.3 (362; 441) | 276.3 (312.5; 434) | 293.5 (331.5; 433) | 334 | 86 / 18 / 3 | .90 |
+| 1.6M | 348.9 (359; 453) | 321.9 (384; 455) | 360.5 (380.5; 435) | 364.0 (396.5; 531) | **380.5** | 93 / 33 / 8 | .87 |
+| 2.0M | 305.4 (327.5; 432) | 317.6 (390.5; 434) | 265.0 (298; 410) | 309.5 (366.5; 414) | 331.5 | 88 / 21 / 1 | .88 |
+| 2.4M | 60.1 (47; 305) | 45.3 (38; 171) | 69.8 (53; 380) | 60.5 (45; 349) | 45 | 9 / 0 / 0 | .74 |
+| 2.8M | 44.7 (43; 85) | stalled | 58.8 (55; 170) | stalled | 44 (48 games) | 2 / 0 / 0 | .51 |
+| 3.2M | 110.5 (63; 364) | stalled | 81.6 (62; 264) | stalled | 62.5 (48 games) | 11 / 0 / 0 | .62 |
+| 3.6M | 182.8 (118; 358) | 196.8 (171; 385) | 152.6 (120; 349) | 199.8 (155; 404) | 141 | 59 / 1 / 0 | .85 |
+
+Fresh cohort: 2.4M 76.7 (49.5; 365) sampled / 59.3 (41.5; 334) greedy;
+3.6M 115.8 (86; 357) / 202.9 (203; 371). "Stalled": the greedy policy
+does not serve the ball, and 47 of the 48 games in those four cells ran
+to the 600,000-action evaluation limit unfinished (one finished at 18).
+
+**The declared test fails.** At 3.6M the median is 141 against the
+required 400 and no game passes 432 against the required 24; by the
+declared rule (median under 380 and fewer than 10 games past 432) more
+budget of this recipe is not the lever for the wall. The predictions
+(median 380 to 420 at 3.6M, fastest balls .92 to .95) were wrong; the
+named risk, a late fall in online returns, is what happened. The
+mechanism target also fails at the peak: descents returned in the 400
+to 432 band are .84 at 1.6M and .85 at 2.0M against the target .90.
+
+**Online returns stop rising at 1.1M and fall at 2.25M.** Mean per
+training game over 50k-action bins: 302 at 1.1M, then 233 to 316 in
+every bin but one (183 at 2.15M) to 2.25M with no trend, 151 at 2.3M, 67 at 2.4M, 35 at 2.6M, a
+partial recovery to 118 at 3.0M, 59 at 3.15M, 137 at 3.5M. Policy
+entropy (2.1 to 2.4 nats) and the continuation loss do not move before
+the fall. The latent-prediction loss does: .044 to .054 through 2.125M,
+.065 to .083 from 2.15M to 2.3M with the dynamics KL rising from 10 to
+12.3, then back to about .05 by 2.4M and down to .027 by 3.5M, lower than
+at any point before the collapse. The same loss rose to .07 for 100k
+actions near 1.0M without a fall in play.
+
+**After the collapse the state reads its own paddle worse.** Reset
+probe, linear readout from the model state:
+
+| Checkpoint | Ball within 8 px | Ball x / y error | Paddle error |
+|---|---:|---:|---:|
+| `B22` 400k / 800k / 1.2M | .51 / .53 / .62 | 7.7, 7.1, 6.8 / 8.3, 8.4, 6.0 px | 5.4 / 5.0 / 5.6 px |
+| `L22` 2.4M | .62 | 6.3 / 6.0 px | **9.0 px** |
+| `L22` 3.6M | .55 | 7.2 / 6.5 px | **9.1 px** |
+
+Every earlier probe of this recipe (three seeds, seven checkpoints)
+reads the paddle at 4.5 to 5.8 px. The ball reading is unchanged. The
+weights show no blow-up between checkpoints. This is two probes after the fact, so it locates the damage,
+not its cause; checkpoints at 1.6M, 2.0M, 2.8M and 3.2M exist and have
+not been probed.
 
 ## Limits
 
@@ -113,4 +201,6 @@ checkpoints will be read with the same split.
   unfinished: 0 of the 432 matched games at 1.2M reach 864, and 6 pass 432.
 - The paddle split is post hoc and uses a screen-read width; its
   speed bins use the pinned replay's descent speed.
-- Part 3 is open.
+- `L22` is one seed; whether the collapse repeats on another seed or at
+  another time is not known.
+- The collapse's cause is not established.
