@@ -299,7 +299,33 @@ accept only the fault records listed in a review file (here
 runs on Mesa's llvmpipe (`VK_DRIVER_FILES` set to its ICD, no device id;
 75 to 100 minutes and 10 GB of host memory per cell, one at a time),
 which four paired cells do not distinguish from the GPU. Nothing is
-chained; queues are launched by hand. On a
+chained; queues are launched by hand. The
+[held-out follow-up](docs/results/2026-11-17-breakout-heldout-and-budget.md)
+(root `/x/Temp/kindle-breakout-heldout-20261117`, 59 jobs, finished)
+confirms the 1.2M marker off the development set: on fresh cohort
+4000313131 the two learners' medians are 346 and 367 (one greedy game
+at 842, the best on record), and held-out seed 5011 plays a median of
+276 over 144 games (301 on the fresh cohort; 31 at 400k, 93 at 800k).
+**More budget is not the lever:** seed 22003 run to 3.6M actions peaks
+at 1.6M (median 380.5, 8 of 96 games past the first wall, best 531),
+online returns stop rising at 1.1M, and play collapses between 2.2M and
+2.6M (median 45 at 2.4M, greedy policies that never serve at 2.8M and
+3.2M, 141 at 3.6M) after the latent-prediction loss doubles; afterwards
+the state probe reads the paddle at 9 px against 4.5 to 5.8 px at every
+earlier checkpoint, the ball unchanged. Cause not established. Post hoc
+CPU replays: Breakout shrinks the paddle from 16 to 12 px once the ball
+reaches the ceiling, and that, not the score, is where balls are lost
+(narrow paddle .79 to .82 returned at every score, fastest balls .76,
+flat from 1.2M to 2.0M; wide paddle .89 to .94). The misses are not
+policy noise (greedy equals sampled) and not reach (0 of 2,160 lost
+balls unreachable); the paddle ends a median 10 px off, and it moves 11
+then 22 px per action. A planner reading the emulator's state under the
+same protocol returns .90 of those balls and .98 on the wide paddle,
+scores a median of 437 and reaches **864 in 0 of 20 games** (it never
+loses a ball without sticky actions), so the 864 / 90% gate is beyond a
+perfect-knowledge planner under sticky actions; replacing it is the
+user's decision. Published sticky-action scores at 200M frames
+(third-party table): DreamerV3 384, MEME 521, BTR 613. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
@@ -357,7 +383,7 @@ The **five-game goal is unfinished**:
 | [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
 | [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
-| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall; original864/90% gate unfinished |
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276, best checkpoint (22003 at 1.6M) median 380.5 | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall; original864/90% gate unfinished (0 of 20 for a perfect-knowledge planner under sticky actions); collapse after 2.2M actions |
 | [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
 
 Published long-run scores are aspirations,not matched-budget comparisons.

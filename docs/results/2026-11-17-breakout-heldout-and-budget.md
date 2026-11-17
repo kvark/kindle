@@ -14,6 +14,11 @@ games each; mean, median in brackets, best after the semicolon.
   median is 141 and no game passes 432.
 - **The project gate (864 in 90% of games) is unmet**: no game at any
   checkpoint reaches 864.
+- **Post hoc, CPU only:** balls are lost on the shrunken paddle by near
+  misses of about 10 px, not by policy noise or reach; a planner that
+  reads the emulator's state returns 90% of the fastest balls on that
+  paddle against the learners' 76%, and itself reaches 864 in 0 of 20
+  games under sticky actions.
 
 | Learner at 1.2M | Games | Mean | Median | 100 or more | 400 or more | Past 432 | At 864 |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -73,6 +78,63 @@ minutes.
   development seeds' .62 and .57.
 - **The first wall.** 15 of 144 games stop at 400 to 431 and none
   passes 432 (best 431).
+
+## Longer budget: `L22`, seed 22003 for 3.6M actions
+
+224,977 updates in 436.8 minutes. Its 1.2M checkpoint has the same
+tensors as `B22`'s (all 261 compared; the file hashes of two of the
+three files differ, the contents do not) and its four 1.2M cells repeat
+`B22`'s to the digit.
+
+| Point | 777001 sampled | 777001 greedy | 022003 sampled | 022003 greedy | Median of 96 | 100 or more / 400 or more / past 432 | Fastest balls returned |
+|---|---:|---:|---:|---:|---:|---|---:|
+| 1.2M | 278.8 (277; 421) | 322.3 (362; 441) | 276.3 (312.5; 434) | 293.5 (331.5; 433) | 334 | 86 / 18 / 3 | .90 |
+| 1.6M | 348.9 (359; 453) | 321.9 (384; 455) | 360.5 (380.5; 435) | 364.0 (396.5; 531) | **380.5** | 93 / 33 / 8 | .87 |
+| 2.0M | 305.4 (327.5; 432) | 317.6 (390.5; 434) | 265.0 (298; 410) | 309.5 (366.5; 414) | 331.5 | 88 / 21 / 1 | .88 |
+| 2.4M | 60.1 (47; 305) | 45.3 (38; 171) | 69.8 (53; 380) | 60.5 (45; 349) | 45 | 9 / 0 / 0 | .74 |
+| 2.8M | 44.7 (43; 85) | stalled | 58.8 (55; 170) | stalled | 44 (48 games) | 2 / 0 / 0 | .51 |
+| 3.2M | 110.5 (63; 364) | stalled | 81.6 (62; 264) | stalled | 62.5 (48 games) | 11 / 0 / 0 | .62 |
+| 3.6M | 182.8 (118; 358) | 196.8 (171; 385) | 152.6 (120; 349) | 199.8 (155; 404) | 141 | 59 / 1 / 0 | .85 |
+
+Fresh cohort: 2.4M 76.7 (49.5; 365) sampled / 59.3 (41.5; 334) greedy;
+3.6M 115.8 (86; 357) / 202.9 (203; 371). "Stalled": the greedy policy
+does not serve the ball, and 47 of the 48 games in those four cells ran
+to the 600,000-action evaluation limit unfinished (one finished at 18).
+
+**The declared test fails.** At 3.6M the median is 141 against the
+required 400 and no game passes 432 against the required 24; by the
+declared rule (median under 380 and fewer than 10 games past 432) more
+budget of this recipe is not the lever for the wall. The predictions
+(median 380 to 420 at 3.6M, fastest balls .92 to .95) were wrong; the
+named risk, a late fall in online returns, is what happened. The
+mechanism target also fails at the peak: descents returned in the 400
+to 432 band are .84 at 1.6M and .85 at 2.0M against the target .90.
+
+**Online returns stop rising at 1.1M and fall at 2.25M.** Mean per
+training game over 50k-action bins: 302 at 1.1M, then 233 to 316 in
+every bin but one (183 at 2.15M) to 2.25M with no trend, 151 at 2.3M, 67 at 2.4M, 35 at 2.6M, a
+partial recovery to 118 at 3.0M, 59 at 3.15M, 137 at 3.5M. Policy
+entropy (2.1 to 2.4 nats) and the continuation loss do not move before
+the fall. The latent-prediction loss does: .044 to .054 through 2.125M,
+.065 to .083 from 2.15M to 2.3M with the dynamics KL rising from 10 to
+12.3, then back to about .05 by 2.4M and down to .027 by 3.5M, lower than
+at any point before the collapse. The same loss rose to .07 for 100k
+actions near 1.0M without a fall in play.
+
+**After the collapse the state reads its own paddle worse.** Reset
+probe, linear readout from the model state:
+
+| Checkpoint | Ball within 8 px | Ball x / y error | Paddle error |
+|---|---:|---:|---:|
+| `B22` 400k / 800k / 1.2M | .51 / .53 / .62 | 7.7, 7.1, 6.8 / 8.3, 8.4, 6.0 px | 5.4 / 5.0 / 5.6 px |
+| `L22` 2.4M | .62 | 6.3 / 6.0 px | **9.0 px** |
+| `L22` 3.6M | .55 | 7.2 / 6.5 px | **9.1 px** |
+
+Every earlier probe of this recipe (three seeds, seven checkpoints)
+reads the paddle at 4.5 to 5.8 px. The ball reading is unchanged. The
+weights show no blow-up between checkpoints. This is two probes after the fact, so it locates the damage,
+not its cause; checkpoints at 1.6M, 2.0M, 2.8M and 3.2M exist and have
+not been probed.
 
 ## Post hoc: balls are lost on the shrunken paddle, not at a score
 
@@ -136,62 +198,39 @@ moves about 11 px in the first action of a move and about 22 px in each
 further one, against a narrow paddle of 12 px.
 
 
-## Longer budget: `L22`, seed 22003 for 3.6M actions
+## Post hoc: what a planner with the emulator's state reaches under this protocol
 
-224,977 updates in 436.8 minutes. Its 1.2M checkpoint has the same
-tensors as `B22`'s (all 261 compared; the file hashes of two of the
-three files differ, the contents do not) and its four 1.2M cells repeat
-`B22`'s to the digit.
+Not declared; CPU only (`scratch-scripts/narrow_oracle2.py`, outputs
+under `analysis/oracle/`). The planner clones the emulator. While the
+ball descends it tries every plan of the form "wait up to three
+actions, move one way for up to seven, then hold", keeps those that
+return the ball, scores them under four sampled sticky draws and
+executes the first action of the most robust one, replanning at every
+action. It plays under the retained protocol (18 actions, four frames
+per action, sticky .25) with no learning and no model error. It is a
+restricted search, so it is a lower bound on what control can reach.
 
-| Point | 777001 sampled | 777001 greedy | 022003 sampled | 022003 greedy | Median of 96 | 100 or more / 400 or more / past 432 | Fastest balls returned |
-|---|---:|---:|---:|---:|---:|---|---:|
-| 1.2M | 278.8 (277; 421) | 322.3 (362; 441) | 276.3 (312.5; 434) | 293.5 (331.5; 433) | 334 | 86 / 18 / 3 | .90 |
-| 1.6M | 348.9 (359; 453) | 321.9 (384; 455) | 360.5 (380.5; 435) | 364.0 (396.5; 531) | **380.5** | 93 / 33 / 8 | .87 |
-| 2.0M | 305.4 (327.5; 432) | 317.6 (390.5; 434) | 265.0 (298; 410) | 309.5 (366.5; 414) | 331.5 | 88 / 21 / 1 | .88 |
-| 2.4M | 60.1 (47; 305) | 45.3 (38; 171) | 69.8 (53; 380) | 60.5 (45; 349) | 45 | 9 / 0 / 0 | .74 |
-| 2.8M | 44.7 (43; 85) | stalled | 58.8 (55; 170) | stalled | 44 (48 games) | 2 / 0 / 0 | .51 |
-| 3.2M | 110.5 (63; 364) | stalled | 81.6 (62; 264) | stalled | 62.5 (48 games) | 11 / 0 / 0 | .62 |
-| 3.6M | 182.8 (118; 358) | 196.8 (171; 385) | 152.6 (120; 349) | 199.8 (155; 404) | 141 | 59 / 1 / 0 | .85 |
+| Descents returned | Wide, all balls | Wide, fastest | Narrow, all balls | Narrow, fastest |
+|---|---:|---:|---:|---:|
+| Planner, sticky .25 (20 games) | .980 (1,516) | .951 (450) | .937 (1,100) | .904 (605) |
+| Planner, no sticky actions (4 games, stopped at 10,000 actions) | 1.000 (152) | 1.000 (60) | 1.000 (1,484) | 1.000 (1,484) |
+| Learners at their best points, greedy (264 games) | .945 (13,983) | .88 (3,027) | .820 (2,997) | .76 (1,710) |
 
-Fresh cohort: 2.4M 76.7 (49.5; 365) sampled / 59.3 (41.5; 334) greedy;
-3.6M 115.8 (86; 357) / 202.9 (203; 371). "Stalled": the greedy policy
-does not serve the ball, and 47 of the 48 games in those four cells ran
-to the 600,000-action evaluation limit unfinished (one finished at 18).
+- **Sticky actions cost a planner that knows everything one fast ball
+  in ten on the narrow paddle.** Without sticky actions it loses none
+  in 1,636 descents (and then cycles forever at 206 points, because
+  the deterministic rally stops reaching bricks).
+- **The planner's 20 sticky games** score 326 to 859, median 437; 11
+  pass 432, 8 pass 500 and **none reaches 864** (best 857 and 859).
+- **The learners are below it everywhere**, most on the narrow paddle
+  (.76 against .90 on the fastest balls, .82 against .94 overall).
+  `L22` at 1.6M has a median of 380.5 with 8 of 96 games past the wall;
+  the planner's median is 437 with 11 of 20.
 
-**The declared test fails.** At 3.6M the median is 141 against the
-required 400 and no game passes 432 against the required 24; by the
-declared rule (median under 380 and fewer than 10 games past 432) more
-budget of this recipe is not the lever for the wall. The predictions
-(median 380 to 420 at 3.6M, fastest balls .92 to .95) were wrong; the
-named risk, a late fall in online returns, is what happened. The
-mechanism target also fails at the peak: descents returned in the 400
-to 432 band are .84 at 1.6M and .85 at 2.0M against the target .90.
-
-**Online returns stop rising at 1.1M and fall at 2.25M.** Mean per
-training game over 50k-action bins: 302 at 1.1M, then 233 to 316 in
-every bin but one (183 at 2.15M) to 2.25M with no trend, 151 at 2.3M, 67 at 2.4M, 35 at 2.6M, a
-partial recovery to 118 at 3.0M, 59 at 3.15M, 137 at 3.5M. Policy
-entropy (2.1 to 2.4 nats) and the continuation loss do not move before
-the fall. The latent-prediction loss does: .044 to .054 through 2.125M,
-.065 to .083 from 2.15M to 2.3M with the dynamics KL rising from 10 to
-12.3, then back to about .05 by 2.4M and down to .027 by 3.5M, lower than
-at any point before the collapse. The same loss rose to .07 for 100k
-actions near 1.0M without a fall in play.
-
-**After the collapse the state reads its own paddle worse.** Reset
-probe, linear readout from the model state:
-
-| Checkpoint | Ball within 8 px | Ball x / y error | Paddle error |
-|---|---:|---:|---:|
-| `B22` 400k / 800k / 1.2M | .51 / .53 / .62 | 7.7, 7.1, 6.8 / 8.3, 8.4, 6.0 px | 5.4 / 5.0 / 5.6 px |
-| `L22` 2.4M | .62 | 6.3 / 6.0 px | **9.0 px** |
-| `L22` 3.6M | .55 | 7.2 / 6.5 px | **9.1 px** |
-
-Every earlier probe of this recipe (three seeds, seven checkpoints)
-reads the paddle at 4.5 to 5.8 px. The ball reading is unchanged. The
-weights show no blow-up between checkpoints. This is two probes after the fact, so it locates the damage,
-not its cause; checkpoints at 1.6M, 2.0M, 2.8M and 3.2M exist and have
-not been probed.
+The project gate asks for 864 in 90% of games. This planner, with the
+emulator's exact state and no learning, reaches it in 0 of 20 games
+under sticky actions. Whether the gate stands is the user's decision;
+this is the evidence for it.
 
 ## Limits
 
@@ -201,6 +240,8 @@ not been probed.
   unfinished: 0 of the 432 matched games at 1.2M reach 864, and 6 pass 432.
 - The paddle split is post hoc and uses a screen-read width; its
   speed bins use the pinned replay's descent speed.
+- The planner is one hand-written search with 20 sticky games; a better
+  search would score higher, so its rates bound the ceiling from below.
 - `L22` is one seed; whether the collapse repeats on another seed or at
   another time is not known.
 - The collapse's cause is not established.
