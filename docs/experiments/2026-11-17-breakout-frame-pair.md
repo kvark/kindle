@@ -70,3 +70,40 @@ in `L22` after 2.2M arriving earlier; memory (six input channels) over
 the headroom guard, which stops the queue. One seed, a development
 screen. The number of games at 864 is reported; the project gate stays
 unfinished unless met.
+
+## Amendment, November 17 15:05 UTC: the pair does not fit a 100k replay; 50k replay and a control
+
+`queue-15` (guards `guards-15`) stopped after 9 minutes: `P22` reached
+63,976 of 1.6M actions and the trainer's own memory guard ended it
+("native GPU memory budget headroom below declared minimum", 18.76 GB
+used of a 20.85 GB budget against a 2,048 MiB minimum). No kernel GPU
+message; this is the named memory risk. The replay grows by about 217 KB
+per stored action with the pair against 124 KB without it, so a 100k
+replay would need about 26 GB. `P22`'s partial directory and `guards-15`
+are kept as a retained protocol failure; nothing was evaluated.
+
+The largest replay that fits with margin is 50,000 actions (about 15.6
+GB at the peak). That changes a second setting, so a control runs with
+it. `queue-15b.json` (40 jobs, built by `make_framepair_queue_b.py`),
+guards `guards-15b`, same unit name, launched by hand; about 6.9 hours:
+
+1. `P22r50`: the pair with `--replay-capacity 50000`, seed 22003, 1.6M
+   actions; the same 20 cells, probes and dumps as declared above.
+2. `C22r50`: the single-frame recipe with `--replay-capacity 50000`,
+   seed 22003, 1.2M actions (about 150 minutes); 12 cells on the reused
+   cohorts at 400k, 800k and 1.2M, a reset probe and an own-play dump at
+   1.2M.
+
+Reading, replacing the baselines above where the replay differs:
+
+- The mechanism, play and score tests for `P22r50` at 1.6M stand as
+  declared, against `L22`'s numbers.
+- **What the pair does at equal replay** is read at 1.2M, `P22r50`
+  against `C22r50`: landing readout one action out, narrow fastest
+  balls returned, pooled median. The pair helps at equal replay if its
+  readout is at least 1.5 px lower and its narrow-paddle return at least
+  .05 higher.
+- **What the smaller replay does** is read from `C22r50` against `B22`
+  at 1.2M (median 334, readout 8.6 px). Predicted: within the seed span
+  (median 260 to 350). A median under 200 means the 50k replay itself
+  hurts and `P22r50` is read only against `C22r50`.
