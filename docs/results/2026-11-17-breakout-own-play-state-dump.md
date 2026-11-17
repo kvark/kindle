@@ -1,5 +1,16 @@
 # The model state does not hold where the ball lands; the collapse loses the paddle
 
+> **Correction, November 17 23:30 UTC.** The landing readout below fits
+> one linear map across every distance from contact. Fitted the same way
+> on the emulator's exact ball and paddle coordinates it scores 15.5 to
+> 16.7 px, so its 8.5 to 10 px did not show missing information, and the
+> headline and the declared reading ("the state does not hold the landing
+> point", "no better than a constant guess") do not stand. Fitted per
+> distance, the state gives the landing point to 3.5 to 4.2 px and the
+> landing relative to the paddle to 4.8 to 5.9 px one action out (exact
+> coordinates: 1.7 to 2.1 px). See [the frame-pair result](2026-11-17-breakout-frame-pair.md#post-hoc-the-landing-readout-was-miscalibrated).
+> The paddle, present-ball, collapse and critic readings are unaffected.
+
 Result of [the own-play state-dump declaration](../experiments/2026-11-17-breakout-own-play-state-dump.md).
 Root `/x/Temp/kindle-breakout-statedump-20261117`, `queue-14.json`,
 guards `guards-14`: 9 of 9 jobs complete in 6 minutes (14:25 to 14:31
