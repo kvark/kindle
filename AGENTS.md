@@ -338,8 +338,11 @@ paddle (9 to 16 px from 2.4M to 3.2M, intact at 2.0M), not the ball.
 [A two-frame encoder input](docs/experiments/2026-11-17-breakout-frame-pair.md)
 (`--rgb-frame-pair`, seed 22003, 1.6M actions; root
 `/x/Temp/kindle-breakout-framepair-20261117`, unit
-`kindle-breakout-framepair-20261117`, about 4 hours from 14:53 UTC
-November 17) tests whether velocity at the encoder closes that gap. On a
+`kindle-breakout-framepair-b-20261117`, about 6.9 hours from 15:05 UTC
+November 17) tests whether velocity at the encoder closes that gap. The
+pair doubles replay memory (217 KB per stored action against 124 KB), so
+it runs with a 50k replay beside a single-frame 50k-replay control; the
+first attempt at 100k was stopped by the memory guard. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),

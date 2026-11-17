@@ -85,7 +85,8 @@ are kept as a retained protocol failure; nothing was evaluated.
 The largest replay that fits with margin is 50,000 actions (about 15.6
 GB at the peak). That changes a second setting, so a control runs with
 it. `queue-15b.json` (40 jobs, built by `make_framepair_queue_b.py`),
-guards `guards-15b`, same unit name, launched by hand; about 6.9 hours:
+guards `guards-15b`, unit `kindle-breakout-framepair-b-20261117`, launched by
+hand; about 6.9 hours:
 
 1. `P22r50`: the pair with `--replay-capacity 50000`, seed 22003, 1.6M
    actions; the same 20 cells, probes and dumps as declared above.
