@@ -276,26 +276,30 @@ arm plays 11 to 12 against DreamerV3's 31. The same recipe differs 1.6 to
 (.49 to .76), and every curve was still rising at 400k. Sticky .25 with
 18 actions stays the retained protocol. The
 [1.2M-action budget run](docs/experiments/2026-11-16-breakout-ratio16-budget.md)
-of K's recipe on both seeds is [partly done](docs/results/2026-11-16-breakout-ratio16-budget.md):
-seed 22003 trained to 1.2M actions in 149 minutes, online returns rise
-throughout to about 300 per game, and matched play at 1.2M is **233.8 to
-304.1 per cell (pooled median 324.5, 82 of 96 games at 100 or more, 19
-at 400 or more, one at 495 past the first wall)** against 80.7 to 101.7
-(median 73) at 400k, with fast balls returned 89%. One of those cells
-ran on the GPU; the other three ran on Mesa's software Vulkan device
-(llvmpipe, `VK_DRIVER_FILES` set to its ICD, about 75 to 100 minutes and
-10 GB of host memory per cell, one at a time), which a repeat of the GPU
-cell does not distinguish from the GPU (249.1 against 278.8, standard
-error 35). The seed-22003 budget test passes; the both-seed tests wait
-for seed 1009, which needs the GPU. Its
-first 400k actions reproduce K bit for bit, so seed spread is the seed.
-**A GPU kernel fault (ring timeout, mode-1 reset, VRAM lost) at 12:28
-UTC November 16 stopped the queue after 2 of 32 jobs; the host guard
-requires a recovery review for this boot, so no GPU job may start until
-the user clears it.** The 30 remaining jobs are prepared, unlaunched, as
-`queue-12b.json` in root `/x/Temp/kindle-breakout-budget-20261116`
-(evidence in `gpu-fault-20261116/`). Nothing is chained; queues are
-launched by hand. On a
+of K's recipe on both seeds [meets the declared learned-well
+marker](docs/results/2026-11-16-breakout-ratio16-budget.md): matched play
+at 1.2M actions is **276.3 to 322.3 per cell on seed 22003 (pooled
+median 334) and 264.3 to 353.3 on seed 1009 (median 350)**, 86 and 88 of
+96 games at 100 or more, against medians 73 and 54 at 400k and 246 and
+154 at 800k; each seed trains in 150 minutes. Fast balls are returned
+90% and 91% (76% and 54% at 400k), the seed gap closes, and the reset
+probe reads the ball within 8 px .62 and .57. Three of 192 games clear
+the first wall (best 441); 38 more stop at 400 to 431, because with few
+bricks left a return earns 1.5 points while one in five is lost. Two
+development seeds on reused cohorts; the 864 / 90% gate is not met. A
+seed's first 400k actions reproduce bit for bit, so seed spread is the
+seed. A GPU kernel fault (ring timeout, mode-1 reset, VRAM lost) at
+12:28 UTC November 16 stopped the first queue; the user reviewed it and
+chose to continue on the same boot, and the remaining 30 jobs then ran
+cleanly. `gpu_host_guard_reviewed.py` / `run_gpu_queue_reviewed.py`
+accept only the fault records listed in a review file (here
+`gpu-fault-20261116/reviewed-kernel-faults.json` in root
+`/x/Temp/kindle-breakout-budget-20261116`, valid for that boot only);
+**a new fault needs a new review by the user.** Frozen evaluation also
+runs on Mesa's llvmpipe (`VK_DRIVER_FILES` set to its ICD, no device id;
+75 to 100 minutes and 10 GB of host memory per cell, one at a time),
+which four paired cells do not distinguish from the GPU. Nothing is
+chained; queues are launched by hand. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
@@ -353,7 +357,7 @@ The **five-game goal is unfinished**:
 | [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
 | [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
-| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall; original864/90% gate unfinished |
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall; original864/90% gate unfinished |
 | [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
 
 Published long-run scores are aspirations,not matched-budget comparisons.

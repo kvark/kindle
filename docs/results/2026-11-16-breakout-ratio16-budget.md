@@ -1,18 +1,34 @@
-# Interim: K's recipe at 1.2M actions plays about 290 per game on seed 22003; seed 1009 is training
+# K's recipe at 1.2M actions plays about 300 per game on both seeds; the declared learned-well marker is met
 
-Partial result of [the ratio-16 budget declaration](../experiments/2026-11-16-breakout-ratio16-budget.md).
-Root `/x/Temp/kindle-breakout-budget-20261116`. The first queue
-(`queue-12.json`, guards `guards-12`, started 09:58 UTC November 16)
-completed 2 of 32 jobs, the seed-22003 training run (`B22`, 74,977
-updates in 148.8 minutes) and one matched evaluation, before a GPU
-kernel fault stopped it at 12:28 UTC. Three open cells were then
+Result of [the ratio-16 budget declaration](../experiments/2026-11-16-breakout-ratio16-budget.md).
+Root `/x/Temp/kindle-breakout-budget-20261116`. The clean centered-CDP
+recipe with the life-loss boundary (`K`: 12M, 96x96, train ratio 16,
+sticky .25, 18 actions, no guidance or labels) was trained for 1.2M
+actions on seeds 22003 (`B22`, 74,977 updates in 148.8 minutes) and 1009
+(`B10`, 74,977 updates in 150.7 minutes) and evaluated matched at 400k,
+800k and 1.2M.
+
+| Seed | 400k cells (pooled median) | 800k | 1.2M | 1.2M games at 100 or more / above 300 of 96 | Fast balls returned at 1.2M |
+|---|---|---|---|---|---:|
+| 22003 | 80.7 to 101.7 (73) | 193.5 to 309.5 (246) | **276.3 to 322.3 (334)** | 86 / 55 | .90 |
+| 1009 | 52.8 to 60.9 (54) | 170.3 to 244.2 (154) | **264.3 to 353.3 (350)** | 88 / 62 | .91 |
+
+**Both declared tests pass on both seeds**: the budget pays (4.6 and 6.5
+times the 400k median) and the learned-well marker (pooled median at
+least 150 on both seeds) is met at 334 and 350. The 1.6 times gap
+between the seeds at 400k is gone at 1.2M. Three of the 192 games at
+1.2M clear the first wall; 38 more stop between 400 and 431.
+
+The run was interrupted: the first queue (`queue-12.json`, guards
+`guards-12`, started 09:58 UTC November 16) completed 2 of 32 jobs
+before a GPU kernel fault stopped it at 12:28 UTC. Three cells were then
 evaluated on a software Vulkan device under the declaration's first
 amendment. After the user reviewed the fault, the remaining 30 jobs
 (`queue-12b.json`, guards `guards-12b`, unit
-`kindle-breakout-budget-b-20261116`) started at 23:30 UTC on the same
-boot under the second amendment. **All twelve `B22` cells are now GPU
-cells and the seed-22003 tests pass.** The seed-1009 run (`B10`) started
-training at 23:35 UTC; the both-seed tests are **not yet read**.
+`kindle-breakout-budget-b-20261116`) ran from 23:30 UTC on the same boot
+under the second amendment and all completed at 02:16 UTC November 17
+(2 hours 46 minutes). Every cell reported as a declared reading is a
+GPU cell.
 
 ## Seed 22003
 
@@ -88,6 +104,69 @@ games that reach 400 arrive with one or two lives left. Clearing the
 wall reliably needs either the late-game return rate near the early-game
 one or returns aimed at the remaining bricks.
 
+## Seed 1009
+
+**Online returns of `B10`**, mean per game over 50k-action bins:
+
+| Actions | 350-400k | 400-450k | 600-650k | 800-850k | 1,000-1,050k | 1,100-1,150k | 1,150-1,200k |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Return per game | 50.4 | 64.6 | 141.7 | 207.6 | 204.7 | 249.8 | 260.5 |
+| Lives lost per 50k actions | 175 | 155 | 134 | 116 | 120 | 110 | 118 |
+| Policy entropy (nats) | 1.34 | 1.43 | 2.14 | 2.25 | 2.24 | 2.22 | 2.22 |
+| Return scale | 7.2 | 9.1 | 54.6 | 125 | 136 | 139 | 150 |
+
+The same shape as seed 22003, a little lower online: a steady rise,
+return scale settling near 150, entropy near 2.2 nats, no late fall.
+
+**Matched frozen play** (GPU, same layout as above):
+
+| Point | 777001 sampled | 777001 greedy | 022003 sampled | 022003 greedy | Pooled median | 50 or less / 100 or more / above 300 / above 432 of 96 |
+|---|---:|---:|---:|---:|---:|---|
+| 400k | 57.6 (52; 189) | 60.9 (58; 95) | 54.6 (52.5; 93) | 52.8 (52; 89) | 54 | 40 / 3 / 0 / 0 |
+| 800k | 182.5 (138; 401) | 202.5 (199.5; 372) | 170.3 (125.5; 415) | 244.2 (258.5; 419) | 154 | 4 / 70 / 29 / 0 |
+| 1.2M | **264.3** (304; 421) | **353.3** (384; 428) | **321.1** (363.5; 424) | **272.3** (312; 426) | **350** | 2 / 88 / 62 / 0 |
+
+`B10`'s 400k cells repeat `K10`'s to the digit. The pooled mean rises
+56.5, 199.9, 302.8. No game passes 432 (best 428); 23 of the 1.2M games
+end between 400 and 431.
+
+**Replay by life**, four cells pooled on each row:
+
+| | Returned, lives 1 to 5 | Paddle hits per life | Under 6 px | 6 to 9 | 9 to 13 | 13 or more | First life from 12 hits |
+|---|---|---|---:|---:|---:|---:|---:|
+| 400k (`K10`) | .96 / .95 / .94 / .93 / .79 | 8.9 / 6.9 / 6.1 / 5.0 / 3.8 | .97 (1469) | .93 (1450) | .77 (111) | .54 (156) | .91 (145) |
+| 800k | .96 / .94 / .94 / .94 / .84 | 15.5 / 11.2 / 8.7 / 7.2 / 5.1 | .97 (1425) | .95 (1671) | .94 (853) | .85 (957) | .93 (594) |
+| 1.2M | .98 / .97 / .95 / .95 / .86 | 20.7 / 14.6 / 9.4 / 7.2 / 6.2 | .98 (1327) | .97 (1745) | .97 (1265) | .91 (1485) | .98 (1089) |
+
+The seed that returned 54% of fast balls at 400k returns 91% at 1.2M and
+is indistinguishable from seed 22003 by life and by speed. Its score
+bands (post hoc) repeat the other seed's: returns fall from .95 below
+100 points to .78 between 400 and 432, where a return is worth 1.5
+points and 14 lives are lost per 100 points, so the last 32 points cost
+about 4.6 lives. Games reaching 300 / 350 / 400 / 420 / 432: 62 / 49 /
+23 / 11 / 0 of 96; 16 of the 23 that reach 400 arrive with one or two
+lives left.
+
+## Reset probes
+
+Linear ball and paddle readout of the model state on held-out teacher
+play with the belief restarted at each lost life
+(`breakout_agent_probe_life.py --life-loss-reset`), source pixels:
+
+| Checkpoint | Ball x / y error | Ball within 8 px | Paddle error | Ball dx / dy R² |
+|---|---:|---:|---:|---:|
+| `B22` 400k | 7.7 / 8.3 | .51 | 5.4 | .73 / .78 |
+| `B22` 800k | 7.1 / 8.4 | .53 | 5.0 | .76 / .82 |
+| `B22` 1.2M | 6.8 / 6.0 | .62 | 5.6 | .80 / .81 |
+| `B10` 400k | 8.3 / 8.2 | .50 | 5.8 | .60 / .68 |
+| `B10` 800k | 7.3 / 7.8 | .51 | 5.8 | .66 / .69 |
+| `B10` 1.2M | 7.8 / 5.6 | .57 | 4.5 | .75 / .80 |
+
+The ball readout improves slowly (within 8 px .50 to .57 and .62) while
+play rises four to six times, so most of the gain is in the policy and value on top
+of a state that already held the ball at 400k; the vertical position and
+the velocity readouts sharpen most in the last third.
+
 ## Software-device cells
 
 Before the fault was reviewed, the first amendment's cells ran on Mesa's
@@ -122,17 +201,33 @@ start under a 13 GB cap.
 
 ## Against the declaration
 
-- **Budget pays on seed 22003: passes.** The pooled median at 1.2M is
-  334 against 73 at 400k (4.6 times; the test asks for 1.5), and every
-  cell mean is above its 400k cell (3.2 to 3.4 times).
-- **Learned-well marker** (pooled median at least 150 on both seeds):
-  seed 22003 reaches 334. **Seed 1009 is not yet read.** At 400k that
-  seed played 52.8 to 60.9 (median 54) and returned 54% of fast balls,
-  so it starts from further back.
-- Predictions: cell means 120 to 250 (all four above, 276 to 322),
-  medians 100 to 180 (all four above, 277 to 362), fast balls returned
-  .75 to .85 (above, .90), at least one game above 432 (three). The run
-  did better than predicted on every count.
+- **Budget pays: passes on both seeds.** Seed 22003: pooled median 334
+  against 73 at 400k (4.6 times; the test asks for 1.5), every cell 3.2
+  to 3.4 times its 400k cell. Seed 1009: 350 against 54 (6.5 times),
+  every cell 4.6 to 5.9 times its 400k cell.
+- **Learned-well marker: met.** The pooled median at 1.2M is at least
+  150 on both seeds (334 and 350); it is also met at 800k (246 and 154).
+- Predictions: cell means 120 to 250 (all eight above, 264 to 353),
+  medians 100 to 180 (all eight above, 277 to 384), fast balls returned
+  .75 to .85 (above, .90 and .91), at least one game above 432 (three on
+  seed 22003, none on seed 1009). The run did better than predicted on
+  every count but the last, which one seed misses.
+- The fallback clause (fast-ball return under .7 on both seeds, then
+  change control or input resolution) does not apply.
+
+## Limits
+
+- Two development seeds on two reused evaluation cohorts, 24 games per
+  cell; a cell mean carries about 25 points of sampling error. No
+  held-out seed has been run at this budget.
+- The first wall is cleared in 3 of 192 games at 1.2M, and the best of
+  them ends nine points into the second wall (441). Both seeds lose
+  about four lives over the last 32 points. The original 864-point /
+  90% gate is far from met; what stands is a declared median marker.
+- Each seed costs 150 minutes of training on one RX 7900 XT plus about
+  30 seconds per evaluation cell.
+- The curves were still rising at 1.2M on both seeds; nothing here says
+  where they stop.
 
 ## GPU fault
 
@@ -157,10 +252,10 @@ training on the device. Kernel log and guard verdict are kept in
 `gpu-fault-20261116/` under the root; the device coredump is readable by
 root only and was not copied.
 
-No GPU job has been started since, and no reset, reload or reboot was
-done. The frozen cumulative-survival learner was not touched; its unit
-is still loaded, but the reset reported VRAM lost, so its device state
-is presumably gone.
+No GPU job was started for the next eleven hours, and no reset, reload
+or reboot was done. The frozen cumulative-survival learner was not
+touched; its unit is still loaded, but the reset reported VRAM lost, so
+its device state is presumably gone.
 
 The user reviewed the fault late on November 16 and chose to continue on
 the same boot without a reboot. The existing guard cannot record that,
@@ -168,10 +263,5 @@ so it is wrapped, unchanged, by `gpu_host_guard_reviewed.py`, which
 accepts exactly the nine journal records of this fault
 (`gpu-fault-20261116/reviewed-kernel-faults.json`) and still stops on
 any other. The first job after the review was the evaluation that had
-faulted; it ran cleanly in 31 seconds, as did the ten after it.
-
-## To finish
-
-`B10` trains until about 02:05 UTC November 17, followed by its twelve
-matched cells and the six reset probes. Nothing is chained after the
-queue.
+faulted; it ran cleanly in 31 seconds, and all 30 jobs, including the
+150-minute training run, completed with no further kernel GPU message.
