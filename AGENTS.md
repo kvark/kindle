@@ -328,21 +328,33 @@ user's decision. Published sticky-action scores at 200M frames
 (third-party table): DreamerV3 384, MEME 521, BTR 613.
 [Own-play state dumps](docs/results/2026-11-17-breakout-own-play-state-dump.md)
 (`breakout_agent_state_dump.py`, root
-`/x/Temp/kindle-breakout-statedump-20261117`) locate the limit in the
-representation: a linear readout of where the ball lands relative to the
-paddle is 8.5 to 10 px off one action before contact (no better than a
-constant guess; paddle 3 px, the ball's present x 4 to 5 px), the critic
-cannot tell a ball it will lose from one it returns until the ball is at
-the paddle row (AUC .43 to .63), and the collapsed checkpoint lost the
+`/x/Temp/kindle-breakout-statedump-20261117`) show the critic cannot
+tell a ball it will lose from one it returns until the ball is at the
+paddle row (AUC .43 to .63), and that the collapsed checkpoint lost the
 paddle (9 to 16 px from 2.4M to 3.2M, intact at 2.0M), not the ball.
-[A two-frame encoder input](docs/experiments/2026-11-17-breakout-frame-pair.md)
-(`--rgb-frame-pair`, seed 22003, 1.6M actions; root
-`/x/Temp/kindle-breakout-framepair-20261117`, unit
-`kindle-breakout-framepair-b-20261117`, about 6.9 hours from 15:05 UTC
-November 17) tests whether velocity at the encoder closes that gap. The
-pair doubles replay memory (217 KB per stored action against 124 KB), so
-it runs with a 50k replay beside a single-frame 50k-replay control; the
-first attempt at 100k was stopped by the memory guard. On a
+Their headline, that the state does not hold where the ball lands, is
+**withdrawn**: the pooled landing readout scores 15.5 to 16.7 px on the
+emulator's exact coordinates; fitted per distance the state gives the
+landing relative to the paddle to 4.8 to 5.9 px one action out (exact
+coordinates 1.7 to 2.1 px) and already holds the ball's velocity.
+[A two-frame encoder input](docs/results/2026-11-17-breakout-frame-pair.md)
+(`--rgb-frame-pair`, seed 22003, replay 50k because the pair doubles
+replay memory, beside a single-frame 50k-replay control; root
+`/x/Temp/kindle-breakout-framepair-20261117`, finished) fails its three
+declared tests and is not retained: median 353.5 at 1.6M with 1 of 96
+games past the first wall, 136.5 at 1.2M against the control's 322, 21%
+more time per action; its 1.6M point returns the narrow paddle's fastest
+balls .83 (the best on record, one seed). The 50k replay costs nothing
+at 1.2M (322 against 334). Post hoc, a held-out linear readout of the
+actor's input separates the balls the agent will lose at AUC .70 to .85
+one and two actions before contact while the critic is at .46 to .63:
+the state knows, the value does not.
+[The continuation head supervised on one-step priors](docs/experiments/2026-11-17-breakout-prior-continuation-life.md)
+(`--prior-continuation-scale 1` on the same recipe, seed 22003, 1.6M
+actions; root `/x/Temp/kindle-breakout-priorcont-20261117`, unit
+`kindle-breakout-priorcont-20261117`, about 4.2 hours from 23:32 UTC
+November 17) tests whether imagined endings on the right states give
+the critic that signal. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),

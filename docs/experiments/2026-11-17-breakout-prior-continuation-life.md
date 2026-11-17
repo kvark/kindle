@@ -1,6 +1,6 @@
 # Declaration: the life-terminal recipe with the continuation head supervised on one-step priors
 
-November 17, 23:35 UTC. Follows [the frame-pair result](../results/2026-11-17-breakout-frame-pair.md).
+November 17, 23:30 UTC. Follows [the frame-pair result](../results/2026-11-17-breakout-frame-pair.md).
 
 ## Why
 
