@@ -1,6 +1,6 @@
 # Declaration: a held-out seed, a fresh cohort and a 3.6M-action run of the clean life-terminal recipe
 
-November 17, 02:50 UTC. Follows [the 1.2M-action budget result](../results/2026-11-16-breakout-ratio16-budget.md).
+November 17, 02:25 UTC. Follows [the 1.2M-action budget result](../results/2026-11-16-breakout-ratio16-budget.md).
 
 ## Why
 
