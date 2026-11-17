@@ -325,7 +325,21 @@ scores a median of 437 and reaches **864 in 0 of 20 games** (it never
 loses a ball without sticky actions), so the 864 / 90% gate is beyond a
 perfect-knowledge planner under sticky actions; replacing it is the
 user's decision. Published sticky-action scores at 200M frames
-(third-party table): DreamerV3 384, MEME 521, BTR 613. On a
+(third-party table): DreamerV3 384, MEME 521, BTR 613.
+[Own-play state dumps](docs/results/2026-11-17-breakout-own-play-state-dump.md)
+(`breakout_agent_state_dump.py`, root
+`/x/Temp/kindle-breakout-statedump-20261117`) locate the limit in the
+representation: a linear readout of where the ball lands relative to the
+paddle is 8.5 to 10 px off one action before contact (no better than a
+constant guess; paddle 3 px, the ball's present x 4 to 5 px), the critic
+cannot tell a ball it will lose from one it returns until the ball is at
+the paddle row (AUC .43 to .63), and the collapsed checkpoint lost the
+paddle (9 to 16 px from 2.4M to 3.2M, intact at 2.0M), not the ball.
+[A two-frame encoder input](docs/experiments/2026-11-17-breakout-frame-pair.md)
+(`--rgb-frame-pair`, seed 22003, 1.6M actions; root
+`/x/Temp/kindle-breakout-framepair-20261117`, unit
+`kindle-breakout-framepair-20261117`, about 4 hours from 14:53 UTC
+November 17) tests whether velocity at the encoder closes that gap. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
