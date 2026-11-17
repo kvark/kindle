@@ -1,6 +1,6 @@
 # Declaration: does the model state know where the ball lands? Own-play state dumps and four probes
 
-November 17, 14:30 UTC. Follows [the held-out and longer-budget result](../results/2026-11-17-breakout-heldout-and-budget.md).
+November 17, 14:25 UTC. Follows [the held-out and longer-budget result](../results/2026-11-17-breakout-heldout-and-budget.md).
 
 ## Why
 
