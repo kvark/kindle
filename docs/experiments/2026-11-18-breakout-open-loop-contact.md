@@ -5,7 +5,7 @@ UTC was unreviewed. The user reviewed it ("Reviewed, use this boot"); the
 review file `gpu-fault-20261118/reviewed-kernel-faults.json` in root
 `/x/Temp/kindle-breakout-imagined-20261118` lists both faults' records.
 **Launched by hand at 05:47 UTC November 18**, unchanged from the prepared
-text below.
+text below. [Result](../results/2026-11-18-breakout-open-loop-contact.md).
 
 ## Why
 

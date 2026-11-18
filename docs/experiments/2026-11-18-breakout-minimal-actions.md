@@ -1,7 +1,8 @@
 # Breakout under the minimal action set: does the agent stop moving at contact?
 
-Prepared 11:08 UTC November 18, before launch. One training run and its
-readings; nothing is chained after it.
+Prepared and committed 11:08 UTC November 18; **launched by hand at 11:08
+UTC**, unchanged. One training run and its readings; nothing is chained
+after it.
 
 ## Why
 

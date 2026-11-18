@@ -371,12 +371,32 @@ emulator, a third on the narrow paddle**, and in the states the agent
 goes on to lose it rates a sequence safe (.05 to .07) that the emulator
 loses half the time. The model is forgiving at the paddle's edge, so
 the critic and actor have nothing to learn precision from. [Eight-step open-loop
-supervision](docs/experiments/2026-11-18-breakout-open-loop-contact.md)
+supervision](docs/results/2026-11-18-breakout-open-loop-contact.md)
 (`--open-loop-length 8 --open-loop-scale 1` on the same recipe, seed
-22003, 1.6M actions; root `/x/Temp/kindle-breakout-openloop-20261118`,
-unit `kindle-breakout-openloop-20261118`, about 4.5 hours from 05:47 UTC
-November 18) tests whether training rollouts to end where the game ends
-removes that, read with the probe. A second GPU kernel fault (same shape
+22003, 1.6M actions, 216 minutes; root
+`/x/Temp/kindle-breakout-openloop-20261118`, finished) fails its four
+declared tests, two by a hair: imagination misses half as many losses
+(.102 against .203; pairs it rates safest lose .06 against .25) and the
+critic prices a loss earlier (AUC .77 against .71), but play does not
+follow (median 317, no game past the first wall, narrow fastest .73);
+not retained as default. Post hoc CPU replays of three learners show
+what a lost ball is: more than half of all lives go on the **wide**
+paddle (returned .93 to .95, planner .98); no lost ball lacked time or
+reach; the paddle arrives late and moving (a move among the last two
+actions in .73 to .80 of descents, a miss 3 to 4 px past its edge); a
+paddle already under the ball that holds still returns .96 to 1.00, and
+the agent moves again from there in half the cases; the state reads the
+landing x to 3 to 4 px five actions early; and one move carries the
+paddle 23 px with an end point that per-frame sticky actions scatter by
+5.5 px. The lost lives are a habit of the policy, not missing knowledge.
+[The minimal action set](docs/experiments/2026-11-18-breakout-minimal-actions.md)
+(`--atari-protocol published-minimal`, four actions, sticky .25, same
+recipe and seed, 1.6M actions; root
+`/x/Temp/kindle-breakout-minimal-20261118`, unit
+`kindle-breakout-minimal-20261118`, about 4.2 hours from 11:08 UTC
+November 18) tests whether the habit comes from an action vocabulary in
+which twelve of 18 actions move the paddle; whether four actions become
+the default is the user's decision. A second GPU kernel fault (same shape
 as November 16) stopped the probe's queue at 04:02 UTC November 18 after
 two of four jobs; the user reviewed it and chose to continue on the same
 boot (review file `gpu-fault-20261118/reviewed-kernel-faults.json` in
