@@ -349,12 +349,34 @@ at 1.2M (322 against 334). Post hoc, a held-out linear readout of the
 actor's input separates the balls the agent will lose at AUC .70 to .85
 one and two actions before contact while the critic is at .46 to .63:
 the state knows, the value does not.
-[The continuation head supervised on one-step priors](docs/experiments/2026-11-17-breakout-prior-continuation-life.md)
-(`--prior-continuation-scale 1` on the same recipe, seed 22003, 1.6M
-actions; root `/x/Temp/kindle-breakout-priorcont-20261117`, unit
-`kindle-breakout-priorcont-20261117`, about 4.2 hours from 23:32 UTC
-November 17) tests whether imagined endings on the right states give
-the critic that signal. On a
+[Supervising the continuation head on one-step priors](docs/results/2026-11-18-breakout-prior-continuation-life.md)
+(`--prior-continuation-scale 1`, seed 22003, 1.6M actions; root
+`/x/Temp/kindle-breakout-priorcont-20261117`, finished) passes its own
+loss test (.0216 against a floor of .0204) and fails the critic, play
+and score tests: median 269 at 1.6M, no game past the first wall,
+narrow-paddle fastest balls .73; not retained. The life ends two to
+three actions after the ball passes the paddle, so the one-step prior
+was asked a trivial question. Raw value varies with the score; read as
+the drop within a descent the critic separates lost balls at AUC .66 to
+.71 one action before contact (state readout .76 to .85), and its value
+has fallen by only 12% to 23% there.
+[An imagined-contact probe](docs/results/2026-11-18-breakout-imagined-contact.md)
+(`breakout_imagined_contact.py`: open-loop rollouts of fixed action
+sequences from the live state against emulator clones; root
+`/x/Temp/kindle-breakout-imagined-20261118`) finds the cause on the best
+checkpoint: imagination orders losing against saving sequences correctly
+in .91 to .92 of pairs and is right 96% when it calls a ball lost,
+but **a quarter of the sequences it calls safe lose the ball in the
+emulator, a third on the narrow paddle**, and in the states the agent
+goes on to lose it rates a sequence safe (.05 to .07) that the emulator
+loses half the time. The model is forgiving at the paddle's edge, so
+the critic and actor have nothing to learn precision from. Untried
+next lever: `--open-loop-length` at a horizon that spans contact in the
+clean life-terminal recipe, tested with this probe's reliability table.
+**A second GPU kernel fault (same shape as November 16) stopped that
+probe's queue at 04:02 UTC November 18 after two of four jobs; it is
+unreviewed, evidence is in `gpu-fault-20261118/` in that root, and no
+GPU work runs until the user reviews it.** On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
