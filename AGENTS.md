@@ -432,10 +432,15 @@ volleys, so no-sticky tests are read on sampled play. Post hoc: the
 right action near contact flips at about 8 px of paddle offset, the
 policy's action mass only changes beyond 12 px, and linear and MLP
 readouts find the state's landing-minus-paddle to 6 to 7 px (each
-object to about 3.5 px). Next run not chosen: the actor's training
-signal on the open-loop recipe (the user's earlier choice) or position
-precision in the representation, which needs native work beyond
-96x96.
+object to about 3.5 px). The user then chose position precision over the actor's training
+signal: [the open-loop recipe plus the pixel-reconstruction
+auxiliary](docs/experiments/2026-11-18-breakout-pixel-auxiliary-precision.md)
+(`--world-pixel-scale 1`, plain squared error, seed 22003, 1.6M actions;
+root `/x/Temp/kindle-breakout-pixelaux-20261118`, unit
+`kindle-breakout-pixelaux-20261118`, about 6 hours from 20:41 UTC
+November 18; 1.6 times the time per update, projected 16.7 GiB of a
+19.1 GiB budget) tests whether the state's positions sharpen and play
+follows.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games

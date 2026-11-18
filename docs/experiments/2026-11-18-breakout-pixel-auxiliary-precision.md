@@ -1,7 +1,8 @@
 # Breakout: does a pixel-reconstruction auxiliary sharpen the state's positions, and does play follow?
 
-Prepared 20:33 UTC November 18. One training run and its readings, after
-a short memory smoke; nothing is chained after it. The user chose this
+Prepared 20:33 UTC November 18; smoke run and **training launched by hand
+at 20:41 UTC**, unchanged. One training run and its readings, after a
+short memory smoke; nothing is chained after it. The user chose this
 run ("Position precision", question of November 18) over the actor's
 training signal after [the sticky check](../results/2026-11-18-breakout-sticky-check.md).
 
@@ -54,6 +55,14 @@ the review file of 16:55 UTC November 18 (this boot only).
    then the remaining cells (1.6M fresh cohort; 1.2M, 800k and 400k on
    the reused cohorts) and the 1.2M dump and probe. Matched cells use the
    belief reset.
+
+**Smoke (20:36 to 20:40 UTC):** finished, 16,384 actions and 1,001
+updates, no fault. The decoder adds 1.1 GiB at the same stage (6.5 GiB
+against `O22`'s 5.4), which projects to about 16.7 GiB at a full replay
+against a 19.1 GiB budget, 0.4 GiB above the enforced headroom. An
+update takes .194 s against `O22`'s .118 (1.6 times), so training should
+take about 5.4 hours and the queue about 6. Reconstruction loss 22.2
+after 1,001 updates.
 
 ## Declared tests
 
