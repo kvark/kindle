@@ -389,19 +389,33 @@ the agent moves again from there in half the cases; the state reads the
 landing x to 3 to 4 px five actions early; and one move carries the
 paddle 23 px with an end point that per-frame sticky actions scatter by
 5.5 px. The lost lives are a habit of the policy, not missing knowledge.
-[The minimal action set](docs/experiments/2026-11-18-breakout-minimal-actions.md)
+[The minimal action set](docs/results/2026-11-18-breakout-minimal-actions.md)
 (`--atari-protocol published-minimal`, four actions, sticky .25, same
-recipe and seed, 1.6M actions; root
-`/x/Temp/kindle-breakout-minimal-20261118`, unit
-`kindle-breakout-minimal-20261118`, about 4.2 hours from 11:08 UTC
-November 18) tests whether the habit comes from an action vocabulary in
-which twelve of 18 actions move the paddle; whether four actions become
-the default is the user's decision. A second GPU kernel fault (same shape
-as November 16) stopped the probe's queue at 04:02 UTC November 18 after
-two of four jobs; the user reviewed it and chose to continue on the same
-boot (review file `gpu-fault-20261118/reviewed-kernel-faults.json` in
-root `/x/Temp/kindle-breakout-imagined-20261118`, both faults' records,
-that boot only). **A further fault needs a further review.**
+recipe and seed, 1.6M actions, 201 minutes; root
+`/x/Temp/kindle-breakout-minimal-20261118`, finished) fails its four
+declared tests and none is close: the agent moves into contact as often
+as with 18 actions (.755 of wide descents against .73) and from a paddle
+already under the ball more often (.74 against .49), returns the wide
+paddle .919 and the narrow one .774, and plays a median of 241.5 with no
+game past the first wall; it learns slower (medians 35 / 94 / 133 at
+400k / 800k / 1.2M) and was still rising. The habit does not come from
+the action vocabulary; four actions are not proposed as the default.
+Post hoc on own-play dumps, two other explanations are not supported:
+the paddle's 23 px step (returns do not depend on where the landing sits
+between multiples of 23 px) and the state's position error (the paddle
+follows the true landing, coefficient .63 to .89, not the linear
+readout's belief, .09 to .28). Declared next, not launched: the actor's
+training signal on the open-loop recipe. A second GPU kernel fault (same
+shape as November 16) stopped the probe's queue at 04:02 UTC November 18
+after two of four jobs; the user reviewed it and chose to continue on
+the same boot (review file `gpu-fault-20261118/reviewed-kernel-faults.json`
+in root `/x/Temp/kindle-breakout-imagined-20261118`, both faults'
+records, that boot only). **A third fault at 14:54 UTC November 18
+stopped the minimal-action queue in its last job (22 of 23 complete;
+evidence in `gpu-fault-20261118-1454/` under that run's root) and is not
+reviewed: no GPU job runs until the user reviews it.** All three faults
+hit frozen-inference jobs (an evaluation cell, a probe, a dump), none a
+training run.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games

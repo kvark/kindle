@@ -3,6 +3,7 @@
 Prepared and committed 11:08 UTC November 18; **launched by hand at 11:08
 UTC**, unchanged. One training run and its readings; nothing is chained
 after it.
+[Result](../results/2026-11-18-breakout-minimal-actions.md).
 
 ## Why
 
