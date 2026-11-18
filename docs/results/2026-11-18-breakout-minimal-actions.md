@@ -91,9 +91,9 @@ With two of four actions moving the paddle instead of twelve of 18, the
 agent moves again from a paddle already under the ball more often, not
 less. The lost balls have the same shape as before.
 
-## Post hoc: two other explanations checked on the own-play dumps
+## Post hoc: two other explanations checked on the own-play dumps, and the policy's own preference
 
-Both use the 1.6M dumps of `M22` and `O22` (about 1,940 descents each)
+These use the 1.6M dumps of `M22` and `O22` (about 1,940 descents each)
 and were not declared.
 
 - **Not the paddle's step size** (`paddle_lattice.py`). One move action
@@ -116,7 +116,15 @@ and were not declared.
   same .08 to .26. The policy reads the position better than the linear
   probe does; the probe's error is not the agent's.
 
-Both are observational, on one checkpoint each of two learners.
+- **The policy is undecided, not set on moving** (`policy_at_contact.py`,
+  from the stored logits). With the paddle within 5 px of the landing in
+  the last four actions, the policy puts .51 to .63 of its mass on
+  actions that leave the paddle still (`O22` .48 to .71), .26 to .35 on a
+  move toward the remaining offset (`O22` .20 to .40) and about .1 on a
+  move away. A move carries the paddle 23 px, so correcting a 5 px
+  offset overshoots it.
+
+All three are observational, on one checkpoint each of two learners.
 
 ## GPU fault
 
