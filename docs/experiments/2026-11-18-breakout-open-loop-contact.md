@@ -1,9 +1,11 @@
 # Open-loop supervision across paddle contact in the life-terminal recipe
 
-Prepared 04:10 UTC November 18, 2026. **Not launched.** A GPU kernel fault
-at 04:02 UTC stopped the previous queue and is unreviewed; this experiment
-starts only after the user has reviewed that fault, with a review file that
-covers it.
+Prepared 04:10 UTC November 18, 2026, while a GPU kernel fault of 04:02
+UTC was unreviewed. The user reviewed it ("Reviewed, use this boot"); the
+review file `gpu-fault-20261118/reviewed-kernel-faults.json` in root
+`/x/Temp/kindle-breakout-imagined-20261118` lists both faults' records.
+**Launched by hand at 05:47 UTC November 18**, unchanged from the prepared
+text below.
 
 ## Why
 

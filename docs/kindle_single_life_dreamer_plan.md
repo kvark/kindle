@@ -2,6 +2,17 @@
 
 Kindle builds against upstream Meganeura main since November 10. The Breakout world-model goal is active: a state-only 96x96 world learner now beats the 64x64 control at every forecast horizon on the shared development origins; the fork-era survival learner stays frozen at the user's request. No world-model mastery or held-out qualification is claimed.
 
+## Breakout gate since November 18
+
+The user replaced the Breakout gate on November 18. "Learned well" is
+measured against a planner that reads the emulator's exact state under the
+same sticky-action protocol: a held-out median near its 437 with most games
+past the first wall (432). That planner reaches 864 in 0 of 20 games, so
+the original 864 / 90% gate is retired; mentions of it below are history.
+Best so far: median 380.5 with 8 of 96 games past 432 (seed 22003 at 1.6M
+actions), 276 on held-out seed 5011 at 1.2M. Evidence and current work are
+in `AGENTS.md`.
+
 ## Selected direction: Breakout world model in isolation
 
 Kindle now builds against **upstream Meganeura main** (`a0eff600`, Blade

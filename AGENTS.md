@@ -323,8 +323,8 @@ then 22 px per action. A planner reading the emulator's state under the
 same protocol returns .90 of those balls and .98 on the wide paddle,
 scores a median of 437 and reaches **864 in 0 of 20 games** (it never
 loses a ball without sticky actions), so the 864 / 90% gate is beyond a
-perfect-knowledge planner under sticky actions; replacing it is the
-user's decision. Published sticky-action scores at 200M frames
+perfect-knowledge planner under sticky actions; the user replaced it
+on November 18 (see below). Published sticky-action scores at 200M frames
 (third-party table): DreamerV3 384, MEME 521, BTR 613.
 [Own-play state dumps](docs/results/2026-11-17-breakout-own-play-state-dump.md)
 (`breakout_agent_state_dump.py`, root
@@ -370,13 +370,22 @@ but **a quarter of the sequences it calls safe lose the ball in the
 emulator, a third on the narrow paddle**, and in the states the agent
 goes on to lose it rates a sequence safe (.05 to .07) that the emulator
 loses half the time. The model is forgiving at the paddle's edge, so
-the critic and actor have nothing to learn precision from. Untried
-next lever: `--open-loop-length` at a horizon that spans contact in the
-clean life-terminal recipe, tested with this probe's reliability table.
-**A second GPU kernel fault (same shape as November 16) stopped that
-probe's queue at 04:02 UTC November 18 after two of four jobs; it is
-unreviewed, evidence is in `gpu-fault-20261118/` in that root, and no
-GPU work runs until the user reviews it.** On a
+the critic and actor have nothing to learn precision from. [Eight-step open-loop
+supervision](docs/experiments/2026-11-18-breakout-open-loop-contact.md)
+(`--open-loop-length 8 --open-loop-scale 1` on the same recipe, seed
+22003, 1.6M actions; root `/x/Temp/kindle-breakout-openloop-20261118`,
+unit `kindle-breakout-openloop-20261118`, about 4.5 hours from 05:47 UTC
+November 18) tests whether training rollouts to end where the game ends
+removes that, read with the probe. A second GPU kernel fault (same shape
+as November 16) stopped the probe's queue at 04:02 UTC November 18 after
+two of four jobs; the user reviewed it and chose to continue on the same
+boot (review file `gpu-fault-20261118/reviewed-kernel-faults.json` in
+root `/x/Temp/kindle-breakout-imagined-20261118`, both faults' records,
+that boot only). **A further fault needs a further review.**
+**On November 18 the user replaced the Breakout gate:** "learned well" is
+measured against the perfect-knowledge planner under the same
+sticky-action protocol, a held-out median near its 437 with most games
+past the first wall (432), not 864 in 90% of games. On a
 [fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
 (4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
 greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
@@ -434,7 +443,7 @@ The **five-game goal is unfinished**:
 | [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
 | [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
-| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276, best checkpoint (22003 at 1.6M) median 380.5 | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall; original864/90% gate unfinished (0 of 20 for a perfect-knowledge planner under sticky actions); collapse after 2.2M actions |
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276, best checkpoint (22003 at 1.6M) median 380.5 | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best 380.5, 8 of 96 past 432). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions |
 | [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
 
 Published long-run scores are aspirations,not matched-budget comparisons.
