@@ -1,6 +1,6 @@
 # Open-loop supervision across paddle contact in the life-terminal recipe
 
-Prepared 04:15 UTC November 18, 2026. **Not launched.** A GPU kernel fault
+Prepared 04:10 UTC November 18, 2026. **Not launched.** A GPU kernel fault
 at 04:02 UTC stopped the previous queue and is unreviewed; this experiment
 starts only after the user has reviewed that fault, with a review file that
 covers it.
