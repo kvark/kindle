@@ -64,6 +64,20 @@ update takes .194 s against `O22`'s .118 (1.6 times), so training should
 take about 5.4 hours and the queue about 6. Reconstruction loss 22.2
 after 1,001 updates.
 
+**First attempt stopped (recorded 21:57 UTC November 18); not relaunched.**
+The training job stopped at 333,128 actions (21:54 UTC, 73 minutes in)
+on the runner's own memory check, not on a fault: usage was a steady
+16.68 GiB, and another project's GPU job on the same card lowered the
+budget from 19.05 to 18.66 GiB, 20 MB under the declared 2 GiB headroom.
+No kernel message, no checkpoint yet (the first is at 400k), 0 of 23
+jobs complete; the partial log stays in `X22-…` (online returns 3.8,
+7.3, 14.5 and 21.3 per 100k actions, the last bin partial; `O22` had 6,
+16, 24 and 39). A relaunch needs either a lower
+training headroom, a smaller footprint or the card to itself; that
+choice is the user's. `queue-20b.json` (`make_pixelaux_queue_b.py`) is
+the same run from scratch as `X22b` with `--min-gpu-budget-headroom-mib
+1024` on the training job only; it is prepared and **not launched**.
+
 ## Declared tests
 
 At 1.6M. Baseline `O22` at 1.6M (same recipe and seed without the

@@ -440,7 +440,12 @@ root `/x/Temp/kindle-breakout-pixelaux-20261118`, unit
 `kindle-breakout-pixelaux-20261118`, about 6 hours from 20:41 UTC
 November 18; 1.6 times the time per update, projected 16.7 GiB of a
 19.1 GiB budget) tests whether the state's positions sharpen and play
-follows.
+follows. **Its first attempt stopped at 333k actions (21:54 UTC) on the
+runner's memory-headroom check, 20 MB short, when another project's GPU
+job on the same card shrank the budget; no fault. Not relaunched: the
+choice between a lower headroom, a smaller footprint and waiting for the
+card is the user's** (`queue-20b.json` with a 1 GiB training headroom is
+prepared, not launched).
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games
