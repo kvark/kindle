@@ -1,7 +1,8 @@
 # Breakout: are the lost balls the sticky draw? The same checkpoints evaluated without sticky actions
 
-Prepared 16:56 UTC November 18. Evaluation only; nothing is trained and
-nothing is chained after it. The user chose this check before the next
+Prepared 16:56 UTC November 18; **launched by hand at 16:57 UTC**,
+unchanged. Evaluation only; nothing is trained and nothing is chained
+after it. The user chose this check before the next
 training run (question of November 18, "Sticky check, then actor signal").
 
 ## Why

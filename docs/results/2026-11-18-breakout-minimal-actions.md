@@ -142,8 +142,11 @@ This is the third fault on boot `a8648671`, after 12:28 UTC November 16
 and 04:02 UTC November 18. All three hit a frozen-inference job (an
 evaluation cell, the imagined-contact probe, an own-play dump); none hit
 a training run, which hold most of the GPU time. Three events, cause not
-established. **The review file of November 18 does not cover this fault;
-no GPU job runs until the user reviews it.**
+established. The review file of 05:48 UTC November 18 does not cover this
+fault. The user reviewed it at 16:55 UTC November 18 and chose to continue
+on the same boot; the new review file
+(`gpu-fault-20261118-1454/reviewed-kernel-faults.json`) lists all 35 fault
+records of the boot. A further fault needs a further review.
 
 ## Limits
 
@@ -159,8 +162,9 @@ no GPU job runs until the user reviews it.**
 
 ## Next
 
-Not launched. The declared next step is the actor's training signal: what
-imagination pays for arriving early and holding still, on the open-loop
-recipe, whose imagination is calibrated. It needs its own declaration and
-the user's review of the 14:54 fault. Four actions are not proposed as
+The user chose a [sticky check](../experiments/2026-11-18-breakout-sticky-check.md)
+first (the same checkpoints evaluated without sticky actions), then the
+declared next step: the actor's training signal, what imagination pays
+for arriving early and holding still, on the open-loop recipe, whose
+imagination is calibrated. That run needs its own declaration. Four actions are not proposed as
 the Breakout default; that remains the user's decision.

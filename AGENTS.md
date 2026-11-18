@@ -410,12 +410,22 @@ shape as November 16) stopped the probe's queue at 04:02 UTC November 18
 after two of four jobs; the user reviewed it and chose to continue on
 the same boot (review file `gpu-fault-20261118/reviewed-kernel-faults.json`
 in root `/x/Temp/kindle-breakout-imagined-20261118`, both faults'
-records, that boot only). **A third fault at 14:54 UTC November 18
-stopped the minimal-action queue in its last job (22 of 23 complete;
-evidence in `gpu-fault-20261118-1454/` under that run's root) and is not
-reviewed: no GPU job runs until the user reviews it.** All three faults
-hit frozen-inference jobs (an evaluation cell, a probe, a dump), none a
-training run.
+records, that boot only). A third fault at 14:54 UTC November 18 stopped the minimal-action queue
+in its last job (22 of 23 complete; evidence in
+`gpu-fault-20261118-1454/` under that run's root); the user reviewed it
+too and chose the same boot (review file
+`gpu-fault-20261118-1454/reviewed-kernel-faults.json` in root
+`/x/Temp/kindle-breakout-minimal-20261118`, all 35 fault records of the
+boot, that boot only). **A further fault needs a further review.** All
+three faults hit frozen-inference jobs (an evaluation cell, a probe, a
+dump), none a training run. The user then chose a sticky check before the
+next training run: [the same checkpoints evaluated without sticky
+actions](docs/experiments/2026-11-18-breakout-sticky-check.md) (16
+cells; root `/x/Temp/kindle-breakout-nosticky-20261118`, unit
+`kindle-breakout-nosticky-20261118`, from 16:57 UTC November 18) to
+settle whether the sticky draw is the direct cause of the misses; the
+actor's training signal on the open-loop recipe follows, declared
+separately.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games
