@@ -4,6 +4,7 @@ Prepared 16:56 UTC November 18; **launched by hand at 16:57 UTC**,
 unchanged. Evaluation only; nothing is trained and nothing is chained
 after it. The user chose this check before the next
 training run (question of November 18, "Sticky check, then actor signal").
+[Result](../results/2026-11-18-breakout-sticky-check.md).
 
 ## Why
 

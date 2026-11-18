@@ -418,14 +418,24 @@ too and chose the same boot (review file
 `/x/Temp/kindle-breakout-minimal-20261118`, all 35 fault records of the
 boot, that boot only). **A further fault needs a further review.** All
 three faults hit frozen-inference jobs (an evaluation cell, a probe, a
-dump), none a training run. The user then chose a sticky check before the
-next training run: [the same checkpoints evaluated without sticky
-actions](docs/experiments/2026-11-18-breakout-sticky-check.md) (16
-cells; root `/x/Temp/kindle-breakout-nosticky-20261118`, unit
-`kindle-breakout-nosticky-20261118`, from 16:57 UTC November 18) to
-settle whether the sticky draw is the direct cause of the misses; the
-actor's training signal on the open-loop recipe follows, declared
-separately.
+dump), none a training run. The user then chose a sticky check before the next training run:
+[the same checkpoints evaluated without sticky actions](docs/results/2026-11-18-breakout-sticky-check.md)
+(16 cells, no fault; root `/x/Temp/kindle-breakout-nosticky-20261118`,
+finished) give a mixed answer. In sampled play without the draw four
+learners lose 24% to 45% fewer balls on the wide paddle (.92 to .95
+becomes .94 to .97) and 23% to 49% fewer on the narrow one (.76 to .82
+becomes .81 to .90), medians rise to 331 to 409, the agents move into
+contact as often, and 2 of 96 distinct sampled games pass the first
+wall: most of the gap is the policy's own. Without sticky actions the
+two cohorts are identical games and some greedy games stall in endless
+volleys, so no-sticky tests are read on sampled play. Post hoc: the
+right action near contact flips at about 8 px of paddle offset, the
+policy's action mass only changes beyond 12 px, and linear and MLP
+readouts find the state's landing-minus-paddle to 6 to 7 px (each
+object to about 3.5 px). Next run not chosen: the actor's training
+signal on the open-loop recipe (the user's earlier choice) or position
+precision in the representation, which needs native work beyond
+96x96.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games
