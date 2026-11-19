@@ -488,8 +488,22 @@ for the wider input (33.5M world parameters against 17.9M). 96x96 stays
 the default; 160x160 costs 2.06 times per update, does not fit with a
 useful float replay, and its compact replay is not built. Five
 world-side changes on this seed have now failed to beat the unchanged
-recipe. Not launched: the actor's training signal, the run the user
-chose on November 18.
+recipe. Post hoc on CPU ([report](docs/results/2026-11-19-breakout-encoder-precision.md),
+a NumPy port of the encoder on replayed frames): the encoder's output
+for one frame holds the paddle to 2.1 px, better than the state (3.5),
+and the ball only to about 5 px (median) in open play, not at all among
+the bricks; the state's ball read comes from integrating frames. At
+128x128 the encoder is sharper on every object (paddle 1.6 px, ball 3.5
+to 3.7) and the state is not (paddle 5.5). A ball 4 px off in x costs
+the latent objective .0075 of cosine distance, a fifth of the remaining
+loss; 1 px costs .001. Next, running:
+[the same recipe at model size 25m](docs/experiments/2026-11-19-breakout-model-size.md)
+(`S25`, 40.3M world parameters, replay 50k, seed 22003, 1.6M actions;
+root `/x/Temp/kindle-breakout-size-20261119`, `queue-23.json`, unit
+`kindle-breakout-size-20261119`, about 5.5 hours from 19:51 UTC
+November 19; 1.50 times the time per update, projected 11.3 GiB). Not
+launched: the actor's training signal, the run the user chose on
+November 18, which still has no concrete design.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games

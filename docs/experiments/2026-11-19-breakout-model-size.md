@@ -1,6 +1,6 @@
 # A wider model: the life-terminal recipe at model size 25m
 
-Prepared 19:51 UTC November 19. Follows [the 128x128 result](../results/2026-11-19-breakout-wide-input.md)
+Prepared 19:51 UTC November 19; **launched by hand at 19:51 UTC**. Follows [the 128x128 result](../results/2026-11-19-breakout-wide-input.md)
 and [the encoder-precision readings](../results/2026-11-19-breakout-encoder-precision.md):
 the encoder's output for one frame holds the paddle to 2.1 px and the
 ball to about 5 px, the state holds the paddle worse than the encoder
