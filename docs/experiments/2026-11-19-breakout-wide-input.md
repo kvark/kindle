@@ -1,6 +1,6 @@
 # A wider input: the life-terminal recipe at 128x128
 
-Prepared 13:47 UTC November 19. Follows [the posterior-noise check and
+Prepared 13:47 UTC November 19; **launched by hand at 13:48 UTC**. Follows [the posterior-noise check and
 the planner readings](../results/2026-11-19-breakout-posterior-noise-check.md):
 a planner with exact control plays at the gate with 1 to 3 px of error in
 the ball-to-paddle offset, the best learner plays just below that band,

@@ -469,8 +469,15 @@ finished, no fault) rules out sampling noise at decision time: the
 posterior's mode makes play worse (medians 330 and 173 against 380.5
 and 260) and averaging the actor over eight draws changes no return
 rate. The GPU replay stores frames as 32-bit floats and is most of the
-memory (11.3 of 15.6 GiB at 96x96 with 100k frames). Next, declared
-separately: a wider input.
+memory (11.3 of 15.6 GiB at 96x96 with 100k frames). Next, running:
+[the life-terminal recipe at 128x128](docs/experiments/2026-11-19-breakout-wide-input.md)
+(`W22`, new native sizes 128 and 160, replay 50k, seed 22003, 1.6M
+actions; root `/x/Temp/kindle-breakout-wide-20261119`, `queue-22.json`,
+unit `kindle-breakout-wide-20261119`, about 5.4 hours from 13:48 UTC
+November 19; 1.44 times the time per update, projected 14.5 GiB).
+160x160 costs 2.06 times and does not fit with a useful float replay.
+Linear readouts do not order the existing learners by play, so the
+run's ball-return and score tests decide.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games
