@@ -471,15 +471,25 @@ finished, no fault) rules out sampling noise at decision time: the
 posterior's mode makes play worse (medians 330 and 173 against 380.5
 and 260) and averaging the actor over eight draws changes no return
 rate. The GPU replay stores frames as 32-bit floats and is most of the
-memory (11.3 of 15.6 GiB at 96x96 with 100k frames). Next, running:
-[the life-terminal recipe at 128x128](docs/experiments/2026-11-19-breakout-wide-input.md)
+memory (11.3 of 15.6 GiB at 96x96 with 100k frames).
+[The life-terminal recipe at 128x128](docs/results/2026-11-19-breakout-wide-input.md)
 (`W22`, new native sizes 128 and 160, replay 50k, seed 22003, 1.6M
-actions; root `/x/Temp/kindle-breakout-wide-20261119`, `queue-22.json`,
-unit `kindle-breakout-wide-20261119`, about 5.4 hours from 13:48 UTC
-November 19; 1.44 times the time per update, projected 14.5 GiB).
-160x160 costs 2.06 times and does not fit with a useful float replay.
-Linear readouts do not order the existing learners by play, so the
-run's ball-return and score tests decide.
+actions, 294 minutes, 1.51 times the time per action, peak 14.4 GiB;
+root `/x/Temp/kindle-breakout-wide-20261119`, `queue-22.json`, finished
+18:53 UTC November 19, no fault) fails its three declared tests and is
+not retained: pooled median 122.5 at 1.6M with no game past the first
+wall, below the 96x96 50k-replay control's 800k checkpoint (174.5) and
+behind at every checkpoint (48.5 / 69 / 103.5 against 60.5 / 174.5 /
+322), still rising at the end; wide paddle .904, narrow .748. Its state
+reads the ball's height better (3.7 px against 4.6), the ball's
+horizontal position the same (5.5) and the paddle worse (5.5 against
+3.5), so landing minus paddle is 9.3 px against 6.7. Nothing was retuned
+for the wider input (33.5M world parameters against 17.9M). 96x96 stays
+the default; 160x160 costs 2.06 times per update, does not fit with a
+useful float replay, and its compact replay is not built. Five
+world-side changes on this seed have now failed to beat the unchanged
+recipe. Not launched: the actor's training signal, the run the user
+chose on November 18.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games
