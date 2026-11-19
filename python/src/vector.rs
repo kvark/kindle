@@ -93,6 +93,9 @@ impl PyVectorAgent {
     #[classattr]
     const SUPPORTS_RGB96: bool = true;
 
+    #[classattr]
+    const SUPPORTS_RGB160: bool = true;
+
     #[classmethod]
     fn learned_rgb(
         _class: &Bound<'_, PyType>,

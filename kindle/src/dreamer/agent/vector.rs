@@ -976,7 +976,7 @@ impl VectorDreamerAgent {
         check_capacity(&config, streams)?;
         if !config.observation_kind.is_rgb() {
             return Err(
-                "learned RGB requires observation_kind=rgb32, rgb48, rgb64 or rgb96".into(),
+                "learned RGB requires observation_kind=rgb32, rgb48, rgb64, rgb96, rgb128 or rgb160".into(),
             );
         }
         let side = config.observation_grid();

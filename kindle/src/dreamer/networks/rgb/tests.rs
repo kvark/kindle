@@ -234,6 +234,13 @@ fn tiny_rgb96_encoder_matches_spatial_reference() {
     check_encoder_at_side(false, false, false, ObservationKind::Rgb96);
 }
 
+#[test]
+#[ignore = "requires a GPU; the scalar CNN reference at the wider sides"]
+fn tiny_rgb128_and_rgb160_encoders_match_spatial_reference() {
+    check_encoder_at_side(false, false, false, ObservationKind::Rgb128);
+    check_encoder_at_side(false, false, false, ObservationKind::Rgb160);
+}
+
 fn check_encoder_at_side(
     frame_pair: bool,
     coordinates: bool,

@@ -512,7 +512,9 @@ impl ObservationEncoder {
             ObservationKind::Rgb64
             | ObservationKind::Rgb48
             | ObservationKind::Rgb32
-            | ObservationKind::Rgb96 => Self::Rgb(rgb::Encoder::new(graph, config)),
+            | ObservationKind::Rgb96
+            | ObservationKind::Rgb128
+            | ObservationKind::Rgb160 => Self::Rgb(rgb::Encoder::new(graph, config)),
         }
     }
 
@@ -969,7 +971,9 @@ impl ObservationDecoder {
             ObservationKind::Rgb64
             | ObservationKind::Rgb48
             | ObservationKind::Rgb32
-            | ObservationKind::Rgb96 => {
+            | ObservationKind::Rgb96
+            | ObservationKind::Rgb128
+            | ObservationKind::Rgb160 => {
                 Self::Rgb(rgb::Decoder::new(graph, config, name, input_dim))
             }
         }

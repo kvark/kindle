@@ -92,7 +92,7 @@ def main():
                         help="train posterior representations from initial imagined actor/value losses (upstream ac_grads)")
     parser.add_argument("--cdp", action="store_true",
                         help="learned CNN with cosine feature prediction instead of RGB reconstruction; CDP split learning rates")
-    parser.add_argument("--image-size", type=int, choices=(32, 48, 64, 96),
+    parser.add_argument("--image-size", type=int, choices=(32, 48, 64, 96, 128, 160),
                         help="learned RGB/CDP GPU resize side; fresh default64, restore uses checkpoint geometry")
     parser.add_argument("--rgb-frame-pair", action="store_true",
                         help="fresh CDP: encode previous/current resized RGB images as six channels")
@@ -722,6 +722,9 @@ def main():
         if (metadata.get("config", {}).get("observation_kind") == "rgb96"
                 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB96", False)):
             parser.error("RGB96 checkpoint requires native RGB96 support")
+        if (metadata.get("config", {}).get("observation_kind") in ("rgb128", "rgb160")
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB160", False)):
+            parser.error("RGB128/RGB160 checkpoint requires native RGB160 support")
         if metadata.get("config", {}).get("actor_expected_value", False):
             if not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_EXPECTED_VALUE", False):
                 parser.error("checkpoint requires native expected-value actor support")
@@ -802,6 +805,8 @@ def main():
         parser.error("image-size requires the learned RGB/CNN frontend")
     if args.image_size == 96 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB96", False):
         parser.error("image-size96 requires native RGB96 support")
+    if args.image_size in (128, 160) and not getattr(kindle.VectorAgent, "SUPPORTS_RGB160", False):
+        parser.error("image-size128/160 requires native RGB160 support")
     if args.image_crop is not None:
         if not learned_rgb:
             parser.error("image-crop requires the learned RGB/CNN frontend")

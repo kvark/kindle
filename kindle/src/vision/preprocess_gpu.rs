@@ -235,7 +235,7 @@ impl GpuPreprocessor {
         side: usize,
         crop: Option<FrameCrop>,
     ) -> Self {
-        assert!(matches!(side, 32 | 48 | 64 | 96));
+        assert!(matches!(side, 32 | 48 | 64 | 96 | 128 | 160));
         if let Some(crop) = crop {
             crop.check().expect("invalid image crop");
         }

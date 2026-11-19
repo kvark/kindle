@@ -14,6 +14,10 @@ pub enum ObservationKind {
     Rgb32,
     /// One GPU resize to 96x96, channel-major RGB in [-0.5, 0.5].
     Rgb96,
+    /// One GPU resize to 128x128, channel-major RGB in [-0.5, 0.5].
+    Rgb128,
+    /// One GPU resize to 160x160, channel-major RGB in [-0.5, 0.5]: Atari's native width.
+    Rgb160,
 }
 
 impl ObservationKind {
@@ -726,6 +730,8 @@ impl DreamerConfig {
             ObservationKind::Rgb48 => 48,
             ObservationKind::Rgb32 => 32,
             ObservationKind::Rgb96 => 96,
+            ObservationKind::Rgb128 => 128,
+            ObservationKind::Rgb160 => 160,
         }
     }
 
@@ -735,7 +741,9 @@ impl DreamerConfig {
             ObservationKind::Rgb64
             | ObservationKind::Rgb48
             | ObservationKind::Rgb32
-            | ObservationKind::Rgb96 => {
+            | ObservationKind::Rgb96
+            | ObservationKind::Rgb128
+            | ObservationKind::Rgb160 => {
                 if self.rgb_frame_pair {
                     6
                 } else {
@@ -754,7 +762,9 @@ impl DreamerConfig {
             ObservationKind::Rgb64
             | ObservationKind::Rgb48
             | ObservationKind::Rgb32
-            | ObservationKind::Rgb96 => [batch, self.observation_dim()],
+            | ObservationKind::Rgb96
+            | ObservationKind::Rgb128
+            | ObservationKind::Rgb160 => [batch, self.observation_dim()],
         }
     }
 
@@ -766,7 +776,9 @@ impl DreamerConfig {
             ObservationKind::Rgb64
             | ObservationKind::Rgb48
             | ObservationKind::Rgb32
-            | ObservationKind::Rgb96 => {
+            | ObservationKind::Rgb96
+            | ObservationKind::Rgb128
+            | ObservationKind::Rgb160 => {
                 let side = self.observation_grid() / 16;
                 side * side * self.network().vision_depth * 4
             }
