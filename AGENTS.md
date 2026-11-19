@@ -434,19 +434,25 @@ policy's action mass only changes beyond 12 px, and linear and MLP
 readouts find the state's landing-minus-paddle to 6 to 7 px (each
 object to about 3.5 px). The user then chose position precision over the actor's training
 signal: [the open-loop recipe plus the pixel-reconstruction
-auxiliary](docs/experiments/2026-11-18-breakout-pixel-auxiliary-precision.md)
-(`--world-pixel-scale 1`, plain squared error, seed 22003, 1.6M actions;
-root `/x/Temp/kindle-breakout-pixelaux-20261118`, unit
-`kindle-breakout-pixelaux-20261118`, about 6 hours from 20:41 UTC
-November 18; 1.6 times the time per update, projected 16.7 GiB of a
-19.1 GiB budget) tests whether the state's positions sharpen and play
-follows. Its first attempt stopped at 333k actions (21:54 UTC) on the
-runner's memory-headroom check, 20 MB short, when another project's GPU
-job on the same card shrank the budget; no fault. The user chose a 1 GiB
-training headroom, and the run was relaunched from scratch as `X22b`
-(`queue-20b.json`, unit `kindle-breakout-pixelaux-b-20261119`, about 6.5
-hours from 06:27 UTC November 19). **Other projects share this GPU; a
-run within 0.5 GiB of its headroom will be stopped by their use.**
+auxiliary](docs/results/2026-11-19-breakout-pixel-auxiliary-precision.md)
+(`--world-pixel-scale 1`, plain squared error, seed 22003, 1.6M actions,
+325 minutes, 1.51 times the time per action, peak 16.7 GiB; root
+`/x/Temp/kindle-breakout-pixelaux-20261118`, `queue-20b.json`, finished
+12:08 UTC November 19, no fault) fails its four declared tests and is not
+retained. The state reads the paddle better (2.3 px against 3.5) but not
+where the ball lands relative to it (6.3 to 6.8 px against 6.2 to 6.6);
+the policy near contact is more diffuse (entropy 1.43 nats against .80
+one action out) and moves again from in place more often (.73 against
+.54); wide paddle .931, narrow .754; median 274 at 1.6M (311.5 at 1.2M),
+no game past the first wall, and eight greedy games that never serve.
+Four world-side changes on this seed (frame pair, prior continuation,
+open-loop, pixel auxiliary) each moved their own measure and none moved
+play; the actor's training signal is the untested side. The first
+attempt (`X22`) stopped at 333k actions on the runner's memory-headroom
+check, 20 MB short, when another project's GPU job on the same card
+shrank the budget; the user chose a 1 GiB training headroom for the
+relaunch (`X22b`). **Other projects share this GPU; a run within 0.5 GiB
+of its headroom will be stopped by their use.**
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games
