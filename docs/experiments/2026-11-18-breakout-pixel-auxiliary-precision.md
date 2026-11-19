@@ -78,6 +78,17 @@ choice is the user's. `queue-20b.json` (`make_pixelaux_queue_b.py`) is
 the same run from scratch as `X22b` with `--min-gpu-budget-headroom-mib
 1024` on the training job only; it is prepared and **not launched**.
 
+**Relaunch (amendment, 06:27 UTC November 19).** The user chose the lower
+headroom ("Lower headroom to 1 GiB", question of November 18).
+`queue-20b.json` is launched by hand unchanged: `X22b`, the same command
+from scratch with `--min-gpu-budget-headroom-mib 1024` on the training
+job (cells and probes keep 2048), guards `guards-20b`, unit
+`kindle-breakout-pixelaux-b-20261119`. With 1 GiB the run tolerates up to
+2.3 GiB of other use on the card; the most seen so far is 1.3 GiB. Tests,
+baselines and readings are unchanged and are read on `X22b`. The kernel
+logged a GPU resume at 00:55 UTC November 19 (power management, no fault
+record); the review file still covers every fault record of the boot.
+
 ## Declared tests
 
 At 1.6M. Baseline `O22` at 1.6M (same recipe and seed without the
