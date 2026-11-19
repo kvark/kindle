@@ -117,6 +117,43 @@ px pays .003 and 1 px .001. The last pixels are worth little to it.
 - The paddle's share of the objective was not measured (its RAM position
   cannot be shifted the way the ball's can).
 
+## A check on the readers
+
+Readouts are the instrument in every precision reading here, so they
+were tested as choosers against the actor (`state_choice_probe.py`,
+`state_choice_read.py`; root `/x/Temp/kindle-breakout-size-20261119`,
+`analysis/state-choice-*`). `L22`'s own-play dump was replayed on CPU
+from its seed and actions (all 64,000 rows match), and at 13,928
+near-contact rows seven fixed action sequences were rolled out six times
+each in a second emulator. A ridge and the MLP were fitted on five lanes
+to predict each sequence's loss rate from the state, and scored on the
+other lanes by the emulator loss rate of the sequence they pick. One
+action before the paddle row:
+
+| Chooser | All (2,806) | Wide (2,164) | Narrow (642) |
+|---|---:|---:|---:|
+| Hold still | .185 | .160 | .269 |
+| Ridge on the state | .137 | .115 | .213 |
+| MLP on the state | .141 | .120 | .212 |
+| The agent's own play | .047 | .037 | .083 |
+| The same MLP on exact coordinates | .037 | .026 | .073 |
+| Best of the seven (picked on half the draws) | .032 | .023 | .062 |
+
+The actor uses its state far better than these readouts do: they lose
+three times as many balls as the agent loses from the same states. So a
+readout's error is an upper bound on what the state lacks, not a
+measurement of it, and the px figures above and in earlier reports are
+to be read that way; the comparison between the encoder's output and the
+state uses the same reader on both and is less exposed. The table also
+bounds the last decision: with exact coordinates the best of seven
+sequences loses .032 against the agent's .047, so about a third of the
+agent's losses could still be avoided at the last action and the rest
+are decided earlier in the descent.
+
+A snapshot of the emulator does not hold the action that sticky repeats
+fall back on, so rolling out in place and restoring changes later draws;
+the first version of this probe did that and its replay diverged.
+
 ## Next
 
 Both losses sit in layers whose width the model-size preset sets (64
