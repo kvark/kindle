@@ -1,4 +1,4 @@
-# The latent's sampling noise is not what limits the paddle; a planner with 1 to 3 px of offset error plays at the gate
+# The latent's sampling noise is not what limits the paddle; a planner with 1 to 3 px of offset error plays near the gate's median
 
 Result of [the posterior-noise check](../experiments/2026-11-19-breakout-posterior-noise-check.md),
 with the post hoc CPU readings that motivated it. Root
@@ -15,8 +15,9 @@ Taking the posterior's mode makes play worse (medians 330 and 173 against
 380.5 and 260); averaging the actor over eight further draws changes no
 return rate. Sampling noise at decision time is not what limits the
 paddle. The planner readings say what does: a controller with exact
-control and 1 to 3 px of error in the ball-to-paddle offset plays at
-about the gate, and our best learner plays slightly below that band.
+control and 1 to 3 px of error in the ball-to-paddle offset scores a
+median of about 423 with a third of its games past the first wall, and
+our best learner plays below that band.
 
 ## Declared tests
 
@@ -53,15 +54,17 @@ every planning rollout sees the ball shifted sideways by an error drawn
 once per descent from a normal distribution with the given sd; the real
 emulator is untouched. The hedging version scores each plan under eight
 sticky draws, each with a further shift from the same distribution, so it
-knows how uncertain it is. Six games per row except where noted.
+knows how uncertain it is. Games per row as listed; the 1 to 3 px rows
+were extended from 6 to 12 games each after the first version of this
+report (then medians 426, 387 and 434).
 
 | Planner | Offset error sd | Games | Median (min; max) | Past 432 | Wide | Narrow | Narrow, fastest |
 |---|---:|---:|---|---:|---:|---:|---:|
 | November 17 planner (4 sticky draws) | 0 | 20 | 437 (326; 859) | 11 | .980 | .937 | .904 |
 | Hedging (8 draws) | 0 | 12 | 566 (431; 860) | 10 | .983 | .953 | .941 |
-| Hedging | 1 px | 6 | 426 (323; 443) | 2 | .967 | .905 | .851 |
-| Hedging | 2 px | 6 | 387 (293; 424) | 0 | .965 | .838 | .803 |
-| Hedging | 3 px | 6 | 434 (358; 446) | 4 | .955 | .922 | .888 |
+| Hedging | 1 px | 12 | 424 (323; 645) | 4 | .973 | .924 | .864 |
+| Hedging | 2 px | 12 | 422 (293; 467) | 3 | .967 | .887 | .839 |
+| Hedging | 3 px | 12 | 424 (277; 446) | 4 | .962 | .895 | .855 |
 | Hedging | 4 px | 6 | 183 (101; 383) | 0 | .912 | .911 (45 balls) | - |
 | Hedging | 6 px | 6 | 123 (74; 327) | 0 | .916 | - | - |
 | Not hedging (4 draws) | 2 px | 6 | 338 (106; 428) | 0 | .940 | .872 | .767 |
@@ -74,14 +77,18 @@ knows how uncertain it is. Six games per row except where noted.
   gate itself is the user's and is unchanged; its reference level is a
   lower bound, as the November 17 report said.
 - **Offset error costs play steeply.** With 1 to 3 px the hedging planner
-  returns .955 to .967 of wide balls and scores medians of 387 to 434,
-  6 of 18 games past the wall; with 4 px and more it scores 123 to 183.
-  Six games per row do not order the 1 to 3 px rows.
+  returns .962 to .973 of wide and .887 to .924 of narrow balls and
+  scores medians of 422 to 424, 11 of 36 games past the wall; with 4 px
+  and more it scores 123 to 183. Even 1 px of error leaves most games
+  short of the wall (4 of 12 past it); with no error 10 of 12 pass.
 - **Our best learner sits just below the 1 to 3 px band** on the wide
-  paddle (.950) and below it on the narrow one (.830 against .84 to .92).
+  paddle (.950 against .962 to .973) and well below it on the narrow one
+  (.830 against .887 to .924).
   It already plays about as well as a controller with 3 to 4 px of offset
   error can, which is also what readouts find in its state (each object
-  to about 3.5 px mean). The gate asks for the 1 to 3 px band or better.
+  to about 3.5 px mean). The gate's median (near 437) is the 1 to 3 px
+  band's; its second half, most games past the first wall, is met only
+  by the planner with no error.
 
 ## Post hoc: where the state holds the positions
 
@@ -109,15 +116,17 @@ held out by lane, mean absolute error in source pixels.
 
 Three things line up at 3 to 4 px: what linear readouts find in the
 state, how far the paddle ends from the landing, and the offset error at
-which a planner with exact control plays like the learner. Play at the
-gate needs that error at 1 to 3 px or better. At 96x96 one input pixel is
+which a planner with exact control plays like the learner. The gate's
+median needs that error at 1 to 3 px, and most games past the wall needs
+it under 1 px. At 96x96 one input pixel is
 1.67 source pixels wide and the ball is 1.2 input pixels wide.
 Reconstruction sharpened the paddle and not the ball; sampling noise is
 not the limit. What is left is the input: more pixels per ball.
 
 ## Limits
 
-- Six planner games per error level; the 1 to 3 px rows overlap. The
+- Six to twelve planner games per error level; the 1 to 3 px rows do not
+  differ. The
   error model (one normal shift per descent, known sd) is one choice; an
   error that varies within a descent costs less at the same sd (4 px
   drawn afresh at every decision, not hedged: wide .934, median 286).

@@ -455,11 +455,13 @@ relaunch (`X22b`). **Other projects share this GPU; a run within 0.5 GiB
 of its headroom will be stopped by their use.** Post hoc on CPU
 ([report](docs/results/2026-11-19-breakout-posterior-noise-check.md)): a
 planner with exact control and a known error in the ball-to-paddle
-offset scores medians of 387 to 434 at 1 to 3 px (sd), 6 of 18 games
-past the first wall, and 123 to 183 at 4 px and more; the same search
-with no error scores a median of 566 (12 games, 10 past the wall), so
-the 437 the gate was set from was a weak search's lower bound. The best
-learner (wide .950, narrow .830) plays just below the 1 to 3 px band,
+offset scores medians of 422 to 424 at 1 to 3 px (sd; wide .962 to
+.973, narrow .887 to .924; 11 of 36 games past the first wall) and 123
+to 183 at 4 px and more; the same search with no error scores a median
+of 566 (12 games, 10 past the wall), so the 437 the gate was set from
+was a weak search's lower bound, and "most games past the wall" is met
+only with no error. The best learner (wide .950, narrow .830) plays
+below the 1 to 3 px band,
 its state reads each object to about 3.5 px and its paddle ends 4 to
 6 px from the landing: position precision is the limit. The state's
 sampled latent is unreadable alone (.82 of its variables change every
