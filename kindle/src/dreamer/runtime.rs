@@ -337,7 +337,15 @@ pub(crate) fn configure_d3_optimizer(
     learning_rate: f32,
 ) {
     if let Some(rate) = config.encoder_learning_rate {
-        session.set_lr_multiplier("world.representation.encoder.", rate / config.learning_rate);
+        let frozen = config
+            .encoder_freeze_update
+            .is_some_and(|update| learner_step >= update);
+        let multiplier = if frozen {
+            0.0
+        } else {
+            rate / config.learning_rate
+        };
+        session.set_lr_multiplier("world.representation.encoder.", multiplier);
     }
     if let Some(rate) = config.dynamics_learning_rate {
         for prefix in [

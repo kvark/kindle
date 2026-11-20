@@ -96,6 +96,10 @@ impl PyVectorAgent {
     #[classattr]
     const SUPPORTS_RGB160: bool = true;
 
+    /// `encoder_freeze_update`: the encoder's learning rate is zero from that learner step.
+    #[classattr]
+    const SUPPORTS_ENCODER_FREEZE: bool = true;
+
     #[classmethod]
     fn learned_rgb(
         _class: &Bound<'_, PyType>,

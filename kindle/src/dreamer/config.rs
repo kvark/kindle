@@ -518,6 +518,10 @@ pub struct DreamerConfig {
     /// Optional CNN/feature-adapter rate; defaults to the world learning rate.
     #[serde(default)]
     pub encoder_learning_rate: Option<f32>,
+    /// Learner step from which the encoder's learning rate is zero; its
+    /// optimizer moments keep tracking. Requires `encoder_learning_rate`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub encoder_freeze_update: Option<u64>,
     /// Optional RSSM (including posterior) and future-predictor learning rate.
     #[serde(default)]
     pub dynamics_learning_rate: Option<f32>,
@@ -651,6 +655,7 @@ impl DreamerConfig {
             return_norm_rate: 0.01,
             learning_rate: 4e-5,
             encoder_learning_rate: None,
+            encoder_freeze_update: None,
             dynamics_learning_rate: None,
             behavior_learning_rate: None,
             actor_learning_starts: 0,
@@ -1469,6 +1474,13 @@ impl DreamerConfig {
         if !self.learning_rate.is_finite() || self.learning_rate <= 0.0 {
             return Err("learning_rate must be finite and positive".into());
         }
+        if self.encoder_freeze_update.is_some_and(|update| update == 0)
+            || (self.encoder_freeze_update.is_some() && self.encoder_learning_rate.is_none())
+        {
+            return Err(
+                "encoder_freeze_update must be positive and requires encoder_learning_rate".into(),
+            );
+        }
         for (name, rate) in [
             ("behavior_learning_rate", self.behavior_learning_rate),
             ("encoder_learning_rate", self.encoder_learning_rate),
@@ -2064,6 +2076,25 @@ mod tests {
             config,
             serde_json::from_slice::<DreamerConfig>(&json).unwrap()
         );
+        assert!(
+            serde_json::to_value(&config)
+                .unwrap()
+                .get("encoder_freeze_update")
+                .is_none()
+        );
+        let mut frozen = config.clone();
+        frozen.encoder_freeze_update = Some(75_000);
+        assert!(frozen.check().is_ok());
+        let json = serde_json::to_vec(&frozen).unwrap();
+        assert_eq!(
+            frozen,
+            serde_json::from_slice::<DreamerConfig>(&json).unwrap()
+        );
+        frozen.encoder_freeze_update = Some(0);
+        assert!(frozen.check().is_err());
+        frozen.encoder_freeze_update = Some(1);
+        frozen.encoder_learning_rate = None;
+        assert!(frozen.check().is_err());
         for rate in [0.0, -1.0, f32::INFINITY, f32::NAN] {
             let mut invalid = config.clone();
             invalid.encoder_learning_rate = Some(rate);
