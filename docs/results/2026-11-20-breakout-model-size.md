@@ -147,10 +147,11 @@ That last point bears on the whole series. Six changes have now been
 compared with one run of the unchanged recipe at one checkpoint (`L22`
 at 1.6M, 380.5): frame pair 353.5, open-loop 317, 25m 296, pixel
 auxiliary 274, prior continuation 269, 128x128 input 122.5. The
-unchanged recipe's own spread across seeds at 1.2M is 276 to 350, and
-its spread across checkpoints or across reruns with a different seed at
-1.6M has not been measured. Only the 128x128 result is clearly outside
-that range. None of the six is at the gate (a median near 437 with most
+unchanged recipe's own spread across seeds at 1.2M is 276 to 350, `L22`
+itself scores 334, 380.5 and 331.5 at 1.2M, 1.6M and 2.0M, so the
+reference is the highest of its three plateau checkpoints, and the
+recipe's spread across seeds at 1.6M has not been measured. Only the
+128x128 result is clearly outside that range. None of the six is at the gate (a median near 437 with most
 games past 432), and that conclusion does not depend on the noise.
 
 ## Limits

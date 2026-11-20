@@ -514,8 +514,23 @@ within 400k actions**, and the unchanged recipe's spread at 1.6M has
 not been measured, so of the six changes compared with `L22`'s 380.5
 only the 128x128 result is clearly outside the noise. None is at the
 gate. 12m stays the default; capacity and input size are closed at this
-budget. Not launched: the actor's training signal, the run the user
-chose on November 18, which still has no concrete design.
+budget. Post hoc on CPU ([report](docs/results/2026-11-20-breakout-critic-calibration.md)):
+**on all eighteen own-play dumps the critic's mean value is 1.8 to 6.1
+times the discounted reward the life goes on to earn** (87.8 against
+30.5 on `L22` at 1.6M, above even the worth of the same reward rate with
+no ball ever lost, 52.3); the value orders states (correlation .56) and
+overstates all of them, and eight actions before a life ends it is
+still at about 90% of its level. The critic's replay target bootstraps
+from imagined returns beyond the 16-step window, so nothing ties it to
+a real outcome further away. Running, as the concrete design of the
+actor's training signal the user chose on November 18:
+[the same recipe with completed real returns as the critic's replay targets](docs/experiments/2026-11-20-breakout-completed-value.md)
+(`V22`, `--replay-value-completed`, which the runner now allows with
+`--life-loss-terminal`; 12m, replay 50k, seed 22003, 1.6M actions; root
+`/x/Temp/kindle-breakout-realvalue-20261120`, `queue-24.json`, unit
+`kindle-breakout-realvalue-20261120`, about 3.9 hours from 02:44 UTC
+November 20). A `journalctl --since` filter without a date, read after
+midnight, names a future time; use dated filters in queue summaries.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games

@@ -177,7 +177,7 @@ def main():
     parser.add_argument("--actor-residual", action="store_true",
                         help="fresh centered CDP: separate imagined-policy correction to a supervised actor")
     parser.add_argument("--replay-value-completed", action="store_true",
-                        help="use completed observed game returns for available replay-value targets; requires disagreement-scale0")
+                        help="use completed observed returns (to the end of the game, or of the life with life-loss-terminal) for available replay-value targets; requires disagreement-scale0")
     parser.add_argument("--replay-actor-scale", type=float,
                         help="fresh training: positive-advantage imitation of completed observed returns")
     parser.add_argument("--replay-actor-observed-lower-bound", action="store_true",
@@ -365,9 +365,9 @@ def main():
             args.environment != "ALE/Breakout-v5" or args.restore or args.evaluate
             or not args.replay_actor_observed_lower_bound):
         parser.error("return life boundaries require fresh Breakout training with observed lower-bound mode")
-    if args.life_loss_terminal and (args.restore or args.evaluate or args.breakout_return_life_boundaries
-                                    or args.replay_value_completed):
-        parser.error("life-loss-terminal requires fresh training without auxiliary life boundaries or completed returns")
+    # With the life boundary, a completed replay return ends at the lost life, as the critic's own targets do.
+    if args.life_loss_terminal and (args.restore or args.evaluate or args.breakout_return_life_boundaries):
+        parser.error("life-loss-terminal requires fresh training without auxiliary life boundaries")
     if args.life_loss_reset and not (args.restore and args.evaluate):
         parser.error("life-loss-reset requires frozen restore")
     life_boundary = args.life_loss_terminal or args.life_loss_reset
