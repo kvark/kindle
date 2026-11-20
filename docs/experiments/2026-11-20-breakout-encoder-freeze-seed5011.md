@@ -1,6 +1,6 @@
 # The frozen-encoder schedule on held-out seed 5011
 
-Prepared 23:05 UTC November 20. Follows
+Prepared 23:02 UTC November 20; **launched by hand at 23:02 UTC**. Follows
 [the encoder-freeze result](../results/2026-11-20-breakout-encoder-freeze.md):
 on seed 22003, freezing the encoder at 1.2M actions prevented the
 collapse and play kept improving to a median of 404.5 at 2.8M. That

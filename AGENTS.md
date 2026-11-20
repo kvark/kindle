@@ -553,12 +553,31 @@ from .100 (1.2M) to .076, .045 and .018 (1.6M, 2.0M, 2.4M), one action
 changes the output a sixth as much, and the drift does not reverse,
 while a linear readout still finds the paddle to 2 px; after the
 collapse the state reads the paddle at 8.9 px and the ball better than
-before. Running as the causal test: `F22`, `L22`'s command with the
-encoder frozen from update 75,000 (1.2M actions; new
-`--encoder-freeze-update`), to 2.8M actions (root
-`/x/Temp/kindle-breakout-collapse-20261120`, `queue-25.json`, unit
-`kindle-breakout-freeze-20261120`, about 6.3 hours from 16:20 UTC
-November 20). The first queue stopped at job 9 of 23 on a **full disk**
+before. The causal test passes both declared tests:
+[`F22`](docs/results/2026-11-20-breakout-encoder-freeze.md), `L22`'s
+command with the encoder frozen from update 75,000 (1.2M actions; new
+`--encoder-freeze-update`), run to 2.8M actions (345 minutes, peak 15.4
+GiB; root `/x/Temp/kindle-breakout-collapse-20261120`, `queue-25.json`,
+finished 22:24 UTC November 20, no fault), **does not collapse and keeps
+improving**: pooled medians 378.5 / 370 / 385.5 / **404.5** at 1.6M /
+2.0M / 2.4M / 2.8M (`L22` 380.5 / 331.5 / 45 / 44), the best checkpoint
+on record (53 of 96 games at 400 or more, 5 past the first wall; wide
+paddle .956, narrow .884, the lower edge of the planner's 1 to 3 px
+band), training returns 342.5 per game over 2.4M to 2.8M (`L22` 49.7),
+paddle read from the state 3.7 to 3.8 px (`L22` 8.9). The run is a true
+twin of `L22` through 1.2M (checkpoint byte-identical, 1,192 training
+games identical). With the target encoder still, the latent loss halves
+(.048 to .023) and the dynamics KL falls from 10.8 to 6.3 within 400k
+actions, and training returns leave `L22`'s plateau. The encoder's
+drift is necessary for the collapse on this seed; why it drifts is not
+established. One development seed; still below the gate. Running as the
+declared second seed:
+[`F50`](docs/experiments/2026-11-20-breakout-encoder-freeze-seed5011.md),
+the same schedule on held-out seed 5011 to 2.8M (`queue-26.json` in the
+same root, unit `kindle-breakout-freeze5011-20261120`, about 6.1 hours
+from 23:02 UTC November 20); that seed's encoder had not drifted at
+1.2M. The standardized objective (`--cdp-scale-floor`) is source only,
+not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
 fault; smoke-run weights were deleted to finish. **Check `df` before
 launching a queue; a run needs about 7 GB.** A `journalctl --since` filter without a date, read after
