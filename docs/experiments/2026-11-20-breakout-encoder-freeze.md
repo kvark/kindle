@@ -1,6 +1,6 @@
 # The collapse after 2.2M: the encoder drifts to slow content; a run with the encoder frozen at 1.2M
 
-Prepared 16:20 UTC November 20. The user chose on November 20 to find
+Prepared 16:20 UTC November 20; **launched by hand at 16:20 UTC**. The user chose on November 20 to find
 the cause of [the collapse of the 3.6M-action run](../results/2026-11-17-breakout-heldout-and-budget.md)
 (`L22`: median 380.5 at 1.6M, 331.5 at 2.0M, 45 at 2.4M) before any
 other run. This file records the CPU diagnosis and declares one causal

@@ -544,8 +544,21 @@ relative to the return scale). The completed-return actor's weights on
 its dump do not prefer holding still from a paddle in place. Eight
 changes on this seed have now failed to beat the unchanged recipe's
 380.5, itself the level published for DreamerV3 with sticky actions at
-200M frames (384); nothing is declared next and the direction is with
-the user. The first queue stopped at job 9 of 23 on a **full disk**
+200M frames (384). The user then chose to **find the cause of the
+collapse after 2.2M**. CPU diagnosis
+([declaration](docs/experiments/2026-11-20-breakout-encoder-freeze.md)):
+on identical frames the encoder's output drifts to slow scene content
+from 1.2M on; the share of its variance that follows the paddle falls
+from .100 (1.2M) to .076, .045 and .018 (1.6M, 2.0M, 2.4M), one action
+changes the output a sixth as much, and the drift does not reverse,
+while a linear readout still finds the paddle to 2 px; after the
+collapse the state reads the paddle at 8.9 px and the ball better than
+before. Running as the causal test: `F22`, `L22`'s command with the
+encoder frozen from update 75,000 (1.2M actions; new
+`--encoder-freeze-update`), to 2.8M actions (root
+`/x/Temp/kindle-breakout-collapse-20261120`, `queue-25.json`, unit
+`kindle-breakout-freeze-20261120`, about 6.3 hours from 16:20 UTC
+November 20). The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
 fault; smoke-run weights were deleted to finish. **Check `df` before
 launching a queue; a run needs about 7 GB.** A `journalctl --since` filter without a date, read after
