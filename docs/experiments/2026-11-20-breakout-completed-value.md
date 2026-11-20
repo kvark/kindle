@@ -1,6 +1,6 @@
 # The actor's training signal: a critic whose replayed targets are the real return of the life
 
-Prepared 02:43 UTC November 20; **launched by hand at 02:44 UTC**. Follows
+Prepared 02:43 UTC November 20; **launched by hand at 02:44 UTC**. **Result:** [calibration passes, the other three tests fail; not retained](../results/2026-11-20-breakout-completed-value.md). The queue stopped at job 9 on a full disk at 06:14 UTC; the 15 remaining jobs ran from `queue-24b.json` (06:17 to 06:27 UTC). Follows
 [the critic-calibration reading](../results/2026-11-20-breakout-critic-calibration.md):
 on every trained checkpoint the critic's mean value is 1.8 to 6.1 times
 the discounted reward the life goes on to earn (87.8 against 30.5 on the

@@ -522,14 +522,33 @@ no ball ever lost, 52.3); the value orders states (correlation .56) and
 overstates all of them, and eight actions before a life ends it is
 still at about 90% of its level. The critic's replay target bootstraps
 from imagined returns beyond the 16-step window, so nothing ties it to
-a real outcome further away. Running, as the concrete design of the
-actor's training signal the user chose on November 18:
-[the same recipe with completed real returns as the critic's replay targets](docs/experiments/2026-11-20-breakout-completed-value.md)
+a real outcome further away. As the concrete design of the
+actor's training signal the user chose on November 18,
+[the same recipe with completed real returns as the critic's replay targets](docs/results/2026-11-20-breakout-completed-value.md)
 (`V22`, `--replay-value-completed`, which the runner now allows with
-`--life-loss-terminal`; 12m, replay 50k, seed 22003, 1.6M actions; root
-`/x/Temp/kindle-breakout-realvalue-20261120`, `queue-24.json`, unit
-`kindle-breakout-realvalue-20261120`, about 3.9 hours from 02:44 UTC
-November 20). A `journalctl --since` filter without a date, read after
+`--life-loss-terminal`; 12m, replay 50k, seed 22003, 1.6M actions, 206
+minutes, peak 9.3 GiB; root `/x/Temp/kindle-breakout-realvalue-20261120`,
+`queue-24.json` then `queue-24b.json`, finished 06:27 UTC November 20, no
+fault) passes its calibration test and fails the other three; not
+retained. The critic's value is .63 of the life's real return (11.4
+against 18.0; before 2.9 times), so the overestimate was the imagined
+bootstrap's, but the critic still prices a lost ball only at contact
+(AUC .64 one action out, bar .85) and orders states worse (correlation
+.30 against .56); wide paddle .921, narrow .708; pooled median 235 at
+1.6M with no game past the first wall, behind the control at every
+checkpoint (25 / 75.5 / 118.5 against 60.5 / 174.5 / 322) and in online
+returns throughout (160 per game at the end, the control's level at
+600k to 800k). Why learning slows is not separated (noisy real targets,
+or the inflated value pricing a lost life two to three times higher
+relative to the return scale). The completed-return actor's weights on
+its dump do not prefer holding still from a paddle in place. Eight
+changes on this seed have now failed to beat the unchanged recipe's
+380.5, itself the level published for DreamerV3 with sticky actions at
+200M frames (384); nothing is declared next and the direction is with
+the user. The first queue stopped at job 9 of 23 on a **full disk**
+(`/` at 100%; another project's run directory holds 935 GB), not a GPU
+fault; smoke-run weights were deleted to finish. **Check `df` before
+launching a queue; a run needs about 7 GB.** A `journalctl --since` filter without a date, read after
 midnight, names a future time; use dated filters in queue summaries.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same

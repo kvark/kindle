@@ -179,3 +179,7 @@ the user chose on November 18, still without a concrete design), the
 objective term that makes the state carry the encoder's output for the
 current frame, and a measurement of the unchanged recipe's spread at
 1.6M, without which changes of 50 to 100 points cannot be read.
+
+Later on November 20 the actor-signal run was designed and run as
+[completed real returns for the critic](2026-11-20-breakout-completed-value.md);
+it was not retained.
