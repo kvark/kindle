@@ -100,6 +100,10 @@ impl PyVectorAgent {
     #[classattr]
     const SUPPORTS_ENCODER_FREEZE: bool = true;
 
+    /// `cdp_scale_floor`: centered CDP with every dimension scaled by its batch deviation.
+    #[classattr]
+    const SUPPORTS_CDP_SCALE_FLOOR: bool = true;
+
     #[classmethod]
     fn learned_rgb(
         _class: &Bound<'_, PyType>,

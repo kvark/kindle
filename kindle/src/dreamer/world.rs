@@ -67,7 +67,9 @@ pub(crate) const LOSS_WORLD_SURVIVAL: usize = 39;
 pub(crate) const CLEAN_PRIOR_VALID_FRACTION: usize = 36;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
-    (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_centered {
+    (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_scale_floor.is_some() {
+        "continuous-standardized-cosine-v1"
+    } else if config.cdp_centered {
         "continuous-centered-cosine-v1"
     } else if config.is_cdp() {
         "continuous-cosine-v1"
@@ -460,9 +462,12 @@ fn training_graph(
             &mut encodings,
         );
     }
-    let cdp_center = config.cdp_centered.then(|| {
-        let targets = stack_time(&mut graph, &encodings, batch, config.prediction_dim());
-        cdp::negative_target_mean(&mut graph, targets)
+    let cdp_targets = config
+        .cdp_centered
+        .then(|| stack_time(&mut graph, &encodings, batch, config.prediction_dim()));
+    let cdp_center = cdp_targets.map(|targets| cdp::negative_target_mean(&mut graph, targets));
+    let cdp_scale = config.cdp_scale_floor.map(|floor| {
+        cdp::target_inverse_deviation(&mut graph, cdp_targets.unwrap(), cdp_center.unwrap(), floor)
     });
     let mut head_inputs = Vec::with_capacity(length);
     let mut exploration_states = Vec::new();
@@ -851,6 +856,14 @@ fn training_graph(
                     (
                         graph.bias_add(prediction, center),
                         graph.bias_add(target, center),
+                    )
+                } else {
+                    (prediction, target)
+                };
+                let (prediction, target) = if let Some(scale) = cdp_scale {
+                    (
+                        cdp::scale_columns(&mut graph, prediction, scale),
+                        cdp::scale_columns(&mut graph, target, scale),
                     )
                 } else {
                     (prediction, target)

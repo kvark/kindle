@@ -196,6 +196,8 @@ def main():
                         help="fresh training only: bootstrap replay targets with imagined returns or observed-state values")
     parser.add_argument("--encoder-learning-rate", type=float,
                         help="fresh CDP encoder rate; omitted: 6e-6 scaled with the base rate")
+    parser.add_argument("--cdp-scale-floor", type=float,
+                        help="fresh centered CDP: divide each centered dimension by the root of its batch variance plus this floor")
     parser.add_argument("--encoder-freeze-update", type=int,
                         help="fresh CDP: learner update from which the encoder's learning rate is zero")
     parser.add_argument("--dynamics-learning-rate", type=float,
@@ -648,6 +650,7 @@ def main():
     training_options.add("--replay-value-bootstrap")
     training_options.add("--encoder-learning-rate")
     training_options.add("--encoder-freeze-update")
+    training_options.add("--cdp-scale-floor")
     training_options.add("--dynamics-learning-rate")
     training_options.add("--cdp")
     training_options.add("--cdp-centered")
@@ -826,6 +829,11 @@ def main():
         parser.error("encoder-learning-rate requires fresh CDP")
     if args.dynamics_learning_rate is not None and not args.cdp:
         parser.error("dynamics-learning-rate requires fresh CDP")
+    if args.cdp_scale_floor is not None:
+        if not args.cdp_centered or args.open_loop_length is not None or not positive_f32(args.cdp_scale_floor):
+            parser.error("cdp-scale-floor requires fresh centered CDP without open-loop supervision and a positive floor")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_CDP_SCALE_FLOOR", False):
+            parser.error("installed Kindle native module lacks the CDP scale floor")
     if args.encoder_freeze_update is not None:
         if not args.cdp or args.encoder_freeze_update < 1:
             parser.error("encoder-freeze-update requires fresh CDP and a positive update")
@@ -841,6 +849,8 @@ def main():
             cdp_rates["dynamics_learning_rate"] = args.dynamics_learning_rate
         if args.encoder_freeze_update is not None:
             cdp_rates["encoder_freeze_update"] = args.encoder_freeze_update
+        if args.cdp_scale_floor is not None:
+            cdp_rates["cdp_scale_floor"] = args.cdp_scale_floor
         if not all(positive_f32(rate) for rate in cdp_rates.values()):
             parser.error("CDP learning rates must be finite and positive in F32")
     if args.cdp_centered and (not args.cdp or args.world_microbatch_size not in (None, args.batch_size)):

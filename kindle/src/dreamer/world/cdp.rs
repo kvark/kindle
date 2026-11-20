@@ -13,6 +13,39 @@ pub(super) fn negative_target_mean(graph: &mut Graph, target: NodeId) -> NodeId 
     graph.reshape(negative_mean, &[shape[1]])
 }
 
+/// Detached `[D, 1]` inverse root of each target dimension's batch variance plus `floor`.
+pub(super) fn target_inverse_deviation(
+    graph: &mut Graph,
+    target: NodeId,
+    negative_mean: NodeId,
+    floor: f32,
+) -> NodeId {
+    let shape = graph.node(target).ty.shape.clone();
+    assert_eq!(shape.len(), 2);
+    let target = graph.stop_gradient(target);
+    let centered = graph.bias_add(target, negative_mean);
+    let squared = graph.mul(centered, centered);
+    let transposed = graph.transpose(squared);
+    let sum = graph.sum_inner(transposed);
+    let variance = graph.scale(sum, 1.0 / shape[0] as f32);
+    let floor = graph.constant(vec![floor; shape[1]], &[shape[1], 1]);
+    let bounded = graph.add(variance, floor);
+    let log = graph.log(bounded);
+    let log_inverse_root = graph.scale(log, -0.5);
+    let inverse = graph.exp(log_inverse_root);
+    graph.stop_gradient(inverse)
+}
+
+/// Multiply every column of a `[rows, D]` value by its `[D, 1]` factor.
+pub(super) fn scale_columns(graph: &mut Graph, value: NodeId, factor: NodeId) -> NodeId {
+    let shape = graph.node(value).ty.shape.clone();
+    assert_eq!(shape.len(), 2);
+    let transposed = graph.transpose(value);
+    let factor = graph.broadcast_inner(factor, shape[0]);
+    let scaled = graph.mul(transposed, factor);
+    graph.transpose(scaled)
+}
+
 /// Optax's cosine distance with a floor on each squared norm, not its root.
 pub(super) fn cosine_distance(graph: &mut Graph, prediction: NodeId, target: NodeId) -> NodeId {
     assert_eq!(graph.node(prediction).ty.shape, graph.node(target).ty.shape);
@@ -74,6 +107,26 @@ mod tests {
         assert_eq!(future_head_revision(&config), Some("continuous-cosine-v1"));
         let backward = meganeura::autodiff::differentiate(&graph);
         assert!(!backward.outputs().is_empty());
+    }
+
+    #[test]
+    fn standardized_cdp_graph_builds_and_differentiates() {
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_kind = ObservationKind::Rgb64;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.cdp_centered = true;
+        config.cdp_scale_floor = Some(1e-3);
+        config.check().unwrap();
+        let graph = build_training_graph(&config, config.world_backprop_length);
+        assert_eq!(
+            future_head_revision(&config),
+            Some("continuous-standardized-cosine-v1")
+        );
+        let backward = meganeura::autodiff::differentiate(&graph);
+        assert!(!backward.outputs().is_empty());
+        config.cdp_centered = false;
+        assert!(config.check().is_err());
     }
 
     #[test]

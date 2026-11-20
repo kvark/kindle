@@ -413,6 +413,11 @@ pub struct DreamerConfig {
     /// full replay batch's target mean. Acting/forecast outputs stay raw.
     #[serde(default)]
     pub cdp_centered: bool,
+    /// Centered CDP: also divide every centered prediction and target
+    /// dimension by the root of that dimension's batch variance plus this
+    /// floor, so no dimension's scale decides its share of the cosine.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cdp_scale_floor: Option<f32>,
     /// Optional feature targets for the full-posterior reconstruction head.
     /// Separate from future targets; RGB reconstruction never uses these.
     #[serde(default)]
@@ -614,6 +619,7 @@ impl DreamerConfig {
             video_encoder: None,
             future_target_standardization: None,
             cdp_centered: false,
+            cdp_scale_floor: None,
             reconstruction_target_standardization: None,
             observation_decoder_depth: OBSERVATION_CHANNELS,
             // Full visual replay entries are intentionally compressed to a
@@ -1243,6 +1249,17 @@ impl DreamerConfig {
             {
                 return Err("color centroid requires RGB, positive finite scales, channel0..2 and a nonempty normalized region".into());
             }
+        }
+        if let Some(floor) = self.cdp_scale_floor
+            && (!self.cdp_centered
+                || self.open_loop_supervision.is_some()
+                || !floor.is_finite()
+                || floor <= 0.0)
+        {
+            return Err(
+                "cdp_scale_floor requires centered CDP without open-loop supervision and a positive finite floor"
+                    .into(),
+            );
         }
         if self.cdp_centered
             && (!self.is_cdp()
@@ -2092,6 +2109,9 @@ mod tests {
         );
         frozen.encoder_freeze_update = Some(0);
         assert!(frozen.check().is_err());
+        let mut scaled = config.clone();
+        scaled.cdp_scale_floor = Some(1e-3);
+        assert!(scaled.check().is_err());
         frozen.encoder_freeze_update = Some(1);
         frozen.encoder_learning_rate = None;
         assert!(frozen.check().is_err());
