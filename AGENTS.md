@@ -496,14 +496,26 @@ the bricks; the state's ball read comes from integrating frames. At
 128x128 the encoder is sharper on every object (paddle 1.6 px, ball 3.5
 to 3.7) and the state is not (paddle 5.5). A ball 4 px off in x costs
 the latent objective .0075 of cosine distance, a fifth of the remaining
-loss; 1 px costs .001. Next, running:
-[the same recipe at model size 25m](docs/experiments/2026-11-19-breakout-model-size.md)
-(`S25`, 40.3M world parameters, replay 50k, seed 22003, 1.6M actions;
-root `/x/Temp/kindle-breakout-size-20261119`, `queue-23.json`, unit
-`kindle-breakout-size-20261119`, about 5.5 hours from 19:51 UTC
-November 19; 1.50 times the time per update, projected 11.3 GiB). Not
-launched: the actor's training signal, the run the user chose on
-November 18, which still has no concrete design.
+loss; 1 px costs .001.
+[The same recipe at model size 25m](docs/results/2026-11-20-breakout-model-size.md)
+(`S25`, 40.3M world parameters, replay 50k, seed 22003, 1.6M actions,
+335 minutes, 1.73 times the time per action, peak 11.5 GiB; root
+`/x/Temp/kindle-breakout-size-20261119`, `queue-23.json`, finished
+01:57 UTC November 20, no fault) fails its three declared tests and is
+not retained: pooled median 296 at 1.6M with no game past the first
+wall (341.5 on the fresh cohort), wide paddle .922, narrow .817. Its
+state reads the ball better (x 4.7 px against 5.5) and the paddle worse
+(4.0 against 3.5), so landing minus paddle is 7.4 px against 6.7; its
+encoder holds the paddle to 1.8 px. It is ahead of the 12m learners at
+400k and 800k (medians 84 and 283), drops to 141 at the 1.2M checkpoint
+with no drop in online returns, and its online returns track the 12m
+learners': **one frozen checkpoint of one seed moves by a factor of two
+within 400k actions**, and the unchanged recipe's spread at 1.6M has
+not been measured, so of the six changes compared with `L22`'s 380.5
+only the 128x128 result is clearly outside the noise. None is at the
+gate. 12m stays the default; capacity and input size are closed at this
+budget. Not launched: the actor's training signal, the run the user
+chose on November 18, which still has no concrete design.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
 sticky-action protocol, a held-out median near its 437 with most games
