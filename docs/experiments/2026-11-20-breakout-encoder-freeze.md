@@ -56,6 +56,17 @@ rest of the record: after the collapse the loss is lower than ever
 play at 2.4M (3.5 px at 1.6M) and the ball better than before (x 3.8 px
 against 5.5), and the policy that depends on the paddle fails.
 
+**It is a drift of scale, not of content** (`embedding_shares_std.py`,
+added 16:35 UTC, after the launch). With every output dimension scaled
+to unit variance over the same frames, the paddle's share is the same
+at every checkpoint (.124, .115, .123, .112 and .127 at 1.2M, 1.6M,
+2.0M, 2.4M and 3.6M), the ball's is .25 to .32 and one action changes
+the output by .19 to .25. Most dimensions carry the paddle and the ball
+as before; a minority that carries slow content has grown and dominates
+the cosine. Dimensions that are nearly constant rise from 238 to 737 of
+2,304. A target standardized per dimension would not see this drift;
+that is the candidate for the objective named in the readings below.
+
 Other learners at 1.6M, on their own frames: `V22` paddle share .164 and
 one-action change .172; `S25` .123 and .217. Neither had reached `L22`'s
 level of play; whether they drift later is not known.
