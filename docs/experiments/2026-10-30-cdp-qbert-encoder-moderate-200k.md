@@ -1,0 +1,119 @@
+# Fresh Qbert comparison with the moderate encoder rate
+
+The [bounded check](2026-10-30-cdp-qbert-encoder-moderate.md) passes8192 actions/
+489 updates in70.203s, followed by1024 greedy frozen actions in.806s with zero
+updates and no natural episodes. All212 pins,357 matched initial/invariant
+frozen tensors,47 pre-update semantic events,full replay and both guards pass.
+Its conservative200k projection31m25s passes the35-minute training cap. Select
+one fresh200k/12,477-update learner to measure frozen gameplay benefit.
+
+Keep the exact checked Qbert12M48/Auto/N8/B16/T16/H15/R16/expert100 recipe,
+with encoder learning rate2e-5 instead of the retained control's6e-6. This is
+the only intended learner-setting change. Keep native447fe50 and Qbert teacher,
+base/actor4e-5,dynamics4e-4,warmup1000,coefficient1,actor-unimix0,full18 actions,
+replay100k,microbatch16,all-state corrective labels,world imitation gradients,
+all action weights1 and20% episode continuation guidance/cap1920. Preserve
+native max-pooled frames and one GPU resize to48. No auxiliary loss is enabled.
+
+The qualified optional-rate runner also contains previously added Breakout
+corrective-label plumbing; the Qbert command leaves that flag false and selects
+the original Qbert corrective path. Its exact diff and native/teacher identities
+are retained. This is not a claim of complete cross-version learning parity.
+Seed4013/evaluation4000004013 and the evaluation cohort are reused development
+inputs. No weights,replay,belief,games,RNG or bounded experience are reused.
+
+Train exactly200,000 aggregate actions/12,477 updates under2100s, first update
+376,residual credit.5. Save and audit100k/6227 recovery. Evaluate fixed final
+and own actual initial with sampled and greedy actions,greedy primary. Each
+arm selects first3 natural episodes per8 lanes=24,with sampled posteriors,
+guidance/labels off,zero updates/truncations,357 invariant tensors and300s/
+600k-action caps. Keep the original mean15000/90%-first-pyramid gate. Retained
+control greedy11984.375/sampled6759.375 clears24/24 first pyramids in both modes,
+with own initials80.208/177.083. Its30m27s training cost remains the reference.
+
+Require357 actual-initial tensors matching control and bounded check,matched
+pre-update training events and both own-initial frozen semantic traces,exact
+source/config/counters,finite reports,changed CNN/reward/actor/value,equal
+labeled-row/weight sums,aligned raw expert losses,full training pixel/action/
+label replay,frozen outcome replays/videos,guards,curves,coverage,exposure and
+completed comparison. Ordinary frozen logs lack live pixel hashes; their
+outcome replay cannot compare unavailable live images. Guided returns and
+changing replay losses are not unaided competence or held-out accuracy.
+
+Caps:training2100s,each frozen arm300s,training replay1200s/outer1230s,CPU audit
+1800s,main5400s,postprocessing6000s,terminal collection6300s. Recovery's fixed
+2700s observation window does not authorize restarting the learner. Stop on
+real faults or nonfinite reports; no driver recovery,GPU retry,cap increase,
+extension,checkpoint selection,rate sweep,seed confirmation or automatic
+successor. Preserve failures and repair CPU-only defects without repeating
+completed GPU stages. The five-game goal remains unfinished.
+
+Root `/x/Temp/kindle-qbert-encoder-moderate-20261030/full`,trial
+`qbert-12m-48-b16-r16-encoder2e5-expert100-200k-seed4013`,service
+`kindle-qbert-encoder-moderate-200k-20261030`. Check live state before launch.
+
+## CPU preparation passes
+
+Corrected preflight passes in.942s: five actual CLI paths,24 audit/comparison
+config cases,49 resolved paths,15 compiled controllers,six header-readiness
+cases,four observer-parser cases and five recovery-body cases. All212 bounded
+and190 control pins,357 initial tensors and checkpoint/update accounting pass,
+with zero native/environment construction. The original copied recovery watcher
+has two partial assertions including obsolete expert1000; the CPU preflight
+rejects its structure before declaration or launch. Preserve that source and
+traceback under`preparation-failure`. Reuse the qualified watcher that compares
+the whole config and guidance against the declaration. No GPU stage repeats.
+
+## Launched and startup checked
+
+The fresh learner starts01:34:55 UTC October30/source54b1b5d,PID373087,invocation
+`33e82ad2f0dc4025bac23ba8383d9c6a`. Startup at01:35:11 verifies all235 pins,
+357 initial tensors matching control and bounded check,47 pre-update training
+transitions,exact config and73 finite supervised reports through1544 actions.
+First six updates376/392/408/424/440/456 match the declared cadence. No frozen
+result is available. Progress,100k recovery,postprocessing and terminal-collection
+observers are active. Do not restart this learner or schedule another GPU job
+while it is active. The read-only.535s startup audit co-hosts with training;
+retain this as a timing caveat without correcting training wall time.
+
+Declaration`2da4231e56fac5f0382d2dd605ae7710fe49602e7a789abed1d15dfb9b77179b`;
+startup`d0f8bd3998520219d9f525a742cd1bbd773b05d506969de3d8d8ff65e0ce8c85`.
+
+## 100k recovery verified
+
+At01:50:30 UTC October30,the original recovery observer verifies100,000 actions/
+6227 updates and all357 finite tensors. It checks6381 finite reports in a
+complete102,472-action prefix; last progress102,400/6377 retains credit.5. The
+observer exits successfully. Read-only confirmation at01:51:16 rechecks all235
+input pins and the original mainPID373087/invocation33e82ad2f0dc4025bac23ba8383d9c6a,
+still active. Final200k and all four frozen assessments remain pending. No
+learner interruption,new GPU work,cap change or frozen assessment occurs.
+
+The.399s confirmation co-hosts with training; prior startup and CPU Breakout
+analysis timing caveats also remain,with no wall-time correction. Recovery is
+checkpoint-integrity evidence,not frozen competence. Keep the original35-minute
+training cap and fixed evaluation protocol;do not restart or schedule a second
+GPU job while this learner remains active.
+
+Recovery review`052c2e69dc3d8c536950fcc0ebcc761912191520b3ae29f89a7eabf52b27eecd`;
+checkpoint identity`7d00e39e549b47c442c16ca73082125985e193c9793ade8b4adfddb483ab5f6f`;
+confirmation`cac442a2a92e3c119b58c0abbcafc00418116d026b93226bd819f2acb92831cf`.
+
+## Completed outcome
+
+The fixed learner and all four frozen arms complete without GPU repetition.
+Training200k/799,728 frames/12,477 updates takes1816.429s (30m16s),.58% less
+than control. Greedy13,785.417/24 first pyramids improves11,984.375/24 by15.03%;
+sampled9,987.500/23 improves6,759.375/24 by47.76%. Own initials80.208/177.083
+clear none and both semantic traces match. The original15,000 mean gate still
+fails; retain2e-5 as a stronger cheaper development point,not broad reliability.
+
+All235 pins,recovery,357 initial/frozen tensors,finite reports,full replays,
+videos,guards,curves,coverage,exposure and comparison pass. Main/post/collection
+succeed02:17:51/02:17:59/02:18:31 UTC October30;all five services succeed.
+Separate ancillary observation/event-count metadata defects remain preserved
+and corrected from retained receipts,without repeating any stage or changing
+the passing pipeline. See the [completed result](../results/2026-10-30-cdp-qbert-encoder-moderate.md)
+for exact evidence,limitations and hashes. No extension,sweep,confirmation or
+automatic successor follows this declaration. No active allocation at closure;
+check live state. The five-game goal remains unfinished.

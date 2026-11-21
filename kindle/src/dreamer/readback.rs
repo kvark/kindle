@@ -9,6 +9,8 @@ pub(crate) struct Readback {
     encoder: blade_graphics::CommandEncoder,
     buffer: Option<blade_graphics::Buffer>,
     capacity: usize,
+    #[cfg(test)]
+    timing: bool,
 }
 
 impl Readback {
@@ -23,6 +25,8 @@ impl Readback {
             encoder,
             buffer: None,
             capacity: 0,
+            #[cfg(test)]
+            timing: meganeura::GpuOptions::from_env().timing,
         }
     }
 
@@ -106,6 +110,18 @@ impl Readback {
                 .expect("GPU readback wait failed"),
             "readback did not complete"
         );
+        #[cfg(test)]
+        if self.timing && self.gpu.capabilities().timing {
+            let timings = self.encoder.last_timing();
+            meganeura::profiler::record_gpu_timings(&meganeura::profiler::GpuTimings {
+                passes: timings
+                    .passes
+                    .iter()
+                    .map(|&(name, at)| (name.to_owned(), at))
+                    .collect(),
+                done: Some(timings.done),
+            });
+        }
         let mut offset = 0;
         for (_, output) in outputs {
             // The completed transfer initialized these aligned f32 regions in
