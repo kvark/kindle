@@ -613,12 +613,21 @@ kernel-journal read timing out (3 s limit; no kernel fault) and was
 relaunched for the remaining cells; **a guard "probe timed out" stop is
 not a device fault: check the kernel log, then relaunch the remaining
 jobs under a new queue file and guard directory.**
-Running, declared by the assistant: the pinned
-[imagined-contact probe on three frozen-encoder checkpoints](docs/experiments/2026-11-21-breakout-frozen-imagination-probe.md)
-(`queue-28.json` in the same root, unit
-`kindle-breakout-imagined-frozen-20261121`, about 30 minutes from 15:11
-UTC November 21); it decides whether open-loop supervision on the frozen
-recipe is the next training run.
+[The pinned imagined-contact probe on three frozen-encoder checkpoints](docs/results/2026-11-21-breakout-frozen-imagination-probe.md)
+(`queue-28.json`, evaluation only, no fault) shows the freeze did not
+change imagination at contact: the world model still rates as safe .205,
+.210 and .192 of the action sequences the emulator loses (`E22` 3.6M,
+`F22` 2.8M, held-out `F50` 2.4M; unfrozen `L22` .203, open-loop `O22`
+.102), and the sequences it rates safest lose the ball .21 to .24 of the
+time.
+Running, declared by the assistant:
+[`OF22`](docs/experiments/2026-11-21-breakout-open-loop-freeze.md),
+`O22`'s open-loop command with the encoder frozen from update 75,000
+(1.2M), to 3.6M actions (`queue-29.json` in the same root, unit
+`kindle-breakout-openloop-freeze-20261121`, about 8.8 hours from 15:44
+UTC November 21); it tests whether calibrated imagination raises the
+frozen learner's level (training returns over 2.8M to 3.6M of 370 or
+more against `E22`'s 343.8).
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
