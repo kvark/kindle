@@ -591,8 +591,15 @@ them serving, the policy's single most probable action at the serve can
 be one that does not serve; `L22` at 2.8M and `X22b` showed the same.
 **A pooled sampled-and-greedy median is only comparable when no game is
 cut at the cap; check `truncated_episodes` in every cell and read
-sampled play separately.** Both frozen runs were still rising at 2.8M;
-nothing further is declared.
+sampled play separately.** Both frozen runs were still rising at 2.8M.
+Running, declared by the assistant:
+[`E22`](docs/experiments/2026-11-21-breakout-encoder-freeze-800k.md),
+`L22`'s command with the encoder frozen from update 50,000 (800k,
+before the KL step both seeds show near 1.0M), to 3.6M actions
+(`queue-27.json` in the same root, unit
+`kindle-breakout-freeze800k-20261121`, about 8.1 hours from 06:18 UTC
+November 21); it tests an earlier freeze against `F22` through 2.8M and
+the budget beyond it.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
