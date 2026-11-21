@@ -570,13 +570,30 @@ games identical). With the target encoder still, the latent loss halves
 (.048 to .023) and the dynamics KL falls from 10.8 to 6.3 within 400k
 actions, and training returns leave `L22`'s plateau. The encoder's
 drift is necessary for the collapse on this seed; why it drifts is not
-established. One development seed; still below the gate. Running as the
-declared second seed:
-[`F50`](docs/experiments/2026-11-20-breakout-encoder-freeze-seed5011.md),
-the same schedule on held-out seed 5011 to 2.8M (`queue-26.json` in the
-same root, unit `kindle-breakout-freeze5011-20261120`, about 6.1 hours
-from 23:02 UTC November 20); that seed's encoder had not drifted at
-1.2M. The standardized objective (`--cdp-scale-floor`) is source only,
+established. One development seed; still below the gate.
+[`F50`](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md),
+the same schedule on held-out seed 5011 to 2.8M (348 minutes;
+`queue-26.json` in the same root, finished 05:39 UTC November 21, no
+fault; a twin of `H50` through 1.2M), passes its safety test and fails
+the other two: no collapse, pooled medians 340.5 / 382 / 315.5 at 2.0M /
+2.4M / 2.8M over 144 games (`H50` 276 at 1.2M), training returns rising
+through every stretch to 320.3 per game over 2.4M to 2.8M; the 2.4M
+checkpoint is the best held-out point on record (57 of 144 games at 400
+or more, 6 past the first wall; wide paddle .949, narrow .853). On this
+seed the latent loss had been rising since 1.0M (.031 to .051) with
+training returns falling, and both turned within 50k actions of the
+freeze. The 2.8M median misses its bar of 350 because **greedy play
+stalls at the serve**: all 72 greedy games at 1.6M and 22 of 72 at 2.8M
+sit on a non-serving action to the action cap (39 cut games in the
+2.8M cells), while sampled play serves within about one action at every
+checkpoint and scores 271 / 333 / 370 / 351. With 18 actions, nine of
+them serving, the policy's single most probable action at the serve can
+be one that does not serve; `L22` at 2.8M and `X22b` showed the same.
+**A pooled sampled-and-greedy median is only comparable when no game is
+cut at the cap; check `truncated_episodes` in every cell and read
+sampled play separately.** Both frozen runs were still rising at 2.8M;
+nothing further is declared.
+The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
 fault; smoke-run weights were deleted to finish. **Check `df` before
@@ -643,7 +660,7 @@ The **five-game goal is unfinished**:
 | [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
 | [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
-| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276; unchanged recipe's best checkpoint (22003 at 1.6M) median 380.5; [encoder frozen from 1.2M](docs/results/2026-11-20-breakout-encoder-freeze.md): 404.5 at 2.8M on seed 22003 | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best 404.5 with 5 of 96 past 432, development seed). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions unless the encoder is frozen |
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276; unchanged recipe's best checkpoint (22003 at 1.6M) median 380.5; [encoder frozen from 1.2M](docs/results/2026-11-20-breakout-encoder-freeze.md): 404.5 at 2.8M on seed 22003, [held-out seed 5011](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md) 382 at 2.4M | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best 404.5 with 5 of 96 past 432 on a development seed; held-out best 382 with 6 of 144). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions unless the encoder is frozen |
 | [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
 
 Published long-run scores are aspirations,not matched-budget comparisons.
