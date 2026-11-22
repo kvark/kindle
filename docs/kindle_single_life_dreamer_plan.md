@@ -2,6 +2,13 @@
 
 Kindle builds against upstream Meganeura main since November 10. The Breakout world-model goal is active: a state-only 96x96 world learner now beats the 64x64 control at every forecast horizon on the shared development origins; the fork-era survival learner stays frozen at the user's request. No world-model mastery or held-out qualification is claimed.
 
+Run roots under `/x/Temp` dated October 27 to November 12 that this
+roadmap and the older reports name were deleted on November 20 and 22
+with the user's approval, except the roots current instructions still
+use (list in `AGENTS.md`'s runtime section and in
+`/x/Temp/kindle-breakout-collapse-20261120/cleanup-20261122/kept-roots.txt`).
+The reports are the record of those runs.
+
 ## Breakout gate since November 18
 
 The user replaced the Breakout gate on November 18. "Learned well" is

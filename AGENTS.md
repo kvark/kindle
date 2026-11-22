@@ -638,16 +638,18 @@ model's side of the lost ball is closed and the actor's side (entropy
 against normalized advantages, horizon, return weighting) is what
 remains, undeclared. **A fourth GPU kernel fault** (same shape, again a
 frozen-inference job) stopped the queue at 00:09 UTC November 22 in job
-8 of 30; evidence and nine unreviewed fault records are in
-`gpu-fault-20261122-0009/` under the root. **The card is not to be used
-until the user reviews it**; the 35-record review file does not cover
-these records. The mechanism probe and test 2's sampled cells ran on
+8 of 30; the user reviewed it on November 22 and chose to continue on
+the same boot (review file
+`gpu-fault-20261122-0009/reviewed-kernel-faults.json` under the root,
+all 44 fault records of the boot, that boot only). **A further fault
+needs a further review.** The mechanism probe and test 2's sampled cells ran on
 llvmpipe instead (the probe takes 313 minutes there, a cell 61 to 74;
 both units finished): sampled medians 328.5 / 362 / 330 / 380 / 339 at
 2.0M to 3.6M pass the safety bar of 250 and sit below `E22`'s 376 to
-394.5 at every checkpoint; 14 queue jobs remain unrun. Another
-project's training job has used the card since 10:11 UTC November 22
-with no kernel fault line; that is not a review.
+394.5 at every checkpoint. The 14 unrun jobs and a rerun of the probe
+on the card run as `queue-29b.json` (unit
+`kindle-breakout-openloop-freeze-b-20261122`). Another project's
+training job has shared the card since 10:11 UTC November 22.
 [Tempered play](docs/experiments/2026-11-22-breakout-tempered-play.md)
 (`--action-temperature 0.5` on the frozen recipe's checkpoints, seven
 sampled cells, evaluation only, declared by the assistant) runs on
@@ -655,7 +657,12 @@ llvmpipe as unit `kindle-tempered-lvp-20261122`.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
-fault; smoke-run weights were deleted to finish. **Check `df` before
+fault; smoke-run weights were deleted to finish. On November 22 the
+user approved deleting the October 27 to November 9 run roots: 283
+removed, 17 kept (lists in `cleanup-20261122/` under the collapse root),
+151 GB free afterwards. Run-root paths from those dates in the roadmap
+and older reports, and the November 10 to 12 screen roots removed
+earlier, no longer exist; the reports are the record. **Check `df` before
 launching a queue; a run needs about 7 GB.** A `journalctl --since` filter without a date, read after
 midnight, names a future time; use dated filters in queue summaries.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
