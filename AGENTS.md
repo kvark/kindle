@@ -641,10 +641,17 @@ frozen-inference job) stopped the queue at 00:09 UTC November 22 in job
 8 of 30; evidence and nine unreviewed fault records are in
 `gpu-fault-20261122-0009/` under the root. **The card is not to be used
 until the user reviews it**; the 35-record review file does not cover
-these records. The mechanism probe ran and test 2's sampled cells run on
-llvmpipe instead (the probe takes 313 minutes there, a cell about 90;
-units `kindle-of22-imagined-lvp-20261122` and
-`kindle-of22-cells-lvp-20261122`); 14 queue jobs remain unrun.
+these records. The mechanism probe and test 2's sampled cells ran on
+llvmpipe instead (the probe takes 313 minutes there, a cell 61 to 74;
+both units finished): sampled medians 328.5 / 362 / 330 / 380 / 339 at
+2.0M to 3.6M pass the safety bar of 250 and sit below `E22`'s 376 to
+394.5 at every checkpoint; 14 queue jobs remain unrun. Another
+project's training job has used the card since 10:11 UTC November 22
+with no kernel fault line; that is not a review.
+[Tempered play](docs/experiments/2026-11-22-breakout-tempered-play.md)
+(`--action-temperature 0.5` on the frozen recipe's checkpoints, seven
+sampled cells, evaluation only, declared by the assistant) runs on
+llvmpipe as unit `kindle-tempered-lvp-20261122`.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU

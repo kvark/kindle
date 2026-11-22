@@ -20,12 +20,12 @@ not been used since and nothing was reset by hand. As the amendment
 declared before any result existed, the probe was run with the same
 pinned script, checkpoint and arguments on Mesa's llvmpipe (313 minutes
 for 24,000 actions against 9 on the card), and test 2's sampled cells
-at 2.0M to 3.2M are running there now, one at a time. The other 14
+at 2.0M to 3.2M were run there too, one at a time (eight cells, 61 to
+74 minutes each, finished 14:30 UTC November 22). The other 14
 unrun jobs (greedy cells before 3.6M, the 1.6M cells, the 2.8M dump and
 probe) wait for the user's review of the fault.
 
-**Result.** Test 1 passes, tests 3 and 4 fail, test 2 passes on training
-returns with its checkpoint half still running. Open-loop supervision
+**Result.** Tests 1 and 2 pass, tests 3 and 4 fail. Open-loop supervision
 calibrates imagination on the frozen recipe as it did on the unfrozen
 one, and the learner plays worse than the frozen recipe without it at
 every stage: 290.4 per training game over 2.8M to 3.6M against `E22`'s
@@ -40,7 +40,7 @@ base either. The term is not retained and the gate is not met.
 | 1. Missed-loss share on the declared rows at 3.6M | .13 or less | .123 (llvmpipe) | passes |
 | 1. Loss rate of the pairs imagination rates below .02 | .12 or less | .09 (llvmpipe) | passes |
 | 2. Training return per game, each 400k stretch from 1.2M | 200 or more in all six | 243.5 / 265.5 / 278.0 / 290.2 / 282.1 / 299.3 | passes |
-| 2. Sampled median, each checkpoint from 2.0M | 250 or more in all five | 339 at 3.6M; 2.0M to 3.2M running on llvmpipe | open |
+| 2. Sampled median, each checkpoint from 2.0M | 250 or more in all five | 328.5 / 362 / 330 / 380 (llvmpipe) / 339 | passes |
 | 3. Training return per game, 2.8M to 3.6M | 370 or more | 290.4 (438 games, standard error 5.4) | fails |
 | 4. Gate marker at 3.6M, 96 games pooled | median 420 or more, or 20 past 432 | 338; 2 | fails |
 
@@ -107,6 +107,23 @@ game is cut at the cap.
 |---|---:|---:|---:|---:|---:|---:|
 | `OF22` | .931 (2,271) | .838 (517) | .80 | .942 (2,428) | .843 (638) | .79 |
 | `E22` | .954 (2,607) | .871 (923) | .83 | .968 (2,778) | .881 (1,281) | .85 |
+
+Sampled play by checkpoint, 48 games each on the same two cohorts
+(`OF22` at 2.0M to 3.2M on llvmpipe, everything else on the card); no
+game is cut at the cap in any cell:
+
+| Checkpoint | `OF22` median | At 400 or more | Past 432 | Best | `E22` median | At 400 or more | Past 432 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 2.0M | 328.5 | 8 | 0 | 424 | 390.5 | 23 | 3 |
+| 2.4M | 362 | 12 | 0 | 427 | 388 | 19 | 3 |
+| 2.8M | 330 | 5 | 0 | 423 | 376 | 17 | 3 |
+| 3.2M | 380 | 18 | 1 | 463 | 383.5 | 21 | 2 |
+| 3.6M | 339 | 9 | 0 | 427 | 394.5 | 22 | 1 |
+
+`OF22`'s sampled median is below `E22`'s at all five checkpoints (by 3.5
+to 62) and moves by up to 50 between neighbouring checkpoints while its
+training returns rise smoothly. 1 of its 240 sampled games passes 432
+against 12 of `E22`'s.
 
 Training returns per game by 400k stretch (games in brackets):
 
@@ -189,8 +206,9 @@ Reward per action is the same in both runs (.15 to .17 from 2.0M on);
   on different floating-point code, so the play it probes is another
   draw of the same policy (12 games, mean 283). The bars were not
   changed.
-- The play table is the 3.6M checkpoint only; the earlier checkpoints'
-  cells did not run before the fault.
+- The pooled play table and the return rates are the 3.6M checkpoint
+  only; of the earlier checkpoints only the sampled cells ran, on
+  llvmpipe, and their greedy cells did not run.
 - The comparison past 2.8M is with `E22`, frozen from 800k; `OF22` is
   frozen from 1.2M like `F22`. The two frozen runs are equal over 1.2M
   to 2.8M.
