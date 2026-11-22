@@ -646,14 +646,22 @@ needs a further review.** The mechanism probe and test 2's sampled cells ran on
 llvmpipe instead (the probe takes 313 minutes there, a cell 61 to 74;
 both units finished): sampled medians 328.5 / 362 / 330 / 380 / 339 at
 2.0M to 3.6M pass the safety bar of 250 and sit below `E22`'s 376 to
-394.5 at every checkpoint. The 14 unrun jobs and a rerun of the probe
-on the card run as `queue-29b.json` (unit
-`kindle-breakout-openloop-freeze-b-20261122`). Another project's
+394.5 at every checkpoint. After the review the 14 unrun jobs and a
+rerun of the probe on the card ran as `queue-29b.json` (15 jobs, no
+fault): the probe passes on the card too (.110 and .08) and pooled
+medians are 306 / 359 / 376.5 / 330 / 387.5 / 338 at 1.6M to 3.6M, below
+`E22` from 2.0M on, with 7 of 480 games past the first wall against 44.
+[Tempered play](docs/results/2026-11-22-breakout-tempered-play.md)
+(`--action-temperature 0.5` on `E22` at 3.6M and 2.8M and held-out `F50`
+at 2.8M, seven sampled cells, evaluation only, the assistant's design)
+passes its serve test and fails the other two: no game is cut, the
+wide-paddle return rate is .951 of 8,889 descents against sampled play's
+.948 (bar .958), medians 402 and 364.5 against bars of 405 and 370.
+Sampling noise is not what loses the ball; a lower actor entropy is not
+pursued. Post hoc: on `E22` at 3.6M nearly two of the five lives are
+lost on the wide paddle before the score reaches 100, and the return
+rate does not fall with the score on either paddle. Another project's
 training job has shared the card since 10:11 UTC November 22.
-[Tempered play](docs/experiments/2026-11-22-breakout-tempered-play.md)
-(`--action-temperature 0.5` on the frozen recipe's checkpoints, seven
-sampled cells, evaluation only, declared by the assistant) runs on
-llvmpipe as unit `kindle-tempered-lvp-20261122`.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
@@ -726,7 +734,7 @@ The **five-game goal is unfinished**:
 | [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
 | [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
-| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276; unchanged recipe's best checkpoint (22003 at 1.6M) median 380.5; [encoder frozen from 1.2M](docs/results/2026-11-20-breakout-encoder-freeze.md): 404.5 at 2.8M on seed 22003, [held-out seed 5011](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md) 382 at 2.4M; [frozen from 800k to 3.6M](docs/results/2026-11-21-breakout-encoder-freeze-800k.md): level at about 345 per training game, 402.5 at 3.6M; [open-loop supervision on the frozen recipe](docs/results/2026-11-22-breakout-open-loop-freeze.md): worse, 338 at 3.6M | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best 410.5 with 13 of 96 past 432 on a development seed; held-out best 382 with 6 of 144). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions unless the encoder is frozen |
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276; unchanged recipe's best checkpoint (22003 at 1.6M) median 380.5; [encoder frozen from 1.2M](docs/results/2026-11-20-breakout-encoder-freeze.md): 404.5 at 2.8M on seed 22003, [held-out seed 5011](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md) 382 at 2.4M; [frozen from 800k to 3.6M](docs/results/2026-11-21-breakout-encoder-freeze-800k.md): level at about 345 per training game, 402.5 at 3.6M; [open-loop supervision on the frozen recipe](docs/results/2026-11-22-breakout-open-loop-freeze.md): worse, 338 at 3.6M; [tempered play](docs/results/2026-11-22-breakout-tempered-play.md): no more balls returned | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best 410.5 with 13 of 96 past 432 on a development seed; held-out best 382 with 6 of 144). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions unless the encoder is frozen |
 | [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
 
 Published long-run scores are aspirations,not matched-budget comparisons.

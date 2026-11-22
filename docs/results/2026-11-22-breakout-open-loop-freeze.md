@@ -21,9 +21,12 @@ declared before any result existed, the probe was run with the same
 pinned script, checkpoint and arguments on Mesa's llvmpipe (313 minutes
 for 24,000 actions against 9 on the card), and test 2's sampled cells
 at 2.0M to 3.2M were run there too, one at a time (eight cells, 61 to
-74 minutes each, finished 14:30 UTC November 22). The other 14
-unrun jobs (greedy cells before 3.6M, the 1.6M cells, the 2.8M dump and
-probe) wait for the user's review of the fault.
+74 minutes each, finished 14:30 UTC November 22). The user reviewed the
+fault on November 22 and chose to continue on the same boot; the other
+14 jobs (greedy cells before 3.6M, the 1.6M cells, the 2.8M dump and
+probe) and a rerun of the mechanism probe on the card then ran as
+`queue-29b.json` (unit `kindle-breakout-openloop-freeze-b-20261122`,
+21:55 to 22:24 UTC, 15 jobs, no fault).
 
 **Result.** Tests 1 and 2 pass, tests 3 and 4 fail. Open-loop supervision
 calibrates imagination on the frozen recipe as it did on the unfrozen
@@ -37,8 +40,8 @@ base either. The term is not retained and the gate is not met.
 
 | Test | Bar | `OF22` | |
 |---|---|---:|---|
-| 1. Missed-loss share on the declared rows at 3.6M | .13 or less | .123 (llvmpipe) | passes |
-| 1. Loss rate of the pairs imagination rates below .02 | .12 or less | .09 (llvmpipe) | passes |
+| 1. Missed-loss share on the declared rows at 3.6M | .13 or less | .123 (llvmpipe), .110 (card) | passes |
+| 1. Loss rate of the pairs imagination rates below .02 | .12 or less | .09 (llvmpipe), .08 (card) | passes |
 | 2. Training return per game, each 400k stretch from 1.2M | 200 or more in all six | 243.5 / 265.5 / 278.0 / 290.2 / 282.1 / 299.3 | passes |
 | 2. Sampled median, each checkpoint from 2.0M | 250 or more in all five | 328.5 / 362 / 330 / 380 (llvmpipe) / 339 | passes |
 | 3. Training return per game, 2.8M to 3.6M | 370 or more | 290.4 (438 games, standard error 5.4) | fails |
@@ -107,6 +110,23 @@ game is cut at the cap.
 |---|---:|---:|---:|---:|---:|---:|
 | `OF22` | .931 (2,271) | .838 (517) | .80 | .942 (2,428) | .843 (638) | .79 |
 | `E22` | .954 (2,607) | .871 (923) | .83 | .968 (2,778) | .881 (1,281) | .85 |
+
+Pooled play by checkpoint, 48 sampled and 48 greedy games; no `OF22`
+game is cut at the cap (`E22`'s greedy cells cut 2 games at 1.6M and 13
+at 2.8M):
+
+| Checkpoint | `OF22` pooled | Greedy | Past 432 | Wide, sampled / greedy | Narrow, sampled / greedy | `E22` pooled | Greedy | Past 432 |
+|---|---:|---:|---:|---|---|---:|---:|---:|
+| 1.6M | 306 | 314.5 | 0 | .926 / .932 | .778 / .784 | 274 | 183 | 2 |
+| 2.0M | 359 | 366.5 | 1 | .934 / .941 | .797 / .802 | 410.5 | 415.5 | 13 |
+| 2.4M | 376.5 | 378.5 | 1 | .938 / .950 | .797 / .844 | 389.5 | 395 | 7 |
+| 2.8M | 330 | 329.5 | 0 | .934 / .943 | .771 / .822 | 371 | 369.5 | 4 |
+| 3.2M | 387.5 | 399.5 | 3 | .946 / .962 | .820 / .848 | 393 | 399.5 | 9 |
+| 3.6M | 338 | 335.5 | 2 | .931 / .942 | .838 / .843 | 402.5 | 410 | 11 |
+
+From 2.0M on `OF22` is below `E22` at every checkpoint in pooled play
+and passes the first wall in 7 of 480 games against 44 of 480. Its
+greedy play serves at every checkpoint.
 
 Sampled play by checkpoint, 48 games each on the same two cohorts
 (`OF22` at 2.0M to 3.2M on llvmpipe, everything else on the card); no
@@ -202,13 +222,14 @@ Reward per action is the same in both runs (.15 to .17 from 2.0M on);
 ## Limits
 
 - One development seed on two reused cohorts.
-- The mechanism probe ran on llvmpipe, not the card: the same weights
-  on different floating-point code, so the play it probes is another
-  draw of the same policy (12 games, mean 283). The bars were not
-  changed.
-- The pooled play table and the return rates are the 3.6M checkpoint
-  only; of the earlier checkpoints only the sampled cells ran, on
-  llvmpipe, and their greedy cells did not run.
+- The mechanism probe ran on llvmpipe first and on the card after the
+  review: the same weights on different floating-point code, so the
+  play each probes is another draw of the same policy. Both pass the
+  unchanged bars (.123 and .09 on 13,104 pairs; .110 and .08 on 13,398).
+  The tables in this report are the llvmpipe run.
+- The sampled cells at 2.0M to 3.2M ran on llvmpipe and every other
+  cell on the card. The 2.8M dump and its reset probe ran and are not
+  read here.
 - The comparison past 2.8M is with `E22`, frozen from 800k; `OF22` is
   frozen from 1.2M like `F22`. The two frozen runs are equal over 1.2M
   to 2.8M.
