@@ -527,6 +527,14 @@ pub struct DreamerConfig {
     /// optimizer moments keep tracking. Requires `encoder_learning_rate`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub encoder_freeze_update: Option<u64>,
+    /// Learner step from which every optimizer's learning rate is
+    /// multiplied by `learning_rate_drop_factor`. Per-group multipliers
+    /// stay relative. Requires the factor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub learning_rate_drop_update: Option<u64>,
+    /// Factor in (0, 1) applied from `learning_rate_drop_update`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub learning_rate_drop_factor: Option<f32>,
     /// Optional RSSM (including posterior) and future-predictor learning rate.
     #[serde(default)]
     pub dynamics_learning_rate: Option<f32>,
@@ -662,6 +670,8 @@ impl DreamerConfig {
             learning_rate: 4e-5,
             encoder_learning_rate: None,
             encoder_freeze_update: None,
+            learning_rate_drop_update: None,
+            learning_rate_drop_factor: None,
             dynamics_learning_rate: None,
             behavior_learning_rate: None,
             actor_learning_starts: 0,
@@ -806,6 +816,18 @@ impl DreamerConfig {
 
     pub fn behavior_learning_rate(&self) -> f32 {
         self.behavior_learning_rate.unwrap_or(self.learning_rate)
+    }
+
+    /// Learning-rate multiplier at a learner step: the drop factor from
+    /// `learning_rate_drop_update` on, one before it or without a drop.
+    pub fn learning_rate_drop(&self, learner_step: u64) -> f32 {
+        match (
+            self.learning_rate_drop_update,
+            self.learning_rate_drop_factor,
+        ) {
+            (Some(update), Some(factor)) if learner_step >= update => factor,
+            _ => 1.0,
+        }
     }
 
     pub fn is_cdp(&self) -> bool {
@@ -1498,6 +1520,19 @@ impl DreamerConfig {
                 "encoder_freeze_update must be positive and requires encoder_learning_rate".into(),
             );
         }
+        if self.learning_rate_drop_update.is_some() != self.learning_rate_drop_factor.is_some()
+            || self
+                .learning_rate_drop_update
+                .is_some_and(|update| update == 0)
+            || self
+                .learning_rate_drop_factor
+                .is_some_and(|factor| !(factor > 0.0 && factor < 1.0))
+        {
+            return Err(
+                "learning_rate_drop_update must be positive and learning_rate_drop_factor in (0, 1), set together"
+                    .into(),
+            );
+        }
         for (name, rate) in [
             ("behavior_learning_rate", self.behavior_learning_rate),
             ("encoder_learning_rate", self.encoder_learning_rate),
@@ -2115,6 +2150,30 @@ mod tests {
         frozen.encoder_freeze_update = Some(1);
         frozen.encoder_learning_rate = None;
         assert!(frozen.check().is_err());
+        assert!(
+            serde_json::to_value(&config)
+                .unwrap()
+                .get("learning_rate_drop_update")
+                .is_none()
+        );
+        let mut dropped = config.clone();
+        dropped.learning_rate_drop_update = Some(150_000);
+        assert!(dropped.check().is_err());
+        dropped.learning_rate_drop_factor = Some(0.25);
+        assert!(dropped.check().is_ok());
+        assert_eq!(dropped.learning_rate_drop(149_999), 1.0);
+        assert_eq!(dropped.learning_rate_drop(150_000), 0.25);
+        assert_eq!(config.learning_rate_drop(150_000), 1.0);
+        let json = serde_json::to_vec(&dropped).unwrap();
+        assert_eq!(
+            dropped,
+            serde_json::from_slice::<DreamerConfig>(&json).unwrap()
+        );
+        dropped.learning_rate_drop_factor = Some(1.0);
+        assert!(dropped.check().is_err());
+        dropped.learning_rate_drop_factor = Some(0.25);
+        dropped.learning_rate_drop_update = Some(0);
+        assert!(dropped.check().is_err());
         for rate in [0.0, -1.0, f32::INFINITY, f32::NAN] {
             let mut invalid = config.clone();
             invalid.encoder_learning_rate = Some(rate);

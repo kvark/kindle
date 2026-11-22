@@ -358,7 +358,8 @@ pub(crate) fn configure_d3_optimizer(
         }
     }
     session.set_laprop(
-        d3_learning_rate(learning_rate, config.learning_rate_warmup, learner_step),
+        d3_learning_rate(learning_rate, config.learning_rate_warmup, learner_step)
+            * config.learning_rate_drop(learner_step),
         config.optimizer_beta1,
         config.optimizer_beta2,
         config.optimizer_epsilon,

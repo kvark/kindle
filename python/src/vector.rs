@@ -100,6 +100,11 @@ impl PyVectorAgent {
     #[classattr]
     const SUPPORTS_ENCODER_FREEZE: bool = true;
 
+    /// `learning_rate_drop_update` / `learning_rate_drop_factor`: every learning rate is
+    /// multiplied by the factor from that learner step.
+    #[classattr]
+    const SUPPORTS_LEARNING_RATE_DROP: bool = true;
+
     /// `cdp_scale_floor`: centered CDP with every dimension scaled by its batch deviation.
     #[classattr]
     const SUPPORTS_CDP_SCALE_FLOOR: bool = true;

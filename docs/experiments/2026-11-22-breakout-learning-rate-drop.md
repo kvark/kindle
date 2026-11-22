@@ -127,3 +127,45 @@ test 4 one in six.
   one (earlier, deeper, or larger batches instead).
 - The drop changes the world model's and the actor-critic's rates
   together, so a pass does not say which mattered.
+
+## Amendment, 22:53 UTC November 22: part 1b before the run
+
+Part 1's eight cells finished (no fault). Their medians were seen before
+this was written; their return rates were not yet read:
+
+| Mean of | Sampled, 4000777001 / 4000022003 | Greedy | Greedy games past 432 |
+|---|---|---|---:|
+| 3.2M, 3.6M | 411.5 / 400 | 402 / 422.5 | 9 of 48 |
+| 2.8M, 3.2M, 3.6M | 402.5 / 401.5 | 428 / 439.5 | 22 of 48 |
+
+`E22`'s single checkpoints: sampled 376 to 394.5, greedy 395 to 415.5
+where it serves, at most 10 of 48 greedy games past 432. No game is cut.
+Because averaging costs minutes and the training run costs eight hours,
+the run waits about half an hour for a second evaluation-only step,
+`queue-33.json` in the same root (22 cells, 24 games each, sampled and
+greedy, `--life-loss-reset`):
+
+- **Held-out:** the mean of `F50`'s 2.0M, 2.4M and 2.8M checkpoints
+  (seed 5011, encoder frozen from 1.2M) on its three cohorts
+  4000313131, 4000777001 and 4000022003, 144 games.
+- Observations: the mean of `F50`'s 2.4M and 2.8M on the same cohorts;
+  `E22`'s means over 2.4M to 3.6M (four checkpoints) and 2.0M to 3.6M
+  (five) on its two cohorts; `E22`'s three-checkpoint mean on a third
+  cohort, 4000313131 (48 more games).
+
+Readings of the held-out cells, fixed now. `F50`'s single checkpoints
+pool to 340.5 / 382 / 315.5 at 2.0M / 2.4M / 2.8M with 0, 6 and 1 of 144
+games past 432 (22 greedy games cut at 2.8M).
+
+- **Carries to the held-out seed:** pooled median 400 or more and 20 or
+  more of 144 games past 432, no game cut at the cap.
+- **At the gate's level:** pooled median 430 or more and 72 or more of
+  144 past 432. This would be reported to the user as a reading at the
+  level their gate names, from one held-out seed and a post hoc
+  procedure; whether it meets the gate is theirs to say.
+- Sampled and greedy are read separately in either case.
+
+Predictions: carries, one in two; gate level, one in eight. `D22` is
+launched after these cells whatever they show: averaged weights and a
+smaller step are two ways at the same noise, and the run also says
+whether the learner itself can get there.
