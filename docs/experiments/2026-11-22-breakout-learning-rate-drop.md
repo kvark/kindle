@@ -169,3 +169,37 @@ Predictions: carries, one in two; gate level, one in eight. `D22` is
 launched after these cells whatever they show: averaged weights and a
 smaller step are two ways at the same noise, and the run also says
 whether the learner itself can get there.
+
+## Amendment, 23:21 UTC November 22: results of parts 1 and 1b, and dense checkpoints for `D22`
+
+Parts 1 and 1b finished (30 cells, no fault, no game cut except one
+greedy game in each of two observation checkpoints). Read against the
+readings fixed above; the full account goes in the result report.
+
+- **Part 1:** the two-checkpoint mean returns the wide paddle .958 of
+  2,536 descents in sampled play against its parents' .951: the first
+  reading (.951 or more) applies.
+- **Part 1b, held-out:** the mean of `F50`'s 2.0M, 2.4M and 2.8M
+  checkpoints plays a pooled median of 409 over 144 games with 19 past
+  432 and no game cut. "Carries" needed 400 and 20; it is not met, by
+  one game. The gate-level reading is not met.
+- Observations: `E22`'s three-checkpoint mean pools to 420 over 144
+  games with 40 past 432 (greedy 428 with 30 of 72, and .977 / .928 of
+  wide / narrow descents returned on its first two cohorts).
+
+Because averaging pays, `D22` saves a checkpoint every 100,000 actions
+instead of every 400,000 (`queue-32b.json`; 36 checkpoints, about 9 GB).
+A two-run check (`queue-32-cadence.json`, 16,384 actions with
+checkpoints every 16,384 and every 4,096 actions) ends with every world,
+behavior and slow-critic tensor bit-identical, so the cadence does not
+change training and `D22` remains `E22`'s twin to 2.4M. The smoke
+(`queue-32-smoke.json`, every rate multiplied by 1e-6 from update 300)
+passed: its two later checkpoints are equal to three decimals in every
+group while the actor has moved .034 from the initial weights.
+
+Tests 1 to 4 are unchanged and read on single checkpoints as declared.
+Added observations, evaluation only after training, each sampled and
+greedy on the two cohorts: the mean of `D22`'s ten checkpoints from
+2.7M to 3.6M, the mean of its five from 3.2M to 3.6M, and, as the
+matched comparison at full rates, the mean of its five from 2.0M to
+2.4M against the single 2.4M checkpoint.
