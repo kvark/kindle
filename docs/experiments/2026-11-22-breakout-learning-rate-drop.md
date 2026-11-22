@@ -3,8 +3,9 @@
 Prepared 22:45 UTC November 22. Two parts, both the assistant's design
 (the user was not asked): an evaluation-only check on averaged
 checkpoints, launched by hand at once, and a training run that needs a
-new option and a rebuilt extension, **not launched yet**; its launch
-time is recorded here when it starts. Follows
+new option and a rebuilt extension, **launched by hand at 23:22 UTC
+November 22** (`queue-32b.json`, unit `kindle-breakout-lrdrop-20261122`)
+after the two amendments below. Follows
 [tempered play](../results/2026-11-22-breakout-tempered-play.md)
 (sampling noise is not what loses the ball) and
 [the 800k freeze](../results/2026-11-21-breakout-encoder-freeze-800k.md)
