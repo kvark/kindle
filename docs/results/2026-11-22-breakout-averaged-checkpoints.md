@@ -71,9 +71,12 @@ For reference the planner that reads the emulator's state returns .98 of
 wide and .90 of narrow descents, and with a 1 to 3 px error in its
 offset .962 to .973 and .887 to .924.
 
-- **Every mean returns more balls than its parents in sampled play**, on
-  both seeds and both paddles: wide .958 to .962 against .941 to .954,
-  narrow .858 to .889 against .832 to .871.
+- **Every mean returns more wide-paddle balls in sampled play than any
+  of its parents**, on both seeds: .958 to .962 against .931 to .954. On
+  the narrow paddle four of the six means are above every parent (.858
+  to .889 against at most .849 on `F50` and .873 on `E22`) and two equal
+  their best parent (the two- and five-checkpoint `E22` means, .871 and
+  .873).
 - **Greedy play of the three- and five-checkpoint means is the best on
   record**: .976 to .977 wide and .923 narrow, the planner's 1 to 3 px
   band on the wide paddle and its upper edge on the narrow one, with a
