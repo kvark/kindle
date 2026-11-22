@@ -109,3 +109,31 @@ training returns over 2.8M to 3.6M 300 to 375, test 3 one in four; test
 - The mechanism test uses one probe of 24,000 actions.
 - The design is the assistant's, following the probe's declared reading;
   the user has not been asked.
+
+## Amendment, 00:22 UTC November 22: the mechanism probe on the CPU renderer
+
+Written before the probe's result exists. Training finished at 23:56 UTC
+November 21. The queue then completed the four 3.6M cells, the 3.6M
+dump and its reset probe, and stopped at 00:09 UTC November 22 in job 8
+of 30, the imagined-contact probe, on a **GPU kernel fault** (ring
+timeout, illegal opcode, mode-1 reset, VRAM lost; the fourth on this
+boot and again in a frozen-inference job). Evidence is in
+`gpu-fault-20261122-0009/` under the run root; its nine fault records
+are not reviewed, the card is not used and nothing was reset by hand.
+
+- **Test 1** is read from the same pinned probe script, checkpoint and
+  arguments run on Mesa's llvmpipe (`VK_DRIVER_FILES` set to its ICD,
+  no device id; unit `kindle-of22-imagined-lvp-20261122`, 12 GB cap,
+  output `llvmpipe/imagined-OF22-3600000-llvmpipe.npz`). Two smokes of
+  200 and 400 actions ran clean (1.07 actions per second, 3.8 GB); the
+  full probe should take about five hours. It is the same weights on
+  different floating-point code, so the play it probes is another draw
+  of the same policy; the bars do not change. If the user reviews the
+  fault and the probe is rerun on the card, both are reported.
+- **Test 2's checkpoint half** (sampled medians at 2.0M to 3.2M) and
+  the other 22 unrun jobs wait for the user's review of the fault. If
+  the card is still unreviewed when the probe ends, the eight sampled
+  cells at 2.0M, 2.4M, 2.8M and 3.2M run on llvmpipe one at a time
+  (about 90 minutes each) and are reported as such.
+- Tests 3 and 4 need nothing more: training returns and the four 3.6M
+  cells are complete.
