@@ -722,6 +722,12 @@ the drop is the best Breakout learner on both seeds and is not at the
 gate**; its level is that of the planner with 1 to 3 px of offset
 error, and the late, moving paddle is unchanged (.73 to .79 of
 descents). No seed chosen after the schedule was fixed has run it.
+**Running, declared by the assistant:**
+[`D60`](docs/experiments/2026-11-23-breakout-recipe-seed6007.md), `D50`'s
+command on fresh seed 6007 (a confirmation of the fixed recipe, no new
+lever); same root, `queue-36.json` (21 jobs), unit
+`kindle-breakout-recipe6007-20261123`, launched 15:49 UTC November 23,
+about 8 hours.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
