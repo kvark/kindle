@@ -149,7 +149,9 @@ after 1.2M pass 432 (best 830); `F22` 20 of 799.
   past the first wall. The planner with 1 to 3 px of offset error
   returns .962 to .973 and .887 to .924 for medians of 422 to 424 with
   11 of 36 games past the wall; the planner the gate was set from
-  returned .98 and .90 for a median of 437.
+  returned .98 and .94 (.90 of the narrow paddle's fastest balls) for a
+  median of 437. (Corrected November 23: this line first gave .90 as
+  that planner's narrow-paddle rate.)
 
 ## Post hoc: the earlier variants on training returns
 

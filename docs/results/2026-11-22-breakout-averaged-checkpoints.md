@@ -68,7 +68,9 @@ checkpoint of any run had.
 | `F50` mean of three | .958 (3,725) | .858 (1,435) | .965 (3,852) | .888 (2,020) | .84 |
 
 For reference the planner that reads the emulator's state returns .98 of
-wide and .90 of narrow descents, and with a 1 to 3 px error in its
+wide and .94 of narrow descents (.90 of the narrow paddle's fastest
+balls; corrected November 23, this line first gave .90 as the narrow
+rate), and with a 1 to 3 px error in its
 offset .962 to .973 and .887 to .924.
 
 - **Every mean returns more wide-paddle balls in sampled play than any

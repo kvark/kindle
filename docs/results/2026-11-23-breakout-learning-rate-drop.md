@@ -133,7 +133,8 @@ error .003) and .879 of 3,352 narrow ones against .865 of 2,506 (.013,
 standard error .009). Where greedy play serves (2.8M and 3.6M) it
 returns .969 to .972 of wide descents and .910 to .911 of narrow ones:
 the planner that reads the emulator's state
-returns .98 and .90, and with a 1 to 3 px error in its offset .962 to
+returns .98 and .94 (.90 of the narrow paddle's fastest balls, where
+`D22`'s greedy play returns .87), and with a 1 to 3 px error in its offset .962 to
 .973 and .887 to .924, with medians of 422 to 424 and 11 of 36 games
 past the wall.
 
@@ -185,11 +186,15 @@ are the same lever: each gets there alone and together they add nothing,
 so the noise the step size puts into the weights is now mostly spent.
 What remains is the late, moving paddle, as frequent as before.
 
-In greedy play at its two serving checkpoints the learner returns the
-ball as often as the perfect-knowledge planner the gate was set from
-(.97 and .91 against .98 and .90) and plays a median of 416.5 to 428
-with 13 to 20 of 48 games past the first wall; that planner's median is
-437. In sampled play it sits just below the planner's 1 to 3 px band on
+In greedy play at its two serving checkpoints the learner is inside the
+band of the planner with 1 to 3 px of offset error and below the
+perfect-knowledge planner the gate was set from, by one point on the
+wide paddle and three on the narrow one (.97 and .91 against .98 and
+.94); it plays a median of 416.5 to 428 with 13 to 20 of 48 games past
+the first wall, and that planner's median is 437. (Corrected November
+23: this paragraph first quoted the planner's rate on the narrow
+paddle's fastest balls, .90, as its narrow-paddle rate and said the
+learner returned the ball as often.) In sampled play it sits just below the planner's 1 to 3 px band on
 the wide paddle and at its lower edge on the narrow one. Greedy play is the stronger mode and remains
 the unsafe one: one checkpoint in three stalls and fails at the serve.
 
