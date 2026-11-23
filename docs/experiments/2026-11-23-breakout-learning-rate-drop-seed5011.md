@@ -1,7 +1,8 @@
 # The late learning-rate drop on held-out seed 5011
 
-Prepared 07:40 UTC November 23. The assistant's design (the user was not
-asked), and the first of the two next steps named in the readings of
+Prepared 07:38 UTC November 23 and **launched by hand at 07:38 UTC**
+(`queue-35.json`, unit `kindle-breakout-lrdrop5011-20261123`). The
+assistant's design (the user was not asked), and the first of the two next steps named in the readings of
 [the learning-rate drop declaration](2026-11-22-breakout-learning-rate-drop.md)
 after [its run `D22`](../results/2026-11-23-breakout-learning-rate-drop.md)
 passed tests 1 to 3: with every learning rate cut to a quarter from 2.4M

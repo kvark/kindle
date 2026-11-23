@@ -676,16 +676,37 @@ the wall and no cut game (best single checkpoint 382 with 6; the
 declared "carries" bar of 400 and 20 is missed by one game). Sampled
 play of every mean returns more wide-paddle balls than any parent;
 greedy play of a mean can stall at the serve (the four-checkpoint mean).
-The gate is not met. **Running, declared by the assistant:**
-[`D22`](docs/experiments/2026-11-22-breakout-learning-rate-drop.md),
+The gate is not met. [`D22`](docs/results/2026-11-23-breakout-learning-rate-drop.md),
 `E22`'s command with every learning rate cut to a quarter from update
 150,000 (2.4M; new `--learning-rate-drop-update` /
 `--learning-rate-drop-factor`, extension rebuilt November 22) and a
-checkpoint every 100k actions, to 3.6M; root
-`/x/Temp/kindle-breakout-lrdrop-20261122`, `queue-32b.json` (19 jobs),
-unit `kindle-breakout-lrdrop-20261122`, launched 23:22 UTC November 22,
-about 8.5 hours. Checkpoint cadence does not change training (checked
-bit for bit over 16,384 actions).
+checkpoint every 100k actions, to 3.6M (451 minutes; root
+`/x/Temp/kindle-breakout-lrdrop-20261122`, `queue-32b.json` then
+`queue-34.json`, finished 07:21 UTC November 23, no fault; the
+assistant's design), passes its mechanism, safety and training-return
+tests and misses its gate marker by two games: **the learner was held
+at its level by its own step size.** A twin of `E22` to the drop, it
+then moves a third as far between checkpoints (actor .066 against
+.186) and plays 382.3 per training game over 2.8M to 3.6M against 343.8
+(difference 38.5, standard error 7.7), a new level reached within 800k
+actions. Sampled medians are 402 to 407.5 at every later checkpoint
+(`E22` 376 to 394.5); the 2.8M checkpoint pools to 420 with 24 of 96
+games past the first wall (greedy 428 with 20 of 48, wide paddle .972,
+narrow .910, the level of the planner the gate was set from: .98, .90
+and 437); 3.6M pools to 406.5 with 18. Greedy play at 3.2M stalls a
+median of 53 actions at the serve and loses whole games at zero. The
+latent loss rises by a third after the drop while play improves; not
+explained. Averaging `D22`'s checkpoints after the drop adds nothing,
+and the mean of its five full-rate checkpoints from 2.0M to 2.4M plays
+417 with 20 of 96 past the wall: the drop and the mean are the same
+lever, and the late, moving paddle (.72 to .75 of descents) is what
+remains. Checkpoint cadence does not change training (checked bit for
+bit over 16,384 actions). **Running, declared by the assistant:**
+[`D50`](docs/experiments/2026-11-23-breakout-learning-rate-drop-seed5011.md),
+`F50`'s command (held-out seed 5011, encoder frozen from 1.2M) with the
+same drop, to 3.6M; same root, `queue-35.json` (21 jobs), unit
+`kindle-breakout-lrdrop5011-20261123`, launched 07:38 UTC November 23,
+about 8 hours.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
@@ -758,7 +779,7 @@ The **five-game goal is unfinished**:
 | [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
 | [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
-| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276; unchanged recipe's best checkpoint (22003 at 1.6M) median 380.5; [encoder frozen from 1.2M](docs/results/2026-11-20-breakout-encoder-freeze.md): 404.5 at 2.8M on seed 22003, [held-out seed 5011](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md) 382 at 2.4M; [frozen from 800k to 3.6M](docs/results/2026-11-21-breakout-encoder-freeze-800k.md): level at about 345 per training game, 402.5 at 3.6M; [open-loop supervision on the frozen recipe](docs/results/2026-11-22-breakout-open-loop-freeze.md): worse, 338 at 3.6M; [tempered play](docs/results/2026-11-22-breakout-tempered-play.md): no more balls returned; [averaged checkpoints](docs/results/2026-11-22-breakout-averaged-checkpoints.md): 420 with 40 of 144 past 432 on seed 22003, held-out 409 with 19 of 144 | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best single checkpoint 410.5 with 13 of 96 past 432 on a development seed, held-out 382 with 6 of 144; averaged checkpoints 420 with 40 of 144 and held-out 409 with 19 of 144). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions unless the encoder is frozen |
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276; unchanged recipe's best checkpoint (22003 at 1.6M) median 380.5; [encoder frozen from 1.2M](docs/results/2026-11-20-breakout-encoder-freeze.md): 404.5 at 2.8M on seed 22003, [held-out seed 5011](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md) 382 at 2.4M; [frozen from 800k to 3.6M](docs/results/2026-11-21-breakout-encoder-freeze-800k.md): level at about 345 per training game, 402.5 at 3.6M; [open-loop supervision on the frozen recipe](docs/results/2026-11-22-breakout-open-loop-freeze.md): worse, 338 at 3.6M; [tempered play](docs/results/2026-11-22-breakout-tempered-play.md): no more balls returned; [averaged checkpoints](docs/results/2026-11-22-breakout-averaged-checkpoints.md): 420 with 40 of 144 past 432 on seed 22003, held-out 409 with 19 of 144; [learning rates cut to a quarter from 2.4M](docs/results/2026-11-23-breakout-learning-rate-drop.md): 382 per training game against 344, 420 with 24 of 96 past 432 at 2.8M, 406.5 with 18 at 3.6M (seed 22003) | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best single checkpoint 420 with 24 of 96 past 432 on a development seed, held-out 382 with 6 of 144; averaged checkpoints 420 with 40 of 144 and held-out 409 with 19 of 144). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions unless the encoder is frozen |
 | [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
 
 Published long-run scores are aspirations,not matched-budget comparisons.
