@@ -728,6 +728,11 @@ command on fresh seed 6007 (a confirmation of the fixed recipe, no new
 lever); same root, `queue-36.json` (21 jobs), unit
 `kindle-breakout-recipe6007-20261123`, launched 15:49 UTC November 23,
 about 8 hours.
+An actor-entropy schedule (`--actor-entropy-drop-update` /
+`--actor-entropy-drop-factor`: the entropy coefficient becomes a graph
+input and is multiplied by the factor from a learner step) is source
+only, added November 23 while `D60` trains: CPU tests pass, not built
+into the installed extension, not yet declared or run.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU

@@ -357,6 +357,14 @@ pub(crate) fn configure_d3_optimizer(
             session.set_lr_multiplier(prefix, rate / config.learning_rate);
         }
     }
+    if config.actor_entropy_scheduled()
+        && session.has_input(crate::dreamer::behavior::NEGATIVE_ACTOR_ENTROPY)
+    {
+        session.set_input(
+            crate::dreamer::behavior::NEGATIVE_ACTOR_ENTROPY,
+            &[-config.actor_entropy_at(learner_step)],
+        );
+    }
     session.set_laprop(
         d3_learning_rate(learning_rate, config.learning_rate_warmup, learner_step)
             * config.learning_rate_drop(learner_step),

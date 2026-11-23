@@ -68,8 +68,38 @@ pub(crate) fn value_loss(
     graph.add(target_loss, slow_loss)
 }
 
+/// Name of the `[1]` input holding minus the actor entropy coefficient
+/// when `DreamerConfig::actor_entropy_scheduled`.
+pub(crate) const NEGATIVE_ACTOR_ENTROPY: &str = "negative_actor_entropy";
+
+/// The scheduled entropy coefficient's input, created once per graph; `None`
+/// keeps the coefficient a graph constant.
+pub(crate) fn negative_actor_entropy_input(
+    graph: &mut Graph,
+    config: &DreamerConfig,
+) -> Option<NodeId> {
+    config.actor_entropy_scheduled().then(|| {
+        let input = graph.input(NEGATIVE_ACTOR_ENTROPY, &[1]);
+        graph.stop_gradient(input)
+    })
+}
+
+/// Trajectory-weighted entropy times minus the entropy coefficient.
+pub(crate) fn entropy_bonus(
+    graph: &mut Graph,
+    config: &DreamerConfig,
+    weighted_entropy: NodeId,
+    negative_coefficient: Option<NodeId>,
+) -> NodeId {
+    match negative_coefficient {
+        Some(coefficient) => graph.mul(weighted_entropy, coefficient),
+        None => scale(graph, weighted_entropy, -config.actor_entropy),
+    }
+}
+
 /// Score-function loss, plus unweighted and trajectory-weighted entropy.
 /// `action_target` is `discount_weight * normalized_advantage * one_hot`.
+/// `negative_entropy` is `negative_actor_entropy_input`'s node.
 pub(crate) fn policy_loss(
     graph: &mut Graph,
     config: &DreamerConfig,
@@ -77,6 +107,7 @@ pub(crate) fn policy_loss(
     action_target: NodeId,
     weight: NodeId,
     rows: usize,
+    negative_entropy: Option<NodeId>,
 ) -> (NodeId, NodeId, NodeId) {
     let log_probabilities = mixed_log_probabilities(
         graph,
@@ -96,7 +127,7 @@ pub(crate) fn policy_loss(
     let mean_entropy = graph.mean_all(entropy);
     let weighted_entropy = graph.mul(entropy, weight);
     let weighted_entropy = graph.mean_all(weighted_entropy);
-    let entropy_bonus = scale(graph, weighted_entropy, -config.actor_entropy);
+    let entropy_bonus = entropy_bonus(graph, config, weighted_entropy, negative_entropy);
     let policy = graph.add(score_loss, entropy_bonus);
     (policy, mean_entropy, weighted_entropy)
 }
@@ -153,6 +184,7 @@ pub fn build_training_graph(
 
     let actor_logits = model.actor.forward_policy(&mut graph, imagined_feature);
     let value_logits = model.value.forward(&mut graph, imagined_feature);
+    let negative_entropy = negative_actor_entropy_input(&mut graph, config);
     let (policy, mean_entropy, weighted_entropy) = policy_loss(
         &mut graph,
         config,
@@ -160,6 +192,7 @@ pub fn build_training_graph(
         action_target,
         imagined_weight,
         imagined_rows,
+        negative_entropy,
     );
     let expected_value_loss = config.actor_expected_value.then(|| {
         expected_value::loss(
@@ -171,7 +204,7 @@ pub fn build_training_graph(
         )
     });
     let policy = if let Some(loss) = expected_value_loss {
-        let entropy = scale(&mut graph, weighted_entropy, -config.actor_entropy);
+        let entropy = entropy_bonus(&mut graph, config, weighted_entropy, negative_entropy);
         graph.add(loss, entropy)
     } else {
         policy
@@ -800,6 +833,42 @@ mod tests {
             value.node(value.outputs()[0]).ty.shape,
             vec![2, config.value_bins]
         );
+    }
+
+    #[test]
+    fn scheduled_actor_entropy_is_one_input_and_absent_by_default() {
+        let mut config = DreamerConfig::tiny(3);
+        let inputs = |graph: &Graph| {
+            graph.nodes().iter().filter(|node|
+            matches!(&node.op, meganeura::graph::Op::Input { name } if name == NEGATIVE_ACTOR_ENTROPY)).count()
+        };
+        let parameters = |graph: &Graph| {
+            graph
+                .nodes()
+                .iter()
+                .filter(|node| matches!(&node.op, meganeura::graph::Op::Parameter { .. }))
+                .count()
+        };
+        let baseline = build_training_graph(&config, 12, 6);
+        assert_eq!(inputs(&baseline), 0);
+        config.actor_entropy_drop_update = Some(10);
+        config.actor_entropy_drop_factor = Some(0.1);
+        let scheduled = build_training_graph(&config, 12, 6);
+        assert_eq!(inputs(&scheduled), 1);
+        assert_eq!(parameters(&scheduled), parameters(&baseline));
+        assert_eq!(scheduled.outputs().len(), baseline.outputs().len());
+        assert_eq!(scheduled.nodes().len(), baseline.nodes().len() + 1);
+        let (plan, _) = meganeura::compile_training_graph(&scheduled);
+        assert!(!plan.dispatches.is_empty());
+        config.actor_critic_gradient = true;
+        let world =
+            crate::dreamer::world::build_training_graph(&config, config.world_backprop_length);
+        assert_eq!(inputs(&world), 1);
+        config.actor_entropy_drop_update = None;
+        config.actor_entropy_drop_factor = None;
+        let world =
+            crate::dreamer::world::build_training_graph(&config, config.world_backprop_length);
+        assert_eq!(inputs(&world), 0);
     }
 
     #[test]

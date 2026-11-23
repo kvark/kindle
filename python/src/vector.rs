@@ -105,6 +105,11 @@ impl PyVectorAgent {
     #[classattr]
     const SUPPORTS_LEARNING_RATE_DROP: bool = true;
 
+    /// `actor_entropy_drop_update` / `actor_entropy_drop_factor`: the actor's entropy
+    /// coefficient is multiplied by the factor from that learner step.
+    #[classattr]
+    const SUPPORTS_ACTOR_ENTROPY_DROP: bool = true;
+
     /// `cdp_scale_floor`: centered CDP with every dimension scaled by its batch deviation.
     #[classattr]
     const SUPPORTS_CDP_SCALE_FLOOR: bool = true;

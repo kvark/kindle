@@ -204,6 +204,10 @@ def main():
                         help="fresh CDP: learner update from which every learning rate is multiplied by --learning-rate-drop-factor")
     parser.add_argument("--learning-rate-drop-factor", type=float,
                         help="fresh CDP: factor in (0, 1) applied from --learning-rate-drop-update")
+    parser.add_argument("--actor-entropy-drop-update", type=int,
+                        help="fresh CDP: learner update from which the actor entropy scale is multiplied by --actor-entropy-drop-factor")
+    parser.add_argument("--actor-entropy-drop-factor", type=float,
+                        help="fresh CDP: factor in [0, 1) applied from --actor-entropy-drop-update")
     parser.add_argument("--dynamics-learning-rate", type=float,
                         help="fresh CDP dynamics/posterior/prediction/exploration rate; omitted: 4e-4 scaled with the base rate")
     parser.add_argument("--latent-unimix", type=float,
@@ -656,6 +660,8 @@ def main():
     training_options.add("--encoder-freeze-update")
     training_options.add("--learning-rate-drop-update")
     training_options.add("--learning-rate-drop-factor")
+    training_options.add("--actor-entropy-drop-update")
+    training_options.add("--actor-entropy-drop-factor")
     training_options.add("--cdp-scale-floor")
     training_options.add("--dynamics-learning-rate")
     training_options.add("--cdp")
@@ -852,6 +858,13 @@ def main():
             parser.error("the learning-rate drop requires fresh CDP, a positive update and a factor in (0, 1)")
         if not getattr(kindle.VectorAgent, "SUPPORTS_LEARNING_RATE_DROP", False):
             parser.error("installed Kindle native module lacks the learning-rate drop")
+    if (args.actor_entropy_drop_update is None) != (args.actor_entropy_drop_factor is None):
+        parser.error("actor-entropy-drop-update and actor-entropy-drop-factor are set together")
+    if args.actor_entropy_drop_update is not None:
+        if not args.cdp or args.actor_entropy_drop_update < 1 or not 0 <= args.actor_entropy_drop_factor < 1:
+            parser.error("the actor entropy drop requires fresh CDP, a positive update and a factor in [0, 1)")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_ACTOR_ENTROPY_DROP", False):
+            parser.error("installed Kindle native module lacks the actor entropy drop")
     if args.cdp:
         rate_scale = args.learning_rate / 4e-5
         cdp_rates = dict(encoder_learning_rate=6e-6 * rate_scale,
@@ -869,6 +882,9 @@ def main():
         if args.learning_rate_drop_update is not None:
             cdp_rates["learning_rate_drop_update"] = args.learning_rate_drop_update
             cdp_rates["learning_rate_drop_factor"] = args.learning_rate_drop_factor
+        if args.actor_entropy_drop_update is not None:
+            cdp_rates["actor_entropy_drop_update"] = args.actor_entropy_drop_update
+            cdp_rates["actor_entropy_drop_factor"] = args.actor_entropy_drop_factor
     if args.cdp_centered and (not args.cdp or args.world_microbatch_size not in (None, args.batch_size)):
         parser.error("centered CDP requires --cdp and full-batch world training")
     if not math.isfinite(args.disagreement_scale) or args.disagreement_scale < 0:

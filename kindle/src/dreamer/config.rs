@@ -535,6 +535,15 @@ pub struct DreamerConfig {
     /// Factor in (0, 1) applied from `learning_rate_drop_update`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub learning_rate_drop_factor: Option<f32>,
+    /// Learner step from which the actor's entropy coefficient is
+    /// multiplied by `actor_entropy_drop_factor`. With a schedule the
+    /// coefficient is a graph input instead of a constant. Requires the
+    /// factor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub actor_entropy_drop_update: Option<u64>,
+    /// Factor in [0, 1) applied from `actor_entropy_drop_update`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub actor_entropy_drop_factor: Option<f32>,
     /// Optional RSSM (including posterior) and future-predictor learning rate.
     #[serde(default)]
     pub dynamics_learning_rate: Option<f32>,
@@ -672,6 +681,8 @@ impl DreamerConfig {
             encoder_freeze_update: None,
             learning_rate_drop_update: None,
             learning_rate_drop_factor: None,
+            actor_entropy_drop_update: None,
+            actor_entropy_drop_factor: None,
             dynamics_learning_rate: None,
             behavior_learning_rate: None,
             actor_learning_starts: 0,
@@ -828,6 +839,23 @@ impl DreamerConfig {
             (Some(update), Some(factor)) if learner_step >= update => factor,
             _ => 1.0,
         }
+    }
+
+    /// Actor entropy coefficient at a learner step: `actor_entropy`
+    /// times the drop factor from `actor_entropy_drop_update` on.
+    pub fn actor_entropy_at(&self, learner_step: u64) -> f32 {
+        match (
+            self.actor_entropy_drop_update,
+            self.actor_entropy_drop_factor,
+        ) {
+            (Some(update), Some(factor)) if learner_step >= update => self.actor_entropy * factor,
+            _ => self.actor_entropy,
+        }
+    }
+
+    /// Whether training graphs take the entropy coefficient as an input.
+    pub fn actor_entropy_scheduled(&self) -> bool {
+        self.actor_entropy_drop_update.is_some()
     }
 
     pub fn is_cdp(&self) -> bool {
@@ -1533,6 +1561,19 @@ impl DreamerConfig {
                     .into(),
             );
         }
+        if self.actor_entropy_drop_update.is_some() != self.actor_entropy_drop_factor.is_some()
+            || self
+                .actor_entropy_drop_update
+                .is_some_and(|update| update == 0)
+            || self
+                .actor_entropy_drop_factor
+                .is_some_and(|factor| !(factor >= 0.0 && factor < 1.0))
+        {
+            return Err(
+                "actor_entropy_drop_update must be positive and actor_entropy_drop_factor in [0, 1), set together"
+                    .into(),
+            );
+        }
         for (name, rate) in [
             ("behavior_learning_rate", self.behavior_learning_rate),
             ("encoder_learning_rate", self.encoder_learning_rate),
@@ -2174,6 +2215,36 @@ mod tests {
         dropped.learning_rate_drop_factor = Some(0.25);
         dropped.learning_rate_drop_update = Some(0);
         assert!(dropped.check().is_err());
+        assert!(
+            serde_json::to_value(&config)
+                .unwrap()
+                .get("actor_entropy_drop_update")
+                .is_none()
+        );
+        assert!(!config.actor_entropy_scheduled());
+        assert_eq!(config.actor_entropy_at(150_000), config.actor_entropy);
+        let mut sharper = config.clone();
+        sharper.actor_entropy_drop_update = Some(150_000);
+        assert!(sharper.check().is_err());
+        sharper.actor_entropy_drop_factor = Some(0.1);
+        assert!(sharper.check().is_ok());
+        assert!(sharper.actor_entropy_scheduled());
+        assert_eq!(sharper.actor_entropy_at(149_999), sharper.actor_entropy);
+        assert_eq!(
+            sharper.actor_entropy_at(150_000),
+            sharper.actor_entropy * 0.1
+        );
+        let json = serde_json::to_vec(&sharper).unwrap();
+        assert_eq!(
+            sharper,
+            serde_json::from_slice::<DreamerConfig>(&json).unwrap()
+        );
+        sharper.actor_entropy_drop_factor = Some(1.0);
+        assert!(sharper.check().is_err());
+        sharper.actor_entropy_drop_factor = Some(0.0);
+        assert!(sharper.check().is_ok());
+        sharper.actor_entropy_drop_update = Some(0);
+        assert!(sharper.check().is_err());
         for rate in [0.0, -1.0, f32::INFINITY, f32::NAN] {
             let mut invalid = config.clone();
             invalid.encoder_learning_rate = Some(rate);

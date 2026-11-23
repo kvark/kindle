@@ -1739,6 +1739,18 @@ impl DreamerCore {
         let chunk_length = self.config.world_backprop_length;
         let chunk_count = self.config.batch_length / chunk_length;
         let pass_count = chunk_count * microbatch_count;
+        // Every accumulated pass of this update reads the same coefficient;
+        // the optimizer is only configured on the last one.
+        if self.config.actor_entropy_scheduled()
+            && self
+                .world_train
+                .has_input(super::behavior::NEGATIVE_ACTOR_ENTROPY)
+        {
+            self.world_train.set_input(
+                super::behavior::NEGATIVE_ACTOR_ENTROPY,
+                &[-self.config.actor_entropy_at(self.learner_step)],
+            );
+        }
         let staged = self.world_posterior.is_none();
         if !staged {
             self.world_train

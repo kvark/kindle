@@ -756,6 +756,9 @@ fn training_graph(
         graph.scalar(0.0)
     };
 
+    let negative_entropy = (config.actor_critic_gradient && model.actor.is_some())
+        .then(|| behavior::negative_actor_entropy_input(&mut graph, config))
+        .flatten();
     for (group, chunk) in head_inputs.chunks(time_batch_length).enumerate() {
         let rows = batch * chunk.len();
         let HeadInputs {
@@ -1167,8 +1170,15 @@ fn training_graph(
             // Same stopped targets and frozen heads as behavior training. Only
             // imagination t=0 is a posterior state; later states are detached.
             let logits = actor.forward_frozen(&mut graph, state);
-            let (policy, _, _) =
-                behavior::policy_loss(&mut graph, config, logits, action_target, weight, rows);
+            let (policy, _, _) = behavior::policy_loss(
+                &mut graph,
+                config,
+                logits,
+                action_target,
+                weight,
+                rows,
+                negative_entropy,
+            );
             let value = model
                 .replay_value
                 .as_ref()
