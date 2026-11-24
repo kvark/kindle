@@ -246,3 +246,14 @@ jobs running unchanged code; training had not faulted in about two
 weeks of runs. A relaunch needs the user's review of the fault first,
 and starts from zero: there is no checkpoint, and checkpoints do not
 hold the replay.
+
+## Amendment, 20:44 UTC November 24: the user's review, relaunched from zero
+
+The user reviewed the sixth fault ("Continue on this boot"; review file
+`gpu-fault-20261124-1843/reviewed-kernel-faults.json` under the root,
+all 62 fault records of the boot, that boot only). The faulted launch's
+logs are in `stopped-run/` beside the evidence and are not read. The
+same queue content was relaunched from zero at 20:44 UTC as
+`queue-40c.json`, guards `guards-40c`, unit
+`kindle-breakout-aligned6007-c-20261124`. Tests, stopping rules and
+readings are as declared. A further fault needs a further review.
