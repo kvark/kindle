@@ -221,7 +221,7 @@ read. The memory projection in "Why" was wrong for this reason; with
 the fix an 80,000-frame replay projects to about 14 GiB. The replay
 stays at 80,000 frames as declared.
 
-## Amendment, 18:46 UTC November 24: a sixth GPU fault stopped the run
+## Amendment, 18:45 UTC November 24: a sixth GPU fault stopped the run
 
 Written before any decision. At 18:43 UTC, 53 minutes into the
 relaunch, a **GPU kernel fault** (ring timeout, illegal opcode, mode-1
