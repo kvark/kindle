@@ -758,9 +758,18 @@ with 32 / 44 / 41 of 144 games past the wall, sampled wide paddle .968
 and narrow .903 (`D60` .966 and .899), greedy .975 and .916 (.975 and
 .920), a move among the last two actions in .53 to .68 of descents. The
 cut is not added to the recipe; with tempered play the actor's entropy
-is closed as a lever. **Nothing is running.** The direction after it
-(an aligned 1:1 input, a loss sharp on small objects, or accepting the
-level) is the user's and open.
+is closed as a lever. **Running, declared by the assistant:**
+[`C60`](docs/experiments/2026-11-24-breakout-playfield-crop.md), `D60`'s
+command with the 96x96 input cropped to the playfield inside the walls
+(`--image-crop 8 32 144 161`: 1.5 by 1.68 native pixels per input pixel
+instead of 1.67 by 2.19, same model, memory and time per update; the
+score digits, ceiling and walls are dropped); same initial weights as
+`D60`, not a twin; root `/x/Temp/kindle-breakout-crop-20261124`,
+`queue-38.json` (21 jobs), unit `kindle-breakout-crop6007-20261124`,
+launched 08:47 UTC November 24, about 8 hours. It is the one input-side
+test that costs no engineering; the direction itself (an aligned 1:1
+input, a loss sharp on small objects, or accepting the level) is the
+user's and open.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
