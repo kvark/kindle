@@ -257,3 +257,22 @@ same queue content was relaunched from zero at 20:44 UTC as
 `queue-40c.json`, guards `guards-40c`, unit
 `kindle-breakout-aligned6007-c-20261124`. Tests, stopping rules and
 readings are as declared. A further fault needs a further review.
+
+## Amendment, 23:03 UTC November 24: an early dump on the CPU renderer
+
+The 400k checkpoint was written at 23:02 UTC with no fault since the
+relaunch. Written before its result exists: the pinned own-play dump of
+that checkpoint (same script and arguments as the queue's declared 400k
+dump) is run on Mesa's llvmpipe beside the trainer, as a memory-capped
+CPU unit (`kindle-breakout-aligned-lvp400k-20261124`, output in the
+run's `llvmpipe/`), and read with the same state-precision script as
+the `D60` references (`D60` at 400k: paddle 2.4 px, ball x 3.7, ball
+height 2.6, landing minus paddle one action out 5.6). It is an
+observation only: no test reads it, no stopping rule depends on it,
+and the declared dumps on the card after training are unchanged. The
+dump may be repeated at 800k on the same terms.
+
+As observations at 400k: 22.6 per training game over the first 400k
+actions (647 games) against `D60`'s 6.6 (1,276 games) and `C60`'s 13.7;
+latent loss .032, KL 13.4, pixel term 13,536 at update 25,147; device
+memory level at 14.1 GiB.
