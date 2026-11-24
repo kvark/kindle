@@ -740,12 +740,17 @@ from 2.4M, 3.6M actions, about 7.6 hours.** Its three seeds at 3.6M
 pool to 406.5, 398 and 424.5 with 19%, 15% and 27% of games past the
 wall; the gate-level reading (430 with half the games past 432) is not
 met on any, and whether the gate is met or changed is the user's call.
-Nothing is running.
-An actor-entropy schedule (`--actor-entropy-drop-update` /
-`--actor-entropy-drop-factor`: the entropy coefficient becomes a graph
-input and is multiplied by the factor from a learner step) is source
-only, added November 23: CPU tests pass, not built
-into the installed extension, not yet declared or run.
+**Running, declared by the assistant:**
+[`N60`](docs/experiments/2026-11-24-breakout-actor-entropy-schedule.md),
+`D60`'s command with the actor's entropy coefficient cut to a tenth
+from update 150,000 (new `--actor-entropy-drop-update` /
+`--actor-entropy-drop-factor`, extension rebuilt November 24; a smoke
+shows the option changes nothing before its update and takes effect at
+it); a twin of `D60` to 2.4M; root
+`/x/Temp/kindle-breakout-entropy-20261124`, `queue-37.json` (21 jobs),
+unit `kindle-breakout-entropy6007-20261124`, launched 00:18 UTC November
+24, about 8 hours. The direction after it (an aligned 1:1 input, a loss
+sharp on small objects, or accepting the level) is the user's and open.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
