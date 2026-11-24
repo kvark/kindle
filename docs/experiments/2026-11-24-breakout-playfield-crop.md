@@ -173,3 +173,16 @@ read.
   and the gate-level reading) wait for the user's review of the fault;
   they are not run on llvmpipe unless the review is still open when the
   3.6M jobs end.
+
+## Amendment, 16:24 UTC November 24: the user's review, back on the card
+
+The user reviewed the fault ("continue on this boot"; review file
+`gpu-fault-20261124-1612/reviewed-kernel-faults.json` under the run
+root, all 53 fault records of the boot, that boot only). The llvmpipe
+unit was stopped nine minutes into the dump, before any output; its
+empty directory is in `llvmpipe-stopped/` beside the evidence. The 17
+jobs of `queue-38.json` that did not complete (the faulted greedy cell
+and every job after it) run unchanged on the card as `queue-38b.json`
+(`make_crop6007_queue_b.py`, guards `guards-38b`, unit
+`kindle-breakout-crop6007-b-20261124`). Tests and readings are as
+declared.
