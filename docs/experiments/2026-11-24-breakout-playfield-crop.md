@@ -142,3 +142,34 @@ six; test 4 one in eight; the gate-level reading one in twenty-five.
   the digits carried anything it used is not tested separately.
 - The three cohorts every run since November 17 has used; 24 games per
   cell.
+
+## Amendment, 16:15 UTC November 24: the 3.6M jobs on the CPU renderer
+
+Written before any result of these jobs exists. Training finished at
+16:09 UTC November 24 (3.6M actions, 2,389 training games, none cut).
+The queue then completed three 3.6M cells (cohort 313131 sampled and
+greedy, cohort 777001 sampled) and stopped at 16:12 UTC in job 5 of 21,
+the greedy cell on cohort 777001, on a **GPU kernel fault** (ring
+timeout, illegal opcode, mode-1 reset, VRAM lost; the fifth on this
+boot and again in a frozen-inference job). Evidence is in
+`gpu-fault-20261124-1612/` under the run root; its nine fault records
+are not reviewed, the card is not used and nothing was reset by hand.
+The faulted cell's partial output is in `partial/` there and is not
+read.
+
+- **Tests 1, 2 and 4** are read from the same pinned scripts,
+  checkpoint and arguments run on Mesa's llvmpipe (`VK_DRIVER_FILES`
+  set to its ICD, no device id): the 3.6M dump and the three unrun 3.6M
+  cells (cohort 777001 greedy, cohort 22003 sampled and greedy), one at
+  a time, outputs under the run's `llvmpipe/` directory
+  (`make_llvmpipe_3600.py`, `run_llvmpipe_3600.sh`, unit
+  `kindle-c60-lvp-20261124`, 12 GB cap, about five hours). Four paired
+  cells on November 16 did not distinguish llvmpipe from the card;
+  whether the crop behaves the same there is checked by the dump's
+  recorded crop and by the three llvmpipe cells sitting with the three
+  card cells.
+- **Test 3** and the training half of test 2 need no further job.
+- The reset probe and the twelve cells at 2.8M and 3.2M (observations
+  and the gate-level reading) wait for the user's review of the fault;
+  they are not run on llvmpipe unless the review is still open when the
+  3.6M jobs end.
