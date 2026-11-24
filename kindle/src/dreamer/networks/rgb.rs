@@ -196,6 +196,7 @@ pub(crate) struct Encoder {
     stride2: bool,
     channels: usize,
     side: usize,
+    reduction: usize,
 }
 
 impl Encoder {
@@ -205,8 +206,14 @@ impl Encoder {
         let input_channels =
             config.observation_channels() * if config.rgb_previous_frame { 2 } else { 1 };
         let mut channels = input_channels + if config.rgb_coordinates { 2 } else { 0 };
-        let layers = [2, 3, 4, 4]
-            .into_iter()
+        let stages: &[usize] = if config.rgb_encoder_stage5 {
+            &[2, 3, 4, 4, 4]
+        } else {
+            &[2, 3, 4, 4]
+        };
+        let layers = stages
+            .iter()
+            .copied()
             .enumerate()
             .map(|(i, mult)| {
                 let output = depth * mult;
@@ -229,11 +236,12 @@ impl Encoder {
             stride2: config.rgb_stride2,
             channels,
             side,
+            reduction: config.rgb_encoder_reduction(),
         }
     }
 
     pub(super) fn output_dim(&self) -> usize {
-        (self.side / 16) * (self.side / 16) * self.channels
+        (self.side / self.reduction) * (self.side / self.reduction) * self.channels
     }
 
     pub(super) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
@@ -265,7 +273,7 @@ impl Encoder {
             value,
             batch,
             self.channels,
-            (self.side / 16) * (self.side / 16),
+            (self.side / self.reduction) * (self.side / self.reduction),
         );
         graph.reshape(value, &[batch, self.output_dim()])
     }

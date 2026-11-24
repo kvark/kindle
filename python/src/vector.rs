@@ -96,6 +96,22 @@ impl PyVectorAgent {
     #[classattr]
     const SUPPORTS_RGB160: bool = true;
 
+    /// `rgb_encoder_stage5`: a fifth halving stage in the learned RGB encoder.
+    #[classattr]
+    const SUPPORTS_RGB_ENCODER_STAGE5: bool = true;
+
+    /// `replay_compact_rgb`: device-replay observations kept as one byte per value.
+    #[classattr]
+    const SUPPORTS_REPLAY_COMPACT_RGB: bool = true;
+
+    /// `world_pixel_loss = cross_entropy` for the CDP auxiliary decoder, also with a crop.
+    #[classattr]
+    const SUPPORTS_PIXEL_CROSS_ENTROPY: bool = true;
+
+    /// `world_pixel_stride`: the CDP auxiliary decoder decodes every n-th step of the window.
+    #[classattr]
+    const SUPPORTS_PIXEL_STRIDE: bool = true;
+
     /// `encoder_freeze_update`: the encoder's learning rate is zero from that learner step.
     #[classattr]
     const SUPPORTS_ENCODER_FREEZE: bool = true;

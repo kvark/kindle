@@ -758,18 +758,45 @@ with 32 / 44 / 41 of 144 games past the wall, sampled wide paddle .968
 and narrow .903 (`D60` .966 and .899), greedy .975 and .916 (.975 and
 .920), a move among the last two actions in .53 to .68 of descents. The
 cut is not added to the recipe; with tempered play the actor's entropy
-is closed as a lever. **Running, declared by the assistant:**
-[`C60`](docs/experiments/2026-11-24-breakout-playfield-crop.md), `D60`'s
+is closed as a lever. [`C60`](docs/results/2026-11-24-breakout-playfield-crop.md), `D60`'s
 command with the 96x96 input cropped to the playfield inside the walls
 (`--image-crop 8 32 144 161`: 1.5 by 1.68 native pixels per input pixel
-instead of 1.67 by 2.19, same model, memory and time per update; the
-score digits, ceiling and walls are dropped); same initial weights as
-`D60`, not a twin; root `/x/Temp/kindle-breakout-crop-20261124`,
-`queue-38.json` (21 jobs), unit `kindle-breakout-crop6007-20261124`,
-launched 08:47 UTC November 24, about 8 hours. It is the one input-side
-test that costs no engineering; the direction itself (an aligned 1:1
-input, a loss sharp on small objects, or accepting the level) is the
-user's and open.
+instead of 1.67 by 2.19, same model, memory and time per update; root
+`/x/Temp/kindle-breakout-crop-20261124`, `queue-38.json` then
+`queue-38b.json`, 21 jobs, finished 16:40 UTC November 24; the
+assistant's design), fails its four tests and is not retained: the
+state reads positions no better (ball height 3.6 px against 3.3,
+landing minus paddle 6.2 against 6.3, paddle 2.9 against 2.3), the
+learner trains at 392.1 per game over 2.8M to 3.6M against 412.2
+(difference -20.0, standard error 7.3), play pools to 405 / 412.5 / 413
+with 25 / 26 / 20 of 144 games past the wall, and greedy play at 2.8M
+stalls at the serve (one game cut). **A fifth GPU kernel fault** (same
+shape, again a frozen-inference job) stopped its queue at 16:12 UTC
+November 24 after training; the user reviewed it at 16:24 UTC and chose
+to continue on the same boot (review file
+`gpu-fault-20261124-1612/reviewed-kernel-faults.json` under that root,
+all 53 fault records of the boot, that boot only). **A further fault
+needs a further review.** At the same time **the user chose the
+direction: an input aligned 1:1 with the game's pixels and a sharp
+loss.** Built for it on November 24 (extension rebuilt; each option is
+off unless set, and the unchanged recipe reproduces its reference smoke
+bit for bit): `--image-size 160 --image-crop 0 33 160 160` is the exact
+1:1 input (a same-size crop passes native bytes through to the last
+place); `--replay-compact` keeps device-replay observations as bytes (a
+quarter of the memory; not a bit-exact twin of the float replay,
+because the host's decode can differ from the card's division in the
+last place); `--rgb-encoder-stage5` adds a fifth halving stage (a 160
+input ends on a 5x5 grid); `--world-pixel-loss cross_entropy` trains
+the CDP auxiliary decoder with the per-value Bernoulli likelihood
+(squared error behind the decoder's sigmoid has a vanishing gradient
+for a confidently missed pixel), now also allowed with a crop;
+`--world-pixel-stride N` decodes every N-th step of the training
+window. Measured on 16,384-action smokes (root
+`/x/Temp/kindle-breakout-aligned-20261124`): the 1:1 input alone runs
+at 70.6 actions per second against 138 (peak 8.5 GiB at 17k replay
+frames) and the 1:1 input with the decoder on every step at 24.3 (peak
+11.5 GiB, too much for a 100k replay), with the latent loss undisturbed
+after 1,000 updates. The run itself is not declared or launched yet.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
@@ -778,8 +805,15 @@ user approved deleting the October 27 to November 9 run roots: 283
 removed, 17 kept (lists in `cleanup-20261122/` under the collapse root),
 151 GB free afterwards. Run-root paths from those dates in the roadmap
 and older reports, and the November 10 to 12 screen roots removed
-earlier, no longer exist; the reports are the record. **Check `df` before
-launching a queue; a run needs about 7 GB.** A `journalctl --since` filter without a date, read after
+earlier, no longer exist; the reports are the record. On November 24, at the
+user's request to clean up, the 2,034 `*-frozen` weight files that
+evaluation cells had written since November 15 (159 GiB, each verified
+by tensor content to equal a kept checkpoint; metadata and logs stay),
+the smoke runs' weights and a scratch build cache were deleted (lists in
+`cleanup-20261124/` under the collapse root): 243 GB free afterwards.
+Roots from before November 15 were not thinned, because their audits
+pin file hashes. **Check `df` before launching a queue; a run needs
+about 7 GB, 4 GB of it frozen exports that duplicate the checkpoints.** A `journalctl --since` filter without a date, read after
 midnight, names a future time; use dated filters in queue summaries.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
 measured against the perfect-knowledge planner under the same
@@ -842,7 +876,7 @@ The **five-game goal is unfinished**:
 | [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
 | [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
 | [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
-| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276; unchanged recipe's best checkpoint (22003 at 1.6M) median 380.5; [encoder frozen from 1.2M](docs/results/2026-11-20-breakout-encoder-freeze.md): 404.5 at 2.8M on seed 22003, [held-out seed 5011](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md) 382 at 2.4M; [frozen from 800k to 3.6M](docs/results/2026-11-21-breakout-encoder-freeze-800k.md): level at about 345 per training game, 402.5 at 3.6M; [open-loop supervision on the frozen recipe](docs/results/2026-11-22-breakout-open-loop-freeze.md): worse, 338 at 3.6M; [tempered play](docs/results/2026-11-22-breakout-tempered-play.md): no more balls returned; [averaged checkpoints](docs/results/2026-11-22-breakout-averaged-checkpoints.md): 420 with 40 of 144 past 432 on seed 22003, held-out 409 with 19 of 144; [learning rates cut to a quarter from 2.4M](docs/results/2026-11-23-breakout-learning-rate-drop.md): 382 per training game against 344, 420 with 24 of 96 past 432 at 2.8M, 406.5 with 18 at 3.6M (seed 22003); [the same drop on held-out seed 5011](docs/results/2026-11-23-breakout-learning-rate-drop-seed5011.md): 364 per training game over 2.8M to 3.6M, 404.5 with 17 of 144 past 432 at 3.2M, 398 with 22 at 3.6M; [the fixed recipe on fresh seed 6007](docs/results/2026-11-24-breakout-recipe-seed6007.md): 412 per training game over 2.8M to 3.6M, 424.5 with 39 of 144 past 432 at 3.6M (424 with 45 at 2.8M), greedy 427.5 with 25 of 72; [the actor's entropy coefficient cut to a tenth from 2.4M](docs/results/2026-11-24-breakout-actor-entropy-schedule.md): policy far sharper, play unchanged (424 with 41 of 144 at 3.6M) | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best single checkpoint 420 with 24 of 96 past 432 on a development seed, held-out 404.5 with 17 of 144 and 398 with 22 of 144, fresh seed 6007 424 with 45 of 144 and 424.5 with 39 of 144; averaged checkpoints 420 with 40 of 144 and held-out 409 with 19 of 144). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions unless the encoder is frozen |
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276; unchanged recipe's best checkpoint (22003 at 1.6M) median 380.5; [encoder frozen from 1.2M](docs/results/2026-11-20-breakout-encoder-freeze.md): 404.5 at 2.8M on seed 22003, [held-out seed 5011](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md) 382 at 2.4M; [frozen from 800k to 3.6M](docs/results/2026-11-21-breakout-encoder-freeze-800k.md): level at about 345 per training game, 402.5 at 3.6M; [open-loop supervision on the frozen recipe](docs/results/2026-11-22-breakout-open-loop-freeze.md): worse, 338 at 3.6M; [tempered play](docs/results/2026-11-22-breakout-tempered-play.md): no more balls returned; [averaged checkpoints](docs/results/2026-11-22-breakout-averaged-checkpoints.md): 420 with 40 of 144 past 432 on seed 22003, held-out 409 with 19 of 144; [learning rates cut to a quarter from 2.4M](docs/results/2026-11-23-breakout-learning-rate-drop.md): 382 per training game against 344, 420 with 24 of 96 past 432 at 2.8M, 406.5 with 18 at 3.6M (seed 22003); [the same drop on held-out seed 5011](docs/results/2026-11-23-breakout-learning-rate-drop-seed5011.md): 364 per training game over 2.8M to 3.6M, 404.5 with 17 of 144 past 432 at 3.2M, 398 with 22 at 3.6M; [the fixed recipe on fresh seed 6007](docs/results/2026-11-24-breakout-recipe-seed6007.md): 412 per training game over 2.8M to 3.6M, 424.5 with 39 of 144 past 432 at 3.6M (424 with 45 at 2.8M), greedy 427.5 with 25 of 72; [the actor's entropy coefficient cut to a tenth from 2.4M](docs/results/2026-11-24-breakout-actor-entropy-schedule.md): policy far sharper, play unchanged (424 with 41 of 144 at 3.6M); [the input cropped to the playfield](docs/results/2026-11-24-breakout-playfield-crop.md): state no sharper, 392 per training game, 413 with 20 of 144 at 3.6M | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best single checkpoint 420 with 24 of 96 past 432 on a development seed, held-out 404.5 with 17 of 144 and 398 with 22 of 144, fresh seed 6007 424 with 45 of 144 and 424.5 with 39 of 144; averaged checkpoints 420 with 40 of 144 and held-out 409 with 19 of 144). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions unless the encoder is frozen |
 | [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
 
 Published long-run scores are aspirations,not matched-budget comparisons.

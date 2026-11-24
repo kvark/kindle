@@ -78,6 +78,10 @@ def rgb_preprocessing(config):
         description += '; encoder appends fixed x/y pixel-center coordinates in [-0.5,0.5]'
     if config.get('rgb_stride2', False):
         description += '; encoder uses stride-two convolutions without max-pooling'
+    if config.get('rgb_encoder_stage5', False):
+        description += '; encoder has a fifth halving stage'
+    if config.get('replay_compact_rgb', False):
+        description += '; replay keeps observations as bytes'
     return description
 
 
@@ -100,6 +104,10 @@ def main():
                         help="fresh learned RGB: append fixed x/y coordinate channels inside the CNN")
     parser.add_argument("--rgb-stride2", action="store_true",
                         help="fresh learned RGB: downsample with stride-two convolutions without max-pooling")
+    parser.add_argument("--rgb-encoder-stage5", action="store_true",
+                        help="fresh learned RGB: a fifth halving encoder stage (side must be divisible by 32), so a 160 input ends on a 5x5 grid")
+    parser.add_argument("--replay-compact", action="store_true",
+                        help="fresh learned RGB: keep device-replay observations as one byte per value (lossless; a quarter of the replay memory)")
     parser.add_argument("--image-crop", type=int, nargs=4, metavar=("X", "Y", "WIDTH", "HEIGHT"),
                         help="fresh learned RGB/CDP: native-pixel crop before the single GPU resize; restore uses checkpoint crop")
     parser.add_argument("--cdp-scale", type=float,
@@ -158,14 +166,16 @@ def main():
                         help="fresh CDP only: posterior continuation loss multiplier for true game-over rows")
     parser.add_argument("--prior-continuation-scale", type=float,
                         help="fresh CDP only: auxiliary continuation loss on sampled one-step priors")
-    parser.add_argument("--world-pixel-loss", choices=("squared_error", "motion_cross_entropy"),
-                        help="learned-RGB world pixel objective; motion cross-entropy weights changed pixels")
+    parser.add_argument("--world-pixel-loss", choices=("squared_error", "cross_entropy", "motion_cross_entropy"),
+                        help="learned-RGB world pixel objective; cross-entropy is the per-value Bernoulli likelihood (CDP auxiliary decoder only); motion cross-entropy weights changed pixels")
     parser.add_argument("--world-prediction-length", type=int,
                         help="learned-RGB world: imagined steps after the observed prefix whose images are supervised directly")
     parser.add_argument("--world-context-lag", type=int,
                         help="learned-RGB pixel world: decoder also sees one observed frame from this many arrivals back, held fixed through the prior rollout (standalone rgb_context_lag)")
     parser.add_argument("--world-pixel-scale", type=float,
                         help="fresh CDP only: auxiliary RGB decoder weight; trained with --world-pixel-loss/--world-prediction-length while CDP keeps its own scales")
+    parser.add_argument("--world-pixel-stride", type=int,
+                        help="fresh CDP with --world-pixel-scale: decode every n-th step of the training window (n divides the window) instead of every step")
     parser.add_argument("--prior-reward-scale", type=float,
                         help="fresh CDP only: auxiliary reward loss on sampled one-step priors")
     parser.add_argument("--actor-dynamics-scale", type=float,
@@ -647,6 +657,7 @@ def main():
     training_options.add("--world-pixel-loss")
     training_options.add("--world-prediction-length")
     training_options.add("--world-pixel-scale")
+    training_options.add("--world-pixel-stride")
     training_options.add("--world-context-lag")
     training_options.add("--replay-value-completed")
     training_options.add("--replay-actor-scale")
@@ -671,6 +682,7 @@ def main():
     training_options.add("--training-precision")
     training_options.add("--rgb-coordinates")
     training_options.add("--rgb-stride2")
+    training_options.update(("--rgb-encoder-stage5", "--replay-compact"))
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
@@ -800,6 +812,9 @@ def main():
         if (metadata.get("config", {}).get("rgb_stride2", False)
                 and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_STRIDE2", False)):
             parser.error("stride-two checkpoint requires native RGB stride-two support")
+        if (metadata.get("config", {}).get("rgb_encoder_stage5", False)
+                and not getattr(kindle.VectorAgent, "SUPPORTS_RGB_ENCODER_STAGE5", False)):
+            parser.error("five-stage checkpoint requires native support for the fifth RGB encoder stage")
     args.observation_size = args.observation_size or "native"
     learned_rgb = args.encoder_checkpoint is None
     if args.rgb_stride2:
@@ -825,6 +840,27 @@ def main():
         parser.error("image-size96 requires native RGB96 support")
     if args.image_size in (128, 160) and not getattr(kindle.VectorAgent, "SUPPORTS_RGB160", False):
         parser.error("image-size128/160 requires native RGB160 support")
+    if args.rgb_encoder_stage5:
+        if args.restore or not learned_rgb or (args.image_size or 64) % 32:
+            parser.error("rgb-encoder-stage5 requires fresh training with the learned CNN and an image size divisible by 32")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_RGB_ENCODER_STAGE5", False):
+            parser.error("rgb-encoder-stage5 requires native support")
+    if args.replay_compact:
+        if args.restore or not learned_rgb or args.encoder_training:
+            parser.error("replay-compact requires fresh training with the learned CNN")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_REPLAY_COMPACT_RGB", False):
+            parser.error("replay-compact requires native support")
+    if args.world_pixel_loss == "cross_entropy":
+        if not args.cdp or args.world_pixel_scale is None or args.world_prediction_length is not None:
+            parser.error("world-pixel-loss cross_entropy is the CDP auxiliary decoder's loss on posterior states: it needs --cdp and --world-pixel-scale and no --world-prediction-length")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_PIXEL_CROSS_ENTROPY", False):
+            parser.error("world-pixel-loss cross_entropy requires native support")
+    if args.world_pixel_stride is not None:
+        if (not args.cdp or args.world_pixel_scale is None or args.world_prediction_length is not None
+                or args.world_pixel_stride < 2 or args.batch_length % args.world_pixel_stride):
+            parser.error("world-pixel-stride needs --cdp and --world-pixel-scale, no --world-prediction-length, and a stride of two or more that divides the batch length")
+        if not getattr(kindle.VectorAgent, "SUPPORTS_PIXEL_STRIDE", False):
+            parser.error("world-pixel-stride requires native support")
     if args.image_crop is not None:
         if not learned_rgb:
             parser.error("image-crop requires the learned RGB/CNN frontend")
@@ -1014,6 +1050,8 @@ def main():
             config["world_prediction_length"] = args.world_prediction_length
         if args.world_pixel_scale is not None:
             config["world_pixel_scale"] = args.world_pixel_scale
+        if args.world_pixel_stride is not None:
+            config["world_pixel_stride"] = args.world_pixel_stride
         if args.world_context_lag is not None:
             config["rgb_spatial_decoder"] = True
             config["rgb_context_lag"] = args.world_context_lag
@@ -1064,6 +1102,10 @@ def main():
                 config["rgb_coordinates"] = True
             if args.rgb_stride2:
                 config["rgb_stride2"] = True
+            if args.rgb_encoder_stage5:
+                config["rgb_encoder_stage5"] = True
+            if args.replay_compact:
+                config["replay_compact_rgb"] = True
             if args.image_crop is not None:
                 config["observation_crop"] = dict(zip(("x", "y", "width", "height"), args.image_crop))
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)

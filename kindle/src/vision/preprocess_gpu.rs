@@ -990,6 +990,59 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires guarded GPU; a crop of the output's own size passes native bytes through to the last place"]
+    fn gpu_rgb_same_size_crop_is_the_identity() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let (width, height, side) = (160usize, 210usize, 160usize);
+        let crop = FrameCrop {
+            x: 0,
+            y: 33,
+            width: 160,
+            height: 160,
+        };
+        let elements = 3 * side * side;
+        let mut graph = meganeura::Graph::new();
+        let input = graph.input("observation", &[2, elements]);
+        let output = graph.neg(input);
+        graph.set_outputs(vec![output]);
+        let mut session = meganeura::build(
+            &graph,
+            meganeura::SessionConfig {
+                mode: meganeura::Mode::Inference,
+                gpu: Some(Arc::clone(&gpu)),
+                ..Default::default()
+            },
+        )
+        .0;
+        let rgb: Vec<u8> = (0..width * height * 3)
+            .map(|i| ((i * 37 + i / 43) % 256) as u8)
+            .collect();
+        let mut expected = vec![0.0; elements * 2];
+        for y in 0..side {
+            for x in 0..side {
+                for channel in 0..3 {
+                    let byte = rgb[((y + crop.y as usize) * width + x) * 3 + channel];
+                    expected[elements + channel * side * side + y * side + x] =
+                        f32::from(byte) / 255.0 - 0.5;
+                }
+            }
+        }
+        let mut pixels = GpuPreprocessor::rgb(Arc::clone(&gpu), 2, side, Some(crop));
+        pixels.cpu_frames(&mut session, &[(1, &rgb, width, height)]);
+        let actual = check_patches(&mut session, &expected, "same-size crop");
+        // The test graph negates its input. The device's division may round
+        // the last place differently from the host's, and no more than that:
+        // the byte replay decodes on the host with `byte / 255 - 0.5`.
+        let worst = actual
+            .iter()
+            .zip(&expected)
+            .map(|(negative, value)| (-negative - value).abs())
+            .fold(0.0_f32, f32::max);
+        assert!(worst <= f32::EPSILON / 2.0, "same-size crop error {worst}");
+        pixels.wait();
+    }
+
+    #[test]
     #[ignore = "requires guarded GPU; RGB pairs across subset arrivals and resets"]
     fn gpu_rgb_pairs_preserve_stream_history_and_repeat_episode_first_frames() {
         let gpu = Arc::new(crate::init_gpu_context().unwrap());

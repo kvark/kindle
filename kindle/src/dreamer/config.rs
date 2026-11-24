@@ -400,6 +400,15 @@ pub struct DreamerConfig {
     /// Downsample the learned RGB encoder with stride-two convolutions, without max-pooling.
     #[serde(default, skip_serializing_if = "is_false")]
     pub rgb_stride2: bool,
+    /// Add a fifth halving stage to the learned RGB encoder, so a 160-pixel
+    /// input ends on a 5x5 grid as a 64-pixel input ends on 4x4.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub rgb_encoder_stage5: bool,
+    /// Keep device-replay observations as one byte per value. Learned-RGB
+    /// preprocessing emits `byte / 255 - 0.5`, so the byte is recovered exactly;
+    /// the host's decode may differ from the device's division in the last place.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub replay_compact_rgb: bool,
     /// Optional native-frame rectangle for the learned-RGB GPU preprocessor.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub observation_crop: Option<crate::vision::preprocess_gpu::FrameCrop>,
@@ -456,6 +465,11 @@ pub struct DreamerConfig {
     /// Plain learned-RGB worlds weight pixels with `loss_scales.reconstruction`.
     #[serde(default, skip_serializing_if = "is_zero_f32")]
     pub world_pixel_scale: f32,
+    /// CDP auxiliary decoder only: decode every this-many-th step of the
+    /// training window (the last step of each stride) instead of every step.
+    /// The loss stays a mean over decoded frames.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub world_pixel_stride: Option<usize>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub open_loop_supervision: Option<OpenLoopSupervision>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -632,6 +646,8 @@ impl DreamerConfig {
             world_mean_latents: false,
             world_gaussian_dim: None,
             rgb_stride2: false,
+            rgb_encoder_stage5: false,
+            replay_compact_rgb: false,
             observation_crop: None,
             video_encoder: None,
             future_target_standardization: None,
@@ -649,6 +665,7 @@ impl DreamerConfig {
             world_pixel_loss: super::world_learner::PixelLoss::SquaredError,
             world_prediction_length: 0,
             world_pixel_scale: 0.0,
+            world_pixel_stride: None,
             open_loop_supervision: None,
             color_centroid_supervision: None,
             rgb_color_attention: None,
@@ -811,9 +828,23 @@ impl DreamerConfig {
             | ObservationKind::Rgb96
             | ObservationKind::Rgb128
             | ObservationKind::Rgb160 => {
-                let side = self.observation_grid() / 16;
+                let side = self.observation_grid() / self.rgb_encoder_reduction();
                 side * side * self.network().vision_depth * 4
             }
+        }
+    }
+
+    /// Total spatial reduction of the learned RGB encoder.
+    pub const fn rgb_encoder_reduction(&self) -> usize {
+        if self.rgb_encoder_stage5 { 32 } else { 16 }
+    }
+
+    /// Width of one stored device-replay observation in 32-bit words.
+    pub fn replay_observation_words(&self) -> usize {
+        if self.replay_compact_rgb {
+            self.observation_dim() / 4
+        } else {
+            self.observation_dim()
         }
     }
 
@@ -1214,6 +1245,20 @@ impl DreamerConfig {
         if self.rgb_stride2 && (!self.observation_kind.is_rgb() || self.video_encoder.is_some()) {
             return Err("RGB stride-two convolutions require the learned RGB encoder".into());
         }
+        if self.rgb_encoder_stage5
+            && (!self.observation_kind.is_rgb()
+                || self.video_encoder.is_some()
+                || !self.observation_grid().is_multiple_of(32))
+        {
+            return Err("a fifth RGB encoder stage requires the learned RGB encoder and a side divisible by 32".into());
+        }
+        if self.replay_compact_rgb
+            && (!self.observation_kind.is_rgb()
+                || self.video_encoder.is_some()
+                || !self.observation_dim().is_multiple_of(4))
+        {
+            return Err("compact replay requires learned-RGB observations whose size is a multiple of four values".into());
+        }
         if self.rgb_coordinates && (!self.observation_kind.is_rgb() || self.video_encoder.is_some())
         {
             return Err("RGB coordinates require the learned RGB encoder".into());
@@ -1446,11 +1491,25 @@ impl DreamerConfig {
                 && (!self.is_cdp()
                     || self.video_encoder.is_some()
                     || self.rgb_frame_pair
-                    || self.observation_crop.is_some()
                     || self.rgb_spatial_decoder
                     || self.reconstruction_target_standardization.is_some())
             {
                 return Err("world_pixel_scale is the CDP auxiliary pixel decoder; plain learned-RGB worlds use reconstruction".into());
+            }
+            if let Some(stride) = self.world_pixel_stride
+                && (stride < 2
+                    || !self.world_backprop_length.is_multiple_of(stride)
+                    || !self.is_cdp()
+                    || self.world_pixel_scale <= 0.0
+                    || self.world_prediction_length > 0
+                    || self.rgb_spatial_decoder
+                    || self.rgb_event_heads
+                    || !matches!(
+                        self.world_pixel_loss,
+                        PixelLoss::SquaredError | PixelLoss::CrossEntropy
+                    ))
+            {
+                return Err("world_pixel_stride needs the CDP auxiliary decoder on posterior states and a stride of two or more that divides the training window".into());
             }
             if (self.world_prediction_length > 0
                 || self.world_pixel_loss != PixelLoss::SquaredError)
@@ -1458,13 +1517,16 @@ impl DreamerConfig {
                     || !self.trains_pixels()
                     || self.video_encoder.is_some()
                     || self.rgb_frame_pair
-                    || self.observation_crop.is_some()
                     || (self.rgb_spatial_decoder && self.rgb_context_lag.is_none())
                     || self.reconstruction_target_standardization.is_some()
                     || !matches!(
                         self.world_pixel_loss,
-                        PixelLoss::SquaredError | PixelLoss::MotionCrossEntropy
-                    ))
+                        PixelLoss::SquaredError
+                            | PixelLoss::CrossEntropy
+                            | PixelLoss::MotionCrossEntropy
+                    )
+                    || (self.world_pixel_loss == PixelLoss::CrossEntropy
+                        && self.world_prediction_length > 0))
             {
                 return Err("agent world pixel objectives require a learned-RGB world that trains pixels: reconstruction, or CDP with world_pixel_scale".into());
             }
@@ -1567,7 +1629,7 @@ impl DreamerConfig {
                 .is_some_and(|update| update == 0)
             || self
                 .actor_entropy_drop_factor
-                .is_some_and(|factor| !(factor >= 0.0 && factor < 1.0))
+                .is_some_and(|factor| !(0.0..1.0).contains(&factor))
         {
             return Err(
                 "actor_entropy_drop_update must be positive and actor_entropy_drop_factor in [0, 1), set together"
@@ -2584,6 +2646,36 @@ mod tests {
         config.color_centroid_supervision = None;
         config.observation_crop.as_mut().unwrap().width = 0;
         assert!(config.check().is_err());
+    }
+
+    #[test]
+    fn fifth_encoder_stage_and_compact_replay_are_optional_and_checked() {
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_kind = ObservationKind::Rgb160;
+        let value = serde_json::to_value(&config).unwrap();
+        assert!(value.get("rgb_encoder_stage5").is_none());
+        assert!(value.get("replay_compact_rgb").is_none());
+        let depth = config.network().vision_depth;
+        assert_eq!(config.encoded_observation_dim(), 10 * 10 * 4 * depth);
+        assert_eq!(config.replay_observation_words(), 3 * 160 * 160);
+        config.rgb_encoder_stage5 = true;
+        config.replay_compact_rgb = true;
+        assert!(config.check().is_ok());
+        assert_eq!(config.encoded_observation_dim(), 5 * 5 * 4 * depth);
+        assert_eq!(config.replay_observation_words(), 3 * 160 * 160 / 4);
+        let value = serde_json::to_value(&config).unwrap();
+        assert_eq!(value["rgb_encoder_stage5"], true);
+        assert_eq!(value["replay_compact_rgb"], true);
+        assert_eq!(
+            serde_json::from_value::<DreamerConfig>(value).unwrap(),
+            config
+        );
+        config.observation_kind = ObservationKind::Rgb48;
+        assert!(config.check().unwrap_err().contains("divisible by 32"));
+        config.rgb_encoder_stage5 = false;
+        assert!(config.check().is_ok());
+        config.observation_kind = ObservationKind::Features;
+        assert!(config.check().unwrap_err().contains("compact replay"));
     }
 
     #[test]

@@ -905,6 +905,27 @@ fn training_graph(
             } else {
                 observation
             };
+            // Optionally decode a fixed subset of the window's steps.
+            let (state, observation, rows) = match config.world_pixel_stride {
+                Some(stride) => {
+                    let start = group * time_batch_length;
+                    let picked = (0..chunk.len())
+                        .filter(|step| (start + step + 1).is_multiple_of(stride))
+                        .collect::<Vec<_>>();
+                    assert!(!picked.is_empty(), "pixel stride exceeds the time group");
+                    let states = picked.iter().map(|&i| chunk[i].state).collect::<Vec<_>>();
+                    let frames = picked
+                        .iter()
+                        .map(|&i| observations[start + i])
+                        .collect::<Vec<_>>();
+                    (
+                        stack_time(&mut graph, &states, batch, config.feature_dim()),
+                        stack_time(&mut graph, &frames, batch, config.observation_dim()),
+                        batch * picked.len(),
+                    )
+                }
+                None => (state, observation, rows),
+            };
             let squared = if pixel_loss != PixelLoss::SquaredError {
                 let loss = if config.rgb_spatial_decoder {
                     let start = group * time_batch_length;

@@ -546,14 +546,14 @@ impl SequenceReplay {
                 } => {
                     device_copies.push((
                         *slot,
-                        config.observation_dim(),
+                        config.replay_observation_words(),
                         0,
                         row * size.deter,
                         size.deter,
                     ));
                     device_copies.push((
                         *slot,
-                        config.observation_dim() + size.deter,
+                        config.replay_observation_words() + size.deter,
                         1,
                         row * stoch_width,
                         stoch_width,
@@ -573,7 +573,7 @@ impl SequenceReplay {
                             let width = crate::vision::levjepa::joint::PIXELS;
                             device_copies.push((
                                 *slot,
-                                config.observation_dim() + config.feature_dim(),
+                                config.replay_observation_words() + config.feature_dim(),
                                 time + length + 2,
                                 row * width,
                                 width,
@@ -584,7 +584,7 @@ impl SequenceReplay {
                                 0,
                                 time + 2,
                                 row * config.observation_dim(),
-                                config.observation_dim(),
+                                config.replay_observation_words(),
                             ));
                         }
                     }
@@ -616,6 +616,20 @@ impl SequenceReplay {
                     0 => &mut initial_deter,
                     1 => &mut initial_stoch,
                     time if time >= length + 2 => &mut pixels.as_mut().unwrap()[time - length - 2],
+                    time if config.replay_compact_rgb => {
+                        // Four stored bytes per word, centered as the
+                        // preprocessing shader centers them.
+                        let frame =
+                            &mut observations[time - 2][offset..offset + config.observation_dim()];
+                        for (centered, word) in frame.chunks_exact_mut(4).zip(&values) {
+                            for (centered, byte) in
+                                centered.iter_mut().zip(word.to_bits().to_le_bytes())
+                            {
+                                *centered = f32::from(byte) / 255.0 - 0.5;
+                            }
+                        }
+                        continue;
+                    }
                     time => &mut observations[time - 2],
                 };
                 target[offset..offset + width].copy_from_slice(&values);
@@ -1557,6 +1571,16 @@ mod tests {
     #[test]
     #[ignore = "requires separately guarded GPU; device prefix readback, eviction and refresh match stored host rows"]
     fn device_replay_prefix_matches_host_storage() {
+        device_replay_matches_host(false);
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; byte-packed device observations restore the stored host rows exactly"]
+    fn compact_device_replay_matches_host_storage() {
+        device_replay_matches_host(true);
+    }
+
+    fn device_replay_matches_host(compact: bool) {
         use std::sync::Arc;
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
@@ -1572,6 +1596,8 @@ mod tests {
         config.world_backprop_length = 16;
         config.replay_context = 9;
         config.replay_capacity = 64;
+        config.replay_compact_rgb = compact;
+        config.check().unwrap();
         let size = config.network();
         let latent = size.stoch * size.classes;
         let mut graph = meganeura::Graph::new();
@@ -1591,6 +1617,13 @@ mod tests {
             let mut arrivals = Vec::new();
             for stream in 0..2 {
                 let mut arrival = frame(stream * 100 + time, &config);
+                if compact {
+                    // Every byte level, in an order that differs per frame.
+                    let values = (0..config.observation_dim())
+                        .map(|i| ((i * 7 + (stream * 100 + time) * 31) % 256) as f32 / 255.0 - 0.5)
+                        .collect();
+                    arrival.observation = Observation::rgb(values, config.observation_grid());
+                }
                 if time == 0 || (stream == 1 && time == 14) {
                     arrival.flags.is_first = true;
                     arrival.previous_action = None;

@@ -121,6 +121,76 @@ fn cdp_world_trains_an_auxiliary_pixel_decoder_and_rollout() {
     assert!(negative.check().is_err());
 }
 
+fn cdp_with_cross_entropy(stride: Option<usize>) -> DreamerConfig {
+    let mut c = cdp_with_pixels();
+    c.world_prediction_length = 0;
+    c.world_pixel_loss = PixelLoss::CrossEntropy;
+    c.world_pixel_stride = stride;
+    c
+}
+
+#[test]
+fn cdp_auxiliary_decoder_accepts_cross_entropy_a_crop_and_a_time_stride() {
+    let parameters = |c: &DreamerConfig| {
+        let graph = world::build_training_graph(&world_training_config(c), c.world_backprop_length);
+        let mut names = graph
+            .nodes()
+            .iter()
+            .filter_map(|n| match &n.op {
+                Op::Parameter { name } => Some(name.clone()),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        names.sort();
+        names
+    };
+    let every = cdp_with_cross_entropy(None);
+    assert!(every.check().is_ok(), "{:?}", every.check());
+    assert!(
+        serde_json::to_value(&every)
+            .unwrap()
+            .get("world_pixel_stride")
+            .is_none()
+    );
+    let mut strided = cdp_with_cross_entropy(Some(2));
+    assert!(
+        strided.world_backprop_length.is_multiple_of(2),
+        "fixture window"
+    );
+    assert!(strided.check().is_ok(), "{:?}", strided.check());
+    assert_eq!(
+        serde_json::from_value::<DreamerConfig>(serde_json::to_value(&strided).unwrap()).unwrap(),
+        strided
+    );
+    // The stride changes which frames are decoded, not what is trained.
+    assert_eq!(parameters(&every), parameters(&strided));
+    assert!(
+        parameters(&strided)
+            .iter()
+            .any(|n| n.starts_with("world.decoder."))
+    );
+    strided.observation_crop = Some(crate::vision::preprocess_gpu::FrameCrop {
+        x: 0,
+        y: 33,
+        width: 160,
+        height: 160,
+    });
+    assert!(strided.check().is_ok(), "{:?}", strided.check());
+    strided.world_pixel_stride = Some(1);
+    assert!(strided.check().is_err());
+    strided.world_pixel_stride = Some(3);
+    assert!(strided.check().is_err());
+    strided.world_pixel_stride = Some(2);
+    strided.world_pixel_scale = 0.0;
+    assert!(strided.check().is_err());
+    let mut rollout = cdp_with_cross_entropy(None);
+    rollout.world_prediction_length = 2;
+    assert!(rollout.check().is_err());
+    let mut plain = with_rollout();
+    plain.world_pixel_loss = PixelLoss::CrossEntropy;
+    assert!(plain.check().is_err());
+}
+
 fn with_rollout_and_bonus() -> DreamerConfig {
     let mut c = with_rollout();
     c.disagreement_bonus = true;
@@ -287,6 +357,36 @@ fn tiny_rgb_agent_trains_with_the_context_frame_decoder() {
 #[ignore = "builds and runs all Dreamer GPU sessions"]
 fn tiny_cdp_agent_trains_the_auxiliary_pixel_rollout() {
     tiny_cdp_agent_trains(cdp_with_pixels());
+}
+
+#[test]
+#[ignore = "builds and runs all Dreamer GPU sessions"]
+fn tiny_cdp_agent_trains_the_strided_cross_entropy_decoder() {
+    let run = |stride| {
+        let config = cdp_with_cross_entropy(stride);
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let mut core = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
+        let mut rng = StdRng::seed_from_u64(701);
+        let mut losses = Vec::new();
+        for _ in 0..2 {
+            let batch = fixture(&config, &mut rng);
+            let posterior = core.sample_posterior_batch(&batch);
+            let mut targets = core.imagine_and_target(&batch, &posterior);
+            let world = core.train_world(&batch, &posterior, &mut targets);
+            core.sync_world_inference();
+            assert!(world.total_loss.is_finite() && world.future_prediction_loss > 0.0);
+            assert!(world.reconstruction_loss.is_finite() && world.reconstruction_loss > 0.0);
+            core.learner_step += 1;
+            losses.push(world.reconstruction_loss);
+        }
+        losses
+    };
+    let (every, strided) = (run(None), run(Some(2)));
+    // Per-frame means of the same initial decoder on overlapping frames.
+    assert!(
+        (every[0] / strided[0] - 1.0).abs() < 0.2,
+        "{every:?} {strided:?}"
+    );
 }
 
 fn tiny_cdp_agent_trains(config: DreamerConfig) {
