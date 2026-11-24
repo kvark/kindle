@@ -202,3 +202,21 @@ reading: one in twenty.
   8,000 actions of the agent's own play.
 - The same three cohorts as every run since November 17; 24 games per
   cell.
+
+## Amendment, 17:50 UTC November 24: relaunched after a replay paging fix
+
+The first launch (17:29 UTC) was stopped by hand at 17:48 UTC at 55,016
+actions, before any declared reading, because its device memory grew
+1.5 times as fast per replay frame as projected and would have reached
+the limit near 80,000 frames. The cause: the byte replay's 256-frame
+pages are 21 MiB at 160x160, and the allocator's 64 MiB blocks hold two
+of them and waste the rest (the recipe's float pages are 29.5 MiB, two
+per block with 8% lost). Byte pages are now sized to 31 MiB (373
+frames), two per block. Nothing else changed: the same
+`queue-40.json` content relaunched as `queue-40b.json`, guards
+`guards-40b`, unit `kindle-breakout-aligned6007-b-20261124`, at 17:50
+UTC on the extension rebuilt with that change. The stopped launch's
+logs are in `stopped-first-launch-1729/` under the root and are not
+read. The memory projection in "Why" was wrong for this reason; with
+the fix an 80,000-frame replay projects to about 14 GiB. The replay
+stays at 80,000 frames as declared.

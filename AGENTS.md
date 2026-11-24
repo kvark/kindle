@@ -803,9 +803,12 @@ GiB), and after 16,384 actions the state already reads the paddle to
 `D60`'s command on seed 6007 with the 1:1 input, the fifth stage, the
 byte replay at 80,000 frames (100,000 projects to within 0.4 GiB of the
 memory limit) and the cross-entropy decoder at weight 1 on every fourth
-step; `queue-40.json` (26 jobs), unit
-`kindle-breakout-aligned6007-20261124`, launched 17:29 UTC November 24,
-about 20 hours of training. Declared stopping rules: stop if the return
+step; 26 jobs, unit
+`kindle-breakout-aligned6007-b-20261124` (`queue-40b.json`), relaunched
+17:50 UTC November 24 after the first launch was stopped at 55,016
+actions for a memory defect (the byte replay's 21 MiB pages wasted a
+third of each 64 MiB allocator block; they are now 31 MiB, two per
+block), about 20 hours of training. Declared stopping rules: stop if the return
 per training game is below 57 over 400k to 800k or below 125 over 800k
 to 1.2M. The design details are the assistant's; the direction is the
 user's.

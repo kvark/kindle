@@ -9,6 +9,9 @@ use meganeura::Session;
 use super::{DreamerConfig, device_copy::DeviceCopies, readback::Readback};
 
 const PAGE_FRAMES: usize = 256;
+/// Byte pages are sized so that two fill one of the allocator's 64 MiB
+/// blocks; a 256-frame page of 160x160 bytes left a third of each block unused.
+const COMPACT_PAGE_BYTES: usize = 31 << 20;
 
 struct PackBindings {
     values: gpu::BufferPiece,
@@ -76,6 +79,7 @@ pub(super) struct DeviceReplay {
     copies: DeviceCopies,
     pub readback: Readback,
     pages: Vec<gpu::Buffer>,
+    page_frames: usize,
     capacity: usize,
     width: usize,
     /// Words one stored observation occupies in a replay row.
@@ -96,6 +100,14 @@ impl DeviceReplay {
             packer: config.replay_compact_rgb.then(|| Packer::new(&gpu)),
             gpu,
             pages: Vec::new(),
+            page_frames: if config.replay_compact_rgb {
+                PAGE_FRAMES.max(
+                    COMPACT_PAGE_BYTES
+                        / (4 * (config.replay_observation_words() + config.feature_dim())),
+                )
+            } else {
+                PAGE_FRAMES
+            },
             capacity: config.replay_capacity,
             width: config.replay_observation_words()
                 + config.feature_dim()
@@ -118,8 +130,10 @@ impl DeviceReplay {
 
     fn allocate_through(&mut self, last: usize) {
         assert!(last < self.capacity);
-        while self.pages.len() <= last / PAGE_FRAMES {
-            let rows = PAGE_FRAMES.min(self.capacity - self.pages.len() * PAGE_FRAMES);
+        while self.pages.len() <= last / self.page_frames {
+            let rows = self
+                .page_frames
+                .min(self.capacity - self.pages.len() * self.page_frames);
             self.pages.push(self.gpu.create_buffer(gpu::BufferDesc {
                 name: "kindle_replay",
                 size: (rows * self.width * 4) as u64,
@@ -172,13 +186,13 @@ impl DeviceReplay {
                 for &(stream, slot) in slots {
                     let mut params = [0; 16];
                     params[0] = (stream * self.observation_values) as u32;
-                    params[1] = (slot % PAGE_FRAMES * self.width) as u32;
+                    params[1] = (slot % self.page_frames * self.width) as u32;
                     params[2] = self.observation as u32;
                     pipeline.bind(
                         0,
                         &PackBindings {
                             values,
-                            packed: self.pages[slot / PAGE_FRAMES].into(),
+                            packed: self.pages[slot / self.page_frames].into(),
                             params,
                         },
                     );
@@ -210,7 +224,8 @@ impl DeviceReplay {
 
     pub fn region(&self, slot: usize, offset: usize) -> gpu::BufferPiece {
         assert!(slot < self.capacity && offset < self.width);
-        self.pages[slot / PAGE_FRAMES].at(((slot % PAGE_FRAMES * self.width + offset) * 4) as u64)
+        self.pages[slot / self.page_frames]
+            .at(((slot % self.page_frames * self.width + offset) * 4) as u64)
     }
 
     pub fn wait(&mut self) {
