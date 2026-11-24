@@ -220,3 +220,29 @@ logs are in `stopped-first-launch-1729/` under the root and are not
 read. The memory projection in "Why" was wrong for this reason; with
 the fix an 80,000-frame replay projects to about 14 GiB. The replay
 stays at 80,000 frames as declared.
+
+## Amendment, 18:46 UTC November 24: a sixth GPU fault stopped the run
+
+Written before any decision. At 18:43 UTC, 53 minutes into the
+relaunch, a **GPU kernel fault** (ring timeout, illegal opcode, mode-1
+reset, VRAM lost; the sixth on this boot and the first in a training
+job) killed the trainer at 152,296 actions and 9,495 updates, before
+its first checkpoint (400k). Evidence is in `gpu-fault-20261124-1843/`
+under the root; its nine fault records are not reviewed, the card is
+not used and nothing was reset by hand. No declared reading exists and
+none is taken from this launch.
+
+What the 152k actions show, as observations only: device memory was
+level at 14.1 GiB with the replay full, as the corrected projection
+said; the return per training game over 100k to 152k was 16.4 (87
+games) against `D60`'s 2.5 and `C60`'s 8.5 at the same point; the
+latent loss over updates 9,000 to 9,495 was .076 against `D60`'s .126,
+the KL 13.6 against 8.0, and the pixel term 14,012.
+
+Whether this fault has to do with what is new in this job (the byte
+replay's compute pass on every tick, the 160x160 convolutions, the
+decoder) is not known. The five earlier faults all hit frozen-inference
+jobs running unchanged code; training had not faulted in about two
+weeks of runs. A relaunch needs the user's review of the fault first,
+and starts from zero: there is no checkpoint, and checkpoints do not
+hold the replay.

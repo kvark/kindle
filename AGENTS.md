@@ -798,7 +798,7 @@ frames) and the 1:1 input with the decoder on every step at 24.3 (peak
 11.5 GiB, too much for a 100k replay), with the latent loss undisturbed
 after 1,000 updates; on every fourth step it runs at 49.8 (peak 9.4
 GiB), and after 16,384 actions the state already reads the paddle to
-0.9 to 1.4 px. **Running:**
+0.9 to 1.4 px. **Declared, stopped by a fault:**
 [`A60`](docs/experiments/2026-11-24-breakout-aligned-input-sharp-loss.md),
 `D60`'s command on seed 6007 with the 1:1 input, the fifth stage, the
 byte replay at 80,000 frames (100,000 projects to within 0.4 GiB of the
@@ -812,6 +812,15 @@ block), about 20 hours of training. Declared stopping rules: stop if the return
 per training game is below 57 over 400k to 800k or below 125 over 800k
 to 1.2M. The design details are the assistant's; the direction is the
 user's.
+**A sixth GPU kernel fault** (same shape; the first in a training
+job) killed that run at 18:43 UTC November 24, at 152,296 actions and
+before its first checkpoint; evidence in `gpu-fault-20261124-1843/`
+under the root, nine fault records **not reviewed: no GPU job until the
+user reviews it.** Nothing was reset. Whether the fault has to do with
+the job's new code (a compute pass on every tick for the byte replay,
+160x160 convolutions, the decoder) is not known. Its 152k actions, as
+observations: memory level at 14.1 GiB; 16.4 per training game over
+100k to 152k against `D60`'s 2.5; latent loss .076 against .126.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
