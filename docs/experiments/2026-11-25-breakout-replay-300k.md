@@ -10,8 +10,8 @@ test that does not depend on that choice.
 ## Why
 
 - Every run of the fixed recipe replays from the last 100,000 frames,
-  2.8% of a 3.6M-action life and about thirty games at the level the
-  learner ends on. DreamerV3's Atari runs replay from millions. The
+  2.8% of a 3.6M-action life and about forty games at the level the
+  learner ends on. DreamerV3's Atari runs replay from a million or more. The
   limit here has been device memory: the replay keeps frames as 32-bit
   floats and was most of the 15.4 GiB a run used.
 - The one comparison of replay sizes on record points the same way.
@@ -51,7 +51,7 @@ November 24). The GPU review file is the one of 20:44 UTC November 24
 Projected device memory: 3.15 GiB without the replay plus 351 pages of
 32 MiB, 14.1 GiB with the replay full at 300,000 actions (`D60` 15.4;
 400,000 frames would project to 17.7, inside the margin other projects'
-use of the card can take). About 7.5 hours of training at the byte
+use of the card can take). About 7 hours of training at the byte
 replay's 145 actions per second, then about 25 minutes of cells.
 
 ## Checks
@@ -98,8 +98,8 @@ second and peak memory.
   seed's or specific to going below 100,000. Replay length is closed at
   this budget.
 - **The return is below 400 with test 2 passing:** read as no gain; a
-  level between 364 and 400 on this seed is where two of its four runs
-  with changed inputs have landed.
+  level between 364 and 400 on this seed is where both of its runs
+  with a changed input have landed (392 and 364).
 - **Test 2 fails:** the longer replay harms, or the byte replay does;
   the byte replay at 100,000 frames would separate them, under its own
   declaration.
@@ -112,7 +112,7 @@ gate-level reading: one in twenty-five.
 ## Limits
 
 - One seed, one run; the recipe's seeds spread from 364 to 412 per
-  training game and this seed's two unchanged runs are at 412 and 423.
+  training game and this seed's two full-frame runs are at 412 and 423.
 - Two things change together: the replay's length and its storage. The
   byte replay is not a bit-exact twin of the float replay (its decode
   can differ from the card's division in the last place), so the run
