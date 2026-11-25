@@ -294,3 +294,19 @@ available; if it reaches that cap it is killed inside its own unit and
 the 400k reading waits for the declared dump on the card. The second
 400k stretch of training took 146 minutes against 138 for the first
 with the dump beside it.
+
+## Amendment, 02:54 UTC November 25: the 400k dump on the CPU renderer
+
+The early dump of the 400k checkpoint finished at 02:49 UTC after 227
+minutes, inside its raised memory cap. As an observation only (linear
+readout of the state, mean absolute error in native pixels; `D60`'s
+400k reference dump in brackets): paddle 2.5 (2.4), ball x 3.0 (3.7),
+ball height 2.4 (2.6), landing minus paddle one action out 5.5 (5.6),
+two actions out 6.1 (5.7), over all descending rows 6.9 (6.8). At 400k
+the 1:1 learner reads the ball's own position a little better and the
+ball-to-paddle offset the same as `D60`. `D60`'s own readings get worse
+after 400k (800k: 2.9 / 4.3 / 3.5 / 7.2) and test 1 reads the 3.6M
+dump, so this says nothing yet about the test.
+
+The same dump of the 800k checkpoint was started at 02:54 UTC on the
+same terms (unit `kindle-breakout-aligned-lvp800k-20261125`, cap 16 GB).
