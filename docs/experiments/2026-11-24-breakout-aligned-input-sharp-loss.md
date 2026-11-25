@@ -276,3 +276,21 @@ As observations at 400k: 22.6 per training game over the first 400k
 actions (647 games) against `D60`'s 6.6 (1,276 games) and `C60`'s 13.7;
 latent loss .032, KL 13.4, pixel term 13,536 at update 25,147; device
 memory level at 14.1 GiB.
+
+## Amendment, 01:30 UTC November 25: the first stopping rule does not fire
+
+The run passed 800k actions at 01:28 UTC with no fault. The return per
+training game over 400k to 800k is 128.8 (281 games, standard error
+5.7) against the rule's bar of 57; `D60` scored 109.3 and `C60` 114.5
+over the same stretch. The run continues to the second rule at 1.2M
+(bar 125 over 800k to 1.2M). At update 50,026: latent loss .039, KL
+17.0, pixel term 12,104.
+
+The early dump on the CPU renderer is still running after 147 minutes
+and prints no progress. Its memory (the renderer's shared buffers)
+grows by about 27 MiB a minute and had reached 11.7 GB of its 12 GB
+cap, so the unit's cap was raised to 16 GB with 12.8 GB of host memory
+available; if it reaches that cap it is killed inside its own unit and
+the 400k reading waits for the declared dump on the card. The second
+400k stretch of training took 146 minutes against 138 for the first
+with the dump beside it.
