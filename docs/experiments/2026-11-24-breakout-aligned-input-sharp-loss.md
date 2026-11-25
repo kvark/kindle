@@ -321,3 +321,18 @@ stretch, so the run is 22.0 behind `D60` here (standard error 11.6)
 after being 19.5 ahead over 400k to 800k. No stopping rule remains; the
 run goes to 3.6M. At update 75,135: latent loss .029, KL 14.5, pixel
 term 11,368.
+
+## Amendment, 06:44 UTC November 25: the 800k dump on the CPU renderer
+
+The early dump of the 800k checkpoint finished at 06:40 UTC (226
+minutes). As an observation only, same readout and units as the 400k
+one (`D60`'s 800k reference dump in brackets): paddle 3.1 (2.9), ball x
+2.9 (4.3), ball height 2.9 (3.5), landing minus paddle one action out
+5.8 (7.2), two actions out 6.2 (7.2), over all descending rows 7.1
+(8.8). Where `D60`'s state got less precise between 400k and 800k, the
+1:1 learner's nearly held (offset 5.5 to 5.8 against 5.6 to 7.2). `D60`
+later recovered to 6.6 at 1.2M and 6.3 at 3.6M, and test 1's bars at
+3.6M are 2.8 for the ball's height and 5.7 for the offset, so the 800k
+reading sits at the bars, not inside them. No further early dump is
+run; the declared dumps on the card follow training. The run was at
+1,673,768 actions at 06:44 UTC with no fault.
