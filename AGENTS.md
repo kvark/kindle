@@ -837,6 +837,19 @@ to do with the job's new code is not known. Frozen dumps of a 160x160
 checkpoint on llvmpipe take 227 minutes each and about 14 GB of host
 memory by their growth rate (11.7 GB measured after 147 minutes; two
 were run beside the trainer as early observations).
+**Running:**
+[`R60`](docs/experiments/2026-11-25-breakout-replay-300k.md), `D60`'s
+command on seed 6007 with `--replay-capacity 300000 --replay-compact`
+and nothing else changed (the assistant's design; root
+`/x/Temp/kindle-breakout-replay-20261125`, `queue-41.json`, 21 jobs,
+unit `kindle-breakout-replay6007-20261125`, launched 18:36 UTC November
+25, about 7 hours of training; projected device memory 14.1 GiB). The
+one replay-size comparison on record (50,000 against 100,000 frames on
+seed 22003) is 33.9 per training game apart over 0.8M to 1.2M (standard
+error 11.9), and a byte-replay frame with its state takes 37,888 bytes
+against 120,832, so three times the replay fits in less memory than
+`D60` used. The device allocator rounds each replay page up to a power
+of two, which is what the 31 MiB byte pages are sized for.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
@@ -852,7 +865,8 @@ by tensor content to equal a kept checkpoint; metadata and logs stay),
 the smoke runs' weights and a scratch build cache were deleted (lists in
 `cleanup-20261124/` under the collapse root): 243 GB free afterwards.
 Roots from before November 15 were not thinned, because their audits
-pin file hashes. **Check `df` before launching a queue; a run needs
+pin file hashes. On November 25 the aligned root's 54 frozen duplicates (4.3 GiB)
+were removed the same way (`cleanup-20261125/` under that root). **Check `df` before launching a queue; a run needs
 about 7 GB, 4 GB of it frozen exports that duplicate the checkpoints.** A `journalctl --since` filter without a date, read after
 midnight, names a future time; use dated filters in queue summaries.
 **On November 18 the user replaced the Breakout gate:** "learned well" is
