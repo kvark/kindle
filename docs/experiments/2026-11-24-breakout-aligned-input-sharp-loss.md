@@ -310,3 +310,14 @@ dump, so this says nothing yet about the test.
 
 The same dump of the 800k checkpoint was started at 02:54 UTC on the
 same terms (unit `kindle-breakout-aligned-lvp800k-20261125`, cap 16 GB).
+
+## Amendment, 03:54 UTC November 25: the second stopping rule does not fire
+
+The run passed 1.2M actions at 03:54 UTC with no fault; the encoder is
+frozen from here. The return per training game over 800k to 1.2M is
+227.3 (238 games, standard error 7.8) against the rule's bar of 125;
+`D60` scored 249.3 (224 games, 8.6) and `C60` 239.8 over the same
+stretch, so the run is 22.0 behind `D60` here (standard error 11.6)
+after being 19.5 ahead over 400k to 800k. No stopping rule remains; the
+run goes to 3.6M. At update 75,135: latent loss .029, KL 14.5, pixel
+term 11,368.
