@@ -1,6 +1,6 @@
 # The fixed recipe with the byte replay at its own 100,000 frames: the separating arm, and the recipe's run-to-run spread on one seed
 
-Declared 02:20 UTC November 26, before launch. The assistant's design;
+Declared 02:18 UTC November 26, before launch. The assistant's design;
 the user was not asked. The gate, the play mode it reads and the
 direction after the failed precision route remain the user's.
 
