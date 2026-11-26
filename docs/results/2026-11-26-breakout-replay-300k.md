@@ -254,6 +254,30 @@ Replay length above 100,000 frames is not pursued. Half-precision state
 storage for a still longer replay, which the declaration tied to test 1
 passing, is not built.
 
+## Post hoc: the five full runs of seed 6007
+
+Read after the result, 02:17 UTC November 26
+(`analysis/train-returns-seed6007-five-runs.txt`). Training return per
+game:
+
+| Stretch | `D60` | `N60` | `C60` (crop) | `A60` (1:1, byte replay 80k) | `R60` |
+|---|---:|---:|---:|---:|---:|
+| 0.4M to 1.2M | 170.8 | 170.8 | 170.9 | 174.0 | 134.7 |
+| 1.2M to 2.4M | 330.1 | 330.1 | 320.1 | 298.0 | 323.8 |
+| 2.4M to 3.6M | 410.0 | 418.3 | 389.2 | 358.0 | 385.1 |
+
+- The late take-off is this run's alone, and `A60`, which stored bytes
+  at 80,000 frames, does not share it: it belongs to the replay's
+  length.
+- The late deficit is not this run's alone. `C60` is level with `D60`
+  to 2.4M and 21 lower after the cut, as this run is 25 lower; `D60`
+  and `N60` are one trajectory to 2.4M. Whether 410 is this seed's
+  level or one trajectory's has not been measured, so "the rate cut
+  buys less" above may be the recipe's own run-to-run spread. The
+  [byte replay at 100,000 frames](../experiments/2026-11-26-breakout-byte-replay-100k.md)
+  is declared to separate the storage from the length and to give a
+  first repeat of the unchanged configuration.
+
 ## Limits
 
 - One seed, one run. The recipe's seeds spread from 364 to 412 per
