@@ -1,6 +1,6 @@
 # Seed 5011 on seed 6007's frozen encoder: does the encoder at the freeze set a seed's level?
 
-Declared 10:49 UTC November 26, before launch. The assistant's design;
+Declared 10:48 UTC November 26, before launch. The assistant's design;
 the user was not asked. The gate, the play mode it reads and the
 direction after the failed precision route remain the user's.
 

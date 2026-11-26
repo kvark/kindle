@@ -902,6 +902,29 @@ unchanged runs and the three late checkpoints, 77 of 432 sampled games
 and 160 of 432 greedy games pass the wall. The gate-level reading (430
 with half the games past 432) is not met. **`--replay-compact` is safe
 and frees 8.6 GiB.**
+Post hoc on CPU: the frozen encoders of five runs of the recipe,
+applied to the same 64,000 frames, order by level in how well one
+frame's output reads the ball (linear readout of ball x: `D60` 8.0 px
+and `B60` 8.4 at 412 and 410 per training game; `R60` 9.9 at 392, `D22`
+10.6 at 382, `D50` 10.2 at 364; `analysis/encoder-readout-*` in the
+replay root). The recipe's seeds differ by more than any change tried
+since the rate cut (364, 382, 411), and that spread is not run-to-run
+noise where it was measured. `--encoder-transplant CHECKPOINT` (runner
+only, no native change; off unless set) starts a fresh agent on another
+checkpoint's image encoder; a restored agent draws its random streams
+from a different seed than a fresh one, so a transplanted run is not a
+twin of the fresh run in its sampling.
+**Running:**
+[`X50`](docs/experiments/2026-11-26-breakout-encoder-transplant.md),
+the recipe on seed 5011 with `D60`'s frozen encoder transplanted, the
+encoder frozen from the first update and the byte replay (the
+assistant's design; root `/x/Temp/kindle-breakout-transplant-20261126`,
+`queue-44.json`, guards `guards-44`, 21 jobs, unit
+`kindle-breakout-transplant5011-20261126`, launched 10:48 UTC November
+26, about 7 hours of training). Test: 388 or more per training game
+over 2.8M to 3.6M (`D50` 364.2, seed 6007 411.2). If it passes, the
+control is the same command with seed 5011's own frozen encoder, under
+its own declaration.
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
