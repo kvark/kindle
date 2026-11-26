@@ -1,6 +1,6 @@
 # The transplant's control: seed 5011 on its own frozen encoder from the first update
 
-Declared 17:53 UTC November 26, before launch. The assistant's design;
+Declared 17:52 UTC November 26, before launch. The assistant's design;
 the user was not asked. This is the control named in
 [the transplant declaration](2026-11-26-breakout-encoder-transplant.md).
 
