@@ -14,6 +14,8 @@ pub(crate) struct DeviceCopies {
     gpu: Arc<blade_graphics::Context>,
     encoder: blade_graphics::CommandEncoder,
     completion: Option<blade_graphics::SyncPoint>,
+    #[cfg(test)]
+    timing: bool,
 }
 
 impl DeviceCopies {
@@ -27,6 +29,8 @@ impl DeviceCopies {
             gpu,
             encoder,
             completion: None,
+            #[cfg(test)]
+            timing: meganeura::GpuOptions::from_env().timing,
         }
     }
 
@@ -46,18 +50,19 @@ impl DeviceCopies {
                 let available = target
                     .slot_size(ExternalSlot::Input(input))
                     .expect("known target input");
+                if matches!(slot, ExternalSlot::Parameter(_)) {
+                    assert_eq!(
+                        bytes, available,
+                        "snapshot parameter/input storage mismatch"
+                    );
+                }
                 let end = copy
                     .target_offset_bytes
                     .checked_add(bytes)
                     .expect("device copy size overflow");
                 assert!(end <= available, "device copy exceeds target input");
                 assert_eq!(copy.target_offset_bytes % size_of::<f32>(), 0);
-                let source_buffer = match slot {
-                    ExternalSlot::Input(name) => source.input_buffer(name),
-                    ExternalSlot::Output(index) => source.output_buffer(index),
-                    ExternalSlot::Parameter(_) => panic!("copy inputs or outputs only"),
-                }
-                .expect("known source buffer");
+                let source_buffer = source.slot_buffer(slot).expect("known source buffer");
                 let mut target_buffer = target.input_buffer(input).expect("known target buffer");
                 target_buffer.offset = target_buffer
                     .offset
@@ -115,6 +120,18 @@ impl DeviceCopies {
                     .expect("GPU device copy wait failed"),
                 "device copy did not complete"
             );
+            #[cfg(test)]
+            if self.timing && self.gpu.capabilities().timing {
+                let timings = self.encoder.last_timing();
+                meganeura::profiler::record_gpu_timings(&meganeura::profiler::GpuTimings {
+                    passes: timings
+                        .passes
+                        .iter()
+                        .map(|&(name, at)| (name.to_owned(), at))
+                        .collect(),
+                    done: Some(timings.done),
+                });
+            }
         }
     }
 }

@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-25",
+  "dependencies": {
+    "blade": "bbbc93b7d26b8196d9143944fe7d8a61d6da4583",
+    "meganeura": "49a192bfbb5f248041c281bfaea5c3a41d826b24"
+  },
+  "source_files_verified": 329,
+  "checks": [
+    "cargo check --workspace",
+    "cargo check --manifest-path python/Cargo.toml --lib",
+    "source hash comparison",
+    "all346 tensors finite in each recovered checkpoint",
+    "archive member hashes compared to originals"
+  ],
+  "archive": {
+    "status": "passed",
+    "verified_files": 304,
+    "uncompressed_bytes": 505940707,
+    "archive": {
+      "name": "artifacts.tar.gz",
+      "sha256": "e57343340fb1a7fb68e22405b7e2b030ae17fb32b4e63aee9a478d1ea0c7b0d1",
+      "bytes": 392172204
+    },
+    "gpu_calls": 0
+  },
+  "recovered_checkpoints": {
+    "context64": {
+      "learner_step": 867,
+      "environment_step": 5120,
+      "finite_tensors": {
+        "behavior": 66,
+        "slow_value": 11,
+        "world": 269
+      },
+      "sha256": {
+        "behavior.safetensors": "4e57c659c9897cc96c49a1ceeacaf11ce2448d856cbed0886d79564b9e2a1fbb",
+        "world.safetensors": "2010dec64f5dfca822a3b0c82578e6a1dde9331856f3a9722a83f15b708aee33",
+        "metadata.json": "734d0b563dd111e7f347f7d8867854425dad6aab21d0a1e97a07726f86b19783",
+        "slow_value.safetensors": "75a4bdd27d0ac8713eeacc2b62f43e06b48cbcd9127bf6ac4493ea6c73c87e28"
+      }
+    },
+    "breakout-b8-2m": {
+      "learner_step": 499939,
+      "environment_step": 2027152,
+      "finite_tensors": {
+        "behavior": 66,
+        "slow_value": 11,
+        "world": 269
+      },
+      "sha256": {
+        "behavior.safetensors": "74e5f1095c6bc854e109c2c1f76cee5aad4b793b42e5d2bf8a869abf3619214f",
+        "world.safetensors": "0fde56040cd20bc7f659456a2d0fc0a7a9c3ba8fabb39be7e87fcf8697118ca2",
+        "metadata.json": "9a37c5d919bc68f58535ec0ce48397e9bd68b22f8c350c40357a8b267ddb3574",
+        "slow_value.safetensors": "0d9af61f9b1ef89ca94df637324ed122da3a578336d3779a1e6c0fbebb30d1f7"
+      }
+    }
+  },
+  "limitations": [
+    "No GPU execution during handover",
+    "New source branches checked by CPU compilation, not new GPU/CI qualification",
+    "Original context64 run disappeared during independent shared cleanup",
+    "Recovered exports have advanced environment counters and do not restore replay/games/RNG/live belief"
+  ]
+}

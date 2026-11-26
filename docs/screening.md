@@ -1,5 +1,10 @@
 # Fast learning screens
 
+This is the retained MinAtar development recipe, not the current CDP Atari
+baseline. The [roadmap](kindle_single_life_dreamer_plan.md) now uses the qualified
+small CDP agent for Atari exploration/reward. Keep MinAtar for cheap diagnostics;
+its different observations and learning path do not establish CDP parity.
+
 Use `python/examples/screen_minatar.py` for early method experiments. This is
 MinAtar, **not Atari/ALE**; scores do not share Atari's scale or mastery gates.
 The first recipe is Breakout, then Freeway for exploration. Both use the public

@@ -3,156 +3,1123 @@
 Kindle learns while acting. Games are the first testbed; sparse explicit rewards
 and human guidance are allowed. Favor minimalism, expressiveness, safety and
 speed. Keep learning/inference native on Meganeura + Blade. Python is for game
-adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
+adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md` when
+available. Only the user merges PRs; commits and pushes are allowed.
 
-## Current priority
+## Start here
 
-- The September 27 user direction adopts `docs/strategy_reset_plan.md`:
-  iteration speed -> test LeVJEPA's value -> exploration/reward -> video priors
-  for dynamics/behavior -> later asynchronous real-time deployment. Stop
-  unchanged five-game/mastery confirmations and Atari-only gate tuning.
-  The current roadmap/evidence stays in `docs/kindle_single_life_dreamer_plan.md`.
-  GPU acting/capture is integrated. Phase 1 is complete: fused learner/grouped
-  RSSM pass, and the three-seed MinAtar screen completes in 8m18s. The 3x update
-  target is unmet; the user explicitly accepts it as a stretch target, not a
-  Phase 1 exit gate. Phase 2 is next.
-  Do not mix speed and learning changes.
-- The first shared-parameter step passes exact 241-tensor/146-moment and report
-  parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.
-  Mean 12M update falls 227.03 -> 212.78 ms (6.28% less time), not yet game
-  throughput or the 3x target. See `docs/results/2026-09-27-shared-parameters.md`.
-  Fused T64/H15 recurrence now uses GPU Gumbel sampling with CPU-owned draws;
-  outputs/gradients have independent references. Grouped RSSM layout improves
-  the shared-control synthetic update 212.70 -> 184.43 ms and short native N6
-  Pong R256 throughput 17.36 -> 20.16 actions/s. The 3x target is not met.
-  See `docs/results/2026-09-27-fused-learner.md`. CPU targets/slow-critic EMA
-  remain; shared mutable weights require serialized actor/learner access.
-- `docs/screening.md` defines the separate Size1M/B8/T16/H15/R32 MinAtar recipe,
-  eight streams and seeds 1009/2017/3019. Public 10x10 observations are packed
-  losslessly into 7x7x64 and use a jointly learned encoder; no frozen frontend,
-  pretraining or reward/action aid. CPU environment/upload is the allowed
-  temporary fallback, not GPU-resident simulation or a CPU learner. Never
-  compare its R32 speed with the R256 Atari control as an optimization gain.
-  All three 32,768-action / 8,135-update runs pass. Final online scores are
-  .44/.40/.68; mean .507 with seed-bootstrap 95% CI [.400,.680]. This does not
-  establish reliable improvement or frozen competence. See
-  `docs/results/2026-09-27-minatar-screen.md`. Keep the unresolved 3x target
-  distinct from completed implementation; no unchanged mastery queue resumes.
-  Next: Phase 2 representation probes and matched learning controls; a frozen
-  JEPA frontend must demonstrate its value. No asynchronous learner or swarms.
-- The user's September 26 direction supersedes historical checkpoint/pinning
-  requirements: finish the new GPU encoding/acting path and remove obsolete
-  implementations freely. Do not build migration layers for old checkpoints or
-  recursively pin old experiment histories. Historical measurements remain
-  historical; do not relabel them as results of changed code.
-- `TASK.md` is the user's high-level intent. The acting path is GPU capture ->
-  preprocessing -> causal LeVJEPA -> belief/policy -> action readback. Rewards,
-  checkpoints and requested diagnostics may cross the host boundary. A buffer
-  entry point alone is not capture integration. Validate ownership, producer
-  completion and GPU memory visibility, including ring-buffer reuse.
-- The current reference uses the independently pretrained ~5.5M causal Tiny frontend,
-  not DINO or the 303M Large default. Keep Dreamer12M and the 7x7x64 observation
-  contract for speed comparisons. Small learners/learned encoders are allowed in
-  explicitly separate screening/representation experiments. JEPA must earn its
-  place on probes and learning curves; it is not an obligation for 2D games.
-  Preserve native image detail; no downscale-then-upscale adapter pipeline.
-- Prioritize one reliable actor before swarms: Atari, accelerated playing plus
-  learning, video/world pretraining, mind-games vkQuake2/TMNF, GOG/Wine, then
-  held-out cross-game adaptation and retention. No concurrent learner service
-  now; the strategy's later deployment phase may introduce one after measuring
-  effective single-actor learning, actor latency and learner debt.
-- Six environments share batched perception/policy and one learner, not causal
-  histories. Preserve per-stream recurrent state, RNG, replay and resets. The
-  encoder's 16-arrival chunk reset is not an environment/RSSM reset.
+- [Machine handover](docs/handover.md): source branches, build instructions,
+  shared checkpoint/evidence package and unfinished work.
+- [Roadmap](docs/kindle_single_life_dreamer_plan.md): results, priorities and gates.
+- [PR31](https://github.com/kvark/kindle/pull/31): live status dashboard. Update its
+  description when status changes; do not create a separate STATUS.md.
+- [Learning diagnosis](docs/results/2026-10-29-cdp-learning-diagnosis.md):
+  representation, forecasting, actor/critic and training-coverage evidence.
+- [GPU incident](docs/results/2026-10-23-cdp-context64-gpu-fault.md):
+  initialization failures on the original machine and their limits.
 
-## Research and status
+## Current work — November 10
 
-- One authoritative plan: `docs/kindle_single_life_dreamer_plan.md`. Keep it
-  decision-focused with one game-status table and direct rollout/world-report
-  links. Detailed results belong in experiment reports and `runs/`.
-- Use [PR29](https://github.com/kvark/kindle/pull/29) as the status dashboard:
-  dated done/running/next items, results and limitations. No STATUS.md. Update
-  at meaningful boundaries, not each poll.
-- The JEPA bet is cheaper useful latent world prediction than pixel
-  reconstruction. Measure whole-agent and world-model time/memory/learning
-  against Dreamer12M at matched actual interactions. Backend parity alone can
-  share bugs: retain independent value/gradient references.
-- Historical non-sticky fixed-protocol reliability is 3/5 (Boxing, Pong,
-  assisted-training Freeway). Qbert and Breakout fail their gates. Pong's one-root
-  sticky .25 evaluation fails: 2/24 wins, mean -7.1667. Do not call the historical
-  non-sticky wins robust mastery. Tiny same-title video pretraining is additional
-  experience (45k train + 5k validation frames/game), not online-only learning.
-- Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
-  truncate Large weights or silently substitute an untrained product encoder.
-- Current backend: Meganeura `367e53d4` carries only the Blade dependency update
-  over latest upstream `ee3aea42`; Blade `7cca6377` adds checked external Vulkan
-  imports/ownership over `fbb4f28c`. Both branches are pushed. Check upstream
-  before diagnosing already-fixed issues. Keep dependencies reproducible, but
-  do not delay implementation to preserve obsolete runtime/checkpoint identities.
-- GPU pixel v2 and its N6 train/frozen/sticky plumbing tests pass. The stock
-  upstream Dreamer/JAX sanity also passes (5,990 actions, 1,149 updates); this is
-  not a matched learning comparison. Reset/update accounting, replay capacity
-  and artificial-cutoff semantics still need alignment for that claim. See
-  `docs/experiments/2026-09-26-gpu-pixels-and-pong-robustness.md` and
-  `docs/experiments/2026-09-26-upstream-control-protocol.md`.
-- Single and vector pixel actors now share resident encoder/pooling/belief/
-  categorical sampling and paged GPU replay collection. Only selected actions
-  leave the acting path. Explicit probes/checkpoints and sampled learner batches
-  may read back. Imagined recurrence is resident; scalar target construction
-  still uses the host.
-  Dullahan GPU_SYNC supplies a fenced EXTERNAL ownership lease, not a SHM flag.
-  vkQuake capture-to-keyboard plumbing passes at native 640x480: 12M frozen
-  256 actions/2.758s; a separate tiny learner completes 105 finite updates.
-  These are short plumbing tests, not 12M training speed or competence. Keep its
-  sparse reward/terminal adapter and full mind-games GameSession integration distinct
-  from transport success. See `docs/experiments/2026-09-26-gpu-resident-acting.md`.
-- Screen small, confirm big. Use one changed factor, >=3 learner seeds and
-  score-vs-actions/time curves for development learning comparisons, with
-  bootstrap uncertainty or suite IQM; no development mastery gates. Numerical
-  smoke tests are not multi-seed learning experiments. One matched timing plus
-  numerical/learning parity check suffices for a speed change; no micro-campaign.
-  Commit each new result as compact JSON + Markdown in `docs/results/`, including
-  config, seeds, aids, curves and limits. PR29 remains the status dashboard.
-  Keep original competence gates for final confirmed claims. Retain failures
-  and all completed episodes/unfinished tails.
-  Plumbing tests and online wins are not frozen competence. Report aggregate
-  and per-stream real time. A lower replay ratio is a learning tradeoff.
-- Frozen evaluation never updates weights. Restore without replay/RNG/live
-  belief is not equivalent to uninterrupted training. Separately evaluate prior
-  forecasts with persistence/unrelated-action/reward controls and event counts;
-  posterior estimates are not forecasts, features are not imagined RGB, and
-  privileged game observers never enter the policy.
+Kindle now builds against **upstream Meganeura main** (`a0eff600`, Blade
+`d9112e26`) instead of the October handover fork; see the
+[switch report](docs/results/2026-11-10-meganeura-main-switch.md). The fork's
+`MEGANEURA_COMMAND_CACHE`/`IMAGE_VIEWS`/`CONVOLUTION_*`/`COPY_COMPOSITION` flags
+are inert. Since November 15 the pin is main `e3215fa2`, which adds
+`Session::slot_buffer`; the retained-off actor-dynamics/expected-value
+parameter snapshots are same-queue device copies again.
+Run every heavy job as a memory-capped `systemd-run --user` unit; a bare
+`cargo test` peaked at 17.6 GB and the OOM killer took the session down.
+
+The goal **prove the world model training on Breakout** is active and has
+its first learner that beats the previous best at every horizon. Three
+feedback-side screens ([16x more play](docs/results/2026-11-10-breakout-world-scale.md),
+[96x96 frames](docs/results/2026-11-10-breakout-world-rgb96.md),
+[palette-committed feedback](docs/results/2026-11-10-breakout-world-palette-feedback.md))
+left eight-step development ball tracking at 38/107, 36/112 and 23/112 against
+the 64x64 control's 53/107, and a [linear state probe](docs/results/2026-11-10-breakout-world-state-probe.md)
+showed why: the spatial-history recipes never encode the ball in the recurrent
+state, only in fed-back frames that fade. [Removing the image history](docs/results/2026-11-10-breakout-world-state-only.md)
+makes the state learn the ball (prior-state readout 14/7 native pixels at one
+step, 20/11 at sixteen, baselines 40/28); the 1M state-only recipe at 96x96
+for 65,536 updates (74 minutes of native calls, 68 ms per update) reaches
+observed 113/113, one-step 109/112, four-step 93/112, eight-step 70/112,
+sixteen-step 46/115 and thirty-two-step 15/102 on the shared development
+origins, against the control's 101/66/53/25/11, and predicts near-term brick
+hits where the spatial recipes never did. Its bricks blur (balanced error
+.32); a [fixed observed context frame](docs/results/2026-11-10-breakout-world-context-frame.md)
+(`rgb_context_lag` 8) keeps the scene sharp with the ball still in the state
+(1M, 16,384 updates: four-step 72/112, eight-step 32/112, brick error .011;
+4M at 16,384: four-step 74/112, eight-step 30/112, brick error .010, its 65k
+continuation stopped at that point and reproducible from `queue-96-context-4m.json`).
+Whole agents can now train this objective: `world_pixel_loss` and
+`world_prediction_length` (plain learned-RGB worlds, full BPTT) with runner
+flags `--world-pixel-loss`/`--world-prediction-length`. The first
+[Breakout agent with the state-only 96x96 world objective](docs/results/2026-11-10-breakout-agent-world96.md)
+(seed 1009, 200k actions, 4M/96/B8/T32/R16, motion cross-entropy, 16-step
+rollout, retained guidance, no CDP and no exploration bonus; 12,469 updates
+in 31 minutes) is a negative result: frozen sampled 4.760 / greedy 4.785 on
+cohort 4000022003 (initial 1.250 / 2.167) against retained CDP 1009's 94.625
+greedy / 70.500 sampled and fresh CDP 22003's 75.250 / 44.708, with guided
+online returns averaging 34.5 that the frozen policy does not carry. That
+run was not matched: it also changed model size, resolution, batch geometry,
+guidance labels, actor unimix, the dynamics rate and the replay-value scale
+and dropped the action-effects bonus (protocol correction recorded). The
+[matched follow-up](docs/results/2026-11-10-breakout-agent-world96-matched.md)
+keeps the retained 12M/B16/T16 recipe (bonus, corrective labels, unimix,
+rates) and swaps only the world objective (motion cross-entropy, 8-step prior
+image rollout; runner now allows the bonus with a pixel world). Frozen on
+cohort 4000022003: **64x64 greedy 151.080 / sampled 40.286** (12,477 updates
+in 33 minutes, 143 ms per update, VRAM 9.5 GiB) and 96x96 greedy 114.625 /
+sampled 38.231 (54 minutes, 17.6 GiB), against the retained CDP learner's
+94.625 / 70.500 on the same cohort and initial controls near 2. The pixel
+objective wins greedy by a wide margin and loses sampled; one seed, no
+held-out qualification, 0 two-wall episodes. Root
+`/x/Temp/kindle-breakout-world96-matched-20261110` (unit finished).
+[Retained CDP plus the pixel objective as an auxiliary](docs/results/2026-11-10-breakout-agent-cdp-pixel-aux.md)
+(`world_pixel_scale`, `--world-pixel-scale`) scores greedy 104.036 / sampled
+61.692 at scale 1 (the most balanced learner; CDP loss still falls to .056)
+and 68.292 / 47.667 at scale .1 (the objectives interfere); root
+`/x/Temp/kindle-breakout-cdp-pixel-aux-20261110` (unit finished). The
+[second seed](docs/results/2026-11-10-breakout-agent-pixel-seed22003.md)
+(22003, root `/x/Temp/kindle-breakout-pixel-seed22003-20261110`, unit
+finished) holds the pattern against fresh CDP 22003's 75.250 / 44.708: pixel
+world 99.259 / 28.375, CDP plus pixel at scale 1 **101.040 / 68.280**.
+Two-seed means on that cohort, greedy / sampled: CDP 84.9 / 57.6, pixel
+world 125.2 / 34.3, CDP plus pixel 102.5 / 65.0. On the retained learner's
+own [original cohort 4000001009](docs/results/2026-11-10-breakout-agent-cdp-pixel-budget400k.md)
+the picture differs: retained CDP 143.667 / 70.750, CDP plus pixel 103.040 /
+66.538, pixel world 156.840 / 37.680. Consistent across all three
+seed/cohort pairs: the pixel world wins greedy and loses sampled, and both
+pixel-world learners vary far less between cohorts than CDP. At **400k** the
+retained CDP learner leads the CDP-plus-pixel learner on both cohorts and
+both modes (92.792 / 173.708 and 120.625 / 150.750 against 85.583 / 135.593
+and 102.840 / 134.519, greedy second) in two-thirds of the time (43.6 against
+65.5 minutes; root `/x/Temp/kindle-breakout-cdp-pixel-400k-20261110`, unit
+finished), so the auxiliary does not improve the retained recipe at a fixed
+budget. The pure pixel world's 400k life (root
+`/x/Temp/kindle-breakout-pixel64-400k-20261110`, unit finished, 65 minutes)
+scores **185.160 greedy / 83.615 sampled** on cohort 1009 and **158.625 /
+100.917** on cohort 22003 against CDP's 173.708 / 92.792 and 150.750 /
+120.625: across all five seed/cohort/budget pairs tried, the pixel objective
+wins greedy and loses sampled, at 1.5 times the training time. An
+[action-temperature diagnostic](docs/results/2026-11-10-breakout-action-temperature.md)
+on the 400k checkpoints (cohort 1009) shows the sampled deficit is
+distribution sharpness, not ranking: at temperature .5 / .25 the pixel world
+scores 162.5 / 198.8 against CDP's 106.4 / 113.9 (temperature 1: 83.6 against
+92.8). Still development seeds on reused cohorts; 0 two-wall episodes
+anywhere (best single episode 404). [Lowering the actor entropy scale](docs/results/2026-11-10-breakout-agent-pixel-entropy.md)
+(1e-4, 3e-5) or removing the 1% actor unimix does not sharpen the
+pixel-world actor: policy entropy stays at .80 to .89 nats, sampled scores
+stay at 29 to 38 and greedy scores drop to 87 to 129 (all one seed), so
+neither explicit policy knob is the lever; return normalization and the
+imitation term remain untested. Porting the [context-frame decoder to the
+agent](docs/results/2026-11-11-breakout-agent-context-frame.md) (`--world-context-lag`,
+runner and native support committed) is also negative at 64x64/12M: sampled
+27 / 35, greedy 77 / 73, pixel losses unchanged, 20% slower. The [fresh-seed
+screen](docs/results/2026-11-11-breakout-agent-pixel-seeds.md) settles the
+variance question against the pixel recipe's favour: seeds 3005 and 4007
+score greedy 108.5 / 160.9 and 50.5 / 43.7 on the two cohorts (sampled 46 /
+35 and 23 / 23), so the recipe's greedy score spans 44 to 161 across four
+seeds while its world losses do not move. **The claim that the pixel
+objective beats CDP in greedy play on every pair is withdrawn**; what holds is
+a higher greedy ceiling (four runs above 150 against CDP's best 150.8 at
+400k), a four-seed greedy mean above CDP's two-seed mean on the new cohort
+(113.7 against 84.9), a worse sampled mode on every seed, and a less
+predictable learner. The [4M context-frame world at 65,536 updates](docs/results/2026-11-10-breakout-world-context-frame.md)
+(`train-96-context-4m-65k-v4`, 349 ms per update, 6h31m, run without the
+host guard after a 14G OOM and a guard probe timeout killed two attempts) is
+the **best Breakout world model so far at every horizon with sharp bricks**:
+observed 113/113, one-step 111/112, four-step 97/112, eight-step 72/112,
+sixteen-step 53/115, thirty-two-step 22/102, brick balanced error .007 /
+.022 / .053 at 8 / 16 / 32, against the control's 101/66/53/25/11 and the
+state-only world's 109/93/70/46/15 with .32 brick error. On a [fresh
+held-out corpus](docs/results/2026-11-11-breakout-world-heldout.md) (seed
+777001, 16 episodes) it scores 112/115, 93/117, 72/113, 41/111, 19/116 with
+brick error .009, against the state-only world's 109, 87, 65, 38, 19 and
+.223: the development screens hold at one to eight steps and were optimistic
+at sixteen and thirty-two, the fitting corpus is not memorized, and the
+ordering of the two worlds holds. Training the same world with a [32-step
+rollout in a 48-step window](docs/results/2026-11-11-breakout-world-context-h32.md)
+(32,768 updates, 870 ms each, 8 hours) raises thirty-two-step tracking to
+31/102 on the development origins and 28/116 held-out (from 22 and 19) with
+sharp bricks, at a cost of 3 to 9 counts at one to eight steps held-out and
+2.5 times the time per update; the long-horizon limit was partly an
+objective-horizon limit, and 24% to 30% at thirty-two steps is the new
+standing number. The [1M model with the same 32-step rollout for 65,536
+updates](docs/results/2026-11-11-breakout-world-context-1m-h32.md) (682 ms per
+update, 12.4 hours) reaches 24/102 development and 18/116 held-out at
+thirty-two steps with the best held-out sixteen-step count (45/111): capacity
+limits the long horizon under the longer objective, so the 4M model with the
+32-step rollout is the better use of compute. Its [65k budget
+point](docs/results/2026-11-12-breakout-world-context-h32-65k.md) (sixteen hours,
+867 ms per update) is the **best Breakout world on record at every horizon**:
+development 112/99/75/61/32 at one to thirty-two steps, held-out
+110/90/72/51/37 with brick error .007 / .045, against the 16-step world's
+held-out 112/93/72/41/19; thirty-two-step tracking is 32% held-out, and the
+curve was still rising. The [12M model under the same objective](docs/results/2026-11-12-breakout-world-context-12m-h32.md)
+(32,768 updates, 1,241 ms each, 11.4 hours) gains 3 to 4 held-out counts at
+eight to thirty-two steps over the 4M model at equal updates and trails its
+65k point by 5 to 6: budget buys more than capacity in this range. Its [131k budget
+point](docs/results/2026-11-13-breakout-world-context-h32-131k.md) (33 hours,
+894 ms per update) scores held-out 110/91/71/56/38 with sharper bricks (.006 /
+.040), within checkpoint noise of the 65k point: a post hoc held-out probe of
+every checkpoint shows neighbouring points 18 counts apart at thirty-two
+steps, and past 65k updates the gain goes mostly to the fitting corpus
+(thirty-two-step window means 34 to 45 against held-out 32 to 36), so more
+updates no longer pay. A [sticky-action oracle](docs/results/2026-11-14-breakout-sticky-oracle.md)
+(CPU emulator replays of the recorded actions with fresh sticky draws) caps
+one-draw tracking of the recorded continuation at 90% / 70% / 41% at eight /
+sixteen / thirty-two steps (best point forecast 94% / 77% / 50%); the best
+world reaches 70% / 72% / 81% of that, and its misses sit in ball contacts:
+brick bounces, which are deterministic, are tracked 50% to 71% at four to
+sixteen steps, paddle bounces 13% to 25% against a 41% to 68% ceiling. The
+world is a near-deterministic hedger: its four prior draws agree (any of four
+75 against 71 to 74 single at eight steps; oracle .955 against .903) and most
+paddle-bounce forecasts show a smeared ball, because the image suffix scores
+decoded prior samples against one recorded outcome. A [32-step latent-overshooting
+variant](docs/experiments/2026-11-14-breakout-world-context-latent-h32.md)
+(priors matched to detached posteriors by KL, no prior decoding, 392 ms per
+update) was killed by the kernel OOM killer at update 7,680, before its
+first evaluation, while frozen to lend the GPU to a smoke (host RAM ran out;
+frozen units remain OOM targets); it has not been rerun. The user then
+redirected the work to [Breakout agents without hand-made relevance
+priors](docs/experiments/2026-11-15-breakout-clean-representation.md): no motion
+weighting, hand action features, context frames or teacher guidance;
+scripted-teacher demonstrations only as an initial phase; value gradients
+into the representation tested. [Its five arms](docs/results/2026-11-15-breakout-clean-representation.md)
+(12M, 64x64, train ratio 16, 400k actions, seed 1009; root
+`/x/Temp/kindle-breakout-clean-20261115`) leave the ball out of the model
+state in every arm (linear probe 19.5 to 24.8 source pixels against 27.3
+untrained; paddle 2.4 to 7.7 px). Clean D3 plays 4.3 / 4.0 sampled /
+greedy on cohort 4000777001; `--actor-critic-gradient` is the one lever
+that moved play (7.2 / 7.4, sharpest paddle); demonstrations sharpen the
+paddle but shock the return scale (1 to 48) and leave greedy policies
+that never press FIRE; removing the replay-value gradient changes
+nothing. The clean arms replay each action 16 times against DreamerV3's
+32 (Atari) and 256 (Atari100k). [Arm B at train ratio
+64](docs/results/2026-11-15-breakout-clean-ratio64.md) (99,907 updates, 165
+minutes) plays 9.8 to 11.1 frozen with no FIRE stalls and moves the ball
+probe only to 19.3 / 16.1 px (within 8 px .081), still improving at the
+end; its 100k checkpoint, with B's update count, plays worse than B. The
+[96x96 run at the same ratio](docs/results/2026-11-15-breakout-clean-ratio64-96.md)
+(293 minutes, 16.3 GiB) is the best clean pixel-objective learner: frozen
+20.3 to 25.3 in all four cells, vertical ball probe error 11.1 px (R² .74)
+against 16.1 at 64x64, horizontal still 18.3; 96x96 is the clean default.
+A [second seed](docs/results/2026-11-15-breakout-clean-ratio64-96-seed22003.md)
+(22003) repeats it: frozen 19.1 to 22.1, ball 18.6 / 13.9 px; two-seed
+mean about 21 on both cohorts in 4.9 hours. The same probe reads the
+retained guided CDP learner's ball at 8.4 / 8.8 px (within 8 px .39), so
+guidance or the latent objective holds the horizontal position no clean
+pixel learner holds. The [clean centered-CDP arm](docs/results/2026-11-15-breakout-clean-cdp-96.md)
+(same recipe, world objective swapped to centered CDP with encoder rate
+4e-5; 187 minutes, 15.4 GiB) separates them and is the **best clean
+Breakout learner**: the latent objective learns the ball without labels
+(probe 7.4 / 7.7 px at 100k, 6.0 / 6.3 at 300k, within 8 px .53 to .67,
+better than the guided learner at every kept checkpoint) and frozen play
+at 400k is 71.1 to 91.4 (medians 28 to 38, best 410) against the pixel
+recipe's 21 and the guided learner's 91 to 192. Online returns peak at
+124 near 200k actions, then fall as the return scale jumps (20 to 93) and
+policy entropy rises (.5 to 1.3 nats). The [second
+seed](docs/results/2026-11-15-breakout-clean-cdp-96-seed22003.md) (22003)
+does not repeat the ball result: its probe stays at 14 / 19 to 22 px
+(within 8 px .08 to .12) at every checkpoint, online returns sit at 19 to
+23 through 250k actions, and frozen play is 34.4 to 58.8 (medians 21.5 to
+33). Two-seed frozen means are 53 to 75 against the pixel recipe's 20 to
+22; whether the latent objective picks up the ball depends on the seed.
+The user's goal since November 15 is **make Kindle learn Breakout well**.
+Published agents that play Breakout well at 100k actions (IRIS 84,
+DIAMOND 133, BBF 371, EfficientZero 414 against DreamerV3's 31) all end
+the training episode on a lost life; the clean recipe did not. The
+[life-loss terminal experiment](docs/experiments/2026-11-15-breakout-life-loss-terminal.md)
+(`--life-loss-terminal`, training only, whole-game evaluation) runs the
+clean CDP recipe with that boundary on both seeds, then a ratio-16 pair:
+root `/x/Temp/kindle-breakout-life-20261115`, unit
+`kindle-breakout-life-20261115`, about 8.7 hours from 22:09 UTC November
+15. Its first arm (seed 22003) misses the declared criteria as evaluated
+(frozen 26.5 to 43.1, pooled median 28 against the control's 27; ball
+within 8 px .25 to .29), but a CPU replay of the frozen logs
+(`breakout_life_replay.py`) shows the evaluation left its training
+distribution: it returns 94% of balls in the first life (97% to 99% until
+the ball speeds up, 81% after twelve hits) and 72% to 89% after its belief
+carries through a lost life, while both controls lose the first life of
+every game with the paddle standing still. The [second arm](docs/results/2026-11-15-breakout-life-loss-terminal.md)
+(seed 1009) fails the same way and more sharply: frozen 28.5 to 33.8
+against its control's 71 to 91, first life 17.8 points with 95% of balls
+returned, second life empty in 82 of 96 games, online returns (belief
+restarted at each loss) rising to 94 per game. The pinned state probe
+carries the belief through lost lives on 71% of its rows, so the life
+arms' probe readings (.18 to .29 within 8 px) are mismatched too;
+`breakout_agent_probe_life.py --life-loss-reset` is the matched probe. All runs so far used sticky
+actions and 18 actions; the published Atari-100k scores did not. The
+[follow-up](docs/experiments/2026-11-16-breakout-life-reset-and-protocol.md)
+adds `--life-loss-reset` (frozen evaluation restarts the belief at a lost
+life, as training did) and the matching probe. **A life-terminal agent
+must be evaluated and probed with that reset.** Under it the
+[matched results](docs/results/2026-11-16-breakout-life-reset.md) are the
+best clean Breakout play on record: seed 1009 at ratio 64 plays 115.9 to
+154.9 per cell (pooled median 98, 47 of 96 games at 100 or more; reset
+probe .53 within 8 px), the ratio-16 arm K on seed 22003 plays 80.7 to
+101.7 (median 73, probe .51) after 52 minutes of training, and the
+ratio-64 arm on seed 22003 49.3 to 63.7 (median 47). Agents trained
+without the boundary get worse under the reset. Even whole-game, K beats
+its no-boundary twin L (53 to 85 against 24 to 31). The fast ball is the
+remaining limit (descents faster than 13 px per action are returned 65%
+to 76%), and at 100k actions the life arms play 22 to 29. The ratio-64
+protocol arms were withdrawn unlaunched. The
+[ratio-16 protocol arms](docs/results/2026-11-16-breakout-ratio16-protocol.md)
+all fail their declared tests: K's recipe on seed 1009 plays 52.8 to 60.9
+(median 54), the Atari-100k wrapper 71.2 to 130.2 with a lower median (51)
+and 16 of 96 games above 300, non-sticky alone 45; non-sticky learners
+keep 13 and 26 under sticky actions, and at 100k actions the Atari-100k
+arm plays 11 to 12 against DreamerV3's 31. The same recipe differs 1.6 to
+2.5 times between its two seeds, the arms differ in fast balls returned
+(.49 to .76), and every curve was still rising at 400k. Sticky .25 with
+18 actions stays the retained protocol. The
+[1.2M-action budget run](docs/experiments/2026-11-16-breakout-ratio16-budget.md)
+of K's recipe on both seeds [meets the declared learned-well
+marker](docs/results/2026-11-16-breakout-ratio16-budget.md): matched play
+at 1.2M actions is **276.3 to 322.3 per cell on seed 22003 (pooled
+median 334) and 264.3 to 353.3 on seed 1009 (median 350)**, 86 and 88 of
+96 games at 100 or more, against medians 73 and 54 at 400k and 246 and
+154 at 800k; each seed trains in 150 minutes. Fast balls are returned
+90% and 91% (76% and 54% at 400k), the seed gap closes, and the reset
+probe reads the ball within 8 px .62 and .57. Three of 192 games clear
+the first wall (best 441); 38 more stop at 400 to 431, because with few
+bricks left a return earns 1.5 points while one in five is lost. Two
+development seeds on reused cohorts; the 864 / 90% gate is not met. A
+seed's first 400k actions reproduce bit for bit, so seed spread is the
+seed. A GPU kernel fault (ring timeout, mode-1 reset, VRAM lost) at
+12:28 UTC November 16 stopped the first queue; the user reviewed it and
+chose to continue on the same boot, and the remaining 30 jobs then ran
+cleanly. `gpu_host_guard_reviewed.py` / `run_gpu_queue_reviewed.py`
+accept only the fault records listed in a review file (here
+`gpu-fault-20261116/reviewed-kernel-faults.json` in root
+`/x/Temp/kindle-breakout-budget-20261116`, valid for that boot only);
+**a new fault needs a new review by the user.** Frozen evaluation also
+runs on Mesa's llvmpipe (`VK_DRIVER_FILES` set to its ICD, no device id;
+75 to 100 minutes and 10 GB of host memory per cell, one at a time),
+which four paired cells do not distinguish from the GPU. Nothing is
+chained; queues are launched by hand. The
+[held-out follow-up](docs/results/2026-11-17-breakout-heldout-and-budget.md)
+(root `/x/Temp/kindle-breakout-heldout-20261117`, 59 jobs, finished)
+confirms the 1.2M marker off the development set: on fresh cohort
+4000313131 the two learners' medians are 346 and 367 (one greedy game
+at 842, the best on record), and held-out seed 5011 plays a median of
+276 over 144 games (301 on the fresh cohort; 31 at 400k, 93 at 800k).
+**More budget is not the lever:** seed 22003 run to 3.6M actions peaks
+at 1.6M (median 380.5, 8 of 96 games past the first wall, best 531),
+online returns stop rising at 1.1M, and play collapses between 2.2M and
+2.6M (median 45 at 2.4M, greedy policies that never serve at 2.8M and
+3.2M, 141 at 3.6M) after the latent-prediction loss doubles; afterwards
+the state probe reads the paddle at 9 px against 4.5 to 5.8 px at every
+earlier checkpoint, the ball unchanged. Cause not established. Post hoc
+CPU replays: Breakout shrinks the paddle from 16 to 12 px once the ball
+reaches the ceiling, and that, not the score, is where balls are lost
+(narrow paddle .79 to .82 returned at every score, fastest balls .76,
+flat from 1.2M to 2.0M; wide paddle .89 to .94). The misses are not
+policy noise (greedy equals sampled) and not reach (0 of 2,160 lost
+balls unreachable); the paddle ends a median 10 px off, and it moves 11
+then 22 px per action. A planner reading the emulator's state under the
+same protocol returns .94 on the narrow paddle (.90 of its fastest
+balls) and .98 on the wide paddle,
+scores a median of 437 and reaches **864 in 0 of 20 games** (it never
+loses a ball without sticky actions), so the 864 / 90% gate is beyond a
+perfect-knowledge planner under sticky actions; the user replaced it
+on November 18 (see below). Published sticky-action scores at 200M frames
+(third-party table): DreamerV3 384, MEME 521, BTR 613.
+[Own-play state dumps](docs/results/2026-11-17-breakout-own-play-state-dump.md)
+(`breakout_agent_state_dump.py`, root
+`/x/Temp/kindle-breakout-statedump-20261117`) show the critic cannot
+tell a ball it will lose from one it returns until the ball is at the
+paddle row (AUC .43 to .63), and that the collapsed checkpoint lost the
+paddle (9 to 16 px from 2.4M to 3.2M, intact at 2.0M), not the ball.
+Their headline, that the state does not hold where the ball lands, is
+**withdrawn**: the pooled landing readout scores 15.5 to 16.7 px on the
+emulator's exact coordinates; fitted per distance the state gives the
+landing relative to the paddle to 4.8 to 5.9 px one action out (exact
+coordinates 1.7 to 2.1 px) and already holds the ball's velocity.
+[A two-frame encoder input](docs/results/2026-11-17-breakout-frame-pair.md)
+(`--rgb-frame-pair`, seed 22003, replay 50k because the pair doubles
+replay memory, beside a single-frame 50k-replay control; root
+`/x/Temp/kindle-breakout-framepair-20261117`, finished) fails its three
+declared tests and is not retained: median 353.5 at 1.6M with 1 of 96
+games past the first wall, 136.5 at 1.2M against the control's 322, 21%
+more time per action; its 1.6M point returns the narrow paddle's fastest
+balls .83 (the best on record, one seed). The 50k replay costs nothing
+at 1.2M (322 against 334). Post hoc, a held-out linear readout of the
+actor's input separates the balls the agent will lose at AUC .70 to .85
+one and two actions before contact while the critic is at .46 to .63:
+the state knows, the value does not.
+[Supervising the continuation head on one-step priors](docs/results/2026-11-18-breakout-prior-continuation-life.md)
+(`--prior-continuation-scale 1`, seed 22003, 1.6M actions; root
+`/x/Temp/kindle-breakout-priorcont-20261117`, finished) passes its own
+loss test (.0216 against a floor of .0204) and fails the critic, play
+and score tests: median 269 at 1.6M, no game past the first wall,
+narrow-paddle fastest balls .73; not retained. The life ends two to
+three actions after the ball passes the paddle, so the one-step prior
+was asked a trivial question. Raw value varies with the score; read as
+the drop within a descent the critic separates lost balls at AUC .66 to
+.71 one action before contact (state readout .76 to .85), and its value
+has fallen by only 12% to 23% there.
+[An imagined-contact probe](docs/results/2026-11-18-breakout-imagined-contact.md)
+(`breakout_imagined_contact.py`: open-loop rollouts of fixed action
+sequences from the live state against emulator clones; root
+`/x/Temp/kindle-breakout-imagined-20261118`) finds the cause on the best
+checkpoint: imagination orders losing against saving sequences correctly
+in .91 to .92 of pairs and is right 96% when it calls a ball lost,
+but **a quarter of the sequences it calls safe lose the ball in the
+emulator, a third on the narrow paddle**, and in the states the agent
+goes on to lose it rates a sequence safe (.05 to .07) that the emulator
+loses half the time. The model is forgiving at the paddle's edge, so
+the critic and actor have nothing to learn precision from. [Eight-step open-loop
+supervision](docs/results/2026-11-18-breakout-open-loop-contact.md)
+(`--open-loop-length 8 --open-loop-scale 1` on the same recipe, seed
+22003, 1.6M actions, 216 minutes; root
+`/x/Temp/kindle-breakout-openloop-20261118`, finished) fails its four
+declared tests, two by a hair: imagination misses half as many losses
+(.102 against .203; pairs it rates safest lose .06 against .25) and the
+critic prices a loss earlier (AUC .77 against .71), but play does not
+follow (median 317, no game past the first wall, narrow fastest .73);
+not retained as default. Post hoc CPU replays of three learners show
+what a lost ball is: more than half of all lives go on the **wide**
+paddle (returned .93 to .95, planner .98); no lost ball lacked time or
+reach; the paddle arrives late and moving (a move among the last two
+actions in .73 to .80 of descents, a miss 3 to 4 px past its edge); a
+paddle already under the ball that holds still returns .96 to 1.00, and
+the agent moves again from there in half the cases; the state reads the
+landing x to 3 to 4 px five actions early; and one move carries the
+paddle 23 px with an end point that per-frame sticky actions scatter by
+5.5 px. The lost lives are a habit of the policy, not missing knowledge.
+[The minimal action set](docs/results/2026-11-18-breakout-minimal-actions.md)
+(`--atari-protocol published-minimal`, four actions, sticky .25, same
+recipe and seed, 1.6M actions, 201 minutes; root
+`/x/Temp/kindle-breakout-minimal-20261118`, finished) fails its four
+declared tests and none is close: the agent moves into contact as often
+as with 18 actions (.755 of wide descents against .73) and from a paddle
+already under the ball more often (.74 against .49), returns the wide
+paddle .919 and the narrow one .774, and plays a median of 241.5 with no
+game past the first wall; it learns slower (medians 35 / 94 / 133 at
+400k / 800k / 1.2M) and was still rising. The habit does not come from
+the action vocabulary; four actions are not proposed as the default.
+Post hoc on own-play dumps, two other explanations are not supported:
+the paddle's 23 px step (returns do not depend on where the landing sits
+between multiples of 23 px) and the state's position error (the paddle
+follows the true landing, coefficient .63 to .89, not the linear
+readout's belief, .09 to .28). Declared next, not launched: the actor's
+training signal on the open-loop recipe. A second GPU kernel fault (same
+shape as November 16) stopped the probe's queue at 04:02 UTC November 18
+after two of four jobs; the user reviewed it and chose to continue on
+the same boot (review file `gpu-fault-20261118/reviewed-kernel-faults.json`
+in root `/x/Temp/kindle-breakout-imagined-20261118`, both faults'
+records, that boot only). A third fault at 14:54 UTC November 18 stopped the minimal-action queue
+in its last job (22 of 23 complete; evidence in
+`gpu-fault-20261118-1454/` under that run's root); the user reviewed it
+too and chose the same boot (review file
+`gpu-fault-20261118-1454/reviewed-kernel-faults.json` in root
+`/x/Temp/kindle-breakout-minimal-20261118`, all 35 fault records of the
+boot, that boot only). **A further fault needs a further review.** All
+three faults hit frozen-inference jobs (an evaluation cell, a probe, a
+dump), none a training run. The user then chose a sticky check before the next training run:
+[the same checkpoints evaluated without sticky actions](docs/results/2026-11-18-breakout-sticky-check.md)
+(16 cells, no fault; root `/x/Temp/kindle-breakout-nosticky-20261118`,
+finished) give a mixed answer. In sampled play without the draw four
+learners lose 24% to 45% fewer balls on the wide paddle (.92 to .95
+becomes .94 to .97) and 23% to 49% fewer on the narrow one (.76 to .82
+becomes .81 to .90), medians rise to 331 to 409, the agents move into
+contact as often, and 2 of 96 distinct sampled games pass the first
+wall: most of the gap is the policy's own. Without sticky actions the
+two cohorts are identical games and some greedy games stall in endless
+volleys, so no-sticky tests are read on sampled play. Post hoc: the
+right action near contact flips at about 8 px of paddle offset, the
+policy's action mass only changes beyond 12 px, and linear and MLP
+readouts find the state's landing-minus-paddle to 6 to 7 px (each
+object to about 3.5 px). The user then chose position precision over the actor's training
+signal: [the open-loop recipe plus the pixel-reconstruction
+auxiliary](docs/results/2026-11-19-breakout-pixel-auxiliary-precision.md)
+(`--world-pixel-scale 1`, plain squared error, seed 22003, 1.6M actions,
+325 minutes, 1.51 times the time per action, peak 16.7 GiB; root
+`/x/Temp/kindle-breakout-pixelaux-20261118`, `queue-20b.json`, finished
+12:08 UTC November 19, no fault) fails its four declared tests and is not
+retained. The state reads the paddle better (2.3 px against 3.5) but not
+where the ball lands relative to it (6.3 to 6.8 px against 6.2 to 6.6);
+the policy near contact is more diffuse (entropy 1.43 nats against .80
+one action out) and moves again from in place more often (.73 against
+.54); wide paddle .931, narrow .754; median 274 at 1.6M (311.5 at 1.2M),
+no game past the first wall, and eight greedy games that never serve.
+Four world-side changes on this seed (frame pair, prior continuation,
+open-loop, pixel auxiliary) each moved their own measure and none moved
+play; the actor's training signal is the untested side. The first
+attempt (`X22`) stopped at 333k actions on the runner's memory-headroom
+check, 20 MB short, when another project's GPU job on the same card
+shrank the budget; the user chose a 1 GiB training headroom for the
+relaunch (`X22b`). **Other projects share this GPU; a run within 0.5 GiB
+of its headroom will be stopped by their use.** Post hoc on CPU
+([report](docs/results/2026-11-19-breakout-posterior-noise-check.md)): a
+planner with exact control and a known error in the ball-to-paddle
+offset scores medians of 422 to 424 at 1 to 3 px (sd; wide .962 to
+.973, narrow .887 to .924; 11 of 36 games past the first wall) and 123
+to 183 at 4 px and more; the same search with no error scores a median
+of 566 (12 games, 10 past the wall), so the 437 the gate was set from
+was a weak search's lower bound, and "most games past the wall" is met
+only with no error. The best learner (wide .950, narrow .830) plays
+below the 1 to 3 px band,
+its state reads each object to about 3.5 px and its paddle ends 4 to
+6 px from the landing: position precision is the limit. The state's
+sampled latent is unreadable alone (.82 of its variables change every
+action) and the recurrent part holds the positions. An evaluation-only
+check (16 cells, root `/x/Temp/kindle-breakout-posterior-20261119`,
+finished, no fault) rules out sampling noise at decision time: the
+posterior's mode makes play worse (medians 330 and 173 against 380.5
+and 260) and averaging the actor over eight draws changes no return
+rate. The GPU replay stores frames as 32-bit floats and is most of the
+memory (11.3 of 15.6 GiB at 96x96 with 100k frames).
+[The life-terminal recipe at 128x128](docs/results/2026-11-19-breakout-wide-input.md)
+(`W22`, new native sizes 128 and 160, replay 50k, seed 22003, 1.6M
+actions, 294 minutes, 1.51 times the time per action, peak 14.4 GiB;
+root `/x/Temp/kindle-breakout-wide-20261119`, `queue-22.json`, finished
+18:53 UTC November 19, no fault) fails its three declared tests and is
+not retained: pooled median 122.5 at 1.6M with no game past the first
+wall, below the 96x96 50k-replay control's 800k checkpoint (174.5) and
+behind at every checkpoint (48.5 / 69 / 103.5 against 60.5 / 174.5 /
+322), still rising at the end; wide paddle .904, narrow .748. Its state
+reads the ball's height better (3.7 px against 4.6), the ball's
+horizontal position the same (5.5) and the paddle worse (5.5 against
+3.5), so landing minus paddle is 9.3 px against 6.7. Nothing was retuned
+for the wider input (33.5M world parameters against 17.9M). 96x96 stays
+the default; 160x160 costs 2.06 times per update, does not fit with a
+useful float replay, and its compact replay is not built. Five
+world-side changes on this seed have now failed to beat the unchanged
+recipe. Post hoc on CPU ([report](docs/results/2026-11-19-breakout-encoder-precision.md),
+a NumPy port of the encoder on replayed frames): the encoder's output
+for one frame holds the paddle to 2.1 px, better than the state (3.5),
+and the ball only to about 5 px (median) in open play, not at all among
+the bricks; the state's ball read comes from integrating frames. At
+128x128 the encoder is sharper on every object (paddle 1.6 px, ball 3.5
+to 3.7) and the state is not (paddle 5.5). A ball 4 px off in x costs
+the latent objective .0075 of cosine distance, a fifth of the remaining
+loss; 1 px costs .001.
+[The same recipe at model size 25m](docs/results/2026-11-20-breakout-model-size.md)
+(`S25`, 40.3M world parameters, replay 50k, seed 22003, 1.6M actions,
+335 minutes, 1.73 times the time per action, peak 11.5 GiB; root
+`/x/Temp/kindle-breakout-size-20261119`, `queue-23.json`, finished
+01:57 UTC November 20, no fault) fails its three declared tests and is
+not retained: pooled median 296 at 1.6M with no game past the first
+wall (341.5 on the fresh cohort), wide paddle .922, narrow .817. Its
+state reads the ball better (x 4.7 px against 5.5) and the paddle worse
+(4.0 against 3.5), so landing minus paddle is 7.4 px against 6.7; its
+encoder holds the paddle to 1.8 px. It is ahead of the 12m learners at
+400k and 800k (medians 84 and 283), drops to 141 at the 1.2M checkpoint
+with no drop in online returns, and its online returns track the 12m
+learners': **one frozen checkpoint of one seed moves by a factor of two
+within 400k actions**, and the unchanged recipe's spread at 1.6M has
+not been measured, so of the six changes compared with `L22`'s 380.5
+only the 128x128 result is clearly outside the noise. None is at the
+gate. 12m stays the default; capacity and input size are closed at this
+budget. Post hoc on CPU ([report](docs/results/2026-11-20-breakout-critic-calibration.md)):
+**on all eighteen own-play dumps the critic's mean value is 1.8 to 6.1
+times the discounted reward the life goes on to earn** (87.8 against
+30.5 on `L22` at 1.6M, above even the worth of the same reward rate with
+no ball ever lost, 52.3); the value orders states (correlation .56) and
+overstates all of them, and eight actions before a life ends it is
+still at about 90% of its level. The critic's replay target bootstraps
+from imagined returns beyond the 16-step window, so nothing ties it to
+a real outcome further away. As the concrete design of the
+actor's training signal the user chose on November 18,
+[the same recipe with completed real returns as the critic's replay targets](docs/results/2026-11-20-breakout-completed-value.md)
+(`V22`, `--replay-value-completed`, which the runner now allows with
+`--life-loss-terminal`; 12m, replay 50k, seed 22003, 1.6M actions, 206
+minutes, peak 9.3 GiB; root `/x/Temp/kindle-breakout-realvalue-20261120`,
+`queue-24.json` then `queue-24b.json`, finished 06:27 UTC November 20, no
+fault) passes its calibration test and fails the other three; not
+retained. The critic's value is .63 of the life's real return (11.4
+against 18.0; before 2.9 times), so the overestimate was the imagined
+bootstrap's, but the critic still prices a lost ball only at contact
+(AUC .64 one action out, bar .85) and orders states worse (correlation
+.30 against .56); wide paddle .921, narrow .708; pooled median 235 at
+1.6M with no game past the first wall, behind the control at every
+checkpoint (25 / 75.5 / 118.5 against 60.5 / 174.5 / 322) and in online
+returns throughout (160 per game at the end, the control's level at
+600k to 800k). Why learning slows is not separated (noisy real targets,
+or the inflated value pricing a lost life two to three times higher
+relative to the return scale). The completed-return actor's weights on
+its dump do not prefer holding still from a paddle in place. Eight
+changes on this seed have now failed to beat the unchanged recipe's
+380.5, itself the level published for DreamerV3 with sticky actions at
+200M frames (384). The user then chose to **find the cause of the
+collapse after 2.2M**. CPU diagnosis
+([declaration](docs/experiments/2026-11-20-breakout-encoder-freeze.md)):
+on identical frames the encoder's output drifts to slow scene content
+from 1.2M on; the share of its variance that follows the paddle falls
+from .100 (1.2M) to .076, .045 and .018 (1.6M, 2.0M, 2.4M), one action
+changes the output a sixth as much, and the drift does not reverse,
+while a linear readout still finds the paddle to 2 px; after the
+collapse the state reads the paddle at 8.9 px and the ball better than
+before. The causal test passes both declared tests:
+[`F22`](docs/results/2026-11-20-breakout-encoder-freeze.md), `L22`'s
+command with the encoder frozen from update 75,000 (1.2M actions; new
+`--encoder-freeze-update`), run to 2.8M actions (345 minutes, peak 15.4
+GiB; root `/x/Temp/kindle-breakout-collapse-20261120`, `queue-25.json`,
+finished 22:24 UTC November 20, no fault), **does not collapse and keeps
+improving**: pooled medians 378.5 / 370 / 385.5 / **404.5** at 1.6M /
+2.0M / 2.4M / 2.8M (`L22` 380.5 / 331.5 / 45 / 44), the best checkpoint
+on record (53 of 96 games at 400 or more, 5 past the first wall; wide
+paddle .956, narrow .884, the lower edge of the planner's 1 to 3 px
+band), training returns 342.5 per game over 2.4M to 2.8M (`L22` 49.7),
+paddle read from the state 3.7 to 3.8 px (`L22` 8.9). The run is a true
+twin of `L22` through 1.2M (checkpoint byte-identical, 1,192 training
+games identical). With the target encoder still, the latent loss halves
+(.048 to .023) and the dynamics KL falls from 10.8 to 6.3 within 400k
+actions, and training returns leave `L22`'s plateau. The encoder's
+drift is necessary for the collapse on this seed; why it drifts is not
+established. One development seed; still below the gate.
+[`F50`](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md),
+the same schedule on held-out seed 5011 to 2.8M (348 minutes;
+`queue-26.json` in the same root, finished 05:39 UTC November 21, no
+fault; a twin of `H50` through 1.2M), passes its safety test and fails
+the other two: no collapse, pooled medians 340.5 / 382 / 315.5 at 2.0M /
+2.4M / 2.8M over 144 games (`H50` 276 at 1.2M), training returns rising
+through every stretch to 320.3 per game over 2.4M to 2.8M; the 2.4M
+checkpoint is the best held-out point on record (57 of 144 games at 400
+or more, 6 past the first wall; wide paddle .949, narrow .853). On this
+seed the latent loss had been rising since 1.0M (.031 to .051) with
+training returns falling, and both turned within 50k actions of the
+freeze. The 2.8M median misses its bar of 350 because **greedy play
+stalls at the serve**: all 72 greedy games at 1.6M and 22 of 72 at 2.8M
+sit on a non-serving action to the action cap (39 cut games in the
+2.8M cells), while sampled play serves within about one action at every
+checkpoint and scores 271 / 333 / 370 / 351. With 18 actions, nine of
+them serving, the policy's single most probable action at the serve can
+be one that does not serve; `L22` at 2.8M and `X22b` showed the same.
+**A pooled sampled-and-greedy median is only comparable when no game is
+cut at the cap; check `truncated_episodes` in every cell and read
+sampled play separately.** Both frozen runs were still rising at 2.8M.
+[`E22`](docs/results/2026-11-21-breakout-encoder-freeze-800k.md),
+`L22`'s command with the encoder frozen from update 50,000 (800k), to
+3.6M actions (459 minutes; `queue-27.json` in the same root, finished
+14:59 UTC November 21, no fault), passes its safety test and fails the
+other three: no collapse, but the earlier freeze is not faster (training
+returns 282.6 per game over 1.2M to 2.0M against `F22`'s 291.8; 309.9
+against 309.4 over 1.2M to 2.8M) and **the frozen learner is level from
+2.4M on**: about 345 per training game, sampled medians 376 to 395,
+greedy 395 to 415.5 where greedy play serves (it stalls at 1.6M and
+2.8M), wide paddle .95 to .97, narrow .86 to .88, pooled 402.5 with 11
+of 96 games past the first wall at 3.6M. Greedy play there is at the
+lower edge of the planner's 1 to 3 px band; the lost ball is the same
+late, moving paddle. On training returns over 800k to 1.6M (about 450
+games, standard error 6) none of the eight earlier changes is ahead of
+the unchanged recipe (263.8; best 244.8), so the verdicts read from
+checkpoints stand. Freeze point and budget are closed as levers on this
+seed. The evaluation queue stopped twice on the host guard's
+kernel-journal read timing out (3 s limit; no kernel fault) and was
+relaunched for the remaining cells; **a guard "probe timed out" stop is
+not a device fault: check the kernel log, then relaunch the remaining
+jobs under a new queue file and guard directory.**
+[The pinned imagined-contact probe on three frozen-encoder checkpoints](docs/results/2026-11-21-breakout-frozen-imagination-probe.md)
+(`queue-28.json`, evaluation only, no fault) shows the freeze did not
+change imagination at contact: the world model still rates as safe .205,
+.210 and .192 of the action sequences the emulator loses (`E22` 3.6M,
+`F22` 2.8M, held-out `F50` 2.4M; unfrozen `L22` .203, open-loop `O22`
+.102), and the sequences it rates safest lose the ball .21 to .24 of the
+time.
+[`OF22`](docs/results/2026-11-22-breakout-open-loop-freeze.md),
+`O22`'s open-loop command with the encoder frozen from update 75,000
+(1.2M), to 3.6M actions (491 minutes; `queue-29.json` in the same root),
+passes its mechanism test and fails its play tests: imagination is
+calibrated (missed-loss share .123, the pairs rated safest lose .09;
+frozen recipe .205 and .23) and **play is worse than the frozen recipe
+without the term at every stage**: 290.4 per training game over 2.8M to
+3.6M against `E22`'s 343.8 (difference 53, standard error 8), pooled
+median 338 at 3.6M with 2 of 96 games past the first wall, wide paddle
+.93 to .94, narrow .84, a move among the last two actions in .82 of
+descents. With the term the freeze no longer halves the latent loss and
+KL (.038 and 11.0 against .027 and 5.1), imagined reward runs half above
+real reward and the critic's value is 6.1 times the real per-life
+return (`E22` 1.6). Open-loop supervision is not retained; the world
+model's side of the lost ball is closed and the actor's side (entropy
+against normalized advantages, horizon, return weighting) is what
+remains, undeclared. **A fourth GPU kernel fault** (same shape, again a
+frozen-inference job) stopped the queue at 00:09 UTC November 22 in job
+8 of 30; the user reviewed it on November 22 and chose to continue on
+the same boot (review file
+`gpu-fault-20261122-0009/reviewed-kernel-faults.json` under the root,
+all 44 fault records of the boot, that boot only). **A further fault
+needs a further review.** The mechanism probe and test 2's sampled cells ran on
+llvmpipe instead (the probe takes 313 minutes there, a cell 61 to 74;
+both units finished): sampled medians 328.5 / 362 / 330 / 380 / 339 at
+2.0M to 3.6M pass the safety bar of 250 and sit below `E22`'s 376 to
+394.5 at every checkpoint. After the review the 14 unrun jobs and a
+rerun of the probe on the card ran as `queue-29b.json` (15 jobs, no
+fault): the probe passes on the card too (.110 and .08) and pooled
+medians are 306 / 359 / 376.5 / 330 / 387.5 / 338 at 1.6M to 3.6M, below
+`E22` from 2.0M on, with 7 of 480 games past the first wall against 44.
+[Tempered play](docs/results/2026-11-22-breakout-tempered-play.md)
+(`--action-temperature 0.5` on `E22` at 3.6M and 2.8M and held-out `F50`
+at 2.8M, seven sampled cells, evaluation only, the assistant's design)
+passes its serve test and fails the other two: no game is cut, the
+wide-paddle return rate is .951 of 8,889 descents against sampled play's
+.948 (bar .958), medians 402 and 364.5 against bars of 405 and 370.
+Sampling noise is not what loses the ball; a lower actor entropy is not
+pursued. Post hoc: on `E22` at 3.6M nearly two of the five lives are
+lost on the wide paddle before the score reaches 100, and the return
+rate does not fall with the score on either paddle. Another project's
+training job has shared the card since 10:11 UTC November 22.
+**[Averaged checkpoints](docs/results/2026-11-22-breakout-averaged-checkpoints.md)
+play better than any single one.** While `E22`'s play is level its
+weights random-walk (the actor's distance between checkpoints is .185
+times the square root of the lag in 400k units), so the plain mean of
+several checkpoints' float tensors (`scratch-scripts/average_checkpoints.py`
+in the collapse root, outputs in `averaged/`; evaluation only, the
+assistant's design) was evaluated: `E22`'s mean of 2.8M, 3.2M and 3.6M
+pools to 420 over 144 games with 40 past the first wall (greedy 428 with
+30 of 72, wide paddle .977, narrow .923, one game at 864), and held-out
+`F50`'s mean of 2.0M, 2.4M and 2.8M to 409 over 144 games with 19 past
+the wall and no cut game (best single checkpoint 382 with 6; the
+declared "carries" bar of 400 and 20 is missed by one game). Sampled
+play of every mean returns more wide-paddle balls than any parent;
+greedy play of a mean can stall at the serve (the four-checkpoint mean).
+The gate is not met. [`D22`](docs/results/2026-11-23-breakout-learning-rate-drop.md),
+`E22`'s command with every learning rate cut to a quarter from update
+150,000 (2.4M; new `--learning-rate-drop-update` /
+`--learning-rate-drop-factor`, extension rebuilt November 22) and a
+checkpoint every 100k actions, to 3.6M (451 minutes; root
+`/x/Temp/kindle-breakout-lrdrop-20261122`, `queue-32b.json` then
+`queue-34.json`, finished 07:21 UTC November 23, no fault; the
+assistant's design), passes its mechanism, safety and training-return
+tests and misses its gate marker by two games: **the learner was held
+at its level by its own step size.** A twin of `E22` to the drop, it
+then moves a third as far between checkpoints (actor .066 against
+.186) and plays 382.3 per training game over 2.8M to 3.6M against 343.8
+(difference 38.5, standard error 7.7), a new level reached within 800k
+actions. Sampled medians are 402 to 407.5 at every later checkpoint
+(`E22` 376 to 394.5); the 2.8M checkpoint pools to 420 with 24 of 96
+games past the first wall (greedy 428 with 20 of 48, wide paddle .972,
+narrow .910, inside the band of the planner with 1 to 3 px of offset
+error; the planner the gate was set from returns .98 and .94 for 437); 3.6M pools to 406.5 with 18. Greedy play at 3.2M stalls a
+median of 53 actions at the serve and loses whole games at zero. The
+latent loss rises by a third after the drop while play improves; not
+explained. Averaging `D22`'s checkpoints after the drop adds nothing,
+and the mean of its five full-rate checkpoints from 2.0M to 2.4M plays
+417 with 20 of 96 past the wall: the drop and the mean are the same
+lever, and the late, moving paddle (.72 to .75 of descents) is what
+remains. Checkpoint cadence does not change training (checked bit for
+bit over 16,384 actions). [`D50`](docs/results/2026-11-23-breakout-learning-rate-drop-seed5011.md),
+`F50`'s command (held-out seed 5011, encoder frozen from 1.2M) with the
+same drop, to 3.6M (452 minutes; same root, `queue-35.json`, 21 jobs,
+finished 15:25 UTC November 23, no fault; the assistant's design),
+passes its mechanism, safety and level tests and misses its play marker
+on the median (398 against 400, with 22 of 144 games past the wall
+against a bar of 20): **the drop does on the held-out seed what it did
+on seed 22003.** A twin of `F50` to the drop, it plays 344.6 per
+training game over 2.4M to 2.8M against `F50`'s 320.3 (difference 24.3,
+standard error 11.3) and 364.2 over 2.8M to 3.6M; held-out
+play pools to 388.5 / 404.5 / 398 at 2.8M / 3.2M / 3.6M over 144 games
+with 11 / 17 / 22 past the first wall and no game cut (best before: 382
+with 6, and 409 with 19 for the mean of three `F50` checkpoints).
+Greedy play is 400.5 / 414.5 / 414 with 10 / 13 / 16 of 72 past the wall
+and serves without delay at all three checkpoints; wide paddle .953
+sampled and .966 greedy, narrow .864 and .882. **The frozen recipe with
+the drop is the best Breakout learner on both seeds and is not at the
+gate**; its level is that of the planner with 1 to 3 px of offset
+error, and the late, moving paddle is unchanged (.73 to .79 of
+descents). [`D60`](docs/results/2026-11-24-breakout-recipe-seed6007.md),
+`D50`'s command on fresh seed 6007, chosen after the schedule was fixed
+(454 minutes; same root, `queue-36.json`, 21 jobs, finished 23:40 UTC
+November 23, no fault; the assistant's design), passes its level, play
+and serve tests and is **the best Breakout learner on record**: 412.2
+per training game over 2.8M to 3.6M (`D22` 382.3, `D50` 364.2), play
+pooled to 424 / 423 / 424.5 at 2.8M / 3.2M / 3.6M over 144 games with
+45 / 40 / 39 past the first wall and no game cut or at zero, greedy play
+426 to 428 with 25 to 31 of 72 past the wall and no serve delay, wide
+paddle .966 sampled and .975 greedy, narrow .899 and .920 (the gate's
+planner .98 and .94). The seed is ahead of the other two from 800k on,
+moves into contact less often (.58 to .68 of wide descents against .73
+to .79) and holds the sharpest state (paddle 2.3 px, ball 3.3,
+landing minus paddle 6.3). **The recipe is fixed: life-terminal
+training, encoder frozen from 1.2M, learning rates cut to a quarter
+from 2.4M, 3.6M actions, about 7.6 hours.** Its three seeds at 3.6M
+pool to 406.5, 398 and 424.5 with 19%, 15% and 27% of games past the
+wall; the gate-level reading (430 with half the games past 432) is not
+met on any, and whether the gate is met or changed is the user's call.
+[`N60`](docs/results/2026-11-24-breakout-actor-entropy-schedule.md),
+`D60`'s command with the actor's entropy coefficient cut to a tenth
+from update 150,000 (new `--actor-entropy-drop-update` /
+`--actor-entropy-drop-factor`, extension rebuilt November 24; 454
+minutes; root `/x/Temp/kindle-breakout-entropy-20261124`,
+`queue-37.json`, 21 jobs, finished 08:10 UTC November 24, no fault; the
+assistant's design), passes its mechanism and safety tests and fails
+its level and play tests: **a policy trained sharper returns no more
+balls.** A twin of `D60` to the cut, its policy is far sharper
+(entropy between the three move classes .29 nats against .72 on the
+3.6M dump, total 1.31 against 2.46; holding still from a paddle in
+place two actions early .94 of the mass against .79) and nothing that
+scores moves: 422.9 per training game over 2.8M to 3.6M against 412.2
+(difference 10.7, standard error 8.6), play pooled to 418 / 424.5 / 424
+with 32 / 44 / 41 of 144 games past the wall, sampled wide paddle .968
+and narrow .903 (`D60` .966 and .899), greedy .975 and .916 (.975 and
+.920), a move among the last two actions in .53 to .68 of descents. The
+cut is not added to the recipe; with tempered play the actor's entropy
+is closed as a lever. [`C60`](docs/results/2026-11-24-breakout-playfield-crop.md), `D60`'s
+command with the 96x96 input cropped to the playfield inside the walls
+(`--image-crop 8 32 144 161`: 1.5 by 1.68 native pixels per input pixel
+instead of 1.67 by 2.19, same model, memory and time per update; root
+`/x/Temp/kindle-breakout-crop-20261124`, `queue-38.json` then
+`queue-38b.json`, 21 jobs, finished 16:40 UTC November 24; the
+assistant's design), fails its four tests and is not retained: the
+state reads positions no better (ball height 3.6 px against 3.3,
+landing minus paddle 6.2 against 6.3, paddle 2.9 against 2.3), the
+learner trains at 392.1 per game over 2.8M to 3.6M against 412.2
+(difference -20.0, standard error 7.3), play pools to 405 / 412.5 / 413
+with 25 / 26 / 20 of 144 games past the wall, and greedy play at 2.8M
+stalls at the serve (one game cut). **A fifth GPU kernel fault** (same
+shape, again a frozen-inference job) stopped its queue at 16:12 UTC
+November 24 after training; the user reviewed it at 16:24 UTC and chose
+to continue on the same boot (review file
+`gpu-fault-20261124-1612/reviewed-kernel-faults.json` under that root,
+all 53 fault records of the boot, that boot only). **A further fault
+needs a further review.** At the same time **the user chose the
+direction: an input aligned 1:1 with the game's pixels and a sharp
+loss.** Built for it on November 24 (extension rebuilt; each option is
+off unless set, and the unchanged recipe reproduces its reference smoke
+bit for bit): `--image-size 160 --image-crop 0 33 160 160` is the exact
+1:1 input (a same-size crop passes native bytes through to the last
+place); `--replay-compact` keeps device-replay observations as bytes (a
+quarter of the memory; not a bit-exact twin of the float replay,
+because the host's decode can differ from the card's division in the
+last place); `--rgb-encoder-stage5` adds a fifth halving stage (a 160
+input ends on a 5x5 grid); `--world-pixel-loss cross_entropy` trains
+the CDP auxiliary decoder with the per-value Bernoulli likelihood
+(squared error behind the decoder's sigmoid has a vanishing gradient
+for a confidently missed pixel), now also allowed with a crop;
+`--world-pixel-stride N` decodes every N-th step of the training
+window. Measured on 16,384-action smokes (root
+`/x/Temp/kindle-breakout-aligned-20261124`): the 1:1 input alone runs
+at 70.6 actions per second against 138 (peak 8.5 GiB at 17k replay
+frames) and the 1:1 input with the decoder on every step at 24.3 (peak
+11.5 GiB, too much for a 100k replay), with the latent loss undisturbed
+after 1,000 updates; on every fourth step it runs at 49.8 (peak 9.4
+GiB), and after 16,384 actions the state already reads the paddle to
+0.9 to 1.4 px. [`A60`](docs/results/2026-11-25-breakout-aligned-input-sharp-loss.md),
+`D60`'s command on seed 6007 with the 1:1 input, the fifth stage, the
+byte replay at 80,000 frames (100,000 projects to within 0.4 GiB of the
+memory limit) and the cross-entropy decoder at weight 1 on every fourth
+step (root `/x/Temp/kindle-breakout-aligned-20261124`, `queue-40c.json`,
+26 jobs, finished 17:52 UTC November 25; training 1,248 minutes at 48.1
+actions per second, 2.87 times the recipe's time per action, peak 14.1
+GiB; the direction is the user's, the design the assistant's), fails
+its four tests and is not retained: **the ball is read sharper, the
+paddle and play are worse.** At 3.6M the state reads the ball's x to
+2.9 px and its height to 3.0 (`D60` 3.3 and 3.3; bar 2.8), the paddle
+to 3.2 (2.3) and the landing relative to the paddle one action out to
+8.7 (6.3; bar 5.7); the paddle read worsens from 1.2M on, as it did at
+128x128. The learner is ahead of `D60` to 800k (22.6 and 128.8 per
+training game over the first two 400k stretches against 6.6 and 109.3)
+and behind in every stretch after: 364.2 over 2.8M to 3.6M against
+412.2 (difference -48.0, standard error 7.6). Play pools to 376 / 390 /
+402.5 with 6 / 7 / 9 of 144 games past the wall; the narrow paddle
+returns .837 sampled and .877 greedy (`D60` .899 and .920); one greedy
+game at 3.2M is cut at the cap in an endless volley. The dynamics KL is
+about twice `D60`'s throughout (13.6 to 15.5 against 6.0 to 8.3) and
+the freeze does not bring it down, the signature open-loop supervision
+left on November 22. Position precision has now been approached four
+ways (squared-error decoder, 128x128, the crop, this package) with no
+gain in the state's landing-to-paddle offset or in play. Two launches
+preceded the run: the first was stopped at 55,016 actions for a memory
+defect (the byte replay's 21 MiB pages wasted a third of each 64 MiB
+allocator block; they are now 31 MiB, two per block), and
+**a sixth GPU kernel fault** (same shape; the first in a training
+job) killed the second at 18:43 UTC November 24, at 152,296 actions;
+evidence in `gpu-fault-20261124-1843/` under the root. The user
+reviewed it at 20:44 UTC and chose to continue on the same boot (review
+file `reviewed-kernel-faults.json` there, all 62 fault records of the
+boot, that boot only; **a further fault needs a further review**), and
+the third launch ran its 21 hours with no fault. Whether that fault had
+to do with the job's new code is not known. Frozen dumps of a 160x160
+checkpoint on llvmpipe take 227 minutes each and about 14 GB of host
+memory by their growth rate (11.7 GB measured after 147 minutes; two
+were run beside the trainer as early observations).
+[`R60`](docs/results/2026-11-26-breakout-replay-300k.md), `D60`'s
+command on seed 6007 with `--replay-capacity 300000 --replay-compact`
+and nothing else changed (the assistant's design; root
+`/x/Temp/kindle-breakout-replay-20261125`, `queue-41.json`, 21 jobs,
+finished 01:49 UTC November 26, no fault; training 415 minutes, peak
+14.1 GiB as projected), fails its three tests and is not retained:
+**three times the replay is no gain.** It trains at 391.7 per game
+over 2.8M to 3.6M against 412.2 (difference -20.5, standard error 7.7).
+It falls behind in two places: learning takes off about 100,000 actions
+later (134.7 per game over 0.4M to 1.2M against 170.8) and the
+learning-rate cut buys less (385.1 over 2.4M to 3.6M against 410.0);
+on the frozen encoder at the full rate the runs are level (323.8
+against 330.1). The latent loss is half of `D60`'s after the freeze
+(.017 to .022 against .030 to .039) and play does not follow. Play pools to
+342.5 / 418 / 419.5 with 9 / 31 / 43 of 144 games past the wall; greedy
+play at 2.8M waits a median of 41 actions at the serve and loses half
+of the first, slow balls (25 of 72 games at zero, 3 cut), while greedy
+play at 3.6M is 429.5 with 31 of 72 past the wall, level with `D60`'s
+best. Sampled play returns .959 wide and .883 narrow (`D60` .966 and
+.899), and the agent moves into contact more often (.76 to .78 of wide
+descents against .58 to .68). The run changes the replay's length and
+its storage together and does not separate them (the byte replay at
+100,000 frames would, under its own declaration); the one earlier
+replay-size comparison (50,000 against 100,000 frames on seed 22003,
+33.9 per training game apart over 0.8M to 1.2M, standard error 11.9)
+also had the 100,000-frame replay ahead. A byte-replay frame with its
+state takes 37,888 bytes against 120,832, and the device allocator
+rounds each replay page up to a power of two, which is what the 31 MiB
+byte pages are sized for. The recipe keeps its 100,000-frame float
+replay.
+Post hoc on the five full runs of seed 6007: the late take-off is
+`R60`'s alone (`A60`, with a byte replay at 80,000 frames, took off
+with the others), while the deficit after the rate cut is shared by
+`C60` (389.2 over 2.4M to 3.6M, `R60` 385.1, `D60` 410.0, `N60` 418.3),
+and `D60` and `N60` are one trajectory to 2.4M: **how far the same
+configuration on one seed moves between runs has not been measured.**
+[`B60`](docs/results/2026-11-26-breakout-byte-replay-100k.md),
+`D60`'s command with `--replay-compact` appended and nothing else
+changed (the assistant's design; same root, `queue-42.json`, 21 jobs,
+finished 09:41 UTC November 26, no fault; training 427 minutes, peak
+6.84 GiB against `D60`'s 15.41), passes its three tests: **the byte
+replay is cleared and the recipe's late level on seed 6007 repeats.**
+The byte replay holds the float replay's values and differs in a
+float's last place, so the run is the first repeat of the unchanged
+configuration on a seed. It trains at 410.3 per game over 2.8M to 3.6M
+against `D60`'s 412.2; pooled, the recipe on this seed is at 411.2 (610
+games, standard error 4.4), and `R60` and `C60` are each 19 below that
+(three standard errors), `A60` 47, `N60` 12 above (inside the noise).
+**The path does not repeat:** the two runs are 55 per game apart over
+0.4M to 1.2M (`B60` ahead) and 29 apart in the first 400k actions after
+the rate cut, single checkpoints span 25 to 54 games past the wall of
+144, and the share of descents with a move among the last two actions
+(.71 to .75 here, `D60` .58 to .68) and the dump's policy readings
+differ by amounts read as effects before. `R60`'s late take-off is
+inside that spread; its late level is not. **Compare runs of this
+recipe on the training return over 2.8M to 3.6M; one checkpoint's games
+past the wall or one dump's policy readings are not evidence of an
+effect.** The 3.6M checkpoint is the best single checkpoint on record:
+pooled 428 with 54 of 144 games past the wall, greedy 431 with 34 of 72
+(wide paddle .980, narrow .923; the gate's planner .98 and .94), sampled
+424 with 20 of 72, no game cut or at zero in any cell. Over both
+unchanged runs and the three late checkpoints, 77 of 432 sampled games
+and 160 of 432 greedy games pass the wall. The gate-level reading (430
+with half the games past 432) is not met. **`--replay-compact` is safe
+and frees 8.6 GiB.**
+Post hoc on CPU: the frozen encoders of five runs of the recipe,
+applied to the same 64,000 frames, order by level in how well one
+frame's output reads the ball (linear readout of ball x: `D60` 8.0 px
+and `B60` 8.4 at 412 and 410 per training game; `R60` 9.9 at 392, `D22`
+10.6 at 382, `D50` 10.2 at 364; `analysis/encoder-readout-*` in the
+replay root). The recipe's seeds differ by more than any change tried
+since the rate cut (364, 382, 411), and that spread is not run-to-run
+noise where it was measured. `--encoder-transplant CHECKPOINT` (runner
+only, no native change; off unless set) starts a fresh agent on another
+checkpoint's image encoder; a restored agent draws its random streams
+from a different seed than a fresh one, so a transplanted run is not a
+twin of the fresh run in its sampling.
+**Running:**
+[`X50`](docs/experiments/2026-11-26-breakout-encoder-transplant.md),
+the recipe on seed 5011 with `D60`'s frozen encoder transplanted, the
+encoder frozen from the first update and the byte replay (the
+assistant's design; root `/x/Temp/kindle-breakout-transplant-20261126`,
+`queue-44.json`, guards `guards-44`, 21 jobs, unit
+`kindle-breakout-transplant5011-20261126`, launched 10:48 UTC November
+26, about 7 hours of training). Test: 388 or more per training game
+over 2.8M to 3.6M (`D50` 364.2, seed 6007 411.2). If it passes, the
+control is the same command with seed 5011's own frozen encoder, under
+its own declaration.
+The standardized objective (`--cdp-scale-floor`) is source only,
+not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
+(`/` at 100%; another project's run directory holds 935 GB), not a GPU
+fault; smoke-run weights were deleted to finish. On November 22 the
+user approved deleting the October 27 to November 9 run roots: 283
+removed, 17 kept (lists in `cleanup-20261122/` under the collapse root),
+151 GB free afterwards. Run-root paths from those dates in the roadmap
+and older reports, and the November 10 to 12 screen roots removed
+earlier, no longer exist; the reports are the record. On November 24, at the
+user's request to clean up, the 2,034 `*-frozen` weight files that
+evaluation cells had written since November 15 (159 GiB, each verified
+by tensor content to equal a kept checkpoint; metadata and logs stay),
+the smoke runs' weights and a scratch build cache were deleted (lists in
+`cleanup-20261124/` under the collapse root): 243 GB free afterwards.
+Roots from before November 15 were not thinned, because their audits
+pin file hashes. On November 25 the aligned root's 54 frozen duplicates (4.3 GiB)
+were removed the same way (`cleanup-20261125/` under that root). On November 26 the replay root's 54 (4.1 GiB) followed (`cleanup-20261126/` under that root), and `B60`'s 54 (4.1 GiB) after it (`cleanup-20261126b/`). **Check `df` before launching a queue; a run needs
+about 7 GB, 4 GB of it frozen exports that duplicate the checkpoints.** A `journalctl --since` filter without a date, read after
+midnight, names a future time; use dated filters in queue summaries.
+**On November 18 the user replaced the Breakout gate:** "learned well" is
+measured against the perfect-knowledge planner under the same
+sticky-action protocol, a held-out median near its 437 with most games
+past the first wall (432), not 864 in 90% of games. On a
+[fresh agent cohort](docs/results/2026-11-12-breakout-agent-heldout.md)
+(4000777001) the seed-1009 pixel-world agent beats the retained CDP agent in
+greedy play at both budgets (177.8 / 163.2 at 200k, 223.0 / 192.0 at 400k),
+loses sampled at 200k (48.0 / 75.2) and ties it at 400k (89.8 / 90.6). The
+[paired CDP seed screen](docs/results/2026-11-12-breakout-agent-cdp-seeds.md)
+(CDP on seeds 3005 and 4007: greedy 93.0 / 112.0 and 82.3 / 100.4, sampled
+39.4 / 41.1 and 49.6 / 43.7) settles the variance question: with four seeds
+each, greedy means are close (CDP 95.6 against pixel 113.7 on cohort 22003)
+but the pixel recipe's range is two to three times wider (44 to 161 against
+75 to 112), and CDP's sampled mode is about 18 points higher on average while
+also varying widely (39 to 71). 0 two-wall episodes in 70 evaluations, best
+single episode 414.
+First-run root
+`/x/Temp/kindle-breakout-world96-agent-20261110` (unit finished). World-model root `/x/Temp/kindle-world-scale-20261110`; driver
+`python/examples/breakout_world_scale.py` (`probe` mode runs the state readout
+on any checkpoint). These are development screens on reused seed 41001 and
+reused origins, not held-out qualification. CDP and the five-game campaign
+stay parked.
+
+The previous [cumulative-survival learner](docs/results/2026-11-10-breakout-world-survival-loss-learning.md)
+remains frozen by systemd at the user's request at update 9,964/16,384
+(`kindle-world-survival-loss-learning-20261110.service`, PID 2287733); it holds
+about 1 GB of host memory and 0.5 GB of VRAM. Do not thaw, restart or stop it
+without the user. The November 16 GPU reset reported VRAM lost, so its
+device state is presumably gone; that does not change the instruction. Its fixed protocol, qualification and the closed RGB-event
+reviews stay as recorded in their reports; its runtime is the fork's.
+
+## Direction and retained results
+
+Training is the priority. Backend optimization,upstream porting and JAX parity
+are parked. The retained agent uses **centered CDP** with a jointly learned CNN,
+categorical RSSM and imagined actor/critic. The isolated-world track
+uses explicit pixel supervision; the denoiser still fails physics gates, with
+bounded reward support retained as a development improvement. No pretrained DINO or Tiny
+JEPA encoder is required. Explicitly select the intended objective; learned RGB
+remains the CLI default.
+
+The priority is compute-constrained success on this game set. Game-specific
+model sizes,resolutions and learning settings are allowed; one universal recipe
+is not required. Prefer useful frozen learning per GPU-hour. Start fromT16;
+T64 is an experiment,not the default. Native32/48/64 geometry is supported.
+Size1M works well for Boxing/Freeway but was much weaker for Breakout/Qbert.
+Changing several settings to find a cheap useful recipe is allowed; disclose
+them without claiming isolated causes or broad reliability.
+
+Work on `phase2-levjepa-evaluation` and PR31. The branch includes the qualified
+c8aeba28 implementation with portable dependencies. Do not switch to a separate
+takeover branch or modify neighboring worktrees. Keep `runs/`,large data and
+archived experiment ledgers out of Git.
+
+The **five-game goal is unfinished**:
+
+| Game | Retained evidence | Remaining limitation |
+|---|---|---|
+| [Boxing](docs/results/2026-10-25-cdp-cheap-boxing.md) |1M32:76.833/79.167,two learners with24/24 wins,in28m22s/28m13s|Both pass; broad reliability open|
+| [Freeway](docs/results/2026-10-25-cdp-cheap-freeway.md) |Aided1M32:31.042/32.000,two learners with24/24 successes,in28m17s/28m50s|Aid off during evaluation; broad reliability open|
+| [Pong](docs/results/2026-10-25-cdp-cheap-pong.md) |12M48/B16/R16:greedy15.208 on both learners,24/24 wins,in41m28s/41m31s|Greedy passes narrowly; sampled passes one of two|
+| [Breakout](docs/results/2026-11-02-cdp-breakout-replay-value1.md) | Retain 200k sampled70.750/greedy143.667 in21m28s; [400k budget point](docs/results/2026-11-03-cdp-breakout-budget400k.md) scores92.792/173.708 in43m37s; clean life-terminal recipe at [1.2M actions](docs/results/2026-11-16-breakout-ratio16-budget.md): cell means 264 to 353, pooled medians 334/350 on seeds 22003/1009, 150m each; [held-out seed 5011](docs/results/2026-11-17-breakout-heldout-and-budget.md) median 276; unchanged recipe's best checkpoint (22003 at 1.6M) median 380.5; [encoder frozen from 1.2M](docs/results/2026-11-20-breakout-encoder-freeze.md): 404.5 at 2.8M on seed 22003, [held-out seed 5011](docs/results/2026-11-21-breakout-encoder-freeze-seed5011.md) 382 at 2.4M; [frozen from 800k to 3.6M](docs/results/2026-11-21-breakout-encoder-freeze-800k.md): level at about 345 per training game, 402.5 at 3.6M; [open-loop supervision on the frozen recipe](docs/results/2026-11-22-breakout-open-loop-freeze.md): worse, 338 at 3.6M; [tempered play](docs/results/2026-11-22-breakout-tempered-play.md): no more balls returned; [averaged checkpoints](docs/results/2026-11-22-breakout-averaged-checkpoints.md): 420 with 40 of 144 past 432 on seed 22003, held-out 409 with 19 of 144; [learning rates cut to a quarter from 2.4M](docs/results/2026-11-23-breakout-learning-rate-drop.md): 382 per training game against 344, 420 with 24 of 96 past 432 at 2.8M, 406.5 with 18 at 3.6M (seed 22003); [the same drop on held-out seed 5011](docs/results/2026-11-23-breakout-learning-rate-drop-seed5011.md): 364 per training game over 2.8M to 3.6M, 404.5 with 17 of 144 past 432 at 3.2M, 398 with 22 at 3.6M; [the fixed recipe on fresh seed 6007](docs/results/2026-11-24-breakout-recipe-seed6007.md): 412 per training game over 2.8M to 3.6M, 424.5 with 39 of 144 past 432 at 3.6M (424 with 45 at 2.8M), greedy 427.5 with 25 of 72; [the actor's entropy coefficient cut to a tenth from 2.4M](docs/results/2026-11-24-breakout-actor-entropy-schedule.md): policy far sharper, play unchanged (424 with 41 of 144 at 3.6M); [the input cropped to the playfield](docs/results/2026-11-24-breakout-playfield-crop.md): state no sharper, 392 per training game, 413 with 20 of 144 at 3.6M; [the 1:1 input with a cross-entropy decoder](docs/results/2026-11-25-breakout-aligned-input-sharp-loss.md): ball read sharper, paddle and offset worse, 364 per training game, 402.5 with 9 of 144 at 3.6M; [a 300,000-frame byte replay](docs/results/2026-11-26-breakout-replay-300k.md): 392 per training game, 419.5 with 43 of 144 at 3.6M; [the byte replay at 100,000 frames, a repeat of the recipe](docs/results/2026-11-26-breakout-byte-replay-100k.md): 410 per training game (recipe pooled 411), 428 with 54 of 144 at 3.6M, greedy 431 with 34 of 72 | [New cohort](docs/results/2026-11-06-cdp-breakout-seed22003.md):greedy94.625/75.250 andsampled70.500/44.708 on1009/22003; material seed/cohort variation. All0/24 two-wall. Gate since November 18 (user): the perfect-knowledge planner's level under sticky actions, held-out median near 437 with most games past 432; unmet (best single checkpoint 420 with 24 of 96 past 432 on a development seed, held-out 404.5 with 17 of 144 and 398 with 22 of 144, fresh seed 6007 424 with 45 of 144, 424.5 with 39 of 144 and, in its repeat, 428 with 54 of 144; averaged checkpoints 420 with 40 of 144 and held-out 409 with 19 of 144). Original864/90% gate retired (0 of 20 for that planner); collapse after 2.2M actions unless the encoder is frozen |
+| [Qbert](docs/results/2026-11-02-cdp-qbert-r20-seed18013.md) |Fixed240k/R20:greedy15,279.167/15,931.250 on16001/18013,24/24 first pyramids each,in25m58s/26m23s|One passing development learner andone fresh confirmation;sampled12,972.917/14,976.042 both fail15k. Earlier R24 failure remains; broad reliability open|
+
+Published long-run scores are aspirations,not matched-budget comparisons.
+Finite losses,short runs and backend speed do not establish mastery or CDP
+superiority. Guided online returns and replay imitation losses are not frozen
+competence. Keep detailed results in the roadmap and linked reports,not a
+growing history in this file.
+
+Useful Breakout diagnostic references:
+- [Value consistency](docs/results/2026-11-02-cdp-breakout-value-consistency.md):
+  sampled one-step RMSE.732/.941 versus complete-return6.682/6.691. Short targets
+  use the same critic's bootstrap; terminal slices are outcome-conditioned.
+  All32 diagnostic/73 source/912 active pins pass;6.366s CPU-only,original Qbert
+  identity preserved. Import failure/repair retained; no new loss orlearner.
+- [Encoder4e-5](docs/results/2026-11-01-cdp-breakout-encoder4e5.md):
+  sampled/greedy56.292/104.667 versus25.292/42.625 at2e-5;21m28s versus22m27s.
+  All227 pins,recovery,initial/frozen tensors,replays,guards and original
+  services pass. Retain4e-5; earlier4M/expert10 rate failure remains relevant.
+- [Representation and own-policy replay](docs/results/2026-11-01-cdp-encoder4e5-representation.md):
+  ball/motion readouts improve but remain less precise than pixel diagnostics.
+  All replacement action readouts trail the learned actor. Own episodes last
+  25.36% longer and earn95.88% more reward/action; state distributions differ.
+- [Teacher takeovers](docs/results/2026-11-01-cdp-breakout-recoverability.md):
+  earlier control avoids108/120 recorded losses versus26/120 at the last
+  near-descending state. This supports earlier-control investigation,not exact
+  causal error attribution or optimal irrecoverability. CPU-only,293 pins pass.
+- [Delayed-takeover states](docs/results/2026-11-01-cdp-breakout-takeover-states.md):
+  onlytwo of21 earlier-only rescues project contact withinfive actions at delay16;
+  14 already match the teacher command. Timing estimates/imperfect teacher do not
+  isolate the cause. All480 joins/478 saved-branch recounts,nine inputs and524
+  active Qbert pins pass;CPU-only2.766s,complete15:23:52 UTC November1. Do not rerun.
+
+Completed negative results and protocol failures remain retained. Do not restart
+completed learners,old queues,failed assessments or collectors; no unchanged
+long extensions,broad seed campaigns or automatic successors. Consult the linked
+protocol before a separately justified new experiment. Preserve original failures
+when a separate CPU-only repair completes missing evidence; never relabel a
+protocol-failed comparison as passed. Single-actor learning precedes swarms or
+concurrent learners.
+
+## Runtime and precision
+
+Use **Auto** on the current AMD RX7900XT/RADV. BF16 and
+`KINDLE_DEVICE_TARGETS` remain unavailable. Three paired early updates leave the
+first reward projection unchanged underF16 while Auto changes it; derivatives
+and mechanism remain unmeasured. Completed F16/Auto B2/T64 lives do not justify
+extensions. [Precision evidence](docs/results/2026-10-25-cdp-amd-precision.md).
+
+Current retained learning uses native447fe50/SHA256 prefix35ad0db and the exact
+matching runner. Breakout retains `/x/Temp/kindle-breakout-corrective-20261028/runtime`;
+current Qbert uses `/x/Temp/kindle-qbert-color-masks-20261101/runtime` with the
+qualified faster,decision-equivalent teacher.
+Each declaration pins exact native,runner,teacher and source bytes. Optional
+posterior,temperature,centroid,open-loop and imitation-decay runtimes have
+separate receipts; do not mix overlays. Preserve source-specific validation
+failures and limits. No rebuild is needed for an exposed learning-rate change.
+
+## Experiment practice
+
+- Treat every declaration-pinned script as immutable, including CPU analysis.
+  Write changes under a new filename and declare them separately.
+- Use small development runs and meaningful checks; avoid turning preparation
+  into another backend qualification project. Automate monitoring and audits.
+- Keep batched inference with eight independent Atari environments. Report
+  aggregate actions and emulator frames separately,plus wall-clock time.
+- Retain config,seeds,source/native identity,curves and frozen natural-episode
+  evaluations against actual-initial controls. Record aids,budgets,cutoffs and
+  failures. Confirm promising changes across seeds before reliability claims;
+  selected/reused development seeds are not held-out tests.
+- Checkpoints omit replay,live belief,games and RNG. A restored extension is a
+  warm start,not uninterrupted learning or an independent seed. Restore preserves
+  architecture/geometry and rejects fresh-training overrides.
+- Preserve native max-pooled frames and one GPU resize; verify small-object
+  visibility. Do not reintroduce CPU downscale followed by upscale.
+- Put compact results in docs/results and update PR31. Logs,weights,videos,
+  build caches and profiling dumps belong outside Git. Keep useful checkpoint
+  milestones; release disposable build caches after packaging.
 
 ## GPU operation
 
-- Ordinary bounded GPU work is authorized on driver 580.178.04. Normal JAX/CUDA
-  initialization (including its internal NVML use) is permitted. Separate NVML
-  polling/legacy health loggers remain off. Do not build an NVML-free backend or
-  a CPU learner workaround. Unavailable utilization is unmeasured, not zero.
-- Serialize heavy GPU jobs. Use `python/examples/gpu_host_guard.py` around the
-  native-bearing process with a persistent systemd user service (`Restart=no`,
-  `KillMode=control-group`, bounded deadline). A game integration needs explicit
-  ownership/cleanup of its game process too. Review failures before any follow-up.
-- Require the expected native device and >=2GiB sampled Vulkan estimated
-  budget headroom. Budget-minus-usage is not physical free or peak VRAM.
-  Last observed boot: `4f5152d1-e5fd-46cf-a0c4-06534c430d26`.
-- Stop on kernel faults/native failures. No reset, driver reload/change, reboot
-  or power-cycle without new user approval. Historical Xid62/154 incidents remain
-  unexplained; successful no-NVML runs prove neither causality nor safety. Never
-  retry quarantined 75dfe, 0a98775/02b600a1 or 070f4b51/7db0d05c bundles. Follow
-  `docs/gpu_incident_response.md`; do not restart historical queues/followers.
+GPU work is authorized unless the device is genuinely faulted. Set
+`MEGANEURA_DEVICE_ID=0x744c` (RX 7900 XT) for every GPU job: on November 14
+Blade's default adapter switched to the integrated GPU without a kernel message. Known allocation
+warnings alone are not an approval gate. Use the existing host guard and stop on
+real faults or numerical failures. No automatic driver reset/reload/reboot.
+Separate NVML polling is unnecessary for the current experiment. Check live
+process/service identity before work; an observer timeout is not a stopped job.
 
-## Implementation discipline
+The current AMD host is separate from the original NVIDIA PMU incident. Older
+595/615 drivers repeatedly halted during first-world initialization,before
+checkpoint loading. An ASLR-disabled debugger success was not a fix; localization
+does not establish a buffer,firmware or hardware cause. On that host,use the
+prepared pre-submission capture after recovery,not another blind restore. The
+ABI-specific GDB collector applies only to its original binary. On a new healthy
+GPU,qualify bounded initialization/restore and record device/driver identity
+without inheriting old boot assertions.
 
-Keep exercised production code small. Delete obsolete encoding/compatibility
-code instead of extending it. Use proportionate correctness/integration tests,
-formatting and Clippy. Do not rebuild unchanged source for documentation edits.
-One concise run configuration/result is enough; no new artifact-pin framework.
+## Historical material
 
-Automate routine validation. Check long training about every 30 minutes or on
-completion; report meaningful results, not counters. Never compile during
-matched timing. Use one CPU, 2GiB and zero swap for heavy preparation. Meganeura
-has an unignored GPU test, so review CPU test filters.
+On this host, the original checkpoints remain in the verified local extraction
+`/x/Temp/kindle-amd-20261025/handover`. The historical shared-transfer pathname
+below is absent at the November10 cleanup check; see the cleanup report.
 
-Preserve unrelated user changes, especially in Meganeura/Blade/mind-games.
-Only the user merges PRs; commits and pushes are allowed. Keep history linear.
+The shared transfer `/mnt/data/kindle-handover-20261025` contains the4096-action
+context smoke and2M Breakout originals,matching all346 tensors. Other historical
+game weights were not transferred. New AMD checkpoints remain locally retained.
+Original archives moved to `/x/Artifacts/shared-drive-cleanup-20261025` on the
+original machine; exact counters and paths are in the handover.
+
+Old incident/optimization ledgers and detailed data remain on
+`archive/phase2-before-cleanup-20261025`; current reports stay here.
+Earlier expanded instructions remain in Git at34b1e74; the earlier experiment
+ledger is preserved at52c2174 (and earlier113ecde/8b1ba49) and in the roadmap/reports. Historical “next”
+paragraphs are not active instructions. Preserve user-authored TASK.md and
+docs/cdp-claude-feedback.md as context; subsequent CDP decisions and measured
+results supersede their older architecture/performance assumptions. Do not
+merge this or upstream PRs on the user's behalf.
