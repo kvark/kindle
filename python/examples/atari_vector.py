@@ -43,6 +43,43 @@ LIFE_TERMINAL_KIND = "raw-frame-life-loss-episode-end-v1"
 LIFE_RESET_KIND = "raw-frame-life-loss-belief-reset-v1"
 
 
+# A fresh agent whose image encoder is another checkpoint's, copied before the first update.
+ENCODER_TRANSPLANT_KIND = "fresh-agent-encoder-tensors-from-checkpoint-v1"
+ENCODER_TENSOR_PREFIX = "world.representation.encoder."
+
+
+def transplant_encoder(work, donor):
+    """Replace the image encoder's tensors in the fresh checkpoint `work` with the donor checkpoint's.
+
+    The optimizer moments of the fresh agent (all zero) are kept; the donor's are not copied."""
+    import hashlib
+    import numpy as np
+    from safetensors import safe_open
+    from safetensors.numpy import save_file
+    world = work / "world.safetensors"
+    with safe_open(str(world), "np") as own, safe_open(str(Path(donor) / "world.safetensors"), "np") as other:
+        metadata = own.metadata()
+        tensors = {name: own.get_tensor(name) for name in own.keys()}
+        names = sorted(name for name in tensors if name.startswith(ENCODER_TENSOR_PREFIX))
+        if not names or names != sorted(name for name in other.keys() if name.startswith(ENCODER_TENSOR_PREFIX)):
+            raise ValueError("encoder transplant: the two checkpoints' encoder tensors differ in name")
+        changed = 0
+        for name in names:
+            value = other.get_tensor(name)
+            if value.shape != tensors[name].shape or value.dtype != tensors[name].dtype:
+                raise ValueError(f"encoder transplant: {name} differs in shape or type")
+            changed += int(not np.array_equal(value, tensors[name]))
+            tensors[name] = value
+    save_file(tensors, str(world), metadata=metadata)
+    meta = json.loads((work / "metadata.json").read_text())
+    if meta["learner_step"] != 0 or meta["environment_step"] != 0:
+        raise ValueError("encoder transplant requires a fresh agent")
+    meta["tensor_sha256"]["world"] = hashlib.sha256(world.read_bytes()).hexdigest()
+    (work / "metadata.json").write_text(json.dumps(meta, indent=2))
+    return dict(kind=ENCODER_TRANSPLANT_KIND, donor=checkpoint_identity(donor), tensors=len(names),
+                tensors_changed=changed, values=int(sum(tensors[name].size for name in names)))
+
+
 def require_gpu_budget(snapshot, minimum_bytes):
     if (not isinstance(snapshot, dict) or set(snapshot) != {"usage_bytes", "budget_bytes"}
             or any(type(value) is not int or value < 0 for value in snapshot.values())):
@@ -210,6 +247,8 @@ def main():
                         help="fresh centered CDP: divide each centered dimension by the root of its batch variance plus this floor")
     parser.add_argument("--encoder-freeze-update", type=int,
                         help="fresh CDP: learner update from which the encoder's learning rate is zero")
+    parser.add_argument("--encoder-transplant", type=Path,
+                        help="fresh CDP: copy the image encoder's tensors from this checkpoint before the first update")
     parser.add_argument("--learning-rate-drop-update", type=int,
                         help="fresh CDP: learner update from which every learning rate is multiplied by --learning-rate-drop-factor")
     parser.add_argument("--learning-rate-drop-factor", type=float,
@@ -887,6 +926,10 @@ def main():
             parser.error("encoder-freeze-update requires fresh CDP and a positive update")
         if not getattr(kindle.VectorAgent, "SUPPORTS_ENCODER_FREEZE", False):
             parser.error("installed Kindle native module lacks the encoder freeze")
+    if args.encoder_transplant is not None:
+        if (not args.cdp or args.restore or args.evaluate or args.encoder_checkpoint
+                or not (args.encoder_transplant / "world.safetensors").is_file()):
+            parser.error("encoder-transplant requires fresh learned-RGB CDP training and a checkpoint directory")
     if (args.learning_rate_drop_update is None) != (args.learning_rate_drop_factor is None):
         parser.error("learning-rate-drop-update and learning-rate-drop-factor are set together")
     if args.learning_rate_drop_update is not None:
@@ -1157,6 +1200,19 @@ def main():
             agent = (kindle.VectorAgent.restore(str(args.restore), args.encoder_checkpoint, args.num_envs)
                      if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config,
                          **(dict(encoder=args.encoder) if args.encoder else {})))
+        encoder_transplant = None
+        if args.encoder_transplant is not None:
+            import gc, shutil, tempfile
+            work = Path(tempfile.mkdtemp(prefix="encoder-transplant-", dir=os.environ.get("TMPDIR")))
+            fresh_config = agent.config
+            agent.save_checkpoint(str(work))
+            del agent
+            gc.collect()
+            encoder_transplant = transplant_encoder(work, args.encoder_transplant)
+            agent = kindle.VectorAgent.restore_rgb(str(work), args.num_envs)
+            shutil.rmtree(work)
+            if agent.config != fresh_config or agent.learner_step != 0 or agent.environment_step != 0:
+                raise ValueError("encoder transplant changed the agent's configuration")
         if expected := os.environ.get("KINDLE_EXPECT_DEVICE_NAME"):
             require_gpu_device(agent.gpu_device, expected)
         if agent.config["action_count"] != actions:
@@ -1185,6 +1241,7 @@ def main():
                            EXPLORATION_PROTOCOL if exploration else VECTOR_PROTOCOL)
         emit(dict(event="run_start", protocol=vector_protocol, environment=args.environment,
                   **(dict(initial_checkpoint=initial_checkpoint) if initial_checkpoint else {}),
+                  **(dict(encoder_transplant=encoder_transplant) if encoder_transplant else {}),
                   num_envs=args.num_envs, steps=args.steps, seed=args.seed, environment_seeds=env_seeds,
                   **(dict(checkpoint_history=True) if args.checkpoint_history else {}),
                   **(dict(evaluation_episodes_per_stream=args.episodes_per_env) if args.episodes_per_env else {}),
