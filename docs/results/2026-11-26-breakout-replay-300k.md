@@ -278,6 +278,19 @@ game:
   is declared to separate the storage from the length and to give a
   first repeat of the unchanged configuration.
 
+**Update, 10:05 UTC November 26:** [that run](2026-11-26-breakout-byte-replay-100k.md)
+passes its tests. The byte storage is cleared, and the unchanged
+configuration repeats `D60`'s late level (410.3 against 412.2), so this
+run's 391.7 is 19.5 below the two pooled (standard error 6.8) and the
+long replay's cost on the late level stands. The same run takes off 55
+per game *ahead* of `D60` over 0.4M to 1.2M: the take-off moves by a
+100k bin either way between runs of one configuration, and the late
+take-off reported above is not outside that spread. Its dump also
+shares this run's paddle read, reversals and move into contact; what
+remains this run's own is the halved latent loss, the value at 1.91
+times the real return, and the lower mass on holding still from a
+paddle in place.
+
 ## Limits
 
 - One seed, one run. The recipe's seeds spread from 364 to 412 per
