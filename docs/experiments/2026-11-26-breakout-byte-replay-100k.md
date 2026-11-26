@@ -29,9 +29,9 @@ the replay root):
   replay's length, not its storage.
 - The level after the rate cut does not separate that way. The only
   runs at 410 and more are `D60` and `N60`, which are one trajectory
-  until 2.4M; the two other runs with a short replay and the recipe's
-  model (`C60`, a changed input) and `R60` both sit 21 to 25 lower
-  after the cut, having been level with `D60` before it.
+  until 2.4M; `C60` (the recipe with a cropped input) and `R60` both
+  sit 21 to 25 lower after the cut, having been within 10 of `D60`
+  over 1.2M to 2.4M.
 - The byte replay holds the same values as the float replay: the
   preprocessing emits Pillow-rounded bytes, the pack shader stores
   them, and the host decodes `byte / 255 - 0.5`. What it changes is the
@@ -69,7 +69,7 @@ game cut; peak device memory against the projection.
 
 1. **Take-off:** the training return per game over 0.4M to 1.2M is 153
    or more (the midpoint of `R60`'s 134.7 and the other runs' 171 to
-   174; three standard errors from either).
+   174; more than three standard errors from either).
 2. **Level:** the training return per game over 2.8M to 3.6M is 400 or
    more (`D60` 412.2, `N60` 422.9; `C60` 392.1, `R60` 391.7).
 3. **Greedy play:** no greedy cell at 2.8M, 3.2M or 3.6M has a game cut

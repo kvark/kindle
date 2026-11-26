@@ -269,7 +269,7 @@ game:
 - The late take-off is this run's alone, and `A60`, which stored bytes
   at 80,000 frames, does not share it: it belongs to the replay's
   length.
-- The late deficit is not this run's alone. `C60` is level with `D60`
+- The late deficit is not this run's alone. `C60` is within 10 of `D60`
   to 2.4M and 21 lower after the cut, as this run is 25 lower; `D60`
   and `N60` are one trajectory to 2.4M. Whether 410 is this seed's
   level or one trajectory's has not been measured, so "the rate cut
