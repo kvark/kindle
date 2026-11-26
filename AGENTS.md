@@ -867,6 +867,22 @@ state takes 37,888 bytes against 120,832, and the device allocator
 rounds each replay page up to a power of two, which is what the 31 MiB
 byte pages are sized for. The recipe keeps its 100,000-frame float
 replay.
+Post hoc on the five full runs of seed 6007: the late take-off is
+`R60`'s alone (`A60`, with a byte replay at 80,000 frames, took off
+with the others), while the deficit after the rate cut is shared by
+`C60` (389.2 over 2.4M to 3.6M, `R60` 385.1, `D60` 410.0, `N60` 418.3),
+and `D60` and `N60` are one trajectory to 2.4M: **how far the same
+configuration on one seed moves between runs has not been measured.**
+**Running:**
+[`B60`](docs/experiments/2026-11-26-breakout-byte-replay-100k.md),
+`D60`'s command with `--replay-compact` appended and nothing else
+changed (the assistant's design; same root, `queue-42.json`, guards
+`guards-42`, 21 jobs, unit `kindle-breakout-bytereplay6007-20261126`,
+launched 02:18 UTC November 26, about 7 hours of training, projected
+device memory 6.8 GiB). It separates the byte storage from the replay's
+length and is the first repeat of the unchanged configuration on a
+seed (the byte replay holds the float replay's values and differs in a
+float's last place).
 The standardized objective (`--cdp-scale-floor`) is source only,
 not in the installed extension. The first queue stopped at job 9 of 23 on a **full disk**
 (`/` at 100%; another project's run directory holds 935 GB), not a GPU
